@@ -840,6 +840,16 @@ def test_the_generators_report_prints_what_her_notes_no_longer_carry(tmp_path):
         "her 238 seamen, 193 men at the guns, 36 of them marines, and 2 at the wheel leave 79"
         " trimmers; the bill keeps 14 marines in their division." in said
     )
+    # the fits' own marines (package 75, B1: the lead's ruling (4) of 2026-11-13)
+    assert (
+        "sixty-four: on 'ardent class 1794': 312 men at the guns, 16 of them marines at its"
+        " carronades; the fit keeps 68 marines in their division." in said
+    )
+    assert (
+        "razee: on 'as razeed 1795': 197 men at the guns, 12 of them marines at its carronades;"
+        " the fit keeps 38 marines in their division." in said
+    )
+    assert said.count("the fit keeps") == 2
     assert "razee: her taffrail 7.15 m above her water" in said
     assert "sixty-four: mizen course: tack 8.73 m above her water, 6.5 ft above" in said
     assert "sixty-four: driver: jaws 9.69 m, set by the clearance" in said
@@ -1226,36 +1236,37 @@ def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured
 
 
 @pytest.mark.parametrize(
-    "path, fit, filled, crews, division, trimmers, unmanned",
+    "path, fit, kept, filled, crews, at_carronades, trimmers, unmanned",
     [
-        (
-            SIXTY_FOUR,
-            "ardent class 1794",
-            33,
-            36,
-            84,
-            53,
-            "the upper deck, No. 13 gun, and the poop, No. 3 gun",
-        ),
-        (RAZEE, "as razeed 1795", 19, 22, 38, 79, "the guns, Nos. 12 to 13 and 17"),
+        (SIXTY_FOUR, "ardent class 1794", 68, 36, 36, 16, 53, None),
+        (RAZEE, "as razeed 1795", 38, 19, 22, 12, 79, "the guns, Nos. 12 to 13 and 17"),
     ],
 )
-def test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short(
-    path, fit, filled, crews, division, trimmers, unmanned
+def test_her_other_fits_beat_keeps_the_fits_own_marines(
+    path, fit, kept, filled, crews, at_carronades, trimmers, unmanned
 ):
-    """The bill's `marines` is set against the default fit, as its trimmers are (the lead's answer
-    of 2026-11-10 at 19:30, built): on her other fit the beat keeps the same marines in their
-    division and the long guns take none, so her seamen fall short of the guns. Measured at seed 7,
-    for the lead: the 64's 'ardent class 1794' fills 33 of 36 crews (the lower deck's No. 13 8 of
-    11, the upper deck's No. 13 and the poop's No. 3 unmanned; old, all 36, 76 marines at the long
-    guns and 8 at the carronades, the trimmers 121); the razee's 'as razeed 1795' 19 of 22 (Nos. 12
-    and 13 unmanned and No. 17 1 of 7, her 12 carronade marines at their guns and 38 in the
-    division; old, all 22, 46 marines at the long guns and 4 at the carronades, the trimmers 89).
-    The beat says it: "Not hands enough for every gun: ... stand unmanned." A key by fit, or the
-    long guns taking marines where the seamen run out, is the lead's to rule."""
+    """The lead's ruling (4) of 2026-11-13, built (package 75, B1: the marines by fit): her other
+    fit gives its own `marines`, the bill's rule on its guns (her marines less the marines at its
+    carronades, the long guns taking none: B7.b's rule stands), JUDGEMENT in the fit's note; the
+    beat keeps that many in their division when she carries it, the carronades take the rest of
+    her marines first and the long guns none. Measured at seed 7: the 64's 'ardent class 1794'
+    keeps 68 and fills all 36 crews, her 16 carronade marines at their guns ("Quarters: 36 gun
+    crews manned, the trimmers 53, the helm 2, the powder 29, the marines 68.", no gun unmanned);
+    the razee's 'as razeed 1795' keeps 38, the same men as before, and her seamen still fall short
+    of her long guns, the bill's trimmers set against the default fit (Nos. 12 and 13 unmanned and
+    No. 17 1 of 7). Old (0e5ff12d, `test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_
+    guns_short`, the bill's 84 and 14 on every fit): the 64's 1794 fit 33 of 36 crews filled (the
+    lower deck's No. 13 8 of 11, the upper deck's No. 13 and the poop's No. 3 unmanned), all 84 in
+    the division and none at the carronades, "Quarters: 34 gun crews manned, ... the marines 84."
+    and "Not hands enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand
+    unmanned."; the razee's as now, man for man."""
+    from freesail.crew.model import Station
     from freesail.crew.quarters import MARINES, TRIMMERS, quarters_of
     from tests.test_brains import world_at
 
+    spec = load_spec(path)
+    assert spec.armament.fits[fit].marines == kept
+    assert spec.armament.fits[spec.armament.default].marines is None
     w = world_at(49.5, -5.5, path, fit=fit)
     assert w.ship.fit == fit
     w.run(10)
@@ -1264,9 +1275,20 @@ def test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short(
     q = quarters_of(w.ship)
     assert sum(1 for gc in q.crews.values() if len(gc.members) == gc.wanted) == filled
     assert len(q.crews) == crews
-    assert len(q.divisions[MARINES]) == division
+    at_guns = [
+        gc.kind for gc in q.crews.values() for s in gc.members if s.station is Station.MARINES
+    ]
+    assert (at_guns.count("long"), at_guns.count("carronade")) == (0, at_carronades)
+    assert len(q.divisions[MARINES]) == kept
     assert len(q.divisions[TRIMMERS]) == trimmers
-    assert f"Not hands enough for every gun: {unmanned} stand unmanned." in said.text
+    if unmanned is None:
+        assert "Not hands enough" not in said.text
+        assert q.describe()[0] == (
+            f"Quarters: {crews} gun crews manned, the trimmers {trimmers}, the helm 2, the powder "
+            f"29, the marines {kept}."
+        )
+    else:
+        assert f"Not hands enough for every gun: {unmanned} stand unmanned." in said.text
 
 
 @pytest.mark.parametrize("path", [SIXTY_FOUR, RAZEE])

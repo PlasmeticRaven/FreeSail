@@ -878,6 +878,22 @@ No. 3 unmanned; old 36 of 36, 76 marines at the long guns), and the razee's 'as 
 saying "Not hands enough for every gun: ... stand unmanned."; a key by fit, or the long guns
 taking marines where the seamen run out, is yours. No recorded passage holds either ship.*
 
+*The marines by fit, at the lead's ruling (4) of 2026-11-13 (built 2026-11-13, B1's module through
+the generator): "a figure for each fit whose complement differs ... from the establishment where a
+source on file gives it, else JUDGEMENT marked so; the long guns do not take marines". A fit's own
+`marines` (`FitSpec.marines`), kept by the beat in place of the bill's when she carries the fit:
+the 64's 'ardent class 1794' **68** (her 84 less the 16 at its carronades of 1794) and the razee's
+'as razeed 1795' **38** (her 50 less the 12 at its six carronades), each JUDGEMENT in its note, the
+bill's rule on the fit's guns: no establishment of private marines by rate or by year is on file
+(Ind §10.8), and a file bears one company whatever her fits (the class's 500 as built and 491 from
+1794, Winfield 1793-1817 p. 99; the razee's 310 at first and 330 afterwards, James vol. 1 p. 454).
+The beat at muster (seed 7), old beside new: the 64's 1794 fit fills 36 of 36 crews (33), her 16
+carronade marines at their guns (none) and 68 in the division (84), "Quarters: 36 gun crews manned,
+the trimmers 53, the helm 2, the powder 29, the marines 68."; the razee's 1795 fit the same men man
+for man, still three crews short, her trimmers set against 1796 (for the lead: a trimmers figure by
+fit would be the same kind of key). The default fits as before. The tuning notes, "The lead's notes
+of 2026-11-12 and 13, built", subsection 3.*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores

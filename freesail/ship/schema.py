@@ -101,6 +101,12 @@ its file's own keys (`lie_a_try: {helm_deg: 20}`), which the runner gives the sc
 evolution file's (`Runner._timing`); the script's logic is unchanged. Only the 74's and the 64's
 files carry it; a file without it has every evolution's own timing, and a spec pickled before it
 reads as one with none.
+
+Package 75's B1, the lead's ruling (4) of 2026-11-13 (the marines by fit), adds a fit's own
+`marines`: the marines the quarter bill keeps in their division at the beat when she carries that
+fit, where it differs from the bill's own (which is the default fit's), a whole number no more than
+the file's marines. Only the 64's 'ardent class 1794' and the razee's 'as razeed 1795' carry it; a
+fit without it keeps the bill's, and a fit pickled before it reads as one without it.
 """
 
 from __future__ import annotations
@@ -278,6 +284,7 @@ FIT_KEYS = (
     "powder_barrels",
     "exercise_charges",
     "shot",
+    "marines",  # package 75, B1: the marines the bill keeps on this fit
 )
 ARMAMENT_KEYS = ("default", "fits", "numbering")
 # How a file numbers its broadside guns (package 75, B7.d's stage 0: the 74's design,
@@ -871,6 +878,19 @@ class FitSpec:
     charges: dict[tuple[str, float], float] | None = None
     powder_barrels: int = 0
     exercise_charges: int = 0
+    # package 75, B1 (the lead's ruling (4) of 2026-11-13): the marines the quarter bill keeps in
+    # their division at the beat when she carries this fit, where it differs from the bill's own
+    # `marines` (the default fit's); None, the bill's. A plain default, left out of the pickle
+    # while None, so that a fit without it, and one pickled before it, is pickled as before it.
+    marines: int | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, its marines only where the fit gives them (package
+        75, B1), so that a fit without them is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("marines") is None:
+            state.pop("marines", None)
+        return state
 
 
 @dataclass
@@ -1309,6 +1329,10 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
         exercise_charges=_count(
             raw.get("exercise_charges", 0), f"{where}'s charges for exercise", source
         ),
+        # package 75, B1: no more than her marines (`validate`, which has the crew)
+        marines=_count(raw["marines"], f"{where}'s marines kept in their division", source)
+        if raw.get("marines") is not None
+        else None,
     )
 
 
@@ -2683,6 +2707,15 @@ def validate(spec: ShipSpec) -> None:
                             f"{src}: the fit '{fit.name}' has two No. {g.number} guns to {g.side}."
                         )
                     pairs.add(key)
+    # a fit's own marines kept (package 75, B1) are men she bears, as the bill's are
+    if spec.armament is not None:
+        bears = spec.crew.stations.get("marines", 0) if spec.crew is not None else 0
+        for fit in spec.armament.fits.values():
+            if fit.marines is not None and fit.marines > bears:
+                raise ShipFileError(
+                    f"{src}: the fit '{fit.name}' keeps {fit.marines} marines in their division, "
+                    f"but the crew has {bears}; it cannot keep more marines than she bears."
+                )
     # the quarter bill's trimmers are men of their stations
     bill = spec.crew.quarter_bill if spec.crew is not None else None
     if bill is not None:

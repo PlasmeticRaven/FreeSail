@@ -20363,13 +20363,14 @@ reads these notes), the bilander's and the schooner's hull tests run again on th
 ## The lead's notes of 2026-11-12 and 13, built (package 75) (2026-11-13)
 
 The lead's notes to the ships session of 2026-11-12 at 21:20 UTC and of 2026-11-13 at 01:05, 01:15
-and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), two of whose rulings are built here in two
-local commits on the package's branch after the trunk's second merge (94bfac27), a subsection for
-each: (2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world. Measured on the
-owner's machine at seed 7, the scripts in the session's scratch (`s13/mend/`, `s13/s196/`), outside
-the repository, each run on the tree and on an export of 94bfac27 (the toggle of the first commit:
-`freesail/world/brains.py` as it was there, nothing else differing in the code). The rest of the
-four notes (the 13th's (3) to (9), the 12th's asks) are not these commits'.
+and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), whose rulings are built here in local
+commits on the package's branch after the trunk's second merge (94bfac27), a subsection for each:
+(2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world; (4) of 01:05, the
+marines by fit. Measured on the owner's machine at seed 7, the scripts in the session's scratch
+(`s13/mend/`, `s13/s196/`, `s13/marines/`), outside the repository, each run on the tree and on an
+export of the commit before (for the first, 94bfac27: `freesail/world/brains.py` as it was there,
+nothing else differing in the code). The rest of the four notes (the 13th's (3) and (5) to (9), the
+12th's asks) are not these commits'.
 
 ### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
 
@@ -20624,6 +20625,130 @@ and Build-Ships (`test_practice`, `test_indefatigable`, `test_hull_schooner`) 12
 `check` and `format --check` clean (382 files). Not run again: the whole fast tier, the slow
 candidates, the captain's trials and the four whole logs (no code, data or file moved since the
 first commit's runs).
+
+### 3. B1: the marines by fit (01:05 (4))
+
+**The ruling.** "The marines: a figure for each fit whose complement differs (the 64's 'ardent
+class 1794', the razee's 'as razeed 1795'), from the establishment where a source on file gives it,
+else JUDGEMENT marked so; the long guns do not take marines (B7.b's rule stands: the bill keeps them
+for the small arms)."
+
+**How it is read.** The bill's `marines` is set against the default fit, as its trimmers are (the
+section of 2026-11-12, subsection 3, "B1: the 64's and the razee's `marines`"), and the two fits
+named are the files' others, whose carronades differ: the 64's 'ardent class 1794' carries the
+class's carronades of 1794 (16 men a side, where 1784 has none), the razee's 'as razeed 1795' six
+42-pounder carronades (12 men a side, where 1796's eighteen take 36). Their complements differ by
+the sources too, the class's 500 as built and 491 from 1794 (Winfield 1793-1817 p. 99), the
+razee's 310 at first and 330 afterwards (James vol. 1 p. 454), but a file carries one company
+whatever her fits (the 64's note on her complement), so the figure by fit is the marines the bill
+keeps on the fit, of the one company. Built as a fit's own `marines`, beside its guns, whose crews
+are the fit's already; a fit without one keeps the bill's.
+
+**The establishment, looked for.** None of private marines by rate or by year is on file: Ind §10.8
+(the Internet Archive's full text, James, Clowes, the *Naval Chronicle*, Gillespie 1803, the Royal
+Marines' *Historical Record* of 1845) and Bel §10 item 6 (the Regulations, James, Clowes, Glascock,
+Gillespie, Nicolas's *Historical Record*, Steel's Lists, Falconer) found none; the Regulations'
+columns give the marines' officers and NCOs alone (p. 165: Ind §4.2); the owner's books on file give
+the class's men and no marines (Winfield 1793-1817 p. 99, the Ardent class; p. 100, *Indefatigable*)
+and a 74's company of 1761 (Lavery 1985 p. 17, Table 7: Bel §13.4); Falconer's men to the small arms
+by the Admiralty's order (1780, QUARTERS: a 4th rate of 60 guns 70, a 5th rate 50) are marines and
+seamen together, the bill's proxy and no establishment of marines (Indf §6.4). So each figure is
+**JUDGEMENT**, marked so in the fit's note with its reason: the bill's own rule on the fit's guns,
+her marines less the marines at the fit's carronades, the carronades taking the marines first and
+the long guns none.
+
+**As built:**
+- `freesail/ship/schema.py`: `FIT_KEYS` gains `marines`; `FitSpec.marines: int | None = None`, a
+  plain default, left out of the pickle while None (`FitSpec.__getstate__`, new), so that a fit
+  without it, and one pickled before it, pickles as before; read as a whole number not below nought,
+  and refused in words beyond the file's marines (`validate`: "the fit 'ardent class 1794' keeps 85
+  marines in their division, but the crew has 84; it cannot keep more marines than she bears.").
+  The module's head says it.
+- `freesail/crew/quarters.py`: `Quarters.beat` keeps the fit's own `marines` where her fit gives
+  them (`ship.fit_spec`), else the bill's, before the gun crews draw; the long guns' lists leave the
+  marines out as before (B7.b's rule). Its head's words on the bill's key brought up to the three
+  files that carry it.
+- `tools/ships/indefatigable.py`: `fit_marines`, after the bill, writes into each other fit, after
+  its `source`, the bill's rule on that fit's guns (`at_the_guns`) where it differs from the bill's,
+  with its note; the generator's report says each fit's arithmetic ("sixty-four: on 'ardent class
+  1794': 312 men at the guns, 16 of them marines at its carronades; the fit keeps 68 marines in their
+  division."). `tools/gen_ships.py`'s dump notes a fit's `marines:` line (no other file has one).
+- The two files by the generator: the 64's 'ardent class 1794' **`marines: 68`** (her 84 less the
+  16 at its carronades), the razee's 'as razeed 1795' **`marines: 38`** (her 50 less the 12), each
+  with its note; two lines each; every other file of the eighteen byte for byte.
+
+**The beat at muster, every fit** (`Quarters.beat`, seed 7, `tests/test_brains.py`'s world off the
+Lizard; ff58e07d's export beside the tree, `s13/marines/probe_fits.py`):
+
+| File, fit | Crews filled | Marines at the long guns | at the carronades | in their division | Trimmers |
+|---|---|---|---|---|---|
+| the 64, 'ardent class 1784' (default) | 32 of 32, both | 0, both | 0, both | 84, both | 53, both |
+| the 64, 'ardent class 1794' | 33 of 36 → **36 of 36** | 0, both | 0 → **16** | 84 → **68** | 53, both |
+| the razee, 'as carried 1796' (default) | 24 of 24, both | 0, both | 36, both | 14, both | 79, both |
+| the razee, 'as razeed 1795' | 19 of 22, both | 0, both | 12, both | 38, both | 79, both |
+
+The helm 2 and the powder 29 (the razee's 22) on each. The 64's 1794 line, old beside new: "Beat to
+quarters! Quarters: 34 gun crews manned, the trimmers 53, the helm 2, the powder 29, the marines 84.
+The lower deck: 13 gun crews, 140 men. The upper deck: 13 gun crews, 108 men. The quarterdeck: five
+gun crews, 30 men. The forecastle: two gun crews, 10 men. The poop: three gun crews, 8 men. Not hands
+enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand unmanned." now "Beat
+to quarters! Quarters: 36 gun crews manned, the trimmers 53, the helm 2, the powder 29, the marines
+68. The lower deck: 13 gun crews, 143 men. The upper deck: 13 gun crews, 117 men. The quarterdeck:
+five gun crews, 30 men. The forecastle: two gun crews, 10 men. The poop: three gun crews, 12 men."
+The razee's 1795 fit keeps the same men man for man: the bill's 14 kept, her 12 carronade marines
+went to their guns and the other 24 to the division (38) already; now 38 kept and the same 12 at the
+guns.
+
+**For the lead** (not built, not ruled): (a) the razee's 'as razeed 1795' still leaves three crews
+short, her Nos. 12 and 13 unmanned and No. 17 1 of 7 (28 seamen short at the long guns): her bill's
+trimmers, 79, are set against 1796's guns, and on 1795's her seamen, 238, less the 79, the helm's 2
+and the long guns' 185, fall short; a trimmers figure by fit (51 on 1795 would man every gun) is the
+same kind of key. (b) The 74's 'as the bellona 1812' carries 28 carronade men a side where her
+default's carry 16; by the same rule her fit's figure would be 83 (her 111 less 28), where the bill's
+95 leaves 12 of those carronades' men seamen; every crew fills either way (her trimmers 69, against
+81 at 83 kept: measured in memory). Not built: the ruling names the 64's and the razee's fits, and her
+file is B7's.
+
+**Pins moved, old beside new.** `tests/test_indefatigable.py`:
+`test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short` (two cases: the 64's 1794
+fit 33 of 36 filled, 84 in the division, "the upper deck, No. 13 gun, and the poop, No. 3 gun stand
+unmanned"; the razee's 1795 fit 19 of 22, 38, "the guns, Nos. 12 to 13 and 17") is now
+`test_her_other_fits_beat_keeps_the_fits_own_marines` (the 64's 36 of 36, 68 kept and 16 at the
+carronades, her beat's first line, no gun unmanned; the razee's as before, the fit's 38 asserted;
+each fit's figure and the default's None); the generator's report test gains the two fits' lines.
+**New:** `tests/test_bill_marines_and_flag.py`, a fit's own marines on the two fits alone and every
+other fit of every file pickling with the keys it held before (18 cases), a fit pickled before
+reading the bill's at the beat (84), the refusals in words (4) and the whole range read (1).
+
+**Whether a recorded passage moves:** none holds either ship on either fit. No shipped scenario or
+business names the 64 or the razee (B7.e's finding, looked for again: outside the ships' own files
+and their people no file of `data/` names either), and a fit without the key reads the bill's as
+before, so no other ship's beat moves; the four whole logs and the captain's trials ("The suites, as
+run", the three steps together). **Lines any ship may say that change:** the 64's, on her 'ardent
+class 1794' alone: her "Beat to quarters!" line (above), "Not hands enough for every gun" no longer
+said there, and what follows from who is at quarters (her carronades manned by marines, the
+marines' division 68, the marines to their muskets and back, the robbing at quarters); nothing of
+the razee's (the same men), of the default fits or of any other file.
+
+**The suites, as run.** Once, on ff58e07d with this step uncommitted, from the tree root with `py`,
+one run at a time, the branch and the tree asserted first, each pytest with `-n 4 -p no:cacheprovider
+-o addopts="--dist loadgroup"` (`scratchpad/s13/marines/after/run.sh`), 04:14 to 04:25 UTC, against
+the bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`):
+- **The files** (`--slow -m "not pace"`: `test_bellerophon`, `test_indefatigable`,
+  `test_bill_marines_and_flag`, `test_magazine`, `test_fight`, `test_filling`, `test_dumb_show`,
+  `test_lee_ports`, `test_subtypes`, `test_neufchatel`, `test_bilander`, `test_profile`,
+  `test_profiles`, `test_ships`, `test_in_world`; the files that beat to quarters, pickle a fit or
+  run the generator): **1,039 passed** (189 s). Against the bases restricted to them (1,017): **no
+  outcome changed**; only in the bases, the two old cases of the other fits' beat (renamed above),
+  the strict expected failure made one with the 64's case at f5102fae and truth 7-196's crewed
+  clause, a pace test, outside `not pace` (it fails at the base and passes since ff58e07d); only in
+  this run, the 26 new and renamed cases above, all passed.
+- **`tests/test_known_truths.py`'s fast tier:** 205 passed (437 s); against the base's 190, no
+  outcome changed, the 15 only here the trunk's (package 102's truth 7-501, six; package 104's 7-510
+  to 7-518, nine), as at f5102fae.
+- **The generator** into scratch: eighteen of eighteen files byte for byte with `data/ships/`, the
+  64's and the razee's as written here; `tools/check_viewer_guns.py` clean. **ruff** `check` and
+  `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

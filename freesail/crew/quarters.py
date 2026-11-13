@@ -30,18 +30,21 @@ station (`tick`), so the guns refill as the tack ends, the forward guns first.
 
 **The bill by deck** (package 75, B7.b: `docs/design/Design-Ship-Bellerophon.md` §6.4, the
 owner's answer 9 and the lead's answers of 2026-10-29, items (1) and (2)), each part keyed so that
-it reaches no ship it was not ruled for. The bill's `marines` (her stage 0c's key, which only the
-74's file carries) keeps that many marines in their division at the beat, before the gun crews
-draw, and the long guns' lists then leave the marines out while the carronades keep them first
-(Falconer 1780, QUARTERS: the marines "generally quartered on the poop and forecastle, or
-gangway"). On a ship whose broadside guns stand on a `lower` deck (the two two-deckers), each
-crew keeps its deck; where they stand on the lower and the upper deck both, the beat says each
-deck's crews and men in a line ("The lower deck: 14 gun crews, 182 men."); and robbing
-takes, after the swivels and the chasers, first the lower-deck crews whose gun on the engaged
-side is shut by the sea, then the other decks' crews from the end that bears least, then the
-lower deck's from that end, its line naming the decks. A ship with no `lower` deck robs, says and
-pickles as before. The stations by deck are the thirds of the length on each deck, unchanged: no
-period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
+it reaches no ship it was not ruled for. The bill's `marines` (her stage 0c's key, which the 74's,
+the 64's and the razee's files carry) keeps that many marines in their division at the beat, before
+the gun crews draw, and the long guns' lists then leave the marines out while the carronades keep
+them first (Falconer 1780, QUARTERS: the marines "generally quartered on the poop and forecastle, or
+gangway"). A fit that gives its own `marines` (package 75, B1, the lead's ruling (4) of
+2026-11-13: the 64's 'ardent class 1794' and the razee's 'as razeed 1795') keeps that many in
+place of the bill's when she carries it; the long guns take none either way. On a ship whose
+broadside guns stand on a `lower` deck (the two two-deckers), each crew keeps its deck; where they
+stand on the lower and the upper deck both, the beat says each deck's crews and men in a line ("The
+lower deck: 14 gun crews, 182 men."); and robbing takes, after the swivels and the chasers, first
+the lower-deck crews whose gun on the engaged side is shut by the sea, then the other decks' crews
+from the end that bears least, then the lower deck's from that end, its line naming the decks. A
+ship with no `lower` deck robs, says and pickles as before. The stations by deck are the thirds of
+the length on each deck, unchanged: no period source quarters the parts of the ship by deck (Bel-D
+§6.4 item 3).
 
 **Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
 whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
@@ -239,9 +242,11 @@ class Quarters:
         if len(divisions[HELM]) < helm_n:
             rest = [s for s in pool if s.station is not Station.MARINES]
             divisions[HELM] += take(rest, helm_n - len(divisions[HELM]), HELM)
-        # the marines the bill keeps in their division (package 75, B7.b: the bill's `marines`,
-        # which only the 74's file carries), before the gun crews draw
-        kept = getattr(bill, "marines", None)
+        # the marines the bill keeps in their division (package 75, B7.b: the bill's `marines`),
+        # before the gun crews draw; her fit's own where it gives them (package 75, B1)
+        kept = getattr(getattr(ship, "fit_spec", None), "marines", None)
+        if kept is None:
+            kept = getattr(bill, "marines", None)
         if kept is not None:
             divisions[MARINES] += take(by_station[Station.MARINES], int(kept), MARINES)
         # the gun crews, forward first, chasers next, the swivels last

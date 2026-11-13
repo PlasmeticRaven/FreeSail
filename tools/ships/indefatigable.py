@@ -2474,6 +2474,7 @@ def write(out_dir, p):
     company(b, p, guns)
     armament(b, p, fits)
     quarter_bill(b, p, guns)
+    fit_marines(b, p, fits)
     boats_pumps_hold(b)
     b.descriptions([DESCRIPTIONS[p.key]])
     if p.key in LIE_A_TRY_HELM_DEG:
@@ -4646,6 +4647,53 @@ def quarter_bill(b, p, guns):
     )
 
 
+# The company each file bears whatever her fit, as the sources give it by year (a file carries
+# one company: the 64's note, Indf §6.1), for the fits' own marines (B1, the marines by fit).
+COMPANY_BY_YEAR = {
+    "sixty-four": "the class's 500 as built and 491 from 1794, Winfield 1793-1817 p. 99; the "
+    "file's the 491",
+    "razee": "her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330",
+}
+
+
+def fit_marines(b, p, fits):
+    """Each fit's own `marines` where it differs from the bill's (package 75, B1: the lead's
+    ruling (4) of 2026-11-13, the marines by fit): the bill's rule on the fit's guns, her marines
+    less the marines at the fit's carronades (`at_the_guns`, the carronades taking the marines
+    first and the long guns none: B7.b's rule stands), written into the fit after `source`, as the
+    bill's own is written after the generator's call. JUDGEMENT, said in the note: no
+    establishment of private marines by rate or by year was found (Ind §10.8), and the file bears
+    one company whatever her fit. The report says each fit's arithmetic."""
+    co = COMPANY[p.key]
+    kept = b.doc["crew"]["quarter_bill"]["marines"]
+    for name, _, guns, _ in fits:
+        men, marines_at = at_the_guns(guns, co["marines"])
+        n = co["marines"] - marines_at
+        if name == DEFAULT_FIT[p.key] or n == kept:
+            continue
+        REPORT.setdefault(p.key, {}).setdefault("fit_marines", []).append(
+            (name, men, marines_at, n)
+        )
+        fit = b.doc["armament"]["fits"][name]
+        items = list(fit.items())
+        fit.clear()
+        for k, v in items:
+            fit[k] = v
+            if k == "source":
+                fit["marines"] = n
+        b.armament_notes[("fit", name, "marines")] = (
+            "The marines the bill keeps in their division at the beat when she carries this fit "
+            "(package 75, B1; the lead's ruling (4) of 2026-11-13): her "
+            f"{co['marines']} marines but the {marines_at} at this fit's carronades, who take them "
+            "first, the long guns taking none (the bill's rule, Bel-D §12.1 and B7.b: the marines "
+            "quartered on the poop and the forecastle or gangway, at the great guns only in "
+            f"distant cannonading, Falconer 1780, QUARTERS); the bill's {kept} (above) is the "
+            "default fit's. JUDGEMENT: the bill's rule on this fit's guns, since no establishment "
+            "of private marines by rate or by year was found (Ind §10.8) and the file bears one "
+            f"company whatever her fit ({COMPANY_BY_YEAR[p.key]})."
+        )
+
+
 def company(b, p, guns):
     """Her crew section (Indf §6.1-§6.2), the people drawn at muster from her wardroom file
     (§6.3), and the stores beside them: water, provisions and cordage by her complement, a shot
@@ -5089,6 +5137,11 @@ def her_report() -> str:
                 f"{key}: the quarter bill on '{fit}': her {seamen} seamen, {men} men at the guns, "
                 f"{marines} of them marines, and {HELM} at the wheel leave {total} trimmers; the "
                 f"bill keeps {kept} marines in their division."
+            )
+        for name, men, marines, kept in r.get("fit_marines", ()):
+            out.append(
+                f"{key}: on '{name}': {men} men at the guns, {marines} of them marines at its "
+                f"carronades; the fit keeps {kept} marines in their division."
             )
         if "upper_works" in r:
             out.append(f"{key}: {r['upper_works']}")
