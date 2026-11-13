@@ -109,6 +109,8 @@ def _flags(world: Any, _: str | None) -> dict[str, Any] | None:
     words = "; ".join(flown) if flown else "none (her colours are down)"
     if hoists:
         words += "; the signal flying: " + "; ".join(hoists)
+    if getattr(locker, "dressed", False):
+        words += "; the ship dressed"  # package 102 (step 4)
     return {
         "words": words,
         "flying": [{"name": f["name"], "place": f["place"]} for f in listed or []],

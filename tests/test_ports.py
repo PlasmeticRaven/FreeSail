@@ -2180,13 +2180,25 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
         assert f.dealings.stance(f.ports.ports["genoa"]) == french
         a = world_at(OFF_THE_LIZARD, ship=SCHOONER, ports=("genoa",), start=when)
         assert a.dealings.stance(a.ports.ports["genoa"]) == "neutral"
-    # the stance follows the world's day across the annexation, the loaded nation the first
+    # decision 69 (the lead's ruling of 2026-11-13, "the calendar and the world"), SUPERSEDING
+    # BY DESIGN 79d's "the stance follows the world's day across the annexation": begun on 3
+    # June and run into the 4th, the port is the world's as the record seeded it, Ligurian
+    # and neutral (79d had it hostile on the 4th); only where the scenario follows the
+    # historical course is the annexation the 4th's event, and hostile then, the port's own
+    # holder France's
     w = world_at(OFF_THE_LIZARD, ports=("genoa",), start=datetime(1805, 6, 3, 22))
     assert w.dealings.stance(w.ports.ports["genoa"]) == "neutral"
     w.run(4 * 3600)
     assert w.clock.ship_time.date() == date(1805, 6, 4)
     assert w.ports.ports["genoa"].nation == "liguria"
-    assert w.dealings.stance(w.ports.ports["genoa"]) == "hostile"
+    assert w.dealings.stance(w.ports.ports["genoa"]) == "neutral"
+    h = world_at(
+        OFF_THE_LIZARD, ports=("genoa",), start=datetime(1805, 6, 3, 22), follows_history=True
+    )
+    assert h.dealings.stance(h.ports.ports["genoa"]) == "neutral"
+    h.run(4 * 3600)
+    assert h.ports.ports["genoa"].nation == "france"
+    assert h.dealings.stance(h.ports.ports["genoa"]) == "hostile"
 
 
 # -- package 105, step 1: a port file's dated rows for more than its holder ----------------
@@ -2258,21 +2270,54 @@ def test_dated_rows_give_each_key_the_row_in_force_on_the_day(tmp_path):
     assert PT.load_port(path).pilot.names == ("the Order's pilot",)
 
 
-def test_dated_rows_turn_with_the_worlds_day(tmp_path):
-    """The row in force on the world's day is read wherever the key is read: the ports'
-    tick puts each dated key to the day when the day turns."""
-    path = _dated_port(tmp_path)
-    port = PT.load_port(path, when=datetime(1800, 9, 4, 12))
-    clock = type("Clock", (), {"ship_time": datetime(1800, 9, 4, 23, 59)})()
-    world = type("World", (), {"clock": clock})()
+def _ports_of(port, when, follows_history):
+    """A ports' table of one port in a world of a clock and a scenario, for the day's tick."""
+    clock = type("Clock", (), {"ship_time": when})()
+    scenario = type("Scenario", (), {"start_time": when, "follows_history": follows_history})()
+    world = type("World", (), {"clock": clock, "scenario": scenario})()
     ports = PT.Ports.__new__(PT.Ports)
     ports.world, ports.ports = world, {"testport": port}
+    return ports, clock
+
+
+def test_dated_rows_seed_the_port_and_the_day_moves_nothing(tmp_path):
+    """Decision 69 (the lead's ruling of 2026-11-13, "the calendar and the world"): the
+    record's rows seed the port on the scenario's first day and the port is then the
+    world's; the day's turn applies no row. SUPERSEDES BY DESIGN package 105's
+    `test_dated_rows_turn_with_the_worlds_day`, which had the ports' tick put each dated
+    key to the running day: there the port was open with a yard on 5 September 1800; here,
+    begun on the 4th, it stays blockaded with the chandlers', the record's change being no
+    longer the calendar's to make."""
+    path = _dated_port(tmp_path)
+    port = PT.load_port(path, when=datetime(1800, 9, 4, 12))
+    ports, clock = _ports_of(port, datetime(1800, 9, 4, 12), follows_history=False)
+    ports.tick()
+    assert port.state == "blockaded" and port.dockyard.kind == "chandlers"
+    clock.ship_time = datetime(1800, 9, 5, 0, 1)
+    ports.tick()
+    assert port.state == "blockaded" and port.dockyard.kind == "chandlers"
+    assert port.pilot.names == ("the pilot",)
+
+
+def test_dated_rows_are_the_days_events_where_the_scenario_follows_history(tmp_path):
+    """Decision 69: with `follows_history: true` each row that begins or ends on a day is
+    that day's event, and the old test's turn holds (open with a yard and the King's pilot
+    on 5 September 1800); a day of no event changes nothing, and a clock that jumps over
+    the event's day still takes it."""
+    path = _dated_port(tmp_path)
+    port = PT.load_port(path, when=datetime(1800, 9, 4, 12))
+    ports, clock = _ports_of(port, datetime(1800, 9, 4, 12), follows_history=True)
     ports.tick()
     assert port.state == "blockaded" and port.dockyard.kind == "chandlers"
     clock.ship_time = datetime(1800, 9, 5, 0, 1)
     ports.tick()
     assert port.state == "open" and port.dockyard.kind == "yard"
     assert port.pilot.names == ("the King's pilot",)
+    jumped = PT.load_port(path, when=datetime(1800, 9, 1, 12))
+    ports, clock = _ports_of(jumped, datetime(1800, 9, 1, 12), follows_history=True)
+    clock.ship_time = datetime(1800, 9, 9, 6)
+    ports.tick()
+    assert jumped.state == "open" and jumped.dockyard.kind == "yard"
 
 
 def test_a_scenarios_entry_goes_over_every_dated_row(tmp_path):

@@ -75,7 +75,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -551,14 +551,38 @@ class Port:
     dated: tuple[tuple[str, tuple[dict[str, Any], ...]], ...] = ()
 
     def on_day(self, when: datetime | date | None) -> None:
-        """Put each dated key's row in force on the day into its field (the world's day,
-        `Ports.tick`); a port of single values is untouched."""
+        """Put each dated key's row in force on the day into its field, whatever play has
+        made of it (a port of single values is untouched). Not the day's tick since decision
+        69, which applies only the record's events (`on_events`); kept for a reader that
+        sets a port to a day by design."""
         for key, rows in self.dated:
             value = _value_on(rows, when)
             if key == "state":
                 self.state, self.blockade = value
             else:
                 setattr(self, key, value)
+
+    def on_events(self, after: date, day: date) -> list[str]:
+        """The record's events after one day and up to another (decision 69, a scenario that
+        follows the historical course; `Ports.tick`): each dated key, and the holder, whose
+        rows begin or end on a day of (after, day] put to the row in force on `day`; a key
+        with no event keeps whatever play has made of it. The keys moved, the holder as
+        `nation`."""
+        moved = []
+        for key, rows in self.dated:
+            if _event_between(rows, after, day):
+                value = _value_on(rows, day)
+                if key == "state":
+                    self.state, self.blockade = value
+                else:
+                    setattr(self, key, value)
+                moved.append(key)
+        if self.nations and _event_between(self.nations, after, day):
+            held = _dated_nation(self.nations, day)
+            if held:
+                self.nation = held
+                moved.append("nation")
+        return moved
 
     def nation_on(self, when: datetime | date | None) -> str:
         """The port's nation on a day: its dated entry for the day, else `nation`."""
@@ -685,7 +709,8 @@ def load_port(
     state = state or {}
     # package 105, step 1: each of these keys one value, or dated rows of {<key>, since,
     # until, source} (`_dated_rows`), the row in force on the day put in the Port's field
-    # (`Port.on_day`); a file of one value reads exactly as before.
+    # (`Port.on_day`), and the port then the world's (decision 69: `Port.on_events` where
+    # the scenario follows history); a file of one value reads exactly as before.
     dated = (
         ("pilot", _dated_rows(doc, "pilot", where, _pilot)),
         ("market", _dated_rows(doc, "market", where, _market)),
@@ -900,6 +925,18 @@ def _row_on(rows: tuple[dict[str, Any], ...], when: datetime | date | None) -> d
 
 def _value_on(rows: tuple[dict[str, Any], ...], when: datetime | date | None) -> Any:
     return _row_on(rows, when)["value"]
+
+
+def _event_between(rows: tuple[dict[str, Any], ...], after: date, day: date) -> bool:
+    """Whether a row begins, or the day after a row's end falls, within (after, day]: the
+    record's event of those days (decision 69)."""
+    for row in rows:
+        since, until = row.get("since"), row.get("until")
+        if since and after < since <= day:
+            return True
+        if until and after < until + timedelta(days=1) <= day:
+            return True
+    return False
 
 
 def _nations(raw: Any, where: str) -> tuple[dict[str, Any], ...]:
@@ -1201,10 +1238,11 @@ class Ports:
     def stance(self, port: Port, nation: str) -> str:
         """The port's stance toward a ship of the nation: the nations' table over the
         port's closures and its blockade (`Nations.stance`)."""
-        # package 79d: a port of dated nations by the world's day (Genoa's annexation)
-        port_nation = port.nation_on(self.world.clock.ship_time) if port.nations else port.nation
+        # decision 69: the port's own holder, seeded by its dated nation on the first day
+        # and moved by the record's events only where the scenario follows history
+        # (`Ports.tick`), as the prices and the prize court read it
         return self.world.nations.stance(
-            port_nation, str(nation), port.closed_to, blockaded_by=port.blockaded_by
+            port.nation, str(nation), port.closed_to, blockaded_by=port.blockaded_by
         )
 
     def nearest_to(
@@ -1331,21 +1369,31 @@ class Ports:
         return out
 
     def tick(self) -> None:
-        """The world's ports' tick, once a tick of the World that owns them: each port's
-        dated keys put to the world's day when the day turns (package 105, step 1;
-        `Port.on_day`); the markets recover as they are read; each hull's dealings tick in
-        her World's tick, her jobs with them. The place for the sleeping hulls' jobs (step
-        5)."""
+        """The world's ports' tick, once a tick of the World that owns them. The dated
+        record seeded each port on the scenario's first day (`load_port`) and the port is
+        then the world's (decision 69): nothing is applied by the day. Where the scenario
+        follows the historical course (`Scenario.follows_history`), each row that begins or
+        ends on a day is that day's event when the day turns (`Port.on_events`), and a key
+        with no event keeps what play made of it. The markets recover as they are read;
+        each hull's dealings tick in her World's tick, her jobs with them."""
+        scenario = getattr(self.world, "scenario", None)
+        if not getattr(scenario, "follows_history", False):
+            return
         when = getattr(getattr(self.world, "clock", None), "ship_time", None)
         if when is None:
             return
         day = when.date() if isinstance(when, datetime) else when
-        if self.__dict__.get("_day") == day:
+        last = self.__dict__.get("_day")
+        if last is None:
+            start = getattr(scenario, "start_time", None)
+            last = start.date() if isinstance(start, datetime) else (start or day)
+        if last >= day:
+            self.__dict__["_day"] = last
             return
         self.__dict__["_day"] = day
         for port in self.ports.values():
-            if getattr(port, "dated", ()):
-                port.on_day(day)
+            if getattr(port, "dated", ()) or getattr(port, "nations", ()):
+                port.on_events(last, day)
 
     def __getattr__(self, name: str) -> Any:
         if name in DEALINGS_NAMES:
