@@ -399,3 +399,16 @@ lines proposed. Truths 7-570 to 7-579.
 `build_charts.py`, the climatology and the tides; they are not on the same region or tiles,
 so they may run side by side, the second to merge taking the first's manifest by
 `--skip-fetch` rebuild as the how-to says.
+
+### 2026-11-13, 08:35: where things stand
+
+- **The calendar and the world** (decision 69): built at 65a7df86, reported at 3a30a85c,
+  merged as 4e079c31. Truths 7-580 to 7-584. Until 103b and 92 design one, nothing in play
+  writes a port's holder or a war; the director's port order closes, opens and prices.
+- **Read for the lead:** 105's step 2 (562ba67) and 111's step 2a (184745d9); the four
+  points taken (the lead's rulings above). **Owed with my next step:** the how-to to say
+  that a gauge's level judged as M2 + S2 + N2 is marked JUDGEMENT and replaced by a
+  published one when read (Sicily's interim answer, not yet the rule).
+- **Waiting:** 106b and 112 at the lead's word on 106a's merge; the builders' briefs
+  above, to be brought up to date then (106a's Madeira proof, 111's seas table and the
+  calendar's `follows_history` for 106b's dated ports).
