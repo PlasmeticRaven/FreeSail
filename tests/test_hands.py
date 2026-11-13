@@ -978,7 +978,7 @@ def test_a_numbered_request_may_call_all_hands_where_the_deck_is_too_few_and_not
     company's clamp (`hands.too_few_on_deck`), so that a watch busy at other work is not too few;
     called, it is all-hands work of the same rating and stations, its party its number
     (`as_all_hands`). Any other word, or the key beside all hands or none, is refused in words;
-    no file but the settee's four carries it (`tests/test_settee.py`)."""
+    no file but the settee's four and the boat's carries it (`tests/test_settee.py`)."""
     crew = small_company()
     want = CrewRequest.from_mapping(
         {

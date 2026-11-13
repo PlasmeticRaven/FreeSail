@@ -234,14 +234,19 @@ def test_the_settees_files_say_what_they_are():
 
 def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
     """The lead's ruling (1) of 2026-11-10 (the bilander's short watch), on her file or her
-    evolutions' data alone so that no other ship's work changes: the four settee files, and no
-    other evolution file, say `too_few: all hands` (`hands.CrewRequest.calls_all_hands`), and of the
+    evolutions' data alone so that no other ship's work changes: the four settee files say
+    `too_few: all hands` (`hands.CrewRequest.calls_all_hands`), and besides them only the boat's,
+    `too_few: all hands until manned` (the lead's ruling 10 of 2026-11-13: package 109's boat
+    road made one with this one; before it, `calling == set(SETTEE_FILES)`), and of the
     committed ship files only the bilander carries a settee. The fixture's settee brig, a brig's
     company, keeps watches of 48 hands (38 who go aloft), never too few for six."""
     from pathlib import Path
 
     calling = {eid for eid, evo in EVOLUTIONS.items() if "too_few" in evo.crew}
-    assert calling == set(SETTEE_FILES)
+    assert calling == set(SETTEE_FILES) | {"send_boat"}
+    for eid in SETTEE_FILES:
+        assert not hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).until_manned, eid
+    assert hands.CrewRequest.from_mapping(EVOLUTIONS["send_boat"].crew).until_manned
     for eid in calling:
         assert hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).calls_all_hands, eid
     with_settee = set()

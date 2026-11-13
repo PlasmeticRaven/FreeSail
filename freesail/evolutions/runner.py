@@ -1295,11 +1295,17 @@ class Runner:
         its file says so, the hands on deck are too few for it counting those at other work
         (`hands.too_few_on_deck`), all hands are not up already, the ship is not at quarters,
         and the order named no party of its own (`hands_from`, which `_check_party` judges).
-        Any other request waits for hands, as before."""
+        Work manned and piped down at once (`until manned`, the boat's crew) calls by package
+        109's own trigger, so that the one road keeps the boat's lines (the lead's ruling 10 of
+        2026-11-13): its request came back too few and no work of the runner's has the hands,
+        so a watch busy at other work waits, said, and a hand at the pumps does not make the
+        deck enough. Any other request waits for hands, as before."""
         if not want.calls_all_hands or crew.all_hands_called or _at_quarters(ship):
             return False
         if inst.params.get("hands_from"):
             return False
+        if want.until_manned:
+            return not self._other_work(inst)
         return hands.too_few_on_deck(crew, self._pool(crew, inst), want, self._aloft(inst))
 
     def _too_few_piped_down(self, ship: Ship, inst: Instance, crew: Crew) -> bool:

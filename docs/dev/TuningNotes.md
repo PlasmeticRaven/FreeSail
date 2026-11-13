@@ -21482,6 +21482,46 @@ lead to re-pin by it. What moved is the one combined case above (the boat behind
 all hands) and `test_settee`'s set of files, left failing for the lead's ruling. *Corrected by the
 review's mends:* and the three cases the review found, above.
 
+### (c) built, and the settee's pin moved (2026-11-13)
+
+After the review's mends, (c) above was built: `Runner._watch_too_few` gives work that is manned
+and piped down at once (`until manned`, the boat's) package 109's own trigger, in two lines. It
+calls where its request came back too few and no work of the runner's has the hands; all hands
+must not be up already, she must not be at quarters, and no party may be named. `too_few: all
+hands` (the settee's) keeps its own trigger. The ruling is "make them one road, yours", and the
+road stays one: one key on the crew line, one call (`_call_all_hands`), the work held up on its
+number (`Instance.held_up`), and one pipe-down (`_after_all_hands`). Only the boat's trigger is
+109's, and so her lines are kept. A line that must move goes to the lead, by the ruling; with (c),
+none of the boat's lines moves but the two mends below. The lead may rule (a) or (b) instead, and
+each is one line.
+
+Measured in memory on the tree, beside caec1983 (the review's `measure.py` and `probe.py`):
+
+- The seven boat cases, 109's own case (e486b095) and the settee's eight orders: every digest is
+  caec1983's, as before.
+- `heave the log`, then `go ashore` (the bilander at 04:30): f2829534, caec1983's. The boat waits
+  while the watch heaves the log, "Not hands enough on deck to send boat; the watch is heaving
+  log." at +3, and calls at +39.
+- One hand busy at no runner work (the bilander at 02:30): 250df54c, caec1983's. She calls at +1
+  and is away at +792.
+
+What still differs from 109's road, and each is a mend: the boat waiting behind work that called
+all hands gets one call and one pipe-down (413d04b1), and a boat belayed while the hands come up
+pipes them down (3e87bbe7).
+
+The settee's pin, old beside new: `tests/test_settee.py`,
+`test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few`.
+- Old: `assert calling == set(SETTEE_FILES)`.
+- New: `assert calling == set(SETTEE_FILES) | {"send_boat"}`, and the settee's four are not until
+  manned where the boat's is.
+- Its docstring says so, with the ruling. The docstring of `tests/test_hands.py`'s key test now
+  reads "no file but the settee's four and the boat's carries it".
+- Reason: ruling 10 gives send_boat's crew line the key, and the test reads that line.
+
+Run: `test_settee`, `test_hands`, `test_mends_109`, `test_bilander`, `test_boat_director`,
+`test_boat_hull`, `test_checkpoint` and `test_routine`, 277 passed; ruff clean. The whole tiers
+follow in the next step's gate (ruling 11), on this commit.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
