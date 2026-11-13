@@ -36,8 +36,8 @@ anchorage:
   depth_fathoms: 3
 mooring:
   name: Poole quay
-  lat_deg: 50.7110     # the channel before the quay (judgement)
-  lon_deg: -1.9850
+  lat_deg: 50.70739     # the channel before the quay (judgement)
+  lon_deg: -1.98069
   depth_fathoms: 1.5   # judgement: the town's channel, small vessels lie aground at low water
   bottom: soft mud
   deep_draught_ft: 10  # judgement: the bar's six to eight feet at low water and fourteen at high springs

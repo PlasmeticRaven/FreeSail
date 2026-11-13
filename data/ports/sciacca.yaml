@@ -1,0 +1,111 @@
+# FreeSail: Sciacca as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch sciacca). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 216 to 217 and App. pp. xxiii to xxiv: one of the principal caricatori of the south coast, with grain pits, exporting corn, fruit, anchovies, sulphur and barilla; eleven thousand people; the bandits of the hills behind put down by the British troops (pp. 216 to 217); ships ride a mile off in summer in seven to twelve fathoms of sand and clay, exposed to every wind from S E round southerly to W, the road used only in the fine months; the berth eight fathoms of mud a mile off, the castle north; Cape St Marco a reddish forked point with its tower battery, its shelf of rocks to be approached by the lead; Cape Bianco's reef a mile and a half to the south. Lamberti 1844, p. 193: grain loaded, a secca four miles off.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: sciacca
+name: Sciacca
+nation: naples
+source: "Smyth 1824 pp. 216-217, App. pp. xxiii-xxiv; Purdy 1826 p. 152; Norie 1831 p. 129"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: sciacca-road
+  name: the road of Sciacca
+  lat_deg: 37.4920
+  lon_deg: 13.0800
+  depth_fathoms: 8
+anchorage:
+  feature: sciacca-road
+  name: the road of Sciacca
+  lat_deg: 37.4920
+  lon_deg: 13.0800
+mooring:
+  feature: sciacca-road
+  name: the road of Sciacca, a mile off
+  lat_deg: 37.4920
+  lon_deg: 13.0800
+  depth_fathoms: 8
+  bottom: mud
+shore:
+  feature: sciacca
+  name: the beach under Sciacca
+  lat_deg: 37.5070
+  lon_deg: 13.0810
+
+pilot:
+  station: sciacca-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Sciacca
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Calogero Ciaccio, Giuseppe Bono, Ignazio Licata, Accursio Montalbano]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 190            # judgement
+  words:
+    channel: "The coast is clean to the lead: Cape St Marco's shelf may be approached by it, and Cape Bianco's reef runs a mile and a half to the south. No harbour; boats and flat vessels are beached."
+    marks: "Sciacca up its slope behind its wall, the castle of Luna at the east angle, Mount Calogero behind; Cape St Marco, forked and reddish, with its square tower and battery."
+    anchorage: "About a mile off the town in seven to twelve fathoms, eight of mud the best, the castle north; a summer road only, open to every wind from south-east round to west."
+    tide: "No tide to reckon on: the currents of this coast rise a foot or two with the wind, a north-wester setting them strongly to the south-east."
+
+tide:
+  establishment: Sciacca
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 9.5, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 360.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 5.5, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 55.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 18.5, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.5, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: sulphur, price: 6, origin: naples, note: "sulphur exported (Smyth 1824, p. 217); the price JUDGEMENT"}
+    - {good: barilla, price: 8.5, origin: naples, note: "barilla exported (Smyth 1824, p. 217); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 36, pounds: 75, note: "no stores named; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 2, pounds: 1, delay_h: 36}
+
+closed_to: []
+
+tracks:
+  to_sea: [sciacca-road, 37 27 N 13 05 E]
+  from_sea: [37 27 N 13 05 E, sciacca-road]
+  in: [sciacca-road]

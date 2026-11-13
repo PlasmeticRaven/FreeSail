@@ -814,7 +814,7 @@ What it found, for the next blocks:
   the variation about 17 to 18 degrees west then): the road of Tunis placed by Purdy's
   bearings made true.
 
-## Sicily and Malta (package 105, as built: step 2)
+## Sicily and Malta (package 105, as built: steps 2 and 3)
 
 `sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E): all Sicily with its islands, the Sicilian
 channel, Malta and Gozo, the Faro of Messina and Calabria's toe to Cape Spartivento, the chart's
@@ -865,3 +865,79 @@ their tile edges (104's finding). What it found, for the next blocks:
   saying plainly what Smyth says of the Order's galleys' enslaved rowers (decision 68);
   Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
   France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.
+
+**Step 3** (the west, the south coast and the islands): sixty-five marks more in
+`features/sicily.yaml` and Ustica's four in `features/tyrrhenian.yaml`, thirteen ports
+(Palermo, Trapani, Favignana, Marsala, Sciacca, the Mole of Girgenti, Alicata, Terranova,
+Cape Passaro's Porto Paolo, Lipari, Pantellaria, Lampedusa, Ustica), the scenario
+`the-faro.yaml` (Valletta through the Faro to Palermo), and two closings of water no
+region's bounds held. What it found, for the next blocks:
+
+- **An unowned sliver inside a neighbour's own column is closed by its bound, not by
+  tiles.** `tyrrhenian`'s tiles ran to its last column's edge (15.84 E) and its bounds
+  stopped at 15.5 E: the water between (Capo Vaticano, Tropea, the gulf of Sant'Eufemia)
+  answered and nobody owned it. The bound moved to 15.83999 E, 0.9 m inside the column
+  edge, takes no tile more (`tiles_over`), and the build reads a region's bounds only for
+  its tile list, its manifest entry and its checks, so no tile is written. Prove it so
+  before trusting it: the world's mean level on the fill grid over the column and its
+  neighbours before and after (here none moved, the block's gauges having no level), and
+  `--check` on the neighbour. Move with the bound every box that stops at it (the streams'
+  `book_limits` row, the open stream area's polygon, the weather box), and the audit's
+  ceilings for the region's own findings that the sliver's water now joins (package 111's
+  known list, old beside new).
+- **Water a block's tiles reach and no bounds hold may still read the block's tide.** A
+  tide region (the manifest's `tide_regions:`, bounds and no tiles, the Solent's form)
+  over it, named in the block's gauges' `block:` lists, gives it the block's level instead
+  of the Atlantic's (`gulf-of-hammamet`, `calabria-north`: 3.7 m to some 0.1 m). Rebuild
+  the block after it, for the fill raise follows the tide; the audit still lists the water
+  as unowned (its finding owned by the block, with its reason), until a later block's
+  bounds take it.
+- **Marks on a neighbour's kept tiles are snapped on the whole chart.** Lipari's anchorage
+  and the Bentinck shoal lie in `sicily`'s bounds but on `tyrrhenian`'s tile row (38.43 N,
+  the seam rule): the block's own chart has no depth there outside its harbour patch. Load
+  `atlantic-east` to place them.
+- **A port in a neighbour's bounds takes its marks in the neighbour's features file** (the
+  brief's Ustica, 38.7 N): a section of its own at the file's end, the index rebuilt from
+  the file (`build_index`) and the manifest's counts edited alone, no tile or coast
+  touched (package 104's form for Oristano), and `--check` on both regions, which also
+  finds an id given twice across the manifest (Sciacca's Cape St Marco met Sardinia's).
+- **The grid holds the modern harbour works.** Palermo's basin is enclosed by today's piers
+  in EMODnet's cells: a port's track from its mole harbour to its road must find the
+  basin's mouth on the grid (a map of the cells' signs at a hundred metres finds it),
+  whatever the period's mole was.
+- **A deep-to island's road is its anchorage.** Lipari and Ustica have thirty to two
+  hundred fathoms a cable off: a road placed off the town reads outside the pilot's depth
+  band, so the anchorage serves as the outer road too (Scilla's form).
+- **The order words take decimal minutes** (`38 16.5 N 15 40.8 E`), not seconds, and a
+  road's name only as its feature's name; a scenario's test that asserts no order rejected
+  finds both at once.
+- **A pilot's word for a port the sources never call a port.** Cefalù's bay is a summer
+  anchorage for coasters with a pier for fishing vessels, and Termini's road is frequented
+  only by boats that can be beached (Smyth 1824, App. p. v): both are marks, not ports.
+
+## What a new block runs before it reports (package 111)
+
+**The audit, clean or declared.** `python tools/audit_chart.py --known` reads the whole
+chart as the game reads it and prints its findings by region, each marked `!` that
+`data/charts/audit-known.yaml` lacks; `--full` is the slow tier's sweep. A block runs it
+after its build and before its report, and comes in in one of two ways: **clean** (no `!`,
+and `tests/test_chart_audit.py` green in both tiers), or **declared**: each finding its
+block adds entered in the known list with its key, its place, its reason in a line, its
+owner (the package) and its count as `most`, and named in the report for the lead to rule.
+A block that mends a listed finding takes its entry out (the slow tier fails on a listed
+finding no longer found) and lowers a count's ceiling where it shrinks it. The list is
+findings owned, never a way round a failure.
+
+What the eight checks ask of a block, so that it comes in clean: (a) its bounds on its
+tiles' edges where open water lies beyond, and abutting its neighbours' exactly (no water
+of its tiles that no region's bounds hold; no two regions claiming one box); (b) no water
+of its bounds that only the corridor answers, and its coast meeting its neighbours' at the
+seam; (c) a gauge of its own sea with its level read, or its neighbours' by the rule of the
+seams and the gaugeless blocks; (d) its water in a box of the climatology, and the box's
+edges on the region's; (e) its box in `book_limits` and a statement and a stream area over
+all its water; (f) every port's spots on water that fits the file (a drying harbour no
+higher than the file has it), its shore by the land, its depths within the band of the
+grid's or the spot on its sounding, and its way in and out clear of the land by the game's
+own guard (`tracks:` where a straight line is not); (g) no mark of the land afloat nor
+danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
+dated; (h) its scenario starting on its water.

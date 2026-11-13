@@ -1,0 +1,113 @@
+# FreeSail: Lampedusa as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch lampedusa). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 285 to 289 and App. pp. xxxiv to xxxv: the island the Tommasi family's with the title of Prince since 1667 (p. 285), never regularly inhabited until Mr Fernandez, an English gentleman, took a lease about ten or twelve years before Smyth wrote, his family living there with twelve or fourteen Maltese peasants in the caves, the venture ruined by the general peace (p. 286); intended as a substitute for Valletta when Buonaparte disputed Britain's keeping Malta (p. 285); wood cut for Tripoli and Malta; water indifferent, the coves of Galera and Croce; a plague of 1784 (p. 288); good anchorage under the island with the old tower N E by N in seventeen or eighteen fathoms of gravelly sand, then warp in; the harbour a cove where ships of three or four hundred tons find shelter from every wind, the S S W the worst, scarcely room to moor a frigate but by fasts ashore, five and a half fathoms the berth; the Rabbit and Coneys under the south shore; Lampion seven or eight miles W by N 1/2 N. Norie 1831, p. 147: the mouth 400 yards wide, the bottom soft mud.
+#
+# The holder: the island a fief of the Sicilian crown in the Tommasi princes' family (Smyth
+# 1824, p. 285), so `naples`; Mr Fernandez's lease a private one (the years not read: about
+# 1812 to 1814 by Smyth's "ten or twelve years ago", JUDGEMENT), not a holder.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: lampedusa
+name: Lampedusa
+nation: naples
+source: "Smyth 1824 pp. 285-289, App. pp. xxxiv-xxxv; Purdy 1826 pp. 167-168; Norie 1831 pp. 147-148"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: lampedusa-road
+  name: the road of Lampedusa
+  lat_deg: 35.4860
+  lon_deg: 12.5960
+  depth_fathoms: 17
+anchorage:
+  feature: lampedusa-harbour
+  name: the harbour of Lampedusa
+  lat_deg: 35.4978
+  lon_deg: 12.6015
+mooring:
+  feature: lampedusa-harbour
+  name: the harbour of Lampedusa, fasts to the rocks
+  lat_deg: 35.4978
+  lon_deg: 12.6015
+  depth_fathoms: 5.5
+  bottom: soft mud
+shore:
+  feature: lampedusa-castle
+  name: the landing under Orlando's tower
+  lat_deg: 35.5010
+  lon_deg: 12.6060
+
+pilot:
+  station: lampedusa-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: Mr Fernandez's boat
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Giuseppe Fenech, Carmelo Attard, Pawlu Buhagiar]   # judgement
+  skill: 0.7
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 200            # judgement
+  words:
+    channel: "The north coast is steep-to, thirty-five and forty fathoms within four hundred yards; the Rabbit and its two Coneys lie halfway between Cape Ponente and the harbour, the western Coney low and hard to see against the white cliffs by night, but bold enough to be brushed. From the south a bank of fifteen to fifty fathoms runs out several leagues."
+    marks: "Cape Ponente's sheer cliff at the west end; Orlando's tower, the castle, on the landing point with its chapel and storehouse; the island level and shelving to the south-east; Lampion like a wall far to the west."
+    anchorage: "Anchor under the island with the old tower north-east by north in seventeen or eighteen fathoms of gravelly sand, where two or three spots rub the cable, then warp in: there is no room to work. Inside, five and a half fathoms of soft mud with fasts to the rocks, sheltered from every wind but the south-south-west."
+    tide: "No tide; the current between Sicily and Barbary runs east in settled weather."
+
+tide:
+  establishment: Lampedusa
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 17.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 18.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 49.5, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 4.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 420.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: cotton, price: 62.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 20.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 5.5, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: firewood, price: 3, origin: naples, note: "a good deal of fire-wood cut and sent to Tripoli and Malta (Smyth 1824, p. 286); the price JUDGEMENT"}
+    - {good: fresh fish, price: 3, origin: naples, note: "fish plentiful (Norie 1831, p. 147); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 48, pounds: 90, note: "no stores; wood in plenty in the west of the island (Smyth 1824, App. p. xxxv); judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "water indifferent, from the coves of Galera and Croce (Smyth 1824, App. p. xxxv); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the Maltese peasants of the lease
+  able: {hands: 0, pounds: 2, delay_h: 72}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 72}
+  landsman: {hands: 1, pounds: 1, delay_h: 72}
+
+closed_to: []
+
+tracks:
+  to_sea: [lampedusa-harbour, lampedusa-road, 35 27 N 12 36 E]
+  from_sea: [35 27 N 12 36 E, lampedusa-road, lampedusa-harbour]
+  in: [lampedusa-road, lampedusa-harbour]

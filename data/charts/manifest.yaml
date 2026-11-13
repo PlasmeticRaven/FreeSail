@@ -3930,10 +3930,10 @@ regions:
   madeira:
     title: Madeira, Porto Santo and the Desertas
     bounds:
-      south: 32.0
-      north: 33.5
-      west: -17.5
-      east: -16.0
+      south: 31.60001
+      north: 33.73333
+      west: -17.86666
+      east: -15.73334
     levels:
     - 2
     - 3
@@ -4126,10 +4126,10 @@ regions:
   azores:
     title: The Western Islands (the Azores)
     bounds:
-      south: 36.5
-      north: 40.0
-      west: -31.5
-      east: -24.5
+      south: 36.29334
+      north: 40.13333
+      west: -31.51999
+      east: -24.26667
     levels:
     - 2
     - 3
@@ -8049,7 +8049,7 @@ regions:
       south: 40.56
       north: 44.5
       west: 3.0
-      east: 7.73
+      east: 7.73333
     levels:
     - 2
     - 3
@@ -8895,8 +8895,8 @@ regions:
     bounds:
       south: 41.0
       north: 44.5
-      west: 7.74
-      east: 11.0
+      west: 7.73334
+      east: 11.1466
     levels:
     - 2
     - 3
@@ -10503,20 +10503,21 @@ regions:
         west: 12.93
         east: 12.98
     fill_to_chart_datum: true
-    feature_count: 126
+    feature_count: 130
     features_by_kind:
-      anchorage: 19
+      anchorage: 20
       bank: 1
-      castle: 8
+      castle: 9
       church: 1
       headland: 24
       hill: 10
-      island: 18
+      island: 19
       ledge: 2
       light: 5
       mark: 2
       place: 3
       rock: 6
+      shoal: 1
       tower: 5
       town: 22
   catalan-coast:
@@ -13187,19 +13188,20 @@ regions:
         west: 12.59
         east: 12.63
     fill_to_chart_datum: true
-    feature_count: 58
+    feature_count: 123
     features_by_kind:
-      anchorage: 17
-      castle: 8
-      headland: 9
-      island: 8
-      ledge: 1
-      light: 2
+      anchorage: 33
+      castle: 14
+      headland: 18
+      hill: 2
+      island: 18
+      ledge: 3
+      light: 5
       mark: 1
       rock: 2
-      shoal: 3
+      shoal: 8
       tower: 1
-      town: 6
+      town: 18
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -13536,6 +13538,13 @@ tide_regions:
       north: 38.85333
       west: 15.84
       east: 16.69332
+  asinara-west:
+    title: 'The sea west of the Asinara: a tide region, no tiles'
+    bounds:
+      south: 40.56
+      north: 41.0
+      west: 7.73334
+      east: 8.0
 world:
   level: 0
   bounds:

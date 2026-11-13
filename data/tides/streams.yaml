@@ -102,16 +102,17 @@ book_limits:
   - {south: 42.0, north: 45.9, west: -9.33, east: -0.9}  # Biscay south and Galicia (package 39c)
   - {south: 36.4, north: 42.0, west: -10.0, east: -6.0}  # Portugal and Cadiz (package 39d)
   - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
-  - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
+  - {south: 36.29334, north: 40.13333, west: -31.51999, east: -24.26667}  # the Western Islands (package 39e; package 111: the region's bounds, moved to its tiles' edges)
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
-  - {south: 35.0, north: 40.5, west: -5.0, east: 4.5}  # the Mediterranean west, both regions (package 79c)
-  - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
-  - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
+  - {south: 35.0, north: 40.56, west: -5.0, east: 4.5}  # the Mediterranean west, both regions (package 79c; package 111: north to 40.56 N, the Balearics' bound since package 89)
+  - {south: 40.56, north: 44.5, west: 3.0, east: 7.73333}  # the Gulf of Lion's block (package 79d; package 111: its bound moved)
+  - {south: 41.0, north: 44.5, west: 7.73334, east: 11.1466}  # the Ligurian sea's block (package 79d; package 111: its bounds moved)
   - {south: 38.5, north: 42.5, west: 8.0, east: 15.83999}  # the Tyrrhenian's block (package 79d; to its column edge, package 105: the Calabria sliver)
   - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
   - {south: 36.29334, north: 40.56, west: 4.5, east: 8.0}  # the Sardinian sea's block (package 104)
   - {south: 36.29334, north: 38.5, west: 8.0, east: 11.1466}  # the coast of Tunis's block (package 104)
   - {south: 35.01334, north: 38.5, west: 11.1466, east: 16.69332}  # Sicily and Malta's block (package 105)
+  - {south: 31.60001, north: 33.73333, west: -17.86666, east: -15.73334}  # Madeira (package 111, the lead's ruling: the region's bounds, at its tiles' edges)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.

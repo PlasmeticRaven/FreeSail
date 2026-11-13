@@ -49,15 +49,16 @@ outer_road:
   lon_deg: -2.27528
   depth_fathoms: 8
 anchorage:
-  feature: st-malo-road
+  # package 111 (the lead's ruling): moved onto its sounding, off the mark st-malo-road
   name: the road of St Malo
-  lat_deg: 48.6456
-  lon_deg: -2.03702
+  lat_deg: 48.64532
+  lon_deg: -2.03813
   depth_fathoms: 4.5
+  bottom: sand
 mooring:
   name: the strand under the town
-  lat_deg: 48.6470     # under the walls on the west side, the sand that dries (Faden)
-  lon_deg: -2.0300
+  lat_deg: 48.64686     # under the walls on the west side, the sand that dries (Faden)
+  lon_deg: -2.03028
   depth_fathoms: -1.5  # dries: ships lie on the sand at low water
   bottom: sand
   deep_draught_ft: 12  # judgement: a vessel that takes the ground; a ship lies in the road

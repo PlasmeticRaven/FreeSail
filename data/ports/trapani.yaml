@@ -1,0 +1,108 @@
+# FreeSail: Trapani as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch trapani). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 236 to 247 and App. pp. xxvi to xxix: the town of twenty-five thousand, the best artisans and sailors of the island, one of the most respectable places of arms (pp. 239 to 240); the harbour damaged by the earthquake of 1542, small; the marina's tolerable mole with the pratique office (p. 241); vessels of two or three hundred tons at the quay with a fast under the walls, ships of greater draught near the Colombara in eight to ten fathoms of patchy mud, moored S S E and N N W (App. p. xxvi); the best berth opposite the light-house, the Colombara hugged at three-quarters of a cable; the quarantine often an obstacle to a pilot (App. p. xxvii); high water at 9h 35m with a spring rise of nearly two feet, the set N E and S W, counter-tides in fresh breezes (App. p. xxvi); the Porcelli, the Formiche's shoals, the Bullata of nine feet off the Mal Consiglio; salt (a hundred thousand cantars a year, much to Marseilles, p. 237) and coral (p. 25) its trade. Norie 1831, p. 126: salt, soda, coral and alabaster exported. Lamberti 1844, p. 190: the road open to the S S W and S W.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: trapani
+name: Trapani
+nation: naples
+source: "Smyth 1824 pp. 236-247, App. pp. xxvi-xxix; Purdy 1826 pp. 145-149; Norie 1831 pp. 123-127"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  name: off the Colombara
+  lat_deg: 38.0020
+  lon_deg: 12.4880
+  depth_fathoms: 14
+anchorage:
+  feature: trapani-harbour
+  name: the harbour of Trapani
+  lat_deg: 38.0060
+  lon_deg: 12.5000
+mooring:
+  feature: trapani-harbour
+  name: the harbour of Trapani, near the Colombara
+  lat_deg: 38.0060
+  lon_deg: 12.5000
+  depth_fathoms: 9
+  bottom: mud, uneven and patchy
+shore:
+  feature: trapani
+  name: the mole and the pratique office
+  lat_deg: 38.0154
+  lon_deg: 12.5155
+
+pilot:
+  station: trapani-harbour
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the Trapanese pilots
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Vito Messina, Alberto Burgarella, Giacomo Mazzara, Nicolò Ingrassia, Michele Pace]   # judgement
+  skill: 0.85
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 240            # judgement
+  words:
+    channel: "From the north keep the Colombara light on with the hill south of Paceco to clear the Porcelli, which rise from eight fathoms to nothing; from the south give the Mal Consiglio a short mile for the Bullata's nine feet. The Colombara may be hugged at three-quarters of a cable."
+    marks: "Mount St Julian with its town on the summit; the tops of Trapani's houses like a fleet under sail; the Colombara's light-house battery in the harbour's mouth and Sigia tower on the point."
+    anchorage: "Ships of draught bring up near the Colombara in eight to ten fathoms of patchy mud, moored south-south-east and north-north-west; small ships lie at the quay above the pratique office with a fast under the walls and an anchor on the mud."
+    tide: "High water at nine hours thirty-five minutes at full and change, the springs nearly two feet; it sets north-east and south-west, with counter-tides over the broken ground in fresh breezes."
+
+tide:
+  establishment: Trapani
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 13.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 1.5, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 360.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 46.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 18.5, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 19.0, origin: naples, note: "JUDGEMENT"}
+    - {good: coral, price: 260, origin: naples, note: "the coral fishery yields the greatest profit to Trapani's seamen and merchants (Smyth 1824, p. 25); the price JUDGEMENT, cheap here"}
+    - {good: barilla, price: 9, origin: naples, note: "soda exported (Norie 1831, p. 126); Paceco's barilla (Smyth 1824, p. 237); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 20, pounds: 55, note: "a spar from the merchants' stores; the best artisans of the island (Smyth 1824, p. 240); judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "water in the town by the aqueduct from St Julian (Smyth 1824, p. 241); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the best sailors in the island (Smyth 1824, p. 240)
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [trapani-harbour, 38 00 N 12 27 E, 38 00 N 12 24 E, 37 58 N 12 22 E]
+  from_sea: [37 58 N 12 22 E, 38 00 N 12 24 E, 38 00 N 12 27 E, trapani-harbour]
+  in: [trapani-harbour]
