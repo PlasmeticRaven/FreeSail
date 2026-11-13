@@ -27030,3 +27030,25 @@ save moved (none holds a free line).
 
 **Truths 7-540 and 7-541** (`tests/test_known_truths.py`) and `tests/test_mends_109.py` (32
 cases, each failing on the trunk as the brief describes).
+
+**Found on the way (step 1), for others and not mended.** The director's say-as (`say as <person>:
+give ...`, `free.spoken`) still says a line naming nothing "as said"; it is the director's
+voice and the brief named the player's orders, so it was left. `take the purse` is the
+reading `the purse` (the asking word "take" before a reading), never a free take of a thing
+named a purse: a thing so named cannot be taken by those words.
+
+**The suites, as run (step 1).** At **642c719** (the trunk merged twice by merge commits, at
+00a85b1 and 642c719: the lead's records and briefs, docs only, no conflict), in a worktree pinned
+there, this container, four workers, one suite at a time. `ruff check .` and `ruff format
+--check .` clean (388 files). **The fast tier** whole: exit 0, 7,519 run, no failure, 1 skipped,
+509 slow left out. Two earlier runs exited 1, one failure each, both of this step's own and
+mended: at 00a85b1 the primer's orders block of chapter 14 (free lines on a ship with nothing
+aboard, each now refused, marked `# rejected:` in the block); at 87494ec the in-world test, the
+block's comment naming a package (said in the world's words at 394f47b). **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_letters.py, test_people.py, test_grammar_book.py, test_primer.py, test_in_world.py,
+test_readings.py, test_director.py, test_known_truths.py): exit 0, 1,751 run, no failure, 8
+skipped; the recorded passages among them, every pinned digest, line count and tick held. **No
+digest moved and no kept save; the pins moved are those listed above, each the ruling's.**
+**The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
+exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
