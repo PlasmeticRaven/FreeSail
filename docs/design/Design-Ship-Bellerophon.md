@@ -972,9 +972,11 @@ alike"). It is offered to the lead as step B7.d. What it needs, each keyed so no
 6. **The orders:** a number with its deck ("No. 3 starboard on the lower deck", "the lower deck's
    No. 3"); a bare number refused in words on a ship numbered by deck ("She has a No. 3 on each
    deck: name the deck.").
-7. **Both two-deckers together.** The 64 and the razee renumbered by deck in the same step, a few
-   lines of `indefatigable.py` (B1's, window closed), their bytes and gun names moving old beside
-   new, any of B1's tests that name a gun by id moved with them. **Pick:** B7.d at the end of her
+7. **Both two-deckers together.** The 64 renumbered by deck in the same step as she is, a few
+   lines of `indefatigable.py` (B1's, window closed), its bytes and gun names moving old beside new,
+   any of B1's tests that name a gun by id moved with them; the razee, of one gun deck, is not
+   renumbered (these words first named "the 64 and the razee"; mended at the lead's ruling (4) of
+   2026-11-12, as built). **Pick:** B7.d at the end of her
    window, on the lead's word, with both two-deckers; if the lead declines the 64's renumbering, both
    wait for a later package together, so that the two two-deckers never number two ways.
 
@@ -1007,6 +1009,17 @@ names the same. **Left, for the lead:** the shut port's line reads "The No. 3 la
 lower deck's port is shut" (`combat/guns.py`, not hers); the marines back from their muskets go to
 the same crews in the same numbers, but which marine to which crew follows the crews' keys as text,
 so on her 1812 fit and the 64's two other marines go (`Quarters.marines_to_guns`).*
+
+*The two possessives, at the lead's ruling (4) of 2026-11-12 (built 2026-11-13): where a gun is
+named by deck its two lines say "of" it, so that the deck is not read as the possessive's: "The port
+of No. 3 larboard gun of the lower deck is shut; the sea is at its sill." (`combat/guns.py`; old "The
+No. 3 larboard gun of the lower deck's port is shut; ...") and, in the minute's line of shot, "the
+carriage of No. 3 starboard gun of the lower deck struck" (`combat/hits.py`; old "No. 3 starboard gun
+of the lower deck's carriage struck"); every other gun's lines word for word, so that no other ship's
+line moves. Every way of naming a gun by its deck with no side agrees with the trunk's rule for a
+bare number (`orders.gunnery._of_the_side_meant`, package 74's step 6: the side engaged, else the
+side the mark is on, else the pair), measured form by form on her and the 64. The tuning notes, "The
+lead's notes of 2026-11-12 and 13, built", subsection 5.*
 
 ### 5.3 Patterns, weights and crews (answer 12)
 
@@ -1873,7 +1886,7 @@ the 64's at the step (§5.2's as-built note), so that the eight and the razee ke
 | `freesail/ship/parts.py` | `pair_key` and `name` by deck | B3 | `by_deck` | B7.d |
 | `freesail/crew/quarters.py` | the parse sites taught `gun:<deck>:<n>` | B7's | `by_deck`'s key form | B7.d |
 | `freesail/orders/gunnery.py` | a number with its deck; a bare number refused on a ship numbered by deck | as above | `by_deck` | B7.d |
-| `tools/ships/indefatigable.py` | the 64 and the razee renumbered by deck | B1 (window closed) | — | B7.d, with the lead's word on the 64 |
+| `tools/ships/indefatigable.py` | the 64 renumbered by deck (the razee, of one gun deck, not: the lead's ruling (4) of 2026-11-12; first written "the 64 and the razee") | B1 (window closed) | — | B7.d, with the lead's word on the 64 |
 | `freesail/world/captains.py`; `data/captains/kings-ship.yaml`, `commodore.yaml` | the rank-4 rule | B7 if taken (Build §4.1); the two books have no listed owner | rank 4 met by a lone rank 3 or less | B7.e, if the owner takes it |
 | `tools/ships/mizen_yard.py` | an extension for the driver's jaws, only if her poop needs one | B1, then B7 in her window (Build §4.2) | her call only | step 2 |
 
@@ -2151,8 +2164,10 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
   on the frigate after SW-2); no test asserts their refusal (grep at her window).
 - **B7.c, only on the lead's word:** truth 7-136 and every ship's tack at quarters, bisected to the one
   commit.
-- **B7.d, only on the lead's word:** the 64's and the razee's bytes, gun ids and gun names, and any of
-  B1's tests that name a gun by id; their truths pin counts, not names.
+- **B7.d, only on the lead's word:** the 64's bytes, gun ids and gun names, and any of B1's tests
+  that name a gun by id; their truths pin counts, not names. (First written "the 64's and the
+  razee's": the razee, of one gun deck, is not renumbered, her bytes as they were; mended at the
+  lead's ruling (4) of 2026-11-12.)
 - **B7.e, only if the owner takes it:** no pinned scenario puts a frigate against rank 4; the 64's
   scenario tests re-run.
 - **The registries:** new rows and words only; no existing scenario, business table or test names
@@ -2297,7 +2312,8 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
 3. **Numbering by deck** (§5.2, the option Indf §5.2 handed to her design): an explicit `numbering: by
    deck` key in stage 0c; her ids re-keyed by her module; `pair_key` and `name` in `parts.py` and
    `graph.py` (B3's) after B3's merge; the quarters' parse sites; deck-qualified numbers in the orders;
-   the 64 and the razee renumbered in `indefatigable.py`. `parts.py` is B3's after 0E (Build §4.2),
+   the 64 renumbered in `indefatigable.py` (the razee, of one gun deck, not: the lead's ruling (4)
+   of 2026-11-12; first written "the 64 and the razee"). `parts.py` is B3's after 0E (Build §4.2),
    so stage 0c's one class default there (`Gun.by_deck`) is laid after B3's merge, on your
    allotment, checked as Build §3.4. *Pick:* B7.d at the end of her window, both two-deckers
    together; else both wait for a later package, and she is numbered on across decks.

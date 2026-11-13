@@ -2959,6 +2959,160 @@ def test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires()
     assert battery_of(w.ship).single == ["gun.lower.3.starboard", "gun.lower.8.starboard"]
 
 
+@pytest.mark.parametrize(
+    "path, gid, said",
+    [
+        (
+            SEVENTY_FOUR,
+            "gun.lower.3.larboard",
+            "The port of No. 3 larboard gun of the lower deck is shut; the sea is at its sill.",
+        ),
+        (
+            SIXTY_FOUR,
+            "gun.upper.1.larboard",
+            "The port of No. 1 larboard gun of the upper deck is shut; the sea is at its sill.",
+        ),
+        (
+            FRIGATE,
+            "gun.3.larboard",
+            "The No. 3 larboard gun's port is shut; the sea is at its sill.",
+        ),
+    ],
+    ids=["the-74", "the-64", "the-frigate"],
+)
+def test_a_gun_named_by_deck_behind_a_shut_port_says_the_port_of_it(path, gid, said):
+    """The lead's ruling (4) of 2026-11-12 (B7.d's possessive, built): a gun named to fire whose
+    port the sea has shut is dropped with its line, which on a ship numbered by deck says "the port
+    of" the gun named by deck, where "the No. 3 larboard gun of the lower deck's port" read the
+    deck as the possessive's (old: "The No. 3 larboard gun of the lower deck's port is shut; the sea
+    is at its sill."); a gun of a ship numbered on across her decks keeps its line, word for word
+    (tests/test_lee_ports.py's brig and chaser)."""
+    from freesail.combat.guns import Battery
+    from freesail.ship.parts import Charge
+    from tests.test_lee_ports import firer_at, lines_of
+
+    ship = load_ship(path)
+    battery = Battery(ship)
+    gun = ship.guns[gid]
+    assert bool(gun.of_deck) is (path != FRIGATE)
+    gun.loaded, gun.primed, gun.run_out = Charge.ROUND, True, True
+    battery.single = [gun.id]
+    battery._shut = frozenset({gun.id})
+    battery._fire(None, firer_at(0.0), None, None, 0, None, None)
+    assert battery.single == [] and gun.fired == 0 and gun.loaded is Charge.ROUND
+    assert [n[2] for n in lines_of(ship, "guns.port_shut")] == [said]
+
+
+class _Draws:
+    """A stream that gives the draws listed, then a half for every draw after (the casualties)."""
+
+    def __init__(self, *draws: float) -> None:
+        self.draws = list(draws)
+
+    def random(self) -> float:
+        return self.draws.pop(0) if self.draws else 0.5
+
+
+@pytest.mark.parametrize(
+    "path, gid, said",
+    [
+        (
+            SEVENTY_FOUR,
+            "gun.lower.3.starboard",
+            "the carriage of No. 3 starboard gun of the lower deck struck",
+        ),
+        (
+            SIXTY_FOUR,
+            "gun.lower.3.larboard",
+            "the carriage of No. 3 larboard gun of the lower deck struck",
+        ),
+        (FRIGATE, "gun.3.starboard", "No. 3 starboard gun's carriage struck"),
+    ],
+    ids=["the-74", "the-64", "the-frigate"],
+)
+def test_a_gun_named_by_deck_struck_says_the_carriage_of_it(path, gid, said):
+    """The lead's ruling (4) of 2026-11-12 (B7.d's possessive, built): a shot across her deck that
+    strikes a gun's carriage and does not dismount it is said in the minute's line ("Shot from
+    ...: ...") as "the carriage of" the gun named by deck on a ship numbered by deck (old: "No. 3
+    starboard gun of the lower deck's carriage struck"), and as before on any other ship, word for
+    word ("No. 3 starboard gun's carriage struck"). The shot falls at her No. 3 gun of that side,
+    the nearest along her hull (forward of her quarter, so that no boat on the booms is in the
+    way); the stream strikes a gun and does not dismount it."""
+    from freesail.combat import hits
+    from freesail.ship.parts import Charge
+
+    ship = load_ship(path)
+    gun = ship.guns[gid]
+    whole = gun.condition
+    keeper = hits.damage_of(ship)
+    seen = hits._deck_hit(
+        ship, keeper, gun, Charge.ROUND, None, gun.x_m, gun.side, 1.0, 1.0, _Draws(0.0, 0.999), 0
+    )
+    assert seen == []
+    assert keeper.minute == [("gun", said)]
+    assert not gun.dismounted and gun.condition < whole
+
+
+@pytest.mark.parametrize(
+    "path, words, deck",
+    [
+        (SEVENTY_FOUR, "No. 8 gun of the lower deck", " of the lower deck"),
+        (SEVENTY_FOUR, "the lower deck's No. 8", " of the lower deck"),
+        (SEVENTY_FOUR, "lower-deck No. 8", " of the lower deck"),
+        (SEVENTY_FOUR, "No. 8 on the upper deck", " of the upper deck"),
+        (SEVENTY_FOUR, "No. 8 gun of the main deck", " of the upper deck"),
+        (SEVENTY_FOUR, "the quarterdeck's No. 7", " of the quarterdeck"),
+        (SEVENTY_FOUR, "No. 1 gun of the forecastle", " of the forecastle"),
+        (SEVENTY_FOUR, "No. 2 gun of the poop", " of the poop"),
+        (SIXTY_FOUR, "No. 13 gun of the upper deck", " of the upper deck"),
+        (SIXTY_FOUR, "the lower deck's No. 1", " of the lower deck"),
+    ],
+)
+def test_a_number_with_its_deck_and_no_side_is_the_gun_of_the_side_engaged_or_of_the_marks(
+    path, words, deck
+):
+    """The lead's ruling (4) of 2026-11-12, the check asked with B7.d's possessive: every way a
+    gun is named by its deck with no side agrees with the trunk's rule for a bare number
+    (`orders.gunnery._of_the_side_meant`, package 74's step 6): with no side engaged and no mark,
+    the pair; a side engaged, that side's gun; both engaged, the pair; none engaged and a mark on
+    one side, that side's gun; said with a side, that side's whatever is engaged. Each gun fired is
+    of the deck said, and the reply names each by its deck. Measured: as the frigate's "fire No. 1
+    gun" (tests/test_practice_orders.py), form for form, on her default fit and the 64's."""
+    import math
+
+    from freesail import orders
+    from freesail.combat.guns import battery_of
+
+    w = _cast_loose(path)
+    battery = battery_of(w.ship)
+
+    def sides(order):
+        battery.single.clear()
+        _kind, text, data = orders.handle(w.ship, order)
+        assert list(battery.single) == data["guns"]
+        guns = [w.ship.guns[g] for g in data["guns"]]
+        assert guns and all(g.of_deck == deck and g.name in text for g in guns), (order, text)
+        return sorted({g.side for g in guns})
+
+    assert battery.engaged is None and not battery.target
+    assert sides(f"fire {words}") == ["larboard", "starboard"]
+    battery.engaged = "starboard"
+    assert sides(f"fire {words}") == ["starboard"]
+    battery.engaged = "larboard"
+    assert sides(f"fire {words}") == ["larboard"]
+    battery.engaged = "both"
+    assert sides(f"fire {words}") == ["larboard", "starboard"]
+    battery.engaged = None
+    battery.target, battery.target_relative_rad = "a mark", math.radians(-80.0)
+    assert sides(f"fire {words}") == ["larboard"]
+    battery.target_relative_rad = math.radians(95.0)
+    assert sides(f"fire {words}") == ["starboard"]
+    battery.engaged, battery.target = "starboard", None
+    if words.startswith("No. "):
+        n, rest = words.split(" ", 2)[1], words.split(" ", 2)[2]
+        assert sides(f"fire No. {n} larboard {rest}") == ["larboard"]
+
+
 # ---------------------------------------------------------------------------
 # Truth 7-195: her lower-deck ports shut at the heel the sources give (Bel-D §14.3; step 6)
 # ---------------------------------------------------------------------------

@@ -20366,12 +20366,13 @@ The lead's notes to the ships session of 2026-11-12 at 21:20 UTC and of 2026-11-
 and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), whose rulings are built here in local
 commits on the package's branch after the trunk's second merge (94bfac27), a subsection for each:
 (2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world; (4) of 01:05, the
-marines by fit; (3)(b) of the 12th at 21:20, a ship under another's orders. Measured on the owner's
-machine at seed 7, the scripts in the session's scratch (`s13/mend/`, `s13/s196/`, `s13/marines/`,
-`s13/orders/`), outside the repository, each run on the tree and on an export of the commit before
-(for the first, 94bfac27: `freesail/world/brains.py` as it was there, nothing else differing in the
-code). The rest of the four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not
-these commits'.
+marines by fit; (3)(b) of the 12th at 21:20, a ship under another's orders; (4) of the 12th, the gun
+named by deck in the struck carriage and the shut port, with the 12th's ask (ii), the 74's pumps
+(the code's, no commit). Measured on the owner's machine at seed 7, the scripts in the session's
+scratch (`s13/mend/`, `s13/s196/`, `s13/marines/`, `s13/orders/`, `s13/possessive/`), outside the
+repository, each run on the tree and on an export of the commit before (for the first, 94bfac27:
+`freesail/world/brains.py` as it was there, nothing else differing in the code). The rest of the
+four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not these commits'.
 
 ### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
 
@@ -20724,8 +20725,8 @@ reading the bill's at the beat (84), the refusals in words (4) and the whole ran
 **Whether a recorded passage moves:** none holds either ship on either fit. No shipped scenario or
 business names the 64 or the razee (B7.e's finding, looked for again: outside the ships' own files
 and their people no file of `data/` names either), and a fit without the key reads the bill's as
-before, so no other ship's beat moves; the four whole logs and the captain's trials ("The suites, as
-run", the three steps together). **Lines any ship may say that change:** the 64's, on her 'ardent
+before, so no other ship's beat moves; the four whole logs and the captain's trials as at the base
+(below, "The suites, as run (subsections 3 to 5 together)"). **Lines any ship may say that change:** the 64's, on her 'ardent
 class 1794' alone: her "Beat to quarters!" line (above), "Not hands enough for every gun" no longer
 said there, and what follows from who is at quarters (her carronades manned by marines, the
 marines' division 68, the marines to their muskets and back, the robbing at quarters); nothing of
@@ -20841,6 +20842,131 @@ the bases at 7b9d7c29, not run again:
   bases, the twelve pace tests; only in this run, the trunk's sixteen (truths 7-501, 7-510 to 7-519)
   and truth 7-231, all passed. The convoy's truths (7-143 onward) pass as at the base.
 - **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+### 5. B7.d: the gun named by deck in the struck carriage and the shut port (21:20 of the 12th, (4))
+
+**The ruling.** "(4) The razee not renumbered: as built (one gun deck); mend the design's words. The
+two lines that read as possessives ('the carriage of No. 3 starboard gun of the lower deck struck';
+'The port of No. 1 larboard gun of the upper deck is shut; the sea is at its sill.'): BUILD as you
+propose, only where the gun is named by deck, so that no other ship's line moves." With it the same
+note's (a): "see that the by-deck names agree with it everywhere", the trunk's rule for a bare
+number.
+
+**As built**, the form step 7's review proposed (the section of 2026-11-11, "The review's mends",
+item 6), word for word, keyed on `Gun.of_deck` (a broadside gun of a file numbered by deck: the 74's
+and the 64's), so that every other gun's line is as it was:
+- `freesail/combat/guns.py`, `Battery._drop_named` (a gun named to fire whose port the sea has
+  shut): "The port of No. 3 larboard gun of the lower deck is shut; the sea is at its sill."; every
+  other gun "The No. 3 larboard gun's port is shut; ..." as before. Its docstring says both.
+- `freesail/combat/hits.py`, `_deck_hit` (a shot across the deck that strikes a gun and does not
+  dismount it), the words in the minute's line of shot ("Shot from ...: ...; ..."): "the carriage
+  of No. 3 starboard gun of the lower deck struck"; every other gun "No. 3 starboard gun's carriage
+  struck" as before.
+
+**Old beside new** (`s13/possessive/probe_lines.py`, the gun loaded and named behind a port shut by
+hand, then a shot across her deck at it, the stream striking a gun and sparing its mounting):
+
+| Ship, gun | 65b757b9 | Now |
+|---|---|---|
+| The 74, No. 3 larboard of the lower deck: the port | "The No. 3 larboard gun of the lower deck's port is shut; the sea is at its sill." | "The port of No. 3 larboard gun of the lower deck is shut; the sea is at its sill." |
+| The 74, No. 2 starboard of the poop: the port | "The No. 2 starboard gun of the poop's port is shut; ..." | "The port of No. 2 starboard gun of the poop is shut; ..." |
+| The 64, No. 1 larboard of the upper deck: the port | "The No. 1 larboard gun of the upper deck's port is shut; ..." | "The port of No. 1 larboard gun of the upper deck is shut; ..." |
+| The 74, No. 3 larboard of the lower deck: the carriage | "No. 3 larboard gun of the lower deck's carriage struck" | "the carriage of No. 3 larboard gun of the lower deck struck" |
+| The 64, No. 1 larboard of the upper deck: the carriage | "No. 1 larboard gun of the upper deck's carriage struck" | "the carriage of No. 1 larboard gun of the upper deck struck" |
+| The frigate-36, No. 3 larboard; the brig's starboard bow chaser | "The No. 3 larboard gun's port is shut; ...", "No. 3 larboard gun's carriage struck"; "The starboard bow chaser's port is shut; ..." | the same, word for word |
+
+**The by-deck names and the trunk's rule for a bare number** (`orders.gunnery._of_the_side_meant`,
+package 74's step 6: a gun's number said with no side is the gun of the side engaged, else of the
+side the mark is on, else the pair). Read: every way of naming a gun by its deck goes by `_fire`,
+`_guns_named` and `_number_on_a_deck` (the pair of the number on the deck said, or the side's gun
+where a side is said) to `_of_the_side_meant`. No other order fires a gun by number (`ordnance`'s
+guns are by kind and calibre); the director's slots that read `guns_named` (a gun's captain,
+`world/orders.py` `_gun_captain`, and a thing aboard, `_gun_by_name`) take the pair's first, one
+crew to the pair, as for a bare number on any ship, and the trunk's rule is the fire order's alone,
+so they agree with it as the frigate's do. Measured on her default fit and the 64's, at quarters with her guns
+cast loose (seed 7), ten forms: "No. 8 gun of the lower deck", "the lower deck's No. 8", "lower-deck
+No. 8", "No. 8 on the upper deck", "No. 8 gun of the main deck", "the quarterdeck's No. 7", "No. 1
+gun of the forecastle", "No. 2 gun of the poop", the 64's "No. 13 gun of the upper deck" and "the
+lower deck's No. 1": with no side engaged and no mark, the pair; starboard engaged, the starboard
+gun; larboard, the larboard; both, the pair; none engaged and a mark 80 degrees on the larboard
+bow, the larboard gun; 95 degrees to starboard, the starboard; said with a side (the six forms that
+begin with the number: "No. 8 larboard gun of the lower deck"), that side's with the other engaged. Each gun fired is of the deck said, and the
+reply names each by it. **Every form agrees; nothing was mended there.** A deck's guns said with no
+number ("fire the lower deck") are a broadside of that deck, the engaged side's and refused with
+none (B7.b's rule, the review's mends of 2026-11-10), not a gun by number, and stay so; the refusal
+of a bare number on a ship numbered by deck gives as its example a form the rule takes ("'fire No. 3
+gun of the lower deck'").
+
+**The design's words** (`docs/design/Design-Ship-Bellerophon.md`), where they said the razee would be
+renumbered: §5.2 item 7 ("The 64 and the razee renumbered by deck in the same step") now the 64
+alone, the razee, of one gun deck, not renumbered; §12.3's row for `tools/ships/indefatigable.py`;
+§15's line for B7.d ("the 64's and the razee's bytes, gun ids and gun names"); §17.2 item 3; each
+with its first words said and the ruling named. A note after §5.2's as-built note gives the two lines
+and the check. **Build-Ships says otherwise nowhere:** its §16.1 row for B7.d has "The razee is not
+renumbered (one gun deck; Bel-D §5.2 item 7 named her, the lead's word the two two-deckers)" already,
+and the *Indefatigable*'s design (§5.2's as-built note) the same.
+
+**Tests**, new in `tests/test_bellerophon.py`, all fast:
+`test_a_gun_named_by_deck_behind_a_shut_port_says_the_port_of_it` and
+`test_a_gun_named_by_deck_struck_says_the_carriage_of_it` (the 74, the 64 and the frigate-36 each),
+the by-deck cases failing with the two code files as they were at 65b757b9 (scratch, the files
+restored byte for byte) and the frigate's passing both ways; and
+`test_a_number_with_its_deck_and_no_side_is_the_gun_of_the_side_engaged_or_of_the_marks` (the ten
+forms). **No pin moved:** no test held either old line by deck (grep).
+
+**What any ship may say that this step changes:** the 74's and the 64's alone: the shut port's line
+for a gun named to fire behind it (`guns.port_shut`) and the carriage struck in the minute's line of
+shot (`action.hit`), as above. Every other ship's words as before; no recorded passage holds either
+ship.
+
+**The 12th's ask (ii), the 74's pumps:** her file is not the cause (four chain pumps then two hand
+pumps, as the 64's and the razee's; given idle hands she mans all six with 20 hands, 350 tons an
+hour); the water's code is (`world/water.py`: the pumps take only the hands idle on deck at the
+order, down to one man, in the file's order, and nothing adds hands while she is manned), so no
+commit here: the mend goes to package 77's brief, item 4a(d), as the lead's note has it.
+
+### The suites, as run (subsections 3 to 5 together)
+
+Once, on 65b757b9 with subsection 5's step uncommitted, from the tree root with `py`, one run at a
+time with nothing else running, the branch and the tree asserted first, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/possessive/after/run.sh`), 05:25 to
+06:41 UTC; the bases at 7b9d7c29 not run again (`rf/final-fast.xml`, `rf/final-slow.xml`,
+`rf/fix/final/trials.xml`, `rf/fix/final/digests.json`). Subsections 3 and 4 add their own runs above.
+- **The whole fast tier** (`s13/possessive/after/fast.xml`): **7,595 passed, 2 skipped, 1 xfailed**,
+  exit 0 (64 minutes). Against the base (7,529): **no outcome changed.** Only in the base, three:
+  the strict expected failure made one with the 64's case at f5102fae, and the two old cases of the
+  other fits' beat (renamed at 26473408); only in this run, 72: these three steps' 42 (the marines'
+  24 and 2, the ship under orders' none, these lines' 16), f5102fae's three, and the trunk's 27
+  from its first merge (package 102's `test_flag_drawings` 9 and truth 7-501's six; package 104's
+  truths 7-510 to 7-518, the tide's gaugeless blocks, the weather's boxes and the Bona passage), all
+  passed; the skips and the xfail the base's.
+- **The slow cases of the touched files** (`--slow -m "slow and not pace"`: `test_bellerophon`,
+  `test_indefatigable`, `test_in_world`, `test_bilander`, `test_crews`, `test_damage_control`,
+  `test_dumb_show`, `test_far_action`, `test_fight`, `test_filling`, `test_health`,
+  `test_hull_schooner`, `test_lateen`, `test_lee_ports`, `test_neufchatel`, `test_pivot_gun`,
+  `test_practice`, `test_practice_orders`, `test_profile`, `test_view_action`, `test_viewer_action`,
+  `test_water`, `test_bill_marines_and_flag` and the captain's trials): 34 passed, 3 failed (356 s).
+  Against the bases restricted to them (35): **no outcome changed**; only in the bases, two pace
+  tests (truth 7-196's crewed clause, truth 88's cap full) and the three trials that are fast (in
+  the fast tier here, passed); only in this run, subsection 4's two and five slow cases of
+  `test_far_action` outside the base's slow list, all passed.
+- **The captain's trials:** five slow passed or failed as at the base, outcome for outcome and digest
+  for digest: the station's gale 1e59009004141b08, the trade's stranger 13432e4b2659bcaf
+  (`TRIAL_TRADE_STRANGER_DIGEST` unmoved by these steps), the trade's thick weather
+  41a37f0290be291a, the machine's three; the station's lee shore and stranger passed; the three
+  fast ones passed in the fast tier.
+- **The four whole logs** (`log_digests.py`, `s13/possessive/after/digests.json`): every field as
+  recorded at 7b9d7c29: the first action 497 lines, 234036cc17e6f137; the encounter 229,
+  732a6020db4d4755; the station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722,
+  1e59009004141b08.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+  Every changed file LF with a final newline.
+
+**Moved by these three steps:** nothing pinned. No recorded passage, digest, line count or tick moved
+(the four whole logs, the captain's trials and `TRIAL_TRADE_STRANGER_DIGEST` as at the base; truth
+77's digest and the gates' constants failing on this machine as at the base with the same figures),
+so there is nothing for the lead to re-pin by them; what moved is each step's behaviour alone, the
+worlds measured above.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
