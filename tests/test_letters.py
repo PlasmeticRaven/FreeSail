@@ -178,7 +178,8 @@ def test_a_paper_burnt_or_torn_up_is_gone_and_said_and_a_thing_that_is_no_paper_
     assert TH.find(w, "the letter") == []
     assert "letter" not in w.readings.words("people")
     assert w.readings.value("people")["things"] == ["a letter to the port admiral, burnt"]
-    assert not w.submit("read the letter").data["moved"]
+    # package 109: a line whose words find nothing is refused (it was a free line, not moved)
+    assert w.submit("read the letter").kind == "order.rejected"
     second = _written(w, "A second word.", "Mr Veale")
     e = w.submit("tear up the letter")
     assert e.text.endswith("tore up the letter; the letter to Mr Veale is torn up, and gone.")
@@ -205,7 +206,10 @@ def test_a_thing_looked_at_is_shown_with_its_description_and_a_letter_never_its_
         "By the captain, on the quarterdeck: looked at the packet; a sealed packet, from the "
         "Custom House; on the quarterdeck."
     )
-    assert w.submit("examine the brandy").text.endswith("as said; nothing of the ship's changed.")
+    # package 109: no brandy is known, and the order is refused saying so (it was "..., as
+    # said; nothing of the ship's changed.")
+    e = w.submit("examine the brandy")
+    assert e.kind == "order.rejected" and "there is no brandy that you know of" in e.text
     letter = _written(w)
     w.submit("seal the letter")
     e = w.submit("inspect the letter")

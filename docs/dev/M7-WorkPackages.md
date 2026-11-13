@@ -92,11 +92,13 @@ on these packages; that is the owner's choice.
 | 106 | Opus | **The west African coast down to Cabo Verde** (the owner, 2026-11-11: "we also want to consider the western African coast down to Cabo Verde for blocks to be booked"): what the chart holds south of the Strait today to be measured first, then the blocks proposed (Morocco's Atlantic coast, the Canaries and Madeira if they are missing, the desert coast, Cape Verde; whether the islands of that name with the cape is the owner's to say at the brief); ports by decision 67 | to be considered: measured and proposed by the lead for the owner, nothing booked to build; **measured 2026-11-11** ("## Package 106 ... the measurement" below): the chart ends at 32 N and holds nothing south of Madeira; six blocks proposed (the ocean layer carried south, the Canaries, Morocco's coast, the Cape Verde Islands, Senegal and Cape Verde, the desert coast), for the owner to book; **the owner, 2026-11-11: "I pointed out Cabo Verde (the islands), as a southern stopping point, but the blocks should cover the African coast as well"**: so all six blocks are the scope, the islands and the coast down to their latitude (the Gambia, south of it, left out); each block briefed for his approval in the lead's order, the ocean layer with the Canaries first; **106a (the ocean carried south, and the Canaries with the Salvages) briefed 2026-11-11 for the owner's final approval** ("## Package 106a" below), truths 7-520 to 7-529; **106a APPROVED by the owner 2026-11-12 and launched (session_01XooV47SbRu5js5GthvcoYf, claude/pkg-106a); the goal for now, in his words: "the western African coast down to the latitude of the Canaries, and including the Canaries and the Atlantic necessary to sail fairly freely to all the charted points off the coast"**: so the ocean layer to the Canaries' row and the Canaries (106a), then Morocco's coast carried down to the islands' latitude (106b, to be briefed); the Cape Verde Islands, Senegal and the desert coast south of the Canaries wait behind that goal; **106b (Morocco's Atlantic coast from Cape Spartel to the Canaries' latitude, two regions) briefed 2026-11-12 for the owner's final approval** ("## Package 106b" below), truths 7-550 to 7-559, to launch when 106a is merged; **106b APPROVED by the owner 2026-11-12 to launch when 106a merges; the goal restated by him the same day: "We can progressively continue towards the Cape Verde islands, as before, while also building out the Mediterranean"**: so the blocks go on southward after 106b (the desert coast, Senegal and the cape, the islands) one at a time, each briefed for his approval, with the Mediterranean's blocks beside them |
 | 107 | Opus | **The ports filled out on the blocks already built** (the owner, 2026-11-11, decision 67: "refinement passes on existing chart blocks to fill out ports that exist only now as anchorages or marks"): a survey first of every region's features that are a road, an anchorage or a harbour without a port file, then the port files, region by region, each with its dated rows | booked 2026-11-11; the survey the lead's, the passes briefed after it; **surveyed 2026-11-11** ("## Package 107 ... the survey" below): 77 port files, about 240 places with a feature and no port file, ten passes proposed (Brest and the Western Approaches first), and a short step before them to settle the port file's dated form; **not yet, by the owner (2026-11-11): "We don't need to run 107 yet, as we'll continue expanding before we do refinement passes"**; the port file's dated form is asked of the new blocks' briefs meanwhile |
 | backlog (the stranger's view) | none | **A ship view of another vessel in sight** (the owner, 2026-11-11, striking the strip from 102): "a later 'stranger view' or 'enemy view' (maybe a small popout) that shows a ship view of a requested vessel that is in sight", her colours and hoists on it; under the knowledge rule, so beside or after package 99 | on the backlog, unbooked |
-| 108 | to be decided (a design note first) | **A scenario generated from a request in plain words** (the owner, 2026-11-11: "a 'scenario generation' feature that calls one of the APIs, or can be called from the MCP, to generate a scenario to an open free-text scenario request. This might streamline the actual play flow, when we get beyond testing, with the full manual scenario editor retained and refined/filled out alongside"). The lead's first shape, for the owner: the generator writes **a scenario file in the editor's own form**, never a thing of its own, so that what it makes is loaded, checked and edited as any scenario is; it chooses only from **what the game holds for the day asked** (the ports, ship files and fits, nations and their wars, roles, briefs: one description of the form with its allowed values, which the editor, the checker and the generator all read); what it could not honour it says in words; two fronts over the same three acts (the menu for a day, the check with its refusals in words, the save): the MCP first (the model the player already talks to writes it: no key, no cost of the game's), a provider's door second (the key in the environment alone, the cost shown before the call). The seats it may write are the consent rules' as for any scenario. **The owner's two answers (2026-11-11):** (1) both routes at once, "simply through both routes that already exist in the code. This will basically functionally be a station 'outside of the game', for the purposes of scenario generation, and so that it can make a second/multiple passes for revision": so the generator is a seat like the stations' and the director's, held through the MCP or a provider's door alike, that stands outside any world, with the menu, the check and the save as its readings and orders, and a conversation it can revise in; (2) whether a director is expected is "one toggleable option in the scenario generation interface, so that the generating model knows whether a director is expected or not". **On consent (the owner, 2026-11-11):** "I'm not sure whether this seat needs to sit within the consent framework, simply because it is as close to 'expected' work that any model might interface with, but for consistency we might include it. It needn't confuse the general consent briefing, though, since this is an 'out of the game' station, it's mostly just a de facto station." So the design note gives it a short paragraph of its own for consistency and leaves the general brief as it is; that a generated scenario seats nobody the doors would refuse is the checker's rule, not a matter of consent. | considered 2026-11-11; booked for a design note beside or after package 96 (which settles the scenario's form); not briefed |
-| 109 | Opus | **The mends from the owner's play of 2026-11-12** (his third notes, ten, with five saves: the bilander free in Torbay, the 74's encounter, the frigate's free patrol): the free order that answered "as said" and did nothing (notes 9, 4, 10), a reading of his own keeping (5), the boat that waited two hours on a short watch and could not be belayed (1), the director's dry run that reported success where the copy of the world had failed (2), the page drawing his first ship while he was aboard another (6), vessels sailing across the land on the legs never checked (8) | **briefed 2026-11-12 for the owner's final approval** ("## Package 109" below): five steps, truths 7-540 to 7-549; note 7 (clear for action) put to him for package 77, the readings' leak for package 99; **APPROVED by the owner 2026-11-12 as briefed; launched** (session_01XooV47kcth9DkyWW4no9HL, claude/pkg-109) |
-| 110 | to be decided (a design note first) | **Slavery in the world, and its suppression** (decision 68; the owner, 2026-11-12: "a real fact of the world", "a grounded and respectful-to-the-history basis", the player's interest "the depiction of the efforts to suppress it"): a design note settling what the data says and by which years (each nation's law and treaties on the trade, the courts, the squadron on the African coast, the Barbary regencies and the expedition of 1816), how a vessel of the trade is met and described, what a King's ship may do on which day and what the prize court of package 74 then does (the people freed, the bounty the law gave, no other money for a person), what is said of a capture before the law changed, and captivity under the regencies as a risk to the player's own people; every date and figure from a source **For the note, from the owner the same day:** (a) his question whether a captor could have freed the people of a slaver before 1808, and the lead's answer from memory, to be checked against sources: not lawfully by a British captain on his own authority (they were prize awaiting the court, and he answerable for their value), and the lead knows no case of it; but it did happen where the captor's own law did not hold them property: France between the decree of 1794 and 1802, and the United States enforcing its acts of 1794 and 1800 on its own flag (the *Ganges*, 1800, at Philadelphia); and a free settlement stood at Sierra Leone from 1792: so the note weighs a player's own choice to free them at his own cost and answer for it (decision 66: the interactions are the world's own) against the default of the outcome said in a line. (b) On Barbary captivity: "I am not opposed to modelling this in some way, and we might look at real examples like Kenshi that depict it, while considering to what extent we want this to be a detailed loop/system": the note sets out a light, a middle and a detailed form on package 74's captive, and recommends one. **Ruled by the owner (2026-11-12, in decision 68):** Barbary captivity in the middle form (no life and labour ashore; a state that "does not destroy the game but rather realizes the consequences and makes travel in the seas where Barbary ships are truly risky"); a slaver taken before the law changed handled by the captor's nation and the day (the freeing playable for the nations whose law gave it, a line and nothing paid for the rest). | booked 2026-11-12 for a design note, to be briefed for the owner; before the charts reach Senegal; meanwhile decision 68's interim rule binds every brief |
-| 111 | Opus | **The chart's audit** (the owner, 2026-11-13, approving the lead's proposal: "We should probably call some stopping point for chart expansion just so that we don't snowball beyond what is testable before we establish that the expansion is truly proceeding comprehensively"): a tool with its own tests that sweeps every block for what the builders found by chance: water that no region owns, a tide that is not the sea's own, weather boxes that do not meet where the regions do, a port that cannot be reached from open water without crossing land, a mark on the wrong side of the shore; its findings listed and the cheap ones mended | **LAUNCHED 2026-11-13** by the owner's word ("111 may launch now, and 112 after 106a's merge"), session_01XooV47SnquXZH8FHgAmcYu on `claude/pkg-111` ("## Package 111" below): two steps (the tool with its ratchet; the mends the lead rules), truths 7-560 to 7-569 |
+| 108 | to be decided (a design note first) | **A scenario generated from a request in plain words** (the owner, 2026-11-11: "a 'scenario generation' feature that calls one of the APIs, or can be called from the MCP, to generate a scenario to an open free-text scenario request. This might streamline the actual play flow, when we get beyond testing, with the full manual scenario editor retained and refined/filled out alongside"). The lead's first shape, for the owner: the generator writes **a scenario file in the editor's own form**, never a thing of its own, so that what it makes is loaded, checked and edited as any scenario is; it chooses only from **what the game holds for the day asked** (the ports, ship files and fits, nations and their wars, roles, briefs: one description of the form with its allowed values, which the editor, the checker and the generator all read); what it could not honour it says in words; two fronts over the same three acts (the menu for a day, the check with its refusals in words, the save): the MCP first (the model the player already talks to writes it: no key, no cost of the game's), a provider's door second (the key in the environment alone, the cost shown before the call). The seats it may write are the consent rules' as for any scenario. **The owner's two answers (2026-11-11):** (1) both routes at once, "simply through both routes that already exist in the code. This will basically functionally be a station 'outside of the game', for the purposes of scenario generation, and so that it can make a second/multiple passes for revision": so the generator is a seat like the stations' and the director's, held through the MCP or a provider's door alike, that stands outside any world, with the menu, the check and the save as its readings and orders, and a conversation it can revise in; (2) whether a director is expected is "one toggleable option in the scenario generation interface, so that the generating model knows whether a director is expected or not". **On consent (the owner, 2026-11-11):** "I'm not sure whether this seat needs to sit within the consent framework, simply because it is as close to 'expected' work that any model might interface with, but for consistency we might include it. It needn't confuse the general consent briefing, though, since this is an 'out of the game' station, it's mostly just a de facto station." So the design note gives it a short paragraph of its own for consistency and leaves the general brief as it is; that a generated scenario seats nobody the doors would refuse is the checker's rule, not a matter of consent. | considered 2026-11-11; booked for a design note beside or after package 96 (which settles the scenario's form); **the owner (2026-11-13) allowed it briefed and run "if you think, especially for 108, it won't miss anything still to come in another build package"; the lead's judgement: it would,** since the menu a generator chooses from is the ship's configuration that 96 designs and "what the game holds for the day asked" is the lever that 103 designs, both held to the milestone's end, and 60, 77 and 80 still add forms a scenario may hold; so it stays with 96 and 103, not briefed |
+| 109 | Opus | **The mends from the owner's play of 2026-11-12** (his third notes, ten, with five saves: the bilander free in Torbay, the 74's encounter, the frigate's free patrol): the free order that answered "as said" and did nothing (notes 9, 4, 10), a reading of his own keeping (5), the boat that waited two hours on a short watch and could not be belayed (1), the director's dry run that reported success where the copy of the world had failed (2), the page drawing his first ship while he was aboard another (6), vessels sailing across the land on the legs never checked (8) | **briefed 2026-11-12 for the owner's final approval** ("## Package 109" below): five steps, truths 7-540 to 7-549; note 7 (clear for action) put to him for package 77, the readings' leak for package 99; **APPROVED by the owner 2026-11-12 as briefed; launched** (session_01XooV47kcth9DkyWW4no9HL, claude/pkg-109); **step 1 (the words that did nothing) merged 2026-11-13 (00da8a1a)**, truths 7-540 and 7-541, truth 7b-115 superseded by design; next steps 2 to 5 |
+| 110 | to be decided (a design note first) | **Slavery in the world, and its suppression** (decision 68; the owner, 2026-11-12: "a real fact of the world", "a grounded and respectful-to-the-history basis", the player's interest "the depiction of the efforts to suppress it"): a design note settling what the data says and by which years (each nation's law and treaties on the trade, the courts, the squadron on the African coast, the Barbary regencies and the expedition of 1816), how a vessel of the trade is met and described, what a King's ship may do on which day and what the prize court of package 74 then does (the people freed, the bounty the law gave, no other money for a person), what is said of a capture before the law changed, and captivity under the regencies as a risk to the player's own people; every date and figure from a source **For the note, from the owner the same day:** (a) his question whether a captor could have freed the people of a slaver before 1808, and the lead's answer from memory, to be checked against sources: not lawfully by a British captain on his own authority (they were prize awaiting the court, and he answerable for their value), and the lead knows no case of it; but it did happen where the captor's own law did not hold them property: France between the decree of 1794 and 1802, and the United States enforcing its acts of 1794 and 1800 on its own flag (the *Ganges*, 1800, at Philadelphia); and a free settlement stood at Sierra Leone from 1792: so the note weighs a player's own choice to free them at his own cost and answer for it (decision 66: the interactions are the world's own) against the default of the outcome said in a line. (b) On Barbary captivity: "I am not opposed to modelling this in some way, and we might look at real examples like Kenshi that depict it, while considering to what extent we want this to be a detailed loop/system": the note sets out a light, a middle and a detailed form on package 74's captive, and recommends one. **Ruled by the owner (2026-11-12, in decision 68):** Barbary captivity in the middle form (no life and labour ashore; a state that "does not destroy the game but rather realizes the consequences and makes travel in the seas where Barbary ships are truly risky"); a slaver taken before the law changed handled by the captor's nation and the day (the freeing playable for the nations whose law gave it, a line and nothing paid for the rest). | booked 2026-11-12 for a design note; **BRIEFED AND LAUNCHED 2026-11-13 by the owner's word** ("## Package 110" below; Opus, session_01XooV4B5W3EYDVMWX14zfUR on `claude/pkg-110`; a design note alone, the questions for the owner at its end); meanwhile decision 68's interim rule binds every brief; **the note merged 2026-11-13 (39d4a586, squashed from b8d629d1 so that six whole volumes of sources stay out of the trunk's history; documents alone)**; **the owner's answers to its nine questions the same day** (decision 68's postscript): the writer's recommendations taken on 1 to 4 and 6 to 9; on 5 a corsair's station may be held by a model under a wholly transparent brief, the model deciding; the note's revision to them to come at a new hash |
+| 111 | Opus | **The chart's audit** (the owner, 2026-11-13, approving the lead's proposal: "We should probably call some stopping point for chart expansion just so that we don't snowball beyond what is testable before we establish that the expansion is truly proceeding comprehensively"): a tool with its own tests that sweeps every block for what the builders found by chance: water that no region owns, a tide that is not the sea's own, weather boxes that do not meet where the regions do, a port that cannot be reached from open water without crossing land, a mark on the wrong side of the shore; its findings listed and the cheap ones mended | **LAUNCHED 2026-11-13** by the owner's word ("111 may launch now, and 112 after 106a's merge"), session_01XooV47SnquXZH8FHgAmcYu on `claude/pkg-111` ("## Package 111" below): two steps (the tool with its ratchet; the mends the lead rules), truths 7-560 to 7-569; **step 1 (the tool, its tests and its ratchet; 174 findings listed, no data changed) merged 2026-11-13 (031de7de)**, truths 7-560 to 7-565; the lead's rulings for step 2 in its record (2a what moves nothing; 2b the 24 ports' ways, reported before it is built) |
 | 112 | Opus | **The coarse seas** (the owner, 2026-11-13: the structural change "adding a coarse ocean layer for the Mediterranean" approved; and his question whether to "establish coarse 'seas', even now beyond the chart boundaries, so that everything can start from a coherent and efficient baseline"): a coarse layer under the whole Mediterranean, laid beside the existing one by package 106a's way so that no existing tile changes; whether the world's coarsest layer and more of the ocean are committed with it is put to the owner with figures | **APPROVED by the owner 2026-11-13 to launch at 106a's merge** ("111 may launch now, and 112 after 106a's merge"); briefed 2026-11-13 ("## Package 112" below), by his "Yes to both briefs" and his word that "the whole Atlantic is eventually coming": the world's layer and the 30-second layer under the Mediterranean and down the eastern Atlantic, measured first; a sea as its chart, its weather and its tide; the plan for the whole Atlantic on paper; truths 7-570 to 7-579; to launch when 106a merges |
+
+**Trial merges in the cloud (the owner, 2026-11-13):** "You may use a scratch branch for trial merges, and multiple cloud runs at a time. I trust that you would verify the integrity of this method, as you are directly managing the merging/pushes and repository." **The method, as the lead keeps it:** one scratch branch, `claude/trial`, written by the lead alone and never merged anywhere; a trial is a commit whose tree is exactly the lead's staged trial merge (the trunk's head with the builder's reported hash merged, the two end-of-file appends kept both) and whose parents are the branch's old tip, that base and that hash, so that every push is a fast-forward and none is forced (`trialpush.sh` in the lead's scratch folder). The whole suite is dispatched on it and the run's own `head_sha` is checked against that commit. **A step merges on the trunk only by the builder's hash, and only where the trunk's tree after the merge equals the tree the green run tested** in every file but the lead's own documents; where the trunk has moved by another merge since, the trial is made again on the new head (or made on top of the other trial, so that the pair is tested as it will stand) and never assumed. The lead's own fast tier runs beside it on another step; the run on the trunk after each merge stays. No run on the scratch branch is recorded as the trunk's.
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
 on, not a ruling: every launch still waits for the owner's word).** *In flight (as of 11:00 UTC, 98 closed and 60's note merged):* 74 (Fable;
@@ -4628,8 +4630,7 @@ xfailed, exit 0; lint and the name sweep clean. **No digest and no line the game
 hoist or of the colours moved. Found and not mended (the lead's list):** a table book's
 lookout says "two flags at the main" for Spain's signals of one flag (401 to 421). A stray
 branch `pkg-102-s2` was left on the remote by the builder's harness; it holds nothing the
-trunk lacks and may be deleted by the owner. The whole suite in the cloud after run 73, the
-figures to follow. **Next: step 3** (a hoist has its place and is seen on the player's own
+trunk lacks and may be deleted by the owner. The whole suite in the cloud, run 73 (2026-11-13, 00:31 to 01:27 UTC, on 06e14183): green whole, lint, the six shards and the pace job. **Next: step 3** (a hoist has its place and is seen on the player's own
 ship; the stranger's strip struck by the owner).
 
 ### Package 105, step 1 (a port file's dated rows), as merged (2026-11-13)
@@ -4656,9 +4657,110 @@ the fast tier exit 0, the slow tier of the touched files and the known truths 44
 and 8 xfailed with the recorded passages to their digests, the pace 12; the lead's fast
 tier on the merged trial (2026-11-13, 00:38 to 01:34 UTC, begun again after the container
 was replaced) 7,502 passed and 1 xfailed, exit 0; lint and the name sweep clean; the
-loader's change read by the lead. **No pin moved.** The whole suite in the cloud after run
-74, the figures to follow. **Next: step 2** (the region; its measurement accepted on
+loader's change read by the lead. **No pin moved.** The whole suite in the cloud, run 74 (2026-11-13, 02:10 to 03:18 UTC, on 5c334d22): green whole, lint, the six shards and the pace job. **Next: step 2** (the region; its measurement accepted on
 2026-11-12: one region of 29.3 MB, six gauges).
+
+### Package 109, step 1 (the words that did nothing), as merged (2026-11-13)
+
+Merged by hash 664ee15 as 00da8a1a (`--no-ff`, the two end-of-file appends kept both, the
+trunk's first), the tree equal to the lead's trial's (5dde2125) in every file but the
+lead's own documents. From the owner's third play notes (9, 4, 10 and 5). **What it
+built:** (a) **a free order whose words find no thing is refused** (`order.rejected`,
+nothing journaled), saying what was not found and what is known by that name: a thing gone
+over the side or destroyed, a person who is no thing, an order of the dialect the words
+were near ("take posession of the renard" is answered with "take possession of"), and what
+is in his keeping and lying where he stands, or "You keep nothing, and nothing lies here."
+A line that found a thing and moved nothing is "as said; nothing of the ship's changed" as
+before; every line that did an act is unchanged; `eat` and `drink` (package 54's) are as
+they were. (b) "take a sight for the latitude" and its like are the dialect's own; a bare
+"take a sight" names both sights; "open the gunports" and "take command" are refused with
+the orders they mean. (c) **The name a thing is listed by is a name the game takes**
+(`things.find`: with or without articles and the words of its state; a letter without its
+writer's title), so the director's letter that the owner could pick up and not read now
+opens by nine forms of words. (d) **Two or more of a name within reach are told apart**
+(the listed name, the hand and the hour, where each lies, the first six words of one he
+may read, never a sealed letter's), and "the first", "the second", "the last" and "the
+other" then take one. (e) **A reading `my keeping`** (and "what I have", "inventory", "the
+letters" and more), for the asker alone. **Taken another way than the brief, accepted:** a
+free verb is refused where no thing is found even though a person is. **Truths** 7-540 and
+7-541; `tests/test_mends_109.py` (32 cases that failed on the trunk before). **Superseded
+by design, old beside new (the owner's standing rule of 2026-11-12):** truth 7b-115's ten
+free lines naming nothing were journaled "as said; nothing of the ship's changed" and are
+now refused; three such lines in `tests/test_people.py` and two in `tests/test_letters.py`
+with them; the primer's chapter 14 says the rule. **No digest and no kept save moved.**
+**The measure:** the builder's, ruff clean, the fast tier exit 0, the slow tier of nine
+files 1,751 run and none failed, the pace 12; the lead's fast tier on the merged trial
+(2026-11-13, 01:35 to 02:29 UTC) 7,541 passed and 1 xfailed, exit 0; lint and the name
+sweep clean; the engine's changes read by the lead. **For package 99's design (held), not
+this package's:** these refusals, as package 100's already did, tell a man where a thing
+lies, whose keeping it is in and that it went over the side, whether or not he saw it.
+**Found and not mended (the lead's list):** "take the purse" is read as the reading "the
+purse", so a thing called a purse cannot be taken by those words. The scratch branch's first trial run on this step's tree (run 75) was cancelled unfinished when the next trial was dispatched on the same branch, and proves nothing. The whole suite in the cloud on the trunk after its next run, the figures to follow. **Next: step 2.**
+
+### Package 111, step 1 (the chart's audit), as merged, and the lead's rulings for step 2 (2026-11-13)
+
+Merged by hash 16c81622 as 031de7de (`--no-ff`, the two end-of-file appends kept both, the
+trunk's first), the code, data, tests and tools equal to the lead's trial's; the documents
+differ by the lead's own and by package 110's note, which came on the trunk between the
+trial and the merge (documents alone, with the tests that read the documents run on them).
+**What it built, changing no data:** `tools/audit_chart.py`, which reads the chart as the
+game reads it and reports by region; `tests/test_chart_audit.py`; and **the ratchet,**
+`data/charts/audit-known.yaml`, the 174 findings of the first full sweep, each with its
+place, its reason in a line, its owner and its count as a ceiling. The fast tier runs a
+sampled grid and fails on a finding the list lacks; the slow tier runs the full sweep and
+fails also on a listed finding that is gone and on a count over its ceiling. Each check is
+proved by planting a fault. **Truths 7-560 to 7-565.** The cost: about 68 seconds of the
+fast tier's serial time, about 89 of the slow tier's. **The measure:** the builder's, ruff
+clean, the fast tier 7,496 passed and 1 xfailed, the slow tier of the touched files and the
+known truths 188 passed and 8 xfailed, the pace 15; the lead's fast tier on the merged
+trial (2026-11-13, 02:38 to 03:38 UTC) 7,558 passed and 1 xfailed, exit 0; lint and the
+name sweep clean. No pin moved.
+
+**The findings** (the builder's table is in the tuning notes): water nobody owns, 52 groups
+(42 where a region's tiles reach past its bounds into open water, some 32,450 square miles;
+10 slivers beside a neighbour's bounds, some 950 square miles, **which read the Channel's
+tide, Saint-Malo's 3.7 m, in the Mediterranean**), and one overlap of bounds (the Ligurian
+sea's and the Tyrrhenian's); the seams whole, three coasts missing by a cell or two; **the
+level of the Channel's eleven gauges over four blocks with no gauge's level of their own**
+(the Tyrrhenian, the Strait, Madeira, the Azores: 3.2 to 6.8 m over the datum); three
+strips in no weather box and five regions cut by a box's edge; Madeira not in the streams'
+limits; **the land guard refusing the way in or out of 25 of the 90 ports, so that the
+business draws no trader for them** (St Malo, Dartmouth, Poole, St Peter Port, Morlaix, St
+Mary's, Toulon, Genoa, Lisbon, Oporto, Ferrol, Palma, Port Mahon and others); 13 moorings
+and one road on the grid's dry ground, 9 depths far from their files', 2 shores afloat; 25
+marks (**the Eddystone and the Longships with no rock under their lights**); the scenarios
+clean.
+
+**The lead's rulings for step 2, in two parts, each at its own hash.** **2a, what provably
+moves no recorded passage, no kept save and no truth** (the proof with the hash: the
+passages and the truths of the regions touched run before and after): (1) Madeira's and
+the Azores' bounds to their tiles' edges, as proposed; never channel-west's. (2) The
+Mediterranean slivers: gulf-of-lion's east and ligurian-sea's west to meet at the column's
+edge, ligurian-sea's east to 11.1466 E; the piece of the Tyrrhenian's tiles west of 8 E
+between 40.56 and 40.99 N by a tide region on `solent`'s pattern, as proposed, the piece
+staying in the list as owned by no region with its reason. The overlap of the Ligurian
+sea's and the Tyrrhenian's bounds stays listed: say which answers there today and leave
+it. (3) The three weather boxes moved as proposed, **only with the proof that each strip
+was answered by that same box before** (then no weather moves); a strip another box
+answered stays listed. (4) Madeira's box in `book_limits` and the Balearics' north to
+40.56 N. (5) The 13 moorings, Cartagena's road and the two shores moved to the nearest
+water (or shore) that fits their files, each old beside new with the distance moved;
+**where a port's spot is the start of a scenario, a truth or a passage, say so and leave
+it for 2b.** (6) **A depth a port file has from a pilot is never rewritten to fit the
+grid:** a spot is moved onto its sounding where the grid has that depth within two cables,
+else it stays listed with both figures. **2b, the 24 ports' ways in and out, reported
+before anything is built:** for each port the `tracks:` proposed (from the pilots on file
+where they give the channel, else from the grid's own water and marked JUDGEMENT), and
+**what giving them moves**: which recorded passages, truths and kept saves see a trader
+they did not see, by toggling each region's tracks. Traders drawn for those ports is the
+world as it should be, and by the owner's standing rule of 2026-11-12 a passage that moves
+by it moves by design, named old beside new, the lead re-pinning on the build machine;
+but nothing is built until the lead has that table. **Package 109 is mending the legs the
+land guard never checked (the owner's note 8): merge the trunk before 2b and say what its
+step changes of your count.** **Not step 2's, kept in the list:** the four levels and the
+rocks the grid lacks (a package of their own, put to the owner as 113; **the owner, 2026-11-13: "Shouldn't we let 111 finish before booking anything that comes from it, so that whatever we do book has all the information and leads?": so nothing is booked from the audit until package 111 is closed, and what it leaves is gathered then**); the coasts' misses
+(a rebuild); the tiles' reach into open water (package 112's seas). The whole suite in the
+cloud on the trunk after its next run, the figures to follow.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -8764,6 +8866,97 @@ slow tier of the touched files and of the known truths; the pace alone and last,
 of the ticks held with the layers loaded), under 700 words, and the lead merges by that
 hash.
 
+## Package 110: slavery in the world, and its suppression: the design note (`docs/design/Design-SlaveryAndSuppression.md` new; `docs/references/` the sources read, each with its row; no code, no data, no test)
+
+**BRIEFED AND LAUNCHED 2026-11-13 by the owner's word** ("Yes, we may brief 110 and 108,
+and run them if you think"). Opus. A design note for the owner's decisions and nothing
+built. **Decision 68 (`docs/DesignProposal.md`) is its frame and is read first, whole:**
+slavery is a real fact of the world, told on "a grounded and respectful-to-the-history
+basis"; the player's part, "if in anything", is "the depiction of the efforts to suppress
+it"; "ignoring it totally ... is also dishonest to reality". Never a thing the player
+does: no person is a cargo of a market or of the business, no scenario is built on
+carrying, and the note proposes nothing that makes the trade a way of playing. **The
+owner's two rulings of 2026-11-12 are settled and are designed to, not reopened:** (a)
+Barbary captivity in the middle form ("detailed depiction of the life and labour ashore
+is definitely too far ... the state should be one that does not destroy the game but
+rather realizes the consequences and makes travel in the seas where Barbary ships are
+truly risky"); (b) a slaver taken before the law changed is handled by the captor's
+nation and the day: the freeing playable "for nations that allowed the freeing of slaves
+from taken slavers", and "a line and nothing paid" for a nation "with no reasonable method
+of freeing at a certain date".
+
+**Everything this brief says of a law, a date, a ship or a sum is FROM MEMORY and is the
+builder's to check: where a source says otherwise the source wins and the note says so.**
+The game's years are about 1792 to 1825 (decision 66; package 103's range).
+
+0. **The sources, first, with a short report in the note's own first section:** what
+   `docs/references/` already holds; then the texts themselves where they can be fetched
+   and are out of copyright: the Acts (Britain's of 1788, 1799, 1806, 1807, 1811 and the
+   bounty clauses; the United States' of 1794, 1800, 1807, 1819 and 1820; France's decree
+   of 1794, the law of 1802, the decree of 1815 and the laws after; Denmark's edict of
+   1792; the Netherlands', Sweden's, Spain's and Portugal's), the treaties (Portugal 1810,
+   1815, 1817; Spain 1817; the Netherlands 1818; the mixed commissions), the Admiralty
+   reports of the leading cases (the *Amedie*, the *Fortuna*, the *Diana*, *Le Louis*),
+   the African Institution's reports, the papers on Sierra Leone and its court, the navy's
+   own orders to the ships on the coast, and for the regencies the treaties, the consuls'
+   printed accounts and the dispatches of 1816. Modern books are cited for a figure or a
+   finding, never copied. Each source gets its row in the references' README as the house
+   does; a download is data, read and never run. What cannot be read is said so.
+1. **The law by nation and year, as a table the data could carry:** for each nation the
+   game holds, by dated rows (decision 66: an element carries its dates; the form of
+   package 105's dated rows), whether its subjects may carry on the trade, whether its
+   ships of war may stop one of their own flag, of an enemy's, of a neutral's or an
+   ally's, in war and in peace, by which act or treaty, before which court, and what the
+   court then did. The peace of 1815 changes the right of search: say how.
+2. **What became of the people,** honestly and from sources: condemned as prize and sold
+   before the law changed; freed by which court and to what (the "liberated Africans" of
+   Sierra Leone, apprenticed or enlisted; the French and American cases); the bounty a
+   captor was paid by head and no other money for a person. The note proposes the words
+   the game would use and the words it will not.
+3. **A vessel of the trade as the world shows her:** in the business of the seas the
+   chart holds (which coasts, which years, which flags, from sources), how the lookout,
+   the boarding officer and her papers describe her, and what is never described. Plain,
+   exact, no cruelty drawn for effect, the people spoken of as people.
+4. **What a ship may do on which day, and what package 74's prize court then does:** the
+   stopping, the sending in, the court's sentence by the table of (1); the freeing as an
+   outcome of the court; the bounty in the prize account. **Before the law changed, by
+   the owner's ruling (b):** the two forms designed, the playable freeing for the nations
+   and years whose law gave it and the line for the rest; and, weighed and put to the
+   owner, a captain's own choice to free them without the law, at his own cost and answer
+   (the lead's answer from memory of 2026-11-12 is in the packages table's row 110: check
+   it).
+5. **The squadron and the places:** the ships sent to the coast from 1808, Sierra Leone
+   and its court, the stations; which of it lies on water the chart has or is to have
+   (package 106b's coast to the Cape Verde Islands) and which waits for charts.
+6. **Captivity under the regencies, by the owner's ruling (a):** who was at risk in which
+   years (the flags covered by treaty, tribute or pass and those not; the wars of the
+   United States; the expedition of 1816 as a dated event), how a taking happens in the
+   game's own terms (the far fight and the striking of package 74, the captive's state of
+   its step 7), and **the state itself: a consequence that passes** (ransom, redemption by
+   a consul or an order, exchange, release by treaty; the time it takes told in the
+   ellipsis, not played hour by hour), for the player's own person and for his people,
+   that makes those seas a real risk without ending the game. How other games have handled
+   a player's captivity may be compared in a paragraph (the owner named Kenshi), as
+   mechanics only.
+7. **The seats:** what a station held by a model, the rules' captains and the director
+   would be asked to play or to say under this design, said plainly for the owner; the
+   consent documents are not touched and nothing is proposed for them here.
+8. **What else it touches:** the ports' words (104, 105, 106a, 106b under the interim
+   rule), the letters and papers (100), the signals and colours, the career study (92),
+   the range's review (103).
+9. **The questions for the owner,** each answerable in a word or a line, the builder's
+   recommendation first; and **the first building package in outline** (the smallest true
+   thing: most likely the table of (1) as data with the ports' and the lookout's words),
+   for the lead to brief after the owner's answers.
+
+**The rules of every package bind:** no model or vendor identifier in any file; nothing
+under `docs/agents/consent/` nor `docs/agents/ConsentBrief.md` touched; no key, no paid
+call; the builder works on `claude/pkg-110`, never pushes to or rebases the trunk, never
+force-pushes, opens no pull request; no code, data or test file changes at all. One hash,
+with `ruff check .`, `ruff format --check .` and the tests that read the documents passing
+(find them and name them), reported to the lead in under 600 words with the questions for
+the owner set out whole.
+
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
 **Built by the owner's own local session by its workflow method** (his word of 2026-10-28;
@@ -8883,6 +9076,8 @@ the quarter gunners as real posts that compete for hands are 77's unless 75 take
 first.
 
 ### Notes from the lead to the ships session (the written channel: the session fetches this branch before each stage; its reports are its branch and `docs/design/`)
+
+**The nudge (from 2026-11-13, tested at 02:06 UTC, the session awake within a minute while idle):** the lead cannot message the ships session, so when a new note is written here the lead also changes `docs/dev/ShipsNudge.md` (its date and its nudge number); a background watcher in the ships session fetches the trunk each minute, wakes the session when that file changes, and is armed again after the notes are read. A note written without changing that file is not seen until the session next fetches.
 
 **2026-10-28, on the session's first message.** The channel works from the session to the
 lead and not back (a cloud session's credential does not deliver to another session), so
@@ -9631,3 +9826,5 @@ rulings stand as written above; the owner is awake and has your send.
 **2026-11-13, 01:15 UTC: an eighth ruling, by the owner's word of this hour, replacing (6) above.** The owner: "the bilander's watches should be large enough to do the standard work that does not normally call all hands. This seems like a basic minimum that would be upheld even in a merchantman's light complement in the period." (8) **Her watches three and three: six seamen, her complement nine** (your own finding of 2026-11-10: "three and three" wants six), through the generator and her people file, so that either watch alone begins every request that is a watch's work by her files (her courses, her topsails, her head sails, the settee short-handed as the starboard's three begin it today). The settee's `too_few: all hands` stays, for a watch that is short by a hand sick or away in the boat. **Her eight was judgement (her design's §6.1) and so is nine until read:** look for a source on the manning of a trader of her tons in her trade and years (tons to a man, by trade; a crew list of a Poole or Newfoundland vessel if one can be fetched), cite it by page and say whether it bears nine; where none can be read the figure is marked JUDGEMENT with the reason, and what you find is for the lead before any other ship's company is touched. Whether a merchantman's master and mate haul with their watches (which would count them hands on deck in every trader) is NOT built: a question for the owner, on the lead's list. Her tests and any passage of hers that move are named old beside new; a save from before loads with the company it holds.
 
 **2026-11-13, 01:25 UTC: a ninth ruling, by the owner's word, and (8) held on it.** The owner: "In principle I support the merchantman's master and mate as working hands, as long as it is a relatively smooth change for the other merchant vessels currently." (9) **Measured first, built on the lead's word after your report; (8)'s nine is NOT built until then,** since working officers may make it needless. In a merchantman (a ship whose file or people file says so; never a King's ship, a privateer or a packet under naval discipline unless a source says it) the master and the mate each head a watch and haul with it: counted hands on deck of their own watch for work on deck (not aloft unless you find a source for it; never taken from the conn while the ship is under a manoeuvre they are giving: say how the helm and the conn are kept). **Report, short, before any build:** where it would live (`crew/hands.py`'s pool, the bill, the people file's posts) and in how many lines; for each merchant vessel on the trunk today (the smack, the merchant brig, the bilander, any other trader), her watches and what each watch can begin, old beside new; every test, truth and recorded passage that would move, by name; and the bilander three ways (eight with working officers; nine without; nine with), which of them lets either watch begin every watch's work. "Relatively smooth" is the owner's condition: if the other traders' passages move beyond their own lines of who hauls, say so and stop.
+
+**2026-11-13, 02:06 UTC: the watcher's test (nudge number 2); no new ruling.** Your watcher as a background command that exits on the change is accepted in the Monitor's place, for the reason you give. If this woke you while idle, send one bridge message whose first line is "nudge received" with the minutes it took by your clock, and go on with your workflow; nothing else is asked.
