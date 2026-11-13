@@ -522,3 +522,17 @@ the owner and the lead together. The cloud environment's setup script now instal
 `dev` and `server` extras in new sessions; running sessions (this one, 106b's, 112's) run
 `python3 -m pip install -e ".[dev,server]"` once, and each report says the browser plans
 played with none skipped.
+
+### 2026-11-13, 23:40: 106b's interim read (cd0faeb)
+
+- **Built:** four regions, 117 level-2 tiles and 30 level-3, 19.96 MiB in all; six ports;
+  34 marks; ~160 citations checked by an independent agent, 12 mended.
+- **The tide:** north M2 1.035 m and level 1.96 m (Huelva's); south M2 0.82 m and level
+  1.57 m. A step at 31.6 N.
+- **The weather:** box `morocco` last in the file. It also answers the Strait's southern
+  half, which no box held: by design, to name to the lead.
+- **Drafted for the known list:** a-unowned:morocco-larache:north (the lead's list),
+  d-split:morocco-sallee and :morocco-mogador (106b), d-no-box:strait out.
+- **Accepted; holding for 111's step 2b.** For the final: 7-530's exclusion in 105's form;
+  the Strait's weather move proven; the 31.6 N step and Mogador's harbour depths listed;
+  the browser plans run.
