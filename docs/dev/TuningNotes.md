@@ -27145,3 +27145,94 @@ skipped; the recorded passages among them, every pinned digest, line count and t
 digest moved and no kept save; the pins moved are those listed above, each the ruling's.**
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
 exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
+
+## Package 111: the chart's audit (2026-11-13)
+
+### Step 1: the audit as a tool, its tests and its ratchet (no data changed)
+
+`python tools/audit_chart.py [--full] [--known]` reads the chart as the game reads it
+(`load_chart("atlantic-east")`, `Chart.elevation_at`, `Tide.constants_about` and
+`gauges_at`, `Climatology.box_at`, `Directions.area_at`, `Tide.area_at`, `ports.load_port`,
+`ships.approach_plan` and `ships.land_crossing`, `scenarios.load_scenario`) and reports by
+region, each finding with its key, a count and its worst positions. The known list,
+`data/charts/audit-known.yaml`, holds the 174 findings of the first full sweep, each with
+its place, its reason in a line, its owner (the package that built it, or the lead's list
+for what no block owns) and its count as a ceiling. `tests/test_chart_audit.py`: the fast
+tier runs the sampled grid (a quarter of a degree, its points a subset of the full sweep's)
+and fails on a finding the list lacks; the slow tier runs the full sweep (a twentieth, the
+fill raise's grid) and fails on a new finding, on a listed one no longer found and on a
+count over its ceiling. Each check is proved by planting (a mooring on the land, a headland
+in the sea, a bound drawn short, a box taken out of the climatology, Barcelona's gauge
+taken out, a stream area over Castile, a scenario started on Minorca's hills).
+
+**What counts as a finding** (each JUDGEMENT, said where it stands in the tool): a mark of
+the land afloat, or a danger on the land, farther than three cells of the finest level (a
+cable at the least) from the other, unless it stands on a rock or island the features give
+or is a light-vessel by its name; a port's shore spot afloat more than two cables from the
+land; a spot's depth on the chart under half the file's and two fathoms less (or over twice
+and ten fathoms more); open water for a way in a point six miles out on one of sixteen
+bearings in twenty metres, the line clear by the land guard; the seas (the Channel, Biscay
+and Portugal one Atlantic; the Strait meeting both; each island block its own; the rest the
+Mediterranean), another sea's tide where its gauges carry over half the blend's weight; a
+Mediterranean level over 1 m; a coast line's end met within a cell and a half.
+
+**The pace** (measured at cd46734, one worker, `--durations`): the fast tier gains about 68 s
+of serial time, run on one worker under `-n 4`: the sampled audit's fixture 32.8 s (the
+chart's load and reading every level-2 tile once, with (a)'s 408 tiles that reach past their
+bounds), the planting tests 9 s together, truths 7-560 to 7-564 26 s together. The slow tier
+gains about 89 s: the full sweep twice, 43.9 s in `test_chart_audit.py` and 44.8 s in truth
+7-565.
+
+**The findings by check** (the full sweep):
+
+| check | findings | where |
+|---|---|---|
+| (a) water nobody owns | 52 groups and 1 overlap | the tiles' reach past the bounds into open water (Azores, Madeira, Portugal, the Channel's and the Tyrrhenian's edges: 42 groups, some 32,450 square miles, the lead's list); 10 groups beside a neighbour's bounds, some 950 square miles (gulf-of-lion east 7.73 to 7.7333 E, ligurian-sea west, south and east, tyrrhenian west 40.56 to 40.99 N by 7.73 to 8 E, 310 square miles, mediterranean-west west, strait north, portugal north, channel-west north-east); the Ligurian sea's and the Tyrrhenian's bounds overlapping 41 to 42.5 N, 8 to 11 E |
+| (b) the seams | 3 | no water in a region's bounds unanswered by its tiles; the coasts miss by a cell or two at channel-west/channel-mid and ligurian-sea/tyrrhenian |
+| (c) the tide | 4 | the level of the eleven over the four blocks with no gauge's level read: the Tyrrhenian 3.7 to 6.83 m (Dover's or Saint-Malo's by the place), the Strait and Madeira 3.98 m (Le Conquet's), the Azores 3.2 to 4 m; no region's water beyond the reach, none mostly another sea's |
+| (d) the weather | 8 | in no box: the Balearics' strip 40.5 to 40.56 N, the Cantabrian coast between 43.4 and 43.5 N east of 5 W, the Strait south of 36 N; split by a box's edge: Biscay north (47.5 N), Biscay south (43.5 N), the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E), the Balearics |
+| (e) the streams | 6 | Madeira not in `book_limits` and no area of the world's; the Azores' open water no statement and no area; the Balearics' strip outside `book_limits` and every area |
+| (f) the ports | 75 | ways in refused by the land guard 24 and ways out 24 (St Malo, Dartmouth, Poole, St Peter Port, Morlaix, St Mary's, Toulon, Villa Franca, Hyères, Genoa, Gaeta, Civita Vecchia, Alghero, Lisbon, Oporto, Setúbal, Ferrol, Santander, Rochefort, Paimboeuf, Palma, Port Mahon, Cartagena, Oran; the Maddalena out only, Hyères in only); 13 moorings and Cartagena's road on the grid's ground; 9 depths far from the file's (Gaeta's road 11 fathoms against 5.3, Brest's mooring 6 against 0.8); 2 shores afloat (Corunna, San Fiorenzo); 2 ways in from no open water (Paimboeuf, Royan); none off the chart, outside its region, with a nation not in the table or dated rows not whole |
+| (g) the marks | 25 | lights over rocks the grid lacks with no rock under them (the Eddystone, the Longships), forts on islets the grid lacks (the Bugio, Brescou, the Meloria's tower), headlands a few hundred metres off the grid's shore (Camarat, Taillat, Esterel, Cape Corse, Cape Muro, the Parata, Cape Palos, Peninnis); dangers on the grid's ground (the Amfar, the Violet Bank, the Cordouan rocks, the Pulpera, the Cock); every light has its years |
+| (h) the scenarios | 0 | every start on its chart's water, every port on file |
+
+**What the brief did not foresee.** (1) The level over the Tyrrhenian is Dover's 3.7 m or Saint-Malo's 6.83 m
+and over the Strait, Madeira and the Azores Le Conquet's 3.98 m: a ship there has the
+eleven's level of water over the grid's datum, metres where the sea has decimetres (the
+how-to says it of the level; its weight under the keel is new). (2) The water nobody owns
+in the Mediterranean reads the eleven's tide alone, Saint-Malo's M2 of 3.7 m. (3) The
+business's land guard refuses the way in or out of 25 of the 90 ports, the Channel's own
+among them, so that no trader is drawn for them; the brief foresaw the check, not the
+count. (4) The Eddystone and the Longships have no rock under their lights: a ship sails
+through the lighthouse.
+
+**The cheap mends proposed** (for the lead's ruling, step 2):
+
+1. *Bounds to the tile edges where the water beyond is open* (no tile changes): Madeira to
+   31.6 to 33.733 N and 17.866 to 15.734 W, the Azores to 36.294 to 40.133 N and 31.52 to
+   24.267 W, so the islands' gauges serve their tiles' water (Le Conquet's M2 there now).
+   Not channel-west's: its bounds are the recorded passages'.
+2. *The Mediterranean slivers*: gulf-of-lion's east bound and ligurian-sea's west bound to
+   meet at the column edge 7.7334 E; ligurian-sea's east bound to 11.1466 E; the piece of
+   tyrrhenian's tiles 40.56 to 40.99 N west of 8 E wants a ruling (every box drawn over it
+   overlaps a neighbour; a tide region on `solent`'s pattern, served by Porto Torres and
+   Carloforte, is the least). The Tyrrhenian's south strip 38.43 to 38.5 N is package 105's.
+3. *The weather's boxes*: mediterranean-west's box north to 40.56 N; biscay's box south to
+   43.3 N east of the Portugal box (the Cantabrian strip); portugal's box south to 35.5 N.
+4. *The streams*: Madeira's box appended to `book_limits`; the Balearics' box's north to
+   40.56 N. The open water of the islands wants an area and a statement from a source.
+5. *The ports*: `tracks:` given for the 24 ways refused, each leg tried by the land guard;
+   the 13 moorings and Cartagena's road moved to the nearest water of their depth; the two
+   shores moved ashore; the nine depths restated or the spots moved onto their soundings.
+6. *Not cheap, kept in the list*: the four levels (a gauge's level read), the coasts' misses
+   (a rebuild), the marks on isles the grid lacks (a features file and its index), the
+   ocean margins elsewhere (the corridor answers there by design).
+
+**The suites, at cd46734, in a worktree pinned there:** `ruff check .` and `ruff format
+--check .` clean; the fast tier whole (`python3 -m pytest -n 4 -q -p no:cacheprovider`): exit
+0, 7,496 passed, 1 xfailed, 511 slow tests left out; the slow tier of the touched files and of
+the known truths (`--slow -m "slow and not pace"`, `tests/test_chart_audit.py` and
+`tests/test_known_truths.py`): exit 0, 188 passed, 8 xfailed, the recorded passages among
+them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No pin moved;
+no data file changed.** The tree reported differs from cd46734 by this paragraph and the
+pace's above alone.
