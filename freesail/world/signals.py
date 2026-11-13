@@ -657,6 +657,18 @@ class Hoist:
     # package 76 (item 8): a private challenge made in a named nation's form (the *Java*'s
     # move), answered only by a ship of that nation; '' for 71's own challenge, as before
     form_nation: str = ""
+    # package 102 (step 3): where it flies, one of the colours' place words (`flags.py`
+    # `place_ok`: a masthead, a truck, the peak, a yardarm); '' at the main, as every hoist
+    # was before. A plain default, left out of the pickle and the record while unset, so that
+    # a save from before loads and every hoist's line reads as it did.
+    place: str = ""
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, its place only where it has one (package 102)."""
+        state = dict(self.__dict__)
+        if not state.get("place"):
+            state.pop("place", None)
+        return state
 
     @property
     def done_at(self) -> int:
@@ -687,15 +699,17 @@ class Hoist:
         return self.meaning
 
     def flags_words(self) -> str:
-        """What a lookout without the book sees: 'three flags at the main'."""
+        """What a lookout without the book sees: 'three flags at the main' (package 102: at
+        its place where it has one, 'at the fore', 'at the main yardarm')."""
+        at = _at_words(getattr(self, "place", ""))
         if self.book == "telegraphic":
             return "the telegraph flag over a hoist of flags"
         if self.book in ("numerary", "convoy"):
             if self.form == "table":
                 # two flags a signal, the upper and the lower, whatever the cell's number
-                return f"{_count(2 * max(1, len(self.numbers)))} flags at the main"
+                return f"{_count(2 * max(1, len(self.numbers)))} flags at the {at}"
             n = len(str(self.numbers[0])) if self.numbers else 1
-            return f"{_count(n)} flag{'s' if n > 1 else ''} at the main"
+            return f"{_count(n)} flag{'s' if n > 1 else ''} at the {at}"
         if self.book in ("private", "reply"):
             return self.shown
         if self.book == "answer":
@@ -716,7 +730,19 @@ class Hoist:
             # written only where it is not the numerary's, so that no British or basic
             # signal's record changes with the field (package 76)
             **({"form": self.form} if self.form != "numerary" else {}),
+            # written only where it flies other than at the main (package 102)
+            **({"place": self.place} if getattr(self, "place", "") else {}),
         }
+
+
+def _at_words(place: str) -> str:
+    """A hoist's place as the lookout says it: 'main' for none (every hoist before package
+    102) and for the main's mastheads; 'fore', 'mizen'; 'main yardarm'; 'peak'."""
+    if not place:
+        return "main"
+    if place.endswith(" masthead") or place.endswith(" truck"):
+        return place.split(" ")[0]
+    return place
 
 
 def _lower(s: str) -> str:
@@ -753,6 +779,20 @@ class Locker:
     # beside the file's (`hoist the broad pendant`, `... a second ensign`, `... the jack`)
     flies: list[dict[str, Any]] | None = None
     ordered_flags: list[str] = field(default_factory=list)
+    # package 102 (step 4): whether she is dressed (`dress ship`), and the tick she dressed;
+    # plain defaults, left out of the pickle while she is not, so that a save from before
+    # loads as it did
+    dressed: bool = False
+    dressed_since: int = 0
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the dressing only while she is dressed (package
+        102)."""
+        state = dict(self.__dict__)
+        if not state.get("dressed"):
+            state.pop("dressed", None)
+            state.pop("dressed_since", None)
+        return state
 
     def next_serial(self) -> int:
         self.serial += 1

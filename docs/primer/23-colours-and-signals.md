@@ -54,6 +54,24 @@ The second ensign, the red ensign, hauled down from the main; her colours at the
 
 `the flags` says what flies where: the ensign, the pendant, the jack, the broad pendant and a second ensign, each at its place, and then the signal flying if a hoist is up (`the colours` reads the ensign alone, as before). The flags you order stay up with the colours and come down with them, or one at a time by name: `haul down the jack`, `strike the broad pendant`, `lower the second ensign`; one not flying is refused in words. They are the deck's orders, as the colours are. Every nation's flags are drawn from her own colours (the British ensigns of the three squadrons with the Union of 1801 in the canton, the pendant and the jack; the French tricolour, blue at the hoist; the Spanish red and yellow of 1785, the red a quarter of the depth above and below; Portugal's white with the arms), and a nation with no colours of her own drawn wears a plain ensign of the colour her flag is named by, and a plain pendant in a ship of war.
 
+## Dressing ship
+
+On a day of rejoicing a ship in harbour dresses: her flags and pendants hung in the rigging, her colours flying as they do. `dress ship` does it in the fashion of the day: about 1805, as Röding's dictionary of 1794 gives it, "hung with flags and pendants made fast to the yards, stays, shrouds, backstays and other rigging", and not yet the line of signal flags from masthead to masthead, which the books give only from the 1880s. A King's ship hangs her ensigns and her jack at the lower yardarms, her book's signal flags at the topsail yardarms, along her stays and in her shrouds, and her pendants at the topgallant yardarms, one of each, so that a ship of few flags leaves some places bare; a merchantman has her colours to hang, and little else. Which flag goes where no book of the period says: a junior officer drew up the scheme for the captain, as the game does for you. She stays dressed until `undress ship`, until sunset, or until her colours come down, and the log says so. The lookout says it of another ship: "she is dressed in her flags".
+
+```orders cutter
+dress ship
+the flags
+undress ship
+# rejected: undress ship
+```
+
+```
+Dress ship: the hands aloft with the flags, and the ship dressed with her flags and pendants in the yards, the stays and the shrouds.
+Undress ship: the flags hauled down from the yards and the stays, and stowed.
+```
+
+A ship dresses by day with her own colours flying: `dress ship` is refused by night and with her colours down, struck or turned over. It is the deck's order, as the colours are. The browser's picture hangs the flags at their places.
+
 ## The private signal
 
 The recognition signal: a small table per nation per month, issued under seal to the King's ships (a merchantman, a packet, a fisherman and a privateer never had it), the challenge a flag at a named place by day and lights by night, the reply another. The actual tables are lost; the game's are drawn under the seed in the period's form, the same for every ship of one nation in one world. It is a paper of the cabin:
@@ -105,7 +123,7 @@ Bend on the signal: the telegraphic signal, England expects that every man will 
 
 `answer the signal` and `repeat the signal` want a signal read from another ship first, and are refused until one has been.
 
-The hoist is an evolution: three hands at the halyards and a minute a hoist, a telegraphic sentence a minute a word, and it breaks out when the hands have run it up, not when you ordered it (a hoist queued behind a wear waits its hands). By night the same order makes the night book's lights and false fires; in fog the fog book's gun, fired by the battery, since the flags are not to be seen. The signal flies a glass at most and then comes down of itself.
+The hoist is an evolution: three hands at the halyards and a minute a hoist, a telegraphic sentence a minute a word, and it breaks out when the hands have run it up, not when you ordered it (a hoist queued behind a wear waits its hands). By night the same order makes the night book's lights and false fires; in fog the fog book's gun, fired by the battery, since the flags are not to be seen. The signal flies a glass at most and then comes down of itself. It flies at the main unless you name another place: `make the signal No. 16 at the fore`, `... at the main yardarm`; the lookout of the other ship says where ("two flags at the fore"). The browser's picture of your ship draws the hoist at its place, flag under flag down the halyard, the uppermost first, each flag drawn as your book's plates have it for the year (the British numerals changed in 1793, 1799 and 1803); it is gone when the hoist comes down. Another ship's hoist is told in words alone.
 
 It is read at the other end by her lookout: "The brig-sloop of war makes a signal: two flags at the main" at the flags' range, and a minute later, if her library holds the book, "The brig-sloop of war's signal is No. 54, tack in succession"; without the book, "a signal we cannot read: not of our book". A rules captain who reads it hoists the answering pendant, and performs it when the sender is the ship he is under the orders of (the scenario's `under_the_orders_of`, or the director's word): a convoy of four merchantmen under your orders reads your `make the signal to tack in succession` from the convoy's book and puts about one after another, the leader first and each when the ship ahead of her has (`data/scenarios/convoy.yaml`). No ship obeys a signal of a ship she is not under the orders of; she logs it. Your own ship obeys nobody's: you read the signal and choose.
 
@@ -155,9 +173,10 @@ the lights
 | `hoist the broad pendant` / `hoist a second ensign at the main` / `hoist the jack` | a commodore's broad pendant at the main; the ensigns doubled; the jack at the fore, or the jackstaff at anchor |
 | `haul down the broad pendant` / `haul down the second ensign` / `haul down the jack` (or strike, lower) | each flag of command down by its name, the colours left flying |
 | `the flags` | what flies where, and then the signal flying |
+| `dress ship` / `undress ship` (or take down the dressing) | her flags and pendants hung in the yards, the stays and the shrouds in the fashion of the day; taken down, and down of themselves at sunset or with the colours |
 | `show the private signal` / `answer the private signal` | the month's challenge and reply, with a table aboard |
 | `make the Spanish private signal` / `make the private signals in succession` | another nation's challenge from her table held, or every table held one after another |
-| `make the signal <meaning>` / `make the signal No. <n>` | a signal of the book by day, the night book's lights by night, the fog book's gun in fog |
+| `make the signal <meaning>` / `make the signal No. <n>` | a signal of the book by day, the night book's lights by night, the fog book's gun in fog; `... at the fore` (or the mizen, a masthead, a yardarm) flies it there, at the main else |
 | `make the telegraphic signal: <words>` | Popham's free sentence, a hoist a word (a well-built book with a dictionary) |
 | `answer the signal` / `repeat the signal` / `haul down the signal` | the answering pendant; the last signal read made again; the hoists down |
 | `hoist the lights` / `hoist the top lights` / `show no lights` | the lights by night |

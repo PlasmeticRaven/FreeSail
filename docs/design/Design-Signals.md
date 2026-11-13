@@ -567,6 +567,29 @@ occasions:                       # what flies where, by occasion and role
   would repeat the upper, Spain's signals of one flag alone; Popham's word under the telegraph
   flag; the answer the answering pendant; a private signal its flag. `tools/check_signals.py`
   checks that every flag a hoist can hold is drawn (truth 7-501).
+- **A hoist's place (package 102, step 3).** `Hoist.place`, one of the colours' place words
+  (with the yardarms: `<mast> yardarm`, `<mast> <yard> yardarm`); '' at the main, as every hoist
+  was before, left out of the pickle and of the record while unset, so that no save and no
+  digest moves. An order names it at the end of its words ('make the signal to tack at the
+  fore', '... at the main yardarm'); a private signal's is in its words. The lookout says it
+  ('two flags at the fore'); at the main the words are as they were. The player's own hoists
+  are served in the snapshot's `hoists` and drawn (Design-ViewerAction.md §12.3); a stranger's
+  are told in words as before and served nowhere.
+- **Dressing ship (package 102, step 4).** `data/signals/<root>/dressing.yaml` (basic's
+  stands for every nation): the fashions as dated rows, each with its source and its `hang`,
+  the slots in order (`yardarms` of named yards, both arms; `stays` of named levels, so many
+  flags along each; `rigging`, each mast's shrouds on each side; `line` along spans between
+  place words; `mastheads`) and the stocks each takes its flags from in order (`ensigns`: her
+  nation's ensigns of her service and her jack; `signal flags`: her book's flags of the year, a
+  King's ship's only; `pendants`). 1805's fashion is 'in the rigging' (Röding 1794, Babron
+  1817; to 1883); the rainbow line from masthead to masthead is dated from 1884 (Luce) and
+  never flown before it. One flag of each: a ship of few flags leaves places bare; a flag her
+  data lacks (another nation's ensign, which the period hung too) is not there (package 96's
+  locker). `dress ship` and `undress ship` are the colours' orders, the deck's; the locker's
+  `dressed` (left out of the pickle while False) holds until `undress ship`, sunset or the
+  colours coming down (`flags.dressing_tick`, once a minute with the look, said in the log).
+  The snapshot serves the player's ship's hung flags under `dressed`; the lookout says of a
+  stranger "she is dressed in her flags".
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 

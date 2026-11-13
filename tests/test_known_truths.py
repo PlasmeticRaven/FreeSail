@@ -16334,6 +16334,80 @@ def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     assert not A.over_ceiling(audit, known)
 
 
+def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_comes_down(tmp_path):
+    """Package 102, step 3: the player's own hoist, broken out, served at its place (the main
+    topgallant masthead, or the place its order names) flag by flag, the uppermost first, and
+    drawn down its halyard from there; gone when it is hauled down; no stranger's served."""
+    import shutil
+
+    from tests.test_flag_drawings import (
+        test_a_hoist_is_drawn_down_its_halyard_from_its_place as b,
+    )
+    from tests.test_flag_drawings import (
+        test_no_other_ships_hoist_is_served as c,
+    )
+    from tests.test_flag_drawings import (
+        test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down as a,
+    )
+
+    a()
+    c()
+    if shutil.which("node"):
+        b(tmp_path)
+
+
+def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
+    """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
+    the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
+    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    is away within ten minutes, where on the trunk she waited until the watch changed at
+    06:00; and a person in the boat that has not left the ship's side belays her, and is
+    on deck again."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(7800)
+    n = len(w.log)
+    w.submit("go ashore")
+    w.run(600)
+    kinds = [e.kind for e in list(w.log)[n:]]
+    assert "evolution.waiting" not in kinds
+    assert ["crew.all_hands", "crew.piped_down"] == [
+        k for k in kinds if k in ("crew.all_hands", "crew.piped_down")
+    ]
+    assert "boat.away" in kinds
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(600)
+    w.submit("go ashore")
+    assert w.people.captain.where == "boat"
+    assert w.submit("belay that").kind == "work.belayed"
+    w.run(120)
+    assert w.people.captain.aboard
+    assert [e.kind for e in w.log].count("boat.stood_down") == 1
+
+
+def test_truth_7_503_a_ship_dressed_flies_the_fashion_of_the_scenarios_year_and_no_later_one():
+    """Package 102, step 4: dressed in 1792 to 1883 her flags hang in the yards, the stays and
+    the shrouds (Röding 1794, Babron 1817), none on a line from masthead to masthead and none
+    at a truck; the rainbow fashion from 1884 (Luce) and never before it."""
+    from tests.test_flag_drawings import test_the_fashion_is_the_years_and_never_a_later_one as c
+
+    c()
+
+
+def test_truth_7_504_dress_ship_holds_until_undress_ship_sunset_or_the_colours_coming_down():
+    """Package 102, step 4: `dress ship` by day hangs her flags (served and read), `undress
+    ship` takes them down, sunset and the colours coming down take them down of themselves;
+    refused by night, with her colours down, and below as the colours' orders are."""
+    from tests.test_flag_drawings import (
+        test_dress_ship_hangs_her_flags_until_undress_ship_sunset_or_the_colours_coming_down as a,
+    )
+    from tests.test_flag_drawings import test_dress_ship_is_refused_below_as_the_colours_are as b
+
+    a()
+    b()
+
+
 def test_truth_7_531_valletta_is_the_orders_frances_and_the_kings_and_a_yard_after_its_year():
     """Package 105, step 2: Valletta's holder by its dated rows, the Order of St John's to
     the capitulation of 12 June 1798, France's to the surrender of 5 September 1800 (James

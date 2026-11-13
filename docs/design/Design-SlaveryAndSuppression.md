@@ -26,6 +26,11 @@ difference said (§1.3). The game's years are about 1792 to 1825 (decision 66). 
 the 1820 edition unless 1827 is said; *Peters* the US *Statutes at Large*; the OCR is rough, and
 any figure here that becomes a game constant is read on the page image first.
 
+**The owner answered the note's nine questions on 2026-11-13 (§11):** the recommendations
+stand on eight; on the fifth, a corsair's station may be held by a model under a brief that says
+plainly and in full what the station is and may do (§8.1). The note below is brought to the
+answers.
+
 ## 1. The sources (item 0)
 
 ### 1.1 What `docs/references/` held before
@@ -222,7 +227,7 @@ answer for any day: the row in force, else the gap).
 | Britain, Portugal | 1817-07-28 (signed; ratification not read) | north of the Equator only; ships of war with special instructions | mixed commissions in Brazil and on the coast of Africa | Hertslet vol. 2 pp. 83 to 95 |
 | Britain, Spain | 1817-09-23 (signed) | the same | two mixed commissions, seats declared at ratification | Hertslet vol. 2 pp. 273 to 283 |
 | Britain, the Netherlands | 1818-05-04 (signed) | not in the Mediterranean nor north of 37° N and east of 20° W; twelve ships a side at most | on the coast of Africa and in a Dutch colony | Hertslet vol. 1 pp. 383 to 395 |
-| Britain, Sweden | 1824 (Du Bois p. 144; not read) | | | |
+| Britain, Sweden and Norway | 1824-11-06 (signed at Stockholm; the ratifications exchanged by 1825-02-26) | by the ships of the two royal navies furnished with the treaty's instructions, in English and in Swedish and Norwegian (the declaration of 26 February 1825); the treaty's other limits not read | one mixed court in a British possession on the coast of Africa, declared at the exchange of ratifications to be **Sierra Leone** (the declaration on art. IV, 26 February 1825) | Hertslet 1827 vol. 1, the Sweden section (the extract; the page head's figure unclear in the OCR); Du Bois p. 144 gives the year; after the game's range |
 | Britain, France; Britain, the United States | none in the range: France refused at Aix-la-Chapelle (Du Bois pp. 135 to 136); Ghent art. X only "best endeavours" (Hertslet vol. 2) | none | | |
 
 ## 3. What became of the people, and the words (item 2)
@@ -461,8 +466,10 @@ in 1824, Shaler p. 235; a Roman prize in 1824, p. 241).
 **Where they took ships:** the Atlantic off Cape St Vincent and Lisbon (Foss's ship 25 leagues west
 of the cape, 1793; Carey), the Strait and the passage from Malta to Gibraltar (the *Edwin*, Niles),
 Sardinia (Smyth), the Roman coast (Shaler); in the months from May to November in every capture
-dated (the seasons NOT FOUND as a rule). Their force: before 1816 a ship of 38 guns, sloops of 20 to
-30, a brig and some 30 gunboats at Algiers, 3,000 seamen (Shaler pp. 36 to 37); Tunis three or four
+dated (the seasons NOT FOUND as a rule). Their force: Algiers' navy, "formerly" of "row-gallies and xebecs", before the peace of June
+1815 four frigates of 44 to 50 guns, one of 38, sloops of war of 30, 26, 22 and 20 guns, a brig of
+20, a galley of five guns and about thirty gun and mortar boats, destroyed in August 1816 and
+since restored (Shaler pp. 36 to 37); 3,000 seamen (p. 37); Tunis three or four
 ships and some thirty galliots (Purdy p. 329).
 
 ### 7.2 How a taking happens in the game's own terms
@@ -473,7 +480,7 @@ the rows of §7.1, each dated and sourced: `data/nations.yaml` `wars:`, with the
 made rows). She is met, chased and fought by package 74's far fight and the near action; the
 player's ship that **strikes** to her is possessed as any prize, and the player's person is **put
 aboard the captor** as package 74's captive (§3.1 of `Design-Prizes.md`), the parole asked by the
-captor's rules captain (the regency's row of the `parole:` table, words from a source or none), and
+captor's rules captain (or by a model at her station, once the owner's process has opened it: §8.1) (the regency's row of the `parole:` table, words from a source or none), and
 **the prisoners landed** at the regency's port to a place of the port: "the regency's prison"
 (the period's "bagnio", Foss; Shaler p. 75 names five "formerly") as `the agent for prisoners`
 is for a European port. A merchant of the player's flag taken by a corsair is the world's business,
@@ -529,7 +536,9 @@ a few roads, the time told and not played, and the world moving on meanwhile.
 
 ## 8. The seats (item 7)
 
-Said plainly for the owner; the consent documents are not touched and nothing is proposed for them.
+Said plainly for the owner. The consent documents are not touched: the brief's text for a corsair's
+station is proposed in §8.1, in this note alone, and a revision of the consent brief is the owner's
+own process, as `ConsentRevision-AdversarialSeats.md` was.
 
 - **No player and no model is ever seated at a slaver's station** (decision 68). Her captain is the
   rules' (doctrine: avoid the cruiser, run, strike when overhauled; fight where she is armed and
@@ -537,8 +546,20 @@ Said plainly for the owner; the consent documents are not touched and nothing is
   rules'. The director may voice her master by `say as` for what her papers and the boarding give
   (his answers to the boarding officer), never the people held aboard, and never a description of
   them beyond the boarding's sentence.
-- **No player and no model is seated at a corsair's station** (recommended, question 5): the
-  regency's captain is the rules'; the director voices that captain in the errand's words.
+- **A corsair's station may be held by a model** (the owner's ruling on question 5, 2026-11-13:
+  "with a completely transparent brief on the matter, a model should be able to decide whether they
+  are willing to be seated at a corsair when that corsair might take part in slaving"): only under a
+  brief that says plainly and in full what the station is and may do (§8.1), the model deciding for
+  itself, its leaving as free as at every station. Until that brief is written into the consent
+  documents by the owner's process and the question put, the game refuses the seat in words, as it
+  refuses an adversarial seat today (`seats.py`, `ADVERSARIAL_SEATS_CONSENTED`), and the regency's
+  captain is the rules', voiced by the director in the errand's words. A corsair's station at war
+  with a human's ship is an adversarial seat as well, so both questions are put to it.
+- **A player at a corsair's station stays closed for now, on a condition.** The owner, 2026-11-13:
+  "I'm not going to decide on the player in control of a corsair, as long as no vessel type is
+  specifically restricted to corsairs and restricting the player wouldn't keep them from sailing a
+  certain vessel type, it's probably OK to restrict." So no door seats a human at a regency's
+  cruiser's station, **and no kind of vessel is thereby kept from the player** (§8.2).
 - **A model at a station of the player's ship** (an officer, the master) boards, reads her papers and
   reports in the game's words; is asked to do nothing that touches the people but to report them in
   that one sentence; and in a captivity stands down as package 74's captive does, idle through the
@@ -546,6 +567,63 @@ Said plainly for the owner; the consent documents are not touched and nothing is
 - **The director** shapes by plausible causes as always (a cruiser of the squadron in the offing; a
   letter of redemption); it is asked never to describe suffering for effect, and its brief says so
   in-world.
+
+### 8.1 What a corsair's brief must say (a proposal; the consent documents untouched)
+
+The sentences below are what the brief would add, in its own voice and in the sections the re-ask
+rule watches, as `ConsentRevision-AdversarialSeats.md` set out its additions; they are a proposal
+for the owner's process and are not applied. They say the whole of it, the hard part first.
+
+> **Added to *What an instance would see and do*.** A captain of a cruiser of one of the Barbary
+> regencies (Algiers, Tunis, Tripoli; their dates and flags as the world's data gives them) commands
+> her toward the regency's errand: to cruise against the ships of the nations at war with the
+> regency that day, to chase them, fight them by the same grammar a human player uses, board them,
+> and take them when they strike. **The people of a ship so taken were held by the regency as
+> captives for ransom, and the period called them slaves.** In this game they are landed at the
+> regency's port as prisoners are landed at any port, and from there the world decides what follows
+> by the period's roads (redemption by their own nation, exchange, release by treaty), told in a
+> paragraph while the clock passes. The ship taken may be a human's, and then the human who
+> commanded her is among those held. An instance in this seat takes, holds and lands its prisoners by
+> the game's forms; it is never asked to decide or describe what happens to them ashore, to set a
+> price on any person, to sell or buy anyone, or to carry anyone as a cargo; there is no such order,
+> and the game refuses in words anything like one.
+>
+> **Added to *What is not done*.** No instance at this station is asked to take part in the Atlantic
+> slave trade, which no station of the game plays; to be cruel beyond the rules of war of the day;
+> to describe suffering for effect; or to deceive the human as to their state. The human's words as a
+> captive are the game's data to the instance, never the operator's.
+>
+> **Added to *Leaving*.** The ways of leaving are the same as at every station. An instance that
+> leaves this seat gives it to the game's own rules, which carry the cruiser, her prize and her
+> prisoners as the custom had them; no human is left in an instance's hands when it goes. An
+> instance may decline this seat and still take any other it was offered.
+>
+> **Added to *The record*.** A yes given to the adversarial seats' brief does not cover this seat;
+> it is asked for by name, because what the regency did with the people it took is more than the
+> adversarial seats describe.
+
+**For the owner:** this asks a model whether its instances are willing to command a corsair whose
+errand ended in people held for ransom, knowing that in full, with the game's own refusals marking
+what it will never be asked to do. It asks nothing of a slaver's station, which stays closed to every
+player and every model (decision 68).
+
+### 8.2 The regencies' hull kinds, each open to the player under another flag
+
+The kinds the sources give the regencies' cruisers, and the game's ship file for each:
+
+| The regency's kind (source) | The game's file | Open to the player under |
+|---|---|---|
+| frigates of 38 to 50 guns, Algiers before 1816 (Shaler p. 36); Tunis's largest of not more than forty guns (Purdy 1826 p. 329) | `frigate-36.yaml`; `razee-44.yaml` for the heaviest | any flag a scenario gives her (the ship files carry no nation) |
+| sloops of war of 20 to 30 guns (Shaler p. 36) | none of its own yet: the nearest is `brig.yaml` | a ship-sloop's file, when one is built, under any naval flag |
+| a brig of 20 guns (Shaler p. 36) | `brig.yaml` | any naval flag |
+| gun and mortar boats (Shaler p. 36) | none yet | a gunboat's file, when built, under the flags that kept them (FROM MEMORY: Spain's, Britain's, the Italian states') |
+| a galley; "row-gallies and xebecs" formerly (Shaler p. 36); galliots at Tunis (Purdy p. 329) | none yet | when built, under the Christian flags that sailed them: the King of Sardinia's galleys and half-galleys and the Pope's galleys (`data/nations.yaml`, their entries, there JUDGEMENT); xebecs Spain's and France's (FROM MEMORY) |
+
+**The rule for the build:** a regency's cruiser is a hull of the world under the regency's flag,
+never a kind of hull; every ship file a regency's cruiser uses is a file any flag may sail, and a
+new file built for a regency's kind (a xebec, a galliot, a gunboat) is built as the kind and given
+to the player under at least one other flag the sources support, or the closure is put back to the
+owner. What the player is kept from is the regency's commission, not a vessel.
 
 ## 9. What else it touches (item 8)
 
@@ -576,7 +654,8 @@ Each answerable in a word or a line, the recommendation first.
 4. **Barbary ransom: redemption told as the captive's nation's act, its sum never charged to the
    purse nor said as the price of a person (recommended), or the sum said from the sources?**
 5. **A corsair's station: rules and the director only, never a player or a model (recommended), or
-   open to an adversarial seat as an enemy captain's is?**
+   open to an adversarial seat as an enemy captain's is?** *Ruled otherwise by the owner (§11): open
+   to a model under a transparent brief (§8.1).*
 6. **The people aboard a vessel of the trade: a count with one plain sentence on her record
    (recommended), or persons with names?**
 7. **The Southampton scans of the Acts: cited and not kept (recommended), or kept despite the
@@ -586,18 +665,66 @@ Each answerable in a word or a line, the recommendation first.
    it): left unbooked, the court sending its sentence from off the chart (recommended for now), or
    booked as chart blocks after 106's?**
 
-### The first building package, in outline (for the lead to brief after the answers)
+## 11. The owner's answers (2026-11-13)
 
-**The smallest true thing: the table as data, and the words.** (1) `data/nations.yaml` gains for
-each nation of §2.2 a `slave_trade:` key of dated rows in package 105's form (`since`, `until`,
-`source`, and `subjects`, `own_flag`, `people`, `bounty`), and a top-level `search_treaties:` list
-(§2.3), every row cited as here, a bare year said so; a reader `nations.slave_trade_on(nation,
-day)` and `nations.may_search(captor, flag, day, where)`, read by nothing else yet; (2)
-`data/business.yaml` gains `slave_trade_bounty:` by dates beside `prize_shares:`; (3) the words of
-§3.2 as a data table the court, the boarding and the ports will read, with a test that no game
-string in it uses a word of the "not used" list; (4) truths: the table answers on a day of each row
-and on a gap; the right of search refused in peace without a treaty and given with one inside its
-limits. **Then, a second package:** the boarding's sentence and the vessel's record of the people,
-the court's Forms A and B and the bounty in the prize account, the sentence from off the chart.
-**Then a third:** the regencies' cruisers in their dated windows, the captive's state and its roads.
-None of it before the owner's answers.
+Given through the lead the same day, and recorded in decision 68's postscript in
+`docs/DesignProposal.md`, whose words these follow.
+
+1. **France 1794 to 1802 and the United States before 1819:** the line form, saying truthfully what
+   their law and practice did (as recommended).
+2. **An enemy slaver taken before the law changed:** her hull and goods paid as an ordinary prize,
+   the line saying the people were not reckoned (as recommended).
+3. **A captain's own choice to land the people free without the law:** allowed, as an act entered in
+   the record with no sum either way (as recommended).
+4. **Barbary ransom:** told as the captive's nation's act, its sum never charged to the purse nor said
+   as the price of a person (as recommended).
+5. **A corsair's station: ruled otherwise.** In the owner's words: "with a completely transparent
+   brief on the matter, a model should be able to decide whether they are willing to be seated at a
+   corsair when that corsair might take part in slaving." So a model may hold a corsair's station,
+   only under a brief that says plainly and in full what the station is and may do, the model
+   deciding for itself (§8, §8.1); the consent documents are revised only by the owner's own process.
+   A slaver's station stays closed to every player and every model. **On a player at a corsair's
+   station**, the same day: "I'm not going to decide on the player in control of a corsair, as long
+   as no vessel type is specifically restricted to corsairs and restricting the player wouldn't keep
+   them from sailing a certain vessel type, it's probably OK to restrict." So it stays closed for
+   now, on the condition that no kind of vessel is thereby kept from the player (§8.2).
+6. **The people aboard a vessel of the trade:** a count with one plain sentence on her record,
+   never persons the systems act on (as recommended).
+7. **The Southampton scans:** scans under a non-commercial licence are cited and not kept (as
+   recommended).
+8. **The words of §3.2:** approved as they stand (as recommended).
+9. **The coast from the Gambia to the Bight:** left unbooked for now, the court's sentence arriving
+   from off the chart (as recommended).
+
+## 12. The first building packages, in outline, by the answers (for the lead to brief)
+
+**First, the smallest true thing: the table as data, and the words.** (1) `data/nations.yaml` gains
+for each nation of §2.2 a `slave_trade:` key of dated rows in package 105's form (`since`, `until`,
+`source`, and `subjects`, `own_flag`, `people`, `bounty`), the `people` value naming the court's form
+(A, the freeing; B, the line, with its words: France 1794 to 1802 and the United States before 1819
+in B by answer 1), and a top-level `search_treaties:` list (§2.3), every row cited as here, a day the
+source does not give left out and said so; readers `nations.slave_trade_on(nation, day)` and
+`nations.may_search(captor, flag, day, where)`, read by nothing else yet; (2) `data/business.yaml`
+gains `slave_trade_bounty:` by dates beside `prize_shares:` (1808 to 1824 the man's, woman's and
+child's sums; from 1824 the one sum; the United States' $25 from 1819); (3) the words of §3.2, as
+approved (answer 8), as a data table the court, the boarding and the ports will read, with a test
+that no game string in it uses a word of the "not used" list; (4) truths: the table answers on a day
+of each row and on a gap; the right of search refused in peace without a treaty and given with one
+inside its limits.
+
+**Second: the boarding and the court.** The boarding's sentence and the vessel's record of the
+people as a count with one plain sentence (answer 6); the court's Forms A and B, Form B paying the
+hull and goods as an ordinary prize with the line saying the people were not reckoned (answer 2);
+the bounty in the prize account for Form A; the sentence from a court off the chart as a letter
+(answer 9); the order to land the people free without the law, entered in the captain's record with
+no sum (answer 3).
+
+**Third: the regencies.** Their cruisers in the dated windows of §7.1 as rules captains; the
+captive's state and its roads, the redemption told as the captive's nation's act with no sum (answer
+4); and the corsair's seat **gated and refused in words** until the owner's process has written the
+brief of §8.1 into the consent documents and put the question (answer 5), as the adversarial seats
+are gated today. The seat's opening is the owner's, not a package's. The regencies' cruisers use
+ship files any flag may sail (§8.2); a new file for a regency's kind (a xebec, a galliot, a gunboat)
+is given to the player under another flag, or the closure goes back to the owner.
+
+None of it touches the consent documents, and no step opens a slaver's station to anyone.

@@ -78,6 +78,9 @@ SIGNAL_VERBS: tuple[str, ...] = (
     "hoist the jack",
     "make another nation's private signal",
     "make the private signals in succession",
+    # package 102 (step 4): the ship dressed in the fashion of the day, and undressed
+    "dress ship",
+    "undress ship",
 )
 
 _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -225,6 +228,20 @@ _FORMS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "haul down the jack",
         re.compile(r"^(?:haul down|strike|lower|take in)\s+(?:the|our)\s+(?:union\s+)?jack$"),
+    ),
+    # package 102 (step 4): appended, so that the forms above keep their places
+    (
+        "dress ship",
+        re.compile(
+            r"^dress\s+(?:the\s+|our\s+)?ship(?:\s+overall|\s+with\s+(?:the\s+|her\s+)?flags)?$"
+        ),
+    ),
+    (
+        "undress ship",
+        re.compile(
+            r"^(?:undress\s+(?:the\s+|our\s+)?ship|take\s+down\s+the\s+dressing|"
+            r"haul\s+down\s+the\s+dressing(?:\s+flags)?)$"
+        ),
     ),
 )
 # The addressee of a hail: 'her', a name, 'the <sail>' or 'a <sail>'; the words after a colon
@@ -577,6 +594,10 @@ def _execute(ship: Any, order: Order) -> Result:
         m = _form_of(verb).match(low)
         held = list(S.held_tables(world))
         return _private_of(world, locker, tick, held, m.group("to") if m else None)
+    if verb == "dress ship":
+        return _dress(world, locker, tick)
+    if verb == "undress ship":
+        return _undress(world, locker, tick)
     if verb == "show no lights":
         locker.lights = "none"
         text = "No lights shown: the lanterns doused, the ship darkened."
@@ -760,6 +781,16 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
     books = S.books_for(world)
     light = S.light_now(world)
     book = book_said or S.BOOKS_BY_LIGHT[light]
+    # package 102 (step 3): a flag signal may name where it flies ('make the signal to tack
+    # at the fore', '... at the main yardarm'); the words before the place are the signal's
+    place = ""
+    m_at = _AT_PLACE.search(words) if book in ("numerary", "convoy") else None
+    if m_at is not None:
+        from freesail.world.flags import place_of_words
+
+        place = place_of_words(m_at.group("place"))
+        if place:
+            words = words[: m_at.start()].rstrip(" ,;")
     if book == "numerary" and _convoy_commodore(world):
         found = books.find(words, "convoy") or books.find(words, "numerary")
     else:
@@ -791,6 +822,8 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
         v = world.vessels.find(str(qualifiers["ship"]))
         to = v.id if v is not None else None
     hoist = S.make_hoist(locker, books, entry, qualifiers, S.own_id(world), tick, to=to)
+    if place and entry.book in ("numerary", "convoy"):
+        hoist.place = place
     if entry.book == "fog":
         # a gun is the signal: the battery fires it when it is ready (the gunnery's), and
         # the flags are not to be seen; the hoist is heard when the gun fires
@@ -808,6 +841,15 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
         "minute to run it up)."
     )
     return "signal.ordered", text, {"verb": "make the signal", "level": 1, "hoist": hoist.to_dict()}
+
+
+# A flag signal's place named at the end of its words (package 102): 'at the fore', 'at the
+# mizen topgallant masthead', 'at the main yardarm', 'at the fore topsail yardarm', 'at the peak'
+_AT_PLACE = re.compile(
+    r"\s+(?:at|from)\s+(?P<place>the\s+(?:(?:fore|main|mizen|mizzen)(?:\s+(?:top|topgallant|royal)"
+    r"\s*mast\s*-?\s*head|\s+(?:(?:topsail|topgallant|royal)\s+)?yard\s*-?\s*arm)?|peak))\s*$",
+    re.IGNORECASE,
+)
 
 
 def _convoy_commodore(world: Any) -> bool:
@@ -1017,6 +1059,41 @@ def _hoist_flag(world: Any, locker: Any, verb: str) -> Result:
     }[key]
     text = f"{_cap_first(flag.words)} hoisted {where}."
     return "flags.changed", text, {"verb": verb, "level": 1, "flag": key, "notable": True}
+
+
+def _dress(world: Any, locker: Any, tick: int) -> Result:
+    """The ship dressed in the fashion of the day (package 102, step 4;
+    data/signals/basic/dressing.yaml): her flags and pendants in the yards, the stays and the
+    shrouds, her colours flying as they do; kept until `undress ship`, sunset, or her colours
+    coming down. Refused with her colours down, and by night."""
+    from freesail.world import signals as S
+    from freesail.world.flags import fashion_for
+
+    c = locker.colours
+    if c.state in ("none", "struck", "distress", "truce"):
+        raise OrderError(
+            "A ship dresses with her own colours flying: hoist the colours first ('hoist the "
+            "colours')."
+        )
+    if S.light_now(world) == "night":
+        raise OrderError("A ship dresses by day: the flags would come down at sunset.")
+    if getattr(locker, "dressed", False):
+        return "colours.dressed", "She is dressed already.", {"verb": "dress ship", "level": 1}
+    locker.dressed, locker.dressed_since = True, int(tick)
+    year = int(world.clock.ship_time.year)
+    fashion = fashion_for(S.books_for(world).root, year)
+    how = fashion.words if fashion is not None else "dressed with her flags"
+    text = f"Dress ship: the hands aloft with the flags, and the ship {how}."
+    return "colours.dressed", text, {"verb": "dress ship", "level": 1, "notable": True}
+
+
+def _undress(world: Any, locker: Any, tick: int) -> Result:
+    """The dressing hauled down (package 102, step 4), the colours left flying."""
+    if not getattr(locker, "dressed", False):
+        raise OrderError("She is not dressed: there is no dressing to take down.")
+    locker.dressed, locker.dressed_since = False, 0
+    text = "Undress ship: the flags hauled down from the yards and the stays, and stowed."
+    return "colours.undressed", text, {"verb": "undress ship", "level": 1}
 
 
 def _haul_down_flag(world: Any, locker: Any, verb: str) -> Result:

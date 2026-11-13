@@ -280,3 +280,247 @@ def test_a_hoist_holds_its_flags_in_order_uppermost_first():
     shown = "a blue pendant at the fore yardarm, with the ensign at the mizen peak"
     assert h("reply", "britain", shown=shown) == ["blue pendant"]
     assert h("night", "britain", shown="two lights horizontal at the mizen peak") == []
+
+
+# -- step 3: a hoist has its place and is seen ---------------------------------------------------
+
+
+def test_a_hoist_flies_at_the_main_unless_a_place_is_named_and_its_record_is_as_before():
+    """Step 3 (a): a hoist with no place is 'at the main' in the lookout's words and its
+    record (`to_dict`, the log's digest) and its pickle carry no place, as before the package;
+    one at a named place says it and records it."""
+    import pickle
+
+    h = S.Hoist(book="numerary", meaning="Tack", by="a", since=0, breaks_out=0, numbers=(16,))
+    assert h.flags_words() == "two flags at the main" and "place" not in h.to_dict()
+    assert "place" not in pickle.loads(pickle.dumps(h)).__dict__
+    h.place = "fore topgallant masthead"
+    assert h.flags_words() == "two flags at the fore"
+    assert h.to_dict()["place"] == "fore topgallant masthead"
+    h.place = "main yardarm"
+    assert h.flags_words() == "two flags at the main yardarm"
+    for w in ("fore yardarm", "main topsail yardarm", "mizen topgallant yardarm"):
+        assert F.place_ok(w)
+    assert not F.place_ok("bowsprit yardarm")
+
+
+def _signal_world():
+    from tests.test_brains import world_at
+
+    return world_at(49.5, -5.5, papers={"private_signals": True})
+
+
+def test_the_players_hoist_is_served_at_its_place_flag_by_flag_and_gone_when_hauled_down():
+    """Truth 7-502 (step 3, b): the player's own hoist, once broken out, is served in the
+    snapshot's `hoists` at its place (the main topgallant masthead when the order names none),
+    its flags in order, the uppermost first, each drawn by the scenario's year; an order may name
+    the place ('at the fore'); hauled down, it is gone from the next snapshot."""
+    from freesail.api import queries
+
+    w = _signal_world()
+    w.submit("make the signal No. 16")
+    assert queries.snapshot(w)["hoists"] == []  # the minute to run it up
+    w.run(120)
+    snap = queries.snapshot(w)
+    [h] = snap["hoists"]
+    assert h["place"] == F.HOIST_PLACE and h["words"] == "two flags at the main"
+    assert [f["name"] for f in h["flags"]] == ["numeral 1", "numeral 6"]
+    year = w.clock.ship_time.year
+    for f in h["flags"]:
+        row = F.signal_flag("britain", f["name"], year)
+        assert f["drawing"]["parts"] == row.flag.served_drawing()["parts"]
+    w.submit("haul down the signal")
+    assert queries.snapshot(w)["hoists"] == []
+    w.submit("make the signal No. 16 at the fore")
+    w.run(120)
+    [h] = queries.snapshot(w)["hoists"]
+    assert h["place"] == "fore topgallant masthead" and h["words"] == "two flags at the fore"
+    said = [e for e in w.log if e.kind == "signal.ordered"][-1]
+    assert said.data["hoist"]["place"] == "fore topgallant masthead"
+
+
+def test_no_other_ships_hoist_is_served():
+    """Step 3 (c) struck by the owner: a stranger's hoist is told as it is today, in words,
+    and nothing of it is served in the snapshot."""
+    from freesail.api import queries
+    from tests.test_brains import put
+
+    w = _signal_world()
+    v = put(w, "frigate", "britain", "49 31 N 5 30 W", "bound for Plymouth", name="Amazon")
+    books = S.load_books("britain")
+    entry, q = books.find("tack in succession")
+    h = S.make_hoist(S.vessel_locker(v), books, entry, q, v.id, int(w.clock.tick))
+    assert h.flying(int(w.clock.tick) + 120)
+    w.run(120)
+    assert queries.snapshot(w)["hoists"] == []
+
+
+@pytest.mark.skipif(not __import__("shutil").which("node"), reason="Node is not installed")
+def test_a_hoist_is_drawn_down_its_halyard_from_its_place(tmp_path):
+    """Truth 7-502, the viewer's half: each flag of a hoist hangs from its place, the uppermost
+    first, the next one hoist (and the halyard's gap) lower, its hoist along the mast; at a
+    yardarm from the yard's weather arm; nothing at a place the ship lacks."""
+    from tests.test_view_action import FRIGATE, _state
+    from tests.test_view_geometry import run_js
+
+    def flag(name):
+        row = F.signal_flag("britain", name, 1805)
+        d = row.flag.served_drawing() | {"kind": row.flag.kind}
+        return {"name": name, "words": row.words, "drawing": d}
+
+    data = _state(FRIGATE)
+    data["snap"]["hoists"] = [
+        {
+            "place": "main topgallant masthead",
+            "key": "a",
+            "words": "three flags at the main",
+            "flags": [flag("numeral 2"), flag("numeral 5"), flag("numeral 3")],
+        },
+        {
+            "place": "fore yardarm",
+            "key": "b",
+            "words": "a blue pendant",
+            "flags": [flag("blue pendant")],
+        },
+    ]
+    out = run_js(
+        tmp_path,
+        data,
+        """
+      const sk = P.buildSkeleton(d.graph, d.snap);
+      const f = sk.figures.filter(f => f.kind === 'flag');
+      const at = {};
+      for (const w of ['main topgallant masthead', 'fore yardarm'])
+        at[w] = P.flagPlace(d.graph, {}, sk.spars, w,
+                            Math.sin(d.snap.wind.apparent_angle) >= 0 ? 1 : -1);
+      const first = f.filter(x => x.id.endsWith('.0')).map(x => [x.of, x.pts]);
+      return {ofs: f.map(x => x.of), first, at, beam: d.graph.hull.beam_m};
+    """,
+    )
+    ofs = out["ofs"]
+    assert ofs[0].startswith("hoist.0.") and {
+        "hoist.0.0",
+        "hoist.0.1",
+        "hoist.0.2",
+        "hoist.1.0",
+    } <= set(ofs)
+    tops = {of: max(p[2] for p in pts) for of, pts in out["first"]}
+    top = out["at"]["main topgallant masthead"]
+    assert abs(tops["hoist.0.0"] - top[2]) < 0.05
+    assert tops["hoist.0.0"] > tops["hoist.0.1"] > tops["hoist.0.2"]
+    beam = out["beam"]
+    step = 0.3 * beam * 2 / 3 + 0.15  # a flag's hoist and the halyard's gap
+    assert abs((tops["hoist.0.0"] - tops["hoist.0.1"]) - step) < 0.05
+    arm = out["at"]["fore yardarm"]
+    hoist_b = [pts for of, pts in out["first"] if of == "hoist.1.0"][0]
+    assert min(abs(p[1] - arm[1]) + abs(p[0] - arm[0]) for p in hoist_b) < 0.05
+    # nothing at a place the ship lacks: a brig has no mizen to cross a yard
+    brig = _state("data/ships/brig.yaml")
+    brig["snap"]["hoists"] = [
+        {"place": "mizen yardarm", "key": "c", "words": "x", "flags": [flag("numeral 1")]}
+    ]
+    none = run_js(
+        tmp_path,
+        brig,
+        "return P.buildSkeleton(d.graph, d.snap).figures.filter(f => f.kind === 'flag').length;",
+    )
+    assert none == 0
+
+
+# -- step 4: dress ship -----------------------------------------------------------------------
+
+
+def test_the_fashion_is_the_years_and_never_a_later_one():
+    """Truth 7-503 (step 4): a ship dressed flies the fashion of the scenario's year: in 1805
+    her flags in the yards, the stays and the shrouds (Röding 1794, Babron 1817), no flag
+    along a line from masthead to masthead and none at a truck; the rainbow fashion only
+    from 1884 (Luce), never before it."""
+    from freesail.api import queries
+    from freesail.api.session import make_ship
+    from freesail.core.world import Scenario
+    from freesail.world.nations import load_nations
+
+    assert F.fashion_for("britain", 1805).name == "in the rigging"
+    assert F.fashion_for("britain", 1883).name == "in the rigging"
+    assert F.fashion_for("britain", 1884).name == "rainbow fashion"
+    assert F.fashion_for("spain", 1795).name == "in the rigging"
+    g = queries.ship_graph(make_ship("data/ships/frigate-36.yaml", Scenario()))
+    n = load_nations()
+    for year in (1792, 1805, 1825, 1883):
+        hung = F.dressing_flies(g, n, "britain", "kings-ship", year)
+        assert hung and not any("to" in x for x in hung), year
+        assert not any(str(x.get("place", "")).endswith("truck") for x in hung), year
+        places = {x.get("place") or "stay" for x in hung}
+        assert {"fore yardarm", "main topsail yardarm", "stay"} <= places
+    later = F.dressing_flies(g, n, "britain", "kings-ship", 1890)
+    assert any("to" in x for x in later) and any(x.get("place") == "main truck" for x in later)
+    # one flag of each in her stock: none hung twice
+    names = [x["flags"][0]["name"] for x in F.dressing_flies(g, n, "britain", "kings-ship", 1805)]
+    assert len(names) == len(set(names))
+    # a merchantman dresses with what she has: her colours (package 96 holds what else)
+    merchant = F.dressing_flies(g, n, "britain", "merchant", 1805)
+    assert [x["flags"][0]["name"] for x in merchant] == ["merchant red ensign"]
+
+
+def test_dress_ship_hangs_her_flags_until_undress_ship_sunset_or_the_colours_coming_down():
+    """Truth 7-504 (step 4): `dress ship` on deck by day hangs her flags (served under the
+    snapshot's `dressed`, and said by the `flags` reading); `undress ship` takes them down;
+    dressed again, they come down at sunset of themselves, and with the colours; refused by
+    night, with her colours down, and below as the colours' orders are."""
+    from freesail.api import queries
+
+    w = _signal_world()
+    w.submit("dress ship")
+    said = [e for e in w.log if e.kind == "colours.dressed"]
+    assert said and "the yards, the stays and the shrouds" in said[-1].text
+    hung = queries.snapshot(w)["dressed"]
+    assert len(hung) >= 20 and all(len(x["flags"]) == 1 for x in hung)
+    from freesail.api.signal_readings import _flags
+
+    assert "the ship dressed" in _flags(w, None)["words"]
+    w.submit("undress ship")
+    assert queries.snapshot(w)["dressed"] == []
+    assert [e for e in w.log if e.kind == "colours.undressed"]
+    w.submit("dress ship")
+    w.submit("haul down the colours")
+    w.run(61)
+    assert queries.snapshot(w)["dressed"] == []
+    assert "colours down" in [e for e in w.log if e.kind == "colours.undressed"][-1].text
+    w.submit("hoist the colours")
+    w.submit("dress ship")
+    assert queries.snapshot(w)["dressed"]
+    while S.light_now(w) != "night":
+        w.run(600)
+    w.run(61)
+    assert queries.snapshot(w)["dressed"] == []
+    assert "Sunset" in [e for e in w.log if e.kind == "colours.undressed"][-1].text
+    w.submit("dress ship")
+    refused = [e for e in w.log if e.kind == "order.rejected"]
+    assert "by day" in refused[-1].text
+
+
+def test_dress_ship_is_refused_below_as_the_colours_are():
+    """Step 4: the deck's order, refused from below in the colours' words (package 98,
+    step 6)."""
+    w = _signal_world()
+    w.submit("hoist the colours")
+    refused_colours = len([e for e in w.log if e.kind == "order.rejected"])
+    w.submit("go below")
+    w.run(30)
+    w.submit("hoist the colours")
+    w.submit("dress ship")
+    refused = [e for e in w.log if e.kind == "order.rejected"][refused_colours:]
+    assert len(refused) == 2
+    assert refused[0].text.split(":")[-1] == refused[1].text.split(":")[-1]
+
+
+def test_the_lookout_says_a_stranger_is_dressed():
+    """Step 4: a stranger dressed, as the lookout reads her flags; not said of one that is
+    not."""
+    from tests.test_brains import put
+
+    w = _signal_world()
+    v = put(w, "frigate", "britain", "49 31 N 5 30 W", "bound for Plymouth", name="Amazon")
+    assert "dressed" not in F.vessel_flies_words(w, v)
+    S.vessel_locker(v).dressed = True
+    assert F.vessel_flies_words(w, v).endswith("she is dressed in her flags")

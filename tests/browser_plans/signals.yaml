@@ -1,0 +1,14 @@
+# The signals seen (package 102, step 3): the King's frigate makes a signal of three flags at
+# the main and another at the fore; each is answered in the log and drawn on the ship view down
+# its halyard; hauled down, it is gone.
+name: A signal made and seen on the ship view
+scenario: data/scenarios/blockade.yaml
+steps:
+  - {label: "ON DECK, a signal made"}
+  - {say: make the signal No. 153, expect: {sent: order, answered: true}}
+  - {tick: 600}
+  - {shot: hoist-at-the-main}
+  - {say: haul down the signal, expect: answered}
+  - {say: make the signal No. 16 at the fore, expect: {sent: order, answered: true}}
+  - {tick: 600}
+  - {shot: hoist-at-the-fore}
