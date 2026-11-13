@@ -1,0 +1,115 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"110,-73": [
+"ferro-west-point",
+"ferro-high-land"
+],
+"111,-62": [
+"gando"
+],
+"111,-63": [
+"canaria-high-land",
+"point-arguineguin"
+],
+"111,-64": [
+"point-aldea"
+],
+"111,-72": [
+"valverde"
+],
+"112,-58": [
+"morro-gable"
+],
+"112,-59": [
+"point-handia"
+],
+"112,-62": [
+"the-isleta",
+"puerto-de-la-luz",
+"las-palmas-town",
+"palmas-road"
+],
+"112,-67": [
+"port-christianos"
+],
+"112,-69": [
+"san-sebastian-gomera-town",
+"san-sebastian-gomera-tower",
+"san-sebastian-gomera-road",
+"gomera-high-land"
+],
+"113,-56": [
+"porto-de-cabras",
+"cala-de-fustes",
+"pozzonegro"
+],
+"113,-65": [
+"santa-cruz-mole",
+"fort-san-cristobal",
+"paso-alto-castle",
+"santa-cruz-road"
+],
+"113,-66": [
+"santa-cruz-de-tenerife-town"
+],
+"113,-67": [
+"peak-of-tenerife",
+"port-orotava",
+"villa-of-orotava",
+"orotava-road"
+],
+"113,-68": [
+"garachico",
+"point-teno"
+],
+"113,-72": [
+"palma-south-point"
+],
+"114,-56": [
+"lobos-road",
+"point-gorda"
+],
+"114,-65": [
+"point-naga",
+"rocks-of-anaga"
+],
+"114,-66": [
+"hidalgo-point"
+],
+"114,-72": [
+"santa-cruz-de-la-palma-town",
+"santa-cruz-de-la-palma-castle",
+"santa-cruz-de-la-palma-road",
+"tazacorte"
+],
+"115,-55": [
+"puerto-de-naos",
+"castle-of-naos",
+"puerto-de-cavallos"
+],
+"115,-56": [
+"lanzarote-south-point",
+"lobos"
+],
+"115,-72": [
+"la-caldera"
+],
+"116,-54": [
+"el-rio",
+"punta-farion"
+],
+"116,-55": [
+"lanzarote-high-land"
+],
+"117,-54": [
+"graciosa",
+"alegranza",
+"east-rock"
+],
+"117,-55": [
+"montana-clara",
+"west-rock"
+]
+}
+}

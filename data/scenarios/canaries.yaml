@@ -1,0 +1,74 @@
+# FreeSail: the Canaries block's passage (package 106a). A free passage, not a gate's: a King's
+# frigate sent from Funchal to look into the road of Santa Cruz of Tenerife, Spain's and at war
+# with Britain since December 1804 (data/ports/santa-cruz-de-tenerife.yaml). She has crossed
+# from Madeira in the night, keeping well to the westward of the Salvages (the Oriental
+# Navigator 1801, p. 25; Purdy 1825, p. 210), and is three miles north-east of Point Naga at
+# daybreak. The block's water on the whole chart (`chart: atlantic-east`), its marks
+# (data/charts/features/canaries.yaml) and its ports. Given to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/canaries.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/canaries.yaml --hours 12 --reckoning
+#
+# The passage as the book beside this file sails it (canaries.orders): from off Point Naga
+# and its two great rocks (Purdy 1825, p. 217) she rounds the point at two or three miles and
+# comes down the east side of the island, as Lisiansky had it (Purdy p. 217, note: "sail close
+# in-shore after passing round the N.E. part of the island"), to a point two miles off the
+# town, out of the forts' reach (JUDGEMENT), where she looks into the road and takes her
+# bearings of it; then she stands on to the south, never bringing the town to the north of west
+# (Purdy p. 215: the calms under the Peak). The weather is pinned: the north-east trade of
+# fifteen knots (the Oriental Navigator 1801, 'Of the winds': from the 28th degree to the
+# Line from N.N.E. to East), judgement, so that the passage is the same on every machine.
+# Sailed for the package's notes (docs/dev/TuningNotes.md, package 106a); not a gate's.
+
+name: The Canaries, the frigate from Funchal looks into Santa Cruz road
+seed: 7
+start: 1805-06-20T05:30
+position: {lat_deg: 28.6300, lon_deg: -16.1000}   # three miles north-east of Point Naga (Purdy 1825, p. 217)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 160
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's, which has Canary Island (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [santa-cruz-de-tenerife, orotava, las-palmas, santa-cruz-de-la-palma, san-sebastian-de-la-gomera, arrecife, cabras]
+
+weather:
+  wind:
+    - {at: 1805-06-20T04:00, from_deg: 30, knots: 15, air_mass: neutral}
+    - {at: 1805-06-20T12:00, from_deg: 35, knots: 16}
+    - {at: 1805-06-20T20:00, from_deg: 30, knots: 14}
+  background:
+    {hpa: 1019, gradient_hpa_per_100km: 0.3, high_toward_deg: 340}
+  systems:
+    - name: the Azores high
+      kind: high
+      radius_km: 1500
+      track:
+        - {at: 1805-06-19T12:00, x_km: -700, y_km: 900, hpa: 1026}
+        - {at: 1805-06-21T12:00, x_km: -680, y_km: 900, hpa: 1026}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/canaries.orders
+
+orders:
+  - set plain sail
+  - shape a course for 28 33.6 N 16 04.2 W

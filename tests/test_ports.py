@@ -210,6 +210,16 @@ SICILY_WEST_PORTS = [
     "trapani",
     "ustica",
 ]
+# package 106a: the Canaries' seven (Hierro has no road in the sources)
+CANARIES_PORTS = [
+    "arrecife",
+    "cabras",
+    "las-palmas",
+    "orotava",
+    "san-sebastian-de-la-gomera",
+    "santa-cruz-de-la-palma",
+    "santa-cruz-de-tenerife",
+]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -225,6 +235,7 @@ ALL_PORTS = sorted(
     + SARDINIA_WEST_PORTS
     + SICILY_PORTS
     + SICILY_WEST_PORTS
+    + CANARIES_PORTS
 )
 
 
@@ -412,6 +423,9 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Calabria's two the King of Naples', neutral
     neutral_ports |= set(SICILY_PORTS) - {"valletta", "marsaxlokk", "st-pauls-bay", "mgarr"}
     neutral_ports |= set(SICILY_WEST_PORTS)
+
+    # package 106a: the Canaries Spain's in this world's year, hostile
+    french_ports |= set(CANARIES_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
@@ -2176,15 +2190,24 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
     # package 104: Tabarka the Bey's from 1738 and Carloforte the King of Sardinia's but for
     # the French holding of 1793, each the same nation in every recorded passage's year
     # package 105: Malta's four (the Order's, France's and the King's) and Calabria's two
-    # (France's from 1806), none in a recorded passage's water
+    # (France's from 1806), none in a recorded passage's water; package 106a: the Canaries'
+    # seven, Spain's through the range by one dated row each (decision 67: the holder as
+    # dated rows even where one nation held it throughout)
     assert sorted(dated) == [
+        "arrecife",
         "barcelona",
+        "cabras",
         "carloforte",
         "genoa",
+        "las-palmas",
         "marsaxlokk",
         "mgarr",
+        "orotava",
         "reggio",
         "rosas",
+        "san-sebastian-de-la-gomera",
+        "santa-cruz-de-la-palma",
+        "santa-cruz-de-tenerife",
         "scilla",
         "st-pauls-bay",
         "tabarka",

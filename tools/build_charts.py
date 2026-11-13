@@ -387,6 +387,58 @@ REGIONS: dict[str, dict[str, Any]] = {
         # are held, and the fill stands as high above that tide as above the sea's
         "fill_to_chart_datum": True,
     },
+    # package 106a: the Canaries, the seven islands with their channels, Alegranza, the
+    # Roque del Este and Lobos; a hair inside the level-2 tile edges (package 104: a bound
+    # on an edge takes in a row or a column more; the brief's 27.33 to 29.47 N and 18.29 to
+    # 13.17 W were 91 tiles, these 60). Over the coarse layer beside the corridor
+    # (`atlantic-south`), which answers the sea about them. The harbours: a level-3 patch
+    # for each port's road from EMODnet, no override (no period plan read with its datum:
+    # the port files say `datum: unverified`). The tide: the block's seven gauges (TICON,
+    # the levels from Puertos del Estado's REDMAR reports), so the fill is raised by its own
+    # water, 1.2 to 1.6 m.
+    "canaries": {
+        "title": "The Canary Islands",
+        "bounds": {"south": 27.33334, "north": 29.46666, "west": -18.29332, "east": -13.17334},
+        "fetch": {"south": 27.28, "north": 29.52, "west": -18.35, "east": -13.12},
+        "harbours": {
+            "santa-cruz-de-tenerife": {
+                "south": 28.45,
+                "north": 28.50,
+                "west": -16.26,
+                "east": -16.21,
+            },
+            "orotava": {"south": 28.405, "north": 28.43, "west": -16.57, "east": -16.53},
+            "las-palmas": {"south": 28.09, "north": 28.16, "west": -15.44, "east": -15.40},
+            "arrecife": {"south": 28.945, "north": 28.975, "west": -13.565, "east": -13.52},
+            "santa-cruz-de-la-palma": {
+                "south": 28.665,
+                "north": 28.695,
+                "west": -17.78,
+                "east": -17.75,
+            },
+            "san-sebastian-de-la-gomera": {
+                "south": 28.08,
+                "north": 28.10,
+                "west": -17.12,
+                "east": -17.10,
+            },
+            "cabras": {"south": 28.49, "north": 28.51, "west": -13.87, "east": -13.85},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
+    # package 106a: the Salvages, by one level-2 tile (29.89 to 30.32 N, 16.16 to 15.73 W)
+    # rather than the Canaries' bound carried up to them (24 tiles and 2.15 MB more): the
+    # Great Salvage, the Great and Little Pitons and their reefs. No gauge of their own: by
+    # package 104's ruling served by Santa Cruz de Tenerife's and Funchal's.
+    "salvages": {
+        "title": "The Salvages",
+        "bounds": {"south": 29.89334, "north": 30.31999, "west": -16.15999, "east": -15.73334},
+        "fetch": {"south": 29.84, "north": 30.37, "west": -16.21, "east": -15.68},
+        "harbours": {},
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
     # package 39e: the Western Islands (the Azores), 36.5 to 40 N and 31.5 to 24.5 W: the
     # nine islands, Flores and Corvo at the western bound, Santa Maria and the Formigas at
     # the south-east. The level-2 tiles that meet the bounds span 36.29 to 40.13 N and
@@ -768,6 +820,29 @@ CORRIDORS: dict[str, dict[str, Any]] = {
         "source": "gebco_2025",
         "folder": "tiles/1/atlantic-corridor",
     },
+    # package 106a: the ocean carried south to the Canaries' own row of the level-1 grid
+    # (25.2 to 29.47 N), from 22.13 W (Hierro's west point is 18.16 W) to the African
+    # coast, and the water between 29.47 and 31.9 N that the corridor's south row holds as
+    # NODATA (beyond its fetch): the Salvages and the passage from Madeira. A second layer
+    # BESIDE the first (`beside`), not the first widened: widening rewrote every one of the
+    # corridor's 48 tiles (its distance field is taken at the block's middle latitude, and
+    # its half-metre ties broke the other way; docs/dev/TuningNotes.md, 106a). A tile whose
+    # name the first lists is written in this layer's own folder, NODATA wherever the
+    # first's committed tile has data, and the runtime fills the first's NODATA from it
+    # (`chart.Level`); where the first answers, it answers alone. The north bound is where
+    # the first's data begins (its fetch's south, 31.9 N), below Madeira's south bound, so
+    # that the tide's open edges (`tide.charted_bounds`) see no charted water beyond it.
+    # The fetch reaches 33.8 N so that the field knows Madeira's and Morocco's shores.
+    "atlantic-south": {
+        "title": "The ocean south: from Madeira to the Canaries and the African coast",
+        "level": 1,
+        "bounds": {"south": 25.2001, "north": 31.9, "west": -22.13, "east": -9.34},
+        "fetch": {"south": 25.1, "north": 33.83, "west": -22.23, "east": -9.23},
+        "datum": "mean sea level",
+        "source": "gebco_2025",
+        "folder": "tiles/1/atlantic-south",
+        "beside": "atlantic-corridor",
+    },
 }
 
 # The tide's regions (package 94): bounds and no tiles, for the gauges' membership alone
@@ -847,8 +922,14 @@ CHARTS: dict[str, dict[str, Any]] = {
             "tunis-coast",
             # package 105: Sicily and Malta
             "sicily",
+            # package 106a: the Canaries and the Salvages, over the ocean carried south
+            "canaries",
+            "salvages",
         ],
         "corridor": "atlantic-corridor",
+        # package 106a: coarse layers read after the corridor, each answering only where
+        # the layers before it have nothing (`CORRIDORS[...]["beside"]`)
+        "corridors_beside": ["atlantic-south"],
     },
 }
 
@@ -1415,6 +1496,12 @@ def save_tile(path: Path, **arrays: Any) -> None:
             info.compress_type = zipfile.ZIP_DEFLATED
             with z.open(info, "w") as f:
                 np.lib.format.write_array(f, np.asanyarray(value), allow_pickle=False)
+
+
+def undifferenced(values: np.ndarray) -> np.ndarray:
+    """The elevation as written undone (`differenced`; int16 wraps exactly), as the
+    runtime reads it (`chart.Tile.load`)."""
+    return np.cumsum(values.view(np.uint16), axis=1, dtype=np.uint16).view(np.int16)
 
 
 def differenced(values: np.ndarray) -> np.ndarray:
@@ -2466,14 +2553,29 @@ class Build:
         folder.mkdir(parents=True, exist_ok=True)
         for old in folder.glob("*.npz"):
             old.unlink()  # the corridor is rebuilt whole
+        # a layer beside another (package 106a): where the first's committed tile of the
+        # same name has data, this layer writes NODATA (the first answers there alone)
+        first_folder = None
+        if recipe.get("beside"):
+            first_folder = CHARTS_DIR / str(CORRIDORS[str(recipe["beside"])]["folder"])
         records = []
         for s, w in tiles:
             r0 = int(round((s - south0) / cell_sec))
             c0 = int(round((w - west0) / cell_sec))
             block = elev[r0 : r0 + TILE, c0 : c0 + TILE]
+            dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
+            first = first_folder / f"{tile_name(s, w)}.npz" if first_folder else None
+            if first is not None and first.exists():
+                with np.load(first) as z:
+                    known = undifferenced(z["elevation"]) != int(z["nodata"])
+                block = np.where(known, np.nan, block)
+                dblock = np.where(known, 0.0, dblock)
+                self.log(
+                    f"    {tile_name(s, w)}: beside {recipe['beside']}'s tile, "
+                    f"{int(known.sum())} cells its own"
+                )
             if np.all(np.isnan(block)):
                 continue
-            dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
             sea = (block < 0.0) & ~np.isnan(block)
             min_depth = float(-np.max(block[sea])) if sea.any() else float("nan")
             dist_cells = np.clip(np.rint(dblock / cell_ns), 0, 65535).astype(np.uint16)
@@ -2543,11 +2645,18 @@ class Build:
             "fetched_sha256": fetched.sha256,
             "folder": recipe["folder"],
             "committed": True,
+            **({"beside": recipe["beside"]} if recipe.get("beside") else {}),
             "built_by": f"python tools/build_charts.py --corridor {name}",
             "note": (
                 "committed (spec M6 §26, the owner's ruling 5): the one level-1 folder the "
                 "repository carries, so that a clone plays the voyage; the runtime reads these "
                 "tiles under every region of a chart that names the corridor"
+            )
+            if not recipe.get("beside")
+            else (
+                f"committed beside {recipe['beside']} (package 106a): read after it, under "
+                "every region of a chart that names it in `corridors_beside`; a tile both "
+                "list is the first's, its NODATA cells filled from this layer's at load"
             ),
             "tiles": records,
             "bytes": total,
@@ -2715,10 +2824,15 @@ class Build:
             if corridor and corridor not in corridors:
                 self.log(f"The chart {cname} names the corridor {corridor}, not built: left out.")
                 corridor = None
+            beside = [c for c in cspec.get("corridors_beside") or [] if c in corridors]
+            for c in cspec.get("corridors_beside") or []:
+                if c not in corridors:
+                    self.log(f"The chart {cname} names the corridor {c}, not built: left out.")
             charts[cname] = {
                 "title": cspec["title"],
                 "regions": present,
                 **({"corridor": corridor} if corridor else {}),
+                **({"corridors_beside": beside} if corridor and beside else {}),
                 **({"regions_not_built": absent} if absent else {}),
             }
         sources = {}
