@@ -4628,8 +4628,7 @@ xfailed, exit 0; lint and the name sweep clean. **No digest and no line the game
 hoist or of the colours moved. Found and not mended (the lead's list):** a table book's
 lookout says "two flags at the main" for Spain's signals of one flag (401 to 421). A stray
 branch `pkg-102-s2` was left on the remote by the builder's harness; it holds nothing the
-trunk lacks and may be deleted by the owner. The whole suite in the cloud after run 73, the
-figures to follow. **Next: step 3** (a hoist has its place and is seen on the player's own
+trunk lacks and may be deleted by the owner. The whole suite in the cloud, run 73 (2026-11-13, 00:31 to 01:27 UTC, on 06e14183): green whole, lint, the six shards and the pace job. **Next: step 3** (a hoist has its place and is seen on the player's own
 ship; the stranger's strip struck by the owner).
 
 ### Package 105, step 1 (a port file's dated rows), as merged (2026-11-13)
