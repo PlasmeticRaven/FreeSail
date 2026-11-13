@@ -21257,7 +21257,11 @@ s. So the key carries when the hands go below, the narrowest general form:
   a blank line.
 - **Old saves.** `Instance.__setstate__` reads 109's mark (`hands_called_for` on the params, kept as
   `_TRUNK_HANDS_CALLED_FOR`) as the new road's mark of the same call: `held_up` set, the mark
-  dropped. An instance without it loads as it was.
+  dropped. An instance without it loads as it was. *Amended by the review's mends (below):* a
+  checkpoint also holds the crew line as read when the order was given (`want`, and the file
+  itself in `evo`), so a boat waiting for hands in a save written before her file said the key
+  loads with the key read from the file as it is now (`calls_all_hands` and `until_manned` set,
+  the rest of her request as it was). Any other instance loads as it was.
 - **New test:** `tests/test_hands.py`, `test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_call_loads`
   (the value read and refused, the boat's file alone saying it, a trunk instance with the mark loaded
   through the checkpoint's pickler). In memory it was broken three ways. Without the mapping, the
@@ -21300,6 +21304,25 @@ at +26 s from the checkpoint and the boat is in at +3,303. Loaded with the mappi
 "Not hands enough on deck to send boat; there are but two to spare." at +1, begins at +26 with no
 pipe-down, and keeps all hands up ("All hands on deck." at +85).
 
+**An old save taken before the call** (the review's finding 1, mended in the review's commit). As
+first built, a save written while the boat waited for hands with no call yet made never called for
+her on this tree: the checkpoint holds her crew line as read then, without the key, where 109's road
+had called for her by her evolution's name, which an old save still matched. Bilander, 04:30, her
+larboard watch of two, at anchor; the review's checkpoints, loaded and run on 4,000 s:
+
+- Written on the trunk before 109's step 2 (79478482), `go ashore` and the checkpoint at +60, she
+  saying "Not hands enough on deck to send boat; there are but two to spare.". On the trunk
+  (ef5b24af) and on caec1983: "All hands! (to send boat)" at +1 from the load, "Only four hands",
+  the pipe-down and the start at +2, in at +3,021, digest eeaa5bb6. On 7b067c6b: no call in 4,000
+  s, still waiting, digest 768f2276. Now: eeaa5bb6, the trunk's own, line for line.
+- Written on caec1983 and on the trunk (`heave the log`, `go ashore` 2 s after, the checkpoint at
+  +10, she saying "the watch is heaving log"). On their own trees: the call at +29 from the load,
+  begun +30, in +3,050, digest 1e28df81. On 7b067c6b: never called; begun at +5,390 with three
+  when the idlers came up at 06:00, in +9,247 (a4c2b44a, run 9,500 s). Now: the call at +1, begun
+  +29, in +3,050, digest a29b97b9. The call comes at once by the one road's trigger, as in a game
+  begun on this tree (the watch at other work, below).
+- The mid-call checkpoints (caec1983's, the trunk's and the tree's own) still run on to f4cdd3f8.
+
 **The captain's pipe-down mid-call** (the same busy hand, "send the boat ashore", "pipe down" at +5
 s): on both trees, the call at +1, the pipe-down at +5, and at +6 "Not hands enough on deck to send
 boat; there are but one to spare.", the call not made again. **A brace waiting before the boat**
@@ -21316,11 +21339,84 @@ setting the mainsail." at +11 and the mainsail is set at +157.
 - New: the settee's guard holds the hands up for her (`_too_few_piped_down`), so there is one call
   and one pipe-down at +157, she is begun on that tick with six, and she is away at +554.
 
-**By reading, not met in any measured case:**
+*Amended by the review's mends (2026-11-13): three more cases where the boat's lines move, found by
+the review and measured again on caec1983's export beside the tree. The first two are the trigger's,
+which this record first set down as "by reading, not met in any measured case"; that was wrong, and
+so was "No line of the boat's moved" under Pins (corrected there).*
 
-- **The trigger** is the settee's. A deck too few counting hands at other work, some of them at
-  work, calls where 109's waited ("the watch is ..."). An order naming its own party (`hands_from`)
-  waits where 109's called.
+- **The boat ordered while the short watch is at other work** (the review's finding 2). The
+  settee's trigger counts hands at other work (`hands.too_few_on_deck`), so a deck too few even
+  with them calls at once. 109's waited while other work had the hands, its record's "Where the
+  watch is at other work the old waiting line stands" (`docs/dev/M7-WorkPackages.md`, package
+  109's step 2). `heave the log`, then `go ashore` 2 s after, the bilander at 04:30, her larboard
+  watch of two, run 400 s:
+  - Old: +3 "Not hands enough on deck to send boat; the watch is heaving log."; +39 "All hands! (to
+    send boat)"; +40 "Only four hands to send boat; there are no more on deck.", "Piped down; the
+    larboard watch has the deck.", "Away the long-boat's crew! Hoist out the long-boat."; digest
+    f2829534.
+  - New: +3 "All hands! (to send boat)"; +39 "Only four hands ...", "Piped down ...", "Away ...";
+    digest badb8a8a. The watch below is turned up 36 s sooner by night, and she is begun one tick
+    sooner.
+  - With `send the boat ashore` and the captain's `call all hands` at +10 the lines move the same
+    way: old "All hands! (by the captain's order)" at +11 (42f4d12f), new "All hands are called
+    already; the watch below is coming up." at +10 (267c5342); begun at +39 in both, the hands kept
+    up by the captain's order in both.
+- **A deck enough counting a hand busy at no work of the runner's** (found while measuring finding
+  2). Hands at the pumps carry `water.PUMPS_ID`, which is no instance's. The settee's trigger counts
+  them on deck, so a deck enough with them does not call, and the boat waits for them to come free.
+  109's called wherever the request came back too few and no work of the runner's had the hands.
+  The bilander at 02:30, her starboard watch of three, one hand of it made busy in the probe's
+  process alone (as the mid-call save above), `go ashore`, run 900 s:
+  - Old: +1 "All hands! (to send boat)", "Only three hands to send boat; there are no more on
+    deck.", "Piped down; the starboard watch has the deck.", "Away ..."; away +792; digest 250df54c.
+  - New: +1 "Not hands enough on deck to send boat; there are but two to spare.", and nothing more
+    while the hand is busy; digest 3b7dc776.
+  - In play, by reading: `man the pumps` in a watch of three or four with water in her well, then
+    the boat. Not measured there: in Brixham road her well was dry, the pumps sucked at once, and
+    `man the pumps` then `go ashore` at 02:30, 09:30 and 13:30 gave one digest on both trees.
+- **A boat belayed while all hands come up to man her** (the review's finding 3). 109's road never
+  piped down for her, and the hands stayed up. The one road pipes down at the belay, through
+  `_after_all_hands` (its gate `all_hands or held_up`). The bilander at 04:30, the busy hand and one
+  hand brought at once (both in the probe's process alone, as above), `send the boat ashore`,
+  `belay that` at +3, run 400 s:
+  - Old: no pipe-down; "All hands on deck." at +90; all hands still called at +400, six turned up;
+    digest a6113da4.
+  - New: "Piped down; the larboard watch has the deck." at +4; nobody turned up at +400; digest
+    3e87bbe7.
+  - In plain play the window is the first case's: `heave the log`, `send the boat ashore`, `belay
+    that` at +10, run 200 s. New: the call at +3, the pipe-down at +11 (0752fbf5). Old: the waiting
+    line alone, no call (2eaf64fa).
+
+**By reading, not met in play:** an order naming its own party (`hands_from`) waits where 109's
+called. The boat's work is begun by `world/dealings.py` with its own params (the errand and the
+port), so no order reaches her with a party: `send the boat ashore with the larboard watch` at 04:30
+gives one digest on both trees (9849df97).
+
+### For the lead's ruling: the boat's trigger (the review's mends)
+
+Ruling 10 has a line of the boat's that must move to make one road said old beside new, for the
+lead to rule. The two trigger cases above move by the settee's trigger alone. The tree keeps it, as
+built; three ways were measured, (b) and (c) in memory on the tree (the scripts `alt.py` and
+`measure_alt.py` in the session's scratch, `r10/fix/scripts/`, outside the repository):
+
+- **(c), my pick: package 109's own trigger for until-manned work**, about four lines in
+  `Runner._watch_too_few`. Such work calls where its request came back too few (as `_take_hands`
+  asks it), no work of the runner's has the hands, all hands are not up, she is not at quarters and
+  no party is named. `too_few: all hands` (the settee's) keeps its own trigger. Both trigger cases
+  give caec1983's digests (f2829534 and 250df54c), and so does the save written on caec1983 while
+  she waited behind the log (1e28df81, the writer's own). In a sketch: the boat waits while the
+  watch is heaving the log, and calls for hands when the log is in; with a hand at the pumps she
+  calls at once, as on the trunk.
+- **(a), as built: the settee's trigger for both values of the key.** The lines move as measured
+  above: she calls at once while the watch is at other work, and waits while a hand at the pumps
+  makes the deck enough.
+- **(b), the review's one line**, `if want.until_manned and self._other_work(inst): return False`.
+  The log case gives caec1983's f2829534, but the busy-hand case still waits (3b7dc776).
+
+Each of (b) and (c) leaves the seven cases of the table, 109's own case and the settee's eight
+orders at caec1983's digests, the mainsail-then-boat case as the one road has it (413d04b1, one
+call and one pipe-down), and the belay's pipe-down as the one road has it (3e87bbe7). The pipe-down
+guard (`_too_few_piped_down`) is the settee's under all three.
 
 ### Pins
 
@@ -21335,8 +21431,11 @@ setting the mainsail." at +11 and the mainsail is set at +157.
   lead's ruling 10)". The test's other clauses hold. The docstring of
   `tests/test_hands.py`'s key test ("no file but the settee's four carries it") is left as it is,
   with that test.
-- **No line of the boat's moved**, and no digest, tick or line count in any measured case.
-  109's tests and truth are unedited and pass.
+- **The boat's lines.** As first recorded here: "No line of the boat's moved, and no digest, tick or
+  line count in any measured case". *Corrected by the review's mends:* no pinned digest, tick or line count moved (the four whole
+  logs, the captain's trials, the known truths, 109's tests and truth, unedited and passing). The
+  boat's lines move in the four cases above, "Where the one road differs from 109's, measured",
+  each old beside new; in 109's own cases and the seven of the table they do not.
 
 ### The suites, as run
 
@@ -21380,7 +21479,8 @@ logs and the trials of `s13/final/`). The script is `r10/oneroad/runs/run.sh`.
 
 **Moved by this step:** no recorded passage, digest, line count or tick. Nothing is left for the
 lead to re-pin by it. What moved is the one combined case above (the boat behind work that called
-all hands) and `test_settee`'s set of files, left failing for the lead's ruling.
+all hands) and `test_settee`'s set of files, left failing for the lead's ruling. *Corrected by the
+review's mends:* and the three cases the review found, above.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
@@ -29935,7 +30035,13 @@ gone, made one with the settee's. `CALLS_HANDS_WHEN_SHORT`, `HANDS_CALLED_FOR`'s
 `_watch_too_few`, `Instance.held_up`, `_manning` and `_after_all_hands`. Every line, tick and digest
 measured above is unchanged, and so are truth 7-542 and this step's tests, unedited. A checkpoint
 taken with (a)'s mark on the boat's params loads as the new road's mark. See "The lead's ruling 10,
-one road (package 75)" in these notes.
+one road (package 75)" in these notes. *Amended by that ruling's review (2026-11-13):* "Where the
+watch is at other work the old waiting line stands unchanged" no longer holds: the settee's trigger
+counts the hands at other work, so a watch too few even with them calls at once. Where a hand of
+the deck is at the pumps, a deck enough with him counted waits, where (a) called. And a boat belayed
+while the hands come up to man her now pipes them down. Each is set down old beside new there, the
+trigger for the lead's ruling. A save written before the boat's file said the key, she waiting for
+hands, loads with it read and calls for her as (a) did.
 
 **Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
 

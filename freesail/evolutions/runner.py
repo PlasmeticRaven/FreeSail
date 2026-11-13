@@ -254,11 +254,33 @@ class Instance:
         to man the boat by package 109's own road carries that road's mark in its params
         (`_TRUNK_HANDS_CALLED_FOR`): it is read as this road's mark of the same call, held up on
         its numbered request, so that she is manned and the hands piped down as they would have
-        been (package 75, the lead's ruling 10 of 2026-11-13)."""
+        been (package 75, the lead's ruling 10 of 2026-11-13).
+
+        A checkpoint holds the work's crew line as it was read when the order was given (`want`,
+        and the file itself in `evo`). One written before the boat's file said `too_few: all
+        hands until manned` (on the trunk, where package 109's road called for her by her
+        evolution's name, or before it) has her waiting for hands with no such key, and on this
+        road she would wait until hands came free. Where the file now says it of work
+        whose request does not, the request is read with it, so that she calls for her hands as
+        on the trunk (the review of the lead's ruling 10). Any other instance loads as it was."""
         state = dict(state)
         params = state.get("params")
         if isinstance(params, dict) and params.pop(_TRUNK_HANDS_CALLED_FOR, None):
             state["held_up"] = True
+        want = state.get("want")
+        if (
+            isinstance(want, hands.CrewRequest)
+            and not want.all_hands
+            and not getattr(want, "calls_all_hands", False)
+        ):
+            now = registry.get(getattr(state.get("evo"), "id", ""))
+            if now is not None and "too_few" in (now.crew or {}):
+                try:
+                    until_manned = hands.CrewRequest.from_mapping(now.crew).until_manned
+                except hands.CrewRequestError:
+                    until_manned = False
+                if until_manned:
+                    state["want"] = replace(want, calls_all_hands=True, until_manned=True)
         self.__dict__.update(state)
 
     @property

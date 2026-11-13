@@ -1017,9 +1017,13 @@ def test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_cal
     `tests/test_mends_109.py` and truth 7-542). Any other word is refused naming both. A checkpoint
     taken on the trunk while all hands came up to man the boat by package 109's own road (its mark
     `hands_called_for` on the work's params) loads as this road's mark of the same call
-    (`Instance.held_up`), the mark gone; an instance without it loads as it was."""
+    (`Instance.held_up`), the mark gone; an instance without it loads as it was. The review of
+    ruling 10: one taken before the boat's file said the key (on the trunk, or before package 109),
+    her crew line read then and her file held as it was, loads with the key read, so that she calls
+    for her hands as on the trunk; a numbered request of a file without the key loads unchanged."""
     import io
     import pickle
+    from dataclasses import replace
 
     from freesail.core import replay
     from freesail.evolutions.runner import Instance
@@ -1038,8 +1042,12 @@ def test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_cal
     with pytest.raises(CrewRequestError, match="beside all hands"):
         CrewRequest.from_mapping({"hands": "all", "too_few": "all hands until manned"})
 
-    def loaded(params: dict[str, Any]) -> Instance:
-        inst = Instance(EVOLUTIONS["send_boat"], None, "Hopewell", params)  # type: ignore[arg-type]
+    boat = EVOLUTIONS["send_boat"]
+
+    def loaded(
+        params: dict[str, Any], evo: Any = boat, want: CrewRequest | None = None
+    ) -> Instance:
+        inst = Instance(evo, None, "Hopewell", params, want=want)  # type: ignore[arg-type]
         buf = io.BytesIO()
         replay._Pickler(buf, protocol=pickle.HIGHEST_PROTOCOL).dump(inst)
         return replay._Unpickler(io.BytesIO(buf.getvalue())).load()
@@ -1048,6 +1056,21 @@ def test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_cal
     assert old.held_up and old.waiting and old.params == {"errand": "prices"}
     plain = loaded({"errand": "prices"})
     assert not plain.held_up and plain.params == {"errand": "prices"}
+
+    # written before the key: her file and her crew line as they were then
+    file_then = replace(boat, crew={k: v for k, v in boat.crew.items() if k != "too_few"})
+    then = CrewRequest(hands=11, stations=("forecastle", "afterguard", "waisters"))
+    assert not CrewRequest.from_mapping(file_then.crew).calls_all_hands
+    waiting = loaded({"errand": "prices"}, file_then, then)
+    assert waiting.want is not None
+    assert waiting.want.until_manned and waiting.want.calls_all_hands
+    assert waiting.want == replace(then, calls_all_hands=True, until_manned=True)
+    assert not waiting.held_up and waiting.params == {"errand": "prices"}
+    now = CrewRequest.from_mapping(boat.crew)
+    assert loaded({"errand": "prices"}, boat, now).want == now
+    log = CrewRequest.from_mapping(EVOLUTIONS["heave_log"].crew)
+    assert log.hands == 3 and not log.calls_all_hands
+    assert loaded({}, EVOLUTIONS["heave_log"], log).want == log
 
 
 def test_three_topsails_are_reefed_together_each_up_to_its_party_and_the_surplus_goes_on():
