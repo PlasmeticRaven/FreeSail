@@ -397,6 +397,8 @@ def _action_entries(world: World, ship: Ship) -> dict[str, Any]:
         "flags": viewer_flags.flags(world, ship),
         # package 102 (step 3): the signals flying on her, at their places, flag by flag
         "hoists": viewer_flags.hoists(world, ship),
+        # package 102 (step 4): her flags hung while she is dressed
+        "dressed": viewer_flags.dressed(world, ship),
     }
 
 
