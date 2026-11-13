@@ -1,11 +1,13 @@
 # The boat and the visitor (package 98, step 1): a merchant brig put on the sea near the
 # Neufchatel by the owner's world order, the player down into the boat, pulled alongside
 # her and aboard her as a visitor; his lines answered in the boat and aboard her; the owner's
-# world orders shown him as given (package 98, addition (d)), his word to her captain (b).
+# world orders shown him as given (package 98, addition (d)), his word to her captain (b); the
+# ship's view drawn from the hull he is in or aboard (package 109, the owner's note 6).
 name: In the boat and a visitor aboard the brig X
 scenario: tests/browser_plans/scenarios/frigate-falmouth.yaml
 steps:
   - {label: "ON DECK, at anchor"}
+  - {drawn: Amazon}  # package 109: the ship's view is the hull he is aboard
   - {say: let go the anchor, setup: true}
   - {tick: 300}
   - {say: 'world: ship: a merchant brig "X" of Britain at 50 9.6 N 5 2.0 W, bound for Falmouth', expect: {shown: true, contains: Your world order}}
@@ -16,6 +18,7 @@ steps:
   - {label: "IN THE BOAT"}
   - {say: go to the boat, expect: answered}
   - {tick: 30}
+  - {drawn: a boat under oars, absent: viewed from}  # package 109: no rig drawn for her
   - where am I
   - the time
   - {say: set plain sail, expect: answered}
@@ -23,6 +26,7 @@ steps:
   - {tick: 1800}  # the launch pulls the four cables and he goes aboard her
   - {where: quarterdeck}
   - {label: "A VISITOR ABOARD THE X"}
+  - {drawn: X, absent: Amazon}  # package 109: her drawing and her name, not his first ship's
   - where am I
   - the time
   - {say: set plain sail, expect: {answered: true}}
