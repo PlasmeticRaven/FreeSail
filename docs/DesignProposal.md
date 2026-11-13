@@ -991,6 +991,33 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     vessel type, it's probably OK to restrict." So it stays closed for now, on the
     condition that no kind of vessel is thereby kept from the player.
 
+69. **The first episode: 1792 to 1825, true on any day; built to extend; and still the
+    world's own once begun.** Owner, 2026-11-13: "a sane option for now is to focus on
+    depicting our stated range (1792-1825, I believe), accurately so that you may play from
+    any day in a well-depicted and functional world (to the standard we're building now,
+    anywhere in the range), with the underlying system built for eventual extensibility so
+    that we consider this 1792-1825 range the first 'episode', with room to expand to more
+    dates once everything is truly established." And, confirming it: "The peacetime
+    question will be important, but the world should be built so that a war might break out
+    even in a period where it didn't in real life, to match the principle that the game may
+    start at a day in history but the actual play might diverge, especially with the state
+    and economy systems and moreso when under the control of a director and/or higher level
+    stationed actors." So: (a) **the goal is fixed and can be checked:** a game begun on any
+    day from 1792 to 1825 finds a world depicted to the standard of the day the build knows
+    best, and working; decision 66's open question (how far each element is dated) is
+    answered for this range: all of it, as far as sources allow, a gap said and never
+    invented. (b) **The range is the first episode, not the limit:** no date is fixed in the
+    engine, dated rows are open at both ends, and nothing is built for other years now.
+    (c) **Decision 66 stands and is sharpened:** the dated record is the state the world
+    begins in; who is at war, who holds a port and what a state does afterwards are the
+    world's own to change, by its state and its economy, by a director and by actors seated
+    above a ship. **A peace in the record is a state the world begins in, not a promise:**
+    a war may break out where history had none, and one that history had need not. So the
+    data's forms must let play change what they seed, and the line between what play owns
+    and what the calendar carries regardless is drawn on purpose (package 103's design).
+    (d) **Peace needs a purpose in play,** to be designed, not only dated. (e) The data
+    work is planned as milestone 7c, after the review, from the range's audit.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
