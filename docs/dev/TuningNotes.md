@@ -27304,6 +27304,29 @@ court has not condemned. 109's case moves out of its table in `tests/test_mends_
 beside new and named: `test_take_command_of_the_prize_is_answered_by_its_road` (and 'assume
 command of the prize') and `test_take_command_of_a_ship_his_to_take_is_package_60s_order`.
 
+**The primer names the order.** The fast tier at 1e4e91ae failed one test, the grammar book's
+`test_every_verb_of_the_vocabulary_is_named_in_the_primer`: the new verb `transfer` was in the
+vocabulary and not in the primer. Chapter 14 gains a paragraph under "Taking command of another
+ship" and a row in its table of forms (606eb1ef); the row is run through the frigate by
+`tests/test_primer.py` and refused for her state ("No ship named 'the fly' is on the sea"), never
+for its words.
+
+**The browser plans, played.** Until now the slow tier on this machine had skipped
+`tests/test_browser_probe.py` ("Playwright is not installed": the Python package, not the
+browser, was missing). The package was installed at the pre-installed Chromium's own version
+(1.63.0, the version of the Node package beside it; no `playwright install`), and the plans are
+played at the hash below: none skipped.
+
+**The suites at ebca949a** (the reconciliation, the three owed mends and step 2, with the trunk at
+ce4b78ea merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0,
+7,636 passed and 1 xfailed, the 515 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of
+the touched files, `tests/test_known_truths.py` and `tests/test_browser_probe.py` exit 0, 2,497
+passed and 8 xfailed, none skipped (step 1's files as before, and test_company_moved,
+test_mends_109, test_ports, test_parity and the browser plans); the pace tests of the same files
+alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. Not tested: the refusal
+of a transfer between two King's ships (no test holds it). The tree reported differs from
+ebca949a by this paragraph alone.
+
 
 
 
