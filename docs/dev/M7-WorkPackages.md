@@ -95,8 +95,8 @@ on these packages; that is the owner's choice.
 | 108 | to be decided (a design note first) | **A scenario generated from a request in plain words** (the owner, 2026-11-11: "a 'scenario generation' feature that calls one of the APIs, or can be called from the MCP, to generate a scenario to an open free-text scenario request. This might streamline the actual play flow, when we get beyond testing, with the full manual scenario editor retained and refined/filled out alongside"). The lead's first shape, for the owner: the generator writes **a scenario file in the editor's own form**, never a thing of its own, so that what it makes is loaded, checked and edited as any scenario is; it chooses only from **what the game holds for the day asked** (the ports, ship files and fits, nations and their wars, roles, briefs: one description of the form with its allowed values, which the editor, the checker and the generator all read); what it could not honour it says in words; two fronts over the same three acts (the menu for a day, the check with its refusals in words, the save): the MCP first (the model the player already talks to writes it: no key, no cost of the game's), a provider's door second (the key in the environment alone, the cost shown before the call). The seats it may write are the consent rules' as for any scenario. **The owner's two answers (2026-11-11):** (1) both routes at once, "simply through both routes that already exist in the code. This will basically functionally be a station 'outside of the game', for the purposes of scenario generation, and so that it can make a second/multiple passes for revision": so the generator is a seat like the stations' and the director's, held through the MCP or a provider's door alike, that stands outside any world, with the menu, the check and the save as its readings and orders, and a conversation it can revise in; (2) whether a director is expected is "one toggleable option in the scenario generation interface, so that the generating model knows whether a director is expected or not". **On consent (the owner, 2026-11-11):** "I'm not sure whether this seat needs to sit within the consent framework, simply because it is as close to 'expected' work that any model might interface with, but for consistency we might include it. It needn't confuse the general consent briefing, though, since this is an 'out of the game' station, it's mostly just a de facto station." So the design note gives it a short paragraph of its own for consistency and leaves the general brief as it is; that a generated scenario seats nobody the doors would refuse is the checker's rule, not a matter of consent. | considered 2026-11-11; booked for a design note beside or after package 96 (which settles the scenario's form); not briefed |
 | 109 | Opus | **The mends from the owner's play of 2026-11-12** (his third notes, ten, with five saves: the bilander free in Torbay, the 74's encounter, the frigate's free patrol): the free order that answered "as said" and did nothing (notes 9, 4, 10), a reading of his own keeping (5), the boat that waited two hours on a short watch and could not be belayed (1), the director's dry run that reported success where the copy of the world had failed (2), the page drawing his first ship while he was aboard another (6), vessels sailing across the land on the legs never checked (8) | **briefed 2026-11-12 for the owner's final approval** ("## Package 109" below): five steps, truths 7-540 to 7-549; note 7 (clear for action) put to him for package 77, the readings' leak for package 99; **APPROVED by the owner 2026-11-12 as briefed; launched** (session_01XooV47kcth9DkyWW4no9HL, claude/pkg-109) |
 | 110 | to be decided (a design note first) | **Slavery in the world, and its suppression** (decision 68; the owner, 2026-11-12: "a real fact of the world", "a grounded and respectful-to-the-history basis", the player's interest "the depiction of the efforts to suppress it"): a design note settling what the data says and by which years (each nation's law and treaties on the trade, the courts, the squadron on the African coast, the Barbary regencies and the expedition of 1816), how a vessel of the trade is met and described, what a King's ship may do on which day and what the prize court of package 74 then does (the people freed, the bounty the law gave, no other money for a person), what is said of a capture before the law changed, and captivity under the regencies as a risk to the player's own people; every date and figure from a source **For the note, from the owner the same day:** (a) his question whether a captor could have freed the people of a slaver before 1808, and the lead's answer from memory, to be checked against sources: not lawfully by a British captain on his own authority (they were prize awaiting the court, and he answerable for their value), and the lead knows no case of it; but it did happen where the captor's own law did not hold them property: France between the decree of 1794 and 1802, and the United States enforcing its acts of 1794 and 1800 on its own flag (the *Ganges*, 1800, at Philadelphia); and a free settlement stood at Sierra Leone from 1792: so the note weighs a player's own choice to free them at his own cost and answer for it (decision 66: the interactions are the world's own) against the default of the outcome said in a line. (b) On Barbary captivity: "I am not opposed to modelling this in some way, and we might look at real examples like Kenshi that depict it, while considering to what extent we want this to be a detailed loop/system": the note sets out a light, a middle and a detailed form on package 74's captive, and recommends one. **Ruled by the owner (2026-11-12, in decision 68):** Barbary captivity in the middle form (no life and labour ashore; a state that "does not destroy the game but rather realizes the consequences and makes travel in the seas where Barbary ships are truly risky"); a slaver taken before the law changed handled by the captor's nation and the day (the freeing playable for the nations whose law gave it, a line and nothing paid for the rest). | booked 2026-11-12 for a design note, to be briefed for the owner; before the charts reach Senegal; meanwhile decision 68's interim rule binds every brief |
-| 111 | Opus | **The chart's audit** (the owner, 2026-11-13, approving the lead's proposal: "We should probably call some stopping point for chart expansion just so that we don't snowball beyond what is testable before we establish that the expansion is truly proceeding comprehensively"): a tool with its own tests that sweeps every block for what the builders found by chance: water that no region owns, a tide that is not the sea's own, weather boxes that do not meet where the regions do, a port that cannot be reached from open water without crossing land, a mark on the wrong side of the shore; its findings listed and the cheap ones mended | approved by the owner 2026-11-13 to be briefed; the brief to come for his final word |
-| 112 | Opus | **The coarse seas** (the owner, 2026-11-13: the structural change "adding a coarse ocean layer for the Mediterranean" approved; and his question whether to "establish coarse 'seas', even now beyond the chart boundaries, so that everything can start from a coherent and efficient baseline"): a coarse layer under the whole Mediterranean, laid beside the existing one by package 106a's way so that no existing tile changes; whether the world's coarsest layer and more of the ocean are committed with it is put to the owner with figures | the Mediterranean's layer approved 2026-11-13; the wider baseline for the owner's word; not briefed |
+| 111 | Opus | **The chart's audit** (the owner, 2026-11-13, approving the lead's proposal: "We should probably call some stopping point for chart expansion just so that we don't snowball beyond what is testable before we establish that the expansion is truly proceeding comprehensively"): a tool with its own tests that sweeps every block for what the builders found by chance: water that no region owns, a tide that is not the sea's own, weather boxes that do not meet where the regions do, a port that cannot be reached from open water without crossing land, a mark on the wrong side of the shore; its findings listed and the cheap ones mended | **briefed 2026-11-13 for the owner's final approval** ("## Package 111" below): two steps (the tool with its ratchet; the mends the lead rules), truths 7-560 to 7-569 |
+| 112 | Opus | **The coarse seas** (the owner, 2026-11-13: the structural change "adding a coarse ocean layer for the Mediterranean" approved; and his question whether to "establish coarse 'seas', even now beyond the chart boundaries, so that everything can start from a coherent and efficient baseline"): a coarse layer under the whole Mediterranean, laid beside the existing one by package 106a's way so that no existing tile changes; whether the world's coarsest layer and more of the ocean are committed with it is put to the owner with figures | **briefed 2026-11-13 for the owner's final approval** ("## Package 112" below), by his "Yes to both briefs" and his word that "the whole Atlantic is eventually coming": the world's layer and the 30-second layer under the Mediterranean and down the eastern Atlantic, measured first; a sea as its chart, its weather and its tide; the plan for the whole Atlantic on paper; truths 7-570 to 7-579; to launch when 106a merges |
 
 **The order of work as it stands (the lead for the owner, 2026-11-10; a picture to re-centre
 on, not a ruling: every launch still waits for the owner's word).** *In flight (as of 11:00 UTC, 98 closed and 60's note merged):* 74 (Fable;
@@ -8567,6 +8567,140 @@ from a source is marked FROM MEMORY or JUDGEMENT where it stands; served text is
 (package 85's rule). The package reports one hash measured in a pinned worktree (ruff check
 and format; the fast tier whole; the slow tier of the touched files and of the known truths;
 the pace alone and last), under 700 words, and the lead merges by that hash.
+
+## Package 111: the chart's audit (`tools/audit_chart.py` new; `tests/test_chart_audit.py` new; `data/charts/audit-known.yaml` new, the findings known and owned; then, by the lead's rulings, small mends in `data/charts/manifest.yaml` and the recipes' bounds, `data/weather/climatology.yaml`, `data/tides/`, `data/ports/*.yaml`)
+
+**BRIEFED 2026-11-13 for the owner's final approval; not launched.** Opus. The owner
+(2026-11-13): "We should probably call some stopping point for chart expansion just so that
+we don't snowball beyond what is testable before we establish that the expansion is truly
+proceeding comprehensively." The chart's builders each found a wart by chance: water that
+answers and that no region owns (104, 105), the Channel's tide in the Mediterranean and in
+mid-ocean (104, 106a), weather boxes that meet where the regions do not (101, 105), and in
+the owner's play vessels sailing over the land. This package looks for every such thing in
+every block, on purpose, and keeps looking: two steps, each at one hash.
+
+1. **The audit, a tool and its tests, changing no data.** `python tools/audit_chart.py`
+   reads the chart as the game reads it (`freesail/world/chart.py`, `tide.py`, the weather,
+   the ports' loader) and reports by region, in plain words with a count and the worst
+   cases by position: (a) **water nobody owns:** cells that a tile answers and no region's
+   bounds hold, and bounds that two regions both claim; (b) **the seams:** between
+   neighbours, a strip no tile answers, and a coast that does not meet itself across the
+   seam; (c) **the tide:** on a grid over each region's water, the gauges that answer and
+   how far off they are, flagging water whose tide comes from a gauge of another sea or
+   from farther than the how-to's reach, and a level that is not its sea's; (d) **the
+   weather:** water that lies in no box and takes the nearest, and where boxes' edges and
+   regions' edges part; (e) **the streams:** a region missing from `book_limits`, a stream
+   area on the land; (f) **the ports:** each port's road, anchorage, mooring and shore on
+   the right side of the shore and in the depth its file says, inside its region, its
+   nation in the table and its dated rows whole; and **reachable**: a way from open water
+   to its anchorage that crosses no land by the game's own test, along its `tracks:` where
+   it has them; (g) **the marks:** a headland, town or light in the water and a rock or
+   shoal on the land beyond the grid's reach, and a light with no years; (h) **the
+   scenarios:** each one's start on water inside the chart, its ports present. **The
+   ratchet:** every finding of the first run goes into `data/charts/audit-known.yaml` with
+   its place, its reason in a line and whose it is (a package, the lead's list); the test
+   passes on those and **fails on any finding not listed**, so that every later block must
+   come in clean or say what it adds. A sampled grid in the fast tier, the full sweep in
+   the slow tier; the pace of neither a burden (say the seconds). **The report to the lead
+   is the table of findings**, the cheap mends proposed for each.
+2. **The mends the lead rules from that table,** each small and each shown old beside new:
+   bounds moved to close water nobody owns where no tile changes; the boxes' and the
+   gauges' membership; a port's point moved to the water; its `tracks:` given. A mend that
+   would rebuild a tile, move a recorded passage or want research is not made: it stays in
+   the known list with its owner. With it the how-to's last section: **what a new block
+   runs before it reports** (the audit, clean or declared).
+
+**Truths 7-560 to 7-569.** **What must not move:** every tile, coast and index (step 1
+changes no data at all); every recorded passage and kept save. The rules of every package
+bind (no model or vendor identifier in any file; nothing under `docs/agents/consent/` nor
+`docs/agents/ConsentBrief.md`; no key, no paid call; never push to or rebase the trunk,
+never force-push; no test skipped, disabled or weakened: the known list is findings owned,
+each with its reason, never a way round a failure; physics read, not changed; served text
+the world's). The builder works on `claude/pkg-111`; each step reports one hash measured in
+a pinned worktree (ruff; the fast tier whole; the slow tier of the touched files and of the
+known truths; the pace alone and last), under 600 words, and the lead merges by that hash.
+Other chart packages build beside it (105, 106a, 106b): it audits the trunk as it stands
+and they come under the ratchet as they merge.
+
+## Package 112: the coarse seas (`tools/build_charts.py` `CORRIDORS`, `WORLD` and `CHARTS`; `data/charts/tiles/0/` and `tiles/1/` the layers committed; `data/charts/seas.yaml` new; `freesail/world/chart.py` the layers' order; `freesail/world/tide.py` and `data/weather/climatology.yaml` the seas' own baselines; `docs/dev/ChartBlocks.md` the plan for the whole Atlantic)
+
+**BRIEFED 2026-11-13 for the owner's final approval; not launched; it launches when package
+106a is merged** (it builds on 106a's way of laying one coarse layer beside another without
+touching the first). Opus. The owner (2026-11-13) approved "the structural change adding a
+coarse ocean layer for the Mediterranean" and asked: "Should we perhaps even expand this
+structural principle to establish coarse 'seas', even now beyond the chart boundaries, so
+that everything can start from a coherent and efficient baseline?"; and, approving this
+brief to be written: "I've already been thinking about the Caribbean, so we'll want to
+consider that the whole Atlantic is eventually coming and plan for that at least."
+
+**The ground, for the builder to check:** the tool has four levels (`LEVELS`): 0, the whole
+world at 150 seconds of arc (`WORLD`); 1, the ocean at 30 seconds ("passages and
+landfalls"); 2, a region at 3 seconds; 3, a harbour at half a second. Only levels 2 and 3
+and one strip of level 1 (`atlantic-corridor`, 32 to 51 N, 32 to 1 W, 48 tiles, 9.75 MB)
+are committed; `.gitignore` leaves out `tiles/0/` and the rest of `tiles/1/`. So the open
+sea is in fine detail wherever a region holds it (the Azores: 153 tiles and 40 MB, 131 of
+them with no land), and outside the regions and the one strip nothing answers. The
+Mediterranean has no coarse layer at all. Outside every block the tide is the nearest of
+the Channel's gauges and the weather the nearest box.
+
+**The principle, as the owner approved it:** the sea is coarse and whole; the fine detail is
+for water near the land. A **sea** is data with three things: its coarse chart, its own
+weather, its own tide and set.
+
+0. **Measured first, with a short report to the lead before anything is committed under
+   `data/charts/`:** (a) level 0: the tiles and bytes for the whole world, and for the
+   Atlantic with the Mediterranean alone (about 70 S to 75 N, 100 W to 40 E), for the
+   lead's choice; what the game does with level 0 today, and what changes when the chart's
+   limits become the layer's (the scenario's refusal, the lookout's "the chart has nothing"
+   lines, the tests that hold the limits); (b) level 1 under the whole Mediterranean (about
+   30 to 46 N, 6 W to 36.5 E), laid beside the existing layer by 106a's way: tiles, bytes,
+   and the proof that every existing tile is byte for byte as it was; (c) level 1 carried
+   down the eastern Atlantic to the Cape Verde Islands' latitude (106a measured nine or ten
+   tiles, about 2 MB); (d) **the plan for the whole Atlantic, on paper only:** a table of
+   the seas to come (the North Sea and the Baltic's approaches; the western ocean and the
+   American coast; the Caribbean and the Gulf; the South Atlantic to the Cape), each with
+   bounds on the level-1 grid, its tiles and bytes by estimate, and what laying all of it
+   at 30 seconds would weigh against laying level 0 there and level 1 only on the tracks
+   and landfalls.
+1. **The layers' order in the game,** generalising 106a's: the finest that answers,
+   answers (a harbour, a region, the 30 seconds, the world); within one level the first
+   listed, the others filling only its empty cells; where a finer layer answers it answers
+   exactly as before (proven over every existing tile's cells).
+2. **The layers committed as the lead chooses from (0):** the world's, the
+   Mediterranean's, the eastern Atlantic's southward; `.gitignore` and the how-to brought
+   to say so.
+3. **`data/charts/seas.yaml`: each sea named, with its bounds, its layer, the weather that
+   answers its open water and the gauges that serve it.** The tide of open water outside
+   every block is its sea's own (the blend of the gauges its sea names, as the lead ruled
+   for a block with no gauge in package 104), never the Channel's by default; the weather
+   of open water is its sea's box where a source on file gives one, and where none does
+   the nearest answers as today **and the sea says so** (a row marked provisional, for the
+   audit to list). No box is invented without a source.
+4. **The chart says what it is.** On water that only a coarse layer answers, near the land,
+   the master's and the lookout's words say that the chart here is a general one and not
+   to be trusted inshore (the period's own case: a general chart of the ocean, coasting
+   charts for some shores, plans for a few harbours); in the world's words, never the
+   code's. A ship is not refused such water; she is warned in it.
+5. **The plan written into the how-to:** the table of (0)(d); the rule that a block from
+   here is a strip within so many miles of the land over its sea (the figure from the
+   Canaries' and Morocco's measures); and, measured and NOT done, what slimming the older
+   blocks that carry open sea in fine detail would save (the Azores above all), for the
+   owner's later word.
+
+**Truths 7-570 to 7-579.** **What moves, by design and said (the owner's standing rule of
+2026-11-12):** the chart's limits; the tide and the weather of open water outside every
+block, old beside new. **What must not move:** every existing tile, coast and index, byte
+for byte; every region's own tide and weather; every recorded passage and kept save (they
+sail the western Channel, whose chart has no coarse layer; prove it). The rules of every
+package bind (no model or vendor identifier in any file; nothing under
+`docs/agents/consent/` nor `docs/agents/ConsentBrief.md`; downloads are data, never run; no
+key, no paid call; never push to or rebase the trunk, never force-push; no test skipped,
+disabled or weakened; physics read, not changed; a figure not read from a source marked
+JUDGEMENT; served text the world's). The builder works on `claude/pkg-112`; it reports the
+measurement and then one hash measured in a pinned worktree (ruff; the fast tier whole; the
+slow tier of the touched files and of the known truths; the pace alone and last, the floor
+of the ticks held with the layers loaded), under 700 words, and the lead merges by that
+hash.
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
