@@ -1169,9 +1169,16 @@ gauges:
 # null levels falls back to the eleven's, the Atlantic's; each is the sum of its own M2, S2
 # and N2 amplitudes, the model's lowest water of the three on the chart's datum (Mahon's
 # published 0.20 m beside them). A published level replaces it.
+# The six serve as well the tide region `gulf-of-hammamet` (no tiles; the manifest's
+# `tide_regions:`): the three tiles of `sicily`'s west column south of 36.29 N, the gulf of
+# Hammamet and the Sahel to Monastir, that no region's bounds hold, so that their water
+# reads the block's own tide and not the Atlantic's (the lead's note of 2026-11-13, after
+# package 111's audit); and `calabria-north`, the strip of the block's top tile row north of
+# 38.5 N and east of `tyrrhenian`'s column (15.84 to 16.69 E: Pizzo and the head of the gulf
+# of Sant'Eufemia, the Calabrian hills, the head of the gulf of Squillace), likewise.
   - id: palermo
     name: Palermo
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 38.1214
     lon_deg: 13.3714
     record: "GESLA-2, ISPRA (idromare), 1992 to 2010"
@@ -1181,7 +1188,7 @@ gauges:
     N2: {amplitude_m: 0.023, phase_deg: 221.5}
   - id: porto-empedocle
     name: Porto Empedocle
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 37.2864
     lon_deg: 13.5270
     record: "GESLA-2, ISPRA (idromare), 1973 to 2010"
@@ -1191,7 +1198,7 @@ gauges:
     N2: {amplitude_m: 0.007, phase_deg: 67.5}
   - id: catania
     name: Catania
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 37.4980
     lon_deg: 15.0939
     record: "GESLA-2, ISPRA (idromare), 1971 to 2010"
@@ -1201,7 +1208,7 @@ gauges:
     N2: {amplitude_m: 0.005, phase_deg: 39.8}
   - id: messina
     name: Messina
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 38.1962
     lon_deg: 15.5633
     record: "GESLA-2, ISPRA (idromare), 1973 to 2010"
@@ -1211,7 +1218,7 @@ gauges:
     N2: {amplitude_m: 0.002, phase_deg: 254.8}
   - id: reggio-calabria
     name: Reggio Calabria
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 38.1214
     lon_deg: 15.6489
     record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
@@ -1221,7 +1228,7 @@ gauges:
     N2: {amplitude_m: 0.012, phase_deg: 66.1}
   - id: lampedusa
     name: Lampedusa
-    block: sicily
+    block: [sicily, gulf-of-hammamet, calabria-north]
     lat_deg: 35.4998
     lon_deg: 12.6045
     record: "GESLA-2, ISPRA (idromare), 1998 to 2010"

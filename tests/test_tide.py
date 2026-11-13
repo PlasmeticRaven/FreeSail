@@ -1153,6 +1153,11 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         "sardinian-sea",
         "tunis-coast",
         "sicily",  # package 105: its six, TICON's in its bounds
+        # package 105, the lead's note of 2026-11-13 (after package 111's audit): two tide
+        # regions, bounds and no tiles, over the water of sicily's tiles no region's bounds
+        # hold, served by the block's six
+        "gulf-of-hammamet",
+        "calabria-north",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1277,10 +1282,22 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
     # gauge's further blocks were the band's alone (`set(g.blocks[1:]) == near`). New: the
     # band's, and for the three gauges the ruling names, the gaugeless blocks it lists;
     # each of those blocks has no gauge of its own.
+    # Package 105, the lead's note of 2026-11-13: the two tide regions over the water of
+    # sicily's tiles that no region's bounds hold are served by the block's six. Old: the
+    # three of package 104 alone; new: the six beside them.
+    sicily_six = (
+        "palermo",
+        "porto-empedocle",
+        "catania",
+        "messina",
+        "reggio-calabria",
+        "lampedusa",
+    )
     ruled = {
         "mahon": {"sardinian-sea", "tunis-coast"},
         "carloforte": {"sardinian-sea", "tunis-coast"},
         "cagliari": {"tunis-coast"},
+        **{g: {"gulf-of-hammamet", "calabria-north"} for g in sicily_six},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())
