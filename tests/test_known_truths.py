@@ -16284,10 +16284,12 @@ def test_truth_7_562_the_tides_level_by_sea_and_the_four_blocks_that_read_the_el
 def test_truth_7_563_the_ways_in_the_land_guard_refuses():
     """Package 111 (f), reachable: of the ninety ports, the business's way in from the sea
     (`ships.approach_plan`, the land guard `ships.land_crossing`) crosses the grid's land for
-    three and the way out by the track to sea for three, Genoa's, Cartagena's and Oran's, whose
-    harbours the grid's modern moles close (the lead's ruling of 2026-11-13: they stay shut);
+    four and the way out by the track to sea for four: Genoa's, Cartagena's and Oran's, whose
+    harbours the grid's modern moles close, and St Malo's, whose only way over the grid's water
+    is the Décollées along the coast, Faden's passage for small vessels (the lead's rulings of
+    2026-11-13: they stay shut);
     every other port has a way in and out clear of the land, and every way in but Royan's
-    begins with open water in reach. Package 111's step 2b gave 22 ports tracks over the grid's
+    begins with open water in reach. Package 111's step 2b gave 21 ports tracks over the grid's
     water. Old: twenty-four in and twenty-four out (St Malo's, Dartmouth's, Toulon's, Lisbon's
     among them; Maddalena's out only, Hyeres's in only), the opens Paimboeuf's and Royan's."""
     A = _audit_tool()
@@ -16297,12 +16299,12 @@ def test_truth_7_563_the_ways_in_the_land_guard_refuses():
     ins = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-in:")}
     outs = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-out:")}
     opens = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-open:")}
-    assert ins == outs == {"genoa", "cartagena", "oran"}  # old: 24 and 24
+    assert ins == outs == {"genoa", "cartagena", "oran", "st-malo"}  # old: 24 and 24
     assert opens == {"royan"}  # old: {"paimboeuf", "royan"}
     for pid in ("falmouth", "plymouth", "brest", "cadiz", "gibraltar", "bona", "barcelona"):
         assert pid not in ins | outs, pid
     # the ways step 2b's tracks opened, among them the four the old pin named
-    for pid in ("st-malo", "dartmouth", "toulon", "lisbon", "st-marys", "maddalena", "hyeres"):
+    for pid in ("dartmouth", "toulon", "lisbon", "st-marys", "maddalena", "hyeres"):
         assert pid not in ins | outs, pid
 
 

@@ -2,7 +2,7 @@
 #
 # Every finding of the audit's first run (the trunk as package 111 was cut from it, the full
 # sweep), less those step 2a mended and with those its mends added (each said in its reason),
-# less the 43 ways in and out that step 2b's tracks mended, each by its key with its place (the
+# less the 41 ways in and out that step 2b's tracks mended, each by its key with its place (the
 # worst position the audit names, or its region),
 # its reason in a line, whose it is (the package that built it, or the lead's list for what no
 # block owns: the tile grid's reach past the bounds, the climatology's boxes, a rule), and the
@@ -349,6 +349,11 @@ known:
   reason: 'the grid''s modern mole closes the harbour: no way in from the sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship in; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
   most: 1
+- key: f-in:st-malo
+  place: 48°40.6′N 2°04.6′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in. The only way the grid''s water allows is along the coast from the bay of La Fresnaye, Faden''s fourth passage, the Décollées, "very difficult, and frequented by none but small vessels" (Faden 1793): not a way for every trader. The lead''s ruling of 2026-11-13: it stays shut'
+  owner: package 39a
+  most: 1
 - key: f-open:royan
   place: 45°33.1′N 1°02.9′W
   reason: the outer road lies in an estuary and the port has no `tracks:`; no straight line to the open sea keeps off the land
@@ -368,6 +373,11 @@ known:
   place: 35°43.8′N 0°41.6′W
   reason: 'the grid''s modern mole closes the harbour: no way out to sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship out; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
+  most: 1
+- key: f-out:st-malo
+  place: 48°40.5′N 2°04.5′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship out. The only way the grid''s water allows is along the coast from the bay of La Fresnaye, Faden''s fourth passage, the Décollées, "very difficult, and frequented by none but small vessels" (Faden 1793): not a way for every trader. The lead''s ruling of 2026-11-13: it stays shut'
+  owner: package 39a
   most: 1
 - key: f-shore-afloat:corunna
   place: 43°21.9′N 8°23.3′W
