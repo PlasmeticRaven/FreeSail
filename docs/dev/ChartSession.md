@@ -418,3 +418,24 @@ so they may run side by side, the second to merge taking the first's manifest by
 - **Waiting:** 106b and 112 at the lead's word on 106a's merge; the builders' briefs
   above, to be brought up to date then (106a's Madeira proof, 111's seas table and the
   calendar's `follows_history` for 106b's dated ports).
+
+### 2026-11-13, 15:20: the lead's word (trunk 18ea2816, merged here)
+
+- **Package 105 closed** (step 3 merged as 801b80e7): `sicily`, its 24 ports, the tide
+  regions `gulf-of-hammamet` and `calabria-north`, `the-faro` scenario and the six gauges'
+  interim judged levels are now this session's ground. The chart is 18 regions and four tide
+  regions (`solent`, `gulf-of-hammamet`, `calabria-north`, `asinara-west`).
+- **111 step 2a merged** (dac8ddd7): every region's sea named in the audit's `SEAS`, an
+  unnamed one a finding. Step 2b building (tracks for 22 of the 25 ports; Genoa, Cartagena
+  and Oran stay listed for the cold review).
+- **106a** at its last measures: re-runs Madeira's tide proof after 2a; adds two findings
+  (the Salvages' weather split at 30 N; Point Handia's grid point) and moves truth 7-564's
+  count; the lead may ask my reading at its report. **At its merge 106b and 112 are mine
+  to begin**, as the owner ruled.
+- **109 step 5** (ruled): traders steer round land by the sea route, and goal squares with
+  a mark on land are laid at sea; how a vessel steers, not what the land guard judges.
+- **The builders' briefs, brought up to date:** 106b's two regions name their sea
+  (`atlantic`) in `SEAS` or the audit fails them; its dated ports seed the game and move
+  only under `follows_history` (decision 69), so its truths load each port on its start
+  day. 112 reads 111's `SEAS` as the table its `seas.yaml` replaces, with `sicily` and the
+  four tide regions in it.
