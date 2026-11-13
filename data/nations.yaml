@@ -686,7 +686,7 @@ nations:
       blockades: []
       convoys: false
       privateers: none
-      source: "James 1837, vol. 2, p. 170: the French took at Malta two 64-gun ships, one frigate and three galleys of the Order's; Smyth 1824, p. 287: the knights went annually with their galleys to Lampedusa; p. 202: in 1570 the Order's squadron beaten by the corsair Uluj Ali and only three vessels sent to Lepanto; not modelled beyond keeping port"
+      source: "James vol. 2 p. 170: the French took at Malta two 64-gun ships, one frigate and three galleys of the Order's; Smyth 1824, p. 287: the knights went annually with their galleys to Lampedusa; p. 202: in 1570 the Order's squadron beaten by the corsair Uluj Ali and only three vessels sent to Lepanto; keeping port and engaging none judgement"
     relations:
       britain: "peace; JUDGEMENT (no treaty read)"
       france: "peace until Bonaparte's landing of 10 June 1798 and the capitulation of the 12th (James 1837, vol. 2, p. 170); beyond this table's date the Order held nothing"

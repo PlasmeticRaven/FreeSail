@@ -27142,3 +27142,10 @@ westerly 17 against 23, the northerly 48 against 39). The generator's easterly s
 rise to Malta's gregale and levanter months without spoiling the other quarters: a finding for
 whoever fits the eastern boxes, not mended. No test holds a box to its row by simulation (as
 before); the test holds the rows to the table.
+
+**Two count-pins moved by the package's own additions** (the first fast tier at 1e9e250 found
+them, exit 1): `tests/test_ordnance.py`, the ports with no powder block, old `27 + 8 + 8 + 4 +
+7 + 5 + 7 + 13`, new `... + 11` (step 2's eleven ports carry none); truth 7-261, the nations,
+old 15, new 16 (the Order of St John), whose naval source was put in that truth's citation
+form ("James vol. 2 p. 170"). Each is a count of the files this package adds, proven by the
+additions themselves (the eleven files and the one nation); no other pin moved.
