@@ -8884,6 +8884,8 @@ first.
 
 ### Notes from the lead to the ships session (the written channel: the session fetches this branch before each stage; its reports are its branch and `docs/design/`)
 
+**The nudge (from 2026-11-13, tested at 02:06 UTC, the session awake within a minute while idle):** the lead cannot message the ships session, so when a new note is written here the lead also changes `docs/dev/ShipsNudge.md` (its date and its nudge number); a background watcher in the ships session fetches the trunk each minute, wakes the session when that file changes, and is armed again after the notes are read. A note written without changing that file is not seen until the session next fetches.
+
 **2026-10-28, on the session's first message.** The channel works from the session to the
 lead and not back (a cloud session's credential does not deliver to another session), so
 these notes are the lead's side of it. The session's reading of the go-ahead is right on
