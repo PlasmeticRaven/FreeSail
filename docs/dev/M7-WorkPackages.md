@@ -9025,11 +9025,10 @@ the owner set out whole.
 
 ## Package 114: the cold review of the whole (`docs/reviews/ColdReview-M7.md` new, with its evidence beside it; no code, no data, no test)
 
-**BRIEFED 2026-11-13; APPROVED by the owner the same day ("114 is approved by the brief, I would run it on Fable 5.2"); not launched: it begins when the work
+**BRIEFED 2026-11-13; APPROVED by the owner the same day ("114 is approved by the brief"; to run on Fable, as the packages table names it); not launched: it begins when the work
 in flight has settled, at a commit of the trunk the lead names, on the owner's word.** The
 reviewer is a new session that has built none of this, on the model the owner has named,
-with readers of its own under it. (The model's name stands here as the owner's choice for
-a launch, as the packages table names a model for each package.) The owner (2026-11-13): "general coverage of the project's current shape as
+with readers of its own under it. The owner (2026-11-13): "general coverage of the project's current shape as
 a cold and critical review, targeting where we've unevenly expanded the scope, missed
 testing, implemented a feature inefficiently or multiple times over without integration,
 and where we're 'missing the forest for the trees' in our development in general. It should
