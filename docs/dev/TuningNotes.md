@@ -28237,13 +28237,19 @@ globe); **the Atlantic with the Mediterranean, 70 S to 75 N and 100 W to 40 E, 6
 11,283,534 bytes** (of 64). *What the game does with level 0 today:* nothing. The manifest's
 `world:` lists no tile and `tiles/0/` is ignored by git, so no clone has one; the code would
 read whatever is present (`Chart.__init__`, `_present`). *What committing it would move:*
-the code lays the world under **every** chart, a chart of one region included. The
-recorded passages sail the chart of `channel-west` alone (bounds 48 to 51 N, 7 to 3 W, its
-tiles to 47.81 N). Tried in a scratch copy: with level 0 present that chart answers depths
+the code lays the world under **every** chart, a chart of one region included, after the
+corridor and its layers, so on `atlantic-east` it answers only where nothing finer does
+(beyond the corridor and its layers, 31.0 N 25 W for one: `test_chart.py`'s
+`BEYOND_THE_CORRIDOR`, None today). **The checkpoint's road** (`core/replay.py:_rebind`)
+reloads a `region: channel-west` save on the chart of `channel-west` alone (bounds 48 to 51
+N, 7 to 3 W, its tiles to 47.81 N, no corridor), while a fresh world or a journal's replay
+takes `chart_holding`'s `atlantic-east` (found by the session's reading, (e) below). Tried
+in a scratch copy: with level 0 present the chart of `channel-west` alone answers depths
 south of 47.81 N where it answers None today (47.70 N 6 W: None, then 139.4 m), its
-`bounds` unchanged. **So level 0 committed as the code stands moves what a region's chart
-answers beyond its tiles.** Step 1 must keep it off a chart of one region, or the passages
-must be proven never to leave their tiles. *The limits:* a chart's `contains`, `bounds` and
+`bounds` unchanged. That is the water of the merchant brig's kept save's Harpy patrol, run
+on by `test_checkpoint.py` (below). **So level 0 must not be laid under a chart of one
+region,** or the save's run-on moves.
+*The limits:* a chart's `contains`, `bounds` and
 `bounds_words` are the envelope of its regions and coarse layers. They are read by the
 scenario's refusal of a start outside the chart (`core/world.py:786`, "the position ...
 lies outside the chart region ..."), the ship's placing and the hand anchor
@@ -28378,9 +28384,11 @@ otherwise the tide's own):
 | ocean | 3,327 | 3.20 to 3.98, 1.76 to 2.02 | 1.20 to 3.98 | 0.59 to 1.60 | 0.37 to 0.83 |
 | none of these (east of 9 W, south of 36 N: 106b's water) | 102 | 3.98, 2.02 | | | |
 
-**The recorded passages' open water is the Channel's sea, and its tide does not move.** Harpy
-is within ten miles of 47 50 N 6 W, all of it north of 47.5 N. Diamond is within eight miles
-of 48 N 4 55 W, inside biscay-north's or channel-west's bounds.
+**The recorded passages' open water is the Channel's sea, and its tide does not move**
+((e) below: they sail `atlantic-east` with its corridor). Harpy is within ten miles of 47 50 N
+6 W, and the south-west of Ushant patrol's south mark is at 47.933 N, both north of 47.5 N.
+Diamond is within eight miles of 48 N 4 55 W, inside biscay-north's or channel-west's
+bounds.
 
 **The known list's open water under these seas** (ruling (a): a group leaves only where its
 sea's tide is its own and not the eleven's): of the 23 groups of the lead's list, biscay's 4
@@ -28389,3 +28397,85 @@ with package 105's two (Sicily's north and west). The Channel's 8 stay: their se
 the eleven, which are that sea's own gauges. Is that the eleven's, by the ruling, or the
 sea's own? The Strait's south three are Morocco's water, 106b's bounds. The seven slivers
 beside a neighbour stay, for bounds.
+
+### Step 0: (e) what reads `atlantic-east`'s open water (106a's first count checked)
+
+"Open" here means outside every region's bounds; positions were tested against the
+manifest's boxes, and the charts and saves were loaded read-only.
+
+**106a's count was short, and the brief's premise does not hold.** The recorded passages
+are built by `make_scenario_world`. A scenario of `region: channel-west` takes
+`chart_holding`'s chart, **`atlantic-east` with its corridor**, not the chart of
+`channel-west` alone. Only a checkpoint's reload (`core/replay.py:_rebind`, `scenario.chart
+or scenario.region` with no `chart_holding`) puts a save of the Channel on `channel-west`
+alone. Two roads, two charts (for others, below). So the passages do read open water:
+
+- **gate 5c's cruise** (`naval-cruise.yaml`): Harpy starts at 47 50 N 6 W and patrols
+  within ten miles, three of her four marks outside every bound (47.833 N 6.248 W, 47.833 N
+  5.752 W, 47.667 N 6 W). Its digest is `test_known_truths.py` about line 4127.
+- **gate 5c's merchant passage and 6a's fake captain** (`merchant-passage.yaml`), and **6a's
+  intent** (`merchant-intent.yaml`): the patrol "off the soundings south-west of Ushant within
+  10 miles" (centre 48.10 N 5.60 W). Its south mark, 47.933 N 5.6 W, is outside every bound,
+  and the leg to it crosses 48 N at about 5.50 W. The same patrol is in directed-passage,
+  merchant-brig, -cutter, -schooner-plymouth and -ship.
+- All of it lies **north of 47.5 N, in the Channel's sea as proposed**, whose gauges are the
+  eleven: its tide is unchanged at every point (simulated above), and its weather box
+  (`channel`) is today's. Diamond's patrol lies inside the bounds. The seas as proposed move
+  nothing these passages read. A sea line south of 47.95 N would move them.
+
+**Kept saves** (`tests/fixtures/saves/`): five. Four reload on the chart of `channel-west`
+alone (m5c-cutter, m5c-b-harpy, m5c-c-37d-officer, pre-100-step-2-letter-in-hand) and one
+has no chart (pre-75-cutter-guns-cast-loose). The **m5c-b** save's Harpy patrol is at 48.12
+N 5.43 W heading for its east mark. Run on four hours (`test_checkpoint.py` about line 240),
+its next mark is the south one, below channel-west's tiles: on that chart no level answers
+there today, and level 0 would (the reason level 0 must stay off a chart of one region).
+Journal replays build on `atlantic-east`: the letter save (`test_letters.py:476`), the 37d
+save, the wardroom save (`test_ports.py:1971-2004`, merchant-intent, run eight hours with
+the south-west of Ushant patrol), and the cutter tender (`test_checkpoint.py:478`, the Nile
+off Cherbourg, all inside).
+
+**Scenarios.** Fourteen name `chart: atlantic-east` (106a counted twelve) and 36 name
+`region: channel-west`. Every player starts inside a region's bounds. Books that sail open
+water: `azores.orders` (the leg west of Madeira to 37 36 N 24 W), `biscay-south.orders` (off
+Finisterre, 42 53 N 9 22 W), `falmouth-to-corunna.orders` (by Ushant, across open Biscay).
+None of these is sailed by a test. `data/regatta/falmouth-to-funchal.yaml`'s fake goes by
+42 55 N 9 50 W; it is loaded only.
+
+**Truths and tests on open water, which move by design if the seas or the layers come:**
+
+- *The tide in the `biscay`, `iberian` and `ocean` seas* (each moves from the eleven to the
+  sea's own): `test_tide.py` at 47 N 8 W, 44 N 12 W, 37 N 14 W (three tests), off Lisbon 38.6
+  N 10.5 W, 35.4 N 6.3 W (106b's water); `test_islands.py` at 40 N 15 W; `test_tide.py:539`
+  (a world at 37 N 14 W, `tide_by_almanac`); truth 7-527's `tide.area_at(30.8, -16.0)`.
+  `test_tide.py` at 49.5 N 7.5 W, 51.2 N 5 W and 47.8333 N 6 W are the Channel's sea and do
+  not move. `test_reckoning.py:1905`'s "none, in open water" reads the account, not the sea.
+- *The weather:* `test_weather.py:710-759`'s `box_at` at 45 N 20 W, 35 N 21 W, 40 N 21 W and
+  55 N 30 W, truth 7-527's at 26 N 15 W, and `test_scenarios.py`'s at 35.7 N 5.5 W are
+  the boxes as they are; the seas move no box.
+- *The chart's limits,* moved by the Mediterranean's layer (the envelope's east from
+  16.69332 E to the layer's) or by any layer laid: `test_chart.py:904-948` (the envelope
+  pinned, `not contains(52, -5)`, `region_at(34, -7) is None`), truth 7-520's limits and its
+  refusal at 25.1 N 20 W (a layer to Cape Verde moves the south bound), the bound pinned in
+  `test_known_truths.py` about line 16641, `test_geo.py:236-297`'s refusal at 55 N 20 W (a
+  level 0 for limits would load it), and **`test_longitude.py:653-676`**, which starts at
+  49.5 N 16.593 E, past every region and layer, and holds "The chart has nothing to the
+  eastward" and "the chart ends here". With the Mediterranean's layer to 36.5 E that edge
+  moves 20 degrees east and the test's place reads water or land of the layer: superseded
+  by design, old beside new, when step 2 comes.
+- *The coarse layer's answers already pinned* (`test_chart.py:281-287`, `1093-1247`: 45 N 20
+  W at level 1, off Morocco, off Finisterre, `BEYOND_THE_CORRIDOR` at 31 N 25 W answering
+  None, the frigate run west from 47.5 N 4.95 W with no chart-edge line). The layers proposed
+  touch none of these but 31 N 25 W: it is in neither the corridor nor its layers, and level
+  0 (or a layer west of 22.13 W) would answer it.
+- *Business:* `world/business.py:290-297` takes the envelope for a start in no region, so its
+  bounds grow with every layer (`test_squadrons.py:584-643` sails 48.5 N 7.5 to 8 W, inside
+  today's envelope either way).
+
+### Found for others, not mended
+
+- The two roads to a Channel world give two charts: a fresh world or a journal's replay on
+  `atlantic-east` with its corridor, a checkpoint's reload on `channel-west` alone. A save
+  made on one is run on the other. `test_checkpoint.py`'s `saved` is built on `atlantic-east`
+  and reloaded on `channel-west`.
+- 106a's notes say the passages "are `region: channel-west`, whose chart has no corridor";
+  true only on the checkpoint's road.
