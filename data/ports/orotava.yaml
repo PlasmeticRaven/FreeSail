@@ -1,0 +1,127 @@
+# FreeSail: Port Orotava (Puerto de la Cruz) and its road (package 106a), on package 35's
+# machinery; the marks are the features file's (data/charts/features/canaries.yaml).
+#
+# Sources. Purdy 1825, pp. 217 to 218 (the directions for British vessels frequenting the
+# island, from advices of November 1816, and Glas): the next best port to Santa Cruz, on the
+# north-west side, 8 1/2 leagues south-westward of Point Naga; good from May to the end of
+# October, but in winter ships slip and put to sea before a north-wester; straggling rocks two
+# ships' lengths off the shore; commonly calm in the road with a long northerly swell; the
+# anchorage in 60 fathoms a mile and a half off with the Peak S.W., or half a league off to
+# the westward of the town in 30 to 45 fathoms, the berth very small; little or no tide; the
+# pratique boat with Spanish colours comes two or three miles off and leaves a pilot on board,
+# and it is proper to keep him; from April to October the vessels moored in an inner creek
+# with iron chains the merchants keep; ships to leeward mistake Garachico for it. Glas (Purdy
+# p. 220): ships from Europe for Santa Cruz commonly unload part of their cargoes here. Norie
+# 1805, Table XL: Orotava 28 23 35 N.
+#
+# The datum: UNVERIFIED (no plan read; EMODnet's depths on the level-3 patch). FOR SOME
+# YEARS ONLY, in words until 105's dated rows: the summer's moorings in the creek "from April
+# to October" and the pratique boat's practice are Purdy's of 1816; the inner creek and its
+# chains not in the grid. Prices FROM MEMORY or JUDGEMENT, in sterling.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written below in its own words, with its years: a port file can date its holder
+# alone until package 105's step 1 (the dated rows for `state`, `closed_to`, `market` and the
+# rest) is on the trunk; the rows waiting for it are named in the head of each file.
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: orotava
+name: Port Orotava
+source: "Purdy 1825, pp. 217 to 218 and 220; Norie 1805, Table XL"
+datum: unverified
+
+outer_road:
+  feature: orotava-road
+  name: the road of Orotava
+  lat_deg: 28.4250
+  lon_deg: -16.5600
+  depth_fathoms: 40
+anchorage:
+  feature: orotava-road
+  name: the road of Orotava
+  lat_deg: 28.4250
+  lon_deg: -16.5600
+mooring:
+  name: the small berth half a league west of the town
+  lat_deg: 28.4250
+  lon_deg: -16.5600
+  bottom: sand
+  deep_draught_ft: 20    # judgement
+shore:
+  feature: port-orotava
+  name: the landing at Port Orotava
+  lat_deg: 28.4144
+  lon_deg: -16.5500
+
+pilot:
+  station: orotava-road
+  cruising_nm: 3                 # Purdy 1825 p. 218: the pratique boat two or three miles off
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pratique boat of Orotava
+    under: oars
+    note: "Purdy 1825, p. 218: a low boat with the Spanish colours set upon a staff; she brings a pilot and leaves him on board"
+  names: [Hernández, González, Rodríguez, Pérez, Martín, Díaz, Afonso, Delgado]   # judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 340            # off the north coast to the north-north-west (judgement)
+  words:
+    channel: "Run down along the north shore two or three leagues off; it is bold and free of danger. Do not fall to leeward, or you will take Garachico for this place and lose a day beating back."
+    marks: "The white town of Orotava a league inland on the side of the high land, with two small round green hills under it: steer in between them and another town rises out of the sea, the port."
+    anchorage: "The berth is half a league off and to the west of the town, and very small; bend your small bower with a single turn round the windlass so it runs quick, for you bring up in thirty to forty-five fathoms. Keep the pilot aboard while you lie here."
+    tide: "There is little or no tide here, and she will bring up easily. Mind the long northerly swell, and in winter put to sea at once if the wind comes north-west."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 40, origin: spain, season: {10: 0.9, 11: 0.9}, note: "the wine country of the north side, its vintage shipped here (Purdy p. 218: fields of corn, gardens and vineyards about Orotava); JUDGEMENT, the cheapest wine of the islands"}
+    - {good: brandy, price: 34, origin: spain, note: "JUDGEMENT"}
+    - {good: vegetables, price: 14, origin: spain, note: "Purdy 1825 p. 218: Orotava surrounded by fields of corn, gardens and vineyards; JUDGEMENT"}
+    - {good: oranges, price: 12, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 38, origin: spain, note: "JUDGEMENT"}
+    - {good: wheat, price: 13, origin: spain, note: "the island's own corn and the eastern islands'; JUDGEMENT"}
+    - {good: barley, price: 10, origin: spain, note: "JUDGEMENT"}
+    - {good: canvas, price: 72, origin: britain, note: "imported, part of the European cargoes for Santa Cruz unloaded here (Purdy p. 220); FROM MEMORY"}
+    - {good: cordage, price: 82, origin: britain, note: "imported; FROM MEMORY"}
+    - {good: timber, price: 8, origin: spain, note: "the pine of the island's heights, JUDGEMENT"}
+    - {good: salt beef, price: 78, origin: null, note: "imported; JUDGEMENT"}
+    - {good: salt fish, price: 27, origin: spain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 18, pounds: 45, note: "JUDGEMENT"}
+    - {item: yard, hours: 12, pounds: 28}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.5, pounds_per_ton: 0.3, note: "JUDGEMENT: through the swell, by the town's boats"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.08}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [orotava-road, 28 27.0 N 16 33.6 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 27.0 N 16 33.6 W, orotava-road]
+  in: [orotava-road]

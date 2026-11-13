@@ -1,0 +1,122 @@
+# FreeSail: Santa Cruz of Palma and its road (package 106a), on package 35's machinery;
+# the marks are the features file's.
+#
+# Sources. Purdy 1825, pp. 218 to 219 (Glas): the chief port, on the east side; Palma seen
+# from the east is shaped exactly like a saddle: steer for a little to windward of its lowest
+# place till within a mile, then run southward along shore, and the town shows close by the
+# sea; the road within a musket-shot of the shore in 15 or 20 fathoms, exposed to easterly
+# winds yet safe in all winds with good ground tackle, the ground clean and good and the high
+# land facing the road throwing back the wind, so that ships ride with a slack cable even in a
+# north-east swell, which makes this road more secure than any of Canaria's or Tenerife's; in
+# winter the swell breaks high on the beach and stops the boats three or four days together;
+# near the mole a castle or battery of a few cannon; a fountain in the middle of the town fed
+# by a rivulet, good water plentiful. Norie 1805, Table XL: Palma, Town 28 37 N.
+#
+# The datum: UNVERIFIED (no plan read; EMODnet on the level-3 patch). FOR SOME YEARS ONLY:
+# nothing read. Prices FROM MEMORY or JUDGEMENT, in sterling.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written below in its own words, with its years: a port file can date its holder
+# alone until package 105's step 1 (the dated rows for `state`, `closed_to`, `market` and the
+# rest) is on the trunk; the rows waiting for it are named in the head of each file.
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: santa-cruz-de-la-palma
+name: Santa Cruz de la Palma
+source: "Purdy 1825, pp. 218 to 219 (Glas); Norie 1805, Table XL"
+datum: unverified
+
+outer_road:
+  feature: santa-cruz-de-la-palma-road
+  name: the road of Santa Cruz of Palma
+  lat_deg: 28.6820
+  lon_deg: -17.7610
+  depth_fathoms: 18
+anchorage:
+  feature: santa-cruz-de-la-palma-road
+  name: the road of Santa Cruz of Palma
+  lat_deg: 28.6820
+  lon_deg: -17.7610
+mooring:
+  name: the road a musket-shot off the town
+  lat_deg: 28.6810
+  lon_deg: -17.7610
+  bottom: clean and good
+  deep_draught_ft: 20    # judgement
+shore:
+  feature: santa-cruz-de-la-palma-castle
+  name: the mole by the castle
+  lat_deg: 28.6880
+  lon_deg: -17.7640
+
+pilot:
+  station: santa-cruz-de-la-palma-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a shore boat of Santa Cruz of Palma
+    under: oars
+    note: "judgement: no pilot is named in the sources"
+  names: [Pérez, Rodríguez, Hernández, Brito, Lorenzo, Acosta, Sicilia, Massieu]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 90             # off to the east (judgement)
+  words:
+    channel: "Seen from the east the island is shaped like a saddle: steer a little to windward of its lowest place until you are within a mile, then run along shore to the southward."
+    marks: "The land behind the town is so high and steep that you will not see the shipping till you are within a mile of them; the town lies close by the sea, the castle by the mole."
+    anchorage: "Anchor within a musket-shot of the shore in fifteen or twenty fathoms: the ground is clean and good, and though the road is open to the east the high land throws the wind back and a ship rides with a slack cable. The safest road in the islands."
+    tide: "The tide is small, six or seven feet at springs, high water about three on the full and change; in winter the swell breaks high on the beach and stops the boats for days."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 50, origin: spain, note: "JUDGEMENT: Palma's malmsey (FROM MEMORY)"}
+    - {good: timber, price: 6, origin: spain, note: "JUDGEMENT: the island's pine forests (FROM MEMORY), the cheapest wood of the islands"}
+    - {good: sugar, price: 50, origin: spain, note: "FROM MEMORY: the sugar of Tazacorte and Argual; JUDGEMENT"}
+    - {good: wheat, price: 14, origin: spain, note: "JUDGEMENT"}
+    - {good: barley, price: 11, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 36, origin: spain, note: "JUDGEMENT"}
+    - {good: vegetables, price: 15, origin: spain, note: "JUDGEMENT"}
+    - {good: brandy, price: 36, origin: spain, note: "JUDGEMENT"}
+    - {good: salt fish, price: 26, origin: spain, note: "JUDGEMENT"}
+    - {good: canvas, price: 75, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: cordage, price: 85, origin: britain, note: "imported; JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 38, note: "JUDGEMENT: the island's pine"}
+    - {item: yard, hours: 10, pounds: 24}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.09}
+    - {item: water, hours_per_ton: 0.4, pounds_per_ton: 0.2, note: "Purdy 1825 p. 219: a fountain in the middle of the town, filled by a rivulet, plentifully supplies good water"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.08}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [santa-cruz-de-la-palma-road, 28 40.8 N 17 43.2 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 40.8 N 17 43.2 W, santa-cruz-de-la-palma-road]
+  in: [santa-cruz-de-la-palma-road]

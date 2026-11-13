@@ -26711,6 +26711,71 @@ passed. No digest moved; no game line about a hoist or the colours moved (the lo
 `dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
 records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
 
+**Step 5: the nations' days.** `days.yaml` for Britain (7 days), Spain (7) and France (5),
+each dated by its years. On a day, a ship of the sea at anchor under a rules captain dresses
+of herself by day and undresses at sunset (not logged; the lookout's words of her flags say
+"she is dressed in her flags"); the player's ship does not: lying at anchor, her first
+lieutenant reminds the captain once that day ("It is the King's birthday, sir: the ships in
+harbour will be dressing"). **Stopped and reported, the salute:** the gunnery has the gun to
+leeward (one loaded gun, "the shot to strike nothing") and no blank: `charges.py` leaves the
+saluting charge out (package 77's), there is no train of guns fired at an interval, a gun
+fired is a shot from a loaded gun, and the far ships fire nothing but their far action's
+rounds. A salute wants: a blank load (powder, no shot) and its cartridge drawn from the
+magazine (the table's saluting charge), a train of N guns of a side fired one at a time at
+the interval (not read in any source held: FROM MEMORY five seconds), each reloaded with
+blank in turn, the guns heard at the guns' range by the ships about her, and the far ships'
+salutes heard as their guns; more than a short new act. **Not built, splice the main
+brace:** the stores keep provisions as days at full allowance and water in tons, no spirits
+apart; an extra issue wants a spirits store first (package 54's stores).
+
+**Step 5 and decision 69 (the lead's word of 2026-11-13).** The days are read by the date of
+the world's own clock (`world.clock.ship_time`), as the calendar carries them: a day is kept
+in its `years`, and the reigns those years follow (a king's birthday ends with the king; the
+French days pass from the Saint-Louis to the Republic's fêtes, the Saint-Napoléon and the
+Saint-Louis again) are read as the calendar's, by the lead's word ("a king's birthday is the
+calendar's"). Nothing in step 5 reads who is at war or who holds a port: a ship dresses on
+her own nation's day wherever she lies at anchor, at home, abroad or off an enemy's coast,
+and the first lieutenant's word is said wherever the player's ship lies at anchor; no line
+asks whose the port is. The scenario's `follows_history` (the trunk's calendar step) is not
+read: the days are the calendar's, kept alike whether the record seeds the world or is
+followed. Left for package 103's design, said not built: when a state can
+change its government in play, which house reigns is the world's own, and the days' years
+would then be read against that state and not the date (the French days from 1792 are the
+plainest case).
+
+**Step 5: the measure.** At 09fd157 (step 5 with the trunk at 788cb3c, step 4 merged as
+c0bd2ac, merged by a merge commit, then the trunk at ce4b78e the same way, the two truths
+appends kept with the trunk's first; the reach of the first lieutenant's word placed, which
+the trunk's truth 7-380 asks of every kind): ruff check and format clean (385 files); the
+fast tier 7,599 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (step 4's ten, test_knowledge and the browser plans, test_browser_probe's
+13 with none skipped; `--slow -m "not pace"`) 1,789 passed, 8 xfailed, 0 failed; pace alone
+and last on the same files, 13 passed. No digest moved; no game line about a hoist or the
+colours moved (the locker's `day_said` out of the pickle while unset; a ship at anchor on no
+day records nothing new). The tree reported differs from 09fd157 by this paragraph alone.
+
+**Step 5: the lead's two mends (2026-11-13, before the trial).** (1) The word of the day is
+the ship's own officer's (`agent.officer_rank`, a lazy import): the first lieutenant in a
+frigate, the lieutenant in a brig-sloop, the mate in a cutter, a schooner or a trader (a
+smack's master at anchor at Falmouth on the 4th of June is reminded by the mate), named as
+the station's binding names him; the record's data carries `person`. (2) No words in a
+seated officer's mouth. **Found:** no line the game speaks as the officer had a rule for a
+seated one (the officer's name is read by `reports` for whose deck it is, and the lines
+`world/captive.py` speaks are the captain's, heard by the seated stations within earshot):
+no precedent, so, as the lead said, where `holder_of(world, "officer of the watch")` is held
+the day is said to the deck with no speaker, "It is the King's birthday: the ships in
+harbour will be dressing." (kind `colours.day`, of the `colours` family: the deck), for the
+seated officer to say to the captain himself; once, as before. Tests: a frigate and a smack,
+each with her own officer's word; a frigate with a fake officer seated (truth 7-505 widened
+to both).
+
+**Step 5, the mends: the measure.** At 4a1a70c (the mends, 606d780, with the trunk at 18ea281
+merged by a merge commit, the truths appends kept with the trunk's first): ruff check and
+format clean (385 files); the fast tier whole 7,605 passed, 1 xfailed, 0 failed; the slow
+tier of the step's files (as at 09fd157: test_browser_probe's 13 played, none skipped, and
+test_knowledge; `--slow -m "not pace"`) 1,794 passed, 8 xfailed, 0 failed. The tree
+reported differs from 4a1a70c by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
@@ -27885,3 +27950,272 @@ passed, `boat-and-visitor`'s three new checks among them; the recorded passages 
 every pinned digest, line count and tick held. **No digest moved, no kept save and no pin.**
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 1.4 at its start):
 exit 0, 12 passed. The tree reported differs from 128741b by this paragraph alone.
+
+## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
+
+**Where I stand (2026-11-12):** built whole, the trunk merged ten times (the last at 18ea281, with package
+105's step 3, western Sicily, beside the Canaries in every list: islets lacking a feature 27,
+ports without a block + 13 + 7; at ef5b24a package 111's step 2a, Madeira's bounds at its tiles' edges, and the proof of Madeira's tide run again
+below; at 774b6dd package 105's step 2, Sicily and Malta, beside the Canaries in every list; the truths file rebuilt as
+the trunk's with 106a's two edits and its block appended; the manifest rewritten by the
+tool, no tile moved; at 9300198 decision 69's first step, the calendar seeded by a port's dated rows, and packages
+102's step 4 and 109's step 3; at fcd2079 package 109's step 2; the one before at bcd5709 with package 111's step 1, the chart's
+audit, and decision 69), measured at the final hash in a pinned
+worktree (the figures below; the suites in the final report).
+Reports (A) and (B) ruled by the lead the same day: the second layer beside the corridor, no
+column from 26.4 W, the reach to 12.4 N recorded and not built; the region's bounds a hair
+inside the edges, the Salvages a region of one tile, written whole, the seven gauges, the
+Salvages served by Santa Cruz's and Funchal's.
+
+### (A) The ocean layer: a second coarse layer against the first widened
+
+**What the chart holds.** The corridor `atlantic-corridor` is 48 level-1 tiles (9,746,887
+bytes), its bounds 32 to 51 N, 32 to 1 W, its fetch 31.9 to 51.1 N. A level-1 tile is
+4.2667 degrees (512 cells of 30"), so its southern row already runs from **29.4667 N** to
+33.7333 N: its eight tiles of that row are NODATA south of 31.9 N (149,504 of 262,144 cells
+each). The Canaries' own row of the grid is 25.2 to 29.4667 N. **The Salvages (30.0 to
+30.2 N) and the whole crossing from Madeira to the islands between 29.47 and 31.9 N lie in
+the existing tiles' NODATA**: a second layer cannot be new tiles alone; it shares the names
+of three of the first's tiles.
+
+**The control.** The tool at the trunk's head, run on a fresh GEBCO extract of the
+corridor's own fetch box (the extract's zip has another checksum, `d59228b0...` against the
+manifest's `69c4dbf9...`; its grid is the same), writes all 48 committed tiles byte for
+byte. Every difference below is the widening's.
+
+**The first widened** (bounds south 25.21 N, fetch 25.1 N, the rest as built): 56 tiles,
+12,512,736 bytes; **8 new tiles (1,731,872 bytes) and all 48 existing tiles rewritten, none
+byte-identical.** The south row's eight have their NODATA filled (149,504 cells each, 50,224
+in the westernmost). In every one of the 48: the elevation's half-metre ties broken the
+other way (2 to 2,381 cells a tile, never more than 1 m; 19 land and sea flips in all, on
+the Iberian and Biscay coasts), and the distance field changed over most of every tile (up
+to all 262,144 cells, even in the row at 50.8 N): the build's east-west cell is taken at
+the block's middle latitude, which the widening moves, so every distance in the block
+changes. The how-to's finding (package 39e), confirmed and worse: the widening moves the
+field of the whole corridor, not only the tiles near new land.
+
+**A second layer beside the first** (a corridor of its own, `atlantic-south` the working
+name; bounds 25.21 to 31.9 N, 18.5 to 9.4 W; fetch 12.3 to 33.8 N, 26.5 to 9.25 W, so that
+its field knows Madeira's shores and the coast of Morocco): 6 tiles, three columns (22.13 to
+9.33 W) by two rows. Three are new names (25.2 to 29.47 N; 733,781 bytes); three share the
+first's names in the row from 29.47 N (`106080_-79680`, `-64320`, `-48960`) and are written
+in their own folder, NODATA wherever the first has data (461,180 bytes so masked; 750,024
+whole): **1,194,961 bytes in all, and no existing tile touched.** The runtime must learn it:
+a level-1 tile listed by both layers is read as the first's, its NODATA cells (elevation,
+distance and the blocks' shoalest soundings) filled from the second's at load
+(`chart.Tile`, `Level.tile`; about thirty lines). Where the first answers, it answers alone,
+as it did. Of the three columns: the west from 22.13 W (Hierro's west point is 18.16 W, the
+pilots' way outside the islands 30 or 40 leagues west of them lies south of the row);
+nothing west of 22.13 W between 29.47 and 31.9 N is filled (a column more, 26.4 to 22.13 W,
+would be 1 tile of 170,625 bytes in the Canaries' row and one more, masked, in the row above, not measured).
+
+**What reads the coarse layer, and whether it moves (the second layer).** The recorded
+passages and the gate's days are `region: channel-west`, whose chart has no corridor; the
+five kept saves of `tests/fixtures/saves/` are all `channel-west`: none reads the corridor.
+Twelve scenarios name `chart: atlantic-east`, and every one starts inside a region's bounds
+(none within 10 miles of an edge of the chart but Spithead's, to the north): their tiles are
+unchanged, and the new tiles answer only where the first had nothing. What does move with
+the second layer is **the chart's envelope**: its south limit 32 N to the new layer's 25.21
+N (`Chart.bounds`, read by the scenario's refusal, `bounds_words`, the harbour page and
+`/api/chart`, the business's bounds where a scenario starts in no region, none does, and
+the lookout's "the chart has nothing to the south" within 10 miles of 32 N, which a ship
+south of Madeira no longer hears). `tests/test_chart.py` asserts the envelope (32.0) and is
+moved with it. The tide's open edges read the corridors' bounds (`charted_bounds`): with the
+new layer's north bound at 31.9 N, below Madeira's south bound of 32 N, Madeira's south edge
+stayed closed. Package 111's step 2a (merged at ef5b24a) laid Madeira's south bound at its
+tiles' edge, 31.60001 N, and the edge now meets the layer: **the proof run again, old beside
+new** (the trunk at ef5b24a against the merge, each with its own code, the tide's
+`constants_about` over Madeira's bounds every 0.02 degrees, 11,449 points): the open edges
+27 old, 38 new (Madeira's south edge from 17.87 to 15.73 W and its sides from 31.6 to 31.9 N,
+and the Canaries' and the Salvages' own), and **not one point's level or constituent
+moved**. The seam's taper is not laid where the eleven are beyond their reach (package 94),
+and Madeira lies some 1,300 miles from the nearest of them: the open edge changes the
+taper's weight and nothing it is applied to.
+
+**Carried on to 12.4 N, measured and not built:** the three rows below (12.4 to 25.2 N) by
+three columns (26.4 to 13.6 W; the coast lies west of 13.6 W from 25.2 N down): 9 tiles,
+1,881,628 bytes; with the Canaries' row's column from 26.4 W, 10 tiles and 2,052,253 bytes.
+By the second layer's way none of the first's tiles moves for it either; by the widening's,
+it would be the same 48 rewritten and 24 tiles more over the whole width (32 to 1 W).
+
+### (B) The region: the Canaries, and the Salvages
+
+Built into a scratch folder by the tool at the head (the trunk's manifest copied beside
+it, so that the seam read the trunk's regions: "0 kept"), from one fetch for the three
+variants (EMODnet 27.28 to 30.37 N, 18.35 to 13.12 W; GEBCO's fill raised by the eleven's
+3.98 m, no gauge of the block's yet: the bytes move a little when the block's own tide is
+in, and the region is rebuilt then, package 101's lesson).
+
+**The bounds.** The brief's 27.33 to 29.47 N and 18.29 to 13.17 W take 91 level-2 tiles: 27.33
+is below the row edge 27.33333, 29.47 above 29.46667, and 13.17 W east of the column edge
+13.17333 (package 104's finding). A hair inside the edges, **27.33334 to 29.46666 N,
+18.29332 to 13.17334 W: 60 tiles (5 rows by 12), 12,496,201 bytes**, 208 KB a tile; the
+coast 688 pieces, 250,001 bytes. Every island lies inside: Hierro's south point (27.64 N)
+and west point (18.16 W), Alegranza (29.40 N), the Roque del Este (13.33 W).
+
+**The Salvages: by one tile, the smaller.** The two islands and their islets lie in one
+level-2 tile (29.89333 to 30.32 N, 16.16 to 15.73333 W): **one tile, 376,201 bytes** (the
+steepest relief of the block), its coast 8,096 bytes. The bound carried up to 30.31999 N
+instead takes 84 tiles, 14,647,521 bytes: 24 tiles and 2.15 MB more against 0.38 MB. A
+region's recipe is one box, so the one tile is a region of its own, **`salvages`**, bounds
+29.89334 to 30.31999 N, 16.15999 to 15.73334 W (no code; its features file its own); the
+ocean between it and the islands is the second coarse layer's.
+
+**Written whole, or within ten miles of land.** Of the 60, 38 tiles hold water within ten
+miles of land (10,575,498 bytes) and 22 do not (1,920,703 bytes, 87 KB a tile): **the rule
+would save 1.9 MB of 12.5**, the deep water round these islands compressing well and the
+dear tiles being the steep shores, unlike the Azores' (260 KB a tile of open sea). It
+would also hand the middles of the wider channels to the coarse layer's 30" cells. The
+Salvages' tile is within ten miles of land either way. **Recommended: whole** (the lead's
+choice).
+
+**The source grid.** EMODnet's DTM answers over the sea of every tile of both regions: the
+cells GEBCO alone fills are the land and, at most, 2.7% of a tile's sea cells (sampled one
+in sixteen; the shore of Gran Canaria's south-west tile), so the tiles are EMODnet's at
+3.75" over the water, GEBCO's under the land, as every block's. The finer grid reaches the
+Canaries and the Salvages.
+
+**Under the 40 MB rule:** the two regions 12.87 MB of level-2 tiles and 0.26 MB of coast;
+with the second coarse layer (1.19 MB), 14.3 MB, before any harbour patch.
+
+**The gauges** (TICON's file, the same zip as package 39b's, SHA-256 7055f8ed...6514, read by
+the stations' coordinates, the longest record of each; the mean level above the chart's
+datum from Puertos del Estado's REDMAR reports, `bancodatos.puertos.es/BD/informes/
+globales/GLOB_2_3_<code>.pdf`, the codes in `INT_3.pdf`, the level the difference of the
+NMM and the BMMI on the gauge's zero, "Referencias de nivel del mar"):
+
+| Gauge | TICON position | Record (longest) | M2 cm, deg | S2 | N2 | REDMAR | NMM - BMMI |
+|---|---|---|---|---|---|---|---|
+| Arrecife, Lanzarote | 28.9722, -13.5300 | IEO 1949 to 2012 | 83.5, 36.6 | 31.5, 59.8 | 17.4, 22.2 | 3470, 2009 to 2017 | 179 - 19 = 1.60 m |
+| Puerto del Rosario, Fuerteventura | 28.5000, -13.8500 | PdE 2004 to 2015 | 80.9, 33.1 | 30.6, 56.7 | 16.8, 18.9 | 3469, 2004 to 2017 | 152 - (-1) = 1.53 m |
+| Las Palmas | 28.1333, -15.4167 | IEO 1949 to 2012 | 74.6, 28.4 | 28.5, 52.4 | 15.4, 14.7 | 3450, 1992 to 2017 | 158 - 14 = 1.44 m |
+| Santa Cruz de Tenerife | 28.4800, -16.2400 | PdE 1992 to 2015 | 70.8, 29.3 | 27.2, 52.6 | 14.7, 15.6 | 3471, 1992 to 2017 | 150 - 13 = 1.37 m |
+| Santa Cruz de la Palma | 28.6833, -17.7500 | UHSLC 1959 to 1981 | 65.1, 29.0 | 25.5, 51.6 | 13.6, 15.8 | 3465, 2007 to 2017 | 141 - 15 = 1.26 m |
+| San Sebastián, Gomera | 28.0000, -17.0000 (rounded) | PdE 2007 to 2015 | 58.1, 23.6 | 23.3, 46.1 | 12.0, 11.3 | 3463 (28.09, -17.11), 2007 to 2017 | 128 - 10 = 1.18 m |
+| La Estaca, Hierro | 27.7800, -17.9000 | PdE 2004 to 2015 | 59.3, 21.8 | 24.2, 44.9 | 12.1, 8.7 | 3459, 2004 to 2017 | 157 - 40 = 1.17 m |
+
+Las Palmas's UHSLC series at 28.10 N, -15.40 (1949 to 1991, three records) has M2's phase
+at 0 to 2 degrees where the IEO's, Puertos del Estado's and UHSLC's own later series agree at
+28 to 29: a clock 27 degrees (54 minutes) early, as Vigo's (package 39c); not taken.
+Gomera's TICON position is rounded to the degree (28.0 N, 17.0 W, at sea nine miles from
+San Sebastián); REDMAR's 28.09 N, 17.11 W is the harbour's, and the gauge is placed there.
+El Hierro's station is La Estaca on the north-east coast (REDMAR's report), not La
+Restinga. **The Salvages have no gauge** (none in TICON's file between 29.47 and 31.9 N):
+by package 104's ruling a block with none is served by its neighbours' nearest gauges within
+the reach, each listing it after its own: Santa Cruz de Tenerife (101 miles; `[canaries,
+salvages]`) and Funchal (159 miles; `[madeira, salvages]`, the gauge's figures unmoved,
+Madeira's water unmoved since the membership is by bounds), the level the blend's of those
+that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share no seam.
+**Outside the blocks** the ocean between them reads the eleven alone, the nearest of them
+(Le Conquet's, 1,300 miles off) as Madeira's ocean does today: the rule, said for the lead.
+
+### (C) What was built, item by item
+
+1. **The ocean carried south**: `atlantic-south`, 6 level-1 tiles, 1,191,415 bytes, beside the
+   corridor (`tools/build_charts.py` `CORRIDORS`, `CHARTS["atlantic-east"]["corridors_beside"]`;
+   `freesail/world/chart.py` `Tile.filled_from`, `Level.beside`, the chart's layers beside,
+   some fifty lines with their words). Every committed corridor tile is byte for byte as it
+   was; truth 7-521 reads its every cell through the new path. Proof of the merge on 10,000
+   random points over the corridor and the new water, the manifest with and without the
+   layer: elevation, distance, the nearest shore and the floor equal at every point the
+   corridor answered, except 14 points on 31 54 N, within a 30" cell of the corridor's data
+   edge, whose bilinear read and gradient now find their corners known (the seam); the
+   blocks' floor first taken as the shoaler of the two layers moved 259 points as far as
+   32 24 N, and was changed to the corridor's own block wherever it has one. The chart's
+   south limit is 25.2001 N (`tests/test_chart.py`: the envelope and its words moved with it,
+   and its point "beyond the corridor" moved from 31 N 10 W, now the new layer's, to 31 N
+   25 W, still NODATA; the tracked-folder test takes the layer's folder).
+2. **The regions**: `canaries`, 60 level-2 tiles 12,513,080 bytes, seven harbour patches 15
+   level-3 tiles 1,688,437 bytes, coast 683 pieces; `salvages`, 1 tile 376,932 bytes, coast 25
+   pieces; both built on the block's own tide (the raise 1.17 to 1.60 m) after a first build
+   on the eleven's 3.98 m (package 101's lesson). The sweep: 2,731 cells in 206 places,
+   the largest 144 cells at the foot of Los Cristianos' shore, Anaga's, the Bocayna's, all
+   small cliff-foot clusters; the Salvages 14 cells. "0 kept" both. 14.58 MB of tiles for
+   the two, 15.8 MB with the second layer: under the 40 MB rule.
+3. **The sources**: Purdy 1825 (the Canaries, pp. 210 to 220, quoting Glas whole for the
+   roads, Vancouver, Krusenstern and Lisiansky for Santa Cruz, Mudge and Vidal's survey of the
+   Salvages of 1820, Rennell on the currents, pp. 94 to 96), Glas 1764 (Fuerteventura's Porto
+   de Cabras and Cala de Fustes; Hierro), the Oriental Navigator 1801 (the Salvages, the
+   sunken rock, the road of Santa Cruz, the trade winds), Norie 1805 (Table XL's positions,
+   Table XLI's "Canary Island, 3h 0m" read from the page image p. 248): laid under
+   `docs/references/pilots/` with their rows. Tofiño's Derrotero of 1789 does not reach the
+   Canaries; Borda's survey (1776) was not found on the Internet Archive by its search, and
+   no period plan of a road was read: every port `datum: unverified`, no override.
+4. **The marks**: 56 features in `canaries.yaml`, 7 in `salvages.yaml`, each with its
+   source; positions FROM MEMORY checked against the tiles, 22 moved (each `fix`). The Peak
+   at Borda's, Lamanon's and Cordier's 1,909 toises (3,720 m), seen at 120 and 130 miles in
+   the clearest weather and not at 140 (truth 7-523; Purdy: "sometimes forty leagues off").
+   Islets: the Rocks of Naga, Graciosa, Clara, Alegranza, Lobos and the East Rock the grid
+   holds; the West Rock (Hell Rock) an island the grid lacks on its shoal head. The Salvages:
+   the Great Salvage and the Pitons the grid holds; the Pitons' rocky bank a danger on the
+   grid's head (a frigate grounds on it at any tide, truth 7-525); the Great Salvage's north
+   and north-east shoal spots EMODnet smooths away (36 to 55 m at the pilot's places), left
+   at the pilot's places, their head JUDGEMENT (the eastern spots' three fathoms). **No light**
+   in 1805 by any source on file, none entered. Purdy's doubtful sunken rock between Tenerife
+   and Canaria not entered (the grid has 1,500 m there).
+5. **The ports**: seven files, each the King of Spain's by one dated row (barcelona's form),
+   with its anchorage, bottom, pilot's four words, market of 11 to 13 goods priced so the
+   islands trade (corn from Lanzarote and Fuerteventura west, timber and wine east: 68 routes),
+   yard, crew pool and `tracks:` to a common mark north of Tenerife (every pair of the 42
+   clear of the land guard; 40 were refused before). Santa Cruz de Tenerife, Port Orotava,
+   Las Palmas (the road of La Luz), Arrecife (Naos and Cavallos), Santa Cruz de la Palma, San
+   Sebastián de la Gomera, Porto de Cabras. **Hierro has none**: Purdy (p. 219) "neither road
+   or harbour worthy of particular description", Glas describes no landing. Gando, the road
+   by Lobos, El Rio, Cala de Fustes and Tasacorte are marks, not ports. Rows waiting for
+   105's dated rows, written in the files' own words: Santa Cruz's quarantine of 1816; the
+   growth of Arrecife's town; Orotava's summer moorings in the creek. Norie's Canary Island
+   placed at Palmas in the master's table.
+6. **The weather**: a box `canaries` (25.2 to 30 N, 22.13 to 9 W), after Madeira's, PROVISIONAL
+   and judgement in every row from the Oriental Navigator's and Purdy's words on the trade and
+   its winter westerlies. The island lee's calms are said in its head, not carried. The
+   Salvages' region (29.89 to 30.32 N) lies across the boxes' edge at 30 N: the islands,
+   all north of it, Madeira's, the region's southern water the Canaries' (the same trade
+   in both; the chart's audit lists the split).
+7. **The streams and the tide**: two areas, `canaries-among` (south, half a knot,
+   JUDGEMENT on Rennell's "less regular") and `canary-current` (S.S.E., three-quarters of a
+   knot, Rennell's sixteen to nineteen miles a day), a `book_limits` box over the new water;
+   no tidal stream (Purdy: "little or no tide" at Orotava). The tide by the block's own seven
+   gauges and the Salvages' ruling (report B).
+8. **The scenario** `canaries.yaml`: a King's frigate from Funchal off Point Naga at
+   daybreak, down the east side of Tenerife to look into Santa Cruz road and on to the
+   south; sailed at seed 7 without touching ground (truth 7-529: 1.34 miles from her mark by
+   the truth, 2.96 from the road). The first book's hourly re-shaping sent her back for the
+   town after she had hove to, and she drove ashore under it: each leg is now shaped once.
+   **Truths 7-520 to 7-529**, the brief's list as step 1 cut it (the ocean to 25.2 N, not 13 N).
+9. **The how-to**: `docs/dev/ChartBlocks.md`, "The ocean carried south, the Canaries and the
+   Salvages".
+
+**Decision 68** (the owner's, on the trunk at the second merge): the sources on file were
+searched (Glas 1764, Purdy 1825, the Oriental Navigator 1801) for the islands' part in
+slavery. Glas alone speaks of it: the Count of Gomera kept about a thousand enslaved Africans
+on his sugar lands at Adeje on Tenerife, and several gentlemen of Tenerife a few (p. 353, OCR
+l. 14740; l. 10373 to 10381; of the 1760s). Said plainly with its years and source in the
+heads of `santa-cruz-de-tenerife.yaml` and `san-sebastian-de-la-gomera.yaml`; no person in
+any market or the business; no scenario on it. A port file has no served field for such a
+statement: it stands in the file's head (a finding for the design note).
+
+**The chart's audit** (package 111, on the trunk at the fifth merge) found seven things in
+the new blocks that its known list lacked. Five are mended: Santa Cruz de la Palma's road
+(its outer road's finding and its anchorage's) moved 240 m north-west, out of 38 fathoms into the pilot's 15 or 20 (32 m on clean ground,
+some 300 m off the town; truth 7-524's band of 25 to 90 m holds it, and the pin does not
+move); Santa Cruz of Tenerife's mooring moved 200 m east, off the modern breakwater the grid
+holds and into 22 fathoms on the pilot's ooze; and the audit's table of seas gains the
+Canaries and the Salvages, the Salvages meeting both Madeira's sea and the Canaries' as
+ruled. Without those two rows the audit took both for Mediterranean water and their 1.2 to
+1.6 m mean levels for a fault. Two are listed in `data/charts/audit-known.yaml` as owned by
+106a: the Salvages split between Madeira's weather box and the Canaries' at 30 N (the same
+trade in both, as Biscay's splits are listed), and Point Handia standing in 2.5 m of water,
+its grid land a kilometre off, left at the pilot's place. Truth 7-564 (package 111's, the
+regions two weather boxes answer) moves with the new region: five at the trunk's bcd5709
+(Biscay north and south, the Strait, the Tyrrhenian, the Balearics), six here, the Salvages
+added and nothing else (the audit's check (d) run on each).
+
+### Found for others, not mended
+
+- The open ocean's tide is the nearest of the eleven (Le Conquet's, M2 about 2 m) over the
+  new layer's water outside the two blocks (the lead's list).
+- Madeira's peaks and the Peak are seen through cloud the weather does not put on a hill.
+- The Canaries' book: a standing order "when the time is 13:00" is refused ("the time is
+  compared in bells"); a book wanting a clock hour has no word for it.
+- The wars table's undated war makes the islands hostile to a King's ship after 1808, as
+  Barcelona's head says.
