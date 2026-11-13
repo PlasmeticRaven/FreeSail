@@ -28479,3 +28479,47 @@ None of these is sailed by a test. `data/regatta/falmouth-to-funchal.yaml`'s fak
   and reloaded on `channel-west`.
 - 106a's notes say the passages "are `region: channel-west`, whose chart has no corridor";
   true only on the checkpoint's road.
+
+### Step 1: the layers' order (an engine step; `freesail/world/chart.py` alone)
+
+**Ruled by the chart session on step 0** (2026-11-13): level 0 is never laid under a chart of
+one region, and a checkpoint's reload answers exactly as today. The Black Sea is cut from
+the Mediterranean's layer. Cape Verde takes all twelve tiles. The islands are one `ocean`
+sea. The seas follow the weather boxes' lines. `seas.yaml` takes `regions:`, `meets:` and
+gauges by id. Put to the lead and not yet answered: the level, the Channel's eight groups,
+and level 0's extent.
+
+**What changed.** `Chart.__init__` reads a chart's coarse layers as **one ordered list**: the
+chart's `layers:` if it gives one, else 106a's `corridor:` followed by
+`corridors_beside:`, read as that list. Giving both forms is refused in words, and so is a
+layer the manifest lacks. At each level the first layer that lists a tile answers in it,
+and every later layer listing the same tile fills only the NODATA its predecessors left
+(`Tile.filled_from`, applied in order). A tile no earlier layer lists is the later layer's
+own. 106a's rule for one layer beside the corridor is now the rule of every layer. The
+uncommitted Atlantic (level 1) and world (level 0) come after every layer and answer only
+where no layer lists the tile. **The world lies under a chart of `charts:` only**: a chart
+of one region keeps its regions' levels alone. `Chart.corridor` and
+`Chart.corridors_beside` stay as the first layer and the rest, for their readers.
+`Chart.layers` is the list. Nothing of the manifest, the tool or any tile changed: the
+manifest still says `corridor:` and `corridors_beside:`. The tool writes `layers:` when
+step 2 lays a layer.
+
+**What moved, said.** Nothing in any committed tile or manifest entry, and nothing a clone
+reads. Two orders moved where no clone has tiles. The Atlantic's uncommitted level 1 used to
+take a tile name before 106a's layer beside the corridor; it now answers after every layer.
+The world no longer lies under a chart of one region.
+
+**The proof, cell for cell over every existing tile.** Every chart and region of the
+manifest was loaded (21 charts: `atlantic-east` and the twenty regions), and every tile each
+level lists was read through `Level.tile`: 4,593 tiles. The hashes of their elevation,
+distance field, blocks' soundings and tile figures, with each chart's levels and bounds,
+are **identical** under the code at 97eb554 (a worktree, the same tiles) and under this
+step's. The script was the session's own, not committed. **Truth 7-570** (slow tier) holds
+it for good. It re-derives every chart's every tile from the manifest alone (the region's
+own tile; the first layer in the chart's order that has it, each later one filling its
+NODATA) and compares the runtime's read cell for cell: 4,593 tiles. Two fast tests in
+`tests/test_chart.py` hold the order on three synthetic layers of one tile: the first
+listed answers, the later fill, and the two forms are one. They also hold the world on a
+synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
+3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
+corridor answering first at 47.70 N.
