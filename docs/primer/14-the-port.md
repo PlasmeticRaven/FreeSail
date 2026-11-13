@@ -449,6 +449,16 @@ a ship in a squadron, a ship whose captain's station is held, and a ship you are
 refused in words. The save keeps the game as it began, and the change is your order in it, so a
 replay takes command of her again at the same minute.
 
+Her people are hers, but men can be moved between two ships of yours lying within a boat's pull:
+`transfer fifteen hands to the Fly`, `transfer six able seamen and four ordinary to the Fly`,
+`transfer Mr Cannon and two hands to the Sherbourne`, or `transfer the people and the hands to
+the Fly` from a ship laid up, which leaves her ship-keepers. The boat takes them across, twelve
+to a load and a quarter of an hour a load close aboard, and each load is said in the receiving
+ship's log as it comes up her side; both musters are made again. A King's ship's people are
+borne on the King's books and turned over by the Admiralty's order, not by her captain's, and are
+refused in words; so is a ship left unable to be worked, a ship past her berths, a name nobody
+answers to, and a transfer while the boat is away.
+
 ## The forms, in a table
 
 | Form | Also taken | What it does |
@@ -458,6 +468,7 @@ replay takes command of her again at the same minute.
 | `where am I` | | where you are: aboard and your place, in the boat, ashore at the port's place, or aboard another ship as a visitor |
 | `send the boat to the Medusa with Mr Veale` | `send the boat to the Medusa for Mr Veale` | the boat to another ship lying within a boat's pull (a mile): whoever is named goes aboard her, or steps into the boat there to come back; a person who goes keeps his station, as a visitor's voice in her, and has it again when he comes home |
 | `take command of her` | `take command of the Fly`, `shift into the Fly`, `take command of her, and lay the Amazon up` | aboard a ship given you: she is your ship from here, the old one left to her senior officer or laid up as the tail says |
+| `transfer fifteen hands to the Fly` | `transfer six able seamen and four ordinary to the Fly`, `transfer Mr Cannon and two hands to the Sherbourne`, `send across twelve hands to the Fly` | men moved by the boat between two ships of yours within her pull, a load of twelve a quarter of an hour; refused in words for a King's ship's people, a ship left unworkable, a ship past her berths |
 | `send for the master` | `pass the word for the carpenter`, `call the surgeon` | the messenger goes; he comes to where the captain is a minute later |
 | `call the captain: land close ahead` | `call the captain`, `send for the captain` | the officer of the watch's order: he sends for the captain below or asleep, and the line wakes him; refused from the captain himself, and when the captain is on deck (he sees it: say it to him) |
 | `go below` | `go to the cabin` | the captain to his cabin; anyone else to his berth below |
