@@ -27297,3 +27297,12 @@ port with dated `closed_to` rows was overwritten at the next day's turn (truth 7
 runs across a row's day; no recorded passage does (they are `channel-west`'s, business off).
 The blockade reader moves only a region entered after the first day, its blockades now the
 first day's. Truths 7-580 to 7-584.
+
+**The suites, at 65a7df86:** `ruff check .` and `ruff format --check .` clean; the fast tier
+whole (`-n 4`): exit 0, 7,569 passed, 1 xfailed, 512 slow left out; the slow tier of the
+touched files, the audit's full sweep, the browser plans and the known truths with the
+recorded passages (`--slow -m "slow and not pace"`, `test_ports`, `test_scenarios`,
+`test_harbour`, `test_business`, `test_nations`, `test_chart_audit`, `test_browser_probe`,
+`test_known_truths`): exit 0, 218 passed, 8 xfailed; the pace alone and last (`--slow -m pace
+-n 0`): 15 passed. No recorded passage's digest moved; no pin moved but the two superseded
+above. The tree reported differs from 65a7df86 by this paragraph alone.
