@@ -27236,3 +27236,104 @@ the known truths (`--slow -m "slow and not pace"`, `tests/test_chart_audit.py` a
 them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No pin moved;
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
+
+### Step 2a: the mends that move no passage, save or truth (the lead's rulings of 2026-11-13)
+
+**(1) The islands' bounds to their tiles' edges** (`data/charts/manifest.yaml` and the recipes
+in `tools/build_charts.py`, each within its edge by under a metre): Madeira 32 to 33.5 N by
+17.5 to 16 W became 31.60001 to 33.73333 N by 17.86666 to 15.73334 W; the Azores 36.5 to 40 N
+by 31.5 to 24.5 W became 36.29334 to 40.13333 N by 31.51999 to 24.26667 W. The tiles the new
+bounds take in are the regions' own, the same 25 and 153 (`tiles_over`, measured), and
+`--check` passes. The sixteen groups of water nobody owns about the islands are gone, and
+Funchal's and the islands' gauges serve the water instead of Le Conquet's M2 of 2 m. The
+chart's envelope moves south from 32 to 31.60001 N, so `Chart.bounds_words` reads "31.6 to
+51.5 N" (`tests/test_chart.py`'s pin moved, old beside new). The business draws its traders
+at a region's own bounds, so in these two regions they come in a few miles farther out.
+Channel-west's bounds are not touched.
+
+**(2) The Mediterranean slivers.** gulf-of-lion's east bound went from 7.73 to 7.73333 E and
+ligurian-sea's west from 7.74 to 7.73334 E: they meet at the column's edge, 0.9 m apart,
+each within its own column (the 104 rule). ligurian-sea's east went from 11.0 to 11.1466 E.
+The piece west of 8 E between 40.56 and 41 N is now the tide region `asinara-west` (on
+`solent`'s pattern: `TIDE_REGIONS`, the manifest's `tide_regions:`), served by Porto Torres
+`[tyrrhenian, asinara-west]` and Carloforte (its list given `asinara-west` too). Its M2 is
+now the gauges' 7 cm, where Saint-Malo's was 3.7 m. Its level stays the eleven's: neither
+gauge has a level read (Ajaccio's 0.47 m would give one; not ruled). `test_tide.py` names
+the two gauges in its ruled list and skips the region in the gaugeless test, as it does the
+other two gaugeless blocks. The piece stays listed as owned by no region, with its reason.
+**The overlap of the Ligurian sea and the Tyrrhenian** stays listed. What answers there today:
+`region_at` gives ligurian-sea (first in the chart's order); the tide blends both blocks'
+gauges; the weather is the Gulf's box (first in the file's order); the directions take both
+boxes and the first statement whose polygon holds it. With the Ligurian sea's east bound at
+11.1466 E, the water 41 to 42.5 N by 11 to 11.15 E (the Argentario's offing) is now
+ligurian-sea's by `region_at` and blends the Ligurian gauges: 89 points of the full sweep
+read a Ligurian level and no longer the eleven's. The strip 42.5 to 42.68 N east of 11 E, now
+the Ligurian sea's, lies in no weather box and has no statement or stream area: five new
+findings, listed with their reasons.
+
+**(3) The weather's boxes: none moved.** The ruling's proof is that each strip is answered
+today by the box it would move into; for all three it fails, measured on a grid of 0.005° by
+0.02° over each strip's water:
+
+| box moved | strip | water points | box changed | answered today by |
+|---|---|---|---|---|
+| mediterranean-west north to 40.56 N | 40.5 to 40.56 N, 5 W to 4.5 E | 2,385 | 1,193 | catalan-coast 738, gulf-of-lion 445, sardinian-sea 10 |
+| biscay south to 43.3 N | 43.3 to 43.5 N, 20 W to 1 W | 26,674 | 23,340 | portugal |
+| portugal south to 35.5 N | 35.5 to 36 N, 20 W to 5 W | 72,653 | 57,579 | madeira 56,538, mediterranean-west 1,041 |
+
+My proposal was wrong for the second and third: each box runs the width of the ocean, so
+moving its edge moves weather far from the strip. All three strips stay listed.
+
+**(4) The directions' limits** (`data/tides/streams.yaml` `book_limits`): Madeira's box was added
+at the region's new bounds; the Mediterranean west's box went north to 40.56 N; and the
+Azores', the Gulf's and the Ligurian sea's boxes now follow their regions' new bounds (beyond
+the ruling's letter, so that no water the mends gave a region falls outside its book; nothing
+the recorded passages read). Madeira's and the Balearic strip's water is now inside the
+limits with no statement there: two new findings, listed.
+
+**(5) The spots on the land** (old beside new, the distance moved). The audit first learned to
+read a drying harbour by its file: a spot whose file has it dry is a finding only where the
+grid's ground stands more than a metre (JUDGEMENT) above the file's figure. Alderney's,
+Dover's and Roscoff's moorings fit their files and were never wrong; step 1 counted them.
+
+| port, spot | old | new | moved |
+|---|---|---|---|
+| Boulogne, mooring (dries 0.9 m) | 50.7265 N 1.595 E (ground 2.1 m) | 50.72678 N 1.59472 E (0.9 m) | 37 m |
+| Le Palais, mooring | 47.348 N 3.152 W (ground 8.2 m) | 47.348 N 3.15089 W (2.8 m water) | 84 m |
+| Paimboeuf, mooring | 47.2905 N 2.031 W (ground 5.9 m) | 47.29369 N 2.031 W (water) | 354 m |
+| Poole, mooring (1.5 fathoms) | 50.711 N 1.985 W (ground 1.6 m) | 50.70739 N 1.98069 W (2.7 m) | 503 m |
+| St Helier, mooring (dries 1.8 m) | 49.181 N 2.112 W (ground 7.9 m) | 49.17808 N 2.11256 W (2.1 m water) | 327 m |
+| St Malo, mooring (dries 2.7 m) | 48.647 N 2.03 W (ground 10.3 m) | 48.64686 N 2.03028 W (2.5 m) | 26 m |
+| Weymouth, mooring (1.2 fathoms) | 50.6085 N 2.45 W (ground 6.9 m) | 50.60961 N 2.44458 W (2.7 m) | 402 m |
+| Cartagena, outer road | on the mark podadera-fort, ashore | its own position in the file, 27.5 m | 625 m |
+| San Fiorenzo, shore | 42.681 N 9.3025 E (4.4 m water) | 42.681 N 9.30778 E (ground) | 431 m |
+
+Left listed, each with its reason: La Rochelle's mooring (the nearest water 1,452 m off),
+Dunkirk's (793 m) and Morlaix's (none within 2.5 km), beyond a move of 600 m (JUDGEMENT:
+farther is another berth, not the file's). Corunna's shore also stays: it is given on the
+castle of San Antón, and package 39c's rule (`test_ports.py`) keeps every spot of Biscay
+south on a mark. No spot moved is a scenario's start (none lies within 3 km of one), and no
+truth names one.
+
+**(6) The depths: none rewritten.** Four spots moved onto their soundings, where the grid has
+the file's depth within two cables. Each left its mark (the mark stays where the pilot gave
+it) with the mark's depth and bottom written into the spot:
+
+| port, spot | file | grid before | moved | grid after |
+|---|---|---|---|---|
+| Gaeta, mooring (off gaeta-port) | 5 fathoms | 4.5 m | 136 m | 9.4 m |
+| L'Orient, mooring (off pennemane-road) | 4 fathoms | 0.6 m | 301 m | 7.5 m |
+| Naples, mooring | 4 fathoms | 3.0 m | 116 m | 7.5 m |
+| St Malo, anchorage (off st-malo-road) | 4.5 fathoms | 4.1 m | 87 m | 8.3 m |
+
+Left listed with both figures: Gaeta's road (the grid has no 11 fathoms within two cables),
+Brest's mooring in the Penfeld, and Paimboeuf's road. Santander's road also stays listed: it
+has its 10 fathoms 149 m off, but Biscay south's rule keeps it on its mark.
+
+**The known list** went from 174 entries to 142: 39 taken out by the mends, 6 added by them (the
+Ligurian strip's five and Madeira's statement, the Balearic strip's statement in place of its
+book), 1 back (Corunna). The ceilings moved with the regions: the Azores' and Madeira's level
+and stream counts (the bigger regions), the overlap 1,443 to 1,503, ligurian-sea's south
+4,992 to 5,120, the Tyrrhenian's level 7,260 to 7,171. Truths 7-560 and 7-564 moved, old
+beside new in their docstrings: three moorings on the ground where there were thirteen and a
+road, one shore afloat, and the Ligurian sea among the split and the boxless.

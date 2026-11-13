@@ -27,9 +27,10 @@ but the arithmetic of what it reports. It changes nothing. The checks, by letter
 (e) **the streams**: a region's water outside every box of `book_limits`, or with no
     statement of the directions within them, or with no stream area of the world's; and
     a stream area whose polygon holds no water.
-(f) **the ports**: each port's road, anchorage and mooring on the water and its shore by
-    the land; the depth the file gives against the chart's; each spot inside a region's
-    bounds; its nations in the table and its dated rows whole; and **reachable**: a way
+(f) **the ports**: each port's road, anchorage and mooring on the water (or, where its
+    file has it dry, on ground no higher than the file says) and its shore by the land;
+    the depth the file gives against the chart's; each spot inside a region's bounds;
+    its nations in the table and its dated rows whole; and **reachable**: a way
     in from open water to its anchorage and out again that crosses no land by the game's
     own test (`ships.land_crossing` over `ships.approach_plan` and the track to sea).
 (g) **the marks**: a headland, town, light or other mark ashore standing in the water,
@@ -142,6 +143,10 @@ SHORE_AFLOAT_M = 2.0 * units.CABLE
 # chart has less than half the file's figure and two fathoms less, or more than twice it
 # and ten fathoms more (the period's soundings against the modern grid at its datum).
 DEPTH_SHOAL_SHARE = 0.5
+# A spot its file gives as drying (a negative depth: a harbour where she takes the ground)
+# is a finding only where the grid's ground stands higher than the file's figure by more
+# than this (JUDGEMENT: a metre, the grid's grain against a pilot's half fathom).
+DRY_MARGIN_M = 1.0
 DEPTH_SHOAL_M = units.fathoms_to_m(2.0)
 DEPTH_DEEP_SHARE = 2.0
 DEPTH_DEEP_M = units.fathoms_to_m(10.0)
@@ -906,7 +911,10 @@ def check_ports(
                         )
                     )
                     continue
-                if e >= 0.0:
+                dries_m = -spot.depth_m if spot.depth_m is not None and spot.depth_m < 0 else None
+                if dries_m is not None and e <= dries_m + DRY_MARGIN_M:
+                    pass  # a drying harbour by its file, and the grid's ground no higher
+                elif e >= 0.0:
                     to_water = distance_to(chart, p, land=False)
                     audit.add(
                         Finding(
@@ -914,8 +922,9 @@ def check_ports(
                             f"f-dry:{pid}:{which}",
                             home,
                             1,
-                            f"{port.name}'s {sw} stands on ground {e:.1f} m above the datum, "
-                            f"{to_water:.0f} m from the nearest water",
+                            f"{port.name}'s {sw} stands on ground {e:.1f} m above the datum"
+                            + (f" where its file has it dry {dries_m:.1f} m" if dries_m else "")
+                            + f", {to_water:.0f} m from the nearest water",
                             [where],
                         )
                     )

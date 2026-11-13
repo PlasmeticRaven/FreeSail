@@ -32,7 +32,6 @@ source: "Tofiño 1787 pp. 76-90 (the harbour, the narrows, the Espalmador, the e
 datum: unverified
 
 outer_road:
-  feature: podadera-fort
   name: within the Podadera
   lat_deg: 37.5800
   lon_deg: -0.9840

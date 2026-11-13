@@ -16196,8 +16196,10 @@ def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the
     mooring answer the chart; every spot lies inside its feature's region's bounds or
     harbours (or inside some region's); every nation it names, dated, blockading or closed
     to, is in the nations' table; its dated rows run whole, no overlap and no day between.
-    The spots on the grid's ground are the known list's: thirteen moorings and Cartagena's
-    road, each in a basin, a river or behind a mole the grid has as land."""
+    The spots on the grid's ground higher than their files have them are the known list's:
+    since package 111's step 2a, three moorings (La Rochelle's, Dunkirk's and Morlaix's, no
+    water that fits within six hundred metres; step 1 had thirteen moorings and Cartagena's
+    road, the drying harbours by their files counted then as ground)."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16205,8 +16207,11 @@ def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the
     kinds = {f.key.split(":", 1)[0] for f in audit.findings}
     assert not kinds & {"f-load", "f-off-chart", "f-region", "f-nation", "f-dated"}
     dry = sorted(f.key for f in audit.findings if f.key.startswith("f-dry:"))
-    assert len(dry) == 14 and dry.count("f-dry:cartagena:outer_road") == 1
-    assert all(k.endswith(":mooring") for k in dry if k != "f-dry:cartagena:outer_road")
+    assert dry == ["f-dry:dunkirk:mooring", "f-dry:la-rochelle:mooring", "f-dry:morlaix:mooring"]
+    # San Fiorenzo's shore moved ashore by step 2a; Corunna's stays on its castle, a mark
+    assert [f.key for f in audit.findings if f.key.startswith("f-shore-afloat:")] == [
+        "f-shore-afloat:corunna"
+    ]
     assert len(list(A.PORTS_DIR.glob("*.yaml"))) >= 90
 
 
@@ -16279,9 +16284,12 @@ def test_truth_7_563_the_ways_in_the_land_guard_refuses():
 def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
     """Package 111 (d): the regions whose water more than one box of the climatology answers
     are Biscay north (the channel box's edge at 47.5 N), Biscay south (portugal's at 43.5 N),
-    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E) and the Balearics (its strip to
-    40.56 N); water in no box lies only in the Balearics' strip, the Cantabrian coast east of
-    5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
+    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E), the Balearics (its strip to
+    40.56 N) and, since package 111's step 2a moved its east bound, the Ligurian sea; water in
+    no box lies only in the Balearics' strip, the Cantabrian coast east of 5 W below 43.5 N,
+    the Strait south of 36 N west of 5 W and the Ligurian sea's strip east of 11 E north of
+    42.5 N. None of the three strips was moved into a box: each box drawn over its strip
+    would change the box of water another box answers today (package 111's step 2a)."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16293,11 +16301,13 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
         "d-split:strait",
         "d-split:tyrrhenian",
         "d-split:balearics",
+        "d-split:ligurian-sea",  # package 111's step 2a: its east bound to 11.1466 E
     }
     assert {k for k in keys if k.startswith("d-no-box:")} == {
         "d-no-box:balearics",
         "d-no-box:biscay-south",
         "d-no-box:strait",
+        "d-no-box:ligurian-sea",  # package 111's step 2a: the strip 42.5 to 42.68 N east of 11 E
     }
 
 

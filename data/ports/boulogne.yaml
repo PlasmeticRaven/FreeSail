@@ -45,8 +45,8 @@ anchorage:
   depth_fathoms: 6
 mooring:
   name: the harbour of the Liane
-  lat_deg: 50.7265     # within the jetties (judgement)
-  lon_deg: 1.5950
+  lat_deg: 50.72678     # within the jetties (judgement)
+  lon_deg: 1.59472
   depth_fathoms: -0.5  # dry at low water (Faden)
   bottom: sand
   deep_draught_ft: 12  # judgement: the bar's three fathoms at the flood

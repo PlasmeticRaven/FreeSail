@@ -43,8 +43,8 @@ anchorage:
   depth_fathoms: 5
 mooring:
   name: the harbour of St Helier
-  lat_deg: 49.1810     # the old harbour under the town, which dries (judgement)
-  lon_deg: -2.1120
+  lat_deg: 49.17808     # the old harbour under the town, which dries (judgement)
+  lon_deg: -2.11256
   depth_fathoms: -1    # dries at low water: a vessel takes the ground
   bottom: sand
   deep_draught_ft: 9   # judgement: for vessels that take the ground; a ship lies in the road

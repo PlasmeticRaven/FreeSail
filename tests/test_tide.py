@@ -1147,6 +1147,7 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # neighbours' nearest gauges (Mahon's, Carloforte's and Cagliari's lists)
         "sardinian-sea",
         "tunis-coast",
+        "asinara-west",  # package 111: a tide region of the manifest, bounds and no tiles
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1273,8 +1274,11 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
     # each of those blocks has no gauge of its own.
     ruled = {
         "mahon": {"sardinian-sea", "tunis-coast"},
-        "carloforte": {"sardinian-sea", "tunis-coast"},
+        "carloforte": {"sardinian-sea", "tunis-coast", "asinara-west"},
         "cagliari": {"tunis-coast"},
+        # package 111, the lead's ruling: the tide region west of the Asinara, which no region
+        # of the chart holds, served by Porto Torres and Carloforte
+        "porto-torres": {"asinara-west"},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())
@@ -1323,6 +1327,6 @@ def test_the_gaugeless_blocks_take_their_neighbours_nearest_and_nothing_outside_
     for i in range(36, 44):
         for j in range(0, 32):
             p = Position(38.0 + i * 0.1, 3.0 + j * 0.2)
-            if tide.blocks_at(p) & {"sardinian-sea", "tunis-coast"}:
-                continue
+            if tide.blocks_at(p) & {"sardinian-sea", "tunis-coast", "asinara-west"}:
+                continue  # asinara-west: package 111's tide region, served by Carloforte too
             assert tide.constants_at(p) == before.constants_at(p), (p.lat_deg, p.lon_deg)
