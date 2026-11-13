@@ -837,6 +837,29 @@ def model_held(vessel: Any) -> bool:
     return bool(getattr(h, "door", ""))
 
 
+def _hulls_left_pruned(world: World) -> list[str]:
+    """The hulls the player has left (package 60, `command.HULLS_LEFT`), the gone among them
+    (a vessel done, or no longer of the world) taken out of the list (the lead's reading of
+    ab0ade58, item 7)."""
+    store = getattr(world, "__dict__", None) or {}
+    left = list(store.get("_hulls_left") or ())
+    if not left:
+        return left
+    live: set[str] = set()
+    for v in world.vessels.vessels:
+        if not v.done:
+            live.add(str(v.id))
+    for hid in getattr(world, "hulls", None) or {}:
+        hull = world.hulls[hid]
+        vessel = getattr(hull, "vessel", None)
+        if vessel is None or not getattr(vessel, "done", False):
+            live.add(str(hid))
+    kept = [hid for hid in left if hid in live]
+    if kept != left:
+        store["_hulls_left"] = kept
+    return kept
+
+
 def switch(world: World) -> None:
     """The crewed promotion by the distance from the centre, once a minute: demoted
     beyond `CREWED_DEMOTE_NM`; promoted within `CREWED_NM` up to the cap in the cap's order
@@ -857,7 +880,7 @@ def switch(world: World) -> None:
     # hull among them, put to sleep beyond the range wakes within it like any other (built
     # from `with_brain` alone she slept for good); no other hull without one is woken by it
     # (the lead's review of 1eb18434: one laid in ordinary by the director)
-    left = set((getattr(world, "__dict__", None) or {}).get("_hulls_left") or ())
+    left = set(_hulls_left_pruned(world))
     kept_asleep = (
         [
             v

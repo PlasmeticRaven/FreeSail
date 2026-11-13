@@ -56,8 +56,9 @@ _LEAVE = re.compile(
 )
 
 
-def parse(words: str) -> tuple[str, str, str, str]:
-    """(the ship's words, how the old ship is settled, the officer's words, the intent)."""
+def parse(words: str, old: str = "old ship") -> tuple[str, str, str, str]:
+    """(the ship's words, how the old ship is settled, the officer's words, the intent); `old`,
+    the name of the ship he commands, for the refusal's example."""
     text = " ".join(str(words).split()).strip().rstrip(".")
     ship, how, who, intent = text, "", "", ""
     m = re.search(r",?\s+and\s+(?=(?:lay|laying|leave|leaving)\b)", text, re.I)
@@ -71,8 +72,8 @@ def parse(words: str) -> tuple[str, str, str, str]:
             how, who, intent = "left", leave.group("who"), (leave.group("intent") or "")
         else:
             raise OrderError(
-                "Say how the old ship is left: '..., and lay the Amazon up' or '..., and leave the "
-                "Amazon to Mr Ryan [to <intent>]'."
+                f"Say how the {old} is left: '..., and lay the {old} up', or '..., and leave "
+                f"the {old} to' an officer of hers and what she is to do."
             )
     ship = " ".join(ship.replace('"', " ").split())
     return ship, how, who.strip().strip('"'), intent.strip()
@@ -89,12 +90,12 @@ def execute(ship: Any, order: Order) -> Result:
         return _transfer(ship, order)
     world = world_of(ship)
     if world is None or getattr(world, "clock", None) is None:
-        raise OrderError("'take command of' wants a ship in a world; this one sails alone.")
+        raise OrderError("She sails alone: there is no other ship here to take command of.")
     root = root_of(world)
     person = knowledge.players_person(root)
     if person is None:
-        raise OrderError("Nobody of yours is at the prompt to take command of a ship.")
-    words, how, who, intent = parse(order.object or "")
+        raise OrderError("You are aboard no ship here to take command of another.")
+    words, how, who, intent = parse(order.object or "", _ship_name(root))
     key = words.lower().removeprefix("the ")
     if key == "prize" or key.endswith(" prize") or key.startswith("prize "):
         raise OrderError(PRIZE_WORDS)
@@ -106,7 +107,7 @@ def execute(ship: Any, order: Order) -> Result:
         try:
             hull = hull_named(root, words, make=False)
         except WorldOrderError as e:
-            raise OrderError(str(e).rstrip(".") + ".") from None
+            raise OrderError(_his_words(e, words)) from None
         if hull is root:
             hull = root.players
     if _prize_not_condemned(hull):
@@ -127,17 +128,18 @@ def _transfer(ship: Any, order: Order) -> Result:
 
     world = world_of(ship)
     if world is None or getattr(world, "clock", None) is None:
-        raise OrderError("'transfer' wants a ship in a world; this one sails alone.")
+        raise OrderError("She sails alone: there is no other ship here to move her people to.")
     root = root_of(world)
     person = knowledge.players_person(root)
     if person is None:
-        raise OrderError("Nobody of yours is at the prompt to move a ship's people.")
+        raise OrderError("You are aboard no ship here to move her people.")
     text = " ".join(str(order.object or "").split()).strip().rstrip(".")
     m = _TRANSFER.match(text)
     if m is None:
+        mine = _ship_name(root)
         raise OrderError(
-            "Say whom and to which ship: 'transfer the people and the hands to the \"Fly\"', "
-            "'transfer twenty hands to the \"Fly\"', 'transfer Mr Ryan and twelve hands to ...'."
+            f"Say whom and to which ship: 'transfer twenty hands to the {mine}', 'transfer the "
+            f"people and the hands to the {mine}', or name them."
         )
 
     def named(words: str) -> Any:
@@ -145,7 +147,7 @@ def _transfer(ship: Any, order: Order) -> Result:
         try:
             hull = hull_named(root, words, make=False)
         except WorldOrderError as e:
-            raise OrderError(str(e).rstrip(".") + ".") from None
+            raise OrderError(_his_words(e, words)) from None
         return root.players if hull is root else hull
 
     receiver = named(m.group("to"))
@@ -161,6 +163,27 @@ def _transfer(ship: Any, order: Order) -> Result:
     except TransferError as e:
         raise OrderError(str(e)) from None
     return "company.transfer", said, {"verb": order.verb, "level": 1, **data}
+
+
+def _ship_name(root: Any) -> str:
+    """The name of the ship he commands, for a refusal's example."""
+    from freesail.world.movement import hull_name
+
+    players = getattr(root, "players", None)
+    return hull_name(players).removeprefix("the ") if players is not None else "ship"
+
+
+def _his_words(e: Exception, words: str) -> str:
+    """A ship's name the world's reader could not give him, said in his words: the reader's
+    own sentence where it is the world's, and none of the director's (an observed world, a
+    hull not made yet)."""
+    said = str(e).rstrip(".")
+    name = " ".join(words.replace('"', " ").split()) or "that ship"
+    if "observed" in said:
+        return "You command no ship here."
+    if "no hull of her own yet" in said:
+        return f"The {name.removeprefix('the ')} lies too far off for a boat to reach her."
+    return said + "."
 
 
 def _prize_not_condemned(hull: Any) -> bool:

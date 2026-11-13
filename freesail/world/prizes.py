@@ -389,28 +389,11 @@ def prize_crew_size(captor_fit: int, prize_complement: int, doctrine: Any) -> in
 
 def _draw_prize_crew(captor_hull: Any, n: int, party: list[Sailor] | None) -> list[Sailor]:
     """The men put aboard her: the party on her deck first (the boarders, whole and at no
-    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler."""
-    crew = captor_hull.ship.extra.get("crew")
-    if crew is None:
-        return []
-    chosen: list[Sailor] = []
-    if party:
-        for s in party:
-            if s.fit and s.at is None and s.station not in (Station.QUARTERDECK, Station.IDLERS):
-                chosen.append(s)
-            if len(chosen) >= n:
-                break
-    if len(chosen) < n:
-        taken = {s.id for s in chosen}
-        for s in crew.sailors:
-            if len(chosen) >= n:
-                break
-            if s.id in taken or not s.fit or s.at is not None or s.post:
-                continue
-            if s.station in (Station.QUARTERDECK, Station.MARINES, Station.IDLERS):
-                continue
-            chosen.append(s)
-    return chosen
+    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler
+    (`musters.draw`, shared with package 60's transfer)."""
+    from freesail.world.musters import draw
+
+    return draw(captor_hull, n, party)
 
 
 def _confine_people(hull: Any, tick: int) -> dict[str, str]:

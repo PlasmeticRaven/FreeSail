@@ -277,6 +277,8 @@ REACH: dict[str, str] = {
     # package 60, step 2: her people and hands moved to another ship of his, and come aboard
     "company.transfer": "aboard",
     "company.came_aboard": "aboard",
+    "company.came_back": "aboard",
+    "company.went_across": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",

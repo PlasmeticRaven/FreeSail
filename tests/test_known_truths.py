@@ -16120,13 +16120,15 @@ def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
 
 
 def test_truth_7_484_the_people_and_the_hands_move_by_one_order_in_the_boats_loads():
-    """Package 60, step 2 (the design's §6): the people and the hands move by one order within a
-    boat's pull, by loads in their time (twelve a load, a quarter of an hour within two
-    cables), each muster made again and each person rehomed; refused in words saying how many
-    she wants where either could not be worked, or where the receiver would not berth them."""
+    """Package 60, step 2 (the design's §6; the lead's reading of ab0ade58): the people and the
+    hands move by one order within a boat's pull, by the dealings' road to another hull, twelve
+    a load at the boat's own pace, every man told off out of the giving muster at the order and
+    each load into the receiver's watches as they stand, each person rehomed before he is put
+    aboard; refused in words saying how many she wants where either could not be worked, or
+    where the receiver would not berth them."""
     from tests import test_company_moved as T
 
-    T.test_fifteen_hands_go_across_in_two_loads_in_their_time_each_muster_made_again()
+    T.test_fifteen_hands_go_across_in_two_loads_by_the_boats_road()
     T.test_a_person_by_name_is_rehomed_to_the_ship_he_goes_to()
     T.test_the_refusals_in_words()
 

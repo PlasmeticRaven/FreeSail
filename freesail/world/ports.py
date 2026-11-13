@@ -1038,6 +1038,17 @@ class BoatState:
     lost: str = ""
     lost_tick: int = -1
     lost_words: str = ""
+    # package 60, step 2 (the lead's reading of ab0ade58: the company moved by this road, not
+    # one beside it): the hands in her (the muster's `Sailor`s, in neither ship's muster), the
+    # person ids among her people who join the company of the ship she goes to (rehomed before
+    # they are put aboard), the loads still to go after this one, each (hands, persons),
+    # every man of them out of the giving muster from the order, and which load this is of how
+    # many; plain class defaults, so a checkpoint from before loads
+    hands: tuple[Any, ...] = ()
+    joining: tuple[str, ...] = ()
+    loads: tuple[tuple[tuple[Any, ...], tuple[Any, ...]], ...] = ()
+    load_no: int = 0
+    load_of: int = 0
 
     def words(self) -> str:
         if self.lost:
@@ -1049,7 +1060,7 @@ class BoatState:
         if self.hull:
             who = f", {self.commander} in her" if self.commander else ""
             return f"{self.boat_name} manned and away as a hull of her own{who}"
-        if self.errand in ("to_ship", "transfer"):
+        if self.errand == "to_ship":
             return f"{self.boat_name} away to the {self.to_name or 'ship'}, {self.phase}"
         return f"{self.boat_name} away {_errand_words(self.errand)}, {self.phase}"
 
@@ -1469,7 +1480,6 @@ def _errand_words(errand: str) -> str:
         "landing": "to land a person who stays ashore",
         "fetch": "to bring a person off from the quay",
         "to_ship": "to another ship",  # package 82: a person put aboard her, or fetched
-        "transfer": "with her people for another ship",  # package 60, step 2
     }.get(errand, errand)
 
 

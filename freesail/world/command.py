@@ -210,7 +210,7 @@ def take_up(
     the order that called it (its reply is the line)."""
     root = _root(world)
     if getattr(root, "observed", False):
-        raise CommandError("There is no ship of the player's in this world to leave.")
+        raise CommandError("You command no ship here, and leave none.")
     old = root.players
     if hull is old:
         raise CommandError(f"You command the {_name(hull)} already.")

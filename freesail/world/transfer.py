@@ -3,22 +3,15 @@
 between the ship the player commands and a ship that is his to man (the one he left, or one
 given him), within a boat's pull or alongside.
 
-The persons move by `movement.put_aboard` and are rehomed (`Registry.rehome`, as the act rehomes
-him), so that they belong to the receiving ship's company. The hands are drawn from the giving
-muster as `prizes._draw_prize_crew` draws a prize crew (fit, at no work, by id; the order's
-ratings first), taken out of it and its quarter bill (`musters.take_out`), and each muster
-made again (`musters.remuster`, `musters.deal_watches`): 74's functions, made shared.
-
-The boat's loads take their time (§6.2, JUDGEMENT): twelve men and their bags a load; a load
-pulled across, cleared and pulled back in a quarter of an hour within two cables and half an
-hour at a mile; alongside, the whole across by the gangway in a quarter of an hour. The men in
-the boat are in neither muster while she is away (kept on the giving ship's `extra`, by load),
-and each load is said in the receiving ship's log as it comes aboard.
-
-Refused in words (§6.3): either ship left unable to be worked (one watch at her sail-handling
-stations, never fewer than four; a ship laid up keeps none), the receiver past a complement and
-a half, a company not his to move (a King's ship's to another's), beyond a boat's pull, the
-boat away, either ship under way, a prisoner giving it, an observed world.
+This module is the order alone (the lead's reading of ab0ade58: one road, not two): its words,
+the men drawn (`musters.draw`, the prize crew's draw), the refusals that are a company's (the
+King's books, either ship left unable to be worked, the receiver past her berths, a ship not
+his, the officer a ship is left to, his own ship laid up under him), and the lay-up tail. The
+boat that carries them is the dealings' road to another hull (`Dealings.send_boat_to`): her pace,
+her refusals (no boat, lost, away, beyond the pull), a load at a time of `LOAD_MEN`, every man
+told off out of the giving muster from the order, each load into the other ship's watches as
+they stand and said in her log, and checked again as the boat comes to where she lay. Alongside
+(within `ALONGSIDE_M`) the men cross by the gangway at the order, said in both logs.
 """
 
 from __future__ import annotations
@@ -31,13 +24,10 @@ from freesail.core.events import Severity
 
 __all__ = [
     "ALONGSIDE_M",
-    "ALONGSIDE_S",
     "LOAD_MEN",
-    "LOAD_MILE_S",
-    "LOAD_NEAR_S",
     "TransferError",
-    "apply_load",
     "berths",
+    "say_came_aboard",
     "transfer",
     "worked_by",
 ]
@@ -45,13 +35,6 @@ __all__ = [
 # JUDGEMENT (the design's §6.2): a ship's largest boat carries twelve men and their bags a
 # load; no boat file carries a capacity.
 LOAD_MEN = 12
-# JUDGEMENT (§6.2): a load pulled across, cleared and pulled back in a quarter of an hour within
-# two cables, half an hour at a mile, and in between by the distance.
-LOAD_NEAR_S = 15 * 60
-LOAD_MILE_S = 30 * 60
-NEAR_NM = 0.2
-# JUDGEMENT (§6.2): alongside, the whole across by the gangway in a quarter of an hour.
-ALONGSIDE_S = 15 * 60
 # Within this of each other the two lie alongside (JUDGEMENT: two hulls' beams and a fender).
 ALONGSIDE_M = 30.0
 # JUDGEMENT (§6.3): she can be worked by one watch at her sail-handling stations, and never by
@@ -83,8 +66,6 @@ _RATINGS = {
 KINGS_KEEPERS = ("gunner", "boatswain", "carpenter", "purser", "cook")
 MERCHANT_KEEPERS = ("mate", "first mate", "chief mate", "master's mate")
 MERCHANT_SHIP_KEEPER_HANDS = 1
-# The giving ship's `extra` key for the men in the boat, by load.
-IN_THE_BOAT = "transfer_in_the_boat"
 
 
 class TransferError(ValueError):
@@ -120,8 +101,14 @@ def _laid_up(hull: Any) -> bool:
 
 
 def _hands(hull: Any) -> list[Any]:
+    """Her hands: the muster's men off the quarterdeck (its rows are her officers, persons of
+    her company counted as such, not twice)."""
+    from freesail.crew.model import Station
+
     crew = getattr(getattr(hull, "ship", None), "extra", {}).get("crew")
-    return list(crew.sailors) if crew is not None else []
+    if crew is None:
+        return []
+    return [s for s in crew.sailors if s.station is not Station.QUARTERDECK]
 
 
 def _souls(hull: Any) -> int:
@@ -219,8 +206,8 @@ def transfer(
     data; raises `TransferError` in words, nothing changed."""
     from freesail.world.movement import BOAT_BETWEEN_NM, hull_of
 
-    if getattr(root, "observed", False):
-        raise TransferError("There is no ship of the player's in this world to man.")
+    if getattr(root, "observed", False) or person is None:
+        raise TransferError("You command no ship here, and move no ship's people.")
     if getattr(person, "confined_to", ""):
         raise TransferError(f"{person.name} is a prisoner; he gives no order to her company.")
     here = hull_of(root, getattr(person, "hull", None))
@@ -235,34 +222,32 @@ def transfer(
             f"You are aboard the {_name(here)}; the order is given aboard the {_name(giver)} or "
             f"the {_name(receiver)}."
         )
-    if not _his_to_man(root, giver) or not _his_to_man(root, receiver):
+    for h in (giver, receiver):
+        if not _his_to_man(root, h):
+            raise TransferError(
+                f"The {_name(h)} is not yours to man; her company is moved by the one who "
+                "commands her."
+            )
+    if lay_up and giver is getattr(root, "players", None):
         raise TransferError(
-            f"The {_name(giver if not _his_to_man(root, giver) else receiver)} is not yours to "
-            "man; her company is moved by the one who commands her."
+            f"You command her: the {_name(giver)} is laid up when you have left her ('take "
+            f"command of ..., and lay the {_name(giver)} up')."
         )
     _company_his(giver, receiver)
     metres = _between_m(giver, receiver)
     if metres is None or metres / units.NAUTICAL_MILE > BOAT_BETWEEN_NM:
         raise TransferError(
-            f"The {_name(receiver)} is beyond a boat's pull ({BOAT_BETWEEN_NM:g} mile); close her "
-            "first."
+            f"The {_name(receiver)} is beyond a boat's pull ({_number(int(BOAT_BETWEEN_NM))} "
+            "mile); close her first."
         )
     alongside = metres <= ALONGSIDE_M
-    for h in (giver, receiver):
-        if _under_way(h) and not alongside:
-            raise TransferError(
-                f"The {_name(h)} has way on her; heave to or come to an anchor before the boat "
-                "is hoisted out."
-            )
-    dealings = getattr(giver, "dealings", None)
     if not alongside:
-        boat = getattr(dealings, "boat", None) if dealings is not None else None
-        if boat is not None and getattr(boat, "away", False):
-            raise TransferError("The boat is away; the people go across when she is back.")
-        if dealings is None or dealings.boat_spec() is None:
-            raise TransferError(
-                f"The {_name(giver)} carries no boat to put them across; lay her alongside."
-            )
+        from freesail.world.boats import way_on_her
+
+        for h in (giver, receiver):
+            refused = way_on_her(h)
+            if refused:
+                raise TransferError(f"The {_name(h)}{refused.removeprefix('She')}")
     every, by_rating, count, rest = read_counts(words)
     port = _lay_up_port(root, giver) if lay_up else None
     laid = lay_up or _laid_up(giver)
@@ -274,8 +259,8 @@ def transfer(
     men = _draw(giver, every, by_rating, count, keep=wants)
     if not men and not persons:
         raise TransferError(
-            "Transfer whom? Say 'transfer the people and the hands to the \"Fly\"', 'transfer "
-            "twenty hands to ...' or 'transfer Mr Ryan and twelve hands to ...'."
+            f"Transfer whom? Say 'transfer the people and the hands to the {_name(receiver)}', "
+            f"'transfer twenty hands to the {_name(receiver)}', or name them."
         )
     keeps = len(_hands(giver)) - len(men)
     if keeps < wants:
@@ -290,184 +275,112 @@ def transfer(
             f"The {_name(receiver)} berths {_number(room)}; she has "
             f"{_number(_souls(receiver))}, and would have {_number(would)}."
         )
+    if alongside:
+        said, data = _by_the_gangway(root, giver, receiver, persons, men)
+    else:
+        said, data = _by_the_boat(giver, receiver, persons, men)
     if port is not None:
         from freesail.world.regimes import put_in_ordinary
 
         vessel = getattr(giver, "vessel", None)
         if vessel is not None:
             put_in_ordinary(root, vessel, port)
-    return _put_across(root, giver, receiver, persons, men, metres, alongside)
+    return said, data
 
 
-def _put_across(
-    root: Any,
-    giver: Any,
-    receiver: Any,
-    persons: list[Any],
-    men: list[Any],
-    metres: float,
-    alongside: bool,
+def _by_the_boat(
+    giver: Any, receiver: Any, persons: list[Any], men: list[Any]
 ) -> tuple[str, dict[str, Any]]:
-    """The men taken out of the giving muster as their load leaves, the loads made jobs of the
-    giving ship's dealings at the boat's pace, each said as it comes aboard."""
-    from freesail.world.musters import take_out as _take_out
-    from freesail.world.ports import Job
+    """The loads by the giving ship's boat, by the dealings' road to another hull
+    (`Dealings.send_boat_to`): the first away now, each after it as she is back; every man
+    told off out of her muster from the order (her watches as they stand)."""
+    from freesail.orders.errors import OrderError
+    from freesail.world.musters import take_out
 
-    now = int(root.clock.tick)
-    loads = _loads(men, persons, alongside)
-    each = ALONGSIDE_S if alongside else _load_s(metres)
-    kept = giver.ship.extra.setdefault(IN_THE_BOAT, {})
-    serial = int(giver.ship.extra.get(IN_THE_BOAT + "_serial", 0) or 0)
-    dealings = giver.dealings
-    for i, (load_men, load_persons) in enumerate(loads):
-        serial += 1
-        key = f"{now}:{serial}"
-        # the first load leaves now; each after it as the boat is back
-        if i == 0:
-            _take_out(giver, load_men)
-            for p in load_persons:
-                p.where = "boat" if not alongside else p.where
-        kept[key] = {"men": list(load_men), "persons": list(load_persons), "left": i == 0}
-        due = now + each * (i + 1)
-        dealings.jobs.append(
-            Job(
-                due,
-                "transfer",
-                "",
-                {"key": key, "to": str(receiver.id), "load": i + 1, "of": len(loads)},
-                hull=str(giver.id),
-            )
+    loads = _loads(men, persons)
+    (first_men, first_persons), rest = loads[0], loads[1:]
+    try:
+        sent, _ = giver.dealings.send_boat_to(
+            receiver,
+            list(first_persons),
+            [],
+            hands=tuple(first_men),
+            join=True,
+            loads=tuple((tuple(m), tuple(p)) for m, p in rest),
         )
-    giver.ship.extra[IN_THE_BOAT + "_serial"] = serial
-    if not alongside:
-        from freesail.world.ports import BoatState
-
-        spec = dealings.boat_spec()
-        dealings.boat = BoatState(
-            away=True,
-            boat_id=spec.id,
-            boat_name=spec.name,
-            errand="transfer",
-            phase=f"putting her people across, {_count_words(len(loads), 'load')}",
-            since_tick=now,
-            to_hull=str(receiver.id),
-            to_name=_name(receiver),
-        )
-    from freesail.world.musters import remuster
-
-    remuster(giver, giver.ship.extra["crew"])
+    except OrderError as e:
+        raise TransferError(str(e)) from None
+    take_out(giver, men)
     who = _who_words(men, persons)
-    minutes = _count_words(max(1, round(each * len(loads) / 60)), "minute")
-    if alongside:
-        how = f"over the gangway to the {_name(receiver)} lying alongside, in some {minutes}"
-    else:
-        boat = dealings.boat_spec()
-        loads_words = "in one load" if len(loads) == 1 else f"in {_count_words(len(loads), 'load')}"
-        how = (
-            f"across to the {_name(receiver)} by {getattr(boat, 'name', 'the boat')} "
-            f"{loads_words}, the last aboard her in some {minutes}"
-        )
-    text = f"{who[:1].upper()}{who[1:]} to go {how}."
-    data = {
+    how = "in one load" if len(loads) == 1 else f"in {_count_words(len(loads), 'load')}"
+    text = f"{who[:1].upper()}{who[1:]} told off for the {_name(receiver)}, {how}. {sent}"
+    return text, {
         "to": str(receiver.id),
         "from": str(giver.id),
         "hands": len(men),
         "persons": [p.name for p in persons],
         "loads": len(loads),
-        "alongside": alongside,
+        "alongside": False,
     }
-    return text, data
 
 
-def apply_load(dealings: Any, job: Any) -> None:
-    """A load come aboard the receiving ship (the job of `_put_across`): the hands into her
-    muster, each muster made again, the persons put aboard her and rehomed, said in her log; the
-    next load taken out of the giving muster as the boat goes back for it."""
-    from freesail.world.movement import hull_of, put_aboard
-    from freesail.world.musters import deal_watches as _watches
-    from freesail.world.musters import remuster
-    from freesail.world.musters import take_out as _take_out
+def _by_the_gangway(
+    root: Any, giver: Any, receiver: Any, persons: list[Any], men: list[Any]
+) -> tuple[str, dict[str, Any]]:
+    """Alongside her: no boat, the men across by the gangway at the order, into her watches
+    as they stand, the persons of her company and put aboard her, said in both logs."""
+    from freesail.world.movement import put_aboard
+    from freesail.world.musters import join, take_out
 
-    root = dealings.world
-    giver = hull_of(root, str(job.hull or dealings.hull_id))
-    receiver = hull_of(root, str(job.payload.get("to") or ""))
-    if giver is None:
-        return
-    kept = giver.ship.extra.get(IN_THE_BOAT) or {}
-    key = str(job.payload.get("key") or "")
-    load = kept.pop(key, None)
-    if load is None:
-        return
-    men = list(load.get("men") or [])
-    if not load.get("left"):
-        _take_out(giver, men)
-        remuster(giver, giver.ship.extra["crew"])
+    take_out(giver, men)
+    join(receiver, men, came_from=str(giver.id))
     registry = getattr(root, "registry", None)
-    persons = list(load.get("persons") or [])
-    if receiver is None or getattr(getattr(receiver, "vessel", None), "done", False):
-        # she is gone: the men back into their own muster (nothing is lost on the way)
-        crew = giver.ship.extra.get("crew")
-        if crew is not None:
-            crew.sailors.extend(men)
-            crew.sailors.sort(key=lambda s: s.id)
-            remuster(giver, crew)
-        for p in persons:
-            p.where = "quarterdeck"
-        _boat_home(dealings)
-        return
-    crew = receiver.ship.extra.get("crew")
-    from freesail.crew.model import Crew
-
-    if crew is None:
-        crew = Crew(ship_name=_name(receiver), sailors=[])
-    taken = {s.id for s in crew.sailors}
-    for s in men:
-        if s.id in taken:
-            s.id = f"{s.id}:{giver.id}"  # told apart by the ship he came from, as a person is
-        taken.add(s.id)
-        s.post = None
-        crew.sailors.append(s)
-    crew.sailors.sort(key=lambda s: s.id)
-    _watches(crew.sailors)
-    remuster(receiver, crew)
     for p in persons:
-        put_aboard(root, p, receiver, "quarterdeck", by="the boat", said=False)
         if registry is not None:
             registry.rehome(p, str(receiver.id))
-    whence = f"the {_name(giver)}"
+        put_aboard(root, p, receiver, "quarterdeck", by="the gangway", said=False)
+    say_came_aboard(receiver, giver, men, persons, 1, 1, by="over the gangway")
     who = _who_words(men, persons)
-    n, of = int(job.payload.get("load") or 1), int(job.payload.get("of") or 1)
+    text = (
+        f"{who[:1].upper()}{who[1:]} across to the {_name(receiver)} lying alongside, over "
+        "the gangway."
+    )
+    giver.record(Severity.NOTABLE, "company.went_across", text, data={"to": str(receiver.id)})
+    return text, {
+        "to": str(receiver.id),
+        "from": str(giver.id),
+        "hands": len(men),
+        "persons": [p.name for p in persons],
+        "loads": 1,
+        "alongside": True,
+    }
+
+
+def say_came_aboard(
+    receiver: Any,
+    giver: Any,
+    men: list[Any],
+    persons: list[Any],
+    n: int,
+    of: int,
+    *,
+    by: str = "",
+) -> None:
+    """The receiving ship's log line for a load come aboard (the boat's road and the gangway
+    alike): who, from whom, which load of how many, and a merchantman's articles signed."""
+    if not men and not persons:
+        return
+    who = _who_words(men, persons)
     part = f" (the {_ordinal(n)} load of {_number(of)})" if of > 1 else ""
+    how = f" {by}" if by else ""
     articles = ""
     if men and _service(receiver) != "kings":
         articles = f"; {_count_words(len(men), 'hand')} sign the {_name(receiver)}'s articles"
     receiver.record(
         Severity.NOTABLE,
         "company.came_aboard",
-        f"{who[:1].upper()}{who[1:]} came aboard from {whence}{part}{articles}.",
+        f"{who[:1].upper()}{who[1:]} came aboard from the {_name(giver)}{how}{part}{articles}.",
         data={"from": str(giver.id), "hands": len(men), "persons": [p.name for p in persons]},
-    )
-    if n >= of:
-        _boat_home(dealings)
-    if n < of:
-        # the boat back for the next: its men out of the giving muster now
-        for other in kept.values():
-            if not other.get("left"):
-                _take_out(giver, list(other.get("men") or []))
-                other["left"] = True
-                remuster(giver, giver.ship.extra["crew"])
-                break
-
-
-def _boat_home(dealings: Any) -> None:
-    """The last load aboard her (or she gone): the boat back at the booms."""
-    from freesail.world.ports import BoatState
-
-    if getattr(getattr(dealings, "boat", None), "errand", "") != "transfer":
-        return
-    spec = dealings.boat_spec()
-    dealings.boat = BoatState(
-        boat_name=getattr(spec, "name", "the boat"), boat_id=getattr(spec, "id", "")
     )
 
 
@@ -488,12 +401,15 @@ def _the_other(root: Any, here: Any) -> Any:
             near.append(hull)
     if not near:
         raise TransferError(
-            f"No other ship of yours lies within a boat's pull of the {_name(here)}; say "
-            "'transfer ... from the \"Amazon\" to ...'."
+            f"No other ship of yours lies within a boat's pull of the {_name(here)}; close her, "
+            f"or give the order aboard the ship her people leave."
         )
     if len(near) > 1:
         names = " or ".join(f"the {_name(h)}" for h in near)
-        raise TransferError(f"From which ship: {names}? Say 'transfer ... from the ... to ...'.")
+        raise TransferError(
+            f"From which ship: {names}? Say 'transfer ... from the {_name(near[0])} to the "
+            f"{_name(here)}'."
+        )
     return near[0]
 
 
@@ -505,14 +421,13 @@ def _is_boat(hull: Any) -> bool:
 
 def _his_to_man(root: Any, hull: Any) -> bool:
     """The ship he commands, a ship he has left (`command.HULLS_LEFT`) or one given him."""
-    from freesail.world.command import HULLS_LEFT
+    from freesail.world.command import HULLS_LEFT, given_to
 
     hid = str(getattr(hull, "id", ""))
     if hull is getattr(root, "players", None):
         return True
     left = set(root.__dict__.get(HULLS_LEFT) or ())
-    given = root.__dict__.get("ships_given") or {}
-    return hid in left or hid in given
+    return hid in left or bool(given_to(root, hid))
 
 
 def _company_his(giver: Any, receiver: Any) -> None:
@@ -560,13 +475,20 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
         and not getattr(p, "confined_to", "")
     ]
     keepers = KINGS_KEEPERS if _service(giver) == "kings" else MERCHANT_KEEPERS
+    # the officer she was left to (`People.command_passed_to`; §4): never moved out of her by
+    # a transfer while she is in his charge, nor among 'the people'
+    left_to = ""
+    if giver is not getattr(root, "players", None):
+        left_to = str(getattr(people, "command_passed_to", "") or "")
     out: list[Any] = []
     for words in rest:
         if words == "the people":
             out += [
                 p
                 for p in hers
-                if p not in out and not (laid and str(getattr(p, "role", "")).lower() in keepers)
+                if p not in out
+                and p.id != left_to
+                and not (laid and str(getattr(p, "role", "")).lower() in keepers)
             ]
             continue
         key = " ".join(words.replace('"', " ").split()).lower()
@@ -574,6 +496,11 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
         if not found:
             raise TransferError(
                 f"Nobody of the {_name(giver)}'s answers to '{_as_a_name(words)}' aboard her."
+            )
+        if left_to and found[0].id == left_to:
+            raise TransferError(
+                f"{found[0].name} has the {_name(giver)} left in his charge; he stays in her "
+                "while she is his."
             )
         if found[0] not in out:
             out.append(found[0])
@@ -590,63 +517,42 @@ def _answers_to(person: Any, key: str) -> bool:
 def _draw(
     giver: Any, every: bool, by_rating: dict[str, int], count: int, keep: int = 0
 ) -> list[Any]:
-    """The hands drawn as 74 draws a prize crew: fit, at no work, by id, no post; the order's
-    ratings first. 'The hands' are every one of them she can spare, `keep` left her to be
-    worked by. Refused in words where she has too few of a rating."""
-    from freesail.crew.model import Station
+    """The hands drawn by the prize crew's draw (`musters.draw`): fit, at no work, no post,
+    in the muster's order; the order's ratings first. 'The hands' are every one of them she can
+    spare, `keep` left her to be worked by. Refused in words where she has too few."""
+    from freesail.world.musters import draw
 
-    pool = [
-        s
-        for s in _hands(giver)
-        if s.fit and s.at is None and not s.post and s.station is not Station.QUARTERDECK
-    ]
-    pool.sort(key=lambda s: s.id)
     if every:
         spare = max(0, len(_hands(giver)) - keep)
-        return pool[:spare]
+        return draw(giver, spare)
     chosen: list[Any] = []
     for rating, n in by_rating.items():
-        of = [s for s in pool if s.rating.value == rating and s not in chosen]
-        if len(of) < n:
+        got = draw(giver, n, rating=rating, taken={s.id for s in chosen})
+        if len(got) < n:
             raise TransferError(
-                f"The {_name(giver)} has {_count_words(len(of))} {rating} fit and free; "
+                f"The {_name(giver)} has {_count_words(len(got))} {rating} fit and free; "
                 f"{_count_words(n)} were asked."
             )
-        chosen += of[:n]
+        chosen += got
     if count:
-        seamen = [
-            s
-            for s in pool
-            if s not in chosen and s.station not in (Station.MARINES, Station.IDLERS)
-        ]
-        if len(seamen) < count:
+        got = draw(giver, count, taken={s.id for s in chosen})
+        if len(got) < count:
             raise TransferError(
-                f"The {_name(giver)} has {_count_words(len(seamen))} fit and free; "
+                f"The {_name(giver)} has {_count_words(len(got))} fit and free; "
                 f"{_count_words(count)} were asked."
             )
-        chosen += seamen[:count]
+        chosen += got
     return chosen
 
 
-def _loads(men: list[Any], persons: list[Any], alongside: bool) -> list[tuple[list, list]]:
-    """The men and the persons in boat loads of `LOAD_MEN`, the persons in the first; one load
-    by the gangway alongside."""
-    if alongside:
-        return [(list(men), list(persons))]
+def _loads(men: list[Any], persons: list[Any]) -> list[tuple[list, list]]:
+    """The men and the persons in boat loads of `LOAD_MEN`, the persons in the first."""
     out: list[tuple[list, list]] = []
     queue = list(persons) + list(men)
     while queue:
         take, queue = queue[:LOAD_MEN], queue[LOAD_MEN:]
         out.append(([x for x in take if x in men], [x for x in take if x in persons]))
     return out or [([], [])]
-
-
-def _load_s(metres: float) -> int:
-    nm = metres / units.NAUTICAL_MILE
-    if nm <= NEAR_NM:
-        return LOAD_NEAR_S
-    share = min(1.0, (nm - NEAR_NM) / (1.0 - NEAR_NM))
-    return int(round(LOAD_NEAR_S + share * (LOAD_MILE_S - LOAD_NEAR_S)))
 
 
 def _lay_up_port(root: Any, giver: Any) -> Any:
@@ -688,12 +594,13 @@ def _name(hull: Any) -> str:
 
 
 def _who_words(men: list[Any], persons: list[Any]) -> str:
+    """'Mr Pearce and two hands', by the dealings' own joining of names (`ports._and`)."""
+    from freesail.world.ports import _and
+
     names = [p.name for p in persons]
     if men:
         names.append(_count_words(len(men), "hand"))
-    if not names:
-        return "nobody"
-    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    return _and(names) if names else "nobody"
 
 
 def _count_words(n: int, what: str = "hand") -> str:
