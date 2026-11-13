@@ -27335,3 +27335,16 @@ none is "could not be tried".
 **Truth 7-543** and the step's tests in `tests/test_mends_109.py`. **The toggle:** with the trunk's
 `agents/director.py` truth 7-543 fails (the dry run on his hull: "it would be performed as said
 (ship)"); with it, it passes.
+
+**The suites, as run (step 3).** At **1a6b1dc** (the trunk merged by merge commit: package 109's
+step 2 as merged and the letter plan's mend, 0c9705d0, the same as this branch's 8429863; the
+appended ends kept, the trunk's first), in a worktree pinned there, this container, four
+workers, one suite at a time. `ruff check .` and `ruff format --check .` clean (390 files).
+**The fast tier** whole: exit 0, 7,572 run, no failure, 1 skipped. **The slow tier of the
+touched files, the browser plans and the known truths whole** (`--slow -m "not pace" -n 4` on
+test_mends_109.py, test_known_truths.py, test_director.py, test_browser_probe.py,
+test_in_world.py): exit 0, 613 run, no failure, 8 skipped; every browser plan played and
+passed; the recorded passages among them, every pinned digest, line count and tick held. **No
+digest moved, no kept save and no pin.** **The pace**, alone and last (`--slow -m pace -n 0`,
+the same files, load 3.5 at its start): exit 0, 12 passed. The tree reported differs from
+1a6b1dc by this paragraph alone.
