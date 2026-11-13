@@ -966,7 +966,7 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     is said in a line and nothing is paid.
 
     **The owner's answers to the design note's questions (2026-11-13;
-    , package 110).** The sources overturned
+    `docs/design/Design-SlaveryAndSuppression.md`, package 110).** The sources overturned
     part of what the lead had told him from memory (France from 1794 to 1802 freed the
     people of a taken slaver in law and not in fact; the United States not before 1819),
     and he agreed with the note's recommendations: (1) for those nations and years the
