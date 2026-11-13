@@ -21,7 +21,7 @@
 # The datum: UNVERIFIED. No period plan of the road was read; the road is EMODnet's depths
 # at LAT, on its level-3 patch; the gauge's mean level is REDMAR's (data/tides/).
 #
-# FOR SOME YEARS ONLY, in words until 105's dated rows (the rows that wait for them): the
+# FOR SOME YEARS ONLY, in words (no dated key carries it): the
 # quarantine "very rigorously enforced", a bill of health indispensable, from the advices of
 # November 1816 (Purdy p. 217: the regulations then); the town's defence against Nelson's
 # boats in July 1797 (FROM MEMORY, no source on file). Prices FROM MEMORY or JUDGEMENT, in
@@ -40,9 +40,9 @@
 # wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
 # ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
 # mended here, and no truth depends on a war's day. What is true of the port only for some
-# years is written below in its own words, with its years: a port file can date its holder
-# alone until package 105's step 1 (the dated rows for `state`, `closed_to`, `market` and the
-# rest) is on the trunk; the rows waiting for it are named in the head of each file.
+# years is written in its own words, with its years, in the head above: none of it is a
+# key that package 105's dated rows (`state`, `closed_to`, `market` and the rest) can carry, so
+# no row waits (the chart session, 2026-11-13).
 
 nation:
   - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
