@@ -20518,6 +20518,113 @@ moved (the four whole logs, the captain's trials, the gates and `TRIAL_TRADE_STR
 the base), so there is nothing for the lead to re-pin by this step; what moved is the new behaviour
 alone, the worlds measured above and the 64's case.
 
+### 2. B7: truth 7-196's crewed world made honest (01:05 (1))
+
+**The ruling.** "Truth 7-196's crewed clause: its world is made honest and the clause kept. What the
+brief asks is 'the pace of a 74 crewed measured against the floors'; that her own side fired into
+the frigate was an accident of a world with no private signals, and since package 74's mends a
+captor goes home with her prize, so the load no longer lasts the measure. Give the frigate the day's
+private signals (or put the three so that they know her by the book's own road), so that the three
+74s keep a station on which each stays within `CREWED_NM` of her for every measured thousand (move
+the station or its radius to make it so, said); `CREWED_NM`, `CREWED_CAP` and
+`CREWED_FLOOR_TICKS_S` unchanged, no floor lowered; the docstring's 'in action' taken out, old
+beside new in the notes with the reason ... The pace of three crewed 74s in action, measured in the
+window before the taking, is recorded in the notes and not pinned."
+
+**The roads, measured** (on the first commit's tree, f5102fae, seed 7, `scratchpad/s13/s196/
+places.py`: each 74's miles from the frigate at the ends of the three timed thousands, 2900, 3900
+and 4900, and the most at any tick from 2000, from 1900 in the last row; the frigate's own world as
+the test lays it, her plain sail set and hove to at 900, the 74s put at 900 where the test puts them):
+
+| The world | S0, S1, S2 at the ends | The most | What they judged |
+|---|---|---|---|
+| The test as it stood | 0.28, 0.08, 0.67; 1.28, 0.57, 2.74; 3.18, 1.79, 5.62 | 5.62 (S2) | all three take her unanswered for a man of war under false colours (S0 and S1 at 1320, S2 at 1980), S0 one 74 (1800); S1 takes her at 2820 and goes on passage |
+| The day's private signals given her (`papers: {private_signals: true}`) | the same to the hundredth | 5.62 | the same: under no rules captain she answers no challenge |
+| The signals given and each challenge answered by order as her lookout reads it | 0.40, 1.24, 0.22; 1.58, 0.25, 0.78; 3.82, 1.47, 3.08 | 3.82 | S0 and S2 know her; S1 takes her unanswered (1320: the three challenged her at 1020, and each reply goes to the last challenge read) and one 74 (1740), takes her, and from 3900 the cap holds two |
+| The three in S0's squadron, the signals given her and answered | 0.17, 0.92, 0.89; 1.02, 0.27, 0.13; 2.04, 1.40, 0.54 | 2.04 | S0 alone challenges her and knows her (1260); but S0 changes between keeping station and investigating a stranger every minute to the end, over the frigate she knows (her own members, under her orders, are never challenged and never spoken, and count for `stranger near`) |
+| S0's squadron with the frigate a member (no signals) | 2.66, 3.87, 2.37; 4.40, 5.07, 3.52; 5.87, 5.90, 5.43 | 6.08 | nobody challenged; S0 investigating to the end and the set sailing off |
+| **The three in the frigate's squadron, under her orders (built)** | 1.31, 0.54, 0.29; 0.88, 0.91, 1.41; 0.99, 1.42, 2.79 | 2.79 (S2, from 1900) | nobody challenged, nothing judged, no shot; each `in company` from her first judgement to the end |
+
+The day's private signals alone do not make the world honest: the frigate under no rules captain
+answers a challenge only by her officer's order, and three King's ships challenging in one minute are
+not all answered by it, nor do they answer one another so. The book's own road does: in a set under
+the frigate's orders the three are no strangers to her (package 71's least relation: a ship under the
+challenger's own orders is none to challenge, `signalling._challenge_strangers`, the set writing it on
+each member, package 72), a member in company challenges nobody and has no stranger row, and keeps
+her station on her commander.
+
+**As built** (`tests/test_bellerophon.py` alone): the 74s put where they were (`SEVENTY_FOURS_AT`
+unmoved), then "our squadron" added before the settle (`squadrons.Squadron`, a squadron of Britain,
+its commander the frigate, `the ship`, the default; its members she and the three, line ahead, the
+goal "patrolling off the Lizard within 2 miles"); asserted at the end of each timed thousand, as
+before, the crewed ships at `CREWED_CAP` and every 74 within `CREWED_NM`, and now each 74's captain
+`in company`; at the end no line of an action in her log. `CREWED_NM` (4.0), `CREWED_CAP` (3) and
+`CREWED_FLOOR_TICKS_S` (60) unchanged; no floor lowered. **The station, moved and said:** from "the
+station off the Lizard within 2 miles", which each 74 kept alone, to each 74's station in the
+frigate's line ahead (two cables apart, `squadrons.INTERVAL_M`), her own intent's legs the set's
+business; no radius. The frigate as the set's commander, three 74s under a frigate's orders, is a
+test's world and no claim of the period: JUDGEMENT, the narrowest of the worlds measured in which
+the three know her by the book.
+
+**The docstring, old beside new** (the owner's standing rule of 2026-11-12: a test superseded by
+design is accepted where said). Old: "**Plainly:** they do not keep their places but engage her: the
+frigate of this world carries no private signal (truth 88's world has no table aboard her), so their
+challenge goes unanswered, and a man of war under their own colours that does not answer is an enemy
+by the King's ship's book (world/signalling.py, package 71's rule), which fires into her; the load
+is three crewed 74s in action, more than on their station." New: "**Her world, plainly** (the lead's
+ruling (1) of 2026-11-13): truth 88's frigate carries no private signal and, under no rules captain,
+answers none; three King's ships each keeping the station off the Lizard alone challenged her and one
+another, took her (and one another) for men of war under false colours and fired into her, and since
+package 74 her captor goes home with her prize, so that load no longer lasted the measure. Given the
+day's private signals and answering each challenge by order, she is still judged unanswered by one
+of three challenging her in one minute (each reply goes to the last challenge read), and one 74
+judges another so. In her squadron, under her orders, the three know her by the book's own road
+(package 71's least relation, package 72's set): a member in company challenges nobody and keeps her
+station on her commander, the frigate." Its place's words, its "in company" and "no line of an
+action" and the measured figures below are in it too. The reason: the clause is the pace of a 74
+crewed against the floors; the action was an accident of a world without private signals, and since
+package 74's mends it did not last the measure.
+
+**The pace, recorded and not pinned** (one process a run, nothing else running):
+
+| Measured | Run 1 | Run 2 | Run 3 |
+|---|---|---|---|
+| The old world, three crewed 74s in action: the thousand before the taking, ticks 1820 to 2820 (S0 and S2 engaging, S1 taking her) | 165.1 | 165.6 | 167.0 |
+| The old world: the action's first thousand, ticks 1320 to 2320 (S0 and S1 engaging from its start, S2 by 2250, S1 taking possession at its end) | 168.0 | 168.0 | 168.7 |
+| The new world, the test's measure: the three thousands (the best) | 105.0, 141.3, 150.3 (150.3) | 105.5, 143.0, 150.9 (150.9) | 102.2, 138.1, 146.7 (146.7) |
+
+Ticks a second on the owner's machine at seed 7, 2026-11-13, against the floor of 60. The new
+world's first thousand is the slowest (the three working up to their stations in her line, their
+evolutions crewed), its best a tenth under the old world's action; the test passes here (40.96 s,
+run alone).
+
+**Found, for the lead, not built** (the signals' owner and the sets'): (a) a King's ship challenged
+by two or more in one minute answers each by "answer the private signal", whose reply goes to the
+last challenge read (`orders/signals._private`), so the others judge her unanswered and take her for
+a man of war under false colours: three King's ships meeting at once take one another for enemies;
+(b) a set's commander who is a King's ship never challenges her own members (under her orders) and so
+never speaks them, `stranger near` counts them, and she changes between keeping station and
+investigating a stranger every minute, her stranger in hand a sail she knows already (the frigate,
+known by the signal); with the frigate a member as well, she investigates to the end and the set sails
+off.
+
+**What any ship may say that this step changes:** nothing. The step is a test's world alone: no
+code, data or ship file moved; no recorded passage, digest or pin of another test moved.
+
+**The suites, as run.** Once, on f5102fae with this step uncommitted (the notes but for this
+paragraph), from the tree root with `py`, one run at a time, the branch and the tree asserted first,
+each pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/s196/
+after/run.sh`), 03:46 to 03:56 UTC, against the first commit's runs (`s13/mend/after/`): her file
+whole but the pace (`tests/test_bellerophon.py --slow -m "not pace"`) 155 passed, no outcome
+changed; truth 7-196's crewed clause run alone, nothing else running (`--slow -m pace`), passed,
+where it failed at the base and on f5102fae (S2 5.62 miles); the far fight's file whole 12 passed;
+`tests/test_known_truths.py`'s fast tier 205 passed, as on f5102fae case for case (its slow tier ran
+on the first commit's code, which this step does not touch); the three files that read these notes
+and Build-Ships (`test_practice`, `test_indefatigable`, `test_hull_schooner`) 122 passed; ruff
+`check` and `format --check` clean (382 files). Not run again: the whole fast tier, the slow
+candidates, the captain's trials and the four whole logs (no code, data or file moved since the
+first commit's runs).
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

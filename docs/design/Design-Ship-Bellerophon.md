@@ -2110,6 +2110,18 @@ on the owner's machine** (the frigate-36 505-631 and the 64 484-486 in the same 
 under the floor of 500 here; the lead's build machine decides (pinned at 550 or more; else recorded, no
 floor lowered).*
 
+*Her world made honest (the lead's ruling (1) of 2026-11-13): truth 88's frigate, without private
+signals and under no rules captain, was taken by the three for a man of war under false colours and
+fired into, and since package 74's mends her captor goes home with her prize, so the action no longer
+lasted the measure (S2 5.62 miles off at the third thousand). The day's private signals alone did not
+mend it (she answers only by order, and three challenging in one minute are not all answered); the
+three are now put in her squadron under her orders, where a member in company challenges nobody and
+keeps her station on the frigate: in company throughout, no shot fired, at most 2.79 miles off at any
+tick of the three thousands, the best of three 147 to 151 ticks a second on the owner's machine (seed
+7, 2026-11-13) against the floor of 60. `CREWED_NM`, `CREWED_CAP` and `CREWED_FLOOR_TICKS_S` as they
+were. The pace of three crewed 74s in action, in the thousand before the taking, 165 to 167, is
+recorded, not pinned, in the tuning notes' "The lead's notes of 2026-11-12 and 13, built".*
+
 **Not truths:** her polar (no pinned point until the close-hauled gap is compared); her tack at
 quarters (recorded); her scenario's round trip and first hour (B6's tests).
 

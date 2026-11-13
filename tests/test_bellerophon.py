@@ -3071,7 +3071,9 @@ def test_truth_7_195_her_lee_lower_deck_guns_shut_by_the_rules_count():
 
 # Her world off the Lizard (Bel-D §14.4): the frigate about three miles south of the Lizard
 # (49.959 N 5.207 W, data/charts/features/channel-west.yaml), and the 74s one to three miles from
-# her (settled by measurement: within the crewed range at the end of each timed thousand)
+# her, put in her squadron under her orders (settled by measurement: within the crewed range at the
+# end of each timed thousand, and at every tick of the three since the lead's ruling (1) of
+# 2026-11-13)
 OFF_THE_LIZARD = (49.9, -5.21)
 SEVENTY_FOURS_AT = ("49 55.5 N 5 12.0 W", "49 53.5 N 5 14.0 W", "49 52.5 N 5 11.0 W")
 
@@ -3086,22 +3088,31 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     where 74s keeping a station off the Lizard would sail for it and pass the crewed range's
     demotion within the measure; here the frigate lies about three miles south of it, her plain sail
     set and then hove to (truth 88's "heave to" at the first tick is refused, no sail being set:
-    Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, keeping the
-    station off the Lizard; a thousand ticks to settle, then the best of three timed thousands, at
-    the end of each the crewed ships at `CREWED_CAP` and every 74 within `CREWED_NM` of her. At
-    least `CREWED_FLOOR_TICKS_S` (60) a second on the build machine. Measured on the owner's machine
-    (seed 7, 2026-11-10): 106 ticks a second, the 74s at 0.25 to 3.59 miles; after B7.c (her tack at
-    quarters, Bel-D §6.7) 89 to 92, at 0.39 to 6.21 miles, S2 over the range; after its review's
-    mend (the helm, the powder, the carpenter's crew and the surgeon's mates kept at their stations,
-    2026-11-11) 164 to 173, at 0.08 to 3.11 miles, her places as they were. **Plainly:** they do not
-    keep their places but engage her: the frigate of this world carries no private signal (truth
-    88's world has no table aboard her), so their challenge goes unanswered, and a man of war under
-    their own colours that does not answer is an enemy by the King's ship's book
-    (world/signalling.py, package 71's rule), which fires into her; the load is three crewed 74s in
-    action, more than on their station."""
+    Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, in her
+    squadron under her orders; a thousand ticks to settle, then the best of three timed thousands,
+    at the end of each the crewed ships at `CREWED_CAP`, every 74 within `CREWED_NM` of her and in
+    company, and no line of an action in her log. At least `CREWED_FLOOR_TICKS_S` (60) a second on
+    the build machine. **Her world, plainly** (the lead's ruling (1) of 2026-11-13): truth 88's
+    frigate carries no private signal and, under no rules captain, answers none; three King's ships
+    each keeping the station off the Lizard alone challenged her and one another, took her (and one
+    another) for men of war under false colours and fired into her, and since package 74 her captor
+    goes home with her prize, so that load no longer lasted the measure. Given the day's private
+    signals and answering each challenge by order, she is still judged unanswered by one of three
+    challenging her in one minute (each reply goes to the last challenge read), and one 74 judges
+    another so. In her squadron, under her orders, the three know her by the book's own road
+    (package 71's least relation, package 72's set): a member in company challenges nobody and keeps
+    her station on her commander, the frigate. Measured on the owner's machine (seed 7, 2026-11-13):
+    the best of three thousands 150, 151 and 147 ticks a second in three runs; the 74s at 0.29 to
+    2.79 miles at the ends of the thousands and at most 2.79 at any tick of them, in company
+    throughout, no shot fired. Before, three crewed 74s in action against her: 106 ticks a second
+    (2026-11-10), 89 to 92 after B7.c, 164 to 173 after its review's mend, and in the thousand
+    before the taking on this tree (ticks 1820 to 2820) 165, 166 and 167 in three runs; the old
+    world and its figures, old beside new, in docs/dev/TuningNotes.md, "The lead's notes of
+    2026-11-12 and 13, built"."""
     import time
 
     from freesail.world import crews as K
+    from freesail.world import squadrons as Q
     from freesail.world.geo import bearing_and_distance
     from tests.test_brains import put, world_at
 
@@ -3116,6 +3127,17 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
         for i, where in enumerate(SEVENTY_FOURS_AT)
     ]
     assert all(v.ship_file == SEVENTY_FOUR for v in fours)
+    ours = Q.Squadron(
+        id="ours",
+        name="our squadron",
+        kind="squadron",
+        nation="britain",
+        members=["the ship"] + [v.id for v in fours],
+        goal=goal,
+        formation="line ahead",
+    )
+    w.squadrons.add(ours, w)
+    assert ours.commander == "the ship"
     w.run(1000)
     best = 0.0
     for _ in range(3):
@@ -3126,6 +3148,8 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
         for v in fours:
             nm = bearing_and_distance(w.position, v.position)[1] / units.NAUTICAL_MILE
             assert nm <= K.CREWED_NM, (v.name, nm)
+            assert v.crew.captain.state == "in company", (v.name, v.crew.captain.state)
+    assert not [e.text for e in w.log if e.kind.startswith("action.")]
     assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
 
 
