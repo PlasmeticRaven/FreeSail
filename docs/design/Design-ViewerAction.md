@@ -506,7 +506,13 @@ for it, its flags uppermost first, each `{name, words, drawing}` with `drawing.k
 under the one above; a signal flag's fly `SIGNAL_FLY_OF_BEAM` (0.3) of her beam, a signal
 pendant's `SIGNAL_PENDANT_OF_BEAM` (0.6), each hoist by its proportion (judgement). Gone with the
 next snapshot after it comes down. The frame is not widened for them: a hoist at a yardarm of
-the schooners and the hermaphrodite brig reaches up to a quarter of a metre beyond it. **Sizes** (judgement, question 7): an
+the schooners and the hermaphrodite brig reaches up to a quarter of a metre beyond it.
+
+**The ship dressed (package 102, step 4).** The snapshot's `dressed`: each `{place, side}` (a
+yardarm's or the shrouds' side, 1 starboard, -1 larboard), `{stay, along}` (the stay's line id
+and the share of the way down from its head, at the skeleton's drawn stay) or `{place, to,
+along}` (along the span between two place words), with its one flag, drawn as a signal flag is
+from that point; nothing at a place she lacks. **Sizes** (judgement, question 7): an
 ensign's fly half her beam, a jack's half the ensign's, a pendant's length 0.6 of her main yard,
 the hoist by the drawing's proportion. In the painter's order a flag sorts at its own middle as a
 sail does. In the frame (§6): every place word's point the ship has, with the largest flag's fly

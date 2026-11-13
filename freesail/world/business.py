@@ -997,7 +997,15 @@ class Business:
                     continue
                 if not nations.at_war(nation, str(port.nation)):
                     continue
-                if not _between(self.world.clock.ship_time, entry):
+                # decision 69: the dated blockade by the scenario's first day, the world's
+                # own after; by the running day only where the scenario follows history
+                scenario = self.world.scenario
+                if not _between(
+                    self.world.clock.ship_time
+                    if getattr(scenario, "follows_history", False)
+                    else scenario.start_time,
+                    entry,
+                ):
                     continue
                 off = dict(book.get("offshore") or {})
                 off.update(entry.get("offshore") or {})

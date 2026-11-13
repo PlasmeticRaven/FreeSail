@@ -1954,7 +1954,7 @@
     }
     // package 81: the guns, the ports, the shot holes and the flags (Design-ViewerAction.md);
     // `options.outs` moves a gun's muzzle while it recoils or runs out between snapshots
-    figures.push.apply(figures, actionFigures(graph, snapshot, hull, spars, options && options.outs));
+    figures.push.apply(figures, actionFigures(graph, snapshot, hull, spars, options && options.outs, stayFoot));
     var frame = fullRigFrame(graph, home, hull).concat(actionFrame(graph, hull, home));
     return { figures: figures, hull: hull, spars: spars, stays: stayFoot, frame: frame };
   }
@@ -4305,9 +4305,10 @@
 
   /** The flags' figures (§12.3): each stiff at its place, its fly to leeward of the apparent wind
    *  drooped FLAG_DROOP_DEG, in its drawing's rectangles; nothing at a place the ship lacks. */
-  function flagFigures(graph, hull, spars, snapshot) {
+  function flagFigures(graph, hull, spars, snapshot, stays) {
     var flags = (snapshot && snapshot.flags) || [];
-    if (!flags.length && !((snapshot && snapshot.hoists) || []).length) return [];
+    var hung = (snapshot && snapshot.dressed) || [];
+    if (!flags.length && !((snapshot && snapshot.hoists) || []).length && !hung.length) return [];
     var app = snapshot.wind ? snapshot.wind.apparent_angle : 0;
     var w = windVector(app);
     var lee = norm(v(w[0], w[1], 0));
@@ -4334,6 +4335,27 @@
         var words = (flag.words || flag.name) + ", in the hoist " + (h.words || "") + " at the " + h.place;
         drawFlag(flag, add(at, v(0, 0, -drop)), size, "hoist." + hn + "." + j, words);
         drop += size.hoist + SIGNAL_GAP_M;
+      });
+    });
+    // package 102 (step 4): her flags hung while she is dressed (`snapshot.dressed`): each at a
+    // yardarm's or the shrouds' side, along a stay (a share of the way from its head to its
+    // foot) or along a span between two places; nothing at a place she lacks
+    hung.forEach(function (d, dn) {
+      var at = null;
+      if (d.stay) {
+        var st = stays && stays[d.stay];
+        if (st && st.head && st.foot) at = lerp(st.head, st.foot, d.along || 0.5);
+      } else if (d.to) {
+        var a = flagPlace(graph, hull, spars, d.place), b = flagPlace(graph, hull, spars, d.to);
+        if (a && b) at = lerp(a, b, d.along || 0.5);
+      } else {
+        at = flagPlace(graph, hull, spars, d.place, d.side);
+        if (at && d.place.indexOf("rigging") >= 0) at = v(at[0], (d.side || weather) * Math.abs(at[1]), at[2]);
+      }
+      if (!at) return;
+      (d.flags || []).forEach(function (flag, j) {
+        var words = (flag.words || flag.name) + ", the ship dressed";
+        drawFlag(flag, at, signalSize(hull, flag), "dressed." + dn + "." + j, words);
       });
     });
     function drawFlag(flag, at, size, of, words) {
@@ -4474,7 +4496,7 @@
   /** The action's figures in ship coordinates: the ports and their lids, the guns by their
    *  states, the shot holes, and the flags. `outs` (optional) moves a gun's muzzle to so many
    *  metres outboard while it recoils or runs out (`effects`' `moving`). */
-  function actionFigures(graph, snapshot, hull, spars, outs) {
+  function actionFigures(graph, snapshot, hull, spars, outs, stays) {
     var figs = [];
     if (!drawnProfile(hull)) return []; // a hull with no profile draws as 75 left her (§1)
     figs.push.apply(figs, portFigures(hull, graph, snapshot));
@@ -4485,7 +4507,7 @@
       figs.push.apply(figs, gunFigures(hull, gun, st, out));
     });
     figs.push.apply(figs, holeFigures(hull, snapshot && snapshot.damage && snapshot.damage.holes));
-    figs.push.apply(figs, flagFigures(graph, hull, spars, snapshot));
+    figs.push.apply(figs, flagFigures(graph, hull, spars, snapshot, stays));
     return figs;
   }
 
