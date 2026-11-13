@@ -26743,6 +26743,17 @@ change its government in play, which house reigns is the world's own, and the da
 would then be read against that state and not the date (the French days from 1792 are the
 plainest case).
 
+**Step 5: the measure.** At 09fd157 (step 5 with the trunk at 788cb3c, step 4 merged as
+c0bd2ac, merged by a merge commit, then the trunk at ce4b78e the same way, the two truths
+appends kept with the trunk's first; the reach of the first lieutenant's word placed, which
+the trunk's truth 7-380 asks of every kind): ruff check and format clean (385 files); the
+fast tier 7,599 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (step 4's ten, test_knowledge and the browser plans, test_browser_probe's
+13 with none skipped; `--slow -m "not pace"`) 1,789 passed, 8 xfailed, 0 failed; pace alone
+and last on the same files, 13 passed. No digest moved; no game line about a hoist or the
+colours moved (the locker's `day_said` out of the pickle while unset; a ship at anchor on no
+day records nothing new). The tree reported differs from 09fd157 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
