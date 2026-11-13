@@ -27088,9 +27088,15 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 ## Package 105: Sicily and Malta (2026-11-12)
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
-measured at 52395f9 and reported. Step 2 begins with its measurement report; Smyth's
-*Memoir* of Sicily (1824) found on the Internet Archive for it. Decision 68 (the lead's
-note of 2026-11-12) binds step 2's and step 3's port words.
+measured at 52395f9, reported (7046d0b) and merged on the trunk as ad256d5. Step 2 (the
+region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own water as the
+lead accepted it, the trunk merged after step 1 (296aa59), measured and reported (0d21bf3);
+held by the lead for package 111's audit, the trunk merged again, the audit's two findings
+owned and the Hammamet and Calabrian water given the block's tide, measured at e3d2ce8 and
+merged as dade4a1. Step 3 (the west, the south coast and the islands, the scenario, the
+sliver closed in step 2's hash) built, the trunk merged after decision 69, measured at
+bdf4442 and reported at the hash that adds its figures. Decision 68 (the lead's note of 2026-11-12)
+binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
 
@@ -27204,6 +27210,51 @@ digest moved and no kept save; the pins moved are those listed above, each the r
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
 exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
 
+### Step 2: the boat and the short watch (note 1)
+
+**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
+the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
+watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
+boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
+boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
+the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
+as the boat").
+
+**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
+the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
+other work has the hands, she is not at quarters and all hands are not up already, all hands
+are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
+(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
+told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
+order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
+send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
+the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
+Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
+ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
+not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
+the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
+work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
+Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
+is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
+`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
+not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
+answers the case where she still waits.
+
+**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+
+**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
+step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
+notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
+suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
+whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
+test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
+test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
+pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
+pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
+passed. The tree reported differs from 929280d by this paragraph alone.
+
 ## Package 111: the chart's audit (2026-11-13)
 
 ### Step 1: the audit as a tool, its tests and its ratchet (no data changed)
@@ -27295,50 +27346,146 @@ them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No p
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
 
-### Step 2: the boat and the short watch (note 1)
+### Step 2a: the mends that move no passage, save or truth (the lead's rulings of 2026-11-13)
 
-**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
-the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
-watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
-boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
-boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
-the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
-as the boat").
+**(1) The islands' bounds to their tiles' edges** (`data/charts/manifest.yaml` and the recipes
+in `tools/build_charts.py`, each within its edge by under a metre): Madeira 32 to 33.5 N by
+17.5 to 16 W became 31.60001 to 33.73333 N by 17.86666 to 15.73334 W; the Azores 36.5 to 40 N
+by 31.5 to 24.5 W became 36.29334 to 40.13333 N by 31.51999 to 24.26667 W. The tiles the new
+bounds take in are the regions' own, the same 25 and 153 (`tiles_over`, measured), and
+`--check` passes. The sixteen groups of water nobody owns about the islands are gone, and
+Funchal's and the islands' gauges serve the water instead of Le Conquet's M2 of 2 m. The
+chart's envelope moves south from 32 to 31.60001 N, so `Chart.bounds_words` reads "31.6 to
+51.5 N" (`tests/test_chart.py`'s pin moved, old beside new). The business draws its traders
+at a region's own bounds, so in these two regions they come in a few miles farther out.
+Channel-west's bounds are not touched.
 
-**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
-the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
-other work has the hands, she is not at quarters and all hands are not up already, all hands
-are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
-(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
-told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
-order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
-send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
-the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
-Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
-ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
-not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
-the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
-work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
-Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
-is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
-`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
-not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
-answers the case where she still waits.
+**(2) The Mediterranean slivers.** gulf-of-lion's east bound went from 7.73 to 7.73333 E and
+ligurian-sea's west from 7.74 to 7.73334 E: they meet at the column's edge, 0.9 m apart,
+each within its own column (the 104 rule). ligurian-sea's east went from 11.0 to 11.1466 E.
+The piece west of 8 E between 40.56 and 41 N is now the tide region `asinara-west` (on
+`solent`'s pattern: `TIDE_REGIONS`, the manifest's `tide_regions:`), served by Porto Torres
+`[tyrrhenian, asinara-west]` and Carloforte (its list given `asinara-west` too). Its M2 is
+now the gauges' 7 cm, where Saint-Malo's was 3.7 m. Its level stays the eleven's: neither
+gauge has a level read (Ajaccio's 0.47 m would give one; not ruled). `test_tide.py` names
+the two gauges in its ruled list and skips the region in the gaugeless test, as it does the
+other two gaugeless blocks. The piece stays listed as owned by no region, with its reason.
+**The overlap of the Ligurian sea and the Tyrrhenian** stays listed. What answers there today:
+`region_at` gives ligurian-sea (first in the chart's order); the tide blends both blocks'
+gauges; the weather is the Gulf's box (first in the file's order); the directions take both
+boxes and the first statement whose polygon holds it. With the Ligurian sea's east bound at
+11.1466 E, the water 41 to 42.5 N by 11 to 11.15 E (the Argentario's offing) is now
+ligurian-sea's by `region_at` and blends the Ligurian gauges: 89 points of the full sweep
+read a Ligurian level and no longer the eleven's. The strip 42.5 to 42.68 N east of 11 E, now
+the Ligurian sea's, lies in no weather box and has no statement or stream area: five new
+findings, listed with their reasons.
 
-**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
+**(3) The weather's boxes: none moved.** The ruling's proof is that each strip is answered
+today by the box it would move into; for all three it fails, measured on a grid of 0.005° by
+0.02° over each strip's water:
 
-**The suites, as run (step 2).** At **929280d** (the trunk merged by merge commit: package 109's
-step 1 and package 105's step 1 as merged, the appended ends of the known truths and these
-notes kept, the trunk's first), in a worktree pinned there, this container, four workers, one
-suite at a time. `ruff check .` and `ruff format --check .` clean (388 files). **The fast tier**
-whole: exit 0, 7,545 run, no failure, 1 skipped, 509 slow left out. **The slow tier of the
-touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
-test_known_truths.py, test_captain_trials.py, test_hands.py, test_boat_hull.py,
-test_boat_director.py, test_orders_places.py, test_ports.py, test_crew_orders.py,
-test_routine.py): exit 0, 648 run, no failure, 8 skipped; the recorded passages among them, every
-pinned digest, line count and tick held. **No digest moved, no kept save and no pin.** **The
-pace**, alone and last (`--slow -m pace -n 0`, the same files, load 2.2 at its start): exit 0, 12
-passed. The tree reported differs from 929280d by this paragraph alone.
+| box moved | strip | water points | box changed | answered today by |
+|---|---|---|---|---|
+| mediterranean-west north to 40.56 N | 40.5 to 40.56 N, 5 W to 4.5 E | 2,385 | 1,193 | catalan-coast 738, gulf-of-lion 445, sardinian-sea 10 |
+| biscay south to 43.3 N | 43.3 to 43.5 N, 20 W to 1 W | 26,674 | 23,340 | portugal |
+| portugal south to 35.5 N | 35.5 to 36 N, 20 W to 5 W | 72,653 | 57,579 | madeira 56,538, mediterranean-west 1,041 |
+
+My proposal was wrong for the second and third: each box runs the width of the ocean, so
+moving its edge moves weather far from the strip. All three strips stay listed.
+
+**(4) The directions' limits** (`data/tides/streams.yaml` `book_limits`): Madeira's box was added
+at the region's new bounds; the Mediterranean west's box went north to 40.56 N; and the
+Azores', the Gulf's and the Ligurian sea's boxes now follow their regions' new bounds (beyond
+the ruling's letter, so that no water the mends gave a region falls outside its book; nothing
+the recorded passages read). Madeira's and the Balearic strip's water is now inside the
+limits with no statement there: two new findings, listed.
+
+**(5) The spots on the land** (old beside new, the distance moved). The audit first learned to
+read a drying harbour by its file: a spot whose file has it dry is a finding only where the
+grid's ground stands more than a metre (JUDGEMENT) above the file's figure. Alderney's,
+Dover's and Roscoff's moorings fit their files and were never wrong; step 1 counted them.
+
+| port, spot | old | new | moved |
+|---|---|---|---|
+| Boulogne, mooring (dries 0.9 m) | 50.7265 N 1.595 E (ground 2.1 m) | 50.72678 N 1.59472 E (0.9 m) | 37 m |
+| Le Palais, mooring | 47.348 N 3.152 W (ground 8.2 m) | 47.348 N 3.15089 W (2.8 m water) | 84 m |
+| Paimboeuf, mooring | 47.2905 N 2.031 W (ground 5.9 m) | 47.29369 N 2.031 W (water) | 354 m |
+| Poole, mooring (1.5 fathoms) | 50.711 N 1.985 W (ground 1.6 m) | 50.70739 N 1.98069 W (2.7 m) | 503 m |
+| St Helier, mooring (dries 1.8 m) | 49.181 N 2.112 W (ground 7.9 m) | 49.17808 N 2.11256 W (2.1 m water) | 327 m |
+| St Malo, mooring (dries 2.7 m) | 48.647 N 2.03 W (ground 10.3 m) | 48.64686 N 2.03028 W (2.5 m) | 26 m |
+| Weymouth, mooring (1.2 fathoms) | 50.6085 N 2.45 W (ground 6.9 m) | 50.60961 N 2.44458 W (2.7 m) | 402 m |
+| Cartagena, outer road | on the mark podadera-fort, ashore | its own position in the file, 27.5 m | 625 m |
+| San Fiorenzo, shore | 42.681 N 9.3025 E (4.4 m water) | 42.681 N 9.30778 E (ground) | 431 m |
+
+Left listed, each with its reason: La Rochelle's mooring (the nearest water 1,452 m off),
+Dunkirk's (793 m) and Morlaix's (none within 2.5 km), beyond a move of 600 m (JUDGEMENT:
+farther is another berth, not the file's). Corunna's shore also stays: it is given on the
+castle of San Antón, and package 39c's rule (`test_ports.py`) keeps every spot of Biscay
+south on a mark. No spot moved is a scenario's start (none lies within 3 km of one), and no
+truth names one.
+
+**(6) The depths: none rewritten.** Four spots moved onto their soundings, where the grid has
+the file's depth within two cables. Each left its mark (the mark stays where the pilot gave
+it) with the mark's depth and bottom written into the spot:
+
+| port, spot | file | grid before | moved | grid after |
+|---|---|---|---|---|
+| Gaeta, mooring (off gaeta-port) | 5 fathoms | 4.5 m | 136 m | 9.4 m |
+| L'Orient, mooring (off pennemane-road) | 4 fathoms | 0.6 m | 301 m | 7.5 m |
+| Naples, mooring | 4 fathoms | 3.0 m | 116 m | 7.5 m |
+| St Malo, anchorage (off st-malo-road) | 4.5 fathoms | 4.1 m | 87 m | 8.3 m |
+
+Left listed with both figures: Gaeta's road (the grid has no 11 fathoms within two cables),
+Brest's mooring in the Penfeld, and Paimboeuf's road. Santander's road also stays listed: it
+has its 10 fathoms 149 m off, but Biscay south's rule keeps it on its mark.
+
+**The known list** went from 174 entries to 142: 39 taken out by the mends, 6 added by them (the
+Ligurian strip's five and Madeira's statement, the Balearic strip's statement in place of its
+book), 1 back (Corunna). The ceilings moved with the regions: the Azores' and Madeira's level
+and stream counts (the bigger regions), the overlap 1,443 to 1,503, ligurian-sea's south
+4,992 to 5,120, the Tyrrhenian's level 7,260 to 7,171. Truths 7-560 and 7-564 moved, old
+beside new in their docstrings: three moorings on the ground where there were thirteen and a
+road, one shore afloat, and the Ligurian sea among the split and the boxless.
+
+**The seas named, not defaulted** (the lead's word for 2a, 2026-11-13). The audit's table of
+seas (`SEAS` in `tools/audit_chart.py`) had called every region it did not name the
+Mediterranean's. The Canaries, the Salvages and the Moroccan blocks now building would then
+have been held to the Mediterranean's level ceiling and told their own gauges were another
+sea's. The table now names every region of the manifest and every tide region. A region or
+tide region it lacks is a finding, `c-no-sea:<region>`, and its tide is not judged until the
+block names its sea. The table stays in the tool until package 112's `seas.yaml` becomes its
+source. A planted test (a box over the Canaries) proves the finding, and another holds the
+table to name every region and tide region of the manifest. The full sweep finds nothing new.
+
+**The suites at c806489** (step 2a's measured hash; the report's hash differs from it by this
+paragraph only), in a clean worktree pinned there. Ruff check and format: clean. The fast
+tier whole: 7,559 passed, 1 xfailed, exit 0 (54 minutes on a loaded machine). Its first run,
+at e496ec3, failed one test: `tests/test_islands.py` pinned the islands' stream book box at
+(36.5, 40.0, -31.5, -24.5). Step 2a had drawn that box to the Azores' bounds, so the test now
+pins the new box, with the old one beside it. The slow tier of the touched files (test_islands,
+test_chart_audit, test_chart, test_tide, test_ports, test_weather, test_scenarios,
+test_business, test_tackle_orders) and of the known truths: 212 passed, 8 xfailed, exit 0. The
+pace tests, alone and last: 15 passed, exit 0.
+
+**Step 2a again, after package 105's step 2 (Sicily) merged first (the lead's order of
+2026-11-13).** The trunk merged at dade4a17 and after (merge commit 969a8be). Sicily's block
+adds two tide regions over its tiles' water that no region holds, `gulf-of-hammamet` and
+`calabria-north`. The audit's table of seas names them and `sicily` (Mediterranean); without
+that, the step's own `c-no-sea` check would have found all three. In the merge, the stream
+book keeps 2a's bounds beside Sicily's box and the Tyrrhenian's east at 15.83999 E. The
+chart's envelope is 31.60001 to 51.5 N and to 16.69332 E, old beside new in `test_chart`. The
+full sweep finds no finding the list lacks and none it no longer finds. The known list has 140
+entries (2a's 142, less the Tyrrhenian's four unowned groups that Sicily closed, with Sicily's
+two). Two ceilings are raised by Sicily's 253 points beside 2a's strip: `c-level:tyrrhenian`
+from 7,171 to 7,424 and `d-split:tyrrhenian` from 8,703 to 8,956. Truths 7-560 to 7-565
+are unchanged and pass in both tiers. **The suites at 969a8be**, in a clean worktree pinned there:
+- ruff check and format: clean;
+- the fast tier whole: 7,594 passed, 1 xfailed, exit 0 (59 minutes);
+- the slow tier of the touched files, the known truths and the twelve browser plans
+  (`tests/test_browser_probe.py`): 224 passed, 8 xfailed, none skipped, exit 0;
+- the pace tests, alone and last: 15 passed, exit 0.
+
+The tree reported differs from 969a8be by this paragraph alone.
 
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
@@ -27383,3 +27530,320 @@ recorded passages (`--slow -m "slow and not pace"`, `test_ports`, `test_scenario
 `test_known_truths`): exit 0, 218 passed, 8 xfailed; the pace alone and last (`--slow -m pace
 -n 0`): 15 passed. No recorded passage's digest moved; no pin moved but the two superseded
 above. The tree reported differs from 65a7df86 by this paragraph alone.
+
+### Step 3: the director's dry run (note 2)
+
+**What was found** (b), and it is not the lead's guess: nothing in a seated world fails to
+pickle. A director seated at the API door (the tests' local server speaking the Messages API's
+shape, `tests/messages_api.py`, a made-up key, no network) copies at rest and after a run; but
+mid-turn his tools hold **his hull** (`Harness.world` is `world.own`, package 97), the dry run
+was given the hull, and `checkpoint_bytes(hull)` made a pickle rooted at the Hull: unpickled, the
+Hull is rebuilt before its World, and `World.__setstate__` → `hulls.bind_to_hull` read
+`hull.world` before it was set (`AttributeError: world`). `_would_do` swallowed it and the dry
+run said "it would be performed as said". Measured on the stub door: `ship "Harpy": order heave
+to` (no Harpy on the sea) dry-ran "would be performed as said (ship)" and was then refused
+("No ship named 'Harpy' is on the sea"). Replayed without a seat, `director.dry_run(World,
+...)` copies the World and refuses rightly, which is what the lead saw.
+
+**The mend.** `_would_do` copies `hulls.world_of(world)`, the World whatever handle it is given.
+(a) Where the copy cannot be made, or the order raises on the copy, it returns `NOT_TRIED` and
+the reason, and `dry_run` says "it could not be tried: ... What it would do is not known until it
+is entered ..." and never that it would be performed; the old "would be performed as said
+({channel})" for a copy not made is gone. (c) `tests/test_mends_109.py`: every example of every
+form of the director's table (96) on a world with the director seated, dry run and order through
+his own tool on his hull: the dry run's word (performed, doubted, refused) is the order's, and
+none is "could not be tried".
+
+**Truth 7-543** and the step's tests in `tests/test_mends_109.py`. **The toggle:** with the trunk's
+`agents/director.py` truth 7-543 fails (the dry run on his hull: "it would be performed as said
+(ship)"); with it, it passes.
+
+**The suites, as run (step 3).** At **1a6b1dc** (the trunk merged by merge commit: package 109's
+step 2 as merged and the letter plan's mend, 0c9705d0, the same as this branch's 8429863; the
+appended ends kept, the trunk's first), in a worktree pinned there, this container, four
+workers, one suite at a time. `ruff check .` and `ruff format --check .` clean (390 files).
+**The fast tier** whole: exit 0, 7,572 run, no failure, 1 skipped. **The slow tier of the
+touched files, the browser plans and the known truths whole** (`--slow -m "not pace" -n 4` on
+test_mends_109.py, test_known_truths.py, test_director.py, test_browser_probe.py,
+test_in_world.py): exit 0, 613 run, no failure, 8 skipped; every browser plan played and
+passed; the recorded passages among them, every pinned digest, line count and tick held. **No
+digest moved, no kept save and no pin.** **The pace**, alone and last (`--slow -m pace -n 0`,
+the same files, load 3.5 at its start): exit 0, 12 passed. The tree reported differs from
+1a6b1dc by this paragraph alone.
+
+## Package 105: Sicily and Malta, continued (step 2 and after)
+
+The section's head and step 1 stand above, before packages 109 and 111 (the trunk's order at
+the merge of 2026-11-13).
+
+### Step 2: the measurement (reported to the lead 2026-11-12, before any tile)
+
+The bounds as briefed (35.01334 to 38.5 N, 11.1466 to 16.69332 E). `tiles_over` gives 126
+level-2 tiles, 9 rows from 35.0133 N and 14 columns from 10.72 E; the seam rule keeps 17
+(`tyrrhenian`'s row from 38.4267 N in the columns 10.72 to 15.41 E, 12; `tunis-coast`'s
+column 10.72 to 11.1467 E from 36.29 N to 38.43 N, 5): **109 the block's own**, the lead's
+figure. The west bound abutting `tunis-coast`'s 7 m west of the column edge takes the
+column 10.72 E in, and its three rows south of 36.29 N, which no region listed, are the
+block's: the gulf of Hammamet and the Sahel to Monastir, outside every region's bounds
+(their water the eleven's tide; said, not mended). A measuring build (the eleven's raise,
+twenty harbour boxes for steps 2 and 3, `--reuse-world`): level 2 22.01 MB, level 3 76 tiles
+6.89 MB, the coast 0.43 MB, **29.3 MB: one region**. No tile, coast or index of another
+region changed. The sweep: 5,940 cells in 256 places, the largest in the three Hammamet
+tiles, off Kelibia and over the Milazzo plain.
+
+The gauges: TICON's file (the zip fetched again, SHA-256 7055f8ed...6514, the file of every
+earlier block) has six in the bounds, each GESLA-2 from ISPRA: Palermo, Porto Empedocle,
+Catania, Messina, Reggio Calabria and Lampedusa; none in Malta, and Crotone outside the east
+bound. None lies within ten miles of a seam: each serves `sicily` alone. No published mean
+level of theirs is on file; the level proposed (JUDGEMENT): each gauge's M2, S2 and N2
+amplitudes summed, the model's own lowest water at the chart's datum.
+
+Naples after February 1806: `data/regimes.yaml` holds no nation; `data/nations.yaml` one
+undated `naples`. The Sicilian ports stay `naples`'s; the mainland's (Reggio, Scilla) take
+dated `nation:` rows to `france` for the French occupation; the British garrisons are
+dated port keys.
+
+Sources: Smyth's *Memoir* of Sicily (1824) laid under `docs/references/pilots/` with its
+README row (the Getty copy, not in copyright); it describes Sicily and its islands and not
+Malta, which is read from Purdy 1826, Norie 1831 and Smyth 1854.
+
+**The rebuild on the block's own water** (`--skip-fetch --reuse-world`, after the six
+gauges): 109 level-2 tiles, 21.96 MB; the sweep 7,902 cells in 340 places, the largest in
+the three tiles west of the bounds (the Sahel's flats about Monastir, 35.6 N 10.9 E, whose
+water reads the eleven's as the lead accepted: a later block's water, on the lead's list),
+then the salt pans of Trapani (37.93 N 12.48 E, step 3's) and Kelibia's. A working build
+gave those three tiles a tide region of their own served by the neighbours' gauges; it
+went beyond the measurement the lead accepted (it touched Mahon's, Carloforte's and
+Cagliari's lists) and was taken out before this build. Probed: Palermo 0.18 m and an M2 of
+11 cm, Messina 0.03 m and 1.5 cm, Valletta 0.09 m and 2.6 cm (the six's blend), where the
+eleven's had given 2.25 to 3.68 m of M2.
+
+### Step 2: the sources' short pass, and what they gave against the brief
+
+Read for Malta: Purdy 1826 (pp. 157 to 166), Norie 1831 (pp. 142 to 146), Lamberti 1844 (p.
+197), Smyth 1854 (pp. 33, 251, 420, 445), James 1837 (vol. 2, pp. 170, 211 to 213, 437, 445;
+vol. 3, p. 152) and Nicolas (vol. 1, p. 12). For Sicily and the Faro: Smyth 1824 (his survey
+of 1814 to 1816, laid under the references by this package: the coasts, the Appendix's
+hydrographical description and his table of positions), Purdy 1826 (pp. 115 to 116, 134 to
+144), Norie 1831 (pp. 110, 133 to 136), Smyth 1854 (pp. 179 to 181, 250, 442 to 445), James
+1837 (vol. 4, pp. 122 to 126, 294). Three reading passes were made in parallel and each
+figure spot-checked against its OCR line before it was written.
+
+Against the brief (the lead's memory): **Malta the Order's to June 1798, the French to
+September 1800, Britain's after**: so, to the day (James: the capitulation of 12 June 1798;
+the surrender of 5 September 1800; the blockade effective from 12 October 1798). **Valletta's
+yard from the year the sources give**: no source on file gives the King's dockyard's year;
+Smyth's chronometers were rated "at the Anchor Wharf, in the dock-yard" from 1816, the first
+year given, and the row starts there (JUDGEMENT; the yard is surely older). The Order's
+arsenal is a name (the Galley Port) and not described. **Messina's and Scilla's garrisons**:
+James gives the British at Messina from early 1806 and Scylla's British garrison from after
+Maida to its evacuation on 17 February 1808; Smyth 1824 the English garrison of the citadel
+and the Flotilla's arsenal in 1814; no source gives the garrison's last day (the row ends at
+the end of 1815, JUDGEMENT). **The mainland French from 1806 to 1815**: James gives March
+1806; the end in May 1815 is FROM MEMORY; James also puts a British and Neapolitan garrison
+in Reggio's fortress to January 1808 without the day it was taken (said in Reggio's file, not
+modelled). **The Adventure bank**: no period pilot on file names it (Smyth surveyed it in the
+Adventure after his Memoir); not entered. **The Formiche and the Porcelli**: Milazzo's
+Porcelli (Smyth 1824, p. vii) are step 2's; the Formiche and Trapani's Porcelli are the west's
+(step 3). **Decision 68**: the one plain statement on file is Smyth 1824's of 1570, the Order's
+galleys with several hundred enslaved men aboard freed by Uluj Ali (p. 202); it is in
+Valletta's pilot's words under the Order's row, with its year. No source on file speaks of a
+slave prison or a trade in captives at Malta; nothing more is said.
+
+Where the sources disagree among themselves (said in the files): the Grand Harbour's entrance
+250 fathoms (Purdy) or 350 (Norie); Messina's 500 yards (Purdy) or 700 (Smyth); Filfla a
+mile long (Purdy) or two cables (the Admiralty, modern); the Benhisa reef's breaking wind.
+
+**The tide**: the six gauges serve `sicily` (block lists `sicily` alone); their levels
+JUDGEMENT by the lead's ruling; Palermo 0.18 m with an M2 of 11 cm, Messina 0.03 m and 1.5 cm,
+Valletta 0.09 m and 2.6 cm. The epitome gains the Faro and Messina at Smyth's hours (6h 56m,
+8h 10m) and Milazzo, Reggio, Catania, Syracuse and Valletta at the world's own; the world's
+hour at Messina is eight hours from Smyth's (the modern gauges' amphidrome), said.
+
+**The Faro's stream**: two areas (the channel bends), the flood northward, four knots at
+springs and two at neaps (JUDGEMENT within Smyth's two to five), strongest three hours before
+high water (JUDGEMENT); measured: 3.9 knots along the axis at springs, four turns in a day
+and a night, 2.3 at neaps. What it cannot carry is said in the file: the shores' counter-sets
+(the refoli), Charybdis's eddies, the slack, the wind's hold, the set onto the Torre di
+Cavallo's rocks. The rest of the block sets east-south-east at half a knot.
+
+**The marks**: 58, placed on the grid by the scratch rule (land marks on its land, roads on
+water of half to half again the pilot's depth, dangers on its shoal head; every move in
+`fix`). The grid lacks Messina's Braccio and Filfla: four islands the grid lacks.
+
+**The ports**: eleven (Valletta, Marsa Scirocco, St Paul's Bay, Port Miggiaro; Messina,
+Milazzo, Catania, Augusta, Syracuse; Reggio, Scilla), each with ten goods and more priced to
+differ, its tracks out to sea clear of the land by `Chart.line_shore` (Marsa Scirocco's and
+Augusta's first drafts crossed Delimara and the harbour's shore and were redrawn).
+
+**The weather box** `sicily` (the block's bounds): Malta's table (the Mediterranean Pilot vol. I,
+1913, p. 734, 26 years of 1852 to 1886, read from the item's leaf 906, the column totals
+checked: N 20, NE 72, E 19, SE 52, S 10, SW 34, W 23, NW 126, the calm 9) for the check rows;
+the generator's figures the coast of Tunis's with each month's gradient and lows searched by
+simulated months (a coarse search of 288 candidates at 36 months, then a local search of 140
+at 120 months for the months outside, then 400 months at seed 11). Eight months within four
+points of the row's westerly and easterly shares; **four outside, said in their notes**:
+April (the easterly 13 against 21), May (18 against 25), December (9 against 15) and July (the
+westerly 17 against 23, the northerly 48 against 39). The generator's easterly share does not
+rise to Malta's gregale and levanter months without spoiling the other quarters: a finding for
+whoever fits the eastern boxes, not mended. No test holds a box to its row by simulation (as
+before); the test holds the rows to the table.
+
+**Two count-pins moved by the package's own additions** (the first fast tier at 1e9e250 found
+them, exit 1): `tests/test_ordnance.py`, the ports with no powder block, old `27 + 8 + 8 + 4 +
+7 + 5 + 7 + 13`, new `... + 11` (step 2's eleven ports carry none); truth 7-261, the nations,
+old 15, new 16 (the Order of St John), whose naval source was put in that truth's citation
+form ("James vol. 2 p. 170"). Each is a count of the files this package adds, proven by the
+additions themselves (the eleven files and the one nation); no other pin moved.
+
+### Step 2: the figures (measured at 296aa59, the trunk merged after step 1)
+
+In a worktree pinned at 296aa59. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 509 slow tests left out.
+**The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`; `--slow -m "not pace" -n 4`): exit 0, 637 passed, 8 xfailed in 64
+minutes, the recorded passages replayed to their digests. **The pace** alone and last
+(`--slow -m pace -n 0`, the same files): exit 0, 12 passed. Pins moved: the two count-pins
+above alone. The tree reported differs from 296aa59 by this paragraph and the "where I stand"
+above alone.
+
+
+### Step 2 meets package 111's audit (the lead's note of 2026-11-13)
+
+The lead's trial merge of 0d21bf3 found two findings the audit's known list lacked, both
+`sicily`'s: `a-unowned:sicily:north` (the block's top tile row north of 38.5 N and east of
+`tyrrhenian`'s last column, 15.84 to 16.69 E) and `a-unowned:sicily:west` (the three
+Hammamet tiles), each reading the Atlantic's tide. The trunk merged (bd9a79a); then:
+
+- **Two tide regions, no tiles** (the manifest's `tide_regions:`, the Solent's form):
+  `gulf-of-hammamet` (35.01334 to 36.29334 N, 10.72 to 11.1466 E) and `calabria-north`
+  (38.5 to 38.85333 N, 15.84 to 16.69332 E), each served by the block's six (their `block:`
+  `[sicily, gulf-of-hammamet, calabria-north]`). The level there: 3.68 and 3.7 m before, 0.12
+  and 0.07 m after. `sicily` rebuilt from the cache after the gauges (`--skip-fetch
+  --reuse-world`): five of its own tiles' fill moved (three of the Hammamet column and the
+  one beside it, two of the Calabrian row), no other region's tile. Both findings listed in
+  `data/charts/audit-known.yaml` with their reasons, owner package 105: the water is a later
+  block's, and the bounds are left as they are. The north finding's figure is taken on the
+  tile's top edge line (38.85333 N), outside the tide region.
+- **The Calabria sliver** (step 3's item, built beside this): `tyrrhenian`'s east bound
+  moved from 15.5 to 15.83999 E, 0.9 m inside its last column's edge, and its streams' book
+  limits, its open stream area and its weather box with it (432c45d). The tile list is the
+  same (`tiles_over` gives no column more), and the build reads a region's bounds only for
+  its tile list, its manifest entry and its checks. The world's mean level on the fill grid
+  is the same before and after over that column, over tyrrhenian's south rows and over
+  sicily's north rows (0 of 1,068, 1,457 and 1,260 cells differ; tyrrhenian's gauges have no
+  level, so the sliver reads the eleven's 3.7 m on both sides). So no tile is written.
+  `--check tyrrhenian` passes. It mends four listed findings, `a-unowned:tyrrhenian:east`,
+  `north-east`, `south` and `south-east` (the last two `sicily`'s bounds had already closed),
+  and they are taken out. **Three ceilings move**, each by the sliver's water now
+  tyrrhenian's: `a-unowned:tyrrhenian:north` 396199 to 490855 (the strip north of 42.5 N now
+  runs to 15.84 E), `c-level:tyrrhenian` 7260 to 7513 and `d-split:tyrrhenian` 8703 to 8956
+  (the sliver's 253 points of the full sweep). They were proven by the bound's toggle: at
+  f0f6a84 with the four bounds put back to 15.5 E, the full sweep gives 396199, 7260 and 8703
+  and finds `tyrrhenian:east` (1009585) and `north-east` (94656) again, the old entries' own
+  counts; `south` and `south-east` stay mended by `sicily`'s bounds.
+- **Two tide tests** take the new regions: the set of the blocks' names gains them, and the
+  ruled list of gauges that serve a block beyond the seam band gains the six (old: package
+  104's three alone).
+
+The audit sampled and full: 0 findings the known list lacks; `tests/test_chart_audit.py`
+passes whole with the slow tier.
+
+### Step 2: the figures again (measured at e3d2ce8, the trunk merged after package 111)
+
+In a worktree pinned at e3d2ce8. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 511 slow tests left out.
+**The slow tier** of the touched files with the audit's (`tests/test_ports.py`,
+`test_known_truths.py`, `test_tide.py`, `test_chart.py`, `test_weather.py`,
+`test_nations.py`, `test_geo.py`, `test_ordnance.py`, `test_chart_audit.py`; `--slow -m "not
+pace" -n 4`): exit 0, 658 passed, 8 xfailed, the recorded passages replayed to their digests
+and the audit's full sweep the known list exactly (truth 7-565). **The pace** alone and last
+(`--slow -m pace -n 0`, the same files): the first three runs exit 1, truth 7-159 (the convoy
+of six at far detail) under truth 51's floor of 500 ticks a second, at 471, 474 and 486; the
+fourth exit 0, 12 passed. **Not a pin this package moved, proven by the trunk**: the same
+pace set at the trunk's db15aef, run alternately with it on the same quiet machine (load
+about 1.0), passed twice and failed once on the same truth at 493; the convoy's best of
+three measured alone nine times a tree, alternately: the trunk 477 to 584 (median 558),
+296aa59 448 to 677 (545), e3d2ce8 400 to 598 (536). The floor sits inside the machine's
+spread for that truth on every tree; a finding for the lead, not mended. The tree reported
+differs from e3d2ce8 by this paragraph and the "where I stand" above alone.
+
+### Step 3: the west, the south coast and the islands (as built)
+
+**The sources' pass.** Smyth 1824's west and south coasts and islands (chs. V to VII) and the
+Appendix (pp. iv to vi, xvii to xxxv, the table of positions pp. xxxvii to xl), with Purdy
+1826, Norie 1831, Smyth 1854's table (pp. 442 to 444) and Lamberti 1844 (after the period,
+sparingly), read place by place; every figure in the files cites its page, the rest marked
+FROM MEMORY or JUDGEMENT. Against the brief: **Cefalù and Termini are marks, not ports**
+(Smyth 1824, App. p. v: Cefalù's bay a summer anchorage for coasters with a pier for fishing
+vessels; Termini's road frequented only by boats that can be beached); **Favignana a port**
+(the fleet's road between it and Levanso and Cala Rossa, App. pp. xxvi to xxvii) and
+**Maritimo marks alone** (its landing for boats, its castle a state prison). No source names
+a pilot or his fee at any of the step's ports (the boats and their people JUDGEMENT), nor
+Ingham's house at Marsala (Woodhouse's mole and ballio are Smyth's), nor a year for any light
+(Palermo's and Trapani's entered lit from 1700, JUDGEMENT as Messina's; Girgenti's from 1756,
+its mole's year; Marsala's mole-light Smyth 1854's and not entered). Lampedusa is the
+Tommasi princes' fief (Smyth 1824, p. 285), so `naples`; Mr Fernandez's lease (about 1812 to
+1814 by "ten or twelve years ago", JUDGEMENT) a private one, not a holder.
+
+**Built.** Sixty-five marks in `features/sicily.yaml` (the north coast from Cape Orlando to
+Palermo, the west and the Egadi, the south coast to Terranova, Porto Paolo, Pantellaria,
+Lampedusa with Linosa and Lampion, Lipari with Vulcano) and Ustica's four in
+`features/tyrrhenian.yaml`, each index rebuilt from its file and the manifest's counts
+edited; no tile written. The grid lacks the Porcelli and the Bentinck shoal (placed by the
+pilots' bearings and Smyth's table) and Lampion (an island the grid lacks); Formica and
+Maritimo's castle moved 2.3 and 2.4 km to the grid's land, said in `fix`. Thirteen ports
+(Palermo, Trapani, Favignana, Marsala, Sciacca, the Mole of Girgenti, Alicata, Terranova,
+Porto Paolo, Lipari, Pantellaria, Lampedusa, Ustica), each `naples`, with tracks clear of the
+land by `Chart.line_shore` and the audit's way in (Porto Paolo is its own road: the road north
+of Passaro put its way in across the cape, the audit's f-in). Lipari's and Ustica's roads
+are their anchorages (thirty to two hundred fathoms a cable off). Decision 68's words at
+Palermo and Girgenti (the convicts called galley slaves, once chained to the oars, App. p. v
+and p. 203), Favignana (its convicts, p. 246), Lipari (Barbarossa's captives of 1544, p. 264)
+and Pantellaria (a thousand carried into slavery by Dragut, p. 281, the year printed 1583 and
+doubtful: the words give none). The epitome gains Trapani's and Mazzara's hours (Smyth's
+own) and Palermo's, Sciacca's, Girgenti's, Lipari's, Pantellaria's and Lampedusa's (the
+world's, JUDGEMENT). Truths 7-537 (Tunis to Palermo on charted water, the thirteen's holders),
+7-538 (each road as its pilot has it, the words, the sliver), 7-539 (slow: the scenario).
+
+**The scenario** `the-faro.yaml` (April 1808, seed 7): Valletta, the channel of Malta,
+outside Syracuse and Catania, the Faro past Messina, Ganzirri and the Faro point, west south
+of Vulcano, the road of Palermo; she anchors in fourteen fathoms 0.13 miles from the road
+some forty-eight hours out, on the chart's stiff clay. Taken another way while building it:
+her book is generated from its legs (a scratch script), each open leg re-shaped hourly only
+within its own leg's length of both its ends and short of its mark, each of the strait's
+every ten minutes on the same rule, no two at once (checked along the route); she starts at
+14:00 so as to enter the strait by day, with its marks for fixes; the open legs stand
+fifteen to eighteen miles off the Sicilian shore, where her account by night ran ten miles
+west of the truth; the scirocco is pinned backing south (by the second day) so that the
+Faro point's turn north-east is not close-hauled. The road shelves past the hand lead (no
+bottom at twenty fathoms a few cables out, fourteen at the anchor), so the truth holds the
+bottom where she lies by the chart's note, not a sounding.
+
+**Pins moved by the step's own additions**, each a count of what it adds: `tests/test_ordnance.py`,
+the ports with no powder block, old `... + 13 + 11`, new `... + 13 + 11 + 13`; `tests/test_chart.py`,
+the islands the grid lacks, old 25, new 26 (Lampion). The port lists of `tests/test_ports.py`
+and `tests/test_nations.py` gain the thirteen.
+
+**Findings for others.** The order words take decimal minutes, not seconds; a scenario
+through a strait wants daylight for its fixes and legs that cannot overlap; marks on a
+neighbour's kept tile row are placed on the whole chart (the how-to has them).
+
+### Step 3: the figures (measured at bdf4442, the trunk merged after step 2 and decision 69)
+
+In a worktree pinned at bdf4442. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 514 slow tests left out.
+**The audit** (package 111's tool) sampled and full: 0 findings the known list lacks, exit 0
+both. **The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`, `test_chart_audit.py`, `test_scenarios.py`; `--slow -m "not pace" -n
+4`): exit 0, 688 passed, 8 xfailed, the recorded passages replayed to their digests and the
+scenario sailed to the road of Palermo (truth 7-539). **The pace** alone and last (`--slow -m
+pace -n 0`, the same files), run alternately with the same set at the trunk's 774b6dd on the
+same machine: this tree 12 passed twice; the trunk failed once on the gate's day with the
+region loaded (459 ticks a second) and once on truth 7-159 (477), the machine's spread about
+truth 51's floor (step 2's finding). Decision 69 (the trunk's): step 3's ports have no dated
+rows, and its truths read the holders on the day each loads; none expects a holder to change
+by the calendar. The tree reported differs from bdf4442 by this paragraph and the "where I
+stand" above alone.

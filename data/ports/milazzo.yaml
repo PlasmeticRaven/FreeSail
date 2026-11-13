@@ -1,0 +1,106 @@
+# FreeSail: Milazzo as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch milazzo). Step 2 of the package.
+#
+# Sources. Smyth 1824, pp. vii to viii and 102 to 105: the promontory bold-to but for the Porcelli on the north-west, a miserable little light-house on its north end; the bay of mud and blue clay with little tide, fouled by the tunny nets' stones; the road off the lower town in 25 fathoms, stiff mud, a quarter of a mile off, the best bower to the south; the pratique office under Fort St Elmo, the watering place S by E of the anchorage; the castle 320 feet up; 8,000 people, exporting wine, silk, fruit, argols, corn, oils and tunny. Purdy 1826, p. 134: Olivieri bay preferred by ships bound west.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: milazzo
+name: Milazzo
+nation: naples
+source: "Smyth 1824 pp. vii-viii, 102-105; Purdy 1826 p. 134"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: milazzo-road
+  name: the road of Milazzo
+  lat_deg: 38.2170
+  lon_deg: 15.2480
+  depth_fathoms: 25
+anchorage:
+  feature: milazzo-road
+  name: the road of Milazzo
+  lat_deg: 38.2170
+  lon_deg: 15.2480
+mooring:
+  feature: milazzo-road
+  name: the road off the lower town
+  lat_deg: 38.2170
+  lon_deg: 15.2480
+  depth_fathoms: 25
+  bottom: stiff mud
+shore:
+  name: the landing at the lower town
+  lat_deg: 38.2190
+  lon_deg: 15.2420
+
+pilot:
+  station: milazzo-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a tunny boat of Milazzo
+    under: oars
+    note: "judgement"
+  names: [Giuseppe Bonanno, Gaetano Arena, Francesco Cannizzaro, Antonino Lombardo]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 0            # judgement
+  words:
+    channel: "Round the promontory well off its north-west side, where the Porcelli stand above the water, and mind the shoal of three fathoms off Point Presso; then the bay is clear."
+    marks: "The castle on its hill over the town; the little light-house on the north end of the cape."
+    anchorage: "Off the lower town in twenty-five fathoms of stiff mud, a quarter of a mile off; moor with the best bower to the south. The bottom grips hard, and the stones of the tunny nets foul it."
+    tide: "Little tide in the bay."
+
+tide:
+  establishment: Milazzo
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 12.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 12.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 270.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 53.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 17.5, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.5, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the country's timber; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the watering place S by E of the anchorage (Smyth 1824, p. viii); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the tunny fishermen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [milazzo-road, 38 15 N 15 17 E, 38 20 N 15 17 E]
+  from_sea: [38 20 N 15 17 E, 38 15 N 15 17 E, milazzo-road]
+  in: [milazzo-road]

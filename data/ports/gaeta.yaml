@@ -30,11 +30,12 @@ anchorage:
   lon_deg: 13.5879
   depth_fathoms: 11
 mooring:
-  feature: gaeta-port
+  # package 111 (the lead's ruling): moved onto its sounding, off the mark gaeta-port
   name: under the walls
-  lat_deg: 41.2178
-  lon_deg: 13.5857
+  lat_deg: 41.21738
+  lon_deg: 13.58723
   depth_fathoms: 5
+  bottom: weed and ooze
 shore:
   feature: gaeta
   name: the mole of Gaeta
