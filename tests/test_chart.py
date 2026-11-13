@@ -931,8 +931,12 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # Tyrrhenian's block 15.5 E (package 79d), Sicily and Malta's 16.69332 E (package 105:
     # Calabria's toe to Cape Spartivento; old: 15.5 E, the Tyrrhenian's)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
-    assert whole.bounds == (32.0, 51.5, west, 16.69332)
-    assert whole.bounds_words() == f"32 to 51.5 N, {abs(west):g} W to 16.6933 E"
+    # package 111's step 2a: Madeira's south bound to its tiles' edge, 31.60001 N (was 32.0);
+    # package 105: the east to 16.69332 E (was 15.5)
+    assert whole.bounds == (31.60001, 51.5, west, 16.69332)
+    assert (
+        whole.bounds_words() == f"31.6 to 51.5 N, {abs(west):g} W to 16.6933 E"
+    )  # was 32 (package 111) and 15.5 E (package 105)
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
