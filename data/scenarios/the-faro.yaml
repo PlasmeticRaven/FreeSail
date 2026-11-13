@@ -22,8 +22,9 @@
 # and printed whole, with the account against the truth, by
 #     py tools/day_log.py data/scenarios/the-faro.yaml --hours 72 --reckoning
 #
-# The weather is pinned (a spring scirocco, south-east and east-south-east at twelve to
-# fourteen knots, a fair wind for the whole run, the north coast's quarter at the last;
+# The weather is pinned (a spring scirocco, south-east at thirteen and fourteen knots,
+# backing south by the second day, a fair wind for the whole run and off the land on the
+# north coast;
 # Smyth 1854, pp. 250 to 253, the winds of the Sicilian seas; JUDGEMENT), so that the passage
 # is the same on every machine; the sea and the motion are kept. Its figures at seed 7 are in
 # docs/dev/TuningNotes.md (package 105), measured once: not a gate's, not pinned.
@@ -59,12 +60,12 @@ ports: [valletta, syracuse, messina, milazzo, lipari, palermo]
 weather:
   wind:
     - {at: 1808-04-20T04:00, from_deg: 135, knots: 13, air_mass: neutral}
-    - {at: 1808-04-20T18:00, from_deg: 130, knots: 14}
-    - {at: 1808-04-21T06:00, from_deg: 125, knots: 13}
-    - {at: 1808-04-21T18:00, from_deg: 115, knots: 12}
-    - {at: 1808-04-22T06:00, from_deg: 110, knots: 12}
-    - {at: 1808-04-22T18:00, from_deg: 100, knots: 11}
-    - {at: 1808-04-23T06:00, from_deg: 95, knots: 10}
+    - {at: 1808-04-20T18:00, from_deg: 140, knots: 14}
+    - {at: 1808-04-21T06:00, from_deg: 155, knots: 13}
+    - {at: 1808-04-21T18:00, from_deg: 170, knots: 12}
+    - {at: 1808-04-22T06:00, from_deg: 175, knots: 12}
+    - {at: 1808-04-22T18:00, from_deg: 165, knots: 11}
+    - {at: 1808-04-23T06:00, from_deg: 150, knots: 10}
   background:
     {hpa: 1012, gradient_hpa_per_100km: 0.25, high_toward_deg: 60}
   systems:
