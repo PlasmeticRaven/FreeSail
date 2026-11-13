@@ -1,0 +1,653 @@
+# FreeSail: the British signal flags drawn (package 102, step 2; docs/design/Design-Signals.md,
+# "The signal flags drawn"). Every flag a hoist of the British books can hold, by the name the
+# hoist holds it (`freesail/world/flags.py`, `hoist_flags`), each with its words, its drawing in
+# colours.yaml's form (x along the fly from the hoist, y down from the head; a `poly`, a
+# `shape`), the years it flew by that drawing (`dates`: a flag drawn otherwise in another year
+# is another row of the same name; a year outside every row takes the nearest), and whether it
+# was drawn from a page image (`mark: plate`) or is the builder's own (`made`), with its source.
+# The numerals are four dated sets: Howe's of 1790, his flags in the 'new arrangement' of 1793
+# (the 1796 book's leaf 31), the 1799 book's and the Admiralty's change of 1803 (Trafalgar's),
+# all read from Perrin's Plate XIII in colour (docs/references/signals/pages/); after 1810 not
+# found (the 1804-1810 set answers). Popham's leaf 13 has no figures: the telegraph flag is
+# Perrin's words, its halves judgement. The flags are 2:3 as the plate draws them. A private
+# table's plain flags are drawn in data/signals/basic/flags.yaml, read after this file.
+
+nation: britain
+sources:
+  - "Perrin, British Flags, Cambridge 1922, Plate XIII (in colour) and pp. 168 to 181"
+  - "the Admiralty's Signal-Book for the Ships of War, 1796, leaves 28, 29 and 31"
+  - "Popham, Telegraphic Signals, 1803, leaf 13 (no figures)"
+  - "Fisher, A Display of the Naval Flags of all Nations, Liverpool [1820], plate 8"
+flags:
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: blue}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.15], colour: black}
+      - {rect: [0, 0.85, 1, 1], colour: black}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.16, colour: yellow}
+      - {line: [[0, 1], [1, 0]], width: 0.16, colour: yellow}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175)"
+  - name: "substitute"
+    kind: flag
+    words: "the substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.1429], colour: red}
+      - {rect: [0, 0.1429, 1, 0.2857], colour: white}
+      - {rect: [0, 0.2857, 1, 0.4286], colour: red}
+      - {rect: [0, 0.4286, 1, 0.5714], colour: white}
+      - {rect: [0, 0.5714, 1, 0.7143], colour: red}
+      - {rect: [0, 0.7143, 1, 0.8571], colour: white}
+      - {rect: [0, 0.8571, 1, 1.0], colour: red}
+    dates: "-1792"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799 (Howe's numerals of 1790); in the game until the new arrangement of 1793 (Perrin p. 175); the substitute's row"
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.15], colour: black}
+      - {rect: [0, 0.85, 1, 1], colour: black}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.16, colour: yellow}
+      - {line: [[0, 1], [1, 0]], width: 0.16, colour: yellow}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: blue}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one"
+  - name: "substitute"
+    kind: flag
+    words: "the substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.1429], colour: red}
+      - {rect: [0, 0.1429, 1, 0.2857], colour: white}
+      - {rect: [0, 0.2857, 1, 0.4286], colour: red}
+      - {rect: [0, 0.4286, 1, 0.5714], colour: white}
+      - {rect: [0, 0.5714, 1, 0.7143], colour: red}
+      - {rect: [0, 0.7143, 1, 0.8571], colour: white}
+      - {rect: [0, 0.8571, 1, 1.0], colour: red}
+    dates: "1793-1798"
+    mark: plate
+    source: "the Admiralty's Signal-Book for the Ships of War, 1796, leaf 31 (the figures grey; 1, 3, 0 and the substitute named in ink), its colours by Perrin's Plate XIII col. 1790-1799 through the transposition of 1793 (Perrin p. 175: '1 became 4; 2, 9; 3, 7; 4, 2; 5, 6; 6, 0; 7, 8; 8, 5; 9, 3; and 0, 1'), the leaf's shapes one for one; the substitute's row"
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: yellow}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: red}
+      - {rect: [0, 0.6667, 1, 1.0], colour: yellow}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: blue}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.15], colour: black}
+      - {rect: [0, 0.85, 1, 1], colour: black}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.16, colour: yellow}
+      - {line: [[0, 1], [1, 0]], width: 0.16, colour: yellow}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175)"
+  - name: "substitute"
+    kind: flag
+    words: "the substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: "1799-1803"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1799-1803 (the 1799 book: No. 1 yellow, red, yellow; the substitute plain white, Perrin p. 175); the substitute's row"
+  - name: "numeral 1"
+    kind: flag
+    words: "the numeral flag one"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0.4333, 0, 0.5667, 1], colour: blue}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 2"
+    kind: flag
+    words: "the numeral flag two"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 3"
+    kind: flag
+    words: "the numeral flag three"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {line: [[0, 0], [1, 1]], width: 0.16, colour: yellow}
+      - {line: [[0, 1], [1, 0]], width: 0.16, colour: yellow}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 4"
+    kind: flag
+    words: "the numeral flag four"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 0.5, 0.5], colour: red}
+      - {rect: [0.5, 0, 1, 0.5], colour: white}
+      - {rect: [0, 0.5, 0.5, 1], colour: white}
+      - {rect: [0.5, 0.5, 1, 1], colour: red}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 5"
+    kind: flag
+    words: "the numeral flag five"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: yellow}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: red}
+      - {rect: [0, 0.6667, 1, 1.0], colour: yellow}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 6"
+    kind: flag
+    words: "the numeral flag six"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.3333], colour: blue}
+      - {rect: [0, 0.3333, 1, 0.6667], colour: white}
+      - {rect: [0, 0.6667, 1, 1.0], colour: red}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 7"
+    kind: flag
+    words: "the numeral flag seven"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.3333, 1], colour: blue}
+      - {rect: [0.3333, 0, 0.6667, 1], colour: white}
+      - {rect: [0.6667, 0, 1.0, 1], colour: blue}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 8"
+    kind: flag
+    words: "the numeral flag eight"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 9"
+    kind: flag
+    words: "the numeral flag nine"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0.0, 0, 0.5, 1], colour: yellow}
+      - {rect: [0.5, 0, 1.0, 1], colour: blue}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "numeral 0"
+    kind: flag
+    words: "the cypher flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {poly: [[0, 0], [1, 0], [0, 1]], colour: white}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game"
+  - name: "substitute"
+    kind: flag
+    words: "the substitute"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0, 0, 1, 0.15], colour: black}
+      - {rect: [0, 0.85, 1, 1], colour: black}
+    dates: "1804-1810"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1803-1810 (the Admiralty's circular of 4 November 1803, in the Mediterranean from 16 January 1804, used at Trafalgar and until the end of 1810, Perrin p. 179); dated from 1804 in the game; the substitute's row"
+  - name: "preparative"
+    kind: flag
+    words: "the preparative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.2], colour: blue}
+      - {rect: [0, 0.2, 1, 0.4], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0, 0.6, 1, 0.8], colour: white}
+      - {rect: [0, 0.8, 1, 1.0], colour: blue}
+    dates: "-1798"
+    mark: plate
+    source: "the 1796 book, leaf 28 ('Preparative', striped across) and Perrin's Plate XIII, col. 1790-1799 (blue and white, five stripes)"
+  - name: "preparative"
+    kind: flag
+    words: "the preparative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0.0, 1, 0.2], colour: blue}
+      - {rect: [0, 0.2, 1, 0.4], colour: white}
+      - {rect: [0, 0.4, 1, 0.6], colour: blue}
+      - {rect: [0, 0.6, 1, 0.8], colour: white}
+      - {rect: [0, 0.8, 1, 1.0], colour: blue}
+    dates: "1799-"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', cols. 1799-1803 and 1803-1810 (the same, blue and white, five stripes)"
+  - name: "assent"
+    kind: flag
+    words: "the affirmative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0, 0.42, 1, 0.58], colour: white}
+      - {rect: [0.4467, 0, 0.5533, 1], colour: white}
+    dates: ""
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', the assent, the same in every column (Perrin p. 172: 'White cross on red ground. Affirmative answer')"
+  - name: "dissent"
+    kind: flag
+    words: "the negative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+      - {rect: [0.3, 0.33, 0.7, 0.67], colour: white}
+    dates: "-1798"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', col. 1790-1799, the dissent"
+  - name: "dissent"
+    kind: flag
+    words: "the negative flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: red}
+      - {rect: [0.0667, 0.1, 0.9333, 0.9], colour: white}
+    dates: "1799-"
+    mark: plate
+    source: "Perrin, British Flags (1922), Plate XIII, 'Numerary Signal Flags, 1790-1810', cols. 1799-1803 and 1803-1810, the dissent (Howe's annulling flag, 'White with red border', Perrin p. 172)"
+  - name: "hundred pendant"
+    kind: pendant
+    words: "the pendant that adds a hundred"
+    proportion: [1, 6]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {rect: [0.5, 0, 1, 1], colour: red}
+    dates: ""
+    mark: plate
+    source: "the 1796 book, leaf 31: 'The Pendant White with Red fly - denoting 100' (inked), its figure a short pendant; the fly's share judgement off the figure"
+  - name: "truce"
+    kind: flag
+    words: "the white flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+    dates: ""
+    mark: plate
+    source: "the 1796 book, leaf 31 ('Truce', the white flag); Perrin p. 172"
+  - name: "cornet"
+    kind: flag
+    words: "the blue cornet"
+    proportion: [1, 2]
+    shape: swallowtail
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: ""
+    mark: plate
+    source: "the 1796 book, leaf 28 ('Cornet', a dark swallow tail); Perrin p. 172 ('Blue cornet', 'a swallow-tailed flag')"
+  - name: "fireships' flag"
+    kind: flag
+    words: "the yellow flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+    dates: ""
+    mark: plate
+    source: "the 1796 book, leaf 28 ('Fire Ships', a plain flag, grey); Perrin p. 172 ('Yellow. To distinguish signals made to the fireships')"
+  - name: "telegraph flag"
+    kind: flag
+    words: "the telegraph flag"
+    proportion: [2, 3]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: white}
+      - {poly: [[0, 0], [1, 1], [0, 1]], colour: red}
+    dates: "1800-"
+    mark: made
+    source: "Perrin p. 178: Popham's 'flag divided diagonally into white and red', the 'preparative' or 'telegraph' flag of his code (Popham 1803, leaf 13, has no figure); which diagonal and which half is which: JUDGEMENT, the white above"
+  - name: "answering pendant"
+    kind: pendant
+    words: "the answering pendant"
+    proportion: [1, 6]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: yellow}
+      - {rect: [0.0, 0.0, 0.1667, 0.5], colour: blue}
+      - {rect: [0.3333, 0.0, 0.5, 0.5], colour: blue}
+      - {rect: [0.6667, 0.0, 0.8333, 0.5], colour: blue}
+      - {rect: [0.1667, 0.5, 0.3333, 1.0], colour: blue}
+      - {rect: [0.5, 0.5, 0.6667, 1.0], colour: blue}
+      - {rect: [0.8333, 0.5, 1.0, 1.0], colour: blue}
+    dates: ""
+    mark: made
+    source: "Popham 1803, leaf 13: 'Numerical pendant. Private ships may either answer with this pendant, or the affirmative' (no figure); its drawing Howe's 'chequered blue and yellow pendant to denote that accompanying numeral flags represented figures only' (Perrin p. 173), taken for it: JUDGEMENT"
+  - name: "thousand pendant"
+    kind: pendant
+    words: "the pendant of the thousands"
+    proportion: [1, 6]
+    drawing:
+      - {rect: [0, 0, 1, 1], colour: blue}
+    dates: "1800-"
+    mark: made
+    source: "Perrin p. 178: Popham's thousands by 'a ball or pendant placed above the hoist' (1000 to 2000) or below it (above 2000); which pendant not read: a plain blue, JUDGEMENT"
+  - name: "Dutch jack"
+    kind: flag
+    words: "the Dutch jack"
+    proportion: [2, 3]
+    drawing:
+      - {poly: [[0.5, 0.5], [0, 0], [0.3333, 0]], colour: red}
+      - {poly: [[0.5, 0.5], [0.3333, 0], [0.6667, 0]], colour: white}
+      - {poly: [[0.5, 0.5], [0.6667, 0], [1, 0]], colour: blue}
+      - {poly: [[0.5, 0.5], [1, 0], [1, 0.3333]], colour: red}
+      - {poly: [[0.5, 0.5], [1, 0.3333], [1, 0.6667]], colour: white}
+      - {poly: [[0.5, 0.5], [1, 0.6667], [1, 1]], colour: blue}
+      - {poly: [[0.5, 0.5], [1, 1], [0.6667, 1]], colour: red}
+      - {poly: [[0.5, 0.5], [0.6667, 1], [0.3333, 1]], colour: white}
+      - {poly: [[0.5, 0.5], [0.3333, 1], [0, 1]], colour: blue}
+      - {poly: [[0.5, 0.5], [0, 1], [0, 0.6667]], colour: red}
+      - {poly: [[0.5, 0.5], [0, 0.6667], [0, 0.3333]], colour: white}
+      - {poly: [[0.5, 0.5], [0, 0.3333], [0, 0]], colour: blue}
+    dates: ""
+    mark: plate
+    source: "Fisher, A Display of the Naval Flags (1820), plate 8 (leaf 20), the first 'Princes Jack', gyronny of twelve, red, white and blue; the private table's 'Dutch jack' (made) taken for the Prince's jack: JUDGEMENT"
+  - name: "union jack"
+    kind: flag
+    words: "the union jack"
+    same: "union jack"
+    dates: ""
+    mark: plate
+    source: "data/signals/britain/colours.yaml, the union jack (Perrin; the Union of 1801)"
