@@ -16074,6 +16074,26 @@ def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_m
     c(root)
 
 
+def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
+    """Package 105, step 1: a port file's `state`, `dockyard`, `closed_to`, `market`,
+    `crew_pool` and `pilot` may be dated rows; no port file before 105 gives any of them so,
+    and each answers the same on every day (the far days 1700 and 1900, and the day of each
+    scenario that names it), as it did before the form (the builder's proof over every
+    scenario's day, docs/dev/TuningNotes.md, package 105)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import DATED_KEYS, load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    files = port_files()
+    assert len(files) >= 90
+    days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
+    for pid, path in files.items():
+        loads = [load_port(path, chart, None, when) for when in days]
+        assert loads[0].dated == (), pid
+        for key in DATED_KEYS:
+            assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
+
+
 # -- Package 109: the mends from the owner's play of 2026-11-12 -----------------------------
 
 

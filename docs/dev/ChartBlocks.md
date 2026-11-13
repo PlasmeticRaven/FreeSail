@@ -125,6 +125,42 @@ region's, its tide and its weather are rows in tables that already reach its wat
    least in its market, a yard's or a chandler's topmast and water, the three ratings
    of the crew pool and the pilot's four words (`channel`, `marks`, `anchorage`, `tide`):
    a small Moorish town has them too, judgement and said so (package 39f).
+   **What was true only for some years is written in dated rows** (decisions 66 and 67;
+   package 105, step 1). Beside `nation:` (79a's and 79d's form), a port file's `state`,
+   `dockyard`, `closed_to`, `market`, `crew_pool` and `pilot` (`ports.DATED_KEYS`) may each
+   be one value, as every file before 105 gives them, or a list of rows, each a mapping
+   that names the key with its value for those years, its `since` and `until` (ISO days,
+   either left open, both counted in, as the nation's rows are) and its `source`:
+
+   ```yaml
+   dockyard:
+     - dockyard: {kind: chandlers, items: [...]}
+       until: 1800-09-04
+       source: "the Order's arsenal ... (the work, its page)"
+     - dockyard: {kind: yard, items: [...]}
+       since: 1800-09-05
+       source: "..."
+   closed_to:
+     - {closed_to: [britain], since: 1798-06-12, until: 1800-09-04, source: "..."}
+   state:
+     - {state: blockaded, blockade: {by: britain, since: "1798"}, since: 1798-09-01, until: 1800-09-04, source: "..."}
+   ```
+
+   The row in force on the scenario's first day is loaded into the port's field, and the
+   ports' tick puts each dated key to the world's day when the day turns (`Port.on_day`),
+   so everything that reads the key reads the day's row. A day that no row covers reads
+   the key as if the file gave none (no closures; the port open; the defaults of a pilot,
+   a market, a chandler's and a pool with nothing in them): write a row for every year the
+   game may be set in, or say why not. With no day (the harbour's lists) the first row is
+   read. A `state:` row carries its own `blockade:`, laid over a top-level `blockade:`; a
+   scenario's `ports:` entry goes over every row (its `state:` over each, its `closed_to`
+   added to each). Rows that overlap, a row with no `source`, a day not in the ISO form and
+   a row that ends before it begins are refused in words. **Every row is held to what one
+   value is held to**: `tests/test_ports.py` reads each port's ten goods, its yard's or
+   chandler's topmast and water, the three ratings and the pilot's four words on the
+   loaded port, that is on its scenario's day only; a block whose ports give rows reads
+   the same of each row (load the port on a day inside each), and a yard's `kind` is
+   `yard` or `chandlers` in every row.
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; Vigo it has (package 39c,
    the IEO's and Puertos del Estado's series; its UHSLC series has every phase an hour
