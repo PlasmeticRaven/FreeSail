@@ -27485,6 +27485,92 @@ are unchanged and pass in both tiers. **The suites at 969a8be**, in a clean work
 
 The tree reported differs from 969a8be by this paragraph alone.
 
+### Step 2b: the ports' ways in and out, a report before anything is built (2026-11-13)
+
+**The count after merging the trunk.** Package 109's step 5 (the legs the land guard never
+checked) is not on the trunk at 99d92b3, so its step changes nothing in this count. The
+guard refuses the way in of 24 ports and the way out of 24, 25 ports in all (Maddalena's
+way out only, Hyeres's way in only).
+
+**How the tracks were drawn (JUDGEMENT).** Every one of the 25 port files has a pilot's
+`channel:` in words, and none gives positions, so every mark proposed is the grid's own water.
+The tool is a scratch script, not the repository's:
+- a lattice a quarter cable apart, of water a metre deep or more and a quarter cable off the land
+  (within two cables of the road and the anchorage, any water: the pilot's own ground);
+- an open point 3 miles off the road in 20 m or more, reached from the road by a clear line where
+  one is (6 and then 10 miles where none is at 3);
+- the shortest way over the lattice, simplified to the fewest legs `ships.land_crossing` passes;
+- the marks written to 0.01 minute and tried as written;
+- the way out simplified on its own from the anchorage, the outer road given by its position (the
+  planner skips the road's own mark, a leg of kind "out").
+
+The guard's own verdict on each proposal is taken as the business plans it (`approach_plan`;
+`Planner._port_track` through `_plan_of_legs`). Each should be read against its pilot's words
+before it is built.
+
+| region | port | tracks now | proposed (JUDGEMENT: the grid's water) |
+|---|---|---|---|
+| balearics | palma | none | from_sea [39 28.86 N 2 37.04 E, 39 31.80 N 2 37.80 E]; in [39 31.80 N 2 37.80 E, 39 32.90 N 2 38.42 E, 39 33.33 N 2 38.29 E, palma-road]; to_sea [39 33.18 N 2 38.42 E, 39 32.78 N 2 38.35 E, 39 28.86 N 2 37.04 E] |
+| balearics | port-mahon | none | from_sea [39 52.75 N 4 22.63 E, mahon-outer-road]; in [mahon-outer-road, 39 53.23 N 4 17.00 E, mahon-arsenal-anchorage]; to_sea [39 51.98 N 4 19.54 E, 39 52.75 N 4 22.63 E] |
+| biscay-north | paimboeuf | none | from_sea [47 09.00 N 2 22.28 W, st-nazaire-road]; in [st-nazaire-road, 47 17.96 N 2 05.54 W, paimboeuf-road]; to_sea [47 16.56 N 2 10.37 W, 47 13.38 N 2 15.84 W, 47 09.00 N 2 22.28 W] |
+| biscay-north | rochefort | none | from_sea [46 05.19 N 1 18.00 W, basque-road]; in [basque-road, 46 00.41 N 1 10.56 W, aix-road]; to_sea [46 01.01 N 1 13.04 W, 46 05.19 N 1 18.00 W] |
+| biscay-south | ferrol | none | from_sea [43 26.11 N 8 22.82 W, carino-road]; in [carino-road, 43 27.61 N 8 17.07 W, 43 28.31 N 8 14.97 W, ferrol-road]; to_sea [43 26.66 N 8 20.93 W, 43 26.11 N 8 22.82 W] |
+| biscay-south | santander | none | from_sea [43 31.71 N 3 45.71 W, sardinero-road]; in [sardinero-road, 43 28.13 N 3 45.69 W, 43 27.88 N 3 45.79 W, 43 27.60 N 3 47.41 W, santander-road]; to_sea [43 27.68 N 3 46.93 W, 43 27.93 N 3 45.72 W, 43 31.71 N 3 45.71 W] |
+| channel-mid | poole | by its tracks | from_sea [50 37.65 N 1 51.33 W, studland-bay]; in [studland-bay, 50 40.95 N 1 56.79 W, 50 41.17 N 1 57.02 W, 50 41.75 N 1 57.38 W, 50 42.07 N 1 58.05 W, brownsea-road]; to_sea [50 42.02 N 1 57.81 W, 50 41.40 N 1 57.02 W, 50 41.05 N 1 56.95 W, 50 37.65 N 1 51.33 W] |
+| channel-mid | st-malo | by its tracks | from_sea [48 42.13 N 2 14.78 W, baie-de-la-fresnaye]; in [baie-de-la-fresnaye, 48 38.92 N 2 02.59 W, 48 38.72 N 2 02.29 W]; to_sea [48 38.99 N 2 03.80 W, 48 39.81 N 2 15.87 W, 48 42.13 N 2 14.78 W] |
+| channel-mid | st-peter-port | by its tracks | from_sea [49 25.56 N 2 29.40 W, the-little-russel]; in [the-little-russel, guernsey-great-road]; to_sea [49 25.56 N 2 29.40 W] |
+| channel-west | dartmouth | by its tracks | from_sea [50 20.07 N 3 28.24 W, the-range-dartmouth]; in [the-range-dartmouth, 50 20.49 N 3 33.88 W, 50 20.90 N 3 34.19 W, dartmouth-harbour]; to_sea [50 20.62 N 3 33.88 W, 50 20.40 N 3 33.76 W, 50 20.04 N 3 32.82 W, 50 20.07 N 3 28.24 W] |
+| channel-west | morlaix | by its tracks | from_sea [48 45.00 N 3 52.80 W, 48 42.00 N 3 52.80 W]; in [48 42.00 N 3 52.80 W, 48 41.57 N 3 53.33 W, 48 40.55 N 3 53.29 W, morlaix-river]; to_sea [48 41.12 N 3 53.33 W, 48 41.60 N 3 53.33 W, 48 45.00 N 3 52.80 W] |
+| channel-west | st-marys | none | from_sea [49 51.35 N 6 17.84 W, 49 54.12 N 6 19.62 W]; in [49 54.12 N 6 19.62 W, 49 55.47 N 6 19.54 W, st-marys-road]; to_sea [49 51.35 N 6 17.84 W] |
+| gulf-of-lion | hyeres | by its tracks | from_sea [42 59.75 N 6 08.45 E, porquerolles-anchorage]; in [porquerolles-anchorage, hyeres-road]; to_sea [42 59.75 N 6 08.45 E] |
+| gulf-of-lion | toulon | by its tracks | from_sea [43 03.49 N 5 58.88 E, toulon-great-road]; in [toulon-great-road, toulon-inner-road]; to_sea [43 03.49 N 5 58.88 E] |
+| gulf-of-lion | villefranche | by its tracks | from_sea [43 39.24 N 7 18.82 E, villefranche-road]; in [villefranche-road]; to_sea [43 39.24 N 7 18.82 E] |
+| ligurian-sea | genoa | by its tracks | none: no lattice way inner (the grid's modern works close the harbour) |
+| ligurian-sea | maddalena | by its tracks | from_sea [41 12.83 N 9 20.53 E, maddalena-road]; in [maddalena-road, agincourt-sound]; to_sea [41 12.82 N 9 21.16 E, 41 12.83 N 9 20.53 E] |
+| mediterranean-west | cartagena | none | none: no lattice way inner (the grid's modern works close the harbour) |
+| mediterranean-west | oran | none | none: no lattice way inner (the grid's modern works close the harbour) |
+| portugal | lisbon | none | from_sea [38 39.34 N 9 27.32 W, cascais-road]; in [cascais-road, 38 40.41 N 9 19.41 W, 38 41.54 N 9 12.30 W, belem-road]; to_sea [38 40.41 N 9 19.38 W, 38 39.34 N 9 27.32 W] |
+| portugal | oporto | none | from_sea [41 09.00 N 8 45.98 W, oporto-road]; in [oporto-road, 41 08.79 N 8 40.41 W, douro-within-bar]; to_sea [41 08.99 N 8 40.97 W, 41 09.00 N 8 45.98 W] |
+| portugal | setubal | none | from_sea [38 23.63 N 9 04.72 W, sesimbra-road]; in [sesimbra-road, 38 26.03 N 9 04.42 W, 38 25.97 N 9 03.75 W, 38 29.10 N 8 55.77 W, setubal-road]; to_sea [38 26.53 N 9 00.18 W, 38 23.63 N 9 04.72 W] |
+| tyrrhenian | alghero | by its tracks | from_sea [40 33.29 N 8 13.93 E, alghero-road]; in [alghero-road]; to_sea [40 33.29 N 8 13.93 E] |
+| tyrrhenian | civita-vecchia | by its tracks | from_sea [42 03.16 N 11 43.94 E, civita-vecchia-road]; in [civita-vecchia-road, 42 05.53 N 11 47.00 E, civita-vecchia-port]; to_sea [42 05.38 N 11 47.00 E, 42 03.16 N 11 43.94 E] |
+| tyrrhenian | gaeta | by its tracks | from_sea [41 10.46 N 13 36.80 E, gaeta-road]; in [gaeta-road]; to_sea [41 10.46 N 13 36.80 E] |
+
+**What giving them moves**, toggled by region in scratch trees:
+
+*The business's draws.* The nine busy scenarios were each played three hours from their own seed and
+start, with tracks off, all on, channel-west's alone and the other eight regions' alone. Channel-west's
+alone give exactly the change, and the other eight move nothing; every busy scenario is in
+channel-west.
+- Morlaix's way in and out, newly clear, moves lugger-roscoff. Traders lie in the river of
+  Morlaix, and the draw's stream reshuffles every vessel drawn after.
+- St Mary's, newly clear, moves merchant-brig, merchant-cutter, merchant-schooner-plymouth,
+  merchant-ship and smack-falmouth. Traders lie in St Mary's Road, and the convoys and blockades
+  after them are drawn otherwise.
+- dispatches-falmouth, prize-home and the-channel-observed draw as before.
+- The business's route from Brest to St Mary's is still refused by the guard on the route's own
+  legs, so it is newly among the refused in three scenarios, beside Roscoff to Falmouth.
+
+*The pinned suites.*
+- The fast tier whole with all tracks on (at 8886f37, before Sicily): 7,566 passed, 1 xfailed,
+  and one failed, truth 7-563, the audit's own count of the refused ways (24 to 3).
+- The slow tier of the known truths, the kept saves (`test_checkpoint`), the business, the
+  captains, the chart, the ports, the sailing by name, the squadrons, the letters, the lee ports,
+  the court, the Bellerophon, the observer and the audit (at 99d92b3): 226 passed, 8 xfailed, and
+  two failed, the audit's own ratchet (`test_the_full_sweep_is_the_known_list_exactly` and truth
+  7-565), whose list would lose its 43 mended entries (f-open:paimboeuf among them).
+- **No recorded passage, no kept save's digest and no other truth moves.** The busy draws that
+  move are pinned by no test: they are the world as it should be, by the owner's standing rule.
+
+**What building them would change of the audit's own**: 43 entries (21 ways in, 21 out, Paimboeuf's open) out of the known list;
+truth 7-563's ways in and out refused from 24 to 3 each (Genoa, Cartagena, Oran), and its opens
+from {paimboeuf, royan} to {royan}.
+
+**Left for the lead.** Genoa, Cartagena and Oran have no way into their anchorages over the
+grid's water: the modern moles close them. They want either their anchorage moved outside the
+works (JUDGEMENT, not read: the harbours of the 1790s lay open where the grid has a mole) or a level-3 patch with the old
+harbour cut, which is package 113's kind of work.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
