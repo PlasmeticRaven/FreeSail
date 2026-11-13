@@ -28412,7 +28412,7 @@ El Araiche and Mazagan need none (every pair among the northern three and to the
 is clear). **Findings:** **the tide steps at 31.6 N**, the seam between the two pairs of gaugeless regions
 (Cadiz's and Huelva's water north of it, Arrecife's and Puerto de Cabras's south): M2 1.035 m at
 57 degrees to 0.82 m at 35 degrees, the level 1.96 m to 1.57 m, in a cable. In the how-to's words
-a seam between two blocks far from every gauge (Huelva some 330 miles off, Arrecife some 250)
+a seam between two blocks far from every gauge (Huelva some 360 miles off, Arrecife some 240)
 stays a step; no taper is laid between two blocks. **Mogador's harbour within the island** is
 not reached in the grid: its north passage reads 0.0 m and its south 0.5 m at the datum, where
 Purdy has five fathoms in the north one; the port's spots are in the road, as Purdy and Jackson
