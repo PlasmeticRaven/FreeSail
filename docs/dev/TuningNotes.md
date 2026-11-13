@@ -26671,6 +26671,15 @@ topgallant masthead in the 1805 set, uppermost first (white with the blue cross,
 yellow, blue with the yellow saltire), gone when hauled down; No. 16 'at the fore' at the
 fore topgallant masthead; seen nearly end on from the beam, the wind on her quarter.
 
+**Step 3: the measure.** At 97d4650 (step 3 with the trunk at 06e1418, step 2 merged as
+7a3edd5, merged by a merge commit; the step's paragraph above): ruff check and format clean
+(382 files); the fast tier 7,499 passed, 1 xfailed, 0 failed; the slow tier of the touched
+files and of `test_known_truths` (step 2's eight and test_parity; `--slow -m "not pace"`) 604
+passed, 8 xfailed, 0 failed; pace alone and last on the same files, 12 passed. No digest
+moved; no game line about a hoist or the colours moved (a hoist with no place says "at the
+main" as before; the record and the pickle carry no place while unset). The tree reported
+differs from 97d4650 by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
