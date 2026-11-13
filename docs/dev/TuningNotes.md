@@ -27030,11 +27030,11 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 ## Package 105: Sicily and Malta (2026-11-12)
 
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
-measured at 52395f9 and reported (7046d0b). Step 2's measurement reported to the lead
-(below), accepted whole by the lead. The six gauges in; the region rebuilt on the block's
-own water and committed (a working commit: the tests that name every region, the weather box, the marks, the stream, the
-Order and the ports follow, and the step is measured at its own hash). Decision 68 (the lead's
-note of 2026-11-12) binds step 2's and step 3's port words.
+measured at 52395f9, reported (7046d0b) and merged on the trunk as ad256d5. Step 2 (the
+region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own water as the
+lead accepted it, the trunk merged after step 1 (296aa59), measured there and reported at the
+hash that adds the figures below. Step 3 next. Decision 68 (the lead's note of 2026-11-12)
+binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
 
@@ -27195,3 +27195,15 @@ them, exit 1): `tests/test_ordnance.py`, the ports with no powder block, old `27
 old 15, new 16 (the Order of St John), whose naval source was put in that truth's citation
 form ("James vol. 2 p. 170"). Each is a count of the files this package adds, proven by the
 additions themselves (the eleven files and the one nation); no other pin moved.
+
+### Step 2: the figures (measured at 296aa59, the trunk merged after step 1)
+
+In a worktree pinned at 296aa59. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 509 slow tests left out.
+**The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`; `--slow -m "not pace" -n 4`): exit 0, 637 passed, 8 xfailed in 64
+minutes, the recorded passages replayed to their digests. **The pace** alone and last
+(`--slow -m pace -n 0`, the same files): exit 0, 12 passed. Pins moved: the two count-pins
+above alone. The tree reported differs from 296aa59 by this paragraph and the "where I stand"
+above alone.
