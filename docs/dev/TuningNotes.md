@@ -28219,3 +28219,88 @@ added and nothing else (the audit's check (d) run on each).
   compared in bells"); a book wanting a clock hour has no word for it.
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
+
+## Package 106b: Morocco's Atlantic coast (2026-11-13)
+
+### Step 0, the measurement (nothing under `data/charts/` committed)
+
+Measured on the trunk at 237b4641 in a scratch worktree (never committed): measuring recipes
+built with `tools/build_charts.py --region` into a fresh cache, the audit run on the result,
+the tiles weighed from the manifest's bytes. The fill was raised by the eleven's level (3.98 m,
+no gauge of the block's yet): the bytes move a little when the block is rebuilt on its own
+water. Harbour boxes for the measure were placed FROM MEMORY.
+
+**The sources.** Purdy 1825 (on file) describes the whole coast, Cape Spartel to Cape Noon
+and Bojador (from l. 22171: "Between Cape Spartel and Cape Cantin ... regular soundings
+towards the shore ... no harbours of consequence"; Arzila, El Araiche, Old and New Mamora,
+Fedala, Anafee, Azamor, Mazagan, Cape Blanco of the north, Cape Cantin, Saffi, Mogador, Cape
+Geer, Agadeer or Santa Cruz, to Cape Noon; the variation "between Cape Spartel and Saffi Bay
+22 to 24 W", l. 4162): the block's pilot. The Oriental Navigator 1801 has nothing of this coast;
+Glas 1764 names Sallee once (l. 13751). Tofiño's Atlantic *Derrotero* (1789, `A302201`)
+reaches and has no text of Africa: its introduction (l. 417) says the charts of the coast "from
+Cape Espartel to Cape Verde" were made in 1776 by Varela and Borda, a memoir promised and not
+printed there; the charts are the atlas's, not yet found. Jackson's *Account of the Empire of
+Marocco* (1809, `accountofempireo00jack`, NOT_IN_COPYRIGHT, OCR 559,124 bytes) reaches: the
+ports, the trade, the harbours and the captives held in the Sahara (decision 68's matter).
+
+**The source grid.** EMODnet's DTM 2024 covers the whole coast (its grid runs from 15 N): of
+5,610 shelf cells sampled at 1.5′ (under 100 m), 5,459 are interpolated (`interpolation_flag`
+1), 151 surveyed, mostly in the Strait's approach. GEBCO under it for the land. TICON's file
+(SHA-256 7055f8ed...6514, as before) has **no gauge** between Ceuta and Fuerteventura.
+
+**The tile grid against the coast.** The coast runs diagonally, four degrees of longitude over
+eight of latitude: Spartel 5.92 W, Rabat's column 6.77 W, Cape Cantin's 9.33 W, Mogador's
+9.76 W at 31.5 N, Cape Juby 12.92 W at 27.95 N. One box over a diagonal coast holds a triangle
+of open sea and one of land. The land's tiles are skipped (`skip_dry_tiles`) where a coarse
+layer answers, except the eight of the row 31.6 to 32.03 N east of 9.34 W (no layer there south
+of 31.9 N). **Mogador (31.51 N) lies south of 31.6 N**: the southern region's port.
+
+| option | regions | level-2 tiles written | MiB (level 2) | with the measured level 3 |
+| --- | --- | --- | --- | --- |
+| A1, the brief's two boxes, coast + 1 column | 31.60001–35.5 N × 10.18666–5.92001 W; 27.33334–31.6 N × 13.17334–9.33334 W | 75 + 74 = 149 | 25.87 | 27.39 |
+| A2, two boxes, coast + 2 | the north's west 10.61332 W | 85 + 74 = 159 | 26.60 | 28.12 |
+| B1, four boxes, coast + 1 | 31.6–34.16 × 10.19 W; 34.16–35.5 × 7.2 W; 27.33–29.47 × 13.17 W; 29.47–31.6 × 10.61 W | 38 + 9 + 26 + 15 = 88 | 13.79 | 15.30 |
+| B2, four boxes, coast + 2 | the same rows; west 10.61, 7.63, 13.17, 11.04 W | 44 + 13 + 26 + 21 = 104 | 17.15 | 18.66 |
+
+Level 3: 24 tiles, 1.52 MiB for eight harbour boxes; the coasts 0.25 MB a region. Every
+region is under 40 MiB in every option. The southern box cannot be narrowed: its rows 27.33
+to 29.47 N must reach the Canaries' east bound (13.17334 W), its rows to 31.6 N lie three
+degrees east of it. The four-box options split each region at a row edge (34.16 N; 29.46666 N,
+the Canaries' own north bound) and are the strip the brief asks for; the open sea west of
+their bounds is the coarse layers' (the corridor north of 31.9 N, `atlantic-south` south of
+it), whose water reaches every tile's edge.
+
+**The seams.** Against `strait` "2 kept" (its row 35.44 to 35.87 N, columns 6.77 to 5.92 W);
+against `canaries` "5 kept" (its column 13.6 to 13.17 W, rows 27.33 to 29.47 N); against the
+coarse layers nothing (another level). `git status` after the build: new files only, no tile,
+coast or index of another region changed; the manifest only adds the two entries (and its
+build hash). The coast south of 27.76 N between 13.6 and 13.17 W (by Tarfaya's south) lies in
+`canaries`' bounds and tiles already.
+
+**The gauges, by the rule for a block with none.** The neighbours' nearest within the reach:
+for the south, Arrecife (1.60 m, REDMAR) and Puerto de Cabras (1.53) of the Canaries, 154 to
+268 miles from its water, M2 0.81 to 0.84 m; listing it after `canaries`. For the north, the
+Strait's: Tarifa (55 miles from Larache, 287 from Safi), Ceuta, and Cadiz (`[portugal,
+strait]`): **none of them has a level read**, so the north's level falls to the eleven's
+(Le Conquet's 3.98 m), and Tarifa's and Ceuta's M2 (0.41, 0.30 m) is the Strait's inner tide,
+not the Atlantic coast's (about a metre, FROM MEMORY; Cadiz 1.03 m). Arrecife and Cabras
+reach the north's water south of about 33.5 N only (Dar el Beida is 410 miles off). Tarifa's
+level is readable: REDMAR 3540, NMM 69 cm and BMMI −10 cm on the gauge's zero (2010 to
+2017), **0.79 m above LAT**; Cadiz and Ceuta are not in REDMAR. Reading it would move the
+Strait's water (its level today the eleven's, the audit's `c-level:strait`): the lead's.
+
+**The audit, sampled, on the measuring build** (the two-box option A2, the sea named
+`morocco`): nine findings the list lacks. `a-unowned:morocco-north:north` (the tiles of the
+row 35.44 to 35.87 N west of 6.77 W, 4,117 square miles north of 35.5 N in no bounds),
+`a-unowned:morocco-south:west` (the column 13.6 to 13.17 W, 29.47 to 31.6 N, 2,822 square
+miles), `c-far` for each (no gauge yet), `d-no-box:morocco-north` and `d-split` for each
+(madeira 87 %, portugal 12 %; canaries and madeira half and half), `e-no-book` and
+`e-no-stream:morocco-north`. The gauges, the weather box, the `book_limits` box east of 9.34 W
+and a stream area mend the c, d and e ones. Option B leaves of the a-findings only the one or
+two tiles of the row 35.44 N west of 6.77 W (some 500 to 900 square miles north of 35.5 N).
+The strait's own `a-unowned:strait:west` now lies beside morocco-north's bounds; unchanged.
+
+**The shore's sweep** (EMODnet silent, GEBCO under 3 m): the north 590 cells in 20 places
+(the largest the lagoon of Moulay Bousselham, 34.85 N 6.28 W; the Tangier shore; Safi; Cape
+Blanco of the north); the south 2,415 in 79 (the lagoon of Khenifiss, 27.8 N 12.4 to 12.9 W):
+real water, to say so after the rebuild on the block's own water.
