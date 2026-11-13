@@ -274,6 +274,9 @@ REACH: dict[str, str] = {
     "ship.filled_away": "aboard",
     "ship.command_passes": "aboard",
     "ship.taken_up": "aboard",  # package 60: a captain takes command of her, or leaves her
+    # package 60, step 2: her people and hands moved to another ship of his, and come aboard
+    "company.transfer": "aboard",
+    "company.came_aboard": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",

@@ -270,6 +270,13 @@ def take_up(
     vessel = getattr(hull, "vessel", None)
     if vessel is not None:
         vessel.brain = None  # the player's ship is awake always (crews.crewed)
+        if getattr(vessel, "regime", "") == "in ordinary":
+            # out of ordinary in his hands (package 60, step 2: a ship the director laid up
+            # and gave him read as laid up still, her keepers alone wanted to work her)
+            vessel.regime = ""
+            vessel.sortie = ""
+            vessel.commission_tick = -1
+            vessel.goal = ""
     _seat_follows(root, person, hull)
     root.__dict__["_players"] = str(hull.id)
     # the hull he left, kept with no far brain, is woken within the range again

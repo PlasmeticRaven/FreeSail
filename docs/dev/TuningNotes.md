@@ -27193,3 +27193,42 @@ hull's captain, not the firing hull's own, now marks her when she fires); `follo
 to every save; the "came aboard from the the ..." line read "from the ...". And from this commit:
 the weigh's line at the order in (A), and (from step 1's item 6) a weigh or an unmoor given while
 she comes to an anchor is begun when she is brought up, not belayed with no word.
+
+### Step 2: the company moved (2026-11-13)
+
+`transfer <who> [from the "Y"] to the "X"[, and lay the Y up]` (`orders/command.py`,
+`world/transfer.py`; the design's §6): persons by name, 'the people', hands by count ('fifteen
+hands') and by rating ('six able seamen and four ordinary'), between the ship he commands and a
+ship of his to man (one he has left, `command.HULLS_LEFT`, or one given him), within a boat's
+pull (`movement.BOAT_BETWEEN_NM`, a mile) or alongside (within 30 m, JUDGEMENT). 74's muster
+functions are lifted into `world/musters.py` (`remuster`, `deal_watches`, `take_out`), 74's
+callers in `prizes.py` kept under their old names; the draw is 74's (fit, at no work, no post,
+by id; the ratings first).
+
+The JUDGEMENT figures of §6, as filed (`world/transfer.py`): twelve men a load (`LOAD_MEN`); a
+load's round, pulled across, cleared and back, a quarter of an hour within two cables
+(`LOAD_NEAR_S`, 900 s) and half an hour at a mile (`LOAD_MILE_S`, 1,800 s), by the distance
+between; alongside, the whole by the gangway in a quarter of an hour (`ALONGSIDE_S`); worked by
+one watch at her sail-handling stations, never fewer than four (`worked_by`: the cutter's 8 + 10
++ 6 gives 12, the topsail schooner's 17); berths a complement and a half (`berths`: the cutter's
+45, the schooner's 60), counted against her hands and her persons aboard; a ship laid up keeps
+her keepers alone (§4.1: a King's ship her warrant officers, persons, and no hand; a merchantman
+her mate and a ship-keeper, one hand, `MERCHANT_SHIP_KEEPER_HANDS`).
+
+Measured (`tests/test_company_moved.py`; the merchant cutter at anchor in Carrick Road, the
+topsail schooner Fly laid up in ordinary at Falmouth some 234 m off by the director's word and
+given him, taken up with the cutter laid up): `transfer fifteen hands to the Fly` is two loads,
+twelve in the boat at once and in neither muster, the first aboard her at the order's tick + 900
+and the second at + 1,800, each said in her log ("Twelve hands came aboard from the Sherbourne
+(the first load of two); twelve hands sign the Fly's articles."), the cutter's muster fifteen
+fewer and the Fly's fifteen more, the ids told apart where they met; the boat away the while
+(`BoatState.errand` "transfer") and every other order of the boat's refused. Refused in words:
+the Fly giving more than she can spare ("she wants seventeen hands to be worked. Transfer fewer,
+or lay her up first."), the Fly past her berths (ten gone across before it: "The Fly berths sixty;
+she has fifty-five, and would have 74."), a name nobody of hers answers to, the Amazon's people to a merchantman ("borne on
+the King's books"), and a King's ship's company turned over by her captain's order at all (by the
+Admiralty's, the director's form, not built in this step).
+
+Found on the way and mended: a ship laid in ordinary by the director and given him was still in
+ordinary once he had taken command of her (her keepers alone wanted to work her); `take_up` now
+takes her out of ordinary in his hands.

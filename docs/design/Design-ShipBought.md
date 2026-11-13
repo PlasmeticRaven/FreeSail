@@ -1190,3 +1190,33 @@ stood off her hull then and stands at it now (§9.2), so the ships about her see
 lead's trunk checkpoint agreed at 600 ticks and parted by 3,600. No legacy mode keeps the drift;
 the save of this build carries `followed_body`, and the loader says so in words of a save without
 it whose inputs show it was played aboard another ship (`replay.followed_body_words`).
+
+### Step 2 (2026-11-13)
+
+**First, the three the lead's review of 1eb18434 found** (b2290253, each with a test that fails
+without it): a weigh or an unmoor given as she comes to an anchor says at the order that it waits
+for the anchor (every ship's); only the boat that brought him goes home at the act; the switch
+wakes the hulls he has left and no other hull without a far brain. The tuning notes name the
+changes to ordinary games.
+
+**Built as the note says:** `transfer ... to the "X"` (§6.2), persons by name rehomed by
+`Registry.rehome` and put aboard by `put_aboard`, hands by count and by rating drawn as 74 draws
+them, 74's muster functions lifted into `world/musters.py` with 74's callers kept; the boat's
+loads in their time by the JUDGEMENT figures of §6.2, the men in the boat in neither muster,
+each load said in the receiving ship's log; merchant hands said to sign her articles; the
+refusals of §6.3 (worked by one watch at her sail-handling stations, never fewer than four;
+berths a complement and a half; a King's ship's company; beyond a boat's pull; the boat away;
+under way; a prisoner; an observed world). Truth 7-484.
+
+**Taken another way:** a load's time is its round, and its men come aboard at its end; the next
+load's men leave the giving muster as the load before comes aboard. The boat is away for the whole
+transfer (`BoatState.errand` "transfer"), so that every other boat order is refused meanwhile.
+Given aboard the receiving ship, the giving ship is the one the words name (`from the "Y"`) or
+the one other ship of his within a boat's pull. 'The hands' are every hand she can spare. A ship
+laid up keeps her keepers (§4.1: a King's ship's warrant officers, a merchantman's mate and one
+hand as ship-keeper), by the order's own tail (`..., and lay the Amazon up`) or laid up before.
+A King's ship's company is refused to the captain's order altogether, since §6.3 turns it over by
+the Admiralty's order alone; the director's form for a turn-over is not built in this step.
+
+**Found and mended:** a ship laid in ordinary by the director and given him stayed in ordinary
+after he took command of her; `take_up` takes her out of it.

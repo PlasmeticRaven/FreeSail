@@ -25,7 +25,14 @@ __all__ = ["COMMAND_VERBS", "execute", "parse"]
 
 Result = tuple[str, str, dict[str, Any]]
 
-COMMAND_VERBS: tuple[str, ...] = ("take command of",)
+COMMAND_VERBS: tuple[str, ...] = ("take command of", "transfer")
+
+# `transfer <who> [from the "Y"] to the "X"[, and lay the Y up]` (step 2, the design's §6.2)
+_TRANSFER = re.compile(
+    r"^(?P<who>.+?)(?:\s+from\s+(?P<giver>.+?))?\s+to\s+(?P<to>.+?)"
+    r"(?:,?\s+and\s+(?:lay|laying)\s+(?:the\s+)?(?P<lay>.+?)\s+up)?$",
+    re.I,
+)
 
 _HER = frozenset({"", "her", "this ship", "this one", "the ship she is", "it"})
 _LAY = re.compile(
@@ -70,6 +77,8 @@ def execute(ship: Any, order: Order) -> Result:
     from freesail.world.movement import hull_of
     from freesail.world.orders import WorldOrderError, hull_named
 
+    if order.verb == "transfer":
+        return _transfer(ship, order)
     world = world_of(ship)
     if world is None or getattr(world, "clock", None) is None:
         raise OrderError("'take command of' wants a ship in a world; this one sails alone.")
@@ -95,3 +104,48 @@ def execute(ship: Any, order: Order) -> Result:
     except CommandError as e:
         raise OrderError(str(e)) from None
     return "ship.taken_up", text, {"verb": order.verb, "level": 1, **data}
+
+
+def _transfer(ship: Any, order: Order) -> Result:
+    """`transfer ... to the "Fly"` (step 2; `world.transfer.transfer`)."""
+    from freesail.world import knowledge
+    from freesail.world.hulls import world_of as root_of
+    from freesail.world.orders import WorldOrderError, hull_named
+    from freesail.world.transfer import TransferError, transfer
+
+    world = world_of(ship)
+    if world is None or getattr(world, "clock", None) is None:
+        raise OrderError("'transfer' wants a ship in a world; this one sails alone.")
+    root = root_of(world)
+    person = knowledge.players_person(root)
+    if person is None:
+        raise OrderError("Nobody of yours is at the prompt to move a ship's people.")
+    text = " ".join(str(order.object or "").split()).strip().rstrip(".")
+    m = _TRANSFER.match(text)
+    if m is None:
+        raise OrderError(
+            "Say whom and to which ship: 'transfer the people and the hands to the \"Fly\"', "
+            "'transfer twenty hands to the \"Fly\"', 'transfer Mr Ryan and twelve hands to ...'."
+        )
+
+    def named(words: str) -> Any:
+        words = " ".join(words.replace('"', " ").split())
+        try:
+            hull = hull_named(root, words, make=False)
+        except WorldOrderError as e:
+            raise OrderError(str(e).rstrip(".") + ".") from None
+        return root.players if hull is root else hull
+
+    receiver = named(m.group("to"))
+    giver = named(m.group("giver")) if m.group("giver") else None
+    lay = m.group("lay")
+    if lay:
+        laid = named(lay)
+        if giver is not None and laid is not giver:
+            raise OrderError("The ship laid up by a transfer is the one her people leave.")
+        giver = laid
+    try:
+        said, data = transfer(root, person, receiver, m.group("who"), giver=giver, lay_up=bool(lay))
+    except TransferError as e:
+        raise OrderError(str(e)) from None
+    return "company.transfer", said, {"verb": order.verb, "level": 1, **data}

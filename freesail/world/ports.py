@@ -874,7 +874,7 @@ class BoatState:
         if self.hull:
             who = f", {self.commander} in her" if self.commander else ""
             return f"{self.boat_name} manned and away as a hull of her own{who}"
-        if self.errand == "to_ship":
+        if self.errand in ("to_ship", "transfer"):
             return f"{self.boat_name} away to the {self.to_name or 'ship'}, {self.phase}"
         return f"{self.boat_name} away {_errand_words(self.errand)}, {self.phase}"
 
@@ -1272,6 +1272,7 @@ def _errand_words(errand: str) -> str:
         "landing": "to land a person who stays ashore",
         "fetch": "to bring a person off from the quay",
         "to_ship": "to another ship",  # package 82: a person put aboard her, or fetched
+        "transfer": "with her people for another ship",  # package 60, step 2
     }.get(errand, errand)
 
 

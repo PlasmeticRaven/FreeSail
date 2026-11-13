@@ -2687,6 +2687,12 @@ class Dealings:
             # the boat at another hull and back (package 82): no port's job
             self._boat_to_job(job)
             return
+        if job.kind == "transfer":
+            # a load of her company come aboard another ship of his (package 60, step 2)
+            from freesail.world.transfer import apply_load
+
+            apply_load(self, job)
+            return
         port = self.ports.get(job.port_id)
         if port is None:
             return
@@ -3131,8 +3137,10 @@ class Dealings:
         booms again, whoever was to go in her is on deck, and the log says so. A boat
         already away is not belayed (`orders.work`), so that she cannot vanish from the
         water; were she found so, she is brought alongside as on her return."""
-        if self.boat.errand in ("to_ship", "manned", "towing"):
-            return  # the boat at another hull, manned or towing (package 82): not the runner's
+        if self.boat.errand in ("to_ship", "manned", "towing", "transfer"):
+            # the boat at another hull, manned or towing (package 82), or putting her people
+            # across to another ship of his (package 60, step 2): not the runner's
+            return
         runner = self.world.ship.extra.get("evolutions")
         if runner is None:
             return
