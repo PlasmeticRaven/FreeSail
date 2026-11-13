@@ -27262,3 +27262,38 @@ the known truths (`--slow -m "slow and not pace"`, `tests/test_chart_audit.py` a
 them; the pace alone and last (`--slow -m pace -n 0`): exit 0, 15 passed. **No pin moved;
 no data file changed.** The tree reported differs from cd46734 by this paragraph and the
 pace's above alone.
+
+## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
+
+**What changed.** A port's dated record seeds the port on the scenario's first day and the
+port is then the world's. `Ports.tick` applies no row unless the scenario says
+`follows_history: true` (`Scenario.follows_history`, false where absent, kept out of the
+save when false so that every save reads as before); then each row of a dated key, and of
+the holder, that begins or ends on a day is that day's event (`Port.on_events`, the days
+since the last turn, so that a clock that jumps a day still takes it), and a key with no
+event keeps what play has made of it. `Ports.stance` reads the port's own holder
+(`port.nation`), as the market's prices and the prize court already did, where it read the
+running day's (`nation_on`). The regimes' dated blockades (`business._blockades`, package
+79a) are read on the scenario's first day, and by the running day only where it follows
+history. The scenario says it in its lines and on the harbour's list in the world's words
+(`scenarios.HISTORY_WORDS`). **Left on the calendar:** a light's years, the private signal
+tables' months, the market's season, a hull's wear. **Until the review designs one (packages
+103b and 92), nothing in play writes a port's holder or a war:** the director's port order
+closes and opens a port to a nation and sets a price; `Nations.declare_war` and `make_peace`
+are called by tests alone.
+
+**Superseded by design, old beside new** (the owner's standing rule of 2026-11-12):
+`tests/test_ports.py`'s `test_dated_rows_turn_with_the_worlds_day` (package 105: begun on
+4 September 1800 and run into the 5th, the test port open with a yard) is now two tests:
+without the key it stays blockaded with the chandlers'; with it, open with a yard, as
+before. In `test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_frances`
+(package 79d) the stance run from 3 June 1805 into the 4th was hostile; it is now neutral
+without the key and hostile with it. Truth 7-299, truth 7-530 and every truth that loads a
+port by its start day stand unchanged. **The fault mended:** a director's `closed_to` on a
+port with dated `closed_to` rows was overwritten at the next day's turn (truth 7-582).
+
+**What moves:** no port file on the trunk gives a key as dated rows, and the dated holders
+(Genoa, Barcelona, Rosas, Tarragona, Valencia, Tabarka, Carloforte) change only where a game
+runs across a row's day; no recorded passage does (they are `channel-west`'s, business off).
+The blockade reader moves only a region entered after the first day, its blockades now the
+first day's. Truths 7-580 to 7-584.

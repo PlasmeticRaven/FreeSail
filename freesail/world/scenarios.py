@@ -155,6 +155,14 @@ from freesail.world.weather_script import WeatherScript
 DEFAULT_SEED = 1805
 
 
+# What a scenario that follows the historical course says of it, in the world's words (decision
+# 69): read by the scenario's lines and by the harbour's list.
+HISTORY_WORDS = (
+    "The world keeps to the course of history: the ports change hands and their state as the "
+    "record has it, each on its own day."
+)
+
+
 class ScenarioError(ValueError):
     """A scenario file that cannot be read, in words that name the file and the field."""
 
@@ -205,6 +213,8 @@ class ScenarioFile:
                 )
             else:
                 out.append(f"She starts at {where}{chart}.")
+        if self.scenario.follows_history:
+            out.append(HISTORY_WORDS)
         if self.script is not None:
             out += ["The weather: " + self.script.lines()[0]]
             out += ["  " + ln for ln in self.script.lines()[1:]]
@@ -460,6 +470,14 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         # the chart whole (spec M6 §26; package 38): the file may say either or both, the
         # chart winning; a region's name is a chart of that one region
         sc.chart = str(raw["chart"])
+    if "follows_history" in raw:
+        # decision 69: the record's dated rows applied as the days come (True), or the record
+        # the world's seed on the first day alone (False, the default)
+        if not isinstance(raw["follows_history"], bool):
+            raise ScenarioError(
+                f"{where}, follows_history: true or false, not '{raw['follows_history']}'."
+            )
+        sc.follows_history = raw["follows_history"]
     if (sc.chart or sc.region) and sc.position is None:
         raise ScenarioError(
             f"{where}: the chart region '{sc.chart or sc.region}' needs a position "
