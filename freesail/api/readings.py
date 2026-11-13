@@ -2659,6 +2659,29 @@ def _where_am_i(world: Any, _: str | None) -> dict[str, Any] | None:
     return {"words": where_am_i(world, person), "ship": str(getattr(person, "hull", "") or "")}
 
 
+def _keeping(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`my keeping` (package 109; the owner's play of 2026-11-12, note 5): what the asker
+    keeps and what lies in the place he stands in, by their listed names; the asker the
+    order's actor, as `where am I`'s."""
+    from freesail.orders.free import reach_words
+    from freesail.world import things as TH
+    from freesail.world.movement import person_of_actor
+
+    extra = getattr(getattr(world, "ship", None), "extra", None)
+    actor = (extra or {}).get("order_actor") if isinstance(extra, dict) else None
+    person = person_of_actor(world, actor or "captain")
+    if person is None:
+        return None
+    kept = TH.kept_by(world, person)
+    said = reach_words(world, person)
+    if not said:
+        words = "You keep nothing, and nothing lies here."
+    else:
+        parts = [p.strip() for p in said.split("; ")]
+        words = " ".join(f"{p[:1].upper()}{p[1:]}." for p in parts)
+    return {"words": words, "kept": [t.id for t in kept]}
+
+
 def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
     ports = getattr(world, "dealings", None)
     return ports.boat_reading() if ports is not None else None
@@ -2916,6 +2939,19 @@ REGISTRY.add(
         none_words=_no_people_words,
         per_asker=True,
         where=("aboard", "ashore", "asleep", "boat"),
+    )
+)
+REGISTRY.add(
+    Reading(
+        "keeping",
+        ("my keeping",),
+        "query",
+        "",
+        _keeping,
+        description="what you keep and what lies where you stand, by the names they are known by",
+        none_words=_no_people_words,
+        per_asker=True,
+        where=("aboard", "ashore", "boat"),
     )
 )
 REGISTRY.add(
@@ -4149,6 +4185,78 @@ def _truth_signals(body: Any, true_nation: str, world: Any) -> dict[str, Any]:
     return out
 
 
+def _truth_prizes(world: Any) -> dict[str, Any]:
+    """The truth's rows for package 74 (the design's §8): every prize with her captor, her
+    prize crew and her prisoners, where she is bound and whether she is in company; every
+    hull's prisoners and their paroles; every far action in its rounds; the courts pending
+    and sat; a court martial sitting."""
+    from freesail.world import prizes as P
+    from freesail.world.court import sitting
+
+    out: dict[str, Any] = {}
+    sea = getattr(world, "vessels", None)
+    prizes: list[str] = []
+    courts: list[str] = []
+    for v in getattr(sea, "vessels", None) or []:
+        rec = P.record_of(v)
+        if not rec or v.done:
+            continue
+        if P.is_prize(v):
+            where = "in company" if rec.get("company") else "parted"
+            captor = rec.get("captor_name", "captor")
+            master = rec.get("master") or "a prize master"
+            prizes.append(
+                f"{v.name}, a prize of the {captor}'s ({rec.get('how')}): {master} and "
+                f"{rec.get('crew', 0)} hands, {rec.get('prisoners', 0)} prisoners, bound for "
+                f"{rec.get('goal') or 'port'}, {where}"
+            )
+        court = rec.get("court")
+        if court:
+            courts.append(
+                f"{v.name}: {court.get('sentence')} by {court.get('court')}, "
+                f"£{float(court.get('paid', 0.0) or 0.0):,.0f} paid"
+            )
+        elif rec.get("court_due") is not None:
+            courts.append(
+                f"{v.name}: the court sits at {rec.get('court_port')} at tick {rec['court_due']}"
+            )
+    prisoners: list[str] = []
+    for hull in (getattr(world, "hulls", None) or {}).values():
+        pris = P.prisoners_of(getattr(hull, "ship", None)) if getattr(hull, "ship", None) else None
+        if pris is None or (pris.count == 0 and not pris.parole):
+            continue
+        paroles = ", ".join(f"{n} ({s})" for n, s in sorted(pris.parole.items())) or "none of rank"
+        prisoners.append(
+            f"{getattr(hull.ship, 'name', hull.id)}: {pris.count} prisoners; the paroles: {paroles}"
+        )
+    actions: list[str] = []
+    for v in getattr(sea, "vessels", None) or []:
+        brain = getattr(v, "brain", None)
+        if v.done or brain is None or brain.state != "engaging":
+            continue
+        mark = sea.get(str(brain._stranger or ""))
+        rounds = int((getattr(v, "damage", None) or {}).get("rounds", 0) or 0)
+        actions.append(
+            f"{v.name} engaging {mark.name if mark is not None else 'her mark'}, "
+            f"{rounds} rounds fired"
+        )
+    cm = sitting(world)
+    if cm is not None:
+        courts.append(
+            f"a court martial sits at {cm.get('port_name')} on {cm.get('person')} for the loss "
+            f"of the {cm.get('ship_name')}"
+        )
+    if prizes:
+        out["prizes"] = prizes
+    if prisoners:
+        out["prisoners"] = prisoners
+    if actions:
+        out["far_actions"] = actions
+    if courts:
+        out["courts"] = courts
+    return out
+
+
 def director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
     """The truth as the director reads it: every ship's true position, heading, speed,
     sail and state (the player's first, by her name, then every vessel on the sea with her
@@ -4340,6 +4448,9 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             except Exception:  # noqa: BLE001
                 pass
     out["people"] = people
+    out.update(
+        _truth_prizes(world)
+    )  # package 74: the prizes, the prisoners, the far actions, the courts
     # the persons ashore at every port, of every hull's company (package 84, step 9)
     registry = getattr(world, "registry", None)
     ashore: list[str] = []

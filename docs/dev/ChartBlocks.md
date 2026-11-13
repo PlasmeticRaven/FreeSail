@@ -125,6 +125,42 @@ region's, its tide and its weather are rows in tables that already reach its wat
    least in its market, a yard's or a chandler's topmast and water, the three ratings
    of the crew pool and the pilot's four words (`channel`, `marks`, `anchorage`, `tide`):
    a small Moorish town has them too, judgement and said so (package 39f).
+   **What was true only for some years is written in dated rows** (decisions 66 and 67;
+   package 105, step 1). Beside `nation:` (79a's and 79d's form), a port file's `state`,
+   `dockyard`, `closed_to`, `market`, `crew_pool` and `pilot` (`ports.DATED_KEYS`) may each
+   be one value, as every file before 105 gives them, or a list of rows, each a mapping
+   that names the key with its value for those years, its `since` and `until` (ISO days,
+   either left open, both counted in, as the nation's rows are) and its `source`:
+
+   ```yaml
+   dockyard:
+     - dockyard: {kind: chandlers, items: [...]}
+       until: 1800-09-04
+       source: "the Order's arsenal ... (the work, its page)"
+     - dockyard: {kind: yard, items: [...]}
+       since: 1800-09-05
+       source: "..."
+   closed_to:
+     - {closed_to: [britain], since: 1798-06-12, until: 1800-09-04, source: "..."}
+   state:
+     - {state: blockaded, blockade: {by: britain, since: "1798"}, since: 1798-09-01, until: 1800-09-04, source: "..."}
+   ```
+
+   The row in force on the scenario's first day is loaded into the port's field, and the
+   ports' tick puts each dated key to the world's day when the day turns (`Port.on_day`),
+   so everything that reads the key reads the day's row. A day that no row covers reads
+   the key as if the file gave none (no closures; the port open; the defaults of a pilot,
+   a market, a chandler's and a pool with nothing in them): write a row for every year the
+   game may be set in, or say why not. With no day (the harbour's lists) the first row is
+   read. A `state:` row carries its own `blockade:`, laid over a top-level `blockade:`; a
+   scenario's `ports:` entry goes over every row (its `state:` over each, its `closed_to`
+   added to each). Rows that overlap, a row with no `source`, a day not in the ISO form and
+   a row that ends before it begins are refused in words. **Every row is held to what one
+   value is held to**: `tests/test_ports.py` reads each port's ten goods, its yard's or
+   chandler's topmast and water, the three ratings and the pilot's four words on the
+   loaded port, that is on its scenario's day only; a block whose ports give rows reads
+   the same of each row (load the port on a day inside each), and a yard's `kind` is
+   `yard` or `chandlers` in every row.
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; Vigo it has (package 39c,
    the IEO's and Puertos del Estado's series; its UHSLC series has every phase an hour
@@ -181,7 +217,19 @@ region's, its tide and its weather are rows in tables that already reach its wat
    biscay-south]`, Cadiz's `[portugal, strait]`; `test_tide.py` holds it over every
    gauge). A block that adds a gauge within ten miles of a seam with another block lists
    that block too; the taper smooths a block's open edges, the rule the seams near a
-   gauge, and a seam between two blocks far from every gauge stays a step (a finding). **The seam's taper** (package 94): where a block's bounds meet charted
+   gauge, and a seam between two blocks far from every gauge stays a step (a finding). **A block with no gauge of its own** (the lead's ruling of
+   2026-11-11, package 104): where no gauge lies within a block's bounds (TICON has none on
+   the Algerian coast east of Algiers, on Tunis's, or in the open sea between Minorca and
+   Sardinia), the seams' rule alone leaves the block no block of the tide's and its water
+   the eleven's, the nearest far gauge's (Saint-Malo's M2 of 3.7 m and mean level of 6.83 m
+   over the Sardinian sea): the fault, not the rule to keep. Such a block is served by its
+   neighbours' nearest gauges within the reach, each listing it after its own (Mahón's
+   `[balearics, sardinian-sea, tunis-coast]`, Carloforte's `[tyrrhenian, sardinian-sea,
+   tunis-coast]`, Cagliari's `[tyrrhenian, tunis-coast]`), the level the blend's of those
+   that have one (Mahón's 0.20 m there); `test_tide.py`'s seam test names the gauges so
+   ruled beside the band's, and a test proves nothing outside the gaugeless blocks moves
+   (the membership is by bounds). Decide it before the build: the fill raise follows the
+   tide. **The seam's taper** (package 94): where a block's bounds meet charted
    water no block holds (a region's or the corridor's: 1 W where channel-mid meets
    channel-east, 48 N where Biscay north meets the Channel west, Biscay's and Portugal's
    ocean edges; not a seam between two blocks, and not an edge beyond which nothing is
@@ -719,3 +767,41 @@ Gulf's, and the depth does not step at 3 E. What it found, for the next blocks:
 - **The isles the grid lacks, again**: the Medas, Tabarca and the Hormigas (Formigues) are
   water in EMODnet's grid; given as islands the grid lacks (the first two) and a rock of
   its height (the third), as the pilots name them.
+
+## The Sardinian sea and the coast of Tunis (package 104, as built)
+
+`sardinian-sea` (36.29334 to 40.56 N, 4.5 to 8 E) and `tunis-coast` (36.29334 to 38.5 N, 8 to
+11.1466 E): the chart's L-shaped hole, the open sea between Minorca and Sardinia and the arm
+along Barbary to Cape Bon, closed in one package. The Sardinian sea's west bound is
+`balearics`' east bound (its column to 4.75 E kept the Balearics', "10 kept"), its north bound
+`gulf-of-lion`'s row edge, its east bound `tyrrhenian`'s west bound (its column 7.73 to 8.16 E
+the Tyrrhenian's north of 38.43 N, "5 kept", and the Sardinian sea's south of it); the coast
+of Tunis meets the Tyrrhenian at 38.5 N ("8 kept") and the Sardinian sea at 8 E ("5 kept").
+What it found, for the next blocks:
+
+- **A bound on a tile edge must sit inside it.** `tiles_over` takes in the row below a south
+  bound and the column beyond an east bound that fall even a metre past the edge: the brief's
+  36.2933 (3.7 m below the row edge 36.29333...) and 11.1467 (past the column edge 11.14667)
+  would each have taken a row or a column more (`tunis-coast` 54 tiles, not 35). The bounds
+  are written 0.7 m and 7 m inside their edges.
+- **Deep water costs about 200 KB a tile**: 75 level-2 tiles of the Sardinian sea 14.7 MB, 35
+  of the coast of Tunis 6.1 MB; with ten patches (74 level-3 tiles, 5.1 MB) and the coasts,
+  26 MB for the two, the lead's estimate from the neighbours' sizes.
+- **A block with no gauge of its own** takes its neighbours' nearest (the tide's paragraph
+  above, the lead's ruling): without it the Sardinian sea had Saint-Malo's tide.
+- **The block's own water floods the lakes behind the shore**: rebuilt on Mahón's 0.20 m (the
+  measuring build had Saint-Malo's 6.83), the sweep found the lake of Tunis, Porto Farina's
+  lagoon and the Medjerda's flats, the lakes and marshes behind La Calle and Bona (26,765
+  cells in the coast of Tunis, 3,857 in the Sardinian sea): real water, left as water.
+- **The period's longitudes are minutes out here**: Smyth's 1823 positions of the Fratelli
+  two minutes west of the grid's islet; the pilots' Keith's reef seven minutes east of the
+  grid's shoal head of the Skerki bank. Place a danger on the grid's head and say the
+  pilots' place in `fix`.
+- **A coast of capes wants every port's tracks out to a lane**: every straight line between
+  two ports of either region crossed a cape (the Seven Capes, Cape de Fer, Cape Serrat, the
+  Fratelli, Plana); each port's `tracks:` run out to a coast lane north of the capes (37° 12′
+  N for the Algerian five, 37° 18′ to 37° 25′ N for Tunis's), checked leg by leg with
+  `Chart.line_shore` as the business's guard reads it.
+- **The pilots' bearings on this coast are magnetic** (Purdy's, with the true in brackets;
+  the variation about 17 to 18 degrees west then): the road of Tunis placed by Purdy's
+  bearings made true.

@@ -1,0 +1,53 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"147,19": [
+"pisan-island"
+],
+"147,20": [
+"mount-goureya",
+"cape-carbon",
+"bougie",
+"bougie-castle",
+"bougie-road"
+],
+"147,22": [
+"cape-cavallo",
+"salamandre-bank"
+],
+"147,23": [
+"djidjelli",
+"djidjelli-anchorage",
+"djidjelli-reef"
+],
+"147,26": [
+"collo-road"
+],
+"147,27": [
+"srigina",
+"stora",
+"stora-anchorage"
+],
+"147,30": [
+"mount-edough"
+],
+"147,31": [
+"cape-de-garde",
+"cape-de-garde-light",
+"fort-genois",
+"fort-genois-anchorage",
+"bona",
+"cassarin-anchorage"
+],
+"148,25": [
+"seven-capes",
+"cape-bougaroun"
+],
+"148,26": [
+"collo"
+],
+"148,28": [
+"cape-de-fer"
+]
+}
+}

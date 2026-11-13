@@ -41,6 +41,7 @@ BUSY_SCENARIOS = {
     "lugger-roscoff.yaml",
     "dispatches-falmouth.yaml",  # the director's test of 2026-10-18, the business about her
     "the-channel-observed.yaml",  # package 82: the Channel observed, the business about the view
+    "prize-home.yaml",  # package 74: a prize's passage home, the cruisers of both sides about her
 }
 
 

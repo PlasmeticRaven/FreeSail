@@ -1,0 +1,52 @@
+# FreeSail: the prize's passage home (package 74, step 7; docs/design/Design-Prizes.md §8;
+# spec M7 §18). The frigate Amazon off the Lizard bound for Falmouth with the French merchant
+# brig Deux Frères in company as her prize under a prize master, the business on about them
+# and a director above the game on the quiet passage's brief: the prize crew's fatigue, the
+# prisoners below, a cruiser of theirs coming up or a gale parting the two are the
+# director's to bring about by plausible causes; at Falmouth the court sits on her in its
+# days and the prize money is paid by the eighths (the primer's chapter 27). The possession
+# is the scenario's own world order two minutes in, when the brig has been made a full ship
+# beside the frigate; nothing is pinned on this file.
+#     py -m freesail.ui.server --scenario data/scenarios/prize-home.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/prize-home.yaml
+
+name: The prize's passage home, off the Lizard for Falmouth
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.7000, lon_deg: -5.4000}   # eight miles south-west of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  name: Amazon
+  heading_deg: 20
+  glass: true
+  instrument: sextant
+intent: bound for Falmouth
+
+people:
+  - {role: captain, name: Captain Bowen}
+  - {role: master, skill: 0.8}
+
+papers:
+  chart: {year: 1804}
+  epitome: moore
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+business: on
+
+# The prize beside her: a French merchant brig of Brest, three cables on the quarter, made
+# a full ship at the first switch and taken possession of by the world order below.
+ships:
+  - {id: deux-freres, description: merchant brig, name: Deux Frères, nation: france,
+     position: {lat_deg: 49.6960, lon_deg: -5.3960}, goal: "bound for Brest", colours: shown}
+
+world_orders:
+  - {at: 1805-06-12T10:02, order: 'ship "Deux Frères": a prize of the Amazon'}
+
+orders:
+  - set plain sail
+
+director:
+  brief: quiet-passage
