@@ -26711,6 +26711,36 @@ passed. No digest moved; no game line about a hoist or the colours moved (the lo
 `dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
 records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
 
+**Step 5: the nations' days.** `days.yaml` for Britain (7 days), Spain (7) and France (5),
+each dated by its years. On a day, a ship of the sea at anchor under a rules captain dresses
+of herself by day and undresses at sunset (not logged; the lookout's words of her flags say
+"she is dressed in her flags"); the player's ship does not: lying at anchor, her first
+lieutenant reminds the captain once that day ("It is the King's birthday, sir: the ships in
+harbour will be dressing"). **Stopped and reported, the salute:** the gunnery has the gun to
+leeward (one loaded gun, "the shot to strike nothing") and no blank: `charges.py` leaves the
+saluting charge out (package 77's), there is no train of guns fired at an interval, a gun
+fired is a shot from a loaded gun, and the far ships fire nothing but their far action's
+rounds. A salute wants: a blank load (powder, no shot) and its cartridge drawn from the
+magazine (the table's saluting charge), a train of N guns of a side fired one at a time at
+the interval (not read in any source held: FROM MEMORY five seconds), each reloaded with
+blank in turn, the guns heard at the guns' range by the ships about her, and the far ships'
+salutes heard as their guns; more than a short new act. **Not built, splice the main
+brace:** the stores keep provisions as days at full allowance and water in tons, no spirits
+apart; an extra issue wants a spirits store first (package 54's stores).
+
+**Step 5 and decision 69 (the lead's word of 2026-11-13).** The days are read by the date of
+the world's own clock (`world.clock.ship_time`), as the calendar carries them: a day is kept
+in its `years`, and the reigns those years follow (a king's birthday ends with the king; the
+French days pass from the Saint-Louis to the Republic's fêtes, the Saint-Napoléon and the
+Saint-Louis again) are read as the calendar's, by the lead's word ("a king's birthday is the
+calendar's"). Nothing in step 5 reads who is at war or who holds a port: a ship dresses on
+her own nation's day wherever she lies at anchor, at home, abroad or off an enemy's coast,
+and the first lieutenant's word is said wherever the player's ship lies at anchor; no line
+asks whose the port is. Left for package 103's design, said not built: when a state can
+change its government in play, which house reigns is the world's own, and the days' years
+would then be read against that state and not the date (the French days from 1792 are the
+plainest case).
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
