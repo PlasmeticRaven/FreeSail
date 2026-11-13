@@ -2507,6 +2507,27 @@ class Captain(Judgement):
             data={"order": text, "state": state, "intent": self.intent_words},
         )
 
+    def give_up(self, to: str, late: str = "") -> None:
+        """Her command given up to the player's person taking command of her (package 60,
+        `world/command.take_up`): called before the command passes, so that the man named is
+        her own late captain; his state's book struck, his intent and plan kept for
+        `captain: carry on`, which is the new captain's to give. Nothing said where he did
+        not command."""
+        if not self.commands or self.state is None:
+            return
+        late = late or self.name
+        self.aside = True
+        state = self.state
+        self._leave(state)
+        self.state = None
+        self.world.record(
+            Severity.NOTABLE,
+            "captain.aside",
+            f"{late} gives up her command to {to}, and his book '{state}' is struck.",
+            actor=actor_for(state),
+            data={"order": f"take command: {to}", "state": state, "intent": self.intent_words},
+        )
+
     def carry_on(self) -> str:
         """`captain: carry on`: the captain commands again from where she is, his plan
         worked afresh at his next judgement; the words for the journal."""

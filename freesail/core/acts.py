@@ -144,14 +144,16 @@ def target_of(world: Any, entry: dict[str, Any]) -> Any:
 
 def act_target_of(world: Any, entry: dict[str, Any]) -> Any:
     """The world an act is given to again (`give`): as `target_of`, but an act keyed "" is
-    the player's own hull's (`hull_id_of`), not the followed hull's as an input's is
+    the game's first hull's (`hull_id_of`; package 60), not the followed hull's as an input's is
     (`World.submit` names a hull only when she is not followed), so it is given to her by
     her own handle when another hull is current or followed (package 97: under `follow` it
     landed on the followed hull); the World itself otherwise, as in every recorded passage."""
     if not str(entry.get("ship") or ""):
-        players = getattr(world, "players", None)
-        if players is not None and getattr(world, "own", None) is not players:
-            return players
+        # the game's first hull (package 60: "" is `PLAYER_ID`'s, the first hull's for the
+        # whole game, whichever ship is the player's; the same hull in every save before)
+        first = (getattr(world, "__dict__", None) or {}).get("_own")
+        if first is not None and getattr(world, "own", None) is not first:
+            return first
     return target_of(world, entry)
 
 
