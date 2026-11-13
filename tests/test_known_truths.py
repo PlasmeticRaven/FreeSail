@@ -16143,3 +16143,33 @@ def test_truth_7_541_a_thing_is_taken_by_its_listed_name_two_are_told_apart_and_
     assert w.submit("read the letter from Mr Gill").data["thing"].startswith("letter_from_mr_gill")
     e = w.submit("open the first letter")
     assert e.data["thing"] == "letter_from_the_admiralty_to_the_captain" and e.data["moved"]
+
+
+def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
+    """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
+    the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
+    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    is away within ten minutes, where on the trunk she waited until the watch changed at
+    06:00; and a person in the boat that has not left the ship's side belays her, and is
+    on deck again."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(7800)
+    n = len(w.log)
+    w.submit("go ashore")
+    w.run(600)
+    kinds = [e.kind for e in list(w.log)[n:]]
+    assert "evolution.waiting" not in kinds
+    assert ["crew.all_hands", "crew.piped_down"] == [
+        k for k in kinds if k in ("crew.all_hands", "crew.piped_down")
+    ]
+    assert "boat.away" in kinds
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(600)
+    w.submit("go ashore")
+    assert w.people.captain.where == "boat"
+    assert w.submit("belay that").kind == "work.belayed"
+    w.run(120)
+    assert w.people.captain.aboard
+    assert [e.kind for e in w.log].count("boat.stood_down") == 1

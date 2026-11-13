@@ -27052,3 +27052,35 @@ skipped; the recorded passages among them, every pinned digest, line count and t
 digest moved and no kept save; the pins moved are those listed above, each the ruling's.**
 **The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
 exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
+
+### Step 2: the boat and the short watch (note 1)
+
+**Reproduced on the trunk** (the Channel east's scenario in Brixham road, the bilander given as
+the command line gives her, let go at 02:00 and run to 04:10, the morning watch, her larboard
+watch of two on deck): `go ashore` put Mr Bowen in the boat, "Not hands enough on deck to send
+boat; there are but two to spare." at 04:10, and nothing until the watch changed at 06:00, the
+boat away at 06:13; from the boat `belay that` and `belay the boat` were refused ("You are in
+the boat; you must be aboard and on deck to give an order of the deck"; "There is no such part
+as the boat").
+
+**What was built.** (a) `evolutions/runner.py`, `_hands_called_for`: where the request to send
+the boat (`send_boat`, the one evolution in `CALLS_HANDS_WHEN_SHORT`) comes back too few, no
+other work has the hands, she is not at quarters and all hands are not up already, all hands
+are called for it by the routine's own call ("All hands! (to send boat)"), the work marked
+(`hands_called_for` in its params) and waiting silently while they come up; when her crew is
+told off the hands are piped down (`_pipe_down_after`: not where the captain called them by
+order, nor where other all-hands work has them or waits). Measured: at 04:10 "All hands! (to
+send boat)", "Only four hands to send boat", "Piped down; the larboard watch has the deck.",
+the boat hoisted out at once and away at 04:16, Mr Bowen landed at 04:32 (06:29 on the trunk).
+Where the watch is at other work the old waiting line stands unchanged (the brief's "no other
+ship's boat work changes"). (b) `world/movement.py`: a person in the boat on an errand that has
+not left the side (`dealings.boat` away, phase "hoisting out", he among her people) may give
+the belays (`belay that`, `belay the work`, `belay all work`); the runner belays the boat's
+work and `dealings._boat_kept` stands her down within the minute, "... she is at the booms; Mr
+Bowen on deck again." Once she has left the side the belay is refused as before (the boat away
+is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (`work_nouns`:
+`boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
+not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
+answers the case where she still waits.
+
+**Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
