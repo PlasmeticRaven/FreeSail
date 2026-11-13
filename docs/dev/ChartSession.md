@@ -474,3 +474,24 @@ the depth along each leg reported.
   One weather box `morocco` over the four and the gap east of 9 W from 30 to 36 N.
 - My own small step at 32e7b093 (the seven Canaries port heads' stale words; the how-to on a
   judged gauge level): the fast tier running.
+
+### 2026-11-13, 21:40: 112's step 0 ruled (97eb554)
+
+**Ruled by this session:**
+- Level 0 is never laid under a one-region chart. A checkpoint reload rebinds to
+  `channel-west` alone, where level 0 made open water answer.
+- The Black Sea is cut from the Mediterranean's level 1.
+- Cape Verde's layer takes all 12 tiles.
+- One `ocean` sea for the island groups.
+- The seas on the weather boxes' lines.
+- `seas.yaml` takes `regions:` and `meets:` keys, replacing the audit's tables.
+- Step 1 (the layers' order) goes ahead.
+
+**Put to the lead:**
+- level 0's extent (recommended: the Atlantic and the Mediterranean, 63 tiles, 11.3 MB);
+- the open Atlantic's level (recommended: M2+S2+N2 judged and marked, Sicily's interim);
+- whether the channel sea's 8 groups leave the list.
+
+**Found and sent to the lead's list:** the coarse layers at mean sea level count the level
+twice (765 coarse shore cells flood at mean tide); two roads to a Channel world give two
+charts (`replay._rebind`).
