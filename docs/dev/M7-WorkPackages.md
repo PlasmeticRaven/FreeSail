@@ -4861,8 +4861,7 @@ merged trial (2026-11-13): the fast tier 07:01 to 08:07 UTC, 7,575 passed and 1 
 exit 0; the browser plans (fifteen with the new one) and the flag drawings' slow tests
 played on the lead's machine, 34 passed, none skipped; lint and the name sweep clean; the
 order's and the state's changes read. **No digest and no line the game says of a hoist or
-of the colours moved.** The whole suite in the cloud on the trunk after the next run, the
-figures to follow. **Next: step 5** (the nations' days).
+of the colours moved.** The whole suite in the cloud, run 83 (2026-11-13, 08:21 to 09:30 UTC, on afd67da8, the trunk with this step, package 109's step 2 and the chart session's calendar step): green in lint, the six shards, the browser plans and the pace job. **Next: step 5** (the nations' days).
 
 ### The chart session's first step: the calendar and the world (decision 69), as merged (2026-11-13)
 
