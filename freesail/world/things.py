@@ -353,18 +353,26 @@ def place_of(world: Any, thing: Thing) -> Where:
     return _where_of_person(world, p)
 
 
-def find(world: Any, words: str) -> list[Thing]:
+def find(world: Any, words: str, gone: bool = False) -> list[Thing]:
     """The things the words name ('the packet', 'the sealed packet', 'the brandy'), not
-    thrown overboard: its name whole, or its noun, or words all of its name's ending in
-    its noun; none when the words name nothing known."""
+    thrown overboard nor destroyed (`gone` true: those too, for the words that say what
+    became of one): its name whole or as listed with or without its state's words, or its
+    noun, or words all of its name's ending in its noun; none when the words name nothing
+    known."""
     key = _key(words)
     if not key:
         return []
+    bare = _bare(key)
     out = []
     for t in things_of(world):
-        if t.place in (OVERBOARD, GONE) and not t.keeper:
+        if t.place in (OVERBOARD, GONE) and not t.keeper and not gone:
             continue
-        if t.is_letter and key in _letter_keys(t):
+        if t.is_letter and (key in _letter_keys(t) or _bare_letter(bare) in _letter_bares(t)):
+            out.append(t)
+            continue
+        if bare and bare in (_bare(_key(t.name)), _bare(_key(name_words(t)))):
+            # the name the game shows is a name the game takes (package 109): 'the sealed
+            # letter from Mr Weston to the master' as listed, with or without its articles
             out.append(t)
             continue
         name = _key(t.name)
@@ -394,6 +402,43 @@ def _letter_keys(t: Thing) -> set[str]:
         out.add(f"letter from {a}")
         out.add(f"{a}'s letter")
         out.add(f"{a} s letter")
+    return out
+
+
+# The words of a thing's state that its listing may show and a speaker may say or leave out
+# (package 109): 'the sealed letter', 'the letter with its seal broken', 'the open letter'.
+_STATE_WORDS = frozenset({"sealed", "unsealed", "open", "opened", "broken", "with", "its", "seal"})
+_INNER_ARTICLES = frozenset({"the", "a", "an"})
+_TITLES = frozenset({"mr", "mrs", "miss", "captain", "capt", "lieutenant", "lt", "dr"})
+
+
+def _bare(key: str) -> str:
+    """A key's words without their articles anywhere ('letter from mr weston to master')."""
+    return " ".join(w for w in key.split() if w not in _INNER_ARTICLES)
+
+
+def _bare_letter(bare: str) -> str:
+    """A letter's bare key without the words of its state."""
+    return " ".join(w for w in bare.split() if w not in _STATE_WORDS)
+
+
+def _letter_bares(t: Thing) -> set[str]:
+    """The bare keys a letter is found by (package 109): its name and its listed name
+    without their state's words and articles, its keys, and each with its writer's or its
+    addressee's title left off ('the letter from Weston')."""
+    keys = {_key(t.name), _key(name_words(t)), *_letter_keys(t)}
+    if t.author and t.to:
+        keys.add(f"letter from {_key(t.author)} to {_key(t.to)}")
+        keys.add(f"{_key(t.author)} s letter to {_key(t.to)}")
+    out = set()
+    for k in keys:
+        b = _bare_letter(_bare(k))
+        if not b:
+            continue
+        out.add(b)
+        untitled = " ".join(w for w in b.split() if w not in _TITLES)
+        if untitled and untitled != b and len(untitled.split()) > 1:
+            out.add(untitled)
     return out
 
 

@@ -6983,13 +6983,16 @@ def test_truth_7b_114_a_thing_made_in_the_cabin_is_given_ashore_by_a_free_line_a
     assert [t.to_dict() for t in TH.things_of(held)] == [t.to_dict() for t in TH.things_of(world)]
 
 
-def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_drink_as_before():
-    """Package 53b's truth: "a free line that names nothing known is logged 'as said;
-    nothing of the ship's changed' and moves nothing, and `eat` and `drink` log as before."
-    Each of the free verbs said of nothing the world knows is a notable line in the words
-    as used ending in those words, journaled, the ship's state the same after them; `eat a
-    fine meal` and `drink three cups of wine` are answered to him alone and are no line of
-    the log, the words kept in the record."""
+def test_truth_7b_115_a_free_line_naming_nothing_known_is_refused_and_eat_and_drink_as_before():
+    """Package 53b's truth, moved by package 109 (the owner's play of 2026-11-12, note 9:
+    "it shouldn't accept an order that will do nothing at all"). It was: "a free line that
+    names nothing known is logged 'as said; nothing of the ship's changed' and moves
+    nothing, and `eat` and `drink` log as before", each line a notable `free.line` ending in
+    those words and journaled. It is now: each of the free verbs said of nothing the world
+    knows is refused (`order.rejected`), in words that say what was not found and what is in
+    his reach, nothing journaled and the ship's state the same after them; `eat a fine meal`
+    and `drink three cups of wine` are answered to him alone and are no line of the log, the
+    words kept in the record, as before."""
     from freesail.world import things as TH
 
     world = _veale_at_falmouth()
@@ -7012,14 +7015,16 @@ def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_dr
         "read the letter",
         "throw the empty bottle overboard",
     )
+    journal = len(world.journal)
     for words in lines:
         e = world.submit(words)
-        assert e.kind == "free.line" and e.severity.value == "notable", words
-        assert e.text.endswith("as said; nothing of the ship's changed."), e.text
-        assert not e.data["moved"]
+        assert e.kind == "order.rejected", (words, e.text)
+        assert "Nothing of that name is known" in e.text, e.text
+        assert "as said" not in e.text, e.text
     assert e.text == (
-        "By the captain, on the quarterdeck: threw the empty bottle overboard, as said; "
-        "nothing of the ship's changed."
+        "Order not carried out ('throw the empty bottle overboard'): Nothing of that name is "
+        "known: there is no empty bottle that you know of. You keep nothing, and nothing lies "
+        "here."
     )
     after = (
         [t.to_dict() for t in TH.things_of(world)],
@@ -7028,7 +7033,7 @@ def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_dr
         world.people.describe(),
     )
     assert after == before
-    assert [t for _, a, t in world.journal if a == "captain"][-len(lines) :] == list(lines)
+    assert len(world.journal) == journal
     n = len(world.log)
     assert world.submit("eat a fine meal").kind == "needs.answer"
     assert world.submit("drink three cups of wine").kind == "needs.answer"
@@ -10939,8 +10944,8 @@ def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or
                 if isinstance(entry, dict) and "source" in entry:
                     naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
     # package 79c: the regency of Algiers the ninth; package 79d: the Italian states and the
-    # King of Sardinia, five more
-    assert len(nations) == 14 and len(naval) > 50
+    # King of Sardinia, five more; package 104: the regency of Tunis the fifteenth (was 14)
+    assert len(nations) == 15 and len(naval) > 50
     for where, said in knobs + naval:
         assert said and _SOURCE_FORM.search(said), (where, said)
         if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):
@@ -14877,9 +14882,6 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
 
 
-# -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
-
-
 def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
     """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
     in Falmouth's road is condemned by the court (France at war with Britain at the taking),
@@ -14983,6 +14985,52 @@ def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
         tmp_path, monkeypatch
     )
     test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+
+
+def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
+    """The design's §8: every new form has examples the director test performs in the dry run
+    and in play with its doubt (`test_director`'s forms test, run here on the forms' table);
+    the two scenarios of the package load and begin (the prize in company, the player a
+    prisoner aboard the captor); the director's truth shows every prize with her captor, her
+    crew and her prisoners, and every hull's prisoners with their paroles."""
+    from freesail.agents import director as D
+    from tests.test_director import (
+        test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs,
+    )
+    from tests.test_prize_scenarios import (
+        test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor,
+        test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her,
+    )
+
+    keys = {f.key for f in D.WORLD_ORDER_FORMS}
+    assert {
+        "prize.parole",
+        "prize.cartel",
+        "ship.prize",
+        "ship.struck",
+        "person.exchanged",
+        "court.sits",
+        "court.read",
+        "court.verdict",
+        "command.new",
+    } <= keys
+    test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs()
+    test_the_prize_home_scenario_begins_with_the_brig_a_prize_in_company_and_the_truth_shows_her()
+    test_the_captive_scenario_begins_with_the_player_a_prisoner_aboard_the_captor()
+
+
+@pytest.mark.slow
+def test_truth_7_368_a_prize_passage_and_a_far_fight_replay_by_both_roads():
+    """84's acceptance form: a passage with the player taken near, the captive aboard the captor
+    and the parole exchanged replays by its transcript and by its acts to the same digests of
+    both hulls' logs; a far fight's passage the same, to the same records."""
+    from tests.test_prize_scenarios import (
+        test_a_far_fights_passage_replays_by_both_roads_to_the_same_records,
+        test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads,
+    )
+
+    test_a_passage_with_the_player_taken_and_the_parole_exchanged_replays_by_both_roads()
+    test_a_far_fights_passage_replays_by_both_roads_to_the_same_records()
 
 
 # -- Package 98: the mends from the owner's play of 2026-11-09 --------------------------------
@@ -15685,6 +15733,337 @@ def test_truth_7_500_every_colours_drawing_is_served_and_drawn_as_before_the_pac
         b(tmp_path)
 
 
+# Package 104: the Sardinian sea and the coast from Bougie to Cape Bon, the L-shaped hole
+# closed, thirteen ports and the regency of Tunis (truths 7-510 to 7-519). States, counts
+# and bands; no digest.
+# ---------------------------------------------------------------------------
+
+BARBARY_PORTS = [
+    "port-mahon",
+    "algiers",
+    "bougie",
+    "djidjelli",
+    "collo",
+    "stora",
+    "bona",
+    "la-calle",
+    "tabarka",
+    "bizerta",
+    "porto-farina",
+    "la-goletta",
+    "carloforte",
+    "gulf-of-palmas",
+    "oristano",
+]
+
+
+def _barb_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart over the Sardinian sea or the coast of Tunis at seed 7,
+    the thirteen ports with Port Mahon and Algiers loaded, a steady breeze (from the west
+    unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 270.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", BARBARY_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_510_the_chart_answers_over_the_l_shaped_hole_on_a_tenth_of_a_degree():
+    """The brief's items 1 and 8: the hole the lead measured, the open sea between Minorca
+    and Sardinia (4.75 to 7.73 E north of 38.43 N) and the arm along Barbary to Cape Bon
+    (to 11.15 E south of it), answers everywhere on a tenth of a degree with a depth or a
+    height and a region; the two regions' own tiles are where the neighbours' are not."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    regions: dict[str, int] = {}
+    for i in range(43):  # 36.3 to 40.5 N
+        lat = 36.3 + 0.1 * i
+        for j in range(67):  # 4.5 to 11.1 E
+            lon = 4.5 + 0.1 * j
+            if lat > 38.5 and lon > 8.0:
+                continue  # the Tyrrhenian's water, charted before
+            p = Position(lat, lon)
+            assert chart.elevation_at(p) is not None, p
+            r = chart.region_at(p)
+            assert r is not None, p
+            regions[r] = regions.get(r, 0) + 1
+    assert set(regions) == {"sardinian-sea", "tunis-coast", "balearics", "tyrrhenian"}
+    assert regions["sardinian-sea"] > regions["tunis-coast"] > 10 * regions["balearics"]
+
+
+def test_truth_7_511_the_seams_hold_no_gap_and_no_overlap_and_the_depth_does_not_step():
+    """The brief's items 1 and 8, the seam rule (docs/dev/ChartBlocks.md): no level-2 tile is
+    listed by two regions of the manifest; the regions' bounds abut their neighbours' on
+    the neighbours' own figures (4.5 E, 40.56 N, 8.0 E, 38.5 N); a cable either side of
+    each seam the chart answers with the same water within a twentieth, and the tide's
+    blocks change there (the two blocks served by their neighbours' gauges, the lead's
+    ruling)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    manifest = yaml.safe_load(open("data/charts/manifest.yaml", encoding="utf-8"))
+    seen: dict[str, str] = {}
+    for name, spec in manifest["regions"].items():
+        for t in (spec.get("tiles") or {}).get("2") or []:
+            assert t["name"] not in seen, (t["name"], seen.get(t["name"]), name)
+            seen[t["name"]] = name
+    b = {r: manifest["regions"][r]["bounds"] for r in manifest["regions"]}
+    assert b["sardinian-sea"]["west"] == b["balearics"]["east"] == 4.5
+    assert b["sardinian-sea"]["north"] == b["gulf-of-lion"]["south"] == 40.56
+    assert b["sardinian-sea"]["east"] == b["tyrrhenian"]["west"] == b["tunis-coast"]["west"]
+    assert b["tunis-coast"]["north"] == b["tyrrhenian"]["south"] == 38.5
+    chart = load_chart("atlantic-east")
+    w = _barb_at(38.0, 6.0, datetime(1805, 6, 20, 12, 0))
+    for (a, c), (ra, rc) in (
+        (((38.0, 4.495), (38.0, 4.505)), ({"balearics"}, {"sardinian-sea"})),
+        (((37.5, 7.995), (37.5, 8.005)), ({"sardinian-sea"}, {"tunis-coast"})),
+        (((38.495, 9.5), (38.505, 9.5)), ({"tunis-coast"}, {"tyrrhenian"})),
+    ):
+        pa, pc = Position(*a), Position(*c)
+        da, dc = chart.depth_at(pa), chart.depth_at(pc)
+        assert da is not None and dc is not None and abs(da - dc) < 0.05 * da, (a, da, dc)
+        assert w.tide.blocks_at(pa) == ra and w.tide.blocks_at(pc) == rc
+
+
+def test_truth_7_512_a_ship_sails_from_port_mahon_to_carloforte_and_from_algiers_to_tunis():
+    """The brief's item 9: on charted water the whole way, no leg crossing dry ground: from
+    off the mouth of Port Mahon south of the Isla del Aire, across the Sardinian sea and into
+    San Pietro's road by its southern channel (Smyth 1828, p. 306); and from Algiers road
+    along the Barbary shore by the coast lanes the ports' tracks keep, north of Cape
+    Bougaroun and Cape de Fer, past the Galita and the Fratelli and Cape Farina, to the road
+    of Tunis."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, bearing_and_distance
+
+    chart = load_chart("atlantic-east")
+    passages = {
+        "carloforte": [(39.86, 4.317), (39.76, 4.42), (39.04, 8.30), (39.138, 8.3198)],
+        "tunis": [
+            (36.774, 3.12),
+            (36.95, 3.30),
+            (37.20, 5.30),
+            (37.20, 7.85),
+            (37.30, 8.80),
+            (37.42, 9.95),
+            (37.40, 10.45),
+            (36.95, 10.40),
+            (36.826, 10.34),
+        ],
+    }
+    for name, legs in passages.items():
+        miles = 0.0
+        for a, b in zip(legs, legs[1:], strict=False):
+            pa, pb = Position(*a), Position(*b)
+            hit = chart.line_shore(
+                pa, pb, units.CABLE, skip_start_m=units.CABLE, skip_end_m=units.CABLE
+            )
+            assert hit is None or not hit[2], (name, a, b, hit)
+            _, d = bearing_and_distance(pa, pb)
+            n = max(2, int(d / units.CABLE))
+            for k in range(n + 1):
+                p = Position(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n)
+                assert chart.elevation_at(p) is not None, (name, p)
+            miles += d / units.NAUTICAL_MILE
+        assert miles > 190.0, (name, miles)
+
+
+def test_truth_7_513_bougies_road_lies_under_the_cape_sheltered_west_and_open_to_the_east():
+    """The brief's item 3, to the pilots' words (Tofiño 1787, p. 155; Norie 1831, p. 355):
+    the road of Bougie lies south of Cape Carbon in seven fathoms or so of soft mud, the land
+    close to the west and north of it and open sea to the east; its port file says so, and
+    the bottom is read at the berth."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ports import load_port, port_files
+
+    road = (36.7560, 5.1021)  # features/sardinian-sea.yaml's `bougie-road`
+    w = _barb_at(*road, datetime(1805, 6, 20, 12, 0))
+    assert 5.0 < w.chart.depth_at(w.position) < 25.0
+    _, to_cape = bearing_and_distance(w.position, w.chart.feature("cape-carbon").position)
+    assert to_cape < 1.5 * units.NAUTICAL_MILE
+    shore = w.chart.nearest_shore(w.position)
+    assert shore is not None and shore.distance_m < units.NAUTICAL_MILE
+    # open to the east: no land a league to the eastward of the berth
+    from freesail.world.geo import Position
+
+    for k in range(1, 30):
+        p = Position(road[0], road[1] + k * 0.005)
+        assert (w.chart.elevation_at(p) or 0.0) < 0.0, p
+    bougie = load_port(port_files()["bougie"], w.chart)
+    words = bougie.pilot.words["anchorage"]
+    assert "sheltered from the west" in words and "easterly" in words
+    assert w.chart.bottom_near(w.position) == "soft mud"
+
+
+def test_truth_7_514_the_road_of_tunis_is_soft_mud_open_to_the_north_east():
+    """The brief's item 3, to Purdy 1826 (p. 334, W. Smith's directions): the best anchorage
+    in five to six fathoms of soft mud with Cape Carthage to the north-north-east and the
+    Goletta to the west; the bay open to the north-east but the north-easters not blowing
+    home; a frigate brought up there by the best bower holds through a north-easter of
+    twenty knots for six hours."""
+    from freesail.world.geo import bearing_and_distance
+
+    road = (36.826, 10.34)  # features/tunis-coast.yaml's `tunis-road`
+    w = _barb_at(
+        *road,
+        datetime(1805, 6, 20, 12, 0),
+        wind_from_deg=45.0,
+        wind_speed_kn=20.0,
+        ship_heading_deg=45.0,
+    )
+    assert 5.0 < w.chart.depth_at(w.position) < 15.0
+    cape = w.chart.feature("cape-carthage").position
+    goletta = w.chart.feature("la-goletta").position
+    b_cape, _ = bearing_and_distance(w.position, cape)
+    b_gol, _ = bearing_and_distance(w.position, goletta)
+    # Purdy's magnetic bearings made true (the variation about 17 W then): the cape between
+    # 11 and 17 degrees, the Goletta between 253 and 276, each within five
+    assert 5.0 <= b_cape <= 22.0 and 248.0 <= b_gol <= 281.0
+    w.submit("let go the best bower")
+    w.run(600)
+    assert any(e.kind == "ship.brought_up" for e in w.log)
+    brought = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log if "drag" in e.kind or "aground" in e.kind]
+    _, moved = bearing_and_distance(brought, w.position)
+    assert moved < 0.2 * units.NAUTICAL_MILE
+
+
+def test_truth_7_515_keiths_reef_grounds_a_frigate_and_stands_where_the_grid_has_its_head():
+    """The brief's item 9, the Skerki and Keith's reef (found by Durban in the Weazle in
+    1802; the Athénienne lost on them in October 1804): the reef nearly awash stands on the
+    grid's shoal head of the bank, some seven minutes west of the pilots' longitude (Norie
+    1831, p. 195; Smyth 1854, p. 457: 37 50 N, 11 8 E), which its `fix` says; a frigate
+    there touches it, and a cable off the bank's deep side she does not."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    reef = chart.feature("keiths-reef")
+    raw = yaml.safe_load(open("data/charts/features/tunis-coast.yaml", encoding="utf-8"))
+    entry = next(f for f in raw["features"] if f["id"] == "keiths-reef")
+    assert reef.kind == "ledge" and "Athenienne" in entry["source"] and "11 8" in entry["fix"]
+    assert chart.region_at(reef.position) == "tunis-coast"
+    assert abs(chart.elevation_at(reef.position)) < 3.0
+    assert chart.danger_under(reef.position, 0.0, 40.0, 5.5) is not None
+    deep = Position(reef.position.lat_deg, reef.position.lon_deg + 0.03)
+    assert chart.danger_under(deep, 0.0, 40.0, 5.5) is None
+    skerki = chart.feature("skerki")
+    assert skerki.kind == "bank" and skerki.dries_m == pytest.approx(-2.7)
+
+
+def test_truth_7_516_the_galita_is_seen_at_the_distance_its_height_gives():
+    """The brief's item 9: the Galita, 476 m (Bérard 1837, pp. 144 to 145), the landfall from
+    Bona to Tunis, is above the lookout's search height and seen to its own geographic
+    horizon in the clearest weather: from a frigate's masthead fifty miles off it is in
+    sight, sixty miles off it is below the horizon."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position, horizon_nm
+
+    chart = load_chart("atlantic-east")
+    galita = chart.feature("galita")
+    reach = horizon_nm(30.0, galita.height_m)
+    assert 55.0 < reach < 58.0
+    noon = datetime(1805, 6, 20, 12, 0)
+
+    def seen(miles: float) -> bool:
+        p = Position(galita.position.lat_deg - miles / 60.0, galita.position.lon_deg)
+        return "galita" in {s.feature.id for s in chart.in_sight(p, 30.0, None, "day", noon)}
+
+    assert seen(50.0) and not seen(60.0)
+
+
+def test_truth_7_517_no_light_on_either_coast_in_1805_and_cape_carthages_by_1845():
+    """The brief's item 2, the lights with their dates: no period text names a light from
+    Dellys to Cape Bon (Tofiño 1787 the lanterns of Mers-el-Kebir and Algiers only; Bérard
+    1837 none east of Algiers): by night in 1805 off Bona and off the Goletta no light is in
+    sight; in 1845 Cape Carthage's (the Admiralty's notice of 17 June 1840) and Bona's on
+    Cape de Garde (Lamberti 1844) show."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    off_bona, off_tunis = Position(37.05, 7.85), Position(36.95, 10.45)
+
+    def lights(p, year):
+        night = datetime(year, 6, 20, 23, 30)
+        return {
+            s.feature.id
+            for s in chart.in_sight(p, 20.0, None, "night", night)
+            if s.feature.kind == "light"
+        }
+
+    assert lights(off_bona, 1805) == set() and lights(off_tunis, 1805) == set()
+    assert lights(off_bona, 1845) == {"cape-de-garde-light"}
+    assert lights(off_tunis, 1845) == {"cape-carthage-light"}
+
+
+def test_truth_7_518_the_regencies_ports_and_tabarkas_and_carlofortes_dated_nations():
+    """The brief's items 3 and 4: in June 1805 Bona and the Goletta are neutral to a King's
+    ship (the Dey and the Bey at peace with Britain); Tabarka is the Bey's, its nation dated
+    from the island's surrender in 1738 (Bérard 1837, p. 142); Carloforte is the King of
+    Sardinia's in 1805 and France's in March 1793 (taken by the French fleet and held till
+    25 May, Smyth 1828, pp. 57 and 308); the regency of Tunis is in the nations table at
+    peace with all."""
+    from freesail.world.nations import load_nations
+
+    when = datetime(1805, 6, 20, 12, 0)
+    w = _barb_at(37.0, 8.0, when)
+    for pid, nation in (("bona", "algiers"), ("la-goletta", "tunis"), ("tabarka", "tunis")):
+        port = w.ports.ports[pid]
+        assert port.nation_on(when) == nation and w.dealings.stance(port) == "neutral", pid
+    carloforte = w.ports.ports["carloforte"]
+    assert carloforte.nation_on(when) == "sardinia"
+    assert carloforte.nation_on(datetime(1793, 3, 1, 12, 0)) == "france"
+    assert carloforte.nation_on(datetime(1793, 6, 1, 12, 0)) == "sardinia"
+    assert w.ports.ports["tabarka"].nation_on(datetime(1792, 1, 1)) == "tunis"
+    table = load_nations()
+    assert "tunis" in table.nations and not table.enemies_of("tunis")
+    assert table.nations["tunis"].adjective == "Tunisian"
+
+
+@pytest.mark.slow
+def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her_short_book():
+    """The brief's item 7: the block's scenario (`bona.yaml`, June 1805) sailed at seed 7 by
+    its short book: from off the mouth of Port Mahon round the Isla del Aire, across the seam
+    at 4.5 E and the open Sardinian sea, her landfall the high land of the Seven Capes, Mount
+    Edough and Cape de Fer, round Cape de Garde by its offing to the anchorage under the
+    Fort Genois, where she anchors on mud mixed with sand (Bérard 1837, p. 131) within two
+    days and a half (at 16:08 on the 22nd at seed 7), without touching ground."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "bona.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    regions = set()
+    for _ in range(61 * 6):
+        w.run(600)
+        regions.add(w.chart.region_at(w.position))
+        if len([e for e in w.log if e.kind == "ship.anchored"]) >= 2:
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Port Mahon at the start, under the Fort Genois
+    assert anchored[1].tick <= 60 * 3600
+    assert {"balearics", "sardinian-sea"} <= regions
+    _, off = bearing_and_distance(w.position, w.chart.feature("fort-genois-anchorage").position)
+    assert off < 0.6 * units.NAUTICAL_MILE
+    assert any("mud mixed with sand" in e.text for e in w.log if e.kind == "sounding")
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
+
+
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
 def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
     """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
@@ -15693,6 +16072,245 @@ def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_m
     from tests.test_flag_drawings import test_every_flag_a_hoist_can_hold_has_a_drawing as c
 
     c(root)
+
+
+def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
+    """Package 105, step 1: a port file's `state`, `dockyard`, `closed_to`, `market`,
+    `crew_pool` and `pilot` may be dated rows; no port file before 105 gives any of them so,
+    and each answers the same on every day (the far days 1700 and 1900, and the day of each
+    scenario that names it), as it did before the form (the builder's proof over every
+    scenario's day, docs/dev/TuningNotes.md, package 105)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import DATED_KEYS, load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    files = port_files()
+    assert len(files) >= 90
+    days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
+    for pid, path in files.items():
+        loads = [load_port(path, chart, None, when) for when in days]
+        assert loads[0].dated == (), pid
+        for key in DATED_KEYS:
+            assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
+
+
+# -- Package 109: the mends from the owner's play of 2026-11-12 -----------------------------
+
+
+def _channel_east(ship: str | None = None):
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    return make_scenario_world(
+        load_scenario(root / "data" / "scenarios" / "channel-east.yaml"), ship=ship
+    )
+
+
+def test_truth_7_540_a_free_order_that_finds_nothing_is_refused_and_one_that_did_is_said():
+    """Package 109, step 1 (the owner's notes 9, 4 and 10): in the bilander in Brixham road,
+    'put Test Book on the table', 'read the letter', 'open the gunports' and 'take command of
+    the prize' are each refused (`order.rejected`), nothing journaled and nothing of the
+    things changed; 'take a sight for the latitude' goes to the navigation (refused at two
+    in the morning as the noon sight is, by the sun not on the meridian); a free line
+    whose words found a thing and moved nothing (the packet in the hold out of reach) is
+    still 'as said; nothing of the ship's changed', and one that moved it is said done."""
+    from freesail.world import things as TH
+
+    w = _channel_east("data/ships/bilander.yaml")
+    w.world_order("aboard: a sealed packet, in the hold", "the truth")
+    journal = len(w.journal)
+    for words in (
+        "put Test Book on the table",
+        "read the letter",
+        "open the gunports",
+        "take command of the prize",
+    ):
+        assert w.submit(words).kind == "order.rejected", words
+    assert len(w.journal) == journal
+    e = w.submit("take a sight for the latitude")  # the noon sight's own answer at two
+    assert e.kind == "order.rejected" and "not yet on the meridian" in e.text
+    e = w.submit("take the packet")
+    assert e.kind == "free.line" and e.text.endswith(
+        "as said; nothing of the ship's changed (the sealed packet is in the hold)."
+    )
+    w.world_order("aboard: a snuffbox, on the quarterdeck", "the truth")
+    e = w.submit("take the snuffbox")
+    assert e.kind == "free.line" and e.data["moved"]
+    assert [t.keeper for t in TH.things_of(w)] == ["", w.people.captain.id]
+
+
+def test_truth_7_541_a_thing_is_taken_by_its_listed_name_two_are_told_apart_and_kept_read():
+    """Package 109, step 1 (the owner's notes 10 and 5): the director's letter listed as 'a
+    sealed letter from Mr Weston to the master' is opened by those words; with two letters
+    to the captain on the quarterdeck, 'read the letter to the captain' is refused naming
+    both by their writers and 'the first', 'the second', and 'read the letter from Mr Gill'
+    and 'open the first letter' each take one; `my keeping` reads what he keeps and what
+    lies where he stands."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.world_order(
+        'aboard: a letter from Mr Weston to the master, on the quarterdeck, sealed: "Go."',
+        "the director",
+    )
+    assert w.submit("my keeping").text == (
+        "My keeping: Lying here: a sealed letter from Mr Weston to the master."
+    )
+    e = w.submit("open the sealed letter from Mr Weston to the master")
+    assert e.kind == "free.line" and e.data["moved"]
+    w = _channel_east()
+    w.world_order(
+        'aboard: a letter from the Admiralty to the captain, on the quarterdeck, sealed: "C."',
+        "the truth",
+    )
+    w.world_order(
+        'aboard: a letter from Mr Gill to the captain, on the quarterdeck: "Short."', "the truth"
+    )
+    e = w.submit("read the letter to the captain")
+    assert e.kind == "order.rejected" and e.data["choices"] == [
+        "letter_from_the_admiralty_to_the_captain",
+        "letter_from_mr_gill_to_the_captain",
+    ]
+    assert "'the letter to the captain' names two letters: the first, " in e.text
+    assert w.submit("read the letter from Mr Gill").data["thing"].startswith("letter_from_mr_gill")
+    e = w.submit("open the first letter")
+    assert e.data["thing"] == "letter_from_the_admiralty_to_the_captain" and e.data["moved"]
+
+
+# ---------------------------------------------------------------------------
+# Package 111: the chart's audit (truths 7-560 to 7-565)
+# ---------------------------------------------------------------------------
+
+
+def _audit_tool():
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("audit_chart", root / "tools" / "audit_chart.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("audit_chart", mod)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the_table():
+    """Package 111 (f): every port file loads on the whole chart; its road, anchorage and
+    mooring answer the chart; every spot lies inside its feature's region's bounds or
+    harbours (or inside some region's); every nation it names, dated, blockading or closed
+    to, is in the nations' table; its dated rows run whole, no overlap and no day between.
+    The spots on the grid's ground are the known list's: thirteen moorings and Cartagena's
+    road, each in a basin, a river or behind a mole the grid has as land."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart))
+    kinds = {f.key.split(":", 1)[0] for f in audit.findings}
+    assert not kinds & {"f-load", "f-off-chart", "f-region", "f-nation", "f-dated"}
+    dry = sorted(f.key for f in audit.findings if f.key.startswith("f-dry:"))
+    assert len(dry) == 14 and dry.count("f-dry:cartagena:outer_road") == 1
+    assert all(k.endswith(":mooring") for k in dry if k != "f-dry:cartagena:outer_road")
+    assert len(list(A.PORTS_DIR.glob("*.yaml"))) >= 90
+
+
+def test_truth_7_561_every_scenario_starts_on_its_charts_water_and_names_only_ports_on_file():
+    """Package 111 (h): every scenario file loads; each that names a chart starts inside it,
+    on water; every port it names has its file."""
+    A = _audit_tool()
+    audit = A.Audit()
+    A.check_scenarios(audit)
+    assert audit.findings == []
+
+
+def test_truth_7_562_the_tides_level_by_sea_and_the_four_blocks_that_read_the_elevens():
+    """Package 111 (c): the world's mean level over a region's water is its sea's where a
+    gauge of the blend has its level read: the Channel's and Biscay's metres, the
+    Mediterranean's few decimetres; over the four blocks whose gauges have none read it is
+    the eleven's (the how-to's rule): the Tyrrhenian Saint-Malo's 6.83 m or Dover's 3.7 m by
+    the place, the Strait and
+    Madeira Le Conquet's 3.98 m, the Azores 3.2 to 4 m. No region's water reads a gauge
+    beyond the reach or mostly another sea's."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_tide
+
+    A = _audit_tool()
+    tide = load_tide()
+
+    def level(lat, lon):
+        return tide.constants_at(Position(lat, lon))[0]
+
+    assert 2.5 < level(50.0, -4.0) < 4.5  # the Channel off the Eddystone
+    assert 2.5 < level(46.5, -2.0) < 4.5  # Biscay off the Sables
+    assert level(41.3, 2.3) < 0.5 and level(43.0, 5.0) < 0.6 and level(39.0, 3.0) < 0.3
+    assert 3.6 < level(40.7, 14.0) < 3.8  # off Naples: Dover's
+    assert 6.7 < level(40.0, 12.0) < 6.9  # the open Tyrrhenian: Saint-Malo's
+    assert 3.9 < level(36.0, -5.6) < 4.0  # the Strait off Tarifa: Le Conquet's
+    assert 3.9 < level(32.62, -16.92) < 4.0  # Funchal road
+    assert 3.0 < level(38.5, -28.0) < 4.0  # the Azores' channel
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_tide(audit, chart, tide, A.Water(chart), A.SAMPLED_STEP_DEG)
+    assert {f.key for f in audit.findings} == {
+        "c-level:tyrrhenian",
+        "c-level:strait",
+        "c-level:madeira",
+        "c-level:azores",
+    }
+
+
+def test_truth_7_563_the_ways_in_the_land_guard_refuses():
+    """Package 111 (f), reachable: of the ninety ports, the business's way in from the sea
+    (`ships.approach_plan`, the land guard `ships.land_crossing`) crosses the grid's land for
+    twenty-four and the way out by the track to sea for twenty-four (St Malo's, Dartmouth's,
+    Toulon's, Lisbon's among them); every other port has a way in and out clear of the land,
+    and every way in but Paimboeuf's and Royan's begins with open water in reach."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart))
+    ins = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-in:")}
+    outs = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-out:")}
+    opens = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-open:")}
+    assert len(ins) == 24 and len(outs) == 24
+    assert {"st-malo", "dartmouth", "toulon", "lisbon"} <= ins & outs
+    assert "maddalena" in outs - ins and "hyeres" in ins - outs
+    assert opens == {"paimboeuf", "royan"}
+    for pid in ("falmouth", "plymouth", "brest", "cadiz", "gibraltar", "bona", "barcelona"):
+        assert pid not in ins | outs, pid
+
+
+def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
+    """Package 111 (d): the regions whose water more than one box of the climatology answers
+    are Biscay north (the channel box's edge at 47.5 N), Biscay south (portugal's at 43.5 N),
+    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E) and the Balearics (its strip to
+    40.56 N); water in no box lies only in the Balearics' strip, the Cantabrian coast east of
+    5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
+    A = _audit_tool()
+    chart = A.load_chart(A.CHART_NAME)
+    audit = A.Audit()
+    A.check_weather(audit, chart, A.load_climatology(), A.Water(chart), A.FULL_STEP_DEG)
+    keys = {f.key for f in audit.findings}
+    assert {k for k in keys if k.startswith("d-split:")} == {
+        "d-split:biscay-north",
+        "d-split:biscay-south",
+        "d-split:strait",
+        "d-split:tyrrhenian",
+        "d-split:balearics",
+    }
+    assert {k for k in keys if k.startswith("d-no-box:")} == {
+        "d-no-box:balearics",
+        "d-no-box:biscay-south",
+        "d-no-box:strait",
+    }
+
+
+@pytest.mark.slow
+def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
+    """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
+    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    A = _audit_tool()
+    audit = A.run(A.FULL_STEP_DEG)
+    known = A.load_known()
+    assert not A.unlisted(audit, known)
+    assert audit.keys() == set(known)
+    assert not A.over_ceiling(audit, known)
 
 
 def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_comes_down(tmp_path):
@@ -15715,6 +16333,36 @@ def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_come
     c()
     if shutil.which("node"):
         b(tmp_path)
+
+
+def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
+    """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
+    the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
+    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    is away within ten minutes, where on the trunk she waited until the watch changed at
+    06:00; and a person in the boat that has not left the ship's side belays her, and is
+    on deck again."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(7800)
+    n = len(w.log)
+    w.submit("go ashore")
+    w.run(600)
+    kinds = [e.kind for e in list(w.log)[n:]]
+    assert "evolution.waiting" not in kinds
+    assert ["crew.all_hands", "crew.piped_down"] == [
+        k for k in kinds if k in ("crew.all_hands", "crew.piped_down")
+    ]
+    assert "boat.away" in kinds
+    w = _channel_east("data/ships/bilander.yaml")
+    w.submit("let go the anchor")
+    w.run(600)
+    w.submit("go ashore")
+    assert w.people.captain.where == "boat"
+    assert w.submit("belay that").kind == "work.belayed"
+    w.run(120)
+    assert w.people.captain.aboard
+    assert [e.kind for e in w.log].count("boat.stood_down") == 1
 
 
 def test_truth_7_503_a_ship_dressed_flies_the_fashion_of_the_scenarios_year_and_no_later_one():

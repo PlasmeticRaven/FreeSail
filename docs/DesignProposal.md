@@ -931,6 +931,93 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     with its years, in rows that another era's rows can stand beside, never as the one
     picture of 1805 (decision 66's rule for an element, applied to ports).
 
+68. **Slavery is a real fact of the world, told with respect for the history; the player's
+    part in it, if any, is its suppression.** Owner, 2026-11-12, as the charts reached the
+    African coast: "we need to address slavery, at least as far as it's necessary for the
+    context of the period. I'm comfortable with the depiction of anti-slavery efforts, but
+    I'm not particularly interested in the depiction of slaving as an actual gameplay loop";
+    and, ruling: "as long as we keep a grounded and respectful-to-the-history basis, we can
+    include it as a real fact of the world, while acknowledging that we're interested, if in
+    anything, in the depiction of the efforts to suppress it as far as the player is
+    concerned. Ignoring it totally, while the easier and more comfortable option by some
+    amount, is also dishonest to reality." For the briefs from here, until the design note
+    that settles the rest: a port, a coast or a vessel is said to be what the sources say it
+    was, in plain words and with its years, never in the period's dehumanising language;
+    people are never a cargo of the trade the player works (nothing to buy, carry or sell,
+    no price, no profit) and no player and no seated model is put at a slaver's station;
+    the suppression of the trade is what may be played, where and when the law of the day
+    gave it (decision 66's dates); no money is reckoned for a person but the bounty the law
+    gave for freeing one. **Left for the design note and the owner:** what the game says of
+    an enemy slaver taken before the law changed, when the courts of the day treated the
+    people aboard as property (the lead's default: the outcome said in a line and nothing
+    paid for it); captivity under the Barbary regencies as a risk to the player's own
+    people; which treaties and courts are in the data by which year.
+
+    **Two of those ruled by the owner the same day.** *Barbary captivity:* the middle form:
+    "detailed depiction of the life and labour ashore is definitely too far for this, the
+    state should be one that does not destroy the game but rather realizes the consequences
+    and makes travel in the seas where Barbary ships are truly risky." *A slaver taken
+    before the law changed:* by the captor's nation and the day: "to simulate it at least
+    to the extent that the player can truly interact with the mechanism when sailing for
+    nations that allowed the freeing of slaves from taken slavers", and "a line and nothing
+    paid is also a reasonable implementation at least for nations with no reasonable method
+    of freeing at a certain date." So where and when a nation's law freed the people of a
+    taken slaver, the player sailing for that nation works that law; elsewhere the outcome
+    is said in a line and nothing is paid.
+
+    **The owner's answers to the design note's questions (2026-11-13;
+    `docs/design/Design-SlaveryAndSuppression.md`, package 110).** The sources overturned
+    part of what the lead had told him from memory (France from 1794 to 1802 freed the
+    people of a taken slaver in law and not in fact; the United States not before 1819),
+    and he agreed with the note's recommendations: (1) for those nations and years the
+    line, saying truthfully what was done; (2) an enemy slaver taken before the law
+    changed is paid as an ordinary prize for her hull and goods, the line saying that the
+    people were not reckoned; (3) a captain may land the people free without the law, as
+    an act entered in his record with no sum either way; (4) a Barbary ransom is told as
+    the captive's nation's act, its sum never charged to the purse nor said as the price
+    of a person; (6) the people aboard a slaver are a count with one plain sentence on her
+    record, never persons the systems act on; (7) scans under a non-commercial licence are
+    cited and not kept; (8) the note's words approved as they stand; (9) the coast where
+    the suppression was done is left unbooked for now, the court's sentence arriving from
+    off the chart. **On (5) he ruled otherwise:** "with a completely transparent brief on
+    the matter, a model should be able to decide whether they are willing to be seated at
+    a corsair when that corsair might take part in slaving." So a corsair's station may be
+    held by a model under a brief that says plainly and in full what the station is and
+    may do, the model deciding for itself; the consent documents are revised only by the
+    owner's own process. A slaver's station stays closed to every player and model. **On
+    a player at a corsair's station (the same day):** "I'm not going to decide on the
+    player in control of a corsair, as long as no vessel type is specifically restricted
+    to corsairs and restricting the player wouldn't keep them from sailing a certain
+    vessel type, it's probably OK to restrict." So it stays closed for now, on the
+    condition that no kind of vessel is thereby kept from the player.
+
+69. **The first episode: 1792 to 1825, true on any day; built to extend; and still the
+    world's own once begun.** Owner, 2026-11-13: "a sane option for now is to focus on
+    depicting our stated range (1792-1825, I believe), accurately so that you may play from
+    any day in a well-depicted and functional world (to the standard we're building now,
+    anywhere in the range), with the underlying system built for eventual extensibility so
+    that we consider this 1792-1825 range the first 'episode', with room to expand to more
+    dates once everything is truly established." And, confirming it: "The peacetime
+    question will be important, but the world should be built so that a war might break out
+    even in a period where it didn't in real life, to match the principle that the game may
+    start at a day in history but the actual play might diverge, especially with the state
+    and economy systems and moreso when under the control of a director and/or higher level
+    stationed actors." So: (a) **the goal is fixed and can be checked:** a game begun on any
+    day from 1792 to 1825 finds a world depicted to the standard of the day the build knows
+    best, and working; decision 66's open question (how far each element is dated) is
+    answered for this range: all of it, as far as sources allow, a gap said and never
+    invented. (b) **The range is the first episode, not the limit:** no date is fixed in the
+    engine, dated rows are open at both ends, and nothing is built for other years now.
+    (c) **Decision 66 stands and is sharpened:** the dated record is the state the world
+    begins in; who is at war, who holds a port and what a state does afterwards are the
+    world's own to change, by its state and its economy, by a director and by actors seated
+    above a ship. **A peace in the record is a state the world begins in, not a promise:**
+    a war may break out where history had none, and one that history had need not. So the
+    data's forms must let play change what they seed, and the line between what play owns
+    and what the calendar carries regardless is drawn on purpose (package 103's design).
+    (d) **Peace needs a purpose in play,** to be designed, not only dated. (e) The data
+    work is planned as milestone 7c, after the review, from the range's audit.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

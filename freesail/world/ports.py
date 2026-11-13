@@ -543,6 +543,22 @@ class Port:
     # day, `nation_on` the entry for a day. Empty for a port of one nation. A plain class
     # default, so that a checkpoint from before loads.
     nations: tuple[dict[str, Any], ...] = ()
+    # The port's dated keys (package 105, step 1; `DATED_KEYS`): ((key, rows), ...) for each
+    # key the file gives as dated rows, each row {since, until, source, value} with its value
+    # parsed (a row of `state` its (state, blockade)); `on_day` puts the row in force into
+    # the key's field. Empty for a file of single values, every file before 105. A plain
+    # class default, so that a checkpoint from before loads.
+    dated: tuple[tuple[str, tuple[dict[str, Any], ...]], ...] = ()
+
+    def on_day(self, when: datetime | date | None) -> None:
+        """Put each dated key's row in force on the day into its field (the world's day,
+        `Ports.tick`); a port of single values is untouched."""
+        for key, rows in self.dated:
+            value = _value_on(rows, when)
+            if key == "state":
+                self.state, self.blockade = value
+            else:
+                setattr(self, key, value)
 
     def nation_on(self, when: datetime | date | None) -> str:
         """The port's nation on a day: its dated entry for the day, else `nation`."""
@@ -666,53 +682,20 @@ def load_port(
         deep = raw.get("deep_draught_ft")
         return Spot(name, pos, depth, bottom, fid, None if deep is None else float(deep))
 
-    pr = doc.get("pilot") or {}
-    pilot = PilotSpec(
-        station=str(pr.get("station") or ""),
-        cruising_nm=float(pr.get("cruising_nm", 6.0)),
-        by_night=bool(pr.get("comes_off_by_night", False)),
-        cutter_file=str(pr.get("cutter") or "data/ships/cutter.yaml"),
-        names=tuple(str(n) for n in (pr.get("names") or ["the pilot"])),
-        skill=float(pr.get("skill", 0.9)),
-        fee_pounds=float(pr.get("fee_pounds", 0.0)),
-        cast=str(pr.get("cast") or "starboard"),
-        course_out_deg=float(pr.get("course_out_deg", 180.0)),
-        words={str(k): str(v) for k, v in (pr.get("words") or {}).items()},
-        vessel={str(k): v for k, v in (pr.get("vessel") or {}).items()},
-    )
-    mk = doc.get("market") or {}
-    goods: dict[str, Good] = {}
-    for g in mk.get("goods") or []:
-        season = {int(k): float(v) for k, v in (g.get("season") or {}).items()}
-        goods[str(g["good"])] = Good(
-            str(g["good"]), float(g["price"]), g.get("origin"), season, str(g.get("note", ""))
-        )
-    market = Market(str(mk.get("currency") or "pounds"), goods)
-    dy = doc.get("dockyard") or {}
-    items = {}
-    for it in dy.get("items") or []:
-        name = str(it["item"])
-        items[name] = YardItem(
-            item=name,
-            hours=float(it.get("hours", 0.0)),
-            pounds=float(it.get("pounds", 0.0)),
-            pounds_per_100m2=float(it.get("pounds_per_100m2", 0.0)),
-            pounds_per_fathom=float(it.get("pounds_per_fathom", 0.0)),
-            hours_per_ton=float(it.get("hours_per_ton", 0.0)),
-            pounds_per_ton=float(it.get("pounds_per_ton", 0.0)),
-            hours_per_day=float(it.get("hours_per_day", 0.0)),
-            pounds_per_man_day=float(it.get("pounds_per_man_day", 0.0)),
-            note=str(it.get("note", "")),
-        )
-    dockyard = Dockyard(str(dy.get("kind") or "chandlers"), items)
-    pool = {
-        str(k): {kk: float(vv) for kk, vv in (v or {}).items()}
-        for k, v in (doc.get("crew_pool") or {}).items()
-    }
     state = state or {}
-    closed = [str(x) for x in (doc.get("closed_to") or [])]
-    closed += [str(x) for x in (state.get("closed_to") or []) if str(x) not in closed]
-    port_state, blockade = _port_state(doc, state, where)
+    # package 105, step 1: each of these keys one value, or dated rows of {<key>, since,
+    # until, source} (`_dated_rows`), the row in force on the day put in the Port's field
+    # (`Port.on_day`); a file of one value reads exactly as before.
+    dated = (
+        ("pilot", _dated_rows(doc, "pilot", where, _pilot)),
+        ("market", _dated_rows(doc, "market", where, _market)),
+        ("dockyard", _dated_rows(doc, "dockyard", where, _dockyard)),
+        ("crew_pool", _dated_rows(doc, "crew_pool", where, _crew_pool)),
+        ("closed_to", _dated_rows(doc, "closed_to", where, lambda raw: _closed(raw, state))),
+        ("state", _dated_rows(doc, "state", where, lambda raw: _state_row(raw, doc, state, where))),
+    )
+    values = {key: _value_on(rows, when) for key, rows in dated}
+    port_state, blockade = values["state"]
     letters = []
     for letter in state.get("letters") or []:
         if isinstance(letter, str):
@@ -741,12 +724,12 @@ def load_port(
         anchorage=spot("anchorage"),
         mooring=spot("mooring"),
         shore=spot("shore"),
-        pilot=pilot,
+        pilot=values["pilot"],
         tide=dict(doc.get("tide") or {}),
-        market=market,
-        dockyard=dockyard,
-        crew_pool=pool,
-        closed_to=closed,
+        market=values["market"],
+        dockyard=values["dockyard"],
+        crew_pool=values["crew_pool"],
+        closed_to=values["closed_to"],
         letters=letters,
         news=[str(x) for x in (state.get("news") or [])],
         path=where,
@@ -758,10 +741,165 @@ def load_port(
             dict(doc["blockade_station"]) if isinstance(doc.get("blockade_station"), dict) else None
         ),
         ordnance=ordnance.parse_block(doc.get("ordnance"), where),
+        dated=tuple((key, rows) for key, rows in dated if _is_rows(doc.get(key), key)),
     )
 
 
 PORT_STATES = ("open", "blockaded")
+
+# The keys of a port file that may carry dated rows (package 105, step 1; decisions 66 and
+# 67), beside `nation:` (package 79d), each read into the Port's field of its name.
+DATED_KEYS = ("state", "dockyard", "closed_to", "market", "crew_pool", "pilot")
+
+
+def _pilot(pr: Any) -> PilotSpec:
+    pr = pr or {}
+    return PilotSpec(
+        station=str(pr.get("station") or ""),
+        cruising_nm=float(pr.get("cruising_nm", 6.0)),
+        by_night=bool(pr.get("comes_off_by_night", False)),
+        cutter_file=str(pr.get("cutter") or "data/ships/cutter.yaml"),
+        names=tuple(str(n) for n in (pr.get("names") or ["the pilot"])),
+        skill=float(pr.get("skill", 0.9)),
+        fee_pounds=float(pr.get("fee_pounds", 0.0)),
+        cast=str(pr.get("cast") or "starboard"),
+        course_out_deg=float(pr.get("course_out_deg", 180.0)),
+        words={str(k): str(v) for k, v in (pr.get("words") or {}).items()},
+        vessel={str(k): v for k, v in (pr.get("vessel") or {}).items()},
+    )
+
+
+def _market(mk: Any) -> Market:
+    mk = mk or {}
+    goods: dict[str, Good] = {}
+    for g in mk.get("goods") or []:
+        season = {int(k): float(v) for k, v in (g.get("season") or {}).items()}
+        goods[str(g["good"])] = Good(
+            str(g["good"]), float(g["price"]), g.get("origin"), season, str(g.get("note", ""))
+        )
+    return Market(str(mk.get("currency") or "pounds"), goods)
+
+
+def _dockyard(dy: Any) -> Dockyard:
+    dy = dy or {}
+    items = {}
+    for it in dy.get("items") or []:
+        name = str(it["item"])
+        items[name] = YardItem(
+            item=name,
+            hours=float(it.get("hours", 0.0)),
+            pounds=float(it.get("pounds", 0.0)),
+            pounds_per_100m2=float(it.get("pounds_per_100m2", 0.0)),
+            pounds_per_fathom=float(it.get("pounds_per_fathom", 0.0)),
+            hours_per_ton=float(it.get("hours_per_ton", 0.0)),
+            pounds_per_ton=float(it.get("pounds_per_ton", 0.0)),
+            hours_per_day=float(it.get("hours_per_day", 0.0)),
+            pounds_per_man_day=float(it.get("pounds_per_man_day", 0.0)),
+            note=str(it.get("note", "")),
+        )
+    return Dockyard(str(dy.get("kind") or "chandlers"), items)
+
+
+def _crew_pool(raw: Any) -> dict[str, dict[str, float]]:
+    return {str(k): {kk: float(vv) for kk, vv in (v or {}).items()} for k, v in (raw or {}).items()}
+
+
+def _closed(raw: Any, state: dict[str, Any]) -> list[str]:
+    """The file's closures, the scenario's added after them (the scenario's in every row)."""
+    closed = [str(x) for x in (raw or [])]
+    closed += [str(x) for x in (state.get("closed_to") or []) if str(x) not in closed]
+    return closed
+
+
+def _state_row(
+    raw: Any, doc: dict[str, Any], state: dict[str, Any], where: str
+) -> tuple[str, dict[str, Any] | None]:
+    """A port's state from one value of `state:` (a word, or a row's mapping of `state`
+    and its own `blockade`, which goes over the file's `blockade:`), the scenario's entry
+    over it as `_port_state` has it."""
+    if isinstance(raw, dict):
+        blockade = {**dict(doc.get("blockade") or {}), **dict(raw.get("blockade") or {})}
+        return _port_state({"state": raw.get("state"), "blockade": blockade}, state, where)
+    return _port_state({"state": raw, "blockade": doc.get("blockade")}, state, where)
+
+
+def _is_rows(raw: Any, key: str) -> bool:
+    """Whether a key's value is dated rows: a list of mappings, each naming the key."""
+    return (
+        isinstance(raw, list) and bool(raw) and all(isinstance(r, dict) and key in r for r in raw)
+    )
+
+
+def _row_day(value: Any, where: str, key: str, which: str) -> date | None:
+    if value is None or isinstance(value, date):
+        return value.date() if isinstance(value, datetime) else value
+    try:
+        return date.fromisoformat(str(value))
+    except ValueError:
+        raise ValueError(
+            f"{where}: a dated row of '{key}' gives {which} '{value}', not a day (1800-09-05)"
+        ) from None
+
+
+def _dated_rows(
+    doc: dict[str, Any], key: str, where: str, parse: Any
+) -> tuple[dict[str, Any], ...]:
+    """A key's dated rows (package 105, step 1): `key:` as a list of {<key>: value, since,
+    until, source}, `since` and `until` ISO days, either open, both counted in as
+    `_dated_nation` counts them; the rows in the file's order, none overlapping, each
+    with its source. One row with no dates (`since` and `until` both open) for a file
+    that gives the key one value as before, or none: the file reads exactly as it did.
+    Each row's value parsed once by `parse` (a row's market keeps its own stock)."""
+    raw = doc.get(key)
+    if not _is_rows(raw, key):
+        if key == "state" and isinstance(raw, list):
+            raise ValueError(f"{where}: each dated row of 'state' gives its state")
+        return ({"since": None, "until": None, "source": "", "value": parse(raw)},)
+    rows = []
+    for r in raw:
+        since = _row_day(r.get("since"), where, key, "since")
+        until = _row_day(r.get("until"), where, key, "until")
+        if since is not None and until is not None and until < since:
+            raise ValueError(f"{where}: a dated row of '{key}' ends ({until}) before it begins")
+        if not str(r.get("source") or "").strip():
+            raise ValueError(
+                f"{where}: each dated row of '{key}' gives its source (decision 66: an "
+                "element carries its dates and where they are from)"
+            )
+        for o in rows:
+            if (since is None or o["until"] is None or since <= o["until"]) and (
+                until is None or o["since"] is None or o["since"] <= until
+            ):
+                raise ValueError(
+                    f"{where}: the dated rows of '{key}' overlap ({o['since'] or 'open'} to "
+                    f"{o['until'] or 'open'}, and {since or 'open'} to {until or 'open'})"
+                )
+        value = r[key] if key != "state" else r
+        rows.append(
+            {"since": since, "until": until, "source": str(r["source"]), "value": parse(value)}
+        )
+    rows.append({"since": None, "until": None, "source": "", "value": parse(None), "gap": True})
+    return tuple(rows)
+
+
+def _row_on(rows: tuple[dict[str, Any], ...], when: datetime | date | None) -> dict[str, Any]:
+    """The row in force on a day: the first whose `since` and `until` hold it, else the
+    gap's row (the key as if the file gave none); with no day, the first row, as
+    `load_port` takes the first nation."""
+    if when is None:
+        return rows[0]
+    day = when.date() if isinstance(when, datetime) else when
+    for row in rows:
+        if row["since"] and day < row["since"]:
+            continue
+        if row["until"] and day > row["until"]:
+            continue
+        return row
+    return rows[-1]
+
+
+def _value_on(rows: tuple[dict[str, Any], ...], when: datetime | date | None) -> Any:
+    return _row_on(rows, when)["value"]
 
 
 def _nations(raw: Any, where: str) -> tuple[dict[str, Any], ...]:
@@ -1193,10 +1331,21 @@ class Ports:
         return out
 
     def tick(self) -> None:
-        """The world's ports' tick, once a tick of the World that owns them: nothing yet
-        (the markets recover as they are read; each hull's dealings tick in her World's
-        tick, her jobs with them). The place for the sleeping hulls' jobs (step 5)."""
-        return None
+        """The world's ports' tick, once a tick of the World that owns them: each port's
+        dated keys put to the world's day when the day turns (package 105, step 1;
+        `Port.on_day`); the markets recover as they are read; each hull's dealings tick in
+        her World's tick, her jobs with them. The place for the sleeping hulls' jobs (step
+        5)."""
+        when = getattr(getattr(self.world, "clock", None), "ship_time", None)
+        if when is None:
+            return
+        day = when.date() if isinstance(when, datetime) else when
+        if self.__dict__.get("_day") == day:
+            return
+        self.__dict__["_day"] = day
+        for port in self.ports.values():
+            if getattr(port, "dated", ()):
+                port.on_day(day)
 
     def __getattr__(self, name: str) -> Any:
         if name in DEALINGS_NAMES:

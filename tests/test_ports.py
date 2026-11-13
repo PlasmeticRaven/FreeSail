@@ -165,6 +165,21 @@ TYRRHENIAN_PORTS = ["alghero", "cagliari", "civita-vecchia", "gaeta", "naples"]
 # package 101: the Catalan coast's three and the four beside it (Rosas and Palamos in the
 # Gulf of Lion's region, Valencia and Alicante in the Mediterranean west's)
 CATALAN_PORTS = ["alfaques", "alicante", "barcelona", "palamos", "rosas", "tarragona", "valencia"]
+# package 104: the Sardinian sea's five and the coast of Tunis's five, and the three beside
+# them on Sardinia (in the Tyrrhenian's region)
+BARBARY_PORTS = [
+    "bizerta",
+    "bona",
+    "bougie",
+    "collo",
+    "djidjelli",
+    "la-calle",
+    "la-goletta",
+    "porto-farina",
+    "stora",
+    "tabarka",
+]
+SARDINIA_WEST_PORTS = ["carloforte", "gulf-of-palmas", "oristano"]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -176,6 +191,8 @@ ALL_PORTS = sorted(
     + LIGURIAN_PORTS
     + TYRRHENIAN_PORTS
     + CATALAN_PORTS
+    + BARBARY_PORTS
+    + SARDINIA_WEST_PORTS
 )
 
 
@@ -357,6 +374,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Catalan coast's and the four beside it (package 101): Spain's in this world's
     # year, hostile
     french_ports |= set(CATALAN_PORTS)
+    # package 104: the regencies' ports and the King of Sardinia's three, neutral
+    neutral_ports |= set(BARBARY_PORTS) | set(SARDINIA_WEST_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
@@ -2118,7 +2137,17 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
     ]
     # package 101: Barcelona, Rosas, Tarragona and Valencia, Spain's and France's by date;
     # Spain's in every recorded passage's year, so none reads anything new
-    assert sorted(dated) == ["barcelona", "genoa", "rosas", "tarragona", "valencia"]
+    # package 104: Tabarka the Bey's from 1738 and Carloforte the King of Sardinia's but for
+    # the French holding of 1793, each the same nation in every recorded passage's year
+    assert sorted(dated) == [
+        "barcelona",
+        "carloforte",
+        "genoa",
+        "rosas",
+        "tabarka",
+        "tarragona",
+        "valencia",
+    ]
     for when, british, french in (
         (datetime(1805, 6, 3, 18), "neutral", "neutral"),
         (datetime(1805, 6, 4, 6), "hostile", "open"),
@@ -2136,3 +2165,125 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
     assert w.clock.ship_time.date() == date(1805, 6, 4)
     assert w.ports.ports["genoa"].nation == "liguria"
     assert w.dealings.stance(w.ports.ports["genoa"]) == "hostile"
+
+
+# -- package 105, step 1: a port file's dated rows for more than its holder ----------------
+
+_DATED_PORT = """
+id: testport
+name: Testport
+nation:
+  - {nation: malta, until: 1798-06-11, source: "a test"}
+  - {nation: france, since: 1798-06-12, until: 1800-09-04, source: "a test"}
+  - {nation: britain, since: 1800-09-05, source: "a test"}
+outer_road: {lat_deg: 35.9, lon_deg: 14.52}
+anchorage: {lat_deg: 35.9, lon_deg: 14.52}
+mooring: {lat_deg: 35.89, lon_deg: 14.51}
+shore: {lat_deg: 35.89, lon_deg: 14.51}
+pilot:
+  - {pilot: {station: the-road, names: [the Order's pilot]}, until: 1798-06-11, source: "a test"}
+  - {pilot: {station: the-road, names: [the King's pilot]}, since: 1800-09-05, source: "a test"}
+market: {currency: pounds, goods: [{good: wine, price: 20}]}
+dockyard:
+  - dockyard: {kind: chandlers}
+    until: 1800-09-04
+    source: "a test"
+  - dockyard: {kind: yard, items: [{item: topmast, hours: 6, pounds: 40}]}
+    since: 1800-09-05
+    source: "a test"
+crew_pool:
+  - {crew_pool: {able: {count: 4}}, since: 1800-09-05, source: "a test"}
+closed_to:
+  - {closed_to: [britain], since: 1798-06-12, until: 1800-09-04, source: "a test"}
+state:
+  - state: blockaded
+    blockade: {by: britain, since: "1798"}
+    since: 1798-09-01
+    until: 1800-09-04
+    source: "a test"
+  - {state: open, since: 1800-09-05, source: "a test"}
+"""
+
+
+def _dated_port(tmp_path, text=_DATED_PORT):
+    path = tmp_path / "testport.yaml"
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def test_dated_rows_give_each_key_the_row_in_force_on_the_day(tmp_path):
+    """Package 105, step 1: `state`, `dockyard`, `closed_to`, `market`, `crew_pool` and
+    `pilot` may be dated rows as `nation:` is; the row in force on the load's day goes into
+    the field, and a day in no row reads the key as if the file gave none."""
+    path = _dated_port(tmp_path)
+    before = PT.load_port(path, when=datetime(1797, 1, 1))
+    assert before.pilot.names == ("the Order's pilot",) and before.dockyard.kind == "chandlers"
+    assert before.state == "open" and before.closed_to == [] and before.crew_pool == {}
+    french = PT.load_port(path, when=datetime(1799, 6, 1))
+    assert french.state == "blockaded" and french.blockaded_by == "britain"
+    assert french.closed_to == ["britain"]
+    assert french.pilot.names == ("the pilot",)  # no row in force: the default pilot
+    after = PT.load_port(path, when=datetime(1805, 6, 1))
+    assert after.dockyard.kind == "yard" and "topmast" in after.dockyard.items
+    assert after.state == "open" and after.blockade is None and after.closed_to == []
+    assert after.crew_pool == {"able": {"count": 4.0}}
+    assert after.market.goods["wine"].price == 20.0  # one value: every day
+    assert {k for k, _ in after.dated} == {"pilot", "dockyard", "crew_pool", "closed_to", "state"}
+    # both ends counted in, as `_dated_nation` counts them
+    assert PT.load_port(path, when=datetime(1800, 9, 4)).state == "blockaded"
+    assert PT.load_port(path, when=datetime(1800, 9, 5)).state == "open"
+    # no day: the first row, as the first nation
+    assert PT.load_port(path).pilot.names == ("the Order's pilot",)
+
+
+def test_dated_rows_turn_with_the_worlds_day(tmp_path):
+    """The row in force on the world's day is read wherever the key is read: the ports'
+    tick puts each dated key to the day when the day turns."""
+    path = _dated_port(tmp_path)
+    port = PT.load_port(path, when=datetime(1800, 9, 4, 12))
+    clock = type("Clock", (), {"ship_time": datetime(1800, 9, 4, 23, 59)})()
+    world = type("World", (), {"clock": clock})()
+    ports = PT.Ports.__new__(PT.Ports)
+    ports.world, ports.ports = world, {"testport": port}
+    ports.tick()
+    assert port.state == "blockaded" and port.dockyard.kind == "chandlers"
+    clock.ship_time = datetime(1800, 9, 5, 0, 1)
+    ports.tick()
+    assert port.state == "open" and port.dockyard.kind == "yard"
+    assert port.pilot.names == ("the King's pilot",)
+
+
+def test_a_scenarios_entry_goes_over_every_dated_row(tmp_path):
+    """A scenario's `state:` goes over the file's rows, and its closures are added to each
+    row's, as they go over a file's one value."""
+    path = _dated_port(tmp_path)
+    port = PT.load_port(
+        path, state={"state": "open", "closed_to": ["spain"]}, when=datetime(1799, 6, 1)
+    )
+    assert port.state == "open" and port.closed_to == ["britain", "spain"]
+    port.on_day(datetime(1805, 1, 1))
+    assert port.closed_to == ["spain"]
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "words"),
+    [
+        (
+            '{state: open, since: 1800-09-05, source: "a test"}',
+            "{state: open, since: 1800-09-05}",
+            "source",
+        ),
+        ("since: 1800-09-05\n    source", "since: 1800-09-01\n    source", "overlap"),
+        ("since: 1800-09-05\n    source", "since: 5 September 1800\n    source", "not a day"),
+        (
+            "since: 1798-09-01\n    until: 1800-09-04",
+            "since: 1798-09-01\n    until: 1700-01-01",
+            "before it begins",
+        ),
+    ],
+)
+def test_dated_rows_are_refused_in_words(tmp_path, old, new, words):
+    assert old in _DATED_PORT
+    path = _dated_port(tmp_path, _DATED_PORT.replace(old, new, 1))
+    with pytest.raises(ValueError, match=words):
+        PT.load_port(path, when=datetime(1805, 6, 1))

@@ -1,0 +1,119 @@
+# FreeSail: Carloforte on San Pietro as a port (package 104, beside the coast of Tunis's block, in the
+# Tyrrhenian's region; no patch), on package 35's machinery; the marks are the Tyrrhenian's features
+# file's (data/charts/features/tyrrhenian.yaml).
+#
+# Sources. Smyth 1828, pp. 306 to 311 (his survey of 1823 to 1824): San Pietro with the coast of
+# Sant'Antioco forms a spacious harbour, secure in every wind; enter by the southern channel and
+# anchor in six or seven fathoms between Sant'Antioco and Carloforte, where he rode out two very
+# severe north-westers in perfectly smooth water; from the north borrow on Piana to avoid the Secca
+# de' Marmi; water at the wells between Spalmatore point and the Vittorio tower; first settled by
+# the refugees of Tabarka in 1737 (not 1738); the town and castle named Carloforte; the Vittorio
+# redoubt of eight guns on the parapet and four in casemates, its light column not hitherto used;
+# in 1798 upwards of 2,000 Moors from six Tunisian vessels landed at Malfatano and drove 850 men,
+# women and children into slavery, ransomed only in 1805; after 1805 a town wall; 2,830 people in
+# 1824 busied with their salterns, vineyards and fisheries of tunnies, anchovies, sardines and
+# coral, the salterns 16 or 17,000 salms a year. Purdy 1826, p. 84: a good road east of the island,
+# well sheltered from westerly winds, 4 to 6 fathoms. Norie 1831, p. 63: the Carlo fort and a little
+# battery defending the road. Derrotero 1849, p. 140: open only to the south. **The *Vanguard*'s
+# refit here in May 1798** (the brief) is in no text read (Smyth 1854, p. 242, has her dismasting
+# in the gulf of Lyons on 22 May 1798 and no port): FROM MEMORY, written in no row.
+#
+# The datum: UNVERIFIED; the Tyrrhenian's tiles, no patch (the region is built).
+#
+# The stance. The King of Sardinia's (the nations table, `sardinia`), neutral to a King's ship;
+# decision 67: the French holding of 1793 written as dated rows. Prices FROM MEMORY or JUDGEMENT,
+# sterling at the exchange.
+
+id: carloforte
+name: Carloforte
+nation:
+  - {nation: sardinia, until: 1793-01-07, source: "the King of Sardinia's; the town founded by the refugees of Tabarka in 1737 (Smyth 1828, p. 307)"}
+  - {nation: france, since: 1793-01-08, until: 1793-05-25, source: "taken by the French fleet in 1793 and held till the 25th of May, when a Spanish fleet of 23 sail of the line arrived (Smyth 1828, pp. 54, 57, 308); the first day JUDGEMENT, the year and the end Smyth's"}
+  - {nation: sardinia, since: 1793-05-26, source: "the King of Sardinia's again (Smyth 1828, p. 308)"}
+source: "Smyth 1828 pp. 54, 57, 306-311; Purdy 1826 p. 84; Norie 1831 p. 63; Derrotero 1849 p. 140; Lamberti 1844 p. 332"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: carloforte-road
+  name: the road of St. Pietro
+  lat_deg: 39.1380
+  lon_deg: 8.3198
+  depth_fathoms: 6
+anchorage:
+  feature: carloforte-road
+  name: the road of St. Pietro
+  lat_deg: 39.1380
+  lon_deg: 8.3198
+mooring:
+  feature: carloforte-road
+  name: "off Carloforte, between St. Pietro and Sant'Antioco"
+  lat_deg: 39.1380
+  lon_deg: 8.3198
+  depth_fathoms: 6
+  bottom: weed
+shore:
+  feature: carloforte
+  name: the marina of Carloforte
+  lat_deg: 39.1450
+  lon_deg: 8.3060
+
+pilot:
+  station: carloforte-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' boat of Carloforte
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Porcile, Rombi, Pomata, Ferraro, Biggio, Rivano, Cappai, Melis]   # judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 180            # judgement
+  words:
+    channel: "Come in by the southern channel, two miles broad and clean, keeping the Toro open of Sant'Antioco's west coast; from the north borrow on Piana to avoid the Secca de' Marmi in mid-channel. Keep the lead going: there are patches of two and three fathoms."
+    marks: "The town of Carloforte on its slope with the Vittorio redoubt below it; the look-out on Monte Guardia; Piana and its tunny fishery to the north."
+    anchorage: "Anchor off the town in six fathoms on weed, between St. Pietro and Sant'Antioco; the road is smooth in a north-wester and open only to the south, which seldom blows. Water at the wells between Spalmatore point and the Vittorio tower."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt, price: 5, origin: sardinia, note: "the salterns, 16 or 17,000 salms a year (Smyth 1828, p. 311); the price JUDGEMENT, cheap"}
+    - {good: salt fish, price: 15, origin: sardinia, note: "the tunny of Piana's tonnara and the anchovies and sardines (Smyth 1828, pp. 310, 312); the price JUDGEMENT"}
+    - {good: coral, price: 330, origin: null, note: "the coral fishery (Smyth 1828, p. 310); the price JUDGEMENT"}
+    - {good: wine, price: 18, origin: sardinia, note: "the vineyards (Smyth 1828, p. 310); the price JUDGEMENT"}
+    - {good: figs, price: 8, origin: sardinia, note: "figs (Smyth 1828, p. 307); the price JUDGEMENT"}
+    - {good: wheat, price: 26, origin: null, note: "corn for about two months' consumption only (Smyth 1828, p. 307); the price JUDGEMENT, dear"}
+    - {good: fresh fish, price: 3, origin: sardinia, note: "JUDGEMENT"}
+    - {good: vegetables, price: 3, origin: sardinia, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 20, origin: sardinia, note: "JUDGEMENT"}
+    - {good: biscuit, price: 30, origin: null, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "a spar from the country's timber at the governor's price; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the wells between Spalmatore point and the Vittorio tower (Smyth 1828, pp. 306 to 307); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the island's seamen and fishermen
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+tracks:
+  to_sea: [carloforte-road, 39 03 N 8 20 E, 38 57 N 8 12 E]
+  from_sea: [38 57 N 8 12 E, 39 03 N 8 20 E, carloforte-road]
+  in: [carloforte-road]

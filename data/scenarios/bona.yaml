@@ -1,0 +1,84 @@
+# FreeSail: the Sardinian sea, Port Mahon to the corn of Bona (package 104). A free passage of
+# the block's water, not a gate's and not pinned: the frigate weighs from the anchorage off
+# the mouth of Port Mahon, rounds the Isla del Aire, and crosses the open sea between
+# Minorca and Sardinia south-south-eastward to the Barbary shore, makes Cape de Garde (like
+# an island from the west, Berard 1837, p. 130) and anchors under the Fort Genois in
+# fourteen fathoms of mud and sand, the winter berth of Bona and its safest (Berard 1837, p.
+# 131; Norie 1831, p. 354); on the whole chart (`chart: atlantic-east`), so that she crosses
+# the seam at 4.5 E from `balearics` into `sardinian-sea`, her region, her tide and her
+# weather's box changing.
+#
+# June 1805: the regency of Algiers at peace with Britain (James 1837, vol. 3, pp. 235 and
+# 333 to 334, the fleet's differences with the Dey settled by its visits), so that Bona
+# reads neutral to her by the nations table (whose wars are one year's picture, June 1805's:
+# the right one here). Bona ships the corn, wool, wax and hides of Constantine's country
+# (Purdy 1826, p. 327; Norie 1831, p. 354); her errand is the corn. The brief's "bullocks for
+# the fleet" is in no text read: not her errand here.
+#
+# Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/bona.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/bona.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/bona.yaml --hours 44 --reckoning
+#
+# The weather is pinned (a fine June: a north-wester at fourteen knots for the crossing, a
+# fair wind, veering north and north-easterly on the last morning, the coast's summer
+# easterly (Berard 1837, p. 66: east winds from May to September), which takes her into the
+# gulf of Bona; JUDGEMENT), so that the passage is the same on every machine; the sea and the motion
+# are kept. Its figures at seed 7 are in docs/dev/TuningNotes.md (package 104), measured
+# once: not a gate's, not pinned.
+
+name: The Sardinian sea, Port Mahon to the corn of Bona
+seed: 7
+start: 1805-06-20T05:00
+position: {lat_deg: 39.8600, lon_deg: 4.3170}   # off the mouth of Port Mahon (features/balearics.yaml `mahon-outer-road`)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 180
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [port-mahon, algiers, bougie, stora, bona, la-calle]
+
+weather:
+  wind:
+    - {at: 1805-06-20T04:00, from_deg: 320, knots: 14, air_mass: neutral}
+    - {at: 1805-06-20T16:00, from_deg: 310, knots: 13}
+    - {at: 1805-06-21T04:00, from_deg: 300, knots: 12}
+    - {at: 1805-06-21T16:00, from_deg: 320, knots: 11}
+    - {at: 1805-06-22T00:00, from_deg: 0, knots: 10}
+    - {at: 1805-06-22T08:00, from_deg: 50, knots: 10}
+    - {at: 1805-06-22T20:00, from_deg: 70, knots: 10}
+  background:
+    {hpa: 1016, gradient_hpa_per_100km: 0.2, high_toward_deg: 230}
+  systems:
+    - name: the high over Spain
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-19T12:00, x_km: -600, y_km: 100, hpa: 1024}
+        - {at: 1805-06-22T12:00, x_km: -500, y_km: 0, hpa: 1022}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/bona.orders
+
+orders:
+  - let go the best bower
