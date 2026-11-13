@@ -189,6 +189,31 @@ package or engine named. (e) The list of saves, truths and passages that sail
 `atlantic-east`'s open water is part of your step 0's report (package 106a's notes hold a
 first count: check it).
 
+**2026-11-13, the calendar and the world (decision 69; the owner: "the running clock
+should not override the state of the world itself ... besides at the start, or in a
+scenario intended to run the actual historical course specifically, factors like port data
+will need to rely on the world rather than the date").** Ruled on your report of 04:43
+UTC, and yours to build as an engine step of its own, on `claude/charts`, at one hash,
+truths 7-580 to 7-584: (1) **a port's dated rows seed the port on the scenario's first day
+and the port is then the world's.** By default `Ports.tick` applies no row, and
+`Ports.stance` reads the port's own holder (`port.nation`), as the prices and the prize
+court already do, so that the two agree. (2) **A scenario may say it follows history**
+(`follows_history: true`, false where absent; said in the scenario's own description and
+on the harbour's page in the world's words): then a row is applied **on the day it
+begins or ends, as an event of that day,** and not on every day, so that what play has
+changed lasts until the next event of the record. (3) The regimes' blockade stations
+(`business.py`, the reader by the running day) take the same key by my leave, in this
+step, changed in that one reader alone; say what it moves. (4) **Left on the calendar:** a
+light's years, the private signal tables' months, the market's season, a hull's wear. (5)
+The fault you found is mended by (1): a director's `closed_to` on a port with dated rows
+is no longer overwritten at the day's turn; pin it. (6) `test_dated_rows_turn_with_the_
+worlds_day` is superseded by design, old beside new: held without the key, turning with
+it; truth 7-530 and package 105's truths by the start's day stand. (7) **Not in this
+step:** a writer for a port's holder or a war in play (the director's forms, the state's
+own motions) is the review portion's to design (packages 103b and 92); say in the notes
+that until then the world's holder and wars change by nothing in play. Tell package 105's
+builder nothing: I do. The gate as your brief has it; the browser plans in your slow tier.
+
 ## The session's standing notes
 
 (The session writes here: where each package stands, the rulings it has made, the owner's
