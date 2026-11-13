@@ -16109,6 +16109,10 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     for pid, path in files.items():
         if pid in PACKAGE_105_PORTS:  # 105's own, whose rows are their truths' (7-531 on)
             continue
+        # package 106b: Morocco's four ports with dated rows, their truths' (7-557); old: the
+        # skip was 105's alone
+        if pid in ("larache", "mazagan", "safi", "mogador", "agadir"):
+            continue
         loads = [load_port(path, chart, None, when) for when in days]
         assert loads[0].dated == (), pid
         for key in DATED_KEYS:
