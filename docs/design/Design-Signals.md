@@ -590,6 +590,21 @@ occasions:                       # what flies where, by occasion and role
   colours coming down (`flags.dressing_tick`, once a minute with the look, said in the log).
   The snapshot serves the player's ship's hung flags under `dressed`; the lookout says of a
   stranger "she is dressed in her flags".
+- **The nations' days (package 102, step 5).** `data/signals/<root>/days.yaml` (Britain's,
+  Spain's and France's; none found for the rest): each day its name, its date in the year,
+  the years it was kept (a king's birthday with his reign), what is done (`dress`), the guns
+  the regulations allow (recorded, not fired) and its source; Britain's from the Regulations
+  of 1806 art. XX, Spain's from the Ordenanzas of 1748 art. XXV and XXXIX, France's FROM
+  MEMORY (the 1765 ordinance names no day). On such a day the sea's ships lying at anchor
+  under a rules captain dress of themselves by day and undress at sunset (`flags.
+  _harbour_dressing`, once a minute with the look; not logged, read by the lookout with
+  their flags); the player's ship does not: lying at anchor, her own officer (`officer_rank`:
+  the first lieutenant in a frigate, the lieutenant in a brig-sloop, the mate in a cutter,
+  a schooner or a trader) reminds the captain once (`officer.reminder`) and the order is
+  his; where a party is seated at the officer's station the day is said to the deck with no
+  speaker (`colours.day`), no words put in the seated officer's mouth. **Not built, said:** the salute
+  (a gun fired blank at an interval wants a blank charge and a train of guns the gunnery has
+  not; package 77's), and the extra issue of spirits (the stores keep no spirits apart).
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
   two ensigns at the peak), for 74's prize when the lead rules it.
 

@@ -1,0 +1,124 @@
+# FreeSail: Arrecife of Lanzarote, the Puerto de Naos and Puerto de Cavallos (package 106a),
+# on package 35's machinery; the marks are the features file's.
+#
+# Sources. Purdy 1825, pp. 212 to 213 (Glas): Lanzarote has three good harbours, the principal
+# Puerto de Naos on the south-east side, which any vessel not drawing more than 18 feet may
+# enter at high water springs and lie secure from all winds, the harbour formed by a ridge of
+# rocks mostly under water that breaks off the swell, as smooth as a mill-pond within; the one
+# convenient place in the Canaries for cleaning or repairing large vessels; a square stone
+# castle with some cannon, of no great strength, on a small island between Naos and Cavallos,
+# joined to the land by a bridge; Cavallos west of the castle, 12 feet in its entrance at
+# springs; "there is no town", some magazines where corn is kept for export (Glas); p. 220:
+# not to be attempted by a stranger, the entrances being very narrow. Norie 1805, Table XL:
+# Lanzarote, Puerto de Naos 28 57 N.
+#
+# The datum: UNVERIFIED (no plan read; the grid's modern port is land over the old Naos: its
+# road placed outside the reef's line, JUDGEMENT, `features/canaries.yaml`). FOR SOME YEARS
+# ONLY, in words: Glas's "no town" is of the 1760s; the town of Arrecife grew about the port
+# (FROM MEMORY, unverified). Prices FROM MEMORY or JUDGEMENT, in sterling.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written below in its own words, with its years: a port file can date its holder
+# alone until package 105's step 1 (the dated rows for `state`, `closed_to`, `market` and the
+# rest) is on the trunk; the rows waiting for it are named in the head of each file.
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: arrecife
+name: Arrecife
+source: "Purdy 1825, pp. 212 to 213 and 220 (Glas); Norie 1805, Table XL"
+datum: unverified
+
+outer_road:
+  feature: puerto-de-naos
+  name: the Puerto de Naos
+  lat_deg: 28.9636
+  lon_deg: -13.5352
+  depth_fathoms: 3
+anchorage:
+  feature: puerto-de-naos
+  name: the Puerto de Naos
+  lat_deg: 28.9636
+  lon_deg: -13.5352
+mooring:
+  name: Puerto de Cavallos, west of the castle
+  lat_deg: 28.9541
+  lon_deg: -13.5523
+  bottom: sand
+  deep_draught_ft: 12    # Purdy 1825 p. 212: no more than 12 feet in its entrance at springs
+shore:
+  feature: castle-of-naos
+  name: the bridge by the castle
+  lat_deg: 28.9580
+  lon_deg: -13.5470
+
+pilot:
+  station: puerto-de-naos
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the port
+    under: oars
+    note: "judgement: Purdy 1825 p. 220 (Glas): not advisable for those not perfectly well acquainted with the harbour to attempt to conduct a ship in"
+  names: [Cabrera, Betancort, Curbelo, Perdomo, Armas, Umpiérrez, Robayna, Rodríguez]   # judgement
+  skill: 0.9
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 135            # out through the reef to the south-east (judgement)
+  words:
+    channel: "The entrances through the reef are very narrow and most of the rocks are under water: do not try them without a man who knows them, and go in on the top of the tide."
+    marks: "The square stone castle on its islet between the two harbours, joined to the shore by a bridge: Naos lies east of it, Cavallos west."
+    anchorage: "Inside the ridge of rocks Naos is as smooth as a mill-pond and secure from every wind; any ship of eighteen feet may lie there, and it is the one place in the islands to clean or heave down a large ship. Cavallos has but twelve feet in its mouth."
+    tide: "You need the high water of spring tides to carry eighteen feet in: three o'clock or a little after on the full and change, a rise of seven feet or so."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 8, origin: spain, note: "Purdy 1825 p. 212 (Glas): magazines where corn is deposited ready for exportation; JUDGEMENT, the cheapest of the islands"}
+    - {good: barley, price: 6, origin: spain, note: "JUDGEMENT"}
+    - {good: barilla, price: 10, origin: spain, note: "FROM MEMORY: the island's barilla burnt for the soap-makers; unverified"}
+    - {good: salt, price: 3, origin: spain, note: "Purdy 1825 p. 213: a salina, or salt-work, under the cliff by El Rio; JUDGEMENT"}
+    - {good: salt fish, price: 20, origin: spain, note: "JUDGEMENT: the barks of the Barbary fishery"}
+    - {good: wine, price: 75, origin: spain, note: "JUDGEMENT: Lanzarote's own little, the rest brought from Tenerife"}
+    - {good: brandy, price: 45, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 32, origin: spain, note: "JUDGEMENT: goats and cattle of the island"}
+    - {good: timber, price: 18, origin: spain, note: "JUDGEMENT: no wood on the island"}
+    - {good: canvas, price: 78, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: cordage, price: 88, origin: britain, note: "imported; JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 60, note: "JUDGEMENT: no wood on the island, a spar brought from Tenerife"}
+    - {item: yard, hours: 16, pounds: 36}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.09}
+    - {item: water, hours_per_ton: 0.6, pounds_per_ton: 0.6, note: "JUDGEMENT: water scarce on Lanzarote"}
+    - {item: provisions, hours_per_day: 0.08, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [puerto-de-naos, 28 55.8 N 13 31.2 W, 28 48.0 N 13 45.0 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 48.0 N 13 45.0 W, 28 55.8 N 13 31.2 W, puerto-de-naos]
+  in: [puerto-de-naos]

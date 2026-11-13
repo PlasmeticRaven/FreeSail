@@ -36,6 +36,7 @@ the new rows of the log pane and the "Where you are" instrument, and marks the l
       - until: ashore                 # tick until the instrument says it (or the snapshot)
         tick: 60
         max: 90
+      - drawn: the Renard             # the ship's view drawn from her (`absent:` words not)
       - shot: landed                  # a screenshot
 
 A typed line's `expect` is `answered` (the default), `shown` (any new row), `unshown`, or a
@@ -264,6 +265,16 @@ class Page:
             return _clean(self.page.eval_on_selector("#i-knowledge", "e => e.textContent"))
         except Exception:  # noqa: BLE001
             return ""
+
+    def drawn(self) -> str:
+        """The ship's view as the page shows it (package 109): the name above it, and the
+        caption of the drawing, the name of the hull it was drawn from."""
+        try:
+            name = _clean(self.page.eval_on_selector("#ship-name", "e => e.textContent"))
+            caption = _clean(self.page.eval_on_selector("#ship-view", "e => e.textContent"))
+        except Exception:  # noqa: BLE001
+            return ""
+        return f"{name} | {caption}"
 
     def snapshot_text(self) -> str:
         return str(self.page.evaluate("JSON.stringify(window.__lastSnap || {})"))
@@ -527,6 +538,19 @@ def run_plan(
                 tell(f"  (where: {got[:120]!r} {'ok' if ok else 'FAILED'})")
                 records.append({"where": got, "expected": step["where"], "step": i, "ok": ok})
                 bad = [] if ok else [f"{where}: where-you-are lacks {step['where']!r}"]
+                failures += bad
+            elif "drawn" in step:
+                # the ship's view drawn from the hull followed (package 109): the words in its
+                # name and caption, and with `absent` words in neither
+                page.page.wait_for_timeout(500)
+                got = page.drawn()
+                ok = str(step["drawn"]).lower() in got.lower()
+                gone = step.get("absent")
+                if gone and str(gone).lower() in got.lower():
+                    ok = False
+                tell(f"  (drawn: {got[:140]!r} {'ok' if ok else 'FAILED'})")
+                records.append({"drawn": got, "expected": step["drawn"], "step": i, "ok": ok})
+                bad = [] if ok else [f"{where}: the ship's view is not {step['drawn']!r}"]
                 failures += bad
             elif "shot" in step:
                 page.shot(out / f"{i:02d}-{step['shot']}.png")

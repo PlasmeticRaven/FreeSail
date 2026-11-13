@@ -41,6 +41,11 @@
 
   var state = {
     ship: null,
+    // package 109 (the owner's note 6): the hull whose drawing `ship` is, by her id, so that
+    // the page takes the followed hull's drawing when the drivers follow another
+    shipFor: null,
+    shipFetching: null,
+    shipUndrawn: false,
     snapshot: null,
     driver: { running: false, compression: 1 },
     facingOverride: null, // radians, or null for abeam to leeward
@@ -138,11 +143,55 @@
     }
   }
 
+  function followedId(snap) {
+    var f = snap && snap.driver && snap.driver.followed;
+    return f && f.id ? String(f.id) : null;
+  }
+
+  function shipTitle(graph) {
+    return graph.name + (graph.rig ? " (" + graph.rig + ")" : "");
+  }
+
+  /** The followed hull's drawing taken from the server when the drivers follow another hull
+   *  (package 109): her graph, her name and her rig; or, where she cannot be drawn as she
+   *  stands (the far shape, a boat, no spars), the words that say so and no drawing. */
+  function takeFollowedShip(id) {
+    if (state.shipFetching === id) return;
+    state.shipFetching = id;
+    fetch("/api/ship")
+      .then(function (r) {
+        return r.ok ? r.json() : null;
+      })
+      .then(function (graph) {
+        state.shipFetching = null;
+        if (followedId(state.snapshot) !== id) return; // followed elsewhere since: asked again
+        state.shipFor = id;
+        state.shipUndrawn = !!(graph && graph.undrawn);
+        if (graph && graph.undrawn) {
+          state.ship = null;
+          if (svg) while (svg.firstChild) svg.removeChild(svg.firstChild);
+          $("ship-name").textContent = graph.name + ": " + graph.undrawn;
+          document.title = "FreeSail · " + graph.name;
+          return;
+        }
+        if (!graph) return;
+        state.ship = graph;
+        $("ship-name").textContent = shipTitle(graph);
+        document.title = "FreeSail · " + graph.name;
+        drawShip();
+      })
+      .catch(function () {
+        state.shipFetching = null;
+      });
+  }
+
   function onSnapshot(snap) {
     noteAction(state.snapshot, snap);
     state.snapshot = snap;
     if (snap.driver) state.driver = snap.driver;
-    if (!state.ship && snap.ship) {
+    var followed = followedId(snap);
+    if (followed && state.shipFor !== null && followed !== state.shipFor) takeFollowedShip(followed);
+    if (!state.ship && snap.ship && !state.shipUndrawn) {
       // a world with no ship of the player's (package 82): the name says what is followed
       $("ship-name").textContent = snap.observer ? "no ship followed (the observer's view)" : snap.ship.name;
     }
@@ -183,11 +232,13 @@
     ws.onmessage = function (msg) {
       var data = JSON.parse(msg.data);
       if (data.type === "hello") {
-        state.ship = data.ship;
+        state.ship = data.ship && !data.ship.undrawn ? data.ship : null;
+        state.shipFor = followedId(data.snapshot) || "";
+        state.shipUndrawn = !!(data.ship && data.ship.undrawn);
         var observer = data.snapshot && data.snapshot.observer; // no ship followed (package 82)
         document.title = "FreeSail · " + (data.ship ? data.ship.name : observer ? "no ship followed" : "point ship");
         $("ship-name").textContent = data.ship
-          ? data.ship.name + " (" + data.ship.rig + ")"
+          ? data.ship.undrawn ? data.ship.name + ": " + data.ship.undrawn : shipTitle(data.ship)
           : observer ? "no ship followed (the observer's view)" : "point ship";
         log.clear();
         seaMap.setMarks(data.marks || []); // the player's pencil, kept with the game (37n)

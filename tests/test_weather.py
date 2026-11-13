@@ -730,6 +730,7 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         "sardinian-sea",  # package 104: the Mediterranean west's rows
         "tunis-coast",  # package 104: Bizerta's table its check
         "sicily",  # package 105: Malta's table its check
+        "canaries",  # package 106a: the trade, PROVISIONAL, judgement
     ]
     channel = clim.boxes["channel"]
     # package 79b: the east bound at 2.5 E, so that the Channel's east block is the Channel's
