@@ -6569,11 +6569,8 @@ class _AnchorScript(Script):
         return d
 
 
-# The work that waits on at anchor when she comes to (package 45c): the boat's errand; and
-# the order to weigh or unmoor given while the sail was furled (package 60: given by the new
-# captain at his taking command, as she finished coming to under her late master, it was
-# belayed with no word and she lay at anchor two hours), which is anchor work, not sail work.
-ANCHOR_WORK_KEPT = frozenset({"send_boat", "weigh_anchor", "unmoor"})
+# The work that waits on at anchor when she comes to (package 45c): the boat's errand.
+ANCHOR_WORK_KEPT = frozenset({"send_boat"})
 
 
 def _belay_held_work(ship: Ship) -> None:

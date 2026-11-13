@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-13, 02:06 UTC (the watcher's test; no new ruling). Nudge number: 2.
+Latest note: 2026-11-13, 04:11 UTC (ruling 10: one road for the hands called when the watch is too few). Nudge number: 3.

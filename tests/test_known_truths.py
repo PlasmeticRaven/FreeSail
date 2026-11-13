@@ -16064,60 +16064,6 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
-# Package 60: a ship bought, and the player's ship changed in play (truths 7-480 onward;
-# `docs/design/Design-ShipBought.md`, its gate §13). Step 1: the change of ship and the
-# followed ship's far body; the tests beside them are tests/test_ship_changed.py.
-
-
-def test_truth_7_480_the_player_takes_command_of_a_ship_given_him_and_aboard_her():
-    """A ship given the player's person by the director's word in play (the `command:` form,
-    she lying at Falmouth) is taken up by his own order aboard her: his person, his command
-    and his journal go with him, the player's ship is she, and both logs say so."""
-    from freesail.world import command, knowledge
-    from tests.test_ship_changed import fly_taken_up
-
-    w, fly, me, e = fly_taken_up()
-    hull = w.hulls[str(fly.id)]
-    assert w.players is hull and w.first_hull is not hull
-    assert knowledge.players_person(w) is me and hull.people.captain is me
-    assert me.home == str(fly.id) and knowledge.players_visitor(w) is None
-    assert sum(1 for x in hull.log if x.kind == command.TAKEN_UP) == 1
-    assert sum(1 for x in w.first_hull.log if x.kind == command.TAKEN_UP) == 1
-
-
-def test_truth_7_481_the_followed_ships_far_body_stands_at_her_truth():
-    """The ship the player is aboard and the drivers follow (`--ship`, and his ship after a
-    change of ship) is where the other sail see her: her far body within fifty metres of her
-    truth every five minutes for twenty (it was 934 m off after five and 3,803 m after twenty
-    before package 60's step 1)."""
-    from tests.test_ship_changed import followed_body_off_m
-
-    off = followed_body_off_m(20)
-    assert len(off) == 4 and max(off) < 50.0, off
-
-
-@pytest.mark.slow
-def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships(tmp_path):
-    """A save written after the change, with his orders after it, replays to the same log of
-    each ship, its first block the game's first hull's (the frigate's file), the player's ship
-    the Fly again and his person hers; a checkpoint taken after the change carries on to the
-    same logs; a save with no change carries no `player_ship`."""
-    from tests import test_ship_changed as T
-
-    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls(tmp_path)
-    T.test_a_save_with_no_change_carries_no_player_ship_and_the_split_reads_as_before()
-
-
-def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
-    """The old ship is left to her senior officer (a King's ship) and kept in the world half
-    an hour on, her hull among the hulls, her company whole and her far body planned; laid up
-    at Falmouth by the order's tail she is in ordinary at the anchorage."""
-    from tests import test_ship_changed as T
-
-    T.test_the_old_ship_is_kept_in_the_world_with_her_company()
-    T.test_the_old_ship_laid_up_at_falmouth()
-
-
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
 def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
     """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag

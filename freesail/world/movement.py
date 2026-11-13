@@ -303,8 +303,7 @@ def where_words(world: Any, person: Any) -> str:
 # moves, his needs, a question or a reading, a free line, a word said (the stations'
 # sentences are not orders of the vocabulary and come another way).
 VISITOR_VERBS = frozenset(
-    # package 60: `take command of` her is given aboard her as a visitor, the act's own
-    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore", "take command of"}
+    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
 )
 VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
 # What a captive's prompt performs (package 74; the owner's play of 2026-11-09), and nothing
@@ -1090,9 +1089,7 @@ def put_aboard(
         return "person.aboard", f"{person.name} is aboard the {hull_name(hull)} already.", {}
     whence = ""
     if was is not None:
-        came_from = hull_name(was)  # "the Amazon's launch" carries its own article
-        the = "" if came_from.lower().startswith("the ") else "the "
-        whence = f" from {the}{came_from}"
+        whence = f" from the {hull_name(was)}"
     elif was_where in ("boat", "cutter"):
         home = hull_of(world, getattr(person, "home", ""))
         whence = f" from the {hull_name(home)}'s boat" if home is not None else " from the boat"

@@ -1147,46 +1147,5 @@ stand here; where they differ from the text above, this section governs.
 
 ## As built (the postscripts, step by step)
 
-Each step's postscript says here what was built, what was taken another way and what was found.
-
-### Step 1 (2026-11-12, built at 2370a2d)
-
-**Built as the note says:** the four floors of §4.2, each with its test; the followed ship's far
-body mirrored to her truth (§9.2: 934 m off after five minutes and 3,803 m after twenty on the
-trunk, none now; truth 7-481); the split of §2 (`World._players`, `players`, `first_hull`, the
-save's first block from the first hull and `"player_ship"` only when set, the acts' `""` key and
-the director's station on the first hull, `hulls.players_id` for the P readers of §9.1); the act
-(`world/command.take_up`, the order `take command of`, the director's `command:` form giving a ship
-lying at the named port in play); truths 7-480 to 7-483. Nothing in the note had to change after
-package 74 closed but its line numbers.
-
-**Taken another way:** a ship laid up keeps her company aboard in this step, her paying off left to
-steps 2 and 3; the refusal for a squadron is made also when the new ship is in a set or has ships
-under her orders; the director's truth reads the player's ship only when called on the director's
-own station's hull (the first hull), so that a reader of another hull reads that hull still; the
-order's reply carries the line the act would have written in the new ship's log, written once.
-
-**Found:** a ship in ordinary has no captain, so no hull can be made for her nor can she be boarded
-(the test's ship is a merchant brig under an intent instead); the listings of step 3 must give a
-ship in ordinary a hull another way, or list only ships with a master.
-
-**Mended at the lead's review (2026-11-12)**, each with a test that fails on 2370a2d (the tuning
-notes give the measures): the act's own line kept for a direct call (step 3's purchase calls it
-so); the boat that brought him across pulls home and is hoisted in; her late master gives her up
-in his own name before the command passes (§2.3, item 3: never the player "standing aside"); the
-`command:` form doubted for a ship of another nation, an enemy's or a prize not condemned (§5.5:
-the director's word stays the road); a chase of `PLAYER_ID` steers for the first hull's body after
-a change, and the player's ship is the witness of another's fire by `players_id` (§9.1); "under
-the orders of the ship" is the player's ship by her id, and a set of his is refused in words
-after a change (§2.5: a set's command is not carried to another hull yet, and every reader of a
-set takes `PLAYER_ID` for the player's); a kept hull asleep wakes within the range (§4.2); a weigh
-waiting on the furling of a coming to anchor is no longer belayed (a fault of every ship's, met
-at the act); truth 7-482 with an order after the act and a checkpoint between.
-
-**The one exception to "every save from before replays as it did"** (the lead's ruling): a save
-or checkpoint from before this step that was played aboard another ship than the first (`--ship`,
-or `follow` of another hull) parts from its game as played, since the followed ship's far body
-stood off her hull then and stands at it now (§9.2), so the ships about her see another sea: the
-lead's trunk checkpoint agreed at 600 ticks and parted by 3,600. No legacy mode keeps the drift;
-the save of this build carries `followed_body`, and the loader says so in words of a save without
-it whose inputs show it was played aboard another ship (`replay.followed_body_words`).
+Nothing is built yet. Each step's postscript will say here what was built, what was taken another way
+and what was found.
