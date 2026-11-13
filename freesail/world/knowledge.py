@@ -279,6 +279,7 @@ REACH: dict[str, str] = {
     "company.came_aboard": "aboard",
     "company.came_back": "aboard",
     "company.went_across": "aboard",
+    "company.picked_up": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",
