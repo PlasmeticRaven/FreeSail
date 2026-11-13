@@ -1,0 +1,188 @@
+# FreeSail: Messina as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch faro). Step 2 of the package.
+#
+# Sources. Smyth 1824, pp. 106 to 123 and xi to xiii: the Faro and its stream (pp. 109 to 110), the harbour within the Braccio, the light so indifferent that a stranger should not pass by night (p. 111), the citadel garrisoned by the English (p. 122), the anchorage in 30 fathoms with a stern-fast to the quay (p. xii), the foul ground of two sunken Spanish ships; the lazaretto; good hard water from the Marina's fountains, provisions plentiful (p. 113); 73,000 people. Purdy 1826, pp. 137 to 138: the basin open to the N W, the entrance 500 yards, no pilot required, most moor with a hawser to the stone posts; the trade chiefly in foreign cottons. Norie 1831, pp. 133 to 135 (Mr Blyth). The grid lacks the Braccio: three islands the grid lacks in the features file stand for it.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# The British in Messina, dated (package 105's rows): British troops posted themselves at
+# Messina in early 1806, when the King left Naples (James 1837, vol. 4, p. 122: he left on
+# 23 January; the day the troops landed not given), and held it with the Faro's command
+# (p. 126); in 1812 "during our occupation" (Smyth 1854, p. 229); the Flotilla's arsenal
+# under Colonel Robinson in 1814 (Smyth 1824, p. 113) and the Flotilla still there in early
+# 1815 (p. 112). The pilot's words and the yard (the Flotilla's arsenal, a yard for a King's
+# ship) carry the garrison from 1 February 1806 to 31 December 1815: the first day
+# JUDGEMENT within James's January and February, the last JUDGEMENT (Smyth 1854, p. 358:
+# the evacuation resolved in the summer of 1814; the leaving day not read).
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: messina
+name: Messina
+nation: naples
+source: "Smyth 1824 pp. 106-123, xi-xiii; Purdy 1826 pp. 135-138; Norie 1831 pp. 133-135; James 1837 vol. 4 pp. 122-126, 294"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: messina-road
+  name: the road off San Francesco di Paola
+  lat_deg: 38.2073
+  lon_deg: 15.5647
+  depth_fathoms: 25
+anchorage:
+  feature: messina-harbour
+  name: the harbour of Messina
+  lat_deg: 38.1915
+  lon_deg: 15.5600
+mooring:
+  feature: messina-harbour
+  name: the harbour of Messina, off the Marina
+  lat_deg: 38.1915
+  lon_deg: 15.5600
+  depth_fathoms: 25
+  bottom: mud
+shore:
+  feature: messina
+  name: the Marina of Messina
+  lat_deg: 38.1935
+  lon_deg: 15.5520
+
+pilot:
+  - pilot:
+      station: messina-road
+      cruising_nm: 2
+      comes_off_by_night: false
+      cutter: data/ships/cutter.yaml
+      vessel:
+        kind: a boat
+        name: a felucca of the Faro's pilots
+        under: oars and a lateen sail
+        note: "judgement"
+      names: [Salvatore Russo, Giuseppe Bonanno, Gaetano Arena, Francesco Cannizzaro, Antonino Lombardo, Vincenzo Rizzo]   # judgement
+      skill: 0.85
+      fee_pounds: 2                  # judgement; unverified
+      cast: starboard
+      course_out_deg: 20            # judgement
+      words:
+        channel: "From the Faro keep over to the Sicilian side, where the beaches are steep-to and the stream lets a ship glide along them; give the rocks under the Torre di Cavallo a wide berth, for the current sets onto them. The mouth of the harbour is open to the north-west, between the Braccio and the Marina."
+        marks: "The Faro's light on the point; the Braccio, the low sandy sickle, with Fort Salvatore at its point and the light within its little fort; the citadel on its root; the Marina's long front of palaces."
+        anchorage: "Run in off the Marina and anchor in thirty fathoms with a stern-fast to the quay, or moor in twenty with a hawser to the stone posts. The north-east quarter is foul with two Spanish ships of the line sunk there. For a short stay lie off San Francesco di Paola."
+        tide: "High water at full and change at eight hours ten minutes in the harbour. In the Faro the stream runs six hours north and six south, two to five miles an hour, with a slack of a quarter to a whole hour between, and counter-sets along each shore."
+    until: 1806-01-31
+    source: "Smyth 1824, pp. xii and 110; Purdy 1826, p. 137: no pilot required, many ships hire one for the boat that carries a hawser ashore"
+  - pilot:
+      station: messina-road
+      cruising_nm: 2
+      comes_off_by_night: false
+      cutter: data/ships/cutter.yaml
+      vessel:
+        kind: a boat
+        name: a felucca of the Faro's pilots
+        under: oars and a lateen sail
+        note: "judgement"
+      names: [Salvatore Russo, Giuseppe Bonanno, Gaetano Arena, Francesco Cannizzaro, Antonino Lombardo, Vincenzo Rizzo]   # judgement
+      skill: 0.85
+      fee_pounds: 2                  # judgement; unverified
+      cast: starboard
+      course_out_deg: 20            # judgement
+      words:
+        channel: "From the Faro keep over to the Sicilian side, where the beaches are steep-to and the stream lets a ship glide along them; give the rocks under the Torre di Cavallo a wide berth, for the current sets onto them. The mouth of the harbour is open to the north-west, between the Braccio and the Marina."
+        marks: "The Faro's light on the point; the Braccio, the low sandy sickle, with Fort Salvatore at its point and the light within its little fort; the citadel on its root; the Marina's long front of palaces. The citadel is the British garrison's; the gun-boats of the Flotilla lie in the harbour."
+        anchorage: "Run in off the Marina and anchor in thirty fathoms with a stern-fast to the quay, or moor in twenty with a hawser to the stone posts. The north-east quarter is foul with two Spanish ships of the line sunk there. For a short stay lie off San Francesco di Paola."
+        tide: "High water at full and change at eight hours ten minutes in the harbour. In the Faro the stream runs six hours north and six south, two to five miles an hour, with a slack of a quarter to a whole hour between, and counter-sets along each shore."
+    since: 1806-02-01
+    until: 1815-12-31
+    source: "the British garrison of the citadel (Smyth 1824, p. 122) and the Flotilla (p. 113); the dates JUDGEMENT within James 1837, vol. 4, p. 122 and Smyth 1824, p. 112"
+  - pilot:
+      station: messina-road
+      cruising_nm: 2
+      comes_off_by_night: false
+      cutter: data/ships/cutter.yaml
+      vessel:
+        kind: a boat
+        name: a felucca of the Faro's pilots
+        under: oars and a lateen sail
+        note: "judgement"
+      names: [Salvatore Russo, Giuseppe Bonanno, Gaetano Arena, Francesco Cannizzaro, Antonino Lombardo, Vincenzo Rizzo]   # judgement
+      skill: 0.85
+      fee_pounds: 2                  # judgement; unverified
+      cast: starboard
+      course_out_deg: 20            # judgement
+      words:
+        channel: "From the Faro keep over to the Sicilian side, where the beaches are steep-to and the stream lets a ship glide along them; give the rocks under the Torre di Cavallo a wide berth, for the current sets onto them. The mouth of the harbour is open to the north-west, between the Braccio and the Marina."
+        marks: "The Faro's light on the point; the Braccio, the low sandy sickle, with Fort Salvatore at its point and the light within its little fort; the citadel on its root; the Marina's long front of palaces."
+        anchorage: "Run in off the Marina and anchor in thirty fathoms with a stern-fast to the quay, or moor in twenty with a hawser to the stone posts. The north-east quarter is foul with two Spanish ships of the line sunk there. For a short stay lie off San Francesco di Paola."
+        tide: "High water at full and change at eight hours ten minutes in the harbour. In the Faro the stream runs six hours north and six south, two to five miles an hour, with a slack of a quarter to a whole hour between, and counter-sets along each shore."
+    since: 1816-01-01
+    source: "the garrison gone (the day not read)"
+
+tide:
+  establishment: Messina
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 14.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 4.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 285.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 41.5, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 14.5, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+
+dockyard:
+  - dockyard:
+      kind: chandlers
+      items:
+        - {item: topmast, hours: 24, pounds: 60, note: "a spar from the merchants' stores; judgement"}
+        - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+        - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "good hard water from the fountains of the Marina (Smyth 1824, p. 113); judgement"}
+        - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+    until: 1806-01-31
+    source: "the merchants' stores; JUDGEMENT"
+  - dockyard:
+      kind: yard
+      items:
+        - {item: topmast, hours: 10, pounds: 50, note: "the Flotilla's arsenal under Colonel Robinson (Smyth 1824, p. 113); judgement"}
+        - {item: suit of sails, hours: 36, pounds_per_100m2: 14, note: "judgement"}
+        - {item: cordage, hours: 4, pounds_per_fathom: 0.07, note: "judgement"}
+        - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "good hard water from the fountains of the Marina (Smyth 1824, p. 113); judgement"}
+        - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "provisions plentiful (Smyth 1824, p. 113); judgement"}
+    since: 1806-02-01
+    until: 1815-12-31
+    source: "the British garrison and the Flotilla's arsenal (Smyth 1824, p. 113; James 1837, vol. 4, p. 122); the dates JUDGEMENT"
+  - dockyard:
+      kind: chandlers
+      items:
+        - {item: topmast, hours: 24, pounds: 60, note: "a spar from the merchants' stores; judgement"}
+        - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+        - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "good hard water from the fountains of the Marina (Smyth 1824, p. 113); judgement"}
+        - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+    since: 1816-01-01
+    source: "the merchants' stores; JUDGEMENT"
+
+crew_pool:
+  # judgement: the Faro's boatmen and the coasters' crews
+  able: {hands: 3, pounds: 2, delay_h: 18}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 18}
+  landsman: {hands: 4, pounds: 1, delay_h: 18}
+
+closed_to: []
+
+tracks:
+  to_sea: [messina-road, 38 13 N 15 35 E, 38 17 N 15 40 E]
+  from_sea: [38 17 N 15 40 E, 38 13 N 15 35 E, messina-road]
+  in: [messina-road, messina-harbour]

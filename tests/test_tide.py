@@ -338,6 +338,7 @@ MEDITERRANEAN = {
     "catalan-coast",
     "sardinian-sea",
     "tunis-coast",
+    "sicily",  # package 105: the Faro's tidal stream beside the open water's set
 }
 MEDITERRANEAN_AREAS = (
     "provence-current",
@@ -356,6 +357,10 @@ MEDITERRANEAN_AREAS = (
     "bay-of-tunis-set",
     "sardinian-sea-open",
     "tunis-coast-open",
+    # package 105
+    "faro-north",
+    "faro-south",
+    "sicily-open",
 )
 
 
@@ -1119,8 +1124,8 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    # package 101: Barcelona's, the Catalan coast's
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 76
+    # package 101: Barcelona's, the Catalan coast's; package 105: Sicily's six (old: 76)
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 82
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1147,6 +1152,12 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # neighbours' nearest gauges (Mahon's, Carloforte's and Cagliari's lists)
         "sardinian-sea",
         "tunis-coast",
+        "sicily",  # package 105: its six, TICON's in its bounds
+        # package 105, the lead's note of 2026-11-13 (after package 111's audit): two tide
+        # regions, bounds and no tiles, over the water of sicily's tiles no region's bounds
+        # hold, served by the block's six
+        "gulf-of-hammamet",
+        "calabria-north",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1271,10 +1282,22 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
     # gauge's further blocks were the band's alone (`set(g.blocks[1:]) == near`). New: the
     # band's, and for the three gauges the ruling names, the gaugeless blocks it lists;
     # each of those blocks has no gauge of its own.
+    # Package 105, the lead's note of 2026-11-13: the two tide regions over the water of
+    # sicily's tiles that no region's bounds hold are served by the block's six. Old: the
+    # three of package 104 alone; new: the six beside them.
+    sicily_six = (
+        "palermo",
+        "porto-empedocle",
+        "catania",
+        "messina",
+        "reggio-calabria",
+        "lampedusa",
+    )
     ruled = {
         "mahon": {"sardinian-sea", "tunis-coast"},
         "carloforte": {"sardinian-sea", "tunis-coast"},
         "cagliari": {"tunis-coast"},
+        **{g: {"gulf-of-hammamet", "calabria-north"} for g in sicily_six},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())

@@ -813,3 +813,55 @@ What it found, for the next blocks:
 - **The pilots' bearings on this coast are magnetic** (Purdy's, with the true in brackets;
   the variation about 17 to 18 degrees west then): the road of Tunis placed by Purdy's
   bearings made true.
+
+## Sicily and Malta (package 105, as built: step 2)
+
+`sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E): all Sicily with its islands, the Sicilian
+channel, Malta and Gozo, the Faro of Messina and Calabria's toe to Cape Spartivento, the chart's
+east limit moved from 15.5 E to 16.69332 E. Its west bound is `tunis-coast`'s east bound
+exactly, its north bound `tyrrhenian`'s south bound; the south and east 0.7 m and 4 m inside
+their tile edges (104's finding). What it found, for the next blocks:
+
+- **A bound that abuts a neighbour's bound 7 m short of a tile edge takes the column in
+  beyond the neighbour's rows.** `tunis-coast` ends at 11.1466 E inside the column edge
+  11.14667; abutting it, `sicily`'s tiles take in that column (10.72 to 11.15 E), whose rows
+  from 36.29 N north are the coast of Tunis's ("5 kept") and whose three rows south of it no
+  region had listed: they are written as `sicily`'s, the gulf of Hammamet and the Sahel to
+  Monastir, outside every region's bounds, their water the eleven's tide (the lead's ruling
+  of 2026-11-12: a later block's water). 126 tiles over the bounds, 17 kept, 109 written;
+  22 MB of level 2, 76 level-3 tiles of 6.9 MB for twenty harbour boxes, 29.3 MB in all: one
+  region.
+- **The grid smooths a narrow mole away.** EMODnet's cells of some 115 m read 13 to 40 m of
+  water over Messina's Braccio of San Raineri, the sickle that makes the harbour; GEBCO's
+  fill under it cannot raise what EMODnet calls water. The sickle is three islands the grid
+  lacks (package 94's rule, `grid_lacks: true`, each 130 m), the harbour's mouth left open
+  to the north; Filfla off Malta is another. A block with a mole or a spit narrower than two
+  cells looks for it in the grid before placing its port.
+- **A block with gauges of its own, and none of a level.** TICON has six in the bounds
+  (Palermo, Porto Empedocle, Catania, Messina, Reggio, Lampedusa; none in Malta) and no
+  published mean level of theirs is on file; with every level null the blend's level falls
+  back to the eleven's, Saint-Malo's 6.83 m. Each gauge's level is the sum of its M2, S2 and
+  N2 amplitudes (the lead's ruling of 2026-11-12, JUDGEMENT: the model's lowest water on the
+  chart's datum), 0.03 to 0.18 m, until a published level replaces it. Build after the
+  gauges go in: the fill raise follows the tide.
+- **The period's establishment and the world's may stand eight hours apart.** Smyth's high
+  water at full and change off the Faro (6h 56m) and at Messina (8h 10m) are the epitome's;
+  the world's by the modern gauges is 2h 17m and 0h 1m (the Strait's amphidrome). The
+  master's tide is the period's; with an M2 of centimetres the error costs him nothing.
+- **A strait that bends wants two stream areas.** The Faro runs north-north-west from Cape
+  dell'Armi to Messina and north-east past the Faro point to Scylla: one axis is out by
+  more than the book's half-point, so the stream is two areas of the same rates and hour
+  (`faro-north`, `faro-south`), the block's set (`sicily-open`) after them.
+- **A weather box fitted to a printed table** (Malta's, the Mediterranean Pilot vol. I,
+  1913, p. 734, read from the item's leaf 906 through the Archive's IIIF server at its full
+  size: `iiif.archive.org/iiif/<item>$<leaf>/full/max/0/default.jpg`, a scale over 100 per
+  cent refused; the leaf from the item's `_page_numbers.json`): the fit by simulated months
+  must give the candidate months to the box the weather reads (`Climatology.boxes[name]`,
+  not the top-level `months`), or every candidate scores alike and the search keeps its
+  first.
+- **The ports' dated rows in use** (step 1's form): Valletta's holder in three rows (the
+  Order, France, the King), its state blockaded from 12 October 1798 to the surrender, its
+  yard from the first year the sources give (1816), and under the Order its pilot's words
+  saying plainly what Smyth says of the Order's galleys' enslaved rowers (decision 68);
+  Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
+  France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.

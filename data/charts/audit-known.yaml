@@ -227,6 +227,16 @@ known:
   reason: portugal's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
   owner: the lead's list
   most: 1505280
+- key: a-unowned:sicily:north
+  place: 38°51.2′N 16°41.4′E
+  reason: sicily's top tile row, built whole, reaches north past its bounds east of tyrrhenian's last column (15.84 to 16.69 E, Pizzo to the gulf of Squillace), a later block's water; inside it the tide is the block's own by the tide region calabria-north (the figure here is the tile's top edge, outside it)
+  owner: package 105
+  most: 144450
+- key: a-unowned:sicily:west
+  place: 35°46.4′N 10°43.2′E
+  reason: sicily's west column, abutting tunis-coast's bound 7 m short of a tile edge, takes three tiles south of tunis-coast's bounds (the gulf of Hammamet and the Sahel to Monastir), a later block's water by the lead's ruling of 2026-11-12; its tide the block's own by the tide region gulf-of-hammamet
+  owner: package 105
+  most: 466186
 - key: a-unowned:strait:north
   place: 36°27.7′N 5°00.0′W
   reason: water north of strait's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone
@@ -247,31 +257,11 @@ known:
   reason: strait's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
   owner: the lead's list
   most: 312256
-- key: a-unowned:tyrrhenian:east
-  place: 38°30.0′N 15°50.4′E
-  reason: tyrrhenian's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
-  owner: the lead's list
-  most: 1009585
 - key: a-unowned:tyrrhenian:north
-  place: 42°41.6′N 15°30.0′E
-  reason: tyrrhenian's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  place: 42°41.6′N 15°50.4′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone (package 105 moved the east bound to 15.83999 E to close the Calabria sliver, and the strip's east end came with it; old ceiling 396199)
   owner: the lead's list
-  most: 396199
-- key: a-unowned:tyrrhenian:north-east
-  place: 42°30.0′N 15°50.4′E
-  reason: tyrrhenian's level-2 tiles, built whole, reach north-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
-  owner: the lead's list
-  most: 94656
-- key: a-unowned:tyrrhenian:south
-  place: 38°25.6′N 15°29.4′E
-  reason: tyrrhenian's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
-  owner: the lead's list
-  most: 455887
-- key: a-unowned:tyrrhenian:south-east
-  place: 38°25.6′N 15°50.4′E
-  reason: tyrrhenian's level-2 tiles, built whole, reach south-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
-  owner: the lead's list
-  most: 35904
+  most: 490855
 - key: a-unowned:tyrrhenian:west
   place: 40°33.6′N 7°44.0′E
   reason: water west of tyrrhenian's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
@@ -309,9 +299,9 @@ known:
   most: 352
 - key: c-level:tyrrhenian
   place: 41°49.5′N 11°04.5′E
-  reason: 'no Tyrrhenian gauge has its mean level read; the level is the eleven''s there (Dover''s 3.7 m or Saint-Malo''s 6.83 m by the place), as the how-to says, and the tiles'' fill raised by it: a research mend'
+  reason: 'no Tyrrhenian gauge has its mean level read; the level is the eleven''s there (Dover''s 3.7 m or Saint-Malo''s 6.83 m by the place), as the how-to says, and the tiles'' fill raised by it: a research mend (package 105 closed the Calabria sliver into tyrrhenian''s bounds, 15.5 to 15.84 E, and its 253 points of the full sweep came with it; old ceiling 7260)'
   owner: package 79d
-  most: 7260
+  most: 7513
 - key: d-no-box:balearics
   place: 40°31.5′N 4°25.5′E
   reason: the strip from 40.5 to 40.56 N (balearics' bound moved north by package 89) lies in no box and takes the nearest
@@ -349,9 +339,9 @@ known:
   most: 352
 - key: d-split:tyrrhenian
   place: tyrrhenian
-  reason: gulf-of-lion's box runs east to 11 E over the Tyrrhenian's north-west; the first box in the file's order answers
+  reason: gulf-of-lion's box runs east to 11 E over the Tyrrhenian's north-west; the first box in the file's order answers (package 105 closed the Calabria sliver into tyrrhenian's bounds and the box, its 253 points of the full sweep with it; old ceiling 8703)
   owner: the lead's list
-  most: 8703
+  most: 8956
 - key: e-no-book:balearics
   place: 40°31.5′N 0°31.5′E
   reason: 'the strip from 40.5 to 40.56 N: package 89 moved balearics'' north bound and `book_limits` kept 40.5'
