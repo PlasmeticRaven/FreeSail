@@ -16091,6 +16091,9 @@ PACKAGE_105_PORTS = frozenset(
         "scilla",
     }
 )
+# package 106b: Morocco's five ports with dated rows (Rabat has none), whose rows are their
+# truths' (7-557), held out of 7-530 as 105's are
+PACKAGE_106B_DATED_PORTS = frozenset({"larache", "mazagan", "safi", "mogador", "agadir"})
 
 
 def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
@@ -16107,11 +16110,9 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     assert len(files) >= 90
     days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
     for pid, path in files.items():
-        if pid in PACKAGE_105_PORTS:  # 105's own, whose rows are their truths' (7-531 on)
-            continue
-        # package 106b: Morocco's four ports with dated rows, their truths' (7-557); old: the
-        # skip was 105's alone
-        if pid in ("larache", "mazagan", "safi", "mogador", "agadir"):
+        # 105's own, whose rows are their truths' (7-531 on); package 106b's dated five, theirs
+        # (7-557). Old: 105's set alone
+        if pid in PACKAGE_105_PORTS | PACKAGE_106B_DATED_PORTS:
             continue
         loads = [load_port(path, chart, None, when) for when in days]
         assert loads[0].dated == (), pid

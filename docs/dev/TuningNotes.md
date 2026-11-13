@@ -28346,6 +28346,21 @@ gate's figures below). The audit's `d-no-box:strait` is no longer found and its 
 reads "morocco 62 %, portugal 38 %" (the known list's change waits for package 111's step 2b,
 below).
 
+**By design, old beside new (the chart session's word, for the lead):** the Strait's southern
+half (35.5 to 36 N, 6.5 to 5 W) is answered by the box `morocco`, where the nearest box,
+`portugal`, answered it before. It moves: `tests/test_scenarios.py`'s Strait passage (its
+`box_at(35.7, -5.5)` "portugal", now "morocco"), the audit's `d-no-box:strait` (no longer found)
+and `d-split:strait`'s shares (portugal 85 %, mediterranean-west 15 % on the sampled sweep before;
+morocco 62 %, portugal 38 % sampled and 59 %, 41 % on the full sweep now, its count 352 unchanged).
+**What reads that water, and the proof it is unmoved:** no recorded passage (the gate's passages
+are the Channel's); of the scenarios only `strait.yaml` sails into it (35 57 N 5 48 W), and its
+weather is pinned (`weather:` its winds and systems): sailed 24 hours at seed 7 with the branch's
+climatology and with the trunk's, the log's digest is `3fadc5de293ad9fe` both ways and she ends in
+36.0749 N 5.4253 W both ways. The tests that name a position in that water read the tide or the
+chart (`MID_STRAIT`, 36.0 N 5.6 W) or a business world at 36.0 N, which Portugal's box, first in
+the file, still answers; the slow tier of the known truths and scenarios passed whole but the
+audit's full sweep (below), the Strait's truths among them.
+
 **The streams.** Two areas, before the Canaries' open sea: `morocco-coast-north` (S.W. by S., a
 knot: Purdy pp. 152 and 154) and `morocco-coast-south` (south, a knot: pp. 156 to 157, the set in
 toward the land said and not carried). The set is the pilot's own word; the directions' test
@@ -28394,7 +28409,14 @@ leg** (correction 4; sampled every 50 m; under 3 m a finding):
 | every port | road to mooring | El Araiche 8.5 m, Rabat 10.4, Mazagan 3.9, Saffi 10.0, Mogador 17.7, Agadeer 8.8 | |
 
 El Araiche and Mazagan need none (every pair among the northern three and to the mark off Cantin
-is clear). **Findings:** the rivers of El Araiche, Mamora and Sallee are the grid's land behind
+is clear). **Findings:** **the tide steps at 31.6 N**, the seam between the two pairs of gaugeless regions
+(Cadiz's and Huelva's water north of it, Arrecife's and Puerto de Cabras's south): M2 1.035 m at
+57 degrees to 0.82 m at 35 degrees, the level 1.96 m to 1.57 m, in a cable. In the how-to's words
+a seam between two blocks far from every gauge (Huelva some 330 miles off, Arrecife some 250)
+stays a step; no taper is laid between two blocks. **Mogador's harbour within the island** is
+not reached in the grid: its north passage reads 0.0 m and its south 0.5 m at the datum, where
+Purdy has five fathoms in the north one; the port's spots are in the road, as Purdy and Jackson
+put ships of war and of burden (the chart session's word: kept so, the finding listed). The rivers of El Araiche, Mamora and Sallee are the grid's land behind
 bars of 1 to 3 m (a way the pilots reserve for vessels of 100 tons at high water; no trader's in
 the world); Mogador's two passages into the harbour within the island read 0.0 m (north) and 0.5 m
 (south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
