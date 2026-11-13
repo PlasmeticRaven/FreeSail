@@ -495,3 +495,21 @@ the depth along each leg reported.
 **Found and sent to the lead's list:** the coarse layers at mean sea level count the level
 twice (765 coarse shore cells flood at mean tide); two roads to a Channel world give two
 charts (`replay._rebind`).
+
+### 2026-11-13, 21:55: the lead's answers on 112; the two roads measured
+
+- **The lead's answers on 112 (passed to its builder):**
+  - Level 0 covers the Atlantic and the Mediterranean, 63 tiles, 11.3 MB.
+  - The open Atlantic's level is judged as M2+S2+N2, marked, on the condition that no
+    passage, truth or save moves by it, or each that does is named and the builder stops.
+  - The double count goes to the lead's list.
+  - The channel sea's 8 groups leave the known list.
+  - The step that moves SEAS merges after 111's step 2b.
+- **The two roads, measured and sent:**
+  - A `region: channel-west` scenario, saved and loaded by the checkpoint road (the drivers'
+    default), comes back with channel-west alone: 47 N 4 W answers None where it answered
+    121 m.
+  - The cause: `replay._rebind` loads the region bare where `World.__init__` takes
+    `chart_holding`.
+  - A one-line mend proposed; test_checkpoint's run-on moves by design.
+  - The lead's to rule.
