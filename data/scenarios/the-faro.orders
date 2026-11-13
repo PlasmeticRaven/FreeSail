@@ -9,40 +9,40 @@ standing order "off Valletta": at under way, if the distance to 35 54.2 N 14 31.
 # from Passaro to Valletta keep a point higher for the current (Smyth 1824, p. 185). Each
 # leg's course is shaped again while she is short of its mark and not past it (the mark
 # beyond still farther than the leg after it).
-standing order "the course for Passaro": every hour, if the distance to 36 40 N 15 25 E is over 3 miles and the distance to 36 40 N 15 25 E is under 68 miles and the distance to 37 30 N 15 30 E is over 51 miles then shape a course for 36 40 N 15 25 E
+standing order "the course for Passaro": every hour, if the distance to 36 40 N 15 25 E is over 3 miles and the distance to 36 40 N 15 25 E is under 63.7 miles and the distance to 37 30 N 15 30 E is over 51.7 miles then shape a course for 36 40 N 15 25 E
 standing order "off Passaro": when the distance to 36 40 N 15 25 E is under 3 miles then shape a course for 37 30 N 15 30 E
 
 # Up the east coast outside Syracuse, Augusta and Catania, eight miles off, to the mouth of
 # the Faro.
-standing order "the course for Catania": every hour, if the distance to 37 30 N 15 30 E is over 3 miles and the distance to 37 30 N 15 30 E is under 56 miles and the distance to 37 55 N 15 32 E is over 26 miles then shape a course for 37 30 N 15 30 E
+standing order "the course for Catania": every hour, if the distance to 37 30 N 15 30 E is over 3 miles and the distance to 37 30 N 15 30 E is under 51.2 miles and the distance to 37 55 N 15 32 E is over 26.6 miles then shape a course for 37 30 N 15 30 E
 standing order "off Catania": when the distance to 37 30 N 15 30 E is under 3 miles then shape a course for 37 55 N 15 32 E
-standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 32 E is over 2 miles and the distance to 37 55 N 15 32 E is under 31 miles and the distance to 38 03 N 15 37 E is over 10 miles then shape a course for 37 55 N 15 32 E
+standing order "the course for the Faro's mouth": every hour, if the distance to 37 55 N 15 32 E is over 2 miles and the distance to 37 55 N 15 32 E is under 26.1 miles and the distance to 38 03 N 15 37 E is over 10.4 miles then shape a course for 37 55 N 15 32 E
 standing order "off the Faro's mouth": when the distance to 37 55 N 15 32 E is under 2 miles then shape a course for 38 03 N 15 37 E
 
 # The Faro: up the middle of the channel past Reggio and Messina, the course shaped every ten
 # minutes and a fix taken as often as the land serves, for the stream sets her (Smyth 1824,
 # pp. 107 to 110 and App. p. xii: six hours north and six south, two to five miles an hour;
 # give the rocks under the Torre di Cavallo a wide berth, for the current sets onto them).
-standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 37 E is over 1 miles and the distance to 38 03 N 15 37 E is under 14 miles and the distance to 38 12 N 15 36.5 E is over 10 miles then shape a course for 38 03 N 15 37 E
+standing order "the course for Reggio": every 10 minutes, if the distance to 38 03 N 15 37 E is over 1 miles and the distance to 38 03 N 15 37 E is under 9.9 miles and the distance to 38 12 N 15 36.5 E is over 10.5 miles then shape a course for 38 03 N 15 37 E
 standing order "off Reggio": when the distance to 38 03 N 15 37 E is under 1 miles then shape a course for 38 12 N 15 36.5 E
-standing order "the course for Messina": every 10 minutes, if the distance to 38 12 N 15 36.5 E is over 0.8 miles and the distance to 38 12 N 15 36.5 E is under 15 miles and the distance to 38 16.5 N 15 40.8 E is over 7 miles then shape a course for 38 12 N 15 36.5 E
+standing order "the course for Messina": every 10 minutes, if the distance to 38 12 N 15 36.5 E is over 0.8 miles and the distance to 38 12 N 15 36.5 E is under 10.0 miles and the distance to 38 16.5 N 15 40.8 E is over 7.1 miles then shape a course for 38 12 N 15 36.5 E
 standing order "off Messina": when the distance to 38 12 N 15 36.5 E is under 0.8 miles then shape a course for 38 16.5 N 15 40.8 E
-standing order "the course for the Faro point": every 10 minutes, if the distance to 38 16.5 N 15 40.8 E is over 0.6 miles and the distance to 38 16.5 N 15 40.8 E is under 11 miles and the distance to 38 24 N 15 33 E is over 11 miles then shape a course for 38 16.5 N 15 40.8 E
+standing order "the course for the Faro point": every 10 minutes, if the distance to 38 16.5 N 15 40.8 E is over 0.6 miles and the distance to 38 16.5 N 15 40.8 E is under 6.6 miles and the distance to 38 24 N 15 33 E is over 11.2 miles then shape a course for 38 16.5 N 15 40.8 E
 standing order "off the Faro point": when the distance to 38 16.5 N 15 40.8 E is under 0.6 miles then shape a course for 38 24 N 15 33 E
-standing order "the course for the Faro's north mouth": every 10 minutes, if the distance to 38 24 N 15 33 E is over 1 miles and the distance to 38 24 N 15 33 E is under 15 miles and the distance to 38 21 N 15 12 E is over 18 miles then shape a course for 38 24 N 15 33 E
+standing order "the course for the Faro's north mouth": every 10 minutes, if the distance to 38 24 N 15 33 E is over 1 miles and the distance to 38 24 N 15 33 E is under 10.7 miles and the distance to 38 21 N 15 12 E is over 18.2 miles then shape a course for 38 24 N 15 33 E
 standing order "off the Faro's north mouth": when the distance to 38 24 N 15 33 E is under 1 miles then shape a course for 38 21 N 15 12 E
 
 # West along the north coast: north of Cape Milazzo, south of Vulcano, outside Cape Orlando,
 # Cefalù and Cape Zaffarana, the tides setting eastward (Smyth 1824, p. 66).
-standing order "the course for Milazzo": every hour, if the distance to 38 21 N 15 12 E is over 2 miles and the distance to 38 21 N 15 12 E is under 22 miles and the distance to 38 18 N 14 57 E is over 13 miles then shape a course for 38 21 N 15 12 E
+standing order "the course for Milazzo": every hour, if the distance to 38 21 N 15 12 E is over 2 miles and the distance to 38 21 N 15 12 E is under 17.7 miles and the distance to 38 18 N 14 57 E is over 13.6 miles then shape a course for 38 21 N 15 12 E
 standing order "off Milazzo": when the distance to 38 21 N 15 12 E is under 2 miles then shape a course for 38 18 N 14 57 E
-standing order "the course for Vulcano": every hour, if the distance to 38 18 N 14 57 E is over 2 miles and the distance to 38 18 N 14 57 E is under 18 miles and the distance to 38 14 N 14 45 E is over 11 miles then shape a course for 38 18 N 14 57 E
+standing order "the course for Vulcano": every hour, if the distance to 38 18 N 14 57 E is over 2 miles and the distance to 38 18 N 14 57 E is under 13.1 miles and the distance to 38 14 N 14 45 E is over 11.7 miles then shape a course for 38 18 N 14 57 E
 standing order "off Vulcano": when the distance to 38 18 N 14 57 E is under 2 miles then shape a course for 38 14 N 14 45 E
-standing order "the course for Cape Orlando": every hour, if the distance to 38 14 N 14 45 E is over 2 miles and the distance to 38 14 N 14 45 E is under 16 miles and the distance to 38 06 N 14 00 E is over 37 miles then shape a course for 38 14 N 14 45 E
+standing order "the course for Cape Orlando": every hour, if the distance to 38 14 N 14 45 E is over 2 miles and the distance to 38 14 N 14 45 E is under 11.2 miles and the distance to 38 06 N 14 00 E is over 37.8 miles then shape a course for 38 14 N 14 45 E
 standing order "off Cape Orlando": when the distance to 38 14 N 14 45 E is under 2 miles then shape a course for 38 06 N 14 00 E
-standing order "the course for Cefalù": every hour, if the distance to 38 06 N 14 00 E is over 2 miles and the distance to 38 06 N 14 00 E is under 42 miles and the distance to 38 09.5 N 13 33 E is over 23 miles then shape a course for 38 06 N 14 00 E
+standing order "the course for Cefalù": every hour, if the distance to 38 06 N 14 00 E is over 2 miles and the distance to 38 06 N 14 00 E is under 37.3 miles and the distance to 38 09.5 N 13 33 E is over 23.0 miles then shape a course for 38 06 N 14 00 E
 standing order "off Cefalù": when the distance to 38 06 N 14 00 E is under 2 miles then shape a course for 38 09.5 N 13 33 E
-standing order "the course for Zaffarana": every hour, if the distance to 38 09.5 N 13 33 E is over 2 miles and the distance to 38 09.5 N 13 33 E is under 27 miles and the distance to the road of Palermo is over 9 miles then shape a course for 38 09.5 N 13 33 E
+standing order "the course for Zaffarana": every hour, if the distance to 38 09.5 N 13 33 E is over 2 miles and the distance to 38 09.5 N 13 33 E is under 22.5 miles and the distance to the road of Palermo is over 9.7 miles then shape a course for 38 09.5 N 13 33 E
 standing order "off Zaffarana": when the distance to 38 09.5 N 13 33 E is under 2 miles then shape a course for the road of Palermo
 
 # The gulf of Palermo, five miles deep and clear of danger (Smyth 1824, App. p. iv): from off
