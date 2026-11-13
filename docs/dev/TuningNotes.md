@@ -26769,6 +26769,13 @@ seated officer to say to the captain himself; once, as before. Tests: a frigate 
 each with her own officer's word; a frigate with a fake officer seated (truth 7-505 widened
 to both).
 
+**Step 5, the mends: the measure.** At 4a1a70c (the mends, 606d780, with the trunk at 18ea281
+merged by a merge commit, the truths appends kept with the trunk's first): ruff check and
+format clean (385 files); the fast tier whole 7,605 passed, 1 xfailed, 0 failed; the slow
+tier of the step's files (as at 09fd157: test_browser_probe's 13 played, none skipped, and
+test_knowledge; `--slow -m "not pace"`) 1,794 passed, 8 xfailed, 0 failed. The tree
+reported differs from 4a1a70c by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
