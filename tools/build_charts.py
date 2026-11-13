@@ -373,7 +373,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 15.73 W; the fetch covers them whole (`--check`).
     "madeira": {
         "title": "Madeira, Porto Santo and the Desertas",
-        "bounds": {"south": 32.0, "north": 33.5, "west": -17.5, "east": -16.0},
+        # package 111, the lead's ruling: the bounds to the tiles' own edges (was 32 to 33.5 N,
+        # 17.5 to 16 W), so that the island's gauge serves the water its tiles answer
+        "bounds": {"south": 31.60001, "north": 33.73333, "west": -17.86666, "east": -15.73334},
         "fetch": {"south": 31.5, "north": 33.85, "west": -17.95, "east": -15.65},
         "harbours": {
             "funchal": {"south": 32.62, "north": 32.66, "west": -16.95, "east": -16.87},
@@ -391,7 +393,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 31.52 to 24.27 W (153 tiles, most of them the deep sea between the islands).
     "azores": {
         "title": "The Western Islands (the Azores)",
-        "bounds": {"south": 36.5, "north": 40.0, "west": -31.5, "east": -24.5},
+        # package 111, the lead's ruling: the bounds to the tiles' own edges (was 36.5 to 40 N,
+        # 31.5 to 24.5 W), so that the islands' gauges serve the water their tiles answer
+        "bounds": {"south": 36.29334, "north": 40.13333, "west": -31.51999, "east": -24.26667},
         "fetch": {"south": 36.2, "north": 40.25, "west": -31.6, "east": -24.15},
         "harbours": {
             "angra": {"south": 38.63, "north": 38.67, "west": -27.25, "east": -27.19},
@@ -523,7 +527,9 @@ REGIONS: dict[str, dict[str, Any]] = {
     # 7.7333 E so that the column beyond is `ligurian-sea`'s, the seam between the two.
     "gulf-of-lion": {
         "title": "The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche",
-        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73},
+        # package 111, the lead's ruling: the east bound at its column's edge (7.73333 E,
+        # within it; was 7.73), meeting the Ligurian sea's west (7.73334 E)
+        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73333},
         "fetch": {"south": 40.45, "north": 44.95, "west": 2.5, "east": 7.85},
         "harbours": {
             "toulon": {"south": 43.02, "north": 43.13, "west": 5.85, "east": 6.05},
@@ -546,7 +552,10 @@ REGIONS: dict[str, dict[str, Any]] = {
     # this block's (the boundary at the row edge 40.99 N west of 11.15 E).
     "ligurian-sea": {
         "title": "The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena",
-        "bounds": {"south": 41.0, "north": 44.5, "west": 7.74, "east": 11.0},
+        # package 111, the lead's ruling: the west bound at its column's edge (7.73334 E,
+        # within it; was 7.74), meeting the Gulf's east, and the east bound at its tiles'
+        # edge (11.1466 E, as the coast of Tunis's; was 11.0)
+        "bounds": {"south": 41.0, "north": 44.5, "west": 7.73334, "east": 11.1466},
         "fetch": {"south": 40.85, "north": 44.95, "west": 2.5, "east": 11.3},
         "harbours": {
             "genoa": {"south": 44.38, "north": 44.43, "west": 8.86, "east": 8.96},
@@ -585,7 +594,7 @@ REGIONS: dict[str, dict[str, Any]] = {
     # Sicily and the Strait of Messina are a later block.
     "tyrrhenian": {
         "title": "The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples",
-        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.5},
+        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.83999},
         "fetch": {"south": 38.3, "north": 42.85, "west": 7.6, "east": 16.0},
         "harbours": {
             "cagliari": {"south": 39.14, "north": 39.23, "west": 9.05, "east": 9.18},
@@ -694,6 +703,53 @@ REGIONS: dict[str, dict[str, Any]] = {
         # as sardinian-sea's
         "fill_to_chart_datum": True,
     },
+    # package 105: Sicily and Malta, the chart south of 38.5 N and east of Cape Bon: all
+    # Sicily with the Egadi, Lipari and Vulcano, the Sicilian channel with Pantellaria,
+    # Linosa and Lampedusa, Malta and Gozo, the Faro of Messina and Calabria's toe to Cape
+    # Spartivento. The north bound is `tyrrhenian`'s south bound exactly (38.5 N: the row
+    # 38.43 to 38.85 N is the Tyrrhenian's west of 15.84 E, "12 kept", and this block's
+    # east of it), the west `tunis-coast`'s east bound exactly (11.1466 E, 7 m inside the
+    # column edge 11.14667: the column 10.72 to 11.15 E is the coast of Tunis's from 36.29 N
+    # to 38.43 N, "5 kept", and this block's south of 36.29 N, where nobody's tiles were,
+    # three tiles of the gulf of Hammamet outside the bounds). The south bound 0.7 m inside
+    # the row edge 35.01333 N, the east 4 m inside the column edge 16.69333 E (package 104's
+    # finding: a bound past an edge takes in a row or a column more). The level-2 tiles that
+    # meet the bounds span 35.01 to 38.85 N and 10.72 to 16.69 E (9 rows, 14 columns, 109
+    # the block's own).
+    "sicily": {
+        "title": "Sicily and Malta, the Faro of Messina, the Sicilian channel and the islands",
+        "bounds": {"south": 35.01334, "north": 38.5, "west": 11.1466, "east": 16.69332},
+        "fetch": {"south": 34.95, "north": 38.95, "west": 10.65, "east": 16.75},
+        "harbours": {
+            # step 2: Malta, eastern Sicily and the Strait (the boxes JUDGEMENT from the
+            # modern map, each round the road, the harbour and its approach)
+            "valletta": {"south": 35.875, "north": 35.915, "west": 14.48, "east": 14.54},
+            "marsaxlokk": {"south": 35.81, "north": 35.85, "west": 14.53, "east": 14.58},
+            "st-pauls-bay": {"south": 35.93, "north": 35.97, "west": 14.38, "east": 14.43},
+            "gozo-mgarr": {"south": 36.01, "north": 36.04, "west": 14.28, "east": 14.32},
+            "syracuse": {"south": 37.03, "north": 37.09, "west": 15.25, "east": 15.31},
+            "augusta": {"south": 37.17, "north": 37.26, "west": 15.17, "east": 15.26},
+            "catania": {"south": 37.47, "north": 37.52, "west": 15.07, "east": 15.12},
+            "faro": {"south": 38.08, "north": 38.29, "west": 15.54, "east": 15.73},
+            "milazzo": {"south": 38.19, "north": 38.28, "west": 15.21, "east": 15.27},
+            # step 3: the west, the south coast and the islands
+            "palermo": {"south": 38.10, "north": 38.15, "west": 13.34, "east": 13.40},
+            "trapani": {"south": 37.91, "north": 38.04, "west": 12.30, "east": 12.53},
+            "marsala": {"south": 37.77, "north": 37.82, "west": 12.41, "east": 12.46},
+            "sciacca": {"south": 37.49, "north": 37.52, "west": 13.06, "east": 13.10},
+            "girgenti": {"south": 37.27, "north": 37.30, "west": 13.51, "east": 13.55},
+            "licata": {"south": 37.08, "north": 37.11, "west": 13.92, "east": 13.96},
+            "terranova": {"south": 37.05, "north": 37.08, "west": 14.23, "east": 14.27},
+            "passaro": {"south": 36.67, "north": 36.71, "west": 15.11, "east": 15.16},
+            "lipari": {"south": 38.36, "north": 38.49, "west": 14.93, "east": 15.00},
+            "pantellaria": {"south": 36.82, "north": 36.85, "west": 11.92, "east": 11.96},
+            "lampedusa": {"south": 35.49, "north": 35.52, "west": 12.59, "east": 12.63},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, the rule's (`mean_level_grid`):
+        # the block's gauges (decided before the build, the lead's ruling of 2026-11-11)
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -728,6 +784,28 @@ TIDE_REGIONS: dict[str, dict[str, Any]] = {
     "solent": {
         "title": "The Solent, Spithead and Poole bay: a tide region, no tiles",
         "bounds": {"south": 50.62, "north": 51.0, "west": -2.2, "east": -1.0},
+    },
+    # package 105: the three tiles of sicily's west column south of tunis-coast's bounds
+    # (the gulf of Hammamet and the Sahel to Monastir), which no region's bounds hold, read
+    # the block's own six gauges (the lead's note of 2026-11-13, after package 111's audit)
+    "gulf-of-hammamet": {
+        "title": "The gulf of Hammamet and the Sahel to Monastir: a tide region, no tiles",
+        "bounds": {"south": 35.01334, "north": 36.29334, "west": 10.72, "east": 11.1466},
+    },
+    # package 105: the strip of sicily's top tile row north of its bounds and east of
+    # tyrrhenian's last column, which no region's bounds hold, likewise
+    "calabria-north": {
+        "title": "Calabria from Pizzo to the gulf of Squillace: a tide region, no tiles",
+        "bounds": {"south": 38.5, "north": 38.85333, "west": 15.84, "east": 16.69332},
+    },
+    # package 111, the lead's ruling: the sea west of the Asinara, the piece of the
+    # Tyrrhenian's tiles west of its bound (8 E) between the Sardinian sea's north bound
+    # (40.56 N) and the Ligurian sea's south (41 N), east of the Gulf's (7.73334 E), which no
+    # region's bounds hold; served by Porto Torres and Carloforte, so that its tide is the
+    # sea's and not the eleven's (Saint-Malo's M2 of 3.7 m there before)
+    "asinara-west": {
+        "title": "The sea west of the Asinara: a tide region, no tiles",
+        "bounds": {"south": 40.56, "north": 41.0, "west": 7.73334, "east": 8.0},
     },
 }
 
@@ -767,6 +845,8 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 104: the Sardinian sea and the coast of Tunis, the L-shaped hole
             "sardinian-sea",
             "tunis-coast",
+            # package 105: Sicily and Malta
+            "sicily",
         ],
         "corridor": "atlantic-corridor",
     },

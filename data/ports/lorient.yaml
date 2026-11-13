@@ -50,11 +50,13 @@ anchorage:
   lat_deg: 47.7130
   lon_deg: -3.3620
 mooring:
-  feature: pennemane-road
+  # package 111 (the lead's ruling): moved onto its sounding, off the mark pennemane-road
   name: the road of Pennemané
-  lat_deg: 47.7333
-  lon_deg: -3.3476
+  lat_deg: 47.73483
+  lon_deg: -3.35093
   deep_draught_ft: 21    # Faden p. 69: a ship drawing above 21 feet makes this road only at high water springs, and anchors at Port Louis
+  depth_fathoms: 4
+  bottom: mud
 shore:
   feature: lorient
   name: the quay at L'Orient

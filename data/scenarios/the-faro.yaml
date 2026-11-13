@@ -1,0 +1,85 @@
+# FreeSail: Sicily and Malta, Valletta through the Faro to Palermo (package 105, step 3). A
+# free passage of the block's water, not a gate's and not pinned: the frigate weighs from off
+# the mouth of the Grand Harbour, crosses the channel of Malta north-north-eastward to the
+# offing of Cape Passaro, runs up the east coast of Sicily outside Syracuse, Augusta and
+# Catania, enters the Faro of Messina from the south, passes Messina and the Faro point with
+# the stream that runs there six hours north and six south (Smyth 1824, pp. 109 to 110), and
+# runs west along the north coast, south of Vulcano, past Cape Orlando, Cefalù and Cape
+# Zaffarana, into the gulf of Palermo, where she anchors in the road off the mole in nineteen
+# fathoms of stiff clay (Smyth 1824, App. p. iv); on the whole chart (`chart:
+# atlantic-east`), so that she sails `sicily`'s water from end to end and its harbour patches
+# of Valletta, the Faro and Palermo.
+#
+# April 1808: Malta the King's since 1800 (James 1837, vol. 2, p. 445), Sicily the King of the
+# Two Sicilies', his court at Palermo and the British garrison at Messina (Smyth 1824, p.
+# 122; James 1837, vol. 4, p. 122); the nations table (June 1805's picture) reads the King of
+# the Two Sicilies neutral to her. Her errand JUDGEMENT: despatches from Malta for the court
+# at Palermo.
+#
+# Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/the-faro.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/the-faro.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/the-faro.yaml --hours 72 --reckoning
+#
+# The weather is pinned (a spring scirocco, south-east at thirteen and fourteen knots,
+# backing south by the second day, a fair wind for the whole run and off the land on the
+# north coast;
+# Smyth 1854, pp. 250 to 253, the winds of the Sicilian seas; JUDGEMENT), so that the passage
+# is the same on every machine; the sea and the motion are kept. Its figures at seed 7 are in
+# docs/dev/TuningNotes.md (package 105), measured once: not a gate's, not pinned.
+
+name: Sicily and Malta, Valletta through the Faro to Palermo
+seed: 7
+start: 1808-04-20T14:00
+position: {lat_deg: 35.9035, lon_deg: 14.5300}   # off the mouth of the Grand Harbour (features/sicily.yaml `valletta-outer-road`)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 30
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1807}
+  epitome: norie                  # a ship of war's
+  almanac: 1808
+
+cargo:
+  purse_pounds: 200
+
+ports: [valletta, syracuse, messina, milazzo, lipari, palermo]
+
+weather:
+  wind:
+    - {at: 1808-04-20T04:00, from_deg: 135, knots: 13, air_mass: neutral}
+    - {at: 1808-04-20T18:00, from_deg: 140, knots: 14}
+    - {at: 1808-04-21T06:00, from_deg: 155, knots: 13}
+    - {at: 1808-04-21T18:00, from_deg: 170, knots: 12}
+    - {at: 1808-04-22T06:00, from_deg: 175, knots: 12}
+    - {at: 1808-04-22T18:00, from_deg: 165, knots: 11}
+    - {at: 1808-04-23T06:00, from_deg: 150, knots: 10}
+  background:
+    {hpa: 1012, gradient_hpa_per_100km: 0.25, high_toward_deg: 60}
+  systems:
+    - name: the low over Barbary
+      kind: low
+      radius_km: 900
+      track:
+        - {at: 1808-04-19T12:00, x_km: -500, y_km: -400, hpa: 1004}
+        - {at: 1808-04-23T12:00, x_km: -300, y_km: -500, hpa: 1007}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/the-faro.orders
+
+orders:
+  - let go the best bower

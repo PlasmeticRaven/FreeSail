@@ -10944,8 +10944,9 @@ def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or
                 if isinstance(entry, dict) and "source" in entry:
                     naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
     # package 79c: the regency of Algiers the ninth; package 79d: the Italian states and the
-    # King of Sardinia, five more; package 104: the regency of Tunis the fifteenth (was 14)
-    assert len(nations) == 15 and len(naval) > 50
+    # King of Sardinia, five more; package 104: the regency of Tunis the fifteenth (was 14);
+    # package 105: the Order of St John the sixteenth (was 15)
+    assert len(nations) == 16 and len(naval) > 50
     for where, said in knobs + naval:
         assert said and _SOURCE_FORM.search(said), (where, said)
         if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):
@@ -16074,6 +16075,24 @@ def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_m
     c(root)
 
 
+# package 105's ports (step 2: Malta's four, eastern Sicily's five, Calabria's two)
+PACKAGE_105_PORTS = frozenset(
+    {
+        "valletta",
+        "marsaxlokk",
+        "st-pauls-bay",
+        "mgarr",
+        "messina",
+        "milazzo",
+        "catania",
+        "augusta",
+        "syracuse",
+        "reggio",
+        "scilla",
+    }
+)
+
+
 def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
     """Package 105, step 1: a port file's `state`, `dockyard`, `closed_to`, `market`,
     `crew_pool` and `pilot` may be dated rows; no port file before 105 gives any of them so,
@@ -16088,6 +16107,8 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     assert len(files) >= 90
     days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
     for pid, path in files.items():
+        if pid in PACKAGE_105_PORTS:  # 105's own, whose rows are their truths' (7-531 on)
+            continue
         loads = [load_port(path, chart, None, when) for when in days]
         assert loads[0].dated == (), pid
         for key in DATED_KEYS:
@@ -16196,8 +16217,10 @@ def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the
     mooring answer the chart; every spot lies inside its feature's region's bounds or
     harbours (or inside some region's); every nation it names, dated, blockading or closed
     to, is in the nations' table; its dated rows run whole, no overlap and no day between.
-    The spots on the grid's ground are the known list's: thirteen moorings and Cartagena's
-    road, each in a basin, a river or behind a mole the grid has as land."""
+    The spots on the grid's ground higher than their files have them are the known list's:
+    since package 111's step 2a, three moorings (La Rochelle's, Dunkirk's and Morlaix's, no
+    water that fits within six hundred metres; step 1 had thirteen moorings and Cartagena's
+    road, the drying harbours by their files counted then as ground)."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16205,8 +16228,11 @@ def test_truth_7_560_every_port_lies_on_the_chart_in_a_region_its_nations_in_the
     kinds = {f.key.split(":", 1)[0] for f in audit.findings}
     assert not kinds & {"f-load", "f-off-chart", "f-region", "f-nation", "f-dated"}
     dry = sorted(f.key for f in audit.findings if f.key.startswith("f-dry:"))
-    assert len(dry) == 14 and dry.count("f-dry:cartagena:outer_road") == 1
-    assert all(k.endswith(":mooring") for k in dry if k != "f-dry:cartagena:outer_road")
+    assert dry == ["f-dry:dunkirk:mooring", "f-dry:la-rochelle:mooring", "f-dry:morlaix:mooring"]
+    # San Fiorenzo's shore moved ashore by step 2a; Corunna's stays on its castle, a mark
+    assert [f.key for f in audit.findings if f.key.startswith("f-shore-afloat:")] == [
+        "f-shore-afloat:corunna"
+    ]
     assert len(list(A.PORTS_DIR.glob("*.yaml"))) >= 90
 
 
@@ -16279,9 +16305,12 @@ def test_truth_7_563_the_ways_in_the_land_guard_refuses():
 def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
     """Package 111 (d): the regions whose water more than one box of the climatology answers
     are Biscay north (the channel box's edge at 47.5 N), Biscay south (portugal's at 43.5 N),
-    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E) and the Balearics (its strip to
-    40.56 N); water in no box lies only in the Balearics' strip, the Cantabrian coast east of
-    5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
+    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E), the Balearics (its strip to
+    40.56 N) and, since package 111's step 2a moved its east bound, the Ligurian sea; water in
+    no box lies only in the Balearics' strip, the Cantabrian coast east of 5 W below 43.5 N,
+    the Strait south of 36 N west of 5 W and the Ligurian sea's strip east of 11 E north of
+    42.5 N. None of the three strips was moved into a box: each box drawn over its strip
+    would change the box of water another box answers today (package 111's step 2a)."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16293,11 +16322,13 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
         "d-split:strait",
         "d-split:tyrrhenian",
         "d-split:balearics",
+        "d-split:ligurian-sea",  # package 111's step 2a: its east bound to 11.1466 E
     }
     assert {k for k in keys if k.startswith("d-no-box:")} == {
         "d-no-box:balearics",
         "d-no-box:biscay-south",
         "d-no-box:strait",
+        "d-no-box:ligurian-sea",  # package 111's step 2a: the strip 42.5 to 42.68 N east of 11 E
     }
 
 
@@ -16544,6 +16575,344 @@ def test_truth_7_543_the_directors_dry_run_on_his_hull_is_the_orders_word_and_ne
     assert "No ship named 'Harpy' is on the sea" in dry
     real = T.world_order(h.world, DIRECTOR, order)
     assert "No ship named 'Harpy' is on the sea" in str(real)
+
+
+def test_truth_7_531_valletta_is_the_orders_frances_and_the_kings_and_a_yard_after_its_year():
+    """Package 105, step 2: Valletta's holder by its dated rows, the Order of St John's to
+    the capitulation of 12 June 1798, France's to the surrender of 5 September 1800 (James
+    1837, vol. 2, pp. 170 and 445), the King's after; blockaded by the British from 12
+    October 1798 (pp. 211 to 213) and open after; the merchants' stores until the King's
+    yard of the first year the sources give (Smyth 1854, p. 420: 1816); under the Order its
+    pilot says plainly that the Order's galleys were rowed by enslaved men (Smyth 1824, p.
+    202; decision 68), and no person is a good of its market."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    path = port_files()["valletta"]
+    days = {
+        "order": datetime(1797, 6, 1, 12),
+        "france": datetime(1798, 7, 1, 12),
+        "blockade": datetime(1799, 6, 1, 12),
+        "king": datetime(1805, 6, 20, 12),
+        "yard": datetime(1816, 6, 1, 12),
+    }
+    ports = {k: load_port(path, chart, None, d) for k, d in days.items()}
+    assert ports["order"].nation == "order-of-st-john"
+    assert ports["france"].nation == ports["blockade"].nation == "france"
+    assert ports["king"].nation == ports["yard"].nation == "britain"
+    assert ports["france"].state == "open" and ports["blockade"].blockaded_by == "britain"
+    assert ports["king"].state == "open" and ports["king"].blockade is None
+    assert [ports[k].dockyard.kind for k in days] == ["chandlers"] * 4 + ["yard"]
+    assert "topmast" in ports["yard"].dockyard.items and "water" in ports["order"].dockyard.items
+    assert "enslaved" in ports["order"].pilot.words["marks"]
+    assert "enslaved" not in ports["king"].pilot.words["marks"]
+    for port in ports.values():
+        assert not {"slaves", "slave", "captives"} & set(port.market.goods)
+    # Malta's other three by their own rows: Gozo's castle capitulated on 28 October 1798
+    gozo = port_files()["mgarr"]
+    assert load_port(gozo, chart, None, datetime(1798, 10, 28)).nation == "france"
+    assert load_port(gozo, chart, None, datetime(1798, 10, 29)).nation == "britain"
+
+
+def test_truth_7_532_sicilys_seams_hold_no_gap_and_no_overlap():
+    """Package 105, step 2: the region `sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E)
+    abuts `tunis-coast` at 11.1466 E and `tyrrhenian` at 38.5 N; the tiles each lists are
+    its own (17 of the block's are its neighbours', kept by the seam rule), the chart answers
+    on either side of each seam, and its east limit is the block's."""
+    from freesail.world.chart import load_chart, load_manifest
+    from freesail.world.geo import Position
+
+    manifest = load_manifest()
+    regions = manifest["regions"]
+    sicily = regions["sicily"]["bounds"]
+    assert sicily == {"south": 35.01334, "north": 38.5, "west": 11.1466, "east": 16.69332}
+    assert regions["tunis-coast"]["bounds"]["east"] == sicily["west"]
+    assert regions["tyrrhenian"]["bounds"]["south"] == sicily["north"]
+    names = {}
+    for rid, spec in regions.items():
+        for t in (spec.get("tiles") or {}).get("2") or []:
+            assert t["name"] not in names, (t["name"], rid, names.get(t["name"]))
+            names[t["name"]] = rid
+    assert sum(1 for r in names.values() if r == "sicily") == 109
+    whole = load_chart("atlantic-east")
+    assert whole.bounds[3] == 16.69332
+    for lat in (36.5, 37.0, 37.5, 38.0, 38.4):
+        assert whole.region_at(Position(lat, 11.14)) == "tunis-coast"
+        assert whole.region_at(Position(lat, 11.15)) == "sicily"
+        for lon in (11.14, 11.15):
+            assert whole.depth_at(Position(lat, lon)) is not None
+    for lon in (11.5, 12.5, 13.5, 14.5, 15.3):
+        assert whole.region_at(Position(38.49, lon)) == "sicily"
+        assert whole.region_at(Position(38.51, lon)) == "tyrrhenian"
+        for lat in (38.49, 38.51):
+            assert whole.depth_at(Position(lat, lon)) is not None
+
+
+def test_truth_7_533_the_faros_stream_turns_and_runs_at_the_pilots_rates():
+    """Package 105, step 2: in the Faro of Messina the stream runs north and south by turns,
+    six hours each way, at four knots at springs and two at neaps (JUDGEMENT within Smyth
+    1824's two to five miles an hour, p. 110), along the channel's two reaches; the master's
+    book says the same water and its sense, the flood the northward stream."""
+    from freesail.world.geo import Position
+    from freesail.world.tide import load_directions, load_tide
+
+    tide = load_tide()
+    north, south = Position(38.24, 15.62), Position(38.08, 15.60)
+    assert tide.area_at(north).id == "faro-north" and tide.area_at(south).id == "faro-south"
+    start = datetime(1805, 6, 12, 0, 0)  # springs
+    for here in (north, south):
+        states = [tide.at(here, start + timedelta(minutes=10 * i)) for i in range(150)]
+        rates = [s.rate_kn for s in states]
+        assert 3.5 <= max(rates) <= 4.5
+        ns = [s.stream_north_ms for s in states]
+        turns = sum(1 for a, b in zip(ns, ns[1:], strict=False) if (a > 0) != (b > 0))
+        assert 3 <= turns <= 5  # four turns in a day and a night, six hours each way
+    neaps = tide.at(north, datetime(1805, 6, 19, 0, 0))
+    assert 1.5 <= neaps.rate_kn <= 2.6
+    book = load_directions()
+    said = book.area_at(north)
+    assert said.id == "faro-north" and said.spring_kn == 4.0 and said.neap_kn == 2.0
+    assert "Smyth 1824" in said.source and book.area_at(south).set_point == "NNW"
+    assert (35.01334, 38.5, 11.1466, 16.69332) in book.boxes
+
+
+def test_truth_7_534_the_tide_at_palermo_messina_and_valletta_is_the_mediterraneans():
+    """Package 105, step 2: the block's six gauges (TICON's, block `sicily`) give the water
+    its own tide: at Palermo, Messina and Valletta an M2 of centimetres and a mean level
+    under a third of a metre, where the eleven's alone had given the Atlantic's (an M2 of
+    two to four metres, Saint-Malo's level)."""
+    import yaml
+
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    streams = yaml.safe_load(open(T.STREAMS_PATH, encoding="utf-8"))
+    eleven = T.Tide({**doc, "gauges": [g for g in doc["gauges"] if "block" not in g]}, streams)
+    for lat, lon in ((38.13, 13.37), (38.19, 15.56), (35.90, 14.52)):
+        level, consts = tide.constants_at(Position(lat, lon))
+        assert 0.0 < level < 0.3 and consts["M2"][0] < 0.15, (lat, lon)
+        assert eleven.constants_at(Position(lat, lon))[1]["M2"][0] > 2.0, (lat, lon)
+    gauges = [g for g in tide.block_gauges if "sicily" in g.blocks]
+    assert sorted(g.id for g in gauges) == [
+        "catania",
+        "lampedusa",
+        "messina",
+        "palermo",
+        "porto-empedocle",
+        "reggio-calabria",
+    ]
+
+
+def test_truth_7_535_each_of_steps_two_ports_road_is_as_its_pilot_has_it():
+    """Package 105, step 2: each port's road lies on the chart's water within half to
+    half again its pilot's depth (the marks placed on the grid, the moves said in the
+    features file), with a note of the bottom within three kilometres; Messina's harbour
+    within the Braccio, which the grid lacks and the features carry as ground; and every
+    port's track out to sea crosses no land."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    for pid in sorted(PACKAGE_105_PORTS):
+        port = load_port(port_files()[pid], chart, None, datetime(1805, 6, 20, 12))
+        road = port.outer_road
+        depth = chart.depth_at(road.position)
+        assert depth is not None and road.depth_m is not None, pid
+        assert 0.5 * road.depth_m <= depth <= 1.6 * road.depth_m, (pid, depth, road.depth_m)
+        assert chart.bottom_near(port.anchorage.position), pid
+    braccio = [chart.feature(f) for f in ("braccio-south", "braccio-middle", "braccio-point")]
+    assert all(f.grid_lacks and f.is_ground for f in braccio)
+    assert chart.danger_under(braccio[1].position, 0.0, 30.0, 3.0) is not None
+
+
+def test_truth_7_536_a_ship_may_sail_from_naples_through_the_faro_to_valletta_on_charted_water():
+    """Package 105, step 2: the passage from Naples's road by the Tyrrhenian, the Faro
+    between the Faro point and Scylla, the channel past Messina to Cape dell'Armi, round
+    Cape Passaro to Valletta's outer road lies on charted water every leg, no leg crossing
+    the land; the mainland's ports France's from 1806 by their rows (Reggio's, Scilla's
+    with the British garrison of 1806 to 1808, James 1837, vol. 4, pp. 125 to 126 and 294)
+    and Messina's British years in its pilot's words and its yard."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    legs = [
+        chart.feature("naples-road").position,
+        Position(40.55, 14.15),
+        Position(38.40, 15.55),
+        Position(38.275, 15.68),
+        Position(38.20, 15.60),
+        Position(38.05, 15.60),
+        Position(37.90, 15.65),
+        Position(36.60, 15.25),
+        chart.feature("valletta-outer-road").position,
+    ]
+    for a, b in zip(legs, legs[1:], strict=False):
+        crossing = chart.line_shore(a, b, 0.0, 185.0, 185.0)
+        assert crossing is None or not crossing[2], (a, b)
+        assert chart.depth_at(b) is not None and chart.depth_at(b) > 0
+    files = port_files()
+    on = {y: datetime(y, 6, 1, 12) for y in (1805, 1807, 1810, 1817)}
+    scilla = [load_port(files["scilla"], chart, None, d).nation for d in on.values()]
+    assert scilla == ["naples", "britain", "france", "naples"]
+    reggio = [load_port(files["reggio"], chart, None, d).nation for d in on.values()]
+    assert reggio == ["naples", "france", "france", "naples"]
+    messina = {y: load_port(files["messina"], chart, None, d) for y, d in on.items()}
+    assert messina[1805].dockyard.kind == "chandlers" and messina[1810].dockyard.kind == "yard"
+    assert "British garrison" in messina[1807].pilot.words["marks"]
+    assert "British" not in messina[1805].pilot.words["marks"]
+    assert {p.nation for p in messina.values()} == {"naples"}
+
+
+# package 105's step 3 ports: western Sicily, the south coast, the islands and Ustica
+PACKAGE_105_WEST_PORTS = frozenset(
+    {
+        "palermo",
+        "trapani",
+        "favignana",
+        "marsala",
+        "sciacca",
+        "girgenti",
+        "licata",
+        "terranova",
+        "porto-palo",
+        "lipari",
+        "pantelleria",
+        "lampedusa",
+        "ustica",
+    }
+)
+
+
+def test_truth_7_537_a_ship_may_sail_from_tunis_to_palermo_on_charted_water():
+    """Package 105, step 3: the passage from the road of Tunis by Cape Bon, across the
+    channel south of Maritimo and the Egadi, round Cape St Vito and Cape di Gallo into the
+    gulf of Palermo to the road off the mole lies on charted water every leg, no leg crossing
+    the land, from
+    `tunis-coast` into `sicily` and along the seam with `tyrrhenian`; the thirteen ports of
+    the step load, each the King of the Two Sicilies' and neutral to a British ship, Ustica
+    in `tyrrhenian`'s bounds and features, the rest in `sicily`'s; Cefalù and Termini marks
+    and not ports (Smyth 1824, App. p. v: a summer anchorage for coasters; a road for boats
+    that can be beached)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+    from freesail.world.nations import load_nations
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    legs = [
+        chart.feature("tunis-road").position,
+        Position(37.15, 10.60),
+        Position(37.20, 11.10),
+        Position(37.80, 11.95),
+        Position(38.25, 12.55),
+        Position(38.25, 12.85),
+        Position(38.25, 13.25),
+        Position(38.20, 13.40),
+        chart.feature("palermo-road").position,
+    ]
+    regions = set()
+    for a, b in zip(legs, legs[1:], strict=False):
+        crossing = chart.line_shore(a, b, 0.0, 185.0, 185.0)
+        assert crossing is None or not crossing[2], (a, b)
+        assert chart.depth_at(b) is not None and chart.depth_at(b) > 0
+        regions.add(chart.region_at(b))
+    assert {"tunis-coast", "sicily"} <= regions
+    files = port_files()
+    table = load_nations()
+    assert PACKAGE_105_WEST_PORTS <= set(files)
+    assert not {"cefalu", "termini"} & set(files)
+    assert chart.feature("cefalu").kind == "town" and chart.feature("termini").kind == "town"
+    for pid in sorted(PACKAGE_105_WEST_PORTS):
+        port = load_port(files[pid], chart, None, datetime(1808, 4, 20, 12))
+        assert port.nation == "naples" == table.port_nations[pid], pid
+        assert table.stance("britain", port.nation) == "neutral", pid
+        want = "tyrrhenian" if pid == "ustica" else "sicily"
+        assert chart.region_at(port.anchorage.position) == want, pid
+        assert chart.region_of[port.anchorage.feature_id] == want, pid
+
+
+def test_truth_7_538_each_of_step_threes_roads_is_as_its_pilot_has_it_and_its_words_say_plainly():
+    """Package 105, step 3: each port's road lies on the chart's water within half to half
+    again its pilot's depth, with a note of the bottom within three kilometres; the reefs
+    and the islet the grid lacks are carried by the features (the Porcelli, the Bentinck
+    shoal, Lampion, an island the grid lacks and so ground); where the sources say a port
+    held convicts or saw its people carried off as captives, its pilot's words say so
+    (decision 68: Palermo's and Girgenti's galley slaves, convicts once chained to the oars,
+    Smyth 1824, App. p. v and p. 203; Favignana's convicts, p. 246; Lipari's captives of
+    1544, p. 264; Pantellaria's thousand carried into slavery, p. 281); and the Calabria
+    sliver closed, 15.5 to 15.84 E north of 38.5 N `tyrrhenian`'s by its bound moved to its
+    last column's edge, with no tile of its written."""
+    from freesail.world.chart import load_chart, load_manifest
+    from freesail.world.geo import Position
+    from freesail.world.ports import load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    files = port_files()
+    ports = {
+        pid: load_port(files[pid], chart, None, datetime(1808, 4, 20, 12))
+        for pid in PACKAGE_105_WEST_PORTS
+    }
+    for pid, port in sorted(ports.items()):
+        road = port.outer_road
+        depth = chart.depth_at(road.position)
+        assert depth is not None and road.depth_m is not None, pid
+        assert 0.5 * road.depth_m <= depth <= 1.6 * road.depth_m, (pid, depth, road.depth_m)
+        assert chart.bottom_near(port.anchorage.position), pid
+    for fid in ("porcelli-trapani", "bentinck-shoal"):
+        f = chart.feature(fid)
+        assert f.is_hazard and f.dries_m is not None and f.dries_m > -5.0, fid
+    lampione = chart.feature("lampione")
+    assert lampione.grid_lacks and lampione.is_ground
+    words = {pid: " ".join(p.pilot.words.values()) for pid, p in ports.items()}
+    assert "galley slaves" in words["palermo"] and "convicts" in words["palermo"]
+    assert "galley slaves" in words["girgenti"] and "chained" in words["girgenti"]
+    assert "convicts" in words["favignana"]
+    assert "captives" in words["lipari"] and "1544" in words["lipari"]
+    assert "slavery" in words["pantelleria"]
+    regions = load_manifest()["regions"]
+    assert regions["tyrrhenian"]["bounds"]["east"] == 15.83999
+    assert len(regions["tyrrhenian"]["tiles"]["2"]) == 158  # as before the bound moved
+    for lat in (38.55, 38.7, 39.0):
+        assert chart.region_at(Position(lat, 15.7)) == "tyrrhenian"
+        assert chart.depth_at(Position(lat, 15.7)) is not None
+
+
+@pytest.mark.slow
+def test_truth_7_539_the_frigate_sails_from_valletta_through_the_faro_to_palermo():
+    """Package 105, step 3: the block's scenario (`the-faro.yaml`, April 1808) sailed at seed
+    7 by its short book: from off the mouth of the Grand Harbour across the channel of Malta
+    to Cape Passaro's offing, up the east coast, through the Faro past Messina and the Faro
+    point, west along the north coast south of Vulcano to the gulf of Palermo, where she
+    anchors in the road off the mole on stiff clay (Smyth 1824, App. p. iv), without touching
+    ground."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "the-faro.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    near_faro = False
+    for _ in range(96 * 6):
+        w.run(600)
+        _, off = bearing_and_distance(w.position, w.chart.feature("faro-point").position)
+        near_faro = near_faro or off < 2.0 * units.NAUTICAL_MILE
+        if len([e for e in w.log if e.kind == "ship.anchored"]) >= 2:
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 2  # off Valletta at the start, in the road of Palermo
+    assert near_faro
+    _, off = bearing_and_distance(w.position, w.chart.feature("palermo-road").position)
+    assert off < 0.6 * units.NAUTICAL_MILE
+    # the road shelves steeply (the hand lead finds no bottom at twenty fathoms a few cables
+    # out): the bottom where she lies is the pilot's, by the chart's note
+    assert w.chart.bottom_near(w.position) == "stiff clay"
 
 
 def test_truth_7_544_the_ships_view_is_drawn_from_the_hull_he_is_in_or_aboard():

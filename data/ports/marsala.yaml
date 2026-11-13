@@ -1,0 +1,110 @@
+# FreeSail: Marsala as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch marsala). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 227 to 236 and App. p. xxvi: twenty-one thousand people trading in excellent wine, fruit and barilla, the town without ordnance or bomb-proof stores (p. 232); the old port, a creek of twelve or fourteen feet, filled with stones about 1570 by John of Austria's order against the Turks (p. 233); Mr Woodhouse's mole raised from the sunken stones before his establishment south of the town (p. 234), seven to fourteen feet between it and the beach; his new ballio of 1815 (p. 229); ships of size two miles S W of the city in eleven to eight fathoms, eight and a half of mud the berth, the rocks more than a mile off the land; the shoals trending S E from Cape Boeo nearly awash; an uncertain tide of three quarters to a mile and a half an hour by the winds, rising ten to twenty inches (pp. 227 to 228). Purdy 1826, p. 150: the English Wine Establishment a mile south of the city.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: marsala
+name: Marsala
+nation: naples
+source: "Smyth 1824 pp. 227-236, App. p. xxvi; Purdy 1826 p. 150; Norie 1831 pp. 127-128"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: marsala-road
+  name: the road of Marsala
+  lat_deg: 37.7740
+  lon_deg: 12.4080
+  depth_fathoms: 8.5
+anchorage:
+  feature: marsala-road
+  name: the road of Marsala
+  lat_deg: 37.7740
+  lon_deg: 12.4080
+mooring:
+  feature: marsala-road
+  name: the road of Marsala, two miles off
+  lat_deg: 37.7740
+  lon_deg: 12.4080
+  depth_fathoms: 8.5
+  bottom: mud
+shore:
+  name: Mr Woodhouse's mole
+  lat_deg: 37.7860
+  lon_deg: 12.4440
+
+pilot:
+  station: marsala-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the wine establishment
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Giuseppe Pipitone, Vincenzo Genna, Antonino Bonomo, Pietro Lombardo]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 230            # judgement
+  words:
+    channel: "The rocks run more than a mile off the land on every side, and the shoals off Cape Boeo trend to the south-east nearly awash: ships of size keep two miles off. For the mole, keep the centre of the Augustine convent a little open of Mount St Julian."
+    marks: "Cape Boeo, low, with the chapel of St John on its point; the town's walls; the English wine establishment and its small mole a mile to the south; Mount St Julian far to the north."
+    anchorage: "Two miles south-west of the city in eight and a half fathoms of mud, St Catharine's Castle on Favignana north-north-west and the wine establishment east by north. Between the mole and the beach only seven to fourteen feet."
+    tide: "An uncertain tide along these shores of three quarters of a mile to a mile and a half an hour by the winds, rising ten to twenty inches."
+
+tide:
+  establishment: Mazzara
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 12.5, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 7.5, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 2.5, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 360.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 5.5, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 53.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 16.0, origin: naples, note: "JUDGEMENT"}
+    - {good: barilla, price: 8, origin: naples, note: "barilla traded (Smyth 1824, p. 232); the price JUDGEMENT"}
+    - {good: figs, price: 10, origin: naples, note: "the figs of San Pantaleo (Smyth 1824, p. 236); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 36, pounds: 70, note: "no stores named; the wine house's own, judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "a spring in the cave under St John's chapel (Smyth 1824, p. 228); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 3, pounds: 1, delay_h: 36}
+
+closed_to: []
+
+tracks:
+  to_sea: [marsala-road, 37 45 N 12 22 E]
+  from_sea: [37 45 N 12 22 E, marsala-road]
+  in: [marsala-road]
