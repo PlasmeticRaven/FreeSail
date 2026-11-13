@@ -923,6 +923,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["catalan-coast"]  # package 101: the hole between the Balearics and the Gulf
     # package 104: the L-shaped hole, the Sardinian sea and the coast of Tunis
     regions += ["sardinian-sea", "tunis-coast"]
+    regions += ["sicily"]  # package 105: Sicily and Malta, south of 38.5 N and east of Cape Bon
+
     regions += ["canaries", "salvages"]  # package 106a, over the ocean carried south
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
@@ -932,13 +934,14 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
     # 32 W with the corridor widened to them); the Channel's east block 51.5 N and 2.5 E
     # (package 79b), across the meridian; the Balearics 4.5 E (package 79c) and the
-    # Tyrrhenian's block 15.5 E (package 79d)
+    # Tyrrhenian's block 15.5 E (package 79d), Sicily and Malta's 16.69332 E (package 105:
+    # Calabria's toe to Cape Spartivento; old: 15.5 E, the Tyrrhenian's)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
     # package 106a: the south limit the ocean carried south's, the Canaries' row of the
     # level-1 grid a hair inside its edge (25.2 N); it was 32 N, the corridor's
     assert manifest["charts"][WHOLE]["corridors_beside"] == ["atlantic-south"]
-    assert whole.bounds == (25.2001, 51.5, west, 15.5)
-    assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 15.5 E"
+    assert whole.bounds == (25.2001, 51.5, west, 16.69332)
+    assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
@@ -959,6 +962,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     catalan = load_chart("catalan-coast")  # package 101
     sardinian = load_chart("sardinian-sea")  # package 104
     tunis = load_chart("tunis-coast")  # package 104
+    sicily = load_chart("sicily")  # package 105
+
     canaries = load_chart("canaries")  # package 106a
     salvages = load_chart("salvages")  # package 106a
     assert whole.features.keys() == (
@@ -978,6 +983,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | catalan.features.keys()
         | sardinian.features.keys()
         | tunis.features.keys()
+        | sicily.features.keys()
         | canaries.features.keys()
         | salvages.features.keys()
     )
@@ -997,6 +1003,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert all(whole.region_of[fid] == "catalan-coast" for fid in catalan.features)
     assert all(whole.region_of[fid] == "sardinian-sea" for fid in sardinian.features)  # 104
     assert all(whole.region_of[fid] == "tunis-coast" for fid in tunis.features)  # 104
+    assert all(whole.region_of[fid] == "sicily" for fid in sicily.features)  # 105
+
     assert all(whole.region_of[fid] == "canaries" for fid in canaries.features)  # 106a
     assert all(whole.region_of[fid] == "salvages" for fid in salvages.features)  # 106a
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
@@ -1019,6 +1027,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(catalan.coast_lines())
         + len(sardinian.coast_lines())
         + len(tunis.coast_lines())
+        + len(sicily.coast_lines())
         + len(canaries.coast_lines())
         + len(salvages.coast_lines())
     )
@@ -2261,10 +2270,19 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
     assert all(f.kind == "island" for f in lacking)
     assert all(f.height_m and 0 < f.extent_m < 1000 for f in lacking)
     regions = {whole.region_of[f.id] for f in lacking}
+    # package 105: the Braccio of Messina's three and Filfla (old: the five regions, 21);
     # package 106a: the West Rock by Clara, north of Lanzarote
-    assert regions == {MEDW, BALEARICS, "gulf-of-lion", "ligurian-sea", "tyrrhenian", "canaries"}
+    assert regions == {
+        MEDW,
+        BALEARICS,
+        "gulf-of-lion",
+        "ligurian-sea",
+        "tyrrhenian",
+        "sicily",
+        "canaries",
+    }
     # package 101: the Medas off the Ter and Tabarca off Cape Santa Pola, two more
-    assert len(lacking) == 22
+    assert len(lacking) == 26
     for f in lacking:
         assert whole.depth_at(f.position) is not None, f.id
         assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id

@@ -729,6 +729,7 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         "catalan-coast",  # package 101: Barcelona's table its check
         "sardinian-sea",  # package 104: the Mediterranean west's rows
         "tunis-coast",  # package 104: Bizerta's table its check
+        "sicily",  # package 105: Malta's table its check
         "canaries",  # package 106a: the trade, PROVISIONAL, judgement
     ]
     channel = clim.boxes["channel"]
@@ -968,3 +969,34 @@ def test_a_world_off_lisbon_seeds_from_the_portuguese_box_and_one_in_the_channel
     assert plane.systems.box.name == "channel"
     channel.run(120)
     assert channel.systems.crossings == 0
+
+
+def test_sicily_and_malta_have_a_box_and_maltas_table_checks_it():
+    """Package 105, step 2: Sicily and Malta's block has a box of its own, its region's
+    bounds, its check rows Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III,
+    p. 734, read from the page image), each month's eight points summed against the printed
+    totals (N 20, NE 72, E 19, SE 52, S 10, SW 34, W 23, NW 126, the calm 9), the shares
+    scaled to nine tenths; the north-wester's quarter ahead of the south's in every month,
+    and in July the north the most of all."""
+    clim = load_climatology()
+    box = clim.boxes["sicily"]
+    assert box.bounds == (35.01334, 38.5, 11.1466, 16.69332) and box.provisional
+    assert "Malta" in box.source and "p. 734" in box.source
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    points = {"N": 0, "NE": 0, "E": 0, "SE": 0, "S": 0, "SW": 0, "W": 0, "NW": 0}
+    for m, row in raw["boxes"]["sicily"]["months"].items():
+        assert row["note"].startswith("judgement") and "p. 734" in row["note"], m
+        check = row["check"]
+        quarters = sum(check[k] for k in ("westerly_pct", "easterly_pct", "southerly_pct"))
+        assert 86 <= quarters + check["northerly_pct"] <= 92, m
+        assert check["northerly_pct"] > check["southerly_pct"], m
+        for word in row["note"].split("26 years): ", 1)[1].split(", the calm")[0].split(", "):
+            point, days = word.rsplit(" ", 1)
+            points[point] += int(days)
+    assert points == {"N": 20, "NE": 72, "E": 19, "SE": 52, "S": 10, "SW": 34, "W": 23, "NW": 126}
+    july = box.month(7).check
+    assert july["northerly_pct"] == max(july[k] for k in july if k.endswith("_pct"))
+    for lat, lon in ((35.90, 14.52), (38.19, 15.56), (37.06, 15.29), (38.12, 13.37)):
+        assert clim.box_at(lat, lon).name == "sicily", (lat, lon)
+    assert clim.box_at(37.28, 9.90).name == "tunis-coast"
+    assert clim.box_at(40.83, 14.26).name == "tyrrhenian"

@@ -219,6 +219,22 @@ tables:
       - {name: Bona, lat_deg: 36.947, lon_deg: 7.790, hw_h: 8, hw_m: 25, spring_rise_ft: 1, note: "no period figure; the hour the world's own establishment by the gauges that serve the block, JUDGEMENT; the rise JUDGEMENT"}
       - {name: Bizerta, lat_deg: 37.285, lon_deg: 9.899, hw_h: 8, hw_m: 50, spring_rise_ft: 1, note: "Smyth 1854, p. 187: the flux and reflux of Bizerta from vaporization, the winds and the rains; the Admiralty 1913, p. 430: VIIIh 20m, springs rise a foot and a half (modern); the hour the world's own by the block's gauges, JUDGEMENT"}
       - {name: the Goletta, lat_deg: 36.816, lon_deg: 10.340, hw_h: 8, hw_m: 50, spring_rise_ft: 1, note: "Smyth 1854, p. 187: at the Goletta a rise and fall of nearly three feet, so variable it must be ascribed to local rather than lunar causes; the rise a foot JUDGEMENT for the moon's part; the hour the world's own by the block's gauges, JUDGEMENT"}
+      # package 105, Sicily and Malta's block: the Faro's and Messina's hours Smyth's own
+      # (1824, p. 110: high water at full and change off the Faro point at 6h 56m and in
+      # Messina's harbour at 8h 10m, the rise a few inches and eighteen or twenty before the
+      # vernal equinox), eight hours from the world's by the block's gauges (Messina's
+      # TICON gauge 0h 1m, Reggio's 3h 11m: the Strait's amphidrome, the modern record's) and
+      # kept as the period's; the other places' hours the world's own by the six gauges,
+      # JUDGEMENT; the rise a foot, JUDGEMENT within Purdy 1826's "a foot or two" with the
+      # weather (p. 151, Sicily's south coast, after Smyth) and Smyth's inches. The block's other
+      # places take the nearest.
+      - {name: the Faro, lat_deg: 38.265, lon_deg: 15.653, hw_h: 6, hw_m: 56, spring_rise_ft: 1, note: "Smyth 1824, p. 110: high water at full and change off the Faro point 6h 56m, the most precise observations he could make; the rise JUDGEMENT within his few inches to twenty"}
+      - {name: Messina, lat_deg: 38.192, lon_deg: 15.560, hw_h: 8, hw_m: 10, spring_rise_ft: 1, note: "Smyth 1824, p. 110: in the harbour of Messina 8h 10m; Norie 1831, p. 134 (Mr Blyth): about 7h 30m; the rise JUDGEMENT within Smyth's few inches to twenty"}
+      - {name: Milazzo, lat_deg: 38.217, lon_deg: 15.248, hw_h: 2, hw_m: 20, spring_rise_ft: 1, note: "Smyth 1824, p. viii: little tide in the bay; the hour the world's own by the block's gauges, JUDGEMENT; the rise JUDGEMENT"}
+      - {name: Reggio, lat_deg: 38.108, lon_deg: 15.642, hw_h: 3, hw_m: 10, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges (Reggio's TICON gauge), JUDGEMENT; the rise JUDGEMENT"}
+      - {name: Catania, lat_deg: 37.500, lon_deg: 15.095, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT; the rise JUDGEMENT"}
+      - {name: Syracuse, lat_deg: 37.058, lon_deg: 15.290, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT; the rise JUDGEMENT"}
+      - {name: Valletta, lat_deg: 35.899, lon_deg: 14.519, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "Purdy 1826, p. 166: off Filfla the tide hereabout scarcely perceptible; the Admiralty 1913, p. 495: IIIh 30m, springs rise 10 to 14 inches (modern); the hour the world's own by the block's gauges (no gauge in Malta: the six's blend), JUDGEMENT; the rise JUDGEMENT"}
       # package 101, the Catalan coast's block: no period tide-hour for the coast (Smyth
       # 1854, p. 176: on the Spanish coast within the Mediterranean the tides are of the
       # most moderate order); the hour the block's own gauge's establishment by the tide's

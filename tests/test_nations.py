@@ -45,6 +45,8 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "papal-state",
         # package 104: the regency of Tunis
         "tunis",
+        # package 105: the Order of St John, Malta's before June 1798
+        "order-of-st-john",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")
@@ -268,6 +270,20 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "carloforte": "sardinia",
         "gulf-of-palmas": "sardinia",
         "oristano": "sardinia",
+        # package 105, step 2: Malta's four the Order's first (their files' dated nations
+        # France's from June 1798 and the King's after), Sicily's five the King of the Two
+        # Sicilies', Calabria's two his first (France's from 1806 by their rows)
+        "valletta": "order-of-st-john",
+        "marsaxlokk": "order-of-st-john",
+        "st-pauls-bay": "order-of-st-john",
+        "mgarr": "order-of-st-john",
+        "messina": "naples",
+        "milazzo": "naples",
+        "catania": "naples",
+        "augusta": "naples",
+        "syracuse": "naples",
+        "reggio": "naples",
+        "scilla": "naples",
         # package 106a: the Canaries, the King of Spain's
         "santa-cruz-de-tenerife": "spain",
         "orotava": "spain",

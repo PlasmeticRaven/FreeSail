@@ -2184,7 +2184,7 @@ boxes:
   # the westerlies a few points over; said in docs/dev/TuningNotes.md.
   tyrrhenian:
     title: "the Tyrrhenian, Sardinia to Naples, with the tramontana and the libeccio"
-    bounds: {south: 38.5, north: 42.5, west: 8.0, east: 15.5}
+    bounds: {south: 38.5, north: 42.5, west: 8.0, east: 15.83999}  # package 105: to the block's new east bound (old 15.5)
     provisional: true
     source: "Naples' table (Admiralty 1916, vol. II, p. 466) for the quarters, the glass and the gale days; the systems judgement, said in each row"
     months:
@@ -3195,6 +3195,182 @@ boxes:
         life_h: {"min": 36, "max": 90}
         high: {"probability": 0.95, "bearing_deg": {"mean": 260, "spread": 76}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
         check: {"westerly_pct": 36, "easterly_pct": 9, "southerly_pct": 20, "northerly_pct": 22, "gust31_days": 5, "gust54_days": 0.9}
+
+  sicily:
+    title: "Sicily and Malta, the Faro and the Sicilian channel, with the north-wester and the gregale"
+    bounds: {south: 35.01334, north: 38.5, west: 11.1466, east: 16.69332}
+    provisional: true
+    source: "Malta's table (the Admiralty's Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, read from the page image; 26 years of the wind, 1852 to 1886) for the quarters; the gust days the Mediterranean west's, JUDGEMENT; the generator's figures the coast of Tunis's with the gradient and the lows fitted to the table by simulated months, judgement; package 105"
+    months:
+      1:
+        name: January
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 2, NE 5, E 1, SE 4, S 1, SW 5, W 2, NW 10, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 25.1, E 13.5, S 16.9, N 24.7; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.09, "high_toward_deg": 255}
+        lows_per_month: 6.4
+        track_bearing_deg: {"mean": 150, "spread": 30}
+        closest_approach_km: {"mean": -117, "spread": 744}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1008, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 179, "spread": 164}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 28, "easterly_pct": 16, "southerly_pct": 16, "northerly_pct": 28, "gust31_days": 5, "gust54_days": 0.9}
+      2:
+        name: February
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 5, E 1, SE 4, S 1, SW 4, W 2, NW 9, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 24.2, E 14.2, S 21.1, N 22.7; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.09, "high_toward_deg": 195}
+        lows_per_month: 9
+        track_bearing_deg: {"mean": 11, "spread": 30}
+        closest_approach_km: {"mean": -412, "spread": 1118}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1004, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 11, "spread": 165}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 27, "easterly_pct": 18, "southerly_pct": 16, "northerly_pct": 26, "gust31_days": 5, "gust54_days": 0.8}
+      3:
+        name: March
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 5, E 2, SE 4, S 1, SW 3, W 3, NW 11, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 27.1, E 15.3, S 18.7, N 30.1; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.12, "high_toward_deg": 240}
+        lows_per_month: 7
+        track_bearing_deg: {"mean": 42, "spread": 30}
+        closest_approach_km: {"mean": 440, "spread": 549}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 991, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 320, "spread": 97}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 29, "easterly_pct": 19, "southerly_pct": 13, "northerly_pct": 26, "gust31_days": 7, "gust54_days": 1.1}
+      4:
+        name: April
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 5, E 2, SE 5, S 1, SW 3, W 2, NW 11, the calm 0, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 23.1, E 13.2, S 14.9, N 26.5 (OUTSIDE four points of the row: said, the nearest the search found); the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.09, "high_toward_deg": 220}
+        lows_per_month: 3.75
+        track_bearing_deg: {"mean": 4, "spread": 30}
+        closest_approach_km: {"mean": -210, "spread": 482}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 997, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.92, "bearing_deg": {"mean": 228, "spread": 144}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 27, "easterly_pct": 21, "southerly_pct": 15, "northerly_pct": 27, "gust31_days": 5, "gust54_days": 0.8}
+      5:
+        name: May
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 2, NE 6, E 3, SE 5, S 1, SW 2, W 2, NW 9, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 22.9, E 18.1, S 16.3, N 26.7 (OUTSIDE four points of the row: said, the nearest the search found); the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.105, "high_toward_deg": 240}
+        lows_per_month: 7
+        track_bearing_deg: {"mean": 3, "spread": 30}
+        closest_approach_km: {"mean": -1133, "spread": 460}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 995, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 67, "spread": 73}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 22, "easterly_pct": 25, "southerly_pct": 13, "northerly_pct": 28, "gust31_days": 3, "gust54_days": 0.5}
+      6:
+        name: June
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 2, NE 8, E 2, SE 4, S 0, SW 1, W 2, NW 10, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 20.5, E 24.2, S 13.4, N 31.9; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.145, "high_toward_deg": 330}
+        lows_per_month: 7.5
+        track_bearing_deg: {"mean": 93, "spread": 30}
+        closest_approach_km: {"mean": 921, "spread": 297}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1003, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.94, "bearing_deg": {"mean": 212, "spread": 156}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 22, "easterly_pct": 24, "southerly_pct": 8, "northerly_pct": 33, "gust31_days": 2, "gust54_days": 0.3}
+      7:
+        name: July
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 3, NE 8, E 1, SE 3, S 0, SW 1, W 1, NW 13, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 17.3, E 17.9, S 8.6, N 48.4 (OUTSIDE four points of the row: said, the nearest the search found); the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.13, "high_toward_deg": 250}
+        lows_per_month: 1.6
+        track_bearing_deg: {"mean": 61, "spread": 30}
+        closest_approach_km: {"mean": -1169, "spread": 654}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 991, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 21, "spread": 100}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 23, "easterly_pct": 19, "southerly_pct": 6, "northerly_pct": 39, "gust31_days": 2, "gust54_days": 0.2}
+      8:
+        name: August
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 3, NE 8, E 1, SE 3, S 1, SW 1, W 1, NW 12, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 22.3, E 21.8, S 6.9, N 32.9; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.06, "high_toward_deg": 345}
+        lows_per_month: 7
+        track_bearing_deg: {"mean": 125, "spread": 30}
+        closest_approach_km: {"mean": 886, "spread": 550}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 994, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 300, "spread": 46}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 22, "easterly_pct": 19, "southerly_pct": 9, "northerly_pct": 38, "gust31_days": 2, "gust54_days": 0.2}
+      9:
+        name: September
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 2, NE 7, E 2, SE 5, S 1, SW 3, W 1, NW 9, the calm 0, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 20.6, E 21.3, S 10.1, N 27.3; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.09, "high_toward_deg": 270}
+        lows_per_month: 4.5
+        track_bearing_deg: {"mean": 95, "spread": 30}
+        closest_approach_km: {"mean": -1249, "spread": 425}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1006, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 67, "spread": 173}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 21, "easterly_pct": 24, "southerly_pct": 15, "northerly_pct": 30, "gust31_days": 2, "gust54_days": 0.3}
+      10:
+        name: October
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 6, E 2, SE 6, S 1, SW 3, W 2, NW 10, the calm 0, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 24.7, E 23.2, S 11.8, N 21.3; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.09, "high_toward_deg": 0}
+        lows_per_month: 5
+        track_bearing_deg: {"mean": 135, "spread": 30}
+        closest_approach_km: {"mean": 596, "spread": 292}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 994, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 286, "spread": 122}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 25, "easterly_pct": 23, "southerly_pct": 16, "northerly_pct": 26, "gust31_days": 4, "gust54_days": 0.6}
+      11:
+        name: November
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 5, E 1, SE 5, S 1, SW 3, W 2, NW 11, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 26.4, E 21.4, S 18.0, N 21.7; the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.12, "high_toward_deg": 345}
+        lows_per_month: 9
+        track_bearing_deg: {"mean": 103, "spread": 30}
+        closest_approach_km: {"mean": 420, "spread": 390}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1004, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 222, "spread": 82}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 27, "easterly_pct": 18, "southerly_pct": 15, "northerly_pct": 27, "gust31_days": 4, "gust54_days": 0.7}
+      12:
+        name: December
+        note: "judgement: the generator's figures the coast of Tunis's, the gradient and the lows fitted by simulated months (a scratch search, then 400 months at seed 11) to the check row, which is Malta's table (the Mediterranean Pilot vol. I, 1913, Appendix III, p. 734, 26 years): N 1, NE 4, E 1, SE 4, S 1, SW 5, W 3, NW 11, the calm 1, a half-point's days split between its quarters and the shares scaled to nine tenths; the 400 months gave W 31.0, E 9.1, S 12.0, N 23.7 (OUTSIDE four points of the row: said, the nearest the search found); the mean force, the gales and the fogs blank, the gust days the Mediterranean west's, JUDGEMENT"
+        background_hpa: 1016
+        gradient: {"hpa_per_100km": 0.075, "high_toward_deg": 125}
+        lows_per_month: 2.5
+        track_bearing_deg: {"mean": 174, "spread": 30}
+        closest_approach_km: {"mean": 396, "spread": 208}
+        speed_kn: {"min": 10, "max": 25}
+        central_hpa: {"mean": 1002, "spread": 8, "floor": 980}
+        radius_km: {"min": 300, "max": 550}
+        life_h: {"min": 36, "max": 90}
+        high: {"probability": 0.95, "bearing_deg": {"mean": 260, "spread": 76}, "distance_km": {"min": 700, "max": 1300}, "anomaly_hpa": {"min": 6, "max": 14}, "radius_km": {"min": 900, "max": 1500}, "life_h": {"min": 96, "max": 240}}
+        check: {"westerly_pct": 32, "easterly_pct": 15, "southerly_pct": 16, "northerly_pct": 25, "gust31_days": 5, "gust54_days": 0.9}
+
   # package 106a: the Canaries' sea and the ocean carried south (25.2 to 30 N, from 22.13 W
   # to the African coast), so that Madeira's box no longer answers south of 30 N by the
   # nearest-box rule; after Madeira's, which keeps 30 N where the two meet. The north-east
