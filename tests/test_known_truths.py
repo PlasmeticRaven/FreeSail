@@ -6983,13 +6983,16 @@ def test_truth_7b_114_a_thing_made_in_the_cabin_is_given_ashore_by_a_free_line_a
     assert [t.to_dict() for t in TH.things_of(held)] == [t.to_dict() for t in TH.things_of(world)]
 
 
-def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_drink_as_before():
-    """Package 53b's truth: "a free line that names nothing known is logged 'as said;
-    nothing of the ship's changed' and moves nothing, and `eat` and `drink` log as before."
-    Each of the free verbs said of nothing the world knows is a notable line in the words
-    as used ending in those words, journaled, the ship's state the same after them; `eat a
-    fine meal` and `drink three cups of wine` are answered to him alone and are no line of
-    the log, the words kept in the record."""
+def test_truth_7b_115_a_free_line_naming_nothing_known_is_refused_and_eat_and_drink_as_before():
+    """Package 53b's truth, moved by package 109 (the owner's play of 2026-11-12, note 9:
+    "it shouldn't accept an order that will do nothing at all"). It was: "a free line that
+    names nothing known is logged 'as said; nothing of the ship's changed' and moves
+    nothing, and `eat` and `drink` log as before", each line a notable `free.line` ending in
+    those words and journaled. It is now: each of the free verbs said of nothing the world
+    knows is refused (`order.rejected`), in words that say what was not found and what is in
+    his reach, nothing journaled and the ship's state the same after them; `eat a fine meal`
+    and `drink three cups of wine` are answered to him alone and are no line of the log, the
+    words kept in the record, as before."""
     from freesail.world import things as TH
 
     world = _veale_at_falmouth()
@@ -7012,14 +7015,16 @@ def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_dr
         "read the letter",
         "throw the empty bottle overboard",
     )
+    journal = len(world.journal)
     for words in lines:
         e = world.submit(words)
-        assert e.kind == "free.line" and e.severity.value == "notable", words
-        assert e.text.endswith("as said; nothing of the ship's changed."), e.text
-        assert not e.data["moved"]
+        assert e.kind == "order.rejected", (words, e.text)
+        assert "Nothing of that name is known" in e.text, e.text
+        assert "as said" not in e.text, e.text
     assert e.text == (
-        "By the captain, on the quarterdeck: threw the empty bottle overboard, as said; "
-        "nothing of the ship's changed."
+        "Order not carried out ('throw the empty bottle overboard'): Nothing of that name is "
+        "known: there is no empty bottle that you know of. You keep nothing, and nothing lies "
+        "here."
     )
     after = (
         [t.to_dict() for t in TH.things_of(world)],
@@ -7028,7 +7033,7 @@ def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_dr
         world.people.describe(),
     )
     assert after == before
-    assert [t for _, a, t in world.journal if a == "captain"][-len(lines) :] == list(lines)
+    assert len(world.journal) == journal
     n = len(world.log)
     assert world.submit("eat a fine meal").kind == "needs.answer"
     assert world.submit("drink three cups of wine").kind == "needs.answer"
@@ -16067,6 +16072,107 @@ def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_m
     from tests.test_flag_drawings import test_every_flag_a_hoist_can_hold_has_a_drawing as c
 
     c(root)
+
+
+def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
+    """Package 105, step 1: a port file's `state`, `dockyard`, `closed_to`, `market`,
+    `crew_pool` and `pilot` may be dated rows; no port file before 105 gives any of them so,
+    and each answers the same on every day (the far days 1700 and 1900, and the day of each
+    scenario that names it), as it did before the form (the builder's proof over every
+    scenario's day, docs/dev/TuningNotes.md, package 105)."""
+    from freesail.world.chart import load_chart
+    from freesail.world.ports import DATED_KEYS, load_port, port_files
+
+    chart = load_chart("atlantic-east")
+    files = port_files()
+    assert len(files) >= 90
+    days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
+    for pid, path in files.items():
+        loads = [load_port(path, chart, None, when) for when in days]
+        assert loads[0].dated == (), pid
+        for key in DATED_KEYS:
+            assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
+
+
+# -- Package 109: the mends from the owner's play of 2026-11-12 -----------------------------
+
+
+def _channel_east(ship: str | None = None):
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    return make_scenario_world(
+        load_scenario(root / "data" / "scenarios" / "channel-east.yaml"), ship=ship
+    )
+
+
+def test_truth_7_540_a_free_order_that_finds_nothing_is_refused_and_one_that_did_is_said():
+    """Package 109, step 1 (the owner's notes 9, 4 and 10): in the bilander in Brixham road,
+    'put Test Book on the table', 'read the letter', 'open the gunports' and 'take command of
+    the prize' are each refused (`order.rejected`), nothing journaled and nothing of the
+    things changed; 'take a sight for the latitude' goes to the navigation (refused at two
+    in the morning as the noon sight is, by the sun not on the meridian); a free line
+    whose words found a thing and moved nothing (the packet in the hold out of reach) is
+    still 'as said; nothing of the ship's changed', and one that moved it is said done."""
+    from freesail.world import things as TH
+
+    w = _channel_east("data/ships/bilander.yaml")
+    w.world_order("aboard: a sealed packet, in the hold", "the truth")
+    journal = len(w.journal)
+    for words in (
+        "put Test Book on the table",
+        "read the letter",
+        "open the gunports",
+        "take command of the prize",
+    ):
+        assert w.submit(words).kind == "order.rejected", words
+    assert len(w.journal) == journal
+    e = w.submit("take a sight for the latitude")  # the noon sight's own answer at two
+    assert e.kind == "order.rejected" and "not yet on the meridian" in e.text
+    e = w.submit("take the packet")
+    assert e.kind == "free.line" and e.text.endswith(
+        "as said; nothing of the ship's changed (the sealed packet is in the hold)."
+    )
+    w.world_order("aboard: a snuffbox, on the quarterdeck", "the truth")
+    e = w.submit("take the snuffbox")
+    assert e.kind == "free.line" and e.data["moved"]
+    assert [t.keeper for t in TH.things_of(w)] == ["", w.people.captain.id]
+
+
+def test_truth_7_541_a_thing_is_taken_by_its_listed_name_two_are_told_apart_and_kept_read():
+    """Package 109, step 1 (the owner's notes 10 and 5): the director's letter listed as 'a
+    sealed letter from Mr Weston to the master' is opened by those words; with two letters
+    to the captain on the quarterdeck, 'read the letter to the captain' is refused naming
+    both by their writers and 'the first', 'the second', and 'read the letter from Mr Gill'
+    and 'open the first letter' each take one; `my keeping` reads what he keeps and what
+    lies where he stands."""
+    w = _channel_east("data/ships/bilander.yaml")
+    w.world_order(
+        'aboard: a letter from Mr Weston to the master, on the quarterdeck, sealed: "Go."',
+        "the director",
+    )
+    assert w.submit("my keeping").text == (
+        "My keeping: Lying here: a sealed letter from Mr Weston to the master."
+    )
+    e = w.submit("open the sealed letter from Mr Weston to the master")
+    assert e.kind == "free.line" and e.data["moved"]
+    w = _channel_east()
+    w.world_order(
+        'aboard: a letter from the Admiralty to the captain, on the quarterdeck, sealed: "C."',
+        "the truth",
+    )
+    w.world_order(
+        'aboard: a letter from Mr Gill to the captain, on the quarterdeck: "Short."', "the truth"
+    )
+    e = w.submit("read the letter to the captain")
+    assert e.kind == "order.rejected" and e.data["choices"] == [
+        "letter_from_the_admiralty_to_the_captain",
+        "letter_from_mr_gill_to_the_captain",
+    ]
+    assert "'the letter to the captain' names two letters: the first, " in e.text
+    assert w.submit("read the letter from Mr Gill").data["thing"].startswith("letter_from_mr_gill")
+    e = w.submit("open the first letter")
+    assert e.data["thing"] == "letter_from_the_admiralty_to_the_captain" and e.data["moved"]
 
 
 # Package 106a: the ocean carried south, and the Canaries with the Salvages (truths 7-520 to

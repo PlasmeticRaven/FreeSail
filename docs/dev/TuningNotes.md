@@ -27027,10 +27027,129 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 
 
+## Package 105: Sicily and Malta (2026-11-12)
+
+**Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
+measured at 52395f9 and reported. Step 2 begins with its measurement report; Smyth's
+*Memoir* of Sicily (1824) found on the Internet Archive for it. Decision 68 (the lead's
+note of 2026-11-12) binds step 2's and step 3's port words.
+
+### Step 1: the dated rows
+
+`freesail/world/ports.py`: `state`, `dockyard`, `closed_to`, `market`, `crew_pool` and
+`pilot` (`DATED_KEYS`) each take one value as before, or rows of `{<key>: value, since,
+until, source}` (`_dated_rows`), the form of the holder's `nation:` rows. Each key's parsing
+moved out of `load_port` into its own function unchanged (`_pilot`, `_market`, `_dockyard`,
+`_crew_pool`, `_closed`, and `_state_row` over `_port_state`), so that a row is parsed as the
+one value was. The row in force on the scenario's first day goes into the field at load; the
+Port keeps its rows (`Port.dated`, a plain class default, so a checkpoint from before loads)
+and `Ports.tick` puts each dated key to the world's day when the day turns (`Port.on_day`), so
+every reader of `port.dockyard`, `port.state` and the rest reads the day's row without
+change. A day in no row reads the key as if the file gave none; no day, the first row (as the
+first nation). Overlapping rows, a row with no source, a day not ISO and a row ending before
+it begins are refused in words. No key needed a wider change: none stopped on.
+
+**The proof that every port answers as it did.** Before the change, a script (in the
+scratchpad, not the tree) loaded every port file (90) on every scenario's first day with that
+scenario's own `ports:` entry (61 scenario files: `data/scenarios/` with its trials,
+`docs/playtests/`'s and `tests/browser_plans/`'s), and every file again on each distinct
+scenario day and on no day, on the chart `atlantic-east`, and wrote the repr of each Port's
+24 fields hashed: 3,516 answers. After the change the same script gave the same 3,516 lines,
+`diff` empty. No port file is rewritten; no file on the trunk gives a key as rows, so every
+`Port.dated` is empty and `Ports.tick` touches none. Truth 7-530 pins it in the tree (every
+file's `dated` empty, its six keys equal on no day, 1700, June 1805 and 1900); four tests in
+`tests/test_ports.py` pin the form on a file written for them (each key by day, both ends
+counted in, the day's turn by the tick, the scenario's entry over every row, the refusals).
+The house form is written in `docs/dev/ChartBlocks.md`, item 5 of the steps.
+
+**Step 1's figures** (measured in a pinned worktree at 52395f9, the step's commit edb4d71
+with the trunk at d11ac5a merged by a merge commit; no file of the trunk's conflicted).
+`ruff check .` and `ruff format --check .` (ruff 0.15.8, the pin): clean, 382 files. **The
+fast tier** (`-n 4`): exit 0, 509 slow tests left out. **The slow tier** of the touched
+files, `tests/test_ports.py` and `tests/test_known_truths.py` (`--slow -m "not pace" -n
+4`): exit 0, 442 passed, 8 xfailed in 58 minutes; the recorded passages among them (the
+gate-5b passage's and the merchant passage's constants, truths 49, 72, 7-283, 7-314,
+7-378, 7-399, 7-476 and the rest replayed to their digests). **No pin moved.** **The pace**
+alone and last (`--slow -m pace -n 0`, the same files, load 0.8 at its start): exit 0, 12
+passed. The tree reported differs from 52395f9 by this paragraph and the "where I stand"
+above alone.
+
+## Package 109: the mends from the owner's play of 2026-11-12
+
+### Step 1: the words that did nothing (notes 9, 4, 10 and the first half of 5)
+
+**What was built.** A free order (`orders/free.py`) is now accepted only where its words found a
+thing (or it writes one, `write a letter`); where they found none it is refused
+(`order.rejected`, nothing journaled), in words that say what was not found and what the game
+knows by that name: a thing of that name gone over the side or destroyed, a person who is no
+thing, an order of the dialect the words were near (`difflib` over the vocabulary's phrases of
+two words or more, ratio 0.88: `take posession of the renard` is answered with `take possession
+of`), and what is in his keeping and lying where he stands by their listed names, or "You keep
+nothing, and nothing lies here." A line whose words found a thing and moved nothing (shown, out
+of reach, opened when it is no letter) is the world's as it was: "as said; nothing of the
+ship's changed" with its reason; every line that did an act is unchanged. **The dialect first:**
+`take a sight for the latitude` and five like forms are synonyms of `observe the sun`; a bare
+`take a sight` is answered with the two sights; `open the gunports` and ten like forms ("the
+ports open as the guns are run out ...") and `take command`, `assume command` ("her prize master
+... by 'take possession of her'; ... 'go to the boat' and 'pull for' her") are
+`refused_phrases`. **The name shown is a name taken** (`things.find`): a thing is found by its
+name or its listed name (`name_words`) with the articles anywhere left out, and a letter by its
+keys without the words of its state (sealed, open, broken) and with its writer's or addressee's
+title left off (`the letter from Weston`). The director's letter of the bilander's save is found
+by the nine forms the test tries. **Two of one name:** where the words name several things in
+his reach, the order is refused (`free.Several`) naming them apart (listed name, writer's hand
+and hour, where it is, the first six words of one he may read: never a sealed letter's), and
+the refusal's data keeps their ids (`choices`; `core/world.py` merges an error's `data` into the
+rejected order's, the one line there); `the first`, `the second`, `the last` with or without the
+noun, and `the other` (the one his last free line did not name) take one. **The keeping read:**
+a per-asker reading `my keeping` (`api/readings.py`, `keeping`, left out of the readings' dict
+as `where am I` is, so no sample changes), with the aliases `the things`, `what I have`,
+`inventory`, `what is in my keeping`, `the letters` and eleven more. The director's say-as
+(`free.spoken`) is left as it was: a line naming nothing is said there, as before.
+
+**Pins moved, old beside new** (each the brief's change itself, the toggle the trunk's code):
+truth 7b-115 (package 53b's, "a free line naming nothing known is as said") was ten lines each a
+notable `free.line` ending "as said; nothing of the ship's changed." and journaled; it is now
+the same ten lines each `order.rejected`, "Nothing of that name is known", nothing journaled,
+the things, purse, hold and people the same (renamed `..._is_refused_and_eat_and_drink_as_
+before`). `test_people.py`: "gave the letter to the pilot, as said ..." now refused; "take the
+packet" after it went over the side, "... as said" now refused saying "The sealed packet went
+over the side."; "handed the chart to the master, as said" now refused; the hearing check's
+"read the orders" (no thing) now "read the packet" (out of reach, said). `test_letters.py`:
+"read the letter" after it was burnt, not moved, now refused; "examine the brandy", "... as
+said", now refused. The primer's chapter 14 paragraph and its table say the new rule; the
+grammar book's test wanted `my keeping` named there. No recorded passage's digest and no kept
+save moved (none holds a free line).
+
+**Truths 7-540 and 7-541** (`tests/test_known_truths.py`) and `tests/test_mends_109.py` (32
+cases, each failing on the trunk as the brief describes).
+
+**Found on the way (step 1), for others and not mended.** The director's say-as (`say as <person>:
+give ...`, `free.spoken`) still says a line naming nothing "as said"; it is the director's
+voice and the brief named the player's orders, so it was left. `take the purse` is the
+reading `the purse` (the asking word "take" before a reading), never a free take of a thing
+named a purse: a thing so named cannot be taken by those words.
+
+**The suites, as run (step 1).** At **642c719** (the trunk merged twice by merge commits, at
+00a85b1 and 642c719: the lead's records and briefs, docs only, no conflict), in a worktree pinned
+there, this container, four workers, one suite at a time. `ruff check .` and `ruff format
+--check .` clean (388 files). **The fast tier** whole: exit 0, 7,519 run, no failure, 1 skipped,
+509 slow left out. Two earlier runs exited 1, one failure each, both of this step's own and
+mended: at 00a85b1 the primer's orders block of chapter 14 (free lines on a ship with nothing
+aboard, each now refused, marked `# rejected:` in the block); at 87494ec the in-world test, the
+block's comment naming a package (said in the world's words at 394f47b). **The slow tier of the
+touched files and the known truths whole** (`--slow -m "not pace" -n 4` on test_mends_109.py,
+test_letters.py, test_people.py, test_grammar_book.py, test_primer.py, test_in_world.py,
+test_readings.py, test_director.py, test_known_truths.py): exit 0, 1,751 run, no failure, 8
+skipped; the recorded passages among them, every pinned digest, line count and tick held. **No
+digest moved and no kept save; the pins moved are those listed above, each the ruling's.**
+**The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 0.7 at its start):
+exit 0, 12 passed. The tree reported differs from 642c719 by this paragraph alone.
+
 ## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
 
-**Where I stand (2026-11-12):** built whole, the trunk merged three times (the last at 06e1418,
-with package 102's step 2 and decision 68's rulings), measured at the final hash in a pinned
+**Where I stand (2026-11-12):** built whole, the trunk merged four times (the last at d97cfea,
+with package 105's step 1 and package 109's step 1), measured at the final hash in a pinned
 worktree (the figures below; the suites in the final report).
 Reports (A) and (B) ruled by the lead the same day: the second layer beside the corridor, no
 column from 26.4 W, the reach to 12.4 N recorded and not built; the region's bounds a hair
