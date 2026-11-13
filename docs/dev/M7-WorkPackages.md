@@ -4825,8 +4825,8 @@ builder's, ruff clean, the fast tier 7,545 run and none failed, the slow tier of
 648 run and none failed, the pace 12; the lead's on the merged trial (2026-11-13): the
 fast tier 04:52 to 05:51 UTC, 7,566 passed and 1 xfailed, exit 0; **the fourteen browser
 plans and the step's own slow tests played on the lead's machine, 46 passed, none
-skipped** (the cloud's trial of this tree, run 80, was dispatched under the workflow that
-skipped the plans, and was still running at the merge); lint and the name sweep clean;
+skipped** (the cloud's trial of this tree, run 80, dispatched under the workflow that
+skipped the plans, came back green after the merge: 04:45 to 06:19 UTC, on `claude/trial` at aef6b99b); lint and the name sweep clean;
 the engine's changes read. **Owed elsewhere, ruled (the lead's note to the ships session
 of 2026-11-13, ruling 10):** the ships session's settee has the same thing by a key on the
 evolution's file (`too_few: all hands`); when it merges the trunk it makes the two one
