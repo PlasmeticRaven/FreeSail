@@ -9049,6 +9049,30 @@ written there.
    ranked; **the hazards to avoid,** in the code, the data, the repository, the process and
    the cost of the work; and what to stop doing.
 
+**A sub-reviewer for the test suite, of its own (the owner, 2026-11-13):** "one
+sub-reviewer that focuses on an audit of the current test suite for tests no longer testing
+relevant features, tests which are built not to fail, tests which might be consolidated,
+and general suggestions for improvements to the general test procedure." A reader under
+the reviewer whose whole work is the tests, every test file read and none sampled away:
+(a) **tests of what is no longer there or no longer matters:** a feature removed, replaced
+or superseded whose tests remain, and tests kept alive by edits that emptied them; (b)
+**tests built not to fail:** an assertion of what the test itself set up, a band wide
+enough for any answer, a patch or a toggle that steps round the thing tested, a digest or
+a count re-pinned to whatever the code now does with no reason a reader can check, an
+expected failure that nobody expects to mend; each such claim proved on a sample by
+planting the fault the test names and seeing whether it fails; (c) **tests that might be
+one:** the same behaviour proved in several files, the same scenario sailed again and
+again for one line each, families that want a table; with the seconds each costs, from
+the suites' own timings; (d) **the procedure:** what the tiers hold and why, what runs on
+the builder's machine, the lead's and the cloud's, what a step is asked to run before it
+reports and what that lets through (the browser plan missed at package 109's step 1 is a
+case on file), how pins are moved and recorded, the pace tests on a shared machine, and
+what would make an hour's fast tier shorter without making it weaker. Its return is a
+table by test file (the tests, their seconds, its verdicts) in the evidence, and its
+proposals ranked by what each saves and what each risks, under head 3 of the report. **It
+changes no test:** the rule that no test is skipped, disabled or weakened binds the review
+as it binds a builder; a test it would remove or join is proposed in words for the owner.
+
 **How a finding stands.** Each with its evidence (a file and line, a command and its
 output, a scenario and what happened), its weight (what it costs if left) and the
 reviewer's confidence; each tried against a second reader told to refute it before it is
