@@ -1,0 +1,884 @@
+# The chart's audit: the findings known and owned (package 111, `tools/audit_chart.py`).
+#
+# Every finding of the audit's first run (the trunk as package 111 was cut from it, the full
+# sweep), each by its key with its place (the worst position the audit names, or its region),
+# its reason in a line, whose it is (the package that built it, or the lead's list for what no
+# block owns: the tile grid's reach past the bounds, the climatology's boxes, a rule), and the
+# full sweep's count as its ceiling (`most`). `tests/test_chart_audit.py` passes on these and
+# fails on any finding not listed, on a listed one the full sweep no longer finds, and on a
+# count above its ceiling: a block comes in clean, or adds its findings here with their
+# reasons; a mend takes its entry out. This list is findings owned, never a way round a
+# failure. Generated once from the run and the reasons read and written by category; a
+# reason marked so is the audit's JUDGEMENT of the cause, not a source's.
+
+known:
+- key: a-overlap:ligurian-sea+tyrrhenian
+  place: 41°01.5′N 8°01.5′E
+  reason: the Tyrrhenian's box (38.5 to 42.5 N from 8 E) was drawn over the Ligurian sea's south; there `region_at` answers ligurian-sea and the tide blends both blocks' gauges
+  owner: package 79d
+  most: 1443
+- key: a-unowned:azores:east
+  place: 36°30.0′N 24°16.0′W
+  reason: azores's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 1176000
+- key: a-unowned:azores:north
+  place: 40°08.0′N 24°30.0′W
+  reason: azores's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 1344000
+- key: a-unowned:azores:north-east
+  place: 40°00.0′N 24°16.0′W
+  reason: azores's level-2 tiles, built whole, reach north-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 44800
+- key: a-unowned:azores:north-west
+  place: 40°08.0′N 31°30.0′W
+  reason: azores's level-2 tiles, built whole, reach north-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 3840
+- key: a-unowned:azores:south
+  place: 36°17.6′N 24°38.7′W
+  reason: azores's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 2083200
+- key: a-unowned:azores:south-east
+  place: 36°17.6′N 24°27.9′W
+  reason: azores's level-2 tiles, built whole, reach south-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 69440
+- key: a-unowned:azores:south-west
+  place: 36°17.6′N 31°30.7′W
+  reason: azores's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 5952
+- key: a-unowned:azores:west
+  place: 36°30.0′N 31°31.2′W
+  reason: azores's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 100800
+- key: a-unowned:biscay-north:west
+  place: 45°54.0′N 5°04.0′W
+  reason: biscay-north's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 183680
+- key: a-unowned:biscay-south:east
+  place: 45°20.6′N 0°48.0′W
+  reason: biscay-south's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 16457
+- key: a-unowned:biscay-south:north
+  place: 46°06.4′N 5°04.0′W
+  reason: biscay-south's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 1268768
+- key: a-unowned:biscay-south:north-west
+  place: 46°06.4′N 9°19.8′W
+  reason: biscay-south's level-2 tiles, built whole, reach north-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 992
+- key: a-unowned:biscay-south:west
+  place: 42°16.0′N 9°20.0′W
+  reason: biscay-south's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 17440
+- key: a-unowned:channel-east:east
+  place: 51°06.8′N 2°36.8′E
+  reason: channel-east's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 65659
+- key: a-unowned:channel-east:north
+  place: 51°39.2′N 2°30.0′E
+  reason: channel-east's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 340093
+- key: a-unowned:channel-east:north-east
+  place: 51°39.2′N 2°36.0′E
+  reason: channel-east's level-2 tiles, built whole, reach north-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 25024
+- key: a-unowned:channel-west:north
+  place: 51°13.6′N 3°00.0′W
+  reason: channel-west's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 920936
+- key: a-unowned:channel-west:north-east
+  place: 51°13.6′N 2°59.9′W
+  reason: water north-east of channel-west's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone
+  owner: package 32
+  most: 85
+- key: a-unowned:channel-west:north-west
+  place: 51°13.6′N 7°01.6′W
+  reason: channel-west's level-2 tiles, built whole, reach north-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 65280
+- key: a-unowned:channel-west:south
+  place: 47°48.8′N 5°02.1′W
+  reason: channel-west's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 537600
+- key: a-unowned:channel-west:south-west
+  place: 47°48.8′N 7°07.2′W
+  reason: channel-west's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 53760
+- key: a-unowned:channel-west:west
+  place: 48°00.0′N 7°12.0′W
+  reason: channel-west's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 864000
+- key: a-unowned:gulf-of-lion:east
+  place: 40°33.6′N 7°44.0′E
+  reason: water east of gulf-of-lion's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 15526
+- key: a-unowned:gulf-of-lion:west
+  place: 42°50.1′N 2°57.3′E
+  reason: gulf-of-lion's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 2249
+- key: a-unowned:ligurian-sea:east
+  place: 42°30.0′N 11°08.8′E
+  reason: water east of ligurian-sea's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 24733
+- key: a-unowned:ligurian-sea:south
+  place: 40°59.2′N 7°47.2′E
+  reason: water south of ligurian-sea's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 4992
+- key: a-unowned:ligurian-sea:south-west
+  place: 40°59.2′N 7°44.4′E
+  reason: water south-west of ligurian-sea's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 128
+- key: a-unowned:ligurian-sea:west
+  place: 41°00.0′N 7°44.0′E
+  reason: water west of ligurian-sea's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 26814
+- key: a-unowned:madeira:east
+  place: 32°00.0′N 15°44.0′W
+  reason: madeira's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 576000
+- key: a-unowned:madeira:north
+  place: 33°44.0′N 16°00.0′W
+  reason: madeira's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 504000
+- key: a-unowned:madeira:north-east
+  place: 33°44.0′N 15°48.1′W
+  reason: madeira's level-2 tiles, built whole, reach north-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 89600
+- key: a-unowned:madeira:north-west
+  place: 33°30.0′N 17°52.0′W
+  reason: madeira's level-2 tiles, built whole, reach north-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 123200
+- key: a-unowned:madeira:south
+  place: 31°36.0′N 16°07.6′W
+  reason: madeira's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 864000
+- key: a-unowned:madeira:south-east
+  place: 31°36.0′N 15°59.6′W
+  reason: madeira's level-2 tiles, built whole, reach south-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 153600
+- key: a-unowned:madeira:south-west
+  place: 31°36.0′N 17°46.5′W
+  reason: madeira's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 211200
+- key: a-unowned:madeira:west
+  place: 32°00.0′N 17°52.0′W
+  reason: madeira's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 792000
+- key: a-unowned:mediterranean-west:west
+  place: 35°24.9′N 5°04.0′W
+  reason: water west of mediterranean-west's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79c
+  most: 3599
+- key: a-unowned:portugal:north
+  place: 42°16.0′N 9°19.8′W
+  reason: water north of portugal's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone
+  owner: package 39d
+  most: 257280
+- key: a-unowned:portugal:north-west
+  place: 42°16.0′N 10°00.0′W
+  reason: portugal's level-2 tiles, built whole, reach north-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 71680
+- key: a-unowned:portugal:south
+  place: 36°17.6′N 6°42.4′W
+  reason: portugal's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 537600
+- key: a-unowned:portugal:south-west
+  place: 36°17.6′N 10°11.2′W
+  reason: portugal's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 28672
+- key: a-unowned:portugal:west
+  place: 36°24.0′N 10°11.2′W
+  reason: portugal's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 1505280
+- key: a-unowned:strait:north
+  place: 36°27.7′N 5°00.0′W
+  reason: water north of strait's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone
+  owner: package 39f
+  most: 10403
+- key: a-unowned:strait:south
+  place: 35°26.4′N 5°02.0′W
+  reason: strait's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 48737
+- key: a-unowned:strait:south-west
+  place: 35°26.4′N 6°46.4′W
+  reason: strait's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 23616
+- key: a-unowned:strait:west
+  place: 35°30.0′N 6°46.4′W
+  reason: strait's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 312256
+- key: a-unowned:tyrrhenian:east
+  place: 38°30.0′N 15°50.4′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 1009585
+- key: a-unowned:tyrrhenian:north
+  place: 42°41.6′N 15°30.0′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach north past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 396199
+- key: a-unowned:tyrrhenian:north-east
+  place: 42°30.0′N 15°50.4′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach north-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 94656
+- key: a-unowned:tyrrhenian:south
+  place: 38°25.6′N 15°29.4′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 455887
+- key: a-unowned:tyrrhenian:south-east
+  place: 38°25.6′N 15°50.4′E
+  reason: tyrrhenian's level-2 tiles, built whole, reach south-east past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 35904
+- key: a-unowned:tyrrhenian:west
+  place: 40°33.6′N 7°44.0′E
+  reason: water west of tyrrhenian's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
+  owner: package 79d
+  most: 163840
+- key: b-coast:channel-west/channel-mid
+  place: 48°42.9′N 2°56.0′W
+  reason: each region's coast is drawn from its own block's field; the two miss each other by a cell or two at the seam column
+  owner: package 39a
+  most: 1
+- key: b-coast:ligurian-sea/tyrrhenian
+  place: 40°59.2′N 8°15.5′E
+  reason: each region's coast is drawn from its own block's field; the two miss each other by about 150 m at the Ligurian sea's south row edge
+  owner: package 79d
+  most: 1
+- key: b-coast:tyrrhenian/ligurian-sea
+  place: 40°59.2′N 8°15.4′E
+  reason: 'the other end of the same miss: the Tyrrhenian''s line at the Ligurian sea''s south row edge meets none of the Ligurian sea''s'
+  owner: package 79d
+  most: 1
+- key: c-level:azores
+  place: 37°40.5′N 24°31.5′W
+  reason: 'no island gauge has its mean level read; the level is the eleven''s (Le Conquet''s and St Mary''s, 3.2 to 3.98 m), as package 39e found: a research mend'
+  owner: package 39e
+  most: 9700
+- key: c-level:madeira
+  place: 33°28.5′N 16°04.5′W
+  reason: 'Funchal''s mean level is unread; the level is the eleven''s (Le Conquet''s 3.98 m), as package 39e found: a research mend'
+  owner: package 39e
+  most: 869
+- key: c-level:strait
+  place: 36°22.5′N 5°04.5′W
+  reason: 'no gauge of the Strait has its mean level read; the level is the eleven''s (Le Conquet''s 3.98 m), as the how-to says: a research mend'
+  owner: package 39f
+  most: 352
+- key: c-level:tyrrhenian
+  place: 41°49.5′N 11°04.5′E
+  reason: 'no Tyrrhenian gauge has its mean level read; the level is the eleven''s there (Dover''s 3.7 m or Saint-Malo''s 6.83 m by the place), as the how-to says, and the tiles'' fill raised by it: a research mend'
+  owner: package 79d
+  most: 7260
+- key: d-no-box:balearics
+  place: 40°31.5′N 4°25.5′E
+  reason: the strip from 40.5 to 40.56 N (balearics' bound moved north by package 89) lies in no box and takes the nearest
+  owner: the lead's list
+  most: 80
+- key: d-no-box:biscay-south
+  place: 43°19.5′N 2°00.3′W
+  reason: 'the Cantabrian coast''s water between 43.4 and 43.5 N east of 5 W: portugal''s box ends at 5 W and biscay''s begins at 43.5 N'
+  owner: the lead's list
+  most: 134
+- key: d-no-box:strait
+  place: 35°31.5′N 6°01.5′W
+  reason: 'the Strait''s water south of 36 N and west of 5 W: portugal''s box begins at 36 N and mediterranean-west''s at 5 W'
+  owner: the lead's list
+  most: 206
+- key: d-split:balearics
+  place: balearics
+  reason: balearics' north bound is 40.56 N (package 89) where mediterranean-west's box ends at 40.5 N; the strip takes the nearest box
+  owner: the lead's list
+  most: 6755
+- key: d-split:biscay-north
+  place: biscay-north
+  reason: the climatology's channel box ends at 47.5 N and biscay's begins there; the region runs from 45.9 to 48 N
+  owner: the lead's list
+  most: 2265
+- key: d-split:biscay-south
+  place: biscay-south
+  reason: biscay's box ends at 43.5 N and portugal's begins there; the region runs from 42 to 45.9 N
+  owner: the lead's list
+  most: 8012
+- key: d-split:strait
+  place: strait
+  reason: portugal's box ends at 5 W and mediterranean-west's begins there; the region runs to 5 W from 6.5 W
+  owner: the lead's list
+  most: 352
+- key: d-split:tyrrhenian
+  place: tyrrhenian
+  reason: gulf-of-lion's box runs east to 11 E over the Tyrrhenian's north-west; the first box in the file's order answers
+  owner: the lead's list
+  most: 8703
+- key: e-no-book:balearics
+  place: 40°31.5′N 0°31.5′E
+  reason: 'the strip from 40.5 to 40.56 N: package 89 moved balearics'' north bound and `book_limits` kept 40.5'
+  owner: the lead's list
+  most: 80
+- key: e-no-book:madeira
+  place: 32°01.5′N 17°28.5′W
+  reason: Madeira's box is not among the directions' `book_limits`
+  owner: package 39e
+  most: 869
+- key: e-no-statement:azores
+  place: 36°31.5′N 31°28.5′W
+  reason: the Azores' box is in `book_limits` but only the Fayal channel has a statement; the open water none
+  owner: package 39e
+  most: 9699
+- key: e-no-stream:azores
+  place: 36°31.5′N 31°28.5′W
+  reason: the world's one stream area there is the Fayal channel's; the open water has none
+  owner: package 39e
+  most: 9699
+- key: e-no-stream:balearics
+  place: 40°31.5′N 0°31.5′E
+  reason: the strip from 40.5 to 40.56 N lies north of every Balearic stream area's polygon
+  owner: package 79c
+  most: 80
+- key: e-no-stream:madeira
+  place: 32°01.5′N 17°28.5′W
+  reason: 'no stream area of the world''s over Madeira''s water: no pilot''s rate was read'
+  owner: package 39e
+  most: 869
+- key: f-depth:brest:mooring
+  place: 48°22.9′N 4°29.6′W
+  reason: the mooring's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 35
+  most: 1
+- key: f-depth:gaeta:anchorage
+  place: 41°13.2′N 13°35.3′E
+  reason: the anchorage's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 79d
+  most: 1
+- key: f-depth:gaeta:mooring
+  place: 41°13.1′N 13°35.1′E
+  reason: the mooring's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 79d
+  most: 1
+- key: f-depth:gaeta:outer_road
+  place: 41°13.2′N 13°35.3′E
+  reason: the outer road's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 79d
+  most: 1
+- key: f-depth:lorient:mooring
+  place: 47°44.0′N 3°20.9′W
+  reason: the mooring's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 39b
+  most: 1
+- key: f-depth:naples:mooring
+  place: 40°50.1′N 14°15.5′E
+  reason: the mooring's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 79d
+  most: 1
+- key: f-depth:paimboeuf:anchorage
+  place: 47°18.1′N 2°03.6′W
+  reason: the anchorage's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 35
+  most: 1
+- key: f-depth:santander:outer_road
+  place: 43°28.8′N 3°46.5′W
+  reason: the outer road's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 39c
+  most: 1
+- key: f-depth:st-malo:anchorage
+  place: 48°38.7′N 2°02.2′W
+  reason: the anchorage's depth is the period's figure; the grid's water there is shoaler by more than half (the modern grid, or the spot off its sounding)
+  owner: package 39a
+  most: 1
+- key: f-dry:alderney:mooring
+  place: 49°43.5′N 2°11.8′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39a
+  most: 1
+- key: f-dry:boulogne:mooring
+  place: 50°43.6′N 1°35.7′E
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 79b
+  most: 1
+- key: f-dry:cartagena:outer_road
+  place: 37°35.0′N 0°59.4′W
+  reason: the outer road given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 79c
+  most: 1
+- key: f-dry:dover:mooring
+  place: 51°07.2′N 1°19.0′E
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 79b
+  most: 1
+- key: f-dry:dunkirk:mooring
+  place: 51°02.6′N 2°22.0′E
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 79b
+  most: 1
+- key: f-dry:la-rochelle:mooring
+  place: 46°09.4′N 1°09.2′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39b
+  most: 1
+- key: f-dry:le-palais:mooring
+  place: 47°20.9′N 3°09.1′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39b
+  most: 1
+- key: f-dry:morlaix:mooring
+  place: 48°34.8′N 3°49.7′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39a
+  most: 1
+- key: f-dry:paimboeuf:mooring
+  place: 47°17.4′N 2°01.9′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 35
+  most: 1
+- key: f-dry:poole:mooring
+  place: 50°42.7′N 1°59.1′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 79b
+  most: 1
+- key: f-dry:roscoff:mooring
+  place: 48°43.5′N 3°58.8′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 35b
+  most: 1
+- key: f-dry:st-helier:mooring
+  place: 49°10.9′N 2°06.7′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39a
+  most: 1
+- key: f-dry:st-malo:mooring
+  place: 48°38.8′N 2°01.8′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39a
+  most: 1
+- key: f-dry:weymouth:mooring
+  place: 50°36.5′N 2°27.0′W
+  reason: the mooring given in an inner harbour or basin that the grid's sixteenth of a minute (or the modern works) has as ground
+  owner: package 39a
+  most: 1
+- key: f-in:alghero
+  place: 40°34.0′N 8°12.3′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:cartagena
+  place: 37°35.1′N 0°59.3′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 79c
+  most: 1
+- key: f-in:civita-vecchia
+  place: 42°05.5′N 11°46.9′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:dartmouth
+  place: 50°20.2′N 3°33.2′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 39a
+  most: 1
+- key: f-in:ferrol
+  place: 43°27.9′N 8°18.2′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39c
+  most: 1
+- key: f-in:gaeta
+  place: 41°12.3′N 13°35.2′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:genoa
+  place: 44°24.1′N 8°55.0′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:hyeres
+  place: 42°59.9′N 6°14.3′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:lisbon
+  place: 38°41.5′N 9°22.4′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39d
+  most: 1
+- key: f-in:morlaix
+  place: 48°41.6′N 3°53.0′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 39a
+  most: 1
+- key: f-in:oporto
+  place: 41°08.8′N 8°40.6′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39d
+  most: 1
+- key: f-in:oran
+  place: 35°43.9′N 0°41.4′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 79c
+  most: 1
+- key: f-in:paimboeuf
+  place: 47°16.6′N 2°09.9′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 35
+  most: 1
+- key: f-in:palma
+  place: 39°32.6′N 2°38.0′E
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 79c
+  most: 1
+- key: f-in:poole
+  place: 50°40.2′N 1°56.4′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79b
+  most: 1
+- key: f-in:port-mahon
+  place: 39°52.7′N 4°17.7′E
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 79c
+  most: 1
+- key: f-in:rochefort
+  place: 46°00.8′N 1°11.0′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39b
+  most: 1
+- key: f-in:santander
+  place: 43°28.6′N 3°46.7′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39c
+  most: 1
+- key: f-in:setubal
+  place: 38°26.5′N 9°05.9′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 39d
+  most: 1
+- key: f-in:st-malo
+  place: 48°40.6′N 2°04.6′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 39a
+  most: 1
+- key: f-in:st-marys
+  place: 49°54.9′N 6°19.6′W
+  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  owner: package 35b
+  most: 1
+- key: f-in:st-peter-port
+  place: 49°29.1′N 2°29.8′W
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 39a
+  most: 1
+- key: f-in:toulon
+  place: 43°04.3′N 5°56.0′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-in:villefranche
+  place: 43°42.1′N 7°18.8′E
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  owner: package 79d
+  most: 1
+- key: f-open:paimboeuf
+  place: 47°16.1′N 2°11.9′W
+  reason: the outer road lies in an estuary and the port has no `tracks:`; no straight line to the open sea keeps off the land
+  owner: package 35
+  most: 1
+- key: f-open:royan
+  place: 45°33.1′N 1°02.9′W
+  reason: the outer road lies in an estuary and the port has no `tracks:`; no straight line to the open sea keeps off the land
+  owner: package 39c
+  most: 1
+- key: f-out:alghero
+  place: 40°34.2′N 8°14.7′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:cartagena
+  place: 37°35.4′N 0°59.2′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 79c
+  most: 1
+- key: f-out:civita-vecchia
+  place: 42°05.5′N 11°46.8′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:dartmouth
+  place: 50°20.6′N 3°33.8′W
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 39a
+  most: 1
+- key: f-out:ferrol
+  place: 43°28.2′N 8°15.8′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39c
+  most: 1
+- key: f-out:gaeta
+  place: 41°12.6′N 13°35.2′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:genoa
+  place: 44°24.3′N 8°55.1′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:lisbon
+  place: 38°41.6′N 9°12.4′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39d
+  most: 1
+- key: f-out:maddalena
+  place: 41°11.5′N 9°22.0′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:morlaix
+  place: 48°40.9′N 3°52.9′W
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 39a
+  most: 1
+- key: f-out:oporto
+  place: 41°08.8′N 8°40.6′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39d
+  most: 1
+- key: f-out:oran
+  place: 35°43.8′N 0°41.6′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 79c
+  most: 1
+- key: f-out:paimboeuf
+  place: 47°16.6′N 2°09.8′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 35
+  most: 1
+- key: f-out:palma
+  place: 39°33.3′N 2°38.1′E
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 79c
+  most: 1
+- key: f-out:poole
+  place: 50°41.9′N 1°58.4′W
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79b
+  most: 1
+- key: f-out:port-mahon
+  place: 39°52.7′N 4°17.6′E
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 79c
+  most: 1
+- key: f-out:rochefort
+  place: 46°00.3′N 1°09.6′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39b
+  most: 1
+- key: f-out:santander
+  place: 43°27.6′N 3°47.9′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39c
+  most: 1
+- key: f-out:setubal
+  place: 38°30.0′N 8°55.7′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 39d
+  most: 1
+- key: f-out:st-malo
+  place: 48°40.5′N 2°04.5′W
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 39a
+  most: 1
+- key: f-out:st-marys
+  place: 49°54.9′N 6°19.6′W
+  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  owner: package 35b
+  most: 1
+- key: f-out:st-peter-port
+  place: 49°28.9′N 2°29.9′W
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 39a
+  most: 1
+- key: f-out:toulon
+  place: 43°04.7′N 5°55.6′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-out:villefranche
+  place: 43°42.1′N 7°18.8′E
+  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  owner: package 79d
+  most: 1
+- key: f-shore-afloat:corunna
+  place: 43°21.9′N 8°23.3′W
+  reason: the landing given on the feature of a castle or town that stands in the grid's water
+  owner: package 39c
+  most: 1
+- key: f-shore-afloat:san-fiorenzo
+  place: 42°40.9′N 9°18.2′E
+  reason: the landing given on the feature of a castle or town that stands in the grid's water
+  owner: package 79d
+  most: 1
+- key: g-afloat:bugio
+  place: 38°39.6′N 9°17.9′W
+  reason: the Bugio's sandbank is water in the grid and no island feature stands under the fort
+  owner: package 39d
+  most: 1
+- key: g-afloat:bugio-light
+  place: 38°39.6′N 9°17.9′W
+  reason: the Bugio's sandbank is water in the grid and no island feature stands under the light
+  owner: package 39d
+  most: 1
+- key: g-afloat:camarat-light
+  place: 43°12.0′N 6°40.9′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:cape-camarat
+  place: 43°12.0′N 6°41.0′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:cape-corse
+  place: 43°00.4′N 9°24.3′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:cape-esterel
+  place: 43°02.1′N 6°09.7′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:cape-muro
+  place: 41°44.4′N 8°39.6′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:cape-palos
+  place: 37°37.9′N 0°41.7′W
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79c
+  most: 1
+- key: g-afloat:cape-taillat
+  place: 43°10.3′N 6°38.7′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:eddystone
+  place: 50°11.0′N 4°15.7′W
+  reason: 'the Eddystone rocks are water in the grid and no rock feature stands under the light: a ship may sail through the lighthouse'
+  owner: package 32
+  most: 1
+- key: g-afloat:espalmador-tower
+  place: 38°47.6′N 1°25.6′E
+  reason: the tower's islet (or point) of Espalmador is water in the grid
+  owner: package 79c
+  most: 1
+- key: g-afloat:fort-brescou
+  place: 43°15.8′N 3°30.1′E
+  reason: Brescou's islet is water in the grid and no island feature stands under the fort
+  owner: package 79d
+  most: 1
+- key: g-afloat:grosse-tour
+  place: 43°06.2′N 5°55.7′E
+  reason: the Great Tower's point at Toulon is water in the grid, three cables off
+  owner: package 79d
+  most: 1
+- key: g-afloat:longships-light
+  place: 50°04.0′N 5°44.9′W
+  reason: the Longships rocks are water in the grid and no rock feature stands under the light
+  owner: package 32
+  most: 1
+- key: g-afloat:marseille-light
+  place: 43°17.7′N 5°21.8′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:meloria-tower
+  place: 43°32.8′N 10°13.2′E
+  reason: the Meloria's tower stands on its shoals, which are water in the grid with no rock feature under it
+  owner: package 79d
+  most: 1
+- key: g-afloat:parata
+  place: 41°53.9′N 8°36.7′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-afloat:peninnis-head
+  place: 49°54.3′N 6°18.3′W
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 32
+  most: 1
+- key: g-afloat:san-anton-castle
+  place: 43°21.9′N 8°23.3′W
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 39c
+  most: 1
+- key: g-afloat:san-fiorenzo
+  place: 42°40.9′N 9°18.2′E
+  reason: the mark's position stands off the grid's shore, beyond its reach of a cell or a cable (a draft position, or a point the grid smooths)
+  owner: package 79d
+  most: 1
+- key: g-ashore:cordouan-rocks
+  place: 45°35.4′N 1°10.8′W
+  reason: the danger's head stands on ground the grid has above its datum (a drying bank the grid's fill raised, or the position off the rock)
+  owner: package 39c
+  most: 1
+- key: g-ashore:la-pulpera
+  place: 36°23.2′N 6°12.2′W
+  reason: the danger's head stands on ground the grid has above its datum (a drying bank the grid's fill raised, or the position off the rock)
+  owner: package 39f
+  most: 1
+- key: g-ashore:le-coq
+  place: 48°20.0′N 4°43.4′W
+  reason: the danger's head stands on ground the grid has above its datum (a drying bank the grid's fill raised, or the position off the rock)
+  owner: package 32
+  most: 1
+- key: g-ashore:the-amfar
+  place: 49°27.9′N 0°07.5′E
+  reason: the danger's head stands on ground the grid has above its datum (a drying bank the grid's fill raised, or the position off the rock)
+  owner: package 79b
+  most: 1
+- key: g-ashore:violet-bank
+  place: 49°09.2′N 2°01.6′W
+  reason: the danger's head stands on ground the grid has above its datum (a drying bank the grid's fill raised, or the position off the rock)
+  owner: package 39a
+  most: 1

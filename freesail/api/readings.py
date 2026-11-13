@@ -2659,6 +2659,29 @@ def _where_am_i(world: Any, _: str | None) -> dict[str, Any] | None:
     return {"words": where_am_i(world, person), "ship": str(getattr(person, "hull", "") or "")}
 
 
+def _keeping(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`my keeping` (package 109; the owner's play of 2026-11-12, note 5): what the asker
+    keeps and what lies in the place he stands in, by their listed names; the asker the
+    order's actor, as `where am I`'s."""
+    from freesail.orders.free import reach_words
+    from freesail.world import things as TH
+    from freesail.world.movement import person_of_actor
+
+    extra = getattr(getattr(world, "ship", None), "extra", None)
+    actor = (extra or {}).get("order_actor") if isinstance(extra, dict) else None
+    person = person_of_actor(world, actor or "captain")
+    if person is None:
+        return None
+    kept = TH.kept_by(world, person)
+    said = reach_words(world, person)
+    if not said:
+        words = "You keep nothing, and nothing lies here."
+    else:
+        parts = [p.strip() for p in said.split("; ")]
+        words = " ".join(f"{p[:1].upper()}{p[1:]}." for p in parts)
+    return {"words": words, "kept": [t.id for t in kept]}
+
+
 def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
     ports = getattr(world, "dealings", None)
     return ports.boat_reading() if ports is not None else None
@@ -2916,6 +2939,19 @@ REGISTRY.add(
         none_words=_no_people_words,
         per_asker=True,
         where=("aboard", "ashore", "asleep", "boat"),
+    )
+)
+REGISTRY.add(
+    Reading(
+        "keeping",
+        ("my keeping",),
+        "query",
+        "",
+        _keeping,
+        description="what you keep and what lies where you stand, by the names they are known by",
+        none_words=_no_people_words,
+        per_asker=True,
+        where=("aboard", "ashore", "boat"),
     )
 )
 REGISTRY.add(

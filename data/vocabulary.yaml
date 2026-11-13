@@ -595,7 +595,11 @@ verbs:
   observe the sun:
     # The noon sight by order, near noon; automatic at noon if the sky allows.
     synonyms: [take the sun, take a sight of the sun, take the noon sight, take the sun's altitude,
-               observe the sun at noon, take a meridian altitude]
+               observe the sun at noon, take a meridian altitude,
+               # package 109 (the owner's play of 2026-11-12, note 4): the latitude's sight in
+               # his words, taken before as a free 'take' of a thing called 'a sight'
+               take a sight for the latitude, take a sight for latitude, take the latitude,
+               take a latitude sight, take a meridian sight, take a sight for the noon latitude]
     object: navigation
     level: 1
   set the reckoning to:
@@ -2367,6 +2371,25 @@ reading_words:
     the pilot cutter: a sail in sight
     the stranger: a sail in sight
     the sail: a sail in sight
+    # Package 109 (the owner's play of 2026-11-12, note 5): his keeping and what lies where
+    # he stands, in the words he asked it by
+    the things: my keeping
+    my things: my keeping
+    what i have: my keeping
+    what have i: my keeping
+    what have i got: my keeping
+    what do i have: my keeping
+    what am i carrying: my keeping
+    what i carry: my keeping
+    inventory: my keeping
+    my inventory: my keeping
+    the inventory: my keeping
+    in my keeping: my keeping
+    what is in my keeping: my keeping
+    the keeping: my keeping
+    the letters: my keeping
+    my letters: my keeping
+    my papers: my keeping
 
 # ---------------------------------------------------------------------------
 # The world-order channel (spec M5 §26; package 36; `freesail/world/orders.py`): orders
@@ -2457,6 +2480,21 @@ irrevocable:
 # standing order's action (`orders.read_whole`).
 # ---------------------------------------------------------------------------
 refused_phrases:
+  # Package 109 (the owner's play of 2026-11-12, notes 9 and 10): words a free 'open' or
+  # 'take' answered as if done, that name what happens of itself or an order of the dialect.
+  open the gunports: &ports "The ports open as the guns are run out, and shut as they are run in: say 'run out the guns' ('run in the guns' to shut them)."
+  open the gun ports: *ports
+  open the ports: *ports
+  open the port lids: *ports
+  open the lower deck ports: *ports
+  open the lower ports: *ports
+  open the upper deck ports: *ports
+  haul up the ports: *ports
+  haul up the port lids: *ports
+  raise the ports: *ports
+  open ports: *ports
+  take command: &command "Command of a prize is not taken by words: her prize master and prize crew are put aboard her by 'take possession of her'; to go aboard another ship yourself, 'go to the boat' and 'pull for' her."
+  assume command: *command
   as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
   lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
   lay out the stream: *stream
