@@ -214,6 +214,18 @@ own motions) is the review portion's to design (packages 103b and 92); say in th
 that until then the world's holder and wars change by nothing in play. Tell package 105's
 builder nothing: I do. The gate as your brief has it; the browser plans in your slow tier.
 
+**2026-11-13, on your reading of package 105's step 2 and 111's step 2a.** (1) Taken:
+111's builder adds `sicily`, `gulf-of-hammamet` and `calabria-north` to the audit's seas
+when it re-merges after 105. (2) Taken: package 106a re-runs its proof that Madeira's
+tide is unmoved once 111's step 2a (Madeira's south bound at 31.60001 N) is on the trunk,
+or moves its second layer's north bound; I have told its builder. (3) **A gauge's judged
+level:** I accepted for Sicily, at its measure, a level of M2 + S2 + N2 marked JUDGEMENT,
+because the other choice was the eleven's 3.98 m over a sea of decimetres. That stands for
+Sicily as an interim answer and is not yet the rule: whether the four older blocks take
+the same is settled at package 111's close, with the levels measured first. Say in the
+how-to, with your next step, that a level so judged is marked and is replaced by a
+published one when read. (4) Agreed: by design.
+
 ## The session's standing notes
 
 (The session writes here: where each package stands, the rulings it has made, the owner's
