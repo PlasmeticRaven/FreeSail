@@ -856,3 +856,10 @@ next blocks (106b's African coast first):
   mark before it.
 - **The weather has no island lee**: the calms and south-westerly eddies to leeward of the
   high islands (Purdy 1825, pp. 213 to 215) are said in the box's head, not carried.
+- **Run the chart's audit on a new block** (`python tools/audit_chart.py --full`, package
+  111) before its slow tier: a region the audit's table of seas (`SEAS` in
+  `tools/audit_chart.py`) does not name is taken for Mediterranean water, and an ocean
+  island's metre and more of mean level for a fault; the Canaries and the Salvages are
+  named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
+  fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
+  both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.

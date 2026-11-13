@@ -65,7 +65,7 @@ anchorage:
 mooring:
   name: the berth between the town and the castle to the north
   lat_deg: 28.4740
-  lon_deg: -16.2410
+  lon_deg: -16.2390    # 200 m east of the modern breakwater the grid holds (the chart's audit, package 111)
   bottom: dark sand and ooze, foul in places with lost anchors
   deep_draught_ft: 22    # judgement: deep water close in; the berth for any ship
 shore:

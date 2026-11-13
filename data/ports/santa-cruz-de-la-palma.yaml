@@ -34,14 +34,14 @@ datum: unverified
 outer_road:
   feature: santa-cruz-de-la-palma-road
   name: the road of Santa Cruz of Palma
-  lat_deg: 28.6800
-  lon_deg: -17.7600
+  lat_deg: 28.6820
+  lon_deg: -17.7610
   depth_fathoms: 18
 anchorage:
   feature: santa-cruz-de-la-palma-road
   name: the road of Santa Cruz of Palma
-  lat_deg: 28.6800
-  lon_deg: -17.7600
+  lat_deg: 28.6820
+  lon_deg: -17.7610
 mooring:
   name: the road a musket-shot off the town
   lat_deg: 28.6810

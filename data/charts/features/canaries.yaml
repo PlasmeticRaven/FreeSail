@@ -482,7 +482,7 @@ features:
     height_m: 20
     source: "Purdy 1825, p. 22 (the table): Pt Handia, the S.W. point of Fortaventura; p. 214: the Isleta of Canaria lies 16 leagues N.W. by W. 1/2 W. from it; Norie 1805, Table XL: Fuerteventura, South West Point 28 4 N"
     says: "Point Handia, the south-west end of Fuerteventura, the Grand Canary sixteen leagues off."
-    fix: "moved 420 m to the grid's land"
+    fix: "moved 420 m to the grid's land; the region as built with its gauges holds the point as water, 2.5 m, its land a kilometre north-east, and the mark is left here (the chart's audit, package 111: listed in data/charts/audit-known.yaml)"
   - id: morro-gable
     kind: headland
     name: Morro Gable
@@ -531,14 +531,15 @@ features:
     kind: road
     name: the road of Santa Cruz of Palma
     modern: the anchorage off Santa Cruz de La Palma
-    lat_deg: 28.6800
-    lon_deg: -17.7600
+    lat_deg: 28.6820
+    lon_deg: -17.7610
     height_m: 0
     depth_fathoms: 18
     bottom: "clean and good"
     source: "Purdy 1825, pp. 218 to 219 (Glas): the road within a musket-shot of the shore, where vessels commonly ride in 15 or 20 fathoms, exposed to easterly winds, yet with good anchors and cables safe in all winds, for the ground is clean and good and the high land facing the road repels the wind; a north-east swell comes rolling in but the wind off the land checks it; in winter the swell breaks high on the beach and stops the boats for three or four days together"
     says: "The road of Santa Cruz of Palma, a musket-shot off in fifteen or twenty fathoms on clean ground: open to the east, but the high land throws the wind back and a ship rides with a slack cable."
 
+    fix: "moved 240 m north-west into the pilot's depth, 32 m (17 1/2 fathoms) on clean ground some 300 m off the town, from 38 fathoms (the chart's audit, package 111)"
   - id: tazacorte
     kind: place
     name: Tasacorta
