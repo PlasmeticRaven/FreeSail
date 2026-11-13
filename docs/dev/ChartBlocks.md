@@ -146,9 +146,14 @@ region's, its tide and its weather are rows in tables that already reach its wat
      - {state: blockaded, blockade: {by: britain, since: "1798"}, since: 1798-09-01, until: 1800-09-04, source: "..."}
    ```
 
-   The row in force on the scenario's first day is loaded into the port's field, and the
-   ports' tick puts each dated key to the world's day when the day turns (`Port.on_day`),
-   so everything that reads the key reads the day's row. A day that no row covers reads
+   The row in force on the scenario's first day is loaded into the port's field: **the
+   record seeds the port, and the port is then the world's** (decision 69, the lead's
+   ruling of 2026-11-13; package 105 had the ports' tick put each key to the running day).
+   Only a scenario that says `follows_history: true` has the record's rows as events: each
+   row that begins or ends on a day is applied that day (`Port.on_events`, from
+   `Ports.tick`), the holder's rows with them, and a key with no event keeps what play has
+   made of it (a director's closure) until the next. Write the rows so that the first day
+   of any year reads true; what follows in play is the world's. A day that no row covers reads
    the key as if the file gave none (no closures; the port open; the defaults of a pilot,
    a market, a chandler's and a pool with nothing in them): write a row for every year the
    game may be set in, or say why not. With no day (the harbour's lists) the first row is
@@ -295,7 +300,9 @@ region's, its tide and its weather are rows in tables that already reach its wat
    `git status` shows no change to any tile, coast or index file another region lists.
    The tiles are committed (the owner's ruling 5; a region is about 12 to 18 MB, but a
    region that is mostly open sea costs more: the Azores' 153 level-2 tiles are 40 MB,
-   package 39e, below). **Every tile is written by `save_tile`** (package 39e), its zip
+   package 39e, below). **The 40 MB rule is in MiB** (the lead's ruling of 2026-11-13): a
+   region's level-2 and level-3 tiles by the manifest's bytes, under 40 × 1,048,576 (the
+   Azores' 40.3 million bytes are 38.4 MiB). **Every tile is written by `save_tile`** (package 39e), its zip
    entries dated alike, so that the same arrays give the same bytes: from 39e on a
    rebuild's byte-identity means array-identity, and a tile that changed in its bytes
    changed in its arrays. The tiles written before it keep their bytes (numpy's
@@ -719,7 +726,8 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   table draw no trader at all. Give each port its own produce cheap and its wants dear.
 - **A port's nation may be dated** (`nation:` a list of `{nation, since, until}`, 79a's
   form; package 79d for Genoa's annexation of June 1805): the loader takes the entry in
-  force on the scenario's first day, `Ports.stance` the world's day.
+  force on the scenario's first day, and `Ports.stance` reads that holder (decision 69:
+  the running day moves it only where the scenario follows history).
 - **The weather's box for a sea without one**: a printed table's days of wind by the eight
   points (the Admiralty's Mediterranean Pilot of 1913 and 1916 has them for Marseille,
   Genoa, Leghorn, Naples, Ajaccio and Cagliari) give the check row, each half-point's days
