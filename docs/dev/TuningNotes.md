@@ -27375,3 +27375,43 @@ minutes, the recorded passages replayed to their digests. **The pace** alone and
 (`--slow -m pace -n 0`, the same files): exit 0, 12 passed. Pins moved: the two count-pins
 above alone. The tree reported differs from 296aa59 by this paragraph and the "where I stand"
 above alone.
+
+
+### Step 2 meets package 111's audit (the lead's note of 2026-11-13)
+
+The lead's trial merge of 0d21bf3 found two findings the audit's known list lacked, both
+`sicily`'s: `a-unowned:sicily:north` (the block's top tile row north of 38.5 N and east of
+`tyrrhenian`'s last column, 15.84 to 16.69 E) and `a-unowned:sicily:west` (the three
+Hammamet tiles), each reading the Atlantic's tide. The trunk merged (bd9a79a); then:
+
+- **Two tide regions, no tiles** (the manifest's `tide_regions:`, the Solent's form):
+  `gulf-of-hammamet` (35.01334 to 36.29334 N, 10.72 to 11.1466 E) and `calabria-north`
+  (38.5 to 38.85333 N, 15.84 to 16.69332 E), each served by the block's six (their `block:`
+  `[sicily, gulf-of-hammamet, calabria-north]`). The level there: 3.68 and 3.7 m before, 0.12
+  and 0.07 m after. `sicily` rebuilt from the cache after the gauges (`--skip-fetch
+  --reuse-world`): five of its own tiles' fill moved (three of the Hammamet column and the
+  one beside it, two of the Calabrian row), no other region's tile. Both findings listed in
+  `data/charts/audit-known.yaml` with their reasons, owner package 105: the water is a later
+  block's, and the bounds are left as they are. The north finding's figure is taken on the
+  tile's top edge line (38.85333 N), outside the tide region.
+- **The Calabria sliver** (step 3's item, built beside this): `tyrrhenian`'s east bound
+  moved from 15.5 to 15.83999 E, 0.9 m inside its last column's edge, and its streams' book
+  limits, its open stream area and its weather box with it (432c45d). The tile list is the
+  same (`tiles_over` gives no column more), and the build reads a region's bounds only for
+  its tile list, its manifest entry and its checks. The world's mean level on the fill grid
+  is the same before and after over that column, over tyrrhenian's south rows and over
+  sicily's north rows (0 of 1,068, 1,457 and 1,260 cells differ; tyrrhenian's gauges have no
+  level, so the sliver reads the eleven's 3.7 m on both sides). So no tile is written.
+  `--check tyrrhenian` passes. It mends four listed findings, `a-unowned:tyrrhenian:east`,
+  `north-east`, `south` and `south-east` (the last two `sicily`'s bounds had already closed),
+  and they are taken out. **Three ceilings move**, each by the sliver's water now
+  tyrrhenian's: `a-unowned:tyrrhenian:north` 396199 to 490855 (the strip north of 42.5 N now
+  runs to 15.84 E), `c-level:tyrrhenian` 7260 to 7513 and `d-split:tyrrhenian` 8703 to 8956
+  (the sliver's 253 points of the full sweep). They were proven by the bound's toggle: at
+  432c45d's parent the full sweep gave the old figures.
+- **Two tide tests** take the new regions: the set of the blocks' names gains them, and the
+  ruled list of gauges that serve a block beyond the seam band gains the six (old: package
+  104's three alone).
+
+The audit sampled and full: 0 findings the known list lacks; `tests/test_chart_audit.py`
+passes whole with the slow tier.
