@@ -1019,3 +1019,30 @@ features:
   source: 'Bérard 1837, ''Cap Matifou'', p. 96: N of the cape 2 miles a rocky shoal with 29 feet on it, about a quarter mile N and S; on its top the W point of the cape bears nearly S and Rassauta shows over it; currents on it to the E at 2 miles at least. Michelot 1715, p. 90: off the end of the point about 2 miles to the NW a ledge of rocks under water where the sea breaks in bad weather, and another very dangerous to the NNW about 2 miles. Purdy 1826, p. 325, note: the cutter Nimble found at three leagues from Cape Matifou in 5 fathoms a bank covered with coral, its direction not expressed (Paris, 1826)'
   says: The bank two miles north of Cape Matifou, twenty-nine feet over it, where the sea breaks in bad weather.
   fix: Bérard's 2 miles N of the cape's W point (the cape FROM MEMORY); his 29 pieds (9.4 m); Michelot's ledges NW and NNW not separately placed; moved 395 m to the shoalest head of the tiles within 400 m (-63.7 m against the datum)
+
+# ---------------------------------------------------------------------------
+# package 104: Dellys and Cape Bengut, the marks of the coast east of Cape Matifu where
+# the Sardinian sea's block begins at 4.5 E (in this region's bounds, its index rebuilt
+# from the file and its manifest counts edited alone; no tile or coast touched)
+# ---------------------------------------------------------------------------
+
+- id: cape-bengut
+  kind: headland
+  name: Cape Bengut
+  modern: 'Cap Bengut, under the Jebel Bou Berak'
+  lat_deg: 36.9235
+  lon_deg: 3.8930
+  fix: 'moved 165 m to the grid''s land'
+  height_m: 300
+  source: 'Tofino 1787, p. 154: high, black and steep, with two islets; Berard 1837, pp. 97 to 98: the high land 24 to 33 miles E by N of Matifu, three mountains, the highest the Bouberac, estimated at 600 metres; pp. 77 to 78: off the cape close in the current east at two miles an hour; Purdy 1826, p. 327: from Matifu to Bingut E 1/2 N, 36 miles; Norie 1831, p. 355: 36 54 16 N, 3 58 15 E; Smyth 1854, p. 458: the summit 36 56 N, 3 54 E, Mount Bubarak 980 feet; height JUDGEMENT from the grid''s ridge behind the cape'
+  says: 'Cape Bengut, high, black and steep with two islets, under the mountain of Bou Berak; close in off it the current runs east at two knots.'
+
+- id: dellys
+  kind: town
+  name: Dellys
+  modern: Dellys
+  lat_deg: 36.9180
+  lon_deg: 3.9120
+  height_m: 30
+  source: 'Tofino 1787, p. 154: east of Cape Tedeles the village and a beach where wheat is loaded, anchoring in 8 and 10 brazas, weed with some rocky patches; Berard 1837, pp. 99 to 100: the point of Dellys runs out like a mole, rocks a cable and a half beyond it; the anchorage sheltered from W and NW, good sand and mud in 13 to 15 brasses, uneasy with easterlies; the town of stone and tile trading its produce to Algiers; Purdy 1840, p. xxix: the marabout of Dellys 36 55 20 N, 3 55 12 E'
+  says: 'Dellys on its point like a mole, a little town of stone and tile that ships wheat to Algiers; there is an anchorage under it sheltered from the westerlies.'
