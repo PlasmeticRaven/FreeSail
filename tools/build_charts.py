@@ -585,7 +585,7 @@ REGIONS: dict[str, dict[str, Any]] = {
     # Sicily and the Strait of Messina are a later block.
     "tyrrhenian": {
         "title": "The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples",
-        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.5},
+        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.83999},
         "fetch": {"south": 38.3, "north": 42.85, "west": 7.6, "east": 16.0},
         "harbours": {
             "cagliari": {"south": 39.14, "north": 39.23, "west": 9.05, "east": 9.18},

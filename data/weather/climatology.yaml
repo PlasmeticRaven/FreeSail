@@ -2184,7 +2184,7 @@ boxes:
   # the westerlies a few points over; said in docs/dev/TuningNotes.md.
   tyrrhenian:
     title: "the Tyrrhenian, Sardinia to Naples, with the tramontana and the libeccio"
-    bounds: {south: 38.5, north: 42.5, west: 8.0, east: 15.5}
+    bounds: {south: 38.5, north: 42.5, west: 8.0, east: 15.83999}  # package 105: to the block's new east bound (old 15.5)
     provisional: true
     source: "Naples' table (Admiralty 1916, vol. II, p. 466) for the quarters, the glass and the gale days; the systems judgement, said in each row"
     months:

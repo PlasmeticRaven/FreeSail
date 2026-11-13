@@ -107,7 +107,7 @@ book_limits:
   - {south: 35.0, north: 40.5, west: -5.0, east: 4.5}  # the Mediterranean west, both regions (package 79c)
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
-  - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
+  - {south: 38.5, north: 42.5, west: 8.0, east: 15.83999}  # the Tyrrhenian's block (package 79d; to its column edge, package 105: the Calabria sliver)
   - {south: 40.56, north: 41.9, west: 0.3, east: 3.0}  # the Catalan coast's block (package 101)
   - {south: 36.29334, north: 40.56, west: 4.5, east: 8.0}  # the Sardinian sea's block (package 104)
   - {south: 36.29334, north: 38.5, west: 8.0, east: 11.1466}  # the coast of Tunis's block (package 104)
@@ -1340,7 +1340,7 @@ areas:
   - id: tyrrhenian-open
     chart: tyrrhenian
     name: the Tyrrhenian sea, Sardinia to Naples
-    polygon: [[38.50, 8.00], [42.50, 8.00], [42.50, 15.50], [38.50, 15.50]]
+    polygon: [[38.50, 8.00], [42.50, 8.00], [42.50, 15.83999], [38.50, 15.83999]]  # package 105: to the block's new east bound (old 15.50)
     axis_deg: 180
     spring_kn: 0.0
     neap_kn: 0.0

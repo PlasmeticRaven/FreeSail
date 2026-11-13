@@ -9514,7 +9514,7 @@ regions:
       south: 38.5
       north: 42.5
       west: 8.0
-      east: 15.5
+      east: 15.83999
     levels:
     - 2
     - 3
