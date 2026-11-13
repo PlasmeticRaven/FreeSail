@@ -131,6 +131,10 @@ SNAPSHOT_BLOCKS = {
     "guns": "the reading `guns` (each state, the ports shut); the `ship_view` picture",
     "damage": "the reading `damage` (the shot holes by side and place); the `ship_view` picture",
     "flags": "the reading `colours`; the `ship_view` picture",
+    # package 102 (step 3): the signals flying on her own ship, flag by flag at their places
+    "hoists": "the reading `signals`; the `ship_view` picture",
+    # package 102 (step 4): her flags hung while she is dressed
+    "dressed": "the reading `flags`; the `ship_view` picture",
 }
 
 # The station's tools (`agents.tools.TOOLS`), each with the player's counterpart, or the

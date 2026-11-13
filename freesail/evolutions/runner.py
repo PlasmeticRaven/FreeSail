@@ -149,6 +149,11 @@ DEFAULT_WATCH_TIME = datetime(1805, 6, 1, 4, 0, 0)
 
 # What a waiting instance waits for, besides its turn at a part another evolution holds.
 WAITING_FOR_HANDS = "hands"
+# The work for which, where the watch on deck is too few and nothing else has the hands, all
+# hands are called (package 109: the boat sent; the bilander's watch of two), and the mark
+# of the call on the work's params until her crew is told off and the hands piped down.
+CALLS_HANDS_WHEN_SHORT = frozenset({"send_boat"})
+HANDS_CALLED_FOR = "hands_called_for"
 
 # How many pieces of other work a log line names before it says "at other work".
 MAX_WORK_NAMED = 3
@@ -1186,6 +1191,12 @@ class Runner:
                 self._subject_mast(ship, inst),
                 aloft=self._aloft(inst),
             )
+        if got.outcome == hands.TOO_FEW and self._hands_called_for(ship, inst, crew):
+            # the watch on deck too few to send the boat: all hands are called for her
+            # (package 109), and she waits for them to come up, said by the call
+            inst.waiting = True
+            inst.waiting_for = WAITING_FOR_HANDS
+            return False
         if got.outcome == hands.TOO_FEW:
             inst.waiting = True
             inst.waiting_for = WAITING_FOR_HANDS
@@ -1209,6 +1220,8 @@ class Runner:
         inst.all_hands = want.all_hands
         if got.outcome == hands.SHORT:
             self._note_short(ship, inst, got)
+        if inst.params.get(HANDS_CALLED_FOR):
+            self._pipe_down_after(ship, inst, crew)
         return True
 
     def _watch_too_few(
@@ -1238,6 +1251,46 @@ class Runner:
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
         deck = bill.on_deck_piped_down(crew, when)
         return hands.too_few_on_deck(crew, deck, want, self._aloft(inst))
+
+    def _hands_called_for(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
+        """Where the watch on deck is too few to send the boat and no other work has the
+        hands (package 109; the owner's play of 2026-11-12, note 1, the bilander's watch of
+        two; the road the lead ruled for her settee of 2026-11-10), all hands are called
+        for it: said in the log as the call, and piped down once she has her crew
+        (`_pipe_down_after`). True while the hands so called are coming up; False where the
+        call is not for this work (another ship's watch at other work waits as it did),
+        or all are up and still too few, when the waiting line is said as before."""
+        if inst.evo.id not in CALLS_HANDS_WHEN_SHORT or self._want(inst).all_hands:
+            return False
+        routine = ship.extra.get("routine")
+        if inst.params.get(HANDS_CALLED_FOR):
+            return not crew.all_hands_called and getattr(routine, "_called_at", None) is not None
+        if crew.all_hands_called or self._other_work(inst):
+            return False
+        quarters = ship.extra.get("quarters")
+        if quarters is not None and getattr(quarters, "at_quarters", False):
+            return False
+        call = getattr(routine, "call_all_hands", None)
+        if call is None:
+            return False
+        note = call(f"to {self._describe(inst)}")
+        if note is None:
+            return False
+        _record(ship, note)
+        inst.params[HANDS_CALLED_FOR] = True
+        return True
+
+    def _pipe_down_after(self, ship: Ship, inst: Instance, crew: Crew) -> None:
+        """The hands called for the boat (`_hands_called_for`) piped down once her crew is
+        told off, unless the captain called them himself or other all-hands work has them."""
+        inst.params.pop(HANDS_CALLED_FOR, None)
+        if crew.all_hands_called_by_order or self._all_hands_at_work():
+            return
+        if any(i.waiting and self._want(i).all_hands for i in self.instances):
+            return
+        pipe_down = getattr(ship.extra.get("routine"), "pipe_down", None)
+        if pipe_down is not None:
+            _record(ship, pipe_down())
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment

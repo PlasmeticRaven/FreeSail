@@ -67,6 +67,23 @@ PLACES_FIXED = (
     "mizen rigging",
 )
 _MASTHEAD = re.compile(r"(fore|main|mizen) (top|topgallant|royal) masthead")
+# package 102 (step 3): the yardarm places beside the mastheads: a mast's lower yard's arm
+# ('main yardarm') or a named yard's ('fore topsail yardarm'), the arm to windward
+# (JUDGEMENT, as the rigging's flags are drawn on the weather side). The 1796 book's private
+# ships' table flies its first signal 'at the topsail or topgallant yard arm' (leaf 77, in
+# ink) and the private tables name 'the fore yardarm' and 'the main yardarm'.
+_YARDARM = re.compile(r"(fore|main|mizen)(?: (topsail|topgallant|royal))? yardarm")
+# Where a hoist flies when no order and no book's practice names a place: 'at the main', the
+# signal halyards at the main topgallant masthead (JUDGEMENT; the viewer falls back to the
+# mast's truck where she has no such piece, Design-ViewerAction.md §12.2)
+HOIST_PLACE = "main topgallant masthead"
+# A hoist's place words as an order or a private table names them, to the place words
+_PLACE_WORDS = {
+    "mizen peak": "peak",
+    "peak": "peak",
+    "ensign staff": "staff",
+    "the ensign staff": "staff",
+}
 
 # The captain's roles (`captains.ROLES`) as the colours read them (judgement: a sloop, a
 # hired cutter and a revenue cutter wear the King's pendant; a packet, a fisherman and an
@@ -98,8 +115,25 @@ ORDERED = {
 
 
 def place_ok(word: str) -> bool:
-    """Whether `word` is one of 81's place words."""
-    return word in PLACES_FIXED or bool(_MASTHEAD.fullmatch(word))
+    """Whether `word` is one of 81's place words (package 102: or a yardarm's)."""
+    return word in PLACES_FIXED or bool(_MASTHEAD.fullmatch(word)) or bool(_YARDARM.fullmatch(word))
+
+
+def place_of_words(words: str) -> str:
+    """The place word for a place as an order or a private table says it ('main topmast
+    head' the main top masthead, 'mizen peak' the peak, 'ensign staff' the staff, 'the fore'
+    the fore topgallant masthead, 'fore yardarm' as it is); '' for words naming none."""
+    w = " ".join(str(words or "").lower().replace("-", " ").split())
+    w = w.removeprefix("the ")
+    if w in _PLACE_WORDS:
+        return _PLACE_WORDS[w]
+    m = re.fullmatch(r"(fore|main|mizen|mizzen) (top|topgallant|royal) ?mast ?head", w)
+    if m:
+        return f"{m.group(1).replace('mizzen', 'mizen')} {m.group(2)} masthead"
+    if w in ("fore", "main", "mizen", "mizzen"):
+        return f"{w.replace('mizzen', 'mizen')} topgallant masthead"
+    w = w.replace("mizzen", "mizen").replace("yard arm", "yardarm")
+    return w if place_ok(w) else ""
 
 
 # Package 102 (step 1): the drawing's form widened by the least the plates ask. A part is a
@@ -564,10 +598,15 @@ def vessel_flies_words(world: Any, vessel: Any) -> str:
         return ""
     from freesail.world import signals as S
 
-    c = S.vessel_locker(vessel).colours
+    locker = S.vessel_locker(vessel)
+    c = locker.colours
     if not c.shows or not c.nation:
         return ""
-    return flies_words(vessel_flies(world, vessel), getattr(world, "nations", None), c.nation)
+    words = flies_words(vessel_flies(world, vessel), getattr(world, "nations", None), c.nation)
+    if getattr(locker, "dressed", False):
+        # package 102 (step 4): a ship dressed, as the lookout sees her
+        words = "; ".join(w for w in (words, "she is dressed in her flags") if w)
+    return words
 
 
 # ---------------------------------------------------------------------------
@@ -834,3 +873,260 @@ def hoist_flags(hoist: Any, tick: int | None = None) -> list[str]:
         flag, _, _ = private_parts(str(getattr(hoist, "shown", "")))
         return [flag] if flag else []
     return []
+
+
+# ---------------------------------------------------------------------------
+# Package 102 (step 4): dressing ship
+# ---------------------------------------------------------------------------
+
+DRESSING_FILE = "dressing.yaml"
+SLOTS = ("yardarms", "stays", "rigging", "line", "mastheads")
+STOCKS = ("ensigns", "signal flags", "pendants")
+YARDS = ("lower", "topsail", "topgallant", "royal")
+STAY_LEVELS = ("lower", "topmast", "topgallant")
+
+
+@dataclass(frozen=True)
+class Fashion:
+    name: str
+    words: str
+    dates: str
+    source: str
+    hang: tuple[dict[str, Any], ...]
+
+
+@cache
+def load_dressing(root: str = "basic", base: str | None = None) -> tuple[Fashion, ...]:
+    """A root's fashions of dressing ship, its own file's or else basic's."""
+    folder = (Path(base) if base else SIGNALS_DIR) / root
+    path = folder / DRESSING_FILE
+    if not path.exists():
+        if root == "basic":
+            return ()
+        return load_dressing("basic", base)
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    out = []
+    for i, f in enumerate(raw.get("fashions") or []):
+        name = str(f.get("name") or "")
+        if not name or not f.get("source"):
+            raise BookFileError(f"{path}: fashion {i + 1} wants a name and a source")
+        hang = []
+        for s in f.get("hang") or []:
+            if str(s.get("at")) not in SLOTS:
+                raise BookFileError(f"{path}: fashion {name!r}: a slot is at one of {SLOTS}")
+            bad = [x for x in s.get("flags") or [] if x not in STOCKS]
+            if bad or not s.get("flags"):
+                raise BookFileError(f"{path}: fashion {name!r}: flags are of {STOCKS}")
+            if s["at"] == "line":
+                for w in s.get("through") or []:
+                    if not place_ok(str(w)):
+                        raise BookFileError(f"{path}: fashion {name!r}: {w!r} is no place word")
+            hang.append(dict(s))
+        out.append(
+            Fashion(
+                name=name,
+                words=str(f.get("words") or name),
+                dates=str(f.get("dates") or ""),
+                source=str(f["source"]),
+                hang=tuple(hang),
+            )
+        )
+    return tuple(out)
+
+
+def fashion_for(root: str, year: int) -> Fashion | None:
+    """The fashion of `year`: the row whose dates hold it, else the nearest earlier one (a
+    later fashion is never flown before its date; decision 66's nearest picture otherwise)."""
+    rows = load_dressing(root)
+    within = [f for f in rows if _in_dates(f.dates, year)]
+    if within:
+        return within[0]
+    earlier = [f for f in rows if _first_year(f.dates) <= year]
+    if earlier:
+        return min(earlier, key=lambda f: _dates_distance(f.dates, year))
+    return min(rows, key=lambda f: _dates_distance(f.dates, year)) if rows else None
+
+
+def _served(drawn: Flag, name: str, words: str) -> dict[str, Any]:
+    d = drawn.served_drawing()
+    d["kind"] = "pendant" if drawn.kind in ("pendant", "broad pendant") else "flag"
+    return {"name": name, "words": words, "drawing": d}
+
+
+def dressing_stock(
+    nations: Any, nation: str, role: str, year: int
+) -> dict[str, list[dict[str, Any]]]:
+    """Her flags for dressing, by stock: her nation's ensigns (of her service; the other
+    squadrons' too for a King's ship) and her jack; her book's signal flags of the year (a
+    King's ship's, in the file's order); her signal pendants, then her colours' pendant. A
+    flag her data lacks (another nation's ensign, which the period hung too: Perrin p. 197)
+    is not there: package 96's locker."""
+    f = file_for_nation(nations, nation)
+    rl = colour_role(role)
+    navy = rl in ("kings ship", "commodore", "admiral")
+    service = "navy" if navy else "merchant" if rl == "merchant" else "privateer"
+    ensign_kind = "ensign" if navy or rl == "privateer" else "merchant ensign"
+    ensigns = [
+        _served(g, g.name, g.words)
+        for g in f.flags.values()
+        if g.drawing
+        and (
+            (g.kind == ensign_kind and (navy or g.service in (service, "any")))
+            or (g.kind == "jack" and g.service in (service, "any"))
+        )
+    ]
+    signal_flags: list[dict[str, Any]] = []
+    pendants: list[dict[str, Any]] = []
+    if navy:
+        root = f.nation if f.nation != "basic" else "basic"
+        try:
+            root = str(nations.get(nation).signals_root or "basic") if nations is not None else root
+        except KeyError:
+            root = "basic"
+        seen: set[str] = {x["name"] for x in ensigns}  # one of each: the jack is one flag
+        for row in load_signal_flags(root).rows:
+            if row.name in seen:
+                continue
+            seen.add(row.name)
+            drawn = load_signal_flags(root).drawing_of(row.name, year)
+            if drawn is None:
+                continue
+            item = _served(drawn.flag, row.name, drawn.words)
+            (pendants if drawn.flag.kind == "pendant" else signal_flags).append(item)
+    own_pendant = f.first_of("pendant", service)
+    if own_pendant is not None and own_pendant.drawing and navy:
+        pendants.append(_served(own_pendant, own_pendant.name, own_pendant.words))
+    return {"ensigns": ensigns, "signal flags": signal_flags, "pendants": pendants}
+
+
+def dressing_slots(graph: dict[str, Any], fashion: Fashion) -> list[tuple[dict[str, Any], dict]]:
+    """Each place the fashion hangs a flag on this ship (her graph's yards, stays and masts),
+    in the fashion's order, with its slot: [(where, slot)], `where` `{place, side}` (a
+    yardarm's or the shrouds' side, 1 starboard, -1 larboard), `{stay, along}` (a stay's line
+    id and how far down it from its head), `{place, to, along}` (along a span between two
+    place words) or `{place}`."""
+    spars = {s["id"]: s for s in graph.get("spars") or []}
+    lower = [s for s in spars.values() if s.get("class") == "mast" and not s.get("parent")]
+    lower.sort(key=lambda s: -float(s.get("x_m") or 0.0))  # the foremost first
+    word = {
+        s["id"]: ("mizen" if s["id"].split(".")[0] == "mizzen" else s["id"].split(".")[0])
+        for s in lower
+    }
+    if len(lower) == 1:
+        word[lower[0]["id"]] = "main"
+
+    def mast_of(sid: str) -> dict | None:
+        s = spars.get(sid)
+        while s is not None and s.get("parent"):
+            s = spars.get(s["parent"])
+        return s
+
+    out: list[tuple[dict[str, Any], dict]] = []
+    for slot in fashion.hang:
+        at = slot["at"]
+        if at == "yardarms":
+            for m in lower:
+                for kind in slot.get("yards") or ["lower"]:
+                    for y in spars.values():
+                        if y.get("class") != "yard" or mast_of(y["id"]) is not m:
+                            continue
+                        if (kind == "lower" and y.get("parent") == m["id"]) or (
+                            kind != "lower" and f".{kind}." in y["id"]
+                        ):
+                            place = (
+                                f"{word[m['id']]} yardarm"
+                                if kind == "lower"
+                                else f"{word[m['id']]} {kind} yardarm"
+                            )
+                            out += [({"place": place, "side": s}, slot) for s in (1, -1)]
+                            break
+        elif at == "stays":
+            n = int(slot.get("flags_each") or 1)
+            for ln in graph.get("lines") or []:
+                if ln.get("class") != "stay":
+                    continue
+                of = spars.get(str(ln.get("of")))
+                if (
+                    of is None
+                    or mast_of(of["id"]) is None
+                    or of.get("class")
+                    not in (
+                        "mast",
+                        "topmast",
+                        "topgallant_mast",
+                    )
+                ):
+                    continue
+                level = {"mast": "lower", "topmast": "topmast", "topgallant_mast": "topgallant"}[
+                    of["class"]
+                ]
+                if level not in (slot.get("stays") or ["lower"]):
+                    continue
+                out += [({"stay": ln["id"], "along": (k + 1) / (n + 1)}, slot) for k in range(n)]
+        elif at == "rigging":
+            for m in lower:
+                out += [({"place": f"{word[m['id']]} rigging", "side": s}, slot) for s in (1, -1)]
+        elif at == "line":
+            through = [str(w) for w in slot.get("through") or []]
+            n = int(slot.get("flags_each") or 1)
+            for a, b in zip(through, through[1:], strict=False):
+                out += [({"place": a, "to": b, "along": (k + 1) / (n + 1)}, slot) for k in range(n)]
+        elif at == "mastheads":
+            out += [({"place": f"{word[m['id']]} truck"}, slot) for m in lower]
+    return out
+
+
+def dressing_flies(
+    graph: dict[str, Any], nations: Any, nation: str, role: str, year: int
+) -> list[dict[str, Any]]:
+    """What a dressed ship hangs where, as the snapshot serves it (`dressed`): each place of
+    the year's fashion with the next flag of its stocks, `{..where, flags: [flag]}`; places
+    left empty when her stock is spent."""
+    fashion = fashion_for("basic" if nations is None else _root_of(nations, nation), year)
+    if fashion is None:
+        return []
+    stock = dressing_stock(nations, nation, role, year)
+    taken = {k: 0 for k in STOCKS}
+    out = []
+    for where, slot in dressing_slots(graph, fashion):
+        flag = None
+        for kind in slot["flags"]:
+            if taken[kind] < len(stock[kind]):
+                flag = stock[kind][taken[kind]]
+                taken[kind] += 1
+                break
+        if flag is not None:
+            out.append({**where, "flags": [flag]})
+    return out
+
+
+def _root_of(nations: Any, nation: str) -> str:
+    try:
+        return str(nations.get(nation).signals_root or "basic")
+    except (KeyError, AttributeError):
+        return "basic"
+
+
+def dressing_tick(world: Any) -> None:
+    """Once a minute with the look (package 102, step 4): the player's ship dressed undresses
+    at sunset (the period's colours came down at sunset, Spavens 1796 as Perrin prints it;
+    that the dressing came with them JUDGEMENT, as Luce 1884 has it) and when her colours
+    come down, said in the log. Nothing while she is not dressed."""
+    from freesail.world import signals as S
+
+    ship = getattr(world, "ship", None)
+    extra = getattr(ship, "extra", None)
+    locker = extra.get("signals") if isinstance(extra, dict) else None
+    if locker is None or not getattr(locker, "dressed", False):
+        return
+    down = locker.colours.state in ("none", "struck", "distress", "truce")
+    night = S.light_now(world) == "night"
+    if not (down or night):
+        return
+    locker.dressed, locker.dressed_since = False, 0
+    text = (
+        "Sunset: the dressing hauled down with the colours, and the flags stowed."
+        if night and not down
+        else "The dressing hauled down: a ship is not dressed with her colours down."
+    )
+    world.record("routine", "colours.undressed", text, data={"by": "the watch"})
