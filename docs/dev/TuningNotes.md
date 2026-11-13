@@ -27501,7 +27501,10 @@ ruled. Without those two rows the audit took both for Mediterranean water and th
 1.6 m mean levels for a fault. Two are listed in `data/charts/audit-known.yaml` as owned by
 106a: the Salvages split between Madeira's weather box and the Canaries' at 30 N (the same
 trade in both, as Biscay's splits are listed), and Point Handia standing in 2.5 m of water,
-its grid land a kilometre off, left at the pilot's place.
+its grid land a kilometre off, left at the pilot's place. Truth 7-564 (package 111's, the
+regions two weather boxes answer) moves with the new region: five at the trunk's bcd5709
+(Biscay north and south, the Strait, the Tyrrhenian, the Balearics), six here, the Salvages
+added and nothing else (the audit's check (d) run on each).
 
 ### Found for others, not mended
 

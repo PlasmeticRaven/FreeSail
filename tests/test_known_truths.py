@@ -16279,9 +16279,10 @@ def test_truth_7_563_the_ways_in_the_land_guard_refuses():
 def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
     """Package 111 (d): the regions whose water more than one box of the climatology answers
     are Biscay north (the channel box's edge at 47.5 N), Biscay south (portugal's at 43.5 N),
-    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E) and the Balearics (its strip to
-    40.56 N); water in no box lies only in the Balearics' strip, the Cantabrian coast east of
-    5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
+    the Strait (5 W), the Tyrrhenian (the Gulf's box to 11 E), the Balearics (its strip to
+    40.56 N) and the Salvages (madeira's box from 30 N, the canaries' to it; package 106a, the
+    same trade in both); water in no box lies only in the Balearics' strip, the Cantabrian
+    coast east of 5 W below 43.5 N and the Strait south of 36 N west of 5 W."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16293,6 +16294,7 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
         "d-split:strait",
         "d-split:tyrrhenian",
         "d-split:balearics",
+        "d-split:salvages",
     }
     assert {k for k in keys if k.startswith("d-no-box:")} == {
         "d-no-box:balearics",
