@@ -1202,9 +1202,8 @@ class Squadron:
                 f"'{spec.get('formation')}' is no formation; say one of {', '.join(FORMATIONS)}."
             )
         commander = str(spec.get("commander") or PLAYER_ID)
-        if commander.lower() in ("the ship", "us", "the player", "the player's ship", "our ship"):
-            commander = PLAYER_ID
-        mine = commander == PLAYER_ID or any(
+        players = ("the ship", "us", "the player", "the player's ship", "our ship")
+        mine = commander.lower() in players or any(
             str(m).lower() in ("the ship", "us") for m in spec.get("members") or []
         )
         if mine and _changed_ships(world):
@@ -1214,6 +1213,8 @@ class Squadron:
                 "the player has taken command of another ship; a set of his is not formed "
                 "in her yet: give the set another commander"
             )
+        if commander.lower() in players:
+            commander = PLAYER_ID
         else:
             v = world.vessels.find(commander)
             if v is None:
