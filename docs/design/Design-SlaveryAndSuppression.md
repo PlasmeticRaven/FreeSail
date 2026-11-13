@@ -42,7 +42,8 @@ Antioco (pp. 309, 311) and the Mercedarians of Cagliari (p. 219). Purdy 1826 on 
 ### 1.2 What was fetched and read
 
 Twenty-nine files in fifteen rows of the references' README, each from the Internet Archive,
-printed before 1926; read as data and never run:
+printed before 1926, six of them extracts holding only the Acts and documents cited here (the
+whole volumes' identifiers in their rows); read as data and never run:
 
 - **The British law:** the *Statutes at Large* of 1789 and 1799 (Dolben's Act; the Act of 1799);
   the *Statutes of the United Kingdom* vols. 2, 3, 4 and 9 for the Acts of 1806, 1807, 1811 and
