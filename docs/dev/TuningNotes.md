@@ -28219,3 +28219,173 @@ added and nothing else (the audit's check (d) run on each).
   compared in bells"); a book wanting a clock hour has no word for it.
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
+
+## Package 112: the coarse seas (2026-11-13)
+
+### Step 0: the measurement (reported to the chart session before anything under `data/charts/`)
+
+Measured on `claude/pkg-112` cut from the trunk at 237b4641. Every tile below was built by the
+tool's own functions (`build_corridor`, `decimate_tiff`, `_write_gebco_level`,
+`distance_field`, `save_tile`) into a scratch folder outside the repository, from GEBCO 2025
+(the global GeoTIFFs, 4,235,605,060 bytes, and the app's area extracts), in the cache
+`.cache/charts`. The repository's two committed level-1 folders hash the same before and
+after (all 54 files). Nothing under `data/charts/` was written.
+
+**(a) Level 0.** The tool's recipe (150″ cells, 2 m steps, land clipped at 50 m, tiles all land
+dropped, no distance field): **the world 150 tiles, 26,490,988 bytes** (of 153 over the
+globe); **the Atlantic with the Mediterranean, 70 S to 75 N and 100 W to 40 E, 63 tiles,
+11,283,534 bytes** (of 64). *What the game does with level 0 today:* nothing. The manifest's
+`world:` lists no tile and `tiles/0/` is ignored by git, so no clone has one; the code would
+read whatever is present (`Chart.__init__`, `_present`). *What committing it would move:*
+the code lays the world under **every** chart, a chart of one region included. The
+recorded passages sail the chart of `channel-west` alone (bounds 48 to 51 N, 7 to 3 W, its
+tiles to 47.81 N). Tried in a scratch copy: with level 0 present that chart answers depths
+south of 47.81 N where it answers None today (47.70 N 6 W: None, then 139.4 m), its
+`bounds` unchanged. **So level 0 committed as the code stands moves what a region's chart
+answers beyond its tiles.** Step 1 must keep it off a chart of one region, or the passages
+must be proven never to leave their tiles. *The limits:* a chart's `contains`, `bounds` and
+`bounds_words` are the envelope of its regions and coarse layers. They are read by the
+scenario's refusal of a start outside the chart (`core/world.py:786`, "the position ...
+lies outside the chart region ..."), the ship's placing and the hand anchor
+(`world/orders.py:1359`, `4234`), and the lookout's "The chart has nothing to the
+<quarter> of this; the coast beyond is uncharted." within `CHART_EDGE_NM` (10 miles) of
+the envelope (`world/lookout.py:551`, `Chart.edge_near`). If the limits became the world's,
+that line would never be said on `atlantic-east` and every start on the globe would load.
+The tests that hold the limits are listed under (e).
+
+**(b) Level 1 under the Mediterranean,** 30 to 46 N and 6 W to 36.5 E (the brief's box,
+`beside: atlantic-corridor`): 44 tiles over the box, **41 written, 9,713,944 bytes**. The
+three in column 9.33 to 5.07 W north of 33.73 N are the corridor's whole, so nothing is
+written. By kind: 34 with a coast (8.53 MB), 6 all land (0.85 MB), 1 open within ten miles
+of land. The box takes in the Black Sea west of 36.5 E and the Marmara (the three tiles
+north of 42.27 N east of 24.8 E, 0.58 MB): cut there if the session wishes. **The existing
+tiles:** the five tiles the corridor shares, read through `Tile.filled_from`, keep every
+corridor cell's elevation, distance and block soundings exactly; the layer fills 125,520,
+29,760, 6,144, 6,144 and 5,520 cells that were NODATA. Seconds to build: 41.
+
+**(c) Level 1 to the Cape Verde Islands,** 12.4 to 25.2 N and 26.4 to 9.34 W (`beside:
+atlantic-south`; it shares no tile with it): **12 tiles, 2,487,854 bytes** (3 all land,
+5 coast, 4 open within ten miles of land). Without the column from 26.4 W: 9 tiles and
+1.85 MB, but the column holds Santo Antão and São Vicente (to 25.36 W). 106a measured 9
+and 1.9, 10 and 2.05; the difference is the column's whole three rows here.
+
+**(d) The plan for the whole Atlantic, on paper.** Level 1 in the corridor's own form
+(elevation, distance field, the blocks' soundings) built from the GeoTIFFs decimated by two
+over each sea's tiles, less the tiles laid or measured above. Each tile was filled whole, so
+the bytes are an upper bound (the tool writes NODATA beyond a fetch). The bounds are
+JUDGEMENT.
+
+| sea | bounds | tiles | MB | open sea | coast or near land | all land |
+|---|---|---|---|---|---|---|
+| the Caribbean and the Gulf | 8 to 31 N, 98 to 58 W | 70 | 20.0 | 16, 4.6 | 51, 14.6 | 3, 0.8 |
+| the western ocean and the American coast | 12.4 to 52 N, 82 to 26.4 W (less the above) | 93 | 25.4 | 62, 17.8 | 24, 5.8 | 7, 1.8 |
+| the British west and the Irish sea (not in the brief's list; the gap north of the corridor) | 51 to 61 N, 32 to 5 W | 16 | 3.8 | 10, 2.4 | 6, 1.3 | 0 |
+| the North Sea and the Baltic's approaches | 51 to 61 N, 5 W to 13 E | 12 | 2.6 | 1, 0.1 | 10, 2.2 | 1, 0.3 |
+| the South Atlantic to the Cape | 35.5 S to 12.4 N, 60 W to 20.5 E | 226 | 60.3 | 126, 35.0 | 58, 14.8 | 42, 10.4 |
+| **all** | | **417** | **112.1** | 215, 59.9 | 149, 38.7 | 53, 13.3 |
+
+Laid whole at 30″ the Atlantic weighs about 112 MB beside the 23 MB of level 1 laid or
+measured here. Laid as **level 0 over all of it (11.3 MB) and level 1 only on the tiles with
+a coast or land within ten miles**, it weighs about 39 + 11 = 50 MB. Open sea at 30″ is 279
+KB a tile (the multibeam relief), against the 150″ world's 177 KB a tile for forty times the
+area. A ship in open water away from the coast is then answered at 150″ (4.6 km cells),
+in steps of 2 m. Nothing a ship needs out there is finer than that.
+
+### Step 0: the open Atlantic's level (the lead's ruling (b): measured, not settled)
+
+**How the tiles' raise and the game's level combine today.** The water over a cell is the
+chart's depth plus the tide's height, `-elevation + level + z` (`Chart.aground`,
+`ground.py`, the tide's `height_m`). At levels 2 and 3 the datum is low water: EMODnet's
+soundings, and GEBCO's fill raised by `mean_level_grid`, which reads `Tide.constants_at`
+itself, so the land and the level agree cell by cell. **At level 1 the datum is mean sea
+level and nothing is raised** (`build_corridor` samples GEBCO as it is), so on water only
+a coarse layer answers, the game counts the level twice: the depth is already below mean
+sea level, and the level above low water is added again. Outside every block that level is
+the eleven's. Over 7,584 points of open water (every quarter degree of the corridor's and
+the south layer's water outside every bound) the game today reads **level 3.11 to 4.37 m
+and M2 1.62 to 2.15 m**, the nearest of the eleven St Mary's or Le Conquet. Nearly all of
+it lies beyond every gauge's reach: every point south of 36 N, 755 to 1,602 miles off.
+**On the coarse shores** (cells where level 1 is the finest, outside every bound, Morocco's
+coast and the islands' outer shores mostly): 416 cells of sea shallower than the level and
+765 of land lower than it, which the game floods at mean tide. By elevation, 149 cells from
+−1 to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 to +3 and
+252 from +3 to +4.
+
+**What the islands' gauges read** (the file's constants; no level is read for Funchal or
+any Azorean gauge):
+
+| gauge | M2 m | M2 phase | level read | M2+S2+N2 (JUDGEMENT, Sicily's interim) |
+|---|---|---|---|---|
+| Funchal | 0.719 | 45.8 | none | 1.135 |
+| Ponta Delgada | 0.487 | 63.0 | none | 0.769 |
+| Angra | 0.447 | 64.4 | none | 0.708 |
+| Horta | 0.414 | 59.5 | none | 0.658 |
+| Santa Cruz das Flores | 0.368 | 60.8 | none | 0.582 |
+| Santa Cruz de Tenerife | 0.708 | 29.3 | 1.37 (REDMAR) | 1.127 |
+| Las Palmas | 0.746 | 28.4 | 1.44 | 1.185 |
+| Arrecife | 0.835 | 36.6 | 1.60 | 1.324 |
+| La Estaca | 0.593 | 21.8 | 1.17 | 0.956 |
+
+Where both are known, the judged sum runs 0.81 to 0.83 of the level read. Over the islands'
+regions the level today is the eleven's 3.98 m (Madeira), 3.2 to 3.98 m (the Azores) and
+the Canaries' own 1.17 to 1.60 m.
+
+**What each choice does to the depths** (the open water outside every block; the islands'
+own regions are the older blocks' and wait for package 111's close by the owner's word):
+
+1. **The eleven's, as today:** 3.1 to 4.4 m. The coarse shore is flooded to that height plus
+   the tide (765 cells of land), and open-water soundings read 3 to 4 m deep. M2 is four
+   times the islands' and an hour and a half late.
+2. **The sea's own gauges, the level only where read:** within the Canaries' reach 1.2 to
+   1.6 m. Elsewhere no gauge of the blend has a level, so `_blend` falls back to the
+   eleven's: 1.20 to 3.98 m, median 3.20. A step where the reach of the Canaries' gauges ends.
+3. **The sea's own gauges, unread levels judged at M2+S2+N2 and marked:** 0.59 to 1.60 m,
+   median 1.05. The coarse shore is flooded to about a metre (about 180 cells of sea and
+   210 of land within it), and the judged figure is a fifth low against the Canaries' read.
+   A published level replaces it when read.
+4. **Mean sea level, the coarse layer's own datum** (a coarse cell read as `-elevation + z`,
+   its level not added): no double count, and nothing to research. But it is an engine change
+   in how a level-1 depth meets the tide (not in the brief, so it needs the lead's word), and
+   the open water on a region's level-2 tiles (the 30 groups) is low-water datum and still
+   wants a level.
+
+### Step 0: the seas proposed, and what they move
+
+Laid on the weather boxes' own lines, so that each sea's weather is a box already on file:
+
+| sea | open water | gauges | weather | regions |
+|---|---|---|---|---|
+| `channel` | 47.5 to 52 N, 32 W to 2.93 E | the eleven | `channel` | channel-west, -mid, -east, solent |
+| `biscay` | 43.5 to 47.5 N, 32 to 0.9 W | biscay-north's and biscay-south's but the four Galician | `biscay` | biscay-north, biscay-south |
+| `iberian` | 36 to 43.5 N, 20 to 5 W | Portugal's and Cadiz, with Vigo, Vilagarcía, Corunna and Ferrol | `portugal` | portugal |
+| `ocean` | 25.2 to 43.5 N, 33 to 9 W, less the above | Funchal, the four Azoreans, the seven Canaries | `azores`, `madeira`, `canaries` by their lines | madeira, azores, canaries, salvages |
+| `strait` | the Strait's | its four and Cadiz | as today | strait |
+| `mediterranean` | the Mediterranean's layer | every Mediterranean gauge | its boxes; east of 16.7 E none on file, the nearest answering and said provisional | the eleven Mediterranean regions and tide regions |
+
+**The islands are one sea** (`ocean`), not four met: their M2 phases run 22 to 64 degrees
+and their amplitudes 0.37 to 0.84 m, one wave from the Canaries to the Azores. The blend
+between them is honest, and `SEAS_THAT_MEET` loses the Salvages' row. 106b's coast lies on
+the same wave; its builder names its sea.
+
+**Simulated** (the sea's gauges blended over open water outside every block, the rule
+otherwise the tide's own):
+
+| sea | points | today: level, M2 | the sea's: level (unread to the eleven's) | judged | M2 |
+|---|---|---|---|---|---|
+| channel | 1,416 | 3.11 to 4.21, 1.62 to 1.99 | **unchanged, every point** | | |
+| biscay | 1,558 | 3.11 to 4.37, 1.74 to 2.15 | 2.83 to 4.06 | 2.01 to 3.24 | 1.29 to 1.57 |
+| iberian | 1,246 | 3.20 to 4.37, 1.76 to 2.15 | 1.68 to 3.98 | 1.65 to 2.00 | 0.99 to 1.16 |
+| ocean | 3,327 | 3.20 to 3.98, 1.76 to 2.02 | 1.20 to 3.98 | 0.59 to 1.60 | 0.37 to 0.83 |
+| none of these (east of 9 W, south of 36 N: 106b's water) | 102 | 3.98, 2.02 | | | |
+
+**The recorded passages' open water is the Channel's sea, and its tide does not move.** Harpy
+is within ten miles of 47 50 N 6 W, all of it north of 47.5 N. Diamond is within eight miles
+of 48 N 4 55 W, inside biscay-north's or channel-west's bounds.
+
+**The known list's open water under these seas** (ruling (a): a group leaves only where its
+sea's tide is its own and not the eleven's): of the 23 groups of the lead's list, biscay's 4
+and iberian's 5 leave, and the Mediterranean's 2 (the Gulf's west, the Tyrrhenian's north),
+with package 105's two (Sicily's north and west). The Channel's 8 stay: their sea's tide is
+the eleven, which are that sea's own gauges. Is that the eleven's, by the ruling, or the
+sea's own? The Strait's south three are Morocco's water, 106b's bounds. The seven slivers
+beside a neighbour stay, for bounds.
