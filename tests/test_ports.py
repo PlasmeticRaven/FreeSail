@@ -194,6 +194,22 @@ SICILY_PORTS = [
     "syracuse",
     "valletta",
 ]
+# package 105, step 3: western Sicily, the south coast, the islands and Ustica
+SICILY_WEST_PORTS = [
+    "favignana",
+    "girgenti",
+    "lampedusa",
+    "licata",
+    "lipari",
+    "marsala",
+    "palermo",
+    "pantelleria",
+    "porto-palo",
+    "sciacca",
+    "terranova",
+    "trapani",
+    "ustica",
+]
 # package 106a: the Canaries' seven (Hierro has no road in the sources)
 CANARIES_PORTS = [
     "arrecife",
@@ -218,6 +234,7 @@ ALL_PORTS = sorted(
     + BARBARY_PORTS
     + SARDINIA_WEST_PORTS
     + SICILY_PORTS
+    + SICILY_WEST_PORTS
     + CANARIES_PORTS
 )
 
@@ -405,6 +422,7 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # package 105: Malta's four the King's in this world's year, open; Sicily's five and
     # Calabria's two the King of Naples', neutral
     neutral_ports |= set(SICILY_PORTS) - {"valletta", "marsaxlokk", "st-pauls-bay", "mgarr"}
+    neutral_ports |= set(SICILY_WEST_PORTS)
 
     # package 106a: the Canaries Spain's in this world's year, hostile
     french_ports |= set(CANARIES_PORTS)

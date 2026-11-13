@@ -2283,7 +2283,8 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
         "canaries",
     }
     # package 101: the Medas off the Ter and Tabarca off Cape Santa Pola, two more
-    assert len(lacking) == 26
+    # package 105, step 3: Lampion, one more (old: 25); package 106a: the West Rock, one more
+    assert len(lacking) == 27
     for f in lacking:
         assert whole.depth_at(f.position) is not None, f.id
         assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id
