@@ -4515,8 +4515,9 @@ LIE_A_TRY_NOTE = (
     "Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the "
     "helm a-lee 32 degrees where the evolution's file gives 5, the figure that brings her up from "
     "way on in a gale to six points and a third with under 2 knots of way once what it hands is "
-    "furled, where at 5 she lay eight points off at 3.6 knots; from rest she lies about five "
-    "points as before, coming up and falling off (measured: docs/dev/TuningNotes.md; judgement)."
+    "furled, where at 5 she lay eight points off at 3.6 knots; from rest she comes up and falls "
+    "off between about four and seven points, inside truth 28's bounds, where at 5 she lay steady "
+    "near five (measured: docs/dev/TuningNotes.md; judgement)."
 )
 
 # The quarter bill's figures beyond the trimmers (Indf §6.4): the frigate-36's two at the helm

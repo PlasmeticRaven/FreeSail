@@ -233,6 +233,9 @@ class Instance:
     want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
+    # waiting its turn, made all-hands work before a pipe-down that would have left the watch
+    # too few for it, the hands kept up for it (`Runner._after_all_hands`; package 75)
+    held_up: bool = False
     short_logged: bool = False
     # the precondition that failed says what was ordered is done already (package 37f)
     done_already: bool = False
@@ -1223,6 +1226,19 @@ class Runner:
             return False
         return hands.too_few_on_deck(crew, self._pool(crew, inst), want, self._aloft(inst))
 
+    def _too_few_piped_down(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
+        """Whether work waiting its turn would call all hands for itself the moment the hands
+        were piped down: `_watch_too_few`'s rule read on the deck as the pipe-down would leave
+        it (`bill.on_deck_piped_down`), all hands not called and nobody turned up. Read by
+        `_after_all_hands` before it pipes down (package 75, the review of the lead's ruling (1)
+        of 2026-11-10)."""
+        want = self._want(inst)
+        if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
+            return False
+        when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
+        deck = bill.on_deck_piped_down(crew, when)
+        return hands.too_few_on_deck(crew, deck, want, self._aloft(inst))
+
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
     ) -> hands.Assignment:
@@ -1470,13 +1486,29 @@ class Runner:
         all hands himself (spec M3 §3.2, §4.2). One still waiting its turn (the next
         topsail of "reef the topsails") counts: the hands are not piped down to be turned
         up again on the same tick, which cost the watch below its broken sleep once for
-        every topsail (playtest 7, finding 1; docs/dev/TuningNotes.md, package 29b)."""
+        every topsail (playtest 7, finding 1; docs/dev/TuningNotes.md, package 29b).
+
+        Work waiting its turn whose file calls all hands where the watch is too few (the
+        bilander's settee, `hands.CrewRequest.calls_all_hands`) counts with it where the watch
+        would be too few for it the moment the hands were piped down (`_too_few_piped_down`):
+        it is made all-hands work here, before the pipe-down, and the hands stay up for it
+        (`Instance.held_up`), so that it begins on them and is not piped down and called again
+        on the same tick (package 75, the review of the lead's ruling (1) of 2026-11-10: a furl
+        ordered behind a take in, a take in behind a wear, in her larboard watch by night). Such
+        work taken away before it began (refused, done already, failed or belayed) ends the call
+        as all-hands work ending would."""
         crew = self._crew(ship)
-        if crew is None or not inst.all_hands or self._all_hands_at_work(but=inst):
+        if crew is None or self._all_hands_at_work(but=inst):
             return
-        if any(i.waiting and i is not inst and self._want(i).all_hands for i in self.instances):
+        if not (inst.all_hands or (inst.waiting and inst.held_up)):
             return
         if crew.all_hands_called_by_order:
+            return
+        for i in self.instances:
+            if i.waiting and i is not inst and self._too_few_piped_down(ship, i, crew):
+                i.want = self._want(i).as_all_hands()
+                i.held_up = True
+        if any(i.waiting and i is not inst and self._want(i).all_hands for i in self.instances):
             return
         routine = ship.extra.get("routine")
         pipe_down = getattr(routine, "pipe_down", None)

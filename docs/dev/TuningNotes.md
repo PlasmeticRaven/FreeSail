@@ -19935,7 +19935,12 @@ hands up. Her other tests as before but the two moved below.
 
 **Lines any ship may say that this changes:** the bilander's alone: her settee's work in a watch too
 few to begin it (the call, the work at the company's pace, the pipe-down, and the waiting lines no
-longer said), her forced round's line, and her manoeuvres ordered while called work is in hand.
+longer said), her forced round's line, and her manoeuvres ordered while called work is in hand. Her
+group orders, measured at the review ("The review's mends", below): of "set plain sail", "make all
+sail", "shorten sail" ("take in sail") and the courses' "take in" and "furl" in her larboard watch
+by night, those that hold her settee move (its work called and piped down, the order's other sails
+waiting for the watch's two as before, their waiting line "the watch is setting the mainsail" where
+it was "there are but two to spare"); the rest line for line as before.
 
 **(6) "make all sail" lists the square sail only where she has one.** *As built*
 (`freesail/orders/storm.py`, `orders/__init__.py`): `storm.listed_lines` drops `make all sail`'s "set
@@ -19995,7 +20000,15 @@ the furls). Truth 28's form holding is the truth's own bounds on her (30 to 95 d
 kn on the hour's mean, nothing carried away, the lying line), from rest in 35 kn (B7's review's
 `try35.py`, the topgallant masts left up) and in 45 kn (truth 28 itself, the frigate's). No ship file
 could carry a timing before this step: the runner gave a script its evolution file's `timing:`
-alone. **The helm alone holds both, on each file** (the sweep below), so it is built.
+alone. **The helm alone holds both, on each file** (the sweep below), so it is built. **A reading,
+for the lead** (named at the review): the ruling's "if the files can carry it in the timings' own
+form" is read as leave to make them carry it in that form, a new section of a ship file
+(`timing:`, an evolution's id to its own timing keys) and the runner's merge of it over the
+evolution file's, the script and its keys unchanged. Read strictly, the files as they stood could
+not carry it, and the ruling's own way out would send the recorded sweep (below) to the evolutions'
+owner, package 77's ground, with the two-deckers' two equilibria named (at the file's 5 degrees,
+from rest about five points at 1.3 to 1.45 kn, from way on about eight at 3.5 to 3.6 kn); then the
+section, the merge and the two files' figures come out.
 
 **As built.** A ship file's top-level `timing:` (`ShipSpec.timing`, `schema._parse_timing`: an
 evolution's id to a mapping of its timing's keys to figures, refused in words where it is not), read
@@ -20191,6 +20204,161 @@ to" on B7's path digest for digest on both two-deckers. Not run: the whole fast 
 candidates beyond these files (the steps reach the bilander's settee work, three files' "make all
 sail", the two two-deckers' lie a-try and their beat, each measured and looked for above); the pace
 tier.
+
+### The review's mends (2026-11-12)
+
+An independent review of the four commits since the trunk's merge (9e04b9fa to 0e5ff12d) found
+seven points. Each was reproduced first on the tree at 0e5ff12d, the scripts in the session's
+scratch (`rf/fix/`), outside the repository, "before" on exports of 9e04b9fa and 0e5ff12d; one
+commit of the mends after these steps.
+
+**1. A settee order waiting its turn behind called work was piped down and called again on the
+same tick** (the review's blocker). In her larboard watch by night (her settle at 00:00, the hands
+piped down and 30 s; seed 7, 15 kn), "take in the mainsail" and 10 s later "furl the mainsail":
+"All hands! (to take in the mainsail)" at +1 s; at +87 s "Took in the mainsail", "Piped down; the
+larboard watch has the deck." and "All hands! (to furl the mainsail)" on one tick, all hands up
+again at +177 s, furled and piped down at +316 s. "wear ship" and 29 s later "take in the
+mainsail": worn at +528 s, piped down and "All hands! (to take in the mainsail)" on that tick, all
+up again at +618 s, taken in and piped down at +621 s. Two calls and two pipe-downs each, the watch
+below turned up twice and its broken sleep (`FATIGUE_ALL_HANDS_AT_NIGHT`) twice, against the
+runner's own rule (`_after_all_hands`, playtest 7's finding 1). The cause: the pipe-down is held
+only for work waiting whose want is all hands already, and a settee's request stays numbered until
+`_watch_too_few` makes it all-hands work as it begins, after the pipe-down. The build's tests sailed
+each order to its end before giving the next.
+
+*As mended* (`freesail/evolutions/runner.py`, `freesail/crew/bill.py`): before it pipes down,
+`_after_all_hands` makes all-hands work of each settee request waiting its turn that would call all
+hands the moment the hands were piped down (`_too_few_piped_down`: `_watch_too_few`'s rule read on
+the deck as the pipe-down would leave it, `bill.on_deck_piped_down`, every hand at work, the idlers
+by the bells and the watch on deck, nobody turned up), marked `Instance.held_up`. The rule as it
+stood then holds the pipe-down, and the work begins on the hands already up and pipes down at its
+own end. Such work taken away before it began (refused, done already, failed or belayed) ends the
+call as all-hands work ending does: without that clause a take in waiting behind a furl, done
+already at its turn, held the hands up and left them up (measured). Gated on the settee's key
+(`calls_all_hands`) and the mark it alone sets, so no other ship's work moves; at quarters, with a
+party named by the order and with all hands called by order, as before. A checkpoint pickled
+before reads the mark as unset (the dataclass's default).
+
+*Measured, old (0e5ff12d) beside new:* take in then furl, one call at +1 s, the furl begun on the
+take in's tick at +87 s, all hands up at +90 s, furled and piped down at +306 s (old +316, two
+calls); wear then take in, one call (the wear's), the take in begun at +528 s on the wear's tick,
+taken in and piped down at +619 s (old +621, two calls); furl then take in, one call and one
+pipe-down on both trees, the take in "done already" ("The mainsail is furled; there is nothing to
+take in.") and the pipe-down on one tick at +306 s, the pipe-down said after it where it was said
+before it; take in then wear (the build's own test) line for line as before. Her four settee orders
+sailed one at a time, her forced round, her wears, her gale and the requests' tables as before (her
+tests).
+
+*Her group orders* (the review's fourth point), in her larboard watch by night from her settle,
+piped down and 30 s, on 9e04b9fa, 0e5ff12d and the mended tree (the last two line for line the
+same): "set plain sail" (her fore course, settee and both topsails taken in first): before, every
+sail waited for hands ("Not hands enough on deck to set the mainsail; there are but two to spare."
+and the topsails' lines) to the watch's end; since the build, "All hands! (to set the mainsail)" at
++1 s, the topsails' "Not hands enough on deck to set the fore topsail; the watch is setting the
+mainsail." (and the main topsail's), the settee set at +94 s and the hands piped down on that tick,
+the fore course and both topsails left waiting for the watch's two to the watch's end, as before.
+"take in the courses" and "furl the courses" the same: the settee taken in at +87 s (furled at +306
+s) by all hands and piped down, the fore course waiting for the watch's two (before, both waited).
+Her company's six are all at the settee's party of six while it is in hand, so the order's other
+sails have no hand until it ends, and the pipe-down falls then. "make all sail" (her settee set
+already; the main topmast staysail waiting for the watch's two), "shorten sail" and "take in sail"
+(both topsails reefed by all hands and both topgallants taken in, 1,227 s, piped down once): line
+for line the same on all three trees. **For the lead, not built:** the pipe-down that falls while
+the same order's other sails still wait for hands, beside the 09:55 note's (5) (waiting work tried
+again only after the pipe-down); holding the call for them would make the call the order's, past
+the ruling's "a settee's dip or settle".
+
+**2. The 64 and a 74 left nothing failing for the trunk's fault** (should-fix). A fifth case of
+`test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line`,
+`[the-64-and-a-74-far-fight-on]`: the 64's world with the far fight on, a strict expected failure
+(`raises=AssertionError`, its reason the fault and its commit). On the tree it fails as found (the
+64 on passage; xfailed, 3.8 s); with the far-brain sketch of "B7.e and the trunk's merge" patched
+in the process (the `_enemy_within` mark taken on entering `engaging`) it passes and, strict, fails
+the run, the four other cases passing: the day package 74's mend lands the suite says so, and the
+switch comes out of the fourth case. The other cases' ids and figures as they were.
+
+**3. The lie a-try's reading** (should-fix, the record's): named in subsection 2's "Read so", for
+the lead. Nothing built moves.
+
+**4. Her group orders unmeasured** (nit): measured, item 1.
+
+**5. The 74's mizen course note** (nit): the note on its tack (`tools/ships/bellerophon.py`, and the
+comment over `MIZEN_TACK_ABOVE_DECK_FT`) still said "(judgement, for the lead)" and Steel's rule "the
+other reading"; now "Bel-D §4.5 first named that deck her quarterdeck, her poop then judged to end
+abaft the mizen, the slip (the lead's ruling (2) of 2026-11-10): ... so the 9 ft are taken above the
+poop, as ruled. Steel's 'within 6 or 7 feet of the deck' (OCR l. 11441-11442) is the general rule
+beside it." Through the generator, the 74's line 598 alone moves.
+
+**6. The 64's lie a-try note** (nit): "from rest she lies about five points as before, coming up and
+falling off" now "from rest she comes up and falls off between about four and seven points, inside
+truth 28's bounds, where at 5 she lay steady near five" (43.5 to 79.4 degrees at 32, 53.4 to 56.4 at
+5: subsection 2's sweep). Through the generator, the 64's line 4550 alone moves.
+
+**7. The commit message of 9e04b9fa** says "as he did at the base" of the 64's captain: left, since it
+cannot be mended without amending, which the branch's rule forbids; for the lead at the merge.
+
+**Lines any ship may say that the mends change:** the bilander's alone: her settee work waiting its
+turn behind called work in a watch too few for it (one call and one pipe-down where there were two
+of each; the work begun on the tick the first ends; a settee order done already or refused at its
+turn piping down after its own line). The two two-deckers' note lines are comments in their files,
+not served. **Pins:** none moved. **New:** `tests/test_bilander.py`,
+`test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again` (three cases), broken on
+purpose by three scratch mutations (the conversion off: all three fail; the deck read as it stands,
+all hands up: all three; the removal's clause off: the done-already case, all hands left up);
+`tests/test_bellerophon.py`, the fifth case above.
+
+### The suites, as run (the review's mends, 2026-11-12)
+
+Once, on 0e5ff12d with the mends uncommitted (the code, the tests, the two ship files and the notes as
+committed but for this subsection), from the tree root with `py`, one run at a time with nothing else
+running, the branch and the tree asserted first (`freesail.__file__` under FreeSail-pkg-75), each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/rf/fix/final/
+run.sh`), 22:59 to 00:48 UTC; against the bases, not run again: B7.e's junits at e4797779
+(`b7e/final-slow.xml`, `b7e/final-fast.xml`) and the four whole logs as recorded there.
+
+- **The slow candidates** (`--slow -m slow`, the base's 86 files; `rf/final-slow.xml`): 323 passed,
+  12 failed, 2 skipped, 9 xfailed (46 minutes). Against the base (330 cases): only in the base, the
+  alone-pace test of truth 7-196 (the lead's removal at the trunk's merge); only in this run, 17, all
+  passed but one skipped: the two-deckers' four lie a-try tests (B7's ruling, subsection 2) and 13
+  truths of the trunk's packages (74's 7-358, 7-360, 7-361, 7-364, 7-368 and 7-369; 98's 7-448,
+  skipped for want of a browser, 7-450 and 7-451; 101's 7-491, 7-492, 7-498 and 7-499). **Two
+  outcomes changed, passed to failed:** truth 7-196's crewed clause (S2 at 5.62 miles against 4.0:
+  the trunk's, bisected at the merge to package 74's dccbf845, "B7.e and the trunk's merge" item 3,
+  as found); and `test_the_pace_on_the_day_under_systems_holds_truth_51s_floor`, 492 ticks a second
+  against 500 (8.6 s, 5.3 at the base), the machine's hour and no code's: run alone after the suites,
+  nothing else running, the best of three thousands three times over, the base e4797779 484, 477 and
+  475, 0e5ff12d 475, 481 and 481, the mends 487, 486 and 479 (and 487, 482, 480 again), every tree
+  under the floor here this hour and the mends no slower. The ten others fail both ways as at the
+  base: the three captain's trials; five tests of the recorded passages on this machine's figures
+  (the merchant's and the schooner-on-an-intent's constants, truth 77's digest, truths 78 and 79's
+  anchoring ticks), two of them with other words than at the base, both the trunk's: truth 77's
+  digest here 2e93986c2989d831 (63168300d93caa13 at the base, and so on 9e04b9fa) against a pin
+  6436eb06a665f379 to 40bcef34afd0cec4, and truths 78 and 79 here [57, 100918] both ways against a pin
+  whose last tick went 115,547 to 115,907, both pins moved by package 98's step 5 (fd350b92, the Rade
+  de Brest's own stream) on the passage into the Bay of Brest (not bisected here, the outcomes the
+  same); the schooner's 767 lines against 766; and truth 7-159's pace (448 ticks a second, 380 at
+  the base).
+- **The captain's trials** (`--slow`): 5 passed, 3 failed (326 s), as on 0e5ff12d outcome for outcome
+  and digest for digest: the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf (ruling (6), subsection 1; the build
+  machine's pin to take again).
+- **The four whole logs** (`log_digests.py`): every field as recorded at e4797779 (the file
+  identical to B7.e's record).
+- **The generator,** `py tools/gen_ships.py` into scratch: eighteen of eighteen files byte for byte
+  as in `data/ships/`; `tools/check_viewer_guns.py` clean, exit 0.
+- **The whole fast tier** (`rf/final-fast.xml`, kept as Phase 5's base): **7,525 passed, 2 skipped,
+  2 xfailed**, exit 0 (51 minutes). Against the base (7,328): **no outcome changed**. Only in the
+  base, 14: the five node ids these steps moved (the larboard wear's case, the default fits' beat
+  under their old parameters, the 64 and the razee out of the keyless files) and nine of the
+  primer's order blocks, renumbered by the trunk's edits to `docs/primer/` (none of ours); only in
+  this run, 215: these steps' 15 (the build's 11; the mends' 4, the three queued settee cases and
+  the strict expected failure, which is the one xfail more) and the trunk's 200 (packages 74, 98,
+  100, 101 and 102: `test_view_action` 56, `test_primer` 45, `test_known_truths` 36, `test_letters`
+  18 and the rest), all passed; the two skips and the old xfail as at the base.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+After this subsection was written, the commit made, `tests/test_practice.py` (the one test that
+reads these notes), the bilander's and the schooner's hull tests run again on the commit.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

@@ -629,10 +629,11 @@ STEEL_DRIVER = (25.5, 32.5, 11.0, 24.0)
 # The mizen course's tack (Bel-D §4.5; task 5): set so that the throat stands where Lavery's I32
 # (her class's mizen course and yard: the owner's photograph) draws it, about 42 ft above the deck
 # the mast stands through, Steel's 11-yard fore leech below it: 9 ft above that deck. Bel-D §4.5
-# read the deck as her quarterdeck, her poop then judged to end abaft the mizen; task 5 measured
-# the poop over the mizen to 36.75 ft, and I32 draws its deck running unbroken from the taffrail
-# past the mast, so the deck is her poop, its middle line at the mast, where the tack is seized
-# (judgement on the design's lean, for the lead: the figures of the other readings are in the
+# first named the deck her quarterdeck, her poop then judged to end abaft the mizen; task 5
+# measured the poop over the mizen to 36.75 ft, and I32 draws its deck running unbroken from the
+# taffrail past the mast, so the deck is her poop, its middle line at the mast, where the tack is
+# seized: the lead's ruling (2) of 2026-11-10, the design's "quarterdeck" the slip and Steel's
+# "within 6 or 7 feet" the general rule beside it (the figures of the other readings are in the
 # generator's report).
 MIZEN_TACK_ABOVE_DECK_FT = 9.0
 # The head room the driver's boom stands above the poop's middle line over its run, where the boom
@@ -1518,13 +1519,13 @@ def mizen_course(b, mz, rope_scale):
         "(tools/ships/mizen_yard.py); corners [tack, throat, peak, clew]. Its tack 9 ft above her "
         "poop at the mast, so that its throat stands where Lavery's I32, her class's mizen course "
         "and yard, draws it, about 42 ft above the deck the mast stands through (Ext §2, §17.1), "
-        "Steel's 11-yard fore leech below it (Bel-D §4.5). Plainly: Bel-D §4.5 read that deck as "
-        "her quarterdeck, her poop then judged to end abaft the mizen; her poop is measured over "
-        "the mizen to 36.75 ft from AP, and I32 draws its deck running unbroken from the taffrail "
-        "past the mast, so the 9 ft are taken above the poop (judgement, for the lead). Steel's "
-        "'within 6 or 7 feet of the deck' (OCR l. 11441-11442) is the other reading. One reef band "
-        "a fifth up its mast leech (Steel, OCR l. "
-        "11448)." + g.canvas_note(canvas),
+        "Steel's 11-yard fore leech below it (Bel-D §4.5). Plainly: Bel-D §4.5 first named that "
+        "deck her quarterdeck, her poop then judged to end abaft the mizen, the slip (the lead's "
+        "ruling (2) of 2026-11-10): her poop is measured over the mizen to 36.75 ft from AP, and "
+        "I32 draws its deck running unbroken from the taffrail past the mast, so the 9 ft are "
+        "taken above the poop, as ruled. Steel's 'within 6 or 7 feet of the deck' (OCR l. "
+        "11441-11442) is the general rule beside it. One reef band a fifth up its mast leech "
+        "(Steel, OCR l. 11448)." + g.canvas_note(canvas),
     )
     # the lines of Ext §3.4: the 64's sizes (Steel's 64 list, read in part) scaled from her rope to
     # hers (judgement: Steel's 74 list, vol. II p. 37, held as a page image, is not read here to its

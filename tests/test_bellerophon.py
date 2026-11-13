@@ -1808,8 +1808,32 @@ def test_the_rank_4_rule_judges_a_lone_ship_within_two_leagues_and_not_beyond(fa
         (FRIGATE, "sixty-four", False, True, True),
         (FRIGATE, "seventy-four", True, False, True),
         (SIXTY_FOUR, "seventy-four", False, False, False),
+        pytest.param(
+            SIXTY_FOUR,
+            "seventy-four",
+            False,
+            False,
+            True,
+            marks=pytest.mark.xfail(
+                strict=True,
+                raises=AssertionError,
+                reason=(
+                    "package 74's step 4 (a4944b87): a far ship of war that takes engaging with "
+                    "no mark in hand leaves the sea, so the French 74 is gone at tick 420 and "
+                    "the 64 stays on passage; for the lead. Strict: when it is mended this case "
+                    "passes, and the far fight's switch comes out of the case before it"
+                ),
+            ),
+            id="the-64-and-a-74-far-fight-on",
+        ),
     ],
-    ids=["a-frigate-and-a-74", "a-frigate-and-a-64", "a-frigate-in-a-set", "the-64-and-a-74"],
+    ids=[
+        "a-frigate-and-a-74",
+        "a-frigate-and-a-64",
+        "a-frigate-in-a-set",
+        "the-64-and-a-74",
+        "the-64-and-a-74-far-fight-on",
+    ],
 )
 def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
     far_only, monkeypatch, ship_file, description, in_set, hauls_off, far_fight
@@ -1836,7 +1860,10 @@ def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
     (0.83 miles); the 64 stays "on passage". A fault of the trunk's, recorded for the lead with its
     figures (docs/dev/TuningNotes.md, "B7.e and the trunk's merge"). The frigates' three cases
     judge her before she goes (the lone frigate evading at tick 300, the one in a set engaging at
-    360) and are left in the trunk's world."""
+    360) and are left in the trunk's world. The fifth case is the 64's in the trunk's world, the
+    far fight on, a strict expected failure (the review of 9e04b9fa): it fails while the fault
+    stands, and passes, so failing the run, the day the far brain is mended, when the switch comes
+    out of the fourth."""
     from freesail.world import squadrons as Q
     from freesail.world.captains import Perception
     from tests.test_brains import put, world_at

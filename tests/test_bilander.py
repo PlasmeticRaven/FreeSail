@@ -2021,6 +2021,83 @@ def test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after(
 
 
 @pytest.mark.parametrize(
+    "first, then, gap, call, second_s, end, piped_s",
+    [
+        (
+            "take in the mainsail",
+            "furl the mainsail",
+            10,
+            "take in the mainsail",
+            87,
+            "furled",
+            306,
+        ),
+        ("wear ship", "take in the mainsail", 29, "wear ship", 528, "in_the_gear", 619),
+        ("furl the mainsail", "take in the mainsail", 10, "furl the mainsail", None, "furled", 306),
+    ],
+    ids=["take-in-then-furl", "wear-then-take-in", "furl-then-take-in"],
+)
+def test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again(
+    first, then, gap, call, second_s, end, piped_s
+):
+    """The review of the lead's ruling (1) of 2026-11-10 (the bilander's short watch): a settee
+    order waiting its turn behind work that called all hands is not piped down and called again on
+    the same tick (the runner's own rule, playtest 7's finding 1, `Runner._after_all_hands`). From
+    her settle (all hands kept up) at 00:00, the hands piped down and 30 s, her larboard watch of
+    two on deck, seed 7, 15 kn: the first order, and the second `gap` s after it, waiting its turn
+    on her settee. Where the two would be too few for it the moment the hands were piped down
+    (`bill.on_deck_piped_down`), the second is made all-hands work before the pipe-down and the
+    hands stay up for it: one call, the first's, the second begun on the tick the first ends, and
+    one pipe-down, at its end. A take in waiting behind a furl is done already when its turn comes
+    ("The mainsail is furled; there is nothing to take in.") and pipes the hands down then, as
+    all-hands work ending does.
+    Old (0e5ff12d): the first's end piped the hands down and the second called them again on that
+    tick, two calls and two pipe-downs, the watch below turned up twice ("Piped down; the larboard
+    watch has the deck." and "All hands! (to furl the mainsail)" both at +87 s, furled at +316 s;
+    the take in behind the wear begun at +528 s with a second call, taken in at +621 s). The take
+    in behind the furl had one call and one pipe-down before too, the pipe-down said before the
+    take in's "done already" on that tick, where now after it; it guards the mend's second clause:
+    with the conversion alone, the take in held the hands up and, done already, left them up
+    (measured in scratch)."""
+    from datetime import datetime
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    runner = world.ship.extra["evolutions"]
+    crew = world.ship.extra["crew"]
+    start = world.clock.tick
+    assert world.submit(first).kind == "order.accepted"
+    world.run(gap)
+    said = world.submit(then)
+    assert said.kind == "order.accepted", said.text
+    (queued,) = [i for i in runner.instances if i.waiting]
+    for _ in range(1500):
+        world.tick()
+        if not runner.in_progress():
+            break
+    world.run(30)
+    lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    alls = [(t, text) for t, kind, text in lines if kind == "crew.all_hands"]
+    piped = [t for t, kind, _ in lines if kind == "crew.piped_down"]
+    assert alls == [(1, f"All hands! (to {call})")], alls
+    assert len(piped) == 1 and abs(piped[0] - piped_s) <= 10, piped
+    assert queued.held_up
+    if second_s is None:
+        (done,) = [t for t, kind, _ in lines if kind == "evolution.done_already"]
+        kinds = [kind for _, kind, _ in lines]
+        assert done == piped[0]
+        assert kinds.index("evolution.done_already") < kinds.index("crew.piped_down")
+    else:
+        begun = [t for t, kind, _ in lines if kind == "evolution.started"]
+        assert len(begun) == 2 and abs(begun[1] - second_s) <= 10, begun
+        assert queued.all_hands and queued.want.party == 6
+    assert world.ship.sails[SETTEE].state is SailState(end) and not runner.in_progress()
+    assert not crew.all_hands_called and not [s for s in crew.sailors if s.turned_up]
+    assert not [ln for ln in lines if ln[1] == "evolution.failed"]
+
+
+@pytest.mark.parametrize(
     "knots, haul_s, lowered_s, factor",
     [(15.0, 90, 149, 1.342), (20.0, 93, 159, 1.517)],
 )

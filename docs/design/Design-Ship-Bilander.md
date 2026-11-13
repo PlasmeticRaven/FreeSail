@@ -1009,6 +1009,16 @@ take in in her larboard watch now follows it, the take in being all-hands work a
 at +614 s; old, the wear at once and worn at +558 s, the take in kept waiting). Figures in
 docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built (package 75)".*
 
+*Mended at the build's review (2026-11-12): a settee order waiting its turn behind work that called
+all hands (a furl given behind a take in, a take in behind a wear) is made all-hands work before the
+pipe-down where her watch would be too few for it, so the hands stay up for it: one call and one
+pipe-down, where the hands were piped down and called again on the same tick
+(`Runner._after_all_hands`, `bill.on_deck_piped_down`). The furl behind a take in by night is done
+at +306 s from the take in's
+order (old +316, two calls). With a group order the settee's call is still its own: "set plain sail"
+by night sets the settee with all hands and pipes down, its fore course and topsails waiting for the
+watch's two as before (for the lead). Figures in the same tuning notes, "The review's mends".*
+
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 
 The smack's form: the master (post, the command), the mate (post), the boy (drawn, afterguard,
