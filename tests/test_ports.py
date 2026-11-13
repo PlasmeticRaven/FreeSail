@@ -194,6 +194,22 @@ SICILY_PORTS = [
     "syracuse",
     "valletta",
 ]
+# package 105, step 3: western Sicily, the south coast, the islands and Ustica
+SICILY_WEST_PORTS = [
+    "favignana",
+    "girgenti",
+    "lampedusa",
+    "licata",
+    "lipari",
+    "marsala",
+    "palermo",
+    "pantelleria",
+    "porto-palo",
+    "sciacca",
+    "terranova",
+    "trapani",
+    "ustica",
+]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -208,6 +224,7 @@ ALL_PORTS = sorted(
     + BARBARY_PORTS
     + SARDINIA_WEST_PORTS
     + SICILY_PORTS
+    + SICILY_WEST_PORTS
 )
 
 
@@ -394,6 +411,7 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # package 105: Malta's four the King's in this world's year, open; Sicily's five and
     # Calabria's two the King of Naples', neutral
     neutral_ports |= set(SICILY_PORTS) - {"valletta", "marsaxlokk", "st-pauls-bay", "mgarr"}
+    neutral_ports |= set(SICILY_WEST_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

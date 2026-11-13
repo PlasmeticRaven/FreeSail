@@ -1,0 +1,108 @@
+# FreeSail: Porto Paolo, Cape Passaro's anchorage as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch passaro). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 180 to 186 and App. pp. xvii to xix: Porto Paolo a convenient place for coasters in all winds but the south, good sandy bottom mixed with mud, five to three fathoms inside and seven to ten at its entrance, a dozen vessels seen riding out a brisk northerly gale (App. p. xix); between Passaro and Avola good shelter for ships bearing up from a westerly gale in the channel of Malta, nine to thirty fathoms (App. p. xvii); the redoubt on Passaro island for twelve guns with seventy-five men, which wants a light-house (p. 181); the reef off the low cape, where an English line of battle ship grounded a few years before; the coast south of Marzamemi nearly deserted for dread of the Barbary cruisers (p. 180); the tonnare of Marzamemi and Passaro, salt from the lake, water from two wells below Pachino. Lamberti 1844, p. 195: ships forced to bear up in the Malta channel lie well under Cape Passaro.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: porto-palo
+name: Porto Paolo
+nation: naples
+source: "Smyth 1824 pp. 180-186, App. pp. xvii-xix; Purdy 1826 pp. 144-145; Norie 1831 pp. 141-142"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: passaro-anchorage
+  name: the road north of Passaro
+  lat_deg: 36.7052
+  lon_deg: 15.1454
+  depth_fathoms: 12
+anchorage:
+  feature: porto-palo
+  name: Porto Paolo
+  lat_deg: 36.6697
+  lon_deg: 15.1239
+mooring:
+  feature: porto-palo
+  name: Porto Paolo
+  lat_deg: 36.6697
+  lon_deg: 15.1239
+  depth_fathoms: 5
+  bottom: sand and mud
+shore:
+  feature: cape-passaro
+  name: the beach under Cape Passaro
+  lat_deg: 36.6800
+  lon_deg: 15.1330
+
+pilot:
+  station: passaro-anchorage
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a tonnara boat of Passaro
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Corrado Tiralongo, Sebastiano Spataro, Paolo Caruso, Giuseppe Rizza]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 90            # judgement
+  words:
+    channel: "Do not take Cape Passaro and Passaro island for one: hauling west after passing the redoubt by night, a ship may be on the reef off the low cape before she sees the land, as an English line of battle ship was a few years ago. Off Point Formiche five black rocks and a reef run nearly a mile out; clear the tunny nets moored from the tower to the tonnara in the season."
+    marks: "The tower-redoubt on Passaro island, like a vessel under sail from the north; the church and windmill of Pachino over all this coast; Marzamemi's tower and tonnara to the north."
+    anchorage: "In Porto Paolo, sandy mud in three to five fathoms inside and seven to ten at the entrance, sheltered in all winds but the south. In a westerly gale in the channel of Malta, bear up and anchor north of Passaro by the lead in nine to thirty fathoms."
+    tide: "No tide; in settled weather the current runs east between Sicily and Barbary at half a mile to a mile an hour."
+
+tide:
+  establishment: Syracuse
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 13.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 16.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 43.5, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 2.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 390.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: cotton, price: 60.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 13.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 5.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 21.0, origin: naples, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 48, pounds: 90, note: "no stores; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "two wells of fresh water below Pachino (Smyth 1824, p. 181); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the tonnara's season hands
+  able: {hands: 0, pounds: 2, delay_h: 48}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 48}
+  landsman: {hands: 2, pounds: 1, delay_h: 48}
+
+closed_to: []
+
+tracks:
+  to_sea: [porto-palo, 36 38 N 15 08 E]
+  from_sea: [36 38 N 15 08 E, porto-palo]
+  in: [porto-palo]

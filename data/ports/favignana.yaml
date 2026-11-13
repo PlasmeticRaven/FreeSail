@@ -1,0 +1,115 @@
+# FreeSail: Favignana as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch trapani). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 244 to 247 and App. pp. xxvi to xxviii: between Favignana and Levanso an eligible rendezvous for a fleet, twenty-one fathoms of mud off the gravelly bottom; good berths in Cala Rossa in seven to twenty fathoms, any wind serving to come or go, where Emo's Venetian squadron lay about 1784 and before it the Russian fleet, with vegetables, fruit and water; the small port with its tonnara; St Catharine's Castle on the summit, impregnable but by famine, its telegraph to Maritimo (p. 246); two thousand three hundred people besides the garrison and three or four hundred convicts; the tunny and anchovy fisheries, stone, sheep, goats and poultry the Pallavicini marquesses' revenue; the bank of St Catharine in the track from Malta round the islands (App. p. xxviii). Purdy 1826, p. 146: the port open to the north, six to two fathoms. Maritimo (pp. 244 to 245): its castle on a steep rock, forty invalids, often a state prison.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# Decision 68: Smyth 1824, p. 246, has three or four hundred convicts on the island, and in the
+# dry ditch of Fort San Giacomo by the port "a gang of the most infamous wretches the
+# tribunals of Sicily can condemn" (Purdy 1826, p. 146); and Maritimo's castle often a
+# state prison (p. 245). The marks' words say so plainly, in the world's words. No good or
+# scenario is built on it.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: favignana
+name: Favignana
+nation: naples
+source: "Smyth 1824 pp. 244-247, App. pp. xxvi-xxviii; Purdy 1826 pp. 145-146; Norie 1831 pp. 123-124"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: favignana-road
+  name: the road between Favignana and Levanso
+  lat_deg: 37.9700
+  lon_deg: 12.3300
+  depth_fathoms: 21
+anchorage:
+  feature: cala-rossa
+  name: Cala Rossa
+  lat_deg: 37.9480
+  lon_deg: 12.3600
+mooring:
+  feature: cala-rossa
+  name: Cala Rossa
+  lat_deg: 37.9480
+  lon_deg: 12.3600
+  depth_fathoms: 12
+  bottom: sand and weed
+shore:
+  name: the landing at the little port of Favignana
+  lat_deg: 37.9290
+  lon_deg: 12.3270
+
+pilot:
+  station: favignana-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a tonnara boat of Favignana
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Giovanni Rallo, Salvatore Campo, Gaspare Torrente, Francesco Ferro]   # judgement
+  skill: 0.75
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 20            # judgement
+  words:
+    channel: "Between the Formiche and Favignana there are shoals of two and two and a half fathoms; by night or in thick weather take the clear passage between Levanso and Maritimo. Pass half a mile off Cala Rossa to clear the Borrone shoals; the east and west ends of the island are low and hard to see on a dark night."
+    marks: "St Catharine's Castle on the island's summit, an excellent sea-mark, with its telegraph to Maritimo; Fort San Giacomo by the little port, in whose dry rock ditch the island's convicts are confined, three or four hundred of them; Levanso's sugar-loaf to the north."
+    anchorage: "In the road between Favignana and Levanso, twenty-one fathoms of mud, room for a fleet; or in Cala Rossa in seven to twenty fathoms, where any wind serves to come or go, and vegetables, fruit and water are to be had."
+    tide: "A tide of a foot or two, setting north-east and south-west about the islands, as at Trapani."
+
+tide:
+  establishment: Trapani
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 14.5, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 16.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 43.5, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.0, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 375.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 7.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: cotton, price: 60.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 15.5, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 5.0, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 20.0, origin: naples, note: "JUDGEMENT"}
+    - {good: stone, price: 2, origin: naples, note: "the quarries of stone (Smyth 1824, p. 246); the price JUDGEMENT"}
+    - {good: fowls, price: 4, origin: naples, note: "sheep, goats and poultry sold (Smyth 1824, p. 246); the price JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 36, pounds: 70, note: "no stores of spars named; a spar sent across from Trapani, judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "water at Cala Rossa (Smyth 1824, p. 245); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement: the tonnara's fishermen
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 2, pounds: 1, delay_h: 36}
+
+closed_to: []
+
+tracks:
+  to_sea: [cala-rossa, favignana-road, 37 58 N 12 22 E]
+  from_sea: [37 58 N 12 22 E, favignana-road, cala-rossa]
+  in: [favignana-road, cala-rossa]

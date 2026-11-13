@@ -1,0 +1,115 @@
+# FreeSail: the Mole of Girgenti as a port (package 105, Sicily and Malta's block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/sicily.yaml, the
+# harbour patch girgenti). Step 3 of the package.
+#
+# Sources. Smyth 1824, pp. 201 to 205 and App. pp. xxi to xxiii: the caricatore of about a hundred houses with its corn magazines and a prison, seven hundred people besides two or three hundred galley-slaves kept to clear the harbour of the sand the southerly winds send in (p. 203); the mole built by Charles III in 1756 with the temple of Jupiter Olympius's stone; tolerable defence against Barbary cruisers; two lights, at the mole-head and on the cliff, useless (p. 204); the royal grain pits; between the bank and the mole-head excellent anchorage for ships of every description in seven to ten fathoms of sand and clay, open from W N W round southerly to S E, nine fathoms of stiff clay a mile and a quarter from the mole steps for a south-wester; inside the mole two and a half and three fathoms shoaling to nine feet, the port small and generally crowded, a hawser to the mole-head post; the first ship loading must be filled before another (App. p. xxiii); the bank three miles south of the river in three and a half to five fathoms (Purdy 1826, p. 153: Melville shoal); the rock of four feet off the river di Naro (Norie 1831, p. 130: Peril Rock). The city on its hill, fifteen thousand people.
+#
+# The holder: the King of the Two Sicilies' (`naples`) throughout, the court at Palermo from
+# December 1798 to 1799 and again from January 1806 (James 1837, vol. 2, p. 214; vol. 4, p.
+# 122), when the mainland was French and Sicily the Bourbons' (the lead's ruling of
+# 2026-11-12: Sicily's ports under `naples` without rows). NOTE: the nations table's wars
+# carry no dates and read Naples at peace with France every year (data/nations.yaml), so
+# nothing here depends on Bourbon Sicily's wars after 1806.
+#
+# Decision 68: Smyth 1824, p. 203, has two or three hundred convicts at the Mole, condemned to
+# hard labour and called galley slaves "from their formerly having been chained as rowers in
+# the galleys", kept to clear the harbour (Purdy 1826, p. 153; Norie 1831, p. 130). The marks'
+# words say so. No good or scenario is built on it.
+#
+# No source on file names a pilot here: the boat and its people JUDGEMENT.
+# Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: girgenti
+name: the Mole of Girgenti
+nation: naples
+source: "Smyth 1824 pp. 201-205, App. pp. xxi-xxiii; Purdy 1826 p. 153; Norie 1831 pp. 130-131"
+datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
+
+outer_road:
+  feature: girgenti-road
+  name: the road of Girgenti
+  lat_deg: 37.2725
+  lon_deg: 13.5245
+  depth_fathoms: 9
+anchorage:
+  feature: girgenti-road
+  name: the road of Girgenti
+  lat_deg: 37.2725
+  lon_deg: 13.5245
+mooring:
+  feature: girgenti-road
+  name: the road of Girgenti, off the mole steps
+  lat_deg: 37.2725
+  lon_deg: 13.5245
+  depth_fathoms: 9
+  bottom: stiff clay
+shore:
+  feature: girgenti-mole
+  name: the mole steps
+  lat_deg: 37.2880
+  lon_deg: 13.5250
+
+pilot:
+  station: girgenti-road
+  cruising_nm: 2
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the caricatore
+    under: oars and a lateen sail
+    note: "judgement"
+  names: [Calogero Sciortino, Gerlando Lauricella, Alfonso Vella, Giuseppe Sferrazza]   # judgement
+  skill: 0.75
+  fee_pounds: 1.5                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 200            # judgement
+  words:
+    channel: "The bank three miles south of the river carries three and a half fathoms on its head: clear it by the mole tower on with the upper light-house. Off the river di Naro a rock of four feet lies a mile and a quarter out. Carry sail till the moment of anchoring."
+    marks: "Girgenti high on its ridge, every house seen; the temples on the slope below; the mole with its battery and light-house, the prison tower and the corn magazines of the caricatore. The convicts called galley slaves, two or three hundred of them, labour here at clearing the harbour of sand; they were once chained to the galleys' oars."
+    anchorage: "Between the bank and the mole-head in seven to ten fathoms of clean sand and clay, nine fathoms of stiff clay a mile and a quarter off the mole steps for a south-wester. Inside the mole two and a half to three fathoms, shoaling with the southerly winds' sand; send a hawser to the mole-head post. The first ship to load is filled before another is begun."
+    tide: "No tide to reckon on: the currents of this coast rise a foot or two with the wind, a north-wester setting them strongly to the south-east."
+
+tide:
+  establishment: Girgenti
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 8.0, origin: naples, note: "Sicily's corn (Smyth 1824, pp. 135 and 160 to 163; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: wine, price: 14.0, origin: naples, note: "the island's wine exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: olive oil, price: 38.0, origin: naples, note: "oil exported (Smyth 1824; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt, price: 3.5, origin: naples, note: "the salt-works (Smyth 1824, pp. xv, 160); the price JUDGEMENT"}
+    - {good: silk, price: 360.0, origin: naples, note: "silk exported (Smyth 1824, pp. 102, 135; Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: oranges, price: 6.0, origin: naples, note: "the island's fruit (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: lemons, price: 7.0, origin: naples, note: "JUDGEMENT"}
+    - {good: cotton, price: 53.0, origin: britain, note: "foreign cottons the chief import at Messina (Purdy 1826, p. 137); the price JUDGEMENT"}
+    - {good: salt fish, price: 22.0, origin: naples, note: "the tunny fisheries (Smyth 1824, pp. viii, 102); the price JUDGEMENT"}
+    - {good: fresh beef, price: 12.0, origin: naples, note: "JUDGEMENT; beef cheap at Syracuse (Purdy 1826, p. 144)"}
+    - {good: vegetables, price: 3.0, origin: naples, note: "JUDGEMENT"}
+    - {good: canvas, price: 4.5, origin: britain, note: "JUDGEMENT"}
+    - {good: timber, price: 19.0, origin: naples, note: "JUDGEMENT"}
+    - {good: sulphur, price: 4.5, origin: naples, note: "the sulphur mines behind Girgenti (Smyth 1824, pp. 209, 237; pigs of sulphur loaded, App. p. xxiii); the price JUDGEMENT, cheapest here"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 36, pounds: 70, note: "no stores named; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "a good watering-place in the centre of the mole (Smyth 1824, App. p. xxii); judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  # judgement
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 2, pounds: 1, delay_h: 36}
+
+closed_to: []
+
+tracks:
+  to_sea: [girgenti-road, 37 14 N 13 30 E]
+  from_sea: [37 14 N 13 30 E, girgenti-road]
+  in: [girgenti-road]

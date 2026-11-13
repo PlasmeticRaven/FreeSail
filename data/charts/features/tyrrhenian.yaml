@@ -1441,3 +1441,52 @@ features:
     height_m: 20
     source: 'Smyth 1828, p. 316: the town of Sant''Antioco with 1800 inhabitants and an old castle on its highest part, joined to the main by a rough stone bridge of 300 yards; Admiralty 1913, p. 684: a fort at the causeway'
     says: 'The town of Sant''Antioco with its old castle above the causeway to the main, at the head of the gulf of Palmas.'
+
+  # ---------------------------------------------------------------------------
+  # package 105, step 3: Ustica, a port of Sicily and Malta's package in this region's bounds and features (38.7 N); its index rebuilt from the file and its manifest counts edited alone; no tile or coast touched
+  # ---------------------------------------------------------------------------
+
+  - id: ustica
+    kind: island
+    name: Ustica
+    modern: 'Ustica'
+    lat_deg: 38.7080
+    lon_deg: 13.1800
+    height_m: 238
+    source: 'Smyth 1824, p. 279: about forty miles north by west of Palermo, the town settled only in 1761 above the sandy beach at the head of its cove; p. 280: three summits, the Turk''s Head, Monte Mezzo and Punta Cavaliere; seventeen hundred people besides the garrison and the prisoners, no springs, rain-water in cisterns, coral and fish on the banks; App. p. xxxiii: from a distance it looks like two small islands; Purdy 1826, p. 118: an excellent mark for ships bound to Palermo; the height FROM MEMORY'
+    says: 'Ustica, a dark island of three summits, like two islands from afar.'
+
+  - id: falconara-ustica
+    kind: castle
+    name: the Falconara of Ustica
+    modern: 'the Rocca della Falconiera, Ustica'
+    lat_deg: 38.7110
+    lon_deg: 13.1940
+    height_m: 157
+    source: 'Smyth 1824, p. 279: the Falconara hill with a fort and prison on its summit, garrisoned by a company of invalids and a few militia, guard-houses within hail all round the coast; p. xl: Falconara Fort 38 43 17 N, 13 11 10 E; the height FROM MEMORY'
+    says: 'The Falconara, the fort and prison on the hill above Ustica''s cove.'
+
+  - id: santa-maria-ustica
+    kind: anchorage
+    name: the cove of Santa Maria
+    modern: 'Cala Santa Maria, Ustica'
+    lat_deg: 38.7065
+    lon_deg: 13.1960
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand
+    source: 'Smyth 1824, App. p. xxxiii: the port or cove of Santa Maria to the south-east, secure in all winds but the scirocco, when vessels should shift round to the Cala Giaconi; p. 279: large enough for the trading feluccas; Purdy 1826, p. 118: a tenth of a mile wide and as deep, five fathoms in the middle; Lamberti 1844, p. 184: sand'
+    says: 'The cove of Santa Maria, five fathoms of sand, secure in all winds but the scirocco.'
+
+  - id: walkers-rocks
+    kind: shoal
+    name: Walker's rocks
+    modern: 'the Secca della Colombara, north of Ustica'
+    lat_deg: 38.7320
+    lon_deg: 13.1870
+    fix: 'the grid lacks the reef (no head under 15 m off the north shore but within 300 m of it): placed by Purdy 1826''s bearing, a mile N E by N of the central north point, FROM MEMORY of the modern chart'
+    height_m: 0
+    dries_m: -2.7
+    extent_m: 100
+    source: 'Smyth 1824, App. p. xxxiii: the approach safe on all sides but the north, where a dangerous shoal of a fathom and a half lies a mile and a quarter from the land, seven to twelve adjacent; Purdy 1826, p. 118: Walker''s Rocks, a reef of nine feet a mile N E by N of the central north point; Smyth 1854, p. 444: 38 44 40 N, 13 10 30 E, two fathoms'
+    says: 'Walker''s rocks, nine feet of water a mile and a quarter off Ustica''s north shore.'
