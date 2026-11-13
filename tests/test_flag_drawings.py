@@ -548,7 +548,7 @@ def test_the_days_are_kept_in_their_years():
     assert F.load_days("naples") == () and F.load_days("britain")[0].guns == 21
 
 
-def _harbour(day, hour=10):
+def _harbour(day, hour=10, ship="data/ships/topsail-schooner.yaml"):
     from datetime import datetime
 
     from freesail.api.session import make_world
@@ -566,7 +566,7 @@ def _harbour(day, hour=10):
         ship_speed_kn=0.0,
         nation="britain",
     )
-    w = make_world(7, "data/ships/topsail-schooner.yaml", sc)
+    w = make_world(7, ship, sc)
     keep = "keep the station off the Lizard within 20 miles"
     ours = put(w, "frigate", "britain", "50 08 N 5 02 W", "bound for Plymouth", keep, name="Amazon")
     # the French ship at anchor far out of sight of the British (on the bank, for the test)
@@ -599,8 +599,8 @@ def test_a_fleet_in_harbour_dresses_on_its_nations_day_and_not_on_another():
 
 def test_the_first_lieutenant_reminds_the_captain_at_anchor_on_the_day_once():
     """Step 5: the player's own ship does not dress of herself: lying at anchor on the King's
-    birthday her first lieutenant reminds the captain once, and the order is his; not at sea,
-    nor on another day."""
+    birthday her officer (the schooner's, by `officer_rank`) reminds the captain once, and the
+    order is his; not at sea, nor on another day."""
     w, *_ = _harbour((1805, 6, 4), hour=9)
     w.run(60)
     w.submit("let go the best bower")
@@ -615,6 +615,62 @@ def test_the_first_lieutenant_reminds_the_captain_at_anchor_on_the_day_once():
     w.submit("let go the best bower")
     w.run(600)
     assert not [e for e in w.log if e.kind == "officer.reminder"]
+
+
+def _reminded_at_anchor(ship):
+    """A ship of `ship`'s file lying at anchor in Falmouth's road on the King's birthday of
+    1805, the morning run on until her officer's word or the day said is in the log."""
+    w, *_ = _harbour((1805, 6, 4), hour=9, ship=ship)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(600)
+    assert w.at_anchor
+    return w
+
+
+def test_the_ships_own_officer_reminds_the_captain_a_kings_ship_and_a_trader_each_hers():
+    """Step 5 (the lead's mend of 2026-11-13): the word of the day is the ship's own officer's
+    (`officer_rank`), not always the first lieutenant's: a frigate's first lieutenant, and a
+    smack's mate at anchor at Falmouth on the 4th of June; the order to dress is the captain's
+    either way."""
+    from freesail.agents.agent import merchant_ship, officer_rank
+
+    frigate = _reminded_at_anchor("data/ships/frigate-36.yaml")
+    assert not merchant_ship(frigate) and officer_rank(frigate)[1] == "first lieutenant"
+    [said] = [e for e in frigate.log if e.kind == "officer.reminder"]
+    who = officer_rank(frigate)[0]
+    assert said.text.startswith(who[:1].upper() + who[1:] + ": 'It is the King's birthday, sir")
+    assert "dress ship" in said.text and said.data["person"].lower() == who.lower()
+    smack = _reminded_at_anchor("data/ships/smack.yaml")
+    assert merchant_ship(smack) and officer_rank(smack)[1] == "mate"
+    [said] = [e for e in smack.log if e.kind == "officer.reminder"]
+    mate = officer_rank(smack)[0]
+    assert said.text.startswith(mate[:1].upper() + mate[1:] + ": 'It is the King's birthday")
+    assert "first lieutenant" not in said.text.lower()
+    for w in (frigate, smack):
+        assert not [e for e in w.log if e.kind == "colours.day"]
+
+
+def test_with_a_party_seated_at_the_officers_station_the_day_is_said_to_the_deck_unspoken():
+    """Step 5 (the lead's mend of 2026-11-13): where a party holds the officer's station the
+    game puts no words in his mouth: the day is said once to the deck with no speaker, for
+    the seated officer to say to the captain himself, and no officer's word is logged."""
+    from freesail.agents.agent import OFFICER
+    from freesail.agents.harness import holder_of
+    from tests.test_director import seat_officer
+
+    w, *_ = _harbour((1805, 6, 4), hour=9, ship="data/ships/frigate-36.yaml")
+    seat_officer(w, [])
+    assert holder_of(w, OFFICER) is not None
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(600)
+    assert w.at_anchor
+    assert not [e for e in w.log if e.kind == "officer.reminder"]
+    [said] = [e for e in w.log if e.kind == "colours.day"]
+    assert said.text == "It is the King's birthday: the ships in harbour will be dressing."
+    w.run(1800)
+    assert len([e for e in w.log if e.kind == "colours.day"]) == 1
 
 
 def test_a_save_from_before_the_package_loads_and_replays_to_its_digests(tmp_path):

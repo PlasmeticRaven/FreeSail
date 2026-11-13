@@ -16762,16 +16762,26 @@ def test_truth_7_505_a_fleet_in_harbour_dresses_on_its_nations_day_and_not_on_an
     """Package 102, step 5: on the King's birthday of 1805 a British ship at anchor under a
     rules captain dresses of herself by day; a French ship at anchor does not, nor a ship under
     way, nor any on the day after or on that day in 1825 (outside George III's years); none by
-    night; and the player's first lieutenant reminds him once, the order his."""
+    night; and the player's own officer reminds him once, the order his (a frigate's first
+    lieutenant, a smack's mate), or, with a party seated at the officer's station, the day
+    is said to the deck with no speaker."""
     from tests.test_flag_drawings import (
         test_a_fleet_in_harbour_dresses_on_its_nations_day_and_not_on_another as a,
     )
     from tests.test_flag_drawings import (
         test_the_first_lieutenant_reminds_the_captain_at_anchor_on_the_day_once as b,
     )
+    from tests.test_flag_drawings import (
+        test_the_ships_own_officer_reminds_the_captain_a_kings_ship_and_a_trader_each_hers as c,
+    )
+    from tests.test_flag_drawings import (
+        test_with_a_party_seated_at_the_officers_station_the_day_is_said_to_the_deck_unspoken as d,
+    )
 
     a()
     b()
+    c()
+    d()
 
 
 def test_truth_7_506_a_save_from_before_the_package_loads_and_replays_to_its_digests(tmp_path):

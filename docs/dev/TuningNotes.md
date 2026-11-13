@@ -26754,6 +26754,21 @@ and last on the same files, 13 passed. No digest moved; no game line about a hoi
 colours moved (the locker's `day_said` out of the pickle while unset; a ship at anchor on no
 day records nothing new). The tree reported differs from 09fd157 by this paragraph alone.
 
+**Step 5: the lead's two mends (2026-11-13, before the trial).** (1) The word of the day is
+the ship's own officer's (`agent.officer_rank`, a lazy import): the first lieutenant in a
+frigate, the lieutenant in a brig-sloop, the mate in a cutter, a schooner or a trader (a
+smack's master at anchor at Falmouth on the 4th of June is reminded by the mate), named as
+the station's binding names him; the record's data carries `person`. (2) No words in a
+seated officer's mouth. **Found:** no line the game speaks as the officer had a rule for a
+seated one (the officer's name is read by `reports` for whose deck it is, and the lines
+`world/captive.py` speaks are the captain's, heard by the seated stations within earshot):
+no precedent, so, as the lead said, where `holder_of(world, "officer of the watch")` is held
+the day is said to the deck with no speaker, "It is the King's birthday: the ships in
+harbour will be dressing." (kind `colours.day`, of the `colours` family: the deck), for the
+seated officer to say to the captain himself; once, as before. Tests: a frigate and a smack,
+each with her own officer's word; a frigate with a fake officer seated (truth 7-505 widened
+to both).
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at

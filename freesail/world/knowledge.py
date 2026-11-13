@@ -319,7 +319,7 @@ REACH: dict[str, str] = {
     "person.waterman": "port",
     "captain.below": "place",
     "captain.on_deck": "place",
-    # the first lieutenant's word to the captain of a nation's day (package 102, step 5)
+    # the ship's officer's word to the captain of a nation's day (package 102, step 5)
     "officer.reminder": "person",
     "aboard.found": "place",
     "aboard.thing": "place",

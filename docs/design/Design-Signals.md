@@ -598,8 +598,11 @@ occasions:                       # what flies where, by occasion and role
   MEMORY (the 1765 ordinance names no day). On such a day the sea's ships lying at anchor
   under a rules captain dress of themselves by day and undress at sunset (`flags.
   _harbour_dressing`, once a minute with the look; not logged, read by the lookout with
-  their flags); the player's ship does not: lying at anchor, her first lieutenant reminds
-  the captain once (`officer.reminder`) and the order is his. **Not built, said:** the salute
+  their flags); the player's ship does not: lying at anchor, her own officer (`officer_rank`:
+  the first lieutenant in a frigate, the lieutenant in a brig-sloop, the mate in a cutter,
+  a schooner or a trader) reminds the captain once (`officer.reminder`) and the order is
+  his; where a party is seated at the officer's station the day is said to the deck with no
+  speaker (`colours.day`), no words put in the seated officer's mouth. **Not built, said:** the salute
   (a gun fired blank at an interval wants a blank charge and a train of guns the gunnery has
   not; package 77's), and the extra issue of spirits (the stores keep no spirits apart).
 - **A hook named and not built:** an occasion `as a prize` (the captor's colours over her own;
