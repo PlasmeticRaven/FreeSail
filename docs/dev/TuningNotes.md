@@ -27093,7 +27093,9 @@ region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own 
 lead accepted it, the trunk merged after step 1 (296aa59), measured and reported (0d21bf3);
 held by the lead for package 111's audit, the trunk merged again, the audit's two findings
 owned and the Hammamet and Calabrian water given the block's tide, measured at e3d2ce8 and
-reported at the hash that adds its figures. Step 3 built beside it on a local branch. Decision 68 (the lead's note of 2026-11-12)
+merged as dade4a1. Step 3 (the west, the south coast and the islands, the scenario, the
+sliver closed in step 2's hash) built, the trunk merged after decision 69, measured at
+bdf4442 and reported at the hash that adds its figures. Decision 68 (the lead's note of 2026-11-12)
 binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -27686,3 +27688,21 @@ and `tests/test_nations.py` gain the thirteen.
 **Findings for others.** The order words take decimal minutes, not seconds; a scenario
 through a strait wants daylight for its fixes and legs that cannot overlap; marks on a
 neighbour's kept tile row are placed on the whole chart (the how-to has them).
+
+### Step 3: the figures (measured at bdf4442, the trunk merged after step 2 and decision 69)
+
+In a worktree pinned at bdf4442. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 514 slow tests left out.
+**The audit** (package 111's tool) sampled and full: 0 findings the known list lacks, exit 0
+both. **The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`, `test_chart_audit.py`, `test_scenarios.py`; `--slow -m "not pace" -n
+4`): exit 0, 688 passed, 8 xfailed, the recorded passages replayed to their digests and the
+scenario sailed to the road of Palermo (truth 7-539). **The pace** alone and last (`--slow -m
+pace -n 0`, the same files), run alternately with the same set at the trunk's 774b6dd on the
+same machine: this tree 12 passed twice; the trunk failed once on the gate's day with the
+region loaded (459 ticks a second) and once on truth 7-159 (477), the machine's spread about
+truth 51's floor (step 2's finding). Decision 69 (the trunk's): step 3's ports have no dated
+rows, and its truths read the holders on the day each loads; none expects a holder to change
+by the calendar. The tree reported differs from bdf4442 by this paragraph and the "where I
+stand" above alone.
