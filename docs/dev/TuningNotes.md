@@ -27513,9 +27513,9 @@ that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share
 6. **The weather**: a box `canaries` (25.2 to 30 N, 22.13 to 9 W), after Madeira's, PROVISIONAL
    and judgement in every row from the Oriental Navigator's and Purdy's words on the trade and
    its winter westerlies. The island lee's calms are said in its head, not carried. The
-   Salvages (29.89 to 30.32 N) lie across the boxes' edge at 30 N: the Great Salvage
-   Madeira's, the Pitons' south the Canaries' (the same trade in both; the chart's audit
-   lists the split).
+   Salvages' region (29.89 to 30.32 N) lies across the boxes' edge at 30 N: the islands,
+   all north of it, Madeira's, the region's southern water the Canaries' (the same trade
+   in both; the chart's audit lists the split).
 7. **The streams and the tide**: two areas, `canaries-among` (south, half a knot,
    JUDGEMENT on Rennell's "less regular") and `canary-current` (S.S.E., three-quarters of a
    knot, Rennell's sixteen to nineteen miles a day), a `book_limits` box over the new water;
