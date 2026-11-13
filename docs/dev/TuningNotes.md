@@ -27032,8 +27032,10 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 **Where I stand:** step 1 (a port file's dated rows for more than its holder) built,
 measured at 52395f9, reported (7046d0b) and merged on the trunk as ad256d5. Step 2 (the
 region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own water as the
-lead accepted it, the trunk merged after step 1 (296aa59), measured there and reported at the
-hash that adds the figures below. Step 3 next. Decision 68 (the lead's note of 2026-11-12)
+lead accepted it, the trunk merged after step 1 (296aa59), measured and reported (0d21bf3);
+held by the lead for package 111's audit, the trunk merged again, the audit's two findings
+owned and the Hammamet and Calabrian water given the block's tide, measured at e3d2ce8 and
+reported at the hash that adds its figures. Step 3 built beside it on a local branch. Decision 68 (the lead's note of 2026-11-12)
 binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -27417,3 +27419,22 @@ Hammamet tiles), each reading the Atlantic's tide. The trunk merged (bd9a79a); t
 
 The audit sampled and full: 0 findings the known list lacks; `tests/test_chart_audit.py`
 passes whole with the slow tier.
+
+### Step 2: the figures again (measured at e3d2ce8, the trunk merged after package 111)
+
+In a worktree pinned at e3d2ce8. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 511 slow tests left out.
+**The slow tier** of the touched files with the audit's (`tests/test_ports.py`,
+`test_known_truths.py`, `test_tide.py`, `test_chart.py`, `test_weather.py`,
+`test_nations.py`, `test_geo.py`, `test_ordnance.py`, `test_chart_audit.py`; `--slow -m "not
+pace" -n 4`): exit 0, 658 passed, 8 xfailed, the recorded passages replayed to their digests
+and the audit's full sweep the known list exactly (truth 7-565). **The pace** alone and last
+(`--slow -m pace -n 0`, the same files): the first three runs exit 1, truth 7-159 (the convoy
+of six at far detail) under truth 51's floor of 500 ticks a second, at 471, 474 and 486; the
+fourth exit 0, 12 passed. **Not a pin this package moved, proven by the trunk**: the same
+pace set at the trunk's db15aef, run alternately with it on the same quiet machine (load
+about 1.0), passed twice and failed once on the same truth at 493; the convoy's best of
+three measured alone nine times a tree, alternately: the trunk 477 to 584 (median 558),
+296aa59 448 to 677 (545), e3d2ce8 400 to 598 (536). The floor sits inside the machine's
+spread for that truth on every tree; a finding for the lead, not mended. The tree reported
+differs from e3d2ce8 by this paragraph and the "where I stand" above alone.
