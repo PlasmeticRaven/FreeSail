@@ -628,6 +628,8 @@ class FarCaptain(Judgement):
             if enemy is not None:
                 self._stranger = enemy.get("id")
                 self.vessel.plan = [("away", self._stranger)]
+        elif state == "engaging":
+            self._take_mark(p)
         elif state == "at anchor":
             since = self._state_entered or 0
             clear = p.visibility not in ("a mile", "a cable")
@@ -635,6 +637,49 @@ class FarCaptain(Judgement):
                 self._weigh()
         elif state == "in port":
             self._in_port(p)
+
+    def _engaging_mark(self, p: Perception) -> dict[str, Any] | None:
+        """The enemy engaged, as the near captain's `Captain._mark` takes theirs (package 75, the
+        lead's ruling (2) of 2026-11-13): the mark in hand while she is in sight, else the
+        nearest enemy within the breaking-off distance, which is the one the `enemy in range`
+        stimulus read when she goes engaging from a plan state with no mark in hand."""
+        th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
+        if self._stranger is not None:
+            for s in p.strangers:
+                if s.get("id") == self._stranger and s.get("estimate_m") is not None:
+                    return s
+        return self._enemy_within(p, float(th("break_off_nm", 2.0)))
+
+    def _on_the_sea(self, sid: Any) -> bool:
+        """Whether a chase leg to `sid` has a ship to steer for (`Vessel._target_of`): the
+        player's ship while she has a place, another vessel while she is on the sea."""
+        if sid is None:
+            return False
+        if sid == PLAYER_ID:
+            return getattr(self.world, "position", None) is not None
+        other = self.world.vessels.get(str(sid))
+        return other is not None and not other.done
+
+    def _take_mark(self, p: Perception) -> None:
+        """Engaging, a mark kept in hand as chasing keeps its stranger (package 75, the lead's
+        ruling (2) of 2026-11-13): none in hand or the mark lost from sight, the nearest enemy
+        within the breaking-off distance is taken (`_engaging_mark`) and the chase leg laid to
+        her at the doctrine's range; with none in sight the mark in hand is kept while she is
+        on the sea, the leg following her until `enemy out of range` ends the action; with no
+        mark on the sea at all she lies to where she is, so that no chase of nobody is laid
+        (`Vessel.tick` drops such a leg and, the plan empty, takes her from the sea)."""
+        from freesail.combat.far_action import engage_range_m
+
+        mark = self._engaging_mark(p)
+        sid = mark.get("id") if mark is not None else self._stranger
+        if not self._on_the_sea(sid):
+            self._stranger = None
+            if self.vessel.plan[:1] != [("lie_to", math.inf)]:
+                self.vessel.plan = [("lie_to", math.inf)]
+            return
+        if sid != self._stranger:
+            self._stranger = sid
+            self.vessel.plan = [("chase", sid, engage_range_m(self))]
 
     def _fishing(self, p: Perception) -> None:
         """The fishing trip (package 43b): the hours of the intent worked on the ground, the
@@ -978,8 +1023,10 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     the station's square; a detour (hove to, investigating, chasing, evading, running
     for shelter, at anchor) saves the plan and lays its own (no way; a chase of the
     stranger in hand to hailing distance; a course away from her; the nearest open road
-    and the anchor; the anchor where she is); in port she lies at anchor; in distress and
-    engaging she lies to. Returns whether the state was resolved."""
+    and the anchor; the anchor where she is); in port she lies at anchor; in distress she
+    lies to; engaging, a chase of her mark to the doctrine's range (package 74), the mark the
+    stimulus read taken where none is in hand (package 75), and with none at all she lies to.
+    Returns whether the state was resolved."""
     if state not in STATES:
         raise ValueError(f"'{state}' is no state of the machine.")
     if brain is None:
@@ -1053,7 +1100,15 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
         # are `combat/far_action.py`'s once a minute
         from freesail.combat.far_action import engage_range_m
 
-        vessel.plan = [("chase", brain._stranger, engage_range_m(brain))]
+        if brain._stranger is None:
+            # package 75 (the lead's ruling (2) of 2026-11-13): gone engaging from a plan
+            # state (the books' `enemy in range` rows from on passage, beating, keeping station
+            # and in company), she has no mark in hand, and a chase of nobody was dropped by
+            # the body and took her from the sea (package 74's a4944b87): she takes the mark
+            # the stimulus read, as the near captain's `_mark` takes theirs (`_take_mark`)
+            brain._take_mark(perceive_vessel(brain.world, vessel, brain))
+        else:
+            vessel.plan = [("chase", brain._stranger, engage_range_m(brain))]
     elif state in ("in distress", "struck"):
         vessel.plan = [("lie_to", math.inf)]
     vessel.tack = 0.0

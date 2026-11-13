@@ -1611,6 +1611,16 @@ four miles, as the picture of §17.1 item 3 has a frigate turn away on sighting 
 already engaged should break off for a ship of the line at close quarters. Two tests run the rule on a
 promoted hull, the crewed cap as shipped.*
 
+*The far fight's case (the trunk's merge of 2026-11-12 to the far brain's mend of 2026-11-13): from
+the merge of package 74's far fight, the 64's case of the rules captain's test (the player's 64 on
+her station, a French 74 a mile and a half north bound for Brest) ran with the far fight's toggle
+off, since the 74, going engaging from her passage with no mark in hand, left the sea a minute after,
+and a fifth case with the toggle on was a strict expected failure. The mend of the far brain (the
+lead's ruling (2) of 2026-11-13; truth 7-231; the tuning notes' "The lead's notes of 2026-11-12 and
+13, built") gives her the mark the stimulus read: she takes the player's 64 for it at 0.94 miles
+(tick 360), chases her to 0.28 miles and keeps the sea, and the 64's captain engages her at tick 420
+as at B7.e. The toggle is out and the two cases are one.*
+
 ---
 
 ## 9. The polar: what B7 measures and records

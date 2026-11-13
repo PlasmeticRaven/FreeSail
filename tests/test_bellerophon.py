@@ -1802,41 +1802,17 @@ def test_the_rank_4_rule_judges_a_lone_ship_within_two_leagues_and_not_beyond(fa
 
 
 @pytest.mark.parametrize(
-    "ship_file, description, in_set, hauls_off, far_fight",
+    "ship_file, description, in_set, hauls_off",
     [
-        (FRIGATE, "seventy-four", False, True, True),
-        (FRIGATE, "sixty-four", False, True, True),
-        (FRIGATE, "seventy-four", True, False, True),
-        (SIXTY_FOUR, "seventy-four", False, False, False),
-        pytest.param(
-            SIXTY_FOUR,
-            "seventy-four",
-            False,
-            False,
-            True,
-            marks=pytest.mark.xfail(
-                strict=True,
-                raises=AssertionError,
-                reason=(
-                    "package 74's step 4 (a4944b87): a far ship of war that takes engaging with "
-                    "no mark in hand leaves the sea, so the French 74 is gone at tick 420 and "
-                    "the 64 stays on passage; for the lead. Strict: when it is mended this case "
-                    "passes, and the far fight's switch comes out of the case before it"
-                ),
-            ),
-            id="the-64-and-a-74-far-fight-on",
-        ),
+        (FRIGATE, "seventy-four", False, True),
+        (FRIGATE, "sixty-four", False, True),
+        (FRIGATE, "seventy-four", True, False),
+        (SIXTY_FOUR, "seventy-four", False, False),
     ],
-    ids=[
-        "a-frigate-and-a-74",
-        "a-frigate-and-a-64",
-        "a-frigate-in-a-set",
-        "the-64-and-a-74",
-        "the-64-and-a-74-far-fight-on",
-    ],
+    ids=["a-frigate-and-a-74", "a-frigate-and-a-64", "a-frigate-in-a-set", "the-64-and-a-74"],
 )
 def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
-    far_only, monkeypatch, ship_file, description, in_set, hauls_off, far_fight
+    far_only, ship_file, description, in_set, hauls_off
 ):
     """Bel-D §8.3 (B7.e) on the near body: the player's frigate on her station off the Lizard
     under her rules captain (tests/test_brains.py's world, seed 7), an enemy ship of the line
@@ -1850,28 +1826,22 @@ def test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line(
     well), so an engagement only after speaking her would be the rule holding her off until
     then.
 
-    The 64's case runs with the far fight's toggle off (`far_action.ENABLED`, the module's switch
-    for the bisection: the far brain never engages, the world B7.e measured), the narrowest change
-    to her world that keeps the point. Since package 74's step 4 (a4944b87, merged at 9944b671)
-    the French 74, a far body with no mark in hand, takes `engaging` from her passage at 0.94
-    miles (tick 360), her plan a chase of nobody (`resolve_state` on `_stranger` None), and is
-    gone from the sea the next minute (`Vessel.tick`: the leg dropped, the plan empty, `done`),
-    "out of sight" in the 64's log at tick 420, the minute her captain engaged the 74 at B7.e
-    (0.83 miles); the 64 stays "on passage". A fault of the trunk's, recorded for the lead with its
-    figures (docs/dev/TuningNotes.md, "B7.e and the trunk's merge"). The frigates' three cases
-    judge her before she goes (the lone frigate evading at tick 300, the one in a set engaging at
-    360) and are left in the trunk's world. The fifth case is the 64's in the trunk's world, the
-    far fight on, a strict expected failure (the review of 9e04b9fa): it fails while the fault
-    stands, and passes, so failing the run, the day the far brain is mended, when the switch comes
-    out of the fourth."""
+    Every case is in the trunk's world, the far fight on. From the trunk's merge (1282e25f) the
+    64's case ran with the far fight's toggle off (`far_action.ENABLED`), since package 74's step 4
+    (a4944b87) took the French 74, a far body going `engaging` from her passage with no mark in
+    hand, from the sea the minute after (a chase of nobody, dropped by the body), and the 64 stayed
+    "on passage"; a fifth case, the far fight on, was a strict expected failure. Package 75's mend
+    of the far brain (the lead's ruling (2) of 2026-11-13, truth 7-231) gives her the mark the
+    stimulus read: she takes the player's 64 for it at 0.94 miles (tick 360), closes her to 0.28
+    miles and keeps the sea, and the 64's captain engages her at tick 420 (0.84 miles), as at
+    B7.e; the toggle came out and the fifth case, now the fourth's own world, is the fourth
+    (docs/dev/TuningNotes.md, "The lead's notes of 2026-11-12 and 13, built"). The frigates' three
+    cases judge her before she engages them (the lone frigate evading at tick 300, the one in a set
+    engaging at 360), as before."""
     from freesail.world import squadrons as Q
     from freesail.world.captains import Perception
     from tests.test_brains import put, world_at
 
-    if not far_fight:
-        from freesail.combat import far_action
-
-        monkeypatch.setattr(far_action, "ENABLED", False)
     world = world_at(49.5, -5.5, ship_file, intent=STATION_OFF_THE_LIZARD)
     world.run(60)
     assert world.captain.commands and world.captain.role == "kings-ship"

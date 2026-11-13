@@ -20360,6 +20360,164 @@ run.sh`), 22:59 to 00:48 UTC; against the bases, not run again: B7.e's junits at
 After this subsection was written, the commit made, `tests/test_practice.py` (the one test that
 reads these notes), the bilander's and the schooner's hull tests run again on the commit.
 
+## The lead's notes of 2026-11-12 and 13, built (package 75) (2026-11-13)
+
+The lead's notes to the ships session of 2026-11-12 at 21:20 UTC and of 2026-11-13 at 01:05, 01:15
+and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), two of whose rulings are built here in two
+local commits on the package's branch after the trunk's second merge (94bfac27), a subsection for
+each: (2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world. Measured on the
+owner's machine at seed 7, the scripts in the session's scratch (`s13/mend/`, `s13/s196/`), outside
+the repository, each run on the tree and on an export of 94bfac27 (the toggle of the first commit:
+`freesail/world/brains.py` as it was there, nothing else differing in the code). The rest of the
+four notes (the 13th's (3) to (9), the 12th's asks) are not these commits'.
+
+### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
+
+**The ruling.** "The far fight's fault is yours to mend, in this branch (package 74 is closed and
+its files are free): a far ship of war that goes engaging from a plan state takes the mark the
+stimulus read, as the near captain's `_mark` takes it, and keeps one in hand as chasing does when
+the mark is lost from sight ... With it: a truth in your numbers (a far ship of war that engages
+from her passage keeps the sea and closes her enemy); the toggle taken out of the 64's case; the
+strict xfail made a plain test that passes."
+
+**The fault, as found** ("B7.e and the trunk's merge", item 2). The King's ship's rows (and the
+cruiser's, the commodore's, the privateer's, the merchantman's, the packet's and the Indiaman's)
+take a far body into `engaging` from her plan states on `enemy in range`; the far brain holds a mark
+(`_stranger`) only where `_work` sets one, so gone engaging from `on passage`, `beating`, `keeping
+station` or `in company` she had none, `resolve_state` laid `("chase", None, range)`,
+`Vessel._target_of(None)` was None, the leg was dropped, the plan was empty and `Vessel.tick` marked
+her `done`: gone from the sea the minute after she judged her enemy, and no round fought
+(`far_action._pairs` finds no mark for her).
+
+**As mended** (`freesail/world/brains.py` alone):
+- `FarCaptain._engaging_mark(p)`: the near captain's `_mark` on the far body: the mark in hand while
+  she is in sight, else the nearest enemy within the breaking-off distance (`_enemy_within` at
+  `break_off_nm`, which is the enemy the `enemy in range` stimulus read at `engage_nm`).
+- `FarCaptain._take_mark(p)`, run each minute in `engaging` from `_work` (the branch it lacked):
+  none in hand or the mark lost from sight, the nearest enemy within the breaking-off distance is
+  taken and the chase leg laid to her at the doctrine's range, as chasing takes the nearest stranger;
+  with none in sight the mark in hand is kept while she is on the sea (the leg follows her truth until
+  `enemy out of range` ends the action); with no mark on the sea at all she lies to where she is
+  (`_on_the_sea`: the player's ship while she has a place, another vessel while she is not `done`),
+  so that no chase of nobody is laid.
+- `resolve_state`'s `engaging`: with no mark in hand she takes one there (`_take_mark` on a
+  perception of the minute, `perceive_vessel`, as `running for shelter` reads one), so that a state
+  entered outside the minute's judgement (the fold-back at a demotion) lays no chase of nobody either;
+  with a mark in hand the leg as before. Its docstring's "in distress and engaging she lies to"
+  (package 74's step 4 made engaging a chase) brought to the code.
+- No new attribute: a checkpoint pickled before loads and runs as it did (the methods are the
+  class's); a far brain pickled in `engaging` with no mark takes one at her next judgement.
+
+**Its truth's number: 7-231.** The package's truths are 7-185 to 7-199 by Build-Ships.md §15 (the
+table's 7-199 the last of the block), and the lead's ruling on the gate (2026-10-28, Ext §14 item 11,
+`docs/dev/M7-WorkPackages.md`) gave it "the spare block 7-230 to 7-239 for more"; 7-230 is the
+driver's (the lead's allotment of 2026-10-29). 7-231 is the next of that block, used nowhere in the
+tree (grep of `tests/` and `docs/`), and no other package's numbers reach it (84's 7-200, 77's 7-201
+to 7-219, 85's from 7-240). Taken without a further ruling, since the block was given for more; for
+the lead to re-number if 7-230's allotment by name meant each needs one. The test lives with the far
+fight's truths: its bodies in `tests/test_far_action.py`, the truth after 7-369 in
+`tests/test_known_truths.py`.
+
+**Measured, the toggle beside the mend:**
+
+| World (seed 7) | 94bfac27 | The mend |
+|---|---|---|
+| The 64's case (`tests/test_bellerophon.py`, the far fight on): the French 74 bound for Brest a mile and a half north of the player's 64 on her station | `engaging` at tick 360 (0.94 miles), her plan `("chase", None, 740.8)`; done and gone at 420; the 64 "on passage" to the end | `engaging` at 360, her mark the player's ship, `("chase", "the ship", 740.8)`; the 64 engaging at 420 (0.84 miles); she closes to 0.28 miles by 780 and keeps there, on the sea (0.25 at 960) |
+| Two far 74s from their passages, a mile apart twelve miles south of the frigate hove to (the cap nought; `s13/mend/farpass.py`) | both `engaging` at 120, both gone at 180, no round | both `engaging` at 120, each the other's mark (the French at her 4 cables, the British at 2, by the nations' habits); the range 0.89 miles at 120, 0.41 at 480, 0.21 at 720, 0.15 from 840; a round every three minutes from 120; the Hero struck at 1200 after seven rounds (the Foudroyant 52 killed and 108 wounded, the Hero 70 and 147); taken possession of at 1260 ("struck at far detail"); both on the sea |
+| The same, the mark then hidden (`seen_within_nm` nought), a British frigate put 1.5 miles off (`keepmark.py other`) | — | the frigate her mark at the next judgement (240), the chase leg to her |
+| Hidden, none other (`hidden`) | — | the Hero kept in hand, the leg following her; `enemy out of range` at 840, `on passage` |
+| The Hero gone from the sea (`gone`) | — | she lies to (no mark); `on passage` at 840; on the sea |
+| Truth 7-358's world (the French frigate and the King's cutter) run three hours past the possession (`anger358.py`) | — | every state, plan, saved plan, mark and range minute by minute as at 94bfac27 |
+| Truth 7-196's crewed world (`rf/places196.py`) | S0, S1, S2 at 0.28, 0.08, 0.67; 1.28, 0.57, 2.74; 3.18, 1.79, 5.62 miles | the same (the 74s are crewed captains, not far bodies) |
+
+**Able to fail.** The truth's four cases fail on 94bfac27 (the mark None at the first judgement). By
+scratch mutations of the mend: `resolve_state` laying the chase of the mark in hand alone fails
+`[none-on-the-sea]` (its `resolve_state` with no mark laid `("chase", None, ...)`); `_work` without its
+`engaging` branch fails `[another-in-sight]` and `[none-on-the-sea]`; the lie to taken out fails
+`[none-on-the-sea]` (the leg dropped, the body `done`). Either half alone keeps the first case and the
+64's case passing, since each takes the mark at her first judgement; both halves are kept, the second
+for a state entered outside the judgement.
+
+**`tests/test_bellerophon.py`, old beside new.** `test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line`:
+the parameter `far_fight` and its toggle out of the fourth case `[the-64-and-a-74]`, which now runs in
+the trunk's world and passes (the 64 engaging at tick 420, `engaged_spoken` False); the fifth case
+`[the-64-and-a-74-far-fight-on]`, a strict expected failure, is the fourth's own world now and was
+made one with it: its xfail and its node id are gone, the plain test that passes being the fourth
+(two cases of one world would be one test twice). The docstring says so. The frigates' three cases
+as before (each judges her before she engages them).
+
+**New:** `tests/test_far_action.py`, `_two_on_passage` and
+`test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy` (slow, 12.8 s:
+the states and marks at 120, both on the sea every minute, the range never opened and under a fifth
+of a mile from 900, the strike at 1200 after seven rounds a side, the possession at 1260) and
+`test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody` (three cases, 3.1 to
+4.2 s); `tests/test_known_truths.py`, truth 7-231 (slow), calling both, after 7-369.
+
+**Found, for the lead, not built: after the action her passage is not taken up.** `engaging` is no
+detour in `resolve_state` (`_DETOUR_STATES`): going engaging from a plan state her plan is not saved,
+and leaving `engaging` for a plan state nothing is taken up. Measured with the mend: the Hero gone
+from the sea, the Foudroyant lies to and, at `enemy out of range` (840), is "on passage" lying to for
+good; the Hero hidden, she is "on passage" with the chase leg of the Hero still laid; and after the
+possession, bound for Brest, she is "on passage" chasing her prize at the engaging range (the plan
+saved at `taking possession` is the action's chase leg), 0.08 to 0.18 miles from her three hours on,
+the prize in company on her. Package 74's own road (engaging from `chasing`, the passage saved at the
+chase) saves the action's chase leg at `taking possession` in the same way; truth 7-358's frigate,
+on a station, lays her square again at `keeping station`, so it does not show there. A few lines would
+make `engaging` a detour for the plan (saved on going engaging from a plan state, taken up on leaving
+it, not overwritten by the detours after it); that moves package 74's road after the action as well,
+and is the lead's to rule.
+
+**What any ship may say that this step changes.** A far ship of war (or an armed merchantman, packet
+or Indiaman under their books' `enemy in range` rows) that goes engaging from a plan state no longer
+leaves the sea the minute after; so the lines that followed her going, the player's lookout's "... is
+out of sight" at that minute, are no longer said there, and the lines of an action that is now fought
+are said where they were not: the lookout's sightings of her as she closes, the far rounds in a hull's
+log (`action.far_round`), the guns heard off the horizon (`action.guns_heard`), her strike and the
+possession in the far story, and, where her mark is the player's ship and the cap has no room, her
+broadside at the player's ship (`action.far_reply`, "The ... fires her broadside at us from ...").
+No line's words changed.
+
+**The suites, as run.** Once, on 94bfac27 with this step's code and tests uncommitted (the notes
+written after), from the tree root with `py`, one run at a time, the branch and the tree asserted
+first (`freesail.__file__` under FreeSail-pkg-75), each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"` (`scratchpad/s13/mend/after/run.sh`), 01:41 to 03:31 UTC; against the
+bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`, `rf/fix/final/
+trials.xml`, `rf/fix/final/digests.json`).
+
+- **The whole fast tier** (`s13/mend/after/fast.xml`): **7,555 passed, 2 skipped, 1 xfailed**,
+  exit 0 (39 minutes). Against the base (7,529): **no outcome changed.** Only in the base, the strict
+  expected failure `[the-64-and-a-74-far-fight-on]`, made one with the fourth case; only in this
+  run, 30: this step's three `[another-in-sight]`, `[none-in-sight]` and `[none-on-the-sea]`, and the
+  trunk's 27 from its first merge (f120b873), each found by `git log -S` to its commit: package 102's
+  step 2 (741ba379: `test_flag_drawings` 9 and truth 7-501's six cases) and package 104 (0fb75016:
+  truths 7-510 to 7-518 and `test_bona_is_a_passage...`; e73f1543 the tide's gaugeless blocks;
+  59960e78 the weather's boxes), all passed.
+- **The slow candidates** (`--slow -m slow`, the base's 86 files; `slow.xml`): 323 passed, 14
+  failed, 2 skipped, 9 xfailed (58 minutes). Only in this run, truth 7-231 (passed) and the trunk's
+  truth 7-519 (package 104's d776537a, passed). **Every recorded passage holds:** each digest, line
+  count and tick that fails here fails as at the base with the same figures (the three captain's
+  trials, truth 77's digest 2e93986c2989d831, the merchant's and the schooner-on-an-intent's
+  constants, truths 78 and 79's [57, 100918], the schooner's 767 lines), the rest passing. Two
+  outcomes changed, passed to failed, both pace (truth 51's floor, 449 ticks a second; the gate's day
+  with the region loaded, 417), and two pace tests failing both ways were slower (the day under the
+  systems 442 against 492; truth 7-159 411 against 448): the machine's hour. Run alone after the
+  suites, nothing else running, twice on the tree and twice on the export of 94bfac27, all four
+  pass.
+- **The far fight's file whole** (`tests/test_far_action.py --slow`, `far.xml`): 12 passed; truths
+  7-358 to 7-361 and 7-369 passed in the runs above.
+- **The captain's trials** (`--slow`): 5 passed, 3 failed, as at the base outcome for outcome and
+  digest for digest (the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf: `TRIAL_TRADE_STRANGER_DIGEST` unmoved by
+  this step).
+- **The four whole logs** (`log_digests.py`): every field as recorded at 7b9d7c29.
+- **The generator** into scratch: eighteen of eighteen files byte for byte; `tools/check_viewer_guns.py`
+  clean. **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+**Moved by the toggle of the mend:** nothing pinned. No recorded passage, digest, line count or tick
+moved (the four whole logs, the captain's trials, the gates and `TRIAL_TRADE_STRANGER_DIGEST` as at
+the base), so there is nothing for the lead to re-pin by this step; what moved is the new behaviour
+alone, the worlds measured above and the 64's case.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

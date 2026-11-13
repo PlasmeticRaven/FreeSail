@@ -14907,6 +14907,27 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
 
 
+@pytest.mark.slow
+def test_truth_7_231_a_far_ship_of_war_that_engages_from_her_passage_keeps_the_sea_and_closes():
+    """Package 75's (the lead's ruling (2) of 2026-11-13; its number the next of the spare block
+    7-230 to 7-239 the lead gave the package on 2026-10-28, set here beside the far fight's
+    truths it stands with): a far ship of war that goes engaging from her passage takes the mark
+    the stimulus read, as the near captain's `_mark` takes it, keeps the sea and closes her
+    enemy, the far rounds fought to the strike and the possession (at seed 7 two 74s a mile
+    apart, both engaging at tick 120, the Hero struck at 1200 after seven rounds, possessed at
+    1260); and engaging she keeps a mark in hand as chasing does: the nearest enemy within the
+    breaking-off distance when the mark is lost from sight, the mark kept while she is on the
+    sea, and with none she lies to, never a chase of nobody."""
+    from tests.test_far_action import (
+        test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy,
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody,
+    )
+
+    test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy()
+    for case in ("another-in-sight", "none-in-sight", "none-on-the-sea"):
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody(case)
+
+
 def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
     """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
     in Falmouth's road is condemned by the court (France at war with Britain at the taking),

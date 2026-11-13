@@ -1276,6 +1276,21 @@ which took truth 7-159 under its floor (175 ticks a second against 500) and woul
 figures are read once a file and fit (`far.file_figures`); 7-361 stands on the frigate of the
 brains' sea. No figure of the fight moved; the toggle's measures are in the notes, step 4.
 
+**The far brain's mark, mended by package 75 (2026-11-13; the lead's ruling (2) of 2026-11-13).**
+§4.2's transition fires from the plan states as well as from the detours, but the far brain held a
+mark only where its `_work` set one (investigating, chasing, evading, and taking possession by the
+mend found on the way above), so a far ship of war that went engaging from her passage, her station
+or her set had none: her plan a chase of nobody, dropped by the body, and she was gone from the sea
+the minute after with no round fought (found at package 75's merge of the trunk, in B7.e's case of
+the player's 64 and a French 74). She now takes the mark the stimulus read, as the near captain's
+`_mark` takes theirs, and keeps one in hand as chasing does (`FarCaptain._engaging_mark`, `_take_mark`,
+`resolve_state`'s `engaging`), lying to where no mark is on the sea: truth 7-231. 7-358's world is
+line for line as before; the passages that moved by the toggle of `brains.py` alone are in
+`docs/dev/TuningNotes.md`, "The lead's notes of 2026-11-12 and 13, built". **Open for the lead:**
+after the action her passage is not taken up, `engaging` being no detour for the plan (a captor bound
+on a passage follows her prize at the engaging range; a ship whose mark is gone lies to "on
+passage").
+
 ### Step 5: the prize court and the money (§5; 2026-11-07)
 
 **Built as designed**: §5.1 to §5.3 (`world/prize_court.py` and `data/business.yaml`'s four
