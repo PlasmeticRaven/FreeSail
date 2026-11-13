@@ -27029,8 +27029,9 @@ reported differs from c58baf7 by this paragraph and the "where I stand" above al
 
 ## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
 
-**Where I stand (2026-11-12):** built whole, the trunk merged (its records only), measured at
-the final hash in a pinned worktree (the figures below; the suites in the final report).
+**Where I stand (2026-11-12):** built whole, the trunk merged three times (the last at 06e1418,
+with package 102's step 2 and decision 68's rulings), measured at the final hash in a pinned
+worktree (the figures below; the suites in the final report).
 Reports (A) and (B) ruled by the lead the same day: the second layer beside the corridor, no
 column from 26.4 W, the reach to 12.4 N recorded and not built; the region's bounds a hair
 inside the edges, the Salvages a region of one tile, written whole, the seven gauges, the
