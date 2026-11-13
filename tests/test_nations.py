@@ -306,6 +306,14 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "santa-cruz-de-la-palma": "spain",
         "san-sebastian-de-la-gomera": "spain",
         "cabras": "spain",
+        # package 106b: Morocco's Atlantic coast (Mazagan Portugal's until 1769: the table
+        # names its holder of the range's present)
+        "larache": "morocco",
+        "rabat": "morocco",
+        "mazagan": "portugal",  # its first row, as Valletta's
+        "safi": "morocco",
+        "mogador": "morocco",
+        "agadir": "morocco",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

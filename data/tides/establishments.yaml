@@ -150,6 +150,16 @@ tables:
       - {name: Tarifa, lat_deg: 36.001, lon_deg: -5.609, hw_h: 0, hw_m: 0, spring_rise_ft: 7, note: "Tofiño 1787, 'Marea', p. 9: high water at Tarifa on the day of conjunction about 12 at noon, rising 7 to 8 feet of Burgos at the greatest (7 English); Purdy 1826, p. 8: about XI 1/4"}
       - {name: Gibraltar, lat_deg: 36.130, lon_deg: -5.360, hw_h: 1, hw_m: 0, spring_rise_ft: 5, note: "Tofiño 1787, 'Mareas', pp. 21 to 22: in the bay high water at one in the afternoon at conjunction and opposition, the greatest tides 5 to 6 feet of Burgos (5 English); Purdy 1826, p. 8: XII 1/4, rising about 5 feet"}
       - {name: Tangier, lat_deg: 35.788, lon_deg: -5.800, hw_h: 0, hw_m: 0, spring_rise_ft: 5, note: "Purdy 1826, p. 8: near Tangier high water at 12; p. 6: at full and change the tide in the bay rises 5 feet"}
+      # package 106b, Morocco's Atlantic coast: Purdy 1825's one hour for the coast, at Mogador
+      # (p. 155, the OCR's "4b." read as 4h and "lu to 12" as 10 to 12 feet); his table's rows
+      # "Along the Coast of Marocco, from the Strait of Gibraltar to Cape Cantin" and "Cape
+      # Geer" (pp. 72 to 73) lost their figures in the OCR, and Moore 1799's too. For the coast
+      # north of Cape Cantin no period hour is read: the world's own (the Atlantic gauges'
+      # blend, 1h 41m at Rabat) and its spring range, JUDGEMENT. The period's hour at Mogador
+      # stands three hours from the world's (0h 44m): the master's is the period's (package
+      # 105's finding of the Faro, again).
+      - {name: Coast of Marocco, lat_deg: 34.045, lon_deg: -6.860, hw_h: 1, hw_m: 40, spring_rise_ft: 9, rise_judgement: true, note: "no period figure read (Purdy 1825's table, pp. 72 to 73, lost its figures in the OCR): the hour the world's at Rabat road (1h 41m) and the rise its spring range, 9.3 feet, JUDGEMENT"}
+      - {name: Mogador, lat_deg: 31.505, lon_deg: -9.775, hw_h: 4, hw_m: 0, spring_rise_ft: 11, note: "Purdy 1825, p. 155: the tide flows here on the full and change at 4h and rises from 10 to 12 feet (the OCR's '4b.' and 'lu to 12'); the world's hour 0h 44m"}
       # package 79b, the Channel's east block: Norie's own Table XLI of 1805 (Internet
       # Archive norie-1805-a-new-and-complete-epitome-of-practical-navigation, the page
       # images of pp. 248 to 252 read through the archive's IIIF server 2026-10-29, as

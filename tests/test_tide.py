@@ -364,6 +364,11 @@ MEDITERRANEAN_AREAS = (
 )
 
 
+# package 106b: the stream areas whose set is the period's own point, the world's axis laid on
+# it (Purdy 1825, pp. 152 to 156: southward along Morocco's coast, S.W. by S.)
+PERIOD_SETS = {"morocco-coast-north", "morocco-coast-south"}
+
+
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
     """Package 37e, item 5: each stream area carries what the sailing directions say of
     it beside the world's own figures, in the form the period's books give: the point
@@ -378,7 +383,11 @@ def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_
         # the point is the world's axis to the nearest point (a book rounds); the open
         # Channel's is the period's own word, which is not the world's axis rounded
         off = abs(units.wrap_pi(said.set_rad - math.radians(world.axis_deg)))
-        if said.id != "mid-channel":
+        if said.id in PERIOD_SETS:
+            # package 106b: the set is the pilot's own word and the world's axis is laid on it
+            assert off <= math.radians(5.7), (said.id, said.set_point, world.axis_deg)
+            assert "set" not in said.judgement, said.id
+        elif said.id != "mid-channel":
             assert off <= math.radians(5.7), (said.id, said.set_point, world.axis_deg)
             assert "set" in said.judgement, said.id
         else:
@@ -906,6 +915,10 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         *MED_WEST_CURRENTS,
         # package 106a: Rennell's current among the Canaries and in the open sea south of
         # Madeira (Purdy 1825, pp. 94 to 96)
+        # package 106b: the pilot's current along Morocco's coast (Purdy 1825, pp. 152 to
+        # 157), before the Canaries' (first-match)
+        "morocco-coast-north",
+        "morocco-coast-south",
         "canaries-among",
         "canary-current",
     ]
@@ -934,6 +947,7 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         for a in tide.areas
         if a.chart not in {"strait", "canaries", *MEDITERRANEAN}  # package 79d; 106a
         and a.id not in MED_WEST_CURRENTS  # package 79c
+        and a.id not in PERIOD_SETS  # package 106b
     )
 
 
@@ -949,7 +963,10 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
     assert said is not None and said.id == "strait-middle"
     assert (said.current_point, said.current_kn) == ("E", 2.0) and "current" in said.judgement
     assert (35.5, 36.4, -6.5, -5.0) in book.boxes
-    assert book.area_at(Position(35.4, -6.3)) is None  # south of the box, no statement
+    # south of the box: package 106b's coast of Morocco (Purdy's current along it); old: None,
+    # no statement
+    assert book.area_at(Position(35.4, -6.3)).id == "morocco-coast-north"
+    assert (34.16, 35.5, -7.62666, -5.92001) in book.boxes
     assert book.area_at(Position(36.10, -5.40)).id == "gibraltar-bay"
     assert book.area_at(Position(36.3, -6.3)).id == "strait-west-approach"
     assert all(
@@ -957,6 +974,7 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
         and a.id not in {"canaries-among", "canary-current"}  # package 106a: Rennell's
+        and a.id not in PERIOD_SETS  # package 106b: Purdy's current along Morocco's coast
         and a.id not in MED_WEST_CURRENTS  # package 79c
         and not a.id.startswith(MEDITERRANEAN_AREAS)
     )
@@ -1169,6 +1187,12 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # Cruz de Tenerife's and Funchal's lists (the lead's ruling of 2026-11-12)
         "canaries",
         "salvages",
+        # package 106b: Morocco's four, gaugeless, served by Cadiz and Huelva and by Arrecife
+        # and Puerto de Cabras (the chart session's ruling)
+        "morocco-larache",
+        "morocco-sallee",
+        "morocco-mogador",
+        "morocco-noun",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1316,6 +1340,12 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
         # Santa Cruz de Tenerife's and Funchal's, their neighbours' nearest within reach
         "santa-cruz-de-tenerife": {"salvages"},
         "funchal": {"salvages"},
+        # package 106b, the chart session's ruling: Morocco's coast, gaugeless, served by the
+        # Atlantic's nearest (the Strait's inner gauges left out)
+        "cadiz": {"morocco-larache", "morocco-sallee"},
+        "huelva": {"morocco-larache", "morocco-sallee"},
+        "arrecife": {"morocco-mogador", "morocco-noun"},
+        "puerto-de-cabras": {"morocco-mogador", "morocco-noun"},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())
@@ -1333,7 +1363,9 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
     assert caught == {
         "portsmouth": ("solent", "channel-east"),
         "ile-daix": ("biscay-north", "biscay-south"),
-        "cadiz": ("portugal", "strait"),
+        # package 106b: Cadiz lists Morocco's northern two after its seam's block; old:
+        # ("portugal", "strait")
+        "cadiz": ("portugal", "strait", "morocco-larache", "morocco-sallee"),
     }
 
 

@@ -4,7 +4,7 @@
 format: 1
 built: '2026-11-13'
 tool: tools/build_charts.py
-build_hash: b67bf746f6912acc
+build_hash: b04d9b64c5c8b404
 levels:
   '0':
     cell_sec: 150.0
@@ -57,6 +57,10 @@ charts:
     - sicily
     - canaries
     - salvages
+    - morocco-larache
+    - morocco-sallee
+    - morocco-mogador
+    - morocco-noun
     corridor: atlantic-corridor
     corridors_beside:
     - atlantic-south
@@ -13689,6 +13693,921 @@ regions:
       shoal: 8
       tower: 1
       town: 18
+  morocco-larache:
+    title: 'Morocco''s Atlantic coast north: Cape Spartel to Mamora, Arzila and Larache'
+    bounds:
+      south: 34.16
+      north: 35.5
+      west: -7.62666
+      east: -5.92001
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 122976_-27456
+        south_sec: 122976
+        west_sec: -27456
+        min_depth_m: 145.7
+        bytes: 213582
+      - name: 122976_-25920
+        south_sec: 122976
+        west_sec: -25920
+        min_depth_m: 47.9
+        bytes: 201777
+      - name: 122976_-24384
+        south_sec: 122976
+        west_sec: -24384
+        min_depth_m: 0.0
+        bytes: 115260
+      - name: 124512_-27456
+        south_sec: 124512
+        west_sec: -27456
+        min_depth_m: 875.2
+        bytes: 301732
+      - name: 124512_-25920
+        south_sec: 124512
+        west_sec: -25920
+        min_depth_m: 114.7
+        bytes: 277294
+      - name: 124512_-24384
+        south_sec: 124512
+        west_sec: -24384
+        min_depth_m: 0.0
+        bytes: 157750
+      - name: 124512_-22848
+        south_sec: 124512
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 91285
+      - name: 126048_-27456
+        south_sec: 126048
+        west_sec: -27456
+        min_depth_m: 961.4
+        bytes: 316127
+      - name: 126048_-25920
+        south_sec: 126048
+        west_sec: -25920
+        min_depth_m: 491.1
+        bytes: 290143
+      - name: 126048_-24384
+        south_sec: 126048
+        west_sec: -24384
+        min_depth_m: 86.3
+        bytes: 247876
+      - name: 126048_-22848
+        south_sec: 126048
+        west_sec: -22848
+        min_depth_m: 0.0
+        bytes: 132521
+      - name: 127584_-27456
+        south_sec: 127584
+        west_sec: -27456
+        min_depth_m: 923.4
+        bytes: 327469
+      - name: 127584_-25920
+        south_sec: 127584
+        west_sec: -25920
+        min_depth_m: 509.2
+        bytes: 299078
+      '3':
+      - name: 126560_-22336
+        south_sec: 126560
+        west_sec: -22336
+        min_depth_m: 0.0
+        bytes: 75492
+        harbour: larache
+      - name: 126560_-22080
+        south_sec: 126560
+        west_sec: -22080
+        min_depth_m: null
+        bytes: 46282
+        harbour: larache
+      - name: 126816_-22336
+        south_sec: 126816
+        west_sec: -22336
+        min_depth_m: 0.0
+        bytes: 71935
+        harbour: larache
+      - name: 126816_-22080
+        south_sec: 126816
+        west_sec: -22080
+        min_depth_m: 0.0
+        bytes: 61650
+        harbour: larache
+      - name: 123232_-24384
+        south_sec: 123232
+        west_sec: -24384
+        min_depth_m: 9.7
+        bytes: 49890
+        harbour: mamora
+      - name: 123232_-24128
+        south_sec: 123232
+        west_sec: -24128
+        min_depth_m: 0.0
+        bytes: 74010
+        harbour: mamora
+    coast: coast/morocco-larache.geojson
+    features: features/morocco-larache.yaml
+    index: features/morocco-larache.index.json
+    overrides: []
+    harbours:
+      larache:
+        south: 35.17
+        north: 35.23
+        west: -6.2
+        east: -6.13
+      mamora:
+        south: 34.24
+        north: 34.29
+        west: -6.72
+        east: -6.64
+    fill_to_chart_datum: true
+    skip_dry_tiles: true
+    feature_count: 8
+    features_by_kind:
+      place: 1
+      road: 2
+      shoal: 2
+      town: 3
+  morocco-sallee:
+    title: 'Morocco''s Atlantic coast: Sallee and Rabat to Cape Cantin and Safi'
+    bounds:
+      south: 31.6
+      north: 34.16
+      west: -10.61332
+      east: -6.34668
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 113760_-38208
+        south_sec: 113760
+        west_sec: -38208
+        min_depth_m: 129.7
+        bytes: 302616
+      - name: 113760_-36672
+        south_sec: 113760
+        west_sec: -36672
+        min_depth_m: 28.8
+        bytes: 207134
+      - name: 113760_-35136
+        south_sec: 113760
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 132460
+      - name: 113760_-33600
+        south_sec: 113760
+        west_sec: -33600
+        min_depth_m: null
+        bytes: 104110
+      - name: 113760_-32064
+        south_sec: 113760
+        west_sec: -32064
+        min_depth_m: null
+        bytes: 94889
+      - name: 113760_-30528
+        south_sec: 113760
+        west_sec: -30528
+        min_depth_m: null
+        bytes: 82851
+      - name: 113760_-28992
+        south_sec: 113760
+        west_sec: -28992
+        min_depth_m: null
+        bytes: 84680
+      - name: 113760_-27456
+        south_sec: 113760
+        west_sec: -27456
+        min_depth_m: null
+        bytes: 83853
+      - name: 113760_-25920
+        south_sec: 113760
+        west_sec: -25920
+        min_depth_m: null
+        bytes: 115120
+      - name: 113760_-24384
+        south_sec: 113760
+        west_sec: -24384
+        min_depth_m: null
+        bytes: 130836
+      - name: 115296_-38208
+        south_sec: 115296
+        west_sec: -38208
+        min_depth_m: 1391.4
+        bytes: 277160
+      - name: 115296_-36672
+        south_sec: 115296
+        west_sec: -36672
+        min_depth_m: 38.7
+        bytes: 317703
+      - name: 115296_-35136
+        south_sec: 115296
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 132783
+      - name: 115296_-33600
+        south_sec: 115296
+        west_sec: -33600
+        min_depth_m: 0.0
+        bytes: 111697
+      - name: 115296_-32064
+        south_sec: 115296
+        west_sec: -32064
+        min_depth_m: null
+        bytes: 86309
+      - name: 115296_-30528
+        south_sec: 115296
+        west_sec: -30528
+        min_depth_m: null
+        bytes: 89586
+      - name: 115296_-28992
+        south_sec: 115296
+        west_sec: -28992
+        min_depth_m: null
+        bytes: 81884
+      - name: 115296_-27456
+        south_sec: 115296
+        west_sec: -27456
+        min_depth_m: null
+        bytes: 76525
+      - name: 115296_-25920
+        south_sec: 115296
+        west_sec: -25920
+        min_depth_m: null
+        bytes: 80519
+      - name: 115296_-24384
+        south_sec: 115296
+        west_sec: -24384
+        min_depth_m: null
+        bytes: 97556
+      - name: 116832_-38208
+        south_sec: 116832
+        west_sec: -38208
+        min_depth_m: 2254.0
+        bytes: 60536
+      - name: 116832_-36672
+        south_sec: 116832
+        west_sec: -36672
+        min_depth_m: 652.7
+        bytes: 217644
+      - name: 116832_-35136
+        south_sec: 116832
+        west_sec: -35136
+        min_depth_m: 28.3
+        bytes: 239215
+      - name: 116832_-33600
+        south_sec: 116832
+        west_sec: -33600
+        min_depth_m: 0.0
+        bytes: 135130
+      - name: 116832_-32064
+        south_sec: 116832
+        west_sec: -32064
+        min_depth_m: 0.0
+        bytes: 80283
+      - name: 116832_-30528
+        south_sec: 116832
+        west_sec: -30528
+        min_depth_m: null
+        bytes: 83204
+      - name: 116832_-28992
+        south_sec: 116832
+        west_sec: -28992
+        min_depth_m: null
+        bytes: 101402
+      - name: 116832_-27456
+        south_sec: 116832
+        west_sec: -27456
+        min_depth_m: null
+        bytes: 91805
+      - name: 116832_-25920
+        south_sec: 116832
+        west_sec: -25920
+        min_depth_m: null
+        bytes: 86081
+      - name: 116832_-24384
+        south_sec: 116832
+        west_sec: -24384
+        min_depth_m: null
+        bytes: 86303
+      - name: 118368_-38208
+        south_sec: 118368
+        west_sec: -38208
+        min_depth_m: 3799.4
+        bytes: 19879
+      - name: 118368_-36672
+        south_sec: 118368
+        west_sec: -36672
+        min_depth_m: 2366.1
+        bytes: 74189
+      - name: 118368_-35136
+        south_sec: 118368
+        west_sec: -35136
+        min_depth_m: 102.1
+        bytes: 309910
+      - name: 118368_-33600
+        south_sec: 118368
+        west_sec: -33600
+        min_depth_m: 26.4
+        bytes: 164728
+      - name: 118368_-32064
+        south_sec: 118368
+        west_sec: -32064
+        min_depth_m: 0.0
+        bytes: 137002
+      - name: 118368_-30528
+        south_sec: 118368
+        west_sec: -30528
+        min_depth_m: 0.0
+        bytes: 100683
+      - name: 118368_-28992
+        south_sec: 118368
+        west_sec: -28992
+        min_depth_m: null
+        bytes: 82358
+      - name: 118368_-27456
+        south_sec: 118368
+        west_sec: -27456
+        min_depth_m: null
+        bytes: 89386
+      - name: 118368_-25920
+        south_sec: 118368
+        west_sec: -25920
+        min_depth_m: null
+        bytes: 101663
+      - name: 118368_-24384
+        south_sec: 118368
+        west_sec: -24384
+        min_depth_m: null
+        bytes: 110139
+      - name: 119904_-38208
+        south_sec: 119904
+        west_sec: -38208
+        min_depth_m: 4250.1
+        bytes: 23547
+      - name: 119904_-36672
+        south_sec: 119904
+        west_sec: -36672
+        min_depth_m: 3864.9
+        bytes: 38331
+      - name: 119904_-35136
+        south_sec: 119904
+        west_sec: -35136
+        min_depth_m: 664.0
+        bytes: 176616
+      - name: 119904_-33600
+        south_sec: 119904
+        west_sec: -33600
+        min_depth_m: 142.3
+        bytes: 258594
+      - name: 119904_-32064
+        south_sec: 119904
+        west_sec: -32064
+        min_depth_m: 20.3
+        bytes: 155293
+      - name: 119904_-30528
+        south_sec: 119904
+        west_sec: -30528
+        min_depth_m: 0.0
+        bytes: 131290
+      - name: 119904_-28992
+        south_sec: 119904
+        west_sec: -28992
+        min_depth_m: 0.0
+        bytes: 117087
+      - name: 119904_-27456
+        south_sec: 119904
+        west_sec: -27456
+        min_depth_m: 0.0
+        bytes: 103080
+      - name: 119904_-25920
+        south_sec: 119904
+        west_sec: -25920
+        min_depth_m: null
+        bytes: 104989
+      - name: 119904_-24384
+        south_sec: 119904
+        west_sec: -24384
+        min_depth_m: null
+        bytes: 117604
+      - name: 121440_-38208
+        south_sec: 121440
+        west_sec: -38208
+        min_depth_m: 4294.7
+        bytes: 35023
+      - name: 121440_-36672
+        south_sec: 121440
+        west_sec: -36672
+        min_depth_m: 4154.5
+        bytes: 24891
+      - name: 121440_-35136
+        south_sec: 121440
+        west_sec: -35136
+        min_depth_m: 3329.0
+        bytes: 20187
+      - name: 121440_-33600
+        south_sec: 121440
+        west_sec: -33600
+        min_depth_m: 1386.0
+        bytes: 102979
+      - name: 121440_-32064
+        south_sec: 121440
+        west_sec: -32064
+        min_depth_m: 220.2
+        bytes: 262845
+      - name: 121440_-30528
+        south_sec: 121440
+        west_sec: -30528
+        min_depth_m: 112.7
+        bytes: 251583
+      - name: 121440_-28992
+        south_sec: 121440
+        west_sec: -28992
+        min_depth_m: 72.6
+        bytes: 143098
+      - name: 121440_-27456
+        south_sec: 121440
+        west_sec: -27456
+        min_depth_m: 0.0
+        bytes: 125477
+      - name: 121440_-25920
+        south_sec: 121440
+        west_sec: -25920
+        min_depth_m: 0.0
+        bytes: 130976
+      - name: 121440_-24384
+        south_sec: 121440
+        west_sec: -24384
+        min_depth_m: 0.0
+        bytes: 108365
+      '3':
+      - name: 122208_-24896
+        south_sec: 122208
+        west_sec: -24896
+        min_depth_m: 0.0
+        bytes: 63494
+        harbour: sallee-rabat
+      - name: 122208_-24640
+        south_sec: 122208
+        west_sec: -24640
+        min_depth_m: null
+        bytes: 46083
+        harbour: sallee-rabat
+      - name: 122464_-24896
+        south_sec: 122464
+        west_sec: -24896
+        min_depth_m: 0.0
+        bytes: 77132
+        harbour: sallee-rabat
+      - name: 122464_-24640
+        south_sec: 122464
+        west_sec: -24640
+        min_depth_m: 0.0
+        bytes: 66565
+        harbour: sallee-rabat
+      - name: 121184_-26944
+        south_sec: 121184
+        west_sec: -26944
+        min_depth_m: 0.0
+        bytes: 80623
+        harbour: fedala
+      - name: 121184_-26688
+        south_sec: 121184
+        west_sec: -26688
+        min_depth_m: 0.0
+        bytes: 65568
+        harbour: fedala
+      - name: 120672_-27712
+        south_sec: 120672
+        west_sec: -27712
+        min_depth_m: 0.0
+        bytes: 43456
+        harbour: dar-el-beida
+      - name: 120672_-27456
+        south_sec: 120672
+        west_sec: -27456
+        min_depth_m: null
+        bytes: 40109
+        harbour: dar-el-beida
+      - name: 120928_-27712
+        south_sec: 120928
+        west_sec: -27712
+        min_depth_m: 0.0
+        bytes: 79734
+        harbour: dar-el-beida
+      - name: 120928_-27456
+        south_sec: 120928
+        west_sec: -27456
+        min_depth_m: 0.0
+        bytes: 82372
+        harbour: dar-el-beida
+      - name: 119392_-30784
+        south_sec: 119392
+        west_sec: -30784
+        min_depth_m: null
+        bytes: 36857
+        harbour: mazagan
+      - name: 119648_-30784
+        south_sec: 119648
+        west_sec: -30784
+        min_depth_m: 0.0
+        bytes: 78772
+        harbour: mazagan
+      - name: 116064_-33600
+        south_sec: 116064
+        west_sec: -33600
+        min_depth_m: 0.0
+        bytes: 72039
+        harbour: safi
+      - name: 116064_-33344
+        south_sec: 116064
+        west_sec: -33344
+        min_depth_m: 0.0
+        bytes: 56270
+        harbour: safi
+      - name: 116320_-33600
+        south_sec: 116320
+        west_sec: -33600
+        min_depth_m: 0.0
+        bytes: 73242
+        harbour: safi
+      - name: 116320_-33344
+        south_sec: 116320
+        west_sec: -33344
+        min_depth_m: 0.0
+        bytes: 48240
+        harbour: safi
+    coast: coast/morocco-sallee.geojson
+    features: features/morocco-sallee.yaml
+    index: features/morocco-sallee.index.json
+    overrides: []
+    harbours:
+      sallee-rabat:
+        south: 34.01
+        north: 34.06
+        west: -6.88
+        east: -6.8
+      fedala:
+        south: 33.69
+        north: 33.73
+        west: -7.43
+        east: -7.36
+      dar-el-beida:
+        south: 33.59
+        north: 33.63
+        west: -7.66
+        east: -7.58
+      mazagan:
+        south: 33.23
+        north: 33.28
+        west: -8.55
+        east: -8.48
+      safi:
+        south: 32.28
+        north: 32.33
+        west: -9.29
+        east: -9.22
+    fill_to_chart_datum: true
+    feature_count: 17
+    features_by_kind:
+      headland: 2
+      ledge: 2
+      place: 2
+      road: 4
+      shoal: 1
+      tower: 1
+      town: 5
+  morocco-mogador:
+    title: 'Morocco''s Atlantic coast: Mogador, Cape Ghir and Santa Cruz of Agadir'
+    bounds:
+      south: 29.46666
+      north: 31.6
+      west: -11.03999
+      east: -9.33334
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 106080_-39744
+        south_sec: 106080
+        west_sec: -39744
+        min_depth_m: 31.0
+        bytes: 281532
+      - name: 106080_-38208
+        south_sec: 106080
+        west_sec: -38208
+        min_depth_m: 9.2
+        bytes: 257075
+      - name: 106080_-36672
+        south_sec: 106080
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 159986
+      - name: 107616_-39744
+        south_sec: 107616
+        west_sec: -39744
+        min_depth_m: 1362.4
+        bytes: 299466
+      - name: 107616_-38208
+        south_sec: 107616
+        west_sec: -38208
+        min_depth_m: 44.7
+        bytes: 294475
+      - name: 107616_-36672
+        south_sec: 107616
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 250400
+      - name: 107616_-35136
+        south_sec: 107616
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 115224
+      - name: 109152_-39744
+        south_sec: 109152
+        west_sec: -39744
+        min_depth_m: 1549.7
+        bytes: 307908
+      - name: 109152_-38208
+        south_sec: 109152
+        west_sec: -38208
+        min_depth_m: 245.5
+        bytes: 336711
+      - name: 109152_-36672
+        south_sec: 109152
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 226427
+      - name: 109152_-35136
+        south_sec: 109152
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 137284
+      - name: 110688_-39744
+        south_sec: 110688
+        west_sec: -39744
+        min_depth_m: 724.0
+        bytes: 294033
+      - name: 110688_-38208
+        south_sec: 110688
+        west_sec: -38208
+        min_depth_m: 2.8
+        bytes: 278327
+      - name: 110688_-36672
+        south_sec: 110688
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 197109
+      - name: 112224_-39744
+        south_sec: 112224
+        west_sec: -39744
+        min_depth_m: 624.9
+        bytes: 259270
+      - name: 112224_-38208
+        south_sec: 112224
+        west_sec: -38208
+        min_depth_m: 1.9
+        bytes: 255241
+      - name: 112224_-36672
+        south_sec: 112224
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 148558
+      - name: 112224_-35136
+        south_sec: 112224
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 115831
+      '3':
+      - name: 113248_-35392
+        south_sec: 113248
+        west_sec: -35392
+        min_depth_m: 0.0
+        bytes: 91493
+        harbour: mogador
+      - name: 113248_-35136
+        south_sec: 113248
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 44737
+        harbour: mogador
+      - name: 113504_-35392
+        south_sec: 113504
+        west_sec: -35392
+        min_depth_m: 6.5
+        bytes: 66137
+        harbour: mogador
+      - name: 113504_-35136
+        south_sec: 113504
+        west_sec: -35136
+        min_depth_m: 0.0
+        bytes: 81393
+        harbour: mogador
+      - name: 109152_-34880
+        south_sec: 109152
+        west_sec: -34880
+        min_depth_m: 0.0
+        bytes: 65264
+        harbour: agadir
+      - name: 109152_-34624
+        south_sec: 109152
+        west_sec: -34624
+        min_depth_m: 0.0
+        bytes: 50552
+        harbour: agadir
+      - name: 109408_-34880
+        south_sec: 109408
+        west_sec: -34880
+        min_depth_m: 0.0
+        bytes: 95437
+        harbour: agadir
+      - name: 109408_-34624
+        south_sec: 109408
+        west_sec: -34624
+        min_depth_m: 0.0
+        bytes: 54012
+        harbour: agadir
+    coast: coast/morocco-mogador.geojson
+    features: features/morocco-mogador.yaml
+    index: features/morocco-mogador.index.json
+    overrides: []
+    harbours:
+      mogador:
+        south: 31.48
+        north: 31.53
+        west: -9.81
+        east: -9.75
+      agadir:
+        south: 30.39
+        north: 30.45
+        west: -9.68
+        east: -9.59
+    fill_to_chart_datum: true
+    skip_dry_tiles: true
+    feature_count: 10
+    features_by_kind:
+      anchorage: 1
+      headland: 3
+      island: 1
+      ledge: 1
+      road: 2
+      town: 2
+  morocco-noun:
+    title: 'Morocco''s Atlantic coast south: the Sus and the Wad Noun to Cape Juby'
+    bounds:
+      south: 27.33334
+      north: 29.46666
+      west: -13.17334
+      east: -9.33334
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 98400_-47424
+        south_sec: 98400
+        west_sec: -47424
+        min_depth_m: 0.0
+        bytes: 87937
+      - name: 98400_-45888
+        south_sec: 98400
+        west_sec: -45888
+        min_depth_m: 0.0
+        bytes: 80984
+      - name: 99936_-47424
+        south_sec: 99936
+        west_sec: -47424
+        min_depth_m: 0.0
+        bytes: 142539
+      - name: 99936_-45888
+        south_sec: 99936
+        west_sec: -45888
+        min_depth_m: 0.0
+        bytes: 111600
+      - name: 99936_-44352
+        south_sec: 99936
+        west_sec: -44352
+        min_depth_m: 0.0
+        bytes: 116154
+      - name: 99936_-42816
+        south_sec: 99936
+        west_sec: -42816
+        min_depth_m: 0.0
+        bytes: 95578
+      - name: 101472_-47424
+        south_sec: 101472
+        west_sec: -47424
+        min_depth_m: 55.2
+        bytes: 222919
+      - name: 101472_-45888
+        south_sec: 101472
+        west_sec: -45888
+        min_depth_m: 43.1
+        bytes: 140500
+      - name: 101472_-44352
+        south_sec: 101472
+        west_sec: -44352
+        min_depth_m: 16.3
+        bytes: 151638
+      - name: 101472_-42816
+        south_sec: 101472
+        west_sec: -42816
+        min_depth_m: 0.0
+        bytes: 147052
+      - name: 101472_-41280
+        south_sec: 101472
+        west_sec: -41280
+        min_depth_m: 0.0
+        bytes: 111237
+      - name: 103008_-47424
+        south_sec: 103008
+        west_sec: -47424
+        min_depth_m: 206.5
+        bytes: 256772
+      - name: 103008_-45888
+        south_sec: 103008
+        west_sec: -45888
+        min_depth_m: 97.6
+        bytes: 247719
+      - name: 103008_-44352
+        south_sec: 103008
+        west_sec: -44352
+        min_depth_m: 62.0
+        bytes: 188629
+      - name: 103008_-42816
+        south_sec: 103008
+        west_sec: -42816
+        min_depth_m: 54.2
+        bytes: 142727
+      - name: 103008_-41280
+        south_sec: 103008
+        west_sec: -41280
+        min_depth_m: 0.0
+        bytes: 149476
+      - name: 103008_-39744
+        south_sec: 103008
+        west_sec: -39744
+        min_depth_m: 0.0
+        bytes: 128810
+      - name: 103008_-38208
+        south_sec: 103008
+        west_sec: -38208
+        min_depth_m: 0.0
+        bytes: 110650
+      - name: 104544_-47424
+        south_sec: 104544
+        west_sec: -47424
+        min_depth_m: 1034.1
+        bytes: 191403
+      - name: 104544_-45888
+        south_sec: 104544
+        west_sec: -45888
+        min_depth_m: 731.9
+        bytes: 205122
+      - name: 104544_-44352
+        south_sec: 104544
+        west_sec: -44352
+        min_depth_m: 341.4
+        bytes: 266824
+      - name: 104544_-42816
+        south_sec: 104544
+        west_sec: -42816
+        min_depth_m: 108.5
+        bytes: 289362
+      - name: 104544_-41280
+        south_sec: 104544
+        west_sec: -41280
+        min_depth_m: 92.5
+        bytes: 245822
+      - name: 104544_-39744
+        south_sec: 104544
+        west_sec: -39744
+        min_depth_m: 18.9
+        bytes: 204954
+      - name: 104544_-38208
+        south_sec: 104544
+        west_sec: -38208
+        min_depth_m: 0.0
+        bytes: 156762
+      - name: 104544_-36672
+        south_sec: 104544
+        west_sec: -36672
+        min_depth_m: 0.0
+        bytes: 115967
+      '3': []
+    coast: coast/morocco-noun.geojson
+    features: features/morocco-noun.yaml
+    index: features/morocco-noun.index.json
+    overrides: []
+    harbours: {}
+    fill_to_chart_datum: true
+    skip_dry_tiles: true
+    feature_count: 1
+    features_by_kind:
+      place: 1
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -14270,6 +15189,18 @@ sources:
       sha256: aca25420a584e7060200e064f11ca97be3e950cb9e2e5a549814f3cccd7bf31e
       bytes: 601965
       file: gebco_2025_s29.74_n30.47_w-16.31_e-15.58_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 27.13, ''north'':
+        31.8, ''west'': -13.8, ''east'': -9.13})'
+      retrieved: '2026-11-13'
+      sha256: fcb3299a9254cbaa88314fcef1c8d20134eb632c505fc2b28c0f63528049aabe
+      bytes: 6596950
+      file: gebco_2025_s27.13_n31.80_w-13.80_e-9.13_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 31.4, ''north'':
+        36.07, ''west'': -10.82, ''east'': -5.72})'
+      retrieved: '2026-11-13'
+      sha256: a3c93eb8075796a2952319932b3fab3926143a6e0f1bb1e629cda5de4a9fc261
+      bytes: 7287592
+      file: gebco_2025_s31.40_n36.07_w-10.82_e-5.72_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -14484,6 +15415,26 @@ sources:
       sha256: 1b0e9b03dbadd609fa1873d9db3585e141685b7a0ca74517209b1f238a4e9454
       bytes: 1053404
       file: emodnet_dtm2024_elevation_max_29.84_30.37_-16.21_-15.68.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(27.23):(31.7)%5D%5B(-13.7):(-9.23)%5D
+      retrieved: '2026-11-13'
+      sha256: 29b25e9535c759c78d14084fa9306fb17849a19d922fd556e77ca5b9021c2ca8
+      bytes: 73776104
+      file: emodnet_dtm2024_elevation_27.23_31.70_-13.70_-9.23.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(27.23):(31.7)%5D%5B(-13.7):(-9.23)%5D
+      retrieved: '2026-11-13'
+      sha256: 5ee12818eca7edc408fb6331d8bdb876705a3d5092756100384c2fa060fc7777
+      bytes: 73775744
+      file: emodnet_dtm2024_elevation_max_27.23_31.70_-13.70_-9.23.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(31.5):(35.97)%5D%5B(-10.72):(-5.82)%5D
+      retrieved: '2026-11-13'
+      sha256: ea45735f5cfb3548e078c28b7556d6443e4a217daf0720cb6bc49da31e10c569
+      bytes: 80852616
+      file: emodnet_dtm2024_elevation_31.50_35.97_-10.72_-5.82.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(31.5):(35.97)%5D%5B(-10.72):(-5.82)%5D
+      retrieved: '2026-11-13'
+      sha256: f5b4fa506e96e1d8aa7cd25f9bf14fa5580ec3d6c5ff58e9cdaae402710738a0
+      bytes: 80852256
+      file: emodnet_dtm2024_elevation_max_31.50_35.97_-10.72_-5.82.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m

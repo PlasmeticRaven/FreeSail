@@ -465,7 +465,7 @@ gauges:
     N2: {amplitude_m: 0.216, phase_deg: 41.4}
   - id: huelva
     name: Huelva (Mazagón)
-    block: portugal
+    block: [portugal, morocco-larache, morocco-sallee]  # package 106b: a gaugeless block's neighbours' nearest of the Atlantic's (the chart session's ruling)
     lat_deg: 37.1320
     lon_deg: -6.8340
     record: "GESLA-2, Puertos del Estado, 1996 to 2015"
@@ -485,7 +485,7 @@ gauges:
     N2: {amplitude_m: 0.190, phase_deg: 48.0}
   - id: cadiz
     name: Cadiz
-    block: [portugal, strait]  # the rule of the seams (package 94, step 5)
+    block: [portugal, strait, morocco-larache, morocco-sallee]  # the rule of the seams (package 94, step 5); package 106b (above)
     lat_deg: 36.5333
     lon_deg: -6.2833
     record: "GESLA-2, IEO, 1961 to 2012"
@@ -1256,7 +1256,7 @@ gauges:
 # salvages]` above), the level Santa Cruz's, Funchal's being unread.
   - id: arrecife
     name: Arrecife
-    block: canaries
+    block: [canaries, morocco-mogador, morocco-noun]  # package 106b: a gaugeless block's neighbours' nearest (the chart session's ruling)
     lat_deg: 28.9722
     lon_deg: -13.5300
     record: "GESLA-2, IEO, 1949 to 2012"
@@ -1266,7 +1266,7 @@ gauges:
     N2: {amplitude_m: 0.174, phase_deg: 22.2}
   - id: puerto-de-cabras
     name: Puerto de Cabras
-    block: canaries
+    block: [canaries, morocco-mogador, morocco-noun]  # package 106b (above)
     lat_deg: 28.5000
     lon_deg: -13.8500
     record: "GESLA-2, Puertos del Estado, 2004 to 2015"

@@ -131,6 +131,13 @@ SEAS: dict[str, str] = {
     # package 106a: the Canaries and the Salvages, an ocean's tide of their own
     "canaries": "canaries",
     "salvages": "salvages",
+    # package 106b: Morocco's Atlantic coast, a sea of its own served by the Atlantic's
+    # gauges of its neighbours (Cadiz and Huelva, Arrecife and Puerto de Cabras; the chart
+    # session's ruling)
+    "morocco-larache": "morocco",
+    "morocco-sallee": "morocco",
+    "morocco-mogador": "morocco",
+    "morocco-noun": "morocco",
 }
 MEDITERRANEAN = "mediterranean"
 # The Salvages, between Madeira and the Canaries, are served by both groups' gauges (package
@@ -138,6 +145,8 @@ MEDITERRANEAN = "mediterranean"
 SEAS_THAT_MEET = {
     "strait": {"atlantic", "mediterranean", "strait"},
     "salvages": {"madeira", "canaries", "salvages"},
+    # Morocco's coast takes the Atlantic's gauges of Spain and the Canaries' (package 106b)
+    "morocco": {"morocco", "atlantic", "canaries"},
 }
 # A share of the blend's weight from gauges of another sea above which the water's tide
 # is called another sea's (JUDGEMENT: the larger part).

@@ -802,6 +802,76 @@ REGIONS: dict[str, dict[str, Any]] = {
         # the block's gauges (decided before the build, the lead's ruling of 2026-11-11)
         "fill_to_chart_datum": True,
     },
+    # package 106b: Morocco's Atlantic coast, Cape Spartel to Cape Juby, as four regions
+    # (the chart session's ruling on the measure: the coast runs diagonally, and one box a
+    # region held a triangle of open sea; four boxes split at the row edges 34.16 N, 31.6 N
+    # and 29.46666 N hold the coast and two tile columns seaward, about forty miles). The
+    # open sea west of their bounds is the coarse layers' (the corridor north of 31.9 N,
+    # `atlantic-south` south of it). Each bound a hair inside its tile edge, or on a
+    # neighbour's: `morocco-larache`'s north is the Strait's 35.5 N (its tiles of the row
+    # 35.44 to 35.87 N east of 6.77 W are the Strait's, "2 kept"), `morocco-noun`'s west the
+    # Canaries' east (13.17334 W; their column 13.6 to 13.17 W is theirs, "5 kept"), and
+    # `morocco-mogador`'s south `morocco-noun`'s north (29.46666 N; the row below is the
+    # Noun's, built first). The harbours: a level-3 patch for each port's road from EMODnet,
+    # no override (no period plan read with its datum: the port files say `datum:
+    # unverified`). The tide: no gauge on the coast; by the rule for a block with none the
+    # Atlantic neighbours' nearest serve it (Cadiz and Huelva the northern two, Arrecife and
+    # Puerto de Cabras the southern), so the fill is raised by that water. The dry tiles are
+    # skipped where a coarse layer answers; `morocco-sallee`, whose southern row east of
+    # 9.34 W no layer holds, writes every tile.
+    "morocco-larache": {
+        "title": "Morocco's Atlantic coast north: Cape Spartel to Mamora, Arzila and Larache",
+        "bounds": {"south": 34.16, "north": 35.5, "west": -7.62666, "east": -5.92001},
+        # the measure's fetch over the northern half (the tiles 34.16 to 35.87 N, 7.63 to
+        # 5.92 W lie within it)
+        "fetch": {"south": 31.5, "north": 35.97, "west": -10.72, "east": -5.82},
+        "harbours": {
+            "larache": {"south": 35.17, "north": 35.23, "west": -6.20, "east": -6.13},
+            "mamora": {"south": 34.24, "north": 34.29, "west": -6.72, "east": -6.64},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
+    "morocco-sallee": {
+        "title": "Morocco's Atlantic coast: Sallee and Rabat to Cape Cantin and Safi",
+        "bounds": {"south": 31.6, "north": 34.16, "west": -10.61332, "east": -6.34668},
+        "fetch": {"south": 31.5, "north": 35.97, "west": -10.72, "east": -5.82},
+        "harbours": {
+            "sallee-rabat": {"south": 34.01, "north": 34.06, "west": -6.88, "east": -6.80},
+            "fedala": {"south": 33.69, "north": 33.73, "west": -7.43, "east": -7.36},
+            "dar-el-beida": {"south": 33.59, "north": 33.63, "west": -7.66, "east": -7.58},
+            "mazagan": {"south": 33.23, "north": 33.28, "west": -8.55, "east": -8.48},
+            "safi": {"south": 32.28, "north": 32.33, "west": -9.29, "east": -9.22},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        # every tile written: its row 31.6 to 32.03 N east of 9.34 W lies under no coarse
+        # layer (the corridor's data begins at 31.9 N, `atlantic-south` ends at 9.34 W),
+        # and the world's level is not committed, so a dry tile left out there answers
+        # nothing (package 79b's rule)
+    },
+    "morocco-mogador": {
+        "title": "Morocco's Atlantic coast: Mogador, Cape Ghir and Santa Cruz of Agadir",
+        "bounds": {"south": 29.46666, "north": 31.6, "west": -11.03999, "east": -9.33334},
+        "fetch": {"south": 27.23, "north": 31.7, "west": -13.7, "east": -9.23},
+        "harbours": {
+            "mogador": {"south": 31.48, "north": 31.53, "west": -9.81, "east": -9.75},
+            "agadir": {"south": 30.39, "north": 30.45, "west": -9.68, "east": -9.59},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
+    "morocco-noun": {
+        "title": "Morocco's Atlantic coast south: the Sus and the Wad Noun to Cape Juby",
+        "bounds": {"south": 27.33334, "north": 29.46666, "west": -13.17334, "east": -9.33334},
+        "fetch": {"south": 27.23, "north": 31.7, "west": -13.7, "east": -9.23},
+        "harbours": {},
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -925,6 +995,11 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 106a: the Canaries and the Salvages, over the ocean carried south
             "canaries",
             "salvages",
+            # package 106b: Morocco's Atlantic coast, north to south
+            "morocco-larache",
+            "morocco-sallee",
+            "morocco-mogador",
+            "morocco-noun",
         ],
         "corridor": "atlantic-corridor",
         # package 106a: coarse layers read after the corridor, each answering only where

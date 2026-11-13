@@ -1,0 +1,132 @@
+# FreeSail: Agadeer, or Santa Cruz (Agadir), the last port of Morocco on the Atlantic (package
+# 106b, Morocco's Atlantic coast), on package 35's machinery; the marks are the features file's
+# (data/charts/features/morocco-mogador.yaml).
+#
+# Sources. Purdy 1825, p. 157: the town about 5 leagues south-eastward of Cape Geer at the
+# bottom of its bay, on the summit of a mountain, strong by nature, its principal battery below
+# guarding a spring of fresh water close to the sea, the Portuguese Fonte at the foot; the bay
+# the best road on the coast of Marocco, large and well sheltered, abounding in fish, dried in
+# ovens for the interior; owing to the jealousy of its government Agadeer has ceased to be a
+# place of trade, though formerly the centre of a very extensive commerce, the caravans
+# constantly passing to and from Timbuctoo; the road's directions (the features file). Jackson
+# 1809, l. 4930 to 4991: walled in 1503 by the King of Portugal, taken by the Moors in 1536; its
+# commerce under Muley Ismael excited the Emperors' jealousy, confirmed in 1773 (the OCR's
+# '177s', the last digit uncertain) when the inhabitants became refractory and the governor Talb
+# Solh refused to deliver it up; after its surrender the merchants were allowed a short time to
+# collect their effects and ordered to Mogodor; l. 4512 to 4514: with Fedala's the only road
+# where ships ride in security in winter; l. 1101 and 11409: Jackson himself resided three years
+# at Santa Cruz; l. 3731: 300 people.
+#
+# What the sources say of captivity and slavery here, plainly (decision 68): the caravans that
+# made Agadeer's commerce under Muley Ismael passed to and from Timbuctoo, and the returns from
+# Timbuctoo included "a great number of slaves, purchased at Timbuctoo" by slave merchants,
+# carried to Fas and Marocco and sold in the public markets (Jackson 1809, l. 11543 to 11650; in
+# 1798 a caravan of two thousand camels with seven hundred enslaved people was plundered and
+# dispersed, l. 11432 to 11434); south of the Sus, Christian seamen wrecked on the desert coast
+# were held and sold as slaves among the Arabs until ransomed through Mogador (l. 10897 to 10916).
+# People are no cargo of this market, and no scenario is built on it.
+#
+# The datum: UNVERIFIED (no period plan read). Dated rows (decision 67, package 105's form;
+# decision 69): `closed_to` from 1773, when the Emperor sent its merchants to Mogador (the year
+# Jackson's, its last digit uncertain; the day JUDGEMENT), to every European nation and the
+# Americans; the port open to its own. Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: agadir
+name: Santa Cruz of Barbary
+nation: morocco
+source: "Purdy 1825, p. 157; Jackson 1809, l. 4930 to 4991"
+datum: unverified
+
+outer_road:
+  feature: agadir-road
+  name: the road of Agadeer
+  lat_deg: 30.4020
+  lon_deg: -9.6280
+  depth_fathoms: 5
+anchorage:
+  feature: agadir-road
+  name: the road of Agadeer
+  lat_deg: 30.4020
+  lon_deg: -9.6280
+mooring:
+  name: close in by the Fonte
+  lat_deg: 30.3969
+  lon_deg: -9.6150
+  depth_fathoms: 4
+  bottom: sand
+  deep_draught_ft: 15    # JUDGEMENT
+shore:
+  feature: santa-cruz-agadir
+  name: the Fonte under the mountain
+  lat_deg: 30.4200
+  lon_deg: -9.6160
+
+pilot:
+  station: agadir-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a fishing boat of the bay
+    under: oars
+    note: "judgement: Purdy 1825 p. 157, the bay abounds in fish taken by the townspeople"
+  names: [Hamet, Ali, Mohammed, Abdallah, Brahim, Lahcen, Mbarek, Omar]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 315            # out to the north-west, judgement
+  words:
+    channel: "From Cape Geer run along by the cape's land until you are before the castle, for the northerly winds are strong here and if you keep off you will have to beat back; by night come no nearer than twelve or fourteen fathoms."
+    marks: "The town on the summit of its mountain, the battery below it over the spring; Cape Geer to the northward, very remarkable, with its round hummock inland."
+    anchorage: "Enter until the storehouses bear east-north-east, south of the rocky ledge off the town, and ride in six or seven fathoms. Lay the small bower out toward the land wind and the sheet anchor out to the south-west against a gale, and keep the foresail to the yard."
+    tide: "No stream to speak of in the bay; the current outside sets southward and in upon the land."
+
+tide:
+  establishment: Mogador
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 13, origin: morocco, note: "Purdy 1825 p. 157: fish caught in immense quantities and prepared in ovens for the interior; JUDGEMENT"}
+    - {good: fresh fish, price: 3, origin: morocco, note: "Purdy 1825 p. 157; JUDGEMENT"}
+    - {good: almonds, price: 17, origin: morocco, note: "JUDGEMENT: the Sus's"}
+    - {good: olive oil, price: 30, origin: morocco, note: "JUDGEMENT"}
+    - {good: wax, price: 70, origin: morocco, note: "JUDGEMENT"}
+    - {good: gum, price: 44, origin: morocco, note: "Jackson 1809, l. 11409 to 11411: a gum caravan from Timbuctoo received at Agadeer; JUDGEMENT"}
+    - {good: hides, price: 18, origin: morocco, note: "JUDGEMENT"}
+    - {good: dates, price: 13, origin: morocco, note: "JUDGEMENT"}
+    - {good: cattle, price: 7, origin: morocco, note: "JUDGEMENT"}
+    - {good: woollens, price: 92, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: iron, price: 35, origin: null, note: "imported; JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 30, pounds: 60, note: "JUDGEMENT: no stores named; a place closed to trade"}
+    - {item: yard, hours: 20, pounds: 36}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.1}
+    - {item: water, hours_per_ton: 0.4, pounds_per_ton: 0.3, note: "Purdy 1825 p. 157: the spring of fresh water close to the sea; JUDGEMENT"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 2, pounds: 1, delay_h: 12}
+
+closed_to:
+  - {closed_to: [], until: 1772-12-31, source: "Jackson 1809, l. 4959 to 4964: the centre of a very extensive commerce under Muley Ismael"}
+  - {closed_to: [britain, france, spain, portugal, batavian-republic, united-states, denmark, sardinia, naples, etruria, liguria, papal-state, order-of-st-john], since: 1773-01-01, source: "Jackson 1809, l. 4966 to 4991 (Purdy 1825, p. 157): after the governor's refusal to deliver it up in 1773 (the OCR's last digit uncertain) the merchants were ordered to Mogodor, and Agadeer ceased to be a place of trade; the day JUDGEMENT"}
+
+# The tracks (package 40's form; packages 101 and 104's lesson: a coast of capes wants every
+# port's way out to a lane): the coast bulges seaward at Cape Cantin, and a straight line from
+# the northern ports to this one crosses it; out by the road to the offing west of Cape Geer (30 36 N 10 12 W, JUDGEMENT, clear of its reef) and to the common mark off Cape Cantin
+# (32 36 N 9 36 W, JUDGEMENT, ten miles west of the cape and its ledge), and in by the same way
+# reversed, each leg checked clear of the shore by a cable with `Chart.line_shore` as the
+# business's guard reads it; the least depth at datum along each leg in docs/dev/TuningNotes.md.
+tracks:
+  to_sea: [agadir-road, 30 36.0 N 10 12.0 W, 32 36.0 N 9 36.0 W]
+  from_sea: [32 36.0 N 9 36.0 W, 30 36.0 N 10 12.0 W, agadir-road]
+  in: [agadir-road]

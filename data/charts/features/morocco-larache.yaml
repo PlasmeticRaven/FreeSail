@@ -1,0 +1,103 @@
+# The features of Morocco's Atlantic coast (package 106b), morocco-larache, as the period's
+# pilots give them, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Purdy 1825      John Purdy, Memoir ... to accompany the new chart of the Atlantic Ocean,
+#                   1825 (docs/references/pilots/purdy-1825-memoir-atlantic-ocean-ocr.txt),
+#                   'Tangier to Rabat' and 'Rabat to Mogodor', 'Mogodor to Cape Noon', pp. 152
+#                   to 157 (l. 22171 to 22620), cited by page; it quotes Jackson for Sallee.
+#   Jackson 1809    James Grey Jackson, An Account of the Empire of Marocco, 1809
+#                   (pilots/jackson-1809-account-empire-marocco-ocr.txt), ch. V, the seaports
+#                   (l. 4055 to 5065), cited by line of the OCR (the pages are not printed in it).
+#
+# No light stood on this coast in 1805 by any source on file, and none is entered. Positions
+# are in the modern frame, first placed FROM MEMORY of the modern chart and the pilots'
+# bearings and distances, then checked against the region's tiles by channel-west.yaml's rule
+# (a headland, town, castle or tower to the nearest land within 800 m; a danger to the grid's
+# shoal head; an anchorage to water of the pilot's depth), each move in `fix`. Heights for the
+# horizon are the pilots' where they give one, else FROM MEMORY (UNVERIFIED). The grid closes
+# the rivers (the Lucos at Larache, the Seboo at Mamora, the Bu Regreg at Sallee): their mouths
+# read as land or under a metre, where the pilots let in vessels of 100 tons at high water (a
+# finding, noted in docs/dev/TuningNotes.md; the ports lie in their roads, as the pilots put
+# the ships).
+
+region: morocco-larache
+features:
+  - id: arzila
+    kind: town
+    name: Arzila
+    modern: Asilah
+    lat_deg: 35.4650
+    lon_deg: -6.0350
+    height_m: 20
+    source: "Purdy 1825, p. 152: from Cape Spartel to the town of Arzilla the coast trends S.W. by S.; generally low, ships may sail along it at half a mile; 30 or more fathoms at a league from shore; Jackson 1809, l. 4194 to 4207: the little town of Arzilla fifteen miles beyond the cape, taken by the Portuguese and abandoned about the end of the sixteenth century, no trade carried on; the height FROM MEMORY"
+    says: "Arzila, a little walled town on a low shore, with no trade; thirty fathoms and more a league off."
+  - id: larache
+    kind: town
+    name: El Araiche
+    modern: Larache
+    lat_deg: 35.1950
+    lon_deg: -6.1520
+    height_m: 40
+    source: "Purdy 1825, p. 152: El Araiche known by its castle, which commands the road, strengthened by batteries on the banks of the river El Kos on which it stands; Jackson 1809, l. 4209 to 4254: thirty-three miles from Arzilla; the Emperor's larger vessels winter in a cove on the north side of the river with magazines of naval stores; the height FROM MEMORY"
+    says: "El Araiche on the south bank of its river, its castle commanding the road and batteries along the water."
+  - id: larache-road
+    kind: road
+    name: the road of El Araiche
+    lat_deg: 35.2150
+    lon_deg: -6.1650
+    height_m: 0
+    depth_fathoms: 7
+    bottom: "sand"
+    source: "Purdy 1825, p. 152: before El Araiche the depth decreases, only 4 fathoms at 2 cables from shore; the best anchorage with the town between S. and S.S.E.; the mouth of the river very narrow at low water, enough on the bar for vessels of 100 tons at high water; Jackson 1809, l. 4252 to 4254: not secure in winter with the winds south and west, a safe anchorage from April to September; the depth the grid's and the bottom JUDGEMENT"
+    says: "The road of El Araiche, with the town bearing south: safe from April to September, open to the winter's southerly and westerly gales. The bar takes only vessels of a hundred tons, at high water."
+    fix: "north of the river's mouth with the town S. by E., in the grid's 13 m (7 fathoms), JUDGEMENT"
+  - id: larache-bar
+    kind: shoal
+    name: the bar of El Araiche
+    modern: the mouth of the Loukkos
+    lat_deg: 35.2035
+    lon_deg: -6.1610
+    height_m: 0
+    source: "Purdy 1825, p. 152: the mouth of the river, which appears very broad, is really very narrow at low water, but there is sufficient water on the bar to admit vessels of 100 tons at high water; Jackson 1809, l. 4218 to 4219 and 582 to 583: a bar of sand at its entrance, ships of 100 or 150 tons may enter at high water"
+    says: "The bar of the river of El Araiche: a hundred-ton vessel crosses it at high water, nothing larger, and at low water the mouth is very narrow."
+    fix: "the grid's least water across the mouth, 1 to 2 m; the river within is the grid's land (a finding)"
+  - id: old-mamora
+    kind: place
+    name: the ruins of Old Mamora
+    modern: Moulay Bousselham, the mouth of the Merja Zerga
+    lat_deg: 34.8800
+    lon_deg: -6.2900
+    height_m: 10
+    source: "Purdy 1825, p. 152: between El Araiche and the remains of Old Mamora the land is very low and uneven, with some sandy hills; 30 to 35 fathoms at half a league from shore, and ships may anchor off the coast hence to Sallee, as they must sometimes in a calm to avoid being drifted by the currents, which set to the southward along the coast, from one to two miles an hour at full and change; the Peak of Fas bears nearly East from it; the identification with the lagoon's mouth FROM MEMORY, UNVERIFIED"
+    says: "The remains of Old Mamora on a low, uneven shore of sandy hills; anchor off it in a calm rather than drift with the southerly set."
+  - id: mamora
+    kind: town
+    name: Mehedia, or New Mamora
+    modern: Mehdia, at the mouth of the Sebou
+    lat_deg: 34.2620
+    lon_deg: -6.6680
+    height_m: 30
+    source: "Purdy 1825, p. 152: from Old Mamora the coast extends 10 leagues S.S.W. to Mehedmna, or New Mamora, very clear and readily known, white sand to the middle of its height and cliffs above; the town from the shore to the top of the highest land, the walls of an old castle in its upper part seen from the offing; Jackson 1809, l. 4257 to 4264 and 605 to 608: sixty-five miles from El Araiche, a poor neglected place, the port evacuated and foreign commerce annihilated since the Portuguese quitted it; the height FROM MEMORY"
+    says: "Mehedia, or New Mamora, its old castle's walls on the top of the hill over the Seboo's mouth; a poor place, with no trade."
+  - id: mamora-road
+    kind: road
+    name: the road of Mamora
+    lat_deg: 34.2850
+    lon_deg: -6.7050
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "sand"
+    source: "Purdy 1825, p. 152: ships may anchor at half a league from shore in 11 or 12 fathoms, sandy ground; but when the wind blows from the offing, and sometimes in fair weather, the swell is very great; the best anchorage with the town from S.E. by E. to S.E. by S."
+    says: "Mamora road in eleven or twelve fathoms, sand, with the town south-east: a great swell sets in whenever the wind is from the sea."
+    fix: "half a league north-west of the town in the grid's 23 m (12 fathoms)"
+  - id: seboo-bar
+    kind: shoal
+    name: the bar of the Seboo
+    modern: the mouth of the Sebou
+    lat_deg: 34.2706
+    lon_deg: -6.6790
+    height_m: 0
+    source: "Purdy 1825, p. 152: the river Seboo, on which the town is situate, impassable except in boats or on rafts at some distance from the sea, though navigable near the ocean; Jackson 1809, l. 4295 to 4298: the sand bank at the mouth has partially disappeared, and the river might be made navigable for ships of 200 tons"
+    says: "The bar of the Seboo, crossed by boats; the river within is navigable near the sea."
+    fix: "the grid's least water across the mouth, under a metre; the river within is the grid's land (a finding)"
