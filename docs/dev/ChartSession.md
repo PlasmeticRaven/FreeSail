@@ -206,8 +206,8 @@ changed lasts until the next event of the record. (3) The regimes' blockade stat
 step, changed in that one reader alone; say what it moves. (4) **Left on the calendar:** a
 light's years, the private signal tables' months, the market's season, a hull's wear. (5)
 The fault you found is mended by (1): a director's `closed_to` on a port with dated rows
-is no longer overwritten at the day's turn; pin it. (6) `test_dated_rows_turn_with_the_
-worlds_day` is superseded by design, old beside new: held without the key, turning with
+is no longer overwritten at the day's turn; pin it. (6) The test
+`test_dated_rows_turn_with_the_worlds_day` is superseded by design, old beside new: held without the key, turning with
 it; truth 7-530 and package 105's truths by the start's day stand. (7) **Not in this
 step:** a writer for a port's holder or a war in play (the director's forms, the state's
 own motions) is the review portion's to design (packages 103b and 92); say in the notes
