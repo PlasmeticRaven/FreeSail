@@ -30,8 +30,10 @@ hands`` beside its number, ``crew: {hands: 6, rating: able, stations: [...], too
 hands}``, is begun as any numbered request where the hands on deck are enough for it; where
 they are too few to begin it at all (`too_few_on_deck`), counting those at other work, the
 runner calls all hands for it and works it as all-hands work whose party is its number
-(`CrewRequest.as_all_hands`), piped down when it ends. A file without the key waits for hands,
-as before.
+(`CrewRequest.as_all_hands`), piped down when it ends. A file that says ``too_few: all hands
+until manned`` (the boat's: the lead's ruling 10 of 2026-11-13, one road with package 109's)
+keeps its number: the runner calls all hands to man it and pipes them down once it is manned
+(`CrewRequest.until_manned`). A file without the key waits for hands, as before.
 
 
 The order hands are taken in (spec §3.1, with the judgement noted at `_tier`):
@@ -107,6 +109,8 @@ SHORT_HANDED_SHARE = 0.5
 ALL = "all"  # hands: all
 TOPMEN = "topmen"  # the topmen of the subject's mast, then the other tops
 ALL_HANDS = "all hands"  # everyone fit
+# too_few: all hands called to man the work, piped down once it is manned (`until_manned`)
+UNTIL_MANNED = "all hands until manned"
 DEFAULT_RATING = Rating.ORDINARY
 
 # The top each mast's topmen work in; a mast not listed (the bowsprit) has none.
@@ -142,6 +146,10 @@ class CrewRequest:
     # few to begin it, all hands are called for it (`too_few_on_deck`, `as_all_hands`; package
     # 75, the lead's ruling (1) of 2026-11-10, a small company's work at her great sail)
     calls_all_hands: bool = False
+    # with `too_few: all hands until manned`, the hands called for it are piped down once it is
+    # manned, its own number told off, and not when it ends; it is never all-hands work (the
+    # boat's crew; package 75, the lead's ruling 10 of 2026-11-13)
+    until_manned: bool = False
 
     @property
     def all_hands(self) -> bool:
@@ -191,12 +199,14 @@ class CrewRequest:
                 )
             party = raw_party
         raw_too_few = mapping.get("too_few")
-        calls = False
+        calls = until_manned = False
         if raw_too_few is not None:
-            if str(raw_too_few).strip().lower() != ALL_HANDS:
+            said = " ".join(str(raw_too_few).lower().split())
+            if said not in (ALL_HANDS, UNTIL_MANNED):
                 raise CrewRequestError(
                     f"The crew line says {raw_too_few!r} for too few hands; say 'all hands', "
-                    "or leave it out and the work waits for hands."
+                    "or leave it out and the work waits for hands ('all hands until manned' "
+                    "pipes them down once it is manned)."
                 )
             if not hands:
                 raise CrewRequestError(
@@ -204,6 +214,7 @@ class CrewRequest:
                     f"{'all' if hands is None else 'no'} hands; that is said of a number of hands."
                 )
             calls = True
+            until_manned = said == UNTIL_MANNED
         raw_rating = str(mapping.get("rating") or DEFAULT_RATING.value)
         rating = _rating_named(raw_rating)
         raw_stations = mapping.get("stations") or []
@@ -211,7 +222,12 @@ class CrewRequest:
             raw_stations = [raw_stations]
         stations = tuple(_station_word(str(s)) for s in raw_stations)
         return cls(
-            hands=hands, rating=rating, stations=stations, party=party, calls_all_hands=calls
+            hands=hands,
+            rating=rating,
+            stations=stations,
+            party=party,
+            calls_all_hands=calls,
+            until_manned=until_manned,
         )
 
 

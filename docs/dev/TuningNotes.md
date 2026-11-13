@@ -21199,6 +21199,189 @@ the captain's trials, `TRIAL_TRADE_STRANGER_DIGEST`, truth 77's digest and the g
 at the base), so there is nothing for the lead to re-pin by it; what moved is the behaviour named
 above and the pins of this subsection's own tests.
 
+## The lead's ruling 10, one road (package 75) (2026-11-13)
+
+The lead's note of 2026-11-13 at 04:11 UTC (`docs/dev/M7-WorkPackages.md`, at its end), ruling
+(10): when the trunk is next merged and package 109's step 2 is found there, the two roads for the
+hands called when the watch is too few become one, the settee's. `send_boat`'s file takes the key,
+and 109's set and its two helpers go. This holds provided truth 7-542 and the step 2 tests of
+`tests/test_mends_109.py` stand as they are: the call's line, the pipe-down, the boat away within
+minutes, the belay from the boat. Built in one local commit on the package's branch after the
+trunk's merge at caec1983 (package 109's steps 2 and 3 among it). That merge had kept both roads
+side by side in `Runner._take_hands`: the settee's first, then 109's.
+
+Measured on the owner's machine at seed 7. The scripts are in the session's scratch (`r10/oneroad/`,
+outside the repository). Each was run on the tree and on an export of caec1983, nothing else
+differing.
+
+### Why a second value of the key, and not `all hands` alone
+
+The settee's `too_few: all hands` makes the work all-hands work for its whole length, piped down
+when it ends. On the boat that keeps the hands up for her whole errand (about 49 minutes in the
+bilander's larboard watch, the scout's probe of 2026-11-13, `s13/pumps/notes.md` (i)). 109's step 2
+test wants the hands down within 1,200 s and truth 7-542 wants one pipe-down within 600 s. In
+memory, the boat's key read as `all hands` fails the step 2 test: no `crew.piped_down` in its 1,200
+s. So the key carries when the hands go below, the narrowest general form:
+
+- `too_few: all hands` (the settee's four files, unchanged): all-hands work, piped down at its end.
+- `too_few: all hands until manned` (`send_boat` alone): the same call by the same trigger. The work
+  keeps its number, and the hands are piped down once it is manned (its own number told off, or
+  begun short-handed with half, as any numbered request). Nothing names the boat. Any file may say
+  it of work whose hands, told off, leave the rest free.
+
+### What was built
+
+- **`crew/hands.py`.** `UNTIL_MANNED` and `CrewRequest.until_manned` are read by `from_mapping`
+  beside `calls_all_hands`, which both values set. A word other than the two is refused. The
+  refusal keeps its old words ("say 'all hands', or leave it out and the work waits for hands") and
+  adds "('all hands until manned' pipes them down once it is manned)".
+- **`evolutions/runner.py`, `_take_hands`.** The trigger is the settee's `_watch_too_few`
+  (`hands.too_few_on_deck`, counting hands at other work; all hands not up; not at quarters; no
+  party named). For an until-manned request, the call ("All hands! (to send boat)",
+  `_call_all_hands`) marks the work `Instance.held_up` on its numbered request, and the work waits on
+  that pass, as 109's did. While the routine's call is under way it waits, said by the call
+  (`_manning`). Once all are up, or after a pipe-down by order before it was manned, it waits with
+  the waiting line, as before, and does not call them again itself (109's way). When its request
+  can be begun, it begins, `_after_all_hands` pipes down and the mark is cleared, so its end pipes
+  down nothing. The pipe-down is not made where the captain's own order called all hands, where
+  other all-hands work has them, or where work waiting would be too few the moment they went below
+  (the settee's own guard).
+- **`_after_all_hands`.** The gate reads `all_hands or held_up` (it read `all_hands or (waiting and
+  held_up)`; the same for every settee path, since held-up settee work that begins is all-hands
+  work). Until-manned work waiting its turn, which the pipe-down would leave too few, is held up on
+  its number, not made all-hands work, and counts as all-hands work waiting does.
+- **Gone:** `CALLS_HANDS_WHEN_SHORT`, `HANDS_CALLED_FOR`'s road, `_hands_called_for` and
+  `_pipe_down_after`.
+- **`data/evolutions/send_boat.yaml`.** The crew line takes `too_few: all hands until manned`. The
+  served head gains one sentence in the period's words, marked judgement. The build notes sit below
+  a blank line.
+- **Old saves.** `Instance.__setstate__` reads 109's mark (`hands_called_for` on the params, kept as
+  `_TRUNK_HANDS_CALLED_FOR`) as the new road's mark of the same call: `held_up` set, the mark
+  dropped. An instance without it loads as it was.
+- **New test:** `tests/test_hands.py`, `test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_call_loads`
+  (the value read and refused, the boat's file alone saying it, a trunk instance with the mark loaded
+  through the checkpoint's pickler). In memory it was broken three ways. Without the mapping, the
+  new test fails. With the boat's key read as `all hands` (as above), or with no pipe-down once
+  manned, 109's step 2 test fails.
+
+### Measured, the caec1983 export beside the tree
+
+Channel east, Brixham road. Each ship is let go at anchor 2 h 10 min before the time named and run
+there; then `go ashore`, run until she is hoisted in. Each line's tick is from the order. The send
+wants six of the bilander's and the smack's companies (eleven, clamped) and eleven of the merchant
+brig's.
+
+| Case | On deck | The call | Pipe-down | Begun | Away | In |
+|---|---|---|---|---|---|---|
+| bilander, starboard watch by night (02:30) | 3 | none | none | +1, three, short | +773 | +3,753 |
+| bilander, starboard watch by day (09:30) | 4 (the cook up) | none | none | +1, four, short | +690 | +3,558 |
+| bilander, larboard watch by night (04:30) | 2 | +1 "All hands! (to send boat)" | +1 "Piped down; the larboard watch has the deck." | +1, four, short | +401 | +3,021 |
+| bilander, larboard watch by day (13:30) | 3 (the cook up) | none | none | +1, three, short | +812 | +3,865 |
+| smack, larboard watch (05:30) | 2 | +1, the same line | +1, the same line | +1, four, short | +472 | +3,150 |
+| merchant brig, larboard watch (05:30) | 3 | +1, the same line | +1, the same line | +1, six, short | +516 | +3,236 |
+| merchant brig, larboard watch (13:30) | 4 | +1, the same line | +1, the same line | +1, seven, short | +525 | +3,278 |
+
+**Old and new, every one of the seven: the whole log's digest the same, line for line and every
+data field.** So is 109's own case (`tests/test_mends_109.py`, at 04:10: the call, "Only four hands
+to send boat", the pipe-down and the start at +1, away at +401). On the call's tick the order is the
+call, the short-handed line, the pipe-down, then "Away the long-boat's crew!", as 109's. The
+smack's and the merchant brig's boats call in their short watches on caec1983 already, by 109's
+road, where before it they waited. This commit leaves them as they are. The settee's four orders
+sailed in her larboard watch by night (00:00) and by day (08:00), as `tests/test_bilander.py` sails
+them, are the same, call for call and tick for tick (87, 100, 338 and 225 s; 183, 198, 275 and 176
+s).
+
+**An old save.** On the export, the bilander at 04:30, one hand of her larboard watch made busy, and
+the call bringing one hand at once (both in the writing process alone), holds her mid-call with
+109's mark for 30 s. A checkpoint is taken at +5 s and the run continued 4,000 s. The checkpoint
+loaded on this tree loads `held_up`, the mark gone, and runs on to the same digest as the export's
+own run on, line for line. There "Only three hands to send boat", the pipe-down and the start come
+at +26 s from the checkpoint and the boat is in at +3,303. Loaded with the mapping left out, it says
+"Not hands enough on deck to send boat; there are but two to spare." at +1, begins at +26 with no
+pipe-down, and keeps all hands up ("All hands on deck." at +85).
+
+**The captain's pipe-down mid-call** (the same busy hand, "send the boat ashore", "pipe down" at +5
+s): on both trees, the call at +1, the pipe-down at +5, and at +6 "Not hands enough on deck to send
+boat; there are but one to spare.", the call not made again. **A brace waiting before the boat**
+("brace the fore yard aback" and "send the boat ashore" 3 s after, the bilander at 04:30 and the
+merchant brig at 05:30): the same on both trees.
+
+**Where the one road differs from 109's, measured:** work that called all hands, with the boat
+waiting behind it. "set the mainsail" (the settee, all hands called) and "go ashore" 10 s after,
+the bilander at 04:30. In both, the boat says "Not hands enough on deck to send boat; the watch is
+setting the mainsail." at +11 and the mainsail is set at +157.
+
+- Old: "Piped down" at +157, "All hands! (to send boat)" at +157 again, "Only four hands to send
+  boat" and a second "Piped down" at +158, the boat begun then with four and away at +558.
+- New: the settee's guard holds the hands up for her (`_too_few_piped_down`), so there is one call
+  and one pipe-down at +157, she is begun on that tick with six, and she is away at +554.
+
+**By reading, not met in any measured case:**
+
+- **The trigger** is the settee's. A deck too few counting hands at other work, some of them at
+  work, calls where 109's waited ("the watch is ..."). An order naming its own party (`hands_from`)
+  waits where 109's called.
+
+### Pins
+
+- **One test fails as it stands, and is left unedited for the lead's ruling:**
+  `tests/test_settee.py`, `test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few`.
+  Its `assert calling == set(SETTEE_FILES)` (the files whose crew line says `too_few`) now finds
+  `send_boat` too, which the ruling gives the key. No other way keeps both: the key is read from
+  the crew line, where the test looks. Proposed, old beside new: `assert calling ==
+  set(SETTEE_FILES)` becomes `assert calling == set(SETTEE_FILES) | {"send_boat"}`, the docstring's
+  "the four settee files, and no other evolution file, say `too_few: all hands`" becoming "the four
+  settee files say `too_few: all hands`, and the boat's alone `too_few: all hands until manned` (the
+  lead's ruling 10)". The test's other clauses hold. The docstring of
+  `tests/test_hands.py`'s key test ("no file but the settee's four carries it") is left as it is,
+  with that test.
+- **No line of the boat's moved**, and no digest, tick or line count in any measured case.
+  109's tests and truth are unedited and pass.
+
+### The suites, as run
+
+At caec1983 with this step's changes, in the tree, one at a time from its root with nothing else
+running (`py`, the tree first on the path; four workers, `--dist loadgroup`). The bases are the
+last step's, at 2d2bbd8b, not run again (`s13/final-fast.xml`, `s13/final-slow.xml`, the four
+logs and the trials of `s13/final/`). The script is `r10/oneroad/runs/run.sh`.
+
+- **The slow tier of the named files and the known truths whole** (`--slow -m "not pace"`, 61
+  minutes): `test_mends_109`, `test_settee`, `test_bilander`, `test_hands`, `test_hull_smack`,
+  `test_hull_brig` (the merchant brig's), `test_known_truths`, `test_replay`, `test_checkpoint`,
+  and the boat's errand in `test_ports`, `test_boat_director`, `test_boat_hull`,
+  `test_orders_places`, `test_crew_orders` and `test_routine`. Result: 908 passed, 8 failed, 1
+  skipped, 8 xfailed.
+  - Against the bases, two outcomes changed. One is `test_settee`'s case above, for the lead.
+  - The other is `test_replay`'s fingerprint case, `a0f20ca386ea907c` against `7a100158e31e7910`.
+    It reads the tree's fingerprint at its process's start and again at its end, and a comment of
+    `runner.py` was reworded while it ran. Run alone afterwards with the tree at rest, the file
+    passes, 22 of 22.
+  - The other six failures are the base's, with the same figures: truth 77's 2e93986c2989d831, the
+    merchant's [16200, 96480], the schooner on an intent, the schooner's 767 lines, and truths 78
+    and 79's [57, 100918].
+  - 92 cases were only in this run, all passed. They are the trunk's (`test_mends_109`, truths
+    7-50x, 7-53x, 7-54x, 7-56x and 7-58x), the slow cases of files outside the base's slow list
+    (`test_hands`, `test_routine`, `test_ports`, `test_orders_places` and `test_crew_orders`), and
+    the new one.
+- **The fast tier of the boat's errand, the saves, the served catalogue and the documents'
+  readers** (28 minutes): 55 files, among them `test_aboard_another`, `test_agents`,
+  `test_business`, `test_letters`, `test_prizes`, `test_tow`, `test_captain`, `test_crews`,
+  `test_driver`, `test_people`, `test_in_world`, `test_catalogue`, `test_evolutions`, `test_primer`
+  and the rest of the 27 that read the notes or the designs (four are in the slow tier above).
+  Result: 4,226 passed, 1 xfailed. Against the base, no outcome changed, and 12 cases were only in
+  this run, all passed (the trunk's forms in `test_primer`).
+- **The captain's trials** (`--slow`): 5 passed and 3 failed, as at the base outcome for outcome and
+  digest for digest (the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf).
+- **The four whole logs** (`log_digests.py`): every field as at the base (the first action 497
+  lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the station's lee shore 1,561,
+  e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08).
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (385 files).
+
+**Moved by this step:** no recorded passage, digest, line count or tick. Nothing is left for the
+lead to re-pin by it. What moved is the one combined case above (the boat behind work that called
+all hands) and `test_settee`'s set of files, left failing for the lead's ruling.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
@@ -29743,6 +29926,16 @@ is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (
 `boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
 not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
 answers the case where she still waits.
+
+*Postscript (package 75, 2026-11-13, the lead's ruling 10 of 04:11 UTC that day):* (a)'s road is
+gone, made one with the settee's. `CALLS_HANDS_WHEN_SHORT`, `HANDS_CALLED_FOR`'s mark,
+`_hands_called_for` and `_pipe_down_after` are no longer in `evolutions/runner.py`.
+`data/evolutions/send_boat.yaml`'s crew line says `too_few: all hands until manned`
+(`hands.CrewRequest.until_manned`), and the runner calls and pipes down through the settee's
+`_watch_too_few`, `Instance.held_up`, `_manning` and `_after_all_hands`. Every line, tick and digest
+measured above is unchanged, and so are truth 7-542 and this step's tests, unedited. A checkpoint
+taken with (a)'s mark on the boat's params loads as the new road's mark. See "The lead's ruling 10,
+one road (package 75)" in these notes.
 
 **Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
 

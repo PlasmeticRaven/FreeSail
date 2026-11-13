@@ -1008,6 +1008,48 @@ def test_a_numbered_request_may_call_all_hands_where_the_deck_is_too_few_and_not
         CrewRequest.from_mapping({"hands": 0, "too_few": "all hands"})
 
 
+def test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_call_loads():
+    """Package 75, the lead's ruling 10 of 2026-11-13 (package 109's boat and the settee's key made
+    one road): a file's ``too_few: all hands until manned`` calls all hands as ``all hands`` does
+    (`CrewRequest.calls_all_hands`, `too_few_on_deck`), but the work keeps its number and the hands
+    are piped down once it is manned (`until_manned`; the runner's `_manning` and
+    `_after_all_hands`), not when it ends; the boat's file alone says it (her short watch sailed in
+    `tests/test_mends_109.py` and truth 7-542). Any other word is refused naming both. A checkpoint
+    taken on the trunk while all hands came up to man the boat by package 109's own road (its mark
+    `hands_called_for` on the work's params) loads as this road's mark of the same call
+    (`Instance.held_up`), the mark gone; an instance without it loads as it was."""
+    import io
+    import pickle
+
+    from freesail.core import replay
+    from freesail.evolutions.runner import Instance
+
+    want = CrewRequest.from_mapping({"hands": 6, "too_few": " All  hands until manned "})
+    assert want.calls_all_hands and want.until_manned and want.hands == 6 and not want.all_hands
+    assert not CrewRequest.from_mapping({"hands": 6, "too_few": "all hands"}).until_manned
+    assert not CrewRequest.from_mapping({"hands": 6}).until_manned
+    manned = {
+        eid for eid, evo in EVOLUTIONS.items() if CrewRequest.from_mapping(evo.crew).until_manned
+    }
+    assert manned == {"send_boat"}
+    assert CrewRequest.from_mapping(EVOLUTIONS["send_boat"].crew).calls_all_hands
+    with pytest.raises(CrewRequestError, match="'all hands until manned' pipes them down"):
+        CrewRequest.from_mapping({"hands": 6, "too_few": "all hands until done"})
+    with pytest.raises(CrewRequestError, match="beside all hands"):
+        CrewRequest.from_mapping({"hands": "all", "too_few": "all hands until manned"})
+
+    def loaded(params: dict[str, Any]) -> Instance:
+        inst = Instance(EVOLUTIONS["send_boat"], None, "Hopewell", params)  # type: ignore[arg-type]
+        buf = io.BytesIO()
+        replay._Pickler(buf, protocol=pickle.HIGHEST_PROTOCOL).dump(inst)
+        return replay._Unpickler(io.BytesIO(buf.getvalue())).load()
+
+    old = loaded({"errand": "prices", "hands_called_for": True})
+    assert old.held_up and old.waiting and old.params == {"errand": "prices"}
+    plain = loaded({"errand": "prices"})
+    assert not plain.held_up and plain.params == {"errand": "prices"}
+
+
 def test_three_topsails_are_reefed_together_each_up_to_its_party_and_the_surplus_goes_on():
     """Playtest 11's finding 14 and the owner's ruling (decision 28): "reef the topsails"
     on the frigate begins all three reefs on the one tick, forty hands each (the file's

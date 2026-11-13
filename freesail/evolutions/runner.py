@@ -149,11 +149,11 @@ DEFAULT_WATCH_TIME = datetime(1805, 6, 1, 4, 0, 0)
 
 # What a waiting instance waits for, besides its turn at a part another evolution holds.
 WAITING_FOR_HANDS = "hands"
-# The work for which, where the watch on deck is too few and nothing else has the hands, all
-# hands are called (package 109: the boat sent; the bilander's watch of two), and the mark
-# of the call on the work's params until her crew is told off and the hands piped down.
-CALLS_HANDS_WHEN_SHORT = frozenset({"send_boat"})
-HANDS_CALLED_FOR = "hands_called_for"
+# The mark package 109's own road (2026-11-13, gone by the lead's ruling 10 of that day) put
+# on the boat's params while all hands came up to man her: a checkpoint taken on the trunk
+# then carries it, and it is read on load as this road's mark of the same call
+# (`Instance.__setstate__`, `Instance.held_up`).
+_TRUNK_HANDS_CALLED_FOR = "hands_called_for"
 
 # How many pieces of other work a log line names before it says "at other work".
 MAX_WORK_NAMED = 3
@@ -238,14 +238,28 @@ class Instance:
     want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
-    # waiting its turn, made all-hands work before a pipe-down that would have left the watch
-    # too few for it, the hands kept up for it (`Runner._after_all_hands`; package 75)
+    # the hands are up for it and are piped down by it: waiting its turn, made all-hands work
+    # before a pipe-down that would have left the watch too few for it (`Runner._after_all_hands`;
+    # package 75); or a numbered request whose file says `too_few: all hands until manned`, the
+    # hands called to man it, until it is manned (`Runner._take_hands`; the lead's ruling 10)
     held_up: bool = False
     short_logged: bool = False
     # the precondition that failed says what was ordered is done already (package 37f)
     done_already: bool = False
     wait_line: str = ""  # the line it said when it first had to wait for hands
     given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """An instance read from a checkpoint. One taken on the trunk while all hands came up
+        to man the boat by package 109's own road carries that road's mark in its params
+        (`_TRUNK_HANDS_CALLED_FOR`): it is read as this road's mark of the same call, held up on
+        its numbered request, so that she is manned and the hands piped down as they would have
+        been (package 75, the lead's ruling 10 of 2026-11-13)."""
+        state = dict(state)
+        params = state.get("params")
+        if isinstance(params, dict) and params.pop(_TRUNK_HANDS_CALLED_FOR, None):
+            state["held_up"] = True
+        self.__dict__.update(state)
 
     @property
     def inst_id(self) -> str:
@@ -1176,11 +1190,25 @@ class Runner:
             aloft=self._aloft(inst),
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
-        if got.outcome == hands.TOO_FEW and self._watch_too_few(ship, inst, crew, want):
+        if (
+            got.outcome == hands.TOO_FEW
+            and not inst.held_up
+            and self._watch_too_few(ship, inst, crew, want)
+        ):
             # a watch too few for the work calls all hands for it, where its file says so
             # (package 75, the lead's ruling (1) of 2026-11-10: a small company's work at her
-            # great sail, the settee's files alone); it is all-hands work from here, its party
-            # its own number, and pipes down when it ends (`_after_all_hands`)
+            # great sail, the settee's files): it is all-hands work from here, its party its
+            # own number, and pipes down when it ends (`_after_all_hands`)
+            if want.until_manned:
+                # or, where the file says `all hands until manned` (the boat's: the lead's
+                # ruling 10 of 2026-11-13, one road with package 109's), it keeps its number and
+                # waits, said by the call, held up while the hands come up, and pipes down once
+                # it is manned (below)
+                inst.held_up = True
+                self._call_all_hands(ship, inst, crew)
+                inst.waiting = True
+                inst.waiting_for = WAITING_FOR_HANDS
+                return False
             want = inst.want = want.as_all_hands()
             self._call_all_hands(ship, inst, crew)
             got = hands.request(
@@ -1191,9 +1219,8 @@ class Runner:
                 self._subject_mast(ship, inst),
                 aloft=self._aloft(inst),
             )
-        if got.outcome == hands.TOO_FEW and self._hands_called_for(ship, inst, crew):
-            # the watch on deck too few to send the boat: all hands are called for her
-            # (package 109), and she waits for them to come up, said by the call
+        if got.outcome == hands.TOO_FEW and self._manning(ship, inst):
+            # called to man it: it waits for the hands still coming up, said by the call
             inst.waiting = True
             inst.waiting_for = WAITING_FOR_HANDS
             return False
@@ -1220,9 +1247,23 @@ class Runner:
         inst.all_hands = want.all_hands
         if got.outcome == hands.SHORT:
             self._note_short(ship, inst, got)
-        if inst.params.get(HANDS_CALLED_FOR):
-            self._pipe_down_after(ship, inst, crew)
+        if inst.held_up and not inst.all_hands:
+            # manned: the hands called to man it are piped down, unless the captain's own order
+            # called them or other work keeps them up (`_after_all_hands`), and it pipes down
+            # nothing more when it ends (`too_few: all hands until manned`; the lead's ruling 10)
+            self._after_all_hands(ship, inst)
+            inst.held_up = False
         return True
+
+    def _manning(self, ship: Ship, inst: Instance) -> bool:
+        """Whether this work waits, said by the call, while the hands called to man it come up:
+        held up on its numbered request (`too_few: all hands until manned`, `Instance.held_up`)
+        while the routine's call is under way (package 75, the lead's ruling 10 of
+        2026-11-13). Once all are up, or piped down by order before it was manned, it waits for
+        hands with the waiting line, as before, and does not call them again itself."""
+        if not inst.held_up or self._want(inst).all_hands:
+            return False
+        return bool(getattr(ship.extra.get("routine"), "calling", False))
 
     def _watch_too_few(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest
@@ -1251,46 +1292,6 @@ class Runner:
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
         deck = bill.on_deck_piped_down(crew, when)
         return hands.too_few_on_deck(crew, deck, want, self._aloft(inst))
-
-    def _hands_called_for(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
-        """Where the watch on deck is too few to send the boat and no other work has the
-        hands (package 109; the owner's play of 2026-11-12, note 1, the bilander's watch of
-        two; the road the lead ruled for her settee of 2026-11-10), all hands are called
-        for it: said in the log as the call, and piped down once she has her crew
-        (`_pipe_down_after`). True while the hands so called are coming up; False where the
-        call is not for this work (another ship's watch at other work waits as it did),
-        or all are up and still too few, when the waiting line is said as before."""
-        if inst.evo.id not in CALLS_HANDS_WHEN_SHORT or self._want(inst).all_hands:
-            return False
-        routine = ship.extra.get("routine")
-        if inst.params.get(HANDS_CALLED_FOR):
-            return not crew.all_hands_called and getattr(routine, "_called_at", None) is not None
-        if crew.all_hands_called or self._other_work(inst):
-            return False
-        quarters = ship.extra.get("quarters")
-        if quarters is not None and getattr(quarters, "at_quarters", False):
-            return False
-        call = getattr(routine, "call_all_hands", None)
-        if call is None:
-            return False
-        note = call(f"to {self._describe(inst)}")
-        if note is None:
-            return False
-        _record(ship, note)
-        inst.params[HANDS_CALLED_FOR] = True
-        return True
-
-    def _pipe_down_after(self, ship: Ship, inst: Instance, crew: Crew) -> None:
-        """The hands called for the boat (`_hands_called_for`) piped down once her crew is
-        told off, unless the captain called them himself or other all-hands work has them."""
-        inst.params.pop(HANDS_CALLED_FOR, None)
-        if crew.all_hands_called_by_order or self._all_hands_at_work():
-            return
-        if any(i.waiting and self._want(i).all_hands for i in self.instances):
-            return
-        pipe_down = getattr(ship.extra.get("routine"), "pipe_down", None)
-        if pipe_down is not None:
-            _record(ship, pipe_down())
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
@@ -1549,19 +1550,28 @@ class Runner:
         on the same tick (package 75, the review of the lead's ruling (1) of 2026-11-10: a furl
         ordered behind a take in, a take in behind a wear, in her larboard watch by night). Such
         work taken away before it began (refused, done already, failed or belayed) ends the call
-        as all-hands work ending would."""
+        as all-hands work ending would.
+
+        Work whose file says `too_few: all hands until manned` (the boat's) pipes down here once
+        it is manned (`_take_hands`), or taken away before it was; waiting its turn where the
+        watch would be too few for it, it keeps its number and the hands stay up for it, held up
+        until it is manned (package 75, the lead's ruling 10 of 2026-11-13)."""
         crew = self._crew(ship)
         if crew is None or self._all_hands_at_work(but=inst):
             return
-        if not (inst.all_hands or (inst.waiting and inst.held_up)):
+        if not (inst.all_hands or inst.held_up):
             return
         if crew.all_hands_called_by_order:
             return
         for i in self.instances:
             if i.waiting and i is not inst and self._too_few_piped_down(ship, i, crew):
-                i.want = self._want(i).as_all_hands()
+                if not self._want(i).until_manned:
+                    i.want = self._want(i).as_all_hands()
                 i.held_up = True
-        if any(i.waiting and i is not inst and self._want(i).all_hands for i in self.instances):
+        if any(
+            i.waiting and i is not inst and (i.held_up or self._want(i).all_hands)
+            for i in self.instances
+        ):
             return
         routine = ship.extra.get("routine")
         pipe_down = getattr(routine, "pipe_down", None)
