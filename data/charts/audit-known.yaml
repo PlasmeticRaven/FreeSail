@@ -854,7 +854,7 @@ known:
   most: 1
 - key: g-afloat:point-handia
   place: 28°04.1′N 14°30.4′W
-  reason: the grid holds Jandía's low point as water, 2.5 m, and its nearest land a kilometre north-east (JUDGEMENT the cause: the mark's fix was made against the region's build before its gauges' levels were laid); the mark is left at the pilot's place
+  reason: "the grid holds Jandía's low point as water, 2.5 m, and its nearest land a kilometre north-east (JUDGEMENT the cause, the mark's fix made against the region's build before its gauges' levels were laid); the mark is left at the pilot's place"
   owner: package 106a
   most: 1
 - key: g-afloat:san-anton-castle
