@@ -2479,7 +2479,14 @@ def ship_words(world: Any) -> str:
     parts.append(f"Her guns: {guns}." if guns else "She carries no guns.")
     crew = (getattr(ship, "extra", None) or {}).get("crew")
     if crew is not None and getattr(crew, "complement", 0):
-        parts.append(f"Her people: {crew.complement} souls by the muster.")
+        from freesail.world.transfer import on_passage
+
+        in_boat, waiting, to = on_passage(world)
+        away = ""
+        if in_boat or waiting:
+            # her men on passage to another ship of his (package 60), in neither muster
+            away = f", and {in_boat + waiting} on passage to the {to}"
+        parts.append(f"Her people: {crew.complement} souls by the muster{away}.")
     who = _commands_words(world)
     if who:
         parts.append(who)

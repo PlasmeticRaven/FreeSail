@@ -1008,6 +1008,11 @@ def _port_state(
 # ---------------------------------------------------------------------------
 
 
+# `BoatState`'s fields of package 60's transfer (the company moved by the boat), left out of a
+# checkpoint while empty.
+_TRANSFER_FIELDS = ("hands", "joining", "loads", "load_no", "load_of")
+
+
 @dataclass
 class BoatState:
     """The ship's boat on an errand, as data (a checkpoint holds it)."""
@@ -1049,6 +1054,16 @@ class BoatState:
     loads: tuple[tuple[tuple[Any, ...], tuple[Any, ...]], ...] = ()
     load_no: int = 0
     load_of: int = 0
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Her state for a checkpoint, package 60's fields left out while they are empty (the
+        lead's ruling: a checkpoint of a boat on no transfer is as it was before them; the
+        class defaults give them back on loading)."""
+        state = dict(self.__dict__)
+        for key in _TRANSFER_FIELDS:
+            if not state.get(key):
+                state.pop(key, None)
+        return state
 
     def words(self) -> str:
         if self.lost:

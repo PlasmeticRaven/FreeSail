@@ -27327,6 +27327,67 @@ alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. Not test
 of a transfer between two King's ships (no test holds it). The tree reported differs from
 ebca949a by this paragraph alone.
 
+### Steps 1 and 2 again: the lead's reading of ab0ade58 (2026-11-13)
+
+ab0ade58 was not merged: an independent reading, probing on this package's own fixtures, found
+step 2 not ready and one fault in step 1 (`docs/dev/M7-WorkPackages.md`, "Package 60, steps 1
+and 2 as reported at ab0ade58"). Mended in its order, each with a test that fails on ab0ade58.
+
+1. **A ship taken up from ordinary is woken at once, at her anchor** (`command.take_up`,
+   `_woken_at_her_anchor`). The player's own ship is skipped by `crews.crewed` and mend (C) wakes
+   only the hulls he left, so the Fly slept on in the far shape after `take command of her`;
+   woken by hand she lay adrift (no near anchor), would not box off and drove toward Mylor
+   Point. Now she is promoted in the act, and where her far body rode at an anchor her best
+   anchor is let go where she lies, veered to the scope the depth wants. Found on the way, and
+   left as it is: by the code's reading (not probed beyond the Fly), any far ship woken at an
+   anchor has no near anchor down (`crews._to_full` sets her sail "at anchor" and lets go
+   nothing); only the ship he takes up is mended here.
+2. **The tail lays up no ship he commands**: refused in words.
+3. **A load joins the receiver's watches as they stand** (`musters.join`: the smaller watch
+   first, nobody aboard moved, her routine, quarter bill and guns as they are); the giver loses
+   only those who go (`musters.take_out`, no remuster). Two hands moved 26 of the Fly's 40
+   before.
+4. **A lost boat carries nobody**: refused in the dealings' own words. `send_boat_to` itself has
+   no check of a lost boat (the road's own gap, kept as it is by the lead's ruling below; it is
+   checked by the transfer before the road is asked).
+5. **Every man told off is out of the giving muster at the order**, not the first load's alone.
+6. **Persons are rehomed before they are put aboard** (as the prizes do it); the officer a ship
+   is left to (`command_passed_to`) stays in her, refused in words.
+7. **A load is checked again as the boat comes to where the ship lay** (done, or beyond the
+   pull): "found no ship where the Sherbourne lay; she pulls back with her people", the men home
+   into their own watches and the loads not carried stood down, said in the giver's log; the
+   list of hulls he left is pruned of the gone (`crews._hulls_left_pruned`).
+
+**One road** (the lead's ruling of 17:30: extend the dealings' road, four conditions). The boat
+that carries the company is `Dealings.send_boat_to`, extended: `BoatState` gains `hands`,
+`joining`, `loads`, `load_no` and `load_of` (plain class defaults, left out of a checkpoint while
+empty by `BoatState.__getstate__`); `send_boat_to` takes `hands=`, `join=` and `loads=`; each
+load after the first goes by the same two jobs as she is back (`_next_load`). The timing is the
+road's own (hoisted out five minutes, the pull at four knots, five minutes alongside, the pull,
+hoisted in five), and the fixed quarter-hour loads of ab0ade58 are gone (`LOAD_NEAR_S`,
+`LOAD_MILE_S`, `ALONGSIDE_S`, the `transfer` job and errand, `IN_THE_BOAT`). Nothing that goes
+by the road today moves: a trip with no hands and no joiners keeps its words, its data and its
+timing, and the road's suites, package 109's tests and truth 7-542 pass as they stand. The men
+on passage are counted where a reader finds them: the giver's muster says them ("Of her company
+out of the muster: twelve hands in the boat for the Fly, three hands told off for her next
+load."), her reading says "and 15 on passage to the Fly", and the receiver berths them from the
+order. Alongside, the gangway at the order, untimed, said in both logs (accepted). Neither
+`evolutions/runner.py` nor `send_boat`'s file was touched.
+
+**Shared, not copied**: the draw (`musters.draw`, now `prizes._draw_prize_crew`'s too, its men
+as before), the joining of names (`ports._and`), the check of way on her (`boats.way_on_her`,
+`man_boat`'s own words) and the ships given (`command.given_to`). Hands no longer count the
+quarterdeck's muster rows (her officers are persons, counted once: the Sherbourne's 33 souls
+were 30). The refusals are in the world's words and name the ships that are here, none of the
+director's ("You command no ship here", "Say how the Fly is left", "'transfer twenty hands to the
+Fly'"). Truth 7-484, this package's own and not yet on the trunk, is moved to the road's terms.
+
+**Tests**: the keepers' path now runs (ten of the cutter's seamen taken out by hand first, so
+that the Fly berths the rest); the third refusal's reason and both musters pinned; the
+assertion that could not fail is gone; a fast checkpoint test with a load in the boat beside the
+slow replay; and alongside, `from X`, the lay-up tail, a receiver gone, two King's ships, way on
+her, beyond the pull, a prisoner, an observed world and a ship not his.
+
 
 
 

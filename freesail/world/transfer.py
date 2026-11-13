@@ -27,6 +27,9 @@ __all__ = [
     "LOAD_MEN",
     "TransferError",
     "berths",
+    "coming",
+    "on_passage",
+    "passage_words",
     "say_came_aboard",
     "transfer",
     "worked_by",
@@ -111,8 +114,46 @@ def _hands(hull: Any) -> list[Any]:
     return [s for s in crew.sailors if s.station is not Station.QUARTERDECK]
 
 
+def on_passage(hull: Any) -> tuple[int, int, str]:
+    """Her men in neither muster while her boat carries them (the lead's ruling on the one
+    road: counted where a reader finds them): (in her boat now, told off for her next loads,
+    the ship they go to); all nought where her boat carries none."""
+    boat = getattr(getattr(hull, "dealings", None), "boat", None)
+    if boat is None or not getattr(boat, "load_of", 0):
+        return 0, 0, ""
+    waiting = sum(len(h) for h, _ in boat.loads)
+    return len(boat.hands), waiting, str(boat.to_name or "")
+
+
+def coming(root: Any, hull: Any) -> int:
+    """The men in another ship's boat, or told off for her loads, bound for this one: hers to
+    berth from the order."""
+    hid = str(getattr(hull, "id", ""))
+    n = 0
+    for other in (getattr(root, "hulls", None) or {}).values():
+        boat = getattr(getattr(other, "dealings", None), "boat", None)
+        if boat is not None and getattr(boat, "load_of", 0) and str(boat.to_hull) == hid:
+            n += len(boat.hands) + sum(len(h) for h, _ in boat.loads)
+    return n
+
+
+def passage_words(hull: Any) -> str:
+    """The muster's line for her men on passage: 'Of her company out of the muster: twelve
+    hands in the boat for the Fly, three told off for her next load.'; "" where none are."""
+    in_boat, waiting, to = on_passage(hull)
+    if not in_boat and not waiting:
+        return ""
+    parts = []
+    if in_boat:
+        parts.append(f"{_count_words(in_boat)} in the boat for the {to}")
+    if waiting:
+        parts.append(f"{_count_words(waiting)} told off for her next load")
+    return "Of her company out of the muster: " + ", ".join(parts) + "."
+
+
 def _souls(hull: Any) -> int:
-    """Her hands and her persons aboard: what she berths."""
+    """Her hands and her persons aboard, and the men in a boat bound for her: what she
+    berths."""
     people = getattr(hull, "people", None)
     persons = 0
     if people is not None:
@@ -122,7 +163,10 @@ def _souls(hull: Any) -> int:
             for p in people.people
             if not getattr(p, "dead", False) and str(getattr(p, "hull", "") or "") == hid
         )
-    return len(_hands(hull)) + persons
+    from freesail.world.hulls import world_of
+
+    root = world_of(hull) if getattr(hull, "clock", None) is not None else None
+    return len(_hands(hull)) + persons + (coming(root, hull) if root is not None else 0)
 
 
 # -- the order's words -----------------------------------------------------------------------
@@ -299,6 +343,13 @@ def _by_the_boat(
 
     loads = _loads(men, persons)
     (first_men, first_persons), rest = loads[0], loads[1:]
+    boat = giver.dealings.boat
+    if boat.lost:
+        # in the dealings' own words (`Dealings._send_boat`); the road to another hull has no
+        # check of its own of a boat lost, and the lead's ruling keeps that road as it is
+        raise TransferError(
+            f"{boat.boat_name[:1].upper()}{boat.boat_name[1:]} is lost: {boat.words()}."
+        )
     try:
         sent, _ = giver.dealings.send_boat_to(
             receiver,

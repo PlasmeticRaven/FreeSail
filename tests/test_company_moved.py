@@ -442,6 +442,8 @@ def test_a_checkpoint_with_a_load_in_the_boat_carries_on_to_the_same_end(tmp_pat
     assert cutter.dealings.boat.hands
     cp = replay.write_checkpoint(w, tmp_path / "load.checkpoint")
     _header, resumed = replay.read_checkpoint(cp)
+    assert len(resumed.first_hull.dealings.boat.hands) == len(cutter.dealings.boat.hands) == 12
+    assert TR.on_passage(resumed.first_hull) == TR.on_passage(cutter) == (12, 3, "Fly")
     for world in (w, resumed):
         _until_home(world, world.first_hull)
     fid = str(fly.id)
@@ -449,6 +451,46 @@ def test_a_checkpoint_with_a_load_in_the_boat_carries_on_to_the_same_end(tmp_pat
     assert len(TR._hands(resumed.first_hull)) == len(TR._hands(cutter))
     lines = [x.text for x in _came_aboard(fly)]
     assert [x.text for x in _came_aboard(resumed.hulls[fid])] == lines and len(lines) == 2
+
+
+def test_the_men_on_passage_are_counted_where_a_reader_finds_them():
+    """The lead's ruling on the one road: the hands in the boat and those told off for her next
+    load are in neither muster, but the giver's muster says them, her reading counts them as
+    her people on passage, and the receiver berths them from the order."""
+    from freesail.api.queries import muster_lines
+    from freesail.api.readings import ship_words
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    souls = TR._souls(fly)
+    e = w.submit("transfer fifteen hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    said = muster_lines(cutter)
+    want = "Of her company out of the muster: twelve hands in the boat for the Fly, three hands "
+    assert any(line.startswith(want) for line in said), said
+    assert "souls by the muster, and 15 on passage to the Fly." in ship_words(cutter)
+    assert TR._souls(fly) == souls + 15
+    _until_home(w, cutter)
+    assert TR.on_passage(cutter) == (0, 0, "") and TR._souls(fly) == souls + 15
+    assert not any("out of the muster" in line for line in muster_lines(cutter))
+
+
+def test_a_boat_on_no_transfer_checkpoints_as_before_and_an_old_state_loads():
+    """The lead's ruling on the one road: `BoatState`'s transfer fields stay out of a checkpoint
+    while empty (a boat on any other errand pickles as before them), and a state written before
+    them loads with them empty."""
+    import pickle
+
+    from freesail.world.ports import _TRANSFER_FIELDS, BoatState
+
+    away = BoatState(away=True, errand="to_ship", to_hull="ship-1", to_name="Fly")
+    state = away.__getstate__()
+    assert not set(_TRANSFER_FIELDS) & set(state)
+    old = BoatState.__new__(BoatState)
+    old.__dict__.update(state)  # as a checkpoint from before them holds her
+    back = pickle.loads(pickle.dumps(old))
+    assert back == away and back.hands == () and back.load_of == 0
+    moving = BoatState(away=True, hands=("a hand",), load_no=1, load_of=2)
+    assert {"hands", "load_no", "load_of"} <= set(moving.__getstate__())
 
 
 @pytest.mark.slow

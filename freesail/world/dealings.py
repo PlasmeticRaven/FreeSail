@@ -3363,7 +3363,7 @@ class Dealings:
         sent for stepping into her there, back alongside and hoisted in; two jobs of the
         port's kind at the boat's pace (`Job(kind="boat_to")`), on an awake hull as on a
         sleeping one, since a boat's pull between two ships wants no hands' evolution to
-        show. Refused in words with no boat, the boat lost or away, the other hull beyond the
+        show. Refused in words with no boat, the boat away, the other hull beyond the
         reach, or nobody to carry or fetch.
 
         Package 60, step 2 (the company moved, by this road): `hands`, men of her muster taken
@@ -3378,9 +3378,6 @@ class Dealings:
         boat = self.boat_spec()
         if boat is None:
             raise OrderError("She carries no boat: the ship's file lists none.")
-        if self.boat.lost:
-            head = f"{boat.name[:1].upper()}{boat.name[1:]}"
-            raise OrderError(f"{head} is lost: {self.boat.words()}.")
         if self.boat.away:
             raise OrderError(f"{boat.name[:1].upper()}{boat.name[1:]} is away already.")
         if target is None or getattr(target, "position", None) is None or world.position is None:
