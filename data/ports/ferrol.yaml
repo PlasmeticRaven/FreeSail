@@ -128,3 +128,12 @@ crew_pool:
   landsman: {hands: 16, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: south of Cape
+# Prioriño and up mid-channel, the Muela a cable and a half off, as the pilot has it.
+tracks:
+  to_sea: [43 26.66 N 8 20.93 W, 43 26.11 N 8 22.82 W]
+  from_sea: [43 26.11 N 8 22.82 W, carino-road]
+  in: [carino-road, 43 27.61 N 8 17.07 W, 43 28.31 N 8 14.97 W, ferrol-road]

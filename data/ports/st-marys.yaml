@@ -126,3 +126,13 @@ crew_pool:
   landsman: {hands: 6, pounds: 1, delay_h: 6}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: by St Mary's Sound,
+# the Woolpack and the Spanish Ledge to starboard and the Bartholomew to larboard, Peninnis
+# eight cables off, as the pilot has it.
+tracks:
+  to_sea: [49 51.35 N 6 17.84 W]
+  from_sea: [49 51.35 N 6 17.84 W, 49 54.12 N 6 19.62 W]
+  in: [49 54.12 N 6 19.62 W, 49 55.47 N 6 19.54 W, st-marys-road]

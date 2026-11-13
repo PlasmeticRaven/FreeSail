@@ -142,7 +142,16 @@ crew_pool:
 
 closed_to: []                    # the table's war with Britain makes the stance
 
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: the Jardin and
+# Cézembre to larboard as the pilot leaves them, but along the coast from the bay of La
+# Fresnaye (the outer road) and not by the Great Gate's transit: the grid's water.
+# The tracks before, which the guard refused:
+#   to_sea: [st-malo-road, 48 39 N 2 03 W, 48 40 N 2 04 W, 48 41 N 2 05 W]
+#   from_sea: [48 41 N 2 05 W, 48 40 N 2 04 W, 48 39 N 2 03 W, st-malo-road]
+#   in: [st-malo-road]
 tracks:
-  to_sea: [st-malo-road, 48 39 N 2 03 W, 48 40 N 2 04 W, 48 41 N 2 05 W]
-  from_sea: [48 41 N 2 05 W, 48 40 N 2 04 W, 48 39 N 2 03 W, st-malo-road]
-  in: [st-malo-road]
+  to_sea: [48 38.99 N 2 03.80 W, 48 39.81 N 2 15.87 W, 48 42.13 N 2 14.78 W]
+  from_sea: [48 42.13 N 2 14.78 W, baie-de-la-fresnaye]
+  in: [baie-de-la-fresnaye, 48 38.92 N 2 02.59 W, 48 38.72 N 2 02.29 W]

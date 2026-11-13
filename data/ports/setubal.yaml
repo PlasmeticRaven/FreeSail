@@ -106,3 +106,12 @@ crew_pool:
   landsman: {hands: 12, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: by Outão, three
+# cables off its tower; the pilot's marks are transits of buildings the chart lacks.
+tracks:
+  to_sea: [38 26.53 N 9 00.18 W, 38 23.63 N 9 04.72 W]
+  from_sea: [38 23.63 N 9 04.72 W, sesimbra-road]
+  in: [sesimbra-road, 38 26.03 N 9 04.42 W, 38 25.97 N 9 03.75 W, 38 29.10 N 8 55.77 W, setubal-road]

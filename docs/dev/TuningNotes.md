@@ -27699,6 +27699,82 @@ grid's water: the modern moles close them. They want either their anchorage move
 works (JUDGEMENT, not read: the harbours of the 1790s lay open where the grid has a mole) or a level-3 patch with the old
 harbour cut, which is package 113's kind of work.
 
+### Step 2b as built (the lead's rulings of 2026-11-13)
+
+**The ruling.** Build all 22. Read each track against its pilot's `channel:` words before it
+goes in: where the pilot names a side, a mark or a danger, the track keeps it; where the grid's
+water will not allow the pilot's way, the track keeps the grid's way and the notes say so.
+Genoa, Cartagena and Oran stay shut and stay listed. Package 109's step 5 is not awaited.
+
+**Each track read against its pilot.** The chart's features named in the pilot's words (the
+features files' marks) were measured against each proposed way in: the distance each lies off
+the way, and on which hand going in. Six proposals broke a pilot's word and were drawn again
+through the pilot's own points. Each segment between those points went over the same lattice
+and was simplified on its own, so the points stay marks of the way:
+- **Toulon**: the proposal ran from the Great Road over the Grosse Tour's point. Now it goes to
+  the Brothers on with Balaguier (the transit's mark) and then to the town, the Tasse 4.2
+  cables to starboard.
+- **Oporto**: the proposal left the Filgueira to starboard. Now the Filgueira is 0.6 cable to
+  larboard and the Cabedelo 3.2 to starboard.
+- **Santander**: the proposal ran over the sand bank's mark. Now it passes 1.8 cables south of
+  the Oradada and south of the bank, the bank 2.2 cables to starboard, toward Mount Castillo
+  and up to the road.
+- **Port Mahon**: the proposal ran between St Philip's ruins and their reef. Now it goes up the
+  middle of the mouth, Philipet's reef 1.5 cables to starboard and St Philip's 0.9 to larboard,
+  then by the south shore inside the Lazareto (1.4 to starboard) and the Isla del Rey (1.8).
+- **Hyères**: the proposal came by the Little Pass, the Rascas to larboard. Now it comes by the
+  Great Pass between Porquerolles and Port-Cros, Porquerolles 9 cables to larboard.
+- **St Peter Port**: the proposal came from the south. Now it comes from the north down the
+  Little Russel, Roustel 1.8 cables to larboard (JUDGEMENT: the pilot's "keep the Rousse close
+  aboard on the larboard hand, for Roustel lies in mid-channel" read so). Two marks of its way
+  in lie 37 m apart (49 29.03 and 49 29.01 N); without the first, the guard refuses the leg.
+
+**The other sixteen were kept as proposed**:
+- Dartmouth: east of the Homestone, the Blackstone 1.6 cables off.
+- St Mary's: by the Sound, the Woolpack and the Spanish Ledge to starboard, the Bartholomew to
+  larboard.
+- Poole: Old Harry to larboard.
+- Paimboeuf: the north side, the ledge to starboard.
+- Rochefort: Aix 3.4 cables to larboard, between it and the Boyart.
+- Ferrol: south of Prioriño, the Muela 1.8 cables off.
+- Lisbon: the Little Pass under São Julião.
+- Setúbal: Outão 2.9 cables off.
+- Palma: the Cuervo Marino 2.6 cables off.
+- Villefranche: by its leading mark.
+- Maddalena: round Point Liche.
+- Alghero, Civita Vecchia and Gaeta: as their pilots' words run.
+- **St Malo** keeps the Jardin and Cézembre to larboard as the pilot has them. But its way runs
+  along the coast from the bay of La Fresnaye, the file's outer road ten miles west, and not by
+  the Great Gate's transit (the grid's way, said so).
+- **Morlaix**: its pilot's marks (the beacons, the Reguel islands, Women's Island) are not among
+  the chart's features, so its sides are not checked.
+
+Each port file carries its tracks with a comment: JUDGEMENT, the grid's own water, what its
+pilot's words were read to give, and the tracks before (which the guard refused) beside them.
+
+**The three that stay shut.** Genoa, Cartagena and Oran stay in the known list, each reason
+saying so: the grid's modern mole closes the harbour; that the harbour of the 1790s lay open
+there is JUDGEMENT, not read; no anchorage moved and no patch cut; new chart work, for the cold
+review.
+
+**What moved, by design.** By the owner's standing rule, a ship drawn for a port newly open is
+the world as it should be. The busy draws of six western Channel scenarios move:
+- lugger-roscoff, by Morlaix opened;
+- merchant-brig, merchant-cutter, merchant-schooner-plymouth, merchant-ship and smack-falmouth,
+  by St Mary's opened.
+
+No test pins them; the table old beside new is above. Played again with the tracks in the port
+files, each of the nine busy scenarios draws exactly as measured with the proposals in the
+scratch trees. The six tracks drawn again are none of channel-west's.
+
+**The audit's own.**
+- The 43 entries leave the known list (21 ways in, 21 out, Paimboeuf's open), which now has 97.
+- Truth 7-563, old beside new: the ways in and out refused go from 24 and 24 to Genoa's,
+  Cartagena's and Oran's alone; the opens go from {paimboeuf, royan} to {royan}. Seven ports
+  the tracks opened are pinned clear (St Malo, Dartmouth, Toulon, Lisbon, St Mary's,
+  Maddalena, Hyères).
+- The full sweep finds the list exactly.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the

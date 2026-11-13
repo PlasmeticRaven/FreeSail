@@ -137,3 +137,12 @@ crew_pool:
   landsman: {hands: 16, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: between Aix and the
+# Boyart, Aix three or four cables to larboard, not north of Aix, as the pilot has it.
+tracks:
+  to_sea: [46 01.01 N 1 13.04 W, 46 05.19 N 1 18.00 W]
+  from_sea: [46 05.19 N 1 18.00 W, basque-road]
+  in: [basque-road, 46 00.41 N 1 10.56 W, aix-road]

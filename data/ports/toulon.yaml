@@ -111,7 +111,16 @@ crew_pool:
 
 closed_to: []
 
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: from the Great Road
+# to the Brothers on with Balaguier, clear of the Tasse four cables, then for the town, as
+# the pilot has it.
+# The tracks before, which the guard refused:
+#   to_sea: [toulon-inner-road, toulon-great-road, 43 02 N 5 56 E]
+#   from_sea: [43 02 N 5 56 E, toulon-great-road, toulon-inner-road]
+#   in: [toulon-inner-road]
 tracks:
-  to_sea: [toulon-inner-road, toulon-great-road, 43 02 N 5 56 E]
-  from_sea: [43 02 N 5 56 E, toulon-great-road, toulon-inner-road]
-  in: [toulon-inner-road]
+  to_sea: [43 05.91 N 5 54.81 E, 43 05.61 N 5 55.98 E, 43 03.49 N 5 58.88 E]
+  from_sea: [43 03.49 N 5 58.88 E, toulon-great-road]
+  in: [toulon-great-road, 43 05.91 N 5 54.81 E, toulon-inner-road]

@@ -124,3 +124,13 @@ crew_pool:
   landsman: {hands: 8, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: up the middle of
+# the mouth, Philipet to starboard and St Philip to larboard, the south shore inside the
+# Lazareto and the Isla del Rey, as the pilot has it.
+tracks:
+  to_sea: [39 52.71 N 4 17.79 E, 39 52.39 N 4 18.23 E, 39 52.33 N 4 18.39 E, 39 51.60 N 4 19.02 E, 39 52.75 N 4 22.63 E]
+  from_sea: [39 52.75 N 4 22.63 E, mahon-outer-road]
+  in: [mahon-outer-road, 39 52.33 N 4 18.39 E, 39 52.39 N 4 18.23 E, 39 52.71 N 4 17.79 E, mahon-arsenal-anchorage]

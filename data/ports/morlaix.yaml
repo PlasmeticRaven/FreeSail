@@ -115,7 +115,16 @@ crew_pool:
 
 closed_to: []
 
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: the river's mouth
+# from the north; no mark of the pilot's (the beacons, the Reguel islands, Women's Island)
+# is among the chart's features, so his sides are not checked.
+# The tracks before, which the guard refused:
+#   to_sea: [morlaix-river, 48 42 N 3 53 W]
+#   from_sea: [48 42 N 3 53 W, morlaix-river]
+#   in: [morlaix-river]
 tracks:
-  to_sea: [morlaix-river, 48 42 N 3 53 W]
-  from_sea: [48 42 N 3 53 W, morlaix-river]
-  in: [morlaix-river]
+  to_sea: [48 41.12 N 3 53.33 W, 48 41.60 N 3 53.33 W, 48 45.00 N 3 52.80 W]
+  from_sea: [48 45.00 N 3 52.80 W, 48 42.00 N 3 52.80 W]
+  in: [48 42.00 N 3 52.80 W, 48 41.57 N 3 53.33 W, 48 40.55 N 3 53.29 W, morlaix-river]

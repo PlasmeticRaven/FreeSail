@@ -116,9 +116,19 @@ crew_pool:
 
 closed_to: []
 
-# The port's tracks (spec M6 §4), for the rules-based captain's planner: out by the Range
-# to the offing south-east of the entrance, clear of the Homestone; in the reverse.
+# The port's tracks (spec M6 §4), for the rules-based captain's planner. Before package 111:
+# out by the Range to the offing south-east of the entrance, clear of the Homestone; in the
+# reverse.
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: east of the
+# Homestone and the Blackstone a cable and a half off, then the western shore, as the pilot
+# has it.
+# The tracks before, which the guard refused:
+#   to_sea: [the-range-dartmouth, 50 18 N 3 30 W]
+#   from_sea: [50 18 N 3 30 W, the-range-dartmouth]
+#   in: [dartmouth-harbour]
 tracks:
-  to_sea: [the-range-dartmouth, 50 18 N 3 30 W]
-  from_sea: [50 18 N 3 30 W, the-range-dartmouth]
-  in: [dartmouth-harbour]
+  to_sea: [50 20.62 N 3 33.88 W, 50 20.40 N 3 33.76 W, 50 20.04 N 3 32.82 W, 50 20.07 N 3 28.24 W]
+  from_sea: [50 20.07 N 3 28.24 W, the-range-dartmouth]
+  in: [the-range-dartmouth, 50 20.49 N 3 33.88 W, 50 20.90 N 3 34.19 W, dartmouth-harbour]
