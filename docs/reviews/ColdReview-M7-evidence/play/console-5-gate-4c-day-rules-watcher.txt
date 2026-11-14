@@ -1,0 +1,697 @@
+Scenario: The gate's day (data/scenarios/gate-4c-day.yaml).
+The weather: From W, 17 knots (a fresh breeze) at 04:00 on 1 June, the air warm, freshening;
+  From W, 18 knots (a fresh breeze) at 14:00 on 1 June, freshening;
+  From W, 19 knots (a fresh breeze) at 19:30 on 1 June, veering 2 points and freshening;
+  From WNW, 29 knots (a moderate gale) at 22:00 on 1 June, the air neutral, veering 2 points and freshening;
+  From NW, 36 knots (a fresh gale) at 00:00 on 2 June, freshening;
+  From NW, 45 knots (a strong gale) at 01:00 on 2 June, steady;
+  From NW, 45 knots (a strong gale) at 03:00 on 2 June, easing;
+  From NW, 26 knots (a strong breeze) at 05:00 on 2 June, easing;
+  to NW, 18 knots (a fresh breeze) at 07:00 on 2 June.
+The systems (the sky and the glass):
+  the low (low, radius 420 km): 1004 hPa at 12:00, 988 hPa at 07:00, 9 waypoints.
+  the old ridge (high, radius 800 km): 1022 hPa at 12:00, 1018 hPa at 12:00, 3 waypoints.
+  the ridge (high, radius 900 km): 1024 hPa at 00:00, 1026 hPa at 09:00, 2 waypoints.
+She carries a glass.
+* Morning watch, 8 bells (04:00)  The gate's day. Wind W, 17 knots, a fresh breeze. Heading SE (135°).
+  Morning watch, 8 bells (04:00)  The watcher takes the station; sampled every glass and on notable and urgent events.
+  Morning watch, 8 bells (04:00)  Order: standing order "night routine": at sunset then take in the studdingsails; take in the royals.
+  Morning watch, 8 bells (04:00)  Standing order 'night routine' entered in the book: at sunset then take in the studdingsails; take in the royals.
+  Morning watch, 8 bells (04:00)  Order: standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals.
+  Morning watch, 8 bells (04:00)  Standing order 'morning sail' entered in the book: at sunrise, if the true wind is under 20 knots then set the royals.
+  Morning watch, 8 bells (04:00)  Order: standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef.
+  Morning watch, 8 bells (04:00)  Standing order 'shorten sail for weather' entered in the book: when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef.
+  Morning watch, 8 bells (04:00)  Order: standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point.
+  Morning watch, 8 bells (04:00)  Standing order 'keep her full' entered in the book: when the apparent wind is forward of 55 degrees then bear away one point.
+  Morning watch, 8 bells (04:00)  Order: standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails.
+  Morning watch, 8 bells (04:00)  Standing order 'trim on a shift' entered in the book: when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails.
+  Morning watch, 8 bells (04:00)  Order: standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets.
+  Morning watch, 8 bells (04:00)  Standing order 'tend the sheets' entered in the book: every glass, if the manoeuvre in hand is not hove to then trim the sheets.
+  Morning watch, 8 bells (04:00)  Order: standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails.
+  Morning watch, 8 bells (04:00)  Standing order 'heavy weather' entered in the book: when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails.
+  Morning watch, 8 bells (04:00)  Order: standing order "gale canvas": when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail.
+  Morning watch, 8 bells (04:00)  Standing order 'gale canvas' entered in the book: when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail.
+  Morning watch, 8 bells (04:00)  Order: standing order "make sail after the gale": when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the storm staysails; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail.
+  Morning watch, 8 bells (04:00)  Standing order 'make sail after the gale' entered in the book: when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the storm staysails; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail.
+  Morning watch, 8 bells (04:00)  Order: standing order "topgallants again": when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants.
+  Morning watch, 8 bells (04:00)  Standing order 'topgallants again' entered in the book: when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants.
+  Morning watch, 8 bells (04:00)  Order: set plain sail.
+  Morning watch, 8 bells (04:00)  Order: set the royals.
+FreeSail console. Seed 7. Morning watch, 8 bells (04:00). Type 'help' for driver commands, 'go' to start the clock.
+The book holds 10 standing orders; 'standing orders' lists them.
+Following the Amazon.
+Morning watch, 8 bells (04:00)
+Wind W, 17 knots, a fresh breeze
+Day. Sunrise 03:56, sunset 19:58; civil twilight from 03:13 and until 20:41.
+The glass 30.01; overcast, fine; the horizon.
+Amazon: heading SE (135°), speed 0.0 kn, leeway 0°, heel 0°
+Apparent wind 0° on the starboard bow, 0.0 kn; helm +0°
+Sail set: none; unbent: fore.storm_staysail, mizzen.storm_staysail, storm_mizzen, ringtail, fore.save_all.starboard, fore.save_all.larboard
+Watch on deck: starboard, 111 hands, 111 at work (12 at the foresail, 12 at the mainsail, 12 at the fore topsail, 12 at the main topsail, 12 at the mizzen topsail, 12 at the fore topgallant, 12 at the main topgallant, 7 at the mizzen topgallant, 6 at the fore topmast staysail, 6 at the jib, 8 at the spanker); idlers below.
+The watcher: stationed.
+The clock runs at 1x; no sample is open.
+Standing orders (10):
+  "night routine" (the captain): at sunset then take in the studdingsails; take in the royals. Standing; never fired.
+  "morning sail" (the captain): at sunrise, if the true wind is under 20 knots then set the royals. Standing; never fired.
+  "shorten sail for weather" (the captain): when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef. Standing; never fired.
+  "keep her full" (the captain): when the apparent wind is forward of 55 degrees then bear away one point. Standing; never fired.
+  "trim on a shift" (the captain): when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails. Standing; never fired.
+  "tend the sheets" (the captain): every glass, if the manoeuvre in hand is not hove to then trim the sheets. Standing; never fired.
+  "heavy weather" (the captain): when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails. Standing; never fired.
+  "gale canvas" (the captain): when the true wind exceeds 36 knots for 5 minutes then take in the jib; take in the spanker; take in the mainsail. Standing; never fired.
+  "make sail after the gale" (the captain): when the fore storm staysail is set and the true wind is under 25 knots for 30 minutes then take in the storm staysails; sway up the topgallant masts; shake out the reefs in the topsails; set plain sail. Standing; never fired.
+  "topgallants again" (the captain): when the fore topsail is set and the fore topsail is not reefed and the fore topgallant is not set and the true wind is under 22 knots for 10 minutes then set the topgallants. Standing; never fired.
+  Morning watch (04:00)  Hands aloft to loose the foresail.
+  Morning watch (04:00)  Hands aloft to loose the mainsail.
+  Morning watch (04:00)  Hands aloft to loose the fore topsail.
+  Morning watch (04:00)  Hands aloft to loose the main topsail.
+  Morning watch (04:00)  Hands aloft to loose the mizzen topsail.
+  Morning watch (04:00)  Hands aloft to loose the fore topgallant.
+  Morning watch (04:00)  Hands aloft to loose the main topgallant.
+  Morning watch (04:00)  Only seven hands to the mizzen topgallant; the rest are setting the foresail, the mainsail and the fore topsail and at other work.
+  Morning watch (04:00)  Hands aloft to loose the mizzen topgallant.
+  Morning watch (04:00)  Clear away the fore topmast staysail; man the halyards.
+  Morning watch (04:00)  Clear away the jib; man the halyards.
+  Morning watch (04:00)  Only eight hands to the spanker; the rest are setting the foresail, the mainsail and the fore topsail and at other work.
+  Morning watch (04:00)  Hands to the spanker halyards and outhaul.
+* Morning watch (04:00)  Setting the royals: not hands enough for all at once; the watch takes the sails in turn.
+  Morning watch (04:00)  Not hands enough on deck to set the main royal; the watch is setting the foresail, the mainsail and the fore topsail and at other work.
+  Morning watch (04:00)  Not hands enough on deck to set the mizzen royal; the watch is setting the foresail, the mainsail and the fore topsail and at other work.
+  Morning watch (04:00)  Leeway 27° to larboard.
+  Morning watch (04:01)  Laid aloft and loosed the main topsail.
+  Morning watch (04:01)  Laid aloft and loosed the mizzen topsail.
+  Morning watch (04:01)  Leeway 18° to larboard.
+  Morning watch (04:01)  Laid aloft and loosed the foresail.
+  Morning watch (04:01)  Laid aloft and loosed the mainsail.
+  Morning watch (04:01)  Laid aloft and loosed the fore topsail.
+  Morning watch (04:02)  Cast off the gaskets and cleared away the brails of the spanker.
+  Morning watch (04:02)  Laid aloft and loosed the fore topgallant.
+  Morning watch (04:02)  Leeway 9° to larboard.
+* Morning watch (04:02)  Set the fore topmast staysail.
+* Morning watch (04:02)  Set the jib.
+  Morning watch (04:02)  Hands to the fore royal halyard; sway up the yard.
+  Morning watch (04:02)  Hands to the main royal halyard; sway up the yard.
+  Morning watch (04:02)  Hands to the mizzen royal halyard; sway up the yard.
+  Morning watch (04:03)  Laid aloft and loosed the main topgallant.
+* Morning watch (04:03)  Set the foresail.
+* Morning watch (04:03)  Set the mainsail.
+  Morning watch (04:03)  Leeway 3° to larboard.
+  Morning watch (04:04)  The sky hazy.
+  Morning watch (04:04)  Drizzle.
+* Morning watch (04:04)  Set the main topsail.
+* Morning watch (04:04)  Set the mizzen topsail.
+  Morning watch (04:04)  Leeway 1° to larboard.
+  Morning watch (04:05)  Laid aloft and loosed the mizzen topgallant.
+* Morning watch (04:05)  Set the fore topsail.
+  Morning watch (04:05)  Swayed up the fore royal's yard from the deck with the sail bent.
+  Morning watch (04:05)  Swayed up the main royal's yard from the deck with the sail bent.
+  Morning watch (04:05)  Swayed up the mizzen royal's yard from the deck with the sail bent.
+* Morning watch (04:07)  Set the spanker.
+* Morning watch (04:07)  Set the fore royal, flying.
+* Morning watch (04:07)  Set the main royal, flying.
+* Morning watch (04:07)  Set the mizzen royal, flying.
+* Morning watch (04:07)  Set the fore topgallant.
+* Morning watch (04:09)  Set the main topgallant.
+  Morning watch (04:09)  Leeway nil.
+* Morning watch (04:16)  Set the mizzen topgallant.
+  Morning watch, 1 bell (04:30)  1 bell.
+  Morning watch, 1 bell (04:30)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 1 bell (04:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (04:47)  A gust: 20 knots, the mean 18.
+  Morning watch (04:52)  A gust: 22 knots, the mean 18.
+  Morning watch, 2 bells (05:00)  Hazy, drizzle; the glass 30.01.
+  Morning watch, 2 bells (05:00)  2 bells.
+  Morning watch, 2 bells (05:00)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 2 bells (05:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (05:28)  A gust: 20 knots, the mean 17.
+  Morning watch, 3 bells (05:30)  3 bells.
+  Morning watch, 3 bells (05:30)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 3 bells (05:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (05:48)  A gust: 17 knots, the mean 15.
+  Morning watch (05:52)  A gust: 17 knots, the mean 15.
+  Morning watch (05:59)  A gust: 17 knots, the mean 15.
+  Morning watch, 4 bells (06:00)  Hazy, drizzle; the glass 30.01.
+  Morning watch, 4 bells (06:00)  Idlers up.
+  Morning watch, 4 bells (06:00)  4 bells.
+  Morning watch, 4 bells (06:00)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 4 bells (06:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (06:00)  Man the spanker sheet.
+  Morning watch (06:01)  Trimmed the spanker sheet; 85° off the centreline.
+  Morning watch (06:16)  A gust: 18 knots, the mean 15.
+  Morning watch (06:24)  A gust: 20 knots, the mean 17.
+  Morning watch (06:29)  A gust: 22 knots, the mean 18.
+  Morning watch, 5 bells (06:30)  5 bells.
+  Morning watch, 5 bells (06:30)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 5 bells (06:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (06:32)  A gust: 22 knots, the mean 19.
+  Morning watch (06:43)  A gust: 20 knots, the mean 18.
+  Morning watch (06:57)  A gust: 20 knots, the mean 17.
+  Morning watch, 6 bells (07:00)  Hazy, drizzle; the glass 30.00.
+  Morning watch, 6 bells (07:00)  6 bells.
+  Morning watch, 6 bells (07:00)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 6 bells (07:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (07:00)  A gust: 20 knots, the mean 17.
+  Morning watch (07:16)  A gust: 17 knots, the mean 14.
+  Morning watch (07:28)  A gust: 19 knots, the mean 16.
+  Morning watch, 7 bells (07:30)  7 bells.
+  Morning watch, 7 bells (07:30)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 7 bells (07:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (07:33)  A gust: 19 knots, the mean 17.
+  Morning watch (07:41)  The drizzle ceased.
+  Morning watch (07:57)  A gust: 20 knots, the mean 17.
+  Forenoon watch, 8 bells (08:00)  Hazy, fine; the glass 30.01, steady since the morning watch.
+  Forenoon watch, 8 bells (08:00)  Eight bells. The larboard watch relieved the deck.
+  Forenoon watch, 8 bells (08:00)  8 bells.
+  Forenoon watch, 8 bells (08:00)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 8 bells (08:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (08:00)  Man the spanker sheet.
+  Forenoon watch (08:01)  Trimmed the spanker sheet; 83° off the centreline.
+  Forenoon watch (08:07)  A gust: 20 knots, the mean 17.
+  Forenoon watch, 1 bell (08:30)  1 bell.
+  Forenoon watch, 1 bell (08:30)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 1 bell (08:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (08:30)  Man the spanker sheet.
+  Forenoon watch (08:31)  Trimmed the spanker sheet; 85° off the centreline.
+  Forenoon watch (08:43)  A gust: 18 knots, the mean 16.
+  Forenoon watch (08:50)  A gust: 17 knots, the mean 16.
+  Forenoon watch, 2 bells (09:00)  Hazy, fine; the glass 30.00.
+  Forenoon watch, 2 bells (09:00)  2 bells.
+  Forenoon watch, 2 bells (09:00)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 2 bells (09:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch, 3 bells (09:30)  3 bells.
+  Forenoon watch, 3 bells (09:30)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 3 bells (09:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (09:30)  Man the spanker sheet.
+  Forenoon watch (09:31)  Trimmed the spanker sheet; 84° off the centreline.
+  Forenoon watch (09:40)  A gust: 21 knots, the mean 19.
+  Forenoon watch, 4 bells (10:00)  Hazy, fine; the glass 30.00.
+  Forenoon watch, 4 bells (10:00)  4 bells.
+  Forenoon watch, 4 bells (10:00)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 4 bells (10:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+Advanced 21600 ticks to Forenoon watch, 4 bells (10:00).
+Following the Amazon.
+Forenoon watch, 4 bells (10:00)
+Wind W, 20 knots, a fresh breeze
+Day. Sunrise 03:53, sunset 19:55; civil twilight from 03:10 and until 20:38.
+The glass 30.00, steady; hazy, fine; a few miles.
+Amazon: heading SE (135°), speed 7.9 kn, leeway -0°, heel -0°
+Apparent wind 111° on the starboard quarter, abaft the beam, 13.1 kn; helm +1°
+Sail set: fore.course, fore.topsail, fore.topgallant, fore.royal, main.course, main.topsail, main.topgallant, main.royal, mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, fore.topmast_staysail, jib; unbent: fore.storm_staysail, mizzen.storm_staysail, storm_mizzen, ringtail, fore.save_all.starboard, fore.save_all.larboard
+Watch on deck: larboard, 141 hands, 6 at work (6 at the spanker); idlers up.
+The watcher: stationed.
+The clock runs at 1x; no sample is open.
+  Forenoon watch, 4 bells (10:00)  Order: ask the watcher how does she do.
+  Forenoon watch, 4 bells (10:00)  Asked the watcher: how does she do?
+* Forenoon watch, 4 bells (10:00)  [watcher] You asked how does she do. The sails: plain sail and the royals set; the studdingsails, the staysails between the masts and the flying jib furled; the storm canvas and the occasional sails unbent. Wind from W, 20 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Forenoon watch (10:00)  Man the spanker sheet.
+  Forenoon watch (10:01)  A gust: 24 knots, the mean 20.
+  Forenoon watch (10:01)  Trimmed the spanker sheet; 85° off the centreline.
+  Forenoon watch, 5 bells (10:30)  5 bells.
+  Forenoon watch, 5 bells (10:30)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 5 bells (10:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (10:58)  A gust: 20 knots, the mean 17.
+  Forenoon watch, 6 bells (11:00)  Hazy, fine; the glass 30.00.
+  Forenoon watch, 6 bells (11:00)  6 bells.
+  Forenoon watch, 6 bells (11:00)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 6 bells (11:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (11:00)  Man the spanker sheet.
+  Forenoon watch (11:01)  Trimmed the spanker sheet; 84° off the centreline.
+  Forenoon watch (11:26)  A gust: 21 knots, the mean 18.
+  Forenoon watch, 7 bells (11:30)  7 bells.
+  Forenoon watch, 7 bells (11:30)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 7 bells (11:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Forenoon watch (11:30)  Man the spanker sheet.
+  Forenoon watch (11:31)  Trimmed the spanker sheet; 85° off the centreline.
+  Afternoon watch, 8 bells (12:00)  Hazy, fine; the glass 30.00, fallen a hundredth since the forenoon watch.
+  Afternoon watch, 8 bells (12:00)  Eight bells. The starboard watch relieved the deck.
+  Afternoon watch, 8 bells (12:00)  8 bells.
+  Afternoon watch, 8 bells (12:00)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 8 bells (12:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (12:00)  Man the spanker sheet.
+  Afternoon watch (12:00)  A gust: 21 knots, the mean 18.
+  Afternoon watch (12:01)  Trimmed the spanker sheet; 83° off the centreline.
+  Afternoon watch (12:08)  A gust: 20 knots, the mean 18.
+  Afternoon watch (12:10)  A gust: 19 knots, the mean 17.
+  Afternoon watch (12:11)  A gust: 19 knots, the mean 17.
+  Afternoon watch, 1 bell (12:30)  1 bell.
+  Afternoon watch, 1 bell (12:30)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 1 bell (12:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (12:30)  Man the spanker sheet.
+  Afternoon watch (12:31)  Trimmed the spanker sheet; 85° off the centreline.
+  Afternoon watch (12:51)  A gust: 20 knots, the mean 18.
+  Afternoon watch, 2 bells (13:00)  Hazy, fine; the glass 30.00.
+  Afternoon watch, 2 bells (13:00)  2 bells.
+  Afternoon watch, 2 bells (13:00)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 2 bells (13:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (13:06)  The sky overcast.
+  Afternoon watch (13:26)  A gust: 19 knots, the mean 17.
+  Afternoon watch, 3 bells (13:30)  3 bells.
+  Afternoon watch, 3 bells (13:30)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 3 bells (13:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (13:38)  A gust: 18 knots, the mean 16.
+  Afternoon watch (13:49)  A gust: 19 knots, the mean 16.
+  Afternoon watch, 4 bells (14:00)  Overcast, fine; the glass 30.00.
+  Afternoon watch, 4 bells (14:00)  4 bells.
+  Afternoon watch, 4 bells (14:00)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 4 bells (14:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch, 5 bells (14:30)  5 bells.
+  Afternoon watch, 5 bells (14:30)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 5 bells (14:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (14:30)  Man the spanker sheet.
+  Afternoon watch (14:31)  Trimmed the spanker sheet; 81° off the centreline.
+  Afternoon watch (14:50)  A gust: 18 knots, the mean 15.
+  Afternoon watch, 6 bells (15:00)  Overcast, fine; the glass 30.00.
+  Afternoon watch, 6 bells (15:00)  6 bells.
+  Afternoon watch, 6 bells (15:00)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 6 bells (15:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Afternoon watch (15:00)  Man the spanker sheet.
+  Afternoon watch (15:01)  Trimmed the spanker sheet; 85° off the centreline.
+  Afternoon watch, 7 bells (15:30)  7 bells.
+  Afternoon watch, 7 bells (15:30)  By standing order 'tend the sheets': trimming the sheets.
+  Afternoon watch, 7 bells (15:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First dog watch, 8 bells (16:00)  Overcast, fine; the glass 29.99, fallen a hundredth since the afternoon watch.
+  First dog watch, 8 bells (16:00)  Eight bells. The larboard watch relieved the deck.
+  First dog watch, 8 bells (16:00)  8 bells.
+  First dog watch, 8 bells (16:00)  By standing order 'tend the sheets': trimming the sheets.
+  First dog watch, 8 bells (16:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+Advanced 21600 ticks to First dog watch, 8 bells (16:00).
+Following the Amazon.
+First dog watch, 8 bells (16:00)
+Wind W, 21 knots, a fresh breeze
+Day. Sunrise 03:50, sunset 19:52; civil twilight from 03:07 and until 20:35.
+The glass 29.99, steady; overcast, fine; the horizon.
+Amazon: heading SE (135°), speed 8.3 kn, leeway -0°, heel -1°
+Apparent wind 111° on the starboard quarter, abaft the beam, 14.3 kn; helm +1°
+Sail set: fore.course, fore.topsail, fore.topgallant, fore.royal, main.course, main.topsail, main.topgallant, main.royal, mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, fore.topmast_staysail, jib; unbent: fore.storm_staysail, mizzen.storm_staysail, storm_mizzen, ringtail, fore.save_all.starboard, fore.save_all.larboard
+Watch on deck: larboard, 141 hands, none at work; idlers up.
+The watcher: stationed.
+The clock runs at 1x; no sample is open.
+  First dog watch (16:13)  The sky hazy.
+  First dog watch, 1 bell (16:30)  1 bell.
+  First dog watch, 1 bell (16:30)  By standing order 'tend the sheets': trimming the sheets.
+  First dog watch, 1 bell (16:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First dog watch (16:48)  A gust: 23 knots, the mean 20.
+  First dog watch, 2 bells (17:00)  Hazy, fine; the glass 29.98.
+  First dog watch, 2 bells (17:00)  2 bells.
+  First dog watch, 2 bells (17:00)  By standing order 'tend the sheets': trimming the sheets.
+  First dog watch, 2 bells (17:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First dog watch (17:15)  A gust: 23 knots, the mean 20.
+  First dog watch, 3 bells (17:30)  3 bells.
+  First dog watch, 3 bells (17:30)  By standing order 'tend the sheets': trimming the sheets.
+  First dog watch, 3 bells (17:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First dog watch (17:52)  A gust: 24 knots, the mean 22.
+  Last dog watch, 4 bells (18:00)  Hazy, fine; the glass 29.98, fallen a hundredth since the first dog watch.
+  Last dog watch, 4 bells (18:00)  Four bells. The starboard watch relieved the deck.
+  Last dog watch, 4 bells (18:00)  4 bells.
+  Last dog watch, 4 bells (18:00)  By standing order 'tend the sheets': trimming the sheets.
+  Last dog watch, 4 bells (18:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (18:12)  A gust: 23 knots, the mean 20.
+  Last dog watch, 1 bell (18:30)  1 bell.
+  Last dog watch, 1 bell (18:30)  By standing order 'tend the sheets': trimming the sheets.
+  Last dog watch, 1 bell (18:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (18:47)  A gust: 20 knots, the mean 18.
+  Last dog watch, 2 bells (19:00)  Hazy, fine; the glass 29.97.
+  Last dog watch, 2 bells (19:00)  2 bells.
+  Last dog watch, 2 bells (19:00)  By standing order 'tend the sheets': trimming the sheets.
+  Last dog watch, 2 bells (19:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (19:04)  A gust: 21 knots, the mean 18.
+  Last dog watch, 3 bells (19:30)  3 bells.
+  Last dog watch, 3 bells (19:30)  By standing order 'tend the sheets': trimming the sheets.
+  Last dog watch, 3 bells (19:30)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (19:30)  Man the spanker sheet.
+* Last dog watch (19:31)  By standing order 'trim on a shift': trimming sails.
+  Last dog watch (19:31)  Braced twelve yards to the wind, 104° on the starboard quarter, abaft the beam; trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (19:31)  Trimmed the spanker sheet; 77° off the centreline.
+  Last dog watch (19:31)  Man the spanker sheet.
+* Last dog watch (19:32)  Braced twelve yards to the wind; 26° from square.
+  Last dog watch (19:33)  Trimmed the spanker sheet; 68° off the centreline.
+  Last dog watch (19:47)  A gust: 25 knots, the mean 21.
+* Last dog watch (19:47)  The fore, main and mizzen royal masts and yards working under the press of sail.
+* Last dog watch (19:47)  By standing order 'trim on a shift': trimming sails.
+  Last dog watch (19:47)  Braced twelve yards to the wind, 110° on the starboard quarter, abaft the beam; trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  Last dog watch (19:47)  Man the spanker sheet.
+* Last dog watch (19:48)  Braced twelve yards to the wind; 20° from square.
+  Last dog watch (19:48)  Trimmed the spanker sheet; 82° off the centreline.
+* Last dog watch (19:50)  Sunset.
+  Last dog watch (19:50)  Standing order 'night routine': order not carried out ('take in the studdingsails'): Nothing done: the starboard fore lower studdingsail is already furled; the larboard fore lower studdingsail is already furled; the starboard fore topmast studdingsail is already furled; the larboard fore topmast studdingsail is already furled; the starboard fore topgallant studdingsail is already furled; the larboard fore topgallant studdingsail is already furled; the starboard main topmast studdingsail is already furled; the larboard main topmast studdingsail is already furled; the starboard main topgallant studdingsail is already furled; the larboard main topgallant studdingsail is already furled.
+* Last dog watch (19:50)  By standing order 'night routine': taking in the royals.
+  Last dog watch (19:50)  Hands to the fore royal halyard and sheet; lower away.
+  Last dog watch (19:50)  Hands to the main royal halyard and sheet; lower away.
+  Last dog watch (19:50)  Hands to the mizzen royal halyard and sheet; lower away.
+  Last dog watch (19:51)  Let go the fore royal sheet and lowered the yard.
+  Last dog watch (19:51)  Let go the main royal sheet and lowered the yard.
+  Last dog watch (19:51)  Let go the mizzen royal sheet and lowered the yard.
+* Last dog watch (19:52)  Took in the fore royal; sent down on deck with its yard.
+* Last dog watch (19:52)  Took in the main royal; sent down on deck with its yard.
+* Last dog watch (19:52)  Took in the mizzen royal; sent down on deck with its yard.
+  Last dog watch (19:56)  A gust: 24 knots, the mean 22.
+  First watch, 8 bells (20:00)  Hazy, fine; the glass 29.93, fallen 5 hundredths since the last dog watch.
+  First watch, 8 bells (20:00)  Eight bells. The larboard watch relieved the deck.
+  First watch, 8 bells (20:00)  Piped the idlers down.
+  First watch, 8 bells (20:00)  8 bells.
+  First watch, 8 bells (20:00)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 8 bells (20:00)  Trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  First watch (20:00)  Man the spanker sheet.
+  First watch (20:01)  A gust: 25 knots, the mean 22.
+  First watch (20:01)  Trimmed the spanker sheet; 82° off the centreline.
+  First watch (20:05)  The sky overcast.
+  First watch (20:05)  Drizzle.
+* First watch (20:24)  By standing order 'trim on a shift': trimming sails.
+  First watch (20:24)  Braced twelve yards to the wind, 125° on the starboard quarter, abaft the beam; trimming the sheets of the mizzen spanker; the sheets of the fore topmast staysail and the jib stand as trimmed.
+  First watch (20:24)  Man the spanker sheet.
+* First watch (20:25)  Braced twelve yards to the wind; 5° from square.
+  First watch (20:25)  Trimmed the spanker sheet; 85° off the centreline.
+  First watch, 1 bell (20:30)  1 bell.
+  First watch, 1 bell (20:30)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 1 bell (20:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch (20:32)  A gust: 28 knots, the mean 26.
+  First watch, 2 bells (21:00)  Overcast, drizzle; the glass 29.89.
+  First watch, 2 bells (21:00)  2 bells.
+  First watch, 2 bells (21:00)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 2 bells (21:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch, 3 bells (21:30)  3 bells.
+  First watch, 3 bells (21:30)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 3 bells (21:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch (21:43)  Standing order 'shorten sail for weather': order not carried out ('take in the studdingsails'): Nothing done: the starboard fore lower studdingsail is already furled; the larboard fore lower studdingsail is already furled; the starboard fore topmast studdingsail is already furled; the larboard fore topmast studdingsail is already furled; the starboard fore topgallant studdingsail is already furled; the larboard fore topgallant studdingsail is already furled; the starboard main topmast studdingsail is already furled; the larboard main topmast studdingsail is already furled; the starboard main topgallant studdingsail is already furled; the larboard main topgallant studdingsail is already furled.
+  First watch (21:43)  Standing order 'shorten sail for weather': order not carried out ('take in the royals'): Nothing done: the fore royal is already sent down; the main royal is already sent down; the mizzen royal is already sent down.
+* First watch (21:43)  By standing order 'shorten sail for weather': taking in the topgallants.
+* First watch (21:43)  By standing order 'shorten sail for weather': reefing the topsails, one reef.
+  First watch (21:43)  Hands to the fore topgallant clewlines and buntlines.
+  First watch (21:43)  Hands to the main topgallant clewlines and buntlines.
+  First watch (21:43)  Hands to the mizzen topgallant clewlines and buntlines.
+* First watch (21:43)  All hands! (to reef the fore topsail)
+  First watch (21:43)  All hands reef the fore topsail.
+  First watch (21:43)  All hands reef the main topsail.
+  First watch (21:43)  Only 28 hands to the mizzen topsail; the rest are taking in the fore topgallant, the main topgallant and the mizzen topgallant and at other work.
+  First watch (21:43)  All hands reef the mizzen topsail.
+  First watch (21:45)  All hands on deck.
+  First watch (21:45)  Clewed up the fore topgallant.
+  First watch (21:45)  Clewed up the main topgallant.
+  First watch (21:45)  Clewed up the mizzen topgallant.
+  First watch (21:45)  Settled the fore topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (21:45)  Settled the mizzen topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (21:45)  Settled the main topsail halyards and clewed down; hauled out the reef tackles.
+* First watch (21:46)  Took in the fore topgallant; hanging in the gear.
+* First watch (21:46)  Took in the main topgallant; hanging in the gear.
+* First watch (21:46)  Took in the mizzen topgallant; hanging in the gear.
+  First watch (21:49)  Laid out and passed the earings of the mizzen topsail.
+  First watch (21:49)  Laid out and passed the earings of the fore topsail.
+  First watch (21:49)  Laid out and passed the earings of the main topsail.
+  First watch (21:51)  A gust: 37 knots, the mean 31.
+* First watch (21:51)  Reefed the mizzen topsail; now set, 1 reef.
+* First watch (21:51)  Reefed the fore topsail; now set, 1 reef.
+* First watch (21:51)  Reefed the main topsail; now set, 1 reef.
+  First watch (21:51)  Piped down; the larboard watch has the deck.
+  First watch (21:52)  A gust: 36 knots, the mean 32.
+  First watch, 4 bells (22:00)  Overcast, drizzle; the glass 29.84.
+  First watch, 4 bells (22:00)  4 bells.
+  First watch, 4 bells (22:00)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 4 bells (22:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+* First watch (22:00)  By standing order 'trim on a shift': trimming sails.
+  First watch (22:00)  Braced twelve yards to the wind, 144° on the starboard quarter, abaft the beam; the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+* First watch (22:01)  Braced twelve yards to the wind; 0° from square.
+  First watch (22:16)  Standing order 'shorten sail for weather': order not carried out ('take in the topgallants'): Nothing done: the fore topgallant: The fore topgallant is in the gear; there is nothing to take in; the main topgallant: The main topgallant is in the gear; there is nothing to take in; the mizzen topgallant: The mizzen topgallant is in the gear; there is nothing to take in.
+* First watch (22:16)  By standing order 'shorten sail for weather': reefing the topsails, one reef.
+* First watch (22:16)  All hands! (to reef the fore topsail)
+  First watch (22:16)  All hands reef the fore topsail.
+  First watch (22:16)  All hands reef the main topsail.
+  First watch (22:16)  All hands reef the mizzen topsail.
+* First watch (22:16)  Wind veered to WNW, a moderate gale.
+  First watch (22:17)  All hands on deck.
+  First watch (22:17)  Settled the mizzen topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (22:17)  Settled the main topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (22:17)  Settled the fore topsail halyards and clewed down; hauled out the reef tackles.
+* First watch (22:20)  By standing order 'trim on a shift': trimming sails.
+  First watch (22:20)  Braced twelve yards to the wind, 163° astern, a little on the starboard quarter; the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch (22:21)  Laid out and passed the earings of the mizzen topsail.
+* First watch (22:21)  Braced twelve yards to the wind; 0° from square.
+  First watch (22:21)  Laid out and passed the earings of the main topsail.
+  First watch (22:21)  Laid out and passed the earings of the fore topsail.
+* First watch (22:23)  Reefed the mizzen topsail; now set, 2 reefs.
+* First watch (22:24)  Reefed the main topsail; now set, 2 reefs.
+* First watch (22:24)  Reefed the fore topsail; now set, 2 reefs.
+  First watch (22:24)  Piped down; the larboard watch has the deck.
+  First watch, 5 bells (22:30)  5 bells.
+  First watch, 5 bells (22:30)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 5 bells (22:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+* First watch (22:56)  By standing order 'shorten sail for weather': reefing the topsails, one reef.
+* First watch (22:56)  All hands! (to reef the fore topsail)
+  First watch (22:56)  All hands reef the fore topsail.
+  First watch (22:56)  All hands reef the main topsail.
+  First watch (22:56)  All hands reef the mizzen topsail.
+  First watch (22:57)  All hands on deck.
+  First watch (22:58)  Settled the mizzen topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (22:58)  Settled the main topsail halyards and clewed down; hauled out the reef tackles.
+  First watch (22:58)  Settled the fore topsail halyards and clewed down; hauled out the reef tackles.
+  First watch, 6 bells (23:00)  Overcast, drizzle; the glass 29.78.
+  First watch, 6 bells (23:00)  6 bells.
+  First watch, 6 bells (23:00)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 6 bells (23:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch (23:01)  Laid out and passed the earings of the mizzen topsail.
+  First watch (23:02)  Laid out and passed the earings of the main topsail.
+  First watch (23:02)  Laid out and passed the earings of the fore topsail.
+* First watch (23:04)  Reefed the mizzen topsail; now set, 3 reefs.
+* First watch (23:04)  Reefed the main topsail; now set, 3 reefs.
+* First watch (23:04)  Reefed the fore topsail; now set, 3 reefs.
+  First watch (23:04)  Piped down; the larboard watch has the deck.
+* First watch (23:09)  By standing order 'trim on a shift': trimming sails.
+  First watch (23:09)  Braced twelve yards to the wind, 179° right astern; the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+* First watch (23:10)  Braced twelve yards to the wind; 0° from square.
+* First watch (23:16)  Wind veered to NW, a moderate gale.
+  First watch, 7 bells (23:30)  7 bells.
+  First watch, 7 bells (23:30)  By standing order 'tend the sheets': trimming the sheets.
+  First watch, 7 bells (23:30)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+  First watch (23:32)  A gust: 42 knots, the mean 33.
+  First watch (23:35)  A gust: 42 knots, the mean 32.
+  First watch (23:43)  A gust: 42 knots, the mean 35.
+  First watch (23:56)  The sky threatening, small inky clouds.
+  First watch (23:56)  Rain set in.
+  First watch (23:59)  A gust: 44 knots, the mean 35.
+  Middle watch, 8 bells (00:00)  Threatening, small inky clouds, rain; the glass 29.71, fallen 22 hundredths since the first watch.
+  Middle watch, 8 bells (00:00)  Eight bells. The starboard watch relieved the deck.
+  Middle watch, 8 bells (00:00)  8 bells.
+  Middle watch, 8 bells (00:00)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 8 bells (00:00)  The sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
+* Middle watch (00:14)  By standing order 'gale canvas': taking in the jib.
+* Middle watch (00:14)  By standing order 'gale canvas': taking in the spanker.
+* Middle watch (00:14)  By standing order 'gale canvas': taking in the mainsail.
+  Middle watch (00:14)  Man the jib downhaul.
+  Middle watch (00:14)  Hands to the spanker brails and halyards.
+  Middle watch (00:14)  Hands to the mainsail clewlines and buntlines.
+* Middle watch (00:15)  Hauled down the jib.
+  Middle watch (00:16)  Clewed up the mainsail.
+* Middle watch (00:16)  Took in the mainsail; hanging in the gear.
+* Middle watch (00:17)  Took in the spanker.
+  Middle watch, 1 bell (00:30)  1 bell.
+  Middle watch, 1 bell (00:30)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 1 bell (00:30)  The sheet of the fore topmast staysail stands as trimmed.
+  Middle watch (00:38)  Standing order 'heavy weather': order not carried out ('close reef the topsails'): Nothing done: the fore topsail is already close reefed; the main topsail is already close reefed; the mizzen topsail is already close reefed.
+* Middle watch (00:38)  By standing order 'heavy weather': sending down the topgallant masts.
+* Middle watch (00:38)  By standing order 'heavy weather': setting the storm staysails.
+* Middle watch (00:38)  All hands! (to send down topgallant masts)
+  Middle watch (00:38)  Down topgallant masts! Topgallant and royal yardmen in the tops.
+* Middle watch (00:38)  Not hands enough on deck to bend the fore storm staysail; the watch is sending down topgallant masts.
+* Middle watch (00:38)  Not hands enough on deck to bend the mizzen storm staysail; the watch is sending down topgallant masts.
+  Middle watch (00:39)  The sky dark and gloomy, a light scud driving across.
+  Middle watch (00:39)  Squally.
+  Middle watch (00:40)  All hands on deck.
+  Middle watch (00:47)  Sent down on deck the fore topgallant yard, the fore royal yard, the main topgallant yard, the main royal yard, the mizzen topgallant yard and the mizzen royal yard, with their studding sail booms.
+  Middle watch (00:59)  Unfidded and lowered away the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast.
+* Middle watch (00:59)  Sent down the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast; the upper spars on deck.
+  Middle watch (00:59)  Piped down; the starboard watch has the deck.
+  Middle watch (00:59)  Bend sail! Rouse up the fore storm staysail from the sail room.
+  Middle watch (00:59)  Bend sail! Rouse up the mizzen storm staysail from the sail room.
+  Middle watch, 2 bells (01:00)  Dark and gloomy, a light scud driving across, squally; the glass 29.65.
+  Middle watch, 2 bells (01:00)  2 bells.
+  Middle watch, 2 bells (01:00)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 2 bells (01:00)  The sheet of the fore topmast staysail stands as trimmed.
+  Middle watch (01:01)  Man the fore topmast staysail downhaul.
+  Middle watch (01:01)  The fore topmast staysail taken in before the fore storm staysail is up: it is loaded near its rating.
+* Middle watch (01:02)  Hauled down the fore topmast staysail.
+  Middle watch (01:03)  Roused up the fore storm staysail from the sail room (No. 1 canvas, new) and swayed it aloft.
+  Middle watch (01:03)  Roused up the mizzen storm staysail from the sail room (No. 1 canvas, new) and swayed it aloft.
+* Middle watch (01:10)  Bent the fore storm staysail (No. 1 canvas, new) and furled it; 19 spare sails left in the sail room.
+* Middle watch (01:10)  Bent the mizzen storm staysail (No. 1 canvas, new) and furled it; 19 spare sails left in the sail room.
+  Middle watch (01:10)  Clear away the fore storm staysail; man the halyards.
+  Middle watch (01:10)  Clear away the mizzen storm staysail; man the halyards.
+* Middle watch (01:12)  Set the fore storm staysail.
+* Middle watch (01:12)  Set the mizzen storm staysail.
+  Middle watch (01:16)  The sky detached clouds, hard-edged and oily-looking.
+  Middle watch (01:16)  Passing showers.
+* Middle watch (01:24)  By standing order 'trim on a shift': trimming sails.
+  Middle watch (01:24)  Braced six yards to the wind, 164° astern, a little on the larboard quarter; the sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed; the topgallant and royal yards are on deck.
+* Middle watch (01:26)  Braced six yards to the wind; 0° from square.
+  Middle watch, 3 bells (01:30)  3 bells.
+  Middle watch, 3 bells (01:30)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 3 bells (01:30)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+* Middle watch (01:43)  By standing order 'trim on a shift': trimming sails.
+  Middle watch (01:43)  Braced six yards to the wind, 179° right astern; the sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed; the topgallant and royal yards are on deck.
+* Middle watch (01:45)  Braced six yards to the wind; 0° from square.
+  Middle watch (01:54)  A gust: 56 knots, the mean 45.
+  Middle watch, 4 bells (02:00)  Detached clouds, hard-edged and oily-looking, passing showers; the glass 29.68.
+  Middle watch, 4 bells (02:00)  4 bells.
+  Middle watch, 4 bells (02:00)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 4 bells (02:00)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+  Middle watch (02:21)  A gust: 48 knots, the mean 38.
+  Middle watch (02:25)  A gust: 44 knots, the mean 38.
+* Middle watch (02:26)  By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:26)  Braced six yards to the wind, 165° astern, a little on the starboard quarter; the sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed; the topgallant and royal yards are on deck.
+* Middle watch (02:27)  Braced six yards to the wind; 0° from square.
+  Middle watch, 5 bells (02:30)  5 bells.
+  Middle watch, 5 bells (02:30)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 5 bells (02:30)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+* Middle watch (02:47)  By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:47)  Braced six yards to the wind, 179° right astern; the sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed; the topgallant and royal yards are on deck.
+* Middle watch (02:48)  Braced six yards to the wind; 0° from square.
+  Middle watch (02:53)  A gust: 48 knots, the mean 38.
+* Middle watch (02:58)  By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:58)  Braced six yards to the wind, 165° astern, a little on the starboard quarter; the sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed; the topgallant and royal yards are on deck.
+* Middle watch (02:59)  Braced six yards to the wind; 0° from square.
+  Middle watch, 6 bells (03:00)  Detached clouds, hard-edged and oily-looking, passing showers; the glass 29.72.
+  Middle watch, 6 bells (03:00)  6 bells.
+  Middle watch, 6 bells (03:00)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 6 bells (03:00)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+  Middle watch (03:22)  Standing order 'heavy weather': order not carried out ('send down the topgallant masts'): The topgallant masts are sent down already.
+  Middle watch (03:22)  Standing order 'heavy weather': order not carried out ('set the storm staysails'): The storm staysails are set already.
+  Middle watch, 7 bells (03:30)  7 bells.
+  Middle watch, 7 bells (03:30)  By standing order 'tend the sheets': trimming the sheets.
+  Middle watch, 7 bells (03:30)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+* Middle watch (03:41)  Sunrise.
+  Middle watch (03:41)  Standing order 'morning sail' at sunrise: not carried out; the true wind is 44 knots, not under 20 knots.
+  Middle watch (03:57)  A gust: 59 knots, the mean 46.
+* Middle watch (03:57)  Foresail straining at the bolt-ropes.
+  Morning watch, 8 bells (04:00)  The sky clear.
+  Morning watch, 8 bells (04:00)  The showers passed.
+  Morning watch, 8 bells (04:00)  Clear, fine; the glass 29.81, risen a tenth since the middle watch.
+  Morning watch, 8 bells (04:00)  Eight bells. The larboard watch relieved the deck.
+  Morning watch, 8 bells (04:00)  8 bells.
+  Morning watch, 8 bells (04:00)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch, 8 bells (04:00)  The sheets of the fore storm staysail and the mizzen storm staysail stand as trimmed.
+Advanced 43200 ticks to Morning watch, 8 bells (04:00).
+Following the Amazon.
+Morning watch, 8 bells (04:00)
+Wind NW by W, 40 knots, a fresh gale
+Day. Sunrise 03:40, sunset 19:45; civil twilight from 02:58 and until 20:28.
+The glass 29.81, rising fast; clear, fine; the horizon.
+Amazon: heading SE (135°), speed 10.4 kn, leeway -0°, heel -0°
+Apparent wind 169° astern, a little on the starboard quarter, 25.2 kn; helm -0°
+Sail set: fore.course, fore.topsail, main.topsail, mizzen.topsail, fore.storm_staysail, mizzen.storm_staysail; unbent: storm_mizzen, ringtail, fore.save_all.starboard, fore.save_all.larboard; sent down: fore.topgallant_mast, main.topgallant_mast, mizzen.topgallant_mast
+Watch on deck: larboard, 111 hands, none at work; idlers below.
+The watcher: stationed.
+The clock runs at 1x; no sample is open.
+  Morning watch, 8 bells (04:00)  The watcher's journal (114 entries):
+  Morning watch, 8 bells (04:00)  (note) Wind from W, 17 knots; heading SE (135°); making 0 knots; heeling 0 degrees.
+  Morning watch (04:00)  (note) Noted: Setting the royals: not hands enough for all at once; the watch takes the sails in turn.
+  Morning watch (04:02)  (note) Noted: Set the fore topmast staysail.
+  Morning watch (04:03)  (note) Noted: Set the foresail.
+  Morning watch (04:04)  (note) Noted: Set the main topsail.
+  Morning watch (04:05)  (note) Noted: Set the fore topsail.
+  Morning watch (04:07)  (note) Noted: Set the spanker.
+  Morning watch (04:07)  (note) Noted: Set the fore royal, flying.
+  Morning watch (04:07)  (note) Noted: Set the fore topgallant.
+  Morning watch (04:09)  (note) Noted: Set the main topgallant.
+  Morning watch (04:16)  (note) Noted: Set the mizzen topgallant.
+  Morning watch, 1 bell (04:30)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Morning watch, 2 bells (05:00)  (note) Wind from W, 19 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Morning watch, 3 bells (05:30)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Morning watch, 4 bells (06:00)  (note) Wind from W, 15 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Morning watch, 5 bells (06:30)  (note) Wind from W, 22 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Morning watch, 6 bells (07:00)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Morning watch, 7 bells (07:30)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Forenoon watch, 8 bells (08:00)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 1 degrees.
+  Forenoon watch, 1 bell (08:30)  (note) Wind from W, 16 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Forenoon watch, 2 bells (09:00)  (note) Wind from W, 14 knots; heading SE (135°); making 6 knots; heeling 0 degrees.
+  Forenoon watch, 3 bells (09:30)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 1 degrees.
+  Forenoon watch, 4 bells (10:00)  (note) Wind from W, 20 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Forenoon watch, 5 bells (10:30)  (note) Wind from W, 19 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Forenoon watch, 6 bells (11:00)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 1 degrees.
+  Forenoon watch, 7 bells (11:30)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Afternoon watch, 8 bells (12:00)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 1 degrees.
+  Afternoon watch, 1 bell (12:30)  (note) Wind from W, 15 knots; heading SE (135°); making 6 knots; heeling 0 degrees.
+  Afternoon watch, 2 bells (13:00)  (note) Wind from W, 19 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Afternoon watch, 3 bells (13:30)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Afternoon watch, 4 bells (14:00)  (note) Wind from W, 18 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Afternoon watch, 5 bells (14:30)  (note) Wind from W, 15 knots; heading SE (135°); making 6 knots; heeling 0 degrees.
+  Afternoon watch, 6 bells (15:00)  (note) Wind from W, 16 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Afternoon watch, 7 bells (15:30)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  First dog watch, 8 bells (16:00)  (note) Wind from W, 21 knots; heading SE (135°); making 8 knots; heeling 1 degrees.
+  First dog watch, 1 bell (16:30)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  First dog watch, 2 bells (17:00)  (note) Wind from W, 20 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  First dog watch, 3 bells (17:30)  (note) Wind from W, 20 knots; heading SE (135°); making 8 knots; heeling 1 degrees.
+  Last dog watch, 4 bells (18:00)  (note) Wind from W, 20 knots; heading SE (135°); making 8 knots; heeling 0 degrees.
+  Last dog watch, 1 bell (18:30)  (note) Wind from W, 17 knots; heading SE (135°); making 7 knots; heeling 0 degrees.
+  Last dog watch, 2 bells (19:00)  (note) Wind from W, 18 knots; heading SE (135°); making 7 knots; heeling 1 degrees.
+  Last dog watch, 3 bells (19:30)  (note) Wind from W by S, 20 knots; heading SE (135°); making 6 knots; heeling 2 degrees.
+  Last dog watch (19:31)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Last dog watch (19:32)  (note) Noted: Braced twelve yards to the wind; 26° from square.
+  Last dog watch (19:47)  (note) Noted: The fore, main and mizzen royal masts and yards working under the press of sail.
+  Last dog watch (19:47)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Last dog watch (19:48)  (note) Noted: Braced twelve yards to the wind; 20° from square.
+  Last dog watch (19:50)  (note) Noted: Sunset.
+  Last dog watch (19:52)  (note) Noted: Took in the fore royal; sent down on deck with its yard.
+  First watch, 8 bells (20:00)  (note) Wind from W, 21 knots; heading SE (135°); making 10 knots; heeling 2 degrees.
+  First watch (20:24)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  First watch (20:25)  (note) Noted: Braced twelve yards to the wind; 5° from square.
+  First watch, 1 bell (20:30)  (note) Wind from W by N, 26 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+  First watch, 2 bells (21:00)  (note) Wind from W by N, 28 knots; heading SE (135°); making 11 knots; heeling 0 degrees.
+  First watch, 3 bells (21:30)  (note) Wind from W by N, 27 knots; heading SE (135°); making 11 knots; heeling 0 degrees.
+  First watch (21:43)  (note) Noted: By standing order 'shorten sail for weather': taking in the topgallants.
+  First watch (21:43)  (note) Noted: All hands! (to reef the fore topsail)
+  First watch (21:46)  (note) Noted: Took in the fore topgallant; hanging in the gear.
+  First watch (21:51)  (note) Noted: Reefed the mizzen topsail; now set, 1 reef.
+  First watch (21:51)  (note) Noted: Reefed the fore topsail; now set, 1 reef.
+  First watch (21:51)  (note) Noted: Reefed the main topsail; now set, 1 reef.
+  First watch, 4 bells (22:00)  (note) Wind from WNW, 28 knots; heading SE (135°); making 10 knots; heeling 1 degrees.
+  First watch (22:00)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  First watch (22:01)  (note) Noted: Braced twelve yards to the wind; 0° from square.
+  First watch (22:16)  (note) Noted: By standing order 'shorten sail for weather': reefing the topsails, one reef.
+  First watch (22:16)  (note) Noted: All hands! (to reef the fore topsail)
+  First watch (22:16)  (note) Noted: Wind veered to WNW, a moderate gale.
+  First watch (22:20)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  First watch (22:21)  (note) Noted: Braced twelve yards to the wind; 0° from square.
+  First watch (22:23)  (note) Noted: Reefed the mizzen topsail; now set, 2 reefs.
+  First watch (22:24)  (note) Noted: Reefed the main topsail; now set, 2 reefs.
+  First watch (22:24)  (note) Noted: Reefed the fore topsail; now set, 2 reefs.
+  First watch, 5 bells (22:30)  (note) Wind from NW by W, 34 knots; heading SE (135°); making 11 knots; heeling 1 degrees.
+  First watch (22:56)  (note) Noted: By standing order 'shorten sail for weather': reefing the topsails, one reef.
+  First watch (22:56)  (note) Noted: All hands! (to reef the fore topsail)
+  First watch, 6 bells (23:00)  (note) Wind from NW, 33 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+  First watch (23:04)  (note) Noted: Reefed the mizzen topsail; now set, 3 reefs.
+  First watch (23:04)  (note) Noted: Reefed the main topsail; now set, 3 reefs.
+  First watch (23:04)  (note) Noted: Reefed the fore topsail; now set, 3 reefs.
+  First watch (23:09)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  First watch (23:10)  (note) Noted: Braced twelve yards to the wind; 0° from square.
+  First watch (23:16)  (note) Noted: Wind veered to NW, a moderate gale.
+  First watch, 7 bells (23:30)  (note) Wind from NW, 31 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+  Middle watch, 8 bells (00:00)  (note) Wind from NW by N, 35 knots; heading SE (135°); making 11 knots; heeling 1 degrees.
+  Middle watch (00:14)  (note) Noted: By standing order 'gale canvas': taking in the jib.
+  Middle watch (00:15)  (note) Noted: Hauled down the jib.
+  Middle watch (00:16)  (note) Noted: Took in the mainsail; hanging in the gear.
+  Middle watch (00:17)  (note) Noted: Took in the spanker.
+  Middle watch, 1 bell (00:30)  (note) Wind from NW, 40 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+  Middle watch (00:38)  (note) Noted: By standing order 'heavy weather': sending down the topgallant masts.
+  Middle watch (00:38)  (note) Noted: All hands! (to send down topgallant masts)
+  Middle watch (00:59)  (note) Noted: Sent down the fore topgallant mast, the main topgallant mast and the mizzen topgallant mast; the upper spars on deck.
+  Middle watch, 2 bells (01:00)  (note) Wind from NW by N, 42 knots; heading SE (135°); making 11 knots; heeling 0 degrees.
+  Middle watch (01:02)  (note) Noted: Hauled down the fore topmast staysail.
+  Middle watch (01:10)  (note) Noted: Bent the fore storm staysail (No. 1 canvas, new) and furled it; 19 spare sails left in the sail room.
+  Middle watch (01:12)  (note) Noted: Set the fore storm staysail.
+  Middle watch (01:24)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Middle watch (01:26)  (note) Noted: Braced six yards to the wind; 0° from square.
+  Middle watch, 3 bells (01:30)  (note) Wind from NW by N, 48 knots; heading SE (135°); making 12 knots; heeling 1 degrees.
+  Middle watch (01:43)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Middle watch (01:45)  (note) Noted: Braced six yards to the wind; 0° from square.
+  Middle watch, 4 bells (02:00)  (note) Wind from NW, 49 knots; heading SE (135°); making 12 knots; heeling 0 degrees.
+  Middle watch (02:26)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:27)  (note) Noted: Braced six yards to the wind; 0° from square.
+  Middle watch, 5 bells (02:30)  (note) Wind from NW by W, 35 knots; heading SE (135°); making 9 knots; heeling 0 degrees.
+  Middle watch (02:47)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:48)  (note) Noted: Braced six yards to the wind; 0° from square.
+  Middle watch (02:58)  (note) Noted: By standing order 'trim on a shift': trimming sails.
+  Middle watch (02:59)  (note) Noted: Braced six yards to the wind; 0° from square.
+  Middle watch, 6 bells (03:00)  (note) Wind from NW by W, 40 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+  Middle watch, 7 bells (03:30)  (note) Wind from NW by W, 44 knots; heading SE (135°); making 11 knots; heeling 1 degrees.
+  Middle watch (03:41)  (note) Noted: Sunrise.
+  Middle watch (03:57)  (note) Noted: Foresail straining at the bolt-ropes.
+  Morning watch, 8 bells (04:00)  (note) Wind from NW by W, 40 knots; heading SE (135°); making 10 knots; heeling 0 degrees.
+Saved to day.json at tick 86400.

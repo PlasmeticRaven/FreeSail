@@ -28024,6 +28024,46 @@ trunk at eb2c8fe1 (no conflict; it adds 112's truth 7-570 and nothing of package
 pushed at 02:45, before the ruling to build on 1e28b0b, and taking it back would need a
 force-push. This step is built on it, and no trunk since is merged.
 
+### The chart read along a line at a fixed step (the lead's ruling of 2026-11-14, 04:49 UTC)
+
+The cause of the Setúbal miss was a step chosen without regard to the grid's cell. The finest
+cell under any port's track is 15.4 m (a harbour patch); the coarsest 92.6 m. Every place the
+audit or the game reads the chart along a line at a fixed step, with its step:
+
+**The audit's own (mended by the halving test, or shown to need none):**
+- `f-shallow`, the depth along each track: 20 m, now 20 m and 2 m where under 8 m (above).
+- `f-open`, the sixteen 6-mile rays from a way's first mark to open water: judged by the game's
+  guard. Read again every 2 m for dry ground besides, no port's verdict changes (none of the
+  rays the guard passes crosses dry ground before a clear one is found). No mend.
+- `f-in` and `f-out`: the game's guard itself, by design (the check says what the game
+  refuses). `_crossing_point` only finds where the guard's refused leg meets the land, at the
+  guard's own step. No mend; the guard's step is listed below. The tracks' dry ground the guard
+  misses is found all the same by `f-shallow` at 2 m (a negative depth).
+- The checks (a) to (e) and the scenarios' (h) read areas, not lines, on a grid of 0.25° (the
+  sampled sweep) or 0.05° (the full one); their grain is the sweep's by design and not a step
+  along a line.
+
+**The game's (listed, not mended; for the lead's list):**
+
+| Where | Step along the line | Finest cell read | What a too-coarse step lets through |
+|---|---|---|---|
+| `ships.land_crossing`, through `Chart.line_shore` (the far-detail guard) | a third of a cable (61.7 m) within two cables of the shore; the distance field's own figure farther off; the first and last cable not tried | 15.4 m | Measured: a leg judged clear across dry ground up to about 60 m wide. Three port legs today: Civita Vecchia's to 42 05.53 N 11 47.00 E (ground drying 0.3 m at 42 05.4 N 11 46.9 E), and Santa Cruz de Tenerife's two to its road (1.6 m at 28 28.4 N 16 14.2 W). Unchanged between a 4 m and a 2 m reading. |
+| `Planner.clear` (the captain's sea route), through `line_shore` with the offing (3 miles at sea, a quarter-mile for the pilot's joining leg) | as above | 15.4 m | Little: land between two steps 62 m apart lies within 31 m of one of them, well inside any offing, so the leg is refused as a near pass. The berth off the charted dangers is by `line_passes`, exact geometry and no step. |
+| The lookout's land ahead (`lookout.py`, `LAND_AHEAD_STEP_M`) | 20 m within 120 m of the shore, depth read for dry ground | 15.4 m | One cell of dry ground, a rock or a spit 15 m across, stepped over: the cry of land ahead late or not given. The same fault as `f-shallow`'s. |
+| The pilot's shoal warning (`Chart.shoal_ahead`, from `dealings.py` twice and the readings in `api/readings.py`) | one cable (185 m) | 15.4 m | A shoal narrower than a cable, a bar or a ledge across the track, stepped over: no warning given. |
+| The side of the deeper water (`Chart._deeper_side`) | one cable out to ten either side | 15.4 m | A channel narrower than a cable unseen: the wrong side said, or neither. |
+| The contour search for the master's soundings (`Chart.contour_point`, `depth_span`; `reckoning.py`) | rings half a mile apart, a cable at finest | 15.4 m | A contour narrower than the ring's step missed: a sounding the chart cannot place. |
+
+The first is the one the lead asked to look for first: a leg judged clear that crosses land
+narrower than the step. It happens today on two ports' tracks, and both are in the known list.
+
+**The suites at 623ca5a** (measured in a clean worktree pinned at that hash). Ruff check and
+format were clean. The browser file, whole under `--slow -m "not pace"`: 13 passed, none skipped.
+The slow tier of the touched modules and the known truths (`test_mends_109` with them): 235
+passed and the same 8 xfailed, none skipped. The nine busy scenarios drew the same as at the
+last measure, vessel for vessel. The fast tier, whole: 7,623 passed and 1 xfailed, exit 0. The
+pace tests ran alone and last at the hash reported, which adds these notes alone to 623ca5a.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
@@ -29174,3 +29214,150 @@ listed answers, the later fill, and the two forms are one. They also hold the wo
 synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
+
+### The lead's answers on step 0 (2026-11-13, through the chart session)
+
+1. **Level 0** covers the Atlantic and the Mediterranean, 70 S to 75 N and 100 W to 40 E. The
+   rest of the world is not committed, and the how-to says that adding it later moves no
+   tile laid now.
+2. **The open Atlantic's level** is choice (3): unread levels judged at M2+S2+N2 and marked
+   JUDGEMENT, read levels where read (Sicily's interim answer). Before it is committed, step
+   3 shows that no recorded passage, digest, truth or kept save moves, or names each that
+   does, old beside new, and stops for the word.
+3. **The Channel sea's eight open-water groups leave the known list**: the eleven are the
+   Channel's own gauges. `seas.yaml` names each sea's gauges, the Channel's eleven included.
+4. **Order:** the step that moves `SEAS` into `seas.yaml` merges after package 111's step
+   2b, and re-merges the trunk.
+
+The chart session's rulings: level 0 is never under a chart of one region, a reason that
+outlives its mend of the checkpoint's reload (`replay._rebind` to take `chart_holding`):
+such a chart is then met only where a scenario or test says `chart: <region>`, and those
+pins are measured on that region alone. Cut the Black Sea. All twelve Cape Verde tiles.
+
+### The double count of the level on the coarse layers (a finding; on the lead's list, not mended)
+
+Levels 0 and 1 are at **mean sea level** and nothing is raised at their build
+(`build_corridor`, `_write_gebco_level`). The tide adds its **level above low water** to
+every depth (`Chart.aground`, `ground.py`: water = depth + tide height = `-elevation + level
++ z`). At levels 2 and 3 that is right, since the datum is low water. On water only a coarse
+layer answers, the level is counted twice: the open sea reads deeper by the level, and a
+coarse shore floods to the level and the tide above it. Measured at step 0 over the corridor
+and the south layer, outside every bound, at the eleven's level of 3.1 to 4.4 m: 416 cells
+of sea shallower than the level, 765 of land lower than it (by elevation: 149 cells from −1
+to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 to +3, 252 from
++3 to +4). At the judged level of the open Atlantic (about 0.6 to 1.6 m), about 180 and
+210. The mend would read a coarse cell as `-elevation + z` (its level not added), an engine
+change for the lead. The new layers and level 0 carry the same fault on their own shores.
+
+### Step 2: the layers laid, as ruled (A)
+
+**What was built** (`tools/build_charts.py`, from the cache alone: `--skip-fetch --corridor
+atlantic-verde --world`):
+
+- `atlantic-verde`, 12.4 to 25.2 N and 26.4 to 9.34 W, beside `atlantic-south` (it shares no
+  tile with it): 12 tiles, 2,487,854 bytes, byte for byte step 0's measure.
+- **Level 0** over 70 S to 75 N and 100 W to 40 E: 63 tiles, 11,283,534 bytes, committed.
+- The chart's entry says `layers:` (the corridor, the south's, Cape Verde's) where it said
+  `corridor:` and `corridors_beside:`; the tool writes it from `CHARTS`. The manifest's
+  `world:` entry is committed and carried by later builds while its tiles are present
+  (`_fetched_level`). `.gitignore` lets `tiles/0/` and `tiles/1/atlantic-verde/` through.
+- **The Mediterranean's two layers are not laid** (below); they come in step 3 with the seas.
+
+**The Mediterranean's layers moved the tide of three regions, and were taken out (the chart
+session's ruling (A), 2026-11-14).** They were built first in this step: `mediterranean`,
+30 to 42.27 N and 6 W to 36.5 E, 31 tiles and 7,411,985 bytes, and `mediterranean-north`,
+42.27 to 46 N and 6 W to 24.79 E, 7 tiles and 1,678,693 bytes, two layers so that the Black
+Sea's three tiles were left out. The slow tier's full sweep (truth 7-565 and
+`test_chart_audit`'s twin) found a new `c-level:gulf-of-lion`. **The mechanism:** the tide
+reads every layer's bounds as charted water (`tide.charted_bounds`), and a block's edge that
+meets charted water no block holds is an open edge, where the block's water tapers over ten
+miles toward the eleven's alone (`Tide.open_edges`, `taper_at`, package 94), wherever the
+eleven are within their reach. The Mediterranean layers' boxes ran from 6 W over the land of
+Spain and France, so the blocks' edges facing that land became open edges: 77 where there
+were 38. Within 400 miles of the eleven the taper blended them in. Old beside new, on a grid
+of 0.05 degrees over every region and tide region:
+
+| region | points moved | of them water | the worst water: level | M2 |
+|---|---|---|---|---|
+| gulf-of-lion | 326 | 9 | 0.51 to 6.62 m at 43.04 N 3.03 E | 0.07 to 3.56 m |
+| biscay-south | 383 | 12 | 3.35 to 4.49 m in the Gironde, 45.53 N 0.91 W | 1.52 to 1.78 m |
+| biscay-north | 22 | 2 | 3.95 to 3.96 m at 45.98 N 1.13 W | unchanged |
+
+The other 21 regions and tide regions were unmoved. Step 3 lays the layers with the seas,
+where an open edge tapers toward its sea's own water and not the eleven's. The other choice
+was a tide that ignores a layer, which is new mechanism; it was not taken.
+
+**The proofs, as built.**
+
+- **Every earlier file under `data/charts/`**, 2,397 of them, hashes the same.
+- **The manifest** against the one before step 2: the regions, the two earlier layers, the
+  tide regions, the levels and the notes are equal, and every earlier fetch record is kept in
+  its place. What changed: the chart's layer keys, `atlantic-verde` added, the world's entry
+  (committed, 63 tiles), two GEBCO fetch records added (Cape Verde's extract and the global
+  zip), and the build's date and hash.
+- **Level 0 equals the world's:** its 63 tiles are byte for byte the same tiles of the whole
+  world's build (150 tiles, made at step 0 in a scratch folder), so widening the box moves none.
+- **No tide moves anywhere:** `charted_bounds` gains `corridor:atlantic-verde` and nothing
+  else changes; the open edges are the same 38. Every region's and tide region's level and
+  constants on a 0.05-degree grid, the Cape Verde layer's water at 0.25 degrees and level
+  0's box at 2 degrees, 126,769 points old beside new: none moved. Cape Verde's edges face no
+  block within the eleven's reach, and level 0 is not a layer of `charted_bounds`.
+- **What the runtime reads:** the twenty charts of one region are identical, tile for tile
+  (step 1's script); `atlantic-east` keeps every earlier tile and adds Cape Verde's 12 and
+  level 0's 63.
+- **The audit** (`--known`, sampled): no finding the known list lacks.
+
+### Step 2: the pins moved by design, old beside new (the chart session's rulings of 2026-11-14)
+
+Seven, re-pinned with their reasons; nine were found with the Mediterranean laid, and two of
+them (truth 7-532's east bound and truth 7-521's fills) did not move once it was taken out.
+
+1. `test_chart::test_the_regions_tiles_are_present_committed_and_under_the_brief_size`:
+   the world's `committed` False to **True** (level 0 committed by the ruling), the
+   Atlantic's still False. The tracked folders are the chart's `layers:` (old: `corridor:`
+   and `corridors_beside:`) and `tiles/0/`, whose 63 files are exactly the manifest's.
+2. `test_chart::test_the_chart_is_the_whole_manifest...`: the chart's `corridor:` to
+   **`layers:`** (the three in order). The levels [3, 2, 1] to **[3, 2, 1, 0]**. The envelope
+   (25.2001, 51.5, −32, 16.69332) to **(12.4001, 51.5, −32, 16.69332)**, and its words with it.
+3. `test_chart::test_the_corridor_is_committed...`: it read `levels[-1]`, the coarsest
+   level, for "the corridor's tile carries the distance field". The coarsest is now level
+   0, which has none. It now reads **the level that carries the field** (level 1), holds the
+   coarsest as level 0, and holds that level 0 has no field. **No reader of the engine takes
+   the coast distance from the coarsest level:** there is no `levels[-1]` in `freesail/`.
+   `coast_distance` and `nearest_shore` walk the levels finest first and skip a level whose
+   field reads None. `coast_trend`, the one reader that walks coarsest first
+   (`reversed(levels)`), skips a level whose `dist_smooth` is None, which level 0's is
+   everywhere, and so reads the next finer level as before.
+4. `test_chart::test_a_query_asks_the_finest_level...`: `BEYOND_THE_CORRIDOR` (31 N 25 W)
+   depth None to **level 0's, 5,000 to 6,000 m** (5,449.5); its coast distance stays None.
+   **What the master and the lookout say there** (a frigate put at 31 N 25 W): the depth of
+   water "2980 fathoms at low water by the chart, at the position by account; the chart has
+   2961 fathoms and a half to 2992 fathoms within the account's doubt"; the land "not in
+   sight"; no chart-edge line (the place is inside the limits). Two things for others: "at
+   low water" is said of a depth at mean sea level (the double count above), and `level_at`
+   and `use_at` name the corridor's level ("the Atlantic: passages and landfalls") there,
+   since the corridor's empty tile is listed at the place and the depth falls through it to
+   level 0.
+5. `test_chart::test_the_recipe_form...`: `tool.CHARTS[WHOLE]["corridor"]` to
+   **`["layers"][0]`**.
+6. Truth 7-520: `bounds[0]` 25.2 to **12.4** (the Cape Verde layer's). **Its refused start**
+   moves from 25.1 N 20 W, now within the limits, to **12.3 N 20 W**, south of them, so a
+   refusal stays tested. `atlantic-south` is held second in the chart's layers.
+7. Truth 7-570: the derivation takes the committed level 0 under a chart of `charts:`; the
+   tiles read 4,593 to **4,668**. It is kept whole, by the chart session's ruling: 33 s alone
+   here with the Mediterranean laid, and 12 s as a sample of 1,561 tiles (every region's
+   tiles across its bounds, every coarse tile and a fixed tenth of the rest). Neither
+   explains the cloud's longer run.
+
+The seven pass. test_longitude's chart-edge line does not move: it reads the bounds.
+
+**A test without links (the lead's word, 2026-11-14).** Step 1's
+`test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_region` built its
+tree with symbolic links, which Windows refuses without a privilege (WinError 1314, on the
+owner's machine). It now reads the chart's own data where it lies, and a world of one
+synthetic tile in the test's folder, named by the manifest's `world:` entry through an
+absolute `folder` (`_present` joins it to the root, and an absolute path stands). It proves
+the same: absent under the chart of `channel-west` alone (None at 47.70 N 6 W), present
+under `atlantic-east` beyond every layer (57 N 6 W, its 140 m read). No skip by platform.
+Grepping the chart's and the audit's tests for `symlink`, `os.link` and `hardlink`: no other
+test makes a link.

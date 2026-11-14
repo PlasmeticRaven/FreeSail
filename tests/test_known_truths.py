@@ -17040,7 +17040,10 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     from freesail.world.geo import Position
 
     chart = load_chart("atlantic-east")
-    assert chart.bounds[0] == pytest.approx(25.2, abs=0.001)
+    # package 112: the south limit is the ocean's to the Cape Verde Islands', 12.4 N (old:
+    # 25.2 N, this package's layer's); the layer's own south bound is as it was
+    assert chart.bounds[0] == pytest.approx(12.4, abs=0.001)
+    assert chart.spec["layers"][1] == "atlantic-south"
     holes = []
     for i in range(int((31.9 - 25.3) / 0.1) + 1):
         lat = 25.3 + 0.1 * i
@@ -17053,7 +17056,8 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     w = _can_at(31.0, -16.0, datetime(1805, 6, 20, 12, 0))
     assert w.chart.level_at(w.position) == 1 and w.chart.depth_at(w.position) > 3000.0
     with pytest.raises(ValueError, match="outside the chart"):
-        _can_at(25.1, -20.0, datetime(1805, 6, 20, 12, 0))
+        # package 112: a start south of the new limit (old: 25.1 N 20 W, now within them)
+        _can_at(12.3, -20.0, datetime(1805, 6, 20, 12, 0))
 
 
 def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as_before():
@@ -17373,6 +17377,12 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     expected.setdefault(int(layer["level"]), {}).setdefault(t["name"], []).append(
                         path
                     )
+        if spec and manifest["world"].get("tiles"):
+            # package 112: the world's level 0, committed, after every layer, under a
+            # chart of the manifest's charts only
+            level0 = expected.setdefault(0, {})
+            for t in manifest["world"]["tiles"]:
+                level0.setdefault(t["name"], [root / "tiles" / "0" / f"{t['name']}.npz"])
         assert [lv.level for lv in chart.levels] == sorted(expected, reverse=True), name
         assert spec is not None or all(lv.level >= 2 for lv in chart.levels), name
         for lv in chart.levels:
@@ -17394,4 +17404,6 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
                 ), (name, tname)
                 read += 1
-    assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+    # 21 charts' tiles, as the step's proof counted them (step 1: 4,593; step 2 with the
+    # ocean to Cape Verde's 12 tiles at level 1 and the world's 63 at level 0: 4,668)
+    assert read == 4668
