@@ -27,6 +27,8 @@ under (b), "n" = the reader's "no test would catch".
 | B-b4 | test_known_truths.py::test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag | `fog_signals_minute` never starts a ship's fog signals (`if False:`) | pass | SURVIVED | 12 |
 | B-b5 | test_known_truths.py::test_truth_7_512_a_ship_sails_from_port_mahon_to_carloforte_and_from_algiers_to_tunis (and ::test_truth_7_545_..., the reader's control) | `ships.land_crossing` returns "" at once (the land guard off) | pass (both) | 7-512 SURVIVED; 7-545 KILLED, as predicted | 116 |
 | B-n1 | test_known_truths.py::test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries; test_lookout.py::test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it | a far ship's light order always sets `"none"` | pass | SURVIVED (both) | 9 |
+| B-b1 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter | rules captain's hole filter `z_m < 0.3` to `< -99.0` (never sends the carpenter) | pass | SURVIVED | 220 |
+| B-n3 | test_known_truths.py::test_truth_7_173_...; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says, ::test_every_repair_is_an_evolution_with_hands_and_competes_for_them; test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine (and 7-183) | the same plant | pass | SURVIVED (all) | 16 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -396,3 +398,38 @@ the ship shows none.
 "stern lantern"` by hand (tests/test_known_truths.py:8958) and orders the player's own lights;
 no test calls `far_perform` with a light order. 7-150 and tests/test_lookout.py::
 test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it both passed. SURVIVED.
+
+## B-b1 and B-n3. No rules captain ever plugs a shot hole
+
+```diff
+--- mut/freesail/world/captains.py
++++ m/1/freesail/world/captains.py
+@@ -4441,7 +4441,7 @@
+         holes = [
+             h
+             for h in (getattr(keeper, "holes", []) or [])
+-            if not h.get("plugged") and float(h.get("z_m", 1.0)) < 0.3
++            if not h.get("plugged") and float(h.get("z_m", 1.0)) < -99.0
+         ]
+```
+
+Live: the first-action scenario sailed 900 s (Renard engaging), eight `HITS._hull_hit` calls
+on Renard aimed between wind and water (3 holes under water), then 700 s: pristine her log
+has "By the captain, engaging: plugging the shot holes (the shot holes under water)." and
+"Plug the shot holes! The carpenter and his crew to the side with the plugs."; with the fault,
+no line with "plug" in it.
+
+B-b1, 7-183: PASSED (220 s). SURVIVED. Its check is `under = [h ... if z_m < 0.0]; if under:
+assert any("Plug the shot holes" ...)` (tests/test_known_truths.py, the test's body), and at
+seed 7 Renard takes no hole under water, so the assertion is never reached, as its own comment
+says ("at this seed her seven lie above it").
+
+B-n3: grep for `plug the shot holes`, `plug_shot_hole` and `damage_priority` in tests gives
+7-173 (the player's own order), two of tests/test_damage_control.py (the player's order) and
+tests/test_fight.py:427 (reads the threshold's words). All four passed. SURVIVED: no test seen
+has a rules captain plug a hole.
+
+Side note from the liveness work, not a planted fault: with tests/test_fight.py's
+`_alongside(30.0)`, the enemy's `Captain._damage_work` was called 0 times in 300 s of
+`w.run` (a spy on the method), so a rules captain there never reaches his repairs; that
+fixture cannot witness any captain's damage work. Not looked into further.
