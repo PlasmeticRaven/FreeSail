@@ -156,11 +156,6 @@ known:
   reason: strait's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
   owner: the lead's list
   most: 48737
-- key: a-unowned:strait:south-west
-  place: 35°26.4′N 6°46.4′W
-  reason: strait's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
-  owner: the lead's list
-  most: 23616
 - key: a-unowned:strait:west
   place: 35°30.0′N 6°46.4′W
   reason: strait's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone

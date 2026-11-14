@@ -28984,7 +28984,7 @@ heaves to in the offing.
 `a-unowned:morocco-larache:north` (the two tiles of the row 35.44 to 35.87 N west of 6.77 W, 915
 square miles north of 35.5 N: the ruling's "lead's list", 112's seas to own it),
 `d-split:morocco-sallee` (madeira 70 %, morocco 30 %) and `d-split:morocco-mogador` (madeira 78 %,
-canaries 22 %), both the box's order by design; and `d-no-box:strait` no longer found. **The known
+canaries 22 %), both the box's order by design; and `d-no-box:strait` no longer found; the full sweep also no longer finds `a-unowned:strait:south-west` (the Strait's tiles south of 35.5 N and west of 6.5 W, 35 26.4 N 6 46.4 W: morocco-larache's bounds hold that water now), which the sampled sweep had not reached; both leave the list, mended by the block. **The known
 list's edit waits for package 111's step 2b on the trunk** (correction 6): the three entered with
 their owners and `d-no-box:strait` taken out, then the trunk re-merged by a merge commit.
 
