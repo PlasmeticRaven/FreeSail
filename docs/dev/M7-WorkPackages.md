@@ -5359,6 +5359,21 @@ The builder reported the cut whole at 53eb42ff (its suites whole, no pin moved).
 
 **For the method:** two packages each green alone met on the trunk's tree, twice in one day (the audit's draws moved by the chart's ports; the audit's ceilings and the tide's pin moved by Morocco). Both were caught by trying the two together before the merge, once in the cloud and once on a scratch tree. A package that changes shared data is to be tried against whatever else is in flight that reads it, before either is called ready.
 
+### Package 60 at 377c5b13 (the six mends): NOT merged; the seventh reading; STOPPED, and put to the owner (2026-11-14)
+
+The builder mended the six items of the sixth reading and reported whole at 377c5b13 (its suites whole, no pin moved). It stages clean on the trunk. An independent reader read the six mends and nothing else, re-running the sixth reading's probes.
+
+**What holds:** the count of hands she keeps and the two ships of one name are mended at their causes; a person's muster row now travels with him (every person in exactly one muster, under his own name and number, a wound landing on him and on nobody else, the count of people unchanged after every step and every save); the state at the take-up holds for every ruled case; the five sleep-and-wake files are untouched; no test weakened.
+
+**What does not, each small, each in the mends themselves:**
+1. Moving a person's row clears his post: a moved officer reads in the muster as "Mr. Adam Bowen, None.", and a moved surgeon would no longer be his ship's surgeon (the second by reading). By way of a third ship two men can come to bear one number.
+2. A transfer is refused at quarters when ordered, but if the receiving ship beats to quarters while a load is in the boat the men who arrive are on no quarter bill.
+3. At the take-up, where one anchor rides and another is marked down a mile off, the far one is left down.
+4. Three sentences: "one were asked"; a man with a dotted name in the muster ("Danl. Ellicott") is said to be nobody aboard; "take command of her" offered of a ship that is not his to take up again.
+5. One new test (the wound after the move) passes with its fault put back.
+
+**Why no list was sent.** After the sixth reading the lead wrote that the list was the last, and that if the next reading found more of the package's own he would stop and put the package to the owner rather than send another. This is that case. The builder is told to hold; nothing is built; nothing merges, whatever the cloud's run of this hash says. **For the owner:** (a) one more round, of these five only, the lead reading the mends himself against this reader's own probes; (b) merge as it is with the five listed (not advised: the muster's line is plainly wrong); (c) leave the package on its branch, unmerged, until the design work. The lead's advice is (a) once, or (c).
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
