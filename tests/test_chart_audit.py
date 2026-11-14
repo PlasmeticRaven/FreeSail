@@ -2,7 +2,8 @@
 
 The audit reads the chart as the game reads it and reports, by region, water nobody owns,
 the seams, the tide, the weather, the streams, the ports, the marks and the scenarios; the
-known list (`data/charts/audit-known.yaml`) holds every finding of its first run, owned.
+known list (`tools/audit_chart_known.yaml`; before the chart session's tracks step
+`data/charts/audit-known.yaml`) holds every finding of its first run, owned.
 The fast tier runs the audit on its sampled grid and fails on any finding the list lacks;
 the slow tier runs the full sweep and fails as well on a listed finding no longer found and
 on a count above its ceiling, so that a mend takes its entry out and a new block comes in
@@ -171,24 +172,35 @@ def test_a_track_over_shallow_water_the_guard_passes_is_found(tmp_path, chart):
 
 
 def test_a_shoal_narrower_than_the_old_step_is_found(tmp_path, chart, monkeypatch):
-    """(f) The depth along a track is sampled finer than the grid's narrowest shoal: on
-    Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W crosses a
-    shoal of 1.2 m at the grid's datum near 38 26.0 N 9 04.1 W that a sample every 20 m
-    stepped over (it read 2.3 m), found by the chart session's own sampler (package 111,
-    step 2b, the lead's ruling of 2026-11-14). The step as set reads the shoal; at 20 m the
-    same leg reads over 2 m, so the test fails at the old step."""
-    from freesail.world.geo import parse_position
+    """(f) The depth along a track is the true least of the grid's surface along each leg:
+    on Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W crosses
+    a shoal near 38 26.0 N 9 04.1 W that a sample every 20 m stepped over (it read 2.3 m),
+    found by the chart session's own sampler (package 111, step 2b, the lead's ruling of
+    2026-11-14). The audit reads its least, 1.13 m (old: 1.2 m, a reading every 2 m; the
+    words "the least 1.2 m" are now "the least 1.1 m"); a reader stepping every 20 m in its
+    place reads the same leg over 2 m, so the test fails at the old step."""
+    from freesail.world.geo import bearing_and_distance, destination, parse_position
 
     a = parse_position("38 26.02 N 9 04.46 W")
     b = parse_position("38 25.97 N 9 03.72 W")
     ((least, where, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
-    assert 1.0 < least < 1.35, least
+    assert 1.10 < least < 1.16, least
     assert 38.43 < where.lat_deg < 38.44 and -9.075 < where.lon_deg < -9.06
     audit = A.Audit()
     A.check_ports(audit, chart, A.Water(chart), _port_file(tmp_path, "setubal", lambda d: None))
     found = next(f for f in audit.findings if f.key == "f-shallow:setubal")
-    assert "the least 1.2 m" in found.words, found.words
-    monkeypatch.setattr(A, "TRACK_STEP_M", 20.0)
+    assert "the least 1.1 m" in found.words, found.words
+
+    # the old reader in the true least's place: the leg cut into its whole number of 20 m
+    # steps, the ends among them (package 111's first hash)
+    def stepped(self, p, q):
+        bearing, dist = bearing_and_distance(p, q)
+        n = max(1, int(dist / 20.0))
+        reads = [(self.depth_at(destination(p, bearing, dist * k / n)), k) for k in range(n + 1)]
+        d, k = min((d, k) for d, k in reads if d is not None)
+        return d, destination(p, bearing, dist * k / n)
+
+    monkeypatch.setattr(type(chart), "least_depth_along", stepped)
     ((coarse, _, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
     assert coarse > 2.0, coarse
 
@@ -342,3 +354,61 @@ def test_a_region_with_no_sea_named_is_a_finding_and_not_the_mediterraneans(char
     named = set(A.SEAS)
     manifest = A.load_manifest()
     assert set(manifest["regions"]) | set(manifest.get("tide_regions") or {}) <= named
+
+
+def test_the_known_list_lies_beside_the_tool_and_outside_the_games_data():
+    """Package 111's ruling 4 (the chart session's tracks step): the known list is the
+    tool's and the game never reads it, so it lies beside the tool and not under `data/`,
+    whose every file the build's fingerprint hashes (`core/world.fingerprint_of`): an edit
+    of the list leaves the build as it is (old: `data/charts/audit-known.yaml`)."""
+    data = ROOT / "data"
+    assert A.KNOWN_PATH.parent == ROOT / "tools" and data not in A.KNOWN_PATH.parents
+    assert A.KNOWN_PATH.is_file() and not (data / "charts" / "audit-known.yaml").exists()
+    assert A.load_known()
+
+
+def test_an_unreadable_track_mark_is_an_error_at_the_load_and_a_finding(tmp_path, chart):
+    """The chart session's tracks step (the lead's ruling of 2026-11-14): a track mark that is
+    neither a feature nor a position in the dialect's one form was skipped by the planner
+    without a word, so Augusta's, Marsaxlokk's and Syracuse's files described legs no ship
+    sailed (ten marks in degrees, minutes and seconds). It is now an error at the load, in
+    words naming the file and the mark, and in the audit a finding of its own (`f-mark`)."""
+    from freesail.world.ports import UnreadableMark, load_port
+
+    def dms(doc):
+        doc["tracks"]["to_sea"] = ["37 11 42 N 15 12 36 E", "37 10 12 N 15 15 36 E"]
+
+    path = _port_file(tmp_path, "augusta", dms)
+    with pytest.raises(UnreadableMark, match="'37 11 42 N 15 12 36 E'"):
+        load_port(next(path.glob("augusta.yaml")), chart)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart), path)
+    assert "f-mark:augusta" in audit.keys() and "f-load:augusta" not in audit.keys()
+    plain = A.Audit()
+    A.check_ports(
+        plain, chart, A.Water(chart), _port_file(tmp_path / "x", "augusta", lambda d: None)
+    )
+    assert "f-mark:augusta" not in plain.keys()
+
+
+def test_no_ports_way_in_goes_on_past_its_anchor(chart):
+    """The chart session's tracks step (the lead's ruling of 2026-11-14): a port's way in
+    from the sea as the business plans it (`ships.approach_plan`) ends at its first anchor,
+    by the same function the far body's course does (`ships.to_first_anchor`), so the plan
+    the audit reads is the plan as sailed. Old: a track from the sea that reached the
+    anchorage went on to the road and the inner track after it, a leg no ship sails (nine
+    ports: Favignana, Le Havre, Portsmouth, San Fiorenzo, St Helier, St Malo, Torbay,
+    Trapani, Weymouth)."""
+    from types import SimpleNamespace
+
+    from freesail.world.ports import load_port, port_files
+    from freesail.world.ships import approach_plan
+
+    world = SimpleNamespace(chart=chart, dealings=None)
+    past = []
+    for pid, path in sorted(port_files().items()):
+        plan = approach_plan(world, load_port(path, chart))
+        kinds = [leg[0] for leg in plan]
+        if "anchor" in kinds and kinds.index("anchor") != len(kinds) - 1:
+            past.append(pid)
+    assert past == []
