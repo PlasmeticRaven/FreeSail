@@ -145,3 +145,148 @@ run).
   fails at line 182. **KILLED** by the suite; the reader's file alone would not.
 - **A3, a spar's rating or a GM changed in the generator and the file regenerated**: that is
   fault 06-4, run above with five other tests. **SURVIVED**.
+
+## 07-1 The lookout's log line carries the true distance
+
+| 07-1 | test_longitude.py::test_the_lookouts_estimate_is_drawn_once_and_held_while_she_makes_no_way | log line's estimate from true distance | pass | SURVIVED | 12 |
+
+```
+--- mut/freesail/world/lookout.py
++++ freesail/world/lookout.py
+@@ -646,7 +646,7 @@
+         return d | {
+             "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
+-            "estimate": estimate_words(s.judged_m),
++            "estimate": estimate_words(s.distance_m),
+         }
+```
+
+Live, in the test's own world (ten miles south of the Lizard): the Lizard's
+`lookout.sighting` line's data says "three leagues" (the truth, 18,520 m) while its text and
+the reading say "four leagues" (the eye's, 23,924 m); pristine all three say four. The named
+test passes (12 s). Its line 587 is worse than `or True` alone: it compares the reading's
+first item (the Lizard) with `w.log[-1]`, which in that world is Mullion Island's line
+("five leagues"), so pristine the assertion would be false even without the fault; the
+`or True` hides a wrong comparison, not a flaky one. Caught elsewhere as the reader
+predicted: `test_lookout.py::test_a_landfall_is_notable_the_reading_carries_it_and_the_land_lost_is_said_once`
+fails, `AssertionError: assert ('three leagues' == 'four leagues'` (line 102).
+**SURVIVED** for the named test; caught by the suite.
+
+## 07-2 The latitude's sight sent to "work up the reckoning"
+
+| 07-2 | test_mends_109.py::test_words_of_the_dialect_go_to_the_dialect (both cases) | two synonyms moved to the wrong order | pass | SURVIVED | 7 |
+
+```
+--- mut/data/vocabulary.yaml
++++ data/vocabulary.yaml
+@@ -589,7 +589,8 @@
+   work up the reckoning:
+-    synonyms: [work the reckoning, work up the dead reckoning, bring up the reckoning, the day's work]
++    synonyms: [work the reckoning, work up the dead reckoning, bring up the reckoning, the day's work,
++               take a sight for the latitude, take a sight for latitude]
+@@ -598,7 +599,7 @@
+-               take a sight for the latitude, take a sight for latitude, take the latitude,
++               take the latitude,
+```
+
+Live: on the test's frigate, "take a sight for the latitude" answers `reckoning.worked`
+("The reckoning worked up: 50° 25' N, 3° 30' W by account...") where pristine it is
+`order.rejected` ("The sun is not yet on the meridian..."). Both cases pass: the test asserts
+only that the kind is not `free.line` and the text lacks "nothing of that name"
+(`tests/test_mends_109.py:107-108`); its `kind` parameter, "navigation", is never used.
+Caught elsewhere: `test_known_truths.py::test_truth_7_540_a_free_order_that_finds_nothing_is_refused_and_one_that_did_is_said`
+fails, `AssertionError: assert ('reckoning.worked' == 'order.rejected'` (line 16152).
+**SURVIVED** for the named test; caught by the suite.
+
+## 07-3 The "Not to be had in the cabin" line kept after he comes on deck
+
+| 07-3 | test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks | first non-None elsewhere line kept for ever | pass | SURVIVED | 13 |
+
+```
+--- mut/freesail/agents/harness.py
++++ freesail/agents/harness.py
+@@ -2033,14 +2033,15 @@
+-    @staticmethod
+-    def _readings_elsewhere(world: Any, senses: knowledge.Senses) -> str | None:
++    def _readings_elsewhere(self, world: Any, senses: knowledge.Senses) -> str | None:
+         """..."""
++        stuck = getattr(self, "_elsewhere_fault", None)  # FAULT: the first answer kept
+         if senses.everything:
+-            return None
++            return stuck
+         rows = knowledge.rows_elsewhere(senses)
+-        return knowledge.elsewhere_words(rows, senses)
++        self._elsewhere_fault = stuck or knowledge.elsewhere_words(rows, senses)
++        return self._elsewhere_fault
+```
+
+Live: in the test's world, after the test's `w.run(3700)`, `w.submit("go on deck")`
+(`captain.on_deck`) and another 3,700 s: pristine the two samples on the quarterdeck carry
+`readings_elsewhere = None`; with the fault both still say "Not to be had in the cabin: the
+true wind, ...". The named test passes (13 s): its "on deck again ... the line is gone"
+check reads `samples(h)[0]`, the first sample, taken before he went below
+(`tests/test_knowledge.py:249`), and the test never brings him on deck. Also run with the
+fault, all pass: `::test_knowledge_all_turns_the_rule_off` (line 311),
+`::test_the_lookouts_station_reads_the_horizon_and_no_instrument` (343),
+`::test_the_masters_days_work_is_done_in_the_gunroom_by_the_rules_master_and_a_model_alike`
+(1525: `"speed" in ... or "readings_elsewhere" not in ...`, carried by its first leg).
+**SURVIVED**: the reader's claim stands, and no test in the file catches it.
+
+## 07-4 A word said on deck no longer written in the other hulls' logs
+
+| 07-4 | test_knowledge.py::test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone | loop recording the word on other hulls deleted | pass | SURVIVED | 22 |
+
+```
+--- mut/freesail/orders/stations.py
++++ freesail/orders/stations.py
+@@ -637,15 +637,6 @@
+         data["notable"] = True
+-    for hull, names in elsewhere.items():
+-        # the word as heard aboard another ship, in her log, for her people's samples
+-        hull.record(
+-            Severity.NOTABLE if data.get("notable") else Severity.ROUTINE,
+-            kind,
+-            line,
+-            actor=str((getattr(ship, "extra", None) or {}).get("order_actor") or "the captain"),
+-            data={**data, "heard_by": names, "said_from": here},
+-        )
+     return kind, line, data
+```
+
+The named test passes with the fault. Its hearing check is guarded by
+`if bearing_cables(w, frigate, boat) <= 4` (`tests/test_knowledge.py:1821`), and the guard
+cannot be true: the helper (`tests/test_knowledge.py:1828-1832`) takes the second value of
+`geo.bearing_and_distance`, which is metres (`freesail/world/geo.py:148-150`), names it `nm`
+and multiplies by ten. In the test the two hulls are at 49° 31' N and 49° 32' N, 5° 31' W,
+about 1,063 m apart (5.7 cables), and the helper returns 10,633 "cables"; the branch would be
+taken only within 0.4 m. Pristine, too, the boat's log holds no "launch ahoy" line at that
+range. Caught elsewhere, as the reader said:
+`::test_a_say_is_heard_on_every_hull_within_hearing_and_written_as_heard` fails,
+`assert heard and heard[0].data["heard_by"] == ["captain"]` / `assert ([])`.
+**SURVIVED** for the named test (by a unit error in its helper, which the reader did not
+see); the fault is caught by the suite.
+
+## 07-5 "is east of" and "is west of" swapped in the dialect
+
+| 07-5 | test_longitude.py::test_the_dialect_reads_the_new_rows_for_nothing_and_the_events_are_named | east_of and west_of swapped | pass | SURVIVED | 7 |
+
+```
+--- mut/freesail/standing/grammar.py
++++ freesail/standing/grammar.py
+@@ -755,8 +755,8 @@
+             ("is north of", "north_of"),
+             ("is south of", "south_of"),
+-            ("is east of", "east_of"),
+-            ("is west of", "west_of"),
++            ("is east of", "west_of"),
++            ("is west of", "east_of"),
+```
+
+Live: in the test's world (49.75 N, 5.2 W), "the reckoning is west of 5 W" holds `True`
+pristine and `False` with the fault. The named test passes (7 s): it asserts only
+`holds(...) in (True, False)` (`tests/test_longitude.py:533`), and in its world "the
+longitude by chronometer" has no value yet (`readings.value("longitude_by_chronometer")` is
+None), so both of its east/west conditions are False pristine and faulty alike. Caught
+elsewhere: `test_reckoning.py::test_the_dialect_reads_the_new_rows_for_nothing` fails,
+`AssertionError: the reckoning is west of 5 W` / `assert False is True`.
+**SURVIVED** for the named test; caught by the suite.
