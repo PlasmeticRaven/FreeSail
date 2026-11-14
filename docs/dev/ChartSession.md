@@ -581,3 +581,14 @@ no tide); the Mediterranean layers go to step 3, whose measure must meet a layer
 land opening a block's edge (boxes off the land, or an open edge read by its water, an
 engine change for the lead). The nine pins re-pinned; the passages, digests, saves and
 browser plans unmoved.
+
+### 2026-11-14, 04:45: the lead's three lines
+
+- 112 step 1's test of the world under a named chart makes a symlink, refused on the owner's
+  Windows machine (WinError 1314): its builder mends it in step 2 without a link and without
+  a platform skip, and says which other chart tests make links.
+- **The review portion is launched** (packages 114, the cold review, and 103a, the range's
+  audit, on the trunk at 504a2506). This branch and the builders' are work in flight, not
+  under review. This session and its builders do not read or write the review's sessions or
+  `docs/reviews/`; a finding that touches the chart comes through the lead.
+- 111's last step is still with its builder (the sampler's step); the seven tracks wait for it.
