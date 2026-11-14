@@ -16344,7 +16344,7 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
 @pytest.mark.slow
 def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
-    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    findings `tools/audit_chart_known.yaml` owns, each within its count's ceiling."""
     A = _audit_tool()
     audit = A.run(A.FULL_STEP_DEG)
     known = A.load_known()

@@ -101,7 +101,19 @@ crew_pool:
 
 closed_to: []
 
+# The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
+# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
+# clear of the land by the game's guard. The old way ran due east over the grid's shoal off Ortygia's south-west
+# (0.5 m): out through the middle third of the mouth, the Plemmyrium shoal's third to the south
+# left on the starboard hand going out (Smyth). Least: the harbour to 37 02.82 N 15 17.43 E 6.1 m;
+# on to 37 02.87 N 15 18.00 E 5.0 m (the grid's ridge across the harbour); on to 37 03 N
+# 15 18 30 E 18.3 m; on to 37 03 N 15 22 E 46.5 m. The way in from the sea ends off the mouth
+# and the inner track goes on by the same marks, the outer road (off the mouth) to the first of
+# them 18.3 m (old: in from the sea to the harbour, and the business's way in went back out to
+# the outer road and straight in again over the shoal).
 tracks:
-  to_sea: [syracuse-harbour, 37 03 N 15 18 30 E, 37 03 N 15 22 E]
-  from_sea: [37 03 N 15 22 E, 37 03 N 15 18 30 E, syracuse-harbour]
-  in: [syracuse-harbour]
+  to_sea: [syracuse-harbour, 37 02.82 N 15 17.43 E, 37 02.87 N 15 18.00 E, 37 03 N 15 18 30 E, 37 03 N 15 22 E]
+  from_sea: [37 03 N 15 22 E, 37 03 N 15 18 30 E]
+  in: [37 02.87 N 15 18.00 E, 37 02.82 N 15 17.43 E, syracuse-harbour]

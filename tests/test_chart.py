@@ -2419,3 +2419,118 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     assert whole.level_at(south) == 1  # the corridor answers before the world
     assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
+
+
+# -- the chart session's tracks step: the least depth along a line ---------------------
+
+
+# the level-3 tile of the global grid holding 0.01 N 0.01 E (tiles of 512 cells of half a
+# second, counted from 90 S and 180 W), its south and west edges in seconds
+HARBOUR_SOUTH_SEC = -90 * 3600 + int((90.01 * 3600 / 0.5) // 512) * 256
+HARBOUR_WEST_SEC = -180 * 3600 + int((180.01 * 3600 / 0.5) // 512) * 256
+
+
+def _harbour_grid(tmp_path: Path, head_col: int | None) -> Chart:
+    """A made chart of one level-3 tile by the equator (cells of half a second, 15.4 m each
+    way there), all 40 m deep at the datum, with a rock one cell wide standing 20 m above
+    it in the tile's row 256 at `head_col` (none where None)."""
+    nodata = -32768
+    name = f"{HARBOUR_SOUTH_SEC}_{HARBOUR_WEST_SEC}"
+    elev = np.full((512, 512), -400, dtype=np.int16)  # tenths of a metre
+    if head_col is not None:
+        elev[256, head_col] = 200
+    path = tmp_path / "tiles" / "3" / "harbour" / f"{name}.npz"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        path,
+        elevation=elev,
+        level=np.int16(3),
+        unit_m=np.float32(0.1),
+        cell_sec=np.float32(0.5),
+        south_sec=np.int64(HARBOUR_SOUTH_SEC),
+        west_sec=np.int64(HARBOUR_WEST_SEC),
+        nodata=np.int16(nodata),
+        dist=np.zeros(elev.shape, dtype=np.uint16),
+        min_depth_m=np.float32(-20.0),
+    )
+    manifest = {
+        "levels": load_manifest()["levels"],
+        "regions": {},
+        "corridors": {
+            "harbour": {
+                "level": 3,
+                "bounds": {
+                    "south": HARBOUR_SOUTH_SEC / 3600.0 + 0.001,
+                    "north": HARBOUR_SOUTH_SEC / 3600.0 + 0.07,
+                    "west": HARBOUR_WEST_SEC / 3600.0 + 0.001,
+                    "east": HARBOUR_WEST_SEC / 3600.0 + 0.07,
+                },
+                "folder": "tiles/3/harbour",
+                "tiles": [{"name": name}],
+            }
+        },
+        "charts": {"sea": {"regions": [], "layers": ["harbour"]}},
+    }
+    return Chart("sea", manifest, tmp_path)
+
+
+def test_a_lines_least_depth_is_read_at_half_the_finest_cell_under_it(whole):
+    """The chart session's tracks step (package 111's ruling 1): the least depth along a
+    line has one reader in the chart, `Chart.least_depth_along`, and its step is half the
+    narrower side of a cell of the finest level under the line, taken from the chart and
+    not a constant: a harbour patch's, a region's or the corridor's, as the line lies."""
+    for a, b in (
+        (Position(50.150, -5.060), Position(50.160, -5.040)),  # Carrick Roads, level 3
+        (Position(49.5, -5.0), Position(49.6, -5.2)),  # the Channel's open water, level 2
+        (Position(45.0, -20.0), Position(45.2, -20.3)),  # the ocean, level 1
+    ):
+        lv = whole._finest_level(a)
+        assert lv is not None and lv is whole._finest_level(b)
+        coslat = math.cos(math.radians(max(abs(a.lat_deg), abs(b.lat_deg))))
+        assert whole.line_step_m(a, b) == pytest.approx(0.5 * lv.cell_m * coslat)
+    # a line from open water into a harbour patch is read at the patch's step throughout
+    a, b = Position(49.95, -5.00), CARRICK_ROADS
+    assert whole._finest_level(a).level < 3 and whole._finest_level(b).level == 3
+    assert whole.line_step_m(a, b) == pytest.approx(
+        0.5 * whole.levels[0].cell_m * math.cos(math.radians(b.lat_deg))
+    )
+    assert whole.line_step_m(Position(0.0, 60.0), Position(0.1, 60.1)) is None
+
+
+def test_a_head_one_cell_wide_is_found_at_the_charts_step_and_missed_at_twenty_metres(tmp_path):
+    """The cause's test (package 111's ruling 1): a rock one cell wide standing 20 m above
+    40 m of water, on a made grid of 15.4 m cells. The line along its row, read at half a
+    cell, finds it dry from wherever the line starts, but read every 20 m it is passed by
+    as over 15 m of water at the worst start (old: the audit's first reading every 20 m,
+    which this would fail)."""
+    chart = _harbour_grid(tmp_path, head_col=300)
+    cell_deg = 0.5 / 3600.0
+    south, west = HARBOUR_SOUTH_SEC / 3600.0, HARBOUR_WEST_SEC / 3600.0
+    lat = south + 256.5 * cell_deg  # the head's row, through its centre
+    head_lon = west + 300.5 * cell_deg
+    end = Position(lat, west + 500 * cell_deg)
+    cell_m = 0.5 * units.NAUTICAL_MILE / 60.0
+    step = chart.line_step_m(Position(lat, west + 10 * cell_deg), end)
+    coslat = math.cos(math.radians(lat))
+    assert step == pytest.approx(0.5 * cell_m * coslat, rel=1e-9)
+    plain = _harbour_grid(tmp_path / "plain", head_col=None)
+    least = plain.least_depth_along(Position(lat, west + 10 * cell_deg), end)
+    assert least is not None and least[0] == pytest.approx(40.0)
+
+    def least_at(every: float | None, start_lon: float) -> float:
+        a = Position(lat, start_lon)
+        if every is None:
+            return chart.least_depth_along(a, end)[0]
+        real = chart.line_step_m
+        try:
+            chart.line_step_m = lambda a, b: every  # type: ignore[method-assign]
+            return chart.least_depth_along(a, end)[0]
+        finally:
+            chart.line_step_m = real  # type: ignore[method-assign]
+
+    # starts a sixteenth of a cell apart over two cells' width, a cable and more short of it
+    starts = [head_lon - 15 * cell_deg + k * (cell_deg / 16.0) for k in range(32)]
+    found = [least_at(None, s) for s in starts]
+    assert max(found) < 0.0, max(found)  # dry from every start: three quarters of its rise
+    coarse = [least_at(20.0, s) for s in starts]
+    assert max(coarse) > 15.0, max(coarse)  # passed by as deep water at the worst start

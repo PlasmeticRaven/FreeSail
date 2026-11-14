@@ -182,7 +182,16 @@ crew_pool:
 
 closed_to: []
 
+# The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
+# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
+# clear of the land by the game's guard. The old way crossed the grid's shore beside the road (ground drying 4.0 m
+# on the leg to the harbour): out east of the road first, then down the Marina's side to the
+# mouth, keeping west of the islands that stand for the Braccio (the mouth open to the
+# north-west, Smyth and Purdy). Least: road to off it 36.1 m; off it to 38 13 N 15 35 E 100.9 m;
+# on to 38 17 N 15 40 E 39.8 m; off the road to the mouth 54.7 m; the mouth to the harbour 34.2 m.
 tracks:
-  to_sea: [messina-road, 38 13 N 15 35 E, 38 17 N 15 40 E]
-  from_sea: [38 17 N 15 40 E, 38 13 N 15 35 E, messina-road]
-  in: [messina-road, messina-harbour]
+  to_sea: [messina-road, 38 12.44 N 15 34.05 E, 38 13 N 15 35 E, 38 17 N 15 40 E]
+  from_sea: [38 17 N 15 40 E, 38 13 N 15 35 E, 38 12.44 N 15 34.05 E, messina-road]
+  in: [messina-road, 38 12.44 N 15 34.05 E, 38 11.91 N 15 33.81 E, messina-harbour]

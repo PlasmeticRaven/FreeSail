@@ -482,7 +482,7 @@ features:
     height_m: 20
     source: "Purdy 1825, p. 22 (the table): Pt Handia, the S.W. point of Fortaventura; p. 214: the Isleta of Canaria lies 16 leagues N.W. by W. 1/2 W. from it; Norie 1805, Table XL: Fuerteventura, South West Point 28 4 N"
     says: "Point Handia, the south-west end of Fuerteventura, the Grand Canary sixteen leagues off."
-    fix: "moved 420 m to the grid's land; the region as built with its gauges holds the point as water, 2.5 m, its land a kilometre north-east, and the mark is left here (the chart's audit, package 111: listed in data/charts/audit-known.yaml)"
+    fix: "moved 420 m to the grid's land; the region as built with its gauges holds the point as water, 2.5 m, its land a kilometre north-east, and the mark is left here (the chart's audit, package 111: listed in tools/audit_chart_known.yaml)"
   - id: morro-gable
     kind: headland
     name: Morro Gable

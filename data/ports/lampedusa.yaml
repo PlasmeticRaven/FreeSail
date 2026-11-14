@@ -107,7 +107,17 @@ crew_pool:
 
 closed_to: []
 
+# The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
+# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
+# clear of the land by the game's guard. The old straight leg from the harbour to the road crossed the grid's
+# shoal at the harbour's mouth (0.4 m): out south by the mouth's deeper side first. Least: the
+# harbour to 35 29.489 N 12 36.012 E 6.4 m; on to the road 27.5 m; the road to 35 27 N 12 36 E
+# 44.5 m; the way in from the sea ends at the road, and the inner track goes on by the mark
+# (old: the track from the sea ran on to the harbour, and the business's way in went from the
+# harbour back out to its road and in again across the shoal).
 tracks:
-  to_sea: [lampedusa-harbour, lampedusa-road, 35 27 N 12 36 E]
-  from_sea: [35 27 N 12 36 E, lampedusa-road, lampedusa-harbour]
-  in: [lampedusa-road, lampedusa-harbour]
+  to_sea: [lampedusa-harbour, 35 29.489 N 12 36.012 E, lampedusa-road, 35 27 N 12 36 E]
+  from_sea: [35 27 N 12 36 E, lampedusa-road]
+  in: [lampedusa-road, 35 29.489 N 12 36.012 E, lampedusa-harbour]

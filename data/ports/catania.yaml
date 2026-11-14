@@ -103,7 +103,15 @@ crew_pool:
 
 closed_to: []
 
+# The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
+# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
+# clear of the land by the game's guard. The old straight leg from the road into the mole crossed the grid's sill
+# at the little port's south side (1.1 m): in by the north, past the piers' heads (Smyth: the lava
+# on the south, the two short piers on the north). Least: the road to 37 30.002 N 15 05.948 E
+# 5.0 m; on within the mole 6.3 m; the road to sea 22.6 m.
 tracks:
   to_sea: [catania-road, 37 29 N 15 10 E]
   from_sea: [37 29 N 15 10 E, catania-road]
-  in: [catania-road, catania-port]
+  in: [catania-road, 37 30.002 N 15 05.948 E, catania-port]

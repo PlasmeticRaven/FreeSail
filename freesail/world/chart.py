@@ -1185,6 +1185,70 @@ class Chart:
         e = self.elevation_at(pos)
         return None if e is None else -e
 
+    # -- depth along a line (package 111's ruling 1, the chart session's tracks step) -------
+
+    def line_step_m(self, a: Position, b: Position) -> float | None:
+        """The step a line from `a` to `b` is read at for its least depth: half the narrower
+        side of a cell of the finest level with a tile anywhere under the line (a cell's
+        width east and west is its height north and south by the cosine of the latitude,
+        taken at the line's latitude furthest from the equator, where it is narrowest).
+        The lookup is bilinear between cell centres, so a reading half a cell apart comes
+        within a quarter cell of every centre the line passes over and reads at least
+        three quarters of a lone cell's rise. A level is under the line where a point read
+        a quarter of its tile's span apart along it, its ends among them, falls in one of
+        its tiles. None where no level has a tile under the line."""
+        bearing, dist = bearing_and_distance(a, b)
+        coslat = math.cos(math.radians(max(abs(a.lat_deg), abs(b.lat_deg))))
+        for lv in self.levels:  # finest first
+            span_m = lv.span_sec * units.NAUTICAL_MILE / 60.0
+            n = max(1, int(math.ceil(dist / (span_m / 4.0))))
+            for i in range(n + 1):
+                p = destination(a, bearing, dist * i / n)
+                if lv.has(p.lat_deg, p.lon_deg):
+                    return 0.5 * lv.cell_m * min(1.0, coslat)
+        return None
+
+    def least_depth_along(
+        self,
+        a: Position,
+        b: Position,
+        refine_below_m: float | None = None,
+        refine_step_m: float | None = None,
+    ) -> tuple[float, Position] | None:
+        """The least depth at the datum the chart gives along the great circle from `a` to
+        `b` (metres, negative where it dries) and the place of it, read every
+        `line_step_m`, the ends among the readings; and, with `refine_below_m` and
+        `refine_step_m`, read again every `refine_step_m` where the first reading's least
+        is under `refine_below_m`, the lesser of the two kept. None where the chart knows
+        nothing along the line. The one reader of a line's least depth (package 111's
+        ruling 1): the audit's track check reads it."""
+        step = self.line_step_m(a, b)
+        if step is None:
+            return None
+        bearing, dist = bearing_and_distance(a, b)
+
+        def read(every: float) -> tuple[float, Position] | None:
+            n = max(1, int(math.ceil(dist / every)))
+            least: tuple[float, Position] | None = None
+            for i in range(n + 1):
+                p = destination(a, bearing, dist * i / n)
+                e = self.elevation_at(p)
+                if e is not None and (least is None or -e < least[0]):
+                    least = (-e, p)
+            return least
+
+        least = read(step)
+        if (
+            least is not None
+            and refine_below_m is not None
+            and refine_step_m is not None
+            and least[0] < refine_below_m
+        ):
+            fine = read(refine_step_m)
+            if fine is not None and fine[0] < least[0]:
+                least = fine
+        return least
+
     def tile_min_depth(self, pos: Position) -> float | None:
         """The shoalest sounding of the finest tile under the point (NaN-free: None
         where the tile is all land or there is none)."""

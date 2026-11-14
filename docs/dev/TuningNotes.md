@@ -29214,3 +29214,117 @@ listed answers, the later fill, and the two forms are one. They also hold the wo
 synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
+
+## The chart session's tracks step: the least depth along a line, and seven ports' tracks (2026-11-14)
+
+By package 111's rulings 1, 3 and 4 as merged (the record's "Package 111, step 2b ... PACKAGE
+111 CLOSED"), on the trunk at 848bbcae.
+
+**One reader of a line's least depth.** `Chart.least_depth_along(a, b, refine_below_m,
+refine_step_m)` reads the great circle every `Chart.line_step_m(a, b)` and keeps the least.
+That step is half the narrower side of a cell of the finest level with a tile under the line:
+- the narrower side is the cell's height north and south times the cosine of the line's
+  highest latitude;
+- a level is under the line where a point read a quarter of its tile's span apart along the
+  line, its ends among them, falls in one of its tiles.
+
+Where the first least is under `refine_below_m` the line is read again every `refine_step_m`,
+and the lesser of the two is kept. The lookup is bilinear between cell centres. A reading half
+a cell apart therefore comes within a quarter cell of every centre the line passes over, and
+reads at least three quarters of a lone cell's rise.
+
+The audit's `_least_depth` (check (f), `f-shallow`) now reads only this, with
+`TRACK_REFINE_BELOW_M` (8 m) and `TRACK_STEP_M` (2 m). Old: a first reading every 20 m
+(`TRACK_COARSE_STEP_M`, taken out), a constant unrelated to the cell, and a second reading that
+replaced the first.
+
+The step is the cell's:
+- 7.7 m over a level-3 harbour patch at the equator, about 5.8 m at 41 N and 5 m at 50 N;
+- 36 m over level 2 at Setúbal, coarser than the old 20 m: the grid cannot say less than a
+  92.6 m cell there, and the 2 m second reading still finds Setúbal's 1.2 m;
+- over level 1 (cells of 926 m) half a cell, some 300 to 460 m by the latitude.
+
+Measured:
+- check (f) whole takes 12.7 s of processor time against 10.9 s;
+- the same 19 `f-shallow` findings before the tracks below were redrawn;
+- three findings' words moved by a tenth of a metre or the leg named: Santa Cruz de Tenerife
+  1.5 to 1.6 m, St Malo's and the Goletta's leg named, Civita Vecchia's place 46.9 to 47.0 E.
+
+The tests:
+- `tests/test_chart.py` asserts the step against the chart's own finest cell (level 3 in
+  Carrick Roads, 2 in the open Channel, 1 in the ocean, and level 3 throughout a line from open
+  water into the Roads).
+- On a made level-3 grid, a rock one cell wide 20 m above 40 m of water is read dry from 32
+  starts a sixteenth of a cell apart. Read every 20 m it is passed by as over 15 m of water at
+  the worst start.
+- `tests/test_chart_audit.py`'s Setúbal test now sets the old step on both readings. Old:
+  `TRACK_STEP_M` alone, which the first reading no longer is; the old reader's spacing is the
+  leg cut into its whole number of 20 m steps.
+
+**Seven ports' tracks.** Searched for the deepest way from each anchorage to open water: a
+widest-path search on a 10 m lattice, simplified to the fewest marks whose legs keep a floor.
+Every leg was read by the reader above and passed by the game's guard.
+
+| Port | Old least (the leg) | New least | What moved |
+|---|---|---|---|
+| Messina | ground drying 4.0 m (the road to the harbour, across the shore) | 34.2 m | out east of the road first, then down the Marina's side to the mouth, west of the islands that stand for the Braccio |
+| Syracuse | 0.5 m (east over the grid's shoal off Ortygia) | 5.0 m | out through the middle third of the mouth (Smyth's Plemmyrium shoal to the south); from the sea to off the mouth, the inner track on to the harbour |
+| Palermo | 0.0 m (across a modern pier) | 4.5 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
+| Lampedusa | 0.4 m (the harbour to its road) | 6.4 m | by the mouth's deeper side; from the sea to the road, the inner track on |
+| Catania | 1.1 m (the road into the mole) | 5.0 m | in by the north, past the piers' heads (Smyth: the lava on the south, the piers on the north) |
+| Santa Cruz de Tenerife | ground drying 1.6 m | not redrawn | the road's spot lies within the grid's modern Dique: the deepest way out within 5 km dries 0.0 m |
+| Porto Paolo | ground drying 2.1 m | not redrawn | the spot lies within the modern basin, closed by the grid's breakwater: the deepest way out is 0.5 m |
+
+Their known-list entries go as they are mended (five out). The last two need their spots moved,
+which is beyond the step, and wait for the lead's word.
+
+Three of the five shared one cause beside the shoal, which is the plan and not the track. The
+business's way in (`ships.approach_plan`) is the track from the sea, then the outer road where
+that track does not pass it, then the inner track. Lampedusa's, Palermo's and Syracuse's tracks
+from the sea ran on to the anchorage, so the plan went back out to the road and straight in
+again over the shoal. Their tracks from the sea now end at the road, as Messina's and Catania's
+already did. Looked for in the other ports: the audit reads the whole plan, so any other port
+so drawn would show a shallow leg; none of the 19 findings is of this kind.
+
+Palermo's grid is the modern port. Its way is the grid's deepest, not the pilot's picture of
+brushing the mole-head (said in the file).
+
+**Faden's sunken rock north-east of Roustel** (St Peter Port; p. 32, the OCR's lines 4249 to
+4251, "About :oo yards"): the track passes Roustel at 220 m, about 240 yards. It keeps "that
+distance" if the figure is 100 or 200 yards and not if it is 300. The rock itself, at each of
+those distances north-east of Roustel, the track passes at 224, 213 and 158 m. Said in the
+port's file.
+
+This corrects my earlier reading, which the lead's ruling repeated ("clears 100 yards but not
+200"): measured on the tracks as merged, it clears 200 too.
+
+**The known list moves out of `data/`** (ruling 4) to `tools/audit_chart_known.yaml`, beside
+the tool. The build's fingerprint hashes every file under `data/` (`core/world.fingerprint_of`),
+so an edit of a list the game never reads changed the build and made earlier saves another
+build's. The move itself changes the fingerprint once, as every data change of the step does.
+A test holds the list beside the tool and nothing at the old path.
+
+**The land guard (ruling 3), on the tracks as merged.** It stays listed and unmended; a second
+way through is recorded here for the lead's list. A crossing is called only at a stepped point,
+and only beyond the first cable and short of the last (`land_crossing`'s skips), so dry ground
+within a cable of a leg's ends is not tried even where the end is a mark at sea and not a
+place on the shore.
+- Civita Vecchia's way in, the road to 42 05.53 N 11 47.00 E (538 m), crosses 138 m of ground
+  drying 0.6 m from 329 to 466 m along. The last stepped point tried is at 309 m and the last
+  cable is skipped, so the guard reports a near pass of 22.7 m.
+- Its way out's first leg crosses 50 m of ground drying 0.4 m, 7 to 56 m from its first mark.
+  That is within the first cable, so it is not tried.
+- Santa Cruz de Tenerife's two legs cross 45 m of ground 1.6 m above the datum and are reported
+  as near passes of 19.4 and 19.0 m.
+
+**Where else a fixed step samples the chart along a line** (package 111's table above, checked
+against the code). It holds, and lacks one: `dealings._leg_made`, the pilot's judging of a leg
+he lays. That reads `dangers_ahead` (the charted features, no step) and then the water under
+her every half cable (92.6 m) by `_water_for`; it is in the game's step of its own (ruling 2)
+with `shoal_ahead`.
+
+Not along a line, and not in the table by design: `captains` (the joining mark, sought out from
+the shore by half cables), `orders` (rings of half cables to the nearest water), and the
+contour searches. `core/world.py`'s halves of a cable are words; `orders/station.py`'s
+`SAIL_STEP_M` is not the chart. The guard and the lookout stay as they are (ruling 3, and the
+lead's 06:15 ruling).

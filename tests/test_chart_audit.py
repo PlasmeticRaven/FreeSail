@@ -2,7 +2,8 @@
 
 The audit reads the chart as the game reads it and reports, by region, water nobody owns,
 the seams, the tide, the weather, the streams, the ports, the marks and the scenarios; the
-known list (`data/charts/audit-known.yaml`) holds every finding of its first run, owned.
+known list (`tools/audit_chart_known.yaml`; before the chart session's tracks step
+`data/charts/audit-known.yaml`) holds every finding of its first run, owned.
 The fast tier runs the audit on its sampled grid and fails on any finding the list lacks;
 the slow tier runs the full sweep and fails as well on a listed finding no longer found and
 on a count above its ceiling, so that a mend takes its entry out and a new block comes in
@@ -16,6 +17,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import math
 import re
 import sys
 from pathlib import Path
@@ -188,7 +190,24 @@ def test_a_shoal_narrower_than_the_old_step_is_found(tmp_path, chart, monkeypatc
     A.check_ports(audit, chart, A.Water(chart), _port_file(tmp_path, "setubal", lambda d: None))
     found = next(f for f in audit.findings if f.key == "f-shallow:setubal")
     assert "the least 1.2 m" in found.words, found.words
-    monkeypatch.setattr(A, "TRACK_STEP_M", 20.0)
+    # at the old step (every 20 m, first and fine alike) the same leg reads over 2 m (the
+    # chart session's tracks step: the first reading is the chart's half cell, so the old
+    # step is set on both readings; old: `TRACK_STEP_M` alone set to 20 m)
+    # the leg lies over Portugal's region alone (level 2, cells of 92.6 m): its first
+    # reading is every half cell, and the 1.2 m is the second's, every TRACK_STEP_M
+    lv = chart._finest_level(a)
+    assert lv.level == 2
+    assert chart.line_step_m(a, b) == pytest.approx(
+        0.5 * lv.cell_m * math.cos(math.radians(a.lat_deg))
+    )
+    # the old reader's spacing: the leg cut into its whole number of 20 m steps (the new
+    # reader cuts it into steps of at most the step it is given)
+    from freesail.world.geo import bearing_and_distance
+
+    _, dist = bearing_and_distance(a, b)
+    old_step = dist / int(dist / 20.0)
+    monkeypatch.setattr(A, "TRACK_STEP_M", old_step)
+    monkeypatch.setattr(chart, "line_step_m", lambda a, b: old_step)
     ((coarse, _, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
     assert coarse > 2.0, coarse
 
@@ -342,3 +361,14 @@ def test_a_region_with_no_sea_named_is_a_finding_and_not_the_mediterraneans(char
     named = set(A.SEAS)
     manifest = A.load_manifest()
     assert set(manifest["regions"]) | set(manifest.get("tide_regions") or {}) <= named
+
+
+def test_the_known_list_lies_beside_the_tool_and_outside_the_games_data():
+    """Package 111's ruling 4 (the chart session's tracks step): the known list is the
+    tool's and the game never reads it, so it lies beside the tool and not under `data/`,
+    whose every file the build's fingerprint hashes (`core/world.fingerprint_of`): an edit
+    of the list leaves the build as it is (old: `data/charts/audit-known.yaml`)."""
+    data = ROOT / "data"
+    assert A.KNOWN_PATH.parent == ROOT / "tools" and data not in A.KNOWN_PATH.parents
+    assert A.KNOWN_PATH.is_file() and not (data / "charts" / "audit-known.yaml").exists()
+    assert A.load_known()
