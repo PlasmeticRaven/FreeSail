@@ -17389,3 +17389,101 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                 ), (name, tname)
                 read += 1
     assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+
+
+# ---------------------------------------------------------------------------
+# Package 103a: the range's audit (truths 7-590 to 7-592)
+# ---------------------------------------------------------------------------
+
+
+def _range_tool():
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("audit_range", root / "tools" / "audit_range.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("audit_range", mod)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
+    """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
+    in every year from 1792 to 1825 and on the days either side of every date the data
+    names makes the findings of the known list (`data/range/audit-known.yaml`) and no
+    other: 60 mechanical (the code's own years and the one finding only a whole world
+    makes left to the audit's own test), among them the three wars of June 1805 in force
+    before their own beginnings and before the prize court at peace, and 38 that rest on
+    the reference of the wars and the nations' lifetimes
+    (`data/range/reference.yaml`, FROM MEMORY, read by nothing in the game). Every listed
+    finding is owned: a data fault for milestone 7c, an engine fault, or a judgement to be
+    read against a source, which every finding of the reference's kind is."""
+    A = _range_tool()
+    letters = "".join(c for c in A.LETTERS if c not in "ea")  # the code's years are slower
+    audit = A.run(letters=letters, worlds=False)
+    known = A.load_known()
+    assert not A.unlisted(audit, known)
+    cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
+    assert audit.keys() == cheap - {"w-block-unread"}
+    assert len(audit.keys(A.MECHANICAL)) == 60
+    assert len(audit.keys(A.REFERENCE)) == 38
+    for foe in ("france", "spain", "batavian-republic"):
+        pair = "+".join(sorted(("britain", foe)))
+        assert {f"w-before-since:{pair}", f"w-court:{pair}"} <= audit.keys()
+    assert all(known[k]["owner"] in A.OWNERS for k in audit.keys())
+    assert {known[k]["owner"] for k in audit.keys(A.REFERENCE)} == {A.OWNERS[2]}
+    assert {d.year for d in audit.days} == set(range(1792, 1826))
+
+
+def test_truth_7_591_every_dated_key_of_the_data_is_in_the_classing():
+    """Package 103a, the classing's completeness: every key under data/ that carries a
+    year or a date (a date, words that name a year, a whole number of a year under a
+    date's key, a fit's name with its year) is in a row of the classing
+    (`tools/audit_range.py`, `CLASSING`; the table in docs/dev/RangeAudit.md), which says
+    how the code reads it: a seed, calendar-read, both by the scenario's choice, a script,
+    read by nothing, or words; and every row but the scenario's own `nations:` block,
+    which no shipped scenario carries, holds a key."""
+    A = _range_tool()
+    scan = A.scan_dated()
+    assert len(scan) > 5000
+    assert all(A.row_of(rel, path) is not None for rel, path, _v in scan)
+    held = {A.row_of(rel, path).id for rel, path, _v in scan}
+    assert {r.id for r in A.CLASSING} - held == {"scenario-nations"}
+    kinds = {r.id: r.kind for r in A.CLASSING}
+    assert kinds["port-holder"] == kinds["port-dated-keys"] == kinds["blockades-dates"] == A.BOTH
+    assert kinds["wars-since"] == kinds["prize-shares"] == kinds["lights-years"] == A.CALENDAR
+    assert kinds["colours-dates"] == kinds["scenario-papers"] == A.UNREAD
+    assert kinds["scenario-start"] == A.SEED
+    # the calendar-read keys that play could change, which decision 69 (c) designs out
+    assert sorted(r.id for r in A.CLASSING if r.kind in (A.CALENDAR, A.BOTH) and r.play) == [
+        "blockades-dates",
+        "days-years",
+        "port-dated-keys",
+        "port-holder",
+        "wars-since",
+    ]
+
+
+def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_at_peace():
+    """Package 103a, as measured and not as wanted: the wars carry a beginning and no end
+    and the World takes the table whole, so on 1 July 1792 the stance has Britain at war
+    with France, Spain and the Batavian Republic (which was not yet), while the prize
+    court, which alone reads a war's `since`, has her at peace with all three; on 1 July
+    1805 the two agree. A blockade of Brest is the business's on both days, and
+    Rochefort's only between 1 June 1803 and 12 July 1805."""
+    from datetime import date
+
+    A = _range_tool()
+    tree = A.load_tree()
+    foes = ("france", "spain", "batavian-republic")
+    for day, court in ((date(1792, 7, 1), False), (date(1805, 7, 1), True)):
+        for foe in foes:
+            assert A.table_at_war(tree, "britain", foe)
+            assert A.court_at_war(tree, "britain", foe, day) is court, (day, foe)
+    assert {p for _n, p, _i in A.blockades_on(tree, date(1792, 7, 1))} == {"brest"}
+    assert {p for _n, p, _i in A.blockades_on(tree, date(1805, 7, 1))} == {
+        "brest",
+        "rochefort",
+        "ferrol",
+        "cadiz",
+    }

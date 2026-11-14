@@ -129,10 +129,11 @@ def test_the_mechanical_findings_stand_without_the_reference(tree, sampled):
     """The findings that rest on the reference are a kind of their own: with the reference
     thrown away the cheap road makes the same mechanical findings, of the same years and
     counts, and none of the other kind (the one mechanical finding only a world makes, the
-    scenario's `nations:` block read by nothing, is the dear road's)."""
-    alone = A.run(worlds=False, reference=False, tree=tree)
+    scenario's `nations:` block read by nothing, is the dear road's; the code's own years,
+    the slowest check, are left to the sampled sweep)."""
+    alone = A.run(letters=QUICK, worlds=False, reference=False, tree=tree)
     assert not alone.keys(A.REFERENCE)
-    both = {k for k in sampled.keys(A.MECHANICAL)} - {"w-block-unread"}
+    both = {k for k in sampled.keys(A.MECHANICAL) if k[0] != "e"} - {"w-block-unread"}
     assert alone.keys() == both
     for key, f in alone.findings.items():
         assert f.count == sampled.findings[key].count, key
@@ -140,10 +141,14 @@ def test_the_mechanical_findings_stand_without_the_reference(tree, sampled):
     assert sampled.keys(A.REFERENCE) and all(k.startswith("r-") for k in sampled.keys(A.REFERENCE))
 
 
+# every check of the cheap road but the code's own years, which take two seconds a run
+QUICK = "".join(c for c in A.LETTERS if c not in "ea")
+
+
 def test_the_sweep_is_the_same_twice(tree):
     """Deterministic: the same tree gives the same findings, days and counts."""
-    one = A.run(worlds=False, tree=tree)
-    two = A.run(worlds=False, tree=tree)
+    one = A.run(letters=QUICK, worlds=False, tree=tree)
+    two = A.run(letters=QUICK, worlds=False, tree=tree)
     assert one.days == two.days and len(one.days) > 150
     assert {k: (f.count, sorted(f.days), f.worst) for k, f in one.findings.items()} == {
         k: (f.count, sorted(f.days), f.worst) for k, f in two.findings.items()
@@ -270,15 +275,7 @@ def test_a_port_held_by_no_nation_and_a_blockade_out_of_any_war_are_found(tree, 
     )
     ports["genoa"] = genoa
     cadiz = copy.copy(ports["cadiz"])
-    cadiz.dated = tuple(
-        (
-            key,
-            tuple({**r, "value": ("blockaded", {**r["value"][1], "by": "portugal"})} for r in rows),
-        )
-        if key == "state"
-        else (key, rows)
-        for key, rows in cadiz.dated
-    )
+    cadiz.blockade = {**cadiz.blockade, "by": "portugal"}
     ports["cadiz"] = cadiz
     audit = A.Audit()
     A.check_ports(audit, _planted(tree, ports=ports), days, None)

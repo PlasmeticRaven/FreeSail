@@ -28702,3 +28702,273 @@ listed answers, the later fill, and the two forms are one. They also hold the wo
 synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
+
+## Package 103a: the range's audit (2026-11-14)
+
+Built on the lead's brief (docs/dev/M7-WorkPackages.md, "Package 103a") and the rulings on
+the ground report (below), from the trunk's 504a250. The measurement itself, the classing's
+table, the ten findings that matter most, what the sweep cannot see and the research mapped
+are in **docs/dev/RangeAudit.md**; this section is what was built, what was taken another
+way, and the helpers' reports.
+
+**What was built.** `tools/audit_range.py` (the sweep), `data/range/audit-known.yaml` (the
+105 findings of the first full sweep, each owned), `data/range/reference.yaml` (the wars,
+the peaces and the nations' lifetimes of 1792 to 1825, FROM MEMORY, read by nothing in the
+game), `tests/test_range_audit.py` (18 fast tests and two slow), truths 7-590 to 7-592, and
+the document. No file under `freesail/` changed, and none under `data/` but the two new
+ones under `data/range/`.
+
+**The ground report and the rulings.** Before anything was written the builder reported
+how a scenario seeds the world on its first day, every place the data carries a date, and
+seven things the brief assumed that are not there: the wars undated and June 1805's on
+every day; no nation with a lifetime; no signal book, regulation or private signal dated;
+no ship dated as data; the flags' years only partly read; words fixed to 1805; a
+scenario's own `nations:` block parsed and read by nothing. The lead accepted the seven as
+findings and ruled: (A) seed each sampled day through the engine's own readers and make
+whole worlds on a few, with a check that the two roads agree on what both see; (B) carry a
+small reference of the wars, the peaces and the nations' lifetimes, every row marked FROM
+MEMORY with its confidence or citing where the tree already has it, its findings a kind of
+their own counted apart, under `data/range/` and read by nothing in the game; (C) "no data
+dates it" as one finding to an element, and the year in a fit's name checked against the
+day wherever a scenario or the business names or draws that fit. The helpers were run as
+the owner directed.
+
+**Taken another way than the brief.**
+
+- The brief's sweep "begins rules-only scenarios on sampled days". A whole world costs ten
+  to nineteen seconds, so the sweep seeds its 202 days through the readers and begins four
+  worlds in the fast tier (138 under `--full`): ruling A.
+- The classing is "data the tool reads": it is the tool's own table (`CLASSING`), not a
+  third file under `data/`, since the package may add no data file but the known list and,
+  by ruling B, the reference. The document's table is the tool's own print of it, and a
+  test holds the two the same.
+- The lead asked for about six whole worlds in the fast tier within about thirty seconds.
+  Four fit: the test file's fast tier is about 25 s.
+- The brief's "each signal book, regulation, private signal in force on that day" and "a
+  class afloat that year" cannot be checked, the data dating none of them: each is one
+  finding of check (u), biting every year (ruling C).
+
+**What counts as a finding** (each JUDGEMENT, said where it stands in the tool). The day
+sampled in each year is 1 July. A port's key is "undated" where its file gives one value
+and not rows; a file with one undated row that says "through the range" counts as said. A
+nation's `relations` say war where the words begin "war" or speak of a "standing war". A
+fit is of the first year its name carries. A flag's dates are read span by span, so
+"-1806, 1815-" is two spans to the audit, though the engine's own reader would refuse it.
+Words are "served" where the builder reads the code as giving them to a player or a model
+(the nations' colours, a ship's account of herself, an officer's brief and history, a
+pilot's words, a port's blockade's beginning); a served line bites every day before the
+latest year it names. A year in the code is a `date(` or `datetime(` call with a year of
+1700 to 1899 written in it, or such a year given to a name with "year" in it; a seed of
+1805 is no date. The chart's manifest, its overrides and its own audit's list are classed
+whole as the builders' provenance. The regulations' files are a list in the tool.
+
+**The whole worlds.** A frigate under British colours at seed 7, the business on, the
+whole chart, begun at 08:00 on the day at one of seven stations (off Ushant, Rochefort,
+Cadiz, Gibraltar, Toulon, Leghorn and Malta). Each carries a scenario's own `nations:`
+block of no war at all, so that a World that came to read the block would show it by being
+at peace; today every one is at the table's three wars (`w-block-unread`). The two roads
+agreed on every one of the 138 worlds of the full sweep: the 121 ports' holders and
+states, the wars, and the blockades drawn within the region.
+
+**The quick loader.** The game reads YAML with the pure-Python loader. Making a world off
+Ushant took 14 to 19 s, 13.8 s of it in 151 calls of `yaml.safe_load`, 9.7 s of that in 25
+calls of `ships._default_fit`, which reads the vessel's ship file afresh each time. While
+the audit runs, and only then, `yaml.safe_load` is answered by libyaml's loader where it
+is installed (`fast_yaml`, put back on the way out); the same world then takes about five
+seconds. The slow tier's test reads every ship, port, signal, scenario and top-level data
+file by both loaders and holds them equal. Nothing of the engine was changed; the pace is
+reported to the lead as found.
+
+**The pace** (one process, four cores, 2026-11-14). The sampled sweep about 20 s (four
+worlds 15 s, the code's years 2 s, the rest under a second); the test file's fast tier
+about 25 s on one worker; truths 7-590 to 7-592 3.4 s together; the full sweep 11 min 18 s
+(138 worlds 672 s), its slow test 674 s.
+
+**The findings** (the full sweep): 105, of which 66 mechanical (46 data faults for
+milestone 7c, 20 engine faults) and 39 that rest on the reference. By check: the ports 9,
+the wars 11, the blockades 1, the vessels 6, the flags 7, the days 2, the lights 1, the
+words 6, the code's years 5, what no data dates 10, the classing 8, the reference 39, the
+two roads' agreement none. The sampled sweep makes all but `r-vessel:etruria`.
+
+**Corrections to the ground report.** It said some 150 lights' words ("not yet built in
+1805") are served on any day: they are not (a feature's `says` is served only for the shore
+and a point of interest). It put 1793's Union of 1801 down to the flags' nearest-year
+answer: that is the signal flags'; the national colours' dates are read by nothing.
+
+**Found for others, not mended.** In the engine: the scenario's `nations:` block unread;
+the prize court and the stance disagreeing before a war's `since`; `Nations.declare_war`
+writing a day the court cannot read (the helper's reading, not measured); the colours'
+dates unread; `papers.almanac` and `papers.chart.year` unread; 1805 fixed in five files
+(`api/viewer_flags.py`, `combat/hits.py`, `core/world.py`, `evolutions/runner.py`,
+`orders/crew.py`) and in the client's map; `Port.on_day` and `Port.nation_on` with no
+caller; `ships._default_fit` reading the ship file once a vessel. In the data: Naples's
+ensign's dates in a form the reader of dates would refuse; the Cadiz blockade's beginning
+in words; Algiers's war with Portugal and the Order's with the regencies written under
+`relations` and not in the table.
+
+### The helpers' reports, kept (package 103a)
+
+Two read-only helpers were used, one for the classing's readers and one for the map of the
+research on file. Each read the tree at 504a250 and changed nothing; neither read
+`docs/reviews/` nor the cold review's branch. Their reports are kept here as returned, cut
+only for length; where the builder checked a claim and it did not hold, the claim is marked.
+What they say is their reading, not a measurement: the classing table in
+`docs/dev/RangeAudit.md` is the builder's, checked against the code.
+
+#### Helper 1: how the code reads each dated key
+
+**Main finding:** only one reader turns the record back toward the calendar, `Ports.tick` to
+`Port.on_events`, and it runs only when a scenario sets `follows_history`; no scenario does.
+Some calendar-reads remain that play cannot change. A few keys are parsed and read by nothing.
+
+| Key | Reader(s) | Class |
+|---|---|---|
+| port `nation:` rows | `load_port` ports.py:736-746 (`_dated_nation(nations, when)`, `when` the scenario's `start_time`, ports.py:1232-1234); `Port.on_events` :580-584 from `Ports.tick` :1371-1396 | both by the scenario's choice |
+| port `state`, `dockyard`, `closed_to`, `market`, `crew_pool`, `pilot` rows | `load_port` :714-722 (`_value_on(rows, when)`); `on_events` :565-579; `Port.on_day` :553-563 has no caller | both by the scenario's choice |
+| `Port.nation_on` :587 | no caller in freesail/ | not read |
+| port `blockade: {since}` | kept as a string (:1001); served as words by `Ports.blockades()` :1292, via dealings.py:245 | not read as a date |
+| nations.yaml `as_of` | `load_nations` nations.py:311-317; `sailed_with_words` :252-256 prints it; served by places.py:769 and readings.py:2851 | not read as a date (words) |
+| `wars[].since` | `at_war` :109-113 ignores it; `prize_court._at_war_at` :304-317 compares it with the day of the taking | calendar-read (the prize court only) |
+| `naval.blockades[].since/until` | `Business._blockades` business.py:977-1008, `_between` :209-218 | both by the scenario's choice |
+| `nations.<id>.relations` | nothing: `load_nations` :278-319 never takes it | not read |
+| `prize_shares[].from/until` | `scheme_for` prize_court.py:96-121; one caller, :535, passes the day of the court's sentence (:417, `ship_time.date()`) | calendar-read |
+| colours.yaml `flags[].dates` (a root's and basic's `nations.<id>`) | parsed into `Flag.dates` (flags.py:282) and read by nothing | not read |
+| flags.yaml signal flags' `dates` | `drawing_of` :673-680, `signal_flag` :743-748, `dressing_stock` :991; the year from viewer_flags.py:132 (`ship_time.year`; 1805 at :134 with no clock) | calendar-read |
+| dressing.yaml `fashions[].dates` | `fashion_for` :937-947, from orders/signals.py:1083 and `dressing_flies` :1085, fed by viewer_flags.py:197 (1805 at :199 with no clock) | calendar-read |
+| days.yaml `date`, `years` | `Day.kept` :1127-1132, `days_on` :1164, from `_harbour_dressing` :1185/1193 and `_the_day_reminded` :1216-1220 | calendar-read |
+| a light's `lit: {from, until}` | `lit_in` chart.py:381-390 and the tower's "built" rule in `_seen_as` :1900-1907; the year `when.year` (:1622), `when` the running clock (lookout.py:457-462) | calendar-read |
+| `lit` in the browser | `queries.chart_block` :130 sends the whole `lit`; client/map.js:859-910 hides a light not lit in the snapshot's year (1805 at :1236 with none) | calendar-read |
+| a feature's `says`, `modern`, `lit.character` | `says` served only for the shore feature and a point of interest (lookout.py:641-646); `lit.character` sent in `chart_block`'s `lit` and read by nothing; `modern` a name key | not read as a date |
+| scenario `start` | scenarios.py:455-456, the clock's tick 0 | seed |
+| regatta `start.at` | tools/regatta.py:218-219 | seed |
+| `papers.almanac`, `papers.chart.year` | kept in `sc.papers` (scenarios.py:627); no code reads either | not read |
+| `papers.chronometer.rated` | scenarios.py:583-597 to `Chronometer.from_scenario` (reckoning.py:2118-2122); `days_since_rated` sights.py:395-397 counts from it to the running clock | seed |
+| chronometer `forgotten` | sights.py:351, :430 | script |
+| `weather.*.at`, the systems' waypoints | scenarios.py:860, :877 | script |
+| `world_orders[].at` | scenarios.py:759-767; ticks once at core/world.py:1037-1047 | script |
+| scenario `nations:` block | `_nations_block` scenarios.py:361-440, kept as `sc.nations` (:619), read by nothing | not read |
+| `follows_history` | scenarios.py:473-480; read by ports.py:1380, business.py:1005, harbour.py:413 | the switch itself |
+| fit names with years, `armament.default`, `descriptions.<kind>.fit` | names only; no year consulted | not read as a date |
+| `era_notes` | readings.py:2402, served as words | not read as a date |
+| a good's `season` | `Market.factors` ports.py:423, the running month | calendar-read, cyclic |
+| the climatology's months | weather.py:960-1113 | calendar-read, cyclic |
+| data/people `history` | words (people.py:189) | not read as a date |
+| prize court `wear_per_year`, `age_years_unknown` | `_age_years` :132-141 reads `spec.built` or `launched`, which the ship schema does not define: the age is always `age_years_unknown` (10) | fixed in effect |
+
+Notes the helper gave:
+- **Ports.** With `follows_history`, `on_events` puts a key to the record's row only on a day
+  a row begins or ends. In play today only the world orders `port <id>: closed to/open to
+  <nation>` (world/orders.py:1615-1625) and the price order change a port's dated keys; no
+  code sets `port.nation`, `state`, `dockyard`, `crew_pool` or `pilot` in play. JUDGEMENT:
+  when an event makes a port blockaded, the business draws no squadron for it (squadrons are
+  drawn only when a region is first peopled, business.py:302-338).
+- **Wars and the prize court.** The live stance ignores `since`; the court does not.
+  `declare_war` and `make_peace` (nations.py:180-197) have no caller in freesail/. JUDGEMENT,
+  a latent fault: `declare_war` stores `since` as a string or None, and `_at_war_at` reads a
+  non-date as not at war (:313-315), so a war declared in play with its day in words would
+  have the court restore every prize. JUDGEMENT: a scenario begun before 12 December 1804
+  is at war with Spain by the stance and at peace with her in the court.
+- **Prize shares.** JUDGEMENT: the scheme is picked by the day of the sentence, not of the
+  taking; the two can straddle 1 January 1808.
+- **Signals.** Nothing in play changes a flag's drawing, the fashion or a kept day (no death,
+  accession or change of government is modelled). The private tables are seeded from the
+  running year and month and read no data date. With no row for the year: `drawing_of` the
+  nearest row; `fashion_for` the nearest earlier, else the nearest; `days_on` no day; the
+  colours never consult the year.
+- **Lights.** Nothing in play builds or puts out a light. JUDGEMENT: navigation's lists of
+  place names (orders/navigation.py:1306, :1341) include lights not yet built.
+- **Ships.** The business draws a kind from business.yaml's `trader_kinds` and
+  `fisher_kinds`, or the blockade's and the convoy's kinds; `_put` passes no fit;
+  `vessel_from_spec` (ships.py:1554-1559) takes the kind's file and its
+  `descriptions.<kind>.fit`. The kinds and their fits: merchant brig (merchant), schooner
+  (unarmed), lugger (unarmed), privateer lugger (gun lugger 1795), smack (unarmed), frigate
+  (amazon class 1795), brig-sloop (diligence class 1796), cutter (carronades), revenue and
+  hired armed cutter (long guns), coasting cutter (unarmed), privateer schooner (long tom),
+  hermaphrodite brig (as taken 1814), razee (as carried 1796), sixty-four (ardent class
+  1784), seventy-four (arrogant class 1795), bilander (unarmed).
+- **Years fixed in the code.** In effect as dates: core/world.py:104 (`Scenario.start_time =
+  datetime(1805, 6, 1, 4, 0, 0)`), combat/hits.py:544, evolutions/runner.py:143 and
+  orders/crew.py:51 (`DEFAULT_WATCH_TIME`), api/viewer_flags.py:134 and :199 (`year =
+  1805`), and outside freesail/ the client's map.js:1236. A label: reckoning.py:2128 ("the
+  chart of 1794"). Seeds only: scenarios.py:155, console.py:1024, repl.py:789.
+- Unverified by the helper: the callers of `Feature.to_dict`; which table the business reads
+  its cruisers' kinds from.
+
+#### Helper 2: the research on file against 1792 to 1825
+
+"Held" is a file under docs/references/; "cited only" a work the data names and the
+repository does not hold.
+
+1. **Ports.** Held: Faden 1793; Tofiño 1787 and Vargas Ponce 1787 (before the range); Moore
+   1799; the Oriental Navigator 1801; Norie 1805; Grasset 1807; Smyth 1824 (Sicily, surveyed
+   1814 to 1816) and 1828 (Sardinia); Purdy 1825 and 1826; later works read back (White 1835,
+   Norie 1831, Purdy 1840, Bérard 1837, Lamberti 1844, the Derrotero of 1849, Smyth 1854,
+   Imray 1874, the Admiralty pilots of 1913 and 1916). James's Naval History (1837 edition,
+   six volumes, 1793 to 1827) is the only work on file that dates holders. Cited only:
+   Tofiño's Atlantic derrotero of 1789 and his atlas, Roux, Heather, Bellin
+   (docs/references/Charts.md). Markets: Purdy 1826 and Norie 1831 name the goods; of 1,405
+   `good:` rows one carries a period price.
+2. **Nations and wars.** Held: James vols. 1 to 6; Hertslet 1820 (the treaties of 1814 to
+   1816 and the Barbary treaties); Shaler 1826, Carey 1794, Foss 1798, Ray 1808 (the
+   Barbary states); Niles, Roosevelt 1882, Coggeshall (the war of 1812); Nicolas 1845 vols.
+   I and II. The table's three wars are each "from memory", none with an end.
+3. **Ships.** Held: Steel 1794 and 1805, Charnock 1802 (the British ships to 1801), Lever
+   1808, Falconer 1780, Röding 1794; Adye 1804, Douglas 1829; Jackson's Logs (1794 to 1805),
+   Osler 1835, James, Chapelle 1930, Cobb, Coggeshall, Niles; Forfait 1788, Lescallier 1791,
+   Chapman 1781. The fits on file are of 1784, 1793 to 1796 and 1812 to 1814: none for 1797
+   to 1811, none after 1815.
+4. **Flags and signals.** Held: France's law of 1790, Bowles 1795, Fisher [1820], Perrin
+   1922, Preble 1894, Babron 1817; the Admiralty's day and fog book of 1796, the night book
+   of 1799, Popham 1803, Corbett 1905 and 1908; Mazarredo 1781 and 1799, Audibert 1802,
+   Orvilliers 1772, du Pavillon 1775, Barry 1800, Naples 1807, Pereira 1817, Giraldes 1820;
+   the Regulations of 1806 "Of Salutes", Spain's Ordenanzas of 1748, France's Ordonnance of
+   1765.
+5. **Regulations.** Held: the Regulations and Instructions of 1806 (the 1808 printing);
+   Acton 1811, Dodson 1815 and 1828 (prize cases 1809 to 1822); Pistoye and Duverdy 1855; the
+   slave-trade statutes and Acts of 1788 to 1820; Millan 1748. The 1790 Regulations are not
+   held. Prize shares rest on Lavery, cited only.
+6. **Lights.** Held: Faden 1793, Moore 1799, Norie 1805 (the Channel's lights, pp. 299 to
+   302), Tofiño 1787, Grasset 1807, Purdy 1825 and 1826, Norie 1831, Purdy 1840, White 1835,
+   Lamberti 1844, the Derrotero of 1849, Imray 1874. Of 117 lights' sources 29 cite Norie
+   1805 and 21 files cite "the encyclopaedia" (pages read in 2026, not held).
+7. **The trade.** Held: Purdy 1826, Norie 1831, Grasset 1807, Smyth, Shaler (goods); Steel
+   1794 and 1805 (two prices); Holdsworth 1874 (fishing); the Regulations of 1806 and James
+   and Niles (convoys). data/business.yaml: "Every figure here is JUDGEMENT".
+
+The helper's table (what the works on file speak to):
+
+| Element | 1792-94 | 1795-97 | 1798-1801 | 1802-03 | 1804-06 | 1807-09 | 1810-12 | 1813-15 | 1816-25 |
+|---|---|---|---|---|---|---|---|---|---|
+| Ports: holders, works, pilots | thin | thin | thin | thin | held | thin | thin | thin | thin |
+| Ports: market prices | bare | bare | bare | bare | bare | bare | bare | bare | bare |
+| Nations and wars (Britain's) | thin (1792 bare) | held | held | held | held | held | held | held | thin |
+| Nations and wars (others) | thin | thin | thin | thin | thin | thin | thin | thin | thin |
+| Ships (British) | held | held | held | held | held | thin | thin | held | thin |
+| Ships (other navies) | thin | thin | thin | thin | thin | thin | thin | thin (American held) | bare |
+| Flags and signals | held | held | held | held | held | thin | thin | thin | thin |
+| Regulations (British) | thin | thin | thin | thin | held | held | held | held | thin |
+| Regulations (other nations) | thin | bare | thin | thin | thin | bare | bare | thin | thin |
+| Lights | thin | thin | thin | thin | held | bare | bare | thin | thin |
+| The trade | thin | thin | thin | thin | thin | thin | thin | thin | thin |
+
+JUDGEMENT (the helper's): "held" for Britain's wars rests on James being on file, though no
+data row cites him for a war. How long the Regulations of 1806 stood is unsure.
+
+The helper's ten gaps: (1) no data row dates a war before May 1803 or after December 1804,
+none ends; James on file covers most and has not been read for them; (2) the states the
+table lacks (Genoa before 1797, Venice, Tuscany before 1801, the Porte, Tripoli, Russia,
+Sweden, Prussia, Holland, the Netherlands, Murat's Naples, the Spanish-American states);
+(3) the Atlantic, Channel and Biscay ports and Toulon, Port Mahon, Leghorn and Corsica's
+carry no dated rows: Toulon in 1793, Corsica in 1794 to 1796, Minorca in 1798 to 1802,
+Lisbon in 1807 to 1808, Corunna and Ferrol in 1809, Cadiz in 1810 to 1812 all read as 1805;
+(4) no price for any year; (5) no light list for 1806 to 1824, and a light first attested in
+1826 is dark through the range; (6) Britain's ensigns before 1801 not built though Perrin is
+on file; no British book after 1803, no French after 1802; (7) no Regulations before 1806,
+no Prize Acts, no convoy acts; (8) prize money mostly from memory; (9) no navy list after
+Charnock (1801), no French, Spanish, Dutch or Danish man of war on file; (10) before
+February 1793 and after 1815 the works thin out in every element.
+
+Cited and not held, as the helper found them: Lempriere 1800 (nations.yaml); Oman or Napier
+(barcelona.yaml); Mahan and the 1799 day book (the squadrons' books); Winfield (nine ship
+files) and Lavery (22 data files); Troude; Lloyd's Register; "the encyclopaedia" in 21
+feature files; Trinity House's pages; Whewell 1833; Tomlins and Raithby's Statutes.

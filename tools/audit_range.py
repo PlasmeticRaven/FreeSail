@@ -41,7 +41,8 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
 (d) the days: the nations that keep no day; the years in which a root keeps none.
 (l) the lights: those dated within the range, by the year alone.
 (x) the words: the table's day served as the day she sailed with it; served words that
-    name a year yet to come.
+    name a year yet to come on the day (JUDGEMENT: which words are served is the
+    classing's).
 (e) the engine: a year or a date fixed in the code.
 (u) what no data dates at all, one finding to an element: the nations' lifetimes, the
     letters of marque, the ships, the signal books, the private signals, the regulations,
@@ -1396,20 +1397,21 @@ def check_words(audit: Audit, tree: Tree, days: list[date], scan: list[tuple]) -
             if not row_holds(row, rel, path):
                 continue
             named = [int(y) for y in YEAR.findall(str(value))]
-            named = [y for y in named if RANGE_SINCE.year < y <= RANGE_UNTIL.year]
+            named = [y for y in named if y > RANGE_SINCE.year]
             if not named:
                 continue
-            first = min(named)
-            before = [d for d in days if d.year < first]
+            latest = max(named)
+            before = [d for d in days if d.year < latest]
             if before:
-                some.append(f"{rel}: {path} ({first})")
+                some.append(f"{rel}: {path} ({latest})")
                 for d in before:
                     ahead[d] += 1
         if some:
             audit.add(
                 "x",
                 f"x-words:{row.id}",
-                "served words that name a year of the range, on days before that year",
+                "served words that name a year yet to come on the day (a work of 1806 cited "
+                "in 1805, a flag of 1820 described in 1792)",
                 set(ahead),
                 count=len(some),
                 worst=some[:5],
