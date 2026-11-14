@@ -9,12 +9,40 @@ the pytest run with the fault planted.
 |---|---|---|---|---|---|
 | 03-1 | test_agent_api.py::test_the_long_poll_waits_without_holding_the_worlds_lock | long poll's 120 s cap removed | pass | SURVIVED | 7.3 |
 | 03-2 | test_anchor.py::test_she_drags_in_a_gale_on_short_scope_and_a_standing_order_sees_it | "dragging;" dropped from the anchor reading's words | pass | KILLED | 8.6 |
-| 03-3 | test_anchor.py::test_every_ship_carries_ground_tackle_by_her_size_from_the_generator[data/ships/brig.yaml] | brig's best bower 800 kg to 1 kg | pass | SURVIVED | 6.7 |
-| 03-4 | test_bilander.py::test_her_burthen_by_the_old_measure_is_about_130_tons | bilander's beam 5.91 m to 6.5 m | pass | SURVIVED | 0.9 |
+| 03-3 | test_anchor.py::test_every_ship_carries_ground_tackle_by_her_size_from_the_generator[data/ships/brig.yaml] | brig's best bower 800 kg to 1 kg | pass | SURVIVED (caught elsewhere) | 6.7 |
+| 03-4 | test_bilander.py::test_her_burthen_by_the_old_measure_is_about_130_tons | bilander's beam 5.91 m to 6.5 m | pass | SURVIVED (caught elsewhere) | 0.9 |
 | 03-5 | test_boat_director.py::test_the_boat_lost_by_the_directors_word_and_doubted_on_a_smooth_sea | `plausible_when` of `boat_swamped` deleted | pass | SURVIVED | 9.7 |
 | 03-6 | test_brains.py::test_the_perception_is_from_her_own_truth_and_sees_the_player_by_the_horizon | every sail in sight made out whole (`level = 3`) | pass | SURVIVED | 14.5 |
+| 03-A | five of test_aboard_another.py (in the section) | a player's seat on a hull not his own refused every line | pass | SURVIVED (all five) | 12.5 to 47.1 each |
+| 03-B | four (in the section) | `boat_swamped` without `plausible_when` (03-5 again) | pass | SURVIVED (all four) | 1.2 to 8.8 each |
+| 03-C | test_ship_particulars.py::test_generator_reproduces_the_committed_files and three more | the generator's bowers at a tenth, then at half, of the rule | pass | KILLED | 0.8 to 6.9 each |
+| 04-1 | test_catalogue.py::test_aloft_flags_are_on_the_steps_aloft | `aloft: true` deleted from the lateen's furl | pass | SURVIVED | 1.2 |
+| 04-2 | test_date_and_war.py::test_the_pilots_news_enters_what_it_changed_in_the_papers | the pilot's news never entered in the papers | pass | SURVIVED | 8.8 |
+| 04-3 | test_canvas.py::test_new_parts_do_not_change_the_ratings_of_the_old_spars | frigate's main topmast rated 26.2 kN, not 261.9 | pass | SURVIVED (caught elsewhere) | 1.8 |
+| 04-4 | test_captain.py::test_the_console_and_the_server_take_the_seat_flag | console's `seat_player` call deleted | pass | SURVIVED | 1.7 |
+| 04-5 | test_consent.py::test_the_harness_and_the_consent_step_import_no_vendor | the vendor SDK imported at the head of the harness | pass | SURVIVED | 3.9 |
+| 04-6 | test_director.py::test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_report | a seam found working reported and makes no water | pass | SURVIVED (caught elsewhere) | 8.5 |
+| 04-A | four (in the section) | back and fill `cycles: 2` to `cycles: 0` | pass (the xfail: xfail) | SURVIVED (all four) | 1.3 to 4.8 each |
+| 04-B | test_scenarios.py::test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_otherwise; test_captain.py's flag test | the server's `seat_player` call dropped | pass | KILLED (the first) | 6.8; 1.1 |
+| 04-C | four (in the section) | the pilot's news written to the papers under `port.id` | pass | SURVIVED (all four) | 8.3 to 22.5 each |
+| 05-1 | test_gale.py::test_headed_full_and_by_the_helm_keeps_her_away_and_says_so_once | the `helm.kept_away` line deleted | pass | SURVIVED | 5.7 |
+| 05-2 | test_far_action.py::test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken | a British far ship fires no shot | pass | SURVIVED (fault inert: the packet fires none on the pristine code either) | 15.9 |
+| 05-3 | test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine | the French kit's musketry never hits | pass | SURVIVED (inert here; survives three more) | 9.7 |
+| 05-4 | test_health.py::test_a_holder_killed_ends_his_station_and_the_captain_killed_passes_the_command | the first lieutenant struck from the succession | pass | SURVIVED (inert here; survives three more) | 6.6 |
+| 05-5 | test_fishing.py::test_a_made_out_line_gives_her_bearing_and_the_course_she_stands | the `, bearing ...` clause dropped from made-out lines | pass | SURVIVED (inert here; caught elsewhere) | 7.2 |
+| 05-6 | test_ground.py::test_truth_66_the_same_passage_with_the_lead_going_hourly_does_not_ground | the parser rejects "if the depth is under N fathoms" | pass | KILLED | 24.7 |
+| 05-N1 | test_evolutions.py::test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on | (present now; nothing to plant) | pass | NOT RUN (confirmed by reading) | 1.2 |
+| 05-N2 | four of test_fishing.py (in the section) | salted fish spoil in twelve hours like green | pass | SURVIVED (all four) | 5.0 to 25.6 each |
+| 05-N3 | test_lying_to.py::test_her_sails_lifting_is_said_before_she_is_taken_aback; test_gale.py's 05-1 test | "starboard"/"larboard" swapped at integrate.py:247 | pass | KILLED (the first) | 4.5; 6.4 |
 
-## 03-1: the long poll's cap
+"Caught elsewhere": the named test survived, but another test in the suite fails on the same
+fault (named in the section). "Inert here": the behaviour is absent from the named test's own
+run on the pristine code too, so the fault changes nothing there; each such fault was shown
+live on another world or in another test.
+
+## tests-03, the faults to plant
+
+### 03-1: the long poll's cap
 
 ```diff
 -        wait = max(0.0, min(float(wait or 0.0), TURNS_WAIT_MAX_S))
@@ -25,7 +53,7 @@ seconds a call, `g.turns(wait=600)` on the test's own `Game` held the poll open 
 seconds with the fault and 130 without it. Output: `.  [100%]`, 1 passed. The test asks only
 that `TURNS_WAIT_MAX_S == 120` (the constant), never that a wait above it is cut down. SURVIVED.
 
-## 03-2: "dragging" in the anchor's reading
+### 03-2: "dragging" in the anchor's reading
 
 ```diff
          words = f"down, {how.rstrip('.')}, {riding.scope_fathoms:.0f} fathoms out"
@@ -42,7 +70,7 @@ KILLED: the standing order `when the anchor is dragging` reads the words, so it 
 fires. The reader's prediction ("likely passes") is refuted. (The line the reader pointed at,
 :207, would indeed not have caught it: its `or anchor.scope_fathoms >= 20.0` is always true.)
 
-## 03-3: the brig's anchor a kilogram
+### 03-3: the brig's anchor a kilogram
 
 ```diff
    - id: best_bower
@@ -54,7 +82,7 @@ fires. The reader's prediction ("likely passes") is refuted. (The line the reade
 (`data/ships/brig.yaml:1892`.) Live: `ground_tackle(road_world(BRIG).ship).get("best_bower").weight_kg`
 gives 1.0. Output: 1 passed. Only `weight_kg > 0` is asked of any ship but the frigate. SURVIVED.
 
-## 03-4: the bilander's burthen
+### 03-4: the bilander's burthen
 
 ```diff
 -  beam_m: 5.91
@@ -66,7 +94,7 @@ gives 1.0. Output: 1 passed. Only `weight_kg > 0` is asked of any ship but the f
 (b = 19.4 and two lengths written in the test) and calls no project code, so no fault in the
 ship can reach it. SURVIVED (the fault itself is caught by another test).
 
-## 03-5: the swamped boat on a smooth sea
+### 03-5: the swamped boat on a smooth sea
 
 ```diff
      effect: {boat_lost: swamped}
@@ -78,7 +106,7 @@ test's Carrick Road world answers "Done: found aboard: The boat swamped alongsid
 fault and "Doubted, not performed: the sea is too slight..." without it. Output: 1 passed. The
 test's `if said.startswith("Doubted"):` takes either answer. SURVIVED.
 
-## 03-6: every sail made out whole at any range
+### 03-6: every sail made out whole at any range
 
 ```diff
 -            level, _ = o.made_out(distance, glass=(o.id == glass_for))
@@ -92,12 +120,6 @@ fifty miles off and never in sight, so the closing assertion (`"Y" not in ids or
 fail. SURVIVED.
 
 ## tests-03, the faults its reader said no test would catch
-
-| # | Tests run | Fault | Baseline | Result | s |
-|---|---|---|---|---|---|
-| 03-A | five of test_aboard_another.py (below) | a player's seat on a hull not his own refused every line | pass | SURVIVED (all five) | 12.5 to 47.1 each |
-| 03-B | four (below) | `boat_swamped` without `plausible_when` (fault 03-5 again) | pass | SURVIVED (all four) | 1.2 to 8.8 each |
-| 03-C | test_ship_particulars.py::test_generator_reproduces_the_committed_files; test_bilander.py::test_the_generator_writes_her_file_as_committed_and_reports_its_checks | the generator's bowers at a tenth (then at half) of the rule | pass | KILLED | 1.5 / 0.8; 4.7 |
 
 ### 03-A: the seat aboard another hull can never order
 
@@ -155,15 +177,6 @@ the frigate and the bilander; the brig's, schooner's and cutter's anchors are pi
 nothing but the regenerate test's equality with themselves. KILLED (all data restored after).
 
 ## tests-04, the faults to plant
-
-| # | Test (file::name) | Fault | Baseline | Result | s |
-|---|---|---|---|---|---|
-| 04-1 | test_catalogue.py::test_aloft_flags_are_on_the_steps_aloft | `aloft: true` deleted from the lateen's furl | pass | SURVIVED | 1.2 |
-| 04-2 | test_date_and_war.py::test_the_pilots_news_enters_what_it_changed_in_the_papers | the pilot's news never entered in the papers | pass | SURVIVED | 8.8 |
-| 04-3 | test_canvas.py::test_new_parts_do_not_change_the_ratings_of_the_old_spars | frigate's main topmast rated 26.2 kN, not 261.9 | pass | SURVIVED | 1.8 |
-| 04-4 | test_captain.py::test_the_console_and_the_server_take_the_seat_flag | console's `seat_player` call deleted | pass | SURVIVED | 1.7 |
-| 04-5 | test_consent.py::test_the_harness_and_the_consent_step_import_no_vendor | the vendor SDK imported at the head of the harness | pass | SURVIVED | 3.9 |
-| 04-6 | test_director.py::test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_report | a seam found working reported and makes no water | pass | SURVIVED | 8.5 |
 
 ### 04-1
 
@@ -248,12 +261,6 @@ fails at :253 (`where False = any(...)`, 5.9 s). SURVIVED (the named test).
 
 ## tests-04, the faults its reader said no test would catch
 
-| # | Tests run | Fault | Baseline | Result | s |
-|---|---|---|---|---|---|
-| 04-A | four (below) | back and fill `cycles: 2` to `cycles: 0` | pass (the xfail: xfail) | SURVIVED (all four) | 1.3 to 4.8 each |
-| 04-B | test_scenarios.py::test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_otherwise; test_captain.py::test_the_console_and_the_server_take_the_seat_flag | the server's `seat_player` call dropped | pass | KILLED (the first) | 6.8; 1.1 |
-| 04-C | four (below) | the pilot's news written to the papers under `port.id` | pass | SURVIVED (all four) | 8.3 to 22.5 each |
-
 ### 04-A: back and fill ends short
 
 ```diff
@@ -309,12 +316,6 @@ run by no test with anything to write. SURVIVED.
 
 ## tests-05, the faults to plant
 
-| # | Test (file::name) | Fault | Baseline | Result | s |
-|---|---|---|---|---|---|
-| 05-1 | test_gale.py::test_headed_full_and_by_the_helm_keeps_her_away_and_says_so_once | the `helm.kept_away` line deleted | pass | SURVIVED | 5.7 |
-| 05-2 | test_far_action.py::test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken | a British far ship fires no shot | pass | SURVIVED (fault inert here: see below) | 15.9 |
-| 05-3 | test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine | the French kit's musketry never hits | pass | SURVIVED (fault inert here; survives three more) | 9.7 |
-
 ### 05-1
 
 ```diff
@@ -344,7 +345,9 @@ alike, `packet rounds_fired 0`, `privateer rounds_fired 87`, six rounds each. Th
 (three 12-pdr carronades, `random_m` 731.5 m) never fires one shot before she strikes: the
 docstring's "fires her guns within her four cables" is false of the test's own run, and the
 assertion at :361 (`rounds_fired >= 0`) hides it. The reader's claim stands and is worse than
-he said: the test cannot see the packet's fire because there is none to see. SURVIVED.
+he said: the test cannot see the packet's fire because there is none to see. The fault is live
+otherwise: `far._fire(packet, privateer, 300.0, Random(1), 60.0)` on the same two far ships
+gives (0 fired, 0 hits) with the fault and (3, 2) without. SURVIVED.
 
 ### 05-3
 
@@ -362,3 +365,126 @@ test_fight.py `::test_the_hit_chance_falls_with_the_square_of_the_range_to_nough
 test_known_truths.py `::test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks`
 (11.5 s). The French marines can be made harmless at any range and no test of the four sees it.
 SURVIVED.
+
+
+### 05-4
+
+```diff
+         order = (
+-            "first lieutenant",
+             "lieutenant",
+             "second lieutenant",
+```
+(`freesail/crew/health.py:435`.) Inert in the named test, as the reader half-suspected: the
+officer the test kills first (`_officer_with_the_deck`) is the first lieutenant himself, so on
+the pristine code too the command passes to the second lieutenant, Mr Pascoe. Live where it
+matters: on the same world with the captain killed and the first lieutenant alive, the command
+goes to "first lieutenant Mr Pearce" on the pristine code and to "second lieutenant Mr Pascoe"
+with the fault. Named test: 1 passed. Three more tests that read `ship.command_passes`, all
+passed with the fault: test_health.py `::test_the_water_expended_kills_by_days_with_the_log_explaining_each_death`
+(254.2 s), test_known_truths.py `::test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down`
+(11.5 s), `::test_truth_7_178_a_hand_dead_of_thirst_is_a_death_the_log_explains_from_the_needs_lines`
+(255.7 s). No test sees the first lieutenant passed over. The named test's docstring ("the
+first lieutenant takes the command") is untrue of its own run. SURVIVED.
+
+### 05-5
+
+```diff
+-        where = f"{relative}, bearing {point}"
++        where = f"{relative}"
+```
+(`freesail/world/lookout.py:1003`.) Inert in the named test: its world logs no
+`lookout.made_out` line in the 180 s on the pristine code or with the fault (0 lines both
+ways; the sail is made out only by `lookout.glass`), so the `for e in made:` loop never runs.
+The reader's open question is answered: it is the empty case. Live elsewhere:
+test_ships.py::test_make_her_out_sends_a_glass_aloft_and_give_chase_puts_the_helm_for_her_bearing
+fails at :369 (7.8 s); test_sail_by_name.py::test_two_sails_answering_alike_give_the_closer_and_none_is_refused_with_the_strangers
+passes (7.0 s). SURVIVED (the named test; the fault itself is caught by test_ships).
+
+### 05-6
+
+`freesail/standing/grammar.py`, the depth branch of the comparison:
+```diff
+         if unit in _DEPTH_UNITS:
++            if op in ("<", "lt") or str(op).startswith("<") or "under" in phrase:
++                raise OrderError("A depth under so many fathoms is not a condition the book reads.")
+             row = _pick(cands, ("depth",))
+```
+Live: the "haul off" line is answered `order.rejected` ("Order not carried out ..."); "stand
+on" (`exceeds 40`) is still `standing.given`. Output:
+```
+>       assert not aground
+E       assert not True
+tests/test_ground.py:141: AssertionError
+```
+KILLED: she grounds within the six hours. The reader's half-prediction holds: the check at
+:139 (`kind != "order.refused"`) passed, since a refused standing order is `order.rejected`,
+a kind the check never names; it can never fail. The test is saved by its outcome, not by
+its check of the orders.
+
+## tests-05, the faults its reader said no test would catch
+
+### 05-N1: the tack named by the timeout
+
+Nothing to plant: the reader says the fault is in the code now. Read:
+`freesail/evolutions/scripts.py:1829-1836` sets `new = self.ship.dyn.tack` on a timeout but
+keeps `"new_course": units.format_heading(self.new_course)`, the course she was put about for.
+The test (`tests/test_evolutions.py:851`) sets the wind from 090°, lays her close-hauled on the
+starboard tack (`old_heading`, some 035° by its docstring's "55 degrees off") and holds her
+there, then asserts at :890 the line "Tacked; braced up on the starboard tack, heading SSE
+(158°)." The test passes (1.2 s): it pins a line that names her tack truly and her heading
+falsely. Confirmed by reading; not run with any change.
+
+### 05-N2: salted fish spoil like green
+
+```diff
+-                    lot = Lot(fish, salted_tons, "hold", tick, None, salted=True)
++                    lot = Lot(fish, salted_tons, "hold", tick, tick + 12 * 3600, salted=True)
+```
+(`freesail/world/fishing.py:548`.) Live: 3.5 tons of pilchards stowed with 2.0 of salt on
+test_fishing.py's world, run thirteen hours: the salted lot (0.5 t) spoiled with the fault, not
+spoiled without. Tests run (chosen by grep for `salt`), all passed:
+`::test_the_spoilage_is_said_when_a_lot_turns_and_once_a_day_and_salt_keeps` (25.6 s; it stows
+with `salt=None`, so the "salt keeps" of its name is never tried),
+`::test_the_haul_fills_the_well_then_the_hold_salted_while_the_salt_lasts` (5.0 s),
+`::test_the_catch_is_sold_at_a_fish_quay_at_its_price_and_the_spoiled_go_over_the_side` (5.8 s),
+`::test_a_checkpoint_keeps_the_gear_in_the_water_and_the_catch_and_goes_on_the_same` (8.4 s).
+SURVIVED.
+
+### 05-N3: the bow named wrong
+
+```diff
+-    side = "starboard" if st.awa >= 0 else "larboard"
++    side = "larboard" if st.awa >= 0 else "starboard"
+```
+(`freesail/physics/integrate.py:247`.) Live: the 05-1 world's line reads "the wind 39° on the
+larboard bow" for "starboard". test_gale.py's kept-away test passes (6.4 s), as the reader said.
+But `side` is shared with the `ship.lifting` lines below it (:269, :277), and
+test_lying_to.py::test_her_sails_lifting_is_said_before_she_is_taken_aback fails at :912
+(`'Her sails lifting, the wind 41° on the larboard bow: keep her away...'`). KILLED: the
+reader's claim is refuted for the fault as he wrote it. (A swap made in the kept-away line
+alone would, by 05-1, be seen by no test; that was not planted.)
+
+## The count
+
+Twenty-seven faults: 21 SURVIVED, 5 KILLED (03-2, 03-C, 04-B, 05-6, 05-N3), 1 NOT RUN
+(05-N1, a fault present in the code with nothing to plant, confirmed by reading). Of the
+eighteen faults planted against a named test, sixteen survived it; of those sixteen, five were
+caught by some other test in the suite (03-3, 03-4, 04-3, 04-6, 05-5), eleven by none tried. Every
+test passed its baseline. Three readers' claims were refuted: 03-2 (the standing order reads
+the anchor's words), 04-B (test_scenarios seats through the server) and 05-N3 (the side word is
+shared with a line test_lying_to reads); and 03-C, where the regenerate test the reader did not
+have holds the generator to the files.
+
+What the survivals have in common: the test checks its own scaffolding rather than the game's
+act. Either it writes the result itself (04-2), reads the source for strings (04-4, 04-5),
+compares a thing with itself or with a bound nothing can miss (`>= 0`, `<= 1`, `> 0`,
+`lambda: True`, a set compared with itself: 03-3, 04-1, 04-6, 05-1, 05-2), or asserts over a
+list its own world leaves empty, so that `all(...)` and `for` loops pass vacuously (05-3, 05-4,
+05-5, 03-6's far brig). In four of them (05-2, 05-3, 05-4, 05-5) the behaviour the name and
+docstring promise does not happen in the test's own run on the pristine code at all: the packet
+fires no shot, nobody falls to musketry, the first lieutenant is dead before the captain, no
+made-out line is logged.
+
+Not done: no browser test; nothing outside the scratch copy edited; the faults of the other
+runners' files not tried.

@@ -24,6 +24,9 @@ under (b), "n" = the reader's "no test would catch".
 | B-b2 | test_known_truths.py::test_truth_7_176_a_broadsides_casualties_are_men_of_the_muster_named_and_the_bill_counts | `_hull_hit` no longer calls `_casualties` (a shot through the hull hurts nobody) | pass | SURVIVED | 6 |
 | B-n2 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter; test_health.py::test_the_butchers_bill_is_said_ten_minutes_after_the_last_shot; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says | the same plant | pass | KILLED by 7-183 (the privateer never strikes); the other two passed | 40 |
 | B-b3 | test_known_truths.py::test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks | `small_arms.QUARTERDECK_SHARE` 0.4 to 0.15 | pass | SURVIVED | 8 |
+| B-b4 | test_known_truths.py::test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag | `fog_signals_minute` never starts a ship's fog signals (`if False:`) | pass | SURVIVED | 12 |
+| B-b5 | test_known_truths.py::test_truth_7_512_a_ship_sails_from_port_mahon_to_carloforte_and_from_algiers_to_tunis (and ::test_truth_7_545_..., the reader's control) | `ships.land_crossing` returns "" at once (the land guard off) | pass (both) | 7-512 SURVIVED; 7-545 KILLED, as predicted | 116 |
+| B-n1 | test_known_truths.py::test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries; test_lookout.py::test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it | a far ship's light order always sets `"none"` | pass | SURVIVED (both) | 9 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -317,3 +320,79 @@ choice is `quarterdeck if rng.random() < quarterdeck_share else deck`
 Output: PASSED. SURVIVED. The test forces the draw to 0.1, under any share above a tenth, and
 asserts only that some musketry fell and that this forced man is of the quarterdeck. Nothing
 counts the share over many balls.
+
+## B-b4. Truth 7-147: no rules ship ever keeps her fog signals
+
+```diff
+--- mut/freesail/world/signalling.py
++++ m/1/freesail/world/signalling.py
+@@ -892,7 +892,7 @@
+     if p.strangers:
+         cap._business["sail_seen_tick"] = tick
+     company = tick - int(cap._business.get("sail_seen_tick", -(10**9))) <= FOG_SIGNALS_COMPANY_S
+-    if light == "fog" and company and not locker.fog_signals:
++    if False:
+         if near:
+```
+
+Live: a script on the test's own fog sea (`_sea_at(49.5, -5.5, CUTTER, ...)`, visibility a
+cable) with two far merchant brigs ninety metres apart nine miles off, run 20 minutes: pristine,
+both brigs' lockers read `fog_signals True`; with the fault, both `False`. (Placed as in the
+test, two miles off with nobody in sight, no ship starts them pristine either: her `p.strangers`
+is empty in a cable's visibility, so the test's own Harpy is no witness.)
+
+Output: PASSED. SURVIVED. The bell part of the test sets `vessel_locker(rider).fog_signals =
+True` by hand (tests/test_known_truths.py:8852) and so never asks whether a ship would. `grep
+-rn fog_signals tests` finds that line alone.
+
+## B-b5. Truth 7-512: the land guard switched off
+
+```diff
+--- mut/freesail/world/ships.py
++++ m/1/freesail/world/ships.py
+@@ -1684,6 +1684,7 @@
+     and last cable are not tried (she lies where she lies; a place may be the shore)."""
++    return ""
+     chart = getattr(world, "chart", None)
+```
+
+Output: 7-512 PASSED (2.6 s). SURVIVED: it draws the two passages' legs on the chart itself
+(`chart.line_shore`, `chart.elevation_at`) and sails no ship, so the guard is never on its
+road; its name ("a ship sails") promises more than a chart check.
+
+The control, 7-545, FAILED (112 s), so the fault is live:
+
+```
+E                   assert (47.9946, -4.556) == (48.0387, -4.7439)
+E                     At index 0 diff: 47.9946 != 48.0387
+```
+
+That is the pinned east corner of Diamond's patrol square in naval-cruise.yaml
+(tests/test_known_truths.py:17323): `_goal_plan` places the corners with `land_crossing`
+(freesail/world/ships.py:1301), and with the guard off the corner falls 0.19 degrees further east (whether on land was not checked).
+The test's own `assert not land_crossing(...)` lines could not have caught it, the test
+calling the faulted function as its oracle; it was the pinned figure that did.
+
+## B-n1. A far ship told to show her lights stays dark
+
+```diff
+--- mut/freesail/world/signals.py
++++ m/1/freesail/world/signals.py
+@@ -1413,9 +1413,7 @@
+     if low in _LIGHT_ORDERS:
+-        vessel_locker(vessel).lights = (
+-            "none" if "no lights" in low else "top lights" if "top" in low else "stern lantern"
+-        )
++        vessel_locker(vessel).lights = "none"
+         return "her lights " + ("doused" if "no lights" in low else "hoisted")
+```
+
+Live: `far_perform(w, v, "hoist a stern lantern")` on a far brig at night returns `her lights
+hoisted` and leaves her locker at `none` with the fault; pristine, `stern lantern` (and `top
+lights` for "hoist the top lights"). With the fault the log says the lights are hoisted while
+the ship shows none.
+
+`grep` for the light orders in tests finds only 7-150, which sets `vessel_locker(v).lights =
+"stern lantern"` by hand (tests/test_known_truths.py:8958) and orders the player's own lights;
+no test calls `far_perform` with a light order. 7-150 and tests/test_lookout.py::
+test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it both passed. SURVIVED.

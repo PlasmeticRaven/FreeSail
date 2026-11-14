@@ -259,3 +259,167 @@ words finds none. Run under the fault, all rc=0: test_agents.py::test_readings_t
 (38 s). I did not run their baselines (each passed with the fault in, so a baseline adds
 nothing).
 
+## tests-10
+
+| # | Test (file::name) | Fault | Baseline | Result | s |
+|---|---|---|---|---|---|
+| 10-1 | test_sea.py::test_the_log_says_the_sea_when_its_words_change_and_the_rollup_says_it_by_the_hour | hourly line's `data["sea"]` is the motion's words | pass (5 s) | SURVIVED | 4 |
+| 10-2 | test_sail_by_name.py::test_the_bearing_and_the_distance_pick_the_far_sail_on_the_same_bearing | `give chase` drops the `distant` clause | pass (7 s) | SURVIVED | 7 |
+| 10-3 | test_rig_geometry.py::test_close_hauled_forces_are_unchanged_without_bowlines | lift x1.1 on the no-bowline path | pass (1 s) | SURVIVED | 1 |
+| 10-4 | test_routine.py::test_three_calls_in_the_middle_watch_leave_the_morning_watch_tired | `FATIGUE_WEIGHT` 0.5 to 0.9 | pass (3 s) | SURVIVED | 2 |
+| 10-5 | test_server.py::test_the_server_takes_the_ease_on_station_flag | `ease_on_station=args.ease_on_station and False` | pass (1 s) | SURVIVED | 1 |
+| 10-6 | test_squadrons.py::test_the_business_draws_a_convoy_a_blockade_and_a_ship_in_ordinary_by_the_nations_knobs | a ship at anchor drifts 5 m east a step | pass (25 s) | SURVIVED | 24 |
+| 10-A | (no test claimed) test_known_truths.py::test_truth_56_a_gale_of_a_day_raises_a_heavy_sea_the_reef_is_slower_in_and_that_outlasts_it | as 10-1 | not run (see section) | KILLED | 185 |
+| 10-B | (no test claimed) 3 tests in test_ships.py, see section | as 10-2 | not run | SURVIVED | 43 |
+| 10-C | (no test claimed) test_hands.py::test_crew_factor_for_the_rating_table | `- FATIGUE_FRESH` dropped at hands.py:426 | pass (1 s) | KILLED | 1 |
+
+### 10-1 SURVIVED (named test); KILLED elsewhere (10-A)
+
+```diff
+--- mut/freesail/core/world.py
++++ freesail/core/world.py
+@@ -1852,7 +1852,7 @@
+         if self.sea is not None:
+             # the sea by the hour (spec M5 §4), for the roll-up
+-            data["sea"] = self.sea.words
++            data["sea"] = self.motion.words
+```
+
+Named test rc=0 (4 s). Its check is `assert all(e.data["sea"] == e.data["sea"] and "sea" in
+e.text for e in hours)` (tests/test_sea.py:636): the field compared with itself. The reader's
+claim stands for this test.
+
+**10-A.** The reader's "no test in my files" holds, but the suite catches it in a slow truth
+(grep of the tests for `data["sea"]` found tests/test_known_truths.py:2574):
+
+```
+>       assert nine.data["sea"] == "a heavy sea" and "a heavy sea" in nine.text
+E       AssertionError: assert ('pitching hea...der her stern' == 'a heavy sea'
+```
+
+185 s. I did not run its baseline (another three minutes); the assertion that failed reads
+exactly the field planted, so the failure is the fault's.
+
+### 10-2 SURVIVED; 10-B SURVIVED
+
+```diff
+--- mut/freesail/orders/navigation.py
++++ freesail/orders/navigation.py
+@@ -1654,7 +1654,7 @@
+     if verb == "give chase":
+         world = _world_with_lookout(ship)
+-        which = _sail_and_rest(order.verb_phrase, rest)
++        which = _sail_and_rest(order.verb_phrase, rest.split(" distant")[0])
+```
+
+Named test rc=0 (7 s). Live, `give chase to the brig bearing NE distant two miles` on the
+test's own `sails_about()`:
+
+```
+fault:    Gave chase to a brig-sloop of war on the starboard bow, bearing NE. Helm ordered: steer NE (48°).
+pristine: Gave chase to a brig on the starboard bow, bearing NE. Helm ordered: steer NE (48°).
+```
+
+She chases the Raven, not the Wasp. In both runs `world.ship.extra.get("chase")` is `None`,
+so line 164's `.get("id", "wasp")` is true whatever is chased: that check can never fail.
+Line 163 asks only for "bearing NE". The reader's claim stands.
+
+**10-B.** Grep of the tests for `give chase` with a distance finds only this test. The other
+submitters of `give chase` (tests/test_ships.py::test_make_her_out_sends_a_glass_aloft_and_give_chase_puts_the_helm_for_her_bearing,
+::test_a_chase_through_the_winds_wake_wears_her_and_does_not_leave_the_yards_braced,
+::test_a_chase_through_the_winds_eye_puts_her_about_and_a_small_alteration_is_steered)
+pass under the fault (rc=0; 10, 17, 16 s); they give the bare order, so the fault cannot touch
+them. No test catches the wrong ship chased.
+
+### 10-3 SURVIVED (named test); caught next door
+
+```diff
+--- mut/freesail/physics/sails.py
++++ freesail/physics/sails.py
+@@ -206,7 +206,7 @@
+         if luff_gain <= 0.0 or a >= peak:
+-            return c_l, c_d
++            return c_l * 1.1, c_d
+```
+
+Named test rc=0 (1 s): it compares two calls that take the same branch. As predicted,
+tests/test_sails.py::test_curves_interpolate_and_fold fails (baseline pass, 1 s):
+
+```
+>       assert cl == pytest.approx(1.12) and 0.45 <= cd <= 0.55
+E       assert (1.2320000000000002 == 1.12 ± 1.1e-06
+tests/test_sails.py:93: AssertionError
+```
+
+### 10-4 SURVIVED (named test); caught next door
+
+```diff
+--- mut/freesail/crew/hands.py
++++ freesail/crew/hands.py
+@@ -47,7 +47,7 @@
+-FATIGUE_WEIGHT = 0.5
++FATIGUE_WEIGHT = 0.9
+```
+
+Named test rc=0 (2 s): it uses its own `FATIGUE_WEIGHT = 0.5` (tests/test_routine.py:36,
+:486) and never calls the code's. Live: tests/test_hands.py::test_crew_factor_for_the_rating_table
+fails (baseline pass, 1 s):
+
+```
+>       assert factor_for(ORD, ORD, fatigue=0.3) == pytest.approx(1.125)  # 0.05 of it is 'fresh'
+E       assert 1.225 == 1.125 ± 1.1e-06
+```
+
+(Its next assertion, at :272-274, checks fatigue 1.0 against `hands.FATIGUE_WEIGHT` itself
+and would pass under any weight.)
+
+### 10-5 SURVIVED
+
+```diff
+--- mut/freesail/ui/server.py
++++ freesail/ui/server.py
+@@ -1857,7 +1857,7 @@
+-        ease_on_station=args.ease_on_station,
++        ease_on_station=args.ease_on_station and False,
+```
+
+Named test rc=0 (1 s): it asserts the substring `ease_on_station=args.ease_on_station` in
+`inspect.getsource(server.main)` (tests/test_server.py:685-686), which the fault keeps.
+Liveness is by reading only: `x and False` is always false, so the driver never eases; I did
+not start `main()` (it serves). The flag is dead and the test is green.
+
+### 10-6 SURVIVED
+
+```diff
+--- mut/freesail/world/ships.py
++++ freesail/world/ships.py
+@@ -898,6 +898,8 @@
+             self.speed_kn = 0.0
+             self.tack = 0.0
++            from freesail.world.geo import destination
++            self.position = destination(self.position, 90.0, 5.0)
+             return
+```
+
+Named test rc=0 (24 s). Live: the test's body run with the hulk's position taken before
+`w.run(1800)` shows "hulk moved m: 150.0000000149308" (the far-detail step comes 30 times
+in the half hour). The check `hulk.position == hulk.position` (tests/test_squadrons.py:530)
+is true of any position. The reader's claim stands.
+
+### 10-C KILLED (the reader's "test_routine's band would still pass" is right; the suite catches it)
+
+```diff
+--- mut/freesail/crew/hands.py
++++ freesail/crew/hands.py
+@@ -423,7 +423,7 @@
+-    fatigue = 1.0 + FATIGUE_WEIGHT * max(0.0, mean_fatigue - FATIGUE_FRESH)
++    fatigue = 1.0 + FATIGUE_WEIGHT * max(0.0, mean_fatigue)
+```
+
+test_routine's named test passes (rc=0, 2 s). tests/test_hands.py::test_crew_factor_for_the_rating_table fails:
+
+```
+>       assert factor_for(ORD, ORD, fatigue=0.3) == pytest.approx(1.125)  # 0.05 of it is 'fresh'
+E       assert 1.15 == 1.125 ± 1.1e-06
+```
+
