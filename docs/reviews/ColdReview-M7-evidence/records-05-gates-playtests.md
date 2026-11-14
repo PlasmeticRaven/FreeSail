@@ -20,8 +20,8 @@ The gate process (`docs/gates/README.md:3,18`): "No milestone is finished until 
 | m4a | yes | 27 Sep | Passed; items 1 to 8 | live checklist (standing orders, the Python twin at item 8) |
 | m4b | yes | 27 Sep | **Not passed** ("the lead's error in spec M4 §13", `gate-m4b.md:5`) | Part A checklist; Part B a model session |
 | (m4b-2) | yes | 28 Sep | no report file; its record is inside m4b-3 | playtests 3 and 4 |
-| m4b-3 | yes | 28 Sep | Passed "on the local-model items"; Desktop and Claude Code items **not run**, carried to 4c | playtests 5 and 6 (models at the watcher's station) |
-| m4c | yes | 29 Sep | Passed on playtests 7 to 9; **`--load` not exercised**, the Claude Code item **not run**, both carried | a day sailed with a model watcher; the report is the playtest form |
+| m4b-3 | yes | 28 Sep | Passed "on the local-model items"; the desktop client's and the code client's items **not run**, carried to 4c | playtests 5 and 6 (models at the watcher's station) |
+| m4c | yes | 29 Sep | Passed on playtests 7 to 9; **`--load` not exercised**, the code client's item **not run**, both carried | a day sailed with a model watcher; the report is the playtest form |
 | m5a / m5a-2 | yes | 30 Sep | Passed (one verdict, the same text in both files); items 5 (`--load`) and 7 (climatology) **not exercised**, deferred to 5b; re-cut once for a Windows fault (27 failed, 8 errored) | playtest 11 plus "the owner's own run of the items alongside" |
 | m5b | yes | 1 Oct | Passed on playtests 12 and 13; items 7 (`--load`) and 8 carried "count for both" (`gate-m5b.md:5`); the verdict does not say they were run | two model-watched passages |
 | m5c | yes | 8 Oct | **Passed** on the build as cut; **provisional** on m5c-c "to stand once the fold-in satisfies both"; the lead's own officer's watch, one of the two halves the spec required, **withdrawn** (`gate-m5c.md:3,5`) | ten games of 2 to 8 Oct and the naval cruise; items 1 to 13 never ticked, item 14 (rulings) ticked |
@@ -76,10 +76,10 @@ By the records (the clone is shallow, so the attribution is the records', not gi
 |---|---|---|
 | 25 Sep | gate m0 | a log line pulled his half-typed order into the output |
 | 27 Sep | `2026-09-27-gate-3b/notes.md` | six tries to say "bear off"; quarter points refused; leeway 145° from a standing start |
-| 27 Sep | `gate-4b-sonnet-watcher` | the door's shape "really, really unwieldy"; the lead's spec error |
-| 28 to 29 Sep | 4b-2, 4b-3, 4c | lost samples, loops, a runner timeout; **no order belays work in hand** (`2026-09-29-gate-4c-qwen-watcher/notes.md:29-38`); re-firing routines call all hands |
+| 27 Sep | the playtest folder of 27 September (a model at the watcher's station) | the door's shape "really, really unwieldy"; the lead's spec error |
+| 28 to 29 Sep | 4b-2, 4b-3, 4c | lost samples, loops, a runner timeout; **no order belays work in hand** (the gate 4c playtest with a local model, `notes.md:29-38`); re-firing routines call all hands |
 | 30 Sep | 5a | 27 tests failed on Windows; all hands to one sail; a standing order cannot `tell` the watcher |
-| 1 Oct | 5b | "Definitely need text suggestions ... in the browser, plus ability to pull up the docs" (`2026-10-01-gate-5b-opus-5.5-the-passage/notes.md:23`); "Couldn't figure out all the ... reckoning's uncertainty terms ... a lot of the orders were refused" (line 24) |
+| 1 Oct | 5b | "Definitely need text suggestions ... in the browser, plus ability to pull up the docs" (the gate 5b playtest of the passage, `notes.md:23`); "Couldn't figure out all the ... reckoning's uncertainty terms ... a lot of the orders were refused" (line 24) |
 | 2 to 8 Oct | 5c review | ten games; the *Harpy* aground off Penlee; three readings give the true position away; **five of the starter book's nine rules refused on the cutter** (`report-2.md:2643-2645`) |
 | 11 Oct | m6a runs | full and by aback; storm staysail blown; the merchant balks an entrance; pictures white; aground on the Filletes with the pilot aboard |
 | 13 to 15 Oct | m6a-2 runs | the boat "ghosted"; image shelving; 25 notes, most of them design wishes (needs, people, the director's voices, gybing) |
@@ -95,7 +95,7 @@ By the records (the clone is shallow, so the attribution is the records', not gi
 | Review finding | Met before? | Where | What was done |
 |---|---|---|---|
 | Guns secured and silent; "firing as they bear already" | **Not by the owner**; met by a model and filed as a success | Owner's first action played with no order of his (`2026-10-24-owner-first-action/notes.md:3-4`), so the rules captain cast loose and fought. On 5 Nov the director, in the gunner's voice, told the model captain "the guns are still secured; they must be cast loose by your order", and the lead's case study lists that under **"What held"** (`2026-11-05-brig-off-falmouth-fully-crewed/case-study.md:36-39`) | Nothing. The trap was seen and read as the director's good conduct. No record finds "as they bear already" |
-| The starter book refused on the cutter | **Yes, 4 to 5 October** | gate-5c games 5 to 7: "5 of its 9 standing orders are refused for a cutter" (`2026-10-05-gate-5c-review/evidence/L1-cutter-gemma.md:34,420`); report-2 lists it among "small faults" (`report-2.md:2643-2645`) | Not mended; the book is now seven rules and three still refuse (review head 1.5). Lost among the "small faults" that "wait" (`report-2.md:441-445`) |
+| The starter book refused on the cutter | **Yes, 4 to 5 October** | gate-5c games 5 to 7: "5 of its 9 standing orders are refused for a cutter" (`2026-10-05-gate-5c-review/evidence/L1-cutter-(a local model).md:34,420`); report-2 lists it among "small faults" (`report-2.md:2643-2645`) | Not mended; the book is now seven rules and three still refuse (review head 1.5). Lost among the "small faults" that "wait" (`report-2.md:441-445`) |
 | A purchase with the boat lost: money taken, nothing delivered | **No**; the design that allows it was recorded | The 5c evidence quotes primer 14: the bargain "moves the purse at once, and sends the boat" (`evidence/V2c-trade-boats-parsing-code.md:197`); `trade` named as what blocks several bargains | Never tried with the boat lost |
 | A port scenario "at the usual anchorage" with no anchor down | No | The 18 Oct dispatches test used the same scenario; the model captain anchored at 05:02 at once (`2026-10-18-dispatches-director-test/notes.md:16`), so nobody met the refusal | Nothing |
 | The log's repeated lines (the same report eight times) | **The class, many times** | the log "chatty" (playtest 7, finding 6); 265 wind-shift lines (`report-2.md:285-287`, made quiet by 37f); the sample "repeats the history" (dispatches finding 21); notable noise waking stations (R-31), 66 tide-swing lines (R-04); "every gun shot ... a notable event" (`model-officer-review.md`, point 4) | Each instance mended where found (37f; the deltas, 58), the class never: the review met a new instance |
@@ -154,7 +154,7 @@ The change record of **a local working copy of the gate-5c zip**, `FreeSail-gate
 1. **"Status: gate m6c passed"** (`README.md:5`) against `gate-m6c.md:3`, the owner's-runs README and decision 50: run in part, and three of the five items run failed their expectations.
 2. **`gate-m6a.md:3` "open"** for 35 days; m6c's line 10 says the verdicts of m6a, m6a-2 and m6c "are the owner's together, and the milestone closes on them". No verdict closes m6a anywhere.
 3. **`docs/gates/README.md:18`** "The next milestone does not start until the verdict is in" has been false since decision 29 (30 Sep) and is unamended; `gate-m6a-2.md:91` says 43, 43b and 44 "wait on this gate", and they ran on a gate never cut.
-4. **R-38 recorded as a P0 taken**, the code (`agents/director.py:420-421`) still lets through any word it cannot rank: the review's decision 14 finding is that residue.
+4. **R-38 recorded as a P0 taken**, the code (`agents/director.py:420-422`) still lets through any word it cannot rank: the review's decision 14 finding is that residue.
 5. **The consent brief's "director is to come"**: decision 48 (17 Oct) records the sentence rewritten; it kept the director "to come" the day the director was built.
 6. **The gate-m5c line "a provisional pass on m5c-c ... to stand once the fold-in satisfies both"**: no record says it stood.
 7. **`docs/playtests/README.md:114-129`** "The records so far" lists four of the 28 folders.
@@ -190,7 +190,7 @@ The change record of **a local working copy of the gate-5c zip**, `FreeSail-gate
 - The whole suite at gate 5c: `2981 passed, 9 xfailed in 1179.13s (0:19:39)` on four workers (`report-2.md:403-405`); 842.59 s on the owner's Windows machine at m5c-c's start (`CHANGES-m5c-c.md`, "The suite at the start"); the interim's cloud runs 7 to 20 at 4,250 to 4,337 passed, the pace job 155 to 300 s and failing on seven runs (`gate-m7-interim.md:29`).
 - One gate's review: `report-2.md` 536,638 chars, `report.md` 215,204, `handover-audit.md` 110,825, `evidence/` 2.2 MB: some 860,000 characters of report for one gate.
 - The M7b review: 99,091 chars plus sixteen reviewers' files (about 450,000) plus 4 MB of extracted transcripts.
-- Model cost met in play: two API seats "about 16.3 M prompt tokens in about two hours"; "the OpenRouter credit that ran out" (R-34, `...Review.md:561`); a director's stand-by "about 1.3 M characters in four hours" (R-26); a 13-hour day took "two hours and a half" of real time (dispatches finding 16).
+- Model cost met in play: two API seats "about 16.3 M prompt tokens in about two hours"; "a vendor's credit that ran out" (R-34, `...Review.md:561`); a director's stand-by "about 1.3 M characters in four hours" (R-26); a 13-hour day took "two hours and a half" of real time (dispatches finding 16).
 - Records against work: the gates folder 273,857 chars; the playtests 81.8 MB, 13% of the repository.
 
 ## 5. The record as a record
@@ -211,9 +211,9 @@ The change record of **a local working copy of the gate-5c zip**, `FreeSail-gate
 4. **The interim gate is the builders' list of what they built, not run, and would have caught almost none of the review's player-facing findings.** `gate-m7-interim.md:50-73`; `data/scenarios/mahon.yaml:31`.
 5. **Some 16,700 lines of post-cut modules plus 18,400 of ship tools have never been before a gate**; the two ship reports stand "in place of" the owner's test. `freesail/combat/`, `agents/director.py`, `world/{signals,squadrons,prizes,boats,water,needs,hulls}.py`, `tools/ships/`; `2026-10-30-pilot-indefatigable/testing-report.md:3-5`.
 6. **The guns-secured trap was met on 5 Nov and filed as a success**; the owner's own first action gave no order. `2026-11-05-brig-off-falmouth-fully-crewed/case-study.md:36-39`; `2026-10-24-owner-first-action/notes.md:3-4`.
-7. **The starter book's refusal on the cutter was found on 4 to 5 Oct and lost among "small faults".** `2026-10-05-gate-5c-review/report-2.md:2643-2645`; `evidence/L1-cutter-gemma.md:34`; `data/standing_orders/starter.orders`.
+7. **The starter book's refusal on the cutter was found on 4 to 5 Oct and lost among "small faults".** `2026-10-05-gate-5c-review/report-2.md:2643-2645`; `evidence/L1-cutter-(a local model).md:34`; `data/standing_orders/starter.orders`.
 8. **The checkpoint's load was carried unrun from 4c to 5c**, the gate the review's checkpoint finding would have needed. `gate-m4c.md:3`, `gate-m5a.md:3`, `gate-m5b.md:5`, `gate-m5c.md:77`; `freesail/core/replay.py`.
-9. **R-38 and the "to come" sentence, each recorded as dealt with, are open**: the limit fails open on an unknown word; the brief still promises a director to come. `...Review.md:570,595`; `agents/director.py:420-421`; `docs/agents/ConsentBrief.md:13`.
+9. **R-38 and the "to come" sentence, each recorded as dealt with, are open**: the limit fails open on an unknown word; the brief still promises a director to come. `...Review.md:570,595`; `agents/director.py:420-422`; `docs/agents/ConsentBrief.md:13`.
 10. **The saves carry the owner's profile folder name (32 times, 21 files with related paths) and make up 61 MB**; no e-mail or key. `docs/playtests/2026-10-25-to-27-owner-playtests-70-72/saves/*` (`director.brief.source`); `docs/playtests/README.md:16-17`.
 
 ## What I did not read
