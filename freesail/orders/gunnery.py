@@ -436,7 +436,8 @@ def _engage(ship: Any, battery: Battery, said: str) -> Result:
             f"Engage {words} to which side? Say 'engage her to starboard' or 'to larboard', "
             f"or 'on both sides'."
         )
-    if battery.mode is FireMode.HOLD:
+    held = battery.mode is FireMode.HOLD and bool(getattr(battery, "held_by_order", False))
+    if battery.mode is FireMode.HOLD and not held:
         changed.append("the guns to fire as they bear")
         battery.mode = FireMode.AS_THEY_BEAR
     if battery.exercise:
@@ -451,6 +452,11 @@ def _engage(ship: Any, battery: Battery, said: str) -> Result:
     text = f"Engage {words} to {battery.engaged}: " + ", ".join(changed) + "."
     if battery.engaged == "both":
         text = f"Engage {words} on both sides: " + ", ".join(changed) + "."
+    if held:
+        # the later explicit order about firing stands (the lead's ruling of 2026-11-14 on
+        # package 115 D1, JUDGEMENT): after 'hold your fire' or 'cease firing', engage takes
+        # her for the mark and holds; before, it turned the hold into "as they bear"
+        text += " The guns are held at your order: 'fire as they bear' to open."
     data = {"verb": "engage", "level": 1, "target": target_id, "side": battery.engaged}
     return "guns.engage", text, data
 
@@ -627,6 +633,8 @@ def _mode(ship: Any, battery: Battery, mode: FireMode) -> Result:
         FireMode.HOLD: "Hold your fire: no gun fires but by name or at the word.",
     }[mode]
     if battery.mode is mode:
+        if mode is FireMode.HOLD:
+            battery.held_by_order = True  # said, though the guns held already
         return (
             "guns.mode",
             f"The guns are {'holding their fire' if mode is FireMode.HOLD else f'firing {mode}'} "
@@ -635,6 +643,8 @@ def _mode(ship: Any, battery: Battery, mode: FireMode) -> Result:
         )
     battery.mode = mode
     battery.word = None
+    # an explicit hold stands against a later engage (`_engage`); an order to fire ends it
+    battery.held_by_order = mode is FireMode.HOLD
     return "guns.mode", words, {"verb": "fire mode", "level": 1, "mode": str(mode)}
 
 
@@ -987,6 +997,7 @@ def _priority(ship: Any, quarters: Any, verb: str) -> Result:
 def _cease(ship: Any, battery: Battery) -> Result:
     was = battery.mode
     battery.mode = FireMode.HOLD
+    battery.held_by_order = True  # an explicit order about firing (see `_engage`)
     battery.word = None
     battery.single = []
     battery.across_bows = False

@@ -150,11 +150,18 @@ class Morale:
 
 def morale_of(ship: Any, doctrine: Any = None) -> Morale:
     """The ship's morale, made at the first call from her captain's doctrine (its
-    `morale_start` and `strike_below`), else the defaults."""
+    `morale_start` and `strike_below`), else the defaults. The doctrine is found here when
+    the caller does not hand it in (her World's captain, `_doctrine_of`), so that her temper
+    never depends on which road asks first (the lead's ruling of 2026-11-14 on package 115
+    D1: a French frigate boarded before she was fired on began at the default 0.7, fired on
+    first at her own doctrine's figure); the defaults are for a ship with no captain's
+    doctrine at all."""
     extra = ship.extra
     m = extra.get("morale")
     if isinstance(m, Morale):
         return m
+    if doctrine is None:
+        doctrine = _doctrine_of(ship)
     start = DEFAULT_START
     below = DEFAULT_STRIKE_BELOW
     if doctrine is not None:
@@ -163,3 +170,13 @@ def morale_of(ship: Any, doctrine: Any = None) -> Morale:
     m = Morale(start=start, strike_below=below, value=start)
     extra["morale"] = m
     return m
+
+
+def _doctrine_of(ship: Any) -> Any:
+    """Her captain's doctrine, by the World she sails in (the runtime the World attaches to
+    every ship it makes): the one the fire's reckoning has always handed in."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    captain = getattr(world, "captain", None) if world is not None else None
+    return getattr(captain, "doctrine", None) if captain is not None else None

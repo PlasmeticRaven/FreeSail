@@ -17957,3 +17957,38 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
         tried += 1
         assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
     assert tried >= 8, tried
+
+
+def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds():
+    """The lead's ruling of 2026-11-14 on package 115 D1 (JUDGEMENT, put to the owner): the
+    later explicit order about firing stands. `_engage` turned a held battery to "as they
+    bear"; with the guns secured that did nothing, and with engage casting loose it fired on
+    a player who had just said hold. The first action as the harbour starts it: `beat to
+    quarters`, `hold your fire`, `engage her to starboard`: the engage takes her for the
+    mark, casts loose, and holds, saying so and naming the order that opens; nothing fires
+    in the next forty minutes; `fire as they bear` then opens. Without the hold, engage fights
+    as they bear (truth 7-628)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    _said(w, "hold your fire")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert "The guns are held at your order: 'fire as they bear' to open." in e.text, e.text
+    assert "being cast loose" in e.text, e.text
+    battery = w.ship.extra["battery"]
+    assert battery.mode.value == "hold" and battery.target, (battery.mode, battery.target)
+    for _ in range(40):
+        w.run(60)
+    assert any(g.cast_loose for g in w.ship.guns.values()), "never cast loose"
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick], "fired, held"
+    opened = _said(w, "fire as they bear")
+    assert opened.kind == "guns.mode", opened.text
+    fired = []
+    for _ in range(60):
+        w.run(60)
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > opened.tick]
+        if fired:
+            break
+    assert fired, "opened and nothing fired in an hour"

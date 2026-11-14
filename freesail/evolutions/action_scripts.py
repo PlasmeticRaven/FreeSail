@@ -218,6 +218,7 @@ class SecureGunsScript(_QuartersScript):
 
             battery.mode = FireMode.HOLD
             battery.word = None
+            battery.held_by_order = False  # secured, not held: a later engage opens fire
             battery.single = []
             # practice and resupply: the dumb show ends with the guns secured, and a mark
             # for practice is given up with them (a sail engaged is kept, as it was)
