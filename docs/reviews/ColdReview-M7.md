@@ -220,7 +220,94 @@ And the data: the chart, 359 MB in 2,325 tiles; 121 ports; six nations' signal b
 
 ## Head 3. What is not tested, and what the testing costs
 
-*(Written when the planted faults and the timed run are in: see the later part of this file.)*
+This head carries the test suite's own audit, which the owner asked for by name. Every test file was read whole by a reader whose only work was the tests (`tests-01` to `tests-12`); their table by file, with the timed seconds, is `ColdReview-M7-evidence/tests-by-file.md`. The claims of weakness were then tried by planting faults (`faults-1` to `faults-5`).
+
+### 3.1 What the suites are
+
+171 test files, 141,400 lines, 3,842 test functions, **8,138 cases**: 7,622 in the fast tier and 516 in the slow (the days sailed, the long truths, the pace tests). Three files make a third of the cases: the primer's checks (1,095), the ship view's geometry (1,045) and the order table (726).
+
+{{TIMINGS}}
+
+### 3.2 What the suites prove, and what they only pin
+
+**They guard the ship's core well.** As a control, the reviewer chose eighteen ordinary faults in behaviour the game leans on every minute, with no test named: the rudder reversed, leeway doubled, evolutions at half time, the tack's preconditions dropped, a standing order's "for 2 minutes" ignored, the reckoning set to the truth, the tide reversed, grounding switched off, the wind's gust made random, the opt-out token ignored, a lesser station allowed every order, a purchase that takes no money, shot that never hits, a world order shown as sent, a save without its book, the lookout's distance doubled, the wind capped. **The fast tier caught all eighteen**, twelve within half a minute of starting the first file chosen and fourteen by a test whose name states the behaviour (`faults-5-control`). A builder who breaks the centre of this game is told quickly and plainly. That is worth saying first, because what follows is all criticism.
+
+**Two of those eighteen were caught by luck, and they show where the weakness is.** Square sails driving a fifth less passed every truth about speed and pointing, and was caught only because one studding-sail boom carried away before another in a test about standing orders. Shot that never hits passed the whole of the fight's own test file, and was caught by a test that compares the hit-chance function with a copy of its own formula kept in the test (`tests/test_dumb_show.py:359`); the same fault planted one step further on would have met no test. **Faults of degree in the physics, and faults in the fight as a whole, are not guarded by the tests that carry their names.**
+
+**Much of the suite pins rather than proves.** A pin is an assertion that the code gives today's answer: a digest of a day's log, a tick at which a line appears, a count of lines, a figure to the millimetre. A pin notices change and cannot say what is right. The readers counted, in the first half of the truths' file alone, 75 tick constants, 8 digests and 8 line counts, with some 870 lines of comment recording each re-pin by package; in the view's geometry some 175 pinned figures at tolerances of a millimetre to two centimetres, "most with no source a reader can check"; in the six hull files some 45; four digests, five line counts and five exact lists of states and ticks in the captain's trials. One trial dropped its digest because, its own comment says, the digest "differs by machine" (`tests-04`), which bears on every promise of replay by digest.
+
+**Much of the suite tests documents, tools and data files, not the game.** 1,095 cases check the primer. About thirty of the fifty-one tests of one ship's file check that a data file holds the figures of her design note (`tests-08`). Two files each run the whole ship generator and compare every ship file byte for byte, and a third does it again (`tests-09`). Of the 185 truths with a body of their own in the second half of the truths' file, **94 run no world and give no order**: they check data, chart cells, tide constants, words in a data file's notes, or a tool's output (`tests-02`). One test asserts sentences in the project's own working notes under `docs/dev/` (`tests/test_practice.py:594-602`).
+
+### 3.3 Tests built not to fail
+
+The readers nominated the tests they judged could not fail for the reason in their name, with the fault each should catch. {{FAULTS}}
+
+What the survivors have in common, with one example of each kind (all in the readers' files with their lines; the reviewer checked the first four kinds against the test files himself):
+
+- **An assertion that is always true.** A value compared with itself (`test_agents.py:1428`, `test_sea.py:636`, `test_squadrons.py:530`, `test_ships.py:93`); `... or True` (`test_longitude.py:587`); `>= 0` of a count or an absolute value (`test_lug.py:130`, `test_far_action.py:361`); `x in (True, False)` (`test_captains.py:311`, `test_longitude.py:533`); a refusal checked against a kind of event nothing produces (`test_ground.py:139`, `test_health.py:247`); the second half of an `or` already implied by the line above (`test_anchor.py:207`).
+- **`all()` over a list that may be empty, or a check under an `if` that is not entered.** `test_known_truths.py:2303` (truth 52: any list of squall events passes, the empty one too); `test_fight.py:452`; `test_ports.py:1657`; `test_knowledge.py:236`, `1821`; `test_standing.py:1229`.
+- **A test that does the work itself.** `test_date_and_war.py:118-121` writes the lines of the log with its own code and then finds them there; the hook it names is never run. `test_bilander.py:160` does arithmetic on its own numbers and calls no code of the game.
+- **A test that stands on a fake of code since merged.** Seventeen of the twenty-four ordnance tests, and the powder orders' quantities, run against a `FakeMagazine` kept "until it is merged"; the real magazine is merged (`ship/parts.py:993`) and already differs from the fake. The practice tests patch out the battery's tick for the same reason (`tests-08`, `tests-09`).
+- **A test of the source's text.** The `--seat` flag is "tested" by finding strings in the source (`test_captain.py:408`, `631`; `test_server.py:677`); a stale docstring is asserted to say what it says (`test_ships.py:251`); a known defect is locked in by a search for the word that causes it (`test_driver.py:909`).
+- **A copy of the code in the test.** The hit chance (above); some dozen rules of the browser's drawing copied into Python inside the test and compared with themselves; a fatigue constant copied without the term the code subtracts (`test_routine.py:36`).
+- **A pin of a thing that is wrong.** "Tacked ... heading SSE (158°)" with the ship held at 035° (`test_evolutions.py:890`); the frigate's boom required to pass *under* her taffrail (`test_view_geometry.py:5030`); a real overlap in the chart's data asserted as the expected answer (`test_chart_audit.py:187`). Mending any of these fails a test.
+- **An expected failure nobody expects to mend.** Eight strict expected failures in the first half of the truths alone pass on any exception; one tests behaviour since removed and still costs a slow run; back-and-fill has been one since an early package, so any further break in it is unseen; the schooner's case of truths 29 and 30 is one, so those truths are not proven on the schooner at all.
+- **A name or docstring that promises what the body does not check.** A gale "sailed for 8,400 seconds" by a test that sails nothing (`test_neufchatel.py:1569`); "slower by exactly" the hands taken, asserted as "at most 1.15 times", with the docstring's own figures showing it faster (truth 7-136); "the merchant hauls off ... and waits in the road" asserting she never anchored (`test_captain_trials.py`).
+
+### 3.4 Behaviour with no test
+
+Beyond head 5.3's list of what the reviewer met in play:
+
+- **The player's own road into a fight** (guns never cast loose). Every test casts loose first.
+- **The director's roads onto the player's ship** (`captain: intent`, `ship "…": intent`, `struck to`, `follow`, a wound, a boat swamped with people in her). No test gives any of them through the director's door.
+- **Parity below the captain.** Only the captain's station is compared with the console.
+- **The helm after a wheel is shot away; a shot into a ship at coarse detail; boarders and their guns.**
+- **The starter book on any ship but the frigate.**
+- **The checkpoint loader against a name reached through a module** (the one test tries only the direct name).
+- **The true position on the wire.** The one test on that road guards the leak.
+- **A captain's doctrine file with a key misspelt or mis-indented;** a port file likewise.
+- **The officer's handover at the context a local model runs with.** At 16,384 tokens the officer's own brief (about 13,500) is over the threshold at his first sample, and he is asked for a handover note then and again every 1,638 tokens after; the test that should notice has had its budget raised nine times to keep its precondition true (`tests-08`; `faults-3`).
+
+### 3.5 Tests that test the same thing
+
+- **The truths call the tests.** In the second half of the truths' file, **102 truths do nothing but call tests of other files**: 197 distinct tests in 31 files, forty of them in one file. The truth and its twin do not differ, so each twin runs at least twice in a whole run, and some three times. Both halves of several pairs are on the slow list; four slow twins run in the *fast* tier through truths not marked slow; and calling a twin by name drops the twin's own skip, so that without Node eleven truths error where their twins would skip (`tests-02`, `tests-07`, `tests-11`).
+- **Six hull files are one test written six times**: about 60 of their 121 functions follow the same eleven sections; three of the sections are proved again for every ship elsewhere. One table and six parametrised tests would replace some 45 functions and a thousand lines (`tests-06`).
+- **The same scene built again and again for one line each.** The struck ship seventeen times in two files; the hove-to brig eleven times (once only to check that a line does not parse); the two-hour passage in the cabin five times; a brig sailed from nothing twenty-six times in one file for 1,200 to 2,400 seconds each; a 1,500-tick settle fifteen times in another (`tests-04`, `tests-07`, `tests-10`).
+- **The same day sailed in two files under the same fixture names**: the frigate's and the schooner's sweeps and the frigate's polar (`tests-10`); truth 27's four gales (`tests-04`); the gale trial three times; the replay-to-digest check about twenty times (`tests-01`).
+- **Helpers of one test file imported by others as a library** (`test_brains.world_at` by four files; `test_people` from four), so that a test file cannot be moved or split without breaking others.
+
+### 3.6 Tests of what is no longer there
+
+- Scenario keys nothing reads, tested (`test_scenario_nations.py` whole; `chart: {year}`).
+- Hooks never wired, tested (`Sea.horizon_nm`, `sight_error_factor`: `test_sea.py:461`).
+- A rule superseded, kept as a strict expected failure "as a record" (`test_agents.py:2411`); a removed constant tested to stay removed (`test_agents.py:679`); "the nine tools of the spec" asserting eighteen.
+- A switch forced on by the test that is off in the game (the drill walk: `test_knowledge.py:1637`, and the truth that calls it).
+- Truths "drafted for Phase 5 to move into the truths' file" and never moved, in five files.
+- Four truths that turn a mend off to assert the old fault still happens, so that each mended defect remains a tested code path (7-340, 7-341, 7-342, 7-350).
+- Docstrings the tree has outgrown: "no committed ship carries a settee" (one does); a build name pinned as `m6c` at milestone 7.
+
+### 3.7 The procedure
+
+**How the tiers are decided.** By hand. `tests/conftest.py` holds 48 fixture names and **370 test ids typed out**; a test is slow if it uses one or is one. A slow test renamed drops into the fast tier and nothing says so; the file's own docstring admits it. **Four of the 370 ids name no test today**, one of them a 3,700-tick run of the server now in the fast tier; ids that carry a parameter's position move if a table is reordered. The file says the slow mark "is applied here and never in a test file"; it is applied in at least six test files (sixteen times in the truths' second half). Heavy tests no list names sit in the fast tier: none of one frigate's 68 cases is marked though her sister's twins are listed at 5 to 29 seconds each; a forty-minute anchor fixture that the next test sails on for twelve hours; five-day and two-day runs of the crew's health (`tests-03`, `tests-05`, `tests-06`, `tests-10`, `tests-11`).
+
+**The shard rule cannot do what its comment says.** The whole-suite workflow splits the suite over six machines by each test's group, but the groups are attached later in the same hook, so each test is placed alone and a module's day may be sailed again on each machine (`tests/conftest.py:695-717`; `tests-11`: sure).
+
+**What the checks on a push let through.**
+
+- **Any change to a document.** The workflow ignores `docs/**` and `**.md`. But the game serves `docs/primer` to players and models, pins the digest of the consent brief, and writes consent records under `docs/`; and tests read the primer, design notes, a chart reference and the working notes. An edit to any of these merges with no run (`code-10`; `refute-08`: confirmed).
+- **Six hull regression tests always skip**, in the checks and in any shallow clone, because they compare against a commit the checkout does not hold. Each file does also pin the hull's own figures in a constant that runs.
+- **The browser's tests skip on every job but one.** The harbour's page test and the pictures' test (which guards the owner's "white image" complaint, its threshold since halved to pass) run only where a browser is installed.
+- **Sixty-five tests of two doors skip in silence where one optional package is missing.** The checks install it; a builder's machine with the `dev` extra alone does not.
+- **Order.** Several module fixtures are changed by the tests that read them, so that tests pass by file order (`test_anchor`, `test_staying`, `test_via`, the pace test on the shared passage).
+- **The clock.** Wall-clock assertions sit in the fast tier (`test_chart.py:300, 336, 340`; truths 7-284 and 7-441) and will fail on a loaded machine; two door files race real time in fractions of a second.
+
+**The release gate's pace tests sit on the edge.** The floor is 500 ticks a second; the project's own note says a cloud runner gives 480 to 520. The floors elsewhere are loose the other way: half the measured speed, or read from the code under test (truth 7-138: a floor of 60 against 538 measured).
+
+**How pins are moved.** By editing the number and writing the package in a comment beside it. The comments are long and honest and point into `docs/dev/`. Nothing in the tree makes a moved pin say what changed in the game and whether that was meant. (What the records require of a builder before a step is reported, and what that lets through, is for the second sitting.)
+
+### 3.8 What would make the suite cheaper without making it weaker, ranked
+
+{{PROPOSALS}}
 
 ---
 

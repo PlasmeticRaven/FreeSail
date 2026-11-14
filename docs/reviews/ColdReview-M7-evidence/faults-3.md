@@ -314,3 +314,248 @@ through that door (`freesail/agents/mcp_server.py:458` -> `game.picture` ->
 with no image. (Pristine, a keyed fetch appended to the test answers 200 with the PNG; with
 the fault the copy fails before reaching it, at the same assertion.) **KILLED**: the
 reader's claim is refused.
+
+## 07, faults "no test in my files would catch"
+
+**B1, the lugger keeps her way hove to.** The reader's description (the mizen lug left
+drawing, the helm amidships) could not be made live as written: the lugger has no square
+yards to back (`HeaveToScript.yards` is `[]`, so `fore_and_after()`), and once she is hove
+to `keep_lying_to` re-tends her helm and sheets every tick (`tend_lying_to`,
+`freesail/evolutions/scripts.py:2669`), so a fault at the heave-to's start alone changed
+nothing (two attempts, both identical to pristine to two decimals). The fault planted, for
+luggers only (the files keyed on a `fore.lug`):
+
+```
+--- mut/freesail/evolutions/scripts.py
++++ freesail/evolutions/scripts.py
+@@ -2666,7 +2666,8 @@
+         manned = _lying_to_hands_on(ship, info, clock, timing)
+-        tend_lying_to(ship, info, dt, wind, timing, sheets=manned)
++        if "fore.lug" not in ship.sails:  # FAULT: a lugger's helm and sheets left untended
++            tend_lying_to(ship, info, dt, wind, timing, sheets=manned)
+@@ -2909,7 +2910,9 @@
+             sheets_to(self.ship, booms, None, None)
+-            if self.headsail is not None:
++            if "fore.lug" in self.ship.sails:  # FAULT: a lugger's helm amidships, jib drawing
++                dyn.target_rudder = 0.0
++            elif self.headsail is not None:
+                 sheets_to(self.ship, [self.headsail], "weather", None)
+```
+
+Live: in `test_she_heaves_to_with_her_lugs_lowered`'s own world, ten minutes after "heave
+to", pristine she has `u = -1.54 kn` (sternway) and holds it 20 minutes on; with the fault
+`u = +1.92 kn` ahead and rising (1.95 kn 20 minutes on), the log saying "Hove to on the
+starboard tack, under her fore-and-aft canvas, jib sheet to windward, helm a-lee." (the
+words are not the deed). Not the three or four knots the reader guessed, but she
+forereaches. `tests/test_lug.py` whole (5 tests, 8 s) passes; the named test's last line is
+`assert math.degrees(abs(world.ship.dyn.u)) >= 0.0` (`tests/test_lug.py:130`), true of any
+number. Grep for a lugger with "heave to" in the other tests finds only `test_lug.py` (the
+truths' lugger test, `test_truth_7b_111`, tacks and wears). **SURVIVED.** Note also that
+pristine she lies hove to with a knot and a half of sternway, which no test reads either.
+
+**B2, `at a sounding` never fires.**
+
+```
+--- mut/freesail/standing/runtime.py
++++ freesail/standing/runtime.py
+@@ -402,6 +402,7 @@
+                         R.event_matches(spec, e.kind, e.data)
++                        and spec.words != "a sounding"  # FAULT: never dispatched
+                         and e.actor != f"{ACTOR_PREFIX}'{rule.name}'"
+```
+
+Live: in Carrick Road, `standing order "b": at a sounding then steer 90` and "heave the lead":
+pristine it fires ("By standing order 'b': steering 90."); with the fault it does not. Pass
+with the fault: `test_log_lines.py::test_at_a_sounding_waits_for_the_bottom` (negative only,
+as the reader said), `::test_a_cast_that_finds_no_bottom_is_routine_and_a_sounding_is_bottom_found`
+(line 418 calls `event_matches` directly), `test_reckoning.py::test_the_dialect_reads_the_new_rows_for_nothing`
+(parses `at a sounding` only). Fails: `test_ground.py::test_truth_66_the_same_passage_with_the_lead_going_hourly_does_not_ground`
+(33 s), `AssertionError: assert (1 >= 5)` at `assert len(casts) >= 5` (its "fill away after
+the cast" order never fills her away, so the hourly heave-to and cast chain stalls).
+**KILLED** by the suite, outside the reader's files.
+
+**B3, "fire" with every lee port shut.** The present behaviour first, pristine, in the
+test's own set-up: the reply is `guns.fire`, "Fire the larboard broadside: no gun of it is
+loaded and run out yet; the word stands until one bears.", the word `larboard` after the
+reply and `None` two seconds on. The reader's account stands: the reply says the word
+stands and the next tick drops it, and no test pins the reply's words. The worse fault:
+
+```
+--- mut/freesail/combat/guns.py
++++ freesail/combat/guns.py
+@@ -924,7 +924,7 @@
+         if not self._behind_ports(guns, relative, target):
+             return
+-        self.word = None
++        # FAULT: the word left standing
+```
+
+`test_lee_ports.py::test_a_word_for_a_broadside_given_by_the_order_is_told_at_the_next_tick`
+fails, `AssertionError: assert 'larboard' is None` (line 940). **KILLED**, as the reader
+predicted.
+
+## 08-1 The handover note asked for whatever the conversation's size
+
+| 08-1 | test_officer.py::test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_watch; ::test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_conversation | `if size < threshold: return` deleted | pass, pass | SURVIVED, SURVIVED | 4, 5 |
+
+```
+--- mut/freesail/agents/harness.py
++++ freesail/agents/harness.py
+@@ -3966,8 +3966,7 @@
+         size = self._conversation_size()
+-        if size < threshold:
+-            return
++        # FAULT: the threshold no longer consulted
+         if self._handover_asked_at and size - self._handover_asked_at < again:
+```
+
+Live: the frigate's officer seated as in the test at 902, with a budget of 200,000 (threshold
+140,000): pristine no ask in six samples (the conversation 17,185 to 31,218 tokens); with the
+fault the note is asked at 17,185 tokens, 8.6% of the context, and the conversation folded
+(revision 1) at the second sample. Both named tests pass, as the reader predicted. Caught
+elsewhere: `test_local_runner.py::test_the_handover_is_asked_for_by_the_servers_count` fails
+(`assert not any("handover note" in n for n in plain.agent.notices)` / `assert not True`), and
+`test_known_truths.py::test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_long_seat`
+fails (the fold said at 75,000 tokens, not the 90,000 it pins). Pass:
+`test_local_runner.py::test_the_handover_reserve_is_tokens_or_a_share_and_the_larger_when_both`,
+`::test_the_two_stopgap_settings_on_the_fake_server` (both read `handover_threshold()` and
+never the ask), `test_officer.py::test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations`.
+**SURVIVED** for both named tests; caught by the suite.
+
+## 08-C The claim as the code stands: the note asked at the first sample at 16,384
+
+Not a fault: tried on the pristine code. The officer seated as in the test at 902 (the
+frigate, "set plain sail", the fake model answering an ask with `handover_note`), and
+`h.budget_tokens = 16384` (the figure the local runner advises,
+`freesail/agents/local.py:604-606`, and the one `test_officer.py:999` shows reaching the
+harness from it). Script: `scratchpad/r3/hand.py 16384`, run in the scratch copy.
+
+```
+budget 16384 threshold (9830, 1638) size at seat 13646
+sample 1 size 17185 asks so far 0 revision 0
+sample 2 size 14058 asks so far 1 revision 1
+sample 3 size 19169 asks so far 1 revision 1
+sample 4 size 13969 asks so far 2 revision 2
+sample 5 size 19050 asks so far 2 revision 2
+sample 6 size 14009 asks so far 3 revision 3
+```
+
+The reader's claim stands, and it is worse than he put it. The brief alone, at the seat, is
+13,646 tokens: already past the threshold of 9,830 (six tenths of 16,384) before the officer
+has said a word. The note is asked at the end of his first turn and rides the next sample;
+the fold leaves the conversation at about 14,000, still over the threshold, so the ask comes
+again as soon as it has grown by a tenth (1,638 tokens): three handover notes and three folds
+in six samples, for as long as he is seated. At the context the runner itself advises, an
+officer spends every other sample writing his handover note. (Whether the real local runner
+gives exactly this budget was read from the test at 999, not run through a server.)
+
+## 08-2 "veer cable" starts the heave-in
+
+| 08-2 | test_orders.py::test_table[frigate: veer cable], [frigate: veer to ninety fathoms] | `"veer cable": "heave_in"` | pass, pass | SURVIVED, SURVIVED | 2 |
+
+```
+--- mut/freesail/orders/ground_tackle.py
++++ freesail/orders/ground_tackle.py
+@@ -69,7 +69,7 @@
+-    "veer cable": "veer_cable",
++    "veer cable": "heave_in",
+```
+
+Live: on the table's frigate, "veer cable" now answers "Started heave_in on ship." with
+`runner.started == [('heave_in', 'ship', {})]`, and "veer to ninety fathoms" starts
+`heave_in` with `{'fathoms': 90.0, 'to': True}`. Both rows pass: they give no `evo=`, so
+`test_table` checks only the kind and the log's form (`tests/test_orders.py:831-835`).
+Caught elsewhere: `test_anchor.py::test_veering_and_the_second_anchor_and_backing_with_the_stream`
+fails, `assert abs(best.scope_fathoms - 60.0) < 0.5` / `AssertionError: assert (30.0 < 0.5)`.
+**SURVIVED** for the named rows; caught by the suite.
+
+## 08-3 The sheets trimmed reported in reverse
+
+| 08-3 | test_orders_m4a.py::test_trim_the_sail_and_tend_the_sheets (all 15 cases, among them [tend the sheets], [trim the headsails], [tend sheets], [trim the sheets]) | `trimmed_sheets` reversed | pass | SURVIVED | 8 |
+
+```
+--- mut/freesail/orders/verbs.py
++++ freesail/orders/verbs.py
+@@ -1315,7 +1315,7 @@
+-        "trimmed_sheets": trimmed,
++        "trimmed_sheets": list(reversed(trimmed)),
+```
+
+Live: "tend the sheets" reports `['the jib', 'the fore topmast staysail', 'the mizzen
+spanker']` for the evolutions started on `['mizzen.spanker', 'fore.topmast_staysail',
+'jib']`; pristine the two agree, and the test's first leg (the names in order) holds pristine
+for all four rows and fails for all four with the fault. The whole parametrised test passes
+(15 cases, 8 s) on its second leg, `or len(data["trimmed_sheets"]) == len(expect.sheets)`
+(`tests/test_orders_m4a.py:142-144`), which any list of the right length satisfies.
+**SURVIVED**. Weight to a player is low (the order of a list in the order's data); the
+weight to the suite is that the assertion on the sheets' names is void.
+
+## 08-4 The real magazine never wants its barrels below made up
+
+| 08-4 | test_ordnance.py::test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sound | reserve dropped from `Magazine.wanting` | pass | SURVIVED | 4 |
+
+```
+--- mut/freesail/ship/parts.py
++++ freesail/ship/parts.py
+@@ -997,7 +997,7 @@
+         established = sum(n * self.charge_of(*k) for k, n in level.items())
+-        established += float(self.reserve_lb)
++        pass  # FAULT: established += float(self.reserve_lb)
+```
+
+The named test passes (4 s): it runs on `FakeMagazine`, whose own `wanting` adds the reserve
+(`tests/test_ordnance.py:81`), so the real method is not under test there, as the reader said.
+But the reader's further prediction is refuted: `::test_the_real_magazine_from_the_gunners_filling_to_the_shilling_and_the_page`
+(825) fails, at line 847: the refusal reads "Her magazine is complete: ..." where it should
+read "Her magazine wants no more shot: ...". And `test_magazine.py::test_receive_wanting_and_spoil_go_by_kind_and_the_wanting_is_to_the_nearest_barrel`
+fails, `assert w.powder_lb == 40.0 and w.barrels == 0` / `assert (0.0 == 40.0)`. **SURVIVED**
+for the named test; **KILLED** for the reader's fault B (the real `wanting`), twice.
+
+## 08-5 The messenger takes an hour
+
+| 08-5 | test_people.py::test_send_for_brings_a_man_to_where_the_captain_is_by_the_messenger | `PASS_THE_WORD_S = 3600` | pass | SURVIVED | 14 |
+
+```
+--- mut/freesail/world/people.py
++++ freesail/world/people.py
+@@ -91,7 +91,7 @@
+-PASS_THE_WORD_S = 60
++PASS_THE_WORD_S = 3600
+```
+
+The test passes (14 s against 7 s pristine: it now runs an hour of ship's time and the man
+comes at the end of it). It waits `PE.PASS_THE_WORD_S - 1` and then 1 (`tests/test_people.py:123-125`),
+whatever the constant is. Fault A (the same fault, "no test pins 60"): every test that
+reads the time names the constant (13 uses, in `test_people.py`, `test_letters.py`,
+`test_known_truths.py:3692`); none names the figure. Run with it, all pass:
+`test_people.py::test_a_watch_keeper_in_his_watch_below_at_night_is_asleep_by_the_bill`,
+`::test_a_message_reaches_the_captain_where_he_is_through_the_messenger_and_the_door`,
+`test_orders_places.py::test_the_captain_goes_where_he_will_aboard_and_the_deck_is_given_from_the_deck`,
+`test_orders.py::test_send_for_the_master_where_the_master_is_the_captain_says_so`.
+**SURVIVED** (both the named test and fault A).
+
+## 08-6 A fix offered with the first mark again for its third
+
+| 08-6 | test_orders.py::test_take_a_fix_is_completed_from_the_marks_in_sight | `... and A and B and A` offered, first among the threes | pass | SURVIVED | 8 |
+
+The reader gave no line; `_fix_offers` is at `freesail/orders/complete.py:373-395`. The
+second of his two forms was planted (the first, the marks reversed, would be caught by the
+test's line 2370, which compares the single offers with `_fix_marks` in order; not run).
+
+```
+--- mut/freesail/orders/complete.py
++++ freesail/orders/complete.py
+@@ -390,7 +390,7 @@
+             for c in names
+-            if len({a, b, c}) == 3
++            if len({a, b, c}) == 3 or (a != b and c == a)  # FAULT: the first mark offered again
+```
+
+Live: after "take a fix by St Mawes castle and Manacle Point " the first offer is now "take a
+fix by St Mawes castle and Manacle Point and St Mawes castle". The test passes (8 s): line
+2373 asks only that the proper three be somewhere in the list, and line 2375 accepts
+`reckoning.fix` or `order.rejected` of each of the first four. The reader expected the bad
+offer to be rejected and passed by 2375's second leg; in fact the game takes it as a fix
+(`reckoning.fix`, "Fixed by cross bearings: St Mawes castle NNW, Manacle Point WSW; the lines
+cut at 80 degrees"): a two-mark fix under three-mark words, the repeated mark dropped without
+a word. **SURVIVED**.

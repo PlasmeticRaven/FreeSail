@@ -306,3 +306,59 @@ test_known_truths.py `::test_truth_7_241_the_war_is_what_the_ship_knows_and_the_
 off Falmouth" itself, and the one that boards the pilot never changes the war first, so the hook's
 loop has nothing to write. Taken with 04-2: the hook that puts the pilot's news in the papers is
 run by no test with anything to write. SURVIVED.
+
+## tests-05, the faults to plant
+
+| # | Test (file::name) | Fault | Baseline | Result | s |
+|---|---|---|---|---|---|
+| 05-1 | test_gale.py::test_headed_full_and_by_the_helm_keeps_her_away_and_says_so_once | the `helm.kept_away` line deleted | pass | SURVIVED | 5.7 |
+| 05-2 | test_far_action.py::test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken | a British far ship fires no shot | pass | SURVIVED (fault inert here: see below) | 15.9 |
+| 05-3 | test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine | the French kit's musketry never hits | pass | SURVIVED (fault inert here; survives three more) | 9.7 |
+
+### 05-1
+
+```diff
+     if d.helm_mode is HelmMode.FULL_AND_BY:
+         what = f", the {_sail_words(ship, sail)} lifting" if isinstance(sail, str) else ""
+-        ship.note(
+-            "routine",
+-            "helm.kept_away",
+-            f"Kept her away{what}, the wind {deg}° on the {side} bow.",
+-            data={**data, "sail": sail},
+-        )
+         return
+```
+(`freesail/physics/integrate.py:253-258`.) Live, the test's own world and wind shift: the
+`helm.kept_away` lines are `[]` with the fault and `['Kept her away, the fore topsail lifting,
+the wind 39° on the starboard bow.']` without. Output: 1 passed (`len(kept) <= 1`). SURVIVED.
+
+### 05-2
+
+```diff
+-        shots = whole + (1 if rng.random() < frac else 0)
++        shots = 0 if firer.nation == "britain" else whole + (1 if rng.random() < frac else 0)
+```
+(`freesail/combat/far.py:187`.) Output: 1 passed. But the fault is inert in this test: the
+test's own body run to the packet's striking gives, with the fault and on the pristine code
+alike, `packet rounds_fired 0`, `privateer rounds_fired 87`, six rounds each. The packet
+(three 12-pdr carronades, `random_m` 731.5 m) never fires one shot before she strikes: the
+docstring's "fires her guns within her four cables" is false of the test's own run, and the
+assertion at :361 (`rounds_fired >= 0`) hides it. The reader's claim stands and is worse than
+he said: the test cannot see the packet's fire because there is none to see. SURVIVED.
+
+### 05-3
+
+```diff
+-    if range_m >= MUSKET_SHOT_M:
++    if range_m >= MUSKET_SHOT_M or kit.get("volley_s") == 30:
+```
+(`freesail/combat/small_arms.py:183`.) Live: `hit_chance({'volley_s': 30, 'hit_at_50_yd':
+0.05}, 20.0)` gives 0.0. The named test: 1 passed. Inert here: on the pristine code the test's
+own world after 540 s has 0 of our people hurt, so the closing `all("musket ball" in ...)`
+runs over an empty list and the docstring's "our people fall to his musketry" is false of its
+own run. Three more musketry tests run with the fault, all passed:
+test_fight.py `::test_the_hit_chance_falls_with_the_square_of_the_range_to_nought_at_musket_shot` (0.6 s),
+`::test_the_marines_fire_by_volley_within_musket_shot_and_her_people_fall` (15.0 s),
+test_known_truths.py `::test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks`
+(11.5 s). The French marines can be made harmless at any range and no test of the four sees it.
+SURVIVED.

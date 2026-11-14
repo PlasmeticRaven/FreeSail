@@ -20,6 +20,10 @@ under (b), "n" = the reader's "no test would catch".
 | A-b2 | test_known_truths.py::test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_notable_line | `events.kept` keeps only urgent lines: notable lines rolled up at 300x | pass | SURVIVED | 223 |
 | A-b6 | test_known_truths.py::test_truth_7_138_the_pace_with_two_crewed_cutters_in_action_holds_the_crewed_floor | 4 ms sleep after each crewed hull's tick (pace 425 to 148 ticks/s) | pass | SURVIVED | 37 |
 | A-n1 | test_known_truths.py::test_truth_51_..._ticks_at_the_build_machines_floor, ::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor, ::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor, ::test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor | 0.6 ms sleep at the head of `World.tick` | pass (558, 569, 528, 942 ticks/s) | KILLED (3 of 4; the merchant passage passed at 514) | 55 |
+| A-n2 | test_known_truths.py::test_truth_11_the_frigate_wears_in_six_to_twelve_minutes, ::test_truth_11_wearing_loses_a_quarter_to_half_a_mile_to_leeward (strict xfail); test_evolutions.py::test_wear_comes_round_the_other_way (2 cases), ::test_a_tack_and_a_wear_by_their_own_word_end_as_they_always_have; test_indefatigable.py::test_the_razee_stays_wears_and_lies_to_in_the_frigates_bands | wear holds the helm up 300 s after the wind is aft (loses 0.54 nm, not 0.13) | pass (wore in 513 s) | truth 11 pair SURVIVED; KILLED by test_evolutions frigate case (721 s against 720) | 31 |
+| B-b2 | test_known_truths.py::test_truth_7_176_a_broadsides_casualties_are_men_of_the_muster_named_and_the_bill_counts | `_hull_hit` no longer calls `_casualties` (a shot through the hull hurts nobody) | pass | SURVIVED | 6 |
+| B-n2 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter; test_health.py::test_the_butchers_bill_is_said_ten_minutes_after_the_last_shot; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says | the same plant | pass | KILLED by 7-183 (the privateer never strikes); the other two passed | 40 |
+| B-b3 | test_known_truths.py::test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks | `small_arms.QUARTERDECK_SHARE` 0.4 to 0.15 | pass | SURVIVED | 8 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -220,3 +224,96 @@ gives about 560 to 625 and would pass, as the reader said. The fifth floor,
 was not run. By these figures the floors would pass a third of the pace lost on a quiet
 machine, and an unchanged game came within 6 per cent of failing on a busy one: they measure
 the machine more than the game.
+
+## A-n2. A wear that runs off five minutes before coming to
+
+```diff
+--- mut/freesail/evolutions/scripts.py
++++ m/1/freesail/evolutions/scripts.py
+@@ -1992,7 +1992,7 @@
+                 follow_wind(self.head, rel, ch, max_step)
+             wind_aft = abs(rel) >= units.deg_to_rad(165.0)
+             crossed = self.sign * rel < 0 and abs(rel) > math.pi / 2
+-            if wind_aft or crossed:
++            if (wind_aft or crossed) and self.t - self.__dict__.setdefault("_aft_at", self.t) >= 300.0:
+                 self.phase = "come_to"
+```
+
+Live: the test's own `wear(close_hauled_on_starboard(FRIGATE))` gives "wore in 513 s; lost
+0.127 nm" pristine and "wore in 640 s; lost 0.539 nm" with the fault. The loss is half a mile,
+not the two miles the reader supposed.
+
+Truth 11: the timed test passed (640 s is inside 360 to 720) and the strict xfail on the loss
+stayed XFAIL (0.54 nm is outside a quarter to half a mile): both SURVIVED, as the reader said.
+
+Beyond the half (grep for `wear ship`/`ship.wore` in tests; the likeliest by name):
+`test_evolutions.py::test_wear_comes_round_the_other_way[data/ships/frigate-36.yaml]` failed:
+
+```
+>       assert 360 <= ticks <= 720  # six to twelve minutes
+E       assert 721 <= 720
+tests/test_evolutions.py:1059: AssertionError
+```
+
+Its schooner case, `test_a_tack_and_a_wear_by_their_own_word_end_as_they_always_have` and
+`test_indefatigable.py::test_the_razee_stays_wears_and_lies_to_in_the_frigates_bands` passed.
+So KILLED, but by one second over a time band, not by the ground lost; a hold of 240 s would
+very likely pass it.
+
+The 120 s variant the reader offered: wore in 501 s, lost 0.263 nm. Both truth-11 time tests
+and `test_wear_comes_round_the_other_way` passed; the strict xfail failed as `[XPASS(strict)]`.
+That is the xfail catching a wear that loses what Luce says it should (inside the band): with
+120 s the plant is closer to a mend than a fault, and the strict xfail fails on the mend.
+
+## B-b2 and B-n2. A shot through the hull hurts nobody
+
+```diff
+--- mut/freesail/combat/hits.py
++++ m/1/freesail/combat/hits.py
+@@ -194,7 +194,6 @@
+     keeper.minute.append(
+         ("hole", f"a shot {'between wind and water' if below else 'through the side'} to {side}")
+     )
+-    _casualties(ship, keeper, MEN_HURT_HULL * scale * grape, x_m, "hull", rng, tick)
+     return ["A shot struck her between wind and water."] if below else []
+```
+
+Live: forty calls of `HITS._hull_hit` on the frigate at quarters (seed 7, a stand-in gun of
+18 pounds) make 40 holes and hurt 59 men pristine, 40 holes and 0 men with the fault.
+
+B-b2, truth 7-176: PASSED. SURVIVED. The test calls `HITS._casualties(..., "hull", ...)`
+itself six times (tests/test_known_truths.py, in its body), so the line removed from
+`_hull_hit` is never on its road.
+
+B-n2, "no truth in this half fires guns and counts hull casualties": refuted for 7-183, which
+is in the same half. With the fault, the first action replayed fails at once:
+
+```
+>       assert first is not None and v.struck and not w.ship.extra.get("struck")
+E       AssertionError: assert (781 is not None and False)
+E        +  where False = Vessel(id='renard', ...).struck
+```
+
+(tests/test_known_truths.py:10571): with no splinter casualties the privateer's morale holds
+and she never strikes. KILLED, though by the morale's consequence and not by a count of the
+hurt. `test_health.py::test_the_butchers_bill_is_said_ten_minutes_after_the_last_shot` and
+`test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says`
+passed.
+
+## B-b3. Truth 7-179: the quarterdeck's share of the musketry cut from two in five to three in twenty
+
+```diff
+--- mut/freesail/combat/small_arms.py
++++ m/1/freesail/combat/small_arms.py
+@@ -59,7 +59,7 @@
+-QUARTERDECK_SHARE = 0.4
++QUARTERDECK_SHARE = 0.15
+```
+
+Live: `inspect.signature(SA.strike_a_man)` shows the default `quarterdeck_share` 0.15; the
+choice is `quarterdeck if rng.random() < quarterdeck_share else deck`
+(freesail/combat/small_arms.py:262).
+
+Output: PASSED. SURVIVED. The test forces the draw to 0.1, under any share above a tenth, and
+asserts only that some musketry fell and that this forced man is of the quarterdeck. Nothing
+counts the share over many balls.
