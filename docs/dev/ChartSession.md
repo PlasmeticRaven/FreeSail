@@ -561,3 +561,12 @@ sides. Setúbal's in-leg from Sesimbra's road to be rechecked by the builder. **
 session after 111 merges:** Santa Cruz de Tenerife and the Sicilian six (Bougie and the
 Goletta are 104's, listed) redrawn by the pilots' sides with the least depth per leg, a small
 step of its own.
+
+### 2026-11-14, 03:30: the Setúbal point, and the seven tracks held
+
+The audit's f-shallow stepped over narrow shoals at 20 m (Setúbal 1.2 m, not 2.1; at 2 m
+Dartmouth 2.87, Ferrol 2.62, Lisbon 2.99, Santander 1.04, Poole 0.12; of mine Catania 1.07,
+Santa Cruz drying 1.53, Messina two legs). 111's builder chooses the step by halving (no
+port's least moving more than a tenth of a metre), adds Setúbal's shoal as a test, makes one
+more pass at its four. **My seven tracks wait for the mended check on the trunk, and are drawn
+with a sampler at least as fine.** The lead will ask me to sample 111's four again.
