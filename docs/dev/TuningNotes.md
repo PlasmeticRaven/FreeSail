@@ -29395,3 +29395,39 @@ falls from 0.88 to 0.82 in forty minutes; two ships laid ten metres apart drift 
 grapnel's throw (thirty) in a minute or two, and `lay her aboard` does not close it in thirty
 minutes; so that, as the fight is built, a player cannot bring about the boarding the old
 truth claimed.
+
+**The pins moved by design, re-pinned in one commit by the lead's word (2026-11-14), each old
+beside new with the line-by-line difference.**
+- The beat's reply (D1): `tests/test_bellerophon.py` (the 64's beat, and the one-gun-deck beat
+  on the cutter, the brig, the frigate, the hermaphrodite brig, the merchant brig, the
+  privateer schooner and the razee) and `tests/test_bilander.py` (the armed merchant fit): each
+  line as it was, with "The guns are secured: 'cast loose the guns' to serve them." after it.
+- The library's catalogue (D4 e): `tests/test_agents.py`, "108 evolutions" to "109
+  evolutions", the relieving tackles' file added (a model reading the catalogue reads it).
+- The naval cruise (gate 5c, 48 hours; `GATE_5C_CRUISE_DIGEST`): 2242 lines both, digest
+  1e7f8ab24b84e6f7 to 46300a9a567b80d7; the only difference, fifteen `standing.held` lines,
+  "not carried out; a stranger in sight is no stranger in sight." to "not carried out; no
+  stranger in sight." (D4 a). Truth 77 reads the same digest.
+- The schooner's passage (gate 5b, 17 hours; `GATE_5B_SCHOONER_LINES`, `_DIGEST`): 766 to 769
+  lines, 3a1698037811b753 to ef15ca96ee2ed052. At the start three refusals ("There is no such
+  part as the royals in this ship") become "The book fitted to her rig, for she carries no
+  royals: 'night routine' without its royals; 'morning sail' left out; 'shorten sail for
+  weather' without its royals." and the two rules entered (D3); at noon "Mr Travers works the
+  day's work where he stands." in place of his going below, and "Mr Travers came on deck, the
+  day's work done." gone (D4 c: no rules captain commands her, so the player at her prompt is
+  her master); at sunset the night routine refused, "take in the studdingsails ... already
+  furled". Nothing else: 'shorten sail for weather' never fires, the same landfall, pilot and
+  anchorage on the same ticks, she does not take the ground.
+- The merchant passage (gate 5c, 36 hours; `GATE_5C_MERCHANT_LINES`, `_DIGEST`): 3103 to 3096
+  lines, 40bcef34afd0cec4 to 82a1447152be8b82. At both noons "Mr Travers works the day's work
+  where he stands." in place of his going below (D4 c), and so, with the captain on deck, the
+  reports and calls the officer sent below to him then are not sent: "a sail sighted, on the
+  larboard bow", "the sail on the larboard quarter lost sight of", the two "came on deck"
+  lines, and five calls on the second day ("the Mingan bearing E by N, distant four miles: a
+  danger"; "her sails lifting ..."; "the Mingan ... steady and closing"; "land ahead ... she is
+  standing into it"; "the pilot warns ..."). Nothing else: her track, her bargains and her
+  anchorage are line for line the same. Truth 78 (the fake captain's merchant passage): the
+  same master seated by a model is a seated player's person too (`Navigation._players_own`
+  reads the stations a seat holds), so his log is still the nobody-seated log with his
+  orders in it; its lines follow the merchant passage's (3115 to 3108), its digest c0bf4b51621ad91f to
+  de0f8c03bd2663df.

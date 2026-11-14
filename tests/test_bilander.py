@@ -1160,9 +1160,12 @@ def test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit(fit):
             HELM: ["fore_top"],
             POWDER: ["idlers"],
         }
+        # package 115 D1 (re-pinned by the lead's word): the beat says the guns are secured;
+        # old, the line ended at "stand unmanned."
         assert said == [
             "Beat to quarters! Quarters: one gun crew manned, the trimmers 2, the helm 1, the "
-            "powder 1. Not hands enough for every gun: the swivels and No. 2 gun stand unmanned."
+            "powder 1. Not hands enough for every gun: the swivels and No. 2 gun stand unmanned. "
+            "The guns are secured: 'cast loose the guns' to serve them."
         ]
     assert not [e for e in w.log if e.kind == "order.rejected"]
 
