@@ -641,3 +641,15 @@ The five (Santander 3.01, Dartmouth 3.08, Ferrol 3.42, Lisbon 3.06, Setúbal 1.1
 2 m / 8 m rule falls short of 1 m by at most 2.54 m, on deep legs only, none across 3 m:
 sound on today's chart; its cause (a step unrelated to the cell) is named, and a step tied to
 the finest level under each leg proposed as the general mend, not blocking.
+
+### 2026-11-14, 06:10: the sampler's step, ruled into my seven-tracks step
+
+By the lead's ruling, in my own step after 111 merges, with the seven tracks and Faden's line:
+- the audit's track check reads first at **half the cell of the finest level under each leg**
+  (taken from the chart, not a constant), everywhere, and again at 2 m where under the margin
+  (the lead measured: 6.3 s as built, 7.7 s at 7.5 m, the 19 findings unchanged);
+- a test at the cause: the step asserted against the chart's own finest cell, and a planted
+  head one cell wide in deep water (a made grid) found at the new step and missed at 20 m;
+- where else a fixed step samples the chart along a line: 111's list checked against the code
+  and completed, the game's own guard listed and measured, not changed.
+Then the seven tracks on that check.
