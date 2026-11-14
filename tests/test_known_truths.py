@@ -17285,6 +17285,50 @@ def test_truth_7_529_the_frigate_from_funchal_looks_into_santa_cruz_road_by_her_
     assert any("Fixed by cross bearings" in e.text for e in w.log if e.kind == "reckoning.fix")
 
 
+def test_truth_7_545_no_goal_square_has_a_mark_on_dry_ground_or_a_leg_across_the_land():
+    """Package 109, step 5 (the lead's ruling: a mark on dry ground is a plain fault): every
+    scenario's ship patrolling a goal's square (package 43's four marks about the station, as
+    `_goal_plan` lays them from her goal's words) has each mark in water and each leg, the
+    last to the first among them, clear of the land (`land_crossing`), and none sailing by
+    it carries the guard's warning. On the trunk the
+    Diamond's square off the Raz (naval-cruise) had its east mark on Cap Sizun, 48.0389 N
+    4.5383 W, 22.6 m above the datum, and two legs across the land; its east mark is laid
+    0.3 miles off the Raz (48.0387 N 4.7439 W), its north mark half a mile further out
+    (48.1724 N to 48.1807 N), its west and south marks as they were."""
+    import glob
+
+    from freesail.world.geo import Position
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+    from freesail.world.ships import _goal_plan, land_crossing
+
+    squares = 0
+    for path in sorted(glob.glob("data/scenarios/*.yaml")):
+        sf = load_scenario(path)
+        w = make_scenario_world(sf)
+        begin(w, sf)
+        for v in w.vessels.vessels:
+            if v is w.vessels.own or not v.goal.startswith("patrolling"):
+                continue
+            squares += 1
+            plan = _goal_plan(w, v.goal, v.position)[0]
+            marks = [leg[1] for leg in plan if len(leg) > 1 and isinstance(leg[1], Position)]
+            assert len(marks) == 4, (path, v.id)
+            for i, m in enumerate(marks):
+                depth = w.chart.depth_at(m)
+                assert depth is None or depth > 0.0, (path, v.id, i, depth)
+                assert not land_crossing(w, marks[i - 1], [("to", m, "")]), (path, v.id, i)
+            assert v.brain is not None or not v.warning, (path, v.id, v.warning)
+            if v.id == "diamond" and path.endswith("naval-cruise.yaml"):
+                east = marks[2]
+                assert (round(east.lat_deg, 4), round(east.lon_deg, 4)) == (48.0387, -4.7439)
+                assert round(marks[1].lat_deg, 4) == 48.1807
+                assert (round(marks[0].lat_deg, 4), round(marks[0].lon_deg, 4)) == (
+                    48.0389,
+                    -4.9371,
+                )
+    assert squares == 33, squares
+
+
 @pytest.mark.slow
 def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
     """Package 112, step 1: one ordered list of layers a level. For every chart and every
@@ -17345,47 +17389,3 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                 ), (name, tname)
                 read += 1
     assert read == 4593  # 21 charts' tiles, as the step's proof counted them
-
-
-def test_truth_7_545_no_goal_square_has_a_mark_on_dry_ground_or_a_leg_across_the_land():
-    """Package 109, step 5 (the lead's ruling: a mark on dry ground is a plain fault): every
-    scenario's ship patrolling a goal's square (package 43's four marks about the station, as
-    `_goal_plan` lays them from her goal's words) has each mark in water and each leg, the
-    last to the first among them, clear of the land (`land_crossing`), and none sailing by
-    it carries the guard's warning. On the trunk the
-    Diamond's square off the Raz (naval-cruise) had its east mark on Cap Sizun, 48.0389 N
-    4.5383 W, 22.6 m above the datum, and two legs across the land; its east mark is laid
-    0.3 miles off the Raz (48.0387 N 4.7439 W), its north mark half a mile further out
-    (48.1724 N to 48.1807 N), its west and south marks as they were."""
-    import glob
-
-    from freesail.world.geo import Position
-    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
-    from freesail.world.ships import _goal_plan, land_crossing
-
-    squares = 0
-    for path in sorted(glob.glob("data/scenarios/*.yaml")):
-        sf = load_scenario(path)
-        w = make_scenario_world(sf)
-        begin(w, sf)
-        for v in w.vessels.vessels:
-            if v is w.vessels.own or not v.goal.startswith("patrolling"):
-                continue
-            squares += 1
-            plan = _goal_plan(w, v.goal, v.position)[0]
-            marks = [leg[1] for leg in plan if len(leg) > 1 and isinstance(leg[1], Position)]
-            assert len(marks) == 4, (path, v.id)
-            for i, m in enumerate(marks):
-                depth = w.chart.depth_at(m)
-                assert depth is None or depth > 0.0, (path, v.id, i, depth)
-                assert not land_crossing(w, marks[i - 1], [("to", m, "")]), (path, v.id, i)
-            assert v.brain is not None or not v.warning, (path, v.id, v.warning)
-            if v.id == "diamond" and path.endswith("naval-cruise.yaml"):
-                east = marks[2]
-                assert (round(east.lat_deg, 4), round(east.lon_deg, 4)) == (48.0387, -4.7439)
-                assert round(marks[1].lat_deg, 4) == 48.1807
-                assert (round(marks[0].lat_deg, 4), round(marks[0].lon_deg, 4)) == (
-                    48.0389,
-                    -4.9371,
-                )
-    assert squares == 33, squares
