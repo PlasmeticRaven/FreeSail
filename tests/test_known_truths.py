@@ -3027,7 +3027,8 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
-GATE_5B_SCHOONER_LINES = 769  # package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before); the well (768 at 56, 763 at package 45)
+# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before)
+GATE_5B_SCHOONER_LINES = 769  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
@@ -4126,7 +4127,8 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # package 75, SW-4: the Palinure made out "a brig-sloop of war, ten ports a side" (RMG ZAZ4491,
 # read), where the words had sixteen; every tick and line the same, proved by bisection (the
 # word put back gives 5a62f6fca122c6ad again; docs/dev/TuningNotes.md, SW-4)
-GATE_5C_CRUISE_DIGEST = "46300a9a567b80d7"  # package 115 D4 (a): "no stranger in sight" (1e7f8ab24b84e6f7 before); SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
+# package 115 D4 (a): "no stranger in sight" (1e7f8ab24b84e6f7 before)
+GATE_5C_CRUISE_DIGEST = "46300a9a567b80d7"  # SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4253,7 +4255,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
 # closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
-GATE_5C_MERCHANT_LINES = 3096  # package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103 before); 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
+# before)
+GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4261,7 +4265,8 @@ GATE_5C_MERCHANT_LINES = 3096  # package 115 D4 (c): the master works the noon o
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
-GATE_5C_MERCHANT_DIGEST = "82a1447152be8b82"  # package 115 (40bcef34afd0cec4 before); package 98, step 5 (6436eb06a665f379 at 65)
+# package 115 (40bcef34afd0cec4 before)
+GATE_5C_MERCHANT_DIGEST = "82a1447152be8b82"  # package 98, step 5 (6436eb06a665f379 at 65)
 
 
 def _people(world) -> list[dict]:
@@ -4906,7 +4911,8 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "de0f8c03bd2663df"  # package 115 D4 (c) (c0bf4b51621ad91f before); package 98, step 5 (7076e667c2bc41e3 at 65)
+# package 115 D4 (c) (c0bf4b51621ad91f before)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "de0f8c03bd2663df"  # package 98, step 5 (7076e667c2bc41e3 at 65)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
