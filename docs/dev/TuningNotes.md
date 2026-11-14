@@ -21922,6 +21922,53 @@ asked), its assertions as they were and one more (no hand let go). New: five in
 and staying aboard, the boat and the kedge; an order naming her watch below; the wear's belay),
 and one in `tests/test_hands.py` (the far prize). Each fails on d6a88e2e.
 
+## Package 75, Phase 5: the made-out rule and the razee's trimmers by fit (2026-11-14)
+
+On cda12ec9 (the step the lead has on trial), by the lead's notes of 2026-11-12 (1) and 2026-11-14
+(13) and (17). Each subsection is its own commit.
+
+### The made-out rule (the lead's 12th's (1); ruling 17, (a) as built)
+
+**What is built.**
+- The 64's and the 74's rig word is "a ship of the line" (`tools/ships/indefatigable.py`,
+  `tools/ships/bellerophon.py`, through the generator; the index's entries in `world/ships.py`
+  `DESCRIPTIONS` with them). Old: "a ship", the frigate's word. Her size and her two tiers are
+  what a lookout tells first of a ship of the line, so she is ranked 4 at her rig's distance
+  (`ships.RIG_MADE_OUT_NM`, four miles), by `captains._SIZE_WORDS`'s "ship of the line".
+  JUDGEMENT on the distance. The razee, of one tier, stays "a ship", rank 3.
+- A far vessel reads another's class from what is made out of her, as a near captain's tops
+  judge it: `Vessels.strangers_of` gives `size_of_words(words_at(level))`, nought while she is "a
+  sail". Old: `_size_of`, her true class at any distance (package 43), now gone.
+
+**Old beside new, the tops at the rig's distance.** The 74 hove to: "a ship, lying to" (rank 3)
+beside "a ship of the line, lying to" (rank 4). The 64 likewise. Every other description ranks the
+same by its rig word, by what it is and by its true class (checked for all seventeen), so a far
+vessel's judgement moves only where she knows a sail an enemy while she is still "a sail" (a shot
+or the signal before her rig is made out): nought there, where it was her true class.
+
+**What it does not move, and why (ruling 17).** In B7.e's world (the lone French frigate five
+miles north of the hove-to 74, crewed, seed 7), the frigate's tops make out "a ship of the line,
+lying to" at 2.92 miles by estimate (tick 1320), rank 4, where they made out "a ship". She still
+hauls off at tick 2160, 1.56 miles by estimate (1.92 true), exactly as before. The rank-4 rule acts
+on an enemy (`Judgement._overmatched` requires `_is_enemy`: her colours made out, the signal
+unanswered, or a shot), and no nation is made out of the 74 until what she is is made out, at a
+mile and a half. The private signal, too, is made only once colours could be read
+(`signalling._challenge_strangers`, `made_out` of two or more). So the truth that the frigate hauls
+off proves the rule acts on an enemy known; it does not prove she hauls off at the rig's distance.
+
+**Not built (ruling 17 (b), on the lead's list for the signals' owner and the reviews).** The
+cautious frigate that keeps her distance from a ship of the line she does not know a friend wants the
+private signal to reach as far as a glass reads flags, or friends avoid each other: package 71's
+road.
+
+**Tests.** Moved, old beside new: `tests/test_bellerophon.py`'s
+`test_her_description_names_her_file_and_ranks_her_a_ship_of_the_line` (`d["rig"]`: "a ship" to "a
+ship of the line", and her rig's words ranked 4 where they were 3) and `tests/test_indefatigable.py`'s
+`test_her_descriptions_name_her_files_and_rank_the_razee_a_frigate` (the 64's rig the same; the
+razee's "a ship" kept). The crewed frigate's test
+(`test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74`) passes as it
+stood; its docstring now says the above.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as

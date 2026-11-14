@@ -20,10 +20,12 @@ ship:
     for every figure and judgement.'
   descriptions:
     sixty-four:
-      rig: a ship
+      rig: a ship of the line
       what: a sixty-four, a ship of the line of two tiers of ports
       note: 'The Ardent class''s 64 (Winfield 1793-1817 p. 99), a third rate (Falconer 1780, RATES): what
-        the glass makes out, her two tiers of ports; her rig''s word the frigate''s, three masts square-rigged.'
+        the glass makes out, her two tiers of ports. Her rig''s word is a ship of the line, her size and
+        her two tiers told first at her rig''s distance (the lead''s ruling of 2026-11-12, (1); JUDGEMENT
+        on the distance; before it, the frigate''s word).'
 hull:
   # 160 ft: WL1, ZAZ1407's load line, rabbet to rabbet (measured, 1407F; D29 (b): Ind §2.3.2, §2.4); 164.6 ft (50.2 m) outside the post and the stem.
   length_waterline_m: 48.8

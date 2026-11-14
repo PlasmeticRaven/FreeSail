@@ -1402,9 +1402,16 @@ def test_her_descriptions_name_her_files_and_rank_the_razee_a_frigate():
     # "a ship of the line" is the 74's words, not hers (Indf §8; tests/test_ships.py:99): her
     # description since package 75's B7 filed her row (old: None, no file's words then)
     assert S.description_key("a ship of the line") == "seventy-four"
-    for key, path, rank in (("sixty-four", SIXTY_FOUR, 4), ("razee", RAZEE, 3)):
+    for key, path, rank, rig in (
+        # the 64 "a ship of the line" to the tops, her two tiers told first (the lead's ruling of
+        # 2026-11-12, (1); old: "a ship"); the razee, of one tier, "a ship", three masts
+        # square-rigged
+        ("sixty-four", SIXTY_FOUR, 4, "a ship of the line"),
+        ("razee", RAZEE, 3, "a ship"),
+    ):
         d = S.description(key)
-        assert d["file"] == path and d["rig"] == "a ship"  # three masts square-rigged
+        assert d["file"] == path and d["rig"] == rig
+        assert C.size_of_words(f"{rig}, lying to") == rank
         assert S.file_descriptions(path)[key]["what"] == d["what"]
         # D16 (a): the razee a frigate (rank 3) by her own words, "cut down from a sixty-four"
         # in them; the 64 rank 4 (`_SIZE_WORDS`, the razee's first)

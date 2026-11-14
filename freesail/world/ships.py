@@ -247,10 +247,10 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
     },
     # package 75 (docs/design/Design-Ship-Indefatigable.md §8; D16 (a)): the Indefatigable as
     # built, an Ardent-class 64 of 1784, and as razeed in 1795, a 44 cut down from her; the
-    # tops make out a ship
+    # tops make out a ship of the line as the 74 (below), the razee a ship
     "sixty-four": {
         "file": "data/ships/sixty-four.yaml",
-        "rig": "a ship",
+        "rig": "a ship of the line",
         "what": "a sixty-four, a ship of the line of two tiers of ports",
     },
     "razee": {
@@ -276,10 +276,14 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a bilander, a merchantman under a settee main, deep laden",
     },
     # package 75 (docs/design/Design-Ship-Bellerophon.md §8): HMS Bellerophon, the
-    # Arrogant-class 74 of 1786, a third rate; the tops make out a ship, the glass her two tiers
+    # Arrogant-class 74 of 1786, a third rate. The tops make out a ship of the line at her
+    # rig's distance, the glass what she is. The lead's ruling of 2026-11-12, (1): her size and
+    # her two tiers are what a lookout tells first of a ship of the line, so her class (rank 4,
+    # `captains._SIZE_WORDS`) is known there (JUDGEMENT on the distance, `RIG_MADE_OUT_NM`).
+    # Before it she was "a ship" there, a frigate's class, until made out.
     "seventy-four": {
         "file": "data/ships/seventy-four.yaml",
-        "rig": "a ship",
+        "rig": "a ship of the line",
         "what": "a seventy-four, a ship of the line, fourteen ports a tier",
     },
 }
@@ -1959,6 +1963,7 @@ class Vessels:
         the land is), each made out at the lookout's distances by eye (the glass aloft for
         the one her captain has in hand), her nation when her colours are shown and made
         out, `spoken` for a sail spoken; the distance is her truth, nearest first."""
+        from freesail.world.captains import size_of_words
         from freesail.world.chart import NIGHT_LAND_NM
         from freesail.world.lookout import relative_words
 
@@ -1994,7 +1999,11 @@ class Vessels:
                     "known": o.words_at(level),
                     "nation": shown if colours else None,
                     "spoken": o.id in spoken,
-                    "size": _size_of(o),
+                    # her class by what is made out of her, as a near captain's tops judge it
+                    # (`captains.size_of_words` on the lookout's words; the lead's ruling of
+                    # 2026-11-12, (1)): nought while she is "a sail". Before it, a far vessel
+                    # read her true class at any distance (`_size_of`, package 43).
+                    "size": size_of_words(o.words_at(level)),
                 }
             )
         items.sort(key=lambda s: s["estimate_m"])
@@ -2283,17 +2292,6 @@ def _lights_of(v: Vessel) -> str:
     fishing = getattr(v, "fishing", None)
     out = getattr(fishing, "out", None) if fishing is not None else None
     return "a lantern at her nets" if out is not None and out.state == "fishing" else ""
-
-
-def _size_of(v: Vessel) -> int:
-    """A vessel's class for a cruiser's judgement of a superior force (package 43;
-    `captains.SIZE_RANK`): by her description, or her file's where she has none (the
-    pilot's cutter)."""
-    from freesail.world.captains import SIZE_RANK, size_of_file
-
-    if v.description:
-        return SIZE_RANK.get(v.description, 0)
-    return size_of_file(v.ship_file)
 
 
 def _ship_speed_ms(ship: Any) -> float:

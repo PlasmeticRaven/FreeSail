@@ -849,8 +849,10 @@ def test_her_boats_pumps_hold_and_stores(her):
 
 
 def test_her_description_names_her_file_and_ranks_her_a_ship_of_the_line():
-    """Bel-D §8.1-§8.2: `seventy-four`, "a ship" to the tops and "a seventy-four, a ship of the
-    line, fourteen ports a tier" to the glass, her roles a King's ship's and a commodore's and her
+    """Bel-D §8.1-§8.2: `seventy-four`, "a ship of the line" to the tops (the lead's ruling of
+    2026-11-12, (1): her size and her two tiers told first at her rig's distance; before it "a
+    ship", a frigate's class there) and "a seventy-four, a ship of the line, fourteen ports a
+    tier" to the glass, her roles a King's ship's and a commodore's and her
     fit her default, filed as every row since SW-4 files both (Bel-D §8.1 had no fit, the default
     serving either way); "a ship of the line" names her and no other file, rank 4;
     "a two-decker" and "a third rate", which name the 64 as well, are not taken (judgement). She
@@ -875,7 +877,8 @@ def test_her_description_names_her_file_and_ranks_her_a_ship_of_the_line():
     for words in ("a two-decker", "a third rate", "a first rate"):
         assert S.description_key(words) is None, words
     d = S.description("seventy-four")
-    assert d["file"] == SEVENTY_FOUR and d["rig"] == "a ship"
+    assert d["file"] == SEVENTY_FOUR and d["rig"] == "a ship of the line"  # old: "a ship"
+    assert C.size_of_words(f"{d['rig']}, lying to") == C.LINE_OF_BATTLE_RANK  # old: 3
     assert d["what"] == "a seventy-four, a ship of the line, fourteen ports a tier"
     assert d["roles"] == ["kings-ship", "commodore"] and d["fit"] == "arrogant class 1795"
     own = S.file_descriptions(SEVENTY_FOUR)["seventy-four"]
@@ -1989,12 +1992,13 @@ def test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a
     frigate keeping her station five miles north of her, hove to (the meeting above, with no
     `far_only`), is crewed within `crews.CREWED_NM`, and her hull's captain judges her by the
     lookout's words (`Perception.read`, `size_of_words`), the parent World's sets (`_alone`)
-    and her own id. AS FOUND: the 74's words at her rig and her colours are "a ship", a frigate's
-    class, so the two leagues do not bind; she investigates and hauls off once what she is is
-    made out (`ships.MADE_OUT_NM`, `GLASS_FACTOR` further with the glass on her: 1.92 miles at
-    seed 7), before she engages, her captain's course "hauling off from a seventy-four" in her
-    log. Whether a two-decker's rig should be told at four miles is the lead's (the tuning notes'
-    "B7.e, the review's mends")."""
+    and her own id. Since the lead's ruling of 2026-11-12, (1), her tops make out "a ship of the
+    line, lying to" at her rig's distance (2.92 miles by estimate at seed 7), rank 4; before it
+    "a ship", a frigate's class. The rule acts on an enemy, and no nation is made out of the 74
+    until what she is is made out (`ships.MADE_OUT_NM`, `GLASS_FACTOR` further with the glass on
+    her: 1.92 miles at seed 7), so she investigates and hauls off there as before, before she
+    engages, her captain's course "hauling off from a seventy-four" in her log (the tuning notes'
+    "Phase 5, the made-out rule")."""
     world = _hove_to_off_the_lizard(SEVENTY_FOUR)
     v = _french(world, "frigate", "49 35 N 5 30 W", STATION_OFF_THE_LIZARD)
     rows = _crewed_until(world, v, 45, lambda r: r[-1][1] == "evading")

@@ -5103,11 +5103,12 @@ def boats_pumps_hold(b):
 DESCRIPTIONS = {
     "sixty-four": (
         "sixty-four",
-        "a ship",
+        "a ship of the line",
         "a sixty-four, a ship of the line of two tiers of ports",
         "The Ardent class's 64 (Winfield 1793-1817 p. 99), a third rate (Falconer 1780, RATES): "
-        "what the glass makes out, her two tiers of ports; her rig's word the frigate's, three "
-        "masts square-rigged.",
+        "what the glass makes out, her two tiers of ports. Her rig's word is a ship of the line, "
+        "her size and her two tiers told first at her rig's distance (the lead's ruling of "
+        "2026-11-12, (1); JUDGEMENT on the distance; before it, the frigate's word).",
     ),
     "razee": (
         "razee",

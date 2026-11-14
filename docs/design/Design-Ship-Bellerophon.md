@@ -1648,6 +1648,15 @@ commander is on the sea and has not struck (the review's mends: a ship whose com
 alone again). The tuning notes, "The lead's notes of 2026-11-12 and 13, built", subsections 4 and
 6.*
 
+*Made out at the rig's distance (Phase 5, 2026-11-14; the lead's notes of 2026-11-12 (1) and
+2026-11-14 (17)): her rig's word, and the 64's, is "a ship of the line" where §8.1 had "a ship", so
+the tops rank her 4 at four miles (JUDGEMENT on the distance), and a far vessel reads her class from
+what is made out, as a near one does. The rule still acts on an enemy known: in this section's world
+the frigate's tops make her out a ship of the line at 2.92 miles, but no nation until a mile and a
+half, where she hauls off as before. The cautious frigate, hauling off from a ship of the line she
+does not know a friend, is not built: it wants the private signal to reach as far as a glass reads
+flags (package 71's road). The tuning notes, "Package 75, Phase 5".*
+
 ---
 
 ## 9. The polar: what B7 measures and records

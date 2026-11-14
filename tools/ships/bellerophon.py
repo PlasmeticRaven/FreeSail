@@ -3513,11 +3513,13 @@ def boats_pumps_hold(b):
 
 DESCRIPTION = (
     "seventy-four",
-    "a ship",
+    "a ship of the line",
     "a seventy-four, a ship of the line, fourteen ports a tier",
     "A third rate (Falconer 1780, RATES), of James's small class of 74s, under 1,700 tons (vol. 1 "
     "p. 451 note M*, read (OCR)): what the glass makes out, her two tiers of fourteen ports a side "
-    "(Bel §3.3); her rig's word the frigate's, three masts square-rigged. Her default fit serves "
+    "(Bel §3.3). Her rig's word is a ship of the line: her size and her two tiers are what a "
+    "lookout tells first of one, at her rig's distance (the lead's ruling of 2026-11-12, (1); "
+    "JUDGEMENT on the distance; before it, the frigate's word). Her default fit serves "
     "a far ship of her, filed here as every row since SW-4 files its fit (Bel-D §8.1 had none, "
     "the default serving either way); her roles a King's ship's and, where she leads a squadron, "
     "a commodore's, as the frigate's (Build-Ships.md §8.2); she sails by the first, a row filed "
