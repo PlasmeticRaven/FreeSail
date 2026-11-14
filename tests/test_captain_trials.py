@@ -82,7 +82,10 @@ TRIAL_STATION_STRANGER_LINES = 788  # package 84 step 6 (787 at 71; 756 at 56, t
 # package 75, SW-4: the brig-sloop made out "ten ports a side" (RMG ZAZ4491, read), where the
 # words had sixteen; every tick and line the same, proved by bisection (the word put back gives
 # d56963daf49d566a again; docs/dev/TuningNotes.md, SW-4)
-TRIAL_STATION_STRANGER_DIGEST = "c1d54413006885aa"  # SW-4 (d56963daf49d566a at 84 step 6)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives c1d54413006885aa; TuningNotes)
+TRIAL_STATION_STRANGER_DIGEST = "d1a7b668bec784ff"  # the trim's words (c1d54413006885aa at SW-4)
 
 
 @pytest.fixture(scope="module")

@@ -1231,7 +1231,7 @@ def _trim(
         if len(candidates) > 1 and new_group is not None:
             extra_s = {**extra_s, "log_group": new_group()}
         for sail in candidates:
-            name = resolve.the(ship, sail.id)
+            name = _the_sail(ship, sail.id)
             wanted = yard_trim.wanted_sheet_angle(sail.curve_class, awa_signed)
             reading = yard_trim.read_sheet(ship, sail)
             if (
@@ -1354,6 +1354,16 @@ def lying_to(ship: Ship) -> bool:
     )
 
 
+def _the_sail(ship: Ship, sail_id: str) -> str:
+    """'the spanker': a sail as the trim's reply names it, by its file's first plain alias, the
+    word the runner's lines for the same sheets name it by ("Man the spanker sheet.", "Trimmed
+    the sheets of the spanker, ..."; `runner.part_name`), else its name in words (package 75,
+    the lead's ruling (2) of 2026-11-09: the reply and the done line name a sail by the same
+    word; the *Neufchatel*'s fore gaff sail "the fore-and-aft foresail", where it had said "the
+    fore sail")."""
+    return f"the {part_name(ship, sail_id)}"
+
+
 def _every_yard(ship: Ship, yards: list[Spar]) -> bool:
     """Whether these are all the ship's yards (a trim of the whole ship, however said)."""
     every = [s for s in ship.spars.values() if s.is_yard]
@@ -1377,7 +1387,7 @@ def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list
     not_set: list[str] = []
     for pid in res.ids:
         part = ship.parts[pid]
-        name = resolve.the(ship, pid)
+        name = _the_sail(ship, pid) if isinstance(part, Sail) else resolve.the(ship, pid)
         if isinstance(part, Spar):
             if part.cls == "lateen_yard":
                 # called a yard but not braced (package 75): refused in the brace orders'
