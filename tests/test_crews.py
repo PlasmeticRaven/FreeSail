@@ -759,7 +759,12 @@ def test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth_where_she_lie
     w, v, crew = _raven_anchored_far()
     crew.ship.extra["water_depth_m"] = 88.6  # what she kept from the deep water she slept in
     charted = crew.chart.depth_at(crew.position) + crew.tide_height_m
+    crew.ship.extra["bottom"] = "ooze"  # and the bottom of it
     K.promote(w, v)
+    # the cause mended where it lives: her place's water brought true at the wake for every
+    # reader (`crews.woken_true`), not the anchor's depth alone
+    assert abs(crew.ship.extra["water_depth_m"] - charted) < 0.5
+    assert crew.ship.extra["bottom"] == crew.chart.bottom_near(crew.position)
     anchor = ground_tackle(crew.ship).riding_by()
     assert crew.at_anchor and abs(anchor.depth_m - charted) < 0.5, (anchor.depth_m, charted)
 
@@ -779,6 +784,51 @@ def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted, mo
     assert lying and "lies to" in lying[-1].text, [x.text for x in lying]
     topsails = set(crew.ship.groups.get("topsails", []))
     assert {s for s, x in crew.ship.sails.items() if x.is_set} <= topsails
+
+
+def test_how_she_lies_is_one_answer_from_her_own_state():
+    """The lead's fourth round: 'how does she lie now' answered once, from her own state, for
+    the take-up, the wake and the demotion: asleep by her far body (the leg the far ticks
+    keep), awake by her tackle and her helm, never by an awake hull's plan, which is not kept
+    while she is awake."""
+    from freesail.ship.parts import AnchorState, ground_tackle
+
+    w, v, crew = _raven_anchored_far()
+    assert K.how_she_lies(v) == K.AT_ANCHOR  # asleep, her far body riding at an anchor
+    K.promote(w, v)
+    assert crew.awake and K.how_she_lies(v) == K.AT_ANCHOR  # awake, by her tackle
+    for a in ground_tackle(crew.ship).anchors:  # weighed by hand, the plan left as it was
+        if a.state is AnchorState.DOWN:
+            a.state = AnchorState.AWEIGH
+            a.ground_x = a.ground_y = None
+    crew.ship.dyn.u = 1.5
+    assert v.plan[0][0] == "anchor" and K.how_she_lies(v) == K.UNDER_WAY
+    v.plan = [("lie_to", float("inf"))]
+    crew.awake = False
+    assert K.how_she_lies(v) == K.LYING_TO  # asleep, her far body lying to
+
+
+def test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed():
+    """The fourth round, the same cause at the demotion: a ship awake, weighed and under way,
+    whose plan still has the leg of the anchor, put to sleep keeps no anchor her far body does
+    not ride by (before, the far ticks froze her at it, and she woke to it)."""
+    from freesail.ship.parts import AnchorState, ground_tackle
+
+    for brainless in (False, True):
+        w, v, crew = _raven_anchored_far()
+        K.promote(w, v)
+        for a in ground_tackle(crew.ship).anchors:
+            if a.state is AnchorState.DOWN:
+                a.state = AnchorState.AWEIGH
+                a.ground_x = a.ground_y = None
+        crew.ship.dyn.u = 1.5
+        if brainless:
+            v.brain = None  # a hull with no far brain to plan for her (one he left)
+        assert v.plan[0][0] == "anchor"
+        K.demote(w, v)
+        assert v.plan[0][0] != "anchor" and not crew._far_anchored
+        # her captain's brain plans her passage; with none, she lies to
+        assert K.how_she_lies(v) == (K.LYING_TO if brainless else K.UNDER_WAY), brainless
 
 
 def test_the_far_course_for_a_port_is_laid_by_the_tracks_and_ends_at_her_anchor():

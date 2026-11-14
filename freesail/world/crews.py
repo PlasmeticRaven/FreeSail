@@ -576,70 +576,98 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
     (package 84, step 5)."""
     if vessel.crew is not None:
         if not vessel.crew.awake:
+            lies = how_she_lies(vessel)  # her far body's, asked before she wakes
             _to_full(vessel)
-            rides_as_she_lay(vessel, vessel.crew)
+            woken_true(vessel.crew)
+            rides_as_she_lay(vessel, vessel.crew, lies)
         return vessel.crew
+    lies = how_she_lies(vessel)
     crew = make_hull(world, vessel)
-    rides_as_she_lay(vessel, crew)
+    woken_true(crew)
+    rides_as_she_lay(vessel, crew, lies)
     return crew
 
 
-def rides_as_she_lay(vessel: Any, crew: Any) -> None:
-    """A far body that rode at an anchor woken as she lay (package 60, the lead's second and
-    third readings of 4dda3dfe and 52d99b9a): judged by how her far body lies as she wakes
-    (riding at an anchor), and never called on a hull that is awake already; nothing done to
-    one at anchor. Every sail set is furled and her way taken off; her
-    first anchor that can be let go goes down where she lies, in the chart's depth there (never
-    a figure her sleeping hull kept), veered to the scope the depth wants and brought up.
-    Where no anchor can hold her (no depth known, no anchor to let go, or more water than her
-    cable reaches) she lies to instead, as lying to sets her, said in her log (JUDGEMENT);
-    never an anchor marked down that is not on the ground."""
+# How a ship lies, the one answer (package 60, the lead's fourth round): at anchor, lying to
+# or under way.
+AT_ANCHOR, LYING_TO, UNDER_WAY = "at anchor", "lying to", "under way"
+
+
+def how_she_lies(vessel: Any) -> str:
+    """How she lies now, from her own state, for whoever asks (the take-up, the wake, the
+    demotion): an awake hull by her tackle and her helm (`_sail_state_of`: her anchor down, or
+    hove to); a sleeping one by her far body, whose plan the far ticks keep (the leg of the
+    anchor a body riding at one, of lying to one lying to). An awake hull's plan is never read
+    for it: it is not kept while she is awake (the third reading of 52d99b9a, item 2)."""
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "awake", False) and getattr(crew, "shape", "") == "full":
+        said = _sail_state_of(crew)
+        return said if said in (AT_ANCHOR, LYING_TO) else UNDER_WAY
+    plan = getattr(vessel, "plan", None) or []
+    kind = plan[0][0] if plan else ""
+    if kind == "anchor":
+        return AT_ANCHOR
+    if kind == "lie_to" or str(getattr(vessel, "sail_state", "") or "") == LYING_TO:
+        return LYING_TO
+    return UNDER_WAY
+
+
+def woken_true(crew: Any) -> None:
+    """Her place's water brought true as she wakes, for every reader (package 60, the lead's
+    fourth round; the third reading's item 1): a sleeping hull's far tick refreshes none of
+    what her own tick keeps of the place she lies in, so she woke with the depth, the bottom,
+    the stream and the tide of where she fell asleep (`World._tick_tide`, run now with her
+    current, says nothing while she is not at anchor). The sea and the weather keep their own
+    minute and are not run here (each says a line when its words change)."""
+    if crew is None or getattr(crew, "tide", None) is None:
+        return
+    with crew.world.as_hull(crew):
+        crew.world._tick_tide()
+
+
+def rides_as_she_lay(vessel: Any, crew: Any, lies: str = "") -> None:
+    """A ship woken as she lay (package 60, the lead's second, third and fourth rounds):
+    where her far body rode at an anchor (`how_she_lies`, asked before she woke), every sail
+    set is furled and her way taken off, and she is brought up by the first anchor that can
+    hold her in the depth under her (brought true at the wake, `woken_true`), veered to the
+    scope the depth wants: the let-go evolutions' own answer to whether she can anchor here
+    (`scripts.cannot_anchor`). Where none can (no anchor, no bottom, the ground too deep for
+    her cable) she lies to, as lying to sets her, said in her log (JUDGEMENT); never an anchor
+    marked down that is not on the ground. Nothing for a ship that lay otherwise, or that is
+    at anchor already."""
     if crew is None or getattr(crew, "at_anchor", False):
         return
-    # how her far body lies: a sleeping hull's far plan is kept by the far ticks, and the leg of
-    # the anchor is a body riding at one (`ships.Vessel.tick`); an awake hull's plan is not kept
-    # (the third reading, item 2), so this is called only as she wakes, never on her awake
-    plan = getattr(vessel, "plan", None) or []
-    if not (plan and plan[0][0] == "anchor"):
+    if (lies or how_she_lies(vessel)) != AT_ANCHOR:
         return
-    from freesail import units
-    from freesail.evolutions.scripts import _let_go, _scope_plan, can_let_go
+    from freesail.evolutions.scripts import _let_go, _scope_plan, _water_depth, cannot_anchor
     from freesail.ship.parts import SailState, ground_tackle
 
     ship = crew.ship
     tackle = ground_tackle(ship)
-    depth = None
-    chart = getattr(crew, "chart", None)
-    if chart is not None and crew.position is not None:
-        charted = chart.depth_at(crew.position)
-        if charted is not None:
-            depth = float(charted) + float(getattr(crew, "tide_height_m", 0.0) or 0.0)
-    anchor = next((a for a in tackle.anchors if can_let_go(a)), None) if tackle else None
-    reach = units.fathoms_to_m(anchor.cable_fathoms) if anchor is not None else 0.0
+    depth = _water_depth(ship)
+    anchors = list(tackle.anchors) if tackle is not None else []
+    why = cannot_anchor(ship, None, depth)
+    anchor = None
+    for a in anchors:
+        why = cannot_anchor(ship, a, depth)
+        if why is None:
+            anchor = a
+            break
     ship.dyn.u = ship.dyn.v = 0.0
-    if anchor is None or depth is None or depth >= reach:
-        why = (
-            "no anchor to let go"
-            if anchor is None
-            else "no sounding for her anchor"
-            if depth is None
-            else "more water than her cable reaches"
-        )
-        _set_sail(crew, "lying to")
+    if anchor is None or depth is None:
+        _set_sail(crew, LYING_TO)
         crew.record(
             Severity.NOTABLE,
             "ship.hove_to",
-            f"{vessel.name} at full detail again where her anchor cannot hold her ({why}): "
-            "she lies to.",
+            f"{vessel.name} at full detail again where she cannot anchor ({why}): she lies to.",
             data={"id": vessel.id, "why": why},
         )
         return
     for sail in ship.sails.values():
         if sail.is_set:
             sail.state = SailState.FURLED
-    ship.extra["water_depth_m"] = depth
     _let_go(ship, anchor, depth)
-    anchor.scope_m = min(_scope_plan(anchor, depth, None)[0], reach)
+    anchor.scope_m = _scope_plan(anchor, depth, None)[0]
     anchor.brought_up = True
     crew._far_anchored = True
 
@@ -738,9 +766,15 @@ def demote(world: World, vessel: Any) -> None:
             brain.fold_back(crew.captain)
         write_damage(vessel, crew)
     seated = any(not h.agent.released for h in crew.agents.values())
-    crew.awake = False
     vessel.detail = "far"  # near by distance from here, as a hull-less vessel (step 6)
-    crew._far_anchored = bool(vessel.plan) and vessel.plan[0][0] == "anchor"
+    # how she lay as she fell asleep, from her own state (the fourth round: her plan is not
+    # kept while she is awake, and a ship weighed and under way kept the leg of the anchor and
+    # was frozen at it by the far ticks)
+    lay = how_she_lies(vessel)
+    if lay != AT_ANCHOR and vessel.plan and vessel.plan[0][0] == "anchor":
+        vessel.plan = [("lie_to", math.inf)] + list(vessel.plan[1:])
+    crew.awake = False
+    crew._far_anchored = lay == AT_ANCHOR
     if seated:
         crew.record(
             Severity.URGENT,
@@ -1199,9 +1233,11 @@ def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
     # scenario whose cap was nought)
     cap, range_nm, _ = settings(parent)
     full = nm <= range_nm and len(crewed(parent)) < cap
+    lies = how_she_lies(vessel)
     crew = make_hull(parent, vessel)
     if full:
-        rides_as_she_lay(vessel, crew)
+        woken_true(crew)
+        rides_as_she_lay(vessel, crew, lies)
     if not full:
         crew.awake = False
         vessel.detail = "far"

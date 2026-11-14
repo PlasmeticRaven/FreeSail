@@ -202,16 +202,13 @@ def ship_for_him(root: Any, words: str) -> Any:
         vessel = vessel_in_sight(root, said)
     name = " ".join(w[:1].upper() + w[1:] for w in key.split()) or "that ship"
     unknown = f"You know of no ship called the {name} hereabouts."
-    if vessel is None or vessel.done:
+    from freesail.world.knowledge import knows_of
+
+    # a ship he does not know of is to him as a name of no ship (the fourth round: one answer,
+    # `knowledge.knows_of`, his ships, a sail in sight, a name his log has said)
+    if vessel is None or vessel.done or not knows_of(root, vessel):
         raise OrderError(unknown)
     if vessel.crew is None:
-        # a ship with no hull of her own has never been near him (never boarded, met or in
-        # sight long enough to be woken): answered as an unknown name is, unless she is one
-        # given him (the lead's third reading of 52d99b9a, item 5)
-        from freesail.world.command import given_to
-
-        if not given_to(root, str(vessel.id)):
-            raise OrderError(unknown)
         raise OrderError(f"The {vessel.name} lies beyond a boat's reach of you.")
     return vessel.crew
 

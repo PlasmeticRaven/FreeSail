@@ -173,35 +173,39 @@ def _souls(hull: Any) -> int:
 
 
 def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
-    """(all the hands, by rating, a count of hands, the other words) from the order's words
-    before `to the "X"`: 'the people and the hands', 'twenty hands', 'six able seamen and four
-    ordinary', 'Mr Ryan and twelve hands'. A rating's count is read by the one reader for
-    numbers (`orders.numbers`)."""
+    """(all the hands, by rating, a count of hands, the names) from the order's words before
+    `to the "X"`, by the list's grammar (package 60, the lead's fourth round: what a list of
+    names IS, everything outside it refused by saying what was not understood):
+
+        list       := part { ("," | "and" | ", and") part }
+        part       := collective | count | name
+        collective := "the people" | "all the people" | "her people"
+                    | "the hands" | "all the hands" | "all hands"
+        count      := number ("hands" | "hand" | "men" | "seamen" | a rating)
+        name       := [title] word [word]       (her whole name, a surname, a title and one)
+                    | "the" word [word]          (a role: "the boatswain", "the first mate")
+
+    No word excludes (there is no "but" or "except"), and none joins but the comma and "and";
+    a part that is none of these is refused, saying it was not understood. Whether a name is
+    answered by anybody aboard is the persons' reading's (`_persons`, `_answers_to`). A count
+    is read by the one reader for numbers (`orders.numbers`); a number said with its own 'and'
+    ('a hundred and twenty hands') is one part."""
     from freesail.orders import numbers
 
     text = " ".join(str(words).replace(";", ",").replace(",", " , ").split())
     parts = [p.strip() for p in _split_and(text) if p.strip()]
-    for part in parts:
-        # the list reads names and counts joined by commas and 'and' alone (the lead's third
-        # reading of 52d99b9a, item 3): a word that would make it say otherwise is refused
-        said = next((w for w in part.lower().split() if w in _NOT_A_LIST), "")
-        if said:
-            raise TransferError(
-                f"'{part}': the order reads names and counts joined by commas and 'and', and "
-                f"takes no '{said}'; name those who go."
-            )
     every, by_rating, count, rest = False, {}, 0, []
     for part in parts:
         low = part.lower()
-        if low in ("the hands", "all the hands", "all hands"):
+        if low in _HANDS:
             every = True
             continue
-        if low in ("the people", "all the people", "her people"):
+        if low in _PEOPLE:
             rest.append("the people")
             continue
         ws = low.split()
         got = numbers.read(ws, 0)
-        if got is not None:
+        if got is not None and got[1] > 0:
             n, used = int(got[0]), got[1]
             what = " ".join(ws[used:])
             if what in ("hands", "hand", "men", "seamen"):
@@ -210,18 +214,39 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
             if what in _RATINGS:
                 by_rating[_RATINGS[what]] = by_rating.get(_RATINGS[what], 0) + n
                 continue
-            raise TransferError(
-                f"'{part}' is no number of hands I can read; say 'twenty hands' or 'six able "
-                "seamen and four ordinary'."
-            )
+            raise TransferError(_not_understood(part))
+        if not name_shaped(low):
+            raise TransferError(_not_understood(part))
         rest.append(part)
     return every, by_rating, count, rest
 
 
+_HANDS = frozenset({"the hands", "all the hands", "all hands"})
+_PEOPLE = frozenset({"the people", "all the people", "her people"})
+
+
+def name_shaped(part: str) -> bool:
+    """Whether a part of the list has the shape of a name (the grammar's `name`): one or two
+    words, or a title or 'the' and one or two words; letters, a stop of a contraction or an
+    apostrophe alone."""
+    words = part.replace(".", " ").split()
+    if not words or any(not w.replace("'", "").isalpha() for w in words):
+        return False
+    head = words[0].lower()
+    body = words[1:] if head in _TITLES or head == "the" else words
+    return 1 <= len(body) <= 2
+
+
+def _not_understood(part: str) -> str:
+    return (
+        f"Not understood: '{part}'. The order reads a list of those who go, joined by commas "
+        "and 'and': each a name of hers ('Mr Pascoe', 'Oliver', 'the boatswain'), a number of "
+        "hands or of a rating ('twelve hands', 'six able seamen'), 'the people' or 'the hands'."
+    )
+
+
 # The titles a surname may be said with.
 _TITLES = frozenset({"mr", "mister", "mrs", "miss", "captain", "lieutenant", "doctor", "dr"})
-# Words that would make a list of names say something it does not read: refused in words.
-_NOT_A_LIST = frozenset({"but", "except", "excepting", "save", "with", "without", "besides"})
 
 
 def _split_and(text: str) -> list[str]:

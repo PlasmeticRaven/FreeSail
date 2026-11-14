@@ -377,27 +377,54 @@ def test_a_person_in_a_boat_lost_on_an_errand_to_another_ship_is_picked_up():
     assert "Mr Bradley picked up by her own side" in lost, lost
 
 
-def test_a_part_of_the_list_is_a_name_only_when_the_whole_part_is_one():
-    """The lead's third reading of 52d99b9a, item 3: 'all the people but Mr Pascoe' and 'Mr
-    Pascoe with Richd. Oliver' are refused in words (before, the first sent Mr Pascoe alone and
-    the second Oliver alone); 'Mr Pascoe; Richd. Oliver' (its semicolon read away by the
-    grammar) is refused as one name nobody answers to; a name is a whole name, a surname, or a
-    title and a surname, never a part's last word."""
+# The list's grammar by its shapes (the lead's fourth round): the words of the order before
+# "from the Sherbourne to the Fly", and what each reads as: the names moved, or the refusal.
+LIST_SHAPES = [
+    ("Mr Pascoe and two hands", {"Mr Pascoe"}, 2),
+    ("Mr Pascoe, Richd. Oliver and two hands", {"Mr Pascoe", "Richd. Oliver"}, 2),
+    ("Pascoe and Oliver", {"Mr Pascoe", "Richd. Oliver"}, 0),
+    ("Mr Oliver", {"Richd. Oliver"}, 0),
+    ("the boatswain and the boy", {"Mr Pascoe", "Richd. Oliver"}, 0),
+    ("the people and two hands", {"Mr Pascoe", "Richd. Oliver"}, 2),
+    ("six able seamen, and four ordinary", set(), 10),
+    ("all the people but Mr Pascoe", "Not understood: 'all the people but mr pascoe'", 0),
+    ("Mr Pascoe with Richd. Oliver", "Not understood", 0),
+    ("the Sherbourne's cook Oliver", "Not understood", 0),
+    ("Mr Pascoe; Richd. Oliver", "Not understood", 0),  # its semicolon read away
+    ("some of the men", "Not understood", 0),
+    ("two dozen barrels", "Not understood", 0),
+    ("Mr Nobody", "answers to 'Mr Nobody'", 0),
+    ("the purser", "answers to 'the purser'", 0),
+    ("Oliver Cromwell", "answers to 'Oliver Cromwell'", 0),
+]
+
+
+def test_the_list_of_those_who_go_is_read_by_its_grammar():
+    """The lead's third reading of 52d99b9a, item 3, mended by the fourth round's method: what
+    a list of names is (its parts joined by commas and 'and', each a collective, a count or a
+    name; no word that excludes), each shape of the table read as it says or refused saying
+    what was not understood; and a name is a whole name, never a part's last word (before,
+    'all the people but Mr Pascoe' sent him alone, 'Mr Pascoe with Richd. Oliver' Oliver)."""
+    from freesail.orders.grammar import parse
+
     w, cutter, fly, me = cutter_and_the_fly_taken_up()
     hands = len(TR._hands(cutter))
-    for order, word in (
-        ("transfer all the people but Mr Pascoe from the Sherbourne to the Fly", "but"),
-        ("transfer Mr Pascoe with Richd. Oliver from the Sherbourne to the Fly", "with"),
-    ):
-        e = w.submit(order)
-        assert e.kind == "order.rejected" and f"takes no '{word}'" in e.text, e.text
-    e = w.submit("transfer the Sherbourne's cook Oliver from the Sherbourne to the Fly")
-    assert e.kind == "order.rejected" and "answers to" in e.text, e.text
-    assert len(TR._hands(cutter)) == hands and not cutter.dealings.boat.away
-    # the semicolon is read away before the order reaches the list (the grammar's normalising),
-    # so the two names run together as one, and nobody answers to it: refused, not Oliver alone
-    e = w.submit("transfer Mr Pascoe; Richd. Oliver from the Sherbourne to the Fly")
-    assert e.kind == "order.rejected" and "answers to" in e.text, e.text
+    for said, want, n in LIST_SHAPES:
+        # the words as the order hands them on (its normalising: lower case, stops and the
+        # semicolon read away), and the reading of them
+        text = parse(cutter.ship, f"transfer {said} to the Fly").text
+        words = text.removeprefix("transfer ").removesuffix(" to the fly")
+        if isinstance(want, set):
+            every, by_rating, count, rest = TR.read_counts(words)
+            moved = {p.name for p in TR._persons(w, cutter, rest, laid=True)}
+            assert (moved, count + sum(by_rating.values())) == (want, n), said
+            continue
+        with pytest.raises(TR.TransferError) as refused:
+            every, by_rating, count, rest = TR.read_counts(words)
+            TR._persons(w, cutter, rest, laid=True)
+        assert want in str(refused.value), (said, str(refused.value))
+        e = w.submit(f"transfer {said} from the Sherbourne to the Fly")
+        assert e.kind == "order.rejected" and want.split(":")[0] in e.text, (said, e.text)
     assert len(TR._hands(cutter)) == hands and not cutter.dealings.boat.away
 
 
@@ -641,6 +668,20 @@ def test_a_ships_name_is_answered_in_the_orders_own_words():
     with pytest.raises(OrderError, match="^You command no ship here"):
         ship_for_him(types.SimpleNamespace(observed=True), "the Fly")
     assert ship_for_him(w, "the ship") is fly and ship_for_him(w, "Fly") is fly
+    # the one answer to 'does he know of this ship' (`knowledge.knows_of`), by its cases: the
+    # ship he commands, the one he left, a sail in sight; and not a ship put on the sea by the
+    # director's word ninety miles off, though the record names her
+    from freesail.world.knowledge import knows_of
+
+    _wo(
+        w,
+        'ship: a brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(120)
+    seen = {name: knows_of(w, w.sea_vessels.find(name)) for name in ("Fly", "Sherbourne", "Hind")}
+    assert seen == {"Fly": True, "Sherbourne": True, "Hind": True}, seen
+    assert not knows_of(w, w.sea_vessels.find("Distant"))
 
 
 def test_the_refusals_played_by_the_order():
