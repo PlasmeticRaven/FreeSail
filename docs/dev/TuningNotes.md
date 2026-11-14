@@ -29293,9 +29293,12 @@ merchant brig is left out of that test: her 'let go' wants twelve forecastle han
 (`let_go_anchor.yaml`) and her company is sixteen, on the trunk and on package 75's branch
 alike; the deeper cause, not built: a scenario's opening state made by an order that can
 wait or fail. (e) The wheel shot away, never mended: `rig the relieving tackles`
-(`orders/damage.py`, `RelievingTacklesScript`, `data/evolutions/relieving_tackles.yaml`, five
-minutes and six hands JUDGEMENT; Falconer's RELIEVING-TACKLES are the careening tackles, and
-the tiller's use is UNVERIFIED here), the hit's line naming the order, the rules captain
+(`orders/damage.py`, `RelievingTacklesScript`, `data/evolutions/relieving_tackles.yaml`, the
+tiller's use by Steel 1794, RELIEVING-TACKLES, "used when the tiller-ropes are damaged", and
+Luce 1884's quarter bill, "at the relieving tackles, an officer or quartermaster, with a few
+men to steer the vessel in case the wheel or tiller-ropes are shot away", both on file under
+docs/references/; Falconer's RELIEVING-TACKLES are the careening tackles; the five minutes and
+six hands JUDGEMENT), the hit's line naming the order, the rules captain
 giving it before any other repair; the physics untouched. Measured at seed 6: lost at
 10:17, rove at 10:22. `boats_stove` is the same shape and is left. (f) "Tacked ... heading
 SSE (158°)" with her head NE: `TackScript.words` names her own heading when the tack ends by

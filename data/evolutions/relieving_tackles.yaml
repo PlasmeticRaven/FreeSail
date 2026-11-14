@@ -2,13 +2,16 @@
 # (scripted, RelievingTacklesScript in evolutions/repair_scripts.py; package 115 D4 (e), the
 # cold review of 2026-11-14, 5.3 item 8: `combat.hits` writes "the helm is lost until the
 # relieving tackles are rove" and nothing could rove them). Two luff tackles hooked to the
-# tiller's end below and manned there, the helm's orders passed down. Falconer 1780 has the
-# helm as rudder, tiller and wheel with the tiller-rope wound about it (HELM), but his
-# RELIEVING-TACKLES are the careening tackles, not the tiller's: the steering use is the
-# nineteenth century seamanship books' (UNVERIFIED here, from memory; the game's own line in
-# combat/hits.py names them). One phase, `reeve`; at its end `helm_lost` is cleared and
-# the helm answers. Her steering meanwhile is the physics' as before (physics/hull.py holds
-# the rudder where it was).
+# tiller's end below and manned there, the helm's orders passed down: Steel 1794, vol. 1,
+# RELIEVING-TACKLES, "used when the tiller-ropes are damaged, have one end made fast to a
+# rope strap, with a thimble on each side of the tiller, and the other end to an eye-bolt in
+# the side" (docs/references/steel/steel-1794-rigging-and-seamanship-vol1-ocr.txt, l. 25825);
+# Luce 1884, the quarter bill: "at the relieving tackles, an officer or quartermaster, with a
+# few men to steer the vessel in case the wheel or tiller-ropes are shot away" (docs/
+# references/luce/luce-1884-textbook-of-seamanship-ocr.txt, l. 21775; and l. 6002). Falconer
+# 1780's RELIEVING-TACKLES are the careening tackles, another use of the name. One phase,
+# `reeve`; at its end `helm_lost` is cleared and the helm answers. Her steering meanwhile is
+# the physics' as before (physics/hull.py holds the rudder where it was).
 id: relieving_tackles
 verb: relieving_tackles
 applies_to: {class: ship}
@@ -16,11 +19,11 @@ script: relieving_tackles
 params: {}
 preconditions: []
 timing:
-  reeve_s: 300   # the tackles got up from the boatswain's store, hooked and manned below: five minutes (JUDGEMENT: the tackles kept ready at quarters, a short job for the afterguard)
+  reeve_s: 300   # hooked to the tiller and manned below: five minutes (JUDGEMENT; Luce's quarter bill keeps men stationed at them, so the tackles are at hand)
 on_start: {log: "Rig the relieving tackles! Hands below to the tiller."}
 on_complete: {log: "{done}", kind: helm.relieved, severity: notable}
 on_fail: {log: "Could not rig the relieving tackles: {reason}.", kind: evolution.failed, severity: notable}
-# crew: the afterguard to hook on and man the tackles: six hands (JUDGEMENT: two tackles,
-# three a fall)
+# crew: "an officer or quartermaster, with a few men" (Luce 1884, l. 21775): six hands
+# (JUDGEMENT in the number: two tackles, three a fall)
 crew: {hands: 6, rating: ordinary, stations: [afterguard, waisters]}
-source: "Falconer 1780, HELM and TILLER (the rudder, the tiller, the tiller-rope and the wheel); the tackles to the tiller UNVERIFIED (from memory of the nineteenth century books); the minutes and the hands JUDGEMENT"
+source: "Steel 1794, RELIEVING-TACKLES (the tiller-ropes damaged); Luce 1884, the quarter bill and ch. on tackles (to steer if the wheel or tiller-ropes are shot away); Falconer 1780, HELM and TILLER; the minutes and the hands JUDGEMENT"
