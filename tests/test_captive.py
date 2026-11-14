@@ -82,6 +82,13 @@ def _struck_to_a_crewed_frigate(
     v.sail_state = "lying to"
     w.vessels.add(v)
     enemy = crews.promote(w, v)
+    # made from a far body lying to, she heaves to by the evolution (package 60, ruling A on
+    # the fourth reading); the action begins once she lies so
+    for _ in range(60):
+        if enemy.ship.extra.get("hove_to"):
+            break
+        w.run(10)
+    assert enemy.ship.extra.get("hove_to"), "the captor never came to lie to"
     enemy.ship.dyn.heading = float(w.ship.heading)
     enemy.captain.state = None
     enemy.submit("beat to quarters")

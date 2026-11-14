@@ -27699,6 +27699,12 @@ failed, in four groups:
   wind and a beam, and laid to it she fell off).
 - *Test*: the table; `test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so`, now
   asking her hove to by the evolution within twenty minutes, no sail named.
+- *Found by the fast tier*: a hull made from a far body lying to now heaves to by the evolution
+  (a frigate's hands take some eight minutes at it), where before she was made with a topsail
+  set and read under way. The captive suite's captor is made so: its set-up now lets her lie
+  to before the action begins, its assertions unchanged. `test_a_crewed_hull_with_no_far_brain_
+  lies_as_she_lay_and_is_never_put_out_of_the_world` (before, "lies where she is": laid to
+  wherever she was) asks how she lies after the sleep to be how she lay before it.
 
 **The refresh at the wake without the tick's speech** (item 3).
 - *Cause*: `woken_true` ran `_tick_tide` with the tide's flag as she fell asleep, so the turn of

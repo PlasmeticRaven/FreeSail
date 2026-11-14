@@ -74,14 +74,18 @@ def fly_taken_up():
 # ---------------------------------------------------------------------------
 
 
-def test_a_crewed_hull_with_no_far_brain_lies_where_she_is_and_is_never_put_out_of_the_world():
+def test_a_crewed_hull_with_no_far_brain_lies_as_she_lay_and_is_never_put_out_of_the_world():
+    """A hull with no far captain sleeps as she lay (package 60, ruling A on the fourth reading:
+    at her anchor, lying to, or her course held; before, she was laid to wherever she was),
+    and is kept: never done, her company still hers."""
     w, b, hull = _frigate_and_the_brig_x_on_the_sea()
     b.brain = None
     b.plan = []
+    lay = crews.how_she_lies(b)
     crews.demote(w, b)
     assert not hull.awake
     w.run(180)
-    assert not b.done and b.plan and b.plan[0][0] in ("lie_to", "anchor")
+    assert not b.done and b.plan and crews.how_she_lies(b) == lay, (lay, b.plan)
     assert w.hulls.get(b.id) is hull and len(w.registry.company(b.id)) > 0
 
 
