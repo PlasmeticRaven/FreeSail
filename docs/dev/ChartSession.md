@@ -551,3 +551,13 @@ The reload mend (9ab10a4d, run 90) and 112's step 1 (b481938e, run 91) are merge
 closed. Truth 7-570 reads every tile and lengthened the cloud run by half an hour: 112 to
 give its cost and a sampled form in step 2's report. 111's step 2b expected within the hour,
 its redrawn tracks for this session to read.
+
+### 2026-11-14, 03:12: 111 step 2b read again (1e28b0b)
+
+St Peter Port now between La Rousse and Roustel (Roustel 1.2 cables to starboard; Faden's
+sunken rock NE of Roustel not a feature, the OCR's distance unreadable); St Malo listed;
+f-shallow agrees with my sampler at Poole and Civita Vecchia; four of the fifteen keep their
+sides. Setúbal's in-leg from Sesimbra's road to be rechecked by the builder. **Owed by this
+session after 111 merges:** Santa Cruz de Tenerife and the Sicilian six (Bougie and the
+Goletta are 104's, listed) redrawn by the pilots' sides with the least depth per leg, a small
+step of its own.
