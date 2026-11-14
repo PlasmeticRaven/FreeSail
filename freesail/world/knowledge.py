@@ -469,6 +469,7 @@ DEFAULT_REACH = "deck"
 # file's name, a sail's or a part's id, a ship file's section, a settings key).
 NOT_KINDS: frozenset[str] = frozenset(
     {
+        "websocket",  # the server's guard's ASGI messages (package 115), no line of the log
         "fore",
         "main",
         "mizzen",

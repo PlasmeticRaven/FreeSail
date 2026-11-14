@@ -6781,7 +6781,9 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
             S.save_settings(s, path)
     assert path.read_text(encoding="utf-8") == kept
     driver = Driver(World(seed=1805, scenario=Scenario()))
-    app = create_app(driver, harbour=Harbour(driver, settings_path=path))
+    app = create_app(
+        driver, harbour=Harbour(driver, settings_path=path), saves_dir=tmp_path / "saves"
+    )
     said: list[str] = []
     with PageClient(app) as c:
         said.append(c.get("/api/harbour/state").text)
@@ -6795,8 +6797,9 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
         assert PLACEHOLDER_MODEL in Path(d["path"]).read_text(encoding="utf-8")
         assert not S.inside_repository(d["path"])
         c.post("/api/driver", json={"action": "tick", "value": 600})
-        save = tmp_path / "game.json"
-        c.post("/api/driver", json={"action": "save", "value": str(save)})
+        # a save over the server is named and lies in the saves place (package 115)
+        save = app.state.driver.places.saves / "game.json"
+        c.post("/api/driver", json={"action": "save", "value": "game"})
         said.append(c.get("/api/log", params={"limit": 5000}).text)
         said.append(c.get("/api/harbour/state").text)
         said.append(c.get("/api/save").text)
