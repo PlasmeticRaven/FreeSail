@@ -135,3 +135,14 @@ crew_pool:
   landsman: {hands: 20, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: by the Little Pass
+# under São Julião, as the pilot's fair-wind way.
+# Its least depth along the way, by the grid at its datum: 3.0 m, drawn through
+# water of 3 m and more on every leg.
+tracks:
+  to_sea: [38 41.49 N 9 12.46 W, 38 40.39 N 9 19.38 W, 38 40.44 N 9 23.29 W, 38 41.46 N 9 24.60 W, 38 39.34 N 9 27.32 W]
+  from_sea: [38 39.34 N 9 27.32 W, cascais-road]
+  in: [cascais-road, 38 40.39 N 9 19.60 W, 38 40.46 N 9 17.46 W, 38 40.56 N 9 17.23 W, 38 41.51 N 9 12.33 W, belem-road]

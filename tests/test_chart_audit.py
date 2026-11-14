@@ -143,6 +143,33 @@ def test_a_mooring_on_the_land_an_unknown_nation_and_overlapping_rows_are_found(
     assert not {k for k in plain.keys() if k.startswith(("f-dry", "f-nation", "f-dated"))}
 
 
+def test_a_track_over_shallow_water_the_guard_passes_is_found(tmp_path, chart):
+    """(f) The guard judges land, not depth: Plymouth's way in led over the shoal ground of
+    the Sound's east side (0.9 m at the grid's datum, the leg clear of the land) is a finding
+    of its least depth; Plymouth's tracks as they are, nothing (package 111's step 2b, the
+    lead's ruling of 2026-11-13)."""
+
+    def plymouth(doc):
+        doc["tracks"]["from_sea"] = [
+            "50 11 N 4 18 W",
+            "50 18.3 N 4 08.0 W",
+            "50 19.08 N 4 07.32 W",
+            "cawsand-bay",
+        ]
+
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart), _port_file(tmp_path, "plymouth", plymouth))
+    keys = audit.keys()
+    assert "f-shallow:plymouth" in keys and "f-in:plymouth" not in keys
+    found = next(f for f in audit.findings if f.key == "f-shallow:plymouth")
+    assert "the least 0.9 m" in found.words
+    plain = A.Audit()
+    A.check_ports(
+        plain, chart, A.Water(chart), _port_file(tmp_path / "x", "plymouth", lambda d: None)
+    )
+    assert "f-shallow:plymouth" not in plain.keys()
+
+
 def test_a_headland_in_the_sea_and_a_rock_inland_are_found(chart):
     """(g) A headland planted in the open Sardinian sea and a rock planted on Sardinia's
     hills are found; a light-vessel afloat and a lighthouse on its rock are not."""

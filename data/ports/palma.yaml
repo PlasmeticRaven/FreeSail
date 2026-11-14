@@ -105,3 +105,15 @@ crew_pool:
   landsman: {hands: 10, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: along the clean
+# west side of the bay, the Cuervo Marino two and a half cables to larboard, as the pilot
+# has it.
+# Its least depth along the way, by the grid at its datum: 3.1 m, drawn through
+# water of 3 m and more on every leg.
+tracks:
+  to_sea: [39 33.37 N 2 38.29 E, 39 33.35 N 2 38.32 E, 39 32.85 N 2 38.42 E, 39 32.25 N 2 38.38 E, 39 31.80 N 2 37.80 E, 39 28.86 N 2 37.04 E]
+  from_sea: [39 28.86 N 2 37.04 E, 39 31.80 N 2 37.80 E]
+  in: [39 31.80 N 2 37.80 E, 39 32.82 N 2 38.42 E, 39 33.15 N 2 38.42 E, 39 33.35 N 2 38.32 E, 39 33.40 N 2 38.25 E, palma-road]

@@ -180,6 +180,15 @@ DEPTH_DEEP_M = units.fathoms_to_m(10.0)
 # bearings from the way's first mark, in water this deep, the line to it clear of the land.
 OPEN_WATER_NM = 6.0
 OPEN_WATER_DEPTH_M = 20.0
+# A port's tracks are the way the land allows (the game's guard judges land, not depth), not a
+# sounded channel: each leg of the way in and the way out is read for the least depth the
+# grid charts along it, every TRACK_STEP_M, and a leg under TRACK_LEAST_DEPTH_M at the chart's
+# datum is a finding (JUDGEMENT: three metres, about a laden trader's draught of ten feet,
+# against the grid's datum near the lowest water; the period's pilots give the channel at low
+# water in fathoms, so a leg the grid gives less than that may be one no trader floats in at
+# low water, or the grid's grain over a narrow channel).
+TRACK_STEP_M = 20.0
+TRACK_LEAST_DEPTH_M = 3.0
 
 # A stream area's polygon tried for water on a grid of this many points a side over its
 # box (JUDGEMENT).
@@ -897,6 +906,39 @@ def _crossing_point(chart: Chart, start: Position, plan: list[tuple[Any, ...]]) 
     return None
 
 
+def _least_depth(
+    chart: Chart, start: Position, plan: list[tuple[Any, ...]]
+) -> list[tuple[float, Position, str]]:
+    """Each leg's least charted depth (metres at the datum, negative where it dries), the
+    place of it and the leg's end's name, sampled every `TRACK_STEP_M` along the great
+    circle of the leg, its ends among them."""
+    out: list[tuple[float, Position, str]] = []
+    here = start
+    for leg in plan:
+        if len(leg) < 2 or not isinstance(leg[1], Position):
+            continue  # an order of the plan's that is no leg (as the guard skips it)
+        there = leg[1]
+        bearing, dist = bearing_and_distance(here, there)
+        n = max(1, int(dist / TRACK_STEP_M))
+        least: tuple[float, Position] | None = None
+        for i in range(n + 1):
+            p = destination(here, bearing, dist * i / n)
+            e = chart.elevation_at(p)
+            if e is None:
+                continue
+            if least is None or -e < least[0]:
+                least = (-e, p)
+        if least is not None:
+            name = str(leg[2]) if len(leg) > 2 else fmt(there.lat_deg, there.lon_deg)
+            out.append((least[0], least[1], name))
+        here = there
+    return out
+
+
+def _depth_words(d: float) -> str:
+    return f"{max(d, 0.0):.1f} m" if d > -0.05 else f"ground drying {-d:.1f} m"
+
+
 def _dated_rows(nations: tuple[dict[str, Any], ...]) -> list[str]:
     """What is not whole in a port's dated rows: a row whose dates run backward, two rows
     that overlap, a day between two rows that no row holds, a row with no source."""
@@ -1124,6 +1166,27 @@ def check_ports(
                     [fmt(hit.lat_deg, hit.lon_deg)] if hit else [],
                 )
             )
+        # the depth along the tracks (the guard judges land, not depth): every port with
+        # tracks, the way in as the business plans it and the way out by its track to sea
+        if port.tracks:
+            legs = _least_depth(chart, first, plan[1:]) + _least_depth(
+                chart, port.anchorage.position, out
+            )
+            shallow = [leg for leg in legs if leg[0] < TRACK_LEAST_DEPTH_M]
+            if shallow:
+                d, where, name = min(shallow, key=lambda leg: leg[0])
+                audit.add(
+                    Finding(
+                        "f",
+                        f"f-shallow:{pid}",
+                        home,
+                        len(shallow),
+                        f"{port.name}'s tracks cross water the grid charts under "
+                        f"{TRACK_LEAST_DEPTH_M:g} m at its datum on {len(shallow)} of "
+                        f"{len(legs)} legs, the least {_depth_words(d)} on the leg to {name}",
+                        [fmt(where.lat_deg, where.lon_deg)],
+                    )
+                )
 
 
 # ---------------------------------------------------------------------------

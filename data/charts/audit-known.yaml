@@ -1,7 +1,10 @@
 # The chart's audit: the findings known and owned (package 111, `tools/audit_chart.py`).
 #
 # Every finding of the audit's first run (the trunk as package 111 was cut from it, the full
-# sweep), less those step 2a mended and with those its mends added (each said in its reason), each by its key with its place (the worst position the audit names, or its region),
+# sweep), less those step 2a mended and with those its mends added (each said in its reason),
+# less the 41 ways in and out that step 2b's tracks mended and with the tracks' shallow legs
+# its depth check found (`f-shallow`), each by its key with its place (the
+# worst position the audit names, or its region),
 # its reason in a line, whose it is (the package that built it, or the lead's list for what no
 # block owns: the tile grid's reach past the bounds, the climatology's boxes, a rule), and the
 # full sweep's count as its ceiling (`most`). `tests/test_chart_audit.py` passes on these and
@@ -338,256 +341,146 @@ known:
   reason: the harbour is ground in the grid higher than the file has it dry, and the nearest water that fits the file lies farther than six hundred metres (package 111's step 2a left it)
   owner: package 39a
   most: 1
-- key: f-in:alghero
-  place: 40°34.0′N 8°12.3′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
-  most: 1
 - key: f-in:cartagena
   place: 37°35.1′N 0°59.3′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  reason: 'the grid''s modern mole closes the harbour: no way in from the sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship in; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
-  most: 1
-- key: f-in:civita-vecchia
-  place: 42°05.5′N 11°46.9′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
-  most: 1
-- key: f-in:dartmouth
-  place: 50°20.2′N 3°33.2′W
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 39a
-  most: 1
-- key: f-in:ferrol
-  place: 43°27.9′N 8°18.2′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39c
-  most: 1
-- key: f-in:gaeta
-  place: 41°12.3′N 13°35.2′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
   most: 1
 - key: f-in:genoa
   place: 44°24.1′N 8°55.0′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  reason: 'the grid''s modern mole closes the harbour: no way in from the sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship in; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79d
-  most: 1
-- key: f-in:hyeres
-  place: 42°59.9′N 6°14.3′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
-  most: 1
-- key: f-in:lisbon
-  place: 38°41.5′N 9°22.4′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39d
-  most: 1
-- key: f-in:morlaix
-  place: 48°41.6′N 3°53.0′W
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 39a
-  most: 1
-- key: f-in:oporto
-  place: 41°08.8′N 8°40.6′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39d
   most: 1
 - key: f-in:oran
   place: 35°43.9′N 0°41.4′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
+  reason: 'the grid''s modern mole closes the harbour: no way in from the sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship in; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
-  most: 1
-- key: f-in:paimboeuf
-  place: 47°16.6′N 2°09.9′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 35
-  most: 1
-- key: f-in:palma
-  place: 39°32.6′N 2°38.0′E
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 79c
-  most: 1
-- key: f-in:poole
-  place: 50°40.2′N 1°56.4′W
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79b
-  most: 1
-- key: f-in:port-mahon
-  place: 39°52.7′N 4°17.7′E
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 79c
-  most: 1
-- key: f-in:rochefort
-  place: 46°00.8′N 1°11.0′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39b
-  most: 1
-- key: f-in:santander
-  place: 43°28.6′N 3°46.7′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39c
-  most: 1
-- key: f-in:setubal
-  place: 38°26.5′N 9°05.9′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 39d
   most: 1
 - key: f-in:st-malo
   place: 48°40.6′N 2°04.6′W
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in. The only way the grid''s water allows is along the coast from the bay of La Fresnaye, Faden''s fourth passage, the Décollées, "very difficult, and frequented by none but small vessels" (Faden 1793): not a way for every trader. The lead''s ruling of 2026-11-13: it stays shut'
   owner: package 39a
-  most: 1
-- key: f-in:st-marys
-  place: 49°54.9′N 6°19.6′W
-  reason: 'no `tracks:`; the straight line from the outer road to the anchorage crosses the grid''s land: the business draws no ship in'
-  owner: package 35b
-  most: 1
-- key: f-in:st-peter-port
-  place: 49°29.1′N 2°29.8′W
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 39a
-  most: 1
-- key: f-in:toulon
-  place: 43°04.3′N 5°56.0′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
-  most: 1
-- key: f-in:villefranche
-  place: 43°42.1′N 7°18.8′E
-  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship in'
-  owner: package 79d
-  most: 1
-- key: f-open:paimboeuf
-  place: 47°16.1′N 2°11.9′W
-  reason: the outer road lies in an estuary and the port has no `tracks:`; no straight line to the open sea keeps off the land
-  owner: package 35
   most: 1
 - key: f-open:royan
   place: 45°33.1′N 1°02.9′W
   reason: the outer road lies in an estuary and the port has no `tracks:`; no straight line to the open sea keeps off the land
   owner: package 39c
   most: 1
-- key: f-out:alghero
-  place: 40°34.2′N 8°14.7′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
-  most: 1
 - key: f-out:cartagena
   place: 37°35.4′N 0°59.2′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  reason: 'the grid''s modern mole closes the harbour: no way out to sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship out; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
-  most: 1
-- key: f-out:civita-vecchia
-  place: 42°05.5′N 11°46.8′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
-  most: 1
-- key: f-out:dartmouth
-  place: 50°20.6′N 3°33.8′W
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 39a
-  most: 1
-- key: f-out:ferrol
-  place: 43°28.2′N 8°15.8′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39c
-  most: 1
-- key: f-out:gaeta
-  place: 41°12.6′N 13°35.2′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
   most: 1
 - key: f-out:genoa
   place: 44°24.3′N 8°55.1′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  reason: 'the grid''s modern mole closes the harbour: no way out to sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship out; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79d
-  most: 1
-- key: f-out:lisbon
-  place: 38°41.6′N 9°12.4′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39d
-  most: 1
-- key: f-out:maddalena
-  place: 41°11.5′N 9°22.0′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
-  most: 1
-- key: f-out:morlaix
-  place: 48°40.9′N 3°52.9′W
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 39a
-  most: 1
-- key: f-out:oporto
-  place: 41°08.8′N 8°40.6′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39d
   most: 1
 - key: f-out:oran
   place: 35°43.8′N 0°41.6′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
+  reason: 'the grid''s modern mole closes the harbour: no way out to sea over the grid''s water between the road and the anchorage (package 111''s step 2b), so the business draws no ship out; that the harbour of the 1790s lay open there is JUDGEMENT, not read. The lead''s ruling of 2026-11-13: it stays shut, no anchorage moved and no patch cut; new chart work, for the cold review'
   owner: package 79c
-  most: 1
-- key: f-out:paimboeuf
-  place: 47°16.6′N 2°09.8′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 35
-  most: 1
-- key: f-out:palma
-  place: 39°33.3′N 2°38.1′E
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 79c
-  most: 1
-- key: f-out:poole
-  place: 50°41.9′N 1°58.4′W
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79b
-  most: 1
-- key: f-out:port-mahon
-  place: 39°52.7′N 4°17.6′E
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 79c
-  most: 1
-- key: f-out:rochefort
-  place: 46°00.3′N 1°09.6′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39b
-  most: 1
-- key: f-out:santander
-  place: 43°27.6′N 3°47.9′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39c
-  most: 1
-- key: f-out:setubal
-  place: 38°30.0′N 8°55.7′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 39d
   most: 1
 - key: f-out:st-malo
   place: 48°40.5′N 2°04.5′W
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+  reason: 'a leg of its tracks crosses the grid''s land by the game''s guard (`land_crossing`): the business draws no ship out. The only way the grid''s water allows is along the coast from the bay of La Fresnaye, Faden''s fourth passage, the Décollées, "very difficult, and frequented by none but small vessels" (Faden 1793): not a way for every trader. The lead''s ruling of 2026-11-13: it stays shut'
   owner: package 39a
   most: 1
-- key: f-out:st-marys
-  place: 49°54.9′N 6°19.6′W
-  reason: 'no `tracks:`; the straight line from the anchorage to the outer road crosses the grid''s land: the business draws no ship out'
-  owner: package 35b
+- key: f-shallow:bougie
+  place: 36°45.3′N 5°06.2′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 0.4 m on the leg to the road of Bougie: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 104
+  most: 2
+- key: f-shallow:calais
+  place: 50°58.8′N 1°49.5′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least 1.7 m on the leg to Calais road: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 79b
+  most: 2
+- key: f-shallow:catania
+  place: 37°29.9′N 15°05.9′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 1 legs, the least 1.8 m on the leg to the mole of Catania: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
   most: 1
-- key: f-out:st-peter-port
-  place: 49°28.9′N 2°29.9′W
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
+- key: f-shallow:civita-vecchia
+  place: 42°05.5′N 11°46.9′E
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 4 legs, the least ground drying 0.6 m on the leg to 42 05.53 N 11 47.00 E: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 4
+- key: f-shallow:dunkirk
+  place: 51°04.1′N 2°14.5′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least 2.5 m on the leg to 51 04 N 2 15 E: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 79b
+  most: 2
+- key: f-shallow:genoa
+  place: 44°24.1′N 8°55.1′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 3.3 m on the leg to the port of Genoa: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 79d
+  most: 2
+- key: f-shallow:la-goletta
+  place: 36°51.9′N 10°21.5′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least 2.0 m on the leg to the road of Tunis: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 104
+  most: 2
+- key: f-shallow:lampedusa
+  place: 35°29.8′N 12°36.1′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 3 legs, the least 0.5 m on the leg to the harbour of Lampedusa: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
+  most: 3
+- key: f-shallow:messina
+  place: 38°12.4′N 15°33.9′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 1 legs, the least ground drying 3.9 m on the leg to the harbour of Messina: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
+  most: 1
+- key: f-shallow:oporto
+  place: 41°08.7′N 8°40.5′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 2 legs, the least 1.0 m on the leg to within the bar of Oporto: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 2
+- key: f-shallow:paimboeuf
+  place: 47°13.5′N 2°15.8′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 6 legs, the least 2.0 m on the leg to 47 13.65 N 2 15.58 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 6
+- key: f-shallow:palermo
+  place: 38°07.7′N 13°22.6′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least -0.0 m on the leg to the mole harbour of Palermo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
+  most: 4
+- key: f-shallow:poole
+  place: 50°42.1′N 1°58.0′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 13 legs, the least 1.0 m on the leg to 50 42.05 N 1 57.85 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 13
+- key: f-shallow:porto-palo
+  place: 36°40.2′N 15°07.5′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 2.0 m on the leg to Porto Paolo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
+  most: 2
+- key: f-shallow:rochefort
+  place: 46°00.0′N 1°09.4′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 8 legs, the least 2.0 m on the leg to 45 59.98 N 1 09.36 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 8
+- key: f-shallow:santa-cruz-de-tenerife
+  place: 28°28.4′N 16°14.2′W
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 0.8 m on the leg to the road of Santa Cruz: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 106a
+  most: 2
+- key: f-shallow:setubal
+  place: 38°28.0′N 8°57.9′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 2.1 m on the leg to 38 28.45 N 8 56.60 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 111
+  most: 5
+- key: f-shallow:st-malo
+  place: 48°40.5′N 2°04.5′W
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 6 legs, the least ground drying 8.7 m on the leg to 48 41 N 2 05 W: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 39a
-  most: 1
-- key: f-out:toulon
-  place: 43°04.7′N 5°55.6′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
-  most: 1
-- key: f-out:villefranche
-  place: 43°42.1′N 7°18.8′E
-  reason: 'a leg of its track to sea crosses the grid''s land by the game''s guard: the business draws no ship out'
-  owner: package 79d
-  most: 1
+  most: 6
+- key: f-shallow:syracuse
+  place: 37°03.0′N 15°17.8′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least 0.6 m on the leg to off the mouth of the Great Harbour: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  owner: package 105
+  most: 4
 - key: f-shore-afloat:corunna
   place: 43°21.9′N 8°23.3′W
   reason: the landing given on the castle of San Antón, an islet the grid has as water; package 39c's rule has every spot of the block on a mark, so the spot stays until the castle's islet is given (package 111's step 2a left it)

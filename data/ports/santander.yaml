@@ -108,3 +108,15 @@ crew_pool:
   landsman: {hands: 12, pounds: 1, delay_h: 12}
 
 closed_to: []
+
+# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
+# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
+# game's land guard passes in and out; read against the pilot's channel: two cables south of
+# the Oradada and south of the sand bank toward Mount Castillo, then up to the road, as the
+# pilot has it.
+# Its least depth along the way, by the grid at its datum: 3.0 m, drawn through
+# water of 3 m and more on every leg.
+tracks:
+  to_sea: [43 27.36 N 3 47.40 W, 43 27.55 N 3 46.76 W, 43 27.88 N 3 45.80 W, 43 28.03 N 3 45.69 W, 43 28.23 N 3 45.66 W, 43 28.35 N 3 45.83 W, 43 28.76 N 3 46.52 W, 43 31.71 N 3 45.71 W]
+  from_sea: [43 31.71 N 3 45.71 W, sardinero-road]
+  in: [sardinero-road, 43 28.25 N 3 45.69 W, 43 27.98 N 3 45.66 W, 43 27.88 N 3 45.80 W, 43 27.55 N 3 46.76 W, 43 27.36 N 3 47.40 W, santander-road]
