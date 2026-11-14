@@ -27759,6 +27759,105 @@ failed, in four groups:
 - *Test*: the list's table, played through the order.
 
 
+### The cut: steps 1 and 2 on the trunk's sleep and wake (2026-11-14)
+
+The owner's word, by the lead, at the fifth reading: no more rounds of mends to the sleep and
+wake. The briefed work (steps 1 and 2) is closed out. What is not the brief's goes to a
+package of its own, the package of the two bodies. The lead's cut, built as commits forward
+from d2c081b3, which stays in the history as the record.
+
+**The trunk's sleep and wake again** (0826da93). crews.py, brains.py and captains.py are at
+the merge base's text (697c0f0b) but for the brief's:
+- crews.py: `mirror`'s clock; `release_done`'s first-hull guard; `switch` (every crewed body
+  by her own position, the hull he left woken when near); `_hulls_left_pruned`;
+- brains.py: `FarCaptain`'s `players_id` (a chase of his first hull);
+- captains.py: `Captain.give_up`.
+
+ships.py and scripts.py keep the package's whole: `Vessel.kept_hull` and its empty-plan rule,
+the targeting and `first_hull_current`, `_player_id(world)`; `cannot_anchor` and
+`ANCHOR_WORK_KEPT`. The check is the diff of the five files against 697c0f0b: no other
+function differs.
+
+**Out, with what they tested:**
+- how_she_lies, _plan_as_she_lies, tackle_as_she_lies, woken_true, rides_as_she_lay,
+  lies_as_her_far_body;
+- the P60 parts of promote, _to_full, demote, far_tick, _sail_state_of and station_world;
+- fold_back's folded_at_sleep and fold_in's skip; Captain's quiet entry.
+
+The tests:
+- `tests/test_sleep_and_wake.py` (the 36-cell table) leaves the tree. Its text is at
+  d2c081b3, for the new package's first test with the fifth reader's loopholes shut.
+- `tests/test_crews.py` goes back to the merge base's text. Its five wake tests leave: the far
+  ship wakes at her anchor with nothing set; the anchor goes in the chart's depth; where no
+  anchor holds she wakes lying to; how she lies is one answer; a ship under way is not frozen
+  at the anchor she weighed.
+- `tests/test_captive.py`: the captor's set-up as it was.
+- `tests/test_ship_changed.py`: "a crewed hull with no far brain lies where she is" as it was.
+
+**The take-up laid at her anchor** (ruling 3; 0826da93).
+- *Cause*: the trunk wakes a ship whose far body rode at an anchor with her far words' sail (her
+  topsails), and no anchor down. Taken up so, she drove (the second reading's 846 m).
+- *Mended*: `command.laid_at_her_anchor`, one state set at once: one anchor (the first
+  `cannot_anchor` passes) on the ground under her, at the scope the chart's depth wants,
+  brought up; an anchor marked down elsewhere laid again under her; nothing set; no way.
+  Where none holds: "No anchor of hers will hold her where she lies (...)." and nothing else.
+  No evolution is started, and nothing in it can refuse or raise.
+- *Called* where a ship of his is woken for him: at the take-up, and as he steps aboard her.
+  `movement`'s boarding wake is the package's own (the second reading, item 3), and in play it
+  wakes her before his order. Called from the take-up alone, she would ride under topsails with
+  no anchor between his boarding and his order. That is told to the lead.
+- *Test*: `tests/test_take_up_at_anchor.py`:
+  - every hull file, at an anchorage and in ordinary: the state, then an hour on. The anchor
+    bites within a band as she first comes back on her cable, then the ground does not move
+    and she is not dragging;
+  - no bottom, too deep, every anchor lost: the one line, no anchor down, nothing in hand;
+  - an anchor on ground a mile off, laid again under her;
+  - a second take-up.
+
+**Whom he knows of, and the refusals** (ruling 4; 0c6e76c4).
+- *Cause*: a hull's id was answered before `knows_of`, giving a stranger's name away; his
+  own prize and his consort out of sight were "no ship called".
+- *Mended*: `ship_for_him` asks `knows_of` of a hull named by her id as of one named by her
+  name. `knows_of` adds a prize of a ship of his and a consort under the orders of a ship of
+  his; out of his reach, the refusal is "lies beyond a boat's reach of you".
+- *Test*: `tests/test_ship_changed.py`: the hull's id; the prize and the consort; and the
+  brief's two refusals untested before (a held captain's station refuses the take-up; a
+  prisoner's 'take command' is refused by his prompt).
+
+**The old ship he leaves, measured on the cut** (ruling 5, before anything was built for it).
+- Laid up, and left to her officer with no intent: she lies at the same anchor on the same
+  ground with nothing set, through an hour and a turn of the tide asleep. Awake again, she
+  swings within her scope.
+- Left to her officer "to bound for Plymouth" while in port: she stays, and never sails. The
+  King's ship's doctrine leaves "in port" only "on: under way".
+- Left "to bound for Falmouth" where she lies: her far captain's voyage ends at once, the far
+  body is done, and the switch never wakes her. Her hull is kept only as the first hull.
+- Sent to the lead for a ruling; nothing built for it.
+
+**What a player meets, left for the package of the two bodies** (when he takes up or comes
+back to a ship of his that has lain asleep, on the cut):
+- At anchor (her far body riding at one): laid at her anchor whole by ruling 3. Where no anchor
+  holds, she wakes as the trunk wakes her: topsails set, no anchor, drifting. The place's depth
+  and tide are stale until her first minute. Her captain's state is re-entered and said at the
+  wake.
+- A far captain who sailed her while she slept leaves her anchor marked down where she fell
+  asleep, until the take-up lays it again under her. A ship that is not taken up keeps it so.
+- Under way: she wakes under her far words' sail at the far body's speed. A ship that was hove
+  to wakes read as under way, her topsails set. A hull with no far captain put to sleep under
+  way keeps her stale plan and lies to at its end. An anchor leg left in a stale plan can
+  freeze her at an anchor she weighed.
+- In ordinary: laid at the port's anchorage by ruling 3, nothing set. With no far captain, her
+  far body does not move.
+- Lying to (a lie_to leg, or a gale on any leg): the trunk's `_set_sail` sets her topsails.
+  On a smack nothing is set. On a lugger, the lug topsails.
+- An old ship left to her officer in port under an intent never sails (the doctrine). Left
+  bound for the port she lies in, she is put off the sea (the far body done).
+- A sleeping far body anchors by its plan or by the far order in any depth. The far body lies
+  to the same way for every rig.
+
+The inventory sent to the lead (the states of each body, every conversion with its function
+and line, the pairs, each rig's heave-to) is the new package's first page.
+
 
 
 ## Package 105: Sicily and Malta (2026-11-12)
