@@ -242,9 +242,10 @@ class Instance:
     want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
-    # the hands are up for it and are piped down by it: waiting its turn, made all-hands work
-    # before a pipe-down that would have left the watch too few for it (`Runner._after_all_hands`;
-    # package 75); or a numbered request whose file says `too_few: all hands until manned`, the
+    # the hands are up for it and are piped down by it: made all-hands work for itself, its watch
+    # too few, as it asked for its hands or before a pipe-down that would have left the watch too
+    # few for it (`Runner._made_all_hands`, the one road for both; package 75, the lead's (C5) of
+    # 2026-11-14); or a numbered request whose file says `too_few: all hands until manned`, the
     # hands called to man it, until it is manned (`Runner._take_hands`; the lead's ruling 10)
     held_up: bool = False
     short_logged: bool = False
@@ -1475,7 +1476,7 @@ class Runner:
                 inst.waiting = True
                 inst.waiting_for = WAITING_FOR_HANDS
                 return False
-            want = inst.want = want.as_all_hands()
+            want = self._made_all_hands(inst)
             self._call_all_hands(ship, inst, crew)
             got = hands.request(
                 crew,
@@ -1544,6 +1545,22 @@ class Runner:
             inst.held_up = False
         return True
 
+    def _made_all_hands(self, inst: Instance) -> hands.CrewRequest:
+        """Work made all-hands work for itself because the watch is too few for it (package 75,
+        the lead's ruling (1) of 2026-11-10; `hands.CrewRequest.calls_all_hands`), the one road
+        for both places that make it so: as it asks for its hands (`_take_hands`) and as a
+        pipe-down would leave it too few (`_after_all_hands`). Its request is all hands (the
+        boat's, `until manned`, keeps its number), and the hands are up for it and piped down by
+        it (`Instance.held_up`), so that taken away before it began (belayed, refused, done
+        already, failed) it ends the call as its end would. Made so as it asked for its hands it
+        was not marked, and work made all-hands there that then waited and was belayed or refused
+        left the hands up for nothing (the lead's (C5) of 2026-11-14). Returns its request."""
+        want = self._want(inst)
+        if not want.until_manned:
+            want = inst.want = want.as_all_hands()
+        inst.held_up = True
+        return want
+
     def _manning(self, ship: Ship, inst: Instance) -> bool:
         """Whether this work waits, said by the call, while the hands called to man it come up:
         held up on its numbered request (`too_few: all hands until manned`, `Instance.held_up`)
@@ -1559,36 +1576,51 @@ class Runner:
     ) -> bool:
         """Whether this work calls all hands because the watch on deck is too few to begin it
         (package 75, the lead's ruling (1) of 2026-11-10; `hands.CrewRequest.calls_all_hands`):
-        its file says so, the hands on deck are too few for it counting those at other work
-        (`hands.too_few_on_deck`), all hands are not up already, the ship is not at quarters,
-        and the order named no party of its own (`hands_from`, which `_check_party` judges).
-        Work manned and piped down at once (`until manned`, the boat's crew) calls by package
-        109's own trigger, so that the one road keeps the boat's lines (the lead's ruling 10 of
-        2026-11-13): its request came back too few and no work of the runner's has the hands,
-        so a watch busy at other work waits, said, and a hand at the pumps does not make the
-        deck enough. Any other request waits for hands, as before."""
-        if not want.calls_all_hands or crew.all_hands_called or _at_quarters(ship):
+        all hands are not up already and the deck as it is now is too few for it by
+        `_calls_for_itself`, the one judge."""
+        if crew.all_hands_called:
             return False
-        if inst.params.get("hands_from"):
-            return False
-        if want.until_manned:
-            return not self._other_work(inst)
-        pool = self._pool(crew, inst)
-        return hands.too_few_on_deck(crew, pool, want, self._aloft(inst), posts=True)
+        return self._calls_for_itself(ship, inst, crew, want, self._pool(crew, inst))
 
     def _too_few_piped_down(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Whether work waiting its turn would call all hands for itself the moment the hands
-        were piped down: `_watch_too_few`'s rule read on the deck as the pipe-down would leave
-        it (`bill.on_deck_piped_down`), all hands not called and nobody turned up. Read by
-        `_after_all_hands` before it pipes down (package 75, the review of the lead's ruling (1)
-        of 2026-11-10), with the post of the watch then on deck where it would be counted
-        (`_working_posts`; the lead's ruling 11 of 2026-11-13)."""
-        want = self._want(inst)
-        if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
-            return False
+        were piped down: `_calls_for_itself`, the one judge, read on the deck as the pipe-down
+        would leave it (`bill.on_deck_piped_down`, all hands not called and nobody turned up),
+        with the post of the watch then on deck where it would be counted (`_working_posts`;
+        the lead's ruling 11 of 2026-11-13). Read by `_after_all_hands` before it pipes down
+        (package 75, the review of the lead's ruling (1) of 2026-11-10)."""
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
         deck = bill.on_deck_piped_down(crew, when) + self._working_posts(crew, inst, True)
-        return hands.too_few_on_deck(crew, deck, want, self._aloft(inst), posts=True)
+        return self._calls_for_itself(ship, inst, crew, self._want(inst), deck)
+
+    def _calls_for_itself(
+        self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, deck: list
+    ) -> bool:
+        """The one judge of whether this work, on `deck`, is too few to begin and calls all hands
+        for itself (the lead's (C5) of 2026-11-14): asked as it asks for its hands
+        (`_watch_too_few`, the deck as it is) and before a pipe-down (`_too_few_piped_down`, the
+        deck as the pipe-down would leave it), so that the hands are never piped down to be
+        called again for it on the same tick. Its file says so, the ship is not at quarters and
+        the order named no party of its own (`hands_from`, which `_check_party` judges).
+
+        Work manned and piped down at once (`until manned`, the boat's crew) by package 109's own
+        trigger, so that the one road keeps the boat's lines (the lead's ruling 10 of
+        2026-11-13): its request would come back too few on that deck (the hands idle there under
+        half its number) and no work of the runner's has the hands, so that a watch busy at
+        other work waits, said, and a hand at the pumps does not make the deck enough. Judged
+        before the pipe-down by the deck's count, which holds the hands at the pumps, the boat
+        waiting behind all-hands work at anchor with her watch at the pumps saw the hands piped
+        down and called all hands again on that tick. Any other such work by the deck's count,
+        hands at other work counted (`hands.too_few_on_deck`), so that a watch busy elsewhere
+        waits as before."""
+        if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
+            return False
+        aloft = self._aloft(inst)
+        if want.until_manned:
+            wanted = min(int(want.hands), hands.company_can_give(crew, aloft))
+            idle = sum(1 for s in deck if s.at is None and hands.can_work(s, aloft, posts=True))
+            return idle < wanted * hands.SHORT_HANDED_SHARE and not self._other_work(inst)
+        return hands.too_few_on_deck(crew, deck, want, aloft, posts=True)
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
@@ -1858,9 +1890,7 @@ class Runner:
             return
         for i in self.instances:
             if i.waiting and i is not inst and self._too_few_piped_down(ship, i, crew):
-                if not self._want(i).until_manned:
-                    i.want = self._want(i).as_all_hands()
-                i.held_up = True
+                self._made_all_hands(i)
         if any(
             i.waiting and i is not inst and (i.held_up or self._want(i).all_hands)
             for i in self.instances

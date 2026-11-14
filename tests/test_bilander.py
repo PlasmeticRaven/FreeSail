@@ -2709,6 +2709,94 @@ def test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again(
     assert not [ln for ln in lines if ln[1] == "evolution.failed"]
 
 
+def test_her_settee_work_made_all_hands_work_and_taken_away_before_it_began_pipes_down():
+    """The lead's (C5) of 2026-11-14, shown reachable and mended: settee work made all-hands work as
+    it asked for its hands (`Runner._take_hands`, its watch too few) that waited and was then
+    belayed, or was found done already when it came to begin, ended the call as its end would only
+    where the other road had made it so (`Runner._after_all_hands`, `Instance.held_up`): one road
+    now, `Runner._made_all_hands`, for both. Reached at nine by night with her larboard watch
+    unable to go aloft (a hand sick, the other two hurt at light duty) and the first two of the
+    starboard, the call's first arrivals, hurt at light duty too: "furl the mainsail" calls all
+    hands ("All hands! (to furl the mainsail)") and waits for a hand who goes aloft ("Not hands
+    enough on deck to furl the mainsail; there are none to spare."). Belayed then ("belay that"),
+    the hands are piped down on that tick; found furled already when it comes to begin (furled by
+    hand while it waits), the same. Old (53c14457): the hands left up for nothing, all hands called
+    to the end."""
+    from freesail.crew.model import Watch
+
+    for then in ("belay that", "furled meanwhile"):
+        w = _her_at(2, (SETTEE,))
+        crew = w.ship.extra["crew"]
+        crew.watch_on_deck = Watch.LARBOARD
+        larboard = [s for s in crew.sailors if s.watch is Watch.LARBOARD and not s.post]
+        larboard[0].fit, larboard[0].hurt = False, "sick"
+        for s in larboard[1:] + [s for s in crew.sailors if s.watch is Watch.STARBOARD][:2]:
+            s.hurt = "hurt"
+        w.run(10)
+        start = w.clock.tick
+        assert w.submit("furl the mainsail").kind == "order.accepted"
+        (work,) = w.ship.extra["evolutions"].instances
+        assert work.waiting and work.want.all_hands and work.held_up
+        if then == "belay that":
+            assert w.submit("belay that").kind == "work.belayed"
+        else:
+            w.ship.sails[SETTEE].state = SailState.FURLED
+        w.run(5)
+        lines = [(e.tick - start, e.kind, e.text) for e in _after(w, start)]
+        assert (1, "crew.all_hands", "All hands! (to furl the mainsail)") in lines, lines
+        said = "Not hands enough on deck to furl the mainsail; there are none to spare."
+        assert (1, "evolution.waiting", said) in lines, lines
+        assert [k for _, k, _ in lines].count("crew.piped_down") == 1, (then, lines)
+        assert not crew.all_hands_called and not w.ship.extra["routine"].calling, then
+        assert not w.ship.extra["evolutions"].instances
+
+
+def test_her_boat_waiting_behind_all_hands_work_with_her_watch_at_the_pumps_is_manned_on_them():
+    """The lead's (C5) of 2026-11-14, shown reachable and mended: the boat was judged by two rules,
+    as she asks for her hands (`Runner._watch_too_few`: her request too few and no work of the
+    runner's has the hands, package 109's trigger) and before a pipe-down (`_too_few_piped_down`:
+    the deck's count, which holds the hands at the pumps), and the two disagreed: now one judge,
+    `Runner._calls_for_itself`, asked in both places. Package 109's Torbay world at anchor, 02:10
+    and her larboard watch given the deck, at nine, a seam started forward and water in the well:
+    "man the pumps" (the larboard's three at the brakes) and "heave short" (all hands); the boat
+    ordered 5 s on waits for the heave ("Not hands enough on deck to send boat; the watch is
+    heaving short."). Hove short at +957 s: the boat is manned on the hands up that tick ("Only
+    four hands to send boat"), and the hands are piped down once she is, one call and one
+    pipe-down. Old
+    (53c14457): piped down at +957 s and on that tick "All hands! (to send boat)" again (the deck's
+    count of four with the master enough, her request with the three at the pumps too few), the
+    boat begun at +1,048 s on the second call."""
+    from freesail.crew.model import Watch
+    from freesail.world.water import water_of
+    from tests.test_mends_109 import _anchored_bilander
+
+    world = _anchored_bilander(watch_of_two=False)
+    world.ship.extra["crew"].watch_on_deck = Watch.LARBOARD
+    well = water_of(world.ship)
+    well.tons = 6.0
+    well.seams.append({"words": "a seam started forward", "t_per_h": 3.0, "since": 0})
+    start = world.clock.tick
+    assert world.submit("man the pumps").kind == "pumps.manned"
+    assert world.submit("heave short").kind == "order.accepted"
+    world.run(5)
+    assert world.submit("send the boat ashore for the prices").kind == "order.accepted"
+    begun = None
+    for _ in range(1500):
+        world.tick()
+        begun = [e for e in _after(world, start) if e.text.startswith("Away the long-boat's")]
+        if begun:
+            break
+    lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    calls = [(t, text) for t, kind, text in lines if kind == "crew.all_hands"]
+    piped = [t for t, kind, _ in lines if kind == "crew.piped_down"]
+    (hove,) = [t for t, kind, _ in lines if kind == "cable.hove_short"]
+    assert calls == [(1, "All hands! (to heave short)")], calls
+    assert abs(hove - 957) <= 10 and piped == [hove], (hove, piped)
+    said = "Only four hands to send boat; there are no more on deck."
+    assert (hove, "evolution.short_handed", said) in lines, lines
+    assert begun and begun[0].tick - start == hove
+
+
 @pytest.mark.parametrize(
     "knots, haul_s, lowered_s, factor",
     [(15.0, 90, 149, 1.342), (20.0, 93, 159, 1.517)],
