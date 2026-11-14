@@ -265,7 +265,7 @@ This head carries the test suite's own audit, which the owner asked for by name.
 
 171 test files, 141,400 lines, 3,842 test functions, **8,138 cases**: 7,622 in the fast tier and 516 in the slow (the days sailed, the long truths, the pace tests). Three files make a third of the cases: the primer's checks (1,095), the ship view's geometry (1,045) and the order table (726).
 
-*(The timed run of the fast tier at the commit under review was still going when this sitting was committed. Its figures are a stopwatch's, not a judgement's, and are added below when it ends: see 3.9.)*
+The fast tier, timed by the review at the commit under review on four workers: **exit 0, 7,613 passed, 9 skipped, 78.7 minutes by the clock, 5.2 hours of one core's work.** (This figure and 3.9 were added when the run ended, after the first sitting was committed: a stopwatch's figures, not a judgement's.)
 
 ### 3.2 What the suites prove, and what they only pin
 
@@ -337,7 +337,7 @@ Beyond head 5.3's list of what the reviewer met in play:
 
 ### 3.5 Tests that test the same thing
 
-- **The truths call the tests.** In the second half of the truths' file, **82 truths call tests of other files, and 73 of them do nothing else**: 163 distinct tests in 27 files. (A reader counting more loosely made it 102 and 197; the figures here are the reviewer's own count: 5.5, item 12.) The truth and its twin do not differ, so each twin runs at least twice in a whole run, and some three times. Both halves of several pairs are on the slow list; four slow twins run in the *fast* tier through truths not marked slow; and calling a twin by name drops the twin's own skip, so that without Node eleven truths error where their twins would skip (`tests-02`, `tests-07`, `tests-11`).
+- **The truths call the tests.** In the second half of the truths' file, **84 truths call tests of other files, and 73 of them do nothing else**: 163 distinct tests in 27 files. (A reader counting more loosely made it 102 and 197; the figures here are the reviewer's own count: 5.5, item 12.) The truth and its twin do not differ, so each twin runs at least twice in a whole run, and some three times. Both halves of several pairs are on the slow list; four slow twins run in the *fast* tier through truths not marked slow; and calling a twin by name drops the twin's own skip, so that without Node eleven truths error where their twins would skip (`tests-02`, `tests-07`, `tests-11`).
 - **Six hull files are one test written six times**: about 60 of their 121 functions follow the same eleven sections; three of the sections are proved again for every ship elsewhere. One table and six parametrised tests would replace some 45 functions and a thousand lines (`tests-06`).
 - **The same scene built again and again for one line each.** The struck ship seventeen times in two files; the hove-to brig eleven times (once only to check that a line does not parse); the two-hour passage in the cabin five times; a brig sailed from nothing twenty-six times in one file for 1,200 to 2,400 seconds each; a 1,500-tick settle fifteen times in another (`tests-04`, `tests-07`, `tests-10`).
 - **The same day sailed in two files under the same fixture names**: the frigate's and the schooner's sweeps and the frigate's polar (`tests-10`); truth 27's four gales (`tests-04`); the gale trial three times; the replay-to-digest check about twenty times (`tests-01`).
@@ -374,19 +374,37 @@ Beyond head 5.3's list of what the reviewer met in play:
 
 ### 3.8 What would make the suite cheaper without making it weaker, ranked
 
+*(The seconds in square brackets were added from the timed run of 3.9.)*
+
 Written before the records were opened, from the readers' evidence; the seconds beside each are added from the timed run where it gives them. None changes a test here: each is proposed in words for the owner.
 
-1. **Run each test once.** Replace the truths that only call another file's test (73 of them) with a register: the truth's number, its sentence, and the name of the test that proves it, with one check that every name exists. *Saves:* the second (and third) run of 163 tests, among them the slowest in the suite; the four slow tests that leak into the fast tier; the errors without Node. *Risks:* none to what is proved; the same test still runs. The owner keeps the numbered truths as a register he can read.
+1. **Run each test once.** Replace the truths that only call another file's test (73 of them) with a register: the truth's number, its sentence, and the name of the test that proves it, with one check that every name exists. *Saves:* the second (and third) run of 163 tests, among them the slowest in the suite [in the fast tier alone 1,555 seconds of work, a twelfth of the tier, and the single dearest test in it]; the four slow tests that leak into the fast tier; the errors without Node. *Risks:* none to what is proved; the same test still runs. The owner keeps the numbered truths as a register he can read.
 2. **Read the world's fixed data once a process, not once a world.** A world set on the chart reads the chart's index (twice), 121 port files and the tide tables with a slow reader: six to eleven seconds a build on this machine (`refute-07`). The data does not change in a run. *Saves:* seconds from every test that builds a scenario's world, which is thousands; probably the largest single cut, and the player's start-up with it. *Risks:* low, if what is cached is never changed by a test; the determinism test would show a leak.
 3. **Build a scene once and copy it.** The game has an exact checkpoint. A fixture that settles the brig, strikes the ship or sails the cabin's passage once, and hands each test a copy restored from memory, replaces seventeen, eleven, five and twenty-six sailings with one each. *Saves:* most of the time of the files named in 3.5. *Risks:* medium: the fixture must be built in the run, never read from a file, or it goes stale in silence as saved fixtures do.
-4. **Decide the tier by measurement.** Let a whole run write each test's seconds to a file in the tree; let the suite mark slow whatever took over the threshold last time; fail when a listed name matches no test. *Saves:* the 370 typed ids, the four dead ones, the heavy tests no list names, the marks scattered through test files. *Risks:* low.
+4. **Decide the tier by measurement.** Let a whole run write each test's seconds to a file in the tree; let the suite mark slow whatever took over the threshold last time; fail when a listed name matches no test. *Saves:* the 370 typed ids, the four dead ones, the heavy tests no list names, the marks scattered through test files [565 tests in the fast tier take more than the tier's own five-second threshold, and they are 65 per cent of its work: held to its own rule, the fast tier would be about a third of what it is]. *Risks:* low; the tests still run, in the slow tier, which the cloud runs at every merge.
 5. **One table for each family.** The six hull files; the scenarios' round trips; the chart blocks' three tests each; the hove-to cases. *Saves:* some two thousand lines and their upkeep. *Risks:* low.
-6. **Sort the suite into three kinds and run each when its subject changes.** The game's behaviour; the agreement of data, documents and tools with one another (the ship files against their notes, the generator's byte-for-byte checks, the primer's 1,095 cases, the chart's audit); the tools' own tests. *Saves:* a third of the cases on most pushes. *Risks:* low, and it mends a hole: today a change to a document runs nothing, though the game serves documents.
+6. **Sort the suite into three kinds and run each when its subject changes.** The game's behaviour; the agreement of data, documents and tools with one another (the ship files against their notes, the generator's byte-for-byte checks, the primer's 1,095 cases, the chart's audit); the tools' own tests. *Saves:* a third of the cases on most pushes [the primer's checks alone are 2,575 seconds, 14 per cent of the fast tier; the ship view's 782]. *Risks:* low, and it mends a hole: today a change to a document runs nothing, though the game serves documents.
 7. **Mend or drop every test shown here not to fail.** The list is in `faults-1` to `faults-4`, each with the fault that should make it fail. *Saves:* no time; it buys back the meaning of a green run. *Risks:* none.
 8. **Keep digests, thin the other pins.** A digest of a replay proves determinism and should stay. A tick, a count of lines or a figure to the millimetre should stay only where no property would do; where one stays, its reason should be data a tool can list, so that a moved pin shows as "what changed in the game, and was it meant". *Risks:* medium: a property catches less unintended change than a pin. Do it first where a pin has been moved more than twice.
 9. **Take the pace tests off shared machines,** set each floor from a measurement with a stated margin, and stop reading floors from the code under test. *Saves:* the release gate's coin toss. *Risks:* low.
 10. **Add the player's road** (this one costs time, a little): a handful of scenarios started as the harbour starts them and given the first orders a newcomer would give, asserting only that he is answered truly. The browser probe is built for it. It would have caught every item of head 1.5.
 11. **Small mends:** the shard grouping; the checkout's depth or the six tests that need it; one rule in the suite that the simulation's packages import nothing above them (F4.1).
+
+### 3.9 The timed run
+
+*(Added when the run ended, after the first sitting was committed and while the records were being read. It measures; it does not judge.)*
+
+The fast tier at the commit under review, as the launch gave it (`python3 -m pytest -n 4 -q -p no:cacheprovider`), with an observer that only writes down each test's seconds as it finishes: **exit 0; 7,613 passed, 9 skipped; 78.7 minutes by the clock; 18,743 seconds of work.** One fault runner shared a core for the first quarter of an hour and readers ran short probes throughout, so the clock reads some minutes long; the lead's figure for the same tier is an hour, and the tuning notes' 54 to 59 minutes. Each test's seconds are in `timings/fast-tier-per-test.csv`; by file, beside each reader's verdict, in `tests-by-file.md`. The slow tier and the pace tests were not run by the review: by the records the whole suite takes about seventy minutes on six machines in the cloud, and a builder's three tiers about four hours.
+
+What the seconds say:
+
+- **The fast tier is not fast by its own rule.** The suite's threshold for a slow test is five seconds, "the fast tier in a few minutes". **565 tests in the fast tier took more than five seconds, and they are 65 per cent of its work;** 124 took more than twenty seconds and are 44 per cent. One truth took 651 seconds and another 537. More than half the tier's cases (4,193) took under half a second.
+- **Two files are 37 per cent of the tier:** the truths (4,358 seconds, 244 cases) and the primer's checks (2,575 seconds, 1,095 cases at 2.4 seconds each).
+- **The truths that call other tests cost a twelfth of the tier.** Forty-seven of them run in the fast tier and take 1,555 seconds, over a third of the truths' own time there. 128 of the tests they call also ran in the same tier under their own names (951 seconds). The dearest test of the whole tier, at 651 seconds, is one such truth: it runs, in the fast tier, tests that are on the slow list under their own names.
+- **The cost is in the bodies, not the fixtures:** setup is 321 seconds of the 18,743. Tests build their worlds inside themselves, one each.
+- **The nine skips** are the eight hull tests that want a commit a shallow clone does not hold, and one other.
+
+What it has cost the work, by the records (5.9): the fast tier has grown fourfold in six weeks and has not been measured since it was first split; the lead runs it for most of an hour before every merge; 91 runs of the whole suite in the cloud in seventeen days; a builder's run cut at two hours at least fifteen times; and, to spare the builders, the rule of 28 October that a builder no longer runs a whole tier after a mend, which is the point at which "green" came to mean less.
 
 ---
 
@@ -519,7 +537,7 @@ The records show the first sitting wrong, or short, in these places. None is rew
 9. **Determinism** (§3.2) is by the C library, not only by the operating system: nine recorded passages moved when the cloud's image changed. The remedy pinned one workflow's image and left the other floating (`docs/dev/TuningNotes.md:22871-22912`).
 10. **The "sheet-tending" fault** the earlier review's ruling left "not now" was in fact mended.
 11. **The port's key `leave_on`** (F2.2) is read; see 5.11.
-12. **The truths that only call other tests** (3.5; 3.8, item 1). The reviewer's own count, made after a reader of the sealed notes counted fewer: **82** truths call a test of another file, **73** of them with nothing else in the body, and the tests so called are **163** in 27 files. The first reader's 102 and 197 counted more loosely. The finding stands at the smaller figure.
+12. **The truths that only call other tests** (3.5; 3.8, item 1). The reviewer's own count, made after a reader of the sealed notes counted fewer: **84** truths call a test of another file (82 counting only calls at the body's top level), **73** of them with nothing else in the body, and the tests so called are **163** in 27 files. The first reader's 102 and 197 counted more loosely. The finding stands at the smaller figure.
 
 ### 5.6 Where the record and the thing differ
 
@@ -745,4 +763,4 @@ All under `docs/reviews/ColdReview-M7-evidence/`. A reader's file is kept as the
 | `probes/` | Short scripts that reproduce seven findings (the checkpoint, the director twice, the guns, the blockade, the far fisherman, a port file's misspelt key). Run from the repository's root. |
 | `records-01` to `records-06` | The second sitting: the project's records set against the first sitting. |
 | `sealed-notes-tried.md` | Each item of the lead's sealed notes tried at the commit. |
-| `timings/` | The timed run of the fast tier: each test's seconds as it finished. |
+| `timings/fast-tier-per-test.csv` | The timed run of the fast tier: each test's seconds, dearest first. (Seven test names that carry a vendor's or a client's name are masked in it.) |
