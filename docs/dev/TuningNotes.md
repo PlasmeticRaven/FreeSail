@@ -28626,3 +28626,148 @@ added and nothing else (the audit's check (d) run on each).
   compared in bells"); a book wanting a clock hour has no word for it.
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
+
+## Package 109, step 5: the vessels kept off the land (note 3), as ruled
+
+Step 5 asked that the unchecked legs be led round the land by the road the plain legs take,
+or a stop and a report. It stopped on the pace (the lead's ruling of 2026-11-13, 18:00): the
+steering is package 61's, measured below for it; the step brings the goal's square laid
+where the water is, and the words for a hull asleep in the ship's view put in the world's.
+
+### Vessels on land: what package 109 measured, for package 61
+
+The owner's note: vessels of the busy sea seen over the land. Package 109's step 5 was to lead
+the unchecked legs (to the ship, in company, on station, a chase, a flight, going home, the
+business's re-made plans) round by the road the plain legs take, `captains.Planner.sea_route`,
+or to stop and say what it would take. It stopped, by the lead's ruling, on the pace; the
+steering is package 61's, and **nothing of it is in the tree: the prototype exists only as
+described here.**
+
+**The count** (a scratch script: a scenario's busy day with the world's business on, every
+vessel's place read against the chart every ten minutes; land is `chart.depth_at` below
+nought, a height above the datum), at 128741b: naval-cruise, 8 of 35 vessels on land at some
+sample (the legs then: to 23, away 3, chase 3, to_ship 2, home 1); Channel east, 6 of 24 (to 8,
+home 7, to_ship 1). Of them: package 43's scripted goals left as warnings on purpose
+(Diamond's square off the Raz, the Hirondelle, the Swift); legs steered straight at a target
+(to_ship, home, chase) and the business's re-made plans (the Good Intent, the Brothers, the
+Mary, the pilot cutters going home); and flight straight off a stranger onto the shore.
+
+**The prototype** (`world/ships.py`, `Vessel.tick`): where each steered leg (to, home, to_ship,
+chase) takes its bearing, `_led_round(world, target, dt)`: where `land_crossing` finds the
+straight line to the target over dry ground, she steers for the first mark of
+`Planner.sea_route(position, target)` and reaches the leg's own mark only by its own line;
+`_flight_clear` gives a ship in flight the nearest course either hand, in steps of 22.5
+degrees, whose run of two miles keeps clear. Her way kept on the vessel (`_way`, a class
+attribute left out of the pickle while None). First form: the way tried again every 600 s.
+Second (the one attempt the lead allowed): the road laid once a leg and its marks sailed in
+turn, a fixed target's road kept for the leg, a moving one's laid again when the target had
+moved a quarter of the way to it (a mile at the least) or after 3,600 s, a road with no mark
+kept as given. Constants: `WAY_RELAID_S` 600, `ROAD_RELAID_S` 3600, `FLIGHT_LOOK_NM` 2.
+
+**What it bought and what it cost** (the base and the prototype run side by side under one
+load, a busy day each):
+
+| | naval-cruise on land | ticks a second | Channel east on land | ticks a second |
+|---|---|---|---|---|
+| the trunk | 8 of 35 | 159 / 165 | 6 of 24 | 226 / 226 |
+| first form (every 600 s) | 3 of 35 | 70 | 3 of 22 | 177 |
+| second form (a road a leg) | 5 of 35 | 158 | 2 of 22 | 236 |
+
+Truth 7-159's form (the convoy of six and the privateer, the best of five thousands, three
+rounds each, the machine quiet) showed no cost: 537 to 546 without, 552 to 575 with. The
+second form's figures move about four in a hundred either way from day to day, so the lead's
+bar of two in a hundred could not be shown met; naval-cruise measured over it.
+
+**The profile.** `Planner.sea_route` costs about half a second a call (52 calls, 24 s, in two
+hours of naval-cruise): every call builds the common tracks' graph again and tries its joins
+by `clear` (`chart.line_shore`, `coast_distance`, `nearest_shore`). `land_crossing` once a
+vessel every ten minutes is cheap where a clear answer is kept. **What package 61 would want:**
+the tracks' graph built once a World (or a chart), and the joins from a point to the graph
+kept by cell, so that a vessel's road is cheap to ask for as often as a moving target needs.
+
+**What the first form moved:** the captain's trial in thick weather
+(`test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits`,
+`TRIAL_TRADE_THICK_LINES` 426 → 427, its digest with it): the Falmouth pilot's cutter, going
+home after putting the pilot aboard across the land, led round and seen otherwise (added:
+12900 `lookout.glass` "The glass on the Falmouth pilot's cutter on the larboard quarter: under
+way on the starboard tack, close-hauled, under plain sail."; 13260 `lookout.sail_lost` "... on
+the larboard quarter is out of sight."; gone: 13920 `lookout.sail_lost` "... on the starboard
+bow is out of sight."). The known truths' whole list was not finished (two runs lost to
+restarts of the container).
+
+**Every landing the road did not mend** (the guard on), with its place and its height:
+
+- **The Mary** (Channel east), bound for Portland Road (a port's road, 12.6 m of water): on
+  the Isle of Portland, 50°34′N 2°26′W, 90 to 103 m above the datum, at 23:45 to 23:50 under
+  both forms, **five minutes after her straight line had been judged clear**. The first to
+  look at.
+- **The Hirondelle**, 06:10, 48°02′N 4°50′W, 1 m: her start at the shore's edge.
+- **The Plymouth cutter** (`ship-27`), `to_ship`, 50°22′N 4°09′W, 16 m; **the Alderney
+  pilot's cutter**, `to_ship`, 49°43′N 2°14′W, 5 m: the ship each makes for lies close under
+  the land (Alderney's mooring itself stands on dry ground, package 111's `f-dry:alderney`).
+- **The Cygnet**, in a chase, 48°16′N 4°37′W, 7 m.
+- Under the second form, **the Diamond** (14 samples, 29 m) and **the Swift** (going home,
+  38 m) on land again after their roads' last marks.
+- The Brothers was no mark ashore: her marks are at sea and she crossed the land on the way;
+  the second form kept her off.
+
+Package 111's count of ports whose ways in or out the land guard refuses
+(`tools/audit_chart.py --check f`) is the same with the prototype as without (25 on this
+base): it steers, and changes no plan or track the guard judges.
+
+### Step 5: a goal's square laid where the water is
+
+**Found.** `ships._goal_plan` lays a patrolling ship's square as four marks at the goal's
+radius west, north, east and south of the station, never looked at against the chart. Read
+for every scenario's patrolling ship (33 squares; a scratch script, `_goal_plan` from each
+ship's goal words): the Diamond's off the Raz (naval-cruise) had its east mark on Cap Sizun,
+48.0389 N 4.5383 W, 22.6 m above the datum, and two legs across the land (her plan's warning
+since package 43); the squares off the Lizard (encounter's and first-action's Renard,
+squadron's Medusa, Nimble and Sparrow; convoy-six's Vengeur off the Lizard within 20 miles;
+the-channel-observed's Medusa off the Deadman) had a north mark inland or a leg across the
+Lizard; the blockade's Naiad and Nimble a leg across the land by the Black Rocks.
+
+**Built** (`ships._off_the_land`, called by `_goal_plan` on the square): each mark that stands
+on dry ground (less than `OFF_THE_LAND_DEPTH_M`, 10 m, under her), or whose leg from the mark
+before crosses the land (`land_crossing`), is laid at the nearest point, sought in rings a
+quarter-mile apart every 15 degrees out to twice the square's radius, with water under her
+and both its legs clear (to the mark after, where that one stands in water); the others as
+package 43 laid them. The Diamond's east mark goes to 0.3 miles off the Raz (48.0387 N
+4.7439 W, 17.6 m), the nearest point whose legs keep clear of Cap Sizun (the peninsula lies
+between the bays her north and south marks stand in), her north mark half a mile out (48.1724
+N to 48.1807 N), her west and south marks as they were; her warning is gone. **Truth 7-545**:
+every patrolling ship's square, read from her goal's words, has its marks in water and its
+legs clear, and none sailing by it carries the warning; the Diamond's marks old beside new.
+**The toggle**: with the trunk's `world/ships.py` the truth fails at the blockade's Naiad (a
+leg across the land); with it, it passes.
+
+**What it moves, measured alone** (the mend on 128741b, in a worktree of its own): the fast
+tier whole, exit 0; the slow tier of the known truths whole, exit 0; the slow tier of
+test_captain_trials, test_checkpoint, test_hulls, test_squadrons, test_brains,
+test_scenarios, test_ships and test_replay, exit 0. **No recorded passage, digest, truth,
+trial or kept save moves**: the squares that move are sailed by brains whose plans are their
+own, or beyond any passage's sight. **The busy day** (naval-cruise, business on, the two run
+side by side): 8 of 35 vessels on land with it and without; the Diamond 18 samples up to 78 m
+above the datum without, 2 samples at the shore's edge (0 m, 48°03′N 4°52′W, off the Raz)
+with; the Swift unchanged (going home across the land, 69 m: the steering's, package 61's);
+167 and 171 ticks a second.
+
+**With it, the lead's wording mend** (1e18a4f): the ship's view of a hull asleep says "she is
+not seen closely enough to draw her sails as they are set" (was "she is not drawn as she
+stands; she sails in the far shape, her sails her file's and not as they are set": the
+engine's words on the player's page); the one test pinning them moved, old beside new.
+
+**The suites, as run (step 5).** At **aea989e** (the trunk merged by merge commit: package
+109's step 4 as merged, packages 102 and 106a closed; the appended ends kept, the trunk's
+first), in a worktree pinned there, this container, four workers, one suite at a time.
+`ruff check .` and `ruff format --check .` clean (390 files). **The fast tier** whole: exit 0,
+7,618 run, no failure, 1 skipped, 515 slow left out. **The slow tier** (`--slow -m "not pace"
+-n 4`), in two runs for the time a background job may run: test_mends_109.py,
+test_known_truths.py, test_browser_probe.py, test_server.py, test_in_world.py: exit 0, 649 run,
+no failure, 8 skipped, every browser plan played and passed; test_captain_trials.py,
+test_squadrons.py, test_brains.py, test_scenarios.py, test_ships.py: exit 0, 87 run, no
+failure. The recorded passages and trials among them, every pinned digest, line count and
+tick held. **No digest moved, no kept save; the one pin moved is the sleeping hull's words,
+old beside new.** **The pace**, alone and last (`--slow -m pace -n 0`, the same ten files, load
+3.1 at its start): exit 0, 12 passed. The tree reported differs from aea989e by this paragraph
+alone.
