@@ -331,19 +331,20 @@ def test_websocket_streams_events_and_snapshots(client):
 
 
 def test_save_from_the_order_box_and_the_driver(tmp_path):
-    """`save PATH` typed in the order box writes the same file the console's `save`
-    writes, says so in the log, and is not journaled (a replay must not re-save); the
-    driver action and the download route give the same save."""
+    """`save NAME` typed in the order box writes the same file the console's `save`
+    writes, in the saves place (package 115: a save over the server is named, and a path
+    out of the saves place is refused), says so in the log, and is not journaled (a replay
+    must not re-save); the driver action and the download route give the same save."""
     world = world_for(SHIPS[0])
     driver = Driver(world)
-    app = create_app(driver)
+    app = create_app(driver, saves_dir=tmp_path)
     with PageClient(app) as client:
         client.post("/api/order", json={"text": "set the jib"})
         client.post("/api/driver", json={"action": "tick", "value": 5})
         journal_before = list(world.journal)
 
         target = tmp_path / "voyage.json"
-        r = client.post("/api/order", json={"text": f"save {target}"})
+        r = client.post("/api/order", json={"text": "save voyage"})
         assert r.status_code == 200
         assert r.json()["kind"] == "driver.saved"
         assert "tick 5" in r.json()["text"]
@@ -355,7 +356,7 @@ def test_save_from_the_order_box_and_the_driver(tmp_path):
         assert saved["journal"][-1][2] == "set the jib"
 
         second = tmp_path / "again.json"
-        r = client.post("/api/driver", json={"action": "save", "value": str(second)})
+        r = client.post("/api/driver", json={"action": "save", "value": "again.json"})
         assert r.status_code == 200
         assert json.loads(second.read_text())["journal"] == saved["journal"]
 
@@ -366,10 +367,9 @@ def test_save_from_the_order_box_and_the_driver(tmp_path):
 
         r = client.post("/api/order", json={"text": "save"})
         assert r.json()["kind"] == "driver.refused"
-        r = client.post(
-            "/api/order", json={"text": f"save {tmp_path / 'no' / 'such' / 'dir' / 'x.json'}"}
-        )
+        r = client.post("/api/order", json={"text": f"save {tmp_path.parent / 'x.json'}"})
         assert r.json()["kind"] == "driver.refused"
+        assert not (tmp_path.parent / "x.json").exists()
 
 
 # -- package 29: --load and --scenario on the server (spec M4 §19, §21) -----------------
@@ -426,10 +426,12 @@ def test_a_save_on_the_server_replays_with_its_line(tmp_path):
     save replays it where it was, and a refusal too, so the digests agree after a save."""
     from freesail.api.session import ship_factory
     from freesail.core import replay
+    from freesail.ui.places import Places
 
     world = world_for(SHIPS[0])
     driver = Driver(world)
-    e = driver.save(str(tmp_path / "one.json"))
+    driver.places = Places(tmp_path)  # the server's saves place, the test's own
+    e = driver.save("one")
     assert e.kind == "driver.saved" and "the log's digest is" in e.text
     world.run(30)
     assert driver.submit("state of the tide").kind == "order.rejected"
