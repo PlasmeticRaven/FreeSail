@@ -372,3 +372,118 @@ def test_a_mark_that_changes_hands_under_fire_is_judged_anew_and_the_fire_held(h
     assert said[0].text == f"A merchant brig is {how}: the guns hold their fire."
     # the minute's line after the change says the shot of that minute before it, and none after
     assert not [e for e in w.log if e.kind == "action.fired" and e.tick > at + 60]
+
+
+# -- the review of 0dcdb8cf: the player's ship's own names, and the hail ---------------------------
+
+
+def test_a_change_of_hands_under_another_hull_reads_the_players_ship_as_hers():
+    """The review of 0dcdb8cf, F1. The cause: `relations` reads the player's ship's own names (her
+    captain, her ship and its battery, her place, her colours, the orders she sails under) on the
+    sea's World, whose per-ship names read whichever hull is current; since `_root` gives the World
+    (item 2's one record), a change of hands run under another hull read that hull's as hers. In
+    ordinary play the current hull is the captor's: a crewed French frigate's own `take possession
+    of the ship` cleared all her captain knew of every ship as one of the player's ship's own
+    judges. Mended in the one place, `relations._players` (the player's own hull, `World.players`),
+    read wherever the module means her. The captor's captain keeps what he knew of a British
+    brig-sloop; the player's own captain forgets every ship, as her own judge (gundeck-1's
+    JUDGEMENT, the one list's 53); and her own state read under the captor's hull is hers. Old
+    (0dcdb8cf): the captor's pirates, chases given up and recognised all emptied, and the player's
+    ship read as the captor (not struck, French); 20a8e2e3 kept them (its `_root` gave the followed
+    hull)."""
+    from freesail.world.ships import PLAYER_ID
+
+    w = world_at(49.5, -5.5)
+    w.crewed_settings = {"cap": 2}
+    w.submit("heave to")
+    w.run(60)
+    east = destination(w.position, 90.0, 0.15 * units.NAUTICAL_MILE)
+    fr = put(w, "frigate", "france", _at(east), "bound for Brest", "bound for Brest", name="Renard")
+    west = destination(w.position, 270.0, 3.0 * units.NAUTICAL_MILE)
+    other = put(w, "brig-sloop", "britain", _at(west), "bound for Falmouth", "bound for Falmouth")
+    hx = fr.crew if fr.crew is not None else crews.promote(w, fr)
+    cap, mine = hx.captain, w.captain
+    cap.pirates.add(other.id)
+    cap.given_up.add(other.id)
+    cap.recognised[other.id] = {"enemy": True, "nation": "britain", "by": "the hail"}
+    mine.given_up.add(other.id)
+    mine.recognised[other.id] = {"enemy": False, "nation": "britain", "by": "the hail"}
+    shadow = w.vessels.get(PLAYER_ID)
+    with w.as_hull(hx):
+        judges = R._own_judges(R._root(w), shadow)
+        assert mine in judges and cap not in judges
+        assert mine in R.judges(w)
+    w.submit("strike the colours")
+    w.run(5)
+    with w.as_hull(hx):
+        hers = R._PlayersShip(w)  # her place, colours and nation where her shadow is not made
+        assert hers.struck and hers.nation == "britain"
+    r = hx.submit("take possession of the ship")
+    assert r.kind == "prize.taken" and P.is_prize(shadow), r.text
+    assert cap.pirates == {other.id} and cap.given_up == {other.id}
+    assert set(cap.recognised) == {other.id}
+    assert mine.given_up == set() and mine.recognised == {}
+
+
+def test_a_sail_that_changes_hands_within_hail_is_hailed_and_spoken_anew():
+    """The review of 0dcdb8cf, F2. The cause: the player's having spoken a sail is one fact kept in
+    two flags, `Vessel.spoken` and `Vessel.hailed`, set together by both roads of the hail
+    (`Vessels._promote_and_hail`, `hail._spoken`); `relations.changed_hands` ended `spoken` alone,
+    and the hail is made only where she is not `hailed`, so that a ship changing hands within hail
+    was never spoken again, and no hail said for her new people, until she lay beyond twice hail's
+    distance (the rules captain, cruising, investigated her for forty minutes and never spoke her).
+    Mended in `changed_hands`: both end. A British merchant brig lying to 0.2 miles off the
+    player's ship, spoken, is taken by the French: within the minute she is hailed, the line with
+    her French colours, and spoken. Old (0dcdb8cf): spoken False and hailed True at 0.22, 0.26 and
+    0.33 miles, no hail; 20a8e2e3: spoken True throughout, never hailed again."""
+    w = world_at(49.5, -5.5)
+    w.crewed_settings = {"cap": 0}
+    w.submit("heave to")
+    w.run(60)
+    east = destination(w.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+    brig = put(w, "merchant brig", "britain", _at(east), "bound for Falmouth", "bound for Falmouth")
+    brig.plan = [("lie_to", float("inf"))]
+    w.run(120)
+    assert brig.spoken and brig.hailed
+    n = len(w.log)
+    _taken_by_the_french(w, brig)
+    brig.plan = [("lie_to", float("inf"))]
+    brig.brain = None
+    w.run(60)
+    said = [e for e in list(w.log)[n:] if e.kind == "sail.within_hail"]
+    assert len(said) == 1 and "French colours" in said[0].text, [e.text for e in said]
+    assert brig.spoken and brig.hailed
+    (item,) = [
+        i for i in w.lookout.strangers(w, float(w.ship.heading))["items"] if i["id"] == brig.id
+    ]
+    assert item["spoken"]
+
+
+def test_a_ship_that_has_struck_is_refused_the_engage_in_her_own_state():
+    """The review of 0dcdb8cf, F6. The cause: the order to engage asked the marks and never her own
+    state. Since item 4 a holder struck fights nobody (`relations.still`), so that after the
+    player's ship struck, "her" was refused as "no enemy in sight to engage ... in sight: a
+    frigate" with a French frigate in sight, and a mark named was taken "to fire as they bear" for
+    guns the strike keeps silent. Mended in the order, before any mark (`gunnery._engage`): a ship
+    whose colours are struck is refused the engage in the words of her own state, by either road.
+    Old (0dcdb8cf): "There is no enemy in sight to engage ..." and "Engage a frigate to starboard:
+    ... the guns to fire as they bear."; 20a8e2e3: both taken ("guns.engage")."""
+    w = world_at(49.5, -5.5)
+    w.crewed_settings = {"cap": 0}
+    w.submit("heave to")
+    w.run(60)
+    east = destination(w.position, 90.0, 0.5 * units.NAUTICAL_MILE)
+    put(w, "frigate", "france", _at(east), "bound for Brest", "bound for Brest", name="Foe")
+    w.run(150)
+    w.submit("beat to quarters")
+    w.run(30)
+    assert w.submit("strike the colours").kind == "action.struck"
+    w.run(5)
+    battery = battery_of(w.ship)
+    for order in ("engage her to starboard", "engage the frigate to starboard"):
+        r = w.submit(order)
+        assert r.kind == "order.rejected", (order, r.text)
+        assert r.text.endswith(
+            "Our own colours are struck: the guns are silent; she lies to for her captor."
+        ), r.text
+        assert battery.target is None and battery.mode is FireMode.HOLD

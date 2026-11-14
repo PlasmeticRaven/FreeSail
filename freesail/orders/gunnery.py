@@ -3,7 +3,8 @@
     engage her to starboard         the mark and the side: a standing intention the battery
     engage the brig to larboard     keeps (the engaged side's guns served and fired at her);
     engage on both sides            'her' or nothing is the enemy nearest who may be fought;
-                                    with none, refused: a sail named is engaged as named
+                                    with none, refused: a sail named is engaged as named;
+                                    refused, her own colours struck
     load with round shot            the charge the guns are loaded with from now (round, chain,
                                     grape, double, a blank cartridge); a loaded gun keeps its
                                     charge until it is fired
@@ -357,6 +358,14 @@ def _side_of(said: str) -> tuple[str | None, str]:
 
 
 def _engage(ship: Any, battery: Battery, said: str) -> Result:
+    if (getattr(ship, "extra", None) or {}).get("struck"):
+        # her own state before any mark (the review of 0dcdb8cf, F6): a ship that has struck
+        # fights nobody (`relations.still`'s holder struck), and the order's "her" said so as
+        # "no enemy in sight to engage" with an enemy in sight; a mark named was taken, "the guns
+        # to fire as they bear", for guns that stay silent
+        raise OrderError(
+            "Our own colours are struck: the guns are silent; she lies to for her captor."
+        )
     # practice and resupply: a notional mark's words before the side's (`_side_of` refuses
     # a bare 'starboard' among them), and the cask's before the sail's
     notional = _notional_of(ship, said)

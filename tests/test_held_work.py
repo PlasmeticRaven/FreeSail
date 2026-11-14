@@ -632,7 +632,7 @@ SHIP_WORK_WORDS = {
     "shoot_nets": ("shoot the nets", "shooting the nets"),
     "shoot_seine": ("shoot the seine", "shooting the seine"),
     "shoot_trawl": ("shoot the trawl", "shooting the trawl"),
-    "strike_topmasts": ("strike topmasts", "striking topmasts"),
+    "strike_topmasts": ("strike the topmasts", "striking the topmasts"),  # file
     "sway_up_topgallant_masts": ("sway up topgallant masts", "swaying up topgallant masts"),
     "tack": ("tack ship", "tacking ship"),  # file
     "take_lunar": ("take a lunar", "taking a lunar"),  # file
@@ -642,17 +642,22 @@ SHIP_WORK_WORDS = {
     "wear_short_round": ("wear short round", "wearing short round"),
     "weigh_anchor": ("weigh anchor", "weighing anchor"),
 }
-SHIP_WORK_FILES = 23  # those marked "file"
+SHIP_WORK_FILES = 24  # those marked "file"
 # A part's work whose verb is no name of it (the whole-change review of 80e703c7, sailing-5, and
-# the last list's 9): the words before the part's name in both forms, on the part named; and the
-# clearing of a wreck, which has no words of its own and is named by its verb ("cut away"), as the
-# lead's list has it. Every other part's work is its verb's own words and its part.
+# the last list's 9): the words before the part's name in both forms, on the part named; the
+# clearing of a wreck by its own words (the review of 0dcdb8cf, F4: with none of its own it was
+# named by its verb, "cutting away the fore mast", another work's, as the lead's list found it).
+# Every other part's work is its verb's own words and its part.
 PART_WORK_WORDS = {
     "cut_away_mast": ("main.mast", "cut away the main mast", "cutting away the main mast"),
     "goose_wing": ("fore.course", "goose-wing the foresail", "goose-winging the foresail"),
-    "clear_wreck": ("fore.mast", "cut away the fore mast", "cutting away the fore mast"),
+    "clear_wreck": (
+        "fore.mast",
+        "clear away the wreck of the fore mast",
+        "clearing away the wreck of the fore mast",
+    ),
 }
-PART_WORK_FILES = {"cut_away_mast", "goose_wing"}
+PART_WORK_FILES = {"cut_away_mast", "goose_wing", "clear_wreck"}
 
 
 def _three_worlds():
@@ -715,7 +720,7 @@ def _ids_left(text: str, eid: str, words: tuple[str, str]) -> list[str]:
     words (its file's id, where the two are one) where they are not its words, once its words in
     both forms are taken out of the line ("veer cable" in "Only four hands to veer cable"; "cut
     away mast" in "to cut away mast the main mast"; nothing of "heave to" in "Not hands enough on
-    deck to heave to", nor of "strike topmasts" in "Strike topmasts! Hook the top tackles.")."""
+    deck to heave to", nor of "weigh anchor" in "Not hands enough on deck to weigh anchor")."""
     import re
 
     verb = registry.get(eid).verb.replace("_", " ")
@@ -759,7 +764,11 @@ def test_every_work_is_named_by_one_road_in_both_forms_where_a_line_names_the_wo
         assert "_" not in eid or registry.get(eid).verb != eid, eid
     files = {e for e, ev in registry.EVOLUTIONS.items() if getattr(ev, "work", None)}
     assert len(files - PART_WORK_FILES) == SHIP_WORK_FILES and PART_WORK_FILES <= files
-    assert seen["clear_wreck"] == ("cut away the fore mast", "cutting away the fore mast")
+    assert seen["clear_wreck"] == (
+        "clear away the wreck of the fore mast",
+        "clearing away the wreck of the fore mast",
+    )
+    assert seen["strike_topmasts"] == ("strike the topmasts", "striking the topmasts")
 
 
 def test_no_line_that_names_a_work_names_it_by_its_id():
@@ -1243,3 +1252,50 @@ def test_a_veer_held_by_the_master_going_below_and_its_anchor_lost_is_refused_wh
     assert not [x for _, k, x in lines if k == "cable.veered"], lines
     assert best.scope_m == scope
     assert not world.ship.extra["evolutions"].instances
+
+
+def test_the_library_says_when_a_works_conditions_are_read_as_the_runner_reads_them():
+    """The review of 0dcdb8cf, F5. The cause: the agents' library worded every file's `requires`
+    as "It stops when", the step list's rule (read before every step), for scripted work too, whose
+    `requires` the runner reads as it begins and as it is taken up again after a belay and never
+    while it runs (`Runner._try_resume`); so that the four trims, their conditions moved into
+    `requires` by the last list's 8, were said to stop when their sail is not set, and a trim runs
+    on with its sail blown out (and `bend_sail` and `shift_sail` the same before). Mended in the
+    library's one rule for an evolution's text (`agents.tools._evolution_text`): every evolution of
+    the registry with `requires`, a script's in its own words, a step list's as before; and the
+    spanker's trim on the merchant brig, its sail blown out at a twentieth done, ends trimmed, as
+    the words now say. Old (0dcdb8cf): "It stops when: the {sail} is {state}; there is no sail to
+    trim; {parted}." for each trim; 20a8e2e3, "It is refused when", the conditions then
+    preconditions."""
+    from freesail.agents import tools as T
+
+    scripted = "It is refused, as it begins or as it is taken up again after a belay, when: "
+    kinds = {True: 0, False: 0}
+    for eid, evo in sorted(registry.EVOLUTIONS.items()):
+        if not evo.requires:
+            continue
+        text = T._evolution_text(evo)
+        kinds[bool(evo.script)] += 1
+        if evo.script:
+            assert scripted in text and "It stops when" not in text, eid
+        else:
+            assert "It stops when: " in text and scripted not in text, eid
+    assert kinds[True] == 6 and kinds[False] > 30, kinds
+    trim = T._evolution_text(registry.get("trim_gaff_sheet"))
+    assert f"{scripted}the {{sail}} is {{state}}; there is no sail to trim; {{parted}}." in trim
+    world = make_world(7, "data/ships/merchant-brig.yaml", Scenario())
+    ship = world.ship
+    sail = ship.sails["main.spanker"]
+    sail.state = SailState.SET
+    world.submit("call all hands")
+    world.run(60)
+    runner = ship.extra["evolutions"]
+    runner.start(ship, "trim_gaff_sheet", "main.spanker", {"angle_deg": 40.0})
+    world.run(3)
+    (inst,) = runner.instances
+    assert 0.0 < inst.script.progress < 0.1
+    n = len(world.log)
+    sail.state = SailState.BLOWN_OUT
+    world.run(200)
+    said = [(e.kind, e.text) for e in list(world.log)[n:] if e.kind.startswith(("sail.", "evol"))]
+    assert [k for k, _ in said] == ["sail.trimmed"], said

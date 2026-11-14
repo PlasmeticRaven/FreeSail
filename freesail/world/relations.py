@@ -77,13 +77,20 @@ Every relation held on her ends there too, the cause being one (the lead's last 
 relation held after what it stood on is gone): the sail spoken and the chase given up
 (`spoken_ids`, `given_up`, read raw by `Judgement._spoken`: a cruiser who spoke her or gave her up
 never looked at her again once the enemy took her, and so never retook her), the player's having
-spoken her (`Vessel.spoken`, the lookout's flag); the shots of the one record, fired by her or at
+spoken her (`Vessel.spoken` and `Vessel.hailed`, the lookout's two flags of the one hail, so that
+she is hailed anew within hail); the shots of the one record, fired by her or at
 her; the orders she sailed under (`under_orders_of`, hers and her hull's: a French prize crew left
 "to her commander's book", the British commander's) and the orders of every ship under hers; the
 far rounds' book of each pair she is in (`root._far_rounds`); and every near battery laid on her
 (`combat.action`): its World is told she has changed hands, and its next tick asks `MARK` of her as
 she now is, holding the fire and telling the deck why where she is no mark (the lead's last list,
 item 5).
+
+The player's ship's own names (her captain, her ship and its battery, her place, her colours and
+nation, the orders she sails under) are read on her own hull (`_players`), never on the World's
+per-ship names, which read whichever hull is current: a change of hands run under another hull (a
+crewed captor's own `take possession of the ship`) read that hull's captain as hers and cleared all
+he knew of every ship (the review of 0dcdb8cf, F1).
 """
 
 from __future__ import annotations
@@ -136,11 +143,26 @@ RELATIONS: tuple[str, ...] = (MARK, STRUCK, PRIZE, SUPPORT)
 
 def _root(world: Any) -> Any:
     """The sea's World: a crewed ship's hull's (her `parent` the player's hull, whose World it is),
-    a Hull's, or the World itself; the one place the one record is kept."""
+    a Hull's, or the World itself; the one place the one record is kept. Its own names are the
+    sea's (`vessels`, `squadrons`, `nations`, its `__dict__`); its per-ship names read whichever
+    hull is current, so that the player's ship's are read on `_players`."""
     from freesail.world.hulls import world_of
 
     parent = getattr(world, "parent", None)
     return world_of(parent if parent is not None else world)
+
+
+def _players(root: Any) -> Any:
+    """The player's own hull (`World.players`), whichever hull is current or followed: the one
+    place this module reads the player's ship's own names (her captain, her ship and its battery,
+    her place, her colours and her nation, the orders she sails under). The World's per-ship names
+    read the current hull (`hulls.PER_SHIP_FIELDS`), and since `_root` gives the World (the one
+    record's place, the last list's item 2) a change of hands run under another hull (a crewed
+    captor's own `take possession of the ship`) read the captor's captain as the player's and
+    cleared all he knew of every ship as one of her own judges (the review of 0dcdb8cf, F1). Any
+    other root (a plain World with no hulls, a test's stand-in) is read as it is."""
+    own = (getattr(root, "__dict__", None) or {}).get("_own")
+    return own if own is not None else root
 
 
 class _PlayersShip:
@@ -150,11 +172,12 @@ class _PlayersShip:
     def __init__(self, root: Any) -> None:
         from freesail.world.signals import player_locker
 
-        ship = getattr(root, "ship", None)
-        dealings = getattr(root, "dealings", None)
-        colours = player_locker(root).colours
+        hers = _players(root)
+        ship = getattr(hers, "ship", None)
+        dealings = getattr(hers, "dealings", None)
+        colours = player_locker(hers).colours
         self.id = PLAYER_ID
-        self.position = root.position
+        self.position = hers.position
         self.struck = bool("struck" in (getattr(ship, "extra", None) or {}))
         self.nation = str(getattr(dealings, "ship_nation", "") or "")
         self.nation_shown = colours.nation if colours.shows and colours.nation else None
@@ -173,7 +196,7 @@ def ship_of(world: Any, sid: Any) -> Any:
     v = sea.get(str(sid)) if sea is not None and hasattr(sea, "get") else None
     if v is not None:
         return None if getattr(v, "done", False) else v
-    if str(sid) == PLAYER_ID and getattr(root, "position", None) is not None:
+    if str(sid) == PLAYER_ID and getattr(_players(root), "position", None) is not None:
         return _PlayersShip(root)
     return None
 
@@ -371,7 +394,7 @@ def judges(world: Any) -> list[Any]:
         add(getattr(v, "_signal_reader", None))  # the least captain of a ship with no brain
         hull = getattr(v, "crew", None)
         add(getattr(hull, "captain", None) if hull is not None else None)
-    add(getattr(root, "captain", None))
+    add(getattr(_players(root), "captain", None))
     return out
 
 
@@ -380,7 +403,7 @@ def _own_judges(root: Any, vessel: Any) -> list[Any]:
     hull = getattr(vessel, "crew", None)
     out.append(getattr(hull, "captain", None) if hull is not None else None)
     if str(getattr(vessel, "id", "")) == PLAYER_ID:
-        out.append(getattr(root, "captain", None))
+        out.append(getattr(_players(root), "captain", None))
     return [j for j in out if j is not None]
 
 
@@ -418,9 +441,15 @@ def changed_hands(world: Any, vessel: Any) -> None:
     book.pop(sid, None)
     for firers in book.values():
         firers.discard(sid)
-    # the player's lookout's flag: spoken within hail by the player's ship
+    # the player's having spoken her: the lookout's two flags of the one hail
+    # (`Vessels._promote_and_hail` and `hail._spoken` set both together), so that her next minute
+    # within hail hails her new people, says the line with her colours now and speaks her anew
+    # (the review of 0dcdb8cf, F2: `spoken` alone ended, and the hail, made only where she is not
+    # `hailed`, was never made again while she lay within twice hail's distance)
     if getattr(vessel, "spoken", False):
         vessel.spoken = False
+    if getattr(vessel, "hailed", False):
+        vessel.hailed = False
     # the orders she sailed under, and the orders of every ship under hers
     sea = getattr(root, "vessels", None)
     ships = list(getattr(sea, "vessels", None) or [])
@@ -431,16 +460,17 @@ def changed_hands(world: Any, vessel: Any) -> None:
             hull = getattr(v, "crew", None)
             if hull is not None and getattr(hull, "under_orders_of", ""):
                 hull.under_orders_of = ""
-    held = str(getattr(root, "under_orders_of", "") or "")
+    players = _players(root)
+    held = str(getattr(players, "under_orders_of", "") or "")
     if held and (held == sid or sid == PLAYER_ID):
-        root.under_orders_of = ""  # the player's ship under hers, or the player's ship herself
+        players.under_orders_of = ""  # the player's ship under hers, or the player's ship herself
     # the far rounds' book of each pair she is in
     rounds = getattr(root, "__dict__", {}).get("_far_rounds")
     if isinstance(rounds, dict):
         for key in [k for k in rounds if sid in str(k).split("|")]:
             del rounds[key]
     # the near batteries laid on her: the next tick of each judges her as she now is
-    for hw in [root, *(getattr(v, "crew", None) for v in ships)]:
+    for hw in [players, *(getattr(v, "crew", None) for v in ships)]:
         ship = getattr(hw, "ship", None) if hw is not None else None
         extra = getattr(ship, "extra", None)
         battery = extra.get("battery") if isinstance(extra, dict) else None

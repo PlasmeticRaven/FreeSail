@@ -22999,10 +22999,17 @@ passages (`sail5.py`), on both trees: every line's tick and kind the same, every
   enough on deck to heave log; ..." to "... to heave the log; ...".
 - Unchanged: the trade in thick weather (426, de00808076d8cccf) and the merchant passage (2,909,
   eb410cf04b496cec).
+- Gate 5c's naval cruise (`GATE_5C_CRUISE_DIGEST`; 2,242 lines both; 0ac7eaba9f341529 to
+  81b0b08a63bf068e), left out of this list as built and found at the merge (sailed by the fixture's
+  road on exports of 20a8e2e3, of this build and of the merge, the merge's log byte for byte this
+  build's; the review of 0dcdb8cf, F3): at 100800, 115200, 129600, 158400 and 172800 "'Tack ship'
+  will follow 'heave log'", and at 144000 "'Wear ship' will follow 'heave log'", in the course's
+  line of the standing order 'back to the station', to "... 'heave the log'".
 
 The build machine's pins these move are the lead's to measure and pass by these lines (left as they
 are): the station gale's and the trade stranger's trials (each failing on its pin at 20a8e2e3,
-as here), gate 5b's schooner, gate 6a's intent and the first action's whole log.
+as here), gate 5b's schooner, gate 6a's intent, gate 5c's naval cruise (its pin passed at 20a8e2e3
+and fails here by the six lines above) and the first action's whole log.
 
 #### The lines any ship may say that change
 
@@ -23286,10 +23293,11 @@ changed against the bases. Ruff check and format clean on what is touched.
 The package folded step by step, as Build-Ships.md §4.1 gives the integrator's Phase 5: each step
 with its commits, the trunk's merge of it where there is one, a pointer to its own section in this
 file (which stays the record: nothing above is deleted or rewritten), its truths, its rulings by
-whom, and what it left; then the three builds of the lead's readings of cda12ec9 by their causes;
-then one list of everything recorded as left for a later package, whose each; then Phase 5's own two
-commits and their suites; then the whole-change review's mends of 80e703c7 and the suites on the
-final hash. The brief is the package's entry in `docs/dev/M7-WorkPackages.md`
+whom, and what it left; then the three builds of the lead's readings of cda12ec9 by their causes,
+and the lead's last list's two builds and their review by theirs; then one list of everything
+recorded as left for a later package, whose each; then Phase 5's own two commits and their suites;
+then the whole-change review's mends of 80e703c7 and their suites; then the last list's review
+mends, the package's last hash. The brief is the package's entry in `docs/dev/M7-WorkPackages.md`
 ("Package 75: the ships", with the lead's notes to the ships session beneath it); the plan is
 `docs/design/Build-Ships.md`; the ships' designs are `docs/design/Design-Ship-Indefatigable.md`,
 `Design-Ship-PrinceDeNeufchatel.md`, `Design-Ship-Bilander.md`, `Design-Ship-Bellerophon.md` and
@@ -23455,6 +23463,22 @@ Winfield"): nothing of this package touches it.
     records (below). The owner's word of 07:25 (nudge 10) holds what follows: the work in hand
     finished in the one combined hash and the close-out after its merge, nothing begun after it,
     packages 77 and 90's preliminaries held.
+21. **The whole-change review's mends** (2026-11-14): 20a8e2e3, the review of 80e703c7 by four
+    lenses (section below). Sent as package 75's one hash, read twice by the lead's readers and
+    tried on the trunk at 96e5e76c: NOT merged (the lead's note of 14:05, nudge 12, "one list,
+    ruled").
+22. **The lead's last list (nudge 12), built** (2026-11-14): the far fight and the relations,
+    items 1 to 7, 2f7efc11 (`l-far`, merged on the branch at 6eb5d513); the crew, items 8 and 9,
+    7941856a (`l-crew`, merged at 0dcdb8cf, its one conflict the two blocks of the one list, joined
+    there). Sections: "The lead's last list, the far fight" (the last subsection of "The lead's
+    notes of 2026-11-12 and 13, built") and "The lead's last list, the crew" (the last of "The
+    lead's rulings 8 and 11, the working officers and the bilander's nine"). Rulings: the lead's
+    nudge 12 ("This is the last list for package 75 ... Mend each at its cause, report one hash,
+    and begin nothing else"); the owner's word on mends. Not built, by the list: items 40, 41 and
+    23, the JUDGEMENT calls, the cold review's two, and the listed items (the one list, 52 to 60).
+23. **The last list's review mends** (2026-11-14): one commit, "Package 75: the last list's review
+    mends", the review of 0dcdb8cf's seven findings, each reproduced first, none refuted (section
+    "The last list's review mends", below). The package's last hash.
 
 ### The truths
 
@@ -23578,6 +23602,56 @@ guns' and the privateer schooner's 'letter of marque' read bills set on another 
 hands (the same cause in form; for the lead). **The test at that level:** every fit of every file
 whose bill keeps marines mans every crew at the beat (the files read, not listed), and the one road
 checked for each key `FIT_OWN_BILL` names.
+
+### The last list's two builds and their review: their causes
+
+The owner's rule for every mend of the list (the lead's nudge 12): the fault's general cause named,
+mended where it lives so that every reader of the same thing is served, where else it was looked for
+and what was found, and a test at that level shown to fail before the mend. Each build's section has
+the whole; here, the cause and its place.
+
+**The far fight and the relations (items 1 to 7; 2f7efc11).** (1) *An order with no mark fell back
+to "any sail":* the order's "her" is the nearest sail her captain holds an enemy and may fight
+(`gunnery._enemy_to_engage`: `Captain._is_enemy` and `relations.MARK`), and with none it is refused
+in words; the player's order and the rules captain's go by it. (2) *One fact in three records:* who
+has fired on whom is one record on the sea's World by the ships' ids (`relations.fired`,
+`fired_on`, `has_fired`), written by the near battery, the far rounds and the far reply, read by
+every judge of the ship fired on (`Judgement.fired_on`, her row, her far brain's and her hull's
+captain's alike) and so by `MARK`, far as near; the rounds key by id, never by a name. (3) and (5)
+*A relation held after what it stood on is gone:* `relations.changed_hands`, the one road of every
+change of hands, ends the sails spoken and the chases given up, the player's having spoken her, the
+shots of the one record, the orders she sailed under and those of the ships under hers, and the far
+rounds' book of her pairs, and tells every battery laid on her, whose next tick asks `MARK` of her
+as she now is and holds the fire with a line. (4) *The one answer asked only of the other ship:*
+`still` answers the holder's being (off the sea or done, nobody held; struck, nobody but her prizes,
+JUDGEMENT) and `SUPPORT`'s side (her nation or an ally's, JUDGEMENT). (6) *A line written for one
+case said for another*, the signal's words made true; (7) *a check guarded twice*, the two tests
+trying an enemy's prize, where the check alone decides.
+
+**The crew (items 8 and 9; 7941856a).** (8) *What must still be true when held work is taken up was
+stated by some scripts and not others:* every script a post can hold states it (`Script.standing`,
+or its file's `requires`, the four trims' conditions moved there) or is named with the reason none
+is needed; refused in words on the one taking-up road (`Runner._try_resume`), never run on. (9) *A
+work's words in two places:* one key in its file (`work:`, as an order to it is given), both forms
+made from it by one road (`Runner._describe`, `Runner._doing`), read wherever a line names work.
+
+**The review of 0dcdb8cf (this hash's commit; seven findings, each reproduced, none refuted).**
+(F1, new from item 2) *The player's ship's own names read on the World's per-ship names:* since
+`relations._root` gives the sea's World (the one record's place), its `captain`, `ship` and
+`position` read whichever hull is current, and a crewed captor's own `take possession of the ship`
+cleared all he knew of every ship as one of her own judges; mended in one place,
+`relations._players` (her own hull, `World.players`), read wherever the module means her. (F2, new
+from item 3) *One fact in two flags:* the player's having spoken her is `Vessel.spoken` and
+`Vessel.hailed`, and the change of hands ended one; both end, so that she is hailed anew within
+hail. (F3) The crew's record of the lines it moves left out gate 5c's naval cruise: set in it. (F4,
+item 9's own case) *A work with no words of its own named by its verb,* the clearing of a wreck by
+another work's ("cutting away the fore mast"): its file's words, `work: clear away the wreck of`,
+the registry taking a part's words that end in "of". (F5, new from item 8) *The library's one rule
+for `requires` was the step list's* ("It stops when"), untrue of a script, whose `requires` are read
+as it begins and as it is taken up again: worded by its kind. (F6, new from items 1 and 4) *The
+engage asked the marks and never her own state:* refused before any mark while her colours are
+struck, by either road. (F7, new from item 9) *A work's words dropped and none given:* `work: strike
+the topmasts`, its cry the same.
 
 ### Left for a later package: one list
 
@@ -23848,6 +23922,32 @@ the crew", above):
     line says "bring her to" as done "bring her to" (and "sling the yards", "ring the bell");
     mended for the works' words alone (`runner._verb_gerund`), the standing orders' and the
     orders' own gerunds left (`standing.runtime.said_as_done`, `orders/`).
+
+**Found by the review of 0dcdb8cf and its mends, older than this change or the lead's to rule, not
+built** ("The last list's review mends", below):
+64. Five works whose files give no words of their own are named by their ids in both forms, where
+    the orders to them are given with the article: `fid_topmasts`, `send_down_topgallant_masts`,
+    `send_down_topgallant_yards`, `sway_up_topgallant_masts` and `cross_topgallant_yards` ("All
+    hands! (to send down topgallant masts)", "sending down topgallant masts"; the orders `fid the
+    topmasts`, `send down the topgallant masts`, `send down the topgallant yards`, `sway up the
+    topgallant masts`, `cross the topgallant yards`), as at 20a8e2e3: whether they stand is the
+    lead's call (the review's F7; `strike_topmasts` lost its words in this change and has them
+    again).
+65. A prize's colours are said with her own nation's id beneath her captor's: "French colours, the
+    tricolour over britain" (`Vessel.colours_words` reads `Colours.words` with no nations table):
+    the lookout's made-out words of every prize since package 74, and since F2's mend the hail of a
+    ship that changes hands within hail of the player's ship.
+66. The gun deck's other orders are taken after her colours are struck, in words untrue of guns
+    that stay silent ("Fire the starboard broadside: 8 guns ready to go together as they bear.",
+    "Load with grape: ...", "The guns are firing as they bear already."; `gunnery.execute`): F6's
+    cause in form, the engage alone mended; which orders a struck ship may still give (cease
+    firing, run in or secure the guns) is the lead's ruling.
+67. Scripted work never reads its `requires` while it runs: a trim of the spanker on the merchant
+    brig, the spanker blown out at a twentieth done, ends "Trimmed the spanker sheet; the spanker
+    40° off the centreline." (so `bend_sail` and `shift_sail`, whose `requires` are older), as at
+    20a8e2e3; the library now says when they are read (F5), and whether such work should stop with
+    its sail (`Runner._tick_script` reading them each tick, which would move lines) is the lead's
+    ruling.
 
 ### Phase 5's integration: the truths moved, and these records
 
@@ -24206,6 +24306,205 @@ passed (the readings' builds' new tests, the truths at their new node ids, and t
 `tests/test_mends_75.py`'s 18 and `tests/test_held_work.py`'s one). **(f)** Ruff check and format
 clean over `freesail`, `tests` and `tools` (390 files). Nothing pushed; the commit local, no
 trailer.
+
+### The last list's review mends (2026-11-14)
+
+One reader read the package's branch at 0dcdb8cf (`20a8e2e3..0dcdb8cf`, the merge of the last
+list's two builds) item by item against nudge 12's nine, with probes of real ticks on the head and
+on an export of 20a8e2e3. What held: items 1, 4, 5, 6 and 7 are mended at their causes (item 1's
+"her" chose the right ship past a neutral, our own prize, a struck enemy, a Frenchman under false
+colours who had fired on us and a neutral who had; item 5 holds with another hull current; item 7's
+two tests fail with `MARK`'s prize check planted out), and item 8 (a kedge held at the sling,
+refused and laid out again, gets her boat back). Seven findings, ranked. Each was reproduced first
+by the reader's probes (the session's scratch `ll/reader/`, outside the repository) on exports of
+0dcdb8cf and of 20a8e2e3, and on this tree by this step's own (`ll/rv/`); none failed to reproduce,
+so none is refuted. Each is mended by the owner's rule: the general cause named, mended where it
+lives, where else it was looked for and what was found, and a test at that level, every one failing
+on an export of 0dcdb8cf with the new tests copied in. One commit, "Package 75: the last list's
+review mends". Old is 0dcdb8cf, and 20a8e2e3 where said.
+
+**F1 (the blocker; new, from item 2's `_root`): the player's ship's own names read on the World.**
+*Reproduced:* at a cap of two the player's frigate strikes with a crewed French frigate, the
+*Renard*, 0.15 miles off, and the *Renard*'s own `take possession of the ship` is given under her
+hull ("Possession taken of the Amazon: Mr Prosser and 21 hands put aboard her, 264 of her people
+prisoners."): her captain's pirates, chases given up and recognised, each holding a British
+brig-sloop three miles off, are all empty after it; at 20a8e2e3 all three kept her. Under her hull
+the player's ship, as `relations` read her where her shadow is not made, was the *Renard* (not
+struck, French). *The cause:* `relations` reads the player's ship's own names (her captain, her ship
+and its battery, her place, her colours and her nation, the orders she sails under) on the sea's
+World, whose per-ship names read whichever hull is current (`hulls.PER_SHIP_FIELDS`); since
+`_root` gives the World (the one record's place), a change of hands run under another hull took
+that hull's captain for one of the player's ship's own judges, who forget every ship
+(`_own_judges`), and the same for `judges`, `_PlayersShip`, `ship_of`'s place and `changed_hands`'
+orders and batteries. *Mended where it lives:* one reader, `relations._players` (her own hull,
+`World.players`, whichever hull is current or followed), read by each of them. *Looked for
+elsewhere:* the module's other reads of the World are the sea's own (`vessels`, the sea whichever
+hull is current; `squadrons`, `nations`; its `__dict__` for the record and the rounds' book):
+sound. The last list's other new readers of a World each read their own hull's:
+`combat.action._watch_changed_hands` and `_fired_on` (run in the battery's own hull's tick),
+`gunnery._enemy_to_engage` (`orders.prompt.world_of`, the ship's own), `Judgement.fired_on` (the
+judge's own hull), `far_action.minute` (the World's record; run in the followed hull's tick alone):
+none reads another's. *Test:* `tests/test_far_last_list.py`,
+`test_a_change_of_hands_under_another_hull_reads_the_players_ship_as_hers` (on 0dcdb8cf it fails
+at her own judges, the captor's captain among them; on 20a8e2e3 at the player's captain's chases
+given up, item 3's).
+
+**F2 (new, from item 3's mend): a ship that changes hands within hail is never hailed again.**
+*Reproduced:* a British merchant brig lying to 0.2 miles off the player's ship, spoken, is taken by
+the French: at +60, +300 and +600 s (0.22, 0.26 and 0.33 miles) `spoken` False and `hailed` True,
+the lookout's "spoken" False and no hail; the rules captain cruising investigates her for forty
+minutes from 0.39 to 0.97 miles and never speaks her. At 20a8e2e3 `spoken` held True throughout
+(the old fault). *The cause:* the player's having spoken her is one fact kept in two flags,
+`Vessel.spoken` and `Vessel.hailed`, set together by both roads of the hail
+(`Vessels._promote_and_hail`, `hail._spoken`); `changed_hands` ended `spoken` alone, and the hail is
+made only where she is not `hailed`, which ends only beyond twice hail's distance. *Mended where it
+lives:* `changed_hands` ends both, so that her next minute within hail hails her new people, says
+the line with her colours now and speaks her anew (and her brain, where she has one, speaks the
+ship). *Looked for elsewhere:* the two roads of the hail set both, the far brains' and the
+captains' `spoken_ids` are item 3's; no other flag of the player's dealings with her outlives her
+people (`alongside` and `letter` are of the moment, `dealing_tick` the cap's). Found, older: the
+line now said for her new people gives her colours "French colours, the tricolour over britain",
+as the lookout's made-out words of every prize have since package 74 (the one list, 65). After the
+mend, within the minute: "A merchant brig, deep laden is within hail, lying to; French colours,
+the tricolour over britain.", and the captain cruising keeps station, the brig spoken. *Test:*
+`test_a_sail_that_changes_hands_within_hail_is_hailed_and_spoken_anew` (fails on 0dcdb8cf and on
+20a8e2e3: no hail).
+
+**F3: the crew build's record left out a pin it moves.** *Reproduced:* gate 5c's naval cruise sailed
+by the fixture's road on exports (the merge's scratch, `ll/merge/`): 0ac7eaba9f341529 at 20a8e2e3
+and at the far build, 81b0b08a63bf068e at the crew build, the merge and this tree, 2,242 lines on
+each, six lines differing, every one item 9's words. *Mended:* the crew's section ("The lead's last
+list, the crew", its list of the recorded lines that move and its sentence of the build machine's
+pins) gives them; `GATE_5C_CRUISE_DIGEST` (`tests/test_known_truths.py`) is the lead's to measure
+and is left as it is.
+
+**F4 (item 9, the lead's own case): the clearing of a wreck named by another work's verb.**
+*Reproduced* (the frigate-36 at seed 7, her fore mast carried away), on both trees: `clear away the
+wreck of the fore mast` begins "Clear away the wreck of the fore mast! Hands aloft with burtons and
+tripping-lines.", the work in hand is "cutting away the fore mast" and `belay that` says "Belayed
+cutting away the fore mast; the fore mast left as it stands."; for the fore topgallant yard, the
+work "cutting away the fore topgallant yard" ends "Cleared the wreck of the fore topgallant yard:
+its remains sent down on deck, ...; nothing went over the side.", untrue of a spar sent down. Item
+9's build pinned it as right. *The cause:* a work with no words of its own in its file is named by
+its verb, and the clearing's verb is the order's (`cut away`), another work's words
+(`cut_away_mast`'s). *Mended where it lives:* its file's words, `work: clear away the wreck of`, so
+that the one road gives "to clear away the wreck of the fore mast" and "clearing away the wreck of
+the fore mast"; the registry's guard on a part's work (`registry.parse_evolution`: a part's words
+name the part after them, and "set the sail" would name it twice) takes words that end in "of",
+whose object is the part. *Looked for elsewhere:* every part's work, by the sweep (the rest are
+their verb's own words and their part, "setting the fore topsail"); the ship's works with no words
+of their own (F7). *Test:* the two sweeps of `tests/test_held_work.py` re-pinned (`PART_WORK_WORDS`,
+the clearing among the files' works), failing on 0dcdb8cf.
+
+**F5 (new, from item 8's move of the trims' conditions): the library said a trim stops when it does
+not.** *Reproduced:* the agents' library gives `trim_jib_sheet` and `trim_gaff_sheet` "It stops
+when: the {sail} is {state}; there is no sail to trim; {parted}." on 0dcdb8cf ("It is refused when:
+..." on 20a8e2e3, the conditions then preconditions); a spanker trim begun on the merchant brig, the
+spanker blown out at a twentieth done, ends "Trimmed the spanker sheet; the spanker 40° off the
+centreline." on both, with no failure. *The cause:* the library's one rule for a file's `requires`
+was the step list's (read before every step, so that the work stops between them), worded so for a
+script too, whose `requires` the runner reads as it begins and as it is taken up again after a
+belay and never while it runs (`Runner._try_resume`). *Mended where it lives:* the library's one
+rule (`agents.tools._evolution_text`) words them by the work's kind: a script's "It is refused, as
+it begins or as it is taken up again after a belay, when: ..."; a step list's "It stops when: ..."
+as before; the registry's note of the file shape says the same. *Looked for elsewhere:* the library
+is the one reader of a file's `requires` beside the runner; the runner's head says the step list's
+rule of step lists. Served truly with it: `bend_sail` and `shift_sail`, scripts whose `requires`
+are older and were said the same. Found, older: that scripted work never reads its `requires`
+while it runs (the one list, 67). *Test:* `tests/test_held_work.py`,
+`test_the_library_says_when_a_works_conditions_are_read_as_the_runner_reads_them`: every
+evolution with `requires` (six scripts, the rest step lists) and the spanker's trim (fails on
+0dcdb8cf and on 20a8e2e3).
+
+**F6 (new, from items 1 and 4 together): a struck ship's engage refused in words that blame the
+others.** *Reproduced:* the player's frigate, a French frigate 0.5 miles off, the colours struck:
+`engage her to starboard` is refused "There is no enemy in sight to engage: name the sail to engage
+her ('engage the brig to starboard'); in sight: a frigate." on 0dcdb8cf and taken on 20a8e2e3;
+`engage the frigate to starboard` is taken on both ("Engage a frigate to starboard: the mark a
+frigate, the starboard battery, the guns to fire as they bear."), the fire held by the strike. *The
+cause:* the order to engage asked the marks and never her own state; since item 4 a holder struck
+fights nobody (`relations.still`), which the order's "her" said as nobody in sight. *Mended where it
+lives:* `gunnery._engage`, before any mark, refuses a ship whose colours are struck in her own
+state's words, by either road and the practice marks with them: "Our own colours are struck: the
+guns are silent; she lies to for her captor." (the strike's own words, and the prize orders' form,
+"Our own colours are struck: nothing of a prize is ours to order."); the primer's row of the order
+(chapter 22) says so. *Looked for elsewhere:* the gun deck's other orders after a strike (`fire`,
+the broadside, `load`, `run out`) are taken in words untrue of guns that stay silent, as at
+20a8e2e3: the same cause in form, older, and which orders a struck ship may still give is a ruling
+(the one list, 66); the rules captain gives no engage once struck (his state is `struck`). *Test:*
+`test_a_ship_that_has_struck_is_refused_the_engage_in_her_own_state` (fails on both trees).
+
+**F7 (new, from item 9): the striking of the topmasts named by its id.** *Reproduced:* item 9's
+build took the file's params copy of its words (`doing: striking the topmasts`) out and gave no
+`work:`, so that the send-down's refusal says "take it in before striking topmasts" (20a8e2e3 "...
+striking the topmasts"), and the work is "strike topmasts" and "striking topmasts", its id. *The
+cause:* the same as F4's, a work with no words of its own in its file named by its verb, its id;
+here the words were the file's until this change. *Mended where it lives:* `work: strike the
+topmasts`, the order's own words (`strike the topmasts`), and its cry with them, "Strike the
+topmasts! Hook the top tackles." (old "Strike topmasts! ...", the id's words, which the sweep reads
+as an id once the work has words of its own). *Looked for elsewhere:* the other works with no words
+of their own whose orders are given with the article, `fid_topmasts`,
+`send_down_topgallant_masts`, `send_down_topgallant_yards`, `sway_up_topgallant_masts` and
+`cross_topgallant_yards`, named by their ids at 20a8e2e3 too: whether they stand is the lead's
+call (the one list, 64); no other file lost its words in this change (item 9's rekeying of the 23
+files kept each). *Test:* `tests/test_catalogue.py`'s
+`test_topmasts_are_struck_only_with_the_topgallant_masts_down_and_no_sail_on_them` reads the refusal
+to "striking the top" (it read "before striking"; fails on 0dcdb8cf, passes on 20a8e2e3), and the
+sweeps' pin.
+
+**Pins moved, old beside new, none weakened.** `tests/test_held_work.py`: `SHIP_WORK_WORDS`'
+`strike_topmasts` ("strike topmasts", "striking topmasts") to ("strike the topmasts", "striking
+the topmasts"), a file's, `SHIP_WORK_FILES` 23 to 24; `PART_WORK_WORDS`' `clear_wreck` ("cut away
+the fore mast", "cutting away the fore mast") to ("clear away the wreck of the fore mast", "clearing
+away the wreck of the fore mast"), `PART_WORK_FILES` with it, the sweep's own assert of it and one
+for the striking; `_ids_left`'s docstring's example. `tests/test_catalogue.py`: the refusal's match
+longer. New: three tests in `tests/test_far_last_list.py` and one in `tests/test_held_work.py`.
+
+**Recorded lines and digests.** This commit moves none: the four whole logs, the five recorded
+passages and gate 5c's naval cruise, sailed with every line on an export of this tree (`ll/rv/`)
+and set beside 20a8e2e3's (the crew build's `logs4-old.json` and `sail5-old.json`, the merge's
+`cruise-base.txt`), differ from it by item 9's words alone, line for line as the crew's section
+gives them (7941856a), each log the merge's: the first action 497 lines, ce44219434e1e42c to
+2a7669c3785b207f; the encounter 229, 732a6020db4d4755 to 2fb50b806e54ea2e; the lee shore 1,561,
+e8c79e9947e244c3 to 1bbe7fbb8084bb67; the station gale 1,722, bf16fbf514055f29 to
+64bd207bf4c1c403; gate 5b's schooner 767, dd6828408be0c5e9 to 4c440e7197466211; the trade stranger
+1,594, 13432e4b2659bcaf to 028b011b3d6b2ccb; the trade in thick weather 426, de00808076d8cccf both;
+the merchant passage 2,909, eb410cf04b496cec both; the merchant intent 2,098, af28debbc98516ae to
+a17f832a5c96a66d; gate 5c's cruise 2,242, 0ac7eaba9f341529 to 81b0b08a63bf068e. The far build moved
+none (its section). No line of any of them moves by this commit's mends.
+
+**Lines any ship may say that change** (old 0dcdb8cf):
+- A ship that changes hands within hail of the player's ship is hailed anew within the minute, "<her
+  words> is within hail, <her course>; <her colours now>.", spoken, and her brain speaks the ship;
+  the rules captain's look at her ends with it.
+- A crewed captor's own possession of the player's ship leaves what his captain knew of other
+  ships; the player's ship as the one answer reads her (struck, her colours, her nation, her place)
+  is hers whichever hull is current.
+- The clearing of a wreck is named in its own words wherever a line names it: "Belayed clearing away
+  the wreck of the fore mast; the fore mast left as it stands." (old "Belayed cutting away the fore
+  mast; ..."), "Not hands enough on deck to clear away the wreck of the fore mast" (old "... to cut
+  away the fore mast"), the work that follows another, and the work in hand in the readings, the
+  console and the glass.
+- The striking of the topmasts: "Strike the topmasts! Hook the top tackles." (old "Strike topmasts!
+  ..."), "All hands! (to strike the topmasts)" (old "(to strike topmasts)"), "Belayed striking the
+  topmasts", and the send-down's "take it in before striking the topmasts" (20a8e2e3's words again;
+  0dcdb8cf "before striking topmasts").
+- A ship whose colours are struck is refused the engage: "Order not carried out ('engage her to
+  starboard'): Our own colours are struck: the guns are silent; she lies to for her captor." (old,
+  for "her", "There is no enemy in sight to engage ..."; for a mark named, "Engage a frigate to
+  starboard: ... the guns to fire as they bear.").
+- The library: a scripted work's `requires` under "It is refused, as it begins or as it is taken up
+  again after a belay, when:" (the four trims, `bend_sail`, `shift_sail`; old "It stops when:").
+
+**For the lead.** (1) Items 64 to 67 of the one list are this review's finds, not built: the five
+works named by their ids (yours to rule whether they stand), a prize's colours said with her
+nation's id (now said in one more case, the hail of F2), the gun deck's other orders after a
+strike, and scripted work reading its `requires` only as it begins and is taken up. (2) The cry of
+the striking (F7) moved with its work's words, the order's own; the one served line the review did
+not name. (3) `GATE_5C_CRUISE_DIGEST` and the build machine's other pins are yours, as the crew's
+section gives them. (4) The suites on this hash (the slow candidates, the captain's trials, the four
+whole logs, the generator and check_viewer_guns, the whole fast tier and ruff) are run once after
+this commit, nothing else running, and reported with the hash.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

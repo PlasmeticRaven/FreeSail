@@ -3852,7 +3852,8 @@ class SendDownScript(PhasedScript):
         if not self.clear_away and self.clew:
             # the work's name from the runner's one road (`Runner._format_context`'s 'doing'),
             # where the file kept a copy of its own in its params, "striking the topmasts", beside
-            # the runner's "striking topmasts" (the lead's last list of 2026-11-14, 9)
+            # the runner's (the lead's last list of 2026-11-14, 9); the file's `work:` now (the
+            # review of 0dcdb8cf, F7)
             doing = str(words.get("doing") or "the work")
             return (
                 f"{_names(ship, self.clew)[:1].upper()}{_names(ship, self.clew)[1:]} "

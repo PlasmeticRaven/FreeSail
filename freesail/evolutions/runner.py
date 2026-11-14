@@ -1986,7 +1986,7 @@ class Runner:
             "heading": units.format_heading(ship.dyn.heading),
             "speed": units.format_speed(ship.dyn.speed),
             # the work's name in both forms, from the one road, for a line of a script's own that
-            # names its work (the send-down's "take it in before striking topmasts")
+            # names its work (the send-down's "take it in before striking the topmasts")
             "doing": self._doing(inst),
             "work": self._describe(inst),
         }

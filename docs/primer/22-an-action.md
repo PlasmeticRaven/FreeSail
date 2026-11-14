@@ -40,7 +40,7 @@ The gun deck's orders are of two kinds. The standing intentions the battery keep
 
 | Order | What it sets |
 |---|---|
-| `engage her to starboard` / `engage the brig to larboard` / `engage on both sides` | the mark and the side; 'her' is the nearest enemy who may be fought (not struck, nobody's prize); with none in sight the order is refused, and a sail named is engaged as named |
+| `engage her to starboard` / `engage the brig to larboard` / `engage on both sides` | the mark and the side; 'her' is the nearest enemy who may be fought (not struck, nobody's prize); with none in sight the order is refused, and a sail named is engaged as named; once her own colours are struck it is refused |
 | `load with round shot` / `chain` / `grape` / `double` / `a blank cartridge` | the charge the guns take from now (a loaded gun keeps its charge until fired; a swivel takes round or grape) |
 | `aim at her hull` / `her rigging` / `between wind and water` | the aim's doctrine: where the hits are allotted |
 | `fire as they bear` / `fire by divisions` / `hold your fire` | the firing's doctrine: each gun as it is loaded and bears (the period's independent fire); the forward and the after division by turns; no gun but by name or at the word |
