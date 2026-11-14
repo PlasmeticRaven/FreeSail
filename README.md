@@ -2,7 +2,7 @@
 
 A ticked, text-first sailing simulation of a late-age-of-sail ship, controlled through layered orders (from hauling a single line to standing orders and scripts), with language models able to watch, crew, or captain through the same channel a human uses.
 
-Status: gate m6c passed (`docs/gates/gate-m6c.md`); milestone 7 is in build, its interim gate drafted in `docs/gates/gate-m7-interim.md`; the gate process and every gate's report are in `docs/gates/`.
+Status: the last gate passed is m5c, on 8 October 2026 (`docs/gates/gate-m5c.md`). Milestone 6's gates were not passed: m6a stands open, m6a-2 was not cut, and m6c was run in part (`docs/gates/gate-m6c.md`), its untested items deferred to a gate that was not run. Milestone 7's interim gate is a draft and has not been run (`docs/gates/gate-m7-interim.md`). A cold review of the whole was made on 14 November 2026 (`docs/reviews/ColdReview-M7.md`); new work is held while what it found unsafe or untrue is mended. The gate process and every gate's report are in `docs/gates/`.
 
 ## Running it
 
