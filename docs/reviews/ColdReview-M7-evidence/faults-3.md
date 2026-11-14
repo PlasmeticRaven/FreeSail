@@ -103,3 +103,45 @@ generator and files agree, as a builder's change would leave them),
 `test_hull_brig.py::test_one_hull_in_two_roles_alike_but_her_own_two_guns_ports`.
 **SURVIVED** (by skip): the tests that promise "no physics figure moved" cannot fail in a
 shallow checkout, and nothing else pins those two figures.
+
+## 06-5 The 64's quarterdeck ports moved in 0.2 m
+
+| 06-5 | test_indefatigable.py::test_her_drawn_hull_stands_within_its_bands_and_moves_nothing | QD port half-breadths in 0.2 m | pass | KILLED | 2 |
+
+```
+--- mut/tools/ships/indefatigable.py
++++ tools/ships/indefatigable.py
+@@ -929,7 +929,7 @@
+     qd_ports = [
+-        (x, wl1_above_k(x) + s, interp(TOP_TIMBER, x) + PLANK_FT) for x, s in QUARTERDECK_SILLS
++        (x, wl1_above_k(x) + s, interp(TOP_TIMBER, x) + PLANK_FT - 0.2 / 0.3048) for x, s in QUARTERDECK_SILLS
+     ]
+regenerated: sixty-four.yaml:81 quarterdeck half-breadths 4.01..5.18 -> 3.81..4.98 (only file changed)
+```
+
+Measured first: pristine, the 64's quarterdeck gaps were +0.173 to +0.269 m (upper deck to
++0.386); with the fault +0.373 to +0.469. The test fails:
+`AssertionError: ('data/ships/sixty-four.yaml', -0.09654782195812839, 0.46868581842714274)`,
+`assert 0.46868581842714274 <= 0.4` (`tests/test_indefatigable.py:718`). **KILLED**: the
+reader's suspicion is refuted for 0.2 m. The headroom is thin all the same: the quarterdeck
+stands 0.131 m inside the band, so a move of 0.1 m would pass (computed from the gaps, not
+run).
+
+## 06, faults "no test in my files would catch"
+
+- **A1, the leeway line every few seconds** (fault 06-1 planted again). Grep of the tests for
+  `ship.leeway`, `LEEWAY_NOTE_INTERVAL`, `seconds_since_leeway`, `Leeway [0-9]`; run with the
+  fault: `test_readings.py::test_the_log_writes_no_leeway_line_without_way_on`,
+  `::test_course_and_leeway_are_not_readings_with_no_way_on`,
+  `test_rollup.py::test_the_words_come_from_the_kinds_and_counts`,
+  `test_settee.py::test_the_luggers_tack_and_wear_are_as_they_were` (both cases; it filters
+  `ship.leeway` out of the log it compares, line 1455), and the named test. All pass.
+  **SURVIVED** in the suite as far as grep reaches.
+- **A2, no windage under bare poles** (fault 06-2 planted again). Caught three times:
+  `test_sea.py::test_windage_under_bare_poles_is_measured_and_recorded` fails
+  (`assert 2.5 <= 0.0`, `tests/test_sea.py:503`: the frigate running under bare poles makes
+  no way), `test_evolutions.py::test_cutting_away_a_boom_...` fails at line 1373
+  (`_spar_windage_area(boom) > 0.0`), `test_lateen.py::test_the_course_draws_on_the_gaffs_curve_...`
+  fails at line 182. **KILLED** by the suite; the reader's file alone would not.
+- **A3, a spar's rating or a GM changed in the generator and the file regenerated**: that is
+  fault 06-4, run above with five other tests. **SURVIVED**.

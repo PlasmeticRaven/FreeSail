@@ -90,3 +90,60 @@ test's near brig is perceived as `made_out 3`, "a merchant brig, deep laden ... 
 with the fault, and `made_out 0`, "a sail", without it. Output: 1 passed. The test's far brig is
 fifty miles off and never in sight, so the closing assertion (`"Y" not in ids or ...`) cannot
 fail. SURVIVED.
+
+## tests-03, the faults its reader said no test would catch
+
+| # | Tests run | Fault | Baseline | Result | s |
+|---|---|---|---|---|---|
+| 03-A | five of test_aboard_another.py (below) | a player's seat on a hull not his own refused every line | pass | SURVIVED (all five) | 12.5 to 47.1 each |
+| 03-B | four (below) | `boat_swamped` without `plausible_when` (fault 03-5 again) | pass | SURVIVED (all four) | 1.2 to 8.8 each |
+| 03-C | test_ship_particulars.py::test_generator_reproduces_the_committed_files; test_bilander.py::test_the_generator_writes_her_file_as_committed_and_reports_its_checks | the generator's bowers at a tenth (then at half) of the rule | pass | KILLED | 1.5 / 0.8; 4.7 |
+
+### 03-A: the seat aboard another hull can never order
+
+`freesail/agents/seat.py`, `PlayerSeat.route`:
+```diff
+         line = " ".join(str(text).split())
+         low = line.lower()
++        _w = getattr(self.world, "world", None)
++        if _w is not None and getattr(_w, "players", None) is not None and self.world is not _w.players:
++            return self._refused(line, f"The {self.station.name} has not the authority. {line!r} not carried out.")
+```
+Live: on the test's `aboard_x()` world, `seat_player(w, "officer").route("set the royals")` gives
+`agent.refused ... has not the authority`. Run, all passed: test_aboard_another.py
+`::test_the_players_seat_on_another_ship_is_hers_and_stays_when_the_drivers_move_on` (12.5 s),
+`::test_the_seat_goes_with_its_person_by_the_boat_and_replays` (47.1 s),
+`::test_the_player_aboard_another_ship_has_her_prompt_and_his_own_is_left_as_she_lies` (14.8 s),
+`::test_the_station_kept_on_the_players_ship_by_her_name_reads_the_players_vessel` (12.6 s),
+`::test_the_player_aboard_another_ship_replays_by_his_acts_to_the_same_digests` (19.5 s).
+(`grep '\.route(' tests/` finds no other test that seats the player on a hull not his own.)
+Worse than the reader said: on the pristine code the same call is refused too (`agent.refused:
+The officer of the watch has not the deck (the captain has it)`), so the one `route` call on
+another hull, :233-234, cannot tell a working seat from a dead one: no test in the suite shows
+a seated player on another hull ever carrying out an order. SURVIVED.
+
+### 03-B: the swamped boat on a smooth sea
+
+The fault of 03-5, planted again. Tests chosen by `grep -n "boat_swamped\|plausible_when" tests/`:
+test_boat_hull.py::test_the_boat_swamped_loses_her_people_and_the_ship_says_so,
+test_aboard_found.py::test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing,
+`::test_every_condition_must_hold_and_the_new_ones_read_the_ship`,
+`::test_a_key_the_game_does_not_know_is_the_tables_mistake_said_at_the_load`. All passed. No
+test asks that a thing with a `doubt` has a `plausible_when` for it to be doubted by. SURVIVED.
+
+### 03-C: the generator's anchors out of proportion
+
+`tools/gen_ships.py:501`, first `/ 100.0` to `/ 1000.0` (the bowers a tenth):
+```diff
+-    bower_cwt = round(BOWER_CWT_PER_100_TONS * burthen / 100.0, 1)
++    bower_cwt = round(BOWER_CWT_PER_100_TONS * burthen / 1000.0, 1)
+```
+The generator then stops: `ShipFileError: rating pass: anchor 'kedge' has weight_kg of nothing.`
+(both tests fail on it). Planted milder, `/ 200.0` (the bowers at half), so that the files are
+written: test_ship_particulars.py::test_generator_reproduces_the_committed_files fails at :590
+(`assert '# The biland...' == '# The biland...'`, the bowers' note differs). KILLED: the reader
+did not have the regenerate-and-compare test in his files; it holds every committed ship file
+to the generator byte for byte. Tried also against the hand edits of 03-3 (the brig's bower at
+1 kg) and 03-4 (the bilander's beam at 6.5 m): it fails on each at :590 (4.2 s, 3.4 s). So the
+data faults of 03-3 and 03-4 survive their named tests but not the suite; a change made in the
+generator and the data together (regenerated and committed) would pass this test and 03-3's.
