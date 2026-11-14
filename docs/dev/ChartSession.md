@@ -764,3 +764,30 @@ What the review says of the chart and its ports:
 In closing 112 and 106b, take any cheap way a step in hand avoids making one of these worse,
 and say so. Two examples: rebuild no tile that does not need it (M1's "commit only tiles whose
 arrays change" already does this), and add no key that nothing reads.
+
+### 2026-11-14, 10:10: the tracks step, gated
+
+What the step built, by package 111's rulings and the lead's of 07:47; the full account is in
+TuningNotes, "The chart session's tracks step":
+- `Chart.least_depth_along` and `Chart.line_step_m`: one reader of a line's least depth, its
+  first step half the finest cell under the line. The audit's (f) reads it.
+- A test at the cause: a made grid with a rock one cell wide.
+- Five tracks redrawn: Messina, Syracuse, Palermo, Lampedusa and Catania. Three of them also had
+  their track from the sea end at the road, the plan's own cause.
+- Santa Cruz de Tenerife's and Porto Paolo's spots moved out of the modern works to their pilots'
+  roads; their tracks stand.
+- Faden's sunken rock in St Peter Port's file. My earlier "clears 100 yards but not 200" was
+  wrong: it clears 200 too.
+- The known list moved to `tools/audit_chart_known.yaml`, seven entries out, and each of the
+  twelve `f-shallow` left given its cause.
+
+Named to the lead and not mended: Genoa, Bougie and Civita Vecchia (their spots inside modern
+works); the Goletta (a 6.2 m way its track does not take); and the guard's first and last cable.
+
+The gate at d8235abc:
+- lint clean;
+- the fast tier whole: 7,625 passed, 1 xfail, and 1 failed, the trunk's key-shape test (mended
+  on the trunk at 9944c9eb, the lead's word: named, not rerun);
+- the slow tier of the ports, chart, audit, truths, browser probe, checkpoint and tide: 220
+  passed, 8 xfail, none skipped;
+- the pace tests alone and last.
