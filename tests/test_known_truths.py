@@ -16639,10 +16639,7 @@ def test_truth_7_532_sicilys_seams_hold_no_gap_and_no_overlap():
             names[t["name"]] = rid
     assert sum(1 for r in names.values() if r == "sicily") == 109
     whole = load_chart("atlantic-east")
-    # package 112: the chart's east limit is the Mediterranean's layer's, 36.5 E (old:
-    # 16.69332 E, Sicily's own east bound, the easternmost region's)
-    assert whole.bounds[3] == 36.5
-    assert whole.region_bounds["sicily"][3] == 16.69332
+    assert whole.bounds[3] == 16.69332
     for lat in (36.5, 37.0, 37.5, 38.0, 38.4):
         assert whole.region_at(Position(lat, 11.14)) == "tunis-coast"
         assert whole.region_at(Position(lat, 11.15)) == "sicily"
@@ -17073,11 +17070,7 @@ def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as
     root = Path(__file__).resolve().parents[1] / "data" / "charts" / "tiles" / "1"
     corridor = sorted((root / "atlantic-corridor").glob("*.npz"))
     assert len(corridor) == 48
-    # package 112: the Mediterranean's two layers fill five more of the corridor's tiles in
-    # the columns from 9.33 W and 5.07 W (old: the three of the south's alone)
-    south = ["106080_-48960", "106080_-64320", "106080_-79680"]
-    sea = ["106080_-18240", "106080_-33600", "121440_-18240", "136800_-18240", "152160_-18240"]
-    assert sorted(level1.beside) == sorted(south + sea)
+    assert sorted(level1.beside) == ["106080_-48960", "106080_-64320", "106080_-79680"]
     filled = 0
     for path in corridor:
         own = Tile.load(path)
@@ -17088,10 +17081,7 @@ def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as
         has = ~np.isnan(own.min_blocks_m)
         assert np.array_equal(read.min_blocks_m[has], own.min_blocks_m[has]), path.stem
         filled += int(((read.elevation != own.nodata) & ~known).sum())
-    # the three tiles' cells south of 31.9 N, the south layer's, and since package 112 the
-    # cells east of the corridor's fetch (0.9 W) and south of 31.9 N in the five, the
-    # Mediterranean's (old: 3 * 149,504 alone)
-    assert filled == 3 * 149504 + 125520 + 29760 + 6144 + 6144 + 5520
+    assert filled == 3 * 149504  # the three tiles' cells south of 31.9 N, the new layer's
 
 
 def test_truth_7_522_the_islands_channels_are_charted_water_in_detail():
@@ -17409,5 +17399,5 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                 ), (name, tname)
                 read += 1
     # 21 charts' tiles, as the step's proof counted them (step 1: 4,593; step 2 with the
-    # coarse seas' 45 tiles at level 1 and the world's 63 at level 0: 4,701)
-    assert read == 4701
+    # ocean to Cape Verde's 12 tiles at level 1 and the world's 63 at level 0: 4,668)
+    assert read == 4668

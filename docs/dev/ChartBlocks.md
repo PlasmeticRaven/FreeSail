@@ -1024,14 +1024,16 @@ the blocks' shoalest soundings), in the chart's order:
 |---|---|---|---|---|
 | `atlantic-corridor` | 32 to 51 N, 32 to 1 W | 48 | 9,746,887 | 38, 39e |
 | `atlantic-south` | 25.2 to 31.9 N, 22.13 to 9.34 W | 6 | 1,191,415 | 106a |
-| `mediterranean` | 30 to 42.27 N, 6 W to 36.5 E | 31 | 7,411,985 | 112 |
-| `mediterranean-north` | 42.27 to 46 N, 6 W to 24.79 E | 7 | 1,678,693 | 112 |
 | `atlantic-verde` | 12.4 to 25.2 N, 26.4 to 9.34 W | 12 | 2,487,854 | 112 |
 
-The Mediterranean is two layers so that the Black Sea is left out: its three tiles of the
-row from 42.27 N east of 24.8 E are not laid. The Black Sea's southern strip, 41 to 42.27 N
-along the Anatolian shore, lies in the first layer's row with the Marmara and is laid with
-it. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
+**A layer's bounds are charted water to the tide** (`tide.charted_bounds`): a block's edge
+that meets them where no block holds the water is an open edge, and within the eleven's reach
+the block's water tapers there toward the eleven's (package 94). A layer whose box runs over
+the land beside a block opens that block's landward edges too: the Mediterranean's, built
+from 6 W, moved the Gulf of Lion's tide by six metres and Biscay's by one (package 112), and
+waits for the seas, under which an open edge tapers toward its sea's water. Before a layer
+is committed, prove every region's tide on a grid, old beside new, and the open edges the
+same. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
 (the build writes NODATA where that one's committed tile has data). It never widens a
 layer already laid: widening rewrites every tile of it (39e, 106a). Each folder is let
 through `.gitignore` by name.

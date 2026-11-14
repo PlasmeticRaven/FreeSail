@@ -28737,70 +28737,83 @@ to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 
 210. The mend would read a coarse cell as `-elevation + z` (its level not added), an engine
 change for the lead. The new layers and level 0 carry the same fault on their own shores.
 
-### Step 2: the layers laid
+### Step 2: the layers laid, as ruled (A)
 
-**What was built** (`tools/build_charts.py`, one run: `--corridor mediterranean --corridor
-mediterranean-north --corridor atlantic-verde --world`):
+**What was built** (`tools/build_charts.py`, from the cache alone: `--skip-fetch --corridor
+atlantic-verde --world`):
 
-- `mediterranean`, 30 to 42.2666 N and 6 W to 36.5 E, beside the corridor: 31 tiles,
-  7,411,985 bytes. The three tiles in the column from 9.33 W north of 33.73 N are the
-  corridor's whole and are not written; five share the corridor's names and fill its NODATA.
-- `mediterranean-north`, 42.2667 to 46 N and 6 W to 24.79 E, beside the corridor: 7 tiles,
-  1,678,693 bytes. With the first: 38 tiles and 9.09 MB, against step 0's 41 and 9.71 in one
-  box with the Black Sea. The three Black Sea tiles are left out; the strip south of 42.27 N
-  stays (the how-to).
-- `atlantic-verde`, 12.4 to 25.2 N and 26.4 to 9.34 W, beside `atlantic-south`: 12 tiles,
-  2,487,854 bytes, byte for byte step 0's measure.
+- `atlantic-verde`, 12.4 to 25.2 N and 26.4 to 9.34 W, beside `atlantic-south` (it shares no
+  tile with it): 12 tiles, 2,487,854 bytes, byte for byte step 0's measure.
 - **Level 0** over 70 S to 75 N and 100 W to 40 E: 63 tiles, 11,283,534 bytes, committed.
-- The chart's entry now says `layers:` (the five, in order) where it said `corridor:` and
-  `corridors_beside:`. The tool writes it from `CHARTS`. The manifest's `world:` entry is
-  committed and carried by later builds while its tiles are present (`_fetched_level`).
-  `.gitignore` lets `tiles/0/` and the three folders through.
+- The chart's entry says `layers:` (the corridor, the south's, Cape Verde's) where it said
+  `corridor:` and `corridors_beside:`; the tool writes it from `CHARTS`. The manifest's
+  `world:` entry is committed and carried by later builds while its tiles are present
+  (`_fetched_level`). `.gitignore` lets `tiles/0/` and `tiles/1/atlantic-verde/` through.
+- **The Mediterranean's two layers are not laid** (below); they come in step 3 with the seas.
 
-**The proofs.**
+**The Mediterranean's layers moved the tide of three regions, and were taken out (the chart
+session's ruling (A), 2026-11-14).** They were built first in this step: `mediterranean`,
+30 to 42.27 N and 6 W to 36.5 E, 31 tiles and 7,411,985 bytes, and `mediterranean-north`,
+42.27 to 46 N and 6 W to 24.79 E, 7 tiles and 1,678,693 bytes, two layers so that the Black
+Sea's three tiles were left out. The slow tier's full sweep (truth 7-565 and
+`test_chart_audit`'s twin) found a new `c-level:gulf-of-lion`. **The mechanism:** the tide
+reads every layer's bounds as charted water (`tide.charted_bounds`), and a block's edge that
+meets charted water no block holds is an open edge, where the block's water tapers over ten
+miles toward the eleven's alone (`Tide.open_edges`, `taper_at`, package 94), wherever the
+eleven are within their reach. The Mediterranean layers' boxes ran from 6 W over the land of
+Spain and France, so the blocks' edges facing that land became open edges: 77 where there
+were 38. Within 400 miles of the eleven the taper blended them in. Old beside new, on a grid
+of 0.05 degrees over every region and tide region:
 
-- **Every earlier file under `data/charts/`**, 2,397 of them (tiles, coasts, indexes,
-  features, overrides, the known list), hashes the same after the build.
-- **The manifest:** the regions, the two earlier layers, the tide regions, the levels and
-  the notes are equal entry for entry, and every earlier fetch record is kept in its place.
-  What changed: the chart's layer keys, the three layers added, the world's entry (now
-  committed, 63 tiles), four GEBCO fetch records added, the build's date and hash, and
-  EMODnet's status word ("fetched" to "fetched in an earlier build"; its records equal).
-- **Level 0 equals the world's:** the 63 tiles are byte for byte the same tiles of the whole
-  world's build (150 tiles, made at step 0 in a scratch folder). Widening the box moves none.
-- **What the runtime reads:** every chart and region loaded and every listed tile read
-  through `Level.tile`, hashed, old beside new (step 1's script). The twenty charts of one
-  region are identical in their levels, bounds and every tile. `atlantic-east`: 2,322 tiles
-  identical; 108 new (45 at level 1, 63 at level 0); 5 changed, the corridor's tiles the
-  Mediterranean fills: `1/106080_-33600`, `1/106080_-18240`, `1/121440_-18240`,
-  `1/136800_-18240`, `1/152160_-18240`. Their corridor cells are unchanged (step 0's proof
-  through `filled_from`; truth 7-570). Levels [3, 2, 1] to [3, 2, 1, 0]; bounds 25.2001 to
-  51.5 N, 32 W to 16.69332 E, to 12.4001 to 51.5 N, 32 W to 36.5 E.
+| region | points moved | of them water | the worst water: level | M2 |
+|---|---|---|---|---|
+| gulf-of-lion | 326 | 9 | 0.51 to 6.62 m at 43.04 N 3.03 E | 0.07 to 3.56 m |
+| biscay-south | 383 | 12 | 3.35 to 4.49 m in the Gironde, 45.53 N 0.91 W | 1.52 to 1.78 m |
+| biscay-north | 22 | 2 | 3.95 to 3.96 m at 45.98 N 1.13 W | unchanged |
+
+The other 21 regions and tide regions were unmoved. Step 3 lays the layers with the seas,
+where an open edge tapers toward its sea's own water and not the eleven's. The other choice
+was a tide that ignores a layer, which is new mechanism; it was not taken.
+
+**The proofs, as built.**
+
+- **Every earlier file under `data/charts/`**, 2,397 of them, hashes the same.
+- **The manifest** against the one before step 2: the regions, the two earlier layers, the
+  tide regions, the levels and the notes are equal, and every earlier fetch record is kept in
+  its place. What changed: the chart's layer keys, `atlantic-verde` added, the world's entry
+  (committed, 63 tiles), two GEBCO fetch records added (Cape Verde's extract and the global
+  zip), and the build's date and hash.
+- **Level 0 equals the world's:** its 63 tiles are byte for byte the same tiles of the whole
+  world's build (150 tiles, made at step 0 in a scratch folder), so widening the box moves none.
+- **No tide moves anywhere:** `charted_bounds` gains `corridor:atlantic-verde` and nothing
+  else changes; the open edges are the same 38. Every region's and tide region's level and
+  constants on a 0.05-degree grid, the Cape Verde layer's water at 0.25 degrees and level
+  0's box at 2 degrees, 126,769 points old beside new: none moved. Cape Verde's edges face no
+  block within the eleven's reach, and level 0 is not a layer of `charted_bounds`.
+- **What the runtime reads:** the twenty charts of one region are identical, tile for tile
+  (step 1's script); `atlantic-east` keeps every earlier tile and adds Cape Verde's 12 and
+  level 0's 63.
 - **The audit** (`--known`, sampled): no finding the known list lacks.
-- **Level 0 at work** (31 N 25 W, 57 N 6 W, 10 N 30 W): a depth is read, no shore distance
-  (no field at this level), no grounding in open water; outside the limits the chart still
-  refuses a start.
 
-### Step 2: the pins moved by design, old beside new (the chart session's ruling of 2026-11-14)
+### Step 2: the pins moved by design, old beside new (the chart session's rulings of 2026-11-14)
 
-The fast tier at c1bbec8 (the reload mend in): 8 failed, 7,613 passed. Each was the chart's
-form or limits, which the lead ruled to move. With truth 7-570 (slow) they are nine,
-re-pinned so:
+Seven, re-pinned with their reasons; nine were found with the Mediterranean laid, and two of
+them (truth 7-532's east bound and truth 7-521's fills) did not move once it was taken out.
 
 1. `test_chart::test_the_regions_tiles_are_present_committed_and_under_the_brief_size`:
    the world's `committed` False to **True** (level 0 committed by the ruling), the
    Atlantic's still False. The tracked folders are the chart's `layers:` (old: `corridor:`
    and `corridors_beside:`) and `tiles/0/`, whose 63 files are exactly the manifest's.
 2. `test_chart::test_the_chart_is_the_whole_manifest...`: the chart's `corridor:` to
-   **`layers:`** (the five in order). The levels [3, 2, 1] to **[3, 2, 1, 0]**. The envelope
-   (25.2001, 51.5, −32, 16.69332) to **(12.4001, 51.5, −32, 36.5)**, and its words with it.
+   **`layers:`** (the three in order). The levels [3, 2, 1] to **[3, 2, 1, 0]**. The envelope
+   (25.2001, 51.5, −32, 16.69332) to **(12.4001, 51.5, −32, 16.69332)**, and its words with it.
 3. `test_chart::test_the_corridor_is_committed...`: it read `levels[-1]`, the coarsest
    level, for "the corridor's tile carries the distance field". The coarsest is now level
    0, which has none. It now reads **the level that carries the field** (level 1), holds the
-   coarsest as level 0, and holds that level 0 has no field. **No reader of the engine
-   takes the coast distance from the coarsest level:** there is no `levels[-1]` in
-   `freesail/`. `coast_distance` and `nearest_shore` walk the levels finest first and skip a
-   level whose field reads None. `coast_trend`, the one reader that walks coarsest first
+   coarsest as level 0, and holds that level 0 has no field. **No reader of the engine takes
+   the coast distance from the coarsest level:** there is no `levels[-1]` in `freesail/`.
+   `coast_distance` and `nearest_shore` walk the levels finest first and skip a level whose
+   field reads None. `coast_trend`, the one reader that walks coarsest first
    (`reversed(levels)`), skips a level whose `dist_smooth` is None, which level 0's is
    everywhere, and so reads the next finer level as before.
 4. `test_chart::test_a_query_asks_the_finest_level...`: `BEYOND_THE_CORRIDOR` (31 N 25 W)
@@ -28809,26 +28822,19 @@ re-pinned so:
    water "2980 fathoms at low water by the chart, at the position by account; the chart has
    2961 fathoms and a half to 2992 fathoms within the account's doubt"; the land "not in
    sight"; no chart-edge line (the place is inside the limits). Two things for others: "at
-   low water" is said of a depth at mean sea level (the double count above), and
-   `level_at` and `use_at` name the corridor's level ("the Atlantic: passages and
-   landfalls") there. The corridor's empty tile is listed at the place, and the
-   depth falls through it to level 0.
+   low water" is said of a depth at mean sea level (the double count above), and `level_at`
+   and `use_at` name the corridor's level ("the Atlantic: passages and landfalls") there,
+   since the corridor's empty tile is listed at the place and the depth falls through it to
+   level 0.
 5. `test_chart::test_the_recipe_form...`: `tool.CHARTS[WHOLE]["corridor"]` to
    **`["layers"][0]`**.
-6. Truth 7-532 (Sicily's seams): `whole.bounds[3]` 16.69332 to **36.5**, the Mediterranean
-   layer's. Sicily's own east bound, 16.69332, is held beside it.
-7. Truth 7-520: `bounds[0]` 25.2 to **12.4** (the Cape Verde layer's). **Its refused start**
+6. Truth 7-520: `bounds[0]` 25.2 to **12.4** (the Cape Verde layer's). **Its refused start**
    moves from 25.1 N 20 W, now within the limits, to **12.3 N 20 W**, south of them, so a
    refusal stays tested. `atlantic-south` is held second in the chart's layers.
-8. Truth 7-521: the corridor's tiles filled beside it, 3 to **8** (the Mediterranean's two
-   layers fill five in the columns from 9.33 W and 5.07 W). The filled cells 3 × 149,504
-   to that plus **173,088** (125,520, 29,760, 6,144, 6,144 and 5,520). Every corridor cell
-   is still its own.
-9. Truth 7-570: the derivation takes the committed level 0 under a chart of `charts:`; the
-   tiles read 4,593 to **4,701**. It is kept whole, by the chart session's ruling: 33 s
-   alone here, and 12 s as a sample of 1,561 tiles (every region's tiles across its bounds,
-   every coarse tile and a fixed tenth of the rest). Neither explains the cloud's longer
-   run.
+7. Truth 7-570: the derivation takes the committed level 0 under a chart of `charts:`; the
+   tiles read 4,593 to **4,668**. It is kept whole, by the chart session's ruling: 33 s alone
+   here with the Mediterranean laid, and 12 s as a sample of 1,561 tiles (every region's
+   tiles across its bounds, every coarse tile and a fixed tenth of the rest). Neither
+   explains the cloud's longer run.
 
-The nine pass (75 s with 7-570). test_longitude's chart-edge line does not move: it reads
-the bounds.
+The seven pass. test_longitude's chart-edge line does not move: it reads the bounds.

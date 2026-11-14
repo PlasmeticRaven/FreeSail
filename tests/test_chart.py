@@ -938,7 +938,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 112: the layers as one ordered list (old: `corridor:` the corridor and
     # `corridors_beside:` the south's), the corridor first; and level 0 under the chart
     # (old: levels [3, 2, 1])
-    layers = [CORRIDOR, "atlantic-south", "mediterranean", "mediterranean-north", "atlantic-verde"]
+    layers = [CORRIDOR, "atlantic-south", "atlantic-verde"]
     assert manifest["charts"][WHOLE]["layers"] == layers
     assert whole.region == whole.name == WHOLE and whole.regions == regions
     assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
@@ -953,9 +953,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 105: the east to 16.69332 E (was 15.5); package 106a: the south limit the ocean
     # carried south's, the Canaries' row of the level-1 grid a hair inside its edge (25.2 N)
     # package 112: the south limit the ocean to the Cape Verde Islands' (old 25.2001 N, the
-    # Canaries' row), the east the Mediterranean's layer's, 36.5 E (old 16.69332 E, Sicily's)
-    assert whole.bounds == (12.4001, 51.5, west, 36.5)
-    assert whole.bounds_words() == f"12.4001 to 51.5 N, {abs(west):g} W to 36.5 E"
+    # Canaries' row); the east still Sicily's (the Mediterranean's layers come with the seas)
+    assert whole.bounds == (12.4001, 51.5, west, 16.69332)
+    assert whole.bounds_words() == f"12.4001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None

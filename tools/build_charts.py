@@ -843,36 +843,6 @@ CORRIDORS: dict[str, dict[str, Any]] = {
         "folder": "tiles/1/atlantic-south",
         "beside": "atlantic-corridor",
     },
-    # package 112 (the coarse seas; the chart session's rulings on its step 0): the
-    # Mediterranean at 30", in two layers so that the Black Sea is left out: the level-1
-    # grid's rows from 29.47 to 42.27 N over the whole sea, 6 W to 36.5 E (the Levant's
-    # coast at Iskenderun, 36.2 E), and the row from 42.27 N west of the column from 24.8 E
-    # (the Gulf of Lion, the Ligurian sea and the Adriatic to Trieste), the three tiles of
-    # that row east of 24.8 E being the Black Sea's. The strip of the Black Sea south of
-    # 42.27 N (41 to 42.27 N, the Anatolian shore) lies in the first layer's row with the
-    # Marmara and is laid with it. Each beside the corridor: where the corridor's tiles in
-    # the column from 9.33 W and from 5.07 W have data they answer alone (three are the
-    # corridor's whole and are not written).
-    "mediterranean": {
-        "title": "The Mediterranean: the Strait to the Levant, the coarse sea",
-        "level": 1,
-        "bounds": {"south": 30.0, "north": 42.2666, "west": -6.0, "east": 36.5},
-        "fetch": {"south": 29.9, "north": 42.37, "west": -6.1, "east": 36.6},
-        "datum": "mean sea level",
-        "source": "gebco_2025",
-        "folder": "tiles/1/mediterranean",
-        "beside": "atlantic-corridor",
-    },
-    "mediterranean-north": {
-        "title": "The Mediterranean's north: the Gulf of Lion, the Ligurian sea and the Adriatic",
-        "level": 1,
-        "bounds": {"south": 42.2667, "north": 46.0, "west": -6.0, "east": 24.79},
-        "fetch": {"south": 42.17, "north": 46.1, "west": -6.1, "east": 24.89},
-        "datum": "mean sea level",
-        "source": "gebco_2025",
-        "folder": "tiles/1/mediterranean-north",
-        "beside": "atlantic-corridor",
-    },
     # package 112: the ocean carried south from the Canaries' row to the Cape Verde
     # Islands' (12.4 to 25.2 N), from the column from 26.4 W (Santo Antao's west point is
     # 25.36 W) to the African coast; it shares no tile with the layers before it
@@ -971,14 +941,11 @@ CHARTS: dict[str, dict[str, Any]] = {
         ],
         # package 112: the coarse layers as one ordered list (freesail/world/chart.py): at
         # each level the first that lists a tile answers in it, a later one filling only
-        # its NODATA (the corridor, then 106a's layer beside it, then the seas)
-        "layers": [
-            "atlantic-corridor",
-            "atlantic-south",
-            "mediterranean",
-            "mediterranean-north",
-            "atlantic-verde",
-        ],
+        # its NODATA (the corridor, then 106a's layer beside it, then the ocean south to
+        # the Cape Verde Islands); the Mediterranean's layers come with the seas (its step
+        # 3: laid now, their bounds made the Gulf of Lion's and Biscay's edges open to the
+        # eleven's taper, the chart session's ruling of 2026-11-14)
+        "layers": ["atlantic-corridor", "atlantic-south", "atlantic-verde"],
     },
 }
 
