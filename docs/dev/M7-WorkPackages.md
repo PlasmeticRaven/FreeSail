@@ -5388,6 +5388,24 @@ Merged at 9381a4f9 by the builder's hash c0074305, read by the chart session at 
 
 **Listed, not mended:** truth 7-284, a measure of time run among the fast tests, fails when the machine is loaded (met twice today); it may want the pace mark; for the test suite's audit.
 
+### Package 115, part D (the newcomer's trips) at 60af48e: NOT merged; the first reading (2026-11-14)
+
+The builder reported part D whole at 60af48e. An independent reader read all of it with a copy of the base beside it, playing each item at the prompt.
+
+**What holds:** with the guns secured or being cast loose every answer of the gun deck is true and names an order that works (a cutter, a frigate, a 74); `engage` casts both batteries loose; no gun fires that was not cast loose. The rules captain's fights are the same fights (four scenarios, ninety minutes each: every tick the same, fire opened at the same moments, the wording alone changed). A ship's temper comes by one road. The purchase balances in every case tried. The starter book refuses nothing on any ship file and reads the same on every square rig. **The pins the builder moved were passed by their lines:** the schooner's passage 766 to 769 lines, the merchant's 3,103 to 3,096, the naval cruise's fifteen lines of wording; every changed line tied to a meant change and the hourly positions identical. Four planted faults each fail their test.
+
+**What does not:**
+1. **New:** after the rules captain's own "hold your fire" (given by his book each time he engages), the player's `engage` no longer opens fire, and the game says "at your order" of a hold he never gave. The lead's ruling was for the player's own hold; the hold did not record whose it was.
+2. **New:** reports sent below are gathered by their words, not by the thing reported: of four different sails sighted on the same bow while he was below, one was reported.
+3. `fire` and its forms were left out of the answers made true: with the guns secured, `fire` still promises a broadside that never comes.
+4. The sale: the boat lost with goods sold, "the money taken stands"; the market pays for what it never had.
+5. When four boarding tests were turned from "carried" to "repulsed", every assertion about a deck carried went with them (the line, the strike, the prize taken, the prisoners). They go back on an honest road.
+6. Small and new: one contradictory answer; a hint that names an order then refused; the fitted book adding a refusal on the schooner at every sunset and a line of noise on every fore-and-aft vessel; the relieving tackles' words; one served text changed and not declared; two scenarios whose own headers name the wrong place or ship.
+
+**Corrected by this reading:** the lead's finding of the morning, that boarding a ship of war cannot succeed as built. It can, by numbers: a 74's boarders carry a frigate's deck in the first round; a frigate against a frigate at equal numbers and full temper is repulsed.
+
+**For the owner, not built:** the new order `rig the relieving tackles` sets a mark that nothing reads: with the wheel shot away she steers exactly as before, and the wheel is never repaired. Whether a shot-away wheel should stop the helm until the tackles are rove is a question of the fight's damage, under his hold. Also older, listed: `strike the colours` is read as striking a standing order of that name; at a newcomer's `engage her to larboard` the rules captain did not stand aside.
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
