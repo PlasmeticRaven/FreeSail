@@ -984,6 +984,39 @@ class LinePiece:
     def along_m(self, t: float) -> float:
         return self.along0 + self.chord_m * t
 
+    def first_under(self, wants_m: float) -> float | None:
+        """The first fraction t within the piece where its depth is under `wants_m`, by the
+        quadratic through its ends and its middle (exact on a bilinear piece, and on a
+        constant one); None where it is nowhere under."""
+        tm = 0.5 * (self.t0 + self.t1)
+        d0, dm, d1 = self.depth(self.t0), self.depth(tm), self.depth(self.t1)
+        if d0 is not None and d0 < wants_m:
+            return self.t0
+        if d0 is None or dm is None or d1 is None:
+            for d, t in ((dm, tm), (d1, self.t1)):
+                if d is not None and d < wants_m:
+                    return t
+            return None
+        # d(u) = A u^2 + B u + C on u in [0, 1] across the piece, C = d0
+        big_a = 2.0 * (d0 - 2.0 * dm + d1)
+        big_b = d1 - d0 - big_a
+        c = d0 - wants_m
+        roots: list[float] = []
+        if abs(big_a) < 1e-12:
+            if abs(big_b) > 1e-12:
+                roots.append(-c / big_b)
+        else:
+            disc = big_b * big_b - 4.0 * big_a * c
+            if disc >= 0.0:
+                r = math.sqrt(disc)
+                roots += [(-big_b - r) / (2.0 * big_a), (-big_b + r) / (2.0 * big_a)]
+        for u in sorted(u for u in roots if 0.0 <= u <= 1.0):
+            # the first crossing downward: just beyond it the depth is under the draught
+            v = min(1.0, u + 1e-9)
+            if big_a * v * v + big_b * v + c < 0.0 or u >= 1.0:
+                return self.t0 + u * (self.t1 - self.t0)
+        return None
+
     def readings(self) -> list[tuple[float, Position]]:
         """The depths that hold the piece's least: its ends, its middle and, where the
         quadratic through the three turns to a least within it, its turning point."""
@@ -1275,9 +1308,26 @@ class Chart:
                     least = (d, p)
         return least
 
+    def first_under(
+        self, a: Position, b: Position, wants_m: float
+    ) -> tuple[float, float, Position] | None:
+        """The first place along the great circle from `a` to `b` where the chart's surface
+        gives less than `wants_m` of water at the datum, as (metres along from `a`, the depth
+        there, the place); None where it nowhere does. The same pieces as
+        `least_depth_along`, in order, each solved exactly: the quadratic through its ends
+        and its middle, and its first root below `wants_m` within the piece (the lead's
+        ruling of 2026-11-14, 11:05: the first place under a draught is the line's second
+        answer, built once, for the pilot's warning when the game's readers move to it)."""
+        for piece in self._line_pieces(a, b):
+            t = piece.first_under(wants_m)
+            if t is not None:
+                d = piece.depth(t)
+                return piece.along_m(t), float(wants_m if d is None else d), piece.at(t)
+        return None
+
     # A long line is read in chords no longer than this, each straight in degrees between
-    # two points of the great circle: at 2 km the two differ by well under a metre
-    LINE_CHORD_M = 2000.0
+    # two points of the great circle: at 500 m the two differ by a few millimetres
+    LINE_CHORD_M = 500.0
 
     def _line_pieces(self, a: Position, b: Position) -> list[LinePiece]:
         """The pieces of the line from `a` to `b` within which the chart's surface is one

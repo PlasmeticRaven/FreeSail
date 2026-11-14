@@ -29228,8 +29228,10 @@ chart session's own measure found too, at Setúbal.
 How it reads:
 - The lookup is bilinear between cell centres. Along a straight line within one square of four
   centres the depth is therefore a quadratic, least at an end or at its turning point.
-- The line is cut into chords of at most 2 km (`LINE_CHORD_M`), each straight in degrees
-  between two points of the great circle; at 2 km the two differ by well under a metre.
+- The line is cut into chords of at most 500 m (`LINE_CHORD_M`), each straight in degrees
+  between two points of the great circle; at 500 m the two differ by millimetres. At 2 km two
+  of Setúbal's legs read 1.1 and 1.5 cm over a reading every metre along the great circle,
+  where the surface is steep; at 500 m every port leg is at or under it within a centimetre.
 - Each chord is cut again (`Chart._line_pieces`): at every level's tile edges, and, where that
   level has a tile, at its cell edges and its centre lines. These are every place the
   surface's formula may change: a square of four centres, a corner unknown where the lookup
@@ -29248,10 +29250,20 @@ span), and a second every 2 m under 8 m. That reader stepped over a head three w
 - At a level's corner. A line clipping a finer tile's corner for less than a quarter of a
   tile's span was read at the coarser step: a 1,729 m line over a level-3 tile for 785 m read
   14.0 m over a two-cell rock drying to nothing.
-- At Setúbal's V, on the real chart. The leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W
-  (level 2) falls to 1.18 m at 561 m along, between the half cell's readings at 544 and 580 m
-  (3.36 and 3.66 m); only the 2 m second reading under 8 m caught it, and the pilot's look
-  ahead has no second reading.
+- At Setúbal's V, on the real chart: the best single picture of the fault. The leg from
+  38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W (1,078 m, level 2, cells 92.6 m by 72.6 m),
+  read every metre (the depth at the datum, metres along it in brackets):
+
+  | 500 | 512 | 524 | 536 | 548 | 554 | 560 | 566 | 572 | 584 | 596 | 614 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|
+  | 10.33 | 8.28 | 6.34 | 4.51 | 2.80 | 1.99 | 1.20 | 1.84 | 2.62 | 4.12 | 5.56 | 7.59 |
+
+  Its least is 1.18 m at 561 m (1.13 m by the exact least): a V to the line's crossing of the
+  centre lines, where the bilinear surface breaks. A cable's step happened to land at 555 and
+  556 m (1.85 and 1.72 m); half a cell's (36.3 m) at 544 and 580 m (3.36 and 3.66 m), so it
+  read the shoal two metres too deep. Only the 2 m second reading under 8 m caught it, and the
+  pilot's look ahead has no second reading. The depth is the interpolated surface itself
+  (`depth_at`), not a block's shoalest sounding (`tile_min_depth`).
 `line_step_m` is gone with it: no reader along a line needs a step now.
 
 The audit's `_least_depth` (check (f)) reads only this. `TRACK_STEP_M` and
@@ -29260,7 +29272,8 @@ nothing along is now a finding of its own (`f-unread`), not a shorter count (the
 4); none today.
 
 Measured on the tree as built (check (f) whole):
-- 12.2 s against 8.2 s stepped: the exact least costs half as much again;
+- 10.6 to 12.2 s by the machine's load (500 m chords), against 8.2 s stepped: the exact least
+  costs a third to a half as much again;
 - the same 30 findings, the 12 `f-shallow` counts unchanged;
 - words moved by a tenth or a leg's name: Paimboeuf 1.9 to 1.8 m, Setúbal 1.2 to 1.1 m;
   St Malo's, Oporto's and the Goletta's leg named.
@@ -29308,6 +29321,10 @@ file and the port file; nothing else of either port moved. What reads them:
   1,403 m to 1,771 m;
 - truth 7-524's band for Santa Cruz's road (40 to 80 m): 61.7 m to 55.6 m, within it;
 - truth 7-529's frigate, her nearest to the road (2 to 3.5 miles, measured 2.96): see below.
+- the pilot's station, which is the same feature (`pilot: station:` in both files): his boat
+  now cruises from the moved road, 547 m east at Santa Cruz (cruising 3 miles) and 413 m south
+  at Porto Paolo (2 miles). A ship takes her pilot that much farther out, well within his
+  cruising ground, and the way from where he boards to the anchorage is the same open water.
 No scenario begins or ends at either spot.
 
 Three of the five shared one cause beside the shoal, which is the plan and not the track. The

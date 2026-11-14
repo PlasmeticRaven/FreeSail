@@ -2618,3 +2618,118 @@ def test_setubals_shoal_is_read_at_its_true_least(whole):
     s, e = on(540.0 / dist), on(580.0 / dist)
     assert least <= _brute_least(whole, s, e, 0.02) + 1e-6
     assert 38.43 < where.lat_deg < 38.44 and -9.07 < where.lon_deg < -9.06
+
+
+def test_a_line_clipping_a_finer_tiles_corner_reads_its_rock(tmp_path):
+    """The reader's item 2 (2026-11-14, 11:00): a line that clips a finer tile's corner for a
+    short stretch is read by that tile there (old: the step of one level chosen for the whole
+    line by sampling every quarter of a tile's span, so a 1,729 m line over a level-3 tile for
+    785 m read 14.0 m over a two-cell rock drying to nothing). A level-3 tile with a rock of
+    two cells by its north-east corner, over a level-2 region 20 m deep; lines across the
+    corner at several slants against a reading every 5 cm."""
+    rng = np.random.default_rng(3)
+    patch = np.full((512, 512), 20.0)
+    patch[508, 508:510] = -0.5  # two cells drying half a metre, four cells from the corner
+    corner = Position(HARBOUR_SOUTH_SEC / 3600.0 + 512 * L3, HARBOUR_WEST_SEC / 3600.0 + 512 * L3)
+    s2 = -90 * 3600 + int(((corner.lat_deg + 90.0) * 3600 / 3.0) // 512) * 1536
+    w2 = -180 * 3600 + int(((corner.lon_deg + 180.0) * 3600 / 3.0) // 512) * 1536
+    region = np.full((512, 512), 20.0)
+    chart = _made_chart(
+        tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, patch), (2, s2, w2, region)]
+    )
+    rock = Position(HARBOUR_SOUTH_SEC / 3600.0 + 508.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 509 * L3)
+    assert chart.level_at(rock) == 3 and chart.level_at(destination(corner, 45.0, 300.0)) == 2
+    for bearing in (100.0, 135.0, 170.0, 300.0):
+        a, b = destination(rock, bearing, -900.0), destination(rock, bearing, 830.0)
+        least = chart.least_depth_along(a, b)
+        assert least is not None and least[0] < 0.0, (bearing, least)
+    _assert_exact(chart, _lines_by(rng, rock, L3, 20, 400.0, 0.8), step_m=0.05, tol_m=0.05)
+
+
+def test_the_first_place_under_a_draught_is_found_where_the_surface_first_falls_under_it(
+    tmp_path,
+):
+    """The line's second answer (the lead's ruling of 2026-11-14, 11:05): `Chart.first_under`
+    gives the first place along the line where the chart's surface is under a draught, by the
+    first root of each piece's quadratic in order; against a reading every 5 mm along random
+    lines by a lone cell, within a centimetre of the first reading under it."""
+    rng = np.random.default_rng(5)
+    depth = np.full((512, 512), 30.0)
+    depth[256, 300] = 1.0
+    chart = _made_chart(tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, depth)])
+    centre = Position(
+        HARBOUR_SOUTH_SEC / 3600.0 + 256.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 300.5 * L3
+    )
+    found = 0
+    for a, b in _lines_by(rng, centre, L3, 30, 20.0, 0.6):
+        _, dist = bearing_and_distance(a, b)
+        got = chart.first_under(a, b, 12.0)
+        n = int(dist / 0.005)
+        first = None
+        for k in range(n + 1):
+            t = k / n
+            d = chart.depth_at(
+                Position(
+                    a.lat_deg + (b.lat_deg - a.lat_deg) * t,
+                    a.lon_deg + (b.lon_deg - a.lon_deg) * t,
+                )
+            )
+            if d is not None and d < 12.0:
+                first = dist * t
+                break
+        if first is None:
+            assert got is None or got[1] >= 11.99
+            continue
+        found += 1
+        assert got is not None and abs(got[0] - first) < 0.01, (got, first)
+        assert got[1] <= 12.0 + 1e-6
+    assert found >= 10
+    assert (
+        chart.first_under(
+            Position(centre.lat_deg + 0.01, centre.lon_deg),
+            Position(centre.lat_deg + 0.011, centre.lon_deg),
+            12.0,
+        )
+        is None
+    )
+
+
+@pytest.mark.slow
+def test_every_port_legs_least_is_at_or_under_a_reading_every_metre(whole):
+    """The exact least on every leg of every port's tracks (under 20 km), against a reading
+    every metre along the great circle: at or under it, within a centimetre over (the reading
+    every metre a point of the same surface; the chord's line straight in degrees, at 500 m,
+    differs from the great circle by millimetres)."""
+    from freesail.world.ports import load_port, port_files
+
+    over = []
+    for pid, path in sorted(port_files().items()):
+        port = load_port(path, whole)
+        tracks = port.tracks or {}
+        for name, seq in tracks.items():
+            marks = []
+            for words in seq:
+                f = whole.feature(str(words))
+                if f is not None:
+                    marks.append(f.position)
+                else:
+                    try:
+                        from freesail.world.geo import parse_position
+
+                        marks.append(parse_position(str(words)))
+                    except ValueError:
+                        continue
+            for a, b in zip(marks, marks[1:], strict=False):
+                bearing, dist = bearing_and_distance(a, b)
+                if dist > 20_000.0 or dist < 1.0:
+                    continue
+                got = whole.least_depth_along(a, b)
+                reads = [
+                    whole.depth_at(destination(a, bearing, float(k))) for k in range(int(dist) + 1)
+                ]
+                reads = [d for d in reads if d is not None]
+                if got is None or not reads:
+                    continue
+                if got[0] > min(reads) + 0.01:
+                    over.append((pid, name, round(got[0], 3), round(min(reads), 3)))
+    assert not over, over
