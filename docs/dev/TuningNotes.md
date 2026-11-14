@@ -28989,8 +28989,11 @@ year, the mechanical count is one more in every year, and the reference's one fe
 1792, 1796, 1800, 1808, 1812, 1816, 1820 and 1824. Truth 7-590's mechanical count by the
 readers' road 60 and 61; its reference count 38 and 38.
 
-*The proof.* (1) The failure reproduced on the trial tree and gone: there the new full
-sweep is the new known list exactly (below, with the measurements). (2) A change that
+*The proof.* (1) The failure reproduced on the trial tree and gone: on a scratch merge of
+this commit into ffb27b5b the slow tier of the file passes whole, the full sweep the new
+known list exactly (54 passed in 23 min 21 s; the full sweep there 20 min 41 s against 11
+min 28 s on the base, run beside it), and on the base the same 54 pass in 13 min 43 s: one
+list for both trees. (2) A change that
 moves the draws and no fact: the sampled sweep at seeds 11 and 1805 makes the list of seed
 7, key for key with its years and counts; off Leghorn in 1792 and 1796 three seeds draw
 different vessels and find the same. (3) A planted fact still raises its finding: Plymouth

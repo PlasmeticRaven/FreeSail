@@ -496,11 +496,12 @@ needs libyaml; the second is what a machine without it pays, as the build machin
 | What | With libyaml's loader | By the pure-Python loader alone |
 |---|---|---|
 | The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 202 days (323 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
-| The fast tier of `tests/test_range_audit.py` (27 tests) | about 1 s | about 4 s, the small tree's fixture 2.6 s of it |
+| The fast tier of `tests/test_range_audit.py` (43 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
 | Truths 7-592 and 7-593 (fast) | under a second | 2.3 s |
 | The slow tier of the file: the sampled sweep's fixture, with the tests that read the whole tree | 19 s, and 4 s for the rest | 41 s for the fixture (the lead's measurement) |
+| The slow tier's proof that no draw moves the list: the sampled sweep at two more seeds; six whole worlds off Leghorn at three seeds | 41 s; 60 s | not measured |
 | Truths 7-590 and 7-591 (slow) | 2.7 s and 1.1 s | 13 s and 7 s (the lead's measurement) |
-| The full sweep (`--full`), and its slow test | 11 min 18 s: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s | not measured |
+| The full sweep (`--full`), and its slow test | 11 min 18 s at 504a250: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s. On a scratch merge with the trunk's trial tree of 14 November (ffb27b5b) the same test took 20 min 41 s, beside another run: the trunk's worlds cost more to make | not measured |
 | The two loaders compared file for file (slow) | 7.8 s for the 437 YAML files under `data/` | skipped, with its reason: there is no second loader to compare |
 
 The dear road is all of the cost. A whole world by the game's own loader takes ten to
