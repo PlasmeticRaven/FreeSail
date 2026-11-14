@@ -203,16 +203,16 @@ def test_the_eleven_ports_have_their_blocks_and_the_others_none():
     w = world_at(OFF_THE_LIZARD, ports=tuple(PT.port_files()))
     with_block = {pid for pid, port in w.dealings.ports.items() if port.ordnance is not None}
     assert with_block == set(BLOCKS)
-    # the other twenty-seven, the Channel's east block's eight (package 79b), the
-    # Mediterranean west's eight (package 79c), and the Gulf of Lion's four, the Ligurian
-    # sea's seven and the Tyrrhenian's five (package 79d), none
-    # and the Catalan coast's seven (package 101), none; package 104: the Sardinian sea's
-    # five, the coast of Tunis's five and the three beside them on Sardinia, none (was
-    # 27 + 8 + 8 + 4 + 7 + 5 + 7 before it); package 105: Sicily and Malta's eleven, none
-    # (was 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 before it)
-    # and step 3's thirteen, none (was 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 before it)
-    # package 106a: the Canaries' seven, none
-    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 + 13 + 7
+    # every other port file loaded, with no block. Old: a hand-kept tally of each block's ports
+    # (27 + 8 + 8 + 4 + 7 + 5 + 7 + 13 + 11 + 13 + 7, every block adding its own: the Channel's
+    # east eight, the Mediterranean west's eight, the Gulf's four, the Ligurian's seven, the
+    # Tyrrhenian's five, the Catalan seven, 104's thirteen, 105's eleven and thirteen, the
+    # Canaries' seven), which each new block had to edit (package 106b's six made it fail). New:
+    # the count is the port files' own, so that the test reads what it holds whatever block
+    # comes next: every file loaded, the eleven with their blocks and the rest with none
+    assert set(w.dealings.ports) == set(PT.port_files())
+    assert len(w.dealings.ports) - len(with_block) == len(PT.port_files()) - len(BLOCKS)
+    assert all(port.ordnance is None for pid, port in w.dealings.ports.items() if pid not in BLOCKS)
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
         block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid

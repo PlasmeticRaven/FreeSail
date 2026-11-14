@@ -28732,6 +28732,307 @@ added and nothing else (the audit's check (d) run on each).
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
 
+## Package 106b: Morocco's Atlantic coast (2026-11-13)
+
+### Step 0, the measurement (nothing under `data/charts/` committed)
+
+Measured on the trunk at 237b4641 in a scratch worktree (never committed): measuring recipes
+built with `tools/build_charts.py --region` into a fresh cache, the audit run on the result,
+the tiles weighed from the manifest's bytes. The fill was raised by the eleven's level (3.98 m,
+no gauge of the block's yet): the bytes move a little when the block is rebuilt on its own
+water. Harbour boxes for the measure were placed FROM MEMORY.
+
+**The sources.** Purdy 1825 (on file) describes the whole coast, Cape Spartel to Cape Noon
+and Bojador (from l. 22171: "Between Cape Spartel and Cape Cantin ... regular soundings
+towards the shore ... no harbours of consequence"; Arzila, El Araiche, Old and New Mamora,
+Fedala, Anafee, Azamor, Mazagan, Cape Blanco of the north, Cape Cantin, Saffi, Mogador, Cape
+Geer, Agadeer or Santa Cruz, to Cape Noon; the variation "between Cape Spartel and Saffi Bay
+22 to 24 W", l. 4162): the block's pilot. The Oriental Navigator 1801 has nothing of this coast;
+Glas 1764 names Sallee once (l. 13751). Tofiño's Atlantic *Derrotero* (1789, `A302201`)
+reaches and has no text of Africa: its introduction (l. 417) says the charts of the coast "from
+Cape Espartel to Cape Verde" were made in 1776 by Varela and Borda, a memoir promised and not
+printed there; the charts are the atlas's, not yet found. Jackson's *Account of the Empire of
+Marocco* (1809, `accountofempireo00jack`, NOT_IN_COPYRIGHT, OCR 559,124 bytes) reaches: the
+ports, the trade, the harbours and the captives held in the Sahara (decision 68's matter).
+
+**The source grid.** EMODnet's DTM 2024 covers the whole coast (its grid runs from 15 N): of
+5,610 shelf cells sampled at 1.5′ (under 100 m), 5,459 are interpolated (`interpolation_flag`
+1), 151 surveyed, mostly in the Strait's approach. GEBCO under it for the land. TICON's file
+(SHA-256 7055f8ed...6514, as before) has **no gauge** between Ceuta and Fuerteventura.
+
+**The tile grid against the coast.** The coast runs diagonally, four degrees of longitude over
+eight of latitude: Spartel 5.92 W, Rabat's column 6.77 W, Cape Cantin's 9.33 W, Mogador's
+9.76 W at 31.5 N, Cape Juby 12.92 W at 27.95 N. One box over a diagonal coast holds a triangle
+of open sea and one of land. The land's tiles are skipped (`skip_dry_tiles`) where a coarse
+layer answers, except the eight of the row 31.6 to 32.03 N east of 9.34 W (no layer there south
+of 31.9 N). **Mogador (31.51 N) lies south of 31.6 N**: the southern region's port.
+
+| option | regions | level-2 tiles written | MiB (level 2) | with the measured level 3 |
+| --- | --- | --- | --- | --- |
+| A1, the brief's two boxes, coast + 1 column | 31.60001–35.5 N × 10.18666–5.92001 W; 27.33334–31.6 N × 13.17334–9.33334 W | 75 + 74 = 149 | 25.87 | 27.39 |
+| A2, two boxes, coast + 2 | the north's west 10.61332 W | 85 + 74 = 159 | 26.60 | 28.12 |
+| B1, four boxes, coast + 1 | 31.6–34.16 × 10.19 W; 34.16–35.5 × 7.2 W; 27.33–29.47 × 13.17 W; 29.47–31.6 × 10.61 W | 38 + 9 + 26 + 15 = 88 | 13.79 | 15.30 |
+| B2, four boxes, coast + 2 | the same rows; west 10.61, 7.63, 13.17, 11.04 W | 44 + 13 + 26 + 21 = 104 | 17.15 | 18.66 |
+
+Level 3: 24 tiles, 1.52 MiB for eight harbour boxes; the coasts 0.25 MB a region. Every
+region is under 40 MiB in every option. The southern box cannot be narrowed: its rows 27.33
+to 29.47 N must reach the Canaries' east bound (13.17334 W), its rows to 31.6 N lie three
+degrees east of it. The four-box options split each region at a row edge (34.16 N; 29.46666 N,
+the Canaries' own north bound) and are the strip the brief asks for; the open sea west of
+their bounds is the coarse layers' (the corridor north of 31.9 N, `atlantic-south` south of
+it), whose water reaches every tile's edge.
+
+**The seams.** Against `strait` "2 kept" (its row 35.44 to 35.87 N, columns 6.77 to 5.92 W);
+against `canaries` "5 kept" (its column 13.6 to 13.17 W, rows 27.33 to 29.47 N); against the
+coarse layers nothing (another level). `git status` after the build: new files only, no tile,
+coast or index of another region changed; the manifest only adds the two entries (and its
+build hash). The coast south of 27.76 N between 13.6 and 13.17 W (by Tarfaya's south) lies in
+`canaries`' bounds and tiles already.
+
+**The gauges, by the rule for a block with none.** The neighbours' nearest within the reach:
+for the south, Arrecife (1.60 m, REDMAR) and Puerto de Cabras (1.53) of the Canaries, 154 to
+268 miles from its water, M2 0.81 to 0.84 m; listing it after `canaries`. For the north, the
+Strait's: Tarifa (55 miles from Larache, 287 from Safi), Ceuta, and Cadiz (`[portugal,
+strait]`): **none of them has a level read**, so the north's level falls to the eleven's
+(Le Conquet's 3.98 m), and Tarifa's and Ceuta's M2 (0.41, 0.30 m) is the Strait's inner tide,
+not the Atlantic coast's (about a metre, FROM MEMORY; Cadiz 1.03 m). Arrecife and Cabras
+reach the north's water south of about 33.5 N only (Dar el Beida is 410 miles off). Tarifa's
+level is readable: REDMAR 3540, NMM 69 cm and BMMI −10 cm on the gauge's zero (2010 to
+2017), **0.79 m above LAT**; Cadiz and Ceuta are not in REDMAR. Reading it would move the
+Strait's water (its level today the eleven's, the audit's `c-level:strait`): the lead's.
+
+**The audit, sampled, on the measuring build** (the two-box option A2, the sea named
+`morocco`): nine findings the list lacks. `a-unowned:morocco-north:north` (the tiles of the
+row 35.44 to 35.87 N west of 6.77 W, 4,117 square miles north of 35.5 N in no bounds),
+`a-unowned:morocco-south:west` (the column 13.6 to 13.17 W, 29.47 to 31.6 N, 2,822 square
+miles), `c-far` for each (no gauge yet), `d-no-box:morocco-north` and `d-split` for each
+(madeira 87 %, portugal 12 %; canaries and madeira half and half), `e-no-book` and
+`e-no-stream:morocco-north`. The gauges, the weather box, the `book_limits` box east of 9.34 W
+and a stream area mend the c, d and e ones. Option B leaves of the a-findings only the one or
+two tiles of the row 35.44 N west of 6.77 W (some 500 to 900 square miles north of 35.5 N).
+The strait's own `a-unowned:strait:west` now lies beside morocco-north's bounds; unchanged.
+
+**The shore's sweep** (EMODnet silent, GEBCO under 3 m): the north 590 cells in 20 places
+(the largest the lagoon of Moulay Bousselham, 34.85 N 6.28 W; the Tangier shore; Safi; Cape
+Blanco of the north); the south 2,415 in 79 (the lagoon of Khenifiss, 27.8 N 12.4 to 12.9 W):
+real water, to say so after the rebuild on the block's own water.
+
+### Step 1, the block built on the chart session's rulings (2026-11-13)
+
+**The rulings** (the chart session on step 0): four regions, coast + 2, split at 34.16, 31.6 and
+29.46666 N, named `morocco-larache`, `morocco-sallee`, `morocco-mogador`, `morocco-noun`; the
+gauges the Atlantic's only (Cadiz and Huelva the northern two, Arrecife and Puerto de Cabras the
+southern; Tarifa's REDMAR level not read); the sea `morocco` with `SEAS_THAT_MEET` {morocco,
+atlantic, canaries}; one weather box `morocco` over the regions' water and the water east of 9 W
+from 30 to 36 N, taking none another box answers; `book_limits` boxes over the four.
+
+**The build.** Built three times from the step 0 cache (`--skip-fetch`): without the gauges'
+listings (the tide refuses a `block:` the manifest does not name), with them (the fill raise
+follows the tide), and after the features (the index). Sizes: larache 13 level-2 tiles 2.83 MiB
+and 6 level-3 0.36; sallee 60 and 7.15 (every tile written, its row 31.6 to 32.03 N east of 9.34
+W under no coarse layer) and 16 level-3 0.96; mogador 18 and 4.02, 8 level-3 0.52; noun 26 and
+4.11; 19.96 MiB in all. Kept: the Strait's 2, the Canaries' 5, the Noun's 3 under Mogador's
+bound. `git status` after each build: new files, the manifest, nothing of another region's. The
+fill raised by 1.47 to 1.96 m within the bounds (3.98 m in the tiles' water beyond them, the
+eleven's). The sweep: larache 513 cells (the lagoon of Moulay Bousselham, Tangier's shore),
+sallee 118 (Safi, Cape Blanco, Dar el Beida's port), mogador 166 (Agadir's port, Mogador's
+island), noun 7,484 (the lagoon of Khenifiss and its sebkha, 27.98 N 12.33 W): real water, left
+as water.
+
+**The water each region gets** (`Tide.constants_at`): the northern two M2 1.035 m at 57 degrees on
+Huelva's level 1.96 m (Cadiz's having none); the southern two 0.82 m at 35 degrees on 1.56 to
+1.57 m. The seam at 31.6 N between the pairs is a step, far from every gauge. Norie's table gains
+two places: Mogador, Purdy's 4h and 10 to 12 feet (the OCR's "4b." and "lu to 12"; the world's
+hour 0h 44m: the master's is the period's), and "Coast of Marocco" at Rabat, the world's hour
+(1h 40m) and spring range (9 feet), JUDGEMENT.
+
+**The weather.** The box `morocco` (27.33334 to 36 N, 13.17334 to 5 W), last in the file, Madeira's
+rows carried to the coast, PROVISIONAL; Purdy's words in each row's note (p. 152: the summer's N.
+by E. to N.E. along the coast, the winter's S.W. and S.S.W.; p. 155: the Liali at Mogador). It
+takes no water another box answers (`box_at` first-match); the water it answers lay in no box and
+took the nearest: the coast from Spartel to Safi east of 9 W and the Strait's southern half
+(35.5 to 36 N between 6.5 and 5 W). **What it moves:** a ship there drew her systems from
+Portugal's or the Mediterranean's box by nearness and now draws from this one; the Strait's
+scenario sails into 35 57 N 5 48 W. The Strait's truths and the recorded passages were run (the
+gate's figures below). The audit's `d-no-box:strait` is no longer found and its `d-split:strait`
+reads "morocco 62 %, portugal 38 %" (the known list's change waits for package 111's step 2b,
+below).
+
+**By design, old beside new (the chart session's word, for the lead):** the Strait's southern
+half (35.5 to 36 N, 6.5 to 5 W) is answered by the box `morocco`, where the nearest box,
+`portugal`, answered it before. It moves: `tests/test_scenarios.py`'s Strait passage (its
+`box_at(35.7, -5.5)` "portugal", now "morocco"), the audit's `d-no-box:strait` (no longer found)
+and `d-split:strait`'s shares (portugal 85 %, mediterranean-west 15 % on the sampled sweep before;
+morocco 62 %, portugal 38 % sampled and 59 %, 41 % on the full sweep now, its count 352 unchanged).
+**What reads that water, and the proof it is unmoved:** no recorded passage (the gate's passages
+are the Channel's); of the scenarios only `strait.yaml` sails into it (35 57 N 5 48 W), and its
+weather is pinned (`weather:` its winds and systems): sailed 24 hours at seed 7 with the branch's
+climatology and with the trunk's, the log's digest is `3fadc5de293ad9fe` both ways and she ends in
+36.0749 N 5.4253 W both ways. The tests that name a position in that water read the tide or the
+chart (`MID_STRAIT`, 36.0 N 5.6 W) or a business world at 36.0 N, which Portugal's box, first in
+the file, still answers; the slow tier of the known truths and scenarios passed whole but the
+audit's full sweep (below), the Strait's truths among them.
+
+**The streams.** Two areas, before the Canaries' open sea: `morocco-coast-north` (S.W. by S., a
+knot: Purdy pp. 152 and 154) and `morocco-coast-south` (south, a knot: pp. 156 to 157, the set in
+toward the land said and not carried). The set is the pilot's own word; the directions' test
+holds such a set unjudged (`PERIOD_SETS`).
+
+**The marks** (34, every position probed against the tiles, each move in `fix`): Arzila, El
+Araiche with its road and bar, Old Mamora, Mehedia with its road and the Seboo's bar, Sallee,
+Rabat, the Tower of Hassan (55 m, Purdy's 180 feet), Sallee road and the Bu Regreg's bar, Fedala
+and its road, Dar el Beida, Azamor, Mazagan with its road and its ledge, Cape Blanco, Cape Cantin
+and its ledge, Saffi and its summer road, Mogador with its island, road and harbour, Cape Sem,
+Cape Tefelneh, Cape Geer and its reef, Agadeer and its road, the mouth of the Wad Noun. Not
+entered: the Cleveland Reef (Purdy p. 156 and his dangers, "three feet ... nine leagues from the
+coast" in 30 45 N, Captain Cleveland 1765), the grid having ocean depths there and the modern
+chart (FROM MEMORY) no reef: a danger the period gives and the world does not (a finding, for the
+chart session); the Peak of Fas (its place not fixed by the bearings). No light in 1805.
+
+**The ports** (six; decision 67, every place the sources support with a road and a trade):
+El Araiche, Sallee and Rabat, Mazagan, Saffi, Mogador, Santa Cruz (Agadeer). Marks only, by the
+same sources: Mamora ("a poor neglected place", the port evacuated, Jackson l. 4260 and 605),
+Fedala (abandoned after the corn was shipped, l. 4508), Dar el Beida ("now in ruins, ... several
+huts", l. 4518), Arzila ("no trade carried on", l. 4206), Azamor ("not adapted to commerce", l.
+4543; no anchorage, Purdy p. 154), the Wad Noun (no road named: "but two roads fit for shipping
+between Santa Cruz and Cape Bojador", which neither pilot names, l. 5007). **Dated rows**
+(package 105's form, seeding the port on its day): El Araiche's `closed_to` from 1780 and Santa
+Cruz's from 1773 (the Europeans and the Americans; Jackson's years, the days JUDGEMENT); Mazagan's
+holder Portugal's until 1769 (the day FROM MEMORY); Saffi's and Mazagan's markets, the corn shipped
+abroad until Soliman's accession and cheap at home after his ban (Jackson l. 4524 to 4533; the
+day FROM MEMORY; first drafted the other way and corrected by the independent check of every
+citation, which found 12 of some 160 wanting, all mended); Mogador's market, pilot, yard and
+pool from its founding in 1760. **Decision 68**, in the heads of Rabat (Sallee's corsairs and the
+dungeon of its European captives; Rabat's walls built by enslaved Spaniards; Muley Ismael's black
+troops), Mogador (the ransom of the crews wrecked on the desert coast; the caravans' enslaved
+Africans from Timbuctoo) and Santa Cruz (the same caravans; the wrecked seamen sold among the
+Arabs), with their years and lines; no cargo a person, no scenario on it.
+
+**The tracks, read against the pilots' channel words, with the least depth at datum along each
+leg** (correction 4; sampled every 50 m; under 3 m a finding):
+
+| port | leg | the pilot's words, and the hand each mark falls on going in | least |
+| --- | --- | --- | --- |
+| Rabat | road to 33 54 N 7 54 W, and back | "lie out of the river near Rabat ... between the mosque and the Tower of Hassan" (Jackson l. 4445): coming in from the WSW the tower ahead, a little on the port hand | 25.8 m |
+| Saffi | road to 32 36 N 9 36 W, and back | "the North point ... a little to the northward of N.N.E., the high castle S.E. by E." (Purdy p. 155): coming in from the NW the North point and its low tower on the port hand, the castle ahead | 23.6 m |
+| Mogador | road to 32 36 N 9 36 W, and back | "anchor at about 1 1/2 mile westward of the Skala" (p. 155): coming down from the north the island and the town on the port hand | 30.9 m |
+| Agadeer | road to 30 36 N 10 12 W | "run along by the land of the cape till you are before the castle" (p. 157): going in from the offing Cape Geer on the port hand, the castle ahead | 6.1 m |
+| Agadeer | 30 36 N 10 12 W to 32 36 N 9 36 W | the open sea west of Cape Geer's reef ("not nearer than 30 fathoms") and of Cape Sem's bank | 38.7 m |
+| every port | road to mooring | El Araiche 8.5 m, Rabat 10.4, Mazagan 3.9, Saffi 10.0, Mogador 17.7, Agadeer 8.8 | |
+
+El Araiche and Mazagan need none (every pair among the northern three and to the mark off Cantin
+is clear). **Findings:** **the tide steps at 31.6 N**, the seam between the two pairs of gaugeless regions
+(Cadiz's and Huelva's water north of it, Arrecife's and Puerto de Cabras's south): M2 1.035 m at
+57 degrees to 0.82 m at 35 degrees, the level 1.96 m to 1.57 m, in a cable. In the how-to's words
+a seam between two blocks far from every gauge (Huelva some 360 miles off, Arrecife some 240)
+stays a step; no taper is laid between two blocks. **Mogador's harbour within the island** is
+not reached in the grid: its north passage reads 0.0 m and its south 0.5 m at the datum, where
+Purdy has five fathoms in the north one; the port's spots are in the road, as Purdy and Jackson
+put ships of war and of burden (the chart session's word: kept so, the finding listed). The rivers of El Araiche, Mamora and Sallee are the grid's land behind
+bars of 1 to 3 m (a way the pilots reserve for vessels of 100 tons at high water; no trader's in
+the world); Mogador's two passages into the harbour within the island read 0.0 m (north) and 0.5 m
+(south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
+the road; Agadir's modern moles enclose the period's road's first place (moved south of them).
+
+**The cold review's two cautions** (the chart session, 2026-11-14): no tile is rebuilt or
+committed but the four regions' own (every other region's files byte for byte, `git status` at
+each build); and the six port files give no key the game reads nowhere, beyond the form: their
+`tide: establishment:` was taken out (read by nothing: the master's hours are the epitome's
+places, `data/tides/establishments.yaml`, by position). Kept **only for the form**: `datum:
+unverified` (the how-to's: a top-level key the machinery does not read, which says no period
+sheet was read with its datum) and `tide: leave_on: ebb` (read by no code; `tests/test_ports.py`
+holds every port file to it).
+
+**The mends, by their causes** (the owner's word of 2026-11-14 through the lead: build for
+generality, not the symptom):
+
+- *`test_ordnance`'s count of ports without a block.* Cause: a hand-kept tally of each block's
+  ports (27 + 8 + ... + 7), which every new block had to edit, beside an assertion that already
+  states the property (`with_block == set(BLOCKS)`). Mended where the cause lives, in the test:
+  every port file is loaded, the eleven carry their blocks and every other port none, the count
+  the files' own. Looked for the same elsewhere (a total summed by hand from blocks' counts, in
+  every test file): truth 7-570's `read == 4593` (package 112's, the tiles read summed by hand
+  from the step's proof; raised here by Morocco's 2 x 147, old beside new) is the same cause in
+  another package's truth, **named and not mended**; the region lists of `test_chart`,
+  `test_geo` and `test_tide` and the ports' lists of `test_ports` and `test_nations` are
+  inventories by design (each block names what it adds), not tallies.
+- *Truth 7-530's exclusion.* Cause: the exemption was a hand list of package 105's ports, held
+  out whether they had dated rows or not, so that a new dated port broke it and a listed port
+  without rows went unchecked. Mended in the truth: a port is held out only when it has dated
+  rows and a package names it with the truth that pins them (105's set, 7-531 on; 106b's,
+  7-557); every other port is checked, 105's nine without dated keys now among them (they
+  pass), and a new dated port fails until its truth is named.
+- *`test_scenarios`' box over the Strait's southern half.* Cause: charted water in no box of the
+  climatology, which took the nearest box by distance. Mended where the cause lives, the
+  climatology: the box `morocco` over the water east of 9 W from 30 to 36 N that lay in no box
+  (the ruling), the test now pinning the box that answers. The same cause elsewhere is the
+  audit's check (d), which finds it everywhere: `d-no-box` for the Balearics, Biscay south and
+  the Ligurian sea, in other blocks' ground, **named and not mended**.
+- *The directions' test and a period's set.* Cause: the test held that every stream area's set
+  but the open Channel's is the world's axis rounded, judgement. The coast's two areas give the
+  pilot's own point: a named set of areas whose set is the period's (`PERIOD_SETS`), each held to
+  its axis within half a point and unjudged; no other area was of that kind.
+
+**The scenario** (`morocco.yaml`): a British merchant brig from Gibraltar for Mogador, from four
+leagues off El Araiche by the offing of Sallee and the mark west of Cape Cantin; hove to fifteen
+miles west of Mogador at 41.4 hours at seed 7, drifting off the land. Sailed to the road itself
+her account (five miles west of the truth after two days) drove her onto the bank south of the
+island, and hove to seven miles off she drifted ashore under Cape Sem in four hours: the book
+heaves to in the offing.
+
+**The audit, sampled** (`tools/audit_chart.py --known`): three findings the known list lacks,
+`a-unowned:morocco-larache:north` (the two tiles of the row 35.44 to 35.87 N west of 6.77 W, 915
+square miles north of 35.5 N: the ruling's "lead's list", 112's seas to own it),
+`d-split:morocco-sallee` (madeira 70 %, morocco 30 %) and `d-split:morocco-mogador` (madeira 78 %,
+canaries 22 %), both the box's order by design; and `d-no-box:strait` no longer found; the full sweep also no longer finds `a-unowned:strait:south-west` (the Strait's tiles south of 35.5 N and west of 6.5 W, 35 26.4 N 6 46.4 W: morocco-larache's bounds hold that water now), which the sampled sweep had not reached; both leave the list, mended by the block. **The known
+list's edit waits for package 111's step 2b on the trunk** (correction 6): the three entered with
+their owners and `d-no-box:strait` taken out, then the trunk re-merged by a merge commit.
+
+
+### The join with package 112 (2026-11-14, the lead's ruling of 10:40, on the trunk at 96e5e76c)
+
+**How.** The trunk merged by a merge commit; `tools/build_charts.py` merged by itself (CHARTS
+holds `layers:` and Morocco's four regions together). The manifest, a generated file, was not
+merged by hand: the trunk's taken whole, Morocco's four region entries put into it from 106b's
+old manifest only to let the tide load (a gauge's `block:` must name a region the manifest
+has), and then the tool wrote it again, `--region` for the four in turn with `--skip-fetch
+--reuse-world`, from step 1's cache. **What did not move:** every tile, coast and features file,
+2,619 of them, the same SHA-256 before and after the rebuild (the trunk's and 106b's); the
+manifest against the trunk's, entry by entry: the same top-level keys, every trunk region's entry
+the same, nothing lost; differing only in the build hash, Morocco's four entries (each the same as
+106b's old manifest's), the chart's region list (the four appended after the Salvages, `layers:`
+kept), the two sources' fetch records (Morocco's six subsets added, none lost; EMODnet's
+`status` the tool's "fetched", this run having read them) and `open_edges:` below.
+**The open edges** (M1's stretches): 39 on the trunk, 45 now; 34 kept; the Strait's south edge
+from 6.5 to 6.03 W and the Canaries' east edge from 27.69 to 29.47 N are seams with Morocco's
+regions now and leave; the stretch at 35.5 N east of 5.12 W is re-cut to 5.120001 W; nine are new,
+eight with Morocco's regions, each facing open water, and that re-cut one (Larache's north edge west of 6.5 W and its west
+edge, Sallee's north and west edges, Mogador's north and west, the Noun's north). **M1's effect
+on the tide in and beside Morocco:** none. On the 0.05 degree grid from 26.9 to 36 N and 14 to 5
+W (33,123 points), read through 106b's old tree and the joined one, not one point's level or
+constituent moved (the eleven, toward which a taper is laid, are beyond reach of this water);
+so the worst water is unmoved, the six ports' spring ranges are as before (El Araiche, Rabat,
+Mazagan, Saffi 2.82 m on 1.96 m, M2 1.034 to 1.036 m; Mogador and Agadeer 2.27 m on 1.57 m, M2
+0.823 m), and the tide's step at 31.6 N stands as measured. **Truth 7-570's count:** 4,668 on the
+trunk, 4,887 on 106b's old tree (before 112's step 2), 4,962 joined (4,668 + 2 x 147).
+**Truth 7-572 (M1's: a manifest read without `open_edges:`)**, missed by the join's narrow gate
+(a fast test; cloud run 102 failed on it): the candidate edges, every edge of a block beyond
+which a charted box lies, are 38 on the trunk and 49 joined (38 + 11), the pin moved old beside
+new. Thirteen come with Morocco's regions and two leave: eight face open sea (Larache's north
+edge west of 6.5 W and its west edge; Sallee's north edge west of 7.63 W and its west edge, in
+two stretches about the coarse layers' seam at 31.9 to 32 N; Mogador's north edge west of 10.61
+W and its west edge; the Noun's north edge west of 11.04 W: eight of the nine stretches above,
+the ninth the re-cut below);
+four face land (the Noun's south edge at 27.33 N over the Sahara's shore, Larache's east edge at
+5.92 W, Sallee's east edge at 6.35 W and the step at 34.16 N between them, over Morocco's
+interior), which the old reading takes for open and M1's stretches do not; and the Strait's
+south edge east of 5.92 W is re-cut. The Strait's south edge west of 5.92 W and the Canaries'
+east edge become seams. No Moroccan edge faces the Canaries' or the Strait's box: the old rule's
+"every edge a charted box lies beyond is open" holds of the thirteen as a description of that
+reading, and its fault (land counted open) is the four's, which M1 mends.
+**Owed:** two chart packages built side by side cannot both land without one of them rebuilding
+the manifest, because the manifest is one generated file for every region.
+
 ## Package 109, step 5: the vessels kept off the land (note 3), as ruled
 
 Step 5 asked that the unchecked legs be led round the land by the road the plain legs take,
@@ -29395,3 +29696,321 @@ anchorage or road to the road or open water.
   track's first mark that the track does not take. Named to the lead, not redrawn.
 - (2) none clearly: where the pilots give a figure at the worst point, it is a bar's or a
   shoal's.
+### The lead's answers on step 0 (2026-11-13, through the chart session)
+
+1. **Level 0** covers the Atlantic and the Mediterranean, 70 S to 75 N and 100 W to 40 E. The
+   rest of the world is not committed, and the how-to says that adding it later moves no
+   tile laid now.
+2. **The open Atlantic's level** is choice (3): unread levels judged at M2+S2+N2 and marked
+   JUDGEMENT, read levels where read (Sicily's interim answer). Before it is committed, step
+   3 shows that no recorded passage, digest, truth or kept save moves, or names each that
+   does, old beside new, and stops for the word.
+3. **The Channel sea's eight open-water groups leave the known list**: the eleven are the
+   Channel's own gauges. `seas.yaml` names each sea's gauges, the Channel's eleven included.
+4. **Order:** the step that moves `SEAS` into `seas.yaml` merges after package 111's step
+   2b, and re-merges the trunk.
+
+The chart session's rulings: level 0 is never under a chart of one region, a reason that
+outlives its mend of the checkpoint's reload (`replay._rebind` to take `chart_holding`):
+such a chart is then met only where a scenario or test says `chart: <region>`, and those
+pins are measured on that region alone. Cut the Black Sea. All twelve Cape Verde tiles.
+
+### The double count of the level on the coarse layers (a finding; on the lead's list, not mended)
+
+Levels 0 and 1 are at **mean sea level** and nothing is raised at their build
+(`build_corridor`, `_write_gebco_level`). The tide adds its **level above low water** to
+every depth (`Chart.aground`, `ground.py`: water = depth + tide height = `-elevation + level
++ z`). At levels 2 and 3 that is right, since the datum is low water. On water only a coarse
+layer answers, the level is counted twice: the open sea reads deeper by the level, and a
+coarse shore floods to the level and the tide above it. Measured at step 0 over the corridor
+and the south layer, outside every bound, at the eleven's level of 3.1 to 4.4 m: 416 cells
+of sea shallower than the level, 765 of land lower than it (by elevation: 149 cells from −1
+to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 to +3, 252 from
++3 to +4). At the judged level of the open Atlantic (about 0.6 to 1.6 m), about 180 and
+210. The mend would read a coarse cell as `-elevation + z` (its level not added), an engine
+change for the lead. The new layers and level 0 carry the same fault on their own shores.
+
+### Step 2: the layers laid, as ruled (A)
+
+**What was built** (`tools/build_charts.py`, from the cache alone: `--skip-fetch --corridor
+atlantic-verde --world`):
+
+- `atlantic-verde`, 12.4 to 25.2 N and 26.4 to 9.34 W, beside `atlantic-south` (it shares no
+  tile with it): 12 tiles, 2,487,854 bytes, byte for byte step 0's measure.
+- **Level 0** over 70 S to 75 N and 100 W to 40 E: 63 tiles, 11,283,534 bytes, committed.
+- The chart's entry says `layers:` (the corridor, the south's, Cape Verde's) where it said
+  `corridor:` and `corridors_beside:`; the tool writes it from `CHARTS`. The manifest's
+  `world:` entry is committed and carried by later builds while its tiles are present
+  (`_fetched_level`). `.gitignore` lets `tiles/0/` and `tiles/1/atlantic-verde/` through.
+- **The Mediterranean's two layers are not laid** (below); they come in step 3 with the seas.
+
+**The Mediterranean's layers moved the tide of three regions, and were taken out (the chart
+session's ruling (A), 2026-11-14).** They were built first in this step: `mediterranean`,
+30 to 42.27 N and 6 W to 36.5 E, 31 tiles and 7,411,985 bytes, and `mediterranean-north`,
+42.27 to 46 N and 6 W to 24.79 E, 7 tiles and 1,678,693 bytes, two layers so that the Black
+Sea's three tiles were left out. The slow tier's full sweep (truth 7-565 and
+`test_chart_audit`'s twin) found a new `c-level:gulf-of-lion`. **The mechanism:** the tide
+reads every layer's bounds as charted water (`tide.charted_bounds`), and a block's edge that
+meets charted water no block holds is an open edge, where the block's water tapers over ten
+miles toward the eleven's alone (`Tide.open_edges`, `taper_at`, package 94), wherever the
+eleven are within their reach. The Mediterranean layers' boxes ran from 6 W over the land of
+Spain and France, so the blocks' edges facing that land became open edges: 77 where there
+were 38. Within 400 miles of the eleven the taper blended them in. Old beside new, on a grid
+of 0.05 degrees over every region and tide region:
+
+| region | points moved | of them water | the worst water: level | M2 |
+|---|---|---|---|---|
+| gulf-of-lion | 326 | 9 | 0.51 to 6.62 m at 43.04 N 3.03 E | 0.07 to 3.56 m |
+| biscay-south | 383 | 12 | 3.35 to 4.49 m in the Gironde, 45.53 N 0.91 W | 1.52 to 1.78 m |
+| biscay-north | 22 | 2 | 3.95 to 3.96 m at 45.98 N 1.13 W | unchanged |
+
+The other 21 regions and tide regions were unmoved. Step 3 lays the layers with the seas,
+where an open edge tapers toward its sea's own water and not the eleven's. The other choice
+was a tide that ignores a layer, which is new mechanism; it was not taken.
+
+**The proofs, as built.**
+
+- **Every earlier file under `data/charts/`**, 2,397 of them, hashes the same.
+- **The manifest** against the one before step 2: the regions, the two earlier layers, the
+  tide regions, the levels and the notes are equal, and every earlier fetch record is kept in
+  its place. What changed: the chart's layer keys, `atlantic-verde` added, the world's entry
+  (committed, 63 tiles), two GEBCO fetch records added (Cape Verde's extract and the global
+  zip), and the build's date and hash.
+- **Level 0 equals the world's:** its 63 tiles are byte for byte the same tiles of the whole
+  world's build (150 tiles, made at step 0 in a scratch folder), so widening the box moves none.
+- **No tide moves anywhere:** `charted_bounds` gains `corridor:atlantic-verde` and nothing
+  else changes; the open edges are the same 38. Every region's and tide region's level and
+  constants on a 0.05-degree grid, the Cape Verde layer's water at 0.25 degrees and level
+  0's box at 2 degrees, 126,769 points old beside new: none moved. Cape Verde's edges face no
+  block within the eleven's reach, and level 0 is not a layer of `charted_bounds`.
+- **What the runtime reads:** the twenty charts of one region are identical, tile for tile
+  (step 1's script); `atlantic-east` keeps every earlier tile and adds Cape Verde's 12 and
+  level 0's 63.
+- **The audit** (`--known`, sampled): no finding the known list lacks.
+
+### Step 2: the pins moved by design, old beside new (the chart session's rulings of 2026-11-14)
+
+Seven, re-pinned with their reasons; nine were found with the Mediterranean laid, and two of
+them (truth 7-532's east bound and truth 7-521's fills) did not move once it was taken out.
+
+1. `test_chart::test_the_regions_tiles_are_present_committed_and_under_the_brief_size`:
+   the world's `committed` False to **True** (level 0 committed by the ruling), the
+   Atlantic's still False. The tracked folders are the chart's `layers:` (old: `corridor:`
+   and `corridors_beside:`) and `tiles/0/`, whose 63 files are exactly the manifest's.
+2. `test_chart::test_the_chart_is_the_whole_manifest...`: the chart's `corridor:` to
+   **`layers:`** (the three in order). The levels [3, 2, 1] to **[3, 2, 1, 0]**. The envelope
+   (25.2001, 51.5, −32, 16.69332) to **(12.4001, 51.5, −32, 16.69332)**, and its words with it.
+3. `test_chart::test_the_corridor_is_committed...`: it read `levels[-1]`, the coarsest
+   level, for "the corridor's tile carries the distance field". The coarsest is now level
+   0, which has none. It now reads **the level that carries the field** (level 1), holds the
+   coarsest as level 0, and holds that level 0 has no field. **No reader of the engine takes
+   the coast distance from the coarsest level:** there is no `levels[-1]` in `freesail/`.
+   `coast_distance` and `nearest_shore` walk the levels finest first and skip a level whose
+   field reads None. `coast_trend`, the one reader that walks coarsest first
+   (`reversed(levels)`), skips a level whose `dist_smooth` is None, which level 0's is
+   everywhere, and so reads the next finer level as before.
+4. `test_chart::test_a_query_asks_the_finest_level...`: `BEYOND_THE_CORRIDOR` (31 N 25 W)
+   depth None to **level 0's, 5,000 to 6,000 m** (5,449.5); its coast distance stays None.
+   **What the master and the lookout say there** (a frigate put at 31 N 25 W): the depth of
+   water "2980 fathoms at low water by the chart, at the position by account; the chart has
+   2961 fathoms and a half to 2992 fathoms within the account's doubt"; the land "not in
+   sight"; no chart-edge line (the place is inside the limits). Two things for others: "at
+   low water" is said of a depth at mean sea level (the double count above), and `level_at`
+   and `use_at` name the corridor's level ("the Atlantic: passages and landfalls") there,
+   since the corridor's empty tile is listed at the place and the depth falls through it to
+   level 0.
+5. `test_chart::test_the_recipe_form...`: `tool.CHARTS[WHOLE]["corridor"]` to
+   **`["layers"][0]`**.
+6. Truth 7-520: `bounds[0]` 25.2 to **12.4** (the Cape Verde layer's). **Its refused start**
+   moves from 25.1 N 20 W, now within the limits, to **12.3 N 20 W**, south of them, so a
+   refusal stays tested. `atlantic-south` is held second in the chart's layers.
+7. Truth 7-570: the derivation takes the committed level 0 under a chart of `charts:`; the
+   tiles read 4,593 to **4,668**. It is kept whole, by the chart session's ruling: 33 s alone
+   here with the Mediterranean laid, and 12 s as a sample of 1,561 tiles (every region's
+   tiles across its bounds, every coarse tile and a fixed tenth of the rest). Neither
+   explains the cloud's longer run.
+
+The seven pass. test_longitude's chart-edge line does not move: it reads the bounds.
+
+**A test without links (the lead's word, 2026-11-14).** Step 1's
+`test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_region` built its
+tree with symbolic links, which Windows refuses without a privilege (WinError 1314, on the
+owner's machine). It now reads the chart's own data where it lies, and a world of one
+synthetic tile in the test's folder, named by the manifest's `world:` entry through an
+absolute `folder` (`_present` joins it to the root, and an absolute path stands). It proves
+the same: absent under the chart of `channel-west` alone (None at 47.70 N 6 W), present
+under `atlantic-east` beyond every layer (57 N 6 W, its 140 m read). No skip by platform.
+Grepping the chart's and the audit's tests for `symlink`, `os.link` and `hardlink`: no other
+test makes a link.
+
+### The open edges read the water (M1; the lead's ruling of 2026-11-14; an engine step)
+
+**The cause** (measured after step 2's stop). `tide._open_edges` (package 94) kept a block's
+edge open wherever a charted box no block holds lay beyond it: `charted_bounds`, every
+region's and layer's box, water or land. A box is not water. The corridor's box runs to 1 W
+over Iberia and France, so 11 of the 38 open edges lay mostly over land (6,158 miles of edge,
+69% facing water). The Mediterranean's boxes, from 6 W, would have made 77 edges, 47% water
+and 43 over land. Wherever the eleven are within their reach, the taper blended a block's
+water toward theirs across that land.
+
+**The mend, where the cause lives.** An edge is open only along the stretches where the chart
+answers water just beyond it. The tool writes the stretches into the manifest at each build
+(`open_edges:`, beside the tide regions), from the chart it has just written. It samples every
+0.01 degree along each of package 94's candidate edges, the water read 0.01 degree beyond
+on the side outside every block (`tide.candidate_edges`, `tide.water_stretches`: one source,
+which the tool and the truths call). The tide reads the stretches as data
+(`tide.open_stretches`), and so the fill raise reads the same water (`mean_level_grid`
+builds its tide by `load_tide`). A manifest without the key, and a tide given its regions,
+read the boxes as before: every synthetic manifest of the tests and any older tree is
+unmoved (truth 7-572). The same tree gives the same stretches, rounded to the
+micro-degree. Today's chart: 38 candidate edges, 39 stretches facing water.
+
+**What it moves, by design: 21 water points of 80,260** (every region's and tide region's
+water on a 0.05-degree grid, old beside new):
+
+| region | points | where | level, old to new (m) | M2, old to new (m) |
+|---|---|---|---|---|
+| biscay-north | 13 | 47.875 to 47.975 N, 4.575 to 3.975 W: the Iroise's south side, Audierne bay and Concarneau | worst 3.289 to 3.085 at 47.875 N 3.975 W | 1.561 to 1.486 there |
+| channel-east | 3 | 49.375 N, 0.875 to 0.775 W (the Seine bay at 1 W) | 4.575 to 4.579 | 1.615 to 1.592 |
+| channel-mid | 4 | 50.775 N, 1.325 to 1.175 W (the Solent's west) | unchanged | 1.121 to 1.122 |
+| solent | 1 | 50.745 N 1.175 W | unchanged | 1.293 to 1.293 (under a millimetre) |
+
+The nearest moved point is 14 miles from the Diamond's patrol centre (she patrols within
+eight). Harpy's water is unmoved. **Package 94's tabled case is closed:** Concarneau's gauge
+lies 7.6 miles inside Biscay north from 48 N, across Brittany's land, and its water read the
+taper toward the eleven across that land (the level 3.29 m where the gauge's own is 3.06
+m). The edge at 48 N east of 4.5 W faces land, is no longer open, and the water there is the
+block's own (3.09 m, M2 1.49 m against the gauge's 1.48). Truth 7-571: every stretch the tide
+reads faces water; on step 2's tree, 3,157 samples on 13 edges faced land. Truth 7-572: a
+manifest without the key reads the 38 edges, and Concarneau's 3.289 m, as before.
+
+**The other readers of a box as if it were charted water** (for the cold review; not mended):
+
+- **`Chart.bounds`, the chart's limits** (the envelope of the regions' and layers' boxes).
+  The scenario's refusal of a start outside it (`core/world.py:786`) lets through a start
+  on water nothing charts inside the envelope, and refuses none on charted water outside
+  it. The ship's placing and the hand anchor (`world/orders.py:1359`, `4234`) read the
+  depth only within it. The lookout's "The chart has nothing to the <quarter> of this; the
+  coast beyond is uncharted." (`world/lookout.py:551`, `Chart.edge_near`) is said within ten
+  miles of the envelope's edge, not of the last water the chart answers: where the
+  envelope's box runs past the charted water (the Adriatic north of 42.5 N, inside the
+  envelope's east of 16.69 E, before level 0), nothing is said. Level 0 now answers most
+  such water.
+- **`world/business.py:290`:** a start in no region takes the whole envelope as its trade
+  area, land and uncharted water with it.
+- The browser's chart block (`api/queries.py`, `ui/harbour.py`) shows the envelope, for
+  display only.
+- Not this cause: `tide.region_bounds` (membership of a gauge's block, rightly by its box),
+  the weather's `box_at` and the streams' `book_limits` (boxes of weather and of statements),
+  the audit's check (a) (ownership by bounds, the water read from the tiles).
+
+**What M1 commits, by the chart session's cautions of 2026-11-14** (the cold review: tiles in
+plain git make a clone of about a gigabyte, and many data keys are read by nothing):
+
+- `open_edges:` holds `stretches:` alone, which the tide reads. The rule and its step live in
+  the code (`tide.water_stretches`, `OPEN_EDGE_STEP_DEG`) and here, not in the data.
+- **A rebuild commits a tile only where its arrays changed.** Biscay north's rebuild changes 5
+  tiles' arrays and gives its other 87 byte for byte as committed. Channel-mid's changes the
+  arrays of 2 tiles by M1 (175200_-4416, 176736_-4416). Its 75 other tiles differ only by
+  their zip entries' clock dates (built before `save_tile`, package 39e) and are left out,
+  their old bytes and manifest records kept. The drift's 2 tiles (181344_-4416,
+  182880_-4416) and its coast wait for the lead's word on (b2).
+
+**M1's whole effect on the tide** (every region's and tide region's points on the 0.05-degree
+grid, the tide with the manifest's stretches against the same manifest without them; land
+points and water both, the water by the chart's depth):
+
+| region | points moved | of them water | the worst water: level, old to new | M2, old to new |
+|---|---|---|---|---|
+| biscay-north | 222 | 13 | 3.289 to 3.085 m at 47.875 N 3.975 W | 1.561 to 1.486 m |
+| biscay-south | 318 | 0 | (land only: the Pyrenees' and the Landes' side of 42 N and 0.9 W) | |
+| portugal | 20 | 0 | (land only: Spain beside 6 W) | |
+| channel-east | 40 | 3 | 4.575 to 4.579 m at 49.375 N 0.875 W | 1.615 to 1.592 m |
+| channel-mid | 55 | 4 | 2.986 to 2.986 m at 50.775 N 1.325 W | 1.121 to 1.122 m |
+| solent | 52 | 1 | 3.158 to 3.158 m at 50.745 N 1.175 W | 1.293 to 1.293 m |
+
+Every other region and tide region: none moved. **Every place of both epitomes and every
+port's anchorage, outer road and mooring**, the spring range (2 × (M2 + S2)) old beside new:
+one moves by more than a tenth of a foot, **Norie's Concarneau, 13.92 to 13.26 ft**. No other
+place or port moves that far.
+
+**The pins M1 moves, by design (the lead's ruling of 2026-11-14):**
+
+1. Truth 94's seam pairs (`test_known_truths`, the seam's taper): the pair on 1 W at 49.1 N
+   is kept and pinned to what is now true. West of 1 W there is Normandy's land by
+   Saint-Lô, so the edge is no open edge: `taper_at(49.1 N, 0.997 W)` 0.0003 to **1.0**.
+   The pin had held the taper across land, the fault M1 mends. Its four other pairs on 1 W
+   and its two in the Iroise are unmoved (0.0003).
+2. Norie's Concarneau (`data/tides/establishments.yaml`): its rise is JUDGEMENT. Faden 1793,
+   p. 66, gives the hour alone, and no source on file gives the rise. By package 37j's rule
+   it is the world's spring range to the foot: **14 to 13 ft**, the model's 13.92 ft before
+   M1 (package 94's taper across Brittany's land, when it was raised from 13) and 13.26 ft
+   now. `test_tide`'s band of 0.6 ft is not widened.
+3. `test_chart`'s recipe-form test: the tool now reads the chart it writes, and the fixture's
+   empty placeholder tiles could not be read (numpy's `EOFError`, with no path). Mended both
+   halves. The fixture writes tiles the chart can read, with nothing in them. **A tile that
+   cannot be read is named and stops the build**: `Tile.load` raises a `ChartError` that
+   names the file, which serves every reader, and the tool's open edges turn it into its
+   stop. The test now holds both: the carry-over as before, and the stop by name with the
+   corridor's tiles made unreadable.
+
+**Where else a failed read is swallowed** (for the cold review; not mended, outside the
+brief). The tool swallows none: its one `except` asks GEBCO's app again after a reset, and
+raises on the last try. In the runtime, nine readers catch every exception about a chart
+read and take it as "beyond the chart's field" or "a chart with no field here":
+`orders/navigation.py:1111`, `world/ships.py:1699`, `world/captains.py:679`, `1149`, `1548`
+and `1676`, `world/brains.py:109`, `ui/harbour.py:447`, `world/prizes.py:1033`. With
+`Tile.load`'s named error, an unreadable tile there is still passed over as no chart.
+
+### Owed, not built (the owner's hold of 2026-11-14): the raise's check, and channel-mid's drift
+
+**The check.** The fill raise (`mean_level_grid`) is one source with the tide (package 93),
+but nothing notices when the tide's rule moves and a region's tiles keep the old raise. The
+check: the tool records at each region's build a hash of the raise grid it used, and a test
+recomputes the grid from today's tide and fails where they differ. **Cost:** recomputing all
+19 regions' grids from today's tide takes 10.7 s (162,891 cells; measured on this machine
+under another run), so it fits the fast tier. A baseline wants a control rebuild of each
+region with today's code, which proves its committed tiles are what that raise gives: about
+10 to 15 minutes a region with its fetch, some 3 to 4 hours for the 19, mostly fetching
+EMODnet and GEBCO. A region not yet baselined would be listed as unknown, not passed. **It
+would have caught** channel-mid's drift (below), at package 94's merge, and M1's own seven
+tiles before they were found by hand.
+
+**Channel-mid's drift.** Its committed tiles do not rebuild to themselves with today's code.
+The control was step 2's code at 7465f50 rebuilding `--region channel-mid` from a fresh
+fetch (EMODnet DTM 2024 and GEBCO 2025 extracts, the recipe's boxes). It differs from the
+committed tiles in **4 tiles' arrays**:
+
+| tile | cells | arrays |
+|---|---|---|
+| 2/175200_-4416 | 4,100 | elevation |
+| 2/176736_-4416 | 12,893 | elevation |
+| 2/181344_-4416 | 2,507 | elevation; the distance field in 33 cells |
+| 2/182880_-4416 | 48,925 | elevation; the distance field in 1 cell |
+
+Its coast file differs too. Its other 75 tiles differ only by their zip entries' clock dates
+(built before `save_tile`, package 39e); their arrays are equal. The four are the column from
+1.23 W, from the Seine bay to Spithead and Selsey, over the water of the Solent's tide region
+and the seam at 1 W. They were last written on 2026-10-30, at package 93's rebuild. **The
+cause, as far as known:** package 94 gave the Solent its own tide region and the seams their
+taper after channel-mid was last built, which moved the raise there, and channel-mid was
+never rebuilt on it; nothing noticed. Not proven: the control rebuilds with today's fetch,
+and a change in the services' data since 30 October would show the same way. The distance
+field's changes (34 cells) say a shore moved by the raise in the Solent's water.
+
+**The drift's cause, checked by what is on the disk (the lead's ruling of 2026-11-14).** The
+build cache does not hold channel-mid's source extracts as they were at package 93's rebuild:
+the three in it (EMODnet's `elevation` and `elevation_max` over 48.15 to 51.3 N and 3.7 to
+0.7 W, GEBCO's over 48.05 to 51.4 N and 3.8 to 0.6 W) were fetched on 2026-11-14 for M1's
+rebuild. Each differs in its checksum from the manifest's record of 2026-10-09, which proves
+nothing: ERDDAP's netCDF and GEBCO's zip carry their own dates of making. So the cause stays
+**unproven, with two hypotheses**: package 94's raise since the rebuild of 2026-10-30 (the
+Solent's tide region and the seam's taper), or a change in the services' data since 2026-10-09.
+A rebuild from the extracts of 2026-10-09, or a comparison of their arrays with today's, would
+decide it. Owed with the raise's check. Nothing of the control's rebuild is committed.
+
+**M1 commits tree b1** (the lead's ruling of 2026-11-14): biscay-north's five tiles and
+channel-mid's two by M1 alone (`2/175200_-4416`, `2/176736_-4416`: the committed arrays with
+M1's change, the M1 rebuild less the control, cell by cell), the manifest's records of their
+bytes, and `open_edges:`. Left out: biscay-north's 87 other tiles (byte for byte), channel-mid's
+75 others (clock dates only), the drift's two tiles and channel-mid's coast.
