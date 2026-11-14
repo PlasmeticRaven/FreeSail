@@ -3035,7 +3035,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
 # package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before)
-GATE_5B_SCHOONER_LINES = 769  # the well (768 at 56, 763 at package 45)
+# 766 on the joined tree, as on the trunk: 115 D's 769 was its count before its own mend took the
+# fitted night routine out of the schooner's book (three lines)
+GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
@@ -3047,8 +3049,9 @@ GATE_5B_SCHOONER_LINES = 769  # the well (768 at 56, 763 at package 45)
 # the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
 # (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
-# package 115 D moves it too (ef15ca96ee2ed052 on its own tree); TO BE MEASURED on the joined tree
-GATE_5B_SCHOONER_DIGEST = "b5f35676ef8183d0"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (b5f35676ef8183d0 with 75 alone; ef15ca96ee2ed052 on 115 D's own tree)
+GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4142,8 +4145,9 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the same, proved by bisection (the base head 93a15ee5 gives 1e7f8ab24b84e6f7; TuningNotes)
 # 75's words, passed by the lead by its lines (1e7f8ab24b84e6f7 on the trunk before); the trim's
 # words (1e7f8ab24b84e6f7 at SW-4)
-# package 115 D moves it too (46300a9a567b80d7 on its own tree); TO BE MEASURED on the joined tree
-GATE_5C_CRUISE_DIGEST = "81b0b08a63bf068e"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
+GATE_5C_CRUISE_DIGEST = "bdd6ce8a97a33140"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4282,8 +4286,9 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
 # 75's words, passed by the lead by its lines (40bcef34afd0cec4 before); package 98, step 5
 # (6436eb06a665f379 at 65)
-# package 115 D moves it too (82a1447152be8b82 on its own tree); TO BE MEASURED on the joined tree
-GATE_5C_MERCHANT_DIGEST = "ad35e60bf5d3737d"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
+GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
 
 
 def _people(world) -> list[dict]:
@@ -4932,8 +4937,9 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
 # 75's words, passed by the lead by its lines (c0bf4b51621ad91f before); package 98, step 5
 # (7076e667c2bc41e3 at 65)
-# package 115 D moves it too (de0f8c03bd2663df on its own tree); TO BE MEASURED on the joined tree
-GATE_6A_FAKE_CAPTAIN_DIGEST = "2cc02c95ad794bc8"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
