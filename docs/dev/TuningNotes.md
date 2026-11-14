@@ -27528,6 +27528,15 @@ anchor") and moves nothing else, there being nothing else to move.
 within 10 miles" lies at her anchor, her captain "in port" with the intent, and does not get
 under way in two hours (step 1's leaving; probed, not traced).
 
+**The suites at 77c3a76b** (item 7 alone at 63108591, items 1 to 6 at 591eda5e and e6ee8fb8,
+with the trunk at 697c0f0b merged, clean; by the lead's word of 03:10 not merged again since):
+ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,684 passed and 1
+xfailed, the 517 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the same files as
+at 2deccd29, in its two halves for the two-hour limit: the truths and the browser plans exit 0,
+1,077 passed and 8 xfailed, none skipped; the rest exit 0, 2,279 passed; the pace tests of the
+same files alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. The tree
+reported differs from 77c3a76b by this paragraph alone.
+
 
 
 
