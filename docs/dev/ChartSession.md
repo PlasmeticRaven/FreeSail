@@ -633,3 +633,11 @@ rebuilt on. Ruled by this session: commit only tiles whose arrays change. Held f
 (b) on M1's tiles alone and on M1 plus the drift; the drift's general cause (a tide rule
 moving the raise with nothing to notice) and a check at it (each region's raise grid hashed
 at build, recomputed by a test).
+
+### 2026-11-14, 06:05: 111's 623ca5ac sampled at 1 m
+
+The five (Santander 3.01, Dartmouth 3.08, Ferrol 3.42, Lisbon 3.06, Setúbal 1.17 m by my
+1 m reader) agree with their files within 0.02 m and keep their pilots' sides. The audit's
+2 m / 8 m rule falls short of 1 m by at most 2.54 m, on deep legs only, none across 3 m:
+sound on today's chart; its cause (a step unrelated to the cell) is named, and a step tied to
+the finest level under each leg proposed as the general mend, not blocking.
