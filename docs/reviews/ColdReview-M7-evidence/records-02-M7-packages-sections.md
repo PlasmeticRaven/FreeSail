@@ -115,7 +115,7 @@ hash", "under 600 words" reports (`WP:9076`). The lead hands builders "the groun
 had it read ... to check, not to trust" (`WP:8258`, `WP:8393`), sometimes "every line FROM
 MEMORY" (`WP:8595`).
 
-**Who builds.** "Fable" for design-heavy packages, "Opus" for the rest; package 75 by "the
+**Who builds.** "[the senior model]" for design-heavy packages, "[the second model]" for the rest; package 75 by "the
 owner's own local session" on its own branch, which the lead "cannot message" (`WP:9756`) and
 whose reports sometimes never arrive ("No bridge message of yours reached me: this session lay
 dormant from the 8th to the 9th", `WP:10488`; "your message of the 8th never having reached
@@ -168,9 +168,9 @@ enforces it. Builders' containers lacking Playwright or websockets: a setup scri
 
 ## 4. The cost, as this half shows it
 
-- Usage limits: "65 pauses after step 1 (the Fable allowance at 95 per cent)"; "a merge spends
+- Usage limits: "65 pauses after step 1 (the [the senior model's] allowance at 95 per cent)"; "a merge spends
   the allowance for nothing" (`WP:6886-6892`); "after the usage reset" (`WP:9964`); the owner:
-  "The Fable usage and the weekly limit are acceptable to use even if the warning flag appears"
+  "The [the senior model's] usage and the weekly limit are acceptable to use even if the warning flag appears"
   (`WP:111`).
 - A week paused on new packages (decision 61, `WP:6882`; again `WP:10289-10293`).
 - Sessions out of reach: dormant a day (`WP:10488`); messages lost (`WP:10187`, `WP:10490`).
