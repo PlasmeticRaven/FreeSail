@@ -29,6 +29,10 @@ under (b), "n" = the reader's "no test would catch".
 | B-n1 | test_known_truths.py::test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries; test_lookout.py::test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it | a far ship's light order always sets `"none"` | pass | SURVIVED (both) | 9 |
 | B-b1 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter | rules captain's hole filter `z_m < 0.3` to `< -99.0` (never sends the carpenter) | pass | SURVIVED | 220 |
 | B-n3 | test_known_truths.py::test_truth_7_173_...; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says, ::test_every_repair_is_an_evolution_with_hands_and_competes_for_them; test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine (and 7-183) | the same plant | pass | SURVIVED (all) | 16 |
+| B-b6 | test_known_truths.py::test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge, ::test_truth_7_441_the_frame_holds_every_state_and_the_view_writes_nothing | no code fault: the game unchanged, run repeatedly on the shared machine (the `-n 4` run itself NOT RUN: the runners' rule forbids `-n`) | pass | 7-284 failed 1 of 15 serial runs with the game unchanged (flaky: the reader's claim stands); 7-441 passed 5 of 5 | 167 |
+| G-b1 | test_view_geometry.py::test_each_line_that_comes_down_ends_on_her_drawn_rail (36 cases) | every brace led to the mast abaft ends 6 m abaft and 4 m below that mast | pass (36) | SURVIVED (36 of 36; and 14 cases of four nearby brace and frame tests) | 11 |
+| G-b2 | test_view_geometry.py::test_the_head_lies_on_head_m (10 cases) | `FIGURE_SHARE` 0.3 to 0.9 (the figurehead three times as tall) | pass (10) | SURVIVED (10 of 10; and 46 cases of five other head tests) | 5 |
+| G-b3 | test_view_geometry.py::test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks[frigate-36], ::test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail[frigate-36] | a mend, not a fault: frigate's `mizzen.boom` `height_m` 2.4 to 4.5 (boom clears her taffrail) | pass (both, on the defect) | first PASSED on the mend (prediction refuted: it passes defect and mend alike); second FAILED on the mend (prediction stands: it pins the defect) | 2 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -433,3 +437,103 @@ Side note from the liveness work, not a planted fault: with tests/test_fight.py'
 `_alongside(30.0)`, the enemy's `Captain._damage_work` was called 0 times in 300 s of
 `w.run` (a spy on the method), so a rules captain there never reaches his repairs; that
 fixture cannot witness any captain's damage work. Not looked into further.
+
+## B-b6. Truths 7-284 and 7-441: wall-clock ratios in the fast tier
+
+No code was changed. The reader's run (`-n 4` beside the slow tier) was not made: the
+runners' instruction forbids `-n` while three other runners share the four cores. Instead each
+test was run alone, one process at a time, on the machine as it was (load average 1.9 to 5.2,
+the other runners working).
+
+7-284, fifteen runs: 14 passed, 1 failed (26 s in all), with the game pristine:
+
+```
+>       assert now < 1.25 * then, (now, then)
+E       AssertionError: (0.024000508000426635, 0.011513147000187018)
+E       assert 0.024000508000426635 < (1.25 * 0.011513147000187018)
+```
+
+A ratio of two timings of about a hundredth of a second each (each the best of five),
+fails when the other cores are busy. FLAKY: the reader's claim stands for 7-284 even without
+`-n`.
+
+7-441 (its `part < 0.25 * whole`), five runs: all passed (141 s). Not shown flaky here; the
+`-n 4` case was not tried.
+
+## G-b1. Braces ending in the air between the masts
+
+```diff
+--- mut/client/projection.js
++++ m/1/client/projection.js
+@@ -1786,7 +1786,7 @@
+         var m = mastAftOf(Y.x);
+-        var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : sideEnd(ss, Y.x - Y.half * 0.8);
++        var to = m ? v(m.x - 6, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1) - 4) : sideEnd(ss, Y.x - Y.half * 0.8);
+```
+
+Live: through the test file's own `fully_dressed` and `run_js(..., LINE_ENDS)` on the frigate,
+the fore yard's starboard brace ends at `[-2, 0.3, 17]` pristine (the main mast) and at
+`[-8, 0.3, 13]` with the fault, six metres abaft the main mast in the air; the test's own
+`where_it_ends` calls both "mast".
+
+Output: 36 PASSED. SURVIVED. `where_it_ends` (tests/test_view_geometry.py:6066) calls a brace's
+end "mast" when `abs(end[1]) == 0.3` and reads neither its x nor its z, so any end 0.3 m off the
+middle line passes as on a mast. Also run with the fault, all passed:
+`test_the_scale_is_the_full_rigs_whatever_is_sent_down_or_braced` (3),
+`test_the_braces_lead_up_to_the_fore_top_the_sheets_aft_and_the_lifts_to_the_spars_end` (6),
+`test_the_frame_is_equal_across_the_shift_and_back` (2), `test_the_yards_brace_is_shown_from_the_beam` (3).
+
+## G-b2. A figurehead three times its size
+
+```diff
+--- mut/client/projection.js
++++ m/1/client/projection.js
+@@ -179,7 +179,7 @@
+-  var FIGURE_SHARE = 0.3;
++  var FIGURE_SHARE = 0.9;
+```
+
+Output: 10 PASSED. SURVIVED. The test reads the share from the page
+(`share: P.constants.FIGURE_SHARE`, tests/test_view_geometry.py:2128) and checks the figure
+against `tall = got["share"] * top` (2145); it pins the siding (`assert s == 0.2`) but not the
+share, so the figure, drawn at 0.9 of the head's height and checked against 0.9, passes. That
+check passing is itself the proof the fault is live (the figure is drawn three times as tall).
+
+Also run with the fault, all passed: `test_the_head_and_the_galleries_stay_inside_the_fixed_frame_across_states`
+(12), `test_no_sky_shows_between_the_head_and_the_stem_from_abaft_the_beam` (10),
+`test_what_stands_on_the_head_paints_after_the_plate_it_stands_on` (5),
+`test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number` (18),
+`test_the_hovers_words_on_the_head_name_no_strip` (1). The whole file was not run.
+
+## G-b3. The frigate's boom raised to clear her taffrail (a mend)
+
+```diff
+--- mut/data/ships/frigate-36.yaml
++++ m/1/data/ships/frigate-36.yaml
+@@ -344,7 +344,7 @@
+   class: boom
+   'on': mizzen.mast
+   length_m: 13.4
+-  height_m: 2.4
++  height_m: 4.5
+   horse_m: 5.8
+```
+
+The reader predicted both tests fail on the mend. One did:
+
+```
+>       assert a[2] - taffrail[2] == pytest.approx(old, abs=0.02)  # level, at its jaws' height
+E       assert 0.2699999999999996 == -1.83 ± 0.02
+FAILED tests/test_view_geometry.py::test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail[data/ships/frigate-36.yaml]
+```
+
+`test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail` pins the boom under the
+taffrail by equality (`BOOM_OVER_TAFFRAIL_M[FRIGATE] = (-1.83, -1.33)`, with `UNDER_HER_TAFFRAIL`
+naming it): it passes the defect and fails the mend. The reader's claim stands for it: a test
+whose name says "clear her taffrail" that fails when she clears it.
+
+`test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks` PASSED on the mend, as it
+did on the defect: its checks are lower bounds (`>= over_deck - 1e-2`, `>= over_rail - 5e-3`)
+against `BOOM_CLEAR_M[FRIGATE] = (0.26, -1.35)`, a negative floor over the rail, so it admits the
+boom 1.35 m under her rail and admits it raised. The reader's prediction is refuted for this one:
+it does not pin the defect, it tolerates it.
