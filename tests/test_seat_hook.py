@@ -94,7 +94,7 @@ def test_the_seat_is_refused_without_a_record_a_grant_or_budget_and_held_with_th
 
 def test_a_door_under_a_directors_seat_is_stood_down_when_the_budget_is_spent(tmp_path):
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -106,7 +106,7 @@ def test_a_door_under_a_directors_seat_is_stood_down_when_the_budget_is_spent(tm
     app = create_app(
         driver, game="a test", consent_records=w.consent_records_dir, saves_dir=tmp_path / "saves"
     )
-    with PageClient(app) as http:
+    with DoorClient(app) as http:
         a = http.post(
             "/api/agents/captain", json={"model_name": WEIGHTS, "door": "mcp", "ship": "X"}
         ).json()

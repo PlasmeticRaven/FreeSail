@@ -17453,6 +17453,20 @@ def test_truth_7_600_a_socket_from_another_page_or_without_the_mark_gets_nothing
             with pytest.raises(InvalidStatus) as refused:
                 _foreign_socket(url, **kw)
             assert refused.value.response.status_code == 403, url
+        # the Host asked of the socket too: a rebinding page's socket at its own name, its
+        # origin that name's and the stolen mark with it
+        evil = f"evil.example:{game.port}"
+        assert (
+            _raw_request(
+                game.port,
+                "GET",
+                f"/ws?page={game.mark}",
+                [f"Host: {evil}", f"Origin: http://{evil}", "Upgrade: websocket"]
+                + ["Connection: Upgrade", "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ=="]
+                + ["Sec-WebSocket-Version: 13"],
+            )
+            == 403
+        )
         assert game.log_texts() == before
         hello = json.loads(_foreign_socket(ws + f"?page={game.mark}", origin=f"http://{game.own}"))
         assert hello["type"] == "hello" and "snapshot" in hello
@@ -17494,6 +17508,9 @@ def test_truth_7_601_an_order_from_another_page_or_without_the_mark_is_refused_b
             ),
             httpx.post(game.url + "/api/harbour/doors/1/stop", timeout=60),  # a body-less POST
         ]
+        refusals.append(  # the page's cookie alone is no mark for an order
+            httpx.post(url, json=order, cookies={f"freesail-page-{game.port}": game.mark})
+        )
         for r in refusals:
             assert r.status_code == 403, r.text
             assert "nothing was done" in r.json()["detail"] or "own address" in r.json()["detail"]
@@ -17631,9 +17648,29 @@ def test_truth_7_604_the_harbours_start_and_maker_open_files_in_the_games_folder
             fields = c.get(
                 "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
             ).json()["fields"]
-            fields["ship"]["file"] = str(outside / "ship.yaml")
-            proved = c.post("/api/harbour/scenario/prove", json={"fields": fields})
-            assert proved.status_code == 403 and "was not opened" in proved.json()["detail"]
+            (outside / "brief.yaml").write_text("name: outside\n", encoding="utf-8")
+            (outside / "book.orders").write_text("trim sails\n", encoding="utf-8")
+            r = c.post(
+                "/api/harbour/start",
+                json={
+                    "scenario": "data/scenarios/lesson-falmouth.yaml",
+                    "director_brief": str(outside / "brief.yaml"),
+                },
+            )
+            assert r.status_code == 403 and "was not opened" in r.json()["detail"]
+            for key, value in (
+                ("ship", str(outside / "ship.yaml")),
+                ("standing_orders", [str(outside / "book.orders")]),
+                ("director", {"brief": str(outside / "brief.yaml")}),
+            ):
+                f = json.loads(json.dumps(fields))
+                if key == "ship":
+                    f["ship"]["file"] = value
+                else:
+                    f[key] = value
+                proved = c.post("/api/harbour/scenario/prove", json={"fields": f})
+                assert proved.status_code == 403, (key, proved.text)
+                assert "was not opened" in proved.json()["detail"]
 
 
 def test_truth_7_609_another_device_opens_the_printed_address_and_not_the_machines_programs(
@@ -18019,17 +18056,25 @@ def test_truth_7_611_the_maker_opens_the_file_it_checked_from_whatever_folder_it
     assert "SENTINEL-CWD-115" not in r.text
 
 
-def _raw_post(port: int, path: str, headers: list[str], body: bytes) -> int:
+def _raw_request(port: int, method: str, path: str, headers: list[str], body: bytes = b"") -> int:
     """A request written by hand on a socket, as no well-behaved client writes one (a
-    header twice): its status."""
+    header twice, a Host of another name on a socket's opening): its status."""
     import socket
 
-    head = [f"POST {path} HTTP/1.1", *headers, "Content-Type: application/json"]
-    head += [f"Content-Length: {len(body)}", "Connection: close", "", ""]
+    head = [f"{method} {path} HTTP/1.1", *headers]
+    if body:
+        head += ["Content-Type: application/json", f"Content-Length: {len(body)}"]
+    if not any(h.lower().startswith("connection:") for h in headers):
+        head.append("Connection: close")
+    head += ["", ""]
     with socket.create_connection(("127.0.0.1", port), timeout=60) as s:
         s.sendall("\r\n".join(head).encode("latin-1") + body)
         first = s.recv(64).decode("latin-1")
     return int(first.split()[1])
+
+
+def _raw_post(port: int, path: str, headers: list[str], body: bytes) -> int:
+    return _raw_request(port, "POST", path, headers, body)
 
 
 def test_truth_7_612_the_guards_small_doors_shut(tmp_path):
@@ -18048,6 +18093,8 @@ def test_truth_7_612_the_guards_small_doors_shut(tmp_path):
         cookie = {f"freesail-page-{game.port}": game.mark}
         r = httpx.get(game.url + "/api/director/log", cookies=cookie, timeout=60)
         assert r.status_code == 403 and "entries" not in r.text
+        bare = httpx.get(game.url + "/api/director/log", timeout=60)  # no mark, no cookie
+        assert bare.status_code == 403 and "entries" not in bare.text
         with game.page() as c:
             assert c.get("/api/director/log").status_code == 200
         body = b'{"text": "hold"}'
@@ -18067,3 +18114,103 @@ def test_truth_7_612_the_guards_small_doors_shut(tmp_path):
         )
         assert odd.status_code == 403
     assert not Guard(token="x").mark_ok("\u00e9")
+
+
+def _link(link: Path, target: Path) -> bool:
+    """A symbolic link made as a stranger's save folder could hold one; False where this
+    system will not let this user make one (Windows without the right), and then no link
+    can lead out of a folder here either."""
+    import os
+
+    try:
+        os.symlink(target, link)
+    except (OSError, NotImplementedError):
+        return False
+    return True
+
+
+def test_truth_7_613_a_save_and_a_load_open_the_file_they_checked_and_no_link_leads_out(tmp_path):
+    """Package 115, part A, the second reader's findings 1, 6 and 7: the save checked its
+    path before it added `.json`, and the checkpoint beside it was never checked, so links
+    in the saves place led a save out of it, and the harbour's load took any file of the
+    game's folder. Through the order line and the harbour, from the game's own page: a save
+    named for a link to a file outside, for a dangling link, and a save whose checkpoint's
+    name is a link out are each refused and write nothing outside; a load named for a link
+    out is refused; the load of a file of the game's folder that is no save (`pyproject.toml`,
+    the server's own code) is refused before it is opened; a NUL in a name and a name too
+    long for the system are refused in words, at the order line and the harbour, never an
+    error of the server. Where the system lets no link be made, the links are not tried
+    (none can lead out here) and the rest is."""
+    from own_page import LiveGame
+
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    victim = outside / "victim.json"
+    victim.write_text("SENTINEL-VICTIM-115", encoding="utf-8")
+    lesson = str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    with LiveGame(tmp_path, "--scenario", lesson) as game:
+        links = (
+            _link(game.saves / "linkvictim.json", victim)
+            and _link(game.saves / "dangling.json", outside / "made.json")
+            and _link(game.saves / "plain.checkpoint", outside / "plain.checkpoint")
+        )
+        with game.page() as c:
+
+            def said(text: str) -> dict:
+                r = c.post("/api/order", json={"text": text})
+                assert r.status_code == 200, r.text
+                return r.json()
+
+            if links:
+                for name in ("linkvictim", "dangling", "plain"):
+                    assert said(f"save {name}")["kind"] == "driver.refused", name
+                assert victim.read_text(encoding="utf-8") == "SENTINEL-VICTIM-115"
+                assert not (outside / "made.json").exists()
+                assert not (outside / "plain.checkpoint").exists()
+                r = c.post("/api/harbour/start", json={"load": "linkvictim"})
+                assert r.status_code == 403 and "SENTINEL" not in r.text
+            for given in ("pyproject.toml", "freesail/ui/guard.py", "data/ships/cutter.yaml"):
+                r = c.post("/api/harbour/start", json={"load": given})
+                assert r.status_code == 403, (given, r.text)
+                assert "a .json file" in r.json()["detail"]
+            for word in ("a\x00b", "x" * 5000):
+                assert said(f"save {word}")["kind"] == "driver.refused"
+                assert said(f"read the standing orders from {word}")["kind"] == "driver.refused"
+                for choice in ({"load": word}, {"scenario": word}, {"ship": word}):
+                    r = c.post("/api/harbour/start", json=choice)
+                    assert r.status_code in (400, 403), (choice, r.status_code)
+            assert said("save kept")["kind"] == "driver.saved"  # a plain name, as before
+
+
+def test_truth_7_614_a_door_from_another_device_comes_with_the_mark_and_on_the_machine_as_before(
+    tmp_path,
+):
+    """Package 115, part A, the second reader's finding 2: off the machine, the doors were
+    open to anyone who could reach the port (`--host 0.0.0.0`, a program on another address
+    seating the captain with no mark). From another device's address a door's seating is
+    refused without the mark, nothing asked of the game, and taken with it; on the machine
+    itself a door comes in with no mark as before. Through the whole app with another
+    device's address as its client (the container has no second device)."""
+    from fastapi.testclient import TestClient
+    from own_page import ON_THE_MACHINE
+
+    from freesail.ui.server import Driver, create_app
+
+    world = World(seed=1805, scenario=Scenario())
+    app = create_app(
+        Driver(world),
+        hosts=("0.0.0.0",),
+        saves_dir=tmp_path / "saves",
+        consent_records=tmp_path / "consent",
+    )
+    mark = app.state.guard.token
+    seat = {"model_name": "lan-program", "door": "api"}
+    with TestClient(app, base_url="http://192.0.2.1:8000", client=("192.0.2.7", 50000)) as other:
+        r = other.post("/api/agents/captain", json=seat)
+        assert r.status_code == 403 and "no station was touched" in r.text
+        assert other.get("/api/agents").status_code == 403
+        assert not any("lan-program" in e.text for e in world.log)
+        marked = other.post("/api/agents/captain", json=seat, headers={"x-freesail-page": mark})
+        assert marked.status_code != 403
+    with TestClient(app, base_url="http://localhost:8000", client=ON_THE_MACHINE) as here:
+        assert here.get("/api/agents").status_code == 200

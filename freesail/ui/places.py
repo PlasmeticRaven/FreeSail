@@ -13,17 +13,25 @@ the machine.
 
 The folders (`Places`):
 
-- **the saves place** (`--saves`, else the settings' `places: saves`, else `saves/` in the
-  game's folder): where `save NAME` writes `NAME.json` and its checkpoint, and where a save
-  is taken up from;
+- **the saves place**: the `--saves` the server was started with. `py -m freesail` gives it
+  the settings' saves place when no `--saves` is given (`saves` beside the settings file,
+  unless the settings name another); `python -m freesail.ui.server` without `--saves` uses
+  `saves/` in the game's folder. Where `save NAME` writes `NAME.json` and its checkpoint,
+  and where a save is taken up from. It is fixed for the run: a change of the setting while
+  the game runs takes effect when the game is started again;
 - **the game's data** (`data/` in the game's folder): the game's ships, scenarios, books and
   the director's briefs, read by name or by the path the primer gives
   (`data/standing_orders/starter.orders`);
 - **the player's scenarios place** (the settings' `places: scenarios`): his own scenarios
   and books, read;
-- **the game's folder** itself, for a save alone: the browser's saves once landed there (a
-  `save foo.json` at the order line of `py -m freesail` wrote it in the game's folder), and
-  they stay loadable.
+- **the game's folder** itself and its `saves/`, for a save alone (a `.json` file lying
+  directly in either): the browser's saves once landed in the game's folder (a `save
+  foo.json` at the order line of `py -m freesail` wrote it there), and they stay loadable.
+
+Every file a save writes (the save and the checkpoint beside it) and every file a load
+reads is checked by its final path, resolved, so that a link in a folder that leads out of
+it is neither written through nor read; words that no path can be made of (a NUL, a name
+too long for the system) are refused in words like any other.
 
 A path given relative is read from the folder its kind lives in (a save from the saves
 place, then the game's folder; anything else from the game's folder), so the primer's own
@@ -70,12 +78,39 @@ def resolve(given: str, base: Path) -> Path | None:
     text = given.strip().strip("\"'")
     if os.name != "nt" and PureWindowsPath(text).drive:
         return None
+    if "\0" in text:
+        return None
     if os.sep != "\\":
         text = text.replace("\\", "/")
     p = Path(text)
     if not p.is_absolute():
         p = base / p
-    return p.resolve()
+    try:
+        return p.resolve()
+    except (OSError, ValueError, RuntimeError):  # too long, a loop of links: no path here
+        return None
+
+
+def _there(p: Path, file: bool = False) -> bool:
+    """Whether the path is there (a file, with `file`); a path this system cannot ask
+    about (a name too long for it) is not there."""
+    try:
+        return p.is_file() if file else p.exists()
+    except (OSError, ValueError):
+        return False
+
+
+def final(p: Path | None, suffix: str) -> Path | None:
+    """`p` with `suffix` when it lacks it, resolved again: the path that is opened, which a
+    link named without its suffix may lead out of the folder from."""
+    if p is None:
+        return None
+    if p.suffix.lower() != suffix:
+        p = p.with_name(p.name + suffix)
+    try:
+        return p.resolve()
+    except (OSError, ValueError, RuntimeError):
+        return None
 
 
 def inside(p: Path | None, folders: Iterable[Path]) -> bool:
@@ -122,46 +157,76 @@ class Places:
 
     def save_target(self, given: str) -> Path:
         """Where `save NAME` writes: `NAME.json` in the saves place; a path only if it lies
-        there."""
+        there. The save and the checkpoint beside it are each checked by their final path."""
+        from freesail.core.replay import CHECKPOINT_SUFFIX, checkpoint_path
+
         text = given.strip().strip("\"'")
         if not text:
             raise PlaceRefused(
                 f"Say 'save NAME', and the game is saved as NAME.json in the saves place "
                 f"({shown(self.saves)})."
             )
-        p = resolve(text, self.saves)
-        if not inside(p, [self.saves]) or p == self.saves:
+        p = final(resolve(text, self.saves), SAVE_SUFFIX)
+        beside = final(checkpoint_path(p), CHECKPOINT_SUFFIX) if p else None
+        if (
+            p is None
+            or beside is None
+            or not inside(p, [self.saves])
+            or not inside(beside, [self.saves])
+        ):
             raise PlaceRefused(
                 f"The game is saved in the saves place ({shown(self.saves)}), not elsewhere: "
                 f"say 'save NAME' and it is written there as NAME.json. To keep a copy "
-                f"elsewhere, download it from the game's page."
+                f"elsewhere, copy the file from the saves place."
             )
-        assert p is not None
-        if p.suffix.lower() != SAVE_SUFFIX:
-            p = p.with_name(p.name + SAVE_SUFFIX)
         return p
 
+    def load_folders(self) -> list[Path]:
+        return [self.saves, ROOT.resolve(), DEFAULT_SAVES.resolve()]
+
     def save_to_load(self, given: str) -> Path:
-        """A save the harbour takes up: by its name in the saves place, or by a path in the
-        saves place or the game's folder."""
+        """A save the harbour takes up: a `.json` save by its name in the saves place, or by
+        a path to one in the saves place, or lying directly in the game's folder or its
+        `saves/` (the game's own older saves). The save's file and the checkpoint beside it
+        are each checked by their final path, before anything is opened."""
+        from freesail.core.replay import CHECKPOINT_SUFFIX, checkpoint_path
+
         text = given.strip().strip("\"'")
-        folders = [self.saves, ROOT.resolve()]
-        for base in folders:
+        found = None
+        for base in (self.saves, ROOT.resolve()):
             p = resolve(text, base)
-            if p is None:
+            p = final(p, SAVE_SUFFIX) if is_name(text) else p
+            if p is not None and self._loadable(p) and _there(p, file=True):
+                found = p
                 break
-            if is_name(text) and p.suffix.lower() != SAVE_SUFFIX:
-                p = p.with_name(p.name + SAVE_SUFFIX)
-            if inside(p, folders) and p.is_file():
-                return p
+        if found is not None:
+            beside = final(checkpoint_path(found), CHECKPOINT_SUFFIX)
+            if beside is not None and (not _there(beside) or self._loadable_beside(beside)):
+                return found
         p = resolve(text, self.saves)
-        if inside(p, folders):
+        plain = Path(text).suffix.lower() in ("", SAVE_SUFFIX)
+        if plain and p is not None and self._loadable(final(p, SAVE_SUFFIX) or p):
             raise PlaceRefused(f"There is no save {text} in the saves place ({shown(self.saves)}).")
         raise PlaceRefused(
-            f"The harbour takes up a save from the saves place ({shown(self.saves)}) or the "
-            f"game's folder, and {text} is in neither. It still loads: move it into the saves "
-            f"place, or start the game with 'py -m freesail --load PATH' at the command line."
+            f"The harbour takes up a save (a .json file) from the saves place "
+            f"({shown(self.saves)}) or the game's folder, and {text} is none. It still loads: "
+            f"move it into the saves place, or start the game with "
+            f"'py -m freesail --load PATH' at the command line."
         )
+
+    def _loadable(self, p: Path | None) -> bool:
+        """A save's file where a load may read one: a `.json` in the saves place, or lying
+        directly in the game's folder or its `saves/`."""
+        if p is None or p.suffix.lower() != SAVE_SUFFIX:
+            return False
+        if inside(p, [self.saves]):
+            return True
+        return p.parent in (ROOT.resolve(), DEFAULT_SAVES.resolve())
+
+    def _loadable_beside(self, p: Path) -> bool:
+        if inside(p, [self.saves]):
+            return True
+        return p.parent in (ROOT.resolve(), DEFAULT_SAVES.resolve())
 
     # -- a file to read ------------------------------------------------------------
 

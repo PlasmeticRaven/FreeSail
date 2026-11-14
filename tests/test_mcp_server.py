@@ -27,7 +27,7 @@ pytest.importorskip("fastapi")
 
 from mcp import Client  # noqa: E402
 from mcp_types import Implementation  # noqa: E402
-from own_page import PageClient  # noqa: E402
+from own_page import DoorClient  # noqa: E402
 
 from freesail.agents import OPT_OUT_TOKEN, TOOLS, consent, tools  # noqa: E402
 from freesail.agents import mcp_server as M  # noqa: E402
@@ -73,7 +73,7 @@ class Game:
             saves_dir=tmp_path / "saves",
             say=self.said.append,
         )
-        self.http = PageClient(app)
+        self.http = DoorClient(app)
 
     def bridge(self, identity: str = WEIGHTS, wait: float = 5.0, **kw: Any) -> M.Bridge:
         told: list[str] = []

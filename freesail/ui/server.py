@@ -1642,7 +1642,7 @@ def create_app(
                 raise HTTPException(
                     status_code=400,
                     detail=(
-                        "Say hold, go, speed N, tick N, standing_orders FILE, save PATH, "
+                        "Say hold, go, speed N, tick N, standing_orders BOOK, save NAME, "
                         "follow SHIP, look_at WHERE or ease_on_station on|off to the driver."
                     ),
                 )

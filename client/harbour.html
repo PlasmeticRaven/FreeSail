@@ -56,7 +56,7 @@
         </select></label>
       <label class="from from-scenario">Scenario <select id="s-scenario"></select></label>
       <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
-      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save file's path"></label>
+      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
       <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
       <label>Your seat <select id="s-seat"></select></label>
       <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
@@ -239,7 +239,7 @@
         <label class="check"><input data-set="server.open_browser" type="checkbox"> open the browser at the start</label>
       </fieldset>
       <fieldset class="wide"><legend>The places</legend>
-        <label class="wide">Saves <input data-set="places.saves" type="text"></label>
+        <label class="wide">Saves <input data-set="places.saves" type="text" placeholder="saves beside the settings; taken when the game's server is started again"></label>
         <label class="wide">Your scenarios <input data-set="places.scenarios" type="text"></label>
         <label class="wide">Consent records <input data-set="places.consent_records" type="text" placeholder="the game's own (docs/agents/consent); read at the server's start"></label>
         <label class="wide">The desktop client's file <input data-set="places.desktop_config" type="text"></label>

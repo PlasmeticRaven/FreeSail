@@ -435,7 +435,7 @@ def test_the_session_a_station_is_told_is_true_and_no_captain_is_told_a_human_ca
     is told it is in a race, whatever its door asked (`tools/regatta.py` sets the desk's
     `race`; its local runner's test says so too)."""
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.agents.agent import (
@@ -460,7 +460,7 @@ def test_the_session_a_station_is_told_is_true_and_no_captain_is_told_a_human_ca
         app = create_app(driver, game="g", consent_records=records, saves_dir=tmp_path / "s")
         driver.desk.race = race
         said = {"model_name": weights, "door": "mcp"} | body
-        a = PageClient(app).post(f"/api/agents/{station}", json=said)
+        a = DoorClient(app).post(f"/api/agents/{station}", json=said)
         assert a.status_code == 200 and a.json()["phase"] == "station", a.text
         h = world.agents.get(station)
         if h is None:  # a station on another ship lives on her own World

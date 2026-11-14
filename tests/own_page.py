@@ -4,8 +4,9 @@ The server answers its own page alone (`freesail.ui.guard`): at its own address,
 own origin, with the mark it wrote into the page. A test that plays as the page plays as
 the page does: `PageClient` is the browser on the machine itself at `http://localhost:8000`
 with the page's mark in every request and in its socket's address, and the page's origin;
-`DoorClient` is an agent's door on the machine (`agents.remote.GameClient`): the same
-address, no origin, no mark, the seating's key in its calls as before.
+`DoorClient` is the machine's page and an agent's door side by side: on the doors' routes
+it comes as `agents.remote.GameClient` comes (the same address, no origin, no mark, the
+seating's key in its calls), elsewhere as the page.
 
 The refusals themselves are tested through real sockets and real requests against a
 running server (`LiveGame` below; truths 7-600 on, `tests/test_known_truths.py`).
@@ -17,11 +18,11 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode, urljoin, urlsplit
 
 from fastapi.testclient import TestClient
 
-from freesail.ui.guard import MARK_HEADER, MARK_QUERY
+from freesail.ui.guard import DOORS_PREFIX, MARK_HEADER, MARK_QUERY
 
 ROOT = Path(__file__).resolve().parents[1]
 OWN = "localhost:8000"
@@ -52,13 +53,25 @@ class PageClient(TestClient):
         return super().websocket_connect(urljoin(f"ws://{OWN}", url), subprotocols, **kwargs)
 
 
-class DoorClient(TestClient):
-    """An agent's door on the machine itself: no page, no origin, no mark."""
+class DoorClient(PageClient):
+    """The machine's own clients side by side, as they are on the owner's machine: an
+    agent's door (`agents.remote.GameClient`) on the doors' routes (`/api/agents/...`), with
+    no mark and no origin, its seating's key in its calls; the game's own page on every
+    other route (the test turns the clock and gives the page's orders as the page does)."""
 
-    def __init__(self, app: Any, **kw: Any):
-        kw.setdefault("base_url", f"http://{OWN}")
-        kw.setdefault("client", ON_THE_MACHINE)
-        super().__init__(app, **kw)
+    def request(self, method: str, url: Any, **kwargs: Any) -> Any:  # type: ignore[override]
+        path = urlsplit(str(url)).path
+        if path == DOORS_PREFIX or path.startswith(DOORS_PREFIX + "/"):
+            # a door's request: nothing of the page's
+            self.headers.pop(MARK_HEADER, None)
+            self.headers.pop("origin", None)
+            try:
+                return super().request(method, url, **kwargs)
+            finally:
+                if self.mark:
+                    self.headers[MARK_HEADER] = self.mark
+                self.headers["origin"] = f"http://{OWN}"
+        return super().request(method, url, **kwargs)
 
 
 class LiveGame:

@@ -370,7 +370,7 @@ class Game:
     def __init__(self, tmp_path: Any, station: str = "watcher"):
         from pathlib import Path
 
-        from own_page import PageClient
+        from own_page import DoorClient
 
         from freesail.api.session import make_world
         from freesail.core.world import Scenario
@@ -391,7 +391,7 @@ class Game:
             consent_records=self.records,
             saves_dir=self.saves,
         )
-        self.http = PageClient(self.app)
+        self.http = DoorClient(self.app)
         self.asked: list[dict[str, Any]] = []
 
     def page(self, width: int = 4, height: int = 3) -> None:

@@ -23,7 +23,12 @@
   // again makes a new one); another site's page cannot read this answer.
   window.freesailFreshMark = function () {
     return plain("/", { cache: "no-store", credentials: "same-origin" })
-      .then(function (r) { return r.text(); })
+      .then(function (r) {
+        // from another device a server started again does not give its new mark to the
+        // old one: the page must be opened again at the address the terminal printed
+        window.freesailMarkLost = r.status === 403;
+        return r.text();
+      })
       .then(function (text) {
         var found = /name="freesail-page" content="([^"]+)"/.exec(text);
         if (found) window.freesailMark = found[1];

@@ -981,14 +981,14 @@ def test_the_budget_reaches_the_harness_from_the_local_runner_and_not_from_mcp(t
     """The local runner says its context when it stations (`context_tokens`); the Desk
     puts it on the harness; the MCP bridge says none, so Claude through Desktop keeps its
     own window and is never asked (its journal gives it the habit by hand)."""
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
     world = frigate_world()
     driver = Driver(world)
     app = create_app(driver, game="g", consent_records=tmp_path / "c", saves_dir=tmp_path / "s")
-    http = PageClient(app)
+    http = DoorClient(app)
     rec = consent.Record(WEIGHTS, "r", "2026-09-26", consent.YES, answer="Yes.", drill="passed")
     rec.write(tmp_path / "c")
     a = http.post(
@@ -1003,7 +1003,7 @@ def test_the_budget_reaches_the_harness_from_the_local_runner_and_not_from_mcp(t
         Driver(world2), game="g", consent_records=tmp_path / "c", saves_dir=tmp_path / "s"
     )
     a = (
-        PageClient(app2)
+        DoorClient(app2)
         .post("/api/agents/officer", json={"model_name": WEIGHTS, "door": "mcp"})
         .json()
     )
@@ -1144,7 +1144,7 @@ def test_a_station_loaded_from_its_checkpoint_is_taken_over_by_the_same_model(tm
     over, the brief sent again), as a replayed save does. Until 37b the checkpoint's
     station had a bare transcript and the desk took it for the game's own scripted agent,
     refusing every door."""
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -1161,7 +1161,7 @@ def test_a_station_loaded_from_its_checkpoint_is_taken_over_by_the_same_model(tm
     consent.Record(WEIGHTS, "r", "2026-09-26", consent.YES, answer="Yes.", drill="passed").write(
         tmp_path / "c"
     )
-    http = PageClient(
+    http = DoorClient(
         create_app(
             Driver(loaded), game="g", consent_records=tmp_path / "c", saves_dir=tmp_path / "s"
         )
@@ -1222,14 +1222,14 @@ def test_the_agent_api_seats_a_released_station_again_and_holds_an_opt_out_to_it
     it: another model, with its own consent, takes it. An opt-out with `final` bars that
     model from the game, at any station, the token in the same reply or not, while the
     first station is taken by another."""
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
     world = frigate_world()
     records = tmp_path / "c"
     app = create_app(Driver(world), game="g", consent_records=records, saves_dir=tmp_path / "s")
-    http = PageClient(app)
+    http = DoorClient(app)
     yes_with_the_drill(records)
     yes_with_the_drill(records, OTHER)
     first = Door(http)
@@ -1587,7 +1587,7 @@ def test_a_yes_given_before_the_briefs_revision_is_asked_again_and_the_question_
     with the question when the brief has changed (the new record holds its own), where
     after an opt-out a drill passed on record is carried. No record file is edited: the
     test makes its own in a temporary folder."""
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -1636,7 +1636,7 @@ def test_a_yes_given_before_the_briefs_revision_is_asked_again_and_the_question_
     # at the door: the question, not the station; the brief as it stands, and why
     world = frigate_world()
     app = create_app(Driver(world), game="g", consent_records=records, saves_dir=tmp_path / "s")
-    door = Door(PageClient(app))
+    door = Door(DoorClient(app))
     a = door.ask().json()
     assert a["phase"] == "consent" and OFFICER not in world.agents
     assert (
@@ -1671,7 +1671,7 @@ def test_a_yes_given_before_the_briefs_revision_is_asked_again_and_the_question_
     consent.Record(OTHER, runtime, "2026-10-02", consent.YES, answer="Yes.", brief=before).write(
         records
     )
-    watcher_door = Door(PageClient(app), OTHER, station="watcher")
+    watcher_door = Door(DoorClient(app), OTHER, station="watcher")
     a = watcher_door.ask().json()
     assert (
         a["phase"] == "consent" and "**Being stopped**" in a["turns"][-1]["content"]["notices"][0]

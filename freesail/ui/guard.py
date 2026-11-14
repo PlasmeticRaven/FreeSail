@@ -29,9 +29,10 @@ touched:
 The harbour's routes that write the settings, the desktop client's file or a shortcut, or
 start, speak to or stop a door, are answered only to a client on the machine itself.
 
-The agents' doors (`/api/agents/...`) have no page and carry no mark: they are seated by
-the game's own rule and every later call carries the seating's key (package 37g). The Host
-and the Origin rules hold for them too, so that no web page can seat a station.
+The agents' doors (`/api/agents/...`) have no page: on the machine itself they carry no
+mark, are seated by the game's own rule and every later call carries the seating's key
+(package 37g); from another device they want the mark as every request there does. The
+Host and the Origin rules hold for them too, so that no web page can seat a station.
 
 A refusal is in the game's words and is made before the game is touched: no listener added,
 no line written, nothing read.
@@ -90,13 +91,22 @@ REFUSED_MARK = (
     "mark; this carried none, and nothing was done. Open the game's page again from its "
     "own address."
 )
+REFUSED_WRONG_MARK = (
+    "The ship takes her orders from the game's own page alone, which carries the game's "
+    "mark; this carried another, and nothing was done. The game may have been started "
+    "again since the page was opened: open the game's page again from its own address."
+)
+REFUSED_DOOR_ELSEWHERE = (
+    "A door from another device comes in with the game's mark, which the address its "
+    "terminal printed carries; this carried none, and no station was touched."
+)
 REFUSED_HERE_ONLY = (
     "The harbour's settings, the desktop client's file, the shortcut and the doors are "
     "kept at the machine the game runs on; they are changed there, not from another device."
 )
 REFUSED_ELSEWHERE = (
     "From another device the game is opened at the address its terminal printed, which "
-    "carries the game's mark; this carried none."
+    "carries the game's mark; this carried none, or one of an earlier start of the game."
 )
 
 
@@ -183,12 +193,19 @@ class Guard:
         if origin is not None and not self.origin_ok(origin, host):
             return REFUSED_ORIGIN
         path = scope.get("path", "")
-        if path == DOORS_PREFIX or path.startswith(DOORS_PREFIX + "/"):
-            return None  # the doors: seated by the game's rule, then by their key
         socket_ = scope["type"] == "websocket"
         method = scope.get("method", "GET").upper()
         client = (scope.get("client") or ("", 0))[0] or ""
         here = _loopback(client)
+        query = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+        given = headers.get(MARK_HEADER) or (query.get(MARK_QUERY) or [None])[0]
+        if path == DOORS_PREFIX or path.startswith(DOORS_PREFIX + "/"):
+            # the doors: on the machine, seated by the game's rule and then by their key;
+            # from another device, the mark as every other request there (the lead's ruling
+            # of 2026-11-14), in the request itself
+            if here or self.mark_ok(given):
+                return None
+            return REFUSED_DOOR_ELSEWHERE
         if path.startswith(CLIENT_PREFIX) and not socket_:
             return None  # the game's own scripts and styles
         writes = not socket_ and method not in SAFE_METHODS
@@ -197,8 +214,6 @@ class Guard:
         asked = socket_ or method not in SAFE_METHODS or path in MARKED_READINGS or not here
         if not asked:
             return None
-        query = parse_qs(scope.get("query_string", b"").decode("latin-1"))
-        given = headers.get(MARK_HEADER) or (query.get(MARK_QUERY) or [None])[0]
         if not given and not socket_ and method in SAFE_METHODS and path not in MARKED_READINGS:
             # a page's own loads after the first (a link followed, the library's window), from
             # another device: plain readings alone; a reading that changes something (the
@@ -213,7 +228,9 @@ class Guard:
             given = kept.value if kept is not None else None
         if self.mark_ok(given):
             return None
-        return REFUSED_MARK if here else REFUSED_ELSEWHERE
+        if not here:
+            return REFUSED_ELSEWHERE
+        return REFUSED_WRONG_MARK if given else REFUSED_MARK
 
     # -- the page ------------------------------------------------------------------
 

@@ -779,7 +779,7 @@ def test_the_console_reveals_the_log_gives_the_brief_and_seats_the_player_as_dir
 
 def test_the_browser_answers_the_same_requests_and_its_log_carries_nothing_of_the_director():
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -794,7 +794,7 @@ def test_the_browser_answers_the_same_requests_and_its_log_carries_nothing_of_th
     assert e.kind == "query.two_stories" and "D " in e.text
     e = driver.submit("director: brief")
     assert e.kind == "query.director_brief" and "A quiet passage" in e.text
-    with PageClient(create_app(driver)) as http:
+    with DoorClient(create_app(driver)) as http:
         got = http.get("/api/director/log").json()
         assert got["lines"][0].startswith("The director's log") and got["entries"]
         shown = http.get("/api/log?limit=2000").json()
@@ -830,7 +830,7 @@ def test_ease_on_station_never_eases_for_the_director_and_no_refusal_names_it():
 
 def test_a_door_seats_a_model_as_the_director_with_the_directors_brief_and_tools(tmp_path):
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -842,7 +842,7 @@ def test_a_door_seats_a_model_as_the_director_with_the_directors_brief_and_tools
     w = directed()
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "s")
-    with PageClient(app) as http:
+    with DoorClient(app) as http:
         bare = world_at(49.5, -5.5)
         assert "director" not in bare.stations.names()
         a = http.post("/api/agents/director", json={"model_name": WEIGHTS, "door": "runner"}).json()

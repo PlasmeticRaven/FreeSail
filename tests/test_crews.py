@@ -232,7 +232,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
     station, said in her log, with no reseat. A ship without a captain of her own, or not
     on the sea, is refused in words."""
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.ui.server import Driver, create_app
@@ -252,7 +252,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with PageClient(app) as http:
+    with DoorClient(app) as http:
         r = http.post(
             "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "Lark"}
         )
@@ -372,7 +372,7 @@ def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tm
     held no captain's station, and the bridge asked for the station again in place of the
     shelve's result. The read again names the ship as every other call does."""
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.agents.model import Reply, ToolCall
@@ -393,7 +393,7 @@ def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tm
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with PageClient(app) as http:
+    with DoorClient(app) as http:
         game = GameClient("http://localhost:8000", "captain", http=http, ship="X")
         a = game.station(weights, "mcp")
         assert a["phase"] == "station" and game.key
@@ -415,7 +415,7 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
     the free words in the same words as before. A captain seated on her is told the free
     intent is his goal, and that the rules-based captain will not follow it."""
     pytest.importorskip("fastapi")
-    from own_page import PageClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.ui.server import Driver, create_app
@@ -455,7 +455,7 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with PageClient(app) as http:
+    with DoorClient(app) as http:
         a = http.post(
             "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "X"}
         ).json()

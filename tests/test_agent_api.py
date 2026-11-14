@@ -22,7 +22,7 @@ pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
 from fastapi import FastAPI  # noqa: E402
-from own_page import PageClient  # noqa: E402
+from own_page import DoorClient  # noqa: E402
 
 from freesail.agents import OPT_OUT_TOKEN, consent  # noqa: E402
 from freesail.agents.agent import A_GLASS_S  # noqa: E402
@@ -59,7 +59,7 @@ class Game:
             saves_dir=tmp_path / "saves",
             say=self.said.append,
         )
-        self.http = PageClient(self.app)
+        self.http = DoorClient(self.app)
         self.desk = self.driver.desk
         self.cursor = 0
         self.key = ""  # the seating's key, kept from the stationing as a door keeps it
@@ -676,7 +676,7 @@ def test_the_console_hosts_the_same_routes_and_prints_the_station_in_state(tmp_p
     con.desk = router.desk
     app = FastAPI()
     app.include_router(router)
-    http = PageClient(app)
+    http = DoorClient(app)
     yes_on_record(tmp_path / "consent")
     r = http.post("/api/agents/watcher", json={"model_name": WEIGHTS, "door": "runner"})
     assert r.status_code == 200 and r.json()["phase"] == "station"

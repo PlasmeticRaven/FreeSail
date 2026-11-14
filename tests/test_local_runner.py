@@ -340,7 +340,7 @@ class Game:
     clock the test turns while the runner runs in a thread."""
 
     def __init__(self, tmp_path):
-        from own_page import PageClient
+        from own_page import DoorClient
 
         from freesail.api.session import make_world
         from freesail.ui.server import Driver, create_app
@@ -358,7 +358,7 @@ class Game:
             consent_records=self.records,
             saves_dir=self.saves,
         )
-        self.http = PageClient(app)
+        self.http = DoorClient(app)
 
     @property
     def harness(self):

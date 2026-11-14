@@ -46,7 +46,10 @@ def named_file(folder: Path, name: str, suffix: str = "") -> Path | None:
     if not is_name(name):
         return None
     leaf = name if not suffix or name.lower().endswith(suffix) else name + suffix
-    p = (folder / leaf).resolve()
-    if not inside(p, folder) or not p.is_file():
+    try:
+        p = (folder / leaf).resolve()
+        if not inside(p, folder) or not p.is_file():
+            return None
+    except (OSError, ValueError, RuntimeError):  # too long for the system: no such file
         return None
     return p

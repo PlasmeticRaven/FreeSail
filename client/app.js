@@ -231,7 +231,13 @@
       // a server started again has a new mark (package 115): the page's own address gives
       // it, read before the socket is asked again; the old one would be refused for ever
       setTimeout(function () {
-        window.freesailFreshMark().then(connect, connect);
+        window.freesailFreshMark().then(function () {
+          if (window.freesailMarkLost) {
+            $("status").textContent =
+              "the game was started again: open the address its terminal printed";
+          }
+          connect();
+        }, connect);
       }, 2000);
     };
     ws.onmessage = function (msg) {
