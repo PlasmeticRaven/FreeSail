@@ -29627,3 +29627,14 @@ the builder of it:
   rigging; the first action at seeds 1 to 8 loses it at seed 6 only.
 - The wheel itself made good (new tiller ropes rove, a spare wheel shipped): another repair
   evolution, on the list.
+
+**The pins moved by the mends of the lead's reading at 60af48e, re-pinned in one commit, old
+beside new.** The fast tier whole at f84ec05 moved one pin besides the trunk's own key-shape
+test: `tests/test_bellerophon.py`, the deck fired to leeward (item 3, `fire` true of the guns;
+the beat leaves her guns secured). OLD "The starboard lower-deck guns to fire each as soon as
+it is ready, six guns; eight are behind ports the sea has shut." NEW "The starboard lower-deck
+guns to fire each as soon as it is cast loose and ready, six guns; eight are behind ports the
+sea has shut. The guns are secured: none is loaded, run out or fired until they are cast
+loose; say 'cast loose the guns'." The gate digests (the naval cruise, the schooner's and the
+merchant passages, the fake captain's) did not move: in neither passage does a minute bring
+two reports of the same words, and the schooner's book is fitted the same way there.

@@ -1956,9 +1956,13 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
     assert len(shut) == 8
     said = w.submit("fire the starboard lower deck")
     assert said.kind == "guns.fire", said.text
+    # package 115 D, the lead's reading at 60af48e, item 3 (`fire` true of the guns): the
+    # beat leaves her guns secured, and the answer says so. OLD "... each as soon as it is
+    # ready, six guns; eight are behind ports the sea has shut."
     assert said.text == (
-        "The starboard lower-deck guns to fire each as soon as it is ready, six guns; eight are "
-        "behind ports the sea has shut."
+        "The starboard lower-deck guns to fire each as soon as it is cast loose and ready, six "
+        "guns; eight are behind ports the sea has shut. The guns are secured: none is loaded, "
+        "run out or fired until they are cast loose; say 'cast loose the guns'."
     )
     assert len(b.single) == 6 and not set(b.single) & shut
     b.single.clear()
