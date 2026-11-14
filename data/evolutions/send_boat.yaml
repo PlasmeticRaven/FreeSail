@@ -31,6 +31,6 @@ timing:
   boat_pace_kn: 4.0    # ports.BOAT_PACE_KN: judgement
 on_start: {log: "Away {boat}'s crew! Hoist out {boat}."}
 on_complete: {log: "{boat_cap} hoisted in.", kind: boat.in, severity: routine}
-on_fail: {log: "The boat could not go: {reason}.", kind: evolution.failed, severity: notable}
+on_fail: {log: "{boat_cap}'s errand is not done: {reason}.", kind: evolution.failed, severity: notable}
 crew: {hands: 11, rating: ordinary, stations: [forecastle, afterguard, waisters]}
 source: "Luce 1866, 'Boats' (lowering and hoisting, the launch and the water); Falconer 1780, BOAT, LONG-BOAT, YAWL; the Regulations of 1806, the Captain, art. XVI (purchases ashore)"

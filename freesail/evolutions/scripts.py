@@ -8893,6 +8893,13 @@ class SendBoatScript(Script):
             if item.get("kind") in ("purchase", "sale")
         )
         self.ashore_s = float(BOAT_ASHORE_S.get(errand, 1800)) + tons * LIGHTER_S_PER_TON
+        # what she carries on the errand, kept by the errand itself: the boat's state is made
+        # afresh when she is lost (`world.boats.lose_boat`), and the goods with it
+        self.carried = [
+            dict(item)
+            for item in self.ports.boat.carrying
+            if item.get("kind") in ("purchase", "sale")
+        ]
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -8906,6 +8913,12 @@ class SendBoatScript(Script):
             self.ship.note(severity.value, kind, text, self.ship.name, data)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.ports is not None and getattr(self.ports.boat, "lost", None):
+            # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
+            # and what was bought or sold in her is said lost with her, paid once and never
+            # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
+            self.fail(self.ports.lost_on_errand(list(getattr(self, "carried", []) or [])))
+            return
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":

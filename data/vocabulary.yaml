@@ -1600,6 +1600,12 @@ verbs:
                preventer backstays, rig preventer stays]
     object: damage
     level: 1
+  rig the relieving tackles:
+    synonyms: [rig relieving tackles, reeve the relieving tackles, reeve relieving tackles,
+               hook on the relieving tackles, man the relieving tackles, steer with the relieving tackles,
+               steer by the relieving tackles, rig the tiller tackles, hook the tackles to the tiller]
+    object: damage
+    level: 1
   sling the yards:
     synonyms: [sling the yards with chains, chain sling the yards, put chain slings on the yards,
                sling the lower yards, sling the yards in chains]

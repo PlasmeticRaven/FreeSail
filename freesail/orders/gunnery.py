@@ -234,6 +234,72 @@ _WORD_NUMBERS = {
 
 
 def execute(ship: Any, order: Order) -> Result:
+    """An order of the gun deck, its answer made true of the guns (`_true_of_the_guns`)."""
+    return _true_of_the_guns(ship, order.verb, _execute(ship, order))
+
+
+# the orders that set the battery's standing intentions, whose answers say the guns' state
+_INTENTIONS = frozenset(
+    {
+        "engage",
+        "load",
+        "run out the guns",
+        "run in the guns",
+        "aim at",
+        "fire as they bear",
+        "fire by divisions",
+        "hold your fire",
+        "fire on the roll",
+        "cease firing",
+    }
+)
+
+
+def _guns_state(ship: Any) -> str:
+    """'loose' when a gun that serves is cast loose, 'casting' while the crews cast them
+    loose, else 'secured' (no gun that serves is loose)."""
+    guns = [g for g in getattr(ship, "guns", {}).values() if g.serves]
+    if not guns or any(g.cast_loose for g in guns):
+        return "loose"
+    runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+    for inst in getattr(runner, "instances", None) or []:
+        if getattr(getattr(inst, "evo", None), "id", "") == "cast_loose_guns":
+            return "casting"
+    return "secured"
+
+
+def _true_of_the_guns(ship: Any, verb: str, result: Result) -> Result:
+    """The answer to an order of the standing intentions made true of the guns (the cold
+    review of 2026-11-14, 1.5 and 5.3 item 1; package 115 D1). An intention is the battery's
+    and stands for the guns when they are served: with every gun secured, "The guns are
+    firing as they bear already" was said of guns lashed in their ports, and the action was
+    fought with them silent and nothing said why. With a gun cast loose the answer is as it
+    was; with none, it says the order stands, what is so, and what to order next. Casting
+    loose stays its own word (Falconer 1780, EXERCISE: "1st. Silence. 2d. Cast loose your
+    guns."): the beat sends the men to quarters, the guns are cast loose at the word."""
+    if verb not in _INTENTIONS:
+        return result
+    state = _guns_state(ship)
+    if state == "loose":
+        return result
+    kind, text, data = result
+    if verb == "cease firing":
+        text = "Cease firing: no gun fires but at the word."
+    else:
+        m = re.match(r"The guns are (.+) already\.$", text)
+        if m:
+            text = f"So ordered already: {m.group(1)}."
+    if state == "casting":
+        text += " The guns are being cast loose; they are served when it is done."
+    else:
+        text += (
+            " The guns are secured: none is loaded, run out or fired until they are cast "
+            "loose; say 'cast loose the guns'."
+        )
+    return kind, text, data | {"guns": state}
+
+
+def _execute(ship: Any, order: Order) -> Result:
     battery = battery_of(ship)
     if battery is None:
         raise OrderError("She carries no guns.")

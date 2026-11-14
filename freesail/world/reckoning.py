@@ -3869,7 +3869,7 @@ class Navigation:
             "moved_nm": 0.0 if obs is None else round(obs.moved_nm, 2),
             "tide": self.tide_allowed(),
         }
-        self.master.occupy("below", tick + DAYS_WORK_MINUTES * 60, "day's work")
+        self._below_to_work(tick + DAYS_WORK_MINUTES * 60, "day's work")
         # the officers' own reckonings, each a line after the noon's (package 40b): only
         # when one is held, so that a passage with no officer's reckoning keeps its log
         owns = self._own_noon_lines(account, account_doubt, observed)
@@ -4131,6 +4131,45 @@ class Navigation:
         if when.date() == clock.ship_time.date():
             return f"{when:%H:%M}"
         return f"{when:%H:%M} on the {_ordinal(when.day)}"
+
+    def _below_to_work(self, until: int, what: str) -> bool:
+        """The master below for a piece of the day's working (the day's work, a time
+        sight's, a lunar's clearing): True when he goes. Where he is the player's own
+        person with the deck his (a vessel whose master commands, the player at her
+        prompt, no rules captain commanding her for him), no routine moves him: he works it
+        where he stands and the log says so (the lead's ruling of 2026-11-14 on package 115
+        D4 (c); the cold review's 5.3 item 6). A master who commands under a rules captain,
+        and every master who does not command, goes below as he always did."""
+        world = self.world
+        if self._players_own(world):
+            self.master.occupy(self.master.place or "on deck", until, what)
+            world.record(
+                Severity.ROUTINE,
+                "master.works_here",
+                f"{self.master.name} works the {what} where he stands.",
+                data={"what": what, "until": until},
+            )
+            return False
+        self.master.occupy("below", until, what)
+        return True
+
+    def _players_own(self, world: Any) -> bool:
+        """Whether the master is the player's own person, the deck his."""
+        from freesail.world.knowledge import players_person
+
+        try:
+            person = players_person(world)
+        except Exception:  # noqa: BLE001  (a world with no people has no player's person)
+            return False
+        if person is None or getattr(person, "mirror", None) is not self.master:
+            return False
+        captain = getattr(world, "captain", None)
+        handed = (
+            captain is not None
+            and bool(getattr(captain, "commands", False))
+            and not getattr(captain, "aside", False)
+        )
+        return not handed
 
     def slate(self) -> tuple[str, dict[str, Any]]:
         """`work my reckoning` (package 40b; spec M6 §5): the master's slate since the
@@ -5110,7 +5149,7 @@ class Navigation:
         r.slate_sight(world.clock.tick, "a longitude by chronometer", before, obs.how)
         self.last_time_sight = sight
         tick = world.clock.tick
-        self.master.occupy("below", tick + sights.TIME_SIGHT_WORK_MINUTES * 60, "time sight")
+        self._below_to_work(tick + sights.TIME_SIGHT_WORK_MINUTES * 60, "time sight")
         c = self.chronometer
         where = f" from {c.where}" if c.where else " from its rating"
         trust = _round_miles(2.0 * sight.sigma_nm)
@@ -5182,11 +5221,13 @@ class Navigation:
         result = sights.lunar_result(world, self.master, self.stream, body, chron_lon)
         due = world.clock.tick + sights.LUNAR_CLEARING_MINUTES * 60
         self._lunar_pending = (due, result)
-        self.master.occupy("below", due, "lunar")
+        went = self._below_to_work(due, "lunar")
         world.record(
             Severity.ROUTINE,
             LUNAR_TAKEN_KIND,
-            f"The distances taken; {self.master.name} below to clear them.",
+            f"The distances taken; {self.master.name} below to clear them."
+            if went
+            else f"The distances taken; {self.master.name} clears them where he stands.",
             data={"body": body, "due_tick": due},
         )
 

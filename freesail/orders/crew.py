@@ -238,6 +238,12 @@ def beat_to_quarters(ship: Ship, order: Order) -> Result:
     tick = int(world.clock.tick) if world is not None else 0
     lines = quarters.beat(tick)
     data: dict[str, Any] = {"verb": order.verb, "level": 1, "quarters": quarters.describe()}
+    guns = [g for g in getattr(ship, "guns", {}).values() if g.serves]
+    if guns and not any(g.cast_loose for g in guns):
+        # the men at quarters, the guns still secured: casting loose is its own word (Falconer
+        # 1780, EXERCISE: "1st. Silence. 2d. Cast loose your guns."), and the reply says so
+        # (the cold review of 2026-11-14, 1.5; package 115 D1)
+        lines.append("The guns are secured: 'cast loose the guns' to serve them.")
     return "crew.quarters", "Beat to quarters! " + " ".join(lines), data
 
 

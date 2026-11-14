@@ -214,7 +214,8 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
         ship.note(
             "urgent",
             "helm.shot_away",
-            "The wheel is shot away; the helm is lost until the relieving tackles are rove.",
+            "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
+            "'rig the relieving tackles'.",
             None,
             {"tick": tick},
         )

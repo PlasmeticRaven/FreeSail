@@ -1,0 +1,26 @@
+# The relieving tackles rove to the tiller when the wheel or the tiller ropes are shot away
+# (scripted, RelievingTacklesScript in evolutions/repair_scripts.py; package 115 D4 (e), the
+# cold review of 2026-11-14, 5.3 item 8: `combat.hits` writes "the helm is lost until the
+# relieving tackles are rove" and nothing could rove them). Two luff tackles hooked to the
+# tiller's end below and manned there, the helm's orders passed down. Falconer 1780 has the
+# helm as rudder, tiller and wheel with the tiller-rope wound about it (HELM), but his
+# RELIEVING-TACKLES are the careening tackles, not the tiller's: the steering use is the
+# nineteenth century seamanship books' (UNVERIFIED here, from memory; the game's own line in
+# combat/hits.py names them). One phase, `reeve`; at its end `helm_lost` is cleared and
+# the helm answers. Her steering meanwhile is the physics' as before (physics/hull.py holds
+# the rudder where it was).
+id: relieving_tackles
+verb: relieving_tackles
+applies_to: {class: ship}
+script: relieving_tackles
+params: {}
+preconditions: []
+timing:
+  reeve_s: 300   # the tackles got up from the boatswain's store, hooked and manned below: five minutes (JUDGEMENT: the tackles kept ready at quarters, a short job for the afterguard)
+on_start: {log: "Rig the relieving tackles! Hands below to the tiller."}
+on_complete: {log: "{done}", kind: helm.relieved, severity: notable}
+on_fail: {log: "Could not rig the relieving tackles: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard to hook on and man the tackles: six hands (JUDGEMENT: two tackles,
+# three a fall)
+crew: {hands: 6, rating: ordinary, stations: [afterguard, waisters]}
+source: "Falconer 1780, HELM and TILLER (the rudder, the tiller, the tiller-rope and the wheel); the tackles to the tiller UNVERIFIED (from memory of the nineteenth century books); the minutes and the hands JUDGEMENT"

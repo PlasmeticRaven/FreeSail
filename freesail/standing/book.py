@@ -18,6 +18,7 @@ drivers submit each line as an order, so each is journaled and replays.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -317,3 +318,80 @@ def read_orders_file(path: str | Path) -> list[str]:
         else:
             out.append(line.strip())
     return out
+
+
+# The sail families a ship file names as one-word groups (data/ships/*.yaml `groups:`, by
+# tools/gen_ships.py): a clause of a book read from a file that names one the ship carries
+# none of is no order for her (package 115 D3; tests/test_known_truths.py truth 7-625 keeps
+# this list to the ship files' own).
+SAIL_FAMILIES = frozenset(
+    {
+        "courses",
+        "topsails",
+        "topgallants",
+        "royals",
+        "studdingsails",
+        "staysails",
+        "headsails",
+        "jibs",
+        "lugs",
+        "spritsails",
+        "save-alls",
+    }
+)
+
+_RULE_HEAD = re.compile(
+    r"^(?P<head>standing order\s+\"(?P<name>[^\"]+)\".*?\bthen\s+)(?P<acts>.+)$", re.S
+)
+_ACT_FAMILY = re.compile(r"^\s*[a-z ]+?\s+the\s+(?P<family>[a-z-]+)\s*(?:,|$)")
+
+
+def fit_to_rig(ship: Any, lines: list[str]) -> tuple[list[str], str]:
+    """A book read from a file fitted to the ship's rig (the cold review of 2026-11-14, 5.3
+    item 3; package 115 D3): a clause that names a family of sails she carries none of (the
+    starter book's royals and studdingsails in a cutter) is left out, and a rule left with no
+    clause is left out whole; every other rule is given as written. One book for any rig: a
+    family she has is never touched, and a word that is no family (a misspelling, a part of
+    her own) is given as written, to be refused or entered by the order's own reading.
+    Returns the lines to give and the ship's line of what was left out ('' when nothing)."""
+    groups = set(getattr(ship, "groups", None) or {})
+    out: list[str] = []
+    said: list[str] = []
+    lacks: list[str] = []
+    for line in lines:
+        m = _RULE_HEAD.match(line)
+        if m is None:
+            out.append(line)
+            continue
+        acts = [a.strip() for a in m.group("acts").split(";")]
+        kept, gone = [], []
+        for act in acts:
+            f = _ACT_FAMILY.match(act)
+            family = f.group("family") if f is not None else ""
+            if family in SAIL_FAMILIES and family not in groups:
+                gone.append(family)
+            else:
+                kept.append(act)
+        if not gone:
+            out.append(line)
+            continue
+        families = list(dict.fromkeys(gone))
+        lacks += [f for f in families if f not in lacks]
+        if kept:
+            out.append(m.group("head") + "; ".join(kept))
+            said.append(f"'{m.group('name')}' without its {_join(families)}")
+        else:
+            said.append(f"'{m.group('name')}' left out")
+    if not said:
+        return out, ""
+    return out, (
+        f"The book fitted to her rig, for she carries no {_join(lacks, 'nor')}: "
+        + "; ".join(said)
+        + "."
+    )
+
+
+def _join(words: list[str], last: str = "and") -> str:
+    if len(words) == 1:
+        return words[0]
+    return ", ".join(words[:-1]) + f" {last} " + words[-1]

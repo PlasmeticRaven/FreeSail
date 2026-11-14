@@ -3022,6 +3022,29 @@ class Dealings:
             {"boat": self.boat.boat_id, "people": list(people)},
         )
 
+    def lost_on_errand(self, carried: list[dict[str, Any]]) -> str:
+        """The words for a boat lost on her errand with goods in her (`SendBoatScript`):
+        the goods bought lost with her, their price paid at the bargain and not paid again;
+        the goods sold lost before they were landed, the price taken standing (JUDGEMENT:
+        struck at the market, the bargain stands, as a merchant's did when the lighter was
+        lost; package 115 D2)."""
+        bought = [i for i in carried if i.get("kind") == "purchase"]
+        sold = [i for i in carried if i.get("kind") == "sale"]
+        parts = ["she is lost"]
+        if bought:
+            goods = _and([f"{float(i['tons']):g} tons of {i['good']}" for i in bought])
+            paid = sum(float(i.get("pounds", 0.0)) for i in bought)
+            parts.append(
+                f"the {goods} bought are lost with her, {pounds_words(paid)} paid for them and "
+                "not to be had again"
+            )
+        if sold:
+            goods = _and([f"{float(i['tons']):g} tons of {i['good']}" for i in sold])
+            parts.append(
+                f"the {goods} sold went down in her before they were landed; the money taken stands"
+            )
+        return "; ".join(parts)
+
     def boat_phase(self, phase: str) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """The boat's script says where it is (`SendBoatScript`): the lines, and what the
         boat does ashore and brings back."""

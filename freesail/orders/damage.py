@@ -59,6 +59,7 @@ DAMAGE_VERBS: tuple[str, ...] = (
     "reeve new lines",
     "fish",
     "rig a jury mast",
+    "rig the relieving tackles",
     "cut away the mast",
     "bury the dead",
 )
@@ -197,6 +198,9 @@ def execute(ship: Any, order: Order) -> Result:
         return "evolution.started", " ".join(texts), data | {"spars": spars}
     if verb == "rig a jury mast":
         return _start(ship, "jury_mast", "ship", {"mast_words": words}, verb)
+    if verb == "rig the relieving tackles":
+        # the wheel or its ropes shot away (package 115 D4 (e)): the tackles to the tiller
+        return _start(ship, "relieving_tackles", "ship", {}, verb)
     if verb == "cut away the mast":
         from freesail.orders.resolve import resolve as resolve_noun_
 

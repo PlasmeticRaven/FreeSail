@@ -2498,14 +2498,36 @@ class Captain(Judgement):
         self._leave(state)
         self.state = None
         words = f" and his book '{state}' struck"
+        # the deck the player's from now, and what of it he must see to himself (the cold
+        # review of 2026-11-14, 1.5; package 115 D1: the guns left lashed through an action
+        # because the captain who would have cast them loose had stood aside unseen)
+        deck = "the deck is yours"
+        ship = getattr(self.world, "ship", None)
+        guns = [g for g in (getattr(ship, "guns", None) or {}).values() if g.serves]
+        if guns and not any(g.cast_loose for g in guns) and self._enemy_in_sight():
+            deck += ", and her guns are secured"
         self.world.record(
             Severity.NOTABLE,
             "captain.aside",
-            f"{self.name} stands aside at your order ({text!r}){words}; "
+            f"{self.name} stands aside at your order ({text!r}){words}; {deck}; "
             "'captain: carry on' gives her back to him.",
             actor=actor_for(state),
             data={"order": text, "state": state, "intent": self.intent_words},
         )
+
+    def _enemy_in_sight(self) -> bool:
+        """A sail in sight of a nation at war with hers, by the lookout (for the aside's
+        words: the guns' state is said where there is a fight to be had)."""
+        world = self.world
+        lookout = getattr(world, "lookout", None)
+        ship = getattr(world, "ship", None)
+        nations = getattr(world, "nations", None)
+        ports = getattr(world, "dealings", None)
+        own = getattr(ports, "ship_nation", None)
+        if lookout is None or ship is None or nations is None or not own:
+            return False
+        items = (lookout.strangers(world, float(ship.heading)) or {}).get("items") or []
+        return any(i.get("nation") and nations.at_war(str(i["nation"]), str(own)) for i in items)
 
     def carry_on(self) -> str:
         """`captain: carry on`: the captain commands again from where she is, his plan
@@ -4447,6 +4469,10 @@ class Captain(Judgement):
         order = [x.strip() for x in str(said).split(",") if x.strip()]
         in_action = self.state == "engaging"
         wanted: list[tuple[str, str]] = []
+        if ship.extra.get("helm_lost") and "relieving_tackles" not in in_hand:
+            # the helm first, before the leak and the rigging: a ship that cannot steer
+            # cannot fight or claw off (package 115 D4 (e))
+            wanted.append(("rig the relieving tackles", "the wheel shot away"))
         for what in order:
             if what == "the leak" and holes and "plug_shot_hole" not in in_hand:
                 wanted.append(("plug the shot holes", "the shot holes under water"))
