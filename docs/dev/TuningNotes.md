@@ -29269,3 +29269,30 @@ The cold review of milestone 7 (`docs/reviews/ColdReview-M7.md`, 5.4, 5.7, 6.1) 
 6. `tools/browser_probe.py` (a plan's `world: module:function`) and `tools/gen_ships.py` (`ships.<name>`) import by name from the repository's own files, never from a player's.
 
 No other `eval`, `exec`, `marshal` or `shelve` in either tree. Truths 7-605 (the review's checkpoint and five more roads, each beside a real save and taken up by `--load`: nothing run, the load's words, the replay's log the same), 7-606 (the census), 7-607 (every kept save taken up from its checkpoint as before), 7-608 (the acts).
+
+### Part A, after the independent reading (the lead's list of 2026-11-14, 13:05)
+
+**1. The director's brief read any `.yaml` on the disk** (with the mark: `director: brief /some/file.yaml`, `director: brief ../../some/file`). *Cause:* a lookup said to take a name that was never a lookup of names. `agents.director._starter` joined the player's words to the starters' folder (`BRIEFS_DIR / f"{key}.yaml"`), so `..` climbed out and an absolute key replaced the folder; `Places.brief` trusted it ("a starter's name, its file the game's own") and the director's reader asked it again for words with no suffix. *Mended at the cause, one rule in one place:* `freesail/core/names.py`: a name is a name (not empty, no separator of either system, no drive, not absolute, not `.` or `..`, no character Windows forbids in a name), and what it finds is checked by its resolved path to lie in the folder it was looked up in (`named_file`). `_starter` and `Places.book` go by it; `Places.brief` takes a `.yaml` only as a path in the reading folders, and refuses one word that is no name (a path without its suffix) as a path is refused. Truth 7-610; toggle: with `_starter` as it was, 7-610 failed ("The director's brief is given (.../outside/secret.yaml): SENTINEL...").
+
+**The roads by which a browser's words become a file by NAME, before and after** (each tried by 7-610 with `..`, an absolute path and a separator of either system, at files planted outside):
+
+| Road | Before | After |
+|---|---|---|
+| `director: brief NAME` at the order line; the harbour start's brief; the maker's `director.brief` | `_starter`: words joined to the folder (the hole) | `named_file` |
+| A book by its name (order line, harbour start, maker) | `Places.book`: `looks_like_path`, then `folder / name` unchecked (a name with `..` inside it was caught only as exactly `..`) | `named_file` |
+| A save by its name (`save NAME`; the harbour's load) | resolved and checked inside the saves place | the same, `is_name` for the suffix rule |
+| The harbour's scenario reader (`?path=`) | resolved and checked inside the game's and the player's scenarios | unchanged (checked by path) |
+| The harbour's chart (`?region=`) | a key of the chart manifest's tables; no file named by the words | unchanged |
+| The library (`topic`, `section`, `find`) | keys of the library's tables; a primer chapter by its number from the chapters listed | unchanged |
+| `/api/picture/{pid}`, `/api/agents/{station}/picture/{pid}` | a key of the easel's table in memory | unchanged |
+| `/api/marks/{id}` | a key of the chart's marks in memory | unchanged |
+| `/api/agents/{station}`, `/api/harbour/doors/{id}` | keys of tables in memory | unchanged |
+| Doctrines (`data/captains/<role>.yaml`), signal books, squadron books | joined names, but every name comes from the game's own data (a vessel's role is checked against `ROLES` where a world order makes one, `world/ships.py`); no browser's words reach them | unchanged; noted |
+
+**2. The maker checked a file from one folder and opened it from another.** *Probed:* `python -m freesail.ui.server` started from a scratch folder holding its own `data/standing_orders/starter.orders`: the maker's proof opened the ship's file and the book from the scratch folder (the ship's file not found there, the proof refused; a planted book would have been read). *Cause:* `_fields_in_places` resolved against the game's folder and handed the player's strings on. *Mended:* it hands the proof the paths it checked (the ship's file, the books, the brief), one base; the fields written stay the player's own words. Truth 7-611; toggle: with the strings handed on, 7-611 failed (`data/ships/smack.yaml: no such ship file.`).
+
+**3. The director's log revealed by another page of the same machine with the cookie alone.** *Ruled and mended:* the reveal (`MARKED_READINGS`) wants the mark in the request itself (the header or the address), never the cookie. *What the cookie is for:* a device other than the machine keeps the mark for its page's later loads (a link followed, the library's window), since those are navigations that carry no header. *Every request that accepts the cookie alone:* a GET or HEAD from a device other than the machine, of any route but `/api/director/log` (the pages, `/api/state`, `/api/log`, `/api/save`, `/api/ship`, `/api/chart`, `/api/complete`, `/api/library...`, `GET /api/marks`, `/api/director/channel`, and the harbour's GETs); on the machine itself those need no mark at all. No write, no socket and no reveal accepts it.
+
+**4. The small doors.** A request with its Host or its Origin twice is refused (the guard read the last, the framework the first). The mark is compared as bytes, so a mark of any characters is refused, never an error. `::ffff:127.0.0.1` is the machine (a server bound to `::`). The README's sentence on the saves place is made exact: `py -m freesail` gives the settings' saves place to the server (`__main__.py`, `ap.set_defaults(saves=...)`, then `create_app(saves_dir=args.saves)`); `python -m freesail.ui.server` without `--saves` uses `saves/` in the game's folder. Truth 7-612.
+
+**Listed, not changed (the lead's word):** `GET /api/save` needs no mark on the machine and answers as an attachment, so a page of another site can make the browser download a save of the game; nothing of it reaches that page (the browser keeps the answer from it), and it was so before.

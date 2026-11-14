@@ -67,7 +67,7 @@ class LiveGame:
     scenarios in that folder: the door every guard test comes in by. `mark` is read from the
     harbour's page as a page reads it."""
 
-    def __init__(self, tmp: Any, *flags: str):
+    def __init__(self, tmp: Any, *flags: str, module: str = "freesail"):
         import socket
 
         self.tmp = Path(tmp)
@@ -78,6 +78,7 @@ class LiveGame:
             s.bind(("127.0.0.1", 0))
             self.port = s.getsockname()[1]
         self.flags = flags
+        self.module = module  # `freesail` (the harbour) or `freesail.ui.server`
         self.url = f"http://127.0.0.1:{self.port}"
         self.own = f"127.0.0.1:{self.port}"
         self.mark = ""
@@ -96,15 +97,17 @@ class LiveGame:
         s["places"]["consent_records"] = str(self.tmp / "consent")
         s["places"]["desktop_config"] = str(self.tmp / "desktop" / "config.json")
         S.save_settings(s, self.settings)
-        argv = [sys.executable, "-m", "freesail", "--no-browser", "--port", str(self.port)]
-        argv += ["--settings", str(self.settings), "--saves", str(self.saves), *self.flags]
+        argv = [sys.executable, "-m", self.module, "--port", str(self.port)]
+        if self.module == "freesail":
+            argv += ["--no-browser", "--settings", str(self.settings)]
+        argv += ["--saves", str(self.saves), *self.flags]
         self.proc = subprocess.Popen(
             argv,
             cwd=str(self.tmp),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            env={**os.environ, "PYTHONPATH": str(ROOT)},
+            env={**os.environ, "PYTHONPATH": str(ROOT), "FREESAIL_SETTINGS": str(self.settings)},
         )
         deadline = time.monotonic() + 90
         while True:

@@ -102,9 +102,12 @@ REFUSED_ELSEWHERE = (
 
 def _loopback(host: str) -> bool:
     try:
-        return ipaddress.ip_address(host.strip("[]")).is_loopback
+        ip = ipaddress.ip_address(host.strip("[]"))
     except ValueError:
         return host.lower() == "localhost"
+    # the machine itself as a server bound to `::` sees it: `::ffff:127.0.0.1`
+    mapped = getattr(ip, "ipv4_mapped", None)
+    return bool(ip.is_loopback or (mapped is not None and mapped.is_loopback))
 
 
 def _figures(host: str) -> bool:
@@ -160,10 +163,18 @@ class Guard:
         return o in (f"http://{h}", f"https://{h}")
 
     def mark_ok(self, given: str | None) -> bool:
-        return bool(given) and hmac.compare_digest(str(given), self.token)
+        # compared as bytes, so that a mark of any characters is refused, never an error
+        if not given:
+            return False
+        return hmac.compare_digest(str(given).encode("utf-8"), self.token.encode("utf-8"))
 
     def refusal(self, scope: dict[str, Any]) -> str | None:
         """The words a request is refused in, or None for one the game answers."""
+        names = [k.decode("latin-1").lower() for k, _ in scope["headers"]]
+        if names.count("host") > 1 or names.count("origin") > 1:
+            # read once by the guard and once by the framework, two of either could be read
+            # two ways: a request that carries either twice is refused
+            return REFUSED_HOST
         headers = {k.decode("latin-1").lower(): v.decode("latin-1") for k, v in scope["headers"]}
         host = headers.get("host", "")
         if not self.host_ok(host):
@@ -188,8 +199,11 @@ class Guard:
             return None
         query = parse_qs(scope.get("query_string", b"").decode("latin-1"))
         given = headers.get(MARK_HEADER) or (query.get(MARK_QUERY) or [None])[0]
-        if not given and not socket_ and method in SAFE_METHODS:
-            # a page's own loads after the first (a link followed, the library's window)
+        if not given and not socket_ and method in SAFE_METHODS and path not in MARKED_READINGS:
+            # a page's own loads after the first (a link followed, the library's window), from
+            # another device: plain readings alone; a reading that changes something (the
+            # director's log revealed) wants the mark in the request itself, since a page of
+            # another port on the same machine is sent the cookie too
             cookie = SimpleCookie()
             try:
                 cookie.load(headers.get("cookie", ""))

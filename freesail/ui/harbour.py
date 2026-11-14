@@ -1034,7 +1034,7 @@ class Harbour:
 
         if not isinstance(fields, dict):
             raise HarbourError("A scenario is a mapping of fields.")
-        self._fields_in_places(fields)
+        fields = self._fields_in_places(fields)
         original, _ = self._original(source)
         try:
             text = scenario_text(fields, original)
@@ -1066,27 +1066,30 @@ class Harbour:
             lines = [ln.replace(str(p), "this scenario") for ln in sf.lines() + guard_lines(world)]
         return {"text": text, "lines": lines}
 
-    def _fields_in_places(self, fields: dict[str, Any]) -> None:
+    def _fields_in_places(self, fields: dict[str, Any]) -> dict[str, Any]:
         """The files a scenario's fields name (her ship's file, the books, a director's
         brief) lie in the server's folders (package 115, part A), or the maker refuses them
-        in words before the scenario is loaded and any of them opened."""
-        named: list[tuple[str, str]] = []
-        ship = fields.get("ship")
-        if isinstance(ship, dict) and ship.get("file"):
-            named.append((str(ship["file"]), "ship's file"))
-        for b in fields.get("standing_orders") or []:
-            named.append((str(b), "book of standing orders"))
-        director = fields.get("director")
-        if isinstance(director, dict) and isinstance(director.get("brief"), str):
-            try:
-                self.places.brief(director["brief"])
-            except PlaceRefused as e:
-                raise HarbourError(str(e), 403) from None
-        for given, what in named:
-            try:
-                self.places.readable(given, what)
-            except PlaceRefused as e:
-                raise HarbourError(str(e), 403) from None
+        in words before the scenario is loaded and any of them opened. The fields to prove,
+        each such file given by the path it was found at (the path checked is the path
+        opened, whatever folder the server was started from); the fields written are the
+        player's own words, unchanged."""
+        import copy
+
+        out = copy.deepcopy(fields)
+        try:
+            ship = out.get("ship")
+            if isinstance(ship, dict) and ship.get("file"):
+                ship["file"] = str(self.places.readable(str(ship["file"]), "ship's file"))
+            if out.get("standing_orders"):
+                out["standing_orders"] = [
+                    str(self.places.book(str(b))) for b in out.get("standing_orders") or []
+                ]
+            director = out.get("director")
+            if isinstance(director, dict) and isinstance(director.get("brief"), str):
+                director["brief"] = self.places.brief(director["brief"])
+        except PlaceRefused as e:
+            raise HarbourError(str(e), 403) from None
+        return out
 
     def save_scenario(
         self,

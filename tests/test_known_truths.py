@@ -17876,3 +17876,188 @@ def test_truth_7_608_an_act_in_a_save_names_a_record_of_the_game_or_nothing_is_m
         say=lambda _l: None,
     )
     assert "watcher" in loaded.agents and loaded.log.digest() == world.log.digest()
+
+
+def _outside_files(tmp_path):
+    """Files out of every folder of the game's, each holding a line that must never come
+    back: a brief, a book, a save, a scenario, a ship's file."""
+    out = tmp_path / "outside"
+    out.mkdir()
+    for leaf in ("secret.yaml", "secret.orders", "secret.json"):
+        (out / leaf).write_text("name: SENTINEL-OUTSIDE-115\n", encoding="utf-8")
+    return out
+
+
+def test_truth_7_610_every_name_a_browser_sends_is_a_name_and_finds_its_file_in_its_folder(
+    tmp_path,
+):
+    """Package 115, part A, the reader's finding 1: the director's starter briefs were found
+    by joining the player's words to their folder, so that `director: brief
+    /some/file.yaml` and `director: brief ../../some/file` read a file anywhere and said its
+    name. One rule now (`core.names`): a name is a name, and what it finds lies in its
+    folder. Every road by which a browser's words become a file is tried here, from the
+    game's own page (its mark and origin), with `..`, an absolute path and a separator of
+    either system, at files planted out of the folders: the order line's brief and book,
+    the harbour's start (brief, book, scenario, ship, save), the maker's ship, books and
+    brief, the harbour's scenario reader and chart, the library, the pictures, the marks,
+    the agents' stations. None gives back the planted line, none says it was taken; the
+    order line's and the harbour's refusals are in the game's words. A starter by its name,
+    a book by its name, and a save by its name are found as before."""
+    from own_page import LiveGame
+
+    out = _outside_files(tmp_path)
+    up = "../" * 12 + out.relative_to(out.anchor).as_posix()
+    tries = [
+        f"{out}/secret",
+        f"{out}/secret.yaml",
+        up + "/secret",
+        up + "/secret.yaml",
+        "..\\..\\..\\outside\\secret",
+        "C:\\outside\\secret.yaml",
+    ]
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+            answers = []
+            for t in tries:
+                brief = c.post("/api/order", json={"text": f"director: brief {t}"}).json()
+                assert "was not taken" in brief["text"], (t, brief["text"])
+                answers.append(brief["text"])
+                book = c.post("/api/order", json={"text": f"read the standing orders from {t}"})
+                assert book.json()["kind"] == "driver.refused", t
+                answers.append(book.text)
+                for choice in (
+                    {"scenario": "data/scenarios/lesson-falmouth.yaml", "director_brief": t},
+                    {"scenario": "data/scenarios/lesson-falmouth.yaml", "standing_orders": t},
+                    {"scenario": t},
+                    {"ship": t},
+                    {"load": t},
+                ):
+                    r = c.post("/api/harbour/start", json=choice)
+                    assert r.status_code in (403, 400), (choice, r.text)
+                    answers.append(r.text)
+                fields = c.get(
+                    "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+                ).json()["fields"]
+                for key in ("ship", "standing_orders", "director"):
+                    f = json.loads(json.dumps(fields))
+                    if key == "ship":
+                        f["ship"]["file"] = t
+                    elif key == "standing_orders":
+                        f["standing_orders"] = [t]
+                    else:
+                        f["director"] = {"brief": t}
+                    r = c.post("/api/harbour/scenario/prove", json={"fields": f})
+                    assert r.status_code == 403, (key, t, r.text)
+                    answers.append(r.text)
+                for route, params in (
+                    ("/api/harbour/scenario", {"path": t}),
+                    ("/api/harbour/chart", {"region": t}),
+                    ("/api/library", {"topic": t}),
+                    ("/api/library", {"topic": "primer", "section": t}),
+                ):
+                    r = c.get(route, params=params)
+                    assert r.status_code in (200, 400, 403, 404), (route, t)
+                    answers.append(r.text)
+                for path in (f"/api/picture/{t}", f"/api/marks/{t}", f"/api/agents/{t}"):
+                    r = c.post(path) if "picture" in path else c.delete(path)
+                    answers.append(r.text)
+            assert not any("SENTINEL-OUTSIDE-115" in a for a in answers)
+            assert not any("brief is given" in a for a in answers)
+            # the names, as before
+            assert (
+                "brief is given"
+                in c.post("/api/order", json={"text": "director: brief quiet-passage"}).json()[
+                    "text"
+                ]
+            )
+            assert (
+                c.post("/api/order", json={"text": "read the standing orders from starter"}).json()[
+                    "kind"
+                ]
+                == "driver.standing_orders"
+            )
+            assert (
+                c.post("/api/order", json={"text": "save by-name"}).json()["kind"] == "driver.saved"
+            )
+            assert c.post("/api/harbour/start", json={"load": "by-name"}).status_code == 200
+
+
+def test_truth_7_611_the_maker_opens_the_file_it_checked_from_whatever_folder_it_was_started(
+    tmp_path,
+):
+    """Package 115, part A, the reader's finding 2: the scenario maker checked a book's path
+    from the game's folder and opened it from the server's working folder. The server run
+    from a scratch folder that holds its own `data/standing_orders/starter.orders` (a line
+    of it a refused order that would come back in the maker's refusal): the maker proves a
+    scenario whose book is the game's `data/standing_orders/starter.orders`, and the book
+    read is the game's own, not the scratch folder's (before, the ship's file and the book
+    were opened from the scratch folder: the proof failed, or read the planted book)."""
+    from own_page import LiveGame
+
+    planted = tmp_path / "data" / "standing_orders"
+    planted.mkdir(parents=True)
+    (planted / "starter.orders").write_text("SENTINEL-CWD-115 is no order\n", encoding="utf-8")
+    with LiveGame(tmp_path, module="freesail.ui.server") as game:
+        with game.page() as c:
+            fields = c.get(
+                "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+            ).json()["fields"]
+            fields["standing_orders"] = ["data/standing_orders/starter.orders"]
+            r = c.post("/api/harbour/scenario/prove", json={"fields": fields})
+    # her ship's file and the book both found where they were checked: the book read is
+    # the game's starter book (its night routine, which the smack's rig refuses, part D's
+    # matter), and the planted one is not read
+    assert "night routine" in r.text, r.text
+    assert "SENTINEL-CWD-115" not in r.text
+
+
+def _raw_post(port: int, path: str, headers: list[str], body: bytes) -> int:
+    """A request written by hand on a socket, as no well-behaved client writes one (a
+    header twice): its status."""
+    import socket
+
+    head = [f"POST {path} HTTP/1.1", *headers, "Content-Type: application/json"]
+    head += [f"Content-Length: {len(body)}", "Connection: close", "", ""]
+    with socket.create_connection(("127.0.0.1", port), timeout=60) as s:
+        s.sendall("\r\n".join(head).encode("latin-1") + body)
+        first = s.recv(64).decode("latin-1")
+    return int(first.split()[1])
+
+
+def test_truth_7_612_the_guards_small_doors_shut(tmp_path):
+    """Package 115, part A, the reader's finding 3 and 4: the director's log revealed by
+    another page of the same machine with the cookie alone (an image's request, no origin)
+    is refused, and with the mark in the request is given; a request that carries its Host
+    or its Origin twice is refused; a mark of characters outside ASCII is refused, not an
+    error; and the machine itself seen as `::ffff:127.0.0.1` is the machine."""
+    import httpx
+    from own_page import LiveGame
+
+    from freesail.ui.guard import Guard, _loopback
+
+    assert _loopback("::ffff:127.0.0.1") and _loopback("127.0.0.1") and not _loopback("192.0.2.7")
+    with LiveGame(tmp_path) as game:
+        cookie = {f"freesail-page-{game.port}": game.mark}
+        r = httpx.get(game.url + "/api/director/log", cookies=cookie, timeout=60)
+        assert r.status_code == 403 and "entries" not in r.text
+        with game.page() as c:
+            assert c.get("/api/director/log").status_code == 200
+        body = b'{"text": "hold"}'
+        for doubled in (
+            [f"Host: {game.own}", f"Host: evil.example:{game.port}"],
+            [f"Host: {game.own}", f"Origin: http://{game.own}", "Origin: http://evil.example"],
+        ):
+            status = _raw_post(
+                game.port, "/api/order", doubled + [f"X-FreeSail-Page: {game.mark}"], body
+            )
+            assert status == 403, doubled
+        odd = httpx.post(
+            game.url + "/api/order",
+            params={"page": "\u00e9\u00e9"},
+            json={"text": "hold"},
+            timeout=60,
+        )
+        assert odd.status_code == 403
+    assert not Guard(token="x").mark_ok("\u00e9")

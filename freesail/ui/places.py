@@ -38,6 +38,8 @@ import os
 from collections.abc import Callable, Iterable
 from pathlib import Path, PureWindowsPath
 
+from freesail.core.names import is_name, named_file
+
 ROOT = Path(__file__).resolve().parents[2]
 GAME_DATA = ROOT / "data"
 DEFAULT_SAVES = ROOT / "saves"
@@ -57,19 +59,6 @@ def shown(p: Path) -> str:
         return p.relative_to(ROOT.resolve()).as_posix()
     except ValueError:
         return str(p)
-
-
-def looks_like_path(given: str) -> bool:
-    """Whether the words name a path rather than a file by its name: a separator of either
-    system, a drive, or a parent."""
-    text = given.strip()
-    return (
-        "/" in text
-        or "\\" in text
-        or bool(PureWindowsPath(text).drive)
-        or text in (".", "..")
-        or text.startswith("~")
-    )
 
 
 def resolve(given: str, base: Path) -> Path | None:
@@ -161,7 +150,7 @@ class Places:
             p = resolve(text, base)
             if p is None:
                 break
-            if not looks_like_path(text) and p.suffix.lower() != SAVE_SUFFIX:
+            if is_name(text) and p.suffix.lower() != SAVE_SUFFIX:
                 p = p.with_name(p.name + SAVE_SUFFIX)
             if inside(p, folders) and p.is_file():
                 return p
@@ -193,23 +182,33 @@ class Places:
         or the player's place (`starter`, `starter.orders`), else by a path in the reading
         folders (the primer's `data/standing_orders/starter.orders`)."""
         text = given.strip().strip("\"'")
-        if text and not looks_like_path(text):
-            name = text if text.lower().endswith(BOOK_SUFFIX) else text + BOOK_SUFFIX
+        if is_name(text):
             folders = list(BOOK_FOLDERS) + ([self.scenarios] if self.scenarios else [])
             for f in folders:
-                if (f / name).is_file():
-                    return (f / name).resolve()
+                found = named_file(f, text, BOOK_SUFFIX)
+                if found is not None:
+                    return found
         return self.readable(text, "book of standing orders")
 
     def brief(self, words: str) -> str:
         """A director's brief as the player gives it (a starter's name, a file or words):
         a file is one in the reading folders, given as its resolved path; any other words
         are passed as they are (the director reads them as the brief's own words)."""
-        from freesail.agents import director as director_mod
-
         text = " ".join(str(words).split())
-        if director_mod._starter(text) is not None:
-            return text  # a starter's name, its file the game's own
         if Path(text.strip("\"'")).suffix.lower() in (".yaml", ".yml"):
+            # a file: in the reading folders, by its path (a starter named with its
+            # suffix, `quiet-passage.yaml`, is read from the starters' folder by its name)
+            from freesail.agents import director as director_mod
+
+            if is_name(text) and director_mod._starter(text) is not None:
+                return text
             return str(self.readable(text, "director's brief"))
+        # a starter's name or the brief's own words: the director's reader takes a starter
+        # by its name alone (`core.names`), and words are words, never a file; one word that
+        # is no name (a path without its suffix) is neither, and is refused as a path is
+        if text and " " not in text and not is_name(text):
+            raise PlaceRefused(
+                f"A director's brief is a starter's name, a file in {self._where_words()}, or "
+                f"words; {text} is none of them, and nothing was opened."
+            )
         return text
