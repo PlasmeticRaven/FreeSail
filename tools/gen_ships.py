@@ -1609,9 +1609,10 @@ class Builder:
                 ):
                     # the magazine's keys (practice and resupply, between packages 72 and 73)
                     note = armament_notes.get(("magazine", fit_name, m.group(1)))
-                elif re.match(r"^      marines:", line):
-                    # a fit's own marines kept (package 75, B1: the marines by fit)
-                    note = armament_notes.get(("fit", fit_name, "marines"))
+                elif m := re.match(r"^      (marines|trimmers):", line):
+                    # a fit's own bill figures (package 75: B1's marines by fit; Phase 5's
+                    # trimmers by fit, the lead's ruling 13), `schema.FIT_OWN_BILL`
+                    note = armament_notes.get(("fit", fit_name, m.group(1)))
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             if line.startswith("ground_tackle:"):

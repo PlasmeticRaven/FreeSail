@@ -173,14 +173,15 @@ def test_a_fit_gives_its_own_marines_only_where_ruled_and_pickles_as_before_with
     bill keeps in their division when she carries it, where it differs from the bill's) on the
     64's 'ardent class 1794' (68) and the razee's 'as razeed 1795' (38) alone; every other fit of
     every file gives none, and its pickled state holds the keys it held before B1, in their
-    order; a fit with them pickles them and reads them back."""
+    order (a fit's own trimmers after them, the lead's ruling 13 of 2026-11-14, held in
+    tests/test_bill_by_fit.py); a fit with them pickles them and reads them back."""
     arm = load_ship(path).spec.armament
     if arm is None:
         return
     given = FIT_MARINES.get(path.name, {})
     for name, fit in arm.fits.items():
         assert fit.marines == given.get(name), name
-        state = list(fit.__getstate__())
+        state = [k for k in fit.__getstate__() if k != "trimmers"]
         assert state == FIT_STATE + (["marines"] if name in given else []), name
         again = pickle.loads(pickle.dumps(fit))
         assert again == fit and again.marines == fit.marines

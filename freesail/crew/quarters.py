@@ -36,15 +36,17 @@ the gun crews draw, and the long guns' lists then leave the marines out while th
 them first (Falconer 1780, QUARTERS: the marines "generally quartered on the poop and forecastle, or
 gangway"). A fit that gives its own `marines` (package 75, B1, the lead's ruling (4) of
 2026-11-13: the 64's 'ardent class 1794' and the razee's 'as razeed 1795') keeps that many in
-place of the bill's when she carries it; the long guns take none either way. On a ship whose
-broadside guns stand on a `lower` deck (the two two-deckers), each crew keeps its deck; where they
-stand on the lower and the upper deck both, the beat says each deck's crews and men in a line ("The
-lower deck: 14 gun crews, 182 men."); and robbing takes, after the swivels and the chasers, first
-the lower-deck crews whose gun on the engaged side is shut by the sea, then the other decks' crews
-from the end that bears least, then the lower deck's from that end, its line naming the decks. A
-ship with no `lower` deck robs, says and pickles as before. The stations by deck are the thirds of
-the length on each deck, unchanged: no period source quarters the parts of the ship by deck (Bel-D
-§6.4 item 3).
+place of the bill's when she carries it; the long guns take none either way. A fit that gives its
+own `trimmers` (package 75, Phase 5, the lead's ruling 13 of 2026-11-14: the razee's 'as razeed
+1795') is told off by them in place of the bill's, so the bill is read on her fit by one road
+(`_on_her_fit`) for both keys. On a ship whose broadside guns stand on a `lower` deck (the two
+two-deckers), each crew keeps its deck; where they stand on the lower and the upper deck both, the
+beat says each deck's crews and men in a line ("The lower deck: 14 gun crews, 182 men."); and
+robbing takes, after the swivels and the chasers, first the lower-deck crews whose gun on the
+engaged side is shut by the sea, then the other decks' crews from the end that bears least, then
+the lower deck's from that end, its line naming the decks. A ship with no `lower` deck robs, says
+and pickles as before. The stations by deck are the thirds of the length on each deck, unchanged:
+no period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
 
 **Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
 whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
@@ -236,8 +238,9 @@ class Quarters:
             where = _TRADE_STATIONS.get(str(s.trade or ""))
             if where:
                 divisions[where] += take([s], 1, where)
-        # the trimmers by the bill's stations
-        trimmers = dict(getattr(bill, "trimmers", {}) or {})
+        # the trimmers by the bill's stations; her fit's own where it gives them (package 75,
+        # Phase 5, the lead's ruling 13)
+        trimmers = dict(_on_her_fit(ship, "trimmers") or {})
         for station_word, n in trimmers.items():
             st = Station(station_word)
             divisions[TRIMMERS] += take(by_station[st], int(n), TRIMMERS)
@@ -587,15 +590,23 @@ def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -
     return ", ".join(said[:-1]) + ", and " + said[-1]
 
 
+def _on_her_fit(ship: Any, key: str) -> Any:
+    """The quarter bill's `key` as she carries her fit: the fit's own figure where it gives one
+    (`schema.FIT_OWN_BILL`: the marines, package 75, B1; the trimmers, Phase 5, the lead's
+    ruling 13), else the bill's, which is set against the default fit; None where neither gives
+    it. A fit pickled before a key reads as one without it, and so the bill's."""
+    own = getattr(getattr(ship, "fit_spec", None), key, None)
+    if own is not None:
+        return own
+    spec = getattr(getattr(ship, "spec", None), "crew", None)
+    return getattr(getattr(spec, "quarter_bill", None), key, None)
+
+
 def _marines_kept(ship: Any) -> int | None:
     """The marines the quarter bill keeps in their division at the beat: her fit's own `marines`
     (package 75, B1), else the bill's (B7.b); None where neither gives them, as on every ship
     but the 74, the 64 and the razee."""
-    kept = getattr(getattr(ship, "fit_spec", None), "marines", None)
-    if kept is None:
-        spec = getattr(getattr(ship, "spec", None), "crew", None)
-        kept = getattr(getattr(spec, "quarter_bill", None), "marines", None)
-    return kept
+    return _on_her_fit(ship, "marines")
 
 
 def _preferred_stations(

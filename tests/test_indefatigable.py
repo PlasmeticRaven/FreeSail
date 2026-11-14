@@ -850,6 +850,13 @@ def test_the_generators_report_prints_what_her_notes_no_longer_carry(tmp_path):
         " the fit keeps 38 marines in their division." in said
     )
     assert said.count("the fit keeps") == 2
+    # the fits' own trimmers (package 75, Phase 5: the lead's ruling 13 of 2026-11-14)
+    assert (
+        "razee: on 'as razeed 1795': her 238 seamen, 197 men at the guns, 12 of them marines, and"
+        " 2 at the wheel leave 51 trimmers; the fit tells off its own 51, the bill's 79 being the"
+        " default fit's." in said
+    )
+    assert said.count("the fit tells off") == 1
     assert "razee: her taffrail 7.15 m above her water" in said
     assert "sixty-four: mizen course: tack 8.73 m above her water, 6.5 ft above" in said
     assert "sixty-four: driver: jaws 9.69 m, set by the clearance" in said
@@ -1236,14 +1243,14 @@ def test_her_quarters_at_the_beat_fill_every_gun_and_leave_the_trimmers_measured
 
 
 @pytest.mark.parametrize(
-    "path, fit, kept, filled, crews, at_carronades, trimmers, unmanned",
+    "path, fit, kept, filled, crews, at_carronades, trimmers, powder, unmanned",
     [
-        (SIXTY_FOUR, "ardent class 1794", 68, 36, 36, 16, 53, None),
-        (RAZEE, "as razeed 1795", 38, 19, 22, 12, 79, "the guns, Nos. 12 to 13 and 17"),
+        (SIXTY_FOUR, "ardent class 1794", 68, 36, 36, 16, 53, 29, None),
+        (RAZEE, "as razeed 1795", 38, 22, 22, 12, 51, 22, None),
     ],
 )
 def test_her_other_fits_beat_keeps_the_fits_own_marines(
-    path, fit, kept, filled, crews, at_carronades, trimmers, unmanned
+    path, fit, kept, filled, crews, at_carronades, trimmers, powder, unmanned
 ):
     """The lead's ruling (4) of 2026-11-13, built (package 75, B1: the marines by fit): her other
     fit gives its own `marines`, the bill's rule on its guns (her marines less the marines at its
@@ -1252,14 +1259,19 @@ def test_her_other_fits_beat_keeps_the_fits_own_marines(
     her marines first and the long guns none. Measured at seed 7: the 64's 'ardent class 1794'
     keeps 68 and fills all 36 crews, her 16 carronade marines at their guns ("Quarters: 36 gun
     crews manned, the trimmers 53, the helm 2, the powder 29, the marines 68.", no gun unmanned);
-    the razee's 'as razeed 1795' keeps 38, the same men as before, and her seamen still fall short
-    of her long guns, the bill's trimmers set against the default fit (Nos. 12 and 13 unmanned and
-    No. 17 1 of 7). Old (0e5ff12d, `test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_
-    guns_short`, the bill's 84 and 14 on every fit): the 64's 1794 fit 33 of 36 crews filled (the
-    lower deck's No. 13 8 of 11, the upper deck's No. 13 and the poop's No. 3 unmanned), all 84 in
-    the division and none at the carronades, "Quarters: 34 gun crews manned, ... the marines 84."
-    and "Not hands enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand
-    unmanned."; the razee's as now, man for man."""
+    the razee's 'as razeed 1795' keeps 38, and by the lead's ruling 13 of 2026-11-14 (package 75,
+    Phase 5: the razee's trimmers by fit, the bill's rule on the fit's guns, JUDGEMENT in the fit's
+    note) tells off her own 51 trimmers (9, 12, 14, 7 and 9), so that all 22 crews are manned:
+    "Quarters: 22 gun crews manned, the trimmers 51, the helm 2, the powder 22, the marines 38.",
+    no gun unmanned. Old (53c14457, the bill's 79 trimmers on her 1795 fit): 19 of 22 filled,
+    "Quarters: 19 gun crews manned, the trimmers 79, ..." and "Not hands enough for every gun: the
+    guns, Nos. 12 to 13 and 17 stand unmanned." (Nos. 12 and 13 unmanned, No. 17 1 of 7). Older
+    (0e5ff12d, `test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short`, the bill's
+    84 and 14 on every fit): the 64's 1794 fit 33 of 36 crews filled (the lower deck's No. 13 8 of
+    11, the upper deck's No. 13 and the poop's No. 3 unmanned), all 84 in the division and none at
+    the carronades, "Quarters: 34 gun crews manned, ... the marines 84." and "Not hands enough for
+    every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand unmanned."; the razee's as
+    at 53c14457, man for man."""
     from freesail.crew.model import Station
     from freesail.crew.quarters import MARINES, TRIMMERS, quarters_of
     from tests.test_brains import world_at
@@ -1285,7 +1297,7 @@ def test_her_other_fits_beat_keeps_the_fits_own_marines(
         assert "Not hands enough" not in said.text
         assert q.describe()[0] == (
             f"Quarters: {crews} gun crews manned, the trimmers {trimmers}, the helm 2, the powder "
-            f"29, the marines {kept}."
+            f"{powder}, the marines {kept}."
         )
     else:
         assert f"Not hands enough for every gun: {unmanned} stand unmanned." in said.text
@@ -1308,10 +1320,11 @@ def test_her_marines_back_from_their_muskets_go_to_the_carronades_alone(
     the beat; a long gun short of hands stays short, and the division keeps the rest for the small
     arms. Measured at seed 7 (beat, cast loose, fire by volley, hold your fire, two minutes apart):
     the 64's 'ardent class 1794' "16 back to the carronades." as before (every crew full); the
-    razee's 'as razeed 1795' "twelve back to the carronades.", the long guns' Nos. 12, 13 and 17
-    short as at the beat. OLD (dfbe4031): the razee's "Marines, hold your fire! The muskets
-    grounded; 40 back to the carronades.", 28 marines to her long guns (Nos. 12 and 13 eleven each,
-    No. 17 six) out of her division."""
+    razee's 'as razeed 1795' "twelve back to the carronades.", every crew full by her own trimmers
+    since the lead's ruling 13 of 2026-11-14 (at 53c14457 the long guns' Nos. 12, 13 and 17 short
+    as at the beat, the same line). OLD (dfbe4031): the razee's "Marines, hold your fire! The
+    muskets grounded; 40 back to the carronades.", 28 marines to her long guns (Nos. 12 and 13
+    eleven each, No. 17 six) out of her division."""
     from freesail.crew.model import Station
     from freesail.crew.quarters import MARINES, quarters_of
     from tests.test_brains import world_at

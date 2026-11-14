@@ -21969,6 +21969,147 @@ razee's "a ship" kept). The crewed frigate's test
 (`test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74`) passes as it
 stood; its docstring now says the above.
 
+### The razee's trimmers by fit (the lead's ruling 13, 2026-11-14)
+
+On 53c14457, by the lead's ruling 13 of 2026-11-14 at 04:40: "The razee's trimmers by fit (51 on
+the 1795 fit, so that her crews are all manned): build it ..., JUDGEMENT, as the marines by fit
+were, what it moves named." Built as B1's marines by fit were (26473408).
+
+**The cause, and where it lives.** A file bears one quarter bill, set against her default fit
+(Indf §6.4), and a fit whose guns want other men read figures set for other guns. B1 met the
+cause for the marines and mended it by a fit's own key; the trimmers are the same cause, so they
+take the same road, and the road is made one for every key a fit may give:
+- *The schema.* `schema.FIT_OWN_BILL` names the bill's keys a fit may give its own figure for,
+  `("marines", "trimmers")`, the last two of `FIT_KEYS`. A fit's `trimmers` is the bill's form
+  (station to whole men), read by the parse the bill's own now goes through (`_parse_trimmers`,
+  the bill's words kept as they were) and checked against the men of each station by the one
+  check that serves the bill's (`validate`), refused in words where it cannot be: not a mapping,
+  a station the engine does not know, a count not whole or below nought, more than the station
+  has. `FitSpec.trimmers`, None while the fit gives none, is left out of the pickle while None,
+  by the same loop as its marines.
+- *The beat.* `crew/quarters._on_her_fit(ship, key)`: the bill's key as she carries her fit, the
+  fit's own where it gives one, else the bill's. `_marines_kept` now reads through it, and the
+  beat's trimmers likewise; a fit pickled before a key reads the bill's. The bill's trimmers had
+  one reader at run time, `Quarters.beat` (searched: `freesail/`, `tools/`, `client/`); every
+  other reader reads the division the beat formed (`lend` and the runner's robbing, the describe
+  line, the hits and the boarding's divisions), and so is served with it.
+- *The generator.* `tools/ships/indefatigable.py`'s `fit_bill` (in place of B1's `fit_marines`)
+  runs the bill's own rules on each fit's guns and writes each figure that differs from the
+  bill's into the fit after its `source`, with its note, and the report says the arithmetic; the
+  marines' note and line are as B1 wrote them. `tools/gen_ships.py` writes the note above either
+  key. The 64's 1794 fit tells off 53 by the rule, the bill's own, so it gets none and her file
+  does not move.
+
+**Where else the same cause was looked for, and what was found** (every fit of every file, beaten
+to quarters at muster, seed 7, `tests.test_brains.world_at`; and each key of the bill against the
+fits' guns):
+- *The bill's other keys.* `helm`, `powder`, `priority`, `small_arms` and `boarders` do not depend
+  on the guns. `filling` does (one to every four cannon, `gen_ships.filling_party`, on the default
+  fit's guns): the 64's 'ardent class 1794' reads the bill's 16, set on her 1784 fit's 64 cannon,
+  where her 72 would give 18 by the rule; the razee's 11 serves both fits (46 and 44 cannon); the
+  74's 18 is her module's own figure on all three fits. **Not mended** (not ruled, and the 64's
+  file would move): for the lead's list.
+- *The beat on every fit.* The 74's three fits, the 64's two and the razee's 1796 man every crew,
+  before and after. The other files' bills are written by other rules (the generator's reference
+  ships, the bilander's module), and their short guns are of those rules: the swivels manned last
+  by whoever is spare (the cutter's 'long guns', both swivels; the privateer's and the topsail
+  schooner's 'letter of marque', one; the lugger's 'gun lugger 1795' and the smack's 'culloden
+  1746', "the swivels stand unmanned"), the trader's few hands (the bilander's 'armed merchant',
+  one crew manned of six; the merchant brig, No. 2 3 of 4), and the topsail schooner's
+  'musquidobit 1813', No. 5 3 of 4. The cutter's 'long guns' and the privateer schooner's 'letter of marque' are the
+  same cause in form (a bill read on a fit other than the one it was set against); not ruled
+  here, and not mended: for the lead's list.
+
+**The arithmetic, and that 51 mans every crew.** Her 238 seamen (forecastle 37, fore top 31, main
+top 39, mizzen top 18, afterguard 66, waisters 47). One side's guns of 'as razeed 1795' want 197
+men in 22 crews: thirteen pairs of long 24-pounders of 11 (143), six pairs of long 12-pounders of 7
+(42) and three pairs of 42-pounder carronades of 4 (12), the 12 at the carronades marines, who take
+them first. So 238 less 185 seamen at the guns and the 2 at the wheel leave **51**, split by the
+frigate-36's shares (8, 10, 12, 6 and 8 of 44) to 9, 12, 14, 7 and 9, as the bill's 79 are 14, 18,
+22, 11 and 14 by the same rule on the 1796 fit's 157 seamen at the guns. At the beat: the
+carpenter's crew and the surgeon's mate by their trades, the 51 by their stations, two afterguard
+at the wheel, the fit's 38 marines kept, and then the gun crews take the 185 seamen left for the
+185 places at the long guns and the 12 marines left for the carronades: every crew manned,
+nobody left over for the trimmers' division, the 22 idlers to the powder. Measured, the beat says
+it: "Quarters: 22 gun crews manned, the trimmers 51, the helm 2, the powder 22, the marines 38."
+So the lead's 51 is the figure, and no other was needed. JUDGEMENT, said in the fit's note: the
+bill's rule on this fit's guns, as her marines on it are; no period quarter bill for a ship of
+about her company was found (Ind §6.3: RMG WQB/39, the Indefatigable's of 1812, is a watch bill),
+and the file bears one company whatever her fit (her 310 at first and 330 afterwards, James vol. 1
+p. 454).
+
+**Old beside new on real ticks** (seed 7, the same world; old 53c14457):
+
+| The fit | Crews manned | The trimmers (by station) | Marines kept, at the carronades | The beat's line |
+|---|---|---|---|---|
+| razee, 'as razeed 1795' | **22 of 22** (19: Nos. 12 and 13 unmanned, No. 17 1 of 7) | **51** (9, 12, 14, 7, 9) (79: 14, 18, 22, 11, 14) | 38, 12 (as before) | "Quarters: 22 gun crews manned, the trimmers 51, the helm 2, the powder 22, the marines 38." (old the same with 19 and 79, and "Not hands enough for every gun: the guns, Nos. 12 to 13 and 17 stand unmanned.") |
+| razee, 'as carried 1796' | 24 of 24 | 79 | 14, 36 | as before, man for man |
+| 64, 'ardent class 1784' | 32 of 32 | 53 | 84, 0 | as before, man for man |
+| 64, 'ardent class 1794' | 36 of 36 | 53 | 68, 16 | as before, man for man |
+
+On 'as razeed 1795' the 185 seamen at her guns are not all the same men crew by crew (19 crews hold
+other names), since each station gives fewer trimmers before the guns draw. Her quarters through
+work (beat, cast loose, tack, wear, the marines' volley and their hold, the same orders and ticks;
+she lies with 0.6 kn of way, so the tack is refused and the wear fails, before and after, and the
+robbing is what is compared): the guns cast loose at tick 143 (155), the three crews more casting
+loose theirs; wearing at quarters "87 hands taken from the guns, Nos. 9 to 19" ("59 hands ..., Nos.
+9 to 11 and 14 to 19"), 28 more from the guns as 28 fewer are trimmers (59 and 79, 87 and 51, 138
+hands both); 19 of 22 crews full while her marines are at their muskets (16); "twelve back to the
+carronades." as before. Her other fit and the 64's two: every line the same, the logs alike to the
+digest.
+
+**Recorded passages.** None moves. No scenario, squadron, captains' file, truth or trial names
+the razee's 1795 fit (searched `data/` and `tests/`), and a razee by description takes her
+default fit unless a scenario names one (`world/ships.py`). The four whole logs (first-action 3
+h, encounter 2 h, the lee-shore and gale station trials 20 h each) on this tree are the base's,
+line for line (497, 229, 1,561 and 1,722 lines, their digests the same). **Lines any ship may say
+that change:** the razee's beat on 'as razeed 1795' and what follows at quarters on that fit (all
+her guns manned, the robbing lines of sail work at quarters taking more from the guns, her guns
+cast loose sooner); no other ship's, and no other fit's.
+
+**A fit pickled before it** loads as before: a real checkpoint of the razee on 'as razeed 1795' at
+muster, ten ticks in, written at 53c14457 and kept
+(`tests/fixtures/saves/pre-ruling-13-razee-as-razeed-1795.checkpoint`, 143,355 bytes; a change
+that breaks it is mended with a class default or a step in `core.replay._rebind`, never by
+changing it), reads its fit with no trimmers, tells off the bill's 79 at the beat with the old line
+word for word, and pickles as before written again.
+As with B1's marines, the fit travels in the save, so a game saved before keeps the bill's
+figure; a game begun from the file has the 51.
+
+**The ship files.** The razee's alone moves through the generator (`py tools/gen_ships.py
+<folder>`, compared byte for byte): seven lines, the fit's note and its `trimmers` block; the
+other seventeen as they were. The generator's report says one line more: "razee: on 'as razeed
+1795': her 238 seamen, 197 men at the guns, 12 of them marines, and 2 at the wheel leave 51
+trimmers; the fit tells off its own 51, the bill's 79 being the default fit's."
+`tools/check_viewer_guns.py` clean.
+
+**Tests.** New, `tests/test_bill_by_fit.py` (39): the two keys a fit may give; every fit of every
+file gives its own trimmers only where ruled and pickles without them as before (18 files); the
+razee's 51 and the bill's 79 as the same rule on each fit's guns, from her file; **the cause's
+level**: every fit of every file whose bill keeps marines (the 74's three, the 64's two, the
+razee's two, read from the files) mans every crew at the beat and tells off at least her fit's
+trimmers by station; `_on_her_fit` one road for each key, a fit with none, a fit pickled before
+and a ship unarmed reading the bill's; the kept checkpoint; a fit's trimmers refused in words (5)
+and read up to a whole station; the bill's own refused in the words they were (4). On 53c14457, 11
+of them fail (the keys, the razee's file, the arithmetic, her beat, the one road, the five
+refusals and the reading); the other 28 pass there as here by design (the seventeen other files,
+the six other fits' beat, the old checkpoint, the bill's own words). **Moved:**
+`tests/test_indefatigable.py`'s `test_her_other_fits_beat_keeps_the_fits_own_marines`, the razee's
+row (19 to 22 crews filled, 79 to 51 trimmers, the unmanned line to none) and a column for the
+powder in its line (29 the 64's, 22 the razee's), the docstring old beside new; its
+`test_the_generators_report_prints_what_her_notes_no_longer_carry` (the line above, one of it);
+the marines' return test's docstring (the crews now full; its line as it stood).
+`tests/test_bill_marines_and_flag.py`'s pickled-state pin leaves the trimmers to the new file.
+
+**Suites as run** (`-n 2`, against the base's fast junit): the three files touched, 163 passed;
+the fifteen files that beat to quarters, read or pickle a fit, load a checkpoint or run the
+generator (`test_bellerophon`, `test_bilander`, `test_neufchatel`, `test_dumb_show`,
+`test_far_action`, `test_fight`, `test_filling`, `test_lee_ports`, `test_magazine`, `test_ships`,
+`test_checkpoint`, `test_ship_loader`, `test_subtypes`, `test_viewer_action`, `test_profiles`),
+842 passed; the eight truths of `test_known_truths` that beat to quarters or read the bill, 8
+passed (five of the fast tier; 7b-129, 7-133 and 7-171 of the slow, against its junit); no outcome
+changed against the bases. Ruff check and format clean on what is touched.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
