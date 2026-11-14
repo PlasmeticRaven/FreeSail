@@ -1828,13 +1828,18 @@ class TackScript(Script):
         braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        heading = self.new_course
         if self.timed_out:
             new = self.ship.dyn.tack
+            # and the heading she lies on, read from her, not the course she was put about
+            # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
+            # up on the starboard tack, heading SSE (158°)" with her head at NE)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
-            "new_course": units.format_heading(self.new_course),
+            "new_course": units.format_heading(heading),
         } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:

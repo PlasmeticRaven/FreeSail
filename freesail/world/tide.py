@@ -1122,7 +1122,10 @@ def time_words(hours: float, clock: bool = True) -> str:
     if h < 12:
         part = "in the morning" if h >= 4 else "in the middle watch"
     elif h < 17:
-        part = "in the afternoon" if h > 12 else "at noon"
+        # the noon hour past noon is the afternoon's: "half past twelve in the afternoon",
+        # never "half past twelve at noon" (the cold review of 2026-11-14, 5.3 item 10;
+        # package 115 D4); noon itself is the head's word below
+        part = "in the afternoon"
     else:
         part = "in the evening" if h < 21 else "at night"
     if quarter == 0:

@@ -17395,3 +17395,158 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                 ), (name, tname)
                 read += 1
     assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+
+
+# -- package 115, part D: the newcomer's trips (truths 7-615 to 7-629) -----------------------
+# The cold review of 2026-11-14 (docs/reviews/ColdReview-M7.md 1.5, 5.3): each trip met at the
+# prompt, and each test here comes in by the player's door: the scenario started as the
+# harbour starts it (`ui.server.prepare_game`, the road the harbour's new game takes), the
+# rules captain and the books as the player finds them, and the orders typed as a newcomer
+# types them, each through `World.submit` as the console and the socket give them.
+
+
+def _harbour_game(scenario: str, *flags: str):
+    """A game started as the harbour starts it: the server's own command line and
+    `prepare_game`, every step in its order."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", scenario, *flags])
+    return prepare_game(args, say=lambda _line: None)
+
+
+def _said(world, order: str):
+    """An order typed at the prompt, and the line the game answered it with."""
+    return world.submit(order)
+
+
+def test_truth_7_615_a_bargain_with_the_boat_lost_takes_nothing_by_any_road_and_one_is_had():
+    """The cold review's 5.3 item 2 (code-03 R1, refute-03): with the boat cut adrift, `buy
+    three tons of coal` answered "Order not carried out" and the purse went £500 to £494,
+    and the two goods together to £248, the market moved and nothing came. The cause: the
+    three doors of the market (`trade`, `trade_together`, `trade_list`) each paid and moved
+    the market before the boat was sent, and the boat's refusal came after. Mended where it
+    lives: one bargaining function (`Dealings._bargain`) by which every door strikes, which
+    sends the boat first and pays only when she is away for the goods. The three roads by the
+    boat as one table, from the merchant cutter at anchor in Carrick Road with the list of
+    Falmouth aboard (her own file's opening): each refused with the boat lost, twice, the
+    purse, the market and the hold as they were; and each, with a boat, paid once and had."""
+    from freesail.world.places import pounds_words
+
+    roads = [
+        ("one", ["buy three tons of coal"], {"coal": 3.0}),
+        ("together", ["buy three tons of coal and two tons of tin"], {"coal": 3.0, "tin": 2.0}),
+        (
+            "the manifest",
+            [
+                'draft a book "cargo": buy 3 tons of coal; buy 2 tons of tin',
+                'give the book "cargo" to the boat',
+            ],
+            {"coal": 3.0, "tin": 2.0},
+        ),
+    ]
+    for road, orders, goods in roads:
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)  # the best bower down (her opening order) and she lies in Falmouth
+        assert w.dealings.in_port() is not None, road
+        market = w.dealings.in_port().market
+        purse, net, hold = w.purse.pounds, dict(market.net_sold), dict(w.hold.goods)
+        e = _said(w, "cut the boat adrift")
+        assert w.dealings.boat.lost, (road, e.text)
+        for _ in range(2):  # a newcomer told nothing will try again
+            for order in orders:
+                e = _said(w, order)
+            assert e.kind == "order.rejected", (road, e.text)
+            assert "The boat is lost: cut adrift" in e.text, (road, e.text)
+            assert "the boat lost" not in e.text, (road, e.text)  # said once, not twice
+            assert w.purse.pounds == purse, road
+            assert dict(market.net_sold) == net, road
+            assert dict(w.hold.goods) == hold, road
+        w.run(3600)
+        assert w.purse.pounds == purse and dict(w.hold.goods) == hold, road
+        # the same road with her boat: paid once, and the goods had when she is back
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)
+        purse = w.purse.pounds
+        for order in orders:
+            e = _said(w, order)
+        assert e.kind == "market.bargain", (road, e.text)
+        paid = purse - w.purse.pounds
+        assert paid > 0 and f"The purse: {pounds_words(w.purse.pounds)}" in e.text, road
+        for _ in range(180):
+            if not w.dealings.boat.away:
+                break
+            w.run(60)
+        assert not w.dealings.boat.away, road
+        for good, tons in goods.items():
+            assert w.hold.goods.get(good) == pytest.approx(tons), (road, good)
+        assert w.purse.pounds == pytest.approx(purse - paid), road
+
+
+def test_truth_7_616_a_sale_with_the_boat_lost_keeps_the_goods_in_the_hold_and_the_money_ashore():
+    """The sale's road of the same fault (refute-03: "on a sale the goods vanish and the
+    player is paid", by the code, not run): goods bought and had by the boat, the boat then
+    cut adrift, and `sell two tons of tin` is refused with the tin still in the hold and the
+    purse as it was."""
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    e = _said(w, "buy two tons of tin")
+    assert e.kind == "market.bargain", e.text
+    for _ in range(180):
+        if not w.dealings.boat.away:
+            break
+        w.run(60)
+    assert w.hold.goods.get("tin") == pytest.approx(2.0)
+    _said(w, "cut the boat adrift")
+    purse = w.purse.pounds
+    for order in ("sell two tons of tin", "sell one ton of tin and one ton of tin"):
+        e = _said(w, order)
+        assert e.kind == "order.rejected" and "The boat is lost" in e.text, e.text
+        assert w.hold.goods.get("tin") == pytest.approx(2.0)
+        assert w.purse.pounds == purse
+
+
+def test_truth_7_617_a_rule_held_back_by_no_stranger_says_so_once_and_it_is_so():
+    """The cold review's 5.3 item 4: in the first action, Mr Bowen's 'more of her' at a sail
+    made out answered "not carried out; a stranger in sight is no stranger in sight". The
+    cause: a clause's words for the log (`standing.rules.Clause.describe`) joined the
+    reading's name, "is" and the reading's own words, and this reading's words are a whole
+    sentence of absence. Mended there: words of absence ("no ...") are said alone. The
+    first action as the harbour starts it, run to that line: it reads "no stranger in sight",
+    and the lookout has indeed no stranger then (the cutter made out is known)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    line = None
+    for _ in range(20):
+        w.run(30)
+        held = [
+            e
+            for e in w.log
+            if "'more of her'" in e.text and "not carried out" in e.text and "stranger" in e.text
+        ]
+        if held:
+            line = held[0]
+            break
+    assert line is not None, "the rule was never held back in the first ten minutes"
+    assert line.text.endswith("not carried out; no stranger in sight."), line.text
+    assert "is no stranger" not in line.text
+    assert w.readings.words("a stranger in sight") == "no stranger in sight"
+
+
+def test_truth_7_618_the_noon_hour_past_noon_is_the_afternoon_in_every_mouth():
+    """The cold review's 5.3 item 10: "High water at Ramhead about a quarter past twelve at
+    noon". The cause: `world.tide.time_words` gave the whole hour from noon to one "at
+    noon". Mended there (the one speller of a time of day in words; the reckoning's own
+    lines say the clock's figures): the time past noon is the afternoon's, noon itself
+    "noon". The schooner in Carrick Road as the harbour starts her, asking the tide as a
+    newcomer asks it; and every quarter of the day by the speller itself, so that no other
+    hour is said wrong."""
+    from freesail.world.tide import time_words
+
+    w = _harbour_game("data/scenarios/merchant-schooner-plymouth.yaml")
+    e = _said(w, "the tide by the almanac")
+    assert "a quarter past twelve in the afternoon" in e.text, e.text
+    assert "at noon" not in e.text
+    for q in range(96):
+        words = time_words(q / 4.0)
+        assert ("at noon" not in words) and (words == "noon") == (q == 48), (q, words)
+        if 48 < q < 68:
+            assert words.endswith("in the afternoon"), (q, words)

@@ -2274,98 +2274,26 @@ class Dealings:
         return listed
 
     def trade(self, verb: str, tons: float, good_words: str) -> tuple[str, dict[str, Any]]:
-        """`buy <n> tons of <good>` and `sell <n> tons of <good>`: the bargain made at
-        the port's price now, the purse moved, and the boat sent for the goods (the hold
-        is changed when the boat is back, `_boat_back`); refused in words when she is
-        not in port, the prices are not known, the boat is away, the hold is full or the
-        purse short."""
-        from freesail.orders.errors import OrderError
-
-        world = self.world
-        port = self.in_port()
-        if port is None:
-            raise OrderError(
-                "She is not in port; the market is ashore and the boat has nowhere to go."
-            )
-        if self.stance(port) in ("hostile", "closed"):
-            raise OrderError(
-                f"{port.name} is {self.stance(port)} to her; there is no trading there."
-            )
-        if port.id not in self.price_lists:
-            raise OrderError(
-                f"The prices at {port.name} are not known; send the boat ashore first, and the "
-                "purser will bring the list off."
-            )
-        if self.boat.away:
-            raise OrderError(
-                f"{self.boat.boat_name[:1].upper()}{self.boat.boat_name[1:]} is away; wait for her."
-            )
-        good = port.market.find(good_words)
-        if good is None:
-            names = ", ".join(port.market.goods)
-            raise OrderError(
-                f"{_possessive(port.name)} market has no {good_words}; it deals in {names}."
-            )
-        if tons <= 0:
-            raise OrderError("How many tons? Say 'buy twenty tons of tin'.")
-        price = self.price_of(port, good.good)
-        sum_pounds = price * tons
-        hold: Hold = world.hold
-        purse: Purse = world.purse
-        now = world.clock.tick
+        """`buy <n> tons of <good>` and `sell <n> tons of <good>`: one bargain by the boat
+        from aboard, struck by `_bargain` (the one road every bargain takes); the words
+        here are this order's own."""
+        purse: Purse = self.world.purse
+        port, struck, _due = self._bargain([(verb, tons, good_words)], form="one")
+        _v, good, tons, price, sum_pounds = struck[0]
         if verb == "buy":
-            if tons > hold.room_tons + 1e-9:
-                raise OrderError(
-                    f"There is room in the hold for {hold.room_tons:g} tons and no more; "
-                    f"{tons:g} tons of {good.good} will not stow."
-                )
-            if sum_pounds > purse.pounds + 1e-9:
-                raise OrderError(
-                    f"{tons:g} tons of {good.good} at {pounds_words(price)} a ton is "
-                    f"{pounds_words(sum_pounds)}, and the purse holds {purse.words()}."
-                )
-            purse.pay(sum_pounds, f"{tons:g} tons of {good.good} at {port.name}", now)
-            port.market.bought_from_port(good.good, tons)
-            self._send_boat(
-                port,
-                "purchase",
-                [{"kind": "purchase", "good": good.good, "tons": tons, "pounds": sum_pounds}],
-            )
             text = (
-                f"Bought {tons:g} tons of {good.good} at {port.name} at {pounds_words(price)} "
+                f"Bought {tons:g} tons of {good} at {port.name} at {pounds_words(price)} "
                 f"a ton, {pounds_words(sum_pounds)} paid; the boat goes for it. The purse: "
                 f"{purse.words()}."
             )
         else:
-            have = hold.goods.get(good.good, 0.0)
-            if tons > have + 1e-9:
-                raise OrderError(
-                    f"The hold has {have:g} tons of {good.good}, not {tons:g}; the manifest "
-                    f"says so."
-                )
-            hold.break_out(good.good, tons)
-            purse.take(sum_pounds, f"{tons:g} tons of {good.good} sold at {port.name}", now)
-            port.market.sold_to_port(good.good, tons)
-            self._send_boat(
-                port,
-                "sale",
-                [{"kind": "sale", "good": good.good, "tons": tons, "pounds": sum_pounds}],
-            )
             text = (
-                f"Sold {tons:g} tons of {good.good} at {port.name} at {pounds_words(price)} a ton, "
+                f"Sold {tons:g} tons of {good} at {port.name} at {pounds_words(price)} a ton, "
                 f"{pounds_words(sum_pounds)} taken; the boat lands it. The purse: {purse.words()}."
             )
-        papers = getattr(world, "papers", None)
-        if papers is not None:
-            line = papers.write(
-                "the manifest",
-                f"{tons:g} tons of {good.good} {'bought' if verb == 'buy' else 'sold'} at "
-                f"{port.name}",
-            )
-            self._record(Severity.ROUTINE, "paper.written", line, {"paper": "the manifest"})
         return text, {
             "port": port.id,
-            "good": good.good,
+            "good": good,
             "tons": tons,
             "price_pounds": price,
             "sum_pounds": sum_pounds,
@@ -2377,87 +2305,16 @@ class Dealings:
     ) -> tuple[str, dict[str, Any]]:
         """Several bargains said in one order (`buy 20 tons of salt fish and 8 tons of
         pilchards`; package 37l, game 10, where it was read as one cargo named "salt fish
-        and 8 pilchards"): each struck at the port's price now, as `trade` strikes one, and
-        the boat sent once for them all. Every bargain is read and weighed before any is
-        struck (the goods, the room in the hold and the purse for them together), so that
-        one that cannot be struck refuses the order whole and nothing is paid."""
-        from freesail.orders.errors import OrderError
-
-        world = self.world
-        port = self.in_port()
-        if port is None:
-            raise OrderError(
-                "She is not in port; the market is ashore and the boat has nowhere to go."
-            )
-        if self.stance(port) in ("hostile", "closed"):
-            raise OrderError(
-                f"{port.name} is {self.stance(port)} to her; there is no trading there."
-            )
-        if port.id not in self.price_lists:
-            raise OrderError(
-                f"The prices at {port.name} are not known; send the boat ashore first, and the "
-                "purser will bring the list off."
-            )
-        if self.boat.away:
-            raise OrderError(
-                f"{self.boat.boat_name[:1].upper()}{self.boat.boat_name[1:]} is away; wait for her."
-            )
-        hold: Hold = world.hold
-        purse: Purse = world.purse
-        struck: list[tuple[str, float, float, float]] = []  # good, tons, price, sum
-        for tons, good_words in bargains:
-            good = port.market.find(good_words)
-            if good is None:
-                names = ", ".join(port.market.goods)
-                raise OrderError(
-                    f"{_possessive(port.name)} market has no {good_words}; it deals in {names}."
-                )
-            if tons <= 0:
-                raise OrderError(f"How many tons of {good.good}? Say 'buy twenty tons of tin'.")
-            price = self.price_of(port, good.good)
-            struck.append((good.good, tons, price, price * tons))
-        total_tons = sum(t for _, t, _, _ in struck)
-        total_pounds = sum(x for _, _, _, x in struck)
-        if verb == "buy":
-            if total_tons > hold.room_tons + 1e-9:
-                raise OrderError(
-                    f"There is room in the hold for {hold.room_tons:g} tons and no more; the "
-                    f"{total_tons:g} tons bought together will not stow."
-                )
-            if total_pounds > purse.pounds + 1e-9:
-                raise OrderError(
-                    f"The bargains together are {pounds_words(total_pounds)}, and the purse "
-                    f"holds {purse.words()}."
-                )
-        else:
-            for good_name, _tons, _, _ in struck:
-                have = hold.goods.get(good_name, 0.0)
-                wanted = sum(t for g, t, _, _ in struck if g == good_name)
-                if wanted > have + 1e-9:
-                    raise OrderError(
-                        f"The hold has {have:g} tons of {good_name}, not {wanted:g}; the "
-                        "manifest says so."
-                    )
-        now = world.clock.tick
-        items: list[dict[str, Any]] = []
-        said: list[str] = []
-        for good_name, tons, price, sum_pounds in struck:
-            if verb == "buy":
-                purse.pay(sum_pounds, f"{tons:g} tons of {good_name} at {port.name}", now)
-                port.market.bought_from_port(good_name, tons)
-                items.append(
-                    {"kind": "purchase", "good": good_name, "tons": tons, "pounds": sum_pounds}
-                )
-            else:
-                hold.break_out(good_name, tons)
-                purse.take(sum_pounds, f"{tons:g} tons of {good_name} sold at {port.name}", now)
-                port.market.sold_to_port(good_name, tons)
-                items.append(
-                    {"kind": "sale", "good": good_name, "tons": tons, "pounds": sum_pounds}
-                )
-            said.append(f"{tons:g} tons of {good_name} at {pounds_words(price)} a ton")
-        self._send_boat(port, "purchase" if verb == "buy" else "sale", items)
-        listed = "; ".join(said)
+        and 8 pilchards"), struck together by `_bargain` and the boat sent once for them
+        all; the words here are this order's own."""
+        purse: Purse = self.world.purse
+        port, struck, _due = self._bargain(
+            [(verb, tons, good_words) for tons, good_words in bargains], form="together"
+        )
+        total_pounds = sum(x for _, _, _, _, x in struck)
+        listed = "; ".join(
+            f"{t:g} tons of {g} at {pounds_words(pr)} a ton" for _, g, t, pr, _ in struck
+        )
         if verb == "buy":
             text = (
                 f"Bought at {port.name}: {listed}; {pounds_words(total_pounds)} paid in all; the "
@@ -2468,20 +2325,11 @@ class Dealings:
                 f"Sold at {port.name}: {listed}; {pounds_words(total_pounds)} taken in all; the "
                 f"boat lands it. The purse: {purse.words()}."
             )
-        papers = getattr(world, "papers", None)
-        if papers is not None:
-            for good_name, tons, _, _ in struck:
-                line = papers.write(
-                    "the manifest",
-                    f"{tons:g} tons of {good_name} {'bought' if verb == 'buy' else 'sold'} at "
-                    f"{port.name}",
-                )
-                self._record(Severity.ROUTINE, "paper.written", line, {"paper": "the manifest"})
         return text, {
             "port": port.id,
             "bargains": [
                 {"good": g, "tons": t, "price_pounds": pr, "sum_pounds": x}
-                for g, t, pr, x in struck
+                for _, g, t, pr, x in struck
             ],
             "sum_pounds": total_pounds,
             "purse_pounds": round(purse.pounds, 2),
@@ -2885,8 +2733,11 @@ class Dealings:
         if boat is None:
             raise OrderError("She carries no boat: the ship's file lists none.")
         if self.boat.lost:
+            # the boat's own words begin with her name and "lost" (`BoatState.words`): said
+            # once ("The boat is lost: cut adrift on the 12th; ..."), not twice
             head = f"{boat.name[:1].upper()}{boat.name[1:]}"
-            raise OrderError(f"{head} is lost: {self.boat.words()}.")
+            why = self.boat.lost_words or self.boat.lost
+            raise OrderError(f"{head} is lost: {why}; a new one is the yard's.")
         if self.boat.away:
             raise OrderError(f"{boat.name[:1].upper()}{boat.name[1:]} is away already.")
         runner = world.ship.extra.get("evolutions")
@@ -3770,13 +3621,78 @@ class Dealings:
         self, bargains: list[tuple[str, float, str]], person: Any = None, said: str = ""
     ) -> tuple[str, dict[str, Any]]:
         """Bargains to buy and to sell struck together (package 53; spec M7b §14 and §16):
-        `(verb, tons, good words)` each. By the boat from aboard in one errand (a drafted
-        manifest given to the boat), or in person at the market by `person` ashore, who
-        reads the prices there and whose purchases come off by the port's lighter. Every
-        bargain is read and weighed before any is struck (the goods, the room in the hold
-        net of what is sold, the purse net of what is taken), so that one that cannot be
-        struck refuses the whole and nothing is paid. `said` heads the line ("By the
-        manifest 'cargo'")."""
+        `(verb, tons, good words)` each, by `_bargain`. By the boat from aboard in one
+        errand (a drafted manifest given to the boat), or in person at the market by
+        `person` ashore, who reads the prices there and whose purchases come off by the
+        port's lighter. `said` heads the line ("By the manifest 'cargo'"); the words here
+        are this order's own."""
+        world = self.world
+        purse: Purse = world.purse
+        port, struck, due = self._bargain(bargains, form="list", person=person)
+        bought = [x for x in struck if x[0] == "buy"]
+        sold = [x for x in struck if x[0] == "sell"]
+        paid = sum(x for _, _, _, _, x in bought)
+        taken = sum(x for _, _, _, _, x in sold)
+        parts = []
+        if bought:
+            parts.append(
+                "bought "
+                + "; ".join(
+                    f"{t:g} tons of {g} at {pounds_words(pr)} a ton" for _, g, t, pr, _ in bought
+                )
+            )
+        if sold:
+            parts.append(
+                "sold "
+                + "; ".join(
+                    f"{t:g} tons of {g} at {pounds_words(pr)} a ton" for _, g, t, pr, _ in sold
+                )
+            )
+        money = []
+        if paid:
+            money.append(f"{pounds_words(paid)} paid")
+        if taken:
+            money.append(f"{pounds_words(taken)} taken")
+        if person is not None:
+            head = f"{person.name} at the market of {port.name}, in person"
+            carried = "the lighter brings it off" if bought else "the goods landed by the lighter"
+        else:
+            head = said or f"At {port.name}"
+            carried = "the boat goes for it" if bought else "the boat lands it"
+        text = (
+            f"{head}: {'; and '.join(parts)}; {', '.join(money) or 'nothing paid'}; "
+            f"{carried}. The purse: {purse.words()}."
+        )
+        data: dict[str, Any] = {
+            "port": port.id,
+            "bargains": [
+                {"verb": v, "good": g, "tons": t, "price_pounds": pr, "sum_pounds": x}
+                for v, g, t, pr, x in struck
+            ],
+            "paid_pounds": paid,
+            "taken_pounds": taken,
+            "purse_pounds": round(purse.pounds, 2),
+            "by": "person" if person is not None else "boat",
+        }
+        if due is not None:
+            data["due_tick"] = due
+        return text, data
+
+    def _bargain(
+        self, bargains: list[tuple[str, float, str]], form: str, person: Any = None
+    ) -> tuple[Port, list[tuple[str, str, float, float, float]], int | None]:
+        """Every bargain of the market, by every door (`trade`, `trade_together`,
+        `trade_list`; the cold review of 2026-11-14, F4.4 and 5.3 item 2): read and weighed
+        whole, refused in words before anything moves, and then struck so that the money
+        moves only when the goods are had: the boat is sent FIRST, and only when she is
+        away on the errand is the purse paid, the market moved and the hold broken out; a
+        boat lost, missing or unmanned refuses the bargain with the purse, the market and
+        the hold as they were (before, all three moved and then the boat's refusal said
+        "Order not carried out", the money gone and nothing coming). In person at the
+        market the goods are had there, and the lighter brings them off. `form` keeps each
+        door's own words of refusal ("one", "together", "list"). Returns the port, the
+        bargains struck, `(verb, good, tons, price, sum)` each, and the lighter's tick when
+        goods bought in person come off by it (else None)."""
         from freesail.orders.errors import OrderError
 
         world = self.world
@@ -3822,93 +3738,87 @@ class Dealings:
                     f"{_possessive(port.name)} market has no {good_words}; it deals in {names}."
                 )
             if tons <= 0:
+                if form == "one":
+                    raise OrderError("How many tons? Say 'buy twenty tons of tin'.")
                 raise OrderError(f"How many tons of {good.good}? Say 'buy twenty tons of tin'.")
             price = self.price_of(port, good.good)
             struck.append((verb, good.good, tons, price, price * tons))
         bought = [x for x in struck if x[0] == "buy"]
         sold = [x for x in struck if x[0] == "sell"]
-        for _v, good_name, _t, _p, _x in sold:
-            have = hold.goods.get(good_name, 0.0)
-            wanted = sum(t for _, g, t, _, _ in sold if g == good_name)
-            if wanted > have + 1e-9:
-                raise OrderError(
-                    f"The hold has {have:g} tons of {good_name}, not {wanted:g}; the manifest "
-                    "says so."
-                )
-        room = hold.room_tons + sum(t for _, _, t, _, _ in sold)
-        tons_in = sum(t for _, _, t, _, _ in bought)
-        if tons_in > room + 1e-9:
-            raise OrderError(
-                f"There is room in the hold for {room:g} tons and no more; the {tons_in:g} tons "
-                "bought will not stow."
-            )
         paid = sum(x for _, _, _, _, x in bought)
         taken = sum(x for _, _, _, _, x in sold)
-        if paid > purse.pounds + taken + 1e-9:
-            raise OrderError(
-                f"The goods bought are {pounds_words(paid)}, and the purse holds "
-                f"{purse.words()}"
-                + (f" with {pounds_words(taken)} from the sales" if taken else "")
-                + "."
-            )
+        tons_in = sum(t for _, _, t, _, _ in bought)
+        if form == "list":
+            self._weigh_sales(hold, sold)
+            room = hold.room_tons + sum(t for _, _, t, _, _ in sold)
+            if tons_in > room + 1e-9:
+                raise OrderError(
+                    f"There is room in the hold for {room:g} tons and no more; the "
+                    f"{tons_in:g} tons bought will not stow."
+                )
+            if paid > purse.pounds + taken + 1e-9:
+                raise OrderError(
+                    f"The goods bought are {pounds_words(paid)}, and the purse holds "
+                    f"{purse.words()}"
+                    + (f" with {pounds_words(taken)} from the sales" if taken else "")
+                    + "."
+                )
+        elif bought:
+            if tons_in > hold.room_tons + 1e-9:
+                if form == "one":
+                    raise OrderError(
+                        f"There is room in the hold for {hold.room_tons:g} tons and no more; "
+                        f"{tons_in:g} tons of {bought[0][1]} will not stow."
+                    )
+                raise OrderError(
+                    f"There is room in the hold for {hold.room_tons:g} tons and no more; the "
+                    f"{tons_in:g} tons bought together will not stow."
+                )
+            if paid > purse.pounds + 1e-9:
+                if form == "one":
+                    _v, g, t, pr, x = bought[0]
+                    raise OrderError(
+                        f"{t:g} tons of {g} at {pounds_words(pr)} a ton is "
+                        f"{pounds_words(x)}, and the purse holds {purse.words()}."
+                    )
+                raise OrderError(
+                    f"The bargains together are {pounds_words(paid)}, and the purse "
+                    f"holds {purse.words()}."
+                )
+        else:
+            self._weigh_sales(hold, sold)
         now = world.clock.tick
-        if person is not None:
+        items = [{"kind": "sale", "good": g, "tons": t, "pounds": x} for _, g, t, _, x in sold] + [
+            {"kind": "purchase", "good": g, "tons": t, "pounds": x} for _, g, t, _, x in bought
+        ]
+        if form != "list":
+            # the one order and the several said together carry their items in the order said
+            items = [
+                {"kind": "purchase" if v == "buy" else "sale", "good": g, "tons": t, "pounds": x}
+                for v, g, t, _, x in struck
+            ]
+        due: int | None = None
+        if person is None:
+            # the boat first: she is lost, missing, or no hand can man her, and the bargain
+            # is refused here with nothing paid, nothing broken out and the market as it was
+            self._send_boat(port, "purchase" if bought else "sale", items)
+        else:
             # the prices read at the market, and the list his to bring off
             self._write_price_list(
                 port, why=f"the prices at {port.name} read at the market by {person.name}"
             )
-        items: list[dict[str, Any]] = []
         for _v, good_name, tons, _p, sum_pounds in sold:
             hold.break_out(good_name, tons)
             purse.take(sum_pounds, f"{tons:g} tons of {good_name} sold at {port.name}", now)
             port.market.sold_to_port(good_name, tons)
-            items.append({"kind": "sale", "good": good_name, "tons": tons, "pounds": sum_pounds})
         for _v, good_name, tons, _p, sum_pounds in bought:
             purse.pay(sum_pounds, f"{tons:g} tons of {good_name} at {port.name}", now)
             port.market.bought_from_port(good_name, tons)
-            items.append(
-                {"kind": "purchase", "good": good_name, "tons": tons, "pounds": sum_pounds}
-            )
-        parts = []
-        if bought:
-            parts.append(
-                "bought "
-                + "; ".join(
-                    f"{t:g} tons of {g} at {pounds_words(pr)} a ton" for _, g, t, pr, _ in bought
-                )
-            )
-        if sold:
-            parts.append(
-                "sold "
-                + "; ".join(
-                    f"{t:g} tons of {g} at {pounds_words(pr)} a ton" for _, g, t, pr, _ in sold
-                )
-            )
-        money = []
-        if paid:
-            money.append(f"{pounds_words(paid)} paid")
-        if taken:
-            money.append(f"{pounds_words(taken)} taken")
-        due = None
-        if person is not None:
-            head = f"{person.name} at the market of {port.name}, in person"
-            if bought:
-                buys = [i for i in items if i["kind"] == "purchase"]
-                pull_s = self.to_shore_m(port) / (BOAT_PACE_KN * units.KNOT)
-                due = now + int(BOAT_ASHORE_S["purchase"] + tons_in * LIGHTER_S_PER_TON + pull_s)
-                self.jobs.append(Job(due, "lighter", port.id, {"items": buys}, hull=self.hull_id))
-                carried = "the lighter brings it off"
-            else:
-                carried = "the goods landed by the lighter"
-        else:
-            head = said or f"At {port.name}"
-            errand = "purchase" if bought else "sale"
-            self._send_boat(port, errand, items)
-            carried = "the boat goes for it" if bought else "the boat lands it"
-        text = (
-            f"{head}: {'; and '.join(parts)}; {', '.join(money) or 'nothing paid'}; "
-            f"{carried}. The purse: {purse.words()}."
-        )
+        if person is not None and bought:
+            buys = [i for i in items if i["kind"] == "purchase"]
+            pull_s = self.to_shore_m(port) / (BOAT_PACE_KN * units.KNOT)
+            due = now + int(BOAT_ASHORE_S["purchase"] + tons_in * LIGHTER_S_PER_TON + pull_s)
+            self.jobs.append(Job(due, "lighter", port.id, {"items": buys}, hull=self.hull_id))
         papers = getattr(world, "papers", None)
         if papers is not None:
             for verb, good_name, tons, _p, _x in struck:
@@ -3918,20 +3828,21 @@ class Dealings:
                     f"{port.name}",
                 )
                 self._record(Severity.ROUTINE, "paper.written", line, {"paper": "the manifest"})
-        data: dict[str, Any] = {
-            "port": port.id,
-            "bargains": [
-                {"verb": v, "good": g, "tons": t, "price_pounds": pr, "sum_pounds": x}
-                for v, g, t, pr, x in struck
-            ],
-            "paid_pounds": paid,
-            "taken_pounds": taken,
-            "purse_pounds": round(purse.pounds, 2),
-            "by": "person" if person is not None else "boat",
-        }
-        if due is not None:
-            data["due_tick"] = due
-        return text, data
+        return port, struck, due
+
+    @staticmethod
+    def _weigh_sales(hold: Hold, sold: list[tuple[str, str, float, float, float]]) -> None:
+        """Goods sold must be in the hold, each good's tons summed over the bargains."""
+        from freesail.orders.errors import OrderError
+
+        for _v, good_name, _t, _p, _x in sold:
+            have = hold.goods.get(good_name, 0.0)
+            wanted = sum(t for _, g, t, _, _ in sold if g == good_name)
+            if wanted > have + 1e-9:
+                raise OrderError(
+                    f"The hold has {have:g} tons of {good_name}, not {wanted:g}; the manifest "
+                    "says so."
+                )
 
 
 def _ship_form(world: Any) -> str:
