@@ -607,3 +607,15 @@ returns: the cause a fixed step unrelated to the grid's cell, and where else a f
 samples the chart, in the audit and the game. **My own seven tracks** are drawn to the same
 rule: the cause of their drying legs named (a leg's line, not the port, crossing a mole or a
 point), not each leg nudged.
+
+### 2026-11-14, 05:05: the open edges' cause, ruled (M1)
+
+The cause, found acting today: `tide._open_edges` opens a block's edge wherever any charted
+box lies beyond it, water or land (11 of today's 38 open edges mostly over land; the fill
+raise inherits it). **Ruled by the lead: M1**, its own engine step in 112 after step 2 and
+before step 3: the tool writes each block's open stretches (where the chart answers water just
+beyond) into the manifest, the tide and the fill raise read them, a manifest without the key
+reads as today. Measured first: (a) the fill raise's cells of committed tiles, (b) every
+passage, digest, truth and kept save in a scratch tree; the 21 points old beside new;
+package 94's Concarneau case closed; a truth at the cause's level; the other box-as-water
+readers listed for the cold review. M2 (boxes off the land) not taken.
