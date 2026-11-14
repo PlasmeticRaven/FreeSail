@@ -619,3 +619,17 @@ reads as today. Measured first: (a) the fill raise's cells of committed tiles, (
 passage, digest, truth and kept save in a scratch tree; the 21 points old beside new;
 package 94's Concarneau case closed; a truth at the cause's level; the other box-as-water
 readers listed for the cold review. M2 (boxes off the land) not taken.
+
+### 2026-11-14, 05:25: M1 built in scratch; a drift found in channel-mid
+
+M1 in a scratch tree: `open_edges:` written by the tool (39 stretches), the tide reading it,
+the 21 points exactly; truths 7-571 (no open stretch faces land) and 7-572 (an old manifest
+reads as before). The rebuild of biscay-north and channel-mid against a CONTROL (the same
+rebuild by step 2's code from the same cache) separates M1's 7 tiles (land heights; one
+cell beside water at the Seine bay) from a DRIFT already there: channel-mid's column from
+1.23 W (Spithead to Selsey) does not rebuild to itself, 4 tiles' arrays and the coast, a
+shore moved: likely package 94's Solent tide region, whose raise the tiles were never
+rebuilt on. Ruled by this session: commit only tiles whose arrays change. Held for the lead:
+(b) on M1's tiles alone and on M1 plus the drift; the drift's general cause (a tide rule
+moving the raise with nothing to notice) and a check at it (each region's raise grid hashed
+at build, recomputed by a test).
