@@ -1745,9 +1745,10 @@ def test_a_frigate_whose_commander_is_struck_or_gone_from_the_sea_is_alone_again
     to her commander's book only while that commander could support her (the one answer since the
     lead's readings of cda12ec9, (F4): `relations.still`, `SUPPORT`: on the sea, not `done`, not
     struck, nobody's prize, within the miles her set keeps a member; `tests/test_relations.py`),
-    since nothing clears `under_orders_of` when the commander goes. The frigate under her consort's orders and in no set (above): her consort struck, or
-    gone from the sea, she is alone again, and the rank-4 rule is hers: she evades the 74 as a lone
-    frigate does, and never engages her. OLD BESIDE NEW: at 65b757b9 she was never alone again,
+    since nothing clears `under_orders_of` when the commander goes. The frigate under her
+    consort's orders and in no set (above): her consort struck, or gone from the sea, she is alone
+    again, and the rank-4 rule is hers: she evades the 74 as a lone frigate does, and never engages
+    her. OLD BESIDE NEW: at 65b757b9 she was never alone again,
     and stood on by her own book against the ship of the line."""
     world = _hove_to_off_the_lizard(SEVENTY_FOUR)
     v, consort = _under_her_consorts_orders(world)

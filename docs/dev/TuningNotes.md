@@ -21199,6 +21199,292 @@ the captain's trials, `TRIAL_TRADE_STRANGER_DIGEST`, truth 77's digest and the g
 at the base), so there is nothing for the lead to re-pin by it; what moved is the behaviour named
 above and the pins of this subsection's own tests.
 
+### The lead's readings of cda12ec9: the far fight (2026-11-14)
+
+The lead's note of 2026-11-14 at 05:10 UTC (nudge number 7: "cda12ec9 is NOT merged; the two
+readings, and what is owed"), its far fight's items (F1) to (F6) and the far fight's part of (C7),
+built with the owner's word on mends of the same morning (the lead's note of 05:20, nudge number
+8: "as long as we make sure to plan our fixes for them so as to build for generality rather than
+fixing the symptom"), ruling 17 (the made-out rule, 53c14457) beneath them. Built in local commits
+on the builder's branch `m-far` from 53c14457, beside the crew's and the evolutions' builders, for
+the integrator to bring to the package's branch as one hash with Phase 5. Measured on the owner's
+machine at seed 7 by the scripts in the session's scratch (`p5/mf/probe/`), outside the
+repository, each run on the branch and on 53c14457's code (the worktree's `freesail/` checked out
+at 53c14457 and back, nothing else differing).
+
+**(F1) The reply at a cap of nought: out, as ruled.** `combat/far_action.py` `_fallback_reply`
+is as it was before 2d2bbd8b (`if cap <= 0 or len(crewed(root)) < cap: return`): at a crewed cap
+of nought a far ship engaging the player's ship does not reply, and under a full cap the
+fallback of the lead's ruling 4 is as it was. Its cap-nought test is taken out with it, and in
+its place `test_at_a_cap_of_nought_a_far_ship_engaging_the_players_ship_does_not_reply` (slow)
+pins the ruled state in the 64's world: the French 74 engaging the 64 from tick 360, no
+`action.far_reply` and nothing counted in the half hour after. On 53c14457 it fails (her
+broadsides at 360 and 540). **For package 77, one mend:** a far body that fires on the player
+and one that can be hurt by him go in together: her reply by the tables at any cap, and the
+player's shot into her (`hits._far_hit`'s count into `damage["hits"]`, which nothing reads)
+carried into her far record, her morale and her strike (`far._judge`), so that the fight is
+two-sided and ends; with it, the cap-nought test of 2d2bbd8b's form (the reply asserted, and the
+hurt beside it). The words of the line (`action.far_reply`) are unchanged.
+
+**(F2) to (F5): the cause, named.** Each of the four is a relation held from one minute to the
+next after the thing it stood on is gone: a ship holds another as her mark, as a struck enemy she
+closes to take, as her own prize, as her commander or a consort of her set, and the relation was
+set when the thing was so. Each reader asked of it only the part it was written for: `_pairs` the
+mark on the sea and not struck (so the prize cut out that minute was fired into, F3);
+`_prize_taken` the struck mark his own prize (so a mark another took kept the second captor in
+`taking possession` for good, F2); `_alone` whether a set holds her at all and whether her
+commander is on the sea (so a captor's company of her prizes, a set of members gone, a commander
+two hundred miles off and a struck player all held her never alone, F4); the signal's `state`
+none at all (so "engage the enemy" sent her engaging nobody, F5). **The mend is one answer where
+the cause lives:** `freesail/world/relations.py`, `still(world, holder, other, what)`, "is she
+still what I hold her to be", asked in every place a relation is held, for both bodies (the far
+brain, the rules captain and the judgement they share) and for the world's own rules that hold
+one (the far rounds, the possession, the cover, the rising):
+
+| Relation (`what`) | Still so while she is | Asked by |
+|---|---|---|
+| `MARK`, an enemy she fights | on the sea, not struck, nobody's prize (a prize is taken back by coming up alongside, `squadrons.far_captures`, never fought), and an enemy to her by what she knows (`Judgement._known_enemy`: the shot, the pirate's act, the private signal, the hail, a prize of her own nation), else by the colours she shows now; none shown and nothing known, as she was held | `far_action._pairs` (every far round's mark); the far brain's `_may_fight` (a new hook of `Judgement._enemy_within`, so that `enemy in range` and `enemy out of range` agree with the rounds), `_engaging_mark` and `_take_mark` |
+| `STRUCK`, a struck enemy she closes to take | on the sea, struck, nobody's prize yet, and struck to her, or to no one known, or to one no longer there to take her (`damage["struck_to"]`, new, written by the far rounds' strike) | `Judgement._prize_taken` (the books' one row out of `taking possession`: `{on: prize taken, to: on passage}`), the far brain's and the rules captain's `_enemy_struck`, the rules captain's `_take_possession`, `prizes.far_minute` |
+| `PRIZE`, her own prize | on the sea, a prize neither retaken nor restored, her record's captor hers | `Judgement._prize_taken`, `prizes.prizes_of` |
+| `SUPPORT`, one who could support her | on the sea, not struck, nobody's prize, and within the miles given, by default the distance at which her set still holds a member (`in_company_nm`, below) | `Judgement._alone` (her commander, and the members of her set but herself and its prizes), `squadrons._covered` (within `COVER_NM`), `prizes._captor_near` (within `COVER_NM`) |
+
+`captains._commander_on_the_sea` is gone into it (its one reader was `_alone`), and the far brain's
+`_on_the_sea` with it (its one reader was `_take_mark`). No new attribute of any class: the one
+new datum is the far record's key `struck_to` (a dict that pickles already), so a checkpoint from
+before loads as it was, a ship struck before it carrying no taker named (anyone may take her, as
+before).
+
+**The distance (F4), chosen: the set's `lost_nm`.** The sets keep three: `straggler_nm` (a member
+out of her station, still of the set), `lost_nm` ("lost to the set: she sails for the destination
+alone", `Squadron._lost`) and `separated_nm` (she makes for the rendezvous). The one that is the
+line between in company and alone is `lost_nm`, so a ship is supported only by one within her
+set's `lost_nm`: the squadron book's eight miles ("beyond a frigate's flags with the glass"), the
+convoy's six, the blockade's twelve; for a ship under the orders of another in no set, the
+squadron book's eight (a set of the default kind's, `Squadron(...).lost_nm`). By the truth's
+distance, as the sets measure their own.
+
+**Each item a case of the one answer, old beside new (seed 7):**
+
+| Item | World (seed 7, the cap nought; `p5/mf/probe/`) | 53c14457 | The branch |
+|---|---|---|---|
+| (F2) | Two French 74s bound for Brest a third of a mile apart and the British Hero bound for Falmouth a mile east, twelve miles south of the frigate hove to (`f2.py`, to tick 7,200) | the Foudroyant engaging at 120, the Tonnant at 300; the Hero struck at 840; both `taking possession` at 900; the Foudroyant took her and was on passage at 960; the Tonnant `taking possession` to the end, her leg `("chase", the Hero, 740.8)`, her passage held, 0.65 miles from the other's prize at 7,200 | the Hero struck in the Tonnant's round at 840 (`struck_to` the Tonnant); the Foudroyant never closes her: her mark no mark, she lies to and is on passage at 1,500 (`enemy out of range`, ten minutes) with the passage she held; the Tonnant `taking possession` at 900, takes her that minute and is on passage at 960 with hers; at 7,200 both on passage, the prize in company 0.31 miles from the Tonnant |
+| (F2), no taker named | the same, the strike's taker taken out (the test's two cases); and the prize then gone | as above | both `taking possession` at 900; the first at hailing distance takes her, the other gives her up at her next judgement and is on passage with her passage; the prize gone, the same |
+| (F3) | The British frigate Amethyst bound for Falmouth and a French merchant brig bound for Brest a third of a mile east of her (`f3.py`, to 21,600) | the brig cut out at 120 and, that minute, fired into by the frigate still `engaging` her (`_pairs`): five killed, eleven wounded, four holes, a gun and a spar; her brain "struck" again, lying to; the frigate `taking possession` at 180 and on passage at 240; 0.77 miles apart at 600, 1.88 at 1,200, 6.39 at 3,600 | no round, the prize unhurt and `in company` on her station leg from 180; the frigate lies to beside her (her mark her own prize: `engaging` with none) and is on passage at 780; 0.32 miles apart at 600, 0.39 at 1,200, 0.32 at 3,600, 0.30 to 0.31 from 4,200 to 21,600. With the round alone mended (the set's pace leaving its prizes out): 0.74 at 3,600, 3.14 at 21,600 |
+| (F3), the captor's passage | Truth 7-231's two 74s, three hours from the possession at 1,260 (`captor.py 231`) | the Foudroyant at 7.05 knots, the Hero falling astern from 0.14 to 1.12 miles; latitude 48.918 N at 12,060 | the set's pace, 6.43 to 6.44 knots (nine tenths of her prize's best), the Hero 0.14 to 0.31 miles; 48.948 N at 12,060 |
+| | The review's world of the French 74 and the British frigate a mile apart (`farfrig.py`'s; `captor.py frig`), the frigate taken at 6,240 | 6.95 to 6.99 knots, the prize 0.33 to 0.84 miles over the three hours | 6.58 to 6.62 knots, the prize 0.31 to 0.69 miles (0.31 from 11,640) |
+| (F4) | The cut-out's world, the captor after her prize (`f4.py`) | `_alone` false, and false with the prize gone from the sea and out of the set; a French 74 put three miles north of her: she engaged her, struck and was taken | `_alone` true throughout; she evades the 74 |
+| (F4), the commander | A frigate under the orders of another 200 miles south of her; under the player's ship five miles off; the player then struck | not alone, not alone, not alone | alone, not alone, alone |
+| (F5) | Two British frigates half a mile apart, the second under the first's orders, no enemy in sight (`f5.py`) | "engage the enemy": `engaging` at 300 with no mark, lying to, on passage at 960; "general chase" (her commander and the player's ship spoken): `chasing` at 300 with no stranger and an empty plan to the end of the half hour | on passage throughout, her story "By the Amethyst's signal: engage the enemy; no enemy within reach, she holds on as she was." and "By the Amethyst's signal: general chase; no sail in sight, she holds on as she was." |
+
+**Where else the same cause was looked for, and what was found.**
+
+- **The far brain's other holdings of a mark.** `investigating a stranger` and `chasing` keep the
+  stranger in hand while she is in sight and take the nearest again when she is not (`_work`); a
+  chase whose mark strikes to another is no longer taken into `taking possession` (`_enemy_struck`
+  asks `STRUCK`), and a chase of a ship become a prize of her own side ends when she is spoken
+  within hail: found sound, unchanged. `evading` chooses the enemy it runs from afresh each minute
+  and holds nothing. Package 74's road into an action (engaging from a detour) keeps the mark it
+  entered with and is not asked each minute (the lead's ruling 14 keeps that road): its ways out
+  now ask the one answer (`enemy out of range` through `_may_fight`, `enemy struck` through
+  `STRUCK`), so a mark there struck to another, taken or of her own side ends her action ten
+  minutes on, as a mark lost does; a mark there gone from the sea is (F6) (2). The fold-in and the
+  fold-back carry the mark as an id, asked at the next judgement: unchanged.
+- **The rules captain (`captains.Captain`).** `_take_possession` and `_enemy_struck` ask `STRUCK`
+  (above), so the near body's second captor gives up another's prize as the far body's does (the
+  same hole: her `_take_possession` entered `on passage` for a mark gone or rehoisted but not for
+  one another had taken). His `_mark` (the battery's target while in sight) is not asked: the near
+  action drops a struck target from the fire at the strike (`combat/action.py` `_watch_struck`),
+  and his action ends by `enemy out of range` when the mark becomes a prize of his side; the near
+  fight is package 70's road and is left, said here.
+- **The judgement's stimuli that judge a sail afresh each minute.** `overmatched` and `man of war
+  near` (`_overmatched`, `_man_of_war_within`) leave out a struck ship but count a prize under the
+  enemy's prize crew as a superior force or a man of war (a captured 74 under twenty men makes a
+  lone frigate haul off); they hold no relation, and the change moves the evading road: found, not
+  mended, for the lead's list.
+- **The sets (`squadrons.py`).** The set's pace left its prizes out (`pace_cap_kn`), so a prize "in
+  company" slower than her captor fell astern without end, never lost (prizes are not): mended
+  with (F3), the prize on her station leg a member of the pace. A member gone from the sea's list
+  is never let go (`Squadron.minute` skips a member with no body), so she stays among the members,
+  her slot kept in the line and the stations laid about her place; `_alone` no longer counts her,
+  and the set's own readers (the slots, the order of sailing, the succession) are package 72's:
+  found, not mended, for the lead. A commander struck and not yet taken keeps her members on
+  station about her until `possess` moves the command (`Squadron.leave`): a set in action is its
+  book's, left. The cover of a yielding ship (`_covered`) counted a man of war of her nation struck,
+  a prize of her nation's (a man of war's hull under a prize crew) and the player's King's ship
+  struck: mended, `SUPPORT` within `COVER_NM`. The cut-out's captor (`_armed_enemy_alongside`) is
+  the world's rule of capture, which must take a prize (her retaking is that road): unchanged.
+- **The signals.** `signalling._obey` entered a signalled state that holds a mark with none for it:
+  mended, (F5), for the chase and the look as for the action. `signals.commanded_by` (whose hoists
+  she obeys) reads the relation for a hoist seen, and a commander struck or taken makes none by her
+  book: unchanged.
+- **The prizes.** `_captor_near` (whether a far prize's prisoners may rise) counted a ship of the
+  captor's nation struck, and another prize of hers: mended, `SUPPORT` within `COVER_NM`.
+  `prizes_of` was right and asks `PRIZE` now, so that it and the stimulus read one rule. `retake`'s
+  recaptor sails on at once (package 74's own mend of this family for one case): it agrees with the
+  one answer (the ship retaken is of his side), and stays.
+
+**(F6), for the lead's list, not mended.** (1) The unseen mark chased by her true position: on the
+plan-state road a far ship in `engaging` keeps her mark in hand out of sight (`_take_mark`, the
+lead's ruling (2) of 2026-11-13) and her chase leg steers for the mark's truth
+(`Vessel._target_of`), so that she follows a ship no lookout of hers can see until `enemy out of
+range` ends the action ten minutes on; a chase by the last bearing or the reckoning of the mark
+is the honest form. (2) Package 74's chaser who is `done` when her mark is done: a chase leg whose
+mark leaves the sea is dropped by the body and, her plan empty, `Vessel.tick` marks her done, so a
+privateer whose chase makes port leaves the sea with her (and package 74's engaging road, whose
+mark is not asked each minute by the lead's ruling 14, does the same when her mark is gone in the
+minute the bodies move); the body should hold her plan (lie to, or her saved plan) where a leg's
+mark is gone, which moves package 74's road.
+
+**The tests (C7's far fight part).** In `tests/test_far_action.py`: (F2)
+`test_the_second_of_two_ships_on_one_mark_gives_it_up_and_takes_her_passage_again` (three cases:
+struck to the other, struck to nobody known, taken and gone; slow); (F3)
+`test_no_round_at_a_prize_and_the_captor_and_her_prize_keep_company` (slow) and
+`test_the_rounds_choose_no_prize_no_struck_ship_and_none_of_her_own_side` (`_pairs`' own level);
+(F4) `test_a_captor_is_alone_after_her_prize_and_hauls_off_from_a_ship_of_the_line` (slow); (F5)
+`test_a_signal_to_engage_or_chase_with_nobody_for_it_leaves_her_as_she_was_said` (two cases) and
+`test_a_signal_to_engage_with_an_enemy_within_reach_takes_her_into_the_action`; the save
+`test_a_save_in_mid_engagement_loads_and_the_action_finishes_as_it_would_have` (slow: truth
+7-231's two 74s written at tick 600 by the checkpoint's own road, `replay.checkpoint_bytes` and its
+`_Unpickler`, both engaging and rounds fought; loaded and run to 1500 beside the world never
+saved, minute for minute the same states, plans and far records, the strike at 1200, the
+possession at 1260 and the passage taken up at 1320); and (F1) the cap of nought above. New,
+`tests/test_relations.py`, the cause's level: each relation and each way it stops being so (a
+mark struck, taken by anybody, gone, a friend by the hail, under her own side's colours, and one
+who fired on her an enemy under any; a struck ship struck to another who is there or gone, taken,
+her colours up; a prize retaken; a supporter struck, taken, gone, beyond each book's distance; the
+player's ship struck with her shadow made and not), and `_alone` for both bodies on a captor's
+company of her prize, a set whose member is gone, struck or out of company, a commander two
+hundred miles off, struck or taken, and the player's ship as commander, within eight miles and
+struck.
+
+**Able to fail.** Every new test was run on 53c14457's code (the worktree's `freesail/` checked out
+at 53c14457, the new tests beside it; `p5/mf/old/newtests-on-old.xml`): twelve fail there, as they
+should: the cap of nought (her broadside at 360), the second captor's three (struck to the other
+for want of a taker named; the other two with the Tonnant `taking possession` at 960), the cut-out
+(the prize's five killed and eleven wounded), `_pairs`' own level (a pair made at a struck mark),
+the captor alone (`_alone` false), the two signals (`engaging` and `chasing` at 300) and the three
+`_alone` tests of `tests/test_relations.py` (false in each). Ten pass both ways, by what they are:
+the signal with an enemy within reach (the control), the save in mid-engagement (what (C7) asked
+was the test: the road held already), the seven tests of `relations.still` itself (the module is
+new, with no old answer to fail) and `tests/test_bellerophon.py`'s commander struck or gone (its
+docstring alone changed).
+
+**Truth 7-196 (C7): its docstring, chosen.** "Truth 7-196 can fail only if friends fire on
+friends: say in the truth's own words what it proves, or give it an enemy in sight who is not
+engaged." Its docstring now says it (`tests/test_bellerophon.py`): every ship of its world is
+British and of one squadron and no enemy is put in it, so "no line of an action" proves that
+three crewed King's ships under her orders, in her set, neither challenge her nor one another
+into an action over the measure, and nothing of how a crewed 74 meets an enemy, which the far
+fight's truths try. The docstring was chosen, not the enemy, because the truth is a pace truth
+whose world was settled by measurement (the lead's ruling (1) of 2026-11-13) and an enemy in
+sight would change what it times; it was not run here (no pace test is this builder's to run).
+
+**The cost of the one answer** (a scratch timing, not a pace test: `timing.py`, the best of three
+1,800-tick runs, nothing else running): the three 74s' world in action 469 ticks a second on
+53c14457's code, 463 and 462 on the branch's (about one per cent: `MARK` asked of each enemy within
+reach each minute); `data/scenarios/convoy-six.yaml`'s far sea 244 there, 242 and 244 here. No pace
+test was run.
+
+**Moved, old beside new.** Pins: `tests/test_far_action.py`'s
+`test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought` (2d2bbd8b: replies
+at [360, 540], "The Foe fires her broadside at us from 9 cables: none of her 63 shot strike us.",
+two counted) is out, and in its place the cap of nought's no reply (none in the half hour, none
+counted), as ruled; `tests/test_bellerophon.py`, two docstrings (truth 7-196's, the commander
+struck or gone's), no assertion. No other test's assertion moved: against the bases no outcome
+changed (below). **No recorded passage, digest, line count or tick moved:** the four whole logs,
+the captain's trials' three digests and the generator as at cda12ec9's bases (below). The far
+record gains a key, `struck_to`. A scratch world's own log digest moves where its captor now
+sails at her set's pace (truth 7-231's world three hours on: 63f85e40ff992cd4 to 6adbc1c2830b5e89,
+24 lines both ways; the review's 74-and-frigate world b1e8e55d4878d245 to eb82f3bc1a5bd851, 49
+lines), which no test pins.
+
+**What any ship may say that this changes:**
+
+- (F1) At a crewed cap of nought (`tender.yaml`, the drivers' `--crewed-cap 0`), a far ship
+  engaging the player's ship no longer fires on her: `action.far_reply` ("The Foe fires her
+  broadside at us from 9 cables: ...") and the `action.hit` lines, wounds and damage that followed
+  from it are not said there, as before 2d2bbd8b; under a full cap, as before.
+- (F2) The second of two ships on one mark is no longer `taking possession` of another's prize
+  for good: a mark struck to another is not closed by her at all, and a mark taken by another or
+  gone is given up at her next judgement; she sails her passage again, and the far story, the
+  lookout's sightings of her and her arrival where she was bound follow it. Which of the two
+  possesses may change where a taker is named: the one the mark struck to (in the three 74s'
+  world the Tonnant where it was the Foudroyant).
+- (F3) No far round is fought at a prize, a struck ship or a ship of her own side: the prize's
+  "a round of the action with the ..." in her story, her "struck to the ..." line, a hull's
+  `action.far_round` and `action.struck` lines for such a round, and the guns heard
+  (`action.guns_heard`) for it are not said; a far ship no longer goes engaging a prize or a
+  ship showing her own nation's colours (a prize of the enemy is retaken by the chase's road, as
+  `far_captures` has it). The captor's prize keeps her station in company, and a far captor with a
+  slower prize sails at the set's pace (nine tenths of the prize's best): her passage slower and
+  her arrival later, her prize's sightings with her.
+- (F4) A captor after her first prize, a ship whose commander is beyond her set's `lost_nm`,
+  struck, taken or gone, or under the orders of the player's ship struck, is alone: the rank-4
+  rule's "By the captain, evading: shaping a course for ... (hauling off from a seventy-four, ...)"
+  is said where her own book's lines were (for the far body, her states and story).
+- (F5) A far or crewed ship signalled to engage with no enemy within her breaking-off distance,
+  or to chase or look with no sail in sight, holds on as she was: new, in her far story or, for a
+  crewed captain, her log (`captain.signal`): "By the X's signal: engage the enemy; no enemy
+  within reach, she holds on as she was." and "...; no sail in sight, she holds on as she was.",
+  where she was engaging nobody ("By ...'s signal: engage the enemy.") and on passage ten minutes
+  on, or chasing nobody.
+- The cover and the rising: a yielding ship whose only cover was a man of war of her nation
+  struck, a prize, or the player's King's ship struck, is cut out where she was not
+  (`squadron.cut_out`); a far prize whose only ship of her captor's nation near was another prize
+  or a struck ship may rise where she did not (`prize.retaken`).
+- The lines of a signal obeyed name the ship signalling where they said her id: "By ship-1's
+  signal: engage the enemy." is "By the Amethyst's signal: engage the enemy.", "Released from
+  ship-1's orders by signal: ..." is "Released from the Amethyst's orders by signal: ...", and an
+  order given by signal says "the signal from the Amethyst: ..." in its reason; the player's ship
+  is "the ship" as before.
+
+**The suites, as run** (from the worktree's root with `py`, the tree asserted first, each pytest
+with `-n 2 -p no:cacheprovider -o addopts="--dist loadgroup"`, no whole tier and no pace test;
+against the bases at cda12ec9, not run again: `mrg/final-fast.xml`, `mrg/final-slow.xml`,
+`mrg/trials.xml`, `mrg/digests.json`):
+- **The files touched and those that exercise the relations**, with the slow (`--slow -m "not
+  pace"`; `p5/mf/run/new.xml`, 47 minutes): `test_far_action`, `test_relations`,
+  `test_bellerophon`, `test_prizes`, `test_prize_scenarios`, `test_squadrons`, `test_captive`,
+  `test_court`, `test_brains`, `test_signals`, `test_captains`, `test_crews`, and the 85 known
+  truths whose bodies name the prizes, the far fight, the sets, the signals to chase or engage,
+  the strike or the rank-4 rule (`p5/mf/run/truth_ids.txt`): **422: 420 passed, 2 failed**, both
+  failures the bases' with the same figures (the merchant's constants [16200, 96480] for 96540; the
+  schooner on an intent's 110,400 for 110,340). **Against both bases no outcome changed**; only in
+  this run, the 21 new (eleven of `test_far_action`, ten of `test_relations`), all passed; only in
+  the base, 2d2bbd8b's cap-nought test, taken out.
+- After that run, the obey's lines named the ship signalling (the last change before the commit):
+  `test_signals`, `test_squadrons`, the two signal tests and the 14 known truths of the signals,
+  the chases, the convoys and the sets again (`p5/mf/run/sig.xml`): 63 passed and truth 7-147
+  failed on its pinned "heaving to (the signal from the ship: ...", the player's ship being named
+  by her name; mended (the player's ship is "the ship", her people's word, as before) and passed.
+- **The captain's trials** (`--slow`; `p5/mf/run/trials.xml`): 5 passed, 3 failed, as at the base
+  outcome for outcome and digest for digest (the station's gale 1e59009004141b08, the trade's thick
+  weather 41a37f0290be291a, the trade's stranger 13432e4b2659bcaf).
+- **The four whole logs** (`log_digests.py`; `p5/mf/run/digests.json`): every field as at the base
+  (the first action 497 lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the
+  station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08).
+- **The generator** into scratch: eighteen of eighteen files byte for byte;
+  `tools/check_viewer_guns.py` clean.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (387 files);
+  every changed file LF with a final newline.
+
+**For the lead:** (1) Package 77's one mend, (F1) above. (2) (F6)'s two, above. (3) Found and not
+mended, each said under "where else": the stimuli `overmatched` and `man of war near` count a prize
+under the enemy's prize crew; a member gone from the sea's list is never let go by her set; the
+rules captain's `_mark` (the battery's target) is not asked. (4) JUDGEMENT, the distance of
+`SUPPORT`: the set's `lost_nm` (the line between in company and alone the sets already keep), the
+squadron book's eight miles for a ship under orders in no set; `straggler_nm` (a mile) would leave a
+straggler alone, and `separated_nm` would count a ship her set has already lost. (5) JUDGEMENT,
+(F3)'s second half: the set's pace counts its prizes, so a far captor with a slower prize in company
+sails at nine tenths of her prize's best (the set's rule for any member), which moves package 72's
+and 74's roads for every such captor; the other way, the pace as it was and the prize astern half a
+mile an hour without end, does not keep company as the records say. (6) JUDGEMENT, `MARK` with no
+colours shown and nothing known: held as she was (no news is no change), so that a mark that hauls
+her colours down without striking is still fought. (7) Found on the way and mended: the lines of
+`signalling._obey` said the signalling ship's id ("By ship-1's signal: engage the enemy.", a crewed
+captain's `captain.signal` line being served, and the reason of an order given by signal); they say
+her name now ("By the Amethyst's signal: ..."), the player's ship "the ship" as before.
+
 ## The lead's ruling 10, one road (package 75) (2026-11-13)
 
 The lead's note of 2026-11-13 at 04:11 UTC (`docs/dev/M7-WorkPackages.md`, at its end), ruling
