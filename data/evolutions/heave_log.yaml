@@ -14,7 +14,6 @@
 # `ship`, so the mate at the log does not hold her against a tack or a wear.
 id: heave_log
 verb: heave_log
-doing: heaving the log
 applies_to: {class: ship}
 params: {automatic: false}
 preconditions: []

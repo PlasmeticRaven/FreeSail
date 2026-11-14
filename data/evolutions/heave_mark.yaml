@@ -12,7 +12,6 @@
 # at the quarter never hold her against a tack or a wear.
 id: heave_mark
 verb: heave_mark
-doing: heaving a mark
 applies_to: {class: ship}
 script: heave_mark
 preconditions: []

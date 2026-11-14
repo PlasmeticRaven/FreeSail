@@ -11,7 +11,6 @@
 # (judgement). Phases: thrum (on deck), haul_under (on deck, the ropes passed under her).
 id: fother_sail
 verb: fother
-doing: fothering a sail over the leak
 applies_to: {class: ship}
 script: fother_sail
 preconditions: []

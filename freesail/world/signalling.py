@@ -297,15 +297,14 @@ def _obey(cap: Any, locker: S.Locker, h: S.Hoist, sender: str, tick: int, near: 
     """A commanded captain performs the hoist's `does`."""
     does = h.does or {}
     locker.obeyed[h.key] = tick
-    by = _sender_words(cap, sender)  # her people's words for the ship signalling, not her id
-    why = f"the signal from {by}: {h.meaning}"
+    why = f"the signal from {sender}: {h.meaning}"
     if does.get("release"):
         vessel = getattr(cap, "vessel", None)
         if vessel is not None:
             vessel.under_orders_of = ""
         else:
             cap.world.under_orders_of = ""
-        _say(cap, tick, f"Released from {by}'s orders by signal: she proceeds on her own.")
+        _say(cap, tick, f"Released from {sender}'s orders by signal: she proceeds on her own.")
         return
     if does.get("closer"):
         cap._business["closer"] = True
@@ -313,38 +312,23 @@ def _obey(cap: Any, locker: S.Locker, h: S.Hoist, sender: str, tick: int, near: 
         return
     state = does.get("state")
     if state:
-        near_s = None
         if state in ("chasing", "investigating a stranger"):
             near_s = (
                 cap._nearest_stranger(_perceive(cap)) if hasattr(cap, "_nearest_stranger") else None
             )
             if near_s is not None:
                 cap._stranger = near_s.get("id")
-        if getattr(cap, "state", None) == state or state not in (
+        if getattr(cap, "state", None) != state and state in (
             "chasing",
             "investigating a stranger",
             "on passage",
             "engaging",
         ):
-            return
-        # a state that holds a mark is entered only with one for it (the lead's readings of
-        # cda12ec9, (F5)): the sail nearest for a chase or a look, an enemy within the breaking-
-        # off distance by her own judgement for the action (`_enemy_within`, the one answer's
-        # `MARK` on the far body); with none she holds on as she was, and says so, where she went
-        # engaging nobody, lay to ten minutes and rejoined (or chased nobody and left the sea)
-        meaning = h.meaning.lower()
-        if state in ("chasing", "investigating a stranger") and near_s is None:
-            _say(cap, tick, f"By {by}'s signal: {meaning}; no sail in sight, {AS_SHE_WAS}.")
-            return
-        if state == "engaging" and _no_enemy_within_reach(cap):
-            words = f"By {by}'s signal: {meaning}; no enemy within reach, {AS_SHE_WAS}."
-            _say(cap, tick, words)
-            return
-        try:
-            cap._enter(state)
-        except Exception:  # noqa: BLE001
-            return
-        _say(cap, tick, f"By {by}'s signal: {meaning}.")
+            try:
+                cap._enter(state)
+            except Exception:  # noqa: BLE001
+                return
+            _say(cap, tick, f"By {sender}'s signal: {h.meaning.lower()}.")
         return
     order = S.order_of(h)
     if not order:
@@ -358,41 +342,7 @@ def _obey(cap: Any, locker: S.Locker, h: S.Hoist, sender: str, tick: int, near: 
     vessel = cap.vessel
     done = S.far_perform(_root_world(cap), vessel, order)
     if done:
-        _story(vessel, tick, f"by {by}'s signal ({h.meaning.lower()}): {done}")
-
-
-AS_SHE_WAS = "she holds on as she was"
-
-
-def _sender_words(cap: Any, sender: str) -> str:
-    """The ship whose signal she obeys, by her name as her people say it ("the Amethyst"),
-    where the lines of `_obey` said her id ("By ship-1's signal": found with the lead's readings
-    of cda12ec9, (F5), a crewed captain's `captain.signal` line being served); the player's ship
-    "the ship" as before (her id is her people's word for her); "the commander" for a ship the
-    sea no longer has."""
-    from freesail.world.ships import PLAYER_ID
-
-    if sender == PLAYER_ID:
-        return PLAYER_ID
-    root = _root_world(cap)
-    sea = getattr(root, "vessels", None)
-    v = sea.get(sender) if sea is not None and hasattr(sea, "get") else None
-    name = str(getattr(v, "name", "") or "") if v is not None else ""
-    if not name:
-        return "the commander"
-    return name if name.lower().startswith("the ") else f"the {name}"
-
-
-def _no_enemy_within_reach(cap: Any) -> bool:
-    """Whether no enemy is within her breaking-off distance by her own judgement (the action's
-    reach: the `enemy out of range` stimulus's), so that the signal to engage has nobody for her
-    to engage (the lead's readings of cda12ec9, (F5))."""
-    finder = getattr(cap, "_enemy_within", None)
-    if finder is None:
-        return False
-    d = getattr(cap, "doctrine", None)
-    reach = float(d.threshold("break_off_nm", 2.0)) if d is not None else 2.0
-    return finder(_perceive(cap), reach) is None
+        _story(vessel, tick, f"by {sender}'s signal ({h.meaning.lower()}): {done}")
 
 
 def _perceive(cap: Any) -> Any:

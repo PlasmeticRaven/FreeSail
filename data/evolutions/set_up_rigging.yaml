@@ -8,7 +8,6 @@
 # (`crew.stores.cordage_fathoms`) and stands sound at the file's rating.
 id: set_up_rigging
 verb: set_up
-doing: setting up the rigging
 applies_to: {class: ship}
 script: set_up_rigging
 params: {line_words: "", aloft: [shroud, backstay, stay]}

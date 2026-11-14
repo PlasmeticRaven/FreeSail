@@ -8,7 +8,6 @@
 # Sails on spars that are sent down or carried away are left as they are.
 id: furl_all
 verb: furl_all
-doing: furling all sail
 applies_to: {class: ship}
 script: furl_all
 params: {aloft: [furl]}

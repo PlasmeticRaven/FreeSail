@@ -16,7 +16,6 @@
 # the ship against a manoeuvre.
 id: heave_lead
 verb: heave_lead
-doing: heaving the lead
 applies_to: {class: ship}
 params: {deep: false}
 preconditions: []

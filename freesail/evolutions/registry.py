@@ -10,12 +10,6 @@ The file shape (spec §8.4, with the additions the runner needs)::
 
     id: set_square                 # the evolution's id; the file name must match
     verb: set                      # the order verb it answers (for the vocabulary)
-    doing: laying out the kedge    # optional: the work in hand in the log's words where the
-                                   # verb's alone would be an id with an ending ("laying out
-                                   # kedge"; the lead's (C8) of 2026-11-14, `Runner._doing`);
-                                   # for a part's work the words before the part's name
-                                   # ("doing: cutting away" gives "cutting away the main
-                                   # mast"; the whole-change review of 80e703c7, sailing-5)
     applies_to: {class: square}    # the subject's class: a sail or spar class, "sail" (any
                                    # sail), "yard", "spar" (any spar), "part" (a spar or a
                                    # sail: clearing a wreck, package 30b), or "ship"
@@ -146,12 +140,6 @@ class Evolution:
     # (a precondition fails): ``on_refused`` in the file, else ``on_fail``'s (package 37k:
     # a tack that could not begin was said in a missed stay's words)
     on_refused: Outcome | None = None
-    # the work in hand in the log's words (``doing:`` in the file; `Runner._doing`): for work whose
-    # subject is the ship its whole name, for a part's the words before the part's name; None, the
-    # verb's own gerund ("battening down", "tacking ship", "setting the fore topsail"). The runner
-    # reads it from the registry by the work's id, so that work pickled before it is named as the
-    # file names it now (the lead's (C8) of 2026-11-14; the whole-change review, engine-3)
-    doing: str | None = None
 
     @property
     def nominal_duration_s(self) -> float:
@@ -291,14 +279,6 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
             f"{where}: only an all-hands evolution belays the work in hand; "
             "its crew line must say hands: all."
         )
-    doing = data.get("doing")
-    if doing is not None and (not isinstance(doing, str) or not doing.strip()):
-        raise EvolutionFileError(f"{where}: doing must be the work's name in words, not {doing!r}.")
-    if doing is not None and str(applies_to.get("class")) != "ship" and " the " in f" {doing} ":
-        raise EvolutionFileError(
-            f"{where}: a part's work names the words before its part by 'doing' ('cutting away'), "
-            f"and the part is named after them; not {doing!r}."
-        )
     return Evolution(
         id=eid,
         verb=str(data.get("verb") or eid),
@@ -333,7 +313,6 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
             if data.get("on_refused")
             else None
         ),
-        doing=doing.strip() if doing is not None else None,
     )
 
 

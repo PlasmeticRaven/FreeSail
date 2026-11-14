@@ -12,7 +12,6 @@
 # an anchor dragging.
 id: back_anchor
 verb: back_anchor
-doing: backing the anchor
 applies_to: {class: ship}
 script: back_anchor
 params: {}

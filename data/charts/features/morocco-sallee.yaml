@@ -1,0 +1,191 @@
+# The features of Morocco's Atlantic coast (package 106b), morocco-sallee, as the period's
+# pilots give them, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Purdy 1825      John Purdy, Memoir ... to accompany the new chart of the Atlantic Ocean,
+#                   1825 (docs/references/pilots/purdy-1825-memoir-atlantic-ocean-ocr.txt),
+#                   'Tangier to Rabat' and 'Rabat to Mogodor', 'Mogodor to Cape Noon', pp. 152
+#                   to 157 (l. 22171 to 22620), cited by page; it quotes Jackson for Sallee.
+#   Jackson 1809    James Grey Jackson, An Account of the Empire of Marocco, 1809
+#                   (pilots/jackson-1809-account-empire-marocco-ocr.txt), ch. VII, the seaports
+#                   (l. 4055 to 5065), cited by line of the OCR (the pages are not printed in it).
+#
+# No light stood on this coast in 1805 by any source on file, and none is entered. Positions
+# are in the modern frame, first placed FROM MEMORY of the modern chart and the pilots'
+# bearings and distances, then checked against the region's tiles by channel-west.yaml's rule
+# (a headland, town, castle or tower to the nearest land within 800 m; a danger to the grid's
+# shoal head; an anchorage to water of the pilot's depth), each move in `fix`. Heights for the
+# horizon are the pilots' where they give one, else FROM MEMORY (UNVERIFIED). The grid closes
+# the rivers (the Lucos at Larache, the Seboo at Mamora, the Bu Regreg at Sallee): their mouths
+# read as land or under a metre, where the pilots let in vessels of 100 tons at high water (a
+# finding, noted in docs/dev/TuningNotes.md; the ports lie in their roads, as the pilots put
+# the ships).
+
+region: morocco-sallee
+features:
+  - id: sallee
+    kind: town
+    name: Sallee
+    modern: Salé
+    lat_deg: 34.0400
+    lon_deg: -6.8120
+    height_m: 20
+    source: "Purdy 1825, p. 153 (Jackson): the towns of Sla and Rabat divided by the river Bu Regreg; Sallee walled and protected by a battery of 24 pieces of cannon, which commands the entrance of the river; Jackson 1809, l. 4312 to 4326: in 34 2 N; under the town the subterraneous apartment where the Europeans were formerly confined; the height FROM MEMORY"
+    says: "Sallee, walled, on the north bank of the Bu Regreg, its battery of twenty-four guns commanding the river's mouth."
+  - id: rabat
+    kind: town
+    name: Rabat
+    lat_deg: 34.0250
+    lon_deg: -6.8350
+    height_m: 30
+    source: "Purdy 1825, p. 153: near the entrance of the river at Rabat the ruins of an old castle of the twelfth century, and batteries rebuilt in 1774; south of the castle a square fort about 2 miles in circuit enclosing the town, a palace and the mausoleum of the Emperor Sidi Mohammed; docks for ship-building both at Salee and Rabat; Jackson 1809, l. 4449: Rabat in 34 3 N; the height FROM MEMORY"
+    says: "Rabat on the south bank of the Bu Regreg, its old castle over the river's mouth and its long walls inland."
+  - id: tower-of-hassan
+    kind: tower
+    name: the Tower of Hassan
+    modern: the Hassan Tower, Rabat
+    lat_deg: 34.0240
+    lon_deg: -6.8230
+    height_m: 55
+    source: "Purdy 1825, p. 153: a remarkable old tower at Rabat, called the Tower of Hassan, the best sea-mark for this place; of hewn stone, 180 feet in height, 35 or 36 feet broad, seen in clear weather 6 or 7 leagues off; Jackson 1809, l. 4393: 180 feet; its height 55 m from the pilot's 180 feet, with the ground FROM MEMORY"
+    says: "The Tower of Hassan, a hundred and eighty feet of hewn stone, the best sea-mark for Sallee and Rabat, seen six or seven leagues off in clear weather."
+  - id: rabat-road
+    kind: road
+    name: the road of Sallee
+    lat_deg: 34.0450
+    lon_deg: -6.8600
+    height_m: 0
+    depth_fathoms: 14
+    bottom: "sand, foul with lost anchors"
+    source: "Jackson 1809, l. 4439 to 4449 (Purdy 1825, p. 153): the road of Salee is dangerous for shipping; the sand at the entrance will scarcely let a vessel of 100 tons into the river without danger; vessels may lie in safety out of the river near Rabat from April to September inclusive, but are not secure the rest of the year, the wind blowing from the southern quarter; the best anchorage between the mosque of Rabat and the old tower of Hassan; a great number of anchors lost in the road, much attention to the cables; the depth the grid's, JUDGEMENT"
+    says: "The road of Sallee, dangerous in winter with the southerly winds and foul with the anchors others have lost: lie here from April to September only, and mind your cables."
+    fix: "off the mouth between the town and the tower, in the grid's 26 m (14 fathoms), JUDGEMENT"
+  - id: bu-regreg-bar
+    kind: shoal
+    name: the bar of the Bu Regreg
+    lat_deg: 34.0367
+    lon_deg: -6.8400
+    height_m: 0
+    source: "Jackson 1809, l. 4305 to 4309 (Purdy 1825, p. 153): going thence to Mogodor a few years since, his vessel of about 150 tons struck three times on the bar; as the sand accumulates, in another century there will be a separation from the ocean at ebb tide; l. 4439 to 4441: scarcely a vessel of 100 tons may enter without danger"
+    says: "The bar of the Bu Regreg: a hundred-ton vessel crosses it with danger even at high water; a hundred and fifty tons strikes."
+    fix: "the grid's least water across the mouth, a metre or two; the river within is the grid's land (a finding)"
+  - id: fedala
+    kind: place
+    name: Fedala
+    modern: Mohammedia
+    lat_deg: 33.7128
+    lon_deg: -7.3868
+    height_m: 10
+    source: "Jackson 1809, l. 4489 to 4514: twenty-five miles south of El Monsoria a peninsula which forms an indifferent shelter to small vessels; the road, with the exception of Agadeer's, the only one where ships may ride at anchor in security in winter; the Emperor Sidi Mohammed, before he founded Mogodor, wished to build a city here and had corn shipped at it, and the place was abandoned soon after; Purdy 1825, p. 153: the land south of the peninsula projecting westward"
+    says: "Fedala's low peninsula, often taken for an island: with Agadeer the only road of this coast where a ship may ride in winter."
+    fix: "FROM MEMORY at sea in the grid (3 m); moved 300 m to the nearest land"
+  - id: fedala-road
+    kind: road
+    name: the road of Fedala
+    lat_deg: 33.7200
+    lon_deg: -7.3950
+    height_m: 0
+    depth_fathoms: 6
+    bottom: "sand"
+    source: "Jackson 1809, l. 4512 to 4514 (Purdy 1825, p. 153): the only road, with Agadeer's, where ships may ride in security in winter; Purdy p. 153: from the S.W. end of Fedala a rocky bank stretches about three miles to the west [W.S.W.], with 15 to 30 fathoms, rocky ground, 2 to 5 miles off; the depth the grid's and the bottom JUDGEMENT"
+    says: "Fedala road under the peninsula, sheltered in winter for small vessels; a rocky bank runs three miles west-north-west from its south-west end."
+    fix: "under the peninsula in the grid's 11 m (6 fathoms), JUDGEMENT"
+  - id: dar-el-beida
+    kind: place
+    name: Dar el Beida, or Anafee
+    modern: Casablanca, the old medina
+    lat_deg: 33.6050
+    lon_deg: -7.6200
+    height_m: 15
+    source: "Jackson 1809, l. 4518 to 4535: twelve miles south of Fedala, a town formerly Portugal's, now in ruins, several huts; formerly Anafa; the Emperor Sidi Mohammed received yearly for duties on corn shipped here five or six hundred thousand Mexico dollars, the exportation of grain prohibited since the accession of the present Emperor; Purdy 1825, p. 153: the remains of the town of Anafee, easily known by its towers, one almost as high as Hassan's Tower; the coast low and bordered with small islets; six miles to the westward a point with red cliffs like houses"
+    says: "The ruins of Dar el Beida, or Anafee, known by their towers, one nearly as high as Hassan's: once a great port for the Emperor's corn, now a few huts."
+  - id: azamor
+    kind: town
+    name: Azamor
+    modern: Azemmour
+    lat_deg: 33.2900
+    lon_deg: -8.3420
+    height_m: 20
+    source: "Jackson 1809, l. 4541 to 4548: forty-four miles south of Dar el Beida, at some distance from the mouth of the Morbeya, not adapted to commerce, the entrance of the river being dangerous; Purdy 1825, p. 154: the town at the entrance of the river Morbeya; the shore flat, not above 8 or 10 fathoms for a league or a league and a half from shore, and foul rocky ground, so that it is not safe to anchor hereabout"
+    says: "Azamor at the Morbeya's mouth, a dangerous entrance: the shore flat and foul, no anchorage off it."
+  - id: mazagan
+    kind: town
+    name: Mazagan
+    modern: El Jadida
+    lat_deg: 33.2570
+    lon_deg: -8.5020
+    height_m: 15
+    source: "Jackson 1809, l. 4559 to 4596: built in 1506 by the Portuguese; a dock on the north side capable of admitting small vessels, large vessels anchoring about two miles from the shore; in 1769 the Portuguese, resolved to abandon it, evacuated it as the Emperor Sidi Mohammed besieged it; the export of corn and wax very considerable in his time; Purdy 1825, p. 154: from Azamor to the ruins of the town of Mazagan, El Burreja, three leagues W.S.W."
+    says: "Mazagan, the Portuguese fortress the Emperor took in 1769, with a little dock on its north side for small craft."
+  - id: mazagan-road
+    kind: road
+    name: the road of Mazagan
+    lat_deg: 33.2850
+    lon_deg: -8.5300
+    height_m: 0
+    depth_fathoms: 12
+    bottom: "clear sand"
+    source: "Purdy 1825, p. 154: anchorage off the coast at a league from the shore in 16 fathoms, clear sandy ground; Jackson 1809, l. 4561 to 4565: large vessels anchor about two miles from the shore; the depth the grid's at two miles, JUDGEMENT between the two"
+    says: "Mazagan road two miles off the town, clear sand; mind the ledge off the west point."
+    fix: "two miles north-west of the town in the grid's 23 m (12 fathoms), between Jackson's two miles and Purdy's league in 16 fathoms"
+  - id: mazagan-ledge
+    kind: ledge
+    name: the ledge off Mazagan's west point
+    lat_deg: 33.2505
+    lon_deg: -8.5390
+    height_m: 0
+    dries_m: 0.3
+    extent_m: 400
+    source: "Purdy 1825, p. 154: at the west point of Mazagan is a ledge of rocks which stretches to the N.E. [N.N.E.] about a league into the sea, uncovered at low water; the head above the datum JUDGEMENT from 'uncovered at low water'"
+    says: "The ledge off Mazagan's west point, running north-east into the bay and uncovered at low water."
+    fix: "the grid's shoal head off the west point (2.9 m); the grid does not carry the ledge a league out (a finding)"
+  - id: cape-blanco-north
+    kind: headland
+    name: Cape Blanco
+    modern: Cap Blanc, Jorf Lasfar
+    lat_deg: 33.1310
+    lon_deg: -8.6310
+    height_m: 40
+    source: "Purdy 1825, p. 154: this cape is a cliff which appears at a distance like a wall, remarkable for its white and red spots; in the bight on the S.W. a good anchoring place for several ships; the height FROM MEMORY"
+    says: "Cape Blanco, a cliff like a wall spotted white and red, with good anchorage in the bight to the south-west."
+    fix: "FROM MEMORY in the grid's water; moved 150 m to the nearest land"
+  - id: cape-cantin
+    kind: headland
+    name: Cape Cantin
+    modern: Cap Beddouza
+    lat_deg: 32.5497
+    lon_deg: -9.2779
+    height_m: 60
+    source: "Purdy 1825, p. 154: a steep headland falling down toward the sea, with a ledge of rocks projecting from it; on its summit the sepulchre of a Mohammedan saint, a mark too small to be always seen; between Cape Blanco and Cape Cantin the coast much higher, safe all along, 40 and 50 fathoms two leagues off; the currents very strong, S.W. by S. along the coast; the height FROM MEMORY"
+    says: "Cape Cantin, steep, with a saint's tomb on its summit and a ledge of rocks running off it: give it a wide berth."
+    fix: "FROM MEMORY in the grid's water; moved 200 m to the nearest land"
+  - id: cantin-ledge
+    kind: ledge
+    name: the ledge off Cape Cantin
+    lat_deg: 32.5625
+    lon_deg: -9.2600
+    height_m: 0
+    extent_m: 300
+    source: "Purdy 1825, p. 154: a ledge of rocks projecting from the cape; p. 154: if bound to Asfee from the northward, shape a course well to the westward of Cape Cantin to avoid the rocks about that cape; the head at the datum, the pilot giving no figure"
+    says: "The rocks off Cape Cantin: keep well to the westward of the cape."
+    fix: "the grid's shoal head north-east of the cape (2.8 m)"
+  - id: safi
+    kind: town
+    name: Saffi, or Asfee
+    modern: Safi
+    lat_deg: 32.3000
+    lon_deg: -9.2400
+    height_m: 30
+    source: "Purdy 1825, p. 154: the antient town of Asfi, or Saffi, in lat 32 20, between two hills, intolerably hot, the winter's rains discharging through the main street into the sea; the high castle of the town; Jackson 1809, l. 4634 to 4692: once of considerable trade, particularly in corn, its people inimical to Europeans; the Portuguese quitted it in 1641; the height FROM MEMORY"
+    says: "Saffi between its two hills, the high castle over the town: the land north of the bay high and uneven, south of it a level plain."
+  - id: safi-road
+    kind: road
+    name: the summer road of Saffi
+    lat_deg: 32.3039
+    lon_deg: -9.2746
+    height_m: 0
+    depth_fathoms: 16
+    bottom: "fine grey sand"
+    source: "Purdy 1825, p. 154: the bay nearly three leagues wide; to anchor in the road bring the North point, with its low tower, a little north of N.N.E., the high castle S.E. by E. or S.E., in 16 to 18 fathoms, fine grey sand; anchorage within in 15 fathoms; these the summer roads, in winter anchor farther off in 20 or 22 fathoms; Jackson 1809, l. 4646 to 4649: safe in summer, but in winter with the wind south or south-west vessels must run to sea, some several times in a month while loading"
+    says: "Saffi's summer road in sixteen to eighteen fathoms, fine grey sand, the castle south-east: in winter lie out in twenty, and be ready to run when it blows from the south-west."
+    fix: "moved 800 m west of the first place to the grid's 28 m (15.5 fathoms)"

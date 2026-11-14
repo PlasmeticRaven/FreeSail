@@ -1,0 +1,25 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"121,-39": [
+"santa-cruz-agadir",
+"agadir-road"
+],
+"122,-40": [
+"cape-ghir",
+"cape-ghir-reef"
+],
+"124,-40": [
+"cape-tefelneh"
+],
+"125,-40": [
+"cape-sem"
+],
+"126,-40": [
+"mogador",
+"mogador-island",
+"mogador-road",
+"mogador-harbour"
+]
+}
+}

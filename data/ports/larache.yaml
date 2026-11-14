@@ -1,0 +1,111 @@
+# FreeSail: El Araiche (Larache), the Emperor of Morocco's port on the river Lucos (package
+# 106b, Morocco's Atlantic coast), on package 35's machinery; the marks are the features
+# file's (data/charts/features/morocco-larache.yaml).
+#
+# Sources. Purdy 1825, p. 152: El Araiche known by its castle, which commands the road, and
+# its batteries on the river El Kos; before the town only 4 fathoms at 2 cables from shore;
+# the best anchorage with the town between S. and S.S.E.; the river's mouth very narrow at low
+# water, enough on the bar for vessels of 100 tons at high water; the Peak of Fas, a sugar-loaf
+# inland, the best mark. Jackson 1809, l. 4209 to 4254: some foreign commerce carried on by the
+# nations of Europe so late as 1780, when the Emperor Sidi Mohammed caused it to be evacuated
+# and ordered the Europeans to quit it, some to Mogodor and others to Europe; the Emperor's
+# larger vessels winter in a cove on the north side of the river, with magazines of naval
+# stores; the country furnishes corn, wax and oil and wood fit for ship-building; the road not
+# secure in winter with the winds south and west, safe from April to September; l. 3675: 3,000
+# people.
+#
+# The datum: UNVERIFIED (no period plan read). The grid closes the river: its mouth reads one
+# to two metres and the river within is land (a finding); the port is its road.
+# Dated rows (decision 67, package 105's form; decision 69: they seed the port on the
+# scenario's first day): `closed_to` from 1780, when the Emperor evacuated the Europeans (the
+# year Jackson's, the day 1 January JUDGEMENT), to every European nation and the Americans,
+# the table's trading flags; the port open to its own and to Barbary. Morocco at peace with
+# all in the nations table. Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+id: larache
+name: El Araiche
+nation: morocco
+source: "Purdy 1825, p. 152; Jackson 1809, l. 4209 to 4254"
+datum: unverified
+
+outer_road:
+  feature: larache-road
+  name: the road of El Araiche
+  lat_deg: 35.2150
+  lon_deg: -6.1650
+  depth_fathoms: 7
+anchorage:
+  feature: larache-road
+  name: the road of El Araiche
+  lat_deg: 35.2150
+  lon_deg: -6.1650
+mooring:
+  name: close in before the bar
+  lat_deg: 35.2080
+  lon_deg: -6.1650
+  depth_fathoms: 4
+  bottom: sand
+  deep_draught_ft: 12    # Purdy 1825 p. 152: 4 fathoms at 2 cables from the shore; JUDGEMENT
+shore:
+  feature: larache
+  name: the landing under the castle
+  lat_deg: 35.1980
+  lon_deg: -6.1560
+
+pilot:
+  station: larache-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the river
+    under: oars
+    note: "judgement"
+  names: [Hamet, Ali, Mohammed, Abdallah, Yusuf, Kasem, Larbi, Tahar]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 315            # out to the north-west, judgement
+  words:
+    channel: "The river's mouth looks broad but is very narrow at low water: only a vessel of a hundred tons crosses the bar, and at high water. Anything larger lies in the road."
+    marks: "The castle that commands the road, the batteries along the river; and inland the Peak of Fas, a sugar-loaf standing by itself, the best mark of all."
+    anchorage: "Anchor with the town between south and south-south-east; four fathoms two cables off the shore. The road is safe from April to September; in winter the southerly and westerly gales make it no place to lie."
+    tide: "Cross the bar at the top of the tide; a calm here can set you down the coast, for the current runs south a mile or two an hour at springs."
+
+tide:
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 9, origin: morocco, note: "Jackson 1809, l. 4216: the country furnishes corn; the grain's export prohibited under the present Emperor (l. 4525): the price JUDGEMENT"}
+    - {good: wax, price: 72, origin: morocco, note: "Jackson 1809, l. 4216: wax; JUDGEMENT"}
+    - {good: olive oil, price: 30, origin: morocco, note: "Jackson 1809, l. 4216: oil; JUDGEMENT"}
+    - {good: timber, price: 8, origin: morocco, note: "Jackson 1809, l. 4217: woods fit for ship-building; JUDGEMENT"}
+    - {good: cattle, price: 7, origin: morocco, note: "JUDGEMENT"}
+    - {good: hides, price: 20, origin: morocco, note: "JUDGEMENT"}
+    - {good: wool, price: 18, origin: morocco, note: "JUDGEMENT"}
+    - {good: oranges, price: 4.5, origin: morocco, note: "JUDGEMENT"}
+    - {good: canvas, price: 82, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: iron, price: 32, origin: null, note: "imported; JUDGEMENT"}
+    - {good: sugar, price: 105, origin: null, note: "imported; JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 18, pounds: 40, note: "Jackson 1809, l. 4247 to 4250: magazines of naval stores in the cove on the north side of the river, where the Emperor's larger vessels winter; JUDGEMENT"}
+    - {item: yard, hours: 12, pounds: 24}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.09}
+    - {item: water, hours_per_ton: 0.5, pounds_per_ton: 0.4}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to:
+  - {closed_to: [], until: 1779-12-31, source: "Jackson 1809, l. 4241 to 4244: some foreign commerce carried on by the nations of Europe so late as 1780"}
+  - {closed_to: [britain, france, spain, portugal, batavian-republic, united-states, denmark, sardinia, naples, etruria, liguria, papal-state, order-of-st-john], since: 1780-01-01, source: "Jackson 1809, l. 4241 to 4245: in 1780 the Emperor Sidi Mohammed, for some reason unavowed, caused it to be evacuated, the Europeans ordered to quit it, some to Mogodor and others to Europe; the day JUDGEMENT"}

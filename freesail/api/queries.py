@@ -620,11 +620,10 @@ def _at_work(world: World) -> list[dict[str, Any]]:
     if runner is None:
         return []
     out = []
-    for inst in list(runner.instances):
-        got = inst.assignment.got if inst.assignment is not None else 0
-        if got:
-            entry = {"evolution": inst.evo.id, "subject": inst.subject_id, "hands": got}
-            entry["words"] = _work_words(world, runner, inst)
+    for e in runner.in_progress():
+        if e.get("hands"):
+            entry = {"evolution": e["id"], "subject": e["subject"], "hands": e["hands"]}
+            entry["words"] = _work_words(world, entry)
             out.append(entry)
     return out
 
@@ -654,17 +653,17 @@ def crew_state(world: World) -> dict[str, Any] | None:
     }
 
 
-def _work_words(world: World, runner: Any, inst: Any) -> str:
-    """'at the fore topsail', 'tacking ship', 'sending down topgallant masts', 'laying out the
-    kedge': a part's work at its part, the ship's by the name the log gives the work in hand
-    (`Runner.doing`), where this named it again from its id, 'laying out kedge' (the lead's (C8)
-    of 2026-11-14: one place names the work)."""
-    from freesail.evolutions.runner import part_name
+def _work_words(world: World, entry: dict[str, Any]) -> str:
+    """'at the fore topsail', 'tacking ship', 'sending down topgallant masts'."""
+    from freesail.evolutions.runner import gerund, part_name
 
     ship = world.ship
-    if inst.subject_id in ship.parts:
-        return f"at the {part_name(ship, inst.subject_id)}"
-    return runner.doing(inst)
+    if entry["subject"] in ship.parts:
+        return f"at the {part_name(ship, entry['subject'])}"
+    verb = entry["evolution"].replace("_", " ")
+    first, _, rest = verb.partition(" ")
+    rest = rest or ("ship" if first in ("tack", "wear") else "")
+    return f"{gerund(first)} {rest}".rstrip()
 
 
 def watch_lines(world: World) -> list[str]:

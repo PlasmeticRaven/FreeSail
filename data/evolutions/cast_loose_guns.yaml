@@ -7,7 +7,6 @@
 # the beat.
 id: cast_loose_guns
 verb: cast_loose_guns
-doing: casting loose the guns
 applies_to: {class: ship}
 script: cast_loose_guns
 preconditions: []

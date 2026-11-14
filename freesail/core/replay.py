@@ -544,23 +544,6 @@ def read_checkpoint(path: str | Path) -> tuple[dict[str, Any], World]:
     return header, world
 
 
-def _rig_word_now(vessel: Any) -> None:
-    """A far vessel's rig's word (`Vessel.kind`) read again from her description, where she has one
-    the descriptions know, as `ships.vessel_from_spec` gives it a new game; any other vessel (a
-    pilot's boat, a shadow of no description) as she was saved."""
-    from freesail.world import ships
-
-    key = str(getattr(vessel, "description", "") or "")
-    if key not in ships.DESCRIPTIONS:
-        return
-    try:
-        rig = ships.description(key).get("rig")
-    except Exception:  # noqa: BLE001 - a file the descriptions no longer read: as saved
-        return
-    if rig:
-        vessel.kind = str(rig)
-
-
 def _rebind(world: World, _seen: set[int] | None = None) -> None:
     # each World once (found on the way by package 58a: a crewed vessel's World lists the
     # parent's other vessels, so with two crewed at once each rebound the other's World
@@ -629,12 +612,6 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
 
         rebind_hooks(ship)
     for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
-        # her rig's word as her description gives it now (`ships.description`, as a new game makes
-        # her): a word of the files copied into the pickle and read from there went stale across
-        # the save, and a 74 saved before the lead's ruling 17 loaded "a ship", a frigate's class
-        # at every distance, where the build that wrote her read her a ship of the line's (the
-        # whole-change review of 80e703c7, engine-4)
-        _rig_word_now(v)
         # a crewed vessel's own World (package 43): rebound as the parent is
         if getattr(v, "crew", None) is not None:
             _rebind(v.crew, seen)

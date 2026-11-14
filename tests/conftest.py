@@ -535,9 +535,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
         # package 75, SW-4 (the lead's ruling at its merge): truth 7-191's draft (7.5 s) and the
         # two crewed ships kept evading by a man of war of their own class (8.3 s and 6.9 s),
-        # the final candidates' junit at four workers, 2026-11-06; the truth's node id moved with
-        # it into the known truths at Phase 5 (2026-11-14; old: test_subtypes.py::)
-        "test_known_truths.py::test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside",
+        # the final candidates' junit at four workers, 2026-11-06
+        "test_subtypes.py::test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside",
         "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
         "[a privateer lugger]",
         "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
@@ -554,55 +553,17 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # workers, 2026-11-10: her stays, wear and heave-to (28.8 s), her round trip (24.0 s), her
         # helm in truths 6 and 17's forms (23.2 s), the Vanguard's and the Bellona's speeds (12.6
         # s), a frigate and a cruiser meeting her (9.6 s and 5.9 s), her handling (7.6 s), and her
-        # posts drawn at muster (5.2 s); her truth 7-196 is the pace run's by its mark (in
-        # test_known_truths.py since Phase 5, 2026-11-14)
+        # posts drawn at muster (5.2 s); her truth 7-196 is the pace run's by its name and mark
         "test_bellerophon.py::test_she_stays_quickly_wears_and_lies_to",
         "test_bellerophon.py::test_she_sails_under_her_rules_captain_with_no_fit_named_and_round_trips",
         "test_bellerophon.py::test_her_helm_as_tuned_holds_truths_6_and_17",
         "test_bellerophon.py::test_she_sails_as_the_vanguard_and_the_bellona_were_reported",
-        # package 75, B7.e: the rank-4 rule's sailed meetings over the threshold, her file alone at
-        # four workers, 2026-11-11: the frigate and the cruiser meeting her (5.3 s and 8.0 s; the
-        # two above renamed, old `test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_
-        # today`; meeting the 64, 4.3 s and 4.2 s, fast), a commodore and her convoy (12.9 s), a
-        # frigate commanding a set (6.5 s), a King's 64 meeting her (6.9 s), her rules captain in a
-        # frigate in a set (8.9 s)
-        "test_bellerophon.py::test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64"
-        "[kings-ship-the-74]",
-        "test_bellerophon.py::test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64"
-        "[cruiser-the-74]",
-        "test_bellerophon.py::test_a_lone_commodore_keeps_away_from_her_and_a_set_is_left_to_its_book"
-        "[a-commodore-and-her-convoy]",
-        "test_bellerophon.py::test_a_lone_commodore_keeps_away_from_her_and_a_set_is_left_to_its_book"
-        "[a-frigate-commanding-a-set]",
-        "test_bellerophon.py::test_a_kings_64_meeting_her_closes_her_as_before",
-        "test_bellerophon.py::test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line"
-        "[a-frigate-in-a-set]",
-        # package 75, B7.e's review mends: the rule on a promoted hull, the crewed cap as shipped
-        # (14.3 s and 18.8 s alone, one process), 2026-11-11
-        "test_bellerophon.py::test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74",
-        "test_bellerophon.py::test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her",
-        # package 75, B7.e, the lead's ruling (3)(b) of 2026-11-12: a frigate under her consort's
-        # orders and in no set, far and crewed (8.3 s each alone, one process), 2026-11-13
-        "test_bellerophon.py::test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her"
-        "_commanders_book",
-        "test_bellerophon.py::test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not"
-        "_haul_off_from_her",
+        "test_bellerophon.py::test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today"
+        "[kings-ship]",
+        "test_bellerophon.py::test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today"
+        "[cruiser]",
         "test_bellerophon.py::test_she_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails",
         "test_bellerophon.py::test_her_posts_draw_at_muster_the_second_master_and_the_chaplain_as_the_others",
-        # package 75, B7.c: her tack cleared beside her tack at quarters, two tacks of a 74 and
-        # her guns made ready (7.3 s alone, her file in one process), 2026-11-11
-        "test_bellerophon.py::test_her_tack_at_quarters_under_sail_before_guns_is_her_cleared_tack",
-        # package 75, B7, the lead's ruling (1) of 2026-11-10 at 19:30: the two-deckers lying a-try
-        # from way on (24.0 s and 21.9 s) and from rest (12.7 s and 13.1 s), four workers,
-        # 2026-11-12
-        "test_bellerophon.py::test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points"
-        "_under_two_knots[the-74]",
-        "test_bellerophon.py::test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points"
-        "_under_two_knots[the-64]",
-        "test_bellerophon.py::test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their"
-        "_lee_helm[the-74]",
-        "test_bellerophon.py::test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their"
-        "_lee_helm[the-64]",
     }
 )
 

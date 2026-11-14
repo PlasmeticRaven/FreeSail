@@ -13,7 +13,6 @@
 # the rigging set up).
 id: jury_mast
 verb: jury_mast
-doing: rigging a jury mast
 applies_to: {class: ship}
 script: jury_mast
 params: {mast_words: "", aloft: [stay]}

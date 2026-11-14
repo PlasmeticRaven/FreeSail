@@ -223,7 +223,7 @@ tend the sheets
   Morning watch (04:25)  Man the jib sheet.
   Morning watch (04:26)  Trimmed the jib sheet; the jib 20° off the centreline.
   Morning watch (04:30)  Order: tend the sheets.
-  Morning watch (04:30)  Trimming the sheets of the spanker, the fore topmast staysail and the jib.
+  Morning watch (04:30)  Trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
   Morning watch (04:31)  Trimmed the sheets of the spanker, the fore topmast staysail and the jib; 20° to 24° off the centreline.
 ```
 
@@ -284,9 +284,9 @@ trim the yards
 
 ```
   Morning watch (04:20)  Order: trim sails.
-  Morning watch (04:20)  Braced twelve yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimming the sheets of the spanker, the fore topmast staysail and the jib.
+  Morning watch (04:20)  Braced twelve yards to the wind, 48° on the starboard bow, the after yards two degrees sharper; trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
   Morning watch (05:05)  Order: trim sails with the head yards sharper.
-  Morning watch (05:05)  Braced twelve yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; the sheets of the spanker, the fore topmast staysail and the jib stand as trimmed.
+  Morning watch (05:05)  Braced twelve yards to the wind, 45° on the starboard bow, the head yards three degrees sharper; the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as trimmed.
 ```
 
 What it is worth in the game is small: at 66° off the wind the frigate makes 5.2 knots with the after yards two degrees sharper and 5.0 with all alike, and 4.8 with the head yards sharper. Fincham's reason is the head sails bending the wind aft of them, and the game's sails all feel one wind, so the after sails gain only the little they gain by standing nearer their luff.

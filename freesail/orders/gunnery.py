@@ -66,14 +66,6 @@ guns, being places of the ship besides), "the poop" and "the poop carronades", e
 without, name that deck's broadside guns (its carronades alone where "carronades" is said), in
 `guns_named` and so in the director's and the world orders' slots that read it. Words that name
 no gun of hers are refused as before.
-
-**A number with its deck** (package 75, B7.d: Bel-D §5.2 item 6, the lead's answer (3) of
-2026-10-29): a ship whose file numbers her guns by deck (the 74 and the 64) has a No. 3 on each
-deck, each deck's pairs from No. 1 forward as the period numbered them, and her gun is named with
-its deck: "No. 3 starboard gun of the lower deck" (its name), "No. 3 on the lower deck", "the
-lower deck's No. 3", "No. 2 gun of the poop", the deck in the words a deck is named by above. A
-bare number names no gun of hers, and "fire" refuses it in words, naming the decks that have one.
-Every other ship's numbers are said as before, bare.
 """
 
 from __future__ import annotations
@@ -98,16 +90,7 @@ from freesail.orders import numbers
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
-from freesail.ship.parts import (
-    BARREL_LB,
-    DECK_SAID,
-    Charge,
-    Gun,
-    fit_levels,
-    gun_words,
-    kind_rank,
-    magazine,
-)
+from freesail.ship.parts import BARREL_LB, Charge, Gun, fit_levels, gun_words, kind_rank, magazine
 from freesail.ship.schema import DECK_WORDS
 
 __all__ = ["GUNNERY_VERBS", "check", "execute", "guns_named"]
@@ -227,16 +210,6 @@ _DECK_OF_WORD = {
     "forecastle": "forecastle",
     "poop": "roundhouse",
 }
-# A number with its deck on a ship numbered by deck (package 75, B7.d; the module's head), its side
-# already taken out: "No. 3 gun of the lower deck", "No. 3 on the lower deck", "the lower deck's
-# No. 3", "the poop's No. 2".
-_A_DECK = (
-    r"(?P<deck>(?:lower|upper|main|middle|gun)(?:\s+|-)deck|quarterdeck|quarter deck|quarter-deck"
-    r"|forecastle|poop)"
-)
-_A_NUMBER = r"(?:no|number|num)?\s*(?P<n>\d+)\s*(?:gun|carronade)?"
-_NUMBER_OF_A_DECK = re.compile(rf"^(?:the\s+)?{_A_NUMBER}\s+(?:of|on)\s+(?:the\s+)?{_A_DECK}$")
-_A_DECKS_NUMBER = re.compile(rf"^(?:the\s+)?{_A_DECK}(?:'s)?\s+{_A_NUMBER}$")
 _WORD_NUMBERS = {
     "one": 1,
     "two": 2,
@@ -426,13 +399,6 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
         ]
         fired = _fired_on(world)
         enemies += [i for i in items if i.get("id") in fired and i not in enemies]
-        # the enemy he may fight, by the one answer (`Judgement._may_fight`, `relations.MARK`:
-        # not struck, nobody's prize, not of his side), so that the rules captain's "engage her"
-        # takes the mark he chose and no prize under an enemy prize crew nearer (the whole-change
-        # review of 80e703c7, gundeck-2); with none such, the nearest sail as before
-        may_fight = getattr(getattr(world, "captain", None), "_may_fight", None)
-        if callable(may_fight):
-            enemies = [i for i in enemies if may_fight(i)]
         pick = enemies[0] if enemies else items[0]
         return str(pick["id"]), _name_of(world, pick)
     for i in items:
@@ -647,59 +613,11 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
         if not deck:
             return {"guns": guns}
         return {"guns": guns, "deck": deck, "deck_side": _side_said(w)}
-    on_each = _a_number_on_each_deck(ship, w)
-    if on_each:
-        raise OrderError(on_each)
     raise OrderError(
         f"Fire what? Say 'fire' for the broadside at the word, 'fire the starboard broadside', "
-        f"'fire No. 3 gun{_of_her_gun_deck(ship)}', 'fire the bow chaser', 'fire the pivot gun', "
-        f"'fire a shot across her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
+        f"'fire No. 3 gun', 'fire the bow chaser', 'fire the pivot gun', 'fire a shot across "
+        f"her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
     )
-
-
-def _numbered_by_deck(guns: dict[str, Gun]) -> bool:
-    """Whether her guns are numbered by deck (package 75, B7.d: her file's armament says so)."""
-    return any(g.by_deck for g in guns.values())
-
-
-def _of_her_gun_deck(ship: Any) -> str:
-    """' of the lower deck' after a number in a refusal's example on a ship numbered by deck
-    (package 75, B7.d), her lowest deck with broadside guns, else ''."""
-    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
-    if not _numbered_by_deck(guns):
-        return ""
-    decks = [g.deck for g in guns.values() if g.place == "broadside" and g.deck in DECK_WORDS]
-    return f" of {DECK_SAID[min(decks, key=DECK_WORDS.index)]}" if decks else ""
-
-
-def _a_number_on_each_deck(ship: Any, w: str) -> str:
-    """A bare number refused in words on a ship numbered by deck (package 75, B7.d; Bel-D §5.2
-    item 6): 'She has a No. 3 starboard gun on the lower deck, the upper deck and the
-    quarterdeck: name the deck, as 'fire No. 3 starboard gun of the lower deck'.' Empty where
-    the words are no bare number, her guns are numbered on across her decks, or no deck of hers
-    has the number (the words then name no gun of hers, as before)."""
-    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
-    if not _numbered_by_deck(guns):
-        return ""
-    words = [str(_WORD_NUMBERS.get(x, x)) for x in w.replace(".", " ").split()]
-    side = _side_said(w)
-    m = _GUN_NUMBER.match(" ".join(x for x in words if x not in ("starboard", "larboard", "port")))
-    if m is None:
-        return ""
-    n = int(m.group(1))
-    decks = {
-        g.deck
-        for g in guns.values()
-        if g.place == "broadside"
-        and g.number == n
-        and g.deck in DECK_WORDS
-        and (side is None or g.side == side)
-    }
-    if not decks:
-        return ""
-    said = [DECK_SAID[d] for d in sorted(decks, key=DECK_WORDS.index)]
-    gun = f"No. {n} {side + ' ' if side else ''}gun"
-    return f"She has a {gun} on {_and(said)}: name the deck, as 'fire {gun} of {said[0]}'."
 
 
 def guns_named(ship: Any, words: str) -> list[str]:
@@ -766,34 +684,6 @@ def _guns_of_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str
     ]
 
 
-def _number_on_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str] | None:
-    """The broadside guns of the number on the deck the words name ('No. 3 gun of the lower deck',
-    'the lower deck's No. 3', 'No. 2 on the poop'; package 75, B7.d, on a ship numbered by deck),
-    on the side if one was said; None where the words say no number with a deck, and [] where
-    that deck has no such number of hers."""
-    m = _NUMBER_OF_A_DECK.match(w2) or _A_DECKS_NUMBER.match(w2)
-    if m is None:
-        return None
-    broadside = [g for g in guns.values() if g.place == "broadside"]
-    said = m.group("deck")
-    gun_deck = re.match(r"^(lower|upper|main|middle|gun)(?:\s+|-)deck$", said)
-    if gun_deck is None:
-        deck = _DECK_OF_WORD[said]
-    elif gun_deck.group(1) == "gun":
-        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
-        if not decks:
-            return []
-        deck = min(decks, key=DECK_WORDS.index)
-    else:
-        deck = _DECK_OF_WORD[gun_deck.group(1)]
-    n = int(m.group("n"))
-    return [
-        g.id
-        for g in broadside
-        if g.deck == deck and g.number == n and (side is None or g.side == side)
-    ]
-
-
 def _guns_named(ship: Any, w: str) -> list[str]:
     guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
     words = w.replace(".", " ").split()
@@ -804,20 +694,11 @@ def _guns_named(ship: Any, w: str) -> list[str]:
         if name in words:
             side = s
             w2 = " ".join(x for x in words if x != name)
-    numbered_by_deck = _numbered_by_deck(guns)
-    if numbered_by_deck:
-        on_a_deck = _number_on_a_deck(guns, w2, side)
-        if on_a_deck is not None:
-            return on_a_deck
-    of_a_deck = _guns_of_a_deck(guns, w2, side)
-    if of_a_deck is not None:
-        return of_a_deck
+    by_deck = _guns_of_a_deck(guns, w2, side)
+    if by_deck is not None:
+        return by_deck
     m = _GUN_NUMBER.match(w2)
     if m:
-        if numbered_by_deck:
-            # a No. 3 on each deck (package 75, B7.d): a bare number names none of them, and
-            # 'fire' says so (`_a_number_on_each_deck`)
-            return []
         n = int(m.group(1))
         out = [
             g.id

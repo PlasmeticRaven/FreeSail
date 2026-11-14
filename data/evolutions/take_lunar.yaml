@@ -13,7 +13,6 @@
 # `her` (see heave_log.yaml): the mates with their sextants hold nothing against a tack.
 id: take_lunar
 verb: take_lunar
-doing: taking a lunar
 applies_to: {class: ship}
 params: {body: the sun}
 preconditions: []

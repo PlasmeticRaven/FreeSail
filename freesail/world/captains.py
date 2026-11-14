@@ -319,12 +319,6 @@ SIZE_RANK: dict[str, int] = {
     "hermaphrodite brig": 2,
     "bilander": 1,
 }
-# The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
-# rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
-# lower class hauls off from an enemy of this class made out within her doctrine's
-# `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
-# match for one ship of the line (p. 78).
-LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
 # the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
@@ -1996,81 +1990,17 @@ class Judgement:
                 self._enter(t.to)
                 return
 
-    def _alone(self) -> bool:
-        """Whether nobody who could support her keeps her company (package 72's squadrons and
-        convoys, the parent World's for a crewed hull; package 71's least relation, the far body's
-        own or the crewed hull's, as `signals.commanded_by` reads it): the rank-4 rule is a lone
-        ship's, and a ship in a set, or under the orders of another, set or no set, is left to her
-        commander's book (package 75, B7.e; the lead's ruling (3)(b) of 2026-11-12), while one who
-        holds her so could support her (`relations.still`, `SUPPORT`: on the sea, not struck,
-        nobody's prize, within the miles her set still holds a member of it, `relations.
-        in_company_nm`; the lead's readings of cda12ec9, (F4)): her commander so, or a member of
-        her set but herself and its prizes. A set whose other members are prizes, gone or done
-        counts for nothing (a captor's company of her prizes, `prizes.possess`), and nor does a
-        commander gone, struck, taken or beyond that distance (the player's ship struck among
-        them)."""
-        from freesail.world import relations as R
-
-        world = getattr(self, "world", None)
-        body = getattr(self, "vessel", None)
-        boss = getattr(body if body is not None else world, "under_orders_of", None)
-        if boss is None:
-            boss = getattr(getattr(world, "vessel", None), "under_orders_of", None)
-        root = getattr(world, "parent", None) or world
-        own = str(self._own_vessel_id() or "the ship")
-        if boss and R.still(root, own, str(boss), R.SUPPORT):
-            return False
-        sets = getattr(root, "squadrons", None)
-        if sets is None or not hasattr(sets, "of"):
-            return True
-        sq = sets.of(own)
-        if sq is None:
-            return True
-        return not any(
-            R.still(root, own, m, R.SUPPORT) for m in sq.members if m != own and m not in sq.prizes
-        )
-
-    def _line_of_battle_nm(self, p: Perception) -> float:
-        """The miles within which she hauls off from an enemy ship of the line (package 75,
-        B7.e, the rank-4 rule, the owner's "Yes, build the rule" of 2026-11-11): her doctrine's
-        `line_of_battle_nm` where she is of a class under `LINE_OF_BATTLE_RANK` and alone
-        (`_alone`); nought for a doctrine without the knob, a ship of the line herself, a ship
-        in a set and a ship under the orders of another."""
-        d = self.doctrine
-        nm = float(d.threshold("line_of_battle_nm", 0) or 0) if d is not None else 0.0
-        if nm <= 0.0 or int(p.own_size or 0) >= LINE_OF_BATTLE_RANK or not self._alone():
-            return 0.0
-        return nm
-
-    def _overmatched(
-        self, p: Perception, within_nm: float, line_nm: float | None = None
-    ) -> dict[str, Any] | None:
+    def _overmatched(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         """An enemy of a bigger class than her own within `within_nm` (package 43, the
-        cruiser's judgement of a superior force), by what the tops have made out; or an enemy
-        ship of the line within `line_nm` (package 75, B7.e, the rank-4 rule), by default the
-        miles her doctrine gives a lone ship of a lower class (`_line_of_battle_nm`), which
-        are nought for every doctrine but the King's ship's and the commodore's."""
-        if not p.strangers:
-            return None
-        line = self._line_of_battle_nm(p) if line_nm is None else float(line_nm)
-        own = int(p.own_size or 0)
+        cruiser's judgement of a superior force), by what the tops have made out."""
         enemies = [
             s
             for s in p.strangers
             if self._is_enemy(s)
             and not self._spoken(s)
             and s.get("estimate_m") is not None
-            and (
-                (
-                    float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
-                    and int(s.get("size") or 0) > own
-                )
-                or (
-                    line > 0.0
-                    and float(s["estimate_m"]) / units.NAUTICAL_MILE <= line
-                    and int(s.get("size") or 0) >= LINE_OF_BATTLE_RANK
-                )
-            )
+            and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
+            and int(s.get("size") or 0) > int(p.own_size or 0)
             # package 70: a merchantman of a bigger hull is a prize, not a superior force
             and "merchant" not in str(s.get("known") or "").lower()
             # package 74: a ship that has struck is nobody's superior force
@@ -2330,28 +2260,11 @@ class Judgement:
             if self._is_enemy(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
-            and self._may_fight(s)
+            and not self._stranger_struck(s)
         ]
         if not enemies:
             return None
         return min(enemies, key=lambda s: float(s["estimate_m"]))
-
-    def _may_fight(self, s: dict[str, Any]) -> bool:
-        """Whether a sail is one the action may be fought with, for both bodies: the one answer,
-        `relations.MARK` (the lead's readings of cda12ec9, (F3)), which `far_action._pairs` asks of
-        every far round: on the sea, her colours not struck, nobody's prize (a prize under a prize
-        crew is taken back by coming up, never fought) and none he knows of his own side, so that
-        the stimuli that take her into the action and out of it (`enemy in range`, `enemy out of
-        range`), the mark she takes in it (`_engaging_mark`, `Captain._mark`) and the order's 'her'
-        (`orders.gunnery._mark`) agree with the rounds. Asked by the far brain and the rules
-        captain alike (the whole-change review of 80e703c7, gundeck-2: the near body asked only
-        "not struck", and a crewed King's frigate engaged and fired into an enemy-held British
-        prize for an hour where the far body, by `MARK`, never fought her)."""
-        from freesail.world import relations as R
-
-        return R.still(
-            self.world, self._own_vessel_id(), str(s.get("id") or ""), R.MARK, judge=self
-        )
 
     def _man_of_war_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         """An enemy's man of war within the miles, by the lookout's words of her ('a
@@ -2381,21 +2294,15 @@ class Judgement:
         return ""
 
     def _prize_taken(self, p: Perception) -> bool:
-        """Package 74: whether the possession is over: the struck mark in hand (`_stranger`) a
-        prize of his, or none in hand. And (the lead's readings of cda12ec9, (F2)) whether she is
-        no longer his to take, by the one answer (`relations.still`, `STRUCK`): taken by another,
-        struck to another who is there to take her, gone from the sea or her colours up again; so
-        that he gives her up and takes his passage again by the books' one row out of the state
-        (`{from: taking possession, on: prize taken, to: on passage}`), where a second captor kept
-        `taking possession` of another's prize for good."""
-        from freesail.world import relations as R
+        """Package 74: whether the struck mark in hand (`_stranger`) is a prize of his."""
+        from freesail.world.prizes import record_of
 
-        if self._stranger is None:
-            return True
-        own = str(self._own_vessel_id() or "the ship")
-        if R.still(self.world, own, self._stranger, R.PRIZE):
-            return True
-        return not R.still(self.world, own, self._stranger, R.STRUCK)
+        sea = getattr(self.world, "vessels", None)
+        v = sea.get(str(self._stranger or "")) if sea is not None else None
+        rec = record_of(v) if v is not None else None
+        if not rec:
+            return self._stranger is None
+        return str(rec.get("captor")) == str(self._own_vessel_id())
 
 
 class Captain(Judgement):
@@ -4234,9 +4141,8 @@ class Captain(Judgement):
         }
 
     def _mark(self, p: Perception) -> dict[str, Any] | None:
-        """The enemy engaged: the battery's mark if she is in sight and still one he may fight
-        (`_may_fight`, the one answer: not struck, nobody's prize, not of his side), else the
-        nearest enemy within the breaking-off distance."""
+        """The enemy engaged: the battery's mark if she is in sight, else the nearest
+        enemy within the breaking-off distance."""
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
         battery = (getattr(self.world.ship, "extra", None) or {}).get("battery")
@@ -4244,9 +4150,7 @@ class Captain(Judgement):
         if target is not None:
             for s in p.strangers:
                 if s.get("id") == target and s.get("estimate_m") is not None:
-                    if self._may_fight(s):
-                        return s
-                    break
+                    return s
         return self._enemy_within(p, float(th("break_off_nm", 2.0)))
 
     def _side_of_mark(self, p: Perception, s: dict[str, Any]) -> str:
@@ -4622,11 +4526,8 @@ class Captain(Judgement):
         target = getattr(battery, "target", None) if battery is not None else None
         if target is None:
             return False
-        from freesail.world import relations as R
-
-        # the one answer (the lead's readings of cda12ec9, (F2)): struck, nobody's prize yet, and
-        # struck to him or to no other who is there to take her
-        struck = R.still(self.world, self._own_vessel_id(), str(target), R.STRUCK)
+        v = self._vessel_of(str(target))
+        struck = bool(v is not None and getattr(v, "struck", False))
         if struck and self._stranger != str(target):
             self._stranger = str(target)  # the struck mark is the one he takes possession of
         return struck
@@ -4641,18 +4542,16 @@ class Captain(Judgement):
     def _take_possession(self, p: Perception) -> None:
         """Each minute in `taking possession`: the struck mark closed to a boat's pull (the
         chase renewed every three minutes), hove to there, and `take possession of her`
-        given once hove to; a mark no longer his to take (`relations.STRUCK`: gone, her colours up
-        again, taken by another or struck to another who is there to take her; the lead's readings
-        of cda12ec9, (F2)) ends the state by the books' row, `prize taken` (`_prize_taken`), in the
-        judgement before this work, and his own prize the same."""
-        from freesail.world import relations as R
+        given once hove to; a mark gone or no longer struck (retaken by her people before he
+        reached her) ends the state."""
         from freesail.world.movement import BOAT_BETWEEN_NM
+        from freesail.world.prizes import is_prize
 
         mark = self._stranger
-        if not R.still(self.world, self._own_vessel_id(), str(mark or ""), R.STRUCK):
-            return
         v = self._vessel_of(str(mark or ""))
-        if v is None:
+        if v is None or getattr(v, "done", False) or not getattr(v, "struck", False) or is_prize(v):
+            if not (v is not None and is_prize(v)):
+                self._enter("on passage")
             return
         here = getattr(self.world, "position", None)
         if here is None or v.position is None:
@@ -4712,18 +4611,11 @@ class Captain(Judgement):
 
     def _haul_off(self, p: Perception) -> None:
         """Evading: a course shaped for a point away from the nearest enemy, the
-        reciprocal of her bearing, by account. Under the rank-4 rule (package 75, B7.e) the
-        enemy run from is the ship of the line, within three times the miles she hauled off
-        at, as the cruiser's reach is three times hers (a King's ship's `stranger_hostile_nm`
-        is nought)."""
+        reciprocal of her bearing, by account."""
         d = self.doctrine
         enemy = self._nearest_enemy(
             p, float(d.threshold("stranger_hostile_nm", 6)) * 3 if d else 18
         )
-        line = self._line_of_battle_nm(p)
-        if line > 0.0:
-            hostile = float(d.threshold("stranger_hostile_nm", 6)) if d else 6.0
-            enemy = self._overmatched(p, hostile * 3, line * 3) or enemy
         if enemy is None:
             return
         self._stranger = enemy.get("id")

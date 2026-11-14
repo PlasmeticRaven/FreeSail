@@ -22,7 +22,6 @@
 # order that does it ("heave in to 60 fathoms").
 id: veer_cable
 verb: veer_cable
-doing: veering the cable
 applies_to: {class: ship}
 script: veer_cable
 params: {fathoms: null, to: false, anchor: null}

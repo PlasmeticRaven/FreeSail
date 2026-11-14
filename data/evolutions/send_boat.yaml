@@ -19,19 +19,8 @@
 #   pull_back   back alongside
 #   hoist_in    hoisted in; what she brings comes aboard
 # The errand and the port are the order's (freesail/world/ports.py).
-#
-# Where the hands on deck are too few to man her, as a small vessel's watch of two by night,
-# all hands are called to man her and piped down once her crew is told off, the rest going
-# below while she is away (judgement).
-
-# Build notes (not served by the library's catalogue):
-# Package 109, step 2 (the owner's play of 2026-11-12, note 1), made one road with package 75's
-# by the lead's ruling 10 of 2026-11-13: `too_few: all hands until manned`
-# (`hands.CrewRequest.until_manned`, `Runner._watch_too_few`, `Runner._manning`), the hands kept
-# up only until she is manned, not for her whole errand as the settee's `all hands` keeps them.
 id: send_boat
 verb: send_boat
-doing: sending the boat
 applies_to: {class: ship}
 script: send_boat
 params: {errand: prices, port: null}
@@ -43,5 +32,5 @@ timing:
 on_start: {log: "Away {boat}'s crew! Hoist out {boat}."}
 on_complete: {log: "{boat_cap} hoisted in.", kind: boat.in, severity: routine}
 on_fail: {log: "The boat could not go: {reason}.", kind: evolution.failed, severity: notable}
-crew: {hands: 11, rating: ordinary, stations: [forecastle, afterguard, waisters], too_few: all hands until manned}
+crew: {hands: 11, rating: ordinary, stations: [forecastle, afterguard, waisters]}
 source: "Luce 1866, 'Boats' (lowering and hoisting, the launch and the water); Falconer 1780, BOAT, LONG-BOAT, YAWL; the Regulations of 1806, the Captain, art. XVI (purchases ashore)"

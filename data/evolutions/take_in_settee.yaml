@@ -3,18 +3,11 @@
 # mast, where the sail hangs in its gear (Lescallier 1791 p. 390: its clewlines and buntlines
 # "comme pour les voiles quarrées"). It is not lowered on deck, as a lug is: its yard comes
 # down only to be dipped round the mast. Time as for clewing up a course (judgement).
-#
-# Where the hands on deck are too few to begin it, as a small coaster's watch of two by night,
-# all hands are called for it and piped down after, as a small company was turned up for
-# any work of her great sail (judgement; no source on her watches was found).
 
 # Build notes (not served by the library's catalogue):
 # Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (Lescallier pp. 221-228 and
 # p. 390; take_in_square's clewing up). "In the gear" is a lug lowered on deck but a settee
 # clewed up aloft (`Sail.yard_lowered` false; E11).
-# Package 75, the lead's ruling (1) of 2026-11-10 (the bilander's short watch): `too_few: all
-# hands` (`hands.CrewRequest.calls_all_hands`, `Runner._watch_too_few`), on the settee's
-# files alone so that no other ship's work changes.
 id: take_in_settee
 verb: take_in
 applies_to: {class: settee}
@@ -31,5 +24,5 @@ on_start: {log: "Hands to the {sail} clewlines and buntlines."}
 on_complete: {log: "Took in the {sail}; hanging in the gear, its yard aloft.", kind: sail.taken_in, severity: notable}
 on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the afterguard and the forecastlemen at the sheet, the tack and the gear (judgement)
-crew: {hands: 6, rating: ordinary, stations: [afterguard, forecastle], too_few: all hands}
+crew: {hands: 6, rating: ordinary, stations: [afterguard, forecastle]}
 source: "Lescallier 1791 p. 390 (the settee clewed up as a square sail); take_in_square's time (judgement)"

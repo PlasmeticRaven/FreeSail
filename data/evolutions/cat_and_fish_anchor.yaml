@@ -7,7 +7,6 @@
 # its end; this is the order for an anchor left aweigh.
 id: cat_and_fish_anchor
 verb: cat_and_fish_anchor
-doing: catting and fishing the anchor
 applies_to: {class: ship}
 script: cat_and_fish
 params: {anchor: null}
