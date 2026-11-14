@@ -678,3 +678,19 @@ where the 1 m reader touches the datum beside the quay. These are depth readings
 line; for `line_shore`, whose test is dry ground searched round, they are an upper bound on
 what it misses, not a measure of it. For the lead: whether `shoal_ahead` and `_leg_made` take
 the grid-tied step too, in a step of their own.
+
+### 2026-11-14, 06:15: the lead's ruling on the survey
+
+1. One cause, one function: the least depth along a line lives once, in `chart.py`, its step
+   tied to the finest cell under the line. The audit's check (f) reads it; built with that use
+   in my seven-tracks step, as ruled at 06:10.
+2. `chart.shoal_ahead` and `dealings._leg_made` move to it in a step of their own after the seven
+   tracks, since they are the game's. I measure and tell the lead before committing: which
+   recorded passages, truths and trials print a different line, old beside new, and whether a ship
+   refuses or changes a leg; the pace on a passage in pilot water, before and after; and what the
+   finer reading finds on today's tracks that a cable's step missed. If nothing recorded moves and
+   the pace holds, I build it and report. If lines move, I stop and send each moved pin with its
+   reason.
+3. Left as they are: `line_shore` and `lookout._dry_ground_along`. They try for land, searched a
+   cable round, not for depth.
+4. 111 is not merged yet; the lead tells me when it lands.
