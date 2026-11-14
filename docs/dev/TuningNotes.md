@@ -29005,8 +29005,8 @@ kept), the two sources' fetch records (Morocco's six subsets added, none lost; E
 `status` the tool's "fetched", this run having read them) and `open_edges:` below.
 **The open edges** (M1's stretches): 39 on the trunk, 45 now; 34 kept; the Strait's south edge
 from 6.5 to 6.03 W and the Canaries' east edge from 27.69 to 29.47 N are seams with Morocco's
-regions now and leave; the stretch at 35.5 N east of 5.12 W is re-cut to 5.120001 W; nine come
-with Morocco's regions, each facing open water (Larache's north edge west of 6.5 W and its west
+regions now and leave; the stretch at 35.5 N east of 5.12 W is re-cut to 5.120001 W; nine are new,
+eight with Morocco's regions, each facing open water, and that re-cut one (Larache's north edge west of 6.5 W and its west
 edge, Sallee's north and west edges, Mogador's north and west, the Noun's north). **M1's effect
 on the tide in and beside Morocco:** none. On the 0.05 degree grid from 26.9 to 36 N and 14 to 5
 W (33,123 points), read through 106b's old tree and the joined one, not one point's level or
@@ -29015,6 +29015,21 @@ so the worst water is unmoved, the six ports' spring ranges are as before (El Ar
 Mazagan, Saffi 2.82 m on 1.96 m, M2 1.034 to 1.036 m; Mogador and Agadeer 2.27 m on 1.57 m, M2
 0.823 m), and the tide's step at 31.6 N stands as measured. **Truth 7-570's count:** 4,668 on the
 trunk, 4,887 on 106b's old tree (before 112's step 2), 4,962 joined (4,668 + 2 x 147).
+**Truth 7-572 (M1's: a manifest read without `open_edges:`)**, missed by the join's narrow gate
+(a fast test; cloud run 102 failed on it): the candidate edges, every edge of a block beyond
+which a charted box lies, are 38 on the trunk and 49 joined (38 + 11), the pin moved old beside
+new. Thirteen come with Morocco's regions and two leave: eight face open sea (Larache's north
+edge west of 6.5 W and its west edge; Sallee's north edge west of 7.63 W and its west edge, in
+two stretches about the coarse layers' seam at 31.9 to 32 N; Mogador's north edge west of 10.61
+W and its west edge; the Noun's north edge west of 11.04 W: eight of the nine stretches above,
+the ninth the re-cut below);
+four face land (the Noun's south edge at 27.33 N over the Sahara's shore, Larache's east edge at
+5.92 W, Sallee's east edge at 6.35 W and the step at 34.16 N between them, over Morocco's
+interior), which the old reading takes for open and M1's stretches do not; and the Strait's
+south edge east of 5.92 W is re-cut. The Strait's south edge west of 5.92 W and the Canaries'
+east edge become seams. No Moroccan edge faces the Canaries' or the Strait's box: the old rule's
+"every edge a charted box lies beyond is open" holds of the thirteen as a description of that
+reading, and its fault (land counted open) is the four's, which M1 mends.
 **Owed:** two chart packages built side by side cannot both land without one of them rebuilding
 the manifest, because the manifest is one generated file for every region.
 

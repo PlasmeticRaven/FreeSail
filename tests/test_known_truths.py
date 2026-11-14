@@ -17799,7 +17799,17 @@ def test_truth_7_572_a_manifest_without_the_open_edges_reads_the_boxes_as_before
     before = T.load_tide(manifest=old)
     edges, _ = T.candidate_edges(old)
     assert T.open_stretches(old) is None
-    assert sorted(before.open_edges) == sorted(edges) and len(edges) == 38
+    # package 106b: Morocco's four regions. Old: 38 on the trunk. New: 38 + 11 = 49, thirteen
+    # edges added and two become seams: added, facing open sea, Larache's north edge west of
+    # 6.5 W and its west edge, Sallee's north edge west of 7.63 W and its west edge (31.6 to 31.9
+    # and 32 to 34.16 N, the coarse layers' seam between), Mogador's north edge west of 10.61 W
+    # and its west edge, and the Noun's north edge west of 11.04 W (the eight M1's stretches
+    # list beside the re-cut below); facing land (open by this old reading, not by the
+    # stretches), the Noun's south edge at 27.33 N, Larache's east edge at 5.92 W, Sallee's east edge at 6.35 W and the step at
+    # 34.16 N between them; and the Strait's south edge east of 5.92 W re-cut. Become seams:
+    # the Strait's south edge west of 5.92 W (Larache's now) and the Canaries' east edge (the
+    # Noun's)
+    assert sorted(before.open_edges) == sorted(edges) and len(edges) == 38 + 11
     now = T.load_tide()
     assert now.open_edges == [tuple(x) for x in T.open_stretches()]
     concarneau = Position(47.875, -3.975)
