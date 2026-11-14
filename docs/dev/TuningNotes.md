@@ -27574,6 +27574,75 @@ Built on 52d99b9a, the trunk not merged again. Each mend has a test that fails o
    moved to the port's anchorage (275 m from the cutter, probed); the refusal is the two ships'
    distance against the pull's mile, patched to its figure.
 
+### The fourth round: each cause mended where it lives (2026-11-14)
+
+The owner's word, by the lead: build the fixes for generality, not the symptom. The third
+reading's items were mended a second time by that method (353f7227), each below as its cause,
+where it was mended, where else the cause was looked for, and the test at that level.
+
+**A hull's state read stale across a sleep and a wake** (items 1 and 2).
+- *Cause*: a sleeping hull's far tick refreshes none of what her own tick keeps of the place
+  she lies in, and an awake hull's plan is not kept; both were read as if true.
+- *Mended*: `crews.woken_true` at every wake (`promote`, both its paths, and the station's hull
+  made at full): `World._tick_tide` run with her current, which brings true `water_depth_m`,
+  `bottom`, `water` (the stream) and `tide_state`, and says nothing while she is not at anchor.
+  The rest of what a far tick does not refresh, listed: the sea (`_tick_sea`) and the motion,
+  and the minute's weather, are not run at the wake (each says a line when its words change;
+  they come true at her next minute); everything else in `ship.extra` is the ship's own (her
+  well, her grounding, her leaks, her helm's marks), not the place's.
+- *Where else the stale depth was read*: `scripts._water_depth`, by every anchoring evolution
+  (let go, come to an anchor, moor, the kedge, veer and heave), and `scripts._let_go`'s
+  `bottom`: each, given in a ship's first minute after a wake, read the place she fell asleep
+  in until her next minute; now true from the wake.
+- *Test*: the wake's own (`test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth...`):
+  `water_depth_m` and `bottom` true after it, not the anchor's depth alone.
+
+**How she lies, one answer** (item 2).
+- *Cause*: "is she at anchor" answered from her plan's leg, which is kept only while she sleeps.
+- *Mended*: `crews.how_she_lies` (at anchor, lying to, under way), from her own state: asleep by
+  her far body, awake by her tackle and her helm (`_sail_state_of`), never an awake hull's plan.
+- *Where else asked*: the wake (asked before she wakes); the take-up (no longer asks of an awake
+  hull at all); the demotion, which set `_far_anchored` from the plan and left the anchor's leg
+  in it, so that a ship weighed and under way when put to sleep was frozen at the anchor by the
+  far ticks: now from how she lies, and a hull with no far brain whose plan still had the
+  anchor's leg sleeps lying to (with a brain, her captain's `fold_back` plans her passage, as
+  before). `far_tick`'s own "Brought to an anchor by the track's end" reads a sleeping hull's
+  plan, which is kept: left.
+- *Test*: `test_how_she_lies_is_one_answer_from_her_own_state` by its cases, and
+  `test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed` (with a brain and
+  without); the take-up's `test_taking_command_of_a_ship_under_way_leaves_her_as_she_lies`.
+
+**Can she anchor here, one answer** (item 4).
+- *Cause*: the wake asked it its own way (any depth, any cable), apart from the evolutions.
+- *Mended*: `scripts.cannot_anchor`, the let-go evolutions' own checks (the anchor, lost or not
+  ready, no bottom, the ground too deep for her cable by `_too_deep`) made one function, asked by
+  both let-go evolutions (their words and order unchanged) and by the wake, which takes the
+  first anchor it allows and, where none, lies to, said in her log (JUDGEMENT).
+- *Test*: the wake's lying-to test (no sounding; more water than her cable) and the anchoring
+  evolutions' own suites, unchanged.
+
+**The list of those who go, by a grammar** (item 3, the third time names went wrong).
+- *Cause*: the list was read by its words one by one, each round one more shape slipping past.
+- *Mended*: the grammar written in `transfer.read_counts`: parts joined by commas and 'and',
+  each a collective, a count or a name-shaped part (a name of one or two words, after a title or
+  'the' or alone); no word excludes; anything else is refused saying what was not understood;
+  a name is answered by a whole name, a surname, or a title and a surname, never a last word.
+  The semicolon is read away by the grammar's normalising before the list sees it.
+- *Test*: `test_the_list_of_those_who_go_is_read_by_its_grammar`, a table of sixteen shapes,
+  the refused ones with their words, played through the order as well as the reader.
+
+**Does he know of this ship, one answer** (item 5).
+- *Cause*: "a ship with no hull of her own" stood for "a ship he does not know of".
+- *Mended*: `knowledge.knows_of`: his ships (the one he commands, one he left, one given him), a
+  sail in sight as his lookout names her, or her name in a line of his log that reaches
+  somebody aboard (never the record's own lines, the director's world orders among them, nor
+  his own orders naming her). A ship he does not know of is answered as a name of no ship.
+- *Where else asked*: his orders' ship reader (`orders.command.ship_for_him`, for `take command
+  of` and `transfer`). Found, not changed (other packages' orders, which would move what goes
+  today): `send the boat to the <ship>`, `come alongside the <ship>` and `pull for <ship>` find a
+  ship by `vessels.find` and the lookout's words, without asking whether he knows of her.
+- *Test*: the ship-name test, `knows_of` by its cases.
+
 
 
 
