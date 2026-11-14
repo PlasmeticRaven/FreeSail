@@ -17709,4 +17709,7 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
                 ), (name, tname)
                 read += 1
-    assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+    # 21 charts' tiles, as the step's proof counted them (4593); package 106b: 25 charts, Morocco's
+    # four regions adding 117 level-2 and 30 level-3 tiles, each read under the whole chart and
+    # under its own region's (4593 + 2 x 147)
+    assert read == 4593 + 2 * 147
