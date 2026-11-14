@@ -368,6 +368,42 @@ def test_the_gale_list_names_the_square_sail_only_where_she_has_one():
     assert reply.kind != "order.rejected" and "square" not in reply.text, reply.text
 
 
+def test_make_all_sail_lists_the_square_sail_only_where_she_has_one():
+    """Package 75, the lead's ruling (6) of 2026-11-10, built as "take in" was (the test before):
+    `make all sail`'s line "set the square sail" (`storm.SET_SQUARE_SAIL_LINE`) is in the order's
+    list only where the ship has a `square_sail` part, the cutter and the smack, every other line
+    as listed. In the *Neufchatel* and the two schooners its reply's "Not done" listed the parser's
+    refusal, "'set the square sail': 'set' was understood, but 'square' belongs with 'brace'" (seed
+    7, 10 kn, all hands called); every other file passed the line over as a noun she lacks."""
+    from pathlib import Path
+
+    from freesail.orders.vocabulary import load_vocabulary
+
+    listed = list(load_vocabulary().group_evolutions["make all sail"])
+    assert storm.SET_SQUARE_SAIL_LINE in listed
+    others = [ln for ln in listed if ln != storm.SET_SQUARE_SAIL_LINE]
+    with_one = set()
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        ship = load_ship(path.as_posix())
+        kept = storm.listed_lines(ship, listed)
+        assert [ln for ln in kept if ln != storm.SET_SQUARE_SAIL_LINE] == others, path.name
+        if storm.SET_SQUARE_SAIL_LINE in kept:
+            assert "square_sail" in ship.sails, path.name
+            with_one.add(path.name)
+    assert with_one == {"cutter.yaml", "smack.yaml"}
+    for path in (
+        SCHOONER,
+        "data/ships/privateer-schooner.yaml",
+        "data/ships/hermaphrodite-brig.yaml",
+    ):
+        world = world_for(path, heading=270.0, knots=10.0)
+        world.submit("all hands")
+        world.run(5)
+        reply = world.submit("make all sail")
+        assert reply.kind == "evolution.started" and "square" not in reply.text, reply.text
+        assert reply.text.startswith("Make all sail: "), reply.text
+
+
 def test_a_head_sail_eased_for_the_storm_staysail_is_said_taken_in_only_as_it_is_begun():
     """Package 75, the lead's ruling (13)(v) of 2026-11-09 (found on the bilander's file): over the
     storm line a head sail the fore storm staysail is to replace, loaded near its rating, is taken

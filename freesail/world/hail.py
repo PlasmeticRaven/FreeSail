@@ -492,7 +492,11 @@ def _fills(
     if lying:
         names = [str(n) for n in ((table.get("lies") or {}).get(nation) or ["Nancy"])]
         name = names[rng.randrange(len(names))]
-    kind = str(vessel.kind or "a ship").removeprefix("a ")
+    from freesail.world.ships import rigged
+
+    # the navy's word for her is how she is rigged (`ships.rigged`): "His Majesty's ship", a ship
+    # of the line among them
+    kind = rigged(str(vessel.kind or "a ship")).removeprefix("a ")
     if "brig" in kind and "sloop" in str(vessel.description or ""):
         kind = "sloop"
     navy = str((table.get("navy") or {}).get(nation) or "the {kind} {name}").format(

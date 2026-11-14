@@ -27,6 +27,7 @@
 # meanwhile.
 id: lie_a_try
 verb: lie_a_try
+doing: lying a-try
 applies_to: {class: ship}
 script: lie_a_try
 preconditions: []

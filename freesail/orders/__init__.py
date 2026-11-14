@@ -402,6 +402,12 @@ def _group_evolution(
     first, _, rest = order.verb.partition(" ")
     group = f"{gerund(first)} {rest}".strip()
     lines = list(vocab.group_evolutions[order.verb])
+    if order.verb == "make all sail":
+        # package 75, the lead's ruling (6) of 2026-11-10: the square sail's line only where she
+        # has one, as `shorten sail`'s (`storm.listed_lines`)
+        from freesail.orders import storm
+
+        lines = storm.listed_lines(ship, lines)
     if order.verb == "shorten sail":
         # package 37p: the jibs by their ratings, and the storm staysails over the storm
         # line, as the wind has risen (`orders.storm`)

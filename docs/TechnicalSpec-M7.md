@@ -1166,6 +1166,91 @@ rather than design once a 74 runs, and M8's unless a scenario wants her sooner. 
 7-viii's third ship, built after the frigate action has proved the systems at the
 frigate's scale.
 
+**As built (package 75; `docs/design/Build-Ships.md`, the ships' designs beside it, and
+docs/dev/TuningNotes.md, "Package 75, as built (Phase 5)").** Every ship is a file through the
+generator (`tools/gen_ships.py`, a module of her own under `tools/ships/` for each new ship):
+the five new files every figure with its source or marked judgement, the eight that were keeping
+their notes as filed (some figures from memory and marked UNVERIFIED, the frigate-36's quarterdeck
+INCORRECT against Winfield p. 143 and kept by the owner's ruling). Every file, the eight and the
+five, now carries a hull profile from her own draught or, where none survives, her type's (the
+smack's Chapman 1768 Pl. LIX No. 3, scaled; the bilander's Chapman Pl. LXII No. 5 at the plate's
+own scale, drawn as Gwyn's; the lugger's body below the water Le Coureur's, ZAZ6170, scaled): the
+sheer, the stem and stern, the wales, the decks and every port's sill, drawn by the viewer. What was
+asked, against what was built:
+
+- **The *Indefatigable*:** built as two files from her draughts, the 64 as she was
+  launched (`sixty-four.yaml`, HMS *Indefatigable* of the *Ardent* class, 1784: 64 guns, the long
+  24-pounders below and the 18-pounders above, 491 men, her two fits `ardent class 1784` and
+  `ardent class 1794`) and the razee of 1795 she was cut down to (`razee-44.yaml`, derived from
+  the 64's file as data: her quarterdeck and forecastle off, her lower masts shortened, rated a
+  44 with twenty-six long 24-pounders in one tier; 330 men, 50 marines; `as razeed 1795` and `as
+  carried 1796`, the default; the 1795 fit with its own marines and its own trimmers, so that
+  her crews are all manned). Her polar is measured: the razee lighter, stiffer and faster than
+  the 64 at every angle (truth 7-187); against the frigate-36 she is reported, not forced (in 15
+  kn under her close-hauled and running large), the owner leaving it to the tuning of both ships
+  against the period's accounts. Truths 7-186 to 7-189.
+- **The *Prince de Neufchatel*:** a departure, plainly. §27 calls her "the privateer schooner";
+  her own lines and sail plan (RMG ZAZ6177 and ZAZ6179) and the accounts (Niles, Cobb,
+  Coggeshall) make her a hermaphrodite brig, a brig's square foremast and a schooner's main, and
+  she is built so (`hermaphrodite-brig.yaml`; "a brig" at a distance, rank 2), one fit `as taken
+  1814` (sixteen 12-pounder carronades and two long 6-pounders, no pivot), 130 men with a
+  captain and five lieutenants, her people American. The provisional `privateer-schooner.yaml`
+  of package 86 is kept beside her (Build-Ships.md §9.5), its `long tom` and `letter of marque`
+  fits as they were. Truths 7-192 and 7-193.
+- **The merchant brig of 68 given her few guns:** built, and more: she sails her own file
+  (`merchant-brig.yaml`, four long 6-pounders and sixteen men, where the world's merchant brig
+  had sailed the brig-sloop's guns and her hundred and twenty-one), with the roles `merchant`,
+  `packet` and `indiaman`.
+- **Every existing file given its armament, its quarter bill and its marines:** built
+  (Build-Ships.md §9): the topsail schooner, the lugger and the smack given their fits and
+  bills, each unarmed by default; the pivot's arc made per gun from its own rig; Table No. 29's
+  service charges by kind and calibre (the Regulations of 1806), serving the new ships alone
+  where an existing ship's figure would move (the lead's stage 0 rule); the marines in the bills
+  (§9.4), and by fit where a fit's complement differs (the 64's and the razee's). **Not built:**
+  the fillers as posts, left to package 77 as ruled. The frigate-36's quarterdeck stays as it
+  is, known wrong against Winfield, by the owner's ruling (Build-Ships.md §11).
+- **The 74:** HMS *Bellerophon* of the *Arrogant* class (`seventy-four.yaml`; Slade's design of
+  1758 on the *Bellona*'s lines, launched 1786), her hull measured on her class's draughts and
+  Lavery's *Bellona*; three fits (`arrogant class 1793`, `arrogant class 1795` the default, `as
+  the bellona 1812`); 590 men and 111 marines; her quarter bill by deck, her guns numbered by
+  deck, her tack at quarters worked by the trimmers and the marines first; her lower-deck ports
+  shut at 10.35 degrees of heel alone and a roll's amplitude sooner (truth 7-195, the
+  *Bellona*'s 5 ft 2 in at Channel draught); her mizzen course on its yard, her driver and the
+  yards under her bowsprit as the 64's. **The pace of a 74 crewed measured against the floors
+  and recorded:** three crewed 74s in company hold the crewed floor (truth 7-196's crewed
+  clause, 147 to 151 ticks a second against 60); her clause alone, truth 51's form, gives 476 to
+  505 on the build machine against its 500 and is recorded, not pinned, no floor lowered.
+  **Departures:** §27 makes her the lee ports' "first true test"; the lee ports were built for
+  every armed file before her (Build-Ships.md §7) and she is their lowest. "A scenario that puts
+  her on the sea" is not built here: the ships' scenarios (B6) are out to a supplemental package
+  on the owner's word of 2026-11-05. Truths 7-194 to 7-196. A first rate is not built, as §27
+  says.
+- **Beyond §27, by the brief and the rulings:** the bilander *Hopewell* (`bilander.yaml`, the
+  owner's ruling of 2026-10-25: a British coasting bilander under a settee main, unarmed by
+  default with an armed merchant fit, nine men, her master and mate hauling where a watch is too
+  small for the work, truths 7-197 to 7-199); the engine's one set of extensions, behind the
+  lead's gate (`docs/design/Design-ShipsEngineExtensions.md`): the lateen cut at the mast (the
+  two-deckers' mizzen course), the driver shifted for it (truth 7-230), the yards under the
+  bowsprit and the settee, the physics' equations unchanged; the lee ports by the heel and the
+  roll, held a minute before they open, with their two events; the sub-types as fits and roles
+  (the revenue cutter, the hired armed cutter, the coasting cutter and the privateer lugger as
+  descriptions, the `indiaman` and `revenue` books, a scenario's `role:` refused in words
+  outside a description's roles; truth 7-191); the rank-4 rule (a lone King's ship hauls off
+  from an enemy ship of the line made out within two leagues), a two-decker made out "a ship of
+  the line" at the rig's distance; a far ship of war that engages from her passage keeps her
+  mark and takes up her passage after (truth 7-231); one road for the hands called when the
+  watch is too few; and the mends of the lead's two readings of the package's hash and of the
+  whole-change review of it: one answer to "is she still what I hold her to be", asked in the
+  places the readings and the review found a relation held (the far rounds, both bodies' marks and
+  possessions, the prizes, the cover, the sets' support, the signals, a change of hands) and not
+  yet by the overmatched and man-of-war-near stimuli, a set's member gone from the sea, or a struck
+  commander's members on station (TuningNotes' one list); work held taken up where it stood, what
+  stands through it read again (`Script.standing`), and the ship's own work a post's leaving held
+  kept through coming to anchor and getting under way. The generator writes all eighteen files
+  byte for byte (truth 7-185). Its truths are 7-185 to 7-199, 7-230 and 7-231, in
+  `tests/test_known_truths.py`. What is left for later packages is TuningNotes' one list ("Left
+  for a later package").
+
 ### 28. The chart's next goal, and the signals' sources
 
 The owner's question of 2026-10-17 stands open: the Mediterranean, the Great Lakes and North

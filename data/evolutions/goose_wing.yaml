@@ -15,6 +15,10 @@
 # the other clew aboard again; `take in` hauls it all up.
 id: goose_wing
 verb: goose_wing
+# The work in hand's words before the sail's name (`doing:`, the whole-change review of 80e703c7,
+# sailing-5): "goose-winging the foresail", where the verb's own gerund read "goosing wing";
+# Luce's 'goose-winged'.
+doing: goose-winging
 applies_to: {class: square}
 preconditions:
   - {check: "parent_of(yard_of(sail)).cls in [mast, topmast]", reason: "Only a course or a topsail is goose-winged; the {sail} is neither."}

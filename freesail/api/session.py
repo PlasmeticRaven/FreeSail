@@ -77,6 +77,14 @@ def attach_crew(world: World) -> World:
 
         # The muster is a function of the seed, like everything else (spec M3 §2.4).
         ship.extra["crew"] = muster(ship.spec.crew, world.rng.stream("muster"), ship_name=ship.name)
+        # a merchantman's master and mate: the watch each heads, from her people file (package 75,
+        # the lead's ruling 11 of 2026-11-13; `crew.hands.post_watch`), set only where the file
+        # gives one, so that every other crew is mustered and pickled as before
+        from freesail.world.people import post_watches
+
+        heads = post_watches(ship.spec.source)
+        if heads:
+            ship.extra["crew"].post_watches = heads
         ship.extra["routine"] = Routine(ship.extra["crew"], world.clock)
         # The watch bill reads the ship's time (spec M3 §3).
         ship.extra["evolutions"].clock = world.clock

@@ -14,6 +14,7 @@
 # takes up where she is.
 id: back_and_fill
 verb: back_and_fill
+doing: backing and filling
 applies_to: {class: ship}
 script: back_and_fill
 preconditions: []

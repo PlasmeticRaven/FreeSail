@@ -2003,9 +2003,9 @@ GLASS_NIGHT_NM = 1.0
 # The lookout says what the glass shows of a sail unasked no oftener than this, in minutes
 # (judgement: a pilot's cutter rounding to and filling by turns is not a line a minute).
 GLASS_REPEAT_MIN = 5
-# The sails a far-detail ship lies to with aback, by her rig's word (judgement on the
-# heave-to evolution's rule, `data/evolutions/heave_to.yaml`: the mast that carries the
-# most square sail; a fore-and-after's head sheet to windward).
+# The sails a far-detail ship lies to with aback, by how she is rigged (`ships.rigged`: a ship of
+# the line is a ship; judgement on the heave-to evolution's rule, `data/evolutions/heave_to.yaml`:
+# the mast that carries the most square sail; a fore-and-after's head sheet to windward).
 _HOVE_TO_ABACK = {
     "a ship": "main topsail aback",
     "a brig": "main topsail aback",
@@ -2031,7 +2031,7 @@ _WORK_KINDS = (
     ("heaving in", "her anchor coming up"),
     ("heaving short", "her anchor coming up"),
     ("getting under way", "her anchor coming up"),
-    ("sending boat", "a boat hoisting out or in"),
+    ("sending the boat", "a boat hoisting out or in"),
     ("shooting the trawl", "the hands at the trawl"),
     ("hauling the trawl", "the hands at the trawl"),
     ("shooting the nets", "the hands at the nets"),
@@ -2169,7 +2169,9 @@ def _glass_far(world: Any, vessel: Any) -> dict[str, Any]:
     work: list[str] = []
     words: list[str] = []
     if lying:
-        aback = _HOVE_TO_ABACK.get(str(vessel.kind), "her sails aback")
+        from freesail.world.ships import rigged
+
+        aback = _HOVE_TO_ABACK.get(rigged(str(vessel.kind)), "her sails aback")
         words.append(f"hove to on the {tack} tack, {aback}")
     if phase.startswith(("shoot:", "haul:")):
         from freesail.world.fishing import gear_spec

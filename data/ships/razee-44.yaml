@@ -2721,7 +2721,7 @@ crew:
   # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
   quarter_bill:
     trimmers:
-      # The trimmers: what her seamen leave when one side's guns of 'as carried 1796', the chasers and the wheel are manned, the marines taking the carronades first, split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of 44 (Indf §6.4; judgement). The bill leaves the marines not wanted at the carronades for their division, as Falconer quarters them on the poop and forecastle or gangway (1780, QUARTERS); the beat to quarters (crew/quarters.py) takes the marines to the long guns before the topmen (Indf §6.4; the station order is the engine's, open for the lead). Of the forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the forecastlemen 'the best older seamen').
+      # The trimmers: what her seamen leave when one side's guns of 'as carried 1796', the chasers and the wheel are manned, the marines taking the carronades first, split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of 44 (Indf §6.4; judgement). The bill leaves the marines not wanted at the carronades for their division, as Falconer quarters them on the poop and forecastle or gangway (1780, QUARTERS), and keeps them there by its marines below. Of the forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the forecastlemen 'the best older seamen').
       forecastle: 14
       # Of the fore topmen, for the fore braces aloft.
       fore_top: 18
@@ -2743,6 +2743,8 @@ crew:
     small_arms: 26
     # The boarders by the bill, a quarter of her seamen told off from the guns' crews (Luce 1884 ch. XX; judgement, the shared rule), with the marines, who board with the bayonet.
     boarders: 60
+    # The marines the bill keeps in their division at the beat (the 74's key, Bel-D §12.1): her marines but the 36 at the default fit's carronades, quartered on the poop and the forecastle or gangway, at the great guns only in distant cannonading (Falconer 1780, QUARTERS), so that the beat forms their division and her trimmers meet the bill's; before it the beat took her marines to the long guns before the topmen (Indf §6.4).
+    marines: 14
 # The armament (spec M7 7; package 70; docs/design/Design-Ship-Indefatigable.md §5): the guns as parts of the graph by their place, in her fits, each on its port of the hull's profile to the centimetre with its deck named (Build-Ships.md §4.4); their weights by Adye 1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py.
 armament:
   default: as carried 1796
@@ -2752,6 +2754,15 @@ armament:
       source: Winfield, British Warships in the Age of Sail 1793-1817, p. 99, Indefatigable as a frigate;
         RMG ZAZ2371 and ZAZ2398, the armament tables (read); James, Naval History vol. 1 p. 454; Adye
         1804 pp. 72 and 155, the pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the crews
+      # The marines the bill keeps in their division at the beat when she carries this fit (package 75, B1; the lead's ruling (4) of 2026-11-13): her 50 marines but the 12 at this fit's carronades, who take them first, the long guns taking none (the bill's rule, Bel-D §12.1 and B7.b: the marines quartered on the poop and the forecastle or gangway, at the great guns only in distant cannonading, Falconer 1780, QUARTERS); the bill's 14 (above) is the default fit's. JUDGEMENT: the bill's rule on this fit's guns, since no establishment of private marines by rate or by year was found (Ind §10.8) and the file bears one company whatever her fit (her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330).
+      marines: 38
+      # The trimmers the bill tells off by station at the beat when she carries this fit (package 75, Phase 5; the lead's ruling 13 of 2026-11-14): what her seamen leave when one side's guns of this fit, the chasers and the wheel are manned, the marines taking the carronades first, split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of 44, as the bill's are, so that every crew of this fit is manned at the beat; the bill's trimmers (above) are the default fit's, whose guns want fewer seamen. JUDGEMENT: the bill's rule on this fit's guns (Indf §6.4), as her marines on it are, since no period quarter bill for a ship of about her company was found (Ind §6.3: RMG WQB/39, the Indefatigable's of 1812, is a watch bill) and the file bears one company whatever her fit (her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330).
+      trimmers:
+        forecastle: 9
+        fore_top: 12
+        main_top: 14
+        mizzen_top: 7
+        afterguard: 9
       guns:
       # Her gun deck's twenty-six long 24-pounders, thirteen a side, the 64's lower-deck guns kept (James vol. 1 p. 454): the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her decks, as the frigate-36 numbers hers.
       - id: gun.1.starboard
@@ -3256,7 +3267,7 @@ armament:
           12: 4.0
         carronade:
           42: 3.5
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 110
       # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 6
@@ -3800,7 +3811,7 @@ armament:
           12: 4.0
         carronade:
           42: 3.5
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 111
       # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 6
