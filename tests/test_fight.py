@@ -20,6 +20,7 @@ FRIGATE = "data/ships/frigate-36.yaml"
 CUTTER = "data/ships/cutter.yaml"
 BRIG = "data/ships/brig.yaml"
 MERCHANT = "data/ships/merchant-brig.yaml"
+SEVENTY_FOUR = "data/ships/seventy-four.yaml"
 
 
 def _scenario(speed: float = 0.0) -> Scenario:
@@ -75,13 +76,18 @@ def _enemy(
 
 
 def _alongside(
-    distance_m: float = 10.0, her_quarters: bool = False, her_captain: bool = False, seed: int = 7
+    distance_m: float = 10.0,
+    her_quarters: bool = False,
+    her_captain: bool = False,
+    seed: int = 7,
+    ship: str = FRIGATE,
 ):
-    """The player's frigate at quarters with her fire held, and a French frigate made so far
-    off her starboard beam and crewed; the lookout given his minute; the mark engaged to
-    starboard. Her captain stands aside (the test moves her) unless `her_captain`. `seed` the
-    game's (package 97: a test whose story needs a man to live through the fight's draw)."""
-    w = make_world(seed, FRIGATE, _scenario())
+    """The player's frigate (or `ship`) at quarters with her fire held, and a French frigate
+    made so far off her starboard beam and crewed; the lookout given his minute; the mark
+    engaged to starboard. Her captain stands aside (the test moves her) unless `her_captain`.
+    `seed` the game's (package 97: a test whose story needs a man to live through the fight's
+    draw)."""
+    w = make_world(seed, ship, _scenario())
     w.submit("beat to quarters")
     w.run(5)
     heading = math.degrees(float(w.ship.heading))
@@ -99,6 +105,34 @@ def _alongside(
     w.run(65)
     out = w.submit("engage her to starboard")
     assert out.kind == "guns.engage", out.text
+    return w, v, enemy
+
+
+def _laid_aboard(description: str = "privateer brig", seed: int = 7):
+    """The player's frigate at quarters with her fire held, and a ship of France of
+    `description` laid ten metres off her starboard beam at the second before the lookout's
+    minute, so that the mark is engaged and the grapnels thrown three seconds after (package
+    115 D1, the lead's ruling (A) of 2026-11-14: a smaller ship laid as `_alongside` lays the
+    frigate drifts beyond the grapnel's throw, thirty metres, within the lookout's minute,
+    and the deck-won tests board the weakest honest defender a frigate's boarders carry: a
+    French frigate at her own temper holds, truth 7-181a). Her captain stands aside; her
+    company beats to quarters. Returns the world, the vessel and her hull, grappled."""
+    w = make_world(seed, FRIGATE, _scenario())
+    w.submit("beat to quarters")
+    w.submit("hold your fire")
+    w.run(60)
+    while w.clock.ship_time.second != 57:
+        w.run(1)
+    heading = math.degrees(float(w.ship.heading))
+    v, enemy = _enemy(w, heading + 90.0, 10.0, description=description)
+    enemy.ship.dyn.heading = float(w.ship.heading)
+    enemy.captain.aside = True
+    enemy.submit("beat to quarters")
+    w.run(4)
+    out = w.submit("engage her to starboard")
+    assert out.kind == "guns.engage", out.text
+    grapple = w.submit("grapple her")
+    assert grapple.kind != "order.rejected", grapple.text
     return w, v, enemy
 
 
@@ -335,14 +369,18 @@ def test_boarders_against_a_whole_company_awake_are_repulsed_and_the_temper_pays
     assert "the last fight repulsed" in w.readings.words("boarders")
 
 
-def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_their_hand():
-    """§11a: against a frigate at quarters, her gun crews at the guns, the boarders with
-    their arms served out carry the deck in a few rounds: her colours come down by the
-    boarders' hand (`action.strike` with the words), the losses on both musters by name;
-    the far body struck for the moment of the strike and then (package 74, the design's
-    §2.3: the officer on the deck won takes possession of her at once) a prize of ours, her
-    record saying how she was taken, her colours ours over hers. The pin moved by 74: on the
-    trunk she lay struck and no prize; the bands of the fight are as they were."""
+def test_boarders_against_a_frigate_at_her_own_temper_are_repulsed_and_both_musters_count_it():
+    """§11a, as truth 7-181a restates it (the lead's ruling of 2026-11-14 on package 115 D1).
+    OLD: "the boarders carry a deck held by her marines and the colours come down by their
+    hand", which held only while the French frigate, boarded before she was fired on, had
+    the default temper and not her captain's (`combat.morale.morale_of`, mended). NEW: at her
+    own temper the deck holds: the boarders are repulsed, the grapnels cast off, the losses
+    on both musters as the fight counted them (more of ours than of hers), our temper the
+    worse by the repulse, and she no prize and not struck. The deck carried is the
+    contest's sum (truth 7-181b)."""
+    from freesail.combat.boarding import REPULSE_COST
+    from freesail.combat.morale import morale_of
+
     w, v, enemy = _alongside(10.0, her_quarters=True)
     w.submit("grapple her")
     w.submit("serve out the small arms")
@@ -356,8 +394,47 @@ def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_
         if f is not None and f.over:
             break
     f = B.fight_of(w.ship)
+    assert f is not None and f.over == "repulsed", (f.over, f.round)
+    repulsed = _events(w, "action.repulsed")
+    assert repulsed and "the grapnels cast off" in repulsed[0].text
+    assert not B.grappled_to(w.ship) and not B.grappled_to(enemy.ship)
+    assert f.lost_attack > f.lost_defence > 0
+    assert morale_of(w.ship).repulses == REPULSE_COST
+    ours = [s for s in w.ship.extra["crew"].sailors if s.hurt] + list(w.ship.extra["crew"].dead)
+    hers = [s for s in enemy.ship.extra["crew"].sailors if s.hurt]
+    hers += list(enemy.ship.extra["crew"].dead)
+    assert len(ours) >= f.lost_attack and len(hers) >= f.lost_defence
+    from freesail.world import prizes as P
+
+    assert not P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")
+
+
+def test_a_seventy_fours_boarders_carry_a_frigate_at_quarters_by_their_numbers():
+    """§11a, the deck carried tested whole (the lead's reading of part D at 60af48e, item 5:
+    when the carried test became the repulsed one above its assertions went from tests/). A
+    deck CAN be carried from a ship of war, by numbers; only equal numbers at full temper
+    fail (truth 7-181b). A 74 at quarters, her 216 boarders with their arms served out,
+    against the French frigate at quarters at her own temper, laid as the frigate is laid
+    above: the deck is carried in the first round (measured), her colours come down by the
+    boarders' hand (`action.carried`, with the words), she is struck "carried by boarding",
+    the far body struck for the moment of the strike and then a prize of ours (package 74,
+    the design's §2.3) and alongside, her people the prize's prisoners and their hurt the
+    fight's, more of hers lost than of ours, and the boarders' reading says the last fight
+    carried. The OLD test's assertions, each back on an honest road."""
+    w, v, enemy = _alongside(10.0, her_quarters=True, ship=SEVENTY_FOUR)
+    w.submit("grapple her")
+    w.submit("serve out the small arms")
+    w.run(400)
+    boarders = w.submit("boarders away")
+    assert boarders.kind == "action.boarders" and "216 over the side" in boarders.text
+    for _ in range(40):
+        w.run(30)
+        f = B.fight_of(w.ship)
+        if f is not None and f.over:
+            break
+    f = B.fight_of(w.ship)
     assert f is not None and f.over == "carried", (f.over, f.round)
-    assert 2 <= f.round <= 12
+    assert f.round == 1, f.round
     carried = _events(w, "action.carried")
     assert carried and "by our boarders' hand" in carried[0].text
     struck = _events(enemy, "action.struck")
@@ -367,7 +444,6 @@ def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_
     assert P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")  # 74's
     assert (P.record_of(v) or {}).get("how") == "carried by boarding"
     assert B.grappled_to(w.ship) == v.id  # the prize alongside
-    # her people are the prize's prisoners (74's muster swap): their hurt the fight's
     prisoners = P.prisoners_of(enemy.ship)
     assert prisoners is not None
     her_hurt = [s for s in prisoners.crew.sailors if s.hurt]
@@ -503,3 +579,41 @@ def test_the_director_puts_men_on_the_sick_list_and_hurts_an_officer_by_the_aboa
     assert "bears no surgeon, or he is ill already" in said
     forms = [f for f in D.WORLD_ORDER_FORMS if f.key == "aboard.found"][0]
     assert "aboard: the first lieutenant is hurt" in forms.examples
+
+
+def test_a_ships_temper_starts_from_her_captains_doctrine_whichever_road_asks_first():
+    """Package 115 D1, the lead's ruling of 2026-11-14: a ship's morale is made at its first
+    asking, and was made from her captain's doctrine only when the asker handed it in (the
+    fire's reckoning did, the boarding did not), so that the French frigate boarded before she
+    was fired on began at the default 0.7 and fired on first at her doctrine's figure (truth
+    7-181's round table: 0.700 against 0.877). Mended at the cause (`combat.morale.morale_of`
+    finds the doctrine itself). The same ship, alongside as the fight tests lay her, asked
+    first by two roads through the orders: by the boarding (grappled and boarded, no gun
+    fired) and by our fire (her company fired into): each starts at the same temper, her
+    captain's own `morale_start`. (Her own fire, the third road the lead named, is not reached
+    here: ordered at her prompt to engage the player's ship to larboard, her guns are cast
+    loose, loaded and run out at ten metres and fire nothing in an hour; found, not mended.)"""
+    from freesail.combat.morale import Morale
+
+    starts = {}
+    for road in ("boarding", "our fire"):
+        w, v, enemy = _alongside(10.0, her_quarters=True)
+        assert not isinstance(enemy.ship.extra.get("morale"), Morale)
+        if road == "boarding":
+            w.submit("grapple her")
+            w.run(60)
+            assert w.submit("boarders away").kind == "action.boarders"
+            w.run(60)
+        else:
+            w.submit("fire as they bear")
+            for _ in range(20):
+                w.run(30)
+                if isinstance(enemy.ship.extra.get("morale"), Morale):
+                    break
+        m = enemy.ship.extra.get("morale")
+        assert isinstance(m, Morale), road
+        starts[road] = m.start
+    doctrine = enemy.captain.doctrine
+    want = float(doctrine.threshold("morale_start", 0.7))
+    assert want != 0.7, "her doctrine gives the default: the case is not met"
+    assert all(abs(s - want) < 1e-9 for s in starts.values()), (starts, want)

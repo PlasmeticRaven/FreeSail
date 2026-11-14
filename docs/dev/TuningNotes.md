@@ -37123,3 +37123,427 @@ Cited and not held, as the helper found them: Lempriere 1800 (nations.yaml); Oma
 (barcelona.yaml); Mahan and the 1799 day book (the squadrons' books); Winfield (nine ship
 files) and Lavery (22 data files); Troude; Lloyd's Register; "the encyclopaedia" in 21
 feature files; Trinity House's pages; Whewell 1833; Tomlins and Raithby's Statutes.
+
+## Package 115, part D: the newcomer's trips (2026-11-14)
+
+From the cold review of 2026-11-14 (`docs/reviews/ColdReview-M7.md` 1.5, 5.3, F2.11), each
+trip played at the prompt from a scenario started as the harbour starts it, its cause read,
+mended where it lives, and tested by the same door (truths 7-615 to 7-627, at the end of
+`tests/test_known_truths.py`). The lead's rulings of the same day stand over each.
+
+**D1, the guns.** The first action with the orders its header lists less one: the answers
+"The guns are firing as they bear already" and "loading with round shot already" were given
+with every gun lashed, and nothing fired. Three causes: the answers of the standing
+intentions (`orders/gunnery.py`) spoke of the battery's intention as of the guns; the beat
+(`orders/crew.py`) did not say the guns were still secured; the player's order made the
+rules captain stand aside (decision 41) before his `engaging` state, where he casts loose,
+and the aside said nothing of it. Measured, differing from the review: the beat at 10:02 is
+before his first judgement (10:05) and does not move him; `engage her to starboard` at
+10:07 does. The period, the lead's ruling: casting loose is its own word (Falconer 1780,
+EXERCISE: "1st. Silence. 2d. Cast loose your guns."; QUARTERS says nothing of the guns).
+Mended in four functions: `gunnery.execute` hands every answer of the intentions to
+`_true_of_the_guns` (new, with `_guns_state`): with a gun loose the answer is as it was;
+with none, "So ordered already: firing as they bear. The guns are secured: none is loaded,
+run out or fired until they are cast loose; say 'cast loose the guns'." (or "being cast
+loose" while they are); `cease firing` no longer says the guns are loaded and run out.
+`crew.beat_to_quarters` adds "The guns are secured: 'cast loose the guns' to serve them.";
+`captains.player_hand` says "the deck is yours", and "and her guns are secured" with an
+enemy in sight (`_enemy_in_sight`, new). Nothing in `crew/quarters.py`, `crew/hands.py`,
+`evolutions/runner.py` or `combat/` (package 75's ground).
+
+**D2, the purchase with the boat lost.** Reproduced at refute-03's figures (£500, £494,
+£248, nothing delivered). The cause: `trade`, `trade_together` and `trade_list` each paid,
+moved the market and broke out the hold before `_send_boat` refused a lost boat. Mended by
+one function, `Dealings._bargain`, by which every door strikes: weighed whole, refused in
+words before anything moves, the boat sent first and the money moved only when she is away
+for the goods (JUDGEMENT, the lead's word: paid once the boat is away, not at her return).
+The three doors keep their own words. The lost boat's refusal says her name once. A boat
+lost after she is away (the lead's question): measured before, the coal's £6 gone, nothing
+said, and "The boat hoisted in" two hours later of a boat that was lost. Mended in the
+errand itself (`SendBoatScript`, which keeps what it carries): it ends and says "the 3 tons
+of coal bought are lost with her, £6 paid for them and not to be had again"; goods sold and
+lost before landing keep the money taken (JUDGEMENT); `send_boat.yaml`'s `on_fail` reads
+"{boat_cap}'s errand is not done: ..." (it said "could not go" of a boat that went).
+`world/boats.py` is not touched. Checked and not of this cause: the yard's demand, the
+recruits and the lighter pay at the order and deliver by the port's own job, not the ship's
+boat; found on the way, for others: those jobs deliver whether or not she still lies in the
+port, and "The boat cut adrift by order" is logged twice for one order (`boats.py`).
+
+**D3, the starter book by rig.** Measured on every ship file: refused in part on the cutter,
+the smack, the lugger, the bilander, both schooners and the five boats; whole on the square
+rigs. Mended where a book file is read (`standing.book.fit_to_rig`, called by
+`ui.console.read_standing_orders`, the console's, the server's and the scenarios' one
+reading; the lead's ruling: one book for any rig): a clause naming a family of sails she
+carries none of (`SAIL_FAMILIES`, the ship files' own plural groups) is left out, a rule
+left empty is left out, and her log says so ("The book fitted to her rig, for she carries no
+studdingsails nor royals: 'night routine' left out; 'morning sail' left out; 'shorten sail
+for weather' without its studdingsails and royals."). A standing order typed at the prompt
+refuses as before. What it moves in the six scenarios that load the book onto such a rig is
+measured for the lead before any pin moves.
+
+**D4, the small items.** (a) "a stranger in sight is no stranger in sight": a clause's
+words (`standing.rules.Clause.describe`) now say a reading's words of absence alone.
+(b) The same report sent down eight times in twelve minutes: eight different sails of the
+world's business, each lost from sight in the same words (for the lookout's owner: the
+lookout names them alike). `world.reports.tick` gathers a minute's same-worded lines into
+one report, the first whole and the count after it, and does not send words the captain was
+told within the hour until he has been on deck (`_reported_lately`, as `_called_lately` is
+the calls'). (c) The player's own person moved below at noon: a cutter whose master
+commands, the master the player's person, `occupy("below")` by the day's work. The lead's
+ruling: the player's person is never moved by a routine. `Navigation._below_to_work` sends
+the master below for the day's work, the time sight and the lunar's clearing unless he is
+the player's own person with the deck his (no rules captain commanding her for him); then
+he works it where he stands, said in the log. Where else a routine moves a person: the sights
+bring the master on deck (`occupy("on deck")`, the noon and the lunar, left: the sight is
+taken on deck); the surgeon's cockpit (a wound, not a routine); the needs' sleep (by his own
+order or where he stands). (d) The dispatches gain their 'let go the best bower'; every
+scenario that says she lies at anchor is tested to be riding in her port at two minutes. The
+merchant brig is left out of that test: her 'let go' wants twelve forecastle hands
+(`let_go_anchor.yaml`) and her company is sixteen, on the trunk and on package 75's branch
+alike; the deeper cause, not built: a scenario's opening state made by an order that can
+wait or fail. (e) The wheel shot away, never mended: `rig the relieving tackles`
+(`orders/damage.py`, `RelievingTacklesScript`, `data/evolutions/relieving_tackles.yaml`, the
+tiller's use by Steel 1794, RELIEVING-TACKLES, "used when the tiller-ropes are damaged", and
+Luce 1884's quarter bill, "at the relieving tackles, an officer or quartermaster, with a few
+men to steer the vessel in case the wheel or tiller-ropes are shot away", both on file under
+docs/references/; Falconer's RELIEVING-TACKLES are the careening tackles; the five minutes and
+six hands JUDGEMENT), the hit's line naming the order, the rules captain
+giving it before any other repair; the physics untouched. Measured at seed 6: lost at
+10:17, rove at 10:22. `boats_stove` is the same shape and is left. (f) "Tacked ... heading
+SSE (158°)" with her head NE: `TackScript.words` names her own heading when the tack ends by
+the timeout; the test that pinned the wrong heading is corrected (old "SSE (158°)", new "NE
+by N (35°)"). (g) "a quarter past twelve at noon": `world.tide.time_words` says the noon
+hour past noon is the afternoon's. "13 fathoms" beside "thirteen fathoms" (three spellers, 52
+call sites) is noted and not mended. (h) A misspelt sail offered its halyard:
+`orders.resolve.NounTable.add` let a part's raw id, entered first unsuggested, keep its
+plain words out of the hints (22 of 38 sails on the frigate); the plain words are the hint
+now. (i) A mistyped `world:` line ended the console: `World._apply_world_order` reads the
+line inside the refusal's reach, and a save holding it replays to the same refusal.
+(j) Recruits given another man's number: `Crew.issued` and `Crew.next_number` number them
+after the highest ever given (the dead and a prize crew included; a prize crew numbered by
+her captor's books); a checkpoint from before reads the books.
+
+**D1, continued: engage, the temper, the hold (the owner's and the lead's rulings of the same
+day).** `engage` given with the guns secured casts them loose by the order 'cast loose the
+guns' (`orders.handle`, the one road), in `_true_of_the_guns`. In the fight tests'
+`_alongside` (beat, hold your fire, engage, grapple, boarders away) the boarding then ended
+"repulsed" where it ended "carried". Measured round by round on truth 7-181 (attacker men,
+temper | defender men, temper): old r1 98, .647 | 118, .700, carried at r10 (lost 43 and 55);
+new r1 100, .632 | 118, .877, repulsed at r9 (lost 59 and 44). The men were the same; her
+TEMPER was not. `combat.morale.morale_of` made a ship's morale at its first asking, from her
+captain's doctrine only when the asker handed it in: our fire's reckoning
+(`action._judge_morale`) did, the boarding (`boarding._morale`) did not, so a ship boarded
+before she was fired on started at `DEFAULT_START` 0.7 and not her own figure. Mended there
+(`_doctrine_of`: her World's captain); the far fight already made hers from the brain's
+doctrine. Nothing else in `combat/` is made at its first asking from a caller's figure. And
+`_engage` turned a held battery to "as they bear", which with the guns secured did nothing and
+with them loose fired on a player who had just said hold: an explicit `hold your fire` or
+`cease firing` (`battery.held_by_order`) now stands against a later engage, which takes her for
+the mark, casts loose and holds ("The guns are held at your order: 'fire as they bear' to
+open."); an order to fire, and securing the guns, clear it (the lead's JUDGEMENT). Found, not
+mended: ordered at her own prompt to engage the player's frigate alongside, a French
+frigate's guns are cast loose, loaded and run out at ten metres and fire nothing in an hour;
+two frigates at ten metres drift beyond a grapnel's throw (thirty) within minutes of opening
+fire, and `lay her aboard` did not close them again in half an hour; pistol-shot fire takes
+about a man a minute from a company of 264.
+
+**F2.11 as found (owed, not mended here).** The same men serve the guns and are counted as
+boarders: `combat.boarding.boarders_of` draws the bill's boarders, the most skilled fit men of
+every station but the marines, the quarterdeck and the idlers, whether or not their guns are
+being served. And the defender's gun crews are not counted in the defence unless `repel
+boarders` is given: `boarding.defenders_of` takes the marines, the helm, the trimmers, the
+quarterdeck and the small-arms men, and every fit man on deck only when repelling.
+
+**The boarding truths restated (the lead's ruling of 2026-11-14, the owner told).** Truth
+7-181, OLD: "the boarders carry a deck held by the marines and the colours come down". NEW,
+two sentences: 7-181a, "at her own temper a frigate's deck held by her marines holds against
+a boarding party of about her defenders' number" (repulsed, her temper above the boarders'
+every round, more of theirs lost than of hers); 7-181b, "a deck is carried when its
+defenders are reduced", tried as the contest's sum (`boarding._strength` and the new
+`boarding._verdict`, taken out of `_round` unchanged), a table either side of the turns: a
+hundred boarders at 0.6 against defenders at her 0.88, carried under 34, contested 35 to 136,
+repulsed from 137; carried when her temper is under her line, repulsed when theirs is. The
+round tables at seed 7 (attacker men, temper | defender men, temper): trunk r1 98, .647 | 118,
+.700; r2 98, .586 | 113, .632; r5 96, .458 | 101, .495; r8 95, .412 | 93, .344; r10 95, .374 |
+92, .291, carried (lost 43 and 55). Mended: r1 100, .632 | 118, .877; r2 99, .548 | 114, .832;
+r5 96, .458 | 109, .726; r9 94, .291 | 99, .597, repulsed (lost 59 and 44). test_fight's
+boarders-carry-a-deck follows 7-181a (now "...are repulsed and both musters count it").
+Why the worldly roads to a carried deck failed, in the lead's order: her company shortened by
+the world's own order (`aboard "Medusa": the fever in the ship`, a tenth sick each; her fit
+264, 216, 196, 178, 161, her defenders 103, 78, 74, 60, 53) and the boarders still repulsed
+at rounds 7 to 15, their own temper falling under its line with 55 to 59 of them lost (the
+sick list does not touch her temper); a fight to reduce her drives the two out of the
+grapnel's throw (below). 7-325 and 7-351 (and the two deck-won tests of `test_between_hulls.py` they call)
+keep their sentences and board the weakest honest defender a frigate's boarders carry, by the
+lead's ruling (A): the far detail's privateer brig (the Prince de Neufchatel's hull, a
+hermaphrodite brig of 130, no marines), laid ten metres off by `tests/test_fight._laid_aboard`
+at the second before the lookout's minute so that the mark is engaged and the grapnels thrown
+three seconds after (laid as `_alongside` lays the frigate, a smaller ship drifts to 33 to 39
+metres, beyond the throw, within the lookout's minute). A French frigate would not serve:
+at her own temper her deck holds (7-181a). Measured over seeds 1 to 10: carried in the second
+round at every seed (ours lost 10 to 17, hers 9 to 24), the first lieutenant standing at each;
+over 11 to 80 he falls only at seed 60. The seeds, old beside new: the officer stands, OLD the
+frigate at seed 1 (Mr Freeman), NEW the brig at seed 1 (Mr Freeman, the same muster); the
+officer killed and the party leading on, OLD the frigate at seed 7 (Mr Pearce killed at 530 by
+"a blow of a tomahawk", Mr Ward leading on), NEW the brig at seed 60 (Mr Gordon killed at 701,
+"a pistol ball in the breast", Mr Bowen leading on). Each draw decides only whether the
+lieutenant stands or falls in the crossing and the rounds.
+
+**Owed, measured and not mended (for the owner at a gate, with the period's figures).** As
+the fight is built, boarding a ship of war cannot succeed (CORRECTED below, the lead's reading
+at 60af48e, item 5: by numbers it can; what this paragraph measured is a hundred boarders
+against a frigate's company, and only equal numbers at full temper fail). A French frigate alongside,
+grappled, her company shortened by the world's own order (`aboard "Medusa": the fever in the
+ship`, a tenth of her fit men sick each time), a hundred boarders away (her fit, her
+defenders, the end, ours lost and hers): no fever 264, 103, repulsed in round 7, 59 and 30; two
+216, 78, repulsed in 11, 59 and 56; three 196, 74, repulsed in 10, 59 and 44; four 178, 60,
+repulsed in 14, 55 and 68; five 161, 53, repulsed in 15, 57 and 65. The sick list does not
+touch her temper (morale counts the hurt, not the sick); the boarders' own temper falls under
+its line first; and against fifty-three defenders a hundred boarders still lose fifty-five to
+fifty-nine men. At
+pistol shot a frigate's fire takes about a man a minute from a company of 264, and her temper
+falls from 0.88 to 0.82 in forty minutes; two ships laid ten metres apart drift beyond the
+grapnel's throw (thirty) in a minute or two, and `lay her aboard` does not close it in thirty
+minutes; so that, as the fight is built, a player cannot bring about the boarding the old
+truth claimed.
+
+**The pins moved by design, re-pinned in one commit by the lead's word (2026-11-14), each old
+beside new with the line-by-line difference.**
+- The beat's reply (D1): `tests/test_bellerophon.py` (the 64's beat, and the one-gun-deck beat
+  on the cutter, the brig, the frigate, the hermaphrodite brig, the merchant brig, the
+  privateer schooner and the razee) and `tests/test_bilander.py` (the armed merchant fit): each
+  line as it was, with "The guns are secured: 'cast loose the guns' to serve them." after it.
+- The library's catalogue (D4 e): `tests/test_agents.py`, "108 evolutions" to "109
+  evolutions", the relieving tackles' file added (a model reading the catalogue reads it).
+- The naval cruise (gate 5c, 48 hours; `GATE_5C_CRUISE_DIGEST`): 2242 lines both, digest
+  1e7f8ab24b84e6f7 to 46300a9a567b80d7; the only difference, fifteen `standing.held` lines,
+  "not carried out; a stranger in sight is no stranger in sight." to "not carried out; no
+  stranger in sight." (D4 a). Truth 77 reads the same digest.
+- The schooner's passage (gate 5b, 17 hours; `GATE_5B_SCHOONER_LINES`, `_DIGEST`): 766 to 769
+  lines, 3a1698037811b753 to ef15ca96ee2ed052. At the start three refusals ("There is no such
+  part as the royals in this ship") become "The book fitted to her rig, for she carries no
+  royals: 'night routine' without its royals; 'morning sail' left out; 'shorten sail for
+  weather' without its royals." and the two rules entered (D3); at noon "Mr Travers works the
+  day's work where he stands." in place of his going below, and "Mr Travers came on deck, the
+  day's work done." gone (D4 c: no rules captain commands her, so the player at her prompt is
+  her master); at sunset the night routine refused, "take in the studdingsails ... already
+  furled". Nothing else: 'shorten sail for weather' never fires, the same landfall, pilot and
+  anchorage on the same ticks, she does not take the ground.
+- The merchant passage (gate 5c, 36 hours; `GATE_5C_MERCHANT_LINES`, `_DIGEST`): 3103 to 3096
+  lines, 40bcef34afd0cec4 to 82a1447152be8b82. At both noons "Mr Travers works the day's work
+  where he stands." in place of his going below (D4 c), and so, with the captain on deck, the
+  reports and calls the officer sent below to him then are not sent: "a sail sighted, on the
+  larboard bow", "the sail on the larboard quarter lost sight of", the two "came on deck"
+  lines, and five calls on the second day ("the Mingan bearing E by N, distant four miles: a
+  danger"; "her sails lifting ..."; "the Mingan ... steady and closing"; "land ahead ... she is
+  standing into it"; "the pilot warns ..."). Nothing else: her track, her bargains and her
+  anchorage are line for line the same. Truth 78 (the fake captain's merchant passage): the
+  same master seated by a model is a seated player's person too (`Navigation._players_own`
+  reads the stations a seat holds), so his log is still the nobody-seated log with his
+  orders in it; its lines follow the merchant passage's (3115 to 3108), its digest c0bf4b51621ad91f to
+  de0f8c03bd2663df.
+
+**Truth 7-134 and the held battery (correcting the builder's first report).** The first report
+said a battery under `hold your fire` is not served ready; measured again, it is: the cutter's
+starboard guns, both sides loaded before the engage, are each loaded, run out and primed within
+thirty seconds of `engage her to starboard` under the hold, none fired (the side is run out and
+primed only once it is engaged, `Battery.serving`). The first measure read the guns one second
+after the engage. So `combat/guns.py` is not touched. The truth gave the word at once: with the
+old override the engage had turned the hold into "as they bear", and its "fired >= 2" was the
+guns' own fire as they bore; with the hold standing the word, given one second after, found one
+gun ready. The truth now gives the word when the side is ready (thirty seconds, asserted ready
+and unfired), its sentence and every figure as they were: "Three shot at a cutter: one struck
+her and two wide."
+
+**D4 (d), the dispatches, as ruled at last (the lead's ruling (b) of 2026-11-14).** The anchor
+given to the dispatches' opening is taken out again: she begins under way in Carrick Road at
+five in the morning as the trunk has her, and her rules captain makes sail for Plymouth at
+05:05 and touches nowhere. Her words are made true the other way: the position line's comment
+was the only place that called the road "the usual anchorage" (the game serves none of it: not
+the harbour's line, not the primer), and it now says she is in Carrick Road under way, bound
+for Plymouth; truth 7-627 tests her as under way. FOUND, NOT MENDED (for the owner's list, the
+captain's pilotage, `world/captains.py`): from an anchor in Carrick Road her rules captain
+traded (42 tons of copper ore), got under way at 09:30 on the starboard tack, took the pilot
+at 09:43, put her about off Trefusis Point, was warned by the pilot at 09:46 ("the Black Rock
+nine cables ahead, right ahead; leave it to larboard"), shaped a course at 09:54 for 50 00 N
+4 57 W and struck the Black Rock at six knots, stove and making water, aground till the flood
+at 17:30; the three other rules captains leaving the same road from an anchor
+(merchant-intent, merchant-cutter, directed-passage) do not take the ground in eight hours.
+The cause read and not measured: a course shaped through the pilot's warning, nothing in his
+plan steering off the rock.
+
+**The lead's reading of part D at 60af48e (2026-11-14, read independently with a base copy
+beside it), mended on top of it.** Each at its cause, the measure old beside new.
+
+1. *The hold knows whose it is.* At 60af48e `held_by_order` was set by any `hold your fire`,
+   the rules captain's own among them ("hold your fire (until she is within the book's
+   range)" at his every entry to engaging, `world/captains.py`, not touched), so that after
+   it the player's `engage her to starboard` held the battery and said "She is engaging a
+   cutter to starboard already. The guns are being cast loose ..." (the first action, the
+   beat, 400 s, Mr Bowen holding at 480, the engage at 520): the guns ready by 10:14 and
+   silent. Mended in `orders/gunnery.py`: the hold keeps the actor of the order that gave it
+   (the World's `order_actor`, the same that `orders.crew.whose_order` reads), and
+   `_hold_binds` lets a rules captain's hold bind only a rules captain's engage; the player's
+   own hold binds either, as at 60af48e (the hand that held is the hand that must loose,
+   JUDGEMENT on the lead's ruling). `_held_words` never says "at your order" of a hold the
+   player did not give ("by the captain's book"), and an engage that changes nothing on a
+   held battery says "She has her for her mark to starboard, and her guns are held at your
+   order: 'fire as they bear' to open." instead of "engaging already". OLD (60af48e) beside
+   NEW and the base, the player's engage at 520: "She is engaging a cutter to starboard
+   already. The guns are being cast loose; they are served when it is done.", nothing fired;
+   NEW "Engage a cutter to starboard: the guns to fire as they bear. The guns are being cast
+   loose; they are served when it is done.", her shot at 3720, 3780 and 3840 s, the base's
+   own to the second (the base: "Engage a cutter to starboard: the guns to fire as they
+   bear.", the same three). Truth 7-629 carries both roads. Looked for elsewhere: the hold is
+   set in `_mode` and `_cease` only, and loosed by `_engage`'s turning it, `_mode` to fire,
+   and `SecureGunsScript.end_phase`.
+2. *A report gathered only of the same thing.* `world/reports._reported_lately` keyed on the
+   words, so that four sails sighted "on the larboard bow" in an hour went down as one
+   report. Mended: the same thing is the same kind of line of the same sail or mark (its
+   id; `_subject`), or of the same words where the line names nothing; a line of it reported
+   is one said a messenger's minute before a report of its kind. A minute's lines alike are
+   said as the lookout says them (`_gathered_words`): "three sail sighted on the starboard
+   beam", "two sail on the larboard quarter lost sight of"; the land once ("the land
+   sighted, right ahead", two marks or one); anything else "(two of them)". OLD (60af48e) "a
+   sail sighted, on the starboard beam (three the same)". The dispatches, below from the
+   start, nine hours: every sail the lookout hails by day is sent down (truth 7-621, its
+   second road), and nothing is sent twice in the hour of the same sail (its first). The
+   eight lines of the cold review's 5.3 item 5 were eight sails (measured at the time):
+   each is now its own report, as the lead ruled.
+3. *`fire` and its forms true of the guns.* `fire` was outside `_INTENTIONS`; it is in now,
+   and with the guns secured its answer says the word stands for the guns when they are cast
+   loose ("the word stands until a gun of it is cast loose, run out and bears"; "fires as
+   soon as it is cast loose and ready"), never "no gun of it is loaded" of guns loaded and
+   lashed: the secured note counts them ("The guns are secured, three of them loaded: none
+   is run out or fired until they are cast loose; say 'cast loose the guns'."), and is as
+   before when none is loaded. Truth 7-622, its second road (an action fought, the guns
+   secured with three loaded, the hands at quarters again): `fire`, `fire a gun to leeward`,
+   `fire the starboard broadside`, `fire number one starboard gun`, `fire as they bear`, `fire
+   by divisions`, each true, and nothing fires in ten minutes after.
+4. *A sale paid when the goods are landed.* `Dealings.lost_on_errand` said "the money taken
+   stands" of tin that went down before the quay. Now a sale lost before the boat reached the
+   quay (`SendBoatScript`'s phase before "ashore") is void: the price paid back from the
+   purse ("the sale of 2 tons of tin at Falmouth void: lost before they were landed"), the
+   market's `net_sold` as before the sale, and the words "the 2 tons of tin to be sold went
+   down in her before they were landed: the sale is void, and the £245 taken for them is paid
+   back". Landed and lost on the pull back, the sale stands ("were landed before she was
+   lost, and the sale stands"). The errand keeps its port (`SendBoatScript.port_id`), the
+   boat's state being made afresh when she is lost. Measured, the merchant cutter: £260 and
+   two tons of tin; sold, £505 and none; stove pulling for the shore, £260, no tin, the
+   market at -2 as before the sale (OLD at 60af48e: £505, no tin, the market at 0). Truth
+   7-624's row more. A purse short at the voiding (spent meanwhile) pays what it holds and
+   the words say the rest is owed; not reached in any test.
+5. *The deck carried tested whole.* The OLD carried test's assertions are back, each on an
+   honest road (`tests/test_fight.py`, "a seventy-four's boarders carry a frigate at quarters
+   by their numbers"): the 74 (`_alongside` now takes the ship file) at quarters, 216
+   boarders with their arms served, against the French frigate at quarters at her own
+   temper: carried in round 1 (ours lost 17, hers 20), `action.carried` "by our boarders'
+   hand", her strike "carried by boarding", a prize of ours (74's) and alongside, her people
+   the prize's prisoners and their hurt the fight's (20), "the last fight carried". CORRECTED:
+   my note above ("as the fight is built, boarding a ship of war cannot succeed"), which
+   repeated the lead's finding of the morning, was measured with a hundred boarders against a
+   frigate's company; by numbers a deck CAN be carried from a ship of war (the 74's in the
+   first round; a frigate's against one that has lost a third of her company in the second,
+   the reader's probe), and only equal numbers at full temper fail.
+6. *The small items.*
+   - The engage on a held battery with the guns secured said both "The guns are held at your
+     order ..." and "she engages to starboard when they are": now one sentence, "The guns are
+     being cast loose, and held at your order when they are: 'fire as they bear' to open."
+     (7-629 re-pinned to it).
+   - `cease firing` before the beat ended "say 'cast loose the guns'", which is then refused
+     ("beat to quarters first"): the hint now names the order that works from where she is
+     (`gunnery._to_cast_loose`: "say 'beat to quarters', then 'cast loose the guns'"). The
+     hold after `cease firing` is meant (an explicit order about firing, the lead's ruling of
+     the morning): it stands until an order to fire (`fire as they bear`, `fire by
+     divisions`; an engage looses only a hold that is not the player's own, by the captain's
+     book) or `secure the guns`; the beat now says so ("The guns are held at your
+     order: 'fire as they bear' to open."), not a silent battery after it.
+   - The schooner's fitted night routine refused at every sunset ("Nothing done: ...
+     studdingsails already furled", tick 58060 of the reader's run, 57533 of a bare ship file):
+     `standing.book.fit_to_rig` now leaves out a rule fitted down to taking in only sails
+     nothing in the book sets, and says so ("'night routine' left out, for it was left to take
+     in her studdingsails only, which nothing in the book sets"). A rule whole as written is
+     never touched (the frigate's night routine refuses its no-op clauses at sunset as on the
+     trunk). Truth 7-625 asserts it on every ship file.
+   - On the fore-and-aft vessels the rules captain's book 'keeping station' logged "has a
+     standing order 'shorten sail for weather', and one of that name is held already (the
+     captain's) ...": the starter's rule, refused whole on them before the fitting, is held now.
+     `standing.runtime._fitted_by_the_game` (read afresh from the starter book, so a save and a
+     replay say the same) lets such a rule stand without the line. The first action's opening
+     lines are now the base's eight (OLD at 60af48e: nine).
+   - The relieving tackles' words: the evolution's verb is `rig_the_relieving_tackles` (the
+     work as the log names it, "rigging the relieving tackles": "Only 15 hands to tack ship;
+     the rest are rigging the relieving tackles."); given twice, "The hands are rigging the
+     relieving tackles already." (`orders/damage.py`); `belay the relieving tackles` belays it
+     (a work noun of two words, `orders/work.py`, `more_work_nouns` in the vocabulary), "Belayed
+     rigging the relieving tackles; the tackles not rove, the helm lost as the shot left it."
+     (`RelievingTacklesScript.left_words`); and the wheel, once shot away, is not shot away
+     again with the tackles rove (`combat/hits.py`, the condition beside `helm_lost`; the draw
+     is taken as before).
+   - QUESTION FOR THE OWNER (put by the lead; not built): nothing reads `helm_by_tackles`, and
+     with the wheel shot away she steers exactly as before (`physics.hull` holds the rudder
+     only where the shot left it until a helm order moves it). Whether a wheel shot away
+     should stop the helm until the tackles are rove is a question of the fight's damage.
+     Truth 7-626 says so in its sentence; the order stands as built meanwhile.
+   - What a model is told that it was not, the whole of part D: the evolution catalogue's 109th
+     evolution (`data/evolutions/relieving_tackles.yaml`, its verb now
+     `rig_the_relieving_tackles`), its vocabulary entry and the work noun "relieving tackles",
+     the primer's row (docs/primer/25); and `data/evolutions/send_boat.yaml`'s fail text,
+     "{boat_cap}'s errand is not done: {reason}." (left out of the first list).
+   - The pins' table above: test_evolutions' "SSE (158°)" to "NE by N (35°)" (D4 f, the tack's
+     heading) was re-pinned in f7c5f083, with its mend, not in a95aebd.
+7. *The scenarios' openings, the place and the ship.* merchant-schooner-plymouth's header was
+   the merchant passage's word for word (the schooner from Falmouth for Brest, the weather
+   pinned) and its position's line said Carrick Road, and she lies in Plymouth Sound;
+   merchant-ship's header was the same passage's, of the schooner Speedwell, and she is the
+   Amazon on the frigate's file; looked for elsewhere, merchant-cutter's header was the same
+   copy (of the Speedwell; she is the cutter Sherbourne). The three headers rewritten true
+   (ship, place, day, purse, the season's weather), the schooner's place line "Plymouth
+   Sound: she rides at the anchorage in the Sound". Truth 7-627 now reads the place (the
+   position's words name her port, its road or its anchorage) and the ship (a name of the
+   ship files in the header is her own, or a sail of the scenario's own list) of every
+   scenario it tries; the merchant brig is held out, and the test says nothing is asserted
+   of her.
+
+**Listed by the reader as older, for the owner's list, not built here.** At a newcomer's
+`engage her to larboard` the rules captain did not stand aside and re-engaged to starboard;
+`strike the colours` is read as striking the fighting book's standing order "the colours";
+"sell five tons of tin and buy one ton of coal" refused as one cargo's name; the boat
+alongside in the same tick when the ship has sailed an hour; helm orders and `tack ship`
+accepted with the wheel shot away; a double full stop after `world: aboard: the boat stove`.
+
+**The wheel shot away: DECIDED, NOT BUILT (the owner's word of 2026-11-14, by the lead: "For
+a wheel shot away, yes, it ought to stop the helm until the damage is repaired"; held for the
+next milestone by the lead's order of the same evening).** The order `rig the relieving
+tackles` stands as built, its words mended (item 6 above). What the ground report found, for
+the builder of it:
+- The engine already stops the rudder: `physics/hull.steer` returns the rudder as it lay while
+  `ship.extra["helm_lost"]` stands, and `physics/integrate` (`d.rudder = hp.steer(ship, h)`) is
+  the one road from the helm to the rudder. Measured at the first action's seed 6, the tackles
+  belayed: the rudder 0.116 rad through `steer north-west` and `steer east`. What is untrue is
+  the words: every helm order is accepted ("Helm ordered: steer NW (315°).") and does nothing.
+- The doors a guard would stand at: `orders/verbs.execute`'s gate beside `_not_riding` (the
+  heading and points verbs and `HELM_VERBS`), `orders/navigation.steer_degrees` (shape a course,
+  the sailing directions, the course held pending), and the start of the evolutions whose
+  scripts give the helm (tack, wear, boxhaul, box off, back and fill, heave to, fill away, lie
+  a-try, scud, come to anchor, get under way); every actor comes through `World.submit` to them.
+- The rules captain's `_repairs` orders the tackles first (31 s after the hit at seed 6, rove
+  318 s later), but runs at most every 600 s and not at all hove to for weather, in distress,
+  or at his shortening wind (30 kn): with the wheel lost in a gale he never rigs them.
+- The rudder meanwhile, as it lay or trailing amidships (tiller ropes shot away leave the
+  tiller free), and whether the tackles steer slower: open, for the builder and the lead.
+- The odds as read: about one hit in 270 takes the wheel on the hull aim, one in 500 on the
+  rigging; the first action at seeds 1 to 8 loses it at seed 6 only.
+- The wheel itself made good (new tiller ropes rove, a spare wheel shipped): another repair
+  evolution, on the list.
+
+**The pins moved by the mends of the lead's reading at 60af48e, re-pinned in one commit, old
+beside new.** The fast tier whole at f84ec05 moved one pin besides the trunk's own key-shape
+test: `tests/test_bellerophon.py`, the deck fired to leeward (item 3, `fire` true of the guns;
+the beat leaves her guns secured). OLD "The starboard lower-deck guns to fire each as soon as
+it is ready, six guns; eight are behind ports the sea has shut." NEW "The starboard lower-deck
+guns to fire each as soon as it is cast loose and ready, six guns; eight are behind ports the
+sea has shut. The guns are secured: none is loaded, run out or fired until they are cast
+loose; say 'cast loose the guns'." The gate digests (the naval cruise, the schooner's and the
+merchant passages, the fake captain's) did not move: in neither passage does a minute bring
+two reports of the same words, and the schooner's book is fitted the same way there.
