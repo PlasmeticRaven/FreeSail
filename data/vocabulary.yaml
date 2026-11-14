@@ -1731,6 +1731,23 @@ verbs:
     synonyms: [scuttle her, sink the prize, sink her, scuttle]
     object: prize
     level: 1
+  # Package 60 (docs/design/Design-ShipBought.md §2.6): the player's person takes command of
+  # a ship that is his to take (given him by the director's word in this step), aboard her;
+  # the old ship laid up or left to her officer by the tail (`orders/command.py`).
+  take command of:
+    # 'take command' and 'assume command' were refused phrases of package 109's step 1; they are
+    # this order, and its own refusal of a prize says 109's words (`orders/command.py`)
+    synonyms: [take command, assume command of, assume command, take up command of, shift into,
+               take her up as my ship]
+    object: command
+    level: 1
+  # Package 60, step 2 (the design's §6): her people by name and her hands by count and rating
+  # moved to another ship of his within a boat's pull or alongside, by the boat's loads in their
+  # time (`orders/command.py`, `world/transfer.py`).
+  transfer:
+    synonyms: [send across, turn over]
+    object: command
+    level: 1
   # Package 74 (spec M7 §20): the accused before a court martial speaks in his own words
   # (`say to the court: I did my duty`), heard at the court's place; refused where no court
   # sits on him.
@@ -2481,8 +2498,6 @@ refused_phrases:
   haul up the port lids: *ports
   raise the ports: *ports
   open ports: *ports
-  take command: &command "Command of a prize is not taken by words: her prize master and prize crew are put aboard her by 'take possession of her'; to go aboard another ship yourself, 'go to the boat' and 'pull for' her."
-  assume command: *command
   as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
   lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
   lay out the stream: *stream

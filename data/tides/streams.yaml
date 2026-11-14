@@ -115,12 +115,6 @@ book_limits:
   - {south: 31.60001, north: 33.73333, west: -17.86666, east: -15.73334}  # Madeira (package 111, the lead's ruling: the region's bounds, at its tiles' edges)
 
   - {south: 25.2001, north: 31.9, west: -22.13, east: -9.34}  # the ocean carried south, the Canaries and the Salvages (package 106a)
-  # Package 106b: Morocco's Atlantic coast, four boxes, each a region's bounds (the chart
-  # session's ruling), every position of them in one of the coast's two areas below
-  - {south: 34.16, north: 35.5, west: -7.62666, east: -5.92001}  # morocco-larache (package 106b)
-  - {south: 31.6, north: 34.16, west: -10.61332, east: -6.34668}  # morocco-sallee (package 106b)
-  - {south: 29.46666, north: 31.6, west: -11.03999, east: -9.33334}  # morocco-mogador (package 106b)
-  - {south: 27.33334, north: 29.46666, west: -13.17334, east: -9.33334}  # morocco-noun (package 106b)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1600,53 +1594,6 @@ areas:
       judgement: [set, rates, hour, current]
       source: "the set the period's own between east and south-east (Purdy 1826, pp. 151 and 166; Smyth 1824, p. 185: from Cape Passaro to Valletta keep a point higher); the rate JUDGEMENT, the lower of the half mile to a mile"
 
-  # Package 106b: Morocco's Atlantic coast. No tidal stream is given by the period for the
-  # open coast; its current is the pilot's, along the shore and southward (Purdy 1825, p. 152,
-  # between Larache and Sallee: "the currents, which set to the southward, along the coast;
-  # and the velocity of which, especially at the full and change of the moon, is frequently
-  # from one to two miles an hour"; p. 154, between Cape Blanco and Cape Cantin: "The currents
-  # are very strong, and generally run in the direction of the coast, S.W. by S."; p. 156,
-  # south of Mogador under Cape Sem: "Hereabout the current sets violently to the southward";
-  # p. 157, south of Agadir: "the rapidity of the currents, which invariably set in towards
-  # the land, too often drive vessels a-shore"; p. 155, at Mogador itself: "The current is
-  # scarcely perceptible"). Two areas over the four regions' bounds, before the Canaries'
-  # open sea (first-match), which answered the southern two's water west of 9.34 W.
-  - id: morocco-coast-north
-    chart: morocco-sallee
-    name: the coast of Morocco from Cape Spartel to Cape Cantin and Safi
-    polygon: [[31.6, -10.61332], [34.16, -10.61332], [34.16, -7.62666], [35.5, -7.62666], [35.5, -5.92001], [34.16, -5.92001], [34.16, -6.34668], [31.6, -6.34668]]
-    axis_deg: 214
-    spring_kn: 0.0
-    neap_kn: 0.0
-    phase_h: 0.0
-    current: {toward_deg: 214, kn: 1.0}
-    source: "Purdy 1825, p. 152: the currents set to the southward along the coast, from one to two miles an hour, especially at full and change; p. 154: very strong, in the direction of the coast, S.W. by S.; the set S.W. by S. the pilot's, the knot the lower of his rates, JUDGEMENT; the springs' stronger set not carried"
-    book:
-      set: SW by S
-      spring_kn: 0.0
-      neap_kn: 0.0
-      strongest_h: 0.0
-      current: {set: SW by S, kn: 1.0}
-      judgement: [rates, hour]
-      source: "Purdy 1825, pp. 152 and 154: southward along the coast, S.W. by S., one to two miles an hour; the rate the lower, JUDGEMENT"
-  - id: morocco-coast-south
-    chart: morocco-mogador
-    name: the coast of Morocco from Mogador to Cape Juby
-    polygon: [[27.33334, -13.17334], [29.46666, -13.17334], [29.46666, -11.03999], [31.6, -11.03999], [31.6, -9.33334], [27.33334, -9.33334]]
-    axis_deg: 180
-    spring_kn: 0.0
-    neap_kn: 0.0
-    phase_h: 0.0
-    current: {toward_deg: 180, kn: 1.0}
-    source: "Purdy 1825, p. 156: south of Mogador the current sets violently to the southward; p. 157: south of Agadir the currents invariably set in towards the land; p. 155: scarcely perceptible at Mogador itself (not carried); the set southward and the knot JUDGEMENT, the set toward the land said and not carried"
-    book:
-      set: S
-      spring_kn: 0.0
-      neap_kn: 0.0
-      strongest_h: 0.0
-      current: {set: S, kn: 1.0}
-      judgement: [rates, hour]
-      source: "Purdy 1825, pp. 156 to 157: violently to the southward, and in towards the land; the rate JUDGEMENT"
   # Package 106a: the Canaries and the ocean carried south. No tidal stream is given by the
   # period (Purdy 1825, p. 218: at Orotava "there is little or no tide"); the period's
   # current is Rennell's (Purdy 1825, pp. 95 to 96, 'Major Rennell's Remarks on the Currents

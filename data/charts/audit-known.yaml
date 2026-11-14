@@ -106,11 +106,6 @@ known:
   reason: water west of mediterranean-west's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone, the Channel's in the Mediterranean
   owner: package 79c
   most: 3599
-- key: a-unowned:morocco-larache:north
-  place: 35°52.0′N 6°46.4′W
-  reason: morocco-larache's level-2 tiles of the row 35.44 to 35.87 N west of the Strait's column reach north past its bound (the Strait's 35.5 N) into open water no region's bounds hold; the tide there the eleven's alone (the chart session's ruling, package 106b)
-  owner: the lead's list
-  most: 450560
 - key: a-unowned:portugal:north
   place: 42°16.0′N 9°19.8′W
   reason: water north of portugal's bounds and beside a neighbour's that its tiles answer and no region's bounds hold, the bounds not abutting; the tide there the eleven's alone
@@ -156,6 +151,11 @@ known:
   reason: strait's level-2 tiles, built whole, reach south past its bounds into open water no region's bounds hold; the tide there the eleven's alone
   owner: the lead's list
   most: 48737
+- key: a-unowned:strait:south-west
+  place: 35°26.4′N 6°46.4′W
+  reason: strait's level-2 tiles, built whole, reach south-west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
+  owner: the lead's list
+  most: 23616
 - key: a-unowned:strait:west
   place: 35°30.0′N 6°46.4′W
   reason: strait's level-2 tiles, built whole, reach west past its bounds into open water no region's bounds hold; the tide there the eleven's alone
@@ -221,6 +221,11 @@ known:
   reason: the strip 42.5 to 42.68 N by 11 to 11.15 E, the Ligurian sea's since package 111 moved its east bound to its tiles' edge, lies in no box (the Gulf's ends at 11 E, the Tyrrhenian's at 42.5 N) and takes the nearest
   owner: the lead's list
   most: 8
+- key: d-no-box:strait
+  place: 35°31.5′N 6°01.5′W
+  reason: 'the Strait''s water south of 36 N and west of 5 W: portugal''s box begins at 36 N and mediterranean-west''s at 5 W'
+  owner: the lead's list
+  most: 206
 - key: d-split:balearics
   place: balearics
   reason: balearics' north bound is 40.56 N (package 89) where mediterranean-west's box ends at 40.5 N; the strip takes the nearest box
@@ -242,16 +247,6 @@ known:
   owner: the lead's list
   most: 3461
 
-- key: d-split:morocco-mogador
-  place: morocco-mogador
-  reason: the box morocco, last in the file, takes no water another box answers; the region's water north of 30 N is madeira's box and south of it the canaries', the same north-east trade in both (package 106b, by the chart session's ruling)
-  owner: package 106b
-  most: 1040
-- key: d-split:morocco-sallee
-  place: morocco-sallee
-  reason: the box morocco, last in the file, answers the coast's water east of 9 W, which lay in no box; the region's water west of 9 W stays madeira's box (package 106b, by the chart session's ruling)
-  owner: package 106b
-  most: 2074
 - key: d-split:salvages
   place: salvages
   reason: madeira's box begins at 30 N and the canaries' ends there; the Salvages run from 29.89 to 30.32 N, the same north-east trade in both

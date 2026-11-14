@@ -44,6 +44,7 @@ from freesail.world.captains import (
     station_off,
 )
 from freesail.world.geo import Position, bearing_and_distance, destination
+from freesail.world.hulls import players_id
 from freesail.world.ships import PLAYER_ID
 
 __all__ = [
@@ -720,7 +721,7 @@ class FarCaptain(Judgement):
                     nations.at_war(n_mine, str(other.nation)),
                 )
             self._exchange = words
-        if other_id != PLAYER_ID and hasattr(vessels, "spoke"):
+        if other_id != players_id(self.world) and hasattr(vessels, "spoke"):
             vessels.spoke(self.vessel, other_id)
 
     def _weigh(self) -> None:

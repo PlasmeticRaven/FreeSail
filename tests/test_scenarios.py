@@ -49,14 +49,11 @@ def test_the_channel_east_is_a_passage_on_the_whole_chart_from_torbay_to_guernse
     assert chart.region_at(race) == "channel-mid" and chart.depth_at(race) > 30.0
     assert world.tide.area_at(race).id == "alderney-race"
     # the book is read whole, every order accepted by the dialect
-    # the weather: the Strait's southern half lay in no box and took the nearest (old: both
-    # "portugal"); package 106b's box `morocco`, last in the file, answers it now (the chart
-    # session's ruling: the water east of 9 W from 30 to 36 N that lay in no box)
+    # the weather: the Strait's southern half lies in no box and takes the nearest
     from freesail.world.weather import load_climatology
 
     boxes = load_climatology()
-    assert boxes.box_at(36.2, -5.5).name == "portugal"
-    assert boxes.box_at(35.7, -5.5).name == "morocco"
+    assert boxes.box_at(36.2, -5.5).name == boxes.box_at(35.7, -5.5).name == "portugal"
     assert not boxes.boxes["portugal"].contains(35.7, -5.5)
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]

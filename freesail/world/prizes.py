@@ -49,8 +49,11 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.crew.model import Crew, Rating, Sailor, Station, Watch, number_words
-from freesail.world.ships import PLAYER_ID
+from freesail.crew.model import Crew, Rating, Sailor, Station, number_words
+from freesail.world.hulls import players_id
+from freesail.world.musters import deal_watches as _watches
+from freesail.world.musters import remuster
+from freesail.world.musters import take_out as _take_out
 
 __all__ = [
     "COVER_NM",
@@ -384,87 +387,13 @@ def prize_crew_size(captor_fit: int, prize_complement: int, doctrine: Any) -> in
 # -- the muster swapped ---------------------------------------------------------------------
 
 
-def remuster(hull: Any, crew: Crew) -> int:
-    """The hull's working company is `crew` from here: `ship.extra["crew"]`, the routine
-    re-pointed (its all-hands call dropped), the quarter bill reckoned afresh at the next
-    beat. Returns how many keepers were re-pointed (the audit's figure)."""
-    ship = hull.ship
-    extra = ship.extra
-    moved = 0
-    crew.reindex()
-    extra["crew"] = crew
-    moved += 1
-    routine = extra.get("routine")
-    if routine is not None:
-        routine.crew = crew
-        routine._coming = []
-        routine._called_at = None
-        routine._aloft_ids = frozenset()
-        routine._aloft_instances = set()
-        moved += 1
-    if extra.pop("quarters", None) is not None:
-        moved += 1
-    battery = extra.get("battery")
-    if battery is not None and hasattr(battery, "mode"):
-        from freesail.combat.guns import FireMode
-
-        battery.mode = FireMode.HOLD
-        battery.word = None
-    # the hull's people read the registry (84's one registry); nothing of theirs is cached
-    return moved
-
-
-def _watches(sailors: list[Sailor]) -> None:
-    for i, s in enumerate(sorted(sailors, key=lambda x: x.id)):
-        if s.station in (Station.QUARTERDECK, Station.IDLERS):
-            s.watch = Watch.NONE
-        else:
-            s.watch = (Watch.STARBOARD, Watch.LARBOARD)[i % 2]
-        s.at = None
-        s.quarters = ""
-        s.turned_up = False
-
-
 def _draw_prize_crew(captor_hull: Any, n: int, party: list[Sailor] | None) -> list[Sailor]:
     """The men put aboard her: the party on her deck first (the boarders, whole and at no
-    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler."""
-    crew = captor_hull.ship.extra.get("crew")
-    if crew is None:
-        return []
-    chosen: list[Sailor] = []
-    if party:
-        for s in party:
-            if s.fit and s.at is None and s.station not in (Station.QUARTERDECK, Station.IDLERS):
-                chosen.append(s)
-            if len(chosen) >= n:
-                break
-    if len(chosen) < n:
-        taken = {s.id for s in chosen}
-        for s in crew.sailors:
-            if len(chosen) >= n:
-                break
-            if s.id in taken or not s.fit or s.at is not None or s.post:
-                continue
-            if s.station in (Station.QUARTERDECK, Station.MARINES, Station.IDLERS):
-                continue
-            chosen.append(s)
-    return chosen
+    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler
+    (`musters.draw`, shared with package 60's transfer)."""
+    from freesail.world.musters import draw
 
-
-def _take_out(captor_hull: Any, men: list[Sailor]) -> None:
-    """The men out of the captor's muster and off her quarter bill."""
-    crew = captor_hull.ship.extra.get("crew")
-    if crew is None:
-        return
-    ids = {s.id for s in men}
-    crew.sailors = [s for s in crew.sailors if s.id not in ids]
-    crew.reindex()
-    quarters = captor_hull.ship.extra.get("quarters")
-    if quarters is not None:
-        for gc in quarters.crews.values():
-            gc.members = [s for s in gc.members if s.id not in ids]
-        for name, division in list(quarters.divisions.items()):
-            quarters.divisions[name] = [s for s in division if s.id not in ids]
+    return draw(captor_hull, n, party)
 
 
 def _confine_people(hull: Any, tick: int) -> dict[str, str]:
@@ -616,8 +545,8 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
 
     vessel.role = role
     brain = getattr(vessel, "brain", None)
-    if brain is None and str(getattr(vessel, "id", "")) == PLAYER_ID:
-        brain = None  # the player's own hull is awake always: no far brain for her
+    if brain is None and str(getattr(vessel, "id", "")) == players_id(world):
+        brain = None  # the player's ship is awake always: no far brain for her (60: his now)
     elif brain is None:
         brain = FarCaptain(_root(world), vessel, words, role=role)
         vessel.brain = brain
@@ -671,7 +600,7 @@ def possess(
     if rec and is_prize(prize) and str(rec.get("nation_was")) == str(captor.nation):
         return retake(world, prize, by=f"{captor.name} coming up", how="retaken", captor=captor)
     captor_hull, prize_hull = _hull(captor), _hull(prize)
-    if str(prize.id) == PLAYER_ID and captor_hull is None:
+    if str(prize.id) == players_id(world) and captor_hull is None:
         # the player's ship taken by a far body (the design's §3.1): her captor is made a
         # hull and woken, a dealing of the first rank under the cap, so that the captive is
         # aboard a real hull with places, a company and a log
@@ -758,7 +687,7 @@ def possess(
             s.at = None
             s.quarters = ""
         remuster(prize_hull, new_crew)
-        if str(prize.id) == PLAYER_ID:
+        if str(prize.id) == players_id(world):
             # the player's person taken aboard the captor (the captive's channel, §3.1)
             from freesail.world.captive import player_taken
 

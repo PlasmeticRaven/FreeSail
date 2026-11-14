@@ -27147,6 +27147,793 @@ last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
 
 
+## Package 60: a ship bought (2026-11-11)
+
+The design is `docs/design/Design-ShipBought.md` (gated 2026-11-10, its §13 binding); the steps
+are its §10, each reported at one hash. Every figure here is measured in this container at the
+hash named, or marked JUDGEMENT where it is a choice.
+
+### Step 1: the player's ship changed in play, and the followed ship's far body
+
+**The four floors of the design's §4.2, first, each with its own test** (`tests/
+test_ship_changed.py`): a crewed hull with no far brain and an empty plan rides at her anchor
+where she lies at one and lies to where she does not (`Vessel.kept_hull`, `world/ships.py`), never
+`done` and so never discharged by `crews.release_done`; a far brain may be given to any ship but
+the player's now (`prizes._give_intent` reads `hulls.players_id`); the game's first hull is never
+released by `release_done`; the switch measures every crewed body by her own position, a brain or
+none (`crews.switch`).
+
+**The followed ship's far body** (the design's §9.2, by the owner's word; truth 7-481): the
+followed hull's far body is mirrored to her truth on every tick of hers where she is another
+hull than the first (`World._tick_vessels`, `crews.mirror`, whose brain's history now reads the
+one clock through the hull rather than the parent the followed hull has not got). Measured with
+`tests/test_ship_changed.followed_body_off_m` (the brig X under `--ship`, the royals set, every
+five minutes for twenty), old beside new:
+
+| minutes | before, on the trunk (m: the lead's at 5 and 20, mine at 10 and 15) | after (m) |
+|---|---|---|
+| 5 | 933.8 | 0 |
+| 10 | 1,892 | 0 |
+| 15 | 2,848 | 0 |
+| 20 | 3,803.4 | 0 |
+
+The truth's band is under fifty metres (JUDGEMENT: the mirror is exact at every tick; the band
+leaves room for a body's minute move between two of the followed hull's ticks).
+
+**The split** (the design's §2): `World._players` (a hull id; None in every save and checkpoint
+from before) and `World.players` reading it, `World.first_hull` the game's first hull; the save's
+first block written from the first hull, `"player_ship"` beside `"hulls"` for the reader only
+when the field is set; the acts' `""` key given to the first hull (`core/acts.act_target_of`);
+the director's station and log on the first hull (`agents/director.director_hull`, the harness's
+note); the director's truth read with the player's ship current (`api/readings.director_readings`);
+`players_current` the player's ship now and `first_hull_current` the shadow's own block;
+`hulls.players_id` for every reader of "the player's ship" by id that the design's §9.1 sorts P
+(the prize's captive channel and its brain, the far fight's "our own action", the hail spoken, the
+taking by a world order, the sea's dealings and hail, the truth's ship list, the station's
+sail named).
+
+**The act** (`world/command.take_up`, the order `take command of` in `orders/command.py` and
+`data/vocabulary.yaml`, a visitor's own order): the ship given him by the director's `command:`
+form where she lies at the named port (`court._command_in_play`, recorded in
+`World.ships_given`); his person rehomed and her command passed to him, her captain's station
+bound, her rules captain standing aside, her far brain dropped, his seat carried with no home kept,
+the old ship left to her senior officer (the default for a King's ship) or laid up at the port's
+anchorage, said in both logs (`ship.taken_up`, placed in the knowledge table as the ship's whole
+company hears it).
+
+**The suites, as run** at 2370a2d (the code of this step; this paragraph and the design note's
+postscript are committed after it, text only): `ruff check .` and `ruff format --check .` clean;
+the fast tier (`-n 4`) exit 0, the slow left out, one expected failure and two picture tests
+skipped for want of Playwright under this interpreter, as before; the slow tier (`--slow -m "not
+pace" -n 4`) of the touched files and `tests/test_known_truths.py` exit 0 (tests/test_aboard_another,
+test_boat_hull, test_brains, test_captive, test_checkpoint, test_court, test_crews, test_director,
+test_facade_readers, test_far_action, test_grammar_book, test_hulls, test_in_world, test_knowledge,
+test_known_truths, test_observer, test_primer, test_prize_court, test_prizes, test_readings,
+test_replay, test_ship_changed, test_world_orders); the pace tests of the same files alone and last
+(`--slow -m pace -n 0`) exit 0. No pin moved.
+
+### Step 1, the lead's mends (2026-11-12)
+
+The lead's read-only review of 46fe724, by reproduction, sent step 1 back with eight items. Each
+was reproduced here, and each mend has a test in `tests/test_ship_changed.py` that fails on
+2370a2d (all eleven new tests run there failed, all pass on the mended code):
+
+1. **`said` overwritten** by the set's check in `command.take_up`: a direct call wrote no line in
+   the new ship's log. The check's result has a name of its own.
+2. **The launch left alongside**: reproduced (she lay fast alongside the Fly with her coxswain and
+   oarsmen). At the act a boat of another ship's lying fast alongside her for his coming back
+   pulls home by her own `come alongside` (`command._boats_home`): in the test case she left the
+   Fly at tick 2100, a mile from the Amazon, and was hoisted in at tick 3264.
+3. **"Captain Bowen stands aside at your order"**: reproduced; and the player, a visitor carrying
+   the captain's role, was among her people, so her captain read him. Her rules captain now
+   stands down by `Captain.give_up` before the command passes, in her late master's name
+   (`command._late_captain`): "Mr Bradley gives up her command to Captain Bowen, and his book
+   'in port' is struck."
+4. **A French brig given at Falmouth**: reproduced. The director's `command:` form stays the road
+   (the owner's answer 3); `court.command_doubt` now doubts a ship in play of another nation
+   ("not Britain's to give"), an enemy's ("taken, not given") or a prize the court has not
+   condemned.
+5. **Readers of the first hull as the player's**: `ships.Vessel._target_of` (a chase of
+   `PLAYER_ID` steers for the first hull's body once he has changed ships) and
+   `combat.action._witnessed` (the player's ship as witness by `players_id`; before it, his new
+   ship's own fire made her a pirate in her own captain's eyes, and the lead says so under
+   `--ship` on the trunk too) mended. Signals and sets: `ship "X": under the orders of the
+   ship` now names the player's ship by her id (`players_id`), her body's id on the sea, by
+   which her hoists are read (`signals.commanded_by`); a set's every reader takes `PLAYER_ID` for the player's ship (some
+   fifteen places in `squadrons.py`), so a set of his (`commander` or a member "the ship" or
+   "us") is refused in words after a change (`Squadron.from_spec`), as the act refuses a ship
+   in a set or with ships under her orders; `signals.py`'s `under_orders_of == "the ship"`
+   (the company leg) is reached after a change only by a vessel put under the first hull's
+   orders before it, which the act refuses. The set's command carried to another hull is left
+   to a later package.
+6. **A kept hull asleep for good**: reproduced (`crews.switch`'s promotions came from the ships
+   with a far brain alone); a kept hull asleep within the range is now among them. **The weigh
+   swallowed**: reproduced at tick 2571, but not the act's: `evolutions.scripts.
+   _belay_held_work` belays every order waiting its turn when a coming to anchor finishes,
+   aboard any ship. A weigh or an unmoor is anchor work, not sail work, and now waits on with
+   the boat's errand (`ANCHOR_WORK_KEPT`): his "weigh anchor" is begun at 2571, "All hands up
+   anchor!".
+7. **Truth 7-482** now gives an order after the act (`weigh anchor`, then `where am i`) and takes a
+   checkpoint between, the resumed world's logs of both ships equal to the game's.
+8. **Saves from before, played aboard another ship**: the lead's measure (a trunk checkpoint
+   taken aboard another ship from the start agrees at 600 ticks and parts by 3,600) is accepted
+   as the price of the §9.2 mend, by the owner's word that the `--ship` fault may be fixed
+   here, with no legacy mode. Not measured again here. It is the one exception to "every save
+   from before replays as it did", and it is said: every save now carries `followed_body`, and
+   the loader (`replay.followed_body_words`, by the checkpoint and by the replay) tells a save
+   without it whose inputs hold a `--ship` line (`driver.left`) or a `follow` of another hull
+   that it parts from its game as played.
+
+Found on the way and mended, small: "came aboard from the the Amazon's launch" (`movement.
+put_aboard`, a boat's name carries its own article).
+
+Found at the first fast tier of the mends (664b7ca3), and mended in 67532719: the guard refusing a
+set of the player's after a change of ship stood between `Squadron.from_spec`'s commander alias
+and its `else`, so a scenario whose set the first hull commands found "no ship named 'the ship'"
+(test_squadrons' scenario set, test_the_ship_herself's reading: 2 failed). The guard now stands
+before the alias.
+
+**The suites at a2976b5a** (the mends, that guard, and the trunk at 0dcaea30 merged): ruff check
+and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,520 passed and 1 xfailed, the 500
+slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the touched files and
+`tests/test_known_truths.py` exit 0, 2,326 passed, 1 skipped and 8 xfailed (the first round's 23
+files and test_squadrons, test_signals, test_evolutions, test_anchor, test_captains,
+test_captain, test_captain_rules, test_ships, test_the_ship_herself, test_boat_director,
+test_view_action, test_fight, test_between_hulls, test_flag_drawings); the pace tests of the same
+files alone and last (`--slow -m pace -n 0`, load 2.3 at its start) exit 0, 14 passed. No pin
+moved. The tree reported differs from a2976b5a by this paragraph alone.
+
+### Step 2, first: owed from the lead's review of 1eb18434 (2026-11-13)
+
+The lead's review by reproduction found the eight items mended and three things owed at the head
+of step 2, one commit, each with a test in `tests/test_ship_changed.py` that fails without the
+mend (the three run with the code of 1eb18434 and these tests: 3 failed; with the mends, 3
+passed):
+
+- **(A) A weigh given as she comes to an anchor** (every ship's): since `ANCHOR_WORK_KEPT` it is
+  begun as she is brought up, and the order said nothing of it (the runner's "will follow" line
+  is returned to the order and not logged, for any work that waits its turn). Reproduced: the
+  frigate under plain sail in Carrick Road, `come to an anchor` at 240, `weigh anchor` at 300,
+  brought up at 1482, "All hands up anchor!" at 1482, aweigh at 2399, and no line at 300. Now
+  `ground_tackle._waits_for_the_anchor` notes at the order (tick 301), notable: "The weigh waits
+  for the anchor: she is coming to an anchor, and it is begun as soon as she is brought up." (the
+  same for an unmoor, and behind a let-go or a moor).
+- **(B) `_boats_home` sent home every other ship's boat fast alongside the new ship.** Reproduced:
+  the Hind's jolly boat made fast alongside the Fly before the act, nobody in her for her, was
+  cast off "nobody to wait for" and pulled for the Hind. Now only the boat whose last
+  `boat.alongside` line at her put him aboard (`_brought_him`) goes home; the jolly boat lies on
+  fast alongside, the launch goes home as before.
+- **(C) `crews.switch` woke any crewed hull with no far brain within the range.** Reproduced: the
+  Hind, her brain taken off and put to sleep by hand, was woken. Now the take up keeps the ids of
+  the hulls he has left (`command.HULLS_LEFT`, the hull's and her body's) and the switch wakes
+  those alone; the old ship, put to sleep, is woken as before, the Hind is not. The item 6 test
+  is narrowed to that rule (it put the brig X, no hull of his, to sleep and asked her woken).
+
+**Changes to ordinary games** (no change of ship in them), said as the lead asks: the witness
+rule's mend (`action._witnessed`: in a game played aboard another ship under `--ship`, the first
+hull's captain, not the firing hull's own, now marks her when she fires); `followed_body` written
+to every save; the "came aboard from the the ..." line read "from the ...". And from this commit:
+the weigh's line at the order in (A), and (from step 1's item 6) a weigh or an unmoor given while
+she comes to an anchor is begun when she is brought up, not belayed with no word.
+
+### Step 2: the company moved (2026-11-13)
+
+`transfer <who> [from the "Y"] to the "X"[, and lay the Y up]` (`orders/command.py`,
+`world/transfer.py`; the design's §6): persons by name, 'the people', hands by count ('fifteen
+hands') and by rating ('six able seamen and four ordinary'), between the ship he commands and a
+ship of his to man (one he has left, `command.HULLS_LEFT`, or one given him), within a boat's
+pull (`movement.BOAT_BETWEEN_NM`, a mile) or alongside (within 30 m, JUDGEMENT). 74's muster
+functions are lifted into `world/musters.py` (`remuster`, `deal_watches`, `take_out`), 74's
+callers in `prizes.py` kept under their old names; the draw is 74's (fit, at no work, no post,
+by id; the ratings first).
+
+The JUDGEMENT figures of §6, as filed (`world/transfer.py`): twelve men a load (`LOAD_MEN`); a
+load's round, pulled across, cleared and back, a quarter of an hour within two cables
+(`LOAD_NEAR_S`, 900 s) and half an hour at a mile (`LOAD_MILE_S`, 1,800 s), by the distance
+between; alongside, the whole by the gangway in a quarter of an hour (`ALONGSIDE_S`); worked by
+one watch at her sail-handling stations, never fewer than four (`worked_by`: the cutter's 8 + 10
++ 6 gives 12, the topsail schooner's 17); berths a complement and a half (`berths`: the cutter's
+45, the schooner's 60), counted against her hands and her persons aboard; a ship laid up keeps
+her keepers alone (§4.1: a King's ship her warrant officers, persons, and no hand; a merchantman
+her mate and a ship-keeper, one hand, `MERCHANT_SHIP_KEEPER_HANDS`).
+
+Measured (`tests/test_company_moved.py`; the merchant cutter at anchor in Carrick Road, the
+topsail schooner Fly laid up in ordinary at Falmouth some 234 m off by the director's word and
+given him, taken up with the cutter laid up): `transfer fifteen hands to the Fly` is two loads,
+twelve in the boat at once and in neither muster, the first aboard her at the order's tick + 900
+and the second at + 1,800, each said in her log ("Twelve hands came aboard from the Sherbourne
+(the first load of two); twelve hands sign the Fly's articles."), the cutter's muster fifteen
+fewer and the Fly's fifteen more, the ids told apart where they met; the boat away the while
+(`BoatState.errand` "transfer") and every other order of the boat's refused. Refused in words:
+the Fly giving more than she can spare ("she wants seventeen hands to be worked. Transfer fewer,
+or lay her up first."), the Fly past her berths (ten gone across before it: "The Fly berths sixty;
+she has fifty-five, and would have 74."), a name nobody of hers answers to, the Amazon's people to a merchantman ("borne on
+the King's books"), and a King's ship's company turned over by her captain's order at all (by the
+Admiralty's, the director's form, not built in this step).
+
+Found on the way and mended: a ship laid in ordinary by the director and given him was still in
+ordinary once he had taken command of her (her keepers alone wanted to work her); `take_up` now
+takes her out of ordinary in his hands.
+
+### Step 1 reconciled with package 109 (2026-11-13)
+
+The lead found 1eb18434 failing 13 of its own tests on the trunk as it stood (truths 7-480 and
+7-483 and eleven of `tests/test_ship_changed.py`), by one cause: package 109's step 1, merged
+after the trunk step 1 took, made "take command" and "assume command" refused phrases in
+`data/vocabulary.yaml` ("Command of a prize is not taken by words ... 'take possession of her'"),
+so `take command of her` was refused before it was read. Reconciled, the verb being 60's: the two
+refused phrases are gone from the vocabulary, "assume command [of]" is a synonym of `take command
+of`, and the order says 109's sentence itself (`orders.command.PRIZE_WORDS`) where it would refuse
+anyway: words that name a prize ('take command of the prize'), and a ship that is a prize the
+court has not condemned. 109's case moves out of its table in `tests/test_mends_109.py`, old
+beside new and named: `test_take_command_of_the_prize_is_answered_by_its_road` (and 'assume
+command of the prize') and `test_take_command_of_a_ship_his_to_take_is_package_60s_order`.
+
+**The primer names the order.** The fast tier at 1e4e91ae failed one test, the grammar book's
+`test_every_verb_of_the_vocabulary_is_named_in_the_primer`: the new verb `transfer` was in the
+vocabulary and not in the primer. Chapter 14 gains a paragraph under "Taking command of another
+ship" and a row in its table of forms (606eb1ef); the row is run through the frigate by
+`tests/test_primer.py` and refused for her state ("No ship named 'the fly' is on the sea"), never
+for its words.
+
+**The browser plans, played.** Until now the slow tier on this machine had skipped
+`tests/test_browser_probe.py` ("Playwright is not installed": the Python package, not the
+browser, was missing). The package was installed at the pre-installed Chromium's own version
+(1.63.0, the version of the Node package beside it; no `playwright install`), and the plans are
+played at the hash below: none skipped.
+
+**The suites at ebca949a** (the reconciliation, the three owed mends and step 2, with the trunk at
+ce4b78ea merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0,
+7,636 passed and 1 xfailed, the 515 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of
+the touched files, `tests/test_known_truths.py` and `tests/test_browser_probe.py` exit 0, 2,497
+passed and 8 xfailed, none skipped (step 1's files as before, and test_company_moved,
+test_mends_109, test_ports, test_parity and the browser plans); the pace tests of the same files
+alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. Not tested: the refusal
+of a transfer between two King's ships (no test holds it). The tree reported differs from
+ebca949a by this paragraph alone.
+
+### Steps 1 and 2 again: the lead's reading of ab0ade58 (2026-11-13)
+
+ab0ade58 was not merged: an independent reading, probing on this package's own fixtures, found
+step 2 not ready and one fault in step 1 (`docs/dev/M7-WorkPackages.md`, "Package 60, steps 1
+and 2 as reported at ab0ade58"). Mended in its order, each with a test that fails on ab0ade58.
+
+1. **A ship taken up from ordinary is woken at once, at her anchor** (`command.take_up`,
+   `_woken_at_her_anchor`). The player's own ship is skipped by `crews.crewed` and mend (C) wakes
+   only the hulls he left, so the Fly slept on in the far shape after `take command of her`;
+   woken by hand she lay adrift (no near anchor), would not box off and drove toward Mylor
+   Point. Now she is promoted in the act, and where her far body rode at an anchor her best
+   anchor is let go where she lies, veered to the scope the depth wants. Found on the way, and
+   left as it is: by the code's reading (not probed beyond the Fly), any far ship woken at an
+   anchor has no near anchor down (`crews._to_full` sets her sail "at anchor" and lets go
+   nothing); only the ship he takes up is mended here.
+2. **The tail lays up no ship he commands**: refused in words.
+3. **A load joins the receiver's watches as they stand** (`musters.join`: the smaller watch
+   first, nobody aboard moved, her routine, quarter bill and guns as they are); the giver loses
+   only those who go (`musters.take_out`, no remuster). Two hands moved 26 of the Fly's 40
+   before.
+4. **A lost boat carries nobody**: refused in the dealings' own words. `send_boat_to` itself has
+   no check of a lost boat (the road's own gap, kept as it is by the lead's ruling below; it is
+   checked by the transfer before the road is asked).
+5. **Every man told off is out of the giving muster at the order**, not the first load's alone.
+6. **Persons are rehomed before they are put aboard** (as the prizes do it); the officer a ship
+   is left to (`command_passed_to`) stays in her, refused in words.
+7. **A load is checked again as the boat comes to where the ship lay** (done, or beyond the
+   pull): "found no ship where the Sherbourne lay; she pulls back with her people", the men home
+   into their own watches and the loads not carried stood down, said in the giver's log; the
+   list of hulls he left is pruned of the gone (`crews._hulls_left_pruned`).
+
+**One road** (the lead's ruling of 17:30: extend the dealings' road, four conditions). The boat
+that carries the company is `Dealings.send_boat_to`, extended: `BoatState` gains `hands`,
+`joining`, `loads`, `load_no` and `load_of` (plain class defaults, left out of a checkpoint while
+empty by `BoatState.__getstate__`); `send_boat_to` takes `hands=`, `join=` and `loads=`; each
+load after the first goes by the same two jobs as she is back (`_next_load`). The timing is the
+road's own (hoisted out five minutes, the pull at four knots, five minutes alongside, the pull,
+hoisted in five), and the fixed quarter-hour loads of ab0ade58 are gone (`LOAD_NEAR_S`,
+`LOAD_MILE_S`, `ALONGSIDE_S`, the `transfer` job and errand, `IN_THE_BOAT`). Nothing that goes
+by the road today moves: a trip with no hands and no joiners keeps its words, its data and its
+timing, and the road's suites, package 109's tests and truth 7-542 pass as they stand. The men
+on passage are counted where a reader finds them: the giver's muster says them ("Of her company
+out of the muster: twelve hands in the boat for the Fly, three hands told off for her next
+load."), her reading says "and 15 on passage to the Fly", and the receiver berths them from the
+order. Alongside, the gangway at the order, untimed, said in both logs (accepted). Neither
+`evolutions/runner.py` nor `send_boat`'s file was touched.
+
+**Shared, not copied**: the draw (`musters.draw`, now `prizes._draw_prize_crew`'s too, its men
+as before), the joining of names (`ports._and`), the check of way on her (`boats.way_on_her`,
+`man_boat`'s own words) and the ships given (`command.given_to`). Hands no longer count the
+quarterdeck's muster rows (her officers are persons, counted once: the Sherbourne's 33 souls
+were 30). The refusals are in the world's words and name the ships that are here, none of the
+director's ("You command no ship here", "Say how the Fly is left", "'transfer twenty hands to the
+Fly'"). Truth 7-484, this package's own and not yet on the trunk, is moved to the road's terms.
+
+**Tests**: the keepers' path now runs (ten of the cutter's seamen taken out by hand first, so
+that the Fly berths the rest); the third refusal's reason and both musters pinned; the
+assertion that could not fail is gone; a fast checkpoint test with a load in the boat beside the
+slow replay; and alongside, `from X`, the lay-up tail, a receiver gone, two King's ships, way on
+her, beyond the pull, a prisoner, an observed world and a ship not his.
+
+**The suites at 2deccd29** (items 1 to 7 and the lead's conditions, 3aa95ab6, with the trunk at
+c010814d merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit
+0, 7,658 passed and 1 xfailed, the 516 slow left out; the road's own check first (package 109's
+tests, truth 7-542, the boat's suites, replay, checkpoint and parity, slow included) exit 0,
+1,439 passed. The slow tier (`--slow -m "not pace" -n 4`) of the touched files,
+`tests/test_known_truths.py` and `tests/test_browser_probe.py`, with test_orders, test_parity,
+test_subtypes, test_replay and test_checkpoint for the queries and readings touched, run in two
+halves for the two-hour limit on a background job: the half with the truths and the browser
+plans exit 1 at its first run, one failure, truth 7b-130 (the director's seat at the API door:
+the door's exit code read as `None` the moment its state read "ended", under four workers'
+load), which passed alone twice, and the half whole again exit 0, 1,050 passed and 8 xfailed,
+none skipped; the other half exit 0, 2,279 passed. The pace tests of the same files alone and
+last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved but truth 7-484, this package's
+own, moved to the road's terms. The tree reported differs from 2deccd29 by this paragraph alone.
+
+### The second reading of 4dda3dfe (2026-11-13)
+
+A second independent reading (`docs/dev/M7-WorkPackages.md`, "Package 60 as reported again at
+4dda3dfe") found six of the seven mends holding by running, the road's old trips unmoved, and
+seven things owed. Each mend has a test that fails on 4dda3dfe.
+
+**7, made general, a commit of its own (63108591):** a far ship riding at an anchor woken to
+full detail had no near anchor down and her file's sail set (`crews._to_full` set her sail
+"at anchor", the topsails drawing, and let go nothing; a hull made at full from her file came
+under plain sail). `crews.rides_as_she_lay`, called wherever a far body is woken (`promote`,
+both paths, and the station's hull made at full): where her far plan's leg is the anchor, her
+first anchor that can be let go goes down where she lies, veered to the depth's scope, brought
+up; every sail set is furled; her way taken off. The cutter in Carrick Road under a rules
+captain bound for Falmouth: before, woken under plain sail and driven 2.6 km before her captain
+brought her to again; after, at her anchor with nothing set, swinging within her cable.
+**Measured alone at 63108591**: ruff clean; the fast tier exit 0, 7,659 passed and 1 xfailed;
+the slow tier in its two halves (the truths and the browser plans; the rest) exit 0, 1,051
+passed and 8 xfailed, and 2,279 passed; the pace tests alone exit 0, 14 passed. No recorded
+passage, digest, truth or kept save moved; the toggle (a scratch plugin making
+`crews.rides_as_she_lay` a no-op) turns its own test from passing to failing ("not at
+anchor") and moves nothing else, there being nothing else to move.
+
+1. **A boat lost with a load in her** (`boats.lose_boat` replaced her state, dropping her hands
+   and loads): `transfer.boat_lost`, called by `lose_boat` only where she carries a transfer.
+   The men told off and not embarked go back to their watches; those in her, and the persons,
+   are picked up by the nearer ship by her stage of the trip (JUDGEMENT: `lose_boat` gives the
+   script's boat's own crew no fate, they being no persons, and no drowning is invented here),
+   a person bound for the receiver of her company where she picks him up; said in that ship's
+   log and in the giver's line of the loss ("...; Mr Pascoe and eleven hands picked up by her
+   own side; four hands told off for her stand down.").
+2. **A list of names is read as a list**: the order's words are read from its text, where the
+   commas stand (its `object` has them read away); every 'and' parts the list but a number's;
+   a name's contraction read with its stop or without ('Richd. Oliver'); a list with a name
+   nobody answers to is refused naming that one.
+3. **The ship in ordinary he is aboard** was followed and stepped while asleep, under her file's
+   plain sail with no anchor down (she moved 516 m and could not be boxed off): a sleeping hull
+   his person goes aboard is woken (`movement`, where the drivers come to follow him), and so
+   rides as her far body lay by 7's mend; `take_up` uses the same function. After take-up
+   nothing is set that he did not order.
+4. **A ship's name is read in the order's own words** (`orders.command.ship_for_him`): an
+   unknown name, "You know of no ship called the Nonesuch hereabouts." (the sail on the sea no
+   longer listed); a ship with no hull of her own, beyond a boat's reach of him; an observed
+   world, none of his. The two branches that matched another module's sentence by substring
+   are gone, and each branch has a test.
+5. **Small**: "away again for the Fly"; the lost boat's refusal "The long-boat was swamped on
+   the 13th; a new one is the yard's."; the comment made to agree with the code (each load is
+   the road's own trip, hoisted in and out); `_under_way` removed; men coming home are told
+   apart from men come aboard meanwhile (`musters.join(..., came_from=)`, a cross-transfer
+   test that fails without it: 40 ids for 42 men).
+6. **Tests played, not patched**: the King's branch by a King's Sherbourne (her papers), the
+   ship not his and the prisoner by the order at his prompt; the refusals' words checked over
+   eight refusals. Still patched, and why: two King's ships both his (a ship's service is her
+   captain's role, which no world order gives a ship of his; the branch is the same code as
+   the merchant-into-King's case played), alongside (two hulls within 30 m wants a mooring
+   the fixture has not), and beyond the pull (see the finding below).
+
+**Found, not mended, for the lead**: the Sherbourne left to Mr Pearce "to cruise off the Lizard
+within 10 miles" lies at her anchor, her captain "in port" with the intent, and does not get
+under way in two hours (step 1's leaving; probed, not traced).
+
+**The suites at 77c3a76b** (item 7 alone at 63108591, items 1 to 6 at 591eda5e and e6ee8fb8,
+with the trunk at 697c0f0b merged, clean; by the lead's word of 03:10 not merged again since):
+ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,684 passed and 1
+xfailed, the 517 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the same files as
+at 2deccd29, in its two halves for the two-hour limit: the truths and the browser plans exit 0,
+1,077 passed and 8 xfailed, none skipped; the rest exit 0, 2,279 passed; the pace tests of the
+same files alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. The tree
+reported differs from 77c3a76b by this paragraph alone.
+
+### The third reading of 52d99b9a (2026-11-14)
+
+A third reading (`docs/dev/M7-WorkPackages.md`, "Package 60 as reported a third time at
+52d99b9a") found every mend of the second list holding by running and seven things owed;
+Mr Pearce's not weighing is not this package's (he waits for Falmouth's `leave_on: ebb`).
+Built on 52d99b9a, the trunk not merged again. Each mend has a test that fails on 52d99b9a.
+
+6. **A commit of its own (ebbad49a), measured alone**: `boats.lose_boat` left a person the
+   dealings' boat carried on any errand in no hull (`send the boat to the Sherbourne with Mr
+   Bradley`, the boat swamped): the transfer's rule serves (`transfer.boat_lost`, the nearer
+   ship by her stage of the trip; ashore, her own), said in the giver's line. Its measure is
+   below.
+1. **The depth is the chart's where she lies as she wakes** (`rides_as_she_lay` read
+   `water_depth_m` first, which a sleeping hull's far tick never refreshes: a cutter put to
+   sleep in 88.6 m let go at Falmouth "in 88.6 m").
+2. **She is judged by how she lies, and never on an awake hull**: `take_up` no longer calls the
+   mend on a hull that is awake (her plan is not kept while she is awake: the Fly under way at
+   2.8 knots was furled and anchored by the leg of the anchor); a sleeping hull's far plan is
+   kept by the far ticks, and the mend is called only as she wakes.
+3. **A part is a name only when the whole part is one**: a whole name, a surname, or a title and
+   a surname, never a part's last word; 'but', 'except', 'with' and their like refused in
+   words; a semicolon is read away by the grammar's normalising, so 'Mr Pascoe; Richd. Oliver'
+   runs together and is refused as a name nobody answers to (before, Oliver went alone).
+4. **Where no anchor can hold her she lies to** (JUDGEMENT): no sounding, no anchor to let go,
+   or more water than her cable reaches, and she wakes lying to as lying to sets her, her log
+   saying why; no anchor is marked down off the ground, and the scope is never more than the
+   cable.
+5. **A ship he has never seen** (no hull of her own, not given him) is answered as an unknown
+   name is.
+7. **Small**: a second order after the ship's name is refused as one ("One order at a time"); a
+   role is said as said ("the purser"); the prisoner's test pins his own prompt's words.
+   "Beyond the pull" stays patched, for a sounder reason than given before: two ships of his a
+   mile apart want one to sail off, and in Carrick Road the Fly weighed under plain sail takes
+   the ground on the flood before she is a mile off (probed), and a ship laid in ordinary is
+   moved to the port's anchorage (275 m from the cutter, probed); the refusal is the two ships'
+   distance against the pull's mile, patched to its figure.
+
+### The fourth round: each cause mended where it lives (2026-11-14)
+
+The owner's word, by the lead: build the fixes for generality, not the symptom. The third
+reading's items were mended a second time by that method (353f7227), each below as its cause,
+where it was mended, where else the cause was looked for, and the test at that level.
+
+**A hull's state read stale across a sleep and a wake** (items 1 and 2).
+- *Cause*: a sleeping hull's far tick refreshes none of what her own tick keeps of the place
+  she lies in, and an awake hull's plan is not kept; both were read as if true.
+- *Mended*: `crews.woken_true` at every wake (`promote`, both its paths, and the station's hull
+  made at full): `World._tick_tide` run with her current, which brings true `water_depth_m`,
+  `bottom`, `water` (the stream) and `tide_state`, and says nothing while she is not at anchor.
+  The rest of what a far tick does not refresh, listed: the sea (`_tick_sea`) and the motion,
+  and the minute's weather, are not run at the wake (each says a line when its words change;
+  they come true at her next minute); everything else in `ship.extra` is the ship's own (her
+  well, her grounding, her leaks, her helm's marks), not the place's.
+- *Where else the stale depth was read*: `scripts._water_depth`, by every anchoring evolution
+  (let go, come to an anchor, moor, the kedge, veer and heave), and `scripts._let_go`'s
+  `bottom`: each, given in a ship's first minute after a wake, read the place she fell asleep
+  in until her next minute; now true from the wake.
+- *Test*: the wake's own (`test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth...`):
+  `water_depth_m` and `bottom` true after it, not the anchor's depth alone.
+
+**How she lies, one answer** (item 2).
+- *Cause*: "is she at anchor" answered from her plan's leg, which is kept only while she sleeps.
+- *Mended*: `crews.how_she_lies` (at anchor, lying to, under way), from her own state: asleep by
+  her far body, awake by her tackle and her helm (`_sail_state_of`), never an awake hull's plan.
+- *Where else asked*: the wake (asked before she wakes); the take-up (no longer asks of an awake
+  hull at all); the demotion, which set `_far_anchored` from the plan and left the anchor's leg
+  in it, so that a ship weighed and under way when put to sleep was frozen at the anchor by the
+  far ticks: now from how she lies, and a hull with no far brain whose plan still had the
+  anchor's leg sleeps lying to (with a brain, her captain's `fold_back` plans her passage, as
+  before). `far_tick`'s own "Brought to an anchor by the track's end" reads a sleeping hull's
+  plan, which is kept: left.
+- *Test*: `test_how_she_lies_is_one_answer_from_her_own_state` by its cases, and
+  `test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed` (with a brain and
+  without); the take-up's `test_taking_command_of_a_ship_under_way_leaves_her_as_she_lies`.
+
+**Can she anchor here, one answer** (item 4).
+- *Cause*: the wake asked it its own way (any depth, any cable), apart from the evolutions.
+- *Mended*: `scripts.cannot_anchor`, the let-go evolutions' own checks (the anchor, lost or not
+  ready, no bottom, the ground too deep for her cable by `_too_deep`) made one function, asked by
+  both let-go evolutions (their words and order unchanged) and by the wake, which takes the
+  first anchor it allows and, where none, lies to, said in her log (JUDGEMENT).
+- *Test*: the wake's lying-to test (no sounding; more water than her cable) and the anchoring
+  evolutions' own suites, unchanged.
+
+**The list of those who go, by a grammar** (item 3, the third time names went wrong).
+- *Cause*: the list was read by its words one by one, each round one more shape slipping past.
+- *Mended*: the grammar written in `transfer.read_counts`: parts joined by commas and 'and',
+  each a collective, a count or a name-shaped part (a name of one or two words, after a title or
+  'the' or alone); no word excludes; anything else is refused saying what was not understood;
+  a name is answered by a whole name, a surname, or a title and a surname, never a last word.
+  The semicolon is read away by the grammar's normalising before the list sees it.
+- *Test*: `test_the_list_of_those_who_go_is_read_by_its_grammar`, a table of sixteen shapes,
+  the refused ones with their words, played through the order as well as the reader.
+
+**Does he know of this ship, one answer** (item 5).
+- *Cause*: "a ship with no hull of her own" stood for "a ship he does not know of".
+- *Mended*: `knowledge.knows_of`: his ships (the one he commands, one he left, one given him), a
+  sail in sight as his lookout names her, or her name in a line of his log that reaches
+  somebody aboard (never the record's own lines, the director's world orders among them, nor
+  his own orders naming her). A ship he does not know of is answered as a name of no ship.
+- *Where else asked*: his orders' ship reader (`orders.command.ship_for_him`, for `take command
+  of` and `transfer`). Found, not changed (other packages' orders, which would move what goes
+  today): `send the boat to the <ship>`, `come alongside the <ship>` and `pull for <ship>` find a
+  ship by `vessels.find` and the lookout's words, without asking whether he knows of her.
+- *Test*: the ship-name test, `knows_of` by its cases.
+
+### The fourth reading of 96ccd4d2, ruled: one cause, one table (2026-11-14)
+
+The lead's fourth reading, with the owner's rulings A to D. Each cause below as before: the
+cause in a line, where it was mended, where else it was looked for, and the test.
+
+**The table first, on 96ccd4d2** (ruling A: `tests/test_sleep_and_wake.py`, 36 cells: she
+begins at anchor, lying to by the order or under way; with no far captain, one who plans a
+passage, or one bound nowhere; asleep a minute or across a turn of the tide; with and without a
+checkpoint written and read while she sleeps). On 96ccd4d2's sleep and wake, 32 of the 36 cells
+failed, in four groups:
+- at anchor under a captain who plans a passage or is bound nowhere: asleep she was under way,
+  awake at anchor, the anchor never weighed (item 2);
+- every lying-to cell: `how_she_lies` answered "under way" of a ship hove to by the order, her
+  heave-to not read (item 1);
+- under way with no far captain, or bound nowhere: asleep she lay to (the kept hull's rule),
+  awake under way again;
+- under way under a captain who plans a passage: the wake said his book unloaded and loaded
+  again (item 3's kind: the wake adding lines).
+
+**How she lies, read from her heave-to** (items 1 and the lying-to group).
+- *Cause*: `_sail_state_of` read a ship hove to by the order as under way: her heave-to record
+  (`ship.extra["hove_to"]`) was not asked.
+- *Mended*: `crews._sail_state_of` answers "lying to" where she is hove to, before the
+  manoeuvre's reading; `how_she_lies` asks it of every awake hull.
+- *Where else*: the wake's `_to_full`, which named a topsail where the far body's state and
+  the near one's differed: now no sail is named where either is lying to; she is brought to it
+  by the evolutions (below).
+- *Test*: the table's lying-to cells; `test_how_she_lies_is_one_answer_from_her_own_state`.
+
+**Her far body laid as she lies, and her tackle following her place** (items 1 and 2).
+- *Cause*: at the demotion, a hull's far plan was kept or laid without asking how she lay: a
+  kept hull got an anchor or a lie-to by rule, and a ship laid to sail kept her anchor marked
+  down.
+- *Mended*: `crews.demote` asks `how_she_lies` before she sleeps: a hull with no far captain
+  gets the plan of how she lies (`_plan_as_she_lies`: the anchor, lying to, or her course held
+  sixty miles on); with a captain, his `fold_back` plans her, and the leg of an anchor she no
+  longer rides by is struck. `crews.tackle_as_she_lies`, at the demotion and at every far tick
+  after the mirror: a sleeping hull that does not lie at anchor has no anchor down (weighed and
+  stowed, its ground cleared).
+- *Where else*: `far_tick`'s own anchoring at a track's end, which reads the plan (kept while
+  she sleeps): left.
+- *Test*: the table (her tackle agrees with her place, after each cell and over the next half
+  hour); `test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed`, which
+  now asks under way of a hull with no far brain (before, she was laid to).
+
+**The wake brings her to lie by the orders' roads** (item 1, ruling A's "by the road the order
+`heave to` takes").
+- *Cause*: the wake set a sail where her far body lay to, and she ran (3,651 m).
+- *Mended*: `crews.lies_as_her_far_body`: lying to by the `heave_to` evolution, out of it by
+  `fill_away`, her hands working each; at anchor by `rides_as_she_lay`. Where no anchor can hold
+  her, `rides_as_she_lay` gives the first anchor's reason (before, the last's) and she heaves to
+  by the same road: "No anchor will hold her here (...); she heaves to." Her heading, hove to,
+  is kept as she lay to the wind (`hove_to["off_at_sleep"]`; the far body's own heading is the
+  wind and a beam, and laid to it she fell off).
+- *Test*: the table; `test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so`, now
+  asking her hove to by the evolution within twenty minutes, no sail named.
+- *Found by the fast tier*: a hull made from a far body lying to now heaves to by the evolution
+  (a frigate's hands take some eight minutes at it), where before she was made with a topsail
+  set and read under way. The captive suite's captor is made so: its set-up now lets her lie
+  to before the action begins, its assertions unchanged. `test_a_crewed_hull_with_no_far_brain_
+  lies_as_she_lay_and_is_never_put_out_of_the_world` (before, "lies where she is": laid to
+  wherever she was) asks how she lies after the sleep to be how she lay before it.
+
+**The refresh at the wake without the tick's speech** (item 3).
+- *Cause*: `woken_true` ran `_tick_tide` with the tide's flag as she fell asleep, so the turn of
+  the tide while she slept was said at the wake as a swing.
+- *Mended*: `crews.woken_true` clears `_tide_was_flood` and her dragging marks before the
+  refresh, so it brings the water true and says nothing.
+- *Where else*: the far tick refreshes none of these (above); the sea and the weather are not
+  run at the wake.
+- *Test*: the table's "a turn of the tide" cells (the wake adds no line but its own).
+
+**Her captain's state at the wake** (the lines the table found).
+- *Cause*: `fold_in` re-entered the far brain's state at every wake, his book unloaded and loaded
+  again and said; and a near captain with no state of his own was given the far body's default
+  'on passage', which filled her away from lying to.
+- *Mended*: `brains.fold_back` keeps the two states as she fell asleep; `fold_in` enters the
+  far state only where the far captain changed it while she slept, and then quietly
+  (`Captain._enter(state, quiet=True)`: the book loaded without its line).
+- *Test*: the table's lying-to cells bound nowhere, and every cell's "no line but its own".
+
+**Does he know of this ship, without the log** (item 4, ruling B).
+- *Cause*: `knows_of` searched his log for her name, and matched a name within any text.
+- *Mended*: `knowledge.knows_of`: his own ships (the one he commands, one he left, one given
+  him), or a sail in sight whose name his lookout has made out (`named_in_sight`: given by hail,
+  private signal or pendant, or made out in the lookout's words as a whole word). Anything else
+  is "You know of no ship called the ... hereabouts"; a sail in sight not yet named is answered
+  by what is made out of her ("The brig is no ship of yours."), never by her name.
+- *Where else*: as before, `send the boat to`, `come alongside` and `pull for` find a ship
+  without asking (other packages' orders): found, not changed.
+- *Test*: `test_he_knows_of_his_own_ships_and_of_a_sail_in_sight_whose_name_is_made_out`, by
+  ruling B's cases (his three kinds, a named sail, an unnamed one, a ship sharing a word with a
+  port and with a sail, a ship met and gone).
+
+**The grammar over the data** (item 5, ruling C).
+- *Cause*: the name's shape was written from the hand's table, not from the names the game has.
+- *Mended*: `transfer.name_shaped` takes one word alone (a role that is a title's word:
+  'lieutenant') and words of any alphabet ('Hervé'), with a hyphen or an apostrophe within;
+  `_answers_to` answers to his whole name as the muster drew it ('Silas Pascoe', with a title or
+  without; `whole_name`).
+- *Test*: `test_every_person_of_every_company_is_answered_by_the_grammar`, over the twelve
+  company files: every person but the player (the flag party is of no company), said by
+  address, whole name, surname, title and surname, and role with 'the' and without, is read as
+  one name and answered by him alone, or refused naming each who shares the words. The hand's
+  table keeps the good shapes nobody answers to ('Mr Smith-Jones', 'the 2nd mate', 'the
+  master-at-arms', three-word names), and 'john smith' for Mr John Smith is its own test.
+
+**His words given back as he typed them** (item 6, ruling D).
+- *Cause*: the order's object is his words lower-cased and read away, and the refusals gave it.
+- *Mended*: `Order.said` keeps the words as typed; `command.said_after_verb` gives both orders
+  the words after the verb from it. "Who is meant by '...'?" names his part as typed and says
+  what may be said, in the ship's voice; "One order at a time: the transfer to the ... first,
+  and '...' after it."; the wake's lines say what the ship does, no builder's terms.
+- *Test*: the list's table, played through the order.
+
+
+### The cut: steps 1 and 2 on the trunk's sleep and wake (2026-11-14)
+
+The owner's word: steps 3 to 5 (owner, price and sale; the errand ashore; the truths and the
+scenario) go back to the held list. The package closes as steps 1 and 2 when the cut is read
+and merged.
+
+The owner's word, by the lead, at the fifth reading: no more rounds of mends to the sleep and
+wake. The briefed work (steps 1 and 2) is closed out. What is not the brief's goes to a
+package of its own, the package of the two bodies. The lead's cut, built as commits forward
+from d2c081b3, which stays in the history as the record.
+
+**The trunk's sleep and wake again** (0826da93). crews.py, brains.py and captains.py are at
+the merge base's text (697c0f0b) but for the brief's:
+- crews.py: `mirror`'s clock; `release_done`'s first-hull guard; `switch` (every crewed body
+  by her own position, the hull he left woken when near); `_hulls_left_pruned`;
+- brains.py: `FarCaptain`'s `players_id` (a chase of his first hull);
+- captains.py: `Captain.give_up`.
+
+ships.py and scripts.py keep the package's whole: `Vessel.kept_hull` and its empty-plan rule,
+the targeting and `first_hull_current`, `_player_id(world)`; `cannot_anchor` and
+`ANCHOR_WORK_KEPT`. The check is the diff of the five files against 697c0f0b: no other
+function differs.
+
+**Out, with what they tested:**
+- how_she_lies, _plan_as_she_lies, tackle_as_she_lies, woken_true, rides_as_she_lay,
+  lies_as_her_far_body;
+- the P60 parts of promote, _to_full, demote, far_tick, _sail_state_of and station_world;
+- fold_back's folded_at_sleep and fold_in's skip; Captain's quiet entry.
+
+The tests:
+- `tests/test_sleep_and_wake.py` (the 36-cell table) leaves the tree. Its text is at
+  d2c081b3, for the new package's first test with the fifth reader's loopholes shut.
+- `tests/test_crews.py` goes back to the merge base's text. Its five wake tests leave: the far
+  ship wakes at her anchor with nothing set; the anchor goes in the chart's depth; where no
+  anchor holds she wakes lying to; how she lies is one answer; a ship under way is not frozen
+  at the anchor she weighed.
+- `tests/test_captive.py`: the captor's set-up as it was.
+- `tests/test_ship_changed.py`: "a crewed hull with no far brain lies where she is" as it was.
+
+**The take-up laid at her anchor** (ruling 3; 0826da93).
+- *Cause*: the trunk wakes a ship whose far body rode at an anchor with her far words' sail (her
+  topsails), and no anchor down. Taken up so, she drove (the second reading's 846 m).
+- *Mended*: `command.laid_at_her_anchor`, one state set at once: one anchor (the first
+  `cannot_anchor` passes) on the ground under her, at the scope the chart's depth wants,
+  brought up; an anchor marked down elsewhere laid again under her; nothing set; no way.
+  Where none holds: "No anchor of hers will hold her where she lies (...)." and nothing else.
+  No evolution is started, and nothing in it can refuse or raise.
+- *Called* by two callers, both the package's own, the same function, never from promote or
+  station_world: the take-up (`command._woken_at_her_anchor`), and his stepping aboard her
+  (`movement`'s boarding wake, the second reading's item 3), which in play wakes her before
+  his order. The lead ruled the second caller in.
+- *Test*: `tests/test_take_up_at_anchor.py`:
+  - every hull file, at an anchorage and in ordinary: the state, then an hour on. The anchor
+    bites within a band as she first comes back on her cable, then the ground does not move
+    and she is not dragging;
+  - no bottom, too deep, every anchor lost: the one line, no anchor down, nothing in hand;
+  - an anchor on ground a mile off, laid again under her;
+  - a second take-up;
+  - between his boarding and his order (ten minutes aboard), she rides at her anchor with
+    nothing set, at an anchorage and in ordinary.
+
+**Whom he knows of, and the refusals** (ruling 4; 0c6e76c4).
+- *Cause*: a hull's id was answered before `knows_of`, giving a stranger's name away; his
+  own prize and his consort out of sight were "no ship called".
+- *Mended*: `ship_for_him` asks `knows_of` of a hull named by her id as of one named by her
+  name. `knows_of` adds a prize of a ship of his and a consort under the orders of a ship of
+  his; out of his reach, the refusal is "lies beyond a boat's reach of you".
+- *Test*: `tests/test_ship_changed.py`: the hull's id; the prize and the consort; and the
+  brief's two refusals untested before (a held captain's station refuses the take-up; a
+  prisoner's 'take command' is refused by his prompt).
+
+**The old ship he leaves, measured on the cut** (ruling 5, before anything was built for it).
+- Laid up, and left to her officer with no intent: she lies at the same anchor on the same
+  ground with nothing set, through an hour and a turn of the tide asleep. Awake again, she
+  swings within her scope.
+- Left to her officer "to bound for Plymouth" while in port: she stays, and never sails. The
+  King's ship's doctrine leaves "in port" only "on: under way".
+- Left "to bound for Falmouth" where she lies: her far captain's voyage ends at once, the far
+  body is done, and the switch never wakes her. Her hull is kept only as the first hull.
+- Sent to the lead for a ruling; nothing built for it. Then ruled:
+  - **(a), built.** The take-up's tail refuses an intent for an old ship that lies at her
+    anchor: "The Sherbourne lies at her anchor, and Mr Pearce will keep her so; nobody aboard
+    her will weigh of his own accord. Leave her to him, or lay her up." Test:
+    `test_an_errand_for_the_old_ship_at_her_anchor_is_refused_in_words`. This also closes the
+    port-she-lies-in case as met at the take-up.
+  - **(b), stopped and told.** The ruling was "every ship he leaves is kept, whatever her officer
+    was told". Built as the kept-hull rule read from the hulls he left (`Vessel.tick`'s empty
+    plan, `_arrived`'s voyage end, `release_done`), it does not hold. Her far captain ends her
+    himself: `FarCaptain._in_port` (brains.py, the trunk's) marks a passage, a letter or a run
+    home done at its destination ("she has gone in and is gone from the sea"), and makes the
+    vessel done whatever her plan. That is the far captain's brain against the kept-hull rule,
+    so by the ruling (b) is taken out and listed below. A test at the far body's level found it
+    (a ship he left, given a far captain bound for the port she lies in); the test left with
+    (b).
+- Finding 4 (the tail refuses free intents) stands as built. Finding 5 (the ship he leaves
+  under way, by the code: with an intent she sails on by the trunk's planner; with none she
+  keeps her far plan and lies to at its end) is read, not run.
+
+**What a player meets, left for the package of the two bodies** (when he takes up or comes
+back to a ship of his that has lain asleep, on the cut):
+- At anchor (her far body riding at one): laid at her anchor whole by ruling 3. Where no anchor
+  holds, she wakes as the trunk wakes her: topsails set, no anchor, drifting. The place's depth
+  and tide are stale until her first minute. Her captain's state is re-entered and said at the
+  wake.
+- A far captain who sailed her while she slept leaves her anchor marked down where she fell
+  asleep, until the take-up lays it again under her. A ship that is not taken up keeps it so.
+- Under way: she wakes under her far words' sail at the far body's speed. A ship that was hove
+  to wakes read as under way, her topsails set. A hull with no far captain put to sleep under
+  way keeps her stale plan and lies to at its end. An anchor leg left in a stale plan can
+  freeze her at an anchor she weighed.
+- In ordinary: laid at the port's anchorage by ruling 3, nothing set. With no far captain, her
+  far body does not move.
+- Lying to (a lie_to leg, or a gale on any leg): the trunk's `_set_sail` sets her topsails.
+  On a smack nothing is set. On a lugger, the lug topsails.
+- An officer left in port cannot be sent to sea: the King's ship's doctrine leaves "in port"
+  only "on: under way", and nobody weighs. The take-up's tail refuses the errand in words (ruling
+  5 (a)); a gap for the owner.
+- A ship he leaves under way with an errand is taken off the sea by her far captain at her
+  voyage's end (`FarCaptain._in_port`), and cannot be had again, her company with her, unless
+  she is the first hull. "Never lost" holds for the first hull and for a ship left with no
+  errand. It is the trunk's brain (ruling 5 (b), out), for the package of the two bodies or the
+  owner's list.
+- A sleeping far body anchors by its plan or by the far order in any depth. The far body lies
+  to the same way for every rig.
+
+The inventory sent to the lead (the states of each body, every conversion with its function
+and line, the pairs, each rig's heave-to) is the new package's first page.
+
+**The cut read independently, and the package's own list** (the lead's last list; each the
+brief's steps 1 and 2).
+1. *A person's muster row travels with him.* Cause: the take-up, the transfer and a boat's
+   company joining rehomed the person and left his row in the old muster, read by id in the
+   new (a wound landed on her late master). Mended: `Registry.rehome(..., row=True)` moves
+   the row (`musters.take_out`, `musters.join`), his `sailor_id` true in the new; called by
+   those three. The prize master's road (74's) is not given it: with it, the pinned prize
+   counts moved (a captor's 256 to 255, a prize's 8 to 9), so it stops there, told to the
+   lead. Test: both musters' own readings after the take-up and a transfer by name, his whole
+   name read from the new muster, a wound after the move his.
+2. *What she keeps counted as her want is.* Cause: the want is one watch at her sail
+   stations, the keeps were every hand off the quarterdeck. Mended: `_sail_hands` (her fit
+   hands at her sail stations; a ship laid up, any hand, her ship-keepers), in the refusal
+   and in 'the hands' drawn. Test: one more than she can spare refused, the words counting
+   her sail hands; that many left her after the most she can spare.
+3. *Two ships of one name.* Cause: the first of a name was taken, then asked whether he knows
+   of her. Mended: every ship of the name asked; of two of his, the one he is aboard, else
+   the one within a boat's pull, else a question in words. Test: a stranger "Fly" first and
+   his own in Carrick Road.
+4. *A transfer at quarters* (ruled): refused while either ship is at quarters, saying what to
+   do first. Test: each ship at quarters.
+5. *The take-up's anchor state* (ruled): a ship riding by her own ground keeps her tackle
+   exactly (moored or at one anchor); else an anchor already down is laid again before a
+   stowed one; the let-go order's own warnings in her log. Tests: a brig moored by her small
+   bower and sheet anchor; an anchor down out of reach preferred; two metres of water warned.
+6. *Words*:
+   - a rating none of whom is fit and free ("no marines ... two were asked");
+   - a hyphened number a count ("twenty-six hands");
+   - a man aboard who may not go told why (you yourself; a prisoner; another ship's man; her
+     idlers stay with her; her hands go by their number);
+   - merchant hands to a King's ship told truly (on her articles, not entered by a transfer;
+     `test_the_refusals_played_by_the_order`'s assertion follows the mended words);
+   - the take-up's refusals say only what is so (her owners' and not given you; a
+     squadron's command; a ship with others under her orders);
+   - the primer's example made true (an errand for the old ship given under way; at her
+     anchor she stays in her officer's charge).
+
+**Listed, not built** (the reader's, for the package of the two bodies or the owner's list):
+- stepping aboard a ship not his lays her as she lay (ruled; kept);
+- the kept-hull empty-plan rule reaches every crewed brainless ship (the design's floor; no
+  scenario moved);
+- `come alongside the Fly` chooses a stranger of the name three leagues off;
+- the Fly's long-boat cannot be manned;
+- a far order anchors a ship where the water dries;
+- for the owner's review (ruled; package 74's road): a prize master is still read on his prize
+  by his captor's muster row, and his captor's muster still counts him; mending it moves
+  test_prizes' captor count from 256 to 255 and the prize's from 8 to 9.
 
 
 
@@ -28731,292 +29518,6 @@ added and nothing else (the audit's check (d) run on each).
   compared in bells"); a book wanting a clock hour has no word for it.
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
-
-## Package 106b: Morocco's Atlantic coast (2026-11-13)
-
-### Step 0, the measurement (nothing under `data/charts/` committed)
-
-Measured on the trunk at 237b4641 in a scratch worktree (never committed): measuring recipes
-built with `tools/build_charts.py --region` into a fresh cache, the audit run on the result,
-the tiles weighed from the manifest's bytes. The fill was raised by the eleven's level (3.98 m,
-no gauge of the block's yet): the bytes move a little when the block is rebuilt on its own
-water. Harbour boxes for the measure were placed FROM MEMORY.
-
-**The sources.** Purdy 1825 (on file) describes the whole coast, Cape Spartel to Cape Noon
-and Bojador (from l. 22171: "Between Cape Spartel and Cape Cantin ... regular soundings
-towards the shore ... no harbours of consequence"; Arzila, El Araiche, Old and New Mamora,
-Fedala, Anafee, Azamor, Mazagan, Cape Blanco of the north, Cape Cantin, Saffi, Mogador, Cape
-Geer, Agadeer or Santa Cruz, to Cape Noon; the variation "between Cape Spartel and Saffi Bay
-22 to 24 W", l. 4162): the block's pilot. The Oriental Navigator 1801 has nothing of this coast;
-Glas 1764 names Sallee once (l. 13751). Tofiño's Atlantic *Derrotero* (1789, `A302201`)
-reaches and has no text of Africa: its introduction (l. 417) says the charts of the coast "from
-Cape Espartel to Cape Verde" were made in 1776 by Varela and Borda, a memoir promised and not
-printed there; the charts are the atlas's, not yet found. Jackson's *Account of the Empire of
-Marocco* (1809, `accountofempireo00jack`, NOT_IN_COPYRIGHT, OCR 559,124 bytes) reaches: the
-ports, the trade, the harbours and the captives held in the Sahara (decision 68's matter).
-
-**The source grid.** EMODnet's DTM 2024 covers the whole coast (its grid runs from 15 N): of
-5,610 shelf cells sampled at 1.5′ (under 100 m), 5,459 are interpolated (`interpolation_flag`
-1), 151 surveyed, mostly in the Strait's approach. GEBCO under it for the land. TICON's file
-(SHA-256 7055f8ed...6514, as before) has **no gauge** between Ceuta and Fuerteventura.
-
-**The tile grid against the coast.** The coast runs diagonally, four degrees of longitude over
-eight of latitude: Spartel 5.92 W, Rabat's column 6.77 W, Cape Cantin's 9.33 W, Mogador's
-9.76 W at 31.5 N, Cape Juby 12.92 W at 27.95 N. One box over a diagonal coast holds a triangle
-of open sea and one of land. The land's tiles are skipped (`skip_dry_tiles`) where a coarse
-layer answers, except the eight of the row 31.6 to 32.03 N east of 9.34 W (no layer there south
-of 31.9 N). **Mogador (31.51 N) lies south of 31.6 N**: the southern region's port.
-
-| option | regions | level-2 tiles written | MiB (level 2) | with the measured level 3 |
-| --- | --- | --- | --- | --- |
-| A1, the brief's two boxes, coast + 1 column | 31.60001–35.5 N × 10.18666–5.92001 W; 27.33334–31.6 N × 13.17334–9.33334 W | 75 + 74 = 149 | 25.87 | 27.39 |
-| A2, two boxes, coast + 2 | the north's west 10.61332 W | 85 + 74 = 159 | 26.60 | 28.12 |
-| B1, four boxes, coast + 1 | 31.6–34.16 × 10.19 W; 34.16–35.5 × 7.2 W; 27.33–29.47 × 13.17 W; 29.47–31.6 × 10.61 W | 38 + 9 + 26 + 15 = 88 | 13.79 | 15.30 |
-| B2, four boxes, coast + 2 | the same rows; west 10.61, 7.63, 13.17, 11.04 W | 44 + 13 + 26 + 21 = 104 | 17.15 | 18.66 |
-
-Level 3: 24 tiles, 1.52 MiB for eight harbour boxes; the coasts 0.25 MB a region. Every
-region is under 40 MiB in every option. The southern box cannot be narrowed: its rows 27.33
-to 29.47 N must reach the Canaries' east bound (13.17334 W), its rows to 31.6 N lie three
-degrees east of it. The four-box options split each region at a row edge (34.16 N; 29.46666 N,
-the Canaries' own north bound) and are the strip the brief asks for; the open sea west of
-their bounds is the coarse layers' (the corridor north of 31.9 N, `atlantic-south` south of
-it), whose water reaches every tile's edge.
-
-**The seams.** Against `strait` "2 kept" (its row 35.44 to 35.87 N, columns 6.77 to 5.92 W);
-against `canaries` "5 kept" (its column 13.6 to 13.17 W, rows 27.33 to 29.47 N); against the
-coarse layers nothing (another level). `git status` after the build: new files only, no tile,
-coast or index of another region changed; the manifest only adds the two entries (and its
-build hash). The coast south of 27.76 N between 13.6 and 13.17 W (by Tarfaya's south) lies in
-`canaries`' bounds and tiles already.
-
-**The gauges, by the rule for a block with none.** The neighbours' nearest within the reach:
-for the south, Arrecife (1.60 m, REDMAR) and Puerto de Cabras (1.53) of the Canaries, 154 to
-268 miles from its water, M2 0.81 to 0.84 m; listing it after `canaries`. For the north, the
-Strait's: Tarifa (55 miles from Larache, 287 from Safi), Ceuta, and Cadiz (`[portugal,
-strait]`): **none of them has a level read**, so the north's level falls to the eleven's
-(Le Conquet's 3.98 m), and Tarifa's and Ceuta's M2 (0.41, 0.30 m) is the Strait's inner tide,
-not the Atlantic coast's (about a metre, FROM MEMORY; Cadiz 1.03 m). Arrecife and Cabras
-reach the north's water south of about 33.5 N only (Dar el Beida is 410 miles off). Tarifa's
-level is readable: REDMAR 3540, NMM 69 cm and BMMI −10 cm on the gauge's zero (2010 to
-2017), **0.79 m above LAT**; Cadiz and Ceuta are not in REDMAR. Reading it would move the
-Strait's water (its level today the eleven's, the audit's `c-level:strait`): the lead's.
-
-**The audit, sampled, on the measuring build** (the two-box option A2, the sea named
-`morocco`): nine findings the list lacks. `a-unowned:morocco-north:north` (the tiles of the
-row 35.44 to 35.87 N west of 6.77 W, 4,117 square miles north of 35.5 N in no bounds),
-`a-unowned:morocco-south:west` (the column 13.6 to 13.17 W, 29.47 to 31.6 N, 2,822 square
-miles), `c-far` for each (no gauge yet), `d-no-box:morocco-north` and `d-split` for each
-(madeira 87 %, portugal 12 %; canaries and madeira half and half), `e-no-book` and
-`e-no-stream:morocco-north`. The gauges, the weather box, the `book_limits` box east of 9.34 W
-and a stream area mend the c, d and e ones. Option B leaves of the a-findings only the one or
-two tiles of the row 35.44 N west of 6.77 W (some 500 to 900 square miles north of 35.5 N).
-The strait's own `a-unowned:strait:west` now lies beside morocco-north's bounds; unchanged.
-
-**The shore's sweep** (EMODnet silent, GEBCO under 3 m): the north 590 cells in 20 places
-(the largest the lagoon of Moulay Bousselham, 34.85 N 6.28 W; the Tangier shore; Safi; Cape
-Blanco of the north); the south 2,415 in 79 (the lagoon of Khenifiss, 27.8 N 12.4 to 12.9 W):
-real water, to say so after the rebuild on the block's own water.
-
-### Step 1, the block built on the chart session's rulings (2026-11-13)
-
-**The rulings** (the chart session on step 0): four regions, coast + 2, split at 34.16, 31.6 and
-29.46666 N, named `morocco-larache`, `morocco-sallee`, `morocco-mogador`, `morocco-noun`; the
-gauges the Atlantic's only (Cadiz and Huelva the northern two, Arrecife and Puerto de Cabras the
-southern; Tarifa's REDMAR level not read); the sea `morocco` with `SEAS_THAT_MEET` {morocco,
-atlantic, canaries}; one weather box `morocco` over the regions' water and the water east of 9 W
-from 30 to 36 N, taking none another box answers; `book_limits` boxes over the four.
-
-**The build.** Built three times from the step 0 cache (`--skip-fetch`): without the gauges'
-listings (the tide refuses a `block:` the manifest does not name), with them (the fill raise
-follows the tide), and after the features (the index). Sizes: larache 13 level-2 tiles 2.83 MiB
-and 6 level-3 0.36; sallee 60 and 7.15 (every tile written, its row 31.6 to 32.03 N east of 9.34
-W under no coarse layer) and 16 level-3 0.96; mogador 18 and 4.02, 8 level-3 0.52; noun 26 and
-4.11; 19.96 MiB in all. Kept: the Strait's 2, the Canaries' 5, the Noun's 3 under Mogador's
-bound. `git status` after each build: new files, the manifest, nothing of another region's. The
-fill raised by 1.47 to 1.96 m within the bounds (3.98 m in the tiles' water beyond them, the
-eleven's). The sweep: larache 513 cells (the lagoon of Moulay Bousselham, Tangier's shore),
-sallee 118 (Safi, Cape Blanco, Dar el Beida's port), mogador 166 (Agadir's port, Mogador's
-island), noun 7,484 (the lagoon of Khenifiss and its sebkha, 27.98 N 12.33 W): real water, left
-as water.
-
-**The water each region gets** (`Tide.constants_at`): the northern two M2 1.035 m at 57 degrees on
-Huelva's level 1.96 m (Cadiz's having none); the southern two 0.82 m at 35 degrees on 1.56 to
-1.57 m. The seam at 31.6 N between the pairs is a step, far from every gauge. Norie's table gains
-two places: Mogador, Purdy's 4h and 10 to 12 feet (the OCR's "4b." and "lu to 12"; the world's
-hour 0h 44m: the master's is the period's), and "Coast of Marocco" at Rabat, the world's hour
-(1h 40m) and spring range (9 feet), JUDGEMENT.
-
-**The weather.** The box `morocco` (27.33334 to 36 N, 13.17334 to 5 W), last in the file, Madeira's
-rows carried to the coast, PROVISIONAL; Purdy's words in each row's note (p. 152: the summer's N.
-by E. to N.E. along the coast, the winter's S.W. and S.S.W.; p. 155: the Liali at Mogador). It
-takes no water another box answers (`box_at` first-match); the water it answers lay in no box and
-took the nearest: the coast from Spartel to Safi east of 9 W and the Strait's southern half
-(35.5 to 36 N between 6.5 and 5 W). **What it moves:** a ship there drew her systems from
-Portugal's or the Mediterranean's box by nearness and now draws from this one; the Strait's
-scenario sails into 35 57 N 5 48 W. The Strait's truths and the recorded passages were run (the
-gate's figures below). The audit's `d-no-box:strait` is no longer found and its `d-split:strait`
-reads "morocco 62 %, portugal 38 %" (the known list's change waits for package 111's step 2b,
-below).
-
-**By design, old beside new (the chart session's word, for the lead):** the Strait's southern
-half (35.5 to 36 N, 6.5 to 5 W) is answered by the box `morocco`, where the nearest box,
-`portugal`, answered it before. It moves: `tests/test_scenarios.py`'s Strait passage (its
-`box_at(35.7, -5.5)` "portugal", now "morocco"), the audit's `d-no-box:strait` (no longer found)
-and `d-split:strait`'s shares (portugal 85 %, mediterranean-west 15 % on the sampled sweep before;
-morocco 62 %, portugal 38 % sampled and 59 %, 41 % on the full sweep now, its count 352 unchanged).
-**What reads that water, and the proof it is unmoved:** no recorded passage (the gate's passages
-are the Channel's); of the scenarios only `strait.yaml` sails into it (35 57 N 5 48 W), and its
-weather is pinned (`weather:` its winds and systems): sailed 24 hours at seed 7 with the branch's
-climatology and with the trunk's, the log's digest is `3fadc5de293ad9fe` both ways and she ends in
-36.0749 N 5.4253 W both ways. The tests that name a position in that water read the tide or the
-chart (`MID_STRAIT`, 36.0 N 5.6 W) or a business world at 36.0 N, which Portugal's box, first in
-the file, still answers; the slow tier of the known truths and scenarios passed whole but the
-audit's full sweep (below), the Strait's truths among them.
-
-**The streams.** Two areas, before the Canaries' open sea: `morocco-coast-north` (S.W. by S., a
-knot: Purdy pp. 152 and 154) and `morocco-coast-south` (south, a knot: pp. 156 to 157, the set in
-toward the land said and not carried). The set is the pilot's own word; the directions' test
-holds such a set unjudged (`PERIOD_SETS`).
-
-**The marks** (34, every position probed against the tiles, each move in `fix`): Arzila, El
-Araiche with its road and bar, Old Mamora, Mehedia with its road and the Seboo's bar, Sallee,
-Rabat, the Tower of Hassan (55 m, Purdy's 180 feet), Sallee road and the Bu Regreg's bar, Fedala
-and its road, Dar el Beida, Azamor, Mazagan with its road and its ledge, Cape Blanco, Cape Cantin
-and its ledge, Saffi and its summer road, Mogador with its island, road and harbour, Cape Sem,
-Cape Tefelneh, Cape Geer and its reef, Agadeer and its road, the mouth of the Wad Noun. Not
-entered: the Cleveland Reef (Purdy p. 156 and his dangers, "three feet ... nine leagues from the
-coast" in 30 45 N, Captain Cleveland 1765), the grid having ocean depths there and the modern
-chart (FROM MEMORY) no reef: a danger the period gives and the world does not (a finding, for the
-chart session); the Peak of Fas (its place not fixed by the bearings). No light in 1805.
-
-**The ports** (six; decision 67, every place the sources support with a road and a trade):
-El Araiche, Sallee and Rabat, Mazagan, Saffi, Mogador, Santa Cruz (Agadeer). Marks only, by the
-same sources: Mamora ("a poor neglected place", the port evacuated, Jackson l. 4260 and 605),
-Fedala (abandoned after the corn was shipped, l. 4508), Dar el Beida ("now in ruins, ... several
-huts", l. 4518), Arzila ("no trade carried on", l. 4206), Azamor ("not adapted to commerce", l.
-4543; no anchorage, Purdy p. 154), the Wad Noun (no road named: "but two roads fit for shipping
-between Santa Cruz and Cape Bojador", which neither pilot names, l. 5007). **Dated rows**
-(package 105's form, seeding the port on its day): El Araiche's `closed_to` from 1780 and Santa
-Cruz's from 1773 (the Europeans and the Americans; Jackson's years, the days JUDGEMENT); Mazagan's
-holder Portugal's until 1769 (the day FROM MEMORY); Saffi's and Mazagan's markets, the corn shipped
-abroad until Soliman's accession and cheap at home after his ban (Jackson l. 4524 to 4533; the
-day FROM MEMORY; first drafted the other way and corrected by the independent check of every
-citation, which found 12 of some 160 wanting, all mended); Mogador's market, pilot, yard and
-pool from its founding in 1760. **Decision 68**, in the heads of Rabat (Sallee's corsairs and the
-dungeon of its European captives; Rabat's walls built by enslaved Spaniards; Muley Ismael's black
-troops), Mogador (the ransom of the crews wrecked on the desert coast; the caravans' enslaved
-Africans from Timbuctoo) and Santa Cruz (the same caravans; the wrecked seamen sold among the
-Arabs), with their years and lines; no cargo a person, no scenario on it.
-
-**The tracks, read against the pilots' channel words, with the least depth at datum along each
-leg** (correction 4; sampled every 50 m; under 3 m a finding):
-
-| port | leg | the pilot's words, and the hand each mark falls on going in | least |
-| --- | --- | --- | --- |
-| Rabat | road to 33 54 N 7 54 W, and back | "lie out of the river near Rabat ... between the mosque and the Tower of Hassan" (Jackson l. 4445): coming in from the WSW the tower ahead, a little on the port hand | 25.8 m |
-| Saffi | road to 32 36 N 9 36 W, and back | "the North point ... a little to the northward of N.N.E., the high castle S.E. by E." (Purdy p. 155): coming in from the NW the North point and its low tower on the port hand, the castle ahead | 23.6 m |
-| Mogador | road to 32 36 N 9 36 W, and back | "anchor at about 1 1/2 mile westward of the Skala" (p. 155): coming down from the north the island and the town on the port hand | 30.9 m |
-| Agadeer | road to 30 36 N 10 12 W | "run along by the land of the cape till you are before the castle" (p. 157): going in from the offing Cape Geer on the port hand, the castle ahead | 6.1 m |
-| Agadeer | 30 36 N 10 12 W to 32 36 N 9 36 W | the open sea west of Cape Geer's reef ("not nearer than 30 fathoms") and of Cape Sem's bank | 38.7 m |
-| every port | road to mooring | El Araiche 8.5 m, Rabat 10.4, Mazagan 3.9, Saffi 10.0, Mogador 17.7, Agadeer 8.8 | |
-
-El Araiche and Mazagan need none (every pair among the northern three and to the mark off Cantin
-is clear). **Findings:** **the tide steps at 31.6 N**, the seam between the two pairs of gaugeless regions
-(Cadiz's and Huelva's water north of it, Arrecife's and Puerto de Cabras's south): M2 1.035 m at
-57 degrees to 0.82 m at 35 degrees, the level 1.96 m to 1.57 m, in a cable. In the how-to's words
-a seam between two blocks far from every gauge (Huelva some 360 miles off, Arrecife some 240)
-stays a step; no taper is laid between two blocks. **Mogador's harbour within the island** is
-not reached in the grid: its north passage reads 0.0 m and its south 0.5 m at the datum, where
-Purdy has five fathoms in the north one; the port's spots are in the road, as Purdy and Jackson
-put ships of war and of burden (the chart session's word: kept so, the finding listed). The rivers of El Araiche, Mamora and Sallee are the grid's land behind
-bars of 1 to 3 m (a way the pilots reserve for vessels of 100 tons at high water; no trader's in
-the world); Mogador's two passages into the harbour within the island read 0.0 m (north) and 0.5 m
-(south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
-the road; Agadir's modern moles enclose the period's road's first place (moved south of them).
-
-**The cold review's two cautions** (the chart session, 2026-11-14): no tile is rebuilt or
-committed but the four regions' own (every other region's files byte for byte, `git status` at
-each build); and the six port files give no key the game reads nowhere, beyond the form: their
-`tide: establishment:` was taken out (read by nothing: the master's hours are the epitome's
-places, `data/tides/establishments.yaml`, by position). Kept **only for the form**: `datum:
-unverified` (the how-to's: a top-level key the machinery does not read, which says no period
-sheet was read with its datum) and `tide: leave_on: ebb` (read by no code; `tests/test_ports.py`
-holds every port file to it).
-
-**The mends, by their causes** (the owner's word of 2026-11-14 through the lead: build for
-generality, not the symptom):
-
-- *`test_ordnance`'s count of ports without a block.* Cause: a hand-kept tally of each block's
-  ports (27 + 8 + ... + 7), which every new block had to edit, beside an assertion that already
-  states the property (`with_block == set(BLOCKS)`). Mended where the cause lives, in the test:
-  every port file is loaded, the eleven carry their blocks and every other port none, the count
-  the files' own. Looked for the same elsewhere (a total summed by hand from blocks' counts, in
-  every test file): truth 7-570's `read == 4593` (package 112's, the tiles read summed by hand
-  from the step's proof; raised here by Morocco's 2 x 147, old beside new) is the same cause in
-  another package's truth, **named and not mended**; the region lists of `test_chart`,
-  `test_geo` and `test_tide` and the ports' lists of `test_ports` and `test_nations` are
-  inventories by design (each block names what it adds), not tallies.
-- *Truth 7-530's exclusion.* Cause: the exemption was a hand list of package 105's ports, held
-  out whether they had dated rows or not, so that a new dated port broke it and a listed port
-  without rows went unchecked. Mended in the truth: a port is held out only when it has dated
-  rows and a package names it with the truth that pins them (105's set, 7-531 on; 106b's,
-  7-557); every other port is checked, 105's nine without dated keys now among them (they
-  pass), and a new dated port fails until its truth is named.
-- *`test_scenarios`' box over the Strait's southern half.* Cause: charted water in no box of the
-  climatology, which took the nearest box by distance. Mended where the cause lives, the
-  climatology: the box `morocco` over the water east of 9 W from 30 to 36 N that lay in no box
-  (the ruling), the test now pinning the box that answers. The same cause elsewhere is the
-  audit's check (d), which finds it everywhere: `d-no-box` for the Balearics, Biscay south and
-  the Ligurian sea, in other blocks' ground, **named and not mended**.
-- *The directions' test and a period's set.* Cause: the test held that every stream area's set
-  but the open Channel's is the world's axis rounded, judgement. The coast's two areas give the
-  pilot's own point: a named set of areas whose set is the period's (`PERIOD_SETS`), each held to
-  its axis within half a point and unjudged; no other area was of that kind.
-
-**The scenario** (`morocco.yaml`): a British merchant brig from Gibraltar for Mogador, from four
-leagues off El Araiche by the offing of Sallee and the mark west of Cape Cantin; hove to fifteen
-miles west of Mogador at 41.4 hours at seed 7, drifting off the land. Sailed to the road itself
-her account (five miles west of the truth after two days) drove her onto the bank south of the
-island, and hove to seven miles off she drifted ashore under Cape Sem in four hours: the book
-heaves to in the offing.
-
-**The audit, sampled** (`tools/audit_chart.py --known`): three findings the known list lacks,
-`a-unowned:morocco-larache:north` (the two tiles of the row 35.44 to 35.87 N west of 6.77 W, 915
-square miles north of 35.5 N: the ruling's "lead's list", 112's seas to own it),
-`d-split:morocco-sallee` (madeira 70 %, morocco 30 %) and `d-split:morocco-mogador` (madeira 78 %,
-canaries 22 %), both the box's order by design; and `d-no-box:strait` no longer found; the full sweep also no longer finds `a-unowned:strait:south-west` (the Strait's tiles south of 35.5 N and west of 6.5 W, 35 26.4 N 6 46.4 W: morocco-larache's bounds hold that water now), which the sampled sweep had not reached; both leave the list, mended by the block. **The known
-list's edit waits for package 111's step 2b on the trunk** (correction 6): the three entered with
-their owners and `d-no-box:strait` taken out, then the trunk re-merged by a merge commit.
-
-
-### The join with package 112 (2026-11-14, the lead's ruling of 10:40, on the trunk at 96e5e76c)
-
-**How.** The trunk merged by a merge commit; `tools/build_charts.py` merged by itself (CHARTS
-holds `layers:` and Morocco's four regions together). The manifest, a generated file, was not
-merged by hand: the trunk's taken whole, Morocco's four region entries put into it from 106b's
-old manifest only to let the tide load (a gauge's `block:` must name a region the manifest
-has), and then the tool wrote it again, `--region` for the four in turn with `--skip-fetch
---reuse-world`, from step 1's cache. **What did not move:** every tile, coast and features file,
-2,619 of them, the same SHA-256 before and after the rebuild (the trunk's and 106b's); the
-manifest against the trunk's, entry by entry: the same top-level keys, every trunk region's entry
-the same, nothing lost; differing only in the build hash, Morocco's four entries (each the same as
-106b's old manifest's), the chart's region list (the four appended after the Salvages, `layers:`
-kept), the two sources' fetch records (Morocco's six subsets added, none lost; EMODnet's
-`status` the tool's "fetched", this run having read them) and `open_edges:` below.
-**The open edges** (M1's stretches): 39 on the trunk, 45 now; 34 kept; the Strait's south edge
-from 6.5 to 6.03 W and the Canaries' east edge from 27.69 to 29.47 N are seams with Morocco's
-regions now and leave; the stretch at 35.5 N east of 5.12 W is re-cut to 5.120001 W; nine come
-with Morocco's regions, each facing open water (Larache's north edge west of 6.5 W and its west
-edge, Sallee's north and west edges, Mogador's north and west, the Noun's north). **M1's effect
-on the tide in and beside Morocco:** none. On the 0.05 degree grid from 26.9 to 36 N and 14 to 5
-W (33,123 points), read through 106b's old tree and the joined one, not one point's level or
-constituent moved (the eleven, toward which a taper is laid, are beyond reach of this water);
-so the worst water is unmoved, the six ports' spring ranges are as before (El Araiche, Rabat,
-Mazagan, Saffi 2.82 m on 1.96 m, M2 1.034 to 1.036 m; Mogador and Agadeer 2.27 m on 1.57 m, M2
-0.823 m), and the tide's step at 31.6 N stands as measured. **Truth 7-570's count:** 4,668 on the
-trunk, 4,887 on 106b's old tree (before 112's step 2), 4,962 joined (4,668 + 2 x 147).
-**Owed:** two chart packages built side by side cannot both land without one of them rebuilding
-the manifest, because the manifest is one generated file for every region.
 
 ## Package 109, step 5: the vessels kept off the land (note 3), as ruled
 

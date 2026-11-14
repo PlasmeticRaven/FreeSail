@@ -897,9 +897,6 @@ OFF_LISBON = Position(38.6, -9.4)
 # package 39d: off Lisbon is the Portugal block's now; the corridor's own coast is Morocco's
 # (no block reaches south of 35.5 N on the Atlantic side)
 OFF_MOROCCO = Position(34.0, -7.0)
-# package 106b: off Morocco is a region's water now (morocco-sallee); the corridor's own
-# water is west of the coast's strip, 34 N 11 W
-WEST_OF_MOROCCO = Position(34.0, -11.0)
 OFF_FINISTERRE = Position(42.9, -9.4)
 FUNCHAL_TOWN = Position(32.65, -16.91)
 # package 106a: 31 N 10 W is the ocean carried south's now (the layer beside the corridor);
@@ -937,8 +934,6 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["sicily"]  # package 105: Sicily and Malta, south of 38.5 N and east of Cape Bon
 
     regions += ["canaries", "salvages"]  # package 106a, over the ocean carried south
-    # package 106b: Morocco's Atlantic coast, four regions north to south
-    regions += ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
     assert manifest["charts"][WHOLE]["regions"] == regions
     # package 112: the layers as one ordered list (old: `corridor:` the corridor and
     # `corridors_beside:` the south's), the corridor first; and level 0 under the chart
@@ -963,9 +958,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert whole.bounds_words() == f"12.4001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
-    # package 106b: off Morocco (34 N 7 W, off Sallee) is now a region's water; old: None
-    assert whole.region_at(LIZARD) == "channel-west"
-    assert whole.region_at(OFF_MOROCCO) == "morocco-sallee"
+    assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
     assert whole.region_at(OFF_LISBON) == "portugal"  # package 39d
     # the features of every region, indexed together, and every region's coast
     mid = load_chart(MID)
@@ -987,10 +980,6 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
 
     canaries = load_chart("canaries")  # package 106a
     salvages = load_chart("salvages")  # package 106a
-    morocco = [
-        load_chart(r)
-        for r in ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
-    ]  # package 106b
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -1011,7 +1000,6 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | sicily.features.keys()
         | canaries.features.keys()
         | salvages.features.keys()
-        | set().union(*(m.features.keys() for m in morocco))
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -1033,8 +1021,6 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
 
     assert all(whole.region_of[fid] == "canaries" for fid in canaries.features)  # 106a
     assert all(whole.region_of[fid] == "salvages" for fid in salvages.features)  # 106a
-    for m in morocco:  # package 106b
-        assert all(whole.region_of[fid] == m.region for fid in m.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -1058,7 +1044,6 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(sicily.coast_lines())
         + len(canaries.coast_lines())
         + len(salvages.coast_lines())
-        + sum(len(m.coast_lines()) for m in morocco)
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -1128,12 +1113,9 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
     """Across the chart: a region's level where the region is, the corridor at level 1
     beyond it, None beyond the corridor's fetch box; the level's `use` says which."""
     assert whole.level_at(CARRICK_ROADS) == 3 and whole.level_at(MID_CHANNEL) == 2
-    # package 106b: off Morocco (34 N 7 W) is morocco-sallee's level 2 now; old: level 1,
-    # the corridor's. The corridor's queries are asked west of the coast's strip instead
-    assert whole.level_at(OFF_MOROCCO) == 2
-    assert whole.level_at(WEST_OF_MOROCCO) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
+    assert whole.level_at(OFF_MOROCCO) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
     assert whole.use_at(MID_CHANNEL) == "a region: coast and approaches"
-    assert whole.use_at(WEST_OF_MOROCCO) == "the Atlantic: passages and landfalls"
+    assert whole.use_at(OFF_MOROCCO) == "the Atlantic: passages and landfalls"
     assert 30.0 < whole.depth_at(OFF_MOROCCO) < 200.0
     assert 100.0 < whole.depth_at(OFF_FINISTERRE) < 200.0
     assert whole.depth_at(FUNCHAL_TOWN) < 0.0  # the town stands above the sea
@@ -1142,11 +1124,9 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
     assert 5000.0 < whole.depth_at(BEYOND_THE_CORRIDOR) < 6000.0
     assert whole.level_at(BEYOND_THE_CORRIDOR) == 1  # the corridor's tile is listed there
     assert whole.coast_distance(BEYOND_THE_CORRIDOR) is None
-    assert whole.tile_min_depth(WEST_OF_MOROCCO) is not None  # package 106b; old: OFF_MOROCCO
-    # the corridor's cell is a kilometre; a region's a hundred metres (package 106b: asked west
-    # of Morocco's strip; old: OFF_MOROCCO)
-    assert 900.0 < whole.cell_m_at(WEST_OF_MOROCCO) < 1000.0
-    assert whole.cell_m_at(MID_CHANNEL) < 100.0
+    assert whole.tile_min_depth(OFF_MOROCCO) is not None
+    # the corridor's cell is a kilometre; a region's a hundred metres
+    assert 900.0 < whole.cell_m_at(OFF_MOROCCO) < 1000.0 and whole.cell_m_at(MID_CHANNEL) < 100.0
     # the nearest shore and its name over the corridor: the ground itself, no name
     shore = whole.nearest_shore(OFF_FINISTERRE)
     assert (
@@ -1266,11 +1246,8 @@ def test_the_lookouts_words_are_honest_over_the_corridor():
     from freesail.world.lookout import COARSE_CELL_M
 
     # package 39d: the Rock of Lisbon is the Portugal block's; the corridor's coast is
-    # Morocco's, two miles off the shore by Rabat. Package 106b: Morocco's coast is the
-    # block's to Cape Juby (27.33 N); the coarse coast is the desert's south of it, under
-    # the layer beside the corridor, two miles off the shore at 26.5 N (old: by Rabat,
-    # 33.955 N 6.94 W)
-    off_roca = destination(Position(26.5, -13.95), 300.0, 2.0 * units.NAUTICAL_MILE)
+    # Morocco's, two miles off the shore by Rabat
+    off_roca = destination(Position(33.955, -6.94), 300.0, 2.0 * units.NAUTICAL_MILE)
     sc = Scenario(
         start_time=datetime(1805, 6, 1, 10, 0),
         wind_from_deg=0.0,
