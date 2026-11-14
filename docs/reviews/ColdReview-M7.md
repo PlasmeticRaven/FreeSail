@@ -226,7 +226,7 @@ This head carries the test suite's own audit, which the owner asked for by name.
 
 171 test files, 141,400 lines, 3,842 test functions, **8,138 cases**: 7,622 in the fast tier and 516 in the slow (the days sailed, the long truths, the pace tests). Three files make a third of the cases: the primer's checks (1,095), the ship view's geometry (1,045) and the order table (726).
 
-{{TIMINGS}}
+*(The timed run of the fast tier at the commit under review was still going when this sitting was committed. Its figures are a stopwatch's, not a judgement's, and are added below when it ends: see 3.9.)*
 
 ### 3.2 What the suites prove, and what they only pin
 
@@ -240,7 +240,35 @@ This head carries the test suite's own audit, which the owner asked for by name.
 
 ### 3.3 Tests built not to fail
 
-The readers nominated the tests they judged could not fail for the reason in their name, with the fault each should catch. {{FAULTS}}
+The readers nominated the tests they judged could not fail for the reason in their name, with the fault each should catch. Four runners planted each fault alone in a scratch copy, showed it was live, ran the named test, and restored the copy (`faults-1` to `faults-4`). **This sample is of tests the readers already suspected. It is not a score for the suite; the control of 3.2 is the fair measure of that.**
+
+| | Planted | Survived (the test passed with the game broken) | Caught |
+|---|---:|---:|---:|
+| Faults planted against the test a reader named as built not to fail | 67 | **61** | 5, and 1 that pins a defect in one test and tolerates it in another |
+| of the 48 survivors that three runners then tried against the rest of the suite | 48 | 26 caught by no test tried | 22 caught by some other test |
+| Faults a reader claimed no test at all would catch | 35 | 16 | 17 (two more could not be planted: one is in the code already) |
+
+Read plainly: where a reader said "this test cannot fail for what its name says", he was right nine times in ten. Where a reader said "nothing anywhere catches this", he was right about half the time: the suite as a whole is better than its named tests, because an older truth or a pin in a neighbouring file often catches what the named test lets through. So the first cost is that tests prove less than their names say; the second, smaller but real, is the **26 faults a player would meet that no test tried caught**, with 16 more of the readers' own choosing. Among them (each with its diff and the passing run in the faults' files):
+
+- notable lines hidden from the log at 300x (truth 50 checks the roll-up with the function that was broken);
+- the tack taking 84 hands from the guns while every gun stays manned and fires at full rate (truth 7-136);
+- a broadside every two minutes where the truth's name says a minute and three quarters (7-135);
+- fresh fish sold at the salted price (7b-105 works out the expected sum with the price function it tests);
+- no rules captain ever plugging a shot hole below the waterline (7-183: at its seed the check is never reached);
+- ships never making fog signals, and a far ship ordered to show lights staying dark while her log says "lights hoisted" (7-147, 7-150 set the state by hand);
+- a squall never logged as passed (truth 52);
+- the French marines' musketry hitting nobody at any range; the first lieutenant struck out of the succession to command;
+- a seated player on another ship refused every order (on the unchanged code the one order those tests give there is refused too: no test shows him ever carrying one out);
+- the pilot's news never entered in the papers;
+- `give chase ... distant two miles` chasing the wrong ship;
+- the `--seat` and `--ease-on-station` flags dead;
+- every `veer` order refused while the primer's "every form is taken" stays green;
+- a ship at anchor drifting 150 metres in half an hour;
+- the wind halved; the cutter's turning circle a fifth larger; the crewed pace cut from 425 ticks a second to 148;
+- the leeway line every 32 seconds; the messenger taking an hour to bring a man aft; "Not to be had in the cabin" staying after the captain is back on deck;
+- in the picture: braces ending in mid-air, a figurehead three times its size, studding sails drawn inboard, every sail bellying into the wind.
+
+In four of the named tests the behaviour the name promises does not happen in the test's own run even on the unchanged code (the packet fires no shot; nobody falls to musketry; the first lieutenant is dead before the captain; no made-out line is logged). Seventeen of the readers' claims were refuted by the runs and are marked so in the readers' files' company: the runners' tables say which.
 
 What the survivors have in common, with one example of each kind (all in the readers' files with their lines; the reviewer checked the first four kinds against the test files himself):
 

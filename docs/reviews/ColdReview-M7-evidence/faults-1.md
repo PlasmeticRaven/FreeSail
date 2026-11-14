@@ -8,31 +8,35 @@ pristine copy `.../scratchpad/mut` after each; `diff -r -q` on `freesail/`, `dat
 Every run was one pytest process, no `-n`. Seconds are wall-clock for the faulted run.
 
 Numbering: A = file 01, B = file 02, G = file 12 (view geometry); "b" = the reader's claim
-under (b), "n" = the reader's "no test would catch".
+under (b), "n" = the reader's "no test would catch". The table is in the readers' order; the
+sections below are in the order the faults were run (the cheap first).
 
 | No. | Test (file::name) | Fault | Baseline | Result | Secs |
 |---|---|---|---|---|---|
 | A-b1 | test_known_truths.py::test_truth_52_a_low_passing_north_backs_veers_holds_squalls_and_rises_in_that_order | squall never logged as passed (`weather.squall_over` branch deleted) | pass | SURVIVED | 27 |
+| A-b2 | test_known_truths.py::test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_notable_line | `events.kept` keeps only urgent lines: notable lines rolled up at 300x | pass | SURVIVED | 223 |
 | A-b3 | test_known_truths.py::test_truth_7_135_the_frigates_broadside_every_minute_and_three_quarters_and_slower_short | long gun's "run out" 18 s to 30 s (85 s nominal to 97) | pass | SURVIVED | 14 |
 | A-b4 | test_known_truths.py::test_truth_7b_105_the_smacks_seine_fills_her_well_the_catch_sells_at_falmouth_and_spoils_kept | `price_of` swaps fresh and salted (fresh pilchards sell at the salted £10 not £6) | pass | SURVIVED | 65 |
 | A-b5 | test_known_truths.py::test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_it_takes | `Quarters.lend` frees the hands to the tack but each still counts at his gun (guns stay 176 of 176 manned through the tack) | pass | SURVIVED | 14 |
-| A-n3 | test_bellerophon.py::test_robbing_on_a_ship_with_no_lower_deck_is_as_it_was, ::test_robbing_by_deck_takes_the_shut_lower_deck_first_and_the_lower_deck_last (2 cases), ::test_robbing_past_every_gun_says_the_marines_last_with_one_and; test_hands.py::test_short_handed_arithmetic; (and 7-136 above) | guns at full crew while the tack takes their hands (the A-b5 plant) | pass | SURVIVED (all) | 20 |
-| A-b2 | test_known_truths.py::test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_notable_line | `events.kept` keeps only urgent lines: notable lines rolled up at 300x | pass | SURVIVED | 223 |
 | A-b6 | test_known_truths.py::test_truth_7_138_the_pace_with_two_crewed_cutters_in_action_holds_the_crewed_floor | 4 ms sleep after each crewed hull's tick (pace 425 to 148 ticks/s) | pass | SURVIVED | 37 |
 | A-n1 | test_known_truths.py::test_truth_51_..._ticks_at_the_build_machines_floor, ::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor, ::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor, ::test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor | 0.6 ms sleep at the head of `World.tick` | pass (558, 569, 528, 942 ticks/s) | KILLED (3 of 4; the merchant passage passed at 514) | 55 |
 | A-n2 | test_known_truths.py::test_truth_11_the_frigate_wears_in_six_to_twelve_minutes, ::test_truth_11_wearing_loses_a_quarter_to_half_a_mile_to_leeward (strict xfail); test_evolutions.py::test_wear_comes_round_the_other_way (2 cases), ::test_a_tack_and_a_wear_by_their_own_word_end_as_they_always_have; test_indefatigable.py::test_the_razee_stays_wears_and_lies_to_in_the_frigates_bands | wear holds the helm up 300 s after the wind is aft (loses 0.54 nm, not 0.13) | pass (wore in 513 s) | truth 11 pair SURVIVED; KILLED by test_evolutions frigate case (721 s against 720) | 31 |
+| A-n3 | test_bellerophon.py::test_robbing_on_a_ship_with_no_lower_deck_is_as_it_was, ::test_robbing_by_deck_takes_the_shut_lower_deck_first_and_the_lower_deck_last (2 cases), ::test_robbing_past_every_gun_says_the_marines_last_with_one_and; test_hands.py::test_short_handed_arithmetic; (and 7-136 above) | guns at full crew while the tack takes their hands (the A-b5 plant) | pass | SURVIVED (all) | 20 |
+| B-b1 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter | rules captain's hole filter `z_m < 0.3` to `< -99.0` (never sends the carpenter) | pass | SURVIVED | 220 |
 | B-b2 | test_known_truths.py::test_truth_7_176_a_broadsides_casualties_are_men_of_the_muster_named_and_the_bill_counts | `_hull_hit` no longer calls `_casualties` (a shot through the hull hurts nobody) | pass | SURVIVED | 6 |
-| B-n2 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter; test_health.py::test_the_butchers_bill_is_said_ten_minutes_after_the_last_shot; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says | the same plant | pass | KILLED by 7-183 (the privateer never strikes); the other two passed | 40 |
 | B-b3 | test_known_truths.py::test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks | `small_arms.QUARTERDECK_SHARE` 0.4 to 0.15 | pass | SURVIVED | 8 |
 | B-b4 | test_known_truths.py::test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag | `fog_signals_minute` never starts a ship's fog signals (`if False:`) | pass | SURVIVED | 12 |
 | B-b5 | test_known_truths.py::test_truth_7_512_a_ship_sails_from_port_mahon_to_carloforte_and_from_algiers_to_tunis (and ::test_truth_7_545_..., the reader's control) | `ships.land_crossing` returns "" at once (the land guard off) | pass (both) | 7-512 SURVIVED; 7-545 KILLED, as predicted | 116 |
-| B-n1 | test_known_truths.py::test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries; test_lookout.py::test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it | a far ship's light order always sets `"none"` | pass | SURVIVED (both) | 9 |
-| B-b1 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter | rules captain's hole filter `z_m < 0.3` to `< -99.0` (never sends the carpenter) | pass | SURVIVED | 220 |
-| B-n3 | test_known_truths.py::test_truth_7_173_...; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says, ::test_every_repair_is_an_evolution_with_hands_and_competes_for_them; test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine (and 7-183) | the same plant | pass | SURVIVED (all) | 16 |
 | B-b6 | test_known_truths.py::test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge, ::test_truth_7_441_the_frame_holds_every_state_and_the_view_writes_nothing | no code fault: the game unchanged, run repeatedly on the shared machine (the `-n 4` run itself NOT RUN: the runners' rule forbids `-n`) | pass | 7-284 failed 1 of 15 serial runs with the game unchanged (flaky: the reader's claim stands); 7-441 passed 5 of 5 | 167 |
+| B-n1 | test_known_truths.py::test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries; test_lookout.py::test_at_night_a_light_is_a_light_and_the_lookout_does_not_name_it | a far ship's light order always sets `"none"` | pass | SURVIVED (both) | 9 |
+| B-n2 | test_known_truths.py::test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter; test_health.py::test_the_butchers_bill_is_said_ten_minutes_after_the_last_shot; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says | the same plant | pass | KILLED by 7-183 (the privateer never strikes); the other two passed | 40 |
+| B-n3 | test_known_truths.py::test_truth_7_173_...; test_damage_control.py::test_the_carpenter_plugs_the_holes_worst_first_in_the_time_the_bill_says, ::test_every_repair_is_an_evolution_with_hands_and_competes_for_them; test_fight.py::test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms_by_his_doctrine (and 7-183) | the same plant | pass | SURVIVED (all) | 16 |
 | G-b1 | test_view_geometry.py::test_each_line_that_comes_down_ends_on_her_drawn_rail (36 cases) | every brace led to the mast abaft ends 6 m abaft and 4 m below that mast | pass (36) | SURVIVED (36 of 36; and 14 cases of four nearby brace and frame tests) | 11 |
 | G-b2 | test_view_geometry.py::test_the_head_lies_on_head_m (10 cases) | `FIGURE_SHARE` 0.3 to 0.9 (the figurehead three times as tall) | pass (10) | SURVIVED (10 of 10; and 46 cases of five other head tests) | 5 |
 | G-b3 | test_view_geometry.py::test_her_booms_and_her_courses_foot_stand_clear_of_her_drawn_decks[frigate-36], ::test_every_boom_on_a_drawn_hull_is_topped_up_to_clear_her_taffrail[frigate-36] | a mend, not a fault: frigate's `mizzen.boom` `height_m` 2.4 to 4.5 (boom clears her taffrail) | pass (both, on the defect) | first PASSED on the mend (prediction refuted: it passes defect and mend alike); second FAILED on the mend (prediction stands: it pins the defect) | 2 |
+| G-n1 | test_view_geometry.py::test_the_graph_and_snapshot_carry_what_the_view_reads, ::test_a_wreck_cleared_away_is_not_drawn, ::test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number, ::test_the_scale_is_the_full_rigs_whatever_is_sent_down_or_braced, ::test_only_a_drivers_boom_goes_from_the_drawing_when_it_is_rigged_in | a set studding sail's outer head corner drawn inboard (`-ss2 * Lb`) | pass | SURVIVED (44 of 44 cases) | 30 |
+| G-n2 | test_view_geometry.py::test_the_frame_holds_her_boom_across_states_old_beside_new, ::test_every_sprit_sails_foot_stands_above_the_water_in_every_state, ::test_her_sprit_topsail_is_drawn_along_the_slant_to_its_files_area, ::test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number, ::test_the_scale_is_the_full_rigs_whatever_is_sent_down_or_braced | every sail bellies into the wind (`bellyDirection` sign flipped) | pass | SURVIVED (40 of 40 cases) | 67 |
+| G-n3 | test_view_geometry.py::test_the_hovers_words_on_the_head_name_no_strip; test_server.py::test_index_serves_the_client (2 cases) | shipview.js drops the `backed` class: a sail aback drawn in the plain canvas colour | pass | SURVIVED (3 of 3) | 3 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -537,3 +541,102 @@ did on the defect: its checks are lower bounds (`>= over_deck - 1e-2`, `>= over_
 against `BOOM_CLEAR_M[FRIGATE] = (0.26, -1.35)`, a negative floor over the rail, so it admits the
 boom 1.35 m under her rail and admits it raised. The reader's prediction is refuted for this one:
 it does not pin the defect, it tolerates it.
+
+## G-n1. A studding sail drawn inboard across its topsail
+
+```diff
+--- mut/client/projection.js
++++ m/1/client/projection.js
+@@ -1730,7 +1730,7 @@
+         } else if (Yd && Yd.arm) {
+           var ss2 = sideSign(spec.side);
+           var headA = ss2 > 0 ? Yd.b : Yd.a;
+-          cornersS = [headA, add(headA, mul(boom.arm || [0, 1, 0], ss2 * Lb)), boom.b, boom.a];
++          cornersS = [headA, add(headA, mul(boom.arm || [0, 1, 0], -ss2 * Lb)), boom.b, boom.a];
+```
+
+Live: the frigate fully dressed (the test file's `fully_dressed`, larboard tack) with
+`fore.topmast.studdingsail.starboard` set, its corners by `P.buildSkeleton`: pristine
+`[[6.49, 3.59, 29.6], [-0.88, 7.19, 29.6], [6.49, 3.59, 17], [13.86, 0, 17]]`; with the fault
+the outer head corner is `[13.86, 0, 29.6]`, on the middle line instead of 7.19 m outboard.
+
+`grep studding tests/test_view_geometry.py` finds no test that sets a studding sail other than
+the ringtail (`fully_dressed` sets plain sail and head sails only; `extra` is used for the
+cutter's and the smack's square sail). The five likeliest (above, 44 cases) all passed.
+SURVIVED.
+
+## G-n2. Every sail bellying into the wind
+
+```diff
+--- mut/client/projection.js
++++ m/1/client/projection.js
+@@ -268,7 +268,7 @@
+     var n = norm(normal);
+     var s = dot(n, wind);
+     if (Math.abs(s) < 1e-6) return [0, 0, 0];
+-    return mul(n, s > 0 ? 1 : -1);
++    return mul(n, s > 0 ? -1 : 1);
+```
+
+Live: the frigate fully dressed on the larboard tack, the main topsail's mean path point less
+the mean of its corners (the belly, metres): pristine `[0.58, 0.6, 0.15]`, faulted
+`[-0.06, -0.84, 0.15]`; its path's y extent goes from -4.79..5.57 to -5.57..4.79. The belly is
+thrown to the other side.
+
+`grep belly tests` finds only docstrings and the frame figure `RINGTAIL_PAST_THE_FRAME_M`
+(an upper bound, `view["over"] <= past`, tests/test_view_geometry.py:4588). The five likeliest
+(the frame and sprit-sail tests above, 40 cases) all passed. SURVIVED: the reader's suspicion
+that a frame test might move was not borne out.
+
+## G-n3. A sail aback no longer coloured as aback
+
+```diff
+--- mut/client/shipview.js
++++ m/1/client/shipview.js
+@@ -90,7 +90,7 @@
+       } else if (f.kind === "sail") {
+-        var scls = "sail " + f.cls + " " + f.state + (f.backed ? " backed" : "") + (f.reefs ? " reefed" : "") + (f.busy ? " busy" : "");
++        var scls = "sail " + f.cls + " " + f.state + (f.reefs ? " reefed" : "") + (f.busy ? " busy" : "");
+```
+
+Live: the brig under plain sail with her topsails marked backed in the snapshot, rendered by
+`ShipView.render` in Node (the harness of test 5812, with `setAttribute` recording): pristine
+`sail square set backed | fore topsail (set, aback)`; faulted `sail square set | fore topsail
+(set, aback)`. The colour comes from `.ship-view .sail.backed` (client/style.css:259), so the
+player loses the drawing's mark of a sail aback; the hover words still say "aback".
+
+`grep -rln shipview.js tests` finds two tests: tests/test_view_geometry.py:5812 (reads hover
+titles of the head) and tests/test_server.py::test_index_serves_the_client (the file is served).
+Both passed. SURVIVED. The reader's "the hover titles of the head alone" is right; for the
+whole suite, the grep is the evidence that no other test renders the file.
+
+## Count
+
+Twenty-four entries (the plants of B-b2 and B-n2, and of B-b1 and B-n3, are one each, run
+against different tests):
+
+- **SURVIVED: 19.** A-b1 to A-b6, A-n3; B-b1 to B-b5, B-n1, B-n3; G-b1, G-b2, G-n1, G-n2, G-n3.
+- **KILLED: 3.** A-n1 (three of four pace floors, on a busy machine; a quiet one would very
+  likely pass it); A-n2 (by `test_evolutions.py::test_wear_comes_round_the_other_way`, outside
+  the half, by one second; the truth-11 pair in the half survived); B-n2 (by 7-183, in the
+  half, through the privateer's morale).
+- **Mixed: 1.** G-b3, a mend: the taffrail test fails on the mend (pins the defect, claim
+  stands); the decks test passes defect and mend alike (claim refuted).
+- **NOT RUN as described: 1.** B-b6 (`-n 4` is forbidden to runners). Run serially instead,
+  7-284 failed once in fifteen with the game unchanged: flaky, claim stands; 7-441 held.
+
+Readers' claims refuted: B-n2 ("no truth in this half fires guns and counts hull
+casualties": 7-183 catches it); A-n1 only on this machine's load; A-n2 in part (a test
+outside the half catches the 300 s hold by a second; with the reader's 120 s alternative the
+strict xfail fails, on what is really a mend); G-b3's first test. Every reader's (b) claim
+that was run as a fault survived.
+
+**What the survivals have in common.** Most check the game against itself: the test computes
+its expectation with the function under test (`kept` in truth 50, `price_of` in 7b-105,
+`land_crossing` in 7-545, `P.constants.FIGURE_SHARE` in the head test), or calls the inner
+function by hand and so steps round the faulted call (`_casualties` in 7-176, the locker's
+`fog_signals` and `lights` set by hand in 7-147 and 7-150). The rest assert a band or a floor
+wide enough to hold a broken game (the broadside, the crewed pace, the wear's time), a
+vacuous form (`all()` of an empty list in truth 52; a check under `if under:` that the seed
+never enters in 7-183; a brace counted "on a mast" by its y alone), or the log's words in
+place of the state they report (7-136 reads the "robbed" line, never the guns' crews).
