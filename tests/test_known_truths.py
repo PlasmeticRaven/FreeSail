@@ -17392,7 +17392,8 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
 
 
 # ---------------------------------------------------------------------------
-# Package 103a: the range's audit (truths 7-590 to 7-592)
+# Package 103a: the range's audit (truths 7-590 to 7-593; 7-590 and 7-591 read the whole
+# tree and are the slow tier's, `tests/conftest.py`)
 # ---------------------------------------------------------------------------
 
 
@@ -17410,12 +17411,12 @@ def _range_tool():
 def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
-    names makes the findings of the known list (`data/range/audit-known.yaml`) and no
+    names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
     other: 60 mechanical (the code's own years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
-    (`data/range/reference.yaml`, FROM MEMORY, read by nothing in the game). Every listed
+    (`tools/range/reference.yaml`, FROM MEMORY, read by nothing in the game). Every listed
     finding is owned: a data fault for milestone 7c, an engine fault, or a judgement to be
     read against a source, which every finding of the reference's kind is."""
     A = _range_tool()
@@ -17474,7 +17475,8 @@ def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_
     from datetime import date
 
     A = _range_tool()
-    tree = A.load_tree()
+    ports = ("brest", "rochefort", "ferrol", "cadiz", "lorient")
+    tree = A.load_tree(ports=ports, ships=(), scenarios=False)
     foes = ("france", "spain", "batavian-republic")
     for day, court in ((date(1792, 7, 1), False), (date(1805, 7, 1), True)):
         for foe in foes:
@@ -17487,3 +17489,30 @@ def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_
         "ferrol",
         "cadiz",
     }
+
+
+def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_part_of_the_build():
+    """Package 103a, as mended on the lead's reading: a file is a key by its path under
+    its folder with forward slashes (`key_of`), so that the classing holds the same keys
+    and the known list the same findings on Windows as elsewhere; and the known list and
+    the reference lie under tools/range/, outside what the build's fingerprint hashes
+    (`core.world.fingerprint_of`: freesail/ and data/), so that a finding owned or mended
+    changes no build and no save reads as another's."""
+    from pathlib import PureWindowsPath
+
+    from freesail.core.world import fingerprint_of
+
+    A = _range_tool()
+    data = PureWindowsPath(r"C:\work\FreeSail\data")
+    key = A.key_of(data / "signals" / "britain" / "days.yaml", data)
+    assert key == "signals/britain/days.yaml"
+    assert A.row_of(key, "days.#.years").id == "days-years"
+    assert A.row_of(A.key_of(data / "ports" / "genoa.yaml", data), "nation.#.since").id == (
+        "port-holder"
+    )
+    root = Path(__file__).resolve().parents[1]
+    for path in (A.KNOWN_PATH, A.REFERENCE_PATH):
+        assert path.is_file() and path.relative_to(root).parts[0] == "tools"
+    assert not (root / "data" / "range").exists()
+    # the fingerprint is of freesail/ and data/ alone: tools/ moves it not
+    assert fingerprint_of(root / "tools") == fingerprint_of(root / "docs")

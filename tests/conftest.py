@@ -96,6 +96,9 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
     "test_studding.py": frozenset({"brought_up"}),
     "test_business.py": frozenset({"busy"}),  # package 43b: a region peopled, 8 to 11 s loaded
     "test_regatta.py": frozenset({"first_course_runs"}),  # package 44: truth 90, two passages
+    # package 103a: the range's audit on the whole tree (41 s for the sampled sweep's four
+    # whole worlds by the pure-Python YAML loader, 20 s by libyaml's)
+    "test_range_audit.py": frozenset({"tree", "sampled"}),
 }
 
 # The other tests at or over the threshold: the mean of two whole-suite runs at `-n 4`
@@ -236,6 +239,10 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_shorten_sail_takes_in_the_topgallants_while_the_reef_is_taken_and_the_reef_speeds_up",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/brig.yaml]",
         "test_known_truths.py::test_the_cutter_and_the_brig_sail_through_the_same_orders[data/ships/cutter.yaml]",
+        # package 103a: the range's audit by the readers' road over the whole tree and the
+        # scan of every data file (13 s and 7 s by the pure-Python YAML loader)
+        "test_known_truths.py::test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list",
+        "test_known_truths.py::test_truth_7_591_every_dated_key_of_the_data_is_in_the_classing",
         # package 98, step 3: every file's guns and every root's ensign at 48 views each
         "test_known_truths.py::test_truth_7_450_a_port_guns_inboard_figures_are_behind_its_side_and_lid",
         "test_known_truths.py::test_truth_7_451_every_roots_ensign_paints_as_one_flag_in_its_order",

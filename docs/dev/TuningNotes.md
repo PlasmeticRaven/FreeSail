@@ -28711,12 +28711,13 @@ table, the ten findings that matter most, what the sweep cannot see and the rese
 are in **docs/dev/RangeAudit.md**; this section is what was built, what was taken another
 way, and the helpers' reports.
 
-**What was built.** `tools/audit_range.py` (the sweep), `data/range/audit-known.yaml` (the
-105 findings of the first full sweep, each owned), `data/range/reference.yaml` (the wars,
+**What was built.** `tools/audit_range.py` (the sweep), `tools/range/audit-known.yaml` (the
+105 findings of the first full sweep, each owned), `tools/range/reference.yaml` (the wars,
 the peaces and the nations' lifetimes of 1792 to 1825, FROM MEMORY, read by nothing in the
-game), `tests/test_range_audit.py` (18 fast tests and two slow), truths 7-590 to 7-592, and
-the document. No file under `freesail/` changed, and none under `data/` but the two new
-ones under `data/range/`.
+game), `tests/test_range_audit.py` (27 fast tests and seven slow), truths 7-590 to 7-593, and
+the document. No file under `freesail/` changed and none under `data/`: the audit's two
+files lie beside the tool, under `tools/range/` (first laid under `data/range/` and moved
+on the lead's reading, below).
 
 **The ground report and the rulings.** Before anything was written the builder reported
 how a scenario seeds the world on its first day, every place the data carries a date, and
@@ -28728,7 +28729,8 @@ findings and ruled: (A) seed each sampled day through the engine's own readers a
 whole worlds on a few, with a check that the two roads agree on what both see; (B) carry a
 small reference of the wars, the peaces and the nations' lifetimes, every row marked FROM
 MEMORY with its confidence or citing where the tree already has it, its findings a kind of
-their own counted apart, under `data/range/` and read by nothing in the game; (C) "no data
+their own counted apart, read by nothing in the game (ruled for `data/range/`; under
+`tools/range/` since the lead's reading); (C) "no data
 dates it" as one finding to an element, and the year in a fit's name checked against the
 day wherever a scenario or the business names or draws that fit. The helpers were run as
 the owner directed.
@@ -28743,7 +28745,8 @@ the owner directed.
   by ruling B, the reference. The document's table is the tool's own print of it, and a
   test holds the two the same.
 - The lead asked for about six whole worlds in the fast tier within about thirty seconds.
-  Four fit: the test file's fast tier is about 25 s.
+  Four were built, at about 25 s for the test file; on the lead's reading the sweep went
+  to the slow tier altogether (below), where the four stand beside the full sweep's 138.
 - The brief's "each signal book, regulation, private signal in force on that day" and "a
   class afloat that year" cannot be checked, the data dating none of them: each is one
   finding of check (u), biting every year (ruling C).
@@ -28779,13 +28782,16 @@ seconds. The slow tier's test reads every ship, port, signal, scenario and top-l
 file by both loaders and holds them equal. Nothing of the engine was changed; the pace is
 reported to the lead as found.
 
-**The pace** (one process, four cores, 2026-11-14). The sampled sweep about 20 s (four
-worlds 15 s, the code's years 2 s, the rest under a second); the test file's fast tier
-about 25 s on one worker; truths 7-590 to 7-592 3.4 s together; the full sweep 11 min 18 s
-(138 worlds 672 s), its slow test 674 s.
+**The pace** (one process, four cores, 2026-11-14; the table by loader is the document's
+section 7). With libyaml's loader: the sampled sweep about 20 s (four worlds 15 s, the
+code's years 2 s, the rest under 2 s); the full sweep 11 min 18 s (138 worlds 672 s), its
+slow test 679 s. By the pure-Python loader alone the sampled sweep is about 45 s. The fast
+tier of the test file is about 1 s (4 s without libyaml) and truths 7-592 and 7-593 under
+a second (2.3 s); the slow tier's fixture 19 s (41 s), truths 7-590 and 7-591 2.7 s and
+1.1 s (13 s and 7 s), the loaders' comparison 7.8 s.
 
-**The findings** (the full sweep): 105, of which 66 mechanical (46 data faults for
-milestone 7c, 20 engine faults) and 39 that rest on the reference. By check: the ports 9,
+**The findings** (the full sweep): 105, of which 66 mechanical (39 data faults for
+milestone 7c, 27 engine faults) and 39 that rest on the reference. By check: the ports 9,
 the wars 11, the blockades 1, the vessels 6, the flags 7, the days 2, the lights 1, the
 words 6, the code's years 5, what no data dates 10, the classing 8, the reference 39, the
 two roads' agreement none. The sampled sweep makes all but `r-vessel:etruria`.
@@ -28805,6 +28811,74 @@ caller; `ships._default_fit` reading the ship file once a vessel. In the data: N
 ensign's dates in a form the reader of dates would refuse; the Cadiz blockade's beginning
 in words; Algiers's war with Portugal and the Order's with the regencies written under
 `relations` and not in the table.
+
+### After the lead's reading of 304d418 (2026-11-14)
+
+The lead had a fresh reader check some twenty findings against the game without the tool
+(all real, their years and basis right) and sent eight things owed before the merge. Each
+below with its cause, the mend where the cause lives, where else it was looked for, and the
+test at that level. No file under `freesail/` or `data/` changed.
+
+1. **The ratchet failed on Windows.** *Cause:* a path used as a key. `str(path)` went into
+   the scan's file names, the code's years' keys and the scenarios' names, and was matched
+   with `fnmatchcase` against "ports/*.yaml" and against the scan's skips: with the other
+   separator 1,057 of 5,545 dated keys fell in no row. *Mend:* one function, `key_of` (the
+   path under its folder, `as_posix`), used wherever a path is compared, skipped or printed
+   into a key; `name_of` and `stem_of` read a file's name from either separator;
+   `_file_kind` and the scenario's key go by POSIX paths. *Looked for elsewhere in
+   `tools/`:* the chart's audit keys by stems and ids and makes its one path key with
+   `as_posix` (no fault); `tools/regatta.py` `_rel` writes `str()` of a path into its
+   runs' rows (shown, not matched; not changed). *Tests:* the keying on `PureWindowsPath`
+   inputs against the classing's rows and the skips; the scan's and the code's keys on a
+   nested made folder; truth 7-593.
+2. **The new tests were too dear for the fast tier.** *Cause:* the ratchet read the whole
+   tree and made four worlds in the fast tier, and every planting read the whole tree; by
+   the pure-Python loader that was 65 s for the file and 13, 7 and 5 s for the truths,
+   against the suite's own threshold of 5 s. *Mend:* `load_tree` takes a few ports and
+   ships; the plantings run on a small tree (ten ports, two ships, no scenarios) or on
+   made data; the fixtures `tree` and `sampled` and truths 7-590 and 7-591 are on the
+   slow lists of `tests/conftest.py`; truth 7-592 reads five ports. The fast tier of the
+   file is 4 s without libyaml and 1 s with it. The document's section 7 gives every
+   figure by loader.
+3. **The audit's files were inside the build's fingerprint.** *Cause:* files the game does
+   not read laid where the game's data lives: `core.world.fingerprint_of` hashes every
+   file under `data/` but the tiles, so an entry taken out of the known list would have
+   changed the build and made an older save read as another build's. *Mend:* both files
+   moved to `tools/range/`. *Tests:* on a made root, a file under `tools/` moves no
+   fingerprint and the same file under `data/` does; the real files are under
+   `tools/range/` and `data/range/` is gone; nothing under `freesail/` names them.
+   *Found for others, not mended:* `data/charts/audit-known.yaml` (package 111's) is in
+   the same case.
+4. **Three owners were wrong.** `w-no-end`, the five `f-colours:` and `u-nations` were
+   owned as data faults and no data can mend them (the loader keeps no `until` and the
+   stance reads no date; the colours' dates are read by nothing; no reader asks whether a
+   nation is in being). They are the engine's now, each reason naming the finding that
+   says why: 39 data faults, 27 engine faults, 39 judgements. The test of the known list
+   holds the seven.
+5. **What the sweep cannot see, with its cases,** in the document's section 5: a port held
+   by another nation that was in being (Toulon, Port Mahon, Bastia, Porto Ferrajo,
+   Villefranche: all inside the one `p-undated:nation`); a class the business draws in
+   years before she was, where the year stands only in words (the topsail schooner "of
+   about 1804", the merchant brig of the Harpy's lines of 1796, the privateer schooner);
+   the colours of the ten nations with no colours of their own.
+6. **The loaders' test** walks every YAML file under `data/` (437 at 504a250; the lead's
+   reader counted 462, presumably on the trunk), compares value by value and type by type
+   (True is not 1 and 1 is not 1.0), and where libyaml is absent skips with its reason
+   and does not compare a loader with itself. A fast test holds the comparison itself
+   honest and another that the swap does nothing where libyaml is absent. The two loaders
+   agree on all 437.
+7. **"Proved by planting"** was true of ten checks. Every finding the tool can make is now
+   made from planted data by its key (the list is the test file's head); the ten of check
+   (u) are counted on a small tree and said not to be planted. `w-asymmetric`, which could
+   never fire, and `FEATURES_DIR`, unused, are out. A data file that will not parse was
+   passed over in silence by the scan; it is a finding now (`c-unparsed:`), planted.
+8. **Two rows of the reference looked at again.** Spain and Portugal, 1801: the row began
+   on 20 May, the invasion; Spain's declaration was late in February (the day remembered
+   as the 27th and not sure), and the row begins there, confidence low, the days by the
+   month. Morocco and the United States: the row ended with September 1803, as the tree's
+   own words have it; the settlement at Tangier is remembered as of October (the 12th, not
+   sure), and the row ends the day before, marked FROM MEMORY where it leaves the tree,
+   confidence low. Neither moves a finding's years.
 
 ### The helpers' reports, kept (package 103a)
 

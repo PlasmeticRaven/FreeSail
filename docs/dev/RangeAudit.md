@@ -7,7 +7,7 @@ measurement of how far the tree is from that, made at the trunk's 504a250 by
 research on file. Nothing was mended and no data changed. What it finds is the brief of
 milestone 7c's data work and of package 103b's design.
 
-The tool, its known list (`data/range/audit-known.yaml`) and its test
+The tool, its known list (`tools/range/audit-known.yaml`) and its test
 (`tests/test_range_audit.py`) go on measuring: a finding the list lacks fails the test, and
 so does a listed finding the sweep no longer makes.
 
@@ -38,7 +38,8 @@ check (a).
 **The reference.** The tree is silent on which wars and which nations are a day's own (its
 table is June 1805's, with no end to any war and no lifetime to any nation), so without a
 measure the audit could say only "undated". By the lead's ruling the audit carries
-`data/range/reference.yaml`: the wars and peaces between the nations the table names, the
+`tools/range/reference.yaml` (beside the tool, not under `data/`, which the build's
+fingerprint hashes whole): the wars and peaces between the nations the table names, the
 general peaces, and those nations' lifetimes, every row marked FROM MEMORY with the
 writer's confidence unless the tree already cites a work for it. It is not research and
 not the game's data; nothing under `freesail/` reads it. A finding that rests on it is a
@@ -46,10 +47,34 @@ kind of its own (`basis: reference`, its key beginning `r-`, its owner "a judgem
 read against a source"), counted and listed apart. The mechanical findings are the same
 with the reference thrown away (`--no-reference`; the test holds it).
 
+**Whose a finding is.** A data fault is one the data work can mend by writing rows the
+game already reads. Where no data can mend it, it is the engine's, whatever rows are
+wanting besides: the wars' want of an end (`w-no-end`: the loader keeps no `until` and the
+stance reads no date), the nations' want of a lifetime (`u-nations`), and the colours worn
+whatever the year (`f-colours:`, five: their dates are read by nothing,
+`c-unread:colours-dates`).
+
 **What a finding is.** A key (the check and what it is of, never a count or a day), what
 it is in words, the years of the sampled days it bites, a count of the things concerned,
 and an owner: a data fault for milestone 7c, an engine fault, or a judgement to be read
 against a source. The findings are stated as the tool makes them.
+
+**How the checks are proved, and in which tier.** Every finding the tool can make is made
+on purpose in `tests/test_range_audit.py` from planted data, by its key: a port held by no
+nation, a war before its own beginning, a blockade with no dates, a fit of a later year,
+colours out of their dates, a year with no day kept, a light of the range, served words of
+a year to come, a year fixed in code, a dated key in no row, a file that will not parse, a
+holder, a war and a vessel out of the reference's years, and the two roads made to
+disagree on a world built by hand. The ten of check (u) count what a tree holds and are
+counted on a small one; they are not planted otherwise. All of that is cheap and is the
+fast tier's. The ratchet itself (the sampled sweep and the full sweep against the known
+list, on the whole tree with whole worlds) is the slow tier's, which the cloud runs at
+every merge: by the suite's own rule a test of five seconds or more is slow, and the
+sampled sweep is twenty by the quick loader and forty by the game's own (section 7).
+
+**A path as a key.** A file enters a finding's key, and is matched against the classing,
+only through one function (`key_of`: its path under its folder, with forward slashes), so
+that the keys and the known list are the same on Windows as elsewhere.
 
 ## 2. Every dated key of the data, classed
 
@@ -151,8 +176,8 @@ The full sweep makes **105 findings: 66 mechanical and 39 that rest on the refer
 
 | Owner | Mechanical | Reference |
 |---|---|---|
-| a data fault for milestone 7c | 46 | 0 |
-| an engine fault | 20 | 0 |
+| a data fault for milestone 7c | 39 | 0 |
+| an engine fault | 27 | 0 |
 | a judgement to be read against a source | 0 | 39 |
 | all | 66 | 39 |
 
@@ -203,7 +228,7 @@ see, because nothing in it ends. The reference's count is lowest in 1804 and 180
 years the table was written for, and highest in 1792 to 1795 and 1808 to 1814.
 
 The whole list, each finding with its owner and its reason, is
-`data/range/audit-known.yaml`.
+`tools/range/audit-known.yaml`.
 
 ## 4. The ten that matter most to a player beginning on an arbitrary day
 
@@ -279,18 +304,42 @@ given year; what a ship of a given year had aboard her that an earlier one had n
 what the sea itself carried by the 1820s (FROM MEMORY: steam packets on the Channel
 crossings before the range's end).
 
+**Three kinds of fault the sweep is blind to, each with its cases.** Package 103b will
+read this as the list of them.
+
+1. *A port held by another nation that was in being.* The reference catches a holder that
+   did not exist (Leghorn's Etruria in 1792); it cannot catch one that did. All of these
+   are inside the one aggregate finding `p-undated:nation` (101 ports whose file gives the
+   holder as one word), which cannot tell them from Falmouth. FROM MEMORY, none checked:
+   Toulon, the allies' from late August to 19 December 1793; Port Mahon, British from
+   November 1798 to 1802; Bastia (and San Fiorenzo and Ajaccio), the British kingdom of
+   Corsica's from 1794 to October 1796; Porto Ferrajo, Tuscan with a British garrison in
+   1796 and 1797 and French only from 1802; Villefranche, the King of Sardinia's before
+   the French took Nice at the end of September 1792 and again after 1814.
+2. *A class the business draws in years before she was.* Check (v) reads a year from a
+   fit's name and from nothing else. A class whose own year stands only in her file's
+   words is "no data dates it" (`u-ships`) and is drawn in 1792 without a finding: the
+   topsail schooner "of about 1804" to a draught of 1812 (`data/ships/topsail-schooner.yaml`,
+   `era_notes`), which the business draws for the British, French, American and Portuguese
+   trade; the merchant brig of the Harpy's lines, a hull launched in 1796
+   (`merchant-brig.yaml`), the commonest trader of all; the privateer schooner "of about
+   1804". The three fits these sail are named "unarmed", "merchant" and "long tom", with no
+   year.
+3. *The colours of a nation with no colours of her own.* Ten of the table's sixteen
+   nations have neither a colours file nor a block in the basic file and wear the basic
+   file's plain list, whose flags carry no dates: Algiers, the Batavian Republic, Denmark,
+   Etruria, Liguria, Morocco, the Order, the Papal state, Sardinia and Tunis. `f-colours:`
+   can find nothing for them in any year, though what the lookout is told of their colours
+   (`u-colours-words`) is one line for the range.
+
 **Whether an undated value is wrong.** `p-undated:nation` counts 101 ports whose holder is
 one word. For most the word is right through the range (Falmouth, Brest). The audit
 cannot tell those from the ones below, which are the builder's memory and the helpers'
 reading of the files' own comments, set down so that 7c knows where to look first. All
 FROM MEMORY, none checked:
 
-- Toulon: held by the allies from late August to 19 December 1793.
-- Corsica's ports (San Fiorenzo, Bastia, Ajaccio): the British kingdom of Corsica, 1794
-  to October 1796 (the three files' own comments say so, from memory).
-- Port Mahon: British from November 1798 to the peace of Amiens, given up in 1802.
-- Porto Ferrajo: Tuscan, a British garrison in 1796 and 1797, French from 1802, Napoleon's
-  own from May 1814 to February 1815.
+- The five of the first kind above; of Corsica's three, the files' own comments say so,
+  from memory; Porto Ferrajo was besides Napoleon's own from May 1814 to February 1815.
 - Leghorn: Tuscan before 1801, occupied by the French in 1796 and again from 1799 and
   1800; a French department's port from 1808 to 1814; Tuscan again after.
 - Genoa: France's in its file from June 1805 with no end; a republic again for some months
@@ -396,21 +445,32 @@ works on file are richer than the data made from them.
 ## 7. What it cost to run
 
 Measured on the build's container (four cores, one process, 2026-11-14), at the tree of
-504a250:
+504a250. Every figure depends on which YAML loader the machine has: the game always reads
+by PyYAML's pure-Python loader; the audit, for its own run alone, has the same call
+answered by libyaml's loader where PyYAML was built with it (section 8). The first column
+needs libyaml; the second is what a machine without it pays, as the build machine does.
 
-| What | Cost |
-|---|---|
-| The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree read in 0.6 s; every check of the cheap road over 202 days (323 with the reference's) in under half a second together, but the reading of the code for its years, 2 s; four whole worlds 15 s (two to six seconds each) |
-| The fast tier's test (`tests/test_range_audit.py`, 18 tests) | about 25 s on one worker: the sampled sweep once (20 s), the sweep twice over for sameness (3 s), the rest under 2 s |
-| Truths 7-590 to 7-592 | 3.4 s together |
-| The full sweep (`--full`) | 11 min 18 s: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s |
-| The slow tier's tests | the full sweep against the known list 674 s; the two loaders file for file 4.5 s |
+| What | With libyaml's loader | By the pure-Python loader alone |
+|---|---|---|
+| The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 202 days (323 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
+| The fast tier of `tests/test_range_audit.py` (27 tests) | about 1 s | about 4 s, the small tree's fixture 2.6 s of it |
+| Truths 7-592 and 7-593 (fast) | under a second | 2.3 s |
+| The slow tier of the file: the sampled sweep's fixture, with the tests that read the whole tree | 19 s, and 4 s for the rest | 41 s for the fixture (the lead's measurement) |
+| Truths 7-590 and 7-591 (slow) | 2.7 s and 1.1 s | 13 s and 7 s (the lead's measurement) |
+| The full sweep (`--full`), and its slow test | 11 min 18 s: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s | not measured |
+| The two loaders compared file for file (slow) | 7.8 s for the 437 YAML files under `data/` | skipped, with its reason: there is no second loader to compare |
 
-The dear road is all of the cost. A whole world by the game's own YAML loader takes ten to
-nineteen seconds; the audit swaps in libyaml's loader for its own run (section 8) and a
-world then takes two to six, the rest being the business peopling its region. The lead
-asked for about six whole worlds in the fast tier within about thirty seconds; four fit
-(each chosen for a year the others do not show), and six would not.
+The dear road is all of the cost. A whole world by the game's own loader takes ten to
+nineteen seconds, most of it reading ship files; by libyaml's two to six, the rest being
+the business peopling its region.
+
+By the suite's own rule a test of five seconds or more belongs to the slow tier, so the
+ratchet is there: the fixtures `tree` and `sampled` and truths 7-590 and 7-591 are on the
+slow lists of `tests/conftest.py`, and the fast tier keeps the plantings on small made
+data, the key function, the fingerprint and the classing's table. The first build had the
+sampled sweep in the fast tier, at four whole worlds where the lead had asked for about
+six within thirty seconds; with the sweep in the slow tier the four stand (each chosen for
+a year the others do not show) and the full sweep's 138 are beside them.
 
 In the building: two read-only helpers, one for the readers of each dated key and one for
 the map of section 6 (their reports are in docs/dev/TuningNotes.md); no paid call, nothing
@@ -430,6 +490,19 @@ corrected:
   nothing.
 
 Found for others and not mended (each is in the known list or said here):
+
+- **The build's fingerprint and an audit's list.** `core.world.fingerprint_of` hashes
+  every file under `data/` but the tiles. This audit's two files were first laid under
+  `data/range/`, so that every entry the ratchet asked to be taken out would have changed
+  the build, and a save made before it would have read as another build's; they are under
+  `tools/range/` now. `data/charts/audit-known.yaml` (package 111's) is in the same case
+  and is left where it is: another package's.
+- **A path as a key, elsewhere in `tools/`.** Looked for wherever a path is turned into
+  words. The chart's audit keys its findings by a file's stem or a feature's id, and its
+  one path key is made with `as_posix` (`tools/audit_chart.py`, the scenarios' check): no
+  fault found. `tools/regatta.py` (`_rel`) writes `str()` of a path under the repository
+  into its runs' rows, which would read with the other separator on Windows; it is shown,
+  not matched. Neither was changed.
 
 - **The engine.** The scenario's `nations:` block read by nothing; the prize court and the
   stance disagreeing before a war's `since`; `Nations.declare_war` writing a day the court

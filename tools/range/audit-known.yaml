@@ -1,4 +1,6 @@
 # The range's audit: the findings known and owned (package 103a, `tools/audit_range.py`).
+# It lives beside the tool and not under data/: the build's fingerprint hashes every file
+# under data/, and an entry taken out of this list is no change of the game's rules.
 #
 # Every finding of the audit's first full sweep (the trunk at 504a250, 1792 to 1825), each by
 # its key with what it is, the years it bites (of the days the sweep samples), its basis,
@@ -13,7 +15,7 @@
 # The owners are three. "a data fault for milestone 7c": the data lacks a date, a row or a
 # form, and the data work mends it. "an engine fault": the code reads a date it should not,
 # or does not read one it should; listed and reported, not mended by the audit. "a judgement
-# to be read against a source": the finding rests on `data/range/reference.yaml`, a table
+# to be read against a source": the finding rests on `tools/range/reference.yaml`, a table
 # written FROM MEMORY and read by nothing in the game (`basis: reference`); these are a kind
 # of their own, counted apart, and the mechanical findings stand whole without them.
 #
@@ -137,8 +139,8 @@ known:
   what: 'no war of the table has an end and the table holds no peace: each is in force on every day'
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'data/nations.yaml is the table of June 1805: three wars, each with a beginning, none with an end, and no peace; the form itself has no place for an end'
+  owner: an engine fault
+  reason: 'no data can mend it: `nations.load_nations` keeps a war''s `since` and would drop an `until`, and `Nations.at_war` reads no date at all (w-before-since:, w-court:); the table''s form and its reader are the engine''s, and the rows of 1792 to 1825 are 7c''s once there is a form to hold them'
   most: 3
 - key: w-relations:algiers+order-of-st-john
   what: the nation's `relations` say war in words and the table has none (the words are read by nothing)
@@ -214,36 +216,36 @@ known:
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1800
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the colours file has only the flags of the years its `dates` give; with the dates read by nothing (c-unread:colours-dates) she wears them in every year, and the years outside want their own rows
+  owner: an engine fault
+  reason: 'no data can mend it: the colours'' `dates` are read by nothing (c-unread:colours-dates), so whatever rows the file held she would wear the flag her occasion names in every year; the flags of the years outside are 7c''s once a reader takes the year'
   most: 4
 - key: f-colours:france
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1793
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the colours file has only the flags of the years its `dates` give; with the dates read by nothing (c-unread:colours-dates) she wears them in every year, and the years outside want their own rows
+  owner: an engine fault
+  reason: 'no data can mend it: the colours'' `dates` are read by nothing (c-unread:colours-dates), so whatever rows the file held she would wear the flag her occasion names in every year; the flags of the years outside are 7c''s once a reader takes the year'
   most: 3
 - key: f-colours:naples
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1807-1814
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the colours file has only the flags of the years its `dates` give; with the dates read by nothing (c-unread:colours-dates) she wears them in every year, and the years outside want their own rows
+  owner: an engine fault
+  reason: 'no data can mend it: the colours'' `dates` are read by nothing (c-unread:colours-dates), so whatever rows the file held she would wear the flag her occasion names in every year; the flags of the years outside are 7c''s once a reader takes the year'
   most: 1
 - key: f-colours:portugal
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1817-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the colours file has only the flags of the years its `dates` give; with the dates read by nothing (c-unread:colours-dates) she wears them in every year, and the years outside want their own rows
+  owner: an engine fault
+  reason: 'no data can mend it: the colours'' `dates` are read by nothing (c-unread:colours-dates), so whatever rows the file held she would wear the flag her occasion names in every year; the flags of the years outside are 7c''s once a reader takes the year'
   most: 1
 - key: f-colours:united-states
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1794, 1819-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the colours file has only the flags of the years its `dates` give; with the dates read by nothing (c-unread:colours-dates) she wears them in every year, and the years outside want their own rows
+  owner: an engine fault
+  reason: 'no data can mend it: the colours'' `dates` are read by nothing (c-unread:colours-dates), so whatever rows the file held she would wear the flag her occasion names in every year; the flags of the years outside are 7c''s once a reader takes the year'
   most: 2
 - key: f-dates-form:naples:Neapolitan ensign
   what: the flag's dates '-1806, 1815-' are in a form the engine's reader of dates cannot read
@@ -389,8 +391,8 @@ known:
   what: no nation of the table carries the days it was in being
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'the table has no form for a nation''s days: the Batavian Republic, Liguria, Etruria and the Order stand on every day of the range, and the states before and after them are not in it'
+  owner: an engine fault
+  reason: 'no data can mend it: `nations.load_nations` reads no lifetime and no reader asks whether a nation is in being on a day, so the Batavian Republic, Liguria, Etruria and the Order stand on every day of the range; the form is the engine''s (the reference''s findings r-nation: say which years bite)'
   most: 16
 - key: u-private
   what: the private signals' form carries no days in force (the tables themselves are made by the running year and month)

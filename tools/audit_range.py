@@ -5,7 +5,7 @@
 Decision 69 (docs/DesignProposal.md): a game begun on any day from 1792 to 1825 finds a
 world depicted accurately and working. This tool measures how far the tree is from that,
 as package 111's audit measures the chart: a sweep, a known list with each finding owned
-(`data/range/audit-known.yaml`), and a test that fails on a finding the list lacks and on a
+(`tools/range/audit-known.yaml`), and a test that fails on a finding the list lacks and on a
 listed finding the sweep no longer makes (`tests/test_range_audit.py`). It mends nothing
 and changes no data.
 
@@ -47,11 +47,11 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
 (u) what no data dates at all, one finding to an element: the nations' lifetimes, the
     letters of marque, the ships, the signal books, the private signals, the regulations,
     the colours' words, the names, the trade, the prize shares.
-(c) the classing: every dated key of the data in the table (`CLASSING`); a row of the
-    table that matches nothing; each key read against the running clock that play could
-    change, and each key parsed and read by nothing.
+(c) the classing: every dated key of the data in the table (`CLASSING`); a data file
+    that will not parse; a row of the table that matches nothing; each key read against
+    the running clock that play could change, and each key parsed and read by nothing.
 (r) the reference: the same day's wars, nations and blockades against
-    `data/range/reference.yaml`, a table of the range's wars, peaces and nations'
+    `tools/range/reference.yaml`, a table of the range's wars, peaces and nations'
     lifetimes written FROM MEMORY and read by nothing in the game. These findings are a
     kind of their own (`basis: reference`), counted and listed apart; the mechanical
     findings stand whole if the reference is thrown away (`--no-reference`).
@@ -61,6 +61,11 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
 half a second and a world loads a dozen. While this tool runs, and only then, the same
 call is answered by libyaml's loader where it is installed (`fast_yaml`), which reads the
 same documents (the slow tier's test holds it file for file).
+
+**Keys.** A file enters a key, and is matched against the classing, only by `key_of`:
+its path under its folder with forward slashes, the same on every machine. The known list
+and the reference lie under `tools/range/`, not under `data/`, which the build's
+fingerprint hashes whole.
 
 Figures marked JUDGEMENT are the audit's own choices of what counts as a finding.
 """
@@ -76,10 +81,10 @@ import re
 import sys
 import time
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
-from pathlib import Path
+from pathlib import Path, PurePath, PurePosixPath
 from types import SimpleNamespace
 from typing import Any
 
@@ -98,13 +103,15 @@ from freesail.world.ports import DATED_KEYS, load_port  # noqa: E402
 
 DATA = ROOT / "data"
 CODE = ROOT / "freesail"
-KNOWN_PATH = DATA / "range" / "audit-known.yaml"
-REFERENCE_PATH = DATA / "range" / "reference.yaml"
+# The audit's own two files: beside the tool, not under data/, which the build's
+# fingerprint hashes whole (`core.world.fingerprint_of`); the game reads neither.
+RANGE_DIR = ROOT / "tools" / "range"
+KNOWN_PATH = RANGE_DIR / "audit-known.yaml"
+REFERENCE_PATH = RANGE_DIR / "reference.yaml"
 PORTS_DIR = DATA / "ports"
 SHIPS_DIR = DATA / "ships"
 SCENARIOS_DIR = DATA / "scenarios"
 SIGNALS_DIR = DATA / "signals"
-FEATURES_DIR = DATA / "charts" / "features"
 NATIONS_PATH = DATA / "nations.yaml"
 BUSINESS_PATH = DATA / "business.yaml"
 CHART_NAME = "atlantic-east"
@@ -573,6 +580,23 @@ def in_range(d: date) -> bool:
     return RANGE_SINCE <= d <= RANGE_UNTIL
 
 
+def key_of(path: PurePath, base: PurePath) -> str:
+    """A file as a key: its path under `base` with forward slashes, whatever the machine's
+    own separator. Every path the audit matches against the classing, skips by its
+    prefix or prints into a finding's key goes through here, so that the keys and the
+    known list are the same on Windows as elsewhere."""
+    return path.relative_to(base).as_posix()
+
+
+def name_of(file: Any) -> str:
+    """A file's own name from a path written with either separator."""
+    return PurePosixPath(str(file).replace("\\", "/")).name
+
+
+def stem_of(file: Any) -> str:
+    return PurePosixPath(name_of(file)).stem
+
+
 def year_of(words: Any) -> int | None:
     """The first year a name or a line of words carries, or None."""
     m = YEAR.search(str(words or ""))
@@ -628,36 +652,48 @@ class Tree:
     code: Path = CODE
 
 
-def load_tree() -> Tree:
+def load_tree(
+    ports: Iterable[str] | None = None,
+    ships: Iterable[str] | None = None,
+    scenarios: bool = True,
+) -> Tree:
+    """The tree read: whole, or for a test a few ports by their files' names, a few ship
+    files, and no scenarios (a small tree reads in a second by any loader)."""
+    wanted = None if ports is None else set(ports)
+    port_files = [p for p in sorted(PORTS_DIR.glob("*.yaml")) if wanted is None or p.stem in wanted]
+    ship_names = None if ships is None else set(ships)
+    ship_files = [
+        p for p in sorted(SHIPS_DIR.glob("*.yaml")) if ship_names is None or p.name in ship_names
+    ]
     with fast_yaml():
         chart = load_chart(CHART_NAME)
         ports = {}
-        for path in sorted(PORTS_DIR.glob("*.yaml")):
+        for path in port_files:
             port = load_port(path, chart)
             ports[port.id] = port
         nations = load_nations()
-    port_docs = {p.stem: read_yaml(p) or {} for p in sorted(PORTS_DIR.glob("*.yaml"))}
+    port_docs = {p.stem: read_yaml(p) or {} for p in port_files}
     port_docs = {str(d.get("id") or stem): d for stem, d in port_docs.items()}
-    scenarios = {}
-    for p in sorted(SCENARIOS_DIR.rglob("*.yaml")):
+    scenarios_read = {}
+    for p in sorted(SCENARIOS_DIR.rglob("*.yaml")) if scenarios else []:
         doc = read_yaml(p)
         if isinstance(doc, dict):
-            scenarios[str(p.relative_to(SCENARIOS_DIR))] = doc
+            scenarios_read[key_of(p, SCENARIOS_DIR)] = doc
     return Tree(
         nations=nations,
         nations_doc=read_yaml(NATIONS_PATH) or {},
         ports=ports,
         port_docs=port_docs,
         business_doc=read_yaml(BUSINESS_PATH) or {},
-        ship_docs={p.name: read_yaml(p) or {} for p in sorted(SHIPS_DIR.glob("*.yaml"))},
-        scenario_docs=scenarios,
+        ship_docs={p.name: read_yaml(p) or {} for p in ship_files},
+        scenario_docs=scenarios_read,
         chart=chart,
     )
 
 
 @dataclass
 class Reference:
-    """`data/range/reference.yaml`: the wars and the nations' lifetimes, FROM MEMORY."""
+    """`tools/range/reference.yaml`: the wars and the nations' lifetimes, FROM MEMORY."""
 
     wars: list[dict[str, Any]]
     lifetimes: list[dict[str, Any]]
@@ -970,8 +1006,6 @@ def check_wars(audit: Audit, tree: Tree, days: list[date], ref: Reference | None
         if pair in seen:
             audit.add("w", f"w-twice:{key}", "the pair is at war twice in the table", days)
         seen.add(pair)
-        if nations.at_war(a, b) != nations.at_war(b, a):
-            audit.add("w", f"w-asymmetric:{key}", "at war one way and not the other", days)
         if nations.allied(a, b):
             audit.add("w", f"w-allied:{key}", "at war and allied at once", days)
         since = _as_day(war.get("since"))
@@ -1112,7 +1146,7 @@ def check_blockades(audit: Audit, tree: Tree, days: list[date], ref: Reference |
 
 
 def default_fit(tree: Tree, ship_file: str) -> str:
-    doc = tree.ship_docs.get(Path(ship_file).name) or {}
+    doc = tree.ship_docs.get(name_of(ship_file)) or {}
     return str((doc.get("armament") or {}).get("default") or "")
 
 
@@ -1120,7 +1154,7 @@ def fit_of_description(tree: Tree, kind: str) -> tuple[str, str]:
     """(the ship file's name, the fit a far ship of the description carries): the file's
     own `ship.descriptions.<kind>.fit`, else its default, as `ships.description` and
     `ships.vessel_from_spec` have it."""
-    file = Path(SH.DESCRIPTIONS[kind]["file"]).name
+    file = name_of(SH.DESCRIPTIONS[kind]["file"])
     doc = tree.ship_docs.get(file) or {}
     own = ((doc.get("ship") or {}).get("descriptions") or {}).get(kind) or {}
     return file, str(own.get("fit") or default_fit(tree, file))
@@ -1148,7 +1182,7 @@ def check_vessels(audit: Audit, tree: Tree, days: list[date]) -> None:
             who = "the business draws her" if kind in drawn else "a scenario may name her"
             audit.add(
                 "v",
-                f"v-fit-ahead:{Path(file).stem}:{fit}",
+                f"v-fit-ahead:{stem_of(file)}:{fit}",
                 f"a {kind} sails the fit '{fit}' on days before {year} ({who})",
                 early,
                 worst=[kind],
@@ -1179,7 +1213,7 @@ def check_vessels(audit: Audit, tree: Tree, days: list[date]) -> None:
         if ahead:
             audit.add(
                 "v",
-                f"v-scenario:{Path(name).with_suffix('')}",
+                f"v-scenario:{PurePosixPath(name).with_suffix('').as_posix()}",
                 f"the scenario begins in {day.year} and sails a fit of a later year",
                 [day] if in_range(day) else [],
                 count=len(ahead),
@@ -1433,7 +1467,7 @@ def engine_years(code: Path = CODE) -> dict[str, list[str]]:
             tree = ast.parse(path.read_text(encoding="utf-8"))
         except SyntaxError:
             continue
-        rel = str(path.relative_to(code.parent))
+        rel = key_of(path, code.parent)
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 name = getattr(node.func, "id", getattr(node.func, "attr", ""))
@@ -1550,16 +1584,16 @@ def check_undated(audit: Audit, tree: Tree, days: list[date]) -> None:
 # (c) the classing
 # ---------------------------------------------------------------------------
 
-# Under data/, what the scan leaves alone: the chart's tiles and coast (no words), and
-# the audit's own two files.
-SCAN_SKIP = ("charts/tiles/", "charts/coast/", "range/")
+# Under data/, what the scan leaves alone: the chart's tiles and coast (no words).
+SCAN_SKIP = ("charts/tiles/", "charts/coast/")
 
 
-def scan_dated(data: Path = DATA) -> list[tuple[str, str, Any]]:
+def scan_dated(data: Path = DATA, unparsed: list[str] | None = None) -> list[tuple[str, str, Any]]:
     """Every key of the data that carries a year or a date: (the file under data/, the
     key's path with a list's items as `#`, the value). A date or a datetime always; words
     that name a year; a whole number of 1500 to 1999 under a key whose name is a date's
-    (`DATE_NAMES`); and a key whose own name carries a year (a fit's)."""
+    (`DATE_NAMES`); and a key whose own name carries a year (a fit's). A file that will
+    not parse is named in `unparsed` and is a finding of its own (`c-unparsed`)."""
     out: list[tuple[str, str, Any]] = []
 
     def walk(value: Any, path: tuple[str, ...], rel: str) -> None:
@@ -1586,12 +1620,14 @@ def scan_dated(data: Path = DATA) -> list[tuple[str, str, Any]]:
             out.append((rel, ".".join(path), value))
 
     for path in sorted(data.rglob("*.yaml")):
-        rel = str(path.relative_to(data))
+        rel = key_of(path, data)
         if rel.startswith(SCAN_SKIP):
             continue
         try:
             doc = read_yaml(path)
         except yaml.YAMLError:
+            if unparsed is not None:
+                unparsed.append(rel)
             continue
         walk(doc, (), rel)
     return out
@@ -1611,7 +1647,16 @@ def row_of(rel: str, path: str) -> Row | None:
     return None
 
 
-def check_classing(audit: Audit, tree: Tree, days: list[date], scan: list[tuple]) -> None:
+def check_classing(
+    audit: Audit, tree: Tree, days: list[date], scan: list[tuple], unparsed: Iterable[str] = ()
+) -> None:
+    for rel in sorted(unparsed):
+        audit.add(
+            "c",
+            f"c-unparsed:{rel}",
+            "a data file that will not parse: its keys are not scanned and not classed",
+            days,
+        )
     used: dict[str, int] = defaultdict(int)
     unclassed: dict[tuple[str, str], int] = defaultdict(int)
     for rel, path, _value in scan:
@@ -1657,7 +1702,7 @@ def check_classing(audit: Audit, tree: Tree, days: list[date], scan: list[tuple]
 
 def _file_kind(rel: str) -> str:
     """A file's kind for a key: its directory, or its own name at the top."""
-    parent = str(Path(rel).parent)
+    parent = PurePosixPath(rel).parent.as_posix()
     return rel if parent == "." else parent
 
 
@@ -1787,13 +1832,13 @@ def check_world(
                 basis=REFERENCE,
                 worst=[where],
             )
-        file = Path(str(getattr(v, "ship_file", "") or "")).name
+        file = name_of(getattr(v, "ship_file", "") or "")
         fit = str(getattr(v, "fit", "") or default_fit(tree, file))
         year = year_of(fit)
         if year is not None and day.year < year:
             audit.add(
                 "v",
-                f"v-fit-ahead:{Path(file).stem}:{fit}",
+                f"v-fit-ahead:{stem_of(file)}:{fit}",
                 f"a vessel sails the fit '{fit}' on days before {year}",
                 day,
                 worst=[f"drawn off {where}"],
@@ -1847,7 +1892,8 @@ def run(
     days = sample_days(tree, full)
     ref_days = sorted(set(days) | set(ref.dates())) if ref is not None else days
     audit.days = days
-    scan = scan_dated(tree.data) if set("xc") & set(letters) else []
+    unparsed: list[str] = []
+    scan = scan_dated(tree.data, unparsed) if set("xc") & set(letters) else []
 
     def timed(letter: str, fn: Any, *args: Any) -> None:
         if letter not in letters:
@@ -1867,7 +1913,7 @@ def run(
     timed("x", check_words, audit, tree, days, scan)
     timed("e", check_engine, audit, tree, days)
     timed("u", check_undated, audit, tree, days)
-    timed("c", check_classing, audit, tree, days, scan)
+    timed("c", check_classing, audit, tree, days, scan, unparsed)
     if ref is not None:
         t = time.perf_counter()
         shadow = Audit()

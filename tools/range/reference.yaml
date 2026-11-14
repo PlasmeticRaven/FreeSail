@@ -18,7 +18,8 @@
 # (`ports._dated_nation`): a war's `until` is the last day of the war, the day before the
 # peace was signed or ratified; a row with no `since` began before the range and one with no
 # `until` outlasts it. `days:` says how far the days themselves are known: "known" (the day
-# remembered or cited), "month" (the month remembered, the day put at its first or last),
+# remembered or cited), "month" (the month remembered; the day entered is the one
+# remembered where the note gives one and says it is not sure, else the month's first or last),
 # "year" (the year only, the day put at 1 January or 31 December). `confidence:` is the
 # writer's own, of the years and of the days: high, medium or low. A JUDGEMENT is said in
 # the note.
@@ -81,7 +82,7 @@ wars:
   # -- France, Spain and Portugal
   - {between: [france, portugal], since: 1793-09-26, until: 1801-09-28, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: Portugal never declared it; she bound herself to Britain by a treaty remembered as of 26 September 1793 and sent troops to Roussillon and a squadron to the Channel fleet, and France treated her as an enemy until the treaty of Madrid of 29 September 1801"}
   - {between: [france, portugal], since: 1807-11-19, until: 1814-05-29, mark: FROM MEMORY, confidence: medium, days: known, note: "Junot's army over the frontier on 19 November 1807 and in Lisbon on the 30th, to the general peace"}
-  - {between: [spain, portugal], since: 1801-05-20, until: 1801-06-05, mark: FROM MEMORY, confidence: medium, days: known, note: "the war of the Oranges, to the treaty of Badajoz of 6 June 1801"}
+  - {between: [spain, portugal], since: 1801-02-27, until: 1801-06-05, mark: FROM MEMORY, confidence: low, days: month, note: "the war of the Oranges. Spain declared war late in February 1801 (the day remembered as the 27th and not sure) and her army crossed the frontier on 20 May; to the treaty of Badajoz of 6 June 1801. The year and the treaty are remembered with more confidence than the first day"}
   - {between: [spain, portugal], since: 1807-11-19, until: 1808-06-05, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: Spanish divisions marched into Portugal with Junot under the treaty of Fontainebleau; ended in fact by the Spanish rising, the last day put at the day before the junta of Seville's declaration against France"}
   # -- France and the Italian states
   - {between: [france, naples], since: 1793-07-12, until: 1796-10-09, mark: FROM MEMORY, confidence: medium, days: known, note: "Naples bound to Britain by the treaty of 12 July 1793; an armistice in June 1796 and the peace of Paris of 10 October 1796"}
@@ -105,7 +106,7 @@ wars:
   - {between: [algiers, sardinia], until: 1816-04-30, mark: FROM MEMORY, confidence: low, days: month, note: "as the row above, for the King of Sardinia"}
   - {between: [tunis, naples], until: 1816-04-30, mark: FROM MEMORY, confidence: low, days: month, note: "as the rows above; data/nations.yaml, `tunis.relations.naples`, says UNVERIFIED, taken as peace"}
   - {between: [tunis, sardinia], until: 1816-04-30, source: "data/nations.yaml, `tunis.relations.sardinia`: the regency's corsairs raided San Pietro in 1798 and carried off 850 of its people, ransomed only in 1805 (Smyth 1828, p. 309)", mark: FROM MEMORY, confidence: low, days: month, note: "the raid is on file; that it was a standing war, and its end in April 1816, are from memory"}
-  - {between: [morocco, united-states], since: 1802-06-01, until: 1803-09-30, source: "data/nations.yaml, `morocco.relations.united-states`: Morocco had declared war in June 1802; peace since September 1803, when Preble met the Emperor at Tangier (the encyclopaedia's articles, read 2026-10-10)", confidence: medium, days: month, note: "the months as the tree has them; the days not given there"}
+  - {between: [morocco, united-states], since: 1802-06-01, until: 1803-10-11, source: "the beginning: data/nations.yaml, `morocco.relations.united-states` (Morocco had declared war in June 1802; the encyclopaedia's articles, read 2026-10-10)", mark: FROM MEMORY, confidence: low, days: month, note: "the end is not the tree's: the tree has peace since September 1803, when Preble met the Emperor at Tangier; the settlement at Tangier is remembered as of October 1803 (the day as the 12th and not sure), and the row ends the day before it. To be read against a source before either month is taken"}
 
 # The general peaces, for the report and the sampling (each is the absence of the wars
 # above, not a row the audit reads for a finding of its own).
