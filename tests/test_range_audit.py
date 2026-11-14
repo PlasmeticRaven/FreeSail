@@ -18,13 +18,16 @@ twice, and the quick loader reads every data file as the game's own does.
 planted data, by its key: the ports' (p-undated, p-holder-unknown, p-blockade-words,
 p-blockade-before, p-blockade-no-war), the wars' (w-before-since, w-court, w-no-end,
 w-twice, w-allied, w-relations, w-block-unread), the blockades' (b-undated, b-no-port),
-the vessels' (v-fit-ahead, v-scenario, v-nation-unknown), the flags' (f-colours,
+the vessels' (v-fit-ahead, v-scenario, v-nation-unknown, by the tables), the flags' (f-colours,
 f-dates-form, f-signal-nearest, f-fashion), the days' (d-none, d-gap), the lights'
 (l-by-year), the words' (x-as-of, x-words), the code's years (e-year), the classing's
 (c-unclassed, c-unparsed, c-dead-row, c-snap-back, c-unread), the reference's (r-holder,
-r-port-blockade, r-nation, r-war-at-peace, r-war-absent, r-blockade, r-vessel) and the
-two roads' (a-wars, a-holder, a-state, a-blockade). The ten of check (u) count what a
-tree holds and are counted here on a small one; they are not planted otherwise.
+r-port-blockade, r-nation, r-war-at-peace, r-war-absent, r-blockade) and the two roads'
+(a-wars, a-holder, a-state, a-blockade, a-vessel-nation, a-vessel-fit, a-colours,
+a-words). No finding stands on which vessels a world's seed draws: a vessel drawn is
+evidence for a finding the cheap road makes, and the list is the same at any seed. The
+ten of check (u) count what a tree holds and are counted here on a small one; they are
+not planted otherwise.
 Truths 7-590 to 7-593 are in test_known_truths.py.
 """
 
@@ -166,7 +169,7 @@ def test_the_known_list_holds_each_finding_owned():
     assert {k.split(":")[0] for k in data} <= set(DATA_CLEARS), sorted(
         {k.split(":")[0] for k in data} - set(DATA_CLEARS)
     )
-    assert len(data) == 28 and len(engine) == 38
+    assert len(data) == 29 and len(engine) == 38
     engines = [k for k in by_owner if k[0] in "ue" or k.startswith(("f-colours:", "c-"))]
     engines += ["w-no-end", "l-by-year", "x-as-of", "w-block-unread"]
     engines += [k for k in by_owner if k.startswith(("w-before-since:", "w-court:"))]
@@ -443,6 +446,23 @@ def test_a_holder_and_a_blockade_out_of_the_references_years_are_its_own_kind(sm
     none = A.Audit()
     A.check_ports(none, small, SOME_DAYS, None)
     assert not none.keys(A.REFERENCE)
+
+
+def test_a_port_given_to_a_nation_not_in_being_raises_its_finding(small):
+    """A planted fact, where a planted draw raises nothing: Plymouth given to Liguria,
+    which the reference has in being from June 1797 to June 1805 and on no other day."""
+    ports = dict(small.ports)
+    plymouth = copy.copy(ports["plymouth"])
+    plymouth.nation = "liguria"
+    ports["plymouth"] = plymouth
+    audit = A.Audit()
+    A.check_ports(audit, _planted(small, ports=ports), SOME_DAYS, A.load_reference())
+    found = audit.findings["r-holder:plymouth"]
+    assert found.basis == A.REFERENCE
+    assert _years_of(found) == set(range(1792, 1797)) | set(range(1805, 1826))
+    clean = A.Audit()
+    A.check_ports(clean, small, SOME_DAYS, A.load_reference())
+    assert "r-holder:plymouth" not in clean.findings
 
 
 def test_a_war_before_its_beginning_twice_allied_and_only_in_words_is_found(small):
@@ -889,6 +909,32 @@ def _clear_u_prize_shares(small, mp):
     return before, after, ["u-prize-shares"]
 
 
+def _clear_v_nation_unknown(small, mp, tmp_path_factory=None):
+    """The cruiser's doctrine as the tree has it, package 74's prize keys under
+    `stations:`; and with the keys where the other doctrines have them."""
+    import tempfile
+
+    root = Path(tempfile.mkdtemp(prefix="range-audit-"))
+    (root / "captains").mkdir()
+    there = root / "captains" / "cruiser.yaml"
+    there.write_text(
+        "thresholds: {}\nstations:\n  britain: []\n  france: []\n  mans_prizes: {value: true}\n",
+        encoding="utf-8",
+    )
+    before = A.Audit()
+    A.check_vessels(before, _planted(small, data=root), SOME_DAYS)
+    there.write_text(
+        "thresholds:\n  mans_prizes: {value: true}\nstations:\n  britain: []\n  france: []\n",
+        encoding="utf-8",
+    )
+    after = A.Audit()
+    A.check_vessels(after, _planted(small, data=root), SOME_DAYS)
+    there.unlink()
+    (root / "captains").rmdir()
+    root.rmdir()
+    return before, after, ["v-nation-unknown:cruiser.stations"]
+
+
 # A kind of finding (its key before the colon) to the planting in which a change of data
 # alone, read by today's readers, clears it. A finding of a kind not here cannot be owned
 # as the data's (`test_the_known_list_holds_each_finding_owned`).
@@ -899,6 +945,7 @@ DATA_CLEARS = {
     "w-relations": _clear_w_relations,
     "b-undated": _clear_b_undated,
     "v-fit-ahead": _clear_v_fit_ahead,
+    "v-nation-unknown": _clear_v_nation_unknown,
     "f-signal-nearest": _clear_f_signal_nearest,
     "d-none": _clear_d_none,
     "d-gap": _clear_d_gap,
@@ -969,7 +1016,7 @@ def test_a_war_with_an_end_and_a_nation_with_its_days_are_counted_no_more(small)
 def test_a_run_with_no_worlds_is_not_asked_for_what_only_a_world_makes():
     known = {
         "w-block-unread": {},
-        "r-vessel:etruria": {"sweep": "full"},
+        "f-colours:made": {"sweep": "full"},
         "p-undated:nation": {},
         "x-as-of": {},
     }
@@ -977,11 +1024,14 @@ def test_a_run_with_no_worlds_is_not_asked_for_what_only_a_world_makes():
     audit.add("x", "x-as-of", "words", [date(1792, 7, 1)])
     assert A.no_longer(audit, known, full=False) == ["p-undated:nation", "w-block-unread"]
     assert A.no_longer(audit, known, full=True) == [
+        "f-colours:made",
         "p-undated:nation",
-        "r-vessel:etruria",
         "w-block-unread",
     ]
-    assert A.no_longer(audit, known, full=True, worlds=False) == ["p-undated:nation"]
+    assert A.no_longer(audit, known, full=True, worlds=False) == [
+        "f-colours:made",
+        "p-undated:nation",
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -1037,42 +1087,72 @@ def test_the_two_roads_agree_on_a_world_made_from_the_readers_and_differ_when_pl
         "a-wars",
         "a-holder:genoa",
         "a-state:valletta",
-        "a-blockade:brest",
         "a-blockade:plymouth",
     }
+    # a squadron the rule admits and the world has not drawn is the draw's, said and not
+    # found (the business draws none where its plan would cross the land)
+    assert "a-blockade:brest" not in planted.findings
+    assert planted.seen["b-not-drawn:brest"] == ["rochefort 1805-07-01"]
 
 
-def test_a_world_shows_the_block_unread_and_what_its_vessels_are_and_wear(small, monkeypatch):
-    """A made world of 1 July 1792 that carries a scenario's block of no war and is at the
-    table's wars; a vessel of no nation, one of a nation the reference has not yet, a brig
-    of the fit of 1796, and a British ship under the ensign of 1801."""
+def _vessel(nation, file, fit="", description=""):
+    return SimpleNamespace(nation=nation, ship_file=file, fit=fit, description=description)
+
+
+def test_a_vessel_drawn_is_evidence_and_never_a_finding_of_its_own(small, monkeypatch):
+    """Which vessels a world's seed draws is the die's, so no finding stands on one. A made
+    world of 1 July 1792 with an Etrurian trader (a nation the reference has not yet), a
+    brig-sloop of the fit of 1796 and a British ship under the ensign of 1801: each is
+    evidence for a finding the cheap road makes (`Audit.seen`) and none is a finding; the
+    same world with no vessels at all makes the same findings. The scenario's block of no
+    war, read by nothing, is the one thing the world adds, and it turns on no draw."""
     day = date(1792, 7, 1)
     block = {"as_of": "1792-07-01", "wars": [], "letters_of_marque": [], "source": "planted"}
     vessels = [
-        SimpleNamespace(nation="atlantis", ship_file="data/ships/smack.yaml", fit=""),
-        SimpleNamespace(nation="etruria", ship_file="data/ships/smack.yaml", fit=""),
-        SimpleNamespace(nation="britain", ship_file=r"data\ships\brig.yaml", fit=""),
+        _vessel("etruria", "data/ships/smack.yaml", description="smack"),
+        _vessel("britain", r"data\ships\brig.yaml", description="brig-sloop"),
     ]
-    world = _made_world(
-        small,
-        day,
-        scenario=SimpleNamespace(nations=block),
-        vessels=SimpleNamespace(vessels=vessels),
-    )
     monkeypatch.setattr(
         A.F,
         "vessel_flies",
         lambda w, v: [{"name": "red ensign"}] if v.nation == "britain" else [],
     )
-    audit = A.Audit()
-    A.check_world(audit, small, day, "ushant", A.load_reference(), world)
-    assert audit.findings["w-block-unread"].worst == ["ushant 1792-07-01"]
-    assert "v-nation-unknown:atlantis" in audit.findings
-    assert audit.findings["r-vessel:etruria"].basis == A.REFERENCE
-    assert "v-fit-ahead:brig:diligence class 1796" in audit.findings
-    assert audit.findings["f-colours:britain"].worst == ["red ensign worn off ushant 1792-07-01"]
-    assert "x-as-of" in audit.findings  # the table's day, 1 June 1805, served in 1792
-    assert not [k for k in audit.findings if k.startswith("a-")]
+    ref = A.load_reference()
+
+    def findings(drawn):
+        world = _made_world(
+            small,
+            day,
+            scenario=SimpleNamespace(nations=block),
+            vessels=SimpleNamespace(vessels=drawn),
+        )
+        audit = A.Audit()
+        A.check_world(audit, small, day, "leghorn", ref, world)
+        return audit
+
+    with_vessels, without = findings(vessels), findings([])
+    assert set(with_vessels.findings) == set(without.findings) == {"w-block-unread"}
+    assert with_vessels.findings["w-block-unread"].worst == ["leghorn 1792-07-01"]
+    assert not [k for k in with_vessels.findings if k.startswith(("r-vessel", "v-", "f-", "a-"))]
+    where = "leghorn 1792-07-01"
+    assert with_vessels.seen == {
+        "r-nation:etruria": [f"a vessel drawn off {where}"],
+        "v-fit-ahead:brig:diligence class 1796": [f"drawn off {where}"],
+        "f-colours:britain": [f"red ensign worn off {where}"],
+        "x-as-of": [f"{where}: The nations as she sailed (1 June 1805): Britain at war with"],
+    }
+    assert set(without.seen) == {"x-as-of"}
+    # each finding the vessels are evidence for is the cheap road's own, made with no world
+    cheap = A.Audit()
+    A.check_wars(cheap, small, [day], ref)
+    A.check_vessels(cheap, small, [day])
+    A.check_words(cheap, small, [day], [])
+    assert {"r-nation:etruria", "v-fit-ahead:brig:diligence class 1796", "x-as-of"} <= set(
+        cheap.findings
+    )
+    text = A.report(with_vessels)
+    assert "== seen in the whole worlds (evidence, no part of the list)" in text
+    assert "r-nation:etruria: a vessel drawn off leghorn 1792-07-01" in text
     # a world that read the block would be at peace with all: no finding, and not compared
     read = _made_world(small, day, scenario=SimpleNamespace(nations=block))
     peace = copy.copy(small.nations)
@@ -1081,6 +1161,52 @@ def test_a_world_shows_the_block_unread_and_what_its_vessels_are_and_wear(small,
     none = A.Audit()
     A.check_world(none, small, day, "ushant", None, read)
     assert not none.findings and not none.worlds
+
+
+def test_a_vessel_the_tables_do_not_admit_is_a_disagreement_of_the_roads(small, monkeypatch):
+    """What can be drawn is the tables': a vessel under a nation neither the nations'
+    table nor the business's tables name, a brig-sloop with a fit that is not her
+    description's, a flag no occasion of her colours names, a served line that is not the
+    readers' road's: each a disagreement, since the cheap road would not have known her."""
+    day = date(1805, 7, 1)
+    vessels = [
+        _vessel("atlantis", "data/ships/smack.yaml", description="smack"),
+        _vessel(
+            "britain", "data/ships/brig.yaml", fit="a fit of her own", description="brig-sloop"
+        ),
+        _vessel("france", "data/ships/smack.yaml", description="smack"),
+    ]
+    monkeypatch.setattr(
+        A.F,
+        "vessel_flies",
+        lambda w, v: [{"name": "flag of an admiral"}] if v.nation == "france" else [],
+    )
+    world = _made_world(small, day, vessels=SimpleNamespace(vessels=vessels))
+    served = copy.copy(small.nations)
+    served.as_of = date(1805, 7, 1)
+    world.nations = served
+    audit = A.Audit()
+    A.check_world(audit, small, day, "rochefort", None, world)
+    assert set(audit.findings) == {
+        "a-vessel-nation:atlantis",
+        "a-vessel-fit:brig:a fit of her own",
+        "a-colours:france:flag of an admiral",
+        "a-words",
+    }
+    # a nation a table of the business's is keyed by is admitted, and is the table's
+    # finding on the cheap road: the vessel under it is evidence, no disagreement
+    doc = {**small.business_doc, "neutrals": [*small.business_doc["neutrals"], "atlantis"]}
+    tabled = _planted(small, business_doc=doc)
+    again = A.Audit()
+    one = _made_world(small, day, vessels=SimpleNamespace(vessels=vessels[:1]))
+    A.check_world(again, tabled, day, "rochefort", None, one)
+    assert not again.findings
+    assert again.seen == {
+        "v-nation-unknown:business.neutrals": ["a vessel of atlantis off rochefort 1805-07-01"]
+    }
+    cheap = A.Audit()
+    A.check_vessels(cheap, tabled, SOME_DAYS)
+    assert cheap.findings["v-nation-unknown:business.neutrals"].worst == ["atlantis"]
 
 
 # ---------------------------------------------------------------------------
@@ -1115,6 +1241,47 @@ def test_the_sampled_sweep_is_the_known_list(sampled):
     assert f"== reference: {len(sampled.keys(A.REFERENCE))} findings" in text
     assert "by year: 1792 " in text and "whole worlds: 4" in text
     assert not [ln for ln in text.splitlines() if ln.startswith("! ")]
+
+
+def test_the_list_is_the_same_whatever_the_seed_draws(tree, sampled):
+    """A change that moves the draws and no fact leaves the list as it was: the sampled
+    sweep with its whole worlds at two other seeds makes the same findings, of the same
+    years and counts, as at the audit's own. (Cloud run 99: a merge that touched ports'
+    tracks and anchorages, and no holder, moved a draw and with it a finding that stood on
+    a vessel drawn; no finding stands on one now.)"""
+
+    def listed(audit):
+        return {k: (f.count, f.years(), f.basis) for k, f in audit.findings.items()}
+
+    for seed in (11, 1805):
+        other = A.run(tree=tree, seed=seed)
+        assert listed(other) == listed(sampled), seed
+        assert other.worlds == sampled.worlds
+
+
+def test_the_worlds_off_leghorn_draw_differently_by_the_seed_and_find_the_same(tree):
+    """Off Leghorn, where run 99's finding moved: whole worlds of 1 July 1792 and 1796 at
+    three seeds. The vessels drawn differ from seed to seed; the findings do not, and none
+    is of a vessel drawn. Leghorn's holder, Etruria, not in being in either year, is the
+    reference's finding by the cheap road whatever is drawn."""
+    ref = A.load_reference()
+    block = {"as_of": "x", "wars": [], "letters_of_marque": [], "source": "the audit"}
+    draws, found = set(), set()
+    with A.fast_yaml():
+        for year in (1792, 1796):
+            day = date(year, 7, 1)
+            for seed in (7, 11, 1805):
+                world = A.make_world(day, "leghorn", block, seed)
+                draws.add(frozenset((v.nation, v.description, v.name) for v in A._vessels(world)))
+                audit = A.Audit()
+                A.check_world(audit, tree, day, "leghorn", ref, world)
+                found.add(frozenset(audit.findings))
+    assert len(draws) > 1  # the die did move
+    assert found == {frozenset({"w-block-unread"})}
+    cheap = A.Audit()
+    A.check_ports(cheap, tree, [date(1792, 7, 1), date(1796, 7, 1)], ref)
+    A.check_wars(cheap, tree, [date(1792, 7, 1), date(1796, 7, 1)], ref)
+    assert {"r-holder:leghorn", "r-nation:etruria", "r-nation:liguria"} <= set(cheap.findings)
 
 
 def test_the_mechanical_findings_stand_without_the_reference(tree, sampled):

@@ -34,7 +34,8 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
 (b) the blockades: an entry with no dates; one drawn outside any war of the table's.
 (v) the vessels: a fit whose name carries a year later than the day, wherever a description
     a scenario or the business may name carries it; a shipped scenario that begins before
-    the year of a fit it sails.
+    the year of a fit it sails; a table of the business keyed by a name the nations' table
+    has not.
 (f) the flags: a nation's colours whose dates do not hold the day's year, flown regardless;
     dates the engine's reader cannot read; a signal flag with no drawing for the year,
     served the nearest; the dressing fashion likewise.
@@ -55,7 +56,19 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
     lifetimes written FROM MEMORY and read by nothing in the game. These findings are a
     kind of their own (`basis: reference`), counted and listed apart; the mechanical
     findings stand whole if the reference is thrown away (`--no-reference`).
-(a) the two roads agree (whole-world days only): no finding is the proof.
+(a) the two roads agree (whole-world days only): no finding is the proof. A holder, a
+    state, the wars, the line served; a squadron drawn that the rule does not admit; a
+    vessel drawn under a nation, with a fit or under a flag the tables do not admit.
+
+**What can be drawn, not what was.** Which vessels the business draws in a world turns on
+the seed and on every port's track and anchorage, so a finding that stood on a vessel
+drawn would move when an unrelated merge moved a draw. No finding stands on one. The
+vessels' checks ask what the tables admit (every description's fit, every nation the
+tables name, every flag an occasion names); a vessel a world happens to draw is evidence
+for a finding already made (`Audit.seen`, printed apart) or, if the tables do not admit
+her, a disagreement of the roads. A vessel under a nation the reference has not in being
+is said under that nation's own finding (`r-nation:`), which is its cause. The list is the
+same at any seed (`--seed`).
 
 **Speed.** The game reads its YAML with the pure-Python loader; a ship file takes it some
 half a second and a world loads a dozen. While this tool runs, and only then, the same
@@ -537,6 +550,15 @@ class Audit:
     seconds: dict[str, float] = field(default_factory=dict)
     days: list[date] = field(default_factory=list)
     worlds: list[tuple[date, str]] = field(default_factory=list)
+    # what the whole worlds happened to show of a finding the cheap road makes (a vessel
+    # drawn, a flag worn): evidence for the reader, no part of the list, since which
+    # vessels a seed draws is the die's and not the tree's
+    seen: dict[str, list[str]] = field(default_factory=dict)
+
+    def see(self, key: str, where: str) -> None:
+        shown = self.seen.setdefault(key, [])
+        if where not in shown:
+            shown.append(where)
 
     def add(
         self,
@@ -1180,7 +1202,35 @@ def business_kinds(tree: Tree) -> set[str]:
     return out
 
 
+def tabled_nations(tree: Tree) -> dict[str, set[str]]:
+    """The names a vessel can be drawn under by the business's own tables, beside the
+    holder of a port, table by table: those its tables of kinds and of names are keyed
+    by, its neutrals, and the keys of the cruisers' stations (`data/captains/cruiser.yaml`,
+    each of which `business._cruisers` reads as a nation)."""
+    out: dict[str, set[str]] = {}
+    for table in ("trader_kinds", "fisher_kinds", "names", "cruiser_names"):
+        out[f"business.{table}"] = {str(k) for k in (tree.business_doc.get(table) or {})}
+    out["business.neutrals"] = {str(n) for n in tree.business_doc.get("neutrals") or []}
+    cruisers = tree.data / "captains" / "cruiser.yaml"
+    if cruisers.exists():
+        stations = (read_yaml(cruisers) or {}).get("stations") or {}
+        out["cruiser.stations"] = {str(k) for k in stations}
+    return {table: names - {"default"} for table, names in out.items()}
+
+
 def check_vessels(audit: Audit, tree: Tree, days: list[date]) -> None:
+    for table, names in sorted(tabled_nations(tree).items()):
+        strangers = sorted(names - set(tree.nations.nations))
+        if strangers:
+            audit.add(
+                "v",
+                f"v-nation-unknown:{table}",
+                "the table is keyed by names the nations' table has not, each of which "
+                "the business reads as a nation",
+                days,
+                count=len(strangers),
+                worst=strangers,
+            )
     drawn = business_kinds(tree)
     for kind in sorted(SH.DESCRIPTIONS):
         file, fit = fit_of_description(tree, kind)
@@ -1743,7 +1793,12 @@ def classing_table() -> str:
 # ---------------------------------------------------------------------------
 
 
-def make_world(day: date, station: str, nations_block: dict[str, Any] | None = None) -> Any:
+def make_world(
+    day: date,
+    station: str,
+    nations_block: dict[str, Any] | None = None,
+    seed: int | None = None,
+) -> Any:
     """A rules-only world begun on the day at a station, the business on, the whole chart."""
     from freesail.api.session import make_world as session_world
     from freesail.core.world import Scenario
@@ -1758,7 +1813,7 @@ def make_world(day: date, station: str, nations_block: dict[str, Any] | None = N
     sc.business = "on"
     if nations_block is not None:
         sc.nations = nations_block
-    return session_world(WORLD_SEED, WORLD_SHIP, sc)
+    return session_world(WORLD_SEED if seed is None else seed, WORLD_SHIP, sc)
 
 
 def _vessels(world: Any) -> list[Any]:
@@ -1772,12 +1827,26 @@ def _sets(world: Any) -> list[Any]:
 
 
 def check_world(
-    audit: Audit, tree: Tree, day: date, station: str, ref: Reference | None, world: Any = None
+    audit: Audit,
+    tree: Tree,
+    day: date,
+    station: str,
+    ref: Reference | None,
+    world: Any = None,
+    seed: int | None = None,
 ) -> None:
+    """A whole world of the day against the readers' road. What a world can add to the
+    list is only what does not turn on the die: that a scenario's block of wars is read by
+    nothing, and a disagreement of the two roads (a holder, a state, the wars, a squadron
+    drawn that the rule does not admit, a vessel drawn that the tables do not admit, the
+    line it serves). Which vessels the business draws is the seed's and the chart's, so a
+    vessel drawn makes no finding of its own: where she shows a finding the cheap road
+    already makes (a nation not in being, a fit of a later year, colours out of their
+    dates) she is evidence for it (`Audit.seen`) and nothing more."""
     # the day's world carries a scenario's own table of no war at all: if the World read
     # the block, it would be at peace with all
     block = {"as_of": day.isoformat(), "wars": [], "letters_of_marque": [], "source": "the audit"}
-    world = world if world is not None else make_world(day, station, block)
+    world = world if world is not None else make_world(day, station, block, seed)
     where = f"{station} {day}"
     table = {frozenset(w["between"]) for w in tree.nations.wars}
     wars = {frozenset(w["between"]) for w in world.nations.wars}
@@ -1826,63 +1895,83 @@ def check_world(
         for s in _sets(world)
         if str(getattr(s, "regime", "")) == "on blockade"
     }
-    for pid in sorted(expected ^ drawn):
+    # a squadron drawn that the rule does not admit is a disagreement; one admitted and
+    # not drawn is the draw's (the business draws none where its plan would cross the
+    # land, `business._put`), and is said, not found
+    for pid in sorted(drawn - expected):
         audit.add(
             "a",
             f"a-blockade:{pid}",
-            "the world's blockade and the readers' road's differ",
+            "the world draws a blockade the readers' road does not admit",
             day,
-            worst=[f"{where}: {'drawn' if pid in drawn else 'not drawn'}"],
+            worst=[where],
         )
-    # the vessels the world draws
+    for pid in sorted(expected - drawn):
+        audit.see(f"b-not-drawn:{pid}", where)
+    # the vessels the world draws: each must be one the tables admit; what she shows
+    # besides is evidence for a finding the cheap road makes
+    tabled = tabled_nations(tree)
+    unknown = {n: t for t, names in sorted(tabled.items(), reverse=True) for n in names}
     for v in _vessels(world):
         nid = str(getattr(v, "nation", "") or "")
         if nid and nid not in tree.nations.nations:
-            audit.add("v", f"v-nation-unknown:{nid}", "a vessel of no nation", day)
+            if nid in unknown:
+                audit.see(f"v-nation-unknown:{unknown[nid]}", f"a vessel of {nid} off {where}")
+            else:
+                audit.add(
+                    "a",
+                    f"a-vessel-nation:{nid}",
+                    "a vessel drawn under a nation neither the table nor the business's "
+                    "tables name",
+                    day,
+                    worst=[where],
+                )
         elif nid and ref is not None and not ref.exists(nid, day):
-            audit.add(
-                "r",
-                f"r-vessel:{nid}",
-                "a vessel drawn under a nation the reference has not in being on the day",
-                day,
-                basis=REFERENCE,
-                worst=[where],
-            )
+            audit.see(f"r-nation:{nid}", f"a vessel drawn off {where}")
         file = name_of(getattr(v, "ship_file", "") or "")
         fit = str(getattr(v, "fit", "") or default_fit(tree, file))
+        kind = str(getattr(v, "description", "") or "")
+        if kind in SH.DESCRIPTIONS and fit_of_description(tree, kind) != (file, fit):
+            audit.add(
+                "a",
+                f"a-vessel-fit:{stem_of(file)}:{fit}",
+                f"a {kind} drawn with a file or a fit that is not her description's",
+                day,
+                worst=[where],
+            )
         year = year_of(fit)
         if year is not None and day.year < year:
-            audit.add(
-                "v",
-                f"v-fit-ahead:{stem_of(file)}:{fit}",
-                f"a vessel sails the fit '{fit}' on days before {year}",
-                day,
-                worst=[f"drawn off {where}"],
-            )
+            audit.see(f"v-fit-ahead:{stem_of(file)}:{fit}", f"drawn off {where}")
         if nid in tree.nations.nations:
             colours = F.file_for_nation(tree.nations, nid)
+            worn = {name for occ in colours.occasions for name, _where in occ.flags}
             for flown in F.vessel_flies(world, v):
-                flag = colours.flags.get(str(flown.get("name")))
-                if flag is not None and not dates_hold(flag.dates, day.year):
+                name = str(flown.get("name"))
+                flag = colours.flags.get(name)
+                if flag is None:
+                    continue
+                if worn and name not in worn:
                     audit.add(
-                        "f",
-                        f"f-colours:{nid}",
-                        "she wears colours whose own dates do not hold the day's year (the "
-                        "colours' dates are read by nothing)",
+                        "a",
+                        f"a-colours:{nid}:{name}",
+                        "a vessel wears a flag no occasion of her nation's colours names",
                         day,
-                        worst=[f"{flag.name} worn off {where}"],
+                        worst=[where],
                     )
-    # the lines the world serves of itself
-    for line in (world.nations.sailed_with_words(), world.nations.wars_words()):
-        named = {int(y) for y in YEAR.findall(line)}
-        if named and day.year not in named:
-            audit.add(
-                "x",
-                "x-as-of",
-                "the table she sailed with is served as of a day of another year",
-                day,
-                worst=[f"{where}: {line[:60]}"],
-            )
+                elif not dates_hold(flag.dates, day.year):
+                    audit.see(f"f-colours:{nid}", f"{flag.name} worn off {where}")
+    # the line the world serves of the table is the readers' road's
+    served = world.nations.sailed_with_words()
+    if served != tree.nations.sailed_with_words():
+        audit.add(
+            "a",
+            "a-words",
+            "the world's line of the table she sailed with is not the readers' road's",
+            day,
+            worst=[f"{where}: {served[:60]}"],
+        )
+    elif {int(y) for y in YEAR.findall(served)} - {day.year}:
+        audit.see("x-as-of", f"{where}: {served[:60]}")
     audit.worlds.append((day, station))
 
 
@@ -1898,8 +1987,10 @@ def run(
     worlds: bool = True,
     reference: bool = True,
     tree: Tree | None = None,
+    seed: int | None = None,
 ) -> Audit:
-    """The audit: the cheap road over the sampled days, the dear road on a few."""
+    """The audit: the cheap road over the sampled days, the dear road on a few (their
+    worlds at `seed`, the audit's own where none is given: the list is the same at any)."""
     audit = Audit()
     t0 = time.perf_counter()
     tree = tree if tree is not None else load_tree()
@@ -1944,7 +2035,7 @@ def run(
         t = time.perf_counter()
         with fast_yaml():
             for day, station in world_days(full):
-                check_world(audit, tree, day, station, ref)
+                check_world(audit, tree, day, station, ref, seed=seed)
         audit.seconds["a"] = time.perf_counter() - t
     audit.info.append(
         f"the days: {len(days)} of the data's naming and the years'"
@@ -1972,7 +2063,7 @@ def unlisted(audit: Audit, known: dict[str, dict[str, Any]]) -> list[Finding]:
 
 
 # The findings only a whole world makes: not asked of a run that makes none.
-DEAR_ONLY = ("w-block-unread", "r-vessel:", "v-nation-unknown:", "a-")
+DEAR_ONLY = ("w-block-unread", "a-")
 
 
 def no_longer(
@@ -2023,6 +2114,11 @@ def report(audit: Audit, known: dict[str, dict[str, Any]] | None = None) -> str:
         )
         years = by_year(audit, basis)
         lines.append("   by year: " + ", ".join(f"{y} {n}" for y, n in years.items()))
+    if audit.seen:
+        lines.append("== seen in the whole worlds (evidence, no part of the list)")
+        for key, shown in sorted(audit.seen.items()):
+            more = f" and {len(shown) - 3} more" if len(shown) > 3 else ""
+            lines.append(f"   {key}: {'; '.join(shown[:3])}{more}")
     lines.append("== what answers")
     lines += audit.info
     lines.append("== seconds: " + ", ".join(f"({k}) {v:.1f}" for k, v in audit.seconds.items()))
@@ -2056,6 +2152,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--full", action="store_true", help="every day the data names; more worlds")
     ap.add_argument("--check", default=LETTERS, help=f"the checks by letter ({LETTERS})")
     ap.add_argument("--no-worlds", action="store_true", help="the cheap road alone")
+    ap.add_argument("--seed", type=int, default=None, help="the whole worlds' seed (7)")
     ap.add_argument("--no-reference", action="store_true", help="the mechanical findings alone")
     ap.add_argument(
         "--known", action="store_true", help="mark the findings the known list lacks with !"
@@ -2068,7 +2165,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.classing:
         print(classing_table())
         return 0
-    audit = run(args.full, args.check, worlds=not args.no_worlds, reference=not args.no_reference)
+    audit = run(
+        args.full,
+        args.check,
+        worlds=not args.no_worlds,
+        reference=not args.no_reference,
+        seed=args.seed,
+    )
     if args.entries:
         sampled = run(False, args.check, worlds=not args.no_worlds) if args.full else None
         print(

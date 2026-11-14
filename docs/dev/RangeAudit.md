@@ -33,6 +33,26 @@ holder and the state of each of the 121 ports, the wars, the blockades drawn), s
 cheap road is proved against the dear one. They agreed on every day tried: no finding of
 check (a).
 
+**What can be drawn, not what was.** Which vessels the business draws in a world turns on
+the seed and on every port's track, road and anchorage. A finding that stood on a vessel
+drawn would move when an unrelated merge moved a draw, and nobody could tell a new fault
+from a shifted die. That happened: the first list held `r-vessel:etruria`, an Etrurian
+trader drawn off Leghorn in years before Etruria was; a merge that touched twenty-one
+ports' tracks and anchorages, and no holder, drew a Ligurian there instead, and the
+ratchet failed on a finding that was no news. So no finding stands on a vessel drawn.
+The vessels' checks ask what the tables admit: every description's fit, every name the
+business's tables are keyed by, every flag an occasion of a nation's colours names. A
+vessel under a nation the reference has not in being is said under that nation's own
+finding (`r-nation:`), which is its cause: the business draws under whatever nation holds
+a port in the world. What a world adds to the list is only what turns on no draw: that a
+scenario's block of wars is read by nothing, and a disagreement of the two roads, among
+them a vessel the tables do not admit (a nation none of them names, a fit that is not her
+description's, a flag no occasion names) and a squadron drawn that the rule does not
+admit. A squadron the rule admits and a world does not draw is the draw's (the business
+draws none where its plan would cross the land) and is said, not found. What the worlds
+happen to show of a finding already made is printed apart, as evidence. The list is the
+same at any seed (`--seed`; the slow tier tries three).
+
 **The days.** A day in every year of the range (1 July, JUDGEMENT) and the days either side of every date the data itself names: a port's dated rows, a war's beginning, the table's own day, a blockade's dates, a prize scheme's, and the first and last years of a flag, a fashion, a national day and a light. That is 202 days (168 of the data's naming, 34 of the years'). The findings that rest on the reference are looked for on those days and on the days either side of the reference's own dates as well, 323 in all; the mechanical findings never on the reference's days. `--full` adds every national day in every year of the range with the day after it (1146 days; 1256 with the reference's). Whole worlds: 4 in the sampled sweep (off Ushant on 1 July 1792, off Rochefort on 1 July 1802 and 1805, off Cadiz on 1 July 1814) and 138 in the full one (off Ushant, Rochefort and Cadiz on 1 July of every year; off Gibraltar, Toulon, Leghorn and Malta every fourth year). Deterministic: the same seed and tree give the same findings.
 
 **The reference.** The tree is silent on which wars and which nations are a day's own (its
@@ -64,7 +84,7 @@ whatever the year and their dates in a form no reader reads; the lights dated by
 ten elements no data dates (ships, books, private signals, regulations, names, the trade,
 letters of marque, the colours' words: each an unconditional count that no change of data
 could clear; and the nations, counted where the loaded table gives no `since` and no
-`until`); and all eight of the classing's. By the rule 28 findings are the data's and 38
+`until`); and all eight of the classing's. By the rule 29 findings are the data's and 38
 the engine's.
 
 **What a finding is.** A key (the check and what it is of, never a count or a day), what
@@ -195,14 +215,14 @@ side of 1 January 1808.
 
 ## 3. The findings
 
-The full sweep makes **105 findings: 66 mechanical and 39 that rest on the reference**. The sampled sweep (the fast tier's) makes all of them but one, which only the full sweep's worlds off Leghorn show (`r-vessel:etruria`).
+The full sweep makes **105 findings: 67 mechanical and 38 that rest on the reference**. The sampled sweep makes every one of them, and the list is the same whatever seed the whole worlds are begun at: no finding stands on which vessels a world happened to draw (section 1).
 
 | Owner | Mechanical | Reference |
 |---|---|---|
-| a data fault for milestone 7c | 28 | 0 |
+| a data fault for milestone 7c | 29 | 0 |
 | an engine fault | 38 | 0 |
-| a judgement to be read against a source | 0 | 39 |
-| all | 66 | 39 |
+| a judgement to be read against a source | 0 | 38 |
+| all | 67 | 38 |
 
 **By check** (the full sweep):
 
@@ -211,7 +231,7 @@ The full sweep makes **105 findings: 66 mechanical and 39 that rest on the refer
 | (p) the ports | 9 | seven keys no file dates, by key; Cadiz's own blockade, in words and before its year |
 | (w) the wars | 11 | three wars before their beginning, the same three before the court, no end to any, three wars that stand only in words, the scenario's block unread |
 | (b) the blockades | 1 | Brest's blockade undated |
-| (v) the vessels and their fits | 6 | six fits of a later year than the day |
+| (v) the vessels and their fits | 7 | six fits of a later year than the day; one table of the business keyed by names that are no nations |
 | (f) the flags | 7 | five nations' colours out of their dates, one form of dates unreadable, Britain's signal flags without a drawing |
 | (d) the national days | 2 | thirteen nations with no day, France's year with none |
 | (l) the lights | 1 | twelve lights dated by the year alone |
@@ -219,30 +239,30 @@ The full sweep makes **105 findings: 66 mechanical and 39 that rest on the refer
 | (e) years fixed in the code | 5 | five files |
 | (u) what no data dates | 10 | ten elements with no dates |
 | (c) the classing | 8 | five keys the clock would put back, three read by nothing |
-| (r) the reference | 39 | 4 `r-blockade`, 3 `r-holder`, 5 `r-nation`, 1 `r-port-blockade`, 1 `r-vessel`, 22 `r-war-absent`, 3 `r-war-at-peace` |
+| (r) the reference | 38 | 4 `r-blockade`, 3 `r-holder`, 5 `r-nation`, 1 `r-port-blockade`, 22 `r-war-absent`, 3 `r-war-at-peace` |
 | (a) the two roads agree | 0 | no disagreement on any of 138 whole worlds |
 
 **By year** (how many findings bite a day sampled in the year; the full sweep):
 
 | Year | Mechanical | Reference | | Year | Mechanical | Reference |
 |---|---|---|---|---|---|---|
-| 1792 | 63 | 20 | | 1809 | 45 | 21 |
-| 1793 | 63 | 22 | | 1810 | 45 | 21 |
-| 1794 | 61 | 20 | | 1811 | 46 | 21 |
-| 1795 | 58 | 20 | | 1812 | 47 | 23 |
-| 1796 | 55 | 18 | | 1813 | 46 | 22 |
-| 1797 | 55 | 13 | | 1814 | 45 | 24 |
-| 1798 | 55 | 17 | | 1815 | 44 | 20 |
-| 1799 | 55 | 15 | | 1816 | 44 | 19 |
-| 1800 | 54 | 16 | | 1817 | 45 | 13 |
-| 1801 | 53 | 14 | | 1818 | 46 | 13 |
-| 1802 | 53 | 13 | | 1819 | 46 | 13 |
-| 1803 | 53 | 12 | | 1820 | 46 | 14 |
-| 1804 | 48 | 8 | | 1821 | 46 | 13 |
-| 1805 | 46 | 7 | | 1822 | 47 | 13 |
-| 1806 | 44 | 10 | | 1823 | 47 | 14 |
-| 1807 | 45 | 15 | | 1824 | 46 | 15 |
-| 1808 | 45 | 21 | | 1825 | 47 | 13 |
+| 1792 | 64 | 19 | | 1809 | 46 | 21 |
+| 1793 | 64 | 22 | | 1810 | 46 | 21 |
+| 1794 | 62 | 20 | | 1811 | 47 | 21 |
+| 1795 | 59 | 20 | | 1812 | 48 | 22 |
+| 1796 | 56 | 17 | | 1813 | 47 | 22 |
+| 1797 | 56 | 13 | | 1814 | 46 | 24 |
+| 1798 | 56 | 17 | | 1815 | 45 | 20 |
+| 1799 | 56 | 15 | | 1816 | 45 | 18 |
+| 1800 | 55 | 15 | | 1817 | 46 | 13 |
+| 1801 | 54 | 14 | | 1818 | 47 | 13 |
+| 1802 | 54 | 13 | | 1819 | 47 | 13 |
+| 1803 | 54 | 12 | | 1820 | 47 | 13 |
+| 1804 | 49 | 8 | | 1821 | 47 | 13 |
+| 1805 | 47 | 7 | | 1822 | 48 | 13 |
+| 1806 | 45 | 10 | | 1823 | 48 | 14 |
+| 1807 | 46 | 15 | | 1824 | 47 | 14 |
+| 1808 | 46 | 20 | | 1825 | 48 | 13 |
 
 The mechanical count falls from 1792 to 1805 and is nearly level after it: the tree is a
 picture of June 1805, the early years lack what 1805 has (the wars' beginnings, the fits of
@@ -513,6 +533,14 @@ corrected:
   nothing.
 
 Found for others and not mended (each is in the known list or said here):
+
+- **The cruiser's prize doctrine is in the wrong table.** In `data/captains/cruiser.yaml`
+  package 74's thirteen prize keys (`mans_prizes`, `prize_crew_share`, `burns_when` and the
+  rest) stand under `stations:`, where every other doctrine has them under `thresholds:`.
+  The business reads each key of `stations:` as a nation with stations (none is at war,
+  so none is drawn), and the cruiser's own prize doctrine is read by its defaults. Found
+  when the vessels' check was made to stand on the tables; it is the list's
+  `v-nation-unknown:cruiser.stations`.
 
 - **The build's fingerprint and an audit's list.** `core.world.fingerprint_of` hashes
   every file under `data/` but the tiles. This audit's two files were first laid under

@@ -2,10 +2,11 @@
 # It lives beside the tool and not under data/: the build's fingerprint hashes every file
 # under data/, and an entry taken out of this list is no change of the game's rules.
 #
-# Every finding of the audit's first full sweep (the trunk at 504a250, 1792 to 1825), each by
+# Every finding of the audit's full sweep (the trunk at 504a250, 1792 to 1825), each by
 # its key with what it is, the years it bites (of the days the sweep samples), its basis,
 # whose it is, its reason in a line, and the full sweep's count as its ceiling (`most`).
-# `sweep: full` marks a finding only the full sweep makes (more whole worlds, more days).
+# No finding stands on which vessels a world's seed happened to draw: the list is the same
+# at any seed, and the sampled sweep makes every entry the full sweep makes.
 # `tests/test_range_audit.py` passes on these and fails on any finding not listed, on a
 # listed one the sweep no longer makes, on a count above its ceiling and, in the slow tier,
 # on years that are not the list's: a mend takes its entry out; new data comes in clean or
@@ -223,6 +224,13 @@ known:
   owner: a data fault for milestone 7c
   reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
+- key: v-nation-unknown:cruiser.stations
+  what: the table is keyed by names the nations' table has not, each of which the business reads as a nation
+  years: 1792-1825
+  basis: mechanical
+  owner: a data fault for milestone 7c
+  reason: 'data/captains/cruiser.yaml: package 74''s prize keys (`mans_prizes`, `prize_crew_share`, `burns_when` and ten more) stand under `stations:` where the other doctrines have them under `thresholds:`, so the business reads thirteen of them as nations with stations (none is at war, so none is drawn) and the cruiser''s own prize doctrine is read by its defaults. The keys moved under `thresholds:` clear it. Found when the vessels'' check was made to stand on the tables'
+  most: 13
 - key: f-colours:britain
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1800
@@ -550,35 +558,35 @@ known:
   years: 1792-1795, 1806-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
   most: 1
 - key: r-nation:etruria
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1792-1801, 1807-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
   most: 1
 - key: r-nation:liguria
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1792-1797, 1805-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
   most: 1
 - key: r-nation:order-of-st-john
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1798-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
   most: 1
 - key: r-nation:papal-state
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1798-1800, 1809-1814
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
   most: 1
 - key: r-port-blockade:cadiz
   what: blockaded by britain, whom the reference has at peace with spain
@@ -587,14 +595,6 @@ known:
   owner: a judgement to be read against a source
   reason: 'the port''s single `state: blockaded` holds in years the reference has blockader and holder at peace'
   most: 1
-- key: r-vessel:etruria
-  what: a vessel drawn under a nation the reference has not in being on the day
-  years: 1792, 1796, 1800, 1808, 1812, 1816, 1820, 1824
-  basis: reference
-  owner: a judgement to be read against a source
-  reason: the business draws a vessel of a nation the reference has not in being on the day
-  most: 1
-  sweep: full
 - key: r-war-absent:algiers+britain
   what: at peace in the table on days the reference has them at war
   years: 1816, 1824

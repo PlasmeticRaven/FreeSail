@@ -28714,7 +28714,7 @@ way, and the helpers' reports.
 **What was built.** `tools/audit_range.py` (the sweep), `tools/range/audit-known.yaml` (the
 105 findings of the first full sweep, each owned), `tools/range/reference.yaml` (the wars,
 the peaces and the nations' lifetimes of 1792 to 1825, FROM MEMORY, read by nothing in the
-game), `tests/test_range_audit.py` (40 fast tests and seven slow), truths 7-590 to 7-593, and
+game), `tests/test_range_audit.py` (43 fast tests and nine slow), truths 7-590 to 7-593, and
 the document. No file under `freesail/` changed and none under `data/`: the audit's two
 files lie beside the tool, under `tools/range/` (first laid under `data/range/` and moved
 on the lead's reading, below).
@@ -28790,11 +28790,12 @@ tier of the test file is about 1 s (4 s without libyaml) and truths 7-592 and 7-
 a second (2.3 s); the slow tier's fixture 19 s (41 s), truths 7-590 and 7-591 2.7 s and
 1.1 s (13 s and 7 s), the loaders' comparison 7.8 s.
 
-**The findings** (the full sweep): 105, of which 66 mechanical (28 data faults for
-milestone 7c, 38 engine faults, by the rule of the second reading below) and 39 that rest on the reference. By check: the ports 9,
-the wars 11, the blockades 1, the vessels 6, the flags 7, the days 2, the lights 1, the
-words 6, the code's years 5, what no data dates 10, the classing 8, the reference 39, the
-two roads' agreement none. The sampled sweep makes all but `r-vessel:etruria`.
+**The findings** (the full sweep): 105, of which 67 mechanical (29 data faults for
+milestone 7c, 38 engine faults, by the rule of the second reading below; 66 and 28 before
+cloud run 99, below) and 38 that rest on the reference (39 before run 99). By check: the ports 9,
+the wars 11, the blockades 1, the vessels 7, the flags 7, the days 2, the lights 1, the
+words 6, the code's years 5, what no data dates 10, the classing 8, the reference 38, the
+two roads' agreement none. The sampled sweep makes every one, at any seed.
 
 **Corrections to the ground report.** It said some 150 lights' words ("not yet built in
 1805") are served on any day: they are not (a feature's `says` is served only for the shore
@@ -28927,6 +28928,76 @@ broken in a scratch copy and each caught) and the lead sent four more, none larg
    over their ceilings at the merge. `python tools/audit_range.py --known --no-worlds`
    (a few seconds) now names a listed finding no longer made and each count over its
    ceiling, and a run with no worlds is not asked for what only a world makes.
+
+### After cloud run 99 (2026-11-14): no finding on a vessel drawn
+
+The lead's trial merge of ce667fd on the trunk failed on this package's own ratchet: the
+full sweep made `r-vessel:liguria` (a vessel drawn off Leghorn in 1792 and 1796 under a
+nation the reference has not yet), which the list lacked. *Reproduced* on a checkout of the
+trial tree (ffb27b5b): off Leghorn at seed 7 the business there draws a Ligurian merchant
+brig where the base draws an Etrurian one, so `r-vessel:liguria` appears and
+`r-vessel:etruria` goes. The merge had touched twenty-one port files (tracks, roads,
+anchorages) and no holder.
+
+*The cause:* a finding that stood on which vessels one seed drew. The ratchet then moves
+with any merge that moves a draw.
+
+*Every finding that turned on a draw,* by reading `check_world` and proved by the tests
+below:
+
+- `r-vessel:<nation>` (a vessel drawn under a nation not in being): its presence, its
+  nation and its years were the draw's. **Folded into its cause.** The business draws
+  under whatever nation holds a port in the world (`_flag_for`, a fisherman's home port),
+  so the cause is the holder and the nation, already `r-holder:<port>` and
+  `r-nation:<nation>`; the engine offers no way to ask what can be drawn in a region short
+  of drawing it. No key of its own; a vessel so drawn is evidence under `r-nation:`.
+- `v-nation-unknown:<nation>` (a vessel of no nation of the table): made by a draw only.
+  **Made to stand on the tables:** the names the business's tables of kinds and of names
+  are keyed by, its neutrals, and the keys of the cruisers' stations, each against the
+  nations' table, one finding to a table. This found something real (below).
+- `v-fit-ahead:` and `f-colours:` from a world: their keys were already the cheap road's
+  (every description's fit; every flag an occasion names), their years and counts
+  unmoved by a world, which added only the places seen. **Left on the tables,** the
+  world's part made evidence.
+- `x-as-of` from a world: the served line turns on no draw; the world's part made
+  evidence, and a line that differs from the readers' road's a disagreement (`a-words`).
+- `a-blockade:` (the two roads on a blockade): it fired both ways, and a squadron the rule
+  admits is not drawn where the business's plan would cross the land (`business._put`),
+  which a chart merge or a seed can bring about. **One way now:** a squadron drawn that
+  the rule does not admit is a disagreement; one admitted and not drawn is said as
+  evidence. JUDGEMENT, for the lead to rule: this gives up catching a blockade that is
+  never drawn at all.
+- `a-holder:`, `a-state:`, `a-wars` and `w-block-unread` turn on no draw (the ports and
+  the table are loaded, not drawn) and stand.
+
+What a world can add to the list now: `w-block-unread`, and a disagreement of the roads,
+among them three new ones for a vessel the tables do not admit (`a-vessel-nation:`,
+`a-vessel-fit:`, `a-colours:`). `Audit.seen` holds what the worlds happened to show and is
+printed apart.
+
+*Found by the mend:* `data/captains/cruiser.yaml` has package 74's thirteen prize keys
+under `stations:` and not under `thresholds:`; the business reads each as a nation with
+stations, and the cruiser's prize doctrine is read by its defaults. It is the list's new
+`v-nation-unknown:cruiser.stations`, the data's (the keys moved clear it; planted so).
+Not mended.
+
+*What moved, old beside new.* The findings 105 and 105: `r-vessel:etruria` out,
+`v-nation-unknown:cruiser.stations` in. Mechanical 66 and 67; resting on the reference 39
+and 38; the data's 28 and 29; the engine's 38 and 38. No finding is the full sweep's alone
+any more (one before). The vessels' check 6 and 7; the reference's check 39 and 38. By
+year, the mechanical count is one more in every year, and the reference's one fewer in
+1792, 1796, 1800, 1808, 1812, 1816, 1820 and 1824. Truth 7-590's mechanical count by the
+readers' road 60 and 61; its reference count 38 and 38.
+
+*The proof.* (1) The failure reproduced on the trial tree and gone: there the new full
+sweep is the new known list exactly (below, with the measurements). (2) A change that
+moves the draws and no fact: the sampled sweep at seeds 11 and 1805 makes the list of seed
+7, key for key with its years and counts; off Leghorn in 1792 and 1796 three seeds draw
+different vessels and find the same. (3) A planted fact still raises its finding: Plymouth
+given to Liguria is `r-holder:plymouth` in the years Liguria was not. (4) A vessel planted
+in a made world under a nation not in being, with a fit of a later year and under the
+ensign of 1801 makes no finding and the same world without her makes the same; a vessel
+the tables do not admit makes a disagreement.
 
 ### The helpers' reports, kept (package 103a)
 
