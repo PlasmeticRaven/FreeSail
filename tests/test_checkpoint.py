@@ -501,3 +501,50 @@ def test_the_owners_tender_save_loads_and_replays_its_first_minutes_when_asked()
     assert [e.text for e in w.log if e.kind == "order.accepted"][:1] == [
         "Order: hoist the signal no. 82."
     ]
+
+
+# ---------------------------------------------------------------------------
+# The chart a loaded game has (the chart session's mend of 2026-11-13, by the lead's
+# ruling): a scenario that names a region (`region: channel-west`) is played on the chart
+# that holds it (package 45's `chart_holding`), and a game loaded from its checkpoint has
+# that same chart; before the mend `_rebind` loaded the region alone, and a game saved and
+# loaded lost the water it began with (47 N 4 W, in Biscay, answering nothing).
+# ---------------------------------------------------------------------------
+
+BISCAY = (47.0, -4.0)  # outside channel-west's bounds, inside biscay-north's
+
+
+def test_a_region_game_loaded_from_its_checkpoint_has_the_chart_it_began_with(tmp_path):
+    from freesail.world.geo import Position
+
+    sf = load_scenario("data/scenarios/blockade.yaml")
+    assert sf.scenario.region == "channel-west" and not sf.scenario.chart
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    world.run(600)
+    begun_depth = world.chart.depth_at(Position(*BISCAY))
+    assert begun_depth is not None and begun_depth > 0
+    path = replay_mod.save_to_file(world, tmp_path / "blockade.json")
+    loaded, report = replay_mod.load_report(path, ship_factory)
+    assert report.how == "checkpoint"
+    assert loaded.chart.depth_at(Position(*BISCAY)) == begun_depth
+    assert loaded.chart.bounds == world.chart.bounds
+    assert list(loaded.chart.regions) == list(world.chart.regions)
+    assert loaded.lookout.chart is loaded.chart
+
+
+def test_a_save_made_before_the_mend_loads_on_the_chart_that_holds_its_region():
+    """The m5c-b playtest save (`region: channel-west`, written long before the mend) loads
+    from its checkpoint without error and with the holding chart: its run-on's water at
+    47.70 N 6 W, south of channel-west's bounds, answers from the corridor, where on the
+    bare region it answered nothing."""
+    from freesail.world.chart import chart_holding, load_chart
+    from freesail.world.geo import Position
+
+    save = _playtest_save("m5c-b-harpy-tick602100")
+    world, report = replay_mod.load_report(save, ship_factory)
+    assert report.how == "checkpoint" and world.scenario.region == "channel-west"
+    holding = load_chart(chart_holding("channel-west"))
+    assert world.chart.bounds == holding.bounds and len(world.chart.regions) > 1
+    assert world.chart.depth_at(Position(47.70, -6.0)) is not None
+    assert load_chart("channel-west").depth_at(Position(47.70, -6.0)) is None
