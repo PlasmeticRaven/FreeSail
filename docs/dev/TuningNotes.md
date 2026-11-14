@@ -21485,6 +21485,267 @@ her colours down without striking is still fought. (7) Found on the way and mend
 captain's `captain.signal` line being served, and the reason of an order given by signal); they say
 her name now ("By the Amethyst's signal: ..."), the player's ship "the ship" as before.
 
+### The lead's last list, the far fight (2026-11-14)
+
+The lead's note of 2026-11-14 at 14:05 UTC (nudge number 12: "package 75 at 20a8e2e3 read twice
+independently and tried on the trunk: NOT merged yet; one list, ruled"), its items 1 to 7 (the far
+fight and the relations), each mended at its cause by the owner's rule: the general cause named,
+mended where it lives so that every reader of the same thing is served, where else the same cause
+was looked for and what was found, and a test at that level shown to fail on 20a8e2e3. Built in a
+local commit on the builder's branch `l-far` from 20a8e2e3, beside the crew's builder (items 8 and
+9). Measured on the owner's machine at seed 7 by the scripts in the session's scratch
+(`ll/lf/`, outside the repository: `measure.py`, `whole_logs.py`, `probe196.py`, `mutate.py`), each
+run on this tree and on 20a8e2e3's (an export of it, `ll/lf/old/`, nothing else differing). The new
+tests are in `tests/test_far_last_list.py`; items 6 and 7 move tests of `tests/test_far_action.py`,
+and item 6 truth 7-196's clause in `tests/test_known_truths.py`.
+
+**1. An order with no mark fell back to "any sail".** The order's "her" (`orders.gunnery._mark`, the
+player's `engage her to starboard` and the rules captain's, given when his judgement has an enemy in
+range) was the nearest sail at war by her colours or that had fired on him, filtered since gundeck-2
+by the one answer; with none left, `pick = items[0]`, the first sail in sight, whoever she was. *The
+cause:* a choice whose rule finds nobody falling back to a sail the rule would not choose. *Mended
+where "her" is read* (`_enemy_to_engage`): the nearest sail in sight her captain holds an enemy
+(`Captain._is_enemy`: her colours at war with his nation, her shot at him, the private signal or the
+hail; the judgement his stimuli read) and may fight (`relations.MARK`); with none, the order is
+refused in words and no mark is laid: "There is no enemy in sight to engage: name the sail to engage
+her ('engage the brig to starboard'); in sight: ...". A sail named is engaged as named, as before
+(the player's own choice of mark, rule 3's road: a sail not made out as an enemy is fired on told,
+not refused). The candidates are taken nearest first in one pass, where a ship that had fired on him
+was put after those at war by colours whatever her distance. *Old beside new* (the lead's case: the
+player's frigate, a British brig-sloop 0.3 miles east, a British merchant brig taken by the French
+0.6 miles south, the hands at quarters): at 20a8e2e3 "Engage a brig-sloop of war to starboard: the
+mark a brig-sloop of war, the starboard battery, the guns to fire as they bear.", the British
+brig-sloop the mark, and the captain's own "engage her" the same ("She is engaging a brig-sloop of
+war to starboard already."); now both refused, no mark; a French frigate put 0.8 miles west is "her"
+two minutes later, past the friend and the prize. *Where else the same cause was looked for:* the
+rules captain's `_mark` and the far brain's `_engaging_mark` (the mark in hand while she may be
+fought, else the nearest enemy within the breaking-off distance who may, else none: no fallback);
+the far body's `give chase` and `haul off` (`crews.far_order`: the nearest stranger, refused with
+none: no fallback; their words, item 6's); the private signal's "to"
+(`orders.signals._nearest_stranger_id`: the nearest sail is the rule itself, a challenge being made
+to whoever is nearest and a sail under the ship's own colours being whom it tests: no fallback);
+`hoist false colours` with no nation (the first enemy nation: a nation, not a sail). Found, older
+than this change, and left for the one list (items 45 and 46): the player's `give chase` with no
+words falls back to "the nearest sail" with no stranger in sight (`orders.navigation`, package 45c's
+`pool = strangers or sails`), and the least captain of a ship under orders with no brain takes the
+first sail in sight for a chase, her own commander among them
+(`signalling._Reader._nearest_stranger`). *Test*
+(`test_her_is_the_nearest_enemy_her_captain_may_fight_and_with_none_the_order_is_refused`): fails on
+20a8e2e3 at the player's order ("Engage a brig-sloop of war to starboard"). *Moved:* truth 7-141
+("firing on a sail not made out as an enemy is told, not refused") fired on its American cutter by
+"engage her to starboard", the fallback's road; it names her now ("engage the cutter to starboard"),
+its claim and every figure as they were. The primer's row of the order
+(`docs/primer/22-an-action.md`: "'her' is the nearest enemy, else the nearest sail") and the gun
+deck's module head said the fallback; they say the rule now.
+
+**2. Who had fired on whom was three records.** Each body's judge kept a set of her own
+(`fired_on`: the far brain's, her hull's captain's), written by the near battery alone
+(`combat.action._fired_on`) and never carried to the other at the promotion or the demotion
+(`brains.FarCaptain.hand_over` and `fold_back` carried `spoken_ids`, `recognised`, `pirates` and
+`given_up`, not it); and the far rounds kept a book of each pair by the ships' names
+(`root._far_rounds[...]["fired_on"]`), which no judge read. So package 70's rule ("she fired on me:
+an enemy whatever her colours") was never true far off, and two ships of one name in a pair were one
+entry. *The cause:* one fact kept in several places, each written by one road and read by another.
+*Mended as one record* (`relations.fired`, `fired_on`, `has_fired`), kept on the sea's World by the
+ids of the sea: written by every road a ship fires on another (the near battery; the far rounds, for
+each side that fires in a round; the far reply by the tables, which wrote nothing before), read by
+every judge of the ship fired on (`Judgement.fired_on` is her row of it, a property: her far brain
+and her hull's captain read one row; `_known_enemy` reads it without making the row) and by `MARK`
+with no judge to ask. The far rounds' book keeps only their rhythm (`last`, `since`); its strike
+"once fired on" reads the record by the ids (`far.round_once` keys its `fired_on` by a side's `id`,
+new on `FarShip`, or by her place in the round, "a" or "b", where she has none, as the measure's
+sides have not: never by name). A checkpoint's judge's own set is folded into the record at its
+first reading, and a checkpoint's book by name into it at the pair's next round; a change of hands
+forgets her row and her shots (item 3). `relations._root` now gives the sea's World for a crewed
+ship's hull (whose `parent` is the player's hull): the record is kept in one place. *Old beside new*
+(truth 7-231's pair, the Foudroyant hoisting British colours at 600 mid-engagement): at 20a8e2e3
+the Hero `on passage` at 1260, a private signal made at 1260 and answered wrong at 1380, a round,
+and struck at 1380 "on passage", fought still, the Foudroyant `taking possession` at 1440 and on
+passage at 1500; now the Hero engages her to the end and strikes at 1200, `taking possession` at
+1260 and on passage at 1320, the minutes of truth 7-231's own pair under their own colours. *Where
+else looked:* the near battery's warning shot (across her bows, a blank: no shot fired on her, as
+before); the musketry (`combat.small_arms`) and the boarding write no record (left for the one list,
+item 47); the morale's `struck_by` and the "opens fire on us" line's `opened_by` on the mark's
+damage keeper are the hull's own minute and words, keyed by id, read by no judge (kept);
+`gunnery._fired_on`, a copy of the player's captain's set, is gone into the record. *Tests:*
+`test_who_fired_on_whom_is_one_record_by_id_written_by_the_rounds_and_read_by_both_bodies` (on
+20a8e2e3 neither brain knew the other had fired after the round),
+`test_the_rounds_key_who_was_fired_on_by_the_side_never_by_a_shared_name` (two frigates of one
+file, one with no guns, each under her line: on 20a8e2e3 the one never fired on struck at 180
+seconds) and, slow,
+`test_an_enemy_under_false_colours_in_a_far_fight_is_still_fought_by_the_ship_she_fires_into`.
+
+**3. `changed_hands` forgot too little.** Since gundeck-1 a change of hands made every judge forget
+what he knew of her by her shot, a pirate's act, the signal and the hail; the rest of what was held
+on her held. *The cause, as the package named it:* a relation held after what it stood on is gone.
+*Mended at the one road of every change of hands* (`relations.changed_hands`, from
+`prizes._nation_words`): every judge forgets that he spoke her or gave her chase up (`spoken_ids`,
+`given_up`, read raw by `Judgement._spoken`), her own judges every ship they spoke or gave up; the
+player's lookout forgets that his ship spoke her (`Vessel.spoken`); her row and her shots in the one
+record go; her orders (`under_orders_of`, hers and her hull's) end, and the orders of every ship
+under hers (the player's ship among them); the far rounds' book of each pair she is in goes; every
+World whose battery is laid on her is told (item 5). The least captain of a ship under orders with
+no brain (`_signal_reader`) is a judge with the others. *Old beside new* (the Amethyst cruising 0.6
+miles north of a British merchant brig she has spoken, or whose chase she has given up, the brig
+then taken by a French frigate that leaves the sea): at 20a8e2e3 never retaken in half an hour,
+either way; now retaken at 180, as by a cruiser who knew nothing of her. A ship taken takes her
+captor's company's orders by the taking (`Squadron.join`'s rewrite), so her own orders were already
+her captor's in a company; outside one, or for a ship under hers, they held. *Where else looked:* a
+judge's stranger in hand (`_stranger`) is asked of the one answer each minute where it is a mark or
+a struck ship, and a stranger chased is a stranger still (kept); her set's membership ends by
+`Squadron.leave` at the taking and the retake (kept); found, older, for the one list (items 48 and
+49): a struck mark is said once to each deck for good (`ship.extra["struck_seen"]`), so a ship
+retaken and struck again is not said; a private signal made to her before she changed hands is
+judged on her new people's answer (`locker.challenges`). JUDGEMENT, as gundeck-1's: her own judges
+forget the ships they spoke and gave up with the rest, the player's captain among them when his ship
+is taken (the lead's listed "the player's own captain forgets every ship when his ship is taken",
+older, item 53). *Tests:* `test_a_change_of_hands_ends_every_relation_held_on_her` (on 20a8e2e3
+every one held), `test_a_cruiser_who_spoke_a_ship_or_gave_her_up_retakes_her_from_the_enemy` (two
+cases; on 20a8e2e3 never retaken).
+
+**4. `still` and the supporter's side, the holder's being.** `SUPPORT` never asked whose side the
+supporter was on (`still(frigate, French 74, SUPPORT)` true a mile off, and `_alone` believed it
+under the 74's orders), and `still` asked nothing of the holder (no holder, an id the sea has not, a
+holder done or struck: yes to `MARK`, `STRUCK` and `SUPPORT`). *The cause:* the one answer asked of
+the other ship and left the rest to each caller, who asked it or did not (`_captor_near` and
+`_covered` asked "of her nation", `_alone` nothing, `_pairs` "not struck"). *Mended in `still`:* a
+supporter is of her side, her own nation or an ally of it by the nations both truly are (the sea's
+truth, as the callers' own rules read it; a Spanish frigate supports the French 74); a holder not on
+the sea holds nobody; a holder struck fights, takes and is supported by nobody, and keeps her prizes
+(JUDGEMENT: her prize crews hold them until they are retaken). `_pairs`' own "not struck" is gone
+into it; `_captor_near`'s and `_covered`'s "of her nation" stay, their own narrower rules. *Old
+beside new:* `still(frigate, French 74, SUPPORT)` true, now false; the frigate under the 74's orders
+not alone, now alone; `still("", 74, MARK)` true, now false; a holder done or struck, `MARK` and
+`SUPPORT` true, now false. *Test:*
+`test_support_is_of_her_side_and_a_holder_off_the_sea_or_struck_holds_nobody` (fails on 20a8e2e3 at
+the 74's support).
+
+**5. The near battery's mark, run as asked.** The player's frigate at quarters, a British merchant
+brig taken by the French lying to a quarter of a mile on her starboard beam engaged by name, the
+guns firing as they bear five minutes (63 shot), and the brig retaken by the Amethyst coming up, or
+restored by a court: at 20a8e2e3 the guns fired as they bore into her for the five minutes after, 45
+shot (two striking after the first minute), her own people aboard and her own colours up (her
+colours shifted at 900), the battery still `as they bear`. *The cause, item 3's:* the battery's mark
+is a relation laid on her people, and only a strike held the fire (`action._watch_struck`). *Mended
+where the change of hands ends every relation* (`changed_hands` tells each World whose battery is
+laid on her, `ship.extra["mark_changed_hands"]`) *and in the battery's tick*
+(`action._watch_changed_hands`, before the guns are served): the one answer (`MARK`, her captain's
+judgement) is asked of her as she now is, the change complete; no mark, the fire laid on her is held
+(the guns, and the marines and the small arms, who fire at the battery's mark) and the deck told
+why, once: "A merchant brig is retaken: the guns hold their fire." (or "is restored"; "has changed
+hands" for a taking; "the small arms" named where they were firing). Still a mark to her by the one
+answer, the fire goes on; the mark is kept, and the player may fire on her again by order, as after
+a strike. Now no shot after the change, the line at the next tick (881). *Where else looked:* the
+far rounds ask `MARK` of every pair every minute (`_pairs`); the rules captain's `_mark` asks it at
+each judgement; the musketry fires only at the battery's mark (held with it now); found, older, for
+the one list (item 47): neither a strike nor anything else holds the musketry's own mode at a struck
+mark. *Test:* `test_a_mark_that_changes_hands_under_fire_is_judged_anew_and_the_fire_held` (two
+cases; on 20a8e2e3, 108 shot at the end for 63).
+
+**6. Words that were not true.** (a) "no sail in sight" was said by `signalling._obey` whenever the
+captain's nearest stranger was none, with sails in sight and all spoken, and its test
+(`test_a_signal_to_engage_or_chase_with_nobody_for_it_leaves_her_as_she_was_said[general chase]`)
+pinned it in such a world. *The cause:* a line written for one case (none in sight) said for
+another (none to chase); the words now say what she found: "no sail in sight" with none in sight,
+"no stranger in sight" where every sail in sight is spoken or given up; and to engage, "no enemy
+within reach to engage" (an enemy within reach who is no mark, struck or a prize, is within reach
+still), where "no enemy within reach" was said. The test now proves its words: the commander and
+the player's ship in sight of her and both spoken, "no stranger in sight" said and "no sail in
+sight" not (on 20a8e2e3 it fails at the line). Found, older, the same cause, for the one list (item
+50): the far body's `give chase` and `haul off` refuse "No sail in sight to chase." and "... to haul
+off from." with sails in sight and all spoken (`crews.far_order`). (b) Truth 7-196's sentence said
+the three crewed 74s do not challenge "one another into an action", and its clause read the
+player's log alone, where a 74 firing on a 74 is said in theirs: the clause now reads every 74's
+own log too (no line of an action in any). Not timed here (a pace truth): its world run untimed on
+this tree (`probe196.py`, 4,900 ticks as the truth's), the three 74s in company at every end, no
+line of an action in the player's log or in any 74's, no private signal made by any of them.
+
+**7. Two tests that could not fail for their own reason.**
+`test_the_rounds_choose_no_prize_no_struck_ship_and_none_of_her_own_side` and
+`test_no_round_at_a_prize_and_the_captor_and_her_prize_keep_company` passed with `MARK`'s prize
+check taken out (shown on 20a8e2e3 by `mutate.py`: `relations.still`'s `if _struck(o) or
+_a_prize(o)` made `_a_prize(o) and what != MARK`; both passed, `test_relations`' enemy's prize alone
+failing). *The cause:* each tried a captor's own prize, which is kept from her rounds twice, by
+"nobody's prize" and by her knowledge (`Judgement._prize_of_ours`: his own prize is no enemy), so
+the check under test was never the one that decided. Each now tries a prize where it alone decides,
+an enemy's prize to the ship engaging her: the first, a British merchant brig under a French prize
+crew and French colours engaged by the British frigate (no pair) before its own prize; the second,
+at the cut-out minute, a French frigate put 0.6 miles off the cut-out brig (within her reach)
+`engaging` her, the brig her own nation's ship under British colours (no pair, the frigate leaving
+the sea before the minute runs, the keeping of company as before). With the mutation both fail
+there, on this tree and on 20a8e2e3; without it both pass on both.
+
+**What moved.** Pins: truth 7-141's order words (item 1);
+`test_a_signal_to_engage_or_chase_with_nobody_for_it_leaves_her_as_she_was_said`'s two words ("no
+sail in sight" to "no stranger in sight", "no enemy within reach" to "no enemy within reach to
+engage"); the two tests of item 7 and truth 7-196's clause made stronger. No digest moved: the four
+whole logs (the first action 497 lines, ce44219434e1e42c; the encounter 229, 732a6020db4d4755; the
+station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722, bf16fbf514055f29) are line
+for line as at 20a8e2e3 and the base, the crewed hulls' logs and every far ship's story with them.
+**Lines any ship may print that change:** a far ship's story, or a crewed captain's `captain.signal`
+line, "By X's signal: general chase; no stranger in sight, she holds on as she was." where sails are
+in sight (was "no sail in sight") and "...; no enemy within reach to engage, she holds on as she
+was." (was "no enemy within reach"); the order's refusal "There is no enemy in sight to engage: name
+the sail to engage her ('engage the brig to starboard'); in sight: ..." where `engage her` took a
+sail, the player's and the rules captain's ("Captain's rule ...: order not carried out ('engage her
+to starboard'): ..."); the new `action.mark_changed_hands` line, "<her> is retaken: the guns hold
+their fire." (is restored; has changed hands; the small arms); and wherever the record now decides:
+a far ship fired on under false colours fighting on (truth 7-231's pair above), a hull's captain
+knowing at his promotion who fired on her far body, a cruiser who spoke a ship taking her back from
+the enemy.
+
+**The suites, as run** (from the worktree's root with `py`, the tree asserted first; each pytest
+with `-n 2 -p no:cacheprovider -o addopts="--dist loadgroup"`, no whole tier and no pace test;
+against the bases at 20a8e2e3, not run again: `p5/final-fast.xml`, `p5/final-slow.xml`,
+`p5/final/trials.xml`, `p5/final/digests.json`):
+- **The files touched and those that exercise the items**, with the slow (`--slow -m "not pace"`;
+  `ll/lf/run1.xml`, 16 minutes): `test_far_last_list`, `test_far_action`, `test_relations`,
+  `test_mends_75`, `test_captive`, `test_prizes`, `test_prize_court`, `test_court`, `test_signals`,
+  `test_brains`, `test_practice`, `test_practice_orders`, `test_fight`, `test_squadrons`,
+  `test_crews`, `test_director`, `test_knowledge`, `test_stand_by_words_and_action_flow`,
+  `test_viewer_action`, `test_harness_instruments`, `test_orders`: **1,157 passed**; and the 53
+  known truths whose bodies name the action, the far fight, the prizes, the signals and the sets
+  (`ll/lf/run2.xml`, 11 minutes): 52 passed and truth 7-141 failed on its `engage her` (item 1),
+  then named and passed. Against both bases no other outcome changed: one passes here that failed
+  in the base's slow tier,
+  `test_the_second_of_two_ships_on_one_mark_gives_it_up_and_takes_her_passage_again[struck-to-the-other]`
+  (its `KeyError: 'struck_to'`), and passed in the base's re-run (`p5/final/a-rerun.xml`); only
+  here, the ten new.
+- **After the last changes** (the musketry held with the guns, `_pairs`' own "not struck" gone into
+  `still`, truth 7-141 named; `ll/lf/run3.xml`): the far fight's, the relations', the mends', the
+  fight's, the captive's, the practice's, the prizes' and the signals' files with the slow, and
+  truths 7-133, 7-134, 7-141, 7-181, 7-231, 7-350, 7-358 and 7-369: **208 passed**.
+- **On 20a8e2e3** (its export, the new and moved tests copied in): the ten new and both cases of
+  the signal test fail; the two tests of item 7 pass, and fail with `MARK`'s prize check taken
+  out, as here.
+- **The captain's trials** (`--slow`; `ll/lf/trials.xml`): 5 passed, 3 failed, as at the base
+  outcome for outcome and digest for digest (the station's gale bf16fbf514055f29, the trade's
+  stranger 13432e4b2659bcaf, the trade's thick weather de00808076d8cccf).
+- **The four whole logs** (`whole_logs.py`: the player's log, every crewed hull's and every far
+  ship's story, on the final tree; `ll/lf/new-logs2.json` beside `ll/lf/old-logs.json`): line for
+  line as at 20a8e2e3, the digests the base's.
+- **The cost** (a scratch timing, not a pace test: `timing.py`, the best of three 1,800-tick runs,
+  twice on each tree, the crew's builder running beside): `data/scenarios/convoy-six.yaml` 421 and
+  414 ticks a second on 20a8e2e3, 422 and 421 here; truth 7-231's pair in action 958 and 944 there,
+  966 and 964 here: nothing to measure.
+- **The generator** into scratch: eighteen of eighteen files byte for byte;
+  `tools/check_viewer_guns.py` clean. `tests/test_primer.py` but its order blocks and forms tables
+  (chapter 22 has neither): 8 passed.
+- **ruff** `check` and `format --check` over the files touched: clean; every changed file LF with a
+  final newline.
+
+**For the lead:** (1) JUDGEMENT, `SUPPORT`'s side by the nations both truly are (the sea's truth,
+as the callers' own "of her nation" reads it), allies counted. (2) JUDGEMENT, a struck holder keeps
+her prizes in `PRIZE`. (3) JUDGEMENT, a change of hands clears her own judges' spoken and given up
+with what they knew (gundeck-1's). (4) Found, older, and on the one list (items 45 to 50): the
+player's `give chase` falling back to the nearest sail; the least captain's chase of the first
+sail; the musketry and the boarding never written as fire, and the musketry never held at a struck
+mark; a strike said once to a deck for good; a private signal judged on a new people's answer;
+the far body's chase and haul-off refusals' words. (5) Not built, the rules captain's `engage her`
+when she bears on the other side (`Captain._engaging`) is the order's "her", the nearest enemy who
+may be fought, which may be another than the battery's mark he keeps (`Captain._mark`): older, the
+order's rule, item 51.
+
 ## The lead's ruling 10, one road (package 75) (2026-11-13)
 
 The lead's note of 2026-11-13 at 04:11 UTC (`docs/dev/M7-WorkPackages.md`, at its end), ruling
@@ -23262,6 +23523,38 @@ review's mends", below, with its figures):
     rig's word are read again from the files (engine-3, engine-4); an evolution's steps, timing and
     crew line are kept as the work was begun (by design: a checkpoint holds the work as it stands),
     and a vessel's `what` as saved (a cartel's is changed in play).
+
+**The lead's last list of 2026-11-14 (nudge 12), the far fight and the relations: listed and not
+built, as the readers found them, with what the far fight's builder found on the same causes, all
+older than the package's change ("The lead's notes of 2026-11-12 and 13, built", its last
+subsection, "The lead's last list, the far fight"):**
+45. The player's `give chase` with no words and no stranger in sight chases the nearest sail
+    (`orders.navigation`, package 45c's `pool = strangers or sails`): a choice falling back to "any
+    sail" (the last list's item 1, its cause).
+46. The least captain of a ship under orders with no brain takes the first sail in sight for a chase
+    or a look, spoken or not, her own commander among them (`signalling._Reader._nearest_stranger`,
+    package 72's): the same.
+47. The musketry and the boarding are written in no record of who has fired on whom (only the great
+    guns and the far rounds are), and a strike holds the battery and not the musketry's own mode,
+    which fires on at a struck mark within musket shot (`combat.small_arms`, package 73); a change
+    of hands holds both now.
+48. A struck mark is said to each deck once for good (`ship.extra["struck_seen"]`): a ship struck,
+    taken or retaken and struck again is not said (package 70).
+49. A private signal made to a ship before she changed hands is judged on her new people's answer
+    (`locker.challenges`, package 71).
+50. The far body's `give chase` and `haul off` refuse "No sail in sight to chase." and "No sail in
+    sight to haul off from." with sails in sight and all spoken (`crews.far_order`, package 43): the
+    last list's item 6, its cause.
+51. The rules captain's `engage her` when she bears on the other side (`Captain._engaging`) is the
+    order's "her", the nearest enemy he may fight, who may be another than the battery's mark he
+    keeps (`Captain._mark`).
+52. The retake's line in the player's log at any distance and by names he may not know (the
+    reader's).
+53. The player's own captain forgets every ship when his ship is taken (the reader's;
+    `relations.changed_hands`, her own judges, gundeck-1's JUDGEMENT; since the last list, the sails
+    spoken and the chases given up with the rest).
+54. A peace made mid-fight leaves the mark (the reader's).
+55. "close the commodore" lays its chase raw (the reader's).
 
 ### Phase 5's integration: the truths moved, and these records
 

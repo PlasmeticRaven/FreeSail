@@ -33,11 +33,32 @@ The relations (`what`):
 - `PRIZE`: her own prize: on the sea, a prize neither retaken nor restored, her record's captor
   hers (`prizes.prizes_of`'s rule).
 - `SUPPORT`: one who could support her: her commander, a consort of her set, a man of war covering
-  her, her captor's people near: on the sea, not struck, nobody's prize, and within the miles given,
-  by default the distance at which her set still holds a member of it (`in_company_nm`: the set's
-  book's `lost_nm`, beyond which "she is lost to the set and sails for the destination alone"; for
-  a ship under orders in no set, the squadron book's, eight miles, "beyond a frigate's flags with
-  the glass").
+  her, her captor's people near: on the sea, not struck, nobody's prize, of her side (her own
+  nation or an ally of it, by the nations both truly are: the sea's truth, as her callers' own
+  rules of "a ship of her nation" read it; the lead's last list of 2026-11-14, item 4: a French 74
+  a mile from a British frigate supported her), and within the miles given, by default the
+  distance at which her set still holds a member of it (`in_company_nm`: the set's book's
+  `lost_nm`, beyond which "she is lost to the set and sails for the destination alone"; for a ship
+  under orders in no set, the squadron book's, eight miles, "beyond a frigate's flags with the
+  glass").
+
+The holder is asked about as the other is (the lead's last list, item 4): a holder who is not on the
+sea (no id, an id the sea has not, a ship `done`) holds nobody in any relation; a holder struck
+fights nobody (`MARK`), takes nobody (`STRUCK`) and is supported by nobody (`SUPPORT`: her strike
+is past their help), and keeps her prizes (`PRIZE`: her prize crews hold them until they are
+retaken; JUDGEMENT), so that no caller asks it again.
+
+**Who has fired on whom** (the lead's last list, item 2) is one record, kept on the sea's World
+(`fired`, `fired_on`, `has_fired`): by the ids of the sea (a vessel's, the player's ship's
+`PLAYER_ID`), never by a name two ships may share; written by every road a ship fires on another
+(the near battery, `combat.action._fired_on`; the far rounds and the far reply,
+`combat.far_action`), read by every judge of the ship fired on (`Judgement.fired_on` is her row of
+it, her far brain's and her hull's captain's alike) and so by `MARK`, far as near: package 70's rule
+"she fired on me: an enemy whatever her colours". Before it the far rounds kept a book of their own
+by the ships' names (`root._far_rounds`) and never wrote the judges' sets, so that an enemy who
+hoisted false colours in a far fight ended the action of the ship she was firing into; and the far
+brain's set and her hull's captain's were two, neither carried to the other at the promotion or the
+demotion.
 
 What a captain knows of a ship (`Judgement._known_enemy`: her shot at him, `fired_on`; a pirate's
 act seen, `pirates`; the private signal or the hail, `recognised`) is of the people she had when he
@@ -51,6 +72,18 @@ fought her rescuer a minute later and struck to her, her brain holding the cruis
 private signal answered while she was in French hands, and the cruiser holding her one by the prize
 crew's shot). JUDGEMENT: her own people's knowledge from before she was taken goes with the prize
 crew's; what is not stamped with the hands it was learned under cannot be sorted.
+
+Every relation held on her ends there too, the cause being one (the lead's last list, item 3: a
+relation held after what it stood on is gone): the sail spoken and the chase given up
+(`spoken_ids`, `given_up`, read raw by `Judgement._spoken`: a cruiser who spoke her or gave her up
+never looked at her again once the enemy took her, and so never retook her), the player's having
+spoken her (`Vessel.spoken`, the lookout's flag); the shots of the one record, fired by her or at
+her; the orders she sailed under (`under_orders_of`, hers and her hull's: a French prize crew left
+"to her commander's book", the British commander's) and the orders of every ship under hers; the
+far rounds' book of each pair she is in (`root._far_rounds`); and every near battery laid on her
+(`combat.action`): its World is told she has changed hands, and its next tick asks `MARK` of her as
+she now is, holding the fire and telling the deck why where she is no mark (the lead's last list,
+item 5).
 """
 
 from __future__ import annotations
@@ -62,23 +95,37 @@ from freesail.world.geo import bearing_and_distance
 from freesail.world.ships import PLAYER_ID
 
 __all__ = [
+    "CHANGED_HANDS",
+    "FIRED_ON",
     "MARK",
     "PRIZE",
     "RELATIONS",
     "STRUCK",
     "SUPPORT",
     "changed_hands",
+    "fired",
+    "fired_on",
+    "has_fired",
     "in_company_nm",
     "judges",
     "ship_of",
     "still",
 ]
 
-# What a judge knows of other ships by their ids (`Judgement._known_enemy`): the ships that fired on
-# him and the ships he saw fire under false or no colours (sets), and what the private signal or the
-# hail made of them (a mapping).
-KNOWLEDGE_SETS = ("fired_on", "pirates")
+# What a judge knows of other ships by their ids beyond the one record of shots (`FIRED_ON`): the
+# ships he saw fire under false or no colours, the sails he has spoken and the chases he has given
+# up (sets: `Judgement._known_enemy`, `Judgement._spoken`), and what the private signal or the hail
+# made of them (a mapping).
+KNOWLEDGE_SETS = ("pirates", "spoken_ids", "given_up")
 KNOWLEDGE_MAPS = ("recognised",)
+
+# The one record of who has fired on whom (the module's head), on the sea's World: the id of each
+# ship fired on, to the ids of the ships that have fired on her.
+FIRED_ON = "_fired_on"
+# A ship's World told that the mark of her battery has changed hands (`changed_hands`), for the
+# battery's next tick to judge (`combat.action._watch_changed_hands`): the ids, in her ship's
+# `extra`.
+CHANGED_HANDS = "mark_changed_hands"
 
 MARK = "mark"
 STRUCK = "struck"
@@ -88,13 +135,12 @@ RELATIONS: tuple[str, ...] = (MARK, STRUCK, PRIZE, SUPPORT)
 
 
 def _root(world: Any) -> Any:
-    """The parent World of a crewed ship's World, a Hull's World, or the World itself."""
-    parent = getattr(world, "parent", None)
-    if parent is not None:
-        return parent
+    """The sea's World: a crewed ship's hull's (her `parent` the player's hull, whose World it is),
+    a Hull's, or the World itself; the one place the one record is kept."""
     from freesail.world.hulls import world_of
 
-    return world_of(world)
+    parent = getattr(world, "parent", None)
+    return world_of(parent if parent is not None else world)
 
 
 class _PlayersShip:
@@ -151,6 +197,41 @@ def _a_prize(v: Any) -> bool:
     return is_prize(v)
 
 
+def _id(x: Any) -> str:
+    return str(getattr(x, "id", x) or "")
+
+
+def _book(world: Any) -> dict[str, set[str]]:
+    """The one record of who has fired on whom, on the sea's World (made at the first shot)."""
+    root = _root(world) if world is not None else None
+    d = getattr(root, "__dict__", None)
+    if d is None:
+        return {}
+    book = d.get(FIRED_ON)
+    if book is None:
+        book = d[FIRED_ON] = {}
+    return book
+
+
+def fired(world: Any, firer: Any, target: Any) -> None:
+    """She (`firer`, a vessel or an id) fired on `target`: written in the one record, by every road
+    a ship fires on another (the module's head)."""
+    fid, tid = _id(firer), _id(target)
+    if fid and tid and fid != tid:
+        _book(world).setdefault(tid, set()).add(fid)
+
+
+def fired_on(world: Any, target: Any) -> set[str]:
+    """The ids of the ships that have fired on `target`: her row of the one record, the set itself
+    (`Judgement.fired_on`), so that what her judges add to it is the record's."""
+    return _book(world).setdefault(_id(target), set())
+
+
+def has_fired(world: Any, firer: Any, target: Any) -> bool:
+    """Whether `firer` has fired on `target`, by the one record."""
+    return _id(firer) in _book(world).get(_id(target), ())
+
+
 def in_company_nm(world: Any, sid: Any) -> float:
     """The miles within which a ship is still in company with her set: her set's book's
     `lost_nm`; for a ship in no set, the squadron book's (a set of the default kind's)."""
@@ -173,6 +254,8 @@ def _enemy_to(root: Any, holder: Any, judge: Any, other: Any) -> bool:
         known = judge._known_enemy({"id": oid})
         if known is not None:
             return bool(known)
+    elif has_fired(root, oid, getattr(holder, "id", "")):
+        return True  # she fired on the holder: the one record, read with no judge to ask
     shown = getattr(other, "nation_shown", None)
     if not shown:
         return True
@@ -192,6 +275,19 @@ def _enemy_to(root: Any, holder: Any, judge: Any, other: Any) -> bool:
     return bool(nations.at_war(str(shown), nation))
 
 
+def _of_her_side(root: Any, her: Any, other: Any) -> bool:
+    """Whether `other` is of her side: her own nation or an ally of it, by the nations both truly
+    are (the module's head, `SUPPORT`)."""
+    a = str(getattr(her, "nation", "") or "")
+    b = str(getattr(other, "nation", "") or "")
+    if not a or not b:
+        return False
+    if a == b:
+        return True
+    nations = getattr(root, "nations", None)
+    return bool(nations is not None and hasattr(nations, "allied") and nations.allied(a, b))
+
+
 def still(
     world: Any,
     holder: Any,
@@ -205,16 +301,22 @@ def still(
     far body's, a crewed hull's, or the player's `PLAYER_ID`) holds her to be, by the relation
     `what` (the module's head). `judge` is the captain whose knowledge decides an enemy (by
     default the holder's far brain); `within_nm` the miles of `SUPPORT` (by default the holder's
-    `in_company_nm`). A ship gone from the sea is nothing to anybody."""
+    `in_company_nm`). A ship gone from the sea is nothing to anybody, and holds nobody; a holder
+    struck holds nobody but her prizes (the module's head)."""
     if what not in RELATIONS:
         raise ValueError(f"'{what}' is no relation: {', '.join(RELATIONS)}")
     root = _root(world)
     hid = str(getattr(holder, "id", holder) or "")
     oid = str(getattr(other, "id", other) or "")
-    if not oid or oid == hid:
+    if not oid or not hid or oid == hid:
         return False
     o = other if not isinstance(other, str) else ship_of(root, oid)
     if o is None or getattr(o, "done", False):
+        return False
+    her = holder if not isinstance(holder, str) else ship_of(root, hid)
+    if her is None or getattr(her, "done", False):
+        return False
+    if what != PRIZE and _struck(her):
         return False
     if what == PRIZE:
         from freesail.world.prizes import record_of
@@ -236,13 +338,14 @@ def still(
         return d > in_company_nm(root, to) * units.NAUTICAL_MILE
     if _struck(o) or _a_prize(o):
         return False
-    her = holder if not isinstance(holder, str) else ship_of(root, hid)
     if what == MARK:
         if judge is None:
             judge = getattr(her, "brain", None)
         return _enemy_to(root, her, judge, o)
     # SUPPORT
-    if her is None or getattr(her, "position", None) is None or o.position is None:
+    if not _of_her_side(root, her, o):
+        return False
+    if getattr(her, "position", None) is None or o.position is None:
         return False
     nm = float(within_nm) if within_nm is not None else in_company_nm(root, hid)
     _, d = bearing_and_distance(her.position, o.position)
@@ -265,6 +368,7 @@ def judges(world: Any) -> list[Any]:
     sea = getattr(root, "vessels", None)
     for v in list(getattr(sea, "vessels", None) or []):
         add(getattr(v, "brain", None))
+        add(getattr(v, "_signal_reader", None))  # the least captain of a ship with no brain
         hull = getattr(v, "crew", None)
         add(getattr(hull, "captain", None) if hull is not None else None)
     add(getattr(root, "captain", None))
@@ -272,7 +376,7 @@ def judges(world: Any) -> list[Any]:
 
 
 def _own_judges(root: Any, vessel: Any) -> list[Any]:
-    out = [getattr(vessel, "brain", None)]
+    out = [getattr(vessel, "brain", None), getattr(vessel, "_signal_reader", None)]
     hull = getattr(vessel, "crew", None)
     out.append(getattr(hull, "captain", None) if hull is not None else None)
     if str(getattr(vessel, "id", "")) == PLAYER_ID:
@@ -282,8 +386,12 @@ def _own_judges(root: Any, vessel: Any) -> list[Any]:
 
 def changed_hands(world: Any, vessel: Any) -> None:
     """She has changed hands (the module's head): what every judge on the sea knew of her by her
-    shot, a pirate's act, the signal or the hail is forgotten, and what her own judges knew of any
-    ship. Called by `prizes._nation_words`, the one road by which a ship's nation changes."""
+    shot, a pirate's act, the signal, the hail, a speaking or a chase given up is forgotten, and
+    what her own judges knew of any ship; and every relation held on her ends: the one record's
+    shots by her and at her, the player's having spoken her, the orders she sailed under and the
+    orders of the ships under hers, the far rounds' book of her pairs, and the near batteries laid
+    on her are told (the lead's last list, items 2, 3 and 5). Called by `prizes._nation_words`,
+    the one road by which a ship's nation changes."""
     root = _root(world)
     sid = str(getattr(vessel, "id", "") or "")
     own = {id(j) for j in _own_judges(root, vessel)}
@@ -303,3 +411,38 @@ def changed_hands(world: Any, vessel: Any) -> None:
                     held.clear()
                 else:
                     held.pop(sid, None)
+    if not sid:
+        return
+    # the one record: who fired on her, and whom she fired on
+    book = _book(root)
+    book.pop(sid, None)
+    for firers in book.values():
+        firers.discard(sid)
+    # the player's lookout's flag: spoken within hail by the player's ship
+    if getattr(vessel, "spoken", False):
+        vessel.spoken = False
+    # the orders she sailed under, and the orders of every ship under hers
+    sea = getattr(root, "vessels", None)
+    ships = list(getattr(sea, "vessels", None) or [])
+    for v in [vessel, *ships]:
+        boss = str(getattr(v, "under_orders_of", "") or "")
+        if boss and (v is vessel or boss == sid):
+            v.under_orders_of = ""
+            hull = getattr(v, "crew", None)
+            if hull is not None and getattr(hull, "under_orders_of", ""):
+                hull.under_orders_of = ""
+    held = str(getattr(root, "under_orders_of", "") or "")
+    if held and (held == sid or sid == PLAYER_ID):
+        root.under_orders_of = ""  # the player's ship under hers, or the player's ship herself
+    # the far rounds' book of each pair she is in
+    rounds = getattr(root, "__dict__", {}).get("_far_rounds")
+    if isinstance(rounds, dict):
+        for key in [k for k in rounds if sid in str(k).split("|")]:
+            del rounds[key]
+    # the near batteries laid on her: the next tick of each judges her as she now is
+    for hw in [root, *(getattr(v, "crew", None) for v in ships)]:
+        ship = getattr(hw, "ship", None) if hw is not None else None
+        extra = getattr(ship, "extra", None)
+        battery = extra.get("battery") if isinstance(extra, dict) else None
+        if battery is not None and str(getattr(battery, "target", "") or "") == sid:
+            extra.setdefault(CHANGED_HANDS, set()).add(sid)

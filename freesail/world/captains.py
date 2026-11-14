@@ -1883,9 +1883,47 @@ class Judgement:
     # the strangers this captain has done with (package 43): a chase given up as stale is
     # not taken up again while she is in sight, as a sail spoken is a stranger no more
     given_up: set[str] = frozenset()  # type: ignore[assignment]
-    # the ships that have fired on her (package 70, rule 3): an enemy from then on whatever
-    # her colours (a checkpoint from before loads with none)
-    fired_on: set[str] = frozenset()  # type: ignore[assignment]
+
+    @property
+    def fired_on(self) -> set[str]:
+        """The ships that have fired on her (package 70, rule 3): an enemy from then on whatever
+        her colours. Her row of the one record of who has fired on whom (`relations.fired_on`, by
+        her id on the sea; the lead's last list of 2026-11-14, item 2), so that her far brain and
+        her hull's captain read one record, which every road of fire writes (the near battery, the
+        far rounds) and a change of hands forgets in one place, where each kept a set of his own
+        and the far rounds a book by name that neither read. A checkpoint from before holds his
+        own set: folded into the record at its first reading. A judge of no ship on the sea keeps
+        one of his own."""
+        from freesail.world import relations as R
+
+        d = self.__dict__
+        old = d.pop("fired_on", None)
+        own = str(self._own_vessel_id() or "")
+        world = d.get("world")
+        if not own or world is None:
+            mine = d.setdefault("_fired_on_alone", set())
+            mine |= set(old or ())
+            return mine
+        row = R.fired_on(world, own)
+        if old:
+            row |= set(old)
+        return row
+
+    @fired_on.setter
+    def fired_on(self, value: Any) -> None:
+        row = self.fired_on
+        row.clear()
+        row |= set(value or ())
+
+    def _fired_on_by(self, sid: str) -> bool:
+        """Whether `sid` has fired on her, by the one record, read without making her row."""
+        from freesail.world import relations as R
+
+        d = self.__dict__
+        own = str(self._own_vessel_id() or "")
+        if "fired_on" in d or not own or d.get("world") is None:
+            return sid in self.fired_on
+        return R.has_fired(d["world"], sid, own)
 
     def _inner_leg(self) -> bool:
         return False
@@ -2278,7 +2316,7 @@ class Judgement:
         sid = str(s.get("id") or "")
         if self._prize_of_ours(sid):
             return False
-        if sid in (self.fired_on or ()) or sid in (getattr(self, "pirates", None) or ()):
+        if self._fired_on_by(sid) or sid in (getattr(self, "pirates", None) or ()):
             return True
         known = (getattr(self, "recognised", None) or {}).get(sid)
         if known is not None and known.get("enemy") is not None:
@@ -2453,7 +2491,7 @@ class Captain(Judgement):
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
         self.given_up: set[str] = set()  # the chases given up (package 43)
-        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
+        # the ships that fired on her (package 70): her row of the one record, `fired_on`
         # package 71 (rule 3): what he knows of each sail by the private signal or the hail
         # (`signalling.recognise`), the pirates he saw fire under false colours, the sail
         # spoken (the far brain's set, folded in and back)
@@ -2618,8 +2656,6 @@ class Captain(Judgement):
         `struck`, whose book is empty and whose work is to lie to for her captor."""
         if self.state == "struck":
             return
-        if not isinstance(self.fired_on, set):
-            self.fired_on = set()
         if self.active and self.commands:
             self._enter("struck")
         else:

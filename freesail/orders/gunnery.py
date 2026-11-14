@@ -2,7 +2,8 @@
 
     engage her to starboard         the mark and the side: a standing intention the battery
     engage the brig to larboard     keeps (the engaged side's guns served and fired at her);
-    engage on both sides            'her' or nothing is the enemy nearest, else the sail nearest
+    engage on both sides            'her' or nothing is the enemy nearest who may be fought;
+                                    with none, refused: a sail named is engaged as named
     load with round shot            the charge the guns are loaded with from now (round, chain,
                                     grape, double, a blank cartridge); a loaded gun keeps its
                                     charge until it is fired
@@ -399,8 +400,9 @@ def _engage(ship: Any, battery: Battery, said: str) -> Result:
 
 
 def _mark(ship: Any, words: str) -> tuple[str, str]:
-    """The sail the words name among those in sight: 'her' or nothing is the nearest
-    enemy, else the nearest sail; a rig's word, a name or an id otherwise."""
+    """The sail the words name among those in sight: 'her' or nothing is the nearest sail
+    her captain holds an enemy and may fight (`_enemy_to_engage`), refused in words with
+    none; a rig's word, a name or an id otherwise (the player's own choice of mark)."""
     world = world_of(ship)
     lookout = getattr(world, "lookout", None) if world is not None else None
     if world is None or lookout is None:
@@ -413,27 +415,13 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
         if want.startswith(lead) and want not in _HER:
             want = want[len(lead) :]
     if not want or words.lower() in _HER:
-        nations = getattr(world, "nations", None)
-        ports = getattr(world, "dealings", None)
-        own = getattr(ports, "ship_nation", None)
-        enemies = [
-            i
-            for i in items
-            if i.get("nation")
-            and own
-            and nations is not None
-            and nations.at_war(str(i["nation"]), str(own))
-        ]
-        fired = _fired_on(world)
-        enemies += [i for i in items if i.get("id") in fired and i not in enemies]
-        # the enemy he may fight, by the one answer (`Judgement._may_fight`, `relations.MARK`:
-        # not struck, nobody's prize, not of his side), so that the rules captain's "engage her"
-        # takes the mark he chose and no prize under an enemy prize crew nearer (the whole-change
-        # review of 80e703c7, gundeck-2); with none such, the nearest sail as before
-        may_fight = getattr(getattr(world, "captain", None), "_may_fight", None)
-        if callable(may_fight):
-            enemies = [i for i in enemies if may_fight(i)]
-        pick = enemies[0] if enemies else items[0]
+        pick = _enemy_to_engage(world, items)
+        if pick is None:
+            seen = ", ".join(_name_of(world, i) for i in items)
+            raise OrderError(
+                f"There is no enemy in sight to engage: name the sail to engage her "
+                f"('engage the brig to starboard'); in sight: {seen}."
+            )
         return str(pick["id"]), _name_of(world, pick)
     for i in items:
         v = world.vessels.get(str(i["id"])) if hasattr(world, "vessels") else None
@@ -447,6 +435,39 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
     raise OrderError(f"No sail in sight answers to '{words}'; in sight: {seen}.")
 
 
+def _enemy_to_engage(world: Any, items: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The order's 'her' (the lead's last list of 2026-11-14, item 1): the nearest sail in sight
+    (`items` are the lookout's, nearest first) that her captain holds an enemy (by her colours at
+    war with his nation, her shot at him, the private signal or the hail: `Captain._is_enemy`, his
+    judgement of the stimuli) and may fight (the one answer, `relations.MARK`: not struck, nobody's
+    prize, none of his side); None with none such, for the order is then refused in words. One
+    rule for the player's order and the rules captain's ("engage her", given when his own judgement
+    has an enemy in range), so that no sail is chosen the rule would not choose: before it, with no
+    enemy who might be fought in sight (a British merchant brig taken by the French, the only
+    enemy), the order took the first sail in sight, whoever she was, and laid the guns on a British
+    brig-sloop a third of a mile off."""
+    from freesail.world import relations as R
+    from freesail.world.signals import own_id
+
+    captain = getattr(world, "captain", None)
+    is_enemy = getattr(captain, "_is_enemy", None)
+    nations = getattr(world, "nations", None)
+    ports = getattr(world, "dealings", None)
+    own = getattr(ports, "ship_nation", None)
+    me = own_id(world)
+    for i in items:
+        if callable(is_enemy):
+            enemy = bool(is_enemy(i))
+        else:
+            shown = i.get("nation")
+            at_war = bool(shown and own and nations is not None)
+            fired = R.has_fired(world, str(i.get("id") or ""), me)
+            enemy = (at_war and nations.at_war(str(shown), str(own))) or fired
+        if enemy and R.still(world, me, str(i.get("id") or ""), R.MARK, judge=captain):
+            return i
+    return None
+
+
 def _name_of(world: Any, item: dict[str, Any]) -> str:
     lookout = getattr(world, "lookout", None)
     if lookout is not None:
@@ -457,12 +478,6 @@ def _name_of(world: Any, item: dict[str, Any]) -> str:
         except Exception:  # noqa: BLE001
             pass
     return str(item.get("known") or "the sail")
-
-
-def _fired_on(world: Any) -> set[str]:
-    captain = getattr(world, "captain", None)
-    fired = getattr(captain, "fired_on", None) if captain is not None else None
-    return set(fired or ())
 
 
 # -- the standing intentions ---------------------------------------------------------------
