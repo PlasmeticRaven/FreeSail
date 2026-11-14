@@ -503,3 +503,41 @@ def test_the_director_puts_men_on_the_sick_list_and_hurts_an_officer_by_the_aboa
     assert "bears no surgeon, or he is ill already" in said
     forms = [f for f in D.WORLD_ORDER_FORMS if f.key == "aboard.found"][0]
     assert "aboard: the first lieutenant is hurt" in forms.examples
+
+
+def test_a_ships_temper_starts_from_her_captains_doctrine_whichever_road_asks_first():
+    """Package 115 D1, the lead's ruling of 2026-11-14: a ship's morale is made at its first
+    asking, and was made from her captain's doctrine only when the asker handed it in (the
+    fire's reckoning did, the boarding did not), so that the French frigate boarded before she
+    was fired on began at the default 0.7 and fired on first at her doctrine's figure (truth
+    7-181's round table: 0.700 against 0.877). Mended at the cause (`combat.morale.morale_of`
+    finds the doctrine itself). The same ship, alongside as the fight tests lay her, asked
+    first by two roads through the orders: by the boarding (grappled and boarded, no gun
+    fired) and by our fire (her company fired into): each starts at the same temper, her
+    captain's own `morale_start`. (Her own fire, the third road the lead named, is not reached
+    here: ordered at her prompt to engage the player's ship to larboard, her guns are cast
+    loose, loaded and run out at ten metres and fire nothing in an hour; found, not mended.)"""
+    from freesail.combat.morale import Morale
+
+    starts = {}
+    for road in ("boarding", "our fire"):
+        w, v, enemy = _alongside(10.0, her_quarters=True)
+        assert not isinstance(enemy.ship.extra.get("morale"), Morale)
+        if road == "boarding":
+            w.submit("grapple her")
+            w.run(60)
+            assert w.submit("boarders away").kind == "action.boarders"
+            w.run(60)
+        else:
+            w.submit("fire as they bear")
+            for _ in range(20):
+                w.run(30)
+                if isinstance(enemy.ship.extra.get("morale"), Morale):
+                    break
+        m = enemy.ship.extra.get("morale")
+        assert isinstance(m, Morale), road
+        starts[road] = m.start
+    doctrine = enemy.captain.doctrine
+    want = float(doctrine.threshold("morale_start", 0.7))
+    assert want != 0.7, "her doctrine gives the default: the case is not met"
+    assert all(abs(s - want) < 1e-9 for s in starts.values()), (starts, want)

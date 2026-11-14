@@ -29313,3 +29313,34 @@ line inside the refusal's reach, and a save holding it replays to the same refus
 (j) Recruits given another man's number: `Crew.issued` and `Crew.next_number` number them
 after the highest ever given (the dead and a prize crew included; a prize crew numbered by
 her captor's books); a checkpoint from before reads the books.
+
+**D1, continued: engage, the temper, the hold (the owner's and the lead's rulings of the same
+day).** `engage` given with the guns secured casts them loose by the order 'cast loose the
+guns' (`orders.handle`, the one road), in `_true_of_the_guns`. In the fight tests'
+`_alongside` (beat, hold your fire, engage, grapple, boarders away) the boarding then ended
+"repulsed" where it ended "carried". Measured round by round on truth 7-181 (attacker men,
+temper | defender men, temper): old r1 98, .647 | 118, .700, carried at r10 (lost 43 and 55);
+new r1 100, .632 | 118, .877, repulsed at r9 (lost 59 and 44). The men were the same; her
+TEMPER was not. `combat.morale.morale_of` made a ship's morale at its first asking, from her
+captain's doctrine only when the asker handed it in: our fire's reckoning
+(`action._judge_morale`) did, the boarding (`boarding._morale`) did not, so a ship boarded
+before she was fired on started at `DEFAULT_START` 0.7 and not her own figure. Mended there
+(`_doctrine_of`: her World's captain); the far fight already made hers from the brain's
+doctrine. Nothing else in `combat/` is made at its first asking from a caller's figure. And
+`_engage` turned a held battery to "as they bear", which with the guns secured did nothing and
+with them loose fired on a player who had just said hold: an explicit `hold your fire` or
+`cease firing` (`battery.held_by_order`) now stands against a later engage, which takes her for
+the mark, casts loose and holds ("The guns are held at your order: 'fire as they bear' to
+open."); an order to fire, and securing the guns, clear it (the lead's JUDGEMENT). Found, not
+mended: ordered at her own prompt to engage the player's frigate alongside, a French
+frigate's guns are cast loose, loaded and run out at ten metres and fire nothing in an hour;
+two frigates at ten metres drift beyond a grapnel's throw (thirty) within minutes of opening
+fire, and `lay her aboard` did not close them again in half an hour; pistol-shot fire takes
+about a man a minute from a company of 264.
+
+**F2.11 as found (owed, not mended here).** The same men serve the guns and are counted as
+boarders: `combat.boarding.boarders_of` draws the bill's boarders, the most skilled fit men of
+every station but the marines, the quarterdeck and the idlers, whether or not their guns are
+being served. And the defender's gun crews are not counted in the defence unless `repel
+boarders` is given: `boarding.defenders_of` takes the marines, the helm, the trimmers, the
+quarterdeck and the small-arms men, and every fit man on deck only when repelling.
