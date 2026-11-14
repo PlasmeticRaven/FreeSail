@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-14, 04:50 UTC (ruling 17: (a) as built for the ship of the line made out at the rig's distance; (b) not built). Nudge number: 6.
+Latest note: 2026-11-14, 05:10 UTC (cda12ec9 NOT merged: the two readings' list, F1 to F6 and C1 to C8). Nudge number: 7.
