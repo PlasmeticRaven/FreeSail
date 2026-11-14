@@ -29244,6 +29244,13 @@ The step is the cell's:
   92.6 m cell there, and the 2 m second reading still finds Setúbal's 1.2 m;
 - over level 1 (cells of 926 m) half a cell, some 300 to 460 m by the latitude.
 
+What a coarse cell can hold (the lead's ruling of 07:47, item 4). A level-2 cell is 92.6 m
+square and holds one depth, its survey's for that whole square. A head, a rock or a bar
+narrower than that is in the grid only as far as it moved its cell's figure. On level-2 water,
+then, the audit proves that no cell along the line is under 3 m. It does not prove that no
+head under 3 m stands there: the half-cell step reads every cell the line crosses, and nothing
+finer can be read where the grid itself is no finer. The same holds tenfold over level 1.
+
 Measured:
 - check (f) whole takes 12.7 s of processor time against 10.9 s;
 - the same 19 `f-shallow` findings before the tracks below were redrawn;
@@ -29272,11 +29279,18 @@ Every leg was read by the reader above and passed by the game's guard.
 | Palermo | 0.0 m (across a modern pier) | 4.5 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
 | Lampedusa | 0.4 m (the harbour to its road) | 6.4 m | by the mouth's deeper side; from the sea to the road, the inner track on |
 | Catania | 1.1 m (the road into the mole) | 5.0 m | in by the north, past the piers' heads (Smyth: the lava on the south, the piers on the north) |
-| Santa Cruz de Tenerife | ground drying 1.6 m | not redrawn | the road's spot lies within the grid's modern Dique: the deepest way out within 5 km dries 0.0 m |
-| Porto Paolo | ground drying 2.1 m | not redrawn | the spot lies within the modern basin, closed by the grid's breakwater: the deepest way out is 0.5 m |
+| Santa Cruz de Tenerife | ground drying 1.6 m | 55.6 m | the road's spot lay within the grid's modern Dique (the deepest way out within 5 km dried 0.0 m): the road moved 547 m east to Purdy's half a mile in 30 to 35 fathoms (the grid 55.6 m), the berth 342 m to the grid's 10.5 m; the tracks stand |
+| Porto Paolo | ground drying 2.1 m | 14.2 m | the spot lay within the modern basin, closed by the grid's breakwater (the deepest way out 0.5 m): moved 413 m south to Smyth's entrance in seven to ten fathoms (the grid 14.2 m), its fathoms 5 to 8; the tracks stand |
 
-Their known-list entries go as they are mended (five out). The last two need their spots moved,
-which is beyond the step, and wait for the lead's word.
+Their known-list entries go as they are mended (seven out). The last two were mended at their
+cause, by the lead's ruling of 07:47: the spot, not the track, was the modern grid's. Each moved
+to the road its pilot gives, the source and the grid's depth said beside it in the features
+file and the port file; nothing else of either port moved. What reads them:
+- the boat's pull from the anchorage to the shore: Santa Cruz 1,051 m to 1,489 m, Porto Paolo
+  1,403 m to 1,771 m;
+- truth 7-524's band for Santa Cruz's road (40 to 80 m): 61.7 m to 55.6 m, within it;
+- truth 7-529's frigate, her nearest to the road (2 to 3.5 miles, measured 2.96): see below.
+No scenario begins or ends at either spot.
 
 Three of the five shared one cause beside the shoal, which is the plan and not the track. The
 business's way in (`ships.approach_plan`) is the track from the sea, then the outer road where
@@ -29328,3 +29342,21 @@ the shore by half cables), `orders` (rings of half cables to the nearest water),
 contour searches. `core/world.py`'s halves of a cable are words; `orders/station.py`'s
 `SAIL_STEP_M` is not the chart. The guard and the lookout stay as they are (ruling 3, and the
 lead's 06:15 ruling).
+
+**The twelve `f-shallow` entries left, by cause** (the lead's ruling of 07:47, item 3; each cause
+also written in its known-list reason). The three causes are: (1) the spot lies inside modern
+works the grid encloses; (2) the grid's grain over a channel the pilots give deeper; (3) a bar
+or shoal the pilots give too. Measured by the deepest way on a 25 to 40 m lattice from the
+anchorage or road to the road or open water.
+- (3), a bar or shoal the pilots give too: Calais (dry at low water), Dunkirk (the Splinter's
+  six or eight feet), Poole (the bar's six to eight feet; the grid's deepest way 2.0 m), St Malo
+  (the drying shelves), Oporto (the bar; 1.5 m), Setúbal (the bar), Paimboeuf (the Loire's
+  ledges; 3.3 m off the pilot's side, JUDGEMENT) and Rochefort (the Charente; 3.1 m, JUDGEMENT).
+- (1), the spot inside modern works: Genoa (the deepest way from the anchorage to open water
+  dries 0.1 m), Bougie (from the road, dries 0.4 m) and Civita Vecchia (the anchorage itself
+  2.9 m within the modern harbour, the pilot's two entrances under its moles). Named to the
+  lead, not moved.
+- None of the three: the Goletta, where the grid has a way of 6.2 m from the road to the
+  track's first mark that the track does not take. Named to the lead, not redrawn.
+- (2) none clearly: where the pilots give a figure at the worst point, it is a bar's or a
+  shoal's.

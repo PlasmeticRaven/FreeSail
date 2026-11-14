@@ -1331,11 +1331,11 @@ features:
     kind: anchorage
     name: Porto Paolo
     modern: 'Portopalo di Capo Passero'
-    lat_deg: 36.6697
-    lon_deg: 15.1239
-    fix: 'moved 962 m to the grid''s water of about the pilot''s depth'
+    lat_deg: 36.6660
+    lon_deg: 15.1235
+    fix: 'moved 962 m to the grid''s water of about the pilot''s depth; then 413 m south, out of the grid''s modern basin, which its breakwater closes in (the deepest way out of 36.6697 N 15.1239 E was 0.5 m), to the entrance Smyth gives in seven to ten fathoms: the grid 14.2 m (7.8 fathoms) here (the chart session''s tracks step, the lead''s ruling of 2026-11-14; old 36.6697 N 15.1239 E, five fathoms, the depth within)'
     height_m: 0
-    depth_fathoms: 5
+    depth_fathoms: 8
     bottom: sand and mud
     source: 'Smyth 1824, App. p. xix: a convenient place for coasters in all winds but that from the south, good sandy bottom mixed with mud, five to three fathoms inside and seven to ten at the entrance; nearly a dozen vessels seen riding out a brisk northerly gale; a reef off the low cape on which an English line of battle ship grounded a few years before'
     says: 'Porto Paolo under Cape Passaro, sandy mud in three to five fathoms, a coasters'' shelter in all winds but the south.'

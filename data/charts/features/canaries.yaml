@@ -124,7 +124,8 @@ features:
     name: the road of Santa Cruz
     modern: the anchorage off Santa Cruz de Tenerife
     lat_deg: 28.4737
-    lon_deg: -16.2394
+    lon_deg: -16.2338
+    fix: "moved 547 m east, out of the grid's modern basin (the Dique's port works, which close it in: the deepest way out of 28.4737 N 16.2394 W was ground drying 0.0 m) to the open road Purdy gives, half a mile off in 30 to 35 fathoms: the grid 55.6 m (30.4 fathoms) here, 231 m off the modern breakwater (the chart session's tracks step, the lead's ruling of 2026-11-14)"
     height_m: 0
     depth_fathoms: 30
     bottom: "dark sand and ooze with small white shells; foul in places with lost anchors"
