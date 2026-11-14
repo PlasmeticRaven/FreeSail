@@ -3027,8 +3027,10 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
-# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before)
-GATE_5B_SCHOONER_LINES = 769  # the well (768 at 56, 763 at package 45)
+# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
+# the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
+# left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
+GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
@@ -3040,7 +3042,7 @@ GATE_5B_SCHOONER_LINES = 769  # the well (768 at 56, 763 at package 45)
 # the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
 # (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
 GATE_5B_SCHOONER_DIGEST = (
-    "ef15ca96ee2ed052"  # package 115 (3a1698037811b753 before); 75's ruled build (3)
+    "3bcbaeccd01fc4e5"  # 115, 60af48e's reading (ef15ca96ee2ed052; 3a1698037811b753 before)
 )
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`

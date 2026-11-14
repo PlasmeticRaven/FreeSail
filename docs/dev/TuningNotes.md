@@ -29635,6 +29635,18 @@ the beat leaves her guns secured). OLD "The starboard lower-deck guns to fire ea
 it is ready, six guns; eight are behind ports the sea has shut." NEW "The starboard lower-deck
 guns to fire each as soon as it is cast loose and ready, six guns; eight are behind ports the
 sea has shut. The guns are secured: none is loaded, run out or fired until they are cast
-loose; say 'cast loose the guns'." The gate digests (the naval cruise, the schooner's and the
-merchant passages, the fake captain's) did not move: in neither passage does a minute bring
-two reports of the same words, and the schooner's book is fitted the same way there.
+loose; say 'cast loose the guns'." CORRECTED by the slow tier (the note above was written
+from the fast tier, where the gates are not run): the schooner's passage (gate 5b,
+`GATE_5B_SCHOONER_LINES`, `_DIGEST`) moved, 769 to 766 lines, ef15ca96ee2ed052 to
+3bcbaeccd01fc4e5, re-pinned in the second commit of the re-pins (one more, against the lead's
+"one commit": the first was made before the slow tier had read the gates). Line by line, old
+beside new: at tick 0 "The book fitted to her rig, for she carries no royals: 'night routine'
+without its royals; 'morning sail' left out; 'shorten sail for weather' without its royals."
+and the night routine's two lines ("Order: standing order "night routine": at sunset then take
+in the studdingsails." and its "entered in the book") become the one line "The book fitted to
+her rig, for she carries no royals: 'night routine' left out, for it was left to take in her
+studdingsails only, which nothing in the book sets; 'morning sail' left out; 'shorten sail for
+weather' without its royals."; at tick 58060 the sunset's refusal ("Standing order 'night
+routine': order not carried out ('take in the studdingsails'): Nothing done: ... already
+furled.") is gone (item 6). Nothing else: every other line and tick the same. The naval
+cruise, the merchant passage and the fake captain's did not move.
