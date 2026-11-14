@@ -1024,7 +1024,14 @@ class Script:
         away with it), and it lays the plan anew (the lead's (C1) of 2026-11-14). Returns the
         reason it fails, or None; None for work that has none (the whole-change review of
         80e703c7, sailing-2: with the whole check left unread on a resume, a main mast carried
-        away while her cutting away lay held was cut away and wrecked a second time)."""
+        away while her cutting away lay held was cut away and wrecked a second time).
+
+        Every script a post can hold states it, here or in its file's `requires` (the lead's last
+        list of 2026-11-14, 8: the veer, backing and catting and fishing the anchor, the kedge, the
+        signal and the four trims, beside the letting go, the cutting away and the fish); refused,
+        the work is said in its `on_fail` and never run on (`Runner._try_resume`). The scripts a
+        post can hold whose beginning nothing in the world makes false while they lie held keep
+        None, each named with its reason by `tests/test_held_work.py`'s sweep."""
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -3843,7 +3850,10 @@ class SendDownScript(PhasedScript):
                 f"{'is' if len(standing) == 1 else 'are'} still aloft."
             )
         if not self.clear_away and self.clew:
-            doing = str(self.params.get("doing") or f"{verb}ing the {what}")
+            # the work's name from the runner's one road (`Runner._format_context`'s 'doing'),
+            # where the file kept a copy of its own in its params, "striking the topmasts", beside
+            # the runner's "striking topmasts" (the lead's last list of 2026-11-14, 9)
+            doing = str(words.get("doing") or "the work")
             return (
                 f"{_names(ship, self.clew)[:1].upper()}{_names(ship, self.clew)[1:]} "
                 f"{'is' if len(self.clew) == 1 else 'are'} set; take "
@@ -6479,6 +6489,12 @@ def _riding(ship: Ship, wind: Wind | None) -> str:
     return riding_words(ship, state, wind_from)
 
 
+def _not_down(anchor: Any, riding: Any) -> str:
+    """An anchor that is not down, beside the one she rides by: 'the small bower is a-cockbill,
+    not down; she rides by the best bower'."""
+    return f"{anchor.name} is {anchor.state.value}, not down; she rides by {riding.name}"
+
+
 class _AnchorScript(Script):
     """What the anchor scripts share: the tackle found, the anchor named, the cable
     veered or hove by the fathom at a rate."""
@@ -6514,12 +6530,7 @@ class _AnchorScript(Script):
         `weigh the small bower` weighed it, without a word)."""
         riding = self.tackle.riding_by()
         if riding is None:
-            hanging = hanging_anchor(self.tackle, self.params.get("anchor"))
-            if hanging is not None:
-                # package 37k (game 10: `weigh the best bower` was answered "no anchor is
-                # down" with the best bower hanging at the bows after a belay)
-                return f"no anchor is down: {anchor_left_words(hanging)}"
-            return "no anchor is down"
+            return self._none_down()
         named = self.params.get("anchor")
         if not named:
             self.anchor = riding
@@ -6528,9 +6539,31 @@ class _AnchorScript(Script):
         if anchor is None:
             return f"no anchor aboard answers to '{named}'; she rides by {riding.name}"
         if not anchor.down:
-            return f"{anchor.name} is {anchor.state.value}, not down; she rides by {riding.name}"
+            return _not_down(anchor, riding)
         self.anchor = anchor
         return None
+
+    def _none_down(self) -> str:
+        """No anchor down, in words: where one hangs at the bows, where (package 37k: in game 10
+        `weigh the best bower` was answered "no anchor is down" with the best bower hanging at
+        the bows after a belay)."""
+        hanging = hanging_anchor(self.tackle, self.params.get("anchor"))
+        if hanging is not None:
+            return f"no anchor is down: {anchor_left_words(hanging)}"
+        return "no anchor is down"
+
+    def _still_down(self) -> str | None:
+        """What work on an anchor down needs still true as it is taken up after lying held
+        (`Script.standing`): the anchor it works still down, which its own going never changes
+        and the world does (a cable parted while the work lay held, `physics.anchor`). In the
+        beginning's words (`_worked`): no anchor down, or the anchor's state and the one she
+        rides by. None while it is down, or before the work has an anchor."""
+        if self.anchor is None or self.anchor.down:
+            return None
+        riding = self.tackle.riding_by()
+        if riding is None:
+            return self._none_down()
+        return _not_down(self.anchor, riding)
 
     def _veer(self, dt: float, factor: float, target_m: float, rate_key: str) -> bool:
         """The cable veered toward `target_m` at the file's rate; True when there."""
@@ -7451,6 +7484,16 @@ class VeerCableScript(_AnchorScript):
         self.target = min(self.target, whole)
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the anchor it veers on still down (`_still_down`), refused in the
+        beginning's words; the scope and its target are the beginning's plan, which the veer's
+        own going makes false and is not read again. A veer held by a post's leaving, its anchor
+        lost while it lay held, veered the lost anchor's cable to the target when it was taken up
+        ("Veered to fifty-six fathoms on the best bower.", the lead's last list of 2026-11-14, 8;
+        cda12ec9, which read the whole check again, refused it in these words)."""
+        why = self._still_down()
+        return f"{why} to veer on" if why == "no anchor is down" else why
+
     def begin(self, words: dict[str, Any]) -> None:
         self.phase = "veer"
 
@@ -7776,6 +7819,20 @@ class CatAndFishScript(_AnchorScript):
             return f"{self.anchor.name} is {self.anchor.state.value}"
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until it is catted and fished at its end: the anchor still hanging at the bows, aweigh
+        or catted (its own going takes it from the one to the other), refused in the beginning's
+        words where it is not (let go again while the work lay held: the lead's last list of
+        2026-11-14, 8)."""
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and self.anchor.state not in (
+            AnchorState.AWEIGH,
+            AnchorState.CATTED,
+        ):
+            return f"{self.anchor.name} is {self.anchor.state.value}"
+        return None
+
     def begin(self, words: dict[str, Any]) -> None:
         from freesail.ship.parts import AnchorState
 
@@ -7822,6 +7879,19 @@ class BackAnchorScript(_AnchorScript):
         if self.stream is None:
             return "she carries no stream anchor"
         if self.stream.state is not AnchorState.STOWED:
+            return f"the stream anchor is {self.stream.state.value}"
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until the stream goes down at its end: the anchor it backs still down (its cable not
+        parted while the work lay held) and the stream still at the bows, refused in the
+        beginning's words (the lead's last list of 2026-11-14, 8)."""
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and not self.anchor.down:
+            riding = self.tackle.riding_by()
+            return "no anchor is down to back" if riding is None else _not_down(self.anchor, riding)
+        if self.stream is not None and self.stream.state is not AnchorState.STOWED:
             return f"the stream anchor is {self.stream.state.value}"
         return None
 
@@ -8818,6 +8888,39 @@ class LayOutKedgeScript(_AnchorScript):
         pace = units.knots_to_ms(self.timing_value("boat_pace_kn", 4.0))
         self.pull_s = self.out_m / max(pace, 0.1)
         return None
+
+    # the phases before the kedge is let go from the boat (at the end of `pull_out`)
+    BEFORE_LET_GO = ("ready", "hoist_out", "sling", "pull_out")
+    # the phases with the boat alongside, hoisting out or in (deck work)
+    ALONGSIDE = ("hoist_out", "sling", "hoist_in")
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until the kedge is let go from the boat: the kedge still in the ship, and a bottom here
+        to lay it in (she may drift while the work lies held: her cable parted), refused in the
+        beginning's words (the lead's last list of 2026-11-14, 8). The boat away with it and the
+        hawser's length are the beginning's, which its own going makes so; once the kedge is let
+        go nothing of its beginning stands, the boat pulling back and hoisted in."""
+        from freesail.ship.parts import AnchorState
+
+        if self.phase not in self.BEFORE_LET_GO or self.anchor is None:
+            return None
+        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+            return f"the kedge is {self.anchor.state.value}"
+        if _water_depth(self.ship) is None:
+            return "no bottom here to lay a kedge in"
+        return None
+
+    def belayed(self) -> None:
+        """Belayed, or refused as it is taken up, with the boat alongside (hoisting out, the kedge
+        slinging, hoisting in): the boat is in the ship again and free, not left away on an errand
+        nobody runs on (the lead's last list of 2026-11-14, 8: before it the boat's state stayed
+        'hoisting out' for good, and every kedge after was refused, "the long-boat is away").
+        Away from her side the boat is left as she is."""
+        if self.ports is None or self.phase not in self.ALONGSIDE:
+            return
+        from freesail.world.ports import BoatState
+
+        self.ports.boat = BoatState(boat_id=self.ports.boat.boat_id, boat_name=self.boat_name)
 
     def begin(self, words: dict[str, Any]) -> None:
         from freesail.world.ports import BoatState

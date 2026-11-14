@@ -1231,10 +1231,7 @@ class Runner:
         were)."""
         assert inst.evo.on_refused is not None
         self._remove(ship, inst)
-        said = reason.strip()
-        if len(said) > 1 and said[0].isupper() and said[1].islower():
-            said = said[0].lower() + said[1:]  # it follows a colon
-        self._note(ship, inst, inst.evo.on_refused, reason=said)
+        self._note(ship, inst, inst.evo.on_refused, reason=_after_a_colon(reason))
         key = inst.params.get("log_group")
         if key:
             self._group_done(ship, inst, key)
@@ -1886,11 +1883,18 @@ class Runner:
         # on a yard that has since been sent down (package 19's finding). What the work's
         # beginning read (a script's own check: the kedge's boat in the ship, the veer's scope
         # and its target from it) is not read again: the work is taken up where it stood, not
-        # begun again (the lead's (C1) of 2026-11-14; `_failing_condition`'s `begun`).
+        # begun again (the lead's (C1) of 2026-11-14; `_failing_condition`'s `begun`). What
+        # must still be true is read instead (the file's `requires` and the script's own
+        # `Script.standing`), and failing it the work is refused in words and never run on (the
+        # lead's last list of 2026-11-14, 8: a veer held, its anchor lost, veered the lost
+        # anchor's cable "to fifty-six fathoms"); what the script holds that would outlive it is
+        # let go as at the captain's belay (`Script.belayed`: the kedge's boat alongside).
         reason = self._failing_condition(ship, inst, inst.evo.requires, begun=True)
         if reason is not None:
             hands.release(crew, inst.inst_id)
-            self._fail(ship, inst, reason)
+            if inst.script is not None:
+                inst.script.belayed()
+            self._fail(ship, inst, _after_a_colon(reason))
             return
         inst.paused = False
         inst.held_by = None
@@ -1981,6 +1985,10 @@ class Runner:
             "tack": ship.dyn.tack,
             "heading": units.format_heading(ship.dyn.heading),
             "speed": units.format_speed(ship.dyn.speed),
+            # the work's name in both forms, from the one road, for a line of a script's own that
+            # names its work (the send-down's "take it in before striking topmasts")
+            "doing": self._doing(inst),
+            "work": self._describe(inst),
         }
         if isinstance(subject, Sail):
             ctx["state"] = subject.describe_state()
@@ -2032,24 +2040,13 @@ class Runner:
         return f"the {part_name(self.ship, inst.subject_id)}"
 
     def _doing(self, inst: Instance) -> str:
-        """The work in hand: 'setting the fore topsail', 'tacking ship', and for work whose file
-        names it (`registry.Evolution.doing`) that name: 'laying out the kedge', where the verb's
-        gerund was the id with an ending, 'laying out kedge' (the lead's (C8) of 2026-11-14); for
-        a part's work the file's words before the part's name, 'cutting away the main mast' where
-        it was 'cutting away mast the main mast' (the whole-change review of 80e703c7,
-        sailing-5). The file's words are read from the registry by the work's id, so that work in
-        a checkpoint written before a file named it is named as the file names it now (engine-3:
-        a boat called on the trunk was 'sending boat', which the lookout's glass no longer read).
-        Every reader of the work in hand's name reads it here: the belayed lines, the captain's
-        belay and its listing, the work the rest are at, the readings."""
-        evo = registry.get(inst.evo.id) or inst.evo
-        doing = getattr(evo, "doing", None)
-        if doing and isinstance(inst.subject, Ship):
-            return doing
-        if doing:
-            return f"{doing} the {part_name(self.ship, inst.subject_id)}"
-        first, _, rest = self._describe(inst).partition(" ")
-        return f"{gerund(first)} {rest}".strip()
+        """The work in hand, the gerund of its words (`_describe`, the one road): 'setting the fore
+        topsail', 'tacking ship', 'laying out the kedge', 'backing and filling', 'cutting away the
+        main mast'. Every reader of the work in hand's name reads it here: the belayed lines, the
+        captain's belay and its listing, the work the rest are at, the conn's line, a party
+        refused, the guns robbed at quarters, the pipe-down refused, the readings, the console's
+        crew state and the lookout's glass (the lead's (C8) of 2026-11-14)."""
+        return gerund_words(self._describe(inst))
 
     def _other_work(self, inst: Instance) -> str:
         """The other work that has hands, for the log: 'setting the main topsail and the
@@ -2076,14 +2073,26 @@ class Runner:
         return _and(phrases, comma=True)
 
     def _describe(self, inst: Instance) -> str:
-        subject = inst.subject
-        name = (
-            inst.subject_id if isinstance(subject, Ship) else part_name(self.ship, inst.subject_id)
-        )
-        verb = inst.evo.verb.replace("_", " ")
-        if isinstance(subject, Ship):
-            return f"{verb} ship" if verb in ("tack", "wear") else verb
-        return f"{verb} the {name}"
+        """The work in words, as an order to it is given: the one road for a work's name, whose
+        gerund is the work in hand (`_doing`), read wherever a line names the work the hands are
+        wanted for: the call for all hands ("All hands! (to send the boat)"), the waiting line
+        ("Not hands enough on deck to let go the anchor"), the short line ("Only four hands to veer
+        the cable"; `_target`), and the work that follows ("'Lay out the kedge' will follow 'veer
+        the cable'"). Its words are the file's (`registry.Evolution.work`: "veer the cable", "tack
+        ship"; for a part's work the words before the part's name, "cut away" the main mast),
+        else the verb's own ("batten down", "set" the fore topsail). The file is read from the
+        registry by the work's id, so that work in a checkpoint written before a file named it is
+        named as the file names it now (the whole-change review of 80e703c7, engine-3: a boat
+        called on the trunk was 'sending boat', which the lookout's glass no longer read).
+        Before the lead's last list of 2026-11-14 (9) the file's words were the gerund's alone and
+        this read the verb, so that the lines it serves named the work by its id ("Only four
+        hands to veer cable", "All hands! (to lie a try)", "Not hands enough on deck to cut away
+        mast the main mast"), and the tack and the wear had a rule of their own here."""
+        evo = registry.get(inst.evo.id) or inst.evo
+        head = getattr(evo, "work", None) or evo.verb.replace("_", " ")
+        if isinstance(inst.subject, Ship):
+            return head
+        return f"{head} the {part_name(self.ship, inst.subject_id)}"
 
     def _remaining_s(self, inst: Instance) -> float:
         if inst.script is not None:
@@ -2136,6 +2145,42 @@ def gerund(verb: str) -> str:
     ):
         return v + v[-1] + "ing"
     return v + "ing"
+
+
+def gerund_words(words: str) -> str:
+    """A work's words as an order gives them made the work in hand: its verb's gerund, and a
+    second verb's joined to it by 'and' ('veer the cable' -> 'veering the cable', 'back and fill'
+    -> 'backing and filling', 'cat and fish the anchor' -> 'catting and fishing the anchor',
+    'set up the rigging' -> 'setting up the rigging'). The one road's second form
+    (`Runner._doing`), so that a file names its work once (`registry.Evolution.work`)."""
+    parts = words.split(" ")
+    if not parts or not parts[0]:
+        return words
+    parts[0] = _verb_gerund(parts[0])
+    if len(parts) >= 3 and parts[1] == "and":
+        parts[2] = _verb_gerund(parts[2])
+    return " ".join(parts)
+
+
+def _verb_gerund(verb: str) -> str:
+    """A work's verb made its gerund (`gerund`), where a verb of one syllable in -ing, alone or
+    the last of a compound, is a verb and not a gerund already: 'goose-wing' -> 'goose-winging'
+    (`gerund` keeps it as it is, its -ing read as the gerund's)."""
+    stem = verb.rsplit("-", 1)[-1].lower()
+    if stem.endswith("ing") and not any(c in "aeiou" for c in stem[:-3]):
+        return verb.lower() + "ing"
+    return gerund(verb)
+
+
+def _after_a_colon(reason: str) -> str:
+    """A reason written to stand as a sentence ("The jib is blown out; ..."), set after the
+    colon of a line ("Could not trim the jib sheet: the jib is blown out; ..."): its first letter
+    lowered where its second is lower (a word, not an initialism such as 'HMS'). The refused
+    line's rule (`_refused`), read by the taking up's too (`_try_resume`)."""
+    said = reason.strip()
+    if len(said) > 1 and said[0].isupper() and said[1].islower():
+        said = said[0].lower() + said[1:]
+    return said
 
 
 def _at_quarters(ship: Ship) -> bool:

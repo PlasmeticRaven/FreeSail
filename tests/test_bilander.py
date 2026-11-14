@@ -2454,9 +2454,10 @@ def test_at_nine_her_master_hauls_at_the_boats_falls_and_stays_aboard_when_she_g
     out to her pull back, and now the kedge's boat alike). Package 109's Torbay world at anchor,
     04:10, at nine, her larboard watch by night: the boat sent for the prices, or a kedge laid out
     to the east, is begun by the watch's three and the master hoisting her out ("Only four hands
-    to send boat"); on the tick after she leaves the side the master is off the work, aboard, and
-    she goes on with the three, never held away from the ship: landed at the quay at +1,567 s, as
-    before; the kedge laid out at +2,274 s, hoisted in by three. Old (d6a88e2e): the master went
+    to send the boat", "to send boat" before the lead's last list of 2026-11-14, 9); on the tick
+    after she leaves the side the master is off the work, aboard, and she goes on with the three,
+    never held away from the ship: landed at the quay at +1,567 s, as before; the kedge laid out
+    at +2,274 s, hoisted in by three. Old (d6a88e2e): the master went
     away in her, their hand at the quay while their person stood on the quarterdeck, and in the
     kedge's boat to her hoisting in, laid out at +1,986 s."""
     from tests.test_mends_109 import _anchored_bilander
@@ -2777,10 +2778,11 @@ def test_her_boat_waiting_behind_all_hands_work_with_her_watch_at_the_pumps_is_m
     `Runner._calls_for_itself`, asked in both places. Package 109's Torbay world at anchor, 02:10
     and her larboard watch given the deck, at nine, a seam started forward and water in the well:
     "man the pumps" (the larboard's three at the brakes) and "heave short" (all hands); the boat
-    ordered 5 s on waits for the heave ("Not hands enough on deck to send boat; the watch is
+    ordered 5 s on waits for the heave ("Not hands enough on deck to send the boat; the watch is
     heaving short."). Hove short at +957 s: the boat is manned on the hands up that tick ("Only
-    four hands to send boat"), and the hands are piped down once she is, one call and one
-    pipe-down. Old
+    four hands to send the boat"), and the hands are piped down once she is, one call and one
+    pipe-down. The work's words in these lines by the one road (the lead's last list of
+    2026-11-14, 9; "to send boat" at 20a8e2e3, the evolution's id). Old
     (53c14457): piped down at +957 s and on that tick "All hands! (to send boat)" again (the deck's
     count of four with the master enough, her request with the three at the pumps too few), the
     boat begun at +1,048 s on the second call."""
@@ -2810,7 +2812,7 @@ def test_her_boat_waiting_behind_all_hands_work_with_her_watch_at_the_pumps_is_m
     (hove,) = [t for t, kind, _ in lines if kind == "cable.hove_short"]
     assert calls == [(1, "All hands! (to heave short)")], calls
     assert abs(hove - 957) <= 10 and piped == [hove], (hove, piped)
-    said = "Only four hands to send boat; there are no more on deck."
+    said = "Only four hands to send the boat; there are no more on deck."  # 20a8e2e3: "send boat"
     assert (hove, "evolution.short_handed", said) in lines, lines
     assert begun and begun[0].tick - start == hove
 

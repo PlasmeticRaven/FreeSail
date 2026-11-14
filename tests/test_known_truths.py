@@ -18031,10 +18031,14 @@ def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_come
 def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
     """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
     the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
-    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    the boat ("All hands! (to send the boat)"), she is manned, the hands are piped down and she
     is away within ten minutes, where on the trunk she waited until the watch changed at
     06:00; and a person in the boat that has not left the ship's side belays her, and is
-    on deck again."""
+    on deck again. The call's words, old beside new: "All hands! (to send boat)" to "All hands!
+    (to send the boat)" (package 75, the lead's last list of 2026-11-14, 9: the line that names
+    the work the hands are wanted for named it by its evolution's id; one road now names the
+    work in both forms, the work's file's words, `Runner._describe`); its kinds, ticks and counts
+    as before."""
     w = _channel_east("data/ships/bilander.yaml")
     w.submit("let go the anchor")
     w.run(7800)

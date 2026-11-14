@@ -26,7 +26,6 @@ params:
   clear_away: false
   what: topmasts
   verb_words: strike
-  doing: striking the topmasts
   first: send down the topgallant masts
   aloft: [yards, mast]
 timing:

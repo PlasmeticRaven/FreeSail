@@ -23,8 +23,18 @@ held. **(C7).** A post taken off by all hands called, at the sight and sent for,
 work's end; the old mark of package 109's road on a world written on the trunk, loaded and sailed
 on.
 
+**The lead's last list of 2026-11-14, 8: what must still be true.** (C1)'s mend read the beginning's
+check no more on a taking up, and what of it stands through the work was stated for three scripts
+alone (`Script.standing`), so held work was taken up after the world had moved under it: a veer
+held by the master going below, its anchor lost, veered the lost anchor's cable to fifty-six
+fathoms. Every script a post can hold now states it, in its script or its file's `requires`, or is
+named with the reason nothing in the world makes its beginning false while it lies held; the test at
+that level holds each, moves the world and takes it up: refused in words, never run. **9: one road
+for a work's words.** The file names its work once (`work:`), and both forms of its name are made
+from it, read wherever a line names work; no line names a work by its evolution's id.
+
 The figures are measured on the owner's machine (Windows 11, 2026-11-14) at seed 7; old is
-53c14457, the branch before these mends.
+53c14457, the branch before these mends, and 20a8e2e3 for the last list's two.
 """
 
 from __future__ import annotations
@@ -67,6 +77,17 @@ BOAT_CALLED_TRUNK = [
         "ashore.",
     ),
 ]
+# The one of them said after the save that names the work the hands are wanted for, by the one road
+# for a work's words since the lead's last list of 2026-11-14 (9): the trunk's and 20a8e2e3's named
+# it by its evolution's id ("to send boat"), the file's words now ("to send the boat"); every tick,
+# kind and other word as on the trunk. The call ("All hands! (to send boat)") was said on the trunk
+# before the save was written, and is logged on the first tick as it was said (the ship's notes kept
+# in the save).
+BOAT_WORDS_MOVED = {
+    "Only four hands to send boat; there are no more on deck.": (
+        "Only four hands to send the boat; there are no more on deck."
+    ),
+}
 QUIET = ("evolution.step", "wind.gust", "clock.bell")
 
 
@@ -82,9 +103,14 @@ def _lines(world, n: int, start: int) -> list[tuple[int, str, str]]:
 
 
 def _subject(ship, cls: str):
-    """The first part of `ship` an evolution of `cls` applies to, or the ship herself."""
+    """The first part of `ship` an evolution of `cls` applies to, or the ship herself; a sail of the
+    class before a spar of it (a gaff sail for `trim_gaff_sheet`, not the gaff it is bent to: its
+    file's `requires` read the sail since the lead's last list of 2026-11-14, 8)."""
     if cls == "ship":
         return ship, ship.name
+    for sail in ship.sails.values():
+        if sail.cls == cls:
+            return sail, sail.id
     for part in ship.parts.values():
         fits = {
             "sail": isinstance(part, Sail),
@@ -130,6 +156,9 @@ def test_every_scripted_work_held_and_taken_up_again_never_reads_its_beginning_a
             if subject is not None:
                 break
         assert subject is not None, eid
+        if any(c.text == "sail.state == set" for c in evo.requires):
+            # what holds through a trim, its file's `requires` since the last list's 8: its sail set
+            subject.state = SailState.SET
         runner, crew = ship.extra["evolutions"], ship.extra["crew"]
         params = dict(evo.params)
         inst = Instance(evo=evo, subject=subject, subject_id=sid, params=params)
@@ -532,7 +561,9 @@ def test_the_old_mark_of_the_boats_call_loads_from_a_trunk_save_and_she_sails_as
     with her eight (no watch for her posts to head) and the boat held up for the hands called, the
     mark read as this road's (`Instance.__setstate__`) and gone from her params; sailed 1,200 s on,
     she gives the trunk's own lines for the same 1,200 s from the same world, line for line: all
-    hands, the boat manned by four, the hands piped down at once, the long-boat away at +401 s."""
+    hands, the boat manned by four, the hands piped down at once, the long-boat away at +401 s; the
+    short line, said after the save, names the work in its words by the one road
+    (`BOAT_WORDS_MOVED`, the lead's last list of 2026-11-14, 9), the trunk's id gone from it."""
     header, world = replay.read_checkpoint(BOAT_CALLED)
     crew = world.ship.extra["crew"]
     assert len(crew.sailors) == 8 and not getattr(crew, "post_watches", None)
@@ -540,170 +571,675 @@ def test_the_old_mark_of_the_boats_call_loads_from_a_trunk_save_and_she_sails_as
     assert boat.held_up and boat.waiting and "hands_called_for" not in boat.params
     n, start = len(world.log), world.clock.tick
     world.run(1200)
-    assert _lines(world, n, start) == BOAT_CALLED_TRUNK
+    assert _lines(world, n, start) == [
+        (t, kind, BOAT_WORDS_MOVED.get(text, text)) for t, kind, text in BOAT_CALLED_TRUNK
+    ]
     assert json.dumps(header["build"])  # written by another build than this
 
 
-# -- (C8): the works by their names ----------------------------------------------------------------
+# -- (C8) and the last list's 9: the works by their names, in both forms, by one road --------------
 
-# Every work whose subject is the ship, by the name the log gives it in hand (`Runner._doing`):
-# the belayed lines, the captain's belay and its listing, the work the rest are at, the readings.
-# Those named by their files (`doing:`) are marked; the rest are their verb's own gerund.
-SHIP_WORK_NAMES = {
-    "back_anchor": "backing the anchor",  # file
-    "back_and_fill": "backing and filling",  # file
-    "batten_down": "battening down",
-    "box_off": "boxing off",
-    "boxhaul": "boxhauling",
-    "cast_loose_guns": "casting loose the guns",  # file
-    "cat_and_fish_anchor": "catting and fishing the anchor",  # file
-    "clear_for_action": "clearing for action",
-    "come_to_anchor": "coming to anchor",
-    "cross_topgallant_yards": "crossing topgallant yards",
-    "fid_topmasts": "fidding topmasts",
-    "fill_away": "filling away",
-    "fother_sail": "fothering a sail over the leak",  # file
-    "furl_all": "furling all sail",  # file
-    "get_under_way": "getting under way",
-    "grapple": "grappling",
-    "haul_lines": "hauling the lines",
-    "haul_nets": "hauling the nets",
-    "haul_seine": "hauling the seine",
-    "haul_trawl": "hauling the trawl",
-    "heave_deep_sea_lead": "heaving the deep-sea lead",  # file
-    "heave_in": "heaving in",
-    "heave_lead": "heaving the lead",  # file
-    "heave_log": "heaving the log",  # file
-    "heave_mark": "heaving a mark",  # file
-    "heave_short": "heaving short",
-    "heave_to": "heaving to",
-    "jury_mast": "rigging a jury mast",  # file
-    "lay_out_kedge": "laying out the kedge",  # file
-    "let_go_anchor": "letting go the anchor",  # file
-    "lie_a_try": "lying a-try",  # file
-    "loose_sails_to_dry": "loosing sails to dry",
-    "make_signal": "making the signal",  # file
-    "moor": "mooring",
-    "plug_shot_hole": "plugging the shot holes",  # file
-    "rig_preventers": "rigging preventers",
-    "scud": "scudding",
-    "secure_guns": "securing the guns",  # file
-    "send_boat": "sending the boat",  # file
-    "send_down_topgallant_masts": "sending down topgallant masts",
-    "send_down_topgallant_yards": "sending down topgallant yards",
-    "serve_small_arms": "serving small arms",
-    "set_lines": "setting the lines",
-    "set_up_rigging": "setting up the rigging",  # file
-    "shoot_nets": "shooting the nets",
-    "shoot_seine": "shooting the seine",
-    "shoot_trawl": "shooting the trawl",
-    "strike_topmasts": "striking topmasts",
-    "sway_up_topgallant_masts": "swaying up topgallant masts",
-    "tack": "tacking ship",
-    "take_lunar": "taking a lunar",  # file
-    "unmoor": "unmooring",
-    "veer_cable": "veering the cable",  # file
-    "wear": "wearing ship",
-    "wear_short_round": "wearing short round",
-    "weigh_anchor": "weighing anchor",
+# Every work whose subject is the ship in both forms of its name: as an order to it is given, the
+# words a line gives where it names the work the hands are wanted for ("All hands! (to send the
+# boat)", "Not hands enough on deck to let go the anchor", "Only four hands to veer the cable"),
+# and the gerund made from them, the work in hand ("Belayed laying out the kedge: ..."). Those
+# whose file names the work (`work:`) are marked; the rest are their verb's own words.
+SHIP_WORK_WORDS = {
+    "back_anchor": ("back the anchor", "backing the anchor"),  # file
+    "back_and_fill": ("back and fill", "backing and filling"),  # file
+    "batten_down": ("batten down", "battening down"),
+    "box_off": ("box off", "boxing off"),
+    "boxhaul": ("boxhaul", "boxhauling"),
+    "cast_loose_guns": ("cast loose the guns", "casting loose the guns"),  # file
+    "cat_and_fish_anchor": ("cat and fish the anchor", "catting and fishing the anchor"),  # file
+    "clear_for_action": ("clear for action", "clearing for action"),
+    "come_to_anchor": ("come to anchor", "coming to anchor"),
+    "cross_topgallant_yards": ("cross topgallant yards", "crossing topgallant yards"),
+    "fid_topmasts": ("fid topmasts", "fidding topmasts"),
+    "fill_away": ("fill away", "filling away"),
+    "fother_sail": ("fother a sail over the leak", "fothering a sail over the leak"),  # file
+    "furl_all": ("furl all sail", "furling all sail"),  # file
+    "get_under_way": ("get under way", "getting under way"),
+    "grapple": ("grapple", "grappling"),
+    "haul_lines": ("haul the lines", "hauling the lines"),
+    "haul_nets": ("haul the nets", "hauling the nets"),
+    "haul_seine": ("haul the seine", "hauling the seine"),
+    "haul_trawl": ("haul the trawl", "hauling the trawl"),
+    "heave_deep_sea_lead": ("heave the deep-sea lead", "heaving the deep-sea lead"),  # file
+    "heave_in": ("heave in", "heaving in"),
+    "heave_lead": ("heave the lead", "heaving the lead"),  # file
+    "heave_log": ("heave the log", "heaving the log"),  # file
+    "heave_mark": ("heave a mark", "heaving a mark"),  # file
+    "heave_short": ("heave short", "heaving short"),
+    "heave_to": ("heave to", "heaving to"),
+    "jury_mast": ("rig a jury mast", "rigging a jury mast"),  # file
+    "lay_out_kedge": ("lay out the kedge", "laying out the kedge"),  # file
+    "let_go_anchor": ("let go the anchor", "letting go the anchor"),  # file
+    "lie_a_try": ("lie a-try", "lying a-try"),  # file
+    "loose_sails_to_dry": ("loose sails to dry", "loosing sails to dry"),
+    "make_signal": ("make the signal", "making the signal"),  # file
+    "moor": ("moor", "mooring"),
+    "plug_shot_hole": ("plug the shot holes", "plugging the shot holes"),  # file
+    "rig_preventers": ("rig preventers", "rigging preventers"),
+    "scud": ("scud", "scudding"),
+    "secure_guns": ("secure the guns", "securing the guns"),  # file
+    "send_boat": ("send the boat", "sending the boat"),  # file
+    "send_down_topgallant_masts": ("send down topgallant masts", "sending down topgallant masts"),
+    "send_down_topgallant_yards": ("send down topgallant yards", "sending down topgallant yards"),
+    "serve_small_arms": ("serve small arms", "serving small arms"),
+    "set_lines": ("set the lines", "setting the lines"),
+    "set_up_rigging": ("set up the rigging", "setting up the rigging"),  # file
+    "shoot_nets": ("shoot the nets", "shooting the nets"),
+    "shoot_seine": ("shoot the seine", "shooting the seine"),
+    "shoot_trawl": ("shoot the trawl", "shooting the trawl"),
+    "strike_topmasts": ("strike topmasts", "striking topmasts"),
+    "sway_up_topgallant_masts": ("sway up topgallant masts", "swaying up topgallant masts"),
+    "tack": ("tack ship", "tacking ship"),  # file
+    "take_lunar": ("take a lunar", "taking a lunar"),  # file
+    "unmoor": ("unmoor", "unmooring"),
+    "veer_cable": ("veer the cable", "veering the cable"),  # file
+    "wear": ("wear ship", "wearing ship"),  # file
+    "wear_short_round": ("wear short round", "wearing short round"),
+    "weigh_anchor": ("weigh anchor", "weighing anchor"),
 }
-
-
-def test_every_work_on_the_ship_is_named_by_its_name_where_the_log_names_the_work_in_hand():
-    """The lead's (C8) of 2026-11-14 at the cause's level: the log named the work in hand whose
-    subject is the ship by its evolution's verb with an ending, and the verb of many is its id
-    ("Belayed laying out kedge", "veering cable", "sending boat"). The name is now the file's own
-    where the verb's would not be one (`doing:`, `registry.Evolution.doing`), read in the one place
-    the work in hand is named (`Runner._doing`), so that every reader is served: the belayed
-    lines, the captain's belay and its listing, the work the rest are at, the readings and the
-    lookout's glass (`world.lookout._WORK_KINDS`: "sending the boat", a boat hoisting out or in).
-    Every such work of the registry is in `SHIP_WORK_NAMES`, none an id with an ending. The
-    infinitive the call, the waiting line and the short line give ("All hands! (to send boat)",
-    "Only four hands to send boat") is the verb's (`Runner._describe`), and stays: package 109's
-    truth 7-542 and its tests pin the call's words (the lead's ruling 10). Old (53c14457): the
-    twenty-one marked "file" named by their ids ("laying out kedge", "heaving lead", "lying a
-    try", "catting and fish anchor")."""
-    world = make_world(7, HER, Scenario())
-    runner = world.ship.extra["evolutions"]
-    named = {}
-    for eid, evo in sorted(registry.EVOLUTIONS.items()):
-        if str(evo.applies_to.get("class")) != "ship":
-            continue
-        inst = Instance(evo=evo, subject=world.ship, subject_id=world.ship.name, params={})
-        named[eid] = runner.doing(inst)
-    assert named == SHIP_WORK_NAMES
-    files = {
-        eid
-        for eid, evo in registry.EVOLUTIONS.items()
-        if evo.doing and str(evo.applies_to.get("class")) == "ship"
-    }
-    assert len(files) == 21 and all(
-        SHIP_WORK_NAMES[eid] == registry.get(eid).doing for eid in files
-    )
-    assert not [n for n in named.values() if "_" in n]
-    sail = Instance(
-        evo=registry.get("set_square"),
-        subject=world.ship.sails["fore.topsail"],
-        subject_id="fore.topsail",
-        params={},
-    )
-    assert runner.doing(sail) == "setting the fore topsail"  # a part's work: its verb and its part
-    with pytest.raises(registry.EvolutionFileError, match="the part is named after them"):
-        registry.parse_evolution(
-            {**_file_of("set_square"), "doing": "setting the sail"}, "set_square.yaml"
-        )
-
-
-# A part's work whose verb's gerund is no name (the whole-change review of 80e703c7, sailing-5): its
-# file's words before the part's name (`doing:`). Every other part's work is its verb and its part.
-PART_WORK_NAMES = {
-    "cut_away_mast": ("main.mast", "cutting away the main mast"),
-    "goose_wing": ("fore.course", "goose-winging the foresail"),
+SHIP_WORK_FILES = 23  # those marked "file"
+# A part's work whose verb is no name of it (the whole-change review of 80e703c7, sailing-5, and
+# the last list's 9): the words before the part's name in both forms, on the part named; and the
+# clearing of a wreck, which has no words of its own and is named by its verb ("cut away"), as the
+# lead's list has it. Every other part's work is its verb's own words and its part.
+PART_WORK_WORDS = {
+    "cut_away_mast": ("main.mast", "cut away the main mast", "cutting away the main mast"),
+    "goose_wing": ("fore.course", "goose-wing the foresail", "goose-winging the foresail"),
+    "clear_wreck": ("fore.mast", "cut away the fore mast", "cutting away the fore mast"),
 }
+PART_WORK_FILES = {"cut_away_mast", "goose_wing"}
 
 
-def test_every_work_on_a_part_is_named_by_a_name_where_the_log_names_the_work_in_hand():
-    """The whole-change review of 80e703c7, sailing-5: (C8)'s cause at every evolution, a part's
-    work among them. A part's work was named by its verb's gerund and its part, and where the verb
-    is the id ("cut_away_mast", "goose_wing") that read "cutting away mast the main mast" (newly
-    served by a post's leaving it: "Belayed cutting away mast the main mast: the master gone
-    below.") and "goosing wing the foresail". Now a part's file gives the words before its part
-    (`doing: cutting away`), read in the one place the work in hand is named (`Runner._doing`).
-    Every part's work of the registry, on the first part of its class in the bilander, the topsail
-    schooner or the 74, is named with no id's underscore and no verb of two words left as its id.
-    Old (80e703c7): the two above."""
-    worlds = [
+def _three_worlds():
+    return [
         make_world(7, f"data/ships/{stem}.yaml", Scenario())
         for stem in ("bilander", "topsail-schooner", "seventy-four")
     ]
+
+
+def _instance(world, eid: str):
+    """An instance of the evolution on a subject of its class in `world` (`PART_WORK_WORDS`' part
+    where it names one), made as `Runner.start` makes it: its script, its holds and its want."""
+    from freesail.crew import hands
+
+    ship = world.ship
+    runner = ship.extra["evolutions"]
+    evo = registry.get(eid)
+    if eid in PART_WORK_WORDS:
+        sid = PART_WORK_WORDS[eid][0]
+        subject = ship.parts[sid]
+    else:
+        subject, sid = _subject(ship, str(evo.applies_to.get("class")))
+    params = dict(evo.params)
+    inst = Instance(evo=evo, subject=subject, subject_id=sid, params=params)
+    runner._counter += 1
+    inst.order = runner._counter
+    if evo.script is not None:
+        inst.script = SCRIPTS[evo.script](ship, params, runner._timing(ship, evo))
+    inst.holds = runner._holds(ship, inst)
+    inst.want = hands.CrewRequest.from_mapping(runner._crew_line(ship, evo))
+    return inst
+
+
+def _world_for(worlds, eid: str):
+    evo = registry.get(eid)
+    if eid in PART_WORK_WORDS:
+        return worlds[0]
+    for w in worlds:
+        if _subject(w.ship, str(evo.applies_to.get("class")))[0] is not None:
+            return w
+    raise AssertionError(eid)
+
+
+def _words_of(world, eid: str, inst) -> tuple[str, str]:
+    """The work's two forms as this test pins them (`SHIP_WORK_WORDS`, `PART_WORK_WORDS`), and for
+    every other part's work its verb's words and its part."""
+    if eid in SHIP_WORK_WORDS:
+        return SHIP_WORK_WORDS[eid]
+    if eid in PART_WORK_WORDS:
+        return PART_WORK_WORDS[eid][1:]
+    from freesail.evolutions.runner import gerund_words, part_name
+
+    verb = registry.get(eid).verb.replace("_", " ")
+    to = f"{verb} the {part_name(world.ship, inst.subject_id)}"
+    return to, gerund_words(to)
+
+
+def _ids_left(text: str, eid: str, words: tuple[str, str]) -> list[str]:
+    """The ids a line names (the last list's 9): any underscore of an id, and the work's verb in
+    words (its file's id, where the two are one) where they are not its words, once its words in
+    both forms are taken out of the line ("veer cable" in "Only four hands to veer cable"; "cut
+    away mast" in "to cut away mast the main mast"; nothing of "heave to" in "Not hands enough on
+    deck to heave to", nor of "strike topmasts" in "Strike topmasts! Hook the top tackles.")."""
+    import re
+
+    verb = registry.get(eid).verb.replace("_", " ")
+    rest = text.lower()
+    for w in sorted(words, key=len, reverse=True):
+        rest = rest.replace(w.lower(), " ")
+    found = ["_"] if "_" in text else []
+    # a verb of one word is a word, and one in the work's own words is its own ("furl all sail")
+    if " " in verb and not any(verb in w for w in words):
+        if re.search(rf"\b{re.escape(verb)}\b", rest):
+            found.append(verb)
+    return found
+
+
+def test_every_work_is_named_by_one_road_in_both_forms_where_a_line_names_the_work():
+    """The lead's (C8) and the last list's 9 of 2026-11-14 at the cause's level: a work's words
+    lived in two places, the file's gerund (`doing:`, read for the work in hand) and the verb (read
+    for the infinitive a line gives where it names the work hands are wanted for), so that half the
+    lines named the work by its id. Now the file names it once, as an order to it is given
+    (`work:`), and both forms are made from that one road (`Runner._describe`, the infinitive, and
+    `Runner._doing` its gerund, `runner.gerund_words`). Every evolution of the registry, on the
+    first subject of its class in the bilander, the topsail schooner or the 74: whose subject is the
+    ship in both forms as `SHIP_WORK_WORDS` pins them, a part's work named as `PART_WORK_WORDS`
+    pins it or by its verb's own words, and none of either form an id. Old (20a8e2e3): the
+    infinitive the verb's, "veer cable", "let go anchor", "lay out kedge", "lie a try", "send boat",
+    "cut away mast the main mast", "goose wing the foresail"; the gerunds as now."""
+    worlds = _three_worlds()
     seen = {}
-    for eid, evo in sorted(registry.EVOLUTIONS.items()):
-        cls = str(evo.applies_to.get("class"))
-        if cls == "ship":
-            continue
-        for w in worlds:
-            subject, sid = _subject(w.ship, cls)
-            if subject is not None:
-                break
-        assert subject is not None, eid
-        if eid in PART_WORK_NAMES:
-            w, sid = worlds[0], PART_WORK_NAMES[eid][0]
-            subject = w.ship.parts[sid]
+    for eid in sorted(registry.EVOLUTIONS):
+        w = _world_for(worlds, eid)
+        inst = _instance(w, eid)
         runner = w.ship.extra["evolutions"]
-        words = runner.doing(Instance(evo=evo, subject=subject, subject_id=sid, params={}))
-        seen[eid] = words
-        assert "_" not in words, (eid, words)
-        verb = evo.verb.replace("_", " ")
-        if " " in verb:
-            assert f"{verb} " not in f"{words} " or evo.doing, (eid, words)  # an id with an ending
-    assert {eid: seen[eid] for eid in PART_WORK_NAMES} == {
-        eid: name for eid, (_part, name) in PART_WORK_NAMES.items()
-    }
-    files = {eid for eid, evo in registry.EVOLUTIONS.items() if evo.doing}
-    assert files - set(SHIP_WORK_NAMES) == set(PART_WORK_NAMES)
+        got = (runner._describe(inst), runner.doing(inst))
+        seen[eid] = got
+        assert got == _words_of(w, eid, inst), (eid, got)
+        assert _ids_left(" / ".join(got), eid, _words_of(w, eid, inst)) == [], (eid, got)
+    ship_works = {e for e, v in registry.EVOLUTIONS.items() if v.applies_to.get("class") == "ship"}
+    assert ship_works == set(SHIP_WORK_WORDS)
+    # a part's work not pinned is named by a verb that is not its id of more than one word
+    for eid in set(registry.EVOLUTIONS) - ship_works - set(PART_WORK_WORDS):
+        assert "_" not in eid or registry.get(eid).verb != eid, eid
+    files = {e for e, ev in registry.EVOLUTIONS.items() if getattr(ev, "work", None)}
+    assert len(files - PART_WORK_FILES) == SHIP_WORK_FILES and PART_WORK_FILES <= files
+    assert seen["clear_wreck"] == ("cut away the fore mast", "cutting away the fore mast")
+
+
+def test_no_line_that_names_a_work_names_it_by_its_id():
+    """The last list's 9 of 2026-11-14: the sweep of every evolution's served lines for an id. For
+    every evolution of the registry, on the first subject of its class in the bilander, the topsail
+    schooner or the 74, every line the runner serves that names the work, made by the runner's own
+    roads: the waiting line (`_waiting_line`), the short line (`_note_short`), the belayed line
+    (`_hold`), the call for all hands (`_call_all_hands`, piped down after), the work that follows
+    another (`Runner.start` behind a work holding what it holds), and the work in hand as the
+    readings and the console give it (`Runner.doing`); and every line of its own file (its
+    outcomes, its states' lines, its steps' lines and its conditions' reasons). Each names the work
+    in its words, both forms by the one road, and none names an id: no underscore of an id, and no
+    id or verb in words that are not the work's own. Old (20a8e2e3): "Only four hands to veer
+    cable", "Not hands enough on deck to let go anchor", "All hands! (to lie a try)", "'Lay out
+    kedge' will follow ...", "Not hands enough on deck to cut away mast the main mast", "Could not
+    veer cable: ..." (the veer's own file), and their like for every work whose file names it."""
+    from freesail.crew import hands
+    from freesail.evolutions.runner import part_name
+
+    worlds = _three_worlds()
+    bad: dict[str, list[tuple[str, list[str]]]] = {}
+    unnamed: dict[str, list[str]] = {}
+    for eid in sorted(registry.EVOLUTIONS):
+        w = _world_for(worlds, eid)
+        ship = w.ship
+        runner, crew = ship.extra["evolutions"], ship.extra["crew"]
+        routine = ship.extra["routine"]
+        inst = _instance(w, eid)
+        to, ing = _words_of(w, eid, inst)
+        on_the_ship = isinstance(inst.subject, type(ship))
+        ship.drain_notes()
+        got = hands.Assignment(inst.inst_id, wanted=7, available=2)
+        named = [(runner._waiting_line(ship, inst, got), to)]
+        got.hands = list(crew.sailors[:2])
+        runner._note_short(ship, inst, got)
+        runner._hold(ship, crew, inst, "stations for wearing ship", {"for": "wear"})
+        runner._call_all_hands(ship, inst, crew)
+        routine.pipe_down()
+        said = {kind: text for _, kind, text, _, _ in ship.drain_notes()}
+        short = said["evolution.short_handed"]
+        named += [
+            (short, to if on_the_ship else f"to the {part_name(ship, inst.subject_id)}"),
+            (said["evolution.belayed"], ing),
+            (said["crew.all_hands"], to),
+            (runner.doing(inst), ing),
+        ]
+        if inst.holds:
+            from freesail.evolutions.runner import Instance as _I
+
+            blocker = _I(
+                evo=registry.get("batten_down"), subject=ship, subject_id=ship.name, params={}
+            )
+            blocker.holds, blocker.waiting = set(inst.holds), False
+            runner.instances.append(blocker)
+            follows = runner.start(ship, eid, inst.subject_id, dict(registry.get(eid).params))
+            runner.instances[:] = [i for i in runner.instances if i is not blocker]
+            runner.instances[:] = [i for i in runner.instances if i.evo.id != eid]
+            named.append((follows, to))
+        for text, words in named:
+            if words.lower() not in text.lower():
+                unnamed.setdefault(eid, []).append(text)
+            left = _ids_left(text, eid, (to, ing))
+            if left:
+                bad.setdefault(eid, []).append((text, left))
+        for text in _file_lines(registry.get(eid)):
+            left = _ids_left(_unbraced(text), eid, (to, ing))
+            if left:
+                bad.setdefault(eid, []).append((text, left))
+    assert bad == {}, bad
+    assert unnamed == {}, unnamed
+
+
+def _unbraced(text: str) -> str:
+    import re
+
+    return re.sub(r"\{[^}]*\}", "", text)
+
+
+def _file_lines(evo) -> list[str]:
+    """Every line of an evolution's own file: its outcomes and their states' lines, its steps'
+    lines and its conditions' reasons, as written ({sail} and its like unfilled)."""
+    out = []
+    for name in ("on_start", "on_complete", "on_fail", "on_refused"):
+        o = getattr(evo, name)
+        if o is not None:
+            out += [o.log, *o.from_state.values()]
+    out += [s.log for s in evo.steps if s.log]
+    out += [c.reason for c in evo.preconditions + evo.requires]
+    return [t for t in out if t]
+
+
+def test_a_files_old_key_for_the_gerund_is_refused_in_words():
+    """The last list's 9: the work is named once in its file (`work:`), and the gerund's old key
+    (`doing:`, a second source of the same words) is refused in words, so that no file names its
+    work twice; a part's work gives the words before its part."""
+    with pytest.raises(registry.EvolutionFileError, match="the work is named once"):
+        registry.parse_evolution({**_file_of("veer_cable"), "doing": "veering the cable"}, "x.yaml")
+    with pytest.raises(registry.EvolutionFileError, match="the part is named after them"):
+        registry.parse_evolution(
+            {**_file_of("set_square"), "work": "set the sail"}, "set_square.yaml"
+        )
 
 
 def _file_of(eid: str) -> dict:
     import yaml
 
     return yaml.safe_load((Path(registry.DATA_DIR) / f"{eid}.yaml").read_text(encoding="utf-8"))
+
+
+# -- the last list's 8: held work taken up after the world has moved under it --------------------
+
+# The Torbay world's merchant brig (a stream anchor, a kedge, her master and mate working with the
+# watch), the best bower let go and 600 s on, checkpointed once; the bilander (her settee, a lug)
+# and the 74 (her mizen lateen) in the default scenario, for the trims of their sails.
+BRIG = "data/ships/merchant-brig.yaml"
+
+
+@pytest.fixture(scope="module")
+def standing_worlds(tmp_path_factory):
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+    from tests.test_mends_109 import TORBAY
+
+    d = tmp_path_factory.mktemp("standing")
+    w = make_scenario_world(load_scenario(TORBAY), ship=BRIG)
+    w.submit("let go the anchor")
+    w.run(600)
+    out = {"brig": replay.write_checkpoint(w, d / "brig.checkpoint")}
+    for key, stem in (("bilander", "bilander"), ("74", "seventy-four")):
+        out[key] = replay.write_checkpoint(
+            make_world(7, f"data/ships/{stem}.yaml", Scenario()), d / f"{key}.checkpoint"
+        )
+    return out
+
+
+def _anchor(ship, name: str):
+    return next(a for a in _tackle(ship).anchors if a.name == name)
+
+
+def _lost(anchor) -> None:
+    """The cable parted as the physics parts it (`physics.anchor`): the anchor on the bottom with
+    its buoy, the cable's load gone."""
+    from freesail.ship.parts import AnchorState
+
+    anchor.state = AnchorState.LOST
+    anchor.cable_load_kn = 0.0
+    anchor.taut = anchor.dragging = False
+
+
+def _set_sail(world, sid):
+    world.ship.sails[sid].state = SailState.SET
+
+
+def _nothing(world, sid):
+    return None
+
+
+def _hoisted(world, sid):
+    from freesail.world.signals import NOT_YET, Hoist, locker_of
+
+    h = locker_of(world.ship).hoist(
+        Hoist(book="numerary", meaning="test", by="the ship", since=0, breaks_out=NOT_YET)
+    )
+    return {"hoist_key": h.key, "hoists": 1, "words": "the signal"}
+
+
+def _aweigh(world, sid):
+    from freesail.ship.parts import AnchorState
+
+    _anchor(world.ship, "the small bower").state = AnchorState.AWEIGH
+
+
+def _off_soundings(world) -> None:
+    """She has drifted off soundings while the work lay held: the water's depth as the World keeps
+    it (`World._tick_tide`, once a minute from the chart), none."""
+    world.ship.extra["water_depth_m"] = None
+    world._tick_tide = lambda: None
+
+
+def _sheet_parted(world, sid) -> None:
+    from freesail.ship.parts import LineState
+
+    sail = world.ship.sails[sid]
+    world.ship.sheets_of(sail)[0].state = LineState.PARTED
+
+
+# Every script a post can hold whose beginning the world can make false while it lies held, each
+# with the world moved so that what must still be true is not, and the line its taking up says:
+# (script's evolution, the move): (world, subject or None for the ship, what readies the world for
+# its beginning and gives its params, the move, the line, what its running on would have done).
+def _scope(world):
+    return _anchor(world.ship, "the best bower").scope_m
+
+
+STANDS = {
+    ("veer_cable", "the anchor lost"): (
+        "brig",
+        None,
+        lambda w, s: {"fathoms": 20.0},
+        lambda w: _lost(_anchor(w.ship, "the best bower")),
+        "Could not veer the cable: no anchor is down to veer on.",
+        "veers the lost anchor's cable",
+    ),
+    ("back_anchor", "the anchor lost"): (
+        "brig",
+        None,
+        _nothing,
+        lambda w: _lost(_anchor(w.ship, "the best bower")),
+        "Could not back the best bower: no anchor is down to back.",
+        "lets the stream go",
+    ),
+    ("back_anchor", "the stream let go"): (
+        "brig",
+        None,
+        _nothing,
+        lambda w: setattr(_anchor(w.ship, "the stream anchor"), "state", _down()),
+        "Could not back the best bower: the stream anchor is down.",
+        "lets the stream go",
+    ),
+    ("cat_and_fish_anchor", "the anchor let go again"): (
+        "brig",
+        None,
+        _aweigh,
+        lambda w: setattr(_anchor(w.ship, "the small bower"), "state", _down()),
+        "Could not cat and fish the small bower: the small bower is down.",
+        "cats it",
+    ),
+    ("lay_out_kedge", "off soundings"): (
+        "brig",
+        None,
+        lambda w, s: {"toward_deg": 90.0},
+        _off_soundings,
+        "Could not lay out the kedge: no bottom here to lay a kedge in.",
+        "lays the kedge out",
+    ),
+    ("let_go_anchor", "aground"): (
+        "brig",
+        None,
+        lambda w, s: {"anchor": "small bower"},
+        lambda w: w.ship.extra.__setitem__("aground", True),
+        "Could not let go the small bower: she is aground.",
+        "lets it go",
+    ),
+    ("cut_away_mast", "the mast carried away"): (
+        "brig",
+        "main.mast",
+        _nothing,
+        lambda w: setattr(w.ship.spars["main.mast"], "wrecked", True),
+        "Could not cut away the main mast: the main mast is carried away already; clear the wreck.",
+        "cuts it away",
+    ),
+    ("make_signal", "the hoist hauled down"): (
+        "brig",
+        None,
+        _hoisted,
+        lambda w: _locker(w).haul_down(w.clock.tick),
+        "Could not make the signal: no signal is bent on.",
+        "runs the hoist up",
+    ),
+    ("trim_jib_sheet", "the sail blown out"): (
+        "brig",
+        "jib",
+        _set_sail,
+        lambda w: setattr(w.ship.sails["jib"], "state", SailState.BLOWN_OUT),
+        "Could not trim the jib sheet: the jib is blown out; there is no sail to trim.",
+        "trims it",
+    ),
+    ("trim_jib_sheet", "the sheet parted"): (
+        "brig",
+        "jib",
+        _set_sail,
+        lambda w: _sheet_parted(w, "jib"),
+        "Could not trim the jib sheet: the starboard jib sheet is parted and must be rove afresh.",
+        "trims it",
+    ),
+    ("trim_gaff_sheet", "the sail blown out"): (
+        "brig",
+        "main.spanker",
+        _set_sail,
+        lambda w: setattr(w.ship.sails["main.spanker"], "state", SailState.BLOWN_OUT),
+        "Could not trim the spanker sheet: the spanker is blown out; there is no sail to trim.",
+        "trims it",
+    ),
+    ("trim_lug_sheet", "the sail blown out"): (
+        "bilander",
+        "main.settee",
+        _set_sail,
+        lambda w: setattr(w.ship.sails["main.settee"], "state", SailState.BLOWN_OUT),
+        "Could not trim the mainsail sheet: the mainsail is blown out; there is no sail to trim.",
+        "trims it",
+    ),
+    ("trim_lateen_sheet", "the sail blown out"): (
+        "74",
+        "mizzen.course",
+        _set_sail,
+        lambda w: setattr(w.ship.sails["mizzen.course"], "state", SailState.BLOWN_OUT),
+        "Could not trim the mizzen course sheet: the mizzen course is blown out; there is no sail "
+        "to trim.",
+        "trims it",
+    ),
+}
+# The scripts a post can hold whose beginning nothing in the world makes false while they lie held:
+# their `Script.standing` is the base's None, and why.
+NOTHING_STANDS = {
+    "batten_down": "the hatches are battened or opened by this work alone, which holds them",
+    "cast_loose_guns": "begun at quarters alone (its check), where no post is counted",
+    "grapple": "the grapnels are thrown as it begins; held, nothing is left of it but its time",
+    "heave_mark": "it reads a world with a chart, which nothing takes away; its end reads it again",
+    "plug_shot_hole": "its own going plugs the holes and spends the plugs, holding the carpenter; "
+    "holes the world adds are more work, not less",
+    "secure_guns": "its own going secures the guns; none is cast loose but by work at quarters",
+    "send_boat": "it reads a port and a boat, which nothing takes away; it holds the boat",
+    "serve_small_arms": "the arms are served out by this work alone, which holds them",
+    "set_lines": "the gear is shot and hauled by the fishing works alone, which hold it",
+    "shoot_nets": "the gear is shot and hauled by the fishing works alone, which hold it",
+    "shoot_seine": "the gear is shot and hauled by the fishing works alone, which hold it",
+    "shoot_trawl": "the gear is shot and hauled by the fishing works alone, which hold it",
+}
+
+
+def _down():
+    from freesail.ship.parts import AnchorState
+
+    return AnchorState.DOWN
+
+
+def _locker(world):
+    from freesail.world.signals import locker_of
+
+    return locker_of(world.ship)
+
+
+def _scripts_a_post_can_hold() -> set[str]:
+    """Every scripted evolution a post may be counted for (`Runner._working_posts`, the lead's
+    ruling 11 of 2026-11-13), by the runner's own rule on the merchant brig, her watches' whole
+    made nought so that any number of hands is more than they hold: numbered work on deck, no hand
+    aloft, no manoeuvre, not at quarters, all hands not called."""
+    from freesail.crew import hands
+
+    w = make_world(7, BRIG, Scenario())
+    runner, crew = w.ship.extra["evolutions"], w.ship.extra["crew"]
+    runner._watch_whole = lambda crew, watch: 0
+    out = set()
+    for eid, evo in registry.EVOLUTIONS.items():
+        if evo.script is None:
+            continue
+        params = dict(evo.params)
+        inst = Instance(evo=evo, subject=w.ship, subject_id=w.ship.name, params=params)
+        inst.script = SCRIPTS[evo.script](w.ship, params, runner._timing(w.ship, evo))
+        inst.want = hands.CrewRequest.from_mapping(runner._crew_line(w.ship, evo))
+        if runner._working_posts(crew, inst, named=True):
+            out.add(eid)
+    return out
+
+
+def test_every_script_a_post_can_hold_states_what_must_still_be_true_or_why_nothing_need():
+    """The lead's last list of 2026-11-14, 8, the sweep: every script a post can hold (by the
+    runner's own rule, `_scripts_a_post_can_hold`) is either one whose beginning the world can make
+    false while it lies held, which states what must still be true (`Script.standing`, or its file's
+    `requires`) and is tried by the test after, or one whose beginning nothing in the world makes
+    false while it lies held, named here with its reason and keeping the base's None. Twenty-three
+    scripts: the reader's four (the veer, backing the anchor, the kedge, catting and fishing), the
+    three given before (the letting go, the cutting away; the fish wants hands aloft, so no post
+    holds it), and the sweep's own five (the signal, its hoist hauled down by the locker, and the
+    four trims, their sail and sheet said as preconditions, read as they begin alone)."""
+    from freesail.evolutions.scripts import Script
+
+    can = _scripts_a_post_can_hold()
+    tried = {eid for eid, _ in STANDS}
+    assert can == tried | set(NOTHING_STANDS), (can - tried - set(NOTHING_STANDS), tried - can)
+    assert not tried & set(NOTHING_STANDS)
+    for eid in tried:  # each states what must still be true, in its script or in its file
+        evo = registry.get(eid)
+        assert SCRIPTS[evo.script].standing is not Script.standing or evo.requires, eid
+    for eid in NOTHING_STANDS:
+        evo = registry.get(eid)
+        assert SCRIPTS[evo.script].standing is Script.standing, eid
+        assert not evo.requires, eid
+
+
+@pytest.mark.parametrize("case", sorted(STANDS), ids=[f"{e}-{m}" for e, m in sorted(STANDS)])
+def test_every_script_a_post_can_hold_held_and_the_world_moved_is_refused_and_never_run(
+    standing_worlds, case
+):
+    """The lead's last list of 2026-11-14, 8, at the cause's level: held work was taken up after the
+    world had moved under it (C1's mend read the beginning's check no more, and what of it stands
+    through the work was stated for three scripts alone). Every script a post can hold whose
+    beginning the world can make false while it lies held: begun with all hands up, held as a post's
+    leaving holds it (`Runner._hold`, the pause's one road), the world moved so that what must still
+    be true is not, and taken up with hands enough (`Runner._try_resume`): refused in words (its
+    `on_fail`, the beginning's words for what is not so), its hands let go, gone from the work, its
+    check never read again, and never run (400 s on, nothing of its going done; the kedge's boat in
+    the ship again). Old (20a8e2e3): the veer veered the lost anchor's cable, the stream went down
+    beside a lost bower, the kedge was laid out off soundings, the small bower let go again was
+    catted, the signal hauled down was run up, and the trims trimmed a sail blown out and a parted
+    sheet; the letting go and the cutting away were refused as here."""
+    eid, _move = case
+    where, sid, prepare, move, said, _ran = STANDS[case]
+    world = replay.read_checkpoint(standing_worlds[where])[1]
+    ship = world.ship
+    runner, crew = ship.extra["evolutions"], ship.extra["crew"]
+    assert world.submit("call all hands").kind == "crew.order"
+    world.run(120)
+    params = prepare(world, sid) or {}
+    runner.start(ship, eid, sid or ship.name, params)
+    (inst,) = [i for i in runner.instances if i.evo.id == eid]
+    assert not inst.waiting and inst.assignment is not None, inst.waiting_for
+    world.run(5)
+    read: list[str] = []
+    check = inst.script.check
+    inst.script.check = lambda words: read.append("read") or check(words)
+    runner._hold(ship, crew, inst, "the master gone below", {"for": "post", "post": "master"})
+    n = len(world.log)
+    move(world)
+    before = _effect(world, eid, sid)
+    world.tick()
+    lines = [(e.kind, e.text) for e in list(world.log)[n:] if not e.kind.startswith(QUIET)]
+    assert ("evolution.failed", said) in lines, lines
+    assert inst not in runner.instances
+    assert not [s for s in crew.sailors if s.at == inst.inst_id]
+    assert read == []
+    world.run(400)
+    assert _effect(world, eid, sid) == before, (eid, "ran on")
+    done = registry.get(eid).on_complete.kind
+    assert not [k for k, _ in lines if k == done]
+    if eid == "lay_out_kedge":
+        assert not world.dealings.boat.away  # the boat in the ship again
+
+
+ANCHOR_WORKS = (
+    "veer_cable",
+    "back_anchor",
+    "cat_and_fish_anchor",
+    "lay_out_kedge",
+    "let_go_anchor",
+)
+
+
+def _effect(world, eid: str, sid: str | None):
+    """What the work's going changes, read before and after its taking up."""
+    ship = world.ship
+    tackle = _tackle(ship)
+    if eid in ANCHOR_WORKS:
+        return [(a.name, a.state, round(a.scope_m, 3)) for a in tackle.anchors]
+    if eid == "cut_away_mast":
+        return sorted(s.id for s in ship.spars.values() if s.wrecked)
+    if eid == "make_signal":
+        return [(h.key, h.breaks_out) for h in _locker(world).made]
+    sail = ship.sails[sid]
+    return [(ln.id, ln.state, round(ln.hauled, 4)) for ln in ship.sheets_of(sail)]
+
+
+def test_a_veer_held_by_the_master_going_below_and_its_anchor_lost_is_refused_when_taken_up(
+    held_worlds,
+):
+    """The reader's own case (the lead's last list of 2026-11-14, 8), sailed: her nine at anchor in
+    Torbay, her larboard watch's three and the master veering twenty fathoms on the best bower; the
+    master goes below 8 s on ("Belayed veering the cable: the master gone below.", three under half
+    the veer's eight), the best bower is lost at +68 s while the work lies held (its cable parted,
+    as the physics parts it), and the master comes on deck at +130 s: the veer is taken up at
+    +131 s and refused in cda12ec9's words, "Could not veer the cable: no anchor is down to veer
+    on." (its head the one road's, "veer cable" at cda12ec9), nothing veered. Old (20a8e2e3):
+    taken up and run on, "Veered to fifty-six fathoms on the best bower." at +203 s, the lost
+    anchor's scope grown from 38.33 fathoms at its loss to 56.32."""
+    world = _held_world(held_worlds, "anchored")
+    best = _anchor(world.ship, "the best bower")
+    n, start = len(world.log), world.clock.tick
+    assert world.submit("veer 20 fathoms").kind == "order.accepted"
+    world.run(8)
+    assert world.submit("go below").kind == "captain.below"
+    world.run(60)
+    _lost(best)
+    scope = best.scope_m
+    world.run(62)
+    assert world.submit("come on deck").kind == "captain.on_deck"
+    world.run(120)
+    lines = _lines(world, n, start)
+    said = [(t, k, x) for t, k, x in lines if k in ("evolution.belayed", "evolution.failed")]
+    assert said[0] == (9, "evolution.belayed", "Belayed veering the cable: the master gone below.")
+    refused = "Could not veer the cable: no anchor is down to veer on."
+    assert said[1] == (131, "evolution.failed", refused), said
+    assert not [x for _, k, x in lines if k == "cable.veered"], lines
+    assert best.scope_m == scope
+    assert not world.ship.extra["evolutions"].instances

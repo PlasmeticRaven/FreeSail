@@ -324,14 +324,14 @@ def test_a_far_seventy_four_saved_on_the_trunk_loads_a_ship_of_the_line():
 
 def test_work_saved_before_its_file_named_it_is_named_as_the_file_names_it_now():
     """The same cause in the work's name (the lead's (C8)): an evolution pickled before its file
-    gave `doing:` read None from the class, so a boat called on the trunk was "sending boat", which
-    the lookout's glass no longer knows ("sending the boat", a boat hoisting out or in). The runner
-    reads the file's words from the registry by the work's id (`Runner._doing`). Old (80e703c7):
-    "sending boat"."""
+    gave its words (`work:`, `doing:` when this was written) read None from the class, so a boat
+    called on the trunk was "sending boat", which the lookout's glass no longer knows ("sending
+    the boat", a boat hoisting out or in). The runner reads the file's words from the registry by
+    the work's id (`Runner._describe`, `Runner._doing`). Old (80e703c7): "sending boat"."""
     _, w = replay.read_checkpoint(BOAT_CALLED)
     runner = w.ship.extra["evolutions"]
     boat = next(i for i in runner.instances if i.evo.id == "send_boat")
-    assert "doing" not in boat.evo.__dict__  # the save's own evolution names nothing
+    assert "work" not in boat.evo.__dict__  # the save's own evolution names nothing
     assert runner.doing(boat) == "sending the boat"
     assert "sending the boat" in dict(L._WORK_KINDS)
 
