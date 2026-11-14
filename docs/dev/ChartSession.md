@@ -536,3 +536,11 @@ played with none skipped.
 - **Accepted; holding for 111's step 2b.** For the final: 7-530's exclusion in 105's form;
   the Strait's weather move proven; the 31.6 N step and Mogador's harbour depths listed;
   the browser plans run.
+
+### 2026-11-14, 00:05: 112's step 1 read and sent (690bcb4)
+
+The layers' order: one list per level in `chart.py`, 106a's two keys read as it; the first
+layer that lists a tile answers, later ones fill NODATA; the uncommitted Atlantic and world
+last, the world under a `charts:` chart only. Proven cell for cell over 4,593 tiles of 21
+charts (truth 7-570). Read by me: nothing a clone reads moves. Sent to the lead; 112 told to
+go on with step 2 (the layers laid as ruled), the seas and the judged level after 111's 2b.
