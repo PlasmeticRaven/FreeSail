@@ -1,0 +1,46 @@
+# FreeSail: the French days on which the ships in port dress (package 102, step 5;
+# docs/design/Design-Signals.md, "The nations' days"). The shape of
+# data/signals/britain/days.yaml (its head says the fields).
+#
+# The Ordonnance du Roi concernant la Marine of 25 March 1765 lets the commandants of the ports
+# and roads fire guns "certains jours de fêtes ou de cérémonies, suivant les usages anciennement
+# établis dans la Marine" (art. CLV, CCLXVI) and merchantmen dress on feast days (CCXXXIX), and
+# names no day; the ordinances of 1786 were not found online. **Every day below is FROM MEMORY,
+# and that the navy dressed on it JUDGEMENT**: the Saint-Louis under the kings; the Republic's
+# two fêtes kept under the Consulate, 14 July and 1 vendémiaire (22 September); the Empire's
+# Saint-Napoléon, 15 August. The Empire's anniversary of the coronation, the first Sunday of
+# December, is movable and left out. No salute is fired by the game (the tuning notes,
+# package 102, step 5).
+
+nation: france
+days:
+  - name: "the Saint-Louis"
+    date: "08-25"
+    years: "-1791"
+    does: [dress]
+    guns: 21
+    source: "the Ordonnance of 1765, art. CLV (guns on feast days by ancient usage, the days not named); the day and that the navy dressed FROM MEMORY and JUDGEMENT"
+  - name: "the Saint-Louis"
+    date: "08-25"
+    years: "1814-1829"
+    does: [dress]
+    guns: 21
+    source: "the Restoration's; the day FROM MEMORY, that the navy dressed JUDGEMENT"
+  - name: "the fête of the 14th of July"
+    date: "07-14"
+    years: "1790-1804"
+    does: [dress]
+    guns: 21
+    source: "the national fête of the Federation (1790) and of the Republic; its years FROM MEMORY, that the navy dressed JUDGEMENT"
+  - name: "the fête of the foundation of the Republic"
+    date: "09-22"
+    years: "1793-1804"
+    does: [dress]
+    guns: 21
+    source: "1 vendémiaire, the Republic's new year (22 September in most years: the game keeps that day); its years FROM MEMORY, that the navy dressed JUDGEMENT"
+  - name: "the Saint-Napoléon"
+    date: "08-15"
+    years: "1806-1813"
+    does: [dress]
+    guns: 21
+    source: "the Empire's fête (the decree of 1806); FROM MEMORY, that the navy dressed JUDGEMENT"

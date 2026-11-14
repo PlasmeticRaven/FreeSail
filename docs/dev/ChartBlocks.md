@@ -185,7 +185,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    at Brest's distance entered it at Falmouth and moved every recorded passage's digest).
    The loader refuses a `block:` that names no region or a region the manifest does not
    name, and a gauge with neither a block nor a mean level. A gauge's mean level not read
-   stays null and is said unverified: it gives the blend its constants and not its level,
+   stays null and is said unverified (or, as Sicily's six by the lead's interim answer of
+   2026-11-13, is judged as M2 + S2 + N2 and marked JUDGEMENT where it stands, to be
+   replaced by a published level when one is read; whether the older blocks take the same
+   is settled at package 111's close, the levels measured first): it gives the blend its constants and not its level,
    and where no gauge of the blend has a level (the Strait's, the islands') the level is
    the eleven's there, as it was, which is the level the tiles' fill was raised by
    ("GEBCO's fill", below). **The fill raise reads the same water** (`mean_level_grid`,
@@ -814,7 +817,7 @@ What it found, for the next blocks:
   the variation about 17 to 18 degrees west then): the road of Tunis placed by Purdy's
   bearings made true.
 
-## Sicily and Malta (package 105, as built: step 2)
+## Sicily and Malta (package 105, as built: steps 2 and 3)
 
 `sicily` (35.01334 to 38.5 N, 11.1466 to 16.69332 E): all Sicily with its islands, the Sicilian
 channel, Malta and Gozo, the Faro of Messina and Calabria's toe to Cape Spartivento, the chart's
@@ -866,6 +869,55 @@ their tile edges (104's finding). What it found, for the next blocks:
   Messina's British years in its pilot's words and its yard; Reggio's and Scilla's holders
   France's from 1806 by their rows, Scilla's castle British from 1806 to February 1808.
 
+**Step 3** (the west, the south coast and the islands): sixty-five marks more in
+`features/sicily.yaml` and Ustica's four in `features/tyrrhenian.yaml`, thirteen ports
+(Palermo, Trapani, Favignana, Marsala, Sciacca, the Mole of Girgenti, Alicata, Terranova,
+Cape Passaro's Porto Paolo, Lipari, Pantellaria, Lampedusa, Ustica), the scenario
+`the-faro.yaml` (Valletta through the Faro to Palermo), and two closings of water no
+region's bounds held. What it found, for the next blocks:
+
+- **An unowned sliver inside a neighbour's own column is closed by its bound, not by
+  tiles.** `tyrrhenian`'s tiles ran to its last column's edge (15.84 E) and its bounds
+  stopped at 15.5 E: the water between (Capo Vaticano, Tropea, the gulf of Sant'Eufemia)
+  answered and nobody owned it. The bound moved to 15.83999 E, 0.9 m inside the column
+  edge, takes no tile more (`tiles_over`), and the build reads a region's bounds only for
+  its tile list, its manifest entry and its checks, so no tile is written. Prove it so
+  before trusting it: the world's mean level on the fill grid over the column and its
+  neighbours before and after (here none moved, the block's gauges having no level), and
+  `--check` on the neighbour. Move with the bound every box that stops at it (the streams'
+  `book_limits` row, the open stream area's polygon, the weather box), and the audit's
+  ceilings for the region's own findings that the sliver's water now joins (package 111's
+  known list, old beside new).
+- **Water a block's tiles reach and no bounds hold may still read the block's tide.** A
+  tide region (the manifest's `tide_regions:`, bounds and no tiles, the Solent's form)
+  over it, named in the block's gauges' `block:` lists, gives it the block's level instead
+  of the Atlantic's (`gulf-of-hammamet`, `calabria-north`: 3.7 m to some 0.1 m). Rebuild
+  the block after it, for the fill raise follows the tide; the audit still lists the water
+  as unowned (its finding owned by the block, with its reason), until a later block's
+  bounds take it.
+- **Marks on a neighbour's kept tiles are snapped on the whole chart.** Lipari's anchorage
+  and the Bentinck shoal lie in `sicily`'s bounds but on `tyrrhenian`'s tile row (38.43 N,
+  the seam rule): the block's own chart has no depth there outside its harbour patch. Load
+  `atlantic-east` to place them.
+- **A port in a neighbour's bounds takes its marks in the neighbour's features file** (the
+  brief's Ustica, 38.7 N): a section of its own at the file's end, the index rebuilt from
+  the file (`build_index`) and the manifest's counts edited alone, no tile or coast
+  touched (package 104's form for Oristano), and `--check` on both regions, which also
+  finds an id given twice across the manifest (Sciacca's Cape St Marco met Sardinia's).
+- **The grid holds the modern harbour works.** Palermo's basin is enclosed by today's piers
+  in EMODnet's cells: a port's track from its mole harbour to its road must find the
+  basin's mouth on the grid (a map of the cells' signs at a hundred metres finds it),
+  whatever the period's mole was.
+- **A deep-to island's road is its anchorage.** Lipari and Ustica have thirty to two
+  hundred fathoms a cable off: a road placed off the town reads outside the pilot's depth
+  band, so the anchorage serves as the outer road too (Scilla's form).
+- **The order words take decimal minutes** (`38 16.5 N 15 40.8 E`), not seconds, and a
+  road's name only as its feature's name; a scenario's test that asserts no order rejected
+  finds both at once.
+- **A pilot's word for a port the sources never call a port.** Cefalù's bay is a summer
+  anchorage for coasters with a pier for fishing vessels, and Termini's road is frequented
+  only by boats that can be beached (Smyth 1824, App. p. v): both are marks, not ports.
+
 ## What a new block runs before it reports (package 111)
 
 **The audit, clean or declared.** `python tools/audit_chart.py --known` reads the whole
@@ -892,3 +944,63 @@ grid's or the spot on its sounding, and its way in and out clear of the land by 
 own guard (`tracks:` where a straight line is not); (g) no mark of the land afloat nor
 danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
 dated; (h) its scenario starting on its water.
+
+## The ocean carried south, the Canaries and the Salvages (package 106a, as built)
+
+`canaries` (27.33334 to 29.46666 N, 18.29332 to 13.17334 W, 60 level-2 tiles, 12.5 MB) and
+`salvages` (one tile, 29.89334 to 30.31999 N, 16.15999 to 15.73334 W, 0.38 MB), two regions
+with no neighbour over **a second coarse layer**, `atlantic-south`. What they found, for the
+next blocks (106b's African coast first):
+
+- **A coarse layer beside the corridor, not the corridor widened.** Widening the corridor
+  south rewrote all 48 of its tiles, as 39e found for the west, and worse: the build takes
+  the distance field's east-west cell at the block's middle latitude, so every distance of
+  every tile moves, up to 50.8 N. A layer of its own (`CORRIDORS["atlantic-south"]`, its
+  `beside: atlantic-corridor`; the chart's `corridors_beside:`) leaves the corridor byte for
+  byte. Its tiles that share a name with the corridor's (the corridor's south row runs from
+  29.47 N, NODATA south of its fetch at 31.9 N: the Salvages and the passage from Madeira lay
+  in it) are written in its own folder, NODATA wherever the corridor's tile has data, and the
+  runtime fills the corridor's NODATA from them at load (`chart.Tile.filled_from`,
+  `Level.beside`): elevation and distance in the empty cells, a block's shoalest sounding
+  only where the corridor's block has none. Truth 7-521 reads every corridor cell through
+  the new path and finds it its own. Within a cell of the corridor's data edge a bilinear
+  read now finds its four corners known: the seam, 14 points of 10,000 sampled, all on
+  31 54 N. The layer's north bound sits at the corridor's data edge (31.9 N). Since package
+  111's step 2a Madeira's south bound is 31.60001 N and the layer opens that edge to the
+  tide (`charted_bounds`); Madeira's tide does not move (11,449 points old beside new), the
+  seam's taper being laid only where the eleven are within reach, and they are 1,300 miles
+  off. `.gitignore` lets its folder through as the corridor's.
+  **Carry it further the same way**: to 12.4 N (the Cape Verde Islands) it measured 9 tiles
+  and 1.9 MB more (10 and 2.05 MB with a column from 26.4 W), none of the corridor's moved.
+- **The bound a hair inside the tile edges** (104's rule) took the brief's 91 tiles to 60.
+- **Open sea is cheap here, the shores dear**: the 22 tiles beyond ten miles of land are 87
+  KB each (1.9 MB), the steep island shores 280 KB; written whole (the lead's ruling), the
+  channels' middles at 3".
+- **A gaugeless one-tile block** (the Salvages) by 104's ruling: Santa Cruz de Tenerife's and
+  Funchal's gauges list it after their own (`[canaries, salvages]`, `[madeira, salvages]`),
+  the level Santa Cruz's, Funchal's being unread; Madeira's water does not move, the
+  membership being by bounds.
+- **REDMAR's reports give the Spanish islands' levels too** (`GLOB_2_3_<code>.pdf`, 3450 to
+  3471): the NMM less the BMMI on the gauge's zero, 1.17 to 1.60 m. TICON rounds Gomera's
+  position to the degree (at sea); REDMAR's is the harbour's. Hierro's gauge is La Estaca.
+- **The modern port is the grid's land** at Santa Cruz (its breakwaters close the road on
+  the north and east: the track leaves it south-east), Arrecife (over the old Naos) and
+  Cabras: the period's anchorages were moved to the nearest water of the pilot's depth and
+  said so in `fix`.
+- **Islands make the business's straight lines cross land**: 40 of the 42 pairs of the
+  seven ports were refused by the far-detail guard until every port had `tracks:` out by
+  its offing to one common mark in open water north of Tenerife (the eastern islands by the
+  Bocayna, Gomera round Point Teno, Palmas round the Isleta); checked pair by pair with
+  `land_crossing` itself.
+- **A scenario's book with hourly re-shaping orders** sends a ship back for a mark she has
+  passed once she heaves to and drifts: the Canaries' book shapes each leg once, at the
+  mark before it.
+- **The weather has no island lee**: the calms and south-westerly eddies to leeward of the
+  high islands (Purdy 1825, pp. 213 to 215) are said in the box's head, not carried.
+- **Run the chart's audit on a new block** (`python tools/audit_chart.py --full`, package
+  111) before its slow tier: a region the audit's table of seas (`SEAS` in
+  `tools/audit_chart.py`) does not name is taken for Mediterranean water, and an ocean
+  island's metre and more of mean level for a fault; the Canaries and the Salvages are
+  named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
+  fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
+  both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.

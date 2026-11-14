@@ -208,8 +208,10 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
     # package 38: the corridor's folder is the one thing under tiles/1/ the repository
     # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed
     corridor = manifest["charts"]["atlantic-east"]["corridor"]
-    folder = manifest["corridors"][corridor]["folder"]
-    assert all(t.startswith(f"data/charts/{folder}/") for t in tracked), tracked
+    # package 106a: and the layer beside it, the ocean carried south, committed the same way
+    names = [corridor] + list(manifest["charts"]["atlantic-east"].get("corridors_beside") or [])
+    folders = [manifest["corridors"][n]["folder"] for n in names]
+    assert all(any(t.startswith(f"data/charts/{f}/") for f in folders) for t in tracked), tracked
 
 
 # ---------------------------------------------------------------------------
@@ -889,7 +891,9 @@ OFF_LISBON = Position(38.6, -9.4)
 OFF_MOROCCO = Position(34.0, -7.0)
 OFF_FINISTERRE = Position(42.9, -9.4)
 FUNCHAL_TOWN = Position(32.65, -16.91)
-BEYOND_THE_CORRIDOR = Position(31.0, -10.0)
+# package 106a: 31 N 10 W is the ocean carried south's now (the layer beside the corridor);
+# 25 W is still in the corridor's south row of tiles, NODATA there, and no layer beside it
+BEYOND_THE_CORRIDOR = Position(31.0, -25.0)
 
 
 @pytest.fixture(scope="module")
@@ -920,6 +924,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 104: the L-shaped hole, the Sardinian sea and the coast of Tunis
     regions += ["sardinian-sea", "tunis-coast"]
     regions += ["sicily"]  # package 105: Sicily and Malta, south of 38.5 N and east of Cape Bon
+
+    regions += ["canaries", "salvages"]  # package 106a, over the ocean carried south
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -932,11 +938,11 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # Calabria's toe to Cape Spartivento; old: 15.5 E, the Tyrrhenian's)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
     # package 111's step 2a: Madeira's south bound to its tiles' edge, 31.60001 N (was 32.0);
-    # package 105: the east to 16.69332 E (was 15.5)
-    assert whole.bounds == (31.60001, 51.5, west, 16.69332)
-    assert (
-        whole.bounds_words() == f"31.6 to 51.5 N, {abs(west):g} W to 16.6933 E"
-    )  # was 32 (package 111) and 15.5 E (package 105)
+    # package 105: the east to 16.69332 E (was 15.5); package 106a: the south limit the ocean
+    # carried south's, the Canaries' row of the level-1 grid a hair inside its edge (25.2 N)
+    assert manifest["charts"][WHOLE]["corridors_beside"] == ["atlantic-south"]
+    assert whole.bounds == (25.2001, 51.5, west, 16.69332)
+    assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
@@ -958,6 +964,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     sardinian = load_chart("sardinian-sea")  # package 104
     tunis = load_chart("tunis-coast")  # package 104
     sicily = load_chart("sicily")  # package 105
+
+    canaries = load_chart("canaries")  # package 106a
+    salvages = load_chart("salvages")  # package 106a
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -976,6 +985,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | sardinian.features.keys()
         | tunis.features.keys()
         | sicily.features.keys()
+        | canaries.features.keys()
+        | salvages.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -994,6 +1005,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert all(whole.region_of[fid] == "sardinian-sea" for fid in sardinian.features)  # 104
     assert all(whole.region_of[fid] == "tunis-coast" for fid in tunis.features)  # 104
     assert all(whole.region_of[fid] == "sicily" for fid in sicily.features)  # 105
+
+    assert all(whole.region_of[fid] == "canaries" for fid in canaries.features)  # 106a
+    assert all(whole.region_of[fid] == "salvages" for fid in salvages.features)  # 106a
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -1015,6 +1029,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(sardinian.coast_lines())
         + len(tunis.coast_lines())
         + len(sicily.coast_lines())
+        + len(canaries.coast_lines())
+        + len(salvages.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -2255,13 +2271,151 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
     assert all(f.kind == "island" for f in lacking)
     assert all(f.height_m and 0 < f.extent_m < 1000 for f in lacking)
     regions = {whole.region_of[f.id] for f in lacking}
-    # package 105: the Braccio of Messina's three and Filfla (old: the five regions, 21)
-    assert regions == {MEDW, BALEARICS, "gulf-of-lion", "ligurian-sea", "tyrrhenian", "sicily"}
+    # package 105: the Braccio of Messina's three and Filfla (old: the five regions, 21);
+    # package 106a: the West Rock by Clara, north of Lanzarote
+    assert regions == {
+        MEDW,
+        BALEARICS,
+        "gulf-of-lion",
+        "ligurian-sea",
+        "tyrrhenian",
+        "sicily",
+        "canaries",
+    }
     # package 101: the Medas off the Ter and Tabarca off Cape Santa Pola, two more
-    assert len(lacking) == 25
+    # package 105, step 3: Lampion, one more (old: 25); package 106a: the West Rock, one more
+    assert len(lacking) == 27
     for f in lacking:
         assert whole.depth_at(f.position) is not None, f.id
         assert whole.danger_under(f.position, 0.0, 30.0, 3.0) is not None, f.id
     belle = whole.feature("belle-isle")
     assert belle.kind == "island" and belle.extent_m == 9000 and not belle.is_ground
     assert not [f for f in whole.dangers_about(belle.position, 30.0) if f.id == "belle-isle"]
+
+
+# -- package 112, step 1: the layers' order --------------------------------------------
+
+
+def _layer_tile(path: Path, cells: np.ndarray, south_sec: int = 0, west_sec: int = 0) -> None:
+    """A level-1 tile in the corridor's form, its elevation `cells` (NODATA where NaN)."""
+    nodata = -32768
+    elev = np.where(np.isnan(cells), nodata, np.rint(cells)).astype(np.int16)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        path,
+        elevation=elev,
+        level=np.int16(1),
+        unit_m=np.float32(1.0),
+        cell_sec=np.float32(30.0),
+        south_sec=np.int64(south_sec),
+        west_sec=np.int64(west_sec),
+        nodata=np.int16(nodata),
+        dist=np.zeros(cells.shape, dtype=np.uint16),
+        min_depth_m=np.float32(float(-np.nanmax(cells))),
+        min_blocks_m=np.full((16, 16), np.float32(-np.nanmax(cells))),
+        min_block_cells=np.int16(32),
+    )
+
+
+def _layered_manifest(tmp_path: Path, spec: dict, **world) -> dict:
+    """A manifest of one region-less chart over three level-1 layers that list one tile
+    each, the same tile: the first holds the west third of it, the second the middle and
+    the west, the third the whole."""
+    name = "0_0"
+    thirds = np.full((512, 512), np.nan)
+    first, second, third = thirds.copy(), thirds.copy(), thirds.copy()
+    first[:, :170] = -10.0
+    second[:, :340] = -20.0
+    third[:, :] = -30.0
+    corridors = {}
+    for layer, cells in (("one", first), ("two", second), ("three", third)):
+        _layer_tile(tmp_path / "tiles" / "1" / layer / f"{name}.npz", cells)
+        corridors[layer] = {
+            "level": 1,
+            "bounds": {"south": 0.1, "north": 4.0, "west": 0.1, "east": 4.0},
+            "folder": f"tiles/1/{layer}",
+            "tiles": [{"name": name}],
+        }
+    levels = load_manifest()["levels"]
+    return {
+        "levels": levels,
+        "regions": {},
+        "corridors": corridors,
+        "charts": {"sea": {"regions": [], **spec}},
+        **world,
+    }
+
+
+def test_the_layers_of_a_level_answer_in_the_charts_order(tmp_path):
+    """Package 112, step 1: one ordered list of layers a level. Where two layers list a
+    tile, the first answers in it and each later layer fills only the cells the ones
+    before it left NODATA (106a's rule for the layer beside the corridor, made the rule
+    of every layer); the `layers:` list and 106a's `corridor:` with `corridors_beside:`
+    are one form."""
+    manifest = _layered_manifest(tmp_path, {"layers": ["two", "one", "three"]})
+    chart = Chart("sea", manifest, tmp_path)
+    tile = chart.levels[0].tile(0, 0)
+    row = tile.elevation[100]
+    assert (row[:340] == -20).all() and (row[340:] == -30).all()  # two, then three
+    manifest = _layered_manifest(tmp_path, {"layers": ["one", "two", "three"]})
+    row = Chart("sea", manifest, tmp_path).levels[0].tile(0, 0).elevation[100]
+    assert (row[:170] == -10).all() and (row[170:340] == -20).all() and (row[340:] == -30).all()
+    old = _layered_manifest(tmp_path, {"corridor": "one", "corridors_beside": ["two", "three"]})
+    old_chart = Chart("sea", old, tmp_path)
+    assert np.array_equal(old_chart.levels[0].tile(0, 0).elevation[100], row)
+    assert [c["folder"] for c in old_chart.layers] == [
+        "tiles/1/one",
+        "tiles/1/two",
+        "tiles/1/three",
+    ]
+    assert old_chart.corridor is old_chart.layers[0]
+    both = _layered_manifest(tmp_path, {"layers": ["one"], "corridor": "two"})
+    with pytest.raises(C.ChartError, match="names its layers twice"):
+        Chart("sea", both, tmp_path)
+    missing = _layered_manifest(tmp_path, {"layers": ["one", "four"]})
+    with pytest.raises(C.ChartError, match="the layer 'four'"):
+        Chart("sea", missing, tmp_path)
+
+
+def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_region(tmp_path):
+    """Package 112, step 1 (the chart session's ruling on step 0): the world's level 0
+    lies under a chart of the manifest's `charts:`, where no layer answers, and never
+    under a chart of one region: a checkpoint's reload of a Channel save takes the chart
+    of `channel-west` alone (`core/replay.py`), and it answers exactly as it did whatever
+    the world's tiles on the disk."""
+    manifest = load_manifest()
+    root = tmp_path / "charts"
+    root.mkdir()
+    for item in CHARTS.iterdir():
+        if item.name != "tiles":
+            (root / item.name).symlink_to(item)
+    (root / "tiles").mkdir()
+    for lv in ("1", "2", "3"):
+        (root / "tiles" / lv).symlink_to(CHARTS / "tiles" / lv)
+    # a world tile over the water south of channel-west's tiles (47.70 N 6 W)
+    span = 150 * 512
+    s = -90 * 3600 + ((47 + 90) * 3600 // span) * span
+    w = -180 * 3600 + ((-7 + 180) * 3600 // span) * span
+    path = root / "tiles" / "0" / f"{s}_{w}.npz"
+    path.parent.mkdir()
+    np.savez(
+        path,
+        elevation=np.full((512, 512), -70, dtype=np.int16),
+        level=np.int16(0),
+        unit_m=np.float32(2.0),
+        cell_sec=np.float32(150.0),
+        south_sec=np.int64(s),
+        west_sec=np.int64(w),
+        nodata=np.int16(-32768),
+        min_depth_m=np.float32(140.0),
+    )
+    manifest = dict(manifest)
+    manifest["world"] = dict(manifest["world"], tiles=[{"name": f"{s}_{w}"}])
+    south = Position(47.70, -6.0)
+    alone = Chart("channel-west", manifest, root)
+    assert [lv.level for lv in alone.levels] == [3, 2]
+    assert alone.depth_at(south) is None
+    whole = Chart(WHOLE, manifest, root)
+    assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
+    assert whole.level_at(south) == 1  # the corridor answers before the world
+    assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world

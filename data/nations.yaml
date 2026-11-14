@@ -853,3 +853,27 @@ ports:
   syracuse: naples
   reggio: naples
   scilla: naples
+  # package 105, step 3: western Sicily, the south coast, the islands and Ustica, the King
+  # of the Two Sicilies' (Lampedusa the Tommasi princes' fief under his crown)
+  palermo: naples
+  trapani: naples
+  favignana: naples
+  marsala: naples
+  sciacca: naples
+  girgenti: naples
+  licata: naples
+  terranova: naples
+  porto-palo: naples
+  lipari: naples
+  pantelleria: naples
+  lampedusa: naples
+  ustica: naples
+
+  # the Canaries (package 106a): the King of Spain's through the range (each file's dated row)
+  santa-cruz-de-tenerife: spain
+  orotava: spain
+  las-palmas: spain
+  arrecife: spain
+  santa-cruz-de-la-palma: spain
+  san-sebastian-de-la-gomera: spain
+  cabras: spain

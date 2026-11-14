@@ -136,6 +136,11 @@ tables:
       - {name: Funchal, lat_deg: 32.640, lon_deg: -16.907, hw_h: 12, hw_m: 4, spring_rise_ft: 7, note: "Norie 1805, Table XLI p. 250 (the page image): Funchal, Madeira, 12h 4m, 7 feet; the Oriental Navigator 1801 p. 24: the tides rise and fall about 7 1/2 feet"}
       - {name: Angra Bay, lat_deg: 38.652, lon_deg: -27.215, hw_h: 11, hw_m: 45, spring_rise_ft: 8, note: "Norie 1805, Table XLI p. 248 (the page image): Angra Bay, Terceira, 11h 45m, 8 feet"}
       - {name: Fayal Road, lat_deg: 38.530, lon_deg: -28.612, hw_h: 2, hw_m: 20, spring_rise_ft: 4.5, note: "Norie 1805, Table XLI p. 249 (the page image, the hour's first figure faint): Fayal Road, Azores, 2h 20m, 4 1/2 feet; Tofiño 1789 p. 224 has half past twelve and eight Spanish feet"}
+      # package 106a: Norie 1805's one row for the Canaries, Table XLI p. 248 (the page image):
+      # "Canary Island, Atlant. Ocean, 3h 0m", no rise; placed at the Grand Canary's road of
+      # Palmas (JUDGEMENT: which island he meant is not said); the rise the world's spring
+      # range there by the 37j rule, the block's own gauges', JUDGEMENT
+      - {name: Canary Island, lat_deg: 28.100, lon_deg: -15.410, hw_h: 3, hw_m: 0, spring_rise_ft: 7, rise_judgement: true, note: "Norie 1805, Table XLI p. 248 (the page image): Canary Island, 3h 0m, no rise given; the rise the world's spring range at Palmas, 6.8 feet, JUDGEMENT; Purdy 1825 p. 218 at Orotava: little or no tide"}
       # package 39f, the Strait: Tofiño 1787's hours (his survey's own observations, the
       # period's best for these waters) and Purdy 1826's where Tofiño gives none (p. 8, read
       # from the page image); Tofiño's feet are the pie de Burgos (0.279 m), turned to
@@ -230,6 +235,20 @@ tables:
       - {name: Catania, lat_deg: 37.500, lon_deg: 15.095, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT; the rise JUDGEMENT"}
       - {name: Syracuse, lat_deg: 37.058, lon_deg: 15.290, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT; the rise JUDGEMENT"}
       - {name: Valletta, lat_deg: 35.899, lon_deg: 14.519, hw_h: 2, hw_m: 30, spring_rise_ft: 1, note: "Purdy 1826, p. 166: off Filfla the tide hereabout scarcely perceptible; the Admiralty 1913, p. 495: IIIh 30m, springs rise 10 to 14 inches (modern); the hour the world's own by the block's gauges (no gauge in Malta: the six's blend), JUDGEMENT; the rise JUDGEMENT"}
+      # package 105, step 3: Trapani's hour Smyth's own (1824, App. p. xxvi: in settled weather
+      # high water at 9h 35m, a spring rise of nearly two feet; the world's by the block's gauges
+      # 9h 10m), and Mazzara's (1824, pp. 227 to 228: 10h 15m at Mr Payne's house on the
+      # Salemi, rising ten to twenty inches); the others the world's own by the six gauges,
+      # JUDGEMENT, the rise a foot (Palermo's within Smyth's "seldom more than twenty inches",
+      # 1824, p. 66).
+      - {name: Trapani, lat_deg: 38.006, lon_deg: 12.500, hw_h: 9, hw_m: 35, spring_rise_ft: 2, note: "Smyth 1824, App. p. xxvi: in settled weather high water at nine hours thirty-five minutes with a spring rise of nearly two feet, setting N E and S W"}
+      - {name: Mazzara, lat_deg: 37.650, lon_deg: 12.585, hw_h: 10, hw_m: 15, spring_rise_ft: 1, note: "Smyth 1824, pp. 227 to 228: high water at 10h 15m at Mr Payne's house on the Salemi, a rise of ten to twenty inches, more in fresh breezes and at the moon's perigee"}
+      - {name: Palermo, lat_deg: 38.125, lon_deg: 13.370, hw_h: 9, hw_m: 5, spring_rise_ft: 1, note: "Smyth 1824, p. 66: the tides set eastward along the north coast, ruled more by the weather than the moon, seldom rising or falling more than twenty inches; the hour the world's own by the block's gauges, JUDGEMENT"}
+      - {name: Sciacca, lat_deg: 37.492, lon_deg: 13.080, hw_h: 1, hw_m: 50, spring_rise_ft: 1, note: "Smyth 1824, p. 184: the south coast's tides rather currents, rising a foot or two; the hour the world's own by the block's gauges, JUDGEMENT"}
+      - {name: Girgenti, lat_deg: 37.273, lon_deg: 13.525, hw_h: 2, hw_m: 50, spring_rise_ft: 1, note: "Smyth 1824, p. 184 and App. p. xxii: no tide figure at Girgenti; the hour the world's own by the block's gauges, JUDGEMENT"}
+      - {name: Lipari, lat_deg: 38.471, lon_deg: 14.956, hw_h: 2, hw_m: 15, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT"}
+      - {name: Pantellaria, lat_deg: 36.842, lon_deg: 11.926, hw_h: 2, hw_m: 5, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT"}
+      - {name: Lampedusa, lat_deg: 35.498, lon_deg: 12.600, hw_h: 2, hw_m: 25, spring_rise_ft: 1, note: "no period figure; the hour the world's own by the block's gauges, JUDGEMENT"}
       # package 101, the Catalan coast's block: no period tide-hour for the coast (Smyth
       # 1854, p. 176: on the Spanish coast within the Mediterranean the tides are of the
       # most moderate order); the hour the block's own gauge's establishment by the tide's

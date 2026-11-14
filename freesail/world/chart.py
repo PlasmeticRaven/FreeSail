@@ -37,7 +37,16 @@ region are loaded and indexed together, their ids unique across regions (a clash
 `ChartError` in words). `contains`, `bounds` and `bounds_words` speak of the whole: the
 envelope of the regions and the corridor. A chart named by a region carries the region's
 own levels and the world's, as it always did, so that nothing a scenario of the Channel
-reads moves; the corridor is a named chart's.
+reads moves; the corridor is a named chart's. **Layers beside the corridor** (package
+106a: `corridors_beside`, the ocean south to the Canaries): further level-1 layers, each
+answering only where the layers before it have nothing; a tile both list is the first's,
+its NODATA cells filled from the other's at load (`Tile.filled_from`), so that where the
+corridor answers it answers alone, as it did. **One ordered list of layers** (package
+112): a chart names its coarse layers as `layers:`, in order, or as 106a's `corridor:` and
+`corridors_beside:`, read as that list; at each level the first layer that lists a tile
+answers in it and each later one fills only its NODATA. The finest level that answers,
+answers: a harbour, a region, the layers, the world. The world's level 0 lies under a chart
+of the manifest's `charts:` only, never under a chart of one region.
 """
 
 from __future__ import annotations
@@ -581,6 +590,53 @@ class Tile:
         n = self.min_block_cells
         return float(self.min_blocks_m[row // n, col // n])
 
+    def filled_from(self, other: Tile) -> Tile:
+        """This tile with its NODATA cells taken from another tile of the same place and
+        grid (package 106a: a coarse layer beside the corridor, whose tiles in the row
+        from 29.47 N are NODATA south of 31.9 N): the elevation and the distance where
+        this one has nothing, and a block's shoalest sounding from the other where this
+        one's block has none. Where this tile has data, its own cells stand, unchanged
+        (within a cell of its data's edge a bilinear read now finds its four corners known:
+        the seam)."""
+        if (other.south_sec, other.west_sec, other.cell_sec) != (
+            self.south_sec,
+            self.west_sec,
+            self.cell_sec,
+        ) or other.elevation.shape != self.elevation.shape:
+            raise ChartError(
+                f"a layer beside the corridor gives the tile {self.south_sec}_{self.west_sec} "
+                "on another grid"
+            )
+        unknown = self.elevation == self.nodata
+        theirs = np.where(other.elevation == other.nodata, self.nodata, other.elevation)
+        elevation = np.where(unknown, theirs, self.elevation).astype(self.elevation.dtype)
+        dist = self.dist
+        if dist is not None and other.dist is not None:
+            dist = np.where(unknown, other.dist, dist).astype(dist.dtype)
+        blocks = self.min_blocks_m
+        if (
+            blocks is not None
+            and other.min_blocks_m is not None
+            and other.min_blocks_m.shape == blocks.shape
+            and other.min_block_cells == self.min_block_cells
+        ):
+            # the first's own block wherever it has one, so that nothing the first answered
+            # moves; the other's where the first's block is all NODATA
+            blocks = np.where(np.isnan(blocks), other.min_blocks_m, blocks).astype(blocks.dtype)
+        return Tile(
+            level=self.level,
+            south_sec=self.south_sec,
+            west_sec=self.west_sec,
+            cell_sec=self.cell_sec,
+            unit_m=self.unit_m,
+            nodata=self.nodata,
+            elevation=np.ascontiguousarray(elevation),
+            dist=dist,
+            min_depth_m=other.min_depth_m if math.isnan(self.min_depth_m) else self.min_depth_m,
+            min_blocks_m=blocks,
+            min_block_cells=self.min_block_cells,
+        )
+
 
 class Level:
     """One level's tiles under a folder, found by integer arithmetic on the position and
@@ -597,6 +653,7 @@ class Level:
         cache_size: int = 16,
         paths: dict[str, Path] | None = None,
         use: str = "",
+        beside: dict[str, list[Path]] | None = None,
     ):
         self.level = level
         self.cell_sec = cell_sec
@@ -611,6 +668,9 @@ class Level:
             dict(paths) if paths is not None else {n: folder / f"{n}.npz" for n in names}
         )
         self.names = set(self.paths)
+        # package 106a: a tile's paths in the layers beside the corridor, which fill its
+        # NODATA at load (`Tile.filled_from`)
+        self.beside: dict[str, list[Path]] = dict(beside or {})
         self.use = use  # the level's `use` as the manifest states it, for the lookout's words
         self._cache: dict[tuple[int, int], Tile] = {}
         self._order: list[tuple[int, int]] = []
@@ -640,6 +700,9 @@ class Level:
         if path is None or not path.exists():
             return None
         t = Tile.load(path)
+        for more in self.beside.get(name, ()):
+            if more.exists():
+                t = t.filled_from(Tile.load(more))
         self._cache[key] = t
         self._order.append(key)
         if len(self._order) > self.cache_size:
@@ -892,23 +955,39 @@ class Chart:
                     f"the chart '{region}' names the region(s) {', '.join(missing)}, which the "
                     f"manifest has not (it has: {', '.join(sorted(regions)) or 'none'})"
                 )
-            corridor_name = spec.get("corridor")
-            self.corridor: dict[str, Any] | None = (
-                corridors.get(str(corridor_name)) if corridor_name else None
-            )
-            if corridor_name and self.corridor is None:
+            # package 112: the chart's coarse layers as one ordered list (`layers:`), or,
+            # as every chart before it, `corridor:` and then `corridors_beside:` (106a's
+            # form), read as that list; never both forms in one chart
+            if "layers" in spec and ("corridor" in spec or "corridors_beside" in spec):
                 raise ChartError(
-                    f"the chart '{region}' names the corridor '{corridor_name}', which the "
-                    f"manifest has not"
+                    f"the chart '{region}' names its layers twice (`layers:` beside "
+                    "`corridor:` or `corridors_beside:`): give the one ordered list"
                 )
+            if "layers" in spec:
+                names = [str(n) for n in spec.get("layers") or []]
+            else:
+                first = spec.get("corridor")
+                names = ([str(first)] if first else []) + [
+                    str(n) for n in spec.get("corridors_beside") or []
+                ]
+            self.layers: list[dict[str, Any]] = []
+            for name in names:
+                if name not in corridors:
+                    raise ChartError(
+                        f"the chart '{region}' names the layer '{name}', which the manifest has not"
+                    )
+                self.layers.append(corridors[name])
             self.spec = dict(spec)
         elif region in regions:
             self.regions = [region]
-            self.corridor = None
+            self.layers = []
             self.spec = regions[region]
         else:
             known = ", ".join(chart_names(manifest)) or "none"
             raise ChartError(f"no chart region named '{region}' (the manifest has: {known})")
+        # the first layer and the layers after it, by the names the readers know (106a's)
+        self.corridor: dict[str, Any] | None = self.layers[0] if self.layers else None
+        self.corridors_beside: list[dict[str, Any]] = self.layers[1:]
         # `region` keeps the name the chart was loaded by (a chart's or a region's), for
         # the browser's block and the drivers' lines; `regions` are the regions it holds
         self.region = region
@@ -918,8 +997,7 @@ class Chart:
         self.region_specs: dict[str, dict[str, Any]] = {r: regions[r] for r in self.regions}
         # the bounds of the whole: the envelope of the regions and the corridor
         boxes = [self.region_specs[r]["bounds"] for r in self.regions]
-        if self.corridor is not None:
-            boxes.append(self.corridor["bounds"])
+        boxes += [c["bounds"] for c in self.layers]
         if not boxes:
             raise ChartError(f"the chart '{region}' holds no region and no corridor")
         self.bounds = (
@@ -938,8 +1016,15 @@ class Chart:
             for r, s in self.region_specs.items()
         }
         # the levels, finest first, with the tiles the manifest lists: every region's at
-        # levels 2 and 3, the corridor's at level 1 beside the Atlantic's where that is
-        # built, the world's at level 0 where it is built
+        # levels 2 and 3; then the coarse layers in the chart's order (package 112): at
+        # each level the first layer that lists a tile answers in it, and a later layer
+        # listing the same tile fills only its NODATA cells at load (`Tile.filled_from`,
+        # 106a's rule made the rule of every layer), while a tile no earlier layer lists
+        # is the later layer's own; then, where no layer lists a tile, the Atlantic's level
+        # 1 and the world's level 0, which the tool builds and git does not keep. The
+        # world lies under a chart of the manifest's `charts:` only: a chart of one region
+        # (a checkpoint's reload of a Channel save) keeps its regions' levels alone, so
+        # that it answers exactly as it did whatever the world's tiles on the disk.
         self.levels: list[Level] = []
         level_specs = manifest.get("levels") or {}
         listed: dict[int, dict[str, Path]] = {}
@@ -949,13 +1034,23 @@ class Chart:
                 listed.setdefault(int(lv), {}).update(
                     {str(t["name"]): folder / f"{t['name']}.npz" for t in tiles}
                 )
-        world = manifest.get("world")
-        atlantic = manifest.get("atlantic")
-        for entry in (atlantic, self.corridor, world):
+        beside: dict[int, dict[str, list[Path]]] = {}
+        for entry in self.layers:
+            lv_tiles = listed.setdefault(int(entry["level"]), {})
+            for tname, path in _present(entry, root).items():
+                if tname in lv_tiles:
+                    beside.setdefault(int(entry["level"]), {}).setdefault(tname, []).append(path)
+                else:
+                    lv_tiles[tname] = path
+        untracked = [manifest.get("atlantic")]
+        if region in charts:
+            untracked.append(manifest.get("world"))
+        for entry in untracked:
             present = _present(entry, root)
             if present:
-                # the corridor's tiles after the Atlantic's: the corridor is the one committed
-                listed.setdefault(int(entry["level"]), {}).update(present)
+                lv_tiles = listed.setdefault(int(entry["level"]), {})
+                for tname, path in present.items():
+                    lv_tiles.setdefault(tname, path)
         for lv in sorted(listed, reverse=True):
             spec = level_specs.get(str(lv)) or {}
             self.levels.append(
@@ -968,6 +1063,7 @@ class Chart:
                     set(listed[lv]),
                     paths=listed[lv],
                     use=str(spec.get("use", "")),
+                    beside=beside.get(lv),
                 )
             )
         # the features of every region and their index, together; an id given twice

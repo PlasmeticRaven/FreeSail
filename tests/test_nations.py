@@ -284,6 +284,28 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "syracuse": "naples",
         "reggio": "naples",
         "scilla": "naples",
+        # package 105, step 3: the west, the south coast, the islands and Ustica the King's
+        "palermo": "naples",
+        "trapani": "naples",
+        "favignana": "naples",
+        "marsala": "naples",
+        "sciacca": "naples",
+        "girgenti": "naples",
+        "licata": "naples",
+        "terranova": "naples",
+        "porto-palo": "naples",
+        "lipari": "naples",
+        "pantelleria": "naples",
+        "lampedusa": "naples",
+        "ustica": "naples",
+        # package 106a: the Canaries, the King of Spain's
+        "santa-cruz-de-tenerife": "spain",
+        "orotava": "spain",
+        "las-palmas": "spain",
+        "arrecife": "spain",
+        "santa-cruz-de-la-palma": "spain",
+        "san-sebastian-de-la-gomera": "spain",
+        "cabras": "spain",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

@@ -405,3 +405,120 @@ lines proposed. Truths 7-570 to 7-579.
 `build_charts.py`, the climatology and the tides; they are not on the same region or tiles,
 so they may run side by side, the second to merge taking the first's manifest by
 `--skip-fetch` rebuild as the how-to says.
+
+### 2026-11-13, 08:35: where things stand
+
+- **The calendar and the world** (decision 69): built at 65a7df86, reported at 3a30a85c,
+  merged as 4e079c31. Truths 7-580 to 7-584. Until 103b and 92 design one, nothing in play
+  writes a port's holder or a war; the director's port order closes, opens and prices.
+- **Read for the lead:** 105's step 2 (562ba67) and 111's step 2a (184745d9); the four
+  points taken (the lead's rulings above). **Owed with my next step:** the how-to to say
+  that a gauge's level judged as M2 + S2 + N2 is marked JUDGEMENT and replaced by a
+  published one when read (Sicily's interim answer, not yet the rule).
+- **Waiting:** 106b and 112 at the lead's word on 106a's merge; the builders' briefs
+  above, to be brought up to date then (106a's Madeira proof, 111's seas table and the
+  calendar's `follows_history` for 106b's dated ports).
+
+### 2026-11-13, 15:20: the lead's word (trunk 18ea2816, merged here)
+
+- **Package 105 closed** (step 3 merged as 801b80e7): `sicily`, its 24 ports, the tide
+  regions `gulf-of-hammamet` and `calabria-north`, `the-faro` scenario and the six gauges'
+  interim judged levels are now this session's ground. The chart is 18 regions and four tide
+  regions (`solent`, `gulf-of-hammamet`, `calabria-north`, `asinara-west`).
+- **111 step 2a merged** (dac8ddd7): every region's sea named in the audit's `SEAS`, an
+  unnamed one a finding. Step 2b building (tracks for 22 of the 25 ports; Genoa, Cartagena
+  and Oran stay listed for the cold review).
+- **106a** at its last measures: re-runs Madeira's tide proof after 2a; adds two findings
+  (the Salvages' weather split at 30 N; Point Handia's grid point) and moves truth 7-564's
+  count; the lead may ask my reading at its report. **At its merge 106b and 112 are mine
+  to begin**, as the owner ruled.
+- **109 step 5** (ruled): traders steer round land by the sea route, and goal squares with
+  a mark on land are laid at sea; how a vessel steers, not what the land guard judges.
+- **The builders' briefs, brought up to date:** 106b's two regions name their sea
+  (`atlantic`) in `SEAS` or the audit fails them; its dated ports seed the game and move
+  only under `follows_history` (decision 69), so its truths load each port on its start
+  day. 112 reads 111's `SEAS` as the table its `seas.yaml` replaces, with `sicily` and the
+  four tide regions in it.
+
+### 2026-11-13, 17:37: 106a's final read for the lead (f2799ec)
+
+Nothing blocking. **For 106b's brief when it launches:** a weather box over Morocco's water
+east of 9 W from 30 to 36 N (in no box today); a `book_limits` box east of 9.34 W; its sea
+in `SEAS` either `canaries` or with `SEAS_THAT_MEET`, since the canaries' gauges serve its
+gaugeless south. **For 112:** the island seas (`madeira`, `azores`, `canaries`, `salvages`)
+to be one sea or met in `seas.yaml`. Left for the lead: the seven Canaries port heads' stale
+words about rows waiting for 105's step 1; decision 68's words are comments only (a served
+field is package 110's to design).
+
+### 2026-11-13, 18:55: 111 step 2b's tracks read for the lead (65fa7b2)
+
+St Peter Port's track is on the wrong side of Roustel by Faden 1793 p. 32 (between La Rousse
+and Roustel, the Rousse to larboard) and crosses the grid's drying head at 49°29.15′N
+2°29.90′W; St Malo's way from La Fresnaye is Faden's Décollées, "frequented by none but
+small vessels" (both reported, the lead's to rule). The other six and a sample of four have
+their sides right. The land guard judges land and not depth: several tracks cross under a
+frigate's draught at low water. **For 106b:** its tracks read the same way from the first,
+the depth along each leg reported.
+
+### 2026-11-13, 19:45: 106b and 112 launched; 106b's step 0 ruled
+
+- 106b's brief corrected at 4b7f7bc5 (the lead told). Builders: 106b session_01XooV49b9SbG99RDtAXZ8Y7
+  on `claude/pkg-106b`, 112 session_01XooV496THRAAMyqk2wCsnr on `claude/pkg-112`; a check-in
+  armed at 20:29 UTC.
+- **106b's measure (174c849), ruled by this session:** four regions, coast plus two columns
+  (88 to 104 tiles, 15 to 19 MiB by the builder's count), split at the row edges 34.16, 31.6
+  and 29.46666 N: `morocco-larache`, `morocco-sallee`, `morocco-mogador`, `morocco-noun`.
+  Gauges the Atlantic's only (Cadiz and Huelva north, Arrecife and Puerto de Cabras south;
+  Tarifa and Ceuta left out as the Strait's inner water, JUDGEMENT; Tarifa's REDMAR level not
+  read, which would move the Strait's water). Sea `morocco`, meeting atlantic and canaries.
+  One weather box `morocco` over the four and the gap east of 9 W from 30 to 36 N.
+- My own small step at 32e7b093 (the seven Canaries port heads' stale words; the how-to on a
+  judged gauge level): the fast tier running.
+
+### 2026-11-13, 21:40: 112's step 0 ruled (97eb554)
+
+**Ruled by this session:**
+- Level 0 is never laid under a one-region chart. A checkpoint reload rebinds to
+  `channel-west` alone, where level 0 made open water answer.
+- The Black Sea is cut from the Mediterranean's level 1.
+- Cape Verde's layer takes all 12 tiles.
+- One `ocean` sea for the island groups.
+- The seas on the weather boxes' lines.
+- `seas.yaml` takes `regions:` and `meets:` keys, replacing the audit's tables.
+- Step 1 (the layers' order) goes ahead.
+
+**Put to the lead:**
+- level 0's extent (recommended: the Atlantic and the Mediterranean, 63 tiles, 11.3 MB);
+- the open Atlantic's level (recommended: M2+S2+N2 judged and marked, Sicily's interim);
+- whether the channel sea's 8 groups leave the list.
+
+**Found and sent to the lead's list:** the coarse layers at mean sea level count the level
+twice (765 coarse shore cells flood at mean tide); two roads to a Channel world give two
+charts (`replay._rebind`).
+
+### 2026-11-13, 21:55: the lead's answers on 112; the two roads measured
+
+- **The lead's answers on 112 (passed to its builder):**
+  - Level 0 covers the Atlantic and the Mediterranean, 63 tiles, 11.3 MB.
+  - The open Atlantic's level is judged as M2+S2+N2, marked, on the condition that no
+    passage, truth or save moves by it, or each that does is named and the builder stops.
+  - The double count goes to the lead's list.
+  - The channel sea's 8 groups leave the known list.
+  - The step that moves SEAS merges after 111's step 2b.
+- **The two roads, measured and sent:**
+  - A `region: channel-west` scenario, saved and loaded by the checkpoint road (the drivers'
+    default), comes back with channel-west alone: 47 N 4 W answers None where it answered
+    121 m.
+  - The cause: `replay._rebind` loads the region bare where `World.__init__` takes
+    `chart_holding`.
+  - A one-line mend proposed; test_checkpoint's run-on moves by design.
+  - The lead's to rule.
+
+### 2026-11-13, 22:20: the owner's word on this session's tier (through the lead)
+
+This session stays as it is: the lead rules design and merges every chart hash; this
+session's own rulings go to the lead in a line each; the arrangement is looked at again by
+the owner and the lead together. The cloud environment's setup script now installs the
+`dev` and `server` extras in new sessions; running sessions (this one, 106b's, 112's) run
+`python3 -m pip install -e ".[dev,server]"` once, and each report says the browser plans
+played with none skipped.

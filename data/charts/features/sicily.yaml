@@ -45,7 +45,23 @@
 #
 # Not here: the Adventure bank (no period pilot on file names it: Smyth surveyed it in the
 # Adventure after his Memoir, and the pilots of 1826 and 1831 have it not); Graham's shoal,
-# which rose in 1831; the west, the south coast and the islands (step 3).
+# which rose in 1831; Ustica, which is tyrrhenian's (its section of that file).
+#
+# Step 3's marks (after step 2's): the north coast from Cape Orlando to Palermo, the west from
+# Cape St Vito by Trapani and the Egadi to Marsala, the south coast from Cape Granitola to
+# Terranova, Cape Passaro's Porto Paolo, Pantellaria, Lampedusa with Linosa and Lampion,
+# and Lipari with Vulcano. Their sources add Smyth 1824's west and south coasts (chs. V and
+# VI), his islands (ch. VII) and the Appendix's pp. iv to vi and xvii to xxxv; Purdy 1826's
+# pp. 117 to 155 and 167 to 168, Norie 1831's pp. 116 to 148, Lamberti 1844's pp. 184 to 232
+# (after the period, sparingly). Positions as above; where the grid lacks a reef or an islet
+# (the Porcelli, the Bentinck shoal, Lampion) the mark is placed by the pilots' bearings or
+# Smyth's table and says so in `fix`. The lights: Palermo's and Trapani's stood in Smyth's
+# survey with no year given, entered lit from 1700 (JUDGEMENT, as Messina's); Girgenti's
+# from 1756, the year of its mole (Smyth 1824, p. 203; the light's own year JUDGEMENT);
+# Marsala's mole-light is Smyth 1854's (p. 443) and not entered. Cefalù and Termini are
+# marks and not ports: Cefalù's bay is a summer anchorage for coasters with a pier for
+# fishing vessels, and Termini's road is frequented only by boats that can be beached
+# (Smyth 1824, App. p. v).
 region: sicily
 features:
   # ---------------------------------------------------------------------------
@@ -752,3 +768,766 @@ features:
     bottom: stiff mud
     source: 'Smyth 1824, p. viii: off the lower town in 25 fathoms, stiff mud, a quarter of a mile off shore, the best bower moored to the south; the bottom grips anchors hard; the anchorage fouled by the tunny nets'' stones; the pratique office under Fort St Elmo, the watering place S by E of the anchorage; p. 105: ships may be got out of the anchorage under Paradiso, out of shot'
     says: 'The road of Milazzo, twenty-five fathoms of stiff mud a quarter of a mile off the lower town; the anchors grip hard, and the tunny nets'' stones foul the ground.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: the north coast from Cape Orlando to Palermo (the harbour patch palermo)
+  # ---------------------------------------------------------------------------
+
+  - id: capo-orlando
+    kind: headland
+    name: Cape Orlando
+    modern: 'Capo d''Orlando'
+    lat_deg: 38.1661
+    lon_deg: 14.7480
+    fix: 'moved 412 m to the grid''s land'
+    height_m: 90
+    source: 'Smyth 1824, p. 98: a steep rock of moderate height crowned by a ruinous pile called the Castle, in fact a church and burial place for the people wrecked on the rocks below, remarkable for sudden squalls and heavy swells; App. p. vi: a ledge just above water a little to the westward, good anchorage for small craft inside it; the height FROM MEMORY'
+    says: 'Cape Orlando, a steep rock crowned by its ruinous castle, a place of sudden squalls and heavy swells.'
+
+  - id: cefalu
+    kind: town
+    name: Cefalù
+    modern: 'Cefalù'
+    lat_deg: 38.0380
+    lon_deg: 14.0220
+    height_m: 270
+    source: 'Smyth 1824, p. 95: the town on a low point under a high conical mount with a Saracenic castle on its summit; p. xxxvii: the cathedral 38 00 00 N, 14 03 57 E; App. pp. v to vi: a small sandy bay where coasters find summer anchorage in three to seven fathoms, a small pier for fishing vessels, two shoals of eight and nine feet close north-west of the pier (Purdy 1826, p. 132, and Norie 1831, p. 120, misprint them fathoms); the height the rock''s, FROM MEMORY'
+    says: 'Cefalù on its low point under the great conical rock with the old castle on its summit; coasters lie in its little bay in summer.'
+
+  - id: termini
+    kind: town
+    name: Termini
+    modern: 'Termini Imerese'
+    lat_deg: 37.9850
+    lon_deg: 13.6990
+    height_m: 60
+    source: 'Smyth 1824, p. 93: the castle on a high rock commanding the town and coast, the town on the declivity of a hill, a caricatore for oil, olives, wine, sumach, corn and rice, about eleven thousand people; App. p. v: the anchorage exposed two-thirds of the year, frequented only by boats that can be drawn up on the beach; p. xxxvii: the castle 37 57 28 N, 13 42 00 E'
+    says: 'Termini on its hill with the castle on the rock above, a loading-place for boats that can be hauled up the beach.'
+
+  - id: capo-zafferano
+    kind: headland
+    name: Cape Zaffarana
+    modern: 'Capo Zafferano'
+    lat_deg: 38.1082
+    lon_deg: 13.5342
+    fix: 'moved 594 m to the grid''s land'
+    height_m: 225
+    source: 'Smyth 1824, App. p. iv: Cape Zaffarana a high conic rock, known at four leagues; Smyth 1854, p. 442: Mount Catalfano 38 5 40 N, 13 32 0 E, 1095 feet; the cape''s height FROM MEMORY'
+    says: 'Cape Zaffarana, a high conical rock at the east horn of the gulf of Palermo.'
+
+  - id: solanto-reefs
+    kind: ledge
+    name: the Solanto reefs
+    modern: 'the reefs off Solanto'
+    lat_deg: 38.0926
+    lon_deg: 13.5426
+    fix: 'moved 1996 m to the grid''s shoal head (2.9 m)'
+    height_m: 0
+    dries_m: -0.5
+    extent_m: 150
+    source: 'Smyth 1824, App. p. v: two ledges even with the surface S E by E two miles and a quarter from Cape Zaffarana, forty fathoms round them and twenty-seven in the channel, a column and flag-staff once on them, broken off'
+    says: 'The Solanto reefs, two ledges awash two miles and a quarter south-east of Cape Zaffarana.'
+
+  - id: monte-pellegrino
+    kind: hill
+    name: Mount Pellegrino
+    modern: 'Monte Pellegrino'
+    lat_deg: 38.1700
+    lon_deg: 13.3530
+    height_m: 596
+    source: 'Smyth 1824, p. 70: Mount Pellegrino of a singularly picturesque form; App. p. iv: two signal-towers on it; Smyth 1854, p. 442: 1955 feet'
+    says: 'Mount Pellegrino, the great bare rock over Palermo''s mole, with its two signal towers.'
+
+  - id: capo-gallo
+    kind: headland
+    name: Cape di Gallo
+    modern: 'Capo Gallo'
+    lat_deg: 38.2150
+    lon_deg: 13.3160
+    height_m: 516
+    source: 'Smyth 1824, App. p. iv: a rugged cliff with brownish red patches, appearing from the offing like an island; squalls between it and Mount Pellegrino off Mondello in winter; Smyth 1854, p. 442: Cape di Gallo 38 14 53 N, 13 18 20 E, 1692 feet'
+    says: 'Cape di Gallo, a rugged cliff patched brownish red, like an island from the offing.'
+
+  - id: palermo
+    kind: town
+    name: Palermo
+    modern: 'Palermo'
+    lat_deg: 38.1160
+    lon_deg: 13.3610
+    height_m: 40
+    source: 'Smyth 1824, pp. 70 to 74: the capital, nearly a hundred and eighty thousand souls, the citadel weak, the Galita fort and the mole-head battery; Norie 1831, p. 122: the trade not extensive, silk and satin for Malta, wine, oil and tunny out, every article of luxury in; the observatory 38 06 44 N, 13 20 15 E (Smyth 1824, p. xxxvii)'
+    says: 'Palermo, the capital, its domes and palaces along the shore of the Conca d''Oro under Mount Pellegrino.'
+
+  - id: palermo-mole
+    kind: castle
+    name: the mole-head battery of Palermo
+    modern: 'the Molo Nord head, Palermo'
+    lat_deg: 38.1335
+    lon_deg: 13.3705
+    fix: 'on the mole, which the grid may smooth away; placed by hand FROM MEMORY'
+    height_m: 10
+    source: 'Smyth 1824, p. 70: a fine mole running out from the arsenal nearly a quarter of a mile into nine and ten fathoms, with a light-house and battery at its end, cost the senate nearly a million sterling; p. 74: the mole-head battery tolerably strong; Lamberti 1844, p. 186: two batteries and a tower in the middle with a light'
+    says: 'The mole of Palermo, a quarter of a mile of stone from the arsenal, its battery and light-house at its head.'
+
+  - id: palermo-light
+    kind: light
+    name: the light of Palermo
+    modern: 'the lanterna of the Molo Nord'
+    lat_deg: 38.1338
+    lon_deg: 13.3708
+    fix: 'on the mole-head (palermo-mole), placed by hand FROM MEMORY'
+    height_m: 20
+    lit: {from: 1700, until: null, range_nm: 8, character: "fixed"}
+    source: 'Smyth 1824, p. 70: the light, in common with all the others in Sicily, very defective; p. xxxvii: Palermo light-house 38 08 15 N, 13 21 56 E; Norie 1831, p. 121: badly attended to; Lamberti 1844, p. 187: of the second order, seen eighteen miles (after the period); the year lit, the character and the range JUDGEMENT'
+    says: 'The light of Palermo on the mole-head, a poor light, like all of Sicily''s.'
+
+  - id: palermo-road
+    kind: anchorage
+    name: the road of Palermo
+    modern: 'off the mole and the city, Palermo'
+    lat_deg: 38.1252
+    lon_deg: 13.3805
+    fix: 'moved 45 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 19
+    bottom: stiff clay
+    source: 'Smyth 1824, App. p. iv: off the mole and the city in sixteen to twenty-five fathoms the best anchorage for a temporary stay, nineteen fathoms of stiff clay half a mile off shore, Mount Pellegrino N N W and the mole light N W 1/2 W; moor small bower to the N W and best to the S S E, open hawse to the N E; a ship parting in a north-easter goes on the reef under the citadel; the heavy sea of the winter gales never rolls home'
+    says: 'The road of Palermo, nineteen fathoms of stiff clay half a mile off the city: moor with an open hawse to the north-east.'
+
+  - id: palermo-mole-harbour
+    kind: anchorage
+    name: the mole harbour of Palermo
+    modern: 'the basin within the Molo Nord'
+    lat_deg: 38.1324
+    lon_deg: 13.3728
+    fix: 'moved 102 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 6
+    bottom: weed and mud
+    source: 'Smyth 1824, App. p. v: ships brush the mole-head, lay out the best bower to the S W and haul the stern close to the pier; the inner port the arsenal''s, with its magazines and the prisons of the galley slaves; the central part very rocky and shallow; Norie 1831, p. 122: a shoal in the middle with one and two fathoms; Lamberti 1844, p. 186: five and six braccia at the mole''s entrance, weed and mud (the bottom his)'
+    says: 'The mole harbour of Palermo: brush the mole-head, an anchor to the south-west and the stern hauled close to the pier; a rocky shoal in the middle.'
+
+  - id: cala-felice
+    kind: anchorage
+    name: the Cala of Palermo
+    modern: 'La Cala, Palermo'
+    lat_deg: 38.1241
+    lon_deg: 13.3707
+    fix: 'moved 416 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 3
+    bottom: mud
+    source: 'Smyth 1824, p. 71: the Cala Felice, a small cove in front of the town, the only remains of its two ancient harbours, the pratique office on its east side and the landing at the steps; App. p. v: small craft repair there and vessels of two hundred tons lie securely in summer, the sea winds sending in a ground swell; the depth and bottom JUDGEMENT'
+    says: 'The Cala, the little old harbour before the town, where the pratique office and the landing steps are.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: the west, Cape St Vito to Marsala, and the Egadi (the harbour patches trapani and marsala)
+  # ---------------------------------------------------------------------------
+
+  - id: capo-san-vito
+    kind: headland
+    name: Cape St Vito
+    modern: 'Capo San Vito'
+    lat_deg: 38.1830
+    lon_deg: 12.7339
+    fix: 'moved 100 m to the grid''s land'
+    height_m: 30
+    source: 'Smyth 1824, p. 66: the usual landfall from the westward, a rugged mount with two tabled points, Agira and Sireno, an anchorage for small vessels by the church of St Vito between them under two square towers; App. p. xxxvi: from Ustica it bears S 32 40 W; the height FROM MEMORY'
+    says: 'Cape St Vito, the rugged mount with its two tabled points, the landfall from the west.'
+
+  - id: monte-san-giuliano
+    kind: hill
+    name: Mount St Julian
+    modern: 'Monte Erice'
+    lat_deg: 38.0360
+    lon_deg: 12.5870
+    height_m: 666
+    source: 'Smyth 1824, App. p. xxvii: instantly known by the town on its summit; p. xxxix: the Saracenic tower 38 02 58 N, 12 37 05 E; Smyth 1854, p. 444: 2184 feet'
+    says: 'Mount St Julian, the old Eryx, with its town on the summit over Trapani.'
+
+  - id: trapani
+    kind: town
+    name: Trapani
+    modern: 'Trapani'
+    lat_deg: 38.0154
+    lon_deg: 12.5155
+    fix: 'moved 184 m to the grid''s land'
+    height_m: 10
+    source: 'Smyth 1824, pp. 239 to 241: about twenty-five thousand people, the best artisans and sailors in the island; the walls and bastions in good repair, one of the most respectable places of arms in Sicily; the marina with a tolerable mole and the pratique office; water in the town by the aqueduct from St Julian; App. p. xxvii: from the north the tops of the houses look like several sail; Norie 1831, p. 126: salt, soda, coral and alabaster exported'
+    says: 'Trapani on its low sickle of land, the tops of its houses like a fleet under sail from the north.'
+
+  - id: colombaia
+    kind: castle
+    name: the Colombara
+    modern: 'Torre Colombaia, Trapani'
+    lat_deg: 38.0090
+    lon_deg: 12.5064
+    fix: 'moved 120 m to the grid''s land'
+    height_m: 30
+    source: 'Smyth 1824, p. 239: the entrance protected by Sigia tower on the point, its fire crossed by the light-house battery on the Colombara; p. xxxix: the Colombara light 38 01 53 N, 12 30 18 E; App. p. xxvii: the rock of Colombara can be hugged at three-quarters of a cable'
+    says: 'The Colombara, the light-house battery on its rock in the harbour''s mouth; it may be hugged at three-quarters of a cable.'
+
+  - id: colombaia-light
+    kind: light
+    name: the light of Trapani
+    modern: 'the light on Torre Colombaia'
+    lat_deg: 38.0092
+    lon_deg: 12.5052
+    fix: 'on the Colombara''s tower (colombaia), placed beside it by hand'
+    height_m: 32
+    lit: {from: 1700, until: null, range_nm: 8, character: "fixed"}
+    source: 'Smyth 1824, p. 239 and App. p. xxvii: the light-house on the Colombara (no year given); the year lit, the character and the range JUDGEMENT'
+    says: 'The light of Trapani on the Colombara.'
+
+  - id: trapani-harbour
+    kind: anchorage
+    name: the harbour of Trapani
+    modern: 'the anchorage within the Colombaia'
+    lat_deg: 38.0060
+    lon_deg: 12.5000
+    height_m: 0
+    depth_fathoms: 9
+    bottom: mud, uneven and patchy
+    source: 'Smyth 1824, App. p. xxvi: ships of greater draught bring up near the Colombara in eight to ten fathoms, muddy bottom but uneven and patchy, moored S S E and N N W; vessels of two to three hundred tons lie at the quay above the pratique office with a fast under the walls and an anchor on the mud shoals; App. p. xxvii: the best berth for large ships opposite the light-house; the quarantine often stops a pilot; Lamberti 1844, p. 190: the road open to the S S W and S W'
+    says: 'The harbour of Trapani, eight to ten fathoms of patchy mud near the Colombara; small ships lie at the quay with a fast under the walls.'
+
+  - id: porcelli-trapani
+    kind: ledge
+    name: the Porcelli
+    modern: 'Scogli Porcelli, off Trapani'
+    lat_deg: 38.0360
+    lon_deg: 12.4330
+    fix: 'the grid lacks the reef (no head under 12 m within 4 km): placed by Purdy 1826''s and Norie 1831''s bearings, 4 to 4 3/4 miles E by N from Point Grosso of Levanso and N W of the Trapani light, FROM MEMORY of the modern chart; Smyth 1854''s table puts it 2 1/2 minutes north'
+    height_m: 0
+    dries_m: 0
+    extent_m: 200
+    source: 'Smyth 1824, App. p. xxvii: the Pigs, a mass of rocks awash, bold to seventeen, twelve and eight fathoms then all at once scarcely a foot, a swash of six or seven fathoms inside the outer pinnacle; clear by the Colombara light on with the hill south of Paceco; Smyth 1854, p. 444: 38 4 30 N, 12 26 45 E'
+    says: 'The Porcelli, the Pigs, a mass of rocks awash north-west of Trapani, bold to and then no water at all.'
+
+  - id: formica
+    kind: island
+    name: the Formiche
+    modern: 'Isola Formica'
+    lat_deg: 37.9905
+    lon_deg: 12.4276
+    fix: 'the grid''s islet, 2.3 km south of the place first drawn FROM MEMORY (Smyth''s table puts the tonnara pier 1.2 minutes north of it)'
+    height_m: 10
+    source: 'Smyth 1824, p. 247: the tonnara''s storehouses, a tower, a chapel and a fishing village, a port to the S E where a few small vessels lie secure; App. p. xxvii: a shoal of two and a half fathoms nearly mid-channel between the Formiche; Smyth 1854, p. 444: the tonnara pier 38 0 37 N, 12 25 53 E'
+    says: 'The Formiche, the low tunny islet with its tower between Trapani and Levanzo.'
+
+  - id: levanzo
+    kind: island
+    name: Levanso
+    modern: 'Levanzo'
+    lat_deg: 38.0000
+    lon_deg: 12.3370
+    height_m: 278
+    source: 'Smyth 1824, p. 247: high, rugged and inaccessible except at two or three places, a few houses, fagots sent to Marsala and Trapani; p. xl: the guard-house 38 01 38 N, 12 20 29 E; the height FROM MEMORY'
+    says: 'Levanso, high and rugged, with a few houses and its guard-house.'
+
+  - id: favignana
+    kind: island
+    name: Favignana
+    modern: 'Favignana'
+    lat_deg: 37.9300
+    lon_deg: 12.3250
+    height_m: 302
+    source: 'Smyth 1824, p. 246: two thousand three hundred people besides the garrison and three or four hundred convicts, the tunny and anchovy fisheries, stone, sheep, goats and poultry the Pallavicini''s revenue; the east and west coasts low and not easily seen on a dark night (App. p. xxviii); the height FROM MEMORY'
+    says: 'Favignana, the largest of the Egadi, low at either end with its high ridge and castle in the middle.'
+
+  - id: santa-caterina
+    kind: castle
+    name: St Catharine's Castle
+    modern: 'Forte di Santa Caterina, Favignana'
+    lat_deg: 37.9390
+    lon_deg: 12.3100
+    height_m: 302
+    source: 'Smyth 1824, p. 246: the castle on the highest point of the island, impregnable unless by famine, a telegraph on its keep in communication with Maritimo; p. xl: 37 56 36 N, 12 17 45 E; Smyth 1854, p. 444: 1249 feet, an excellent sea-mark'
+    says: 'St Catharine''s Castle on the summit of Favignana, an excellent sea-mark, with its telegraph.'
+
+  - id: favignana-road
+    kind: anchorage
+    name: the road between Favignana and Levanso
+    modern: 'between Favignana and Levanzo'
+    lat_deg: 37.9700
+    lon_deg: 12.3300
+    height_m: 0
+    depth_fathoms: 21
+    bottom: mud
+    source: 'Smyth 1824, App. pp. xxvi to xxvii: between Favignana and Levanso an eligible rendezvous for a fleet, twenty-one fathoms of mud just off the gravelly bottom, St Catharine''s Castle W S W and the Formiche tower N E'
+    says: 'The road between Favignana and Levanso, twenty-one fathoms of mud, a rendezvous for a fleet.'
+
+  - id: cala-rossa
+    kind: anchorage
+    name: Cala Rossa
+    modern: 'Cala Rossa, Favignana'
+    lat_deg: 37.9480
+    lon_deg: 12.3600
+    height_m: 0
+    depth_fathoms: 12
+    bottom: sand and weed
+    source: 'Smyth 1824, App. p. xxvii: good berths in Cala Rossa in seven to twenty fathoms, any wind serving for coming or going; p. 245: the Venetian squadron under Emo lay there about 1784 and before it the Russian fleet; vegetables, fruit and water to be had; the bottom JUDGEMENT'
+    says: 'Cala Rossa on Favignana''s north-east side, good berths in seven to twenty fathoms, any wind serving to come or go.'
+
+  - id: st-catherine-bank
+    kind: shoal
+    name: the bank of St Catharine
+    modern: 'the Secca di Santa Caterina, south of Favignana'
+    lat_deg: 37.8982
+    lon_deg: 12.3532
+    fix: 'the grid''s isolated head of 3.1 m, S E 3.2 miles from St Catharine''s Castle, where Smyth gives S 1/2 E nearly three'
+    height_m: 0
+    dries_m: -5.5
+    extent_m: 200
+    source: 'Smyth 1824, App. p. xxviii: two foul spots N N E and S S W with a deep swash between, the north bank''s head a dangerous rock of three fathoms S 1/2 E nearly three miles from St Catharine''s Castle, in the usual track from Malta round the islands to Italy; Smyth 1854, p. 444: 37 53 40 N, 12 17 10 E'
+    says: 'The bank of St Catharine, a rock of three fathoms three miles south of Favignana, in the track from Malta round the islands.'
+
+  - id: marettimo
+    kind: island
+    name: Maritimo
+    modern: 'Marettimo'
+    lat_deg: 37.9700
+    lon_deg: 12.0600
+    height_m: 686
+    source: 'Smyth 1824, p. 244: high, about seven miles round, its west side inaccessibly steep; fifty or sixty people at San Simone, good landing in westerly winds and excellent water; App. p. xxix: one of the most important landfalls in the Mediterranean; Smyth 1854, p. 444: to 2300 feet'
+    says: 'Maritimo, the high westernmost of the Egadi, one of the great landfalls of the sea.'
+
+  - id: marettimo-castle
+    kind: castle
+    name: the castle of Maritimo
+    modern: 'Castello di Punta Troia, Marettimo'
+    lat_deg: 37.9928
+    lon_deg: 12.0631
+    fix: 'the grid''s north point of the island, 2.4 km south of the place first drawn FROM MEMORY'
+    height_m: 116
+    source: 'Smyth 1824, p. 244: the castle on a high steep rock joined to the island by an isthmus, defending the small anchorage beneath; p. 245: garrisoned by about forty invalids and often used as a state prison; p. xl: 38 01 10 N, 12 03 55 E; the height FROM MEMORY'
+    says: 'The castle of Maritimo on its steep rock at the north-east point, a state prison.'
+
+  - id: marsala
+    kind: town
+    name: Marsala
+    modern: 'Marsala'
+    lat_deg: 37.7980
+    lon_deg: 12.4370
+    height_m: 10
+    source: 'Smyth 1824, p. 232: twenty-one thousand people trading in excellent wine, fruit and barilla, the town without ordnance or bomb-proof stores; p. 233: the old port filled with stones about 1570 by John of Austria''s order; p. 234: Mr Woodhouse''s mole raised from the sunken stones before his establishment south of the town; Purdy 1826, p. 150: the English Wine Establishment a mile south of the city'
+    says: 'Marsala on its low cape, with the English wine establishment and its small mole a mile to the south.'
+
+  - id: cape-boeo
+    kind: headland
+    name: Cape Boeo
+    modern: 'Capo Lilibeo (Boeo)'
+    lat_deg: 37.8040
+    lon_deg: 12.4264
+    fix: 'moved 560 m to the grid''s land'
+    height_m: 5
+    source: 'Smyth 1824, p. xxxix: Cape Boeo 37 48 10 N, 12 25 10 E; Purdy 1826, p. 150: low, the chapel of St John on the point a useful mark; Smyth 1824, p. 228: a spring of fresh water in the cave under the chapel'
+    says: 'Cape Boeo, the old Lilybaeum, low, with the chapel of St John on its point.'
+
+  - id: boeo-shoals
+    kind: shoal
+    name: the shoals of Cape Boeo
+    modern: 'the shoals off Capo Lilibeo'
+    lat_deg: 37.8056
+    lon_deg: 12.4334
+    fix: 'moved 1393 m to the grid''s shoal head (0.0 m)'
+    height_m: 0
+    dries_m: -0.5
+    extent_m: 400
+    source: 'Smyth 1824, App. p. xxvi: the shoals trend from Cape Boeo to the S E, in many places nearly even with the water''s edge, the rocks extending more than a mile from the land in every direction'
+    says: 'The shoals off Cape Boeo, nearly awash, running a mile and more off the land.'
+
+  - id: marsala-road
+    kind: anchorage
+    name: the road of Marsala
+    modern: 'south-west of Marsala, two miles off'
+    lat_deg: 37.7740
+    lon_deg: 12.4080
+    height_m: 0
+    depth_fathoms: 8.5
+    bottom: mud
+    source: 'Smyth 1824, App. p. xxvi: ships of size lie S W of the city in eleven to eight fathoms nearly two miles off shore, the rocks extending more than a mile; the berth eight and a half fathoms of mud, St Catharine''s Castle N N W and Mr Woodhouse''s ballio E 1/2 N; between the mole and the beach seven to fourteen feet, stiff bottom'
+    says: 'The road of Marsala, eight and a half fathoms of mud two miles off the city; the rocks run out more than a mile.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: the south coast, Cape Granitola to Terranova (the harbour patches sciacca, girgenti, licata and terranova)
+  # ---------------------------------------------------------------------------
+
+  - id: capo-granitola
+    kind: headland
+    name: Cape Granitola
+    modern: 'Capo Granitola'
+    lat_deg: 37.5656
+    lon_deg: 12.6625
+    fix: 'moved 772 m to the grid''s land'
+    height_m: 5
+    source: 'Smyth 1824, p. 223: a long, low, sandy projection with a reef of rocks off it at the south-west point of Sicily, the land flat, not seen in thick weather before a vessel is on the shoals, which extend to a considerable distance; the want of a light-house seriously felt'
+    says: 'Cape Granitola, a long low sandy point with its reef, hard to see in thick weather before the shoals.'
+
+  - id: cape-st-marco-sciacca
+    kind: headland
+    name: Cape St Marco
+    modern: 'Capo San Marco, Sciacca'
+    lat_deg: 37.4960
+    lon_deg: 13.0170
+    height_m: 30
+    source: 'Smyth 1824, App. p. xxiv: an abrupt forked point of moderate height and a reddish colour, a square tower with a battery on its summit, a shelf of rocks to be approached by the lead; p. xxxix: the tower 37 29 15 N, 13 00 20 E'
+    says: 'Cape St Marco, a reddish forked point with its square tower and battery.'
+
+  - id: sciacca
+    kind: town
+    name: Sciacca
+    modern: 'Sciacca'
+    lat_deg: 37.5070
+    lon_deg: 13.0810
+    height_m: 60
+    source: 'Smyth 1824, p. 217: eleven thousand people, one of the principal caricatori of the south coast with grain pits, corn, fruit, anchovies, sulphur and barilla exported; its wall with the castle of Luna at its east angle; pp. 216 to 217: the bandits of the hills put down by the British troops; p. xxxix: Castle Peralta 37 29 50 N, 13 04 46 E'
+    says: 'Sciacca up its slope behind its wall, the castle of Luna at the east angle, a loading-place for corn.'
+
+  - id: sciacca-road
+    kind: anchorage
+    name: the road of Sciacca
+    modern: 'a mile off Sciacca'
+    lat_deg: 37.4920
+    lon_deg: 13.0800
+    height_m: 0
+    depth_fathoms: 8
+    bottom: mud
+    source: 'Smyth 1824, App. p. xxiii: ships ride about a mile off Sciacca in summer in seven to twelve fathoms, sand and clay, exposed to every wind from S E round southerly to W, used only in the fine months except by boats and flat vessels that can be beached; the berth eight fathoms of mud a mile off, the castle N'
+    says: 'The road of Sciacca, eight fathoms of mud a mile off the town: a summer road, open from south-east round to west.'
+
+  - id: capo-bianco
+    kind: headland
+    name: Cape Bianco
+    modern: 'Capo Bianco (Eraclea Minoa)'
+    lat_deg: 37.3900
+    lon_deg: 13.2770
+    height_m: 27
+    source: 'Smyth 1824, pp. 216 and App. p. xxiii: a white promontory about ninety feet high, a shoal reef nearly a mile and a half to the southward; p. xxxix: the turret 37 22 25 N, 13 16 27 E'
+    says: 'Cape Bianco, a white promontory ninety feet high.'
+
+  - id: capo-bianco-reef
+    kind: shoal
+    name: the reef off Cape Bianco
+    modern: 'the reef south of Capo Bianco'
+    lat_deg: 37.3833
+    lon_deg: 13.2796
+    fix: 'moved 1487 m to the grid''s shoal head (8.5 m)'
+    height_m: 0
+    dries_m: -2.0
+    extent_m: 300
+    source: 'Smyth 1824, p. 216 and App. p. xxiii: a shoal reef extending nearly a mile and a half to the southward of Cape Bianco; the depth JUDGEMENT'
+    says: 'The reef off Cape Bianco, running a mile and a half to the south.'
+
+  - id: girgenti
+    kind: town
+    name: Girgenti
+    modern: 'Agrigento'
+    lat_deg: 37.3110
+    lon_deg: 13.5770
+    height_m: 360
+    source: 'Smyth 1824, pp. 204 to 205: the city on its hill nearly twelve hundred feet above the sea, almost every house seen from the offing, fifteen thousand people (once two hundred thousand); the cathedral 37 17 44 N, 13 34 06 E (p. xxxix), a mark in taking the anchorage (Smyth 1854, p. 443)'
+    says: 'Girgenti on its high ridge, every house seen from the sea, the temples below it.'
+
+  - id: girgenti-mole
+    kind: town
+    name: the Mole of Girgenti
+    modern: 'Porto Empedocle'
+    lat_deg: 37.2880
+    lon_deg: 13.5250
+    height_m: 10
+    source: 'Smyth 1824, p. 203: the caricatore of about a hundred houses, extensive corn magazines and a prison, seven hundred people besides two or three hundred galley-slaves (convicts) kept to clear the harbour; the mole built by Charles III in 1756 with the stone of the temple of Jupiter Olympius; p. 204: tolerable defence against Barbary cruisers; App. p. xxii: the mole well finished, a good watering-place in its centre and mooring posts all round'
+    says: 'The Mole of Girgenti, the caricatore with its corn magazines, its prison tower and its mole.'
+
+  - id: girgenti-light
+    kind: light
+    name: the light of Girgenti
+    modern: 'the mole-head light, Porto Empedocle'
+    lat_deg: 37.2855
+    lon_deg: 13.5280
+    fix: 'on the mole-head, placed by hand FROM MEMORY'
+    height_m: 12
+    lit: {from: 1756, until: null, range_nm: 6, character: "fixed"}
+    source: 'Smyth 1824, p. 204: two light-houses, at the mole-head and on the cliff, both useless from their construction and the wretchedness of the lights; p. xxxix: the mole light 37 15 39 N, 13 31 40 E; the year the mole''s (p. 203: 1756), the light''s own JUDGEMENT, the character and the range JUDGEMENT'
+    says: 'The light of Girgenti on the mole-head, so poorly kept as to be nearly useless.'
+
+  - id: girgenti-road
+    kind: anchorage
+    name: the road of Girgenti
+    modern: 'off the mole, Porto Empedocle'
+    lat_deg: 37.2725
+    lon_deg: 13.5245
+    fix: 'moved 72 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 9
+    bottom: stiff clay
+    source: 'Smyth 1824, App. p. xxii: between the bank and the mole-head very excellent anchorage for ships of every description in seven to ten fathoms, sand and clay, level and clean, open from W N W round southerly to S E but seldom to be feared; the station for a south-wester nine fathoms of stiff clay a mile and a quarter from the mole steps; inside the mole two and a half and three fathoms, shoaling with the southerly winds'' sand, the port small and generally crowded'
+    says: 'The road of Girgenti, nine fathoms of stiff clay a mile and a quarter off the mole steps; the mole within is small and crowded.'
+
+  - id: melville-shoal
+    kind: shoal
+    name: the bank off the river of Girgenti
+    modern: 'the Secca di Melville, south of San Leone'
+    lat_deg: 37.2193
+    lon_deg: 13.5568
+    fix: 'moved 2308 m to the grid''s shoal head (9.6 m)'
+    height_m: 0
+    dries_m: -6.4
+    extent_m: 600
+    source: 'Smyth 1824, App. p. xxii: about three miles south of the river of Girgenti, trending W N W and E S E, three and a half to five fathoms on the shoalest part, the mole tower on with the upper light-house; Purdy 1826, p. 153: Melville shoal'
+    says: 'The bank off the river of Girgenti, three fathoms and a half on its head, three miles out.'
+
+  - id: licata
+    kind: town
+    name: Alicata
+    modern: 'Licata'
+    lat_deg: 37.1040
+    lon_deg: 13.9370
+    height_m: 30
+    source: 'Smyth 1824, p. 199: nearly eleven thousand people, a considerable caricatore for grain and sulphur, two tolerable forts, the walls decayed; p. 200: no port, the want of one felt nowhere more; App. p. xxi: the sea castle with its flagstaff and the upper castle; p. xxxviii: the castle 37 04 03 N, 13 55 54 E'
+    says: 'Alicata under its castled hill, a loading-place for grain and sulphur with no harbour.'
+
+  - id: licata-road
+    kind: anchorage
+    name: the road of Alicata
+    modern: 'a mile south-west of Licata'
+    lat_deg: 37.0888
+    lon_deg: 13.9214
+    fix: 'moved 386 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 8.5
+    bottom: mud
+    source: 'Smyth 1824, App. p. xxi: about a mile S W of the town in seven to twelve fathoms, good clayey bottom, exposed in winter to all winds from east to west round southerly; buoy the cables in light winds; the berth eight and a half fathoms of mud a mile off (Purdy 1826, p. 155; the Memoir''s OCR reads 82)'
+    says: 'The road of Alicata, eight and a half fathoms of mud a mile off the town; open from east round south to west in winter.'
+
+  - id: terranova
+    kind: town
+    name: Terranova
+    modern: 'Gela'
+    lat_deg: 37.0660
+    lon_deg: 14.2500
+    height_m: 45
+    source: 'Smyth 1824, p. 197: about nine thousand people, a brisk trade in sulphur, corn, wine and coarse cloth, the produce of Caltagirone brought down for embarkation; App. p. xx: on a tabled hill between two rivulets, small craft at the caricatore under the Torre dell''Insegna; p. xxxviii: the Doric column 37 02 54 N, 14 15 00 E'
+    says: 'Terranova on its tabled hill over the Geloan plain, a lone Doric column on the shore below.'
+
+  - id: terranova-road
+    kind: anchorage
+    name: the road of Terranova
+    modern: 'a mile off Gela'
+    lat_deg: 37.0389
+    lon_deg: 14.2442
+    fix: 'moved 1286 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 9
+    bottom: sand and mud
+    source: 'Smyth 1824, App. p. xx: about a mile from the town in seven to eleven fathoms, sand and mud, very much exposed, the south-wester sending in a great sea, no room to get under way when it blows fresh; Lamberti 1844, p. 194: eight and ten braccia a mile off'
+    says: 'The road of Terranova, seven to eleven fathoms of sand and mud a mile off: very much exposed, watch every shift of wind.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: Cape Passaro's Porto Paolo (the harbour patch passaro)
+  # ---------------------------------------------------------------------------
+
+  - id: porto-palo
+    kind: anchorage
+    name: Porto Paolo
+    modern: 'Portopalo di Capo Passero'
+    lat_deg: 36.6697
+    lon_deg: 15.1239
+    fix: 'moved 962 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand and mud
+    source: 'Smyth 1824, App. p. xix: a convenient place for coasters in all winds but that from the south, good sandy bottom mixed with mud, five to three fathoms inside and seven to ten at the entrance; nearly a dozen vessels seen riding out a brisk northerly gale; a reef off the low cape on which an English line of battle ship grounded a few years before'
+    says: 'Porto Paolo under Cape Passaro, sandy mud in three to five fathoms, a coasters'' shelter in all winds but the south.'
+
+  - id: marzamemi
+    kind: town
+    name: Marzamemi
+    modern: 'Marzamemi'
+    lat_deg: 36.7400
+    lon_deg: 15.1180
+    height_m: 5
+    source: 'Smyth 1824, p. 180: the tonnara one of the most profitable in Sicily, with salt from the lake behind it, defended by a miserable tower-battery; App. p. xvii: very small and shallow, room for a few trading boats in two and a quarter fathoms, refreshments by waiting a day or two, water at the end of the marshes; a reef of one and a quarter fathoms a mile E N E; p. xxxvii: the tower 36 45 30 N, 15 06 45 E'
+    says: 'Marzamemi, the tunny station with its tower and salt lake, a few boats in its shallow cove.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: Pantelleria (the harbour patch pantellaria)
+  # ---------------------------------------------------------------------------
+
+  - id: pantelleria
+    kind: island
+    name: Pantellaria
+    modern: 'Pantelleria'
+    lat_deg: 36.7800
+    lon_deg: 11.9900
+    height_m: 675
+    source: 'Smyth 1824, pp. 281 to 283: about four thousand six hundred souls, the most natives, the rest fugitives from the laws of Sicily or criminals under sentence; raisins, wine, oil, cotton, orchilla and a little alum exported, corn for three months only; Purdy 1826, p. 147: seen from a frigate''s deck at fifteen leagues; Smyth 1854, p. 444: to 2213 feet'
+    says: 'Pantellaria, high and dark, seen fifteen leagues off, its summit near the middle.'
+
+  - id: pantelleria-town
+    kind: castle
+    name: the castle of Pantellaria
+    modern: 'Castello Barbacane, Pantelleria'
+    lat_deg: 36.8320
+    lon_deg: 11.9416
+    fix: 'moved 40 m to the grid''s land'
+    height_m: 15
+    source: 'Smyth 1824, p. 283: a large but weak castle with a square keep mounting ten or twelve old guns, two-gun batteries on Points St Leonard and Santa Croce; p. 282: the town and castle at the head of a cove on the north-west point; p. xl: the Prison Fort 36 51 15 N, 11 54 29 E'
+    says: 'The castle of Pantellaria, the prison fort, its square keep over the cove of the town.'
+
+  - id: pantelleria-road
+    kind: anchorage
+    name: the road of Pantellaria
+    modern: 'two miles north-west of Pantelleria town'
+    lat_deg: 36.8423
+    lon_deg: 11.9263
+    fix: 'the nearest water of the pilot''s depth band to his bearing (48 m: the bank is steep), moved from the place drawn by the castle''s bearing'
+    height_m: 0
+    depth_fathoms: 18
+    bottom: sand
+    source: 'Smyth 1824, App. pp. xxxiii to xxxiv: large ships anchor off the harbour with the castle S E about two miles in eighteen fathoms, sandy bottom, rocky and foul further in, best with the chain; the harbour of Points Leonardo and Santa Croce for the island''s small vessels, a passage of fifty fathoms wide and two and a half deep among the rocks; a N W gale sends in a ground swell'
+    says: 'The road of Pantellaria, eighteen fathoms of sand with the castle two miles south-east; foul ground further in.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: Lampedusa, Linosa and Lampion (the harbour patch lampedusa)
+  # ---------------------------------------------------------------------------
+
+  - id: lampedusa
+    kind: island
+    name: Lampedusa
+    modern: 'Lampedusa'
+    lat_deg: 35.5150
+    lon_deg: 12.5800
+    height_m: 120
+    source: 'Smyth 1824, p. 285: level, shelving to the S E from nearly four hundred feet; never regularly inhabited until Mr Fernandez''s lease about ten or twelve years before (p. 286), the Tommasi family''s since 1667; intended as a substitute for Valletta when Buonaparte disputed Malta; wood cut for Tripoli and Malta'
+    says: 'Lampedusa, a long level island shelving to the south-east, its cliffs white on the north.'
+
+  - id: cape-ponente
+    kind: headland
+    name: Cape Ponente
+    modern: 'Capo Ponente, Lampedusa'
+    lat_deg: 35.5183
+    lon_deg: 12.5235
+    fix: 'moved 519 m to the grid''s land'
+    height_m: 115
+    source: 'Smyth 1824, App. p. xxxv: a steep, picturesque and perpendicular cliff that may be rounded by ships of any size at a furlong; Smyth 1854, p. 444: 35 31 0 N, 12 29 57 E, 378 feet'
+    says: 'Cape Ponente, Lampedusa''s west cape, a sheer cliff to be rounded at a furlong.'
+
+  - id: lampedusa-castle
+    kind: castle
+    name: the castle of Lampedusa
+    modern: 'the old tower above the harbour, Lampedusa'
+    lat_deg: 35.5010
+    lon_deg: 12.6060
+    height_m: 20
+    source: 'Smyth 1824, p. 285: Orlando''s tower, now called the castle; App. p. xxxv: on the landing point, with a chapel, a storehouse and the walls and bastions built by Mr Fernandez; p. xl: 35 29 19 N, 12 35 10 E'
+    says: 'Orlando''s tower, the castle of Lampedusa, on the point over the harbour.'
+
+  - id: lampedusa-road
+    kind: anchorage
+    name: the road of Lampedusa
+    modern: 'south of Lampedusa harbour'
+    lat_deg: 35.4860
+    lon_deg: 12.5960
+    height_m: 0
+    depth_fathoms: 17
+    bottom: gravelly sand
+    source: 'Smyth 1824, App. p. xxxiv: good anchorage under the island with the old tower N E by N in seventeen or eighteen fathoms, gravelly sand, two or three spots that rub the cable; then warp in, there being no room to work'
+    says: 'The road of Lampedusa, seventeen fathoms of gravelly sand with the old tower north-east by north; warp in from here.'
+
+  - id: lampedusa-harbour
+    kind: anchorage
+    name: the harbour of Lampedusa
+    modern: 'Porto di Lampedusa'
+    lat_deg: 35.4978
+    lon_deg: 12.6015
+    fix: 'moved 80 m to the grid''s water of about the pilot''s depth'
+    height_m: 0
+    depth_fathoms: 5.5
+    bottom: soft mud
+    source: 'Smyth 1824, App. pp. xxxiv to xxxv: a cove where ships of three or four hundred tons find excellent shelter from every wind, the S S W the worst for its ground-swell, scarcely room to moor a frigate unless by fasts to the shore; the berth five and a half fathoms opposite the low rocky point; the rocks cut for small vessels'' fasts; Norie 1831, p. 147: the mouth about 400 yards wide, the bottom mostly soft mud'
+    says: 'The harbour of Lampedusa, five and a half fathoms of soft mud, with fasts to the rocks: shelter from every wind but the south-south-west.'
+
+  - id: rabbit-island
+    kind: island
+    name: the Rabbit
+    modern: 'Isola dei Conigli'
+    lat_deg: 35.5109
+    lon_deg: 12.5578
+    fix: 'moved 189 m to the grid''s land'
+    height_m: 25
+    source: 'Smyth 1824, App. p. xxxv: an islet and two rocks, the Rabbit and Coneys, exactly halfway between the cape and the harbour, the western Coney very low and hard to see against the white cliffs by night; the group bold enough to be brushed; the height FROM MEMORY'
+    says: 'The Rabbit and its Coneys, an islet and two rocks under Lampedusa''s south shore.'
+
+  - id: linosa
+    kind: island
+    name: Linosa
+    modern: 'Linosa'
+    lat_deg: 35.8650
+    lon_deg: 12.8650
+    height_m: 159
+    source: 'Smyth 1824, App. p. xxxiv: bold to on all sides, twenty to ten fathoms close in, boats land in a small creek under a cliff on the west point; the appearance of two islets from its conical peak; p. 284: uninhabited; p. xl: the landing cove 35 51 50 N, 12 52 09 E; Smyth 1854, p. 444: the highest crater 522 feet'
+    says: 'Linosa, the uninhabited island of craters, bold to all round.'
+
+  - id: lampione
+    kind: island
+    name: Lampion
+    modern: 'Lampione'
+    lat_deg: 35.5480
+    lon_deg: 12.3200
+    fix: 'an island the grid lacks (EMODnet reads 47 m of water over it): placed at the modern islet FROM MEMORY, its extent its length halved'
+    height_m: 40
+    grid_lacks: true
+    extent_m: 300
+    source: 'Smyth 1824, App. p. xxxv: steep west, north and south sides, cliffs of 120 to 140 feet, bold to in ten to twenty fathoms except a shoal tailing a furlong off the seal-point; W by N 1/2 N seven or eight miles from Lampedusa''s west cape across a clear channel; p. 289: like a mere wall from the north-west; p. xl: 35 32 47 N, 12 19 50 E'
+    says: 'Lampion, a wall of a rock seven or eight miles west of Lampedusa.'
+
+  # ---------------------------------------------------------------------------
+  # Step 3: Lipari and Vulcano (the harbour patch lipari)
+  # ---------------------------------------------------------------------------
+
+  - id: lipari
+    kind: town
+    name: Lipari
+    modern: 'Lipari'
+    lat_deg: 38.4660
+    lon_deg: 14.9550
+    height_m: 50
+    source: 'Smyth 1824, pp. 261 to 264: nearly twelve thousand people, the seat of the islands'' government, the castle on a huge mass of volcanic glass with a garrison of invalid veterans, built by Charles V after Barbarossa had plundered the town in 1544 and carried off numbers of captives; the pratique office on the marina; p. 250: wine, currants, pumice, sulphur, coral and fish exported; p. xxxix: the castle 38 27 56 N, 14 57 50 E'
+    says: 'Lipari, its castle on the great rock of black glass between the two bays of the town.'
+
+  - id: lipari-anchorage
+    kind: anchorage
+    name: the anchorage of Lipari
+    modern: 'Marina Lunga, Lipari'
+    lat_deg: 38.4710
+    lon_deg: 14.9559
+    fix: 'the grid''s water of about the pilot''s depth (18.5 m), placed by hand: the anchorage lies on tyrrhenian''s tile beyond the harbour patch'
+    height_m: 0
+    depth_fathoms: 13
+    bottom: sand
+    source: 'Smyth 1824, App. pp. xxxi to xxxii: the water very deep, thirty to fifty fathoms close in, except a lava reef of three fathoms off the beach of the northern bay; sixteen or seventeen vessels lie between it and the castle, anchoring in twelve or fourteen fathoms with stern-fasts to the shore; the island''s craft off the pratique office mole south of the castle; large ships in the northern bay under the Scala di Canneto, where the S E wind is inconvenient; Purdy 1826, p. 120: exposed to every wind but that over the island; the bottom JUDGEMENT'
+    says: 'The anchorage of Lipari, twelve to fourteen fathoms with a stern-fast to the shore, between the lava reef and the castle.'
+
+  - id: bentinck-shoal
+    kind: shoal
+    name: the Bentinck shoal
+    modern: 'the shoal west of Lipari'
+    lat_deg: 38.4811
+    lon_deg: 14.8055
+    fix: 'the grid lacks the pinnacle (no head under 15 m within 5 km south of 38.5 N): placed at Smyth 1854''s table less a minute of longitude (the block''s reading of his longitudes)'
+    height_m: 0
+    dries_m: -4.6
+    extent_m: 60
+    source: 'Smyth 1824, App. p. xxxii: two miles outside the Scoglio del Bagno, two hundred yards round with two and a half fathoms on it and sixteen to twenty-five a few feet off, the head of a bank of twenty to forty fathoms; Pietra Longa just open north of Vulcanello; named by him (p. 267); Smyth 1854, p. 444: 38 28 52 N, 14 49 20 E'
+    says: 'The Bentinck shoal, two fathoms and a half on a pinnacle west of Lipari.'
+
+  - id: vulcano
+    kind: island
+    name: Vulcano
+    modern: 'Vulcano'
+    lat_deg: 38.3900
+    lon_deg: 14.9650
+    height_m: 499
+    source: 'Smyth 1824, App. p. xxxii: the crater and the smell of sulphur to leeward; the channel between Lipari and Vulcano a mile broad and perfectly safe, thirty to forty fathoms, with a ripple in some winds; p. xxxix: the sulphur works 38 23 19 N, 14 55 56 E; the height FROM MEMORY'
+    says: 'Vulcano, its crater smoking and the smell of sulphur carried to leeward.'

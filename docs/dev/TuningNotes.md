@@ -29940,6 +29940,71 @@ passed. No digest moved; no game line about a hoist or the colours moved (the lo
 `dressed` and `dressed_since` are out of the pickle while unset; a ship never dressed
 records nothing new). The tree reported differs from 01885a5 by this paragraph alone.
 
+**Step 5: the nations' days.** `days.yaml` for Britain (7 days), Spain (7) and France (5),
+each dated by its years. On a day, a ship of the sea at anchor under a rules captain dresses
+of herself by day and undresses at sunset (not logged; the lookout's words of her flags say
+"she is dressed in her flags"); the player's ship does not: lying at anchor, her first
+lieutenant reminds the captain once that day ("It is the King's birthday, sir: the ships in
+harbour will be dressing"). **Stopped and reported, the salute:** the gunnery has the gun to
+leeward (one loaded gun, "the shot to strike nothing") and no blank: `charges.py` leaves the
+saluting charge out (package 77's), there is no train of guns fired at an interval, a gun
+fired is a shot from a loaded gun, and the far ships fire nothing but their far action's
+rounds. A salute wants: a blank load (powder, no shot) and its cartridge drawn from the
+magazine (the table's saluting charge), a train of N guns of a side fired one at a time at
+the interval (not read in any source held: FROM MEMORY five seconds), each reloaded with
+blank in turn, the guns heard at the guns' range by the ships about her, and the far ships'
+salutes heard as their guns; more than a short new act. **Not built, splice the main
+brace:** the stores keep provisions as days at full allowance and water in tons, no spirits
+apart; an extra issue wants a spirits store first (package 54's stores).
+
+**Step 5 and decision 69 (the lead's word of 2026-11-13).** The days are read by the date of
+the world's own clock (`world.clock.ship_time`), as the calendar carries them: a day is kept
+in its `years`, and the reigns those years follow (a king's birthday ends with the king; the
+French days pass from the Saint-Louis to the Republic's fêtes, the Saint-Napoléon and the
+Saint-Louis again) are read as the calendar's, by the lead's word ("a king's birthday is the
+calendar's"). Nothing in step 5 reads who is at war or who holds a port: a ship dresses on
+her own nation's day wherever she lies at anchor, at home, abroad or off an enemy's coast,
+and the first lieutenant's word is said wherever the player's ship lies at anchor; no line
+asks whose the port is. The scenario's `follows_history` (the trunk's calendar step) is not
+read: the days are the calendar's, kept alike whether the record seeds the world or is
+followed. Left for package 103's design, said not built: when a state can
+change its government in play, which house reigns is the world's own, and the days' years
+would then be read against that state and not the date (the French days from 1792 are the
+plainest case).
+
+**Step 5: the measure.** At 09fd157 (step 5 with the trunk at 788cb3c, step 4 merged as
+c0bd2ac, merged by a merge commit, then the trunk at ce4b78e the same way, the two truths
+appends kept with the trunk's first; the reach of the first lieutenant's word placed, which
+the trunk's truth 7-380 asks of every kind): ruff check and format clean (385 files); the
+fast tier 7,599 passed, 1 xfailed, 0 failed; the slow tier of the touched files and of
+`test_known_truths` (step 4's ten, test_knowledge and the browser plans, test_browser_probe's
+13 with none skipped; `--slow -m "not pace"`) 1,789 passed, 8 xfailed, 0 failed; pace alone
+and last on the same files, 13 passed. No digest moved; no game line about a hoist or the
+colours moved (the locker's `day_said` out of the pickle while unset; a ship at anchor on no
+day records nothing new). The tree reported differs from 09fd157 by this paragraph alone.
+
+**Step 5: the lead's two mends (2026-11-13, before the trial).** (1) The word of the day is
+the ship's own officer's (`agent.officer_rank`, a lazy import): the first lieutenant in a
+frigate, the lieutenant in a brig-sloop, the mate in a cutter, a schooner or a trader (a
+smack's master at anchor at Falmouth on the 4th of June is reminded by the mate), named as
+the station's binding names him; the record's data carries `person`. (2) No words in a
+seated officer's mouth. **Found:** no line the game speaks as the officer had a rule for a
+seated one (the officer's name is read by `reports` for whose deck it is, and the lines
+`world/captive.py` speaks are the captain's, heard by the seated stations within earshot):
+no precedent, so, as the lead said, where `holder_of(world, "officer of the watch")` is held
+the day is said to the deck with no speaker, "It is the King's birthday: the ships in
+harbour will be dressing." (kind `colours.day`, of the `colours` family: the deck), for the
+seated officer to say to the captain himself; once, as before. Tests: a frigate and a smack,
+each with her own officer's word; a frigate with a fake officer seated (truth 7-505 widened
+to both).
+
+**Step 5, the mends: the measure.** At 4a1a70c (the mends, 606d780, with the trunk at 18ea281
+merged by a merge commit, the truths appends kept with the trunk's first): ruff check and
+format clean (385 files); the fast tier whole 7,605 passed, 1 xfailed, 0 failed; the slow
+tier of the step's files (as at 09fd157: test_browser_probe's 13 played, none skipped, and
+test_knowledge; `--slow -m "not pace"`) 1,794 passed, 8 xfailed, 0 failed. The tree
+reported differs from 4a1a70c by this paragraph alone.
+
 ## Package 104: the Sardinian sea and the coast from Bougie to Cape Bon (2026-11-11)
 
 **Where I stand (2026-11-11, 05:10 UTC).** Done: items 0 to 9 built, the trunk merged at
@@ -30322,7 +30387,9 @@ region `sicily`: Malta, eastern Sicily and the Strait) built on the block's own 
 lead accepted it, the trunk merged after step 1 (296aa59), measured and reported (0d21bf3);
 held by the lead for package 111's audit, the trunk merged again, the audit's two findings
 owned and the Hammamet and Calabrian water given the block's tide, measured at e3d2ce8 and
-reported at the hash that adds its figures. Step 3 built beside it on a local branch. Decision 68 (the lead's note of 2026-11-12)
+merged as dade4a1. Step 3 (the west, the south coast and the islands, the scenario, the
+sliver closed in step 2's hash) built, the trunk merged after decision 69, measured at
+bdf4442 and reported at the hash that adds its figures. Decision 68 (the lead's note of 2026-11-12)
 binds step 2's and step 3's port words.
 
 ### Step 1: the dated rows
@@ -31011,3 +31078,872 @@ three measured alone nine times a tree, alternately: the trunk 477 to 584 (media
 296aa59 448 to 677 (545), e3d2ce8 400 to 598 (536). The floor sits inside the machine's
 spread for that truth on every tree; a finding for the lead, not mended. The tree reported
 differs from e3d2ce8 by this paragraph and the "where I stand" above alone.
+
+### Step 3: the west, the south coast and the islands (as built)
+
+**The sources' pass.** Smyth 1824's west and south coasts and islands (chs. V to VII) and the
+Appendix (pp. iv to vi, xvii to xxxv, the table of positions pp. xxxvii to xl), with Purdy
+1826, Norie 1831, Smyth 1854's table (pp. 442 to 444) and Lamberti 1844 (after the period,
+sparingly), read place by place; every figure in the files cites its page, the rest marked
+FROM MEMORY or JUDGEMENT. Against the brief: **Cefalù and Termini are marks, not ports**
+(Smyth 1824, App. p. v: Cefalù's bay a summer anchorage for coasters with a pier for fishing
+vessels; Termini's road frequented only by boats that can be beached); **Favignana a port**
+(the fleet's road between it and Levanso and Cala Rossa, App. pp. xxvi to xxvii) and
+**Maritimo marks alone** (its landing for boats, its castle a state prison). No source names
+a pilot or his fee at any of the step's ports (the boats and their people JUDGEMENT), nor
+Ingham's house at Marsala (Woodhouse's mole and ballio are Smyth's), nor a year for any light
+(Palermo's and Trapani's entered lit from 1700, JUDGEMENT as Messina's; Girgenti's from 1756,
+its mole's year; Marsala's mole-light Smyth 1854's and not entered). Lampedusa is the
+Tommasi princes' fief (Smyth 1824, p. 285), so `naples`; Mr Fernandez's lease (about 1812 to
+1814 by "ten or twelve years ago", JUDGEMENT) a private one, not a holder.
+
+**Built.** Sixty-five marks in `features/sicily.yaml` (the north coast from Cape Orlando to
+Palermo, the west and the Egadi, the south coast to Terranova, Porto Paolo, Pantellaria,
+Lampedusa with Linosa and Lampion, Lipari with Vulcano) and Ustica's four in
+`features/tyrrhenian.yaml`, each index rebuilt from its file and the manifest's counts
+edited; no tile written. The grid lacks the Porcelli and the Bentinck shoal (placed by the
+pilots' bearings and Smyth's table) and Lampion (an island the grid lacks); Formica and
+Maritimo's castle moved 2.3 and 2.4 km to the grid's land, said in `fix`. Thirteen ports
+(Palermo, Trapani, Favignana, Marsala, Sciacca, the Mole of Girgenti, Alicata, Terranova,
+Porto Paolo, Lipari, Pantellaria, Lampedusa, Ustica), each `naples`, with tracks clear of the
+land by `Chart.line_shore` and the audit's way in (Porto Paolo is its own road: the road north
+of Passaro put its way in across the cape, the audit's f-in). Lipari's and Ustica's roads
+are their anchorages (thirty to two hundred fathoms a cable off). Decision 68's words at
+Palermo and Girgenti (the convicts called galley slaves, once chained to the oars, App. p. v
+and p. 203), Favignana (its convicts, p. 246), Lipari (Barbarossa's captives of 1544, p. 264)
+and Pantellaria (a thousand carried into slavery by Dragut, p. 281, the year printed 1583 and
+doubtful: the words give none). The epitome gains Trapani's and Mazzara's hours (Smyth's
+own) and Palermo's, Sciacca's, Girgenti's, Lipari's, Pantellaria's and Lampedusa's (the
+world's, JUDGEMENT). Truths 7-537 (Tunis to Palermo on charted water, the thirteen's holders),
+7-538 (each road as its pilot has it, the words, the sliver), 7-539 (slow: the scenario).
+
+**The scenario** `the-faro.yaml` (April 1808, seed 7): Valletta, the channel of Malta,
+outside Syracuse and Catania, the Faro past Messina, Ganzirri and the Faro point, west south
+of Vulcano, the road of Palermo; she anchors in fourteen fathoms 0.13 miles from the road
+some forty-eight hours out, on the chart's stiff clay. Taken another way while building it:
+her book is generated from its legs (a scratch script), each open leg re-shaped hourly only
+within its own leg's length of both its ends and short of its mark, each of the strait's
+every ten minutes on the same rule, no two at once (checked along the route); she starts at
+14:00 so as to enter the strait by day, with its marks for fixes; the open legs stand
+fifteen to eighteen miles off the Sicilian shore, where her account by night ran ten miles
+west of the truth; the scirocco is pinned backing south (by the second day) so that the
+Faro point's turn north-east is not close-hauled. The road shelves past the hand lead (no
+bottom at twenty fathoms a few cables out, fourteen at the anchor), so the truth holds the
+bottom where she lies by the chart's note, not a sounding.
+
+**Pins moved by the step's own additions**, each a count of what it adds: `tests/test_ordnance.py`,
+the ports with no powder block, old `... + 13 + 11`, new `... + 13 + 11 + 13`; `tests/test_chart.py`,
+the islands the grid lacks, old 25, new 26 (Lampion). The port lists of `tests/test_ports.py`
+and `tests/test_nations.py` gain the thirteen.
+
+**Findings for others.** The order words take decimal minutes, not seconds; a scenario
+through a strait wants daylight for its fixes and legs that cannot overlap; marks on a
+neighbour's kept tile row are placed on the whole chart (the how-to has them).
+
+### Step 3: the figures (measured at bdf4442, the trunk merged after step 2 and decision 69)
+
+In a worktree pinned at bdf4442. **Lint**: `ruff check .` and `ruff format --check .`
+(0.15.8), clean. **The fast tier** (`-n 4`): exit 0, no failure, 514 slow tests left out.
+**The audit** (package 111's tool) sampled and full: 0 findings the known list lacks, exit 0
+both. **The slow tier** of the touched files (`tests/test_ports.py`, `test_known_truths.py`,
+`test_tide.py`, `test_chart.py`, `test_weather.py`, `test_nations.py`, `test_geo.py`,
+`test_ordnance.py`, `test_chart_audit.py`, `test_scenarios.py`; `--slow -m "not pace" -n
+4`): exit 0, 688 passed, 8 xfailed, the recorded passages replayed to their digests and the
+scenario sailed to the road of Palermo (truth 7-539). **The pace** alone and last (`--slow -m
+pace -n 0`, the same files), run alternately with the same set at the trunk's 774b6dd on the
+same machine: this tree 12 passed twice; the trunk failed once on the gate's day with the
+region loaded (459 ticks a second) and once on truth 7-159 (477), the machine's spread about
+truth 51's floor (step 2's finding). Decision 69 (the trunk's): step 3's ports have no dated
+rows, and its truths read the holders on the day each loads; none expects a holder to change
+by the calendar. The tree reported differs from bdf4442 by this paragraph and the "where I
+stand" above alone.
+
+### Step 4: the view follows the hull he is aboard (note 6)
+
+**What was built.** The server already serves the followed hull (`World.ship` is the followed
+hull's since package 84, step 10) and says which in every snapshot (`driver.followed.id`); the
+page fetched her drawing once, at the hello. `client/app.js` now keeps the id of the hull its
+drawing is of (`state.shipFor`) and, when a snapshot's followed hull differs, takes
+`/api/ship` again: her graph, her name and rig over the view and in the title. `ui/server.py`'s
+`ship_drawing` (the hello and `/api/ship`) serves the graph, or her name and the words that say
+why she is not drawn as she stands: a hull in the far shape ("she is not drawn as she stands;
+she sails in the far shape, her sails her file's and not as they are set"), a boat ("a boat
+under oars, with no rig to draw"), a hull with no spars; the page then clears the drawing and
+shows the words. **Seen in the browser** by the probe (`tools/browser_probe.py`'s new `drawn:`
+step: the name over the view and the drawing's caption): the plan `boat-and-visitor` checks the
+Amazon drawn on deck, "the Amazon's launch: a boat under oars, with no rig to draw" in the boat,
+and the X's drawing and name ("X (brig)", not the Amazon's) aboard her. **The toggle:** with the
+trunk's `client/app.js` and `ui/server.py` the same plan fails both later checks (the view
+"Amazon (ship)" throughout, the X's state drawn on the Amazon's rig); with them, it passes.
+
+**Truth 7-544** (the same passage in the world: the frigate's graph on deck, the launch's words,
+the X's graph and name aboard her) and the step's test in `tests/test_mends_109.py`.
+
+**Pins:** none moved (to be confirmed by the suites at the hash).
+
+**The suites, as run (step 4).** At **128741b** (the trunk merged by merge commit: package 109's
+step 3 as merged and the trunk's work since, the signal flags' `client/app.js` among it, merged
+without a conflict; the appended ends kept, the trunk's first), in a worktree pinned there, this
+container, four workers, one suite at a time (the first run lost to a restart of the
+container, the second's chain to the time a background job may run; each suite run again
+whole). `ruff check .` and `ruff format --check .` clean. **The fast tier** whole: exit 0,
+7,589 run, no failure, 1 skipped, 513 slow left out. **The slow tier of the touched files,
+the browser plans and the known truths whole** (`--slow -m "not pace" -n 4` on
+test_mends_109.py, test_known_truths.py, test_browser_probe.py, test_server.py,
+test_in_world.py): exit 0, 627 run, no failure, 8 skipped; every browser plan played and
+passed, `boat-and-visitor`'s three new checks among them; the recorded passages among them,
+every pinned digest, line count and tick held. **No digest moved, no kept save and no pin.**
+**The pace**, alone and last (`--slow -m pace -n 0`, the same files, load 1.4 at its start):
+exit 0, 12 passed. The tree reported differs from 128741b by this paragraph alone.
+
+## Package 106a: the ocean carried south, and the Canaries with the Salvages (2026-11-12)
+
+**Where I stand (2026-11-12):** built whole, the trunk merged ten times (the last at 18ea281, with package
+105's step 3, western Sicily, beside the Canaries in every list: islets lacking a feature 27,
+ports without a block + 13 + 7; at ef5b24a package 111's step 2a, Madeira's bounds at its tiles' edges, and the proof of Madeira's tide run again
+below; at 774b6dd package 105's step 2, Sicily and Malta, beside the Canaries in every list; the truths file rebuilt as
+the trunk's with 106a's two edits and its block appended; the manifest rewritten by the
+tool, no tile moved; at 9300198 decision 69's first step, the calendar seeded by a port's dated rows, and packages
+102's step 4 and 109's step 3; at fcd2079 package 109's step 2; the one before at bcd5709 with package 111's step 1, the chart's
+audit, and decision 69), measured at the final hash in a pinned
+worktree (the figures below; the suites in the final report).
+Reports (A) and (B) ruled by the lead the same day: the second layer beside the corridor, no
+column from 26.4 W, the reach to 12.4 N recorded and not built; the region's bounds a hair
+inside the edges, the Salvages a region of one tile, written whole, the seven gauges, the
+Salvages served by Santa Cruz's and Funchal's.
+
+### (A) The ocean layer: a second coarse layer against the first widened
+
+**What the chart holds.** The corridor `atlantic-corridor` is 48 level-1 tiles (9,746,887
+bytes), its bounds 32 to 51 N, 32 to 1 W, its fetch 31.9 to 51.1 N. A level-1 tile is
+4.2667 degrees (512 cells of 30"), so its southern row already runs from **29.4667 N** to
+33.7333 N: its eight tiles of that row are NODATA south of 31.9 N (149,504 of 262,144 cells
+each). The Canaries' own row of the grid is 25.2 to 29.4667 N. **The Salvages (30.0 to
+30.2 N) and the whole crossing from Madeira to the islands between 29.47 and 31.9 N lie in
+the existing tiles' NODATA**: a second layer cannot be new tiles alone; it shares the names
+of three of the first's tiles.
+
+**The control.** The tool at the trunk's head, run on a fresh GEBCO extract of the
+corridor's own fetch box (the extract's zip has another checksum, `d59228b0...` against the
+manifest's `69c4dbf9...`; its grid is the same), writes all 48 committed tiles byte for
+byte. Every difference below is the widening's.
+
+**The first widened** (bounds south 25.21 N, fetch 25.1 N, the rest as built): 56 tiles,
+12,512,736 bytes; **8 new tiles (1,731,872 bytes) and all 48 existing tiles rewritten, none
+byte-identical.** The south row's eight have their NODATA filled (149,504 cells each, 50,224
+in the westernmost). In every one of the 48: the elevation's half-metre ties broken the
+other way (2 to 2,381 cells a tile, never more than 1 m; 19 land and sea flips in all, on
+the Iberian and Biscay coasts), and the distance field changed over most of every tile (up
+to all 262,144 cells, even in the row at 50.8 N): the build's east-west cell is taken at
+the block's middle latitude, which the widening moves, so every distance in the block
+changes. The how-to's finding (package 39e), confirmed and worse: the widening moves the
+field of the whole corridor, not only the tiles near new land.
+
+**A second layer beside the first** (a corridor of its own, `atlantic-south` the working
+name; bounds 25.21 to 31.9 N, 18.5 to 9.4 W; fetch 12.3 to 33.8 N, 26.5 to 9.25 W, so that
+its field knows Madeira's shores and the coast of Morocco): 6 tiles, three columns (22.13 to
+9.33 W) by two rows. Three are new names (25.2 to 29.47 N; 733,781 bytes); three share the
+first's names in the row from 29.47 N (`106080_-79680`, `-64320`, `-48960`) and are written
+in their own folder, NODATA wherever the first has data (461,180 bytes so masked; 750,024
+whole): **1,194,961 bytes in all, and no existing tile touched.** The runtime must learn it:
+a level-1 tile listed by both layers is read as the first's, its NODATA cells (elevation,
+distance and the blocks' shoalest soundings) filled from the second's at load
+(`chart.Tile`, `Level.tile`; about thirty lines). Where the first answers, it answers alone,
+as it did. Of the three columns: the west from 22.13 W (Hierro's west point is 18.16 W, the
+pilots' way outside the islands 30 or 40 leagues west of them lies south of the row);
+nothing west of 22.13 W between 29.47 and 31.9 N is filled (a column more, 26.4 to 22.13 W,
+would be 1 tile of 170,625 bytes in the Canaries' row and one more, masked, in the row above, not measured).
+
+**What reads the coarse layer, and whether it moves (the second layer).** The recorded
+passages and the gate's days are `region: channel-west`, whose chart has no corridor; the
+five kept saves of `tests/fixtures/saves/` are all `channel-west`: none reads the corridor.
+Twelve scenarios name `chart: atlantic-east`, and every one starts inside a region's bounds
+(none within 10 miles of an edge of the chart but Spithead's, to the north): their tiles are
+unchanged, and the new tiles answer only where the first had nothing. What does move with
+the second layer is **the chart's envelope**: its south limit 32 N to the new layer's 25.21
+N (`Chart.bounds`, read by the scenario's refusal, `bounds_words`, the harbour page and
+`/api/chart`, the business's bounds where a scenario starts in no region, none does, and
+the lookout's "the chart has nothing to the south" within 10 miles of 32 N, which a ship
+south of Madeira no longer hears). `tests/test_chart.py` asserts the envelope (32.0) and is
+moved with it. The tide's open edges read the corridors' bounds (`charted_bounds`): with the
+new layer's north bound at 31.9 N, below Madeira's south bound of 32 N, Madeira's south edge
+stayed closed. Package 111's step 2a (merged at ef5b24a) laid Madeira's south bound at its
+tiles' edge, 31.60001 N, and the edge now meets the layer: **the proof run again, old beside
+new** (the trunk at ef5b24a against the merge, each with its own code, the tide's
+`constants_about` over Madeira's bounds every 0.02 degrees, 11,449 points): the open edges
+27 old, 38 new (Madeira's south edge from 17.87 to 15.73 W and its sides from 31.6 to 31.9 N,
+and the Canaries' and the Salvages' own), and **not one point's level or constituent
+moved**. The seam's taper is not laid where the eleven are beyond their reach (package 94),
+and Madeira lies some 1,300 miles from the nearest of them: the open edge changes the
+taper's weight and nothing it is applied to.
+
+**Carried on to 12.4 N, measured and not built:** the three rows below (12.4 to 25.2 N) by
+three columns (26.4 to 13.6 W; the coast lies west of 13.6 W from 25.2 N down): 9 tiles,
+1,881,628 bytes; with the Canaries' row's column from 26.4 W, 10 tiles and 2,052,253 bytes.
+By the second layer's way none of the first's tiles moves for it either; by the widening's,
+it would be the same 48 rewritten and 24 tiles more over the whole width (32 to 1 W).
+
+### (B) The region: the Canaries, and the Salvages
+
+Built into a scratch folder by the tool at the head (the trunk's manifest copied beside
+it, so that the seam read the trunk's regions: "0 kept"), from one fetch for the three
+variants (EMODnet 27.28 to 30.37 N, 18.35 to 13.12 W; GEBCO's fill raised by the eleven's
+3.98 m, no gauge of the block's yet: the bytes move a little when the block's own tide is
+in, and the region is rebuilt then, package 101's lesson).
+
+**The bounds.** The brief's 27.33 to 29.47 N and 18.29 to 13.17 W take 91 level-2 tiles: 27.33
+is below the row edge 27.33333, 29.47 above 29.46667, and 13.17 W east of the column edge
+13.17333 (package 104's finding). A hair inside the edges, **27.33334 to 29.46666 N,
+18.29332 to 13.17334 W: 60 tiles (5 rows by 12), 12,496,201 bytes**, 208 KB a tile; the
+coast 688 pieces, 250,001 bytes. Every island lies inside: Hierro's south point (27.64 N)
+and west point (18.16 W), Alegranza (29.40 N), the Roque del Este (13.33 W).
+
+**The Salvages: by one tile, the smaller.** The two islands and their islets lie in one
+level-2 tile (29.89333 to 30.32 N, 16.16 to 15.73333 W): **one tile, 376,201 bytes** (the
+steepest relief of the block), its coast 8,096 bytes. The bound carried up to 30.31999 N
+instead takes 84 tiles, 14,647,521 bytes: 24 tiles and 2.15 MB more against 0.38 MB. A
+region's recipe is one box, so the one tile is a region of its own, **`salvages`**, bounds
+29.89334 to 30.31999 N, 16.15999 to 15.73334 W (no code; its features file its own); the
+ocean between it and the islands is the second coarse layer's.
+
+**Written whole, or within ten miles of land.** Of the 60, 38 tiles hold water within ten
+miles of land (10,575,498 bytes) and 22 do not (1,920,703 bytes, 87 KB a tile): **the rule
+would save 1.9 MB of 12.5**, the deep water round these islands compressing well and the
+dear tiles being the steep shores, unlike the Azores' (260 KB a tile of open sea). It
+would also hand the middles of the wider channels to the coarse layer's 30" cells. The
+Salvages' tile is within ten miles of land either way. **Recommended: whole** (the lead's
+choice).
+
+**The source grid.** EMODnet's DTM answers over the sea of every tile of both regions: the
+cells GEBCO alone fills are the land and, at most, 2.7% of a tile's sea cells (sampled one
+in sixteen; the shore of Gran Canaria's south-west tile), so the tiles are EMODnet's at
+3.75" over the water, GEBCO's under the land, as every block's. The finer grid reaches the
+Canaries and the Salvages.
+
+**Under the 40 MB rule:** the two regions 12.87 MB of level-2 tiles and 0.26 MB of coast;
+with the second coarse layer (1.19 MB), 14.3 MB, before any harbour patch.
+
+**The gauges** (TICON's file, the same zip as package 39b's, SHA-256 7055f8ed...6514, read by
+the stations' coordinates, the longest record of each; the mean level above the chart's
+datum from Puertos del Estado's REDMAR reports, `bancodatos.puertos.es/BD/informes/
+globales/GLOB_2_3_<code>.pdf`, the codes in `INT_3.pdf`, the level the difference of the
+NMM and the BMMI on the gauge's zero, "Referencias de nivel del mar"):
+
+| Gauge | TICON position | Record (longest) | M2 cm, deg | S2 | N2 | REDMAR | NMM - BMMI |
+|---|---|---|---|---|---|---|---|
+| Arrecife, Lanzarote | 28.9722, -13.5300 | IEO 1949 to 2012 | 83.5, 36.6 | 31.5, 59.8 | 17.4, 22.2 | 3470, 2009 to 2017 | 179 - 19 = 1.60 m |
+| Puerto del Rosario, Fuerteventura | 28.5000, -13.8500 | PdE 2004 to 2015 | 80.9, 33.1 | 30.6, 56.7 | 16.8, 18.9 | 3469, 2004 to 2017 | 152 - (-1) = 1.53 m |
+| Las Palmas | 28.1333, -15.4167 | IEO 1949 to 2012 | 74.6, 28.4 | 28.5, 52.4 | 15.4, 14.7 | 3450, 1992 to 2017 | 158 - 14 = 1.44 m |
+| Santa Cruz de Tenerife | 28.4800, -16.2400 | PdE 1992 to 2015 | 70.8, 29.3 | 27.2, 52.6 | 14.7, 15.6 | 3471, 1992 to 2017 | 150 - 13 = 1.37 m |
+| Santa Cruz de la Palma | 28.6833, -17.7500 | UHSLC 1959 to 1981 | 65.1, 29.0 | 25.5, 51.6 | 13.6, 15.8 | 3465, 2007 to 2017 | 141 - 15 = 1.26 m |
+| San Sebastián, Gomera | 28.0000, -17.0000 (rounded) | PdE 2007 to 2015 | 58.1, 23.6 | 23.3, 46.1 | 12.0, 11.3 | 3463 (28.09, -17.11), 2007 to 2017 | 128 - 10 = 1.18 m |
+| La Estaca, Hierro | 27.7800, -17.9000 | PdE 2004 to 2015 | 59.3, 21.8 | 24.2, 44.9 | 12.1, 8.7 | 3459, 2004 to 2017 | 157 - 40 = 1.17 m |
+
+Las Palmas's UHSLC series at 28.10 N, -15.40 (1949 to 1991, three records) has M2's phase
+at 0 to 2 degrees where the IEO's, Puertos del Estado's and UHSLC's own later series agree at
+28 to 29: a clock 27 degrees (54 minutes) early, as Vigo's (package 39c); not taken.
+Gomera's TICON position is rounded to the degree (28.0 N, 17.0 W, at sea nine miles from
+San Sebastián); REDMAR's 28.09 N, 17.11 W is the harbour's, and the gauge is placed there.
+El Hierro's station is La Estaca on the north-east coast (REDMAR's report), not La
+Restinga. **The Salvages have no gauge** (none in TICON's file between 29.47 and 31.9 N):
+by package 104's ruling a block with none is served by its neighbours' nearest gauges within
+the reach, each listing it after its own: Santa Cruz de Tenerife (101 miles; `[canaries,
+salvages]`) and Funchal (159 miles; `[madeira, salvages]`, the gauge's figures unmoved,
+Madeira's water unmoved since the membership is by bounds), the level the blend's of those
+that have one (Funchal's is null, so Santa Cruz's 1.37 m). The two regions share no seam.
+**Outside the blocks** the ocean between them reads the eleven alone, the nearest of them
+(Le Conquet's, 1,300 miles off) as Madeira's ocean does today: the rule, said for the lead.
+
+### (C) What was built, item by item
+
+1. **The ocean carried south**: `atlantic-south`, 6 level-1 tiles, 1,191,415 bytes, beside the
+   corridor (`tools/build_charts.py` `CORRIDORS`, `CHARTS["atlantic-east"]["corridors_beside"]`;
+   `freesail/world/chart.py` `Tile.filled_from`, `Level.beside`, the chart's layers beside,
+   some fifty lines with their words). Every committed corridor tile is byte for byte as it
+   was; truth 7-521 reads its every cell through the new path. Proof of the merge on 10,000
+   random points over the corridor and the new water, the manifest with and without the
+   layer: elevation, distance, the nearest shore and the floor equal at every point the
+   corridor answered, except 14 points on 31 54 N, within a 30" cell of the corridor's data
+   edge, whose bilinear read and gradient now find their corners known (the seam); the
+   blocks' floor first taken as the shoaler of the two layers moved 259 points as far as
+   32 24 N, and was changed to the corridor's own block wherever it has one. The chart's
+   south limit is 25.2001 N (`tests/test_chart.py`: the envelope and its words moved with it,
+   and its point "beyond the corridor" moved from 31 N 10 W, now the new layer's, to 31 N
+   25 W, still NODATA; the tracked-folder test takes the layer's folder).
+2. **The regions**: `canaries`, 60 level-2 tiles 12,513,080 bytes, seven harbour patches 15
+   level-3 tiles 1,688,437 bytes, coast 683 pieces; `salvages`, 1 tile 376,932 bytes, coast 25
+   pieces; both built on the block's own tide (the raise 1.17 to 1.60 m) after a first build
+   on the eleven's 3.98 m (package 101's lesson). The sweep: 2,731 cells in 206 places,
+   the largest 144 cells at the foot of Los Cristianos' shore, Anaga's, the Bocayna's, all
+   small cliff-foot clusters; the Salvages 14 cells. "0 kept" both. 14.58 MB of tiles for
+   the two, 15.8 MB with the second layer: under the 40 MB rule.
+3. **The sources**: Purdy 1825 (the Canaries, pp. 210 to 220, quoting Glas whole for the
+   roads, Vancouver, Krusenstern and Lisiansky for Santa Cruz, Mudge and Vidal's survey of the
+   Salvages of 1820, Rennell on the currents, pp. 94 to 96), Glas 1764 (Fuerteventura's Porto
+   de Cabras and Cala de Fustes; Hierro), the Oriental Navigator 1801 (the Salvages, the
+   sunken rock, the road of Santa Cruz, the trade winds), Norie 1805 (Table XL's positions,
+   Table XLI's "Canary Island, 3h 0m" read from the page image p. 248): laid under
+   `docs/references/pilots/` with their rows. Tofiño's Derrotero of 1789 does not reach the
+   Canaries; Borda's survey (1776) was not found on the Internet Archive by its search, and
+   no period plan of a road was read: every port `datum: unverified`, no override.
+4. **The marks**: 56 features in `canaries.yaml`, 7 in `salvages.yaml`, each with its
+   source; positions FROM MEMORY checked against the tiles, 22 moved (each `fix`). The Peak
+   at Borda's, Lamanon's and Cordier's 1,909 toises (3,720 m), seen at 120 and 130 miles in
+   the clearest weather and not at 140 (truth 7-523; Purdy: "sometimes forty leagues off").
+   Islets: the Rocks of Naga, Graciosa, Clara, Alegranza, Lobos and the East Rock the grid
+   holds; the West Rock (Hell Rock) an island the grid lacks on its shoal head. The Salvages:
+   the Great Salvage and the Pitons the grid holds; the Pitons' rocky bank a danger on the
+   grid's head (a frigate grounds on it at any tide, truth 7-525); the Great Salvage's north
+   and north-east shoal spots EMODnet smooths away (36 to 55 m at the pilot's places), left
+   at the pilot's places, their head JUDGEMENT (the eastern spots' three fathoms). **No light**
+   in 1805 by any source on file, none entered. Purdy's doubtful sunken rock between Tenerife
+   and Canaria not entered (the grid has 1,500 m there).
+5. **The ports**: seven files, each the King of Spain's by one dated row (barcelona's form),
+   with its anchorage, bottom, pilot's four words, market of 11 to 13 goods priced so the
+   islands trade (corn from Lanzarote and Fuerteventura west, timber and wine east: 68 routes),
+   yard, crew pool and `tracks:` to a common mark north of Tenerife (every pair of the 42
+   clear of the land guard; 40 were refused before). Santa Cruz de Tenerife, Port Orotava,
+   Las Palmas (the road of La Luz), Arrecife (Naos and Cavallos), Santa Cruz de la Palma, San
+   Sebastián de la Gomera, Porto de Cabras. **Hierro has none**: Purdy (p. 219) "neither road
+   or harbour worthy of particular description", Glas describes no landing. Gando, the road
+   by Lobos, El Rio, Cala de Fustes and Tasacorte are marks, not ports. Rows waiting for
+   105's dated rows, written in the files' own words: Santa Cruz's quarantine of 1816; the
+   growth of Arrecife's town; Orotava's summer moorings in the creek. Norie's Canary Island
+   placed at Palmas in the master's table.
+6. **The weather**: a box `canaries` (25.2 to 30 N, 22.13 to 9 W), after Madeira's, PROVISIONAL
+   and judgement in every row from the Oriental Navigator's and Purdy's words on the trade and
+   its winter westerlies. The island lee's calms are said in its head, not carried. The
+   Salvages' region (29.89 to 30.32 N) lies across the boxes' edge at 30 N: the islands,
+   all north of it, Madeira's, the region's southern water the Canaries' (the same trade
+   in both; the chart's audit lists the split).
+7. **The streams and the tide**: two areas, `canaries-among` (south, half a knot,
+   JUDGEMENT on Rennell's "less regular") and `canary-current` (S.S.E., three-quarters of a
+   knot, Rennell's sixteen to nineteen miles a day), a `book_limits` box over the new water;
+   no tidal stream (Purdy: "little or no tide" at Orotava). The tide by the block's own seven
+   gauges and the Salvages' ruling (report B).
+8. **The scenario** `canaries.yaml`: a King's frigate from Funchal off Point Naga at
+   daybreak, down the east side of Tenerife to look into Santa Cruz road and on to the
+   south; sailed at seed 7 without touching ground (truth 7-529: 1.34 miles from her mark by
+   the truth, 2.96 from the road). The first book's hourly re-shaping sent her back for the
+   town after she had hove to, and she drove ashore under it: each leg is now shaped once.
+   **Truths 7-520 to 7-529**, the brief's list as step 1 cut it (the ocean to 25.2 N, not 13 N).
+9. **The how-to**: `docs/dev/ChartBlocks.md`, "The ocean carried south, the Canaries and the
+   Salvages".
+
+**Decision 68** (the owner's, on the trunk at the second merge): the sources on file were
+searched (Glas 1764, Purdy 1825, the Oriental Navigator 1801) for the islands' part in
+slavery. Glas alone speaks of it: the Count of Gomera kept about a thousand enslaved Africans
+on his sugar lands at Adeje on Tenerife, and several gentlemen of Tenerife a few (p. 353, OCR
+l. 14740; l. 10373 to 10381; of the 1760s). Said plainly with its years and source in the
+heads of `santa-cruz-de-tenerife.yaml` and `san-sebastian-de-la-gomera.yaml`; no person in
+any market or the business; no scenario on it. A port file has no served field for such a
+statement: it stands in the file's head (a finding for the design note).
+
+**The chart's audit** (package 111, on the trunk at the fifth merge) found seven things in
+the new blocks that its known list lacked. Five are mended: Santa Cruz de la Palma's road
+(its outer road's finding and its anchorage's) moved 240 m north-west, out of 38 fathoms into the pilot's 15 or 20 (32 m on clean ground,
+some 300 m off the town; truth 7-524's band of 25 to 90 m holds it, and the pin does not
+move); Santa Cruz of Tenerife's mooring moved 200 m east, off the modern breakwater the grid
+holds and into 22 fathoms on the pilot's ooze; and the audit's table of seas gains the
+Canaries and the Salvages, the Salvages meeting both Madeira's sea and the Canaries' as
+ruled. Without those two rows the audit took both for Mediterranean water and their 1.2 to
+1.6 m mean levels for a fault. Two are listed in `data/charts/audit-known.yaml` as owned by
+106a: the Salvages split between Madeira's weather box and the Canaries' at 30 N (the same
+trade in both, as Biscay's splits are listed), and Point Handia standing in 2.5 m of water,
+its grid land a kilometre off, left at the pilot's place. Truth 7-564 (package 111's, the
+regions two weather boxes answer) moves with the new region: five at the trunk's bcd5709
+(Biscay north and south, the Strait, the Tyrrhenian, the Balearics), six here, the Salvages
+added and nothing else (the audit's check (d) run on each).
+
+### Found for others, not mended
+
+- The open ocean's tide is the nearest of the eleven (Le Conquet's, M2 about 2 m) over the
+  new layer's water outside the two blocks (the lead's list).
+- Madeira's peaks and the Peak are seen through cloud the weather does not put on a hill.
+- The Canaries' book: a standing order "when the time is 13:00" is refused ("the time is
+  compared in bells"); a book wanting a clock hour has no word for it.
+- The wars table's undated war makes the islands hostile to a King's ship after 1808, as
+  Barcelona's head says.
+
+## Package 109, step 5: the vessels kept off the land (note 3), as ruled
+
+Step 5 asked that the unchecked legs be led round the land by the road the plain legs take,
+or a stop and a report. It stopped on the pace (the lead's ruling of 2026-11-13, 18:00): the
+steering is package 61's, measured below for it; the step brings the goal's square laid
+where the water is, and the words for a hull asleep in the ship's view put in the world's.
+
+### Vessels on land: what package 109 measured, for package 61
+
+The owner's note: vessels of the busy sea seen over the land. Package 109's step 5 was to lead
+the unchecked legs (to the ship, in company, on station, a chase, a flight, going home, the
+business's re-made plans) round by the road the plain legs take, `captains.Planner.sea_route`,
+or to stop and say what it would take. It stopped, by the lead's ruling, on the pace; the
+steering is package 61's, and **nothing of it is in the tree: the prototype exists only as
+described here.**
+
+**The count** (a scratch script: a scenario's busy day with the world's business on, every
+vessel's place read against the chart every ten minutes; land is `chart.depth_at` below
+nought, a height above the datum), at 128741b: naval-cruise, 8 of 35 vessels on land at some
+sample (the legs then: to 23, away 3, chase 3, to_ship 2, home 1); Channel east, 6 of 24 (to 8,
+home 7, to_ship 1). Of them: package 43's scripted goals left as warnings on purpose
+(Diamond's square off the Raz, the Hirondelle, the Swift); legs steered straight at a target
+(to_ship, home, chase) and the business's re-made plans (the Good Intent, the Brothers, the
+Mary, the pilot cutters going home); and flight straight off a stranger onto the shore.
+
+**The prototype** (`world/ships.py`, `Vessel.tick`): where each steered leg (to, home, to_ship,
+chase) takes its bearing, `_led_round(world, target, dt)`: where `land_crossing` finds the
+straight line to the target over dry ground, she steers for the first mark of
+`Planner.sea_route(position, target)` and reaches the leg's own mark only by its own line;
+`_flight_clear` gives a ship in flight the nearest course either hand, in steps of 22.5
+degrees, whose run of two miles keeps clear. Her way kept on the vessel (`_way`, a class
+attribute left out of the pickle while None). First form: the way tried again every 600 s.
+Second (the one attempt the lead allowed): the road laid once a leg and its marks sailed in
+turn, a fixed target's road kept for the leg, a moving one's laid again when the target had
+moved a quarter of the way to it (a mile at the least) or after 3,600 s, a road with no mark
+kept as given. Constants: `WAY_RELAID_S` 600, `ROAD_RELAID_S` 3600, `FLIGHT_LOOK_NM` 2.
+
+**What it bought and what it cost** (the base and the prototype run side by side under one
+load, a busy day each):
+
+| | naval-cruise on land | ticks a second | Channel east on land | ticks a second |
+|---|---|---|---|---|
+| the trunk | 8 of 35 | 159 / 165 | 6 of 24 | 226 / 226 |
+| first form (every 600 s) | 3 of 35 | 70 | 3 of 22 | 177 |
+| second form (a road a leg) | 5 of 35 | 158 | 2 of 22 | 236 |
+
+Truth 7-159's form (the convoy of six and the privateer, the best of five thousands, three
+rounds each, the machine quiet) showed no cost: 537 to 546 without, 552 to 575 with. The
+second form's figures move about four in a hundred either way from day to day, so the lead's
+bar of two in a hundred could not be shown met; naval-cruise measured over it.
+
+**The profile.** `Planner.sea_route` costs about half a second a call (52 calls, 24 s, in two
+hours of naval-cruise): every call builds the common tracks' graph again and tries its joins
+by `clear` (`chart.line_shore`, `coast_distance`, `nearest_shore`). `land_crossing` once a
+vessel every ten minutes is cheap where a clear answer is kept. **What package 61 would want:**
+the tracks' graph built once a World (or a chart), and the joins from a point to the graph
+kept by cell, so that a vessel's road is cheap to ask for as often as a moving target needs.
+
+**What the first form moved:** the captain's trial in thick weather
+(`test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits`,
+`TRIAL_TRADE_THICK_LINES` 426 → 427, its digest with it): the Falmouth pilot's cutter, going
+home after putting the pilot aboard across the land, led round and seen otherwise (added:
+12900 `lookout.glass` "The glass on the Falmouth pilot's cutter on the larboard quarter: under
+way on the starboard tack, close-hauled, under plain sail."; 13260 `lookout.sail_lost` "... on
+the larboard quarter is out of sight."; gone: 13920 `lookout.sail_lost` "... on the starboard
+bow is out of sight."). The known truths' whole list was not finished (two runs lost to
+restarts of the container).
+
+**Every landing the road did not mend** (the guard on), with its place and its height:
+
+- **The Mary** (Channel east), bound for Portland Road (a port's road, 12.6 m of water): on
+  the Isle of Portland, 50°34′N 2°26′W, 90 to 103 m above the datum, at 23:45 to 23:50 under
+  both forms, **five minutes after her straight line had been judged clear**. The first to
+  look at.
+- **The Hirondelle**, 06:10, 48°02′N 4°50′W, 1 m: her start at the shore's edge.
+- **The Plymouth cutter** (`ship-27`), `to_ship`, 50°22′N 4°09′W, 16 m; **the Alderney
+  pilot's cutter**, `to_ship`, 49°43′N 2°14′W, 5 m: the ship each makes for lies close under
+  the land (Alderney's mooring itself stands on dry ground, package 111's `f-dry:alderney`).
+- **The Cygnet**, in a chase, 48°16′N 4°37′W, 7 m.
+- Under the second form, **the Diamond** (14 samples, 29 m) and **the Swift** (going home,
+  38 m) on land again after their roads' last marks.
+- The Brothers was no mark ashore: her marks are at sea and she crossed the land on the way;
+  the second form kept her off.
+
+Package 111's count of ports whose ways in or out the land guard refuses
+(`tools/audit_chart.py --check f`) is the same with the prototype as without (25 on this
+base): it steers, and changes no plan or track the guard judges.
+
+### Step 5: a goal's square laid where the water is
+
+**Found.** `ships._goal_plan` lays a patrolling ship's square as four marks at the goal's
+radius west, north, east and south of the station, never looked at against the chart. Read
+for every scenario's patrolling ship (33 squares; a scratch script, `_goal_plan` from each
+ship's goal words): the Diamond's off the Raz (naval-cruise) had its east mark on Cap Sizun,
+48.0389 N 4.5383 W, 22.6 m above the datum, and two legs across the land (her plan's warning
+since package 43); the squares off the Lizard (encounter's and first-action's Renard,
+squadron's Medusa, Nimble and Sparrow; convoy-six's Vengeur off the Lizard within 20 miles;
+the-channel-observed's Medusa off the Deadman) had a north mark inland or a leg across the
+Lizard; the blockade's Naiad and Nimble a leg across the land by the Black Rocks.
+
+**Built** (`ships._off_the_land`, called by `_goal_plan` on the square): each mark that stands
+on dry ground (less than `OFF_THE_LAND_DEPTH_M`, 10 m, under her), or whose leg from the mark
+before crosses the land (`land_crossing`), is laid at the nearest point, sought in rings a
+quarter-mile apart every 15 degrees out to twice the square's radius, with water under her
+and both its legs clear (to the mark after, where that one stands in water); the others as
+package 43 laid them. The Diamond's east mark goes to 0.3 miles off the Raz (48.0387 N
+4.7439 W, 17.6 m), the nearest point whose legs keep clear of Cap Sizun (the peninsula lies
+between the bays her north and south marks stand in), her north mark half a mile out (48.1724
+N to 48.1807 N), her west and south marks as they were; her warning is gone. **Truth 7-545**:
+every patrolling ship's square, read from her goal's words, has its marks in water and its
+legs clear, and none sailing by it carries the warning; the Diamond's marks old beside new.
+**The toggle**: with the trunk's `world/ships.py` the truth fails at the blockade's Naiad (a
+leg across the land); with it, it passes.
+
+**What it moves, measured alone** (the mend on 128741b, in a worktree of its own): the fast
+tier whole, exit 0; the slow tier of the known truths whole, exit 0; the slow tier of
+test_captain_trials, test_checkpoint, test_hulls, test_squadrons, test_brains,
+test_scenarios, test_ships and test_replay, exit 0. **No recorded passage, digest, truth,
+trial or kept save moves**: the squares that move are sailed by brains whose plans are their
+own, or beyond any passage's sight. **The busy day** (naval-cruise, business on, the two run
+side by side): 8 of 35 vessels on land with it and without; the Diamond 18 samples up to 78 m
+above the datum without, 2 samples at the shore's edge (0 m, 48°03′N 4°52′W, off the Raz)
+with; the Swift unchanged (going home across the land, 69 m: the steering's, package 61's);
+167 and 171 ticks a second.
+
+**With it, the lead's wording mend** (1e18a4f): the ship's view of a hull asleep says "she is
+not seen closely enough to draw her sails as they are set" (was "she is not drawn as she
+stands; she sails in the far shape, her sails her file's and not as they are set": the
+engine's words on the player's page); the one test pinning them moved, old beside new.
+
+**The suites, as run (step 5).** At **aea989e** (the trunk merged by merge commit: package
+109's step 4 as merged, packages 102 and 106a closed; the appended ends kept, the trunk's
+first), in a worktree pinned there, this container, four workers, one suite at a time.
+`ruff check .` and `ruff format --check .` clean (390 files). **The fast tier** whole: exit 0,
+7,618 run, no failure, 1 skipped, 515 slow left out. **The slow tier** (`--slow -m "not pace"
+-n 4`), in two runs for the time a background job may run: test_mends_109.py,
+test_known_truths.py, test_browser_probe.py, test_server.py, test_in_world.py: exit 0, 649 run,
+no failure, 8 skipped, every browser plan played and passed; test_captain_trials.py,
+test_squadrons.py, test_brains.py, test_scenarios.py, test_ships.py: exit 0, 87 run, no
+failure. The recorded passages and trials among them, every pinned digest, line count and
+tick held. **No digest moved, no kept save; the one pin moved is the sleeping hull's words,
+old beside new.** **The pace**, alone and last (`--slow -m pace -n 0`, the same ten files, load
+3.1 at its start): exit 0, 12 passed. The tree reported differs from aea989e by this paragraph
+alone.
+
+## The chart session: a loaded game keeps its chart (the lead's ruling of 2026-11-13)
+
+**The fault.** A scenario that names a region (`region: channel-west`, 36 of them) is played
+on the chart that holds it (`chart_holding`, package 45): `atlantic-east` whole. Saved by
+either driver (a checkpoint beside the save by default) and loaded, it came back on the
+region alone, because `replay._rebind` loaded `scenario.chart or scenario.region` bare: in
+`blockade.yaml`, 47 N 4 W answered 121 m when begun and nothing after the load, and a ship
+sailing south of 48 N or east of 3 W after a load was off the chart. A scenario that names
+`chart: atlantic-east` kept its chart. Found by package 112's measure ("two roads to a
+Channel world").
+
+**The mend.** `_rebind` takes `chart_holding(region)` where the scenario names no chart, as
+`World.__init__` does; a scenario or a test that names `chart: <region>` outright keeps that
+one region. Two tests in `tests/test_checkpoint.py`, each failing before the mend: a
+`region:` game begun, saved and loaded by the checkpoint road answers at 47 N 4 W as it did
+begun, with the same bounds and regions; and the m5c-b playtest save, written long before,
+loads without error on the holding chart, 47.70 N 6 W answering from the corridor where the
+bare region answered nothing.
+
+**What moved, by toggle** (the old `_rebind` and the new on the same build): nothing pinned.
+The two playtest saves loaded and run on a watch give the same digests both ways (m5c-b
+43bb3a263fc9 at load, c48ff0d9e542 after four hours, 114 lines; m5c's cutter afec5325e32a,
+db9942cb5136, 52 lines): their run-on stays in channel-west's water, and the chart's wider
+reach answers nothing they read in that watch. No recorded passage is a checkpoint's load.
+
+**The suites, at 0d093aeb** (the trunk merged at b7a96da7; the dev and server extras
+installed): `ruff check .` and `ruff format --check .` clean; the fast tier whole (`-n 4`):
+exit 0, 7,618 passed, 1 xfailed, 515 slow left out; the slow tier of the checkpoint,
+replay, chart and kept-save tests with the browser plans (`--slow -m "slow and not pace"`,
+`test_checkpoint`, `test_replay`, `test_chart`, `test_browser_probe`, `test_hulls`,
+`test_lee_ports`, `test_letters`, `test_bellerophon`, `test_flag_drawings`): exit 0, 32
+passed, none skipped; the pace alone and last: 15 passed, exit 0. The tree reported
+differs from 0d093aeb by the documents alone.
+
+## Package 112: the coarse seas (2026-11-13)
+
+### Step 0: the measurement (reported to the chart session before anything under `data/charts/`)
+
+Measured on `claude/pkg-112` cut from the trunk at 237b4641. Every tile below was built by the
+tool's own functions (`build_corridor`, `decimate_tiff`, `_write_gebco_level`,
+`distance_field`, `save_tile`) into a scratch folder outside the repository, from GEBCO 2025
+(the global GeoTIFFs, 4,235,605,060 bytes, and the app's area extracts), in the cache
+`.cache/charts`. The repository's two committed level-1 folders hash the same before and
+after (all 54 files). Nothing under `data/charts/` was written.
+
+**(a) Level 0.** The tool's recipe (150″ cells, 2 m steps, land clipped at 50 m, tiles all land
+dropped, no distance field): **the world 150 tiles, 26,490,988 bytes** (of 153 over the
+globe); **the Atlantic with the Mediterranean, 70 S to 75 N and 100 W to 40 E, 63 tiles,
+11,283,534 bytes** (of 64). *What the game does with level 0 today:* nothing. The manifest's
+`world:` lists no tile and `tiles/0/` is ignored by git, so no clone has one; the code would
+read whatever is present (`Chart.__init__`, `_present`). *What committing it would move:*
+the code lays the world under **every** chart, a chart of one region included, after the
+corridor and its layers, so on `atlantic-east` it answers only where nothing finer does
+(beyond the corridor and its layers, 31.0 N 25 W for one: `test_chart.py`'s
+`BEYOND_THE_CORRIDOR`, None today). **The checkpoint's road** (`core/replay.py:_rebind`)
+reloads a `region: channel-west` save on the chart of `channel-west` alone (bounds 48 to 51
+N, 7 to 3 W, its tiles to 47.81 N, no corridor), while a fresh world or a journal's replay
+takes `chart_holding`'s `atlantic-east` (found by the session's reading, (e) below). Tried
+in a scratch copy: with level 0 present the chart of `channel-west` alone answers depths
+south of 47.81 N where it answers None today (47.70 N 6 W: None, then 139.4 m), its
+`bounds` unchanged. That is the water of the merchant brig's kept save's Harpy patrol, run
+on by `test_checkpoint.py` (below). **So level 0 must not be laid under a chart of one
+region,** or the save's run-on moves.
+*The limits:* a chart's `contains`, `bounds` and
+`bounds_words` are the envelope of its regions and coarse layers. They are read by the
+scenario's refusal of a start outside the chart (`core/world.py:786`, "the position ...
+lies outside the chart region ..."), the ship's placing and the hand anchor
+(`world/orders.py:1359`, `4234`), and the lookout's "The chart has nothing to the
+<quarter> of this; the coast beyond is uncharted." within `CHART_EDGE_NM` (10 miles) of
+the envelope (`world/lookout.py:551`, `Chart.edge_near`). If the limits became the world's,
+that line would never be said on `atlantic-east` and every start on the globe would load.
+The tests that hold the limits are listed under (e).
+
+**(b) Level 1 under the Mediterranean,** 30 to 46 N and 6 W to 36.5 E (the brief's box,
+`beside: atlantic-corridor`): 44 tiles over the box, **41 written, 9,713,944 bytes**. The
+three in column 9.33 to 5.07 W north of 33.73 N are the corridor's whole, so nothing is
+written. By kind: 34 with a coast (8.53 MB), 6 all land (0.85 MB), 1 open within ten miles
+of land. The box takes in the Black Sea west of 36.5 E and the Marmara (the three tiles
+north of 42.27 N east of 24.8 E, 0.58 MB): cut there if the session wishes. **The existing
+tiles:** the five tiles the corridor shares, read through `Tile.filled_from`, keep every
+corridor cell's elevation, distance and block soundings exactly; the layer fills 125,520,
+29,760, 6,144, 6,144 and 5,520 cells that were NODATA. Seconds to build: 41.
+
+**(c) Level 1 to the Cape Verde Islands,** 12.4 to 25.2 N and 26.4 to 9.34 W (`beside:
+atlantic-south`; it shares no tile with it): **12 tiles, 2,487,854 bytes** (3 all land,
+5 coast, 4 open within ten miles of land). Without the column from 26.4 W: 9 tiles and
+1.85 MB, but the column holds Santo Antão and São Vicente (to 25.36 W). 106a measured 9
+and 1.9, 10 and 2.05; the difference is the column's whole three rows here.
+
+**(d) The plan for the whole Atlantic, on paper.** Level 1 in the corridor's own form
+(elevation, distance field, the blocks' soundings) built from the GeoTIFFs decimated by two
+over each sea's tiles, less the tiles laid or measured above. Each tile was filled whole, so
+the bytes are an upper bound (the tool writes NODATA beyond a fetch). The bounds are
+JUDGEMENT.
+
+| sea | bounds | tiles | MB | open sea | coast or near land | all land |
+|---|---|---|---|---|---|---|
+| the Caribbean and the Gulf | 8 to 31 N, 98 to 58 W | 70 | 20.0 | 16, 4.6 | 51, 14.6 | 3, 0.8 |
+| the western ocean and the American coast | 12.4 to 52 N, 82 to 26.4 W (less the above) | 93 | 25.4 | 62, 17.8 | 24, 5.8 | 7, 1.8 |
+| the British west and the Irish sea (not in the brief's list; the gap north of the corridor) | 51 to 61 N, 32 to 5 W | 16 | 3.8 | 10, 2.4 | 6, 1.3 | 0 |
+| the North Sea and the Baltic's approaches | 51 to 61 N, 5 W to 13 E | 12 | 2.6 | 1, 0.1 | 10, 2.2 | 1, 0.3 |
+| the South Atlantic to the Cape | 35.5 S to 12.4 N, 60 W to 20.5 E | 226 | 60.3 | 126, 35.0 | 58, 14.8 | 42, 10.4 |
+| **all** | | **417** | **112.1** | 215, 59.9 | 149, 38.7 | 53, 13.3 |
+
+Laid whole at 30″ the Atlantic weighs about 112 MB beside the 23 MB of level 1 laid or
+measured here. Laid as **level 0 over all of it (11.3 MB) and level 1 only on the tiles with
+a coast or land within ten miles**, it weighs about 39 + 11 = 50 MB. Open sea at 30″ is 279
+KB a tile (the multibeam relief), against the 150″ world's 177 KB a tile for forty times the
+area. A ship in open water away from the coast is then answered at 150″ (4.6 km cells),
+in steps of 2 m. Nothing a ship needs out there is finer than that.
+
+### Step 0: the open Atlantic's level (the lead's ruling (b): measured, not settled)
+
+**How the tiles' raise and the game's level combine today.** The water over a cell is the
+chart's depth plus the tide's height, `-elevation + level + z` (`Chart.aground`,
+`ground.py`, the tide's `height_m`). At levels 2 and 3 the datum is low water: EMODnet's
+soundings, and GEBCO's fill raised by `mean_level_grid`, which reads `Tide.constants_at`
+itself, so the land and the level agree cell by cell. **At level 1 the datum is mean sea
+level and nothing is raised** (`build_corridor` samples GEBCO as it is), so on water only
+a coarse layer answers, the game counts the level twice: the depth is already below mean
+sea level, and the level above low water is added again. Outside every block that level is
+the eleven's. Over 7,584 points of open water (every quarter degree of the corridor's and
+the south layer's water outside every bound) the game today reads **level 3.11 to 4.37 m
+and M2 1.62 to 2.15 m**, the nearest of the eleven St Mary's or Le Conquet. Nearly all of
+it lies beyond every gauge's reach: every point south of 36 N, 755 to 1,602 miles off.
+**On the coarse shores** (cells where level 1 is the finest, outside every bound, Morocco's
+coast and the islands' outer shores mostly): 416 cells of sea shallower than the level and
+765 of land lower than it, which the game floods at mean tide. By elevation, 149 cells from
+−1 to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 to +3 and
+252 from +3 to +4.
+
+**What the islands' gauges read** (the file's constants; no level is read for Funchal or
+any Azorean gauge):
+
+| gauge | M2 m | M2 phase | level read | M2+S2+N2 (JUDGEMENT, Sicily's interim) |
+|---|---|---|---|---|
+| Funchal | 0.719 | 45.8 | none | 1.135 |
+| Ponta Delgada | 0.487 | 63.0 | none | 0.769 |
+| Angra | 0.447 | 64.4 | none | 0.708 |
+| Horta | 0.414 | 59.5 | none | 0.658 |
+| Santa Cruz das Flores | 0.368 | 60.8 | none | 0.582 |
+| Santa Cruz de Tenerife | 0.708 | 29.3 | 1.37 (REDMAR) | 1.127 |
+| Las Palmas | 0.746 | 28.4 | 1.44 | 1.185 |
+| Arrecife | 0.835 | 36.6 | 1.60 | 1.324 |
+| La Estaca | 0.593 | 21.8 | 1.17 | 0.956 |
+
+Where both are known, the judged sum runs 0.81 to 0.83 of the level read. Over the islands'
+regions the level today is the eleven's 3.98 m (Madeira), 3.2 to 3.98 m (the Azores) and
+the Canaries' own 1.17 to 1.60 m.
+
+**What each choice does to the depths** (the open water outside every block; the islands'
+own regions are the older blocks' and wait for package 111's close by the owner's word):
+
+1. **The eleven's, as today:** 3.1 to 4.4 m. The coarse shore is flooded to that height plus
+   the tide (765 cells of land), and open-water soundings read 3 to 4 m deep. M2 is four
+   times the islands' and an hour and a half late.
+2. **The sea's own gauges, the level only where read:** within the Canaries' reach 1.2 to
+   1.6 m. Elsewhere no gauge of the blend has a level, so `_blend` falls back to the
+   eleven's: 1.20 to 3.98 m, median 3.20. A step where the reach of the Canaries' gauges ends.
+3. **The sea's own gauges, unread levels judged at M2+S2+N2 and marked:** 0.59 to 1.60 m,
+   median 1.05. The coarse shore is flooded to about a metre (about 180 cells of sea and
+   210 of land within it), and the judged figure is a fifth low against the Canaries' read.
+   A published level replaces it when read.
+4. **Mean sea level, the coarse layer's own datum** (a coarse cell read as `-elevation + z`,
+   its level not added): no double count, and nothing to research. But it is an engine change
+   in how a level-1 depth meets the tide (not in the brief, so it needs the lead's word), and
+   the open water on a region's level-2 tiles (the 30 groups) is low-water datum and still
+   wants a level.
+
+### Step 0: the seas proposed, and what they move
+
+Laid on the weather boxes' own lines, so that each sea's weather is a box already on file:
+
+| sea | open water | gauges | weather | regions |
+|---|---|---|---|---|
+| `channel` | 47.5 to 52 N, 32 W to 2.93 E | the eleven | `channel` | channel-west, -mid, -east, solent |
+| `biscay` | 43.5 to 47.5 N, 32 to 0.9 W | biscay-north's and biscay-south's but the four Galician | `biscay` | biscay-north, biscay-south |
+| `iberian` | 36 to 43.5 N, 20 to 5 W | Portugal's and Cadiz, with Vigo, Vilagarcía, Corunna and Ferrol | `portugal` | portugal |
+| `ocean` | 25.2 to 43.5 N, 33 to 9 W, less the above | Funchal, the four Azoreans, the seven Canaries | `azores`, `madeira`, `canaries` by their lines | madeira, azores, canaries, salvages |
+| `strait` | the Strait's | its four and Cadiz | as today | strait |
+| `mediterranean` | the Mediterranean's layer | every Mediterranean gauge | its boxes; east of 16.7 E none on file, the nearest answering and said provisional | the eleven Mediterranean regions and tide regions |
+
+**The islands are one sea** (`ocean`), not four met: their M2 phases run 22 to 64 degrees
+and their amplitudes 0.37 to 0.84 m, one wave from the Canaries to the Azores. The blend
+between them is honest, and `SEAS_THAT_MEET` loses the Salvages' row. 106b's coast lies on
+the same wave; its builder names its sea.
+
+**Simulated** (the sea's gauges blended over open water outside every block, the rule
+otherwise the tide's own):
+
+| sea | points | today: level, M2 | the sea's: level (unread to the eleven's) | judged | M2 |
+|---|---|---|---|---|---|
+| channel | 1,416 | 3.11 to 4.21, 1.62 to 1.99 | **unchanged, every point** | | |
+| biscay | 1,558 | 3.11 to 4.37, 1.74 to 2.15 | 2.83 to 4.06 | 2.01 to 3.24 | 1.29 to 1.57 |
+| iberian | 1,246 | 3.20 to 4.37, 1.76 to 2.15 | 1.68 to 3.98 | 1.65 to 2.00 | 0.99 to 1.16 |
+| ocean | 3,327 | 3.20 to 3.98, 1.76 to 2.02 | 1.20 to 3.98 | 0.59 to 1.60 | 0.37 to 0.83 |
+| none of these (east of 9 W, south of 36 N: 106b's water) | 102 | 3.98, 2.02 | | | |
+
+**The recorded passages' open water is the Channel's sea, and its tide does not move**
+((e) below: they sail `atlantic-east` with its corridor). Harpy is within ten miles of 47 50 N
+6 W, and the south-west of Ushant patrol's south mark is at 47.933 N, both north of 47.5 N.
+Diamond is within eight miles of 48 N 4 55 W, inside biscay-north's or channel-west's
+bounds.
+
+**The known list's open water under these seas** (ruling (a): a group leaves only where its
+sea's tide is its own and not the eleven's): of the 23 groups of the lead's list, biscay's 4
+and iberian's 5 leave, and the Mediterranean's 2 (the Gulf's west, the Tyrrhenian's north),
+with package 105's two (Sicily's north and west). The Channel's 8 stay: their sea's tide is
+the eleven, which are that sea's own gauges. Is that the eleven's, by the ruling, or the
+sea's own? The Strait's south three are Morocco's water, 106b's bounds. The seven slivers
+beside a neighbour stay, for bounds.
+
+### Step 0: (e) what reads `atlantic-east`'s open water (106a's first count checked)
+
+"Open" here means outside every region's bounds; positions were tested against the
+manifest's boxes, and the charts and saves were loaded read-only.
+
+**106a's count was short, and the brief's premise does not hold.** The recorded passages
+are built by `make_scenario_world`. A scenario of `region: channel-west` takes
+`chart_holding`'s chart, **`atlantic-east` with its corridor**, not the chart of
+`channel-west` alone. Only a checkpoint's reload (`core/replay.py:_rebind`, `scenario.chart
+or scenario.region` with no `chart_holding`) puts a save of the Channel on `channel-west`
+alone. Two roads, two charts (for others, below). So the passages do read open water:
+
+- **gate 5c's cruise** (`naval-cruise.yaml`): Harpy starts at 47 50 N 6 W and patrols
+  within ten miles, three of her four marks outside every bound (47.833 N 6.248 W, 47.833 N
+  5.752 W, 47.667 N 6 W). Its digest is `test_known_truths.py` about line 4127.
+- **gate 5c's merchant passage and 6a's fake captain** (`merchant-passage.yaml`), and **6a's
+  intent** (`merchant-intent.yaml`): the patrol "off the soundings south-west of Ushant within
+  10 miles" (centre 48.10 N 5.60 W). Its south mark, 47.933 N 5.6 W, is outside every bound,
+  and the leg to it crosses 48 N at about 5.50 W. The same patrol is in directed-passage,
+  merchant-brig, -cutter, -schooner-plymouth and -ship.
+- All of it lies **north of 47.5 N, in the Channel's sea as proposed**, whose gauges are the
+  eleven: its tide is unchanged at every point (simulated above), and its weather box
+  (`channel`) is today's. Diamond's patrol lies inside the bounds. The seas as proposed move
+  nothing these passages read. A sea line south of 47.95 N would move them.
+
+**Kept saves** (`tests/fixtures/saves/`): five. Four reload on the chart of `channel-west`
+alone (m5c-cutter, m5c-b-harpy, m5c-c-37d-officer, pre-100-step-2-letter-in-hand) and one
+has no chart (pre-75-cutter-guns-cast-loose). The **m5c-b** save's Harpy patrol is at 48.12
+N 5.43 W heading for its east mark. Run on four hours (`test_checkpoint.py` about line 240),
+its next mark is the south one, below channel-west's tiles: on that chart no level answers
+there today, and level 0 would (the reason level 0 must stay off a chart of one region).
+Journal replays build on `atlantic-east`: the letter save (`test_letters.py:476`), the 37d
+save, the wardroom save (`test_ports.py:1971-2004`, merchant-intent, run eight hours with
+the south-west of Ushant patrol), and the cutter tender (`test_checkpoint.py:478`, the Nile
+off Cherbourg, all inside).
+
+**Scenarios.** Fourteen name `chart: atlantic-east` (106a counted twelve) and 36 name
+`region: channel-west`. Every player starts inside a region's bounds. Books that sail open
+water: `azores.orders` (the leg west of Madeira to 37 36 N 24 W), `biscay-south.orders` (off
+Finisterre, 42 53 N 9 22 W), `falmouth-to-corunna.orders` (by Ushant, across open Biscay).
+None of these is sailed by a test. `data/regatta/falmouth-to-funchal.yaml`'s fake goes by
+42 55 N 9 50 W; it is loaded only.
+
+**Truths and tests on open water, which move by design if the seas or the layers come:**
+
+- *The tide in the `biscay`, `iberian` and `ocean` seas* (each moves from the eleven to the
+  sea's own): `test_tide.py` at 47 N 8 W, 44 N 12 W, 37 N 14 W (three tests), off Lisbon 38.6
+  N 10.5 W, 35.4 N 6.3 W (106b's water); `test_islands.py` at 40 N 15 W; `test_tide.py:539`
+  (a world at 37 N 14 W, `tide_by_almanac`); truth 7-527's `tide.area_at(30.8, -16.0)`.
+  `test_tide.py` at 49.5 N 7.5 W, 51.2 N 5 W and 47.8333 N 6 W are the Channel's sea and do
+  not move. `test_reckoning.py:1905`'s "none, in open water" reads the account, not the sea.
+- *The weather:* `test_weather.py:710-759`'s `box_at` at 45 N 20 W, 35 N 21 W, 40 N 21 W and
+  55 N 30 W, truth 7-527's at 26 N 15 W, and `test_scenarios.py`'s at 35.7 N 5.5 W are
+  the boxes as they are; the seas move no box.
+- *The chart's limits,* moved by the Mediterranean's layer (the envelope's east from
+  16.69332 E to the layer's) or by any layer laid: `test_chart.py:904-948` (the envelope
+  pinned, `not contains(52, -5)`, `region_at(34, -7) is None`), truth 7-520's limits and its
+  refusal at 25.1 N 20 W (a layer to Cape Verde moves the south bound), the bound pinned in
+  `test_known_truths.py` about line 16641, `test_geo.py:236-297`'s refusal at 55 N 20 W (a
+  level 0 for limits would load it), and **`test_longitude.py:653-676`**, which starts at
+  49.5 N 16.593 E, past every region and layer, and holds "The chart has nothing to the
+  eastward" and "the chart ends here". With the Mediterranean's layer to 36.5 E that edge
+  moves 20 degrees east and the test's place reads water or land of the layer: superseded
+  by design, old beside new, when step 2 comes.
+- *The coarse layer's answers already pinned* (`test_chart.py:281-287`, `1093-1247`: 45 N 20
+  W at level 1, off Morocco, off Finisterre, `BEYOND_THE_CORRIDOR` at 31 N 25 W answering
+  None, the frigate run west from 47.5 N 4.95 W with no chart-edge line). The layers proposed
+  touch none of these but 31 N 25 W: it is in neither the corridor nor its layers, and level
+  0 (or a layer west of 22.13 W) would answer it.
+- *Business:* `world/business.py:290-297` takes the envelope for a start in no region, so its
+  bounds grow with every layer (`test_squadrons.py:584-643` sails 48.5 N 7.5 to 8 W, inside
+  today's envelope either way).
+
+### Found for others, not mended
+
+- The two roads to a Channel world give two charts: a fresh world or a journal's replay on
+  `atlantic-east` with its corridor, a checkpoint's reload on `channel-west` alone. A save
+  made on one is run on the other. `test_checkpoint.py`'s `saved` is built on `atlantic-east`
+  and reloaded on `channel-west`.
+- 106a's notes say the passages "are `region: channel-west`, whose chart has no corridor";
+  true only on the checkpoint's road.
+
+### Step 1: the layers' order (an engine step; `freesail/world/chart.py` alone)
+
+**Ruled by the chart session on step 0** (2026-11-13): level 0 is never laid under a chart of
+one region, and a checkpoint's reload answers exactly as today. The Black Sea is cut from
+the Mediterranean's layer. Cape Verde takes all twelve tiles. The islands are one `ocean`
+sea. The seas follow the weather boxes' lines. `seas.yaml` takes `regions:`, `meets:` and
+gauges by id. Put to the lead and not yet answered: the level, the Channel's eight groups,
+and level 0's extent.
+
+**What changed.** `Chart.__init__` reads a chart's coarse layers as **one ordered list**: the
+chart's `layers:` if it gives one, else 106a's `corridor:` followed by
+`corridors_beside:`, read as that list. Giving both forms is refused in words, and so is a
+layer the manifest lacks. At each level the first layer that lists a tile answers in it,
+and every later layer listing the same tile fills only the NODATA its predecessors left
+(`Tile.filled_from`, applied in order). A tile no earlier layer lists is the later layer's
+own. 106a's rule for one layer beside the corridor is now the rule of every layer. The
+uncommitted Atlantic (level 1) and world (level 0) come after every layer and answer only
+where no layer lists the tile. **The world lies under a chart of `charts:` only**: a chart
+of one region keeps its regions' levels alone. `Chart.corridor` and
+`Chart.corridors_beside` stay as the first layer and the rest, for their readers.
+`Chart.layers` is the list. Nothing of the manifest, the tool or any tile changed: the
+manifest still says `corridor:` and `corridors_beside:`. The tool writes `layers:` when
+step 2 lays a layer.
+
+**What moved, said.** Nothing in any committed tile or manifest entry, and nothing a clone
+reads. Two orders moved where no clone has tiles. The Atlantic's uncommitted level 1 used to
+take a tile name before 106a's layer beside the corridor; it now answers after every layer.
+The world no longer lies under a chart of one region.
+
+**The proof, cell for cell over every existing tile.** Every chart and region of the
+manifest was loaded (21 charts: `atlantic-east` and the twenty regions), and every tile each
+level lists was read through `Level.tile`: 4,593 tiles. The hashes of their elevation,
+distance field, blocks' soundings and tile figures, with each chart's levels and bounds,
+are **identical** under the code at 97eb554 (a worktree, the same tiles) and under this
+step's. The script was the session's own, not committed. **Truth 7-570** (slow tier) holds
+it for good. It re-derives every chart's every tile from the manifest alone (the region's
+own tile; the first layer in the chart's order that has it, each later one filling its
+NODATA) and compares the runtime's read cell for cell: 4,593 tiles. Two fast tests in
+`tests/test_chart.py` hold the order on three synthetic layers of one tile: the first
+listed answers, the later fill, and the two forms are one. They also hold the world on a
+synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
+3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
+corridor answering first at 47.70 N.

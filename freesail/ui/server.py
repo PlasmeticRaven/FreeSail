@@ -189,6 +189,32 @@ def snapshot_interval(compression: float) -> int:
     return 1
 
 
+def ship_drawing(world: Any) -> dict[str, Any] | None:
+    """The drawing of the hull the drivers follow (package 109; the owner's play of
+    2026-11-12, note 6: the page drew his first ship's rig with the state of the one he was
+    aboard): her graph (`queries.ship_graph`); or her name and the words that say why she is
+    not drawn as she stands (`undrawn`): a hull asleep (her sails as her ship is rigged, not
+    as they are set; the words say she is not seen closely enough), a boat under oars, a
+    hull with no spars standing; None where the world has no ship file (the point ship, an
+    observer's view)."""
+    from freesail.world.boats import is_boat
+
+    hull = getattr(world, "own", None)
+    ship = getattr(world, "ship", None)
+    if ship is None or not hasattr(ship, "spars"):
+        return None
+    name = str(getattr(ship, "name", "") or "")
+    if hull is not None and getattr(hull, "awake", True) is False:
+        undrawn = "she is not seen closely enough to draw her sails as they are set"
+    elif is_boat(world):
+        undrawn = "a boat under oars, with no rig to draw"
+    elif not ship.spars:
+        undrawn = "no spar of hers is standing; there is nothing aloft to draw"
+    else:
+        return queries.ship_graph(ship)
+    return {"name": name, "undrawn": undrawn}
+
+
 def save_path(line: str) -> str | None:
     """The path named by `save <path>`, or None. The console's own `save` is the same
     word; here it is read out of the order box so the browser session can save too."""
@@ -1472,10 +1498,10 @@ def create_app(
     @app.get("/api/ship")
     def api_ship() -> JSONResponse:
         with driver.lock:
-            ship = driver.world.ship
-            if not hasattr(ship, "spars"):
+            drawing = ship_drawing(driver.world)
+            if drawing is None:
                 raise HTTPException(status_code=404, detail="This world has no ship file.")
-            return JSONResponse(queries.ship_graph(ship))
+            return JSONResponse(drawing)
 
     @app.get("/api/state")
     def api_state() -> JSONResponse:
@@ -1594,10 +1620,9 @@ def create_app(
             loop.call_soon_threadsafe(queue.put_nowait, message)
 
         with driver.lock:
-            ship = driver.world.ship
             hello = {
                 "type": "hello",
-                "ship": queries.ship_graph(ship) if hasattr(ship, "spars") else None,
+                "ship": ship_drawing(driver.world),
                 "snapshot": driver.snapshot(),
                 "log": driver.shown_log(500),
                 # the player's pencil on the chart (package 37n), for the chart alone
