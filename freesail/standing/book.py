@@ -358,6 +358,7 @@ def fit_to_rig(ship: Any, lines: list[str]) -> tuple[list[str], str]:
     out: list[str] = []
     said: list[str] = []
     lacks: list[str] = []
+    fitted: list[tuple[int, int, str, list[str]]] = []  # (its line, its words, name, kept)
     for line in lines:
         m = _RULE_HEAD.match(line)
         if m is None:
@@ -380,8 +381,34 @@ def fit_to_rig(ship: Any, lines: list[str]) -> tuple[list[str], str]:
         if kept:
             out.append(m.group("head") + "; ".join(kept))
             said.append(f"'{m.group('name')}' without its {_join(families)}")
+            fitted.append((len(out) - 1, len(said) - 1, m.group("name"), kept))
         else:
             said.append(f"'{m.group('name')}' left out")
+    # a rule fitted down to taking in sails the book left in her never sets can only refuse
+    # at its every firing ("Nothing done: ... already furled", the schooner's night routine at
+    # each sunset once its royals and the morning sail were gone: the lead's reading of part
+    # D at 60af48e, item 6): a book fitted to the rig carries no such rule, and says so
+    drop: set[int] = set()
+    for at, said_at, name, kept in fitted:
+        taken = [_ACT_FAMILY.match(a) for a in kept]
+        if not all(
+            t is not None and kept[i].lstrip().startswith("take in ") for i, t in enumerate(taken)
+        ):
+            continue
+        fams = [t.group("family") for t in taken if t is not None]
+        sets = [
+            ln
+            for j, ln in enumerate(out)
+            if j != at and any(re.search(rf"\bset the {re.escape(f)}\b", ln) for f in fams)
+        ]
+        if sets:
+            continue
+        drop.add(at)
+        said[said_at] = (
+            f"'{name}' left out, for it was left to take in her {_join(fams)} only, which "
+            "nothing in the book sets"
+        )
+    out = [ln for j, ln in enumerate(out) if j not in drop]
     if not said:
         return out, ""
     return out, (

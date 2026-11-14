@@ -20,6 +20,7 @@ FRIGATE = "data/ships/frigate-36.yaml"
 CUTTER = "data/ships/cutter.yaml"
 BRIG = "data/ships/brig.yaml"
 MERCHANT = "data/ships/merchant-brig.yaml"
+SEVENTY_FOUR = "data/ships/seventy-four.yaml"
 
 
 def _scenario(speed: float = 0.0) -> Scenario:
@@ -75,13 +76,18 @@ def _enemy(
 
 
 def _alongside(
-    distance_m: float = 10.0, her_quarters: bool = False, her_captain: bool = False, seed: int = 7
+    distance_m: float = 10.0,
+    her_quarters: bool = False,
+    her_captain: bool = False,
+    seed: int = 7,
+    ship: str = FRIGATE,
 ):
-    """The player's frigate at quarters with her fire held, and a French frigate made so far
-    off her starboard beam and crewed; the lookout given his minute; the mark engaged to
-    starboard. Her captain stands aside (the test moves her) unless `her_captain`. `seed` the
-    game's (package 97: a test whose story needs a man to live through the fight's draw)."""
-    w = make_world(seed, FRIGATE, _scenario())
+    """The player's frigate (or `ship`) at quarters with her fire held, and a French frigate
+    made so far off her starboard beam and crewed; the lookout given his minute; the mark
+    engaged to starboard. Her captain stands aside (the test moves her) unless `her_captain`.
+    `seed` the game's (package 97: a test whose story needs a man to live through the fight's
+    draw)."""
+    w = make_world(seed, ship, _scenario())
     w.submit("beat to quarters")
     w.run(5)
     heading = math.degrees(float(w.ship.heading))
@@ -401,6 +407,49 @@ def test_boarders_against_a_frigate_at_her_own_temper_are_repulsed_and_both_must
     from freesail.world import prizes as P
 
     assert not P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")
+
+
+def test_a_seventy_fours_boarders_carry_a_frigate_at_quarters_by_their_numbers():
+    """§11a, the deck carried tested whole (the lead's reading of part D at 60af48e, item 5:
+    when the carried test became the repulsed one above its assertions went from tests/). A
+    deck CAN be carried from a ship of war, by numbers; only equal numbers at full temper
+    fail (truth 7-181b). A 74 at quarters, her 216 boarders with their arms served out,
+    against the French frigate at quarters at her own temper, laid as the frigate is laid
+    above: the deck is carried in the first round (measured), her colours come down by the
+    boarders' hand (`action.carried`, with the words), she is struck "carried by boarding",
+    the far body struck for the moment of the strike and then a prize of ours (package 74,
+    the design's §2.3) and alongside, her people the prize's prisoners and their hurt the
+    fight's, more of hers lost than of ours, and the boarders' reading says the last fight
+    carried. The OLD test's assertions, each back on an honest road."""
+    w, v, enemy = _alongside(10.0, her_quarters=True, ship=SEVENTY_FOUR)
+    w.submit("grapple her")
+    w.submit("serve out the small arms")
+    w.run(400)
+    boarders = w.submit("boarders away")
+    assert boarders.kind == "action.boarders" and "216 over the side" in boarders.text
+    for _ in range(40):
+        w.run(30)
+        f = B.fight_of(w.ship)
+        if f is not None and f.over:
+            break
+    f = B.fight_of(w.ship)
+    assert f is not None and f.over == "carried", (f.over, f.round)
+    assert f.round == 1, f.round
+    carried = _events(w, "action.carried")
+    assert carried and "by our boarders' hand" in carried[0].text
+    struck = _events(enemy, "action.struck")
+    assert struck and "carried by boarding" in struck[0].text
+    from freesail.world import prizes as P
+
+    assert P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")  # 74's
+    assert (P.record_of(v) or {}).get("how") == "carried by boarding"
+    assert B.grappled_to(w.ship) == v.id  # the prize alongside
+    prisoners = P.prisoners_of(enemy.ship)
+    assert prisoners is not None
+    her_hurt = [s for s in prisoners.crew.sailors if s.hurt]
+    assert len(her_hurt) == f.lost_defence > f.lost_attack
+    assert "of them hurt" in enemy.readings.words("prisoners")
+    assert "the last fight carried" in w.readings.words("boarders")
 
 
 def test_repel_boarders_brings_the_gun_crews_up_and_the_guns_fall_silent():

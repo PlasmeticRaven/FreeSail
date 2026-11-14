@@ -2408,6 +2408,8 @@ more_work_nouns:
   sounding: heave the lead
   cast: heave the lead
   log: heave the log
+  # package 115 D4 (e): `belay the relieving tackles`, the work by its own name
+  relieving tackles: rig the relieving tackles
 
 # ---------------------------------------------------------------------------
 # What undoes what (package 37g, item 5; the review of gate 5c's playtests, 5.4 and 10.5):

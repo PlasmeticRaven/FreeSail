@@ -8900,6 +8900,7 @@ class SendBoatScript(Script):
             for item in self.ports.boat.carrying
             if item.get("kind") in ("purchase", "sale")
         ]
+        self.port_id = self.ports.boat.port_id  # the market of her errand, kept with them
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -8917,7 +8918,12 @@ class SendBoatScript(Script):
             # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
             # and what was bought or sold in her is said lost with her, paid once and never
             # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
-            self.fail(self.ports.lost_on_errand(list(getattr(self, "carried", []) or [])))
+            # a sale is had when the goods are landed: lost before she reached the quay, it
+            # is void (the lead's reading of part D at 60af48e, item 4)
+            landed = self.phase in ("ashore", "pull_back", "hoist_in")
+            carried = list(getattr(self, "carried", []) or [])
+            port_id = getattr(self, "port_id", None)
+            self.fail(self.ports.lost_on_errand(carried, landed=landed, port_id=port_id))
             return
         self.t += dt
         self.phase_t += dt

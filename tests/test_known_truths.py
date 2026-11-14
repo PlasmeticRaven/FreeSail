@@ -17700,7 +17700,7 @@ def test_truth_7_620_a_misspelt_sail_is_offered_the_sail_on_every_readme_ship():
         assert tried >= 5, (ship_file, tried)
 
 
-def test_truth_7_621_the_officer_does_not_send_the_same_words_down_twice_within_the_hour():
+def test_truth_7_621_the_officer_does_not_send_the_same_thing_down_twice_within_the_hour():
     """The cold review's 5.3 item 5 (play/console-4, 12:17 to 12:29): "the sail on the
     larboard quarter lost sight of" sent down to the captain eight times in twelve minutes.
     Measured: eight sails of the world's business, each lost from sight in the same words.
@@ -17721,16 +17721,57 @@ def test_truth_7_621_the_officer_does_not_send_the_same_words_down_twice_within_
     w.run(7200 + 14400)
     made = [e for e in w.log if e.kind == reports.REPORT_MADE]
     assert made, "no report sent down in the passage"
-    for i, e in enumerate(made):
-        for later in made[i + 1 :]:
-            if later.tick - e.tick > 3600:
-                break
-            if later.data["text"] != e.data["text"]:
-                continue
-            up = [
-                x for x in w.log if x.kind == "captain.on_deck" and e.tick <= x.tick <= later.tick
+    # the same thing is not sent down twice in the hour: the same kind of line of the same
+    # sail or mark (`reports._subject`), the captain below throughout
+    told: dict[tuple[str, str], int] = {}
+    for e in w.log:
+        if e.kind == "captain.on_deck":
+            told.clear()
+        what = reports._what(e)
+        if what is None or not [m for m in made if m.tick == e.tick + reports.MESSENGER_S]:
+            continue
+        subject = reports._subject(e, what)
+        if subject in told and e.tick - told[subject] <= 3600:
+            again = [
+                m
+                for m in made
+                if m.tick == e.tick + reports.MESSENGER_S
+                and m.data["of"] == e.kind
+                and (m.data["text"] == what or m.data.get("n"))
             ]
-            assert up, (e.ship_time, later.ship_time, e.text)
+            assert not again or any(
+                reports._subject(x, reports._what(x) or "") != subject
+                for x in w.log
+                if x.tick == e.tick and x.kind == e.kind and x is not e
+            ), (e.ship_time, e.text)
+        told.setdefault(subject, e.tick)
+
+    # and a different sail is a different report (the lead's reading of part D at 60af48e,
+    # item 2: four sails sighted "on the larboard bow" in an hour, the base sending four
+    # reports and the gathering by words one): below from the start, every sail the lookout
+    # hails by day is sent down, a minute's sails alike as the lookout says them
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    _said(w, "go below")
+    w.run(9000)
+    hailed: dict[int, int] = {}
+    for e in w.log:
+        if e.kind == "lookout.sighting" and str(e.data.get("id", "")).startswith("sail:"):
+            hailed[e.tick] = hailed.get(e.tick, 0) + 1
+    assert len([n for n in hailed.values()]) >= 8, hailed
+    sent = {
+        e.tick - reports.MESSENGER_S: e
+        for e in w.log
+        if e.kind == reports.REPORT_MADE
+        and e.data["of"] == "lookout.sighting"
+        and "sail" in e.data["text"]
+    }
+    for tick, n in hailed.items():
+        assert tick in sent, (tick, n)
+        assert sent[tick].data.get("n", 1) == n, (tick, n, sent[tick].text)
+        if n > 1:
+            words = {2: "two", 3: "three", 4: "four"}[n]
+            assert f": {words} sail sighted" in sent[tick].text, sent[tick].text
+            assert "the same" not in sent[tick].text, sent[tick].text
 
 
 def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_to_be_yours():
@@ -17778,6 +17819,44 @@ def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_
     by_book = [x for x in w.log if x.kind in ("guns.aim", "guns.load") and x.tick <= 180]
     assert by_book and all("The guns are secured" in x.text for x in by_book), by_book
     assert w.readings.value("guns")["cast_loose"] is False
+
+    # every order that asks the guns to fire (the lead's reading of part D at 60af48e, item
+    # 3): after an action fought, the guns secured with three still loaded and the mark and
+    # side still engaged, the hands beat to quarters again; `fire` and its forms each say
+    # the word stands for the guns when they are cast loose, that three are loaded and none
+    # is run out, and name the order; and nothing fires on them
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    _said(w, "engage her to starboard")
+    w.run(3300)
+    assert [x for x in w.log if x.kind == "action.fired"], "no action fought"
+    _said(w, "secure the guns")
+    w.run(600)
+    _said(w, "beat to quarters")
+    w.run(30)
+    assert secured() and sum(1 for g in w.ship.guns.values() if g.loaded) == 3
+    battery = w.ship.extra["battery"]
+    assert battery.engaged == "starboard" and battery.target
+    orders = (
+        "fire",
+        "fire a gun to leeward",
+        "fire the starboard broadside",
+        "fire number one starboard gun",
+        "fire as they bear",
+        "fire by divisions",
+    )
+    for order in orders:
+        a = _said(w, order)
+        assert a.kind.startswith("guns."), (order, a.text)
+        assert "The guns are secured, three of them loaded: none is run out or fired" in a.text
+        assert a.text.endswith("say 'cast loose the guns'."), (order, a.text)
+        assert "no gun of it is loaded" not in a.text, (order, a.text)
+        assert "as soon as it is ready" not in a.text, (order, a.text)
+        assert "as soon as ready" not in a.text, (order, a.text)
+    last = w.clock.tick
+    w.run(600)
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > last]
 
 
 def test_truth_7_628_engage_casts_the_guns_loose_and_the_reviewers_own_orders_fight_her():
@@ -17892,6 +17971,32 @@ def test_truth_7_624_a_boat_lost_on_her_errand_says_the_goods_went_with_her_paid
     assert again.kind == "order.rejected" and "The boat is lost" in again.text
     assert w.purse.pounds == paid
 
+    # the sale, one row more (the lead's reading of part D at 60af48e, item 4: "the money
+    # taken stands" had the market pay for tin it never had): a sale is had when the goods
+    # are landed; the boat stove while she pulls for the shore with the tin, he has neither
+    # tin nor money, and the market is as it was before the sale
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    assert _said(w, "buy two tons of tin").kind == "market.bargain"
+    w.run(3 * 3600)
+    assert w.hold.goods.get("tin") == 2.0 and not w.dealings.boat.away
+    before = w.purse.pounds
+    sold = _said(w, "sell two tons of tin")
+    assert sold.kind == "market.bargain" and "the boat lands it" in sold.text, sold.text
+    port = w.dealings.ports[w.dealings.boat.port_id]
+    market_before_sale = port.market.net_sold.get("tin", 0.0) - 2.0
+    w.run(600)
+    assert w.dealings.boat.phase == "pulling for the shore"
+    w.world_order("aboard: the boat stove", source=LIVE_WORLD_ORDER_SOURCE)
+    w.run(60)
+    said = [x.text for x in w.log if "errand is not done" in x.text]
+    assert said and (
+        "the 2 tons of tin to be sold went down in her before they were landed: the sale is "
+        "void, and the £245 taken for them is paid back" in said[0]
+    ), said
+    assert w.purse.pounds == before and not w.hold.goods.get("tin")
+    assert port.market.net_sold.get("tin", 0.0) == market_before_sale
+
 
 def test_truth_7_625_the_starter_book_fits_every_rig_and_says_what_it_left_out():
     """The cold review's 5.3 item 3 (play/console-2): the starter book refused three of its
@@ -17946,8 +18051,31 @@ def test_truth_7_625_the_starter_book_fits_every_rig_and_says_what_it_left_out()
         else:
             assert not ({"royals", "studdingsails"} & lacks), ship_file
         assert len(w.standing.book) >= 4, (ship_file, len(w.standing.book))
+        # no rule fitted down to taking in only what nothing in the book sets, which could
+        # only refuse at its every firing (the lead's reading of part D at 60af48e, item 6:
+        # the schooner's night routine, "Nothing done: ... already furled" at each sunset)
+        texts = [r.text for r in w.standing.book.rules]
+        for r in w.standing.book.rules:
+            acts = [a.strip() for a in r.text.split(" then ", 1)[-1].split(";")]
+            if not all(a.startswith("take in the ") for a in acts):
+                continue
+            fams = [a.removeprefix("take in the ").split(",")[0].strip() for a in acts]
+            sets = [t for t in texts if any(f"set the {f}" in t for f in fams)]
+            unfitted = [ln for ln in open(STARTER_BOOK, encoding="utf-8") if r.name in ln]
+            assert sets or any(r.text.split(" then ", 1)[-1] in ln for ln in unfitted), (
+                ship_file,
+                r.text,
+            )
     # the families the fitting knows are the ship files' own: a new one is added on purpose
     assert families_in_files <= SAIL_FAMILIES, families_in_files - SAIL_FAMILIES
+
+    # and the rules captain's own books are not refused for a rule the game fitted: the
+    # first action's cutter, the starter book loaded at her opening, its 'shorten sail for
+    # weather' fitted; the book 'keeping station' says only what it said before the fitting
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(1800)
+    clash = [e.text for e in w.log if "held already" in e.text and "keeping station" in e.text]
+    assert clash and not [t for t in clash if "'shorten sail for weather'" in t], clash
 
 
 def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_she_answers():
@@ -17959,7 +18087,14 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
     clears the loss, the hit's line naming the order, and the rules captain's `_repairs`
     giving it first. The first action at seed 6 as the harbour starts it (the wheel lost at
     seventeen minutes): the order given at the prompt on the minute the wheel goes, and the
-    helm answers again within the quarter hour, the rudder following the helm's order."""
+    loss is cleared within the quarter hour, the rudder following the helm's order.
+
+    What the helm does with the wheel shot away and before the tackles are rove is not here:
+    nothing reads the tackles (`helm_by_tackles`), and she steers meanwhile exactly as before
+    (the lead's reading of part D at 60af48e, item 6; the question put to the owner, in the
+    notes). Its words are true (the same reading): given twice, said once; the hands' work
+    named as the log names it; `belay the relieving tackles` belays it and says how she is
+    left; and the wheel, once shot away, is not shot away again with the tackles rove."""
     w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
     for _ in range(90):
         w.run(30)
@@ -17971,6 +18106,19 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
     held = float(w.ship.dyn.rudder)
     e = _said(w, "rig the relieving tackles")
     assert e.kind != "order.rejected", e.text
+    w.run(5)
+    twice = _said(w, "rig the relieving tackles")
+    assert twice.text.endswith("The hands are rigging the relieving tackles already."), twice.text
+    b = _said(w, "belay the relieving tackles")
+    assert b.kind == "work.belayed", b.text
+    assert b.text == (
+        "Belayed rigging the relieving tackles; the tackles not rove, the helm lost as the "
+        "shot left it."
+    ), b.text
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    short = [x.text for x in w.log if x.kind == "evolution.short_handed" and x.tick >= e.tick]
+    assert not [t for t in short if t.endswith("the rest are relieving tackles.")], short
     for _ in range(30):
         w.run(30)
         if not w.ship.extra.get("helm_lost"):
@@ -17984,6 +18132,10 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
         w.run(30)
         seen.append(float(w.ship.dyn.rudder))
     assert abs(seen[0] - seen[1]) > 0.2, ("the rudder did not answer the helm", held, seen)
+    rove = [x.tick for x in w.log if x.kind == "helm.relieved"][0]
+    w.run(1800)
+    again = [x for x in w.log if x.kind == "helm.shot_away" and x.tick > rove]
+    assert not again, [x.text for x in again]
 
 
 # the merchant brig's case waits on package 75's people (the lead's ruling of 2026-11-14 on
@@ -18003,9 +18155,24 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
     for hands for ever, left for package 75's people). Mended: the dispatches let go as the
     merchant scenarios in the same road do. Every scenario started as the harbour starts it:
     one whose opening words (the header and the position line) say she lies at anchor, and
-    not that she is unmoored or under way, is riding at anchor in her port at two minutes."""
+    not that she is unmoored or under way, is riding at anchor in her port at two minutes;
+    in the place her position's words name, and named in her header by her own name (the
+    lead's reading of part D at 60af48e, item 7: the schooner of Plymouth's header and place
+    said Falmouth and Carrick Road, the merchant ship's and the merchant cutter's described
+    the schooner Speedwell; the three headers rewritten true)."""
     import glob
 
+    import yaml
+
+    # the ships' own names, file by file: a header naming one must name her own (the lead's
+    # reading of part D at 60af48e, item 7: the merchant ship's header described the schooner
+    # Speedwell, and she is the Amazon)
+    ship_names = set()
+    for f in glob.glob("data/ships/*.yaml"):
+        spec = yaml.safe_load(open(f, encoding="utf-8")) or {}
+        n = str((spec.get("ship") or {}).get("name") or "")
+        if n and not n.startswith("the "):
+            ship_names.add(n)
     tried = 0
     under_way = 0
     for path in sorted(glob.glob("data/scenarios/*.yaml")):
@@ -18027,6 +18194,8 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
         if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
             continue
         if name in _OPENING_UNTIL_75:
+            # the merchant brig's opening waits for hands (package 75's people): nothing is
+            # asserted of her here, neither her anchor nor her place nor her name
             continue
         w = _harbour_game(path)
         if getattr(w, "ship", None) is None or not hasattr(w.ship, "dyn"):
@@ -18034,6 +18203,24 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
         w.run(120)
         tried += 1
         assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
+        # her place, where her position's words name it: the port she lies in, its road or
+        # its anchorage (the schooner of Plymouth's said Carrick Road, and she lies in the
+        # Sound)
+        port = w.dealings.in_port()
+        spots = [port.name] + [
+            str(getattr(getattr(port, r, None), "name", "") or "")
+            for r in ("anchorage", "outer_road", "mooring")
+        ]
+        assert any(x and x.lower() in place.lower() for x in spots), (name, place, spots)
+        # and her name, where the header names a ship of the files: her own, or a sail of
+        # the scenario's own list
+        header = " ".join(
+            ln for ln in raw[: next(i for i, ln in enumerate(raw) if not ln.startswith("#"))]
+        )
+        spec = yaml.safe_load("\n".join(raw)) or {}
+        others = {str(x.get("name") or "") for x in spec.get("ships") or []}
+        named = {n for n in ship_names if re.search(rf"\b{re.escape(n)}\b", header)}
+        assert named <= {w.ship.name} | others, (name, w.ship.name, named)
     assert tried >= 8 and under_way >= 1, (tried, under_way)
 
 
@@ -18045,7 +18232,14 @@ def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds
     quarters`, `hold your fire`, `engage her to starboard`: the engage takes her for the
     mark, casts loose, and holds, saying so and naming the order that opens; nothing fires
     in the next forty minutes; `fire as they bear` then opens. Without the hold, engage fights
-    as they bear (truth 7-628)."""
+    as they bear (truth 7-628).
+
+    The hand that held is the hand that must loose (the lead's reading of part D at 60af48e,
+    item 1): the rules captain's own hold ("hold your fire (until she is within the book's
+    range)", at his every entry to engaging) does not bind the player's engage, which opens as
+    the base's did, the same shot at the same seconds; and no answer says "at your order" of
+    a hold he did not give, nor "engaging already" of a battery that is held. The engage on a
+    held battery with the guns secured says one thing of them: cast loose, and held."""
     w = _harbour_game("data/scenarios/first-action.yaml")
     w.run(120)
     _said(w, "beat to quarters")
@@ -18053,8 +18247,16 @@ def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds
     w.run(300)
     e = _said(w, "engage her to starboard")
     assert e.kind == "guns.engage", e.text
-    assert "The guns are held at your order: 'fire as they bear' to open." in e.text, e.text
-    assert "being cast loose" in e.text, e.text
+    assert e.text.endswith(
+        "The guns are being cast loose, and held at your order when they are: "
+        "'fire as they bear' to open."
+    ), e.text
+    assert "engages to starboard when they are" not in e.text, e.text
+    assert e.text.count("held at your order") == 1, e.text
+    again = _said(w, "engage her to starboard")
+    assert "already" not in again.text and "her guns are held at your order" in again.text, (
+        again.text
+    )
     battery = w.ship.extra["battery"]
     assert battery.mode.value == "hold" and battery.target, (battery.mode, battery.target)
     for _ in range(40):
@@ -18070,3 +18272,28 @@ def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds
         if fired:
             break
     assert fired, "opened and nothing fired in an hour"
+
+    # the rules captain's own hold, and the player's engage after it
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    held = [x for x in w.log if x.text.startswith("By the captain, engaging: holding your fire")]
+    assert held, "the captain's book held no fire on engaging"
+    e = _said(w, "engage her to starboard")
+    assert e.text.startswith("Engage a cutter to starboard: the guns to fire as they bear."), e.text
+    assert "your order" not in e.text and "already" not in e.text, e.text
+    w.run(3600)
+    fired = [x.tick for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
+    assert fired[:3] == [3720, 3780, 3840], fired[:3]  # the base's own, to the second
+    other = _said(w, "engage her to larboard")
+    assert "your order" not in other.text, other.text
+
+    # `cease firing` before the beat: its hint is the order that works from there, and its
+    # hold (meant: an explicit order about firing, standing until an order to fire) is said
+    # again at the beat, not found later in a silent battery
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    c = _said(w, "cease firing")
+    assert c.text.endswith("say 'beat to quarters', then 'cast loose the guns'."), c.text
+    b = _said(w, "beat to quarters")
+    assert b.text.endswith("The guns are held at your order: 'fire as they bear' to open."), b.text
+    assert _said(w, "cast loose the guns").kind != "order.rejected"

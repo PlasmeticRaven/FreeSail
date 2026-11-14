@@ -910,6 +910,11 @@ class RelievingTacklesScript(PhasedScript):
         lost = self.ship.extra.pop("helm_lost", None)
         self.ship.extra["helm_by_tackles"] = str(lost or "the wheel shot away")
 
+    def left_words(self) -> str | None:
+        """Belayed before they are rove: what is so (the lead's reading of part D at
+        60af48e, item 6: "the helm and the yards left as they stand at reeve")."""
+        return "the tackles not rove, the helm lost as the shot left it"
+
     def words(self) -> dict[str, Any]:
         return {
             "done": "The relieving tackles are rove to the tiller and manned below: the helm "

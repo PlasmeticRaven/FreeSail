@@ -10,7 +10,7 @@
 # another use of the name. One phase, `reeve`; at its end the helm answers again. Her
 # steering meanwhile is as it was, the rudder held where the shot left it.
 id: relieving_tackles
-verb: relieving_tackles
+verb: rig_the_relieving_tackles   # the work as the log names it: "rigging the relieving tackles"
 applies_to: {class: ship}
 script: relieving_tackles
 params: {}

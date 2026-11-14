@@ -3022,12 +3022,16 @@ class Dealings:
             {"boat": self.boat.boat_id, "people": list(people)},
         )
 
-    def lost_on_errand(self, carried: list[dict[str, Any]]) -> str:
-        """The words for a boat lost on her errand with goods in her (`SendBoatScript`):
-        the goods bought lost with her, their price paid at the bargain and not paid again;
-        the goods sold lost before they were landed, the price taken standing (JUDGEMENT:
-        struck at the market, the bargain stands, as a merchant's did when the lighter was
-        lost; package 115 D2)."""
+    def lost_on_errand(
+        self, carried: list[dict[str, Any]], landed: bool = False, port_id: str | None = None
+    ) -> str:
+        """The words for a boat lost on her errand with goods in her (`SendBoatScript`), and
+        the bargain settled as the goods were had: the goods bought lost with her, their
+        price paid at the bargain and not paid again; the goods sold lost before they were
+        landed (`landed` False: she had not reached the quay), the sale void, the price
+        taken paid back and the market as it was before it, for the market pays for goods
+        it has (the lead's reading of part D at 60af48e, item 4: "the money taken stands"
+        had the market pay for tin it never had); sold and landed, the sale stands."""
         bought = [i for i in carried if i.get("kind") == "purchase"]
         sold = [i for i in carried if i.get("kind") == "sale"]
         parts = ["she is lost"]
@@ -3038,10 +3042,33 @@ class Dealings:
                 f"the {goods} bought are lost with her, {pounds_words(paid)} paid for them and "
                 "not to be had again"
             )
-        if sold:
+        if sold and landed:
             goods = _and([f"{float(i['tons']):g} tons of {i['good']}" for i in sold])
+            parts.append(f"the {goods} sold were landed before she was lost, and the sale stands")
+        elif sold:
+            goods = _and([f"{float(i['tons']):g} tons of {i['good']}" for i in sold])
+            back = sum(float(i.get("pounds", 0.0)) for i in sold)
+            # the errand's market, kept by the errand: the boat's state is made afresh when
+            # she is lost (`world.boats.lose_boat`)
+            port = self.ports.get(port_id) if port_id else None
+            now = int(self.world.clock.tick)
+            purse = self.world.purse
+            short = 0.0
+            for i in sold:
+                pounds = float(i.get("pounds", 0.0))
+                what = f"{float(i['tons']):g} tons of {i['good']}"
+                where = f" at {port.name}" if port is not None else ""
+                paid = min(pounds, purse.pounds)
+                short += pounds - paid
+                purse.pay(
+                    paid, f"the sale of {what}{where} void: lost before they were landed", now
+                )
+                if port is not None:
+                    port.market.bought_from_port(str(i["good"]), float(i["tons"]))
+            owed = f", {pounds_words(short)} of it owed, the purse short" if short > 1e-9 else ""
             parts.append(
-                f"the {goods} sold went down in her before they were landed; the money taken stands"
+                f"the {goods} to be sold went down in her before they were landed: the sale is "
+                f"void, and the {pounds_words(back)} taken for them is paid back{owed}"
             )
         return "; ".join(parts)
 

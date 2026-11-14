@@ -244,6 +244,20 @@ def beat_to_quarters(ship: Ship, order: Order) -> Result:
         # 1780, EXERCISE: "1st. Silence. 2d. Cast loose your guns."), and the reply says so
         # (the cold review of 2026-11-14, 1.5; package 115 D1)
         lines.append("The guns are secured: 'cast loose the guns' to serve them.")
+    battery = getattr(ship, "extra", {}).get("battery")
+    if (
+        battery is not None
+        and str(getattr(battery, "mode", "")) == "hold"
+        and getattr(battery, "held_by_order", "")
+    ):
+        # a hold given before the beat (`hold your fire`, `cease firing`) stands at quarters
+        # until an order to fire (the lead's ruling of 2026-11-14 on package 115 D1): the
+        # beat says so, not a silent battery after it (its reading of part D, item 6)
+        from freesail.orders.gunnery import _held_words
+
+        lines.append(
+            f"The guns are held {_held_words(ship, battery)}: 'fire as they bear' to open."
+        )
     return "crew.quarters", "Beat to quarters! " + " ".join(lines), data
 
 
