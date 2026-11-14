@@ -28364,3 +28364,37 @@ tick held. **No digest moved, no kept save; the one pin moved is the sleeping hu
 old beside new.** **The pace**, alone and last (`--slow -m pace -n 0`, the same ten files, load
 3.1 at its start): exit 0, 12 passed. The tree reported differs from aea989e by this paragraph
 alone.
+
+## The chart session: a loaded game keeps its chart (the lead's ruling of 2026-11-13)
+
+**The fault.** A scenario that names a region (`region: channel-west`, 36 of them) is played
+on the chart that holds it (`chart_holding`, package 45): `atlantic-east` whole. Saved by
+either driver (a checkpoint beside the save by default) and loaded, it came back on the
+region alone, because `replay._rebind` loaded `scenario.chart or scenario.region` bare: in
+`blockade.yaml`, 47 N 4 W answered 121 m when begun and nothing after the load, and a ship
+sailing south of 48 N or east of 3 W after a load was off the chart. A scenario that names
+`chart: atlantic-east` kept its chart. Found by package 112's measure ("two roads to a
+Channel world").
+
+**The mend.** `_rebind` takes `chart_holding(region)` where the scenario names no chart, as
+`World.__init__` does; a scenario or a test that names `chart: <region>` outright keeps that
+one region. Two tests in `tests/test_checkpoint.py`, each failing before the mend: a
+`region:` game begun, saved and loaded by the checkpoint road answers at 47 N 4 W as it did
+begun, with the same bounds and regions; and the m5c-b playtest save, written long before,
+loads without error on the holding chart, 47.70 N 6 W answering from the corridor where the
+bare region answered nothing.
+
+**What moved, by toggle** (the old `_rebind` and the new on the same build): nothing pinned.
+The two playtest saves loaded and run on a watch give the same digests both ways (m5c-b
+43bb3a263fc9 at load, c48ff0d9e542 after four hours, 114 lines; m5c's cutter afec5325e32a,
+db9942cb5136, 52 lines): their run-on stays in channel-west's water, and the chart's wider
+reach answers nothing they read in that watch. No recorded passage is a checkpoint's load.
+
+**The suites, at 0d093aeb** (the trunk merged at b7a96da7; the dev and server extras
+installed): `ruff check .` and `ruff format --check .` clean; the fast tier whole (`-n 4`):
+exit 0, 7,618 passed, 1 xfailed, 515 slow left out; the slow tier of the checkpoint,
+replay, chart and kept-save tests with the browser plans (`--slow -m "slow and not pace"`,
+`test_checkpoint`, `test_replay`, `test_chart`, `test_browser_probe`, `test_hulls`,
+`test_lee_ports`, `test_letters`, `test_bellerophon`, `test_flag_drawings`): exit 0, 32
+passed, none skipped; the pace alone and last: 15 passed, exit 0. The tree reported
+differs from 0d093aeb by the documents alone.
