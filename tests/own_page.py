@@ -53,25 +53,40 @@ class PageClient(TestClient):
         return super().websocket_connect(urljoin(f"ws://{OWN}", url), subprotocols, **kwargs)
 
 
-class DoorClient(PageClient):
+class DoorClient(TestClient):
     """The machine's own clients side by side, as they are on the owner's machine: an
     agent's door (`agents.remote.GameClient`) on the doors' routes (`/api/agents/...`), with
     no mark and no origin, its seating's key in its calls; the game's own page on every
-    other route (the test turns the clock and gives the page's orders as the page does)."""
+    other route (the test turns the clock and gives the page's orders as the page does).
+    The page's headers are added to each request of the page's alone, never kept on the
+    client, so that a door's request and a page's in two threads at once are each as they
+    come (a page posting its picture while the door waits for its turn)."""
+
+    def __init__(self, app: Any, **kw: Any):
+        guard = getattr(getattr(app, "state", None), "guard", None)
+        self.mark = guard.token if guard is not None else ""
+        kw.setdefault("base_url", f"http://{OWN}")
+        kw.setdefault("client", ON_THE_MACHINE)
+        super().__init__(app, **kw)
+
+    def _page_headers(self, given: Any) -> dict[str, str]:
+        headers = dict(given or {})
+        if self.mark:
+            headers.setdefault(MARK_HEADER, self.mark)
+        headers.setdefault("origin", f"http://{OWN}")
+        return headers
 
     def request(self, method: str, url: Any, **kwargs: Any) -> Any:  # type: ignore[override]
         path = urlsplit(str(url)).path
-        if path == DOORS_PREFIX or path.startswith(DOORS_PREFIX + "/"):
-            # a door's request: nothing of the page's
-            self.headers.pop(MARK_HEADER, None)
-            self.headers.pop("origin", None)
-            try:
-                return super().request(method, url, **kwargs)
-            finally:
-                if self.mark:
-                    self.headers[MARK_HEADER] = self.mark
-                self.headers["origin"] = f"http://{OWN}"
+        if not (path == DOORS_PREFIX or path.startswith(DOORS_PREFIX + "/")):
+            kwargs["headers"] = self._page_headers(kwargs.get("headers"))
         return super().request(method, url, **kwargs)
+
+    def websocket_connect(self, url: str, subprotocols: Any = None, **kwargs: Any) -> Any:
+        if self.mark and f"{MARK_QUERY}=" not in url:
+            url += ("&" if "?" in url else "?") + urlencode({MARK_QUERY: self.mark})
+        kwargs["headers"] = self._page_headers(kwargs.get("headers"))
+        return super().websocket_connect(urljoin(f"ws://{OWN}", url), subprotocols, **kwargs)
 
 
 class LiveGame:
