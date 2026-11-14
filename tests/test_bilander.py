@@ -2709,6 +2709,112 @@ def test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again(
     assert not [ln for ln in lines if ln[1] == "evolution.failed"]
 
 
+# A real checkpoint of hers written on the trunk at 1eea8d18, before the lead's ruling 8 (her
+# eight): seed 7, her settle from 00:00 (all hands, plain sail set and braced sharp up), the hands
+# piped down and saved 30 s on, her larboard watch of two by night. A kept save
+# (tests/fixtures/saves/): a change that breaks it is mended in the code, never by changing it.
+EIGHT_SAVE = ROOT / "tests" / "fixtures" / "saves" / "pre-75-bilander-eight-under-sail.checkpoint"
+
+
+def test_a_real_save_from_before_loads_with_her_eight_and_sails_under_this_builds_rules():
+    """The lead's (C7) of 2026-11-14 ("a save from before loads with her eight" from a real old
+    checkpoint): `EIGHT_SAVE`, written on the trunk, loads in this build with the company it holds,
+    her eight, its crew holding no watch for its posts to head (`Crew.post_watches`, read only at
+    a muster), so that no post of hers is ever counted; and her company is `_her_eight`'s, the
+    muster this file's tests make again for her eight, row for row (id, name, station, watch,
+    rating, post and trade), so that the settee's road sailed on `_her_eight` is sailed on what a
+    save from before holds. "take in the mainsail" sailed on from it, her larboard watch's two too
+    few (the settee's `too_few: all hands`, this build's rule): "All hands! (to take in the
+    mainsail)" at +1 s, taken in and piped down at +87 s, the figure of the settee's road at her
+    eight by night (`test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after`).
+    On the trunk, which has no such key, the same save waited: "Not hands enough on deck to take in
+    the mainsail; there are but two to spare." at +1 s."""
+    from freesail.api.session import make_world
+    from freesail.core import replay
+    from freesail.core.world import Scenario
+
+    header, world = replay.read_checkpoint(EIGHT_SAVE)
+    crew = world.ship.extra["crew"]
+    assert header["seed"] == 7 and header["build"]["name"] == "m6c"
+    assert len(crew.sailors) == 8 and not getattr(crew, "post_watches", None)
+
+    def rows(c):
+        return [(s.id, s.name, s.station, s.watch, s.rating, s.post, s.trade) for s in c.sailors]
+
+    made = _her_eight(make_world(7, HER, Scenario())).ship.extra["crew"]
+    assert rows(crew) == rows(made)
+    runner = world.ship.extra["evolutions"]
+    start = world.clock.tick
+    assert world.submit("take in the mainsail").kind == "order.accepted"
+    (work,) = runner.instances
+    assert runner._working_posts(crew, work) == []
+    for _ in range(600):
+        world.tick()
+        if not runner.in_progress():
+            break
+    lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    assert (1, "crew.all_hands", "All hands! (to take in the mainsail)") in lines, lines
+    assert world.ship.sails[SETTEE].state is SailState.IN_THE_GEAR
+    (taken,) = [t for t, kind, _ in lines if kind == "sail.taken_in"]
+    piped = (87, "crew.piped_down", "Piped down; the larboard watch has the deck.")
+    assert taken == 87 and piped in lines, lines
+    assert not [s for s in crew.sailors if s.post and s.at]
+
+
+def test_at_nine_with_a_hand_of_her_watch_sick_her_settees_road_calls_all_hands_aloft_alone():
+    """The lead's (C7) of 2026-11-14 (at nine the settee's all-hands road tried at nine): from her
+    settle at 00:00, the hands piped down and 30 s, her larboard watch by night with its main topman
+    sick, two hands and the master. "take in the mainsail" (on deck, six wanted) is begun short by
+    the two and the master, half, and calls nobody: "Only three hands to the mainsail; there are no
+    more on deck.", taken in at +154 s. "furl the mainsail" (aloft, where no post goes: the two
+    under half of the five her company could give aloft) calls all hands for it, "All hands! (to
+    furl the mainsail)", is worked as all-hands work and pipes down at its end, furled at +217 s;
+    and "set the mainsail" from furled, aloft, likewise, set at +206 s. Old: the road was tried at
+    nine only through her eight (`_her_eight`); at nine with her watches whole nothing of a watch's
+    work calls all hands."""
+    from datetime import datetime
+
+    from freesail.crew.model import Watch
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    crew = world.ship.extra["crew"]
+    sick = next(
+        s for s in crew.sailors if s.watch is Watch.LARBOARD and s.station.value == "main_top"
+    )
+    sick.fit, sick.hurt = False, "sick"
+    runner = world.ship.extra["evolutions"]
+    settee = world.ship.sails[SETTEE]
+    for order, end, call, secs in (
+        ("take in the mainsail", SailState.IN_THE_GEAR, False, 154),
+        ("furl the mainsail", SailState.FURLED, True, 217),
+        ("set the mainsail", SailState.SET, True, 206),
+    ):
+        start = world.clock.tick
+        assert world.submit(order).kind == "order.accepted", order
+        (work,) = [i for i in runner.instances if i.evo.id.endswith("_settee")]
+        posts = [h.post for h in work.assignment.hands if h.post] if work.assignment else []
+        for _ in range(900):
+            world.tick()
+            if not runner.in_progress():
+                break
+        took = world.clock.tick - start
+        lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+        alls = [text for _, kind, text in lines if kind == "crew.all_hands"]
+        piped = [t for t, kind, _ in lines if kind == "crew.piped_down"]
+        assert settee.state is end and abs(took - secs) <= 10, (order, took)
+        assert not [ln for ln in lines if ln[1] in ("evolution.waiting", "evolution.failed")]
+        if call:
+            assert alls == [f"All hands! (to {order.split(' the ')[0]} the mainsail)"], alls
+            assert piped == [took], (order, piped)
+        else:
+            assert alls == [] and piped == [] and posts == ["master"], (order, posts)
+            said = "Only three hands to the mainsail; there are no more on deck."
+            assert (1, "evolution.short_handed", said) in lines, lines
+        world.run(30)
+
+
 def test_her_settee_work_made_all_hands_work_and_taken_away_before_it_began_pipes_down():
     """The lead's (C5) of 2026-11-14, shown reachable and mended: settee work made all-hands work as
     it asked for its hands (`Runner._take_hands`, its watch too few) that waited and was then
