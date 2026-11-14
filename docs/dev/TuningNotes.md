@@ -29443,3 +29443,20 @@ guns' own fire as they bore; with the hold standing the word, given one second a
 gun ready. The truth now gives the word when the side is ready (thirty seconds, asserted ready
 and unfired), its sentence and every figure as they were: "Three shot at a cutter: one struck
 her and two wide."
+
+**D4 (d), the dispatches, as ruled at last (the lead's ruling (b) of 2026-11-14).** The anchor
+given to the dispatches' opening is taken out again: she begins under way in Carrick Road at
+five in the morning as the trunk has her, and her rules captain makes sail for Plymouth at
+05:05 and touches nowhere. Her words are made true the other way: the position line's comment
+was the only place that called the road "the usual anchorage" (the game serves none of it: not
+the harbour's line, not the primer), and it now says she is in Carrick Road under way, bound
+for Plymouth; truth 7-627 tests her as under way. FOUND, NOT MENDED (for the owner's list, the
+captain's pilotage, `world/captains.py`): from an anchor in Carrick Road her rules captain
+traded (42 tons of copper ore), got under way at 09:30 on the starboard tack, took the pilot
+at 09:43, put her about off Trefusis Point, was warned by the pilot at 09:46 ("the Black Rock
+nine cables ahead, right ahead; leave it to larboard"), shaped a course at 09:54 for 50 00 N
+4 57 W and struck the Black Rock at six knots, stove and making water, aground till the flood
+at 17:30; the three other rules captains leaving the same road from an anchor
+(merchant-intent, merchant-cutter, directed-passage) do not take the ground in eight hours.
+The cause read and not measured: a course shaped through the pilot's warning, nothing in his
+plan steering off the rock.

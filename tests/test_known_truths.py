@@ -18007,13 +18007,23 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
     import glob
 
     tried = 0
+    under_way = 0
     for path in sorted(glob.glob("data/scenarios/*.yaml")):
         name = path.rsplit("/", 1)[-1]
         raw = open(path, encoding="utf-8").read().splitlines()
-        words = " ".join(
-            [ln for ln in raw if ln.startswith("#")][:30]
-            + [ln.split("#", 1)[1] for ln in raw if ln.startswith("position:") and "#" in ln]
+        place = " ".join(
+            ln.split("#", 1)[1] for ln in raw if ln.startswith("position:") and "#" in ln
         )
+        words = " ".join([ln for ln in raw if ln.startswith("#")][:30] + [place])
+        if re.search(r"\bunder way\b", place):
+            # her place says she is under way (the dispatches, the lead's ruling (b) of
+            # 2026-11-14: an anchor at her opening sent her rules captain onto the Black Rock
+            # at 09:54, so she begins under way as before and her words say so)
+            w = _harbour_game(path)
+            w.run(120)
+            assert not w.dealings.anchored, (name, place)
+            under_way += 1
+            continue
         if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
             continue
         if name in _OPENING_UNTIL_75:
@@ -18024,7 +18034,7 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
         w.run(120)
         tried += 1
         assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
-    assert tried >= 8, tried
+    assert tried >= 8 and under_way >= 1, (tried, under_way)
 
 
 def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds():
