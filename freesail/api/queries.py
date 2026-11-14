@@ -729,12 +729,6 @@ def muster_lines(world: World) -> list[str]:
         return ["There is no ship's company mustered in this ship."]
     sail_room(world.ship)  # gives the crew its sail room for the muster's line (spec 3b §6.3)
     lines = crew.describe(world.clock)
-    from freesail.world.transfer import passage_words
-
-    passage = passage_words(world)
-    if passage:
-        # her men in her boat for another ship of his (package 60), in neither muster
-        lines.append(passage)
     people = getattr(world, "people", None)
     if people is not None and getattr(people, "_built", False):
         # the named few in their places (spec M7b §14; package 53, truth 100): where each

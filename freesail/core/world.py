@@ -30,9 +30,6 @@ from freesail.world.reckoning import NAVIGATION_KINDS
 
 ENGINE_VERSION = "0.0.1"
 SAVE_FORMAT = 1
-# The save's word that the followed hull's far body is kept at her truth (package 60): a save
-# from before has no `followed_body`, and the format does not move for it.
-FOLLOWED_BODY = "at her truth"
 
 # The build's stamp (package 37d; the review of gate 5c's playtests, section 9 under
 # "Replay"): a save and its checkpoint say which build wrote them. `BUILD_NAME` is set by
@@ -489,10 +486,6 @@ class World:
     # and replayed without a word. None as the class default: a checkpoint from before
     # the stamp loads with it and is given [None, this build].
     played_under: list[Any] | None = None
-    # Package 60 (docs/design/Design-ShipBought.md §2): the id of the player's ship once he
-    # has taken command of another than the game's first hull (`world.command.take_up`);
-    # None, the first hull, until then and in every save and checkpoint from before.
-    _players: str | None = None
     # Package 37n (the owner's note 5 of 2026-10-09): the player's pencil on the captain's
     # chart, the lines, rings and notes he lays down in the browser, kept with the game:
     # saved as `"chart_marks"` and taken up again by the door that draws the chart
@@ -577,32 +570,15 @@ class World:
 
     @property
     def players(self) -> Any:
-        """The player's ship, whichever hull is followed or current (package 84, step 10):
-        the readers that mean the player's ship by name read her. Since package 60 (`docs/
-        design/Design-ShipBought.md` §2) she is the hull `_players` names once he has taken
-        command of another (`world.command.take_up`), and the game's first hull (`_own`,
-        `hulls[PLAYER_ID]`) until then; the first hull keeps the sea, the seed, the
-        scenario, the save's first block and the director's station whichever ship is his."""
-        d = self.__dict__
-        hid = d.get("_players")
-        if hid:
-            hull = (d.get("hulls") or {}).get(hid)
-            if hull is not None:
-                return hull
-        return d["_own"]
-
-    @property
-    def first_hull(self) -> Any:
-        """The game's first hull (package 60): the hull the scenario built, which keeps the
-        sea (`sea_vessels`), the game's seed and scenario, the save's first block, the
-        director's station and the id "the ship" for the whole game."""
+        """The player's own hull (her ship's; `hulls[PLAYER_ID]`), whichever hull is
+        followed or current (package 84, step 10): the sea is hers, her vessel on it is
+        `Vessels.own`, and the readers that mean the player's ship by name read her."""
         return self.__dict__["_own"]
 
     @property
     def sea_vessels(self) -> Any:
         """The `Vessels` of the sea, whichever hull is current or followed (another hull's
-        `vessels` is her view of them): kept on the game's first hull (package 60: whichever
-        ship is the player's)."""
+        `vessels` is her view of them): kept on the player's own hull."""
         return self.__dict__["_own"].vessels
 
     def follow(self, words: str, source: str = "the driver") -> Event:
@@ -1685,14 +1661,6 @@ class World:
         # the followed hull's own vessel brought up to her truth (package 84, step 7), the
         # other hulls and the brains reading her from the sea as they read any sail
         own = self.vessels.player_shadow(self)
-        # the followed hull's far body brought up to her truth too, where she is another hull
-        # than the first (package 60, the design's §9.2: under `--ship`, and the player's
-        # ship after a change of ship, it was left where she had been)
-        body = self.own.__dict__.get("vessel") if self.own is not self.__dict__["_own"] else None
-        if body is not None and body is not own and not body.done and self._position is not None:
-            from freesail.world.crews import mirror
-
-            mirror(body, self.own, self.clock.ship_time.second == 0)
         if self._position is None or not any(v is not own for v in self.vessels.vessels):
             return
         if getattr(self.vessels, "crewed_ids", ()):
@@ -2621,18 +2589,11 @@ class World:
 
     def save(self) -> dict[str, Any]:
         """Everything needed to rebuild this world by replay: seed, scenario, journal. The
-        game's, whichever hull the drivers follow (package 84, step 10): the game's first
+        game's, whichever hull the drivers follow (package 84, step 10): the player's own
         hull is current for the writing, so the seed, the scenario, the ship and the
-        stations at the top are hers and every other hull's are in `hulls` (package 60: the
-        first hull's whichever ship is the player's, so that the replay builds the game it
-        began as and the change of ship is given again by its order)."""
-        with self.as_hull(self.__dict__["_own"]):
-            out = self._save()
-        hid = self.__dict__.get("_players")
-        if hid:
-            # for the reader alone (package 60, the design's §2.4); read by nothing at a load
-            out["player_ship"] = str(hid)
-        return out
+        stations at the top are hers and every other hull's are in `hulls`."""
+        with self.as_hull(self.players):
+            return self._save()
 
     def _save(self) -> dict[str, Any]:
         return {
@@ -2682,11 +2643,6 @@ class World:
             # journals, her book and her bindings, as the World's own are above; her log is
             # rebuilt by the replay as the World's is, and the checkpoint keeps it
             "hulls": self._hull_blocks(),
-            # the followed hull's far body kept at her truth (package 60, the design's §9.2):
-            # a save without it is from before, and one of those played aboard another ship
-            # than the first parts from its game as played when it is loaded here (the
-            # loader says so, `replay.followed_body_words`)
-            "followed_body": FOLLOWED_BODY,
         }
 
     def _agents_seated_on(self, hull_id: str) -> list[Any]:

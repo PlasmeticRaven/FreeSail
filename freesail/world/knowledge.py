@@ -273,13 +273,6 @@ REACH: dict[str, str] = {
     "ship.hove_to": "aboard",
     "ship.filled_away": "aboard",
     "ship.command_passes": "aboard",
-    "ship.taken_up": "aboard",  # package 60: a captain takes command of her, or leaves her
-    # package 60, step 2: her people and hands moved to another ship of his, and come aboard
-    "company.transfer": "aboard",
-    "company.came_aboard": "aboard",
-    "company.came_back": "aboard",
-    "company.went_across": "aboard",
-    "company.picked_up": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",
@@ -794,8 +787,6 @@ def player_hull(world: Any) -> Any:
     players = getattr(root, "players", None)
     if players is None or is_observer(players):
         return None
-    if (getattr(root, "__dict__", None) or {}).get("_players"):
-        return players  # he has taken command of her (package 60): `--ship` stood at the start
     hulls = getattr(root, "hulls", None) or {}
     log = getattr(players, "log", None)
     if log is None or not hulls:
@@ -850,42 +841,6 @@ def players_station(world: Any) -> str:
     """The station the player's words are said as: his seat's, else the captain's."""
     seat = _seat(world)
     return str(seat.station.name) if seat is not None else "captain"
-
-
-def knows_of(world: Any, vessel: Any) -> bool:
-    """Whether the player knows of this ship (package 60, the lead's fourth round: one question,
-    one answer, wherever an order of his names a ship): she is his (the ship he commands, one
-    he has left, one given him); she is in sight now, as his lookout names a sail; or her name
-    has been said in his own ship's log in a line that reaches somebody aboard (met, hailed,
-    sighted by name, told of; never the record's own lines, the director's world orders among
-    them). A ship he knows of by none of these is to him as a name of no ship is."""
-    from freesail.world.command import HULLS_LEFT, given_to
-    from freesail.world.lookout import vessel_in_sight
-
-    root = _root(world)
-    vid = str(getattr(vessel, "id", "") or "")
-    players = getattr(root, "players", None)
-    if players is not None and str(getattr(players, "id", "")) == vid:
-        return True
-    if vid in set(root.__dict__.get(HULLS_LEFT) or ()) or given_to(root, vid):
-        return True
-    name = str(getattr(vessel, "name", "") or "")
-    if not name:
-        return False
-    if players is not None:
-        with root.as_hull(players):
-            if vessel_in_sight(root, name) is vessel:
-                return True
-        for e in getattr(players, "log", ()):
-            # a line that reaches somebody aboard (the record's own, a world order's, never:
-            # the director's word that puts a ship on the sea is not his knowing of her)
-            kind = str(getattr(e, "kind", "") or "")
-            if reach_of(kind) == "record" or kind.startswith("order."):
-                # nor his own order naming her, given or refused: his word is not her news
-                continue
-            if name in str(getattr(e, "text", "")):
-                return True
-    return False
 
 
 def players_person(world: Any) -> Any:

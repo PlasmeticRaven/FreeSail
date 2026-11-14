@@ -16065,74 +16065,6 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
-# Package 60: a ship bought, and the player's ship changed in play (truths 7-480 onward;
-# `docs/design/Design-ShipBought.md`, its gate §13). Step 1: the change of ship and the
-# followed ship's far body; the tests beside them are tests/test_ship_changed.py.
-
-
-def test_truth_7_480_the_player_takes_command_of_a_ship_given_him_and_aboard_her():
-    """A ship given the player's person by the director's word in play (the `command:` form,
-    she lying at Falmouth) is taken up by his own order aboard her: his person, his command
-    and his journal go with him, the player's ship is she, and both logs say so."""
-    from freesail.world import command, knowledge
-    from tests.test_ship_changed import fly_taken_up
-
-    w, fly, me, e = fly_taken_up()
-    hull = w.hulls[str(fly.id)]
-    assert w.players is hull and w.first_hull is not hull
-    assert knowledge.players_person(w) is me and hull.people.captain is me
-    assert me.home == str(fly.id) and knowledge.players_visitor(w) is None
-    assert sum(1 for x in hull.log if x.kind == command.TAKEN_UP) == 1
-    assert sum(1 for x in w.first_hull.log if x.kind == command.TAKEN_UP) == 1
-
-
-def test_truth_7_481_the_followed_ships_far_body_stands_at_her_truth():
-    """The ship the player is aboard and the drivers follow (`--ship`, and his ship after a
-    change of ship) is where the other sail see her: her far body within fifty metres of her
-    truth every five minutes for twenty (it was 934 m off after five and 3,803 m after twenty
-    before package 60's step 1)."""
-    from tests.test_ship_changed import followed_body_off_m
-
-    off = followed_body_off_m(20)
-    assert len(off) == 4 and max(off) < 50.0, off
-
-
-@pytest.mark.slow
-def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships(tmp_path):
-    """A save written after the change, with his orders after it, replays to the same log of
-    each ship, its first block the game's first hull's (the frigate's file), the player's ship
-    the Fly again and his person hers; a checkpoint taken after the change carries on to the
-    same logs; a save with no change carries no `player_ship`."""
-    from tests import test_ship_changed as T
-
-    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls(tmp_path)
-    T.test_a_save_with_no_change_carries_no_player_ship_and_the_split_reads_as_before()
-
-
-def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
-    """The old ship is left to her senior officer (a King's ship) and kept in the world half
-    an hour on, her hull among the hulls, her company whole and her far body planned; laid up
-    at Falmouth by the order's tail she is in ordinary at the anchorage."""
-    from tests import test_ship_changed as T
-
-    T.test_the_old_ship_is_kept_in_the_world_with_her_company()
-    T.test_the_old_ship_laid_up_at_falmouth()
-
-
-def test_truth_7_484_the_people_and_the_hands_move_by_one_order_in_the_boats_loads():
-    """Package 60, step 2 (the design's §6; the lead's reading of ab0ade58): the people and the
-    hands move by one order within a boat's pull, by the dealings' road to another hull, twelve
-    a load at the boat's own pace, every man told off out of the giving muster at the order and
-    each load into the receiver's watches as they stand, each person rehomed before he is put
-    aboard; refused in words saying how many she wants where either could not be worked, or
-    where the receiver would not berth them."""
-    from tests import test_company_moved as T
-
-    T.test_fifteen_hands_go_across_in_two_loads_by_the_boats_road()
-    T.test_a_person_by_name_is_rehomed_to_the_ship_he_goes_to()
-    T.test_the_refusals_in_words()
-
-
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
 def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
     """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
@@ -16352,9 +16284,14 @@ def test_truth_7_562_the_tides_level_by_sea_and_the_four_blocks_that_read_the_el
 def test_truth_7_563_the_ways_in_the_land_guard_refuses():
     """Package 111 (f), reachable: of the ninety ports, the business's way in from the sea
     (`ships.approach_plan`, the land guard `ships.land_crossing`) crosses the grid's land for
-    twenty-four and the way out by the track to sea for twenty-four (St Malo's, Dartmouth's,
-    Toulon's, Lisbon's among them); every other port has a way in and out clear of the land,
-    and every way in but Paimboeuf's and Royan's begins with open water in reach."""
+    four and the way out by the track to sea for four: Genoa's, Cartagena's and Oran's, whose
+    harbours the grid's modern moles close, and St Malo's, whose only way over the grid's water
+    is the Décollées along the coast, Faden's passage for small vessels (the lead's rulings of
+    2026-11-13: they stay shut);
+    every other port has a way in and out clear of the land, and every way in but Royan's
+    begins with open water in reach. Package 111's step 2b gave 21 ports tracks over the grid's
+    water. Old: twenty-four in and twenty-four out (St Malo's, Dartmouth's, Toulon's, Lisbon's
+    among them; Maddalena's out only, Hyeres's in only), the opens Paimboeuf's and Royan's."""
     A = _audit_tool()
     chart = A.load_chart(A.CHART_NAME)
     audit = A.Audit()
@@ -16362,11 +16299,12 @@ def test_truth_7_563_the_ways_in_the_land_guard_refuses():
     ins = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-in:")}
     outs = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-out:")}
     opens = {f.key.split(":")[1] for f in audit.findings if f.key.startswith("f-open:")}
-    assert len(ins) == 24 and len(outs) == 24
-    assert {"st-malo", "dartmouth", "toulon", "lisbon"} <= ins & outs
-    assert "maddalena" in outs - ins and "hyeres" in ins - outs
-    assert opens == {"paimboeuf", "royan"}
+    assert ins == outs == {"genoa", "cartagena", "oran", "st-malo"}  # old: 24 and 24
+    assert opens == {"royan"}  # old: {"paimboeuf", "royan"}
     for pid in ("falmouth", "plymouth", "brest", "cadiz", "gibraltar", "bona", "barcelona"):
+        assert pid not in ins | outs, pid
+    # the ways step 2b's tracks opened, among them the four the old pin named
+    for pid in ("dartmouth", "toulon", "lisbon", "st-marys", "maddalena", "hyeres"):
         assert pid not in ins | outs, pid
 
 
