@@ -1861,21 +1861,6 @@ STIMULI: tuple[str, ...] = (
 )
 
 
-def _commander_on_the_sea(root: Any, boss: str) -> bool:
-    """Whether the ship named by `under_orders_of` still commands (package 75, the review's mends
-    of B7.e): the player's ship while she has a place; another while she is on the sea, not
-    `done` (gone into port, sunk or taken from it) and not struck."""
-    if boss == "the ship":  # the player's ship (`ships.PLAYER_ID`)
-        return getattr(root, "position", None) is not None
-    sea = getattr(root, "vessels", None)
-    other = sea.get(boss) if sea is not None and hasattr(sea, "get") else None
-    return (
-        other is not None
-        and not getattr(other, "done", False)
-        and not getattr(other, "struck", False)
-    )
-
-
 class Judgement:
     """The brain's judgement, shared by the two bodies (spec M6 §4, "one brain, two
     bodies"; package 43): the weather's trend and the doctrine's transitions on a
@@ -2012,26 +1997,38 @@ class Judgement:
                 return
 
     def _alone(self) -> bool:
-        """Whether she sails in no set, neither a member of one nor its commander (package 72's
-        squadrons and convoys, the parent World's for a crewed hull), and under nobody's orders
-        (package 71's least relation, the far body's own or the crewed hull's, as
-        `signals.commanded_by` reads it): the rank-4 rule is a lone ship's, and a ship in a set,
-        or under the orders of another, set or no set, is left to her commander's book (package
-        75, B7.e; the lead's ruling (3)(b) of 2026-11-12), while that commander is on the sea and
-        has not struck (`_commander_on_the_sea`; the review's mends: nothing clears the relation
-        when the commander goes, and a commander gone or struck has no book to leave her to)."""
+        """Whether nobody who could support her keeps her company (package 72's squadrons and
+        convoys, the parent World's for a crewed hull; package 71's least relation, the far body's
+        own or the crewed hull's, as `signals.commanded_by` reads it): the rank-4 rule is a lone
+        ship's, and a ship in a set, or under the orders of another, set or no set, is left to her
+        commander's book (package 75, B7.e; the lead's ruling (3)(b) of 2026-11-12), while one who
+        holds her so could support her (`relations.still`, `SUPPORT`: on the sea, not struck,
+        nobody's prize, within the miles her set still holds a member of it, `relations.
+        in_company_nm`; the lead's readings of cda12ec9, (F4)): her commander so, or a member of
+        her set but herself and its prizes. A set whose other members are prizes, gone or done
+        counts for nothing (a captor's company of her prizes, `prizes.possess`), and nor does a
+        commander gone, struck, taken or beyond that distance (the player's ship struck among
+        them)."""
+        from freesail.world import relations as R
+
         world = getattr(self, "world", None)
         body = getattr(self, "vessel", None)
         boss = getattr(body if body is not None else world, "under_orders_of", None)
         if boss is None:
             boss = getattr(getattr(world, "vessel", None), "under_orders_of", None)
         root = getattr(world, "parent", None) or world
-        if boss and _commander_on_the_sea(root, str(boss)):
+        own = str(self._own_vessel_id() or "the ship")
+        if boss and R.still(root, own, str(boss), R.SUPPORT):
             return False
         sets = getattr(root, "squadrons", None)
         if sets is None or not hasattr(sets, "of"):
             return True
-        return sets.of(str(self._own_vessel_id() or "the ship")) is None
+        sq = sets.of(own)
+        if sq is None:
+            return True
+        return not any(
+            R.still(root, own, m, R.SUPPORT) for m in sq.members if m != own and m not in sq.prizes
+        )
 
     def _line_of_battle_nm(self, p: Perception) -> float:
         """The miles within which she hauls off from an enemy ship of the line (package 75,
@@ -2333,11 +2330,16 @@ class Judgement:
             if self._is_enemy(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
-            and not self._stranger_struck(s)
+            and self._may_fight(s)
         ]
         if not enemies:
             return None
         return min(enemies, key=lambda s: float(s["estimate_m"]))
+
+    def _may_fight(self, s: dict[str, Any]) -> bool:
+        """Whether a sail is one the action may be fought with: not struck (package 74); the far
+        body's own asks the one answer (`brains.FarCaptain._may_fight`, `relations.MARK`)."""
+        return not self._stranger_struck(s)
 
     def _man_of_war_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         """An enemy's man of war within the miles, by the lookout's words of her ('a
@@ -2367,15 +2369,21 @@ class Judgement:
         return ""
 
     def _prize_taken(self, p: Perception) -> bool:
-        """Package 74: whether the struck mark in hand (`_stranger`) is a prize of his."""
-        from freesail.world.prizes import record_of
+        """Package 74: whether the possession is over: the struck mark in hand (`_stranger`) a
+        prize of his, or none in hand. And (the lead's readings of cda12ec9, (F2)) whether she is
+        no longer his to take, by the one answer (`relations.still`, `STRUCK`): taken by another,
+        struck to another who is there to take her, gone from the sea or her colours up again; so
+        that he gives her up and takes his passage again by the books' one row out of the state
+        (`{from: taking possession, on: prize taken, to: on passage}`), where a second captor kept
+        `taking possession` of another's prize for good."""
+        from freesail.world import relations as R
 
-        sea = getattr(self.world, "vessels", None)
-        v = sea.get(str(self._stranger or "")) if sea is not None else None
-        rec = record_of(v) if v is not None else None
-        if not rec:
-            return self._stranger is None
-        return str(rec.get("captor")) == str(self._own_vessel_id())
+        if self._stranger is None:
+            return True
+        own = str(self._own_vessel_id() or "the ship")
+        if R.still(self.world, own, self._stranger, R.PRIZE):
+            return True
+        return not R.still(self.world, own, self._stranger, R.STRUCK)
 
 
 class Captain(Judgement):
@@ -4599,8 +4607,11 @@ class Captain(Judgement):
         target = getattr(battery, "target", None) if battery is not None else None
         if target is None:
             return False
-        v = self._vessel_of(str(target))
-        struck = bool(v is not None and getattr(v, "struck", False))
+        from freesail.world import relations as R
+
+        # the one answer (the lead's readings of cda12ec9, (F2)): struck, nobody's prize yet, and
+        # struck to him or to no other who is there to take her
+        struck = R.still(self.world, self._own_vessel_id(), str(target), R.STRUCK)
         if struck and self._stranger != str(target):
             self._stranger = str(target)  # the struck mark is the one he takes possession of
         return struck
@@ -4615,16 +4626,18 @@ class Captain(Judgement):
     def _take_possession(self, p: Perception) -> None:
         """Each minute in `taking possession`: the struck mark closed to a boat's pull (the
         chase renewed every three minutes), hove to there, and `take possession of her`
-        given once hove to; a mark gone or no longer struck (retaken by her people before he
-        reached her) ends the state."""
+        given once hove to; a mark no longer his to take (`relations.STRUCK`: gone, her colours up
+        again, taken by another or struck to another who is there to take her; the lead's readings
+        of cda12ec9, (F2)) ends the state by the books' row, `prize taken` (`_prize_taken`), in the
+        judgement before this work, and his own prize the same."""
+        from freesail.world import relations as R
         from freesail.world.movement import BOAT_BETWEEN_NM
-        from freesail.world.prizes import is_prize
 
         mark = self._stranger
+        if not R.still(self.world, self._own_vessel_id(), str(mark or ""), R.STRUCK):
+            return
         v = self._vessel_of(str(mark or ""))
-        if v is None or getattr(v, "done", False) or not getattr(v, "struck", False) or is_prize(v):
-            if not (v is not None and is_prize(v)):
-                self._enter("on passage")
+        if v is None:
             return
         here = getattr(self.world, "position", None)
         if here is None or v.position is None:

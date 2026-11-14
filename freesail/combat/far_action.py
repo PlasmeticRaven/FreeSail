@@ -204,8 +204,13 @@ def _awake(vessel: Any) -> bool:
 
 
 def _pairs(world: Any) -> list[tuple[Any, Any]]:
-    """(the engaging ship, her mark) for every far body in `engaging` whose mark is on the
-    sea and not struck; one pair for two ships engaging each other."""
+    """(the engaging ship, her mark) for every far body in `engaging` whose mark is still a mark
+    to her by the one answer (`relations.still`, `MARK`: on the sea, not struck, nobody's prize,
+    and an enemy to her by what she knows; the lead's readings of cda12ec9, (F3): a captor in
+    `engaging` the minute her mark was cut out fired into her own prize, "struck" her again and
+    left her lying to); one pair for two ships engaging each other."""
+    from freesail.world import relations as R
+
     sea = getattr(world, "vessels", None)
     out: list[tuple[Any, Any]] = []
     seen: set[tuple[str, str]] = set()
@@ -215,13 +220,10 @@ def _pairs(world: Any) -> list[tuple[Any, Any]]:
         brain = getattr(v, "brain", None)
         if v.done or brain is None or brain.state != "engaging" or _awake(v):
             continue
+        if getattr(v, "struck", False):
+            continue
         mark = sea.get(str(brain._stranger or ""))
-        if (
-            mark is None
-            or mark.done
-            or getattr(mark, "struck", False)
-            or getattr(v, "struck", False)
-        ):
+        if mark is None or not R.still(world, v, mark, R.MARK, judge=brain):
             continue
         key = tuple(sorted((str(v.id), str(mark.id))))
         if key in seen:
@@ -322,6 +324,9 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 
     loser.struck = True
     loser.damage["struck_tick"] = tick
+    # to whom (the lead's readings of cda12ec9, (F2)): hers to take, and no other ship's while
+    # she is there to take her (`relations.STRUCK`)
+    loser.damage["struck_to"] = str(winner.id)
     from freesail.world.prize_court import note_in_sight
 
     note_in_sight(root, loser)

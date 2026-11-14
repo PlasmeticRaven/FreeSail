@@ -1742,9 +1742,10 @@ def test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not_haul_
 
 def test_a_frigate_whose_commander_is_struck_or_gone_from_the_sea_is_alone_again(far_only):
     """The review's mends of B7.e (the lead's ruling (3)(b) of 2026-11-12): the relation leaves her
-    to her commander's book only while that commander commands (`captains._commander_on_the_sea`:
-    on the sea, not `done`, not struck), since nothing clears `under_orders_of` when the commander
-    goes. The frigate under her consort's orders and in no set (above): her consort struck, or
+    to her commander's book only while that commander could support her (the one answer since the
+    lead's readings of cda12ec9, (F4): `relations.still`, `SUPPORT`: on the sea, not `done`, not
+    struck, nobody's prize, within the miles her set keeps a member; `tests/test_relations.py`),
+    since nothing clears `under_orders_of` when the commander goes. The frigate under her consort's orders and in no set (above): her consort struck, or
     gone from the sea, she is alone again, and the rank-4 rule is hers: she evades the 74 as a lone
     frigate does, and never engages her. OLD BESIDE NEW: at 65b757b9 she was never alone again,
     and stood on by her own book against the ship of the line."""
@@ -3324,7 +3325,15 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     squadron under her orders; a thousand ticks to settle, then the best of three timed thousands,
     at the end of each the crewed ships at `CREWED_CAP`, every 74 within `CREWED_NM` of her and in
     company, and no line of an action in her log. At least `CREWED_FLOOR_TICKS_S` (60) a second on
-    the build machine. **Her world, plainly** (the lead's ruling (1) of 2026-11-13): truth 88's
+    the build machine. **What the last clause proves, and no more** (the lead's readings of
+    cda12ec9, (C7)): every ship of her world is British and of one squadron, and no enemy is put
+    in it, so that "no line of an action" can fail only if friends fire on friends: it proves that
+    three crewed King's ships under her orders, in her set, neither challenge her nor one another
+    into an action over the measure, and nothing of how a crewed 74 meets an enemy, which the far
+    fight's truths try (7-231, `tests/test_far_action.py`). Her world is left as it is (the
+    docstring chosen, not an enemy in sight who is not engaged): it is a pace truth whose world
+    was settled by measurement, and an enemy in sight would change what it times. **Her world,
+    plainly** (the lead's ruling (1) of 2026-11-13): truth 88's
     frigate carries no private signal and, under no rules captain, answers none; three King's ships
     each keeping the station off the Lizard alone challenged her and one another, took her (and one
     another) for men of war under false colours and fired into her, and since package 74 her captor
