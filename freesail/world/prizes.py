@@ -589,8 +589,14 @@ def _bearing_distance(a: Any, b: Any) -> tuple[float, float]:
 
 
 def _nation_words(world: Any, vessel: Any, nation_id: str) -> None:
+    """Her nation and its words: the one road by which a ship changes hands (taken, retaken,
+    restored), and so where she becomes a new party to every judge on the sea and her own judges
+    to every ship (`relations.changed_hands`; the whole-change review of 80e703c7, gundeck-1)."""
+    from freesail.world import relations as R
+
     n = _nation_of(world, nation_id)
     vessel.nation = str(nation_id)
+    R.changed_hands(world, vessel)
     if n is not None:
         vessel.colours = n.colours
         vessel.flag = getattr(n, "flag", "")
@@ -609,6 +615,13 @@ def _set_colours(world: Any, vessel: Any, nation_id: str, over: str, tick: int) 
         hull.ship.extra["signals"] = locker  # one object (71)
         hull.ship.extra.pop("struck", None)
     vessel.struck = False
+    # the strike's record ends with the strike (the whole-change review of 80e703c7, engine-2):
+    # her colours given back, she is struck to nobody, and a later strike by a road that names no
+    # taker is to no one known (`relations.STRUCK`), its hour counted from then
+    damage = getattr(vessel, "damage", None)
+    if isinstance(damage, dict):
+        damage.pop("struck_to", None)
+        damage.pop("struck_tick", None)
 
 
 def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
@@ -634,7 +647,6 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
         from freesail.world.captains import load_doctrine
 
         brain.doctrine = load_doctrine(role)
-        brain.fired_on = set()
         brain._stranger = None
         brain.state = None
         brain.planned = False
@@ -650,7 +662,6 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
             cap.set_intent(words)
         except ValueError:
             cap.set_intent(words, free=True)
-        cap.fired_on = set()
         cap._stranger = None
 
 
@@ -801,30 +812,11 @@ def possess(
             # from words (the design's §2.6)
             fill_far_prize(prize_hull, record, nation_was, tick)
     prize.prize = record
-    _no_enemy_now(captor, captor_hull, prize)
+    # what her captor knew her an enemy by (her shot at him, a pirate's act, the signal or the
+    # hail) went with her change of hands (`_nation_words`, `relations.changed_hands`); she is
+    # his prize from now and judged so (`Judgement._prize_of_ours`)
     _lines(world, captor, prize, record, said)
     return record
-
-
-def _no_enemy_now(captor: Any, captor_hull: Any, prize: Any) -> None:
-    """The taking clears the prize from what her captor knew her an enemy by: her shot at
-    him (`fired_on`), a pirate's act (`pirates`), the signal or the hail (`recognised`); she
-    is his prize from now and judged so (`Judgement._prize_of_ours`)."""
-    sid = str(prize.id)
-    judges = (
-        getattr(captor, "brain", None),
-        getattr(captor_hull, "captain", None) if captor_hull is not None else None,
-    )
-    for judge in judges:
-        if judge is None:
-            continue
-        for name in ("fired_on", "pirates"):
-            held = getattr(judge, name, None)
-            if isinstance(held, set):
-                held.discard(sid)
-        known = getattr(judge, "recognised", None)
-        if isinstance(known, dict) and (known.get(sid) or {}).get("enemy"):
-            known[sid] = {**known[sid], "enemy": False}
 
 
 def _service_of(captor: Any) -> str:
@@ -1078,12 +1070,20 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
     rec["retaken"] = (how, by, tick)
     if captor is not None:
         rec["recaptor"] = str(captor.id)  # the salvors (the design's §5.2)
-        cb = getattr(captor, "brain", None)
-        if cb is not None:
+        captor_hull = _hull(captor)
+        for cb in (
+            getattr(captor, "brain", None),
+            getattr(captor_hull, "captain", None) if captor_hull is not None else None,
+        ):
+            if cb is None:
+                continue
             # the recaptor's captain has his mark no more (package 74, step 4: wired, the
             # far cruiser came up `engaging` and stayed so over a ship of his own nation):
-            # spoken, she is a stranger no more, and he resumes his passage
-            cb.spoken_ids.add(str(prize.id))
+            # spoken, she is a stranger no more, and he resumes his passage; his hull's captain
+            # the same where she is crewed (the whole-change review of 80e703c7, gundeck-2)
+            spoken = getattr(cb, "spoken_ids", None)
+            if isinstance(spoken, set):
+                spoken.add(str(prize.id))
             if str(getattr(cb, "_stranger", "") or "") == str(prize.id) and cb.state in (
                 "engaging",
                 "chasing",

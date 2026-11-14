@@ -23,7 +23,13 @@ The relations (`what`):
   ship showing no colours and known nothing of is held as she was.
 - `STRUCK`: a struck enemy she closes to take possession of: on the sea, struck, nobody's prize
   yet, and struck to her, or to no one known, or to one who is no longer there to take her
-  (`damage["struck_to"]`, written by the far rounds' strike).
+  (`damage["struck_to"]`, written by the far rounds' strike): gone, struck, a prize, or beyond the
+  miles at which she could still take her, the distance `SUPPORT` keeps for her taker
+  (`in_company_nm`; JUDGEMENT: a ship could take her who could still support her; the
+  whole-change review of 80e703c7, gundeck-4). The strike's record ends with the strike: her
+  colours given back (`prizes._set_colours`, the one road by which a struck ship's colours go up
+  again, taken or retaken) end `struck_to` and `struck_tick`, so that a later strike by a road
+  that names no taker (the near action, the cut-out, a world order) is to no one known (engine-2).
 - `PRIZE`: her own prize: on the sea, a prize neither retaken nor restored, her record's captor
   hers (`prizes.prizes_of`'s rule).
 - `SUPPORT`: one who could support her: her commander, a consort of her set, a man of war covering
@@ -32,6 +38,19 @@ The relations (`what`):
   book's `lost_nm`, beyond which "she is lost to the set and sails for the destination alone"; for
   a ship under orders in no set, the squadron book's, eight miles, "beyond a frigate's flags with
   the glass").
+
+What a captain knows of a ship (`Judgement._known_enemy`: her shot at him, `fired_on`; a pirate's
+act seen, `pirates`; the private signal or the hail, `recognised`) is of the people she had when he
+learned it. When she changes hands (taken, retaken, restored: `prizes._nation_words`, the one road
+by which a ship's nation changes) she is a new party: `changed_hands` makes every judge on the sea
+(`judges`: each ship's far brain and her hull's captain, and the player's World's) forget what he
+knew of her, and her own judges forget what they knew of others, so that `MARK` and every other
+reader of that knowledge judge her and her people by what they show and do from then on (the
+whole-change review of 80e703c7, gundeck-1: a far prize retaken by a cruiser of her own nation
+fought her rescuer a minute later and struck to her, her brain holding the cruiser an enemy by the
+private signal answered while she was in French hands, and the cruiser holding her one by the prize
+crew's shot). JUDGEMENT: her own people's knowledge from before she was taken goes with the prize
+crew's; what is not stamped with the hands it was learned under cannot be sorted.
 """
 
 from __future__ import annotations
@@ -48,10 +67,18 @@ __all__ = [
     "RELATIONS",
     "STRUCK",
     "SUPPORT",
+    "changed_hands",
     "in_company_nm",
+    "judges",
     "ship_of",
     "still",
 ]
+
+# What a judge knows of other ships by their ids (`Judgement._known_enemy`): the ships that fired on
+# him and the ships he saw fire under false or no colours (sets), and what the private signal or the
+# hail made of them (a mapping).
+KNOWLEDGE_SETS = ("fired_on", "pirates")
+KNOWLEDGE_MAPS = ("recognised",)
 
 MARK = "mark"
 STRUCK = "struck"
@@ -201,7 +228,12 @@ def still(
         if not to or to == hid:
             return True
         taker = ship_of(root, to)
-        return taker is None or _struck(taker) or _a_prize(taker)
+        if taker is None or _struck(taker) or _a_prize(taker):
+            return True
+        if getattr(taker, "position", None) is None or getattr(o, "position", None) is None:
+            return False
+        _, d = bearing_and_distance(taker.position, o.position)
+        return d > in_company_nm(root, to) * units.NAUTICAL_MILE
     if _struck(o) or _a_prize(o):
         return False
     her = holder if not isinstance(holder, str) else ship_of(root, hid)
@@ -215,3 +247,59 @@ def still(
     nm = float(within_nm) if within_nm is not None else in_company_nm(root, hid)
     _, d = bearing_and_distance(her.position, o.position)
     return d <= nm * units.NAUTICAL_MILE
+
+
+def judges(world: Any) -> list[Any]:
+    """Every captain on the sea whose knowledge decides an enemy (`Judgement._known_enemy`): each
+    ship's far brain and her hull's captain where she is crewed, and the player's World's captain;
+    each once."""
+    root = _root(world)
+    out: list[Any] = []
+    seen: set[int] = set()
+
+    def add(judge: Any) -> None:
+        if judge is not None and id(judge) not in seen:
+            seen.add(id(judge))
+            out.append(judge)
+
+    sea = getattr(root, "vessels", None)
+    for v in list(getattr(sea, "vessels", None) or []):
+        add(getattr(v, "brain", None))
+        hull = getattr(v, "crew", None)
+        add(getattr(hull, "captain", None) if hull is not None else None)
+    add(getattr(root, "captain", None))
+    return out
+
+
+def _own_judges(root: Any, vessel: Any) -> list[Any]:
+    out = [getattr(vessel, "brain", None)]
+    hull = getattr(vessel, "crew", None)
+    out.append(getattr(hull, "captain", None) if hull is not None else None)
+    if str(getattr(vessel, "id", "")) == PLAYER_ID:
+        out.append(getattr(root, "captain", None))
+    return [j for j in out if j is not None]
+
+
+def changed_hands(world: Any, vessel: Any) -> None:
+    """She has changed hands (the module's head): what every judge on the sea knew of her by her
+    shot, a pirate's act, the signal or the hail is forgotten, and what her own judges knew of any
+    ship. Called by `prizes._nation_words`, the one road by which a ship's nation changes."""
+    root = _root(world)
+    sid = str(getattr(vessel, "id", "") or "")
+    own = {id(j) for j in _own_judges(root, vessel)}
+    for judge in [*judges(root), *_own_judges(root, vessel)]:
+        mine = id(judge) in own
+        for name in KNOWLEDGE_SETS:
+            held = getattr(judge, name, None)
+            if isinstance(held, set):
+                if mine:
+                    held.clear()
+                else:
+                    held.discard(sid)
+        for name in KNOWLEDGE_MAPS:
+            held = getattr(judge, name, None)
+            if isinstance(held, dict):
+                if mine:
+                    held.clear()
+                else:
+                    held.pop(sid, None)

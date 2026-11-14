@@ -251,9 +251,14 @@ CREW_VERBS: dict[str, Callable[[Ship, Order], Result]] = {
 
 
 def all_hands_work(ship: Ship) -> str | None:
-    """A sentence if an all-hands evolution is still at work, else None: the work named as the
-    log names the work in hand (`Runner.doing`), "furling all sail", where this named it again
-    from its verb, "furling all" (the lead's (C8) of 2026-11-14: one place names the work)."""
+    """A sentence if all-hands work is still at work, else None: the work named as the log names
+    the work in hand (`Runner.doing`), "furling all sail", where this named it again from its
+    verb, "furling all" (the lead's (C8) of 2026-11-14: one place names the work). All-hands work
+    is the request as it was made (`Instance.all_hands`): a file's all-hands work, and work made
+    all-hands work for itself because its watch was too few (`Runner._made_all_hands`, the lead's
+    ruling (1) of 2026-11-10), which this read from the file's crew line alone, so that "pipe
+    down" was taken while all hands were at a take in called for itself (the whole-change review
+    of 80e703c7, sailing-6: the plan read where the work's own state should be)."""
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "work"):
         return None
@@ -261,7 +266,7 @@ def all_hands_work(ship: Ship) -> str | None:
         if inst.waiting or inst.paused:
             continue
         evo = inst.evo
-        if not _is_all_hands(evo):
+        if not (getattr(inst, "all_hands", False) or _is_all_hands(evo)):
             continue
         if evo.id in ABOUT_SHIP:
             return "The hands are still about ship; wait for her to come round."

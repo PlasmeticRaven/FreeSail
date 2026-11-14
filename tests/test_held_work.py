@@ -109,7 +109,13 @@ def test_every_scripted_work_held_and_taken_up_again_never_reads_its_beginning_a
     schooner (her gaffs) and the 74 (her mizen lateen), the check made to give a reason, so that a
     reading of it on the resume would fail the work. Old (53c14457): the check read again on every
     resume, and every one of them failed on its taking up ("Could not lay out the kedge: the
-    long-boat is away.", read as the work's own going had made it)."""
+    long-boat is away.", read as the work's own going had made it).
+
+    And (the whole-change review of 80e703c7, sailing-2): what of the script's own conditions stands
+    through the work (`Script.standing`: what the world can make false while the work is held and
+    its own going never does) is read on every taking up, as the file's `requires` are, so that a
+    mast carried away while her cutting away lay held is not cut away again. Old (80e703c7): no
+    script's standing conditions were read on a resume."""
     worlds = [
         make_world(7, f"data/ships/{stem}.yaml", Scenario())
         for stem in ("bilander", "topsail-schooner", "seventy-four")
@@ -132,13 +138,16 @@ def test_every_scripted_work_held_and_taken_up_again_never_reads_its_beginning_a
         inst.script = SCRIPTS[evo.script](ship, params, runner._timing(ship, evo))
         inst.holds = runner._holds(ship, inst)
         read: list[str] = []
+        stood: list[str] = []
         inst.script.check = lambda words, read=read: read.append("read") or "it is done already"
+        inst.script.standing = lambda words, stood=stood: stood.append("read") or None
         runner.instances.append(inst)
         assert runner._failing_condition(ship, inst, evo.requires) == "it is done already", eid
-        assert read == ["read"], eid  # the beginning reads it
+        assert read == ["read"] and stood == [], eid  # the beginning reads its check alone
         inst.waiting, inst.paused, inst.assignment = False, True, None
         runner._try_resume(ship, inst, crew)
-        assert read == ["read"], eid  # the resume does not
+        assert read == ["read"], eid  # the resume does not read the check
+        assert stood == ["read"], eid  # and reads what stands through the work
         assert inst in runner.instances, (eid, "failed on its taking up")
         assert not inst.paused, (eid, "not taken up: too few hands, the check not reached")
         runner._remove(ship, inst)
@@ -623,7 +632,11 @@ def test_every_work_on_the_ship_is_named_by_its_name_where_the_log_names_the_wor
         inst = Instance(evo=evo, subject=world.ship, subject_id=world.ship.name, params={})
         named[eid] = runner.doing(inst)
     assert named == SHIP_WORK_NAMES
-    files = {eid for eid, evo in registry.EVOLUTIONS.items() if evo.doing}
+    files = {
+        eid
+        for eid, evo in registry.EVOLUTIONS.items()
+        if evo.doing and str(evo.applies_to.get("class")) == "ship"
+    }
     assert len(files) == 21 and all(
         SHIP_WORK_NAMES[eid] == registry.get(eid).doing for eid in files
     )
@@ -635,10 +648,59 @@ def test_every_work_on_the_ship_is_named_by_its_name_where_the_log_names_the_wor
         params={},
     )
     assert runner.doing(sail) == "setting the fore topsail"  # a part's work: its verb and its part
-    with pytest.raises(registry.EvolutionFileError, match="only work whose subject is the ship"):
+    with pytest.raises(registry.EvolutionFileError, match="the part is named after them"):
         registry.parse_evolution(
-            {**_file_of("set_square"), "doing": "setting a sail"}, "set_square.yaml"
+            {**_file_of("set_square"), "doing": "setting the sail"}, "set_square.yaml"
         )
+
+
+# A part's work whose verb's gerund is no name (the whole-change review of 80e703c7, sailing-5): its
+# file's words before the part's name (`doing:`). Every other part's work is its verb and its part.
+PART_WORK_NAMES = {
+    "cut_away_mast": ("main.mast", "cutting away the main mast"),
+    "goose_wing": ("fore.course", "goose-winging the foresail"),
+}
+
+
+def test_every_work_on_a_part_is_named_by_a_name_where_the_log_names_the_work_in_hand():
+    """The whole-change review of 80e703c7, sailing-5: (C8)'s cause at every evolution, a part's
+    work among them. A part's work was named by its verb's gerund and its part, and where the verb
+    is the id ("cut_away_mast", "goose_wing") that read "cutting away mast the main mast" (newly
+    served by a post's leaving it: "Belayed cutting away mast the main mast: the master gone
+    below.") and "goosing wing the foresail". Now a part's file gives the words before its part
+    (`doing: cutting away`), read in the one place the work in hand is named (`Runner._doing`).
+    Every part's work of the registry, on the first part of its class in the bilander, the topsail
+    schooner or the 74, is named with no id's underscore and no verb of two words left as its id.
+    Old (80e703c7): the two above."""
+    worlds = [
+        make_world(7, f"data/ships/{stem}.yaml", Scenario())
+        for stem in ("bilander", "topsail-schooner", "seventy-four")
+    ]
+    seen = {}
+    for eid, evo in sorted(registry.EVOLUTIONS.items()):
+        cls = str(evo.applies_to.get("class"))
+        if cls == "ship":
+            continue
+        for w in worlds:
+            subject, sid = _subject(w.ship, cls)
+            if subject is not None:
+                break
+        assert subject is not None, eid
+        if eid in PART_WORK_NAMES:
+            w, sid = worlds[0], PART_WORK_NAMES[eid][0]
+            subject = w.ship.parts[sid]
+        runner = w.ship.extra["evolutions"]
+        words = runner.doing(Instance(evo=evo, subject=subject, subject_id=sid, params={}))
+        seen[eid] = words
+        assert "_" not in words, (eid, words)
+        verb = evo.verb.replace("_", " ")
+        if " " in verb:
+            assert f"{verb} " not in f"{words} " or evo.doing, (eid, words)  # an id with an ending
+    assert {eid: seen[eid] for eid in PART_WORK_NAMES} == {
+        eid: name for eid, (_part, name) in PART_WORK_NAMES.items()
+    }
+    files = {eid for eid, evo in registry.EVOLUTIONS.items() if evo.doing}
+    assert files - set(SHIP_WORK_NAMES) == set(PART_WORK_NAMES)
 
 
 def _file_of(eid: str) -> dict:

@@ -897,6 +897,15 @@ back from their muskets at "hold your fire" go to the carronades alone where the
 keeps marines, as at the beat: the razee's 1795 "twelve back to the carronades" (old "40", 28 of
 them to her long guns).*
 
+*Ruling 13 as built (Phase 5, 2026-11-14; the lead's note of 04:40): the "still three crews short"
+above is superseded. The 1795 fit carries its own trimmers in the bill's form, forecastle 9, fore
+top 12, main top 14, mizzen top 7 and afterguard 9, 51 (her 238 seamen less 185 at one side's guns
+and 2 at the wheel, split by the frigate-36's shares; JUDGEMENT), and at the beat (seed 7) she mans
+22 crews of 22: "Quarters: 22 gun crews manned, the trimmers 51, the helm 2, the powder 22, the
+marines 38." (old 19 crews, "Not hands enough for every gun: the guns, Nos. 12 to 13 and 17 stand
+unmanned."). The bill's 79 stay the 1796 fit's; a game saved before keeps its 79, the fit travelling
+in the checkpoint. TuningNotes, "The razee's trimmers by fit".*
+
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores
@@ -947,6 +956,13 @@ rated by `rope_kn` (Luce ch. IV).
 
 The vessel type is the rig word "ship", as the frigate's. Both "what"s already carry a man-of-war
 word ("ship of the line", "frigate": `world/captains.py:190-198`).
+
+*As built (Phase 5, 2026-11-14; the lead's 12th's (1) and ruling 17): the 64's rig word is "a ship
+of the line", ranked 4 at the rig's distance (JUDGEMENT on the distance, `RIG_MADE_OUT_NM`), as the
+74's; the razee's stays "a ship". How she is rigged is read apart from it (`ships.rigged`: a ship of
+the line is a ship), so that she answers the hail "His Majesty's ship Ardent" and lies to with her
+main topsail aback, as before the rule (the whole-change review of 80e703c7; TuningNotes, "The
+whole-change review's mends").*
 
 **Stage 0's registries** (shared with the 74):
 - `DESCRIPTIONS` and `_DESCRIPTION_WORDS` (`world/ships.py:163-242`): the two keys with their

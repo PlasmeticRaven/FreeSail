@@ -1055,6 +1055,15 @@ going on with the watch's three. An order naming her watch below begins with its
 three are up, and a manoeuvre begun while the master hauls says the work it holds as a belay does.
 Figures in the same tuning notes, "The review's mends".*
 
+*Her own hands for heaving to and filling away (the lead's (C2) of 2026-11-14): at her nine the
+company's clamp on the files' twelve rose from six to seven with the ninth hand (`hands.
+company_can_give` counts the cook), so either watch's three was under half and neither could heave
+to or fill away by night. Her file gives her own figure, six, for both (`hands: {heave_to: 6,
+fill_away: 6}`, a ship file's top-level section, `ShipSpec.hands`, read by `Runner._crew_line` over
+a numbered crew line alone), JUDGEMENT, the lead's least change that moves no other trader's line:
+the symptom's mend, the clamp itself left for every trader and named for the lead (the merchant
+brig's and the smack's watches; TuningNotes, "The whole-change review's mends").*
+
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 
 The smack's form: the master (post, the command), the mate (post), the boy (drawn, afterguard,

@@ -1648,6 +1648,13 @@ commander is on the sea and has not struck (the review's mends: a ship whose com
 alone again). The tuning notes, "The lead's notes of 2026-11-12 and 13, built", subsections 4 and
 6.*
 
+*As built since (the lead's readings of cda12ec9, (F4), 2026-11-14): the relation counts while her
+commander, or a member of her set, could support her, by the one answer (`relations.SUPPORT`): on
+the sea, not struck, nobody's prize, and within her set's `lost_nm` (squadron 8, convoy 6, blockade
+12; the squadron book's 8 for a ship under orders in no set), JUDGEMENT; a set whose other members
+are gone, struck, prizes or out of company counts for nothing, nor a captor's company of her prizes.
+TuningNotes, "The lead's readings of cda12ec9: the far fight".*
+
 *Made out at the rig's distance (Phase 5, 2026-11-14; the lead's notes of 2026-11-12 (1) and
 2026-11-14 (17)): her rig's word, and the 64's, is "a ship of the line" where §8.1 had "a ship", so
 the tops rank her 4 at four miles (JUDGEMENT on the distance), and a far vessel reads her class from

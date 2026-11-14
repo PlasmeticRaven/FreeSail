@@ -1010,7 +1010,21 @@ class Script:
         return set()
 
     def check(self, words: dict[str, Any]) -> str | None:
-        """An extra precondition in code. Returns the reason it fails, or None."""
+        """An extra precondition in code, the beginning's: read once, as the work begins, against
+        the world as the work finds it, and free to lay the work's plan from it. Returns the
+        reason it fails, or None."""
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """What of the work's preconditions stands through it: what the world can make false
+        while the work is held and its own going never does (a mast carried away by the wind
+        before the axes have done; the anchor lost). Read whenever held work is taken up again
+        (`Runner._failing_condition`'s `begun`), as the file's `requires` are, where `check`, the
+        beginning's, is not: the work's own going makes the beginning's false (the kedge's boat
+        away with it), and it lays the plan anew (the lead's (C1) of 2026-11-14). Returns the
+        reason it fails, or None; None for work that has none (the whole-change review of
+        80e703c7, sailing-2: with the whole check left unread on a resume, a main mast carried
+        away while her cutting away lay held was cut away and wrecked a second time)."""
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -6589,6 +6603,15 @@ class _AnchorScript(Script):
 
 # The work that waits on at anchor when she comes to (package 45c): the boat's errand.
 ANCHOR_WORK_KEPT = frozenset({"send_boat"})
+# The work a post's leaving held (`Runner._hold`, the lead's ruling 11 of 2026-11-13) that coming to
+# anchor or getting under way does not do away with, by its subject's class: the ship's own work
+# (battening down, the cable, the kedge, the small arms) and her repairs (a spar cut away, fished
+# or shifted, a wreck cleared, a line rove). It stays held and is taken up where it stood when the
+# hands are piped down (`Runner._try_resume`), as the boat's errand waits on (the whole-change
+# review of 80e703c7, sailing-1 and engine-1). The ship's work on her sails, all of them at once
+# (furling all sail, loosing them to dry), is sail work and goes with it.
+HELD_ON_AT_ANCHOR = frozenset({"ship", "spar", "part", "line"})
+SAIL_WORK_OF_THE_SHIP = frozenset({"furl_all", "loose_sails_to_dry"})
 
 
 def _belay_held_work(ship: Ship) -> None:
@@ -6599,15 +6622,35 @@ def _belay_held_work(ship: Ship) -> None:
     finds no sail to trim). The boat's errand is not sail work and is anchor work: it
     waits on for its hands and goes when they are free (package 45c, the owner's ghosted
     boat: sent ashore at Guernsey while all hands brought her to, it was belayed here with
-    no line, and the boat's state left 'hoisting out' for ever)."""
+    no line, and the boat's state left 'hoisting out' for ever).
+
+    The pause has two causes since the lead's ruling 11 (`Instance.held_for`): a manoeuvre's
+    belay, which holds the step-list sail work in hand, and a post's leaving work under half its
+    hands, which holds any work, scripted or not. Work a post's leaving held is belayed here only
+    where it is sail work; the ship's own work and her repairs (`HELD_ON_AT_ANCHOR`) stay held and
+    are taken up after the pipe-down. Read as decision 25's, a hatch half battened down by three
+    and the master, the master gone to the conn for coming to anchor, was ended here without a word
+    after its "Belayed battening down" had said it would be taken up (the whole-change review of
+    80e703c7, sailing-1 and engine-1)."""
+    from freesail.evolutions.runner import HELD_BY_POST
+
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "belay"):
         return
+
+    def kept(i: Any) -> bool:
+        evo = getattr(i, "evo", None)
+        if getattr(evo, "id", "") in ANCHOR_WORK_KEPT:
+            return True
+        if getattr(i, "paused", False) and getattr(i, "held_for", None) == HELD_BY_POST:
+            cls = str((getattr(evo, "applies_to", None) or {}).get("class"))
+            return cls in HELD_ON_AT_ANCHOR and getattr(evo, "id", "") not in SAIL_WORK_OF_THE_SHIP
+        return False
+
     held = [
         i
         for i in runner.instances
-        if (getattr(i, "paused", False) or getattr(i, "waiting", False))
-        and getattr(getattr(i, "evo", None), "id", "") not in ANCHOR_WORK_KEPT
+        if (getattr(i, "paused", False) or getattr(i, "waiting", False)) and not kept(i)
     ]
     if held:
         runner.belay(ship, held)
@@ -7305,6 +7348,24 @@ class LetGoAnchorScript(_AnchorScript):
                 f"{self.anchor.name} has but {_fathoms_words(self.anchor.cable_fathoms)} of "
                 f"cable bent to it"
             )
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: she is not aground and the anchor is not lost; and before it is let
+        go (`stand_clear`), a bottom here within reach of her cable (she may drift while the work
+        lies held)."""
+        if self.ship.extra.get("aground"):
+            return "she is aground"
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and self.anchor.state is AnchorState.LOST:
+            return f"{self.anchor.name} is lost"
+        if self.phase == "stand_clear" and self.anchor is not None:
+            depth = _water_depth(self.ship)
+            if depth is None:
+                return "no bottom here to anchor in"
+            if (why := _too_deep(self.tackle, self.anchor, depth, "here")) is not None:
+                return why
         return None
 
     def begin(self, words: dict[str, Any]) -> None:

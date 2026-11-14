@@ -1367,6 +1367,10 @@ class Builder:
             for key in magazine:
                 if key in MAGAZINE_NOTES:
                     self.armament_notes[("magazine", name, key)] = MAGAZINE_NOTES[key]
+            if "powder_barrels" in magazine and not isinstance(magazine, MagazineAsFiled):
+                # a fit whose charges are the Regulations' table takes the barrel by Adye; an
+                # eight file's fits, kept as filed, keep the note they were filed with
+                self.armament_notes[("magazine", name, "powder_barrels")] = POWDER_BARRELS_NOTE
             if isinstance(magazine, MagazineAsFiled):
                 self.armament_notes[("magazine", name, "charges")] = charges_as_filed_note(
                     magazine["charges"]
@@ -4472,6 +4476,15 @@ MAGAZINE_NOTES = {
         "months' figure, the game keeping no commissioning date (judgement)."
     ),
 }
+# The powder barrel by Adye for a fit whose charges are the Regulations' table (the whole-change
+# review of 80e703c7, sources-7): the eight files' fits, kept as filed, keep
+# `MAGAZINE_NOTES["powder_barrels"]`, so that their bytes do not move.
+POWDER_BARRELS_NOTE = (
+    "The powder below in barrels of a hundred pounds: the whole barrel was made to contain a "
+    "hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye "
+    "1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up "
+    "to the barrel (judgement: the period kept most of its powder in the barrels)."
+)
 FILLING_NOTE = (
     "The quarter gunners and the gunner's crew in the filling room, one to every four cannon "
     "(Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice "

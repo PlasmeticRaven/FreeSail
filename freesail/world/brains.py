@@ -547,17 +547,6 @@ class FarCaptain(Judgement):
         v = self.world.vessels.get(str(s.get("id") or ""))
         return bool(v is not None and getattr(v, "struck", False))
 
-    def _may_fight(self, s: dict[str, Any]) -> bool:
-        """The far rounds' mark (the lead's readings of cda12ec9, (F3)): the one answer,
-        `relations.MARK`, which `far_action._pairs` asks of every round, so that the stimuli
-        that take her into the action and out of it (`enemy in range`, `enemy out of range`)
-        and the mark she takes in it (`_engaging_mark`) agree with the rounds: no struck ship,
-        no prize (taken back by coming up, `squadrons.far_captures`, never fought) and none she
-        knows of her own side."""
-        from freesail.world import relations as R
-
-        return R.still(self.world, self.vessel, str(s.get("id") or ""), R.MARK, judge=self)
-
     def _own_vessel_id(self) -> str:
         return str(self.vessel.id)
 

@@ -1291,7 +1291,10 @@ line for line as before; no recorded passage moved by the toggle of `brains.py` 
 when the action is done (`PASSAGE_HELD`), and her mark is kept each minute on that road alone, so
 §4.2's road from a detour is as package 74 built it; and at a crewed cap of nought a far ship
 engaging the player's ship replies by the tables (`_fallback_reply`: a cap of nought has never
-room). **Open for the lead:** on §4.2's road from a detour the passage is still not taken up after
+room). *(The lead's readings of cda12ec9, (F1), 2026-11-14: that reply taken out again; at a cap
+of nought she does not reply, a far body that fires on the player and one he can hurt being one
+mend, package 77's; TuningNotes, "The lead's readings of cda12ec9: the far fight".)* **Open for the
+lead:** on §4.2's road from a detour the passage is still not taken up after
 the action (a captor that went engaging from a chase follows her prize at the engaging range,
 `engaging` being no detour for the plan); and the far body does not strike to the player's shot.
 

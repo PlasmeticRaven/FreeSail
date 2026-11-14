@@ -3757,7 +3757,7 @@ armament:
           32: 10.625
           18: 6.0
           9: 3.0
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 206
       # The Regulations' allowance for exercise a month: a charge and a round shot for a third of the upper deck guns in a ship of two or three decks, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144: 'one third of the number of the upper deck guns, in Ships of two or three decks'; the Captain's chapter, l.8842-8879, gives a third too); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 9
@@ -4707,7 +4707,7 @@ armament:
         carronade:
           32: 2.625
           18: 1.5
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 211
       # The Regulations' allowance for exercise a month: a charge and a round shot for a third of the upper deck guns in a ship of two or three decks, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144: 'one third of the number of the upper deck guns, in Ships of two or three decks'; the Captain's chapter, l.8842-8879, gives a third too); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 9
@@ -5617,7 +5617,7 @@ armament:
           32: 2.625
           18: 1.5
           12: 1.0
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 209
       # The Regulations' allowance for exercise a month: a charge and a round shot for a third of the upper deck guns in a ship of two or three decks, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144: 'one third of the number of the upper deck guns, in Ships of two or three decks'; the Captain's chapter, l.8842-8879, gives a third too); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 9

@@ -86,6 +86,7 @@ __all__ = [
     "Vessels",
     "polar_of",
     "rig_height_m",
+    "rigged",
     "vessel_from_spec",
 ]
 
@@ -287,6 +288,23 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a seventy-four, a ship of the line, fourteen ports a tier",
     },
 }
+# Her rig's word (`DESCRIPTIONS`' `rig`, a vessel's `kind`) is what the tops make out of her at the
+# rig's distance, and for a two-decker that is her class, "a ship of the line" (the lead's ruling 17
+# of 2026-11-12, 53c14457). How she is rigged is another thing: a ship of the line is ship-rigged,
+# her main topsail laid aback when she lies to, and "His Majesty's ship" by her hail. The readers of
+# how she is rigged read `rigged` (the whole-change review of 80e703c7, sources-1 and gundeck-3: the
+# made-out word served the hail's answer, "His Majesty's ship of the line Bellerophon", and the
+# glass's "her sails aback" for a two-decker lying to, where both read as a ship's before it).
+RIGGED_AS = {"a ship of the line": "a ship"}
+
+
+def rigged(kind: str) -> str:
+    """How a vessel of the rig's word `kind` is rigged, in the same words: a ship of the line is a
+    ship; every other rig's word is its own."""
+    word = str(kind or "")
+    return RIGGED_AS.get(word, word)
+
+
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
     "frigate": "frigate",

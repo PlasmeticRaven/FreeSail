@@ -3267,7 +3267,7 @@ armament:
           12: 4.0
         carronade:
           42: 3.5
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 110
       # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 6
@@ -3811,7 +3811,7 @@ armament:
           12: 4.0
         carronade:
           42: 3.5
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 111
       # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
       exercise_charges: 6

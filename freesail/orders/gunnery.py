@@ -426,6 +426,13 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
         ]
         fired = _fired_on(world)
         enemies += [i for i in items if i.get("id") in fired and i not in enemies]
+        # the enemy he may fight, by the one answer (`Judgement._may_fight`, `relations.MARK`:
+        # not struck, nobody's prize, not of his side), so that the rules captain's "engage her"
+        # takes the mark he chose and no prize under an enemy prize crew nearer (the whole-change
+        # review of 80e703c7, gundeck-2); with none such, the nearest sail as before
+        may_fight = getattr(getattr(world, "captain", None), "_may_fight", None)
+        if callable(may_fight):
+            enemies = [i for i in enemies if may_fight(i)]
         pick = enemies[0] if enemies else items[0]
         return str(pick["id"]), _name_of(world, pick)
     for i in items:

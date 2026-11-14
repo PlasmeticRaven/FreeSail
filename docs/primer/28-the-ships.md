@@ -102,4 +102,4 @@ ships:
 
 ## Where it comes from
 
-Each ship's file carries the source of every figure beside it: her draughts and her lines where they survive, the lists of the Navy's ships for her dimensions and her guns, the period's tables for her masts, yards and sails, and the logs and letters of her own day for how she sailed. Where a figure has no source it is a judgement, and the file says so.
+Each ship's file carries the source of its figures beside them: her draughts and her lines where they survive (where none does, a draught of her type, scaled), the lists of the Navy's ships for her dimensions and her guns, the period's tables for her masts, yards and sails, and the logs and letters of her own day for how she sailed. Where a figure has no source it is a judgement, and the file says so; the older files keep a few figures from memory, marked unverified.

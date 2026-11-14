@@ -22604,6 +22604,15 @@ razee's "a ship" kept). The crewed frigate's test
 (`test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74`) passes as it
 stood; its docstring now says the above.
 
+*Found by the whole-change review of 80e703c7 (sources-1, gundeck-3), and mended there: the rig's
+word does two jobs, what the tops make of her and how she is rigged, and this step checked only the
+readers of the first. Two served lines moved here and were not recorded: a hailed two-decker
+answered "His Majesty's ship of the line Bellerophon. And what ship is that?" (the French "The
+French national ship of the line Tonnant."), where before it she answered "His Majesty's ship
+Bellerophon."; and the glass of a far two-decker lying to read "hove to on the larboard tack, her
+sails aback", where before it "main topsail aback". Both are as before this step again
+(`ships.rigged`; "The whole-change review's mends", below).*
+
 ### The razee's trimmers by fit (the lead's ruling 13, 2026-11-14)
 
 On 53c14457, by the lead's ruling 13 of 2026-11-14 at 04:40: "The razee's trimmers by fit (51 on
@@ -22752,7 +22761,8 @@ with its commits, the trunk's merge of it where there is one, a pointer to its o
 file (which stays the record: nothing above is deleted or rewritten), its truths, its rulings by
 whom, and what it left; then the three builds of the lead's readings of cda12ec9 by their causes;
 then one list of everything recorded as left for a later package, whose each; then Phase 5's own two
-commits and their suites. The brief is the package's entry in `docs/dev/M7-WorkPackages.md`
+commits and their suites; then the whole-change review's mends of 80e703c7 and the suites on the
+final hash. The brief is the package's entry in `docs/dev/M7-WorkPackages.md`
 ("Package 75: the ships", with the lead's notes to the ships session beneath it); the plan is
 `docs/design/Build-Ships.md`; the ships' designs are `docs/design/Design-Ship-Indefatigable.md`,
 `Design-Ship-PrinceDeNeufchatel.md`, `Design-Ship-Bilander.md`, `Design-Ship-Bellerophon.md` and
@@ -22967,10 +22977,14 @@ commander on the sea"; the signal's state nothing). **Mended where it lives:** o
 `freesail/world/relations.py` `still(world, holder, other, what)`, "is she still what I hold her to
 be", by four relations (MARK, STRUCK, PRIZE, SUPPORT), reading the sea's truth as the far brain and
 the prizes do, with `captains._commander_on_the_sea` and `FarCaptain._on_the_sea` folded into it;
-asked in every place a relation is held, for both bodies (the far rounds, the far brain's
+asked in the places the readings found a relation held, for both bodies (the far rounds, the far
+brain's
 `_may_fight` hook in `Judgement._enemy_within` and its mark-taking, the shared `_prize_taken` and
 `_alone`, the rules captain's `_take_possession` and `_enemy_struck`, the prizes' `far_minute`,
-`prizes_of` and `_captor_near`, the cover's `squadrons._covered`, the signals' `_obey`). SUPPORT's
+`prizes_of` and `_captor_near`, the cover's `squadrons._covered`, the signals' `_obey`; and since
+the whole-change review, the rules captain's mark and the order's "her", and a change of hands:
+"The whole-change review's mends"), not yet by the overmatched and man-of-war-near stimuli, a set's
+member gone from the sea, or a struck commander's members on station (the one list). SUPPORT's
 distance is the set's own `lost_nm` (squadron 8, convoy 6, blockade 12; the squadron book's 8 for a
 ship under orders in no set), JUDGEMENT. A second fault under (F3), the set's pace leaving its
 prizes out, is mended in `Squadron.pace_cap_kn` (JUDGEMENT: a captor with a slower prize at nine
@@ -23007,8 +23021,12 @@ held and taken up again never reads its check (failing on 53c14457 at the first,
 `combat/hits.py`, `crew/health.py`, found and not mended). (C8)'s cause, ship work named from the
 evolution's verb, mended by the files' `doing:` key read in `Runner._doing` alone, its two copies
 (`orders/crew.py`'s, `api/queries.py`'s) reading it (the infinitive, `_describe`, found and not
-mended: 7-542's call words). (C2)'s cause, the company clamp rising with the ninth hand, mended by
-her own `hands:` figure, six, in a new ship-file section (JUDGEMENT; her file alone moves). (C4)'s,
+mended: 7-542's call words). (C2) is mended at the symptom, by the lead's least-change rule: her
+own `hands:` figure, six, in a new ship-file section (JUDGEMENT; her file alone moves). The cause,
+a numbered manoeuvre's want clamped to what the whole company could give (`hands.company_can_give`,
+the idlers counted) against a watch that must begin it alone under the half rule, stays for every
+trader: the merchant brig's and the smack's larboard watches are its other cases, and the merchant
+brig's opening anchor the lead's nudge 11 names (the one list). (C4)'s,
 a claim taken from the runs: the test pins the rule's letter. (C5a)'s, two conversion roads, mended
 in `Runner._made_all_hands`; (C5b)'s, two judges of one question, in `Runner._calls_for_itself`.
 (C7): the owed tests, with two real checkpoints written on the trunk at 1eea8d18 and kept under
@@ -23017,7 +23035,9 @@ in `Runner._made_all_hands`; (C5b)'s, two judges of one question, in `Runner._ca
 **The razee's trimmers by fit (ruling 13; `m-trim`; section "The razee's trimmers by fit").** **The
 cause:** a ship file bears one quarter bill, set against her default fit (Indf §6.4), and a fit
 whose guns want other men was read with figures set for other guns; B1's marines were the same
-cause. **Mended where it lives, one road for every key a fit may give:** the schema (`FIT_OWN_BILL =
+cause. **Mended where it lives, one road for the keys a fit gives, the marines and the trimmers**
+(the bill's `filling` still read on every fit, the same cause left for the lead: the one list) **:**
+the schema (`FIT_OWN_BILL =
 ("marines", "trimmers")`, a fit's `trimmers` in the bill's own form, refused in words where it
 cannot be, out of the pickle while None), the beat (`quarters._on_her_fit`, read by the marines kept
 and the trimmers alike; the bill's trimmers had one runtime reader, `Quarters.beat`, every other
@@ -23088,8 +23108,11 @@ quarterdeck (above) stands apart: known wrong, kept by the owner's ruling, to be
     taken keeps her members on station around her (the far fight's reading, left).
 
 **Package 70's road (the near fight) and package 74's (the far):**
-13. The near `Captain._mark`, the battery's target, does not ask the one answer (the struck target
-    is dropped by `_watch_struck`): the far fight's reading, said.
+13. A crewed cruiser beside a crewed enemy-held prize of her nation chases her and never has her:
+    the near body's bringing-to of a prize under a prize crew is not modelled (the far rule of the
+    retake by coming up takes a crewed cruiser for a far prize alone). The near `Captain._mark` and
+    the order's "her" ask the one answer since the whole-change review ("The whole-change review's
+    mends", gundeck-2).
 14. (F6) (a): the unseen mark chased by her true position (`FarCaptain._take_mark`,
     `Vessel._target_of`); (b): package 74's chaser done when her mark is done, a chase leg whose
     mark leaves the sea dropped and the chaser leaving the sea with it (a privateer whose chase
@@ -23118,14 +23141,20 @@ words):**
     7-542's call words; a hand struck or taken sick at work stays in the work's assignment, unsaid,
     mending it moving King's ships' action lines; on the trunk, a file's own all-hands work that
     waits and is removed before it begins leaves the hands up; the merchant brig's larboard three
-    and the smack's larboard two cannot heave to by night alone, on the trunk too; (C5b)'s one judge
+    and the smack's larboard two cannot heave to by night alone, on the trunk too (the cause, the
+    company's clamp against a watch alone, with item 41); (C5b)'s one judge
     changes one untested case (other work holding hands with the deck under half: the hands piped
     down and the boat waiting, where they were kept up) (the same section).
-23. From the trimmers' build: the 64's 'ardent class 1794' `filling` 16 against 18 by the rule; the
+23. From the trimmers' build: the 64's 'ardent class 1794' `filling` 16 against 18 by the rule, the
+    bill's `filling` read on every fit (`combat/filling.py`'s `filling_of`, not through
+    `quarters._on_her_fit`: ruling 13's cause in a third key, her file moving if it is mended); the
     cutter's 'long guns' and the privateer schooner's 'letter of marque' short of swivel hands at
-    the beat ("The razee's trimmers by fit"); and an old save keeps the bill's 79 on the 1795 fit (a
-    game saved before keeps its figure, "loads as before"; for the lead's ruling if wanted
-    otherwise).
+    the beat ("The razee's trimmers by fit"); B1's "For the lead (b)", the 74's 'as the bellona
+    1812' (by B1's rule 83 marines against the bill's 95 and 81 trimmers against the 69 she beats,
+    every crew manned either way), and `tools/ships/bellerophon.py` with no `fit_bill`, so that her
+    other fits are never run against the bill's rules; and an old save keeps the bill's 79 on the
+    1795 fit (a game saved before keeps its figure, "loads as before"; for the lead's ruling if
+    wanted otherwise).
 24. The spoken-sail filter (package 43's, shared with the cruiser and the trials), kept as it is
     (the lead's note of 2026-11-12 at 21:20, (3) (a)).
 25. The hail line's comma where a description holds commas (ten rows, shared templates, a served
@@ -23194,10 +23223,45 @@ of 2026-11-14 at 07:25, nudge 10; `docs/reviews/ColdReview-M7.md` on the trunk, 
     `GATE_5B_SCHOONER`, `GATE_5C_MERCHANT`, `GATE_6A_FAKE_CAPTAIN`, and the first action's whole log
     (234036cc17e6f137 to ce44219434e1e42c, its 497 lines the same); with the seven of 56c1174b the
     lead re-pins (the lead's note of 2026-11-14 at 06:25, nudge 9).
-40. `Design-Ship-Indefatigable.md` §6.4's B1 paragraph says the 1795 fit is "still three crews
-    short", which ruling 13 has made out of date (its table already gives 9, 12, 14, 7 and 9, 51);
-    the design's owner's to amend, left by the trimmers' build, whose brief allowed records only in
-    this file.
+
+**Found by the whole-change review of 80e703c7 and not built, each the lead's** ("The whole-change
+review's mends", below, with its figures):
+40. The razee lies a-try from way on nearly abeam and forereaches over two knots (B7's path, seed 7,
+    35 kn: furled 81.4 to 81.5 degrees off at 2.43 kn, not furled 82.3 to 99.9 at 2.80; old and new
+    alike). B7 ruled the band (five to six and a half points, under 2 kn) for the 74's and the 64's
+    files alone; her helm patched in the process gives, furled, 20 degrees 67.7 to 76.6 at 1.62 kn,
+    25 68.1 to 74.8 at 1.57, 29 68.4 to 73.8 at 1.55, 32 68.6 to 73.3 at 1.53, 35 (hard a-lee) 68.6
+    to 73.0 at 1.52: only hard a-lee brings her inside, by a tenth of a degree, and her lie from
+    rest in truth 28's form at it is not measured. A ruling on whether she takes a `lie_a_try`
+    timing, or the evolutions' owner's (package 77) with the two equilibria.
+41. The lead's nudge 11, the merchant brig's opening `let go the best bower`: not covered by this
+    hash. Her muster at seed 7 splits her ten seamen seven and three (each station of three two to
+    the starboard and one to the larboard, the afterguard's one to the starboard), and at 05:00 the
+    larboard watch's three and the master are four against `let_go_anchor`'s twelve clamped to
+    eleven (half, 5.5), so she waits for good ("Not hands enough on deck to let go anchor; there are
+    but four to spare."), drifting with her leeway 16 to 30 degrees; her starboard watch (seven and
+    the mate) could do it, and with "call all hands" first she lets go at once ("Only six hands to
+    let go anchor"). The lead's own reading (twelve against her sixteen, so neither a watch nor all
+    hands) is not so: all hands do it. What she needs is not small, and it is (C2)'s cause, the
+    company's clamp against a watch alone, with the muster's split beside it: either the muster's
+    watches balanced by station across the company (it moves every trader's muster and her lines,
+    measured old beside new), or a numbered work a watch is asked for without a call clamped to the
+    larger watch's whole (it moves the merchant brig's and the smack's lines), or the settee's road
+    on `let_go_anchor.yaml` (`too_few: all hands`, every trader whose watch is too few to let go
+    calling all hands where it waited). A ship file's own `hands:` figure, (C2)'s road, would be a
+    second symptom's mend. For package 115's held case: the lead's ruling.
+42. The scripts' standing conditions given three (the fish, the cutting away, the letting go:
+    `Script.standing`); of the other forty-four checks read, a grapple's range and mark (an enemy
+    drawn off while the work lay held) and the anchor's manoeuvres' "aground" stand through the
+    work and are not given, quarters' and all hands' work that no post's leaving holds; a hand of
+    the work taken by another road is the same (item 22).
+43. Every judge on the sea is walked twice: `relations.judges` for a change of hands and
+    `combat.action._witnessed` for a pirate's act seen (the same brains and captains, the second
+    with the sight's distance); one road for both moves nothing and is not built here.
+44. Words of the files copied into the pickle and read from it: the work's name and a far vessel's
+    rig's word are read again from the files (engine-3, engine-4); an evolution's steps, timing and
+    crew line are kept as the work was begun (by design: a checkpoint holds the work as it stands),
+    and a vessel's `what` as saved (a cartel's is changed in play).
 
 ### Phase 5's integration: the truths moved, and these records
 
@@ -23268,6 +23332,294 @@ tests ran too): 1,553 passed, 1 xfailed (the base's own,
 to the same files, no outcome changed; new, chapter 28's five orders blocks and its in-world case,
 all passed. Ruff check and format clean over `freesail`, `tests` and `tools` (389 files). Nothing
 pushed; both commits local, no trailer.
+
+### The whole-change review's mends (2026-11-14)
+
+Four readers read package 75 whole at 80e703c7, each by a lens: the sources, fidelity and the bytes;
+sailing and the hands; the gun deck and the fight; the engine's gate, the saves, the pace and the
+viewer. Their twenty-one findings were each reproduced first, by their probes and scratch scripts of
+this step's own (outside the repository), on 80e703c7; none failed to reproduce, so none is refuted.
+Each mend is named by its cause, mended where the cause lives, with where else the cause was looked
+for and a test at that level (`tests/test_mends_75.py`, new, and the cause-level tests of
+`tests/test_held_work.py` widened); every new test fails on a tree of 80e703c7, its controls aside.
+What wants a ruling is not built: the one list's items 40 to 44. One commit, "Package 75, Phase 5:
+the whole-change review's mends". Old is 80e703c7 throughout.
+
+**A change of hands makes her a new party (gundeck-1, the blocker).** *Reproduced:* a British
+merchant brig, the *Hope*, taken by a French frigate, the frigate then off the sea, and the British
+frigate *Amethyst* 0.6 miles off at a cap of nought: retaken by the *Amethyst* coming up at tick
+180, the *Hope* paired with her in the far rounds at 240 ("a round with the Amethyst at 2 cables";
+"struck to the Amethyst: the hands would not stand to the guns", four killed, twelve wounded) and
+lay struck for good, nobody taking her (at 11,580 still struck); her brain held the *Amethyst* an
+enemy by the private signal answered while she was in French hands, and a cruiser whom the prize
+crew had fired on held the retaken ship one by their shot. *The cause:* what a captain knows of a
+ship (her shot, `fired_on`; a pirate's act seen, `pirates`; the signal or the hail, `recognised`) is
+of the people she had, and nothing ended it when she changed hands, so the one answer's `MARK`,
+which reads it first (`Judgement._known_enemy`), held her what she had been: (F3) mended at its
+symptom, the cut-out, and not at this. *Mended where it lives:* the one road by which a ship's
+nation changes, `prizes._nation_words` (taken, retaken, restored by a court), calls
+`relations.changed_hands`: every judge on the sea (`relations.judges`: each ship's far brain and her
+hull's captain, and the player's World's) forgets what he knew of her, and her own judges forget
+what they knew of every ship (JUDGEMENT: her own people's knowledge from before she was taken goes
+with the prize crew's, since what is not stamped with the hands it was learned under cannot be
+sorted). `possess`'s `_no_enemy_now` (the captor alone) and `_give_intent`'s two clearings of
+`fired_on` (her own) are folded into it. *Looked for elsewhere:* `spoken_ids` and `given_up` (a
+stranger no more: kept; the retake marks her spoken to her recaptor as before); the far rounds' book
+per pair (its morale's "fired on" is read only while the pair fights, and `MARK` keeps them apart);
+the player's own keeper of who fired on her (`struck_by`, `opened_by`: her damage lines, no
+judgement of an enemy); the prize money's `in_sight` (history, kept); `_witnessed`'s walk over the
+same judges (item 43). *Tests:* both ways at the one answer's level, after a retake and after a
+taking, and the case sailed (no round between the *Hope* and her rescuer in twenty minutes, her
+passage under her own colours).
+
+**One mark rule for both bodies (gundeck-2).** *Reproduced:* the same world at a cap of three, both
+crewed: the *Amethyst* went engaging the French-held *Hope* at 480 ("Engage a merchant brig to
+larboard: the mark a merchant brig, the larboard battery"), cast loose at 890 and fired at 3,780
+("Two shot at a merchant brig: one fell short and one wide."), shifting her side every three minutes
+for over an hour, where the far body by `MARK` never fights her and takes her back by coming up.
+*The cause:* two rules for one question, whether a sail may be fought: the far brain asked the one
+answer (`FarCaptain._may_fight`); the rules captain asked "not struck" (`Judgement._may_fight`),
+kept his battery's mark whatever she had become (`Captain._mark`), and his "engage her" took the
+nearest sail at war by her colours (`orders.gunnery._mark`). *Mended where it lives:*
+`Judgement._may_fight` is `MARK` for both bodies (the far brain's own override gone),
+`Captain._mark` keeps the battery's mark only while it passes, and the order's "her" chooses among
+the sails the World's captain may fight (the nearest sail as before where none passes; a sail the
+player names is his). And the retake by coming up (`squadrons.far_captures`,
+`_armed_enemy_alongside`), which skipped a crewed captor ("the near fight is 70's"), takes a crewed
+cruiser for a far prize of her own nation alone, her hull's captain's state and mark read where the
+far brain's were, `retake` giving up the mark of both her captains: with the near body no longer
+fighting her she would never have had her. *Looked for elsewhere:* the far brain's `_engaging_mark`
+and `_take_mark` (they ask `_may_fight`: the same answer); the chase's `_nearest_enemy` (a prize
+under an enemy crew is chased, and the chase is the road to her retake: right); `_man_of_war_within`
+(the overmatched stimulus: item 15, left); the near fight between a crewed cruiser and a crewed
+prize (item 13: she chases and never has her, the near bringing-to of a prize not modelled).
+*Tests:* the player's World's captain refuses a prize, a ship struck to another and a friend by the
+hail, as the far brain does; sailed, the crewed cruiser never engages the prize in a quarter of an
+hour, and at a cap of one retakes a far one by coming up.
+
+**The struck mark's taker within reach, and the strike's record ended with it (gundeck-4,
+engine-2).** *Reproduced:* the *Hero* struck to the *Tonnant* at 840, the *Tonnant* put forty miles
+off before she possessed: at 4,440 the *Hero* still struck and nobody's prize, the *Foudroyant*
+within a mile at the strike on passage; and a ship struck to A in the far rounds, her colours up
+again, struck again by a road that names no taker, was nobody else's for as long as A sailed. *The
+cause:* `STRUCK`'s taker "there to take her" asked only that she be on the sea, the gap (F4) found
+in support; and the strike's record (`struck_to`, `struck_tick`) outlived the strike. *Mended where
+it lives:* in `relations.STRUCK`, a taker beyond the miles at which she could still support
+(`in_company_nm`, the taker's set's `lost_nm`, eight for a ship in no set; JUDGEMENT: a ship could
+take her who could still support her) is no longer there to take her; and the one road by which a
+struck ship's colours go up again, `prizes._set_colours` (taken or retaken), ends `struck_to` and
+`struck_tick`, so that a later strike by the near action, a cut-out or a world order is to no one
+known and its hour counted from then. *Looked for elsewhere:* the readers of `struck_to` (the far
+prizes' captor, `far_minute`, and both bodies' possession, through `STRUCK`) and of `struck_tick`
+(`far_action.struck_within_hour`); the colours hoisted by order or by the far body's doctrine
+(`orders/signals.py`, `signals.py`, `signalling.py`) never unstrike a vessel, and a ship sunk is off
+the sea. *Test:* at the one answer's level, both.
+
+**How she is rigged, apart from what the tops make of her (sources-1, gundeck-3).** *Reproduced:*
+"His Majesty's ship of the line Bellerophon. And what ship is that?", "The French national ship of
+the line Tonnant.", "His Majesty's ship of the line Ardent.", and a far two-decker lying to under
+the glass "her sails aback"; the frigate "His Majesty's ship Amethyst" and "main topsail aback".
+*The cause:* the rig's word did two jobs, what the tops make of her at the rig's distance (for a
+two-decker her class, ruling 17) and how she is rigged; 53c14457 checked only the readers of the
+first. *Mended where the word lives:* `ships.rigged` (`RIGGED_AS`: a ship of the line is a ship),
+read by the two readers of how she is rigged, the hail's navy word (`hail._fills`) and the sails she
+lies to with aback (`lookout._HOVE_TO_ABACK`). *Looked for elsewhere:* every reader of
+`vessel.kind`: the hail's finding a sail by her kind (`hail.py`, by the whole word or a part of it),
+her name where unnamed and the lookout's "the ship of the line" (made-out words: right), the order's
+names for her (`orders.gunnery._mark`), the readings' `what or kind`, the ranks of
+`captains._SIZE_WORDS`: all the tops' words, as they should be. *Test:* a far 74, British and
+French, and a far 64 answer "His Majesty's ship ..." and lie to "main topsail aback", the frigate
+the control; and the rig's word is still the class for the tops. The two lines are recorded under
+"The made-out rule".
+
+**The files' words read from the files at load (engine-3, engine-4).** *Reproduced:* the kept trunk
+save of the boat called (1eea8d18) named her work "sending boat", which the lookout's glass no
+longer reads ("sending the boat", a boat hoisting out or in); a far 74 saved on the trunk at
+8a06cf9b loaded "a ship", seen as "a ship" at three miles and ranked 3, where a new game has her "a
+ship of the line" at rank 4 and the trunk read her rank 4 at any distance (`_size_of`, gone with
+ruling 17). *The cause:* a word of the files copied into the pickle and read from there, stale
+across a save and a load. *Mended where it is read:* `Runner._doing` reads the work's `doing:` from
+the registry by its id (the pickled evolution's where the registry has none); and the load's
+rebinding (`replay._rebind`, `_rig_word_now`) reads a far vessel's rig's word again from her
+description, as a new game makes it (a vessel of no description the descriptions know, as saved).
+*Looked for elsewhere:* item 44. *Tests:* the two kept saves; the far 74's checkpoint written on the
+trunk at 8a06cf9b by this step is kept (`tests/fixtures/saves/pre-75-far-seventy-four.checkpoint`,
+153,114 bytes).
+
+**Why work is held (sailing-1, engine-1).** *Reproduced:* in package 109's Torbay bilander at her
+nine, her larboard watch on deck, "batten down the hatches" begun by the three and the master and
+"come to anchor" 8 s on: "Belayed battening down: all hands, bring ship to anchor! ...", brought up
+and piped down at 1,023, and nothing more of it, the hatches open and no word; at anchor with "get
+under way" the same, under way at 1,449; and "go below" instead, the reading 'the work in hand'
+"belayed while all hands are about ship: battening down" with no hands called. *The cause:* the
+pause got one road (`Runner._hold`, (C6)) and none for reading it; two readers of a hold were
+written when it could only be a manoeuvre's belay of the step-list sail work in hand (decision 25),
+and read a post's leaving work under half its hands (ruling 11) as one. *Mended where it lives:* the
+hold records why (`Instance.held_by`, `HELD_BY_BELAY` or `HELD_BY_POST`, read by `held_for`; a
+checkpoint from before read by the only holds it could carry: scripted work a post's, step-list a
+manoeuvre's), cleared when the work is taken up; `scripts._belay_held_work` keeps the ship's own
+work and her repairs that a post's leaving held (`HELD_ON_AT_ANCHOR`: work on the ship, a spar, a
+part or a line, but furling all sail and loosing them to dry, sail work of the whole ship) for
+`_try_resume` after the pipe-down, and belays the rest as before (a manoeuvre's belay, sail work,
+work waiting its turn: the trunk's own, its lines as they were); the reading says "held for hands:
+..." for a post's hold (and a key `held`). *Looked for elsewhere:* every reader of `paused`: the
+pipe-down refusal, `Runner.belay`'s entry, the step's name and the status, the sails' drawing and
+the glass (all read it as "not at work", true of both holds). *Tests:* at the cause's level, each
+hold says why and the anchor's rule asks it; sailed, the hatches battened down after the pipe-down.
+
+**What stands through held work (sailing-2).** *Reproduced:* at anchor in the same world, "cut away
+the mainmast" by the three and the master, "go below" 8 s on ("Belayed cutting away mast the main
+mast: the master gone below."), the main mast carried away by the strain model while it lay held,
+the master on deck again: "Main mast cut away ..." at 1,205 and "The main mast is cut away and gone
+over the side" at 1,820, wrecked twice; cda12ec9 refused it ("Could not cut away the main mast: the
+main mast is carried away already; clear the wreck."). *The cause:* (C1)'s mend was wider than its
+cause: a script's check holds the beginning's reading and plan, which the work's own going makes
+false, and standing conditions, which the world can make false while the work is held and its own
+going never does; the resume read neither. *Mended where it lives:* `Script.standing` (by default
+none), read with the file's `requires` whenever held work is taken up (`Runner._failing_condition`'s
+`begun`), the check still the beginning's alone; given to the fish (the spar carried away or sent
+down), the cutting away (the mast carried away, until the axes have done: the work's own going
+brings it down) and the letting go (aground, the anchor lost, and before it is let go a bottom
+within reach). The other forty-four checks were read: the beginning's (their own going makes them
+false or they lay the plan), the file's words (a port, a boat, a chart), or quarters' and all hands'
+work no post's leaving holds (item 42). *Tests:* the cause-level sweep of `tests/test_held_work.py`
+widened, every one of the 64 scripted evolutions held and taken up reading its standing and never
+its check; and the case sailed, the cutting away refused in cda12ec9's words.
+
+**A part's work by its name (sailing-5).** *Reproduced:* "Belayed cutting away mast the main mast:
+the master gone below.", newly served by a post's leaving it, and "goosing wing the foresail". *The
+cause:* (C8)'s, at a part's work: the verb's gerund and the part, where the verb is the id. *Mended
+where it lives:* a part's file may give `doing:` as the words before its part (`cut_away_mast`:
+"cutting away"; `goose_wing`: "goose-winging", Luce's "goose-winged"), read in `Runner._doing`,
+which names the part after them; the registry refuses a part's `doing` that names its own part.
+*Test:* (C8)'s widened to every evolution, parts among them.
+
+**The pipe-down's refusal reads the request as made (sailing-6).** *Reproduced:* the kept trunk save
+of the bilander at her eight under sail by night, "take in the mainsail" ("All hands! (to take in
+the mainsail)") and "pipe down" four seconds on: "Piped down; the larboard watch has the deck.", the
+take in going on with its hands; "furl all sail" refused the same order. *The cause:* the plan read
+where the work's own state should be: `orders.crew.all_hands_work` read the evolution file's crew
+line, and work that called all hands for itself because its watch was too few (ruling (1) of
+2026-11-10) was not all-hands work to it. *Mended:* it reads the request as it was made
+(`Instance.all_hands`, which `Runner._made_all_hands` sets), the file's line beside it. *Looked for
+elsewhere:* the order naming a party for all-hands work (`orders/crew.py`, before any work is begun:
+the file's line is the request there). *Test:* the case, on the kept save.
+
+**A ship file's own hands (sources-3).** *Reproduced:* `{"heave-to": 6}` and `{"no_such_work": 9}`
+load and are never read; `{"tack": 2}` made a tack numbered work of two; `{"furl_all": 3}` raised at
+`Runner.start`. *The cause:* the section held to its shape alone, its parser's word that "the files'
+tests hold every ship file's to them" not so. *Mended:* `Runner._crew_line` reads a ship's figure
+only over a numbered crew line; and the test the parser speaks of: every ship file's `hands:` names
+evolutions of the registry whose files ask a number, the bilander's alone given, the shape refused
+in words.
+
+**The powder barrel by Adye (sources-7).** Adye 1804 p. 46 (BARRELS), in the tree: the whole barrel
+made to contain a hundred pounds, of late filled with ninety. The five new files' fits, whose
+charges are the Regulations' table, take a note of their own citing it, the hundred kept
+(JUDGEMENT); the eight files' fits, kept as filed, keep theirs (`tools/gen_ships.py`,
+`POWDER_BARRELS_NOTE`). The generator gives the bilander's, the hermaphrodite brig's, the razee's,
+the 64's and the 74's files moved by their notes alone (one line a fit, nine in all), every other
+file byte for byte; no figure moves.
+
+**The records brought true (sources-2, sources-4, sources-5, sources-6, gundeck-6).** Dated as-built
+notes, nothing deleted: `Design-Prizes.md` (the reply at a cap of nought out by (F1));
+`Design-Ship-Indefatigable.md` §6.4 (ruling 13; "still three crews short" superseded) and §8 (the
+64's rig word); `Design-Ship-Bellerophon.md` §8 and the two books' `line_of_battle_nm` notes
+(`kings-ship.yaml`, `commodore.yaml`; notes alone, no value: the relation counts while her commander
+or a member could support her); `Design-Ship-Bilander.md` §6.1 (her `hands:`, the symptom's mend).
+This file's causes summary says (C2) is the symptom's mend, the one answer asked where the readings
+and the review found a relation (not everywhere), and the fit's road the marines' and the trimmers';
+`TechnicalSpec-M7.md` §27 says which files carry every figure's source and which hull profile is a
+type's, and where the one answer is not yet asked; the primer's chapter 28 the same of the files.
+The one list takes B1's "For the lead (b)" (item 23).
+
+**Not built, the lead's (the one list, items 40 to 44).** The razee's lie a-try from way on
+(sailing-4: B7 ruled the band for the 74 and the 64 alone; the sweep's figures there); the lead's
+nudge 11, the merchant brig's opening anchor (sailing-3: not covered, not small, what she needs
+there; package 115's held case); the bill's `filling` by fit (gundeck-5, item 23: it would move the
+64's file); and the pace (engine-5), measured on the final hash alone, below.
+
+**Lines any ship may say that change** (old 80e703c7):
+- A far prize retaken by a cruiser of her own nation no longer fights her rescuer: her story's round
+  and strike lines with him, and the far round's and strike's events for such a pair, are not said;
+  she sails her passage. A captain who knew a ship by the signal or the hail before she changed
+  hands makes the private signal or hails her again where he meets her.
+- A crewed captain no longer engages a prize under a prize crew, a ship struck to another, or one he
+  knows of his side ("Engage a merchant brig to larboard ...", the cast loose and the fire into
+  her); he chases or investigates her. A crewed cruiser comes up with a far prize of her own nation
+  and retakes her ("Hope, prize to Renard, is retaken by Amethyst coming up: her prize crew strike
+  to him with no help near."). "Engage her" passes over a struck ship or a prize nearer than the
+  enemy he may fight.
+- A ship struck to a taker beyond her set's distance, or struck again after her colours went up, is
+  taken by another who comes up (the possession's lines, the prize's story).
+- "His Majesty's ship Bellerophon." (80e703c7 "His Majesty's ship of the line Bellerophon."; so for
+  the 64 and the French "The French national ship Tonnant."); a far two-decker lying to "main
+  topsail aback" (80e703c7 "her sails aback"): both as at cda12ec9.
+- In an old save, the work in hand named as the files name it now ("sending the boat"), and the
+  lookout's glass on it; a far 74 or 64 from a trunk save made out "a ship of the line".
+- The ship's own work and her repairs a post's leaving held are taken up after the pipe-down at an
+  anchor or under way, with their own lines ("The hatches are battened down: ..."), where they were
+  ended without a word; the reading 'the work in hand' "held for hands: battening down" where
+  "belayed while all hands are about ship: battening down" was.
+- Held work refused on its taking up where what stands through it is gone: "Could not cut away the
+  main mast: the main mast is carried away already; clear the wreck.", the fish's "is carried away,
+  not sprung" and "is sent down on deck", the let-go's "she is aground", "is lost", "no bottom here"
+  and its too-deep line, each in its file's failure line, where the work went on.
+- "cutting away the main mast" (old "cutting away mast the main mast"), "goose-winging the foresail"
+  (old "goosing wing the foresail") wherever the work in hand is named.
+- "pipe down" refused while all hands are at work called for itself ("Order not carried out ('pipe
+  down'): All hands are still at work (taking in the mainsail); pipe down when it is done.") where
+  "Piped down; ..." was said.
+
+**Pins:** none weakened, none moved but these, each old beside new in its docstring:
+`tests/test_held_work.py`'s (C1) sweep now also asserts each resume reads `standing`, and (C8)'s
+counts its 21 ship files among the 23 that give `doing:` and matches the registry's new refusal (a
+part's `doing` naming its part, where any part's `doing` was refused); `tests/test_far_action.py`'s
+(F2) road `struck-to-the-other` reads to whom the *Hero* struck at the strike, where it read it
+after the possession, which now ends the strike's record (the same claim, the captor the ship she
+struck to, and now that the record ends).
+
+**Digests:** this commit moves none: the four whole logs and the captain's trials are as at the
+merge of the readings' builds (sailed once early, then in the suites below). Every digest moved
+since cda12ec9, old beside new, by commit, all by m-crew's words of (C8) (d039243e, merged at
+b30c0553) and the lead's to re-pin (item 39): the first action's whole log 234036cc17e6f137 to
+ce44219434e1e42c (497 lines both); the station gale's (and `TRIAL_STATION_GALE`) 1e59009004141b08 to
+bf16fbf514055f29 (1,722 lines both); `TRIAL_TRADE_THICK` 41a37f0290be291a to de00808076d8cccf; truth
+77's merchant passage (gate 5c) 2e93986c2989d831 to eb410cf04b496cec; `GATE_5B_SCHOONER` and
+`GATE_6A_FAKE_CAPTAIN` read on this machine only in their constants' tests, which fail at the bases
+before the digest is read. The encounter (732a6020db4d4755) and the lee shore (e8c79e9947e244c3),
+the privateer's trial (13432e4b2659bcaf) and the generator's eighteen files' figures did not move.
+
+**The suites, as run (the final tree).** Once, on 80e703c7 with this commit's files uncommitted
+(this paragraph and the one change to `tests/test_far_action.py` below written after), from the tree
+root with `py`, freesail imported from it, nothing else of this work running (11:58 to 13:26 UTC;
+the session's scratch `p5/final/run.sh`, its junits beside it). **(a) The slow candidates** (the
+base's 86 files, the seven named and six this work touched; `--slow -m slow`, four workers): 401
+tests, 378 passed, 10 failed, 11 xfailed, 2 skipped. Against the slow base at cda12ec9 (389) no
+outcome changed; its nine failures the same nine (the messages moved only by the digests above and
+an object's address); three only in the base (7-191's and 7-196's node ids moved into the known
+truths, (F1)'s cap-nought reply test taken out); fifteen only here, fourteen passed and one failed,
+`test_the_second_of_two_ships_on_one_mark_gives_it_up_and_takes_her_passage_again[struck-to-the-other]`,
+which read `struck_to` after the possession that this commit's colours-up road now ends: its read
+moved to the strike (Pins, above), and the function rerun alone on one worker, 3 passed. **(a2) The
+pace tier alone** (engine-5; `--slow -m pace`, one worker, nothing beside it): 15 of 15 passed, each
+its floor (truth 51's 500 ticks a second, the crewed floor's 60, the filters' and the observer's
+shares), in 296 s, where the as-built record above had three of them read under four workers. **(b)
+The captain's trials:** 8, 5 passed and the base's three failed as at the base (the station gale and
+the trade in thick weather by the digests above, the privateer's the same message). **(c) The four
+whole logs:** the first action 497 lines, ce44219434e1e42c; the encounter 229, 732a6020db4d4755; the
+lee shore 1,561, e8c79e9947e244c3; the station gale 1,722, bf16fbf514055f29; port lines, shut ticks,
+roll and heel as at the base. **(d)** The generator writes the eighteen files byte for byte the
+tree's; check_viewer_guns is clean, its output byte for byte the merge's. **(e) The whole fast
+tier** (four workers, 43 minutes): 7,862 tests, 7,858 passed, 1 failed, 2 skipped, 1 xfailed.
+Against the fast base (7,750) one outcome changed: `test_replay`'s fingerprint test failed at the
+base by its timing under load (0.70 s against 0.5, item 25) and passes here, not this work's; the
+one failure is the trunk's symlink test (`test_chart`, WinError 1314 on this machine, its owner's);
+41 only in the base (Phase 5's truths moved and the readings' renamed tests) and 153 only here, all
+passed (the readings' builds' new tests, the truths at their new node ids, and this commit's:
+`tests/test_mends_75.py`'s 18 and `tests/test_held_work.py`'s one). **(f)** Ruff check and format
+clean over `freesail`, `tests` and `tools` (390 files). Nothing pushed; the commit local, no
+trailer.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

@@ -159,6 +159,14 @@ WAITING_FOR_HANDS = "hands"
 # (`Instance.__setstate__`, `Instance.held_up`).
 _TRUNK_HANDS_CALLED_FOR = "hands_called_for"
 
+# Why work in hand is held (`Instance.held_by`, `Runner._hold`, the pause's one road): a manoeuvre's
+# belay of the step-list work in hand (decision 25) or a post's leaving it under half its hands (the
+# lead's ruling 11 of 2026-11-13). The readers of a hold ask which (the whole-change review of
+# 80e703c7, engine-1: `scripts._belay_held_work` and the reading 'the work in hand' were written
+# when a hold could only be a manoeuvre's, and read a post's as one).
+HELD_BY_BELAY = "belay"
+HELD_BY_POST = "post"
+
 # How many pieces of other work a log line names before it says "at other work".
 MAX_WORK_NAMED = 3
 
@@ -238,7 +246,9 @@ class Instance:
     script: Script | None = None
     order: int = 0
     waiting_for: str | None = None  # "hands" while it waits for hands; else None
-    paused: bool = False  # belayed while all hands are about ship (spec M3 §3.4)
+    paused: bool = False  # held, its progress kept (`Runner._hold`; why in `held_by`)
+    # why it is held while `paused` (`HELD_BY_BELAY`, `HELD_BY_POST`); None in a checkpoint written
+    # before it, read by `held_for`
     want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
@@ -253,6 +263,7 @@ class Instance:
     done_already: bool = False
     wait_line: str = ""  # the line it said when it first had to wait for hands
     given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
+    held_by: str | None = None
 
     def __setstate__(self, state: dict[str, Any]) -> None:
         """An instance read from a checkpoint. One taken on the trunk while all hands came up
@@ -287,6 +298,19 @@ class Instance:
                 if until_manned:
                     state["want"] = replace(want, calls_all_hands=True, until_manned=True)
         self.__dict__.update(state)
+
+    @property
+    def held_for(self) -> str | None:
+        """Why it is held, while it is (`paused`): a manoeuvre's belay or a post's leaving. In a
+        checkpoint written before the hold said why, scripted work was held only by a post's
+        leaving (a manoeuvre's belay holds step-list work alone) and step-list work by either; it is
+        read as the manoeuvre's, the only hold the trunk knew."""
+        if not self.paused:
+            return None
+        held_by = self.__dict__.get("held_by")
+        if held_by:
+            return str(held_by)
+        return HELD_BY_POST if self.script is not None else HELD_BY_BELAY
 
     @property
     def inst_id(self) -> str:
@@ -604,10 +628,15 @@ class Runner:
         either watch's three begin them by night at her nine as the starboard's three did at her
         eight, where the ninth hand had lifted the company's clamp on the file's twelve from six
         to seven). Every other ship and evolution, the file's own; a spec pickled before it, the
-        file's own."""
+        file's own. The ship's figure is a number of hands, and is read only over a file's number:
+        an all-hands line stays all hands whatever a ship file says (the whole-change review of
+        80e703c7, sources-3: `tack: 2` in a ship file made a tack numbered work of two)."""
         spec = getattr(ship, "spec", None)
         own = (getattr(spec, "hands", None) or {}).get(evo.id)
-        return {**evo.crew, "hands": own} if own else evo.crew
+        numbered = isinstance((evo.crew or {}).get("hands"), int) and not isinstance(
+            (evo.crew or {}).get("hands"), bool
+        )
+        return {**evo.crew, "hands": own} if own and numbered else evo.crew
 
     def _check_party(self, ship: Ship, inst: Instance) -> None:
         """An order that names its hands (`with the idlers`, `send the starboard watch
@@ -812,7 +841,10 @@ class Runner:
         the long-boat is away.") and laid a new plan over the old (a veer of twenty fathoms to
         fifty-eight where fifty-six were ordered): work paused and begun again as if new (the
         lead's (C1) of 2026-11-14). The file's `requires` hold through the work and are read
-        whenever it goes on."""
+        whenever it goes on, and with them what of the script's own conditions stands through it
+        (`Script.standing`: what the world can make false while the work is held and its own
+        going never does; the whole-change review of 80e703c7, sailing-2: a mast carried away
+        while her cutting away lay held was cut away again)."""
         env = self._env(ship, inst)
         inst.done_already = False
         for cond in conditions:
@@ -825,6 +857,10 @@ class Runner:
                 return self._format(inst, cond.reason)
         if inst.script is not None and not begun:
             return inst.script.check(self._format_context(inst))
+        if inst.script is not None:
+            standing = getattr(inst.script, "standing", None)
+            if callable(standing):
+                return standing(self._format_context(inst))
         return None
 
     # -- holds: which parts an evolution occupies ------------------------------
@@ -976,6 +1012,7 @@ class Runner:
         hands (the lead's ruling 11 of 2026-11-13; `_post_off`). Returns how many hands it let
         go."""
         work.paused = True
+        work.held_by = HELD_BY_POST if "post" in data else HELD_BY_BELAY
         let_go = hands.release(crew, work.inst_id)
         work.assignment = None
         ship.note(
@@ -1856,6 +1893,7 @@ class Runner:
             self._fail(ship, inst, reason)
             return
         inst.paused = False
+        inst.held_by = None
         inst.assignment = got
         if got.outcome == hands.SHORT:
             self._note_short(ship, inst, got)
@@ -1994,14 +2032,22 @@ class Runner:
         return f"the {part_name(self.ship, inst.subject_id)}"
 
     def _doing(self, inst: Instance) -> str:
-        """The work in hand: 'setting the fore topsail', 'tacking ship', and for work on the ship
-        whose file names it (`registry.Evolution.doing`) that name: 'laying out the kedge', where
-        the verb's gerund was the id with an ending, 'laying out kedge' (the lead's (C8) of
-        2026-11-14). Every reader of the work in hand's name reads it here: the belayed lines,
-        the captain's belay and its listing, the work the rest are at, the readings."""
-        doing = getattr(inst.evo, "doing", None)
+        """The work in hand: 'setting the fore topsail', 'tacking ship', and for work whose file
+        names it (`registry.Evolution.doing`) that name: 'laying out the kedge', where the verb's
+        gerund was the id with an ending, 'laying out kedge' (the lead's (C8) of 2026-11-14); for
+        a part's work the file's words before the part's name, 'cutting away the main mast' where
+        it was 'cutting away mast the main mast' (the whole-change review of 80e703c7,
+        sailing-5). The file's words are read from the registry by the work's id, so that work in
+        a checkpoint written before a file named it is named as the file names it now (engine-3:
+        a boat called on the trunk was 'sending boat', which the lookout's glass no longer read).
+        Every reader of the work in hand's name reads it here: the belayed lines, the captain's
+        belay and its listing, the work the rest are at, the readings."""
+        evo = registry.get(inst.evo.id) or inst.evo
+        doing = getattr(evo, "doing", None)
         if doing and isinstance(inst.subject, Ship):
             return doing
+        if doing:
+            return f"{doing} the {part_name(self.ship, inst.subject_id)}"
         first, _, rest = self._describe(inst).partition(" ")
         return f"{gerund(first)} {rest}".strip()
 

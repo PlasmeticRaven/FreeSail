@@ -1168,11 +1168,15 @@ frigate's scale.
 
 **As built (package 75; `docs/design/Build-Ships.md`, the ships' designs beside it, and
 docs/dev/TuningNotes.md, "Package 75, as built (Phase 5)").** Every ship is a file through the
-generator (`tools/gen_ships.py`, a module of her own under `tools/ships/` for each new ship),
-every figure with its source or marked judgement, and every file, the eight that were and the
-five new, now carries a hull profile from her own draught (the sheer, the stem and stern, the
-wales, the decks and every port's sill), drawn by the viewer. What was asked, against what was
-built:
+generator (`tools/gen_ships.py`, a module of her own under `tools/ships/` for each new ship):
+the five new files every figure with its source or marked judgement, the eight that were keeping
+their notes as filed (some figures from memory and marked UNVERIFIED, the frigate-36's quarterdeck
+INCORRECT against Winfield p. 143 and kept by the owner's ruling). Every file, the eight and the
+five, now carries a hull profile from her own draught or, where none survives, her type's (the
+smack's Chapman 1768 Pl. LIX No. 3, scaled; the bilander's Chapman Pl. LXII No. 5 at the plate's
+own scale, drawn as Gwyn's; the lugger's body below the water Le Coureur's, ZAZ6170, scaled): the
+sheer, the stem and stern, the wales, the decks and every port's sill, drawn by the viewer. What was
+asked, against what was built:
 
 - **The *Indefatigable*:** built as two files from her draughts, the 64 as she was
   launched (`sixty-four.yaml`, HMS *Indefatigable* of the *Ardent* class, 1784: 64 guns, the long
@@ -1235,11 +1239,17 @@ built:
   from an enemy ship of the line made out within two leagues), a two-decker made out "a ship of
   the line" at the rig's distance; a far ship of war that engages from her passage keeps her
   mark and takes up her passage after (truth 7-231); one road for the hands called when the
-  watch is too few; and the mends of the lead's two readings of the package's hash (one answer
-  to "is she still what I hold her to be" for every relation a ship holds; work paused taken up
-  where it stood). The generator writes all eighteen files byte for byte (truth 7-185). Its
-  truths are 7-185 to 7-199, 7-230 and 7-231, in `tests/test_known_truths.py`. What is left for
-  later packages is TuningNotes' one list ("Left for a later package").
+  watch is too few; and the mends of the lead's two readings of the package's hash and of the
+  whole-change review of it: one answer to "is she still what I hold her to be", asked in the
+  places the readings and the review found a relation held (the far rounds, both bodies' marks and
+  possessions, the prizes, the cover, the sets' support, the signals, a change of hands) and not
+  yet by the overmatched and man-of-war-near stimuli, a set's member gone from the sea, or a struck
+  commander's members on station (TuningNotes' one list); work held taken up where it stood, what
+  stands through it read again (`Script.standing`), and the ship's own work a post's leaving held
+  kept through coming to anchor and getting under way. The generator writes all eighteen files
+  byte for byte (truth 7-185). Its truths are 7-185 to 7-199, 7-230 and 7-231, in
+  `tests/test_known_truths.py`. What is left for later packages is TuningNotes' one list ("Left
+  for a later package").
 
 ### 28. The chart's next goal, and the signals' sources
 

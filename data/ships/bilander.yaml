@@ -1379,7 +1379,7 @@ armament:
           3: 1.0
         swivel:
           0.5: 0.125
-      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 1
       shot:
         3:

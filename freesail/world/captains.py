@@ -2337,9 +2337,21 @@ class Judgement:
         return min(enemies, key=lambda s: float(s["estimate_m"]))
 
     def _may_fight(self, s: dict[str, Any]) -> bool:
-        """Whether a sail is one the action may be fought with: not struck (package 74); the far
-        body's own asks the one answer (`brains.FarCaptain._may_fight`, `relations.MARK`)."""
-        return not self._stranger_struck(s)
+        """Whether a sail is one the action may be fought with, for both bodies: the one answer,
+        `relations.MARK` (the lead's readings of cda12ec9, (F3)), which `far_action._pairs` asks of
+        every far round: on the sea, her colours not struck, nobody's prize (a prize under a prize
+        crew is taken back by coming up, never fought) and none he knows of his own side, so that
+        the stimuli that take her into the action and out of it (`enemy in range`, `enemy out of
+        range`), the mark she takes in it (`_engaging_mark`, `Captain._mark`) and the order's 'her'
+        (`orders.gunnery._mark`) agree with the rounds. Asked by the far brain and the rules
+        captain alike (the whole-change review of 80e703c7, gundeck-2: the near body asked only
+        "not struck", and a crewed King's frigate engaged and fired into an enemy-held British
+        prize for an hour where the far body, by `MARK`, never fought her)."""
+        from freesail.world import relations as R
+
+        return R.still(
+            self.world, self._own_vessel_id(), str(s.get("id") or ""), R.MARK, judge=self
+        )
 
     def _man_of_war_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         """An enemy's man of war within the miles, by the lookout's words of her ('a
@@ -4222,8 +4234,9 @@ class Captain(Judgement):
         }
 
     def _mark(self, p: Perception) -> dict[str, Any] | None:
-        """The enemy engaged: the battery's mark if she is in sight, else the nearest
-        enemy within the breaking-off distance."""
+        """The enemy engaged: the battery's mark if she is in sight and still one he may fight
+        (`_may_fight`, the one answer: not struck, nobody's prize, not of his side), else the
+        nearest enemy within the breaking-off distance."""
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
         battery = (getattr(self.world.ship, "extra", None) or {}).get("battery")
@@ -4231,7 +4244,9 @@ class Captain(Judgement):
         if target is not None:
             for s in p.strangers:
                 if s.get("id") == target and s.get("estimate_m") is not None:
-                    return s
+                    if self._may_fight(s):
+                        return s
+                    break
         return self._enemy_within(p, float(th("break_off_nm", 2.0)))
 
     def _side_of_mark(self, p: Perception, s: dict[str, Any]) -> str:

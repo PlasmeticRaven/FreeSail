@@ -497,13 +497,18 @@ def test_the_second_of_two_ships_on_one_mark_gives_it_up_and_takes_her_passage_a
 
         monkeypatch.setattr(FA, "_strike", strike_unnamed)
     assert _until(w, lambda: b.struck, 40), (a.brain.state, c.brain.state)
+    # to whom she struck, read at the strike: the strike's record ends with her colours given her
+    # captor's (`prizes._set_colours`; the whole-change review of 80e703c7, engine-2), so that it
+    # is read here and no longer after the possession, as it was at 80e703c7
+    struck_to = b.damage.get("struck_to")
     held = {v.id: list(v.saved_plan or []) for v in (a, c)}
     assert all(held.values()) and all(v.brain._business.get(B.PASSAGE_HELD) for v in (a, c))
     assert _until(w, lambda: P.is_prize(b), 10)
     captor = w.vessels.get(P.record_of(b)["captor"])
     other = a if captor is c else c
     if road == "struck-to-the-other":
-        assert captor is w.vessels.get(b.damage["struck_to"])
+        assert struck_to and captor is w.vessels.get(struck_to)
+        assert "struck_to" not in b.damage  # ended with the strike
         assert "taking possession" not in [s for _, s in other.brain.history]
     else:
         assert other.brain.state == "taking possession" and other.brain._stranger == b.id
