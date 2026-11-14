@@ -2660,8 +2660,7 @@ class Harness:
         # current, so the entry's act is the game's and replays into the same log
         # (test_replay's fake captain of another ship: her acts are all hers)
         world = self.world
-        # the game's first hull, where the director's station is kept (package 60)
-        players = getattr(world, "first_hull", None)
+        players = getattr(world, "players", None)
         root = getattr(players, "world", None)
         if players is None or root is None:
             director_mod.log_of(world).append(world, text, kind=PROSE_KIND, by=self.station.name)

@@ -1119,6 +1119,7 @@ class Builder:
         self.hold_note: str = ""
         self.boat_notes: dict[tuple[str, ...], str] = {}
         self.oars_note: str = ""
+        self.timing_note: str = ""
         # package 75 (SW-4; Build-Ships.md §9.2): each lower mast's channel as (fore end,
         # after end), metres from the mast's own x, where her hull's module gives them from
         # her sheet; read by `pivot_arc_from_rig` alone and written to no file
@@ -1274,6 +1275,18 @@ class Builder:
             "tiring_h": tiring_h,
         }
         self.oars_note = note
+
+    def timing(self, note, figures):
+        """The `timing:` section (package 75, the lead's ruling (1) of 2026-11-10 at 19:30): the
+        ship's own figures for a scripted evolution's timing, {evolution id: {key: figure}}, in
+        its file's own keys, which the runner gives the script over the evolution file's
+        (`ShipSpec.timing`, `Runner._timing`); `note` above the section. A whole figure is
+        written as a whole number, as the evolution files write theirs."""
+        self.doc["timing"] = {
+            eid: {k: (int(v) if float(v).is_integer() else v) for k, v in keys.items()}
+            for eid, keys in figures.items()
+        }
+        self.timing_note = note
 
     def pumps(self, note, entries):
         """The `pumps:` list (package 73, spec M7 §13) from (id, kind, name, tons_per_hour,
@@ -1596,6 +1609,9 @@ class Builder:
                 ):
                     # the magazine's keys (practice and resupply, between packages 72 and 73)
                     note = armament_notes.get(("magazine", fit_name, m.group(1)))
+                elif re.match(r"^      marines:", line):
+                    # a fit's own marines kept (package 75, B1: the marines by fit)
+                    note = armament_notes.get(("fit", fit_name, "marines"))
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             if line.startswith("ground_tackle:"):
@@ -1614,6 +1630,9 @@ class Builder:
                 out.append("# " + self.hold_note)
             if line.startswith("oars:") and self.oars_note:
                 out.append("# " + self.oars_note)
+            # the ship's own timing figures (package 75, B7), noted as the hold is
+            if line.startswith("timing:") and getattr(self, "timing_note", ""):
+                out.append("# " + self.timing_note)
             if line.startswith("boats:"):
                 in_boats = True
                 note = self.boat_notes.get(("section",))

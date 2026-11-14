@@ -140,19 +140,6 @@ def boat_named(ship_hull: Any, words: str = "") -> Any:
 # ---------------------------------------------------------------------------
 
 
-def way_on_her(ship_hull: Any) -> str:
-    """The words refusing a boat hoisted out while she has way on her (more than
-    `HOIST_OUT_WAY_MS` through the water), or "" where she may hoist one out. Shared by
-    `man_boat` and package 60's transfer."""
-    way = abs(float(getattr(getattr(ship_hull.ship, "dyn", None), "u", 0.0) or 0.0))
-    if way > HOIST_OUT_WAY_MS:
-        return (
-            f"She has {units.ms_to_knots(way):.1f} knots of way on her; heave to or come to an "
-            "anchor before the boat is hoisted out."
-        )
-    return ""
-
-
 def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple[Any, str]:
     """The ship's boat manned as a hull of the world: (her hull, the words). Refused in
     words for a ship with no boat, a boat with no file of her own, a boat away on an
@@ -186,9 +173,12 @@ def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple
             f"{_cap(spec.name)} has no file of her own to be a vessel by: her errands are the "
             "script's ('send the boat ashore', 'send the boat to the <ship>')."
         )
-    refused = way_on_her(ship_hull)
-    if refused:
-        raise OrderError(refused)
+    way = abs(float(getattr(ship_hull.ship.dyn, "u", 0.0) or 0.0))
+    if way > HOIST_OUT_WAY_MS:
+        raise OrderError(
+            f"She has {units.ms_to_knots(way):.1f} knots of way on her; heave to or come to an "
+            "anchor before the boat is hoisted out."
+        )
     pos = getattr(ship_hull, "position", None)
     if pos is None:
         raise OrderError("The boat is hoisted out on the sphere alone; this world has no chart.")
@@ -935,13 +925,6 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
         if vessel is not None:
             vessel.done = True
         release_done(world)
-    saved = ""
-    if getattr(state, "load_of", 0):
-        # a load of a transfer in her or told off for her (package 60): never lost from every
-        # muster and log, nor a person left nowhere (`transfer.boat_lost`)
-        from freesail.world.transfer import boat_lost
-
-        saved = boat_lost(_root(world), ship_hull, state)
     when = world.clock.ship_time
     dealings.boat = BoatState(
         boat_name=name,
@@ -951,7 +934,7 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
         lost_words=f"{how} on the {when.day}{_th(when.day)}",
     )
     people_words = f"; {', '.join(lost)} lost with her" if lost else ""
-    text = f"{_cap(name)} {words or how}{people_words}{saved}. A new one is the yard's."
+    text = f"{_cap(name)} {words or how}{people_words}. A new one is the yard's."
     ship_hull.record(
         Severity.URGENT, "boat.lost", text, data={"how": how, "lost": lost, "boat": state.boat_id}
     )

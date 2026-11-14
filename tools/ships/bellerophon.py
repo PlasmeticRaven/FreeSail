@@ -19,7 +19,9 @@ the studding sails, the storm and occasional canvas, the groups and the aliases 
 three fits with their magazines (§5); her company of 590, her marines, her quarter bill with the
 marines it keeps, her flag party, her people file's posts and drawn roles (§6); her stores, sail
 room, ground tackle, boats, pumps and hold (§7); her description (§8). Her bill by deck (B7.b,
-§6.4) is her step 6's and reads the bill's `marines`, which nothing reads before it.
+§6.4) is her step 6's and reads the bill's `marines`, which nothing reads before it. At her step 7
+(B7.d, §5.2, on the lead's word) her guns are numbered by deck, each deck from No. 1, their ids
+re-keyed by deck and her armament's `numbering` set, the 64's with hers.
 
 **The frame (Bel-D §1.4).** The figures at the top are in the drawings' own frame, as the sources
 give them: feet forward of AP (ZAZ1357's red dashed after perpendicular) and feet above WL1 (its
@@ -627,10 +629,11 @@ STEEL_DRIVER = (25.5, 32.5, 11.0, 24.0)
 # The mizen course's tack (Bel-D §4.5; task 5): set so that the throat stands where Lavery's I32
 # (her class's mizen course and yard: the owner's photograph) draws it, about 42 ft above the deck
 # the mast stands through, Steel's 11-yard fore leech below it: 9 ft above that deck. Bel-D §4.5
-# read the deck as her quarterdeck, her poop then judged to end abaft the mizen; task 5 measured
-# the poop over the mizen to 36.75 ft, and I32 draws its deck running unbroken from the taffrail
-# past the mast, so the deck is her poop, its middle line at the mast, where the tack is seized
-# (judgement on the design's lean, for the lead: the figures of the other readings are in the
+# first named the deck her quarterdeck, her poop then judged to end abaft the mizen; task 5
+# measured the poop over the mizen to 36.75 ft, and I32 draws its deck running unbroken from the
+# taffrail past the mast, so the deck is her poop, its middle line at the mast, where the tack is
+# seized: the lead's ruling (2) of 2026-11-10, the design's "quarterdeck" the slip and Steel's
+# "within 6 or 7 feet" the general rule beside it (the figures of the other readings are in the
 # generator's report).
 MIZEN_TACK_ABOVE_DECK_FT = 9.0
 # The head room the driver's boom stands above the poop's middle line over its run, where the boom
@@ -1516,13 +1519,13 @@ def mizen_course(b, mz, rope_scale):
         "(tools/ships/mizen_yard.py); corners [tack, throat, peak, clew]. Its tack 9 ft above her "
         "poop at the mast, so that its throat stands where Lavery's I32, her class's mizen course "
         "and yard, draws it, about 42 ft above the deck the mast stands through (Ext §2, §17.1), "
-        "Steel's 11-yard fore leech below it (Bel-D §4.5). Plainly: Bel-D §4.5 read that deck as "
-        "her quarterdeck, her poop then judged to end abaft the mizen; her poop is measured over "
-        "the mizen to 36.75 ft from AP, and I32 draws its deck running unbroken from the taffrail "
-        "past the mast, so the 9 ft are taken above the poop (judgement, for the lead). Steel's "
-        "'within 6 or 7 feet of the deck' (OCR l. 11441-11442) is the other reading. One reef band "
-        "a fifth up its mast leech (Steel, OCR l. "
-        "11448)." + g.canvas_note(canvas),
+        "Steel's 11-yard fore leech below it (Bel-D §4.5). Plainly: Bel-D §4.5 first named that "
+        "deck her quarterdeck, her poop then judged to end abaft the mizen, the slip (the lead's "
+        "ruling (2) of 2026-11-10): her poop is measured over the mizen to 36.75 ft from AP, and "
+        "I32 draws its deck running unbroken from the taffrail past the mast, so the 9 ft are "
+        "taken above the poop, as ruled. Steel's 'within 6 or 7 feet of the deck' (OCR l. "
+        "11441-11442) is the general rule beside it. One reef band a fifth up its mast leech "
+        "(Steel, OCR l. 11448)." + g.canvas_note(canvas),
     )
     # the lines of Ext §3.4: the 64's sizes (Steel's 64 list, read in part) scaled from her rope to
     # hers (judgement: Steel's 74 list, vol. II p. 37, held as a page image, is not read here to its
@@ -2485,12 +2488,16 @@ FIT_1793 = "arrogant class 1793"
 FIT_1795 = "arrogant class 1795"
 FIT_1812 = "as the bellona 1812"
 DEFAULT_FIT = FIT_1795
-# Her guns' numbers (Bel-D §5.2): on across her decks from forward, the lower deck first, each
-# deck's places from forward: the lower 1-14, the upper 15-28, the quarterdeck 29-35, the
-# forecastle's two ports 36-37 and the 1795 carronade's place over its rail 38, the poop's three
-# places 39-41. A place keeps its number in every fit; a fit that leaves a place empty leaves a
-# gap.
-FIRST_NUMBER = {"lower": 1, "upper": 15, "quarterdeck": 29, "forecastle": 36, "roundhouse": 39}
+# Her guns' numbers (Bel-D §5.2; B7.d, on the lead's word, (3) of the answers to her §17.2): by
+# deck, each deck's places from forward from No. 1, as the period numbered each deck (the
+# Regulations 1808 printing, the Gunner, p. 215): the lower 1-14, the upper 1-14, the
+# quarterdeck 1-7, the forecastle's two ports 1-2 and the 1795 carronade's place over its rail 3,
+# the poop's three places 1-3; her armament's `numbering` says so, and each gun's id names its deck
+# (`gun.lower.3.starboard`). A place keeps its number in every fit; a fit that leaves a place
+# empty leaves a gap. Before B7.d she numbered on across her decks, the lower deck first (lower
+# 1-14, upper 15-28, quarterdeck 29-35, forecastle 36-38, poop 39-41).
+GUN_DECKS = ("lower", "upper", "quarterdeck", "forecastle", "roundhouse")
+NUMBERING = "by deck"
 # Bel-D §1.5's figures for each fit, raised on before her file is written: its pieces, and its
 # broadside by 70's rule (one side's broadside guns and every chaser: combat/far.py), James's 781
 # and 867 lb (vol. 1, Abstracts No. 1 and 3, page images) and the 1812 list's 938 (Bel-D §5.5).
@@ -2509,7 +2516,10 @@ ARMAMENT_NOTE = (
     "forecastle a long 9 or 12 in the wake of the shrouds and a 32-pounder carronade elsewhere, "
     "the long guns within four, at most six, of those established (the order of 17 March 1797, "
     "James vol. 2 pp. 119-120); on the poop none to six carronades; the two gun decks' 56 fixed. "
-    "Every figure's source is in tools/ships/bellerophon.py."
+    "Numbered by deck, each deck's pairs from No. 1 forward as the period numbered each deck (the "
+    "Regulations 1808 printing, the Gunner, p. 215), a pair keeping one number where the period "
+    "numbered each gun, so her gun is said with its deck; the `numbering` below says so (Bel-D "
+    "§5.2, B7.d). Every figure's source is in tools/ships/bellerophon.py."
 )
 
 
@@ -2529,19 +2539,27 @@ def long_cwt(pounder, length, of_1812=False):
 
 def places_of(profile):
     """Each deck's places from forward as (number, x, sill), metres as the profile has them, so
-    that a gun on one stands on its triple (Build-Ships.md §4.4), numbered by `FIRST_NUMBER`."""
+    that a gun on one stands on its triple (Build-Ships.md §4.4), numbered by deck from No. 1
+    (`GUN_DECKS`, B7.d)."""
     out = {}
-    for deck, first in FIRST_NUMBER.items():
+    for deck in GUN_DECKS:
         ports = sorted(profile["ports_m"][deck], key=lambda t: -t[0])
-        out[deck] = [(first + i, x, sill) for i, (x, sill, _hb) in enumerate(ports)]
+        out[deck] = [(1 + i, x, sill) for i, (x, sill, _hb) in enumerate(ports)]
     return out
+
+
+def by_deck_id(gun):
+    """A gun's id with its deck (Bel-D §5.2 item 2, B7.d): `gun.lower.3.starboard`, since each deck
+    has its own No. 3 and `g.broadside_pair` writes `gun.3.starboard`."""
+    return f"gun.{gun['deck']}.{gun['number']}.{gun['side']}"
 
 
 def pairs(places, deck, kind, pounder, cwt, note):
     """Broadside pairs at `places`, each gun on its triple to the centimetre with its deck named,
     its crew the period's to the pair (Bel-D §5.3): Falconer's for a long gun "when the ship is well
     manned, so as to fight both sides at once occasionally" (1780, QUARTERS), Douglas's four for a
-    carronade of any nature (1829, art. 136); the note on the first."""
+    carronade of any nature (1829, art. 136); the note on the first. Each id re-keyed by its deck
+    after the call (`by_deck_id`), as the crew is."""
     crew = period.FALCONER_CREW[pounder] if kind == "long" else period.DOUGLAS_CARRONADE_CREW
     out = []
     for i, (number, x, sill) in enumerate(places):
@@ -2549,6 +2567,7 @@ def pairs(places, deck, kind, pounder, cwt, note):
             number, kind, pounder, cwt, x, sill, note if i == 0 else None, deck=deck, round_to=0.01
         )
         for gun, _ in made:
+            gun["id"] = by_deck_id(gun)  # reassigned, so that the key keeps its place
             gun["crew"] = crew  # reassigned, so that the key keeps its place (Indf §5.2)
         out += made
     return out
@@ -2572,10 +2591,9 @@ def her_fits(profile):
         "The lower deck's twenty-eight long 32-pounders, fourteen a side: the 9 ft 6 in gun of 55 "
         "cwt (Adye 1804 p. 155; Lavery 1985 p. 21, Table 17, 1760-1812; answer 12), each on its "
         "port, its x and its sill to the centimetre (Bel-D §5.2); thirteen men to the pair, who "
-        "fight whichever side bears (Falconer 1780, QUARTERS). Numbered from forward and on "
-        "across her decks, the lower deck first, so that her lower deck's pairs run from No. 1 "
-        "forward as the period's numbering began; the period numbered each deck from No. 1, a gun "
-        "at a time (the Regulations 1808 printing, the Gunner, p. 215: Bel-D §5.2).",
+        "fight whichever side bears (Falconer 1780, QUARTERS). Numbered by deck from forward, "
+        "each deck from No. 1 as the period numbered each deck, a gun at a time, where a pair here "
+        "keeps one number (the Regulations 1808 printing, the Gunner, p. 215: Bel-D §5.2, B7.d).",
     )
     upper_40 = pairs(
         p["upper"],
@@ -2774,8 +2792,9 @@ def broadside_lb(guns):
 
 def check_fits(fits, profile):
     """Bel-D §1.5's checks on her guns, raised before her file is written: every broadside gun of
-    every fit on a triple of its deck to the centimetre, its deck named (Build-Ships.md §4.4);
-    the pieces of each fit 74, 82 and 78, and the broadsides by 70's rule 781, 867 and 938 lb."""
+    every fit on a triple of its deck to the centimetre, its deck named (Build-Ships.md §4.4), its
+    id its deck's, number's and side's (B7.d); the pieces of each fit 74, 82 and 78, and the
+    broadsides by 70's rule 781, 867 and 938 lb."""
     triples = {
         deck: {(round(x, 2), round(s, 2)) for x, s, _ in t}
         for deck, t in profile["ports_m"].items()
@@ -2788,6 +2807,8 @@ def check_fits(fits, profile):
                     f"her fit '{name}' puts {gun['id']} at x {gun['x_m']} m, {gun['height_m']} m "
                     f"above her water, on no triple of its deck ({deck})."
                 )
+            if gun["id"] != by_deck_id(gun):
+                raise ValueError(f"her fit '{name}' keys {gun['id']}, not {by_deck_id(gun)}.")
         pieces, lb = len(guns), broadside_lb(guns)
         if (pieces, lb) != FIT_FIGURES[name]:
             raise ValueError(
@@ -2804,7 +2825,9 @@ def default_guns(fits):
 def armament(b, fits):
     """Her fits and their magazines (Bel-D §5.4): `fit_magazine` with the King's allowance
     (judgement, as every King's file), the charges Table No. 29's through `charge_lb` (SW-1),
-    the exercise a two-decker's, a third of her upper deck's guns."""
+    the exercise a two-decker's, a third of her upper deck's guns. Her guns numbered by deck
+    (B7.d): the armament's `numbering` set after the call, the generator's own taking no such
+    key (Bel-D §12.1), its words in the section's note."""
     exercise = g.exercise_allowance(UPPER_DECK_GUNS, decks=2)
     rounds = {"long": g.KINGS_ROUNDS, "carronade": g.KINGS_ROUNDS}
     b.armament(
@@ -2815,6 +2838,7 @@ def armament(b, fits):
             for name, source, guns, note in fits
         ],
     )
+    b.doc["armament"]["numbering"] = NUMBERING
     for name, *_ in fits:
         b.armament_notes[("magazine", name, "exercise_charges")] = period.TWO_DECKS_EXERCISE_NOTE
     REPORT["fits"] = {
@@ -3507,6 +3531,24 @@ DESCRIPTION = (
 # The file
 # ---------------------------------------------------------------------------
 
+# Her lee helm lying a-try (the lead's ruling (1) of 2026-11-10 at 19:30, B7: lie a-try from way
+# on), `lie_a_try`'s own timing key on her file (`ShipSpec.timing`): the evolution's 5 degrees
+# left her lying 86.5 to 101.4 degrees off at 3.57 kn from way on in 35 kn, and 87.6 at 3.52 with
+# what it hands furled, where she lies about five points at 1.30 kn from rest. Measured (seed 7;
+# docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built"): with what lie a-try hands
+# furled, the least helm that settles her inside five to six and a half points under 2 kn is 17.5
+# (70.6 at 1.96 kn), 19 lies 68.9 at 1.91 and 20 lies 67.6 at 1.88; from rest truth 28's form
+# holds at every figure to 35. 20 taken (judgement), Luce's "helm a-lee" a little more than the
+# frigate's: her clr_x_m (4.8) and truth 17 as the lead has them.
+LIE_A_TRY_HELM_DEG = 20
+LIE_A_TRY_NOTE = (
+    "Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the "
+    "helm a-lee 20 degrees where the evolution's file gives 5, the figure that brings her up from "
+    "way on in a gale to six points with under 2 knots of way once what it hands is furled, where "
+    "at 5 she lay eight points off at 3.5 knots; from rest she lies five points as before "
+    "(measured: docs/dev/TuningNotes.md; judgement)."
+)
+
 ERA_NOTES = (
     "HMS Bellerophon, a 74-gun ship of the Arrogant class (Slade's design of 1758 on the Bellona's "
     "lines): ordered 1782, launched by Graves at Frindsbury in 1786, at the Glorious First of "
@@ -3954,6 +3996,7 @@ def write(out_dir):
     check_company(b)
     boats_pumps_hold(b)
     b.descriptions([DESCRIPTION])
+    b.timing(LIE_A_TRY_NOTE, {"lie_a_try": {"helm_deg": LIE_A_TRY_HELM_DEG}})
     b.dump(os.path.join(out_dir, "seventy-four.yaml"), HEADER)
 
 

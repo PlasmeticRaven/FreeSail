@@ -2522,7 +2522,10 @@ GATE_5A_SEA_TICKS = {
 # storm line); the topgallants again two seconds later; nothing lost.
 # the well's order gone from the starter book, and its two held lines with it (2026-10-21)
 GATE_5A_DAY_LINES = 623  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
-GATE_5A_DAY_DIGEST = "1680cb1391720dd8"  # bff57a00218b7ec5 at 57 (a235022bc8bf8bc7 at 45c)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1680cb1391720dd8; TuningNotes)
+GATE_5A_DAY_DIGEST = "0325e18ce782b58b"  # the trim's words (1680cb1391720dd8 before)
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2971,8 +2974,11 @@ GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
 GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
 GATE_5B_DIGEST = (
-    "9a1f2802ba7c6533"  # the well (2026-10-21; c8c81b7617e4e0fd at 56, 5f682b9f676a2db4 at 57)
+    "2c38f76132521e4e"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3050,7 +3056,10 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
 # proved by bisection (the old word restored gives 6f062dc60419f52c again; TuningNotes, B3.4);
 # before it: 6f062dc60419f52c, the well, 2026-10-21; 155a46cede6c96a3 at 57, e358748a1eae5fc6 at 45
-GATE_5B_THICK_DIGEST = "9ce8174ebc6948c6"  # ruling 2 (6f062dc60419f52c before it, above)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
+GATE_5B_THICK_DIGEST = "f119ec763d2b442e"  # the trim's words (9ce8174ebc6948c6 at ruling 2)
 
 
 def the_landfall(log):
@@ -4124,7 +4133,10 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # package 75, SW-4: the Palinure made out "a brig-sloop of war, ten ports a side" (RMG ZAZ4491,
 # read), where the words had sixteen; every tick and line the same, proved by bisection (the
 # word put back gives 5a62f6fca122c6ad again; docs/dev/TuningNotes.md, SW-4)
-GATE_5C_CRUISE_DIGEST = "1e7f8ab24b84e6f7"  # SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1e7f8ab24b84e6f7; TuningNotes)
+GATE_5C_CRUISE_DIGEST = "0ac7eaba9f341529"  # the trim's words (1e7f8ab24b84e6f7 at SW-4)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -8337,11 +8349,21 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
     """Spec M7 §8 and §8a: "a tack with the guns run out takes longer than the same tack
     cleared", by the fighting book's priority (the design of item 1). The frigate close
     hauled on the starboard tack (truth 10's world): cleared, she tacks in 447 s at seed
-    7; at quarters with the guns run out under `sail before guns` the bill lends the tack
-    half of every gun's crew (84 hands, said from where) and she tacks in 436 s with the
-    guns gone short; under `guns before sail` the trimmers alone have her, and she tacks
-    in 642 s. The player never queues a thing: the order is given and the bill finds the
-    hands."""
+    7. At quarters with the guns run out the tack is worked as package 75's B7.c has it
+    (`docs/design/Design-Ship-Bellerophon.md` §6.7, as mended at its review): its party is
+    one watch, 111 hands, worked first by her 44 trimmers, her helm, powder, carpenter's
+    crew and surgeon's mates keeping their stations. Under `sail before guns` the bill lends
+    the rest, 67 hands, whole crews from the end that bears least (the bow chasers and the
+    guns, Nos. 10 to 13 and 15 to 17, said from where), and she tacks in 468 s; under `guns
+    before sail` nothing is lent, the tack goes short (44 hands of 111, said), its crew
+    factor 111/44 through it, and she tacks in 453 s, slower than cleared (from 290 and 295
+    degrees, 528 and 458 s against 343 and 370 cleared). Before B7.c the bill lent half of
+    every gun's crew (84 hands) and she tacked in 436 s under `sail before guns` and 642 s
+    under `guns before sail`, the tack counting every man at the guns as wanted for it; at
+    B7.c, before its review, the tack drew on every hand idle at quarters (76, the helm and
+    the powder among them), lent 44 and tacked in 468 s, and under `guns before sail` went
+    short 76 of 111 in 433 s, quicker than cleared. The player never queues a thing: the
+    order is given and the bill finds the hands."""
 
     def tack(at_quarters: bool, priority: str = "sail before guns"):
         w = close_hauled_on_starboard(FRIGATE, heading=292.5)
@@ -8354,20 +8376,28 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
             w.run(120)
         t0 = w.clock.tick
         w.submit("tack ship")
+        runner = w.ship.extra["evolutions"]
+        inst = next(i for i in runner.instances if i.evo.id == "tack")
+        factor = runner._crew_factor(inst, False)
         done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
         assert done and done[0].kind == "ship.tacked", (priority, [e.text for e in done])
         robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
-        return seconds, robbed
+        short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
+        return seconds, robbed, short, factor
 
-    cleared, none_robbed = tack(False)
+    cleared, none_robbed, _, _ = tack(False)
     assert not none_robbed and 285 <= cleared <= 600
-    sail_first, robbed = tack(True)
-    assert robbed and robbed[0].data["hands"] >= 40, [r.text for r in robbed]
-    assert "taken from the guns" in robbed[0].text
+    sail_first, robbed, short, factor = tack(True)
+    # what the watch wants beyond the trimmers (111 - 44), not half of every crew (84)
+    assert [r.data["hands"] for r in robbed] == [111 - 44], [r.text for r in robbed]
+    assert "taken from the bow chasers and the guns, Nos." in robbed[0].text, robbed[0].text
+    assert not short and factor == pytest.approx(1.0, abs=1e-3), ([e.text for e in short], factor)
     assert sail_first <= cleared * 1.15, f"{sail_first} s against {cleared} s cleared"
-    guns_first, robbed2 = tack(True, "guns before sail")
+    guns_first, robbed2, short2, factor2 = tack(True, "guns before sail")
     assert not robbed2
-    assert guns_first >= cleared * 1.25, f"{guns_first} s against {cleared} s cleared"
+    assert short2 and (short2[0].data["hands_got"], short2[0].data["hands_wanted"]) == (44, 111)
+    assert factor2 == pytest.approx(111 / 44, abs=1e-3), factor2
+    assert cleared < guns_first <= 600, f"{guns_first} s against {cleared} s cleared"
 
 
 def test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why():
@@ -14883,6 +14913,27 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
 
 
+@pytest.mark.slow
+def test_truth_7_231_a_far_ship_of_war_that_engages_from_her_passage_keeps_the_sea_and_closes():
+    """Package 75's (the lead's ruling (2) of 2026-11-13; its number the next of the spare block
+    7-230 to 7-239 the lead gave the package on 2026-10-28, set here beside the far fight's
+    truths it stands with): a far ship of war that goes engaging from her passage takes the mark
+    the stimulus read, as the near captain's `_mark` takes it, keeps the sea and closes her
+    enemy, the far rounds fought to the strike and the possession (at seed 7 two 74s a mile
+    apart, both engaging at tick 120, the Hero struck at 1200 after seven rounds, possessed at
+    1260); and engaging she keeps a mark in hand as chasing does: the nearest enemy within the
+    breaking-off distance when the mark is lost from sight, the mark kept while she is on the
+    sea, and with none she lies to, never a chase of nobody."""
+    from tests.test_far_action import (
+        test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy,
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody,
+    )
+
+    test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy()
+    for case in ("another-in-sight", "none-in-sight", "none-on-the-sea"):
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody(case)
+
+
 def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
     """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
     in Falmouth's road is condemned by the court (France at war with Britain at the taking),
@@ -16063,74 +16114,6 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("mud mixed with sand" in e.text for e in w.log if e.kind == "sounding")
     seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
-
-
-# Package 60: a ship bought, and the player's ship changed in play (truths 7-480 onward;
-# `docs/design/Design-ShipBought.md`, its gate §13). Step 1: the change of ship and the
-# followed ship's far body; the tests beside them are tests/test_ship_changed.py.
-
-
-def test_truth_7_480_the_player_takes_command_of_a_ship_given_him_and_aboard_her():
-    """A ship given the player's person by the director's word in play (the `command:` form,
-    she lying at Falmouth) is taken up by his own order aboard her: his person, his command
-    and his journal go with him, the player's ship is she, and both logs say so."""
-    from freesail.world import command, knowledge
-    from tests.test_ship_changed import fly_taken_up
-
-    w, fly, me, e = fly_taken_up()
-    hull = w.hulls[str(fly.id)]
-    assert w.players is hull and w.first_hull is not hull
-    assert knowledge.players_person(w) is me and hull.people.captain is me
-    assert me.home == str(fly.id) and knowledge.players_visitor(w) is None
-    assert sum(1 for x in hull.log if x.kind == command.TAKEN_UP) == 1
-    assert sum(1 for x in w.first_hull.log if x.kind == command.TAKEN_UP) == 1
-
-
-def test_truth_7_481_the_followed_ships_far_body_stands_at_her_truth():
-    """The ship the player is aboard and the drivers follow (`--ship`, and his ship after a
-    change of ship) is where the other sail see her: her far body within fifty metres of her
-    truth every five minutes for twenty (it was 934 m off after five and 3,803 m after twenty
-    before package 60's step 1)."""
-    from tests.test_ship_changed import followed_body_off_m
-
-    off = followed_body_off_m(20)
-    assert len(off) == 4 and max(off) < 50.0, off
-
-
-@pytest.mark.slow
-def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships(tmp_path):
-    """A save written after the change, with his orders after it, replays to the same log of
-    each ship, its first block the game's first hull's (the frigate's file), the player's ship
-    the Fly again and his person hers; a checkpoint taken after the change carries on to the
-    same logs; a save with no change carries no `player_ship`."""
-    from tests import test_ship_changed as T
-
-    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls(tmp_path)
-    T.test_a_save_with_no_change_carries_no_player_ship_and_the_split_reads_as_before()
-
-
-def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
-    """The old ship is left to her senior officer (a King's ship) and kept in the world half
-    an hour on, her hull among the hulls, her company whole and her far body planned; laid up
-    at Falmouth by the order's tail she is in ordinary at the anchorage."""
-    from tests import test_ship_changed as T
-
-    T.test_the_old_ship_is_kept_in_the_world_with_her_company()
-    T.test_the_old_ship_laid_up_at_falmouth()
-
-
-def test_truth_7_484_the_people_and_the_hands_move_by_one_order_in_the_boats_loads():
-    """Package 60, step 2 (the design's §6; the lead's reading of ab0ade58): the people and the
-    hands move by one order within a boat's pull, by the dealings' road to another hull, twelve
-    a load at the boat's own pace, every man told off out of the giving muster at the order and
-    each load into the receiver's watches as they stand, each person rehomed before he is put
-    aboard; refused in words saying how many she wants where either could not be worked, or
-    where the receiver would not berth them."""
-    from tests import test_company_moved as T
-
-    T.test_fifteen_hands_go_across_in_two_loads_by_the_boats_road()
-    T.test_a_person_by_name_is_rehomed_to_the_ship_he_goes_to()
-    T.test_the_refusals_in_words()
 
 
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])

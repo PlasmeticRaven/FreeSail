@@ -17882,6 +17882,1156 @@ base's runs throughout (the slow candidates 2,878 s against 1,874; the captain's
 Junit: `scratchpad/b7/final-slow.xml`, `scratchpad/b7/final-fast.xml`; the logs and comparisons under
 `scratchpad/b7/final/`. Not run: the pace tier beyond the slow candidates' pace tests.
 
+### B7.c, the tack at quarters (2026-11-11)
+
+*Mended at its review (2026-11-11): the tack's pool kept to the trimmers and the marines' division,
+the line's count, truth 7-136 again and truth 7-196 passing on its places; below, "Package 75, B7's
+review mends". The figures here are B7.c's as committed at 69121a9e.*
+
+**The step**, on the lead's word ((4) of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md`:
+"B7.c, its own commit, bisected, old beside new for 7-136 and every file's tack at quarters; the lead
+reads the moved pins before the merge"): Bel-D §6.7's rule in `freesail/evolutions/runner.py`, the file
+allotted for the step, returned at its merge.
+
+- **The party** (`_quarters_party`): every all-hands request at quarters (a manoeuvre, the masts and
+  all-hands sail work, every request the share's branch took) is given a party, the hands the same work
+  takes at sea in one watch: the watch on deck and, by day, the idlers, as the watch bill has the deck
+  with no call (`_one_watch`: `bill.watch_on_deck`, `bill.idlers_up`), each fit for the work
+  (`hands.can_work`), or the file's own party where that is less. The guns' own work (`QUARTERS_OWN`)
+  as before. The instance's own request is untouched; the party rides on the assignment, as package
+  31b's does, so nothing new is pickled.
+- **The one condition** (`_rob_the_guns`): an all-hands request with hands enough returns at once,
+  and one short is lent by the numbered path, §6.4's order (the swivels and the chasers, then whole
+  crews from the end that bears least, a `lower` deck last), only what its party wants beyond the hands
+  idle at their quarters. The share's branch (half of every crew, `TOLD_OFF_SHARE`) is gone from it.
+- **Under "guns before sail"** nothing is lent, as before; the tack goes short of its party and says so
+  ("Only 76 hands to tack ship; there are no more on deck.").
+- **The tack's script** (`TackScript`) reads the crew factor the runner hands it and nothing of the
+  hands, so nothing of `evolutions/scripts.py` changed. With exactly its party the factor is 1.0, the
+  cleared tack's.
+- **Nothing away from quarters moves:** both methods return what they were given unless the ship is at
+  quarters, and a numbered request at quarters goes as before (its condition was already this one).
+  Every file's cleared tack below is the same to the second before and after.
+
+**Judgement, said:** "one watch" is read as the bill's deck with one watch. The call at sea turns up a
+third of the watch below at once, so a cleared tack begins with more (the frigate 158 against her watch
+of 111, the 74 370 against 268); read so, the frigate's tack would want 82 from her guns, not 35.
+
+**Every armed file's tack at quarters, before and after** (truth 7-136's world: seed 7, 15 kn,
+close-hauled on the starboard tack, the guns cast loose, loaded and run out, the priority given and two
+minutes run, then "tack ship"; 04:22 ship's time, the starboard watch on deck, the idlers below;
+seconds from 290, 292.5 and 295 degrees, the hands lent in brackets; before on the head 9c812f43, after
+on the same tree with this step's `runner.py`, by the same script, `scratchpad/s7/tackq.py`):
+
+| File | Party (one watch) / idle at quarters | Cleared | Sail before guns, before | After | Guns before sail, before | After |
+|---|---|---|---|---|---|---|
+| seventy-four | 268 / 196 | 237, 243, 258 | 382, 386, 405 (175) | 237, 243, 258 (72) | 479, 531, 556 | 331, 334, 391 |
+| sixty-four | 218 / 181 | 244, 251, 266 | 362, 368, 401 (135) | 244, 251, 266 (39) | 437, 500, 520 | 295, 298, 350 |
+| frigate-36 | 111 / 76 | 343, 447, 370 | 424, 436, 455 (84) | 334, 468, 469 (44) | 614, 642, 660 | 436, 433, 453 |
+| razee-44 | 146 / 125 | 435, 427, 484 | 534, 536, 538 (89) | 435, 427, 484 (29) | 567, 558, 560 | 499, 501, 502 |
+| brig | 48 / 61 | 440, 454, 455 | 494, 494, 495 (22) | 440, 454, 455 (none) | 269, 551, 552 | 440, 454, 455 |
+| hermaphrodite-brig | 55 / 76 | 192, 189, 193 | 173, 172, 178 (20) | 192, 189, 193 (none) | 229, 229, 221 | 192, 189, 193 |
+| cutter | 12 / 15 | 107, 106, 106 | 116, 114, 115 (6) | 107, 106, 106 (none) | 129, 129, 128 | 107, 106, 106 |
+| privateer-schooner | 17 / 16 | 142, 142, 142 | 154, 155, 157 (8) | 142, 142, 142 (1) | 178, 177, 176 | 142, 142, 142 |
+| merchant-brig | — | no tack ended in 1,200 s | the same | the same | the same | the same |
+
+**Her tack at quarters** under "sail before guns" is her cleared tack to the second (1.57-1.61 times
+before), gaining to windward as cleared (105, 95 and 69 m; before 32, 28 and -23); under "guns before
+sail" 1.37-1.52 times (2.02-2.19 before), gaining 75, 71 and -7 m (before -63, -99 and -130). The 64 as
+she: 1.00 and 1.19-1.32 times (before 1.47-1.51 and 1.79-1.99). The robbed lines from 292.5 degrees,
+after: hers "Tacking ship at quarters: 72 hands taken from the poop, Nos. 39 to 41, the upper deck, Nos.
+25 to 28, and the quarterdeck, Nos. 32 to 35; the guns go on short-handed." (her lower deck untouched);
+the 64's "39 hands taken from the upper deck, Nos. 24 to 26, and the quarterdeck, Nos. 30 to 31"; the
+frigate's "44 hands taken from the bow chasers and the guns, Nos. 12 to 13 and 16 to 17"; the razee's
+"29 hands taken from the bow chasers and the guns, Nos. 13 and 19"; the privateer's "one hand taken from
+the swivels". Before, every one "N hands taken from the guns, half of each crew", and each tack began
+short, wanting every fit hand aboard (the 74 574, the frigate 252). The brig, the hermaphrodite brig and
+the cutter lend nothing now: the hands idle at their quarters make a watch. The merchant brig's tack
+never begins in this world, before or after (her plain sail still setting short-handed, the tack
+waiting), and is no measure of the rule.
+
+**The frigate's knife-edge:** her crew factor is 1.0 through both her cleared tack and her tack at
+quarters, but her state at the order is not quite the cleared one's (from 292.5 degrees heeled 3.567
+against 3.593 degrees, 2.613 against 2.575 m/s, after six minutes more sailing with her guns run out),
+and her way out of stays is truth 10's knife-edge: 334, 468 and 469 s against 343, 447 and 370. The
+razee's state at the order is her cleared state to the third place, and so are her tacks.
+
+**Truth 7-136, old beside new** (`tests/test_known_truths.py`; slow by `tests/conftest.py`'s
+`SLOW_TESTS`, run by its node id):
+
+- Cleared 447 s, banded 285-600 s: the same.
+- "Sail before guns": 84 hands lent, "taken from the guns" (half of each crew), 436 s within 1.15 times
+  cleared, **to** 44 hands, asserted from 35 (the rest of the watch, 111 less 76) to under 84 (half of
+  every crew), "taken from the bow chasers and the guns, Nos.", no short line, 468 s within 1.15 times
+  cleared (held).
+- "Guns before sail": nothing lent, 642 s at least 1.25 times cleared, **to** nothing lent, the tack
+  short 76 of 111 (the line's figures asserted), 433 s, asserted within 285-600 s (truth 10's band).
+  The old clause cannot hold: from 292.5 degrees the factor 111/76 = 1.46 on her braces carries her
+  through stays in 433 s against 447 cleared; from 290 and 295 she is 1.27 and 1.22 times cleared.
+- Its docstring carries the figures, old and new.
+
+**Pins moved, old beside new:** truth 7-136 (above). **New** (`tests/test_bellerophon.py`, "Her tack at
+quarters"): the party and the hands lent at the order for her, the 64 and the brig under both
+priorities (six cases, 2.8-3.9 s at four workers), and her tack at quarters beside her cleared tack, 243 and 243
+s, asserted within 1.05 times (7.3 s alone, so in `SLOW_TESTS`); her module's docstring names step 7.
+
+**Bisected:** the head 9c812f43 and this commit differ in code by `runner.py` alone; every "before"
+figure above is the head's, every "after" this step's tree, by the same script and seed.
+
+**Truth 7-196's crewed clause moved by the step** (`tests/test_bellerophon.py`, routed to the pace run):
+her 74s engage the frigate there (no private signal aboard her, Bel-D §14.4) and work their manoeuvres
+at quarters; under B7.c S0's tack lends 124 hands (the forecastle's, the upper deck's and the
+quarterdeck's after crews) and S1's wear 120, where they lent half of every crew (175 and 167), and the
+world goes otherwise. At the end of the three timed thousands the 74s stood at most 1.02, 1.78 and 3.59
+miles from her (96, 101 and 105 ticks a second); now 1.42, 3.87 and 6.21 (89, 89 and 92): S2, who
+works no manoeuvre in the measure, stands 6.21 miles off at the third, over `CREWED_NM` (4), and the
+clause fails here, the crewed count 3 throughout and the pace over its 60. Bisected on the head's tree
+(a scratch worktree at 9c812f43) and this step's, by one script (`scratchpad/s7/probe7196.py`). Not
+re-settled: her world's places were settled by measurement and are the lead's to move; measured for the
+lead, S2 put at 49 55.0 N 5 10.5 W (from 49 52.5 N 5 11.0 W) holds 0.30-3.07 miles at 86-96 ticks a
+second, at 49 54.5 N 5 13.5 W 0.15-1.92 miles at 70-83. `tools/pace.py`'s mode for her carries the same
+places.
+
+### For the lead (B7.c)
+
+- **Truth 7-196's crewed clause** (above): it fails here after B7.c on S2's distance alone. Re-settle
+  her third 74 (both `tests/test_bellerophon.py` and `tools/pace.py`), at 49 55.0 N 5 10.5 W as
+  measured, or leave it for your word.
+- **The pool at quarters, left as the engine had it:** the hands idle at quarters, which the party
+  takes first, are not the trimmers and the marines' division alone (Bel-D §6.7's words) but every
+  division not at a gun: the frigate's 76 are the trimmers 44, the powder 22, the carpenter's crew 6,
+  the helm 2 and the surgeon's mates 2; hers 196 the marines 95, the trimmers 55, the powder 31, the
+  carpenter's crew 11, the helm 2 and the surgeon's mates 2. The request ranks them by rating, so the
+  helm's able men go before the marines and the idlers last (nine of the frigate's stay at their
+  stations, seven of the powder and the surgeon's two mates; none of hers). Numbered sail work at quarters draws on the same pool, as before. Keeping the helm, the
+  powder, the carpenter's crew and the surgeon's mates out of all sail work at quarters would raise the
+  tack's want of the guns to 67 in the frigate (35 now) and 118 in her (72 now). Not built.
+- **`crew/quarters.py` (B7's):** `TOLD_OFF_SHARE`, `lend`'s `share` and `_share_words` are read by
+  nothing after this step, and the constant's comment still says an all-hands manoeuvre takes half of
+  each crew. A tidy of her own file, not made in this step, whose file was `runner.py`.
+- **"Guns before sail" is quicker for every ship:** the tack wants one watch, not every fit hand aboard,
+  so its factor is the watch over the idle hands (the frigate's 111/76, hers 268/196) where it was the
+  company over them (252/76, 574/196); her tack under it is 1.37-1.52 times cleared (2.02-2.19 before).
+  From 292.5 degrees the frigate's is 0.97 times cleared (433 against 447 s), so the spec's "a tack with
+  the guns run out takes longer than the same tack cleared" holds in truth 7-136's world under "sail
+  before guns" (468 s) by her state at the order, and under "guns before sail" from 290 and 295 degrees,
+  not from 292.5.
+- **"One watch"** is the lean built (above); the call's first third of the watch below beside it would
+  ask 82 of the frigate's guns.
+
+### The suites, as run (B7.c)
+
+Once, on the final tree (branch `claude/pkg-75` at 9c812f43, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The step's files, fast** (`test_bellerophon`, `test_indefatigable`, `test_known_truths`,
+  `test_evolutions`, `test_staying`): **410 passed** (743 s). Against `b7/final-fast.xml`'s same files
+  (404): no outcome changed; six new, her party's cases, passed.
+- **(b) The moved truth and the files' slow tests** (truth 7-136 by its node id; `--slow -m slow` over
+  `test_bellerophon`, `test_evolutions`, `test_staying` and `test_indefatigable`): **25 passed, 2 failed**
+  (89 s). Truth 7-136 and her tack beside her cleared tack passed; truth 7-196's floor clause failed at
+  481 ticks a second (478 at the base), as known; truth 7-196's crewed clause, passed at the base, failed
+  on S2's 6.21 miles (above).
+- **(c) The captain's trials** (`--slow`): 3 failed, 4 passed (326 s), the three on the known digests
+  (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43), the base's messages.
+- **(d) The four whole logs** (`log_digests.py`): all four the same as `b2/digests-final.json`.
+- **(e) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`).
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- **Beyond the step's list:** the fast tier of the seventeen files that beat to quarters or test the
+  hands (`test_bilander`, `test_captive`, `test_crews`, `test_dumb_show`, `test_fight`, `test_filling`,
+  `test_flags`, `test_hands`, `test_health`, `test_lee_ports`, `test_neufchatel`, `test_practice`,
+  `test_practice_orders`, `test_profile`, `test_stand_by_words_and_action_flow`, `test_subtypes`,
+  `test_viewer_action`): 748 passed, as at the base; eighteen action truths of the slow tier by name
+  (7-133, 7-135, 7-137, 7-138, 7-143, 7-144, 7-148, 7-149, 7-153, 7-161, 7-166, 7-167, 7-171, 7-342,
+  7-352, 7-353, 7-426, 7-435) and the slow tests of `test_crews` (truths 87 and 88), `test_bilander`,
+  `test_neufchatel` and `test_subtypes` (10): all passed, as at the base.
+
+Junit and logs under `scratchpad/s7/run/`; the measurements `scratchpad/s7/tackq_base.json` and
+`tackq_new.json`. Not run: the whole fast tier, the slow tier beyond the above, the pace tier beyond
+the files' pace tests.
+
+### B7.d, numbering by deck (2026-11-11)
+
+**The step**, on the lead's word ((3) of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md`:
+"B7.d at the end of her window, both two-deckers together, on the lead's allotment of `parts.py` and
+`graph.py` after B3's merge, checked as Build §3.4"): Bel-D §5.2's numbering by deck and §12.1 item
+2's key, for her and the 64 together, in two commits; `freesail/ship/graph.py`, `freesail/ship/parts.py`
+and `tools/ships/indefatigable.py` allotted for the step, returned at its merge.
+
+- **Stage 0, laid inert** (its own commit): `"numbering"` appended to `ARMAMENT_KEYS`, `BY_DECK`
+  ("by deck") its one word, any other refused in words; `ArmamentSpec.numbering`, a plain None
+  default left out of the pickle while None; under it every broadside gun names a deck and a number
+  is one gun a side on each deck, the refusals in words naming the deck, else `(number, side)` as
+  before (`schema.py`); `Gun.by_deck`, a plain class default false and no field, left out of
+  `Gun.__getstate__` while false (`parts.py`). Proved behaviour-free by the stage-0 checker
+  (`scratchpad/s7/b7d/dig.py`, the hash seed and the rules' fingerprint held): the head before and
+  the change give 1,500 digests alike (every ship file's spec, crew and bill pickles and their state
+  keys, each file's Ship by the checkpoint's pickler, a World of each at tick 0 and after 120 ticks
+  and, armed, at quarters with the guns cast loose; the 41 shipped scenarios and the owner's 24; the
+  four kept saves loaded, run and pickled again); the head's 45 checkpoints, read by the head's code
+  and by the change and pickled again, alike; the generator's 18 files byte for byte.
+- **Her module and the 64's** (`tools/ships/bellerophon.py`, `tools/ships/indefatigable.py`): each
+  deck's pairs from No. 1 forward; each id re-keyed after `g.broadside_pair` by its deck
+  (`gun.lower.3.starboard`), the key keeping its place as the crew's does; `numbering: by deck` set
+  after `b.armament(...)`, the generator taking no such key (Bel-D §12.1), its words in the section's
+  note; the lower deck's note says the numbering. The razee's fits, note and file as before.
+- **The engine** (`ship/graph.py`, `ship/parts.py`, `crew/quarters.py`, `orders/gunnery.py`): the
+  ship sets `Gun.by_deck` on every gun of a fit whose armament says so; `Gun.pair_key`
+  `gun:<deck>:<n>` and `Gun.name` "No. 3 starboard gun of the lower deck" there (`Gun.of_deck`, the
+  deck's words `parts.DECK_SAID`, the `roundhouse` "the poop", which the beat's deck lines now share);
+  the quarters' parse sites read a crew's number from the key's last part and its deck from the
+  middle (`_crew_number`: the stations, the robbing order, the robbed words), a crew keeps its deck
+  where the guns are numbered by deck as where they stand on a lower deck, and a pair's line at the
+  muster says its deck; the orders take a number with its deck and refuse a bare number in words,
+  keyed on numbering by deck.
+
+**Judgement, said:** the razee is not renumbered. Bel-D §5.2 item 7 named "the 64 and the razee", and
+Indf §5.2 "both files then take it alike"; the lead's (3) is "both two-deckers together", and the razee
+has one gun deck, numbered on across as the frigate-36's. So her file is byte for byte and no ship of
+one gun deck numbers by deck. The number with its deck is keyed on numbering by deck: on the razee and
+every other file "No. 3 gun of the upper deck" names no gun, as before.
+
+**Their numbers, old beside new:**
+
+| Deck | Hers before | Hers after | The 64's before | The 64's after |
+|---|---|---|---|---|
+| lower | 1-14 | 1-14 | 1-13 | 1-13 |
+| upper | 15-28 | 1-14 | 14-26 | 1-13 |
+| quarterdeck | 29-35 | 1-7 | 27-31 | 1-5 |
+| forecastle | 36-37, the 1795 carronade 38 | 1-2, 3 | the 9s 32, the carronades of 1794 33 | 1, 2 |
+| roundhouse (the poop) | 39-41 | 1-3 | 34-36 (1794) | 1-3 |
+
+**The bytes, old beside new** (`py tools/gen_ships.py <scratch>`, `cmp`): `seventy-four.yaml` 5,721
+lines to 5,722, 388 changed and one added (her 234 ids, `gun.15.starboard` to `gun.upper.1.starboard`;
+the 150 numbers off her lower deck; four notes, the section's and the lower deck's in each fit; the key
+added, last in the armament); `sixty-four.yaml` 4,546 to 4,547, 223 changed and one added (136 ids, 84
+numbers, three notes; the key). The razee's and every other file byte for byte.
+
+**The served words, old beside new** (`scratchpad/s7/b7d/probe.py` and `lines.py`, seed 7, the
+brains' world off the Lizard, on the stage-0 head and this step's tree; compared through each gun's
+place, `cmp_probe.py`):
+
+- **A gun's name:** her "No. 15 starboard gun" is "No. 1 starboard gun of the upper deck", her "No. 8
+  starboard gun" "No. 8 starboard gun of the lower deck", her "No. 39 starboard gun" "No. 1 starboard
+  gun of the poop"; the 64's "No. 14 larboard gun" "No. 1 larboard gun of the upper deck": every
+  gun of their five fits (74, 82, 78; 64, 72), the viewer's served name and its words with it ("No. 1
+  larboard gun of the upper deck, a long 18-pounder"). The shut port's line: "The No. 15 larboard
+  gun's port is shut; the sea is at its sill." to "The No. 1 larboard gun of the upper deck's port is
+  shut; the sea is at its sill."
+- **The beat** at muster on each of the five fits: its said line the same; every crew the same men man
+  for man, the same men wanted, the same deck and the same order (37, 41 and 39 crews; 32 and 36),
+  keyed `gun:upper:1` for `gun:15`; the divisions the same (their pickles byte for byte, the crews'
+  moved by their keys); the muster's pair lines "Nos. 28 guns: manned." to "Nos. 14 guns of the upper
+  deck: manned.", the lower deck's "Nos. 1 guns: manned." to "Nos. 1 guns of the lower deck: manned.".
+- **Robbing**, heeled 12.5 degrees by hand and engaged to starboard: the same men in the same order in
+  every case; with sixty wanted the line the same ("from the lower deck, Nos. 7 to 11, their ports
+  shut" hers, "Nos. 5 to 10" the 64's: the lower deck's numbers did not move); with no side engaged hers
+  "from the poop, Nos. 39 to 41, the upper deck, Nos. 26 to 28, and the quarterdeck, Nos. 32 to 35" to
+  "from the poop, Nos. 1 to 3, the upper deck, Nos. 12 to 14, and the quarterdeck, Nos. 4 to 7", the
+  64's "from the upper deck, Nos. 22 to 26, and the quarterdeck, Nos. 29 to 31" to "Nos. 9 to 13 ...
+  Nos. 3 to 5"; past every gun hers "..., the poop, Nos. 39 to 41, the upper deck, Nos. 15 to 28, the
+  quarterdeck, Nos. 29 to 35, the forecastle, Nos. 36 to 38, ..." to "..., the poop, Nos. 1 to 3, the
+  upper deck, Nos. 1 to 14, the quarterdeck, Nos. 1 to 7, the forecastle, Nos. 1 to 3, ...".
+- **The orders**, at quarters with the guns cast loose and a mark engaged: "fire No. 3 gun", which fired
+  her lower deck's two No. 3s ("No. 3 starboard gun and No. 3 larboard gun to fire as soon as ready."),
+  is refused: "She has a No. 3 gun on the lower deck, the upper deck, the quarterdeck, the forecastle
+  and the poop: name the deck, as 'fire No. 3 gun of the lower deck'." (on her 1793 and 1812 fits and
+  the 64's of 1784 the lower deck, the upper deck and the quarterdeck; on the 64's of 1794 those and
+  the poop); "fire No. 8 starboard gun" ("No. 8 starboard gun to fire as soon as ready.") is refused
+  naming the lower and the upper deck; "fire No. 20 gun", her upper deck's sixth before, names no gun
+  of hers; "fire No. 3 starboard gun of the lower deck", "fire the lower deck's No. 8" and "fire No. 2
+  starboard gun on the poop", refused before as naming no gun, fire as named ("No. 3 starboard gun of
+  the lower deck to fire as soon as ready."). The refusal of words that name no gun gives her example
+  with its deck ("'fire No. 3 gun of the lower deck'"). Through `guns_named` (the director's and the world orders' slots), of
+  42 phrases on her default fit the eight bare numbers that named guns name none, the fifteen numbers
+  with a deck name that deck's (none before), the ten decks' words what they named, the nine others
+  none before and after; her other fits and the 64's the same by what each carries (seven to eight
+  bare numbers, eleven to fifteen with a deck).
+- **Nothing of the other nine armed files moved** (the brig, the cutter's two fits, the frigate-36, the
+  hermaphrodite brig, the merchant brig, the privateer's two, the bilander, the razee's two): every gun's
+  name and crew key, the served names, the 42 phrases, the beat, the crews man for man, the divisions,
+  their pickles, the marines to arms and back, robbing, the fire orders' replies and the dumb show,
+  record for record the same.
+- **The pickles and checkpoints** (the stage-0 checker again, this step's tree against the head before
+  stage 0, the hash seed and the rules' fingerprint held): of 1,500 digests 26 moved, all of the two
+  files: each one's spec pickled (protocols 2 to 5, its deep copy, its round trip), its Ship's
+  checkpoint, its Worlds' checkpoints at tick 0, after 120 ticks and at quarters, and the log's digest
+  at quarters (its data's gun ids; its lines, kind and words, the same); and the owner's two scenarios
+  of the 64 ("64-gun-in-Torbay", "64-gun-schooner-tender"), their Worlds' checkpoints at tick 0 and
+  after 30 (their pickles, dicts, lines and logs the same). Every other leaf the same: the sixteen other
+  files, the 63 other scenarios, the four kept saves. The head's 45 checkpoints, hers and the 64's among
+  them, read by this step's code and pickled again give the head's bytes: a save of either from before
+  keeps the numbering it was saved with (its guns' ids, no `by_deck`).
+- **The viewer's checker** (`tools/check_viewer_guns.py`): clean, as before; its 34 lines that name a
+  gun by id, 26 hers and 8 the 64's, moved by the id alone (her "note gun.29.starboard: over the rail
+  by the side's test, ..." to "note gun.quarterdeck.1.starboard: ...").
+
+**Pins moved, old beside new:**
+
+- `tests/test_bellerophon.py`: `NUMBERS` (the upper 15-28 to 1-14, the quarterdeck 29-35 to 1-7, the
+  forecastle 36-38 to 1-3, the poop 39-41 to 1-3); her numbering test, named "numbered on across her
+  decks" to "numbered by deck", its ids `gun.{n}.{side}` to `gun.{deck}.{n}.{side}` and the 1812 fit's
+  empty places ("forecastle", 38) and ("roundhouse", 41) to 3 and 3; robbing by deck's shut crews read
+  from `gun:lower:7` for `gun:7`, its lines the same; robbing past every gun's line (above); the
+  phrases' row "No. 8 starboard gun" on her file, one gun, to "No. 8 starboard gun of the lower deck",
+  one gun, with two rows for the razee beside it (her bare number one gun, a number with its deck none);
+  stage 0's "no file carries the key" to "only the two two-deckers carry it", every other gun's name and
+  key held in the old forms.
+- `tests/test_indefatigable.py` (B1's), her fits' test: `(number, side)` one gun to `(deck, number,
+  side)` one gun on the 64, each of her decks from No. 1 and each id its deck's; the razee's as before.
+
+**New** (`tests/test_bellerophon.py`, "Numbering by deck"): stage 0's key and its refusals; a gun
+numbered by deck named and crewed by its deck (eight cases, hers and the 64's); her quarters' words by
+deck, the crews' keys and `_crew_number`; a number said with its deck (22 phrases on her, the 64 and the
+frigate-36); a bare number refused naming the decks, one with its deck fired.
+
+**Bisected:** stage 0 moves nothing (its digests); every move above is the step's, between the stage-0
+head and this commit, by the same scripts on both trees (the stage-0 head archived to a scratch tree).
+
+### For the lead (B7.d)
+
+- **The shut port's line** (`combat/guns.py`, `Battery._drop_named`, not B7's): "The No. 3 larboard
+  gun of the lower deck's port is shut; the sea is at its sill." reads as English but heavily; "The
+  port of No. 3 larboard gun of the lower deck is shut" is the mend, one line in `combat/`. Not built.
+- **The marines back from their muskets** (`Quarters.marines_to_guns`): the short crews are made up
+  carronades first and then by their keys as text, so on her 1812 fit and the 64's two fits the same
+  crews take the same number of marines as before, but other marines (her 16, the 64's 84: measured
+  after `marines_to_arms` at muster). Any order by deck and number would move them again; left as the
+  key's text, said.
+- **A bare number in the director's and the world orders' slots** (`world/orders.py`, by
+  `guns_named`): on the two two-deckers it finds no gun, and the slot's own words refuse it; the
+  gunnery order's refusal naming the decks is the gun deck's alone.
+- **The razee**, not renumbered (above): Bel-D §5.2 item 7 and Indf §5.2 named her; the lead's word was
+  the two two-deckers. Renumbering her quarterdeck and forecastle by deck would be a few lines of
+  `indefatigable.py`, her file's ids and numbers moving as the 64's did. Not built.
+
+### The suites, as run (B7.d)
+
+Once, on the final tree (the package's branch at 412658a9, stage 0 committed and the step
+uncommitted), from the tree root with `py`, one run at a time with nothing else running, the tree
+asserted first on `sys.path`, each pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`;
+the bases not re-run. Stage 0 was checked on its own before its commit (above).
+
+- **(a) The touched files' slow tests** (`--slow -m slow` over `test_bellerophon`, `test_indefatigable`
+  and `test_lee_ports`): **9 passed, 2 failed** (77 s), against `b7/final-slow.xml`'s same files and
+  B7.c's run: truth 7-196's floor clause failed at 475 ticks a second (478 at the base, 481 at B7.c), as
+  known; its crewed clause on S2's 6.2087 miles, as at B7.c to the fourth place (passed at the base,
+  moved by B7.c, not by this step); her tack at quarters beside her cleared tack, B7.c's, passed.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (261 s), the three on the known digests
+  (8df0ab2beba93320, df5f02eb6e6ce68a, 8dac97a4c9bdfe43), the base's messages.
+- **(c) The four whole logs** (`log_digests.py`): all four the same as `b2/digests-final.json`.
+- **(d) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`), hers and the 64's this step's; `tools/check_viewer_guns.py` clean (above).
+- **(e) The digests** (above): 26 of 1,500 moved, all of the two files; the head's 45 checkpoints
+  read alike.
+- **(f) The fast tier of the 35 files the step reaches** (`test_bellerophon`, `test_indefatigable`,
+  `test_practice`, `test_practice_orders`, `test_dumb_show`, `test_in_world`,
+  `test_bill_marines_and_flag`, `test_lee_ports`, `test_profile`, `test_ships`, `test_view_action`,
+  `test_viewer_action`, `test_view_geometry`, `test_check_viewer_guns`, `test_magazine`,
+  `test_pivot_gun`, `test_fight`, `test_filling`, `test_bilander`, `test_neufchatel`,
+  `test_world_orders`, `test_known_truths`, `test_subtypes`, `test_prizes`, `test_driver`,
+  `test_hull_form`, `test_profiles`, `test_signals`, `test_powder_orders`, `test_crews`,
+  `test_captive`, `test_flags`, `test_health`, `test_stand_by_words_and_action_flow`, `test_hands`):
+  **2,715 passed** (1,647 s). Against `b7/final-fast.xml`'s same files (2,673): no outcome changed;
+  two cases gone by their names (her numbering test renamed, the phrases' row moved: above), 44 new,
+  B7.c's six and this work's 38 (stage 0's and the step's), passed.
+- **(g) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+
+Junit, logs and the measurements under `scratchpad/s7/b7d/` (`run/`, `s0/`, `probe-old.json`,
+`probe-new.json`, `cmp-probe2.txt`, `lines-old.json`, `lines-new.json`; the stage-0 head's tree
+`old/`). Not run: the whole fast tier, the slow tier beyond the three files, the pace tier beyond the
+files' pace tests.
+
+### B7.e, the rank-4 rule (2026-11-11)
+
+**The ruling.** Bel-D §8.3 offered the rule and put it to the owner (§17.1 item 3), who agreed on
+2026-10-29 ("Agreed.", §17.0: a frigate on her own keeps away from her) and took it on 2026-11-11:
+"Yes, build the rule". The lead's answer (10) to her §17.2 in `docs/dev/M7-WorkPackages.md`: "If the
+owner takes the rank-4 rule, B7.e owns `world/captains.py` and the two doctrine books for that step
+alone, and the 64's scenario tests are re-run." One commit; `freesail/world/captains.py`,
+`data/captains/kings-ship.yaml` and `data/captains/commodore.yaml` B7.e's for the step, returned at its
+merge.
+
+**The rule as built** (a lone King's ship of rank 3 or less hauls off from an enemy of rank 4 made out
+within two leagues):
+
+- `captains.LINE_OF_BATTLE_RANK = 4`, the class of the sixty-four and the seventy-four in `SIZE_RANK`.
+- `Judgement._line_of_battle_nm(p)`: the doctrine's `line_of_battle_nm` where her own class
+  (`p.own_size`) is under 4 and she is alone, nought otherwise; `Judgement._alone()`: in no set of
+  package 72's (`squadrons.of`, the parent World's for a crewed hull), neither a member nor its
+  commander. The knob is in the two books alone, 6 nm, its source by fact and page: Maitland p. 78 on
+  three frigates hardly a match for one ship of the line, the two leagues the cruiser's own distance
+  for a superior force (judgement), and Steel 1805 p. 124's exception and the *Droits de l'Homme*
+  (James vol. 2 pp. 12-19) as the later refinement, not built. Every other book reads nought.
+- `Judgement._overmatched(p, within_nm, line_nm=None)`: an enemy of a bigger class within `within_nm`
+  as before; or, for that case alone, an enemy of rank 4 within `line_nm`, by default
+  `_line_of_battle_nm`; the same filters for both (made out an enemy by `_is_enemy`, unspoken, not a
+  merchantman, not struck). Both bodies judge by it (the far brain and the near captain share it).
+- `Captain._haul_off` (the near body): the enemy run from is the ship of the line within three times
+  the knob, as the cruiser's reach is three times her `stranger_hostile_nm`, which on a King's ship is
+  nought: without it the near captain entered `evading` and shaped no course. The far body's
+  `evading` plan already ran from `_overmatched(p, 1e9)`.
+- The two books: the cruiser's `overmatched` rows from `on passage`, `beating`, `keeping station`,
+  `investigating a stranger` and `chasing` to `evading`, each where the cruiser has it (before the
+  stranger rows); out of it, `evading` on `stranger lost` to `on passage` and on `gale` to `hove to for
+  weather` unless no sea room; the `evading` book, empty before, the cruiser's three lines (trim to the
+  course, tend the sheets, make all sail to haul off). No `in company` row. `stranger_hostile_nm` nought
+  as before, its source's words amended (no ship of her own class or under).
+- **Rows live since B7.e, not new** (named at the step's review): both books' package 70 and 74 rows
+  `{from: engaging, on: overmatched, to: evading}` and `{from: taking possession, on: overmatched, to:
+  evading}`, and the `unless: overmatched` on every `enemy in range` row, were dormant for a King's
+  ship and a commodore before (their `stranger_hostile_nm` nought, so `overmatched` never held); for
+  a lone ship of a lower class they now act on an enemy ship of the line: she breaks off an action or
+  a prize, and does not engage her (below, "B7.e, the review's mends").
+
+**Judgement, said** (where §8.3 left a choice, its lean built):
+
+1. **The commodore's book takes the rows as well as the knob.** §8.3 names the knob in both books and
+   "`overmatched` transitions in the King's ship's book"; without the rows the commodore's knob would
+   act only where `overmatched` stood already (no engaging; from engaging or taking possession to
+   evading), and a lone commodore would never haul off from her passage or her station. The
+   commodore's is a King's ship's doctrine.
+2. **A ship in a set is any member, its commander included** (`squadrons.of`): a set's commander
+   answers to the set's book (`data/squadrons/`), whose rules judge an enemy for the whole set; the
+   rest are `in company`. A ship merely under another's orders by package 71's least relation
+   (`under_the_orders_of`, no set) is alone by the design's words (for the lead, below).
+3. **Out of `evading` to `on passage`**, as the King's ship's book leaves engaging and as the cruiser's
+   leaves evading: a ship with a station takes it up again from her passage (the far body on reaching
+   it, the near by her station leg).
+4. **Rank 3 or less** is any class under 4, a hull of no description (class 0) with it.
+
+**Old beside new** (`scratchpad/b7e/probe.py` and `probe_near.py`, seed 7, tests/test_brains.py's world
+off the Lizard, the far brain alone with no crewed promotion; run on a worktree of 62cf52c6 and on this
+tree; the states in their order):
+
+| Who meets whom | 62cf52c6 | B7.e |
+|---|---|---|
+| A French frigate (King's ship) keeping her station five miles north of the player's 74, hove to | keeping station, investigating a stranger, chasing, keeping station | keeping station, investigating a stranger, evading |
+| The same, the player's 64 | as the 74's | as the 74's |
+| The same, the player's frigate-36 (her own class) | keeping station, investigating a stranger, chasing, keeping station | the same |
+| A French brig-sloop (cruiser), the 74 | keeping station, investigating a stranger, evading | the same |
+| A French sixty-four (King's ship), the 74 | keeping station, investigating a stranger, chasing, keeping station | the same |
+| The French frigate in company in a set of two frigates | in company | the same |
+| The French frigate commanding that set | keeping station, investigating a stranger, keeping station, investigating a stranger | the same |
+| A French frigate escorting the convoy to Brest (the commodore's book), alone a mile and a half north of the 74 | on passage | on passage, evading |
+| The same commanding a convoy of one merchant brig (a set) | on passage | the same |
+| The player's frigate under her rules captain on her station, a French 74 bound for Brest a mile and a half north (near body) | on passage, engaging | on passage, evading ("shaping a course for 49 09.9 n 5 29.9 w (hauling off from a seventy-four, a ship of the line, ...)"), on passage, engaging |
+| The same, a French 64 | on passage, engaging | as the 74's ("hauling off from a sixty-four, ...") |
+| The same, a French frigate | on passage, engaging | the same |
+| The player's frigate in company in a British brig-sloop's set, the 74 | in company, engaging | the same |
+| The player's 64 under her rules captain, the 74 | on passage, engaging | the same |
+
+The near frigate's second "on passage" (tick 720, the 74 0.34 miles off;
+`scratchpad/b7e/probe_near2.py`): the 74, standing the same way and faster, ranged up within hail, and
+a sail spoken is no superior force to `_overmatched` (package 43's filter, the cruiser's as well), so
+`stranger lost` ended the evasion and she engaged at tick 780, 0.22 miles off; the far frigates evaded
+before the 74 was within hail. For the lead (below). **Where the rule acts on real ticks** (corrected
+at the step's review; measured in "B7.e, the review's mends", below): not at the two leagues, and not
+alike on the two bodies. She is known an enemy by her colours (`ships.COLOURS_MADE_OUT_NM`, two miles,
+three with the glass on her) or by `_known_enemy` (the shot, the private signal, the hail). The far
+brain sizes her by her description at any distance, so it hauls off where her colours are made out:
+3.0 to 3.1 miles investigating her with the glass, 1.8 on passage, in this table's runs. The near body
+(every promoted hull, French frigates within `crews.CREWED_NM` of her among them, and the player's ship
+under her rules captain) sizes her by the lookout's words (`size_of_words`), and a two-decker's words
+at her rig and her colours are "a ship" (`DESCRIPTIONS`' `rig`), a frigate's class: it hauls off only
+once what she is is made out (`ships.MADE_OUT_NM`, a mile and a half, `GLASS_FACTOR` further with the
+glass), 1.3 to 2.0 miles, from investigating her or from her passage. The two leagues bind only on the
+far body, for an enemy known beyond her colours' distance by `_known_enemy`.
+
+**What moves: the grep** (`data/scenarios/` and its trials, `data/business.yaml`, `data/regimes.yaml`,
+`tests/`, `freesail/`; the owner's scenarios folder beside them):
+
+- **No pinned scenario:** none of the shipped scenarios or the five trials names a sixty-four, a
+  seventy-four, a two-decker or a ship of the line, and the world's business draws none (its traders,
+  fishers and brig-sloop cruisers; the convoy's escort a brig-sloop by `in convoy`), so no scenario puts
+  a King's ship of rank 3 or less against rank 4: the four whole logs and the captain's trials as at
+  62cf52c6 (below).
+- **One test moved**, her own record of the engine's then (its words corrected at the step's review):
+  `tests/test_bellerophon.py`'s
+  `test_a_cruiser_keeps_away_from_her_and_a_kings_frigate_does_not_today[kings-ship]` ("evading" not
+  in her states, and one of "investigating a stranger", "engaging" or "chasing" in them) is
+  `test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64[kings-ship-the-74]`, "evading"
+  in her states after "investigating a stranger"; its cruiser case, renamed `[cruiser-the-74]`, asserts
+  "evading" as before and now also "investigating a stranger" before it; `[cruiser-the-64]` and
+  `[kings-ship-the-64]` are new; both old slow node ids renamed in `tests/conftest.py`'s `SLOW_TESTS`.
+- **The other tests that put a rank-4 ship on the sea, none moved:** her round trip (the 74 with a
+  British 64 bound for Plymouth: rank 4 both, friends), the 64's round trip (`tests/test_indefatigable.py`,
+  the great guns' scenario with nothing else on the sea), `tests/test_signals.py`'s British 64 hailed,
+  and the words' tests (`test_ships`, `test_world_orders`, `test_subtypes`' and `test_neufchatel`'s role
+  tables).
+- **Not pinned, the owner's folder:** `64-gun-in-Torbay.yaml` and `64-gun-schooner-tender.yaml` sail the
+  64 as the player's ship, British: a lone French frigate the director puts in her way now hauls off
+  once she has made her out (above), where she closed. Five more (the four privateer brigs' and the
+  French hermaphrodite brig's) let the director put an enemy sixty-four (`enemy_heaviest: sixty-four`):
+  a lone King's frigate of the other side that meets it hauls off.
+- **Not pinned, the owner's saves folder** (added at the step's review, read only): the 64's tender
+  scenario's saves (seed 7 at ticks 0, 1852, 1860, 6912, 6918 and 137600; seed 609627938 at 1867, 6929
+  and 137600) sail the British 64 with French ships of a lower class in the King's ship's role (a
+  privateer schooner at 1860, a lugger at 6912 and 6918). By the checkpoint road the rule stays off for
+  them (below, "Saves"); by the replay road it is on, and the saves whose checkpoints do not read here
+  (seed 7 at 1852, the three of seed 609627938) can take only that road. The privateers' saves whose
+  briefs let the director put an enemy sixty-four (seed 7 at 16475 and 36052) are under the same two
+  roads.
+
+**The 64's scenario tests, re-run:** `tests/test_indefatigable.py` whole (her round trip under the rules
+captain with no fit named among them) and her own round trip with the 64 in sight: as at the base
+(below). B6's scenario tests are not yet written (Phase 5).
+
+**Saves** (by road, corrected at the step's review): the doctrine is pickled with its captain
+(`Doctrine`, a frozen dataclass). **By the checkpoint road** the captains a save from before B7.e holds
+keep their books as saved, the knob absent and read as nought, the rule off for them; a hull promoted
+after the load takes her far brain's (`fold_in`), so the same; a captain given a new intent loads his
+book anew (`set_intent`), and a ship made after the load (the director's, the business's) takes B7.e's,
+the rule on for them. **By the replay road** (a save with no checkpoint beside it, or one that does not
+read, or a door that replays) every captain is made anew under B7.e's books and the rule is on: the
+load's own words say a replay under another build's rules may differ (and refuse one holding a
+station's transcript unless asked, `replay_anyway`). A world made since takes it. No field added.
+
+**New** (`tests/test_bellerophon.py`, "A frigate meeting her"): the renamed meeting, four cases (the 74
+and the 64; the cruiser and the King's frigate); a lone commodore keeping away and a set left to its
+book (a commodore alone, a commodore and her convoy, a frigate commanding a squadron); a King's 64
+meeting her closing her as before; `overmatched` by the tops' report alone on both bodies (a lone
+frigate under either book at 5.9 miles and 1 mile against a 74 and a 64, not at 6.1, not against a
+frigate; a member and a commander of a set not; a King's 64 not; the cruiser at 5.9 and not 6.1; only
+the two books carry the knob); her rules captain in a lone frigate hauling off from a 74 and a 64, and
+engaging as before in a set and in the 64, each engagement begun on an enemy not yet spoken.
+
+**Each able to fail** (`scratchpad/b7e/mutate.py`, each mutation made on the tree, the 13 cases run,
+the files restored byte for byte, the diff's digest the same before and after):
+
+| Mutation | Failed |
+|---|---|
+| M1, the knob nought in both books | the King's frigate's two meetings, the commodore alone, the near frigate's two, the perception test |
+| M2, a ship in a set judged alone | the commodore and her convoy, the frigate commanding a set, the near frigate in a set, the perception test |
+| M3, the rule on a ship of the line herself | the King's 64 meeting her, the near 64, the perception test |
+| M4, the two leagues a mile wider | the perception test (6.1 miles) |
+| M5, `_haul_off`'s reach as before | the near frigate's two (no course shaped) |
+| M6, the King's ship's rows from passage, station and investigating out | the near frigate's two (the far ones evade from `chasing`, its row kept) |
+| M7, the commodore's rows from passage, station and investigating out | the commodore alone |
+| M8, the cruiser's bigger class dropped | the cruiser's two meetings, the perception test |
+
+On 62cf52c6's worktree the new file gave 8 failed and 5 passed: the cruiser's two, the King's 64, the
+near frigate in a set and the near 64 passing, as before (the two set cases there failing on `_alone`,
+which the base has not).
+
+### For the lead (B7.e)
+
+- **A ship of the line within hail is no superior force** (`_overmatched`'s `_spoken` filter, package
+  43's, the cruiser's as well): the near frigate overhauled within hail gave up hauling off and engaged
+  her (above). Keeping an enemy spoken in `overmatched`, and out of an evasion's `stranger lost`, is a
+  few lines in `_overmatched` and `_stimulus`, and the cruiser's judgement would move with it. Not built.
+- **Package 71's least relation:** a commodore whose convoy is held by `under_the_orders_of` alone (the
+  convoy scenario's brig-sloop and her four merchant brigs, no set) is alone by the design's words, and
+  would leave them to haul off from a ship of the line. Whether that relation counts as a set for the
+  rule is yours. Not built.
+- **The *Droits de l'Homme*'s case** (a sea that shuts a 74's lower tier, Steel 1805 p. 124's exception;
+  James vol. 2 pp. 12-19), recorded in the knob's source as §8.3 has it: a later refinement.
+- **Her scenario (B6):** her French frigates, alone, now keep away by doctrine as well as by B6's intent.
+- **A two-decker made out at her rig** (added at the step's review): the near body knows her rank 4
+  only from what she is (a mile and a half, two and a quarter with the glass), her words at her rig
+  and her colours being "a ship" (`ships.DESCRIPTIONS`' `rig` for the 74 and the 64); so a lone French
+  frigate crewed beside her stands on or investigates her to 1.5 to 2.0 miles before she hauls off
+  (the player's frigate under her rules captain, a French 74 in sight, to 1.3 to 1.4), against the
+  picture §17.1 item 3 put to the owner, who agreed: "a French frigate on her own sighting the
+  *Bellerophon* turns away and makes sail". Whether a two-decker's rig-level words should name her
+  two tiers, so that `size_of_words` reads rank 4 at `RIG_MADE_OUT_NM` (four miles), is yours:
+  `world/ships.py` is not B7.e's, and it would move every served line naming a two-decker at her rig.
+  Not built.
+- **A King's ship in action, or lost to her set in action** (added at the step's review): a lone King's
+  ship of a lower class engaging, or taking possession, now breaks off for an enemy ship of the line
+  made out within two leagues (the rows live since B7.e, above), and a member lost to her set as a
+  straggler while engaging the 74 is alone and evades at 0.45 miles (below). Whether a ship already
+  engaged should break off at close quarters for a ship of the line is yours. Not built.
+
+### The suites, as run (B7.e)
+
+Once, on the final tree (the package's branch at 62cf52c6, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The named files, both tiers** (`--slow` over `test_captains`, `test_brains`, `test_squadrons`,
+  `test_indefatigable`, `test_bellerophon`, `test_in_world`, and `test_subtypes` and `test_fight`, which
+  read the two books): **455 passed** (218 s). Against `s7/final-fast.xml` and `s7/final-slow.xml`'s same
+  files (444): no outcome changed but one, truth 7-196's floor clause, failed at the base by pace and
+  passing here at this run (pace alone, not this step's); two cases gone by their names (the meeting
+  renamed, above), 13 new, passed. The 64's scenario tests among them: `test_indefatigable` whole and
+  her round trip with the 64 in sight, passed as at the base.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (251 s), the three on the known digests
+  (1e59009004141b08, 41a37f0290be291a, 0b430d261669ba5a), the base's messages.
+- **(c) The four whole logs** (`log_digests.py`): all four the same as 62cf52c6's (the s7 fixer's
+  record, `s7/mend/final/digests.json`), line for line by their digests.
+- **(d) Her file alone, both tiers**, for the slow list: 150 passed (105 s). The new cases at 5 s or
+  more went into `tests/conftest.py`'s `SLOW_TESTS` (the meetings with the 74, 5.3 and 8.0 s; a
+  commodore and her convoy, 12.9; a frigate commanding a set, 6.5; a King's 64 meeting her, 6.9; her
+  rules captain in a set, 8.9); the rest, 3.2 to 4.5 s, fast.
+- **(e) The mutations and the base worktree** (above): each new case failed under at least one; the
+  new file on 62cf52c6, 8 failed and 5 passed.
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+
+Junit, logs and the probes under `scratchpad/b7e/` (`run/`, `probe.py`, `probe_near.py`,
+`probe_near2.py`, `mutate.py`, `mutations.json`); the worktree of 62cf52c6 cleared after. Not run: the
+whole fast tier, the slow tier beyond her file, the pace tier beyond her file's pace tests.
+
+### B7.e, the review's mends (2026-11-11)
+
+**The review** (of 9de4ba06 since 62cf52c6, against Bel-D §8.3, §12.3's row for B7.e and the owner's
+words; the rule run on real ticks at seed 7, old beside new, the far brain alone and at the crewed cap
+as shipped) found the code the rule as offered, the design's leans built and said, and five findings,
+four in the record and one a test the rule wanted. Each was reproduced before it was mended
+(`scratchpad/b7e/fix/`: `repro.py` records the judging body's own reading of the 74 by wrapping
+`_overmatched`, no further read; `repro_player.py`; `saves_peek.py`, read only), on this tree and on a
+worktree of 62cf52c6, cleared after. **No code and no book moved**: the record, and two tests.
+
+1. **Where the rule acts** (should-fix). The record had "her colours at two miles (three with a
+   glass), as the cruiser's does"; that holds for the far brain alone. Measured, the 74 hove to off
+   the Lizard and the French ship five miles north (the review's runs at six and eight miles the same
+   within a tenth of a mile):
+
+   | Body, case | Her reading of the 74 before (level made out, nation, class) | She hauls off |
+   |---|---|---|
+   | The far brain alone, a lone frigate keeping her station | her rig, class 4 (her description) | at 3.03 miles from investigating, her colours made out with the glass |
+   | The far brain alone, the same bound for Brest | as above | at 1.80 miles from her passage, her colours by eye |
+   | Crewed (promoted at 3.99 miles), the station frigate | her rig, class 3 ("a ship") at 3.3 miles | at 1.92 miles from investigating, what she is made out (the glass) |
+   | Crewed, the same bound for Brest; the commodore's the same | her colours, class 3 at 1.87 miles | at 1.47 miles from her passage, what she is made out |
+   | The player's frigate under her rules captain, a French 74 bound for Brest | her colours, class 3 at 1.81 miles | at 1.34 miles from her passage, what she is made out |
+
+   Corrected in place (above, "Where the rule acts on real ticks"; the owner's folder's bullet), in her
+   design's §8.3 as-built note and in Build-Ships §16.1's row; the two-decker's rig-level words for the
+   lead (above), not built.
+2. **A member lost to her set** (should-fix). The old-beside-new table above is the far brain's; at the
+   crewed cap as shipped, old beside new:
+
+   | Crewed at the shipped cap | 62cf52c6 | B7.e |
+   |---|---|---|
+   | The lone frigate keeping her station | investigating, chasing at 1.92 miles, engaging at 1.32 | investigating, evading at 1.92 |
+   | The same bound for Brest | on passage, engaging at 1.22 | on passage, evading at 1.47 |
+   | A frigate under the commodore's book, bound for Brest | on passage, engaging at 1.00 | on passage, evading at 1.47 |
+   | The frigate in company in a set of two frigates, the consort commanding | in company; a straggler at tick 2100; engaging at 1.15 miles (tick 3060); lost to the set at tick 3840 ("she proceeds alone"), engaging still | the same to tick 3840; then alone (`_alone`, the knob 6), evading at 0.45 miles (tick 3900) |
+
+   The rows that make her break off, `engaging` and `taking possession` to `evading` on `overmatched`,
+   are package 70's and 74's, live since B7.e (named above, "Rows live since B7.e"); the question for
+   the lead (above), not built. Her design's §8.3 as-built note says the same.
+3. **Saves by road** (nit). The record had a save from before keep its books and the rule off; that
+   is the checkpoint road's. Read from the code (`replay.build_world` makes the world anew from the
+   scenario; `brains.fold_in` carries the far brain's doctrine into a promoted hull's captain;
+   `set_intent` loads the book anew) and measured by the review (a checkpoint written at 62cf52c6, a
+   lone King's frigate and a commodore, far brain alone, read here and run forty minutes: the base's
+   states and log digest, 65cc6bab3a7ab3ef; the books loaded anew, the frigate goes on to `evading` and
+   the commodore to `on passage`, `evading`, 569640e2f4efc4ad). The owner's saves folder read
+   (`saves_peek.py`): the saves of the 64's tender scenario and the privateers' as named above, the
+   checkpoints of seed 7 at 1852 and of seed 609627938 not reading here. Corrected in place ("Saves",
+   the saves folder's bullet), in Build-Ships §16.1's row and as a row of its §16.2.
+4. **The rule on a promoted hull** (nit). Every test of B7.e's ran the far brain alone (`far_only`) or
+   the player's own ship. Two new, with the crewed cap as shipped, in `tests/test_bellerophon.py` (both
+   slow, 14.3 s and 18.8 s alone, one process):
+   `test_a_lone_kings_frigate_crewed_beside_her_hauls_off_once_she_is_made_out_a_74` (the lone station
+   frigate crewed, her captain's states "investigating a stranger" and then "evading" with no
+   "engaging" before it, and her log's course "hauling off from a seventy-four", what she is) and
+   `test_a_crewed_frigate_in_a_set_does_not_haul_off_from_her_while_the_set_holds_her` (the member
+   crewed, engaging her while the set holds her and never evading while it does). Each able to fail
+   (`scratchpad/b7e/fix/mutate_crewed.py`, the files restored byte for byte, the diff's digest the
+   same before and after): the knob nought in both books fails the first; `_alone` by the player's id
+   in place of her own fails the second; `_alone` by the hull's own World in place of the parent's
+   fails neither, the hull reading the World's `squadrons` under the same name
+   (`hulls.SHARED_FIELDS`), so that mutation is no fault; the size by the truth for the near body
+   fails neither, the station frigate's lookout at seed 7 reporting the 74's rig and then what she
+   is, with no report of her colours alone between (the passage's crewed run has one, above). On
+   62cf52c6, with this file: the first failed, the second passed (the member engages there too).
+5. **The moved pin's words** (nit): the old King's-ship assertion had "engaging" among its three, the
+   cruiser case gained a clause, and the two 64 cases are new. Corrected in place (above) and in her
+   design's §8.3.
+
+**The suites, as run (the review's mends).** Once, on the final tree (the package's branch at 9de4ba06,
+the mends uncommitted), from the tree root with `py`, one run at a time with no other suite running,
+the tree asserted first on `sys.path`, each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"`; the bases not re-run (`scratchpad/b7e/fix/run_end.sh`).
+
+- **(a) The slow candidates** (`--slow -m slow` over the base's 86 files, `b7/final/slowlist.txt`):
+  **309 passed, 11 failed, 1 skipped, 9 xfailed** (2,975 s), junit `scratchpad/b7e/final-slow.xml`.
+  Against `s7/final-slow.xml` (324): two gone by name, the old meeting's two cases (renamed at B7.e,
+  above); eight new in `test_bellerophon`, all passed: B7.e's six slow cases and the review's two.
+  **One outcome changed**, passed to failed: truth 7-159's convoy of six at far detail against truth
+  51's floor (380 ticks a second against 500). Measured after the runs by its own measure
+  (`scratchpad/b7e/fix/pace7159.py`), alone, on this tree and on a worktree of 62cf52c6 by turns: 437,
+  439 and 437 here, 438, 440 and 454 at the base. The machine's load at the time, not the mends,
+  which move no code. Truth 7-196's floor failed as at the base (413 against 390). The other non-passes
+  as at the base, the same messages: the three captain's trials and truth 77 on their digests, the
+  merchant passage's and the schooner's intent constants, truths 78 and 79, the schooner's octant
+  passage's count; the nine marked xfail and the browser's skip.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (357 s), the three on the known digests
+  (1e59009004141b08, 41a37f0290be291a, 0b430d261669ba5a).
+- **(c) The four whole logs** (`log_digests.py`): every field the same as 62cf52c6's
+  (`s7/mend/final/digests.json`): first-action 234036cc17e6f137, encounter 732a6020db4d4755, the lee
+  shore e8c79e9947e244c3, the gale 1e59009004141b08.
+- **(d) The whole fast tier**: **7,325 passed, 2 skipped, 1 xfailed** (3,737 s), junit kept at
+  `scratchpad/b7e/final-fast.xml`. Against `s7/final-fast.xml` (7,321): **no outcome changed**, none
+  gone; seven new, B7.e's fast cases in `test_bellerophon`, all passed (the meetings with the 64, the
+  commodore alone, her rules captain's three, and the rank-4 rule by the tops' report).
+- **(e) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- Before the runs: the two new tests alone (2 passed, 33.8 s), their mutations and their run on
+  62cf52c6 (above, item 4); her file's collection 135 fast and 17 slow.
+
+Junit, logs and the probes under `scratchpad/b7e/fix/` (`final/`, `repro.py`, `repro_player.py`,
+`saves_peek.py`, `mutate_crewed.py`, `mutations-crewed.json`, `pace7159.log`); the worktree of 62cf52c6
+cleared after. Not run: the pace tier alone, and the generator (no ship file touched).
+
+### B7.e and the trunk's merge (2026-11-12)
+
+**The merge.** The lead's trunk at 746c0bb7 merged onto e4797779 (B7.e's review mends) at 1282e25f;
+it brought every trunk commit since the branch last took the trunk at 7693cad5 (package 74's steps 4
+to 7 and close-out, 98, 100, 101, 102, the lead's records and the removal of truth 7-196's
+alone-pace test, its figures kept in a comment). Two fast tests failed after it, both in
+`tests/test_bellerophon.py`. Each was bisected before it was moved: worktrees of e4797779 under the
+scratch with one trunk commit merged into each (`git merge --no-ff`, no conflict in any), the
+failing case run alone on each, the tree asserted first on `sys.path`; the worktrees cleared after.
+
+**1. The bare number**
+(`test_a_bare_number_is_refused_naming_the_decks_and_one_with_its_deck_fires`).
+
+| Tree | The case |
+|---|---|
+| e4797779 with 56e3befd (the trunk before 74's step 6) | passed |
+| e4797779 with 4ee7ab2b (74's step 6 merged) | failed |
+| e4797779 with 71f21f03 (6b84c966's parent) | passed |
+| e4797779 with 6b84c966 (74's step 6, the lead's review's mends) | failed |
+
+6b84c966 gave a gun named by its number with no side the side engaged, else the side the mark is on
+(`gunnery._of_the_side_meant`), the lead's ruling (7) of 2026-11-10 at the 74's merge having sent
+the named gun's bearing check to package 74. "fire the lower deck's No. 8", her mark engaged four
+cables on the starboard beam, old beside new: "No. 8 starboard gun of the lower deck and No. 8
+larboard gun of the lower deck to fire as soon as ready." (the guns ready to fire
+`gun.lower.3.starboard`, `gun.lower.8.starboard`, `gun.lower.8.larboard`); now "No. 8 starboard gun
+of the lower deck to fire as soon as ready." (`gun.lower.3.starboard`, `gun.lower.8.starboard`). The
+trunk's reason, by its own ruling: the pin moved, the reply still pinned whole, so that the case
+fails if the deck is not named; the refusals of the bare number are as they were.
+
+**2. The 64 and a 74**
+(`test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line[the-64-and-a-74]`).
+
+| Tree | The case |
+|---|---|
+| e4797779 with 985c8777 (the trunk before 74's step 4) | passed |
+| e4797779 with 9944b671 (74's step 4 merged) | failed |
+| e4797779 alone (74's step 3, 924d1b26, already in it) | passed |
+| e4797779 with 3af179be (step 3 and a4944b87, "the far fight wired") | failed |
+
+The case's world (tests/test_brains.py's, seed 7, the far brain alone): the player's 64 under her
+rules captain on her station off the Lizard, a French 74 put a mile and a half north bound for
+Brest, both King's ships by their books (`engage_nm` a mile), each minute after she is put:
+
+| Tick | e4797779 | 1282e25f |
+|---|---|---|
+| 300 | the 64 on passage; the 74 on passage at 1.05 miles | the same |
+| 360 | the 74 on passage at 0.94 miles | the 74 `engaging`, her plan `[("chase", None, 740.8)]` |
+| 420 | the 64 `engaging`, the 74 at 0.83 miles | the 74 `done` and gone from the sea; "The seventy-four on the starboard bow is out of sight."; the 64 on passage |
+| 480 to 960 | the 64 engaging; the 74 closed to 0.04 miles at 840 | the 64 on passage throughout |
+
+**Found, a fault of the trunk's, for the lead** (package 74's step 4, a4944b87, merged at 9944b671;
+not mended here, the code being 74's and the package closed). The far brain now takes the engaging
+transition (`FarCaptain._enemy_within` returns the mark where it returned None), and the King's
+ship's rows take her into `engaging` from her plan states (`{from: on passage, on: enemy in range,
+to: engaging}`, and the rows from beating, keeping station and in company); but the far brain holds
+a mark (`_stranger`) only where `_work` sets one, investigating, chasing and evading, or taking
+possession, and `_work` has no branch for `engaging`. So a far ship of war that engages from a plan
+state has no mark in hand: `resolve_state` gives her a chase of nobody, `Vessel._target_of(None)` is
+None, the leg is dropped, the plan is empty and `Vessel.tick` marks her `done`, a 74 gone from the
+sea under a mile from an enemy she has just judged; and `far_action._pairs` finds no mark for her,
+so no round is fought. The three frigate cases see the same (the 74 `engaging` at tick 360 and gone
+at 420) and pass, the lone frigate having hauled off at 300 and the one in a set engaged at 360.
+Measured for the lead, not built: a scratch wrapper of `brains.resolve_state` that gives her the
+mark the stimulus read (`_enemy_within` at her `engage_nm`) where none is in hand, as the near
+captain's `_mark` takes it; with it the 74 chases the player's ship, closes to 0.28 miles and keeps
+there, and the 64's captain engages her at tick 420 as at e4797779: the case passes in the trunk's
+world.
+
+**The guard kept.** The 64's case alone runs with the far fight's toggle off (`far_action.ENABLED`
+False, the module's own switch for the bisection: the far brain never engages, the world B7.e
+measured; a new parameter `far_fight`, the node ids unchanged), the narrowest change to her world
+that keeps the point (a 64, a ship of the line herself, is not sent away by the rank-4 rule; she
+engages an enemy not yet spoken). Every figure of its run is e4797779's (the 64 engaging at tick
+420, the 74 at 0.83 miles). Able to fail: the rank-4 rule without its own-size clause
+(`_line_of_battle_nm` patched in the scratch to give the miles to a ship of the line) fails it, the
+64 on passage throughout. Where the far brain is mended to take her mark, the toggle can come out of
+the case. The frigates' three cases are left in the trunk's world.
+
+**3. Found by the step's run of her file whole, explained and not mended: truth 7-196's crewed
+clause** (`test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor`, marked `pace`, passed in
+the base's slow run): it fails on the places, before its clock is judged, S2 5.62 miles from the
+frigate at the end of the third thousand against `CREWED_NM` (4.0). The places are the world's and
+not the clock's (the same in one process without the clock, `scratchpad/rf/places196.py`), the three
+74s' miles from her at the end of each thousand:
+
+| Tree | 2900 (S0, S1, S2) | 3900 | 4900 |
+|---|---|---|---|
+| e4797779, and with 985c8777 or 8bfdde0a | 0.28, 0.08, 0.67 | 0.31, 1.06, 1.27 | 0.50, 0.92, 3.11 |
+| e4797779 with 9944b671 or dccbf845; 1282e25f | 0.28, 0.08, 0.67 | 1.28, 0.57, 2.74 | 3.18, 1.79, 5.62 |
+
+dccbf845 is package 74's step 4 at the resumption, with step 3's five mends from the owner's play.
+File by file on e4797779 with 8bfdde0a: its `world/captains.py` alone or its `world/prizes.py` alone
+(each with its orders, world, captive and movement changes, which alone move nothing) gives the new
+figures; on 1282e25f the two mends off by scratch patches (`Judgement._prize_of_ours` False,
+`prizes._no_enemy_now` a no-op) give e4797779's exactly. The world: the frigate carries no private
+signal table, so the three British 74s take her, and each other, for enemies (the lead's (5) of
+2026-11-10, booked to the signals' owner), and they take her at tick 2820, S1 her captor with the
+player's person a captive aboard. Before, S1 still held her prize an enemy (her challenge
+unanswered) and stayed engaging; with the two mends (a captor's own prize, and any of the captor's
+nation's, is no enemy, and the taking clears her from what made her one) S1 has no enemy left and
+goes on passage for Falmouth with her prisoners, while S0 and S2, each the other's mark, draw off as
+they fight. The trunk's behaviour is right by its own ruling (the owner's play of 2026-11-09: a
+captor engaged their own prize); what carries the 74s off is the truth's world, its want of private
+signals. Not mended here: the clause is Phase 5's to move into the known truths, and its world or
+its place bound is the lead's to rule (two ways, neither measured here: the frigate given the day's
+private signals, their want being what sets the 74s on her by the clause's own docstring; or the
+places read before the taking).
+
+**What any ship may say that this step changes:** nothing. No code, no data and no ship file moved;
+the lines that moved are the trunk's (a named pair's reply under a side engaged, every armed ship's;
+a far ship of war gone from the sea when she engages from a plan state, every far body's; a captor
+no longer engaging their own prize, every captor's).
+
+**The suites, as run.** On the final tree (1282e25f with these changes uncommitted), from the tree
+root with `py`, one run at a time, the tree asserted first on `sys.path`, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/rf/runs/run.sh`); the bases not re-run.
+
+- **Her file whole** (`tests/test_bellerophon.py --slow`): 150 passed, 1 failed (136 s), junit
+  `scratchpad/rf/runs/bel.xml`. Against the base's fast and slow junits for her file (152): truth
+  7-196's alone-pace test gone (the lead's); one outcome changed, passed to failed, the crewed
+  clause (item 3); the two moved pins passed.
+- **The files the bisection points to** (`tests/test_far_action.py` and
+  `tests/test_practice_orders.py`, `--slow`): 57 passed (39 s); against the base, no outcome
+  changed, nine new from the trunk (the far fight's eight and the bearing check's test), all passed.
+  **The far fight's truths** (`tests/test_known_truths.py --slow -k` 7-358 to 7-361 and 7-369, new
+  from the trunk): 5 passed (31 s).
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+- Before the runs: the two moved tests alone (5 passed); the 64's case able to fail (above).
+
+Not run: the whole fast tier, the slow candidates, the captain's trials, the four whole logs and the
+pace tier (no code moved; the two pins are tests), and the generator (no ship file touched). The
+bisection's worktrees and its probes under `scratchpad/rf/` (`diag64.py`, `diagset.py`,
+`mutate64.py`, `places196.py`, `logs196.py`, `mark196.py`); the worktrees cleared after.
+
+## The trim's words by the alias (package 75) (2026-11-11)
+
+**The ruling.** The lead's note of 2026-11-09, 22:56 UTC, (2), confirmed in the note of 2026-11-10,
+02:25: "BUILD it for every file as one words step (the reply and the done line name a sail by the
+same word, the file's first plain alias), every moved pin old beside new; with the 74's window".
+B2b's finding ((3)(d), above, "not one function's line") had the trim's reply naming each sheet's
+sail by `resolve.the`, that is `resolve.display_name`, which reads no alias, while the runner's
+lines for the same sheets ("Man the fore-and-aft foresail sheet.", "Trimmed the sheets of the
+fore-and-aft foresail, ...") read `runner.part_name`, the file's first plain alias.
+
+**As built** (`freesail/orders/verbs.py` alone among the code): `_the_sail`, "the " and
+`runner.part_name`, names every sail the trim's reply names: the sheets being trimmed, the sheets
+standing as trimmed, a sheet refused, and a sail named to `trim the <sail>` that is not set ("The
+gaff topsail is furled; there is no sail to trim."). The reply and the runner's started and done
+lines now read one function, so they name a sail by one word on every file by construction.
+`display_name` is unchanged, and with it its callers (the grammar, the completions, the readings,
+the other verbs: "Backed the fore staysail" on the cutter is as it was); a yard, a mast or a line
+in the trim's reply is named as before, and so is the order's own object ("Braced the topsails to
+the wind", the captain's noun). A sail with no plain alias is named alike by the two functions
+(measured over the 304 sails of the 18 files: none apart), so only an aliased sail's words move,
+and nothing but words: the names are read for the reply's text and its `trimmed_sheets` and
+`standing_sheets` data, which nothing reads, and the lists keep their lengths.
+
+*Judgement (the ruling's lean):* the refusal of a sail not set is the trim's reply too, so it names
+the sail as the sheets' clauses do; the ruling's "reply" read as every sail the trim's words name.
+
+**The words that move, by file** (the display name, then the first plain alias):
+
+| File | Fore-and-aft sails (the sheets' clauses and the refusal) | Square sails (the refusal alone) |
+|---|---|---|
+| frigate-36, razee-44 | mizzen spanker → spanker | fore course → foresail, main course → mainsail |
+| brig, merchant brig | main spanker → spanker | fore course → foresail, main course → mainsail |
+| seventy-four, sixty-four | mizzen driver → driver (their mizzen course "mizzen course" by both) | fore course → foresail, main course → mainsail |
+| cutter | main sail → mainsail, main gaff topsail → gaff topsail, fore staysail → foresail, storm trysail → trysail | none |
+| smack | main sail → mainsail, fore staysail → foresail, storm trysail → trysail | none |
+| lugger | fore lug → foresail, main lug → mainsail, mizen lug → mizen, taille vent → taille-vent | none |
+| topsail schooner, privateer schooner | fore sail → foresail, main sail → mainsail, main gaff topsail → gaff topsail | none |
+| *Neufchatel* | fore sail → fore-and-aft foresail, main sail → mainsail, main gaff topsail → gaff topsail | fore course → foresail |
+| bilander | main settee → mainsail | fore course → foresail |
+| the five boats | none | none |
+
+A square sail is trimmed by its yard and named as the yard in the trim's words; only the refusal
+of one not set names it as a sail. Her fore course "the foresail" and her fore gaff sail "the
+fore-and-aft foresail" stay apart in the one reply.
+
+**Measured.** The scripts in the session's scratch (`s7/alias/`), outside the repository, each the
+same on the base tree (the branch at 93a15ee5, exported whole) and on this step's.
+
+- *Every file's trim lines* (`trimlines.py`): every file of `data/ships/` under plain sail with the
+  wind abeam (heading 270, the wind from the north at 15 kn, seed 7; the truths' `under_plain_sail`,
+  its trims every two minutes), then "trim sails", "trim the sheets" twice and "trim the <sail>" for
+  each fore-and-aft sail by its display name: **527 trim lines over the 18 files, 122 moved**, every
+  one at the same tick and kind, every log the same length (the 13 sailing files' digests moved,
+  the five boats' not). Hers, old beside new: "trimming the sheets of the fore sail, the main sail,
+  the fore staysail and the jib" to "trimming the sheets of the fore-and-aft foresail, the mainsail,
+  the fore staysail and the jib", beside the runner's "Trimmed the sheets of the fore staysail, the
+  fore-and-aft foresail, the jib and the mainsail; 28° to 32° off the centreline." as before. The
+  frigate's "the sheets of the mizzen spanker, the fore topmast staysail and the jib stand as
+  trimmed" to "the sheets of the spanker, ...", beside "Man the spanker sheet." and "Trimmed the
+  sheets of the fore topmast staysail, the jib and the spanker". The cutter's "trimming the sheets
+  of the main sail, the fore staysail and the jib" to "... of the mainsail, the foresail and the
+  jib", beside "Man the foresail sheet."; the lugger's "the fore lug, the main lug, the mizen lug
+  and the jib" to "the foresail, the mainsail, the mizen and the jib"; the bilander's "the main
+  settee" to "the mainsail". Every started and done line the same, and now the reply's words.
+- *The refusal* (`furled.py`): every sail of every file named to "trim the <sail>" with all furled:
+  **304 orders, 41 moved** (the table's aliased sails), each "The <sail> is furled (unbent); there is
+  no sail to trim." with the alias, the outcome and kind the same.
+- *The four whole logs* (`log_digests.py`, and `loglines.py` line by line): the lines, the port
+  lines, the shut ticks, the roll and the heel the same as `b2/digests-final.json`; the digests
+  moved, every moved line a trim's reply at the same tick and kind: `first-action` (the cutter)
+  497 lines, 84176c16104a2c67 to 234036cc17e6f137, 7 lines ("the main sail, the fore staysail" to
+  "the mainsail, the foresail"); `encounter` (the frigate) 229, 523ebf0bf6180321 to
+  732a6020db4d4755, 9; `trial-station-lee-shore` 1561, 8f2e1783e6d13312 to e8c79e9947e244c3, 20;
+  `trial-station-gale` 1722, 8df0ab2beba93320 to 1e59009004141b08, 13 ("the mizzen spanker" to "the
+  spanker").
+- *The schooner's gate runs* whose truths fail on this machine before their digests are read
+  (`gates.py`): every line's tick and kind the same, the trim lines alone moved: the gate 5b
+  schooner's passage 767 lines, 4343b1c434b5b56a to cae2b06446ea86c3 (40 of 138 trim lines); the
+  merchant passage 2909, 117ddf79cef5831e to 63168300d93caa13 (103 of 466); the schooner on an
+  intent 2098, 0f69f4dc0798176d to f3626a67bca16526 (119 of 558); the merchant passage under the fake
+  captain 2921, 01dd0e989a2f1191 to 1001994b41d53626 (103 of 466) ("the fore sail and the main
+  sail" to "the foresail and the mainsail").
+
+**Pins moved, old beside new.**
+- Words: `tests/test_trim_order.py` ("the mizzen spanker" to "the spanker", the reply and its
+  `trimmed_sheets`); `tests/test_orders_m4a.py` ("trim the spanker" and "tend the sheets": "the
+  mizzen spanker" to "the spanker"; the schooner's "the main sail" to "the mainsail", the reply and
+  its data); `tests/test_staying.py` ("Trimming the sheet of the mizzen spanker" to "... of the
+  spanker"); `tests/test_lateen.py` (the frigate with the 64's mizen course, a fixture whose first
+  plain alias for the course is the frigate's "mizzen": "The sheet of the mizzen course stands as
+  trimmed." to "The sheet of the mizzen stands as trimmed."); `tests/test_orders.py` (the cutter's
+  "trim the headsail sheets": "The sheets of the fore staysail and the jib" to "The sheets of the
+  foresail and the jib").
+- Digests that pass on this machine, re-pinned, every line the same, proved by bisection (the base
+  head gives the old figure, the base's junit): gate 5a's day 1680cb1391720dd8 to
+  0325e18ce782b58b; gate 5b's passage 9a1f2802ba7c6533 to 2c38f76132521e4e (731 lines); its thick
+  weather 9ce8174ebc6948c6 to f119ec763d2b442e (469); the naval cruise 1e7f8ab24b84e6f7 to
+  0ac7eaba9f341529 (2242); the captain's trial on the station with the stranger c1d54413006885aa to
+  d1a7b668bec784ff (788), all the frigate's.
+- Digests that fail on this machine at the base, not re-pinned, both figures here for the lead's
+  build machine: the trials in a gale 8df0ab2beba93320 to 1e59009004141b08 (the pin
+  04f2fcd0fe9023a4), the trade with the stranger 8dac97a4c9bdfe43 to 0b430d261669ba5a
+  (aa04702e062bc64b) and in thick weather df5f02eb6e6ce68a to 41a37f0290be291a (cfa538b19cb0d2fe);
+  truth 77's merchant passage 117ddf79cef5831e to 63168300d93caa13 (`GATE_5C_MERCHANT_DIGEST`
+  6436eb06a665f379); and three whose tests fail here on a tick or a line before the digest is read,
+  the figures from `gates.py`: `GATE_5B_SCHOONER_DIGEST` (2b68e8b1f60e8496), `GATE_6A_INTENT_DIGEST`
+  (8744d3e56cfc9508) and `GATE_6A_FAKE_CAPTAIN_DIGEST` (7076e667c2bc41e3), above. The lee shore's
+  trial reads its digest and asserts none.
+
+**For the lead.**
+1. The seven digests above are the build machine's to re-pin at the merge; each moves by the trim's
+   words alone here (the four gate runs every tick and kind the same, line by line; the three
+   trials their states, anchorings and line counts, asserted before the digest, the same, and the
+   gale's every line by the whole log).
+2. Found on the way, not built (the reply's own grammar, older than this step): a whole-ship trim
+   with one sheet to work says "trimming the sheets of the mainsail" (the bilander's settee, the
+   smack's and the schooners' mainsail), the plural kept unless the sail was named.
+3. Beside the trim, other replies still name a sail by `display_name` ("Backed the fore staysail"
+   on the cutter, "Hauled the mizzen spanker sheet flat aft", the roll-call of a set or a take-in
+   of more than three sails, `verbs._summarise`'s "Hands to ..."): the ruling is the trim's, so
+   they are as they were.
+
+### The suites, as run (the trim's words)
+
+Once, on the final tree (the package's branch at 93a15ee5, the step uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run.
+
+- **(a) The trim's and the words' files, fast** (`test_trim_order`, `test_orders_m4a`, `test_staying`,
+  `test_lateen`, `test_orders`, `test_evolutions`, `test_readings`, `test_in_world`, `test_primer`,
+  `test_grammar_book`): 2,083 passed, 1 failed (494 s), the cutter's headsail sheets in
+  `test_orders`, re-pinned (above).
+- **(b) The slow candidates** (every test that pins a log's digest as a constant: nine truths by
+  name and the captain's trials): 3 passed, 13 failed (809 s); against `b7/final-slow.xml`, the five
+  that passed at the base failed on their digests alone, re-pinned and run again, **5 passed** (284
+  s); the eight that failed at the base failed on the same asserts, the three trials and truth 77
+  with the digests above.
+- **(c) The touched files' slow tests and the words' files'** (`--slow -m slow` over the ten files of
+  (a)): **27 passed** (24 s), as at the base.
+- **(d) The four whole logs**: above.
+- **(e) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`); no ship file is touched.
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- **(g) The whole fast tier**, last, on the final tree with every re-pin: **7,316 passed, 2 skipped,
+  1 xfailed** (1,952 s). Against `b7/final-fast.xml` (7,277): no outcome changed; the 44 new in
+  `test_bellerophon` B7.c's and B7.d's, passed, and the two gone B7.d's renames.
+
+Junit, logs and the measurements under `scratchpad/s7/alias/` (`run/`, `trim_old.json`,
+`trim_new.json`, `cmptrim.txt`; `run/furled-*.json`, `run/lines-*.json`, `run/cmplines.txt`,
+`run/gates-*.json`; the base head's tree `old/`). Not run: the slow tier beyond (b) and (c), the
+pace tier.
+
+## Package 75, B7's review mends (2026-11-11)
+
+**The review** of 69121a9e (B7.c), 412658a9 and 93a15ee5 (B7.d) and 56c1174b (the trim's words)
+against 9c812f43: seven findings, each reproduced on 56c1174b first; five real and mended, two real and
+left for the lead (outside B7's files), none refuted. One commit of the mends, on the steps' files and
+the records: `freesail/evolutions/runner.py` (B7.c's), `freesail/crew/quarters.py` (B7's), her tests,
+truth 7-136, the primer's lines that quote the moved words and the harness's quote of the robbed line.
+
+**1. Truth 7-196's crewed clause, red on distance** (the blocker). Reproduced: S2 6.21 miles off at
+the third timed thousand (the probe, `scratchpad/s7/probe7196.py`, 85-88 ticks a second). **Mended by
+item 3's mend, her places unmoved:** her 74s work their manoeuvres at quarters in that world, and with
+the helm, the powder, the carpenter's crew and the surgeon's mates kept at their stations they stand at
+most 0.67, 1.27 and 3.11 miles off at the ends of the timed thousands (the least 0.08), the crewed
+count 3, 164-173 ticks a second by the probe (S0's tack lends 168 hands, S1's wear 162 and her tack
+178). The clause passes by its node id (33 s alone). `SEVENTY_FOURS_AT` in her tests and in
+`tools/pace.py` as they were; the docstring gives the figures old beside new (0.25-3.59 miles at the
+base, 0.39-6.21 after B7.c, 0.08-3.11 now).
+
+**2. Truth 7-136's band hid the spec's sentence.** Real at 56c1174b: "guns before sail" 433 s against
+447 cleared from 292.5 degrees, passing `285 <= guns_first <= 600`. After item 3's mend the tack under
+"guns before sail" has the trimmers alone, 44 of 111, its crew factor 111/44 = 2.52 through it, and is
+slower than cleared from each heading: 528, 453 and 458 s against 343, 447 and 370. **Re-pinned, old
+beside new** (`tests/test_known_truths.py`; its docstring gives the base's, B7.c's and the mend's
+figures): the hands lent, 44 within 35 to under 84, **to** exactly 67, what one watch wants beyond her
+44 trimmers; under "sail before guns" no short line and the crew factor 1.0 at the order (within a
+thousandth), 468 s within 1.15 times cleared (held); under "guns before sail" short 76 of 111 **to** 44
+of 111, the crew factor 111/44 asserted within a thousandth, and **the spec's sentence asserted
+again**, `cleared < guns_first <= 600` where the band was 285-600 s alone. **Plainly:** from 292.5
+degrees the margin is six seconds (453 against 447), the frigate's way out of stays being truth 10's
+knife-edge; the factor's clause is the one that holds the rule whatever her way.
+
+**3. The pool at quarters** (Bel-D §6.7: "worked first by the trimmers and, for the work on deck, the
+marines' division ... and takes from the guns ... only what its party wants beyond them"). Real, and
+the rule binding on it. Reproduced on 56c1174b, one tick after "tack ship" in truth 7-136's world under
+"sail before guns": the frigate's tack held her 44 trimmers, both her helmsmen, her carpenter's crew of
+6 and 15 of her 22 powder beside the 44 lent; hers held every hand idle at quarters (the trimmers 55,
+the marines 95, the powder 31, the carpenter's crew 11, the helm 2, the surgeon's mates 2) beside 72
+lent. **Mended** in `runner.py`:
+- `_quarters_pool`: an all-hands request at quarters (the test of `_quarters_party`: not the guns' own
+  work) draws on the trimmers, the marines' division (on deck alone, by `hands.can_work`), the hands the
+  guns lend and any not quartered; the hands whose `quarters` is the helm, the powder, the carpenter's
+  crew or the surgeon's mates (`KEEP_THEIR_STATIONS`) keep their stations. Read at the order, in the
+  robbing and in the top-up as hands join (`_take_hands`, `_rob_the_guns`, `_top_up_all_hands`).
+- `_rob_the_guns`: an all-hands request short of its party keeps the hands it has and is made up from
+  the whole crews freed (`hands.top_up`, the best fitted first), the rest of a crew going back to its
+  gun at once (`Quarters.tick`); a numbered request as before (released and asked again). Without this
+  the request ranked the trimmers and the freed together and could leave a trimmer idle for a gunner:
+  two of the privateer schooner's trimmers stood idle while eight of her guns' hands tacked.
+- The robbed line's count: the hands of the freed crews the all-hands work took (67 in the frigate,
+  where the crews freed held 69); a numbered request's line counts every hand freed, as before.
+- Numbered sail work at quarters draws on the pool as before (the rule is the manoeuvre's).
+
+**Every armed file's tack at quarters, B7.c (56c1174b) beside the mend** (truth 7-136's world as in
+B7.c's table, the same script, `scratchpad/s7/tackq.py`; `tackq_new.json` and `tackq_mend3.json`;
+seconds from 290, 292.5 and 295 degrees, the hands lent in brackets):
+
+| File | Party / its workers at quarters (B7.c's idle) | Cleared | Sail before guns, B7.c | Mended | Guns before sail, B7.c | Mended |
+|---|---|---|---|---|---|---|
+| seventy-four | 268 / 150 (196) | 237, 243, 258 | 237, 243, 258 (72) | the same (118) | 331, 334, 391 | 409, 446, 422 |
+| sixty-four | 218 / 137 (181) | 244, 251, 266 | 244, 251, 266 (39) | the same (81) | 295, 298, 350 | 396, 422, 396 |
+| frigate-36 | 111 / 44 (76) | 343, 447, 370 | 334, 468, 469 (44) | the same (67) | 436, 433, 453 | 528, 453, 458 |
+| razee-44 | 146 / 93 (125) | 435, 427, 484 | 435, 427, 484 (29) | the same (53) | 499, 501, 502 | 543, 545, 544 |
+| brig | 48 / 42 (61) | 440, 454, 455 | 440, 454, 455 (none) | the same (6) | 440, 454, 455 | 469, 470, 471 |
+| hermaphrodite-brig | 55 / 65 (76) | 192, 189, 193 | 192, 189, 193 (none) | the same (none) | 192, 189, 193 | the same |
+| cutter | 12 / 9 (15) | 107, 106, 106 | 107, 106, 106 (none) | the same (3) | 107, 106, 106 | 118, 116, 116 |
+| privateer-schooner | 17 / 11 (16) | 142, 142, 142 | 142, 142, 142 (1) | the same (6) | 142, 142, 142 | 154, 155, 157 |
+| merchant-brig | — | no tack ended in 1,200 s | the same | the same | the same | the same |
+
+Every cleared tack and every tack under "sail before guns" is the same to the second, the party made
+up; the hands lent are exactly the party less its workers on every file that lends. Under "guns before
+sail" each tack goes short by the hands the helm, the powder, the carpenter's crew and the surgeon's
+mates no longer give: hers 150 of 268 (1.73, 1.84 and 1.64 times cleared), the 64's 137 of 218, the
+frigate's 44 of 111, the razee's 93 of 146, the brig's 42 of 48, the cutter's 9 of 12, the privateer's
+11 of 17. The robbed lines from 292.5 degrees: hers "118 hands taken from the poop, Nos. 1 to 3, the
+upper deck, Nos. 7 to 14, and the quarterdeck, Nos. 1 to 7" (her lower deck untouched), the 64's "81
+hands taken from the upper deck, Nos. 8 to 13, and the quarterdeck, Nos. 1 to 5", the frigate's "67
+hands taken from the bow chasers and the guns, Nos. 10 to 13 and 15 to 17", the razee's "53 hands
+taken from the bow chasers and the guns, Nos. 11 to 13 and 17 to 19", the brig's "six hands taken from
+the bow chasers", the cutter's "three hands taken from No. 3 gun", the privateer's "six hands taken
+from the pivot gun and the swivels". **Bisected:** 56c1174b and the mend's tree differ in code by
+`runner.py` (this item) and `quarters.py` (item 7, read by nothing), every "B7.c" figure the head's and
+every "mended" one the tree's, by the same script and seed.
+
+Her tests moved with it, old beside new (`tests/test_bellerophon.py`, "Her tack at quarters"): the
+table's (watch, idle, lent) to (watch, workers, lent), hers (268, 196, 72) to (268, 150, 118), the
+64's (218, 181, 39) to (218, 137, 81), the brig's (48, 61, 0) to (48, 42, 6), and the hermaphrodite
+brig's (55, 65, 0) new, the case where the trimmers make a watch (two cases more, eight in all); the
+assertions tightened: the hands lent exactly the party less its workers and exactly the tack's hands
+from the guns, and none of the tack's hands of the helm, the powder, the carpenter's crew or the
+surgeon's mates. Her slow tack beside her cleared tack, 243 and 243 s, its docstring's 72 to 118.
+
+**4. The primer's tack at quarters** (`docs/primer/22-an-action.md`, served). Real: it gave the half of
+every crew, the 84 hands and the 642 s. Mended to the rule as built, in the in-world voice, with the
+frigate's lines from truth 7-136's world ("Tacking ship at quarters: 67 hands taken from the bow
+chasers and the guns, Nos. 10 to 13 and 15 to 17; the guns go on short-handed"; "Only 44 hands to tack
+ship; there are no more on deck."; 447 s cleared, 453 under "guns before sail"). The same old line
+quoted in `docs/agents/Harness.md`'s action rows, found on the way, mended to the frigate's new line.
+**Left for the lead:** `docs/TechnicalSpec-M7.md`'s two as-built passages (§8a, "under `sail before
+guns` the frigate's tack takes half of every gun's crew and keeps its pace (436 s against 447 cleared)
+... under `guns before sail` the trimmers alone have her (642 s)"; §9's truth list, "at quarters 436 s
+with 84 hands lent ... and 642 s"), yours to amend old beside new: now 67 hands lent and 468 s under
+"sail before guns", 44 of 111 and 453 s under "guns before sail".
+
+**5. The primer's trim replies** (`docs/primer/04-trimming.md` three lines, `07-a-first-passage.md`
+and `18-lessons.md` one each). Real after 56c1174b: "the sheets of the mizzen spanker, the fore topmast
+staysail and the jib" in the frigate's trim replies, where the reply now says "the spanker". Mended in
+those five lines alone; the sheet's own orders and refusals ("Eased the mizzen spanker sheet", "The
+mizzen spanker sheet is already hard in") are other replies, named by `display_name` as before.
+
+**6. The possessive after a gun's name by deck** (`combat/hits.py`, "No. 3 starboard gun of the lower
+deck's carriage struck"; `combat/guns.py`, "The No. 1 larboard gun of the upper deck's port is shut;
+the sea is at its sill."). Real, reproduced on her file. `freesail/combat/` is not B7's (Bel-D §13):
+for the lead, "the carriage of No. 3 starboard gun of the lower deck struck" and "The port of No. 1
+larboard gun of the upper deck is shut; the sea is at its sill." where `gun.by_deck`, the possessive
+kept for every other gun so that other files' lines stay byte for byte.
+
+**7. `crew/quarters.py`'s told-off share, read by nothing after B7.c.** Real; B7's file, tidied:
+`TOLD_OFF_SHARE` and its comment, `lend`'s `share` parameter and branch and `_share_words` are gone,
+and `lend`'s docstring says the all-hands manoeuvre's lending as built. Nothing called them (grep over
+`freesail`, `tests` and `tools`); nothing of a pickle moves (a module constant and a function).
+
+**Found on the way, left:** a numbered request's robbed line counts every hand of the whole crews
+freed, some of whom go back to their guns at once when the request is made up from better-fitted idle
+hands (package 70's line, older than B7.c).
+
+### The suites, as run (the review's mends)
+
+Once, on the final tree (the package's branch at 56c1174b, the mends uncommitted), from the tree root
+with `py`, one run at a time with nothing else running, the tree asserted first on `sys.path`, each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`; the bases not re-run
+(`scratchpad/s7/mend/run.sh`).
+
+- **(a) The slow candidates** (`--slow -m slow` over the base's 86 files, `b7/final/slowlist.txt`):
+  **304 passed, 10 failed, 1 skipped, 9 xfailed** (2,792 s). Against `b7/final-slow.xml` (323): one
+  new, her tack beside her cleared tack (B7.c's, passed); truths 7-136 and 7-196's crewed clause
+  passed, as at the base. Three outcomes changed, failed to passed, all pace floors read under four
+  workers: the day under systems, the gate's day with the region loaded and truth 7-159's convoy of
+  six (496, 471 and 447 ticks a second at the base, 500 or more here); in the same run truth 7-196's
+  alone clause read 390 against the base's 478, the other way: the machine's load, not the code. The
+  other non-passes as at the base: the three captain's trials and truth 77 on their digests, now the
+  trim's words' (56c1174b's, reported there: 1e59009004141b08, 41a37f0290be291a and 0b430d261669ba5a;
+  63168300d93caa13); the schooner's octant passage, the merchant passage's and the schooner's intent
+  constants and truths 78 and 79 on the base's messages (the octant's but for an object's address);
+  truth 7-196's floor by pace; the nine known failures marked so and the browser's skip.
+- **(b) The captain's trials** (`--slow`): 3 failed, 4 passed (263 s), the three on their digests,
+  the trim's words' figures above (56c1174b), the base's asserts before the digest all holding.
+- **(c) The four whole logs** (`log_digests.py`): every figure the same as `b2/digests-final.json`
+  (lines, port lines, shut ticks, roll and heel) but each digest, which is the trim's words' (56c1174b,
+  line by line there): first-action 234036cc17e6f137, encounter 732a6020db4d4755, the lee shore
+  e8c79e9947e244c3, the gale 1e59009004141b08. Nothing of the four is moved by the mends.
+- **(d) The generator** (`py tools/gen_ships.py <scratch>`): 18 written, every one byte for byte the
+  committed (`cmp`); `tools/check_viewer_guns.py` clean.
+- **(e) The whole fast tier**: **7,318 passed, 2 skipped, 1 xfailed** (3,018 s), junit kept at
+  `scratchpad/s7/final-fast.xml`. Against `b7/final-fast.xml` (7,277): **no outcome changed**; two gone
+  by name, B7.d's (93a15ee5: the renamed triple test and the moved phrase row); 46 new in
+  `test_bellerophon`, all passed: B7.c's six party cases (69121a9e), B7.d's 38 (412658a9 and 93a15ee5)
+  and the mends' two (the hermaphrodite brig's cases).
+- **(f) ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (369 files).
+- Before the runs, the moved tests by node id (her eight party cases, her slow tack, truth 7-136: 10
+  passed) and truth 7-196's crewed clause alone (passed, 33 s); the fast tier of the 23 files that beat
+  to quarters, test the hands or read the primer: 2,210 passed. After the records' last edit the files
+  that read them (`test_practice`, `test_hull_schooner`, `test_indefatigable`): 120 passed.
+
+Junit and logs under `scratchpad/s7/mend/final/` and `scratchpad/s7/final-slow.xml`,
+`scratchpad/s7/final-fast.xml`; the measurements `scratchpad/s7/tackq_mend3.json`,
+`scratchpad/s7/mend/who_mend2.log` and `scratchpad/s7/mend/p7196_mend.log`. Not run: the pace tier
+alone.
+
 ## Table No. 29's charges (package 75, SW-1) (2026-11-09)
 
 **The step.** `docs/design/Build-Ships.md` §10 whole, its §2.2 and §16.1 rows, and the
@@ -18692,6 +19842,2085 @@ again):
 - **ruff** check and format clean (367 files); every changed file LF;
 - **with these records written**, the files that read the documents (B2c's fourteen, as in "The
   settee and the runner"): 1,619 passed in 5:28, every outcome as in the fast tier above.
+
+## The lead's rulings of 2026-11-10, built (package 75) (2026-11-12)
+
+The lead's notes to the ships session of 2026-11-10 at 09:55 UTC ((1), the bilander's watches; (6),
+"make all sail") and at 19:30 UTC ((1), lie a-try from way on; the 64's and the razee's `marines`;
+(2), the mizen course's tack in the design note), `docs/dev/M7-WorkPackages.md` on the tree, built in
+three local commits on the package's branch after the trunk's merge (1282e25f) and its two pins (9e04b9fa),
+a subsection here for each. Measured on the owner's machine at seed 7, the scripts in the session's
+scratch (`rf/rul/`), outside the repository: before on a worktree of 9e04b9fa, after on the tree, each
+script the same on both. Every ship file came out of the generator (`py tools/gen_ships.py` into
+scratch, compared byte for byte); the suites ran once on the three together ("The suites, as run",
+the last subsection).
+
+### 1. The bilander's short watch, and "make all sail" (09:55 (1) and (6))
+
+**(1) The ruling, and how it is read.** "Where the watch on deck is too few to begin a settee's dip
+or settle, the request calls all hands for it ... as a small coaster did for any work of her great
+sail". Read with its own "any work of her great sail": every work of her settee's own files, its dip,
+its set (from the gear or from furled), its take in and its furl. Her settee's sheet is trimmed by
+`trim_lug_sheet`, the lug's file, which the lugger shares; it is not given the key, so that no other
+ship's work changes (her settle's last sheet trim by night still waits on the larboard's two, as
+before: recorded, nothing built). **The source:** the lead's judgement, no source read for it; her
+research (`Research-Bilander-2026-10.md`: Steel's going about costing her "more time and hands than
+a brig of her size", nothing of her watches) and her sources say nothing of a coaster's watches, so
+it stands, and the served notes say "judgement".
+
+**As built.** `crew: {hands: 6, ..., too_few: all hands}` on the settee's four evolution files
+(`set_settee`, `take_in_settee`, `furl_settee`, `dip_settee`), each with a served sentence in its
+notes. `crew/hands.py`: `CrewRequest.calls_all_hands` read from the key (refused in words for any
+other word, and beside all hands or none); `too_few_on_deck`, the hands on deck fit for the work,
+idle or at other work, fewer than `SHORT_HANDED_SHARE` of the number wanted after the company's
+clamp (so a watch busy at other work waits for it, as before, and calls nobody); `as_all_hands`, the
+same rating and stations as all-hands work, its party its number. `Runner._take_hands`: a request
+that comes out too few, where `_watch_too_few` holds (the key; all hands not up already; not at
+quarters; no party named by the order, which `_check_party` judges), calls all hands for it through
+the routine ("All hands! (to furl the mainsail)", `_call_all_hands`, which belays nothing for a work
+that is no manoeuvre), takes the hands idle on deck and those who come up to its six (the top-up),
+and at its end pipes down unless the captain called them (`_after_all_hands`): the all-hands path
+every pool action takes, with its crew factor (the company's pace, the numbers term to the party).
+`scripts._hove_to_no_longer`: a dip begun so is said "The watch calls all hands to dip the mainsail,
+lying against its mast." (data `all_hands_called`), its call's own line after it; "The watch dips
+..." where the watch begins it, as before. No other committed file carries a settee
+(`tests/test_settee.py`: the key on the settee's four files alone, the bilander the one file with a
+settee); the fixture's settee brig keeps watches of 48 (38 who go aloft), never too few for six.
+
+*Measured: her four orders sailed* (her test's `_her_settle` in 15 kn, the hands piped down and 30 s,
+then "take in the mainsail", "set the mainsail" from the gear, "furl the mainsail" and "set the
+mainsail" from furled, each to its end; seconds from the order):
+
+| Watch on deck | take in | set from the gear | furl | set from furled |
+|---|---|---|---|---|
+| larboard by night (her 00:00 settle), two | 87, all hands (old: waits for hands) | 100, all hands (old: refused, still set) | 338, all hands (old: waits) | 225, all hands (old: refused) |
+| larboard by day (her 08:00 settle), two and the cook | 183, three (as before) | 198, three (as before) | 275, all hands (old: waits) | 176, all hands (old: refused) |
+| starboard (04:00 and 12:00, B4's harness), three | as before, 169 and 154 | 183 and 167 | 490 | 316 |
+
+B4's harness (`r10/m/bil/req.py`, her settle piped down at 2,300 s) gives the larboard's within four
+seconds (87, 100, 341 and 229 s by night; 274 and 176 by day, the take in and the set from the gear
+184 and 199 with three, as before). Each called work says "All hands! (to take in the mainsail)" at +1 s with its first line on that
+tick, "All hands on deck." at +90 s where it runs so long, and "Piped down; the larboard watch has
+the deck." on the tick it ends; no "Not hands enough on deck" line. (Old: "Not hands enough on deck
+to take in the mainsail; there are but two to spare.", the work waiting to the watch's end, and the
+later orders refused, the settee set still, or queued behind it.) The static table of her requests
+by watch (`REQUESTS`) is unchanged cell for cell; beside it `CALLS_ALL_HANDS`: the larboard by night
+all four, by day the furl and the loosing aloft (two topmen for five aloft), the starboard none.
+
+*Forced round in her larboard watch by night* (her (3)(i), as her test has it: hove to from her
+settle at 00:00, piped down, 60 s, the shift of eight points): "hove to no longer" at +155 s, the line
+now "... The helm keeps her full and by. The watch calls all hands to dip the mainsail, lying against
+its mast." (old "... The mainsail, lying against its mast, is to be dipped." and the runner's "Not
+hands enough on deck to dip the mainsail; there are but two to spare."), the call and "Dip the
+mainsail! Hands to the jeers and the tack." on that tick, all hands up at +245 s, dipped and piped
+down at +423 s (old: begun only when the test called all hands at +160 s, dipped at +555 s). Hove to
+600 s, the tuning notes' measure: dipped at +424 s in 15 and in 20 kn; at +1,800 s the settee
+drawing 61.7 m² and she 2.74 kn full and by in 15 kn, 61.1 m² and 3.63 kn in 20 kn (old: against its
+mast to the end, 41.2 m² and 2.58 kn; 40.8 m² and 3.42 kn).
+
+*A wear after a take in, her larboard watch* (her (3)(iii)'s case, 00:45): the take in now calls all
+hands at +1 s and is all-hands work, so the wear ordered at +29 s waits for it as two all-hands works
+always have (spec M3 §3.4): "Not hands enough on deck to wear ship; the watch is taking in the
+mainsail." at +30 s, "Took in the mainsail" at +87 s and the wear begun on that tick, worn at +614 s,
+piped down once, there (old: the wear at once at +30 s, "lower the mainsail" in its helm line, worn at
++558 s, the take in waiting and kept, begun when all hands were called by order). Her starboard
+watch's case line for line as before (worn at +501 s, the take in after at +643 s). **For the lead,
+a judgement:** the called work is all-hands work, so a manoeuvre ordered while it is in hand follows
+it rather than belaying it (57 s here); the manoeuvre belaying it, and the work's own call to come
+again after, would want the runner's belay to treat called work as the watch's, not built.
+
+*Her gale* (B4's script, all hands called by order from her settle and never piped down): every line,
+the trace and every reply the same before and after (120 lines): the call is never made with all
+hands up. Her other tests as before but the two moved below.
+
+**Lines any ship may say that this changes:** the bilander's alone: her settee's work in a watch too
+few to begin it (the call, the work at the company's pace, the pipe-down, and the waiting lines no
+longer said), her forced round's line, and her manoeuvres ordered while called work is in hand. Her
+group orders, measured at the review ("The review's mends", below): of "set plain sail", "make all
+sail", "shorten sail" ("take in sail") and the courses' "take in" and "furl" in her larboard watch
+by night, those that hold her settee move (its work called and piped down, the order's other sails
+waiting for the watch's two as before, their waiting line "the watch is setting the mainsail" where
+it was "there are but two to spare"); the rest line for line as before.
+
+**(6) "make all sail" lists the square sail only where she has one.** *As built*
+(`freesail/orders/storm.py`, `orders/__init__.py`): `storm.listed_lines` drops `make all sail`'s "set
+the square sail" (`SET_SQUARE_SAIL_LINE`) where the ship has no `square_sail` part, as it drops
+`shorten sail`'s "take in the square sail", and `_group_evolution` takes `make all sail`'s list
+through it. *Measured* ("make all sail" at the prompt in every committed sailing file, seed 7, 10 kn,
+all hands called): three replies move, the *Neufchatel*'s, the topsail schooner's and the privateer
+schooner's, whose "Not done" loses "'set the square sail': 'set' was understood, but 'square' belongs
+with 'brace'"; the cutter and the smack keep the line and set their square sail; every other file
+passed it over before as a noun she lacks, and its reply is the same. **Lines any ship may say that
+this changes:** a "Make all sail" reply or line of those three (the player's, a standing order's "make
+all sail to haul off" in every captain's book, a signal's "make all sail", a hail's "she will not"),
+its "Not done" list; where the square sail's refusal was the only thing not done, the "Not done"
+goes. **A recorded passage this moves, for the lead's re-pin:** the captain's trial "the merchant
+hauls off from a privateer and waits in the road for a wind" (`trial-trade-stranger`, the topsail
+schooner under the merchant's book; `TRIAL_TRADE_STRANGER_DIGEST`, `tests/test_captain_trials.py`):
+sailed on both trees, 1,594 lines each and every tick the same, three lines differ, the standing
+order "make all sail to haul off"'s at ticks 14,631 ("Make all sail: ...", begun) and 15,216 and
+29,000 ("... order not carried out ('make all sail'): Could not make all sail: ..."), each losing
+"'set the square sail': 'set' was understood, but 'square' belongs with 'brace'; " and nothing else.
+**The toggle:** on the tree with `storm.SET_SQUARE_SAIL_LINE` made a line none is, the trial gives
+the old log byte for byte. On this machine the digest 0b430d261669ba5a (as at e4797779 and
+9e04b9fa) is now 13432e4b2659bcaf; the pin, aa04702e062bc64b, is the build machine's and fails here
+already, so the new figure is the build machine's to take. Her other recorded passages, sailed on
+both trees here: the schooner's of gate 5b (767 lines, cae2b06446ea86c3), the merchant's of gate 5c
+(2,909, 2e93986c2989d831), the intent's of gate 6a (2,098, af28debbc98516ae) and the fake captain's
+(2,921, 3211d917eda5f4af) line for line, and the trial in thick weather digest for digest
+(41a37f0290be291a), the same: none says "make all sail" where the square sail's refusal was listed.
+
+**Pins moved, old beside new** (each in its test's words): `tests/test_bilander.py`, her forced
+round in the larboard watch by night (the line, the call, dipped at +423 s where it waited and was
+dipped at +555 s after a call by order), and her wear after a take in, the larboard case
+(`[0-larboard-558-None]`) out of the parametrized test into its own,
+`test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wear_follows_it` (worn at
++614 s, old +558 s). **New:** `tests/test_bilander.py`, her larboard watch's four orders by night and
+by day (`test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after`) and
+`CALLS_ALL_HANDS` in the requests' test; `tests/test_hands.py`, the key read and refused and the deck
+too few; `tests/test_settee.py`, the key on the settee's files alone; `tests/test_gale.py`, "make all
+sail" by the part.
+
+**Found on the way, for the lead (not built):** the runner's waiting line says "the watch is" while
+all hands are being called and not yet up (`_waiting_line` reads `crew.all_hands_called`, set only
+when the last is up): every ship's, a second all-hands work in a call's first ninety seconds.
+
+### 2. B7: the two-deckers lie a-try from way on (19:30 (1))
+
+**The ruling.** `clr_x_m` stays 4.8 and truth 17 is not re-ruled; "BUILD ... on the 74's and the
+64's files alone if the files can carry it in the timings' own form: the figure that brings her up
+from way on, in your path's 35 kn, to between five and six and a half points and under 2 kn, with
+truth 28's form from rest still holding and 'heave to' on the path as it lies today; every other
+file and its logs untouched ... If the helm alone will not hold both (your sweep will say), stop
+...; no change to the script's logic in B7." **Read so:** the path is B7's review's (her record,
+"Lie a-try from way on"): plain sail at 300 degrees in 35 kn, "shorten sail" five times 400 s apart,
+"lie a-try", then the courses, the fore and mizzen topsails and the topgallants furled, as truth 28's
+own form furls what lie a-try hands; her lie judged on the settled half hour (2,700 to 4,500 s after
+the furls). Truth 28's form holding is the truth's own bounds on her (30 to 95 degrees off, under 2
+kn on the hour's mean, nothing carried away, the lying line), from rest in 35 kn (B7's review's
+`try35.py`, the topgallant masts left up) and in 45 kn (truth 28 itself, the frigate's). No ship file
+could carry a timing before this step: the runner gave a script its evolution file's `timing:`
+alone. **The helm alone holds both, on each file** (the sweep below), so it is built. **A reading,
+for the lead** (named at the review): the ruling's "if the files can carry it in the timings' own
+form" is read as leave to make them carry it in that form, a new section of a ship file
+(`timing:`, an evolution's id to its own timing keys) and the runner's merge of it over the
+evolution file's, the script and its keys unchanged. Read strictly, the files as they stood could
+not carry it, and the ruling's own way out would send the recorded sweep (below) to the evolutions'
+owner, package 77's ground, with the two-deckers' two equilibria named (at the file's 5 degrees,
+from rest about five points at 1.3 to 1.45 kn, from way on about eight at 3.5 to 3.6 kn); then the
+section, the merge and the two files' figures come out.
+
+**As built.** A ship file's top-level `timing:` (`ShipSpec.timing`, `schema._parse_timing`: an
+evolution's id to a mapping of its timing's keys to figures, refused in words where it is not), read
+by `Runner._timing`, which gives the script its evolution file's timing with the ship's figures for
+that evolution over it; every other ship and evolution its file's own (the same object). The
+script's logic is unchanged: `LieATryScript` reads `timing_value("helm_deg", 5.0)` as before. The
+generator's `Builder.timing` writes the section last in the file with its note; the 74's module
+`lie_a_try: {helm_deg: 20}` (`LIE_A_TRY_HELM_DEG`, its judgement in a comment), B1's module the 64's
+32 and nothing for the razee. Every other file's bytes the generator's as before (sixteen of
+eighteen byte for byte; the two with the section added and its note, four lines each). A spec pickled
+before reads as one with no timing (`getattr`).
+
+*The sweep* (seed 7, the wind steady at 35 kn; `lie_a_try`'s `helm_deg` patched in the process on a
+worktree of 9e04b9fa, nothing in the tree changed; degrees off the wind, least to most, at the mean
+knots; "not furled" the half hour from 4,200 s after "lie a-try", "furled" the half hour from 2,700 s
+after the furls, "from rest" the hour of `try35.py`'s form in 35 kn):
+
+| helm_deg | the 74 not furled | the 74 furled | the 74 from rest | the 64 not furled | the 64 furled | the 64 from rest |
+|---|---|---|---|---|---|---|
+| 5 (the file's) | 89.9 at 3.48 | 87.6 at 3.52 | 56.2-57.7 at 1.30 | 92.2 at 3.60 | 90.7 at 3.60 | 53.4-56.4 at 1.45 |
+| 10 | 84.6-84.7 at 2.59 | 78.8-79.7 at 2.55 | 56.2-57.2 at 1.24 | 86.0 at 2.63 | 81.5 at 2.58 | 53.9-56.1 at 1.42 |
+| 15 | 81.5-84.3 at 2.28 | 71.1-74.3 at 2.08 | 55.6-57.2 at 1.21 | 83.7-84.0 at 2.27 | 76.3-79.6 at 2.17 | 54.0-56.5 at 1.39 |
+| 17.5 | 72.1-92.4 at 2.23 | **70.5-70.6 at 1.96** | 54.9-58.4 at 1.20 | | | |
+| 19 | 68.3-95.2 at 2.15 | **68.9 at 1.91** | 53.8-59.1 at 1.19 | | | |
+| **20 (hers)** | 66.3-96.7 at 2.09 | **67.6 at 1.88** | 52.7-59.9 at 1.17 | 78.6-86.7 at 2.08 | 70.9-78.5 at 1.94 | 51.7-58.1 at 1.38 |
+| 22.5 | 61.1-101.8 at 2.10 | **66.2-66.5 at 1.83** | 53.5-60.8 at 1.22 | 70.9-93.5 at 2.05 | 70.6-76.8 at 1.86 | 49.8-60.1 at 1.37 |
+| 25 | 58.4-104.3 at 2.02 | **65.7-66.2 at 1.79** | 46.8-90.0 at 1.21 | 67.5-96.0 at 2.01 | 70.4-75.2 at 1.79 | 52.2-62.3 at 1.38 |
+| 28 | | | | 62.4-100.4 at 1.95 | 70.6-73.5 at 1.74 | 49.2-89.7 at 1.36 |
+| 29 | | | | 60.9-101.9 at 1.89 | **70.7-73.0 at 1.73** | 47.2-91.3 at 1.37 |
+| 30 | 55.8-106.0 at 1.96 | **64.9-66.1 at 1.73** | 42.1-87.5 at 1.19 | 59.8-103.0 at 1.87 | **70.7-72.5 at 1.71** | 45.7-86.9 at 1.37 |
+| **32 (the 64's)** | | | | 58.1-104.7 at 1.91 | **71.1-71.5 at 1.69** | 43.5-79.4 at 1.36 |
+| 35 (hard a-lee) | 54.3-106.7 at 1.87 | **64.1-66.2 at 1.69** | 39.1-86.0 at 1.16 | 56.5-106.0 at 1.84 | **70.7 at 1.66** | 41.0-75.0 at 1.34 |
+
+Bold: inside five to six and a half points (56.25 to 73.125 degrees) and under 2 kn. **Not furled**,
+the courses, the fore and mizzen topsails and the topgallants hanging in the gear, no helm settles
+either ship in the band: to 15 she lies steady eight to seven and a half points off at 2.3 kn and
+more, from 17.5 (the 64 from 20) she comes up and falls off, between about 55 and 106 degrees at
+the most, at about 2 kn: the band is reached when the hands furl what lie a-try handed. **Furled**,
+the 74 from 17.5 and the 64 from 29. **From rest** every figure holds truth 28's form in 35 kn (30
+to 95 degrees, under 2 kn); the 74 steady near five points to 22.5, coming up and falling off from
+25; the 64 near five points to 26 and coming up and falling off from 27 and 28 (as truth 28's
+frigate does, 33 to 87 degrees). **Taken (judgement):** the 74 **20** (settled 67.6 degrees, six points, at 1.88
+kn, her lie from rest nearly as it was, 52.7 to 59.9 at 1.17 against 56.2 to 57.7 at 1.30), and the
+64 **32** (settled 71.1 to 71.5 at 1.69, a degree and a half inside six and a half points where 29
+and 30 hold it by 0.1 and 0.6 degrees; from rest 43.5 to 79.4 at 1.36). Each the file's own; the 74
+at 32 would come up and fall off from rest (42 to 88 at 30), the 64 at 20 lies outside the band.
+
+*As built, measured on the tree* (the figures the sweep gave, to the hundredth): her path's "Lying
+a-try under the main topsail and the staysails, helm a-lee." at tick 3,275 (the 64 3,272), as before;
+furled, the 74 67.6 degrees at 1.88 kn and the 64 71.1 to 71.5 at 1.69 (old 87.6 at 3.52 and 90.7 at
+3.60); her lying-to line an hour on "Lying to on the starboard tack, her head six points from the
+wind; the watch tending the helm and the sheets." (old "eight points"); her log on the path 367
+lines where it was 267 (the 64's 349), the more her leeway's lines as she comes up and falls off
+before the furls (in a longer run of the path, 6,000 s lying and 6,300 s furled: `ship.leeway` 120
+lines where it was 20, every other kind as many and the same). From
+rest in 35 kn, truth 28's form: as the sweep. In 45 kn, truth 28 itself on her: 50.6 to 83.9 degrees
+at 1.37 kn, nothing carried away (old 54.4 to 91.4 at 1.79); the 64 there carries away her main
+topsail sheet and blows out her mizzen topsail before she lies a-try, at every helm and before this
+step alike (her log digest for digest the same), not her truth. **"Heave to" on the path:** each
+file's log line for line and digest for digest as before (the 74 256 lines, ecfb97653106ca59; the 64
+256, 17f0502076e2b12b), the heave-to's own `helm_deg` untouched.
+
+**Lines any ship may say that this changes:** the 74's and the 64's lying a-try alone: where she lies
+and her way, her lying-to line's points, and her leeway's lines as she comes up and falls off. No
+other file carries a timing (her test), so no other ship's lie a-try, heave-to or any scripted
+manoeuvre moves; no recorded passage holds either ship (the four whole logs as before, and no
+captain's trial moved by this step: "The suites, as run").
+
+**Pins:** none moved. **New** (`tests/test_bellerophon.py`): the timing on the two files alone, every
+other file's and evolution's its own, and refused in words
+(`test_her_and_the_64s_lee_helm_lying_a_try_is_their_files_alone`); from way on in the band
+(`test_lying_a_try_from_way_on_the_two_deckers_come_up_to_six_points_under_two_knots`, the 74 and the
+64); from rest in truth 28's form
+(`test_from_rest_the_two_deckers_lie_a_try_in_truth_28s_form_with_their_lee_helm`, both); the four
+sailed ones slow (24.0, 21.9, 12.7 and 13.1 s at four workers; `tests/conftest.py`'s `SLOW_TESTS`).
+
+### 3. B1: the 64's and the razee's `marines`, and the design note's words (19:30)
+
+**The ruling.** "The 64's and the razee's `marines` (84 and 14 would form their divisions and meet
+their bills exactly): BUILD with step 7 as a generator's change to B1's two files, each file's beat
+old beside new, and say whether any recorded passage of the 64's moves (a line every ship of two
+decks may say)." And (2): "The mizen course's tack: as built, 9 ft above the poop ... the design's
+'quarterdeck' was the slip. Steel's 'within 6 or 7 feet' stays in the note as the general rule beside
+it. Mend the design note's words".
+
+**As built** (`tools/ships/indefatigable.py`): `quarter_bill` writes the bill's `marines` after the
+generator's call, as the 74's module writes hers, each file's marines less its default fit's
+carronades' crews (`at_the_guns`): the 64's **84** (her 'ardent class 1784' carries no carronade),
+the razee's **14** (her 'as carried 1796' carronades take 36 of her 50), each with a note; the
+forecastle trimmers' note no longer says the beat takes the marines to the long guns; the generator's
+report adds "the bill keeps 84 (14) marines in their division". Both files by the generator, the
+64's two lines (the key and its note) and the note's words, the razee's the same; every other file
+byte for byte.
+
+*The beat at muster, every fit* (`Quarters.beat`, seed 7, `tests/test_brains.py`'s world off the
+Lizard; old beside new):
+
+| File, fit | Crews filled | Marines at the long guns | at the carronades | in their division | Trimmers |
+|---|---|---|---|---|---|
+| the 64, 'ardent class 1784' (default) | 32 of 32, both | 84 → **0** | 0 → 0 | 0 → **84** | 137 → **53** |
+| the 64, 'ardent class 1794' | 36 of 36 → **33 of 36** | 76 → **0** | 8 → **0** | 0 → **84** | 121 → **53** |
+| the razee, 'as carried 1796' (default) | 24 of 24, both | 18 → **0** | 32 → **36** | 0 → **14** | 93 → **79** |
+| the razee, 'as razeed 1795' | 22 of 22 → **19 of 22** | 46 → **0** | 4 → **12** | 0 → **38** | 89 → **79** |
+
+The helm 2 and the powder 29 (the razee's 22) on each, old and new. Their lines, old beside new: the
+64's "Beat to quarters! Quarters: 32 gun crews manned, the trimmers 137, the helm 2, the powder 29."
+now "... the trimmers 53, the helm 2, the powder 29, the marines 84.", her four deck lines as before
+man for man; the razee's "... 24 gun crews manned, the trimmers 93, the helm 2, the powder 22." now
+"... the trimmers 79, the helm 2, the powder 22, the marines 14.". On the default fits the divisions
+form and the trimmers meet the bills, 53 and 79, as B7 measured with the key in memory. **For the
+lead:** the key is the bill's, set against the default fit as the trimmers are, and on the other fit
+of each the long guns now take no marine where her seamen run short: the 64's 'ardent class 1794'
+leaves her lower deck's No. 13 8 of 11 and her upper deck's No. 13 and her poop's No. 3 unmanned
+("Not hands enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand
+unmanned."), the razee's 'as razeed 1795' her Nos. 12 and 13 unmanned and No. 17 1 of 7 ("... the
+guns, Nos. 12 to 13 and 17 stand unmanned."), where before both filled every crew with marines at the
+long guns. Falconer's marines at the great guns "only in distant cannonading" is the engine's rule
+since B7.b; a key by fit, or the long guns taking marines where the seamen run out, is yours. The
+74's three fits fill every crew with hers (B7.b), her company larger.
+
+**Whether a recorded passage of the 64's moves:** none holds her or the razee. No shipped scenario
+names a ship of the line, and the business draws none (B7.e's finding, looked for again: outside
+the ships' own files and their people no file of `data/` names one, the captains' books but for the
+rank-4 rule's knob); the pinned passages are the frigate's, the schooner's and the merchant's (the
+known truths' gates, the captain's trials, the regatta and the replays); the four whole logs are as they were
+and no captain's trial moves for this step ("The suites, as run"). **Lines any ship may say that this
+changes:** the two files' alone, at quarters: the "Beat to quarters!" line and the readings of their
+quarters (their trimmers and their marines' division), and what follows from who is at quarters
+(the sail work's hands at quarters, `Runner._quarters_pool` and the robbing's line, the marines'
+muskets); on the other fit of each, the line of the guns unmanned. A ship of two decks says them
+only where her file carries the key: the 74's since B7.b, now the 64's.
+
+**(2) The design note's words** (`docs/design/Design-Ship-Bellerophon.md`): the rows of "How the two
+drafts were judged" and "Decisions taken" (item 11) (the tack 9 ft above the deck the mast stands through, the poop, the design's "quarterdeck" the
+slip, Steel's "within 6 or 7 feet" beside it), §4.5's tack (the deck named the poop, the figures as
+built, the quarterdeck's arithmetic kept and marked as the slip's), its "Plainly" (Steel's rule kept
+as the general rule beside the built figure; the clew figures marked as taken from the quarterdeck),
+a ruled note after its as-built note, §4.6's jaws (the same deck), and §17.2 item 13's question
+pointed to the ruling. Nothing built moves: the file's tack has stood 9 ft above the poop since B7.
+
+**Pins moved, old beside new** (each in its test's words): `tests/test_indefatigable.py`, the beat
+at muster on the default fits (the marines at the long guns 84 and 18 to none, the divisions none to
+84 and 14, the trimmers 137 and 93 to 53 and 79) and the generator's report's two bill lines (now
+with the marines kept); `tests/test_bellerophon.py`, `BEAT_LINE`'s two rows (the 64's and the
+razee's, old in the comment) and the one-gun-deck test's razee (her division 14, where none);
+`tests/test_bill_marines_and_flag.py`, the keyless files (the 64's and the razee's out of them: they
+carry the marines and no flag) and the pickled bill read back (the 64's, its marines left out, as a
+pickle from before the stage). **New:** `tests/test_indefatigable.py`, the other fits' beats
+(`test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short`).
+
+### The suites, as run (the three steps together)
+
+Once, on the final tree (9e04b9fa with the three steps uncommitted), from the tree root with `py`,
+one run at a time with nothing else running, the tree asserted first on `sys.path`
+(`freesail.__file__` under FreeSail-pkg-75), each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"` (`scratchpad/rf/rul/run/run.sh`); the bases not run again: the fast and
+slow junits at e4797779 (`b7e/final-fast.xml`, `b7e/final-slow.xml`), the four whole logs as at
+e4797779 (b7e's record), and the captain's trials as run on 9e04b9fa before any change.
+
+- **The generator,** `py tools/gen_ships.py` into scratch: eighteen of eighteen files byte for byte
+  as in `data/ships/`, the 74's, the 64's and the razee's as these steps write them.
+- **The files** (`--slow`: every touched test file, `test_bilander`, `test_settee`,
+  `test_bellerophon`, `test_indefatigable`, `test_gale`, `test_lying_to`, `test_in_world`,
+  `test_hands`, `test_bill_marines_and_flag`, and the files the steps could reach: `test_catalogue`,
+  `test_evolutions`, `test_profile`, `test_profiles`, `test_neufchatel`, `test_schooner_mast`,
+  `test_orders`, `test_ships`, `test_lee_ports`, `test_driver`, `test_subtypes`, `test_brains`,
+  `test_captains`, `test_practice_orders`, `test_view_geometry`, `test_view_action`,
+  `test_viewer_action`, `test_hull_form`, `test_magazine`, `test_rig_classing`, `test_wardroom`; 30
+  files): **3,647 passed, 1 failed, 1 xfailed** (779 s). Against the base's junits restricted to these files (3,568 cases): one
+  outcome changed, truth 7-196's crewed clause, passed to failed on S2's 5.62 miles, the trunk's
+  (B7.e and the trunk's merge, item 3), as found; only in the base, six: the five named above as
+  moved (the larboard wear's case, the default fits' beat under their old parameters, the 64 and the
+  razee out of the keyless files) and the trunk's removed alone-pace test; only in this run, 87:
+  these steps' 15 (the default fits' beat two of them, under their new parameters), the trunk's 57
+  (package 98's viewer cases in `test_view_action`, 56; package 74's bearing check, 1), and the slow
+  cases of `test_hands` (9) and `test_lying_to` (6), outside the base's slow list, all passed; the
+  xfail the same.
+- **The four whole logs** (`log_digests.py`): all four as at e4797779 in every field (the first
+  action 497 lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the station's lee shore
+  1,561, e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08), and as on 9e04b9fa before
+  any change: the trunk's merge moved none of them.
+- **The captain's trials** (`--slow`): 5 passed, 3 failed (325 s), as on 9e04b9fa before any
+  change outcome for outcome; two on the machine's digests as there and at e4797779 (the station's
+  gale 1e59009004141b08, the trade's thick weather 41a37f0290be291a), and the trade's stranger on
+  0b430d261669ba5a there and **13432e4b2659bcaf** here: ruling (6)'s three lines (subsection 1),
+  its pin the build machine's to take again.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files). Every
+  changed file LF with a final newline.
+
+Measured besides, before and after: her gale (B4's script) line for line; the schooner's recorded
+passage of gate 5b line for line (on this machine); "make all sail" in every sailing file; "heave
+to" on B7's path digest for digest on both two-deckers. Not run: the whole fast tier and the slow
+candidates beyond these files (the steps reach the bilander's settee work, three files' "make all
+sail", the two two-deckers' lie a-try and their beat, each measured and looked for above); the pace
+tier.
+
+### The review's mends (2026-11-12)
+
+An independent review of the four commits since the trunk's merge (9e04b9fa to 0e5ff12d) found
+seven points. Each was reproduced first on the tree at 0e5ff12d, the scripts in the session's
+scratch (`rf/fix/`), outside the repository, "before" on exports of 9e04b9fa and 0e5ff12d; one
+commit of the mends after these steps.
+
+**1. A settee order waiting its turn behind called work was piped down and called again on the
+same tick** (the review's blocker). In her larboard watch by night (her settle at 00:00, the hands
+piped down and 30 s; seed 7, 15 kn), "take in the mainsail" and 10 s later "furl the mainsail":
+"All hands! (to take in the mainsail)" at +1 s; at +87 s "Took in the mainsail", "Piped down; the
+larboard watch has the deck." and "All hands! (to furl the mainsail)" on one tick, all hands up
+again at +177 s, furled and piped down at +316 s. "wear ship" and 29 s later "take in the
+mainsail": worn at +528 s, piped down and "All hands! (to take in the mainsail)" on that tick, all
+up again at +618 s, taken in and piped down at +621 s. Two calls and two pipe-downs each, the watch
+below turned up twice and its broken sleep (`FATIGUE_ALL_HANDS_AT_NIGHT`) twice, against the
+runner's own rule (`_after_all_hands`, playtest 7's finding 1). The cause: the pipe-down is held
+only for work waiting whose want is all hands already, and a settee's request stays numbered until
+`_watch_too_few` makes it all-hands work as it begins, after the pipe-down. The build's tests sailed
+each order to its end before giving the next.
+
+*As mended* (`freesail/evolutions/runner.py`, `freesail/crew/bill.py`): before it pipes down,
+`_after_all_hands` makes all-hands work of each settee request waiting its turn that would call all
+hands the moment the hands were piped down (`_too_few_piped_down`: `_watch_too_few`'s rule read on
+the deck as the pipe-down would leave it, `bill.on_deck_piped_down`, every hand at work, the idlers
+by the bells and the watch on deck, nobody turned up), marked `Instance.held_up`. The rule as it
+stood then holds the pipe-down, and the work begins on the hands already up and pipes down at its
+own end. Such work taken away before it began (refused, done already, failed or belayed) ends the
+call as all-hands work ending does: without that clause a take in waiting behind a furl, done
+already at its turn, held the hands up and left them up (measured). Gated on the settee's key
+(`calls_all_hands`) and the mark it alone sets, so no other ship's work moves; at quarters, with a
+party named by the order and with all hands called by order, as before. A checkpoint pickled
+before reads the mark as unset (the dataclass's default).
+
+*Measured, old (0e5ff12d) beside new:* take in then furl, one call at +1 s, the furl begun on the
+take in's tick at +87 s, all hands up at +90 s, furled and piped down at +306 s (old +316, two
+calls); wear then take in, one call (the wear's), the take in begun at +528 s on the wear's tick,
+taken in and piped down at +619 s (old +621, two calls); furl then take in, one call and one
+pipe-down on both trees, the take in "done already" ("The mainsail is furled; there is nothing to
+take in.") and the pipe-down on one tick at +306 s, the pipe-down said after it where it was said
+before it; take in then wear (the build's own test) line for line as before. Her four settee orders
+sailed one at a time, her forced round, her wears, her gale and the requests' tables as before (her
+tests).
+
+*Her group orders* (the review's fourth point), in her larboard watch by night from her settle,
+piped down and 30 s, on 9e04b9fa, 0e5ff12d and the mended tree (the last two line for line the
+same): "set plain sail" (her fore course, settee and both topsails taken in first): before, every
+sail waited for hands ("Not hands enough on deck to set the mainsail; there are but two to spare."
+and the topsails' lines) to the watch's end; since the build, "All hands! (to set the mainsail)" at
++1 s, the topsails' "Not hands enough on deck to set the fore topsail; the watch is setting the
+mainsail." (and the main topsail's), the settee set at +94 s and the hands piped down on that tick,
+the fore course and both topsails left waiting for the watch's two to the watch's end, as before.
+"take in the courses" and "furl the courses" the same: the settee taken in at +87 s (furled at +306
+s) by all hands and piped down, the fore course waiting for the watch's two (before, both waited).
+Her company's six are all at the settee's party of six while it is in hand, so the order's other
+sails have no hand until it ends, and the pipe-down falls then. "make all sail" (her settee set
+already; the main topmast staysail waiting for the watch's two), "shorten sail" and "take in sail"
+(both topsails reefed by all hands and both topgallants taken in, 1,227 s, piped down once): line
+for line the same on all three trees. **For the lead, not built:** the pipe-down that falls while
+the same order's other sails still wait for hands, beside the 09:55 note's (5) (waiting work tried
+again only after the pipe-down); holding the call for them would make the call the order's, past
+the ruling's "a settee's dip or settle".
+
+**2. The 64 and a 74 left nothing failing for the trunk's fault** (should-fix). A fifth case of
+`test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line`,
+`[the-64-and-a-74-far-fight-on]`: the 64's world with the far fight on, a strict expected failure
+(`raises=AssertionError`, its reason the fault and its commit). On the tree it fails as found (the
+64 on passage; xfailed, 3.8 s); with the far-brain sketch of "B7.e and the trunk's merge" patched
+in the process (the `_enemy_within` mark taken on entering `engaging`) it passes and, strict, fails
+the run, the four other cases passing: the day package 74's mend lands the suite says so, and the
+switch comes out of the fourth case. The other cases' ids and figures as they were.
+
+**3. The lie a-try's reading** (should-fix, the record's): named in subsection 2's "Read so", for
+the lead. Nothing built moves.
+
+**4. Her group orders unmeasured** (nit): measured, item 1.
+
+**5. The 74's mizen course note** (nit): the note on its tack (`tools/ships/bellerophon.py`, and the
+comment over `MIZEN_TACK_ABOVE_DECK_FT`) still said "(judgement, for the lead)" and Steel's rule "the
+other reading"; now "Bel-D §4.5 first named that deck her quarterdeck, her poop then judged to end
+abaft the mizen, the slip (the lead's ruling (2) of 2026-11-10): ... so the 9 ft are taken above the
+poop, as ruled. Steel's 'within 6 or 7 feet of the deck' (OCR l. 11441-11442) is the general rule
+beside it." Through the generator, the 74's line 598 alone moves.
+
+**6. The 64's lie a-try note** (nit): "from rest she lies about five points as before, coming up and
+falling off" now "from rest she comes up and falls off between about four and seven points, inside
+truth 28's bounds, where at 5 she lay steady near five" (43.5 to 79.4 degrees at 32, 53.4 to 56.4 at
+5: subsection 2's sweep). Through the generator, the 64's line 4550 alone moves.
+
+**7. The commit message of 9e04b9fa** says "as he did at the base" of the 64's captain: left, since it
+cannot be mended without amending, which the branch's rule forbids; for the lead at the merge.
+
+**Lines any ship may say that the mends change:** the bilander's alone: her settee work waiting its
+turn behind called work in a watch too few for it (one call and one pipe-down where there were two
+of each; the work begun on the tick the first ends; a settee order done already or refused at its
+turn piping down after its own line). The two two-deckers' note lines are comments in their files,
+not served. **Pins:** none moved. **New:** `tests/test_bilander.py`,
+`test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again` (three cases), broken on
+purpose by three scratch mutations (the conversion off: all three fail; the deck read as it stands,
+all hands up: all three; the removal's clause off: the done-already case, all hands left up);
+`tests/test_bellerophon.py`, the fifth case above.
+
+### The suites, as run (the review's mends, 2026-11-12)
+
+Once, on 0e5ff12d with the mends uncommitted (the code, the tests, the two ship files and the notes as
+committed but for this subsection), from the tree root with `py`, one run at a time with nothing else
+running, the branch and the tree asserted first (`freesail.__file__` under FreeSail-pkg-75), each
+pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/rf/fix/final/
+run.sh`), 22:59 to 00:48 UTC; against the bases, not run again: B7.e's junits at e4797779
+(`b7e/final-slow.xml`, `b7e/final-fast.xml`) and the four whole logs as recorded there.
+
+- **The slow candidates** (`--slow -m slow`, the base's 86 files; `rf/final-slow.xml`): 323 passed,
+  12 failed, 2 skipped, 9 xfailed (46 minutes). Against the base (330 cases): only in the base, the
+  alone-pace test of truth 7-196 (the lead's removal at the trunk's merge); only in this run, 17, all
+  passed but one skipped: the two-deckers' four lie a-try tests (B7's ruling, subsection 2) and 13
+  truths of the trunk's packages (74's 7-358, 7-360, 7-361, 7-364, 7-368 and 7-369; 98's 7-448,
+  skipped for want of a browser, 7-450 and 7-451; 101's 7-491, 7-492, 7-498 and 7-499). **Two
+  outcomes changed, passed to failed:** truth 7-196's crewed clause (S2 at 5.62 miles against 4.0:
+  the trunk's, bisected at the merge to package 74's dccbf845, "B7.e and the trunk's merge" item 3,
+  as found); and `test_the_pace_on_the_day_under_systems_holds_truth_51s_floor`, 492 ticks a second
+  against 500 (8.6 s, 5.3 at the base), the machine's hour and no code's: run alone after the suites,
+  nothing else running, the best of three thousands three times over, the base e4797779 484, 477 and
+  475, 0e5ff12d 475, 481 and 481, the mends 487, 486 and 479 (and 487, 482, 480 again), every tree
+  under the floor here this hour and the mends no slower. The ten others fail both ways as at the
+  base: the three captain's trials; five tests of the recorded passages on this machine's figures
+  (the merchant's and the schooner-on-an-intent's constants, truth 77's digest, truths 78 and 79's
+  anchoring ticks), two of them with other words than at the base, both the trunk's: truth 77's
+  digest here 2e93986c2989d831 (63168300d93caa13 at the base, and so on 9e04b9fa) against a pin
+  6436eb06a665f379 to 40bcef34afd0cec4, and truths 78 and 79 here [57, 100918] both ways against a pin
+  whose last tick went 115,547 to 115,907, both pins moved by package 98's step 5 (fd350b92, the Rade
+  de Brest's own stream) on the passage into the Bay of Brest (not bisected here, the outcomes the
+  same); the schooner's 767 lines against 766; and truth 7-159's pace (448 ticks a second, 380 at
+  the base).
+- **The captain's trials** (`--slow`): 5 passed, 3 failed (326 s), as on 0e5ff12d outcome for outcome
+  and digest for digest: the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf (ruling (6), subsection 1; the build
+  machine's pin to take again).
+- **The four whole logs** (`log_digests.py`): every field as recorded at e4797779 (the file
+  identical to B7.e's record).
+- **The generator,** `py tools/gen_ships.py` into scratch: eighteen of eighteen files byte for byte
+  as in `data/ships/`; `tools/check_viewer_guns.py` clean, exit 0.
+- **The whole fast tier** (`rf/final-fast.xml`, kept as Phase 5's base): **7,525 passed, 2 skipped,
+  2 xfailed**, exit 0 (51 minutes). Against the base (7,328): **no outcome changed**. Only in the
+  base, 14: the five node ids these steps moved (the larboard wear's case, the default fits' beat
+  under their old parameters, the 64 and the razee out of the keyless files) and nine of the
+  primer's order blocks, renumbered by the trunk's edits to `docs/primer/` (none of ours); only in
+  this run, 215: these steps' 15 (the build's 11; the mends' 4, the three queued settee cases and
+  the strict expected failure, which is the one xfail more) and the trunk's 200 (packages 74, 98,
+  100, 101 and 102: `test_view_action` 56, `test_primer` 45, `test_known_truths` 36, `test_letters`
+  18 and the rest), all passed; the two skips and the old xfail as at the base.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+After this subsection was written, the commit made, `tests/test_practice.py` (the one test that
+reads these notes), the bilander's and the schooner's hull tests run again on the commit.
+
+## The lead's notes of 2026-11-12 and 13, built (package 75) (2026-11-13)
+
+The lead's notes to the ships session of 2026-11-12 at 21:20 UTC and of 2026-11-13 at 01:05, 01:15
+and 01:25 UTC (`docs/dev/M7-WorkPackages.md` on the tree), whose rulings are built here in local
+commits on the package's branch after the trunk's second merge (94bfac27), a subsection for each:
+(2) of 01:05, the far brain's mark; (1) of 01:05, truth 7-196's crewed world; (4) of 01:05, the
+marines by fit; (3)(b) of the 12th at 21:20, a ship under another's orders; (4) of the 12th, the gun
+named by deck in the struck carriage and the shut port, with the 12th's ask (ii), the 74's pumps
+(the code's, no commit). Measured on the owner's machine at seed 7, the scripts in the session's
+scratch (`s13/mend/`, `s13/s196/`, `s13/marines/`, `s13/orders/`, `s13/possessive/`), outside the
+repository, each run on the tree and on an export of the commit before (for the first, 94bfac27:
+`freesail/world/brains.py` as it was there, nothing else differing in the code). The rest of the
+four notes (the 13th's (3) and (5) to (9), the 12th's other asks) are not these commits'. The two
+reviews of the five commits and their mends, in one commit after them, are subsection 6
+(`s13/mends/`).
+
+### 1. A far ship of war engaging from her passage keeps her mark (01:05 (2))
+
+**The ruling.** "The far fight's fault is yours to mend, in this branch (package 74 is closed and
+its files are free): a far ship of war that goes engaging from a plan state takes the mark the
+stimulus read, as the near captain's `_mark` takes it, and keeps one in hand as chasing does when
+the mark is lost from sight ... With it: a truth in your numbers (a far ship of war that engages
+from her passage keeps the sea and closes her enemy); the toggle taken out of the 64's case; the
+strict xfail made a plain test that passes."
+
+**The fault, as found** ("B7.e and the trunk's merge", item 2). The King's ship's rows (and the
+cruiser's, the commodore's, the privateer's, the merchantman's, the packet's and the Indiaman's)
+take a far body into `engaging` from her plan states on `enemy in range`; the far brain holds a mark
+(`_stranger`) only where `_work` sets one, so gone engaging from `on passage`, `beating`, `keeping
+station` or `in company` she had none, `resolve_state` laid `("chase", None, range)`,
+`Vessel._target_of(None)` was None, the leg was dropped, the plan was empty and `Vessel.tick` marked
+her `done`: gone from the sea the minute after she judged her enemy, and no round fought
+(`far_action._pairs` finds no mark for her).
+
+**As mended** (`freesail/world/brains.py` alone):
+- `FarCaptain._engaging_mark(p)`: the near captain's `_mark` on the far body: the mark in hand while
+  she is in sight, else the nearest enemy within the breaking-off distance (`_enemy_within` at
+  `break_off_nm`, which is the enemy the `enemy in range` stimulus read at `engage_nm`).
+- `FarCaptain._take_mark(p)`, run each minute in `engaging` from `_work` (the branch it lacked; on
+  the road from a plan state alone since the review's mends, subsection 6 (a)): none in hand or the
+  mark lost from sight, the nearest enemy within the breaking-off distance is taken and the chase
+  leg laid to her at the doctrine's range, as chasing takes the nearest stranger; with none in sight
+  the mark in hand is kept while she is on the sea (the leg follows her truth until `enemy out of
+  range` ends the action); with no mark on the sea at all she lies to where she is (`_on_the_sea`:
+  the player's ship while she has a place, another vessel while she is not `done`), so that no chase
+  of nobody is laid.
+- `resolve_state`'s `engaging`: with no mark in hand she takes one there (`_take_mark` on a
+  perception of the minute, `perceive_vessel`, as `running for shelter` reads one), so that a state
+  entered outside the minute's judgement (the fold-back at a demotion) lays no chase of nobody
+  either; with a mark in hand the leg as before. Its docstring's "in distress and engaging she lies
+  to" (package 74's step 4 made engaging a chase) brought to the code.
+- No new attribute: a checkpoint pickled before loads and runs as it did (the methods are the
+  class's); a far brain pickled in `engaging` with no mark (94bfac27's chase of nobody) leaves the
+  sea as she did there (corrected by the review's mends, subsection 6 (a), where this line said she
+  takes one at her next judgement).
+
+**Its truth's number: 7-231.** The package's truths are 7-185 to 7-199 by Build-Ships.md §15 (the
+table's 7-199 the last of the block), and the lead's ruling on the gate (2026-10-28, Ext §14 item 11,
+`docs/dev/M7-WorkPackages.md`) gave it "the spare block 7-230 to 7-239 for more"; 7-230 is the
+driver's (the lead's allotment of 2026-10-29). 7-231 is the next of that block, used nowhere in the
+tree (grep of `tests/` and `docs/`), and no other package's numbers reach it (84's 7-200, 77's 7-201
+to 7-219, 85's from 7-240). Taken without a further ruling, since the block was given for more; for
+the lead to re-number if 7-230's allotment by name meant each needs one. The test lives with the far
+fight's truths: its bodies in `tests/test_far_action.py`, the truth after 7-369 in
+`tests/test_known_truths.py`.
+
+**Measured, the toggle beside the mend:**
+
+| World (seed 7) | 94bfac27 | The mend |
+|---|---|---|
+| The 64's case (`tests/test_bellerophon.py`, the far fight on): the French 74 bound for Brest a mile and a half north of the player's 64 on her station | `engaging` at tick 360 (0.94 miles), her plan `("chase", None, 740.8)`; done and gone at 420; the 64 "on passage" to the end | `engaging` at 360, her mark the player's ship, `("chase", "the ship", 740.8)`; the 64 engaging at 420 (0.84 miles); she closes to 0.28 miles by 780 and keeps there, on the sea (0.25 at 960) |
+| Two far 74s from their passages, a mile apart twelve miles south of the frigate hove to (the cap nought; `s13/mend/farpass.py`) | both `engaging` at 120, both gone at 180, no round | both `engaging` at 120, each the other's mark (the French at her 4 cables, the British at 2, by the nations' habits); the range 0.89 miles at 120, 0.41 at 480, 0.21 at 720, 0.15 from 840; a round every three minutes from 120; the Hero struck at 1200 after seven rounds (the Foudroyant 52 killed and 108 wounded, the Hero 70 and 147); taken possession of at 1260 ("struck at far detail"); both on the sea |
+| The same, the mark then hidden (`seen_within_nm` nought), a British frigate put 1.5 miles off (`keepmark.py other`) | — | the frigate her mark at the next judgement (240), the chase leg to her |
+| Hidden, none other (`hidden`) | — | the Hero kept in hand, the leg following her; `enemy out of range` at 840, `on passage` |
+| The Hero gone from the sea (`gone`) | — | she lies to (no mark); `on passage` at 840; on the sea |
+| Truth 7-358's world (the French frigate and the King's cutter) run three hours past the possession (`anger358.py`) | — | every state, plan, saved plan, mark and range minute by minute as at 94bfac27 |
+| Truth 7-196's crewed world (`rf/places196.py`) | S0, S1, S2 at 0.28, 0.08, 0.67; 1.28, 0.57, 2.74; 3.18, 1.79, 5.62 miles | the same (the 74s are crewed captains, not far bodies) |
+
+**Able to fail.** The truth's four cases fail on 94bfac27 (the mark None at the first judgement). By
+scratch mutations of the mend: `resolve_state` laying the chase of the mark in hand alone fails
+`[none-on-the-sea]` (its `resolve_state` with no mark laid `("chase", None, ...)`); `_work` without its
+`engaging` branch fails `[another-in-sight]` and `[none-on-the-sea]`; the lie to taken out fails
+`[none-on-the-sea]` (the leg dropped, the body `done`). Either half alone keeps the first case and the
+64's case passing, since each takes the mark at her first judgement; both halves are kept, the second
+for a state entered outside the judgement.
+
+**`tests/test_bellerophon.py`, old beside new.** `test_her_rules_captain_in_a_lone_frigate_hauls_off_from_a_ship_of_the_line`:
+the parameter `far_fight` and its toggle out of the fourth case `[the-64-and-a-74]`, which now runs in
+the trunk's world and passes (the 64 engaging at tick 420, `engaged_spoken` False); the fifth case
+`[the-64-and-a-74-far-fight-on]`, a strict expected failure, is the fourth's own world now and was
+made one with it: its xfail and its node id are gone, the plain test that passes being the fourth
+(two cases of one world would be one test twice). The docstring says so. The frigates' three cases
+as before (each judges her before she engages them).
+
+**New:** `tests/test_far_action.py`, `_two_on_passage` and
+`test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy` (slow, 12.8 s:
+the states and marks at 120, both on the sea every minute, the range never opened and under a fifth
+of a mile from 900, the strike at 1200 after seven rounds a side, the possession at 1260) and
+`test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody` (three cases, 3.1 to
+4.2 s); `tests/test_known_truths.py`, truth 7-231 (slow), calling both, after 7-369.
+
+**Found, for the lead, not built: after the action her passage is not taken up.** `engaging` is no
+detour in `resolve_state` (`_DETOUR_STATES`): going engaging from a plan state her plan is not
+saved, and leaving `engaging` for a plan state nothing is taken up. Measured with the mend: the Hero
+gone from the sea, the Foudroyant lies to and, at `enemy out of range` (840), is "on passage" lying
+to for good; the Hero hidden, she is "on passage" with the chase leg of the Hero still laid; and
+after the possession, bound for Brest, she is "on passage" chasing her prize at the engaging range
+(the plan saved at `taking possession` is the action's chase leg), 0.08 to 0.18 miles from her three
+hours on, the prize in company on her. Package 74's own road (engaging from `chasing`, the passage
+saved at the chase) saves the action's chase leg at `taking possession` in the same way; truth
+7-358's frigate, on a station, lays her square again at `keeping station`, so it does not show
+there. A few lines would make `engaging` a detour for the plan (saved on going engaging from a plan
+state, taken up on leaving it, not overwritten by the detours after it); that moves package 74's
+road after the action as well, and is the lead's to rule. (Built for the plan-state road alone by
+the review's mends, subsection 6 (a); package 74's road is still the lead's.)
+
+**What any ship may say that this step changes.** A far ship of war (or an armed merchantman, packet
+or Indiaman under their books' `enemy in range` rows) that goes engaging from a plan state no longer
+leaves the sea the minute after; so the lines that followed her going, the player's lookout's "... is
+out of sight" at that minute, are no longer said there, and the lines of an action that is now fought
+are said where they were not: the lookout's sightings of her as she closes, the far rounds in a hull's
+log (`action.far_round`), the guns heard off the horizon (`action.guns_heard`), her strike and the
+possession in the far story, and, where her mark is the player's ship and the cap has no room, her
+broadside at the player's ship (`action.far_reply`, "The ... fires her broadside at us from ...").
+No line's words changed.
+
+**The suites, as run.** Once, on 94bfac27 with this step's code and tests uncommitted (the notes
+written after), from the tree root with `py`, one run at a time, the branch and the tree asserted
+first (`freesail.__file__` under FreeSail-pkg-75), each pytest with `-n 4 -p no:cacheprovider -o
+addopts="--dist loadgroup"` (`scratchpad/s13/mend/after/run.sh`), 01:41 to 03:31 UTC; against the
+bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`, `rf/fix/final/
+trials.xml`, `rf/fix/final/digests.json`).
+
+- **The whole fast tier** (`s13/mend/after/fast.xml`): **7,555 passed, 2 skipped, 1 xfailed**,
+  exit 0 (39 minutes). Against the base (7,529): **no outcome changed.** Only in the base, the strict
+  expected failure `[the-64-and-a-74-far-fight-on]`, made one with the fourth case; only in this
+  run, 30: this step's three `[another-in-sight]`, `[none-in-sight]` and `[none-on-the-sea]`, and the
+  trunk's 27 from its first merge (f120b873), each found by `git log -S` to its commit: package 102's
+  step 2 (741ba379: `test_flag_drawings` 9 and truth 7-501's six cases) and package 104 (0fb75016:
+  truths 7-510 to 7-518 and `test_bona_is_a_passage...`; e73f1543 the tide's gaugeless blocks;
+  59960e78 the weather's boxes), all passed.
+- **The slow candidates** (`--slow -m slow`, the base's 86 files; `slow.xml`): 323 passed, 14
+  failed, 2 skipped, 9 xfailed (58 minutes). Only in this run, truth 7-231 (passed) and the trunk's
+  truth 7-519 (package 104's d776537a, passed). **Every recorded passage holds:** each digest, line
+  count and tick that fails here fails as at the base with the same figures (the three captain's
+  trials, truth 77's digest 2e93986c2989d831, the merchant's and the schooner-on-an-intent's
+  constants, truths 78 and 79's [57, 100918], the schooner's 767 lines), the rest passing. Two
+  outcomes changed, passed to failed, both pace (truth 51's floor, 449 ticks a second; the gate's day
+  with the region loaded, 417), and two pace tests failing both ways were slower (the day under the
+  systems 442 against 492; truth 7-159 411 against 448): the machine's hour. Run alone after the
+  suites, nothing else running, twice on the tree and twice on the export of 94bfac27, all four
+  pass.
+- **The far fight's file whole** (`tests/test_far_action.py --slow`, `far.xml`): 12 passed; truths
+  7-358 to 7-361 and 7-369 passed in the runs above.
+- **The captain's trials** (`--slow`): 5 passed, 3 failed, as at the base outcome for outcome and
+  digest for digest (the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf: `TRIAL_TRADE_STRANGER_DIGEST` unmoved by
+  this step).
+- **The four whole logs** (`log_digests.py`): every field as recorded at 7b9d7c29.
+- **The generator** into scratch: eighteen of eighteen files byte for byte; `tools/check_viewer_guns.py`
+  clean. **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+**Moved by the toggle of the mend:** nothing pinned. No recorded passage, digest, line count or tick
+moved (the four whole logs, the captain's trials, the gates and `TRIAL_TRADE_STRANGER_DIGEST` as at
+the base), so there is nothing for the lead to re-pin by this step; what moved is the new behaviour
+alone, the worlds measured above and the 64's case.
+
+### 2. B7: truth 7-196's crewed world made honest (01:05 (1))
+
+**The ruling.** "Truth 7-196's crewed clause: its world is made honest and the clause kept. What the
+brief asks is 'the pace of a 74 crewed measured against the floors'; that her own side fired into
+the frigate was an accident of a world with no private signals, and since package 74's mends a
+captor goes home with her prize, so the load no longer lasts the measure. Give the frigate the day's
+private signals (or put the three so that they know her by the book's own road), so that the three
+74s keep a station on which each stays within `CREWED_NM` of her for every measured thousand (move
+the station or its radius to make it so, said); `CREWED_NM`, `CREWED_CAP` and
+`CREWED_FLOOR_TICKS_S` unchanged, no floor lowered; the docstring's 'in action' taken out, old
+beside new in the notes with the reason ... The pace of three crewed 74s in action, measured in the
+window before the taking, is recorded in the notes and not pinned."
+
+**The roads, measured** (on the first commit's tree, f5102fae, seed 7, `scratchpad/s13/s196/
+places.py`: each 74's miles from the frigate at the ends of the three timed thousands, 2900, 3900
+and 4900, and the most at any tick from 2000, from 1900 in the last row; the frigate's own world as
+the test lays it, her plain sail set and hove to at 900, the 74s put at 900 where the test puts them):
+
+| The world | S0, S1, S2 at the ends | The most | What they judged |
+|---|---|---|---|
+| The test as it stood | 0.28, 0.08, 0.67; 1.28, 0.57, 2.74; 3.18, 1.79, 5.62 | 5.62 (S2) | all three take her unanswered for a man of war under false colours (S0 and S1 at 1320, S2 at 1980), S0 one 74 (1800); S1 takes her at 2820 and goes on passage |
+| The day's private signals given her (`papers: {private_signals: true}`) | the same to the hundredth | 5.62 | the same: under no rules captain she answers no challenge |
+| The signals given and each challenge answered by order as her lookout reads it | 0.40, 1.24, 0.22; 1.58, 0.25, 0.78; 3.82, 1.47, 3.08 | 3.82 | S0 and S2 know her; S1 takes her unanswered (1320: the three challenged her at 1020, and each reply goes to the last challenge read) and one 74 (1740), takes her, and from 3900 the cap holds two |
+| The three in S0's squadron, the signals given her and answered | 0.17, 0.92, 0.89; 1.02, 0.27, 0.13; 2.04, 1.40, 0.54 | 2.04 | S0 alone challenges her and knows her (1260); but S0 changes between keeping station and investigating a stranger every minute to the end, over the frigate she knows (her own members, under her orders, are never challenged and never spoken, and count for `stranger near`) |
+| S0's squadron with the frigate a member (no signals) | 2.66, 3.87, 2.37; 4.40, 5.07, 3.52; 5.87, 5.90, 5.43 | 6.08 | nobody challenged; S0 investigating to the end and the set sailing off |
+| **The three in the frigate's squadron, under her orders (built)** | 1.31, 0.54, 0.29; 0.88, 0.91, 1.41; 0.99, 1.42, 2.79 | 2.79 (S2, from 1900) | nobody challenged, nothing judged, no shot; each `in company` from her first judgement to the end |
+
+The day's private signals alone do not make the world honest: the frigate under no rules captain
+answers a challenge only by her officer's order, and three King's ships challenging in one minute
+are not all answered by it, nor do they answer one another so. The book's own road does: in a set
+under the frigate's orders the three are no strangers to her (package 71's least relation: a ship
+under the challenger's own orders is none to challenge, `signalling._challenge_strangers`, the set
+writing it on each member, package 72), a member in company challenges nobody and has no stranger
+row, and is given her station on her commander (which she does not keep while the frigate lies to:
+the review's mends, subsection 6 (e)).
+
+**As built** (`tests/test_bellerophon.py` alone): the 74s put where they were (`SEVENTY_FOURS_AT`
+unmoved), then "our squadron" added before the settle (`squadrons.Squadron`, a squadron of Britain,
+its commander the frigate, `the ship`, the default; its members she and the three, line ahead, the
+goal "patrolling off the Lizard within 2 miles"); asserted at the end of each timed thousand, as
+before, the crewed ships at `CREWED_CAP` and every 74 within `CREWED_NM`, and now each 74's captain
+`in company`; at the end no line of an action in her log. `CREWED_NM` (4.0), `CREWED_CAP` (3) and
+`CREWED_FLOOR_TICKS_S` (60) unchanged; no floor lowered. **The station, moved and said:** from "the
+station off the Lizard within 2 miles", which each 74 kept alone, to each 74's station in the
+frigate's line ahead (two cables apart, `squadrons.INTERVAL_M`), her own intent's legs the set's
+business; no radius. The frigate as the set's commander, three 74s under a frigate's orders, is a
+test's world and no claim of the period: JUDGEMENT, the narrowest of the worlds measured in which
+the three know her by the book.
+
+**The docstring, old beside new** (the owner's standing rule of 2026-11-12: a test superseded by
+design is accepted where said). Old: "**Plainly:** they do not keep their places but engage her: the
+frigate of this world carries no private signal (truth 88's world has no table aboard her), so their
+challenge goes unanswered, and a man of war under their own colours that does not answer is an enemy
+by the King's ship's book (world/signalling.py, package 71's rule), which fires into her; the load
+is three crewed 74s in action, more than on their station." New: "**Her world, plainly** (the lead's
+ruling (1) of 2026-11-13): truth 88's frigate carries no private signal and, under no rules captain,
+answers none; three King's ships each keeping the station off the Lizard alone challenged her and one
+another, took her (and one another) for men of war under false colours and fired into her, and since
+package 74 her captor goes home with her prize, so that load no longer lasted the measure. Given the
+day's private signals and answering each challenge by order, she is still judged unanswered by one
+of three challenging her in one minute (each reply goes to the last challenge read), and one 74
+judges another so. In her squadron, under her orders, the three know her by the book's own road
+(package 71's least relation, package 72's set): a member in company challenges nobody and keeps her
+station on her commander, the frigate." Its place's words, its "in company" and "no line of an
+action" and the measured figures below are in it too. The reason: the clause is the pace of a 74
+crewed against the floors; the action was an accident of a world without private signals, and since
+package 74's mends it did not last the measure.
+
+**The pace, recorded and not pinned** (one process a run, nothing else running):
+
+| Measured | Run 1 | Run 2 | Run 3 |
+|---|---|---|---|
+| The old world, three crewed 74s in action: the thousand before the taking, ticks 1820 to 2820 (S0 and S2 engaging, S1 taking her) | 165.1 | 165.6 | 167.0 |
+| The old world: the action's first thousand, ticks 1320 to 2320 (S0 and S1 engaging from its start, S2 by 2250, S1 taking possession at its end) | 168.0 | 168.0 | 168.7 |
+| The new world, the test's measure: the three thousands (the best) | 105.0, 141.3, 150.3 (150.3) | 105.5, 143.0, 150.9 (150.9) | 102.2, 138.1, 146.7 (146.7) |
+
+Ticks a second on the owner's machine at seed 7, 2026-11-13, against the floor of 60. The new
+world's first thousand is the slowest (the three working up to their stations in her line, their
+evolutions crewed), its best a tenth under the old world's action; the test passes here (40.96 s,
+run alone).
+
+**Found, for the lead, not built** (the signals' owner and the sets'): (a) a King's ship challenged
+by two or more in one minute answers each by "answer the private signal", whose reply goes to the
+last challenge read (`orders/signals._private`), so the others judge her unanswered and take her for
+a man of war under false colours: three King's ships meeting at once take one another for enemies;
+(b) a set's commander who is a King's ship never challenges her own members (under her orders) and so
+never speaks them, `stranger near` counts them, and she changes between keeping station and
+investigating a stranger every minute, her stranger in hand a sail she knows already (the frigate,
+known by the signal); with the frigate a member as well, she investigates to the end and the set sails
+off.
+
+**What any ship may say that this step changes:** nothing. The step is a test's world alone: no
+code, data or ship file moved; no recorded passage, digest or pin of another test moved.
+
+**The suites, as run.** Once, on f5102fae with this step uncommitted (the notes but for this
+paragraph), from the tree root with `py`, one run at a time, the branch and the tree asserted first,
+each pytest with `-n 4 -p no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/s196/
+after/run.sh`), 03:46 to 03:56 UTC, against the first commit's runs (`s13/mend/after/`): her file
+whole but the pace (`tests/test_bellerophon.py --slow -m "not pace"`) 155 passed, no outcome
+changed; truth 7-196's crewed clause run alone, nothing else running (`--slow -m pace`), passed,
+where it failed at the base and on f5102fae (S2 5.62 miles); the far fight's file whole 12 passed;
+`tests/test_known_truths.py`'s fast tier 205 passed, as on f5102fae case for case (its slow tier ran
+on the first commit's code, which this step does not touch); the three files that read these notes
+and Build-Ships (`test_practice`, `test_indefatigable`, `test_hull_schooner`) 122 passed; ruff
+`check` and `format --check` clean (382 files). Not run again: the whole fast tier, the slow
+candidates, the captain's trials and the four whole logs (no code, data or file moved since the
+first commit's runs).
+
+### 3. B1: the marines by fit (01:05 (4))
+
+**The ruling.** "The marines: a figure for each fit whose complement differs (the 64's 'ardent
+class 1794', the razee's 'as razeed 1795'), from the establishment where a source on file gives it,
+else JUDGEMENT marked so; the long guns do not take marines (B7.b's rule stands: the bill keeps them
+for the small arms)."
+
+**How it is read.** The bill's `marines` is set against the default fit, as its trimmers are (the
+section of 2026-11-12, subsection 3, "B1: the 64's and the razee's `marines`"), and the two fits
+named are the files' others, whose carronades differ: the 64's 'ardent class 1794' carries the
+class's carronades of 1794 (16 men a side, where 1784 has none), the razee's 'as razeed 1795' six
+42-pounder carronades (12 men a side, where 1796's eighteen take 36). Their complements differ by
+the sources too, the class's 500 as built and 491 from 1794 (Winfield 1793-1817 p. 99), the
+razee's 310 at first and 330 afterwards (James vol. 1 p. 454), but a file carries one company
+whatever her fits (the 64's note on her complement), so the figure by fit is the marines the bill
+keeps on the fit, of the one company. Built as a fit's own `marines`, beside its guns, whose crews
+are the fit's already; a fit without one keeps the bill's.
+
+**The establishment, looked for.** None of private marines by rate or by year is on file: Ind §10.8
+(the Internet Archive's full text, James, Clowes, the *Naval Chronicle*, Gillespie 1803, the Royal
+Marines' *Historical Record* of 1845) and Bel §10 item 6 (the Regulations, James, Clowes, Glascock,
+Gillespie, Nicolas's *Historical Record*, Steel's Lists, Falconer) found none; the Regulations'
+columns give the marines' officers and NCOs alone (p. 165: Ind §4.2); the owner's books on file give
+the class's men and no marines (Winfield 1793-1817 p. 99, the Ardent class; p. 100, *Indefatigable*)
+and a 74's company of 1761 (Lavery 1985 p. 17, Table 7: Bel §13.4); Falconer's men to the small arms
+by the Admiralty's order (1780, QUARTERS: a 4th rate of 60 guns 70, a 5th rate 50) are marines and
+seamen together, the bill's proxy and no establishment of marines (Indf §6.4). So each figure is
+**JUDGEMENT**, marked so in the fit's note with its reason: the bill's own rule on the fit's guns,
+her marines less the marines at the fit's carronades, the carronades taking the marines first and
+the long guns none.
+
+**As built:**
+- `freesail/ship/schema.py`: `FIT_KEYS` gains `marines`; `FitSpec.marines: int | None = None`, a
+  plain default, left out of the pickle while None (`FitSpec.__getstate__`, new), so that a fit
+  without it, and one pickled before it, pickles as before; read as a whole number not below nought,
+  and refused in words beyond the file's marines (`validate`: "the fit 'ardent class 1794' keeps 85
+  marines in their division, but the crew has 84; it cannot keep more marines than she bears.").
+  The module's head says it.
+- `freesail/crew/quarters.py`: `Quarters.beat` keeps the fit's own `marines` where her fit gives
+  them (`ship.fit_spec`), else the bill's, before the gun crews draw; the long guns' lists leave the
+  marines out as before (B7.b's rule). Its head's words on the bill's key brought up to the three
+  files that carry it.
+- `tools/ships/indefatigable.py`: `fit_marines`, after the bill, writes into each other fit, after
+  its `source`, the bill's rule on that fit's guns (`at_the_guns`) where it differs from the bill's,
+  with its note; the generator's report says each fit's arithmetic ("sixty-four: on 'ardent class
+  1794': 312 men at the guns, 16 of them marines at its carronades; the fit keeps 68 marines in their
+  division."). `tools/gen_ships.py`'s dump notes a fit's `marines:` line (no other file has one).
+- The two files by the generator: the 64's 'ardent class 1794' **`marines: 68`** (her 84 less the
+  16 at its carronades), the razee's 'as razeed 1795' **`marines: 38`** (her 50 less the 12), each
+  with its note; two lines each; every other file of the eighteen byte for byte.
+
+**The beat at muster, every fit** (`Quarters.beat`, seed 7, `tests/test_brains.py`'s world off the
+Lizard; ff58e07d's export beside the tree, `s13/marines/probe_fits.py`):
+
+| File, fit | Crews filled | Marines at the long guns | at the carronades | in their division | Trimmers |
+|---|---|---|---|---|---|
+| the 64, 'ardent class 1784' (default) | 32 of 32, both | 0, both | 0, both | 84, both | 53, both |
+| the 64, 'ardent class 1794' | 33 of 36 → **36 of 36** | 0, both | 0 → **16** | 84 → **68** | 53, both |
+| the razee, 'as carried 1796' (default) | 24 of 24, both | 0, both | 36, both | 14, both | 79, both |
+| the razee, 'as razeed 1795' | 19 of 22, both | 0, both | 12, both | 38, both | 79, both |
+
+The helm 2 and the powder 29 (the razee's 22) on each. The 64's 1794 line, old beside new: "Beat to
+quarters! Quarters: 34 gun crews manned, the trimmers 53, the helm 2, the powder 29, the marines 84.
+The lower deck: 13 gun crews, 140 men. The upper deck: 13 gun crews, 108 men. The quarterdeck: five
+gun crews, 30 men. The forecastle: two gun crews, 10 men. The poop: three gun crews, 8 men. Not hands
+enough for every gun: the upper deck, No. 13 gun, and the poop, No. 3 gun stand unmanned." now "Beat
+to quarters! Quarters: 36 gun crews manned, the trimmers 53, the helm 2, the powder 29, the marines
+68. The lower deck: 13 gun crews, 143 men. The upper deck: 13 gun crews, 117 men. The quarterdeck:
+five gun crews, 30 men. The forecastle: two gun crews, 10 men. The poop: three gun crews, 12 men."
+The razee's 1795 fit keeps the same men man for man: the bill's 14 kept, her 12 carronade marines
+went to their guns and the other 24 to the division (38) already; now 38 kept and the same 12 at the
+guns.
+
+**For the lead** (not built, not ruled): (a) the razee's 'as razeed 1795' still leaves three crews
+short, her Nos. 12 and 13 unmanned and No. 17 1 of 7 (28 seamen short at the long guns): her bill's
+trimmers, 79, are set against 1796's guns, and on 1795's her seamen, 238, less the 79, the helm's 2
+and the long guns' 185, fall short; a trimmers figure by fit (51 on 1795 would man every gun) is the
+same kind of key. (b) The 74's 'as the bellona 1812' carries 28 carronade men a side where her
+default's carry 16; by the same rule her fit's figure would be 83 (her 111 less 28), where the bill's
+95 leaves 12 of those carronades' men seamen; every crew fills either way (her trimmers 69, against
+81 at 83 kept: measured in memory). Not built: the ruling names the 64's and the razee's fits, and her
+file is B7's.
+
+**Pins moved, old beside new.** `tests/test_indefatigable.py`:
+`test_her_other_fits_beat_keeps_the_bills_marines_and_leaves_guns_short` (two cases: the 64's 1794
+fit 33 of 36 filled, 84 in the division, "the upper deck, No. 13 gun, and the poop, No. 3 gun stand
+unmanned"; the razee's 1795 fit 19 of 22, 38, "the guns, Nos. 12 to 13 and 17") is now
+`test_her_other_fits_beat_keeps_the_fits_own_marines` (the 64's 36 of 36, 68 kept and 16 at the
+carronades, her beat's first line, no gun unmanned; the razee's as before, the fit's 38 asserted;
+each fit's figure and the default's None); the generator's report test gains the two fits' lines.
+**New:** `tests/test_bill_marines_and_flag.py`, a fit's own marines on the two fits alone and every
+other fit of every file pickling with the keys it held before (18 cases), a fit pickled before
+reading the bill's at the beat (84), the refusals in words (4) and the whole range read (1).
+
+**Whether a recorded passage moves:** none holds either ship on either fit. No shipped scenario or
+business names the 64 or the razee (B7.e's finding, looked for again: outside the ships' own files
+and their people no file of `data/` names either), and a fit without the key reads the bill's as
+before, so no other ship's beat moves; the four whole logs and the captain's trials as at the base
+(below, "The suites, as run (subsections 3 to 5 together)"). **Lines any ship may say that change:** the 64's, on her 'ardent
+class 1794' alone: her "Beat to quarters!" line (above), "Not hands enough for every gun" no longer
+said there, and what follows from who is at quarters (her carronades manned by marines, the
+marines' division 68, the marines to their muskets and back, the robbing at quarters); nothing of
+the razee's (the same men), of the default fits or of any other file.
+
+**The suites, as run.** Once, on ff58e07d with this step uncommitted, from the tree root with `py`,
+one run at a time, the branch and the tree asserted first, each pytest with `-n 4 -p no:cacheprovider
+-o addopts="--dist loadgroup"` (`scratchpad/s13/marines/after/run.sh`), 04:14 to 04:25 UTC, against
+the bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`):
+- **The files** (`--slow -m "not pace"`: `test_bellerophon`, `test_indefatigable`,
+  `test_bill_marines_and_flag`, `test_magazine`, `test_fight`, `test_filling`, `test_dumb_show`,
+  `test_lee_ports`, `test_subtypes`, `test_neufchatel`, `test_bilander`, `test_profile`,
+  `test_profiles`, `test_ships`, `test_in_world`; the files that beat to quarters, pickle a fit or
+  run the generator): **1,039 passed** (189 s). Against the bases restricted to them (1,017): **no
+  outcome changed**; only in the bases, the two old cases of the other fits' beat (renamed above),
+  the strict expected failure made one with the 64's case at f5102fae and truth 7-196's crewed
+  clause, a pace test, outside `not pace` (it fails at the base and passes since ff58e07d); only in
+  this run, the 26 new and renamed cases above, all passed.
+- **`tests/test_known_truths.py`'s fast tier:** 205 passed (437 s); against the base's 190, no
+  outcome changed, the 15 only here the trunk's (package 102's truth 7-501, six; package 104's 7-510
+  to 7-518, nine), as at f5102fae.
+- **The generator** into scratch: eighteen of eighteen files byte for byte with `data/ships/`, the
+  64's and the razee's as written here; `tools/check_viewer_guns.py` clean. **ruff** `check` and
+  `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+### 4. B7.e: a ship under the orders of another left to her commander's book (21:20 of the 12th, (3)(b))
+
+**The ruling.** "(b) A ship under the orders of another, set or no set, is left to her commander's
+book as a ship in a set is: BUILD if it is a few lines, and say what `convoy.yaml`'s escort then
+does."
+
+**Built, six lines** in `Judgement._alone` (`freesail/world/captains.py`; its docstring and
+`_line_of_battle_nm`'s brought to it): a ship whose `under_orders_of` names another (package 71's
+least relation: the scenario's `under_the_orders_of`, the director's order, a signal; a set writes
+it on each member, package 72) is not alone, the relation read as `signals.commanded_by` reads it,
+the far body's vessel's own, and for a crewed hull's captain the hull's World's, else her vessel's.
+So `_line_of_battle_nm` is nought for her and the rank-4 rule does not send her away on her own; her
+book's other rows are as before. A ship that commands others by the relation, under nobody's orders
+and in no set, is alone as before. The two books' words (`data/captains/kings-ship.yaml` and
+`commodore.yaml`, the head's comment and the knob's source) say it; no figure or row moved. No
+attribute is added, so a checkpoint from before loads as it was (the relation is the vessel's since
+package 71).
+
+**`convoy.yaml`'s escort, measured.** The scenario as shipped has no enemy, and no ship of it that
+the rule reads is under another's orders: its four merchant brigs are under the orders of the
+player's ship and have no brain (`brain` None: they keep company at far detail by the company leg),
+and the escort, the player's *Harpy* brig-sloop under her rules captain (the commodore's book),
+commands them and is under nobody's orders, in no set. So nothing of it moves. With a French
+seventy-four bound for Brest put 2.5 miles north of her a minute after the start
+(`s13/orders/probe_orders.py`, seed 7, forty minutes), at ff58e07d's export and on the tree alike:
+she is "on passage" at tick 300 and "evading" at 900, "By the captain, evading: shaping a course for
+49 25.0 n 5 17.8 w (hauling off from a seventy-four, a ship of the line, fourteen ports a tier,
+standing to the south-eastward (SSE), under plain sail; French colours, the tricolour)." and two
+courses more so; her four brigs, keeping company on her, go with her, each 0.2 miles from her at the
+end, the 74 2.13 miles off. **Plainly:** the escort hauls off from a ship of the line as before and
+takes her convoy with her; the ruling's road reaches the ships under her orders, which have no book.
+Whether a commodore whose convoy is held by the relation alone, no set, should keep with it (one
+line more: a ship with a vessel under her orders on the sea is not alone) is the lead's.
+
+**Measured, old beside new** (seed 7; ff58e07d's export with the rule stood in by hand on
+`Judgement._alone`, and the tree after it, line for line the same; `s13/orders/probe_orders.py` and
+`probe_test_world.py`):
+
+| World | ff58e07d | The rule |
+|---|---|---|
+| A British frigate in company with the player's 74 (hove to) and under her orders, no set; a French 74 bound for Brest a mile and a half north of her; the far brain alone | on passage, evading | on passage, engaging, struck, in company (her prize master's): she engages the 74 alone, the player's 74 hove to and making no signal, and is taken |
+| The same in the player's set, for the comparison (B7.e's road) | in company, engaging, struck, in company | the same |
+| The first, crewed (the cap as shipped) | evading, engaging (the 74 overhauling her within hail: the spoken filter, B7.e's finding) | on passage, engaging |
+| The tests' world: a French frigate on her station five miles north of the player's 74 hove to, under her consort's orders (a French frigate half a mile beyond her), no set, the far brain alone | keeping station, investigating a stranger, keeping station, investigating a stranger, evading | the same to the fourth, then chasing, engaging; her consort, alone, evading in both |
+| The same, crewed | investigating a stranger at tick 1560 (3.94 miles), chasing at 2400 (1.96), evading at 2640 (1.40) | the same to 2400, engaging at 2760 (1.12) |
+
+**For the lead, not built:** under the relation alone her commander's book makes no signal for her.
+With her commander alone (under nobody's orders, in no set) she hauls off by the rule and the ship
+under her orders stands on and engages the ship of the line by her own book (the consort's case);
+with the player's ship hove to she fights her alone and strikes. In a set the set's book judges the
+enemy for the whole set (B7.e).
+
+**Tests.** New in `tests/test_bellerophon.py`, both slow (8.3 s each alone; `tests/conftest.py`'s
+`SLOW_TESTS`): `test_a_frigate_under_her_consorts_orders_and_in_no_set_is_left_to_her_commanders_book`
+(the far brain: never evading, engaging; her consort alone and evading) and
+`test_a_crewed_frigate_under_her_consorts_orders_and_in_no_set_does_not_haul_off_from_her` (crewed:
+engaging, never evading). Both fail at ff58e07d (`_alone` true for her); the crewed one fails with the
+fallback to the hull's vessel taken out (a scratch mutation, the file restored byte for byte), the
+far one passing then. No pin moved.
+
+**What any ship may say that this step changes:** a King's ship, or a commodore's ship, of a lower
+class under the orders of another and in no set, meeting an enemy ship of the line within two
+leagues: her hauling off is no longer said ("By the captain, evading: shaping a course for ...
+(hauling off from a seventy-four, ...)"), and what her own book does with the enemy is
+(investigating, chasing, engaging, and the lines of an action that follows). No shipped scenario has
+such a ship: `convoy.yaml`'s ships under orders are brainless merchant brigs, and `tender.yaml`'s
+Raven, a cutter under the merchant's book (no `line_of_battle_nm`), is the only other; nothing of
+hers moves (the review's mends, subsection 6 (g), where this line said no other file names the
+relation).
+
+**The suites, as run.** Once, on 26473408 with this step uncommitted, from the tree root with `py`,
+one run at a time, the branch and the tree asserted first, each pytest with `-n 4 -p no:cacheprovider
+-o addopts="--dist loadgroup"` (`scratchpad/s13/orders/after/run.sh`), 04:31 to 05:18 UTC, against
+the bases at 7b9d7c29, not run again:
+- **The files** (`--slow -m "not pace"`: `test_bellerophon`, `test_indefatigable`, `test_in_world`,
+  `test_brains`, `test_captain`, `test_captain_rules`, `test_captains`, `test_crews`,
+  `test_far_action`, `test_far_hail`, `test_squadrons`, `test_signals`, `test_sail_by_name`,
+  `test_prizes`, `test_prize_scenarios`; the captains, the far brain, the sets, the signals and the
+  prizes): **493 passed** (340 s). Against the bases restricted to them (481): **no outcome
+  changed**; only in the bases, the strict expected failure made one at f5102fae, the old other
+  fits' beat (renamed at 26473408), and two pace tests outside `not pace` (truth 7-196's crewed
+  clause, truth 88 with the cap full); only in this run, 17: this step's two, the marines' two
+  renamed, truth 7-231's four bodies and nine slow cases of `test_far_action`, `test_prizes` and
+  `test_prize_scenarios` outside the base's slow list, all passed.
+- **`tests/test_known_truths.py` whole but the pace** (`--slow -m "not pace"`): 385 passed, 6
+  failed, 1 skipped, 8 xfailed (2,469 s). Against the bases (395): **no outcome changed**; the six
+  failures are the base's with the same figures (the merchant's constants [16200, 96480], the
+  schooner on an intent alone, the schooner's 767 lines, truth 77's digest 2e93986c2989d831, truths
+  78 and 79's [57, 100918]), each a passage this machine runs as it ran at the base; only in the
+  bases, the twelve pace tests; only in this run, the trunk's sixteen (truths 7-501, 7-510 to 7-519)
+  and truth 7-231, all passed. The convoy's truths (7-143 onward) pass as at the base.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+
+### 5. B7.d: the gun named by deck in the struck carriage and the shut port (21:20 of the 12th, (4))
+
+**The ruling.** "(4) The razee not renumbered: as built (one gun deck); mend the design's words. The
+two lines that read as possessives ('the carriage of No. 3 starboard gun of the lower deck struck';
+'The port of No. 1 larboard gun of the upper deck is shut; the sea is at its sill.'): BUILD as you
+propose, only where the gun is named by deck, so that no other ship's line moves." With it the same
+note's (a): "see that the by-deck names agree with it everywhere", the trunk's rule for a bare
+number.
+
+**As built**, the form step 7's review proposed (the section of 2026-11-11, "The review's mends",
+item 6), word for word, keyed on `Gun.of_deck` (a broadside gun of a file numbered by deck: the 74's
+and the 64's), so that every other gun's line is as it was:
+- `freesail/combat/guns.py`, `Battery._drop_named` (a gun named to fire whose port the sea has
+  shut): "The port of No. 3 larboard gun of the lower deck is shut; the sea is at its sill."; every
+  other gun "The No. 3 larboard gun's port is shut; ..." as before. Its docstring says both.
+- `freesail/combat/hits.py`, `_deck_hit` (a shot across the deck that strikes a gun and does not
+  dismount it), the words in the minute's line of shot ("Shot from ...: ...; ..."): "the carriage
+  of No. 3 starboard gun of the lower deck struck"; every other gun "No. 3 starboard gun's carriage
+  struck" as before.
+
+**Old beside new** (`s13/possessive/probe_lines.py`, the gun loaded and named behind a port shut by
+hand, then a shot across her deck at it, the stream striking a gun and sparing its mounting):
+
+| Ship, gun | 65b757b9 | Now |
+|---|---|---|
+| The 74, No. 3 larboard of the lower deck: the port | "The No. 3 larboard gun of the lower deck's port is shut; the sea is at its sill." | "The port of No. 3 larboard gun of the lower deck is shut; the sea is at its sill." |
+| The 74, No. 2 starboard of the poop: the port | "The No. 2 starboard gun of the poop's port is shut; ..." | "The port of No. 2 starboard gun of the poop is shut; ..." |
+| The 64, No. 1 larboard of the upper deck: the port | "The No. 1 larboard gun of the upper deck's port is shut; ..." | "The port of No. 1 larboard gun of the upper deck is shut; ..." |
+| The 74, No. 3 larboard of the lower deck: the carriage | "No. 3 larboard gun of the lower deck's carriage struck" | "the carriage of No. 3 larboard gun of the lower deck struck" |
+| The 64, No. 1 larboard of the upper deck: the carriage | "No. 1 larboard gun of the upper deck's carriage struck" | "the carriage of No. 1 larboard gun of the upper deck struck" |
+| The frigate-36, No. 3 larboard; the brig's starboard bow chaser | "The No. 3 larboard gun's port is shut; ...", "No. 3 larboard gun's carriage struck"; "The starboard bow chaser's port is shut; ..." | the same, word for word |
+
+**The by-deck names and the trunk's rule for a bare number** (`orders.gunnery._of_the_side_meant`,
+package 74's step 6: a gun's number said with no side is the gun of the side engaged, else of the
+side the mark is on, else the pair). Read: every way of naming a gun by its deck goes by `_fire`,
+`_guns_named` and `_number_on_a_deck` (the pair of the number on the deck said, or the side's gun
+where a side is said) to `_of_the_side_meant`. No other order fires a gun by number (`ordnance`'s
+guns are by kind and calibre); the director's slots that read `guns_named` (a gun's captain,
+`world/orders.py` `_gun_captain`, and a thing aboard, `_gun_by_name`) take the pair's first, one
+crew to the pair, as for a bare number on any ship, and the trunk's rule is the fire order's alone,
+so they agree with it as the frigate's do. Measured on her default fit and the 64's, at quarters with her guns
+cast loose (seed 7), ten forms: "No. 8 gun of the lower deck", "the lower deck's No. 8", "lower-deck
+No. 8", "No. 8 on the upper deck", "No. 8 gun of the main deck", "the quarterdeck's No. 7", "No. 1
+gun of the forecastle", "No. 2 gun of the poop", the 64's "No. 13 gun of the upper deck" and "the
+lower deck's No. 1": with no side engaged and no mark, the pair; starboard engaged, the starboard
+gun; larboard, the larboard; both, the pair; none engaged and a mark 80 degrees on the larboard
+bow, the larboard gun; 95 degrees to starboard, the starboard; said with a side (the six forms that
+begin with the number: "No. 8 larboard gun of the lower deck"), that side's with the other engaged. Each gun fired is of the deck said, and the
+reply names each by it. **Every form agrees; nothing was mended there.** A deck's guns said with no
+number ("fire the lower deck") are a broadside of that deck, the engaged side's and refused with
+none (B7.b's rule, the review's mends of 2026-11-10), not a gun by number, and stay so; the refusal
+of a bare number on a ship numbered by deck gives as its example a form the rule takes ("'fire No. 3
+gun of the lower deck'").
+
+**The design's words** (`docs/design/Design-Ship-Bellerophon.md`), where they said the razee would be
+renumbered: §5.2 item 7 ("The 64 and the razee renumbered by deck in the same step") now the 64
+alone, the razee, of one gun deck, not renumbered; §12.3's row for `tools/ships/indefatigable.py`;
+§15's line for B7.d ("the 64's and the razee's bytes, gun ids and gun names"); §17.2 item 3; each
+with its first words said and the ruling named. A note after §5.2's as-built note gives the two lines
+and the check. **Build-Ships says otherwise nowhere:** its §16.1 row for B7.d has "The razee is not
+renumbered (one gun deck; Bel-D §5.2 item 7 named her, the lead's word the two two-deckers)" already,
+and the *Indefatigable*'s design (§5.2's as-built note) the same.
+
+**Tests**, new in `tests/test_bellerophon.py`, all fast:
+`test_a_gun_named_by_deck_behind_a_shut_port_says_the_port_of_it` and
+`test_a_gun_named_by_deck_struck_says_the_carriage_of_it` (the 74, the 64 and the frigate-36 each),
+the by-deck cases failing with the two code files as they were at 65b757b9 (scratch, the files
+restored byte for byte) and the frigate's passing both ways; and
+`test_a_number_with_its_deck_and_no_side_is_the_gun_of_the_side_engaged_or_of_the_marks` (the ten
+forms). **No pin moved:** no test held either old line by deck (grep).
+
+**What any ship may say that this step changes:** the 74's and the 64's alone: the shut port's line
+for a gun named to fire behind it (`guns.port_shut`) and the carriage struck in the minute's line of
+shot (`action.hit`), as above. Every other ship's words as before; no recorded passage holds either
+ship.
+
+**The 12th's ask (ii), the 74's pumps:** her file is not the cause (four chain pumps then two hand
+pumps, as the 64's and the razee's; given idle hands she mans all six with 20 hands, 350 tons an
+hour); the water's code is (`world/water.py`: the pumps take only the hands idle on deck at the
+order, down to one man, in the file's order, and nothing adds hands while she is manned), so no
+commit here: the mend goes to package 77's brief, item 4a(d), as the lead's note has it. The owner's
+29 tons an hour is the first chain pump (her file's first) worked by four tired idlers, and the
+reading names every pump she has: subsection 6 (f).
+
+### The suites, as run (subsections 3 to 5 together)
+
+Once, on 65b757b9 with subsection 5's step uncommitted, from the tree root with `py`, one run at a
+time with nothing else running, the branch and the tree asserted first, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/possessive/after/run.sh`), 05:25 to
+06:41 UTC; the bases at 7b9d7c29 not run again (`rf/final-fast.xml`, `rf/final-slow.xml`,
+`rf/fix/final/trials.xml`, `rf/fix/final/digests.json`). Subsections 3 and 4 add their own runs above.
+- **The whole fast tier** (`s13/possessive/after/fast.xml`): **7,595 passed, 2 skipped, 1 xfailed**,
+  exit 0 (64 minutes). Against the base (7,529): **no outcome changed.** Only in the base, three:
+  the strict expected failure made one with the 64's case at f5102fae, and the two old cases of the
+  other fits' beat (renamed at 26473408); only in this run, 72: these three steps' 42 (the marines'
+  24 and 2, the ship under orders' none, these lines' 16), f5102fae's three, and the trunk's 27
+  from its first merge (package 102's `test_flag_drawings` 9 and truth 7-501's six; package 104's
+  truths 7-510 to 7-518, the tide's gaugeless blocks, the weather's boxes and the Bona passage), all
+  passed; the skips and the xfail the base's.
+- **The slow cases of the touched files** (`--slow -m "slow and not pace"`: `test_bellerophon`,
+  `test_indefatigable`, `test_in_world`, `test_bilander`, `test_crews`, `test_damage_control`,
+  `test_dumb_show`, `test_far_action`, `test_fight`, `test_filling`, `test_health`,
+  `test_hull_schooner`, `test_lateen`, `test_lee_ports`, `test_neufchatel`, `test_pivot_gun`,
+  `test_practice`, `test_practice_orders`, `test_profile`, `test_view_action`, `test_viewer_action`,
+  `test_water`, `test_bill_marines_and_flag` and the captain's trials): 34 passed, 3 failed (356 s).
+  Against the bases restricted to them (35): **no outcome changed**; only in the bases, two pace
+  tests (truth 7-196's crewed clause, truth 88's cap full) and the three trials that are fast (in
+  the fast tier here, passed); only in this run, subsection 4's two and five slow cases of
+  `test_far_action` outside the base's slow list, all passed.
+- **The captain's trials:** five slow passed or failed as at the base, outcome for outcome and digest
+  for digest: the station's gale 1e59009004141b08, the trade's stranger 13432e4b2659bcaf
+  (`TRIAL_TRADE_STRANGER_DIGEST` unmoved by these steps), the trade's thick weather
+  41a37f0290be291a, the machine's three; the station's lee shore and stranger passed; the three
+  fast ones passed in the fast tier.
+- **The four whole logs** (`log_digests.py`, `s13/possessive/after/digests.json`): every field as
+  recorded at 7b9d7c29: the first action 497 lines, 234036cc17e6f137; the encounter 229,
+  732a6020db4d4755; the station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722,
+  1e59009004141b08.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+  Every changed file LF with a final newline.
+
+**Moved by these three steps:** nothing pinned. No recorded passage, digest, line count or tick moved
+(the four whole logs, the captain's trials and `TRIAL_TRADE_STRANGER_DIGEST` as at the base; truth
+77's digest and the gates' constants failing on this machine as at the base with the same figures),
+so there is nothing for the lead to re-pin by them; what moved is each step's behaviour alone, the
+worlds measured above.
+
+### 6. The review's mends (subsections 1 to 5)
+
+Two reviews read the five commits (f5102fae, ff58e07d, 26473408, 65b757b9, dfbe4031): one word by
+word against the four notes, one on real ticks. Each finding was reproduced first on the tree at
+dfbe4031, by the reviewers' scripts and the session's own (`scratchpad/s13/rev2/`, `s13/rvw/py/`,
+`s13/mends/`), then mended in one commit or said here where it is not this branch's; the old beside
+the new is an export of dfbe4031 (`s13/mends/head`), at seed 7.
+
+**(a) The plan-state road: her passage held and taken up** (`freesail/world/brains.py`). Found:
+since subsection 1 a far ship that went engaging from a plan state never took up her passage again
+(`engaging` saved no plan, and `taking possession` then saved the action's chase leg), so she was
+"on passage" for good, chasing her prize, chasing a mark lost from sight by its truth, or lying to
+where her mark had left the sea; and `_work`'s new `engaging` branch reached package 74's own road
+too (engaging from a detour, the mark in hand), which subsection 1 did not record. Mended on the
+plan-state road alone: a key of the brain's business, `PASSAGE_HELD` (no new attribute: `_business`
+pickles already), set by `resolve_state` when she goes `engaging` from a plan state, which saves her
+plan there as a detour's is; while it is set no detour of the action (taking possession, evading,
+in distress) saves over it, and her next plan state takes the plan up and drops the key; `_work`
+keeps her mark in hand each minute (`_take_mark`) only while it is set; the fold-back at a demotion
+drops it (the plan is laid afresh there). `resolve_state` still takes a mark where none is in hand
+on any road, so that no chase of nobody is laid. Package 74's road is as it was at 94bfac27.
+
+| World (seed 7) | dfbe4031 | Mended |
+|---|---|---|
+| A French 74 bound for Brest and a British frigate bound for Falmouth a mile apart, twelve miles south of the frigate hove to, the cap nought (`rvw/py/farfrig.py`, 200 minutes): the 74 engaging from her passage at 120, the frigate struck at 5880, possessed, the 74 `on passage` at 6300 | "on passage" with the chase leg of her prize, 0.11 to 0.12 miles from her to tick 10,920, her latitude 49.282 to 49.273 N (the reviewer's run: so to tick 34,320) | `on passage` with her passage to Brest from 6300 (the soundings seven leagues south-west of Ushant first), her latitude 49.282 to 49.126 N by 10,920, her prize in company 0.77 to 0.81 miles |
+| Truth 7-231's two 74s (`s13/mends/after/pass231.py`): the Hero possessed at 1260 | "on passage" chasing her prize at the engaging range for good (subsection 1: 0.08 to 0.18 miles three hours on) | `on passage` at 1320 with the plan she held at 120, its first mark 65.37 miles off and 60.97 at 3420, her prize in company 0.14 to 0.45 miles |
+| The same, engaged, the Hero hidden, or gone from the sea | at 840 "on passage" with the chase leg of the hidden Hero, or lying to, for good | at 840 `on passage` with the plan she held |
+| Package 74's road: the two put chasing each other at 60, engaging from `chasing` at 120; the Hero then gone from the sea (`rev2/road74.py gone`) | lying to, `engaging` with no mark, from 240 | as at 94bfac27: her plan empty at 240, gone from the sea at 300 |
+| The same, the Hero hidden and a British frigate put 1.5 miles off (`road74.py other`) | the frigate her mark at 240 | as at 94bfac27: the Hero kept in hand, her chase leg as she entered |
+| Truth 7-358's world (`s13/mend/anger358.py`) | — | line for line as at 94bfac27 over that script's run to tick 7,320 (state, plan, saved plan, mark and range) |
+| A checkpoint of the 64's case written on 94bfac27 at tick 300 (the reviewer's `rvw/saves/m94`), the French 74 `engaging` with a chase of nobody | — | loads (by the checkpoint), and she leaves the sea at 360 as on 94bfac27 |
+
+**Corrected, subsection 1's words.** "A far brain pickled in `engaging` with no mark takes one at
+her next judgement" was not so: such a brain (94bfac27's chase of nobody, only in the minute she
+went engaging) leaves the sea as she did there, near detail or far (the row above). And the "Found,
+for the lead" paragraph there is built for the plan-state road by this subsection; its package
+74's road is still the lead's (below).
+
+**(b) A commander gone or struck** (`freesail/world/captains.py`). Found: subsection 4's `_alone`
+read the relation `under_orders_of` whether or not the ship it names still commands, and nothing
+clears it when she goes (only the release order, the release signal and a set's dissolution do),
+so a ship whose commander had struck or left the sea was never alone again. Mended: the relation
+counts only while her commander is on the sea, not `done` and not struck (`_commander_on_the_sea`;
+the player's ship while she has a place). Measured (`rvw/py/orphan.py`: a far British frigate under
+the orders of another, no set, her commander gone from the sea at 180, a French 74 put three miles
+north of her at 240, the cap nought): at dfbe4031 not alone, engaging at 900, struck at 2160 and
+taken; mended, alone, evading at 600 and 2.01 miles off at the end, as she did before subsection 4.
+
+**(c) The far ship's reply at a cap of nought** (`freesail/combat/far_action.py`). Found: at a
+crewed cap of nought (`crewed: {cap: 0}`: `tender.yaml`, the drivers' `--crewed-cap 0`, the tests'
+`far_only`), a far ship engaging the player's ship lay alongside her and never fired:
+`_fallback_reply` returned at `cap <= 0` as if the cap had room to wake her, and a cap of nought
+wakes nobody. Before subsection 1 such a ship left the sea the minute after she went engaging from
+her passage, so it did not show there (package 74's road at a cap of nought had it already).
+Mended: a cap of nought has never room, so she replies by the tables, the fallback of the lead's
+ruling 4 (`if cap > 0 and len(crewed(root)) < cap: return`). Measured, the 64's case with the cap
+nought (`rvw/py/scene64.py`, an hour): at dfbe4031 the French 74 engaging from 360 and at 0.26 miles
+by 1920, no `action.far_reply` and no shot into the 64, the 64's guns firing 23 times; mended, "The
+Foe fires her broadside at us from 9 cables: none of her 63 shot strike us." at 360, ten of 89 at
+540 and a broadside every three minutes after (19 in the hour, each with its `action.hit` line but
+the first), the 64's butcher's bill 145 killed and 346 wounded by 3600, her own guns firing once.
+Truth 7-200, the tender's day at a cap of nought, passes as before. **For the lead, not built:** the
+far body never strikes to the player's shot (`hits._far_hit` counts it into `damage["hits"]`, which
+nothing reads), so a far ship engaging an awake hull at a cap of nought, or under a full cap, fights
+on until the hull strikes or the range opens: package 74's open half.
+
+**(d) The marines back from their muskets** (`freesail/crew/quarters.py`). Found: `marines_to_guns`
+(package 73's) made up every short crew from the marines' division when they held their fire, the
+long guns too, against B7.b's rule as the lead's ruling (4) of 01:05 restates it ("the long guns do
+not take marines"); subsection 3's "the long guns take none either way" held at the beat alone.
+Mended: where her fit or her bill keeps marines (`_marines_kept`, the beat's own reading, now one
+function), the carronades alone take them back. Measured (`rvw/py/musket.py`: beat, cast loose,
+fire by volley, hold your fire): the razee's 'as razeed 1795', at dfbe4031 "Marines, hold your
+fire! The muskets grounded; 40 back to the carronades." and 28 marines at her long guns (Nos. 12 and
+13 eleven each, No. 17 six); mended "... twelve back to the carronades.", the carronades' twelve
+alone, the long guns short as at the beat, 38 in the division. The 64's 'ardent class 1794' "16
+back to the carronades." both ways (every crew full). A ship without kept marines (every other
+file) as before. The same line moves on the 74, the 64 and the razee wherever a long gun's crew is
+short when the marines hold their fire.
+
+**(e) Truth 7-196: the 74s do not keep their stations** (`tests/test_bellerophon.py`'s docstring and
+comment, subsection 2's words and Build-Ships', Bel-D §14.4). Found: subsection 2 said each 74 in
+company "keeps her station on her commander"; she does not. The frigate lies to, heading NW by N at
+a knot and a half; a crewed member ahead of her station steers the flag's course and shortens sail
+to drop back (`orders/station.py`), which drops her back only on a flag with way on; so the three
+straggle by the set's own lines (`squadron.straggler`: S0 at tick 1560, S1 at 3060, S2 at 3840, the
+last two inside the measure), and S2, reefed, opens on the frigate's heading at about six knots:
+1.41 miles at 3900, 2.79 at 4900, 3.87 at 8400 and 4.18 at 8650 (`rvw/w196long_head.txt`;
+`s13/mends/w196/why.txt`, her own log "two miles ahead of her station" from 3840). The clause holds
+within its 4,900 ticks, and that is its margin: at the third end S2 is 1.21 miles inside
+`CREWED_NM`. Corrected in the records; the test's assertions unchanged. A world under way was
+measured (`s13/mends/w196/way.py`: the frigate steering south under plain sail shortened once, the
+74s put at or near their stations in her line): the three straggle within the measure there too (S1
+and S2 to 1.89 and 2.12 miles from her, each a mile and a half out of station at 2400) and regain
+their stations only from 4320, so it is no better within the clause's ticks and was not taken. **For
+the lead (package 72's station keeping):** a crewed member does not keep a line-ahead station on a
+commander lying to. The docstring, old beside new: old "a member in company challenges nobody and
+keeps her station on her commander, the frigate. ... Before, three crewed 74s in action against her:
+106 ticks a second (2026-11-10), 89 to 92 after B7.c, 164 to 173 after its review's mend, and in the
+thousand before the taking on this tree (ticks 1820 to 2820) 165, 166 and 167 in three runs; the old
+world and its figures, ..."; new "a member in company challenges nobody. **They do not keep their
+stations** (the review's mends): the frigate lies to, ... the clause holds within its 4,900 ticks,
+and that is its margin. ... The old world and its figures, old beside new, in
+docs/dev/TuningNotes.md, ...": the in-action figures are subsection 2's, as the lead's ruling (1)
+has them, and no longer the docstring's. Its comment gains the JUDGEMENT that the frigate commanding
+three 74s is the test's world.
+
+**(f) The 74's pumps, the owner's figure** (subsection 5's last paragraph). The verdict stands (the
+water's code, not her file), and the owner's reading is now explained: the pumps' men go to the
+pumps in her file's order, and her file lists the four chain pumps first, so four hands work the
+first chain pump. The owner's 29 tons an hour is that chain pump worked by four tired idlers: 80
+tons × 0.3/0.6 (an idler's deck skill against the ordinary seaman's, `crew/model.py`'s
+`RATING_SKILL`) ÷ (1 + 0.5 × (0.8 − 0.05)) (`hands.FATIGUE_WEIGHT` and `FATIGUE_FRESH` at a fatigue
+of 0.8) = 29.1 (`s13/pumps/notes.md`, reproduced at anchor in Plymouth Sound: "four chain pumps and
+two hand pumps manned by 4 of 20 hands, lifting 29 tons an hour"). The chain pumps were not idle:
+the reading names every pump she has (`Pumps.describe`), which reads as if the two hand pumps were
+the ones manned; two hand pumps fresh would lift 30. For package 77's item 4a(d), beside the hands
+filled up as they come free, the fallback ranked (seamen before idlers) and all hands called to the
+pumps when the deck cannot man them: the reading should name the pumps worked, one by one.
+
+**(g) Words.** The commander is a ship: "he hauls off ... under his orders" in subsection 4, "the
+ship under his orders" in Bel-D §8.3's postscript and "the ships under his orders" in Build-Ships
+§16.1 now read "her". Subsection 4 and its Build-Ships row said no other file of `data/` names the
+relation: `tender.yaml`'s Raven does (its world order 'ship "Raven": under the orders of the
+ship'), a cutter under the merchant's book with no `line_of_battle_nm`, so that `_alone`, false for
+her now and true at 94bfac27, moves nothing of hers (`rvw/py/tender.py`). Design-Prizes' step 4
+postscript said "the passages that moved by the toggle of `brains.py` alone are in" the notes: none
+moved.
+
+**Tests, old beside new.** `tests/test_far_action.py`: truth 7-231's body now asserts the passage
+held at 120 and taken up at 1320, its first mark closed each minute of the half hour after, the
+prize in company (old: it stopped at the possession, the passage "for the lead"); the three
+mark-in-hand cases assert the passage held, and taken up at 840 where the action ends; new,
+`test_package_74s_road_from_a_chase_keeps_the_mark_it_entered_with_as_it_did` and
+`test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought` (slow). New in
+`tests/test_bellerophon.py`,
+`test_a_frigate_whose_commander_is_struck_or_gone_from_the_sea_is_alone_again`; in
+`tests/test_indefatigable.py`, `test_her_marines_back_from_their_muskets_go_to_the_carronades_alone`
+(the 64's 1794 and the razee's 1795). Each of them fails on dfbe4031's code but the 64's case of the
+marines, which passes both ways (`s13/mends/headtests`); no assertion of an existing test is
+weakened.
+
+**What any ship may say that this step changes:**
+- A far ship of war (or an armed trader, packet or Indiaman under her book's `enemy in range` rows)
+  that went engaging from a plan state sails her passage again when the action ends, where she lay
+  to or chased her prize or her mark for good: the far story, the lookout's sightings of her and of
+  her prize, and her arrival where she was bound follow her passage.
+- Package 74's road (engaging from a detour) as at 94bfac27: a ship whose mark leaves the sea leaves
+  it after her; a mark lost from sight is kept, another enemy in sight not taken.
+- A ship under the orders of a commander who has struck or left the sea is alone again: her "By the
+  captain, evading: shaping a course for ... (hauling off from a seventy-four, ...)" is said again
+  where her own book's lines were.
+- At a crewed cap of nought, a far ship engaging the player's ship fires by the tables within her
+  reach every three minutes: `action.far_reply` ("The Foe fires her broadside at us from 9 cables:
+  none of her 63 shot strike us.") and, where shot strike, the minute's `action.hit` and all that
+  follows from shot in her parts (the wounded, the damage, the butcher's bill).
+- The 74, the 64 and the razee: "Marines, hold your fire! The muskets grounded; N back to the
+  carronades." where a long gun's crew is short, N now the carronades' marines alone (the razee's
+  1795 fit "twelve" for "40").
+
+**For the lead:** (1) package 74's road after the action: a captor that went engaging from a chase
+(the passage saved at the chase) saves the action's chase leg at `taking possession` and follows her
+prize "on passage" for good (`s13/mends/after/captor74.py`: the Foudroyant 0.09 to 0.14 miles from
+her prize from 1860 to 4860, her latitude 49.290 to 49.242 N); with `engaging` among
+`_DETOUR_STATES` (the reviewer's one word, measured on a copy, `s13/mends/alt`) she takes up her
+passage instead (49.290 to 49.163 N by 4860, her prize in company 0.26 to 0.56 miles), which moves
+package 74's road and is yours to rule. (2) The far body's strike to the player's shot, (c) above.
+(3) A crewed member's station on a commander lying to, (e) above.
+
+**The suites, as run.** Once, on dfbe4031 with this subsection's code, tests and notes uncommitted
+(this paragraph written after), from the tree root with `py`, one run at a time with nothing else of
+the session's running, the branch and the tree asserted first, each pytest with `-n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"` (`scratchpad/s13/final/run.sh`), 08:24 to 10:32
+UTC; against the bases at 7b9d7c29, not run again (`rf/final-fast.xml`, `rf/final-slow.xml`,
+`rf/fix/final/trials.xml`, `rf/fix/final/digests.json`).
+- **The slow candidates** (`--slow -m slow`, the base's 86 files and `tests/test_far_action.py`,
+  touched here; `s13/final-slow.xml`): 333 passed, 12 failed, 2 skipped, 9 xfailed (53 minutes).
+  Against the base (346), two outcomes changed: truth 7-196's crewed clause, failed to passed
+  (ff58e07d, subsection 2); the gate's day with the region loaded, passed to failed, a pace test
+  (472 ticks a second against 500), which run alone afterwards with nothing else running fails on
+  every tree alike (this tree 476 and 473, dfbe4031's export 473, 94bfac27's 471), so it is the
+  machine's hour and not the code (it passed alone on both trees after subsection 1's run). Only in
+  this run, ten, all passed: truth 7-231 (f5102fae), subsection 4's two (65b757b9), the trunk's
+  truth 7-519 (package 104's d776537a), and six slow cases of `tests/test_far_action.py`, the file
+  in this list for the first time (this subsection's cap of nought, 7-231's body of f5102fae and
+  package 74's four of a4944b87). The twelve failures are the base's with the same figures, the
+  pace aside: the captain's three trials' digests, truth 77's 2e93986c2989d831, the merchant's
+  [16200, 96480], the schooner on an intent, the schooner's 767 lines, truths 78 and 79's [57,
+  100918], the day under the systems (499 ticks a second, 492 at the base) and truth 7-159 (450,
+  448 at the base), with the gate's day above.
+- **The captain's trials** (`--slow`, `s13/final/trials.xml`): 5 passed, 3 failed, as at the base
+  outcome for outcome and digest for digest (the station's gale 1e59009004141b08, the trade's thick
+  weather 41a37f0290be291a, the trade's stranger 13432e4b2659bcaf: `TRIAL_TRADE_STRANGER_DIGEST`
+  unmoved).
+- **The four whole logs** (`log_digests.py`, `s13/final/digests.json`): every field as recorded at
+  7b9d7c29 (the first action 497 lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the
+  station's lee shore 1,561, e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08).
+- **The generator** into scratch: eighteen of eighteen files byte for byte;
+  `tools/check_viewer_guns.py` clean.
+- **The whole fast tier** (`s13/final-fast.xml`, the next base): **7,599 passed, 2 skipped, 1
+  xfailed**, exit 0 (63 minutes). Against the base (7,529): **no outcome changed.** Only in the
+  base, three: the strict expected failure made one with the 64's case at f5102fae and the other
+  fits' two old cases (renamed at 26473408); only in this run, 76, all passed: this subsection's
+  four (the commander struck or gone, package 74's road, the marines back on two fits), the earlier
+  steps' 45 (f5102fae's three, 26473408's 26, dfbe4031's 16) and the trunk's 27 (subsection 1). The
+  commander's case ran 7.3 s, over the tier's 5 s judgement (`tests/conftest.py`), as the two
+  consort cases beside it do; it is left in the fast tier so that this run is the next base, for
+  the lead's `SLOW_TESTS` sweep.
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (382 files).
+  Every changed file LF with a final newline.
+- After this paragraph and the last words of the designs, the 27 files that read the notes or the
+  designs (`test_bellerophon`, `test_indefatigable`, `test_known_truths`, `test_practice`, the
+  hulls', the profiles' and the scenarios' among them; the fast tier, `-n 4`,
+  `s13/final/docs-readers.xml`): 2,497 passed (20 minutes).
+
+**Moved by this subsection:** no recorded passage, digest, line count or tick (the four whole logs,
+the captain's trials, `TRIAL_TRADE_STRANGER_DIGEST`, truth 77's digest and the gates' constants as
+at the base), so there is nothing for the lead to re-pin by it; what moved is the behaviour named
+above and the pins of this subsection's own tests.
+
+## The lead's ruling 10, one road (package 75) (2026-11-13)
+
+The lead's note of 2026-11-13 at 04:11 UTC (`docs/dev/M7-WorkPackages.md`, at its end), ruling
+(10): when the trunk is next merged and package 109's step 2 is found there, the two roads for the
+hands called when the watch is too few become one, the settee's. `send_boat`'s file takes the key,
+and 109's set and its two helpers go. This holds provided truth 7-542 and the step 2 tests of
+`tests/test_mends_109.py` stand as they are: the call's line, the pipe-down, the boat away within
+minutes, the belay from the boat. Built in one local commit on the package's branch after the
+trunk's merge at caec1983 (package 109's steps 2 and 3 among it). That merge had kept both roads
+side by side in `Runner._take_hands`: the settee's first, then 109's.
+
+Measured on the owner's machine at seed 7. The scripts are in the session's scratch (`r10/oneroad/`,
+outside the repository). Each was run on the tree and on an export of caec1983, nothing else
+differing.
+
+### Why a second value of the key, and not `all hands` alone
+
+The settee's `too_few: all hands` makes the work all-hands work for its whole length, piped down
+when it ends. On the boat that keeps the hands up for her whole errand (about 49 minutes in the
+bilander's larboard watch, the scout's probe of 2026-11-13, `s13/pumps/notes.md` (i)). 109's step 2
+test wants the hands down within 1,200 s and truth 7-542 wants one pipe-down within 600 s. In
+memory, the boat's key read as `all hands` fails the step 2 test: no `crew.piped_down` in its 1,200
+s. So the key carries when the hands go below, the narrowest general form:
+
+- `too_few: all hands` (the settee's four files, unchanged): all-hands work, piped down at its end.
+- `too_few: all hands until manned` (`send_boat` alone): the same call by the same trigger. The work
+  keeps its number, and the hands are piped down once it is manned (its own number told off, or
+  begun short-handed with half, as any numbered request). Nothing names the boat. Any file may say
+  it of work whose hands, told off, leave the rest free.
+
+### What was built
+
+- **`crew/hands.py`.** `UNTIL_MANNED` and `CrewRequest.until_manned` are read by `from_mapping`
+  beside `calls_all_hands`, which both values set. A word other than the two is refused. The
+  refusal keeps its old words ("say 'all hands', or leave it out and the work waits for hands") and
+  adds "('all hands until manned' pipes them down once it is manned)".
+- **`evolutions/runner.py`, `_take_hands`.** The trigger is the settee's `_watch_too_few`
+  (`hands.too_few_on_deck`, counting hands at other work; all hands not up; not at quarters; no
+  party named). For an until-manned request, the call ("All hands! (to send boat)",
+  `_call_all_hands`) marks the work `Instance.held_up` on its numbered request, and the work waits on
+  that pass, as 109's did. While the routine's call is under way it waits, said by the call
+  (`_manning`). Once all are up, or after a pipe-down by order before it was manned, it waits with
+  the waiting line, as before, and does not call them again itself (109's way). When its request
+  can be begun, it begins, `_after_all_hands` pipes down and the mark is cleared, so its end pipes
+  down nothing. The pipe-down is not made where the captain's own order called all hands, where
+  other all-hands work has them, or where work waiting would be too few the moment they went below
+  (the settee's own guard).
+- **`_after_all_hands`.** The gate reads `all_hands or held_up` (it read `all_hands or (waiting and
+  held_up)`; the same for every settee path, since held-up settee work that begins is all-hands
+  work). Until-manned work waiting its turn, which the pipe-down would leave too few, is held up on
+  its number, not made all-hands work, and counts as all-hands work waiting does.
+- **Gone:** `CALLS_HANDS_WHEN_SHORT`, `HANDS_CALLED_FOR`'s road, `_hands_called_for` and
+  `_pipe_down_after`.
+- **`data/evolutions/send_boat.yaml`.** The crew line takes `too_few: all hands until manned`. The
+  served head gains one sentence in the period's words, marked judgement. The build notes sit below
+  a blank line.
+- **Old saves.** `Instance.__setstate__` reads 109's mark (`hands_called_for` on the params, kept as
+  `_TRUNK_HANDS_CALLED_FOR`) as the new road's mark of the same call: `held_up` set, the mark
+  dropped. An instance without it loads as it was. *Amended by the review's mends (below):* a
+  checkpoint also holds the crew line as read when the order was given (`want`, and the file
+  itself in `evo`), so a boat waiting for hands in a save written before her file said the key
+  loads with the key read from the file as it is now (`calls_all_hands` and `until_manned` set,
+  the rest of her request as it was). Any other instance loads as it was.
+- **New test:** `tests/test_hands.py`, `test_a_numbered_request_may_call_all_hands_until_it_is_manned_and_an_old_call_loads`
+  (the value read and refused, the boat's file alone saying it, a trunk instance with the mark loaded
+  through the checkpoint's pickler). In memory it was broken three ways. Without the mapping, the
+  new test fails. With the boat's key read as `all hands` (as above), or with no pipe-down once
+  manned, 109's step 2 test fails.
+
+### Measured, the caec1983 export beside the tree
+
+Channel east, Brixham road. Each ship is let go at anchor 2 h 10 min before the time named and run
+there; then `go ashore`, run until she is hoisted in. Each line's tick is from the order. The send
+wants six of the bilander's and the smack's companies (eleven, clamped) and eleven of the merchant
+brig's.
+
+| Case | On deck | The call | Pipe-down | Begun | Away | In |
+|---|---|---|---|---|---|---|
+| bilander, starboard watch by night (02:30) | 3 | none | none | +1, three, short | +773 | +3,753 |
+| bilander, starboard watch by day (09:30) | 4 (the cook up) | none | none | +1, four, short | +690 | +3,558 |
+| bilander, larboard watch by night (04:30) | 2 | +1 "All hands! (to send boat)" | +1 "Piped down; the larboard watch has the deck." | +1, four, short | +401 | +3,021 |
+| bilander, larboard watch by day (13:30) | 3 (the cook up) | none | none | +1, three, short | +812 | +3,865 |
+| smack, larboard watch (05:30) | 2 | +1, the same line | +1, the same line | +1, four, short | +472 | +3,150 |
+| merchant brig, larboard watch (05:30) | 3 | +1, the same line | +1, the same line | +1, six, short | +516 | +3,236 |
+| merchant brig, larboard watch (13:30) | 4 | +1, the same line | +1, the same line | +1, seven, short | +525 | +3,278 |
+
+**Old and new, every one of the seven: the whole log's digest the same, line for line and every
+data field.** So is 109's own case (`tests/test_mends_109.py`, at 04:10: the call, "Only four hands
+to send boat", the pipe-down and the start at +1, away at +401). On the call's tick the order is the
+call, the short-handed line, the pipe-down, then "Away the long-boat's crew!", as 109's. The
+smack's and the merchant brig's boats call in their short watches on caec1983 already, by 109's
+road, where before it they waited. This commit leaves them as they are. The settee's four orders
+sailed in her larboard watch by night (00:00) and by day (08:00), as `tests/test_bilander.py` sails
+them, are the same, call for call and tick for tick (87, 100, 338 and 225 s; 183, 198, 275 and 176
+s).
+
+**An old save.** On the export, the bilander at 04:30, one hand of her larboard watch made busy, and
+the call bringing one hand at once (both in the writing process alone), holds her mid-call with
+109's mark for 30 s. A checkpoint is taken at +5 s and the run continued 4,000 s. The checkpoint
+loaded on this tree loads `held_up`, the mark gone, and runs on to the same digest as the export's
+own run on, line for line. There "Only three hands to send boat", the pipe-down and the start come
+at +26 s from the checkpoint and the boat is in at +3,303. Loaded with the mapping left out, it says
+"Not hands enough on deck to send boat; there are but two to spare." at +1, begins at +26 with no
+pipe-down, and keeps all hands up ("All hands on deck." at +85).
+
+**An old save taken before the call** (the review's finding 1, mended in the review's commit). As
+first built, a save written while the boat waited for hands with no call yet made never called for
+her on this tree: the checkpoint holds her crew line as read then, without the key, where 109's road
+had called for her by her evolution's name, which an old save still matched. Bilander, 04:30, her
+larboard watch of two, at anchor; the review's checkpoints, loaded and run on 4,000 s:
+
+- Written on the trunk before 109's step 2 (79478482), `go ashore` and the checkpoint at +60, she
+  saying "Not hands enough on deck to send boat; there are but two to spare.". On the trunk
+  (ef5b24af) and on caec1983: "All hands! (to send boat)" at +1 from the load, "Only four hands",
+  the pipe-down and the start at +2, in at +3,021, digest eeaa5bb6. On 7b067c6b: no call in 4,000
+  s, still waiting, digest 768f2276. Now: eeaa5bb6, the trunk's own, line for line.
+- Written on caec1983 and on the trunk (`heave the log`, `go ashore` 2 s after, the checkpoint at
+  +10, she saying "the watch is heaving log"). On their own trees: the call at +29 from the load,
+  begun +30, in +3,050, digest 1e28df81. On 7b067c6b: never called; begun at +5,390 with three
+  when the idlers came up at 06:00, in +9,247 (a4c2b44a, run 9,500 s). Now: the call at +1, begun
+  +29, in +3,050, digest a29b97b9. The call comes at once by the one road's trigger, as in a game
+  begun on this tree (the watch at other work, below).
+- The mid-call checkpoints (caec1983's, the trunk's and the tree's own) still run on to f4cdd3f8.
+
+**The captain's pipe-down mid-call** (the same busy hand, "send the boat ashore", "pipe down" at +5
+s): on both trees, the call at +1, the pipe-down at +5, and at +6 "Not hands enough on deck to send
+boat; there are but one to spare.", the call not made again. **A brace waiting before the boat**
+("brace the fore yard aback" and "send the boat ashore" 3 s after, the bilander at 04:30 and the
+merchant brig at 05:30): the same on both trees.
+
+**Where the one road differs from 109's, measured:** work that called all hands, with the boat
+waiting behind it. "set the mainsail" (the settee, all hands called) and "go ashore" 10 s after,
+the bilander at 04:30. In both, the boat says "Not hands enough on deck to send boat; the watch is
+setting the mainsail." at +11 and the mainsail is set at +157.
+
+- Old: "Piped down" at +157, "All hands! (to send boat)" at +157 again, "Only four hands to send
+  boat" and a second "Piped down" at +158, the boat begun then with four and away at +558.
+- New: the settee's guard holds the hands up for her (`_too_few_piped_down`), so there is one call
+  and one pipe-down at +157, she is begun on that tick with six, and she is away at +554.
+
+*Amended by the review's mends (2026-11-13): three more cases where the boat's lines move, found by
+the review and measured again on caec1983's export beside the tree. The first two are the trigger's,
+which this record first set down as "by reading, not met in any measured case"; that was wrong, and
+so was "No line of the boat's moved" under Pins (corrected there).*
+
+- **The boat ordered while the short watch is at other work** (the review's finding 2). The
+  settee's trigger counts hands at other work (`hands.too_few_on_deck`), so a deck too few even
+  with them calls at once. 109's waited while other work had the hands, its record's "Where the
+  watch is at other work the old waiting line stands" (`docs/dev/M7-WorkPackages.md`, package
+  109's step 2). `heave the log`, then `go ashore` 2 s after, the bilander at 04:30, her larboard
+  watch of two, run 400 s:
+  - Old: +3 "Not hands enough on deck to send boat; the watch is heaving log."; +39 "All hands! (to
+    send boat)"; +40 "Only four hands to send boat; there are no more on deck.", "Piped down; the
+    larboard watch has the deck.", "Away the long-boat's crew! Hoist out the long-boat."; digest
+    f2829534.
+  - New: +3 "All hands! (to send boat)"; +39 "Only four hands ...", "Piped down ...", "Away ...";
+    digest badb8a8a. The watch below is turned up 36 s sooner by night, and she is begun one tick
+    sooner.
+  - With `send the boat ashore` and the captain's `call all hands` at +10 the lines move the same
+    way: old "All hands! (by the captain's order)" at +11 (42f4d12f), new "All hands are called
+    already; the watch below is coming up." at +10 (267c5342); begun at +39 in both, the hands kept
+    up by the captain's order in both.
+- **A deck enough counting a hand busy at no work of the runner's** (found while measuring finding
+  2). Hands at the pumps carry `water.PUMPS_ID`, which is no instance's. The settee's trigger counts
+  them on deck, so a deck enough with them does not call, and the boat waits for them to come free.
+  109's called wherever the request came back too few and no work of the runner's had the hands.
+  The bilander at 02:30, her starboard watch of three, one hand of it made busy in the probe's
+  process alone (as the mid-call save above), `go ashore`, run 900 s:
+  - Old: +1 "All hands! (to send boat)", "Only three hands to send boat; there are no more on
+    deck.", "Piped down; the starboard watch has the deck.", "Away ..."; away +792; digest 250df54c.
+  - New: +1 "Not hands enough on deck to send boat; there are but two to spare.", and nothing more
+    while the hand is busy; digest 3b7dc776.
+  - In play, by reading: `man the pumps` in a watch of three or four with water in her well, then
+    the boat. Not measured there: in Brixham road her well was dry, the pumps sucked at once, and
+    `man the pumps` then `go ashore` at 02:30, 09:30 and 13:30 gave one digest on both trees.
+- **A boat belayed while all hands come up to man her** (the review's finding 3). 109's road never
+  piped down for her, and the hands stayed up. The one road pipes down at the belay, through
+  `_after_all_hands` (its gate `all_hands or held_up`). The bilander at 04:30, the busy hand and one
+  hand brought at once (both in the probe's process alone, as above), `send the boat ashore`,
+  `belay that` at +3, run 400 s:
+  - Old: no pipe-down; "All hands on deck." at +90; all hands still called at +400, six turned up;
+    digest a6113da4.
+  - New: "Piped down; the larboard watch has the deck." at +4; nobody turned up at +400; digest
+    3e87bbe7.
+  - In plain play the window is the first case's: `heave the log`, `send the boat ashore`, `belay
+    that` at +10, run 200 s. New: the call at +3, the pipe-down at +11 (0752fbf5). Old: the waiting
+    line alone, no call (2eaf64fa).
+
+**By reading, not met in play:** an order naming its own party (`hands_from`) waits where 109's
+called. The boat's work is begun by `world/dealings.py` with its own params (the errand and the
+port), so no order reaches her with a party: `send the boat ashore with the larboard watch` at 04:30
+gives one digest on both trees (9849df97).
+
+### For the lead's ruling: the boat's trigger (the review's mends)
+
+Ruling 10 has a line of the boat's that must move to make one road said old beside new, for the
+lead to rule. The two trigger cases above move by the settee's trigger alone. The tree keeps it, as
+built; three ways were measured, (b) and (c) in memory on the tree (the scripts `alt.py` and
+`measure_alt.py` in the session's scratch, `r10/fix/scripts/`, outside the repository):
+
+- **(c), my pick: package 109's own trigger for until-manned work**, about four lines in
+  `Runner._watch_too_few`. Such work calls where its request came back too few (as `_take_hands`
+  asks it), no work of the runner's has the hands, all hands are not up, she is not at quarters and
+  no party is named. `too_few: all hands` (the settee's) keeps its own trigger. Both trigger cases
+  give caec1983's digests (f2829534 and 250df54c), and so does the save written on caec1983 while
+  she waited behind the log (1e28df81, the writer's own). In a sketch: the boat waits while the
+  watch is heaving the log, and calls for hands when the log is in; with a hand at the pumps she
+  calls at once, as on the trunk.
+- **(a), as built: the settee's trigger for both values of the key.** The lines move as measured
+  above: she calls at once while the watch is at other work, and waits while a hand at the pumps
+  makes the deck enough.
+- **(b), the review's one line**, `if want.until_manned and self._other_work(inst): return False`.
+  The log case gives caec1983's f2829534, but the busy-hand case still waits (3b7dc776).
+
+Each of (b) and (c) leaves the seven cases of the table, 109's own case and the settee's eight
+orders at caec1983's digests, the mainsail-then-boat case as the one road has it (413d04b1, one
+call and one pipe-down), and the belay's pipe-down as the one road has it (3e87bbe7). The pipe-down
+guard (`_too_few_piped_down`) is the settee's under all three.
+
+### Pins
+
+- **One test fails as it stands, and is left unedited for the lead's ruling:**
+  `tests/test_settee.py`, `test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few`.
+  Its `assert calling == set(SETTEE_FILES)` (the files whose crew line says `too_few`) now finds
+  `send_boat` too, which the ruling gives the key. No other way keeps both: the key is read from
+  the crew line, where the test looks. Proposed, old beside new: `assert calling ==
+  set(SETTEE_FILES)` becomes `assert calling == set(SETTEE_FILES) | {"send_boat"}`, the docstring's
+  "the four settee files, and no other evolution file, say `too_few: all hands`" becoming "the four
+  settee files say `too_few: all hands`, and the boat's alone `too_few: all hands until manned` (the
+  lead's ruling 10)". The test's other clauses hold. The docstring of
+  `tests/test_hands.py`'s key test ("no file but the settee's four carries it") is left as it is,
+  with that test.
+- **The boat's lines.** As first recorded here: "No line of the boat's moved, and no digest, tick or
+  line count in any measured case". *Corrected by the review's mends:* no pinned digest, tick or line count moved (the four whole
+  logs, the captain's trials, the known truths, 109's tests and truth, unedited and passing). The
+  boat's lines move in the four cases above, "Where the one road differs from 109's, measured",
+  each old beside new; in 109's own cases and the seven of the table they do not.
+
+### The suites, as run
+
+At caec1983 with this step's changes, in the tree, one at a time from its root with nothing else
+running (`py`, the tree first on the path; four workers, `--dist loadgroup`). The bases are the
+last step's, at 2d2bbd8b, not run again (`s13/final-fast.xml`, `s13/final-slow.xml`, the four
+logs and the trials of `s13/final/`). The script is `r10/oneroad/runs/run.sh`.
+
+- **The slow tier of the named files and the known truths whole** (`--slow -m "not pace"`, 61
+  minutes): `test_mends_109`, `test_settee`, `test_bilander`, `test_hands`, `test_hull_smack`,
+  `test_hull_brig` (the merchant brig's), `test_known_truths`, `test_replay`, `test_checkpoint`,
+  and the boat's errand in `test_ports`, `test_boat_director`, `test_boat_hull`,
+  `test_orders_places`, `test_crew_orders` and `test_routine`. Result: 908 passed, 8 failed, 1
+  skipped, 8 xfailed.
+  - Against the bases, two outcomes changed. One is `test_settee`'s case above, for the lead.
+  - The other is `test_replay`'s fingerprint case, `a0f20ca386ea907c` against `7a100158e31e7910`.
+    It reads the tree's fingerprint at its process's start and again at its end, and a comment of
+    `runner.py` was reworded while it ran. Run alone afterwards with the tree at rest, the file
+    passes, 22 of 22.
+  - The other six failures are the base's, with the same figures: truth 77's 2e93986c2989d831, the
+    merchant's [16200, 96480], the schooner on an intent, the schooner's 767 lines, and truths 78
+    and 79's [57, 100918].
+  - 92 cases were only in this run, all passed. They are the trunk's (`test_mends_109`, truths
+    7-50x, 7-53x, 7-54x, 7-56x and 7-58x), the slow cases of files outside the base's slow list
+    (`test_hands`, `test_routine`, `test_ports`, `test_orders_places` and `test_crew_orders`), and
+    the new one.
+- **The fast tier of the boat's errand, the saves, the served catalogue and the documents'
+  readers** (28 minutes): 55 files, among them `test_aboard_another`, `test_agents`,
+  `test_business`, `test_letters`, `test_prizes`, `test_tow`, `test_captain`, `test_crews`,
+  `test_driver`, `test_people`, `test_in_world`, `test_catalogue`, `test_evolutions`, `test_primer`
+  and the rest of the 27 that read the notes or the designs (four are in the slow tier above).
+  Result: 4,226 passed, 1 xfailed. Against the base, no outcome changed, and 12 cases were only in
+  this run, all passed (the trunk's forms in `test_primer`).
+- **The captain's trials** (`--slow`): 5 passed and 3 failed, as at the base outcome for outcome and
+  digest for digest (the station's gale 1e59009004141b08, the trade's thick weather
+  41a37f0290be291a, the trade's stranger 13432e4b2659bcaf).
+- **The four whole logs** (`log_digests.py`): every field as at the base (the first action 497
+  lines, 234036cc17e6f137; the encounter 229, 732a6020db4d4755; the station's lee shore 1,561,
+  e8c79e9947e244c3; the station's gale 1,722, 1e59009004141b08).
+- **ruff** `check` and `format --check` over `freesail`, `tests` and `tools`: clean (385 files).
+
+**Moved by this step:** no recorded passage, digest, line count or tick. Nothing is left for the
+lead to re-pin by it. What moved is the one combined case above (the boat behind work that called
+all hands) and `test_settee`'s set of files, left failing for the lead's ruling. *Corrected by the
+review's mends:* and the three cases the review found, above.
+
+### (c) built, and the settee's pin moved (2026-11-13)
+
+After the review's mends, (c) above was built: `Runner._watch_too_few` gives work that is manned
+and piped down at once (`until manned`, the boat's) package 109's own trigger, in two lines. It
+calls where its request came back too few and no work of the runner's has the hands; all hands
+must not be up already, she must not be at quarters, and no party may be named. `too_few: all
+hands` (the settee's) keeps its own trigger. The ruling is "make them one road, yours", and the
+road stays one: one key on the crew line, one call (`_call_all_hands`), the work held up on its
+number (`Instance.held_up`), and one pipe-down (`_after_all_hands`). Only the boat's trigger is
+109's, and so her lines are kept. A line that must move goes to the lead, by the ruling; with (c),
+none of the boat's lines moves but the two mends below. The lead may rule (a) or (b) instead, and
+each is one line.
+
+Measured in memory on the tree, beside caec1983 (the review's `measure.py` and `probe.py`):
+
+- The seven boat cases, 109's own case (e486b095) and the settee's eight orders: every digest is
+  caec1983's, as before.
+- `heave the log`, then `go ashore` (the bilander at 04:30): f2829534, caec1983's. The boat waits
+  while the watch heaves the log, "Not hands enough on deck to send boat; the watch is heaving
+  log." at +3, and calls at +39.
+- One hand busy at no runner work (the bilander at 02:30): 250df54c, caec1983's. She calls at +1
+  and is away at +792.
+
+What still differs from 109's road, and each is a mend: the boat waiting behind work that called
+all hands gets one call and one pipe-down (413d04b1), and a boat belayed while the hands come up
+pipes them down (3e87bbe7).
+
+The settee's pin, old beside new: `tests/test_settee.py`,
+`test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few`.
+- Old: `assert calling == set(SETTEE_FILES)`.
+- New: `assert calling == set(SETTEE_FILES) | {"send_boat"}`, and the settee's four are not until
+  manned where the boat's is.
+- Its docstring says so, with the ruling. The docstring of `tests/test_hands.py`'s key test now
+  reads "no file but the settee's four and the boat's carries it".
+- Reason: ruling 10 gives send_boat's crew line the key, and the test reads that line.
+
+Run: `test_settee`, `test_hands`, `test_mends_109`, `test_bilander`, `test_boat_director`,
+`test_boat_hull`, `test_checkpoint` and `test_routine`, 277 passed; ruff clean. The whole tiers
+follow in the next step's gate (ruling 11), on this commit.
+
+## The lead's rulings 8 and 11, the working officers and the bilander's nine (package 75) (2026-11-13)
+
+The lead's note of 2026-11-13 at 14:32 UTC (`docs/dev/M7-WorkPackages.md`, at its end; nudge
+number 4) accepts ruling 9's measure and does not build its wider form, which moved the topsail
+schooner's recorded passages. Ruling (11) is the narrower form: a merchantman's master or mate is
+counted a hand of their own watch for deck work only where the watch's whole number is under the
+work's want (a watch too small for the job, not a watch that is busy). Everything else is as
+ruling 9's probe had it. It is built without going back to the lead if, and only if, (a) no
+recorded passage, digest, truth or test of the schooner, the smack or the merchant brig moves
+(test_studding's two strict xfails stay xfail), (b) the only tests that move are the bilander's
+own, each old beside new, and (c) at nine either watch of the bilander begins every watch's deck
+work by night and by day. Ruling (8) of 01:15, her nine, is built on it. Two local commits on a
+branch cut from bfb10c6f: ruling 11 first, the engine with the three other traders' people files;
+then her nine with her own people file.
+
+### Ruling 11: what was built, and where
+
+- **The rule** (`Runner._working_posts`, `freesail/evolutions/runner.py`). A post that heads a
+  watch is put in a request's pool only where that watch's whole number is under the work's want.
+  As ruling 9's probe had it, the request must be numbered and on deck (never aloft, never all
+  hands), she must not be at quarters, the work must not be one of the twelve manoeuvres
+  (`scripts.HELM_MANOEUVRES`) and none may be in hand (the officer of the deck gives it), all hands
+  must not be called or coming, the post's watch must have the deck (for a party an order names,
+  that watch), and the post's person must be aboard, well, free and on deck
+  (`People.works_on_deck`). In the pool the post is taken after every hand of it (`hands._tier`,
+  a sixth tier). A manoeuvre begun takes a post from the work they hold back to the conn
+  (`Runner._to_the_conn`): the work goes on short, or under half its hands is held as belayed work
+  is until hands come. A post away in the boat stays with her, and the other gives the manoeuvre.
+- **"The watch's whole number"** (`Runner._watch_whole`). Every hand of the watch (`Sailor.watch`)
+  fit for work on deck, as `hands.can_work(s, aloft=False)` counts a hand: fit and not of the
+  quarterdeck, so a hand hurt at light duty counts and the sick, the wounded and the dead do not.
+  Whatever they are doing they count: idle, at other work, below, at the pumps. A hand away in the
+  boat is not on board and is not counted: one held by work whose crew is out of the ship
+  (`Script.crew_away`, true for the boat from her pull out to her pull back; hoisting her out or in
+  is deck work). The post is not counted in it: the whole is the hands', and the post makes it up.
+  **Why:** the ruling's own gloss, "a watch too small for the job, not a watch that is busy".
+  Counting the hands at other work makes a busy watch big enough, so it waits as before; leaving
+  out only the unfit and those not aboard makes the count the watch's size as she stands.
+- **"The work's want"**: the request's own `wanted` for work on deck, the file's number of hands no
+  more than the whole company could ever put to it, `min(want.hands, hands.company_can_give(crew,
+  aloft=False))`, as `hands.request` clamps it. **Why:** it is the number the request itself
+  measures the deck against (enough, short or too few). A file's figure beyond the company, such
+  as the twelve of a topsail set from the gear in a company of seven, is no want the watch could
+  be measured against. It is the want, not half of it: a watch of three for a jib that wants four
+  is under it, and the post makes the fourth.
+- **Where the watch a post heads is written.** A post's wardroom entry in the ship's people file
+  says `watch: larboard` or `watch: starboard` (`world/people.post_watches`, refused in words for
+  any other word or for a role that is no post). It is read at the muster into
+  `Crew.post_watches` (`api.session.attach_crew`), set on that crew alone. `hands.post_watch`
+  reads it, and the post's own `Sailor.watch` stays the bill's, none. **The master the larboard
+  and the mate the starboard, JUDGEMENT**: the mate's is the watch the people's turn already keeps
+  them in (`world/people.WATCH_KEEPERS`). The merchant brig's, the smack's and the topsail
+  schooner's people files say so in this commit; the bilander's in the next.
+- **A departure from ruling 9's unapplied diff (`proposed9.diff`), for the lead.** The diff wrote
+  the watch into the ship files' `crew.posts` through the generator and into the posts'
+  `Sailor.watch` at the muster. Built that way (measured on this tree, the merchant files'
+  and crew tests run whole), four tests of the three other traders moved on the data's placement
+  alone, so condition (a) failed:
+  - `tests/test_crew_model.py`, `test_watches_split_each_station_evenly_odd_one_to_starboard` (the
+    schooner's quarterdeck keeps no watch);
+  - `tests/test_crew_model.py`, `test_all_hands_at_work_turned_up_and_the_routines_watch` (the
+    schooner's starboard watch's first member became her mate);
+  - `tests/test_hull_smack.py`, `test_her_file_but_for_her_lines_is_what_it_was_against_git`;
+  - `tests/test_hull_brig.py`, `test_no_figure_the_physics_or_the_gunnery_reads_moved[merchant-brig]`.
+
+  Read from the people files instead, no ship file of theirs changes (the generator's eighteen
+  files byte for byte, the bilander's alone moving in the next commit), the muster and its draws
+  are untouched, and a crew from a checkpoint written before holds no `post_watches`, so a save
+  from before loads with the company it holds, its posts heading none. Every other crew is
+  mustered and pickled as before, since the attribute is set only where a file gives a watch. The
+  diff's `Runner.people` is not built either: the people are read through the standing runtime the
+  World attaches to her (`scripts._world_of`), so every runner pickles as before.
+- **Lines.** `freesail/crew/hands.py` (the module's note, `post_watch`, the `posts` flag of
+  `can_work`, `request`, `_deck_for` and `too_few_on_deck`, the sixth tier),
+  `freesail/evolutions/runner.py` (`_working_posts`, `_watch_whole`, `_watch_word`,
+  `_to_the_conn`, the pool and the party an order names, the piped-down deck, the four requests
+  and two too-few checks passed as the runner's pools), `freesail/evolutions/scripts.py`
+  (`Script.crew_away`, `SendBoatScript`'s), `freesail/world/people.py` (`post_watches`,
+  `People.works_on_deck`), `freesail/api/session.py` (the muster's three lines), the three people
+  files, and five tests in `tests/test_hands.py`.
+
+### Ruling 11 measured: condition (a), the three other traders
+
+Measured on the tree at this commit (the bilander's files as at bfb10c6f, her eight), against the
+r10 bases (`final-fast.xml`, `final-slow.xml`, run at 4df85dc7), with a count, by ship, of every
+post the rule put in a pool and took (a scratch pytest plugin wrapping `Runner._working_posts` and
+`hands.request`, the tree untouched):
+
+- **Their watches as mustered at seed 7.** The merchant brig's are seven and three (each of her
+  stations odd, the odd hand to the starboard by the muster's rule), the smack's three and two,
+  the topsail schooner's seventeen and sixteen. The schooner's are over the want of every request
+  that is a watch's work on deck by her files (twelve at the most, a topsail set from the gear),
+  by night and by day, so her post is never counted for it (pinned:
+  `test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work`). Beyond a
+  watch's work, two anchor files want twenty hands (`cat_and_fish_anchor`, `back_anchor`), over
+  either of her watches: her post would be counted there if all hands were not up (for the lead,
+  below). The smack's and the merchant brig's are under nearly every want, so their posts work.
+- **The merchant vessels' and the crew files, the settee's, 109's, the generator's and the guards
+  that list every file, with ruling 9's fast movers** (29 files whole and 78 tests by node id:
+  test_bilander, test_fishing, test_hands, test_crews, test_crew_orders, test_crew_model,
+  test_routine, test_hull_smack, test_hull_brig, test_hull_schooner, test_people, test_water,
+  test_bill_marines_and_flag, test_settee, test_mends_109, test_ship_particulars,
+  test_check_viewer_guns, test_anchor, test_catalogue, test_profiles, test_driver,
+  test_view_geometry, test_ship_loader, test_places, test_fight, test_subtypes, test_wardroom,
+  test_scenarios, test_checkpoint; `-n 4`): **2,098 passed, 1 xfailed** (16 minutes). Against the
+  bases no outcome changed but `test_settee`'s file-set test, failed at 4df85dc7 and passed since
+  bfb10c6f (not ruling 11's). The xfail is the base's own (`test_catalogue`'s backing and
+  filling). A post was put in a pool in 21 tests, every one passing: the merchant brig in her own
+  files' tests (`test_ordnance`'s three, `test_scenarios`' free sailing: taken at most once), the
+  smack in `test_fishing`'s two (taken once), the crewed merchant brigs of `test_crews` (truths
+  87 and 88 among them, with the pace held), `test_people`, `test_ports`, `test_squadrons`,
+  `test_subtypes`' truth 7-191 and `test_world_orders`, and the five new tests. No topsail
+  schooner's post was put in a pool in any test.
+- **Ruling 9's slow movers** (every test where its wider form took an officer in the slow tier,
+  and its second round's: 61 by node id, `--slow`, `-n 4`): **50 passed, 8 failed, 3 xfailed**
+  (19 minutes). No outcome changed against the base. The eight failures are the base's own, each
+  with the same assertion: the digests and constants the lead re-pins on the build machine (the
+  trade trials' stranger and thick weather, gates 5b, 5c and 6a, truths 77 to 79); the gate 5b
+  case's message differs only by an object's address, its assertion the base's (767 lines against
+  766). **test_studding's two strict xfails stay xfail.** A post was put in a pool in 20 of them,
+  each passing or failing as at the base: the smack in truth 73 extended (taken 163 times), the
+  seine, the maker's scenario and the harbour; the crewed merchant brigs and the other far
+  traders (truths 7-137, 7-144, 7-157, 7-168, 7-191, 7-320, 7-378, 7-399, 7-491, `test_crews`,
+  `test_director`, `test_knowledge`, `test_observer`). No topsail schooner's post was put in a
+  pool.
+- **The five recorded passages ruling 9 sailed whole** (the topsail schooner's, begun as the trials
+  and the whole logs begin them and ticked to the end, in memory), old being ruling 9's base runs
+  of them, which give the pinned digests (truth 77's 2e93986c2989d831, `TRIAL_TRADE_STRANGER_DIGEST`
+  13432e4b2659bcaf), and new this tree, with the posts' count:
+
+  | Passage | Seconds | Lines old, new | Digest old, new | Posts pooled |
+  |---|---|---|---|---|
+  | gate 5b's schooner | 61,200 | 767, 767 | cae2b06446ea86c3, the same | 0 |
+  | the trade stranger | 72,000 | 1,594, 1,594 | 13432e4b2659bcaf, the same | 0 |
+  | the trade in thick weather | 72,000 | 426, 426 | 41a37f0290be291a, the same | 0 |
+  | the merchant passage | 129,600 | 2,909, 2,909 | 2e93986c2989d831, the same | 0 |
+  | the merchant intent | 129,600 | 2,098, 2,098 | af28debbc98516ae, the same | 0 |
+
+  Nothing of them moved, line for line. **The four whole logs and the captain's trials** (King's
+  ships' worlds and the three trials) did not move under ruling 9's wider form, and no post of a
+  King's ship is ever counted; the whole tiers follow in the step's gate.
+- **Asked by the lead, and left as she is:** the schooner of the merchant passage takes the ground
+  first at tick 101,155. She let go her best bower at 100,918 in three fathoms and a half off Point
+  Bertheaume, in the road of Bertheaume, veering to seventeen fathoms with the warning that she
+  would swing within a cable of the land to the NNW; fixed at 101,100 by cross bearings at 48° 20'
+  N, 4° 42' W, Point Bertheaume NE by N three cables. At 101,155: "She has taken the ground
+  forward, on sand and mud: two fathoms of water by the chart, and she draws 11 feet; she struck at
+  two knots, heeling 3 degrees, the tide falling." Thirteen times in all as recorded, the last
+  at 119,562, and never with one more hand under ruling 11, her post never counted.
+
+### For the lead (ruling 11)
+
+- **The data's placement** above: the four tests of the three other traders that ruling 9's diff
+  would have moved, and why the people files carry the watch instead.
+- **The boat.** A post counted for the boat's crew (the bilander's at nine by night, below) is
+  held by her errand and goes away in her with the hands, as a trader's mate often went in the
+  boat; their person in the people's model is not moved and stays at their place aboard. A post
+  away in her is never taken to the conn. Whether a post goes in the boat, or the boat calls all
+  hands to man her where only the post makes her number, is the lead's to rule; as built, the
+  post goes.
+- **The topsail schooner's anchor work.** Two files want twenty hands (`cat_and_fish_anchor`,
+  `back_anchor`), over her watches of seventeen and sixteen, so her post would be counted for them
+  if all hands were not up. In none of the tests run nor the five recorded passages was her post
+  put in a pool.
+- **The merchant brig's watches** are seven and three as mustered (each of her stations odd, the
+  odd hand to the starboard), so her master works with the larboard's three at nearly every
+  request: her own lines of who hauls, no test or truth of hers moved.
+
+### Ruling 8 on ruling 11: the bilander's nine (the second commit)
+
+- **Her company** (`tools/ships/bilander.py`, through the generator; her file alone of the
+  eighteen moves, every other byte for byte): complement 9 (old 8); her stations two in each top,
+  two in the afterguard (old one, the boy alone) and the cook; her shares as they were, so her six
+  seamen muster five able and the landsman boy. Her notes: the complement's (nine, JUDGEMENT within
+  the sourced range of eight to nine, the three sources by page: Macpherson, Annals of Commerce
+  vol. 4, pp. 287 and 331, England in 1793 and 1794, 13.8 and 14.0 tons a man, 9.3 and 9.1 at her
+  128 tons; the Transport Board's rule of 1797, Sutcliffe 2013 p. 30 citing TNA ADM 1/3733, eight
+  at her tons; TNA HCA 32's catalogue for 1776-83, British traders of 100 to 160 tons, a median of
+  8 short-sea and 10 Atlantic; D43's eight and the Nancy of Boston kept beside them as the old),
+  the afterguard's, the shares', the water's (nine men, three tons as before), the powder's and the
+  armed fit's words ("Her nine cannot man a side's guns, the helm and the sails together", as
+  measured: her guns want ten of her seven off the quarterdeck), and her description's "a trader of
+  nine hands" (old "eight"). The generator's report: "of her 7 hands off the quarterdeck the bill
+  tells off 2 trimmers and 1 at the helm first, and her guns want 10" (old 6).
+- **Her people file** (`data/people/bilander.yaml`): `watch: larboard` on the master and `watch:
+  starboard` on the mate (ruling 11, JUDGEMENT), its header "nine hands".
+- **Her watches as mustered at seed 7**: the starboard a fore topman, a main topman and the
+  afterguard's able seaman, the mate heading it; the larboard a fore topman, a main topman and the
+  boy, the master heading it; the cook keeps none (old: three, the boy the starboard's third, and
+  two).
+
+### Condition (c), measured: her watches' work, old (eight, bfb10c6f) beside new (nine)
+
+In memory at seed 7 off the Lizard, a fresh World for each cell (tests/test_brains.py's world, its
+start at the hour), the watch given the deck by the bill's override, all hands not called, her
+people made; each request made as `Runner.start` makes it and asked for its hands by the runner's
+own `_take_hands` (the all-hands call where its file says `too_few`), nothing ticked. "Short n/w":
+begun short-handed with n of the w it wants of her deck. By night (02:00) the idlers are below, by
+day (12:00) the cook is up.
+
+| Work (her files) | Wants, eight / nine | Starboard, night | Starboard, day | Larboard, night | Larboard, day |
+|---|---|---|---|---|---|
+| fore course, fore and main topsails, fore topgallant: set from the gear, taken in | 6 / 7 | 3/6 / 4/7 with the mate | 4/6 / 5/7 with the cook and the mate | waits (two) / 4/7 with the master | 3/6 (two and the cook) / 5/7 with the cook and the master |
+| jib, fore topmast staysail: set from the gear (the jib from furled alike) | 6 / 6 | 3/6 / 4/6, the mate | 4/6 / 5/6, the mate | waits / 4/6, the master | 3/6 / 5/6, the master |
+| jib, fore topmast staysail: taken in | 4 / 4 | 3/4 / 4/4 whole, the mate | 4/4 whole / 4/4 whole, no post | 2/4 / 4/4 whole, the master | 3/4 / 4/4 whole, no post |
+| the braces | 6 / 7 | 3/6 / 4/7, the mate | 4/6 / 5/7, the mate | waits / 4/7, the master | 3/6 / 5/7, the master |
+| the boat | 6 / 7 | 3/6 / 4/7, the mate | 4/6 / 5/7, the mate | all hands called to man her (ruling 10), waits / 4/7, the master | 3/6 / 5/7, the master |
+| the settee: set from the gear, taken in, dipped | 6 / 6 | 3/6 / 4/6, the mate | 4/6 / 5/6, the mate | all hands called, begun as all-hands work / 4/6, the master | 3/6 / 5/6, the master |
+| aloft: a topsail or the fore course loosed, a topsail furled | 5 / 6 | 3/5 / 3/6 | 3/5 / 3/6 | waits / 3/6 | waits / 3/6 |
+| aloft: the settee set from furled, furled | 5 / 6 | 3/5 / 3/6 | 3/5 / 3/6 | all hands called / 3/6 | all hands called / 3/6 |
+
+**Either watch at nine begins every request that is a watch's work on deck, by night and by day,
+with the master or the mate where its three are under the want** (taken after every hand, the
+cook first by day), and the work aloft with its three alone: condition (c) holds, **while the
+post who heads the watch is free on deck** (the ruling counts their person only aboard, well,
+free and on deck: `People.works_on_deck`, ruling 9's probe). With her master, who is her captain,
+below or at other business, or her mate so, that watch by night waits for the work that wants
+seven, as at eight: its three are under half (the review's mends, below). Pinned:
+`test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate`, each
+watch by night and by day. Sailed at nine from her settle (15 kn), her larboard watch by night
+takes in her settee in 115 s, sets it from the gear in 125, furls it in 587 and sets it from
+furled in 377, and by day in 111, 120, 587 and 377 s, calling nobody (old, her eight: by night all
+hands called for each, 87, 100, 338 and 225 s; by day the take in and the set by three with the
+cook, 183 and 198, and the furl and the loosing with all hands, 275 and 176). Forced round hove to
+by night, the watch's three with the master dip the settee ("The watch dips the mainsail, lying
+against its mast.", dipped at +618 s; old, all hands called, +423 s), on her lee at +900 s, 61.7 m²
+and 2.68 kn. A wear ordered 29 s after "take in the mainsail" belays it in either watch and the
+post goes to the conn: the starboard wore her at +501 s and took in the settee at +559 s (old
++643), the larboard at +549 and +636 (old: the take in called all hands and the wear waited for
+it, +614).
+
+**What still calls all hands in her.** With her watches whole, nothing of a watch's work, on deck or
+aloft. The settee's `too_few: all hands` and the boat's `until manned` stay, for a watch short: with
+the afterguard's hand of the watch on deck sick (measured in memory, each watch by night and by
+day), her work on deck still begins with the two and the post; the settee set from furled and its
+furl, aloft where no post goes, call all hands (two of the six, under half); her square sails
+loosed or furled aloft wait for hands, their files carrying no key, as before.
+
+**A save from before loads with the company it holds.** A save of hers written at bfb10c6f (seed 7
+off the Lizard at 00:00, all hands called and plain sail set, piped down at 1,800 s, saved at
+1,860 s) loads in this tree from its checkpoint ("written by another build ... the game goes on
+from where it was saved, under this build's rules"): eight, its crew holding no watch for its posts
+to head, and "take in the mainsail" sailed 600 s on from it gives the old tree's lines, line for
+line. Replayed from its journal alone (no checkpoint, or one that cannot be read) she is mustered
+from her file as it is now: nine.
+
+### Condition (b): the tests that moved, every one the bilander's own (`tests/test_bilander.py`)
+
+Each with its old beside its new in its docstring or at its assertion.
+
+- **Her company:** `test_her_company_is_eight_with_two_in_the_main_top`, renamed
+  `test_her_company_is_nine_with_two_in_the_main_top`: (complement, names, seamen) (8, english, 5)
+  to (9, english, 6); the afterguard 1 to 2; her people file's watches and the complement note's
+  three sources asserted (new). `test_truth_7_197_...`'s company clause: 8 to 9.
+  `test_her_muster_at_seed_7_puts_four_topmen_aloft_and_the_boy_aft`: eight rows to nine, the
+  afterguard's able seaman added, each with its watch, the boy found as the afterguard's landsman,
+  the crew's watches for its posts. `test_her_boat_pumps_hold_and_stores`: the water's words for
+  nine men (its bound held at eight too).
+- **The generator's report:** `test_the_generator_writes_her_file_as_committed_and_reports_its_
+  checks`: "of her 6 hands off the quarterdeck" to "of her 7".
+- **Her quarters:** `test_her_quarters_at_the_beat_man_one_gun_short_on_the_armed_fit`, both
+  fits: unarmed, the trimmers four to five and the helm a fore topman to the afterguard's able
+  seaman ("the trimmers 4" to "the trimmers 5"); armed, No. 1 manned by the boy and a main topman
+  (one short) to the boy, a fore topman and a main topman (whole), the log's line the same. Its
+  name kept.
+- **Her helm and lie:** `test_hove_to_her_main_topsail_goes_to_the_mast_and_she_lies_to_both_ways`
+  (its five cases): `CLOSE_HAULED_HELM` -1.14, +0.43, -4.91 to -2.26, -0.74, +0.45; her lie hove to
+  within its bands as before, figures recorded; in 20 kn the other yards braced up at the
+  heave-to again (old none). `test_her_polar_agrees_with_her_sailed_beam_reach_and_her_helm_is_as_
+  tuned` (slow): her helm under plain sail -0.02 to -1.07, the headsails taken in +0.44 to +0.36,
+  6.52 kn abeam (old 6.20), the settee's -3.29 the same; her figures before the boy was a landsman,
+  as it happens.
+- **Truth 7-198's dip:** six of her eight to seven of her nine, the afterguard's two among them,
+  the posts on the quarterdeck; every other figure within its band.
+- **The wear after a settee order:** `test_a_wear_ordered_after_an_order_of_her_settee_begins_at_
+  once_and_keeps_the_order`: `[4-starboard-501-643]` to `[4-starboard-501-559]`, and
+  `[0-larboard-549-636]` new (her larboard watch now begins the take in).
+- **The settee's road where a watch is too few, sailed on her eight as a save from before holds it**
+  (`_her_eight`, a helper new; `_her_settle`'s `eight`), every figure and line as before:
+  `test_forced_round_in_her_larboard_watch_by_night_the_settee_is_to_be_dipped_with_hands`,
+  `test_in_her_larboard_watch_a_take_in_of_her_settee_calls_all_hands_and_a_wear_follows_it`,
+  `test_her_settee_requests_at_eight_begin_with_the_starboard_watch_and_wait_with_the_larboard`,
+  `test_her_larboard_watch_calls_all_hands_for_her_settee_and_pipes_down_after` (both hours) and
+  `test_her_settee_work_waiting_its_turn_is_not_piped_down_and_called_again` (its three cases).
+  At nine none of these cases calls all hands, so the road is pinned where a watch is too few: her
+  eight, which a save from before still is.
+- **New:** `test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate`
+  (each watch by night and by day), `test_at_nine_her_larboard_watch_works_her_settee_with_the_
+  master_and_calls_nobody` (00:00 and 08:00) and `test_forced_round_at_nine_her_larboard_watch_
+  dips_the_settee_with_the_master`.
+
+### The suites at the second commit
+
+- `tests/test_bilander.py` whole with the slow (`--slow`, `-n 4`): **76 passed** (1 minute).
+- The first commit's 29 files again, with `test_practice` (it reads these notes): **2,034 passed**
+  (6 minutes). Against the bases no outcome changed but `test_settee`'s file-set test (bfb10c6f's,
+  as before); the bilander's ten node ids not in the base are her renamed and new ones above. A
+  post was put in a pool in her own tests, the merchant brig's, the smack's and the crewed traders',
+  never the topsail schooner's.
+- The generator: the eighteen files byte for byte but hers; `tools/check_viewer_guns.py`'s test
+  and the guards that list every file among the 29. **ruff** `check` and `format --check` over
+  `freesail`, `tests` and `tools`: clean (385 files). Every changed file LF.
+- The whole tiers, the captain's trials and the four whole logs follow in the step's gate.
+
+### For the lead (ruling 8)
+
+- **Nine is JUDGEMENT**, within the sourced eight to nine; the sources bear on a trader of her tons
+  in her years, none on a bilander.
+- **With a hand of a watch short,** her square sails loosed or furled aloft wait for hands, as
+  every file without the key does; the settee's aloft work calls all hands. Whether a short watch
+  should call all hands for any sail aloft is not asked of this step.
+- **Her helm close-hauled and in the polar harness** are back at the figures of before the boy was a
+  landsman (1.07 of lee helm against 1.09, +0.36 with the headsails in): her trims done by three a
+  watch and the post. Measured, not tuned.
+- **The gate's generator check** ("every file but the bilander's identical") holds: with the posts'
+  watches in the people files no other ship file moves.
+
+### The review's mends (one further commit)
+
+The review of the two commits (04858415, d6a88e2e) gave eight findings. Each was reproduced
+first, on the review's own probes and on a tree of d6a88e2e taken out beside the clone, and is
+measured below old (d6a88e2e) beside new. Seven are mended in one commit, the first with a
+question left to the lead and its limit recorded, and one is a record only.
+
+- **1. The post's person off the deck** (the review's blocker). Condition (c) holds only while
+  the post who heads the watch is free on deck, as the ruling's form has it, and the records said
+  (c) without that limit: now said here, in Build-Ships §16.1 and in her design's §6.1. Measured
+  with the post's person below, each watch: by night the square sails set from the gear or taken
+  in and the braces wait (seven wanted, three under half), the boat calls all hands to man her
+  (ruling 10's road), the head sails and the settee begin short with the three; by day every one
+  begins with the three and the cook. **Mended:** the post's hand outlasted the person, so that
+  the captain gone below hauled at the fore sheet from the cabin to "Set the foresail." at +226 s.
+  Each tick before the work is ticked, `Runner._posts_off_the_work` takes a post off the work
+  they hold where `_working_posts` would count them no longer: their person not aboard, well,
+  free and on deck (`People.off_the_deck`, the words of `works_on_deck`), at quarters, or all
+  hands called or coming. The work goes on short, or under half its hands is held, said ("Belayed
+  setting the foresail: the master gone below."), and is taken up again when hands come (the
+  captain come on deck 300 s on: taken up with the master that tick, set at +527 s). **Left to the
+  lead:** whether the watch whose post is below should begin its seven-handed work some other way
+  (the review's thought: the officer of the watch's person counted in their place). Nothing built.
+- **2. The post in the boat.** The master was the long-boat's oarsman at the quay while their
+  person stood on the quarterdeck, and in the kedge's boat likewise; the kedge's boat counted as
+  aboard in a watch's whole. **Mended, otherwise than the review proposed:** the post still hauls
+  at her falls (hoisting out is work on deck, and the ruling counts them for it), and on the tick
+  after she leaves the side they are taken off the work and stay aboard, the boat going on with
+  the rest and never held away from the ship (`Script.crew_away`, `_posts_off_the_work`). The
+  kedge's boat is away from her pull out to her pull back (`LayOutKedgeScript.crew_away`), so its
+  crew is not aboard for a watch's whole. Package 109's Torbay world at 04:10, her larboard watch by
+  night: the boat away at +606 s with the master as before, the master off at +607, landed at the
+  quay at +1,567 s with three, as before; the kedge away at +1,219 s, the master off at +1,220,
+  laid out at +2,274 s (old +1,986, hoisted in by four). The review's own mend (no post for work
+  whose crew goes away) would have sent the boat by night on ruling 10's road, all hands called
+  until manned, in both watches, and made the kedge wait by night in both, which would move what
+  condition (c) measured; it is one line in `_working_posts` if the lead prefers it.
+- **3. An order naming the watch below.** `_check_party` counted the named watch's post and
+  `_pool` did not, so "set the fore course with the larboard watch" at 02:00 was accepted on the
+  master's count and waited to the larboard's own watch (begun at +7,170 s). **Mended:** `_pool`
+  reads the named watch's post as `_check_party` does; begun at +90 s by the three and the master
+  once the three were up, set at +328 s.
+- **4. Quarters and all hands.** The master's hand stayed at the sheet through the beat to
+  quarters. **Mended** by the same per-tick rule: "Belayed setting the foresail: the master to
+  the conn at quarters." on the tick after the beat, the work taken up again on that tick by the
+  hands at quarters and set at +146 s (old +226 s, the master at it), the master never at it again.
+- **5. The manoeuvre's line.** `_to_the_conn` ran after the manoeuvre's short line, so that the
+  line named hands as still at the work they joined the manoeuvre from that tick, and it held the
+  work it took the post from without a word. **Mended:** `_to_the_conn` is called by
+  `_take_hands` once the manoeuvre has its hands and before its line, the hands the held work lets
+  go topping the manoeuvre up first (an all-hands one; a numbered one asks again), and it writes
+  the line a manoeuvre's belay writes. Her settle at 00:00, the larboard watch by night, "batten
+  down the hatches" then "wear ship" 18 s on: "Belayed battening down: stations for wearing
+  ship." and no short line at +19 s (old: "Only two hands to wear ship; the rest are battening
+  down."), the same five in the wear, wore at +537 s as before, the batten-down taken up again by
+  the three and the master.
+- **6. Which ships are merchantmen** (a record only). The files with a merchant's or a
+  fisherman's description: the bilander, the merchant brig (merchant, packet and Indiaman), the
+  topsail schooner (merchant) and the smack (fisherman) are given working officers in their people
+  files; the lugger (the chasse-marée, fisherman and merchant) and the cutter (its "coasting
+  cutter", merchant) are not. Their files serve a privateer ("privateer lugger") and the King's,
+  the revenue and the hired cutters too, with one people file each, so a `watch:` there would count
+  the officers of ships ruling 9 forbids. **For the lead:** whether the coaster lugger and the
+  coasting cutter are to haul; if so, read per description at `attach_crew` (a role of merchant or
+  fisherman and none of privateer, kings-ship or revenue), their watches measured against every
+  want as the schooner's were. Nothing built.
+- **7. A far prize retaken.** `fill_far_prize` made her prisoners' company afresh without the
+  watches her posts head, so that retaken her master and mate never hauled again. **Mended:** the
+  prisoners' company keeps them (the merchant brig struck and filled as a far prize: her
+  prisoners' company and the hull remustered on it head the larboard and the starboard again; old,
+  none).
+- **8. A comment** in her generator module named proposed9's `works_with_the_watch`, never built:
+  now `hands.post_watch` and `Runner._working_posts`. Her file unchanged.
+
+**Tests.** Moved: `tests/test_hands.py`'s
+`test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_at_quarters` (this
+step's own, on the merchant brig's world) calls `_to_the_conn` as `_take_hands` now does (old
+`runner._to_the_conn(crew)`, new `runner._to_the_conn(w.ship, crew, heave)` with a heave-to
+asked), its assertions as they were and one more (no hand let go). New: five in
+`tests/test_bilander.py` (her master leaving the work below and at quarters; at the boat's falls
+and staying aboard, the boat and the kedge; an order naming her watch below; the wear's belay),
+and one in `tests/test_hands.py` (the far prize). Each fails on d6a88e2e.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
@@ -27147,396 +30376,6 @@ last (`--slow -m pace -n 0`, the same files, load 0.9 at its start): exit 0, 12 
 reported differs from c58baf7 by this paragraph and the "where I stand" above alone.
 
 
-## Package 60: a ship bought (2026-11-11)
-
-The design is `docs/design/Design-ShipBought.md` (gated 2026-11-10, its §13 binding); the steps
-are its §10, each reported at one hash. Every figure here is measured in this container at the
-hash named, or marked JUDGEMENT where it is a choice.
-
-### Step 1: the player's ship changed in play, and the followed ship's far body
-
-**The four floors of the design's §4.2, first, each with its own test** (`tests/
-test_ship_changed.py`): a crewed hull with no far brain and an empty plan rides at her anchor
-where she lies at one and lies to where she does not (`Vessel.kept_hull`, `world/ships.py`), never
-`done` and so never discharged by `crews.release_done`; a far brain may be given to any ship but
-the player's now (`prizes._give_intent` reads `hulls.players_id`); the game's first hull is never
-released by `release_done`; the switch measures every crewed body by her own position, a brain or
-none (`crews.switch`).
-
-**The followed ship's far body** (the design's §9.2, by the owner's word; truth 7-481): the
-followed hull's far body is mirrored to her truth on every tick of hers where she is another
-hull than the first (`World._tick_vessels`, `crews.mirror`, whose brain's history now reads the
-one clock through the hull rather than the parent the followed hull has not got). Measured with
-`tests/test_ship_changed.followed_body_off_m` (the brig X under `--ship`, the royals set, every
-five minutes for twenty), old beside new:
-
-| minutes | before, on the trunk (m: the lead's at 5 and 20, mine at 10 and 15) | after (m) |
-|---|---|---|
-| 5 | 933.8 | 0 |
-| 10 | 1,892 | 0 |
-| 15 | 2,848 | 0 |
-| 20 | 3,803.4 | 0 |
-
-The truth's band is under fifty metres (JUDGEMENT: the mirror is exact at every tick; the band
-leaves room for a body's minute move between two of the followed hull's ticks).
-
-**The split** (the design's §2): `World._players` (a hull id; None in every save and checkpoint
-from before) and `World.players` reading it, `World.first_hull` the game's first hull; the save's
-first block written from the first hull, `"player_ship"` beside `"hulls"` for the reader only
-when the field is set; the acts' `""` key given to the first hull (`core/acts.act_target_of`);
-the director's station and log on the first hull (`agents/director.director_hull`, the harness's
-note); the director's truth read with the player's ship current (`api/readings.director_readings`);
-`players_current` the player's ship now and `first_hull_current` the shadow's own block;
-`hulls.players_id` for every reader of "the player's ship" by id that the design's §9.1 sorts P
-(the prize's captive channel and its brain, the far fight's "our own action", the hail spoken, the
-taking by a world order, the sea's dealings and hail, the truth's ship list, the station's
-sail named).
-
-**The act** (`world/command.take_up`, the order `take command of` in `orders/command.py` and
-`data/vocabulary.yaml`, a visitor's own order): the ship given him by the director's `command:`
-form where she lies at the named port (`court._command_in_play`, recorded in
-`World.ships_given`); his person rehomed and her command passed to him, her captain's station
-bound, her rules captain standing aside, her far brain dropped, his seat carried with no home kept,
-the old ship left to her senior officer (the default for a King's ship) or laid up at the port's
-anchorage, said in both logs (`ship.taken_up`, placed in the knowledge table as the ship's whole
-company hears it).
-
-**The suites, as run** at 2370a2d (the code of this step; this paragraph and the design note's
-postscript are committed after it, text only): `ruff check .` and `ruff format --check .` clean;
-the fast tier (`-n 4`) exit 0, the slow left out, one expected failure and two picture tests
-skipped for want of Playwright under this interpreter, as before; the slow tier (`--slow -m "not
-pace" -n 4`) of the touched files and `tests/test_known_truths.py` exit 0 (tests/test_aboard_another,
-test_boat_hull, test_brains, test_captive, test_checkpoint, test_court, test_crews, test_director,
-test_facade_readers, test_far_action, test_grammar_book, test_hulls, test_in_world, test_knowledge,
-test_known_truths, test_observer, test_primer, test_prize_court, test_prizes, test_readings,
-test_replay, test_ship_changed, test_world_orders); the pace tests of the same files alone and last
-(`--slow -m pace -n 0`) exit 0. No pin moved.
-
-### Step 1, the lead's mends (2026-11-12)
-
-The lead's read-only review of 46fe724, by reproduction, sent step 1 back with eight items. Each
-was reproduced here, and each mend has a test in `tests/test_ship_changed.py` that fails on
-2370a2d (all eleven new tests run there failed, all pass on the mended code):
-
-1. **`said` overwritten** by the set's check in `command.take_up`: a direct call wrote no line in
-   the new ship's log. The check's result has a name of its own.
-2. **The launch left alongside**: reproduced (she lay fast alongside the Fly with her coxswain and
-   oarsmen). At the act a boat of another ship's lying fast alongside her for his coming back
-   pulls home by her own `come alongside` (`command._boats_home`): in the test case she left the
-   Fly at tick 2100, a mile from the Amazon, and was hoisted in at tick 3264.
-3. **"Captain Bowen stands aside at your order"**: reproduced; and the player, a visitor carrying
-   the captain's role, was among her people, so her captain read him. Her rules captain now
-   stands down by `Captain.give_up` before the command passes, in her late master's name
-   (`command._late_captain`): "Mr Bradley gives up her command to Captain Bowen, and his book
-   'in port' is struck."
-4. **A French brig given at Falmouth**: reproduced. The director's `command:` form stays the road
-   (the owner's answer 3); `court.command_doubt` now doubts a ship in play of another nation
-   ("not Britain's to give"), an enemy's ("taken, not given") or a prize the court has not
-   condemned.
-5. **Readers of the first hull as the player's**: `ships.Vessel._target_of` (a chase of
-   `PLAYER_ID` steers for the first hull's body once he has changed ships) and
-   `combat.action._witnessed` (the player's ship as witness by `players_id`; before it, his new
-   ship's own fire made her a pirate in her own captain's eyes, and the lead says so under
-   `--ship` on the trunk too) mended. Signals and sets: `ship "X": under the orders of the
-   ship` now names the player's ship by her id (`players_id`), her body's id on the sea, by
-   which her hoists are read (`signals.commanded_by`); a set's every reader takes `PLAYER_ID` for the player's ship (some
-   fifteen places in `squadrons.py`), so a set of his (`commander` or a member "the ship" or
-   "us") is refused in words after a change (`Squadron.from_spec`), as the act refuses a ship
-   in a set or with ships under her orders; `signals.py`'s `under_orders_of == "the ship"`
-   (the company leg) is reached after a change only by a vessel put under the first hull's
-   orders before it, which the act refuses. The set's command carried to another hull is left
-   to a later package.
-6. **A kept hull asleep for good**: reproduced (`crews.switch`'s promotions came from the ships
-   with a far brain alone); a kept hull asleep within the range is now among them. **The weigh
-   swallowed**: reproduced at tick 2571, but not the act's: `evolutions.scripts.
-   _belay_held_work` belays every order waiting its turn when a coming to anchor finishes,
-   aboard any ship. A weigh or an unmoor is anchor work, not sail work, and now waits on with
-   the boat's errand (`ANCHOR_WORK_KEPT`): his "weigh anchor" is begun at 2571, "All hands up
-   anchor!".
-7. **Truth 7-482** now gives an order after the act (`weigh anchor`, then `where am i`) and takes a
-   checkpoint between, the resumed world's logs of both ships equal to the game's.
-8. **Saves from before, played aboard another ship**: the lead's measure (a trunk checkpoint
-   taken aboard another ship from the start agrees at 600 ticks and parts by 3,600) is accepted
-   as the price of the §9.2 mend, by the owner's word that the `--ship` fault may be fixed
-   here, with no legacy mode. Not measured again here. It is the one exception to "every save
-   from before replays as it did", and it is said: every save now carries `followed_body`, and
-   the loader (`replay.followed_body_words`, by the checkpoint and by the replay) tells a save
-   without it whose inputs hold a `--ship` line (`driver.left`) or a `follow` of another hull
-   that it parts from its game as played.
-
-Found on the way and mended, small: "came aboard from the the Amazon's launch" (`movement.
-put_aboard`, a boat's name carries its own article).
-
-Found at the first fast tier of the mends (664b7ca3), and mended in 67532719: the guard refusing a
-set of the player's after a change of ship stood between `Squadron.from_spec`'s commander alias
-and its `else`, so a scenario whose set the first hull commands found "no ship named 'the ship'"
-(test_squadrons' scenario set, test_the_ship_herself's reading: 2 failed). The guard now stands
-before the alias.
-
-**The suites at a2976b5a** (the mends, that guard, and the trunk at 0dcaea30 merged): ruff check
-and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,520 passed and 1 xfailed, the 500
-slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the touched files and
-`tests/test_known_truths.py` exit 0, 2,326 passed, 1 skipped and 8 xfailed (the first round's 23
-files and test_squadrons, test_signals, test_evolutions, test_anchor, test_captains,
-test_captain, test_captain_rules, test_ships, test_the_ship_herself, test_boat_director,
-test_view_action, test_fight, test_between_hulls, test_flag_drawings); the pace tests of the same
-files alone and last (`--slow -m pace -n 0`, load 2.3 at its start) exit 0, 14 passed. No pin
-moved. The tree reported differs from a2976b5a by this paragraph alone.
-
-### Step 2, first: owed from the lead's review of 1eb18434 (2026-11-13)
-
-The lead's review by reproduction found the eight items mended and three things owed at the head
-of step 2, one commit, each with a test in `tests/test_ship_changed.py` that fails without the
-mend (the three run with the code of 1eb18434 and these tests: 3 failed; with the mends, 3
-passed):
-
-- **(A) A weigh given as she comes to an anchor** (every ship's): since `ANCHOR_WORK_KEPT` it is
-  begun as she is brought up, and the order said nothing of it (the runner's "will follow" line
-  is returned to the order and not logged, for any work that waits its turn). Reproduced: the
-  frigate under plain sail in Carrick Road, `come to an anchor` at 240, `weigh anchor` at 300,
-  brought up at 1482, "All hands up anchor!" at 1482, aweigh at 2399, and no line at 300. Now
-  `ground_tackle._waits_for_the_anchor` notes at the order (tick 301), notable: "The weigh waits
-  for the anchor: she is coming to an anchor, and it is begun as soon as she is brought up." (the
-  same for an unmoor, and behind a let-go or a moor).
-- **(B) `_boats_home` sent home every other ship's boat fast alongside the new ship.** Reproduced:
-  the Hind's jolly boat made fast alongside the Fly before the act, nobody in her for her, was
-  cast off "nobody to wait for" and pulled for the Hind. Now only the boat whose last
-  `boat.alongside` line at her put him aboard (`_brought_him`) goes home; the jolly boat lies on
-  fast alongside, the launch goes home as before.
-- **(C) `crews.switch` woke any crewed hull with no far brain within the range.** Reproduced: the
-  Hind, her brain taken off and put to sleep by hand, was woken. Now the take up keeps the ids of
-  the hulls he has left (`command.HULLS_LEFT`, the hull's and her body's) and the switch wakes
-  those alone; the old ship, put to sleep, is woken as before, the Hind is not. The item 6 test
-  is narrowed to that rule (it put the brig X, no hull of his, to sleep and asked her woken).
-
-**Changes to ordinary games** (no change of ship in them), said as the lead asks: the witness
-rule's mend (`action._witnessed`: in a game played aboard another ship under `--ship`, the first
-hull's captain, not the firing hull's own, now marks her when she fires); `followed_body` written
-to every save; the "came aboard from the the ..." line read "from the ...". And from this commit:
-the weigh's line at the order in (A), and (from step 1's item 6) a weigh or an unmoor given while
-she comes to an anchor is begun when she is brought up, not belayed with no word.
-
-### Step 2: the company moved (2026-11-13)
-
-`transfer <who> [from the "Y"] to the "X"[, and lay the Y up]` (`orders/command.py`,
-`world/transfer.py`; the design's §6): persons by name, 'the people', hands by count ('fifteen
-hands') and by rating ('six able seamen and four ordinary'), between the ship he commands and a
-ship of his to man (one he has left, `command.HULLS_LEFT`, or one given him), within a boat's
-pull (`movement.BOAT_BETWEEN_NM`, a mile) or alongside (within 30 m, JUDGEMENT). 74's muster
-functions are lifted into `world/musters.py` (`remuster`, `deal_watches`, `take_out`), 74's
-callers in `prizes.py` kept under their old names; the draw is 74's (fit, at no work, no post,
-by id; the ratings first).
-
-The JUDGEMENT figures of §6, as filed (`world/transfer.py`): twelve men a load (`LOAD_MEN`); a
-load's round, pulled across, cleared and back, a quarter of an hour within two cables
-(`LOAD_NEAR_S`, 900 s) and half an hour at a mile (`LOAD_MILE_S`, 1,800 s), by the distance
-between; alongside, the whole by the gangway in a quarter of an hour (`ALONGSIDE_S`); worked by
-one watch at her sail-handling stations, never fewer than four (`worked_by`: the cutter's 8 + 10
-+ 6 gives 12, the topsail schooner's 17); berths a complement and a half (`berths`: the cutter's
-45, the schooner's 60), counted against her hands and her persons aboard; a ship laid up keeps
-her keepers alone (§4.1: a King's ship her warrant officers, persons, and no hand; a merchantman
-her mate and a ship-keeper, one hand, `MERCHANT_SHIP_KEEPER_HANDS`).
-
-Measured (`tests/test_company_moved.py`; the merchant cutter at anchor in Carrick Road, the
-topsail schooner Fly laid up in ordinary at Falmouth some 234 m off by the director's word and
-given him, taken up with the cutter laid up): `transfer fifteen hands to the Fly` is two loads,
-twelve in the boat at once and in neither muster, the first aboard her at the order's tick + 900
-and the second at + 1,800, each said in her log ("Twelve hands came aboard from the Sherbourne
-(the first load of two); twelve hands sign the Fly's articles."), the cutter's muster fifteen
-fewer and the Fly's fifteen more, the ids told apart where they met; the boat away the while
-(`BoatState.errand` "transfer") and every other order of the boat's refused. Refused in words:
-the Fly giving more than she can spare ("she wants seventeen hands to be worked. Transfer fewer,
-or lay her up first."), the Fly past her berths (ten gone across before it: "The Fly berths sixty;
-she has fifty-five, and would have 74."), a name nobody of hers answers to, the Amazon's people to a merchantman ("borne on
-the King's books"), and a King's ship's company turned over by her captain's order at all (by the
-Admiralty's, the director's form, not built in this step).
-
-Found on the way and mended: a ship laid in ordinary by the director and given him was still in
-ordinary once he had taken command of her (her keepers alone wanted to work her); `take_up` now
-takes her out of ordinary in his hands.
-
-### Step 1 reconciled with package 109 (2026-11-13)
-
-The lead found 1eb18434 failing 13 of its own tests on the trunk as it stood (truths 7-480 and
-7-483 and eleven of `tests/test_ship_changed.py`), by one cause: package 109's step 1, merged
-after the trunk step 1 took, made "take command" and "assume command" refused phrases in
-`data/vocabulary.yaml` ("Command of a prize is not taken by words ... 'take possession of her'"),
-so `take command of her` was refused before it was read. Reconciled, the verb being 60's: the two
-refused phrases are gone from the vocabulary, "assume command [of]" is a synonym of `take command
-of`, and the order says 109's sentence itself (`orders.command.PRIZE_WORDS`) where it would refuse
-anyway: words that name a prize ('take command of the prize'), and a ship that is a prize the
-court has not condemned. 109's case moves out of its table in `tests/test_mends_109.py`, old
-beside new and named: `test_take_command_of_the_prize_is_answered_by_its_road` (and 'assume
-command of the prize') and `test_take_command_of_a_ship_his_to_take_is_package_60s_order`.
-
-**The primer names the order.** The fast tier at 1e4e91ae failed one test, the grammar book's
-`test_every_verb_of_the_vocabulary_is_named_in_the_primer`: the new verb `transfer` was in the
-vocabulary and not in the primer. Chapter 14 gains a paragraph under "Taking command of another
-ship" and a row in its table of forms (606eb1ef); the row is run through the frigate by
-`tests/test_primer.py` and refused for her state ("No ship named 'the fly' is on the sea"), never
-for its words.
-
-**The browser plans, played.** Until now the slow tier on this machine had skipped
-`tests/test_browser_probe.py` ("Playwright is not installed": the Python package, not the
-browser, was missing). The package was installed at the pre-installed Chromium's own version
-(1.63.0, the version of the Node package beside it; no `playwright install`), and the plans are
-played at the hash below: none skipped.
-
-**The suites at ebca949a** (the reconciliation, the three owed mends and step 2, with the trunk at
-ce4b78ea merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0,
-7,636 passed and 1 xfailed, the 515 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of
-the touched files, `tests/test_known_truths.py` and `tests/test_browser_probe.py` exit 0, 2,497
-passed and 8 xfailed, none skipped (step 1's files as before, and test_company_moved,
-test_mends_109, test_ports, test_parity and the browser plans); the pace tests of the same files
-alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. Not tested: the refusal
-of a transfer between two King's ships (no test holds it). The tree reported differs from
-ebca949a by this paragraph alone.
-
-### Steps 1 and 2 again: the lead's reading of ab0ade58 (2026-11-13)
-
-ab0ade58 was not merged: an independent reading, probing on this package's own fixtures, found
-step 2 not ready and one fault in step 1 (`docs/dev/M7-WorkPackages.md`, "Package 60, steps 1
-and 2 as reported at ab0ade58"). Mended in its order, each with a test that fails on ab0ade58.
-
-1. **A ship taken up from ordinary is woken at once, at her anchor** (`command.take_up`,
-   `_woken_at_her_anchor`). The player's own ship is skipped by `crews.crewed` and mend (C) wakes
-   only the hulls he left, so the Fly slept on in the far shape after `take command of her`;
-   woken by hand she lay adrift (no near anchor), would not box off and drove toward Mylor
-   Point. Now she is promoted in the act, and where her far body rode at an anchor her best
-   anchor is let go where she lies, veered to the scope the depth wants. Found on the way, and
-   left as it is: by the code's reading (not probed beyond the Fly), any far ship woken at an
-   anchor has no near anchor down (`crews._to_full` sets her sail "at anchor" and lets go
-   nothing); only the ship he takes up is mended here.
-2. **The tail lays up no ship he commands**: refused in words.
-3. **A load joins the receiver's watches as they stand** (`musters.join`: the smaller watch
-   first, nobody aboard moved, her routine, quarter bill and guns as they are); the giver loses
-   only those who go (`musters.take_out`, no remuster). Two hands moved 26 of the Fly's 40
-   before.
-4. **A lost boat carries nobody**: refused in the dealings' own words. `send_boat_to` itself has
-   no check of a lost boat (the road's own gap, kept as it is by the lead's ruling below; it is
-   checked by the transfer before the road is asked).
-5. **Every man told off is out of the giving muster at the order**, not the first load's alone.
-6. **Persons are rehomed before they are put aboard** (as the prizes do it); the officer a ship
-   is left to (`command_passed_to`) stays in her, refused in words.
-7. **A load is checked again as the boat comes to where the ship lay** (done, or beyond the
-   pull): "found no ship where the Sherbourne lay; she pulls back with her people", the men home
-   into their own watches and the loads not carried stood down, said in the giver's log; the
-   list of hulls he left is pruned of the gone (`crews._hulls_left_pruned`).
-
-**One road** (the lead's ruling of 17:30: extend the dealings' road, four conditions). The boat
-that carries the company is `Dealings.send_boat_to`, extended: `BoatState` gains `hands`,
-`joining`, `loads`, `load_no` and `load_of` (plain class defaults, left out of a checkpoint while
-empty by `BoatState.__getstate__`); `send_boat_to` takes `hands=`, `join=` and `loads=`; each
-load after the first goes by the same two jobs as she is back (`_next_load`). The timing is the
-road's own (hoisted out five minutes, the pull at four knots, five minutes alongside, the pull,
-hoisted in five), and the fixed quarter-hour loads of ab0ade58 are gone (`LOAD_NEAR_S`,
-`LOAD_MILE_S`, `ALONGSIDE_S`, the `transfer` job and errand, `IN_THE_BOAT`). Nothing that goes
-by the road today moves: a trip with no hands and no joiners keeps its words, its data and its
-timing, and the road's suites, package 109's tests and truth 7-542 pass as they stand. The men
-on passage are counted where a reader finds them: the giver's muster says them ("Of her company
-out of the muster: twelve hands in the boat for the Fly, three hands told off for her next
-load."), her reading says "and 15 on passage to the Fly", and the receiver berths them from the
-order. Alongside, the gangway at the order, untimed, said in both logs (accepted). Neither
-`evolutions/runner.py` nor `send_boat`'s file was touched.
-
-**Shared, not copied**: the draw (`musters.draw`, now `prizes._draw_prize_crew`'s too, its men
-as before), the joining of names (`ports._and`), the check of way on her (`boats.way_on_her`,
-`man_boat`'s own words) and the ships given (`command.given_to`). Hands no longer count the
-quarterdeck's muster rows (her officers are persons, counted once: the Sherbourne's 33 souls
-were 30). The refusals are in the world's words and name the ships that are here, none of the
-director's ("You command no ship here", "Say how the Fly is left", "'transfer twenty hands to the
-Fly'"). Truth 7-484, this package's own and not yet on the trunk, is moved to the road's terms.
-
-**Tests**: the keepers' path now runs (ten of the cutter's seamen taken out by hand first, so
-that the Fly berths the rest); the third refusal's reason and both musters pinned; the
-assertion that could not fail is gone; a fast checkpoint test with a load in the boat beside the
-slow replay; and alongside, `from X`, the lay-up tail, a receiver gone, two King's ships, way on
-her, beyond the pull, a prisoner, an observed world and a ship not his.
-
-**The suites at 2deccd29** (items 1 to 7 and the lead's conditions, 3aa95ab6, with the trunk at
-c010814d merged, clean): ruff check and ruff format --check clean; the fast tier (`-n 4`) exit
-0, 7,658 passed and 1 xfailed, the 516 slow left out; the road's own check first (package 109's
-tests, truth 7-542, the boat's suites, replay, checkpoint and parity, slow included) exit 0,
-1,439 passed. The slow tier (`--slow -m "not pace" -n 4`) of the touched files,
-`tests/test_known_truths.py` and `tests/test_browser_probe.py`, with test_orders, test_parity,
-test_subtypes, test_replay and test_checkpoint for the queries and readings touched, run in two
-halves for the two-hour limit on a background job: the half with the truths and the browser
-plans exit 1 at its first run, one failure, truth 7b-130 (the director's seat at the API door:
-the door's exit code read as `None` the moment its state read "ended", under four workers'
-load), which passed alone twice, and the half whole again exit 0, 1,050 passed and 8 xfailed,
-none skipped; the other half exit 0, 2,279 passed. The pace tests of the same files alone and
-last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved but truth 7-484, this package's
-own, moved to the road's terms. The tree reported differs from 2deccd29 by this paragraph alone.
-
-### The second reading of 4dda3dfe (2026-11-13)
-
-A second independent reading (`docs/dev/M7-WorkPackages.md`, "Package 60 as reported again at
-4dda3dfe") found six of the seven mends holding by running, the road's old trips unmoved, and
-seven things owed. Each mend has a test that fails on 4dda3dfe.
-
-**7, made general, a commit of its own (63108591):** a far ship riding at an anchor woken to
-full detail had no near anchor down and her file's sail set (`crews._to_full` set her sail
-"at anchor", the topsails drawing, and let go nothing; a hull made at full from her file came
-under plain sail). `crews.rides_as_she_lay`, called wherever a far body is woken (`promote`,
-both paths, and the station's hull made at full): where her far plan's leg is the anchor, her
-first anchor that can be let go goes down where she lies, veered to the depth's scope, brought
-up; every sail set is furled; her way taken off. The cutter in Carrick Road under a rules
-captain bound for Falmouth: before, woken under plain sail and driven 2.6 km before her captain
-brought her to again; after, at her anchor with nothing set, swinging within her cable.
-**Measured alone at 63108591**: ruff clean; the fast tier exit 0, 7,659 passed and 1 xfailed;
-the slow tier in its two halves (the truths and the browser plans; the rest) exit 0, 1,051
-passed and 8 xfailed, and 2,279 passed; the pace tests alone exit 0, 14 passed. No recorded
-passage, digest, truth or kept save moved; the toggle (a scratch plugin making
-`crews.rides_as_she_lay` a no-op) turns its own test from passing to failing ("not at
-anchor") and moves nothing else, there being nothing else to move.
-
-1. **A boat lost with a load in her** (`boats.lose_boat` replaced her state, dropping her hands
-   and loads): `transfer.boat_lost`, called by `lose_boat` only where she carries a transfer.
-   The men told off and not embarked go back to their watches; those in her, and the persons,
-   are picked up by the nearer ship by her stage of the trip (JUDGEMENT: `lose_boat` gives the
-   script's boat's own crew no fate, they being no persons, and no drowning is invented here),
-   a person bound for the receiver of her company where she picks him up; said in that ship's
-   log and in the giver's line of the loss ("...; Mr Pascoe and eleven hands picked up by her
-   own side; four hands told off for her stand down.").
-2. **A list of names is read as a list**: the order's words are read from its text, where the
-   commas stand (its `object` has them read away); every 'and' parts the list but a number's;
-   a name's contraction read with its stop or without ('Richd. Oliver'); a list with a name
-   nobody answers to is refused naming that one.
-3. **The ship in ordinary he is aboard** was followed and stepped while asleep, under her file's
-   plain sail with no anchor down (she moved 516 m and could not be boxed off): a sleeping hull
-   his person goes aboard is woken (`movement`, where the drivers come to follow him), and so
-   rides as her far body lay by 7's mend; `take_up` uses the same function. After take-up
-   nothing is set that he did not order.
-4. **A ship's name is read in the order's own words** (`orders.command.ship_for_him`): an
-   unknown name, "You know of no ship called the Nonesuch hereabouts." (the sail on the sea no
-   longer listed); a ship with no hull of her own, beyond a boat's reach of him; an observed
-   world, none of his. The two branches that matched another module's sentence by substring
-   are gone, and each branch has a test.
-5. **Small**: "away again for the Fly"; the lost boat's refusal "The long-boat was swamped on
-   the 13th; a new one is the yard's."; the comment made to agree with the code (each load is
-   the road's own trip, hoisted in and out); `_under_way` removed; men coming home are told
-   apart from men come aboard meanwhile (`musters.join(..., came_from=)`, a cross-transfer
-   test that fails without it: 40 ids for 42 men).
-6. **Tests played, not patched**: the King's branch by a King's Sherbourne (her papers), the
-   ship not his and the prisoner by the order at his prompt; the refusals' words checked over
-   eight refusals. Still patched, and why: two King's ships both his (a ship's service is her
-   captain's role, which no world order gives a ship of his; the branch is the same code as
-   the merchant-into-King's case played), alongside (two hulls within 30 m wants a mooring
-   the fixture has not), and beyond the pull (see the finding below).
-
-**Found, not mended, for the lead**: the Sherbourne left to Mr Pearce "to cruise off the Lizard
-within 10 miles" lies at her anchor, her captain "in port" with the intent, and does not get
-under way in two hours (step 1's leaving; probed, not traced).
-
-**The suites at 77c3a76b** (item 7 alone at 63108591, items 1 to 6 at 591eda5e and e6ee8fb8,
-with the trunk at 697c0f0b merged, clean; by the lead's word of 03:10 not merged again since):
-ruff check and ruff format --check clean; the fast tier (`-n 4`) exit 0, 7,684 passed and 1
-xfailed, the 517 slow left out; the slow tier (`--slow -m "not pace" -n 4`) of the same files as
-at 2deccd29, in its two halves for the two-hour limit: the truths and the browser plans exit 0,
-1,077 passed and 8 xfailed, none skipped; the rest exit 0, 2,279 passed; the pace tests of the
-same files alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. The tree
-reported differs from 77c3a76b by this paragraph alone.
-
 
 
 
@@ -27694,6 +30533,22 @@ is not belayed, `orders/work.py`). `belay the boat` is read as the boat's work (
 `boat: send the boat`; `work._evolution_ids` names `send_boat`), from the deck or the boat. (c)
 not taken: he is still put in the boat at the order, since (a) gives her hands at once and (b)
 answers the case where she still waits.
+
+*Postscript (package 75, 2026-11-13, the lead's ruling 10 of 04:11 UTC that day):* (a)'s road is
+gone, made one with the settee's. `CALLS_HANDS_WHEN_SHORT`, `HANDS_CALLED_FOR`'s mark,
+`_hands_called_for` and `_pipe_down_after` are no longer in `evolutions/runner.py`.
+`data/evolutions/send_boat.yaml`'s crew line says `too_few: all hands until manned`
+(`hands.CrewRequest.until_manned`), and the runner calls and pipes down through the settee's
+`_watch_too_few`, `Instance.held_up`, `_manning` and `_after_all_hands`. Every line, tick and digest
+measured above is unchanged, and so are truth 7-542 and this step's tests, unedited. A checkpoint
+taken with (a)'s mark on the boat's params loads as the new road's mark. See "The lead's ruling 10,
+one road (package 75)" in these notes. *Amended by that ruling's review (2026-11-13):* "Where the
+watch is at other work the old waiting line stands unchanged" no longer holds: the settee's trigger
+counts the hands at other work, so a watch too few even with them calls at once. Where a hand of
+the deck is at the pumps, a deck enough with him counted waits, where (a) called. And a boat belayed
+while the hands come up to man her now pipes them down. Each is set down old beside new there, the
+trigger for the lead's ruling. A save written before the boat's file said the key, she waiting for
+hands, loads with it read and calls for her as (a) did.
 
 **Truth 7-542** and the step's tests in `tests/test_mends_109.py`.
 

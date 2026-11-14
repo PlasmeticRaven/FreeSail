@@ -8,6 +8,8 @@ as the fallback where the cap is full; the toggle that turns it all off."""
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from freesail import units
@@ -168,6 +170,263 @@ def test_beyond_the_guns_reach_nothing_fires_and_the_chase_leg_closes_her():
         w.run(60)
     d1 = P._bearing_distance(a.position, b.position)[1]
     assert d1 < d0 and not a.damage and "far" not in w.rng.stream_names()
+
+
+# -- a far ship of war engaging from her passage (package 75, truth 7-231) -------------------------
+
+
+def _two_on_passage():
+    """Two far King's ships of war on their passages, neither chasing first (package 75, the
+    lead's ruling (2) of 2026-11-13): tests/test_brains.py's world at seed 7, the frigate hove
+    to and the cap nought, and twelve miles south of her a French 74 bound for Brest and a
+    British 74 bound for Falmouth a mile apart, each within the other's `engage_nm` (a mile)
+    at her first judgement, so that each goes `engaging` from `on passage` with no mark in
+    hand (the King's ship's row `{from: on passage, on: enemy in range, to: engaging}`)."""
+    w = world_at(49.5, -5.5)
+    w.crewed_settings = {"cap": 0}
+    w.submit("heave to")
+    w.run(60)
+    far = destination(w.position, 180.0, 12.0 * units.NAUTICAL_MILE)
+    q = destination(far, 90.0, 1.0 * units.NAUTICAL_MILE)
+    a = put(
+        w,
+        "seventy-four",
+        "france",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "bound for Brest",
+        intent="bound for Brest",
+        colours="shown",
+        name="Foudroyant",
+    )
+    b = put(
+        w,
+        "seventy-four",
+        "britain",
+        {"lat_deg": q.lat_deg, "lon_deg": q.lon_deg},
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        colours="shown",
+        name="Hero",
+    )
+    return w, a, b
+
+
+@pytest.mark.slow
+def test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy():
+    """Truth 7-231 (package 75; the lead's ruling (2) of 2026-11-13): a far ship of war that
+    goes engaging from her passage takes the mark the stimulus read (`FarCaptain._engaging_mark`,
+    as the near captain's `_mark`), keeps the sea and closes her enemy. Before the mend (package
+    74's a4944b87) each of the two 74s, with no mark in hand, was given a chase of nobody, which
+    the body dropped, and both were gone from the sea the next minute (tick 180) without a round.
+    Now, at seed 7: both go `engaging` from `on passage` at their first judgement (tick 120), each
+    with the other as her mark and a chase leg to her at her doctrine's engaging range (the
+    French 4 cables, the British 2 by the nations' habits); both keep the sea every minute; the
+    range closes every minute from 0.89 miles to under a fifth of a mile by tick 900 and is
+    never opened; the far rounds fire every three minutes from the first judgement (both
+    within the French long guns' reach) until the Hero strikes, at tick 1200 after seven rounds;
+    the Foudroyant takes possession at hailing distance at the next judgement (tick 1260, "struck
+    at far detail"), and both are on the sea at its end. **After the action** (the review's mends
+    of the lead's notes of 12 and 13 November): each held her passage when she went engaging
+    (`brains.PASSAGE_HELD`, the plan saved as a detour's is), and the Foudroyant, the prize taken,
+    is on passage at the next judgement (tick 1320) with that plan again, and closes its first mark
+    every minute of the half hour after, her prize in company. OLD BESIDE NEW: at f5102fae her
+    passage was not taken up (`engaging` saved nothing, and `taking possession` saved the action's
+    chase leg), and she was "on passage" chasing her prize at the engaging range for good."""
+    from freesail.world import brains as B
+
+    w, a, b = _two_on_passage()
+    w.run(60)
+    assert w.clock.tick == 120
+    for v, other in ((a, b), (b, a)):
+        assert v.brain.role == "kings-ship"
+        assert v.brain.history == [(120, "on passage"), (120, "engaging")]
+        assert v.brain._stranger == other.id
+        assert v.plan == [("chase", other.id, FA.engage_range_m(v.brain))]
+        assert v.brain._business.get(B.PASSAGE_HELD) is True
+        assert v.saved_plan and all(leg[0] in ("to", "anchor") for leg in v.saved_plan)
+    held = list(a.saved_plan)
+    assert round(FA.engage_range_m(a.brain)) == 741 and round(FA.engage_range_m(b.brain)) == 370
+    ranges: list[tuple[int, float]] = []
+    while not b.struck and w.clock.tick < 3600:
+        assert all(w.vessels.get(v.id) is v and not v.done for v in (a, b)), w.clock.tick
+        nm = P._bearing_distance(a.position, b.position)[1] / units.NAUTICAL_MILE
+        ranges.append((w.clock.tick, nm))
+        w.run(60)
+    assert 0.85 <= ranges[0][1] <= 0.9, ranges[0]
+    closing = zip(ranges, ranges[1:], strict=False)
+    assert all(later <= sooner for (_, sooner), (_, later) in closing), ranges
+    assert max(nm for t, nm in ranges if t >= 900) < 0.2, ranges
+    assert b.struck and not a.struck and w.clock.tick == 1200
+    assert a.damage["rounds"] == b.damage["rounds"] == 7 and b.damage["struck_tick"] == 1200
+    for _ in range(5):
+        w.run(60)
+        if P.is_prize(b):
+            break
+    assert P.is_prize(b) and w.clock.tick == 1260
+    assert P.record_of(b)["captor"] == a.id and P.record_of(b)["how"] == "struck at far detail"
+    assert a.brain.history[-1] == (1260, "taking possession")
+    assert all(w.vessels.get(v.id) is v and not v.done for v in (a, b))
+    assert a.saved_plan == held  # `taking possession` saved nothing over her passage
+    w.run(60)
+    assert a.brain.history[-1] == (1320, "on passage") and a.plan == held
+    assert a.saved_plan is None and B.PASSAGE_HELD not in a.brain._business
+    miles = []
+    for _ in range(30):
+        assert a.brain.state == "on passage" and a.plan[0] == held[0], w.clock.tick
+        miles.append(P._bearing_distance(a.position, held[0][1])[1])
+        w.run(60)
+    assert all(later < sooner for sooner, later in zip(miles, miles[1:], strict=False)), miles
+    assert P.is_prize(b) and b.brain.state == "in company"
+
+
+@pytest.mark.parametrize("case", ["another-in-sight", "none-in-sight", "none-on-the-sea"])
+def test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody(case):
+    """Truth 7-231's second half (the lead's ruling (2) of 2026-11-13: "keeps one in hand as
+    chasing does when the mark is lost from sight"; `FarCaptain._take_mark`): the two 74s of
+    `_two_on_passage` engaged (tick 180), the Hero is then hidden from every masthead
+    (`seen_within_nm` nought) or gone from the sea. With a British frigate put a mile and a half
+    from the Foudroyant, within her breaking-off distance, she takes the frigate for her mark at
+    the next judgement and chases her, as chasing takes the nearest stranger; with none in
+    sight she keeps the Hero in hand while the Hero is on the sea, her leg following her; with
+    the Hero gone from the sea and none other, she lies to where she is (no chase of nobody,
+    which the body would drop and take her from the sea with it), and `resolve_state` laying
+    `engaging` with no mark and no enemy in sight lies her to as well. Hidden or gone, the
+    action ends by `enemy out of range` ten minutes after the last judgement that saw an
+    enemy (tick 840) and she is on passage, on the sea, with the passage she held when she went
+    engaging (the review's mends of the lead's notes of 12 and 13 November; OLD BESIDE NEW: at
+    f5102fae she was "on passage" lying to, or chasing the hidden Hero, for good)."""
+    from freesail.world import brains as B
+
+    w, a, b = _two_on_passage()
+    w.run(120)
+    assert a.brain.state == "engaging" and a.brain._stranger == b.id
+    held = list(a.saved_plan)
+    assert held and held[0][0] == "to" and a.brain._business.get(B.PASSAGE_HELD) is True
+    engage = FA.engage_range_m(a.brain)
+    c = None
+    if case == "another-in-sight":
+        b.seen_within_nm = 0.0
+        r = destination(a.position, 0.0, 1.5 * units.NAUTICAL_MILE)
+        c = put(
+            w,
+            "frigate",
+            "britain",
+            {"lat_deg": r.lat_deg, "lon_deg": r.lon_deg},
+            "bound for Falmouth",
+            intent="bound for Falmouth",
+            colours="shown",
+            name="Amethyst",
+        )
+    elif case == "none-in-sight":
+        b.seen_within_nm = 0.0
+    else:
+        b.done = True
+    w.run(60)
+    assert a.brain.state == "engaging" and not a.done
+    if case == "another-in-sight":
+        assert a.brain._stranger == c.id and a.plan == [("chase", c.id, engage)]
+    elif case == "none-in-sight":
+        assert a.brain._stranger == b.id and a.plan == [("chase", b.id, engage)]
+    else:
+        assert a.brain._stranger is None and a.plan == [("lie_to", math.inf)]
+        a.plan = [("to", a.position, "nowhere")]
+        assert B.resolve_state(a, "engaging", a.brain)
+        assert a.brain._stranger is None and a.plan == [("lie_to", math.inf)]
+    for _ in range(10):
+        w.run(60)
+        assert w.vessels.get(a.id) is a and not a.done, w.clock.tick
+    if case == "another-in-sight":
+        assert a.brain.state == "engaging" and a.brain._stranger == c.id
+        assert a.saved_plan == held
+    else:
+        assert a.brain.history[-1] == (840, "on passage"), a.brain.history
+        assert a.plan == held and a.saved_plan is None
+        assert B.PASSAGE_HELD not in a.brain._business
+
+
+def test_package_74s_road_from_a_chase_keeps_the_mark_it_entered_with_as_it_did():
+    """The review's mends of the lead's notes of 12 and 13 November: the mark kept in hand each
+    minute and the passage held are the plan-state road's alone (`brains.PASSAGE_HELD`); package
+    74's own road into an action, engaging from a detour with her mark in hand, is as it was at
+    94bfac27. The two 74s of `_two_on_passage` each put chasing the other at tick 60, both engaging
+    at 120 from `chasing` with the other in hand; the Hero then hidden from every masthead and a
+    British frigate put a mile and a half from the Foudroyant, within her breaking-off distance:
+    she keeps the Hero and the chase leg she entered with, minute after minute, and holds no
+    passage. OLD BESIDE NEW: at f5102fae she took the frigate for her mark at tick 240."""
+    from freesail.world import brains as B
+
+    w, a, b = _two_on_passage()
+    for v, other in ((a, b), (b, a)):
+        v.brain._stranger = other.id
+        v.brain._enter("chasing")
+    w.run(120)
+    assert a.brain.history[-2:] == [(60, "chasing"), (120, "engaging")]
+    engage = FA.engage_range_m(a.brain)
+    assert a.brain._stranger == b.id and a.plan == [("chase", b.id, engage)]
+    assert B.PASSAGE_HELD not in a.brain._business
+    b.seen_within_nm = 0.0
+    r = destination(a.position, 0.0, 1.5 * units.NAUTICAL_MILE)
+    put(
+        w,
+        "frigate",
+        "britain",
+        {"lat_deg": r.lat_deg, "lon_deg": r.lon_deg},
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        colours="shown",
+        name="Amethyst",
+    )
+    for _ in range(4):
+        w.run(60)
+        assert a.brain.state == "engaging", w.clock.tick
+        assert a.brain._stranger == b.id and a.plan == [("chase", b.id, engage)], w.clock.tick
+        assert B.PASSAGE_HELD not in a.brain._business
+
+
+@pytest.mark.slow
+def test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought():
+    """The review's mends of the lead's notes of 12 and 13 November: a cap of nought (`crewed:
+    {cap: 0}`, nobody promoted: the tender's day, the drivers' `--crewed-cap 0`) has never room
+    to wake a far ship, so one engaging the player's ship replies by the tables
+    (`far_action._fallback_reply`, the lead's ruling 4's fallback), as under a full cap. The 64's
+    case of `tests/test_bellerophon.py` (the player's 64 on her station off the Lizard, a French
+    74 bound for Brest a mile and a half north of her), the cap nought, at seed 7: the 74 goes
+    engaging from her passage at tick 360 with the 64 her mark, and her first broadside by the
+    tables comes the same minute at 9 cables, said in the 64's log as the fallback, and again
+    three minutes on. OLD BESIDE NEW: at dfbe4031 (a cap of nought returned as if it had room)
+    she lay alongside the 64 for hours and never fired."""
+    from tests.test_brains import world_at
+
+    FA.FALLBACK_COUNT["rounds"] = 0
+    w = world_at(
+        49.5,
+        -5.5,
+        "data/ships/sixty-four.yaml",
+        intent="keep the station off the Lizard within 10 miles",
+    )
+    w.crewed_settings = {"cap": 0}
+    w.run(60)
+    foe = put(
+        w,
+        "seventy-four",
+        "france",
+        "49 31.5 N 5 30 W",
+        "bound for Brest",
+        "bound for Brest",
+        "shown",
+        "Foe",
+    )
+    for _ in range(8):
+        w.run(60)
+    assert foe.brain.history[-1] == (360, "engaging") and foe.brain._stranger == "the ship"
+    assert not foe.done and foe.crew is None
+    replies = [e for e in w.log if e.kind == "action.far_reply"]
+    assert [e.tick for e in replies] == [360, 540], [(e.tick, e.text) for e in replies]
+    assert all(e.data.get("fallback") is True for e in replies)
+    assert replies[0].text == (
+        "The Foe fires her broadside at us from 9 cables: none of her 63 shot strike us."
+    )
+    assert FA.FALLBACK_COUNT["rounds"] == 2
 
 
 # -- the agreement of the two roads ----------------------------------------------------------------

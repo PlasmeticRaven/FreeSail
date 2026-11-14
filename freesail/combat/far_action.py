@@ -359,11 +359,14 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 def _fallback_reply(root: Any, far: Any, awake: Any, rec: dict, tick: int, lines: list) -> None:
     """The far ship's broadside at an awake hull by the tables, only where the cap has no
     room to wake her (the lead's ruling 4); each shot that strikes resolved into the awake
-    hull's parts with a synthetic gun of her fit's kind."""
+    hull's parts with a synthetic gun of her fit's kind. A cap of nought (`crewed: {cap: 0}`,
+    nobody promoted) has never room, so there she replies by the tables too (package 75, the
+    review's mends of the lead's notes of 12 and 13 November: before it the switch woke
+    nobody and she lay alongside the awake hull without firing)."""
     from freesail.world.crews import crewed, settings
 
     cap, _within, _demote = settings(root)
-    if cap <= 0 or len(crewed(root)) < cap:
+    if cap > 0 and len(crewed(root)) < cap:
         return  # room under the cap: the switch wakes her and the near action takes over
     from freesail.world.geo import bearing_and_distance
 
@@ -461,10 +464,9 @@ def _guns_heard(root: Any, fired: list[tuple[Any, Any, float]], tick: int) -> li
         nm = d / units.NAUTICAL_MILE
         if nm > reach:
             continue
-        from freesail.world.hulls import players_id
+        from freesail.world.ships import PLAYER_ID
 
-        mine = players_id(root)  # the player's ship (package 60: his now)
-        if any(str(getattr(v, "id", "")) == mine for v in (a, b)):
+        if any(str(getattr(v, "id", "")) == PLAYER_ID for v in (a, b)):
             return out  # our own action is our own log's
         point = units.point_name(units.deg_to_rad(bearing))
         what = "The flashes of guns" if light == "night" else "The sound of guns"
