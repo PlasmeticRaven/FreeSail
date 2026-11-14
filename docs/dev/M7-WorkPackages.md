@@ -5296,6 +5296,20 @@ Read three times and staged on the trunk at 8a06cf9b; the cloud's whole suite (r
 
 **For the method:** a check that is to hold the trunk steady must be proven on the trunk's tree and against a change of unrelated data before it is called a ratchet; the cloud's run on the trial merge is what caught this.
 
+### Package 115, part A (the server) at 876393f: NOT merged; the first reading (2026-11-14)
+
+Built as ruled: one guard around the whole server and the console's second door (the Host the game's own; the Origin, when sent, the page's own; a mark made at the start and asked of the socket and of every request that changes anything), the socket's order receiver removed, and one confinement for the files a browser's text may name. An independent reader ran a real server and attacked it.
+
+**What holds:** the guard, against a hostile page in the same browser. Every route and mount was listed and requested; no method, path trick, Host form or Origin form got an order, a socket, a seat at a door or the director's log without the mark; the mark is 192 bits, compared in constant time, in no script, no log and no answer another site can read; a book's lines cannot reach the console's free paths.
+
+**What does not, and why it is not merged:**
+1. **The director's brief reads any `.yaml` file on the disk** (`director: brief /some/path.yaml`, or a name with `..` in it, from the page): the new confinement asks the starter briefs' resolver first and trusts its answer, and that resolver builds a path from the player's text. The traversal was there before; routing it round the confinement is new, and it makes the claim "confined" false. Ruled by its cause: a name is a name (no separator, no `..`, no drive), what it resolves to is checked to lie in the folder it was looked up in, and every road that turns a browser's text into a file by name is listed and proven.
+2. The scenario maker checks its file fields against one folder and opens them against another (read, not probed; to be probed and mended so that the path checked is the path opened).
+3. Another page on the same machine (a different local port) could cause the director's log to be revealed, since the mark's cookie alone was accepted for it; the reveal is to want the mark in the request itself.
+4. Small: a request carrying Host or Origin twice; a mark with a character outside ASCII raising; an IPv4-mapped loopback not taken for the machine; one sentence of the README unproven; and, as before the change, a page can make the browser download a save (nothing leaks to it; listed).
+
+A second reader is on what the first did not reach (whether the changed tests still test what they did, the new truths under planted faults, the confinement attacked directly, another device, the words).
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
