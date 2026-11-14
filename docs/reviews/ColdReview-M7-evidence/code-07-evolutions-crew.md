@@ -154,8 +154,8 @@ make_signal, heave_mark, serve_small_arms, send_boat. Command: a script over the
 - In health.py, `DIE_FLUX_AFTER_D` (95), `PROVISIONS_OUT_LAG_D` (109) and
   `HealthState.provisions_out_since` (167) are declared and never used (grep over freesail and tests).
 - Python fallbacks that the YAML always overrides and that disagree with it: in `TackScript.tick`
-  `hang_after_s` defaults to 15.0 (scripts.py:1520) where tack.yaml:45 says 5, and
-  `steady_timeout_s` to 120.0 (scripts.py:1636) where tack.yaml:60 says 300. Dead while the file
+  `hang_after_s` defaults to 15.0 (scripts.py:1519) where tack.yaml:45 says 5, and
+  `steady_timeout_s` to 120.0 (scripts.py:1638) where tack.yaml:60 says 300. Dead while the file
   carries the key; wrong the day a key is misspelt (see 5.2).
 
 ## 3. Built more than once
@@ -181,9 +181,9 @@ make_signal, heave_mark, serve_small_arms, send_boat. Command: a script over the
 4. **Three ways to apply the work factor.** Step lists and `PhasedScript` and `YardSwing` integrate
    `progress += dt / (duration * factor)` (runner.py:882, scripts.py:1629, 923); `LugDip` and
    `SetteeChange` subtract `dt / factor` (scripts.py:462, 535); `FishingGearScript` compares the
-   raw elapsed time with `duration * factor` at the current tick (scripts.py:9003), so a factor that
+   raw elapsed time with `duration * factor` at the current tick (scripts.py:9007), so a factor that
    falls (hands arriving to an all-hands haul) can finish the work at once, and its `remaining_s`
-   ignores the factor (scripts.py:9032). Joining: every script on one progress helper.
+   ignores the factor (scripts.py:9035). Joining: every script on one progress helper.
 5. **Two fatigue models.** `Sailor.fatigue` 0..1 kept by the routine for hands, with words at 0.2 and
    0.5 (model.py:95-96); and the named people's hours-owed fatigue in `world/needs.py` from
    `data/crew/needs.yaml` (lines 32-50), which reads a hand's 0..1 at other bounds
@@ -272,7 +272,7 @@ And because `close_hauled_angle` is never set (2.3), the tack's and wear's new c
 off the true wind for a cutter as for a 74; only the physics makes them differ. Weight low, sure.
 
 5.7 **Omniscient helm.** The tack sets the new course from the true wind each tick
-(`wind.direction_from`, scripts.py:1590, 1633), and `Runner.step` stores the true wind's speed
+(`wind.direction_from`, scripts.py:1592, 1633), and `Runner.step` stores the true wind's speed
 (runner.py:391). The deck is not reading a vane. Weight low, sure.
 
 5.8 **Faked outcomes behind step files.** `take_lunar.yaml` is one 900 s step; its comment says the
@@ -354,7 +354,7 @@ not charged, a fatigue whose largest effect on a job is under 1.5x and in practi
    orders/verbs.py:966), and the per-ship hook `close_hauled_angle` is never set. Medium, sure.
 8. **Dead and missing catalogue entries**: `furl_gaff`, `furl_jibheaded` unreachable in play;
    `set_sprit`, `take_in_sprit` named in vocabulary.yaml:1902, 1914 with no file; three dead health
-   constants (health.py:95, 109, 167); stale Python timing defaults (scripts.py:1520, 1636). Low,
+   constants (health.py:95, 109, 167); stale Python timing defaults (scripts.py:1519, 1638). Low,
    sure.
 9. **Layering and size**: 113 function-local imports (67 in scripts.py), the runner calling into
    `orders` each tick (runner.py:392-405), `crew/health.py` writing into agents' state by duck typing
@@ -362,7 +362,7 @@ not charged, a fatigue whose largest effect on a job is under 1.5x and in practi
 10. **Duplicated helpers with drift**: a second sailor maker in world/dealings.py:2820-2850 without
     the muster's clamp or redraw cap; three `number_words` with different ranges used side by side
     in evolution lines; three ways of applying the work factor, `FishingGearScript`'s finishing early
-    when hands arrive (scripts.py:9003). Low to medium, sure.
+    when hands arrive (scripts.py:9007). Low to medium, sure.
 
 ## What I did not read
 
