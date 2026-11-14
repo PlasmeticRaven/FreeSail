@@ -12,11 +12,12 @@ and Steel 1805's brig collier, her stand-in under the water, and a mark on every
 masts and yards against Gwyn's shares and Chapman's yards; her settee's cut and contract, and
 `settee.py`'s checks each raised in words; her spritsail and main topmast staysail bent and out of
 plain sail; the generator's report and her file as committed; her file loading, rated, and her
-polar beside the brig's, with rule 1's clause of truth 7-197 drafted on it. Her road's step 3
-(Bil-D §5-§8): her two fits, unarmed by default and the armed merchant, its guns against Lloyd's,
-Adye and Falconer, each on its port or on her rail, and the builder's checklist for the viewer
-(Build-Ships.md §6's postscript); her broadside by 70's rule; her armed fit's lowest lee port by
-7-190's form; her company (nine since the lead's ruling 8 of 2026-11-13; eight before) and her
+polar beside the brig's, with rule 1's clause of truth 7-197 drafted on it (truths 7-197 to
+7-199 moved into tests/test_known_truths.py at Phase 5, 2026-11-14, their helpers here). Her road's
+step 3 (Bil-D §5-§8): her two fits, unarmed by default and the armed merchant, its guns against
+Lloyd's, Adye and Falconer, each on its port or on her rail, and the builder's checklist for the
+viewer (Build-Ships.md §6's postscript); her broadside by 70's rule; her armed fit's lowest lee port
+by 7-190's form; her company (nine since the lead's ruling 8 of 2026-11-13; eight before) and her
 wardroom file; the beat to quarters on the armed fit, measured; her ground tackle, boat, pumps,
 hold, stores and ration; her description in her file and through the index, and her role by every
 intent. Her road's step 4 (Bil-D §9, §14): her polar recorded beside the brig-sloop's and the
@@ -121,8 +122,14 @@ print(json.dumps({
 
 @pytest.fixture(scope="module")
 def module():
+    """The module's figures, read once for the file (`her_module_figures`)."""
+    return her_module_figures()
+
+
+def her_module_figures():
     """The module's figures, read through the generator as its hook runs it (a subprocess, so
-    that this process keeps no second copy of the generator)."""
+    that this process keeps no second copy of the generator); truth 7-197 reads them so
+    (tests/test_known_truths.py)."""
     done = subprocess.run(
         [sys.executable, "-c", MODULE_PROBE],
         cwd=ROOT,
@@ -812,101 +819,6 @@ def test_her_polar_as_measured_and_tuned_beside_the_brig_sloops_and_the_merchant
         q = polar_of(str(path))
         assert q.closest_deg <= 50.0 and q.beat_deg(15.0) <= 60.0, knots
         assert made_good(q, 60.0) > made_good(q, 70.0), knots
-
-
-def test_truth_7_197_her_particulars_hold_their_sources_and_she_lies_as_close_as_a_brig(module):
-    """Truth 7-197 (B4; Bil-D §14; Build-Ships.md §15), whole, drafted here for Phase 5: her
-    particulars hold their sources, and by the wind she lies as close as a brig. Measured on her
-    file at her step 4 (the owner's machine, 2026-11-08), each band its source's:
-    - her hull: LWL 21.52 m against Chapman's 70.6 ft, +-1.5-2 ft (21.5 +- 0.5); beam 5.91 m
-      against Chapman's 19.4 ft, +-1.5% (+- 0.1); draught 3.51 m against Lloyd's 11 and 12 ft
-      (+- 0.16); burthen by the old measure 118 and 128 tons, D6 (a)'s "about 130" (118-130);
-      her waist rail 1.65 m above the water against Chapman's 5.3-5.5 ft (+- 0.05);
-    - her settee to D5 (a): luff over leech 0.16, leech and foot over head 0.72 (+- 0.02, Gwyn's
-      ratios); the head at 44 degrees (+- 1) and 0.68 of the rail length (Gwyn's 534 px of 785),
-      its yard cut to it (B5.4's finding: the drawing draws a settee's yard as its head; her
-      design's §14 had the yard 0.72 of the rail length, Gwyn's 564 px, before her step 2 cut it,
-      old beside new: 16.59 to 15.68 m); slung a third along throat to peak on the main mast's
-      raked line (within 0.1 m); the peak 0.088 of the rail length inside the taffrail (0.07-0.11,
-      Gwyn's 0.09 +- 0.02); `settee` and `dipping` true; one unsided sheet;
-    - her rig to Gwyn's shares above the waist rail: the main top 0.35 (+- 0.02), the main truck
-      0.95 and the fore truck 0.85 (+- 0.03); Chapman's yards: the fore yard 12.44 m, the topsail
-      yards 9.14 and 9.36 m (+- 0.2); a dry yard on the main and no royal (D40 (a));
-    - her company of nine, two in the main top (the lead's ruling 8 of 2026-11-13, on ruling 11,
-      JUDGEMENT within the sourced eight to nine; old: eight, D43; Ext §5.1); `heave_to_aback` on
-      the main mast and no other (D4 (a));
-    - her fits: unarmed by default (the brief, item 3), the armed merchant four long 3-pounders and
-      four half-pounder swivels (Lloyd's Elizabeth, "4-3 P."; D41 (a));
-    - her description at rank 1, "merchant" in what she is made out to be (D16 (a));
-    - **rule 1** (D46 rule 1; Ext §5.9; Steel 1794 vol. I p. 237, Lescallier p. 380: lateen craft
-      lie a point nearer the wind than square-riggers, five points against six; with a square fore
-      she does not gain the whole point, Research-Bilander-2026-10.md §4, judgement): her
-      `closest_deg` and `beat_deg(15)` no wider than the brig's 50 and 60 degrees at this head.
-      Measured: 50 and 60, the beat by 0.06 kn of way to windward over 70 degrees. To be measured
-      again on D44 (c)'s settee row had rule 5 taken it (Bil-D §14): on her file it did not (her
-      step 5, `test_rule_5_on_her_file_holds_held_aback_near_its_trim_and_never_in_stays`), so the
-      clause stands as measured here."""
-    ship = load_ship(HER)
-    spec = load_spec(HER)
-    hull = spec.hull
-    assert abs(hull.length_waterline_m - 21.5) <= 0.5 and abs(hull.beam_m - 5.91) <= 0.1
-    assert abs(hull.draught_m - 3.51) <= 0.16
-    b = 19.4
-    for length in (70.6, 75.6):  # her waterline and her taffrail to stem head, ft
-        assert 118.0 - 0.5 <= (length - 0.6 * b) * b * b / 2.0 / 94.0 <= 130.0
-    waist = min(z for _x, z in hull.profile.rail_m)
-    assert abs(waist - 1.65) <= 0.05
-    spars, sails = {x.id: x for x in spec.spars}, {x.id: x for x in spec.sails}
-    settee = sails["main.settee"]
-    tack, throat, peak, clew = settee_corners(sails)
-    head, leech = math.dist(throat, peak), math.dist(peak, clew)
-    assert abs(math.dist(tack, throat) / leech - 0.16) <= 0.02
-    assert abs(leech / head - 0.72) <= 0.02 and abs(math.dist(tack, clew) / head - 0.72) <= 0.02
-    assert abs(math.degrees(math.atan2(peak[1] - throat[1], throat[0] - peak[0])) - 44.0) <= 1.0
-    yard = spars["main.lug_yard"]
-    assert abs(yard.length_m / RAIL_LENGTH_M - 534.0 / 785.0) <= 0.02
-    assert abs(yard.length_m - head) <= 0.02
-    sx, sz = throat[0] + (peak[0] - throat[0]) / 3.0, throat[1] + (peak[1] - throat[1]) / 3.0
-    main = spars["main.mast"]
-    assert abs(sx - (main.x_m - math.tan(math.radians(main.rake_deg)) * (sz - DATUM_M))) <= 0.1
-    taffrail = hull.profile.rail_m[0][0]
-    assert 0.07 <= (peak[0] - taffrail) / RAIL_LENGTH_M <= 0.11
-    assert settee.settee and settee.dipping
-    sheets = [ln for ln in spec.lines if ln.cls == "sheet" and ln.of == "main.settee"]
-    assert len(sheets) == 1 and sheets[0].side is None
-    assert abs(gwyn_share(module["rig"]["main"]["top"]) - 0.35) <= 0.02
-    truck = {
-        m: above_water(spars, f"{m}.mast")
-        + spars[f"{m}.topmast"].height_m
-        + spars[f"{m}.topgallant_mast"].height_m
-        for m in ("fore", "main")
-    }
-    assert abs(gwyn_share(truck["main"]) - 0.95) <= 0.03
-    assert abs(gwyn_share(truck["fore"]) - 0.85) <= 0.03
-    for yid, metres in (
-        ("fore.yard", 12.44),
-        ("fore.topsail.yard", 9.14),
-        ("main.topsail.yard", 9.36),
-    ):
-        assert abs(spars[yid].length_m - metres) <= 0.2, yid
-    assert "main.crossjack.yard" in spars and not [s for s in spars if "royal" in s]
-    assert spec.crew.complement == 9 and spec.crew.stations["main_top"] == 2  # old: 8
-    assert [s.id for s in ship.spars.values() if s.heave_to_aback] == ["main.mast"]
-    arm = spec.armament
-    assert arm.default == "unarmed" and arm.fit(None) is None
-    assert Counter((g.kind, g.pounder) for g in arm.fits[ARMED].guns) == {
-        ("long", 3.0): 4,
-        ("swivel", 0.5): 4,
-    }
-    from freesail.world import captains as C
-    from freesail.world import ships as S
-
-    d = S.description("bilander")
-    assert C.size_of_file(HER) == 1 and C.size_rank_of(d["what"]) == 1
-    assert "merchant" in d["what"]
-    brig, p = polar_of(BRIG), polar_of(HER)
-    assert (brig.closest_deg, brig.beat_deg(15.0)) == (50.0, 60.0)
-    assert p.closest_deg <= brig.closest_deg and p.beat_deg(15.0) <= brig.beat_deg(15.0)
 
 
 # ---------------------------------------------------------------------------
@@ -2901,143 +2813,6 @@ def test_her_boat_waiting_behind_all_hands_work_with_her_watch_at_the_pumps_is_m
     said = "Only four hands to send boat; there are no more on deck."
     assert (hove, "evolution.short_handed", said) in lines, lines
     assert begun and begun[0].tick - start == hove
-
-
-@pytest.mark.parametrize(
-    "knots, haul_s, lowered_s, factor",
-    [(15.0, 90, 149, 1.342), (20.0, 93, 159, 1.517)],
-)
-def test_truth_7_198_her_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_and_dipped_last(
-    knots, haul_s, lowered_s, factor
-):
-    """Truth 7-198 (B4, on B3.3; Bil-D §14; Ext §10.3 item 1; D46 rules 2 and 3, D3 (b)), drafted
-    on the fixture by B3.3 (tests/test_settee.py) and measured again here on her file, for Phase 5:
-    in stays her settee is kept drawing as a ship's mizen is, its ourse braced to leeward as the
-    helm goes down, and its yard is changed last, after the head yards are swung. Each rule is
-    carried over by judgement from a ship's mizen (Bourdé 1765 p. 87; Steel 1794 vol. II p. 316;
-    Boteler p. 163) to her settee, which Röding (1794 vol. II col. 581) has lowered and shifted
-    round in going about (D1 (a)); rule 2 is pinned on her own dip, the yard lowered and passed
-    round and by how many hands (D46 (d)), not against a brig.
-
-    Her file at seed 7 from her settle (close-hauled on the starboard tack, 67.5 degrees off),
-    15 and 20 kn, measured on the owner's machine at her `clr_x_m` +2.0 (her review, 2026-11-08;
-    at her step 5's +2.25 each tick within a second of these): at helm's a-lee + 1 tick the
-    settee set at its floor, 8 degrees, the words "haul aft the mainsail sheet and brace the ourse
-    to leeward"; her after yards hauled by "Main-topsail haul." at 32 s and 28 s (the lead's
-    ruling (2)(d) of 2026-11-07, as on the fixture), her fore tack risen apart, "Rise fore tack
-    and sheet. Let go and haul. ..." at 90 s and 93 s (89 and 93 at +2.25; the fixture's 97 and
-    96); the head yards' swing ended and the yard lowered at 149 s and 159 s ("Dip the mainsail:
-    lower the yard, pass it round abaft the mast ..."; 148 and 160 at +2.25; the fixture's 155
-    and 161); down in one spell of 161 and 182 ticks (`SETTEE_DIP_S` 120 by her factor of 1.342
-    and 1.517; the fixture's 1.33 and 1.51), its side larboard to starboard; hoisted and
-    "Tacked" at 310 s and 341 s (309 and 342 at +2.25; the fixture's 318 and 342), the report's
-    tick recorded and not pinned, only its order after the hoist (D13 (a); her review); at +400 s
-    on the larboard tack 67.4 and 66.5 degrees off. **Rule 2's hands:** six at
-    her dip, the tack's all hands (her two fore topmen, her two main topmen, the afterguard's hand
-    and the cook), the master and the mate on the quarterdeck. At her nine (the lead's rulings 8
-    and 11 of 2026-11-13) seven, the afterguard's two among them, the posts still on the
-    quarterdeck (a manoeuvre is never a post's work), every other figure within its band (haul 92
-    and 93 s, lowered 151 and 159 s, down 161 and 182 ticks, at +400 s 67.4 and 66.6 off).
-    **Rule 5 in stays:** her settee is never aback from helm's a-lee to "Tacked", where her main
-    topsail is (the static case, `test_rule_5_...`). Judged by her heading and tack at a set
-    time, never by the "Tacked" line (D13 (a))."""
-    from freesail.evolutions import scripts
-
-    world = _her_settle(knots)
-    settee = world.ship.sails[SETTEE]
-    start = world.clock.tick
-    world.submit("tack ship")
-    world.tick()
-    assert settee.is_set
-    assert math.degrees(abs(settee.sheet_angle)) == pytest.approx(LUG_FLOOR_DEG, abs=1.0)
-    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
-    assert "haul aft the mainsail sheet and brace the ourse to leeward" in line, line
-    runner = world.ship.extra["evolutions"]
-    sides, lowered, backed, at_dip = [], [], 0, set()
-    for i in range(2, 601):
-        world.tick()
-        if settee.yard_lowered:
-            lowered.append(i)
-            (tack,) = [x for x in runner.instances if isinstance(x.script, scripts.TackScript)]
-            at_dip.add(tuple(sorted(h.station.value for h in tack.assignment.hands)))
-        if settee.is_set and settee.backed:
-            backed += 1
-        sides.append(settee.lug_side)
-        if i == 400:
-            at_400 = (world.ship.dyn.tack, abs(_rel_deg(world)))
-    texts = [e.text for e in _after(world, start)]
-    assert "Main-topsail haul." in texts
-    assert any(t.startswith("Rise fore tack and sheet. Let go and haul.") for t in texts)
-    haul = _first_tick(world, start, "Let go and haul")
-    swung = _first_tick(world, start, "Dip the mainsail: lower the yard")
-    tacked = _first_tick(world, start, "Tacked")
-    hoisted = _first_tick(world, start, "Dipped the mainsail; hoisted on the starboard side")
-    assert _first_tick(world, start, "Main-topsail haul.") < haul
-    assert abs(haul - haul_s) <= 5 and haul < swung
-    assert lowered[0] >= swung and abs(lowered[0] - lowered_s) <= 10
-    down = len(lowered)
-    assert lowered == list(range(lowered[0], lowered[0] + down))  # one spell, not two
-    assert abs(down - scripts.SETTEE_DIP_S * factor) <= 10
-    assert sides[0] == "larboard" and sides[-1] == "starboard"
-    assert hoisted is not None and tacked is not None and tacked >= hoisted  # the order alone
-    assert at_dip == {
-        ("afterguard", "afterguard", "fore_top", "fore_top", "idlers", "main_top", "main_top")
-    }  # rule 2: seven of her nine, the posts on the quarterdeck (old: six of her eight)
-    assert backed == 0  # rule 5: never aback in her tack
-    assert at_400[0] == "larboard" and abs(at_400[1] - 67.5) <= 5.0
-
-
-@pytest.mark.parametrize("knots, crossed_s, hoisted_s", [(15.0, 58, 153), (20.0, 48, 168)])
-def test_truth_7_199_in_wearing_her_settee_is_lowered_as_she_bears_up_and_hoisted_past_the_wind(
-    knots, crossed_s, hoisted_s
-):
-    """Truth 7-199 (B4, on B3.3; Bil-D §14; Ext §10.3 item 2; D46 (d) rule 4 as reworded), drafted
-    on the fixture by B3.3 and measured again here on her file, for Phase 5: in wearing her settee
-    is lowered as she bears up and hoisted again on the new lee once her stern is past the wind.
-    Steel's order for a ship's mizen (1794 vol. II pp. 321-322: hauled up as she bears up, hauled
-    out "as soon as the stern has passed the wind"), carried over by judgement to the dip D1 (a)
-    gives the settee; the truth pins the order of events, not a clewing up.
-
-    Her file at seed 7 from her settle, 15 and 20 kn, measured at her `clr_x_m` +2.0 (her review,
-    2026-11-08): lowered at "up helm" + 1 tick ("Up helm; lower the mainsail; brace in the after
-    yards"); the wind across her stern to the larboard quarter at 58 s and 48 s (57 and 48 at her
-    step 5's +2.25; the fixture's 66 and 55); hoisted at 153 s and 168 s (the fixture's 152 and
-    168), the wind then 120.5 and 121.7 degrees on her larboard side (121.4 and 120.4 at +2.25)
-    ("Hoisted the mainsail on the starboard side, to leeward of the mast; the wind is past the
-    stern."); "Wore" at 472 s and 517 s (472 and 516 at +2.25; the fixture's 478 and 520), the
-    report's tick recorded and not pinned, only its order after the hoist (her review); at +600 s
-    on the larboard tack 67.5 and 67.4 degrees off. Judged by her heading and tack at a set time
-    (D13 (a))."""
-    world = _her_settle(knots)
-    settee = world.ship.sails[SETTEE]
-    start = world.clock.tick
-    world.submit("wear ship")
-    lowered, crossed, hoist = [], None, None
-    for i in range(1, 601):
-        world.tick()
-        rel = _rel_deg(world)
-        if settee.yard_lowered:
-            lowered.append(i)
-        if crossed is None and rel < 0 and abs(rel) > 90:
-            crossed = i
-        if hoist is None and lowered and not settee.yard_lowered:
-            hoist = (i, rel)
-        if i == 600:
-            at_600 = (world.ship.dyn.tack, abs(rel))
-    up = next(e.text for e in _after(world, start) if "Up helm" in e.text)
-    assert "Up helm; lower the mainsail; brace in the after yards" in up, up
-    assert lowered and lowered[0] <= 5
-    assert abs(crossed - crossed_s) <= 10 and abs(hoist[0] - hoisted_s) <= 10
-    assert hoist[0] > crossed and hoist[1] < 0.0  # the wind on the new side of the stern
-    texts = [e.text for e in _after(world, start)]
-    assert (
-        "Hoisted the mainsail on the starboard side, to leeward of the mast; the wind is past the "
-        "stern." in texts
-    )
-    wore = _first_tick(world, start, "Wore")
-    assert wore is not None and wore > hoist[0]  # the order alone (D13 (a))
-    assert settee.is_set and settee.lug_side == "starboard"
-    assert at_600[0] == "larboard" and abs(at_600[1] - 67.5) <= 5.0
 
 
 def test_her_first_hour_at_seed_7_under_her_rules_captain_with_no_fit_named(tmp_path):

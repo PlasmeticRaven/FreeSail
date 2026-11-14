@@ -535,8 +535,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_398_the_identified_sail_is_named_in_the_rows_and_forgotten_when_lost",
         # package 75, SW-4 (the lead's ruling at its merge): truth 7-191's draft (7.5 s) and the
         # two crewed ships kept evading by a man of war of their own class (8.3 s and 6.9 s),
-        # the final candidates' junit at four workers, 2026-11-06
-        "test_subtypes.py::test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside",
+        # the final candidates' junit at four workers, 2026-11-06; the truth's node id moved with
+        # it into the known truths at Phase 5 (2026-11-14; old: test_subtypes.py::)
+        "test_known_truths.py::test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside",
         "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
         "[a privateer lugger]",
         "test_subtypes.py::test_a_man_of_war_of_her_own_class_keeps_a_crewed_ship_evading"
@@ -553,7 +554,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # workers, 2026-11-10: her stays, wear and heave-to (28.8 s), her round trip (24.0 s), her
         # helm in truths 6 and 17's forms (23.2 s), the Vanguard's and the Bellona's speeds (12.6
         # s), a frigate and a cruiser meeting her (9.6 s and 5.9 s), her handling (7.6 s), and her
-        # posts drawn at muster (5.2 s); her truth 7-196 is the pace run's by its name and mark
+        # posts drawn at muster (5.2 s); her truth 7-196 is the pace run's by its mark (in
+        # test_known_truths.py since Phase 5, 2026-11-14)
         "test_bellerophon.py::test_she_stays_quickly_wears_and_lies_to",
         "test_bellerophon.py::test_she_sails_under_her_rules_captain_with_no_fit_named_and_round_trips",
         "test_bellerophon.py::test_her_helm_as_tuned_holds_truths_6_and_17",

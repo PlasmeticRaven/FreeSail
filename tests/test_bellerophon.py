@@ -14,11 +14,12 @@ company, her marines, her quarter bill with the marines it keeps and her flag pa
 deck reads the bill's marines; her ground tackle, boats, pumps, hold and stores; her description,
 its words and its rank; and the generator's report. Her road's step 5 adds her helm and her
 handling as tuned (Bel-D §9), her sailed checks against the Vanguard's log and the Bellona's
-reports, truth 7-194, a cruiser and a King's frigate meeting her, her round trip under her rules
-captain and her checkpoint at quarters; step 6 her bill by deck (B7.b, Bel-D §6.4, with §12.5's
-checks on every armed file) and truths 7-195 and 7-196; step 7 her tack at quarters (B7.c, Bel-D
-§6.7), with the 64's and the brig's, and her guns numbered by deck with the 64's (B7.d, Bel-D §5.2,
-its stage 0's key and its names, keys, quarters and orders, with §12.5's checks).
+reports, truth 7-194 (moved into tests/test_known_truths.py at Phase 5, 2026-11-14, with 7-195
+and 7-196, their worlds here), a cruiser and a King's frigate meeting her, her round trip under her
+rules captain and her checkpoint at quarters; step 6 her bill by deck (B7.b, Bel-D §6.4, with
+§12.5's checks on every armed file) and truths 7-195 and 7-196; step 7 her tack at quarters (B7.c,
+Bel-D §6.7), with the 64's and the brig's, and her guns numbered by deck with the 64's (B7.d, Bel-D
+§5.2, its stage 0's key and its names, keys, quarters and orders, with §12.5's checks).
 
 The figures quoted as measured were measured at seed 7 on the owner's machine (Windows 11,
 2026-11-10); the bands are the sources' or judgement where they say so.
@@ -1467,95 +1468,6 @@ def test_she_sails_as_the_vanguard_and_the_bellona_were_reported(tmp_path):
     r = reading(world)
     assert abs(r["off"] - 67.5) <= 1.0
     assert 6.0 <= r["speed"] <= 9.0, r
-
-
-# ---------------------------------------------------------------------------
-# Truth 7-194: her particulars hold their sources (Bel-D §14.2; her road's step 5)
-# ---------------------------------------------------------------------------
-
-
-def test_truth_7_194_her_particulars_hold_their_sources():
-    """**A draft, for Phase 5 to move into `tests/test_known_truths.py`** (Build-Ships.md §15,
-    row 7-194; Bel-D §14.2), pinned at her step 5, on `seventy-four.yaml` as it loads. Her beam
-    46 ft 9 in (ZAZ1357's table) 14.25 ± 0.05 m; her waterline 168 ft 51.2 ± 0.3 m; her draught to K
-    6.46 ± 0.10 m at her water, the Channel line; her displacement within Bel's H1 band, 2,490 to
-    2,900 t, and within the measured lines' 2,560 to 2,660 t at her line (Bel-D §2.1, either
-    conversion); her GM within 1.2 to 1.5 m. Her lowest lower-deck sill 1.57 ± 0.01 m above her
-    water (the Bellona's 5 ft 2 in at Channel draught, Lavery 1985 p. 9, Table 2), the side at it
-    6.90 to 7.09 m (6.92 moulded, 7.04 with the plank; 7.04 measured). Her ports a side 14, 14 and
-    7, the forecastle's 2 (Bel H3; the forecastle's third place a carronade's over the rail), the
-    lower 3 ft 4 3/4 in by 2 ft 8 1/2 in, 1.04 by 0.83 m (Bel-D §3.2's 0.82 a rounding slip). Her
-    main mast within 107 ft 4 1/2 in to 108 ft from its heel to its head (Steel's rule; Lavery
-    Table 10: 108 ft, its heel 5.11 ft above the keel's top), the mizen yard 86 ft 6 in ± 1%.
-    Twenty-eight long 32-pounders of 55 cwt on her lower deck in every fit; 74, 82 and 78 pieces;
-    broadsides by 70's rule 781 and 867 lb (James vol. 1, Abstracts No. 1 and 3) and 938 lb. Her
-    crews to the pair 13, 9, 7 and 6 for the 32s, 18s, 12s and 9s (Falconer 1780) and 4 to a
-    carronade (Douglas 1829 art. 136). Her complement 590 (the 1807 column), five lieutenants, 111
-    marines of whom eleven officers and NCOs (the column's: her notes, and her people file's
-    captain, lieutenant and serjeant drawn from them); filling 18; exercise 9. Four bowers of 67
-    cwt, a stream of 16 and a kedge of 8 on seven 22-in cables (Steel 1794; Lavery p. 15, Table 4);
-    six boats (Lavery p. 16, Table 5). "A ship of the line" names her description, rank 4. Pins
-    states and bands, no digest."""
-    from freesail.combat.far import far_ship
-    from freesail.world import captains as C
-    from freesail.world import ships as S
-
-    ship = load_ship(SEVENTY_FOUR)
-    spec, h = ship.spec, ship.hull.spec
-    assert abs(h.beam_m - 14.25) <= 0.05
-    assert abs(h.length_waterline_m - 51.2) <= 0.3
-    assert abs(h.draught_m - 6.46) <= 0.10
-    assert 2_490_000 <= h.displacement_kg <= 2_900_000
-    assert 2_560_000 <= h.displacement_kg <= 2_660_000
-    assert 1.2 <= h.gm_m <= 1.5
-    p = h.profile
-    _x, sill, half = min(ports_of(p, "lower"), key=lambda t: t[1])
-    assert abs(sill - 1.57) <= 0.01
-    assert 6.90 <= half <= 7.09
-    counts = {deck: len(ports_of(p, deck)) for deck in ("lower", "upper", "quarterdeck")}
-    assert counts == {"lower": 14, "upper": 14, "quarterdeck": 7}
-    forecastle = [g for g in spec.armament.fits[FIT_1793].guns if g.deck == "forecastle"]
-    assert len({g.number for g in forecastle}) == 2  # the forecastle's two ports a side
-    width, depth = dict(p.port_size_m)["lower"]
-    assert (round(width, 2), round(depth, 2)) == (1.04, 0.83)
-    main = ship.spars["main.mast"]
-    x_ft = MIDSHIPS_FT + main.x_m / FT
-    heel_ft = -(18.89 + 1.72 * (MIDSHIPS_FT - x_ft) / 168.0) + 5.11  # above WL1 (Bel §5.2)
-    head_ft = above_wl1_ft(h.deck_height_m + main.height_m)
-    length_ft = (head_ft - heel_ft) / math.cos(main.rake)
-    assert 107.0 + 4.5 / 12.0 <= length_ft <= 108.0 + 0.4, length_ft  # heights to the decimetre
-    assert abs(ship.spars["mizzen.yard"].length_m / (86.5 * FT) - 1.0) <= 0.01
-    arm = spec.armament
-    for fit, pieces, lb in ((FIT_1793, 74, 781.0), (FIT_1795, 82, 867.0), (FIT_1812, 78, 938.0)):
-        guns = arm.fits[fit].guns
-        assert len(guns) == pieces, fit
-        lower = [g for g in guns if g.deck == "lower"]
-        assert len(lower) == 28 and all(
-            (g.kind, g.pounder, g.weight_cwt) == ("long", 32, 55.0) for g in lower
-        ), fit
-        assert far_ship(SEVENTY_FOUR, "britain", fit=fit).broadside_lb == lb, fit
-        crews = {(g.kind, int(g.pounder)): g.crew for g in guns}
-        for (kind, pounder), crew in crews.items():
-            want = 4 if kind == "carronade" else {32: 13, 18: 9, 12: 7, 9: 6}[pounder]
-            assert crew == want, (fit, kind, pounder)
-        assert arm.fits[fit].exercise_charges == 9
-    crew = spec.crew
-    assert crew.complement == 590
-    assert sum(1 for q in crew.posts if q.post.endswith(" lieutenant")) == 5
-    assert crew.stations["marines"] == 111
-    assert {"captain of marines", "lieutenant of marines", "sergeant of marines"} <= {
-        q.role for q in crew.people if q.station == "marines"
-    }
-    assert crew.quarter_bill.filling == 18
-    anchors = spec.ground_tackle.anchors
-    bowers = [a for a in anchors if abs(a.weight_kg - 67 * CWT_KG) <= 1.0]
-    assert len(bowers) == 4 and all(a.cable_in == 22.0 for a in bowers)
-    weights = sorted(round(a.weight_kg / CWT_KG) for a in anchors if a not in bowers)
-    assert weights == [8, 16]
-    assert sum(a.cable_fathoms for a in bowers) / 100.0 == 7.0  # seven cables of 100 fathoms
-    assert len(spec.boats) == 6
-    assert S.description_key("a ship of the line") == "seventy-four"
-    assert C.size_of_file(SEVENTY_FOUR) == 4
 
 
 # ---------------------------------------------------------------------------
@@ -3141,7 +3053,8 @@ def test_a_number_with_its_deck_and_no_side_is_the_gun_of_the_side_engaged_or_of
 
 
 # ---------------------------------------------------------------------------
-# Truth 7-195: her lower-deck ports shut at the heel the sources give (Bel-D §14.3; step 6)
+# Truth 7-195's sea and counts (Bel-D §14.3; step 6); the truth in tests/test_known_truths.py
+# since Phase 5
 # ---------------------------------------------------------------------------
 
 # Her lee lower-deck ports shut by the count the rule gives at heels raised from upright, each
@@ -3205,101 +3118,9 @@ def _hold_ticks():
     return round(ports.PORT_HOLD_S / TICK_SECONDS)
 
 
-def test_truth_7_195_her_lowest_lower_deck_port_shuts_at_the_bellonas_heel():
-    """**A draft, for Phase 5 to move into `tests/test_known_truths.py` and measure again on the
-    merged tree** (Build-Ships.md §15, row 7-195; Bel-D §14.3, in truth 7-190's form): "her lower
-    deck's 32-pounders and their ports' sills against the heel" (the brief, item 3). The
-    Bellona's lowest gun-deck port 5 ft 2 in above the water at her best Channel draught (Lavery
-    1985 p. 9, Table 2), her own lowest sill (L7, the lower deck's pair No. 8 at x -2.15 m, found
-    by its triple, the least sill, never by its number) 1.57 m on her drawn side of 7.04 m: by
-    `shot.lee_port_shut` it is open at 9.9 degrees of heel alone and shut at 10.9, its threshold
-    10.35 (within 10.2-10.7: Bel-D's 10.35 on 7.04, the dead flat re-traced on its own line at the
-    review of 2026-11-10, 10.38 on 7.02 before it; 10.58 the source's 5 ft 2 in on the moulded
-    22.7 ft, the brief's 10.6; the lead's answer (11)). On her battery, raised from upright: open
-    at 9.9, shut at 10.9 with the four ports whose thresholds lie under it; still shut at 9.9 on
-    the way down, within the minute's hold and once it has run (the six inches to reopen: below
-    9.11); open at 8.6, the minute run. **A roll's amplitude sooner** (the owner's rule, Bel §13.1
-    answer 7): with a roll of 4 degrees on her motion it is open at 5.8 degrees of heel and shut at
-    6.9. **The
-    log:** "The lee lower-deck ports are shut, the sea at their sills." once at the change, her
-    guns cast loose. Her weather side open throughout. Measured at seed 7 on the owner's machine,
-    2026-11-10.
-
-    **Recorded, not pinned (Bel-D §14.3's condition): in ordinary sailing**, close-hauled six
-    points off under plain sail, no book, a steady wind with no gusts: her heel settles at 7.73
-    degrees in 22 kn, 9.23 in 24 and 16.55 at its most in 32 (measured); but in 24 kn the setting
-    of sail heels her to 10.72 for a moment, the two lowest ports shut and stay shut at the steady
-    9.23 (they reopen below 9.11 and 9.18), so "open at 24 kn" does not hold with a degree's
-    margin; in 23 kn she peaks at 9.88 and none shuts; in 32 kn twelve of the fourteen are shut.
-    In the World's gusts at 24 kn (answer 8's "or in gusts at 24 kn") a lee lower port of hers is
-    shut for 31% of the hour, her heel 6.9 to 16.3 degrees (measured again on her re-traced side,
-    2026-11-10: one port and 30% before). The period's own cases are swell and rolling, not
-    steady heel (the Blenheim, the Monarch, the Droits de l'Homme: Bel §6.1), which the roll's
-    clause serves."""
-    from freesail.combat import shot
-
-    w = _in_her_sea()
-    ship = w.ship
-    x, sill, half = min(ports_of(ship.hull.spec.profile, "lower"), key=lambda t: t[1])
-    assert x == pytest.approx(-2.15, abs=0.005)
-    assert not shot.lee_port_shut(sill, 9.9, half)
-    assert shot.lee_port_shut(sill, 10.9, half)
-    threshold = math.degrees(math.asin((sill - shot.PORT_SHUT_M) / half))
-    assert 10.2 <= threshold <= 10.7, threshold
-    (lowest,) = [
-        g.id
-        for g in ship.guns.values()
-        if g.deck == "lower" and g.side == "starboard" and (g.x_m, g.height_m) == (x, sill)
-    ]
-    for g in ship.guns.values():
-        g.cast_loose = True
-        g.run_out = True
-    ship.drain_notes()
-    hold = _hold_ticks()
-    assert not _ports_at(w, 0.0, 0.0, 0)
-    assert lowest not in _ports_at(w, 9.9, 0.0, 1)
-    shut = _ports_at(w, 10.9, 0.0, 2)
-    assert lowest in shut and len(shut) == 4
-    assert all(ship.guns[g].deck == "lower" and ship.guns[g].side == "starboard" for g in shut)
-    lines = [n for n in ship.drain_notes() if len(n) == 5 and n[1] == "guns.ports_shut"]
-    assert [n[2] for n in lines] == ["The lee lower-deck ports are shut, the sea at their sills."]
-    assert _ports_at(w, 9.9, 0.0, 3) == shut  # down again within the minute
-    assert _ports_at(w, 9.9, 0.0, 3 + hold) == shut  # the minute run, the six inches not cleared
-    assert not [n for n in ship.drain_notes() if len(n) == 5 and n[1] == "guns.ports_shut"]
-    assert not _ports_at(w, 8.6, 0.0, 4 + hold)  # six inches clear and the minute run: open
-    # a roll's amplitude sooner, raised from upright
-    at = 10 + 3 * hold
-    assert not _ports_at(w, 0.0, 0.0, at)
-    assert lowest not in _ports_at(w, 5.8, ROLL_DEG, at + 1)
-    assert lowest in _ports_at(w, 6.9, ROLL_DEG, at + 2)
-
-
-def test_truth_7_195_her_lee_lower_deck_guns_shut_by_the_rules_count():
-    """Truth 7-195's battery clause (Bel-D §14.3; a draft for Phase 5, as above): her default fit,
-    her guns cast loose and run out, heeled to starboard by hand and raised from upright, so that
-    the six inches of reopening do not bite; at heels each 0.3 degree or more from every one of
-    her lower ports' thresholds (`LEE_LOWER_SHUT_AT`), `Battery._shut` holds her lee lower-deck
-    guns in the counts the rule gives: none at 10.0, eight at 12.4, ten at 13.7, twelve at 16.0,
-    all fourteen at 19.4. No upper-deck gun is shut below 25 degrees (her lowest upper port's
-    threshold 32.37), nor any of the quarterdeck's, the forecastle's or the poop's, and the
-    weather side stands open."""
-    w = _in_her_sea()
-    for g in w.ship.guns.values():
-        g.cast_loose = True
-        g.run_out = True
-    assert not _ports_at(w, 0.0, 0.0, 0)
-    for tick, (heel, count) in enumerate(LEE_LOWER_SHUT_AT, start=1):
-        shut = _ports_at(w, heel, 0.0, tick)
-        lee_lower = [g for g in shut if w.ship.guns[g].deck == "lower"]
-        assert len(lee_lower) == count, (heel, len(lee_lower))
-        assert all(w.ship.guns[g].side == "starboard" for g in shut), heel
-        assert len(shut) == count, heel  # no gun of another deck
-    shut = _ports_at(w, 25.0, 0.0, len(LEE_LOWER_SHUT_AT) + 1)
-    assert {w.ship.guns[g].deck for g in shut} == {"lower"} and len(shut) == 14
-
-
 # ---------------------------------------------------------------------------
-# Truth 7-196: a 74 crewed holds the floors (Bel-D §14.4; step 6), routed as pace tests
+# Truth 7-196's world (Bel-D §14.4; step 6); the truth, its crewed clause alone, in
+# tests/test_known_truths.py since Phase 5, marked `pace` there
 # ---------------------------------------------------------------------------
 
 # Her world off the Lizard (Bel-D §14.4): the frigate about three miles south of the Lizard
@@ -3310,100 +3131,5 @@ def test_truth_7_195_her_lee_lower_deck_guns_shut_by_the_rules_count():
 # period (the narrowest world measured in which the three know her by the book).
 OFF_THE_LIZARD = (49.9, -5.21)
 SEVENTY_FOURS_AT = ("49 55.5 N 5 12.0 W", "49 53.5 N 5 14.0 W", "49 52.5 N 5 11.0 W")
-
-
-@pytest.mark.pace
-def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
-    """**A draft, for Phase 5 to move into `tests/test_known_truths.py`** (Build-Ships.md §15, row
-    7-196; Bel-D §14.4): "the pace of a 74 crewed measured against the floors" (the brief, item 3).
-    Truth 88's form (tests/test_crews.py), marked `pace` by hand as truths 88 and 7-138 are, so that
-    tests/conftest.py routes it to the pace run, alone after the rest. **Its place differs from
-    truth 88's:** truth 88's frigate lies at 49 30 N 5 30 W, about thirty miles from the Lizard,
-    where 74s keeping a station off the Lizard would sail for it and pass the crewed range's
-    demotion within the measure; here the frigate lies about three miles south of it, her plain sail
-    set and then hove to (truth 88's "heave to" at the first tick is refused, no sail being set:
-    Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, in her
-    squadron under her orders; a thousand ticks to settle, then the best of three timed thousands,
-    at the end of each the crewed ships at `CREWED_CAP`, every 74 within `CREWED_NM` of her and in
-    company, and no line of an action in her log. At least `CREWED_FLOOR_TICKS_S` (60) a second on
-    the build machine. **What the last clause proves, and no more** (the lead's readings of
-    cda12ec9, (C7)): every ship of her world is British and of one squadron, and no enemy is put
-    in it, so that "no line of an action" can fail only if friends fire on friends: it proves that
-    three crewed King's ships under her orders, in her set, neither challenge her nor one another
-    into an action over the measure, and nothing of how a crewed 74 meets an enemy, which the far
-    fight's truths try (7-231, `tests/test_far_action.py`). Her world is left as it is (the
-    docstring chosen, not an enemy in sight who is not engaged): it is a pace truth whose world
-    was settled by measurement, and an enemy in sight would change what it times. **Her world,
-    plainly** (the lead's ruling (1) of 2026-11-13): truth 88's
-    frigate carries no private signal and, under no rules captain, answers none; three King's ships
-    each keeping the station off the Lizard alone challenged her and one another, took her (and one
-    another) for men of war under false colours and fired into her, and since package 74 her captor
-    goes home with her prize, so that load no longer lasted the measure. Given the day's private
-    signals and answering each challenge by order, she is still judged unanswered by one of three
-    challenging her in one minute (each reply goes to the last challenge read), and one 74 judges
-    another so. In her squadron, under her orders, the three know her by the book's own road
-    (package 71's least relation, package 72's set): a member in company challenges nobody. **They
-    do not keep their stations** (the review's mends): the frigate lies to, heading NW by N at a
-    knot and a half, and a crewed member ahead of her station steers the flag's course with her sail
-    shortened, which drops her back only on a flag with way on; so the three straggle by the set's
-    own lines (S0 at tick 1560, S1 at 3060, S2 at 3840), and S2 opens on the frigate's heading at
-    about six knots, 2.79 miles at the third end, past `CREWED_NM` between ticks 8,400 and 8,650
-    (3.87 and 4.18 miles): the clause holds within its 4,900 ticks, and that is its margin.
-    Measured on the owner's machine (seed 7, 2026-11-13): the best of three thousands 150, 151 and
-    147 ticks a second in three runs; the 74s at 0.29 to 2.79 miles at the ends of the thousands
-    and at most 2.79 at any tick of them, in company throughout, no shot fired. The old world and
-    its figures, old beside new, in docs/dev/TuningNotes.md, "The lead's notes of 2026-11-12 and
-    13, built"."""
-    import time
-
-    from freesail.world import crews as K
-    from freesail.world import squadrons as Q
-    from freesail.world.geo import bearing_and_distance
-    from tests.test_brains import put, world_at
-
-    w = world_at(*OFF_THE_LIZARD)
-    w.submit("set plain sail")
-    w.run(900)
-    assert w.submit("heave to").kind == "order.accepted"
-    goal = "patrolling off the Lizard within 2 miles"
-    intent = "keep the station off the Lizard within 2 miles"
-    fours = [
-        put(w, "seventy-four", "britain", where, goal, intent, name=f"S{i}")
-        for i, where in enumerate(SEVENTY_FOURS_AT)
-    ]
-    assert all(v.ship_file == SEVENTY_FOUR for v in fours)
-    ours = Q.Squadron(
-        id="ours",
-        name="our squadron",
-        kind="squadron",
-        nation="britain",
-        members=["the ship"] + [v.id for v in fours],
-        goal=goal,
-        formation="line ahead",
-    )
-    w.squadrons.add(ours, w)
-    assert ours.commander == "the ship"
-    w.run(1000)
-    best = 0.0
-    for _ in range(3):
-        t0 = time.perf_counter()
-        w.run(1000)
-        best = max(best, 1000 / (time.perf_counter() - t0))
-        assert len(w.vessels.crewed_ids) == K.CREWED_CAP
-        for v in fours:
-            nm = bearing_and_distance(w.position, v.position)[1] / units.NAUTICAL_MILE
-            assert nm <= K.CREWED_NM, (v.name, nm)
-            assert v.crew.captain.state == "in company", (v.name, v.crew.captain.state)
-    assert not [e.text for e in w.log if e.kind.startswith("action.")]
-    assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
-
-
-# Truth 7-196's clause alone (Bel-D §14.4: truth 51's form with her file in the frigate's place,
-# at least the build machine's floor of 500 ticks a second) is recorded and not pinned, by the
-# lead's answer (5) ("pinned only if the build machine leaves a tenth's margin, 550 or more; else
-# recorded, and no floor lowered") and the lead's measurement at her merge (2026-11-10, the build
-# machine quiet, the best of three thousands in each of three runs): 505, 476 and 492 ticks a
-# second, the frigate 524 and 516 in the same runs; on the owner's machine 474, 477, 483 and 490
-# (the frigate-36 505 and 631, the 64 484 and 486). She runs about a twentieth slower than the
-# frigate, and the frigate holds the floor by less than that. The test that asked it was taken
-# out by the lead at the merge; `tools/pace.py seventy-four` measures it still.
+# Truth 7-196's clause alone (truth 51's form, the build machine's 500 ticks a second) is recorded
+# and not pinned, its figures in the truth's docstring (tests/test_known_truths.py).

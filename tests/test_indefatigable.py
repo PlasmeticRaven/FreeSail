@@ -12,11 +12,11 @@ her wardroom files; her ground tackle against Steel's 64; her descriptions and s
 names; her polars in tests/test_ships.py's form; and her round trip under the rules captains at
 seed 7 with no fit named (Indf §11.2).
 
-Her truths are drafted here under their numbers (Build-Ships.md §15), to be moved into
-tests/test_known_truths.py in Phase 5 and measured again there: 7-186 her particulars, 7-187 the
-razee lighter, stiffer and faster than the 64, 7-188 her broadside against the frigate-36's, 7-189
-the 64's handling with her mizen yard and spritsails, and the clauses of 7-230 that are hers. Each
-is written against the names the Hull keeps (`world.ship`; Design-OneWorld §2.2).
+Her truths were drafted here under their numbers (Build-Ships.md §15) and moved into
+tests/test_known_truths.py at Phase 5 (2026-11-14), their helpers here: 7-186 her particulars, 7-187
+the razee lighter, stiffer and faster than the 64, 7-188 her broadside against the frigate-36's,
+7-189 the 64's handling with her mizen yard and spritsails, and the clauses of 7-230 that are hers.
+Each is written against the names the Hull keeps (`world.ship`; Design-OneWorld §2.2).
 
 **Stage B (Indf §13 step 7; the lead's notes of 2026-10-29, item 2).** The 64's mizen course is cut
 at the mast on her whole yard, her driver is in the sail room and her yards are under the
@@ -59,7 +59,6 @@ from freesail.ship.loader import load_ship, load_spec, ship_from_dict
 from freesail.ship.parts import SailState
 from freesail.ship.profile import deck_at, half_breadth_at_sill, interp, ports_of, sill_at
 from freesail.ship.stub import OrderError
-from freesail.world.ships import _balanced_speed_ms
 
 ROOT = Path(__file__).resolve().parents[1]
 SIXTY_FOUR = "data/ships/sixty-four.yaml"
@@ -1771,136 +1770,9 @@ def test_her_scenario_round_trips_and_she_sails_it_under_the_rules_captain_with_
 
 
 # ---------------------------------------------------------------------------
-# Her truths, 7-186 to 7-188 (Build-Ships.md §15; Indf §14)
+# Her truths' helpers, 7-186 to 7-188 (Build-Ships.md §15; Indf §14); the truths in
+# tests/test_known_truths.py since Phase 5
 # ---------------------------------------------------------------------------
-
-
-def test_truth_7_186_her_particulars_hold_their_sources_and_the_razee_is_the_64_cut_down():
-    """Indf §14 truth 1, the brief's item 6. Both files load. Beam 13.5 ± 0.1 m (44 ft 5 in,
-    Winfield 1793-1817 p. 100), load line 48.8 ± 0.3 m (160 ft on WL1, measured), draughts
-    6.33 and 5.88 ± 0.1 m (measured on ZAZ1407 and ZAZ2371). The razee's profile below the old
-    upper deck is the 64's raised by her rise, 0.44 ± 0.02 m, point by point: her keel, stem
-    and counter, her wales, her midship section, her gun deck (the 64's lower deck) and its
-    thirteen ports, her quarterdeck (the old upper deck); 0.44-0.45 by the files. The lowest
-    gun-deck sills 1.53 and 1.98 ± 0.03 m (5.02 ft above WL1 on ZAZ1407; ZAZ2371's 1.96). Each
-    lower mast's head lower by its cut (6 ft 3 in, 6 ft 7 in, 6 ft 9 in: Ind §3.3) less the
-    rise, ± 0.1 m for the heights kept to the decimetre (1.43, 1.53 and 1.63 m by the files).
-    26 long 24-pounders in every fit of both files. Complements 491 and 330, marines 84 and 50
-    (the Regulations' columns; James vol. 1 p. 454). Four bowers of 57 cwt in both (Steel's
-    64). Pinned at once: nothing here moves at stage B."""
-    s64, s = load_ship(SIXTY_FOUR), load_ship(RAZEE)
-    h64, h = s64.hull.spec, s.hull.spec
-    for hull in (h64, h):
-        assert abs(hull.beam_m - 13.5) <= 0.1
-        assert abs(hull.length_waterline_m - 48.8) <= 0.3
-    assert abs(h64.draught_m - 6.33) <= 0.1 and abs(h.draught_m - 5.88) <= 0.1
-    p64, p = h64.profile, h.profile
-    old_upper = dict(p64.decks_m)["upper"]
-
-    def raised(old, new):
-        assert abs(new - old - RISE_M) <= 0.02, (old, new)
-
-    def below_old_upper(x, z):
-        return z < interp(old_upper, x)
-
-    for (x0, z0), (x1, z1) in zip(p64.keel_m, p.keel_m, strict=True):
-        assert x0 == x1
-        raised(z0, z1)
-    compared = 0
-    for line64, line in ((p64.stem_m, p.stem_m), (p64.stern_m, p.stern_m)):
-        for (x0, z0), (x1, z1) in zip(line64, line, strict=False):
-            if x0 == x1 and below_old_upper(x0, z0):
-                raised(z0, z1)
-                compared += 1
-    assert compared >= 15  # the stem to the old upper deck and the counter
-    for w64, w in zip(p64.wales_m, p.wales_m, strict=True):
-        assert w64[0] == w[0]
-        raised(w64[1], w[1])
-        raised(w64[2], w[2])
-    for (z0, hb0), (z1, hb1) in zip(p64.section_m, p.section_m, strict=True):
-        assert hb0 == hb1
-        if z0 < interp(old_upper, 0.0):
-            raised(z0, z1)
-    lower64, gun_deck = dict(p64.decks_m)["lower"], dict(p.decks_m)["upper"]
-    for (x0, z0), (x1, z1) in zip(lower64, gun_deck, strict=True):
-        assert x0 == x1
-        raised(z0, z1)
-    for x, z in dict(p.decks_m)["quarterdeck"]:
-        raised(interp(old_upper, x), z)
-    for (x0, z0, hb0), (x1, z1, hb1) in zip(
-        ports_of(p64, "lower"), ports_of(p, "upper"), strict=True
-    ):
-        assert (x0, hb0) == (x1, hb1)
-        raised(z0, z1)
-    assert abs(min(z for _x, z, _hb in ports_of(p64, "lower")) - 1.53) <= 0.03
-    assert abs(min(z for _x, z, _hb in ports_of(p, "upper")) - 1.98) <= 0.03
-    for mast, cut_ft in CUT_FT.items():
-        lower = above_water(s64, f"{mast}.mast") - above_water(s, f"{mast}.mast")
-        assert abs(lower - (cut_ft * FT - RISE_M)) <= 0.1, (mast, lower)
-    for ship in (s64, s):
-        for fit in ship.spec.armament.fits.values():
-            long_24s = [g for g in fit.guns if g.kind == "long" and g.pounder == 24]
-            assert len(long_24s) == 26, fit.name
-        anchors = ship.spec.ground_tackle.anchors
-        bowers = [a for a in anchors if abs(a.weight_kg - 57 * CWT_KG) <= 1.0]
-        assert len(bowers) == 4 and {a.kind for a in bowers} <= {"bower", "sheet"}
-    assert (s64.spec.crew.complement, s.spec.crew.complement) == (491, 330)
-    assert (s64.spec.crew.stations["marines"], s.spec.crew.stations["marines"]) == (84, 50)
-
-
-def test_truth_7_187_the_razee_is_lighter_stiffer_and_faster_than_the_64_she_was_cut_from():
-    """The plan's (Phase 5); Indf §14 truth 2. The razee displaces less than the 64 by the
-    slice measured between their lines, 238-244 tons of 35 cu ft (Ind §2.3.3; 241.1 by the
-    files); she draws 0.44 ± 0.03 m less (0.45); her righting moment at 10 degrees of heel is
-    greater by at least 4% (1,925 t at 1.65 m against 2,170 t at 1.35 m: 8.4% by the files);
-    and under plain sail on a beam reach in fifteen knots she heels less (the known truths'
-    polar form at seed 7: the razee 4.28 deg at 7.86 kn, stage A 4.04 at 7.79; the 64 4.90 deg at
-    7.55 kn, stage A 4.6 at 7.50; the frigate-36 5.46 deg at 7.97 kn). Pinned at once.
-
-    **The speed clause, pinned at stage B** (Build-Ships.md §15): her speed greater at every
-    angle from her closest to 180 degrees in 15 and 25 kn (`polar_of`: by 0.15-0.38 kn in 15 kn
-    and 0.33-0.69 kn in 25 kn; with the spanker at 191 m2 0.13-0.36 and 0.32-0.67; on the 64's
-    stand-in 0.16-0.34 and 0.33-0.66).
-
-    **Not pinned: the razee outsailing the frigate-36** (Indf §14 truth 4; D24; the Virginie
-    chase). Her best in 25 kn, 11.64 kn, meets the chase's mean of 11.2 and stands 0.01 over the
-    frigate-36's; but in 15 kn she is under the frigate-36 close-hauled and running large
-    (`polar_of`: 60 deg 4.15 against 4.29, 70 deg 6.00 against 6.14, 120 deg 7.64 against 7.86, 130
-    deg 7.26 against 7.40, 140 deg 6.86 against 6.99, 150 deg 6.43 against 6.53; with the spanker
-    at 191 m2 4.14, 5.99, 7.63, 7.25, 6.85, 6.43; stage A 4.17, 5.97, 7.60, 7.21, 6.81, 6.39), and
-    sailed (60 deg 3.53 against 3.63, 120 deg 7.51 against 7.53; stage A 3.60 and 7.47).
-    `hull_speed_kn` at the top of D24's band, 14.5, raises her
-    15-kn figures at those angles by 0.03 kn at most (7.67, 7.28, 6.88, 6.45; 60 deg not at all, 70
-    deg by 0.01); `clr_x_m` does not reach the polar (+4.1 to +5.1 m measured, no figure moved); the
-    brace limits move only with a source. Reported, not forced (Indf §9). The owner (2026-10-29;
-    Indf §17) leaves it to the tuning of both ships against the period's accounts, neither presumed
-    the one at fault: the razee may be right and the frigate-36 too fast, or the razee too slow
-    and the frigate-36 right."""
-    from tests.test_known_truths import under_plain_sail
-
-    s64, s = load_spec(SIXTY_FOUR), load_spec(RAZEE)
-    slice_tons = (s64.hull.displacement_kg - s.hull.displacement_kg) / units.LONG_TON
-    assert 238.0 <= slice_tons <= 244.0, f"{slice_tons:.1f} tons"
-    assert abs(s64.hull.draught_m - s.hull.draught_m - 0.44) <= 0.03
-
-    def righting(world):
-        hull = world.ship.hull
-        return hull.spec.displacement_kg * units.G * hull.gm_m * math.sin(math.radians(10.0))
-
-    w64 = under_plain_sail(SIXTY_FOUR, 90.0)
-    w = under_plain_sail(RAZEE, 90.0)
-    assert righting(w) >= 1.04 * righting(w64)
-    heel64, heel = abs(math.degrees(w64.ship.dyn.heel)), abs(math.degrees(w.ship.dyn.heel))
-    assert 2.0 <= heel < heel64 <= 8.0, (heel, heel64)
-    for world in (w64, w):  # both on the beam reach with way on
-        assert units.ms_to_knots(world.ship.dyn.speed) > 6.5
-    from freesail.world import ships as S
-
-    p64, p = S.polar_of(SIXTY_FOUR), S.polar_of(RAZEE)
-    for wind in (15.0, 25.0):
-        for angle in p.angles_deg:
-            if angle >= p.closest_deg:
-                assert p.speed_kn(angle, wind) > p64.speed_kn(angle, wind), (angle, wind)
 
 
 def _interval(path: str, hurt_share: float) -> float:
@@ -1959,36 +1831,6 @@ def _interval(path: str, hurt_share: float) -> float:
             gaps += [t2 - t1 for t1, t2 in zip(ticks[1:], ticks[2:], strict=False)]
     assert gaps, "no 24-pounder fired twice"
     return sum(gaps) / len(gaps)
-
-
-def test_truth_7_188_her_broadside_against_the_frigate_36s_by_70s_rule():
-    """The brief's item 6; Indf §14 truth 3. By 70's rule (`far_ship`: one side's broadside
-    guns and every chaser, `combat/far.py`), the razee's broadside weighs 510 lb as razeed in
-    1795 and 714 lb as carried from 1796, against the frigate-36's 421: ratios 1.21 and 1.70
-    ± 0.05 (counts; James's 702 for 1796 counts one 12-pounder, Indf §18 item 2). The 64's,
-    600 lb as built (1.43), is pinned beside them. The bands hold the frigate-36's quarterdeck
-    as the owner keeps it, and the 416 lb it would weigh corrected (Indf §16 item 14). Her rate,
-    in truth 7-135's form on her own files at seed 7: the mean interval of a starboard long
-    24-pounder over twenty minutes at a mark abeam, within the frigate's bands, 90-125 s with
-    the full company and 140-210 s with a quarter of each crew struck down. Measured: the razee
-    as carried 1796 108 s and 195 s, the 64 as built 103 s and 185 s; three of a 24-pounder's
-    eleven (Falconer) struck down."""
-    from freesail.combat.far import far_ship
-
-    frigate = far_ship(FRIGATE, "britain").broadside_lb
-    # her 421 lb as the owner keeps her quarterdeck, or the 416 it would weigh corrected
-    assert 416.0 <= frigate <= 421.0
-    razeed = far_ship(RAZEE, "britain", fit="as razeed 1795").broadside_lb
-    carried = far_ship(RAZEE, "britain").broadside_lb
-    assert (razeed, carried) == (510.0, 714.0)
-    assert abs(razeed / frigate - 1.21) <= 0.05 and abs(carried / frigate - 1.70) <= 0.05
-    assert far_ship(SIXTY_FOUR, "britain").broadside_lb == 600.0
-    for path in (RAZEE, SIXTY_FOUR):
-        full = _interval(path, 0.0)
-        assert 90.0 <= full <= 125.0, f"{path}: {full:.0f} s"
-        short = _interval(path, 0.25)
-        assert 140.0 <= short <= 210.0, f"{path}: {short:.0f} s"
-        assert short >= full * 1.3
 
 
 # ---------------------------------------------------------------------------
@@ -2681,38 +2523,6 @@ def test_the_gale_takes_in_her_driver_or_her_course_at_the_third_reef():
         assert bowsprit_sail_lines(ship) == ["take in the sprit topsail", "take in the spritsail"]
 
 
-@pytest.mark.parametrize("bent", [True, False], ids=["driver", "course"])
-def test_truth_7_230_the_64s_clauses_her_after_sail_at_helms_a_lee_and_hove_to(tmp_path, bent):
-    """Truth 7-230's clause left for B1 (Ext §17.7), on `sixty-four.yaml`: the driver, bent and
-    set, is her after sail on the paths by `drives_aft`: hauled flat aft at helm's a-lee, its words
-    naming it and the bowline, and brailed up hove to; the course likewise, the driver then
-    untouched in the sail room. Seed 7, fifteen knots, six points off."""
-    world = _world(tmp_path, bent)
-    after = world.ship.sails["mizzen.driver" if bent else "mizzen.course"]
-    assert after.is_set
-    name = "driver" if bent else "mizzen course"
-    start = world.clock.tick
-    world.submit("tack ship")
-    _until(world, "Helm's a-lee", 500)
-    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
-    assert f"haul aft the {name} sheet and brace the bowline to leeward" in line, line
-    assert after.is_set and math.degrees(abs(after.sheet_angle)) == pytest.approx(18.0, abs=0.01)
-    assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
-    if not bent:
-        assert world.ship.sails["mizzen.driver"].state is SailState.UNBENT
-    _until(world, "Tacked", 900)
-    start = world.clock.tick
-    world.submit("heave to")
-    for _ in range(600):
-        world.tick()
-    texts = [e.text for e in _after(world, start)]
-    assert any(e.kind == "ship.hove_to" for e in _after(world, start)), texts
-    assert any(f"brailed up the {name}" in t for t in texts), texts
-    assert after.state is SailState.IN_THE_GEAR
-    if not bent:
-        assert world.ship.sails["mizzen.driver"].state is SailState.UNBENT
-
-
 def test_the_64s_driver_is_brailed_at_up_helm_and_set_after_the_cast(tmp_path):
     """Ext §3.5 and §17.7 on `sixty-four.yaml`, the driver bent: wearing, brailed at "up helm" and
     hauled out by the wind on the new tack (Steel 1794 vol. II pp. 321-322); and it is the sail
@@ -2752,243 +2562,6 @@ def test_the_64s_driver_is_brailed_at_up_helm_and_set_after_the_cast(tmp_path):
     line = next(e.text for e in world.log if e.tick == cast and "right the helm" in e.text)
     assert line.endswith("right the helm, brace round the head yards, set the driver."), line
     assert after.is_set and world.ship.sails["mizzen.course"].state is SailState.UNBENT
-
-
-def test_truth_7_230_the_64s_clauses_her_shift_and_her_polar_with_the_driver():
-    """Truth 7-230's clauses left for B1 (Ext §17.7; Steel 1794 vol. I, OCR l. 13819-13821 and
-    24536-24538; *Venus*'s shift), on `sixty-four.yaml`.
-
-    1. **The shift at her company**, under plain sail in ten knots 120 degrees off, seed 7: the
-       course, drawing, taken in, unbent, sent down while the driver is swayed up, the boom rigged
-       out (Ext §17.11), the driver bent and set, in that order; each phase between its file's time
-       and a quarter more (measured 102, 205, 171, 137, 273 and 137 s against 90, 180, 150, 120, 240
-       and 120; the boom's rigged out by the state of the spar), the whole between fifteen and
-       nineteen minutes (1,025 s; old beside new, five phases of 888 s and the band thirteen to
-       sixteen). Trimmed, it draws ahead (5.07 kn against 4.93 under the course). Shifted back the
-       boom comes in after the unbend, 102, 205, 137, 171, 273 and 137 s, 1,025 s.
-    2. **Her polar with the driver**, bent and set in the course's place, above the course's from
-       90 to 150 degrees in ten knots, Steel's "light fair winds" (by `_balanced_speed_ms`, kn, the
-       course then the driver: 90 deg 5.32, 5.46; 120 deg 5.04, 5.18; 150 deg 4.26, 4.32; and in
-       six knots 3.23, 3.32; 3.05, 3.14; 2.56, 2.60). It holds, and is pinned.
-
-    **Measured and not pinned: her tack with the driver bent** (Ext §17.7 as built; Steel's "light
-    fair winds", Ext §17.1). "Tacked" from six points off in 15 kn 479 s against 251 s with the
-    course, in 10 kn 494 against 279; from 75 deg in 8 kn 506 against 344; she comes through the
-    wind in the same time, and the driver's 38-77 kN m of weather helm from 60 to 120 deg in 10 kn
-    keeps her from falling off on the new tack. It is the sail of a fair wind, as Steel has it, and
-    the sail to shift before working to windward: docs/dev/TuningNotes.md, the table."""
-    scenario = Scenario(
-        wind_from_deg=0.0,
-        wind_speed_kn=10.0,
-        gustiness=0.0,
-        variability=0.0,
-        ship_heading_deg=240.0,
-        ship_speed_kn=4.0,
-    )
-    world = make_world(7, SIXTY_FOUR, scenario)
-    world.submit("set plain sail")
-    for i in range(1200):
-        if i >= 400 and i % 120 == 40:
-            world.submit("trim sails")
-        world.tick()
-    ship = world.ship
-    course, driver = ship.sails["mizzen.course"], ship.sails["mizzen.driver"]
-    boom = ship.spars["mizzen.boom"]
-    assert course.is_set and driver.state is SailState.UNBENT and boom.rigged_out is False
-    start = world.clock.tick
-    assert world.submit("shift the mizen for the driver").kind == "order.accepted"
-    ends = {}
-    for _ in range(1500):
-        world.tick()
-        now = world.clock.tick
-        room = [kind for kind, _no in _in_the_room(ship)]
-        seen = (
-            ("take_in", course.state is SailState.IN_THE_GEAR),
-            ("unbend", course.state is SailState.UNBENT),
-            ("send_up", "mizzen.driver" not in room),
-            ("rig_out_boom", boom.rigged_out),
-            ("bend", driver.state is not SailState.UNBENT),
-            ("set", driver.is_set),
-        )
-        for phase, done in seen:
-            if done and phase not in ends:
-                ends[phase] = now
-        if driver.is_set:
-            break
-    began = next(
-        e.tick for e in _after(world, start) if e.kind == "evolution.started" and "shift" in e.text
-    )
-    times = dict(SHIFT_S, rig_out_boom=RIG_BOOM_S)
-    in_order = ["take_in", "unbend", "send_up", "rig_out_boom", "bend", "set"]
-    assert list(ends) == in_order, ends
-    marks = [began, *(ends[phase] for phase in in_order)]
-    took = {phase: marks[i + 1] - marks[i] for i, phase in enumerate(in_order)}
-    for phase in in_order:
-        assert times[phase] <= took[phase] <= 1.25 * times[phase], took
-    assert 15 * 60 <= ends["set"] - began <= 19 * 60
-    assert course.state is SailState.UNBENT
-    assert boom.rigged_out is True
-
-    # and back, the boom's other phase, her way on as she draws under the driver
-    start = world.clock.tick
-    assert world.submit("shift the driver for the mizen").kind == "order.accepted"
-    ends = {}
-    for _ in range(1500):
-        world.tick()
-        now = world.clock.tick
-        room = [kind for kind, _no in _in_the_room(ship)]
-        seen = (
-            ("take_in", driver.state is SailState.IN_THE_GEAR),
-            ("unbend", driver.state is SailState.UNBENT),
-            ("rig_in_boom", not boom.rigged_out),
-            ("send_up", "mizzen.driver" in room),
-            ("bend", course.state is not SailState.UNBENT),
-            ("set", course.is_set),
-        )
-        for phase, done in seen:
-            if done and phase not in ends:
-                ends[phase] = now
-        if course.is_set:
-            break
-    began = next(
-        e.tick for e in _after(world, start) if e.kind == "evolution.started" and "shift" in e.text
-    )
-    times = dict(SHIFT_S, rig_in_boom=RIG_BOOM_S)
-    in_order = ["take_in", "unbend", "rig_in_boom", "send_up", "bend", "set"]
-    assert list(ends) == in_order, ends
-    marks = [began, *(ends[phase] for phase in in_order)]
-    took = {phase: marks[i + 1] - marks[i] for i, phase in enumerate(in_order)}
-    for phase in in_order:
-        assert times[phase] <= took[phase] <= 1.25 * times[phase], took
-    assert 15 * 60 <= ends["set"] - began <= 19 * 60
-    assert driver.state is SailState.UNBENT and boom.rigged_out is False
-
-    def rigged(doc, driver_set):
-        ship = ship_from_dict(doc, "sixty-four.yaml")
-        for sid in ship.groups["plain sail"]:
-            if sid != "mizzen.course" or not driver_set:
-                ship.sails[sid].state = SailState.SET
-        if driver_set:
-            ship.sails["mizzen.driver"].state = SailState.SET
-        return ship
-
-    with_course = rigged(doc_of(SIXTY_FOUR), False)
-    with_driver = rigged(her_doc_with_the_driver_bent(), True)
-    for angle in (90, 100, 110, 120, 130, 140, 150):
-        kn_c = units.ms_to_knots(_balanced_speed_ms(with_course, angle, 10.0))
-        kn_d = units.ms_to_knots(_balanced_speed_ms(with_driver, angle, 10.0))
-        assert kn_d > kn_c, (angle, kn_c, kn_d)
-
-
-def test_truth_7_189_the_64_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails(tmp_path):
-    """Truth 7-189 (Build-Ships.md §15; Ext §10.3 item 4; D8 (b), D9 (c)), on `sixty-four.yaml` at
-    seed 7, fifteen knots, six points off under plain sail. "Mainsail haul" swings the main and
-    mizzen yards alone, the yards under the bowsprit going with the head yards at "let go and
-    haul"; the mizen yard is never braced; the course is hauled aft at helm's a-lee (above: 7-230's
-    clause) and brailed up hove to. Hove to with the spritsail and the sprit topsail set by name
-    first, they are clewed up; she lies to within truth 12's band (below 1.6 kn, 45 to 65 degrees
-    off, the heading steady within 15; measured 56-63 degrees off and 1.11 kn on the course, no
-    aback). Her classing as the frigate's row is the test above."""
-    world = _world(tmp_path)
-    ship = world.ship
-    assert ship.sails["mizzen.course"].is_set
-    assert world.submit("tack ship").kind == "order.accepted"
-    _until(world, "Mainsail haul", 500)
-    runner = ship.extra["evolutions"]
-    (tack,) = [i.script for i in runner.instances if isinstance(i.script, scripts.TackScript)]
-    assert {y.id for y in tack.swing.yards} == {y.id for y in tack.after}
-    assert {ship.mast_of(y).id for y in tack.swing.yards} == {"main.mast", "mizzen.mast"}
-    assert {"spritsail.yard", "sprit_topsail.yard"} <= {y.id for y in tack.head}
-    assert ship.spars["mizzen.yard"].brace_angle == 0.0
-    _until(world, "Let go and haul", 700)
-    assert {"spritsail.yard", "sprit_topsail.yard"} <= {y.id for y in tack.swing.yards}
-    _until(world, "Tacked", 1200)
-    assert ship.spars["mizzen.yard"].brace_angle == 0.0
-    for text in ("set the spritsail", "set the sprit topsail"):
-        world.submit(text)
-    for _ in range(600):
-        world.tick()
-    assert ship.sails["spritsail"].is_set and ship.sails["sprit_topsail"].is_set
-    start = world.clock.tick
-    world.submit("heave to")
-    for _ in range(300):
-        world.tick()
-    assert units.ms_to_knots(ship.dyn.speed) < 1.6, "not stopped within five minutes"
-    offs, speeds = [], []
-    for _ in range(600):
-        world.tick()
-        offs.append(abs(math.degrees(units.wrap_pi(ship.dyn.heading - world.wind.direction_from))))
-        speeds.append(units.ms_to_knots(ship.dyn.speed))
-    texts = [e.text for e in _after(world, start)]
-    assert any(e.kind == "ship.hove_to" for e in _after(world, start)), texts
-    assert not [e for e in _after(world, start) if e.kind == "ship.aback"]
-    assert "Clewed up the fore topgallant, the spritsail and the sprit topsail." in texts
-    for sid in ("spritsail", "sprit_topsail"):
-        assert ship.sails[sid].state is SailState.IN_THE_GEAR
-    assert ship.sails["mizzen.course"].state is SailState.IN_THE_GEAR
-    assert ship.spars["mizzen.yard"].brace_angle == 0.0
-    assert max(speeds) < 1.6
-    assert all(45.0 <= o <= 65.0 for o in offs), (min(offs), max(offs))
-    assert max(offs) - min(offs) <= 30.0
-
-
-def test_truth_7_189_she_stays_quickly_and_wears_with_her_mizen_brailed():
-    """Truth 7-189's clause of her mizen against the Bellona's report, that she stayed and wore
-    quickly (Lavery 1985 p. 9; Bel §9; Ext §12 lens 4), judgement for a 64 of her class, on
-    `sixty-four.yaml` at seed 7 in fifteen knots. Measured, in truth 10's form, from 290, 292.5 and
-    295 degrees: 244, 251 and 266 s, gaining 104, 94 and 67 m (the course's tack at 9.43 m 246, 252
-    and 262 s, 105, 95 and 66 m), under Luce's five minutes and well under the frigate-36's 343,
-    447 and 370 s (51, -37 and 25 m), which are tacked here, so that the clause says what it claims
-    if she is retuned. The band: quicker than the frigate-36's quickest (the report's "quickly",
-    which gives no time) and no quicker than four minutes, a round floor of judgement that stands 4
-    s under her quickest and has no source (stage A, her stand-in mizen course, 259, 283 and 327
-    s). She is under truth 10's 285 s at all three headings, where stage A was at two; that band is
-    not asked of her here, for the lead to rule. What sets it (TuningNotes, measured) is her small
-    after sail against her lead, not the yards under her bowsprit: she is no quicker through
-    the wind than the frigate-36, 124-132 s to "let go and haul" against 108-112, and falls off to
-    her course sooner on the new tack. In truth 11's form she wears
-    in 497 s (the frigate-36 513 s, within truth 11's six to twelve minutes), the mizen course
-    brailed at "up helm" and hauled out by the wind, its yard never braced; so the model gives her
-    no more than a quarter of a minute's quickness wearing, and that is reported, not forced.
-
-    **Measured and not pinned: lying to as the Bellona did, under the mainsail and mizen staysail**
-    (Lavery 1985, Table 2; Bel §9). With all else in and the helm a-lee she swings 44-70 deg off at
-    1.1 kn in 15 kn, 42-78 at 1.8 in 25 kn, as the frigate-36 does (42-76 at 1.5; 41-85 at 1.5): no
-    steady lie in the model, where "heave to" gives truth 12's (above)."""
-    from tests.test_known_truths import FRIGATE, close_hauled_on_starboard, until
-
-    frigate = []
-    for heading in (290.0, 292.5, 295.0):
-        world = close_hauled_on_starboard(FRIGATE, heading=heading)
-        world.submit("tack ship")
-        done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
-        assert [e.kind for e in done] == ["ship.tacked"], heading
-        frigate.append(seconds)
-    for heading in (290.0, 292.5, 295.0):
-        world = close_hauled_on_starboard(SIXTY_FOUR, heading=heading)
-        y_before = world.ship.dyn.y
-        world.submit("tack ship")
-        done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
-        assert [e.kind for e in done] == ["ship.tacked"], heading
-        assert 240 <= seconds < min(frigate), (heading, seconds, frigate)
-        assert world.ship.dyn.y > y_before, heading
-        assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
-
-    world = close_hauled_on_starboard(SIXTY_FOUR)
-    course = world.ship.sails["mizzen.course"]
-    start = world.clock.tick
-    world.submit("wear ship")
-    _until(world, "Up helm", 60)
-    assert "brail up the mizzen course" in next(
-        e.text for e in _after(world, start) if "Up helm" in e.text
-    )
-    assert course.state is SailState.IN_THE_GEAR
-    _until(world, "Haul out the mizzen course!", 700)
-    done, _seconds = until(world, ("ship.wore", "evolution.failed"), 400)
-    assert [e.kind for e in done] == ["ship.wore"]
-    assert 360 <= world.clock.tick - start <= 720, world.clock.tick - start
-    assert course.is_set and world.ship.dyn.tack == "larboard"
-    assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
 
 
 @pytest.mark.parametrize("path", [SIXTY_FOUR, RAZEE])

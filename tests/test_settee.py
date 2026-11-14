@@ -24,9 +24,10 @@ None of the committed files carries a settee (`tests/test_rig_classing.py`, the 
 tests run on the fixture `brig_with_settee()` (`tests/rig_fixtures.py`, stage 0E): `brig.yaml`
 with her main course, spanker, gaff and boom replaced by a settee cut to D5(a)'s proportions, the
 dry main yard and the main topsail above it, the main laid aback to heave to. The bilander's own
-file is B4's; her measures there are hers (her design §12.2). Two truths are drafted here for
-Phase 5, 7-198 and 7-199 (`docs/design/Build-Ships.md` §15), measured on the fixture and to be
-measured again on her file.
+file is B4's; her measures there are hers (her design §12.2). Two truths were drafted here for
+Phase 5, 7-198 and 7-199 (`docs/design/Build-Ships.md` §15), measured on the fixture and again on
+her file; both moved into `tests/test_known_truths.py` at Phase 5 (2026-11-14), their helpers
+here.
 """
 
 from __future__ import annotations
@@ -1479,112 +1480,3 @@ def test_the_luggers_tack_and_wear_are_as_they_were(order, lines):
         if e.kind != "ship.leeway" and e.tick - start <= lines[-1][0]
     ]
     assert got == lines
-
-
-# ---------------------------------------------------------------------------
-# The truths, drafted for Phase 5 (docs/design/Build-Ships.md §15): 7-198 and 7-199
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "knots, lowered_s, haul_s, factor",
-    [(15.0, 155, 97, 1.33), (20.0, 161, 96, 1.51)],
-)
-def test_truth_7_198_the_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_and_dipped_last(
-    tmp_path, knots, lowered_s, haul_s, factor
-):
-    """Truth 7-198 (drafted; Ext §10.3 item 1; D46 rules 2 and 3, D3(b)): in stays the settee is
-    kept drawing as a ship's mizen is, its ourse braced to leeward as the helm goes down, and its
-    yard is changed last, after the head yards are swung. Each rule is carried over by judgement
-    from a ship's mizen (Bourdé 1765 p. 87; Steel 1794 vol. II p. 316; Boteler p. 163) to the
-    bilander's settee, which Röding (1794 vol. II col. 581) has lowered and shifted round in going
-    about (D1(a)); rule 2 is pinned on her own dip, the yard lowered and passed round, not against
-    a brig (D46(d)).
-
-    The fixture `brig_with_settee()` at seed 7, from close-hauled on the starboard tack in 15 and
-    20 kn (B3.4's settle: 2,400 s at 292.5 degrees, 67.5 degrees off). Measured on the owner's
-    machine (2026-11-07), B3.3: at helm's a-lee + 1 tick the settee set at its floor, 8 degrees,
-    the words "haul aft the mainsail sheet and brace the ourse to leeward"; "Let go and haul" at
-    97 s and 96 s; the head yards' swing ended and the yard lowered at 155 s and 161 s ("Dip the
-    mainsail: lower the yard, pass it round abaft the mast ..."); down 159 and 181 ticks
-    (`SETTEE_DIP_S` 120 by her factor of 1.33 and 1.51), its side larboard to starboard; hoisted at
-    314 s and 342 s, "Tacked" at 318 s and 342 s; at +400 s on the larboard tack 67.7 and 66.8
-    degrees off. Judged by her heading and tack at a set time, never by the "Tacked" line
-    (D13(a)). Rule 5's clause is not pinned here: in her own tack at seed 7 the settee is never
-    aback (its single sheet lies it to leeward of the wind; Ext §5.10's measure, the tuning notes),
-    so that half goes to the lead. To be measured again on the bilander's file (B4) in Phase 5.
-    The words since, every tick the same (B3.4b, the lead's ruling (2) of 2026-11-07; Luce 1884
-    pp. 421, 428, 446): her after yards hauled by "Main-topsail haul." with her fore tack kept
-    fast, and that line "Rise fore tack and sheet. Let go and haul. ..." (at 97 s in 15 kn), where
-    they were "Rise tacks and sheets. Main-topsail haul." and "Let go and haul. ..."."""
-    world = _world(tmp_path, knots=knots)
-    settee = world.ship.sails[SETTEE]
-    start = world.clock.tick
-    world.submit("tack ship")
-    world.tick()
-    assert settee.is_set and _deg(settee.sheet_angle) == pytest.approx(LUG_FLOOR_DEG, abs=1.0)
-    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
-    assert "haul aft the mainsail sheet and brace the ourse to leeward" in line, line
-    sides, lowered = [], []
-    for i in range(2, 601):
-        world.tick()
-        if settee.yard_lowered:
-            lowered.append(i)
-        sides.append(settee.lug_side)
-        if i == 400:
-            at_400 = (world.ship.dyn.tack, abs(_rel_deg(world)))
-    haul = _first_tick(world, start, "Let go and haul")
-    swung = _first_tick(world, start, "Dip the mainsail: lower the yard")
-    tacked = _first_tick(world, start, "Tacked")
-    hoisted = _first_tick(world, start, "Dipped the mainsail; hoisted on the starboard side")
-    assert abs(haul - haul_s) <= 5 and haul < swung
-    assert lowered[0] >= swung and abs(lowered[0] - lowered_s) <= 10
-    down = len(lowered)
-    assert lowered == list(range(lowered[0], lowered[0] + down))  # one spell, not two
-    assert abs(down - scripts.SETTEE_DIP_S * factor) <= 10
-    assert sides[0] == "larboard" and sides[-1] == "starboard"
-    assert hoisted is not None and tacked is not None and tacked >= hoisted
-    assert at_400[0] == "larboard" and abs(at_400[1] - 67.5) <= 5.0
-
-
-@pytest.mark.parametrize("knots, crossed_s, hoisted_s", [(15.0, 66, 152), (20.0, 55, 168)])
-def test_truth_7_199_in_wearing_the_settee_is_lowered_as_she_bears_up_and_hoisted_past_the_wind(
-    tmp_path, knots, crossed_s, hoisted_s
-):
-    """Truth 7-199 (drafted; Ext §10.3 item 2; D46(d) rule 4 as reworded): in wearing the settee is
-    lowered as she bears up and hoisted again on the new lee once the stern is past the wind.
-    Steel's order for a ship's mizen (1794 vol. II pp. 321-322: hauled up as she bears up, hauled
-    out "as soon as the stern has passed the wind"), carried over by judgement to the dip D1(a)
-    gives the settee; the truth pins the order of events, not a clewing up.
-
-    The fixture at seed 7, from close-hauled on the starboard tack in 15 and 20 kn (B3.4's settle).
-    Measured on the owner's machine (2026-11-07), B3.3: lowered at "up helm" + 1 tick ("Up helm;
-    lower the mainsail; brace in the after yards"); the wind across the stern to the larboard
-    quarter at 66 s and 55 s; hoisted at 152 s and 168 s, the wind then 99.6 and 133.6 degrees on
-    the larboard side ("Hoisted the mainsail on the starboard side, to leeward of the mast; the
-    wind is past the stern."); "Wore" at 478 s and 520 s; at +600 s on the larboard tack 67.3
-    degrees off, both. Judged by her heading and tack at a set time (D13(a)). To be measured again
-    on the bilander's file (B4) in Phase 5."""
-    world = _world(tmp_path, knots=knots)
-    settee = world.ship.sails[SETTEE]
-    start = world.clock.tick
-    world.submit("wear ship")
-    lowered, crossed, hoist = [], None, None
-    for i in range(1, 601):
-        world.tick()
-        rel = _rel_deg(world)
-        if settee.yard_lowered:
-            lowered.append(i)
-        if crossed is None and rel < 0 and abs(rel) > 90:
-            crossed = i
-        if hoist is None and lowered and not settee.yard_lowered:
-            hoist = (i, rel)
-        if i == 600:
-            at_600 = (world.ship.dyn.tack, abs(rel))
-    up = next(e.text for e in _after(world, start) if "Up helm" in e.text)
-    assert "Up helm; lower the mainsail; brace in the after yards" in up, up
-    assert lowered and lowered[0] <= 5
-    assert abs(crossed - crossed_s) <= 10 and abs(hoist[0] - hoisted_s) <= 10
-    assert hoist[0] > crossed and hoist[1] < 0.0  # the wind on the new side of the stern
-    assert settee.is_set and settee.lug_side == "starboard"
-    assert at_600[0] == "larboard" and abs(at_600[1] - 67.5) <= 5.0
