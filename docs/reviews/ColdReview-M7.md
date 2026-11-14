@@ -57,7 +57,7 @@ Around that centre, three things have happened that the proposal did not decide:
 | 1. Bottom-up realism | **Built as decided** | Parts, strain, carrying away, damage into the graph: `freesail/ship/`, `freesail/physics/`. In play a shot parted a halyard and the gaff came down (`play/console-2`, 10:49). |
 | 2. Any rig | **Built in part** | The physics and the ship model name no mast and no sail (`code-08`, confirmed `refute-01`). Square, gaff, lug, settee and lateen sails sail. But the crew has exactly three tops, fixed in code and matched to a mast by the first word of its id (`crew/hands.py:104`, `evolutions/runner.py:1110`): a rig with other mast names still gets topmen but not her own, and a fourth mast can have no top (the second reader cut this down from the first reader's "no topmen": `refute-08`, low); every ship is treated as close-hauled at six points; and the starter book of standing orders refuses three of its seven rules on every fore-and-aft vessel (`code-06`; met in play). |
 | 3. Orders at every altitude | **Built in part** | Levels 0 to 2 are built and good. **Level 3, scripts in Python, is not in the game**: the Python interface is a library reached only by one tool and the tests; no console line, page, scenario key or model's tool gives the game Python (`code-06`, `spec-01`, `refute-04`). |
-| 4. Parity | **Built in part** | Every order ends in one `World.submit`. Above it the human and the model have different fronts, and they differ: a model officer may act on a danger and the seated player may not (`agents/tools.py:1036`, `agents/seat.py:450`); a seated player without the deck is refused `go below` and `eat` where a model is not (run by two readers). Only the captain's station is tested for parity. |
+| 4. Parity | **Built in part** | Every order ends in one `World.submit`. Above it the human and the model have different fronts, and they differ: a model officer may act on a danger and the seated player may not (`agents/tools.py:1036`, `agents/seat.py:450`); a seated player without the deck is refused `go below` and `eat` where a model is not (run by two readers). Only the captain's station is tested for parity. *[Second sitting: see 5.5, item 3.]* |
 | 5. Dynamic, not authored | **Built as decided** | Weather systems, tide, rules captains with intents, a business that draws voyages. With gaps where the far world is thin (head 2). |
 | 6. Depth over gloss | **Built as decided**, to excess in places | Head 2. |
 | 7. Period-plausible | **Built as decided** | All 108 evolution files cite a source (`code-07`). |
@@ -71,9 +71,9 @@ Verdicts: **as decided**, **otherwise** (built, but not as the proposal says), *
 | 2.2 | The control ladder, four levels, each built on the one below | **In part** | Level 3 absent from play (above). |
 | 2.3 | The player never has to write code; starter standing orders ship with the game | **As decided**, for the frigate | `data/standing_orders/starter.orders`; three of seven rules refused on the cutter, the schooners, the smack, the lugger and the bilander (`code-06`, `refute-04`). No test loads the book on any ship but the frigate. |
 | 3.1 | One-second tick; compression; roll-up of routine at high compression; free-running and lockstep | **As decided** | Run at up to 1000x. The test of the roll-up compares the page with the code's own filter and cannot fail on a wrong roll-up (`tests-01`, truth 50; fault planted, head 3). |
-| 3.2 | Determinism: same seed and orders, same log. "A saved log is a saved game." | **Otherwise** | True on one build on one platform. A build is a fingerprint of every code and data file, comments included (`core/world.py:55-83`), so any edit makes every earlier save "another build's"; the journal then replays "with the log perhaps differing" or is refused. The exact road is a pickled checkpoint held together by some fifty compatibility shims, dropped without a word if pickling fails (`core/replay.py:68-81`). The project's own tests pin different digests for Linux and Windows. A game with a Python standing order comes back two ways: replayed from its journal the rule is lost without a warning (81 events against 70 in the second reader's run); loaded from its checkpoint the rule is there. So one save is two games, by whether the checkpoint file lies beside it (`refute-08`). Decision 36 narrowed the promise to "exact from its checkpoint, a replay only on the build that made it"; §3.2 was never amended. (`code-08`, `spec-01`, `refute-01`: stands, high.) |
+| 3.2 | Determinism: same seed and orders, same log. "A saved log is a saved game." | **Otherwise** | True on one build on one platform. A build is a fingerprint of every code and data file, comments included (`core/world.py:55-83`), so any edit makes every earlier save "another build's"; the journal then replays "with the log perhaps differing" or is refused. The exact road is a pickled checkpoint held together by some fifty compatibility shims, dropped without a word if pickling fails (`core/replay.py:68-81`). The project's own tests pin different digests for Linux and Windows. *[Second sitting: see 5.5, item 9.]* A game with a Python standing order comes back two ways: replayed from its journal the rule is lost without a warning (81 events against 70 in the second reader's run); loaded from its checkpoint the rule is there. So one save is two games, by whether the checkpoint file lies beside it (`refute-08`). Decision 36 narrowed the promise to "exact from its checkpoint, a replay only on the build that made it"; §3.2 was never amended. (`code-08`, `spec-01`, `refute-01`: stands, high.) |
 | 3.3 | The ship is a graph of parts | **As decided** | |
-| 3.3 | "Ships are data files, not code. Making a new ship class, or refitting one, is editing a data file." | **Otherwise** | All eighteen files in `data/ships/` are written by `tools/gen_ships.py` and `tools/ships/` (28,810 lines of Python, more than the simulation's own core, ship and physics together). A test fails on any hand edit (`tests/test_ship_particulars.py:555-592`). The game will load an edited file; the project's own checks forbid one. (`code-08`; `refute-01`: stands in part, medium.) |
+| 3.3 | "Ships are data files, not code. Making a new ship class, or refitting one, is editing a data file." | **Otherwise** | All eighteen files in `data/ships/` are written by `tools/gen_ships.py` and `tools/ships/` (28,810 lines of Python, more than the simulation's own core, ship and physics together). A test fails on any hand edit (`tests/test_ship_particulars.py:555-592`). The game will load an edited file; the project's own checks forbid one. (`code-08`; `refute-01`: stands in part, medium.) *[Second sitting: see 5.5, item 6.]* |
 | 3.3 | The order vocabulary is generated from the ship file | **As decided** | With one fault a player meets: a misspelt sail is offered its lift, halyard and sheet as the hint, not the sail (`orders/resolve.py:295`; `refute-04`). |
 | 3.4 | The seven physics steps; weather systems, sea state, tide, day and night, depth, grounding | **As decided** | The reviewer ran aground at six knots on a course the game had warned crossed the land, and floated off on the flood (`play/console-4`). |
 | 3.5 | Individual sailors with rating, skills, fatigue, morale, health, watch | **In part** | Rating, fatigue, health and watch are per man. No man has morale. Each man's skill aloft is drawn at muster and never read. The extra fatigue for work aloft is charged only by tests (`crew/routine.py:114-123`). Fatigue at most slows work by half. (`code-07`; `refute-03`: stands.) |
@@ -104,8 +104,8 @@ Verdicts: **as decided**, **otherwise** (built, but not as the proposal says), *
 | 9 | The "cool obscure" list | **Mostly built** | Studding sails, ringtail, save-all, goose-winging, boxhauling, heaving to, lying a-try, scudding, kedging, mooring, fothering, fishing a spar, jury masts, cutting away, preventers, the lead, the log, the lunar, signals, shot types. Not found: club-hauling, springs on the cable, sweeps as an evolution, careening. |
 | 10 | Risk: "the part graph becomes an unmanageable pile of special cases" | **The risk has come in** | Not in the graph but in the scripts that work it and the world around it (head 4). |
 | 10 | Risk: "scope ... the milestone plan, and the pillars as tie-breakers" | **The mitigation was set aside** | Decisions 29 (gates lag the work), 49 (milestone 7 expands as it goes) and 51 (milestone 7b frozen open, its gate not run). Head 5. |
-| 11 | Each milestone ends in a gate passed by the owner before the next starts | **Overtaken** by decision 29, then lapsed | The README says gate m6c passed; decision 50 says it "stands run in part, its untested items deferred to the director's milestone's gate"; decision 51 says that gate was not run. By the proposal's own text no gate has been passed whole since milestone 6's first parts. To be checked against the gate reports in the second sitting. |
-| 11 | M7: "and the sails at fine control (settling the halyards, the vangs, a sail kept shivering by command)" | **Not built** | Named in the proposal's one line for the milestone. Sheets eased by the fathom and yards braced by the point exist; the rest does not (`spec-04`; `refute-07`: stands in part). |
+| 11 | Each milestone ends in a gate passed by the owner before the next starts | **Overtaken** by decision 29, then lapsed | The README says gate m6c passed; decision 50 says it "stands run in part, its untested items deferred to the director's milestone's gate"; decision 51 says that gate was not run. By the proposal's own text no gate has been passed whole since milestone 6's first parts. To be checked against the gate reports in the second sitting. *[Second sitting: see 5.5, item 7.]* |
+| 11 | M7: "and the sails at fine control (settling the halyards, the vangs, a sail kept shivering by command)" | **Not built** | Named in the proposal's one line for the milestone. Sheets eased by the fathom and yards braced by the point exist; the rest does not (`spec-04`; `refute-07`: stands in part). *[Second sitting: see 5.5, item 1.]* |
 
 ### 1.4 The sixty-nine decisions
 
@@ -123,10 +123,10 @@ Grouped where several decide one matter. A decision that only records a ruling o
 | 8, 9, 12, 13 | **As decided** | |
 | 10 Rigs as a pillar | **In part** | Pillar 2. |
 | 11 The tartane, then the bilander, then the cutter | **In part** | Bilander and cutter built; no tartane. |
-| 14 The director: "through journalled world orders and plausible causes only" | **Built, and the rule not held** | Under the gentlest starter brief a director's world order handed the player's ship to a rules captain, who made sail and turned her from west to north-east (`captain: intent ...`); wounded the player's own captain dangerously under a brief that says nobody dies; and made the player's frigate strike to a cutter the director had just put on the sea, which sent seven men aboard her as a prize crew, her 264 people prisoners and the player carried aboard the captor. The reviewer ran the first and the third himself (`probes/director-captain-intent.py`, `probes/director-wound-and-strike.py`). The "nobody dies" limit refuses only acts marked deadly, and none is so marked; the limit on an enemy's weight passes any word it cannot rank ("a line-of-battle ship" on a brief that allows nothing heavier than a cutter); an order that names the ship (`aboard the Amazon: ...`) skips the doubt and every limit; a director's `follow` moves the player's own prompt to another ship. The director's brief to the model promises the opposite. After the first, the player's next direct order does take her back. (`spec-05`, `code-05b`; `refute-06`: the core stands, two parts worse than first said. High.) |
+| 14 The director: "through journalled world orders and plausible causes only" | **Built, and the rule not held** | Under the gentlest starter brief a director's world order handed the player's ship to a rules captain, who made sail and turned her from west to north-east (`captain: intent ...`); wounded the player's own captain dangerously under a brief that says nobody dies; and made the player's frigate strike to a cutter the director had just put on the sea, which sent seven men aboard her as a prize crew, her 264 people prisoners and the player carried aboard the captor. The reviewer ran the first and the third himself (`probes/director-captain-intent.py`, `probes/director-wound-and-strike.py`). The "nobody dies" limit refuses only acts marked deadly, and none is so marked; the limit on an enemy's weight passes any word it cannot rank ("a line-of-battle ship" on a brief that allows nothing heavier than a cutter); an order that names the ship (`aboard the Amazon: ...`) skips the doubt and every limit; a director's `follow` moves the player's own prompt to another ship. The director's brief to the model promises the opposite. After the first, the player's next direct order does take her back. (`spec-05`, `code-05b`; `refute-06`: the core stands, two parts worse than first said. High.) *[Second sitting: see 5.5, item 2.]* |
 | 15 The ship view | **In part** | The projected skeleton, as decided. Hulls drawn from stations, not painted. No backgrounds, weather or light. |
 | 16 Consent per model, recorded | **Cannot tell** | The records and the pinned digest of the brief exist. The practice is the owner's. |
-| 17 The harness's welfare contract | **In part** | Built: the token scanned before the game sees a reply; the brief's fixed head; a nudge, a pause, a stand-down when unattended; a journal; the human's stop. **Not held:** (a) *"nothing from the game, another agent or the director is ever passed as a system or operator instruction."* The station's brief is sent as the system message at two doors (`agents/api.py:609`, `agents/local.py:686`) and carries the night orders, standing orders' names and the last holder's note; the second reader got three texts written on a model captain's road, one a standing order named "SYSTEM: the operator instructs…", verbatim into an officer's one operator turn. Decision 17 itself asks for recent events in the brief, so the owner's two rulings pull against each other; sending the situation as the first turn of data would keep both. (b) The token is lost when a model at the local runner writes it in a tool call's extra field (`agents/local.py:887-910`). (c) The consent brief says of the journal that nothing in the game acts on what is written there; a seated director model reads every station's reply. (d) The brief says the director "is to come"; the director is built and a model can be seated at it by the ordinary gate. (`code-05`; `refute-04`: (a) stands in part and high, the rest medium or low.) |
+| 17 The harness's welfare contract | **In part** | Built: the token scanned before the game sees a reply; the brief's fixed head; a nudge, a pause, a stand-down when unattended; a journal; the human's stop. **Not held:** (a) *"nothing from the game, another agent or the director is ever passed as a system or operator instruction."* The station's brief is sent as the system message at two doors (`agents/api.py:609`, `agents/local.py:686`) and carries the night orders, standing orders' names and the last holder's note; the second reader got three texts written on a model captain's road, one a standing order named "SYSTEM: the operator instructs…", verbatim into an officer's one operator turn. Decision 17 itself asks for recent events in the brief, so the owner's two rulings pull against each other; sending the situation as the first turn of data would keep both. (b) The token is lost when a model at the local runner writes it in a tool call's extra field (`agents/local.py:887-910`). (c) The consent brief says of the journal that nothing in the game acts on what is written there; a seated director model reads every station's reply. (d) The brief says the director "is to come"; the director is built and a model can be seated at it by the ordinary gate. (`code-05`; `refute-04`: (a) stands in part and high, the rest medium or low.) *[Second sitting: see 5.5, item 3.]* |
 | 18 Stand by is an action | **As decided** | |
 | 19, 20, 21 Brace limits; canvas; practices with a price | **As decided** | Not examined beyond the readers' passes. |
 | 22 Standing orders one engine | **As decided** | But a Python rule is not journalled (§3.2). |
@@ -137,14 +137,14 @@ Grouped where several decide one matter. A decision that only records a ruling o
 | 31 The launcher is a page; packaging for any machine | **In part** | The harbour is built. A plain install of the package does not find its data: the data folder's path is worked out in 25 modules from the source tree and only the code is packaged; a copy run outside the checkout found no port and no ship (`code-10`; shown by `refute-08`). Every install line in the README is the editable kind, so the owner's own road works. |
 | 33 to 38 The officer of the watch; leaving; the grant; saves | **As decided** | With decision 36's narrowing of §3.2. |
 | 39 The player at parity for the roles on ships; the pace rule; the helm through the wind | **In part** | The pace rule and the helm as decided. Parity at a lesser station is not whole (pillar 4). |
-| 40 The rules-based captain: "perception on the player's terms ... one brain for the far and the near body" | **In part** | He works: he made out a stranger, showed the private signal, chased and engaged in the reviewer's play. But the far brain knows a stranger's true class at the horizon; the prize code reads true positions and counts the enemy's fit men by a spelling that slips past the test meant to forbid it (`world/captains.py:4326-4337`, `4556-4576`; `tests/test_captains.py:280-294`); there are four rule engines, and a ship behaves differently inside and outside four miles. Twelve keys of the doctrine files are read by nothing, and one whole block of the cruiser's is mis-indented and inert. (`code-02`, `spec-03`; `refute-02`, `refute-06`: narrowed, medium.) |
+| 40 The rules-based captain: "perception on the player's terms ... one brain for the far and the near body" | **In part** | He works: he made out a stranger, showed the private signal, chased and engaged in the reviewer's play. But the far brain knows a stranger's true class at the horizon; the prize code reads true positions and counts the enemy's fit men by a spelling that slips past the test meant to forbid it (`world/captains.py:4326-4337`, `4556-4576`; `tests/test_captains.py:280-294`); there are four rule engines, and a ship behaves differently inside and outside four miles. Twelve keys of the doctrine files are read by nothing, and one whole block of the cruiser's is mis-indented and inert. (`code-02`, `spec-03`; `refute-02`, `refute-06`: narrowed, medium.) *[Second sitting: see 5.5, item 3.]* |
 | 41 A direct order makes the rules captain stand aside | **As decided** | And it is how the reviewer's first action went silent: head 1.5. |
 | 43 Stations are data bound at run time | **As decided** | |
 | 46 A world order is not shown as sent | **As decided** | |
 | 50 A world order doubted, not refused; "the brief's hard limits stay refusals" | **Half built** | The doubt is built. The hard limits do not refuse (decision 14). |
-| 52, 53 One world | **As decided**, with seams | Eight forms of "a ship in the world" and three overlapping flags (`code-02`). The player's shot does nothing to any ship without a captain's brain, which is every merchant in about twelve scenarios and every mark in `tender.yaml`, the scenario of decision 52's own acceptance test (`refute-02`). |
+| 52, 53 One world | **As decided**, with seams | Eight forms of "a ship in the world" and three overlapping flags (`code-02`). *[Second sitting: see 5.5, item 5.]* The player's shot does nothing to any ship without a captain's brain, which is every merchant in about twelve scenarios and every mark in `tender.yaml`, the scenario of decision 52's own acceptance test (`refute-02`). |
 | 56 Twenty hull classes; the Spanish and Mediterranean five | **In part** | Thirteen classes in files. None of the five. |
-| 59, 62 The player reads by his place | **In part** | True at the console. In the browser the hiding is a grey over readouts: the snapshot still carries the speed and every sail, and the map and the ship view ignore his place (`code-09`, `refute-05`). |
+| 59, 62 The player reads by his place | **In part** | True at the console. In the browser the hiding is a grey over readouts: the snapshot still carries the speed and every sail, and the map and the ship view ignore his place (`code-09`, `refute-05`). *[Second sitting: see 5.5, item 4.]* |
 | 60 A reply's prose is the person's own note | **As decided** | See 17(c). |
 | 63 The command devolves; a told order is the captain's word | **As decided**, with a fault | "Do not cut away the mainmast", told to a station, is read as leave to cut it away: the match is by substring and comes before the guard on what cannot be undone (`world/reports.py:821-823`; run by the second reader). |
 | 64 Spain and the Mediterranean in every nation's table | **In part** | Kept for Spain in three tables sampled; not for the Mediterranean states in any of them (`spec-04`). |
@@ -200,7 +200,7 @@ And the data: the chart, 359 MB in 2,325 tiles; 121 ports; six nations' signal b
 
 **F2.5 The director's milestone.** *Weight: medium. Confidence: sure.* The roadmap called it "small once both exist". Its new modules are some 16,000 lines and its tests some 12,000; its specification is 182,000 characters. Its guardrails, the part that matters most, are the part with holes (decision 14).
 
-**F2.6 Milestone 7 past its first target.** *Weight: medium (cost and order), within the owner's leave. Confidence: sure.* The proposal's first target was "a single-broadside engagement between two small vessels". Milestone 7 now holds boarding in rounds, prize courts with dated shares, parole, cartels and courts martial, practice firing and resupply at eleven ports, signal books for six nations, sixteen nations, boats as vessels, water and health. Its own one-line promise of the sails at fine control is not built; nor are sight across the land, collision (grappled ships overlap on the chart) or the gybe as an evolution.
+**F2.6 Milestone 7 past its first target.** *Weight: medium (cost and order), within the owner's leave. Confidence: sure.* The proposal's first target was "a single-broadside engagement between two small vessels". Milestone 7 now holds boarding in rounds, prize courts with dated shares, parole, cartels and courts martial, practice firing and resupply at eleven ports, signal books for six nations, sixteen nations, boats as vessels, water and health. Its own one-line promise of the sails at fine control is not built; nor are sight across the land, collision (grappled ships overlap on the chart) or the gybe as an evolution. *[Second sitting: see 5.5, item 1.]*
 
 ### 2.3 Where a thing the game leans on is thin
 
@@ -329,7 +329,7 @@ Beyond head 5.3's list of what the reviewer met in play:
 - **Order.** Several module fixtures are changed by the tests that read them, so that tests pass by file order (`test_anchor`, `test_staying`, `test_via`, the pace test on the shared passage).
 - **The clock.** Wall-clock assertions sit in the fast tier (`test_chart.py:300, 336, 340`; truths 7-284 and 7-441) and will fail on a loaded machine; two door files race real time in fractions of a second.
 
-**The release gate's pace tests sit on the edge.** The floor is 500 ticks a second; the project's own note says a cloud runner gives 480 to 520. The floors elsewhere are loose the other way: half the measured speed, or read from the code under test (truth 7-138: a floor of 60 against 538 measured).
+**The release gate's pace tests sit on the edge.** The floor is 500 ticks a second; the project's own note says a cloud runner gives 480 to 520. *[Second sitting: see 5.5, item 8.]* The floors elsewhere are loose the other way: half the measured speed, or read from the code under test (truth 7-138: a floor of 60 against 538 measured).
 
 **How pins are moved.** By editing the number and writing the package in a comment beside it. The comments are long and honest and point into `docs/dev/`. Nothing in the tree makes a moved pin say what changed in the game and whether that was meant. (What the records require of a builder before a step is reported, and what that lets through, is for the second sitting.)
 
@@ -461,6 +461,194 @@ Each is a sentence in the tree and the thing that contradicts it.
 
 ---
 
+## Head 5, continued: the second sitting (the records and the sealed notes)
+
+Everything above this line under heads 1 to 5 was committed (`b72ed89`) before any record was opened. What follows was written after: the work packages of every milestone, the tuning notes, the gates, the playtests' notes, the design notes with the project's earlier cold review, and the lead's sealed notes, each read by a reader told to set it against the first sitting (`records-01` to `records-06`, `sealed-notes-tried`), with the reviewer reading the heads of the main records and checking the claims he repeats here.
+
+### 5.5 Corrections to the first sitting
+
+The records show the first sitting wrong, or short, in these places. None is rewritten above; each is corrected here.
+
+1. **The fine control of the sails, the gybe and sight across the land** (§11 in 1.3; F2.6) are not oversights. The owner booked them as packages 78a and 78b on 10 November and they are held for this review; **collision** was dropped by him. They remain unbuilt, and the proposal's line for milestone 7 still names the first.
+2. **The director making the player's ship strike** (decision 14) is a form put in the director's table on purpose, for a scenario's start, guarded only by a doubt "after the first minute" (`docs/design/Design-Prizes.md:1353-1357`; `agents/director.py:986-993`). The finding stands (the proposal and the director's own brief say he cannot, and no limit refuses it), but it is a design that breaks the rule, not a slip. The director's reach onto every hull was briefed as a feature (`docs/dev/M7-WorkPackages.md:7670`), and no brief asks for the limits to be tested.
+3. **The brief sent as the system message** (decision 17(a)) was asked for by the lead's brief of package 42 (`docs/dev/M6-WorkPackages.md:735-736`). **Parity tested only at the captain's station** (pillar 4) was package 44's brief (`:1665`). **The far captain knowing true positions** (decision 40) was package 43's brief (`:1346`). Each is a brief of the lead's set against a rule of the proposal's, and built to the brief.
+4. **The browser's map and ship view not following the player's place** (decisions 59, 62) is a ruling, the grey over the readouts package 99's design, held by the owner (`docs/design/Design-PlaceKnowledge.md:413-420`). That the figures still travel to the page stands.
+5. **Two of the "eight forms of a ship"** (decisions 52, 53) were chosen in the one-world study.
+6. **The ships as the output of code** (§3.3; F2.1) was "the lead's structural decision, agreed" (`docs/dev/M7-WorkPackages.md:9642`). The proposal's sentence was never changed. The generator's drift from the engine's sail law was written down in `docs/design/Build-Ships.md:2248` and left as nobody's job.
+7. **The gates** (§11; 5.2). Worse than the first sitting said. By the gates' own reports **no gate of milestone 6 was ever passed**: m6a still reads open, m6a-2 was never cut, m6c is "run in part" (five of thirteen items, three of the five failing what they expected). The last gate passed is m5c, on 8 October, and that "provisionally" on one half with the lead's own watch withdrawn. The README's "gate m6c passed" is false by the gate's first line (checked by the reviewer). The eight items m6c deferred went to a gate that was frozen and never run, and the interim gate does not carry them.
+8. **The pace on a cloud runner** (3.7) spreads from 382 to 677 ticks a second by the tuning notes, not 480 to 520.
+9. **Determinism** (§3.2) is by the C library, not only by the operating system: nine recorded passages moved when the cloud's image changed. The remedy pinned one workflow's image and left the other floating (`docs/dev/TuningNotes.md:22871-22912`).
+10. **The "sheet-tending" fault** the earlier review's ruling left "not now" was in fact mended.
+
+### 5.6 Where the record and the thing differ
+
+Each checked against the tree by a reader; the first, second and eighth by the reviewer.
+
+| The record says | Where | The thing |
+|---|---|---|
+| "Gate m6c passed" | `README.md:5` | "Verdict: run in part" (`docs/gates/gate-m6c.md:3`). |
+| Milestone 7's interim gate is "drafted" | `README.md`; `docs/gates/gate-m7-interim.md` | Drafted on 30 October. Everything it waited on was merged by the 31st. It is still pending, none of its seventeen items run, and no ruling says why. Its draft says the guns are cast loose at quarters; they are not. As written it would have caught almost none of what the reviewer met in play. |
+| The director's hand on the followed ship is refused (package 62) | `docs/dev/M7b-WorkPackages.md` | Refused for one spelling. `captain: intent` is dispatched before the check (`world/orders.py:272-273` against `300-303`). |
+| "The brief's hard limits stay refusals" | decision 50 | Package 50's own merge record says the limit "nobody dies" has "nothing yet for them to refuse" (`docs/dev/M7b-WorkPackages.md:321-322`, 17 October). It still has nothing. |
+| Package 70 "built as briefed": the tack at quarters "slower by exactly the hands it takes" | `docs/dev/M7-WorkPackages.md` | The record's own figures show the tack faster; the truth's assertion was loosened to "at most 1.15 times" to fit. A fault planted there survives (head 3.3). |
+| Package 74 closed "with the far fight" | `:4500` | A far warship that goes to engage from a passage drops her leg; the lead bisected it to 74's fourth step (`:10498`); the mend is on a branch not merged; the code is unchanged at this commit. |
+| Package 84 (the one world) "green at every merge" | `docs/dev/M7-WorkPackages.md` | Its fifth run failed and the steps were mended after the merge. The design study costed a façade in which each ship hands shared things to the world; what was built is the reverse, a "current hull" switch inside the world, whose faults stayed hidden under green suites for thirteen packages, one test passing only because of the fault (`docs/design/Design-FacadeReaders.md:24-25`). |
+| "Never a test skipped, disabled or quarantined" (the head rule of every milestone) | `docs/dev/M7-WorkPackages.md:9-10` | The 74's pace test "was taken out by the lead at the merge" when she measured 505, 476 and 492 against a floor of 500 (`tests/test_bellerophon.py:2188-2196`; `docs/dev/M7-WorkPackages.md:10496`). |
+| "No model identifier in any file of the repository" (the same head rule) | `:7` | The record that states the rule names the models' tiers some 120 times, in the same paragraph and through its tables, while the lead sweeps builders' diffs for them. The playtests' folders are named for models. |
+| Runs recorded as "green whole" | the merges' records before run 81 | No cloud run before run 81 played the browser's plans: the probe's own brief made it skip where no browser is installed. Run 77 was "green" with a plan broken by a merged step. The lead found and recorded this himself (`:119`). |
+| "An expected failure is a debt" | `docs/dev/M7b-WorkPackages.md:858` | Broken by two packages in the same week; eight stand in the first half of the truths alone. |
+| The ship the player is aboard carries her own far body (package 60, "proved by 7-481") | `docs/design/Design-ShipBought.md:926-938`, `1125-1129` | Package 60 is not merged and truth 7-481 does not exist. Under `--ship` or `follow` the far body is left behind: nothing at the start, 925 metres after five minutes, two miles after twenty (run by the reader). **A fault the first sitting did not find.** |
+| The officer's context budget | `docs/dev/TuningNotes.md:24386`, `24778` | Raised by 500 tokens a package "as the lead's ruled practice"; the fault under it (the officer asked for a handover at his first sample at a local model's size) was flagged on 17 October (`:6273`) and never mended. |
+| Decision 68's rules on slavery | the proposal | Kept only because nothing exists that could break them, plus one test on one port's market. Nothing in the code refuses a person as a good: a market takes whatever its file lists. The prize court's head money of £5 a man would break the decision's words if read literally; the owner should say what the sentence means. |
+
+### 5.7 What the project already knew, and what it did not
+
+**Known, written down, and left:**
+
+- The boundary, with three crossings and their line numbers; the duplicated code; the two oversized files; tests that pin rather than prove; the performance. All in the project's earlier cold review of 30 September (`docs/design/ColdReview-2026-09-30.md`). The owner's ruling put each "not now" (decision 29). Six weeks on: the crossings in `core` are nineteen; `scripts.py` has gone from 2,977 lines to 9,095; the frigate from 800 to 1,000 ticks a second to between 480 and 650.
+- The "nobody dies" limit refusing nothing (17 October). The enemy-weight limit: mended for one word after a playtest, the hole for any word it cannot rank left.
+- The guns left secured: met in a playtest of 5 November, when a director told a model captain "the guns are still secured"; the lead filed it under "What held".
+- The starter book refused on the cutter: found on 4 and 5 October ("5 of its 9 standing orders are refused for a cutter") and lost among a review's "small faults".
+- The harbour open to anyone who can reach its port; the consent brief's "to come" for the director (flagged four times, deferred to a package not run); the seated player refused readings and `eat` (found, then lost).
+- The pace floors inside the machine's noise; the truths that only call other tests; the helper defined twice (the lead's sealed notes).
+- Vessels crossing the land (8 of 35 at a sample), the report repeated to the captain below, a kedge that cannot be weighed aground: in the tuning notes among **144 "found on the way", 31 "not mended" and 268 "for the lead"**; five checked in the code are all still there.
+
+**Not known before this review** (no record names it):
+
+- The roads by which the director takes the player's ship (`captain: intent`, `ship "…": intent`), moves his prompt (`follow`), or skips every limit by naming the ship.
+- The purchase with the boat lost.
+- The server's socket open to any page, with the file commands behind it; the checkpoint that runs code.
+- The true position recoverable from the log's data (a package had promised "no reading gives the true position by any road").
+- The token lost in a tool call's extra field; another model's words in the operator's turn as a breach of the consent brief's own sentence.
+- That player Python is not in the game at all (the close-out of milestone 5 handed "officers writing Python" and the sandbox to milestone 6, which never briefed it).
+- The wheel: lost in a hand-off between three packages, each of which thought another had it.
+- The far fisherman's haul on the player's hold; the blockade's rendezvous; the player's shot into a ship with no brain.
+- The size of what the tests do not prove (head 3).
+- **A first game.** Nothing about a newcomer's first game or a tutorial appears anywhere in the milestone's record.
+
+**The owner knew what he wanted.** On 27 October, after playing: "playability and understandability", and additions that "integrate holistically". The work that followed was the one-world refactor, the charts and the hulls.
+
+### 5.8 The lead's method, as the records show it
+
+**How a package runs.** The lead writes a brief; the owner approves it; a builder (a session of its own, on a branch of its own) builds it in steps; the lead reads the diff, runs his own fast tier on a trial merge (forty to seventy-five minutes), merges, runs the whole suite in the cloud, plays the package briefly and writes the record. Since 28 October a builder runs the fast tier once on its final tree and the slow tier of the files it touched. The senior builder is by rule "generously scoped ... trusted with the design, not fenced to a list ... growing a part where the work shows it should".
+
+**What is good in it,** said once: the briefs are careful; sources are demanded for numbers; the lead records his own errors as plainly as others' (every reader of the records said so); a builder's work is never merged unread; the owner is asked, in words he can judge, before scope is added.
+
+**Where it lets things through.**
+
+1. **One reader.** Packages 70 to 101 were merged on the lead's reading alone. The first independent reading of a package was on 10 November. The lead's own note says what happened when there was one: three rounds of independent reading of one package found some twenty faults its green suites had not, and each round's mends brought new ones.
+2. **"Green" has meant less each month.** In September, the builder's whole suite. From October, the fast tier and the files touched. By the director's milestone, one suite a wave. Whole only since run 81. A builder's suites are cut short by container restarts; three builders were found asleep for hours.
+3. **Pins are moved by the builder who broke them.** The record of a re-pin (173 of them in the tuning notes) gives the old figure, the new and the cause. It never says the change was meant, or that anyone but the builder judged it. At least once it was "taking each figure the run gave".
+4. **Faults are found late, by the owner playing.** The owner at the prompt found all of two packages of mends; later builders, chiefly the ships' session, found the rest; days to weeks after merges whose suites passed. No fault found late is traced to the test that should have caught it.
+5. **Hand-offs lose things.** The wheel; the findings of gate 6c given to a package whose brief does not hold them; the sandbox; the playtests' "small faults". There is no single list of what is owed.
+6. **The briefs, not the proposal, are the working law,** and where they differ the proposal is left standing (5.5, items 2, 3 and 6). The owner approves a brief; he cannot see from it that it sets aside a rule he approved earlier.
+7. **Packages grow and split.** Twenty-six lettered packages in milestone 5, thirteen in 6; milestone 7 from about twelve in its specification to about sixty-four, nearly all by the owner's word at the lead's proposal. On 13 November the owner asked for no more to be added.
+8. **The review's own launch** was to wait until the work in flight had settled. One package had been reported three times and not merged, and the review was launched.
+
+### 5.9 The cost, as the records show it
+
+- **The suites.** On 1 October the fast tier was 1,866 tests in one to three minutes. On 13 November it was about 7,600 in 54 to 59 minutes. The tiers were measured once and never again. A whole run in the cloud went from about 40 minutes in late October to about 70, at most 116; 91 cloud runs in seventeen days. The two-hour limit on a builder's run was met at least fifteen times. By the lead's sealed notes a builder's three tiers take about four hours.
+- **The account's usage** paused one package at 95 per cent of a week's allowance and later stopped every session until the week turned. The order of packages is set in part by which model's allowance is left.
+- **The ships.** One ship took 7,401 lines of research, design, generator and tests; another 11,207. The plan said "most of a day" a ship; the work ran sixteen days. The ships are two-thirds of the design notes by size, a quarter of the tuning notes, and no note weighs any of it against "ships are data files".
+- **The records.** `docs/dev/` is 4.9 MB; the tuning notes alone 2.9 MB in 28,704 lines; the design notes 3 MB. Sixty-three per cent of the commits in the visible week touch only documents (by lines, code still leads). Recorded play is 82 MB, an eighth of the repository; its saves carry the owner's user-profile folder name thirty-two times (no address and no key).
+
+### 5.10 The records as records
+
+They are honest and they cannot be used. The tuning notes do their stated work, why a number is what it is, for their first six hundred lines; after that they are a diary in the order things were merged, with no index, in which a mend can stand before its finding and four faults since mended are still written as open. A number can be found by searching for it (ten pins tried: one to four searches each), and what is found is as often a history as a reason: the pace floor's premise lapsed long ago; the tack's band was moved to fit the build. The work packages' table is fifty-one rows whose status cells are dated diaries, out of order, with no word of which rulings still bind. No package's section says its state. The specifications are the same (5.4). **The owner cannot learn the state of his project from its records;** he learns it from the lead, and the lead from memory and search.
+
+### 5.11 The sealed notes
+
+{{SEALED}}
+
+---
+
 ## Head 6. What to do
 
-*(Written in the second sitting, after the records.)*
+In the owner's order: a continuation, with what each step buys; the refinements existing systems want before more is laid on them; the integrations of head 4 ranked; the hazards; what to stop.
+
+### 6.1 The continuation, in order
+
+**Step 1. Mend what is unsafe or untrue today.** Days, not weeks; no new feature.
+
+- *The server.* Check where a socket's request comes from and require the page's own token; take the file commands off the socket; do the same for the harbour's route that writes a command. *Buys:* a game a friend can run without any web page he has open being able to read his files.
+- *The checkpoint.* An exact list of the classes a checkpoint may hold, no `getattr`, no whole modules; and correct the sentence that says it cannot run code. *Buys:* a save folder that is not a program.
+- *The director.* One rule of reach judged on every channel that can touch the player's hull, his person or his prompt; limits that refuse (mark the deadly acts; refuse a weight that cannot be ranked); `follow` not the director's; tests that go in through the director's door. Then either the proposal's sentence or the forms change, and the owner says which. *Buys:* a director whose brief is a guardrail, as §7.6 promised the player.
+- *The consent brief against the code.* The owner's own process, and his call: change the code (the situation sent as data, the whole call scanned for the token, the director's reading of journals said) or revise the brief and ask again by his rule. Until then no new station is offered to a model. *Buys:* that what a model agreed to is what is done.
+- *The player's road.* The guns' warning; payment after the boat is known to be there; the starter book by rig; the list of 5.3. *Buys:* a first fight and a first port that do not fail in silence.
+- *The README and the proposal's status line* made true.
+
+**Step 2. Hold a gate.** The project has not passed one since 8 October. Not the interim gate as drafted: a newcomer's gate. The owner, or better someone who has never played, starts from the harbour page and takes a ship through a passage, a fight and a port, with nothing added first but step 1. Write the player's-road tests (3.8, item 10) before it, from what the reviewer's play and the owner's found. *Buys:* the first true measure in five weeks of whether this is a game, and a list of what to mend that comes from play and not from momentum.
+
+**Step 3. The first hour.** A first game named on the harbour page; the lessons listed as lessons; the gates' and the tests' scenarios out of the player's list; the Sailing Master's first passage, which the proposal put in milestone 8 and which is cheap now because the primer and four lesson scenarios exist. *Buys:* every other system, for a new player.
+
+**Step 4. Make the suite cheaper and truer** (3.8, in its order). *Buys:* hours back on every package, and a green run that means what it says.
+
+**Step 5. Draw the boundary and stop it moving.** First a test that counts today's crossings and fails if there is one more. Then the nineteen in `core`. Then `world` against `agents` and `ui`. *Buys:* that a change in a door cannot break a tick; that the simulation can be tested and timed alone; the performance work the earlier review asked for becomes possible.
+
+**Step 6. The integrations of 6.3,** each a package with its tests written first.
+
+**Step 7. Say what the proposal now is.** A third version, true to the tree: the promises not kept either built or struck (level 3 and its sandbox; "a saved log is a saved game"; "ships are data files"; the catalogue "is data"; the true position "by any road"); the decisions that decide kept, the diary moved to the records. One page of "as built" for each subsystem in place of seven histories. *Buys:* that the owner can hold the work to a document again.
+
+**Only then, new scope,** and in this order: what milestone 7 still owes by its own line (the sails at fine control, sight across the land), its gate, and then the content: ships, charts, the range of years, a career.
+
+### 6.2 What existing systems want before more is laid on them
+
+| System | Before more is added | Why |
+|---|---|---|
+| Ports (121) | Hull repair and lower masts at a yard; a crew pool that refills; demand in the market; war counted once | More ports multiply a thin thing. |
+| The data files | A schema that refuses a key it does not know, for ports, captains' doctrines and evolutions | 121 ports, 11 doctrines and 108 evolutions in which a typo is silent; twelve doctrine keys and a whole block already inert. |
+| The chart | Tiles out of plain git (a large-file store or a release's asset); a world that loads the regions it is in | A gigabyte to clone; six to eleven seconds to begin a game. |
+| The far world | A ship with no brain that can be hit; the far fisherman's haul on her own hold; the land not crossed; the player's ship keeping her far body | The world the player mostly meets. |
+| The fight | The player's road; the wheel; boarders who leave their guns; `repel boarders` that ends | Head 1.5. |
+| The crew | The fatigue of work aloft charged in play; skill aloft read or struck | §3.5's promise. |
+| The director | Step 1 | |
+| The ships | The generator's sail law taken from the engine; then no new hull until step 3 is done | The largest block of work in the project serves its least urgent need. |
+| The records | 6.5 | |
+
+### 6.3 The integrations of head 4, ranked
+
+By what joining buys against what it risks.
+
+1. **One table of the world-order forms** (F4.3) that carries, for each form, its grammar, its reach and its harm, read by the channel, the director and the doubt alike. *Buys* the director's guardrails by construction; removes four copies of the channel list. *Risk* low: the forms are few and listed.
+2. **One router for a typed line** (F4.2), used by the prompt, the models' tool and a sleeping hull. *Buys* parity by construction; a new verb in one place. *Risk* medium: the three orders of trying differ today and tests pin each.
+3. **One function that trades** (F4.4). Small; mends the purchase fault once.
+4. **One core for the doors** (F4.5): the turn made into messages, the reply parsed, the token scanned, the budget kept. *Buys* the consent brief's promises in one place. *Risk* medium: three vendors' shapes.
+5. **One perception and one table of roles for a captain,** far or crewed (F4.8). *Buys* a ship that behaves alike inside and outside four miles.
+6. **The boundary** (F4.1; step 5).
+7. **One speller of numbers, distances and times** (F4.9). Small.
+8. **The picture:** serve the rig's skeleton from Python as the hull's stations are, or test that the two agree (F4.6). *Risk* medium: 1,600 lines of JavaScript.
+9. **The fight's sums shared across the levels of detail** (F4.7).
+10. **One driver under the console and the server** (F4.10).
+
+The lead's own list under this head (5.11) adds four more, of which the ways a thing is dated matters most before the range of years is built.
+
+### 6.4 Hazards to avoid
+
+**In the code.** The import inside a function as a habit (1,767 of them): each is a crossing nobody decided. The bare catch. A new level of detail that copies a sum. `freesail/world/` as the place every new thing goes. Tests that import other tests. History in comments.
+
+**In the data.** Files that look like data and are the output of programs, with tests that forbid a hand's edit. Keys nothing reads. One year's picture written as if dated. No schema. Binary tiles in git.
+
+**In the repository.** A gigabyte clone that grows with every chart block. Checks that run nothing on a document the game serves. A checkout one commit deep that makes tests skip. Recorded play with a user's folder name in it. No licence file though one is declared. An install that works only in the editable form.
+
+**In the process.** A milestone "frozen open". A gate that lags until it lapses. A brief that sets aside a rule of the proposal without saying so. One reader for both the code and the record of it. A builder "trusted with the design" on a package with no gate behind it. Pins moved by whoever moved them. Findings handed between packages with no list. A review launched before its condition was met.
+
+**In the cost.** A suite that grows by a thousand cases a week with nobody measuring it. Suites restarted by every merge. Packages ordered by which model's allowance is left. Records that cost more to write than anyone can afford to read.
+
+### 6.5 What to stop doing
+
+1. **Stop adding content** (ports, chart blocks, hulls, signal books, nations' tables, eras) until a gate is passed and a newcomer can begin.
+2. **Stop freezing milestones open.** A milestone closes at a gate or is cut down until it can.
+3. **Stop writing history into the code and the data.** What a line does goes beside it; why it changed goes in the commit. The 7,600 package numbers can stay where they are; add no more.
+4. **Stop pinning what the code gives** without a reason a reader can check, and stop the builder who moved a pin being the one who passes it.
+5. **Stop calling tests from tests,** and stop hand-keeping the tiers.
+6. **Stop using the specifications and the proposal as running records.** A decision decides; a diary goes in `docs/dev/`.
+7. **Stop merging on one reading.** An independent reading before the merge of anything a player or a model will meet. The lead's own experience of one package says what it finds.
+8. **Stop adding to scope by decision without taking something off.** Decisions 54, 56, 58, 67 and 69 each added a field of work; none removed one.
+
+### 6.6 How this sits with the reviews that follow
+
+The brief proposes that packages 103, 96 and 92 follow this review, each amended by what it finds. The reviewer's advice, for the owner to settle:
+
+- **96 (a ship's configuration, and the harbour presenting it)** first, and amended: the harbour's first duty is the newcomer's first game (step 3), before it presents every configuration the game has.
+- **103 (the years 1792 to 1825)** after the gate, and amended: the schema for the data files and one reader of a dated row come first (6.2; 5.11), or thirty-three years of rows will be written into files where a typo is silent.
+- **92 (a career)** last, and not begun until steps 1 to 5 are done: it lays a new layer on the ports, the far world and the director, the three systems this review found least held to their rules.
