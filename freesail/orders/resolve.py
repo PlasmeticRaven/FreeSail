@@ -102,6 +102,12 @@ class NounTable:
                 kind = existing.kind if existing.kind == noun.kind else "shorthand"
                 plural = existing.plural and noun.plural
                 self.entries[k] = Noun(merged, kind, existing.name, existing.rank, plural)
+        if suggest and phrase not in self._names and self.entries[k].ids == noun.ids:
+            # the plain words of a part whose raw id ("fore.topsail") was entered first under
+            # the same key, unsuggested: still this part's, and so the hint for it (the cold
+            # review of 2026-11-14, 5.3 item 11; package 115 D4: "set the fore topsial" was
+            # offered the fore topsail's lift, halyard and sheet, and never the sail)
+            self._names.append(phrase)
 
     @property
     def names(self) -> list[str]:

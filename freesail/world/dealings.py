@@ -2678,7 +2678,10 @@ class Dealings:
         used = {s.name for s in crew.sailors}
         r = Rating(rating)
         deck, aloft = RATING_SKILL[r]
-        start = len(crew.sailors)
+        # numbered after the highest number ever given (`Crew.next_number`), not the length of
+        # the list: a man buried or away in a prize crew keeps his number (the cold review of
+        # 2026-11-14, 5.3 item 13); with nobody gone the two are the same
+        start = crew.next_number()
         entered = []
         for i in range(n):
             name = f"{abbreviate(stream.choice(given))} {stream.choice(surnames)}"
@@ -2698,6 +2701,7 @@ class Dealings:
             )
             crew.sailors.append(sailor)
             entered.append(sailor.name)
+        crew.issued = start + n
         crew.reindex()
         word = {"able": "able seamen", "ordinary": "ordinary seamen", "landsman": "landsmen"}[
             rating

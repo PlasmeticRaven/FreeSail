@@ -365,6 +365,26 @@ def _called_lately(log: Any, kind: str, now: int) -> bool:
     return False
 
 
+def _reported_lately(log: Any, what: str, now: int) -> bool:
+    """Whether the same words were sent down to the captain within the hour and he has not
+    come on deck since: the officer does not send the messenger down again to say what the
+    captain has just been told (the cold review of 2026-11-14, 5.3 item 5; package 115 D4:
+    "the sail on the larboard quarter lost sight of" sent down eight times in twelve
+    minutes, each a sail of the world's business passing out of sight in the same words).
+    The reports' guard, as `_called_lately` is the calls'."""
+    i = len(log) - 1
+    while i >= 0:
+        e = log[i]
+        if e.tick < now - 3600:
+            return False
+        if e.kind == "captain.on_deck":
+            return False
+        if e.kind == REPORT_MADE and str((e.data or {}).get("text") or "") == what:
+            return True
+        i -= 1
+    return False
+
+
 def tick(world: Any) -> None:
     """Each tick of a hull: the calls for the lines of the tick before (the officer sends
     at once), the reports for the lines of the minute before (the messenger's minute), the
@@ -411,6 +431,8 @@ def tick(world: Any) -> None:
         what = _what(e)
         if what is None or _why_called(world, e, what) is not None:
             continue  # nothing to report, or it was a call already
+        if _reported_lately(log, what, now):
+            continue  # he was told this in these words, and has not been up since
         world.record(
             Severity.NOTABLE,
             REPORT_MADE,

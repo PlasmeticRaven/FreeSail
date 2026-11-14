@@ -17528,7 +17528,7 @@ def test_truth_7_617_a_rule_held_back_by_no_stranger_says_so_once_and_it_is_so()
     assert line is not None, "the rule was never held back in the first ten minutes"
     assert line.text.endswith("not carried out; no stranger in sight."), line.text
     assert "is no stranger" not in line.text
-    assert w.readings.words("a stranger in sight") == "no stranger in sight"
+    assert w.readings.words("stranger_in_sight") == "no stranger in sight"
 
 
 def test_truth_7_618_the_noon_hour_past_noon_is_the_afternoon_in_every_mouth():
@@ -17550,3 +17550,116 @@ def test_truth_7_618_the_noon_hour_past_noon_is_the_afternoon_in_every_mouth():
         assert ("at noon" not in words) and (words == "noon") == (q == 48), (q, words)
         if 48 < q < 68:
             assert words.endswith("in the afternoon"), (q, words)
+
+
+def test_truth_7_619_a_mistyped_world_line_is_refused_in_words_and_the_game_goes_on(tmp_path):
+    """The cold review's 5.3 item 12: a mistyped `world:` line ended the console with a
+    traceback. The cause: `World._apply_world_order` read the line outside the refusal's
+    reach (only the carrying out was caught), after the line was journaled, so the console's
+    loop, the socket's and a replay of a save holding it all raised. Mended there: the
+    reading is inside it. The first action as the harbour starts it, at the console's own
+    door: each mistyped line is answered "not carried out" in the world's words, the console
+    plays on, and a save holding the lines replays to the same log."""
+    import io
+
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.ui.console import Console
+
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    out = io.StringIO()
+    con = Console(w, out=out)
+    for line in (
+        "world: wether: a gale from the west",
+        "world: weather a gale",
+        "world: : :",
+        "world: ship",
+    ):
+        con.handle_line(line)
+    con.handle_line("tick 60")
+    con.handle_line("state")
+    text = out.getvalue()
+    refused = [e for e in w.log if e.kind == "world.order" and e.data.get("result") == "refused"]
+    assert len(refused) == 4, [e.text for e in refused]
+    assert all(e.text.startswith("World order (") and "not carried out" in e.text for e in refused)
+    assert "Traceback" not in text and "Sherbourne: heading" in text
+    path = replay_mod.save_to_file(w, tmp_path / "mistyped.json", checkpoint=False)
+    copy = replay_mod.replay(replay_mod.load_file(path), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+
+
+def test_truth_7_620_a_misspelt_sail_is_offered_the_sail_on_every_readme_ship():
+    """The cold review's 5.3 item 11: on the README's frigate `set the fore topsial` was
+    answered "did you mean the fore topsail lift, the fore topsail halyard or the fore
+    topsail sheet?", and never the fore topsail. The cause: `orders.resolve.NounTable.add`
+    entered a part's raw id first ("fore.topsail", unsuggested) under the same key as its
+    plain words, so the plain words never went into the hints (22 of 38 sails on the frigate
+    were never offered as themselves). Mended there: the plain words are the hint for the
+    part they still name. On each ship of the README's first commands, started as the README
+    starts her, every sail misspelt in its own word at the prompt is offered as itself."""
+    import re
+
+    from freesail.orders.resolve import key
+    from freesail.ui.server import prepare_game, server_parser
+
+    readme = [
+        ("data/ships/frigate-36.yaml", "293"),
+        ("data/ships/topsail-schooner.yaml", "300"),
+        ("data/ships/cutter.yaml", "300"),
+        ("data/ships/brig.yaml", "295"),
+    ]
+    sides = {"starboard", "larboard"}
+    for ship_file, heading in readme:
+        args = server_parser().parse_args(
+            [ship_file, "--seed", "7", "--wind", "0,15", "--heading", heading]
+        )
+        w = prepare_game(args, say=lambda _line: None)
+        tried = 0
+        for sid in w.ship.sails:
+            words = key(sid).split()
+            own = [x for x in words if x not in sides]
+            plain = " ".join(own)
+            long = max(own, key=len)
+            if len(long) < 5:
+                continue
+            miss = " ".join(x if x != long else x[:-2] + x[-1] + x[-2] for x in words)
+            e = _said(w, f"set the {miss}")
+            hint = re.search(r"did you mean (.*?)\? \(", e.text)
+            if e.kind == "order.rejected" and hint:
+                tried += 1
+                offered = hint.group(1).replace(" or ", ", ").split(", ")
+                assert any(o.endswith(f"the {plain}") or o == f"the {key(sid)}" for o in offered), (
+                    ship_file,
+                    miss,
+                    e.text,
+                )
+        assert tried >= 5, (ship_file, tried)
+
+
+def test_truth_7_621_the_officer_does_not_send_the_same_words_down_twice_within_the_hour():
+    """The cold review's 5.3 item 5 (play/console-4, 12:17 to 12:29): "the sail on the
+    larboard quarter lost sight of" sent down to the captain eight times in twelve minutes.
+    Measured: eight sails of the world's business, each lost from sight in the same words.
+    The cause: `world.reports.tick` sent every reportable line with no guard, where the calls
+    have one (`_called_lately`). Mended there (`_reported_lately`): words sent down within
+    the hour are not sent again until the captain has been on deck. The dispatches as the
+    harbour starts them, the reviewer's own orders: the reports still go down, and no words
+    go down twice in the hour with the captain below throughout."""
+    from freesail.world import reports
+
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    w.run(9000)
+    _said(w, "shape a course for Plymouth")
+    w.run(7200 + 14400)
+    made = [e for e in w.log if e.kind == reports.REPORT_MADE]
+    assert made, "no report sent down in the passage"
+    for i, e in enumerate(made):
+        for later in made[i + 1 :]:
+            if later.tick - e.tick > 3600:
+                break
+            if later.data["text"] != e.data["text"]:
+                continue
+            up = [
+                x for x in w.log if x.kind == "captain.on_deck" and e.tick <= x.tick <= later.tick
+            ]
+            assert up, (e.ship_time, later.ship_time, e.text)
