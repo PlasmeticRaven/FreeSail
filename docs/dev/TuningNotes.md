@@ -27417,8 +27417,13 @@ both paths, and the station's hull made at full): where her far plan's leg is th
 first anchor that can be let go goes down where she lies, veered to the depth's scope, brought
 up; every sail set is furled; her way taken off. The cutter in Carrick Road under a rules
 captain bound for Falmouth: before, woken under plain sail and driven 2.6 km before her captain
-brought her to again; after, at her anchor with nothing set, swinging within her cable. Its
-measure by toggle is below.
+brought her to again; after, at her anchor with nothing set, swinging within her cable.
+**Measured alone at 63108591**: ruff clean; the fast tier exit 0, 7,659 passed and 1 xfailed;
+the slow tier in its two halves (the truths and the browser plans; the rest) exit 0, 1,051
+passed and 8 xfailed, and 2,279 passed; the pace tests alone exit 0, 14 passed. No recorded
+passage, digest, truth or kept save moved; the toggle (a scratch plugin making
+`crews.rides_as_she_lay` a no-op) turns its own test from passing to failing ("not at
+anchor") and moves nothing else, there being nothing else to move.
 
 1. **A boat lost with a load in her** (`boats.lose_boat` replaced her state, dropping her hands
    and loads): `transfer.boat_lost`, called by `lose_boat` only where she carries a transfer.
