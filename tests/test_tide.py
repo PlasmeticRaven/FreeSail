@@ -904,6 +904,10 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         "strait-west-approach",
         # package 79c: the Mediterranean west's currents, some 900 miles from the Channel
         *MED_WEST_CURRENTS,
+        # package 106a: Rennell's current among the Canaries and in the open sea south of
+        # Madeira (Purdy 1825, pp. 94 to 96)
+        "canaries-among",
+        "canary-current",
     ]
     start = datetime(1805, 6, 12, 0, 0)  # springs
     states = [tide.at(MID_STRAIT, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
@@ -928,7 +932,7 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
     assert all(
         a.current_kn == 0.0
         for a in tide.areas
-        if a.chart not in {"strait", *MEDITERRANEAN}  # package 79d
+        if a.chart not in {"strait", "canaries", *MEDITERRANEAN}  # package 79d; 106a
         and a.id not in MED_WEST_CURRENTS  # package 79c
     )
 
@@ -952,6 +956,7 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         a.current_kn == 0.0
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
+        and a.id not in {"canaries-among", "canary-current"}  # package 106a: Rennell's
         and a.id not in MED_WEST_CURRENTS  # package 79c
         and not a.id.startswith(MEDITERRANEAN_AREAS)
     )
@@ -1124,8 +1129,9 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
     bounds = T.region_bounds()
     blocks = [g for g in doc["gauges"] if "block" in g]
     assert [g["id"] for g in doc["gauges"] if "block" not in g] == [g.id for g in tide.gauges]
-    # package 101: Barcelona's, the Catalan coast's; package 105: Sicily's six (old: 76)
-    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 82
+    # package 101: Barcelona's, the Catalan coast's; package 105: Sicily's six (old: 76);
+    # package 106a: the Canaries' seven
+    assert len(tide.gauges) == 11 and len(tide.block_gauges) == len(blocks) == 89
     for g in blocks:
         # its own block first (a list's further blocks are the rule of the seams': below)
         own = g["block"][0] if isinstance(g["block"], list) else g["block"]
@@ -1159,6 +1165,10 @@ def test_every_blocks_gauge_names_its_block_and_the_loader_refuses_one_that_does
         # hold, served by the block's six
         "gulf-of-hammamet",
         "calabria-north",
+        # package 106a: the Canaries' seven, and the gaugeless Salvages served by Santa
+        # Cruz de Tenerife's and Funchal's lists (the lead's ruling of 2026-11-12)
+        "canaries",
+        "salvages",
     }
     newhaven = next(g for g in blocks if g["id"] == "newhaven")
     assert newhaven["mean_level_m"] is None
@@ -1302,6 +1312,10 @@ def test_a_gauge_serves_a_neighbour_block_whose_seam_lies_within_the_band_of_it(
         # of the chart holds, served by Porto Torres and Carloforte
         "porto-torres": {"asinara-west"},
         **{g: {"gulf-of-hammamet", "calabria-north"} for g in sicily_six},
+        # package 106a, the lead's ruling of 2026-11-12: the Salvages, gaugeless, served by
+        # Santa Cruz de Tenerife's and Funchal's, their neighbours' nearest within reach
+        "santa-cruz-de-tenerife": {"salvages"},
+        "funchal": {"salvages"},
     }
     owned = {g.blocks[0] for g in tide.block_gauges}
     assert not owned & set().union(*ruled.values())

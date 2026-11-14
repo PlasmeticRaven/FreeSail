@@ -1,0 +1,124 @@
+# FreeSail: Porto de Cabras on Fuerteventura (package 106a), a road where the barks lade corn,
+# on package 35's machinery; the marks are the features file's.
+#
+# Sources. Glas 1764, Fuertaventura (docs/references/pilots/glas-1764-history-canary-islands-
+# ocr.txt, l. 8335 to 8365): sailing along the island no houses are seen on the coast except at
+# two or three places where barks load corn; sixteen miles south of the road near Lobos a bay
+# with a road where barks lie and lade corn, Porto de Cabras; a stranger cannot find it without
+# a pilot, the ground all round rocky and foul; the best mark a patch of yellow sand on the
+# shore near the road that looks from the sea like a field of ripe wheat; two leagues farther
+# south Cala de Fustes, a harbour for small barks with a good road before it. Purdy 1825, p.
+# 213 (Glas): the road by Lobos with its well of good water on Fortaventura's shore. The modern
+# name is Puerto del Rosario (FROM MEMORY, unverified); TICON's and REDMAR's Fuerteventura
+# gauge stands there (data/tides/constituents.yaml, `puerto-de-cabras`).
+#
+# A small place for a port file: the pilots give its road, its mark and its trade, and the
+# house form wants its market, yard, crew and pilot's words, which are JUDGEMENT for a corn
+# road with a few houses (as Tangier's small things were, package 39f). The datum: UNVERIFIED
+# (no plan read; the grid's modern port is land at the place FROM MEMORY, its road moved to
+# 9 m of water). Prices FROM MEMORY or JUDGEMENT, in sterling.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written in its own words, with its years, in the head above: none of it is a
+# key that package 105's dated rows (`state`, `closed_to`, `market` and the rest) can carry, so
+# no row waits (the chart session, 2026-11-13).
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: cabras
+name: Porto de Cabras
+source: "Glas 1764, Fuertaventura (l. 8335 to 8365); Purdy 1825, pp. 213 and 220"
+datum: unverified
+
+outer_road:
+  feature: porto-de-cabras
+  name: Porto de Cabras
+  lat_deg: 28.4958
+  lon_deg: -13.8528
+  depth_fathoms: 8
+anchorage:
+  feature: porto-de-cabras
+  name: Porto de Cabras
+  lat_deg: 28.4958
+  lon_deg: -13.8528
+mooring:
+  name: the barks' road off the yellow sand
+  lat_deg: 28.4958
+  lon_deg: -13.8528
+  bottom: sand, the ground about it rocky and foul
+  deep_draught_ft: 14    # judgement: a bark's road
+shore:
+  name: the landing by the patch of yellow sand
+  lat_deg: 28.4990
+  lon_deg: -13.8600
+
+pilot:
+  station: porto-de-cabras
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a corn bark's boat
+    under: oars
+    note: "Glas 1764: a stranger cannot find it without a pilot, for the ground all round it is rocky and foul"
+  names: [Cabrera, Morales, Rodríguez, Hernández, Brito, Castañeyra, Umpiérrez, Mesa]   # judgement
+  skill: 0.85
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 90             # off to the east (judgement)
+  words:
+    channel: "Sixteen miles south of the road by Lobos; there are no houses on this coast but where the barks load corn. Do not come in without a man who knows it: the ground all round is rocky and foul."
+    marks: "The patch of yellow sand on the shore by the road, which shows from the sea like a field of ripe wheat: that is the best mark there is."
+    anchorage: "The barks lie in the road off the yellow sand in eight fathoms or so; there is no shelter from the east, and a ship anchors only to load corn. Cala de Fustes two leagues south is for small barks only."
+    tide: "High water about three on the full and change, the tide rising seven feet; the barks wait for the top of it to come off the beach."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 7, origin: spain, note: "Glas 1764: a road where barks lie and lade corn; JUDGEMENT, the cheapest corn of the islands"}
+    - {good: barley, price: 5, origin: spain, note: "JUDGEMENT"}
+    - {good: cheese, price: 22, origin: spain, note: "JUDGEMENT: the goats of the island"}
+    - {good: hides, price: 20, origin: spain, note: "JUDGEMENT"}
+    - {good: salt, price: 3, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 28, origin: spain, note: "JUDGEMENT"}
+    - {good: wine, price: 80, origin: spain, note: "JUDGEMENT: brought from Tenerife"}
+    - {good: brandy, price: 50, origin: spain, note: "JUDGEMENT"}
+    - {good: timber, price: 20, origin: spain, note: "JUDGEMENT: no wood on the island"}
+    - {good: canvas, price: 85, origin: britain, note: "JUDGEMENT"}
+    - {good: cordage, price: 95, origin: britain, note: "JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 30, pounds: 65, note: "JUDGEMENT: a spar brought from another island"}
+    - {item: yard, hours: 20, pounds: 40}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.1}
+    - {item: water, hours_per_ton: 0.8, pounds_per_ton: 0.6, note: "JUDGEMENT: water scarce, from the wells inland"}
+    - {item: provisions, hours_per_day: 0.08, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 48}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 36}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [porto-de-cabras, 28 29.7 N 13 49.2 W, 28 48.0 N 13 45.0 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 48.0 N 13 45.0 W, 28 29.7 N 13 49.2 W, porto-de-cabras]
+  in: [porto-de-cabras]

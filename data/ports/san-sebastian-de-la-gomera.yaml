@@ -1,0 +1,129 @@
+# FreeSail: St. Sebastian of Gomera and its bay (package 106a), on package 35's machinery;
+# the marks are the features file's.
+#
+# Sources. Purdy 1825, p. 219 (Glas): the principal town close by the shore at the bottom of a
+# bay on the east side, the shipping land-locked from all winds but the S.E.; anchor at a
+# convenient distance in 15 to 7 fathoms and moor with a large scope, the land wind often
+# blowing hard enough to blow a ship out of the bay; the sea so smooth that boats land on the
+# beach; on the north side a cove where a ship may haul close to the cliff and heave down or
+# repair; plenty of good water from wells, and a rivulet in winter; an old round tower on the
+# south side of the rivulet's mouth, a chapel and a battery of a few guns on the cliff north of
+# the cove; stand close in with the north point, for the land wind is scanty, and better come
+# in on the sea breeze about noon; the best berth with the main street open, a cable off the
+# beach; the north point like Rame Head from a league north (Glas). Norie 1805, Table XL: St.
+# Sebastian 28 5 40 N.
+#
+# The datum: UNVERIFIED (no plan read; EMODnet on the level-3 patch). FOR SOME YEARS ONLY:
+# nothing read. Prices FROM MEMORY or JUDGEMENT, in sterling.
+# Slavery (decision 68): the Count of Gomera, lord of this island and of Hierro, kept about a
+# thousand enslaved Africans on his sugar lands at Adeje on Tenerife, over against Gomera, in
+# the 1760s (Glas 1764, OCR l. 10373 to 10381, and p. 353, OCR l. 14740). Whether any
+# laboured on Gomera itself the source does not say. Said here with its years and its
+# source; no person is a cargo of this port's market or of the business, and no scenario is
+# built on it.
+# The holder, dated (79a's form, `nation:`, one row: Spain's through the whole range; decision
+# 67): Spanish from the conquest to the end of the range and after. Hostile to a King's ship by
+# the nations table's war of December 1804; NOTE (as data/ports/barcelona.yaml's): the table's
+# wars carry no dates (`Nations.at_war` reads none), so from 1808, when Spain became Britain's
+# ally, the islands still read as at war with Britain: the owner's finding (decision 66), not
+# mended here, and no truth depends on a war's day. What is true of the port only for some
+# years is written in its own words, with its years, in the head above: none of it is a
+# key that package 105's dated rows (`state`, `closed_to`, `market` and the rest) can carry, so
+# no row waits (the chart session, 2026-11-13).
+
+nation:
+  - {nation: spain, source: "the King of Spain's through the range: Spanish since the conquest (Purdy 1825, p. 210: by the treaty between Ferdinand of Castile and Alphonso of Portugal the islands to belong to Spain); at war with Britain from 12 December 1804 (James 1837, vol. 3, p. 200, as data/ports/barcelona.yaml cites it)"}
+id: san-sebastian-de-la-gomera
+name: San Sebastián de la Gomera
+source: "Purdy 1825, p. 219 (Glas); Norie 1805, Table XL"
+datum: unverified
+
+outer_road:
+  feature: san-sebastian-gomera-road
+  name: the bay of St. Sebastian
+  lat_deg: 28.0880
+  lon_deg: -17.1060
+  depth_fathoms: 12
+anchorage:
+  feature: san-sebastian-gomera-road
+  name: the bay of St. Sebastian
+  lat_deg: 28.0880
+  lon_deg: -17.1060
+mooring:
+  name: a cable off the beach with the main street open
+  lat_deg: 28.0890
+  lon_deg: -17.1080
+  bottom: sand
+  deep_draught_ft: 20    # judgement
+shore:
+  feature: san-sebastian-gomera-tower
+  name: the beach by the old tower
+  lat_deg: 28.0910
+  lon_deg: -17.1110
+
+pilot:
+  station: san-sebastian-gomera-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of St. Sebastian
+    under: oars
+    note: "judgement: no pilot is named in the sources"
+  names: [Mendoza, Trujillo, Darias, Chinea, Herrera, Negrín, Plasencia, Morales]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 110            # out of the bay to the east-south-east (judgement)
+  words:
+    channel: "Stand close in with the north point of the bay, for the land wind is commonly too scanty to fetch the berth; better come in with the sea breeze, which begins about noon."
+    marks: "The north point, which from a league north of it looks like Rame Head; the town at the bottom of the bay, the old round tower by the rivulet's mouth, the chapel and battery on the cliff over the cove."
+    anchorage: "Anchor a cable's length off the beach where you can see straight along the main street, in seven to fifteen fathoms, and moor at once with a long scope: the land wind blows hard out of the valley and the eddies come round in the bay."
+    tide: "The tide rises six feet or so at springs, high water about three on the full and change; the bay is so smooth the boats land on the beach."
+
+tide:
+  establishment: Canary Island
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: cheese, price: 30, origin: spain, note: "JUDGEMENT: the island's goats"}
+    - {good: honey, price: 40, origin: spain, note: "JUDGEMENT"}
+    - {good: wine, price: 55, origin: spain, note: "JUDGEMENT"}
+    - {good: wheat, price: 12, origin: spain, note: "JUDGEMENT"}
+    - {good: barley, price: 9, origin: spain, note: "JUDGEMENT"}
+    - {good: fresh beef, price: 30, origin: spain, note: "JUDGEMENT"}
+    - {good: vegetables, price: 13, origin: spain, note: "JUDGEMENT"}
+    - {good: timber, price: 7, origin: spain, note: "JUDGEMENT: the island's woods"}
+    - {good: brandy, price: 38, origin: spain, note: "JUDGEMENT"}
+    - {good: canvas, price: 80, origin: britain, note: "imported; JUDGEMENT"}
+    - {good: cordage, price: 88, origin: britain, note: "imported; JUDGEMENT"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 20, pounds: 40, note: "JUDGEMENT; Purdy 1825 p. 219: a cove on the north side where ships of any burthen may haul close to the cliff and heave down, clean or repair"}
+    - {item: yard, hours: 12, pounds: 26}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.09}
+    - {item: water, hours_per_ton: 0.4, pounds_per_ton: 0.2, note: "Purdy 1825 p. 219: plenty of good water drawn from wells in every part of the town"}
+    - {item: provisions, hours_per_day: 0.07, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The tracks (package 40's form; package 101's lesson: the islands stand between the ports, and
+# the business's far-detail guard refuses a straight line across the land): out by the road's
+# offing to the common mark in open water north of Tenerife (28 51 N 16 24 W, JUDGEMENT), each
+# leg checked clear of the shore by a cable with `Chart.line_shore` as the guard reads it, and in
+# by the same way reversed. The marks between are JUDGEMENT.
+tracks:
+  to_sea: [san-sebastian-gomera-road, 28 05.4 N 17 04.2 W, 28 19.8 N 17 00.0 W, 28 51.0 N 16 24.0 W]
+  from_sea: [28 19.8 N 17 00.0 W, 28 05.4 N 17 04.2 W, san-sebastian-gomera-road]
+  in: [san-sebastian-gomera-road]

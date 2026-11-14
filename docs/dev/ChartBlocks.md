@@ -185,7 +185,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    at Brest's distance entered it at Falmouth and moved every recorded passage's digest).
    The loader refuses a `block:` that names no region or a region the manifest does not
    name, and a gauge with neither a block nor a mean level. A gauge's mean level not read
-   stays null and is said unverified: it gives the blend its constants and not its level,
+   stays null and is said unverified (or, as Sicily's six by the lead's interim answer of
+   2026-11-13, is judged as M2 + S2 + N2 and marked JUDGEMENT where it stands, to be
+   replaced by a published level when one is read; whether the older blocks take the same
+   is settled at package 111's close, the levels measured first): it gives the blend its constants and not its level,
    and where no gauge of the blend has a level (the Strait's, the islands') the level is
    the eleven's there, as it was, which is the level the tiles' fill was raised by
    ("GEBCO's fill", below). **The fill raise reads the same water** (`mean_level_grid`,
@@ -941,3 +944,63 @@ grid's or the spot on its sounding, and its way in and out clear of the land by 
 own guard (`tracks:` where a straight line is not); (g) no mark of the land afloat nor
 danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
 dated; (h) its scenario starting on its water.
+
+## The ocean carried south, the Canaries and the Salvages (package 106a, as built)
+
+`canaries` (27.33334 to 29.46666 N, 18.29332 to 13.17334 W, 60 level-2 tiles, 12.5 MB) and
+`salvages` (one tile, 29.89334 to 30.31999 N, 16.15999 to 15.73334 W, 0.38 MB), two regions
+with no neighbour over **a second coarse layer**, `atlantic-south`. What they found, for the
+next blocks (106b's African coast first):
+
+- **A coarse layer beside the corridor, not the corridor widened.** Widening the corridor
+  south rewrote all 48 of its tiles, as 39e found for the west, and worse: the build takes
+  the distance field's east-west cell at the block's middle latitude, so every distance of
+  every tile moves, up to 50.8 N. A layer of its own (`CORRIDORS["atlantic-south"]`, its
+  `beside: atlantic-corridor`; the chart's `corridors_beside:`) leaves the corridor byte for
+  byte. Its tiles that share a name with the corridor's (the corridor's south row runs from
+  29.47 N, NODATA south of its fetch at 31.9 N: the Salvages and the passage from Madeira lay
+  in it) are written in its own folder, NODATA wherever the corridor's tile has data, and the
+  runtime fills the corridor's NODATA from them at load (`chart.Tile.filled_from`,
+  `Level.beside`): elevation and distance in the empty cells, a block's shoalest sounding
+  only where the corridor's block has none. Truth 7-521 reads every corridor cell through
+  the new path and finds it its own. Within a cell of the corridor's data edge a bilinear
+  read now finds its four corners known: the seam, 14 points of 10,000 sampled, all on
+  31 54 N. The layer's north bound sits at the corridor's data edge (31.9 N). Since package
+  111's step 2a Madeira's south bound is 31.60001 N and the layer opens that edge to the
+  tide (`charted_bounds`); Madeira's tide does not move (11,449 points old beside new), the
+  seam's taper being laid only where the eleven are within reach, and they are 1,300 miles
+  off. `.gitignore` lets its folder through as the corridor's.
+  **Carry it further the same way**: to 12.4 N (the Cape Verde Islands) it measured 9 tiles
+  and 1.9 MB more (10 and 2.05 MB with a column from 26.4 W), none of the corridor's moved.
+- **The bound a hair inside the tile edges** (104's rule) took the brief's 91 tiles to 60.
+- **Open sea is cheap here, the shores dear**: the 22 tiles beyond ten miles of land are 87
+  KB each (1.9 MB), the steep island shores 280 KB; written whole (the lead's ruling), the
+  channels' middles at 3".
+- **A gaugeless one-tile block** (the Salvages) by 104's ruling: Santa Cruz de Tenerife's and
+  Funchal's gauges list it after their own (`[canaries, salvages]`, `[madeira, salvages]`),
+  the level Santa Cruz's, Funchal's being unread; Madeira's water does not move, the
+  membership being by bounds.
+- **REDMAR's reports give the Spanish islands' levels too** (`GLOB_2_3_<code>.pdf`, 3450 to
+  3471): the NMM less the BMMI on the gauge's zero, 1.17 to 1.60 m. TICON rounds Gomera's
+  position to the degree (at sea); REDMAR's is the harbour's. Hierro's gauge is La Estaca.
+- **The modern port is the grid's land** at Santa Cruz (its breakwaters close the road on
+  the north and east: the track leaves it south-east), Arrecife (over the old Naos) and
+  Cabras: the period's anchorages were moved to the nearest water of the pilot's depth and
+  said so in `fix`.
+- **Islands make the business's straight lines cross land**: 40 of the 42 pairs of the
+  seven ports were refused by the far-detail guard until every port had `tracks:` out by
+  its offing to one common mark in open water north of Tenerife (the eastern islands by the
+  Bocayna, Gomera round Point Teno, Palmas round the Isleta); checked pair by pair with
+  `land_crossing` itself.
+- **A scenario's book with hourly re-shaping orders** sends a ship back for a mark she has
+  passed once she heaves to and drifts: the Canaries' book shapes each leg once, at the
+  mark before it.
+- **The weather has no island lee**: the calms and south-westerly eddies to leeward of the
+  high islands (Purdy 1825, pp. 213 to 215) are said in the box's head, not carried.
+- **Run the chart's audit on a new block** (`python tools/audit_chart.py --full`, package
+  111) before its slow tier: a region the audit's table of seas (`SEAS` in
+  `tools/audit_chart.py`) does not name is taken for Mediterranean water, and an ocean
+  island's metre and more of mean level for a fault; the Canaries and the Salvages are
+  named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
+  fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
+  both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.
