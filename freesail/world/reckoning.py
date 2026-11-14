@@ -4154,14 +4154,31 @@ class Navigation:
         return True
 
     def _players_own(self, world: Any) -> bool:
-        """Whether the master is the player's own person, the deck his."""
+        """Whether the master is a seated player's own person, the deck his: the player's at
+        the prompt (`knowledge.players_person`), or a model's at a station it holds (the
+        lead's ruling: the person a seated player is, human or model, is never moved by a
+        routine)."""
         from freesail.world.knowledge import players_person
 
         try:
             person = players_person(world)
         except Exception:  # noqa: BLE001  (a world with no people has no player's person)
-            return False
-        if person is None or getattr(person, "mirror", None) is not self.master:
+            person = None
+        mine = person is not None and getattr(person, "mirror", None) is self.master
+        if not mine:
+            stations = getattr(world, "stations", None)
+            for name, harness in (getattr(world, "agents", None) or {}).items():
+                agent = getattr(harness, "agent", None)
+                if agent is None or getattr(agent, "released", False) or stations is None:
+                    continue
+                try:
+                    held = stations.holder(name)
+                except Exception:  # noqa: BLE001  (a station bound to nobody)
+                    held = None
+                if held is not None and getattr(held, "mirror", None) is self.master:
+                    mine = True
+                    break
+        if not mine:
             return False
         captain = getattr(world, "captain", None)
         handed = (
