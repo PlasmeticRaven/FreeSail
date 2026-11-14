@@ -8,6 +8,42 @@
 
 ---
 
+## For the owner: two pages
+
+*(Written last, after both sittings. The numbers in brackets are where the body says more.)*
+
+### What the project is
+
+FreeSail is a real and unusual thing: a sailing ship of about 1805 simulated part by part and man by man, sailed by typing orders in the words of the time, in a sea with weather, tide, a chart, other ships and ports, where a language model can stand a watch through the same orders you give. Its centre works and is good. I sailed it. A frigate left to her standing orders rode out a day's rising gale by herself. A passage by dead reckoning ended, through my own fault, aground off Rame Head exactly where the game had warned me my course crossed the land.
+
+It is about 350,000 lines: a game of 165,000, tests of 141,000, tools of 37,000, a browser client of 10,000, and more words of record and design than of game. Since early October it has grown mostly sideways: more sea, more ports, more ships, more nations, a director, a far world, powder. It has not passed a gate since 8 October, and the newest third of it has never been before one.
+
+### The ten things that matter most
+
+1. **A stranger cannot begin, and the first fight and the first port fail him without a word.** The opening page is a form with forty-seven scenarios in alphabetical order and no first game. In the first action I gave the orders the game lists, and my guns stayed lashed while it answered that they were "firing as they bear already"; the enemy shot my masts away. A purchase with the boat lost takes the money and delivers nothing. (1.5, 5.3)
+2. **No gate has been passed since milestone 5,** though the README says one was. Milestone 6's gates were never passed; the director's milestone was "frozen open"; milestone 7's gate has been pending since October with nothing in its way. (5.5 item 7, 5.6)
+3. **The director can take your ship.** Under the gentlest brief it handed my frigate to a captain of its own choosing, wounded her captain under "nobody dies", and made her strike. The limits that should refuse have refused nothing since they were built; the project's own record has said so since 17 October. (1.4 decision 14, 5.6)
+4. **Two things make the game unsafe to hand to a friend.** While it runs, any web page open in his browser can read his files through it. And a saved game's folder that came from someone else can run a program on his machine. Both are small to mend. (5.4, 6.1)
+5. **What models were told when they were asked to consent no longer matches the code** in four places, one of weight: another station's words can reach a model in the operator's voice. The remedy is yours to choose, by your own process. (1.4 decision 17)
+6. **The game has become one mass.** The proposal's "single most important boundary", the simulation kept apart from whatever drives or shows it, is gone: every part reaches into every other, 1,767 times by a back door. The earlier review named three such crossings six weeks ago; there are nineteen in the core now. Every change is dearer and riskier than the one before. (F4.1, 5.7)
+7. **The tests are strong at the centre, weak where they are newest, and cost an hour a run.** Eighteen ordinary faults I chose in the ship's core were all caught, most within seconds. But of sixty-seven faults planted against tests my readers suspected, sixty-one passed with the game broken, and twenty-six of those were caught by nothing. A hundred of the "known truths" only run another file's tests a second time. The fast tier has grown fourfold in six weeks, and nobody has measured it since the first day. (head 3)
+8. **The proposal still promises things that were quietly given up:** Python as a way to play (it is not in the game at all); a saved log that is a saved game; ships and evolutions as data a person can edit (they are the output, or the settings, of some forty thousand lines of program); the true position never leaving the simulation. (1.3)
+9. **The largest single block of work in the project is designing ships:** a quarter of all the code and tests, sixteen days where the plan said most of one, while a newcomer's first hour has nothing. On 27 October you asked for "playability and understandability"; the work that followed was a refactor, charts and hulls. (F2.1, 5.7, 5.9)
+10. **The records are honest and cannot be read.** Three megabytes of tuning notes in the order things happened; a packages table of dated diaries; 7,600 package numbers written into the code and the data. You cannot learn the state of your project from them, only from the lead, whose eye is the only one on both the work and the record of it. (5.8, 5.10)
+
+### What to do first
+
+1. **Stop adding.** No new port, chart, ship, nation or system until the three things below are done. You asked for this on 13 November. Hold to it.
+2. **Mend what is unsafe or untrue:** the server, the saved game, the director's limits, the consent brief against the code, the half-dozen things a new player trips on, and the README's line about the gate. A week or two of work, no new feature. (6.1, step 1)
+3. **Hold a gate, a newcomer's one:** someone who has never played, from the opening page through a passage, a fight and a port. (step 2)
+4. **Give the game a first hour:** a first game named on the opening page, and the guided first passage the proposal always meant it to have. (step 3)
+
+Then the test suite, which will pay for itself within a fortnight; then the boundary; then the joins of head 4; and only then more sea. (6.1 to 6.3)
+
+**What to keep exactly as it is:** the ship; the order language; the standing orders; the sources behind the numbers; the lead's habit of writing down his own mistakes; and your own habit of playing it, which has found more than the tests have.
+
+---
+
 ## How the review was done, and what was not looked at
 
 1. **The brief**, then **the proposal whole** (`docs/DesignProposal.md`, every section and all sixty-nine decisions), read by the reviewer.
