@@ -2939,14 +2939,72 @@ class Build:
             "notes": notes,
         }
         path = CHARTS_DIR / "manifest.yaml"
-        path.write_text(
-            "# The chart data's manifest (spec M5 §10; C §5.2), written by tools/build_charts.py.\n"
-            "# Every source with its licence, attribution, URL, retrieval date and checksum; the\n"
-            "# regions and their tiles; the attribution block the game shows in its about text.\n"
-            + yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=100),
-            encoding="utf-8",
-        )
+
+        def write() -> None:
+            path.write_text(
+                "# The chart data's manifest (spec M5 §10; C §5.2), written by "
+                "tools/build_charts.py.\n"
+                "# Every source with its licence, attribution, URL, retrieval date and "
+                "checksum; the\n"
+                "# regions and their tiles; the attribution block the game shows in its "
+                "about text.\n"
+                + yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=100),
+                encoding="utf-8",
+            )
+
+        write()
+        # package 112 (the lead's ruling of 2026-11-14): the tide's open edges, kept only
+        # along the stretches where the chart just written answers water beyond them, so
+        # that a box over the land opens no block's edge; written beside the tide regions and
+        # read by the tide (and so by the fill raise) as data
+        stretches = self.open_stretches(path, manifest)
+        items = list(manifest.items())
+        at = [k for k, _ in items].index("tide_regions") + 1
+        items.insert(at, ("open_edges", stretches))
+        manifest = dict(items)
+        write()
         return path
+
+    def open_stretches(self, path: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+        """The tide's open edges for the manifest at `path` (`tide.candidate_edges`, package
+        94's rule over the boxes), kept where the chart answers water just beyond
+        (`tide.water_stretches`): the water of the manifest's first chart, or of its
+        regions where it names none."""
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from freesail.world import chart as world_chart
+        from freesail.world import tide as world_tide
+        from freesail.world.geo import Position
+
+        for cache in (
+            world_tide._REGION_BOUNDS,
+            world_tide._CHARTED_BOUNDS,
+            world_tide._OPEN_STRETCHES,
+        ):
+            cache.pop(str(path), None)
+        edges, blocks = world_tide.candidate_edges(path, TIDES_CONSTITUENTS)
+        names = list(manifest.get("charts") or {}) or list(manifest.get("regions") or {})
+        charts = [world_chart.Chart(n, manifest, CHARTS_DIR) for n in names[:1]]
+
+        def is_water(lat: float, lon: float) -> bool:
+            for c in charts:
+                d = c.depth_at(Position(lat, lon))
+                if d is not None:
+                    return d > 0.0
+            return False
+
+        try:
+            stretches = world_tide.water_stretches(edges, blocks, is_water)
+        except world_chart.ChartError as e:
+            # a tile the manifest lists and the chart cannot read stops the build, named
+            raise SystemExit(f"the tide's open edges could not be read from the chart: {e}") from e
+        self.log(
+            f"The tide's open edges: {len(edges)} edges of the boxes, {len(stretches)} "
+            "stretches facing water"
+        )
+        # the stretches alone: the tide reads them and nothing else (the rule is
+        # `tide.water_stretches`'s, its step `tide.OPEN_EDGE_STEP_DEG`)
+        return {"stretches": [list(x) for x in stretches]}
 
 
 def _last_manifest() -> dict[str, Any]:

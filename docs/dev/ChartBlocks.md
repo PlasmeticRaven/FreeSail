@@ -1040,14 +1040,21 @@ the blocks' shoalest soundings), in the chart's order:
 | `atlantic-south` | 25.2 to 31.9 N, 22.13 to 9.34 W | 6 | 1,191,415 | 106a |
 | `atlantic-verde` | 12.4 to 25.2 N, 26.4 to 9.34 W | 12 | 2,487,854 | 112 |
 
-**A layer's bounds are charted water to the tide** (`tide.charted_bounds`): a block's edge
-that meets them where no block holds the water is an open edge, and within the eleven's reach
-the block's water tapers there toward the eleven's (package 94). A layer whose box runs over
-the land beside a block opens that block's landward edges too: the Mediterranean's, built
-from 6 W, moved the Gulf of Lion's tide by six metres and Biscay's by one (package 112), and
-waits for the seas, under which an open edge tapers toward its sea's water. Before a layer
-is committed, prove every region's tide on a grid, old beside new, and the open edges the
-same. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
+**An edge is open only where the chart answers water beyond it** (package 112, M1; the
+lead's ruling of 2026-11-14). The seam's taper (package 94) runs from a block's open edge,
+where the block's water meets charted water no block holds. A charted box beyond an edge is
+no proof of water: the corridor's box ran over Spain's and France's land, and a
+Mediterranean layer's box over the Pyrenees opened the Gulf of Lion's edges to the eleven's
+6.6 m. So the tool writes the open stretches into the manifest at each build (`open_edges:`
+with its `stretches:`, from `tide.candidate_edges` and `tide.water_stretches`, sampled every
+0.01 degree, the water read 0.01 degree beyond on the side outside every block, from the
+chart it has just written). The tide reads them as data, and so does the fill raise. A
+manifest without the key reads the boxes as before. Truth 7-571 holds that no open stretch
+faces land. Before a layer is committed, prove every region's tide on a grid, old beside new.
+**A rebuild commits a tile only where its arrays changed** (the chart session's ruling of
+2026-11-14): a tile written before `save_tile` (package 39e) rebuilds with new clock dates in
+its zip entries and the same arrays. Keep its old bytes and its manifest record, and list
+the tiles left out in the notes. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
 (the build writes NODATA where that one's committed tile has data). It never widens a
 layer already laid: widening rewrites every tile of it (39e, 106a). Each folder is let
 through `.gitignore` by name.

@@ -364,7 +364,9 @@ class Tide:
         constituents: dict[str, Any],
         streams: dict[str, Any],
         regions: dict[str, tuple[float, float, float, float]] | None = None,
+        manifest: str | Path | None = None,
     ):
+        manifest = MANIFEST_PATH if manifest is None else manifest
         self.speeds: dict[str, float] = {
             str(k): float(v["speed_deg_per_h"]) for k, v in constituents["constituents"].items()
         }
@@ -395,7 +397,7 @@ class Tide:
             (self.block_gauges if blocks else self.gauges).append(gauge)
         self.block_bounds = {}
         if self.block_gauges:
-            known = region_bounds() if regions is None else regions
+            known = region_bounds(manifest) if regions is None else regions
             for g in self.block_gauges:
                 for b in g.blocks:
                     if b not in known:
@@ -405,9 +407,18 @@ class Tide:
                         )
                     self.block_bounds[b] = known[b]
         # the edges of the blocks' water where it meets charted water the eleven alone
-        # serve (package 94: the seam's taper reads the distance to them)
-        charted = list((charted_bounds() if regions is None else regions).values())
-        self.open_edges = _open_edges(list(self.block_bounds.values()), charted)
+        # serve (package 94: the seam's taper reads the distance to them). Package 112: an
+        # edge is open only along the stretches where the chart answers WATER beyond it,
+        # which the tool writes into the manifest at each build (`open_edges:`,
+        # `water_stretches`), a charted box beyond an edge being no proof of water (a
+        # layer's box over Spain's land opened the Gulf of Lion's edges to the eleven). A
+        # manifest without the key, and a tide given its regions, read the boxes as before.
+        written = open_stretches(manifest) if regions is None else None
+        if written is not None:
+            self.open_edges = written
+        else:
+            charted = list((charted_bounds(manifest) if regions is None else regions).values())
+            self.open_edges = _open_edges(list(self.block_bounds.values()), charted)
         self.band_nm = SEAM_BAND_NM
         interpolation = constituents.get("interpolation") or {}
         self.power = float(interpolation.get("power", 2))
@@ -711,11 +722,13 @@ class Tide:
 
 
 def load_tide(
-    constituents: str | Path = CONSTITUENTS_PATH, streams: str | Path = STREAMS_PATH
+    constituents: str | Path = CONSTITUENTS_PATH,
+    streams: str | Path = STREAMS_PATH,
+    manifest: str | Path | None = None,
 ) -> Tide:
     c = yaml.safe_load(Path(constituents).read_text(encoding="utf-8"))
     s = yaml.safe_load(Path(streams).read_text(encoding="utf-8"))
-    return Tide(c, s)
+    return Tide(c, s, manifest=manifest)
 
 
 def _gauge_blocks(g: dict[str, Any]) -> tuple[str, ...]:
@@ -844,6 +857,88 @@ def charted_bounds(
                 float(c["bounds"][k]) for k in ("south", "north", "west", "east")
             )
     _CHARTED_BOUNDS[key] = out
+    return out
+
+
+_OPEN_STRETCHES: dict[str, list[tuple[str, float, float, float]] | None] = {}
+
+# Package 112: the open edges are sampled every OPEN_EDGE_STEP_DEG along each candidate
+# edge, the water read OPEN_EDGE_STEP_DEG beyond it (about a cable and a half; JUDGEMENT:
+# beyond the edge and within the chart's cells there)
+OPEN_EDGE_STEP_DEG = 0.01
+
+
+def open_stretches(
+    path: str | Path = MANIFEST_PATH,
+) -> list[tuple[str, float, float, float]] | None:
+    """The open edges the tool wrote into the manifest (`open_edges:`, package 112), as
+    `Tide.open_edges` holds them; None where the manifest has no such key (a tree built
+    before package 112, or a manifest a test writes), which then reads the boxes as before.
+    Read once a process."""
+    key = str(path)
+    if key in _OPEN_STRETCHES:
+        return _OPEN_STRETCHES[key]
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # the manifest is long
+    doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=loader) or {}  # noqa: S506
+    entry = doc.get("open_edges")
+    out = (
+        None
+        if entry is None
+        else [
+            (str(a), float(at), float(lo), float(hi))
+            for a, at, lo, hi in entry.get("stretches") or []
+        ]
+    )
+    _OPEN_STRETCHES[key] = out
+    return out
+
+
+def candidate_edges(
+    manifest: str | Path = MANIFEST_PATH, constituents: str | Path = CONSTITUENTS_PATH
+) -> tuple[list[tuple[str, float, float, float]], list[tuple[float, float, float, float]]]:
+    """The edges of the blocks' bounds that meet a charted box no block holds (package 94's
+    rule, `_open_edges`), and the blocks' bounds: the gauges' blocks of the constituents'
+    file within the manifest's regions and tide regions."""
+    doc = yaml.safe_load(Path(constituents).read_text(encoding="utf-8"))
+    regions = region_bounds(manifest)
+    blocks = sorted({regions[b] for g in doc["gauges"] for b in _gauge_blocks(g) if b in regions})
+    return _open_edges(blocks, list(charted_bounds(manifest).values())), blocks
+
+
+def water_stretches(
+    edges: list[tuple[str, float, float, float]],
+    blocks: list[tuple[float, float, float, float]],
+    is_water: Any,
+    step_deg: float = OPEN_EDGE_STEP_DEG,
+) -> list[tuple[str, float, float, float]]:
+    """The stretches of the edges along which the chart answers water just beyond them
+    (package 112; `is_water(lat, lon)` the chart's word): each edge cut into steps of
+    `step_deg`, each step's middle read `step_deg` beyond the edge on the side outside
+    every block, and the runs of water kept, rounded to the micro-degree so that the same
+    tree gives the same stretches."""
+
+    def outside(lat: float, lon: float) -> bool:
+        return not any(s <= lat <= n and w <= lon <= e for s, n, w, e in blocks)
+
+    out: list[tuple[str, float, float, float]] = []
+    for axis, at, lo, hi in edges:
+        n = max(1, int(round((hi - lo) / step_deg)))
+        run: float | None = None
+        for i in range(n + 1):
+            wet = False
+            if i < n:
+                x = lo + (i + 0.5) * (hi - lo) / n
+                for off in (step_deg, -step_deg):
+                    lat, lon = (at + off, x) if axis == "lat" else (x, at + off)
+                    if outside(lat, lon):
+                        wet = bool(is_water(lat, lon))
+                        break
+            here = lo + i * (hi - lo) / n
+            if wet and run is None:
+                run = here
+            elif not wet and run is not None:
+                out.append((axis, round(at, 6), round(run, 6), round(here, 6)))
+                run = None
     return out
 
 

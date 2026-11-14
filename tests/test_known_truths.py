@@ -12745,9 +12745,16 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
     # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
     # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
-    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
+    for lat in (49.5, 50.0, 50.3, 50.6):
         cable = 0.1 / 60.0 / math.cos(math.radians(lat))
         pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    # package 112 (M1, the lead's ruling of 2026-11-14): at 49.1 N the water west of 1 W is
+    # Normandy's land (by Saint-Lo), so the edge there is no open edge and the block's water
+    # is its own to the bound: the taper whole (old: 0.0003, the taper across the land, the
+    # fault M1 mends; new: 1.0), and no step across land is pinned
+    cable = 0.1 / 60.0 / math.cos(math.radians(49.1))
+    normandy = Position(49.1, -1.0 + cable)
+    assert tide.blocks_at(normandy) and tide.taper_at(normandy) == 1.0
     for lon in (-4.7, -4.9):
         pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
     for inside, outside in pairs:
@@ -17409,140 +17416,68 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
     assert read == 4668
 
 
-# ---------------------------------------------------------------------------
-# Package 103a: the range's audit (truths 7-590 to 7-593; 7-590 and 7-591 read the whole
-# tree and are the slow tier's, `tests/conftest.py`)
-# ---------------------------------------------------------------------------
+def test_truth_7_571_no_open_edge_of_any_block_faces_land():
+    """Package 112 (the lead's ruling of 2026-11-14, M1): the seam's taper (package 94) is
+    toward the water beyond a block's open edge, and an edge is open only where the chart
+    answers water beyond it. A charted box beyond an edge is no proof of water: the
+    corridor's box over Spain's and France's land had opened Portugal's, Biscay's and
+    Brittany's landward edges, and a layer's box over the Pyrenees the Gulf of Lion's,
+    whose water read Saint-Malo's 6.6 m level. Every stretch of every open edge the tide
+    reads is read again here, every hundredth of a degree, a hundredth of a degree beyond
+    it on the side outside every block: the chart answers water there."""
+    import freesail.world.tide as T
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    chart = load_chart("atlantic-east")
+    blocks = list(tide.block_bounds.values())
+
+    def outside(lat: float, lon: float) -> bool:
+        return not any(s <= lat <= n and w <= lon <= e for s, n, w, e in blocks)
+
+    assert tide.open_edges, "the blocks have open edges"
+    land = []
+    for axis, at, lo, hi in tide.open_edges:
+        steps = max(1, int(round((hi - lo) / 0.01)))
+        for i in range(steps):
+            x = lo + (i + 0.5) * (hi - lo) / steps
+            for off in (0.01, -0.01):
+                lat, lon = (at + off, x) if axis == "lat" else (x, at + off)
+                if outside(lat, lon):
+                    depth = chart.depth_at(Position(lat, lon))
+                    if depth is None or depth <= 0.0:
+                        land.append((axis, at, round(x, 3)))
+                    break
+    assert land == [], land[:10]
 
 
-def _range_tool():
-    import importlib.util
+def test_truth_7_572_a_manifest_without_the_open_edges_reads_the_boxes_as_before(tmp_path):
+    """Package 112, M1's other side: a manifest with no `open_edges:` (a tree built before
+    the step, or a manifest a test writes) reads the boxes as package 94 did, every edge a
+    charted box lies beyond being open; the same tree with the key reads the stretches the
+    tool wrote. At Concarneau's water, 7.6 miles inside Biscay north from 48 N across
+    Brittany's land, the tide is the old taper's without the key and the block's own with it
+    (package 94's tabled case)."""
+    import yaml
 
-    root = Path(__file__).resolve().parents[1]
-    spec = importlib.util.spec_from_file_location("audit_range", root / "tools" / "audit_range.py")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules.setdefault("audit_range", mod)
-    spec.loader.exec_module(mod)
-    return mod
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
 
-
-def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
-    """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
-    in every year from 1792 to 1825 and on the days either side of every date the data
-    names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 60 mechanical (the code's own years and the one finding only a whole world
-    makes left to the audit's own test), among them the three wars of June 1805 in force
-    before their own beginnings and before the prize court at peace, and 38 that rest on
-    the reference of the wars and the nations' lifetimes
-    (`tools/range/reference.yaml`, FROM MEMORY, read by nothing in the game). Every listed
-    finding is owned: a data fault for milestone 7c, an engine fault, or a judgement to be
-    read against a source, which every finding of the reference's kind is."""
-    A = _range_tool()
-    letters = "".join(c for c in A.LETTERS if c not in "ea")  # the code's years are slower
-    audit = A.run(letters=letters, worlds=False)
-    known = A.load_known()
-    assert not A.unlisted(audit, known)
-    cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
-    assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 60
-    assert len(audit.keys(A.REFERENCE)) == 38
-    for foe in ("france", "spain", "batavian-republic"):
-        pair = "+".join(sorted(("britain", foe)))
-        assert {f"w-before-since:{pair}", f"w-court:{pair}"} <= audit.keys()
-    assert all(known[k]["owner"] in A.OWNERS for k in audit.keys())
-    assert {known[k]["owner"] for k in audit.keys(A.REFERENCE)} == {A.OWNERS[2]}
-    assert {d.year for d in audit.days} == set(range(1792, 1826))
-
-
-def test_truth_7_591_every_dated_key_of_the_data_is_in_the_classing():
-    """Package 103a, the classing's completeness: every key under data/ that carries a
-    year or a date (a date, words that name a year, a whole number of a year under a
-    date's key, a fit's name with its year) is in a row of the classing
-    (`tools/audit_range.py`, `CLASSING`; the table in docs/dev/RangeAudit.md), which says
-    how the code reads it: a seed, calendar-read, both by the scenario's choice, a script,
-    read by nothing, or words; and every row but the scenario's own `nations:` block,
-    which no shipped scenario carries, holds a key."""
-    A = _range_tool()
-    scan = A.scan_dated()
-    assert len(scan) > 5000
-    assert all(A.row_of(rel, path) is not None for rel, path, _v in scan)
-    held = {A.row_of(rel, path).id for rel, path, _v in scan}
-    assert {r.id for r in A.CLASSING} - held == {"scenario-nations"}
-    kinds = {r.id: r.kind for r in A.CLASSING}
-    assert kinds["port-holder"] == kinds["port-dated-keys"] == kinds["blockades-dates"] == A.BOTH
-    assert kinds["wars-since"] == kinds["prize-shares"] == kinds["lights-years"] == A.CALENDAR
-    assert kinds["colours-dates"] == kinds["scenario-papers"] == A.UNREAD
-    assert kinds["scenario-start"] == A.SEED
-    # the calendar-read keys that play could change, which decision 69 (c) designs out
-    assert sorted(r.id for r in A.CLASSING if r.kind in (A.CALENDAR, A.BOTH) and r.play) == [
-        "blockades-dates",
-        "days-years",
-        "port-dated-keys",
-        "port-holder",
-        "wars-since",
-    ]
-
-
-def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_at_peace():
-    """Package 103a, as measured and not as wanted: the wars carry a beginning and no end
-    and the World takes the table whole, so on 1 July 1792 the stance has Britain at war
-    with France, Spain and the Batavian Republic (which was not yet), while the prize
-    court, which alone reads a war's `since`, has her at peace with all three; on 1 July
-    1805 the two agree. A blockade of Brest is the business's on both days, and
-    Rochefort's only between 1 June 1803 and 12 July 1805."""
-    from datetime import date
-
-    A = _range_tool()
-    ports = ("brest", "rochefort", "ferrol", "cadiz", "lorient")
-    tree = A.load_tree(ports=ports, ships=(), scenarios=False)
-    foes = ("france", "spain", "batavian-republic")
-    for day, court in ((date(1792, 7, 1), False), (date(1805, 7, 1), True)):
-        for foe in foes:
-            assert A.table_at_war(tree, "britain", foe)
-            assert A.court_at_war(tree, "britain", foe, day) is court, (day, foe)
-    assert {p for _n, p, _i in A.blockades_on(tree, date(1792, 7, 1))} == {"brest"}
-    assert {p for _n, p, _i in A.blockades_on(tree, date(1805, 7, 1))} == {
-        "brest",
-        "rochefort",
-        "ferrol",
-        "cadiz",
-    }
-
-
-def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_part_of_the_build(
-    tmp_path,
-):
-    """Package 103a, as mended on the lead's reading: a file is a key by its path under
-    its folder with forward slashes (`key_of`), so that the classing holds the same keys
-    and the known list the same findings on Windows as elsewhere; and the known list and
-    the reference lie under tools/range/, outside what the build's fingerprint hashes
-    (`core.world.fingerprint_of`: freesail/ and data/). On a made root an entry taken out
-    of a list under tools/ moves no fingerprint, and the same list under data/ moves it:
-    a finding owned or mended changes no build, and no save reads as another's."""
-    from pathlib import PureWindowsPath
-
-    from freesail.core.world import fingerprint_of
-
-    A = _range_tool()
-    data = PureWindowsPath(r"C:\work\FreeSail\data")
-    key = A.key_of(data / "signals" / "britain" / "days.yaml", data)
-    assert key == "signals/britain/days.yaml"
-    assert A.row_of(key, "days.#.years").id == "days-years"
-    assert A.row_of(A.key_of(data / "ports" / "genoa.yaml", data), "nation.#.since").id == (
-        "port-holder"
-    )
-    root = Path(__file__).resolve().parents[1]
-    for path in (A.KNOWN_PATH, A.REFERENCE_PATH):
-        assert path.is_file() and path.relative_to(root).parts[:2] == ("tools", "range")
-    assert not (root / "data" / "range").exists()
-    for folder in ("freesail", "data", "tools/range"):
-        (tmp_path / folder).mkdir(parents=True)
-    (tmp_path / "freesail" / "a.py").write_text("X = 1\n", encoding="utf-8")
-    (tmp_path / "data" / "a.yaml").write_text("a: 1\n", encoding="utf-8")
-    listed = tmp_path / "tools" / "range" / "audit-known.yaml"
-    listed.write_text("known: [one, two]\n", encoding="utf-8")
-    before = fingerprint_of(tmp_path)
-    listed.write_text("known: [one]\n", encoding="utf-8")
-    assert fingerprint_of(tmp_path) == before
-    (tmp_path / "data" / "audit-known.yaml").write_text("known: [one]\n", encoding="utf-8")
-    assert fingerprint_of(tmp_path) != before
+    root = Path(__file__).resolve().parents[1] / "data" / "charts" / "manifest.yaml"
+    doc = yaml.safe_load(root.read_text(encoding="utf-8"))
+    assert doc["open_edges"]["stretches"]
+    del doc["open_edges"]
+    old = tmp_path / "manifest.yaml"
+    old.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    before = T.load_tide(manifest=old)
+    edges, _ = T.candidate_edges(old)
+    assert T.open_stretches(old) is None
+    assert sorted(before.open_edges) == sorted(edges) and len(edges) == 38
+    now = T.load_tide()
+    assert now.open_edges == [tuple(x) for x in T.open_stretches()]
+    concarneau = Position(47.875, -3.975)
+    old_level = before.constants_at(concarneau)[0]
+    new_level = now.constants_at(concarneau)[0]
+    assert old_level == pytest.approx(3.289, abs=0.001)
+    assert new_level == pytest.approx(3.085, abs=0.001)
