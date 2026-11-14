@@ -1,0 +1,34 @@
+# The features of Morocco's Atlantic coast (package 106b), morocco-noun, as the period's
+# pilots give them, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Purdy 1825      John Purdy, Memoir ... to accompany the new chart of the Atlantic Ocean,
+#                   1825 (docs/references/pilots/purdy-1825-memoir-atlantic-ocean-ocr.txt),
+#                   'Tangier to Rabat' and 'Rabat to Mogodor', 'Mogodor to Cape Noon', pp. 152
+#                   to 157 (l. 22171 to 22620), cited by page; it quotes Jackson for Sallee.
+#   Jackson 1809    James Grey Jackson, An Account of the Empire of Marocco, 1809
+#                   (pilots/jackson-1809-account-empire-marocco-ocr.txt), ch. VII, the seaports
+#                   (l. 4055 to 5065), cited by line of the OCR (the pages are not printed in it).
+#
+# No light stood on this coast in 1805 by any source on file, and none is entered. Positions
+# are in the modern frame, first placed FROM MEMORY of the modern chart and the pilots'
+# bearings and distances, then checked against the region's tiles by channel-west.yaml's rule
+# (a headland, town, castle or tower to the nearest land within 800 m; a danger to the grid's
+# shoal head; an anchorage to water of the pilot's depth), each move in `fix`. Heights for the
+# horizon are the pilots' where they give one, else FROM MEMORY (UNVERIFIED). The grid closes
+# the rivers (the Lucos at Larache, the Seboo at Mamora, the Bu Regreg at Sallee): their mouths
+# read as land or under a metre, where the pilots let in vessels of 100 tons at high water (a
+# finding, noted in docs/dev/TuningNotes.md; the ports lie in their roads, as the pilots put
+# the ships).
+
+region: morocco-noun
+features:
+  - id: wad-noun
+    kind: place
+    name: the mouth of the Wad Akassa, the river of Noon
+    modern: the mouth of the Oued Assaka
+    lat_deg: 28.9500
+    lon_deg: -10.5700
+    height_m: 10
+    source: "Jackson 1809, l. 10975 to 10986: the Wed Akassa, erroneously called in the maps the river Nun, a large stream from the sea to the town of Noon, about fifteen miles inland; it is to the southward of this river that the ships are generally wrecked; l. 5041 to 5051 (Purdy 1825, p. 157): Wedinoon a depot for merchandise going to Soudan and its produce going to Mogodor, gums, wax and gold dust, in constant trade with Timbuctoo; l. 5007 to 5010: but two roads fit for shipping between Santa Cruz and Cape Bojador, which neither pilot names; the place FROM MEMORY, UNVERIFIED"
+    says: "The mouth of the river of Noon, which runs up to the town of Wedinoon fifteen miles inland: south of it is the coast where ships are wrecked, and no road for shipping is known."

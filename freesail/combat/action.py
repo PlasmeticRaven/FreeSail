@@ -360,16 +360,9 @@ def _witnessed(world: Any, tick: int) -> None:
         cap = getattr(crew, "captain", None) if crew is not None else None
         if cap is not None and hasattr(cap, "pirates"):
             cap.pirates.add(firer)
-    # the player's ship a witness of another's fire: hers by `players_id` (package 60: after
-    # he takes command of another, the root's own reading is his new ship, and the firer's
-    # id was hers, so he marked his own ship a pirate)
-    from freesail.world.hulls import players_id
-
-    players = getattr(root, "players", None) or root
-    seen_at = getattr(players, "position", None)
-    if firer != players_id(root) and seen_at is not None:
-        if bearing_and_distance(here, seen_at)[1] <= reach:
-            cap = getattr(players, "captain", None)
+    if firer != PLAYER_ID and root.position is not None:
+        if bearing_and_distance(here, root.position)[1] <= reach:
+            cap = getattr(root, "captain", None)
             if cap is not None and hasattr(cap, "pirates"):
                 cap.pirates.add(firer)
 

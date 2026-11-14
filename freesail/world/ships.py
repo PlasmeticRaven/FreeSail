@@ -793,19 +793,14 @@ class Vessel:
         (metres a second east and north): the player's ship (`captains.PLAYER_ID`), or
         another vessel; None when she is gone."""
         from freesail.world.brains import PLAYER_ID
-        from freesail.world.hulls import players_id
 
-        # the game's first hull is the player's ship until he takes command of another
-        # (package 60): after it, a chase of hers steers for her own body, not his new ship
-        if target_id == PLAYER_ID and players_id(world) == PLAYER_ID:
+        if target_id == PLAYER_ID:
             pos = world.position
             if pos is None:
                 return None
             east, north = _ship_velocity(world)
             return pos, east, north
         other = world.vessels.get(str(target_id)) if target_id else None
-        if other is None and target_id == PLAYER_ID:
-            other = world.vessels.player_shadow(world)
         if other is None or other.done:
             return None
         ms = units.knots_to_ms(other.speed_kn)
@@ -889,12 +884,6 @@ class Vessel:
         if not self.plan:
             if self.station_held():
                 self.plan = [("lie_to", math.inf)]
-            elif self.kept_hull():
-                # a hull with no far brain to plan for her (package 60, the design's §4.2: the
-                # old ship of a change of ship) is never ended by an empty plan: she rides at
-                # her anchor where she lies at one, and lies to where she does not
-                at_anchor = bool(getattr(self.crew, "at_anchor", False))
-                self.plan = [("anchor", "")] if at_anchor else [("lie_to", math.inf)]
             else:
                 self.done = True
                 return
@@ -1089,16 +1078,6 @@ class Vessel:
                 return
             self.done = True
 
-    def kept_hull(self) -> bool:
-        """Whether this body is a crewed hull's with no far brain (package 60): not a boat,
-        whose plan's end is her errand's; such a hull lies where she is when her plan is
-        empty, and is never put out of the world by it."""
-        return (
-            getattr(self, "crew", None) is not None
-            and getattr(self, "brain", None) is None
-            and not getattr(self, "boat", False)
-        )
-
     def station_held(self) -> bool:
         """Whether a station is seated at this hull's captain's station and holds her
         deck (package 84, step 4): the same test the far brain stands aside by."""
@@ -1255,29 +1234,13 @@ def players_current(world: Any) -> Iterator[Any]:
     for it and the World yielded, so that her per-ship names (`ship`, `position`,
     `dealings`, `readings`) and the properties of her per-ship objects are hers (package
     84, step 6); what was given is yielded as it is when she is current already, on the
-    endless plane and in an old shape. Since package 60 the player's ship now
-    (`World.players`), which is the game's first hull until he takes command of another;
-    `first_hull_current` is the first hull's own block (her shadow on the sea)."""
+    endless plane and in an old shape."""
     base = world.__dict__.get("world", world) if hasattr(world, "__dict__") else world
-    d = base.__dict__ if hasattr(base, "__dict__") else {}
-    players = getattr(base, "players", None) if "_own" in d else None
+    players = base.__dict__.get("_own") if hasattr(base, "__dict__") else None
     if players is None or getattr(base, "own", None) is players:
         yield base if players is not None else world
         return
     with base.as_hull(players):
-        yield base
-
-
-@contextmanager
-def first_hull_current(world: Any) -> Iterator[Any]:
-    """The block reads the game's first hull (package 60): her shadow on the sea is hers,
-    under `PLAYER_ID`, whichever ship is the player's (`players_current` before 60)."""
-    base = world.__dict__.get("world", world) if hasattr(world, "__dict__") else world
-    first = base.__dict__.get("_own") if hasattr(base, "__dict__") else None
-    if first is None or getattr(base, "own", None) is first:
-        yield base if first is not None else world
-        return
-    with base.as_hull(first):
         yield base
 
 
@@ -1919,7 +1882,7 @@ class Vessels:
         every reader of hers asked by it; she is the one vessel the sea never moves."""
         from freesail.world.captains import _is_kings_ship
 
-        with first_hull_current(world) as world:
+        with players_current(world) as world:
             pos = getattr(world, "position", None)
             if pos is None or getattr(world, "is_observer", False):
                 # none on the plane; none in an observed world (package 82, item 1): the
@@ -2140,7 +2103,7 @@ class Vessels:
             if brain is not None and (
                 nm <= HAIL_NM
                 or (
-                    brain._stranger == _player_id(world)
+                    brain._stranger == _player_id()
                     and brain.state in ("investigating a stranger", "chasing", "evading")
                 )
             ):
@@ -2153,7 +2116,7 @@ class Vessels:
                 hail = ""
                 if brain is not None:
                     # her captain speaks the ship (package 43; the owner's note 19)
-                    brain.speak(_player_id(world))
+                    brain.speak(_player_id())
                     said = brain.doctrine.threshold("hail", "") if brain.doctrine else ""
                     hail = f" She hails: {said!r}." if said else ""
                     if said:
@@ -2263,14 +2226,8 @@ class Vessels:
         return [v.to_dict() for v in self.vessels]
 
 
-def _player_id(world: Any = None) -> str:
-    """The player's ship's id on the sea: `PLAYER_ID` until he takes command of another
-    ship (package 60; `hulls.players_id`)."""
-    if world is None:
-        return PLAYER_ID
-    from freesail.world.hulls import players_id
-
-    return players_id(world)
+def _player_id() -> str:
+    return PLAYER_ID
 
 
 # The evolutions whose work in hand is a heaving to (the reading `the manoeuvre in hand`

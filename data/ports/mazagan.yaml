@@ -1,0 +1,128 @@
+# FreeSail: Mazagan (El Bridja), the fortress the Portuguese held until 1769 (package 106b,
+# Morocco's Atlantic coast), on package 35's machinery; the marks are the features file's
+# (data/charts/features/morocco-sallee.yaml).
+#
+# Sources. Jackson 1809, l. 4559 to 4596: built in 1506 by the Portuguese; a dock on the north
+# side of the town capable of admitting small vessels, large vessels anchoring about two miles
+# from the shore for fear of the Cape of Azamore and a south-westerly wind; in 1769 the
+# Portuguese had resolved to abandon it when the Emperor Sidi Mohammed ben Abdallah laid siege
+# to it, and took it, they having evacuated it; the export of corn and wax from it very
+# considerable in his time; the export of grain prohibited since the accession of the present
+# Emperor (l. 4525). Purdy 1825, p. 154: anchorage off the coast at a league from the shore in
+# 16 fathoms, clear sandy ground; at the west point a ledge of rocks stretching N.E. about a
+# league into the sea, uncovered at low water; toward Cape Blanco the shore rocky and dangerous.
+#
+# The datum: UNVERIFIED (no period plan read). Dated rows (decision 67, package 105's form;
+# decision 69: they seed the port on the scenario's first day): the holder Portugal's until the
+# evacuation of 1769 (the year Jackson's; the day, 11 March, FROM MEMORY, UNVERIFIED) and the
+# Emperor's after; the market's corn shipped abroad under Sidi Mohammed and cheap at home since
+# his son Soliman's accession forbade its export (Jackson 1809, l. 4524 to 4533; the day of the
+# accession, 1 March 1792, FROM MEMORY, UNVERIFIED; the reign of Yazid between is the first
+# row's). Prices FROM MEMORY or JUDGEMENT, in sterling.
+
+nation:
+  - {nation: portugal, until: 1769-03-10, source: "Jackson 1809, l. 4559 to 4571: built in 1506 by the Portuguese, held by them until they evacuated it in 1769; the day FROM MEMORY"}
+  - {nation: morocco, since: 1769-03-11, source: "Jackson 1809, l. 4567 to 4571: taken by the Emperor Sidi Mohammed ben Abdallah in 1769, the Portuguese having evacuated it; the day FROM MEMORY"}
+id: mazagan
+name: Mazagan
+source: "Jackson 1809, l. 4559 to 4596; Purdy 1825, p. 154"
+datum: unverified
+
+outer_road:
+  feature: mazagan-road
+  name: the road of Mazagan
+  lat_deg: 33.2850
+  lon_deg: -8.5300
+  depth_fathoms: 12
+anchorage:
+  feature: mazagan-road
+  name: the road of Mazagan
+  lat_deg: 33.2850
+  lon_deg: -8.5300
+mooring:
+  name: off the dock on the north side
+  lat_deg: 33.2730
+  lon_deg: -8.5080
+  depth_fathoms: 3
+  bottom: sand
+  deep_draught_ft: 9     # Jackson 1809 l. 4561: the dock admits small vessels; JUDGEMENT
+shore:
+  feature: mazagan
+  name: the dock under the walls
+  lat_deg: 33.2585
+  lon_deg: -8.5025
+
+pilot:
+  station: mazagan-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of the town
+    under: oars
+    note: "judgement"
+  names: [Hamet, Ali, Mohammed, Abdallah, Yusuf, Kasem, Larbi, Tahar]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard                # judgement
+  course_out_deg: 330            # out to the north-north-west, judgement
+  words:
+    channel: "Keep clear of the ledge off the west point, which runs north-east into the bay and shows at low water; small vessels go into the dock on the north side, large ships stay outside."
+    marks: "The Portuguese walls of the fortress low on the shore; to the south-west the high tower of Tit, and Cape Blanco's white cliff beyond."
+    anchorage: "Large ships anchor two miles off the town, clear sand; a league off you have sixteen fathoms. A south-westerly wind sends them to sea."
+    tide: "Go into the dock at high water."
+
+tide:
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  - market:
+      currency: pounds
+      goods:
+        - {good: wheat, price: 11, origin: morocco, note: "Jackson 1809, l. 4594 to 4596: the export of corn very considerable in Sidi Mohammed's time; the price, with the shippers' demand, JUDGEMENT"}
+        - {good: barley, price: 5, origin: morocco, note: "JUDGEMENT"}
+        - {good: wax, price: 70, origin: morocco, note: "Jackson 1809, l. 4594 to 4596: the export of wax very considerable; JUDGEMENT"}
+        - {good: hides, price: 20, origin: morocco, note: "JUDGEMENT"}
+        - {good: wool, price: 18, origin: morocco, note: "JUDGEMENT"}
+        - {good: cattle, price: 7, origin: morocco, note: "JUDGEMENT"}
+        - {good: fresh beef, price: 11, origin: morocco, note: "JUDGEMENT"}
+        - {good: olive oil, price: 32, origin: morocco, note: "JUDGEMENT"}
+        - {good: linen, price: 88, origin: null, note: "imported; JUDGEMENT"}
+        - {good: iron, price: 33, origin: null, note: "imported; JUDGEMENT"}
+        - {good: sugar, price: 104, origin: null, note: "imported; JUDGEMENT"}
+    until: 1792-02-29
+    source: "Jackson 1809, l. 4594 to 4596: the corn and wax exported in Sidi Mohammed's time; the end of the row the accession of Soliman, FROM MEMORY"
+  - market:
+      currency: pounds
+      goods:
+        - {good: wheat, price: 6, origin: morocco, note: "Jackson 1809, l. 4524 to 4533: the export of grain prohibited since the present Emperor's accession, the land lying fallow, and after the famine of 1800 corn so cheap that husbandmen let their crops stand; the price JUDGEMENT"}
+        - {good: barley, price: 8, origin: morocco, note: "JUDGEMENT"}
+        - {good: wax, price: 70, origin: morocco, note: "JUDGEMENT"}
+        - {good: hides, price: 20, origin: morocco, note: "JUDGEMENT"}
+        - {good: wool, price: 18, origin: morocco, note: "JUDGEMENT"}
+        - {good: cattle, price: 7, origin: morocco, note: "JUDGEMENT"}
+        - {good: fresh beef, price: 11, origin: morocco, note: "JUDGEMENT"}
+        - {good: olive oil, price: 32, origin: morocco, note: "JUDGEMENT"}
+        - {good: linen, price: 88, origin: null, note: "imported; JUDGEMENT"}
+        - {good: iron, price: 33, origin: null, note: "imported; JUDGEMENT"}
+        - {good: sugar, price: 104, origin: null, note: "imported; JUDGEMENT"}
+    since: 1792-03-01
+    source: "Jackson 1809, l. 4524 to 4527: since the accession of the present Emperor and his prohibition of the export of grain; the day FROM MEMORY"
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 50, note: "JUDGEMENT: no naval stores named"}
+    - {item: yard, hours: 16, pounds: 30}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.1}
+    - {item: water, hours_per_ton: 0.6, pounds_per_ton: 0.5}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 36}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []

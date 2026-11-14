@@ -220,6 +220,9 @@ CANARIES_PORTS = [
     "santa-cruz-de-la-palma",
     "santa-cruz-de-tenerife",
 ]
+# package 106b: Morocco's Atlantic coast, the six the sources give a road and a trade (Mamora,
+# Fedala, Dar el Beida, Arzila and Azamor marks only, by the same sources)
+MOROCCO_PORTS = ["agadir", "larache", "mazagan", "mogador", "rabat", "safi"]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -236,6 +239,7 @@ ALL_PORTS = sorted(
     + SICILY_PORTS
     + SICILY_WEST_PORTS
     + CANARIES_PORTS
+    + MOROCCO_PORTS
 )
 
 
@@ -426,14 +430,28 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
 
     # package 106a: the Canaries Spain's in this world's year, hostile
     french_ports |= set(CANARIES_PORTS)
+    # package 106b: Morocco's six the Emperor's, at peace with all and neutral to her, but
+    # Larache and Santa Cruz closed to the Europeans' trade (since 1780 and 1773: their files'
+    # dated rows)
+    neutral_ports |= set(MOROCCO_PORTS) - {"larache", "agadir"}
+    closed_ports = {"larache", "agadir"}
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
-        pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
+        pid: (
+            "hostile"
+            if pid in french_ports
+            else "neutral"
+            if pid in neutral_ports
+            else "closed"
+            if pid in closed_ports
+            else "open"
+        )
         for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.dealings.ship_nation == "united-states"
+    # package 106b: Larache and Santa Cruz closed to the Americans too (their files' rows)
     assert {p.id: schooner.dealings.stance(p) for p in schooner.ports.ports.values()} == {
-        pid: "neutral" for pid in ALL_PORTS
+        pid: "closed" if pid in closed_ports else "neutral" for pid in ALL_PORTS
     }
     french = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france")
     assert french.dealings.ship_nation == "france"
@@ -2201,6 +2219,7 @@ def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_f
         "genoa",
         "las-palmas",
         "marsaxlokk",
+        "mazagan",  # package 106b: Portugal's until 1769, the Emperor's after
         "mgarr",
         "orotava",
         "reggio",

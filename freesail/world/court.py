@@ -750,49 +750,6 @@ def command_doubt(world: Any, body: str) -> str | None:
                 f"{person.name} was dismissed his ship {ago // 86400} days ago: a new command "
                 "within the year wants a cause (interest, a friend at the Admiralty)"
             )
-    return _in_play_doubt(root, _ship, _port)
-
-
-def _in_play_doubt(root: Any, ship_name: str, port: Any) -> str | None:
-    """The ship given in play (package 60) where she is no ship of his service's to give: of
-    another nation, an enemy's, or a prize the court has not condemned. The director's word
-    stays the road (the owner's answer 3); the doubt says what wants a cause."""
-    from freesail.world import prizes as P
-    from freesail.world.command import ship_at_port
-    from freesail.world.signals import own_nation
-
-    vessel = ship_at_port(root, ship_name, port)
-    if vessel is None:
-        return None
-    mine = own_nation(getattr(root, "players", root))
-    hers = str(getattr(vessel, "nation", "") or "")
-    rec = P.record_of(vessel)
-    if rec and P.is_prize(vessel):
-        court = rec.get("court") or {}
-        if str(court.get("sentence") or "") != "condemned":
-            return (
-                f"the {vessel.name} is a prize the court has not condemned: she is no ship to "
-                "give until she is condemned and bought in"
-            )
-        return None
-    if hers and hers != mine:
-        from freesail.world.prize_court import _people
-
-        nations = getattr(root, "nations", None)
-        at_war = False
-        try:
-            at_war = bool(nations is not None and nations.at_war(mine, hers))
-        except (KeyError, ValueError):
-            at_war = False
-        if at_war:
-            return (
-                f"the {vessel.name} is an enemy's ship ({_people(nations, hers)}'s), lying at "
-                f"{port.name}: she is taken, not given"
-            )
-        return (
-            f"the {vessel.name} is a ship of {_people(nations, hers)}, lying at {port.name}: "
-            f"she is not {_people(nations, mine)}'s to give"
-        )
     return None
 
 
@@ -853,14 +810,6 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         )
     if sitting(root) is not None and sitting(root).get("person") == person.name:
         raise CourtError(f"The court martial sits on {person.name} still: its verdict first.")
-    from freesail.world.command import ship_at_port
-
-    lying = ship_at_port(root, ship_name, port)
-    if lying is not None:
-        # package 60 (docs/design/Design-ShipBought.md §5.5): the ship lies at the port in this
-        # world, so she is given him in play, to take up by `take command of her` once he is
-        # aboard her; no scenario is written
-        return _command_in_play(root, person, key, lying, port)
     followers = _followers(root, person, port)
     when = root.clock.ship_time + timedelta(days=1)
     start = when.replace(hour=8, minute=0, second=0, microsecond=0)
@@ -969,49 +918,6 @@ def new_command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         "scenario": shown,
         "followers": [f.name for f in followers],
     }
-
-
-def _command_in_play(
-    root: Any, person: Any, key: str, vessel: Any, port: Any
-) -> tuple[str, dict[str, Any]]:
-    """The `command:` form where the ship lies at the port (package 60): she is given him
-    (`command.give`), his record has the appointment, and the served line is the service's
-    words, heard ashore at the port; the director's reply says how he takes her up."""
-    from freesail.world.command import give
-
-    if root.__dict__.get("dry_run"):
-        return (
-            f"a new command for {person.name}: the {vessel.name}, lying at {port.name}, given "
-            "him in play",
-            {"person": person.name, "ship": str(vessel.id), "port": port.id, "dry_run": True},
-        )
-    give(root, vessel, person, by="the director")
-    note(
-        root,
-        person,
-        "command",
-        f"appointed to the {key} {vessel.name} at {port.name}",
-        ship_name=str(vessel.name),
-        port=port.id,
-    )
-    served = f"{person.name} is appointed to the {key} {vessel.name}, lying at {port.name}."
-    root.record(
-        Severity.NOTABLE,
-        "command.new",
-        served,
-        data={
-            "person": person.name,
-            "ship": str(vessel.name),
-            "port": port.id,
-            "place": "shore",
-            "given": str(vessel.id),
-        },
-    )
-    reply = (
-        f"a new command for {person.name}: the {vessel.name}, lying at {port.name}, given him in "
-        "play; he takes her up by 'take command of her' aboard her"
-    )
-    return reply, {"person": person.name, "ship": str(vessel.id), "port": port.id, "given": True}
 
 
 def _and_names(persons: list[Any]) -> str:

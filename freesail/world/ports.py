@@ -1008,11 +1008,6 @@ def _port_state(
 # ---------------------------------------------------------------------------
 
 
-# `BoatState`'s fields of package 60's transfer (the company moved by the boat), left out of a
-# checkpoint while empty.
-_TRANSFER_FIELDS = ("hands", "joining", "loads", "load_no", "load_of")
-
-
 @dataclass
 class BoatState:
     """The ship's boat on an errand, as data (a checkpoint holds it)."""
@@ -1043,27 +1038,6 @@ class BoatState:
     lost: str = ""
     lost_tick: int = -1
     lost_words: str = ""
-    # package 60, step 2 (the lead's reading of ab0ade58: the company moved by this road, not
-    # one beside it): the hands in her (the muster's `Sailor`s, in neither ship's muster), the
-    # person ids among her people who join the company of the ship she goes to (rehomed before
-    # they are put aboard), the loads still to go after this one, each (hands, persons),
-    # every man of them out of the giving muster from the order, and which load this is of how
-    # many; plain class defaults, so a checkpoint from before loads
-    hands: tuple[Any, ...] = ()
-    joining: tuple[str, ...] = ()
-    loads: tuple[tuple[tuple[Any, ...], tuple[Any, ...]], ...] = ()
-    load_no: int = 0
-    load_of: int = 0
-
-    def __getstate__(self) -> dict[str, Any]:
-        """Her state for a checkpoint, package 60's fields left out while they are empty (the
-        lead's ruling: a checkpoint of a boat on no transfer is as it was before them; the
-        class defaults give them back on loading)."""
-        state = dict(self.__dict__)
-        for key in _TRANSFER_FIELDS:
-            if not state.get(key):
-                state.pop(key, None)
-        return state
 
     def words(self) -> str:
         if self.lost:
