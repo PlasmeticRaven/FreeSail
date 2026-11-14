@@ -1,0 +1,272 @@
+Scenario: The first action (data/scenarios/first-action.yaml).
+She starts at 49° 48' N, 5° 18' W, on the chart of channel-west.
+She carries a glass.
+The master takes the noon sight with an octant.
+She is of britain.
+The ports: falmouth, plymouth, brest.
+Other sail on the sea at the start: 1.
+  cutter Renard of france at 49 46.9 N 5 16.4 W, cruising off the Lizard within 10 miles.
+* Forenoon watch, 4 bells (10:00)  The first action. Wind W, 12 knots, a moderate breeze. Heading S (180°).
+* Forenoon watch, 4 bells (10:00)  Sail ho! A cutter on the larboard bow, bearing SE, distant two miles.
+* Forenoon watch, 4 bells (10:00)  The Lizard bearing NNE, distant four leagues.
+* Forenoon watch, 4 bells (10:00)  The Beast bearing NNE, distant four leagues.
+* Forenoon watch, 4 bells (10:00)  Rill Point bearing N by E, distant four leagues.
+* Forenoon watch, 4 bells (10:00)  Cadgwith Cove bearing NNE, distant three leagues.
+* Forenoon watch, 4 bells (10:00)  Mullion Island bearing N by E, distant four leagues.
+  Forenoon watch, 4 bells (10:00)  The glass on the cutter on the larboard bow: under way on the larboard tack, close-hauled, under plain sail.
+  Forenoon watch, 4 bells (10:00)  Order not carried out ('standing order "night routine": at sunset then take in the studdingsails; take in the royals'): In standing order 'night routine', 'take in the studdingsails' is refused: There is no such part as the studdingsails in this ship; did you mean the staysails? ('take in' was understood.)
+  Forenoon watch, 4 bells (10:00)  Order not carried out ('standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals'): In standing order 'morning sail', 'set the royals' is refused: There is no such part as the royals in this ship. ('set' was understood.)
+  Forenoon watch, 4 bells (10:00)  Order not carried out ('standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef'): In standing order 'shorten sail for weather', 'take in the studdingsails' is refused: There is no such part as the studdingsails in this ship; did you mean the staysails? ('take in' was understood.)
+  Forenoon watch, 4 bells (10:00)  Order: standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point.
+  Forenoon watch, 4 bells (10:00)  Standing order 'keep her full' entered in the book: when the apparent wind is forward of 55 degrees then bear away one point.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails.
+  Forenoon watch, 4 bells (10:00)  Standing order 'trim on a shift' entered in the book: when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets.
+  Forenoon watch, 4 bells (10:00)  Standing order 'tend the sheets' entered in the book: every glass, if the manoeuvre in hand is not hove to then trim the sheets.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails.
+  Forenoon watch, 4 bells (10:00)  Standing order 'heavy weather' entered in the book: when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "open fire": when the range is under 2 cables then fire as they bear.
+  Forenoon watch, 4 bells (10:00)  Standing order 'open fire' entered in the book: when the range is under 2 cables then fire as they bear.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "long shot": when the range exceeds 20 cables then hold your fire.
+  Forenoon watch, 4 bells (10:00)  Standing order 'long shot' entered in the book: when the range exceeds 20 cables then hold your fire.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "return her fire": at she opens fire then fire as they bear.
+  Forenoon watch, 4 bells (10:00)  Standing order 'return her fire' entered in the book: at she opens fire then fire as they bear.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "she strikes": at the enemy strikes then cease firing.
+  Forenoon watch, 4 bells (10:00)  Standing order 'she strikes' entered in the book: at the enemy strikes then cease firing.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "the colours": at the colours struck then cease firing.
+  Forenoon watch, 4 bells (10:00)  Standing order 'the colours' entered in the book: at the colours struck then cease firing.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "the aim": at quarters then aim at her hull.
+  Forenoon watch, 4 bells (10:00)  Standing order 'the aim' entered in the book: at quarters then aim at her hull.
+  Forenoon watch, 4 bells (10:00)  Order: standing order "the charge": at quarters then load with round shot.
+  Forenoon watch, 4 bells (10:00)  Standing order 'the charge' entered in the book: at quarters then load with round shot.
+  Forenoon watch, 4 bells (10:00)  Order: set plain sail.
+FreeSail console. Seed 7. Forenoon watch, 4 bells (10:00). Type 'help' for driver commands, 'go' to start the clock.
+The book holds 11 standing orders; 'standing orders' lists them.
+Following the Sherbourne.
+Forenoon watch, 4 bells (10:00)
+Wind W, 12 knots, a moderate breeze
+Day. Sunrise 03:51, sunset 20:07; civil twilight from 03:07 and until 20:51.
+In sight: Sail ho! A cutter on the larboard bow, bearing SE, distant two miles; the Lizard bearing NNE, distant four leagues; the Beast bearing NNE, distant four leagues; Rill Point bearing N by E, distant four leagues; Cadgwith Cove bearing NNE, distant three leagues; Mullion Island bearing N by E, distant four leagues; Black Head bearing NE by N, distant five leagues; Coverack bearing NE by N, distant six leagues; and 17 more in sight.
+49° 48' N, 5° 18' W by account; the tide allowed: the ebb, two knots and a half to the W, by the directions for off the Lizard and high water at Scilly by the epitome. I would not trust the reckoning within a mile east or west, nor a mile north or south.
+Port: no port within the pilot's cruising ground by account; the nearest is Falmouth, NNE by account, seven leagues and a half, the account good to a mile.
+Sherbourne: heading S (180°), speed 5.0 kn, leeway 0°, heel 0°
+Apparent wind 0° on the starboard bow, 0.0 kn; helm +0°
+Sail set: none; unbent: storm_trysail, storm_jib
+Watch on deck: starboard, 15 hands, 15 at work (10 at the mainsail, 5 at the foresail); idlers up.
+  Forenoon watch (10:00)  Hands to the mainsail halyards and outhaul.
+  Forenoon watch (10:00)  Only five hands to the foresail; the rest are setting the mainsail.
+  Forenoon watch (10:00)  Clear away the foresail; man the halyards.
+* Forenoon watch (10:00)  Setting plain sail: not hands enough for all at once; the watch takes the sails in turn.
+  Forenoon watch (10:00)  Not hands enough on deck to set the topsail; the watch is setting the mainsail and the foresail.
+  Forenoon watch (10:00)  Leeway 1° to larboard.
+  Forenoon watch (10:00)  Cast off the gaskets and cleared away the brails of the mainsail.
+  Forenoon watch (10:01)  The cutter on the larboard bow, bearing SE, is a cutter, standing to the north-westward (NW by N), under plain sail; British colours, the red ensign.
+* Forenoon watch (10:01)  The cutter shifts her colours: British colours, the red ensign.
+  Forenoon watch (10:01)  Leeway 5° to larboard.
+Advanced 120 ticks to Forenoon watch (10:02).
+  Forenoon watch (10:02)  The enemy: none engaged.
+  Forenoon watch (10:02)  The range: no mark is engaged.
+  Forenoon watch (10:02)  Order: beat to quarters.
+  Forenoon watch (10:02)  Beat to quarters! Quarters: three gun crews manned, the trimmers 9, the helm 1, the powder 4. Six of the guns' hands at the work in hand, to go to their guns as it is done.
+* Forenoon watch (10:02)  All hands! (to beat to quarters)
+  Forenoon watch (10:02)  Clear away the jib; man the halyards.
+* Forenoon watch (10:02)  Setting the topsail at quarters: six hands taken from the guns, Nos. 1 to 3; the guns go on short-handed.
+  Forenoon watch (10:02)  Only six hands to the topsail; the rest are setting the mainsail, the foresail and the jib.
+  Forenoon watch (10:02)  Hands aloft to loose the topsail.
+* Forenoon watch (10:02)  By standing order 'the aim': aiming at her hull.
+  Forenoon watch (10:02)  The guns are laid for her hull already.
+* Forenoon watch (10:02)  By standing order 'the charge': loading with round shot.
+  Forenoon watch (10:02)  The guns are loading with round shot already.
+  Forenoon watch (10:02)  Leeway 11° to larboard.
+* Forenoon watch (10:02)  Set the mainsail.
+* Forenoon watch (10:03)  Her sails lifting, the wind 75° on the starboard bow: keep her away, or she will be taken aback.
+* Forenoon watch (10:03)  Set the jib.
+  Forenoon watch (10:03)  All hands on deck.
+  Forenoon watch (10:03)  Leeway 10° to larboard.
+* Forenoon watch (10:03)  Set the foresail.
+  Forenoon watch (10:04)  Leeway 3° to larboard.
+  Forenoon watch (10:05)  The book 'keeping station' has a standing order 'trim on a shift', and one of that name is held already (the captain's), which stands; the book's is not loaded.
+  Forenoon watch (10:05)  The book 'keeping station' has a standing order 'tend the sheets', and one of that name is held already (the captain's), which stands; the book's is not loaded.
+  Forenoon watch (10:05)  The book 'keeping station' loaded: wear at the hour, the offing, land ahead, land close ahead, by the wind, back to the station, a sail on the station, trim to the course, bearings, the morning sight, shorten sail for weather.
+* Forenoon watch (10:05)  Mr Bowen: keeping station (cruise off the Lizard within 10 miles); his book 'keeping station' loaded: wear at the hour, the offing, land ahead, land close ahead, by the wind, back to the station, a sail on the station, trim to the course, bearings, the morning sight, shorten sail for weather.
+* Forenoon watch (10:05)  By the captain, keeping station: shaping a course for 49 53.7 n 5 26.7 w.
+  Forenoon watch (10:05)  Shaped a course for 49° 54' N, 5° 27' W: NW by account, 8 miles. Allowing the ebb, two knots and a half to the W, steer N to make it good; the allowance holds till the tide turns, about one o'clock in the afternoon. N (355°) lies across the wind's eye from her head; she is put about for it. All hands about ship.
+  Forenoon watch (10:05)  The book 'keeping station' unloaded: wear at the hour, the offing, land ahead, land close ahead, by the wind, back to the station, a sail on the station, trim to the course, bearings, the morning sight, shorten sail for weather.
+  Forenoon watch (10:05)  The book 'investigating a stranger' loaded: close the stranger, more of her, trim to the course.
+* Forenoon watch (10:05)  Mr Bowen: investigating a stranger (cruise off the Lizard within 10 miles); his book 'investigating a stranger' loaded: close the stranger, more of her, trim to the course.
+* Forenoon watch (10:05)  By the captain, investigating a stranger: making her out.
+  Forenoon watch (10:05)  The glass aloft makes out the cutter on the larboard bow, bearing SE by E: a cutter, standing to the north-westward (NW by N), under plain sail; British colours, the red ensign.
+* Forenoon watch (10:05)  By the captain, investigating a stranger: showing the private signal to renard (a strange sail within signal distance).
+  Forenoon watch (10:05)  'Make signal' will follow 'tack ship', which the hands are still at (a blue flag at the mizen topmast head; the table for June 1805).
+* Forenoon watch (10:05)  Belayed setting the topsail: all hands about ship.
+* Forenoon watch (10:05)  Tacking ship at quarters: three hands taken from the guns, half of each crew; the guns go on short-handed.
+  Forenoon watch (10:05)  Only 24 hands to tack ship; there are no more on deck.
+  Forenoon watch (10:05)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Forenoon watch (10:05)  All hands about ship.
+  Forenoon watch (10:05)  Standing order 'more of her' at a sail made out: not carried out; a stranger in sight is no stranger in sight.
+* Forenoon watch (10:05)  By standing order 'keep her full': bearing away one point.
+  Forenoon watch (10:05)  Helm ordered: bear away a point; steer NW by W (301°).
+  Forenoon watch (10:05)  Leeway 16° to larboard.
+  Forenoon watch (10:05)  Let go and haul. Draw jib; trim aft the head sheets.
+  Forenoon watch (10:06)  Leeway 24° to starboard.
+* Forenoon watch (10:07)  The cutter shifts her colours: French colours, the tricolour.
+  Forenoon watch (10:07)  The book 'investigating a stranger' unloaded: close the stranger, more of her, trim to the course.
+  Forenoon watch (10:07)  The book 'chasing' has a standing order 'tend the sheets', and one of that name is held already (the captain's), which stands; the book's is not loaded.
+  Forenoon watch (10:07)  The book 'chasing' loaded: keep her bearing, more of her, trim to the course.
+* Forenoon watch (10:07)  Mr Bowen: chasing (cruise off the Lizard within 10 miles); his book 'chasing' loaded: keep her bearing, more of her, trim to the course.
+* Forenoon watch (10:07)  By the captain, chasing: chasing the cutter.
+  Forenoon watch (10:07)  Gave chase to a cutter on the starboard quarter, bearing ESE; ESE (115°) lies across the wind from her head, by the stern; she gybes for it by the helm. Helm ordered: steer ESE (115°).
+Advanced 300 ticks to Forenoon watch (10:07).
+  Forenoon watch (10:07)  The guns: 6 12-pounder carronades; secured.
+  Forenoon watch (10:07)  Order: engage her to starboard.
+  Forenoon watch (10:07)  The book 'chasing' unloaded: keep her bearing, more of her, trim to the course.
+* Forenoon watch (10:07)  Mr Bowen stands aside at your order ('engage her to starboard') and his book 'chasing' struck; 'captain: carry on' gives her back to him.
+  Forenoon watch (10:07)  Engage a cutter to starboard: the mark a cutter, the starboard battery, the guns to fire as they bear.
+  Forenoon watch (10:07)  Leeway 4° to starboard.
+  Forenoon watch (10:08)  Steady on N (355°).
+* Forenoon watch (10:08)  Tacked; braced up for the course ordered on the larboard tack, heading N (355°).
+  Forenoon watch (10:08)  Bend on the signal: the private signal.
+  Forenoon watch (10:08)  Leeway 3° to starboard.
+  Forenoon watch (10:08)  Laid aloft and loosed the topsail.
+  Forenoon watch (10:09)  The glass on the cutter on the starboard quarter: under way on the larboard tack, with the wind abeam.
+* Forenoon watch (10:09)  The signal is up: the private signal.
+  Forenoon watch (10:09)  Leeway 4° to starboard.
+* Forenoon watch (10:11)  The cutter makes a reply: a chequered blue and white flag at the fore topmast head, with the ensign at the mizen peak.
+* Forenoon watch (10:11)  Set the topsail.
+Advanced 300 ticks to Forenoon watch (10:12).
+  Forenoon watch (10:12)  The enemy: a cutter, 8.1 cables abeam to starboard.
+  Forenoon watch (10:12)  The range: 8 cables.
+  Forenoon watch (10:12)  Order: fire as they bear.
+  Forenoon watch (10:12)  The guns are firing as they bear already.
+Advanced 600 ticks to Forenoon watch (10:22).
+  Forenoon watch (10:22)  The damage: none.
+  Forenoon watch (10:22)  The bill: nobody hurt of 30; the hands steady.
+  Forenoon watch (10:22)  The enemy: a cutter, 5.6 cables on the starboard bow.
+  Forenoon watch, 5 bells (10:30)  Mousehole bearing NNW, distant four leagues.
+  Forenoon watch, 5 bells (10:30)  5 bells.
+  Forenoon watch, 5 bells (10:30)  By standing order 'tend the sheets': trimming the sheets.
+  Forenoon watch, 5 bells (10:30)  Trimming the sheets of the main sail, the fore staysail and the jib.
+  Forenoon watch (10:30)  Man the mainsail sheet.
+  Forenoon watch (10:30)  Man the foresail sheet.
+  Forenoon watch (10:30)  Man the jib sheet.
+  Forenoon watch (10:30)  Trimmed the sheets of the foresail, the jib and the mainsail; 31° to 39° off the centreline.
+* Forenoon watch (10:30)  By standing order 'keep her full': bearing away one point.
+  Forenoon watch (10:30)  Helm ordered: bear away a point; steer N by E (6°).
+  Forenoon watch (10:30)  Leeway 3° to starboard.
+  Forenoon watch (10:31)  Lowland Point bearing NE by N, distant five leagues.
+  Forenoon watch (10:31)  Leeway 2° to starboard.
+  Forenoon watch (10:33)  Steady on N by E (6°).
+  Forenoon watch (10:35)  St Agnes Head bearing N by E, distant eight leagues.
+Advanced 900 ticks to Forenoon watch (10:37).
+  Forenoon watch (10:37)  The damage: none.
+  Forenoon watch (10:37)  The bill: nobody hurt of 30; the hands steady.
+  Forenoon watch (10:37)  The enemy: a cutter, 6.2 cables right ahead.
+  Forenoon watch (10:37)  The range: 6 cables.
+! Forenoon watch (10:42)  A cutter opens fire on us at 5 cables.
+* Forenoon watch (10:42)  By standing order 'return her fire': firing as they bear.
+  Forenoon watch (10:42)  The guns are firing as they bear already.
+* Forenoon watch (10:43)  Shot from a cutter: a shot across the deck.
+  Forenoon watch (10:43)  Falmouth church bearing NNE, distant eight leagues.
+  Forenoon watch (10:43)  The glass on the cutter on the larboard bow: under way, running before it.
+* Forenoon watch (10:44)  A cutter is within hail, standing to the eastward (E by N), under plain sail; French colours, the tricolour.
+  Forenoon watch (10:44)  Pendennis Point bearing NE by N, distant seven leagues.
+* Forenoon watch (10:45)  Shot from a cutter: a shot through the topsail.
+* Forenoon watch (10:46)  By standing order 'open fire': firing as they bear.
+  Forenoon watch (10:46)  The guns are firing as they bear already.
+! Forenoon watch (10:47)  Main gaff topsail sheet shot away.
+* Forenoon watch (10:48)  Shot from a cutter: main gaff topsail sheet shot away; No. 1 starboard gun's carriage struck.
+  Forenoon watch (10:48)  Penzance bearing NNW, distant five leagues.
+  Forenoon watch (10:48)  The glass on the cutter on the starboard bow: under way on the larboard tack, with the wind on the quarter.
+* Forenoon watch (10:49)  Shot from a cutter: a shot across the deck; a shot through the mainsail.
+! Forenoon watch (10:49)  Storm jib halyard shot away.
+! Forenoon watch (10:49)  Main gaff throat halyard shot away; the gaff came down and the mainsail hangs in the brails.
+  Forenoon watch (10:49)  Leeway 3° to starboard.
+! Forenoon watch (10:50)  Shot from a cutter: storm jib halyard shot away; the main boom wounded; main gaff throat halyard shot away; a shot through the foresail.
+! Forenoon watch (10:50)  Topgallant yard shot away in the slings.
+! Forenoon watch (10:50)  Square sail yard shot away in the slings.
+! Forenoon watch (10:51)  Shot from a cutter: the topgallant yard shot away; a shot through the side to starboard; the square sail yard shot away.
+! Forenoon watch (10:51)  Main gaff shot away.
+! Forenoon watch (10:52)  Shot from a cutter: the main gaff shot away.
+  Forenoon watch (10:53)  The glass on the cutter on the starboard quarter: under way, running before it.
+  Forenoon watch (10:54)  The Longships light bearing NW by W, distant eight leagues.
+! Forenoon watch (10:55)  Main topmast shot away; the jib and topsail, with the main topgallant mast, topsail yard and topgallant yard, hanging to leeward.
+  Forenoon watch (10:55)  Leeway 4° to starboard.
+! Forenoon watch (10:56)  Shot from a cutter: the main topmast shot away.
+  Forenoon watch (10:56)  Leeway 6° to starboard.
+  Forenoon watch (10:57)  Leeway 8° to starboard.
+! Forenoon watch (10:57)  Fore staysail halyard shot away; the foresail came down in a heap.
+* Forenoon watch (10:58)  Shot from a cutter: fore staysail halyard shot away.
+  Forenoon watch (10:58)  The glass on the cutter on the starboard quarter: under way on the larboard tack, with the wind on the quarter.
+  Forenoon watch (10:58)  Leeway 11° to starboard.
+  Forenoon watch (10:59)  Leeway 14° to starboard.
+  Forenoon watch, 6 bells (11:00)  6 bells.
+  Forenoon watch, 6 bells (11:00)  Standing order 'tend the sheets': order not carried out ('trim the sheets'): Nothing to trim: no sail is set.
+  Forenoon watch (11:00)  Leeway 15° to starboard.
+  Forenoon watch (11:01)  Leeway 14° to starboard.
+  Forenoon watch (11:02)  Leeway 15° to starboard.
+  Forenoon watch (11:04)  Leeway 14° to starboard.
+  Forenoon watch (11:05)  Leeway 15° to starboard.
+  Forenoon watch (11:06)  Leeway 14° to starboard.
+* Forenoon watch (11:07)  Shot from a cutter: a shot across the deck.
+Advanced 1800 ticks to Forenoon watch (11:07).
+Following the Sherbourne.
+Forenoon watch (11:07)
+Wind W, 12 knots, a moderate breeze
+Day. Sunrise 03:51, sunset 20:07; civil twilight from 03:07 and until 20:51.
+In sight: Sail ho! A cutter abeam to starboard, bearing E by S, distant five cables; the Lizard bearing NE, distant three leagues; Rill Point bearing NE by N, distant three leagues; the Beast bearing NE, distant three leagues; Mullion Island bearing NNE, distant three leagues; Cadgwith Cove bearing NE, distant three leagues; Black Head bearing NE, distant five leagues; Porthleven bearing N, distant five leagues; and 20 more in sight.
+49° 52' N, 5° 22' W by account; the tide allowed: the ebb, two knots to the W, by the directions for off the Lizard and high water at Scilly by the epitome. I would not trust the reckoning within two miles east or west, nor a mile north or south.
+Port: no port within the pilot's cruising ground by account; the nearest is Falmouth, NE by N by account, seven leagues, the account good to two miles.
+Sherbourne: heading N by E (15°), speed 1.6 kn, leeway 14°, heel 2°
+Apparent wind 99° on the larboard quarter, abaft the beam, 11.4 kn; helm -17°
+Sail set: none; unbent: storm_trysail, storm_jib
+Watch on deck: starboard, 27 hands, none at work; idlers up.
+All hands called by quarters order.
+  Forenoon watch (11:07)  The damage: the main topmast, the main topgallant mast, the main gaff, the square sail yard, the topsail yard and the topgallant yard carried away; the fore staysail halyard parted (to be rove: 'reeve new lines'); three lines gone with the spars carried away; the topsail holed (2%), the main sail holed (0%) and the fore staysail holed (4%); a shot hole through the side to starboard, forward.
+  Forenoon watch (11:07)  The bill: nobody hurt of 30; the hands steady.
+  Forenoon watch (11:07)  The enemy: a cutter, 5.4 cables abeam to starboard.
+  Forenoon watch (11:07)  Order not carried out ('board her'): She is grappled to nobody: lay her aboard and 'grapple her' before the boarders are called away.
+* Forenoon watch (11:08)  Shot from a cutter: starboard main shrouds shot away.
+! Forenoon watch (11:08)  Starboard main shrouds shot away.
+  Forenoon watch (11:08)  Leeway 15° to starboard.
+  Forenoon watch (11:09)  Leeway 14° to starboard.
+! Forenoon watch (11:10)  Larboard fore staysail sheet shot away.
+* Forenoon watch (11:11)  Shot from a cutter: larboard fore staysail sheet shot away.
+  Forenoon watch (11:11)  Leeway 15° to starboard.
+  Forenoon watch (11:12)  Leeway 14° to starboard.
+  Forenoon watch (11:14)  Leeway 15° to starboard.
+  Forenoon watch (11:15)  Leeway 14° to starboard.
+  Forenoon watch (11:16)  Leeway 15° to starboard.
+  Forenoon watch (11:18)  Leeway 14° to starboard.
+  Forenoon watch (11:19)  Leeway 15° to starboard.
+  Forenoon watch (11:21)  Leeway 14° to starboard.
+  Forenoon watch (11:22)  Leeway 15° to starboard.
+  Forenoon watch (11:23)  Leeway 14° to starboard.
+* Forenoon watch (11:25)  The butcher's bill: nobody hurt.
+  Forenoon watch (11:25)  Leeway 15° to starboard.
+  Forenoon watch (11:26)  Leeway 14° to starboard.
+  Forenoon watch (11:28)  Leeway 15° to starboard.
+  Forenoon watch (11:29)  Leeway 14° to starboard.
+  Forenoon watch, 7 bells (11:30)  7 bells.
+  Forenoon watch (11:31)  Leeway 15° to starboard.
+  Forenoon watch (11:32)  Leeway 14° to starboard.
+* Forenoon watch (11:33)  By standing order 'long shot': holding your fire.
+  Forenoon watch (11:33)  Hold your fire: no gun fires but by name or at the word.
+  Forenoon watch (11:33)  Leeway 15° to starboard.
+  Forenoon watch (11:35)  Leeway 14° to starboard.
+  Forenoon watch (11:36)  Leeway 15° to starboard.
+Advanced 1800 ticks to Forenoon watch (11:37).
+Following the Sherbourne.
+Forenoon watch (11:37)
+Wind W, 12 knots, a moderate breeze
+Day. Sunrise 03:51, sunset 20:07; civil twilight from 03:07 and until 20:51.
+In sight: Sail ho! A cutter on the larboard bow, bearing N by W, distant two miles; Rill Point bearing NE by N, distant three leagues; the Lizard bearing NE, distant three leagues; the Beast bearing NE by E, distant three leagues; Mullion Island bearing NNE, distant three leagues; Cadgwith Cove bearing NE, distant three leagues; Black Head bearing NE, distant five leagues; Porthleven bearing N by E, distant five leagues; and 21 more in sight.
+49° 52' N, 5° 23' W by account; the tide allowed: the ebb, a knot and a half to the W, by the directions for off the Lizard and high water at Scilly by the epitome. I would not trust the reckoning within three miles east or west, nor two miles north or south.
+Port: no port within the pilot's cruising ground by account; the nearest is Falmouth, NE by account, seven leagues, the account good to three miles.
+Sherbourne: heading N by E (8°), speed 1.5 kn, leeway 15°, heel 2°
+Apparent wind 92° on the larboard beam, 11.5 kn; helm -15°
+Sail set: none; unbent: storm_trysail, storm_jib
+Watch on deck: starboard, 27 hands, none at work; idlers up.
+All hands called by quarters order.
+  Forenoon watch (11:37)  The enemy: a cutter, 22.8 cables on the larboard bow.
+The director's log (1 entry):
+  Forenoon watch (11:37)  (revealed) The director's log was asked for by the player.

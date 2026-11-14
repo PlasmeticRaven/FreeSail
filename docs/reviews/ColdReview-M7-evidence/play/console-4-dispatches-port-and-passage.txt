@@ -1,0 +1,523 @@
+Scenario: The dispatches, Falmouth to Plymouth (data/scenarios/dispatches-falmouth.yaml).
+She starts at 50° 10' N, 5° 02' W, on the chart of channel-west.
+The weather: From SW, 15 knots (a moderate breeze) at 05:00 on 12 June, the air neutral, veering 1 point and freshening;
+  From SW by W, 17 knots (a fresh breeze) at 14:00 on 12 June, veering 2 points and easing;
+  to W by S, 12 knots (a moderate breeze) at 00:00 on 13 June.
+She carries a glass.
+The master takes the noon sight with an octant.
+She is of britain.
+The purse holds £400.
+A thing: a sealed packet, in the captain's keeping, from the Custom House.
+The ports: falmouth, plymouth.
+  The far-detail guard: Endeavour (bound for Falmouth) her plan crosses the land on the leg to Falmouth at far detail, where no ship takes the ground; give her a way by marks, or a captain (intent:).
+  The far-detail guard: Prosperous (bound for Falmouth) her plan crosses the land on the leg to Falmouth at far detail, where no ship takes the ground; give her a way by marks, or a captain (intent:).
+  The far-detail guard: Ann (bound for Falmouth) her plan crosses the land on the leg to Falmouth at far detail, where no ship takes the ground; give her a way by marks, or a captain (intent:).
+  Morning watch, 2 bells (05:00)  The director's station is bound (nobody named).
+* Morning watch, 2 bells (05:00)  The dispatches, Falmouth to Plymouth. Wind SW, 15 knots, a moderate breeze. Heading S by W (190°).
+* Morning watch, 2 bells (05:00)  The land about Trefusis Point close aboard abeam to larboard, bearing ESE, distant three cables.
+* Morning watch, 2 bells (05:00)  Trefusis Point bearing WNW, distant five cables.
+* Morning watch, 2 bells (05:00)  Pendennis Point bearing SW by S, distant a mile.
+* Morning watch, 2 bells (05:00)  Mylor Point bearing N by E, distant a mile.
+* Morning watch, 2 bells (05:00)  Falmouth bearing WSW, distant a mile.
+* Morning watch, 2 bells (05:00)  St Anthony's Head bearing SE by S, distant two miles.
+FreeSail console. Seed 7. Morning watch, 2 bells (05:00). Type 'help' for driver commands, 'go' to start the clock.
+The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).
+Following the Sherbourne.
+Morning watch, 2 bells (05:00)
+Wind SW, 15 knots, a moderate breeze
+Day. Sunrise 03:49, sunset 20:09; civil twilight from 03:05 and until 20:53.
+In sight: the land about Trefusis Point close aboard abeam to larboard, bearing ESE, distant three cables; Trefusis Point bearing WNW, distant five cables; Pendennis Point bearing SW by S, distant a mile; Mylor Point bearing N by E, distant a mile; Falmouth bearing WSW, distant a mile; St Anthony's Head bearing SE by S, distant two miles; Rosemullion Head bearing SW by S, distant four miles; Helford river bearing SW by S, distant five miles; and 32 more in sight.
+50° 10' N, 5° 02' W by account; the tide allowed: the flood, a quarter of a knot to the N by E, by the directions for Carrick Road and high water at Ramhead by the epitome. I would not trust the reckoning within a mile east or west, nor a mile north or south.
+Port: Falmouth, Carrick Road bearing SW by S by account, a cable, the account good to a mile; the port open to the English; the boat at the booms.
+Sherbourne: heading S by W (190°), speed 0.0 kn, leeway 0°, heel 0°
+Apparent wind 0° on the starboard bow, 0.0 kn; helm +0°
+Sail set: none; unbent: storm_trysail, storm_jib
+Watch on deck: larboard, 12 hands, none at work; idlers below.
+  Morning watch, 2 bells (05:00)  Where am i: aboard the Sherbourne, on the quarterdeck.
+  Morning watch, 2 bells (05:00)  The prices: the last list, Falmouth (12 June, Morning watch, 2 bells (05:00)): tin £120 a ton, copper ore £9 a ton, pilchards £17 a ton, salt £25 a ton, coal £2 a ton, canvas £60 a ton, hemp £70 a ton, wine £70 a ton, brandy £300 a ton, timber £6 a ton, salt beef £55 a ton.
+  Morning watch, 2 bells (05:00)  Order not carried out ('buy 5 tons of copper ore'): She is not in port; the market is ashore and the boat has nowhere to go.
+  Morning watch, 2 bells (05:00)  Order not carried out ('send the boat ashore'): She is under way; bring her to an anchor in Falmouth's roads before the boat goes ashore.
+  Morning watch (05:05)  The book 'on passage' loaded: trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+* Morning watch (05:05)  Mr Bowen: on passage (trade copper ore from Falmouth to Plymouth); his book 'on passage' loaded: trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+* Morning watch (05:05)  By the captain, on passage: setting plain sail (under way with no sail set).
+* Morning watch (05:05)  Mr Bowen's plan for trade copper ore from Falmouth to Plymouth: 50 06.2 N 5 01.8 W; 50 04.3 N 5 00.0 W; 50 11 N 4 18 W; 50 18.3 N 4 08.0 W; Cawsand Bay; the anchorage in the Sound.
+* Morning watch (05:05)  By the captain, on passage: shaping a course for 50 06.2 n 5 01.8 w.
+  Morning watch (05:05)  Shaped a course for 50° 06' N, 5° 02' W: S by account, 4 miles; the line crosses the Black Rock and the line passes the Governor within two cables, the Lugo rock within three cables and the Old Wall within six cables and the line passes the shore under Trefusis Point within three cables. She has no way on to work an allowance by: the flood, a quarter of a knot to the N by E is not allowed for in the course; shape it again when she has gathered way. S (177°) lies too near the wind to be laid; she is kept full and by on the starboard tack. Helm ordered: keep her full and by.
+  Morning watch (05:05)  Hands to the mainsail halyards and outhaul.
+* Morning watch (05:05)  Setting plain sail: not hands enough for all at once; the watch takes the sails in turn.
+  Morning watch (05:05)  Not hands enough on deck to set the jib; the watch is setting the mainsail.
+  Morning watch (05:05)  Not hands enough on deck to set the topsail; the watch is setting the mainsail.
+  Morning watch (05:06)  Cast off the gaskets and cleared away the brails of the mainsail.
+* Morning watch (05:07)  Two minutes in irons, going astern, and she will not pay off: box her off!
+* Morning watch (05:07)  All hands! (to box off)
+* Morning watch (05:07)  Belayed setting the mainsail: box her off! Stand by the head braces.
+  Morning watch (05:07)  Brace abox the head yards!
+  Morning watch (05:07)  Box her off! Stand by the head braces.
+  Morning watch (05:07)  Her head falls off.
+  Morning watch (05:07)  Her after sails take. Let go and haul! Brace up for the starboard tack.
+  Morning watch (05:08)  By the master's tide the ebb makes: allowing a knot and a half to the S by W.
+  Morning watch (05:08)  All hands on deck.
+* Morning watch (05:08)  Boxed her off; braced sharp up on the starboard tack, full and by.
+  Morning watch (05:08)  Piped down; the larboard watch has the deck.
+* Morning watch (05:09)  Set the mainsail.
+  Morning watch (05:09)  Clear away the foresail; man the halyards.
+  Morning watch (05:09)  Clear away the jib; man the halyards.
+  Morning watch (05:10)  Standing order 'pilot water' every 5 minutes: not carried out; the distance to cawsand bay is 34 miles by account, not under 14 miles.
+  Morning watch (05:10)  Standing order 'the lead in pilot water' every 5 minutes: not carried out; the distance to the anchorage in the sound is 36 miles by account, not under 6 miles.
+* Morning watch (05:10)  Her sails aback; she had no way on to lose.
+  Morning watch (05:11)  Steady, full and by, the wind 44° on the starboard bow.
+* Morning watch (05:11)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:11)  Braced three yards to the wind, 44° on the starboard bow; trimming the sheets of the main sail.
+* Morning watch (05:11)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (05:11)  Not hands enough on deck to brace the topsail yard; the watch is setting the foresail and the jib.
+  Morning watch (05:11)  Not hands enough on deck to brace the topgallant yard; the watch is setting the foresail and the jib.
+  Morning watch (05:11)  Not hands enough on deck to trim the mainsail; the watch is setting the foresail and the jib.
+* Morning watch (05:11)  Set the foresail.
+* Morning watch (05:11)  Set the jib.
+  Morning watch (05:11)  Hands aloft to loose the topsail.
+* Morning watch (05:12)  Ann is a straggler: a mile out of her station in the Plymouth convoy.
+* Morning watch (05:12)  Sail ho! A cutter standing out from the land right ahead, bearing S, distant two miles.
+  Morning watch (05:12)  The glass on the cutter right ahead: under way, running before it, under plain sail.
+  Morning watch (05:12)  Leeway 60° to larboard.
+  Morning watch (05:13)  Leeway 8° to larboard.
+  Morning watch (05:13)  Laid aloft and loosed the topsail.
+  Morning watch (05:14)  Leeway 6° to larboard.
+  Morning watch (05:16)  The cutter right ahead, bearing S, is the Falmouth pilot's cutter, standing to the northward (N), under plain sail; British colours, the red ensign.
+* Morning watch (05:16)  Set the topsail.
+  Morning watch (05:16)  Only four hands to the topsail yard; the rest are bracing the square sail yard.
+  Morning watch (05:17)  The glass on the Falmouth pilot's cutter right ahead: under way on the larboard tack, with the wind on the quarter, under plain sail.
+  Morning watch (05:17)  The book 'on passage' unloaded: the leg, trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+  Morning watch (05:17)  The book 'beating' loaded: the leg, the offing, trim to the course, tend the sheets, bearings, shorten sail for weather.
+* Morning watch (05:17)  Mr Bowen: beating (trade copper ore from Falmouth to Plymouth); his book 'beating' loaded: the leg, the offing, trim to the course, tend the sheets, bearings, shorten sail for weather.
+* Morning watch (05:17)  By the captain, beating: shaping a course for 50 06.2 n 5 01.8 w.
+  Morning watch (05:17)  Shaped a course for 50° 06' N, 5° 02' W: S by account, 3 miles; the line crosses the Black Rock and the line passes the Lugo rock within two cables, the Governor within three cables and the Old Wall within six cables and the line passes the shore under St Anthony's Head within four cables. S (178°) lies too near the wind to be laid; she is kept full and by on the starboard tack. Helm ordered: keep her full and by.
+* Morning watch (05:17)  By standing order 'the offing': putting her about.
+* Morning watch (05:17)  Put about: tacking, the land no distance to leeward, where wearing would lose the ground.
+  Morning watch (05:17)  Steady, full and by, the wind 43° on the starboard bow.
+* Morning watch (05:17)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:17)  Trimming the sheets of the main sail; the sheets of the fore staysail and the jib stand as trimmed; the yards are being trimmed already, 1 still to brace taking the new angle.
+  Morning watch (05:17)  Leeway 5° to larboard.
+  Morning watch (05:17)  Only four hands to the mainsail; the rest are bracing the topgallant yard.
+  Morning watch (05:17)  Man the mainsail sheet.
+* Morning watch (05:18)  Braced three yards to the wind; 54° to 58° from square.
+* Morning watch (05:18)  All hands! (to tack ship)
+  Morning watch (05:18)  Only 13 hands to tack ship; the rest are trimming the mainsail.
+  Morning watch (05:18)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (05:18)  All hands about ship.
+  Morning watch (05:18)  Trimmed the mainsail sheet; the mainsail 18° off the centreline.
+  Morning watch (05:18)  Not hands enough on deck to trim the mainsail; the watch is tacking ship.
+  Morning watch (05:18)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (05:18)  Leeway 11° to larboard.
+  Morning watch (05:19)  All hands on deck.
+  Morning watch (05:19)  Leeway 10° to starboard.
+* Morning watch (05:19)  Tacked; braced up on the larboard tack, heading WNW (294°).
+  Morning watch (05:19)  Piped down; the larboard watch has the deck.
+  Morning watch (05:19)  Man the mainsail sheet.
+  Morning watch (05:20)  Leeway 4° to starboard.
+  Morning watch (05:20)  Steady on WNW (294°).
+* Morning watch (05:20)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:20)  Braced three yards to the wind, 48° on the larboard bow; trimming the sheets of the fore staysail and the jib; the sheet of the main sail stands as trimmed.
+  Morning watch (05:20)  Only six hands to the square sail yard; the rest are trimming the mainsail.
+  Morning watch (05:20)  Not hands enough on deck to brace the topsail yard; the watch is trimming the mainsail and bracing the square sail yard.
+  Morning watch (05:20)  Not hands enough on deck to brace the topgallant yard; the watch is trimming the mainsail and bracing the square sail yard.
+  Morning watch (05:20)  Not hands enough on deck to trim the foresail; the watch is trimming the mainsail and bracing the square sail yard.
+  Morning watch (05:20)  Not hands enough on deck to trim the jib; the watch is trimming the mainsail and bracing the square sail yard.
+  Morning watch (05:20)  Trimmed the mainsail sheet; 22° off the centreline.
+  Morning watch (05:20)  Only six hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (05:21)  Land ahead, fine on the starboard bow, five cables: she is standing into it.
+* Morning watch (05:21)  By the captain, beating: shaping a course for 50 06.2 n 5 01.8 w (land ahead).
+  Morning watch (05:21)  Shaped a course for 50° 06' N, 5° 02' W: S by account, 3 miles; the line crosses the Black Rock and the line passes the Governor within two cables, the Lugo rock within four cables and the Old Wall within six cables and the line passes the shore under St Anthony's Head within five cables. S (176°) lies too near the wind to be laid; she is put about and kept full and by on the starboard tack. 'Tack ship' will follow 'brace the square sail yard', which the hands are still at.
+  Morning watch (05:21)  Only six hands to the topgallant yard; the rest are bracing the topsail yard.
+  Morning watch (05:21)  Man the foresail sheet.
+  Morning watch (05:21)  Only two hands to the jib; the rest are bracing the topgallant yard and trimming the foresail.
+  Morning watch (05:21)  Man the jib sheet.
+  Morning watch (05:22)  The glass on the Falmouth pilot's cutter on the larboard quarter: under way on the larboard tack, with the wind abeam, under plain sail.
+* Morning watch (05:22)  Braced three yards to the wind; 54° to 58° from square.
+* Morning watch (05:22)  All hands! (to tack ship)
+  Morning watch (05:22)  Only 15 hands to tack ship; the rest are trimming the jib.
+  Morning watch (05:22)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (05:22)  All hands about ship.
+  Morning watch (05:22)  Trimmed the sheets of the foresail and the jib; 21° to 60° off the centreline.
+  Morning watch (05:22)  Leeway 6° to starboard.
+  Morning watch (05:22)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (05:23)  Leeway 16° to larboard.
+  Morning watch (05:23)  All hands on deck.
+* Morning watch (05:23)  Tacked; braced up on the starboard tack, heading SSE (160°), full and by.
+  Morning watch (05:23)  Piped down; the larboard watch has the deck.
+  Morning watch (05:24)  Steady, full and by, the wind 43° on the starboard bow.
+* Morning watch (05:24)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:24)  Braced three yards to the wind, 44° on the starboard bow; trimming the sheets of the main sail, the fore staysail and the jib.
+  Morning watch (05:24)  Only four hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (05:24)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (05:24)  Not hands enough on deck to trim the mainsail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:24)  Not hands enough on deck to trim the foresail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:24)  Not hands enough on deck to trim the jib; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:24)  Leeway 5° to larboard.
+  Morning watch (05:24)  Only four hands to the mainsail; the rest are bracing the topgallant yard.
+  Morning watch (05:24)  Man the mainsail sheet.
+* Morning watch (05:25)  Pendennis Point bearing SW by S, steady and closing: distant a mile.
+* Morning watch (05:25)  The cutter hailed: a pilot for Falmouth, if you will take him.
+* Morning watch (05:25)  Braced three yards to the wind; 54° to 58° from square.
+  Morning watch (05:25)  Man the foresail sheet.
+  Morning watch (05:25)  Man the jib sheet.
+! Morning watch (05:25)  Taken aback: the sails pressed against the masts and she lost her way.
+  Morning watch (05:26)  Trimmed the sheets of the foresail, the jib and the mainsail; 17° to 20° off the centreline.
+  Morning watch (05:27)  The glass on the Falmouth pilot's cutter on the starboard bow: under way on the starboard tack, close-hauled, under plain sail.
+  Morning watch, 3 bells (05:30)  3 bells.
+Advanced 1800 ticks to Morning watch, 3 bells (05:30).
+  Morning watch, 3 bells (05:30)  The prices: the last list, Falmouth (12 June, Morning watch, 2 bells (05:00)): tin £120 a ton, copper ore £9 a ton, pilchards £17 a ton, salt £25 a ton, coal £2 a ton, canvas £60 a ton, hemp £70 a ton, wine £70 a ton, brandy £300 a ton, timber £6 a ton, salt beef £55 a ton.
+  Morning watch, 3 bells (05:30)  Order not carried out ('buy 5 tons of copper ore'): She is not in port; the market is ashore and the boat has nowhere to go.
+  Morning watch (05:32)  By the master's reckoning she is in the entrance of Falmouth harbour: allowing the ebb, a knot to the S.
+* Morning watch (05:35)  The cutter hailed again: a pilot for Falmouth; heave to and he will come aboard. Unanswered, she will bear away for the outer road.
+* Morning watch (05:35)  By the captain, beating: heaving the lead (in soundings on the leg).
+  Morning watch (05:35)  A hand into the chains with the lead.
+* Morning watch (05:36)  And a half thirteen; good ground. Two fathoms and a half of tide allowed by the epitome: eleven fathoms on the chart. The account moved a mile to the SE by S.
+* Morning watch (05:37)  By the captain, beating: shaping a course for 50 04.3 n 5 00.0 w.
+  Morning watch (05:37)  Shaped a course for 50° 04' N, 5° 00' W: S by E by account, 3 miles; the line crosses the Old Wall. Allowing the flood, a quarter of a knot to the E by N, steer S by E to make it good, a quarter of a point of leeway allowed; the allowance holds till the tide turns, about a quarter past seven in the morning. S by E (174°) lies too near the wind to be laid; she is kept full and by on the starboard tack. Helm ordered: keep her full and by.
+* Morning watch (05:37)  By standing order 'the offing': putting her about.
+* Morning watch (05:37)  Put about: tacking, the land half a mile to leeward, where wearing would lose the ground.
+* Morning watch (05:37)  All hands! (to tack ship)
+  Morning watch (05:37)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (05:37)  All hands about ship.
+  Morning watch (05:37)  Leeway 7° to larboard.
+  Morning watch (05:37)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (05:38)  The glass on the Falmouth pilot's cutter abeam to larboard: under way on the larboard tack, close-hauled, under plain sail.
+  Morning watch (05:38)  By the master's reckoning she is in the approaches to Falmouth: allowing the flood, half a knot to the E by N.
+  Morning watch (05:38)  Leeway 18° to starboard.
+  Morning watch (05:38)  All hands on deck.
+* Morning watch (05:38)  Tacked; braced up on the larboard tack, heading WNW (292°).
+  Morning watch (05:38)  Piped down; the larboard watch has the deck.
+  Morning watch (05:39)  Leeway 4° to starboard.
+  Morning watch (05:39)  Steady on WNW (292°).
+* Morning watch (05:39)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:39)  Braced three yards to the wind, 47° on the larboard bow; trimming the sheets of the main sail, the fore staysail and the jib.
+  Morning watch (05:39)  Only four hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (05:39)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (05:39)  Not hands enough on deck to trim the mainsail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:39)  Not hands enough on deck to trim the foresail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:39)  Not hands enough on deck to trim the jib; the watch is bracing the square sail yard and the topsail yard.
+* Morning watch (05:40)  Land ahead, fine on the starboard bow, eight cables: she is standing into it.
+* Morning watch (05:40)  By the captain, beating: shaping a course for 50 04.3 n 5 00.0 w (land ahead).
+  Morning watch (05:40)  Shaped a course for 50° 04' N, 5° 00' W: S by E by account, 3 miles; the line crosses the Old Wall. Allowing the flood, a quarter of a knot to the E by N, steer S by E to make it good, half a point of leeway allowed; the allowance holds till the tide turns, about a quarter past seven in the morning. S by E (164°) lies too near the wind to be laid; she is put about and kept full and by on the starboard tack. 'Tack ship' will follow 'brace the square sail yard', which the hands are still at.
+  Morning watch (05:40)  Only four hands to the mainsail; the rest are bracing the topgallant yard.
+  Morning watch (05:40)  Man the mainsail sheet.
+* Morning watch (05:40)  Braced three yards to the wind; 54° to 58° from square.
+  Morning watch (05:40)  Man the foresail sheet.
+  Morning watch (05:40)  Man the jib sheet.
+* Morning watch (05:40)  All hands! (to tack ship)
+  Morning watch (05:40)  Only five hands to tack ship; the rest are trimming the mainsail, the foresail and the jib.
+  Morning watch (05:40)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (05:40)  All hands about ship.
+  Morning watch (05:40)  Trimmed the sheets of the mainsail, the foresail and the jib; 18° to 60° off the centreline.
+  Morning watch (05:40)  Leeway 6° to starboard.
+  Morning watch (05:41)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (05:41)  Leeway 19° to larboard.
+  Morning watch (05:42)  All hands on deck.
+* Morning watch (05:42)  Tacked; braced up on the starboard tack, heading SSE (152°), full and by.
+  Morning watch (05:42)  Piped down; the larboard watch has the deck.
+  Morning watch (05:42)  Steady, full and by, the wind 43° on the starboard bow.
+* Morning watch (05:42)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:42)  Braced three yards to the wind, 44° on the starboard bow; trimming the sheets of the main sail, the fore staysail and the jib.
+  Morning watch (05:42)  Only four hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (05:42)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (05:42)  Not hands enough on deck to trim the mainsail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:42)  Not hands enough on deck to trim the foresail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:42)  Not hands enough on deck to trim the jib; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:42)  Leeway 5° to larboard.
+  Morning watch (05:43)  The glass on the Falmouth pilot's cutter on the starboard bow: under way on the starboard tack, with the wind abeam, under plain sail.
+  Morning watch (05:43)  Only four hands to the mainsail; the rest are bracing the topgallant yard.
+  Morning watch (05:43)  Man the mainsail sheet.
+  Morning watch (05:43)  Leeway 4° to larboard.
+* Morning watch (05:43)  Braced three yards to the wind; 54° to 58° from square.
+  Morning watch (05:43)  Man the foresail sheet.
+  Morning watch (05:43)  Man the jib sheet.
+! Morning watch (05:44)  Taken aback: the sails pressed against the masts and she lost her way.
+  Morning watch (05:44)  Trimmed the sheets of the foresail, the jib and the mainsail; 18° to 20° off the centreline.
+* Morning watch (05:45)  The cutter bore away for the outer road, her hail unanswered; no pilot will come off from Falmouth for six hours.
+  Morning watch (05:46)  Ann has regained her station in the Plymouth convoy.
+  Morning watch (05:47)  A gust: 18 knots, the mean 16.
+  Morning watch (05:47)  Leeway 5° to larboard.
+  Morning watch (05:48)  The glass on the Falmouth pilot's cutter on the starboard quarter: under way on the larboard tack, with the wind abeam, under plain sail.
+  Morning watch (05:48)  Leeway 4° to larboard.
+  Morning watch (05:49)  The Falmouth pilot's cutter on the starboard quarter is out of sight.
+  Morning watch (05:52)  A gust: 21 knots, the mean 16.
+  Morning watch (05:52)  Leeway 5° to larboard.
+  Morning watch (05:53)  Leeway 4° to larboard.
+* Morning watch (05:55)  By the captain, beating: shaping a course for 50 11 n 4 18 w.
+  Morning watch (05:55)  Shaped a course for 50° 11' N, 4° 18' W: E by N by account, 27 miles. Allowing the flood, a quarter of a knot to the E by N, steer E by N to make it good; the allowance holds till the tide turns, about a quarter past seven in the morning. Helm ordered: steer E by N (80°).
+* Morning watch (05:55)  By standing order 'the offing': putting her about.
+* Morning watch (05:55)  Put about: tacking, the land a mile to leeward, where wearing would lose the ground.
+* Morning watch (05:55)  All hands! (to tack ship)
+  Morning watch (05:55)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (05:55)  All hands about ship.
+  Morning watch (05:55)  Leeway 5° to larboard.
+  Morning watch (05:55)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (05:56)  Leeway 18° to starboard.
+  Morning watch (05:56)  All hands on deck.
+* Morning watch (05:56)  Tacked; braced up on the larboard tack, heading WNW (293°).
+  Morning watch (05:56)  Piped down; the larboard watch has the deck.
+  Morning watch (05:57)  Leeway 4° to starboard.
+  Morning watch (05:57)  Steady on WNW (293°).
+* Morning watch (05:57)  By standing order 'trim to the course': trimming sails.
+  Morning watch (05:57)  Braced three yards to the wind, 48° on the larboard bow; trimming the sheets of the main sail, the fore staysail and the jib.
+  Morning watch (05:57)  Only four hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (05:57)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (05:57)  Not hands enough on deck to trim the mainsail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:57)  Not hands enough on deck to trim the foresail; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:57)  Not hands enough on deck to trim the jib; the watch is bracing the square sail yard and the topsail yard.
+  Morning watch (05:58)  Only four hands to the mainsail; the rest are bracing the topgallant yard.
+  Morning watch (05:58)  Man the mainsail sheet.
+  Morning watch (05:58)  Leeway 3° to starboard.
+* Morning watch (05:58)  Braced three yards to the wind; 54° to 58° from square.
+  Morning watch (05:58)  Man the foresail sheet.
+  Morning watch (05:58)  Man the jib sheet.
+! Morning watch (05:58)  Taken aback: the sails pressed against the masts and she lost her way.
+  Morning watch (05:59)  Trimmed the sheets of the foresail, the jib and the mainsail; 20° to 22° off the centreline.
+  Morning watch, 4 bells (06:00)  Idlers up.
+  Morning watch, 4 bells (06:00)  4 bells.
+Advanced 1800 ticks to Morning watch, 4 bells (06:00).
+  Morning watch, 4 bells (06:00)  Order not carried out ('go ashore'): She is under way; bring her to an anchor in Falmouth's roads before you go ashore.
+  Morning watch (06:00)  Hove the log: seven knots and a quarter.
+* Morning watch (06:05)  By the captain, beating: heaving the lead (in soundings on the leg).
+  Morning watch (06:05)  A hand into the chains with the lead.
+* Morning watch (06:06)  By the captain, beating: putting her about (the land about Pendennis Point, on the starboard bow, bearing NNW, a mile).
+* Morning watch (06:06)  Put about: tacking, the Old Wall a mile under her lee, where wearing would lose the ground.
+* Morning watch (06:06)  All hands! (to tack ship)
+  Morning watch (06:06)  Ready about. Helm's a-lee; ease off the head sheets; haul aft the mainsail sheet.
+  Morning watch (06:06)  All hands about ship.
+* Morning watch (06:06)  Quarter less fourteen; good ground. Two fathoms and a half of tide allowed by the epitome: eleven fathoms and a half on the chart. The account kept.
+  Morning watch (06:06)  Leeway 5° to starboard.
+  Morning watch (06:07)  The book 'beating' unloaded: the leg, the offing, trim to the course, tend the sheets, bearings, shorten sail for weather.
+  Morning watch (06:07)  The book 'on passage' loaded: the leg, trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+* Morning watch (06:07)  Mr Bowen: on passage (trade copper ore from Falmouth to Plymouth); his book 'on passage' loaded: the leg, trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+* Morning watch (06:07)  By the captain, on passage: shaping a course for 50 11 n 4 18 w.
+  Morning watch (06:07)  Shaped a course for 50° 11' N, 4° 18' W: E by N by account, 28 miles; the line passes the Old Wall within two cables. Allowing the flood, a quarter of a knot to the E by N, steer E by N to make it good; the allowance holds till the tide turns, about a quarter past seven in the morning. E by N (82°): she is going about, and the course is given her as she comes round.
+  Morning watch (06:07)  Let go and haul. Draw jib; trim aft the head sheets.
+  Morning watch (06:07)  Leeway 18° to larboard.
+  Morning watch (06:08)  All hands on deck.
+  Morning watch (06:08)  Leeway 4° to starboard.
+  Morning watch (06:09)  Leeway 1° to starboard.
+* Morning watch (06:10)  Tacked; braced up for the course ordered on the starboard tack, heading E by N (82°).
+  Morning watch (06:10)  Piped down; the larboard watch has the deck.
+  Morning watch (06:11)  Steady on E by N (82°).
+* Morning watch (06:11)  By standing order 'trim to the course': trimming sails.
+  Morning watch (06:11)  Braced three yards to the wind, 122° on the starboard quarter, abaft the beam; the sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (06:11)  Only seven hands to the topsail yard; the rest are bracing the square sail yard.
+* Morning watch (06:11)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (06:12)  Standing order 'pilot water' every 5 minutes: not carried out; the distance to cawsand bay is 34 miles by account, not under 14 miles.
+  Morning watch (06:12)  Standing order 'the lead in pilot water' every 5 minutes: not carried out; the distance to the anchorage in the sound is 36 miles by account, not under 6 miles.
+* Morning watch (06:12)  Braced three yards to the wind; 8° from square.
+  Morning watch (06:20)  Fowey bearing NE, distant seven leagues.
+Advanced 1200 ticks to Morning watch (06:20).
+  Morning watch (06:20)  Where am i: aboard the Sherbourne, on the quarterdeck.
+  Morning watch (06:20)  Order not carried out ('the places ashore'): She is not in port: the places ashore are a port's, asked at anchor in its roads or ashore.
+  Morning watch (06:20)  Order not carried out ('go to the market'): 'market' is no place aboard; the places are the quarterdeck, the deck, the cabin, the gunroom, the tops, the sail room, the hold, the galley, the cockpit, the sick berth. Say 'go to the gunroom', 'go below', 'come on deck'.
+Advanced 300 ticks to Morning watch (06:25).
+  Morning watch (06:25)  Order not carried out ('buy 5 tons of copper ore'): She is not in port; the market is ashore and the boat has nowhere to go.
+  Morning watch (06:25)  Order not carried out ('go to the tavern'): 'tavern' is no place aboard; the places are the quarterdeck, the deck, the cabin, the gunroom, the tops, the sail room, the hold, the galley, the cockpit, the sick berth. Say 'go to the gunroom', 'go below', 'come on deck'.
+  Morning watch (06:27)  Maker tower bearing ENE, distant eleven leagues.
+  Morning watch (06:28)  Rame church bearing ENE, distant eleven leagues.
+  Morning watch (06:28)  A gust: 19 knots, the mean 15.
+  Morning watch, 5 bells (06:30)  5 bells.
+Advanced 300 ticks to Morning watch, 5 bells (06:30).
+  Morning watch, 5 bells (06:30)  Where am i: aboard the Sherbourne, on the quarterdeck.
+  Morning watch, 5 bells (06:30)  Order not carried out ('recruit ten hands'): She is not in port; there are no hands to be had at sea.
+  Morning watch, 5 bells (06:30)  Order not carried out ('go aboard'): You are aboard already, on the quarterdeck.
+  Morning watch (06:33)  Looe Island bearing NE by E, distant seven leagues.
+  Morning watch (06:36)  Rame Head bearing ENE, distant twelve leagues.
+  Morning watch (06:37)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch (06:37)  The sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (06:37)  By standing order 'bearings': taking a bearing of the land.
+  Morning watch (06:37)  St Anthony's Head bore WNW, two miles by estimation: the account moved six cables to the NW.
+  Morning watch (06:37)  By standing order 'bearings': taking a fix.
+  Morning watch (06:37)  Fixed by cross bearings: St Anthony's Head WNW, Mylor Point NW by N, Mawnan church W by S; the lines met within two cables. The account moved two cables to the NW by W: 50° 08' N, 4° 58' W by the fix, good to a cable along the shore and two cables off it.
+* Morning watch (06:37)  By the captain, on passage: shaping a course for 50 11 n 4 18 w (the stream changed since the leg was laid: a knot to the north-eastward now).
+  Morning watch (06:37)  Shaped a course for 50° 11' N, 4° 18' W: E by N by account, 26 miles. Allowing the flood, a knot to the NE, steer E to make it good; the allowance holds till the tide turns, about a quarter past eight in the morning. Helm ordered: steer E (88°).
+  Morning watch (06:37)  Leeway nil.
+  Morning watch (06:37)  Steady on E (88°).
+* Morning watch (06:37)  By standing order 'trim to the course': trimming sails.
+  Morning watch (06:37)  Braced three yards to the wind, 113° on the starboard quarter, abaft the beam; the sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (06:37)  Only seven hands to the topsail yard; the rest are bracing the square sail yard.
+  Morning watch (06:37)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+  Morning watch (06:38)  Leeway 1° to starboard.
+* Morning watch (06:38)  Braced three yards to the wind; 17° from square.
+* Morning watch (06:39)  Sail ho! A sail right ahead, bearing E by N, distant six leagues.
+  Morning watch (06:39)  By the master's reckoning she is in the open Channel: allowing the flood, a knot and a half to the NE.
+  Morning watch (06:48)  A gust: 17 knots, the mean 13.
+  Morning watch (06:52)  A gust: 16 knots, the mean 13.
+  Morning watch (06:59)  A gust: 16 knots, the mean 14.
+  Morning watch, 6 bells (07:00)  6 bells.
+Advanced 1800 ticks to Morning watch, 6 bells (07:00).
+  Morning watch, 6 bells (07:00)  Where am i: aboard the Sherbourne, on the quarterdeck.
+  Morning watch, 6 bells (07:00)  The manifest: empty, room for 42 tons.
+  Morning watch, 6 bells (07:00)  The purse: £400.
+  Morning watch, 6 bells (07:00)  Order not carried out ('weigh anchor'): no anchor is down
+* Morning watch (07:06)  Sail ho! A sail right ahead, bearing E by N, distant four leagues.
+  Morning watch (07:07)  By standing order 'the leg': shaping a course for 50 11 n 4 18 w.
+  Morning watch (07:07)  Shaped a course for 50° 11' N, 4° 18' W: E by N by account, 22 miles. Allowing the flood, three quarters of a knot to the NE, steer E to make it good; the allowance holds till the tide turns, about a quarter past eight in the morning. Helm ordered: steer E (86°).
+  Morning watch (07:07)  By standing order 'tend the sheets': trimming the sheets.
+  Morning watch (07:07)  The sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (07:07)  By standing order 'bearings': taking a bearing of the land.
+  Morning watch (07:07)  The Nare Head bore N by W, five miles by estimation: the account moved seven cables to the SW by W.
+  Morning watch (07:07)  By standing order 'bearings': taking a fix.
+  Morning watch (07:07)  Fixed by cross bearings: Mylor Point NW by W, the Nare Head N by W; the lines cut at 45 degrees. The account moved two cables to the NW: 50° 08' N, 4° 54' W by the fix, good to three cables.
+  Morning watch (07:07)  Steady on E (86°).
+* Morning watch (07:07)  By standing order 'trim to the course': trimming sails.
+  Morning watch (07:07)  Braced three yards to the wind, 120° on the starboard quarter, abaft the beam; the sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (07:07)  Only seven hands to the topsail yard; the rest are bracing the square sail yard.
+  Morning watch (07:07)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+* Morning watch (07:08)  Sail ho! A sail right ahead, bearing E by N, distant six leagues.
+* Morning watch (07:08)  Sail ho! A sail right ahead, bearing E by N, distant six leagues.
+* Morning watch (07:08)  Braced three yards to the wind; 10° from square.
+* Morning watch (07:11)  Sail ho! A sail on the larboard bow, bearing NE by E, distant six leagues.
+* Morning watch (07:14)  Sail ho! A sail on the larboard bow, bearing NE by E, distant six leagues.
+* Morning watch (07:15)  Sail ho! A sail on the larboard bow, bearing NE by E, distant seven leagues.
+Advanced 900 ticks to Morning watch (07:15).
+  Morning watch (07:15)  Order not carried out ('get under way'): no anchor is down: she is under way already, or adrift
+  Morning watch (07:16)  A gust: 17 knots, the mean 14.
+* Morning watch (07:20)  Sail ho! A sail on the larboard bow, bearing NE by E, distant seven leagues.
+* Morning watch (07:21)  By standing order 'trim on a shift': trimming sails.
+  Morning watch (07:21)  Braced three yards to the wind, 135° on the starboard quarter, abaft the beam; the sheets of the main sail, the fore staysail and the jib stand as trimmed.
+  Morning watch (07:21)  Only seven hands to the topsail yard; the rest are bracing the square sail yard.
+  Morning watch (07:21)  Bracing the yards: not hands enough for all at once; the watch takes them in turn.
+* Morning watch (07:22)  Sail ho! A sail on the larboard bow, bearing NE by E, distant eight leagues.
+* Morning watch (07:22)  Sail ho! A sail on the larboard bow, bearing NE, distant six leagues.
+* Morning watch (07:22)  Braced three yards to the wind; 0° from square.
+* Morning watch (07:23)  Sail ho! A sail on the larboard bow, bearing NE, distant seven leagues.
+* Morning watch (07:24)  Sail ho! A sail on the larboard bow, bearing NE by E, distant six leagues.
+  Morning watch (07:24)  A gust: 19 knots, the mean 16.
+  Morning watch (07:29)  A gust: 21 knots, the mean 17.
+  Morning watch, 7 bells (07:30)  7 bells.
+Advanced 900 ticks to Morning watch, 7 bells (07:30).
+  Morning watch, 7 bells (07:30)  Order: shape a course for Plymouth.
+  Morning watch, 7 bells (07:30)  The book 'on passage' unloaded: the leg, trim to the course, trim on a shift, tend the sheets, bearings, pilot water, the lead in pilot water, the anchorage, shorten sail for weather, the pilot boards, the pilot aboard, the pilot put off, the pilot off, under way again.
+* Morning watch, 7 bells (07:30)  Mr Bowen stands aside at your order ('shape a course for Plymouth') and his book 'on passage' struck; 'captain: carry on' gives her back to him.
+  Morning watch, 7 bells (07:30)  Shaped a course for Plymouth: NE by E by account, 30 miles; the line passes the Knap within a mile and the line crosses the land about Rame Head. Allowing the flood, half a knot to the NE, steer ENE to make it good; the allowance holds till the tide turns, about a quarter past eight in the morning. Helm ordered: steer ENE (63°).
+  Morning watch (07:30)  Leeway 2° to starboard.
+  Morning watch (07:31)  Leeway 1° to starboard.
+  Morning watch (07:31)  Steady on ENE (63°).
+  Morning watch (07:32)  A gust: 21 knots, the mean 17.
+  Morning watch (07:43)  A gust: 19 knots, the mean 16.
+  Morning watch (07:54)  The Eddystone bearing E, distant eight leagues.
+  Morning watch (07:57)  A gust: 19 knots, the mean 16.
+  Forenoon watch, 8 bells (08:00)  Eight bells. The starboard watch relieved the deck.
+  Forenoon watch, 8 bells (08:00)  8 bells.
+  Forenoon watch (08:00)  Hove the log: six knots.
+  Forenoon watch (08:00)  A gust: 19 knots, the mean 16.
+  Forenoon watch (08:08)  By the master's tide the ebb makes: allowing a knot and a half to the SW.
+  Forenoon watch (08:09)  Penlee Point bearing ENE, distant six leagues.
+  Forenoon watch (08:09)  The Mewstone bearing ENE, distant eight leagues.
+  Forenoon watch (08:16)  A gust: 17 knots, the mean 13.
+  Forenoon watch (08:28)  A gust: 18 knots, the mean 15.
+  Forenoon watch, 1 bell (08:30)  1 bell.
+  Forenoon watch (08:33)  A gust: 19 knots, the mean 15.
+  Forenoon watch (08:44)  The Citadel bearing ENE, distant seven leagues.
+  Forenoon watch (08:50)  The Bolt Tail bearing E, distant eight leagues.
+  Forenoon watch (08:50)  The Bolt Head bearing E, distant twelve leagues.
+  Forenoon watch (08:57)  A gust: 20 knots, the mean 16.
+  Forenoon watch, 2 bells (09:00)  2 bells.
+  Forenoon watch (09:04)  Plymouth bearing NE by E, distant seven leagues.
+  Forenoon watch (09:07)  Cawsand bearing ENE, distant six leagues.
+  Forenoon watch (09:07)  A gust: 19 knots, the mean 15.
+  Forenoon watch (09:18)  Drake's Island bearing NE by E, distant six leagues.
+  Forenoon watch (09:19)  Mount Batten tower bearing ENE, distant six leagues.
+  Forenoon watch, 3 bells (09:30)  3 bells.
+Advanced 7200 ticks to Forenoon watch, 3 bells (09:30).
+Following the Sherbourne.
+Forenoon watch, 3 bells (09:30)
+Wind SW by W, 15 knots, a moderate breeze
+Day. Sunrise 03:47, sunset 20:07; civil twilight from 03:03 and until 20:52.
+In sight: Sail ho! A sail on the starboard bow, bearing ESE, distant three miles; Sail ho! A sail on the starboard bow, bearing ESE, distant six miles; Sail ho! A sail on the starboard bow, bearing ESE, distant two leagues; Sail ho! A sail on the starboard bow, bearing ESE, distant six miles; Sail ho! A sail abeam to larboard, bearing N by W, distant three leagues; Sail ho! A sail abeam to larboard, bearing N by W, distant three leagues; Sail ho! A sail abeam to larboard, bearing N by W, distant three leagues; Sail ho! A sail abeam to larboard, bearing N by W, distant five leagues; and 41 more in sight.
+50° 13' N, 4° 33' W by account; the tide allowed: the ebb, three quarters of a knot to the SW, by the directions for the open Channel and high water at Ramhead by the epitome. I would not trust the reckoning within three miles NE and SW, nor nine cables across.
+The last cast: 14 fathoms; good ground, by the cast three hours ago.
+Port: no port within the pilot's cruising ground by account; the nearest is Plymouth, ENE by account, five leagues, the account good to three miles.
+Sherbourne: heading ENE (63°), speed 5.7 kn, leeway 0°, heel -0°
+Apparent wind 168° astern, a little on the starboard quarter, 8.1 kn; helm -8°
+Sail set: topsail, main.sail, fore.staysail, jib; unbent: storm_trysail, storm_jib
+Watch on deck: starboard, 15 hands, none at work; idlers up.
+  Forenoon watch, 3 bells (09:30)  Plymouth: in sight, bearing ENE, six leagues.
+  Forenoon watch (09:38)  The sail on the starboard bow, bearing SE by E, is a smack, standing to the north-westward (NW), under plain sail.
+  Forenoon watch (09:43)  The sail on the starboard bow, bearing SE by E, is a smack, standing to the north-westward (NW), under plain sail.
+  Forenoon watch (09:43)  A gust: 18 knots, the mean 14.
+  Forenoon watch (09:45)  The sail on the starboard bow, bearing SE by E, is a smack, standing to the north-westward (NW), under plain sail.
+  Forenoon watch (09:47)  The sail on the starboard bow, bearing SE, is a lugger, standing to the north-westward (NW), under plain sail.
+  Forenoon watch (09:50)  A gust: 17 knots, the mean 14.
+  Forenoon watch, 4 bells (10:00)  4 bells.
+  Forenoon watch (10:00)  Hove the log: five knots and three quarters.
+  Forenoon watch (10:16)  The lugger abeam to starboard, bearing SE, standing to the north-eastward (NE), under plain sail, shows British colours, the red ensign.
+  Forenoon watch (10:16)  The glass on the lugger abeam to starboard: under way, running before it, under plain sail.
+  Forenoon watch (10:23)  The glass on the lugger abeam to starboard: under way on the starboard tack, with the wind abeam, under plain sail.
+  Forenoon watch, 5 bells (10:30)  5 bells.
+  Forenoon watch (10:40)  A gust: 20 knots, the mean 17.
+  Forenoon watch, 6 bells (11:00)  6 bells.
+  Forenoon watch (11:01)  A gust: 24 knots, the mean 19.
+* Forenoon watch (11:10)  Sail ho! A sail right ahead, bearing ENE, distant two leagues.
+  Forenoon watch (11:18)  Stoke Fleming church bearing E, distant eight leagues.
+  Forenoon watch, 7 bells (11:30)  7 bells.
+  Forenoon watch (11:33)  The sail on the larboard bow, bearing NE, is a cutter standing out from the land, standing to the southward (S), under plain sail.
+  Forenoon watch (11:46)  The cutter right ahead, bearing NE by E, standing to the southward (S), under plain sail, shows British colours, the red ensign.
+  Forenoon watch (11:46)  The glass on the cutter right ahead: under way on the starboard tack, close-hauled, under plain sail.
+  Forenoon watch (11:50)  The land about Rame Head on the larboard bow, bearing NE by N, distant three miles.
+  Forenoon watch (11:50)  The cutter on the starboard bow, bearing E by N, is the Plymouth pilot's cutter, standing to the southward (S), under plain sail; British colours, the red ensign.
+* Forenoon watch (11:52)  Rame Head bearing E by N, steady and closing: distant three miles.
+  Forenoon watch (11:52)  The glass on the Plymouth pilot's cutter on the starboard bow: under way on the larboard tack, close-hauled, under plain sail.
+* Forenoon watch (11:57)  The cutter hailed: a pilot for Plymouth, if you will take him.
+  Forenoon watch (11:58)  The glass on the Plymouth pilot's cutter on the larboard bow: under way, running before it, under plain sail.
+  Forenoon watch (11:58)  A gust: 20 knots, the mean 16.
+  Afternoon watch, 8 bells (12:00)  Eight bells. The larboard watch relieved the deck.
+  Afternoon watch, 8 bells (12:00)  8 bells.
+  Afternoon watch (12:00)  Hove the log: six knots and a quarter.
+* Afternoon watch (12:06)  Mr Pearce sends for the captain: cawsand bearing ENE, steady and closing: distant four miles.
+* Afternoon watch (12:08)  Mr Pearce sent down to the captain, in the gunroom: the pilot's hail: the cutter hailed again: a pilot for Plymouth, if you will take him. Unanswered, she will bear away for Cawsand Bay.
+* Afternoon watch (12:10)  Mr Pearce sent down to the captain, in the gunroom: the land sighted, on the starboard bow.
+* Afternoon watch (12:17)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:20)  Mr Pearce sent down to the captain, in the gunroom: the land sighted, on the starboard bow.
+* Afternoon watch (12:20)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:21)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:21)  Mr Pearce sends for the captain: land ahead, fine on the larboard bow, seven cables: she is standing into it.
+* Afternoon watch (12:22)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:22)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:28)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:29)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+* Afternoon watch (12:29)  Mr Pearce sent down to the captain, in the gunroom: the sail on the larboard quarter lost sight of.
+  Afternoon watch, 1 bell (12:30)  Mr Bowen came on deck, the day's work done.
+  Afternoon watch, 1 bell (12:30)  1 bell.
+! Afternoon watch (12:30)  She has taken the ground forward, on sand, foul and rocky in the north part: one fathom and a half of water by the chart, and she draws 9 feet; she struck at six knots, heeling 0 degrees, the tide rising.
+* Afternoon watch (12:30)  The carpenter reports her stove on the rock and making water.
+* Afternoon watch (12:30)  She took the ground on the flood; the master thinks she will float as it makes.
+* Afternoon watch (12:30)  Main topmast working under the press of sail.
+* Afternoon watch (12:30)  Main topgallant mast working under the press of sail.
+* Afternoon watch (12:42)  The carpenter reports a foot of water in the well, and gaining.
+  Afternoon watch (12:43)  The Plymouth pilot's cutter on the starboard bow is out of sight.
+* Afternoon watch (12:55)  The carpenter reports 2 feet of water in the well, and gaining.
+  Afternoon watch, 2 bells (13:00)  2 bells.
+  Afternoon watch (13:00)  A gust: 21 knots, the mean 17.
+! Afternoon watch (13:02)  She is settling: the water is over the orlop and she answers her helm like a log; the pumps cannot hold her unless the leak is stopped.
+! Afternoon watch (13:07)  The carpenter reports 3 feet of water in the well, and gaining.
+  Afternoon watch (13:08)  A gust: 20 knots, the mean 17.
+* Afternoon watch (13:09)  She is off, and afloat again on the flood.
+  Afternoon watch (13:09)  Leeway 1° to larboard.
+! Afternoon watch (13:09)  She has taken the ground forward, on sand, foul and rocky in the north part: one fathom and a half of water by the chart, and she draws 9 feet; she struck at two knots, heeling 6 degrees, the tide rising.
+* Afternoon watch (13:09)  The carpenter reports her stove on the rock and making water.
+* Afternoon watch (13:09)  She took the ground on the flood; the master thinks she will float as it makes.
+  Afternoon watch (13:10)  A gust: 19 knots, the mean 16.
+  Afternoon watch (13:11)  A gust: 19 knots, the mean 16.
+  Afternoon watch, 3 bells (13:30)  3 bells.
+Advanced 14400 ticks to Afternoon watch, 3 bells (13:30).
+Following the Sherbourne.
+Afternoon watch, 3 bells (13:30)
+Wind SW by W, 14 knots, a moderate breeze
+Day. Sunrise 03:45, sunset 20:06; civil twilight from 03:00 and until 20:51.
+In sight: Sail ho! A sail on the starboard quarter, bearing SW by W, distant three leagues; Sail ho! A sail on the starboard quarter, bearing SW, distant three leagues; Sail ho! A sail on the starboard quarter, bearing SW by W, distant four leagues; Sail ho! A sail on the starboard quarter, bearing SW by W, distant four leagues; the land about Cawsand close aboard on the larboard bow, bearing NNE, distant a cable; Rame Head bearing S by E, distant a mile; Cawsand bearing E by N, distant a mile; Penlee Point bearing ESE, distant a mile; and 19 more in sight.
+50° 18' N, 4° 09' W by account; the tide allowed: none while she rides at anchor. I would not trust the reckoning within three miles ENE and WSW, nor two miles across.
+The last cast: 14 fathoms; good ground, by the cast seven hours ago.
+aground, forward on sand, foul and rocky in the north part
+Port: Plymouth, Cawsand Bay bearing NW by N by account, three miles, the account good to three miles; the port open to the English; the boat at the booms.
+Sherbourne: heading E by N (81°), speed 0.7 kn, leeway -16°, heel -15°
+Apparent wind 160° on the starboard quarter, abaft the beam, 12.2 kn; helm -18°
+Sail set: topsail, main.sail, fore.staysail, jib; unbent: storm_trysail, storm_jib
+Watch on deck: larboard, 15 hands, none at work; idlers up.
+
+real	2m5.471s
+user	1m58.480s
+sys	0m0.300s

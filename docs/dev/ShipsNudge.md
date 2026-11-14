@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-13, 14:32 UTC (ruling 11: working officers in the narrower form, measured and then built if clean; the bilander nine on it). Nudge number: 4.
+Latest note: 2026-11-14, 14:05 UTC (package 75 at 20a8e2e3 read twice and tried on the trunk: not merged yet; one last list of nine to mend at their causes, the rest listed). Nudge number: 12.
