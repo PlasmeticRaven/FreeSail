@@ -110,8 +110,8 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: by the Great Pass
 # between Porquerolles and Port-Cros, Porquerolles 9 cables to larboard and the Sarraniers
 # 13, then along Porquerolles' north side, as the pilot has it.
-# Its least depth along the way, by the grid at its datum: 3.3 m, drawn through
-# water of 3 m and more on every leg.
+# Its least depth along the way, by the grid at its datum read every 2 m: 3.1 m,
+# drawn through water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [hyeres-road, porquerolles-anchorage, 42 58 N 6 18 E]
 #   from_sea: [42 58 N 6 18 E, porquerolles-anchorage, hyeres-road]

@@ -106,9 +106,9 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: Old Harry to
 # larboard, over the bar between the Hook sand and the Haven's points to Brownsea, as the
 # pilot has it.
-# Its least depth along the way, by the grid at its datum: 1.0 m, on the leg to
-# 50 42.05 N 1 57.85 W (13 of 16 legs under 3 m): the grid has no deeper way within the
-# pilot's sides, so the track stands and the audit lists it (f-shallow).
+# Its least depth along the way, by the grid at its datum read every 2 m: 0.1 m,
+# on the leg to 50 40.88 N 1 56.87 W (13 of 16 legs under 3 m): the grid has no deeper way
+# within the pilot's sides, so the track stands and the audit lists it (f-shallow).
 # The tracks before, which the guard refused:
 #   to_sea: [brownsea-road, 50 40.3 N 1 56.5 W, studland-bay, 50 38 N 1 52 W]
 #   from_sea: [50 38 N 1 52 W, studland-bay, 50 40.3 N 1 56.5 W, brownsea-road]

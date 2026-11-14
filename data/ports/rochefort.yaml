@@ -143,9 +143,9 @@ closed_to: []
 # game's land guard passes in and out; read against the pilot's channel: from the Basque
 # Road between Aix and the Boyart, Aix 6.7 cables to larboard and the Boyart 9.2 to
 # starboard, not north of Aix, as the pilot has it.
-# Its least depth along the way, by the grid at its datum: 2.0 m, on the leg to
-# 45 59.98 N 1 09.36 W (8 of 13 legs under 3 m): the grid has no deeper way within the
-# pilot's sides, so the track stands and the audit lists it (f-shallow).
+# Its least depth along the way, by the grid at its datum read every 2 m: 2.0 m,
+# on the leg to 46 00.01 N 1 09.22 W (8 of 13 legs under 3 m): the grid has no deeper way
+# within the pilot's sides, so the track stands and the audit lists it (f-shallow).
 tracks:
   to_sea: [45 59.98 N 1 09.32 W, 46 00.01 N 1 09.86 W, 46 00.03 N 1 09.90 W, 46 00.18 N 1 11.70 W, 46 02.70 N 1 15.60 W, 46 05.19 N 1 18.00 W]
   from_sea: [46 05.19 N 1 18.00 W, basque-road]

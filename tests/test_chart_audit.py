@@ -170,6 +170,29 @@ def test_a_track_over_shallow_water_the_guard_passes_is_found(tmp_path, chart):
     assert "f-shallow:plymouth" not in plain.keys()
 
 
+def test_a_shoal_narrower_than_the_old_step_is_found(tmp_path, chart, monkeypatch):
+    """(f) The depth along a track is sampled finer than the grid's narrowest shoal: on
+    Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W crosses a
+    shoal of 1.2 m at the grid's datum near 38 26.0 N 9 04.1 W that a sample every 20 m
+    stepped over (it read 2.3 m), found by the chart session's own sampler (package 111,
+    step 2b, the lead's ruling of 2026-11-14). The step as set reads the shoal; at 20 m the
+    same leg reads over 2 m, so the test fails at the old step."""
+    from freesail.world.geo import parse_position
+
+    a = parse_position("38 26.02 N 9 04.46 W")
+    b = parse_position("38 25.97 N 9 03.72 W")
+    ((least, where, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
+    assert 1.0 < least < 1.35, least
+    assert 38.43 < where.lat_deg < 38.44 and -9.075 < where.lon_deg < -9.06
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart), _port_file(tmp_path, "setubal", lambda d: None))
+    found = next(f for f in audit.findings if f.key == "f-shallow:setubal")
+    assert "the least 1.2 m" in found.words, found.words
+    monkeypatch.setattr(A, "TRACK_STEP_M", 20.0)
+    ((coarse, _, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
+    assert coarse > 2.0, coarse
+
+
 def test_a_headland_in_the_sea_and_a_rock_inland_are_found(chart):
     """(g) A headland planted in the open Sardinian sea and a rock planted on Sardinia's
     hills are found; a light-vessel afloat and a lighthouse on its rock are not."""

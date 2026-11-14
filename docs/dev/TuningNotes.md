@@ -27959,6 +27959,71 @@ last measure with the tracks in, vessel for vessel (prize-home 22 to 24, smack-f
 trunk's next commits touched only `docs/dev/M7-WorkPackages.md`; they and this paragraph are all
 that the final hash adds, so its code and data are byte for byte those measured.
 
+### Step 2b: the depth read finer (the lead's ruling of 2026-11-14, 03:30 UTC)
+
+The chart session's coarser sampler found 1.6 m on Setúbal's way in, where the audit said 2.1 m.
+The audit missed no leg (it reads the way in as `approach_plan` builds it, the road and the `in:`
+track among it, and the way out by the track to sea), but its 20 m step was coarser than the
+grid: the finest cell under any port's track is 15.4 m (the coarsest 92.6 m), and on the leg
+from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W the 20 m step read 2.26 m over a shoal of
+1.17 m (1 m step) near 38 26.0 N 9 04.1 W. The fault was the check's, and so package 111's.
+
+**The step, measured over the 92 ports with tracks** (3,870 km of legs; each port's least, and
+its count of legs under 3 m, at each step; seconds for one pass over all 92):
+
+| Step | One pass | Worst move of a port's least on halving | Counts that move on halving |
+|---|---|---|---|
+| 20 m | 2.9 s | 2.53 m (Milazzo, deep water) | Dartmouth, Ferrol, Lisbon, Messina, Santander |
+| 10 m | 4.0 s | 0.72 m (Santander) | Dartmouth, Ferrol |
+| 5 m | 7.0 s | 0.25 m (Santa Cruz de Tenerife) | Lisbon |
+| 2 m | 15.7 s | 0.08 m (Santa Cruz de Tenerife) | none |
+| 1 m | 29.8 s | 0.03 m (Setúbal) | none |
+
+The lead's test (halving the step again moves no port's least by more than a tenth of a metre)
+is met first at 2 m (JUDGEMENT, so marked in the code). Read at 2 m everywhere, the check grew
+each of the four fast-tier tests that sweep the ports (the two full sweeps, 7-560 and 7-563) by
+about 13 s, some 55 s in all, over the lead's twenty. So, as the lead allowed, each leg is read
+every 20 m first and again every 2 m where that reading is under a threshold. **The threshold
+is 8 m, not the 5 m first proposed, and the data says why:** a leg left at its 20 m reading read
+up to 2.54 m less at 2 m, so a coarse 5 m could hide a leg under 3 m. At 8 m, every leg that reads
+under 8 m at 2 m is read at 2 m (proven over all 92); one pass costs 6.1 s against 2.9 s at the
+old step and 19.1 s at 2 m throughout. The test `test_a_shoal_narrower_than_the_old_step_is_found`
+holds Setúbal's shoal (1.2 m, between 1.0 and 1.35) and fails at the 20 m step (it reads 2.26 m).
+
+**The four, one pass more** (the redraw's own depth test read every 2 m; the same pilot's points
+as before, every new mark within 190 m of an old one and most within 66 m; in and out clear of
+the land):
+
+| Port | At 1e28b0b, by 2 m | Now | Shallow legs |
+|---|---|---|---|
+| Santander | 1.04 m | 3.0 m (3.01) | 2 to 0 |
+| Dartmouth | 2.87 m | 3.1 m | 3 to 0 |
+| Ferrol | 2.62 m | 3.4 m | 3 to 0 |
+| Lisbon | 2.99 m | 3.1 m | 2 to 0 |
+
+So all fifteen keep 3 m and more on every leg. Each file says its new least, and its tracks of
+the step before with their figure.
+
+**Every figure brought to the new reading.** In package 111's port files: Setúbal 2.1 to 1.2 m,
+Poole 1.0 to 0.1 m, Paimboeuf 2.0 to 1.9 m, Hyères 3.3 to 3.1, Maddalena 5.5 to 5.3, Palma 3.1 to
+3.0, St Peter Port 4.2 to 4.0 m. The rest stand (Alghero 17.2, Civita Vecchia ground drying 0.6,
+Gaeta 5.2, Morlaix 3.0, Oporto 1.0, Port Mahon 9.3, Rochefort 2.0, St Mary's 3.5, Toulon 7.9,
+Villefranche 15.0). The audit's words no longer say "-0.0 m" (Palermo: "0.0 m").
+
+**The known list** keeps 120 entries, 19 of them `f-shallow`. No entry was added: the four were
+redrawn clean. Messina's ceiling is 2 (one leg at 20 m, two at 2 m). The figures and places in
+the reasons moved for Catania (1.8 to 1.1 m), La Goletta (2.0 to 1.9), Lampedusa (0.5 to 0.4),
+Messina (ground drying 3.9 to 4.0), Paimboeuf, Palermo, Poole, Porto Paolo (drying 2.0 to 2.1),
+Rochefort (its place), Santa Cruz de Tenerife (drying 0.8 to 1.5), Setúbal and Syracuse (0.6 to
+0.5). They are listed, not mended: the Sicilian six and Santa Cruz are the chart session's to
+redraw. No truth pins an `f-shallow` figure: 7-563 pins the ways refused (four in, four out,
+unchanged). 7-565 holds the full sweep to the known list, and it passes.
+
+**The hash.** The branch's head before this step is ce8bb0e, which is 1e28b0b merged with the
+trunk at eb2c8fe1 (no conflict; it adds 112's truth 7-570 and nothing of package 111's). It was
+pushed at 02:45, before the ruling to build on 1e28b0b, and taking it back would need a
+force-push. This step is built on it, and no trunk since is merged.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the

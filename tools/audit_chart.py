@@ -182,12 +182,21 @@ OPEN_WATER_NM = 6.0
 OPEN_WATER_DEPTH_M = 20.0
 # A port's tracks are the way the land allows (the game's guard judges land, not depth), not a
 # sounded channel: each leg of the way in and the way out is read for the least depth the
-# grid charts along it, every TRACK_STEP_M, and a leg under TRACK_LEAST_DEPTH_M at the chart's
-# datum is a finding (JUDGEMENT: three metres, about a laden trader's draught of ten feet,
-# against the grid's datum near the lowest water; the period's pilots give the channel at low
-# water in fathoms, so a leg the grid gives less than that may be one no trader floats in at
-# low water, or the grid's grain over a narrow channel).
-TRACK_STEP_M = 20.0
+# grid charts along it, and a leg under TRACK_LEAST_DEPTH_M at the chart's datum is a finding
+# (JUDGEMENT: three metres, about a laden trader's draught of ten feet, against the grid's
+# datum near the lowest water; the period's pilots give the channel at low water in fathoms,
+# so a leg the grid gives less than that may be one no trader floats in at low water, or the
+# grid's grain over a narrow channel). Each leg is read every TRACK_COARSE_STEP_M first, and
+# a leg whose coarse least is under TRACK_REFINE_BELOW_M is read again every TRACK_STEP_M.
+# JUDGEMENT, measured (package 111, the lead's ruling of 2026-11-14): the finest cell under any
+# port's track is 15.4 m, and over the 92 ports with tracks, halving 2 m to 1 m moves no port's
+# least by more than 0.08 m and no count of shallow legs (20 m stepped over Setubal's 1.2 m
+# shoal and read 2.3 m). A leg left at the coarse reading read at most 2.54 m less at 2 m, so
+# the refinement takes every leg under 8 m (three metres, that move and a margin): over the 92,
+# every leg that reads under 8 m at 2 m is read at 2 m, at a third of the cost of reading all.
+TRACK_STEP_M = 2.0
+TRACK_COARSE_STEP_M = 20.0
+TRACK_REFINE_BELOW_M = 8.0
 TRACK_LEAST_DEPTH_M = 3.0
 
 # A stream area's polygon tried for water on a grid of this many points a side over its
@@ -910,24 +919,32 @@ def _least_depth(
     chart: Chart, start: Position, plan: list[tuple[Any, ...]]
 ) -> list[tuple[float, Position, str]]:
     """Each leg's least charted depth (metres at the datum, negative where it dries), the
-    place of it and the leg's end's name, sampled every `TRACK_STEP_M` along the great
-    circle of the leg, its ends among them."""
+    place of it and the leg's end's name, sampled along the great circle of the leg, its
+    ends among them: every `TRACK_COARSE_STEP_M`, and every `TRACK_STEP_M` again where the
+    coarse least is under `TRACK_REFINE_BELOW_M`."""
+
+    def sampled(a: Position, b: Position, step: float) -> tuple[float, Position] | None:
+        bearing, dist = bearing_and_distance(a, b)
+        n = max(1, int(dist / step))
+        least: tuple[float, Position] | None = None
+        for i in range(n + 1):
+            p = destination(a, bearing, dist * i / n)
+            e = chart.elevation_at(p)
+            if e is None:
+                continue
+            if least is None or -e < least[0]:
+                least = (-e, p)
+        return least
+
     out: list[tuple[float, Position, str]] = []
     here = start
     for leg in plan:
         if len(leg) < 2 or not isinstance(leg[1], Position):
             continue  # an order of the plan's that is no leg (as the guard skips it)
         there = leg[1]
-        bearing, dist = bearing_and_distance(here, there)
-        n = max(1, int(dist / TRACK_STEP_M))
-        least: tuple[float, Position] | None = None
-        for i in range(n + 1):
-            p = destination(here, bearing, dist * i / n)
-            e = chart.elevation_at(p)
-            if e is None:
-                continue
-            if least is None or -e < least[0]:
-                least = (-e, p)
+        least = sampled(here, there, TRACK_COARSE_STEP_M)
+        if least is not None and least[0] < TRACK_REFINE_BELOW_M:
+            least = sampled(here, there, TRACK_STEP_M)
         if least is not None:
             name = str(leg[2]) if len(leg) > 2 else fmt(there.lat_deg, there.lon_deg)
             out.append((least[0], least[1], name))
@@ -936,7 +953,7 @@ def _least_depth(
 
 
 def _depth_words(d: float) -> str:
-    return f"{max(d, 0.0):.1f} m" if d > -0.05 else f"ground drying {-d:.1f} m"
+    return f"{max(d, 0.0) + 0.0:.1f} m" if d > -0.05 else f"ground drying {-d:.1f} m"
 
 
 def _dated_rows(nations: tuple[dict[str, Any], ...]) -> list[str]:

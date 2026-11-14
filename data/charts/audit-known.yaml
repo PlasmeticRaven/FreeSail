@@ -3,7 +3,8 @@
 # Every finding of the audit's first run (the trunk as package 111 was cut from it, the full
 # sweep), less those step 2a mended and with those its mends added (each said in its reason),
 # less the 41 ways in and out that step 2b's tracks mended and with the tracks' shallow legs
-# its depth check found (`f-shallow`), each by its key with its place (the
+# its depth check found (`f-shallow`, read every 2 m where a leg's coarse reading is under 8 m,
+# by the lead's ruling of 2026-11-14), each by its key with its place (the
 # worst position the audit names, or its region),
 # its reason in a line, whose it is (the package that built it, or the lead's list for what no
 # block owns: the tile grid's reach past the bounds, the climatology's boxes, a rule), and the
@@ -398,7 +399,7 @@ known:
   most: 2
 - key: f-shallow:catania
   place: 37°29.9′N 15°05.9′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 1 legs, the least 1.8 m on the leg to the mole of Catania: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 1 legs, the least 1.1 m on the leg to the mole of Catania: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 105
   most: 1
 - key: f-shallow:civita-vecchia
@@ -418,57 +419,57 @@ known:
   most: 2
 - key: f-shallow:la-goletta
   place: 36°51.9′N 10°21.5′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least 2.0 m on the leg to the road of Tunis: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least 1.9 m on the leg to the road of Tunis: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 104
   most: 2
 - key: f-shallow:lampedusa
   place: 35°29.8′N 12°36.1′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 3 legs, the least 0.5 m on the leg to the harbour of Lampedusa: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 3 legs, the least 0.4 m on the leg to the harbour of Lampedusa: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 105
   most: 3
 - key: f-shallow:messina
   place: 38°12.4′N 15°33.9′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 1 legs, the least ground drying 3.9 m on the leg to the harbour of Messina: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 4.0 m on the leg to the harbour of Messina: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum); one leg at the 20 m step before, two at 2 m'
   owner: package 105
-  most: 1
+  most: 2
 - key: f-shallow:oporto
   place: 41°08.7′N 8°40.5′W
   reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 2 legs, the least 1.0 m on the leg to within the bar of Oporto: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 2
 - key: f-shallow:paimboeuf
-  place: 47°13.5′N 2°15.8′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 6 legs, the least 2.0 m on the leg to 47 13.65 N 2 15.58 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  place: 47°16.9′N 2°10.1′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 6 legs, the least 1.9 m on the leg to 47 17.93 N 2 08.05 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 6
 - key: f-shallow:palermo
   place: 38°07.7′N 13°22.6′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least -0.0 m on the leg to the mole harbour of Palermo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least 0.0 m on the leg to the mole harbour of Palermo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 105
   most: 4
 - key: f-shallow:poole
-  place: 50°42.1′N 1°58.0′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 13 legs, the least 1.0 m on the leg to 50 42.05 N 1 57.85 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  place: 50°41.0′N 1°56.9′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 13 legs, the least 0.1 m on the leg to 50 40.88 N 1 56.87 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 13
 - key: f-shallow:porto-palo
-  place: 36°40.2′N 15°07.5′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 2.0 m on the leg to Porto Paolo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  place: 36°40.2′N 15°07.4′E
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 2.1 m on the leg to Porto Paolo: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 105
   most: 2
 - key: f-shallow:rochefort
-  place: 46°00.0′N 1°09.4′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 8 legs, the least 2.0 m on the leg to 45 59.98 N 1 09.36 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  place: 46°00.0′N 1°09.3′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 8 legs, the least 2.0 m on the leg to 46 00.01 N 1 09.22 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 8
 - key: f-shallow:santa-cruz-de-tenerife
   place: 28°28.4′N 16°14.2′W
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 0.8 m on the leg to the road of Santa Cruz: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 2 legs, the least ground drying 1.5 m on the leg to the road of Santa Cruz: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 106a
   most: 2
 - key: f-shallow:setubal
-  place: 38°28.0′N 8°57.9′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 2.1 m on the leg to 38 28.45 N 8 56.60 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  place: 38°26.0′N 9°04.1′W
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 1.2 m on the leg to 38 25.97 N 9 03.72 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 111
   most: 5
 - key: f-shallow:st-malo
@@ -478,7 +479,7 @@ known:
   most: 6
 - key: f-shallow:syracuse
   place: 37°03.0′N 15°17.8′E
-  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least 0.6 m on the leg to off the mouth of the Great Harbour: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
+  reason: 'its tracks cross water the grid charts under 3 m at its datum on 4 legs, the least 0.5 m on the leg to off the mouth of the Great Harbour: the game''s guard judges land, not depth; listed and not mended (the lead''s ruling of 2026-11-13: only package 111''s own tracks were redrawn) (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum)'
   owner: package 105
   most: 4
 - key: f-shore-afloat:corunna
