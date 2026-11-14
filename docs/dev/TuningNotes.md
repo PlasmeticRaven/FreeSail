@@ -29602,3 +29602,28 @@ beside it), mended on top of it.** Each at its cause, the measure old beside new
 "sell five tons of tin and buy one ton of coal" refused as one cargo's name; the boat
 alongside in the same tick when the ship has sailed an hour; helm orders and `tack ship`
 accepted with the wheel shot away; a double full stop after `world: aboard: the boat stove`.
+
+**The wheel shot away: DECIDED, NOT BUILT (the owner's word of 2026-11-14, by the lead: "For
+a wheel shot away, yes, it ought to stop the helm until the damage is repaired"; held for the
+next milestone by the lead's order of the same evening).** The order `rig the relieving
+tackles` stands as built, its words mended (item 6 above). What the ground report found, for
+the builder of it:
+- The engine already stops the rudder: `physics/hull.steer` returns the rudder as it lay while
+  `ship.extra["helm_lost"]` stands, and `physics/integrate` (`d.rudder = hp.steer(ship, h)`) is
+  the one road from the helm to the rudder. Measured at the first action's seed 6, the tackles
+  belayed: the rudder 0.116 rad through `steer north-west` and `steer east`. What is untrue is
+  the words: every helm order is accepted ("Helm ordered: steer NW (315°).") and does nothing.
+- The doors a guard would stand at: `orders/verbs.execute`'s gate beside `_not_riding` (the
+  heading and points verbs and `HELM_VERBS`), `orders/navigation.steer_degrees` (shape a course,
+  the sailing directions, the course held pending), and the start of the evolutions whose
+  scripts give the helm (tack, wear, boxhaul, box off, back and fill, heave to, fill away, lie
+  a-try, scud, come to anchor, get under way); every actor comes through `World.submit` to them.
+- The rules captain's `_repairs` orders the tackles first (31 s after the hit at seed 6, rove
+  318 s later), but runs at most every 600 s and not at all hove to for weather, in distress,
+  or at his shortening wind (30 kn): with the wheel lost in a gale he never rigs them.
+- The rudder meanwhile, as it lay or trailing amidships (tiller ropes shot away leave the
+  tiller free), and whether the tackles steer slower: open, for the builder and the lead.
+- The odds as read: about one hit in 270 takes the wheel on the hull aim, one in 500 on the
+  rigging; the first action at seeds 1 to 8 loses it at seed 6 only.
+- The wheel itself made good (new tiller ropes rove, a spare wheel shipped): another repair
+  evolution, on the list.
