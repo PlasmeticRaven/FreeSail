@@ -154,7 +154,7 @@
 
   /** The followed hull's drawing taken from the server when the drivers follow another hull
    *  (package 109): her graph, her name and her rig; or, where she cannot be drawn as she
-   *  stands (the far shape, a boat, no spars), the words that say so and no drawing. */
+   *  stands (a hull asleep, a boat, no spars), the words that say so and no drawing. */
   function takeFollowedShip(id) {
     if (state.shipFetching === id) return;
     state.shipFetching = id;
