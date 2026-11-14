@@ -18169,7 +18169,12 @@ def test_truth_7_613_a_save_and_a_load_open_the_file_they_checked_and_no_link_le
                 assert not (outside / "plain.checkpoint").exists()
                 r = c.post("/api/harbour/start", json={"load": "linkvictim"})
                 assert r.status_code == 403 and "SENTINEL" not in r.text
-            for given in ("pyproject.toml", "freesail/ui/guard.py", "data/ships/cutter.yaml"):
+            for given in (
+                "pyproject.toml",
+                "./pyproject.toml",  # a path to a file lying in the game's folder: no save
+                "freesail/ui/guard.py",
+                "data/ships/cutter.yaml",
+            ):
                 r = c.post("/api/harbour/start", json={"load": given})
                 assert r.status_code == 403, (given, r.text)
                 assert "a .json file" in r.json()["detail"]
