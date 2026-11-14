@@ -273,6 +273,13 @@ REACH: dict[str, str] = {
     "ship.hove_to": "aboard",
     "ship.filled_away": "aboard",
     "ship.command_passes": "aboard",
+    "ship.taken_up": "aboard",  # package 60: a captain takes command of her, or leaves her
+    # package 60, step 2: her people and hands moved to another ship of his, and come aboard
+    "company.transfer": "aboard",
+    "company.came_aboard": "aboard",
+    "company.came_back": "aboard",
+    "company.went_across": "aboard",
+    "company.picked_up": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",
@@ -787,6 +794,8 @@ def player_hull(world: Any) -> Any:
     players = getattr(root, "players", None)
     if players is None or is_observer(players):
         return None
+    if (getattr(root, "__dict__", None) or {}).get("_players"):
+        return players  # he has taken command of her (package 60): `--ship` stood at the start
     hulls = getattr(root, "hulls", None) or {}
     log = getattr(players, "log", None)
     if log is None or not hulls:
@@ -841,6 +850,62 @@ def players_station(world: Any) -> str:
     """The station the player's words are said as: his seat's, else the captain's."""
     seat = _seat(world)
     return str(seat.station.name) if seat is not None else "captain"
+
+
+def knows_of(world: Any, vessel: Any) -> bool:
+    """Whether the player knows of this ship (package 60; the lead's ruling on the fourth
+    reading: one answer, no search of a log): she is one of his own wherever she is (the ship he
+    commands, one he has left, one given him, a prize of a ship of his, a consort under the
+    orders of a ship of his: the cut's ruling 4), or a sail in sight whose name his lookout has
+    made out (the
+    lookout's own record of what is made out of each sail, and a name she has given). Of every
+    other ship he knows nothing, which is true of one once met and now gone."""
+    from freesail.world.command import HULLS_LEFT, given_to
+
+    root = _root(world)
+    vid = str(getattr(vessel, "id", "") or "")
+    players = getattr(root, "players", None)
+    if players is not None and str(getattr(players, "id", "")) == vid:
+        return True
+    left = set(root.__dict__.get(HULLS_LEFT) or ())
+    if vid in left or given_to(root, vid):
+        return True
+    # his own wherever she is (the cut's ruling 4): a prize of a ship of his, a consort under
+    # the orders of a ship of his
+    his = left | {str(getattr(players, "id", "") or "")}
+    his |= {str(getattr(getattr(players, "vessel", None), "id", "") or "")}
+    his.discard("")
+    from freesail.world import prizes as P
+
+    rec = P.record_of(vessel) if P.is_prize(vessel) else None
+    if rec and str(rec.get("captor") or "") in his:
+        return True
+    if str(getattr(vessel, "under_orders_of", "") or "") in his:
+        return True
+    return named_in_sight(players, vessel)
+
+
+def named_in_sight(hull: Any, vessel: Any) -> bool:
+    """Whether this ship is a sail in sight of the hull whose name her lookout has made out:
+    her name among the words made out of her, or given by her hail (`Lookout._sail_known`,
+    `Lookout._sail_ident`)."""
+    import re
+
+    lookout = getattr(hull, "lookout", None)
+    name = str(getattr(vessel, "name", "") or "")
+    if lookout is None or not name:
+        return False
+    pattern = re.compile(rf"\b{re.escape(name.lower())}\b")
+    known = getattr(lookout, "_sail_known", {}) or {}
+    ident = getattr(lookout, "_sail_ident", {}) or {}
+    for s in getattr(lookout, "sightings", ()) or ():
+        if getattr(s, "seen_as", "") != "sail" or str(s.feature.modern) != str(vessel.id):
+            continue
+        fid = s.feature.id
+        given = str((ident.get(fid) or {}).get("name") or "").lower()
+        if given == name.lower() or pattern.search(str(known.get(fid, "")).lower()):
+            return True
+    return False
 
 
 def players_person(world: Any) -> Any:
