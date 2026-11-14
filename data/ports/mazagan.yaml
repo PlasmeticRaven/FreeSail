@@ -74,9 +74,7 @@ pilot:
     tide: "Go into the dock at high water."
 
 tide:
-  establishment: Coast of Marocco
   enter_on: flood
-  leave_on: ebb
 
 market:
   - market:

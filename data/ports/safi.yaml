@@ -71,9 +71,7 @@ pilot:
     tide: "No tide to speak of in the road; the current runs south-south-west along the coast."
 
 tide:
-  establishment: Coast of Marocco
   enter_on: flood
-  leave_on: ebb
 
 market:
   - market:

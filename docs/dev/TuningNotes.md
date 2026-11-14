@@ -28422,6 +28422,14 @@ the world); Mogador's two passages into the harbour within the island read 0.0 m
 (south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
 the road; Agadir's modern moles enclose the period's road's first place (moved south of them).
 
+**The cold review's two cautions** (the chart session, 2026-11-14): no tile is rebuilt or
+committed but the four regions' own (every other region's files byte for byte, `git status` at
+each build); and the six port files give no key the game reads nowhere, beyond the form: their
+`tide: establishment:` and `tide: leave_on:` were taken out (read by nothing: the master's hours
+are the epitome's places, `data/tides/establishments.yaml`, by position), and `datum:
+unverified` is kept **only for the form** (the how-to's: a top-level key the machinery does not
+read, which says no period sheet was read with its datum).
+
 **The mends, by their causes** (the owner's word of 2026-11-14 through the lead: build for
 generality, not the symptom):
 

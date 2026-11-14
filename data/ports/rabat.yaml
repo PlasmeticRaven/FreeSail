@@ -83,9 +83,7 @@ pilot:
     tide: "Cross the bar at high water only, with the flood."
 
 tide:
-  establishment: Coast of Marocco
   enter_on: flood
-  leave_on: ebb
 
 market:
   currency: pounds

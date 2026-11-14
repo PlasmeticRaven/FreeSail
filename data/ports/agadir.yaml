@@ -83,9 +83,7 @@ pilot:
     tide: "No stream to speak of in the bay; the current outside sets southward and in upon the land."
 
 tide:
-  establishment: Mogador
   enter_on: flood
-  leave_on: ebb
 
 market:
   currency: pounds

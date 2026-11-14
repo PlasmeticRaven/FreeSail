@@ -99,9 +99,7 @@ pilot:
     source: "Jackson 1809, l. 4722 to 4726: built in 1760; the day JUDGEMENT"
 
 tide:
-  establishment: Mogador
   enter_on: flood
-  leave_on: ebb
 
 market:
   - market:

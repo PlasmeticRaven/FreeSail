@@ -74,9 +74,7 @@ pilot:
     tide: "Cross the bar at the top of the tide; a calm here can set you down the coast, for the current runs south a mile or two an hour at springs."
 
 tide:
-  establishment: Coast of Marocco
   enter_on: flood
-  leave_on: ebb
 
 market:
   currency: pounds
