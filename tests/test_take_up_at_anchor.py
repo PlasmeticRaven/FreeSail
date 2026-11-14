@@ -168,3 +168,25 @@ def test_a_second_take_up_lays_her_again():
     command.give(w, lark, me, by="the test")
     _take_up(w, lark_hull, me)
     _laid(lark_hull)
+
+
+def test_an_errand_for_the_old_ship_at_her_anchor_is_refused_in_words():
+    """The cut's ruling 5 (a): an officer left at her anchor keeps her there (nobody aboard
+    weighs of his own accord), so an errand given him at the take-up would be accepted and
+    never sailed; it is refused, saying what works, nothing changed."""
+    from freesail.world.command import CommandError
+    from freesail.world.movement import put_aboard
+
+    w, lark, lark_hull, me = _asleep("ordinary")
+    put_aboard(w, me, lark_hull, "quarterdeck", by="the boat")
+    old = w.players
+    assert old.at_anchor
+    with pytest.raises(CommandError) as refused:
+        command.take_up(
+            w, me, lark_hull, how="left", officer="Mr Pearce", intent="bound for Plymouth"
+        )
+    assert str(refused.value) == (
+        "The Sherbourne lies at her anchor, and Mr Pearce will keep her so; nobody aboard her "
+        "will weigh of his own accord. Leave her to him, or lay her up."
+    ), str(refused.value)
+    assert w.players is old  # nothing changed

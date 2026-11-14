@@ -27832,7 +27832,24 @@ The tests:
   King's ship's doctrine leaves "in port" only "on: under way".
 - Left "to bound for Falmouth" where she lies: her far captain's voyage ends at once, the far
   body is done, and the switch never wakes her. Her hull is kept only as the first hull.
-- Sent to the lead for a ruling; nothing built for it.
+- Sent to the lead for a ruling; nothing built for it. Then ruled:
+  - **(a), built.** The take-up's tail refuses an intent for an old ship that lies at her
+    anchor: "The Sherbourne lies at her anchor, and Mr Pearce will keep her so; nobody aboard
+    her will weigh of his own accord. Leave her to him, or lay her up." Test:
+    `test_an_errand_for_the_old_ship_at_her_anchor_is_refused_in_words`. This also closes the
+    port-she-lies-in case as met at the take-up.
+  - **(b), stopped and told.** The ruling was "every ship he leaves is kept, whatever her officer
+    was told". Built as the kept-hull rule read from the hulls he left (`Vessel.tick`'s empty
+    plan, `_arrived`'s voyage end, `release_done`), it does not hold. Her far captain ends her
+    himself: `FarCaptain._in_port` (brains.py, the trunk's) marks a passage, a letter or a run
+    home done at its destination ("she has gone in and is gone from the sea"), and makes the
+    vessel done whatever her plan. That is the far captain's brain against the kept-hull rule,
+    so by the ruling (b) is taken out and listed below. A test at the far body's level found it
+    (a ship he left, given a far captain bound for the port she lies in); the test left with
+    (b).
+- Finding 4 (the tail refuses free intents) stands as built. Finding 5 (the ship he leaves
+  under way, by the code: with an intent she sails on by the trunk's planner; with none she
+  keeps her far plan and lies to at its end) is read, not run.
 
 **What a player meets, left for the package of the two bodies** (when he takes up or comes
 back to a ship of his that has lain asleep, on the cut):
@@ -27850,8 +27867,13 @@ back to a ship of his that has lain asleep, on the cut):
   far body does not move.
 - Lying to (a lie_to leg, or a gale on any leg): the trunk's `_set_sail` sets her topsails.
   On a smack nothing is set. On a lugger, the lug topsails.
-- An old ship left to her officer in port under an intent never sails (the doctrine). Left
-  bound for the port she lies in, she is put off the sea (the far body done).
+- An officer left in port cannot be sent to sea: the King's ship's doctrine leaves "in port"
+  only "on: under way", and nobody weighs. The take-up's tail refuses the errand in words (ruling
+  5 (a)); a gap for the owner.
+- A ship he leaves under way under an intent, at her voyage's end, is made done by her far
+  captain (`FarCaptain._in_port`). She is off the sea, and released unless she is the first hull.
+  "Never lost" holds for the first hull and for a ship left with no intent, not for one left
+  with an errand (ruling 5 (b), stopped).
 - A sleeping far body anchors by its plan or by the far order in any depth. The far body lies
   to the same way for every rig.
 

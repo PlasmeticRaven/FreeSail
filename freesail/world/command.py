@@ -242,6 +242,14 @@ def take_up(
     how, left_to, port = _settlement(root, old, how, officer)
     if intent and how == LAID_UP:
         raise CommandError("A ship laid up sails for nothing; leave her to an officer to sail her.")
+    if intent and getattr(old, "at_anchor", False):
+        # the cut's ruling 5 (a): an officer left at her anchor keeps her there, and an errand
+        # given him would be accepted and never sailed (nobody aboard weighs of his own accord)
+        officer_name = getattr(left_to, "name", "") or "her officer"
+        raise CommandError(
+            f"The {_name(old)} lies at her anchor, and {officer_name} will keep her so; nobody "
+            "aboard her will weigh of his own accord. Leave her to him, or lay her up."
+        )
     if intent:
         from freesail.world.captains import read_intent
 
