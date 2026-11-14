@@ -258,13 +258,7 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
             _casualties(ship, keeper, mean, g.x_m, "gun", rng, tick)
         else:
             g.condition = max(0.0, g.condition - GUN_WOUND)
-            # a gun named by deck (package 75, B7.d) says "the carriage of" it, so that the deck
-            # is not read as the possessive's (the lead's ruling (4) of 2026-11-12); every other
-            # gun's words as before
-            struck = (
-                f"the carriage of {g.name} struck" if g.of_deck else f"{g.name}'s carriage struck"
-            )
-            keeper.minute.append(("gun", struck))
+            keeper.minute.append(("gun", f"{g.name}'s carriage struck"))
             _casualties(ship, keeper, MEN_HURT_DECK * scale * grape, g.x_m, "gun", rng, tick)
         return seen
     _casualties(ship, keeper, MEN_HURT_DECK * scale * grape, x_m, "deck", rng, tick)

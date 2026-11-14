@@ -170,7 +170,10 @@ def _named_or_kind(world: Any, root: Any, key: str) -> Any:
 
     own = _own_id(world)
     others = [(v, str(v.id)) for v in root.vessels.active() if str(v.id) != own]
-    players = getattr(root.vessels, "own", None)  # the player's ship, a vessel of the sea (step 7)
+    # the player's ship, a vessel of the sea (step 7; package 60: his now, else the shadow)
+    players = getattr(getattr(root, "players", None), "vessel", None) or getattr(
+        root.vessels, "own", None
+    )
     if players is not None and own != str(players.id):
         if key in (players.name.lower(), players.name.lower().removeprefix("the ")):
             return players

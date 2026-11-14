@@ -94,19 +94,6 @@ and `flag:`, the flag party a flagship bears beyond her company when a scenario 
 not in the complement. No file carries either yet; nothing reads them until her bill by deck
 (the marines) and the flag's own package (the flag party); a bill and a crew pickle as before
 while they hold neither.
-
-Package 75's B7, the lead's ruling (1) of 2026-11-10 at 19:30 (lie a-try from way on), adds a
-top-level `timing:`: the ship's own figures for a scripted evolution's timing, by its id and in
-its file's own keys (`lie_a_try: {helm_deg: 20}`), which the runner gives the script over the
-evolution file's (`Runner._timing`); the script's logic is unchanged. Only the 74's and the 64's
-files carry it; a file without it has every evolution's own timing, and a spec pickled before it
-reads as one with none.
-
-Package 75's B1, the lead's ruling (4) of 2026-11-13 (the marines by fit), adds a fit's own
-`marines`: the marines the quarter bill keeps in their division at the beat when she carries that
-fit, where it differs from the bill's own (which is the default fit's), a whole number no more than
-the file's marines. Only the 64's 'ardent class 1794' and the razee's 'as razeed 1795' carry it; a
-fit without it keeps the bill's, and a fit pickled before it reads as one without it.
 """
 
 from __future__ import annotations
@@ -284,17 +271,8 @@ FIT_KEYS = (
     "powder_barrels",
     "exercise_charges",
     "shot",
-    "marines",  # package 75, B1: the marines the bill keeps on this fit
 )
-ARMAMENT_KEYS = ("default", "fits", "numbering")
-# How a file numbers its broadside guns (package 75, B7.d's stage 0: the 74's design,
-# docs/design/Design-Ship-Bellerophon.md §5.2 and §12.1 item 2): the one word an armament's
-# `numbering` may give, each deck's pairs from No. 1 forward, as the period numbered each deck
-# (the Regulations 1808 printing, the Gunner, p. 215), every broadside gun naming its deck and
-# one gun to a deck, a number and a side. A file that says nothing numbers them on across her
-# decks, one gun to a number and a side, as every file before it.
-BY_DECK = "by deck"
-NUMBERINGS = (BY_DECK,)
+ARMAMENT_KEYS = ("default", "fits")
 # The quarter bill beyond the gun crews (spec M7 §8a; `docs/design/Design-WorkInAction.md`):
 # the sail trimmers by station, the hands at the helm, the powder, and the fighting book's
 # priority between the sails and the guns when hands are short; package 73's small-arms
@@ -878,42 +856,16 @@ class FitSpec:
     charges: dict[tuple[str, float], float] | None = None
     powder_barrels: int = 0
     exercise_charges: int = 0
-    # package 75, B1 (the lead's ruling (4) of 2026-11-13): the marines the quarter bill keeps in
-    # their division at the beat when she carries this fit, where it differs from the bill's own
-    # `marines` (the default fit's); None, the bill's. A plain default, left out of the pickle
-    # while None, so that a fit without it, and one pickled before it, is pickled as before it.
-    marines: int | None = None
-
-    def __getstate__(self) -> dict[str, Any]:
-        """Its state for the checkpoint, its marines only where the fit gives them (package
-        75, B1), so that a fit without them is pickled as before it."""
-        state = dict(self.__dict__)
-        if state.get("marines") is None:
-            state.pop("marines", None)
-        return state
 
 
 @dataclass
 class ArmamentSpec:
     """The ship's armament: the fits she may carry, and the default the scenario takes
     when it names none. The default may be `UNARMED` (package 75), a file whose ship
-    sails with no guns unless a scenario names a fit. Its `numbering` (package 75, B7.d's
-    stage 0) is `BY_DECK` where the file numbers each deck's guns from No. 1, else None, the
-    guns numbered on across her decks."""
+    sails with no guns unless a scenario names a fit."""
 
     default: str
     fits: dict[str, FitSpec]
-    # a plain default, left out of the pickle while None, so that an armament without it, and
-    # one pickled before it, is pickled as before it
-    numbering: str | None = None
-
-    def __getstate__(self) -> dict[str, Any]:
-        """Its state for the checkpoint, its numbering only where the file gives one (package
-        75, B7.d's stage 0), so that an armament without one is pickled as before it."""
-        state = dict(self.__dict__)
-        if state.get("numbering") is None:
-            state.pop("numbering", None)
-        return state
 
     def fit(self, name: str | None = None) -> FitSpec | None:
         """The fit named, else the default; None for `UNARMED`, named or by default (package
@@ -1065,10 +1017,6 @@ class ShipSpec:
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
     pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
     oars: OarsSpec | None = None  # None: no oars; a boat's file has them (package 82)
-    # the ship's own figures for a scripted evolution's timing, {evolution id: {key: figure}},
-    # taken over the evolution file's (package 75, the lead's ruling (1) of 2026-11-10 at 19:30:
-    # the two-deckers' lee helm lying a-try); none: every evolution's own timing
-    timing: dict[str, dict[str, float]] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -1143,30 +1091,9 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         ),
         pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
         oars=_parse_oars(data["oars"], source) if data.get("oars") is not None else None,
-        timing=_parse_timing(data["timing"], source) if data.get("timing") is not None else {},
     )
     validate(spec)
     return spec
-
-
-def _parse_timing(raw: Any, source: str) -> dict[str, dict[str, float]]:
-    """The `timing:` section (package 75, the lead's ruling (1) of 2026-11-10 at 19:30): for each
-    scripted evolution named by its id, the ship's own figures for keys of its timing, each a
-    number, read by the runner over the evolution file's own (`Runner._timing`). Which ids and
-    keys an evolution has is its file's, and the files' tests hold every ship file's to them;
-    here the shape alone, refused in words."""
-    if not isinstance(raw, dict):
-        raise ShipFileError(f"{source}: 'timing' is not a mapping of evolutions to their figures.")
-    out: dict[str, dict[str, float]] = {}
-    for eid, figures in raw.items():
-        if not isinstance(figures, dict) or not figures:
-            raise ShipFileError(
-                f"{source}: the timing for '{eid}' is not a mapping of its keys to figures."
-            )
-        out[str(eid)] = {
-            str(k): _num(figures, k, f"the timing for '{eid}'", source) for k in figures
-        }
-    return out
 
 
 def _parse_pumps(raw: Any, source: str) -> list[PumpSpec]:
@@ -1230,15 +1157,7 @@ def _parse_armament(raw: Any, source: str) -> ArmamentSpec:
             f"{source}: the armament's default fit '{default}' is none of its fits "
             f"({', '.join(fits)}) and not '{UNARMED}'."
         )
-    # how she numbers her guns (package 75, B7.d's stage 0): one word, else nothing said
-    numbering = raw.get("numbering")
-    if numbering is not None and numbering not in NUMBERINGS:
-        raise ShipFileError(
-            f"{source}: the armament numbers its guns '{numbering}'; a file numbers them "
-            f"'{BY_DECK}', each deck from No. 1, or says nothing, the guns numbered on across "
-            "her decks."
-        )
-    return ArmamentSpec(default=default, fits=fits, numbering=numbering)
+    return ArmamentSpec(default=default, fits=fits)
 
 
 def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
@@ -1329,10 +1248,6 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
         exercise_charges=_count(
             raw.get("exercise_charges", 0), f"{where}'s charges for exercise", source
         ),
-        # package 75, B1: no more than her marines (`validate`, which has the crew)
-        marines=_count(raw["marines"], f"{where}'s marines kept in their division", source)
-        if raw.get("marines") is not None
-        else None,
     )
 
 
@@ -2655,15 +2570,12 @@ def validate(spec: ShipSpec) -> None:
     # the armament (package 70): a gun's id is a part's, unique against the rig's and within
     # its fit; a broadside number is one gun a side. A gun's deck (package 75) is a deck word,
     # and where the hull's profile gives ports, a gun with a port names a deck that has them.
-    # Where the armament numbers its guns by deck (package 75, B7.d's stage 0), every broadside
-    # gun names its deck and a number is one gun a side on each deck.
     profile = spec.hull.profile
     port_decks = [word for word, _triples in profile.ports_m] if profile is not None else []
     if spec.armament is not None:
-        by_deck = spec.armament.numbering == BY_DECK
         for fit in spec.armament.fits.values():
             ids: set[str] = set()
-            pairs: set[tuple[str | None, int, str]] = set()
+            pairs: set[tuple[int, str]] = set()
             for g in fit.guns:
                 if g.id in seen:
                     raise ShipFileError(
@@ -2691,31 +2603,12 @@ def validate(spec: ShipSpec) -> None:
                         f"(the decks with ports: {', '.join(port_decks)})."
                     )
                 if g.place == "broadside":
-                    if by_deck and g.deck is None:
-                        raise ShipFileError(
-                            f"{src}: the armament numbers its guns {BY_DECK}, and the gun "
-                            f"'{g.id}' of the fit '{fit.name}' names no deck."
-                        )
-                    key = (g.deck if by_deck else None, int(g.number or 0), str(g.side))
+                    key = (int(g.number or 0), str(g.side))
                     if key in pairs:
-                        if by_deck:
-                            raise ShipFileError(
-                                f"{src}: the fit '{fit.name}' has two No. {g.number} guns to "
-                                f"{g.side} on the {_deck_name(str(g.deck))}."
-                            )
                         raise ShipFileError(
                             f"{src}: the fit '{fit.name}' has two No. {g.number} guns to {g.side}."
                         )
                     pairs.add(key)
-    # a fit's own marines kept (package 75, B1) are men she bears, as the bill's are
-    if spec.armament is not None:
-        bears = spec.crew.stations.get("marines", 0) if spec.crew is not None else 0
-        for fit in spec.armament.fits.values():
-            if fit.marines is not None and fit.marines > bears:
-                raise ShipFileError(
-                    f"{src}: the fit '{fit.name}' keeps {fit.marines} marines in their division, "
-                    f"but the crew has {bears}; it cannot keep more marines than she bears."
-                )
     # the quarter bill's trimmers are men of their stations
     bill = spec.crew.quarter_bill if spec.crew is not None else None
     if bill is not None:

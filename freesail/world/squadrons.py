@@ -1202,7 +1202,18 @@ class Squadron:
                 f"'{spec.get('formation')}' is no formation; say one of {', '.join(FORMATIONS)}."
             )
         commander = str(spec.get("commander") or PLAYER_ID)
-        if commander.lower() in ("the ship", "us", "the player", "the player's ship", "our ship"):
+        players = ("the ship", "us", "the player", "the player's ship", "our ship")
+        mine = commander.lower() in players or any(
+            str(m).lower() in ("the ship", "us") for m in spec.get("members") or []
+        )
+        if mine and _changed_ships(world):
+            # a set's command is not carried to another hull yet (package 60, the design's
+            # §2.5): every reader of a set takes `PLAYER_ID` for the player's ship
+            raise ValueError(
+                "the player has taken command of another ship; a set of his is not formed "
+                "in her yet: give the set another commander"
+            )
+        if commander.lower() in players:
             commander = PLAYER_ID
         else:
             v = world.vessels.find(commander)
@@ -1750,3 +1761,11 @@ def keep_station(vessel: Any, world: Any, dt: float, wind_from: float, wind_kn: 
     vessel.position = vessel.position.advanced(step * math.sin(rad), step * math.cos(rad))
     vessel.distance_run_m += step
     vessel._stream(world, dt)
+
+
+def _changed_ships(world: Any) -> bool:
+    """Whether the player has taken command of a ship other than the game's first hull
+    (package 60)."""
+    from freesail.world.hulls import players_id
+
+    return players_id(world) != PLAYER_ID

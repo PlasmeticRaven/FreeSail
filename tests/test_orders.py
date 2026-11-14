@@ -2675,13 +2675,11 @@ def test_two_bargains_in_one_order_are_two():
         ("frigate", "keep her close hauled", ok(kind="helm.order", text=["full and by"])),
         ("frigate", "bring her up", ok(kind="helm.order", text=["come up a point"])),
         ("frigate", "bring her up two points", ok(kind="helm.order", text=["two points"])),
-        # the sheets of a group of sails, each by the file's first plain alias, the cutter's
-        # fore staysail her "foresail" (package 75, the trim's words by the alias; old "the
-        # fore staysail")
+        # the sheets of a group of sails
         (
             "cutter",
             "trim the headsail sheets",
-            ok(kind="sail.trimmed", text=["The sheets of the foresail and the jib"]),
+            ok(kind="sail.trimmed", text=["The sheets of the fore staysail and the jib"]),
         ),
         # a headsail backed by its sheet, hauled to windward
         (

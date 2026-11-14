@@ -531,7 +531,7 @@ def mirror(vessel: Any, crew: CrewedWorld, minute: bool) -> None:
         brain = vessel.brain
         if brain is not None and state and (not brain.history or brain.history[-1][1] != state):
             # the brain's record runs on through the near body (one brain, two bodies)
-            brain.history.append((crew.parent.clock.tick, state))
+            brain.history.append((crew.clock.tick, state))
             brain.state = state
         vessel.state = state
 
@@ -576,9 +576,100 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
     (package 84, step 5)."""
     if vessel.crew is not None:
         if not vessel.crew.awake:
+            lies = how_she_lies(vessel)  # her far body's, asked before she wakes
             _to_full(vessel)
+            woken_true(vessel.crew)
+            rides_as_she_lay(vessel, vessel.crew, lies)
         return vessel.crew
-    return make_hull(world, vessel)
+    lies = how_she_lies(vessel)
+    crew = make_hull(world, vessel)
+    woken_true(crew)
+    rides_as_she_lay(vessel, crew, lies)
+    return crew
+
+
+# How a ship lies, the one answer (package 60, the lead's fourth round): at anchor, lying to
+# or under way.
+AT_ANCHOR, LYING_TO, UNDER_WAY = "at anchor", "lying to", "under way"
+
+
+def how_she_lies(vessel: Any) -> str:
+    """How she lies now, from her own state, for whoever asks (the take-up, the wake, the
+    demotion): an awake hull by her tackle and her helm (`_sail_state_of`: her anchor down, or
+    hove to); a sleeping one by her far body, whose plan the far ticks keep (the leg of the
+    anchor a body riding at one, of lying to one lying to). An awake hull's plan is never read
+    for it: it is not kept while she is awake (the third reading of 52d99b9a, item 2)."""
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "awake", False) and getattr(crew, "shape", "") == "full":
+        said = _sail_state_of(crew)
+        return said if said in (AT_ANCHOR, LYING_TO) else UNDER_WAY
+    plan = getattr(vessel, "plan", None) or []
+    kind = plan[0][0] if plan else ""
+    if kind == "anchor":
+        return AT_ANCHOR
+    if kind == "lie_to" or str(getattr(vessel, "sail_state", "") or "") == LYING_TO:
+        return LYING_TO
+    return UNDER_WAY
+
+
+def woken_true(crew: Any) -> None:
+    """Her place's water brought true as she wakes, for every reader (package 60, the lead's
+    fourth round; the third reading's item 1): a sleeping hull's far tick refreshes none of
+    what her own tick keeps of the place she lies in, so she woke with the depth, the bottom,
+    the stream and the tide of where she fell asleep (`World._tick_tide`, run now with her
+    current, says nothing while she is not at anchor). The sea and the weather keep their own
+    minute and are not run here (each says a line when its words change)."""
+    if crew is None or getattr(crew, "tide", None) is None:
+        return
+    with crew.world.as_hull(crew):
+        crew.world._tick_tide()
+
+
+def rides_as_she_lay(vessel: Any, crew: Any, lies: str = "") -> None:
+    """A ship woken as she lay (package 60, the lead's second, third and fourth rounds):
+    where her far body rode at an anchor (`how_she_lies`, asked before she woke), every sail
+    set is furled and her way taken off, and she is brought up by the first anchor that can
+    hold her in the depth under her (brought true at the wake, `woken_true`), veered to the
+    scope the depth wants: the let-go evolutions' own answer to whether she can anchor here
+    (`scripts.cannot_anchor`). Where none can (no anchor, no bottom, the ground too deep for
+    her cable) she lies to, as lying to sets her, said in her log (JUDGEMENT); never an anchor
+    marked down that is not on the ground. Nothing for a ship that lay otherwise, or that is
+    at anchor already."""
+    if crew is None or getattr(crew, "at_anchor", False):
+        return
+    if (lies or how_she_lies(vessel)) != AT_ANCHOR:
+        return
+    from freesail.evolutions.scripts import _let_go, _scope_plan, _water_depth, cannot_anchor
+    from freesail.ship.parts import SailState, ground_tackle
+
+    ship = crew.ship
+    tackle = ground_tackle(ship)
+    depth = _water_depth(ship)
+    anchors = list(tackle.anchors) if tackle is not None else []
+    why = cannot_anchor(ship, None, depth)
+    anchor = None
+    for a in anchors:
+        why = cannot_anchor(ship, a, depth)
+        if why is None:
+            anchor = a
+            break
+    ship.dyn.u = ship.dyn.v = 0.0
+    if anchor is None or depth is None:
+        _set_sail(crew, LYING_TO)
+        crew.record(
+            Severity.NOTABLE,
+            "ship.hove_to",
+            f"{vessel.name} at full detail again where she cannot anchor ({why}): she lies to.",
+            data={"id": vessel.id, "why": why},
+        )
+        return
+    for sail in ship.sails.values():
+        if sail.is_set:
+            sail.state = SailState.FURLED
+    _let_go(ship, anchor, depth)
+    anchor.scope_m = _scope_plan(anchor, depth, None)[0]
+    anchor.brought_up = True
+    crew._far_anchored = True
 
 
 def _to_full(vessel: Any) -> None:
@@ -675,9 +766,15 @@ def demote(world: World, vessel: Any) -> None:
             brain.fold_back(crew.captain)
         write_damage(vessel, crew)
     seated = any(not h.agent.released for h in crew.agents.values())
-    crew.awake = False
     vessel.detail = "far"  # near by distance from here, as a hull-less vessel (step 6)
-    crew._far_anchored = bool(vessel.plan) and vessel.plan[0][0] == "anchor"
+    # how she lay as she fell asleep, from her own state (the fourth round: her plan is not
+    # kept while she is awake, and a ship weighed and under way kept the leg of the anchor and
+    # was frozen at it by the far ticks)
+    lay = how_she_lies(vessel)
+    if lay != AT_ANCHOR and vessel.plan and vessel.plan[0][0] == "anchor":
+        vessel.plan = [("lie_to", math.inf)] + list(vessel.plan[1:])
+    crew.awake = False
+    crew._far_anchored = lay == AT_ANCHOR
     if seated:
         crew.record(
             Severity.URGENT,
@@ -702,9 +799,14 @@ def demote(world: World, vessel: Any) -> None:
 def release_done(world: World) -> None:
     """A vessel gone from the sea (`done`) gives up her World (package 84, step 5): her
     persons and the things they keep out of the one registry, as the drop did before."""
+    first = world.__dict__.get("_own") if hasattr(world, "__dict__") else None
     for v in world.vessels.vessels:
         crew = v.crew
         if crew is None or not v.done:
+            continue
+        if first is not None and crew is first:
+            # the game's first hull is never given up (package 60, the design's §4.2): she
+            # keeps the sea and the save's first block; her body done, her hull stays
             continue
         people = getattr(crew, "people", None)
         if people is not None and hasattr(people, "discharge"):
@@ -832,6 +934,29 @@ def model_held(vessel: Any) -> bool:
     return bool(getattr(h, "door", ""))
 
 
+def _hulls_left_pruned(world: World) -> list[str]:
+    """The hulls the player has left (package 60, `command.HULLS_LEFT`), the gone among them
+    (a vessel done, or no longer of the world) taken out of the list (the lead's reading of
+    ab0ade58, item 7)."""
+    store = getattr(world, "__dict__", None) or {}
+    left = list(store.get("_hulls_left") or ())
+    if not left:
+        return left
+    live: set[str] = set()
+    for v in world.vessels.vessels:
+        if not v.done:
+            live.add(str(v.id))
+    for hid in getattr(world, "hulls", None) or {}:
+        hull = world.hulls[hid]
+        vessel = getattr(hull, "vessel", None)
+        if vessel is None or not getattr(vessel, "done", False):
+            live.add(str(hid))
+    kept = [hid for hid in left if hid in live]
+    if kept != left:
+        store["_hulls_left"] = kept
+    return kept
+
+
 def switch(world: World) -> None:
     """The crewed promotion by the distance from the centre, once a minute: demoted
     beyond `CREWED_DEMOTE_NM`; promoted within `CREWED_NM` up to the cap in the cap's order
@@ -848,11 +973,35 @@ def switch(world: World) -> None:
     cap, within_nm, demote_nm = settings(world)
     vessels = world.vessels
     with_brain = [v for v in vessels.vessels if v.brain is not None and not v.done]
-    if not with_brain and not vessels.crewed_ids:
+    # the hull he left (package 60), kept with no far brain, left or laid up, the game's first
+    # hull among them, put to sleep beyond the range wakes within it like any other (built
+    # from `with_brain` alone she slept for good); no other hull without one is woken by it
+    # (the lead's review of 1eb18434: one laid in ordinary by the director)
+    left = set(_hulls_left_pruned(world))
+    kept_asleep = (
+        [
+            v
+            for v in vessels.vessels
+            if str(v.id) in left
+            and v.kept_hull()
+            and not v.done
+            and not v.crew.awake
+            and v.position is not None
+        ]
+        if left
+        else []
+    )
+    if not with_brain and not kept_asleep and not vessels.crewed_ids:
         return
     far_nm: dict[str, float] = {}
     for v in with_brain:
         far_nm[v.id] = bearing_and_distance(centre, v.position)[1] / units.NAUTICAL_MILE
+    for v in vessels.vessels:
+        # every crewed body by her own position, a brain or none (package 60, the design's
+        # §4.2: a hull with no far brain, the old ship laid up beside him, was "beyond the
+        # range" alongside and put to sleep at once)
+        if v.id not in far_nm and v.crew is not None and not v.done and v.position is not None:
+            far_nm[v.id] = bearing_and_distance(centre, v.position)[1] / units.NAUTICAL_MILE
     always = stationed_always(world)
 
     def held_fast(v: Any) -> bool:
@@ -891,6 +1040,7 @@ def switch(world: World) -> None:
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
         and getattr(v.brain, "role", "") not in FAR_ONLY_ROLES
     ]
+    wanted += [v for v in kept_asleep if far_nm.get(v.id, math.inf) <= within_nm]
     wanted.sort(key=lambda v: (rank(v), far_nm[v.id]))
     for v in wanted:
         held = crewed(world)
@@ -1083,7 +1233,11 @@ def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
     # scenario whose cap was nought)
     cap, range_nm, _ = settings(parent)
     full = nm <= range_nm and len(crewed(parent)) < cap
+    lies = how_she_lies(vessel)
     crew = make_hull(parent, vessel)
+    if full:
+        woken_true(crew)
+        rides_as_she_lay(vessel, crew, lies)
     if not full:
         crew.awake = False
         vessel.detail = "far"

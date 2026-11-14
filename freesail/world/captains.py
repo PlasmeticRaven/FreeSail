@@ -319,12 +319,6 @@ SIZE_RANK: dict[str, int] = {
     "hermaphrodite brig": 2,
     "bilander": 1,
 }
-# The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
-# rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
-# lower class hauls off from an enemy of this class made out within her doctrine's
-# `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
-# match for one ship of the line (p. 78).
-LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
 # the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
@@ -1861,21 +1855,6 @@ STIMULI: tuple[str, ...] = (
 )
 
 
-def _commander_on_the_sea(root: Any, boss: str) -> bool:
-    """Whether the ship named by `under_orders_of` still commands (package 75, the review's mends
-    of B7.e): the player's ship while she has a place; another while she is on the sea, not
-    `done` (gone into port, sunk or taken from it) and not struck."""
-    if boss == "the ship":  # the player's ship (`ships.PLAYER_ID`)
-        return getattr(root, "position", None) is not None
-    sea = getattr(root, "vessels", None)
-    other = sea.get(boss) if sea is not None and hasattr(sea, "get") else None
-    return (
-        other is not None
-        and not getattr(other, "done", False)
-        and not getattr(other, "struck", False)
-    )
-
-
 class Judgement:
     """The brain's judgement, shared by the two bodies (spec M6 §4, "one brain, two
     bodies"; package 43): the weather's trend and the doctrine's transitions on a
@@ -2011,69 +1990,17 @@ class Judgement:
                 self._enter(t.to)
                 return
 
-    def _alone(self) -> bool:
-        """Whether she sails in no set, neither a member of one nor its commander (package 72's
-        squadrons and convoys, the parent World's for a crewed hull), and under nobody's orders
-        (package 71's least relation, the far body's own or the crewed hull's, as
-        `signals.commanded_by` reads it): the rank-4 rule is a lone ship's, and a ship in a set,
-        or under the orders of another, set or no set, is left to her commander's book (package
-        75, B7.e; the lead's ruling (3)(b) of 2026-11-12), while that commander is on the sea and
-        has not struck (`_commander_on_the_sea`; the review's mends: nothing clears the relation
-        when the commander goes, and a commander gone or struck has no book to leave her to)."""
-        world = getattr(self, "world", None)
-        body = getattr(self, "vessel", None)
-        boss = getattr(body if body is not None else world, "under_orders_of", None)
-        if boss is None:
-            boss = getattr(getattr(world, "vessel", None), "under_orders_of", None)
-        root = getattr(world, "parent", None) or world
-        if boss and _commander_on_the_sea(root, str(boss)):
-            return False
-        sets = getattr(root, "squadrons", None)
-        if sets is None or not hasattr(sets, "of"):
-            return True
-        return sets.of(str(self._own_vessel_id() or "the ship")) is None
-
-    def _line_of_battle_nm(self, p: Perception) -> float:
-        """The miles within which she hauls off from an enemy ship of the line (package 75,
-        B7.e, the rank-4 rule, the owner's "Yes, build the rule" of 2026-11-11): her doctrine's
-        `line_of_battle_nm` where she is of a class under `LINE_OF_BATTLE_RANK` and alone
-        (`_alone`); nought for a doctrine without the knob, a ship of the line herself, a ship
-        in a set and a ship under the orders of another."""
-        d = self.doctrine
-        nm = float(d.threshold("line_of_battle_nm", 0) or 0) if d is not None else 0.0
-        if nm <= 0.0 or int(p.own_size or 0) >= LINE_OF_BATTLE_RANK or not self._alone():
-            return 0.0
-        return nm
-
-    def _overmatched(
-        self, p: Perception, within_nm: float, line_nm: float | None = None
-    ) -> dict[str, Any] | None:
+    def _overmatched(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         """An enemy of a bigger class than her own within `within_nm` (package 43, the
-        cruiser's judgement of a superior force), by what the tops have made out; or an enemy
-        ship of the line within `line_nm` (package 75, B7.e, the rank-4 rule), by default the
-        miles her doctrine gives a lone ship of a lower class (`_line_of_battle_nm`), which
-        are nought for every doctrine but the King's ship's and the commodore's."""
-        if not p.strangers:
-            return None
-        line = self._line_of_battle_nm(p) if line_nm is None else float(line_nm)
-        own = int(p.own_size or 0)
+        cruiser's judgement of a superior force), by what the tops have made out."""
         enemies = [
             s
             for s in p.strangers
             if self._is_enemy(s)
             and not self._spoken(s)
             and s.get("estimate_m") is not None
-            and (
-                (
-                    float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
-                    and int(s.get("size") or 0) > own
-                )
-                or (
-                    line > 0.0
-                    and float(s["estimate_m"]) / units.NAUTICAL_MILE <= line
-                    and int(s.get("size") or 0) >= LINE_OF_BATTLE_RANK
-                )
-            )
+            and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
+            and int(s.get("size") or 0) > int(p.own_size or 0)
             # package 70: a merchantman of a bigger hull is a prize, not a superior force
             and "merchant" not in str(s.get("known") or "").lower()
             # package 74: a ship that has struck is nobody's superior force
@@ -2578,6 +2505,27 @@ class Captain(Judgement):
             "'captain: carry on' gives her back to him.",
             actor=actor_for(state),
             data={"order": text, "state": state, "intent": self.intent_words},
+        )
+
+    def give_up(self, to: str, late: str = "") -> None:
+        """Her command given up to the player's person taking command of her (package 60,
+        `world/command.take_up`): called before the command passes, so that the man named is
+        her own late captain; his state's book struck, his intent and plan kept for
+        `captain: carry on`, which is the new captain's to give. Nothing said where he did
+        not command."""
+        if not self.commands or self.state is None:
+            return
+        late = late or self.name
+        self.aside = True
+        state = self.state
+        self._leave(state)
+        self.state = None
+        self.world.record(
+            Severity.NOTABLE,
+            "captain.aside",
+            f"{late} gives up her command to {to}, and his book '{state}' is struck.",
+            actor=actor_for(state),
+            data={"order": f"take command: {to}", "state": state, "intent": self.intent_words},
         )
 
     def carry_on(self) -> str:
@@ -4684,18 +4632,11 @@ class Captain(Judgement):
 
     def _haul_off(self, p: Perception) -> None:
         """Evading: a course shaped for a point away from the nearest enemy, the
-        reciprocal of her bearing, by account. Under the rank-4 rule (package 75, B7.e) the
-        enemy run from is the ship of the line, within three times the miles she hauled off
-        at, as the cruiser's reach is three times hers (a King's ship's `stranger_hostile_nm`
-        is nought)."""
+        reciprocal of her bearing, by account."""
         d = self.doctrine
         enemy = self._nearest_enemy(
             p, float(d.threshold("stranger_hostile_nm", 6)) * 3 if d else 18
         )
-        line = self._line_of_battle_nm(p)
-        if line > 0.0:
-            hostile = float(d.threshold("stranger_hostile_nm", 6)) if d else 6.0
-            enemy = self._overmatched(p, hostile * 3, line * 3) or enemy
         if enemy is None:
             return
         self._stranger = enemy.get("id")

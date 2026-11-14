@@ -700,23 +700,6 @@ with this sail (§16, risk 6).
   No. 1 on each deck waits for a deck-aware pair key, the 74's design to propose, and both
   files then take it alike.
 
-*As built for the 64 (package 75, B7.d, 2026-11-11; the 74's design, Design-Ship-Bellerophon.md
-§5.2 and its as-built note; the lead's answer (3) to her §17.2, "both two-deckers together", and
-the allotment of `tools/ships/indefatigable.py` to B7 for the step alone, returned at its merge):
-the 64 is numbered by deck, each deck's pairs from No. 1 forward, the 74's key: the lower 1-13 (as
-before), the upper 1-13 (14-26 before), the quarterdeck 1-5 (27-31), the forecastle's 9s 1 (32) and
-its 24-pounder carronades of 1794 2 (33), the roundhouse's carronades 1-3 (34-36). `pairs` takes
-`by_deck` and re-keys each id after the call, `gun.lower.3.starboard`, the key keeping its place as
-the crew's does; `armament` writes `numbering: by deck` after `b.armament(...)` and the words in her
-section's note; her lower deck's note says so. Her file moves by those lines alone: 136 ids, the 84
-numbers off her lower deck, three notes and the key (`docs/dev/TuningNotes.md`, "B7.d, numbering by
-deck"). Her guns are named with their deck ("No. 1 starboard gun of the upper deck"), her crews keyed
-by it (`gun:upper:1`), and the same men man the same crews at the beat. **The razee is not
-renumbered:** she has one gun deck, her pairs Nos. 1-13 on it and her upper works numbered on, as the
-frigate-36's, and the lead's word was the two two-deckers; her file is byte for byte as it was, so
-that "both files then take it alike" above stands for the 64 and the 74, not the razee. B1's test of
-her fits' numbers moved with it (`(deck, number, side)` one gun on the 64).*
-
 ### 5.3 Patterns, weights and crews
 
 | Piece | Pattern and weight | Crew | Note |
@@ -860,43 +843,6 @@ check on both files (*settled by `Build-Ships.md` §4.1*: no builder edits a sha
   records whether every gun crew fills, how many marines go to the carronades, and the marines'
   division left. That answers Eng §8's item 6 on her own figures.
 
-*The bills' `marines`, at the lead's answer of 2026-11-10 at 19:30 (built 2026-11-12, B1's module
-through the generator): the 74's key (Bel-D §12.1) on both bills, each file's marines less the
-default fit's carronades' crews, **84** (the 64's, no carronade) and **14** (the razee's, 36 at her
-carronades), written after the generator's call with a note, as the 74's module writes hers. The
-beat at muster (seed 7, `tests/test_brains.py`'s world), old beside new, on the default fits: the
-64 fills her 32 crews as before, no marine at a long gun (old 84 there), her division 84 (none) and
-her trimmers 53, the bill's (137): "Quarters: 32 gun crews manned, the trimmers 53, the helm 2, the
-powder 29, the marines 84." with her deck lines as before; the razee fills her 24, her carronades'
-36 marines (32) and none at a long gun (18), her division 14 (none) and her trimmers 79, the bill's
-(93): "Quarters: 24 gun crews manned, the trimmers 79, the helm 2, the powder 22, the marines 14."
-**For the lead:** the key is set against the default fit, as the trimmers are, and on the other fit
-of each the long guns now take no marine where her seamen run short: the 64's 'ardent class 1794'
-fills 33 of her 36 crews (the lower deck's No. 13 8 of 11, the upper deck's No. 13 and the poop's
-No. 3 unmanned; old 36 of 36, 76 marines at the long guns), and the razee's 'as razeed 1795' 19 of
-22 (Nos. 12 and 13 unmanned, No. 17 1 of 7; old 22 of 22, 46 marines at the long guns), the beat
-saying "Not hands enough for every gun: ... stand unmanned."; a key by fit, or the long guns
-taking marines where the seamen run out, is yours. No recorded passage holds either ship.*
-
-*The marines by fit, at the lead's ruling (4) of 2026-11-13 (built 2026-11-13, B1's module through
-the generator): "a figure for each fit whose complement differs ... from the establishment where a
-source on file gives it, else JUDGEMENT marked so; the long guns do not take marines". A fit's own
-`marines` (`FitSpec.marines`), kept by the beat in place of the bill's when she carries the fit:
-the 64's 'ardent class 1794' **68** (her 84 less the 16 at its carronades of 1794) and the razee's
-'as razeed 1795' **38** (her 50 less the 12 at its six carronades), each JUDGEMENT in its note, the
-bill's rule on the fit's guns: no establishment of private marines by rate or by year is on file
-(Ind §10.8), and a file bears one company whatever her fits (the class's 500 as built and 491 from
-1794, Winfield 1793-1817 p. 99; the razee's 310 at first and 330 afterwards, James vol. 1 p. 454).
-The beat at muster (seed 7), old beside new: the 64's 1794 fit fills 36 of 36 crews (33), her 16
-carronade marines at their guns (none) and 68 in the division (84), "Quarters: 36 gun crews manned,
-the trimmers 53, the helm 2, the powder 29, the marines 68."; the razee's 1795 fit the same men man
-for man, still three crews short, her trimmers set against 1796 (for the lead: a trimmers figure by
-fit would be the same kind of key). The default fits as before. The tuning notes, "The lead's notes
-of 2026-11-12 and 13, built", subsection 3. By the review's mends (subsection 6 there), the marines
-back from their muskets at "hold your fire" go to the carronades alone where the fit or the bill
-keeps marines, as at the beat: the razee's 1795 "twelve back to the carronades" (old "40", 28 of
-them to her long guns).*
-
 ---
 
 ## 7. Ground tackle, boats, pumps, hold and stores
@@ -1003,16 +949,6 @@ razee may not beat the frigate on the polar.
 the brace limits, only with a source. Each tuned figure is recorded beside its start. **Realism,
 not pacing:** if she is still not faster, B1 reports it with the figures and does not force it.
 The frigate-36's Luce-ruled sail areas are the lead's file, not B1's.
-
-*Lying a-try, the lead's ruling (1) of 2026-11-10 at 19:30 (the 74's B7, built 2026-11-12): from way
-on in a gale, after "shorten sail" five times from plain sail in 35 kn, the 64 at her `clr_x_m` of
-4.8 lay 89.3 to 103.6 degrees off at 3.67 kn, and 90.7 at 3.60 with what it hands furled, where
-from rest she lies about five points (53.4 to 56.4 degrees at 1.45 kn). Her file now gives
-`lie_a_try` her own lee helm, 32 degrees where the evolution gives 5 (`timing:`, written by B1's
-module; the 74's 20): furled, she settles 71.1 to 71.5 degrees off at 1.69 kn, inside five to six
-and a half points; from rest she comes up and falls off, 43.5 to 79.4 at 1.36, inside truth 28's
-form; "heave to" as it was. The razee keeps the evolution's own. The sweep and its figures in
-docs/dev/TuningNotes.md, "The lead's rulings of 2026-11-10, built (package 75)".*
 
 ---
 

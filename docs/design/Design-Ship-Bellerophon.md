@@ -85,7 +85,7 @@ orders.
 | The displacement band's citation | corrected | Bel §3.2.5 prints 2,530-2,600 t at WL1. The buildability draft cited its own conversion of the tons of 35 (2,515-2,584 t) to Bel. Both conversions are given (§2.1) |
 | The topgallant masts | fidelity: Steel p. 42's long pole-head, put to the owner for both ships | The OCR (vol. I l. 2934-2942, 4701-4702) bears the reading: a pole-head is set up from the stop, a long one two-thirds of the length to it |
 | The mizen topgallant mast | buildability (Steel's 24-6 × 0.973) | The rule for a mast Table 10 lacks; the room table re-measured on it here |
-| The mizen course's tack | neither: 9 ft above the deck the mast stands through, her poop (written "quarterdeck" here at first, the slip: the lead's ruling (2) of 2026-11-10), where I32's throat (about 42 ft above it) less Steel's 11-yard fore leech puts it; Steel's general "within 6 or 7 feet" beside it | The fidelity draft's 6 ft 6 in (Steel's general "within 6 or 7 feet"; B1's `MIZEN_TACK_ABOVE_DECK_FT = 6.5`) ends the course's level foot inside her judged poop, and leaves her driver failing both of Ext §17.2's checks (§4.5, §4.6). The buildability draft's "3 ft, as the 64's" was stale |
+| The mizen course's tack | neither: 9 ft above the quarterdeck, where I32's throat (about 42 ft above it) less Steel's 11-yard fore leech puts it | The fidelity draft's 6 ft 6 in (Steel's general "within 6 or 7 feet"; B1's `MIZEN_TACK_ABOVE_DECK_FT = 6.5`) ends the course's level foot inside her judged poop, and leaves her driver failing both of Ext §17.2's checks (§4.5, §4.6). The buildability draft's "3 ft, as the 64's" was stale |
 | The driver's boom | neither, corrected | Both drafts took Ext §17.2's jaws (2.7 m above the quarterdeck, measured on I32's 42-ft throat) beside a course whose throat stood 2½ ft lower. The throat is the course's, so Steel's fore leech puts the jaws at the course's tack. On I32's throat the boom must be raised about 5¼ ft to clear the judged poop by 6 ft; task 5 measures the poop before the cut (§4.6) |
 | The fits | buildability's (the 1812 fit of 78 pieces), with fidelity's forecastle 9s of 8 ft 6 in | The owner chose the *Bellona*'s list of 78. The fidelity draft mounted 76, leaving out two 12-pdr carronades by judgement under "Plainly" alone |
 | The fits' names | buildability | The "ardent class 1784" precedent |
@@ -118,7 +118,7 @@ orders.
 | 8 | Masts and yards: *Dragon*'s (Lavery p. 19, Table 10), her class's own; Steel 1794 p. 49's 74 column where Table 10 lacks a spar, a mast scaled 0.973 and a yard 1.00 | The ladder (S before R); Bel §13.4 |
 | 9 | **Topgallant masts with Steel's long pole-head set up above their listed length**; the topgallants and royals cut to the spars so read | Steel 1794 vol. I pp. 41-42 (§4.2). Put to the owner for both ships (§17.1 item 2) |
 | 10 | Sails: Steel's table IV, 74 column, unscaled; Lavery's Table 15 (1773) the check | Her yards are Steel's within 1% (Bel §13.4) |
-| 11 | The mizen course on its lateen yard through `mizen_yard.py`; the yard 86 ft 6 in; the tack 9 ft above the poop, the deck the mast stands through ("the quarterdeck" here at first, the slip), under I32's throat | Ext §2, §3.4, §17.2; Bel §13.5 (§4.5) |
+| 11 | The mizen course on its lateen yard through `mizen_yard.py`; the yard 86 ft 6 in; the tack 9 ft above the quarterdeck, under I32's throat | Ext §2, §3.4, §17.2; Bel §13.5 (§4.5) |
 | 12 | Steel's driver boomsail through `mizen_yard.driver()`, unscaled; its boom 70 ft 6 in; its jaws set by her measured poop and taffrail | Ext §17.2, §17.8 (§4.6) |
 | 13 | Spritsail and sprit-topsail yards through `spritsail_yards.py`, out of "plain sail" | D8 (b); Ext §4.1 |
 | 14 | Three fits: "arrogant class 1793" (74 pieces), **"arrogant class 1795"** (82, the default), "as the bellona 1812" (78) | Answer 3 as revised (Bel §13.5); names for the lead |
@@ -752,19 +752,14 @@ cut to her yards is Steel's.
 - **The sail** `mizzen.course`: class `lateen`, `cut_at_mast: true`, roles `yard` and `mast`, cut
   by `mizen_yard.py` from Steel's cloths and leeches (16 and 17 cloths; fore leech 11 yd, after
   leech 21 yd): about 138 m², its head rising 30 ft over 30 ft (Ext §2's table, measured there).
-- **Its tack** 9 ft above the deck the mast stands through at the mizen, so that the throat
-  stands where Lavery's I32 draws it, about 42 ft above that deck (measured by eye on the owner's
-  photograph: Ext §2, §17.1), with Steel's 11-yard fore leech below it. That deck is her poop:
-  task 5 measured the poop over the mizen (§3.5), and the tack stands 10.24 m above her water, the
-  throat 20.30 m (as built, below). *Corrected (the lead's ruling (2) of 2026-11-10 at 19:30):
-  this bullet first named the deck her quarterdeck, the slip; the 9 ft is I32's throat less
-  Steel's fore leech, measured from the deck the mast stands through. On her quarterdeck, 5.58 m
-  above her water there (18.6 ft above WL1, interpolated between 19.24 ft aft and 17.72 ft at 60
-  ft: measured here), it put the tack 8.32 m above her water (27.6 ft above WL1) and the throat
-  about 15.2 m above the datum, on which Ext §17.2's figures for her driver were measured.*
+- **Its tack** 9 ft above her quarterdeck at the mizen, so that the throat stands where Lavery's
+  I32 draws it, about 42 ft above the deck (measured by eye on the owner's photograph: Ext §2,
+  §17.1), with Steel's 11-yard fore leech below it. The quarterdeck there stands 5.58 m above her
+  water (18.6 ft above WL1, interpolated between 19.24 ft aft and 17.72 ft at 60 ft: measured
+  here), so the tack stands 8.32 m above her water (27.6 ft above WL1) and the throat about 15.2 m
+  above the datum. Ext §17.2's figures for her driver were measured on this throat.
 - **Plainly:** Steel has the fore leech "attached to the mizen-mast within 6 or 7 feet of the deck"
-  (OCR l. 11441-11442), a rule for every ship, kept here beside her 9 ft as the general rule (the
-  lead's ruling (2) of 2026-11-10 at 19:30), and B1's 64 takes 6 ft 6 in
+  (OCR l. 11441-11442), a rule for every ship, and B1's 64 takes 6 ft 6 in
   (`MIZEN_TACK_ABOVE_DECK_FT = 6.5`, `indefatigable.py:398`). The drawing of her class's mizen is
   taken before his general words, for two reasons on her own profile (measured here,
   `probe/mend_figs.py`, the poop judged as §3.5). Cut by B1's rule, the foot level at the tack
@@ -772,9 +767,7 @@ cut to her yards is Steel's.
   1.4 ft inside her judged poop deck there, at 9 ft about 1.1 ft clear of it. And the driver,
   whose throat is the course's (Ext §17.2), cannot be cut within Ext §17.2's checks under the
   lower throat (§4.6). Steel's 6 ft 6 in and the 2½ ft between go in the note; task 5's poop
-  checks the clew again (§1.5). (Those clew figures were taken from the quarterdeck, the slip
-  above; from the poop the course's foot stands 2.32 m over it at the least, and Steel's 6 ft 6 in
-  above the poop 1.56 m: the as-built note below.) The course's corners are physics: the higher tack lifts its centre
+  checks the clew again (§1.5). The course's corners are physics: the higher tack lifts its centre
   by 0.76 m, recorded in her polar notes.
 - One reef band; canvas No. 2; one unsided sheet to the taffrail, one tack; the storm mizzen
   `in_place_of` it.
@@ -789,12 +782,6 @@ line at the mast, 10.24 m above her water**, the throat 20.30 m, the foot 2.32 m
 the least; 137 m², its centre 17.7 m. The other readings, in the generator's report: 9 ft above the
 quarterdeck as written here, the tack 8.33 m and the foot 0.42 m over the poop's middle line;
 Steel's 6 ft 6 in above the poop, 9.48 m and 1.56 m. The lead's to rule.*
-
-*Ruled (the lead's (2) of 2026-11-10 at 19:30): as built, 9 ft above the poop. The design's 9 ft
-was I32's throat less Steel's fore leech, measured from the deck the mast stands through; that
-deck is the poop, so the design's own derivation gives the built figure, and its "quarterdeck" was
-the slip. Steel's "within 6 or 7 feet" stays as the general rule beside it. The words above
-mended so (package 75, B1's marines step, 2026-11-12); nothing built moved.*
 
 ### 4.6 The driver (Ext §17; the owner's choice)
 
@@ -815,9 +802,8 @@ driver; no driver unless the course is cut at the mast):
 **The jaws' height, set by her measured poop (task 5).** Ext §17.2 fixes the boom's height first,
 clear of the quarterdeck rail, the roundhouse and the taffrail, and cuts the sail to it. The
 driver's throat is the course's, and its fore leech at Steel's 11 yards is the course's too, so
-Steel's leech puts her jaws at the course's tack: 9 ft (2.74 m) above the deck the mast stands
-through, written here her quarterdeck at the mizen, 27.6 ft above WL1 (§4.5; the poop as built and
-ruled, the quarterdeck the slip), as Ext §17.2 found on I32 (about 2.7 m). Against her profile
+Steel's leech puts her jaws at the course's tack: 9 ft (2.74 m) above her quarterdeck at the
+mizen, 27.6 ft above WL1 (§4.5), as Ext §17.2 found on I32 (about 2.7 m). Against her profile
 (measured, Bel §3.3, ±0.2 ft on the rails; the poop judged, §3.5; measured here):
 - the taffrail stands 28.1 ft above WL1, so a level boom at Steel's leech passes about 6 in under
   its top;
@@ -972,54 +958,11 @@ alike"). It is offered to the lead as step B7.d. What it needs, each keyed so no
 6. **The orders:** a number with its deck ("No. 3 starboard on the lower deck", "the lower deck's
    No. 3"); a bare number refused in words on a ship numbered by deck ("She has a No. 3 on each
    deck: name the deck.").
-7. **Both two-deckers together.** The 64 renumbered by deck in the same step as she is, a few
-   lines of `indefatigable.py` (B1's, window closed), its bytes and gun names moving old beside new,
-   any of B1's tests that name a gun by id moved with them; the razee, of one gun deck, is not
-   renumbered (these words first named "the 64 and the razee"; mended at the lead's ruling (4) of
-   2026-11-12, as built). **Pick:** B7.d at the end of her
+7. **Both two-deckers together.** The 64 and the razee renumbered by deck in the same step, a few
+   lines of `indefatigable.py` (B1's, window closed), their bytes and gun names moving old beside
+   new, any of B1's tests that name a gun by id moved with them. **Pick:** B7.d at the end of her
    window, on the lead's word, with both two-deckers; if the lead declines the 64's renumbering, both
    wait for a later package together, so that the two two-deckers never number two ways.
-
-*As built (B7.d, 2026-11-11), on the lead's word ((3) of the answers to her §17.2 in
-`docs/dev/M7-WorkPackages.md`: "B7.d at the end of her window, both two-deckers together, on the
-lead's allotment of `parts.py` and `graph.py` after B3's merge, checked as Build §3.4"), in two
-commits: stage 0 (§12.1 item 2's key and class default, inert, proved by digests) and the step. Her
-guns and the 64's are numbered by deck, each deck's pairs from No. 1 forward: hers the lower 1-14 (as
-before), the upper 1-14 (15-28 before), the quarterdeck 1-7 (29-35), the forecastle 1-3 (36-38) and
-the poop 1-3 (39-41); the 64's the lower 1-13 (as before), the upper 1-13 (14-26), the quarterdeck 1-5
-(27-31), the forecastle 1 and in 1794 2 (32, 33) and the roundhouse 1-3 (34-36). Items 1 to 6 as
-listed: her module and `tools/ships/indefatigable.py` set `numbering: by deck` after
-`b.armament(...)`, its words in the section's note, and re-key each id after `g.broadside_pair`
-(`gun.lower.3.starboard`); `ship/graph.py` sets `Gun.by_deck` on every gun of a fit so numbered;
-`Gun.pair_key` is `gun:<deck>:<n>` and `Gun.name` "No. 3 starboard gun of the lower deck" (the
-`roundhouse` "the poop", `parts.DECK_SAID`, which the beat's deck lines now share); the quarters'
-parse sites read the key's last part as the number and its middle as the deck (`_crew_number`), and a
-pair's line at the muster says its deck ("Nos. 14 guns of the upper deck: manned."); the orders take a
-number with its deck ("No. 3 starboard gun of the lower deck", "No. 3 starboard on the lower deck",
-"the lower deck's No. 3", "No. 2 gun of the poop"), keyed on numbering by deck, and refuse a bare
-number in words naming the decks that have one ("She has a No. 3 gun on the lower deck, the upper
-deck and the quarterdeck: name the deck, as 'fire No. 3 gun of the lower deck'."). **The razee is
-not renumbered** (item 7 named her): she has one gun deck, and the lead's (3) is "both two-deckers";
-she numbers on across her decks as the frigate-36, her file byte for byte, so that no ship of one gun
-deck numbers by deck. **Measured old beside new** (TuningNotes, "B7.d, numbering by deck"): on her
-three fits and the 64's two, at the beat (seed 7) every crew takes the same men man for man in the
-same order, the divisions and the beat's lines the same; robbing takes the same crews in the same
-order, its words each deck's own numbers; every phrase that named guns on every other armed file
-names the same. **Left, for the lead:** the shut port's line reads "The No. 3 larboard gun of the
-lower deck's port is shut" (`combat/guns.py`, not hers); the marines back from their muskets go to
-the same crews in the same numbers, but which marine to which crew follows the crews' keys as text,
-so on her 1812 fit and the 64's two other marines go (`Quarters.marines_to_guns`).*
-
-*The two possessives, at the lead's ruling (4) of 2026-11-12 (built 2026-11-13): where a gun is
-named by deck its two lines say "of" it, so that the deck is not read as the possessive's: "The port
-of No. 3 larboard gun of the lower deck is shut; the sea is at its sill." (`combat/guns.py`; old "The
-No. 3 larboard gun of the lower deck's port is shut; ...") and, in the minute's line of shot, "the
-carriage of No. 3 starboard gun of the lower deck struck" (`combat/hits.py`; old "No. 3 starboard gun
-of the lower deck's carriage struck"); every other gun's lines word for word, so that no other ship's
-line moves. Every way of naming a gun by its deck with no side agrees with the trunk's rule for a
-bare number (`orders.gunnery._of_the_side_meant`, package 74's step 6: the side engaged, else the
-side the mark is on, else the pair), measured form by form on her and the 64. The tuning notes, "The
-lead's notes of 2026-11-12 and 13, built", subsection 5.*
 
 ### 5.3 Patterns, weights and crews (answer 12)
 
@@ -1196,12 +1139,6 @@ at their marines less their carronades' crews (84 and 14), a division of 84 and 
 fills, and their trimmers come to their bills' 53 and 79 exactly (measured, for the lead's answer (1):
 the key on their bills is the lead's to place).*
 
-*Placed (the lead's answer of 2026-11-10 at 19:30, built 2026-11-12): B1's module writes the key on
-both bills, 84 and 14, through the generator; on their default fits the beat forms their divisions
-and their trimmers meet their bills, 53 and 79, as measured here; on their other fits the long guns
-take no marine and three crews go short on each (`Design-Ship-Indefatigable.md` §6.4, for the
-lead).*
-
 ### 6.4 The bill by deck (answer 9): what is built, B7.b
 
 The owner asked for "a deck key on each gun, with orders, divisions, stations and robbing by deck,
@@ -1364,69 +1301,6 @@ at quarters is 1.5-1.6 times her cleared tack, where the frigate's is 0.98-1.24 
 (Bel §7.4): B7.c's case, for the lead's word at step 7. Measured again after B7.b at step 6, the
 marines' division standing: the same to the second, the same 175 hands lent (TuningNotes).*
 
-*As built (B7.c, 2026-11-11), on the lead's word ((4) of the answers to her §17.2 in
-`docs/dev/M7-WorkPackages.md`: "B7.c, its own commit, bisected, old beside new for 7-136 and every
-file's tack at quarters"), in `freesail/evolutions/runner.py` alone, the file allotted for the step.
-Every all-hands request at quarters (the manoeuvres, the masts and the all-hands sail work alike, as
-the share's branch it replaces had them) is given a party (`_quarters_party`): the hands the same
-work takes at sea in one watch, read as the watch bill has the deck with no call (the watch on deck
-and, by day, the idlers; `_one_watch`), each fit for the work, or the file's own party where that is
-less; the guns' own work (`QUARTERS_OWN`) as before. `_rob_the_guns` loses the share's branch: an
-all-hands request with hands enough returns at once (the one condition), and one short is lent by
-§6.4's order, whole crews from the end that bears least, only what its party wants beyond the hands
-idle at their quarters. Under "guns before sail" nothing is lent and the tack goes short of its
-party, said. The tack's script reads only the crew factor the runner hands it, so nothing of
-`evolutions/scripts.py` changed. **Measured** in truth 7-136's world (seed 7, fifteen knots, 04:22,
-the starboard watch on deck; `docs/dev/TuningNotes.md`, "B7.c, the tack at quarters"), from 290,
-292.5 and 295 degrees: her tack at quarters under "sail before guns" is her cleared tack to the
-second, 237, 243 and 258 s, her party of 268 made up by 72 hands from the poop's, the upper deck's
-and the quarterdeck's after crews, her lower deck untouched (before: 382, 386 and 405 s with 175 lent,
-1.57-1.61 times); under "guns before sail" 331, 334 and 391 s, short 196 of 268 (before 479, 531 and
-556). The 64 the same: her cleared tack's 244, 251 and 266 s with 39 lent (before 362, 368 and 401
-with 135); 295, 298 and 350 (before 437, 500 and 520). The frigate-36: 334, 468 and 469 with 44 lent
-(before 424, 436 and 455 with 84), her crew factor 1.0 through the tack and her state at the order a
-little off her cleared state's; under "guns before sail" 436, 433 and 453 (before 614, 642 and 660).
-The razee lends 29 and tacks as cleared; the brig, the hermaphrodite brig and the cutter lend
-nothing, their hands idle at quarters making a watch, and tack at quarters as cleared under either
-priority. **Truth 7-136 moved**, old beside new in its docstring: the 44 hands lent within 35 (the
-rest of the watch) and 84 (half of every crew), named from the bow chasers and the guns; under "guns
-before sail" the tack short 76 of 111, said, and tacked within 285-600 s, where 642 s stood within
-"at least 1.25 times cleared": from 292.5 degrees the slower braces carry her through stays in 433 s
-against 447 cleared (from 290 and 295, 1.27 and 1.22 times). **Judgement, said:** "one watch" read as
-the bill's deck with one watch, not the watch with the third of the watch below that the routine turns
-up at once (158 hands in the frigate at the call). **Truth 7-196's crewed clause moved with it:** her
-74s engage the frigate there and work their manoeuvres at quarters, and S2 stands 6.21 miles off at
-the third timed thousand against `CREWED_NM`'s 4 (3.59 before), so it fails here; her world's places
-not re-settled, for the lead (TuningNotes). **Left as the engine had it, for the lead:** the
-hands idle at quarters beside the trimmers and the marines' division (the helm, the powder, the
-carpenter's crew and the surgeon's mates) are in the pool of any sail work there, numbered or all
-hands, as before.*
-
-*As mended at its review (2026-11-11), the rule's own words: the review read "worked first by the
-trimmers and, for the work on deck, the marines' division ... and takes from the guns ... only what its
-party wants beyond them" as binding on who works it, and it is built so, in `runner.py` (the step's
-file): an all-hands request at quarters draws on the trimmers, the marines' division, the hands the
-guns lend and any not quartered (`_quarters_pool`), the helm, the powder, the carpenter's crew and the
-surgeon's mates keeping their stations (`KEEP_THEIR_STATIONS`), at the order and as hands join; one
-short keeps the hands it has and is made up to its party from the whole crews freed (`hands.top_up`),
-the rest of a crew going back to its gun at once, and the robbed line says the hands taken. Numbered
-sail work at quarters draws on its pool as before. **Measured again**, the same world and script, the
-times the same to the second wherever the party is made up: her 118 lent (the poop's, the upper
-deck's Nos. 7 to 14 and the quarterdeck's) to her 55 trimmers and 95 marines, 237, 243 and 258 s; under
-"guns before sail" short 150 of 268, 409, 446 and 422 s (1.73, 1.84 and 1.64 times cleared). The 64's
-81 lent to her 137 trimmers; 396, 422 and 396 s short 137 of 218. The frigate-36 lends 67 to her 44
-trimmers, 334, 468 and 469 s; under "guns before sail" short 44 of 111, her crew factor 111/44, 528, 453
-and 458 s against 343, 447 and 370 cleared, so the spec's sentence holds in truth 7-136's world from
-each heading. The razee 53 (as cleared); 543, 545 and 544 s short 93 of 146. The brig 6, the cutter 3
-and the privateer schooner 6 (each as cleared); under "guns before sail" 469-471, 116-118 and 154-157
-s, short 42 of 48, 9 of 12 and 11 of 17. The hermaphrodite brig's 65 trimmers make her watch of 55:
-nothing lent and her cleared tack under either. **Truth 7-136 moved again**, old beside new in its
-docstring: 67 hands lent, exactly what her watch wants beyond her trimmers; under "guns before sail"
-short 44 of 111, the crew factor 111/44 asserted, and the tack slower than cleared asserted again, 453
-against 447 s (the band's 600 s kept above it). **Truth 7-196's crewed clause passes again** on her
-world's places as they were: her 74s at 0.08 to 3.11 miles at the ends of the timed thousands (TuningNotes,
-"Package 75, B7's review mends").*
-
 ### 6.8 The people file (B7's, hand-written data)
 
 `data/people/seventy-four.yaml` in `sixty-four.yaml`'s form: the sixteen posts in order; the drawn
@@ -1573,81 +1447,6 @@ old beside new (None to "seventy-four"), the reason her row.*
   stands). Without the rule they record that a King's frigate engages her, and her scenario's French
   frigates are kept in the road by B6's intent, not by doctrine. Put to the owner (§17.1 item 3).
 
-*As built (B7.e, 2026-11-11), on the owner's "Yes, build the rule" (2026-11-11) and the lead's (10)
-of the answers to her §17.2 in `docs/dev/M7-WorkPackages.md` ("If the owner takes the rank-4 rule,
-B7.e owns `world/captains.py` and the two doctrine books for that step alone, and the 64's scenario
-tests are re-run"), one commit. The rule as offered: `line_of_battle_nm` (6 nm) in `kings-ship.yaml`
-and `commodore.yaml` alone; `captains.LINE_OF_BATTLE_RANK` (4); `Judgement._line_of_battle_nm`, the
-knob where her own class is under 4 and she is alone (`Judgement._alone`: in no set, neither a member
-nor its commander), nought otherwise; `_overmatched` reading it for the rank-4 case alone, its other
-case and its filters as before, on both bodies. The King's ship's book takes the cruiser's
-`overmatched` rows from her five sailing states to `evading`, `evading` on `stranger lost` to `on
-passage` and on `gale` to `hove to for weather`, and the cruiser's three lines as its `evading` book;
-no `in company` row. Built where §8.3 left the choice, by its lean and said: the commodore's book takes
-the same rows (without them its knob would act only where `overmatched` stood already); a set's
-commander is in the set, left to the set's book; `Captain._haul_off` runs from the ship of the line
-within three times the knob, a King's ship's `stranger_hostile_nm` being nought (the cruiser's reach is
-three times hers). Measured at seed 7 against 62cf52c6, with no hull promoted: a lone French frigate
-keeping her station five miles off her or the 64 investigates and evades where she investigated and
-chased; a lone frigate under the commodore's book a mile and a half off evades where she stood on;
-the player's frigate under her rules captain hauls off from a French 74 or 64 where she engaged; a
-cruiser, a King's 64, a frigate meeting a frigate, a frigate in a set or commanding one, and a
-commodore commanding a convoy as before. **Its reach, as found:** no shipped scenario names a ship of
-the line and the business draws none (grep), so no scenario's pin moved (the four whole logs and the
-captain's trials as at the base); one test moved, her own record of the engine's then (B7's
-`..._and_a_kings_frigate_does_not_today[kings-ship]`, "evading" not in her states and one of
-"investigating a stranger", "engaging" or "chasing" in them), now
-`test_a_cruiser_and_a_lone_kings_frigate_keep_away_from_her_and_the_64[kings-ship-the-74]`; its
-cruiser case renamed `[cruiser-the-74]` and given "investigating a stranger" before "evading"; the two
-64 cases new; the 64's scenario tests re-run, as before (B6's are not yet written). Her scenario's
-French frigates, alone, now keep away by doctrine as well as by B6's intent. The *Droits*' case stays
-the later refinement, recorded in the knob's source. For the lead: a ship of the line within hail is
-no superior force to `_overmatched` (package 43's filter, the cruiser's as well), so a frigate
-overhauled within hail gives up hauling off and engages; and a commodore whose convoy is held by
-package 71's least relation alone (no set) is alone by these words. Old beside new in the tuning
-notes' "B7.e, the rank-4 rule".*
-
-*Where it acts, and the review's mends (2026-11-11; the tuning notes' "B7.e, the review's mends"):
-not at the two leagues, and not alike on the two bodies. She is known an enemy by her colours (two
-miles, three with the glass) or by the shot, the private signal or the hail. The far brain sizes her
-by her description and hauls off where her colours are made out (3.0 miles investigating her with the
-glass, 1.8 on passage, at seed 7); the near body, every promoted hull and the player's ship under her
-rules captain, sizes her by the lookout's words, and a two-decker's words at her rig and her colours
-are "a ship", a frigate's class, so it hauls off only once what she is is made out (1.3 to 2.0 miles).
-At the crewed cap as shipped, a member of a set lost to it as a straggler while engaging her is
-alone, and evades at 0.45 miles: the King's ship's older rows from `engaging` and `taking possession`
-to `evading` on `overmatched` are live since B7.e for a lone ship of a lower class. A save keeps its
-captains' books by the checkpoint road (the rule off for them, until a new intent loads the book
-anew); a replay makes them anew under B7.e's, the rule on. For the lead, not built: whether a
-two-decker's rig-level words should name her two tiers, so that she is known a ship of the line at
-four miles, as the picture of §17.1 item 3 has a frigate turn away on sighting her; and whether a ship
-already engaged should break off for a ship of the line at close quarters. Two tests run the rule on a
-promoted hull, the crewed cap as shipped.*
-
-*The far fight's case (the trunk's merge of 2026-11-12 to the far brain's mend of 2026-11-13): from
-the merge of package 74's far fight, the 64's case of the rules captain's test (the player's 64 on
-her station, a French 74 a mile and a half north bound for Brest) ran with the far fight's toggle
-off, since the 74, going engaging from her passage with no mark in hand, left the sea a minute after,
-and a fifth case with the toggle on was a strict expected failure. The mend of the far brain (the
-lead's ruling (2) of 2026-11-13; truth 7-231; the tuning notes' "The lead's notes of 2026-11-12 and
-13, built") gives her the mark the stimulus read: she takes the player's 64 for it at 0.94 miles
-(tick 360), chases her to 0.28 miles and keeps the sea, and the 64's captain engages her at tick 420
-as at B7.e. The toggle is out and the two cases are one.*
-
-*A ship under the orders of another (the lead's ruling (3)(b) of 2026-11-12, built 2026-11-13): set
-or no set, she is left to her commander's book as a ship in a set is (`Judgement._alone` reads
-package 71's least relation as `signals.commanded_by` reads it, six lines), so the rank-4 rule does
-not send her away on her own; a ship commanding others by the relation alone, in no set, is alone as
-before. Measured at seed 7: a French frigate under her consort's orders and in no set, five miles
-north of her, investigates, chases and engages her where she evaded (far and crewed), her consort,
-alone, evading; `convoy.yaml`'s escort, the player's brig-sloop under nobody's orders, hauls off
-from a French 74 put 2.5 miles north as before, her four brainless brigs keeping company on her. For
-the lead: under the relation alone her commander's book makes no signal for her, so a commander
-alone hauls off and the ship under her orders stands on. The relation counts only while her
-commander is on the sea and has not struck (the review's mends: a ship whose commander is gone is
-alone again). The tuning notes, "The lead's notes of 2026-11-12 and 13, built", subsections 4 and
-6.*
-
 ---
 
 ## 9. The polar: what B7 measures and records
@@ -1742,26 +1541,6 @@ under way is aback from 4.9 in 16 kn. No one lead holds both on this path; the c
 two-deckers with truth 17's case re-ruled, or a harder lee helm in `LieATryScript`, measured on her,
 the 64 and the frigate) is the lead's (`docs/dev/TuningNotes.md`, her review's mends).*
 
-*Built at the lead's ruling (1) of 2026-11-10 at 19:30 (2026-11-12): `clr_x_m` stays 4.8 and truth
-17 is not re-ruled; the lee helm lying a-try is her file's and the 64's alone, in the timing's own
-form (`timing: {lie_a_try: {helm_deg: 20}}`, the 64's 32, written by the generator; `ShipSpec.timing`
-read by `Runner._timing` over the evolution's 5 degrees; the script's logic unchanged, every other
-file and evolution its own timing). Swept on the path (seed 7, 35 kn) from 5 to 35 degrees: with
-what lie a-try hands furled, she settles inside five to six and a half points under 2 kn from 17.5
-(70.6 degrees at 1.96 kn), at 19 68.9 at 1.91 and at 20 67.6 at 1.88, the figure taken (judgement);
-the 64 from 29 (70.7 to 73.0 at 1.73), at her 32 71.1 to 71.5 at 1.69. Before the furls, the
-courses, the fore and mizzen topsails and the topgallants hanging in the gear, no helm settles
-either in the band (she comes up and falls off, at 20 between 61.6 and 100.9 degrees at 2.14 kn;
-at 25 and over between about 55 and 106): the band is reached once the hands furl what lie a-try
-handed, as truth 28's form furls it. From rest truth 28's form holds at every figure swept: in 35
-kn she lies 52.7 to 59.9 at 1.17 kn (old 56.2 to 57.7 at 1.30), the 64 coming up and falling off
-43.5 to 79.4 at 1.36 (old 53.4 to 56.4 at 1.45), each inside the truth's 30 to 95 degrees and 2 kn;
-in 45 kn with the topgallant masts down (the truth itself) she lies 50.6 to 83.9 at 1.37 (old 54.4
-to 91.4 at 1.79), and the 64 carries away her main topsail sheet before she lies a-try, at every
-helm, as before. "Heave to" on the path lies as it did (its own `helm_deg`): the same log, digest
-for digest, on both files. Figures in `docs/dev/TuningNotes.md`, "The lead's rulings of 2026-11-10,
-built (package 75)".*
-
 ---
 
 ## 10. The lee ports: what her file supplies
@@ -1847,21 +1626,6 @@ loads; every pickle of the eight, the 64 and the razee byte-identical to the hea
 read for any reach beyond the list. **Plainly:** if the owner chooses the flag on her muster (§17.1
 item 4), stage 0c also lays one optional crew key, inert and left out of the pickle while empty.
 
-*As built, item 2 (B7.d's stage 0, 2026-11-11, its own commit before the step, on the lead's word
-(3) to her §17.2): in `freesail/ship/schema.py`, `"numbering"` appended to `ARMAMENT_KEYS`,
-`BY_DECK` ("by deck") its one word, any other refused in words; `ArmamentSpec.numbering`, a plain
-None default, left out of the pickled state while None; under it every broadside gun of every fit
-names a deck, refused in words where one does not, and a number is one gun a side on each deck, the
-refusal naming the deck ("has two No. 1 guns to starboard on the upper deck"), else as before; in
-`freesail/ship/parts.py`, `Gun.by_deck`, a plain class default false and no field, left out of
-`Gun.__getstate__` while false, set by nothing. Checked by the stage-0 checker's digests: the
-generator's 18 files byte for byte; 1,500 digests alike, the head before and the change, with the
-hash seed and the rules' fingerprint held (every ship file's spec, crew and bill pickles, her Ship's
-checkpoint, each file's World at tick 0, after 120 ticks and at quarters; the 41 shipped scenarios
-and the owner's 24; the four kept saves); the head's 45 checkpoints read by both and pickled again,
-alike; the fast tests of the four files it reaches as the base. The key is written by her module and
-the 64's at the step (§5.2's as-built note), so that the eight and the razee keep `(number, side)`.*
-
 ### 12.2 What she takes from others (the contracts she assumes)
 
 | Provider | What |
@@ -1888,7 +1652,7 @@ the 64's at the step (§5.2's as-built note), so that the eight and the razee ke
 | `freesail/ship/parts.py` | `pair_key` and `name` by deck | B3 | `by_deck` | B7.d |
 | `freesail/crew/quarters.py` | the parse sites taught `gun:<deck>:<n>` | B7's | `by_deck`'s key form | B7.d |
 | `freesail/orders/gunnery.py` | a number with its deck; a bare number refused on a ship numbered by deck | as above | `by_deck` | B7.d |
-| `tools/ships/indefatigable.py` | the 64 renumbered by deck (the razee, of one gun deck, not: the lead's ruling (4) of 2026-11-12; first written "the 64 and the razee") | B1 (window closed) | — | B7.d, with the lead's word on the 64 |
+| `tools/ships/indefatigable.py` | the 64 and the razee renumbered by deck | B1 (window closed) | — | B7.d, with the lead's word on the 64 |
 | `freesail/world/captains.py`; `data/captains/kings-ship.yaml`, `commodore.yaml` | the rank-4 rule | B7 if taken (Build §4.1); the two books have no listed owner | rank 4 met by a lone rank 3 or less | B7.e, if the owner takes it |
 | `tools/ships/mizen_yard.py` | an extension for the driver's jaws, only if her poop needs one | B1, then B7 in her window (Build §4.2) | her call only | step 2 |
 
@@ -2137,22 +1901,6 @@ on the owner's machine** (the frigate-36 505-631 and the 64 484-486 in the same 
 under the floor of 500 here; the lead's build machine decides (pinned at 550 or more; else recorded, no
 floor lowered).*
 
-*Her world made honest (the lead's ruling (1) of 2026-11-13): truth 88's frigate, without private
-signals and under no rules captain, was taken by the three for a man of war under false colours and
-fired into, and since package 74's mends her captor goes home with her prize, so the action no
-longer lasted the measure (S2 5.62 miles off at the third thousand). The day's private signals alone
-did not mend it (she answers only by order, and three challenging in one minute are not all
-answered); the three are now put in her squadron under her orders, where a member in company
-challenges nobody: in company throughout, no shot fired, at most 2.79 miles off at any tick of the
-three thousands (they do not keep their stations while the frigate lies to, a crewed member ahead of
-hers steering the flag's course under shortened sail; they straggle by the set's own lines, S2
-opening at about six knots to pass `CREWED_NM` at about tick 8,500, so the clause holds within its
-4,900 ticks: the review's mends, for the lead as package 72's station keeping), the best of three
-147 to 151 ticks a second on the owner's machine (seed 7, 2026-11-13) against the floor of 60.
-`CREWED_NM`, `CREWED_CAP` and `CREWED_FLOOR_TICKS_S` as they were. The pace of three crewed 74s in
-action, in the thousand before the taking, 165 to 167, is recorded, not pinned, in the tuning notes'
-"The lead's notes of 2026-11-12 and 13, built".*
-
 **Not truths:** her polar (no pinned point until the close-hauled gap is compared); her tack at
 quarters (recorded); her scenario's round trip and first hour (B6's tests).
 
@@ -2170,10 +1918,8 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
   on the frigate after SW-2); no test asserts their refusal (grep at her window).
 - **B7.c, only on the lead's word:** truth 7-136 and every ship's tack at quarters, bisected to the one
   commit.
-- **B7.d, only on the lead's word:** the 64's bytes, gun ids and gun names, and any of B1's tests
-  that name a gun by id; their truths pin counts, not names. (First written "the 64's and the
-  razee's": the razee, of one gun deck, is not renumbered, her bytes as they were; mended at the
-  lead's ruling (4) of 2026-11-12.)
+- **B7.d, only on the lead's word:** the 64's and the razee's bytes, gun ids and gun names, and any of
+  B1's tests that name a gun by id; their truths pin counts, not names.
 - **B7.e, only if the owner takes it:** no pinned scenario puts a frigate against rank 4; the 64's
   scenario tests re-run.
 - **The registries:** new rows and words only; no existing scenario, business table or test names
@@ -2318,8 +2064,7 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
 3. **Numbering by deck** (§5.2, the option Indf §5.2 handed to her design): an explicit `numbering: by
    deck` key in stage 0c; her ids re-keyed by her module; `pair_key` and `name` in `parts.py` and
    `graph.py` (B3's) after B3's merge; the quarters' parse sites; deck-qualified numbers in the orders;
-   the 64 renumbered in `indefatigable.py` (the razee, of one gun deck, not: the lead's ruling (4)
-   of 2026-11-12; first written "the 64 and the razee"). `parts.py` is B3's after 0E (Build §4.2),
+   the 64 and the razee renumbered in `indefatigable.py`. `parts.py` is B3's after 0E (Build §4.2),
    so stage 0c's one class default there (`Gun.by_deck`) is laid after B3's merge, on your
    allotment, checked as Build §3.4. *Pick:* B7.d at the end of her window, both two-deckers
    together; else both wait for a later package, and she is numbered on across decks.
@@ -2345,8 +2090,7 @@ quarters (recorded); her scenario's round trip and first hour (B6's tests).
 12. **The close-hauled gap** against the *Bellona*'s reports (9-10 kn against the engine's about 7½),
     which the frigate's file likely shares: book it to a later package of the physics?
 13. **The mizen course's tack, and the driver's jaws** (§4.5, §4.6). Her tack at 9 ft above the
-    quarterdeck (the poop, the deck the mast stands through: the lead's ruling (2) of 2026-11-10 at
-    19:30, §4.5), under I32's throat, against Steel's general 6 or 7 ft and the 64's 6 ft 6 in: at
+    quarterdeck, under I32's throat, against Steel's general 6 or 7 ft and the 64's 6 ft 6 in: at
     6 ft 6 in her course's clew ends inside her judged poop and her driver fails both of Ext §17.2's
     checks. On I32's throat both hold, the after leech by 0.10 m. If the measured poop breaks a
     check: less head room (to 5 ft), a driver cut more than 10% under Steel's area, or `DRIVER =
