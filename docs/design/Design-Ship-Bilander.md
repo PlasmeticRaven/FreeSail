@@ -1035,13 +1035,25 @@ never aloft, never for all hands, the manoeuvres or quarters (`Runner._working_p
 in memory at seed 7, each watch by night and by day, every request that is a watch's work on deck
 by her files begins with the watch: her courses and topsails from the gear and taken in, her head
 sails, the braces, the boat, her settee set from the gear, taken in and dipped, four by night with
-the post and five by day with the cook and the post (a head sail's take in of four begun whole).
+the post and five by day with the cook and the post (a head sail's take in of four begun whole),
+while the post who heads the watch is free on deck: with her master, who is her captain, below or
+at other business (or her mate so), that watch by night waits for the work wanting seven, as at
+eight, and by day begins it with the cook.
 Her work aloft (loosing and furling, the settee from furled) is begun short by the watch's three
 alone. Nothing calls all hands with her watches whole; the settee's `too_few: all hands` stays,
 and with a hand of the watch sick its loosing and furling aloft call all hands (her square sails'
 waiting for hands, their files carrying no key). A save from before loads with the company it
 holds, her eight, its posts heading no watch. Figures in docs/dev/TuningNotes.md, "The lead's
 rulings 8 and 11, the working officers and the bilander's nine (package 75)".*
+
+*The review's mends of rulings 8 and 11 (2026-11-13): the post's hand no longer outlasts what
+counted it. Her master gone below, beating to quarters or with all hands called, is taken off the
+work they hold on the next tick, the work held where it is under half its hands, said ("Belayed
+setting the foresail: the master gone below."), and taken up again when hands come. Her master
+hauls at the boat's falls and stays aboard when she leaves the side, the boat and the kedge's boat
+going on with the watch's three. An order naming her watch below begins with its post once its
+three are up, and a manoeuvre begun while the master hauls says the work it holds as a belay does.
+Figures in the same tuning notes, "The review's mends".*
 
 ### 6.2 The people file (`data/people/bilander.yaml`, hand-written data)
 

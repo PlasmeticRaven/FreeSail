@@ -2191,12 +2191,13 @@ def armament(b, guns) -> None:
 # sourced range of eight to nine, the sources in the complement's note below; D43's eight before
 # it; Bil-D §6.1): the posts her wardroom file's, the master and the mate
 # (data/people/bilander.yaml), who head the two watches and haul with them on deck where the
-# watch's whole number is under the work's want (crew/hands.py, `works_with_the_watch`); two in
-# each top, the main top's for the settee's loosing and furling aloft (Ext §5.1 and its risk 10),
-# the fore's alike (judgement); two in the afterguard, an able seaman and the boy, the messenger,
-# drawn by name, one to each watch, so that her six seamen keep two watches of three; the cook. No
-# forecastle station: the head sheets and the anchors fall to the fore topmen by the hands'
-# ranking (crew/hands.py), a company of nine having no hand to spare for one.
+# watch's whole number is under the work's want (crew/hands.py, `post_watch`;
+# evolutions/runner.py, `Runner._working_posts`); two in each top, the main top's for the
+# settee's loosing and furling aloft (Ext §5.1 and its risk 10), the fore's alike (judgement);
+# two in the afterguard, an able seaman and the boy, the messenger, drawn by name, one to each
+# watch, so that her six seamen keep two watches of three; the cook. No forecastle station: the
+# head sheets and the anchors fall to the fore topmen by the hands' ranking (crew/hands.py), a
+# company of nine having no hand to spare for one.
 COMPLEMENT = 9
 STATIONS = {"fore_top": 2, "main_top": 2, "afterguard": 2, "idlers": 1}
 # Her shares (the lead's ruling (8) of 2026-11-09, package 75; judgement): able seamen and a boy,

@@ -985,8 +985,10 @@ class Script:
     @property
     def crew_away(self) -> bool:
         """Whether the hands this work holds are out of the ship now (the boat away from her
-        side: `SendBoatScript`), so not on board for a watch's whole number (`Runner._watch_whole`;
-        package 75, the lead's ruling 11 of 2026-11-13). No other work takes its hands away."""
+        side: `SendBoatScript`, `LayOutKedgeScript`), so not on board for a watch's whole number
+        (`Runner._watch_whole`; package 75, the lead's ruling 11 of 2026-11-13), and a post who
+        hauled at her falls stays aboard (`Runner._posts_off_the_work`). No other work takes its
+        hands away."""
         return False
 
     def holds(self) -> set[str]:
@@ -8697,6 +8699,14 @@ class LayOutKedgeScript(_AnchorScript):
     that hold her, so that the kedge's boat is not denied while she is out)."""
 
     holds_subject = True
+
+    # the phases with the boat's crew in her, away from the ship's side (hoisting out, slinging
+    # the kedge and hoisting in are deck work): the review of the lead's ruling 11
+    CREW_AWAY_PHASES = ("pull_out", "pull_back")
+
+    @property
+    def crew_away(self) -> bool:
+        return self.phase in self.CREW_AWAY_PHASES
 
     def holds(self) -> set[str]:
         return {self.ship.name, "the boat"}

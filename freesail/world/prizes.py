@@ -948,6 +948,11 @@ def fill_far_prize(hull: Any, record: dict[str, Any], nation_was: str, tick: int
     new_crew = Crew(ship_name=str(crew.ship_name), sailors=list(keep))
     _watches(new_crew.sailors)
     old_crew = Crew(ship_name=str(crew.ship_name), sailors=list(rest), dead=list(crew.dead))
+    if getattr(crew, "post_watches", None):
+        # a merchantman's master and mate keep the watches they head, so that retaken they haul
+        # with them again (the lead's ruling 11 of 2026-11-13; `hands.post_watch`), as the near
+        # prize's company, kept whole, keeps them
+        old_crew.post_watches = dict(crew.post_watches)
     for s in old_crew.sailors:
         s.at = None
         s.quarters = ""

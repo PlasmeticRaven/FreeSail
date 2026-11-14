@@ -1288,7 +1288,11 @@ def test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_
     assert runner._working_posts(crew, jib) == []
     master.where = "quarterdeck"
     assert "master" in taken(w, jib)
-    runner._to_the_conn(crew)  # as `Runner._begin` calls it for every manoeuvre begun
+    # as `Runner._take_hands` calls it for every manoeuvre begun (old: `Runner._begin`, after the
+    # manoeuvre's line; the review of ruling 11), the work going on short letting none go
+    heave = asked(w, "heave_to", None)
+    assert runner._to_the_conn(w.ship, crew, heave) == 0
+    runner.instances.remove(heave)
     assert next(s for s in crew.sailors if s.post == "master").at is None
     assert jib.assignment is not None and "master" not in [s.post for s in jib.assignment.hands]
     assert jib.assignment.outcome == hands.SHORT and not jib.paused
@@ -1383,3 +1387,29 @@ def test_a_posts_watch_is_read_from_the_people_file_in_words_and_a_save_from_bef
     jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
     assert hands.post_watch(crew, next(s for s in crew.sailors if s.post == "master")) is None
     assert runner._working_posts(crew, jib) == []
+
+
+def test_a_far_prize_keeps_her_masters_and_mates_watches_for_her_retaking():
+    """The review of the lead's ruling 11 of 2026-11-13: a merchantman made a far prize keeps the
+    watches her master and mate head with her prisoners, so that retaken (`prizes.retake`
+    remusters her prisoners' company) they haul with them again, as the near prize's company,
+    kept whole, keeps them. The merchant brig struck to the frigate (tests/test_prizes.py's
+    scene), filled as a far prize with a prize crew of six (`prizes.fill_far_prize`): her
+    prisoners' company holds the master and the mate and their watches, and the hull remustered
+    on it has them again. Old (d6a88e2e): the prisoners' company was made afresh without them, and
+    retaken her master and mate never hauled again (`hands.post_watch` None)."""
+    from freesail.world import prizes as P
+    from tests.test_prizes import _struck_brig
+
+    w, _, hull = _struck_brig()
+    heads = {"master": "larboard", "mate": "starboard"}
+    assert hull.ship.extra["crew"].post_watches == heads
+    P.fill_far_prize(hull, {"crew": 6}, "france", w.clock.tick)
+    assert not getattr(hull.ship.extra["crew"], "post_watches", None)  # the prize crew's: none
+    pris = P.prisoners_of(hull.ship)
+    assert {"master", "mate"} <= {s.post for s in pris.crew.sailors if s.post}
+    assert pris.crew.post_watches == heads
+    P.remuster(hull, pris.crew)
+    crew = hull.ship.extra["crew"]
+    master = next(s for s in crew.sailors if s.post == "master")
+    assert hands.post_watch(crew, master) is Watch.LARBOARD

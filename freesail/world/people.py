@@ -979,14 +979,31 @@ class People:
         work with their watch (package 75, the lead's ruling 11 of 2026-11-13, on ruling 9's probe;
         `Runner._working_posts`): True before the people are made (none has moved yet) and for a
         post no person is."""
+        return self.off_the_deck(sailor) is None
+
+    def off_the_deck(self, sailor: Any) -> str | None:
+        """Why the person who is this post may not work with their watch, in a few words for
+        the belayed line ("gone below", "at the lunar", "sent for"), or None where they may
+        (`works_on_deck`; `Runner._posts_off_the_work`, the review of the lead's ruling 11)."""
         if not self._built:
-            return True
+            return None
         p = next((x for x in self.people if x.sailor_id == sailor.id), None)
         if p is None:
-            return True
-        if not p.aboard or p.sick or p.dead or p.confined_to or p.occupied or p.pending:
-            return False
-        return p.where in ("quarterdeck", "deck")
+            return None
+        if p.dead:
+            return "dead"
+        if p.sick:
+            return "sick"
+        if p.confined_to:
+            return "confined"
+        if not p.aboard or p.where not in ("quarterdeck", "deck"):
+            place = PLACES.get(p.where)
+            return "gone below" if place is not None and place.below else place_words(p.where)
+        if p.occupied:
+            return f"at the {p.task}"
+        if p.pending:
+            return "sent for"
+        return None
 
     # -- finding ------------------------------------------------------------------
 

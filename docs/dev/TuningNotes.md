@@ -21735,7 +21735,11 @@ day (12:00) the cook is up.
 
 **Either watch at nine begins every request that is a watch's work on deck, by night and by day,
 with the master or the mate where its three are under the want** (taken after every hand, the
-cook first by day), and the work aloft with its three alone: condition (c) holds. Pinned:
+cook first by day), and the work aloft with its three alone: condition (c) holds, **while the
+post who heads the watch is free on deck** (the ruling counts their person only aboard, well,
+free and on deck: `People.works_on_deck`, ruling 9's probe). With her master, who is her captain,
+below or at other business, or her mate so, that watch by night waits for the work that wants
+seven, as at eight: its three are under half (the review's mends, below). Pinned:
 `test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_mate`, each
 watch by night and by day. Sailed at nine from her settle (15 kn), her larboard watch by night
 takes in her settee in 115 s, sets it from the gear in 125, furls it in 587 and sets it from
@@ -21834,6 +21838,89 @@ Each with its old beside its new in its docstring or at its assertion.
   watch and the post. Measured, not tuned.
 - **The gate's generator check** ("every file but the bilander's identical") holds: with the posts'
   watches in the people files no other ship file moves.
+
+### The review's mends (one further commit)
+
+The review of the two commits (04858415, d6a88e2e) gave eight findings. Each was reproduced
+first, on the review's own probes and on a tree of d6a88e2e taken out beside the clone, and is
+measured below old (d6a88e2e) beside new. Seven are mended in one commit, the first with a
+question left to the lead and its limit recorded, and one is a record only.
+
+- **1. The post's person off the deck** (the review's blocker). Condition (c) holds only while
+  the post who heads the watch is free on deck, as the ruling's form has it, and the records said
+  (c) without that limit: now said here, in Build-Ships §16.1 and in her design's §6.1. Measured
+  with the post's person below, each watch: by night the square sails set from the gear or taken
+  in and the braces wait (seven wanted, three under half), the boat calls all hands to man her
+  (ruling 10's road), the head sails and the settee begin short with the three; by day every one
+  begins with the three and the cook. **Mended:** the post's hand outlasted the person, so that
+  the captain gone below hauled at the fore sheet from the cabin to "Set the foresail." at +226 s.
+  Each tick before the work is ticked, `Runner._posts_off_the_work` takes a post off the work
+  they hold where `_working_posts` would count them no longer: their person not aboard, well,
+  free and on deck (`People.off_the_deck`, the words of `works_on_deck`), at quarters, or all
+  hands called or coming. The work goes on short, or under half its hands is held, said ("Belayed
+  setting the foresail: the master gone below."), and is taken up again when hands come (the
+  captain come on deck 300 s on: taken up with the master that tick, set at +527 s). **Left to the
+  lead:** whether the watch whose post is below should begin its seven-handed work some other way
+  (the review's thought: the officer of the watch's person counted in their place). Nothing built.
+- **2. The post in the boat.** The master was the long-boat's oarsman at the quay while their
+  person stood on the quarterdeck, and in the kedge's boat likewise; the kedge's boat counted as
+  aboard in a watch's whole. **Mended, otherwise than the review proposed:** the post still hauls
+  at her falls (hoisting out is work on deck, and the ruling counts them for it), and on the tick
+  after she leaves the side they are taken off the work and stay aboard, the boat going on with
+  the rest and never held away from the ship (`Script.crew_away`, `_posts_off_the_work`). The
+  kedge's boat is away from her pull out to her pull back (`LayOutKedgeScript.crew_away`), so its
+  crew is not aboard for a watch's whole. Package 109's Torbay world at 04:10, her larboard watch by
+  night: the boat away at +606 s with the master as before, the master off at +607, landed at the
+  quay at +1,567 s with three, as before; the kedge away at +1,219 s, the master off at +1,220,
+  laid out at +2,274 s (old +1,986, hoisted in by four). The review's own mend (no post for work
+  whose crew goes away) would have sent the boat by night on ruling 10's road, all hands called
+  until manned, in both watches, and made the kedge wait by night in both, which would move what
+  condition (c) measured; it is one line in `_working_posts` if the lead prefers it.
+- **3. An order naming the watch below.** `_check_party` counted the named watch's post and
+  `_pool` did not, so "set the fore course with the larboard watch" at 02:00 was accepted on the
+  master's count and waited to the larboard's own watch (begun at +7,170 s). **Mended:** `_pool`
+  reads the named watch's post as `_check_party` does; begun at +90 s by the three and the master
+  once the three were up, set at +328 s.
+- **4. Quarters and all hands.** The master's hand stayed at the sheet through the beat to
+  quarters. **Mended** by the same per-tick rule: "Belayed setting the foresail: the master to
+  the conn at quarters." on the tick after the beat, the work taken up again on that tick by the
+  hands at quarters and set at +146 s (old +226 s, the master at it), the master never at it again.
+- **5. The manoeuvre's line.** `_to_the_conn` ran after the manoeuvre's short line, so that the
+  line named hands as still at the work they joined the manoeuvre from that tick, and it held the
+  work it took the post from without a word. **Mended:** `_to_the_conn` is called by
+  `_take_hands` once the manoeuvre has its hands and before its line, the hands the held work lets
+  go topping the manoeuvre up first (an all-hands one; a numbered one asks again), and it writes
+  the line a manoeuvre's belay writes. Her settle at 00:00, the larboard watch by night, "batten
+  down the hatches" then "wear ship" 18 s on: "Belayed battening down: stations for wearing
+  ship." and no short line at +19 s (old: "Only two hands to wear ship; the rest are battening
+  down."), the same five in the wear, wore at +537 s as before, the batten-down taken up again by
+  the three and the master.
+- **6. Which ships are merchantmen** (a record only). The files with a merchant's or a
+  fisherman's description: the bilander, the merchant brig (merchant, packet and Indiaman), the
+  topsail schooner (merchant) and the smack (fisherman) are given working officers in their people
+  files; the lugger (the chasse-marée, fisherman and merchant) and the cutter (its "coasting
+  cutter", merchant) are not. Their files serve a privateer ("privateer lugger") and the King's,
+  the revenue and the hired cutters too, with one people file each, so a `watch:` there would count
+  the officers of ships ruling 9 forbids. **For the lead:** whether the coaster lugger and the
+  coasting cutter are to haul; if so, read per description at `attach_crew` (a role of merchant or
+  fisherman and none of privateer, kings-ship or revenue), their watches measured against every
+  want as the schooner's were. Nothing built.
+- **7. A far prize retaken.** `fill_far_prize` made her prisoners' company afresh without the
+  watches her posts head, so that retaken her master and mate never hauled again. **Mended:** the
+  prisoners' company keeps them (the merchant brig struck and filled as a far prize: her
+  prisoners' company and the hull remustered on it head the larboard and the starboard again; old,
+  none).
+- **8. A comment** in her generator module named proposed9's `works_with_the_watch`, never built:
+  now `hands.post_watch` and `Runner._working_posts`. Her file unchanged.
+
+**Tests.** Moved: `tests/test_hands.py`'s
+`test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_at_quarters` (this
+step's own, on the merchant brig's world) calls `_to_the_conn` as `_take_hands` now does (old
+`runner._to_the_conn(crew)`, new `runner._to_the_conn(w.ship, crew, heave)` with a heave-to
+asked), its assertions as they were and one more (no hand let go). New: five in
+`tests/test_bilander.py` (her master leaving the work below and at quarters; at the boat's falls
+and staying aboard, the boat and the kedge; an order naming her watch below; the wear's belay),
+and one in `tests/test_hands.py` (the far prize). Each fails on d6a88e2e.
 
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 

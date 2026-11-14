@@ -2393,6 +2393,210 @@ def test_at_nine_her_larboard_watch_works_her_settee_with_the_master_and_calls_n
         world.run(30)
 
 
+def _her_at(hour: int, gear: tuple[str, ...] = ()):
+    """Her World at seed 7 off the Lizard at `hour` (tests/test_brains.py's world, its start set to
+    the hour), at nine, her people made, the sails named put in the gear, her bill's own watch on
+    deck."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, hour, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+    )
+    w = make_world(7, HER, sc)
+    _ = w.people.all
+    for sid in gear:
+        w.ship.sails[sid].state = SailState("in_the_gear")
+    return w
+
+
+def _posts_and_lines(world, start: int, ticks: int):
+    """Ticked to the work's end (at most `ticks`): the master's work at each tick it changed, by
+    the tick from `start`, and the lines since `start`."""
+    runner = world.ship.extra["evolutions"]
+    master = next(s for s in world.ship.extra["crew"].sailors if s.post == "master")
+    held: list = []
+    for _ in range(ticks):
+        world.tick()
+        if not held or held[-1][1] != master.at:
+            held.append((world.clock.tick - start, master.at))
+        if not runner.in_progress():
+            break
+    lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    return held, lines
+
+
+@pytest.mark.parametrize(
+    "second, said, back, set_s",
+    [
+        ("go below", "the master gone below", "come on deck", 527),
+        ("beat to quarters", "the master to the conn at quarters", None, 146),
+    ],
+    ids=["below", "quarters"],
+)
+def test_at_nine_her_master_leaves_the_work_once_they_may_haul_no_longer_said(
+    second, said, back, set_s
+):
+    """The review of the lead's ruling 11 of 2026-11-13: a post's hand never outlasts what counted
+    it (`Runner._posts_off_the_work`). Seed 7 off the Lizard at 04:00, at nine, her larboard watch
+    by night, the fore course in the gear: "set the fore course" is begun by the watch's three and
+    the master (seven wanted, the three under it), and 5 s later the captain, who is her master,
+    goes below, or beats to quarters. On the next tick the master's hand leaves the sheet and the
+    work, three under half its seven, is held, said: "Belayed setting the foresail: the master
+    gone below." Below, it waits for them (the three cannot begin it alone: the limit of
+    condition (c), which holds while the post who heads the watch is free on deck), and 300 s on,
+    the captain come on deck, it is taken up with the master on that tick and the foresail set at
+    +527 s. At quarters the ruling counts no post: the master goes to the conn ("Belayed setting
+    the foresail: the master to the conn at quarters."), the work is taken up again on that tick
+    by the hands at quarters (all hands called) and the foresail set at +146 s, the master never at
+    it again.
+    Old (d6a88e2e): the master's hand stayed at the sheet from the cabin, and through the beat,
+    to the foresail set at +226 s, nothing said."""
+    world = _her_at(4, ("fore.course",))
+    world.run(30)
+    start = world.clock.tick
+    assert world.submit("set the fore course").kind == "order.accepted"
+    (work,) = world.ship.extra["evolutions"].instances
+    assert [h.post for h in work.assignment.hands if h.post] == ["master"]
+    world.run(5)
+    assert world.submit(second).kind != "order.rejected"
+    world.tick()
+    master = next(s for s in world.ship.extra["crew"].sailors if s.post == "master")
+    assert master.at is None
+    if back is None:
+        # belayed, and taken up again on that tick by the hands at quarters, the master not one
+        assert not work.paused and len(work.assignment.hands) > 3
+        assert master not in work.assignment.hands
+    else:
+        assert work.paused and work.assignment is None
+        world.run(299)
+        assert work.paused, "the larboard's three alone are under half its seven"
+        assert world.submit(back).kind == "captain.on_deck"
+        world.tick()
+        assert not work.paused
+        assert [h.post for h in work.assignment.hands if h.post] == ["master"]
+    held, lines = _posts_and_lines(world, start, 900)
+    belayed = [(t, text) for t, kind, text in lines if kind == "evolution.belayed"]
+    assert belayed == [(6, f"Belayed setting the foresail: {said}.")], belayed
+    (done,) = [t for t, kind, _ in lines if kind == "sail.set"]
+    assert abs(done - set_s) <= 10, done
+    assert world.ship.sails["fore.course"].state is SailState.SET
+    if back is None:
+        assert all(at is None for _, at in held), held
+
+
+@pytest.mark.parametrize(
+    "order, away, end, end_s",
+    [
+        ("send the boat ashore for the prices", "boat.away", "boat.ashore", 1567),
+        ("lay out a kedge to the E", "evolution.step", "ship.kedged", 2274),
+    ],
+    ids=["boat", "kedge"],
+)
+def test_at_nine_her_master_hauls_at_the_boats_falls_and_stays_aboard_when_she_goes(
+    order, away, end, end_s
+):
+    """The review of the lead's ruling 11 of 2026-11-13: the ruling counts a post for work on deck,
+    and a boat's crew pulling away is out of the ship (`Script.crew_away`: the boat from her pull
+    out to her pull back, and now the kedge's boat alike). Package 109's Torbay world at anchor,
+    04:10, at nine, her larboard watch by night: the boat sent for the prices, or a kedge laid out
+    to the east, is begun by the watch's three and the master hoisting her out ("Only four hands
+    to send boat"); on the tick after she leaves the side the master is off the work, aboard, and
+    she goes on with the three, never held away from the ship: landed at the quay at +1,567 s, as
+    before; the kedge laid out at +2,274 s, hoisted in by three. Old (d6a88e2e): the master went
+    away in her, their hand at the quay while their person stood on the quarterdeck, and in the
+    kedge's boat to her hoisting in, laid out at +1,986 s."""
+    from tests.test_mends_109 import _anchored_bilander
+
+    world = _anchored_bilander()
+    crew = world.ship.extra["crew"]
+    start = world.clock.tick
+    assert world.submit(order).kind == "order.accepted"
+    (work,) = world.ship.extra["evolutions"].instances
+    by = [h.post or h.watch.value for h in work.assignment.hands]
+    assert by == ["larboard", "larboard", "larboard", "master"], by
+    held, lines = _posts_and_lines(world, start, 2600)
+    went = next(t for t, kind, text in lines if kind == away and "away" in text)
+    assert held[:2] == [(1, work.inst_id), (went + 1, None)], (held, went)
+    assert all(at is None for _, at in held[1:]), held
+    assert world.people.captain.where == "quarterdeck"
+    (done,) = [t for t, kind, _ in lines if kind == end]
+    assert abs(done - end_s) <= 10, done
+    assert not [ln for ln in lines if ln[1] in ("crew.all_hands", "evolution.failed")]
+    assert not [s for s in crew.sailors if s.post and s.at]
+
+
+def test_at_nine_an_order_naming_her_watch_below_begins_with_its_post_once_it_is_up():
+    """The review of the lead's ruling 11 of 2026-11-13: an order that names a watch counts that
+    watch's post for it where it begins as where it was judged (`Runner._check_party`,
+    `Runner._pool`). Seed 7 off the Lizard at 02:00, at nine, her starboard watch on deck, the fore
+    course in the gear: "set the fore course with the larboard watch" turns the larboard up, waits
+    while its three come up, and is begun at +90 s by the three and the master, who heads it; the
+    foresail set at +328 s. Old (d6a88e2e): accepted on the master's count and begun without
+    them, so it waited to the larboard's own watch, begun at eight bells, +7,170 s."""
+    world = _her_at(2, ("fore.course",))
+    world.run(30)
+    start = world.clock.tick
+    assert world.submit("set the fore course with the larboard watch").kind == "order.accepted"
+    held, lines = _posts_and_lines(world, start, 900)
+    (begun,) = [t for t, kind, _ in lines if kind == "evolution.started"]
+    (done,) = [t for t, kind, _ in lines if kind == "sail.set"]
+    assert abs(begun - 90) <= 10 and abs(done - 328) <= 10, (begun, done)
+    assert held[1][0] == begun and held[1][1] is not None, held
+    said = "Only four hands to the foresail; there are no more on deck."
+    assert (begun, "evolution.short_handed", said) in lines
+
+
+def test_at_nine_a_wear_begun_while_her_master_hauls_belays_the_work_in_its_own_words():
+    """The review of the lead's ruling 11 of 2026-11-13: a manoeuvre begun takes the post from the
+    work they hold to the conn before its line is written (`Runner._to_the_conn`, called by
+    `Runner._take_hands`), and the work it holds is said as a manoeuvre's belay says it. From her
+    settle at 00:00, at nine, the hands piped down and 30 s, her larboard watch by night: "batten
+    down the hatches" is begun by the three and the master ("Only four hands to batten down"), and
+    "wear ship" 18 s later calls all hands and takes the master to the conn, the batten-down held:
+    "Belayed battening down: stations for wearing ship.", the three in the wear on that tick and
+    no short line; she wore at +537 s and the batten-down is taken up again by the three and the
+    master. Old (d6a88e2e): "Only two hands to wear ship; the rest are battening down." while the
+    three joined the wear on that tick, the batten-down held without a word."""
+    from datetime import datetime
+
+    world = _her_settle(15.0, start_time=datetime(1805, 6, 1, 0, 0))
+    assert world.submit("pipe down").kind == "crew.piped_down"
+    world.run(30)
+    runner = world.ship.extra["evolutions"]
+    start = world.clock.tick
+    assert world.submit("batten down the hatches").kind == "order.accepted"
+    world.run(18)
+    assert world.submit("wear ship").kind == "order.accepted"
+    world.tick()
+    batten, wear = sorted(runner.instances, key=lambda i: i.order)
+    assert batten.paused and wear.evo.id == "wear"
+    assert sum(1 for h in wear.assignment.hands if h.watch.value == "larboard") == 3
+    for _ in range(600):
+        world.tick()
+        if wear not in runner.instances:
+            break
+    world.tick()
+    lines = [(e.tick - start, e.kind, e.text) for e in _after(world, start)]
+    at_19 = [(kind, text) for t, kind, text in lines if t == 19]
+    assert ("evolution.belayed", "Belayed battening down: stations for wearing ship.") in at_19
+    assert not [k for k, _ in at_19 if k == "evolution.short_handed"], at_19
+    (wore,) = [t for t, kind, _ in lines if kind == "ship.wore"]
+    assert abs(wore - 537) <= 10, wore
+    assert not batten.paused
+    assert [h.post for h in batten.assignment.hands if h.post] == ["master"]
+
+
 @pytest.mark.parametrize(
     "first, then, gap, call, second_s, end, piped_s",
     [
