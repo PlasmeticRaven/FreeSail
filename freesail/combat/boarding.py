@@ -545,12 +545,52 @@ def _round(f: Fight, tick: int) -> None:
     aw.record(Severity.URGENT, "action.boarding", line_a, data=data)
     if dw is not None and dw is not aw:
         dw.record(Severity.URGENT, "action.boarding", line_d, data=data)
-    if not theirs or sd < CARRIED_RATIO * sa or float(md.value) < float(md.strike_below):
+    how = _verdict(
+        len(ours),
+        sa,
+        float(ma.value),
+        float(ma.strike_below),
+        len(theirs),
+        sd,
+        float(md.value),
+        float(md.strike_below),
+        f.round,
+    )
+    if how == "carried":
         _end(f, "carried", "")
-    elif not ours or sa < CARRIED_RATIO * sd or float(ma.value) < float(ma.strike_below):
+    elif how == "repulsed":
         _end(f, "repulsed", "the boarders driven back over the side")
-    elif f.round >= CONTEST_ROUNDS:
+    elif how == "contested":
         _end(f, "contested", "the deck contested past a quarter of an hour, the boarders drawn off")
+
+
+def _verdict(
+    boarders: int,
+    strength_attack: float,
+    temper_attack: float,
+    line_attack: float,
+    defenders: int,
+    strength_defence: float,
+    temper_defence: float,
+    line_defence: float,
+    round_no: int,
+) -> str:
+    """The round's end from the sides as they stand (package 115 D1: the contest's own rule,
+    taken out of `_round` so that it is tested at its own level): "carried" when the
+    defenders are gone, their strength under `CARRIED_RATIO` of the boarders' or their temper
+    under its line; "repulsed" the same of the boarders; "contested" past `CONTEST_ROUNDS`;
+    "" while the fight goes on."""
+    if not defenders or strength_defence < CARRIED_RATIO * strength_attack:
+        return "carried"
+    if temper_defence < line_defence:
+        return "carried"
+    if not boarders or strength_attack < CARRIED_RATIO * strength_defence:
+        return "repulsed"
+    if temper_attack < line_attack:
+        return "repulsed"
+    if round_no >= CONTEST_ROUNDS:
+        return "contested"
+    return ""
 
 
 def _end(f: Fight, how: str, why: str) -> None:

@@ -29344,3 +29344,32 @@ every station but the marines, the quarterdeck and the idlers, whether or not th
 being served. And the defender's gun crews are not counted in the defence unless `repel
 boarders` is given: `boarding.defenders_of` takes the marines, the helm, the trimmers, the
 quarterdeck and the small-arms men, and every fit man on deck only when repelling.
+
+**The boarding truths restated (the lead's ruling of 2026-11-14, the owner told).** Truth
+7-181, OLD: "the boarders carry a deck held by the marines and the colours come down". NEW,
+two sentences: 7-181a, "at her own temper a frigate's deck held by her marines holds against
+a boarding party of about her defenders' number" (repulsed, her temper above the boarders'
+every round, more of theirs lost than of hers); 7-181b, "a deck is carried when its
+defenders are reduced", tried as the contest's sum (`boarding._strength` and the new
+`boarding._verdict`, taken out of `_round` unchanged), a table either side of the turns: a
+hundred boarders at 0.6 against defenders at her 0.88, carried under 34, contested 35 to 136,
+repulsed from 137; carried when her temper is under her line, repulsed when theirs is. The
+round tables at seed 7 (attacker men, temper | defender men, temper): trunk r1 98, .647 | 118,
+.700; r2 98, .586 | 113, .632; r5 96, .458 | 101, .495; r8 95, .412 | 93, .344; r10 95, .374 |
+92, .291, carried (lost 43 and 55). Mended: r1 100, .632 | 118, .877; r2 99, .548 | 114, .832;
+r5 96, .458 | 109, .726; r9 94, .291 | 99, .597, repulsed (lost 59 and 44). test_fight's
+boarders-carry-a-deck follows 7-181a (now "...are repulsed and both musters count it").
+Why the worldly roads to a carried deck failed, in the lead's order: her company shortened by
+the world's own order (`aboard "Medusa": the fever in the ship`, a tenth sick each; her fit
+264, 216, 196, 178, 161, her defenders 103, 78, 74, 60, 53) and the boarders still repulsed
+at rounds 7 to 15, their own temper falling under its line with 55 to 59 of them lost (the
+sick list does not touch her temper); a fight to reduce her drives the two out of the
+grapnel's throw (below). 7-325 and 7-351 wait on the lead's word (a weaker company laid within
+the throw, or another road).
+
+**Owed, measured and not mended (for the owner at a gate, with the period's figures).** At
+pistol shot a frigate's fire takes about a man a minute from a company of 264, and her temper
+falls from 0.88 to 0.82 in forty minutes; two ships laid ten metres apart drift beyond the
+grapnel's throw (thirty) in a minute or two, and `lay her aboard` does not close it in thirty
+minutes; so that, as the fight is built, a player cannot bring about the boarding the old
+truth claimed.

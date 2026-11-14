@@ -10469,18 +10469,21 @@ def test_truth_7_180_the_boarders_are_repulsed_by_a_whole_company_awake_and_the_
     assert f.lost_attack > f.lost_defence > 0
 
 
-def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colours_come_down():
-    """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
-    their guns and the deck held by her marines, the helm, the trimmers and the
-    quarterdeck, the boarders with their arms served out carry it in a few rounds: her
-    colours come down 'carried by boarding' (the strike's own line, the far body struck for
-    the moment of it), and (package 74, step 2: the officer on the deck won takes possession
-    at once) she is a prize of ours alongside, her record saying how; the losses by name on
-    both bills, hers the prisoners'. The pin moved by 74: on the trunk she lay struck and no
-    prize; the fight's bands are as they were."""
+def test_truth_7_181a_a_frigates_deck_held_by_her_marines_at_her_own_temper_holds():
+    """Spec M7 §11a, the deck held; restated by the lead's ruling of 2026-11-14 on package 115
+    D1 (the owner told). OLD SENTENCE: "the boarders carry a deck held by the marines and the
+    colours come down". It passed because the French frigate, never fired on, was given the
+    default temper (0.70) by the boarding's asking where her own captain's doctrine gives
+    0.88 (`combat.morale.morale_of`, mended). NEW SENTENCE: at her own temper a frigate's
+    deck held by her marines, the helm, the trimmers and the quarterdeck HOLDS against a
+    boarding party of about her defenders' number: the boarders are repulsed, her temper
+    above theirs in every round, and they lose more men than she does. Round table at seed 7
+    (attacker men, temper | defender men, temper): old r1 98, .647 | 118, .700 ... r10 95,
+    .374 | 92, .291 carried (lost 43 and 55); new r1 100, .632 | 118, .877 ... r9 94, .291 |
+    99, .597 repulsed (lost 59 and 44). Asserted by direction, not by its figures. The deck
+    carried when her defenders are reduced is truth 7-181b."""
     from freesail.combat import boarding as B
     from freesail.combat import small_arms as SA
-    from freesail.world import prizes as P
     from tests.test_fight import _alongside
 
     w, v, enemy = _alongside(10.0, her_quarters=True)
@@ -10495,12 +10498,54 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
         if f is not None and f.over:
             break
     f = B.fight_of(w.ship)
-    assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
-    assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
-    assert events(w, "action.carried") and events(w, "prize.taken")
-    assert P.is_prize(v) and not v.struck and P.record_of(v)["how"] == "carried by boarding"
-    assert f.lost_defence > f.lost_attack > 0
-    assert "of them hurt" in enemy.readings.words("prisoners")
+    assert f.over == "repulsed", (f.over, f.round)
+    rounds = [e.data for e in events(w, "action.boarding")]
+    assert rounds and all(r["temper_defence"] > r["temper_attack"] for r in rounds), rounds
+    assert f.lost_attack > f.lost_defence > 0
+    assert not v.struck and not enemy.ship.extra.get("struck")
+
+
+def test_truth_7_181b_a_deck_is_carried_when_its_defenders_are_reduced_the_contests_sum():
+    """The deck carried, the second of 7-181's two sentences (the lead's ruling of 2026-11-14
+    on package 115 D1). A TEST OF THE CONTEST'S SUM, NOT OF A FIGHT: no road the game offers
+    today brings a frigate's boarders to a reduced French frigate (measured: her fit men put
+    on the sick list a tenth at a time by the world's own order, 264 to 161, and the boarders
+    still repulsed, their own temper falling under its line; our fire drives the two ships
+    out of the grapnel's throw and in forty minutes takes eleven of her men; the brigs the
+    far detail offers carry no marines and drift beyond the throw), so the rule is tried at
+    its own level: the men, their arms, the tempers and the cover in, the end out, by the
+    contest's own `_strength` and `_verdict`. A hundred boarders at temper 0.6 against her
+    marines and deck stations at her own 0.88: carried under 34 defenders, contested from 35
+    to 136, repulsed from 137; and carried at any number when her temper falls under her
+    line, repulsed when theirs does."""
+    from freesail.combat.boarding import CONTEST_ROUNDS, _strength, _verdict
+
+    def end(boarders, ta, defenders, td, line_a=0.3, line_d=0.3, round_no=3):
+        sa = _strength([(None, 1.0)] * boarders, ta, 1.0)
+        sd = _strength([(None, 1.0)] * defenders, td, 1.0)
+        return _verdict(boarders, sa, ta, line_a, defenders, sd, td, line_d, round_no)
+
+    table = [
+        # (boarders, their temper, defenders, her temper) -> the end
+        ((100, 0.6, 30, 0.88), "carried"),
+        ((100, 0.6, 32, 0.88), "carried"),
+        ((100, 0.6, 34, 0.88), "carried"),
+        ((100, 0.6, 35, 0.88), ""),
+        ((100, 0.6, 37, 0.88), ""),
+        ((100, 0.6, 40, 0.88), ""),
+        ((100, 0.6, 118, 0.88), ""),
+        ((100, 0.6, 135, 0.88), ""),
+        ((100, 0.6, 136, 0.88), ""),
+        ((100, 0.6, 137, 0.88), "repulsed"),
+        ((100, 0.6, 140, 0.88), "repulsed"),
+        ((100, 0.6, 118, 0.29), "carried"),  # her temper under her line
+        ((100, 0.29, 118, 0.88), "repulsed"),  # theirs under theirs
+        ((100, 0.6, 0, 0.88), "carried"),
+        ((0, 0.6, 118, 0.88), "repulsed"),
+    ]
+    for (b, ta, d, td), want in table:
+        assert end(b, ta, d, td) == want, ((b, ta, d, td), end(b, ta, d, td), want)
+    assert end(100, 0.6, 118, 0.88, round_no=CONTEST_ROUNDS) == "contested"
 
 
 def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():

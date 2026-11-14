@@ -335,14 +335,18 @@ def test_boarders_against_a_whole_company_awake_are_repulsed_and_the_temper_pays
     assert "the last fight repulsed" in w.readings.words("boarders")
 
 
-def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_their_hand():
-    """§11a: against a frigate at quarters, her gun crews at the guns, the boarders with
-    their arms served out carry the deck in a few rounds: her colours come down by the
-    boarders' hand (`action.strike` with the words), the losses on both musters by name;
-    the far body struck for the moment of the strike and then (package 74, the design's
-    §2.3: the officer on the deck won takes possession of her at once) a prize of ours, her
-    record saying how she was taken, her colours ours over hers. The pin moved by 74: on the
-    trunk she lay struck and no prize; the bands of the fight are as they were."""
+def test_boarders_against_a_frigate_at_her_own_temper_are_repulsed_and_both_musters_count_it():
+    """§11a, as truth 7-181a restates it (the lead's ruling of 2026-11-14 on package 115 D1).
+    OLD: "the boarders carry a deck held by her marines and the colours come down by their
+    hand", which held only while the French frigate, boarded before she was fired on, had
+    the default temper and not her captain's (`combat.morale.morale_of`, mended). NEW: at her
+    own temper the deck holds: the boarders are repulsed, the grapnels cast off, the losses
+    on both musters as the fight counted them (more of ours than of hers), our temper the
+    worse by the repulse, and she no prize and not struck. The deck carried is the
+    contest's sum (truth 7-181b)."""
+    from freesail.combat.boarding import REPULSE_COST
+    from freesail.combat.morale import morale_of
+
     w, v, enemy = _alongside(10.0, her_quarters=True)
     w.submit("grapple her")
     w.submit("serve out the small arms")
@@ -356,24 +360,19 @@ def test_boarders_carry_a_deck_held_by_her_marines_and_the_colours_come_down_by_
         if f is not None and f.over:
             break
     f = B.fight_of(w.ship)
-    assert f is not None and f.over == "carried", (f.over, f.round)
-    assert 2 <= f.round <= 12
-    carried = _events(w, "action.carried")
-    assert carried and "by our boarders' hand" in carried[0].text
-    struck = _events(enemy, "action.struck")
-    assert struck and "carried by boarding" in struck[0].text
+    assert f is not None and f.over == "repulsed", (f.over, f.round)
+    repulsed = _events(w, "action.repulsed")
+    assert repulsed and "the grapnels cast off" in repulsed[0].text
+    assert not B.grappled_to(w.ship) and not B.grappled_to(enemy.ship)
+    assert f.lost_attack > f.lost_defence > 0
+    assert morale_of(w.ship).repulses == REPULSE_COST
+    ours = [s for s in w.ship.extra["crew"].sailors if s.hurt] + list(w.ship.extra["crew"].dead)
+    hers = [s for s in enemy.ship.extra["crew"].sailors if s.hurt]
+    hers += list(enemy.ship.extra["crew"].dead)
+    assert len(ours) >= f.lost_attack and len(hers) >= f.lost_defence
     from freesail.world import prizes as P
 
-    assert P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")  # 74's
-    assert (P.record_of(v) or {}).get("how") == "carried by boarding"
-    assert B.grappled_to(w.ship) == v.id  # the prize alongside
-    # her people are the prize's prisoners (74's muster swap): their hurt the fight's
-    prisoners = P.prisoners_of(enemy.ship)
-    assert prisoners is not None
-    her_hurt = [s for s in prisoners.crew.sailors if s.hurt]
-    assert len(her_hurt) == f.lost_defence > f.lost_attack
-    assert "of them hurt" in enemy.readings.words("prisoners")
-    assert "the last fight carried" in w.readings.words("boarders")
+    assert not P.is_prize(v) and not v.struck and not enemy.ship.extra.get("struck")
 
 
 def test_repel_boarders_brings_the_gun_crews_up_and_the_guns_fall_silent():
