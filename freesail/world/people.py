@@ -604,17 +604,55 @@ class Registry:
                     del persons[i]
                     return
 
-    def rehome(self, person: Person, hull_id: str) -> None:
+    def rehome(self, person: Person, hull_id: str, row: bool = False) -> None:
         """A person given another home (a prize master, 74): moved between the lists. A
         company's ids are its muster's posts (`first_lieutenant`), so a man rehomed into a
         company that has his post already is told apart by his old home's id after a colon
         (`first_lieutenant:the ship`); `People.captain` and the records read the id as it
-        stands after the move."""
+        stands after the move. With `row`, his muster row moves with him (package 60's moves:
+        the take-up, the transfer, a boat's company joining); the prize master's road (74's)
+        keeps his row in his captor's muster, as its counts are pinned."""
+        old_home = str(getattr(person, "home", "") or "")
         self.remove(person)
         if any(p.id == person.id for p in self.company(hull_id)):
             person.id = f"{person.id}:{person.home}"
         person.home = hull_id
         self.company(hull_id).append(person)
+        if row:
+            self._row_follows(person, old_home, hull_id)
+
+    def _row_follows(self, person: Person, old_home: str, hull_id: str) -> None:
+        """His muster row moved with him (package 60, the cut's reading, item 1: a person's row
+        travels with the person): out of his old ship's muster and into his new one's as her
+        watches stand (`musters.take_out`, `musters.join`), his `sailor_id` the id it has
+        there (told apart by the ship he came from where hers has it already). Nothing where
+        he has no row, or it is not in his old ship's muster."""
+        sid = getattr(person, "sailor_id", None)
+        if not sid or old_home == hull_id:
+            return
+        old_hull, new_hull = self._hull(old_home), self._hull(hull_id)
+        if old_hull is None or new_hull is None:
+            return
+        old_crew = (getattr(old_hull.ship, "extra", None) or {}).get("crew")
+        sailor = old_crew.by_id.get(sid) if old_crew is not None else None
+        if sailor is None:
+            return
+        from freesail.world.musters import join, take_out
+
+        take_out(old_hull, [sailor])
+        join(new_hull, [sailor], came_from=old_home)
+        person.sailor_id = sailor.id
+
+    def _hull(self, hull_id: str) -> Any:
+        """The hull whose company is registered under `hull_id`, or None."""
+        company = self.companies.get(hull_id)
+        if company is None:
+            return None
+        from freesail.world.hulls import world_of
+
+        root = world_of(getattr(company, "world", None))
+        hulls = getattr(root, "hulls", None) or {}
+        return hulls.get(hull_id)
 
     def adopt_old(self, company: Any, hull_id: str) -> None:
         """A `People` from a checkpoint written before the registry (its persons and things

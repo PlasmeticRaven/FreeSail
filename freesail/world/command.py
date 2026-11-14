@@ -261,7 +261,7 @@ def take_up(
     # -- the act, in order (§2.3) --
     registry = getattr(root, "registry", None)
     if registry is not None:
-        registry.rehome(person, str(hull.id))
+        registry.rehome(person, str(hull.id), row=True)
     person.confined_to = ""
     captain = getattr(hull, "captain", None)
     if captain is not None and getattr(captain, "commands", False):

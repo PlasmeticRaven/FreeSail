@@ -3570,7 +3570,7 @@ class Dealings:
                     # of her company from here (package 60), rehomed before he is put aboard,
                     # as a prize master is: a station held through him comes as her own
                     if registry is not None:
-                        registry.rehome(p, str(target.id))
+                        registry.rehome(p, str(target.id), row=True)
                     put_aboard(world, p, target, "quarterdeck", by="the boat", said=False)
                     joined.append(p)
                     continue

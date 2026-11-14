@@ -441,7 +441,7 @@ def _by_the_gangway(
     registry = getattr(root, "registry", None)
     for p in persons:
         if registry is not None:
-            registry.rehome(p, str(receiver.id))
+            registry.rehome(p, str(receiver.id), row=True)
         put_aboard(root, p, receiver, "quarterdeck", by="the gangway", said=False)
     say_came_aboard(receiver, giver, men, persons, 1, 1, by="over the gangway")
     who = _who_words(men, persons)
@@ -496,7 +496,7 @@ def boat_lost(root: Any, giver: Any, state: Any) -> str:
         join(nearer, men, came_from=str(giver.id) if nearer is not giver else bound)
     for p in persons:
         if nearer is receiver and p.id in state.joining and registry is not None:
-            registry.rehome(p, str(receiver.id))
+            registry.rehome(p, str(receiver.id), row=True)
         put_aboard(root, p, nearer, "deck", by="picked up", said=False)
     parts: list[str] = []
     picked = _who_words(men, persons)

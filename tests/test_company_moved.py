@@ -982,3 +982,59 @@ def test_a_scenarios_whole_name_answers_without_its_title():
         assert TR.name_shaped(said.lower()) and TR._answers_to(smith, said), said
     for said in ("john", "Mr John", "John Smith Jones"):
         assert not TR._answers_to(smith, said), said
+
+
+# -- the cut's reading, item 1: a person's muster row travels with him ----------------------
+
+
+def _mustered(hull) -> str:
+    """The muster's own reading of a hull, joined (`Crew.describe`)."""
+    crew = hull.ship.extra["crew"]
+    return " ".join(crew.describe(hull.clock))
+
+
+def _row(hull, person):
+    crew = hull.ship.extra["crew"]
+    return crew.by_id.get(person.sailor_id)
+
+
+def test_a_persons_muster_row_moves_with_him_at_the_take_up_and_the_transfer():
+    """The cut's reading, item 1: a person moved keeps no row in his old ship's muster. At the
+    take-up his row leaves the cutter's muster and joins the Fly's, his own (his whole name),
+    and the musters' own readings say so on both ships; a man moved by name in a transfer the
+    same; and his whole name is read from his new ship's muster ('Silas Pascoe' answers)."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    row = _row(fly, me)
+    assert row is not None and row.name.endswith("Bowen"), row
+    assert _row(cutter, me) is None
+    assert not any(s.name.endswith("Bowen") for s in cutter.ship.extra["crew"].sailors)
+    assert "Bowen" not in _mustered(cutter) and "Bowen" in _mustered(fly)
+    cut = cutter.ship.extra["crew"].complement
+    pascoe = next(p for p in cutter.people.people if p.name == "Mr Pascoe")
+    whole = TR.whole_name(cutter, pascoe)
+    e = w.submit("transfer Mr Pascoe from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    for _ in range(40):
+        w.run(60)
+        if str(pascoe.hull) == str(fly.id):
+            break
+    assert pascoe.home == str(fly.id) and _row(fly, pascoe) is not None
+    assert _row(fly, pascoe).name == whole and _row(cutter, pascoe) is None
+    assert cutter.ship.extra["crew"].complement == cut - 1
+    assert whole.split()[-1] not in _mustered(cutter) and whole in _mustered(fly)
+    # read from his new ship's muster by his whole name, and told from her own men
+    e = w.submit(f"transfer {whole} to the Sherbourne")
+    assert e.kind == "company.transfer", e.text
+
+
+def test_a_wound_given_after_the_move_lands_on_the_man_moved():
+    """The cut's reading, item 1: after the take-up his row is his own in the Fly's muster, so
+    a wound written to it is his ('Mr Bowen, wounded'), never her late master's."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    crew = fly.ship.extra["crew"]
+    row = _row(fly, me)
+    others = [s for s in crew.sailors if s is not row]
+    row.hurt = "wounded"
+    said = w.submit("where is mr bowen").text
+    assert "Mr Bowen, wounded" in said, said
+    assert not any(s.hurt for s in others)
