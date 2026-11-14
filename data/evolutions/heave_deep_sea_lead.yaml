@@ -22,6 +22,7 @@
 # bring her to first, as Falconer has it). The subject is `her` (see heave_log.yaml).
 id: heave_deep_sea_lead
 verb: heave_deep_sea_lead
+doing: heaving the deep-sea lead
 applies_to: {class: ship}
 params: {deep: true}
 preconditions: []

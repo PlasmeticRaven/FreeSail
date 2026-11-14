@@ -2160,7 +2160,8 @@ PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | st
         OFF_FALMOUTH,
         "belay heave the lead",
         _orders("heave the lead"),
-        took(("work.belayed",), ("Belayed heaving lead",)),
+        # the work by its name (the lead's (C8) of 2026-11-14; old "Belayed heaving lead")
+        took(("work.belayed",), ("Belayed heaving the lead",)),
     ),
     (
         "cutter",
@@ -2168,7 +2169,7 @@ PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | st
         OFF_FALMOUTH,
         "avast heave lead",
         _orders("heave the lead"),
-        took(("work.belayed",), ("Belayed heaving lead",)),
+        took(("work.belayed",), ("Belayed heaving the lead",)),
     ),
     ("cutter", "17:41", OFF_FALMOUTH, "tack ship", _reaching, still(("She is not close-hauled",))),
     # -- playtest 13, the brig (refused-brig.md: eighteen) -------------------------------

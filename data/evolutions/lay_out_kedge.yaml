@@ -21,6 +21,7 @@
 # the scope and the quarter port).
 id: lay_out_kedge
 verb: lay_out_kedge
+doing: laying out the kedge
 applies_to: {class: ship}
 script: lay_out_kedge
 params: {toward_deg: null, fathoms: null}

@@ -12,6 +12,7 @@
 # (`crew.stores.shot_plugs`).
 id: plug_shot_hole
 verb: plug
+doing: plugging the shot holes
 applies_to: {class: ship}
 script: plug_shot_hole
 params: {verb: "plug the shot holes"}

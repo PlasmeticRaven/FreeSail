@@ -102,6 +102,12 @@ evolution file's (`Runner._timing`); the script's logic is unchanged. Only the 7
 files carry it; a file without it has every evolution's own timing, and a spec pickled before it
 reads as one with none.
 
+Package 75's close, the lead's (C2) of 2026-11-14 (the bilander's heave-to by night at her nine),
+adds a top-level `hands:`: the ship's own number of hands for an evolution whose file asks a
+number, by its id (`heave_to: 6`), which the runner reads over the evolution file's crew line
+(`Runner._crew_line`). Only the bilander's file carries it; a file without it has every
+evolution's own number, and a spec pickled before it reads as one with none.
+
 Package 75's B1, the lead's ruling (4) of 2026-11-13 (the marines by fit), adds a fit's own
 `marines`: the marines the quarter bill keeps in their division at the beat when she carries that
 fit, where it differs from the bill's own (which is the default fit's), a whole number no more than
@@ -1069,6 +1075,10 @@ class ShipSpec:
     # taken over the evolution file's (package 75, the lead's ruling (1) of 2026-11-10 at 19:30:
     # the two-deckers' lee helm lying a-try); none: every evolution's own timing
     timing: dict[str, dict[str, float]] = field(default_factory=dict)
+    # the ship's own number of hands for an evolution whose file asks a number, {evolution id:
+    # hands}, taken over the evolution file's (package 75, the lead's (C2) of 2026-11-14: the
+    # bilander's heave-to and filling away, six of her); none: every evolution's own number
+    hands: dict[str, int] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -1144,6 +1154,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
         oars=_parse_oars(data["oars"], source) if data.get("oars") is not None else None,
         timing=_parse_timing(data["timing"], source) if data.get("timing") is not None else {},
+        hands=_parse_hands(data["hands"], source) if data.get("hands") is not None else {},
     )
     validate(spec)
     return spec
@@ -1166,6 +1177,24 @@ def _parse_timing(raw: Any, source: str) -> dict[str, dict[str, float]]:
         out[str(eid)] = {
             str(k): _num(figures, k, f"the timing for '{eid}'", source) for k in figures
         }
+    return out
+
+
+def _parse_hands(raw: Any, source: str) -> dict[str, int]:
+    """The `hands:` section (package 75, the lead's (C2) of 2026-11-14): for each evolution named
+    by its id, the ship's own number of hands for it, a whole number of one or more, read by the
+    runner over the evolution file's crew line (`Runner._crew_line`). Which evolutions ask a
+    number is their files', and the files' tests hold every ship file's to them; here the shape
+    alone, refused in words."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'hands' is not a mapping of evolutions to their hands.")
+    out: dict[str, int] = {}
+    for eid, n in raw.items():
+        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+            raise ShipFileError(
+                f"{source}: the hands for '{eid}' are {n!r}, which is not a whole number of hands."
+            )
+        out[str(eid)] = n
     return out
 
 

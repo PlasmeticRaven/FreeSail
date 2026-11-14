@@ -1318,12 +1318,19 @@ def test_a_post_is_counted_where_the_watch_is_small_on_board_and_not_where_it_is
     assert [s.post for s in runner._working_posts(crew, jib)] == ["mate"]
 
 
-def test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work():
-    """Ruling 11's condition (a), at its root: the topsail schooner's watches are seventeen and
-    sixteen hands as mustered at seed 7, each over the want of every request that is a watch's work
-    on deck by her files, so that her master and mate are never counted for it, by night or by day
-    (old: ruling 9's wider form took her mate where work at once used up her watch, and moved her
-    passages). The armed schooner has no people file, and her posts head no watch."""
+def test_the_schooners_posts_are_counted_only_for_the_anchor_work_that_wants_twenty():
+    """Ruling 11's condition (a), at its root, and what is so (the lead's (C4) of 2026-11-14): the
+    topsail schooner's watches are seventeen and sixteen hands as mustered at seed 7, each over the
+    want of every request that is a watch's work on deck by her files, so that her master and mate
+    are not counted for it, by night or by day (old: ruling 9's wider form took her mate where work
+    at once used up her watch, and moved her passages). Two anchor files want twenty hands
+    (`back_anchor`, `cat_and_fish_anchor`), over either watch: by ruling 11's letter, which stands,
+    the post of the watch on deck IS counted for them, while all hands are not called or coming,
+    the mate with the starboard and the master with the larboard. The armed schooner has no people
+    file, and her posts head no watch. Old (this test as cda12ec9 had it, "...are never counted"):
+    the two anchor files left out of its cases, and the report's "no post of hers is ever pooled",
+    which was so only of the tests and passages run, in none of which she did that work by a
+    watch."""
     from freesail.world import people as PE
 
     cases = [
@@ -1337,7 +1344,9 @@ def test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work
         ("brace", None, None),
         ("send_boat", None, None),
     ]
+    twenty = ("back_anchor", "cat_and_fish_anchor")
     for watch in (Watch.STARBOARD, Watch.LARBOARD):
+        post = "mate" if watch is Watch.STARBOARD else "master"
         for hour in (2, 12):
             w, crew, runner = trader_at(SCHOONER, hour, watch)
             whole = runner._watch_whole(crew, watch)
@@ -1345,6 +1354,22 @@ def test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work
             for eid, sid, state in cases:
                 inst = asked(w, eid, sid, state)
                 assert inst.want.hands <= whole and runner._working_posts(crew, inst) == [], eid
+            for eid in twenty:
+                inst = asked(w, eid, None)
+                assert inst.want.hands == 20 > whole, eid
+                assert [s.post for s in runner._working_posts(crew, inst)] == [post], (eid, hour)
+                crew.all_hands_called = True
+                assert runner._working_posts(crew, inst) == [], eid
+                crew.all_hands_called = False
+    every = {
+        eid
+        for eid, evo in EVOLUTIONS.items()
+        if not CrewRequest.from_mapping(evo.crew).all_hands
+        and CrewRequest.from_mapping(evo.crew).hands
+        and CrewRequest.from_mapping(evo.crew).hands > 16
+    }
+    # no other file wants more than her smaller watch holds (the kedge's sixteen is its whole)
+    assert every == set(twenty), every
     assert PE.post_watches("data/ships/privateer-schooner.yaml") == {}
 
 

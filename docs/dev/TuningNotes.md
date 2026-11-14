@@ -22208,6 +22208,355 @@ asked), its assertions as they were and one more (no hand let go). New: five in
 and staying aboard, the boat and the kedge; an order naming her watch below; the wear's belay),
 and one in `tests/test_hands.py` (the far prize). Each fails on d6a88e2e.
 
+### The lead's readings of cda12ec9: the crew and the evolutions (2026-11-14)
+
+The lead's note of 2026-11-14 at 05:10 UTC (`docs/dev/M7-WorkPackages.md`, nudge number 7), its
+items (C1) to (C8), and the owner's word of 05:20 (nudge number 8): every mend names the fault's
+general cause, mends it where the cause lives so that every reader of the same thing is served,
+says where else the same cause was looked for and what was found, and is tested at that level.
+Built on 53c14457 (Phase 5's made-out rule) in local commits on `m-crew`, one per group of items:
+3e7226b9 (C2), d039243e ((C6), (C1), (C3), (C8) and (C7)'s roads and old mark), 594234b4 (C5)
+and 32372167 ((C4) and the rest of (C7)), and this record after them. Old is 53c14457 throughout,
+measured on a tree of it taken out beside the worktree; new is the branch's head. Every figure at
+seed 7 on the owner's machine (Windows 11).
+
+#### (C6) and (C1): work paused and begun again as if new, and the pause's one road
+
+- **The cause.** Work held and taken up again was begun again as if new. The runner holds work in
+  hand on two roads: a manoeuvre's belay of the step-list work (decision 25) and a post's leaving
+  work under half its hands (ruling 11's review). Both took it up again by `Runner._try_resume`,
+  which read `Runner._failing_condition` with the file's `requires`, and that read the script's own
+  check (`Script.check`) as well. The check is the beginning's: it reads the world as the work finds
+  it and lays its plan from it (the veer's target from the scope out, the kedge's anchor, boat and
+  hawser), and the work's own going makes it false (the boat away with the kedge; the scope
+  veered). The trunk never held scripted work, so the check was never read twice there; ruling
+  11's review held it on the post's road, and the read failed it ("Could not lay out the kedge:
+  the long-boat is away.") or laid a new plan over the old (a veer of twenty fathoms to fifty-eight
+  where fifty-six were ordered, the later the pause the more), on every road that takes a post off.
+- **Where it lives, and the mend.** `Runner._failing_condition` gains `begun`: the script's check
+  is read as the work begins (`Runner.start`, `_start_waiting`) and never once it has begun (a
+  resume, the next step of a step list); the file's `requires`, which hold through the work, are
+  read whenever it goes on. (C6): `_post_off`'s copy of `_call_all_hands`'s pause, release and
+  "Belayed" block is gone; both take one road, `Runner._hold` (paused, hands let go, the line), and
+  `_try_resume` takes the work up where it stood. The lead's alternative, scripted work going on
+  short whatever its share when its post leaves, was not taken: it would run work under half its
+  hands, which no request begins, and leave two rules for one pause.
+- **Where else the cause was looked for.** Every road on which the runner begins or takes up work:
+  `_start_waiting` and `_begin` begin only work not yet begun (the check is theirs);
+  `_enter_next_step` reads `requires` alone (marked `begun`); a checkpoint taken mid-work
+  (`Instance.__setstate__`) loads the work as it stood and reads nothing again;
+  `_belay_held_work` (coming to anchor) belays held work, never takes it up; `belay` ends work,
+  never holds it; a script's `begin` is called by `_begin` alone. None begins work again. The
+  captains' business (a course resumed after a box-off, a passage taken again) is the far fight's
+  ground and was not read for this.
+- **The tests.** At the cause's level (`tests/test_held_work.py`,
+  `test_every_scripted_work_held_and_taken_up_again_never_reads_its_beginning_again`): every one of
+  the registry's sixty-four scripted evolutions, on the bilander, the topsail schooner or the 74 by
+  its subject's class, its check made to give a reason, held as the road leaves it and taken up
+  again with hands enough: the check never read again and the work taken up. Old: the check read
+  again on the first (`back_anchor`) and the work failed on its taking up. Then every scripted work
+  a post of hers may hold at her nine, sailed with the master taken off it 8 s in by each road that
+  can reach it (`test_every_scripted_work_a_post_may_hold_finishes_as_ordered_whatever_takes_the_
+  post_off`, 23 cases: the veer, the kedge, letting go the small bower, the boat and battening down
+  at anchor, each by quarters, all hands called and the master below and on deck again; battening
+  down under sail and serving out the small arms by those three and a wear begun). Each finishes as
+  ordered, nothing failed, the check never read again, the post's leaving said once by name. Old:
+  all 23 failed (the check read again on every one; the kedge refused on its three roads; the veer
+  to 58.33 fathoms on its three). Not sailed, each tried at the cause's level: backing and catting
+  the anchor (she carries no stream anchor; an anchor left aweigh is a weigh belayed), the trims
+  (her sheets stand as trimmed at her settle), the guns' and the damage's work, the signal and the
+  mark (their want is her watch's three, so no post is counted). (C6) at its level: a spy on the
+  one road sees the wear's belay of the jib and the master's going below from the batten-down both
+  pass through `_hold` (`test_a_manoeuvres_belay_and_a_posts_leaving_hold_work_by_the_one_road`;
+  old: no such road).
+- **The reading's two, old beside new** (package 109's Torbay world at 02:10, her larboard watch,
+  the three and the master; `test_the_kedge_and_the_veer_held_when_all_hands_are_called_finish_as_
+  ordered`): the kedge, all hands called 8 s in: old "Belayed laying out kedge: the master to the
+  conn, all hands called." and on that tick "Could not lay out the kedge: the long-boat is away.";
+  new "Belayed laying out the kedge: the master to the conn, all hands called.", taken up on that
+  tick by the hands up and laid out ninety fathoms to the east at +1,611 s. The veer of twenty: old
+  "Veered to fifty-eight fathoms" (58.33), new "Veered to fifty-six fathoms on the best bower."
+  (56.32, thirty-six and twenty) at +66 s.
+
+#### (C3): the post's leaving said where the work goes on short
+
+- **The cause.** `_post_off` said the post's leaving only where it held the work; where the work
+  went on short it changed the assignment and said nothing, so the log's last word of the hands
+  was the beginning's count. **Mend there**, the one place a post leaves work: where the work goes
+  on, the short line's words with the leaving ("Only four hands to the foresail; the master gone
+  below."; "Only three hands to serve small arms; the master to the conn for wearing ship."; the
+  boat's or the kedge's crew pulling away, "Only three hands to lay out kedge; the master stays
+  aboard."), routine, as every short line.
+- **Where else.** Every road by which a hand leaves work: the work ended or held (`hands.release`,
+  its own line), the guns' lending at quarters ("... taken from the guns"), the pumps' spells
+  (said).
+  **Found, not mended, for the lead's list:** a hand struck in action or taken sick at work
+  (`combat/hits.py`, `crew/health.py`) is set `at = None` while the work's assignment still lists
+  him, so the work goes on counting a dead or sick man in its crew factor and says nothing; the
+  mend would move King's ships' action lines (the first action's whole log).
+- **Measured** (`test_the_posts_leaving_is_said_where_the_work_goes_on_short`): the fore course at
+  noon by the larboard's three, the cook and the master; "go below" 5 s on: old the lines "Only
+  five hands to the foresail" alone, set at +304 s; new the same and "Only four hands to the
+  foresail; the master gone below." at +6 s, set at +304 s.
+
+#### (C8): the works by their names
+
+- **The cause.** The work in hand whose subject is the ship was named from its evolution's verb,
+  and the verb of many is the id: "laying out kedge", "veering cable", "sending boat", "heaving
+  lead", "making signal", "catting and fish anchor". The rule lived in `Runner._doing` and in two
+  copies of it: `orders/crew.py`'s `_doing` (the pipe-down refused, "All hands are still at work
+  (furling all)") and `api/queries.py`'s `_work_words` (the console's crew state). **Mend where it
+  lives:** an evolution file whose subject is the ship may name the work (`doing:`, read by
+  `registry` into `Evolution.doing`, refused in words on a part's file); `Runner._doing` reads it,
+  and the two copies now read `Runner.doing`. Twenty-one files name theirs (`back_anchor`,
+  `back_and_fill`, `cast_loose_guns`, `cat_and_fish_anchor`, `fother_sail`, `furl_all`,
+  `heave_deep_sea_lead`, `heave_lead`, `heave_log`, `heave_mark`, `jury_mast`, `lay_out_kedge`,
+  `let_go_anchor`, `lie_a_try`, `make_signal`, `plug_shot_hole`, `secure_guns`, `send_boat`,
+  `set_up_rigging`, `take_lunar`, `veer_cable`); every other work's name is its verb's as before.
+  The lookout's glass reads the name (`world.lookout._WORK_KINDS`'s key "sending boat" to "sending
+  the boat", its served words, "a boat hoisting out or in", the same). Tested at that level:
+  `test_every_work_on_the_ship_is_named_by_its_name_where_the_log_names_the_work_in_hand`, every
+  such work of the registry by its name, none an id with an ending (old: the twenty-one).
+- **Where else, not mended, for the lead:** the infinitive (`Runner._describe`) reads the verb
+  too: the all-hands call, the waiting line and the short line ("All hands! (to send boat)", "Not
+  hands enough on deck to send boat", "Only four hands to lay out kedge"). Package 109's truth
+  7-542 and `tests/test_mends_109.py` pin the call's words, which ruling 10's condition holds, so it
+  is left; a second key (the infinitive) or a rule from the name would move them, old beside new
+  then.
+
+#### (C2): at nine either watch heaves to and fills away by night
+
+- **The cause.** A numbered request's want is its file's number no more than the whole company
+  could ever put to it (`hands.company_can_give`: every fit hand off the quarterdeck, the cook
+  among them). Her ninth hand lifted that clamp on heaving to's and filling away's twelve from six
+  to seven; three are under half of seven, and no post is counted for a manoeuvre (ruled), so by
+  night neither watch began them ("Not hands enough on deck to heave to; there are but three to
+  spare."), where at eight the starboard's three did.
+- **The least change that moves no other trader's line, chosen:** her own number of hands for the
+  two, in her file: a new top-level ship-file section `hands:` (`ShipSpec.hands`, parsed and refused
+  in words by `ship/schema.py`; written by `tools/gen_ships.py`'s `hands()`; her module's
+  `WATCH_MANOEUVRE_HANDS`), read over the evolution file's crew line by `Runner._crew_line` where a
+  request is made (`Runner.start`, `Runner._want`). Six: her seamen of both watches, the clamp at
+  her eight, JUDGEMENT. Her file alone of the eighteen moves (the generator, every other byte for
+  byte). **Not chosen:** the clamp without the idlers (moves the smack's clamp from six to five and
+  the merchant brig's from eleven to ten, so their heave-to's pace); the posts counted for the two
+  (ruled out: never for the twelve manoeuvres); `too_few: all hands` on the two files (a call, where
+  (c) is the watch alone).
+- **Measured** (`_her_request`, the runner's own road, all hands not called): by night either
+  watch, old waits (three of seven), new begun short by the three (three of six); by day old the
+  three and the cook, four of seven, new four of six. Scudding and backing and filling (six by their
+  files) as before, begun by the three. With all hands up the two take her six seamen where they
+  took her seven with the cook: the forced-round fill-away from her settle hoisted the settee at
+  +144 s (old +169), filled away at +199 s (old +233), 4.15 kn (old 4.11)
+  (`test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away`, moved, old beside
+  new in its docstring); her heave-to's five lies hold their bands.
+- **The sweep** (`test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_the_
+  mate`) takes in `NINE_MANOEUVRES`, every manoeuvre a watch on deck may be asked for without a call
+  (every numbered one: heaving to, filling away, scudding, backing and filling; the rest call all
+  hands by their files), each watch by night and by day, the watch alone, no post.
+- **Where else, not mended, for the lead:** the merchant brig's larboard watch of three (her clamp
+  eleven) and the smack's of two (six) cannot heave to or fill away by night alone, on the trunk and
+  here alike; the lead's (c) was the bilander's.
+
+#### (C4): the schooner's master and mate are counted for the work that wants twenty
+
+Ruling 11 by its letter, which stands: `back_anchor` and `cat_and_fish_anchor` want twenty, over the
+topsail schooner's watches of seventeen and sixteen, so the post of the watch on deck is counted
+for them while all hands are not called or coming. The test is renamed and says so
+(`test_the_schooners_whole_watches_are_over_every_want_of_her_watchs_deck_work` to
+`test_the_schooners_posts_are_counted_only_for_the_anchor_work_that_wants_twenty`): her nine cases
+not counted as before, the two counted (the mate with the starboard, the master with the larboard,
+by night and by day), not while all hands are called, and no other file of the registry wants more
+than her smaller watch holds (the kedge's sixteen is its whole). **What is so, for these notes:**
+"so her post is never counted for it" and "No topsail schooner's post was put in a pool" above were
+true of the requests and of the tests and passages run, not of the rule; the report's "no post of
+hers is ever pooled" was not so. The cause: a claim taken from the runs where the rule's letter
+said otherwise.
+
+#### (C5): shown reachable, and mended
+
+- **(a) Settee work made all-hands work and taken away before it began.** Two places make work
+  all-hands work because its watch is too few: as it asks for its hands (`_take_hands`) and before a
+  pipe-down (`_after_all_hands`). The second marked it the call's owner (`held_up`), the first did
+  not, so made so as it asked, waited, and then belayed, refused or found done already, it left the
+  hands up for nothing. **The cause:** two copies of one road; **mended** by one,
+  `Runner._made_all_hands`, for both. **Reachable**: at nine by night with her larboard watch unable
+  to go aloft (a hand sick, two at light duty) and the call's first arrivals (two of the starboard)
+  at light duty too, "furl the mainsail" calls all hands and waits for a hand who goes aloft; old,
+  "belay that" left all hands called to the end, new piped down on that tick, and alike found furled
+  already (`test_her_settee_work_made_all_hands_work_and_taken_away_before_it_began_pipes_down`).
+  **Where else:** the file's own all-hands work (a tack, a reef of the topsails) that waits for
+  hands and is taken away before it began leaves the hands up as well, on the trunk; an
+  all-hands request comes back too few only when every hand on deck and every first arrival of
+  the call is busy or unfit for it. Not mended here (the trunk's rule, King's ships' lines): for
+  the lead.
+- **(b) The boat judged by two rules.** As she asked for her hands (`_watch_too_few`: her request
+  too few and no work of the runner's holding the hands, package 109's trigger) and before a
+  pipe-down (`_too_few_piped_down`: the deck's count, which holds the hands at the pumps). **The
+  cause:** two judges of one question; **mended** by one, `Runner._calls_for_itself`, asked in both
+  places on the deck each reads (as it is; as the pipe-down would leave it), so that the hands are
+  never piped down to be called again for her on one tick. **Reachable**: Torbay at 02:10, her
+  larboard watch, a seam started and water in the well, "man the pumps" (the three at the brakes),
+  "heave short" and the boat 5 s on: old, hove short at +957 s, "Piped down" and on that tick "All
+  hands! (to send boat)" again, the boat begun at +1,048 s; new, the boat manned at +957 s on the
+  hands up and one pipe-down
+  (`test_her_boat_waiting_behind_all_hands_work_with_her_watch_at_the_pumps_is_manned_on_them`).
+  **What else moves:** where the deck's count is under half and other work of the runner's holds
+  hands as the all-hands work ends, the old look-ahead kept the hands up for the boat; the one judge
+  says she would not call then (a watch busy at other work waits, the boat's own rule), so they are
+  piped down and she waits, said, and calls when that work is done. Not met in any test run.
+
+#### (C7): the tests owed
+
+- A post taken off by all hands called, at the sight and sent for, each sailed to the foresail set
+  (`test_a_post_taken_off_by_all_hands_called_at_the_sight_and_sent_for_sailed_to_the_end`): all
+  hands called at 04:00 ("Belayed setting the foresail: the master to the conn, all hands called.",
+  set at +178 s); the noon sight at 11:45 ("Only four hands to the foresail; the master at the
+  sight.", set at +262 s); the mate sent for to the cabin at 02:00 ("Belayed setting the foresail:
+  the mate sent for.", held while the three are under half, taken up with the mate once sent for
+  to the quarterdeck, set).
+- The old mark on a world that goes on to finish
+  (`test_the_old_mark_of_the_boats_call_loads_from_a_trunk_save_and_she_sails_as_on_the_trunk`): a
+  real checkpoint written on the trunk at 1eea8d18, kept as
+  `tests/fixtures/saves/pre-75-bilander-eight-boat-called.checkpoint` (package 109's Torbay world at
+  04:10, her eight, saved the moment "go ashore" had called all hands for the boat, its params
+  carrying `hands_called_for`): it loads with the boat held up, the mark gone, and sails 1,200 s
+  giving the trunk's own lines for the same 1,200 s from the same world, line for line.
+- A save from before loads with her eight, from a real checkpoint
+  (`test_a_real_save_from_before_loads_with_her_eight_and_sails_under_this_builds_rules`):
+  `tests/fixtures/saves/pre-75-bilander-eight-under-sail.checkpoint`, written on the trunk at
+  1eea8d18 (her settle from 00:00, piped down and 30 s, her larboard watch of two). Her eight, no
+  watch for her posts to head, and her company is `_her_eight`'s muster row for row, so the
+  settee's road sailed on `_her_eight` is sailed on what a save from before holds; "take in the
+  mainsail" calls all hands (this build's settee key) and is taken in and piped down at +87 s
+  (the trunk, which has no such key: "Not hands enough on deck to take in the mainsail; there are
+  but two to spare.").
+- At nine the settee's all-hands road with a hand of the watch sick
+  (`test_at_nine_with_a_hand_of_her_watch_sick_her_settees_road_calls_all_hands_aloft_alone`): her
+  larboard watch's main topman sick; the take in begun by the two and the master and calling
+  nobody (+154 s); the furl and the set from furled, aloft, each calling all hands, worked as
+  all-hands work and piped down at its end (+217 s, +206 s).
+
+#### What moved, old beside new
+
+- **Tests** (each old beside new in its docstring or at its assertion): `tests/test_orders.py`, the
+  cutter's two belays of the lead, "Belayed heaving lead" to "Belayed heaving the lead" (C8);
+  `tests/test_bilander.py`, `test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_
+  fills_away`, hoisted +177 s (+169 measured on 53c14457) to +144 s, its band kept (C2), and
+  `test_at_nine_either_watch_begins_...` with `NINE_MANOEUVRES` (C2), its helper `_her_request`
+  making the request as `Runner.start` does (`Runner._crew_line`); `tests/test_hands.py`, the
+  schooner's test renamed and rewritten (C4). New: `tests/test_held_work.py` (eight tests, the
+  sweep's 23 cases among them) and four in `tests/test_bilander.py` (the real save from before,
+  the settee's road at nine with a hand sick, and (C5)'s two); two kept saves under
+  `tests/fixtures/saves/` (written on the trunk at 1eea8d18, binary by `.gitattributes`).
+- **Data:** twenty-one evolution files gain `doing:` (C8); her ship file gains `hands:` with its
+  note (C2: through the generator, her file alone of the eighteen, every other byte for byte;
+  `tools/check_viewer_guns.py` clean, its output as at cda12ec9).
+- **Digests, words only** (every line's tick and kind the same; measured on the owner's machine,
+  old 53c14457 beside new; the base's own digests at 53c14457 equal cda12ec9's in every run here):
+  - the first action's whole log: 234036cc17e6f137 to ce44219434e1e42c, 497 lines both, twelve
+    lines' words ("making signal", "setting up", "securing guns" to "making the signal", "setting
+    up the rigging", "securing the guns");
+  - the station gale (the whole log and `TRIAL_STATION_GALE_DIGEST`'s trial): 1e59009004141b08 to
+    bf16fbf514055f29, 1,722 lines both, sixteen lines ("heaving deep sea lead" to "heaving the
+    deep-sea lead");
+  - the trade in thick weather (`TRIAL_TRADE_THICK_DIGEST`'s trial): 41a37f0290be291a to
+    de00808076d8cccf, 426 lines both, sixteen lines ("heaving lead" to "heaving the lead");
+  - gate 5b's schooner passage: cae2b06446ea86c3 to dd6828408be0c5e9, 767 lines both, nine lines
+    ("heaving lead", "heaving log");
+  - the merchant passage (gate 5c's): 2e93986c2989d831 to eb410cf04b496cec, 2,909 lines both,
+    ten lines ("heaving log");
+  - the fake captain's passage (gate 6a's, truth 78's fixture): 3211d917eda5f4af to
+    db47c977d464b85b, 2,921 lines both, ten lines ("heaving log");
+  - unchanged: the encounter (732a6020db4d4755), the station lee shore (e8c79e9947e244c3), the
+    station stranger (its trial passes), the trade stranger (13432e4b2659bcaf), the merchant
+    intent (af28debbc98516ae), gate 5c's naval cruise (0ac7eaba9f341529, its pin), gate 5a's day
+    and gate 5b's thick weather (their constants' tests pass on both trees).
+  The pinned digests these move are the lead's to re-pin on the build machine: the station gale's
+  and the thick weather's trials (each already failing on its pin at 53c14457, which the lead
+  re-pins), and gate 5b's schooner and gate 5c's merchant and the fake captain's, whose constants'
+  tests fail at 53c14457 before their digest is read (the same assertions on both trees).
+
+#### The lines any ship may say that change
+
+- **Every ship, (C8):** the work in hand whose subject is the ship by its name wherever the log
+  names it: a manoeuvre's belay ("Belayed heaving the lead: stations for tacking ship."), the
+  captain's belay and its listing ("Belayed heaving the lead; ..."), the work the rest or the watch
+  are at in the short and the waiting lines ("the rest are making the signal", "the watch is heaving
+  the deep-sea lead"), the pipe-down refused ("All hands are still at work (furling all sail); pipe
+  down when it is done."), a named party refused ("... laying out the kedge wants seven."), the
+  guns robbed at quarters ("Heaving the lead at quarters: ..."), the readings' work in hand and the
+  console's crew state; the twenty-one names of `SHIP_WORK_NAMES` marked "file". The lookout's
+  glass says what it said.
+- **Every ship's boat, (C5 b):** where she waits behind all-hands work with hands of her watch at
+  the pumps, manned on the hands up where the hands were piped down and called again on one tick;
+  and where the deck's count is under half while other work of the runner's holds hands as the
+  all-hands work ends, piped down and waiting, said, where the hands were kept up for her.
+- **A merchantman whose post works with the watch** (the bilander, the merchant brig, the smack;
+  the topsail schooner at the two anchor works), (C1) and (C3): scripted work held by the post's
+  leaving is taken up where it stood (no refusal, no new plan), and where the work goes on short the
+  post's leaving is said ("Only four hands to the foresail; the master gone below.", "...; the
+  master to the conn at quarters.", "...; the master to the conn, all hands called.", "...; the
+  master to the conn for wearing ship.", "...; the master at the sight.", "...; the mate sent
+  for.", "...; the master stays aboard.").
+- **The bilander, (C2) and (C5 a):** heaving to and filling away want six of her (begun by either
+  watch's three by night; her six seamen with all hands up, the cook no longer at the braces), and
+  settee work made all-hands work and taken away before it began pipes down.
+
+#### For the lead
+
+- **(C6)'s rest, on your list as the reader gave it, not mended:** `bill.on_deck_piped_down` a third
+  copy of the on-deck rule; `hands.too_few_on_deck` beside `request`'s own judgement; `held_up`
+  carrying two meanings (one road now makes the first, `_made_all_hands`); `_engaging_mark` beside
+  `Captain._mark`; `PASSAGE_HELD` beside `_DETOUR_STATES`.
+- **Found by the causes' searches, not mended:** the infinitive name of ship's work
+  (`Runner._describe`, pinned by 7-542's call); a hand struck or taken sick at work left in the
+  work's assignment (`combat/hits.py`, `crew/health.py`); the file's own all-hands work that waits
+  and is taken away before it began leaving the hands up (the trunk's); the merchant brig's and the
+  smack's larboard watches by night at a heave-to (the trunk's).
+- **The boat's one judge** moves the case of other work holding hands at the pipe-down (above);
+  met in no test run. If you would rather the hands kept up there, the look-ahead may judge the
+  idle hands alone, a second rule that again cannot pipe down and call on one tick.
+- **The new tests' times** (`-n 2` beside the other builders, the owner's machine): the
+  `held_worlds` fixture 9.7 s (charged to its first test; the module's tests in one group), each of
+  `tests/test_held_work.py`'s tests 0.1 to 2.5 s; the nine's sweep 26.4 s a case (24.1 at
+  cda12ec9's base, four requests more); the four new in `tests/test_bilander.py` 0.3 to 4.6 s.
+  None is in `tests/conftest.py`'s lists; yours to place.
+
+#### The suites as run
+
+Every run with `-n 2 -p no:cacheprovider -o addopts="--dist loadgroup"` beside the other
+builders, on the owner's machine; old beside new by the junits (`cmp_xml.py`).
+
+- The files touched and those that exercise the items, with the slow (`--slow`): test_held_work,
+  test_bilander, test_hands, test_mends_109, test_settee, test_evolutions, test_orders,
+  test_anchor, test_ports, test_crew_orders, test_routine, test_fishing, test_damage_control,
+  test_lying_to, test_tackle_orders, test_catalogue, test_checkpoint, test_crew_model,
+  test_people, test_crews, test_subtypes: **1,607 passed, 1 xfailed** (31 minutes); against the
+  fast and the slow bases at cda12ec9 no outcome changed (the xfail is the base's own,
+  test_catalogue's backing and filling). The files the last two mends touched (the pipe-down's
+  refusal, the crew state) again with test_readings and this record's own: **392 passed**.
+- The new tests on a tree of 53c14457: of `tests/test_held_work.py`'s thirty cases twenty-nine fail
+  there (the cause's level, the one road, the sweep's twenty-three, the reading's two, the leaving
+  said, the roads sailed and the names), the old mark's passing (as the lead's reading found); of
+  the bilander's, the two of (C5), the nine's sweep and the fill-away fail there, and the real
+  save and the settee's road at nine pass (they are the tests owed, not mends).
+- Each commit's own tests on a tree of that commit alone: 3e7226b9, test_bilander and
+  test_hands, 137 passed; d039243e, test_held_work and the heave's and the lead's tests of
+  test_orders and test_bilander, 40 passed; 594234b4, test_bilander, test_mends_109 and
+  test_held_work, 151 passed.
+- The captain's trials (`tests/test_captain_trials.py --slow`) on both trees: the same three fail
+  on their pins at 53c14457 and here, two with new digests by the words (above), the trade
+  stranger's unchanged; the five others pass on both.
+- The four whole logs and the five recorded passages ruling 9 sailed (`log_digests.py`,
+  `sail5.py`), gate 5c's cruise and merchant and gate 6a's fake captain from their fixtures, and
+  the constants' tests of gates 5a, 5b, 5c and 6a (`--slow`), all on both trees: as above; the
+  constants' tests fail and pass alike on both (the four failures the base's own, before their
+  digests are read).
+- The generator into a scratch folder: the eighteen files byte for byte but hers, its report the
+  same; `py tools/check_viewer_guns.py` clean, its output as at cda12ec9. **ruff** `check` and
+  `format --check` over every file touched: clean. Every changed file LF.
+
 ## Package 75, Phase 5: the made-out rule and the razee's trimmers by fit (2026-11-14)
 
 On cda12ec9 (the step the lead has on trial), by the lead's notes of 2026-11-12 (1) and 2026-11-14

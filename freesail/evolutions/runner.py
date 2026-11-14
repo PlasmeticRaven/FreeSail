@@ -71,7 +71,10 @@ says ``belays: true``: tack, wear, box-haul, lie a-try) also belays the step-lis
 work in hand, which holds its progress and resumes, hands permitting, when the
 all-hands work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
 Sending down the topgallant masts belays the work on those masts' sails
-alone, which it clears away (`Script.clears`).
+alone, which it clears away (`Script.clears`). Work so held, and work a post leaves under
+half its hands (package 75, the lead's ruling 11), takes one road (`Runner._hold`) and is
+taken up again where it stood (`Runner._try_resume`): the file's `requires` read again, a
+script's own check, which is the beginning's, never (the lead's (C1) and (C6) of 2026-11-14).
 Who is on deck is the
 watch bill's question (``crew/bill.py``), asked at ``Runner.clock``; the
 composer sets that to the World's clock, and without it the bill is read at
@@ -239,9 +242,10 @@ class Instance:
     want: hands.CrewRequest | None = None  # the file's crew line, read when there is a crew
     assignment: hands.Assignment | None = None  # the hands it holds
     all_hands: bool = False  # began as a call for all hands
-    # the hands are up for it and are piped down by it: waiting its turn, made all-hands work
-    # before a pipe-down that would have left the watch too few for it (`Runner._after_all_hands`;
-    # package 75); or a numbered request whose file says `too_few: all hands until manned`, the
+    # the hands are up for it and are piped down by it: made all-hands work for itself, its watch
+    # too few, as it asked for its hands or before a pipe-down that would have left the watch too
+    # few for it (`Runner._made_all_hands`, the one road for both; package 75, the lead's (C5) of
+    # 2026-11-14); or a numbered request whose file says `too_few: all hands until manned`, the
     # hands called to man it, until it is manned (`Runner._take_hands`; the lead's ruling 10)
     held_up: bool = False
     short_logged: bool = False
@@ -384,7 +388,7 @@ class Runner:
         inst.holds = self._holds(ship, inst)
         if self._crew(ship) is not None:
             try:
-                inst.want = hands.CrewRequest.from_mapping(evo.crew)
+                inst.want = hands.CrewRequest.from_mapping(self._crew_line(ship, evo))
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
@@ -592,6 +596,19 @@ class Runner:
         own = (getattr(spec, "timing", None) or {}).get(evo.id)
         return {**evo.timing, **own} if own else evo.timing
 
+    @staticmethod
+    def _crew_line(ship: Ship, evo: registry.Evolution) -> dict[str, Any]:
+        """The work's crew line: its file's, with the ship file's own number of hands for that
+        evolution over the file's where her file gives one (`ShipSpec.hands`; package 75, the
+        lead's (C2) of 2026-11-14: the bilander's heave-to and filling away, six of her, so that
+        either watch's three begin them by night at her nine as the starboard's three did at her
+        eight, where the ninth hand had lifted the company's clamp on the file's twelve from six
+        to seven). Every other ship and evolution, the file's own; a spec pickled before it, the
+        file's own."""
+        spec = getattr(ship, "spec", None)
+        own = (getattr(spec, "hands", None) or {}).get(evo.id)
+        return {**evo.crew, "hands": own} if own else evo.crew
+
     def _check_party(self, ship: Ship, inst: Instance) -> None:
         """An order that names its hands (`with the idlers`, `send the starboard watch
         aloft to ...`) whose party has fewer than half the hands the work wants is refused
@@ -778,9 +795,24 @@ class Runner:
         return expr.Env(names, functions)
 
     def _failing_condition(
-        self, ship: Ship, inst: Instance, conditions: list[registry.Condition]
+        self,
+        ship: Ship,
+        inst: Instance,
+        conditions: list[registry.Condition],
+        begun: bool = False,
     ) -> str | None:
-        """The reason (in words) of the first condition that does not hold, else None."""
+        """The reason (in words) of the first condition that does not hold, else None.
+
+        A script's own check (`Script.check`) is read with them as the work begins, and never
+        once it has begun (`begun`: the next step of a step list, work held and taken up again,
+        `_try_resume`). The check is the beginning's: it reads the world as the work finds it and
+        lays its plan from it (the veer's target from the scope out, the kedge's boat and hawser),
+        and the work's own going makes it false (the boat away with the kedge, the scope veered).
+        Read again on a resume it refused work that was half done ("Could not lay out the kedge:
+        the long-boat is away.") and laid a new plan over the old (a veer of twenty fathoms to
+        fifty-eight where fifty-six were ordered): work paused and begun again as if new (the
+        lead's (C1) of 2026-11-14). The file's `requires` hold through the work and are read
+        whenever it goes on."""
         env = self._env(ship, inst)
         inst.done_already = False
         for cond in conditions:
@@ -791,7 +823,7 @@ class Runner:
             if not ok:
                 inst.done_already = cond.done
                 return self._format(inst, cond.reason)
-        if inst.script is not None:
+        if inst.script is not None and not begun:
             return inst.script.check(self._format_context(inst))
         return None
 
@@ -878,10 +910,11 @@ class Runner:
         let_go = 0
         for s in self._posts_at_work(crew):
             work = next((i for i in self.instances if i.inst_id == s.at), None)
-            away = work is not None and getattr(work.script, "crew_away", False)
-            let_go += self._post_off(
-                ship, crew, s, work, None if away else reason, manoeuvre.evo.id
-            )
+            if work is not None and getattr(work.script, "crew_away", False):
+                let_go += self._post_off(ship, crew, s, work, None, manoeuvre.evo.id)
+                continue
+            gone = f"the {s.post} to the conn for {self._doing(manoeuvre)}"
+            let_go += self._post_off(ship, crew, s, work, reason, manoeuvre.evo.id, gone)
         return let_go
 
     @staticmethod
@@ -901,39 +934,58 @@ class Runner:
         work: Instance | None,
         reason: str | None,
         cause: str,
+        gone: str | None = None,
     ) -> int:
         """Take a post who works with the watch off the work they hold (the lead's ruling 11 of
         2026-11-13, and the review's mends of it): the work goes on short, or, under half its
-        hands, is held as belayed work is until hands come (`_try_resume`), said by the belayed
-        line with `reason`. With `reason` None (the boat or the kedge away from her side,
-        `Script.crew_away`) the post stays aboard and the work goes on with the rest whatever
-        their share, never held away from the ship. Returns how many hands the held work let
-        go."""
+        hands, is held as belayed work is until hands come (`_hold`, the pause's one road, taken
+        up again where it stood by `_try_resume`), said by the belayed line with `reason`. With
+        `reason` None (the boat or the kedge away from her side, `Script.crew_away`) the post
+        stays aboard and the work goes on with the rest whatever their share, never held away from
+        the ship. Where the work goes on short the post's leaving is said in the short line's
+        words with `gone` ("Only four hands to the foresail; the master gone below.": the
+        lead's (C3) of 2026-11-14), `reason` where `gone` is not given, "the master stays aboard"
+        for the boat. Returns how many hands the held work let go."""
         post.at = None
         a = work.assignment if work is not None else None
         if work is None or a is None:
             return 0
         a.hands[:] = [h for h in a.hands if h is not post]
         if reason is not None and a.got < a.wanted * hands.SHORT_HANDED_SHARE:
-            work.paused = True
-            let_go = hands.release(crew, work.inst_id)
-            work.assignment = None
-            ship.note(
-                "notable",
-                "evolution.belayed",
-                f"Belayed {self._doing(work)}: {reason}.",
-                work.subject_id,
-                {
-                    "evolution": work.evo.id,
-                    "subject": work.subject_id,
-                    "for": cause,
-                    "post": post.post,
-                },
-            )
-            return len(let_go)
+            return self._hold(ship, crew, work, reason, {"for": cause, "post": post.post})
         if a.outcome == hands.ENOUGH and a.got < a.wanted:
             a.outcome = hands.SHORT
+        said = gone or reason or f"the {post.post} stays aboard"
+        n = a.got
+        text = (
+            f"Only {number_words(n)} hand{'s' if n != 1 else ''} to {self._target(work)}; {said}."
+        )
+        data = {**self._hands_data(work, a), "for": cause, "post": post.post}
+        ship.note("routine", "evolution.short_handed", text, work.subject_id, data)
         return 0
+
+    def _hold(
+        self, ship: Ship, crew: Crew, work: Instance, reason: str, data: dict[str, Any]
+    ) -> int:
+        """The pause's one road (the lead's (C6) of 2026-11-14): work in hand held, its progress
+        kept and its hands let go, said ("Belayed setting the fore topsail: stations for tacking
+        ship.", "Belayed setting the foresail: the master gone below."), and taken up again
+        where it stood when hands come (`_try_resume`). Taken by a manoeuvre's belay of the
+        step-list work in hand (decision 25, the owner's ruling of 2026-09-29 at gate 4c;
+        `_call_all_hands`) and by a post's leaving work, step-list or scripted, under half its
+        hands (the lead's ruling 11 of 2026-11-13; `_post_off`). Returns how many hands it let
+        go."""
+        work.paused = True
+        let_go = hands.release(crew, work.inst_id)
+        work.assignment = None
+        ship.note(
+            "notable",
+            "evolution.belayed",
+            f"Belayed {self._doing(work)}: {reason}.",
+            work.subject_id,
+            {"evolution": work.evo.id, "subject": work.subject_id, **data},
+        )
+        return len(let_go)
 
     def _posts_off_the_work(self, ship: Ship, crew: Crew) -> None:
         """Each tick, before the work is ticked: a post's hand never outlasts what counted it
@@ -1018,7 +1070,7 @@ class Runner:
             if step is None:
                 self._complete(ship, inst)
                 return
-            reason = self._failing_condition(ship, inst, inst.evo.requires)
+            reason = self._failing_condition(ship, inst, inst.evo.requires, begun=True)
             if reason is not None:
                 self._fail(ship, inst, reason)
                 return
@@ -1357,7 +1409,7 @@ class Runner:
 
     def _want(self, inst: Instance) -> hands.CrewRequest:
         if inst.want is None:
-            inst.want = hands.CrewRequest.from_mapping(inst.evo.crew)
+            inst.want = hands.CrewRequest.from_mapping(self._crew_line(self.ship, inst.evo))
         return inst.want
 
     def _subject_mast(self, ship: Ship, inst: Instance) -> str | None:
@@ -1424,7 +1476,7 @@ class Runner:
                 inst.waiting = True
                 inst.waiting_for = WAITING_FOR_HANDS
                 return False
-            want = inst.want = want.as_all_hands()
+            want = self._made_all_hands(inst)
             self._call_all_hands(ship, inst, crew)
             got = hands.request(
                 crew,
@@ -1493,6 +1545,22 @@ class Runner:
             inst.held_up = False
         return True
 
+    def _made_all_hands(self, inst: Instance) -> hands.CrewRequest:
+        """Work made all-hands work for itself because the watch is too few for it (package 75,
+        the lead's ruling (1) of 2026-11-10; `hands.CrewRequest.calls_all_hands`), the one road
+        for both places that make it so: as it asks for its hands (`_take_hands`) and as a
+        pipe-down would leave it too few (`_after_all_hands`). Its request is all hands (the
+        boat's, `until manned`, keeps its number), and the hands are up for it and piped down by
+        it (`Instance.held_up`), so that taken away before it began (belayed, refused, done
+        already, failed) it ends the call as its end would. Made so as it asked for its hands it
+        was not marked, and work made all-hands there that then waited and was belayed or refused
+        left the hands up for nothing (the lead's (C5) of 2026-11-14). Returns its request."""
+        want = self._want(inst)
+        if not want.until_manned:
+            want = inst.want = want.as_all_hands()
+        inst.held_up = True
+        return want
+
     def _manning(self, ship: Ship, inst: Instance) -> bool:
         """Whether this work waits, said by the call, while the hands called to man it come up:
         held up on its numbered request (`too_few: all hands until manned`, `Instance.held_up`)
@@ -1508,36 +1576,51 @@ class Runner:
     ) -> bool:
         """Whether this work calls all hands because the watch on deck is too few to begin it
         (package 75, the lead's ruling (1) of 2026-11-10; `hands.CrewRequest.calls_all_hands`):
-        its file says so, the hands on deck are too few for it counting those at other work
-        (`hands.too_few_on_deck`), all hands are not up already, the ship is not at quarters,
-        and the order named no party of its own (`hands_from`, which `_check_party` judges).
-        Work manned and piped down at once (`until manned`, the boat's crew) calls by package
-        109's own trigger, so that the one road keeps the boat's lines (the lead's ruling 10 of
-        2026-11-13): its request came back too few and no work of the runner's has the hands,
-        so a watch busy at other work waits, said, and a hand at the pumps does not make the
-        deck enough. Any other request waits for hands, as before."""
-        if not want.calls_all_hands or crew.all_hands_called or _at_quarters(ship):
+        all hands are not up already and the deck as it is now is too few for it by
+        `_calls_for_itself`, the one judge."""
+        if crew.all_hands_called:
             return False
-        if inst.params.get("hands_from"):
-            return False
-        if want.until_manned:
-            return not self._other_work(inst)
-        pool = self._pool(crew, inst)
-        return hands.too_few_on_deck(crew, pool, want, self._aloft(inst), posts=True)
+        return self._calls_for_itself(ship, inst, crew, want, self._pool(crew, inst))
 
     def _too_few_piped_down(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Whether work waiting its turn would call all hands for itself the moment the hands
-        were piped down: `_watch_too_few`'s rule read on the deck as the pipe-down would leave
-        it (`bill.on_deck_piped_down`), all hands not called and nobody turned up. Read by
-        `_after_all_hands` before it pipes down (package 75, the review of the lead's ruling (1)
-        of 2026-11-10), with the post of the watch then on deck where it would be counted
-        (`_working_posts`; the lead's ruling 11 of 2026-11-13)."""
-        want = self._want(inst)
-        if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
-            return False
+        were piped down: `_calls_for_itself`, the one judge, read on the deck as the pipe-down
+        would leave it (`bill.on_deck_piped_down`, all hands not called and nobody turned up),
+        with the post of the watch then on deck where it would be counted (`_working_posts`;
+        the lead's ruling 11 of 2026-11-13). Read by `_after_all_hands` before it pipes down
+        (package 75, the review of the lead's ruling (1) of 2026-11-10)."""
         when = self.clock if self.clock is not None else DEFAULT_WATCH_TIME
         deck = bill.on_deck_piped_down(crew, when) + self._working_posts(crew, inst, True)
-        return hands.too_few_on_deck(crew, deck, want, self._aloft(inst), posts=True)
+        return self._calls_for_itself(ship, inst, crew, self._want(inst), deck)
+
+    def _calls_for_itself(
+        self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, deck: list
+    ) -> bool:
+        """The one judge of whether this work, on `deck`, is too few to begin and calls all hands
+        for itself (the lead's (C5) of 2026-11-14): asked as it asks for its hands
+        (`_watch_too_few`, the deck as it is) and before a pipe-down (`_too_few_piped_down`, the
+        deck as the pipe-down would leave it), so that the hands are never piped down to be
+        called again for it on the same tick. Its file says so, the ship is not at quarters and
+        the order named no party of its own (`hands_from`, which `_check_party` judges).
+
+        Work manned and piped down at once (`until manned`, the boat's crew) by package 109's own
+        trigger, so that the one road keeps the boat's lines (the lead's ruling 10 of
+        2026-11-13): its request would come back too few on that deck (the hands idle there under
+        half its number) and no work of the runner's has the hands, so that a watch busy at
+        other work waits, said, and a hand at the pumps does not make the deck enough. Judged
+        before the pipe-down by the deck's count, which holds the hands at the pumps, the boat
+        waiting behind all-hands work at anchor with her watch at the pumps saw the hands piped
+        down and called all hands again on that tick. Any other such work by the deck's count,
+        hands at other work counted (`hands.too_few_on_deck`), so that a watch busy elsewhere
+        waits as before."""
+        if not want.calls_all_hands or _at_quarters(ship) or inst.params.get("hands_from"):
+            return False
+        aloft = self._aloft(inst)
+        if want.until_manned:
+            wanted = min(int(want.hands), hands.company_can_give(crew, aloft))
+            idle = sum(1 for s in deck if s.at is None and hands.can_work(s, aloft, posts=True))
+            return idle < wanted * hands.SHORT_HANDED_SHARE and not self._other_work(inst)
+        return hands.too_few_on_deck(crew, deck, want, aloft, posts=True)
 
     def _rob_the_guns(
         self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
@@ -1733,16 +1816,7 @@ class Runner:
                 continue  # two all-hands evolutions serialise by their holds, as before
             if not self._belays(inst, other):
                 continue
-            other.paused = True
-            hands.release(crew, other.inst_id)
-            other.assignment = None
-            ship.note(
-                "notable",
-                "evolution.belayed",
-                f"Belayed {self._doing(other)}: {reason}.",
-                other.subject_id,
-                {"evolution": other.evo.id, "subject": other.subject_id, "for": inst.evo.id},
-            )
+            self._hold(ship, crew, other, reason, {"for": inst.evo.id})
 
     @staticmethod
     def _belays(inst: Instance, other: Instance) -> bool:
@@ -1772,8 +1846,11 @@ class Runner:
         if got.outcome == hands.TOO_FEW:
             return
         # The world moved while the work lay belayed: a hoist half done must not finish
-        # on a yard that has since been sent down (package 19's finding).
-        reason = self._failing_condition(ship, inst, inst.evo.requires)
+        # on a yard that has since been sent down (package 19's finding). What the work's
+        # beginning read (a script's own check: the kedge's boat in the ship, the veer's scope
+        # and its target from it) is not read again: the work is taken up where it stood, not
+        # begun again (the lead's (C1) of 2026-11-14; `_failing_condition`'s `begun`).
+        reason = self._failing_condition(ship, inst, inst.evo.requires, begun=True)
         if reason is not None:
             hands.release(crew, inst.inst_id)
             self._fail(ship, inst, reason)
@@ -1813,9 +1890,7 @@ class Runner:
             return
         for i in self.instances:
             if i.waiting and i is not inst and self._too_few_piped_down(ship, i, crew):
-                if not self._want(i).until_manned:
-                    i.want = self._want(i).as_all_hands()
-                i.held_up = True
+                self._made_all_hands(i)
         if any(
             i.waiting and i is not inst and (i.held_up or self._want(i).all_hands)
             for i in self.instances
@@ -1919,7 +1994,14 @@ class Runner:
         return f"the {part_name(self.ship, inst.subject_id)}"
 
     def _doing(self, inst: Instance) -> str:
-        """The work in hand: 'setting the fore topsail', 'tacking ship'."""
+        """The work in hand: 'setting the fore topsail', 'tacking ship', and for work on the ship
+        whose file names it (`registry.Evolution.doing`) that name: 'laying out the kedge', where
+        the verb's gerund was the id with an ending, 'laying out kedge' (the lead's (C8) of
+        2026-11-14). Every reader of the work in hand's name reads it here: the belayed lines,
+        the captain's belay and its listing, the work the rest are at, the readings."""
+        doing = getattr(inst.evo, "doing", None)
+        if doing and isinstance(inst.subject, Ship):
+            return doing
         first, _, rest = self._describe(inst).partition(" ")
         return f"{gerund(first)} {rest}".strip()
 

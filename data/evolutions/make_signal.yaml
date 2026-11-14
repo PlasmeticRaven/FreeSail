@@ -12,6 +12,7 @@
 # hands cannot be had, and the hoist comes down.
 id: make_signal
 verb: make_signal
+doing: making the signal
 applies_to: {class: ship}
 script: make_signal
 params: {hoists: 1, hoist_key: "", words: ""}
