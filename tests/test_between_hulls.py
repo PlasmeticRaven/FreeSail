@@ -178,13 +178,15 @@ def test_a_captive_put_aboard_the_captor_stands_his_station_down_by_the_handover
 def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him():
     from freesail.agents.agent import officer as officer_station
     from freesail.combat import boarding as B
-    from tests.test_fight import _alongside
+    from tests.test_fight import _laid_aboard
 
-    # the officer's survival is the fight's draw; this seed is the first from 1 under which
-    # the first lieutenant (Mr Freeman by this seed's muster) stands at the deck won; under
-    # the default he (Mr Pearce) is killed at tick 530 by a tomahawk, a draw the trunk's
-    # Health misread as the Medusa's man (package 97; the pin of it is the test below)
-    w, v, enemy = _alongside(10.0, her_quarters=True, seed=1)
+    # the officer's survival is the fight's draw. Package 115 D1 (the lead's ruling (A)): the
+    # deck won is a privateer brig's, laid aboard within the throw (`_laid_aboard`), a French
+    # frigate at her own temper holding her deck (truth 7-181a). OLD: the frigate at seed 1,
+    # Mr Freeman standing (the default seed's Mr Pearce killed at 530). NEW: the brig at seed
+    # 1, Mr Freeman by the same muster standing; he stands at seeds 1 to 59 alike, the deck
+    # carried in the second round at each
+    w, v, enemy = _laid_aboard("privateer brig", seed=1)
     lieutenant = B.boarders_officer(w)
     assert lieutenant is not None and lieutenant.role == "first lieutenant"
     policy = SamplingPolicy.in_lockstep(300, "notable", "urgent")
@@ -195,7 +197,6 @@ def test_the_boarders_officer_stands_on_the_deck_won_and_his_station_follows_him
     )
     h.start()
     assert w.stations.holder("officer of the watch") is lieutenant
-    w.submit("grapple her")
     w.submit("serve out the small arms")
     w.run(400)
     assert w.submit("boarders away").kind == "action.boarders"
@@ -232,18 +233,21 @@ def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_th
     her prize master. The pin moved by 74: on the trunk none led on."""
     from freesail.agents.agent import officer as officer_station
     from freesail.combat import boarding as B
-    from tests.test_fight import _alongside
+    from tests.test_fight import _laid_aboard
 
-    w, v, enemy = _alongside(10.0, her_quarters=True)
+    # package 115 D1 (the lead's ruling (A)): the privateer brig laid aboard within the throw
+    # (`_laid_aboard`); OLD the French frigate at the default seed 7, Mr Pearce killed at 530
+    # by a tomahawk and Mr Ward leading on; NEW the brig at seed 60, the first seed from 1 at
+    # which the first lieutenant falls in her boarding
+    w, v, enemy = _laid_aboard("privateer brig", seed=60)
     lieutenant = B.boarders_officer(w)
-    assert lieutenant is not None and lieutenant.name == "Mr Pearce"
+    assert lieutenant is not None and lieutenant.name == "Mr Gordon"
     h = Harness(
         w,
         officer_station(SamplingPolicy.in_lockstep(300, "notable", "urgent"), world=w),
         Fake([lambda last, turns: Reply(text="Aye.")], loop=True),
     )
     h.start()
-    w.submit("grapple her")
     w.submit("serve out the small arms")
     w.run(400)
     assert w.submit("boarders away").kind == "action.boarders"
@@ -254,20 +258,22 @@ def test_the_boarders_officer_killed_in_the_round_leaves_the_deck_carried_and_th
             break
     assert f is not None and f.over == "carried"
     assert lieutenant.dead and lieutenant.hull == w.own.id
-    killed = [e for e in w.log if e.kind == "person.killed" and "Mr Pearce" in e.text]
+    # OLD (the frigate, seed 7): (530, "Mr Pearce is killed: a blow of a tomahawk.")
+    killed = [e for e in w.log if e.kind == "person.killed" and "Mr Gordon" in e.text]
     assert [(e.tick, e.text) for e in killed] == [
-        (530, "Mr Pearce is killed: a blow of a tomahawk.")
+        (701, "Mr Gordon is killed: a pistol ball in the breast.")
     ]
     assert B.boarders_officer(w) is None
     from freesail.world import prizes as P
 
     led = [e.text for e in w.log if "leads the boarders on, their officer fallen" in e.text]
-    assert len(led) == 1 and led[0].startswith("Mr Ward ")
+    # OLD (the frigate, seed 7): Mr Ward led on
+    assert len(led) == 1 and led[0].startswith("Mr Bowen ")
     rec = P.record_of(v) or {}
-    assert rec.get("master") == "Mr Ward" and rec.get("how") == "carried by boarding"
-    ward = enemy.people.find("Mr Ward")
-    assert ward is not None and ward.hull == v.id and ward.home == v.id
-    assert enemy.stations.holder("captain") is ward
+    assert rec.get("master") == "Mr Bowen" and rec.get("how") == "carried by boarding"
+    leader = enemy.people.find("Mr Bowen")
+    assert leader is not None and leader.hull == v.id and leader.home == v.id
+    assert enemy.stations.holder("captain") is leader
 
 
 def test_the_director_sends_a_person_aboard_another_ship_by_the_boat_and_doubts_it_far_off():

@@ -29364,10 +29364,32 @@ the world's own order (`aboard "Medusa": the fever in the ship`, a tenth sick ea
 264, 216, 196, 178, 161, her defenders 103, 78, 74, 60, 53) and the boarders still repulsed
 at rounds 7 to 15, their own temper falling under its line with 55 to 59 of them lost (the
 sick list does not touch her temper); a fight to reduce her drives the two out of the
-grapnel's throw (below). 7-325 and 7-351 wait on the lead's word (a weaker company laid within
-the throw, or another road).
+grapnel's throw (below). 7-325 and 7-351 (and the two deck-won tests of `test_between_hulls.py` they call)
+keep their sentences and board the weakest honest defender a frigate's boarders carry, by the
+lead's ruling (A): the far detail's privateer brig (the Prince de Neufchatel's hull, a
+hermaphrodite brig of 130, no marines), laid ten metres off by `tests/test_fight._laid_aboard`
+at the second before the lookout's minute so that the mark is engaged and the grapnels thrown
+three seconds after (laid as `_alongside` lays the frigate, a smaller ship drifts to 33 to 39
+metres, beyond the throw, within the lookout's minute). A French frigate would not serve:
+at her own temper her deck holds (7-181a). Measured over seeds 1 to 10: carried in the second
+round at every seed (ours lost 10 to 17, hers 9 to 24), the first lieutenant standing at each;
+over 11 to 80 he falls only at seed 60. The seeds, old beside new: the officer stands, OLD the
+frigate at seed 1 (Mr Freeman), NEW the brig at seed 1 (Mr Freeman, the same muster); the
+officer killed and the party leading on, OLD the frigate at seed 7 (Mr Pearce killed at 530 by
+"a blow of a tomahawk", Mr Ward leading on), NEW the brig at seed 60 (Mr Gordon killed at 701,
+"a pistol ball in the breast", Mr Bowen leading on). Each draw decides only whether the
+lieutenant stands or falls in the crossing and the rounds.
 
-**Owed, measured and not mended (for the owner at a gate, with the period's figures).** At
+**Owed, measured and not mended (for the owner at a gate, with the period's figures).** As
+the fight is built, boarding a ship of war cannot succeed. A French frigate alongside,
+grappled, her company shortened by the world's own order (`aboard "Medusa": the fever in the
+ship`, a tenth of her fit men sick each time), a hundred boarders away (her fit, her
+defenders, the end, ours lost and hers): no fever 264, 103, repulsed in round 7, 59 and 30; two
+216, 78, repulsed in 11, 59 and 56; three 196, 74, repulsed in 10, 59 and 44; four 178, 60,
+repulsed in 14, 55 and 68; five 161, 53, repulsed in 15, 57 and 65. The sick list does not
+touch her temper (morale counts the hurt, not the sick); the boarders' own temper falls under
+its line first; and against fifty-three defenders a hundred boarders still lose fifty-five to
+fifty-nine men. At
 pistol shot a frigate's fire takes about a man a minute from a company of 264, and her temper
 falls from 0.88 to 0.82 in forty minutes; two ships laid ten metres apart drift beyond the
 grapnel's throw (thirty) in a minute or two, and `lay her aboard` does not close it in thirty

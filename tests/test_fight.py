@@ -102,6 +102,34 @@ def _alongside(
     return w, v, enemy
 
 
+def _laid_aboard(description: str = "privateer brig", seed: int = 7):
+    """The player's frigate at quarters with her fire held, and a ship of France of
+    `description` laid ten metres off her starboard beam at the second before the lookout's
+    minute, so that the mark is engaged and the grapnels thrown three seconds after (package
+    115 D1, the lead's ruling (A) of 2026-11-14: a smaller ship laid as `_alongside` lays the
+    frigate drifts beyond the grapnel's throw, thirty metres, within the lookout's minute,
+    and the deck-won tests board the weakest honest defender a frigate's boarders carry: a
+    French frigate at her own temper holds, truth 7-181a). Her captain stands aside; her
+    company beats to quarters. Returns the world, the vessel and her hull, grappled."""
+    w = make_world(seed, FRIGATE, _scenario())
+    w.submit("beat to quarters")
+    w.submit("hold your fire")
+    w.run(60)
+    while w.clock.ship_time.second != 57:
+        w.run(1)
+    heading = math.degrees(float(w.ship.heading))
+    v, enemy = _enemy(w, heading + 90.0, 10.0, description=description)
+    enemy.ship.dyn.heading = float(w.ship.heading)
+    enemy.captain.aside = True
+    enemy.submit("beat to quarters")
+    w.run(4)
+    out = w.submit("engage her to starboard")
+    assert out.kind == "guns.engage", out.text
+    grapple = w.submit("grapple her")
+    assert grapple.kind != "order.rejected", grapple.text
+    return w, v, enemy
+
+
 def _events(world, kind: str) -> list:
     return [e for e in world.log if e.kind == kind]
 
