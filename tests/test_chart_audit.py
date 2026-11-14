@@ -365,3 +365,27 @@ def test_the_known_list_lies_beside_the_tool_and_outside_the_games_data():
     assert A.KNOWN_PATH.parent == ROOT / "tools" and data not in A.KNOWN_PATH.parents
     assert A.KNOWN_PATH.is_file() and not (data / "charts" / "audit-known.yaml").exists()
     assert A.load_known()
+
+
+def test_an_unreadable_track_mark_is_an_error_at_the_load_and_a_finding(tmp_path, chart):
+    """The chart session's tracks step (the lead's ruling of 2026-11-14): a track mark that is
+    neither a feature nor a position in the dialect's one form was skipped by the planner
+    without a word, so Augusta's, Marsaxlokk's and Syracuse's files described legs no ship
+    sailed (ten marks in degrees, minutes and seconds). It is now an error at the load, in
+    words naming the file and the mark, and in the audit a finding of its own (`f-mark`)."""
+    from freesail.world.ports import UnreadableMark, load_port
+
+    def dms(doc):
+        doc["tracks"]["to_sea"] = ["37 11 42 N 15 12 36 E", "37 10 12 N 15 15 36 E"]
+
+    path = _port_file(tmp_path, "augusta", dms)
+    with pytest.raises(UnreadableMark, match="'37 11 42 N 15 12 36 E'"):
+        load_port(next(path.glob("augusta.yaml")), chart)
+    audit = A.Audit()
+    A.check_ports(audit, chart, A.Water(chart), path)
+    assert "f-mark:augusta" in audit.keys() and "f-load:augusta" not in audit.keys()
+    plain = A.Audit()
+    A.check_ports(
+        plain, chart, A.Water(chart), _port_file(tmp_path / "x", "augusta", lambda d: None)
+    )
+    assert "f-mark:augusta" not in plain.keys()

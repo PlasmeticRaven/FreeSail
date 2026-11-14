@@ -103,6 +103,6 @@ crew_pool:
 closed_to: []
 
 tracks:
-  to_sea: [marsaxlokk, 35 48 54 N 14 33 11 E, 35 47 24 N 14 34 12 E]
-  from_sea: [35 47 24 N 14 34 12 E, 35 48 54 N 14 33 11 E, marsaxlokk]
+  to_sea: [marsaxlokk, 35 48.90 N 14 33.183 E, 35 47.40 N 14 34.20 E]
+  from_sea: [35 47.40 N 14 34.20 E, 35 48.90 N 14 33.183 E, marsaxlokk]
   in: [marsaxlokk]

@@ -969,7 +969,7 @@ def check_ports(
     ports_dir: Path = PORTS_DIR,
     nations_path: Path = NATIONS_PATH,
 ) -> None:
-    from freesail.world.ports import load_port
+    from freesail.world.ports import UnreadableMark, load_port
     from freesail.world.ships import approach_plan, land_crossing
 
     table = yaml.safe_load(nations_path.read_text(encoding="utf-8")) or {}
@@ -986,6 +986,11 @@ def check_ports(
         pid = path.stem
         try:
             port = load_port(path, chart)
+        except UnreadableMark as e:
+            # a track mark the planner cannot read (the chart session's tracks step): a
+            # finding of its own, never a skipped leg
+            audit.add(Finding("f", f"f-mark:{pid}", "", 1, f"a track mark is unreadable: {e}"))
+            continue
         except Exception as e:  # noqa: BLE001 - said as a finding
             audit.add(Finding("f", f"f-load:{pid}", "", 1, f"the port file does not load: {e}"))
             continue
