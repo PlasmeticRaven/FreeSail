@@ -30207,7 +30207,7 @@ and 448; the dated values classed 5,545 and 5,710; the sampled days 202 and 204 
 side of 1 March 1792), 323 and 325 with the reference's; the full sweep's days 1,146 and
 1,148 (1,256 and 1,258). The list is the same 105 by key, owner and years; no figure of
 truths 7-590 to 7-593 moved. The file has 45 fast tests where it had 44. The full sweep
-on the merged tree: 22 min 8 s on the scratch tree with the one station off Mazagan (147 worlds, 1,322 s).
+on the merged tree: 23 min 56 s, the 165 whole worlds 1,429 s of it (22 min 8 s on the scratch tree with one Moroccan station and 147 worlds).
 
 **For whoever adds a port next.** The ratchet will stop you at the counts, and it is
 meant to. A field of a port written as one value raises its `p-undated:` count: it says
