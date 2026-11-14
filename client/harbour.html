@@ -6,6 +6,7 @@
 <title>FreeSail · the harbour</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M3 13h10l-1 2H4z%27 fill=%27%234a3d31%27/%3E%3Cpath d=%27M8 1v12M8 3l5 8H8z%27 fill=%27%23ece5d3%27 stroke=%27%233b3128%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/client/style.css">
+<script src="/client/token.js"></script>
 </head>
 <!-- The harbour (package 59; spec M7b §21d, §21e): a page of the game's own server. A new
      game from the server's flags as controls, the doors and the stations held, the
@@ -55,7 +56,7 @@
         </select></label>
       <label class="from from-scenario">Scenario <select id="s-scenario"></select></label>
       <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
-      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save file's path"></label>
+      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
       <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
       <label>Your seat <select id="s-seat"></select></label>
       <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
@@ -238,7 +239,7 @@
         <label class="check"><input data-set="server.open_browser" type="checkbox"> open the browser at the start</label>
       </fieldset>
       <fieldset class="wide"><legend>The places</legend>
-        <label class="wide">Saves <input data-set="places.saves" type="text"></label>
+        <label class="wide">Saves <input data-set="places.saves" type="text" placeholder="saves beside the settings; taken when the game's server is started again"></label>
         <label class="wide">Your scenarios <input data-set="places.scenarios" type="text"></label>
         <label class="wide">Consent records <input data-set="places.consent_records" type="text" placeholder="the game's own (docs/agents/consent); read at the server's start"></label>
         <label class="wide">The desktop client's file <input data-set="places.desktop_config" type="text"></label>

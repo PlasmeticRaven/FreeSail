@@ -1665,14 +1665,14 @@ def test_the_console_stations_the_scripted_watcher_and_prints_its_lines(tmp_path
 
 
 def test_the_server_snapshot_carries_the_agents():
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
     world = frigate_world()
     station_watcher(world, "fake")
     driver = Driver(world)
-    with TestClient(create_app(driver)) as client:
+    with PageClient(create_app(driver)) as client:
         agents = client.get("/api/state").json()["agents"]
         assert agents[0]["station"] == "watcher" and agents[0]["state"] == "stationed"
         r = client.post("/api/order", json={"text": "ask the watcher how she lies"})

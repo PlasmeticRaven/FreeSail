@@ -433,8 +433,12 @@ def _starter(name: str) -> DirectorBrief | None:
     key = " ".join(str(name).lower().split()).replace(" ", "-").removesuffix(".yaml")
     for article in ("a-", "an-", "the-"):
         key = key.removeprefix(article)
-    p = BRIEFS_DIR / f"{key}.yaml"
-    return DirectorBrief.load(p) if p.exists() else None
+    # a starter by its name and only its name, in the starters' folder (package 115: the
+    # words were joined to the folder, so that `..` or an absolute path read any file)
+    from freesail.core.names import named_file
+
+    p = named_file(BRIEFS_DIR, key, ".yaml")
+    return DirectorBrief.load(p) if p is not None else None
 
 
 def starter_briefs() -> list[str]:
