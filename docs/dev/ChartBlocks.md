@@ -1019,4 +1019,4 @@ next blocks (106b's African coast first):
   island's metre and more of mean level for a fault; the Canaries and the Salvages are
   named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
   fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
-  both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.
+  both moved; what is left is listed, with its reason, in the known list (then `data/charts/audit-known.yaml`, since the chart session's tracks step `tools/audit_chart_known.yaml`).

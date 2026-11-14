@@ -112,16 +112,16 @@ crew_pool:
 closed_to: []
 
 # The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
-# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
-# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, the
+# true least of the grid's surface along the leg), the way the
 # grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
 # clear of the land by the game's guard. The grid is the modern port, its moles and basins, not the mole of 1756:
 # the old way south-east to the road crossed a modern pier (0.0 m). The grid's one way out of the
 # mole harbour of 3 m and more is north by its inner channel and east through the modern
 # entrance, so the track is the grid's and not the pilot's picture of brushing the mole-head.
 # Least, going out: to 38 08.003 N 13 22.244 E 8.1 m; to 38 08.128 N 13 22.244 E 5.1 m; to
-# 38 08.252 N 13 22.450 E 5.1 m; to 38 08.246 N 13 22.505 E 4.5 m; to 38 08.192 N 13 22.574 E
-# 5.8 m; to 38 08.172 N 13 22.800 E 16.6 m; to 38 10 N 13 30 E 59.3 m; from the road to the
+# 38 08.252 N 13 22.450 E 5.1 m; to 38 08.246 N 13 22.505 E 4.4 m; to 38 08.192 N 13 22.574 E
+# 5.4 m; to 38 08.172 N 13 22.800 E 16.6 m; to 38 10 N 13 30 E 59.3 m; from the road to the
 # entrance 24.2 m; the way in from the sea ends at the road, the inner track going on from it.
 # (Old: by 38 07 41 N 13 22 48 E and 38 07 44 N 13 22 32 E, and from the sea on to the harbour.)
 tracks:

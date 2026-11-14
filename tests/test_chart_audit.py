@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import copy
 import importlib.util
-import math
 import re
 import sys
 from pathlib import Path
@@ -173,41 +172,35 @@ def test_a_track_over_shallow_water_the_guard_passes_is_found(tmp_path, chart):
 
 
 def test_a_shoal_narrower_than_the_old_step_is_found(tmp_path, chart, monkeypatch):
-    """(f) The depth along a track is sampled finer than the grid's narrowest shoal: on
-    Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W crosses a
-    shoal of 1.2 m at the grid's datum near 38 26.0 N 9 04.1 W that a sample every 20 m
-    stepped over (it read 2.3 m), found by the chart session's own sampler (package 111,
-    step 2b, the lead's ruling of 2026-11-14). The step as set reads the shoal; at 20 m the
-    same leg reads over 2 m, so the test fails at the old step."""
-    from freesail.world.geo import parse_position
+    """(f) The depth along a track is the true least of the grid's surface along each leg:
+    on Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W crosses
+    a shoal near 38 26.0 N 9 04.1 W that a sample every 20 m stepped over (it read 2.3 m),
+    found by the chart session's own sampler (package 111, step 2b, the lead's ruling of
+    2026-11-14). The audit reads its least, 1.13 m (old: 1.2 m, a reading every 2 m; the
+    words "the least 1.2 m" are now "the least 1.1 m"); a reader stepping every 20 m in its
+    place reads the same leg over 2 m, so the test fails at the old step."""
+    from freesail.world.geo import bearing_and_distance, destination, parse_position
 
     a = parse_position("38 26.02 N 9 04.46 W")
     b = parse_position("38 25.97 N 9 03.72 W")
     ((least, where, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
-    assert 1.0 < least < 1.35, least
+    assert 1.10 < least < 1.16, least
     assert 38.43 < where.lat_deg < 38.44 and -9.075 < where.lon_deg < -9.06
     audit = A.Audit()
     A.check_ports(audit, chart, A.Water(chart), _port_file(tmp_path, "setubal", lambda d: None))
     found = next(f for f in audit.findings if f.key == "f-shallow:setubal")
-    assert "the least 1.2 m" in found.words, found.words
-    # at the old step (every 20 m, first and fine alike) the same leg reads over 2 m (the
-    # chart session's tracks step: the first reading is the chart's half cell, so the old
-    # step is set on both readings; old: `TRACK_STEP_M` alone set to 20 m)
-    # the leg lies over Portugal's region alone (level 2, cells of 92.6 m): its first
-    # reading is every half cell, and the 1.2 m is the second's, every TRACK_STEP_M
-    lv = chart._finest_level(a)
-    assert lv.level == 2
-    assert chart.line_step_m(a, b) == pytest.approx(
-        0.5 * lv.cell_m * math.cos(math.radians(a.lat_deg))
-    )
-    # the old reader's spacing: the leg cut into its whole number of 20 m steps (the new
-    # reader cuts it into steps of at most the step it is given)
-    from freesail.world.geo import bearing_and_distance
+    assert "the least 1.1 m" in found.words, found.words
 
-    _, dist = bearing_and_distance(a, b)
-    old_step = dist / int(dist / 20.0)
-    monkeypatch.setattr(A, "TRACK_STEP_M", old_step)
-    monkeypatch.setattr(chart, "line_step_m", lambda a, b: old_step)
+    # the old reader in the true least's place: the leg cut into its whole number of 20 m
+    # steps, the ends among them (package 111's first hash)
+    def stepped(self, p, q):
+        bearing, dist = bearing_and_distance(p, q)
+        n = max(1, int(dist / 20.0))
+        reads = [(self.depth_at(destination(p, bearing, dist * k / n)), k) for k in range(n + 1)]
+        d, k = min((d, k) for d, k in reads if d is not None)
+        return d, destination(p, bearing, dist * k / n)
+
+    monkeypatch.setattr(type(chart), "least_depth_along", stepped)
     ((coarse, _, _),) = A._least_depth(chart, a, [("to", b, "the leg")])
     assert coarse > 2.0, coarse
 

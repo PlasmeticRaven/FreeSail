@@ -108,8 +108,8 @@ crew_pool:
 closed_to: []
 
 # The tracks redrawn by the chart session's tracks step (package 111's ruling 1): each leg's
-# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, every
-# half cell of the finest level under the leg and every 2 m again under 8 m), the way the
+# least depth at the grid's datum by the chart's own reader (`Chart.least_depth_along`, the
+# true least of the grid's surface along the leg), the way the
 # grid's deepest from the anchorage to open water (a search on a 10 m lattice), every leg
 # clear of the land by the game's guard. The old straight leg from the harbour to the road crossed the grid's
 # shoal at the harbour's mouth (0.4 m): out south by the mouth's deeper side first. Least: the

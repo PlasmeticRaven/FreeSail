@@ -431,7 +431,7 @@ known:
   most: 2
 - key: f-shallow:paimboeuf
   place: 47°16.9′N 2°10.1′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 6 legs, the least 1.9 m on the leg to 47 17.93 N 2 08.05 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum); the cause (the chart session''s tracks step): a shoal the pilots give too, the Loire''s ledges and banks below Paimboeuf (JUDGEMENT: the grid''s deepest way from the anchorage to the road is 3.3 m, off the pilot''s north side)'
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 6 legs, the least 1.8 m (old 1.9 m, read every 2 m) on the leg to 47 17.93 N 2 08.05 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum); the cause (the chart session''s tracks step): a shoal the pilots give too, the Loire''s ledges and banks below Paimboeuf (JUDGEMENT: the grid''s deepest way from the anchorage to the road is 3.3 m, off the pilot''s north side)'
   owner: package 111
   most: 6
 - key: f-shallow:poole
@@ -446,7 +446,7 @@ known:
   most: 8
 - key: f-shallow:setubal
   place: 38°26.0′N 9°04.1′W
-  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 1.2 m on the leg to 38 25.97 N 9 03.72 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum); the cause (the chart session''s tracks step): a bar the pilots give too, the sands at the river''s mouth'
+  reason: 'its tracks (package 111''s step 2b) cross water the grid charts under 3 m at its datum on 5 legs, the least 1.1 m (old 1.2 m, read every 2 m) on the leg to 38 25.97 N 9 03.72 W: the grid has no deeper way within the pilot''s sides, so the track stands, its least depth said in the port file (JUDGEMENT: 3 m, a laden trader''s ten feet at the datum); the cause (the chart session''s tracks step): a bar the pilots give too, the sands at the river''s mouth'
   owner: package 111
   most: 5
 - key: f-shallow:st-malo

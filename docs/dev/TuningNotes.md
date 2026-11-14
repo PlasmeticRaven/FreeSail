@@ -29220,53 +29220,71 @@ corridor answering first at 47.70 N.
 By package 111's rulings 1, 3 and 4 as merged (the record's "Package 111, step 2b ... PACKAGE
 111 CLOSED"), on the trunk at 848bbcae.
 
-**One reader of a line's least depth.** `Chart.least_depth_along(a, b, refine_below_m,
-refine_step_m)` reads the great circle every `Chart.line_step_m(a, b)` and keeps the least.
-That step is half the narrower side of a cell of the finest level with a tile under the line:
-- the narrower side is the cell's height north and south times the cosine of the line's
-  highest latitude;
-- a level is under the line where a point read a quarter of its tile's span apart along the
-  line, its ends among them, falls in one of its tiles.
+**One reader of a line's least depth, the true least of the chart's surface.**
+`Chart.least_depth_along(a, b)` gives the least depth along the great circle with no step and
+no margin. This is the lead's ruling of 11:00 on the independent reader's finding, which the
+chart session's own measure found too, at Setúbal.
 
-Where the first least is under `refine_below_m` the line is read again every `refine_step_m`,
-and the lesser of the two is kept. The lookup is bilinear between cell centres. A reading half
-a cell apart therefore comes within a quarter cell of every centre the line passes over, and
-reads at least three quarters of a lone cell's rise.
+How it reads:
+- The lookup is bilinear between cell centres. Along a straight line within one square of four
+  centres the depth is therefore a quadratic, least at an end or at its turning point.
+- The line is cut into chords of at most 2 km (`LINE_CHORD_M`), each straight in degrees
+  between two points of the great circle; at 2 km the two differ by well under a metre.
+- Each chord is cut again (`Chart._line_pieces`): at every level's tile edges, and, where that
+  level has a tile, at its cell edges and its centre lines. These are every place the
+  surface's formula may change: a square of four centres, a corner unknown where the lookup
+  falls back to the nearest cell, or a finer level beginning or ending.
+- On each piece (`LinePiece.readings`) the depth is read at the ends and the middle, and at the
+  quadratic's turning point where that is a least within the piece.
 
-The audit's `_least_depth` (check (f), `f-shallow`) now reads only this, with
-`TRACK_REFINE_BELOW_M` (8 m) and `TRACK_STEP_M` (2 m). Old: a first reading every 20 m
-(`TRACK_COARSE_STEP_M`, taken out), a constant unrelated to the cell, and a second reading that
-replaced the first.
+Old, in this step's first hash (84fdbcc8): a first reading every half cell of one level
+(`Chart.line_step_m`, the level chosen for the whole line by sampling a quarter of a tile's
+span), and a second every 2 m under 8 m. That reader stepped over a head three ways:
+- Off a cell's axis. Half a cell reads three quarters of a lone cell's rise only along the
+  cell's axis through its centre: a diagonal reads about 0.68 of it, an off-centre line less.
+  The reader's made grid gave 13 lines of 750 read three metres and more where the truth is
+  under three (9.51 m where it is 1.79 m), so the first reading stayed above 8 m and the
+  second never ran.
+- At a level's corner. A line clipping a finer tile's corner for less than a quarter of a
+  tile's span was read at the coarser step: a 1,729 m line over a level-3 tile for 785 m read
+  14.0 m over a two-cell rock drying to nothing.
+- At Setúbal's V, on the real chart. The leg from 38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W
+  (level 2) falls to 1.18 m at 561 m along, between the half cell's readings at 544 and 580 m
+  (3.36 and 3.66 m); only the 2 m second reading under 8 m caught it, and the pilot's look
+  ahead has no second reading.
+`line_step_m` is gone with it: no reader along a line needs a step now.
 
-The step is the cell's:
-- 7.7 m over a level-3 harbour patch at the equator, about 5.8 m at 41 N and 5 m at 50 N;
-- 36 m over level 2 at Setúbal, coarser than the old 20 m: the grid cannot say less than a
-  92.6 m cell there, and the 2 m second reading still finds Setúbal's 1.2 m;
-- over level 1 (cells of 926 m) half a cell, some 300 to 460 m by the latitude.
+The audit's `_least_depth` (check (f)) reads only this. `TRACK_STEP_M` and
+`TRACK_REFINE_BELOW_M` are out, as `TRACK_COARSE_STEP_M` went before them. A leg the chart knows
+nothing along is now a finding of its own (`f-unread`), not a shorter count (the reader's item
+4); none today.
+
+Measured on the tree as built (check (f) whole):
+- 12.2 s against 8.2 s stepped: the exact least costs half as much again;
+- the same 30 findings, the 12 `f-shallow` counts unchanged;
+- words moved by a tenth or a leg's name: Paimboeuf 1.9 to 1.8 m, Setúbal 1.2 to 1.1 m;
+  St Malo's, Oporto's and the Goletta's leg named.
 
 What a coarse cell can hold (the lead's ruling of 07:47, item 4). A level-2 cell is 92.6 m
 square and holds one depth, its survey's for that whole square. A head, a rock or a bar
 narrower than that is in the grid only as far as it moved its cell's figure. On level-2 water,
-then, the audit proves that no cell along the line is under 3 m. It does not prove that no
-head under 3 m stands there: the half-cell step reads every cell the line crosses, and nothing
-finer can be read where the grid itself is no finer. The same holds tenfold over level 1.
-
-Measured:
-- check (f) whole takes 12.7 s of processor time against 10.9 s;
-- the same 19 `f-shallow` findings before the tracks below were redrawn;
-- three findings' words moved by a tenth of a metre or the leg named: Santa Cruz de Tenerife
-  1.5 to 1.6 m, St Malo's and the Goletta's leg named, Civita Vecchia's place 46.9 to 47.0 E.
+then, the audit proves that the grid's surface nowhere along the line is under 3 m. It does
+not prove that no head under 3 m stands there: nothing finer can be read where the grid
+itself is no finer. The same holds tenfold over level 1.
 
 The tests:
-- `tests/test_chart.py` asserts the step against the chart's own finest cell (level 3 in
-  Carrick Roads, 2 in the open Channel, 1 in the ocean, and level 3 throughout a line from open
-  water into the Roads).
-- On a made level-3 grid, a rock one cell wide 20 m above 40 m of water is read dry from 32
-  starts a sixteenth of a cell apart. Read every 20 m it is passed by as over 15 m of water at
-  the worst start.
-- `tests/test_chart_audit.py`'s Setúbal test now sets the old step on both readings. Old:
-  `TRACK_STEP_M` alone, which the first reading no longer is; the old reader's spacing is the
-  leg cut into its whole number of 20 m steps.
+- In `tests/test_chart.py`, the true least by a lone cell standing at 2, 0, -3, -6 and -10 m in
+  30 m of water. Thirty random lines by each, at any bearing within 0.8 of a cell of its
+  centre, each read against the same surface every centimetre: at or under every reading, and
+  within 1.5 cm of the least of them.
+- The same over a ridge of fifty cells crossed at a slant; across the edge between two tiles of
+  one level (a head on the seam); and across a level's edge, from a harbour patch out over a
+  region's coarser cells to a head of the region's own.
+- Setúbal's leg on the real chart: its least 1.13 m, at or under a reading every 2 cm about the
+  V.
+- `tests/test_chart_audit.py`'s Setúbal test: the audit reads 1.1 m, and a reader stepping
+  every 20 m in its place reads the leg over 2 m. Old: the old step set on the stepped reader's
+  two readings.
 
 **Seven ports' tracks.** Searched for the deepest way from each anchorage to open water: a
 widest-path search on a 10 m lattice, simplified to the fewest marks whose legs keep a floor.
@@ -29276,7 +29294,7 @@ Every leg was read by the reader above and passed by the game's guard.
 |---|---|---|---|
 | Messina | ground drying 4.0 m (the road to the harbour, across the shore) | 34.2 m | out east of the road first, then down the Marina's side to the mouth, west of the islands that stand for the Braccio |
 | Syracuse | 0.5 m (east over the grid's shoal off Ortygia) | 5.0 m | out through the middle third of the mouth (Smyth's Plemmyrium shoal to the south); from the sea to off the mouth, the inner track on to the harbour |
-| Palermo | 0.0 m (across a modern pier) | 4.5 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
+| Palermo | 0.0 m (across a modern pier) | 4.4 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
 | Lampedusa | 0.4 m (the harbour to its road) | 6.4 m | by the mouth's deeper side; from the sea to the road, the inner track on |
 | Catania | 1.1 m (the road into the mole) | 5.0 m | in by the north, past the piers' heads (Smyth: the lava on the south, the piers on the north) |
 | Santa Cruz de Tenerife | ground drying 1.6 m | 55.6 m | the road's spot lay within the grid's modern Dique (the deepest way out within 5 km dried 0.0 m): the road moved 547 m east to Purdy's half a mile in 30 to 35 fathoms (the grid 55.6 m), the berth 342 m to the grid's 10.5 m; the tracks stand |
