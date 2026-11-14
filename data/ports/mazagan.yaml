@@ -75,6 +75,7 @@ pilot:
 
 tide:
   enter_on: flood
+  leave_on: ebb
 
 market:
   - market:
