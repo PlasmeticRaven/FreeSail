@@ -2093,6 +2093,8 @@ BEAT_LINE = {
 MARINES_KEPT = {"data/ships/razee-44.yaml": 14, SIXTY_FOUR: 84}
 # The 64's deck lines, new beside her old beat, which had none (B7.b item 2, keyed on two gun
 # decks: the lead's answer (2))
+# the beat's last words while no gun is cast loose (package 115 D1)
+GUNS_SECURED = "The guns are secured: 'cast loose the guns' to serve them."
 SIXTY_FOURS_DECK_LINES = [
     "The lower deck: 13 gun crews, 143 men.",
     "The upper deck: 13 gun crews, 117 men.",
@@ -2181,8 +2183,10 @@ def test_her_beat_says_her_decks_and_the_64s_with_her():
     _w, said, q = _beaten(SIXTY_FOUR)
     assert q.describe()[0] == f"Quarters: {BEAT_LINE[SIXTY_FOUR]}."
     assert q.describe()[1:5] == SIXTY_FOURS_DECK_LINES
+    # package 115 D1 (re-pinned by the lead's word): the beat says the guns are secured
+    # (old: the line ended with the deck lines)
     assert said.text == "Beat to quarters! " + " ".join(
-        [f"Quarters: {BEAT_LINE[SIXTY_FOUR]}.", *SIXTY_FOURS_DECK_LINES]
+        [f"Quarters: {BEAT_LINE[SIXTY_FOUR]}.", *SIXTY_FOURS_DECK_LINES, GUNS_SECURED]
     )
 
 
@@ -2197,7 +2201,8 @@ def test_nothing_of_a_one_gun_deck_file_moves_at_the_beat(path):
     from freesail.crew.quarters import MARINES
 
     _w, said, q = _beaten(path)
-    assert said.text == f"Beat to quarters! Quarters: {BEAT_LINE[path]}."
+    # package 115 D1 (re-pinned by the lead's word): old, the line ended at the bill
+    assert said.text == f"Beat to quarters! Quarters: {BEAT_LINE[path]}. {GUNS_SECURED}"
     assert q.describe()[0] == f"Quarters: {BEAT_LINE[path]}."
     assert not any(line.startswith("The ") and " deck: " in line for line in q.describe())
     assert all(gc.deck is None and "deck" not in gc.__getstate__() for gc in q.crews.values())
@@ -2502,9 +2507,13 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
     assert len(shut) == 8
     said = w.submit("fire the starboard lower deck")
     assert said.kind == "guns.fire", said.text
+    # package 115 D, the lead's reading at 60af48e, item 3 (`fire` true of the guns): the
+    # beat leaves her guns secured, and the answer says so. OLD "... each as soon as it is
+    # ready, six guns; eight are behind ports the sea has shut."
     assert said.text == (
-        "The starboard lower-deck guns to fire each as soon as it is ready, six guns; eight are "
-        "behind ports the sea has shut."
+        "The starboard lower-deck guns to fire each as soon as it is cast loose and ready, six "
+        "guns; eight are behind ports the sea has shut. The guns are secured: none is loaded, "
+        "run out or fired until they are cast loose; say 'cast loose the guns'."
     )
     assert len(b.single) == 6 and not set(b.single) & shut
     b.single.clear()

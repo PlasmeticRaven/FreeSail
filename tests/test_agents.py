@@ -1892,7 +1892,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # (97 before it; the owner's tree, before 73, had 88 for 87); and package 75's lateen six
     # (set, take in, furl, reef, shake out and trim its sheet; 98 before them), and its settee
     # four (set, take in, furl and dip; 104 before them)
-    assert "108 evolutions; the list about" in contents
+    # ... and package 115's relieving tackles (relieving_tackles.yaml; 108 before it)
+    assert "109 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)

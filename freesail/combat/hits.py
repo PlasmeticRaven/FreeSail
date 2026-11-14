@@ -209,12 +209,20 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
         for g in getattr(ship, "guns", {}).values()
         if ((g.side == side and g.place == "broadside") or g.place == "pivot") and not g.dismounted
     ]
-    if aft and rng.random() < HELM_SHOT_SHARE and not ship.extra.get("helm_lost"):
+    if (
+        aft
+        and rng.random() < HELM_SHOT_SHARE
+        and not ship.extra.get("helm_lost")
+        # the wheel is shot away once: with the relieving tackles rove she steers from below
+        # (the lead's reading of part D at 60af48e, item 6)
+        and not ship.extra.get("helm_by_tackles")
+    ):
         ship.extra["helm_lost"] = "the wheel shot away"
         ship.note(
             "urgent",
             "helm.shot_away",
-            "The wheel is shot away; the helm is lost until the relieving tackles are rove.",
+            "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
+            "'rig the relieving tackles'.",
             None,
             {"tick": tick},
         )

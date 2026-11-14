@@ -1858,13 +1858,18 @@ class TackScript(Script):
         braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        heading = self.new_course
         if self.timed_out:
             new = self.ship.dyn.tack
+            # and the heading she lies on, read from her, not the course she was put about
+            # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
+            # up on the starboard tack, heading SSE (158°)" with her head at NE)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
-            "new_course": units.format_heading(self.new_course),
+            "new_course": units.format_heading(heading),
         } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:
@@ -9101,6 +9106,14 @@ class SendBoatScript(Script):
             if item.get("kind") in ("purchase", "sale")
         )
         self.ashore_s = float(BOAT_ASHORE_S.get(errand, 1800)) + tons * LIGHTER_S_PER_TON
+        # what she carries on the errand, kept by the errand itself: the boat's state is made
+        # afresh when she is lost (`world.boats.lose_boat`), and the goods with it
+        self.carried = [
+            dict(item)
+            for item in self.ports.boat.carrying
+            if item.get("kind") in ("purchase", "sale")
+        ]
+        self.port_id = self.ports.boat.port_id  # the market of her errand, kept with them
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -9114,6 +9127,17 @@ class SendBoatScript(Script):
             self.ship.note(severity.value, kind, text, self.ship.name, data)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.ports is not None and getattr(self.ports.boat, "lost", None):
+            # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
+            # and what was bought or sold in her is said lost with her, paid once and never
+            # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
+            # a sale is had when the goods are landed: lost before she reached the quay, it
+            # is void (the lead's reading of part D at 60af48e, item 4)
+            landed = self.phase in ("ashore", "pull_back", "hoist_in")
+            carried = list(getattr(self, "carried", []) or [])
+            port_id = getattr(self, "port_id", None)
+            self.fail(self.ports.lost_on_errand(carried, landed=landed, port_id=port_id))
+            return
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":
