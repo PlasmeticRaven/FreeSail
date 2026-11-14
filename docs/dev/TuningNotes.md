@@ -22818,6 +22818,272 @@ builders, on the owner's machine; old beside new by the junits (`cmp_xml.py`).
   same; `py tools/check_viewer_guns.py` clean, its output as at cda12ec9. **ruff** `check` and
   `format --check` over every file touched: clean. Every changed file LF.
 
+### The lead's last list, the crew (2026-11-14)
+
+The lead's note of 2026-11-14 at 14:05 UTC (nudge number 12), the last list for package 75, its
+items 8 and 9, the crew's; built on 20a8e2e3 in one local commit on `l-crew`. Old is 20a8e2e3
+throughout, measured on a tree of it taken out beside the worktree; new is the branch's head.
+Every figure at seed 7 on the owner's machine (Windows 11).
+
+#### 8: held work taken up after the world has moved under it
+
+- **The cause.** What must still be true when held work is taken up was stated for some of the
+  scripts a post can hold and not for others. (C1)'s mend rightly stopped reading the beginning's
+  check (`Script.check`) on a taking up; what of the check stands through the work was then to be
+  said by each script (`Script.standing`), and only three said it (the letting go, the cutting
+  away, the fish). The rest were taken up whatever the world had done while they lay held: the
+  reader's veer, held by the master going below and its anchor then lost, veered the lost
+  anchor's cable to fifty-six fathoms. The same cause in the files: a trim's sail set and its
+  sheet whole, which its own going never changes, were said as `preconditions` (read as the work
+  begins alone), not `requires` (read as it begins and as it is taken up).
+- **Where it lives, and the mend.** In each script a post can hold, beside its check, and in the
+  trims' files; and on the one road of the taking up (`Runner._try_resume`), which reads them:
+  - the veer (`VeerCableScript.standing`): the anchor it veers still down, refused in the
+    beginning's words, cda12ec9's: "no anchor is down to veer on" (`_AnchorScript._still_down`,
+    the beginning's `_worked` words, `_none_down` and `_not_down`, one road for both);
+  - backing the anchor (`BackAnchorScript.standing`): the anchor it backs still down ("no anchor is
+    down to back"), and the stream still at the bows ("the stream anchor is down");
+  - catting and fishing (`CatAndFishScript.standing`): the anchor still aweigh or catted ("the
+    small bower is down");
+  - the kedge (`LayOutKedgeScript.standing`): until the kedge is let go from the boat, the kedge
+    in the ship and a bottom here to lay it in ("no bottom here to lay a kedge in"); after, nothing
+    of its beginning stands;
+  - the signal, found by the sweep (`MakeSignalScript.standing`): the hoist still bent on, in the
+    locker and not hauled down ("no signal is bent on"; the locker hauls down a hoist never run up
+    after a glass, `Locker.tidy`, which a signal held by a post's leaving may lie past);
+  - the four trims, found by the sweep (`trim_gaff_sheet`, `trim_jib_sheet`, `trim_lateen_sheet`,
+    `trim_lug_sheet`): their two conditions moved from `preconditions` to `requires`, words
+    unchanged ("The jib is blown out; there is no sail to trim.", "{parted}").
+  `Runner._try_resume`, refusing, now lets go what the script holds that would outlive it, as the
+  captain's belay does (`Script.belayed`), and sets the reason after the colon as the refused line
+  does (`_after_a_colon`, `_refused`'s rule made one): "Could not trim the jib sheet: the jib is
+  blown out; there is no sail to trim." The kedge gains `belayed()`: with the boat alongside
+  (hoisting out, the kedge slinging, hoisting in) she is in the ship again and free, where she was
+  left "hoisting out" for good and every kedge after refused, "the long-boat is away".
+- **Where else the cause was looked for.** Every scripted evolution a post can hold, by the
+  runner's own rule (`Runner._working_posts`, her watches' whole made nought): twenty-three. The
+  reader's four and the sweep's five above; two of the three given before (the letting go and the
+  cutting away; the fish wants hands aloft, so no post holds it); and twelve whose beginning
+  nothing in the world makes false while they lie held, each named in the test with its reason
+  and keeping the base's None: battening down (the hatches its own, held), casting loose the guns
+  (begun at quarters alone, where no post is counted), the grapple (thrown as it begins), heaving a
+  mark (a chart, read again at its end), plugging the shot holes (its own going plugs and spends,
+  holding the carpenter), securing the guns, the boat (a port and a boat, held), serving small
+  arms (held), and the four fishing works (the gear held). Step-list work a post can hold: its
+  file's `requires` are read before every step and on its taking up (package 19's road); the
+  reader's older find there, a blown-out sail taken in from a belay, is on the one list below. The
+  other roads on which work goes on: `_enter_next_step` (`requires`), `Instance.__setstate__` (as
+  it stood), `_start_waiting` (the beginning, the check), the captain's belay (ends it). **Found by
+  the search, older, not mended:** the kedge failed in its own going away from the ship's side
+  ("no bottom to let the kedge go in") or belayed there leaves its boat away; a signal waiting for
+  hands past a glass is begun with its hoist hauled down (its check reads the hoist's being in the
+  locker alone).
+- **The tests** (`tests/test_held_work.py`). At the cause's level:
+  `test_every_script_a_post_can_hold_states_what_must_still_be_true_or_why_nothing_need` (the
+  twenty-three by the runner's rule, each stating what must still be true in its script or its
+  file, or named with its reason and keeping None; old: the veer, the back, the cat, the kedge, the
+  signal and the trims state nothing) and
+  `test_every_script_a_post_can_hold_held_and_the_world_moved_is_refused_and_never_run` (thirteen
+  cases: each begun with all hands up, held as a post's leaving holds it, the world moved, taken
+  up: its `on_fail` in the beginning's words, its hands let go, its check never read, nothing of
+  its going done 400 s on, the kedge's boat in the ship). Old: eleven of the thirteen fail, each
+  taken up and run on (the letting go aground and the cutting away of a mast carried away pass on
+  both, given before). The reader's own case sailed,
+  `test_a_veer_held_by_the_master_going_below_and_its_anchor_lost_is_refused_when_taken_up`: her
+  nine at anchor in Torbay, her larboard watch's three and the master veering twenty fathoms, the
+  master below at +8 s ("Belayed veering the cable: the master gone below."), the best bower lost
+  at +68 s, the master on deck at +130 s: new "Could not veer the cable: no anchor is down to veer
+  on." at +131 s, nothing veered; old "Veered to fifty-six fathoms on the best bower." at +203 s,
+  the lost anchor's scope 38.33 fathoms at its loss and 56.32 after. On a tree of 20a8e2e3
+  seventeen of the file's forty-seven fail: these thirteen (the enumeration, the eleven cases, the
+  reader's veer), item 9's three and the trunk save's run on (its short line, below).
+
+#### 9: one road for a work's words, in both forms
+
+- **The cause.** A work's words lived in two places: the file's gerund (`doing:`, (C8)'s, read
+  for the work in hand) and the verb (read for the infinitive a line gives where it names the
+  work the hands are wanted for, `Runner._describe`), so that those lines named the work by its
+  id wherever the verb was the id ("Only four hands to veer cable", "to let go anchor", "to lay
+  out kedge", "All hands! (to lie a try)", "Not hands enough on deck to cut away mast the main
+  mast"). The tack and the wear had a third: a rule of their own in `_describe` ("tack ship").
+- **Where it lives, and the mend.** One key in the file, the work as an order to it is given
+  (`work:`, `registry.Evolution.work`: "veer the cable"; for a part's work the words before the
+  part, "cut away"); one road for both forms, `Runner._describe` (the infinitive: the call for all
+  hands, the waiting line, the short line, the work that follows) and `Runner._doing` its gerund
+  (`runner.gerund_words`: the verb and a second joined to it by "and", "backing and filling",
+  "catting and fishing the anchor"; a verb of one syllable in -ing is a verb, "goose-winging").
+  The twenty-three files that named their work rename `doing:` to `work:` in the order's words; the
+  tack and the wear gain theirs ("tack ship", "wear ship") and `_describe`'s rule goes; the old key
+  is refused in words. The send-down's refusal, which kept a copy of the striking's name in its
+  file's params ("take it in before striking the topmasts"), reads the road from the format
+  context (`doing`, `work`: "take it in before striking topmasts"). The veer's own failed line
+  named it by its id ("Could not veer cable: ...", found by the sweep): "Could not veer the
+  cable: ...". `clear_wreck`, with no words of its own, is named by its verb: "to cut away the fore
+  mast", "cutting away the fore mast".
+- **Where else the cause was looked for.** Every reader of a work's name: the gerund's (the belayed
+  lines, the captain's belay and its listing, the work the rest are at, the conn's line, a party
+  refused, the guns robbed at quarters, the pipe-down refused, the readings, the console's crew
+  state, the lookout's glass) read `Runner._doing`; the infinitive's read `_describe`. Not of the
+  work's name, left: the scripts' own sentences ("sway them up before crossing the yards"), swept
+  for ids by the test, none holding one; the manoeuvre in hand's reading (`MANOEUVRE_WORDS`, its
+  own closed vocabulary); the library's catalogue of the files (`agents/tools.py`
+  `_evolution_line`, "veer_cable: 'veer_cable', ...", an index by the files' ids by design); the
+  runner's guards for an evolution started on a subject not of its class (`_check_applies`,
+  "'set_square' is for a square sail", reached by naming an evolution by its id in code alone:
+  the orders probed that give a ship's work a part, or a part's work the ship, are refused by the
+  grammar first in the player's own words); an expression of a file that cannot be read
+  (`_failing_condition`, a broken file's error); the order verbs' gerunds in `orders/`
+  (`_group_label`, the group's, `_gerund_words`: the vocabulary's verbs, not a file's work). **Found, older, not mended:** `runner.gerund` takes a verb of one syllable in -ing for a
+  gerund, so the standing orders' firing line says "bring her to" as done "bring her to" (and
+  "sling the yards", "ring the bell"); mended here for the works' words alone
+  (`_verb_gerund`).
+- **The tests** (`tests/test_held_work.py`, (C8)'s two rewritten as one and two new). At the
+  cause's level,
+  `test_every_work_is_named_by_one_road_in_both_forms_where_a_line_names_the_work` (every
+  evolution, both forms as `SHIP_WORK_WORDS` and `PART_WORK_WORDS` pin them, none an id) and the
+  lead's sweep, `test_no_line_that_names_a_work_names_it_by_its_id` (every evolution's lines made
+  by the runner's own roads, the waiting, the short, the belayed, the call, the work that follows
+  and the work in hand, and every line of its own file: each names the work in its words and none
+  an id); `test_a_files_old_key_for_the_gerund_is_refused_in_words`. Old: all three fail (the
+  infinitive the verb's for the twenty-three; "Could not veer cable").
+
+#### The pins moved, old beside new
+
+- Truth 7-542 (`tests/test_known_truths.py`, its docstring; its asserts read kinds, ticks and
+  counts, which hold): "All hands! (to send boat)" to "All hands! (to send the boat)". The reason:
+  the call names the work the hands are wanted for, and named it by its evolution's id; the one
+  road names it in the file's words. The truth's own record in `docs/dev/M7-WorkPackages.md`
+  (package 109's row and its section) quotes the old words; the lead's document, not edited.
+- `tests/test_mends_109.py`, `test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_
+  down`: the same call, "(to send boat)" to "(to send the boat)".
+- `tests/test_held_work.py`, the trunk save's lines (`BOAT_CALLED_TRUNK`, kept as the trunk said
+  them; `BOAT_WORDS_MOVED`): "Only four hands to send boat; there are no more on deck." to "...
+  to send the boat; ...", every tick, kind and other word as on the trunk. Its call, "All hands!
+  (to send boat)", stays as it was said: the trunk said it before the save was written, and the
+  save keeps it among the ship's notes, logged on the first tick after the load.
+- `tests/test_bilander.py`, (C5 b)'s boat: "Only four hands to send boat; there are no more on
+  deck." to "... send the boat; ..." (and two docstrings).
+- `tests/test_ports.py`, `test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_
+  goes`: "Not hands enough on deck to send boat; the hands are coming to anchor." to "... to send
+  the boat; ...".
+- `tests/test_mends_75.py`: the save's evolution names nothing, `"doing"` to `"work"`.
+- `tests/test_held_work.py`, (C1)'s test at the cause's level: its `_subject` takes a sail of the
+  class before a spar of it, and a trim's sail is set before the trim begins (the trims' two
+  conditions are `requires` now, which that test reads, and its gaff trim had been given the gaff
+  spar); its assertions as before. (C8)'s two naming tests are one, in both forms
+  (`SHIP_WORK_NAMES` to `SHIP_WORK_WORDS`, `PART_WORK_NAMES` to `PART_WORK_WORDS`, every gerund as
+  pinned before), the refusal of a part's work naming its part moved to the old key's test.
+
+#### The recorded lines that move, every one (words only)
+
+The four whole logs (`log_digests.py`'s four, sailed with their lines kept) and the five recorded
+passages (`sail5.py`), on both trees: every line's tick and kind the same, every count the same.
+
+- The first action (497 lines both; ce44219434e1e42c to 2a7669c3785b207f): at 300
+  "'Make signal' will follow 'tack ship', ..." to "'Make the signal' will follow ..."; at 654
+  "Not hands enough on deck to cast loose guns; ..." to "... to cast loose the guns; ...".
+- The encounter (229 both; 732a6020db4d4755 to 2fb50b806e54ea2e): at 300 "'Make signal' will
+  follow 'wear ship', ..." to "'Make the signal' will follow ...".
+- The station lee shore (1,561 both; e8c79e9947e244c3 to 1bbe7fbb8084bb67): at 9721 and 32709
+  "All hands! (to lie a try)" to "All hands! (to lie a-try)".
+- The station gale (1,722 both; bf16fbf514055f29 to 64bd207bf4c1c403): at 15532 "Only 248 hands
+  to lie a try; ..." to "... to lie a-try; ..."; at 41881 "All hands! (to lie a try)" to "... (to
+  lie a-try)"; at 54180 and 57780, in the course's line, "'Tack ship' will follow 'heave deep sea
+  lead'" and "'Wear ship' will follow 'heave deep sea lead'" to "... 'heave the deep-sea lead'".
+- Gate 5b's schooner passage (767 both; dd6828408be0c5e9 to 4c440e7197466211): at 46801 "Only one
+  hand to heave lead; ..." to "... to heave the lead; ..."; at 52201 and 54001 "Not hands enough on
+  deck to heave lead; ..." to "... to heave the lead; ...".
+- The trade stranger (1,594 both; 13432e4b2659bcaf to 028b011b3d6b2ccb): at 36001 "Not hands
+  enough on deck to heave log; ..." to "... to heave the log; ...".
+- The merchant intent (2,098 both; af28debbc98516ae to a17f832a5c96a66d): at 18001 "Not hands
+  enough on deck to heave log; ..." to "... to heave the log; ...".
+- Unchanged: the trade in thick weather (426, de00808076d8cccf) and the merchant passage (2,909,
+  eb410cf04b496cec).
+
+The build machine's pins these move are the lead's to measure and pass by these lines (left as they
+are): the station gale's and the trade stranger's trials (each failing on its pin at 20a8e2e3,
+as here), gate 5b's schooner, gate 6a's intent and the first action's whole log.
+
+#### The lines any ship may say that change
+
+- **Every ship, 9:** a line that names the work the hands are wanted for names it in the file's
+  words where a file gives them: the call ("All hands! (to send the boat)", "(to lie a-try)"), the
+  waiting line ("Not hands enough on deck to let go the anchor", "to heave the lead", "to cast
+  loose the guns", "to cut away the main mast", "to goose-wing the foresail"), the short line
+  ("Only four hands to veer the cable") and the work that follows ("'Make the signal' will follow
+  ...", "... 'heave the deep-sea lead'"), for the twenty-three works whose files name them; the
+  veer's failed line ("Could not veer the cable: ..."); the striking's refusal ("take it in before
+  striking topmasts"). The gerund in every line as before.
+- **A merchantman whose post works with the watch, 8:** work a post's leaving held, taken up after
+  the world has moved under it, refused in its failed line in the beginning's words where it was
+  run on: the veer and the back on a lost anchor, the cat on an anchor let go again, the kedge off
+  soundings, the signal hauled down, a trim of a sail blown out or a parted sheet; the reason after
+  the colon begun in lower case. The kedge's boat, the kedge belayed or refused with her
+  alongside, is in the ship again (the captain's belay of a kedge hoisting out among them).
+- **The library** (the agents' catalogue of the files): the four trims' two conditions read under
+  "It stops when" where they were under "It is refused when".
+
+#### For the lead
+
+- The listed-not-built items of the crew's reader are on the one list (items 56 to 60, as the
+  reader found them), with the older faults this build's searches found (61 to 63), and item 42
+  says what of it this build took up; the far reader's four are the far build's, set there (52 to
+  55). Both builds appended to the list, and at their merge the two blocks were joined: the far
+  build's, merged first and cited by its numbers, kept 45 to 55; the crew's were numbered after
+  it (built as 45 to 52).
+  Items 40, 41 and 23, the JUDGEMENT calls and the cold review's two are not built.
+- The truth 7-542's record in `docs/dev/M7-WorkPackages.md` quotes the call's old words.
+- The new tests' times (`-n 2` beside the other builder, the owner's machine): item 9's two
+  sweeps 0.47 s each, the old key's 0.01 s; item 8's enumeration 0.13 s, its thirteen cases 0.15
+  to 0.34 s each, the first 1.53 s with the `standing_worlds` fixture, the reader's veer 0.13 s
+  (the module's `held_worlds` fixture charged to its first test). None is in
+  `tests/conftest.py`'s lists; yours to place.
+- A hang met on the way, not of this change: one run of the files beside the other builder lost a
+  worker to "Windows fatal exception: code 0x80000003" inside `yaml.safe_load` of a ship file
+  (`tests/test_practice_orders.py`), and pytest-xdist's replacement worker then sat idle with the
+  run at 99 % until stopped; the files run again in two parts, each whole (below).
+
+#### The suites as run
+
+Every run with `-n 2 -p no:cacheprovider -o addopts="--dist loadgroup"` beside the other
+builder, on the owner's machine; compared with the bases at 20a8e2e3 by the junits (`cmp_xml.py`).
+
+- The files touched and those that exercise the items, the fast tier, run whole in two parts (the
+  first run of them whole lost a worker, above). test_held_work, test_mends_75, test_evolutions,
+  test_catalogue, test_orders, test_orders_m4a, test_settee, test_crew_orders, test_hands,
+  test_log_lines, test_signals, test_flags, test_staying, test_rig_classing, test_bill_by_fit,
+  test_rig_geometry, test_readings, test_lookout, test_fishing, test_driver, test_practice_orders,
+  test_tackle_orders and test_lying_to: 1,597 run, 1,595 passed and two failed, both of
+  test_held_work and both mended in the test ((C1)'s test meeting the trims' `requires` on the
+  gaff spar it had chosen; the trunk save's call, said before the save), and test_held_work run
+  again whole, 47 passed. test_anchor, test_damage_control, test_tow, test_far_action,
+  test_indefatigable, test_flag_drawings, test_checkpoint, test_bilander, test_mends_109,
+  test_ports, test_ground and test_officer: 410 passed. test_known_truths (touched): 282 passed.
+  Against the fast base no outcome changed; (C8)'s two naming tests are replaced (above), and
+  eighteen cases are new.
+- The slow tier of those files that have one, with the captain's trials (`--slow -m "slow and
+  not pace"`): 82 passed, 1 xfailed (the base's own, test_catalogue's backing and filling) and
+  3 failed, the station gale's, the trade stranger's and the trade in thick weather's trials, each
+  on its pin as at 20a8e2e3, the gale's and the stranger's with this build's digests
+  (64bd207bf4c1c403 and 028b011b3d6b2ccb, by the words above), the thick weather's the same.
+  Against the slow base one outcome changed: test_far_action's
+  `test_the_second_of_two_ships_on_one_mark_gives_it_up_and_takes_her_passage_again[struck-to-the-
+  other]`, failed in the base (`KeyError: 'struck_to'`) and passed here: the far fight's ground,
+  reading no work's name; for the far build and the lead.
+- The slow truths that touch the items (`-k` on the boat, the kedge, the anchor, the signals, the
+  lead and the log, a-try, the veer, the trims, the held, the posts, the master and the hands, and
+  gates 5b and 6a; `-m "slow and not pace"`): 42 passed, 3 xfailed and 4 failed, the four the
+  base's own with the same messages (the schooner's passage at 767 lines against 766; the
+  merchant passage's, the schooner on an intent's and truth 78's constants), the xfails the
+  base's.
+- The new tests on a tree of 20a8e2e3: seventeen of test_held_work's forty-seven fail there (above),
+  the rest pass.
+- The reader's veer sailed on both trees (a scratch script of the test's world): as above. The four
+  whole logs and the five recorded passages on both trees: as above, every moved line listed.
+- The generator into a scratch folder: the eighteen ship files byte for byte; `py
+  tools/check_viewer_guns.py` clean. **ruff** `check` and `format --check` over every Python file
+  touched: clean. Every changed file LF.
+
 ## Package 75, Phase 5: the made-out rule and the razee's trimmers by fit (2026-11-14)
 
 On cda12ec9 (the step the lead has on trial), by the lead's notes of 2026-11-12 (1) and 2026-11-14
@@ -23515,7 +23781,10 @@ review's mends", below, with its figures):
     `Script.standing`); of the other forty-four checks read, a grapple's range and mark (an enemy
     drawn off while the work lay held) and the anchor's manoeuvres' "aground" stand through the
     work and are not given, quarters' and all hands' work that no post's leaving holds; a hand of
-    the work taken by another road is the same (item 22).
+    the work taken by another road is the same (item 22). Since the lead's last list of 2026-11-14
+    (8) every script a post can hold states what must still be true, or is named with why nothing
+    need ("The lead's last list, the crew", above); what is left here is the work no post's
+    leaving holds, and the hand taken by another road.
 43. Every judge on the sea is walked twice: `relations.judges` for a change of hands and
     `combat.action._witnessed` for a pirate's act seen (the same brains and captains, the second
     with the sight's distance); one road for both moves nothing and is not built here.
@@ -23555,6 +23824,30 @@ subsection, "The lead's last list, the far fight"):**
     spoken and the chases given up with the rest).
 54. A peace made mid-fight leaves the mark (the reader's).
 55. "close the commodore" lays its chase raw (the reader's).
+
+**Listed by the lead's last list of 2026-11-14 (nudge 12) and not built, as the crew's reader of
+20a8e2e3 found them** (older than that hash; the far reader's four are the far build's, set
+above as 52 to 55):
+56. Held all-hands work is never taken up after a manoeuvre belays it: a sail lies half taken in,
+    its hands idle, nothing said.
+57. Work waiting its turn behind work a post holds never begins.
+58. The merchant brig's and the smack's small watch (item 41): she cannot anchor or heave to with
+    her larboard three; the cause is her muster's split of seven and three.
+59. A blown-out sail taken in from a belay.
+60. An old save's step-list work that a post held is read as belayed.
+
+**Found by the searches of the last list's crew build, older, not mended** ("The lead's last list,
+the crew", above):
+61. The kedge failed in its own going away from the ship's side ("no bottom to let the kedge go in")
+    or belayed there leaves its boat away, and every kedge after is refused ("the long-boat is
+    away"); alongside she is now brought in (`LayOutKedgeScript.belayed`).
+62. A signal waiting for hands past a glass is begun with its hoist hauled down by the locker
+    (`MakeSignalScript.check` reads the hoist's being in the locker alone; its taking up reads it
+    bent on).
+63. `runner.gerund` takes a verb of one syllable in -ing for a gerund: a standing order's firing
+    line says "bring her to" as done "bring her to" (and "sling the yards", "ring the bell");
+    mended for the works' words alone (`runner._verb_gerund`), the standing orders' and the
+    orders' own gerunds left (`standing.runtime.said_as_done`, `orders/`).
 
 ### Phase 5's integration: the truths moved, and these records
 
