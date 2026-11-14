@@ -791,3 +791,14 @@ The gate at d8235abc:
 - the slow tier of the ports, chart, audit, truths, browser probe, checkpoint and tide: 220
   passed, 8 xfail, none skipped;
 - the pace tests alone and last.
+
+### 2026-11-14, 10:40: 106b's manifest, and what is owed
+
+The lead staged 106b and found four conflicts in `data/charts/manifest.yaml`. It is a generated
+file, so it is generated again by the tool from the cache, never merged by hand. 106b has been
+told how (10:33).
+
+Owed: two chart packages built side by side cannot both land without one of them rebuilding the
+manifest, because the manifest is one generated file for every region. 112's M1 (6a02c77) writes
+the manifest too (its `open_edges:` and the build hash), so it meets the same once 106b lands.
+Whether the manifest should be one file is not for now.
