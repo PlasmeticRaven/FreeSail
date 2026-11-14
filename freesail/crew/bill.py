@@ -91,6 +91,25 @@ def on_deck(crew: Crew, clock: Any) -> list[Sailor]:
     return [s for s in crew.sailors if _on_deck(crew, s, watch, up)]
 
 
+def on_deck_piped_down(crew: Crew, clock: Any) -> list[Sailor]:
+    """The hands who would be on deck the moment the hands are piped down, in id order: the rule
+    of `on_deck` with all hands not called and nobody turned up (`Routine.pipe_down` clears
+    both), so every hand at work, the idlers by the bells and the watch on deck. The runner reads
+    it before it pipes down, for work waiting its turn that would call all hands again on the same
+    tick (package 75, the review of the lead's ruling (1) of 2026-11-10, the bilander's short
+    watch; `Runner._after_all_hands`)."""
+    when = when_of(clock)
+    watch = watch_on_deck(crew, when)
+    up = idlers_up(when)
+    out: list[Sailor] = []
+    for s in crew.sailors:
+        if s.station is Station.QUARTERDECK or not s.fit:
+            continue
+        if s.at is not None or (up if s.station is Station.IDLERS else s.watch is watch):
+            out.append(s)
+    return out
+
+
 def below(crew: Crew, clock: Any) -> list[Sailor]:
     """The hands below (the quarterdeck is neither), in id order."""
     deck = {s.id for s in on_deck(crew, clock)}

@@ -27,6 +27,9 @@
 # turn itself is the physics' to make.
 id: tack
 verb: tack
+# The work in words (`work:`), read for both forms of its name: "to tack ship", "tacking ship"
+# (the runner's one road, the lead's last list of 2026-11-14, 9; it was a rule of its own there).
+work: tack ship
 applies_to: {class: ship}
 script: tack
 preconditions:

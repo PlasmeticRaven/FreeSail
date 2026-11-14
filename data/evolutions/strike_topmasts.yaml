@@ -17,6 +17,11 @@
 #   mast   top tackles manned, swayed, the fid drawn, the mast lowered away
 id: strike_topmasts
 verb: strike_topmasts
+# The work's words, as the order to it is given (`work:`, the lead's last list of 2026-11-14, 9,
+# and the review of 0dcdb8cf, F7): "to strike the topmasts" and "striking the topmasts", the words
+# its params kept for the send-down's refusal before the one road, and its cry the same, where its
+# verb's read "strike topmasts", its id.
+work: strike the topmasts
 applies_to: {class: ship}
 script: send_down
 params:
@@ -26,13 +31,12 @@ params:
   clear_away: false
   what: topmasts
   verb_words: strike
-  doing: striking the topmasts
   first: send down the topgallant masts
   aloft: [yards, mast]
 timing:
   yards_s: 240   # topsail yards lowered on the caps, booms in (judgement)
   mast_s: 900    # top tackles, swayed, unfidded and lowered (judgement)
-on_start: {log: "Strike topmasts! Hook the top tackles."}
+on_start: {log: "Strike the topmasts! Hook the top tackles."}
 on_complete: {log: "Struck {sent}.", kind: spar.sent_down, severity: notable}
 on_fail: {log: "Could not strike the topmasts: {reason}.", kind: evolution.failed, severity: notable}
 # crew: a heavy evolution for all hands: the topmen in the tops "fid and unfid mast", the
