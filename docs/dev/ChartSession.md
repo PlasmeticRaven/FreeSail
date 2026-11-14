@@ -653,3 +653,28 @@ By the lead's ruling, in my own step after 111 merges, with the seven tracks and
 - where else a fixed step samples the chart along a line: 111's list checked against the code
   and completed, the game's own guard listed and measured, not changed.
 Then the seven tracks on that check.
+
+### 2026-11-14, 06:40: where else a fixed step samples the chart along a line (read only)
+
+Read in the code while 111's step 2b waits; nothing changed. The finest cell is level 3's
+0.5″, about 15.4 m north and south (less east and west). The steps found:
+- `lookout._dry_ground_along`: 20 m (`LAND_AHEAD_STEP_M`) within 120 m of the shore, and
+  leaps by the distance field beyond it; dry ground only.
+- `chart.line_shore` (the game's guard `ships.land_crossing`, and captains, crews, reckoning):
+  a third of a cable (61.7 m) near the shore, each point searched a cable round by
+  `nearest_shore`, so dry ground is not stepped over; depth is not tried at all.
+- `chart.shoal_ahead` (dealings 1049 and 1894, `api/readings` 2099): a cable (185.2 m) of
+  `depth_at`, the pilot's warning of the depth. Not on 111's list.
+- `dealings._leg_made`: `dangers_ahead` (charted features, no step) and then `_water_for`
+  every half cable (92.6 m).
+- `captains` 1225 (a joining mark, half cables out from the shore), `orders` 1365 (rings of
+  half cables to the nearest water), `chart.CONTOUR_STEP_M` and `reckoning`'s contour step
+  (half a mile to a cable): searches for a point, not a line's soundings.
+- `core/world.py` 2799 and `orders/station.py`'s `SAIL_STEP_M` are not chart sampling.
+Measured: the least depth on each of the 311 port track legs read at each step against 1 m.
+The worst shortfall, legs short by more than 1 m: 20 m, 3.29 m, 7; 61.7 m, 24.83 m, 13;
+92.6 m, 42.2 m, 29; 185.2 m, 57.06 m, 59. The worst of each is Messina's first leg to sea,
+where the 1 m reader touches the datum beside the quay. These are depth readings along the
+line; for `line_shore`, whose test is dry ground searched round, they are an upper bound on
+what it misses, not a measure of it. For the lead: whether `shoal_ahead` and `_leg_made` take
+the grid-tied step too, in a step of their own.
