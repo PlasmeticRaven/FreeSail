@@ -27537,6 +27537,43 @@ at 2deccd29, in its two halves for the two-hour limit: the truths and the browse
 same files alone and last (`--slow -m pace -n 0`) exit 0, 14 passed. No pin moved. The tree
 reported differs from 77c3a76b by this paragraph alone.
 
+### The third reading of 52d99b9a (2026-11-14)
+
+A third reading (`docs/dev/M7-WorkPackages.md`, "Package 60 as reported a third time at
+52d99b9a") found every mend of the second list holding by running and seven things owed;
+Mr Pearce's not weighing is not this package's (he waits for Falmouth's `leave_on: ebb`).
+Built on 52d99b9a, the trunk not merged again. Each mend has a test that fails on 52d99b9a.
+
+6. **A commit of its own (ebbad49a), measured alone**: `boats.lose_boat` left a person the
+   dealings' boat carried on any errand in no hull (`send the boat to the Sherbourne with Mr
+   Bradley`, the boat swamped): the transfer's rule serves (`transfer.boat_lost`, the nearer
+   ship by her stage of the trip; ashore, her own), said in the giver's line. Its measure is
+   below.
+1. **The depth is the chart's where she lies as she wakes** (`rides_as_she_lay` read
+   `water_depth_m` first, which a sleeping hull's far tick never refreshes: a cutter put to
+   sleep in 88.6 m let go at Falmouth "in 88.6 m").
+2. **She is judged by how she lies, and never on an awake hull**: `take_up` no longer calls the
+   mend on a hull that is awake (her plan is not kept while she is awake: the Fly under way at
+   2.8 knots was furled and anchored by the leg of the anchor); a sleeping hull's far plan is
+   kept by the far ticks, and the mend is called only as she wakes.
+3. **A part is a name only when the whole part is one**: a whole name, a surname, or a title and
+   a surname, never a part's last word; 'but', 'except', 'with' and their like refused in
+   words; a semicolon is read away by the grammar's normalising, so 'Mr Pascoe; Richd. Oliver'
+   runs together and is refused as a name nobody answers to (before, Oliver went alone).
+4. **Where no anchor can hold her she lies to** (JUDGEMENT): no sounding, no anchor to let go,
+   or more water than her cable reaches, and she wakes lying to as lying to sets her, her log
+   saying why; no anchor is marked down off the ground, and the scope is never more than the
+   cable.
+5. **A ship he has never seen** (no hull of her own, not given him) is answered as an unknown
+   name is.
+7. **Small**: a second order after the ship's name is refused as one ("One order at a time"); a
+   role is said as said ("the purser"); the prisoner's test pins his own prompt's words.
+   "Beyond the pull" stays patched, for a sounder reason than given before: two ships of his a
+   mile apart want one to sail off, and in Carrick Road the Fly weighed under plain sail takes
+   the ground on the flood before she is a mile off (probed), and a ship laid in ordinary is
+   moved to the port's anchorage (275 m from the cutter, probed); the refusal is the two ships'
+   distance against the pull's mile, patched to its figure.
+
 
 
 

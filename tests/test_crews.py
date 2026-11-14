@@ -737,6 +737,49 @@ def test_a_far_ship_riding_at_her_anchor_wakes_at_it_with_nothing_set():
     assert not [x for x in crew.log if x.kind == "captain.plan"]
 
 
+def _raven_anchored_far():
+    """The far cutter Raven riding at her anchor in Carrick Road under a rules captain bound
+    for Falmouth, asleep: (world, vessel, her hull)."""
+    w = hove_to_world()
+    falmouth = w.ports.find("Falmouth")
+    v, crew = _held_far_cutter(w, falmouth.anchorage.position)
+    assert crew.submit("come to an anchor", actor="the captain").kind == "ship.anchored"
+    assert w.world_order('ship "Raven": intent bound for Falmouth').data["result"] == "done"
+    crew.captain.seated = False
+    w._position = falmouth.anchorage.position
+    return w, v, crew
+
+
+def test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth_where_she_lies():
+    """The lead's third reading of 52d99b9a, item 1: the depth her anchor goes down in is the
+    chart's where she lies when she wakes, never a figure her sleeping hull kept from before
+    (a cutter put to sleep in 88.6 m and woken at Falmouth in 11 m let go 'in 88.6 m')."""
+    from freesail.ship.parts import ground_tackle
+
+    w, v, crew = _raven_anchored_far()
+    crew.ship.extra["water_depth_m"] = 88.6  # what she kept from the deep water she slept in
+    charted = crew.chart.depth_at(crew.position) + crew.tide_height_m
+    K.promote(w, v)
+    anchor = ground_tackle(crew.ship).riding_by()
+    assert crew.at_anchor and abs(anchor.depth_m - charted) < 0.5, (anchor.depth_m, charted)
+
+
+@pytest.mark.parametrize("charted", [None, 2000.0], ids=["no depth known", "beyond her cable"])
+def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted):
+    """The lead's third reading, item 4 (JUDGEMENT): where her far body rode at an anchor but no
+    anchor can hold her now (no depth known, or more water than her cable reaches), she wakes
+    lying to with what lying to sets, no anchor marked down, and her log says why."""
+    w, v, crew = _raven_anchored_far()
+    crew.ship.extra["water_depth_m"] = None
+    crew.chart.depth_at = lambda position: charted
+    K.promote(w, v)
+    assert not crew.at_anchor
+    lying = [x for x in crew.log if x.kind == "ship.hove_to"]
+    assert lying and "lies to" in lying[-1].text, [x.text for x in lying]
+    topsails = set(crew.ship.groups.get("topsails", []))
+    assert {s for s, x in crew.ship.sails.items() if x.is_set} <= topsails
+
+
 def test_the_far_course_for_a_port_is_laid_by_the_tracks_and_ends_at_her_anchor():
     """Package 84, step 4: `shape a course for <port>` on a sleeping hull is the planner's
     passage for it (the far brain's own way), out of the port she lies in by its track to

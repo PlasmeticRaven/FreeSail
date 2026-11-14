@@ -585,38 +585,62 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
 
 
 def rides_as_she_lay(vessel: Any, crew: Any) -> None:
-    """A far body that rode at an anchor (her plan's leg is the anchor) woken with her anchor
-    down where she lies and no sail set (package 60, the lead's second reading of 4dda3dfe: she
-    woke under sail with no near anchor down, her captain planned her passage again and she
-    drove 846 m in twenty minutes): her first anchor that can be let go, let go in the depth
-    there and veered to the scope the depth wants, brought up; every sail set furled; her way
-    taken off. Nothing where her far body was under way, or she is at anchor already."""
-    if not (vessel.plan and vessel.plan[0][0] == "anchor") or crew is None:
+    """A far body that rode at an anchor woken as she lay (package 60, the lead's second and
+    third readings of 4dda3dfe and 52d99b9a): judged by how her far body lies as she wakes
+    (riding at an anchor), and never called on a hull that is awake already; nothing done to
+    one at anchor. Every sail set is furled and her way taken off; her
+    first anchor that can be let go goes down where she lies, in the chart's depth there (never
+    a figure her sleeping hull kept), veered to the scope the depth wants and brought up.
+    Where no anchor can hold her (no depth known, no anchor to let go, or more water than her
+    cable reaches) she lies to instead, as lying to sets her, said in her log (JUDGEMENT);
+    never an anchor marked down that is not on the ground."""
+    if crew is None or getattr(crew, "at_anchor", False):
         return
-    if getattr(crew, "at_anchor", False):
+    # how her far body lies: a sleeping hull's far plan is kept by the far ticks, and the leg of
+    # the anchor is a body riding at one (`ships.Vessel.tick`); an awake hull's plan is not kept
+    # (the third reading, item 2), so this is called only as she wakes, never on her awake
+    plan = getattr(vessel, "plan", None) or []
+    if not (plan and plan[0][0] == "anchor"):
         return
+    from freesail import units
     from freesail.evolutions.scripts import _let_go, _scope_plan, can_let_go
     from freesail.ship.parts import SailState, ground_tackle
 
     ship = crew.ship
     tackle = ground_tackle(ship)
-    depth = (getattr(ship, "extra", None) or {}).get("water_depth_m")
-    if depth is None and getattr(crew, "chart", None) is not None and crew.position is not None:
-        charted = crew.chart.depth_at(crew.position)
-        tide = getattr(crew, "tide_height_m", 0.0) or 0.0
-        depth = None if charted is None else charted + tide
-    if tackle is None or depth is None:
-        return
-    anchor = next((a for a in tackle.anchors if can_let_go(a)), None)
-    if anchor is None:
+    depth = None
+    chart = getattr(crew, "chart", None)
+    if chart is not None and crew.position is not None:
+        charted = chart.depth_at(crew.position)
+        if charted is not None:
+            depth = float(charted) + float(getattr(crew, "tide_height_m", 0.0) or 0.0)
+    anchor = next((a for a in tackle.anchors if can_let_go(a)), None) if tackle else None
+    reach = units.fathoms_to_m(anchor.cable_fathoms) if anchor is not None else 0.0
+    ship.dyn.u = ship.dyn.v = 0.0
+    if anchor is None or depth is None or depth >= reach:
+        why = (
+            "no anchor to let go"
+            if anchor is None
+            else "no sounding for her anchor"
+            if depth is None
+            else "more water than her cable reaches"
+        )
+        _set_sail(crew, "lying to")
+        crew.record(
+            Severity.NOTABLE,
+            "ship.hove_to",
+            f"{vessel.name} at full detail again where her anchor cannot hold her ({why}): "
+            "she lies to.",
+            data={"id": vessel.id, "why": why},
+        )
         return
     for sail in ship.sails.values():
         if sail.is_set:
             sail.state = SailState.FURLED
-    _let_go(ship, anchor, float(depth))
-    anchor.scope_m = _scope_plan(anchor, float(depth), None)[0]
+    ship.extra["water_depth_m"] = depth
+    _let_go(ship, anchor, depth)
+    anchor.scope_m = min(_scope_plan(anchor, depth, None)[0], reach)
     anchor.brought_up = True
-    ship.dyn.u = ship.dyn.v = 0.0
     crew._far_anchored = True
 
 

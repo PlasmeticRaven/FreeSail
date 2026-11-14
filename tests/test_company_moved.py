@@ -205,14 +205,9 @@ def test_a_receiver_gone_is_said_and_the_men_come_home():
     assert str(cutter.id) not in (w.__dict__.get(HULLS_LEFT) or [])
 
 
-def test_a_ship_in_ordinary_he_is_aboard_lies_at_her_anchor_with_nothing_set():
-    """The lead's second reading of 4dda3dfe, item 3: aboard the laid-up Fly half an hour
-    before he takes command, she lies at her anchor with nothing set (before, she was stepped
-    asleep under her file's plain sail, could not be boxed off and moved 516 m); after he takes
-    command nothing is set that he did not order."""
-    from freesail.ship.parts import ground_tackle
-    from freesail.world.geo import bearing_and_distance
-
+def _aboard_the_fly_in_ordinary():
+    """(the world, the Fly's vessel, her hull): he has come aboard the Fly laid up in ordinary
+    and given him, and has not yet taken command of her."""
     w = at_anchor_in(CARRICK_ROAD)
     _wo(
         w,
@@ -231,7 +226,40 @@ def test_a_ship_in_ordinary_he_is_aboard_lies_at_her_anchor_with_nothing_set():
         w.run(60)
         if str(me.hull) == str(fly.id):
             break
-    hull = w.hulls[str(fly.id)]
+    assert str(me.hull) == str(fly.id)
+    return w, fly, w.hulls[str(fly.id)]
+
+
+def test_taking_command_of_a_ship_under_way_leaves_her_as_she_lies():
+    """The lead's third reading of 52d99b9a, item 2: an awake ship's plan is not kept, so the
+    Fly woken at her anchor and then under way (her anchor up, a sail set, two knots and more
+    through the water) still had the leg of the anchor, and `take command` furled her, let go
+    her anchor and took her way off. She is taken up as she lies."""
+    from freesail.ship.parts import AnchorState, SailState, ground_tackle
+
+    w, fly, hull = _aboard_the_fly_in_ordinary()
+    for a in ground_tackle(hull.ship).anchors:
+        if a.state is AnchorState.DOWN:
+            a.state = AnchorState.AWEIGH
+            a.ground_x = a.ground_y = None
+    jib = next(s for s in hull.ship.sails.values() if s.id == "jib")
+    jib.state = SailState.SET
+    hull.ship.dyn.u = 1.44  # 2.8 knots
+    assert not hull.at_anchor and fly.plan[0][0] == "anchor"
+    e = w.submit("take command of her, and lay the Sherbourne up")
+    assert e.kind == "ship.taken_up", e.text
+    assert not hull.at_anchor and jib.is_set and hull.ship.dyn.u > 1.0
+
+
+def test_a_ship_in_ordinary_he_is_aboard_lies_at_her_anchor_with_nothing_set():
+    """The lead's second reading of 4dda3dfe, item 3: aboard the laid-up Fly half an hour
+    before he takes command, she lies at her anchor with nothing set (before, she was stepped
+    asleep under her file's plain sail, could not be boxed off and moved 516 m); after he takes
+    command nothing is set that he did not order."""
+    from freesail.ship.parts import ground_tackle
+    from freesail.world.geo import bearing_and_distance
+
+    w, fly, hull = _aboard_the_fly_in_ordinary()
 
     def set_sails():
         return [s for s, x in hull.ship.sails.items() if x.is_set]
@@ -347,6 +375,55 @@ def test_a_person_in_a_boat_lost_on_an_errand_to_another_ship_is_picked_up():
     assert str(bradley.hull) == str(fly.id) and not bradley.dead
     lost = [x for x in fly.log if x.kind == "boat.lost"][-1].text
     assert "Mr Bradley picked up by her own side" in lost, lost
+
+
+def test_a_part_of_the_list_is_a_name_only_when_the_whole_part_is_one():
+    """The lead's third reading of 52d99b9a, item 3: 'all the people but Mr Pascoe' and 'Mr
+    Pascoe with Richd. Oliver' are refused in words (before, the first sent Mr Pascoe alone and
+    the second Oliver alone); 'Mr Pascoe; Richd. Oliver' (its semicolon read away by the
+    grammar) is refused as one name nobody answers to; a name is a whole name, a surname, or a
+    title and a surname, never a part's last word."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    hands = len(TR._hands(cutter))
+    for order, word in (
+        ("transfer all the people but Mr Pascoe from the Sherbourne to the Fly", "but"),
+        ("transfer Mr Pascoe with Richd. Oliver from the Sherbourne to the Fly", "with"),
+    ):
+        e = w.submit(order)
+        assert e.kind == "order.rejected" and f"takes no '{word}'" in e.text, e.text
+    e = w.submit("transfer the Sherbourne's cook Oliver from the Sherbourne to the Fly")
+    assert e.kind == "order.rejected" and "answers to" in e.text, e.text
+    assert len(TR._hands(cutter)) == hands and not cutter.dealings.boat.away
+    # the semicolon is read away before the order reaches the list (the grammar's normalising),
+    # so the two names run together as one, and nobody answers to it: refused, not Oliver alone
+    e = w.submit("transfer Mr Pascoe; Richd. Oliver from the Sherbourne to the Fly")
+    assert e.kind == "order.rejected" and "answers to" in e.text, e.text
+    assert len(TR._hands(cutter)) == hands and not cutter.dealings.boat.away
+
+
+def test_the_small_words_of_the_third_reading():
+    """Item 7: a second order after the ship's name is refused as one ('the Fly, Then Muster'
+    was read as a name); a role nobody answers to is said as said ('the cook'); the prisoner is
+    refused by his own prompt, in its words; and item 5: a ship he has never seen, with no hull
+    of her own and not given him, is answered as an unknown name is."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    e = w.submit("transfer two hands to the Sherbourne, then muster")
+    assert e.kind == "order.rejected" and "One order at a time" in e.text, e.text
+    assert "Then Muster" not in e.text
+    e = w.submit("transfer the purser to the Sherbourne")
+    assert e.kind == "order.rejected" and "answers to 'the purser'" in e.text, e.text
+    _wo(
+        w,
+        'ship: a brig "Distant" of Britain at 49 00 N 6 30 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    w.run(60)
+    e = w.submit("transfer two hands to the Distant")
+    assert "You know of no ship called the Distant hereabouts." in e.text, e.text
+    me.confined_to = "the hold"
+    e = w.submit("transfer two hands to the Sherbourne")
+    assert e.kind == "order.rejected" and "You are a prisoner aboard the Fly" in e.text, e.text
+    me.confined_to = ""
 
 
 def _came_aboard(hull, since=0):
@@ -560,9 +637,7 @@ def test_a_ships_name_is_answered_in_the_orders_own_words():
     w.run(60)
     assert w.sea_vessels.find("Distant").crew is None
     e = w.submit("transfer two hands to the Distant")
-    assert e.kind == "order.rejected" and "The Distant lies beyond a boat's reach of you." in (
-        e.text
-    ), e.text
+    assert e.kind == "order.rejected" and "no ship called the Distant" in e.text, e.text
     with pytest.raises(OrderError, match="^You command no ship here"):
         ship_for_him(types.SimpleNamespace(observed=True), "the Fly")
     assert ship_for_him(w, "the ship") is fly and ship_for_him(w, "Fly") is fly
@@ -588,7 +663,7 @@ def test_the_refusals_played_by_the_order():
     assert e.kind == "order.rejected" and "The Hind is not yours to man" in e.text, e.text
     me.confined_to = "the hold"
     e = w.submit("transfer two hands to the Sherbourne")
-    assert e.kind == "order.rejected", e.text
+    assert e.kind == "order.rejected" and "You are a prisoner aboard the Fly" in e.text, e.text
     me.confined_to = ""
     assert (len(TR._hands(cutter)), len(TR._hands(fly))) == was
 

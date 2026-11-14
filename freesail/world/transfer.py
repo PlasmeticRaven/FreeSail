@@ -179,8 +179,17 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
     numbers (`orders.numbers`)."""
     from freesail.orders import numbers
 
-    text = " ".join(str(words).replace(",", " , ").split())
+    text = " ".join(str(words).replace(";", ",").replace(",", " , ").split())
     parts = [p.strip() for p in _split_and(text) if p.strip()]
+    for part in parts:
+        # the list reads names and counts joined by commas and 'and' alone (the lead's third
+        # reading of 52d99b9a, item 3): a word that would make it say otherwise is refused
+        said = next((w for w in part.lower().split() if w in _NOT_A_LIST), "")
+        if said:
+            raise TransferError(
+                f"'{part}': the order reads names and counts joined by commas and 'and', and "
+                f"takes no '{said}'; name those who go."
+            )
     every, by_rating, count, rest = False, {}, 0, []
     for part in parts:
         low = part.lower()
@@ -207,6 +216,12 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
             )
         rest.append(part)
     return every, by_rating, count, rest
+
+
+# The titles a surname may be said with.
+_TITLES = frozenset({"mr", "mister", "mrs", "miss", "captain", "lieutenant", "doctor", "dr"})
+# Words that would make a list of names say something it does not read: refused in words.
+_NOT_A_LIST = frozenset({"but", "except", "excepting", "save", "with", "without", "besides"})
 
 
 def _split_and(text: str) -> list[str]:
@@ -634,13 +649,20 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
 
 
 def _answers_to(person: Any, key: str) -> bool:
-    """A name as said ('Mr Pascoe', 'Richd. Oliver', 'Oliver') or a role ('the boatswain'):
-    the stops of a name's contraction read away on both sides."""
+    """A name as said, whole ('Mr Pascoe', 'Richd. Oliver', 'Oliver', 'Mr Oliver') or a role
+    ('the boatswain'): the stops of a name's contraction read away on both sides."""
     name = " ".join(str(getattr(person, "name", "")).lower().replace(".", " ").split())
     role = str(getattr(person, "role", "")).lower()
     key = " ".join(key.replace(".", " ").split())
-    bare = key.removeprefix("the ")
-    return key == name or bare == role or (len(key) > 3 and name.endswith(" " + key.split()[-1]))
+    if not key or not name:
+        return False
+    if key == name or key.removeprefix("the ") == role:
+        return True
+    # his surname alone, or with a title: the whole part one name (the third reading, item 3:
+    # a part matched by its last word moved the wrong man)
+    surname = name.split()[-1]
+    words = key.split()
+    return words == [surname] or (len(words) == 2 and words[0] in _TITLES and words[1] == surname)
 
 
 def _draw(
@@ -731,6 +753,8 @@ def _count_words(n: int, what: str = "hand") -> str:
 
 def _as_a_name(words: str) -> str:
     """The order's words (normalised to the lower case) said as a name: 'Mr Nobody'."""
+    if words.lower().startswith("the "):
+        return words.lower()  # a role, as said: 'the cook'
     small = {"the", "of", "and", "a", "an"}
     return " ".join(w if w in small else w[:1].upper() + w[1:] for w in words.split())
 

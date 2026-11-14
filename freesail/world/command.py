@@ -320,14 +320,15 @@ def _woken_at_her_anchor(root: Any, hull: Any, vessel: Any) -> None:
     """The ship he takes up woken at once, if she sleeps in the far shape (the player's own
     ship is awake always, and `crews.switch` wakes no hull that is his: the lead's reading of
     ab0ade58, item 1), riding as her far body lay (`crews.rides_as_she_lay`: at her anchor
-    where it rode at one, nothing set)."""
+    where it rode at one, nothing set); an awake hull as she lies."""
     from freesail.world import crews
 
     crew = getattr(vessel, "crew", None)
     if crew is not None and not getattr(crew, "awake", True):
         crews.promote(root, vessel)
-    else:
-        crews.rides_as_she_lay(vessel, crew)
+    # an awake hull is taken up as she lies, at anchor or under way (the third reading of
+    # 52d99b9a, item 2: her plan is not kept while she is awake, and a ship making way was
+    # furled and anchored by it)
 
 
 def _seat_follows(root: Any, person: Any, hull: Any) -> None:

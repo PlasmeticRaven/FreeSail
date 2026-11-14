@@ -146,7 +146,15 @@ def _transfer(ship: Any, order: Order) -> Result:
     def named(words: str) -> Any:
         return ship_for_him(root, words)
 
-    receiver = named(m.group("to"))
+    to = m.group("to")
+    if "," in to:
+        # a second order after the ship's name (the third reading, item 7: "the Fly, Then
+        # Muster" read as a name): one order at a time
+        ship_words, rest = (x.strip() for x in to.split(",", 1))
+        raise OrderError(
+            f"One order at a time: '... to {ship_words}', and then '{rest}' as an order of its own."
+        )
+    receiver = named(to)
     giver = named(m.group("giver")) if m.group("giver") else None
     lay = m.group("lay")
     if lay:
@@ -193,9 +201,17 @@ def ship_for_him(root: Any, words: str) -> Any:
     if vessel is None:
         vessel = vessel_in_sight(root, said)
     name = " ".join(w[:1].upper() + w[1:] for w in key.split()) or "that ship"
+    unknown = f"You know of no ship called the {name} hereabouts."
     if vessel is None or vessel.done:
-        raise OrderError(f"You know of no ship called the {name} hereabouts.")
+        raise OrderError(unknown)
     if vessel.crew is None:
+        # a ship with no hull of her own has never been near him (never boarded, met or in
+        # sight long enough to be woken): answered as an unknown name is, unless she is one
+        # given him (the lead's third reading of 52d99b9a, item 5)
+        from freesail.world.command import given_to
+
+        if not given_to(root, str(vessel.id)):
+            raise OrderError(unknown)
         raise OrderError(f"The {vessel.name} lies beyond a boat's reach of you.")
     return vessel.crew
 
