@@ -1,4 +1,4 @@
-import sys; sys.path.insert(0, "/home/user/FreeSail")
+import sys; sys.path.insert(0, ".")  # run from the repository root
 from freesail.world.scenarios import load_scenario, make_scenario_world, begin
 from freesail.combat.guns import battery_of
 sf = load_scenario("data/scenarios/first-action.yaml")

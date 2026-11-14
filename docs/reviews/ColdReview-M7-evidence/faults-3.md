@@ -290,3 +290,27 @@ None), so both of its east/west conditions are False pristine and faulty alike. 
 elsewhere: `test_reckoning.py::test_the_dialect_reads_the_new_rows_for_nothing` fails,
 `AssertionError: the reckoning is west of 5 W` / `assert False is True`.
 **SURVIVED** for the named test; caught by the suite.
+
+## 07-6 Every keyed fetch of a picture answers 404
+
+| 07-6 | test_mcp_server.py::test_the_chart_and_the_ships_view_come_as_images_drawn_by_the_open_page | `pic = None` in `Desk.picture` | pass | KILLED | 3 |
+
+```
+--- mut/freesail/agents/remote.py
++++ freesail/agents/remote.py
+@@ -1280,7 +1280,7 @@
+             painter = pictures.painter_of(self.world())
+-        pic = painter.get(str(picture_id)) if painter is not None else None
++        pic = None  # FAULT: painter.get(str(picture_id)) if painter is not None else None
+         if pic is None:
+```
+
+The test fails: `assert len(images) == 1 and images[0].mime_type == "image/png"` /
+`assert (0 == 1)` (`tests/test_mcp_server.py:1331`). The reader thought only the no-key 409
+at the end touched this road; in fact the MCP bridge itself fetches the picture it returns
+through that door (`freesail/agents/mcp_server.py:458` -> `game.picture` ->
+`freesail/agents/remote.py:1733`, `GET /api/agents/{name}/picture/{id}` ->
+`freesail/ui/server.py:1124` -> `desk.picture`), so the chart and the ship's view come back
+with no image. (Pristine, a keyed fetch appended to the test answers 200 with the PNG; with
+the fault the copy fails before reaching it, at the same assertion.) **KILLED**: the
+reader's claim is refused.

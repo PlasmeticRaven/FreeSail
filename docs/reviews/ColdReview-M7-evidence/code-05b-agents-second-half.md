@@ -9,7 +9,7 @@ The tree is checked out at 89a6f72. `git diff --stat 504a2506..HEAD -- freesail 
 - `tools.py`: 1-760, 1150-1600, 1600-1932 (the table) and 2100-3253 (books, the library's pages, the grammar, the standing dialect).
 - `agent.py`: 1-300 and 1276-2245 (every station brief and its factory, places, the voyage words, the brief's shared words).
 - `local.py`: 774-870 and 1250-1660 (the budget, `main`, `run`).
-- `api.py`: 540-1236 (the messages, the request, the reply, OpenRouter, `main`).
+- `api.py`: 540-1236 (the messages, the request, the reply, the second vendor's subclass, `main`).
 - `mcp_server.py`: 1239-1467 (the tool wrapper, `build_server`, `main`).
 - `remote.py`: 262-417 and 1250-1754 (the seat, the library and stations endpoints, `GameClient`).
 - `docs/agents/Harness.md`: sections 8-15, 20-21b and 22, sampled, with greps over the rest.

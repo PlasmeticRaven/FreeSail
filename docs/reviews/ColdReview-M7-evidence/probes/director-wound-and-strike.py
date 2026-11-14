@@ -1,4 +1,4 @@
-import sys; sys.path.insert(0, "/home/user/FreeSail")
+import sys; sys.path.insert(0, ".")  # run from the repository root
 from tests.test_director import directed
 from freesail.agents import director as D
 from freesail.core.events import for_the_record

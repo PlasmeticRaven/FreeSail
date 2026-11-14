@@ -1,4 +1,4 @@
-import sys; sys.path.insert(0, "/home/user/FreeSail/tests"); sys.path.insert(0, "/home/user/FreeSail")
+import sys; sys.path.insert(0, "tests"); sys.path.insert(0, ".")  # run from the repository root
 from test_fishing import world_at
 from freesail.world.squadrons import Squadron
 from freesail.world.captains import read_intent

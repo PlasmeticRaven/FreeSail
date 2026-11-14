@@ -245,3 +245,64 @@ Output: 1 passed (its check is `lambda: True`). The reader's second prediction h
 test_damage_control.py::test_the_ground_leak_is_caulked_by_the_carpenter_in_his_hours passes
 too (19.8 s). Caught elsewhere: test_water.py::test_the_directors_causes_act_through_the_keeper_and_the_pumped_out_form_is_doubted
 fails at :253 (`where False = any(...)`, 5.9 s). SURVIVED (the named test).
+
+## tests-04, the faults its reader said no test would catch
+
+| # | Tests run | Fault | Baseline | Result | s |
+|---|---|---|---|---|---|
+| 04-A | four (below) | back and fill `cycles: 2` to `cycles: 0` | pass (the xfail: xfail) | SURVIVED (all four) | 1.3 to 4.8 each |
+| 04-B | test_scenarios.py::test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_otherwise; test_captain.py::test_the_console_and_the_server_take_the_seat_flag | the server's `seat_player` call dropped | pass | KILLED (the first) | 6.8; 1.1 |
+| 04-C | four (below) | the pilot's news written to the papers under `port.id` | pass | SURVIVED (all four) | 8.3 to 22.5 each |
+
+### 04-A: back and fill ends short
+
+```diff
+-  cycles: 2       # back and fill this many times, then lie to aback
++  cycles: 0       # back and fill this many times, then lie to aback
+```
+(`data/evolutions/back_and_fill.yaml:21`.) Live, on test_catalogue.py's own frigate world and
+orders: "Backed the main topsail" 2 lines and "Filled" 1 with the fault, 3 and 2 without. (So
+`cycles: 0` does not end the evolution at once, as the reader said: it ends a cycle short; the
+script reads the figure loosely. Not chased further.) Tests chosen by
+`grep "back and fill\|back_and_fill" tests/`, run: test_catalogue.py
+`::test_backing_and_filling_keeps_her_place_and_leaves_her_lying_to` (strict xfail: `x` both
+ways, so it stays an expected failure), `::test_whole_ship_orders_start_their_evolution[back and fill-back_and_fill]`,
+test_settee.py `::test_the_untried_manoeuvres_each_run_to_an_end[back and fill-ship.hove_to-None]`,
+test_bowsprit_yards.py `::test_backing_and_filling_their_sails_are_hauled_up`. All passed.
+SURVIVED.
+
+### 04-B: `--seat` at the browser
+
+```diff
+     if seat:
+         from freesail.agents.seat import seat_player
+-
+-        seat_player(world, seat, door="browser")
+```
+(`freesail/ui/server.py:1834-1836`.) test_scenarios.py::test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_otherwise:
+```
+E       AttributeError: 'NoneType' object has no attribute 'station'
+tests/test_scenarios.py:288: AttributeError
+```
+KILLED: the reader's claim is refuted (the test is outside his files; it seats the player
+through the server's `prepare_game`). test_captain.py's flag test passes. But the same
+test's name says "at either driver" and it drives only the server: with 04-4's console fault
+planted again it passes (7.5 s), so 04-4 stands; no test runs the console's seating.
+
+### 04-C: the pilot's news under the wrong port name
+
+```diff
+-                for line in papers.news_heard(f"the pilot off {port.name}"):
++                for line in papers.news_heard(f"the pilot off {port.id}"):
+```
+(`freesail/world/dealings.py:865`.) Live (the 04-2 boarding): the paper reads "by the pilot off
+falmouth" (the id) for "by the pilot off Falmouth". Tests chosen by grep for `pilot off`,
+`news_heard`, `port.news` and run: test_date_and_war.py
+`::test_the_war_is_what_the_ship_knows_never_the_worlds_table` (9.0 s),
+`::test_the_pilots_news_enters_what_it_changed_in_the_papers` (8.3 s),
+test_known_truths.py `::test_truth_7_241_the_war_is_what_the_ship_knows_and_the_news_is_entered_in_her_papers`
+(11.2 s), test_ports.py `::test_the_pilot_comes_off_in_his_cutter_hails_boards_and_is_a_person_aboard`
+(22.5 s). All passed: each that reads the papers calls `news_heard` with the literal "the pilot
+off Falmouth" itself, and the one that boards the pilot never changes the war first, so the hook's
+loop has nothing to write. Taken with 04-2: the hook that puts the pilot's news in the papers is
+run by no test with anything to write. SURVIVED.

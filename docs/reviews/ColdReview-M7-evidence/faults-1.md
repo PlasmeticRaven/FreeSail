@@ -18,6 +18,8 @@ under (b), "n" = the reader's "no test would catch".
 | A-b5 | test_known_truths.py::test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_it_takes | `Quarters.lend` frees the hands to the tack but each still counts at his gun (guns stay 176 of 176 manned through the tack) | pass | SURVIVED | 14 |
 | A-n3 | test_bellerophon.py::test_robbing_on_a_ship_with_no_lower_deck_is_as_it_was, ::test_robbing_by_deck_takes_the_shut_lower_deck_first_and_the_lower_deck_last (2 cases), ::test_robbing_past_every_gun_says_the_marines_last_with_one_and; test_hands.py::test_short_handed_arithmetic; (and 7-136 above) | guns at full crew while the tack takes their hands (the A-b5 plant) | pass | SURVIVED (all) | 20 |
 | A-b2 | test_known_truths.py::test_truth_50_at_three_hundred_times_the_log_shows_hourly_rollups_and_every_notable_line | `events.kept` keeps only urgent lines: notable lines rolled up at 300x | pass | SURVIVED | 223 |
+| A-b6 | test_known_truths.py::test_truth_7_138_the_pace_with_two_crewed_cutters_in_action_holds_the_crewed_floor | 4 ms sleep after each crewed hull's tick (pace 425 to 148 ticks/s) | pass | SURVIVED | 37 |
+| A-n1 | test_known_truths.py::test_truth_51_..._ticks_at_the_build_machines_floor, ::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor, ::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor, ::test_the_pace_at_the_merchant_passages_start_with_the_dozen_ships_holds_truth_51s_floor | 0.6 ms sleep at the head of `World.tick` | pass (558, 569, 528, 942 ticks/s) | KILLED (3 of 4; the merchant passage passed at 514) | 55 |
 
 ## A-b1. Truth 52: the squall that never passes
 
@@ -164,3 +166,57 @@ oracle is the function under test: `assert lines == [e for e in log if kept(e)]`
 other assertion (hours, counts, `sum(r.count) + len(lines) == len(log)`) holds whatever
 `kept` lets through. Its second assertion would reject a routine line shown, never a notable
 line hidden.
+
+## A-b6. Truth 7-138: the crewed pace cut to a third
+
+```diff
+--- mut/freesail/world/ships.py
++++ m/1/freesail/world/ships.py
+@@ -1868,6 +1868,7 @@
+             # her tick is the World's own with her current (package 84, step 6)
+             with world.as_hull(crew):
+                 world.tick()
++            import time; time.sleep(0.004)
+             mirror(v, crew, minute)
+```
+
+Live: with a temporary print of `best` added to the test copy (then restored), the best of
+three thousands was 148 ticks a second with the fault against 425 pristine (the machine
+shared with other runners; the docstring's 538 was measured alone).
+
+Output: `.  [100%]` (1 passed). SURVIVED. The floor is `crews.CREWED_FLOOR_TICKS_S = 60.0`
+(freesail/world/crews.py:99), set for three crewed ships; with two, a loss of two thirds of
+the pace passes. The pace would have to fall below a seventh of what was measured to fail.
+
+## A-n1. The whole game slower by 0.6 ms a tick
+
+```diff
+--- mut/freesail/core/world.py
++++ m/1/freesail/core/world.py
+@@ -2336,6 +2336,7 @@
+         current, from `Vessels.tick_crews`, in the order a crewed World's ran)."""
++        import time; time.sleep(0.0006)
+         followed = self.is_followed
+```
+
+A `print("BEST", best)` was put before each `assert best >= BUILD_MACHINE_FLOOR` of the test
+copy for both runs (the assertion untouched; the file restored after). Pristine, on this
+machine shared with three other runners: 558, 569, 528 and 942 ticks a second, against the
+floor of 500 (tests/test_known_truths.py:2163), not the 843 to 1000 the reader quotes.
+Faulted: 379, 379, 361 and 514.
+
+Output, the first of three alike:
+```
+E       AssertionError: 379 ticks a second
+E       assert 378.7558885490308 >= 500.0
+tests/test_known_truths.py:2181: AssertionError
+```
+KILLED by truth 51, the day under systems and the gate's day with the region; the merchant
+passage's start passed at 514 (from 942, a loss of 45 per cent). The kill is the load's as
+much as the fault's: the pristine figures were within 6 to 14 per cent of the floor here, so
+on the build machine alone at the figures the reader quotes (843 to 1000), the same 0.6 ms
+gives about 560 to 625 and would pass, as the reader said. The fifth floor,
+`test_the_pace_on_the_passage_holds_truth_51s_floor` (it needs the `gate_5b_passage` fixture),
+was not run. By these figures the floors would pass a third of the pace lost on a quiet
+machine, and an unchanged game came within 6 per cent of failing on a busy one: they measure
+the machine more than the game.
