@@ -738,3 +738,29 @@ has for its lists.
 The lead asked me to read the cold review's pages for the owner and its F2.2, 6.2 and 6.4. The
 read of `docs/reviews/` was refused in this session, as the standing rule has it. I have asked
 the lead to send what touches the chart through them.
+
+### 2026-11-14, 07:30: the cold review's points on the chart, through the lead
+
+These are the lead's words for the reviewer's points; I have not read the review myself. They
+change nothing in the steps in flight, and none of them is briefed.
+
+What the review says of the chart and its ports:
+- Most of the repository is binary tiles in plain git, so a clone is about a gigabyte.
+- Every world loads all twenty regions and all 121 ports; building one takes 6 to 11 s.
+- The ports are thin beside their number: no repair yard and no crew pool, and the market has
+  no demand.
+- Many port keys are read by nothing: the datum, the establishment, the currency and the
+  roads' bottoms.
+- The known-faults list holds 142 entries.
+- The tide has three constituents and no diurnal ones, and serves the open ocean from the
+  Channel's eleven gauges.
+- The coarse layers' level is counted twice.
+- The tracks follow the land, not sounded channels; 24 ports cannot be entered.
+- Region bounds are read by several loaders, and the weather boxes copy them by hand.
+- One stream area names a region that does not exist.
+- The audit keeps its own copy of the tide's blend, without the seam taper.
+- No schema refuses an unknown key.
+
+In closing 112 and 106b, take any cheap way a step in hand avoids making one of these worse,
+and say so. Two examples: rebuild no tile that does not need it (M1's "commit only tiles whose
+arrays change" already does this), and add no key that nothing reads.
