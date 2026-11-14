@@ -71,7 +71,10 @@ says ``belays: true``: tack, wear, box-haul, lie a-try) also belays the step-lis
 work in hand, which holds its progress and resumes, hands permitting, when the
 all-hands work is done: the owner's ruling of 2026-09-29 at gate 4c (spec M3 §3.4).
 Sending down the topgallant masts belays the work on those masts' sails
-alone, which it clears away (`Script.clears`).
+alone, which it clears away (`Script.clears`). Work so held, and work a post leaves under
+half its hands (package 75, the lead's ruling 11), takes one road (`Runner._hold`) and is
+taken up again where it stood (`Runner._try_resume`): the file's `requires` read again, a
+script's own check, which is the beginning's, never (the lead's (C1) and (C6) of 2026-11-14).
 Who is on deck is the
 watch bill's question (``crew/bill.py``), asked at ``Runner.clock``; the
 composer sets that to the World's clock, and without it the bill is read at
@@ -791,9 +794,24 @@ class Runner:
         return expr.Env(names, functions)
 
     def _failing_condition(
-        self, ship: Ship, inst: Instance, conditions: list[registry.Condition]
+        self,
+        ship: Ship,
+        inst: Instance,
+        conditions: list[registry.Condition],
+        begun: bool = False,
     ) -> str | None:
-        """The reason (in words) of the first condition that does not hold, else None."""
+        """The reason (in words) of the first condition that does not hold, else None.
+
+        A script's own check (`Script.check`) is read with them as the work begins, and never
+        once it has begun (`begun`: the next step of a step list, work held and taken up again,
+        `_try_resume`). The check is the beginning's: it reads the world as the work finds it and
+        lays its plan from it (the veer's target from the scope out, the kedge's boat and hawser),
+        and the work's own going makes it false (the boat away with the kedge, the scope veered).
+        Read again on a resume it refused work that was half done ("Could not lay out the kedge:
+        the long-boat is away.") and laid a new plan over the old (a veer of twenty fathoms to
+        fifty-eight where fifty-six were ordered): work paused and begun again as if new (the
+        lead's (C1) of 2026-11-14). The file's `requires` hold through the work and are read
+        whenever it goes on."""
         env = self._env(ship, inst)
         inst.done_already = False
         for cond in conditions:
@@ -804,7 +822,7 @@ class Runner:
             if not ok:
                 inst.done_already = cond.done
                 return self._format(inst, cond.reason)
-        if inst.script is not None:
+        if inst.script is not None and not begun:
             return inst.script.check(self._format_context(inst))
         return None
 
@@ -891,10 +909,11 @@ class Runner:
         let_go = 0
         for s in self._posts_at_work(crew):
             work = next((i for i in self.instances if i.inst_id == s.at), None)
-            away = work is not None and getattr(work.script, "crew_away", False)
-            let_go += self._post_off(
-                ship, crew, s, work, None if away else reason, manoeuvre.evo.id
-            )
+            if work is not None and getattr(work.script, "crew_away", False):
+                let_go += self._post_off(ship, crew, s, work, None, manoeuvre.evo.id)
+                continue
+            gone = f"the {s.post} to the conn for {self._doing(manoeuvre)}"
+            let_go += self._post_off(ship, crew, s, work, reason, manoeuvre.evo.id, gone)
         return let_go
 
     @staticmethod
@@ -914,39 +933,58 @@ class Runner:
         work: Instance | None,
         reason: str | None,
         cause: str,
+        gone: str | None = None,
     ) -> int:
         """Take a post who works with the watch off the work they hold (the lead's ruling 11 of
         2026-11-13, and the review's mends of it): the work goes on short, or, under half its
-        hands, is held as belayed work is until hands come (`_try_resume`), said by the belayed
-        line with `reason`. With `reason` None (the boat or the kedge away from her side,
-        `Script.crew_away`) the post stays aboard and the work goes on with the rest whatever
-        their share, never held away from the ship. Returns how many hands the held work let
-        go."""
+        hands, is held as belayed work is until hands come (`_hold`, the pause's one road, taken
+        up again where it stood by `_try_resume`), said by the belayed line with `reason`. With
+        `reason` None (the boat or the kedge away from her side, `Script.crew_away`) the post
+        stays aboard and the work goes on with the rest whatever their share, never held away from
+        the ship. Where the work goes on short the post's leaving is said in the short line's
+        words with `gone` ("Only four hands to the foresail; the master gone below.": the
+        lead's (C3) of 2026-11-14), `reason` where `gone` is not given, "the master stays aboard"
+        for the boat. Returns how many hands the held work let go."""
         post.at = None
         a = work.assignment if work is not None else None
         if work is None or a is None:
             return 0
         a.hands[:] = [h for h in a.hands if h is not post]
         if reason is not None and a.got < a.wanted * hands.SHORT_HANDED_SHARE:
-            work.paused = True
-            let_go = hands.release(crew, work.inst_id)
-            work.assignment = None
-            ship.note(
-                "notable",
-                "evolution.belayed",
-                f"Belayed {self._doing(work)}: {reason}.",
-                work.subject_id,
-                {
-                    "evolution": work.evo.id,
-                    "subject": work.subject_id,
-                    "for": cause,
-                    "post": post.post,
-                },
-            )
-            return len(let_go)
+            return self._hold(ship, crew, work, reason, {"for": cause, "post": post.post})
         if a.outcome == hands.ENOUGH and a.got < a.wanted:
             a.outcome = hands.SHORT
+        said = gone or reason or f"the {post.post} stays aboard"
+        n = a.got
+        text = (
+            f"Only {number_words(n)} hand{'s' if n != 1 else ''} to {self._target(work)}; {said}."
+        )
+        data = {**self._hands_data(work, a), "for": cause, "post": post.post}
+        ship.note("routine", "evolution.short_handed", text, work.subject_id, data)
         return 0
+
+    def _hold(
+        self, ship: Ship, crew: Crew, work: Instance, reason: str, data: dict[str, Any]
+    ) -> int:
+        """The pause's one road (the lead's (C6) of 2026-11-14): work in hand held, its progress
+        kept and its hands let go, said ("Belayed setting the fore topsail: stations for tacking
+        ship.", "Belayed setting the foresail: the master gone below."), and taken up again
+        where it stood when hands come (`_try_resume`). Taken by a manoeuvre's belay of the
+        step-list work in hand (decision 25, the owner's ruling of 2026-09-29 at gate 4c;
+        `_call_all_hands`) and by a post's leaving work, step-list or scripted, under half its
+        hands (the lead's ruling 11 of 2026-11-13; `_post_off`). Returns how many hands it let
+        go."""
+        work.paused = True
+        let_go = hands.release(crew, work.inst_id)
+        work.assignment = None
+        ship.note(
+            "notable",
+            "evolution.belayed",
+            f"Belayed {self._doing(work)}: {reason}.",
+            work.subject_id,
+            {"evolution": work.evo.id, "subject": work.subject_id, **data},
+        )
+        return len(let_go)
 
     def _posts_off_the_work(self, ship: Ship, crew: Crew) -> None:
         """Each tick, before the work is ticked: a post's hand never outlasts what counted it
@@ -1031,7 +1069,7 @@ class Runner:
             if step is None:
                 self._complete(ship, inst)
                 return
-            reason = self._failing_condition(ship, inst, inst.evo.requires)
+            reason = self._failing_condition(ship, inst, inst.evo.requires, begun=True)
             if reason is not None:
                 self._fail(ship, inst, reason)
                 return
@@ -1746,16 +1784,7 @@ class Runner:
                 continue  # two all-hands evolutions serialise by their holds, as before
             if not self._belays(inst, other):
                 continue
-            other.paused = True
-            hands.release(crew, other.inst_id)
-            other.assignment = None
-            ship.note(
-                "notable",
-                "evolution.belayed",
-                f"Belayed {self._doing(other)}: {reason}.",
-                other.subject_id,
-                {"evolution": other.evo.id, "subject": other.subject_id, "for": inst.evo.id},
-            )
+            self._hold(ship, crew, other, reason, {"for": inst.evo.id})
 
     @staticmethod
     def _belays(inst: Instance, other: Instance) -> bool:
@@ -1785,8 +1814,11 @@ class Runner:
         if got.outcome == hands.TOO_FEW:
             return
         # The world moved while the work lay belayed: a hoist half done must not finish
-        # on a yard that has since been sent down (package 19's finding).
-        reason = self._failing_condition(ship, inst, inst.evo.requires)
+        # on a yard that has since been sent down (package 19's finding). What the work's
+        # beginning read (a script's own check: the kedge's boat in the ship, the veer's scope
+        # and its target from it) is not read again: the work is taken up where it stood, not
+        # begun again (the lead's (C1) of 2026-11-14; `_failing_condition`'s `begun`).
+        reason = self._failing_condition(ship, inst, inst.evo.requires, begun=True)
         if reason is not None:
             hands.release(crew, inst.inst_id)
             self._fail(ship, inst, reason)
@@ -1932,7 +1964,14 @@ class Runner:
         return f"the {part_name(self.ship, inst.subject_id)}"
 
     def _doing(self, inst: Instance) -> str:
-        """The work in hand: 'setting the fore topsail', 'tacking ship'."""
+        """The work in hand: 'setting the fore topsail', 'tacking ship', and for work on the ship
+        whose file names it (`registry.Evolution.doing`) that name: 'laying out the kedge', where
+        the verb's gerund was the id with an ending, 'laying out kedge' (the lead's (C8) of
+        2026-11-14). Every reader of the work in hand's name reads it here: the belayed lines,
+        the captain's belay and its listing, the work the rest are at, the readings."""
+        doing = getattr(inst.evo, "doing", None)
+        if doing and isinstance(inst.subject, Ship):
+            return doing
         first, _, rest = self._describe(inst).partition(" ")
         return f"{gerund(first)} {rest}".strip()
 

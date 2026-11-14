@@ -6,6 +6,7 @@
 # down` the other.
 id: secure_guns
 verb: secure_guns
+doing: securing the guns
 applies_to: {class: ship}
 script: secure_guns
 preconditions: []

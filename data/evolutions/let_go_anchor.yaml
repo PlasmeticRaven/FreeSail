@@ -27,6 +27,7 @@
 # as it goes, and the World says "Brought up" when she is (core/world.py).
 id: let_go_anchor
 verb: let_go_anchor
+doing: letting go the anchor
 applies_to: {class: ship}
 script: let_go_anchor
 params: {anchor: null, fathoms: null}

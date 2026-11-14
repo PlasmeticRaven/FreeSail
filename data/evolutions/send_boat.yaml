@@ -31,6 +31,7 @@
 # up only until she is manned, not for her whole errand as the settee's `all hands` keeps them.
 id: send_boat
 verb: send_boat
+doing: sending the boat
 applies_to: {class: ship}
 script: send_boat
 params: {errand: prices, port: null}

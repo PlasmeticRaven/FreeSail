@@ -2031,7 +2031,7 @@ _WORK_KINDS = (
     ("heaving in", "her anchor coming up"),
     ("heaving short", "her anchor coming up"),
     ("getting under way", "her anchor coming up"),
-    ("sending boat", "a boat hoisting out or in"),
+    ("sending the boat", "a boat hoisting out or in"),
     ("shooting the trawl", "the hands at the trawl"),
     ("hauling the trawl", "the hands at the trawl"),
     ("shooting the nets", "the hands at the nets"),
