@@ -843,6 +843,19 @@ CORRIDORS: dict[str, dict[str, Any]] = {
         "folder": "tiles/1/atlantic-south",
         "beside": "atlantic-corridor",
     },
+    # package 112: the ocean carried south from the Canaries' row to the Cape Verde
+    # Islands' (12.4 to 25.2 N), from the column from 26.4 W (Santo Antao's west point is
+    # 25.36 W) to the African coast; it shares no tile with the layers before it
+    "atlantic-verde": {
+        "title": "The ocean south: the Canaries' row to the Cape Verde Islands",
+        "level": 1,
+        "bounds": {"south": 12.4001, "north": 25.1999, "west": -26.3999, "east": -9.34},
+        "fetch": {"south": 12.3, "north": 25.3, "west": -26.5, "east": -9.23},
+        "datum": "mean sea level",
+        "source": "gebco_2025",
+        "folder": "tiles/1/atlantic-verde",
+        "beside": "atlantic-south",
+    },
 }
 
 # The tide's regions (package 94): bounds and no tiles, for the gauges' membership alone
@@ -926,14 +939,23 @@ CHARTS: dict[str, dict[str, Any]] = {
             "canaries",
             "salvages",
         ],
-        "corridor": "atlantic-corridor",
-        # package 106a: coarse layers read after the corridor, each answering only where
-        # the layers before it have nothing (`CORRIDORS[...]["beside"]`)
-        "corridors_beside": ["atlantic-south"],
+        # package 112: the coarse layers as one ordered list (freesail/world/chart.py): at
+        # each level the first that lists a tile answers in it, a later one filling only
+        # its NODATA (the corridor, then 106a's layer beside it, then the ocean south to
+        # the Cape Verde Islands); the Mediterranean's layers come with the seas (its step
+        # 3: laid now, their bounds made the Gulf of Lion's and Biscay's edges open to the
+        # eleven's taper, the chart session's ruling of 2026-11-14)
+        "layers": ["atlantic-corridor", "atlantic-south", "atlantic-verde"],
     },
 }
 
-WORLD = {"level": 0, "south": -90.0, "north": 90.0, "west": -180.0, "east": 180.0}
+# Level 0 (package 112, the lead's ruling of 2026-11-13): the Atlantic and the
+# Mediterranean, 70 S to 75 N and 100 W to 40 E, COMMITTED under tiles/0/ (63 tiles, about
+# 11 MB); the rest of the world is not. Each tile is the GEBCO cells of its own place
+# decimated and clipped, nothing read across a tile's edge (no distance field at this
+# level), so widening the box to the globe later writes the other tiles and moves no tile
+# laid now (measured: the 63 tiles of the box byte for byte the world's build's).
+WORLD = {"level": 0, "south": -70.0, "north": 75.0, "west": -100.0, "east": 40.0}
 ATLANTIC = {"level": 1, "south": -60.0, "north": 70.0, "west": -100.0, "east": 20.0}
 
 # A corridor tile's blocks of cells whose shoalest sounding is kept beside the tile's
@@ -2820,19 +2842,14 @@ class Build:
         for cname, cspec in CHARTS.items():
             present = [r for r in cspec["regions"] if r in regions]
             absent = [r for r in cspec["regions"] if r not in regions]
-            corridor = cspec.get("corridor")
-            if corridor and corridor not in corridors:
-                self.log(f"The chart {cname} names the corridor {corridor}, not built: left out.")
-                corridor = None
-            beside = [c for c in cspec.get("corridors_beside") or [] if c in corridors]
-            for c in cspec.get("corridors_beside") or []:
+            layers = [c for c in cspec.get("layers") or [] if c in corridors]
+            for c in cspec.get("layers") or []:
                 if c not in corridors:
-                    self.log(f"The chart {cname} names the corridor {c}, not built: left out.")
+                    self.log(f"The chart {cname} names the layer {c}, not built: left out.")
             charts[cname] = {
                 "title": cspec["title"],
                 "regions": present,
-                **({"corridor": corridor} if corridor else {}),
-                **({"corridors_beside": beside} if corridor and beside else {}),
+                **({"layers": layers} if layers else {}),
                 **({"regions_not_built": absent} if absent else {}),
             }
         sources = {}
@@ -2915,7 +2932,7 @@ class Build:
             # developer's machine and never committed (spec M5 §10): the manifest says so,
             # lists their tiles only when this build made them, and the runtime reads
             # only the tiles that are present
-            "world": _fetched_level(gebco_levels.get("0"), 0, WORLD, "--world"),
+            "world": _fetched_level(gebco_levels.get("0"), 0, WORLD, "--world", last.get("world")),
             "atlantic": _fetched_level(gebco_levels.get("1"), 1, ATLANTIC, "--atlantic"),
             "sources": sources,
             "attribution": attribution,
@@ -2975,24 +2992,47 @@ def _tiles_present(tiles: dict[str, Any], folder: Path) -> bool:
 
 
 def _fetched_level(
-    built: dict[str, Any] | None, level: int, box: dict[str, float], flag: str
+    built: dict[str, Any] | None,
+    level: int,
+    box: dict[str, float],
+    flag: str,
+    last: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """The manifest's entry for a level the tool builds and the repository does not carry
-    (the world and the Atlantic, spec M5 §10): its box, the flag that builds it, `committed:
-    false`, and its tiles only when this build made them."""
+    """The manifest's entry for a level the tool builds from GEBCO's global tiles: the
+    Atlantic at level 1, built on the developer's machine and not committed (spec M5
+    §10), and the world's level 0, committed over the Atlantic and the Mediterranean
+    since package 112. Its box, the flag that builds it and its tiles when this build made
+    them; for the committed world, the last manifest's tiles when this build did not and
+    they are present (carried as a corridor is, so that a region's build keeps them)."""
+    committed = level == 0
     entry: dict[str, Any] = {
         "level": level,
         "bounds": {k: v for k, v in box.items() if k != "level"},
-        "committed": False,
+        "committed": committed,
         "built_by": f"python tools/build_charts.py {flag}",
         "note": (
-            "built by the tool on the developer's machine and not committed; the runtime "
-            "reads the tiles that are present under tiles/<level>/ and nothing else"
+            "committed (package 112, the lead's ruling): the Atlantic and the Mediterranean; "
+            "the runtime reads these tiles under a chart of the manifest's charts, after "
+            "every layer, and never under a chart of one region; the rest of the world, "
+            "built later, moves no tile laid now"
+            if committed
+            else "built by the tool on the developer's machine and not committed; the "
+            "runtime reads the tiles that are present under tiles/<level>/ and nothing else"
         ),
     }
     if built:
         entry["tiles"] = built["tiles"]
         entry["bytes"] = built["bytes"]
+    elif (
+        committed
+        and last
+        and last.get("tiles")
+        and all(
+            (CHARTS_DIR / "tiles" / str(level) / f"{t['name']}.npz").exists() for t in last["tiles"]
+        )
+    ):
+        entry["tiles"] = last["tiles"]
+        entry["bytes"] = last.get("bytes")
     else:
         entry["tiles"] = []
     return entry
