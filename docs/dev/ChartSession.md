@@ -570,3 +570,14 @@ Santa Cruz drying 1.53, Messina two legs). 111's builder chooses the step by hal
 port's least moving more than a tenth of a metre), adds Setúbal's shoal as a test, makes one
 more pass at its four. **My seven tracks wait for the mended check on the trunk, and are drawn
 with a sampler at least as fine.** The lead will ask me to sample 111's four again.
+
+### 2026-11-14, 03:50: 112's step 2 stopped and ruled (A)
+
+The Mediterranean layers' boxes (from 6 W, over Iberia and France) made 39 more blocks'
+edges open (77 for 38), and the seam's taper blended toward the eleven within their reach:
+the Gulf of Lion's level 0.51 to 6.62 m and M2 0.07 to 3.56 m at 43.04 N 3.03 E; the
+Gironde 3.35 to 4.49 m. Ruled (A): step 2 lays Cape Verde and level 0 only (proven to move
+no tide); the Mediterranean layers go to step 3, whose measure must meet a layer box over
+land opening a block's edge (boxes off the land, or an open edge read by its water, an
+engine change for the lead). The nine pins re-pinned; the passages, digests, saves and
+browser plans unmoved.
