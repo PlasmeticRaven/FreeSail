@@ -16639,7 +16639,10 @@ def test_truth_7_532_sicilys_seams_hold_no_gap_and_no_overlap():
             names[t["name"]] = rid
     assert sum(1 for r in names.values() if r == "sicily") == 109
     whole = load_chart("atlantic-east")
-    assert whole.bounds[3] == 16.69332
+    # package 112: the chart's east limit is the Mediterranean's layer's, 36.5 E (old:
+    # 16.69332 E, Sicily's own east bound, the easternmost region's)
+    assert whole.bounds[3] == 36.5
+    assert whole.region_bounds["sicily"][3] == 16.69332
     for lat in (36.5, 37.0, 37.5, 38.0, 38.4):
         assert whole.region_at(Position(lat, 11.14)) == "tunis-coast"
         assert whole.region_at(Position(lat, 11.15)) == "sicily"
@@ -17034,7 +17037,10 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     from freesail.world.geo import Position
 
     chart = load_chart("atlantic-east")
-    assert chart.bounds[0] == pytest.approx(25.2, abs=0.001)
+    # package 112: the south limit is the ocean's to the Cape Verde Islands', 12.4 N (old:
+    # 25.2 N, this package's layer's); the layer's own south bound is as it was
+    assert chart.bounds[0] == pytest.approx(12.4, abs=0.001)
+    assert chart.spec["layers"][1] == "atlantic-south"
     holes = []
     for i in range(int((31.9 - 25.3) / 0.1) + 1):
         lat = 25.3 + 0.1 * i
@@ -17047,7 +17053,8 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     w = _can_at(31.0, -16.0, datetime(1805, 6, 20, 12, 0))
     assert w.chart.level_at(w.position) == 1 and w.chart.depth_at(w.position) > 3000.0
     with pytest.raises(ValueError, match="outside the chart"):
-        _can_at(25.1, -20.0, datetime(1805, 6, 20, 12, 0))
+        # package 112: a start south of the new limit (old: 25.1 N 20 W, now within them)
+        _can_at(12.3, -20.0, datetime(1805, 6, 20, 12, 0))
 
 
 def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as_before():
@@ -17066,7 +17073,11 @@ def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as
     root = Path(__file__).resolve().parents[1] / "data" / "charts" / "tiles" / "1"
     corridor = sorted((root / "atlantic-corridor").glob("*.npz"))
     assert len(corridor) == 48
-    assert sorted(level1.beside) == ["106080_-48960", "106080_-64320", "106080_-79680"]
+    # package 112: the Mediterranean's two layers fill five more of the corridor's tiles in
+    # the columns from 9.33 W and 5.07 W (old: the three of the south's alone)
+    south = ["106080_-48960", "106080_-64320", "106080_-79680"]
+    sea = ["106080_-18240", "106080_-33600", "121440_-18240", "136800_-18240", "152160_-18240"]
+    assert sorted(level1.beside) == sorted(south + sea)
     filled = 0
     for path in corridor:
         own = Tile.load(path)
@@ -17077,7 +17088,10 @@ def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as
         has = ~np.isnan(own.min_blocks_m)
         assert np.array_equal(read.min_blocks_m[has], own.min_blocks_m[has]), path.stem
         filled += int(((read.elevation != own.nodata) & ~known).sum())
-    assert filled == 3 * 149504  # the three tiles' cells south of 31.9 N, the new layer's
+    # the three tiles' cells south of 31.9 N, the south layer's, and since package 112 the
+    # cells east of the corridor's fetch (0.9 W) and south of 31.9 N in the five, the
+    # Mediterranean's (old: 3 * 149,504 alone)
+    assert filled == 3 * 149504 + 125520 + 29760 + 6144 + 6144 + 5520
 
 
 def test_truth_7_522_the_islands_channels_are_charted_water_in_detail():
@@ -17367,6 +17381,12 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     expected.setdefault(int(layer["level"]), {}).setdefault(t["name"], []).append(
                         path
                     )
+        if spec and manifest["world"].get("tiles"):
+            # package 112: the world's level 0, committed, after every layer, under a
+            # chart of the manifest's charts only
+            level0 = expected.setdefault(0, {})
+            for t in manifest["world"]["tiles"]:
+                level0.setdefault(t["name"], [root / "tiles" / "0" / f"{t['name']}.npz"])
         assert [lv.level for lv in chart.levels] == sorted(expected, reverse=True), name
         assert spec is not None or all(lv.level >= 2 for lv in chart.levels), name
         for lv in chart.levels:
@@ -17388,4 +17408,6 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
                 ), (name, tname)
                 read += 1
-    assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+    # 21 charts' tiles, as the step's proof counted them (step 1: 4,593; step 2 with the
+    # coarse seas' 45 tiles at level 1 and the world's 63 at level 0: 4,701)
+    assert read == 4701

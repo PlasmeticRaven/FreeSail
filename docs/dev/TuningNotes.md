@@ -28780,3 +28780,55 @@ mediterranean-north --corridor atlantic-verde --world`):
 - **Level 0 at work** (31 N 25 W, 57 N 6 W, 10 N 30 W): a depth is read, no shore distance
   (no field at this level), no grounding in open water; outside the limits the chart still
   refuses a start.
+
+### Step 2: the pins moved by design, old beside new (the chart session's ruling of 2026-11-14)
+
+The fast tier at c1bbec8 (the reload mend in): 8 failed, 7,613 passed. Each was the chart's
+form or limits, which the lead ruled to move. With truth 7-570 (slow) they are nine,
+re-pinned so:
+
+1. `test_chart::test_the_regions_tiles_are_present_committed_and_under_the_brief_size`:
+   the world's `committed` False to **True** (level 0 committed by the ruling), the
+   Atlantic's still False. The tracked folders are the chart's `layers:` (old: `corridor:`
+   and `corridors_beside:`) and `tiles/0/`, whose 63 files are exactly the manifest's.
+2. `test_chart::test_the_chart_is_the_whole_manifest...`: the chart's `corridor:` to
+   **`layers:`** (the five in order). The levels [3, 2, 1] to **[3, 2, 1, 0]**. The envelope
+   (25.2001, 51.5, −32, 16.69332) to **(12.4001, 51.5, −32, 36.5)**, and its words with it.
+3. `test_chart::test_the_corridor_is_committed...`: it read `levels[-1]`, the coarsest
+   level, for "the corridor's tile carries the distance field". The coarsest is now level
+   0, which has none. It now reads **the level that carries the field** (level 1), holds the
+   coarsest as level 0, and holds that level 0 has no field. **No reader of the engine
+   takes the coast distance from the coarsest level:** there is no `levels[-1]` in
+   `freesail/`. `coast_distance` and `nearest_shore` walk the levels finest first and skip a
+   level whose field reads None. `coast_trend`, the one reader that walks coarsest first
+   (`reversed(levels)`), skips a level whose `dist_smooth` is None, which level 0's is
+   everywhere, and so reads the next finer level as before.
+4. `test_chart::test_a_query_asks_the_finest_level...`: `BEYOND_THE_CORRIDOR` (31 N 25 W)
+   depth None to **level 0's, 5,000 to 6,000 m** (5,449.5); its coast distance stays None.
+   **What the master and the lookout say there** (a frigate put at 31 N 25 W): the depth of
+   water "2980 fathoms at low water by the chart, at the position by account; the chart has
+   2961 fathoms and a half to 2992 fathoms within the account's doubt"; the land "not in
+   sight"; no chart-edge line (the place is inside the limits). Two things for others: "at
+   low water" is said of a depth at mean sea level (the double count above), and
+   `level_at` and `use_at` name the corridor's level ("the Atlantic: passages and
+   landfalls") there. The corridor's empty tile is listed at the place, and the
+   depth falls through it to level 0.
+5. `test_chart::test_the_recipe_form...`: `tool.CHARTS[WHOLE]["corridor"]` to
+   **`["layers"][0]`**.
+6. Truth 7-532 (Sicily's seams): `whole.bounds[3]` 16.69332 to **36.5**, the Mediterranean
+   layer's. Sicily's own east bound, 16.69332, is held beside it.
+7. Truth 7-520: `bounds[0]` 25.2 to **12.4** (the Cape Verde layer's). **Its refused start**
+   moves from 25.1 N 20 W, now within the limits, to **12.3 N 20 W**, south of them, so a
+   refusal stays tested. `atlantic-south` is held second in the chart's layers.
+8. Truth 7-521: the corridor's tiles filled beside it, 3 to **8** (the Mediterranean's two
+   layers fill five in the columns from 9.33 W and 5.07 W). The filled cells 3 × 149,504
+   to that plus **173,088** (125,520, 29,760, 6,144, 6,144 and 5,520). Every corridor cell
+   is still its own.
+9. Truth 7-570: the derivation takes the committed level 0 under a chart of `charts:`; the
+   tiles read 4,593 to **4,701**. It is kept whole, by the chart session's ruling: 33 s
+   alone here, and 12 s as a sample of 1,561 tiles (every region's tiles across its bounds,
+   every coarse tile and a fixed tenth of the rest). Neither explains the cloud's longer
+   run.
+
+The nine pass (75 s with 7-570). test_longitude's chart-edge line does not move: it reads
+the bounds.
