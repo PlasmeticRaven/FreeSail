@@ -359,14 +359,15 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 def _fallback_reply(root: Any, far: Any, awake: Any, rec: dict, tick: int, lines: list) -> None:
     """The far ship's broadside at an awake hull by the tables, only where the cap has no
     room to wake her (the lead's ruling 4); each shot that strikes resolved into the awake
-    hull's parts with a synthetic gun of her fit's kind. A cap of nought (`crewed: {cap: 0}`,
-    nobody promoted) has never room, so there she replies by the tables too (package 75, the
-    review's mends of the lead's notes of 12 and 13 November: before it the switch woke
-    nobody and she lay alongside the awake hull without firing)."""
+    hull's parts with a synthetic gun of her fit's kind. At a cap of nought (`crewed: {cap:
+    0}`, nobody promoted) she does not reply (the lead's ruling of 2026-11-14, (F1): the reply
+    there made the fight one-sided and endless, the player's shot reaching only
+    `hits._far_hit`'s count, which nothing reads; a far body that fires on the player and one
+    that can be hurt by him are one mend, package 77's)."""
     from freesail.world.crews import crewed, settings
 
     cap, _within, _demote = settings(root)
-    if cap > 0 and len(crewed(root)) < cap:
+    if cap <= 0 or len(crewed(root)) < cap:
         return  # room under the cap: the switch wakes her and the near action takes over
     from freesail.world.geo import bearing_and_distance
 

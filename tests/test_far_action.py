@@ -384,17 +384,19 @@ def test_package_74s_road_from_a_chase_keeps_the_mark_it_entered_with_as_it_did(
 
 
 @pytest.mark.slow
-def test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought():
-    """The review's mends of the lead's notes of 12 and 13 November: a cap of nought (`crewed:
-    {cap: 0}`, nobody promoted: the tender's day, the drivers' `--crewed-cap 0`) has never room
-    to wake a far ship, so one engaging the player's ship replies by the tables
-    (`far_action._fallback_reply`, the lead's ruling 4's fallback), as under a full cap. The 64's
-    case of `tests/test_bellerophon.py` (the player's 64 on her station off the Lizard, a French
-    74 bound for Brest a mile and a half north of her), the cap nought, at seed 7: the 74 goes
-    engaging from her passage at tick 360 with the 64 her mark, and her first broadside by the
-    tables comes the same minute at 9 cables, said in the 64's log as the fallback, and again
-    three minutes on. OLD BESIDE NEW: at dfbe4031 (a cap of nought returned as if it had room)
-    she lay alongside the 64 for hours and never fired."""
+def test_at_a_cap_of_nought_a_far_ship_engaging_the_players_ship_does_not_reply():
+    """The lead's ruling of 2026-11-14, (F1): the reply at a cap of nought comes out of this hash
+    (`far_action._fallback_reply` as it was before 2d2bbd8b). There it put her broadside into the
+    player's parts every three minutes while his shot reached only `hits._far_hit`'s count, which
+    nothing reads, so that the fight was one-sided and endless; a far body that fires on the
+    player and one that can be hurt by him are one mend, package 77's, and go in together or not
+    at all. The 64's case of `tests/test_bellerophon.py` (the player's 64 on her station off the
+    Lizard, a French 74 bound for Brest a mile and a half north of her), the cap nought, at seed
+    7: the 74 goes engaging from her passage at tick 360 with the 64 her mark, and in the half
+    hour after no broadside of hers is said in the 64's log and none is counted. OLD BESIDE NEW:
+    at 53c14457 her first broadside came at 360 ("The Foe fires her broadside at us from 9
+    cables: none of her 63 shot strike us.") and again at 540; under a full cap the fallback is
+    as it was (`test_a_far_ship_replies_to_an_awake_hull_only_where_the_cap_has_no_room`)."""
     from tests.test_brains import world_at
 
     FA.FALLBACK_COUNT["rounds"] = 0
@@ -419,14 +421,11 @@ def test_a_far_ship_replies_to_the_players_ship_by_the_tables_at_a_cap_of_nought
     for _ in range(8):
         w.run(60)
     assert foe.brain.history[-1] == (360, "engaging") and foe.brain._stranger == "the ship"
-    assert not foe.done and foe.crew is None
-    replies = [e for e in w.log if e.kind == "action.far_reply"]
-    assert [e.tick for e in replies] == [360, 540], [(e.tick, e.text) for e in replies]
-    assert all(e.data.get("fallback") is True for e in replies)
-    assert replies[0].text == (
-        "The Foe fires her broadside at us from 9 cables: none of her 63 shot strike us."
-    )
-    assert FA.FALLBACK_COUNT["rounds"] == 2
+    for _ in range(30):
+        w.run(60)
+    assert not foe.done and foe.crew is None and foe.brain.state == "engaging"
+    assert not [e for e in w.log if e.kind == "action.far_reply"]
+    assert FA.FALLBACK_COUNT["rounds"] == 0
 
 
 # -- the agreement of the two roads ----------------------------------------------------------------
