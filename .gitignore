@@ -23,11 +23,17 @@ day.json
 # The corridor at level 1 (spec M6 §26, package 38; tools/build_charts.py --corridor) is the
 # one level-1 folder committed, under its own name: the rule for tiles/1/ gives way for it
 # alone, and the Atlantic beyond it is still fetched and not committed; package 106a's
-# layer beside it (the ocean south to the Canaries) is committed the same way
-data/charts/tiles/0/
+# layer beside it (the ocean south to the Canaries) is committed the same way, and package
+# 112's coarse seas (the Mediterranean in two layers, the ocean to the Cape Verde Islands).
+# Level 0 is committed since package 112 over the Atlantic and the Mediterranean (70 S to
+# 75 N, 100 W to 40 E; tools/build_charts.py WORLD); the rest of the world, built later,
+# moves no tile laid now
 data/charts/tiles/1/*
 !data/charts/tiles/1/atlantic-corridor/
 !data/charts/tiles/1/atlantic-south/
+!data/charts/tiles/1/mediterranean/
+!data/charts/tiles/1/mediterranean-north/
+!data/charts/tiles/1/atlantic-verde/
 # package 37d kept three saves as test fixtures (tests/fixtures/saves/): the rule above would
 # hide them, so they are let through here
 !tests/fixtures/saves/

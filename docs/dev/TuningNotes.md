@@ -28523,3 +28523,81 @@ listed answers, the later fill, and the two forms are one. They also hold the wo
 synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
+
+### The lead's answers on step 0 (2026-11-13, through the chart session)
+
+1. **Level 0** covers the Atlantic and the Mediterranean, 70 S to 75 N and 100 W to 40 E. The
+   rest of the world is not committed, and the how-to says that adding it later moves no
+   tile laid now.
+2. **The open Atlantic's level** is choice (3): unread levels judged at M2+S2+N2 and marked
+   JUDGEMENT, read levels where read (Sicily's interim answer). Before it is committed, step
+   3 shows that no recorded passage, digest, truth or kept save moves, or names each that
+   does, old beside new, and stops for the word.
+3. **The Channel sea's eight open-water groups leave the known list**: the eleven are the
+   Channel's own gauges. `seas.yaml` names each sea's gauges, the Channel's eleven included.
+4. **Order:** the step that moves `SEAS` into `seas.yaml` merges after package 111's step
+   2b, and re-merges the trunk.
+
+The chart session's rulings: level 0 is never under a chart of one region, a reason that
+outlives its mend of the checkpoint's reload (`replay._rebind` to take `chart_holding`):
+such a chart is then met only where a scenario or test says `chart: <region>`, and those
+pins are measured on that region alone. Cut the Black Sea. All twelve Cape Verde tiles.
+
+### The double count of the level on the coarse layers (a finding; on the lead's list, not mended)
+
+Levels 0 and 1 are at **mean sea level** and nothing is raised at their build
+(`build_corridor`, `_write_gebco_level`). The tide adds its **level above low water** to
+every depth (`Chart.aground`, `ground.py`: water = depth + tide height = `-elevation + level
++ z`). At levels 2 and 3 that is right, since the datum is low water. On water only a coarse
+layer answers, the level is counted twice: the open sea reads deeper by the level, and a
+coarse shore floods to the level and the tide above it. Measured at step 0 over the corridor
+and the south layer, outside every bound, at the eleven's level of 3.1 to 4.4 m: 416 cells
+of sea shallower than the level, 765 of land lower than it (by elevation: 149 cells from −1
+to 0 m, 161 from −2 to −1, 176 from 0 to +1, 154 from +1 to +2, 184 from +2 to +3, 252 from
++3 to +4). At the judged level of the open Atlantic (about 0.6 to 1.6 m), about 180 and
+210. The mend would read a coarse cell as `-elevation + z` (its level not added), an engine
+change for the lead. The new layers and level 0 carry the same fault on their own shores.
+
+### Step 2: the layers laid
+
+**What was built** (`tools/build_charts.py`, one run: `--corridor mediterranean --corridor
+mediterranean-north --corridor atlantic-verde --world`):
+
+- `mediterranean`, 30 to 42.2666 N and 6 W to 36.5 E, beside the corridor: 31 tiles,
+  7,411,985 bytes. The three tiles in the column from 9.33 W north of 33.73 N are the
+  corridor's whole and are not written; five share the corridor's names and fill its NODATA.
+- `mediterranean-north`, 42.2667 to 46 N and 6 W to 24.79 E, beside the corridor: 7 tiles,
+  1,678,693 bytes. With the first: 38 tiles and 9.09 MB, against step 0's 41 and 9.71 in one
+  box with the Black Sea. The three Black Sea tiles are left out; the strip south of 42.27 N
+  stays (the how-to).
+- `atlantic-verde`, 12.4 to 25.2 N and 26.4 to 9.34 W, beside `atlantic-south`: 12 tiles,
+  2,487,854 bytes, byte for byte step 0's measure.
+- **Level 0** over 70 S to 75 N and 100 W to 40 E: 63 tiles, 11,283,534 bytes, committed.
+- The chart's entry now says `layers:` (the five, in order) where it said `corridor:` and
+  `corridors_beside:`. The tool writes it from `CHARTS`. The manifest's `world:` entry is
+  committed and carried by later builds while its tiles are present (`_fetched_level`).
+  `.gitignore` lets `tiles/0/` and the three folders through.
+
+**The proofs.**
+
+- **Every earlier file under `data/charts/`**, 2,397 of them (tiles, coasts, indexes,
+  features, overrides, the known list), hashes the same after the build.
+- **The manifest:** the regions, the two earlier layers, the tide regions, the levels and
+  the notes are equal entry for entry, and every earlier fetch record is kept in its place.
+  What changed: the chart's layer keys, the three layers added, the world's entry (now
+  committed, 63 tiles), four GEBCO fetch records added, the build's date and hash, and
+  EMODnet's status word ("fetched" to "fetched in an earlier build"; its records equal).
+- **Level 0 equals the world's:** the 63 tiles are byte for byte the same tiles of the whole
+  world's build (150 tiles, made at step 0 in a scratch folder). Widening the box moves none.
+- **What the runtime reads:** every chart and region loaded and every listed tile read
+  through `Level.tile`, hashed, old beside new (step 1's script). The twenty charts of one
+  region are identical in their levels, bounds and every tile. `atlantic-east`: 2,322 tiles
+  identical; 108 new (45 at level 1, 63 at level 0); 5 changed, the corridor's tiles the
+  Mediterranean fills: `1/106080_-33600`, `1/106080_-18240`, `1/121440_-18240`,
+  `1/136800_-18240`, `1/152160_-18240`. Their corridor cells are unchanged (step 0's proof
+  through `filled_from`; truth 7-570). Levels [3, 2, 1] to [3, 2, 1, 0]; bounds 25.2001 to
+  51.5 N, 32 W to 16.69332 E, to 12.4001 to 51.5 N, 32 W to 36.5 E.
+- **The audit** (`--known`, sampled): no finding the known list lacks.
+- **Level 0 at work** (31 N 25 W, 57 N 6 W, 10 N 30 W): a depth is read, no shore distance
+  (no field at this level), no grounding in open water; outside the limits the chart still
+  refuses a start.

@@ -1004,3 +1004,56 @@ next blocks (106b's African coast first):
   named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
   fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
   both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.
+
+## The coarse seas (package 112, steps 1 and 2)
+
+**The sea is coarse and whole; the fine detail is for water near the land.** A chart names
+its coarse layers as **one ordered list**, `layers:` in its entry of `CHARTS` (the tool
+writes it into the manifest). At each level the first layer that lists a tile answers in
+it, and each later layer listing the same tile fills only the NODATA cells left
+(`chart.Tile.filled_from`, in order). A tile no earlier layer lists is the later layer's
+own. The finest level that answers, answers: a harbour (3), a region (2), the layers (1),
+the world (0). 106a's `corridor:` and `corridors_beside:` are read as that list where a
+manifest still gives them. Giving both forms is refused.
+
+**The layers committed** (tools/build_charts.py `CORRIDORS`, each built by `--corridor
+<name>` from GEBCO's area extract at 30″, the corridor's form: elevation, distance field,
+the blocks' shoalest soundings), in the chart's order:
+
+| layer | bounds | tiles | bytes | package |
+|---|---|---|---|---|
+| `atlantic-corridor` | 32 to 51 N, 32 to 1 W | 48 | 9,746,887 | 38, 39e |
+| `atlantic-south` | 25.2 to 31.9 N, 22.13 to 9.34 W | 6 | 1,191,415 | 106a |
+| `mediterranean` | 30 to 42.27 N, 6 W to 36.5 E | 31 | 7,411,985 | 112 |
+| `mediterranean-north` | 42.27 to 46 N, 6 W to 24.79 E | 7 | 1,678,693 | 112 |
+| `atlantic-verde` | 12.4 to 25.2 N, 26.4 to 9.34 W | 12 | 2,487,854 | 112 |
+
+The Mediterranean is two layers so that the Black Sea is left out: its three tiles of the
+row from 42.27 N east of 24.8 E are not laid. The Black Sea's southern strip, 41 to 42.27 N
+along the Anatolian shore, lies in the first layer's row with the Marmara and is laid with
+it. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
+(the build writes NODATA where that one's committed tile has data). It never widens a
+layer already laid: widening rewrites every tile of it (39e, 106a). Each folder is let
+through `.gitignore` by name.
+
+**Level 0, the world's picture, is committed over the Atlantic and the Mediterranean**
+(`WORLD`, 70 S to 75 N and 100 W to 40 E; `--world`; 63 tiles, 11,283,534 bytes; the lead's
+ruling of 2026-11-13). It is GEBCO's global tiles decimated to 150″, in steps of 2 m, the
+land clipped at 50 m, with no distance field. **Adding the rest of the world later moves no
+tile laid now:** each tile is its own place's cells, nothing is read across a tile's edge,
+and the 63 tiles are byte for byte the whole world's build's (measured, package 112).
+Widening `WORLD` to the globe writes the other tiles beside them. The manifest's `world:`
+entry is carried by every later build while its tiles are present, as a layer is. The
+runtime lays level 0 under a chart of the manifest's `charts:` only, after every layer, and
+**never under a chart of one region**: such a chart is met where a scenario or a test says
+`chart: <region>` outright, and its answers are pinned on that region alone. Level 0 does
+not widen a chart's limits (`contains`, `bounds`, the lookout's "the chart has nothing"
+line), which stay the envelope of its regions and layers. Over water only level 0 answers,
+a depth is read and no shore distance: a ship there is in the open ocean of 4.6 km cells.
+
+**Mind the datum** (package 112's measure, not mended; on the lead's list): levels 0 and
+1 are at mean sea level and nothing is raised, while the tide adds its level above low
+water to every depth. On water a coarse layer alone answers, the level is counted twice:
+the open sea reads deep by it, and a coarse shore floods to it (765 cells of the corridor
+and the south layer at the eleven's 3 to 4 m). A block's own tiles are at low water and
+are not touched by this.
