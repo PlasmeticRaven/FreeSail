@@ -113,6 +113,13 @@ Package 75's B1, the lead's ruling (4) of 2026-11-13 (the marines by fit), adds 
 fit, where it differs from the bill's own (which is the default fit's), a whole number no more than
 the file's marines. Only the 64's 'ardent class 1794' and the razee's 'as razeed 1795' carry it; a
 fit without it keeps the bill's, and a fit pickled before it reads as one without it.
+
+Package 75's Phase 5, the lead's ruling 13 of 2026-11-14 (the razee's trimmers by fit), adds a
+fit's own `trimmers`, as the marines by fit were: the sail trimmers the quarter bill tells off by
+station at the beat when she carries that fit, where they differ from the bill's own (which are
+the default fit's), each a whole number no more than the men of its station, in the bill's
+`trimmers` form. Only the razee's 'as razeed 1795' carries them; a fit without them keeps the
+bill's, and a fit pickled before them reads as one without them.
 """
 
 from __future__ import annotations
@@ -291,7 +298,12 @@ FIT_KEYS = (
     "exercise_charges",
     "shot",
     "marines",  # package 75, B1: the marines the bill keeps on this fit
+    "trimmers",  # package 75, Phase 5 (the lead's ruling 13): the bill's trimmers on this fit
 )
+# The quarter bill's keys a fit may give its own figure for, read in place of the bill's when
+# she carries it (`crew.quarters`): the marines kept in their division (package 75, B1) and the
+# trimmers (Phase 5, the lead's ruling 13). Each is left out of a fit's pickle while None.
+FIT_OWN_BILL = ("marines", "trimmers")
 ARMAMENT_KEYS = ("default", "fits", "numbering")
 # How a file numbers its broadside guns (package 75, B7.d's stage 0: the 74's design,
 # docs/design/Design-Ship-Bellerophon.md §5.2 and §12.1 item 2): the one word an armament's
@@ -889,13 +901,20 @@ class FitSpec:
     # `marines` (the default fit's); None, the bill's. A plain default, left out of the pickle
     # while None, so that a fit without it, and one pickled before it, is pickled as before it.
     marines: int | None = None
+    # package 75, Phase 5 (the lead's ruling 13 of 2026-11-14): the sail trimmers the quarter
+    # bill tells off by station at the beat when she carries this fit, where they differ from the
+    # bill's own `trimmers` (the default fit's); None, the bill's. Left out of the pickle while
+    # None, as the marines are.
+    trimmers: dict[str, int] | None = None
 
     def __getstate__(self) -> dict[str, Any]:
-        """Its state for the checkpoint, its marines only where the fit gives them (package
-        75, B1), so that a fit without them is pickled as before it."""
+        """Its state for the checkpoint, its marines (package 75, B1) and its trimmers (Phase
+        5, the lead's ruling 13) only where the fit gives them, so that a fit without them is
+        pickled as before them."""
         state = dict(self.__dict__)
-        if state.get("marines") is None:
-            state.pop("marines", None)
+        for key in FIT_OWN_BILL:
+            if state.get(key) is None:
+                state.pop(key, None)
         return state
 
 
@@ -1362,6 +1381,11 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
         marines=_count(raw["marines"], f"{where}'s marines kept in their division", source)
         if raw.get("marines") is not None
         else None,
+        # package 75, Phase 5 (the lead's ruling 13): the bill's form; no more than the men of
+        # each station (`validate`)
+        trimmers=_parse_trimmers(raw["trimmers"], where, source)
+        if raw.get("trimmers") is not None
+        else None,
     )
 
 
@@ -1494,6 +1518,29 @@ def _pivot_arc(raw: Any, place: str, at: str, source: str) -> tuple[float, float
     return (lo, hi)
 
 
+def _parse_trimmers(raw: Any, fit: str | None, source: str) -> dict[str, int]:
+    """The sail trimmers by station, the quarter bill's (`fit` None) or a fit's own (package 75,
+    Phase 5, the lead's ruling 13: `fit` the fit's words), one form for both: each key a station
+    of the crew, each value a whole number of its men. The bill's words are as before."""
+    whose = fit if fit is not None else "the quarter bill"
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: {whose}'s 'trimmers' is not a mapping.")
+    trimmers: dict[str, int] = {}
+    for k, v in raw.items():
+        if fit is None:
+            station = _known(k, CREW_STATIONS, "the station", source)
+            trimmers[station] = _count(v, f"the trimmers of the {station}", source)
+            continue
+        station = str(k)
+        if station not in CREW_STATIONS:
+            raise ShipFileError(
+                f"{source}: {fit}'s trimmers name the station '{station}', which is not one the "
+                f"engine knows. Known: {', '.join(CREW_STATIONS)}."
+            )
+        trimmers[station] = _count(v, f"{fit}'s trimmers of the {station}", source)
+    return trimmers
+
+
 def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
     """The crew's `quarter_bill:` block (spec M7 §8a; package 70)."""
     if not isinstance(raw, dict):
@@ -1504,13 +1551,7 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
                 f"{source}: the quarter bill has '{key}', which it does not take "
                 f"({', '.join(QUARTER_BILL_KEYS)})."
             )
-    trimmers: dict[str, int] = {}
-    raw_trimmers = raw.get("trimmers") or {}
-    if not isinstance(raw_trimmers, dict):
-        raise ShipFileError(f"{source}: the quarter bill's 'trimmers' is not a mapping.")
-    for k, v in raw_trimmers.items():
-        station = _known(k, CREW_STATIONS, "the station", source)
-        trimmers[station] = _count(v, f"the trimmers of the {station}", source)
+    trimmers = _parse_trimmers(raw.get("trimmers") or {}, None, source)
     priority = str(raw.get("priority") or PRIORITIES[0])
     if priority not in PRIORITIES:
         raise ShipFileError(
@@ -2745,14 +2786,25 @@ def validate(spec: ShipSpec) -> None:
                     f"{src}: the fit '{fit.name}' keeps {fit.marines} marines in their division, "
                     f"but the crew has {bears}; it cannot keep more marines than she bears."
                 )
-    # the quarter bill's trimmers are men of their stations
+    # the quarter bill's trimmers, and a fit's own (package 75, Phase 5, the lead's ruling 13),
+    # are men of their stations
     bill = spec.crew.quarter_bill if spec.crew is not None else None
+    told_off: list[tuple[str, dict[str, int]]] = []
     if bill is not None:
-        for station, n in bill.trimmers.items():
-            if n > spec.crew.stations.get(station, 0):
+        told_off.append(("the quarter bill", bill.trimmers))
+    if spec.armament is not None:
+        told_off += [
+            (f"the fit '{fit.name}'", fit.trimmers)
+            for fit in spec.armament.fits.values()
+            if fit.trimmers is not None
+        ]
+    stations = spec.crew.stations if spec.crew is not None else {}
+    for whose, trimmers in told_off:
+        for station, n in trimmers.items():
+            if n > stations.get(station, 0):
                 raise ShipFileError(
-                    f"{src}: the quarter bill wants {n} trimmers of the {station}, and the "
-                    f"station has {spec.crew.stations.get(station, 0)}."
+                    f"{src}: {whose} wants {n} trimmers of the {station}, and the "
+                    f"station has {stations.get(station, 0)}."
                 )
 
 

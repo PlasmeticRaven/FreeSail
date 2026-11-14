@@ -2756,6 +2756,13 @@ armament:
         1804 pp. 72 and 155, the pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the crews
       # The marines the bill keeps in their division at the beat when she carries this fit (package 75, B1; the lead's ruling (4) of 2026-11-13): her 50 marines but the 12 at this fit's carronades, who take them first, the long guns taking none (the bill's rule, Bel-D §12.1 and B7.b: the marines quartered on the poop and the forecastle or gangway, at the great guns only in distant cannonading, Falconer 1780, QUARTERS); the bill's 14 (above) is the default fit's. JUDGEMENT: the bill's rule on this fit's guns, since no establishment of private marines by rate or by year was found (Ind §10.8) and the file bears one company whatever her fit (her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330).
       marines: 38
+      # The trimmers the bill tells off by station at the beat when she carries this fit (package 75, Phase 5; the lead's ruling 13 of 2026-11-14): what her seamen leave when one side's guns of this fit, the chasers and the wheel are manned, the marines taking the carronades first, split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of 44, as the bill's are, so that every crew of this fit is manned at the beat; the bill's trimmers (above) are the default fit's, whose guns want fewer seamen. JUDGEMENT: the bill's rule on this fit's guns (Indf §6.4), as her marines on it are, since no period quarter bill for a ship of about her company was found (Ind §6.3: RMG WQB/39, the Indefatigable's of 1812, is a watch bill) and the file bears one company whatever her fit (her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330).
+      trimmers:
+        forecastle: 9
+        fore_top: 12
+        main_top: 14
+        mizzen_top: 7
+        afterguard: 9
       guns:
       # Her gun deck's twenty-six long 24-pounders, thirteen a side, the 64's lower-deck guns kept (James vol. 1 p. 454): the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her decks, as the frigate-36 numbers hers.
       - id: gun.1.starboard
