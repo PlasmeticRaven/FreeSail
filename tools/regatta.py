@@ -527,7 +527,10 @@ def run_door(
     desk = driver.desk
     desk.on_record_only = True  # the regatta runs no model without its consent on record
     desk.race = True  # and tells it the session is a race (package 42b)
-    http = TestClient(app)
+    # the game and its door in one process, on the machine itself (package 115: the
+    # server asks a door elsewhere for the mark, and the test client's default is no
+    # address of the machine's)
+    http = TestClient(app, base_url="http://localhost", client=("127.0.0.1", 50000))
     out = out or sys.stdout
     # the door names the game at the machine's own address, as every door does (package 115:
     # the server answers no other name)
