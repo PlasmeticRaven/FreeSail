@@ -22745,6 +22745,530 @@ generator (`test_bellerophon`, `test_bilander`, `test_neufchatel`, `test_dumb_sh
 passed (five of the fast tier; 7b-129, 7-133 and 7-171 of the slow, against its junit); no outcome
 changed against the bases. Ruff check and format clean on what is touched.
 
+## Package 75, as built (Phase 5) (2026-11-14)
+
+The package folded step by step, as Build-Ships.md §4.1 gives the integrator's Phase 5: each step
+with its commits, the trunk's merge of it where there is one, a pointer to its own section in this
+file (which stays the record: nothing above is deleted or rewritten), its truths, its rulings by
+whom, and what it left; then the three builds of the lead's readings of cda12ec9 by their causes;
+then one list of everything recorded as left for a later package, whose each; then Phase 5's own two
+commits and their suites. The brief is the package's entry in `docs/dev/M7-WorkPackages.md`
+("Package 75: the ships", with the lead's notes to the ships session beneath it); the plan is
+`docs/design/Build-Ships.md`; the ships' designs are `docs/design/Design-Ship-Indefatigable.md`,
+`Design-Ship-PrinceDeNeufchatel.md`, `Design-Ship-Bilander.md`, `Design-Ship-Bellerophon.md` and
+`Design-ShipsEngineExtensions.md` (Ext). "The lead" is the lead's notes in M7-WorkPackages by date
+and number; "the owner" is the owner's word as those notes or this file record it.
+
+**The package's own rulings, before any step.** The owner (2026-10-28): the package built by his own
+local session by its workflow method (research, decisions, two-draft designs, a behaviour-free stage
+0, builders in worktrees, reviews by lenses, truths); the whole *Indefatigable* first as the hull's
+pilot (Build-Ships.md §2.6); a 74 from the *Bellona* or the *Bellerophon* (his note 9, "dream a
+little big"); the hull's end goal, hulls distinguishable and as near the sources as they allow
+(§5.0); and, from 2026-10-25, the British bilander under a settee main. The owner's note of
+2026-10-24: the sub-types as fits and roles the scenario editor selects. The lead (2026-10-28): the
+session's five extensions ruled in (the hull drawn in the viewer, the lateen class and the yards
+under the bowsprit under the gate with the settee, the lee ports wired for every ship, the settee
+tacking as a mizen); the engine extensions' gate passed as designed
+(`Design-ShipsEngineExtensions.md` at bee6e96, the mizen course cut at the mast its first item); the
+per-ship generator modules under `tools/ships/`, the lead's structural decision, agreed. The
+frigate-36's quarterdeck is known wrong against Winfield (p. 143) and kept as it is by the owner's
+ruling (Build-Ships.md §11; TuningNotes, "Open, for the lead: the frigate's quarterdeck against
+Winfield"): nothing of this package touches it.
+
+### The steps, in order
+
+1. **Research, decisions and design** (2026-10-25 to 29). The research notes and the owner's two
+   rounds of decisions (`Decisions-ShipsRound2-2026-10.md`, answers at 9710fad), the four ship
+   designs and Ext, and `Build-Ships.md`, the one build document. Rulings: the owner's answers
+   (above); the lead's notes of 2026-10-28 and 29 (the gate; D48's third way; the hull's principles,
+   design and order approved at 85b5a2a; the three later designs read at 164027c). Docs only; no
+   pin.
+2. **Stage 0, 0E, 0H** (2026-10-28 to 30), behaviour-free: fd5bb95 (with c514048 the pages and
+   b562bae the driver), 2ead5f0 and 0dbde00 (0E), the hull's shape keys (0H, §3.5). Every hook
+   inert, nothing moved (§16.1's first row). Rulings: the lead, stage 0 accepted as laid
+   (2026-10-28), stage 0E accepted and the driver's addendum ruled (2026-10-29). Merged with B1.
+3. **B1, HMS *Indefatigable*: the 64 of 1784 and the razee of 1795** (2026-10-28 to 30), with B3.1,
+   B3.2 and B3.5 (the lateen cut at the mast, the yards under the bowsprit, the driver: Ext §17) and
+   B5 (the viewer's first drawing). The branch at bb60222, merged on the trunk at b3d68189 (the
+   lead's record "Package 75, B1 (the *Indefatigable*), as merged"). Section: "Package 75, the first
+   ship: HMS *Indefatigable*, the 64 and the razee". Truths drafted: 7-186 to 7-189 (in
+   `tests/test_indefatigable.py`) and 7-230 (the driver, in `tests/test_driver.py`, with the 64's
+   clauses in hers). Rulings: the owner, the mizen course cut at the mast for the 64 and the 74
+   (2026-10-28) and the razee's speed against the frigate-36's left to the tuning of both
+   (2026-10-29, Indf §17); the lead, Ext §17.11 approved and the four points (2026-10-30), B1's
+   stage B and three figures ruled (2026-10-30), the merge from bb60222 as it stood. Left: the B1
+   record's "Found by the session, booked" (the shift or bend belayed after `send_up`, the
+   ringtail's `wrecked`), and the list below.
+4. **The hull step: the eight existing ships' own hulls** (SW-2 with SW-2b.2, B5.6; 2026-10-31). The
+   branch at d9477c6 (the eight landed as one commit 7dd68f2), merged on the trunk at dd208a3e
+   ("Package 75, the hull step ..., as merged"). Section: "The eight hulls (package 75, SW-2 with
+   SW-2b.2)". Truth 7-185 drafted in `tests/test_profiles.py`, the brig's band its one pin moved
+   ("Truth 7-185's band"). Rulings: the owner's word to build the rest too; the lead's ten points
+   (2026-10-31) and then the eight points and the viewer step (2026-10-31, later). Left: the
+   lugger's bowsprit at 21.8 kN for a tuning pass ("Left and reported").
+5. **The lee ports: L2 on the heel, L3 with the roll, the rig lines and the booms** (2026-10-31 to
+   11-05). 65c56b8b, 46926bdf (the record, and the *Neufchatel*'s §12.2a), 148af855, bd5566cd,
+   06019a4b, e88df444 (the trunk brought in at 1238bedf), merged on the trunk at 8c30c8a. Sections:
+   "The lee ports on the heel alone (package 75, L2)", "The lee ports with the roll (package 75,
+   L3)". Truth 7-190 drafted in `tests/test_lee_ports.py` ("Truth 7-190, drafted for Phase 5").
+   Rulings: the owner's rule, the dip the heel toward the gun's side plus the roll's amplitude (Bel
+   §13.1 answer 7); the lead's ruling on the ports as data honesty for every ship (2026-10-28).
+   Left: L2's and L3's lists for package 77, booked by the lead at the merge (below, items 1 to 4).
+6. **SW-5, the lee ports held a minute, and B3.4, the schooner's mast** (2026-11-06). 42a995b1 and
+   1c025178 (the trunk brought in at e6cf0334 and 5dd7d67a), merged on the trunk at f414ed1.
+   Sections: "The lee ports held a minute (package 75, the lead's ruling of 2026-11-06)", "The
+   schooner's mast (package 75, B3.4, the lead's ruling of 2026-11-06)". Rulings: the lead, the
+   minute's hold (`PORT_HOLD_S`, the owner leaning to it) and the rule in the key's place on the
+   *Neufchatel*'s §12.2a. Left: the polacre's masts and mizen for package 90 (below).
+7. **SW-4, the sub-types as fits and roles** (2026-11-06), with its words step (37c93bac,
+   2026-11-07). 1ff4e813, merged on the trunk at 73b9469; the words step with B2. Section: "The
+   sub-types, fits and roles (package 75, SW-4)" and its "The words step". Truth 7-191 drafted in
+   `tests/test_subtypes.py`. Rulings: the owner's note of 2026-10-24; the lead at the merge (the
+   slow node ids; the role sets). Left: "Left, and for whom" of that section (below).
+8. **B3.4's four rulings** (2026-11-07): da7c0e4d, aff2e57e, e5b861e3, 2e97d97f and the review's
+   mends 6e19f46c, merged on the trunk at 3c9df9e1. Section: "The lead's four rulings, built
+   (2026-11-07)" under B3.4. Rulings: the lead's four of 2026-11-06 (the short after swing, the word
+   by Luce, place 2, the courses' reef).
+9. **B2, the *Prince de Neufchatel*** (2026-11-07): her stage 0b (5afa7b6e, the scenario's
+   `nations:` block), 87896126, 84763fb8, 9f2276ee (her), a244e1bb (the shared guards), merged on
+   the trunk at 04136d99. Section: "The *Prince de Neufchatel* (package 75, B2)". Truths 7-192 and
+   7-193 drafted in `tests/test_neufchatel.py`. Rulings: the owner's choice of her and his word
+   "don't worry about tuning for best speed running" (2026-10-29); the lead's answers at Neuf-D §17.
+10. **B3.3 the settee in the engine, B5.4 the settee drawn, B3.4b, B2b and B4 the bilander**
+    (2026-11-07 to 08): 994bf966, 1bdb0546 (the trunk at 2da2668f), 52fad521, 46cf8218, 7fe5a877,
+    ceff087c, d0fd2799, bd12a802, merged on the trunk at acdcfb56. Sections: "The settee in the
+    engine (package 75, B3.3)", "The settee drawn (package 75, B5.4)", "B3.4b, the word's two cases
+    and the dismasted lines", "Her ruled fixes (B2b, 2026-11-08)", "The bilander (package 75, B4)".
+    Truths: 7-198 and 7-199 drafted on the fixture in `tests/test_settee.py` (B3.3) and measured
+    again on her file in `tests/test_bilander.py` (B4), 7-197 in hers. Rulings: the owner's of
+    2026-10-25 (the bilander); the lead's gate on the settee (2026-10-28) and B2b's ruled fixes
+    (2026-11-07).
+11. **B2c, the owner's two rulings on the *Neufchatel*, and B3.3b, the settee forced round**
+    (2026-11-08): 8b327687, d622c4d5, 5af283de, merged on the trunk at cff8fdb1. Sections: "The
+    owner's two rulings (B2c, 2026-11-08)", "B3.3b, the settee kept and forced round hove to", "B2c
+    and B3.3b, the review's mends". Rulings: the owner, "At lie a-try" and "Re-tune, widen bands 0.2
+    degrees" (2026-11-08, made in the lead's place).
+12. **SW-1, Table No. 29's charges, and the lead's ruled builds of 2026-11-09 and 11-10**
+    (2026-11-09 to 10): 35e33ad0, 8bceb1cb, caf1d329, ad71736f, merged on the trunk at 09222043.
+    Sections: "Table No. 29's charges (package 75, SW-1)", "The lead's ruled builds of 2026-11-09
+    and 11-10 (package 75)". Rulings: the lead's stage 0 rule ("where a figure of the eight would
+    move, the table serves the new ships alone") and the numbered builds of the 9th and 10th.
+13. **B7, the 74, HMS *Bellerophon*, steps 0 to 6** (2026-11-10): 75a59907 (stage 0c), 3d507afe,
+    92c80e2c (her), 7c1d561c (B7.b, the quarter bill by deck), 9c812f43 (the shared guards), merged
+    on the trunk at 31f6bb35 ("Package 75: B7, the 74 ..., as merged"). Section: "The 74, the
+    *Bellerophon* (package 75, B7)", steps 1 to 6 and "Her review's mends". Truths 7-194 to 7-196
+    drafted in `tests/test_bellerophon.py`. Rulings: the owner's word of 2026-10-28 (the class
+    chosen from the research, starting from the *Bellona* or the *Bellerophon*); the lead, her seven
+    points (2026-11-10 at 19:30), 7-196's alone clause recorded and not pinned (his answer (5), the
+    test taken out by the lead at the merge), 7-195's ordinary-sailing clause recorded.
+14. **Step 7 and the rulings of 2026-11-10** (2026-11-10 to 12): B7.c the tack at quarters
+    (69121a9e), B7.d numbering by deck (412658a9, 93a15ee5), the trim's words by the alias
+    (56c1174b), B7's review mends (62cf52c6), B7.e the rank-4 rule (9de4ba06, e4797779), the trunk
+    merged (1282e25f), the 74's two pins after it (9e04b9fa), the bilander's short watch and "make
+    all sail" (39b1ceac), the two-deckers lying a-try from way on (2005fc47), the 64's and the
+    razee's `marines` (0e5ff12d), the review's mends (7b9d7c29), the trunk merged again (f120b873,
+    94bfac27). Not merged on the trunk on its own: tried and held at e4797779 (2026-11-12 at 21:20,
+    two failures where it met the trunk) and at 7b9d7c29 (2026-11-13 at 01:05, truth 7-196 on the
+    places). Sections: "B7.c, the tack at quarters", "B7.d, numbering by deck", "B7.e, the rank-4
+    rule" with its review's mends and "B7.e and the trunk's merge", "The trim's words by the alias
+    (package 75)", "Package 75, B7's review mends", "The lead's rulings of 2026-11-10, built
+    (package 75)". Rulings: the owner's "Yes, build the rule" (2026-11-11) and the lead's (10) of
+    the answers to Bel-D §17.2; the lead's of 2026-11-10 at 19:30 and of 2026-11-12 at 21:20 (the
+    bare number's rule the trunk's, the seven digests of the trim's words re-pinned by the lead).
+15. **The lead's notes of 2026-11-12 and 13, built** (2026-11-12 to 13): the far ship of war
+    engaging from her passage (f5102fae; ruling (2) of 01:05), truth 7-196's crewed world made
+    honest (ff58e07d; (1)), the marines by fit (26473408; (4)), a ship under another's orders left
+    to her commander's book (65b757b9; (3)(b) of the 12th), the gun named by deck in the struck
+    carriage and the shut port (dfbe4031; (4) of the 12th), the review's mends (2d2bbd8b), the trunk
+    merged (caec1983). Section: "The lead's notes of 2026-11-12 and 13, built (package 75)",
+    subsections 1 to 6. Truth 7-231 (the spare block's, ruling (12) of 2026-11-14 accepting it) in
+    `tests/test_far_action.py` and beside the far fight's truths in `tests/test_known_truths.py`.
+    Rulings: the lead's (1) to (7) of 2026-11-13 at 01:05 ((3) the ship files' `timing:` accepted;
+    (5) the digests the lead's; (6) "set plain sail" by night in the bilander for the owner's word).
+16. **Ruling 10, one road for the hands called when the watch is too few** (2026-11-13): 7b067c6b,
+    the review's mends 4df85dc7, (c) built and the settee's pin moved bfb10c6f. Section: "The lead's
+    ruling 10, one road (package 75)". Ruling: the lead's (10), package 109's step 2 and the
+    settee's road made one, the settee's, with truth 7-542 and 109's step 2 tests holding as they
+    stood.
+17. **Rulings 8 and 11: the working officers and the bilander's nine** (2026-11-13): 04858415
+    (ruling 11), d6a88e2e (ruling 8 on it), the review's mends 07a5869c, the trunk merged
+    (cda12ec9). Section: "The lead's rulings 8 and 11, the working officers and the bilander's nine
+    (package 75)". Rulings: the owner's words (8) of 01:15 ("the bilander's watches should be large
+    enough to do the standard work that does not normally call all hands") and (9) of 01:25 ("In
+    principle I support the merchantman's master and mate as working hands, as long as it is a
+    relatively smooth change for the other merchant vessels currently"); the lead's (9) measured
+    first and its wide form not built, the narrower (11) of 14:32 built on its three conditions;
+    nine JUDGEMENT within the sourced eight to nine.
+18. **Phase 5, the made-out rule** (2026-11-13 to 14): 53c14457. Section: "Package 75, Phase 5: the
+    made-out rule and the razee's trimmers by fit", its first subsection. Rulings: the lead's 12th's
+    (1) (2026-11-12) and (17) (a) as built (2026-11-14 at 04:50); (17) (b) not built. cda12ec9, the
+    hash before it, was sent and put on trial (2026-11-14 at 04:40, rulings (12) to (16), Phase 5 to
+    begin on it) and NOT merged (05:10, the two readings); Phase 5 went on beside the mends, the two
+    to come as one hash.
+19. **The readings of cda12ec9, mended, and Phase 5's trimmers beside them** (2026-11-14): the far
+    fight's 9f3140b1, 2e5700a3 and 40ef299e (merged on the branch at 667164e2); the crew's and the
+    evolutions' 3e7226b9, d039243e, 594234b4, 32372167 and 0e2d65b5 (b30c0553); the razee's trimmers
+    by fit 1a0f5fac (d7fbea68). Sections: "The lead's readings of cda12ec9: the far fight", "The
+    lead's readings of cda12ec9: the crew and the evolutions", "The razee's trimmers by fit (the
+    lead's ruling 13, 2026-11-14)". Rulings: the lead's (F1) to (F6) and (C1) to (C8) of 05:10 and
+    ruling (13) of 04:40; the owner's word on mends (05:20, nudge 8: "as long as we make sure to
+    plan our fixes for them so as to build for generality rather than fixing the symptom"). Their
+    causes are below.
+20. **Phase 5's integration** (2026-11-14): the truths moved into the known truths, and these
+    records (below). The owner's word of 07:25 (nudge 10) holds what follows: the work in hand
+    finished in the one combined hash and the close-out after its merge, nothing begun after it,
+    packages 77 and 90's preliminaries held.
+
+### The truths
+
+Each is in `tests/test_known_truths.py` by its number since Phase 5 (7-185 to 7-199 and 7-230 after
+truth 7-184; 7-231 beside the far fight's truths after 7-369, as its row in Build-Ships.md §15 has
+it), its helpers where they live in the builders' files, each passing on the merged tree at the pins
+it was drafted with (the move's proof below). Slow by its node id: 7-191 (`SLOW_TESTS`, moved with
+it); 7-231 marked `slow`; 7-196 marked `pace` and run alone after the rest.
+
+| No. | The claim, short | Drafted | Measured (seed 7, the owner's machine) |
+|---|---|---|---|
+| 7-185 | the generator writes every file; every port gun on its port; each sill in its band | `tests/test_profiles.py`, SW-2 (2026-10-31) | 18 files byte for byte, 582 port guns of every fit on their triples; the sills 2.19, 1.57, 1.57, 1.00, 0.95, 0.95, 1.53, 1.98 m; re-run with every file at Phase 5 |
+| 7-186 | the *Indefatigable*'s particulars; the razee the 64 cut down | `tests/test_indefatigable.py`, B1 stage A | beam 13.5 m, LWL 48.8 m; the lowest sills 1.53 and 1.98 m, the rise 0.44-0.45 m; complements 491 and 330 |
+| 7-187 | the razee lighter, stiffer and faster than the 64 | the same; the speed clause at stage B | the frigate-36 outsailing her in 15 kn reported, not forced |
+| 7-188 | her broadside against the frigate-36's by 70's rule | the same | 510 and 714 lb against 421; 108 s and 195 s, the 64 103 s and 185 s |
+| 7-189 | the 64 handles with her mizen yard and her spritsails | the same, stage B (two tests) | 56-63 degrees off hove to; her tacks 244-266 s |
+| 7-190 | every armed file's lowest lee port shuts at its heel, and a roll sooner | `tests/test_lee_ports.py`, L3 (four tests, nine files) | 19.7 (the frigate-36) to 10.35 (the 74) degrees by file |
+| 7-191 | an armed Indiaman holds her colours where a merchantman strikes | `tests/test_subtypes.py`, SW-4 | 0.273 against her 0.25; the merchantman 0.12 against 0.4 |
+| 7-192 | the *Neufchatel*'s particulars | `tests/test_neufchatel.py`, B2 | her sill 1.50 m; 108 lb |
+| 7-193 | her polar's best point | the same | 12.07 kn in 25 kn |
+| 7-194 | the *Bellerophon*'s particulars | `tests/test_bellerophon.py`, B7 step 5 | her sill 1.57 m; 781, 867 and 938 lb |
+| 7-195 | her lower-deck ports shut at the heel the sources give | the same, step 6 (two tests) | 10.35 degrees heel alone; 6.9 with a roll of 4 |
+| 7-196 | a 74 crewed holds the floors (the crewed clause alone) | the same, step 6; its world made honest 2026-11-13 | 150, 151 and 147 ticks a second against 60; alone 476-505 against 500, recorded and not pinned |
+| 7-197 | the bilander's particulars; she lies as close as a brig | `tests/test_bilander.py`, B4 step 4 | closest 50, beat 60 |
+| 7-198 | the settee in stays kept drawing, its ourse to leeward, dipped last | `tests/test_settee.py` (B3.3) and `tests/test_bilander.py` (B4) | her file: haul at 90 and 93 s, lowered at 149 and 159 s |
+| 7-199 | in wearing the settee lowered as she bears up and hoisted past the wind | the same | her file: hoisted at 153 and 168 s |
+| 7-230 | the driver is the spanker to the physics; the shift of the mizen for it | `tests/test_driver.py` (B3.5) and the 64's clauses in `tests/test_indefatigable.py` | the shift in its band |
+| 7-231 | a far ship of war that engages from her passage keeps the sea and closes | `tests/test_far_action.py` (the notes of 12 and 13, (2)) | both engaging at 120, the Hero struck at 1200, possessed at 1260, the Foudroyant on passage at 1320 |
+
+**Not truths, as Build-Ships.md §15 said:** each scenario's round trip (B6's tests, and B6 is out to
+a supplemental package), the bilander's heave-to, the razee's lee ports (lines of 7-190).
+
+### The three builds of the readings of cda12ec9: their causes
+
+The owner's word on mends (above) asks of each mend its general cause, its place where the cause
+lives, where else the cause was looked for, and a test at that level. Each build's own section has
+the whole; what follows is the cause and the reach, so that a reader asks of the mended hash which
+it is.
+
+**The far fight (F1 to F6; the builder's branch `m-far`; section "The lead's readings of cda12ec9:
+the far fight").** (F1) is no cause-mend but a ruled revert: `far_action._fallback_reply` as before
+2d2bbd8b, its single mend (a far body that fires on the player and one he can hurt, together)
+package 77's. **(F2) to (F5), one cause:** a relation held from one minute to the next after the
+thing it stood on is gone, each reader asking only the part it was written for (`_pairs` "on the
+sea, not struck"; `_prize_taken` "is the mark my prize"; `_alone` "does a set hold her" and "is her
+commander on the sea"; the signal's state nothing). **Mended where it lives:** one answer,
+`freesail/world/relations.py` `still(world, holder, other, what)`, "is she still what I hold her to
+be", by four relations (MARK, STRUCK, PRIZE, SUPPORT), reading the sea's truth as the far brain and
+the prizes do, with `captains._commander_on_the_sea` and `FarCaptain._on_the_sea` folded into it;
+asked in every place a relation is held, for both bodies (the far rounds, the far brain's
+`_may_fight` hook in `Judgement._enemy_within` and its mark-taking, the shared `_prize_taken` and
+`_alone`, the rules captain's `_take_possession` and `_enemy_struck`, the prizes' `far_minute`,
+`prizes_of` and `_captor_near`, the cover's `squadrons._covered`, the signals' `_obey`). SUPPORT's
+distance is the set's own `lost_nm` (squadron 8, convoy 6, blockade 12; the squadron book's 8 for a
+ship under orders in no set), JUDGEMENT. A second fault under (F3), the set's pace leaving its
+prizes out, is mended in `Squadron.pace_cap_kn` (JUDGEMENT: a captor with a slower prize at nine
+tenths of the prize's best, moving 72's and 74's roads for every far captor with a prize). The one
+new datum is `damage["struck_to"]`; old checkpoints load. **Looked for elsewhere:** the far brain's
+investigating, chasing and evading (sound; nothing held); package 74's engaging road (its exits ask
+the one answer; ruling 14 keeps it from being asked each minute; the mark gone from the sea there is
+F6); fold-in and fold-back (unchanged); the near `Captain._mark` (not asked: package 70's near
+fight, the struck target dropped by `_watch_struck`); the `overmatched` and `man of war near`
+stimuli (they count a prize under an enemy prize crew: found, not mended); the sets keeping a member
+gone from the sea's list (package 72's); `_armed_enemy_alongside`, `signals.commanded_by` and
+`retake`'s recaptor case (agree, unchanged). **Tests at the cause's level:**
+`tests/test_relations.py` (ten: each relation and each way it stops being so, `_alone` for both
+bodies), then the cases in `tests/test_far_action.py` (F2's three roads, F3's cut-out and `_pairs`,
+F4, F5 with a control, a save in mid-engagement, F1). Found on the way and mended: `_obey`'s served
+lines said the sender's id; they say her name.
+
+**The crew and the evolutions (C1 to C8; `m-crew`; section "The lead's readings of cda12ec9: the
+crew and the evolutions").** **(C1), the lead's named cause:** work paused and begun again as if
+new. `Runner._try_resume` read the script's own beginning check (`Script.check`, which reads the
+world as the work found it and lays its plan from it: the veer's target from the scope out, the
+kedge's boat), and the work's own going made it false. **Mended where it lives:**
+`_failing_condition(begun=...)`, the script's check read only as work begins (`start`,
+`_start_waiting`), a resume and the next step reading the file's `requires` alone; the lead's other
+way (scripted work going on short) not taken, as it would run work under half its hands and leave
+two rules for one pause. **(C6), with it:** the pause, the release and the "Belayed" line were two
+copies, now one road, `Runner._hold`, for the manoeuvre's belay and the post's leaving. **Looked for
+elsewhere:** every road that begins or takes up work (`_begin`, `_start_waiting`,
+`_enter_next_step`, `Instance.__setstate__`, `_belay_held_work`, `belay`, `Script.begin`): nothing
+else begins work again. **Tests at that level:** every one of the registry's 64 scripted evolutions
+held and taken up again never reads its check (failing on 53c14457 at the first, back_anchor), a
+23-case sweep of every scripted work a bilander post may hold, and the reading's own kedge and veer.
+(C3) mended in `_post_off`, the one place a post leaves work (a hand struck or taken sick at work,
+`combat/hits.py`, `crew/health.py`, found and not mended). (C8)'s cause, ship work named from the
+evolution's verb, mended by the files' `doing:` key read in `Runner._doing` alone, its two copies
+(`orders/crew.py`'s, `api/queries.py`'s) reading it (the infinitive, `_describe`, found and not
+mended: 7-542's call words). (C2)'s cause, the company clamp rising with the ninth hand, mended by
+her own `hands:` figure, six, in a new ship-file section (JUDGEMENT; her file alone moves). (C4)'s,
+a claim taken from the runs: the test pins the rule's letter. (C5a)'s, two conversion roads, mended
+in `Runner._made_all_hands`; (C5b)'s, two judges of one question, in `Runner._calls_for_itself`.
+(C7): the owed tests, with two real checkpoints written on the trunk at 1eea8d18 and kept under
+`tests/fixtures/saves/`.
+
+**The razee's trimmers by fit (ruling 13; `m-trim`; section "The razee's trimmers by fit").** **The
+cause:** a ship file bears one quarter bill, set against her default fit (Indf §6.4), and a fit
+whose guns want other men was read with figures set for other guns; B1's marines were the same
+cause. **Mended where it lives, one road for every key a fit may give:** the schema (`FIT_OWN_BILL =
+("marines", "trimmers")`, a fit's `trimmers` in the bill's own form, refused in words where it
+cannot be, out of the pickle while None), the beat (`quarters._on_her_fit`, read by the marines kept
+and the trimmers alike; the bill's trimmers had one runtime reader, `Quarters.beat`, every other
+reading the division it forms), and the generator (`fit_bill`, the bill's own rules run on each
+fit's guns, writing a figure only where it differs). The 1795 fit's 51 (forecastle 9, fore top 12,
+main top 14, mizzen top 7, afterguard 9), JUDGEMENT, mans all twenty-two crews. **Looked for
+elsewhere:** every fit of every file beaten at muster; `helm`, `powder`, `priority`, `small_arms`
+and `boarders` do not depend on the guns; `filling` does, and the 64's 'ardent class 1794' reads 16
+where her 72 cannon would give 18 (not mended, not ruled: her file would move); the cutter's 'long
+guns' and the privateer schooner's 'letter of marque' read bills set on another fit, short of swivel
+hands (the same cause in form; for the lead). **The test at that level:** every fit of every file
+whose bill keeps marines mans every crew at the beat (the files read, not listed), and the one road
+checked for each key `FIT_OWN_BILL` names.
+
+### Left for a later package: one list
+
+Everything the package's records and the lead's notes leave for a later package or for another's
+hand, as at this head; whose, and where its figures are (a section of this file unless another
+document is named). An item a later step of this package took up is not here. The frigate-36's
+quarterdeck (above) stands apart: known wrong, kept by the owner's ruling, to be fixed later.
+
+**Package 77 (the gunnery's and the fight's evolutions; held by the owner's word of 2026-11-14 at
+07:25):**
+1. The lee ports in the orders: `engage` with every port of a side shut answering what follows, and
+   "fire the broadside" saying the ports before the ports' line (L2's and L3's "Left, and for whom";
+   booked by the lead at the lee-port step's merge, 2026-11-06).
+2. The two served words for the weather side (`the weather ports shut`, `the weather ports opened`,
+   `lee` False) under the in-world rule (the same).
+3. The rules captains reading the ports: `engage_side: weather` putting the mark on the shut guns;
+   `_a_gun_for_a_signal` and the distress gun taking an open port, never a weather gun (the same;
+   the cutter's and the *Renard*'s figures in L2's list).
+4. The weather port the roll shut opening exactly upright, said the lee's (the same;
+   `combat/ports.py`'s `_tell`).
+5. The fillers as posts: the gunner's crew and the quarter gunners stay `filling` by Falconer's rule
+   in every bill (Build-Ships.md §9.3; SW-4's list).
+6. The far fight made two-sided: a far body that fires on the player and one that can be hurt by
+   him, together (her reply at any cap; the player's shot, `hits._far_hit` into `damage["hits"]`,
+   carried into her record, her morale and her strike), with 2d2bbd8b's cap-nought test back (F1;
+   "The lead's readings of cda12ec9: the far fight", its "For the lead" (1)).
+7. The pumps: the reading naming the pumps worked one by one, the hands filled up as they come free,
+   the fallback ranked, all hands called when the deck cannot man them (the 74 struck at Plymouth
+   working one chain pump with four idlers: "The lead's notes of 2026-11-12 and 13, built",
+   subsections 5 and 6 (f); the lead's brief, item 4a(d)); and the pumps' five of the lead's (14).
+
+**Package 90 (the tartane, the xebec and the Spanish and Mediterranean ships; held likewise):**
+8. The polacre's pole masts and her lateen mizen kept hove to as a fore-and-after's, and whether the
+   heave-to's driver rule reaches it; a whole lateen hauled aft at helm's a-lee by nothing; the
+   limit of the schooner's-mast rule (a lower square-sail yard on the main, a pole main with a
+   topsail yard on the lower mast) for whichever files a pole main first ("The schooner's mast",
+   "Left, and for whom").
+
+**Package 71's road (the signals' owner) and the reviews:**
+9. (17) (b): the cautious frigate that keeps her distance from a ship of the line she does not know
+   a friend wants the private signal to reach as far as a glass reads flags, or friends avoid each
+   other ("Package 75, Phase 5", "Not built (ruling 17 (b))"; the lead's note of 2026-11-14 at
+   04:50).
+10. A King's ship made by a test world or a scenario that gives her no private signal table is taken
+    for an enemy by her own side: whether every King's ship carries the day's signals unless a
+    scenario takes them away (the lead's note of 2026-11-10 at 19:30, (5); truth 7-196's old world,
+    "2. B7: truth 7-196's crewed world made honest").
+
+**Package 72's road (the sets):**
+11. A set never lets go a member gone from the sea's list (`Squadron.minute` skips her; her slot is
+    kept); `_alone` no longer counts her, pruning her is the sets' ("The lead's readings of
+    cda12ec9: the far fight", "Looked for elsewhere").
+12. A crewed member does not keep a line-ahead station on a commander lying to (truth 7-196's
+    straggling: "2. B7: truth 7-196's crewed world made honest"); and a struck commander not yet
+    taken keeps her members on station around her (the far fight's reading, left).
+
+**Package 70's road (the near fight) and package 74's (the far):**
+13. The near `Captain._mark`, the battery's target, does not ask the one answer (the struck target
+    is dropped by `_watch_struck`): the far fight's reading, said.
+14. (F6) (a): the unseen mark chased by her true position (`FarCaptain._take_mark`,
+    `Vessel._target_of`); (b): package 74's chaser done when her mark is done, a chase leg whose
+    mark leaves the sea dropped and the chaser leaving the sea with it (a privateer whose chase
+    makes port vanishes), and the engaging road the same when the mark goes during the bodies' move
+    ("The lead's readings of cda12ec9: the far fight", "(F6), for the lead's list, not mended").
+15. The `overmatched` and `man of war near` stimuli count a prize under an enemy prize crew; mending
+    them moves the evading road (the same reading).
+
+**The lead's list for the reviews (the lead's (14) of 2026-11-14 at 04:40, each with the session's
+words):**
+16. The captor that went engaging from a chase and follows her prize for good: the one word in
+    `_DETOUR_STATES` moves package 74's road ("The lead's notes of 2026-11-12 and 13, built",
+    subsection 6).
+17. The far body that never strikes to the player's shot (with item 6).
+18. The commander who hauls off alone while the ship under her orders engages ("4. B7.e: a ship
+    under the orders of another left to her commander's book").
+19. The crewed member that does not keep station on a commander lying to (item 12).
+20. The signals' and the sets' faults the session found (the subsections above; items 10 to 12).
+21. C6's rest, as the reader gave it: `bill.on_deck_piped_down` a third copy of the on-deck rule;
+    `hands.too_few_on_deck` beside `request`'s own judgement; `held_up` carrying two meanings (its
+    first now made by one road, `Runner._made_all_hands`); `_engaging_mark` beside `Captain._mark`;
+    `PASSAGE_HELD` beside `_DETOUR_STATES` ("The lead's readings of cda12ec9: the crew and the
+    evolutions").
+22. From the crew's build, found and not mended: the infinitive name (`Runner._describe`: "All
+    hands! (to send boat)", "Only four hands to lay out kedge") still reads the verb, held by
+    7-542's call words; a hand struck or taken sick at work stays in the work's assignment, unsaid,
+    mending it moving King's ships' action lines; on the trunk, a file's own all-hands work that
+    waits and is removed before it begins leaves the hands up; the merchant brig's larboard three
+    and the smack's larboard two cannot heave to by night alone, on the trunk too; (C5b)'s one judge
+    changes one untested case (other work holding hands with the deck under half: the hands piped
+    down and the boat waiting, where they were kept up) (the same section).
+23. From the trimmers' build: the 64's 'ardent class 1794' `filling` 16 against 18 by the rule; the
+    cutter's 'long guns' and the privateer schooner's 'letter of marque' short of swivel hands at
+    the beat ("The razee's trimmers by fit"); and an old save keeps the bill's 79 on the 1795 fit (a
+    game saved before keeps its figure, "loads as before"; for the lead's ruling if wanted
+    otherwise).
+24. The spoken-sail filter (package 43's, shared with the cruiser and the trials), kept as it is
+    (the lead's note of 2026-11-12 at 21:20, (3) (a)).
+25. The hail line's comma where a description holds commas (ten rows, shared templates, a served
+    line recorded passages may hold), and the replay fingerprint's timing under load beside truth
+    7-441's (the lead's note of 2026-11-10 at 19:30, (7)).
+26. "set plain sail" by night in the bilander (her settee by all hands, the hands piped down, the
+    fore course and topsails waiting for the watch's two), for the owner's word on short watches
+    (the lead's (6) of 2026-11-13 at 01:05; ruling 8's nine and ruling 11's posts built since).
+27. The schooner of the merchant passage takes the ground thirteen times as recorded and never with
+    one more hand (the lead's note of 2026-11-13 at 14:32; "Ruling 11 measured: condition (a), the
+    three other traders").
+28. The close-hauled gap of the two-deckers (the *Bellona*'s 9 kn against the engine's 6.64 at 60
+    degrees in 25 kn): a later package of the physics (the lead's answer (12) to Bel-D; "Step 5: her
+    helm, her handling, her polar as tuned and truth 7-194").
+
+**SW-4's left, each the lead's:**
+29. The lugger's company (her three 18-pounders want thirty by the gun's rule against her thirty,
+    judgement); a rail gun named a swivel, with a swivel's crew and count (`Gun.name`,
+    `orders/gunnery.py`); the pivot's arc 62 to 141 against the owner's 60 to 140 by eye; the role
+    sets keyed by name elsewhere and not widened (the hail's words, the private signals,
+    `regimes._MAN_OF_WAR_ROLES`, `squadrons._ARMED_ROLES`, `orders.HAND_PEACEFUL_ROLES`, the
+    readings' service words); whom the revenue cutter speaks (every sail she closes); no trader
+    cutter drawn by the business; truth 7-191's margin, 0.023 on the Indiaman's line ("The
+    sub-types, fits and roles", "Left, and for whom").
+30. Not modelled, said: the smuggler and the search, a later package's with the Customs' and the
+    Excise's cruisers if the owner asks for the coast's trade; the packet's description (no packet
+    fit; a packet one of the merchant brig's roles by `role: packet`) for her own hull (the same).
+
+**A tuning pass's, or the files' figures against the sheets (a later package; the owner's eye):**
+31. The lugger's bowsprit at 21.8 kN against 37.4 by rule (3)'s words ("The eight hulls", "Left and
+    reported").
+32. The brig's sills on WL1 (303 t by her sheet against her file's 413 t: her wind to shut about
+    24.0 to 20.6 kn if mended); the lugger's heel (15.9 degrees in 15 kn, over 50 in gusts); at 25
+    kn under all sail the royals and topgallants carrying away (L2's "Left, and for whom").
+33. The one table of every figure the sheets now disagree with, and the F rows of the booms, masts
+    and bowsprits ("The eight hulls", "Every figure the sheets now disagree with" and "Where the
+    existing rig no longer sits right on the new hull").
+
+**The engine's, for the lead (B3.3's and B5.4's left):**
+34. Backing and filling taking the brig as filed to a run in 15 kn; the box-haul's head through the
+    wind by the bow on the sternboard and its "Wind aft"; taken aback with no helm full and by, a
+    settee left against its mast with no word ("The settee in the engine", "Left, and for whom").
+35. The settee's drawing: the two yards' crossing by the wind, the derrick drawn, a sheet held to
+    windward drawn to leeward, the yard's length; a lug's slings and cloth drawn apart if the
+    lugger's lugs are drawn set to weather ("The settee drawn", "Left, and for whom").
+
+**The scenarios:**
+36. B6, a scenario per ship: out to a supplemental package on the owner's word of 2026-11-05, booked
+    as the ships' scenarios after Phase 5, in the waves table when 75 closes (the lead's note of
+    2026-11-06).
+
+**Found by the cold review, for the close-out's notes and not mended in this hash** (the lead's note
+of 2026-11-14 at 07:25, nudge 10; `docs/reviews/ColdReview-M7.md` on the trunk, its F2.1, 5.9 and
+6.2 of the ships):
+37. The generator keeps its own copy of the sail-force law and it has drifted from the engine's:
+    `tools/gen_ships.py`'s `PEAK_COEFF` gives the studding class 1.25, the comment's "the engine's
+    force coefficient at the peak of each class's curve ... if the curves change, change these and
+    rerun", where the review reads the engine's as 1.44; a rating pass's figure, read by the
+    generator alone.
+38. The six `tests/test_hull_<ship>.py` files (the brig, the cutter, the frigate, the lugger, the
+    schooner, the smack) are one test written six times.
+
+**For the lead at the merge, not a package's:**
+39. The digests the readings' builds move by words alone, to re-pin on the build machine:
+    `TRIAL_STATION_GALE` (bf16fbf514055f29), `TRIAL_TRADE_THICK` (de00808076d8cccf),
+    `GATE_5B_SCHOONER`, `GATE_5C_MERCHANT`, `GATE_6A_FAKE_CAPTAIN`, and the first action's whole log
+    (234036cc17e6f137 to ce44219434e1e42c, its 497 lines the same); with the seven of 56c1174b the
+    lead re-pins (the lead's note of 2026-11-14 at 06:25, nudge 9).
+40. `Design-Ship-Indefatigable.md` §6.4's B1 paragraph says the 1795 fit is "still three crews
+    short", which ruling 13 has made out of date (its table already gives 9, 12, 14, 7 and 9, 51);
+    the design's owner's to amend, left by the trimmers' build, whose brief allowed records only in
+    this file.
+
+### Phase 5's integration: the truths moved, and these records
+
+**The truths moved** (commit "Package 75, Phase 5: the truths moved into the known truths"). Each of
+package 75's drafts, 7-185 to 7-199 and 7-230 (25 test functions in nine builders' files), cut from
+its file and set in `tests/test_known_truths.py` after truth 7-184 under one heading, by number, its
+decorators with it (the parametrizations, `pace`), its docstring saying where it was drafted and
+that it was moved; what it read from its own file imported where it lives, inside the truth (`from
+tests.test_X import ...`), and its two rows' tables for 7-190's parametrization (`LOWEST_LEE_PORT`,
+`RAZEE_DECKS`) imported at the file's head, pure constants with no side effect at import. Every
+other test of the builders' files is kept; their headers and module docstrings say where the truths
+went. Two small changes beside the move, neither a figure: 7-197 read her generator module's figures
+through a module fixture of `tests/test_bilander.py`, so the probe is a helper there
+(`her_module_figures`) which the fixture and the truth both call; and 7-185's docstring says what
+its re-run with every file is (eighteen files, 582 port guns; the three new ships' sills their own
+truths' or design's). **7-196 is its crewed clause alone**, its figures in its words (the crewed
+floor's 60 and the measured 150, 151 and 147; her clause alone, the build machine's 500, recorded
+and not pinned with its figures, the comment that held them in `tests/test_bellerophon.py` folded
+into the docstring). **7-231 was there already** and is checked: in its form beside the far fight's
+truths, which call their tests where they live, its docstring now naming what its called tests
+assert since the review's mends and (F3) (the passage taken up at 1320, the prize in company).
+`SLOW_TESTS`: 7-191's node id moved with it (`test_subtypes.py::` to `test_known_truths.py::`); no
+other moved truth was slow by node id. No truth is red on this machine, so none needed its reason
+said.
+
+**The move moves nothing, by junit** (the scripts and their output in the session's scratch,
+`p5/truths/`, outside the repository). The touched files whole (`tests/test_known_truths.py` and the
+nine builders' files), `--slow`, four workers, from each tree's root with `py`, freesail imported
+from it: before, on a worktree of the head at d7fbea68 (08:12 to 09:07 UTC); after, on a worktree of
+it with this commit's eleven files, byte for byte the commit's (09:07 to 10:13). Each way 1,316
+tests: 9 failed, 1,298 passed, 1 skipped, 8 xfailed. **The 40 moved cases** (the 25 functions with
+their parameters) have the same outcome by their function and parameters, all passed, before in
+their builders' files and after in the known truths. **The other 1,276** have the same outcome by
+file and name, none only in one run and none changed. The nine failures are the same tests both ways
+and none is a moved truth: six this machine's at the bases already (the gate passages' constants and
+digests, decision 26's machine: 5b's schooner passage, 767 lines against 766; 5c's merchant passage
+and truths 77, 78 and 79; 6a's schooner on an intent), and three pace tests read under four workers,
+as the conftest's own note says they will be (the day under the systems 486 before and 495 after,
+the gate's day with the region 474 and 475, 7-159's convoy 448 and 441 ticks a second, against truth
+51's 500); truth 7-196, the pace truth moved, passed both ways. While the before-run ran, this
+section's own checks ran beside it for some minutes in one process, and once for two minutes on four
+workers (the primer's three tests, stopped); the after-run had nothing beside it.
+
+**The records** (commit "Package 75, Phase 5: the as-built records"): this section;
+`docs/TechnicalSpec-M7.md` §27 as built; `docs/agents/Harness.md`'s two events of Build-Ships.md
+§4.1 (`the lee ports shut`, `the lee ports opened`), written already at the lee-port step and
+brought true (the minute's hold, the lines by deck, the opening said the lee's); the primer's ships
+chapter (`docs/primer/28-the-ships.md`, new, in the README's table) and chapter 15's list of the
+hulls on the sea; and Build-Ships.md §16.1's rows for the three builds' commits and the truths'
+move.
+
+**Beside the records, one small change in tests and one check:** `tests/test_primer.py` gives the
+primer's blocks the five new ships (`sixty-four`, `seventy-four`, `razee`, `neufchatel`, `bilander`)
+and checks chapter 28 with the others, so that its five orders blocks are run through the parser as
+the primer's introduction promises; the chapter's scenario entries were loaded through
+`load_scenario` and sailed a minute in a scratch copy of a shipped scenario (the revenue cutter on
+her `long guns` with the revenue's book, the merchant brig under the Indiaman's), outside the
+repository.
+
+**The suites, as run (the records).** Once, on 7d1fd6de with this commit's files uncommitted (this
+paragraph written after), from the tree root with `py`, four workers, nothing else running (10:15 to
+10:30 UTC): `tests/test_primer.py`, `test_grammar_book.py`, `test_in_world.py`, `test_practice.py`,
+`test_context_budget.py`, `test_local_runner.py`, the six `test_hull_<ship>.py` files (which read
+the ships' design notes and Build-Ships.md), `test_agents.py` (which reads the primer's chapters and
+their sizes) and the known truths' test of the primer's chapter 9 by its node id (so the files' slow
+tests ran too): 1,553 passed, 1 xfailed (the base's own,
+`test_an_empty_reply_at_an_urgent_event_counts_and_words_end_the_count`). Against the fast base cut
+to the same files, no outcome changed; new, chapter 28's five orders blocks and its in-world case,
+all passed. Ruff check and format clean over `freesail`, `tests` and `tools` (389 files). Nothing
+pushed; both commits local, no trailer.
+
 ## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
 
 Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
