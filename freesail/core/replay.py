@@ -24,8 +24,11 @@ checkpoint and a world replayed to the same tick carry on to the same digest for
 watch. The state is Python's pickle of the object graph with the hooks that do not
 pickle left out (the ship's stepper and order handler, the chart's shared tiles, the
 log's subscribers, an agent's live door) and put back at the load; it is read through
-an unpickler that admits the game's own classes and the standard library's plain
-types and nothing else, so a checkpoint from elsewhere cannot run code here.
+an unpickler that admits an exact list of the classes and functions the game's own
+checkpoints hold (`core/checkpoint_names.py`) and nothing else, so that loading a
+checkpoint from elsewhere calls nothing but the game's own constructors of its state
+(package 115, part B: before it the list admitted whole modules, and a hand-made
+checkpoint could call a function of the operating system).
 
 **The build's stamp and the load's rule** (package 37d; the review of gate 5c's
 playtests, sections 6 and 9). A save and its checkpoint's header say which build wrote
@@ -445,58 +448,48 @@ def _new(cls: type) -> Any:
     return cls.__new__(cls)
 
 
-# What a checkpoint may name: the game's own classes and the standard library's plain
-# types that its state is made of. Anything else is refused, so a checkpoint from
-# elsewhere cannot run code here.
-_ALLOWED_MODULES = ("freesail.",)
-_ALLOWED_EXACT = {
-    ("freesail.core.replay", "_new"),
-    ("copyreg", "_reconstructor"),
-    ("builtins", "set"),
-    ("builtins", "frozenset"),
-    ("builtins", "list"),
-    ("builtins", "dict"),
-    ("builtins", "tuple"),
-    ("builtins", "object"),
-    ("builtins", "bytearray"),
-    ("builtins", "bytes"),
-    ("builtins", "str"),
-    ("builtins", "int"),
-    ("builtins", "float"),
-    ("builtins", "bool"),
-    ("builtins", "complex"),
-    ("builtins", "range"),
-    ("builtins", "slice"),
-    ("builtins", "getattr"),
-    ("random", "Random"),
-    ("_random", "Random"),
-    ("collections", "OrderedDict"),
-    ("collections", "deque"),
-    ("collections", "defaultdict"),
-    ("datetime", "datetime"),
-    ("datetime", "date"),
-    ("datetime", "timedelta"),
-    ("datetime", "time"),
-    ("datetime", "timezone"),
-    ("pathlib", "PosixPath"),
-    ("pathlib", "WindowsPath"),
-    ("pathlib", "PurePosixPath"),
-    ("pathlib", "PureWindowsPath"),
-    ("enum", "EnumType"),
-    ("enum", "EnumMeta"),
-}
-_ALLOWED_PREFIXES = ("numpy",)
+# What a checkpoint may name (package 115, part B; the cold review's 5.4): an exact list of
+# the classes and functions the game's own checkpoints hold (`core/checkpoint_names.py`,
+# written from the census of `tools/checkpoint_names.py` and held to it by
+# `tests/test_checkpoint_names.py`), and nothing else: no module admitted by its name, so
+# nothing a module of the game has itself imported, and no dotted name walked from one.
+# The cause it mends: the loader admitted any name in any module beginning `freesail.`
+# and `numpy`, and `builtins.getattr`, and so whatever those modules import (a hand-made
+# checkpoint that named `os.getcwd` through `freesail.settings` was loaded and called it).
+#
+# `getattr` is admitted for one thing alone: the bound methods the game's own older
+# checkpoints hold (a World's coast hooks, before they were left out), each by its class
+# and its method's name exactly (`BOUND_METHODS`); any other use is refused.
+from freesail.core.checkpoint_names import ADMITTED  # noqa: E402
+
+BOUND_METHODS: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("freesail.core.world.World", "_coast_of_plane"),
+        ("freesail.core.world.World", "_coast_trend_of_plane"),
+    }
+)
+
+
+class CheckpointRefused(pickle.UnpicklingError):
+    """A checkpoint that holds what the game's own checkpoints never hold."""
+
+
+def _bound_method(obj: Any, name: str) -> Any:
+    cls = type(obj)
+    if (f"{cls.__module__}.{cls.__qualname__}", name) not in BOUND_METHODS:
+        raise CheckpointRefused(
+            f"the checkpoint asks for {cls.__qualname__}.{name}, which a checkpoint may not hold"
+        )
+    return getattr(obj, name)
 
 
 class _Unpickler(pickle.Unpickler):
     def find_class(self, module: str, name: str) -> Any:
-        if (
-            (module, name) in _ALLOWED_EXACT
-            or module.startswith(_ALLOWED_MODULES)
-            or module.startswith(_ALLOWED_PREFIXES)
-        ):
+        if (module, name) == ("builtins", "getattr"):
+            return _bound_method
+        if (module, name) in ADMITTED:
             return super().find_class(module, name)
-        raise pickle.UnpicklingError(
+        raise CheckpointRefused(
             f"the checkpoint names {module}.{name}, which a checkpoint may not hold"
         )
 

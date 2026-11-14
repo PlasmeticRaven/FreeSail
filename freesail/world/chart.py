@@ -555,7 +555,7 @@ class Tile:
 
     @classmethod
     def load(cls, path: Path) -> Tile:
-        with np.load(path) as z:
+        with np.load(path, allow_pickle=False) as z:  # a tile is arrays, never a pickle
             elevation = z["elevation"]
             if "predictor" in z.files and int(z["predictor"]) == 2:
                 # the build's horizontal differencing undone: int16 wraps exactly

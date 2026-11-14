@@ -17678,3 +17678,201 @@ def test_truth_7_609_another_device_opens_the_printed_address_and_not_the_machin
     with PageClient(app, client=ON_THE_MACHINE) as here:
         r = here.post("/api/harbour/shortcut", json={})
         assert r.status_code == 200
+
+
+def _hand_made_checkpoint(module: bytes, name: bytes, args: tuple[str, ...] = ()) -> bytes:
+    """The review's hand-made checkpoint (`probes/checkpoint-allow-list.py`): a pickle that
+    names `module`.`name` and calls it with `args`, written as a pickle is, by hand."""
+    import pickle
+
+    out = pickle.PROTO + b"\x04"
+    for part in (module, name):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL + pickle.MARK
+    for a in args:
+        b = a.encode("utf-8")
+        out += pickle.BINUNICODE + len(b).to_bytes(4, "little") + b
+    return out + pickle.TUPLE + pickle.REDUCE + pickle.STOP
+
+
+def _getattr_checkpoint(module: bytes, name: bytes, attribute: bytes) -> bytes:
+    """A hand-made checkpoint that asks `getattr` of a name the list admits."""
+    import pickle
+
+    out = pickle.PROTO + b"\x04"
+    for part in (b"builtins", b"getattr"):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL
+    for part in (module, name):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL + pickle.SHORT_BINUNICODE + bytes([len(attribute)]) + attribute
+    return out + pickle.TUPLE2 + pickle.REDUCE + pickle.STOP
+
+
+def test_truth_7_605_a_hand_made_checkpoint_beside_a_save_runs_nothing_and_the_save_is_replayed(
+    tmp_path,
+):
+    """Package 115, part B, items 1 and 2 (the review's 5.4): a save of the game's own, its
+    checkpoint replaced on the disk by a hand-made one under the save's own header, so that
+    it is taken for the save's, and the save taken up by `--load` as a player takes it up.
+    Before, the loader admitted any name in any module of the game, and `getattr`: the
+    reviewer's checkpoint called `os.getcwd` through `freesail.settings`. Now each road is
+    refused (a function of the operating system through a module of the game; a module the
+    list once admitted whole, numpy; `getattr` of an admitted class), nothing is run (the
+    folder the payload would make is not made), the load says the checkpoint could not be
+    read and why, and the save is replayed from its journal to the same log."""
+    import gzip
+
+    from freesail.core import replay
+    from freesail.ui.server import prepare_game, server_parser
+
+    save = tmp_path / "mine.json"
+    world = prepare_game(
+        server_parser().parse_args(["--scenario", "data/scenarios/lesson-falmouth.yaml"]),
+        say=lambda _l: None,
+    )
+    world.run(60)
+    replay.save_to_file(world, save)
+    cp = replay.checkpoint_path(save)
+    with gzip.open(cp, "rb") as f:
+        header = f.readline()
+    made = tmp_path / "made-by-the-checkpoint"
+    payloads = [
+        _hand_made_checkpoint(b"freesail.settings", b"os.mkdir", (str(made),)),
+        _hand_made_checkpoint(b"freesail.core.replay", b"pickle.loads", ("x",)),
+        _hand_made_checkpoint(b"numpy", b"load", (str(save),)),
+        _hand_made_checkpoint(b"os", b"mkdir", (str(made),)),
+        _getattr_checkpoint(b"collections", b"deque", b"__reduce__"),
+        _getattr_checkpoint(b"freesail.core.world", b"World", b"mro"),
+    ]
+    for payload in payloads:
+        with gzip.open(cp, "wb") as f:
+            f.write(header + payload)
+        loaded = prepare_game(server_parser().parse_args(["--load", str(save)]), say=lambda _l: 0)
+        report = loaded.load_report
+        assert report.how == "replay", report
+        assert replay.COULD_NOT_BE_READ in report.checkpoint
+        assert "may not hold" in report.checkpoint
+        assert not made.exists()
+        assert loaded.log.digest() == world.log.digest()
+
+
+def _census_cases():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import checkpoint_names as C
+
+    cases = [
+        pytest.param("fixture", p, 0, (), id=p.name)
+        for p in sorted(C.FIXTURES.glob("*.checkpoint"))
+    ]
+    cases += [pytest.param("scenario", p, C.RUN_S, (), id=p.name) for p in C.scenario_files()]
+    cases += [
+        pytest.param("scenario", C.SCENARIOS / n, run_s, orders, id=what)
+        for what, n, run_s, orders in C.WORLDS
+    ]
+    return cases
+
+
+@pytest.mark.parametrize(("kind", "path", "run_s", "orders"), _census_cases())
+def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list_admits(
+    kind, path, run_s, orders
+):
+    """Package 115, part B, item 1: the loader's list is exact and made from what the
+    game's own checkpoints hold. Each checkpoint of the census (`tools/checkpoint_names.py`:
+    every scenario begun as the harbour begins it and run ten minutes, the kept saves, a
+    fight with the guns cast loose and fired, a port, the far world) is read with every name
+    it calls recorded, and every name is one the list admits; a class new to a checkpoint
+    fails here until it is added to the list on purpose, by the tool. `getattr` is admitted
+    only for the bound methods the older checkpoints hold, each by its class and name."""
+    import checkpoint_names as C
+
+    from freesail.core.checkpoint_names import ADMITTED
+
+    names = (
+        C.names_of_file(path) if kind == "fixture" else C.census_of_scenario(path, run_s, orders)
+    )
+    lacking = sorted(names - ADMITTED - {("builtins", "getattr")})
+    assert not lacking, f"{path.name} holds names the list lacks: {lacking}"
+
+
+def test_truth_7_607_every_kept_save_loads_from_its_checkpoint_as_before():
+    """Package 115, part B, item 2: every kept save under `tests/fixtures/saves/` is taken
+    up from its checkpoint, as before the list was made exact (not passed over for a replay
+    because a name was refused), and the bare checkpoint without a save is read whole."""
+    from freesail.core import replay
+
+    saves = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "saves"
+    for save in sorted(saves.glob("*.json")):
+        world, report = replay.load_report(save, replay_anyway=True)
+        assert report.how == "checkpoint", (save.name, report.why)
+    for cp in sorted(saves.glob("*.checkpoint")):
+        if not cp.with_suffix(".json").exists():
+            header, world = replay.read_checkpoint(cp)
+            assert header["end_tick"] == world.clock.tick
+
+
+def test_truth_7_608_an_act_in_a_save_names_a_record_of_the_game_or_nothing_is_made(tmp_path):
+    """Package 115, part B, item 3 (where else): a save's acts (`core/acts.py`) name the
+    game's records by module and name, and the loader walked the name through whatever the
+    module imports, as the checkpoint did, and made what it found. A save of the game's own
+    with the scripted watcher at his station, marked as another build's (so that it is
+    replayed by its stations' acts, as an older save is), an act added to it by hand on the
+    disk whose line carries a walk out of the module
+    (`freesail.settings:os.environ`), a class imported from elsewhere
+    (`freesail.core.acts:dataclasses.Field`), a function, or a method of a record, and taken
+    up by `--load` as a player takes it up, is refused in words and nothing of it is made;
+    the same save without the act is replayed by its acts as before."""
+    from freesail.core import replay
+    from freesail.ui.server import prepare_game, server_parser
+
+    world = prepare_game(
+        server_parser().parse_args(
+            ["--scenario", "data/scenarios/lesson-falmouth.yaml", "--watcher", "fake"]
+        ),
+        say=lambda _l: None,
+    )
+    world.run(60)
+    save = tmp_path / "mine.json"
+    replay.save_to_file(world, save, checkpoint=False)
+    kept = json.loads(save.read_text(encoding="utf-8"))
+
+    def with_act(named: str) -> Path:
+        data = json.loads(json.dumps(kept))
+        data["build"] = {"name": "an-older-build", "rules": "0000000000000000"}
+        data["builds"] = [data["build"]]
+        line = {
+            "severity": "routine",
+            "kind": "director.note",
+            "text": "A line of a hand-made act.",
+            "actor": "director",
+            "data": {"what": {"__class__": named, "fields": {"words": "a bell"}}},
+        }
+        data.setdefault("station_acts", []).append(
+            {"tick": 30, "after_inputs": 0, "station": "watcher", "line": line}
+        )
+        path = tmp_path / "made.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        return path
+
+    for named in (
+        "freesail.settings:os.environ",
+        "freesail.core.acts:dataclasses.Field",
+        "freesail.core.acts:decode",
+        "freesail.agents.agent:StandBy.__init__",
+    ):
+        with pytest.raises(SystemExit, match="no record of the game"):
+            prepare_game(
+                server_parser().parse_args(["--load", str(with_act(named)), "--replay-anyway"]),
+                say=lambda _l: None,
+            )
+    # the same save without the hand-made act is replayed by its acts, the watcher seated
+    data = json.loads(json.dumps(kept))
+    data["build"] = {"name": "an-older-build", "rules": "0000000000000000"}
+    data["builds"] = [data["build"]]
+    plain = tmp_path / "plain.json"
+    plain.write_text(json.dumps(data), encoding="utf-8")
+    loaded = prepare_game(
+        server_parser().parse_args(["--load", str(plain), "--replay-anyway"]),
+        say=lambda _l: None,
+    )
+    assert "watcher" in loaded.agents and loaded.log.digest() == world.log.digest()

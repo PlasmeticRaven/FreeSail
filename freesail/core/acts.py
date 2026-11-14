@@ -493,10 +493,21 @@ def decode(v: Any) -> Any:
             module, _, name = str(v["__class__"]).partition(":")
             if not module.startswith("freesail."):
                 raise ValueError(f"an act names {module}:{name}, which an act may not hold")
+            # a record of the game's, defined in that module of the game by that name
+            # (package 115, part B: the same cause as the checkpoint's, a name from a file
+            # walked through whatever a module of the game imports; no walk now leaves the
+            # module the name says, and nothing but a record class is made)
             cls: Any = importlib.import_module(module)
             for part in name.split("."):
-                cls = getattr(cls, part)
-            if not dataclasses.is_dataclass(cls):
+                cls = cls.__dict__.get(part) if isinstance(cls, type) else vars(cls).get(part)
+                if cls is None:
+                    break
+            if (
+                not isinstance(cls, type)
+                or not dataclasses.is_dataclass(cls)
+                or cls.__module__ != module
+                or cls.__qualname__ != name
+            ):
                 raise ValueError(f"an act names {module}:{name}, which is no record of the game")
             return cls(**{k: decode(x) for k, x in v["fields"].items()})
         return {k: decode(x) for k, x in v.items()}
