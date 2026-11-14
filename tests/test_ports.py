@@ -768,9 +768,7 @@ def test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_goes():
     to 212700 on the tree before: 'Send the boat ashore with the purser' at 209444 waited
     for hands while all hands brought her to an anchor, was belayed with no line when the
     anchoring ended, as the sail work held then is, and the launch stood "hoisting out" to
-    the end of the game). The boat's errand waits on through the anchoring and goes. Its waiting
-    line names the work by the one road for its name (the lead's last list of 2026-11-14, 9): "Not
-    hands enough on deck to send the boat; ...", where 20a8e2e3 said "to send boat", the id."""
+    the end of the game). The boat's errand waits on through the anchoring and goes."""
     w = world_at(CARRICK_ROAD, heading=200.0, speed=2.0)
     w.run(30)
     e = w.submit("bring her to an anchor")
@@ -779,8 +777,8 @@ def test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_goes():
     e = w.submit("send the boat ashore")
     assert e.kind == "order.accepted" and w.dealings.boat.away
     w.run(5)
-    waits = [x.text for x in events(w, "evolution.waiting") if "send the boat" in x.text]
-    assert waits == ["Not hands enough on deck to send the boat; the hands are coming to anchor."]
+    waits = [x.text for x in events(w, "evolution.waiting") if "send boat" in x.text]
+    assert waits == ["Not hands enough on deck to send boat; the hands are coming to anchor."]
     away = run_until(w, "boat.away", 90)
     assert away.text.startswith("The launch away for ")
     assert not events(w, "boat.stood_down")

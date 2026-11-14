@@ -8,14 +8,14 @@ words and their class (§8.2); the merchant brig sailing her own file (§8.4, th
 2026-10-29); a scenario's `role:` refused at the load outside her description's roles and the
 captains' (§8.1); the two new books, the Indiaman's and the revenue cutter's (§8.3), each against
 the book it is made from and at sea; quarters beaten in the three unarmed files meeting their
-bills, measured and pinned (§9.1); and truth 7-191's world, the truth drafted here and moved
-into `tests/test_known_truths.py` at Phase 5 (§15; 2026-11-14). The reviews' mends: a crewed ship
-kept evading by a man of war of her own class (a row's `unless` naming several stimuli), a crewed
-sub-type keeping her first role when her intent is changed, the sub-types found after "the", and one
-role refused in the singular. The words step (the lead's ruling at SW-4's merge, 2026-11-07): the
-revenue cutter told and hailed as the Customs' cruiser she is, the Indiaman told by her name, the
-role sets that key by name taking the revenue cutter as armed and of the Crown and the Indiaman as a
-merchantman, and the Musquidobit fit's carronades at Adye's pattern."""
+bills, measured and pinned (§9.1); and truth 7-191, drafted here for Phase 5 to move into
+`tests/test_known_truths.py` (§15). The reviews' mends: a crewed ship kept evading by a man of war
+of her own class (a row's `unless` naming several stimuli), a crewed sub-type keeping her first
+role when her intent is changed, the sub-types found after "the", and one role refused in the
+singular. The words step (the lead's ruling at SW-4's merge, 2026-11-07): the revenue cutter told
+and hailed as the Customs' cruiser she is, the Indiaman told by her name, the role sets that key by
+name taking the revenue cutter as armed and of the Crown and the Indiaman as a merchantman, and the
+Musquidobit fit's carronades at Adye's pattern."""
 
 from __future__ import annotations
 
@@ -802,7 +802,7 @@ def test_the_smacks_fit_is_cullodens_two_guns_and_her_bill():
 
 
 def test_no_port_gun_of_the_small_files_wants_a_port_they_have_not():
-    """Truth 7-185's form (`tests/test_known_truths.py`): the lugger and the smack have no port, and
+    """Truth 7-185's form (`tests/test_profiles.py`): the lugger and the smack have no port, and
     their guns stand on none; the schooner's stand on the file's existing triples (Musquidobit's
     carronades at +4.81 on the plate's own port 5, where no gun of the privateer's fits stands)."""
     from freesail.combat.ports import PORT_PLACES
@@ -950,7 +950,7 @@ def test_quarters_beaten_unarmed_meet_her_files_bill(path):
 
 
 # ---------------------------------------------------------------------------
-# Truth 7-191's world (§15); the truth in tests/test_known_truths.py since Phase 5
+# Truth 7-191 (§15), drafted here for Phase 5 to move into tests/test_known_truths.py
 # ---------------------------------------------------------------------------
 
 
@@ -1019,6 +1019,49 @@ def _one_broadside_into_the_brig(role: str):
         if m is not None:
             least = min(least, m.value)
     return v, brig, w, least
+
+
+def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside():
+    """**A draft, for Phase 5 to move into `tests/test_known_truths.py` and measure again on the
+    merged tree** (Build-Ships.md §15, row 7-191; the brief's item 4: "an Indiaman is not a
+    merchantman who strikes at the first telling broadside"). The merchant brig, her own file's
+    sixteen men and four 6-pounders, given `role: indiaman` and `role: merchant` by her scenario
+    entry, crewed a cable off the French cutter's starboard beam; one broadside at the word, three
+    12-pounder carronades (36 pounds to her 12), the fire held after it. At seed 7 (measured on the
+    owner's machine, 2026-11-06) the one broadside is the same in both: three fired, one struck
+    her, one killed and one wounded. As a merchantman she strikes at it, her figure 0.12 under the
+    merchant's 0.4 (two of sixteen hurt and the odds); as an Indiaman she holds her colours through
+    the ten minutes, her figure at its least 0.27 over the Indiaman's 0.25. Each half can fail: the
+    Indiaman's strikes if her role is not carried to her crewed captain or her book's figures are
+    the merchant's, and the merchantman's holds if no shot tells or his line is the Indiaman's."""
+    out = {role: _one_broadside_into_the_brig(role) for role in ("indiaman", "merchant")}
+    broadsides = {}
+    for role, (v, brig, w, _least) in out.items():
+        assert brig.captain.role == role and v.brain.role == role
+        assert brig.ship.spec.crew.complement == 16 and len(brig.ship.guns) == 4
+        fired = [(e.data["fired"], e.data["struck"]) for e in w.log if e.kind == "action.fired"]
+        hit = [
+            (e.data["hits"], e.data["killed"], e.data["wounded"])
+            for e in brig.log
+            if e.kind == "action.hit"
+        ]
+        broadsides[role] = (fired, hit)
+    # one broadside, the same broadside into both
+    assert broadsides["indiaman"] == broadsides["merchant"] == ([(3, 1)], [(1, 1, 1)])
+    v, brig, _w, _least = out["merchant"]
+    line = [e for e in brig.log if e.kind == "action.struck"]
+    assert v.struck and brig.captain.state == "struck" and line
+    assert line[0].data["by_rule"] and line[0].data["strike_below"] == 0.4
+    assert line[0].data["morale"] == 0.12 and brig.ship.extra["morale"].value == pytest.approx(
+        0.123, abs=0.001
+    )
+    assert "two of 16 hurt, against a broadside of 36 pounds to our 12" in line[0].text
+    v, brig, _w, least = out["indiaman"]
+    assert not v.struck and not brig.ship.extra.get("struck")
+    assert not [e for e in brig.log if e.kind == "action.struck"]
+    m = brig.ship.extra["morale"]
+    assert m.strike_below == 0.25 and least == pytest.approx(0.273, abs=0.001)
+    assert least >= m.strike_below
 
 
 # ---------------------------------------------------------------------------

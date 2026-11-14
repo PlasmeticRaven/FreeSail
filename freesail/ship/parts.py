@@ -516,17 +516,6 @@ class Charge(StrEnum):
 
 # The words of a gun's kind, for the log and the readings.
 GUN_KIND_WORDS = {"long": "long gun", "carronade": "carronade", "swivel": "swivel"}
-# A deck as the guns' words say it (`schema.DECK_WORDS`; the `roundhouse` is the poop:
-# docs/design/Design-Ship-Bellerophon.md §3.5): the beat's deck lines (`crew/quarters.py`), and
-# (package 75, B7.d) a gun's name on a ship that numbers her guns by deck.
-DECK_SAID = {
-    "lower": "the lower deck",
-    "middle": "the middle deck",
-    "upper": "the upper deck",
-    "quarterdeck": "the quarterdeck",
-    "forecastle": "the forecastle",
-    "roundhouse": "the poop",
-}
 
 
 @dataclass
@@ -567,22 +556,13 @@ class Gun(Part):
     # not say, and a gun pickled before it): read by the lee ports' rule, and the 74's bill by
     # deck will
     deck: str | None = None
-    # numbered by deck (package 75, B7.d: docs/design/Design-Ship-Bellerophon.md §5.2, §12.1
-    # item 2): true for a gun of a file whose armament numbers its guns `by deck`, each deck's
-    # pairs from No. 1, set by the ship that builds it (`ship/graph.py`) and read by its name and
-    # its crew's key. A plain class default, no field, false for every other gun and for one
-    # pickled before it, and left out of the pickle while false.
-    by_deck = False
 
     def __getstate__(self) -> dict[str, Any]:
         """Its state for the checkpoint, its deck only where its file names one (package
-        75), and its numbering by deck only where it is so numbered (B7.d's stage 0), so that
-        a gun without them is pickled as before them."""
+        75), so that a gun without one is pickled as before it."""
         state = dict(self.__dict__)
         if state.get("deck") is None:
             state.pop("deck", None)
-        if not state.get("by_deck"):
-            state.pop("by_deck", None)
         return state
 
     @classmethod
@@ -615,12 +595,10 @@ class Gun(Part):
     @property
     def name(self) -> str:
         """The gun's name as the deck says it: 'No. 3 starboard gun', 'the starboard bow
-        chaser', 'the stern chaser', 'the No. 2 larboard swivel'; on a ship that numbers her
-        guns by deck (package 75, B7.d) a broadside gun's with its deck, 'No. 3 starboard gun of
-        the lower deck'."""
+        chaser', 'the stern chaser', 'the No. 2 larboard swivel'."""
         side = f"{self.side} " if self.side else ""
         if self.place == "broadside":
-            return f"No. {self.number} {side}gun{self.of_deck}"
+            return f"No. {self.number} {side}gun"
         if self.place in ("bow", "stern"):
             return f"the {side}{self.place} chaser"
         if self.place == "pivot":
@@ -647,21 +625,10 @@ class Gun(Part):
         return ", ".join(parts)
 
     @property
-    def of_deck(self) -> str:
-        """' of the lower deck' after a broadside gun's number on a ship that numbers her guns
-        by deck (package 75, B7.d: she has a No. 3 on each deck), else ''."""
-        if self.by_deck and self.place == "broadside" and self.deck:
-            return f" of {DECK_SAID.get(self.deck, f'the {self.deck}')}"
-        return ""
-
-    @property
     def pair_key(self) -> str:
         """The key of the gun crew that serves it: the broadside pair by number, else the
-        gun itself (a chaser or a swivel has its own small crew). On a ship that numbers her
-        guns by deck (package 75, B7.d) the pair by its deck and number, `gun:lower:3`."""
+        gun itself (a chaser or a swivel has its own small crew)."""
         if self.place == "broadside":
-            if self.by_deck and self.deck:
-                return f"gun:{self.deck}:{self.number}"
             return f"gun:{self.number}"
         return f"gun:{self.id}"
 

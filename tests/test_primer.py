@@ -78,12 +78,6 @@ SHIP_FILES = {
     "cutter": ROOT / "data" / "ships" / "cutter.yaml",
     "brig": ROOT / "data" / "ships" / "brig.yaml",
     "lugger": ROOT / "data" / "ships" / "lugger.yaml",  # package 43b: chapter 2's lug
-    # package 75, Phase 5: chapter 28's ships
-    "sixty-four": ROOT / "data" / "ships" / "sixty-four.yaml",
-    "seventy-four": ROOT / "data" / "ships" / "seventy-four.yaml",
-    "razee": ROOT / "data" / "ships" / "razee-44.yaml",
-    "neufchatel": ROOT / "data" / "ships" / "hermaphrodite-brig.yaml",
-    "bilander": ROOT / "data" / "ships" / "bilander.yaml",
 }
 SPECS = {name: load_spec(path) for name, path in SHIP_FILES.items()}
 
@@ -113,7 +107,6 @@ CHAPTERS = [
     "20-the-director.md",  # package 50: the world orders refused at the prompt
     "23-colours-and-signals.md",  # package 71: the colours, the signals, the lights
     "26-the-boat.md",  # package 82: the boat as a hull, the person aboard another ship
-    "28-the-ships.md",  # package 75, Phase 5: the ships, the new hulls and the sub-types
 ]
 
 DRIVER_COMMANDS = frozenset(

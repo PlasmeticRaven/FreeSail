@@ -86,7 +86,6 @@ __all__ = [
     "Vessels",
     "polar_of",
     "rig_height_m",
-    "rigged",
     "vessel_from_spec",
 ]
 
@@ -248,10 +247,10 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
     },
     # package 75 (docs/design/Design-Ship-Indefatigable.md §8; D16 (a)): the Indefatigable as
     # built, an Ardent-class 64 of 1784, and as razeed in 1795, a 44 cut down from her; the
-    # tops make out a ship of the line as the 74 (below), the razee a ship
+    # tops make out a ship
     "sixty-four": {
         "file": "data/ships/sixty-four.yaml",
-        "rig": "a ship of the line",
+        "rig": "a ship",
         "what": "a sixty-four, a ship of the line of two tiers of ports",
     },
     "razee": {
@@ -277,34 +276,13 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "what": "a bilander, a merchantman under a settee main, deep laden",
     },
     # package 75 (docs/design/Design-Ship-Bellerophon.md §8): HMS Bellerophon, the
-    # Arrogant-class 74 of 1786, a third rate. The tops make out a ship of the line at her
-    # rig's distance, the glass what she is. The lead's ruling of 2026-11-12, (1): her size and
-    # her two tiers are what a lookout tells first of a ship of the line, so her class (rank 4,
-    # `captains._SIZE_WORDS`) is known there (JUDGEMENT on the distance, `RIG_MADE_OUT_NM`).
-    # Before it she was "a ship" there, a frigate's class, until made out.
+    # Arrogant-class 74 of 1786, a third rate; the tops make out a ship, the glass her two tiers
     "seventy-four": {
         "file": "data/ships/seventy-four.yaml",
-        "rig": "a ship of the line",
+        "rig": "a ship",
         "what": "a seventy-four, a ship of the line, fourteen ports a tier",
     },
 }
-# Her rig's word (`DESCRIPTIONS`' `rig`, a vessel's `kind`) is what the tops make out of her at the
-# rig's distance, and for a two-decker that is her class, "a ship of the line" (the lead's ruling 17
-# of 2026-11-12, 53c14457). How she is rigged is another thing: a ship of the line is ship-rigged,
-# her main topsail laid aback when she lies to, and "His Majesty's ship" by her hail. The readers of
-# how she is rigged read `rigged` (the whole-change review of 80e703c7, sources-1 and gundeck-3: the
-# made-out word served the hail's answer, "His Majesty's ship of the line Bellerophon", and the
-# glass's "her sails aback" for a two-decker lying to, where both read as a ship's before it).
-RIGGED_AS = {"a ship of the line": "a ship"}
-
-
-def rigged(kind: str) -> str:
-    """How a vessel of the rig's word `kind` is rigged, in the same words: a ship of the line is a
-    ship; every other rig's word is its own."""
-    word = str(kind or "")
-    return RIGGED_AS.get(word, word)
-
-
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
     "frigate": "frigate",
@@ -1981,7 +1959,6 @@ class Vessels:
         the land is), each made out at the lookout's distances by eye (the glass aloft for
         the one her captain has in hand), her nation when her colours are shown and made
         out, `spoken` for a sail spoken; the distance is her truth, nearest first."""
-        from freesail.world.captains import size_of_words
         from freesail.world.chart import NIGHT_LAND_NM
         from freesail.world.lookout import relative_words
 
@@ -2017,11 +1994,7 @@ class Vessels:
                     "known": o.words_at(level),
                     "nation": shown if colours else None,
                     "spoken": o.id in spoken,
-                    # her class by what is made out of her, as a near captain's tops judge it
-                    # (`captains.size_of_words` on the lookout's words; the lead's ruling of
-                    # 2026-11-12, (1)): nought while she is "a sail". Before it, a far vessel
-                    # read her true class at any distance (`_size_of`, package 43).
-                    "size": size_of_words(o.words_at(level)),
+                    "size": _size_of(o),
                 }
             )
         items.sort(key=lambda s: s["estimate_m"])
@@ -2310,6 +2283,17 @@ def _lights_of(v: Vessel) -> str:
     fishing = getattr(v, "fishing", None)
     out = getattr(fishing, "out", None) if fishing is not None else None
     return "a lantern at her nets" if out is not None and out.state == "fishing" else ""
+
+
+def _size_of(v: Vessel) -> int:
+    """A vessel's class for a cruiser's judgement of a superior force (package 43;
+    `captains.SIZE_RANK`): by her description, or her file's where she has none (the
+    pilot's cutter)."""
+    from freesail.world.captains import SIZE_RANK, size_of_file
+
+    if v.description:
+        return SIZE_RANK.get(v.description, 0)
+    return size_of_file(v.ship_file)
 
 
 def _ship_speed_ms(ship: Any) -> float:

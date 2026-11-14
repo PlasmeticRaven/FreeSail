@@ -10,15 +10,6 @@ The file shape (spec §8.4, with the additions the runner needs)::
 
     id: set_square                 # the evolution's id; the file name must match
     verb: set                      # the order verb it answers (for the vocabulary)
-    work: lay out the kedge        # optional: the work in words, as an order to it is given,
-                                   # where the verb's alone would be its id ("lay out kedge"):
-                                   # read by the runner's one road for both forms, "to lay out
-                                   # the kedge" and "laying out the kedge" (`Runner._describe`,
-                                   # `Runner._doing`; the lead's (C8) and the last list's 9 of
-                                   # 2026-11-14); for a part's work the words before the part's
-                                   # name ("work: cut away" gives "to cut away the main mast"
-                                   # and "cutting away the main mast"; "work: clear away the
-                                   # wreck of" gives "clearing away the wreck of the fore mast")
     applies_to: {class: square}    # the subject's class: a sail or spar class, "sail" (any
                                    # sail), "yard", "spar" (any spar), "part" (a spar or a
                                    # sail: clearing a wreck, package 30b), or "ship"
@@ -30,9 +21,7 @@ The file shape (spec §8.4, with the additions the runner needs)::
                                    # any precondition; found so by work that waited its
                                    # turn, it is a routine line (`evolution.done_already`)
                                    # and not a failed evolution (package 37f)
-    requires:                      # checked at the start and again before every step; for a
-                                   # script, at the start and as it is taken up again after a
-                                   # belay, never while it runs (`Runner._try_resume`)
+    requires:                      # checked at the start and again before every step
       - {check: not wrecked(spar_chain(sail)), reason: "The {sail}'s spars are wrecked."}
     steps:
       - do: loose                  # a name for the step, shown in the state snapshot
@@ -151,14 +140,6 @@ class Evolution:
     # (a precondition fails): ``on_refused`` in the file, else ``on_fail``'s (package 37k:
     # a tack that could not begin was said in a missed stay's words)
     on_refused: Outcome | None = None
-    # the work in words as an order to it is given (``work:`` in the file), the one source of both
-    # forms of its name (`Runner._describe`, the infinitive, and `Runner._doing`, the gerund made
-    # from it): for work whose subject is the ship its whole name ("lay out the kedge"), for a
-    # part's the words before the part's name ("cut away"); None, the verb's own words ("batten
-    # down", "set" the fore topsail). The runner reads it from the registry by the work's id, so
-    # that work pickled before it is named as the file names it now (the lead's (C8) of 2026-11-14
-    # and the last list's 9; the whole-change review, engine-3)
-    work: str | None = None
 
     @property
     def nominal_duration_s(self) -> float:
@@ -298,29 +279,6 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
             f"{where}: only an all-hands evolution belays the work in hand; "
             "its crew line must say hands: all."
         )
-    if "doing" in data:
-        # the gerund was a second source of the work's words beside the verb's infinitive (the
-        # lead's last list, 9, of 2026-11-14): one key now, and both forms are made from it
-        raise EvolutionFileError(
-            f"{where}: the work is named once, as an order to it is given ('work: lay out the "
-            "kedge'); the log's 'laying out the kedge' is made from it, so 'doing' is not read."
-        )
-    work = data.get("work")
-    if work is not None and (not isinstance(work, str) or not work.strip()):
-        raise EvolutionFileError(f"{where}: work must be the work's name in words, not {work!r}.")
-    if (
-        work is not None
-        and str(applies_to.get("class")) != "ship"
-        and " the " in f" {work} "
-        and not f" {work.strip()}".endswith(" of")
-    ):
-        # a part's work names its part after its words: 'set the sail' would name it twice;
-        # words that end in 'of' name the part as their object ('clear away the wreck of' the
-        # fore mast; the review of 0dcdb8cf, F4)
-        raise EvolutionFileError(
-            f"{where}: a part's work names the words before its part by 'work' ('cut away', "
-            f"'clear away the wreck of'), and the part is named after them; not {work!r}."
-        )
     return Evolution(
         id=eid,
         verb=str(data.get("verb") or eid),
@@ -355,7 +313,6 @@ def parse_evolution(data: Any, path: str = "<memory>") -> Evolution:
             if data.get("on_refused")
             else None
         ),
-        work=work.strip() if work is not None else None,
     )
 
 

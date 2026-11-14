@@ -270,15 +270,6 @@ class MakeSignalScript(PhasedScript):
     def check(self, words: dict[str, Any]) -> str | None:
         return None if self._hoist() is not None else "no signal is bent on"
 
-    def standing(self, words: dict[str, Any]) -> str | None:
-        """Through the work: the hoist still bent on, in the locker and not hauled down (the
-        locker hauls down a hoist never run up after a glass, `Locker.tidy`, which a signal held
-        by a post's leaving may lie past), which its own going never does but by failing; refused
-        in the beginning's words, and never run up hauled down (the lead's last list of
-        2026-11-14, 8)."""
-        h = self._hoist()
-        return "no signal is bent on" if h is None or h.down is not None else None
-
     def phase_s(self, name: str) -> float:
         return self.timing_value("hoist_s", 60.0)
 

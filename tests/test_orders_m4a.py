@@ -95,12 +95,11 @@ TRIM_TABLE: list[tuple[str, ok | no]] = [
     ),
     ("trim the fore yard", ok(yards=["fore.yard"], text=["Braced the fore yard to the wind"])),
     # package 32e: a sheet is trimmed by an evolution with hands and time, so the order's
-    # line says the work is begun; each sail by the file's first plain alias, as the runner's
-    # done line names it (package 75, the trim's words by the alias; old "the mizzen spanker")
+    # line says the work is begun
     ("trim the jib", ok(sheets=["jib"], text=["Trimming the sheet of the jib."])),
     (
         "trim the spanker",
-        ok(sheets=["mizzen.spanker"], text=["Trimming the sheet of the spanker."]),
+        ok(sheets=["mizzen.spanker"], text=["Trimming the sheet of the mizzen spanker."]),
     ),
     (
         "trim the headsails",
@@ -113,7 +112,9 @@ TRIM_TABLE: list[tuple[str, ok | no]] = [
         "tend the sheets",
         ok(
             sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"],
-            text=["Trimming the sheets of the spanker, the fore topmast staysail and the jib."],
+            text=[
+                "Trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib."
+            ],
         ),
     ),
     ("tend sheets", ok(sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"])),
@@ -181,10 +182,8 @@ def test_the_schooner_trims_her_gaff_sails_by_the_sheet_and_her_topsail_by_the_y
     ship, runner = rigged(SCHOONER, awa_deg=45.0)
     kind, log, data = handle(ship, "trim the mainsail")
     assert [(e, s) for e, s, _ in runner.started] == [("trim_gaff_sheet", "main.sail")]
-    # her "mainsail", the word she was ordered by and her done line's (package 75, the trim's
-    # words by the alias; old "the main sail")
-    assert data["trimmed_sheets"] == ["the mainsail"]
-    assert log == "Trimming the sheet of the mainsail."
+    assert data["trimmed_sheets"] == ["the main sail"]
+    assert log == "Trimming the sheet of the main sail."
     kind, log, _ = handle(ship, "trim the fore topsail")
     assert [s for e, s, _ in runner.started if e == "brace"] == ["fore.topsail.yard"]
 

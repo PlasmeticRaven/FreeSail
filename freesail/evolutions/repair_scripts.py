@@ -440,21 +440,6 @@ class FishSparScript(PhasedScript):
             return f"the {name} is sound enough; a fish would add nothing to it"
         return None
 
-    def standing(self, words: dict[str, Any]) -> str | None:
-        """Through the work: the spar neither carried away nor sent down, which the fish's own
-        going never does (`Script.standing`)."""
-        spar = self.spar if self.spar is not None else self._subject(words)
-        if spar is None:
-            return None
-        name = _name(self.ship, spar.id)
-        if spar.wrecked:
-            return (
-                f"the {name} is carried away, not sprung; clear the wreck and shift it for a spare"
-            )
-        if spar.sent_down:
-            return f"the {name} is sent down on deck; it is fished when it stands"
-        return None
-
     def begin(self, words: dict[str, Any]) -> None:
         if self.spar is None:
             self.spar = self._subject(words)
@@ -515,16 +500,6 @@ class CutAwayMastScript(PhasedScript):
             return f"the {name} is no lower mast; a topmast is sent down, not cut away"
         if spar.wrecked:
             return f"the {name} is carried away already; clear the wreck"
-        return None
-
-    def standing(self, words: dict[str, Any]) -> str | None:
-        """Until the axes have done (the mast goes over the side at the end of `axes`, by the
-        work's own going): the mast not carried away already (`Script.standing`)."""
-        spar = self.spar if self.spar is not None else self._subject(words)
-        if spar is None or self.phase not in ("ready", "axes"):
-            return None
-        if spar.wrecked:
-            return f"the {_name(self.ship, spar.id)} is carried away already; clear the wreck"
         return None
 
     def begin(self, words: dict[str, Any]) -> None:

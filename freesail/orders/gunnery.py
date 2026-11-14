@@ -2,9 +2,7 @@
 
     engage her to starboard         the mark and the side: a standing intention the battery
     engage the brig to larboard     keeps (the engaged side's guns served and fired at her);
-    engage on both sides            'her' or nothing is the enemy nearest who may be fought;
-                                    with none, refused: a sail named is engaged as named;
-                                    refused, her own colours struck
+    engage on both sides            'her' or nothing is the enemy nearest, else the sail nearest
     load with round shot            the charge the guns are loaded with from now (round, chain,
                                     grape, double, a blank cartridge); a loaded gun keeps its
                                     charge until it is fired
@@ -68,14 +66,6 @@ guns, being places of the ship besides), "the poop" and "the poop carronades", e
 without, name that deck's broadside guns (its carronades alone where "carronades" is said), in
 `guns_named` and so in the director's and the world orders' slots that read it. Words that name
 no gun of hers are refused as before.
-
-**A number with its deck** (package 75, B7.d: Bel-D §5.2 item 6, the lead's answer (3) of
-2026-10-29): a ship whose file numbers her guns by deck (the 74 and the 64) has a No. 3 on each
-deck, each deck's pairs from No. 1 forward as the period numbered them, and her gun is named with
-its deck: "No. 3 starboard gun of the lower deck" (its name), "No. 3 on the lower deck", "the
-lower deck's No. 3", "No. 2 gun of the poop", the deck in the words a deck is named by above. A
-bare number names no gun of hers, and "fire" refuses it in words, naming the decks that have one.
-Every other ship's numbers are said as before, bare.
 """
 
 from __future__ import annotations
@@ -100,16 +90,7 @@ from freesail.orders import numbers
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
-from freesail.ship.parts import (
-    BARREL_LB,
-    DECK_SAID,
-    Charge,
-    Gun,
-    fit_levels,
-    gun_words,
-    kind_rank,
-    magazine,
-)
+from freesail.ship.parts import BARREL_LB, Charge, Gun, fit_levels, gun_words, kind_rank, magazine
 from freesail.ship.schema import DECK_WORDS
 
 __all__ = ["GUNNERY_VERBS", "check", "execute", "guns_named"]
@@ -229,16 +210,6 @@ _DECK_OF_WORD = {
     "forecastle": "forecastle",
     "poop": "roundhouse",
 }
-# A number with its deck on a ship numbered by deck (package 75, B7.d; the module's head), its side
-# already taken out: "No. 3 gun of the lower deck", "No. 3 on the lower deck", "the lower deck's
-# No. 3", "the poop's No. 2".
-_A_DECK = (
-    r"(?P<deck>(?:lower|upper|main|middle|gun)(?:\s+|-)deck|quarterdeck|quarter deck|quarter-deck"
-    r"|forecastle|poop)"
-)
-_A_NUMBER = r"(?:no|number|num)?\s*(?P<n>\d+)\s*(?:gun|carronade)?"
-_NUMBER_OF_A_DECK = re.compile(rf"^(?:the\s+)?{_A_NUMBER}\s+(?:of|on)\s+(?:the\s+)?{_A_DECK}$")
-_A_DECKS_NUMBER = re.compile(rf"^(?:the\s+)?{_A_DECK}(?:'s)?\s+{_A_NUMBER}$")
 _WORD_NUMBERS = {
     "one": 1,
     "two": 2,
@@ -358,14 +329,6 @@ def _side_of(said: str) -> tuple[str | None, str]:
 
 
 def _engage(ship: Any, battery: Battery, said: str) -> Result:
-    if (getattr(ship, "extra", None) or {}).get("struck"):
-        # her own state before any mark (the review of 0dcdb8cf, F6): a ship that has struck
-        # fights nobody (`relations.still`'s holder struck), and the order's "her" said so as
-        # "no enemy in sight to engage" with an enemy in sight; a mark named was taken, "the guns
-        # to fire as they bear", for guns that stay silent
-        raise OrderError(
-            "Our own colours are struck: the guns are silent; she lies to for her captor."
-        )
     # practice and resupply: a notional mark's words before the side's (`_side_of` refuses
     # a bare 'starboard' among them), and the cask's before the sail's
     notional = _notional_of(ship, said)
@@ -409,9 +372,8 @@ def _engage(ship: Any, battery: Battery, said: str) -> Result:
 
 
 def _mark(ship: Any, words: str) -> tuple[str, str]:
-    """The sail the words name among those in sight: 'her' or nothing is the nearest sail
-    her captain holds an enemy and may fight (`_enemy_to_engage`), refused in words with
-    none; a rig's word, a name or an id otherwise (the player's own choice of mark)."""
+    """The sail the words name among those in sight: 'her' or nothing is the nearest
+    enemy, else the nearest sail; a rig's word, a name or an id otherwise."""
     world = world_of(ship)
     lookout = getattr(world, "lookout", None) if world is not None else None
     if world is None or lookout is None:
@@ -424,13 +386,20 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
         if want.startswith(lead) and want not in _HER:
             want = want[len(lead) :]
     if not want or words.lower() in _HER:
-        pick = _enemy_to_engage(world, items)
-        if pick is None:
-            seen = ", ".join(_name_of(world, i) for i in items)
-            raise OrderError(
-                f"There is no enemy in sight to engage: name the sail to engage her "
-                f"('engage the brig to starboard'); in sight: {seen}."
-            )
+        nations = getattr(world, "nations", None)
+        ports = getattr(world, "dealings", None)
+        own = getattr(ports, "ship_nation", None)
+        enemies = [
+            i
+            for i in items
+            if i.get("nation")
+            and own
+            and nations is not None
+            and nations.at_war(str(i["nation"]), str(own))
+        ]
+        fired = _fired_on(world)
+        enemies += [i for i in items if i.get("id") in fired and i not in enemies]
+        pick = enemies[0] if enemies else items[0]
         return str(pick["id"]), _name_of(world, pick)
     for i in items:
         v = world.vessels.get(str(i["id"])) if hasattr(world, "vessels") else None
@@ -444,39 +413,6 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
     raise OrderError(f"No sail in sight answers to '{words}'; in sight: {seen}.")
 
 
-def _enemy_to_engage(world: Any, items: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """The order's 'her' (the lead's last list of 2026-11-14, item 1): the nearest sail in sight
-    (`items` are the lookout's, nearest first) that her captain holds an enemy (by her colours at
-    war with his nation, her shot at him, the private signal or the hail: `Captain._is_enemy`, his
-    judgement of the stimuli) and may fight (the one answer, `relations.MARK`: not struck, nobody's
-    prize, none of his side); None with none such, for the order is then refused in words. One
-    rule for the player's order and the rules captain's ("engage her", given when his own judgement
-    has an enemy in range), so that no sail is chosen the rule would not choose: before it, with no
-    enemy who might be fought in sight (a British merchant brig taken by the French, the only
-    enemy), the order took the first sail in sight, whoever she was, and laid the guns on a British
-    brig-sloop a third of a mile off."""
-    from freesail.world import relations as R
-    from freesail.world.signals import own_id
-
-    captain = getattr(world, "captain", None)
-    is_enemy = getattr(captain, "_is_enemy", None)
-    nations = getattr(world, "nations", None)
-    ports = getattr(world, "dealings", None)
-    own = getattr(ports, "ship_nation", None)
-    me = own_id(world)
-    for i in items:
-        if callable(is_enemy):
-            enemy = bool(is_enemy(i))
-        else:
-            shown = i.get("nation")
-            at_war = bool(shown and own and nations is not None)
-            fired = R.has_fired(world, str(i.get("id") or ""), me)
-            enemy = (at_war and nations.at_war(str(shown), str(own))) or fired
-        if enemy and R.still(world, me, str(i.get("id") or ""), R.MARK, judge=captain):
-            return i
-    return None
-
-
 def _name_of(world: Any, item: dict[str, Any]) -> str:
     lookout = getattr(world, "lookout", None)
     if lookout is not None:
@@ -487,6 +423,12 @@ def _name_of(world: Any, item: dict[str, Any]) -> str:
         except Exception:  # noqa: BLE001
             pass
     return str(item.get("known") or "the sail")
+
+
+def _fired_on(world: Any) -> set[str]:
+    captain = getattr(world, "captain", None)
+    fired = getattr(captain, "fired_on", None) if captain is not None else None
+    return set(fired or ())
 
 
 # -- the standing intentions ---------------------------------------------------------------
@@ -671,59 +613,11 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
         if not deck:
             return {"guns": guns}
         return {"guns": guns, "deck": deck, "deck_side": _side_said(w)}
-    on_each = _a_number_on_each_deck(ship, w)
-    if on_each:
-        raise OrderError(on_each)
     raise OrderError(
         f"Fire what? Say 'fire' for the broadside at the word, 'fire the starboard broadside', "
-        f"'fire No. 3 gun{_of_her_gun_deck(ship)}', 'fire the bow chaser', 'fire the pivot gun', "
-        f"'fire a shot across her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
+        f"'fire No. 3 gun', 'fire the bow chaser', 'fire the pivot gun', 'fire a shot across "
+        f"her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
     )
-
-
-def _numbered_by_deck(guns: dict[str, Gun]) -> bool:
-    """Whether her guns are numbered by deck (package 75, B7.d: her file's armament says so)."""
-    return any(g.by_deck for g in guns.values())
-
-
-def _of_her_gun_deck(ship: Any) -> str:
-    """' of the lower deck' after a number in a refusal's example on a ship numbered by deck
-    (package 75, B7.d), her lowest deck with broadside guns, else ''."""
-    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
-    if not _numbered_by_deck(guns):
-        return ""
-    decks = [g.deck for g in guns.values() if g.place == "broadside" and g.deck in DECK_WORDS]
-    return f" of {DECK_SAID[min(decks, key=DECK_WORDS.index)]}" if decks else ""
-
-
-def _a_number_on_each_deck(ship: Any, w: str) -> str:
-    """A bare number refused in words on a ship numbered by deck (package 75, B7.d; Bel-D §5.2
-    item 6): 'She has a No. 3 starboard gun on the lower deck, the upper deck and the
-    quarterdeck: name the deck, as 'fire No. 3 starboard gun of the lower deck'.' Empty where
-    the words are no bare number, her guns are numbered on across her decks, or no deck of hers
-    has the number (the words then name no gun of hers, as before)."""
-    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
-    if not _numbered_by_deck(guns):
-        return ""
-    words = [str(_WORD_NUMBERS.get(x, x)) for x in w.replace(".", " ").split()]
-    side = _side_said(w)
-    m = _GUN_NUMBER.match(" ".join(x for x in words if x not in ("starboard", "larboard", "port")))
-    if m is None:
-        return ""
-    n = int(m.group(1))
-    decks = {
-        g.deck
-        for g in guns.values()
-        if g.place == "broadside"
-        and g.number == n
-        and g.deck in DECK_WORDS
-        and (side is None or g.side == side)
-    }
-    if not decks:
-        return ""
-    said = [DECK_SAID[d] for d in sorted(decks, key=DECK_WORDS.index)]
-    gun = f"No. {n} {side + ' ' if side else ''}gun"
-    return f"She has a {gun} on {_and(said)}: name the deck, as 'fire {gun} of {said[0]}'."
 
 
 def guns_named(ship: Any, words: str) -> list[str]:
@@ -790,34 +684,6 @@ def _guns_of_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str
     ]
 
 
-def _number_on_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str] | None:
-    """The broadside guns of the number on the deck the words name ('No. 3 gun of the lower deck',
-    'the lower deck's No. 3', 'No. 2 on the poop'; package 75, B7.d, on a ship numbered by deck),
-    on the side if one was said; None where the words say no number with a deck, and [] where
-    that deck has no such number of hers."""
-    m = _NUMBER_OF_A_DECK.match(w2) or _A_DECKS_NUMBER.match(w2)
-    if m is None:
-        return None
-    broadside = [g for g in guns.values() if g.place == "broadside"]
-    said = m.group("deck")
-    gun_deck = re.match(r"^(lower|upper|main|middle|gun)(?:\s+|-)deck$", said)
-    if gun_deck is None:
-        deck = _DECK_OF_WORD[said]
-    elif gun_deck.group(1) == "gun":
-        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
-        if not decks:
-            return []
-        deck = min(decks, key=DECK_WORDS.index)
-    else:
-        deck = _DECK_OF_WORD[gun_deck.group(1)]
-    n = int(m.group("n"))
-    return [
-        g.id
-        for g in broadside
-        if g.deck == deck and g.number == n and (side is None or g.side == side)
-    ]
-
-
 def _guns_named(ship: Any, w: str) -> list[str]:
     guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
     words = w.replace(".", " ").split()
@@ -828,20 +694,11 @@ def _guns_named(ship: Any, w: str) -> list[str]:
         if name in words:
             side = s
             w2 = " ".join(x for x in words if x != name)
-    numbered_by_deck = _numbered_by_deck(guns)
-    if numbered_by_deck:
-        on_a_deck = _number_on_a_deck(guns, w2, side)
-        if on_a_deck is not None:
-            return on_a_deck
-    of_a_deck = _guns_of_a_deck(guns, w2, side)
-    if of_a_deck is not None:
-        return of_a_deck
+    by_deck = _guns_of_a_deck(guns, w2, side)
+    if by_deck is not None:
+        return by_deck
     m = _GUN_NUMBER.match(w2)
     if m:
-        if numbered_by_deck:
-            # a No. 3 on each deck (package 75, B7.d): a bare number names none of them, and
-            # 'fire' says so (`_a_number_on_each_deck`)
-            return []
         n = int(m.group(1))
         out = [
             g.id

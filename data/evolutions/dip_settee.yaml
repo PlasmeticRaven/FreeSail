@@ -6,18 +6,11 @@
 # 1794 vol. II col. 581). This is the order by itself, for a settee left on the wrong side;
 # going about does it as part of the manoeuvre. A longer yard than a lugger's: the lug's dip
 # lengthened (judgement; no period figure).
-#
-# Where the hands on deck are too few to begin it, as a small coaster's watch of two by night,
-# all hands are called for it and piped down after, as a small company was turned up for
-# any work of her great sail (judgement; no source on her watches was found).
 
 # Build notes (not served by the library's catalogue):
 # Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (D1(a); dip_lug's 30/60/60
 # lengthened for a yard of 15-17 m against the lugger's 10.3 m). Its own file, so that the
 # lugger's dip_lug.yaml is not touched for `yard_lowered`.
-# Package 75, the lead's ruling (1) of 2026-11-10 (the bilander's short watch): `too_few: all
-# hands` (`hands.CrewRequest.calls_all_hands`, `Runner._watch_too_few`), on the settee's
-# files alone so that no other ship's work changes.
 id: dip_settee
 verb: dip
 applies_to: {class: settee}
@@ -47,5 +40,5 @@ on_start: {log: "Dip the {sail}! Hands to the jeers and the tack."}
 on_complete: {log: "Dipped the {sail}; it stands to leeward of the mast.", kind: sail.dipped, severity: notable}
 on_fail: {log: "Could not dip the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the forecastlemen and the afterguard, able hands, as dip_lug's (judgement)
-crew: {hands: 6, rating: able, stations: [forecastle, afterguard], too_few: all hands}
+crew: {hands: 6, rating: able, stations: [forecastle, afterguard]}
 source: "Röding 1794 vol. II col. 581; dip_lug's times lengthened (judgement)"

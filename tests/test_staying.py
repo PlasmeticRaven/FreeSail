@@ -301,9 +301,7 @@ def test_trim_after_a_let_fly_hauls_the_sheet_back_with_hands_and_time(frigate_b
     world.run(3)
     assert sheet.state is LineState.FREE
     e = world.submit("trim the spanker")
-    # by her file's first plain alias (package 75, the trim's words by the alias; old "the
-    # mizzen spanker")
-    assert e.text.startswith("Trimming the sheet of the spanker")
+    assert e.text.startswith("Trimming the sheet of the mizzen spanker")
     runner = ship.extra["evolutions"]
     assert [i.evo.id for i in runner.instances if i.evo.id.startswith("trim_")] == [
         "trim_gaff_sheet"

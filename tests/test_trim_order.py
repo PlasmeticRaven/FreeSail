@@ -74,14 +74,12 @@ def test_trim_the_sheets_works_each_sheet_by_an_evolution():
     ]
     assert all(p["angle_deg"] is None and "sail" in p for _, _, p in runner.started)
     assert kind == "sail.trimmed"
-    # each sail by her file's first plain alias, as the runner's done line names it (package
-    # 75, the trim's words by the alias; old "the mizzen spanker" in the reply)
-    assert set(data["trimmed_sheets"]) >= {"the spanker", "the jib"}
+    assert set(data["trimmed_sheets"]) >= {"the mizzen spanker", "the jib"}
     from freesail.evolutions import trim
 
     spanker = trim.read_sheet(ship, ship.sails["mizzen.spanker"])
     assert spanker.angle == pytest.approx(units.deg_to_rad(18)) and not spanker.free
-    assert "trimming the sheets of the spanker" in text.lower()
+    assert "trimming the sheets of the mizzen spanker" in text.lower()
     # at their trim already, the sheets stand and the line says so
     from freesail.evolutions import trim
 

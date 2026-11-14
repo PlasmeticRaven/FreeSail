@@ -68,7 +68,7 @@ Amazon: heading WNW (293°), speed 4.9 kn, leeway -4°, heel -4°
 Apparent wind 51° on the starboard bow, 14.3 kn; helm -6°
 Sail set: fore.course, fore.topsail, fore.topgallant, main.course, main.topsail, main.topgallant, mizzen.topsail, mizzen.spanker, fore.topmast_staysail, jib; unbent: ...
   Morning watch (04:13)  Order: trim sails.
-  Morning watch (04:13)  Braced twelve yards to the wind, 51° on the starboard bow, the after yards two degrees sharper; trimming the sheets of the spanker, the fore topmast staysail and the jib.
+  Morning watch (04:13)  Braced twelve yards to the wind, 51° on the starboard bow, the after yards two degrees sharper; trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
 * Morning watch (04:13)  Bracing the yards: not hands enough for all at once; the watch takes the sails in turn.
 * Morning watch (04:13)  Braced twelve yards to the wind; 56° to 64° from square.
   Morning watch (04:14)  Trimmed the sheets of the fore topmast staysail, the jib and the spanker; 23° to 28° off the centreline.

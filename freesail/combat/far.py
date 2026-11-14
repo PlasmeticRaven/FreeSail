@@ -60,10 +60,6 @@ class FarShip:
     aim: str = "hull"  # hull | rigging | between
     morale_start: float = M.DEFAULT_START
     strike_below: float = M.DEFAULT_STRIKE_BELOW
-    # her id on the sea where the world fights her (`far_action.far_ship_of`): the key of the
-    # rounds' `fired_on`, which a name two ships may share is not; "" for the measure's sides,
-    # keyed by their places in the round (the lead's last list of 2026-11-14, item 2)
-    id: str = ""
     # the sums
     killed: int = 0
     wounded: int = 0
@@ -295,18 +291,16 @@ def round_once(
     factored out so that the world's far action runs the same round the measure runs):
     each side's broadside at the other, the morale judged on the sums, the colours struck
     under the doctrine's line once fired on; `fired_on` is kept across the rounds (whether
-    each has yet been fired on, by her id, or by her place in the round, "a" or "b", where she
-    has none: never by her name, which two ships may share). The round's record is returned."""
-    ka, kb = a.id or "a", b.id or "b"
+    each has yet been fired on, by name). The round's record is returned."""
     fa, sa = _fire(a, b, range_m, rng, step_s)
     fb, sb = _fire(b, a, range_m, rng, step_s)
-    fired_on[kb] = fired_on.get(kb, False) or fa > 0
-    fired_on[ka] = fired_on.get(ka, False) or fb > 0
-    ma = _judge(a, b, fired_on[ka])
-    mb = _judge(b, a, fired_on[kb])
-    if fired_on[ka] and ma < a.strike_below:
+    fired_on[b.name] = fired_on.get(b.name, False) or fa > 0
+    fired_on[a.name] = fired_on.get(a.name, False) or fb > 0
+    ma = _judge(a, b, fired_on[a.name])
+    mb = _judge(b, a, fired_on[b.name])
+    if fired_on[a.name] and ma < a.strike_below:
         a.struck_at_s = t_s
-    if fired_on[kb] and mb < b.strike_below and a.struck_at_s is None:
+    if fired_on[b.name] and mb < b.strike_below and a.struck_at_s is None:
         b.struck_at_s = t_s
     return Round(t_s, (fa, fb), (sa, sb), (a.hurt, b.hurt), (ma, mb))
 
@@ -324,7 +318,7 @@ def fight(
     minutes are out; the rounds' record. `rng` is any `random()` source (an `Rng` stream)."""
     rounds: list[Round] = []
     t = 0.0
-    fired_on: dict[str, bool] = {}
+    fired_on = {a.name: False, b.name: False}
     while t < minutes * 60.0 and a.struck_at_s is None and b.struck_at_s is None:
         t += step_s
         rounds.append(round_once(a, b, range_m, rng, t, fired_on, step_s))

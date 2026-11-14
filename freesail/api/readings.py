@@ -1695,16 +1695,10 @@ def _work_in_hand(world: Any, _: str | None) -> dict[str, Any]:
     doing: list[str] = []
     waiting: list[str] = []
     belayed: list[str] = []
-    held: list[str] = []
     for inst in runner.work() if runner is not None and hasattr(runner, "work") else ():
         words = runner.doing(inst)
         if inst.waiting:
             waiting.append(f"{words} ({'for hands' if inst.waiting_for else 'its turn'})")
-        elif inst.paused and getattr(inst, "held_for", None) == "post":
-            # held by a post's leaving it under half its hands (the lead's ruling 11), not by a
-            # manoeuvre: no hands need be about ship (the whole-change review of 80e703c7,
-            # engine-1: "belayed while all hands are about ship" with no hands called)
-            held.append(words)
         elif inst.paused:
             belayed.append(words)
         else:
@@ -1721,14 +1715,11 @@ def _work_in_hand(world: Any, _: str | None) -> dict[str, Any]:
         parts.append("waiting: " + ", ".join(waiting))
     if belayed:
         parts.append("belayed while all hands are about ship: " + ", ".join(belayed))
-    if held:
-        parts.append("held for hands: " + ", ".join(held))
     return {
         "words": "; ".join(parts) or NO_WORK_WORDS,
         "doing": doing,
         "waiting": waiting,
         "belayed": belayed,
-        "held": held,
     }
 
 

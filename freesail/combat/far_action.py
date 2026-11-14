@@ -14,16 +14,6 @@ at the first round and not before (70's rule for the gunnery's stream, so that n
 passage's list of streams moves); the sums written back into `Vessel.damage` with a line in
 each side's story and, where a hull sleeps under her, in her log (`action.far_round`).
 
-**Who has fired on whom** is the one record (`relations.fired`; the lead's last list of
-2026-11-14, item 2): each side that fires in a round is written in it, as the near battery's
-shot is, so that the ship fired into holds the firer an enemy whatever colours she hoists
-(package 70's rule, `relations.MARK`), and the round's strike "once fired on" reads it by the
-ships' ids. The book of the pairs (`root._far_rounds`) keeps only the rounds' rhythm (the last
-round's tick and the first's); before it the book kept a `fired_on` of its own by the ships'
-names, which no judge read, and an enemy hoisting false colours ended the action of the ship she
-was firing into (truth 7-231's pair: the Hero on passage at 1260 and struck at 1380, fought
-still). A change of hands forgets the book of her pairs (`relations.changed_hands`).
-
 **The strike by morale** is `far._judge` on the carried sums: the colours come down by the
 doctrine's line as 70 measured; then she is struck as `far_captures` writes it (her state,
 her brain, her plan, her colours), and her captor's brain takes `taking possession` (§2.4).
@@ -165,7 +155,6 @@ def far_ship_of(world: Any, vessel: Any) -> F.FarShip:
     kw = {k: v for k, v in fig.items() if k in ("aim", "morale_start", "strike_below")}
     fs = F.far_ship(vessel.ship_file, str(vessel.nation), getattr(vessel, "fit", "") or None, **kw)
     fs.name = str(vessel.name)
-    fs.id = str(vessel.id)
     d = dict(getattr(vessel, "damage", None) or {})
     fs.killed = int(d.get("killed", 0) or 0)
     fs.wounded = int(d.get("wounded", 0) or 0)
@@ -215,13 +204,8 @@ def _awake(vessel: Any) -> bool:
 
 
 def _pairs(world: Any) -> list[tuple[Any, Any]]:
-    """(the engaging ship, her mark) for every far body in `engaging` whose mark is still a mark
-    to her by the one answer (`relations.still`, `MARK`: on the sea, not struck, nobody's prize,
-    and an enemy to her by what she knows; the lead's readings of cda12ec9, (F3): a captor in
-    `engaging` the minute her mark was cut out fired into her own prize, "struck" her again and
-    left her lying to); one pair for two ships engaging each other."""
-    from freesail.world import relations as R
-
+    """(the engaging ship, her mark) for every far body in `engaging` whose mark is on the
+    sea and not struck; one pair for two ships engaging each other."""
     sea = getattr(world, "vessels", None)
     out: list[tuple[Any, Any]] = []
     seen: set[tuple[str, str]] = set()
@@ -231,9 +215,13 @@ def _pairs(world: Any) -> list[tuple[Any, Any]]:
         brain = getattr(v, "brain", None)
         if v.done or brain is None or brain.state != "engaging" or _awake(v):
             continue
-        # a holder struck fights nobody: the one answer's own (the lead's last list, item 4)
         mark = sea.get(str(brain._stranger or ""))
-        if mark is None or not R.still(world, v, mark, R.MARK, judge=brain):
+        if (
+            mark is None
+            or mark.done
+            or getattr(mark, "struck", False)
+            or getattr(v, "struck", False)
+        ):
             continue
         key = tuple(sorted((str(v.id), str(mark.id))))
         if key in seen:
@@ -256,15 +244,11 @@ def minute(world: Any) -> list[tuple[Any, ...]]:
     pairs = _pairs(root)
     if not pairs:
         return lines
-    from freesail.world import relations as R
-
     book = root.__dict__.setdefault("_far_rounds", {})
     fired_somewhere: list[tuple[Any, Any, float]] = []
     for a, b in pairs:
         key = "|".join(sorted((str(a.id), str(b.id))))
-        rec = book.setdefault(key, {"last": -(10**9), "since": tick})
-        if "fired_on" in rec:
-            _fold_old_book(root, a, b, rec.pop("fired_on"))
+        rec = book.setdefault(key, {"last": -(10**9), "fired_on": {}, "since": tick})
         if tick - rec["last"] < FAR_ROUND_S:
             continue
         if _awake(b):
@@ -279,13 +263,10 @@ def minute(world: Any) -> list[tuple[Any, ...]]:
         rng = root.rng.stream(STREAM)
         fa, fb = far_ship_of(root, a), far_ship_of(root, b)
         t_s = float(tick - rec["since"])
-        # whether each has been fired on by the other: the one record, by their ids
-        fired_on = {fa.id: R.has_fired(root, b, a), fb.id: R.has_fired(root, a, b)}
+        fired_on = rec["fired_on"]
+        fired_on.setdefault(fa.name, False)
+        fired_on.setdefault(fb.name, False)
         r = F.round_once(fa, fb, range_m, rng, t_s, fired_on, FAR_ROUND_S)
-        if r.fired[0] > 0:
-            R.fired(root, a, b)
-        if r.fired[1] > 0:
-            R.fired(root, b, a)
         _write_back(a, fa, tick)
         _write_back(b, fb, tick)
         _say_round(root, a, b, fa, fb, r, range_m, tick)
@@ -297,20 +278,6 @@ def minute(world: Any) -> list[tuple[Any, ...]]:
     if fired_somewhere:
         lines.extend(_guns_heard(root, fired_somewhere, tick))
     return lines
-
-
-def _fold_old_book(root: Any, a: Any, b: Any, by_name: Any) -> None:
-    """A checkpoint's book of the pair kept who had been fired on by her name: folded into the one
-    record by the ids of the two (the module's head); where the two share a name, the one entry
-    stands for both, as it did."""
-    from freesail.world import relations as R
-
-    if not isinstance(by_name, dict):
-        return
-    if by_name.get(str(a.name)):
-        R.fired(root, b, a)
-    if by_name.get(str(b.name)):
-        R.fired(root, a, b)
 
 
 def _say_round(
@@ -355,9 +322,6 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 
     loser.struck = True
     loser.damage["struck_tick"] = tick
-    # to whom (the lead's readings of cda12ec9, (F2)): hers to take, and no other ship's while
-    # she is there to take her (`relations.STRUCK`)
-    loser.damage["struck_to"] = str(winner.id)
     from freesail.world.prize_court import note_in_sight
 
     note_in_sight(root, loser)
@@ -395,11 +359,7 @@ def _strike(root: Any, loser: Any, winner: Any, tick: int) -> None:
 def _fallback_reply(root: Any, far: Any, awake: Any, rec: dict, tick: int, lines: list) -> None:
     """The far ship's broadside at an awake hull by the tables, only where the cap has no
     room to wake her (the lead's ruling 4); each shot that strikes resolved into the awake
-    hull's parts with a synthetic gun of her fit's kind. At a cap of nought (`crewed: {cap:
-    0}`, nobody promoted) she does not reply (the lead's ruling of 2026-11-14, (F1): the reply
-    there made the fight one-sided and endless, the player's shot reaching only
-    `hits._far_hit`'s count, which nothing reads; a far body that fires on the player and one
-    that can be hurt by him are one mend, package 77's)."""
+    hull's parts with a synthetic gun of her fit's kind."""
     from freesail.world.crews import crewed, settings
 
     cap, _within, _demote = settings(root)
@@ -425,10 +385,6 @@ def _fallback_reply(root: Any, far: Any, awake: Any, rec: dict, tick: int, lines
     )
     fired, struck = F._fire(fa, fb, range_m, rng, FAR_ROUND_S)
     fa.rounds_fired += 0  # counted in _fire
-    if fired > 0:
-        from freesail.world import relations as R
-
-        R.fired(root, far, awake)  # the one record: the awake hull's captain knows his enemy
     _write_back(far, fa, tick)
     if struck:
         _into_parts(root, hull, awake, far, fa, struck, bearing, range_m, rng, tick)

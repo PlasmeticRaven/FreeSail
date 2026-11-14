@@ -22,7 +22,6 @@
 # order that does it ("heave in to 60 fathoms").
 id: veer_cable
 verb: veer_cable
-work: veer the cable
 applies_to: {class: ship}
 script: veer_cable
 params: {fathoms: null, to: false, anchor: null}
@@ -33,7 +32,7 @@ timing:
                            # runs when let go
 on_start: {log: "Veer away on {anchor} cable."}
 on_complete: {log: "Veered to {fathoms} on {anchor}.", kind: cable.veered, severity: routine}
-on_fail: {log: "Could not veer the cable: {reason}.", kind: evolution.failed, severity: routine}
+on_fail: {log: "Could not veer cable: {reason}.", kind: evolution.failed, severity: routine}
 # crew: the forecastlemen at the stoppers and the bitts (judgement in the number).
 crew: {hands: 8, rating: ordinary, stations: [forecastle]}
 source: "Steel 1794 vol. II, p. 292; Lever 1808, 'Single Anchor', p. 97 (the long or leeward service veered to against wind and tide); Luce 1866, ch. XXXIV, p. 568 (the scope to ride by)"

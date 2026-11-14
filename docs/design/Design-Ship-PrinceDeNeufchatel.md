@@ -1012,13 +1012,6 @@ square sail" is read in her and the two schooners as "square", a brace's word, b
 "sail" that their `fore.sail` and `main.sail` give, in the grammar's leading words
 (`grammar._match_object`), not in any file's aliases.*
 
-*As built (2026-11-11), the lead's note of 2026-11-09, (2), for every file with the 74's window:
-the trim's reply names each sail by the file's first plain alias, as the runner's lines for the
-same sheets do (`orders/verbs.py`, `_the_sail`), so that hers says "the sheets of the
-fore-and-aft foresail, the mainsail, the fore staysail and the jib" where it said "the fore sail,
-the main sail"; `display_name` unchanged. Every file's trim lines old beside new in
-`docs/dev/TuningNotes.md`, "The trim's words by the alias".*
-
 ### 4.9 Her rig's peculiarities, for the physics' reading (the brief)
 
 | Peculiarity | Sail class | In the engine | Said for the lead |

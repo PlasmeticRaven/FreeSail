@@ -3,17 +3,10 @@
 # loose the sail" (Falconer 1780, YARD), and furl it on the yard. No source lowers the yard to
 # furl it. One lowered on deck to be dipped is furled where it lies and hoisted again. Times as
 # for furling a square sail (judgement).
-#
-# Where the hands on deck are too few to begin it, as a small coaster's watch of two by night,
-# all hands are called for it and piped down after, as a small company was turned up for
-# any work of her great sail (judgement; no source on her watches was found).
 
 # Build notes (not served by the library's catalogue):
 # Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (Bil §1.4: "no source says
 # the yard was lowered to furl"; furl_square's furl). Ext E6 for a sail laced to a yard.
-# Package 75, the lead's ruling (1) of 2026-11-10 (the bilander's short watch): `too_few: all
-# hands` (`hands.CrewRequest.calls_all_hands`, `Runner._watch_too_few`), on the settee's
-# files alone so that no other ship's work changes.
 id: furl_settee
 verb: furl
 applies_to: {class: settee}
@@ -54,5 +47,5 @@ on_start:
 on_complete: {log: "Furled the {sail} on its yard.", kind: sail.furled, severity: notable}
 on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the main top's men aloft, the afterguard at the gear (judgement, as furl_square's)
-crew: {hands: 6, rating: ordinary, stations: [topmen, afterguard], too_few: all hands}
+crew: {hands: 6, rating: ordinary, stations: [topmen, afterguard]}
 source: "Falconer 1780, YARD (the woldings); furl_square's times (judgement)"

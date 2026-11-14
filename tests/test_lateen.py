@@ -342,9 +342,7 @@ def test_the_orders_find_the_courses_trim_by_its_curve_class(whole_lateen):
         started = {e["subject"] for e in trims}
         assert (COURSE in started) is whole_lateen, (text, words)
         if text == "trim the mizen" and not whole_lateen:
-            # by the fixture's first plain alias, the frigate's "mizzen" (package 75, the
-            # trim's words by the alias; old "the mizzen course")
-            assert words == "The sheet of the mizzen stands as trimmed."
+            assert words == "The sheet of the mizzen course stands as trimmed."
         _run(runner, ship)
         assert _deg(course.sheet_angle) == pytest.approx(want, abs=0.01), text
     ship, course, _runner = _at_the_gaffs_floor(whole_lateen)

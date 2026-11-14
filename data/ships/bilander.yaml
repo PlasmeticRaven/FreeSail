@@ -18,7 +18,7 @@ ship:
     by 19.4 ft (Architectura Navalis Mercatoria Pl. LXII No. 5), drawn as Edward Gwyn''s British bilander
     of about 1780 (RMG PAG3828) on Steel 1805''s brig collier''s body; 118 tons burthen on her waterline
     and 128 on her length taffrail to stem head by the old measure; rigged to Gwyn''s heights with Chapman''s
-    yards. Unarmed by default, a trader of nine hands, with the armed merchant''s four 3-pounders and
+    yards. Unarmed by default, a trader of eight hands, with the armed merchant''s four 3-pounders and
     four swivels for the editor (Lloyd''s 1779 and 1782: the Elizabeth''s guns). Not the Hopewell of Poole,
     a bilander of 150 tons built in 1749 and lengthened in 1756 (Lloyd''s 1776, 1779), whose name she
     bears by the owner''s answer of 2026-10-29. Undated. See tools/ships/bilander.py for every figure''s
@@ -1181,21 +1181,21 @@ ground_tackle:
     cable_in: 5.0
     cable_kn: 38.7
 crew:
-  # Nine (the lead's ruling 8 of 2026-11-13, built on ruling 11): the master, the mate, six seamen in two watches of three, the boy among them, and a cook. JUDGEMENT within the sourced range of eight to nine for a trader of her tons in her years: Macpherson, Annals of Commerce (1805) vol. 4, pp. 287 and 331, the register's usual number of men for England in 1793 and 1794, 13.8 and 14.0 tons a man, so 9.3 and 9.1 at her 128 tons (every trade together); the Transport Board's rule of 1797 for hired transports, the master, five men and a boy to each hundred tons and a man for each twenty tons beyond (R. K. Sutcliffe 2013, p. 30, citing TNA ADM 1/3733), eight at her tons; TNA HCA 32, the prize papers' catalogue for 1776-83, British traders of 100 to 160 tons whose entries give their men, a median of 8 in the short-sea trades and 10 on Atlantic voyages. Nine, not eight, so that either watch of three, with the master or the mate where the watch is too small for the work, begins every watch's work on deck by night and by day (the owner's word of 2026-11-13: her watches large enough for the standard work that does not normally call all hands). Before it, eight (D43, judgement): no source gives a bilander's company (Research-Bilander-2026-10.md §2.8); the Nancy of Boston, 170 tons and catalogued 'brigantine or bilander', had ten in 1779 (TNA HCA 32/405/21, the catalogue).
-  complement: 9
+  # Eight (D43): a coasting trader of about 130 tons, the master, the mate, four seamen, a boy and a cook (judgement). No source gives a bilander's company (Research-Bilander-2026-10.md §2.8): the Nancy of Boston, 170 tons and catalogued 'brigantine or bilander', had ten in 1779 (TNA HCA 32/405/21, the catalogue); the merchant brig's five men to a hundred tons gives six or seven, and a settee dipped by hand at every tack wants the upper figure.
+  complement: 8
   # A British coaster's people: the english list in data/crew/names.yaml, as the smack's.
   names: english
   stations:
-    # Hands per station, both watches together (Bil-D §6.1; judgement). No forecastle station: the head sheets and the anchors fall to the fore topmen by the hands' ranking, a company of nine having no hand to spare for one. Fore topmen: 2, the main top's alike.
+    # Hands per station, both watches together (Bil-D §6.1; judgement). No forecastle station: the head sheets and the anchors fall to the fore topmen by the hands' ranking, a company of eight having no hand to spare for one. Fore topmen: 2, the main top's alike.
     fore_top: 2
     # Main topmen: 2, for the settee's loosing and furling aloft and her main topsail and topgallant (Ext §5.1 and its risk 10: two in the main top at the least).
     main_top: 2
-    # Afterguard: 2, an able seaman and the boy, the messenger (the smack's and the merchant brig's), one to each watch, so that her watches are three and three (the lead's ruling 8 of 2026-11-13).
-    afterguard: 2
+    # Afterguard: the boy, 1, the messenger (the smack's and the merchant brig's).
+    afterguard: 1
     # Idlers: the cook.
     idlers: 1
   ratings:
-    # Share of the seamen by rating (judgement; the lead's ruling of 2026-11-09): a coaster's able seamen and a boy, five able seamen and a landsman boy, as the merchant brig's boy is rated; her shares (0.70, 0.20, 0.10) mustered the boy an able seaman. Able: 0.80.
+    # Share of the seamen by rating (judgement; the lead's ruling of 2026-11-09): a coaster's able seamen and a boy, four able topmen and a landsman boy, as the merchant brig's boy is rated; her shares (0.70, 0.20, 0.10) mustered the boy an able seaman. Able: 0.80.
     able: 0.8
     # Ordinary: none.
     ordinary: 0.0
@@ -1209,7 +1209,7 @@ crew:
     # How the idlers are made up: the cook, 1.
     cook: 1
   stores:
-    # Water for two months: nine men at a gallon a day is about 2 tons, and some over (judgement).
+    # Water for two months: eight men at a gallon a day is about 2 tons, and some over (judgement).
     water_tons: 3
     # Provisions: two months, a coaster's passage and its delays (judgement).
     provisions_days: 60
@@ -1257,7 +1257,7 @@ crew:
       main_top: 1
     # One man at the helm, as the merchant brig's (judgement).
     helm: 1
-    # The powder beyond the idlers: none; the cook passes it (judgement: nine hands, the boy among them, and six wanted at one side's 3-pounders).
+    # The powder beyond the idlers: none; the cook passes it (judgement: eight hands, the boy among them, and six wanted at one side's 3-pounders).
     powder: 0
     # The quarter gunners and the gunner's crew in the filling room, one to every four cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice and resupply, between packages 72 and 73). Her four 3-pounders give one (Bil-D §5.3).
     filling: 1
@@ -1271,7 +1271,7 @@ crew:
 armament:
   default: unarmed
   fits:
-    # The armed merchant (D41 (a)): four long 3-pounders, two a side in the waist, Elizabeth's four 3-pounders of the common construction (Lloyd's 1779 and 1782), and four half-pounder swivels on the quarterdeck rail, two a side (judgement: no British source counts a bilander's swivels; four is the privateer schooner's). The register's other bilanders give the degrees an editor may reason within: Kerrison's six 4-pounders (140 tons, 1781-1783) and Essex's two 2-pounders (160 tons, 1781); neither is a fit. Her ports are cut for the fit in the waist bulwark (the owner's 'cutouts in the gunwale', 2026-10-29), Gwyn drawing her unpierced. Her nine cannot man a side's guns, the helm and the sails together: at the beat the bill's trimmers and helmsman are told off first and the guns take what is left (her design's §5.4; the beat measured in docs/dev/TuningNotes.md).
+    # The armed merchant (D41 (a)): four long 3-pounders, two a side in the waist, Elizabeth's four 3-pounders of the common construction (Lloyd's 1779 and 1782), and four half-pounder swivels on the quarterdeck rail, two a side (judgement: no British source counts a bilander's swivels; four is the privateer schooner's). The register's other bilanders give the degrees an editor may reason within: Kerrison's six 4-pounders (140 tons, 1781-1783) and Essex's two 2-pounders (160 tons, 1781); neither is a fit. Her ports are cut for the fit in the waist bulwark (the owner's 'cutouts in the gunwale', 2026-10-29), Gwyn drawing her unpierced. Her eight cannot man a side's guns, the helm and the sails together: at the beat the bill's trimmers and helmsman are told off first and the guns take what is left (her design's §5.4; the beat measured in docs/dev/TuningNotes.md).
     armed merchant:
       source: 'Lloyd''s Register 1779 and 1782, the bilander Elizabeth of 130 tons, ''4-3 P.'' (the row
         images read: Research-Bilander-2026-10.md §3); Adye 1804 p. 155, the piece; Falconer 1780 (QUARTERS),
@@ -1379,7 +1379,7 @@ armament:
           3: 1.0
         swivel:
           0.5: 0.125
-      # The powder below in barrels of a hundred pounds: the whole barrel was made to contain a hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye 1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
       powder_barrels: 1
       shot:
         3:
@@ -1413,7 +1413,3 @@ boats:
   oars: 6
   crew: 7
   tons: 0.4
-# Her own number of hands for an evolution, over its file's: heaving to and filling away, six, her seamen of both watches, so that either watch of three begins them by night, short, as the starboard's three did at her eight; the files' twelve, clamped to what her company could ever give, is seven at her nine (her six seamen and the cook), and three are under half of it (the lead's (C2) of 2026-11-14; judgement).
-hands:
-  heave_to: 6
-  fill_away: 6

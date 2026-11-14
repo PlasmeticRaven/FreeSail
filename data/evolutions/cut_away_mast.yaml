@@ -8,11 +8,6 @@
 # mast cut through), clear (on deck: the wreck cut adrift).
 id: cut_away_mast
 verb: cut_away_mast
-# The work's words before the mast's name (`work:`, the whole-change review of 80e703c7, sailing-5,
-# and the lead's last list of 2026-11-14, 9): "to cut away the main mast" and "cutting away the
-# main mast", where the verb's own words read "to cut away mast the main mast" and "cutting away
-# mast the main mast".
-work: cut away
 applies_to: {class: spar}
 script: cut_away_mast
 preconditions: []

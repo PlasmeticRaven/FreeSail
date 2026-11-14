@@ -8,14 +8,14 @@ tuning notes' "The port triples before L2", typed from them, so that the files, 
 the rule are held to one another. Her heel is the test's hand wherever a heel is named, by
 7-135's form (`Battery.tick` with a `Firer`) or by `heeled` below; one test heels her by her
 own sails, and one rolls her by her own sea. Her roll is the test's hand likewise, on a `Firer`
-or on the World's motion (truth 7-190's rows and helpers, at the end; the truth itself moved
-into tests/test_known_truths.py at Phase 5, 2026-11-14).
+or on the World's motion (truth 7-190's draft, at the end).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -1628,14 +1628,14 @@ def test_the_one_compare_takes_the_roll(path, roll):
         assert battery._shut == whole._shut, heel
 
 
-# -- truth 7-190's rows (§15); the truth in tests/test_known_truths.py since Phase 5 -------------
+# -- truth 7-190 (§15), drafted here for Phase 5 to move into tests/test_known_truths.py --------
 
 # Each armed file and her default fit: the deck and shut heel of her lowest port with a gun in it
 # by §7.1's arithmetic on her drawn hull, degrees (L2's `LOWEST_WITH_A_GUN`, read again at L3),
 # and the count of that deck's lee ports shut a degree above it (measured). Every file of
-# `data/ships` whose default fit has a port gun is a row (the truth's last line). The
-# *Neufchatel*'s (package 75, B2), measured by the truth's draft on her file: her lowest port with a
-# gun in it amidships (her No. 6 from forward, the bow chasers' the first; `gun.5` of her fit), sill
+# `data/ships` whose default fit has a port gun is a row (the truth's last line below). The
+# *Neufchatel*'s (package 75, B2), measured by this draft on her file: her lowest port with a gun
+# in it amidships (her No. 6 from forward, the bow chasers' the first; `gun.5` of her fit), sill
 # 1.50 m and half-breadth 3.83 m, shut at 18.18 degrees of heel alone (Neuf-D §3.4, §10: 18.2).
 LOWEST_LEE_PORT = (
     (BRIG, "diligence class 1796", "upper", 17.5, 4),
@@ -1728,6 +1728,85 @@ def _open_then_shut(w, deck: str, figure: float, roll: float, at: int) -> tuple[
     assert _ports_at(w, 0.0, 0.0, at + 1 + HOLD)  # held a tick short of the minute
     assert not _ports_at(w, 0.0, 0.0, at + 2 + HOLD)
     return counts
+
+
+@pytest.mark.parametrize("path,fit,deck,figure,count", LOWEST_LEE_PORT)
+def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_roll_sooner(
+    path, fit, deck, figure, count
+):
+    """**A draft, for Phase 5 to move into `tests/test_known_truths.py` and measure again on the
+    merged tree** (Build-Ships.md §15, row 7-190; the lead's ruling; the owner's rule, Bel §13.1
+    answer 7: the dip is the heel toward the gun's side plus the roll's amplitude). Each armed
+    file's default fit in a World that keeps a sea (`sea: true`, six knots, seed 7), her heel
+    to starboard and her roll set by hand on the World's own names (`ship.dyn.heel`,
+    `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
+    digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
+    14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18 and the 74's lower deck's 10.35 degrees
+    (±0.05). With no roll, no port of that deck shut half a degree below that heel, and that port
+    shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3 and 6 of the deck's lee ports; with a
+    roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
+    amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
+    port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
+    before it). Measured on the owner's machine, 2026-11-05, at L3; the *Neufchatel*'s line
+    2026-11-07, at her landing (B2); the 74's 2026-11-10, at her step 4 (B7) and again at its
+    review's re-trace (10.38 to 10.35), her truth 7-195
+    being her step 6's. She is built with no fit named, so that the row's fit is her file's
+    default (since L3's review: the fit was named, and the line could not fail)."""
+    w = _in_a_sea(path)
+    assert w.ship.fit == fit
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
+
+
+def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut_heel():
+    """7-190's clause (Bel §6.1, P5, "the frigate unmoved"; `Design-Ship-Bellerophon.md` §14.3
+    leaves it to this truth). A draft for Phase 5, as above. At the 74's 10.35 degrees of heel
+    alone (`SEVENTY_FOURS_SHUT_DEG`: her file's since her step 6, B7; §15's and Bel's 10.6 before
+    it) every port of the frigate-36 stands open, heeled to either side, her lowest shutting at
+    19.7 on her drawn hull (Bel's 21.0 was her first written sill); and with a roll of 4 degrees
+    on her motion as well."""
+    w = _in_a_sea(FRIGATE, None)
+    assert _lowest_lee(w, "upper")[1] == pytest.approx(19.7, abs=0.05)
+    for tick, roll in enumerate((0.0, ROLL_SET_DEG)):
+        assert _ports_at(w, SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick) == frozenset()
+        assert _ports_at(w, -SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick + 1) == frozenset()
+
+
+@pytest.mark.parametrize("deck,figure,count", RAZEE_DECKS)
+def test_truth_7_190_the_razees_lee_ports_deck_by_deck(deck, figure, count):
+    """The razee's lee ports, lines of 7-190 (§15; Indf §3.4, 10.6 and 14.5 heel alone): her
+    main battery is the 64's lower deck raised by her rise, and shuts at 14.5 for the 64's
+    10.55 on the drawn hulls (3.95 degrees later, ±0.1); her quarterdeck at 42.02 and her
+    forecastle at 43.84. Each open half a degree below and shut a degree above, and a roll's
+    amplitude sooner, as the truth's row, with 6, 1 and 1 of the deck's lee ports. A draft for
+    Phase 5, as above. Each of her default fit and the 64's."""
+    w = _in_a_sea(RAZEE)
+    assert w.ship.fit == "as carried 1796"
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
+    if deck == "upper":
+        her = _lowest_lee(w, "upper")[1]
+        sixty_four = _in_a_sea(SIXTY_FOUR)
+        assert sixty_four.ship.fit == "ardent class 1784"
+        was = _lowest_lee(sixty_four, "lower")[1]
+        assert her - was == pytest.approx(3.95, abs=0.1)
+
+
+def test_truth_7_190_covers_every_armed_file():
+    """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
+    in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
+    carries none, so that a ship file added or rearmed is not passed by in silence. Today the
+    nine: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), and the 74
+    (package 75, B7; old: eight files). A draft for Phase 5, as above."""
+    armed = {
+        path.as_posix()
+        for path in sorted(Path("data/ships").glob("*.yaml"))
+        if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
+    }
+    assert armed == {row[0] for row in LOWEST_LEE_PORT}
+    assert len(armed) == 9
 
 
 # -- the old saves -----------------------------------------------------------------------------

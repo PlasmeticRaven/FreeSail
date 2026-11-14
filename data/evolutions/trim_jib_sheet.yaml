@@ -19,12 +19,7 @@ verb: trim
 applies_to: {class: jibheaded}
 script: trim_sheet
 params: {angle_deg: null, side: null}
-preconditions: []
-# The sail set and its sheet whole hold through the trim, which never changes them: read as it
-# begins and again as it is taken up after a post's leaving held it (`requires`; the lead's last
-# list of 2026-11-14, 8: as preconditions, read as it begins alone, a trim held while its sail
-# blew out or its sheet parted was worked on when it was taken up).
-requires:
+preconditions:
   - {check: "sail.state == set", reason: "The {sail} is {state}; there is no sail to trim."}
   - {check: "not wrecked(sheets_of(sail))", reason: "{parted}"}
 timing:

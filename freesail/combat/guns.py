@@ -936,20 +936,16 @@ class Battery:
 
     def _drop_named(self, gun: Gun) -> None:
         """A gun named to fire whose port is shut: the order dropped, with the deck's line
-        ("The No. 3 larboard gun's port is shut; the sea is at its sill."; a gun named by deck,
-        package 75, B7.d, "The port of No. 3 larboard gun of the lower deck is shut; the sea is
-        at its sill.", so that the deck is not read as the possessive's: the lead's ruling (4) of
-        2026-11-12). A shot across her bows that goes with it goes when no named gun is left to
-        carry it, or the next gun fired would take the word for a signal and strike nothing."""
+        ("The No. 3 larboard gun's port is shut; the sea is at its sill."). A shot across her
+        bows that goes with it goes when no named gun is left to carry it, or the next gun
+        fired would take the word for a signal and strike nothing."""
         self.single.remove(gun.id)
         if not self.single:
             self.across_bows = False
         self.ship.note(
             "notable",
             "guns.port_shut",
-            f"The port of {gun.name} is shut; the sea is at its sill."
-            if gun.of_deck
-            else f"The {gun.name.removeprefix('the ')}'s port is shut; the sea is at its sill.",
+            f"The {gun.name.removeprefix('the ')}'s port is shut; the sea is at its sill.",
             gun.id,
             {"gun": gun.id, "side": gun.side, "deck": gun.deck},
         )

@@ -2442,17 +2442,7 @@ def _evolution_text(ev: Any) -> str:
     if ev.preconditions:
         parts.append(f"It is refused when: {reasons(ev.preconditions)}.")
     if ev.requires:
-        # as the runner reads them: a step list's before every step, so that it stops between
-        # them; a script's as it begins and as it is taken up again after a belay, never while it
-        # runs (`Runner._try_resume`; the review of 0dcdb8cf, F5: the trims' conditions moved into
-        # `requires` were said to stop a trim that ran on with its sail blown out)
-        if ev.script:
-            parts.append(
-                "It is refused, as it begins or as it is taken up again after a belay, when: "
-                f"{reasons(ev.requires)}."
-            )
-        else:
-            parts.append(f"It stops when: {reasons(ev.requires)}.")
+        parts.append(f"It stops when: {reasons(ev.requires)}.")
     if ev.steps:
         steps = []
         for st in ev.steps:

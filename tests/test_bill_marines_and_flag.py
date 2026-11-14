@@ -36,10 +36,7 @@ SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
 # the files that carry neither key: every file but the 74's, whose step 4 writes both (her bill's
 # marines and her flag party: Design-Ship-Bellerophon.md §6.3, §17.0), held in tests/
 # test_bellerophon.py (old: every file on the shelf)
-# the files whose bills carry the marines: the 74's since her step 4, the 64's and the razee's since
-# the lead's answer of 2026-11-10 at 19:30 (B1's module)
-KEYED_FILES = ("seventy-four.yaml", "sixty-four.yaml", "razee-44.yaml")
-KEYLESS_FILES = [p for p in SHIP_FILES if p.name not in KEYED_FILES]
+KEYLESS_FILES = [p for p in SHIP_FILES if p.name != "seventy-four.yaml"]
 # the pickled states' keys before the stage, in their order
 BILL_STATE = ["trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling"]
 CREW_STATE = [
@@ -79,11 +76,9 @@ def test_the_marines_key_is_the_bills_last_and_the_flags_posts_are_the_posts_for
 
 @pytest.mark.parametrize("path", KEYLESS_FILES, ids=[p.stem for p in KEYLESS_FILES])
 def test_no_file_carries_either_key_and_each_pickles_as_before(path):
-    """Inert: every file on the shelf but the 74's, the 64's and the razee's reads no division kept
-    and no flag party, and her bill's and her crew's pickled states hold the keys they held before
-    the stage, in their order. The 74's file carries both since her step 4 (old: every file on the
-    shelf); the 64's and the razee's the marines since the lead's answer of 2026-11-10 at 19:30,
-    and no flag."""
+    """Inert: every file on the shelf but the 74's reads no division kept and no flag party, and
+    her bill's and her crew's pickled states hold the keys they held before the stage, in their
+    order. The 74's file carries both since her step 4 (old: every file on the shelf)."""
     crew = load_ship(path).spec.crew
     if crew is None:
         return
@@ -99,18 +94,11 @@ def test_no_file_carries_either_key_and_each_pickles_as_before(path):
 
 
 def test_a_bill_and_a_crew_pickled_before_the_stage_read_their_plain_defaults():
-    """The 64's bill and crew pickled with the keys they held before the stage. Her bill carries
-    the marines since the lead's answer of 2026-11-10 at 19:30 (84): the bill read back is hers
-    with none kept."""
-    import dataclasses
-
     crew = load_ship(SIXTY_FOUR).spec.crew
     was_bill = QuarterBillSpec.__new__(QuarterBillSpec)
     was_bill.__dict__.update({k: copy.deepcopy(getattr(crew.quarter_bill, k)) for k in BILL_STATE})
     was_bill = pickle.loads(pickle.dumps(was_bill))
-    assert crew.quarter_bill.marines == 84
-    assert was_bill.marines is None
-    assert was_bill == dataclasses.replace(crew.quarter_bill, marines=None)
+    assert was_bill.marines is None and was_bill == crew.quarter_bill
     was_crew = CrewSpec.__new__(CrewSpec)
     was_crew.__dict__.update({k: copy.deepcopy(getattr(crew, k)) for k in CREW_STATE})
     was_crew = pickle.loads(pickle.dumps(was_crew))
@@ -144,91 +132,6 @@ def test_a_bills_marines_below_nought_or_beyond_her_marines_are_refused_in_words
     doc["crew"]["quarter_bill"]["marines"] = value
     with pytest.raises(ShipFileError, match=match):
         spec_from_dict(doc, "s.yaml")
-
-
-# -- a fit's own marines (package 75, B1: the lead's ruling (4) of 2026-11-13) ----------------
-
-RAZEE = ROOT / "data" / "ships" / "razee-44.yaml"
-# the files whose fits give their own marines, and the figure each fit gives
-FIT_MARINES = {
-    "sixty-four.yaml": {"ardent class 1794": 68},
-    "razee-44.yaml": {"as razeed 1795": 38},
-}
-# a fit's pickled state's keys before B1's key, in their order
-FIT_STATE = [
-    "name",
-    "guns",
-    "cartridges",
-    "shot",
-    "source",
-    "charges",
-    "powder_barrels",
-    "exercise_charges",
-]
-
-
-@pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_a_fit_gives_its_own_marines_only_where_ruled_and_pickles_as_before_without(path):
-    """Package 75, B1 (the lead's ruling (4) of 2026-11-13): a fit's own `marines` (the marines the
-    bill keeps in their division when she carries it, where it differs from the bill's) on the
-    64's 'ardent class 1794' (68) and the razee's 'as razeed 1795' (38) alone; every other fit of
-    every file gives none, and its pickled state holds the keys it held before B1, in their
-    order (a fit's own trimmers after them, the lead's ruling 13 of 2026-11-14, held in
-    tests/test_bill_by_fit.py); a fit with them pickles them and reads them back."""
-    arm = load_ship(path).spec.armament
-    if arm is None:
-        return
-    given = FIT_MARINES.get(path.name, {})
-    for name, fit in arm.fits.items():
-        assert fit.marines == given.get(name), name
-        state = [k for k in fit.__getstate__() if k != "trimmers"]
-        assert state == FIT_STATE + (["marines"] if name in given else []), name
-        again = pickle.loads(pickle.dumps(fit))
-        assert again == fit and again.marines == fit.marines
-        if name not in given:
-            assert "marines" not in again.__dict__
-
-
-def test_a_fit_pickled_before_its_marines_reads_the_bills():
-    """A fit pickled before B1 (no `marines` in its state) reads None, and the beat keeps the
-    bill's marines on it, as before B1."""
-    from freesail.crew.quarters import MARINES, quarters_of
-    from tests.test_brains import world_at
-
-    w = world_at(49.5, -5.5, str(SIXTY_FOUR), fit="ardent class 1794")
-    new = w.ship.fit_spec
-    was = type(new).__new__(type(new))
-    was.__dict__.update({k: copy.deepcopy(getattr(new, k)) for k in FIT_STATE})
-    was = pickle.loads(pickle.dumps(was))
-    assert was.marines is None and was.name == "ardent class 1794"
-    w.ship.fit_spec = was
-    w.run(10)
-    w.submit("beat to quarters")
-    w.run(30)
-    assert len(quarters_of(w.ship).divisions[MARINES]) == 84
-
-
-@pytest.mark.parametrize(
-    "value, match",
-    [
-        (-1, "'s marines kept in their division is -1; it must be a whole number, not negative"),
-        (12.5, "'s marines kept in their division is 12.5; it must be a whole number"),
-        ("sixty", "'s marines kept in their division is 'sixty'; it must be a whole number"),
-        (85, "the fit 'ardent class 1794' keeps 85 marines in their division, but the crew has 84"),
-    ],
-)
-def test_a_fits_marines_below_nought_or_beyond_her_marines_are_refused_in_words(value, match):
-    doc = _doc()
-    doc["armament"]["fits"]["ardent class 1794"]["marines"] = value
-    with pytest.raises(ShipFileError, match=match):
-        spec_from_dict(doc, "s.yaml")
-
-
-def test_a_fits_marines_up_to_the_whole_of_her_marines_are_read():
-    doc = _doc()
-    for kept in (0, 40, doc["crew"]["stations"]["marines"]):
-        doc["armament"]["fits"]["ardent class 1794"]["marines"] = kept
-        assert spec_from_dict(doc, "s.yaml").armament.fits["ardent class 1794"].marines == kept
 
 
 def test_a_flag_party_is_borne_beyond_her_company_as_posts():

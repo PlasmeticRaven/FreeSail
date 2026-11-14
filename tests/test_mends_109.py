@@ -227,10 +227,7 @@ def _since(w, n):
 def test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_down():
     """On the trunk 'go ashore' in the morning watch waited two hours ("Not hands enough on
     deck to send boat; there are but two to spare") and he sat in the boat. Now all hands
-    are called for her, she is manned and hoisted out, and the hands are piped down. The call's
-    words name the work by the one road for its name since the lead's last list of 2026-11-14 (9):
-    "All hands! (to send the boat)", where it was "All hands! (to send boat)", her evolution's id
-    (20a8e2e3 and before)."""
+    are called for her, she is manned and hoisted out, and the hands are piped down."""
     w = _anchored_bilander()
     n = len(w.log)
     assert w.submit("go ashore").kind == "order.accepted"
@@ -238,7 +235,7 @@ def test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_down():
     kinds = [e.kind for e in _since(w, n)]
     assert "evolution.waiting" not in kinds
     called = next(e for e in _since(w, n) if e.kind == "crew.all_hands")
-    assert called.text == "All hands! (to send the boat)"  # 20a8e2e3: "(to send boat)"
+    assert called.text == "All hands! (to send boat)"
     assert kinds.index("crew.all_hands") < kinds.index("crew.piped_down")
     assert kinds.index("crew.piped_down") <= kinds.index("evolution.started")
     assert "boat.away" in kinds

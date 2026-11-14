@@ -337,21 +337,14 @@ def _waiting_for_hands(ship: Ship, sail_id: str) -> bool:
 # and the two schooners it parses as the noun "sail", their `fore.sail` and `main.sail`, after a
 # brace mode, "square", and every "shorten sail" of their gales listed the parser's refusal in
 # its "Not done". The grammar's refusal of the phrase typed at the prompt is the grammar's.
-# The lead's ruling (6) of 2026-11-10 (package 75): `make all sail`'s line "set the square sail"
-# likewise, as "take in" was, its reply's "Not done" in the same three listing the same refusal.
 SQUARE_SAIL_LINE = "take in the square sail"
-SET_SQUARE_SAIL_LINE = "set the square sail"
 SQUARE_SAIL_PART = "square_sail"
 
 
 def listed_lines(ship: Ship, lines: list[str]) -> list[str]:
-    """The vocabulary's group lines as this ship takes them: `shorten sail`'s "take in the square
-    sail" (`SQUARE_SAIL_LINE`) and `make all sail`'s "set the square sail"
-    (`SET_SQUARE_SAIL_LINE`) only where she has a `square_sail` part, every other line as
-    listed."""
-    if SQUARE_SAIL_PART in ship.sails:
-        return list(lines)
-    return [ln for ln in lines if ln not in (SQUARE_SAIL_LINE, SET_SQUARE_SAIL_LINE)]
+    """The vocabulary's `shorten sail` lines as this ship takes them: "take in the square sail"
+    only where she has a `square_sail` part (`SQUARE_SAIL_LINE`), every other line as listed."""
+    return [ln for ln in lines if ln != SQUARE_SAIL_LINE or SQUARE_SAIL_PART in ship.sails]
 
 
 def flying_topsail_lines(ship: Ship) -> list[str]:
@@ -493,7 +486,6 @@ def true_wind_kn(ship: Ship) -> float | None:
 
 __all__ = [
     "HEAD_SAIL_IN_RATIO",
-    "SET_SQUARE_SAIL_LINE",
     "SQUARE_SAIL_LINE",
     "STORM_CANVAS_KN",
     "STORM_VERBS",

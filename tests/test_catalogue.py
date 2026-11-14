@@ -634,9 +634,7 @@ def test_topmasts_are_struck_only_with_the_topgallant_masts_down_and_no_sail_on_
     runner.start(ship, "send_down_topgallant_masts", "ship")
     run(runner, ship, wind)
     ship.sails["main.topsail"].state = SailState.SET
-    # the work by its file's words, the one road's (the review of 0dcdb8cf, F7: "before striking
-    # topmasts", its id, once its params' copy was gone and its file gave none)
-    with pytest.raises(OrderError, match="main topsail is set; take it in before striking the top"):
+    with pytest.raises(OrderError, match="main topsail is set; take it in before striking"):
         runner.start(ship, "strike_topmasts", "ship")
     ship.sails["main.topsail"].state = SailState.IN_THE_GEAR
     runner.start(ship, "strike_topmasts", "ship")

@@ -1119,8 +1119,6 @@ class Builder:
         self.hold_note: str = ""
         self.boat_notes: dict[tuple[str, ...], str] = {}
         self.oars_note: str = ""
-        self.timing_note: str = ""
-        self.hands_note: str = ""
         # package 75 (SW-4; Build-Ships.md §9.2): each lower mast's channel as (fore end,
         # after end), metres from the mast's own x, where her hull's module gives them from
         # her sheet; read by `pivot_arc_from_rig` alone and written to no file
@@ -1277,25 +1275,6 @@ class Builder:
         }
         self.oars_note = note
 
-    def timing(self, note, figures):
-        """The `timing:` section (package 75, the lead's ruling (1) of 2026-11-10 at 19:30): the
-        ship's own figures for a scripted evolution's timing, {evolution id: {key: figure}}, in
-        its file's own keys, which the runner gives the script over the evolution file's
-        (`ShipSpec.timing`, `Runner._timing`); `note` above the section. A whole figure is
-        written as a whole number, as the evolution files write theirs."""
-        self.doc["timing"] = {
-            eid: {k: (int(v) if float(v).is_integer() else v) for k, v in keys.items()}
-            for eid, keys in figures.items()
-        }
-        self.timing_note = note
-
-    def hands(self, note, figures):
-        """The `hands:` section (package 75, the lead's (C2) of 2026-11-14): the ship's own number
-        of hands for an evolution whose file asks a number, {evolution id: hands}, over the
-        evolution file's (`ShipSpec.hands`, `Runner._crew_line`); `note` above the section."""
-        self.doc["hands"] = {eid: int(n) for eid, n in figures.items()}
-        self.hands_note = note
-
     def pumps(self, note, entries):
         """The `pumps:` list (package 73, spec M7 §13) from (id, kind, name, tons_per_hour,
         hands, note) entries, the note above each pump's line and `note` above the section."""
@@ -1367,10 +1346,6 @@ class Builder:
             for key in magazine:
                 if key in MAGAZINE_NOTES:
                     self.armament_notes[("magazine", name, key)] = MAGAZINE_NOTES[key]
-            if "powder_barrels" in magazine and not isinstance(magazine, MagazineAsFiled):
-                # a fit whose charges are the Regulations' table takes the barrel by Adye; an
-                # eight file's fits, kept as filed, keep the note they were filed with
-                self.armament_notes[("magazine", name, "powder_barrels")] = POWDER_BARRELS_NOTE
             if isinstance(magazine, MagazineAsFiled):
                 self.armament_notes[("magazine", name, "charges")] = charges_as_filed_note(
                     magazine["charges"]
@@ -1621,10 +1596,6 @@ class Builder:
                 ):
                     # the magazine's keys (practice and resupply, between packages 72 and 73)
                     note = armament_notes.get(("magazine", fit_name, m.group(1)))
-                elif m := re.match(r"^      (marines|trimmers):", line):
-                    # a fit's own bill figures (package 75: B1's marines by fit; Phase 5's
-                    # trimmers by fit, the lead's ruling 13), `schema.FIT_OWN_BILL`
-                    note = armament_notes.get(("fit", fit_name, m.group(1)))
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             if line.startswith("ground_tackle:"):
@@ -1643,11 +1614,6 @@ class Builder:
                 out.append("# " + self.hold_note)
             if line.startswith("oars:") and self.oars_note:
                 out.append("# " + self.oars_note)
-            # the ship's own timing figures (package 75, B7), noted as the hold is
-            if line.startswith("timing:") and getattr(self, "timing_note", ""):
-                out.append("# " + self.timing_note)
-            if line.startswith("hands:") and getattr(self, "hands_note", ""):
-                out.append("# " + self.hands_note)
             if line.startswith("boats:"):
                 in_boats = True
                 note = self.boat_notes.get(("section",))
@@ -4476,15 +4442,6 @@ MAGAZINE_NOTES = {
         "months' figure, the game keeping no commissioning date (judgement)."
     ),
 }
-# The powder barrel by Adye for a fit whose charges are the Regulations' table (the whole-change
-# review of 80e703c7, sources-7): the eight files' fits, kept as filed, keep
-# `MAGAZINE_NOTES["powder_barrels"]`, so that their bytes do not move.
-POWDER_BARRELS_NOTE = (
-    "The powder below in barrels of a hundred pounds: the whole barrel was made to contain a "
-    "hundred pounds, of late filled with ninety to leave the powder room to be shifted (Adye "
-    "1804 p. 46, BARRELS); the barrel's whole kept (JUDGEMENT), half the filled powder rounded up "
-    "to the barrel (judgement: the period kept most of its powder in the barrels)."
-)
 FILLING_NOTE = (
     "The quarter gunners and the gunner's crew in the filling room, one to every four cannon "
     "(Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice "

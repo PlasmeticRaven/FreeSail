@@ -2474,11 +2474,8 @@ def write(out_dir, p):
     company(b, p, guns)
     armament(b, p, fits)
     quarter_bill(b, p, guns)
-    fit_bill(b, p, fits)
     boats_pumps_hold(b)
     b.descriptions([DESCRIPTIONS[p.key]])
-    if p.key in LIE_A_TRY_HELM_DEG:
-        b.timing(LIE_A_TRY_NOTE, {"lie_a_try": {"helm_deg": LIE_A_TRY_HELM_DEG[p.key]}})
     b.dump(os.path.join(out_dir, p.file), p.header)
 
 
@@ -4077,17 +4074,6 @@ ARMAMENT_NOTE = (
     "1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's "
     "allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py."
 )
-# The 64's guns numbered by deck (package 75, B7.d: the 74's design, Bel-D §5.2 item 7, and the
-# lead's answer (3) to her §17.2, both two-deckers together): each deck's pairs from No. 1 forward,
-# the lower 1-13, the upper 1-13, the quarterdeck 1-5, the forecastle's 9s 1 and its carronades of
-# 1794 2, the roundhouse's 1-3; before it on across her decks (the upper 14-26, the quarterdeck
-# 27-31, the forecastle 32-33, the roundhouse 34-36). The razee's one gun deck keeps her numbers.
-NUMBERING = "by deck"
-NUMBERING_NOTE = (
-    " Numbered by deck, each deck's pairs from No. 1 forward as the period numbered each deck "
-    "(Bel §7.2), so her gun is said with its deck, as the 74's is; the `numbering` below says so "
-    "(Bel-D §5.2; package 75, B7.d)."
-)
 
 
 def piece(kind, pounder):
@@ -4107,11 +4093,9 @@ def ports_from_forward(profile, deck):
     return [(x, sill) for x, sill, _ in reversed(profile["ports_m"][deck])]
 
 
-def pairs(ports, deck, first, kind, pounder, note, by_deck=False):
+def pairs(ports, deck, first, kind, pounder, note):
     """Broadside pairs on `ports`, numbered on from `first` from forward (Indf §5.2), each gun's
-    x and height its port's x and sill, its crew the period's (§5.3); the note on the first. The
-    64's `by_deck` (package 75, B7.d, with the 74: Bel-D §5.2 item 7): each deck from No. 1, each
-    id re-keyed after the call by its deck, `gun.lower.3.starboard`, as the 74's are."""
+    x and height its port's x and sill, its crew the period's (§5.3); the note on the first."""
     cwt, crew = piece(kind, pounder)
     out = []
     for i, (x, sill) in enumerate(ports):
@@ -4127,8 +4111,6 @@ def pairs(ports, deck, first, kind, pounder, note, by_deck=False):
             round_to=0.01,
         )
         for gun, _ in made:
-            if by_deck:
-                gun["id"] = f"gun.{deck}.{gun['number']}.{gun['side']}"  # the key keeps its place
             gun["crew"] = crew  # reassigned, so the key keeps its place (Indf §5.2)
         out += made
     return out
@@ -4167,43 +4149,39 @@ def sixty_four_fits(profile):
                 "The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun "
                 "of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill "
                 "to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side "
-                "bears (Falconer 1780, QUARTERS; D31 (c)). Numbered by deck from forward, each "
-                "deck from No. 1 as the period numbered each deck (Bel §7.2) and the 74 numbers "
-                "hers (Bel-D §5.2; package 75, B7.d).",
-                by_deck=True,
+                "bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her "
+                "decks, as the frigate-36 numbers hers; the period numbered each deck from No. 1 "
+                "(Bel §7.2).",
             )
             + pairs(
                 upper,
                 "upper",
-                1,
+                14,
                 "long",
                 18,
                 "The upper deck's twenty-six long 18-pounders: the 9 ft gun of 40 cwt (Adye 1804 "
                 "p. 155), the 74's pattern (Bel §13.1 answer 12; judgement for hers); nine men to "
                 "the pair (Falconer 1780, QUARTERS).",
-                by_deck=True,
             )
             + pairs(
                 quarterdeck,
                 "quarterdeck",
-                1,
+                27,
                 "long",
                 9,
                 "The quarterdeck's ten long 9-pounders in its five foremost ports a side, the "
                 "sixth, under the roundhouse, empty: the 7 ft 6 in gun of 24 cwt 2 qr (Adye 1804 "
                 "p. 155; the 74's pattern, judgement for hers); six men to the pair (Falconer "
                 "1780).",
-                by_deck=True,
             )
             + pairs(
                 forecastle[:1],
                 "forecastle",
-                1,
+                32,
                 "long",
                 9,
                 "The forecastle's two long 9-pounders, one a side, firing over its rail (no port "
                 "is drawn on 1407F: Indf §3.3); six men to the pair (Falconer 1780).",
-                by_deck=True,
             )
         )
 
@@ -4229,26 +4207,24 @@ def sixty_four_fits(profile):
             + pairs(
                 forecastle[1:],
                 "forecastle",
-                2,
+                33,
                 "carronade",
                 24,
                 "The forecastle's two 24-pounder carronades of 1794, one a side (Indf "
                 "§5.1, judgement), firing over the rail: 13 cwt, the 3 ft 7 1/2 in carronade (Adye "
                 "1804 p. 72); four men to the pair, its captain, two privates and a provider "
                 "(Douglas 1829 art. 136).",
-                by_deck=True,
             )
             + pairs(
                 roundhouse,
                 "roundhouse",
-                1,
+                34,
                 "carronade",
                 18,
                 "The roundhouse's six 18-pounder carronades of 1794, three a side "
                 "(Indf §5.1; the roundhouse unmeasured but its rail and the line under it, "
                 "judgement), firing over the rail: 9 cwt, the 3 ft 3 in carronade (Adye 1804 p. "
                 "72); four men to the pair (Douglas 1829 art. 136).",
-                by_deck=True,
             ),
             "The class's guns from 1794: those of 1784 with 2 x 24-pounder carronades on the "
             "forecastle and 6 x 18-pounder carronades on the roundhouse, 72 pieces (Winfield "
@@ -4393,10 +4369,7 @@ def default_guns(p, fits):
 
 def armament(b, p, fits):
     """Her fits and their magazines (Indf §5), the charges Table No. 29's and their note the
-    shared one (SW-1), the 64's exercise note a two-decker's; the 64's guns numbered by deck
-    (package 75, B7.d): her armament's `numbering` set after the call, the generator's own taking
-    no such key (Bel-D §12.1), its words in her section's note. The razee numbers hers on across
-    her decks, as the frigate-36, her one gun deck's pairs Nos. 1-13."""
+    shared one (SW-1), the 64's exercise note a two-decker's."""
     decks = DECKS_OF[p.key]
     exercise = g.exercise_allowance(UPPER_DECK_GUNS, decks=decks)
     rounds = {"long": g.KINGS_ROUNDS, "carronade": g.KINGS_ROUNDS, "swivel": g.SWIVEL_ROUNDS}
@@ -4413,8 +4386,6 @@ def armament(b, p, fits):
             b.armament_notes[("magazine", name, "exercise_charges")] = (
                 period.TWO_DECKS_EXERCISE_NOTE
             )
-        b.doc["armament"]["numbering"] = NUMBERING
-        b.armament_notes[("section",)] = ARMAMENT_NOTE + NUMBERING_NOTE
 
 
 # ---------------------------------------------------------------------------
@@ -4500,27 +4471,6 @@ COMPANY = {
         "(judgement; D32 (a))",
     },
 }
-# The 64's lee helm lying a-try (the lead's ruling (1) of 2026-11-10 at 19:30, B7: lie a-try from
-# way on, on the 74's and the 64's files alone), `lie_a_try`'s own timing key on her file
-# (`ShipSpec.timing`): the evolution's 5 degrees left her lying 89.3 to 103.6 degrees off at 3.67
-# kn from way on in 35 kn, and 90.7 at 3.60 with what it hands furled, where she lies about five
-# points at 1.45 kn from rest. Measured (seed 7; docs/dev/TuningNotes.md, "The lead's rulings of
-# 2026-11-10, built"): with what lie a-try hands furled, the least helm that settles her inside
-# five to six and a half points under 2 kn is 29 (70.7 to 73.0 at 1.73 kn), 30 lies 70.7 to 72.5
-# at 1.71 and 32 lies 71.1 to 71.5 at 1.69, all but steady; from rest truth 28's form holds at every
-# figure to 35, coming up and falling off from 28 (43.5 to 79.4 degrees at 32, 1.36 kn). 32 taken
-# (judgement): her settled lie a degree and a half inside the six and a half points. The razee
-# keeps the evolution's own.
-LIE_A_TRY_HELM_DEG = {"sixty-four": 32}
-LIE_A_TRY_NOTE = (
-    "Her own figure for an evolution's timing, over its file's (the runner's): lying a-try, the "
-    "helm a-lee 32 degrees where the evolution's file gives 5, the figure that brings her up from "
-    "way on in a gale to six points and a third with under 2 knots of way once what it hands is "
-    "furled, where at 5 she lay eight points off at 3.6 knots; from rest she comes up and falls "
-    "off between about four and seven points, inside truth 28's bounds, where at 5 she lay steady "
-    "near five (measured: docs/dev/TuningNotes.md; judgement)."
-)
-
 # The quarter bill's figures beyond the trimmers (Indf §6.4): the frigate-36's two at the helm
 # and no powder beyond the idlers; her small-arms men the frigate-36's share of her seamen, 20 of
 # 182; her boarders a quarter of the seamen (`gen_ships.BOARDERS_NOTE`); all judgement as hers.
@@ -4560,20 +4510,16 @@ def at_the_guns(guns, marines):
 def quarter_bill(b, p, guns):
     """Her quarter bill set against the default fit (Indf §6.4): the trimmers what her seamen
     leave when one side's guns, the chasers and the wheel are manned, the marines taking the
-    carronades first, split by the frigate-36's shares; the bill's `marines` (the 74's stage 0c
-    key, Bel-D §12.1) the marines it leaves for their division, the rest of them, written after
-    the generator's call, which takes no such key, as the 74's module writes hers (the lead's
-    answer of 2026-11-10 at 19:30: the 64's 84 and the razee's 14, so that the beat to quarters
-    forms their divisions and their trimmers meet the bill; crew/quarters.py; her tests hold what
-    it does at muster)."""
+    carronades first, split by the frigate-36's shares; the bill leaves the marines not at the
+    carronades for their division, which the beat to quarters does not (crew/quarters.py; her
+    tests hold what it does at muster)."""
     co = COMPANY[p.key]
     seamen = sum(co["seamen"].values())
     men, marines_at = at_the_guns(guns, co["marines"])
     total = seamen - (men - marines_at) - HELM
     trimmers = shares(total, TRIMMER_SHARES)
     fit = DEFAULT_FIT[p.key]
-    kept = co["marines"] - marines_at
-    REPORT.setdefault(p.key, {})["bill"] = (seamen, fit, men, marines_at, total, kept)
+    REPORT.setdefault(p.key, {})["bill"] = (seamen, fit, men, marines_at, total)
     b.quarter_bill(
         g.QUARTER_BILL_NOTE,
         [
@@ -4585,8 +4531,9 @@ def quarter_bill(b, p, guns):
                 "split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of "
                 "44 (Indf §6.4; judgement). The bill leaves the marines not wanted at the "
                 "carronades for their division, as Falconer quarters them on the poop and "
-                "forecastle or gangway (1780, QUARTERS), and keeps them there by its marines "
-                "below. Of the "
+                "forecastle or gangway (1780, QUARTERS); the beat to quarters (crew/quarters.py) "
+                "takes the marines to the long guns before the topmen (Indf §6.4; the station "
+                "order is the engine's, open for the lead). Of the "
                 "forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the "
                 "forecastlemen 'the best older seamen').",
             ),
@@ -4632,104 +4579,6 @@ def quarter_bill(b, p, guns):
         f"the {period.REGULATIONS_COLUMNS[co['column']]} column (p. 165: Ind §4.2), the period's "
         "figure twice over (Indf §5.4)."
     )
-    b.doc["crew"]["quarter_bill"]["marines"] = kept
-    b.crew_notes[("quarter_bill", "marines")] = (
-        "The marines the bill keeps in their division at the beat (the 74's key, Bel-D §12.1): "
-        + (
-            "all her marines, the default fit carrying no carronade"
-            if not marines_at
-            else f"her marines but the {marines_at} at the default fit's carronades"
-        )
-        + ", quartered on the poop and the forecastle or gangway, at the great guns only in "
-        "distant cannonading (Falconer 1780, QUARTERS), so that the beat forms their division and "
-        "her trimmers meet the bill's; before it the beat took her marines to the long guns before "
-        "the topmen (Indf §6.4)."
-    )
-
-
-# The company each file bears whatever her fit, as the sources give it by year (a file carries
-# one company: the 64's note, Indf §6.1), for the fits' own bill figures (`fit_bill`: B1's
-# marines by fit, Phase 5's trimmers by fit).
-COMPANY_BY_YEAR = {
-    "sixty-four": "the class's 500 as built and 491 from 1794, Winfield 1793-1817 p. 99; the "
-    "file's the 491",
-    "razee": "her 310 at first and 330 afterwards, James vol. 1 p. 454; the file's the 330",
-}
-
-
-def fit_bill(b, p, fits):
-    """The quarter bill on each fit (package 75, B1 and Phase 5): the bill's own rules run on the
-    fit's guns, and where a figure differs from the bill's (which is the default fit's), the fit
-    carries its own, written after its `source` in `schema.FIT_OWN_BILL`'s order, with its note,
-    as the bill's own figures are written after the generator's call. The report says each fit's
-    arithmetic.
-
-    - Its `marines` (B1, the lead's ruling (4) of 2026-11-13, the marines by fit): her marines
-      less the marines at the fit's carronades (`at_the_guns`, the carronades taking the marines
-      first and the long guns none: B7.b's rule stands).
-    - Its `trimmers` (Phase 5, the lead's ruling 13 of 2026-11-14, the razee's trimmers by fit):
-      what her seamen leave when one side's guns of the fit, the chasers and the wheel are
-      manned, split by the frigate-36's shares (`quarter_bill`'s rule), so that every crew of the
-      fit is manned at the beat.
-
-    Each JUDGEMENT, said in its note: no establishment of private marines by rate or by year was
-    found (Ind §10.8), nor a period quarter bill for a ship of about her company (Ind §6.3), and
-    the file bears one company whatever her fit."""
-    co = COMPANY[p.key]
-    seamen = sum(co["seamen"].values())
-    bill = b.doc["crew"]["quarter_bill"]
-    kept = bill["marines"]
-    bill_trimmers = sum(bill["trimmers"].values())
-    for name, _, guns, _ in fits:
-        if name == DEFAULT_FIT[p.key]:
-            continue
-        men, marines_at = at_the_guns(guns, co["marines"])
-        own = {}
-        n = co["marines"] - marines_at
-        if n != kept:
-            own["marines"] = n
-            REPORT.setdefault(p.key, {}).setdefault("fit_marines", []).append(
-                (name, men, marines_at, n)
-            )
-            b.armament_notes[("fit", name, "marines")] = (
-                "The marines the bill keeps in their division at the beat when she carries this "
-                "fit (package 75, B1; the lead's ruling (4) of 2026-11-13): her "
-                f"{co['marines']} marines but the {marines_at} at this fit's carronades, who take "
-                "them first, the long guns taking none (the bill's rule, Bel-D §12.1 and B7.b: the "
-                "marines quartered on the poop and the forecastle or gangway, at the great guns "
-                f"only in distant cannonading, Falconer 1780, QUARTERS); the bill's {kept} (above) "
-                "is the default fit's. JUDGEMENT: the bill's rule on this fit's guns, since no "
-                "establishment of private marines by rate or by year was found (Ind §10.8) and the "
-                f"file bears one company whatever her fit ({COMPANY_BY_YEAR[p.key]})."
-            )
-        total = seamen - (men - marines_at) - HELM
-        if total != bill_trimmers:
-            own["trimmers"] = shares(total, TRIMMER_SHARES)
-            REPORT.setdefault(p.key, {}).setdefault("fit_trimmers", []).append(
-                (name, seamen, men, marines_at, total, bill_trimmers)
-            )
-            b.armament_notes[("fit", name, "trimmers")] = (
-                "The trimmers the bill tells off by station at the beat when she carries this fit "
-                "(package 75, Phase 5; the lead's ruling 13 of 2026-11-14): what her seamen leave "
-                "when one side's guns of this fit, the chasers and the wheel are manned, the "
-                "marines taking the carronades first, split by the frigate-36's trimmer shares, "
-                "8, 10, 12, 6 and 8 of 44, as the bill's are, so that every crew of this fit is "
-                "manned at the beat; the bill's trimmers (above) are the default fit's, whose guns "
-                f"want {'fewer' if total < bill_trimmers else 'more'} seamen. JUDGEMENT: the "
-                "bill's rule on this fit's guns (Indf §6.4), as her marines on it are, since no "
-                "period quarter bill for a ship of about her company was found (Ind §6.3: RMG "
-                "WQB/39, the Indefatigable's of 1812, is a watch bill) and the file bears one "
-                f"company whatever her fit ({COMPANY_BY_YEAR[p.key]})."
-            )
-        if not own:
-            continue
-        fit = b.doc["armament"]["fits"][name]
-        items = list(fit.items())
-        fit.clear()
-        for k, v in items:
-            fit[k] = v
-            if k == "source":
-                fit.update(own)
 
 
 def company(b, p, guns):
@@ -5141,12 +4990,11 @@ def boats_pumps_hold(b):
 DESCRIPTIONS = {
     "sixty-four": (
         "sixty-four",
-        "a ship of the line",
+        "a ship",
         "a sixty-four, a ship of the line of two tiers of ports",
         "The Ardent class's 64 (Winfield 1793-1817 p. 99), a third rate (Falconer 1780, RATES): "
-        "what the glass makes out, her two tiers of ports. Her rig's word is a ship of the line, "
-        "her size and her two tiers told first at her rig's distance (the lead's ruling of "
-        "2026-11-12, (1); JUDGEMENT on the distance; before it, the frigate's word).",
+        "what the glass makes out, her two tiers of ports; her rig's word the frigate's, three "
+        "masts square-rigged.",
     ),
     "razee": (
         "razee",
@@ -5171,22 +5019,10 @@ def her_report() -> str:
             plain, scale = r["rope"]
             out.append(f"{key}: plain sail {plain:.0f} m2, her rope's scale {scale:.3f}.")
         if "bill" in r:
-            seamen, fit, men, marines, total, kept = r["bill"]
+            seamen, fit, men, marines, total = r["bill"]
             out.append(
                 f"{key}: the quarter bill on '{fit}': her {seamen} seamen, {men} men at the guns, "
-                f"{marines} of them marines, and {HELM} at the wheel leave {total} trimmers; the "
-                f"bill keeps {kept} marines in their division."
-            )
-        for name, men, marines, kept in r.get("fit_marines", ()):
-            out.append(
-                f"{key}: on '{name}': {men} men at the guns, {marines} of them marines at its "
-                f"carronades; the fit keeps {kept} marines in their division."
-            )
-        for name, seamen, men, marines, total, bill in r.get("fit_trimmers", ()):
-            out.append(
-                f"{key}: on '{name}': her {seamen} seamen, {men} men at the guns, {marines} of "
-                f"them marines, and {HELM} at the wheel leave {total} trimmers; the fit tells off "
-                f"its own {total}, the bill's {bill} being the default fit's."
+                f"{marines} of them marines, and {HELM} at the wheel leave {total} trimmers."
             )
         if "upper_works" in r:
             out.append(f"{key}: {r['upper_works']}")
