@@ -26,7 +26,7 @@ It is about 350,000 lines: a game of 165,000, tests of 141,000, tools of 37,000,
 4. **Two things make the game unsafe to hand to a friend.** While it runs, any web page open in his browser can read his files through it. And a saved game's folder that came from someone else can run a program on his machine. Both are small to mend. (5.4, 6.1)
 5. **What models were told when they were asked to consent no longer matches the code** in four places, one of weight: another station's words can reach a model in the operator's voice. The remedy is yours to choose, by your own process. (1.4 decision 17)
 6. **The game has become one mass.** The proposal's "single most important boundary", the simulation kept apart from whatever drives or shows it, is gone: every part reaches into every other, 1,767 times by a back door. The earlier review named three such crossings six weeks ago; there are nineteen in the core now. Every change is dearer and riskier than the one before. (F4.1, 5.7)
-7. **The tests are strong at the centre, weak where they are newest, and cost an hour a run.** Eighteen ordinary faults I chose in the ship's core were all caught, most within seconds. But of sixty-seven faults planted against tests my readers suspected, sixty-one passed with the game broken, and twenty-six of those were caught by nothing. A hundred of the "known truths" only run another file's tests a second time. The fast tier has grown fourfold in six weeks, and nobody has measured it since the first day. (head 3)
+7. **The tests are strong at the centre, weak where they are newest, and cost an hour a run.** Eighteen ordinary faults I chose in the ship's core were all caught, most within seconds. But of sixty-seven faults planted against tests my readers suspected, sixty-one passed with the game broken, and twenty-six of those were caught by nothing. Seventy-three of the "known truths" only run another file's tests a second time. The fast tier has grown fourfold in six weeks, and nobody has measured it since the first day. (head 3)
 8. **The proposal still promises things that were quietly given up:** Python as a way to play (it is not in the game at all); a saved log that is a saved game; ships and evolutions as data a person can edit (they are the output, or the settings, of some forty thousand lines of program); the true position never leaving the simulation. (1.3)
 9. **The largest single block of work in the project is designing ships:** a quarter of all the code and tests, sixteen days where the plan said most of one, while a newcomer's first hour has nothing. On 27 October you asked for "playability and understandability"; the work that followed was a refactor, charts and hulls. (F2.1, 5.7, 5.9)
 10. **The records are honest and cannot be read.** Three megabytes of tuning notes in the order things happened; a packages table of dated diaries; 7,600 package numbers written into the code and the data. You cannot learn the state of your project from them, only from the lead, whose eye is the only one on both the work and the record of it. (5.8, 5.10)
@@ -60,6 +60,7 @@ Then the test suite, which will pay for itself within a fortnight; then the boun
 4. **Every finding of weight tried by a second reader told to refute it** (`refute-01` to `refute-08`), and several run again by the reviewer. Where a second reader narrowed or overturned a finding, this report uses the narrowed form and says so. One finding fell outright and is named in head 5.
 5. **Faults planted** in scratch copies outside the repository, to see whether the tests that claim to guard a behaviour fail when it is broken (`faults-1` to `faults-5`; head 3).
 6. **The suites run** at the commit under review (head 3).
+7. **Then, and only then, the records** (`records-01` to `records-06`): the work packages of every milestone, the tuning notes, the gates, the playtests' notes, the design notes and the project's earlier cold review, each read by a reader told to set it against the first sitting; and **the lead's sealed notes**, read by the reviewer and each item tried (`sealed-notes-tried`).
 
 **The readers ran on a different model from the reviewer**, at the owner's word relayed by the lead after the launch. The weighing of what they found is the reviewer's.
 
@@ -71,6 +72,8 @@ Then the test suite, which will pay for itself within a fortnight; then the boun
 - No real model was seated. Everything said of the doors, the briefs and the director is from the code, the rules' seats and short probes.
 - Windows. Every run was on Linux, on Python 3.13 (the project names 3.11).
 - The slow tier and the pace tests were timed only as head 3 says.
+- Of the records: about a quarter of the tuning notes was read whole and the rest by search; of the milestone 7 work packages some 3,300 of 10,500 lines were read by their headings and dated rulings only; of the fifty-six design notes fourteen were read in whole or in their heads and histories; the playtests' saved games, logs and transcripts were not opened, only their notes.
+- Anything on GitHub that is not in the tree: the settings of the repository, the minutes the workflows have used, the runs' own logs.
 
 ---
 
@@ -228,7 +231,7 @@ And the data: the chart, 359 MB in 2,325 tiles; 121 ports; six nations' signal b
 
 **F2.1 The ships as designs.** *Weight: high. Confidence: sure.* The generator and its per-ship modules are 28,800 lines, and 23,100 lines of tests guard them: together a quarter of everything written. Each ship is designed in prose-heavy Python from period sources, checked against her design note, and written out as a file nobody may edit. The tests of this subject are the suite's largest block and the least about the game: they prove a document, a tool and a file agree (`tests-06`; six `test_hull_<ship>.py` files are one test written six times). Meanwhile the generator keeps its own copy of the sail-force law, and it has drifted from the engine's: 1.25 for a studding sail against the engine's 1.44 (`tools/gen_ships.py:136`; `refute-01`: stands). The proposal called the remaining rigs "data work". They have become the project's largest engineering work, while the player's first hour has no tutorial.
 
-**F2.2 The chart and the ports.** *Weight: medium (cost), not a fault of design. Confidence: sure.* The owner ruled the map's growth, more than once. What it costs: 94 per cent of the repository's tracked bytes are chart tiles, scanned texts and recorded play; the tiles are binary in plain git, and each rebuild of a tile is a permanent copy; a clone is about a gigabyte. (A first reader counted 2,333 tile changes in the visible week; the second reader showed that nearly all were the shallow clone's first commit and new tiles, and only eight were rewrites. The size stands; the churn seen was small: `refute-08`.) Every world, wherever it is set, loads all twenty regions and all 121 ports (Algiers for a game off the Lizard) and takes six to eleven seconds to build, most of it a slow reader of the data files, the chart's index read twice (`refute-07`). And what the ports are for is thin beside their number: 121 ports in which nothing mends a hull, no crew pool refills, and the market has no demand. Much of what a port file carries is read by nothing: the datum (116 files), the tide's establishment and its leave (121 each), the currency (121), the roads' depths and bottoms (319 entries, probably) (`code-03`; `refute-03`: stands, low). There are 142 accepted faults on the chart's known-faults list.
+**F2.2 The chart and the ports.** *Weight: medium (cost), not a fault of design. Confidence: sure.* The owner ruled the map's growth, more than once. What it costs: 94 per cent of the repository's tracked bytes are chart tiles, scanned texts and recorded play; the tiles are binary in plain git, and each rebuild of a tile is a permanent copy; a clone is about a gigabyte. (A first reader counted 2,333 tile changes in the visible week; the second reader showed that nearly all were the shallow clone's first commit and new tiles, and only eight were rewrites. The size stands; the churn seen was small: `refute-08`.) Every world, wherever it is set, loads all twenty regions and all 121 ports (Algiers for a game off the Lizard) and takes six to eleven seconds to build, most of it a slow reader of the data files, the chart's index read twice (`refute-07`). And what the ports are for is thin beside their number: 121 ports in which nothing mends a hull, no crew pool refills, and the market has no demand. Much of what a port file carries is read by nothing: the datum (116 files), the tide's establishment (121), the currency (121), the roads' depths and bottoms (319 entries, probably) (`code-03`; `refute-03`: stands, low). There are 142 accepted faults on the chart's known-faults list.
 
 **F2.3 Signals.** *Weight: medium. Confidence: likely.* Some 3,900 lines of signal and flag code and 6,500 lines of data, six nations' books; ten scenarios use a squadron, a convoy, a ship under orders or a private signal. Four entries of the books probably cannot be obeyed, and the refusal is swallowed (`code-04`; `refute-02`: stands in part).
 
@@ -304,7 +307,7 @@ Read plainly: where a reader said "this test cannot fail for what its name says"
 - the leeway line every 32 seconds; the messenger taking an hour to bring a man aft; "Not to be had in the cabin" staying after the captain is back on deck;
 - in the picture: braces ending in mid-air, a figurehead three times its size, studding sails drawn inboard, every sail bellying into the wind.
 
-In four of the named tests the behaviour the name promises does not happen in the test's own run even on the unchanged code (the packet fires no shot; nobody falls to musketry; the first lieutenant is dead before the captain; no made-out line is logged). Seventeen of the readers' claims were refuted by the runs and are marked so in the readers' files' company: the runners' tables say which.
+In four of the named tests the behaviour the name promises does not happen in the test's own run even on the unchanged code (the packet fires no shot; nobody falls to musketry; the first lieutenant is dead before the captain; no made-out line is logged). Seventeen of the readers' claims of "nothing catches this" were refuted by the runs; the runners' tables say which, and the readers' files stand uncorrected beside them so that both can be seen.
 
 What the survivors have in common, with one example of each kind (all in the readers' files with their lines; the reviewer checked the first four kinds against the test files himself):
 
@@ -334,7 +337,7 @@ Beyond head 5.3's list of what the reviewer met in play:
 
 ### 3.5 Tests that test the same thing
 
-- **The truths call the tests.** In the second half of the truths' file, **102 truths do nothing but call tests of other files**: 197 distinct tests in 31 files, forty of them in one file. The truth and its twin do not differ, so each twin runs at least twice in a whole run, and some three times. Both halves of several pairs are on the slow list; four slow twins run in the *fast* tier through truths not marked slow; and calling a twin by name drops the twin's own skip, so that without Node eleven truths error where their twins would skip (`tests-02`, `tests-07`, `tests-11`).
+- **The truths call the tests.** In the second half of the truths' file, **82 truths call tests of other files, and 73 of them do nothing else**: 163 distinct tests in 27 files. (A reader counting more loosely made it 102 and 197; the figures here are the reviewer's own count: 5.5, item 12.) The truth and its twin do not differ, so each twin runs at least twice in a whole run, and some three times. Both halves of several pairs are on the slow list; four slow twins run in the *fast* tier through truths not marked slow; and calling a twin by name drops the twin's own skip, so that without Node eleven truths error where their twins would skip (`tests-02`, `tests-07`, `tests-11`).
 - **Six hull files are one test written six times**: about 60 of their 121 functions follow the same eleven sections; three of the sections are proved again for every ship elsewhere. One table and six parametrised tests would replace some 45 functions and a thousand lines (`tests-06`).
 - **The same scene built again and again for one line each.** The struck ship seventeen times in two files; the hove-to brig eleven times (once only to check that a line does not parse); the two-hour passage in the cabin five times; a brig sailed from nothing twenty-six times in one file for 1,200 to 2,400 seconds each; a 1,500-tick settle fifteen times in another (`tests-04`, `tests-07`, `tests-10`).
 - **The same day sailed in two files under the same fixture names**: the frigate's and the schooner's sweeps and the frigate's polar (`tests-10`); truth 27's four gales (`tests-04`); the gale trial three times; the replay-to-digest check about twenty times (`tests-01`).
@@ -373,7 +376,7 @@ Beyond head 5.3's list of what the reviewer met in play:
 
 Written before the records were opened, from the readers' evidence; the seconds beside each are added from the timed run where it gives them. None changes a test here: each is proposed in words for the owner.
 
-1. **Run each test once.** Replace the 102 truths that only call another file's test with a register: the truth's number, its sentence, and the name of the test that proves it, with one check that every name exists. *Saves:* the second (and third) run of 197 tests, among them the slowest in the suite; the four slow tests that leak into the fast tier; the errors without Node. *Risks:* none to what is proved; the same test still runs. The owner keeps the numbered truths as a register he can read.
+1. **Run each test once.** Replace the truths that only call another file's test (73 of them) with a register: the truth's number, its sentence, and the name of the test that proves it, with one check that every name exists. *Saves:* the second (and third) run of 163 tests, among them the slowest in the suite; the four slow tests that leak into the fast tier; the errors without Node. *Risks:* none to what is proved; the same test still runs. The owner keeps the numbered truths as a register he can read.
 2. **Read the world's fixed data once a process, not once a world.** A world set on the chart reads the chart's index (twice), 121 port files and the tide tables with a slow reader: six to eleven seconds a build on this machine (`refute-07`). The data does not change in a run. *Saves:* seconds from every test that builds a scenario's world, which is thousands; probably the largest single cut, and the player's start-up with it. *Risks:* low, if what is cached is never changed by a test; the determinism test would show a leak.
 3. **Build a scene once and copy it.** The game has an exact checkpoint. A fixture that settles the brig, strikes the ship or sails the cabin's passage once, and hands each test a copy restored from memory, replaces seventeen, eleven, five and twenty-six sailings with one each. *Saves:* most of the time of the files named in 3.5. *Risks:* medium: the fixture must be built in the run, never read from a file, or it goes stale in silence as saved fixtures do.
 4. **Decide the tier by measurement.** Let a whole run write each test's seconds to a file in the tree; let the suite mark slow whatever took over the threshold last time; fail when a listed name matches no test. *Saves:* the 370 typed ids, the four dead ones, the heavy tests no list names, the marks scattered through test files. *Risks:* low.
@@ -515,6 +518,8 @@ The records show the first sitting wrong, or short, in these places. None is rew
 8. **The pace on a cloud runner** (3.7) spreads from 382 to 677 ticks a second by the tuning notes, not 480 to 520.
 9. **Determinism** (§3.2) is by the C library, not only by the operating system: nine recorded passages moved when the cloud's image changed. The remedy pinned one workflow's image and left the other floating (`docs/dev/TuningNotes.md:22871-22912`).
 10. **The "sheet-tending" fault** the earlier review's ruling left "not now" was in fact mended.
+11. **The port's key `leave_on`** (F2.2) is read; see 5.11.
+12. **The truths that only call other tests** (3.5; 3.8, item 1). The reviewer's own count, made after a reader of the sealed notes counted fewer: **82** truths call a test of another file, **73** of them with nothing else in the body, and the tests so called are **163** in 27 files. The first reader's 102 and 197 counted more loosely. The finding stands at the smaller figure.
 
 ### 5.6 Where the record and the thing differ
 
@@ -594,7 +599,38 @@ They are honest and they cannot be used. The tuning notes do their stated work, 
 
 ### 5.11 The sealed notes
 
-{{SEALED}}
+The lead wrote down before the launch what he already believed, and sealed it. Each item was then tried at the commit like any other claim (`sealed-notes-tried`; three by the reviewer). In the brief's three classes:
+
+**Found by the review itself, cold.**
+
+- Truths that only call tests of another file. The lead named it; the review counted it and costed it (3.5).
+- The orders, the forms and the readings built in several places (F4.2, F4.3).
+- In part: the pace floors inside the machine's noise (3.7; a fault runner met it); the helper `_until` defined twice in the truths' file (`tests-01`); a line said in many places (F4.9); vessels and the land (the guard's warning seen in play; ships seen through the land); browser tests skipped unseen where a package is missing (3.7).
+
+**Missed by the review, and now confirmed.**
+
+- `take the purse` is answered as the reading "the purse" (tried by the reviewer). A refusal says where an unseen thing lies: "the bag of guineas is ashore at Plymouth", asked at Falmouth.
+- A rules captain waits for his tide without a word. In the reader's run the cargo was in at 12:21 and she weighed at 17:59: five hours and thirty-eight minutes, seventy lines of log, none saying why she lay there. (With it a correction to the first sitting: the port's key `leave_on` *is* read, by a name built at run time, `world/captains.py:3981`; a first reader's "read by nothing" was wrong, and F2.2's list is shorter by that one.)
+- A person in a boat that is lost is left in no hull and not dead.
+- The open ocean takes its tide from the Channel's eleven gauges.
+- The coarse chart layers stand at mean sea level and the game adds the level above low water again (the mechanism confirmed; the count not re-measured).
+- A book of orders cannot name a clock hour, only bells (tried by the reviewer).
+- A Spanish signal of one flag reads "two flags at the main".
+- Port tracks follow the land and not sounded channels; and ports that cannot be entered are not four but **twenty-four**, by the chart audit's own list.
+- The nations' days are from memory: Spain's, all of them.
+- **The ways a ship is set up:** six roads to one maker, each with its own checks. A ship put on the land is refused by a world order, accepted from a scenario (two ships of one scenario start on ground that dries) and dropped without a word by the business. The harbour's form offers no intent and no fit.
+- **The ways a thing is dated:** nine readers of a dated row. The prize shares' `until` leaves the day out where the others keep it in; `at_war` ignores dates altogether; a war declared with its date as text is, to the prize court, no war (latent: nothing declares one yet). This matters most, because the range of years is the next large work planned.
+- **Regions:** three sets of bounds read by four loaders; five weather boxes copy the chart's bounds by hand; one stream area names a region that does not exist.
+
+**Disputed.**
+
+- "The schooner of the recorded merchant passage takes the ground thirteen times as recorded." Both truths that pin her recorded passages assert that she never takes the ground over the whole log. As the tree records it, refuted; the lead should say what he measured.
+- That hands are called in several ways: calling all hands is one road. (Sailors are, though, assigned outside the crew's own module in seven others.)
+- The saved game that lost its chart: mended before the commit under review, and no fault of this tree.
+
+**Not triable here** (work in flight, the cloud, the process): the far ship woken at anchor; the cutter aground after weighing; one truth that failed once under load; the runs before run 81; the builders' stalls; the suites' hours (the review's own timing is 3.9).
+
+**The two lists side by side.** The lead's list is of particular faults in the game and its data, nearly all true, most of them small, and of the daily frictions of the process. It holds none of the review's structural findings: not the boundary, the director's reach, the server, the checkpoint, the consent brief against the code, the absence of player Python, the catalogue and the ships as code, the tests that cannot fail, nor the newcomer's first hour. The review's list holds few of the lead's particulars. Each saw what its place lets it see: the lead, inside every package, sees the fault in front of him; a cold reader sees the shape. The owner needs both, and has been getting the first.
 
 ---
 
@@ -688,3 +724,25 @@ The brief proposes that packages 103, 96 and 92 follow this review, each amended
 - **96 (a ship's configuration, and the harbour presenting it)** first, and amended: the harbour's first duty is the newcomer's first game (step 3), before it presents every configuration the game has.
 - **103 (the years 1792 to 1825)** after the gate, and amended: the schema for the data files and one reader of a dated row come first (6.2; 5.11), or thirty-three years of rows will be written into files where a typo is silent.
 - **92 (a career)** last, and not begun until steps 1 to 5 are done: it lays a new layer on the ports, the far world and the director, the three systems this review found least held to their rules.
+
+---
+
+## The evidence
+
+All under `docs/reviews/ColdReview-M7-evidence/`. A reader's file is kept as the reader wrote it, with only models' and vendors' names taken out; where a second reader or a fault runner overturned a claim, the overturning is in the later file and this report follows the later file.
+
+| File | What it is |
+|---|---|
+| `READERS.md`, `TESTREADERS.md`, `CODEREADERS.md`, `SPECREADERS.md`, `REFUTERS.md`, `FAULTRUNNERS.md`, `RECORDREADERS.md` | The standing instructions each kind of reader worked under: the review's method, so that it can be checked. |
+| `play/` | The reviewer's own play: five console transcripts and three screenshots of the browser. |
+| `tests-01` to `tests-12` | The test suite's audit: every test file read whole, a table by file, verdicts under (a) to (c), and the faults each reader nominated. |
+| `tests-by-file.md` | The one table by test file: lines, tests and cases, the seconds of the timed run, the reader's verdict. |
+| `faults-1` to `faults-4` | The nominated faults planted: each with its diff, the run, and SURVIVED or KILLED. |
+| `faults-5-control.md` | The control: eighteen ordinary faults of the reviewer's choosing, all caught. |
+| `code-01` to `code-10`, `code-05b` | The code and the data read by subject. |
+| `spec-01` to `spec-05` | The technical specifications set against the code, commitment by commitment. |
+| `refute-01` to `refute-08` | The second readers: each finding of weight tried by a reader told to refute it. |
+| `probes/` | Short scripts that reproduce seven findings (the checkpoint, the director twice, the guns, the blockade, the far fisherman, a port file's misspelt key). Run from the repository's root. |
+| `records-01` to `records-06` | The second sitting: the project's records set against the first sitting. |
+| `sealed-notes-tried.md` | Each item of the lead's sealed notes tried at the commit. |
+| `timings/` | The timed run of the fast tier: each test's seconds as it finished. |
