@@ -802,3 +802,36 @@ Owed: two chart packages built side by side cannot both land without one of them
 manifest, because the manifest is one generated file for every region. 112's M1 (6a02c77) writes
 the manifest too (its `open_edges:` and the build hash), so it meets the same once 106b lands.
 Whether the manifest should be one file is not for now.
+
+### 2026-11-14, 22:00: the tracks step on the trunk with M1 and 106b, and its record
+
+The trunk at 4570c804 was merged in as 77aa3113. 106b's known-list changes came through the
+file's move (three added, two removed), and the appended sections of three files were kept
+from both sides. The step as it stands:
+- `Chart.least_depth_along`: the true least of the chart's surface along a line, read piece by
+  piece, in great-circle chords of 500 m;
+- `Chart.first_under`: the line's first place under a draught;
+- `ships.to_first_anchor`: the way in cut at its first anchor, as sailed;
+- `ports.UnreadableMark` and `f-mark`: a mark the planner cannot read;
+- `f-unread`: a leg the chart knows nothing along;
+- seven ports' ways (five tracks redrawn, two spots moved), ten marks in the dialect's form,
+  and Faden's line;
+- the known list moved to `tools/`.
+
+What the step moves of what is recorded, old beside new:
+- Tests (the only pins moved):
+  - `test_chart_audit.py`'s Setúbal test: the least, `1.0 < least < 1.35` becomes
+    `1.10 < least < 1.16` (the true least 1.13 m); its words "the least 1.2 m" become "the
+    least 1.1 m"; the old-step check, `TRACK_STEP_M` set to 20 m, becomes a reader stepping
+    every 20 m put in the true least's place;
+  - truth 7-565's docstring names the known list's new path.
+- The known list:
+  - seven `f-shallow` entries out: Catania, Lampedusa, Messina, Palermo, Porto Paolo, Santa Cruz
+    de Tenerife, Syracuse;
+  - St Malo's ceiling 6 to 4 (the doubled legs cut);
+  - Paimboeuf's and Setúbal's figures in their reasons by a tenth;
+  - each of the twelve left gives its cause.
+- Recorded passages, digests, kept saves and scenarios: none moved. Measured three times:
+  - the marks' new legs, 102 tests of the ports, scenarios, truths and audit;
+  - the cut at the first anchor, 63 of the checkpoint, business and digests;
+  - and the gate below.
