@@ -662,7 +662,9 @@ Read in the code while 111's step 2b waits; nothing changed. The finest cell is 
   leaps by the distance field beyond it; dry ground only.
 - `chart.line_shore` (the game's guard `ships.land_crossing`, and captains, crews, reckoning):
   a third of a cable (61.7 m) near the shore, each point searched a cable round by
-  `nearest_shore`, so dry ground is not stepped over; depth is not tried at all.
+  `nearest_shore`; depth is not tried at all. (Corrected at 07:25, below: the search finds
+  the near pass, but a crossing is called only where a stepped point is itself on dry ground,
+  so a narrow run of dry ground between two points reads as a near pass.)
 - `chart.shoal_ahead` (dealings 1049 and 1894, `api/readings` 2099): a cable (185.2 m) of
   `depth_at`, the pilot's warning of the depth. Not on 111's list.
 - `dealings._leg_made`: `dangers_ahead` (charted features, no step) and then `_water_for`
@@ -691,6 +693,48 @@ the grid-tied step too, in a step of their own.
    finer reading finds on today's tracks that a cable's step missed. If nothing recorded moves and
    the pace holds, I build it and report. If lines move, I stop and send each moved pin with its
    reason.
-3. Left as they are: `line_shore` and `lookout._dry_ground_along`. They try for land, searched a
-   cable round, not for depth.
+3. Left as they are: `line_shore` and `lookout._dry_ground_along`. They try for land, not for
+   depth. (The reason "searched a cable round" is corrected at 07:25, below.)
 4. 111 is not merged yet; the lead tells me when it lands.
+
+### 2026-11-14, 07:25: the owner's hold; 111's finding on `line_shore` checked
+
+The owner, through the lead: "I would like to close out what work is in flight, and we don't
+need to cut anything off immediately, but we should hold writing or starting any new packages
+for now." For the chart that means three things:
+- the work in flight is finished as briefed and closed: 112 (its steps and M1), 106b, my
+  tracks step, and the depth read along a line;
+- nothing new is proposed, briefed or begun after them;
+- a step that would grow beyond its brief stops and goes to the lead.
+106b and 112 are told (07:23).
+
+111 measured that `line_shore` judges clear a leg across dry ground up to about 60 m wide. My
+survey said it does not step over land. 111 is right on the mechanism; I was wrong.
+`nearest_shore` finds the ground beside a stepped point, but `line_shore` calls a crossing only
+where a stepped point is itself on dry ground. Otherwise it records a near pass.
+
+Run on the trunk's tracks, with `land_crossing`'s own arguments (a cable within, the first and
+last cable skipped):
+- Santa Cruz de Tenerife: `to_sea` leg 0 and `from_sea` leg 4 cross a run of dry ground 45 m
+  wide, 1.6 m above the datum, at 28.4729 N 16.2374 W. `line_shore` gives a near pass of 19.4 m
+  and 19.0 m, not a crossing. Missed.
+- Civita Vecchia: `to_sea` leg 0 and `from_sea` leg 1 cross 121 m of dry ground, 0.6 m above
+  the datum, at 42.0915 N 11.7825 E. `line_shore` gives a crossing. Found.
+  111's figure is 0.3 m at 42 05.4 N 11 46.9 E, and it found this one missed; it measured on
+  its own branch's tracks, which may differ from the trunk's. This is to be read again on
+  111's tracks once 111 is merged.
+The shore guard stays listed and unmended unless the lead rules otherwise. It is measured again
+in the depth-along-a-line step.
+
+Two samplers from 111's list go in the table:
+- `chart._deeper_side`: a cable a side, out to `SHOAL_SIDE_REACH_M`;
+- `chart.contour_point`: half a mile (`CONTOUR_STEP_M`).
+
+For my tracks step, by the lead's ruling: `data/charts/audit-known.yaml` lies under `data/`,
+which `fingerprint_of` hashes. Every edit of the known list therefore changes the build and
+makes earlier saves another build's. It moves with the tool's own files, the same ruling 103a
+has for its lists.
+
+The lead asked me to read the cold review's pages for the owner and its F2.2, 6.2 and 6.4. The
+read of `docs/reviews/` was refused in this session, as the standing rule has it. I have asked
+the lead to send what touches the chart through them.
