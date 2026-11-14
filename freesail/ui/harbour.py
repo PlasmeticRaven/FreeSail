@@ -1034,7 +1034,7 @@ class Harbour:
 
         if not isinstance(fields, dict):
             raise HarbourError("A scenario is a mapping of fields.")
-        fields = self._fields_in_places(fields)
+        fields, said = self._fields_in_places(fields)
         original, _ = self._original(source)
         try:
             text = scenario_text(fields, original)
@@ -1048,12 +1048,15 @@ class Harbour:
                 world = make_scenario_world(sf)
                 begin(world, sf)
             except (ScenarioError, OSError, ValueError, KeyError) as e:
-                raise HarbourError(_scenario_words(str(e), p)) from None
+                raise HarbourError(self._in_their_words(_scenario_words(str(e), p), said)) from None
             refused = [e for e in world.log if e.kind == "order.rejected"]
             if refused:
                 raise HarbourError(
-                    "A first order or standing order was refused: "
-                    + "; ".join(e.text for e in refused[:3])
+                    self._in_their_words(
+                        "A first order or standing order was refused: "
+                        + "; ".join(e.text for e in refused[:3]),
+                        said,
+                    )
                 )
             seat = sf.player_seat
             if seat:
@@ -1063,10 +1066,13 @@ class Harbour:
                     seat_station(world, seat)
                 except Exception as e:  # noqa: BLE001  (OrderError, in words)
                     raise HarbourError(f"stations: {e}") from None
-            lines = [ln.replace(str(p), "this scenario") for ln in sf.lines() + guard_lines(world)]
+            lines = [
+                self._in_their_words(ln.replace(str(p), "this scenario"), said)
+                for ln in sf.lines() + guard_lines(world)
+            ]
         return {"text": text, "lines": lines}
 
-    def _fields_in_places(self, fields: dict[str, Any]) -> dict[str, Any]:
+    def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
         """The files a scenario's fields name (her ship's file, the books, a director's
         brief) lie in the server's folders (package 115, part A), or the maker refuses them
         in words before the scenario is loaded and any of them opened. The fields to prove,
@@ -1076,20 +1082,38 @@ class Harbour:
         import copy
 
         out = copy.deepcopy(fields)
+        said: dict[str, str] = {}  # each path as found -> the player's own words for it
+
+        def found(given: str, path: Any) -> str:
+            said[str(path)] = given
+            return str(path)
+
         try:
             ship = out.get("ship")
             if isinstance(ship, dict) and ship.get("file"):
-                ship["file"] = str(self.places.readable(str(ship["file"]), "ship's file"))
+                given = str(ship["file"])
+                ship["file"] = found(given, self.places.readable(given, "ship's file"))
             if out.get("standing_orders"):
                 out["standing_orders"] = [
-                    str(self.places.book(str(b))) for b in out.get("standing_orders") or []
+                    found(str(b), self.places.book(str(b)))
+                    for b in out.get("standing_orders") or []
                 ]
             director = out.get("director")
             if isinstance(director, dict) and isinstance(director.get("brief"), str):
-                director["brief"] = self.places.brief(director["brief"])
+                given = director["brief"]
+                director["brief"] = found(given, self.places.brief(given))
         except PlaceRefused as e:
             raise HarbourError(str(e), 403) from None
-        return out
+        return out, said
+
+    @staticmethod
+    def _in_their_words(text: str, said: dict[str, str]) -> str:
+        """The proof's words with each file named as the player named it, not as it was
+        found (its whole path)."""
+        for path, given in sorted(said.items(), key=lambda kv: -len(kv[0])):
+            if path != given:
+                text = text.replace(path, given)
+        return text
 
     def save_scenario(
         self,
