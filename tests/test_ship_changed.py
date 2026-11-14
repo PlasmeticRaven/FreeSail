@@ -482,3 +482,82 @@ def test_the_loader_says_a_save_from_before_played_aboard_another_ship_parts_fro
     plain = json.loads(json.dumps(w2.save()))
     del plain["followed_body"]
     assert replay.followed_body_words(plain, "replay") == []
+
+
+# ---------------------------------------------------------------------------
+# the cut's ruling 4: the brief's refusals held by tests, and whom he knows of
+# ---------------------------------------------------------------------------
+
+
+def test_a_held_captains_station_refuses_the_take_up():
+    """Step 1's refusal: where a model or another person holds her captain's station, she is
+    not his to take up, in words, nothing changed. The station's holder is stood in by the
+    one thing the take-up reads of it (an agent at her captain's station, not released)."""
+    from types import SimpleNamespace
+
+    from freesail.agents.agent import CAPTAIN
+    from freesail.world.command import CommandError
+    from tests.test_take_up_at_anchor import _asleep, _take_up
+
+    w, v, hull, me = _asleep("ordinary")
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    hull.agents[CAPTAIN] = SimpleNamespace(agent=SimpleNamespace(released=False))
+    try:
+        with pytest.raises(CommandError, match="Her captain's station is held"):
+            command.take_up(w, me, hull)
+    finally:
+        del hull.agents[CAPTAIN]
+    assert w.players is w.first_hull and me.home == "the ship"
+    _take_up(w, hull, me)  # the station free, she is his
+
+
+def test_a_prisoner_is_refused_take_command():
+    """Step 1's refusal: a prisoner aboard his captor takes command of nothing, by his prompt's
+    own words."""
+    from tests.test_captive import _struck_to_a_crewed_frigate
+
+    w, enemy = _struck_to_a_crewed_frigate()
+    players = w.players
+    for words in ("take command of her", "take command of the Medusa"):
+        e = w.submit(words)
+        assert e.kind == "order.rejected", (words, e.text)
+        assert "You are a prisoner aboard the Medusa" in e.text, (words, e.text)
+    assert w.players is players
+
+
+def test_a_hulls_id_is_answered_as_her_name_is_only_where_he_knows_of_her():
+    """The fifth reading's item 6: a stranger named by her hull's id was found before he was
+    asked whether he knows of her, and her true name was said; now an id is a name like any
+    other."""
+    from freesail.orders.command import ship_for_him
+    from freesail.orders.errors import OrderError
+
+    w, b, hull = _frigate_and_the_brig_x_on_the_sea()
+    with pytest.raises(OrderError) as refused:
+        ship_for_him(w, str(hull.id))
+    assert "You know of no ship called" in str(refused.value)
+    assert b.name not in str(refused.value)
+
+
+def test_he_knows_of_his_own_prize_and_his_consort_wherever_they_are():
+    """The cut's ruling 4: what is his he knows of wherever she is (a ship given him, his own
+    prize, a consort under his orders); out of his reach, the refusal says so, never "no ship
+    called"."""
+    from freesail.orders.command import ship_for_him
+    from freesail.orders.errors import OrderError
+
+    w = at_anchor_in(CARRICK_ROAD)
+    mine = str(w.players.vessel.id if getattr(w.players, "vessel", None) else w.players.id)
+    for name, how in (("Hope", "prize"), ("Swift", "consort")):
+        _wo(w, f'ship: a brig "{name}" of Britain at 48 30 N 7 30 W, bound for Brest')
+        v = w.sea_vessels.find(name)
+        assert not knowledge.knows_of(w, v), name  # a stranger a hundred miles off
+        if how == "prize":
+            v.prize = {"captor": mine, "manned": True}
+        else:
+            v.under_orders_of = mine
+        assert knowledge.knows_of(w, v), name
+        with pytest.raises(OrderError) as refused:
+            ship_for_him(w, name)
+        said = str(refused.value)
+        assert "no ship called" not in said and "beyond a boat's reach" in said, said

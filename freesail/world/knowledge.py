@@ -854,8 +854,10 @@ def players_station(world: Any) -> str:
 
 def knows_of(world: Any, vessel: Any) -> bool:
     """Whether the player knows of this ship (package 60; the lead's ruling on the fourth
-    reading: one answer, no search of a log): she is one of his own (the ship he commands, one
-    he has left, one given him), or a sail in sight whose name his lookout has made out (the
+    reading: one answer, no search of a log): she is one of his own wherever she is (the ship he
+    commands, one he has left, one given him, a prize of a ship of his, a consort under the
+    orders of a ship of his: the cut's ruling 4), or a sail in sight whose name his lookout has
+    made out (the
     lookout's own record of what is made out of each sail, and a name she has given). Of every
     other ship he knows nothing, which is true of one once met and now gone."""
     from freesail.world.command import HULLS_LEFT, given_to
@@ -865,7 +867,20 @@ def knows_of(world: Any, vessel: Any) -> bool:
     players = getattr(root, "players", None)
     if players is not None and str(getattr(players, "id", "")) == vid:
         return True
-    if vid in set(root.__dict__.get(HULLS_LEFT) or ()) or given_to(root, vid):
+    left = set(root.__dict__.get(HULLS_LEFT) or ())
+    if vid in left or given_to(root, vid):
+        return True
+    # his own wherever she is (the cut's ruling 4): a prize of a ship of his, a consort under
+    # the orders of a ship of his
+    his = left | {str(getattr(players, "id", "") or "")}
+    his |= {str(getattr(getattr(players, "vessel", None), "id", "") or "")}
+    his.discard("")
+    from freesail.world import prizes as P
+
+    rec = P.record_of(vessel) if P.is_prize(vessel) else None
+    if rec and str(rec.get("captor") or "") in his:
+        return True
+    if str(getattr(vessel, "under_orders_of", "") or "") in his:
         return True
     return named_in_sight(players, vessel)
 

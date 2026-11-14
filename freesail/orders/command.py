@@ -199,10 +199,13 @@ def ship_for_him(root: Any, words: str) -> Any:
     if key in ("ship", "us", "her", "this ship", "our ship", own):
         return players
     hulls = getattr(root, "hulls", None) or {}
-    if key in hulls:
-        return hulls[key]
     vessels = getattr(root, "vessels", None)
-    vessel = vessels.find(said) if vessels is not None else None
+    # a hull's id is a name like any other: answered only where he knows of her (the cut's
+    # ruling 4; the fifth reading's item 6: an id gave a stranger's true name away)
+    by_id = hulls.get(key)
+    vessel = getattr(by_id, "vessel", None) if by_id is not None else None
+    if vessel is None:
+        vessel = vessels.find(said) if vessels is not None else None
     by_sight = False
     if vessel is None:
         vessel = vessel_in_sight(root, said)
