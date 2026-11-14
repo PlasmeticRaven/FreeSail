@@ -185,12 +185,14 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
     total += (CHARTS / region["coast"]).stat().st_size
     total += (CHARTS / region["features"]).stat().st_size
     assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
-    # the world and the Atlantic are built by the tool and never committed (spec M5 §10):
-    # the manifest says so, and no tile of theirs is in the repository's files
+    # the Atlantic at level 1 is built by the tool and never committed (spec M5 §10), and
+    # the world's level 0 was not either until package 112 (old: `committed` False for
+    # both; new, by the lead's ruling: level 0 committed over the Atlantic and the
+    # Mediterranean, 70 S to 75 N and 100 W to 40 E, its tiles under tiles/0/)
     tool = build_tool()
     for key, level, flag in (("world", 0, "--world"), ("atlantic", 1, "--atlantic")):
         entry = manifest[key]
-        assert entry["level"] == level and entry["committed"] is False
+        assert entry["level"] == level and entry["committed"] is (key == "world")
         assert flag in entry["built_by"]
         for t in entry.get("tiles") or []:
             # a tile the tool made here is named by its corner in whole seconds
@@ -206,12 +208,18 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
         check=False,
     ).stdout.split()
     # package 38: the corridor's folder is the one thing under tiles/1/ the repository
-    # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed
-    corridor = manifest["charts"]["atlantic-east"]["corridor"]
-    # package 106a: and the layer beside it, the ocean carried south, committed the same way
-    names = [corridor] + list(manifest["charts"]["atlantic-east"].get("corridors_beside") or [])
-    folders = [manifest["corridors"][n]["folder"] for n in names]
+    # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed;
+    # package 106a: and the layer beside it, committed the same way; package 112: the
+    # chart's layers as one list (old: `corridor:` and `corridors_beside:`), and the
+    # world's level 0, its tiles exactly the manifest's
+    names = list(manifest["charts"]["atlantic-east"]["layers"])
+    folders = [manifest["corridors"][n]["folder"] for n in names] + ["tiles/0"]
     assert all(any(t.startswith(f"data/charts/{f}/") for f in folders) for t in tracked), tracked
+    world = sorted(t for t in tracked if t.startswith("data/charts/tiles/0/"))
+    assert world == sorted(
+        f"data/charts/tiles/0/{t['name']}.npz" for t in manifest["world"]["tiles"]
+    )
+    assert len(world) == 63
 
 
 # ---------------------------------------------------------------------------
@@ -932,9 +940,13 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 106b: Morocco's Atlantic coast, four regions north to south
     regions += ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
     assert manifest["charts"][WHOLE]["regions"] == regions
-    assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
+    # package 112: the layers as one ordered list (old: `corridor:` the corridor and
+    # `corridors_beside:` the south's), the corridor first; and level 0 under the chart
+    # (old: levels [3, 2, 1])
+    layers = [CORRIDOR, "atlantic-south", "atlantic-verde"]
+    assert manifest["charts"][WHOLE]["layers"] == layers
     assert whole.region == whole.name == WHOLE and whole.regions == regions
-    assert [lv.level for lv in whole.levels] == [3, 2, 1]
+    assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
     # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
     # 32 W with the corridor widened to them); the Channel's east block 51.5 N and 2.5 E
@@ -945,9 +957,10 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 111's step 2a: Madeira's south bound to its tiles' edge, 31.60001 N (was 32.0);
     # package 105: the east to 16.69332 E (was 15.5); package 106a: the south limit the ocean
     # carried south's, the Canaries' row of the level-1 grid a hair inside its edge (25.2 N)
-    assert manifest["charts"][WHOLE]["corridors_beside"] == ["atlantic-south"]
-    assert whole.bounds == (25.2001, 51.5, west, 16.69332)
-    assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 16.6933 E"
+    # package 112: the south limit the ocean to the Cape Verde Islands' (old 25.2001 N, the
+    # Canaries' row); the east still Sicily's (the Mediterranean's layers come with the seas)
+    assert whole.bounds == (12.4001, 51.5, west, 16.69332)
+    assert whole.bounds_words() == f"12.4001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     # package 106b: off Morocco (34 N 7 W, off Sallee) is now a region's water; old: None
@@ -1099,10 +1112,16 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
             check=False,
         ).stdout.split()
         assert len(tracked) == len(entry["tiles"]), "the corridor's tiles are committed"
-    # the tile carries the distance field, so a landfall over the corridor is a landfall
-    lv = load_chart(WHOLE).levels[-1]
+    # the tile carries the distance field, so a landfall over the corridor is a landfall:
+    # the coarsest level that has a field is the corridor's (old: `levels[-1]`, the
+    # coarsest level, which since package 112 is the world's level 0, which has none)
+    levels = load_chart(WHOLE).levels
+    assert levels[-1].level == 0
+    lv = next(lv for lv in levels if lv.level == 1)
     tile = lv.tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
     assert tile is not None and tile.level == 1 and tile.dist is not None
+    world = levels[-1].tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
+    assert world is not None and world.dist is None
 
 
 def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_none(whole):
@@ -1118,7 +1137,10 @@ def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_non
     assert 30.0 < whole.depth_at(OFF_MOROCCO) < 200.0
     assert 100.0 < whole.depth_at(OFF_FINISTERRE) < 200.0
     assert whole.depth_at(FUNCHAL_TOWN) < 0.0  # the town stands above the sea
-    assert whole.depth_at(BEYOND_THE_CORRIDOR) is None  # a tile, but nothing in it
+    # a corridor tile with nothing in it there; since package 112 the world's level 0
+    # answers its depth (old: None), and no shore distance (it has no field)
+    assert 5000.0 < whole.depth_at(BEYOND_THE_CORRIDOR) < 6000.0
+    assert whole.level_at(BEYOND_THE_CORRIDOR) == 1  # the corridor's tile is listed there
     assert whole.coast_distance(BEYOND_THE_CORRIDOR) is None
     assert whole.tile_min_depth(WEST_OF_MOROCCO) is not None  # package 106b; old: OFF_MOROCCO
     # the corridor's cell is a kilometre; a region's a hundred metres (package 106b: asked west
@@ -1315,7 +1337,7 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     tool = build_tool()
     for key in ("title", "bounds", "fetch", "harbours", "sources"):
         assert key in tool.REGIONS["channel-west"], key
-    assert tool.CORRIDORS[CORRIDOR]["level"] == 1 and tool.CHARTS[WHOLE]["corridor"] == CORRIDOR
+    assert tool.CORRIDORS[CORRIDOR]["level"] == 1 and tool.CHARTS[WHOLE]["layers"][0] == CORRIDOR
     assert tool.main(["--check", "channel-west"]) == 0
     out = capsys.readouterr().out
     for words in (
@@ -1350,14 +1372,30 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     fake.mkdir()
     last = yaml.safe_load((CHARTS / "manifest.yaml").read_text(encoding="utf-8"))
     (fake / "manifest.yaml").write_text(yaml.safe_dump(last, sort_keys=False), encoding="utf-8")
+
+    # package 112: the tool reads the chart it writes (the tide's open edges), so the
+    # fixture's tiles are tiles the chart can read, with nothing in them (old: empty files)
+    def nothing(path: Path, level: int, t: dict) -> None:
+        np.savez_compressed(
+            path,
+            elevation=np.full((512, 512), -32768, dtype=np.int16),
+            level=np.int16(level),
+            unit_m=np.float32(0.1),
+            cell_sec=np.float32(3.0),
+            south_sec=np.int64(t["south_sec"]),
+            west_sec=np.int64(t["west_sec"]),
+            nodata=np.int16(-32768),
+            min_depth_m=np.float32(np.nan),
+        )
+
     for level, tiles in last["regions"]["channel-west"]["tiles"].items():
         (fake / "tiles" / str(level)).mkdir(parents=True, exist_ok=True)
         for t in tiles:
-            (fake / "tiles" / str(level) / f"{t['name']}.npz").write_bytes(b"")
+            nothing(fake / "tiles" / str(level) / f"{t['name']}.npz", int(level), t)
     folder = fake / last["corridors"][CORRIDOR]["folder"]
     folder.mkdir(parents=True)
     for t in last["corridors"][CORRIDOR]["tiles"]:
-        (folder / f"{t['name']}.npz").write_bytes(b"")
+        nothing(folder / f"{t['name']}.npz", 1, t)
     (fake / "features").mkdir()
     (fake / "overrides").mkdir()
     monkeypatch.setattr(tool, "CHARTS_DIR", fake)
@@ -1375,6 +1413,12 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     report = []
     tool.Build(tmp_path, True, report).write_manifest({}, {}, {}, {})
     assert any("channel-west has tiles missing" in line for line in report)
+    # package 112: a tile the manifest lists and the chart cannot read stops the build, by
+    # its name, and is never passed over (the tide's open edges read the corridor here)
+    for t in last["corridors"][CORRIDOR]["tiles"]:
+        (folder / f"{t['name']}.npz").write_bytes(b"")
+    with pytest.raises(SystemExit, match=r"the tile .*\.npz cannot be read"):
+        tool.Build(tmp_path, True, []).write_manifest({}, {}, {}, {})
 
 
 # ---------------------------------------------------------------------------
@@ -2406,21 +2450,18 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     under a chart of one region: a checkpoint's reload of a Channel save takes the chart
     of `channel-west` alone (`core/replay.py`), and it answers exactly as it did whatever
     the world's tiles on the disk."""
+    # the chart's own data as it lies, and a world of one synthetic tile in the test's own
+    # folder, which the manifest's `world:` entry names by its absolute folder (no copy of
+    # the chart and no link: a link wants a privilege on Windows, WinError 1314)
     manifest = load_manifest()
-    root = tmp_path / "charts"
-    root.mkdir()
-    for item in CHARTS.iterdir():
-        if item.name != "tiles":
-            (root / item.name).symlink_to(item)
-    (root / "tiles").mkdir()
-    for lv in ("1", "2", "3"):
-        (root / "tiles" / lv).symlink_to(CHARTS / "tiles" / lv)
+    root = CHARTS
     # a world tile over the water south of channel-west's tiles (47.70 N 6 W)
     span = 150 * 512
     s = -90 * 3600 + ((47 + 90) * 3600 // span) * span
     w = -180 * 3600 + ((-7 + 180) * 3600 // span) * span
-    path = root / "tiles" / "0" / f"{s}_{w}.npz"
-    path.parent.mkdir()
+    folder = tmp_path / "world"
+    path = folder / f"{s}_{w}.npz"
+    folder.mkdir()
     np.savez(
         path,
         elevation=np.full((512, 512), -70, dtype=np.int16),
@@ -2433,7 +2474,7 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
         min_depth_m=np.float32(140.0),
     )
     manifest = dict(manifest)
-    manifest["world"] = dict(manifest["world"], tiles=[{"name": f"{s}_{w}"}])
+    manifest["world"] = dict(manifest["world"], folder=str(folder), tiles=[{"name": f"{s}_{w}"}])
     south = Position(47.70, -6.0)
     alone = Chart("channel-west", manifest, root)
     assert [lv.level for lv in alone.levels] == [3, 2]
@@ -2442,3 +2483,4 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     assert whole.level_at(south) == 1  # the corridor answers before the world
     assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
+    assert whole.depth_at(Position(57.0, -6.0)) == 140.0  # the synthetic tile's, read

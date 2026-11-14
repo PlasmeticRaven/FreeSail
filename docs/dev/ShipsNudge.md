@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-14, 07:25 UTC (the cold review is merged; the owner's word: finish what is in hand, begin nothing after it; 77 and 90 held). Nudge number: 10.
+Latest note: 2026-11-14, 09:42 UTC (the merchant brig cannot let go her anchor: twelve forecastle hands wanted of a company of sixteen; for your combined report). Nudge number: 11.

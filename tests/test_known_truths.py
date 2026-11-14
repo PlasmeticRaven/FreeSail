@@ -12745,9 +12745,16 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
     # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
     # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
-    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
+    for lat in (49.5, 50.0, 50.3, 50.6):
         cable = 0.1 / 60.0 / math.cos(math.radians(lat))
         pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    # package 112 (M1, the lead's ruling of 2026-11-14): at 49.1 N the water west of 1 W is
+    # Normandy's land (by Saint-Lo), so the edge there is no open edge and the block's water
+    # is its own to the bound: the taper whole (old: 0.0003, the taper across the land, the
+    # fault M1 mends; new: 1.0), and no step across land is pinned
+    cable = 0.1 / 60.0 / math.cos(math.radians(49.1))
+    normandy = Position(49.1, -1.0 + cable)
+    assert tide.blocks_at(normandy) and tide.taper_at(normandy) == 1.0
     for lon in (-4.7, -4.9):
         pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
     for inside, outside in pairs:
@@ -17051,7 +17058,10 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     from freesail.world.geo import Position
 
     chart = load_chart("atlantic-east")
-    assert chart.bounds[0] == pytest.approx(25.2, abs=0.001)
+    # package 112: the south limit is the ocean's to the Cape Verde Islands', 12.4 N (old:
+    # 25.2 N, this package's layer's); the layer's own south bound is as it was
+    assert chart.bounds[0] == pytest.approx(12.4, abs=0.001)
+    assert chart.spec["layers"][1] == "atlantic-south"
     holes = []
     for i in range(int((31.9 - 25.3) / 0.1) + 1):
         lat = 25.3 + 0.1 * i
@@ -17064,7 +17074,8 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     w = _can_at(31.0, -16.0, datetime(1805, 6, 20, 12, 0))
     assert w.chart.level_at(w.position) == 1 and w.chart.depth_at(w.position) > 3000.0
     with pytest.raises(ValueError, match="outside the chart"):
-        _can_at(25.1, -20.0, datetime(1805, 6, 20, 12, 0))
+        # package 112: a start south of the new limit (old: 25.1 N 20 W, now within them)
+        _can_at(12.3, -20.0, datetime(1805, 6, 20, 12, 0))
 
 
 def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as_before():
@@ -17696,6 +17707,12 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     expected.setdefault(int(layer["level"]), {}).setdefault(t["name"], []).append(
                         path
                     )
+        if spec and manifest["world"].get("tiles"):
+            # package 112: the world's level 0, committed, after every layer, under a
+            # chart of the manifest's charts only
+            level0 = expected.setdefault(0, {})
+            for t in manifest["world"]["tiles"]:
+                level0.setdefault(t["name"], [root / "tiles" / "0" / f"{t['name']}.npz"])
         assert [lv.level for lv in chart.levels] == sorted(expected, reverse=True), name
         assert spec is not None or all(lv.level >= 2 for lv in chart.levels), name
         for lv in chart.levels:
@@ -17717,7 +17734,76 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
                 ), (name, tname)
                 read += 1
-    # 21 charts' tiles, as the step's proof counted them (4593); package 106b: 25 charts, Morocco's
-    # four regions adding 117 level-2 and 30 level-3 tiles, each read under the whole chart and
-    # under its own region's (4593 + 2 x 147)
-    assert read == 4593 + 2 * 147
+    # 21 charts' tiles, as the step's proof counted them (step 1: 4,593; step 2 with the
+    # ocean to Cape Verde's 12 tiles at level 1 and the world's 63 at level 0: 4,668). Package
+    # 106b: Morocco's four regions add 117 level-2 and 30 level-3 tiles, each read under the
+    # whole chart and under its own region's. Old: 4,668 on the trunk; 4,887 on 106b's tree
+    # before step 2 (4,593 + 2 x 147); joined, 4,668 + 2 x 147
+    assert read == 4668 + 2 * 147
+
+
+def test_truth_7_571_no_open_edge_of_any_block_faces_land():
+    """Package 112 (the lead's ruling of 2026-11-14, M1): the seam's taper (package 94) is
+    toward the water beyond a block's open edge, and an edge is open only where the chart
+    answers water beyond it. A charted box beyond an edge is no proof of water: the
+    corridor's box over Spain's and France's land had opened Portugal's, Biscay's and
+    Brittany's landward edges, and a layer's box over the Pyrenees the Gulf of Lion's,
+    whose water read Saint-Malo's 6.6 m level. Every stretch of every open edge the tide
+    reads is read again here, every hundredth of a degree, a hundredth of a degree beyond
+    it on the side outside every block: the chart answers water there."""
+    import freesail.world.tide as T
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    chart = load_chart("atlantic-east")
+    blocks = list(tide.block_bounds.values())
+
+    def outside(lat: float, lon: float) -> bool:
+        return not any(s <= lat <= n and w <= lon <= e for s, n, w, e in blocks)
+
+    assert tide.open_edges, "the blocks have open edges"
+    land = []
+    for axis, at, lo, hi in tide.open_edges:
+        steps = max(1, int(round((hi - lo) / 0.01)))
+        for i in range(steps):
+            x = lo + (i + 0.5) * (hi - lo) / steps
+            for off in (0.01, -0.01):
+                lat, lon = (at + off, x) if axis == "lat" else (x, at + off)
+                if outside(lat, lon):
+                    depth = chart.depth_at(Position(lat, lon))
+                    if depth is None or depth <= 0.0:
+                        land.append((axis, at, round(x, 3)))
+                    break
+    assert land == [], land[:10]
+
+
+def test_truth_7_572_a_manifest_without_the_open_edges_reads_the_boxes_as_before(tmp_path):
+    """Package 112, M1's other side: a manifest with no `open_edges:` (a tree built before
+    the step, or a manifest a test writes) reads the boxes as package 94 did, every edge a
+    charted box lies beyond being open; the same tree with the key reads the stretches the
+    tool wrote. At Concarneau's water, 7.6 miles inside Biscay north from 48 N across
+    Brittany's land, the tide is the old taper's without the key and the block's own with it
+    (package 94's tabled case)."""
+    import yaml
+
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    root = Path(__file__).resolve().parents[1] / "data" / "charts" / "manifest.yaml"
+    doc = yaml.safe_load(root.read_text(encoding="utf-8"))
+    assert doc["open_edges"]["stretches"]
+    del doc["open_edges"]
+    old = tmp_path / "manifest.yaml"
+    old.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    before = T.load_tide(manifest=old)
+    edges, _ = T.candidate_edges(old)
+    assert T.open_stretches(old) is None
+    assert sorted(before.open_edges) == sorted(edges) and len(edges) == 38
+    now = T.load_tide()
+    assert now.open_edges == [tuple(x) for x in T.open_stretches()]
+    concarneau = Position(47.875, -3.975)
+    old_level = before.constants_at(concarneau)[0]
+    new_level = now.constants_at(concarneau)[0]
+    assert old_level == pytest.approx(3.289, abs=0.001)
+    assert new_level == pytest.approx(3.085, abs=0.001)

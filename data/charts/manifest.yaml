@@ -2,9 +2,9 @@
 # Every source with its licence, attribution, URL, retrieval date and checksum; the
 # regions and their tiles; the attribution block the game shows in its about text.
 format: 1
-built: '2026-11-13'
+built: '2026-11-14'
 tool: tools/build_charts.py
-build_hash: b04d9b64c5c8b404
+build_hash: aeb1e9676898bb7b
 levels:
   '0':
     cell_sec: 150.0
@@ -61,9 +61,10 @@ charts:
     - morocco-sallee
     - morocco-mogador
     - morocco-noun
-    corridor: atlantic-corridor
-    corridors_beside:
+    layers:
+    - atlantic-corridor
     - atlantic-south
+    - atlantic-verde
 regions:
   channel-west:
     title: The western Channel and the Western Approaches, Falmouth to Ushant
@@ -1208,7 +1209,7 @@ regions:
         south_sec: 175200
         west_sec: -4416
         min_depth_m: null
-        bytes: 111950
+        bytes: 113551
       - name: 176736_-10560
         south_sec: 176736
         west_sec: -10560
@@ -1233,7 +1234,7 @@ regions:
         south_sec: 176736
         west_sec: -4416
         min_depth_m: -7.1
-        bytes: 126562
+        bytes: 130737
       - name: 178272_-10560
         south_sec: 178272
         west_sec: -10560
@@ -1971,27 +1972,27 @@ regions:
         south_sec: 172128
         west_sec: -10560
         min_depth_m: null
-        bytes: 108215
+        bytes: 107935
       - name: 172128_-9024
         south_sec: 172128
         west_sec: -9024
         min_depth_m: null
-        bytes: 105640
+        bytes: 105390
       - name: 172128_-7488
         south_sec: 172128
         west_sec: -7488
         min_depth_m: null
-        bytes: 101589
+        bytes: 101893
       - name: 172128_-5952
         south_sec: 172128
         west_sec: -5952
         min_depth_m: null
-        bytes: 100527
+        bytes: 99144
       - name: 172128_-4416
         south_sec: 172128
         west_sec: -4416
         min_depth_m: null
-        bytes: 103463
+        bytes: 101908
       '3':
       - name: 171360_-12352
         south_sec: 171360
@@ -14984,6 +14985,104 @@ corridors:
       bytes: 185717
       sha256: 28e9c2369019673bc8310cb9310e95eef46becad9f2ac10dc962ed64b0a9601d
     bytes: 1191415
+  atlantic-verde:
+    title: 'The ocean south: the Canaries'' row to the Cape Verde Islands'
+    level: 1
+    bounds:
+      south: 12.4001
+      north: 25.1999
+      west: -26.3999
+      east: -9.34
+    fetch:
+      south: 12.3
+      north: 25.3
+      west: -26.5
+      east: -9.23
+    datum: mean sea level
+    source: gebco_2025
+    licence: public-domain
+    fetched_sha256: 8dbbe93abdeea23181ef9c8c510149998d7faa82f7f113889ae272902c91c2b1
+    folder: tiles/1/atlantic-verde
+    committed: true
+    beside: atlantic-south
+    built_by: python tools/build_charts.py --corridor atlantic-verde
+    note: 'committed beside atlantic-south (package 106a): read after it, under every region of a chart
+      that names it in `corridors_beside`; a tile both list is the first''s, its NODATA cells filled from
+      this layer''s at load'
+    tiles:
+    - name: 44640_-95040
+      south_sec: 44640
+      west_sec: -95040
+      min_depth_m: 0.0
+      bytes: 266314
+      sha256: d3e33f949ce88ef9468dff1a80ca60774ebc5391ae64ba3c3c7de0d1da719588
+    - name: 44640_-79680
+      south_sec: 44640
+      west_sec: -79680
+      min_depth_m: 575.5
+      bytes: 220960
+      sha256: bdcf9a8f50d65864825fac2e8f069bbc4a7dbd5547d911dd86a21e39ebf0b1f8
+    - name: 44640_-64320
+      south_sec: 44640
+      west_sec: -64320
+      min_depth_m: 0.0
+      bytes: 186646
+      sha256: df84a02ea10b9f59ecd207b0b8df51a38b5a46122326f51ee832263dbdfae2d6
+    - name: 44640_-48960
+      south_sec: 44640
+      west_sec: -48960
+      min_depth_m: null
+      bytes: 221712
+      sha256: dc4dbae648faed318bbb7bb0ddb32fa66b8229cb578ba27a626c94c157b01960
+    - name: 60000_-95040
+      south_sec: 60000
+      west_sec: -95040
+      min_depth_m: 0.0
+      bytes: 215634
+      sha256: 7032e7b06ed8d289a533d831617a7418fe08b7ab352a78c86560a90c85c5de1e
+    - name: 60000_-79680
+      south_sec: 60000
+      west_sec: -79680
+      min_depth_m: 166.2
+      bytes: 214966
+      sha256: 589cb0bffd9db42536a7c6474582ae3150c787e1a711e205c4dc2610f4cb8d7f
+    - name: 60000_-64320
+      south_sec: 60000
+      west_sec: -64320
+      min_depth_m: 0.0
+      bytes: 199886
+      sha256: a41209579ed85645acce1c7d2e7373f261717009bda27930cbb85a40bb3ffa68
+    - name: 60000_-48960
+      south_sec: 60000
+      west_sec: -48960
+      min_depth_m: null
+      bytes: 211573
+      sha256: 07d8cc4dcf53fefdce31d5b0de6cab25db672e6acc76772f5e9a4439a347b7e5
+    - name: 75360_-95040
+      south_sec: 75360
+      west_sec: -95040
+      min_depth_m: 4339.8
+      bytes: 152726
+      sha256: 9e93641a67e665f072331728e27f05c51f75c711fc1d68ad9f8d6ae9b5415265
+    - name: 75360_-79680
+      south_sec: 75360
+      west_sec: -79680
+      min_depth_m: 885.5
+      bytes: 227314
+      sha256: 75df0bd13d18333abc8752cc7712c022677c56a1ec69abf43e6bece8f231edcb
+    - name: 75360_-64320
+      south_sec: 75360
+      west_sec: -64320
+      min_depth_m: 0.0
+      bytes: 197182
+      sha256: 67ea1831af090ede27a22e08de574ff39690bf329a0af96a3cd14bd59287de4a
+    - name: 75360_-48960
+      south_sec: 75360
+      west_sec: -48960
+      min_depth_m: null
+      bytes: 172941
+      sha256: 6ffd12fcfb2808e1e9d22aefdd7051d6ea6c97e0121dc8a63f02f1a26377c216
+    bytes: 2487854
 tide_regions:
   solent:
     title: 'The Solent, Spithead and Poole bay: a tide region, no tiles'
@@ -15013,18 +15112,517 @@ tide_regions:
       north: 41.0
       west: 7.73334
       east: 8.0
+open_edges:
+  stretches:
+  - - lat
+    - 27.33334
+    - -18.29332
+    - -13.313339
+  - - lat
+    - 29.46666
+    - -18.29332
+    - -13.17334
+  - - lon
+    - -18.29332
+    - 27.33334
+    - 29.46666
+  - - lat
+    - 29.46666
+    - -13.17334
+    - -11.03999
+  - - lat
+    - 31.6
+    - -11.03999
+    - -10.61332
+  - - lon
+    - -11.03999
+    - 29.46666
+    - 31.6
+  - - lat
+    - 29.89334
+    - -16.15999
+    - -15.73334
+  - - lat
+    - 30.31999
+    - -16.15999
+    - -15.73334
+  - - lon
+    - -16.15999
+    - 29.89334
+    - 30.31999
+  - - lon
+    - -15.73334
+    - 29.89334
+    - 30.31999
+  - - lat
+    - 34.16
+    - -10.61332
+    - -7.62666
+  - - lon
+    - -10.61332
+    - 32.0
+    - 34.16
+  - - lon
+    - -10.61332
+    - 31.6
+    - 31.9
+  - - lat
+    - 31.60001
+    - -17.86666
+    - -15.73334
+  - - lat
+    - 33.73333
+    - -17.86666
+    - -15.73334
+  - - lon
+    - -17.86666
+    - 32.0
+    - 33.73333
+  - - lon
+    - -17.86666
+    - 31.60001
+    - 31.9
+  - - lon
+    - -15.73334
+    - 32.0
+    - 33.73333
+  - - lon
+    - -15.73334
+    - 31.60001
+    - 31.9
+  - - lat
+    - 35.5
+    - -7.62666
+    - -6.5
+  - - lon
+    - -7.62666
+    - 34.16
+    - 35.5
+  - - lon
+    - -5.0
+    - 35.4
+    - 35.5
+  - - lon
+    - -5.0
+    - 36.4
+    - 36.46
+  - - lat
+    - 35.5
+    - -5.120001
+    - -5.0
+  - - lat
+    - 36.4
+    - -5.18
+    - -5.0
+  - - lon
+    - -6.5
+    - 35.5
+    - 36.4
+  - - lat
+    - 36.29334
+    - -31.51999
+    - -24.26667
+  - - lat
+    - 40.13333
+    - -31.51999
+    - -24.26667
+  - - lon
+    - -31.51999
+    - 36.29334
+    - 40.13333
+  - - lon
+    - -24.26667
+    - 36.29334
+    - 40.13333
+  - - lat
+    - 36.4
+    - -10.0
+    - -6.5
+  - - lat
+    - 42.0
+    - -10.0
+    - -9.33
+  - - lon
+    - -10.0
+    - 36.4
+    - 42.0
+  - - lat
+    - 45.9
+    - -9.33
+    - -5.0
+  - - lon
+    - -9.33
+    - 42.0
+    - 45.9
+  - - lat
+    - 48.0
+    - -5.0
+    - -4.59
+  - - lat
+    - 48.0
+    - -4.56
+    - -4.54
+  - - lat
+    - 48.0
+    - -5.0
+    - -4.59
+  - - lat
+    - 48.0
+    - -4.56
+    - -4.54
+  - - lon
+    - -5.0
+    - 45.9
+    - 48.0
+  - - lon
+    - -1.0
+    - 49.4
+    - 50.62
+  - - lat
+    - 50.62
+    - -2.2
+    - -2.15
+  - - lat
+    - 50.62
+    - -2.14
+    - -2.13
+  - - lat
+    - 50.62
+    - -1.95
+    - -1.36
+  - - lat
+    - 50.62
+    - -1.17
+    - -1.0
 world:
   level: 0
   bounds:
-    south: -90.0
-    north: 90.0
-    west: -180.0
-    east: 180.0
-  committed: false
+    south: -70.0
+    north: 75.0
+    west: -100.0
+    east: 40.0
+  committed: true
   built_by: python tools/build_charts.py --world
-  note: built by the tool on the developer's machine and not committed; the runtime reads the tiles that
-    are present under tiles/<level>/ and nothing else
-  tiles: []
+  note: 'committed (package 112, the lead''s ruling): the Atlantic and the Mediterranean; the runtime
+    reads these tiles under a chart of the manifest''s charts, after every layer, and never under a chart
+    of one region; the rest of the world, built later, moves no tile laid now'
+  tiles:
+  - name: -324000_-417600
+    south_sec: -324000
+    west_sec: -417600
+    min_depth_m: 0.1
+    bytes: 57860
+  - name: -324000_-340800
+    south_sec: -324000
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 43525
+  - name: -324000_-264000
+    south_sec: -324000
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 31823
+  - name: -324000_-187200
+    south_sec: -324000
+    west_sec: -187200
+    min_depth_m: 0.6
+    bytes: 50431
+  - name: -324000_-110400
+    south_sec: -324000
+    west_sec: -110400
+    min_depth_m: 0.1
+    bytes: 55945
+  - name: -324000_-33600
+    south_sec: -324000
+    west_sec: -33600
+    min_depth_m: 0.1
+    bytes: 29384
+  - name: '-324000_43200'
+    south_sec: -324000
+    west_sec: 43200
+    min_depth_m: 0.1
+    bytes: 22336
+  - name: '-324000_120000'
+    south_sec: -324000
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 6480
+  - name: -247200_-417600
+    south_sec: -247200
+    west_sec: -417600
+    min_depth_m: 603.0
+    bytes: 249135
+  - name: -247200_-340800
+    south_sec: -247200
+    west_sec: -340800
+    min_depth_m: 0.1
+    bytes: 256693
+  - name: -247200_-264000
+    south_sec: -247200
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 233330
+  - name: -247200_-187200
+    south_sec: -247200
+    west_sec: -187200
+    min_depth_m: 0.3
+    bytes: 265244
+  - name: -247200_-110400
+    south_sec: -247200
+    west_sec: -110400
+    min_depth_m: 9.4
+    bytes: 273079
+  - name: -247200_-33600
+    south_sec: -247200
+    west_sec: -33600
+    min_depth_m: 16.8
+    bytes: 285168
+  - name: '-247200_43200'
+    south_sec: -247200
+    west_sec: 43200
+    min_depth_m: 14.4
+    bytes: 270923
+  - name: '-247200_120000'
+    south_sec: -247200
+    west_sec: 120000
+    min_depth_m: 0.2
+    bytes: 227814
+  - name: -170400_-417600
+    south_sec: -170400
+    west_sec: -417600
+    min_depth_m: 27.1
+    bytes: 328184
+  - name: -170400_-340800
+    south_sec: -170400
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 324813
+  - name: -170400_-264000
+    south_sec: -170400
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 100183
+  - name: -170400_-187200
+    south_sec: -170400
+    west_sec: -187200
+    min_depth_m: 0.1
+    bytes: 240012
+  - name: -170400_-110400
+    south_sec: -170400
+    west_sec: -110400
+    min_depth_m: 23.8
+    bytes: 331281
+  - name: -170400_-33600
+    south_sec: -170400
+    west_sec: -33600
+    min_depth_m: 30.4
+    bytes: 313399
+  - name: '-170400_43200'
+    south_sec: -170400
+    west_sec: 43200
+    min_depth_m: 0.0
+    bytes: 231585
+  - name: '-170400_120000'
+    south_sec: -170400
+    west_sec: 120000
+    min_depth_m: 2.7
+    bytes: 320701
+  - name: -93600_-417600
+    south_sec: -93600
+    west_sec: -417600
+    min_depth_m: 201.6
+    bytes: 327744
+  - name: -93600_-340800
+    south_sec: -93600
+    west_sec: -340800
+    min_depth_m: 0.1
+    bytes: 296767
+  - name: -93600_-264000
+    south_sec: -93600
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 29926
+  - name: -93600_-187200
+    south_sec: -93600
+    west_sec: -187200
+    min_depth_m: 0.0
+    bytes: 117683
+  - name: -93600_-110400
+    south_sec: -93600
+    west_sec: -110400
+    min_depth_m: 6.8
+    bytes: 348901
+  - name: -93600_-33600
+    south_sec: -93600
+    west_sec: -33600
+    min_depth_m: 0.3
+    bytes: 320004
+  - name: '-93600_43200'
+    south_sec: -93600
+    west_sec: 43200
+    min_depth_m: 0.0
+    bytes: 24291
+  - name: '-93600_120000'
+    south_sec: -93600
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 221350
+  - name: -16800_-417600
+    south_sec: -16800
+    west_sec: -417600
+    min_depth_m: 0.1
+    bytes: 313630
+  - name: -16800_-340800
+    south_sec: -16800
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 249056
+  - name: -16800_-264000
+    south_sec: -16800
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 130679
+  - name: -16800_-187200
+    south_sec: -16800
+    west_sec: -187200
+    min_depth_m: 0.0
+    bytes: 294281
+  - name: -16800_-110400
+    south_sec: -16800
+    west_sec: -110400
+    min_depth_m: 0.0
+    bytes: 291708
+  - name: -16800_-33600
+    south_sec: -16800
+    west_sec: -33600
+    min_depth_m: 0.0
+    bytes: 133302
+  - name: '-16800_120000'
+    south_sec: -16800
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 134135
+  - name: 60000_-417600
+    south_sec: 60000
+    west_sec: -417600
+    min_depth_m: 0.0
+    bytes: 119201
+  - name: 60000_-340800
+    south_sec: 60000
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 194049
+  - name: 60000_-264000
+    south_sec: 60000
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 315435
+  - name: 60000_-187200
+    south_sec: 60000
+    west_sec: -187200
+    min_depth_m: 421.1
+    bytes: 362206
+  - name: 60000_-110400
+    south_sec: 60000
+    west_sec: -110400
+    min_depth_m: 0.0
+    bytes: 254079
+  - name: 60000_-33600
+    south_sec: 60000
+    west_sec: -33600
+    min_depth_m: 0.0
+    bytes: 34909
+  - name: '60000_43200'
+    south_sec: 60000
+    west_sec: 43200
+    min_depth_m: 0.0
+    bytes: 95457
+  - name: '60000_120000'
+    south_sec: 60000
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 59764
+  - name: 136800_-417600
+    south_sec: 136800
+    west_sec: -417600
+    min_depth_m: 0.0
+    bytes: 3311
+  - name: 136800_-340800
+    south_sec: 136800
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 45777
+  - name: 136800_-264000
+    south_sec: 136800
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 151083
+  - name: 136800_-187200
+    south_sec: 136800
+    west_sec: -187200
+    min_depth_m: 8.5
+    bytes: 292167
+  - name: 136800_-110400
+    south_sec: 136800
+    west_sec: -110400
+    min_depth_m: 0.2
+    bytes: 304598
+  - name: 136800_-33600
+    south_sec: 136800
+    west_sec: -33600
+    min_depth_m: 0.0
+    bytes: 128920
+  - name: '136800_43200'
+    south_sec: 136800
+    west_sec: 43200
+    min_depth_m: 0.0
+    bytes: 77918
+  - name: '136800_120000'
+    south_sec: 136800
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 56909
+  - name: 213600_-417600
+    south_sec: 213600
+    west_sec: -417600
+    min_depth_m: 0.0
+    bytes: 81763
+  - name: 213600_-340800
+    south_sec: 213600
+    west_sec: -340800
+    min_depth_m: 0.0
+    bytes: 113506
+  - name: 213600_-264000
+    south_sec: 213600
+    west_sec: -264000
+    min_depth_m: 0.0
+    bytes: 149472
+  - name: 213600_-187200
+    south_sec: 213600
+    west_sec: -187200
+    min_depth_m: 0.0
+    bytes: 70039
+  - name: 213600_-110400
+    south_sec: 213600
+    west_sec: -110400
+    min_depth_m: 0.0
+    bytes: 169999
+  - name: 213600_-33600
+    south_sec: 213600
+    west_sec: -33600
+    min_depth_m: 0.0
+    bytes: 225582
+  - name: '213600_43200'
+    south_sec: 213600
+    west_sec: 43200
+    min_depth_m: 0.0
+    bytes: 108024
+  - name: '213600_120000'
+    south_sec: 213600
+    west_sec: 120000
+    min_depth_m: 0.0
+    bytes: 86581
+  bytes: 11283534
 atlantic:
   level: 1
   bounds:
@@ -15189,6 +15787,12 @@ sources:
       sha256: aca25420a584e7060200e064f11ca97be3e950cb9e2e5a549814f3cccd7bf31e
       bytes: 601965
       file: gebco_2025_s29.74_n30.47_w-16.31_e-15.58_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 12.3, ''north'':
+        25.3, ''west'': -26.5, ''east'': -9.23})'
+      retrieved: '2026-11-13'
+      sha256: 8dbbe93abdeea23181ef9c8c510149998d7faa82f7f113889ae272902c91c2b1
+      bytes: 63818936
+      file: gebco_2025_s12.30_n25.30_w-26.50_e-9.23_ascii.zip
     - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 27.13, ''north'':
         31.8, ''west'': -13.8, ''east'': -9.13})'
       retrieved: '2026-11-13'
@@ -15201,6 +15805,11 @@ sources:
       sha256: a3c93eb8075796a2952319932b3fab3926143a6e0f1bb1e629cda5de4a9fc261
       bytes: 7287592
       file: gebco_2025_s31.40_n36.07_w-10.82_e-5.72_ascii.zip
+    - url: https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2025/ice_surface_elevation/geotiff/gebco_2025_geotiff.zip
+      retrieved: '2026-11-14'
+      sha256: 55d6c08b99a859cdf97dff07a2d41a2be5e52fec518606156450abf056a8e8eb
+      bytes: 4235605060
+      file: gebco_2025_geotiff.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024

@@ -1068,3 +1068,65 @@ blocks (the African coast south of the Canaries first, if the owner books it):
   westward of the truth over two days, and a book shaped for the road drove her onto the bank
   under Mogador's island; the marks' rings are their scale (ten miles for an offing), and she
   heaves to in the offing.
+
+## The coarse seas (package 112, steps 1 and 2)
+
+**The sea is coarse and whole; the fine detail is for water near the land.** A chart names
+its coarse layers as **one ordered list**, `layers:` in its entry of `CHARTS` (the tool
+writes it into the manifest). At each level the first layer that lists a tile answers in
+it, and each later layer listing the same tile fills only the NODATA cells left
+(`chart.Tile.filled_from`, in order). A tile no earlier layer lists is the later layer's
+own. The finest level that answers, answers: a harbour (3), a region (2), the layers (1),
+the world (0). 106a's `corridor:` and `corridors_beside:` are read as that list where a
+manifest still gives them. Giving both forms is refused.
+
+**The layers committed** (tools/build_charts.py `CORRIDORS`, each built by `--corridor
+<name>` from GEBCO's area extract at 30″, the corridor's form: elevation, distance field,
+the blocks' shoalest soundings), in the chart's order:
+
+| layer | bounds | tiles | bytes | package |
+|---|---|---|---|---|
+| `atlantic-corridor` | 32 to 51 N, 32 to 1 W | 48 | 9,746,887 | 38, 39e |
+| `atlantic-south` | 25.2 to 31.9 N, 22.13 to 9.34 W | 6 | 1,191,415 | 106a |
+| `atlantic-verde` | 12.4 to 25.2 N, 26.4 to 9.34 W | 12 | 2,487,854 | 112 |
+
+**An edge is open only where the chart answers water beyond it** (package 112, M1; the
+lead's ruling of 2026-11-14). The seam's taper (package 94) runs from a block's open edge,
+where the block's water meets charted water no block holds. A charted box beyond an edge is
+no proof of water: the corridor's box ran over Spain's and France's land, and a
+Mediterranean layer's box over the Pyrenees opened the Gulf of Lion's edges to the eleven's
+6.6 m. So the tool writes the open stretches into the manifest at each build (`open_edges:`
+with its `stretches:`, from `tide.candidate_edges` and `tide.water_stretches`, sampled every
+0.01 degree, the water read 0.01 degree beyond on the side outside every block, from the
+chart it has just written). The tide reads them as data, and so does the fill raise. A
+manifest without the key reads the boxes as before. Truth 7-571 holds that no open stretch
+faces land. Before a layer is committed, prove every region's tide on a grid, old beside new.
+**A rebuild commits a tile only where its arrays changed** (the chart session's ruling of
+2026-11-14): a tile written before `save_tile` (package 39e) rebuilds with new clock dates in
+its zip entries and the same arrays. Keep its old bytes and its manifest record, and list
+the tiles left out in the notes. A new sea is a layer appended to the list, `beside:` the layer whose tiles it shares
+(the build writes NODATA where that one's committed tile has data). It never widens a
+layer already laid: widening rewrites every tile of it (39e, 106a). Each folder is let
+through `.gitignore` by name.
+
+**Level 0, the world's picture, is committed over the Atlantic and the Mediterranean**
+(`WORLD`, 70 S to 75 N and 100 W to 40 E; `--world`; 63 tiles, 11,283,534 bytes; the lead's
+ruling of 2026-11-13). It is GEBCO's global tiles decimated to 150″, in steps of 2 m, the
+land clipped at 50 m, with no distance field. **Adding the rest of the world later moves no
+tile laid now:** each tile is its own place's cells, nothing is read across a tile's edge,
+and the 63 tiles are byte for byte the whole world's build's (measured, package 112).
+Widening `WORLD` to the globe writes the other tiles beside them. The manifest's `world:`
+entry is carried by every later build while its tiles are present, as a layer is. The
+runtime lays level 0 under a chart of the manifest's `charts:` only, after every layer, and
+**never under a chart of one region**: such a chart is met where a scenario or a test says
+`chart: <region>` outright, and its answers are pinned on that region alone. Level 0 does
+not widen a chart's limits (`contains`, `bounds`, the lookout's "the chart has nothing"
+line), which stay the envelope of its regions and layers. Over water only level 0 answers,
+a depth is read and no shore distance: a ship there is in the open ocean of 4.6 km cells.
+
+**Mind the datum** (package 112's measure, not mended; on the lead's list): levels 0 and
+1 are at mean sea level and nothing is raised, while the tide adds its level above low
+water to every depth. On water a coarse layer alone answers, the level is counted twice:
+the open sea reads deep by it, and a coarse shore floods to it (765 cells of the corridor
+and the south layer at the eleven's 3 to 4 m). A block's own tiles are at low water and
+are not touched by this.

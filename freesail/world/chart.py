@@ -555,6 +555,15 @@ class Tile:
 
     @classmethod
     def load(cls, path: Path) -> Tile:
+        try:
+            return cls._load(path)
+        except (OSError, ValueError, EOFError, KeyError) as e:
+            # package 112: a tile that cannot be read is named, never passed over (an empty
+            # or broken file had raised numpy's words with no path)
+            raise ChartError(f"the tile {path} cannot be read: {e}") from e
+
+    @classmethod
+    def _load(cls, path: Path) -> Tile:
         with np.load(path) as z:
             elevation = z["elevation"]
             if "predictor" in z.files and int(z["predictor"]) == 2:
