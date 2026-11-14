@@ -145,7 +145,9 @@ def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[
         yield f"the kept save {path.name}", names_of_file(path)
     for path in scenario_files():
         say(f"  {path.name}")
-        yield f"the scenario {path.name}", census_of_scenario(path, run_s)
+        # ten minutes (an evolution under way) and the long run (what the hours bring)
+        for seconds in sorted({RUN_S, run_s}):
+            yield f"the scenario {path.name} at {seconds} s", census_of_scenario(path, seconds)
     for what, name, run_s, orders in WORLDS:
         say(f"  {what}")
         yield what, census_of_scenario(SCENARIOS / name, run_s, orders)
