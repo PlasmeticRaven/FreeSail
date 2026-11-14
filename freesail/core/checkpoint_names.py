@@ -41,6 +41,8 @@ ADMITTED: frozenset[tuple[str, str]] = frozenset(
         ("freesail.combat.guns", "Target"),
         ("freesail.combat.guns", "Volley"),
         ("freesail.combat.hits", "Damage"),
+        ("freesail.combat.marks", "Cask"),
+        ("freesail.combat.marks", "Practice"),
         ("freesail.combat.morale", "Morale"),
         ("freesail.combat.small_arms", "Musketry"),
         ("freesail.core.clock", "Clock"),

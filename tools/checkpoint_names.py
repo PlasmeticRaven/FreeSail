@@ -10,7 +10,8 @@ list from what the game's own checkpoints hold: every scenario under `data/scena
 begun as the harbour begins it (the server's `prepare_game`), run and checkpointed; the
 kept saves under `tests/fixtures/saves/`; a fight; a port, a ship in it and her business;
 the far world; and the wardroom (`wardroom_world`: the stations seated as play seats them,
-the watcher, the player at a seat, a captain and an officer at work). The list is written
+the watcher, the player at a seat, a captain and an officer at work); and a
+practice at the great guns (`practice_world`: a cask heaved over and engaged). The list is written
 from a long census (`LIST_RUN_S`, two hours of each scenario, where the fishermen's gear
 is out and the people's needs have come due); truth 7-606 (`tests/test_known_truths.py`)
 takes the short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own
@@ -156,6 +157,8 @@ def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[
         yield what, census_of_scenario(SCENARIOS / name, run_s, orders)
     say("  the wardroom")
     yield "the wardroom", census_of_wardroom()
+    say("  a practice at the great guns")
+    yield "a practice at the great guns", census_of_practice()
 
 
 def census_of_kept_save(path: Path, run_s: int = 3600):
@@ -172,6 +175,34 @@ def census_of_kept_save(path: Path, run_s: int = 3600):
             h.reseat(Fake(["Aye."], loop=True), identity="the census", door="mcp", save=None)
     world.run(run_s)
     return names_of_bytes(replay.checkpoint_bytes(world))
+
+
+def practice_world():
+    """A forenoon's practice at the great guns, as the owner's scenario sails it
+    (`exercising-the-great-guns`): quarters beaten, a battery exercised with the guns cast
+    loose, a cask heaved overboard and engaged."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(SCENARIOS / "exercising-the-great-guns.yaml")
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    for order, then in (
+        ("beat to quarters", 5),
+        ("exercise the starboard battery", 0),
+        ("cast loose the guns", 20 * 60),
+        ("cease exercising", 60),
+        ("heave a cask overboard from the starboard quarter", 120),
+        ("engage the cask to starboard", 600),
+    ):
+        world.submit(order)
+        world.run(then)
+    return world
+
+
+def census_of_practice():
+    from freesail.core import replay
+
+    return names_of_bytes(replay.checkpoint_bytes(practice_world()))
 
 
 def census_of_wardroom():
