@@ -1,0 +1,139 @@
+"""The game's own page and doors as the tests' client (package 115, part A).
+
+The server answers its own page alone (`freesail.ui.guard`): at its own address, from its
+own origin, with the mark it wrote into the page. A test that plays as the page plays as
+the page does: `PageClient` is the browser on the machine itself at `http://localhost:8000`
+with the page's mark in every request and in its socket's address, and the page's origin;
+`DoorClient` is an agent's door on the machine (`agents.remote.GameClient`): the same
+address, no origin, no mark, the seating's key in its calls as before.
+
+The refusals themselves are tested through real sockets and real requests against a
+running server (`LiveGame` below; truths 7-600 on, `tests/test_known_truths.py`).
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+from typing import Any
+from urllib.parse import urlencode, urljoin
+
+from fastapi.testclient import TestClient
+
+from freesail.ui.guard import MARK_HEADER, MARK_QUERY
+
+ROOT = Path(__file__).resolve().parents[1]
+OWN = "localhost:8000"
+ON_THE_MACHINE = ("127.0.0.1", 50000)
+
+
+def mark_of(app: Any) -> str:
+    return app.state.guard.token
+
+
+class PageClient(TestClient):
+    """The game's own page in a browser on the machine itself."""
+
+    def __init__(self, app: Any, **kw: Any):
+        headers = dict(kw.pop("headers", None) or {})
+        guard = getattr(getattr(app, "state", None), "guard", None)
+        self.mark = guard.token if guard is not None else ""
+        if self.mark:
+            headers.setdefault(MARK_HEADER, self.mark)
+        headers.setdefault("origin", f"http://{OWN}")
+        kw.setdefault("base_url", f"http://{OWN}")
+        kw.setdefault("client", ON_THE_MACHINE)
+        super().__init__(app, headers=headers, **kw)
+
+    def websocket_connect(self, url: str, subprotocols: Any = None, **kwargs: Any) -> Any:
+        if self.mark and f"{MARK_QUERY}=" not in url:
+            url += ("&" if "?" in url else "?") + urlencode({MARK_QUERY: self.mark})
+        return super().websocket_connect(urljoin(f"ws://{OWN}", url), subprotocols, **kwargs)
+
+
+class DoorClient(TestClient):
+    """An agent's door on the machine itself: no page, no origin, no mark."""
+
+    def __init__(self, app: Any, **kw: Any):
+        kw.setdefault("base_url", f"http://{OWN}")
+        kw.setdefault("client", ON_THE_MACHINE)
+        super().__init__(app, **kw)
+
+
+class LiveGame:
+    """The game's server run as the owner runs it (`py -m freesail`, its own process, the
+    browser not opened), on a free port, from a scratch folder, with its settings, saves and
+    scenarios in that folder: the door every guard test comes in by. `mark` is read from the
+    harbour's page as a page reads it."""
+
+    def __init__(self, tmp: Any, *flags: str):
+        import socket
+
+        self.tmp = Path(tmp)
+        self.saves = self.tmp / "saves"
+        self.saves.mkdir(parents=True, exist_ok=True)
+        self.settings = self.tmp / "player" / "settings.yaml"
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            self.port = s.getsockname()[1]
+        self.flags = flags
+        self.url = f"http://127.0.0.1:{self.port}"
+        self.own = f"127.0.0.1:{self.port}"
+        self.mark = ""
+        self.out = ""
+
+    def __enter__(self) -> LiveGame:
+        import os
+        import subprocess
+        import time
+
+        import httpx
+
+        from freesail import settings as S
+
+        s = S.load_settings(self.settings)
+        s["places"]["consent_records"] = str(self.tmp / "consent")
+        s["places"]["desktop_config"] = str(self.tmp / "desktop" / "config.json")
+        S.save_settings(s, self.settings)
+        argv = [sys.executable, "-m", "freesail", "--no-browser", "--port", str(self.port)]
+        argv += ["--settings", str(self.settings), "--saves", str(self.saves), *self.flags]
+        self.proc = subprocess.Popen(
+            argv,
+            cwd=str(self.tmp),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            env={**os.environ, "PYTHONPATH": str(ROOT)},
+        )
+        deadline = time.monotonic() + 90
+        while True:
+            try:
+                page = httpx.get(self.url + "/harbour", timeout=30)
+                break
+            except httpx.TransportError:
+                assert self.proc.poll() is None, "the server ended before it answered"
+                assert time.monotonic() < deadline, "the server did not answer"
+                time.sleep(0.2)
+        found = re.search(r'<meta name="freesail-page" content="([^"]+)">', page.text)
+        assert found, "the harbour's page carries no mark"
+        self.mark = found.group(1)
+        return self
+
+    def __exit__(self, *exc: Any) -> None:
+        self.proc.terminate()
+        self.out, _ = self.proc.communicate(timeout=30)
+
+    def page(self) -> Any:
+        """An HTTP client as the game's own page: its origin and its mark."""
+        import httpx
+
+        return httpx.Client(
+            base_url=self.url,
+            timeout=60,
+            headers={MARK_HEADER: self.mark, "origin": f"http://{self.own}"},
+        )
+
+    def log_texts(self) -> list[str]:
+        with self.page() as c:
+            return [e["text"] for e in c.get("/api/log", params={"limit": 5000}).json()]

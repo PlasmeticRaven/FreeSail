@@ -219,7 +219,8 @@
 
   function connect() {
     var proto = location.protocol === "https:" ? "wss:" : "ws:";
-    var ws = new WebSocket(proto + "//" + location.host + "/ws");
+    // the game's mark in the address (package 115): the server opens its socket to its own page alone
+    var ws = new WebSocket(proto + "//" + location.host + "/ws?page=" + encodeURIComponent(window.freesailMark || ""));
     ws.onopen = function () {
       $("status").textContent = "connected";
       $("status").className = "ok";
@@ -227,7 +228,11 @@
     ws.onclose = function () {
       $("status").textContent = "disconnected; retrying";
       $("status").className = "bad";
-      setTimeout(connect, 2000);
+      // a server started again has a new mark (package 115): the page's own address gives
+      // it, read before the socket is asked again; the old one would be refused for ever
+      setTimeout(function () {
+        window.freesailFreshMark().then(connect, connect);
+      }, 2000);
     };
     ws.onmessage = function (msg) {
       var data = JSON.parse(msg.data);

@@ -340,7 +340,7 @@ class Game:
     clock the test turns while the runner runs in a thread."""
 
     def __init__(self, tmp_path):
-        from fastapi.testclient import TestClient
+        from own_page import PageClient
 
         from freesail.api.session import make_world
         from freesail.ui.server import Driver, create_app
@@ -358,7 +358,7 @@ class Game:
             consent_records=self.records,
             saves_dir=self.saves,
         )
-        self.http = TestClient(app)
+        self.http = PageClient(app)
 
     @property
     def harness(self):
@@ -395,7 +395,7 @@ def run_runner(game: Game, server: Server, argv: list[str], inp: str = "") -> di
 
     def run() -> None:
         got["code"] = L.main(
-            ["--game", "http://testserver", *argv],
+            ["--game", "http://localhost:8000", *argv],
             inp=io.StringIO(inp),
             out=got["out"],
             transport=server.transport(),
@@ -521,7 +521,7 @@ def test_an_endpoint_failure_is_reported_in_words_and_the_station_released(tmp_p
 
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver"],
+        ["--game", "http://localhost:8000"],
         inp=io.StringIO(""),
         out=out,
         transport=httpx.MockTransport(handler),
@@ -619,7 +619,7 @@ def test_a_timed_out_request_leaves_the_turn_open_and_the_runner_asks_again(tmp_
 
     def run() -> None:
         got["code"] = L.main(
-            ["--game", "http://testserver", "--max-reply", "2048"],
+            ["--game", "http://localhost:8000", "--max-reply", "2048"],
             inp=io.StringIO(""),
             out=out,
             transport=httpx.MockTransport(handler),
@@ -654,7 +654,7 @@ def test_failures_in_a_row_stand_the_station_down_with_the_reason(tmp_path):
     server = llama([])
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver"],
+        ["--game", "http://localhost:8000"],
         inp=io.StringIO(""),
         out=out,
         transport=flaky(server, ["timeout", "500", "timeout"]),
@@ -696,7 +696,7 @@ def test_the_context_guard_refuses_a_small_context_with_what_it_measured(tmp_pat
     game = Game(tmp_path)
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver", "--endpoint", "http://127.0.0.1:11434"],
+        ["--game", "http://localhost:8000", "--endpoint", "http://127.0.0.1:11434"],
         inp=io.StringIO(""),
         out=out,
         transport=ollama({"ps": 4096}),
@@ -898,7 +898,7 @@ def test_no_officer_is_seated_without_a_context_size_and_the_guard_measures_his_
     code = L.main(
         [
             "--game",
-            "http://testserver",
+            "http://localhost:8000",
             "--endpoint",
             "http://127.0.0.1:11434",
             "--station",
@@ -1232,7 +1232,7 @@ def test_the_handover_reserve_is_tokens_or_a_share_and_the_larger_when_both(tmp_
         L.main(["--handover-reserve", "lots"], out=io.StringIO())
     # sent with the station request in tokens, kept on the harness and in the save
     game = Game(tmp_path)
-    client = GameClient("http://testserver", http=game.http)
+    client = GameClient("http://localhost:8000", http=game.http)
     consent.Record("made-up-weights", "r", "2026-09-26", consent.YES, answer="Yes.").write(
         game.records
     )

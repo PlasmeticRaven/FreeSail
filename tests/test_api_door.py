@@ -140,7 +140,7 @@ def test_the_door_refuses_to_start_where_the_key_would_be_written(tmp_path):
 def test_the_door_will_not_start_without_a_model_or_a_key_and_says_so(monkeypatch):
     fake_store(monkeypatch)
     out = io.StringIO()
-    assert api.main(["--game", "http://testserver"], out=out, environ={}) == 2
+    assert api.main(["--game", "http://localhost:8000"], out=out, environ={}) == 2
     assert "--model" in out.getvalue() and "no default" in out.getvalue()
     out = io.StringIO()
     assert api.main(["--model", MODEL], out=out, environ={}) == 2
@@ -650,7 +650,7 @@ def _openrouter_door(game: Game, transport, tmp_path: Path) -> dict:
         got["code"] = api.main(
             [
                 "--game",
-                "http://testserver",
+                "http://localhost:8000",
                 "--dialect",
                 "openrouter",
                 "--model",

@@ -45,7 +45,8 @@ Routes (spec §9.2):
     GET  /api/marks     the player's lines, rings and notes on the chart (package 37n);
                         POST one, DELETE /api/marks/{id} one or /api/marks all
                         (`mark_routes`): kept with the game, read by the chart alone
-    WS   /ws          every log event as it happens, and a snapshot every
+    WS   /ws          (the game's own page alone, its mark in the address: package
+                        115) every log event as it happens, and a snapshot every
                         tick at 1x, every 10 ticks at 10x, every 60 at 60x and up;
                         at 60x and up the log is rolled up (spec M4 §20): the notable
                         and urgent lines and the captain's come as events, and each
@@ -114,7 +115,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from freesail import units
@@ -166,6 +167,9 @@ from freesail.ui.console import (
     start_world,
     station_watcher,
 )
+from freesail.ui.guard import Guard, guard_app
+from freesail.ui.places import PlaceRefused, Places
+from freesail.ui.places import shown as shown_place
 from freesail.world import knowledge
 
 CLIENT_DIR = Path(__file__).resolve().parents[2] / "client"
@@ -261,6 +265,9 @@ class Driver:
         self.desk: Any = None  # the agent API's stations (`agent_routes`), when mounted
         self.running = False
         self.lock = threading.RLock()
+        # the folders the server reads and writes files in (package 115, part A); the app
+        # gives its own (`create_app`: the saves place, the player's scenarios place)
+        self.places = Places()
         self._listeners: list[Listener] = []
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
@@ -721,7 +728,12 @@ class Driver:
                 "query.director_word",
             )
         elif director_brief_words(text) is not None:
-            lines = give_director_brief(world, director_brief_words(text) or "", "the player")
+            try:
+                words = self.places.brief(director_brief_words(text) or "")
+            except PlaceRefused as e:
+                lines = [f"The brief was not taken: {e}"]
+            else:
+                lines = give_director_brief(world, words, "the player")
             kind = "query.director_brief"
         else:
             return None
@@ -745,21 +757,23 @@ class Driver:
 
     def _save(self, path: str) -> Event:
         """Write the save file and say so in the log (not journaled: a save is the
-        driver's act, not an order, and a replay must not re-save)."""
-        if not path:
+        driver's act, not an order, and a replay must not re-save). Over the server a save
+        is named and lies in the saves place (package 115, part A: `Places.save_target`);
+        a path out of it is refused in words and nothing is written."""
+        try:
+            target = self.places.save_target(path)
+        except PlaceRefused as e:
             return self.world.record_driver(
-                "routine",
-                "driver.refused",
-                "Say 'save somewhere.json'.",
-                data={"path": path},
+                "routine", "driver.refused", str(e), data={"path": path}
             )
         try:
-            p = replay_mod.save_to_file(self.world, path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            p = replay_mod.save_to_file(self.world, target)
         except OSError as e:
             return self.world.record_driver(
                 "routine",
                 "driver.refused",
-                f"Could not write {path}: {e.strerror or e}.",
+                f"Could not write {shown_place(target)}: {e.strerror or e}.",
                 data={"path": path},
             )
         # the digest of the log the save holds (this line comes after it), so a replay of
@@ -767,23 +781,35 @@ class Driver:
         return self.world.record_driver(
             "notable",
             "driver.saved",
-            f"Saved to {p} at tick {self.world.clock.tick}; the log's digest is "
+            f"Saved to {shown_place(p)} at tick {self.world.clock.tick}; the log's digest is "
             f"{self.world.log.digest()[:16]}.",
             data={"path": str(p), "tick": self.world.clock.tick},
         )
 
     def _read_standing_orders(self, path: str) -> Event:
+        """`read the standing orders from BOOK`: a book by its name or by a path in the
+        server's folders (package 115, part A: `Places.book`); a path out of them is refused
+        before it is opened, so nothing of it is read or given back."""
         try:
-            n = read_standing_orders(self.world, path)
-        except OSError as e:
+            if not path:
+                raise OSError(2, "Say which book", path)
+            book = self.places.book(path)
+            n = read_standing_orders(self.world, str(book))
+        except PlaceRefused as e:
+            self.emit_snapshot()
+            return self.world.record_driver(
+                "routine", "driver.refused", str(e), data={"path": path}
+            )
+        except (OSError, ValueError) as e:
+            self.emit_snapshot()
+            why = getattr(e, "strerror", None) or "it is not a book of standing orders"
             return self.world.record_driver(
                 "routine",
                 "driver.refused",
-                f"Could not read {path or 'the standing orders'}: {e.strerror or e}.",
+                f"Could not read {path or 'the standing orders'}: {why}.",
                 data={"path": path},
             )
-        finally:
-            self.emit_snapshot()
+        self.emit_snapshot()
         return self.world.record_driver(
             "routine",
             "driver.standing_orders",
@@ -1430,10 +1456,14 @@ def create_app(
     saves_dir: Path | str | None = None,
     say: Callable[[str], None] | None = None,
     harbour: Any = None,
+    hosts: tuple[str, ...] = (),
 ) -> FastAPI:
     """The game's app around a driver. `harbour` is the launcher's (`ui.harbour.Harbour`,
     package 59), made here with the game already started when none is given, so that the
-    harbour is at `/harbour` whichever way the server was started."""
+    harbour is at `/harbour` whichever way the server was started. The guard (package 115,
+    part A; `freesail.ui.guard`) is around the whole of it: the game answers its own page,
+    whose mark is `app.state.guard.token`, at its own address (`hosts`, the `--host` given,
+    beside localhost and the machine's own names), and the agents' doors by their key."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -1447,6 +1477,7 @@ def create_app(
 
     app = FastAPI(title="FreeSail", lifespan=lifespan)
     app.state.driver = driver
+    guard = guard_app(app, Guard(hosts))
     options: dict[str, Any] = {"game": game, "lockstep": driver.lockstep, "say": say}
     if consent_records is not None:
         options["records_dir"] = consent_records
@@ -1483,17 +1514,26 @@ def create_app(
             driver, consent_records=consent_records, saves_dir=saves_dir, started=True
         )
     harbour.client_dir = client_dir
+    harbour.page = guard.page  # the harbour's page carries the mark as the game's does
+    # the server's folders (package 115, part A): the saves place it was started with and
+    # the player's scenarios place as the harbour's settings name it
+    from freesail.agents.remote import SAVES_DIR
+
+    driver.places = Places(saves_dir or SAVES_DIR, harbour.scenarios_place)
+    harbour.places = driver.places
     app.state.harbour = harbour
     app.include_router(harbour_routes(harbour))
 
     @app.get("/", response_model=None)
-    def index() -> Response:
+    def index(request: Request) -> Response:
         if not harbour.started:
-            # `py -m freesail` with no game yet: the harbour first
+            # `py -m freesail` with no game yet: the harbour first (the address's mark kept
+            # with it, for a device other than this machine)
             from fastapi.responses import RedirectResponse
 
-            return RedirectResponse("/harbour")
-        return FileResponse(client_dir / "index.html", media_type="text/html")
+            query = request.url.query
+            return RedirectResponse("/harbour" + (f"?{query}" if query else ""))
+        return guard.page(client_dir / "index.html", request.headers.get("host", ""))
 
     @app.get("/api/ship")
     def api_ship() -> JSONResponse:
@@ -1631,7 +1671,7 @@ def create_app(
             driver.add_listener(listener)
         try:
             await websocket.send_json(hello)
-            receiver = asyncio.ensure_future(_receive_orders(websocket, driver, queue))
+            receiver = asyncio.ensure_future(_until_gone(websocket, driver, queue))
             try:
                 while True:
                     message = await queue.get()
@@ -1663,27 +1703,17 @@ def create_app(
     return app
 
 
-async def _receive_orders(
+async def _until_gone(
     websocket: WebSocket, driver: Driver, queue: asyncio.Queue[dict[str, Any]]
 ) -> None:
-    """Orders and driver commands may also arrive over the socket. When the
-    client goes away, a `closed` message on the queue ends the sending loop."""
+    """The socket carries the game to the page and takes nothing from it (package 115,
+    part A: it once took orders and driver commands, which no page sent; a door nobody
+    used is closed, and the page's orders come by `/api/order` and `/api/driver`). What
+    the page might send is read and passed over, so that its going away is seen: then a
+    `closed` message on the queue ends the sending loop."""
     try:
         while True:
-            data = await websocket.receive_json()
-            kind = data.get("type")
-            if kind == "order":
-                await asyncio.to_thread(driver.submit, str(data.get("text") or ""))
-            elif kind == "driver":
-                action, value = data.get("action"), data.get("value")
-                if action == "hold":
-                    driver.hold()
-                elif action == "go":
-                    driver.go()
-                elif action in SPEED_WORDS:
-                    driver.set_compression(float(value))
-                elif action == "tick":
-                    await asyncio.to_thread(driver.tick, int(value or 1))
+            await websocket.receive_text()
     except (WebSocketDisconnect, RuntimeError, ValueError, TypeError):
         pass
     finally:
@@ -1721,6 +1751,27 @@ def start_server_world(args: argparse.Namespace) -> tuple[World, Any]:
     if getattr(args, "load", None):
         take_marks(world, replay_mod.load_file(args.load))
     return world, scenario_file
+
+
+def elsewhere_words(guard: Guard, host: str, port: int, page: str) -> list[str]:
+    """The terminal's lines for a device other than this machine (package 115, part A):
+    with the server bound beyond the machine itself, the address that carries the game's
+    mark, which such a device opens the game at; none when it is bound to the machine."""
+    from freesail.ui.guard import _loopback, machine_names
+
+    if _loopback(host) or host == "localhost":
+        return []
+    name = host
+    if host in ("0.0.0.0", "::", ""):
+        names = sorted(machine_names(), key=len)
+        name = names[0] if names else "this-machine"
+    if ":" in name and not name.startswith("["):
+        name = f"[{name}]"
+    return [
+        f"From another device, open http://{name}:{port}{page}?page={guard.token} "
+        "(the address carries the game's mark: whoever has it can play this game, so give "
+        "it only to a device you trust)."
+    ]
 
 
 def server_parser(description: str = "FreeSail local server") -> argparse.ArgumentParser:
@@ -1866,9 +1917,12 @@ def main(argv: list[str] | None = None) -> int:
         consent_records=args.consent_records,
         saves_dir=args.saves,
         say=say_to_terminal,
+        hosts=(args.host,),
     )
     app.state.harbour.game_url = f"http://localhost:{args.port}"  # the doors' address
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
+    for line in elsewhere_words(app.state.guard, args.host, args.port, "/"):
+        print(line)
     print(
         f"A model's door connects to http://localhost:{args.port} (docs/agents/Harness.md)"
         + (

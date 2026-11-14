@@ -32,7 +32,7 @@ import pytest
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
-from fastapi.testclient import TestClient  # noqa: E402
+from own_page import PageClient  # noqa: E402
 
 from freesail import settings as S  # noqa: E402
 from freesail.core.world import Scenario, World  # noqa: E402
@@ -84,7 +84,7 @@ def port(tmp_path):
 
 @pytest.fixture
 def client(port):
-    with TestClient(port.app) as c:
+    with PageClient(port.app) as c:
         yield c
 
 
@@ -357,6 +357,11 @@ class Live:
             assert time.monotonic() < deadline and self.thread.is_alive()
             time.sleep(0.05)
 
+    @property
+    def page(self) -> dict[str, str]:
+        """The headers of the game's own page (package 115): its origin and its mark."""
+        return {"x-freesail-page": self.port.app.state.guard.token, "origin": self.url}
+
     def close(self) -> None:
         self.server.should_exit = True
         self.thread.join(timeout=15)
@@ -378,7 +383,7 @@ def test_a_door_that_dies_is_said_so_in_its_pane(tmp_path):
     try:
         import httpx
 
-        with httpx.Client(base_url=live.url, timeout=60) as c:
+        with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
             refused = c.post("/api/harbour/doors", json={"door": "local", "station": "watcher"})
             assert refused.status_code == 400 and "Start a game first" in refused.json()["detail"]
             c.post("/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"})
@@ -428,7 +433,7 @@ def test_the_api_door_started_from_the_harbour_seats_its_station_and_is_stopped(
         try:
             import httpx
 
-            with httpx.Client(base_url=live.url, timeout=60) as c:
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
                 c.post(
                     "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
                 )
@@ -637,7 +642,7 @@ def test_the_harbour_starts_a_seats_door_as_the_directors_and_stops_it_when_the_
 
     monkeypatch.setattr(port.harbour, "start_door", start_door)
     monkeypatch.setattr(port.harbour, "_stop_seat_door", lambda door: door.stop())
-    with TestClient(port.app) as c:
+    with PageClient(port.app) as c:
         c.post("/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"})
         w = port.driver.world
         for name in (PLACEHOLDER, "placeholder-two", "placeholder-four"):

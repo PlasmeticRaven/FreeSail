@@ -3211,7 +3211,7 @@ def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path, rig):
     its truss, the course a bundle along its after part; then set and sheeted, to leeward of
     the tack the state gives, the yard's fore part to windward, its sheet to the taffrail."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -3220,7 +3220,7 @@ def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path, rig):
     world = make_world(7, str(path), scenario)
     world.tick()  # her tack and her sails' states are read at a tick
     course = world.ship.sails[MIZEN_COURSE]
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         course.state = SailState.SET
         set_sheet_angle(world.ship, course, math.radians(30.0))
@@ -3865,7 +3865,7 @@ def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path, rig):
     braced, each yard turned about its slings by the brace the state gives, and the sprit
     topsail's clews at the spritsail yard's arms."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -3873,7 +3873,7 @@ def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path, rig):
     scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=10.0, ship_heading_deg=150.0)
     world = make_world(7, str(path), scenario)
     world.tick()
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         yards, sails = sprit_parts(start["graph"])
         for sid in sails:
@@ -5402,7 +5402,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
     sheeted, the boom and the driver lie to leeward of the tack the state gives, the yard's fore
     part to windward, and the sheet runs from the boom's end to the taffrail."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -5415,7 +5415,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
         world.ship.spars[DRIVER_BOOM].rigged_out = True  # out with it (Ext §17.11)
     world.tick()  # her tack and her sails' states are read at a tick
     driver = world.ship.sails[DRIVER]
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         driver.state = SailState.SET
         set_sheet_angle(world.ship, driver, math.radians(30.0))
@@ -5460,7 +5460,7 @@ def test_the_boom_goes_out_and_comes_in_with_the_driver_through_the_games_own_ro
     mizen": the driver down, then the boom served in and gone from the drawing before the course
     goes up. The view's frame and bounds are one through all of it."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -5476,7 +5476,7 @@ def test_the_boom_goes_out_and_comes_in_with_the_driver_through_the_games_own_ro
     states: dict[str, dict] = {}
     seen: list[tuple] = []
 
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
 
         def look() -> None:
             """The two doors the page reads, kept at each change of what they serve of the rig."""
@@ -6529,7 +6529,7 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
     """Through the game's own doors (`/api/ship`, `/api/state`), a tick on: the served stations
     and the state's yards and sails, and each brace and sheet on the rail or up in the rig."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -6538,7 +6538,7 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
     for sid in world.ship.groups["plain sail"]:
         world.ship.sails[sid].state = SailState.SET
     world.tick()
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         data = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
     assert data["snap"]["ship"]["tack"] == "larboard"
     got = run_js(tmp_path, data, LINE_ENDS)
@@ -6995,7 +6995,7 @@ def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
     snapshot without it, and the settee drawn aloft to starboard, slung to starboard of the mast,
     its sheet to the starboard block."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -7021,7 +7021,7 @@ def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
     def mine(data: dict) -> dict:
         return next(s for s in data["snap"]["sails"] if s["id"] == SETTEE)
 
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         before = served(client)
         world.submit("tack ship")
         for _ in range(600):

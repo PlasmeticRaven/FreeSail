@@ -717,7 +717,7 @@ def test_the_doors_ask_the_worlds_binding_and_a_held_station_is_refused_to_a_sec
     a station the ship has not got refused in words; the cadence a setting of the
     seating, said in the stationed line and in the brief."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -730,7 +730,7 @@ def test_the_doors_ask_the_worlds_binding_and_a_held_station_is_refused_to_a_sec
         ).write(records)
     driver = Driver(world, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with TestClient(app) as http:
+    with PageClient(app) as http:
         a = http.post(
             "/api/agents/master", json={"model_name": WEIGHTS, "door": "mcp", "cadence": "events"}
         ).json()

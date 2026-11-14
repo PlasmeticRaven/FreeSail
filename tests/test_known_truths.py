@@ -6631,7 +6631,11 @@ def test_truth_7b_108_py_m_freesail_opens_the_harbour_and_shows_a_started_game_a
                     assert proc.poll() is None and time.monotonic() < deadline
                     time.sleep(0.2)
             assert first.status_code == 307 and first.headers["location"] == "/harbour"
-            assert "the harbour" in c.get("/harbour").text
+            harbour_page = c.get("/harbour").text
+            assert "the harbour" in harbour_page
+            # the game's own page from here on, its origin and its mark (package 115)
+            mark = re.search(r'name="freesail-page" content="([^"]+)"', harbour_page).group(1)
+            c.headers.update({"x-freesail-page": mark, "origin": url})
             r = c.post(
                 "/api/harbour/start",
                 json={
@@ -6683,7 +6687,7 @@ def test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads
     form and written again, the same bytes; and the hand-made file itself read into the
     form and written with nothing changed is itself."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.core.world import Scenario, World
     from freesail.ui.console import start_world
@@ -6695,7 +6699,7 @@ def test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads
     driver = Driver(World(seed=1805, scenario=Scenario()))
     app = create_app(driver, harbour=Harbour(driver, settings_path=settings))
     hand = HARBOUR_ROOT / "data" / "scenarios" / "smack-falmouth.yaml"
-    with TestClient(app) as c:
+    with PageClient(app) as c:
         got = c.get("/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"})
         fields = got.json()["fields"]
         made = c.post("/api/harbour/scenario", json={"fields": fields, "name": "smack"}).json()
@@ -6747,8 +6751,8 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
     the desktop client's file (likewise); a game started from the harbour and saved, its
     log and its save hold no word of it; nor does anything the harbour says."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
     from messages_api import fake_store
+    from own_page import PageClient
 
     from freesail import settings as S
     from freesail.agents.api import KEYRING_ACCOUNT, KEYRING_SERVICE
@@ -6779,7 +6783,7 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
     driver = Driver(World(seed=1805, scenario=Scenario()))
     app = create_app(driver, harbour=Harbour(driver, settings_path=path))
     said: list[str] = []
-    with TestClient(app) as c:
+    with PageClient(app) as c:
         said.append(c.get("/api/harbour/state").text)
         assert "is in the credential store" in said[-1]
         r = c.post(
@@ -7678,7 +7682,7 @@ def test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_
         monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.null.Keyring")
         live = Live(port)
         try:
-            with httpx.Client(base_url=live.url, timeout=60) as c:
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
                 c.post(
                     "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
                 )
@@ -17395,3 +17399,279 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                 ), (name, tname)
                 read += 1
     assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+
+
+# ---------------------------------------------------------------------------
+# Package 115, parts A and B: what is unsafe (the cold review of milestone 7, 5.4, 5.7 and
+# 6.1). Truths 7-600 to 7-614. Every one comes in by the door the fault was met at: the
+# game's server run as the owner runs it (`py -m freesail`, its own process) and a real
+# socket or a real request to it, from a foreign page, with no mark, or as the game's own
+# page; a checkpoint or a save made by hand on the disk and loaded as a player loads it.
+# ---------------------------------------------------------------------------
+
+
+def _foreign_socket(url: str, **kw):
+    """A socket opened on the game's server as a web page of another site opens one."""
+    import asyncio
+
+    import websockets
+
+    async def go():
+        async with websockets.connect(url, open_timeout=30, **kw) as ws:
+            return await asyncio.wait_for(ws.recv(), 30)
+
+    return asyncio.run(go())
+
+
+def test_truth_7_600_a_socket_from_another_page_or_without_the_mark_gets_nothing_and_moves_nothing(
+    tmp_path,
+):
+    """Package 115, part A, item 4 (the review's 5.7; `refute-05` finding 1): a web page of
+    another site opens the game's socket. Before, it was given the hello (the ship, the
+    snapshot, the log) and its orders were obeyed, a file read among them. Now a socket
+    from a foreign origin, one from the game's own origin without the game's mark, and one
+    carrying a wrong mark are each refused at the handshake (403), before the hello; the
+    game's log has not a line more for them. The game's own page, its origin and its mark,
+    is given the hello as before."""
+    pytest.importorskip("websockets")
+    from own_page import LiveGame
+    from websockets.exceptions import InvalidStatus
+
+    with LiveGame(tmp_path) as game:
+        before = game.log_texts()
+        ws = f"ws://{game.own}/ws"
+        tried = [
+            (ws + f"?page={game.mark}", {"origin": "http://evil.example"}),  # the mark stolen
+            (ws, {"origin": f"http://{game.own}"}),  # its own origin, no mark
+            (ws + "?page=not-the-mark", {"origin": f"http://{game.own}"}),
+            (ws, {}),  # no page at all
+        ]
+        for url, kw in tried:
+            with pytest.raises(InvalidStatus) as refused:
+                _foreign_socket(url, **kw)
+            assert refused.value.response.status_code == 403, url
+        assert game.log_texts() == before
+        hello = json.loads(_foreign_socket(ws + f"?page={game.mark}", origin=f"http://{game.own}"))
+        assert hello["type"] == "hello" and "snapshot" in hello
+
+
+def test_truth_7_601_an_order_from_another_page_or_without_the_mark_is_refused_before_the_game(
+    tmp_path,
+):
+    """Package 115, part A, items 1 and 4: the routes that change anything are the game's
+    own page's. A POST of an order from a foreign origin, one with no mark (a program on the
+    machine, or a page whose request carries none), and one from a name that is not the
+    game's address (a page of another site made to resolve here: DNS rebinding) are each
+    refused in the game's words (403), and the game has not a line more: the order was not
+    given, the file it named not read. The same order from the game's own page is given.
+    The page itself is not served to the foreign name, so its mark cannot be read there."""
+    import httpx
+    from own_page import LiveGame
+
+    secret = tmp_path / "secret.txt"
+    secret.write_text("SECRET_TOKEN=abc123\n", encoding="utf-8")
+    order = {"text": f"read the standing orders from {secret}"}
+    with LiveGame(tmp_path) as game:
+        before = game.log_texts()
+        url = game.url + "/api/order"
+        refusals = [
+            httpx.post(url, json=order, headers={"origin": "http://evil.example"}, timeout=60),
+            httpx.post(
+                url,
+                json=order,
+                headers={"origin": "http://evil.example", "x-freesail-page": game.mark},
+                timeout=60,
+            ),
+            httpx.post(url, json=order, timeout=60),
+            httpx.post(
+                url,
+                json=order,
+                headers={"host": f"evil.example:{game.port}", "x-freesail-page": game.mark},
+                timeout=60,
+            ),
+            httpx.post(game.url + "/api/harbour/doors/1/stop", timeout=60),  # a body-less POST
+        ]
+        for r in refusals:
+            assert r.status_code == 403, r.text
+            assert "nothing was done" in r.json()["detail"] or "own address" in r.json()["detail"]
+            assert "SECRET" not in r.text
+        page = httpx.get(game.url + "/", headers={"host": f"evil.example:{game.port}"}, timeout=60)
+        assert page.status_code == 403 and game.mark not in page.text
+        after = game.log_texts()
+        assert after == before and not any("SECRET" in t for t in after)
+        with game.page() as c:
+            r = c.post("/api/order", json={"text": "hold"})
+        assert r.status_code == 200
+
+
+def test_truth_7_602_the_agents_doors_still_come_in_by_their_key_and_no_web_page_seats_one(
+    tmp_path,
+):
+    """Package 115, part A, the agents' doors: they have no page and carry no mark, and are
+    seated by the game's own rule with every later call carrying the seating's key (package
+    37g). A door on the machine (no origin, no mark, the game's address) is answered as
+    before; the same request from a web page of another site, or at a foreign name, is
+    refused before the game, so no page can seat a station."""
+    import httpx
+    from own_page import LiveGame
+
+    with LiveGame(tmp_path) as game:
+        door = httpx.get(game.url + "/api/agents", timeout=60)
+        assert door.status_code == 200 and "stations" in door.json()
+        foreign = httpx.post(
+            game.url + "/api/agents/captain",
+            json={"model_name": "a-page", "door": "api"},
+            headers={"origin": "http://evil.example"},
+            timeout=60,
+        )
+        assert foreign.status_code == 403
+        rebound = httpx.get(
+            game.url + "/api/agents", headers={"host": f"evil.example:{game.port}"}, timeout=60
+        )
+        assert rebound.status_code == 403
+        assert httpx.get(game.url + "/api/agents", timeout=60).json() == door.json()
+
+
+# The paths a player or a page might type, written as strings so that they mean the same on
+# Linux and on Windows: out by `..`, absolute, a Windows drive, a Windows share.
+_OUT_OF_THE_FOLDERS = (
+    "../outside",
+    "{tmp}/outside",
+    "C:\\Users\\someone\\outside",
+    "\\\\a-host\\a-share\\outside",
+)
+
+
+def test_truth_7_603_over_the_server_a_save_and_a_book_are_named_and_lie_in_the_games_folders(
+    tmp_path,
+):
+    """Package 115, part A, items 2 and 3 (`refute-05` finding 1): the order line over the
+    server, given by the game's own page. `save NAME` writes NAME.json and its checkpoint in
+    the saves place and the reply says where; a save by a path out of it (by `..`, absolute,
+    a Windows drive, a share) is refused in words that say where saves are kept, and nothing
+    is written. A book by such a path is refused before it is opened, so no line of it comes
+    back. The primer's own line, `read the standing orders from
+    data/standing_orders/starter.orders`, and the book by its name, are read as before."""
+    from own_page import LiveGame
+
+    secret = tmp_path / "outside.orders"
+    secret.write_text("SECRET_TOKEN=abc123\n", encoding="utf-8")
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+
+            def said(text: str) -> dict:
+                r = c.post("/api/order", json={"text": text})
+                assert r.status_code == 200, r.text
+                return r.json()
+
+            saved = said("save my-passage")
+            assert saved["kind"] == "driver.saved"
+            assert (game.saves / "my-passage.json").is_file()
+            assert (game.saves / "my-passage.checkpoint").is_file()
+            assert str(game.saves / "my-passage.json") in saved["text"]
+            before = sorted(p.name for p in tmp_path.rglob("*") if p.is_file())
+            for path in _OUT_OF_THE_FOLDERS:
+                given = path.format(tmp=tmp_path.as_posix())
+                refused = said(f"save {given}.json")
+                assert refused["kind"] == "driver.refused", given
+                assert "saved in the saves place" in refused["text"]
+                assert "save NAME" in refused["text"]
+                book = said(f"read the standing orders from {given}.orders")
+                assert book["kind"] == "driver.refused", given
+                assert "was not opened" in book["text"]
+            assert said(f"read the standing orders from {secret}")["kind"] == "driver.refused"
+            after = sorted(p.name for p in tmp_path.rglob("*") if p.is_file())
+            assert after == before
+            primer = said("read the standing orders from data/standing_orders/starter.orders")
+            assert primer["kind"] == "driver.standing_orders" and "Read 7" in primer["text"]
+            assert said("read the standing orders from fighting")["kind"] == (
+                "driver.standing_orders"
+            )
+        assert not any("SECRET" in t for t in game.log_texts())
+
+
+def test_truth_7_604_the_harbours_start_and_maker_open_files_in_the_games_folders_alone(tmp_path):
+    """Package 115, part A, item 2: the harbour's start and its scenario maker, from the
+    game's own page. A save in the saves place is taken up by its name; one outside the
+    saves place and the game's folder is refused in words that say the two ways it still
+    loads, and is not opened; so is a scenario, a ship's file or a book by a path out of the
+    folders, and a scenario the maker is to prove whose ship's file lies outside."""
+    from own_page import LiveGame
+
+    outside = tmp_path / "elsewhere"
+    outside.mkdir()
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+            assert c.post("/api/order", json={"text": "save kept"}).json()["kind"] == (
+                "driver.saved"
+            )
+            (outside / "stranger.json").write_bytes((game.saves / "kept.json").read_bytes())
+            started = c.post("/api/harbour/start", json={"load": "kept"})
+            assert started.status_code == 200, started.text
+            for choice in (
+                {"load": str(outside / "stranger.json")},
+                {"load": "..\\elsewhere\\stranger.json"},
+                {"scenario": str(outside / "s.yaml")},
+                {"scenario": "C:\\scenarios\\s.yaml"},
+                {"ship": "\\\\a-host\\share\\ship.yaml"},
+                {"scenario": "data/scenarios/lesson-falmouth.yaml", "standing_orders": "../x"},
+            ):
+                r = c.post("/api/harbour/start", json=choice)
+                assert r.status_code == 403, (choice, r.text)
+            words = c.post("/api/harbour/start", json={"load": str(outside / "stranger.json")})
+            assert "move it into the saves place" in words.json()["detail"]
+            assert "--load PATH" in words.json()["detail"]
+            fields = c.get(
+                "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+            ).json()["fields"]
+            fields["ship"]["file"] = str(outside / "ship.yaml")
+            proved = c.post("/api/harbour/scenario/prove", json={"fields": fields})
+            assert proved.status_code == 403 and "was not opened" in proved.json()["detail"]
+
+
+def test_truth_7_609_another_device_opens_the_printed_address_and_not_the_machines_programs(
+    tmp_path,
+):
+    """Package 115, part A, items 1 and the lead's ruling 6: bound beyond the machine
+    (`--host 0.0.0.0`), the terminal prints the address another device opens, which carries
+    the game's mark. A request from another device's address without it is refused, the
+    page among them; with it the page is served and keeps the mark for its later loads. The
+    harbour's routes that write the settings, the desktop client's file or a shortcut, or
+    start a door, are refused to the other device, mark or no mark, and answered on the
+    machine itself. The requests come through the whole app with another device's address
+    as the client (the container that runs the suite has no second device)."""
+    from own_page import ON_THE_MACHINE, PageClient
+
+    from freesail.ui.server import Driver, create_app, elsewhere_words
+
+    world = World(seed=1805, scenario=Scenario())
+    app = create_app(Driver(world), hosts=("0.0.0.0",), saves_dir=tmp_path / "saves")
+    mark = app.state.guard.token
+    (line,) = elsewhere_words(app.state.guard, "0.0.0.0", 8000, "/harbour")
+    assert f"/harbour?page={mark}" in line and "From another device" in line
+    from fastapi.testclient import TestClient
+
+    device = ("192.0.2.7", 50000)
+    with TestClient(app, base_url="http://192.0.2.1:8000", client=device) as other:
+        assert other.get("/harbour").status_code == 403
+        assert other.get("/api/state").status_code == 403
+        page = other.get(f"/harbour?page={mark}")
+        assert page.status_code == 200 and mark in page.text
+        assert other.get("/api/harbour/state").status_code == 200  # the cookie kept it
+        own = {"x-freesail-page": mark, "origin": "http://192.0.2.1:8000"}
+        for route, body in (
+            ("/api/harbour/settings", {"settings": {}}),
+            ("/api/harbour/desktop", {"stations": ["captain"], "write": True}),
+            ("/api/harbour/shortcut", {"write": True}),
+            ("/api/harbour/doors", {"door": "local", "station": "captain"}),
+        ):
+            r = other.post(route, json=body, headers=own)
+            assert r.status_code == 403 and "machine the game runs on" in r.text, route
+        assert other.post("/api/order", json={"text": "hold"}, headers=own).status_code == 200
+    with PageClient(app, client=ON_THE_MACHINE) as here:
+        r = here.post("/api/harbour/shortcut", json={})
+        assert r.status_code == 200

@@ -12,7 +12,7 @@ import io
 from datetime import datetime, timedelta
 
 import pytest
-from fastapi.testclient import TestClient
+from own_page import PageClient
 
 from freesail.agents import Fake, Harness, SamplingPolicy, Station, call, reply
 from freesail.agents.agent import WATCHER_BRIEF, Authority
@@ -239,7 +239,7 @@ def test_the_server_sends_rollups_at_sixty_and_events_below():
 def test_the_server_takes_speed_to_a_thousand_and_serves_the_store_by_ticks():
     driver = Driver(frigate())
     app = create_app(driver)
-    with TestClient(app) as client:
+    with PageClient(app) as client:
         r = client.post("/api/driver", json={"action": "speed", "value": 6000})
         assert r.json()["compression"] == 1000.0  # the most there is since b9052c5
         client.post("/api/order", json={"text": "set plain sail"})

@@ -902,6 +902,10 @@ class Console:
         self.desk = router.desk  # type: ignore[attr-defined]
         app = FastAPI(title="FreeSail agents")
         app.include_router(router)
+        # the doors' own rule (package 115, part A): no web page seats a station here either
+        from freesail.ui.guard import Guard, guard_app
+
+        guard_app(app, Guard((host,)))
         server = uvicorn.Server(uvicorn.Config(app, host=host, port=port, log_level="warning"))
         threading.Thread(target=server.run, daemon=True).start()
         return server

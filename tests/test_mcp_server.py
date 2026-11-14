@@ -25,9 +25,9 @@ anyio = pytest.importorskip("anyio")
 pytest.importorskip("mcp")
 pytest.importorskip("fastapi")
 
-from fastapi.testclient import TestClient  # noqa: E402
 from mcp import Client  # noqa: E402
 from mcp_types import Implementation  # noqa: E402
+from own_page import PageClient  # noqa: E402
 
 from freesail.agents import OPT_OUT_TOKEN, TOOLS, consent, tools  # noqa: E402
 from freesail.agents import mcp_server as M  # noqa: E402
@@ -73,12 +73,12 @@ class Game:
             saves_dir=tmp_path / "saves",
             say=self.said.append,
         )
-        self.http = TestClient(app)
+        self.http = PageClient(app)
 
     def bridge(self, identity: str = WEIGHTS, wait: float = 5.0, **kw: Any) -> M.Bridge:
         told: list[str] = []
         b = M.Bridge(
-            GameClient("http://testserver", http=self.http),
+            GameClient("http://localhost:8000", http=self.http),
             identity,
             wait=wait,
             tell_owner=told.append,
@@ -166,7 +166,7 @@ def test_the_bridge_lists_package_27s_tools_with_their_own_words_and_say(tmp_pat
     assert listed["say"].description == M.SAY_DESCRIPTION
     assert g.world.agents == {}  # listing the tools stations nobody
     # a bridge started with `--station director` lists the director's own tools too (50)
-    d = M.Bridge(GameClient("http://testserver", "director", http=g.http), WEIGHTS, wait=5.0)
+    d = M.Bridge(GameClient("http://localhost:8000", "director", http=g.http), WEIGHTS, wait=5.0)
     listed = {t.name for t in session(d, script)}
     assert "world_order" in listed and "truth" in listed
     assert listed == {*tools.tool_names(pictures=True, director=True), "say"}
@@ -1106,7 +1106,7 @@ def test_the_held_call_waits_under_the_desktop_clients_cut_and_wait_overrides_it
     the Western Islands run cut at sixty (package 68, R-25), so it holds one for 50 by
     default and comes back with the honest digest before the cut; `--wait` still sets it,
     up to the ceiling."""
-    game = GameClient("http://testserver")
+    game = GameClient("http://localhost:8000")
     assert M.Bridge(game, WEIGHTS).wait == M.MCP_WAIT_S == 50.0 < 60
     assert M.Bridge(game, WEIGHTS, wait=200).wait == 200
     assert M.Bridge(game, WEIGHTS, wait=10**6).wait == M.WAIT_CEILING_MAX_S
