@@ -27643,6 +27643,115 @@ where it was mended, where else the cause was looked for, and the test at that l
   ship by `vessels.find` and the lookout's words, without asking whether he knows of her.
 - *Test*: the ship-name test, `knows_of` by its cases.
 
+### The fourth reading of 96ccd4d2, ruled: one cause, one table (2026-11-14)
+
+The lead's fourth reading, with the owner's rulings A to D. Each cause below as before: the
+cause in a line, where it was mended, where else it was looked for, and the test.
+
+**The table first, on 96ccd4d2** (ruling A: `tests/test_sleep_and_wake.py`, 36 cells: she
+begins at anchor, lying to by the order or under way; with no far captain, one who plans a
+passage, or one bound nowhere; asleep a minute or across a turn of the tide; with and without a
+checkpoint written and read while she sleeps). On 96ccd4d2's sleep and wake, 32 of the 36 cells
+failed, in four groups:
+- at anchor under a captain who plans a passage or is bound nowhere: asleep she was under way,
+  awake at anchor, the anchor never weighed (item 2);
+- every lying-to cell: `how_she_lies` answered "under way" of a ship hove to by the order, her
+  heave-to not read (item 1);
+- under way with no far captain, or bound nowhere: asleep she lay to (the kept hull's rule),
+  awake under way again;
+- under way under a captain who plans a passage: the wake said his book unloaded and loaded
+  again (item 3's kind: the wake adding lines).
+
+**How she lies, read from her heave-to** (items 1 and the lying-to group).
+- *Cause*: `_sail_state_of` read a ship hove to by the order as under way: her heave-to record
+  (`ship.extra["hove_to"]`) was not asked.
+- *Mended*: `crews._sail_state_of` answers "lying to" where she is hove to, before the
+  manoeuvre's reading; `how_she_lies` asks it of every awake hull.
+- *Where else*: the wake's `_to_full`, which named a topsail where the far body's state and
+  the near one's differed: now no sail is named where either is lying to; she is brought to it
+  by the evolutions (below).
+- *Test*: the table's lying-to cells; `test_how_she_lies_is_one_answer_from_her_own_state`.
+
+**Her far body laid as she lies, and her tackle following her place** (items 1 and 2).
+- *Cause*: at the demotion, a hull's far plan was kept or laid without asking how she lay: a
+  kept hull got an anchor or a lie-to by rule, and a ship laid to sail kept her anchor marked
+  down.
+- *Mended*: `crews.demote` asks `how_she_lies` before she sleeps: a hull with no far captain
+  gets the plan of how she lies (`_plan_as_she_lies`: the anchor, lying to, or her course held
+  sixty miles on); with a captain, his `fold_back` plans her, and the leg of an anchor she no
+  longer rides by is struck. `crews.tackle_as_she_lies`, at the demotion and at every far tick
+  after the mirror: a sleeping hull that does not lie at anchor has no anchor down (weighed and
+  stowed, its ground cleared).
+- *Where else*: `far_tick`'s own anchoring at a track's end, which reads the plan (kept while
+  she sleeps): left.
+- *Test*: the table (her tackle agrees with her place, after each cell and over the next half
+  hour); `test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed`, which
+  now asks under way of a hull with no far brain (before, she was laid to).
+
+**The wake brings her to lie by the orders' roads** (item 1, ruling A's "by the road the order
+`heave to` takes").
+- *Cause*: the wake set a sail where her far body lay to, and she ran (3,651 m).
+- *Mended*: `crews.lies_as_her_far_body`: lying to by the `heave_to` evolution, out of it by
+  `fill_away`, her hands working each; at anchor by `rides_as_she_lay`. Where no anchor can hold
+  her, `rides_as_she_lay` gives the first anchor's reason (before, the last's) and she heaves to
+  by the same road: "No anchor will hold her here (...); she heaves to." Her heading, hove to,
+  is kept as she lay to the wind (`hove_to["off_at_sleep"]`; the far body's own heading is the
+  wind and a beam, and laid to it she fell off).
+- *Test*: the table; `test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so`, now
+  asking her hove to by the evolution within twenty minutes, no sail named.
+
+**The refresh at the wake without the tick's speech** (item 3).
+- *Cause*: `woken_true` ran `_tick_tide` with the tide's flag as she fell asleep, so the turn of
+  the tide while she slept was said at the wake as a swing.
+- *Mended*: `crews.woken_true` clears `_tide_was_flood` and her dragging marks before the
+  refresh, so it brings the water true and says nothing.
+- *Where else*: the far tick refreshes none of these (above); the sea and the weather are not
+  run at the wake.
+- *Test*: the table's "a turn of the tide" cells (the wake adds no line but its own).
+
+**Her captain's state at the wake** (the lines the table found).
+- *Cause*: `fold_in` re-entered the far brain's state at every wake, his book unloaded and loaded
+  again and said; and a near captain with no state of his own was given the far body's default
+  'on passage', which filled her away from lying to.
+- *Mended*: `brains.fold_back` keeps the two states as she fell asleep; `fold_in` enters the
+  far state only where the far captain changed it while she slept, and then quietly
+  (`Captain._enter(state, quiet=True)`: the book loaded without its line).
+- *Test*: the table's lying-to cells bound nowhere, and every cell's "no line but its own".
+
+**Does he know of this ship, without the log** (item 4, ruling B).
+- *Cause*: `knows_of` searched his log for her name, and matched a name within any text.
+- *Mended*: `knowledge.knows_of`: his own ships (the one he commands, one he left, one given
+  him), or a sail in sight whose name his lookout has made out (`named_in_sight`: given by hail,
+  private signal or pendant, or made out in the lookout's words as a whole word). Anything else
+  is "You know of no ship called the ... hereabouts"; a sail in sight not yet named is answered
+  by what is made out of her ("The brig is no ship of yours."), never by her name.
+- *Where else*: as before, `send the boat to`, `come alongside` and `pull for` find a ship
+  without asking (other packages' orders): found, not changed.
+- *Test*: `test_he_knows_of_his_own_ships_and_of_a_sail_in_sight_whose_name_is_made_out`, by
+  ruling B's cases (his three kinds, a named sail, an unnamed one, a ship sharing a word with a
+  port and with a sail, a ship met and gone).
+
+**The grammar over the data** (item 5, ruling C).
+- *Cause*: the name's shape was written from the hand's table, not from the names the game has.
+- *Mended*: `transfer.name_shaped` takes one word alone (a role that is a title's word:
+  'lieutenant') and words of any alphabet ('Hervé'), with a hyphen or an apostrophe within;
+  `_answers_to` answers to his whole name as the muster drew it ('Silas Pascoe', with a title or
+  without; `whole_name`).
+- *Test*: `test_every_person_of_every_company_is_answered_by_the_grammar`, over the twelve
+  company files: every person but the player (the flag party is of no company), said by
+  address, whole name, surname, title and surname, and role with 'the' and without, is read as
+  one name and answered by him alone, or refused naming each who shares the words. The hand's
+  table keeps the good shapes nobody answers to ('Mr Smith-Jones', 'the 2nd mate', 'the
+  master-at-arms', three-word names), and 'john smith' for Mr John Smith is its own test.
+
+**His words given back as he typed them** (item 6, ruling D).
+- *Cause*: the order's object is his words lower-cased and read away, and the refusals gave it.
+- *Mended*: `Order.said` keeps the words as typed; `command.said_after_verb` gives both orders
+  the words after the verb from it. "Who is meant by '...'?" names his part as typed and says
+  what may be said, in the ship's voice; "One order at a time: the transfer to the ... first,
+  and '...' after it."; the wake's lines say what the ship does, no builder's terms.
+- *Test*: the list's table, played through the order.
+
 
 
 
