@@ -564,7 +564,15 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
     if not lineage or lineage[-1] != here:
         lineage.append(here)
     world.played_under = lineage
-    chart_name = getattr(world.scenario, "chart", None) or world.scenario.region
+    # the chart in play as the World takes it (package 45's `chart_holding`): a scenario
+    # that names a region has the chart that holds it, and a checkpoint loaded so (the
+    # chart session's mend of 2026-11-13; before it a `region:` game came back from its
+    # checkpoint with that one region, and lost the water it began with)
+    chart_name = getattr(world.scenario, "chart", None)
+    if not chart_name and world.scenario.region:
+        from freesail.world.chart import chart_holding
+
+        chart_name = chart_holding(world.scenario.region)
     is_world = isinstance(world, World)
     if chart_name and is_world:
         from freesail.world.chart import load_chart
