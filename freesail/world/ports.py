@@ -666,29 +666,25 @@ class UnreadableMark(ValueError):
     cannot read was skipped without a word, so a file described legs no ship sailed)."""
 
 
-def _check_track_marks(tracks: dict[str, list[str]], chart: Any, where: str) -> None:
-    """Every mark of a port's tracks readable as the planner reads it (`captains._mark`: a
-    feature by its id or name, else a position in the dialect's one form); an
-    `UnreadableMark` in words naming the file and the mark otherwise. Without a chart, a
-    mark is a feature's id or name the chart is not here to judge, unless it reads as a
-    position or begins with a figure, when it must be a position."""
+def _check_track_marks(tracks: dict[str, list[str]], where: str) -> None:
+    """Every mark of a port's tracks written as the planner reads it (`captains._mark`): a
+    feature by its id or name, or a position in the dialect's one form. A mark that begins
+    with a figure is a position and must read as one; an `UnreadableMark` in words naming the
+    file and the mark otherwise. Whether a named feature is on the chart is the audit's to
+    say (`f-mark`), since a world on a chart of one region loads every port's file."""
     for which, marks in tracks.items():
         for words in marks:
             text = " ".join(str(words).split())
-            if chart is not None and (chart.feature(text) or chart.find_feature(text)):
+            if not text[:1].isdigit():
                 continue
             try:
                 parse_position(text)
-                continue
             except ValueError:
-                pass
-            if chart is None and not text[:1].isdigit():
-                continue
-            raise UnreadableMark(
-                f"{where}: the {which} track's mark '{text}' is neither a feature of the chart "
-                "nor a position in the form the orders read (e.g. 37 03.00 N 15 18.50 E); a "
-                "mark the planner cannot read would be skipped and the leg not sailed"
-            )
+                raise UnreadableMark(
+                    f"{where}: the {which} track's mark '{text}' is not a position in the form "
+                    "the orders read (e.g. 37 03.00 N 15 18.50 E); a mark the planner cannot "
+                    "read would be skipped and the leg not sailed"
+                ) from None
 
 
 def load_port(
@@ -766,7 +762,7 @@ def load_port(
             )
     nations = _nations(doc.get("nation"), where)
     tracks = {str(k): [str(m) for m in (v or [])] for k, v in (doc.get("tracks") or {}).items()}
-    _check_track_marks(tracks, chart, where)
+    _check_track_marks(tracks, where)
     return Port(
         reach_nm=float(doc.get("reach_nm", IN_PORT_NM)),
         id=str(doc.get("id") or p.stem),

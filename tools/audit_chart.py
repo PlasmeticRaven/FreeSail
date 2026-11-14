@@ -995,6 +995,25 @@ def check_ports(
             audit.add(Finding("f", f"f-load:{pid}", "", 1, f"the port file does not load: {e}"))
             continue
         home = chart.region_at(port.anchorage.position) or ""
+        # a track's mark the whole chart has not, by its id or its name: the planner would
+        # skip it without a word (the chart session's tracks step)
+        missing = [
+            str(words)
+            for marks in port.tracks.values()
+            for words in marks
+            if not str(words)[:1].isdigit()
+            and not (chart.feature(" ".join(str(words).split())) or chart.find_feature(str(words)))
+        ]
+        if missing:
+            audit.add(
+                Finding(
+                    "f",
+                    f"f-mark:{pid}",
+                    home,
+                    len(missing),
+                    f"{port.name}'s tracks name a mark the chart has not: {missing[0]}",
+                )
+            )
         for which in ("outer_road", "anchorage", "mooring", "shore"):
             spot = getattr(port, which)
             p = spot.position
