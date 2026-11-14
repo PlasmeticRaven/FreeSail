@@ -247,6 +247,8 @@ def test_the_refusals_in_words():
         command.take_up(w, me, hull)
     e = w.submit("take command of her")
     assert e.kind == "order.rejected" and "is not yours" in e.text
+    # it says what is so, and names no road he has not got (the cut's reading, item 6)
+    assert e.text.endswith("is not yours: she is her owners', and not given you."), e.text
     command.give(w, b, me, by="the test")
     with pytest.raises(command.CommandError, match="lies at no anchor in a port"):
         command.take_up(w, me, hull, how=command.LAID_UP)

@@ -799,15 +799,19 @@ def test_he_knows_of_his_own_ships_and_of_a_sail_in_sight_whose_name_is_made_out
 
 
 def test_the_refusals_played_by_the_order():
-    """The lead's second reading, item 6, played and not patched: a King's ship's company is
-    turned over by the Admiralty's order (the Sherbourne a King's cutter by her papers, the
-    Fly's hands refused her); a prisoner gives no order to a company; a ship not his is not
-    his to man; each by the order at his prompt, nothing changed."""
+    """The lead's second reading, item 6, played and not patched: a merchantman's hands are not
+    entered in a King's ship by a transfer (the Sherbourne a King's cutter by her papers, the
+    Fly's hands refused her: the cut's reading, item 6, "by the Admiralty's order" being untrue
+    of merchant hands); a prisoner gives no order to a company; a ship not his is not his to
+    man; each by the order at his prompt, nothing changed."""
     w, cutter, fly, me = cutter_and_the_fly_taken_up(papers={"service": "kings"})
     was = len(TR._hands(cutter)), len(TR._hands(fly))
     e = w.submit("transfer two hands to the Sherbourne")
     assert e.kind == "order.rejected"
-    assert "turned over to the Sherbourne by the Admiralty's order" in e.text, e.text
+    assert e.text.endswith(
+        "The Fly's hands are signed on her articles; a transfer does not enter them in the "
+        "King's ship Sherbourne."
+    ), e.text
     _wo(
         w,
         'ship: a brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
@@ -1075,3 +1079,24 @@ def test_a_transfer_is_refused_while_either_ship_is_at_quarters(which):
     assert e.kind == "order.rejected", e.text
     assert f"The {which} is at quarters" in e.text and "Secure the guns, or pipe down" in e.text
     assert (len(TR._hands(cutter)), len(TR._hands(fly))) == hands
+
+
+def test_the_words_of_the_cuts_reading():
+    """The cut's reading, item 6: a rating none of whom is fit and free is said as such; a
+    hyphened number is a count; a man aboard who may not go is told why (you yourself, her
+    cook among her idlers, one of her hands)."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    e = w.submit("transfer two marines from the Fly to the Sherbourne")
+    assert (
+        e.kind == "order.rejected"
+        and "The Fly has no marines fit and free; two were asked." in (e.text)
+    ), e.text
+    every, by_rating, count, rest = TR.read_counts("twenty-six hands")
+    assert (count, rest) == (26, []), (count, rest)
+    e = w.submit("transfer Mr Bowen from the Fly to the Sherbourne")
+    assert e.kind == "order.rejected" and "You are not moved by a transfer" in e.text, e.text
+    e = w.submit("transfer the cook from the Fly to the Sherbourne")
+    assert e.kind == "order.rejected" and "her cook, is one of the Fly's idlers" in e.text, e.text
+    hand = next(s for s in TR._sail_hands(fly))
+    e = w.submit(f"transfer {hand.name} from the Fly to the Sherbourne")
+    assert e.kind == "order.rejected" and "her hands go by their number" in e.text, e.text

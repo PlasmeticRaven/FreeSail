@@ -125,10 +125,7 @@ def _his_to_take(root: Any, person: Any, hull: Any) -> str | None:
 
     if _service(hull) == KINGS:
         return f"The {_name(hull)} is the King's; she is given by an order, not taken."
-    return (
-        f"The {_name(hull)} is not yours: she is her owners'; she must be bought, or given you "
-        "by her owners' word."
-    )
+    return f"The {_name(hull)} is not yours: she is her owners', and not given you."
 
 
 def _in_a_set(root: Any, hull: Any) -> str | None:
@@ -137,13 +134,17 @@ def _in_a_set(root: Any, hull: Any) -> str | None:
     vessel = getattr(hull, "vessel", None)
     hid = str(hull.id)
     if vessel is not None and str(getattr(vessel, "squadron", "") or ""):
-        return f"The {_name(hull)} is in a squadron or a convoy; shift the broad pendant first."
+        return (
+            f"The {_name(hull)} is in a squadron or a convoy; her command is the squadron's, "
+            "and is not taken up by itself."
+        )
     for v in list(getattr(root.sea_vessels, "vessels", []) or []):
         if v.done or v is vessel:
             continue
         if str(getattr(v, "under_orders_of", "") or "") == hid:
             return (
-                f"The {v.name} is under the {_name(hull)}'s orders; put her under nobody's first."
+                f"The {v.name} is under the {_name(hull)}'s orders; a ship with others under her "
+                "orders is not taken up, nor left, by itself."
             )
     return None
 

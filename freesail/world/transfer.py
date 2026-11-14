@@ -218,7 +218,8 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
         if low in _PEOPLE:
             rest.append("the people")
             continue
-        ws = low.split()
+        # a number written with its hyphen ('twenty-six hands') read as one written without
+        ws = low.replace("-", " ").split() if _HYPHENED_NUMBER.match(low) else low.split()
         got = numbers.read(ws, 0)
         if got is not None and got[1] > 0:
             n, used = int(got[0]), got[1]
@@ -237,6 +238,11 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
 
 
 _HANDS = frozenset({"the hands", "all the hands", "all hands"})
+# a part that opens with a hyphened number word ('twenty-six', 'thirty-one')
+_HYPHENED_NUMBER = re.compile(
+    r"^(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)-"
+    r"(one|two|three|four|five|six|seven|eight|nine)\b"
+)
 _PEOPLE = frozenset({"the people", "all the people", "her people"})
 
 
@@ -643,13 +649,19 @@ def _company_his(giver: Any, receiver: Any) -> None:
             f"The {_name(giver)}'s people are borne on the King's books; they are turned over to "
             "a King's ship alone, by the Admiralty's order."
         )
-    if _service(giver) == "kings" or _service(receiver) == "kings":
+    if _service(giver) == "kings":
         # §6.3: a King's ship's company is turned over by an order alone (the director's
-        # form, not built in this step); a merchantman's hands do not enter a King's ship by
-        # signing her articles
+        # form, not built in this step)
         raise TransferError(
             f"The {_name(giver)}'s people are turned over to the {_name(receiver)} by the "
             "Admiralty's order, not by her captain's."
+        )
+    if _service(receiver) == "kings":
+        # a merchantman's hands are on her articles, not the King's books (the cut's reading,
+        # item 6: "by the Admiralty's order" was said of them, untrue)
+        raise TransferError(
+            f"The {_name(giver)}'s hands are signed on her articles; a transfer does not enter "
+            f"them in the King's ship {_name(receiver)}."
         )
 
 
@@ -698,7 +710,7 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
         key = " ".join(words.replace('"', " ").split()).lower()
         found = [p for p in hers if _answers_to(p, key, whole_name(giver, p))]
         if not found:
-            raise TransferError(f"Nobody of the {_name(giver)}'s answers to '{words}' aboard her.")
+            raise TransferError(_why_not_moved(root, giver, key, words, me))
         if len(found) > 1:
             names = ", ".join(p.name for p in found[:-1]) + f" and {found[-1].name}"
             raise TransferError(f"{names} each answer to '{words}'; name the one who goes.")
@@ -719,6 +731,47 @@ def whole_name(hull: Any, person: Any) -> str:
     crew = (getattr(getattr(hull, "ship", None), "extra", None) or {}).get("crew")
     sailor = crew.by_id.get(sid) if crew is not None and sid else None
     return str(getattr(sailor, "name", "") or "")
+
+
+def _why_not_moved(root: Any, giver: Any, key: str, words: str, me: Any) -> str:
+    """The refusal of a name no person of hers to be moved answers to (the cut's reading, item
+    6: "nobody answers" was said of a man aboard who may not go): him, where he is aboard and
+    why he does not go (you yourself; a prisoner; another ship's man; one of her idlers, who
+    stay with her; one of her hands, who go by their number); else that nobody answers."""
+    gid = str(getattr(giver, "id", ""))
+    registry = getattr(root, "registry", None)
+    aboard = list(registry.aboard(gid)) if registry is not None else []
+    for p in aboard:
+        if not _answers_to(p, key, whole_name(giver, p)):
+            continue
+        if p is me:
+            return (
+                "You are not moved by a transfer: go across in the boat yourself, or take "
+                "command of her."
+            )
+        if getattr(p, "confined_to", ""):
+            return (
+                f"{p.name} is a prisoner aboard the {_name(giver)}; her prisoners stay where "
+                "they are."
+            )
+        if str(getattr(p, "home", "") or "") != gid:
+            return f"{p.name} is not of the {_name(giver)}'s company; he goes home by his own ship."
+    crew = (getattr(getattr(giver, "ship", None), "extra", None) or {}).get("crew")
+    from freesail.crew.model import Station
+
+    for s in getattr(crew, "sailors", []) or []:
+        trade = str(getattr(s, "trade", "") or "").lower()
+        name = " ".join(str(s.name).lower().replace(".", " ").split())
+        if key.removeprefix("the ") != trade and key.replace(".", " ") != name:
+            continue
+        who = f"{s.name}, her {trade}," if trade else s.name
+        if s.station is Station.IDLERS:
+            return f"{who} is one of the {_name(giver)}'s idlers, who stay with her."
+        return (
+            f"{who} is one of the {_name(giver)}'s hands; her hands go by their number "
+            "('transfer two hands')."
+        )
+    return f"Nobody of the {_name(giver)}'s answers to '{words}' aboard her."
 
 
 def _answers_to(person: Any, key: str, whole: str = "") -> bool:

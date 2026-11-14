@@ -258,9 +258,7 @@ def _the_one_he_means(root: Any, known: list[Any], said: str) -> Any:
     pos = getattr(aboard, "position", None) or getattr(root, "position", None)
     if pos is not None:
         near = [
-            v
-            for v in known
-            if bearing_and_distance(pos, v.position)[1] / 1852.0 <= BOAT_BETWEEN_NM
+            v for v in known if bearing_and_distance(pos, v.position)[1] / 1852.0 <= BOAT_BETWEEN_NM
         ]
         if len(near) == 1:
             return near[0]

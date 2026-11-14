@@ -27887,6 +27887,52 @@ back to a ship of his that has lain asleep, on the cut):
 The inventory sent to the lead (the states of each body, every conversion with its function
 and line, the pairs, each rig's heave-to) is the new package's first page.
 
+**The cut read independently, and the package's own list** (the lead's last list; each the
+brief's steps 1 and 2).
+1. *A person's muster row travels with him.* Cause: the take-up, the transfer and a boat's
+   company joining rehomed the person and left his row in the old muster, read by id in the
+   new (a wound landed on her late master). Mended: `Registry.rehome(..., row=True)` moves
+   the row (`musters.take_out`, `musters.join`), his `sailor_id` true in the new; called by
+   those three. The prize master's road (74's) is not given it: with it, the pinned prize
+   counts moved (a captor's 256 to 255, a prize's 8 to 9), so it stops there, told to the
+   lead. Test: both musters' own readings after the take-up and a transfer by name, his whole
+   name read from the new muster, a wound after the move his.
+2. *What she keeps counted as her want is.* Cause: the want is one watch at her sail
+   stations, the keeps were every hand off the quarterdeck. Mended: `_sail_hands` (her fit
+   hands at her sail stations; a ship laid up, any hand, her ship-keepers), in the refusal
+   and in 'the hands' drawn. Test: one more than she can spare refused, the words counting
+   her sail hands; that many left her after the most she can spare.
+3. *Two ships of one name.* Cause: the first of a name was taken, then asked whether he knows
+   of her. Mended: every ship of the name asked; of two of his, the one he is aboard, else
+   the one within a boat's pull, else a question in words. Test: a stranger "Fly" first and
+   his own in Carrick Road.
+4. *A transfer at quarters* (ruled): refused while either ship is at quarters, saying what to
+   do first. Test: each ship at quarters.
+5. *The take-up's anchor state* (ruled): a ship riding by her own ground keeps her tackle
+   exactly (moored or at one anchor); else an anchor already down is laid again before a
+   stowed one; the let-go order's own warnings in her log. Tests: a brig moored by her small
+   bower and sheet anchor; an anchor down out of reach preferred; two metres of water warned.
+6. *Words*:
+   - a rating none of whom is fit and free ("no marines ... two were asked");
+   - a hyphened number a count ("twenty-six hands");
+   - a man aboard who may not go told why (you yourself; a prisoner; another ship's man; her
+     idlers stay with her; her hands go by their number);
+   - merchant hands to a King's ship told truly (on her articles, not entered by a transfer;
+     `test_the_refusals_played_by_the_order`'s assertion follows the mended words);
+   - the take-up's refusals say only what is so (her owners' and not given you; a
+     squadron's command; a ship with others under her orders);
+   - the primer's example made true (an errand for the old ship given under way; at her
+     anchor she stays in her officer's charge).
+
+**Listed, not built** (the reader's, for the package of the two bodies or the owner's list):
+- stepping aboard a ship not his lays her as she lay (ruled; kept);
+- the kept-hull empty-plan rule reaches every crewed brainless ship (the design's floor; no
+  scenario moved);
+- `come alongside the Fly` chooses a stranger of the name three leagues off;
+- the Fly's long-boat cannot be manned;
+- a far order anchors a ship where the water dries;
+- the prize master's row stays in his captor's muster (item 1; pins).
+
 
 
 ## Package 105: Sicily and Malta (2026-11-12)

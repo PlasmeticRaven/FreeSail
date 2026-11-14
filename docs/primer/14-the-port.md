@@ -442,8 +442,10 @@ stand on her deck say `take command of her`. From that order she is your ship: h
 captain is you, your journal and your record come with you, the prompt and the play log are hers,
 and both ships' logs say so. Your old ship is left to her senior officer, the first lieutenant in
 a King's ship, unless you lay her up at the port's anchorage (`take command of her, and lay the
-Amazon up`) or name whom she is left to and what she is to do (`take command of her, and leave
-the Amazon to Mr Pearce to cruise off the Lizard within 10 miles`). Her purse, her hold, her
+Amazon up`) or name whom she is left to (`take command of her, and leave the Amazon to Mr
+Pearce`). Lying at her anchor she stays there in his charge, for nobody aboard her weighs of his
+own accord; under way you may give her an errand as well (`..., and leave the Amazon to Mr Pearce
+to cruise off the Lizard within 10 miles`). Her purse, her hold, her
 papers, her stores and her standing orders stay with her: they are hers. A ship not given you,
 a ship in a squadron, a ship whose captain's station is held, and a ship you are not aboard are
 refused in words. The save keeps the game as it began, and the change is your order in it, so a
