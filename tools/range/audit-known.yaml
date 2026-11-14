@@ -558,35 +558,35 @@ known:
   years: 1792-1795, 1806-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so on days it was not in being it stands in the nations' table, holds whatever ports the data gives it, and may have a vessel drawn under it where it holds one (a vessel so drawn in a whole world is evidence here and no finding of its own)
   most: 1
 - key: r-nation:etruria
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1792-1801, 1807-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so on days it was not in being it stands in the nations' table, holds whatever ports the data gives it, and may have a vessel drawn under it where it holds one (a vessel so drawn in a whole world is evidence here and no finding of its own)
   most: 1
 - key: r-nation:liguria
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1792-1797, 1805-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so on days it was not in being it stands in the nations' table, holds whatever ports the data gives it, and may have a vessel drawn under it where it holds one (a vessel so drawn in a whole world is evidence here and no finding of its own)
   most: 1
 - key: r-nation:order-of-st-john
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1798-1825
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so on days it was not in being it stands in the nations' table, holds whatever ports the data gives it, and may have a vessel drawn under it where it holds one (a vessel so drawn in a whole world is evidence here and no finding of its own)
   most: 1
 - key: r-nation:papal-state
   what: stands in the table, at peace or at war, on days the reference has it not in being
   years: 1798-1800, 1809-1814
   basis: reference
   owner: a judgement to be read against a source
-  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so that it holds its ports, stands in the served table, and has vessels drawn under it wherever it holds a port in the world (seen in the whole worlds off Leghorn, an Etrurian and a Ligurian trader in years before either state was; a vessel so drawn is evidence here and no finding of its own)
+  reason: the reference gives the nation a beginning or an end within the range; the table has it on every day, so on days it was not in being it stands in the nations' table, holds whatever ports the data gives it, and may have a vessel drawn under it where it holds one (a vessel so drawn in a whole world is evidence here and no finding of its own)
   most: 1
 - key: r-port-blockade:cadiz
   what: blockaded by britain, whom the reference has at peace with spain

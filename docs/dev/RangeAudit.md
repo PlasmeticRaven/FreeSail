@@ -45,13 +45,18 @@ business's tables are keyed by, every flag an occasion of a nation's colours nam
 vessel under a nation the reference has not in being is said under that nation's own
 finding (`r-nation:`), which is its cause: the business draws under whatever nation holds
 a port in the world. What a world adds to the list is only what turns on no draw: that a
-scenario's block of wars is read by nothing, and a disagreement of the two roads, among
-them a vessel the tables do not admit (a nation none of them names, a fit that is not her
-description's, a flag no occasion names) and a squadron drawn that the rule does not
-admit. A squadron the rule admits and a world does not draw is the draw's (the business
-draws none where its plan would cross the land) and is said, not found. What the worlds
-happen to show of a finding already made is printed apart, as evidence. The list is the
-same at any seed (`--seed`; the slow tier tries three).
+scenario's block of wars is read by nothing, a day the game could not begin a world on at
+all (`a-no-world:`, with the game's own words: the audit does not fall with it), and a
+disagreement of the two roads, among them a vessel with a fit that is not her
+description's or under a flag no occasion names, and a blockade. A blockade is found both
+ways, drawn against the rule or admitted and not drawn, because it is no draw: the gates
+of `business._blockades` are the port within the region, the war, the entry's dates, the
+chart's feature and the guard of the land, and the seed picks only the ships' names; one
+the rule admits and a world has not is a fact of the chart's or a port's data, or a fault
+in the drawing. No vessel can be drawn under a nation the table has not
+(`ships.vessel_from_spec` refuses her and the world is not begun), so there is no finding
+of that name. What the worlds happen to show of a finding already made is printed apart,
+as evidence. The list is the same at any seed (`--seed`; the slow tier tries three).
 
 **The days.** A day in every year of the range (1 July, JUDGEMENT) and the days either side of every date the data itself names: a port's dated rows, a war's beginning, the table's own day, a blockade's dates, a prize scheme's, and the first and last years of a flag, a fashion, a national day and a light. That is 202 days (168 of the data's naming, 34 of the years'). The findings that rest on the reference are looked for on those days and on the days either side of the reference's own dates as well, 323 in all; the mechanical findings never on the reference's days. `--full` adds every national day in every year of the range with the day after it (1146 days; 1256 with the reference's). Whole worlds: 4 in the sampled sweep (off Ushant on 1 July 1792, off Rochefort on 1 July 1802 and 1805, off Cadiz on 1 July 1814) and 138 in the full one (off Ushant, Rochefort and Cadiz on 1 July of every year; off Gibraltar, Toulon, Leghorn and Malta every fourth year). Deterministic: the same seed and tree give the same findings.
 
@@ -98,7 +103,9 @@ nation, a war before its own beginning, a blockade with no dates, a fit of a lat
 colours out of their dates, a year with no day kept, a light of the range, served words of
 a year to come, a year fixed in code, a dated key in no row, a file that will not parse, a
 holder, a war and a vessel out of the reference's years, and the two roads made to
-disagree on a world built by hand. The ten of check (u) count what a tree holds and are
+disagree on a world built by hand. Two are planted on the game's own worlds as well (the
+slow tier): a blockade the rule admits and the business is made not to draw, and a port
+given to a nation the table has not, on which the game cannot begin the day. The ten of check (u) count what a tree holds and are
 counted on a small one; they are not planted otherwise. All of that is cheap and is the
 fast tier's. The ratchet itself (the sampled sweep and the full sweep against the known
 list, on the whole tree with whole worlds) is the slow tier's: by the suite's own rule a
@@ -496,10 +503,11 @@ needs libyaml; the second is what a machine without it pays, as the build machin
 | What | With libyaml's loader | By the pure-Python loader alone |
 |---|---|---|
 | The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 202 days (323 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
-| The fast tier of `tests/test_range_audit.py` (43 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
+| The fast tier of `tests/test_range_audit.py` (44 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
 | Truths 7-592 and 7-593 (fast) | under a second | 2.3 s |
 | The slow tier of the file: the sampled sweep's fixture, with the tests that read the whole tree | 19 s, and 4 s for the rest | 41 s for the fixture (the lead's measurement) |
 | The slow tier's proof that no draw moves the list: the sampled sweep at two more seeds; six whole worlds off Leghorn at three seeds | 41 s; 60 s | not measured |
+| The slow tier's two plants on the game's own worlds: a blockade not drawn (three worlds off Ushant); a port of a nation the table has not | 16 s; 2 s | not measured |
 | Truths 7-590 and 7-591 (slow) | 2.7 s and 1.1 s | 13 s and 7 s (the lead's measurement) |
 | The full sweep (`--full`), and its slow test | 11 min 18 s at 504a250: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s. On a scratch merge with the trunk's trial tree of 14 November (ffb27b5b) the same test took 20 min 41 s, beside another run: the trunk's worlds cost more to make | not measured |
 | The two loaders compared file for file (slow) | 7.8 s for the 437 YAML files under `data/` | skipped, with its reason: there is no second loader to compare |

@@ -57,8 +57,9 @@ findings that rest on it. Deterministic: the same seed and tree give the same fi
     kind of their own (`basis: reference`), counted and listed apart; the mechanical
     findings stand whole if the reference is thrown away (`--no-reference`).
 (a) the two roads agree (whole-world days only): no finding is the proof. A holder, a
-    state, the wars, the line served; a squadron drawn that the rule does not admit; a
-    vessel drawn under a nation, with a fit or under a flag the tables do not admit.
+    state, the wars, the line served; a blockade drawn that the rule does not admit, or
+    admitted and not drawn; a vessel drawn with a fit or under a flag the tables do not
+    admit; a day the game could not begin a world on at all.
 
 **What can be drawn, not what was.** Which vessels the business draws in a world turns on
 the seed and on every port's track and anchorage, so a finding that stood on a vessel
@@ -66,9 +67,10 @@ drawn would move when an unrelated merge moved a draw. No finding stands on one.
 vessels' checks ask what the tables admit (every description's fit, every nation the
 tables name, every flag an occasion names); a vessel a world happens to draw is evidence
 for a finding already made (`Audit.seen`, printed apart) or, if the tables do not admit
-her, a disagreement of the roads. A vessel under a nation the reference has not in being
-is said under that nation's own finding (`r-nation:`), which is its cause. The list is the
-same at any seed (`--seed`).
+her fit or her flag, a disagreement of the roads. A vessel under a nation the reference
+has not in being is said under that nation's own finding (`r-nation:`), which is its
+cause. A blockade is no draw: the seed picks only its ships' names, so one the rule admits
+and the world has not is found. The list is the same at any seed (`--seed`).
 
 **Speed.** The game reads its YAML with the pure-Python loader; a ship file takes it some
 half a second and a world loads a dozen. While this tool runs, and only then, the same
@@ -1194,12 +1196,24 @@ def fit_of_description(tree: Tree, kind: str) -> tuple[str, str]:
 
 def business_kinds(tree: Tree) -> set[str]:
     """The descriptions the business's own tables name (the trade's and the fishermen's
-    kinds; the frigate and the brig-sloop of the blockade and the convoy)."""
+    kinds; the frigate and the brig-sloop of the blockade and the convoy; the kinds of the
+    cruisers' stations, a brig-sloop where a station names none)."""
     out = {"frigate", "brig-sloop"}
     for table in ("trader_kinds", "fisher_kinds"):
         for kinds in (tree.business_doc.get(table) or {}).values():
             out.update(str(k) for k in kinds or [])
+    for rows in _cruiser_stations(tree).values():
+        if isinstance(rows, list):
+            out.update(str(r.get("kind") or "brig-sloop") for r in rows if isinstance(r, dict))
     return out
+
+
+def _cruiser_stations(tree: Tree) -> dict[str, Any]:
+    """The cruiser's doctrine's `stations:` as `business._cruisers` reads it."""
+    cruisers = tree.data / "captains" / "cruiser.yaml"
+    if not cruisers.exists():
+        return {}
+    return dict((read_yaml(cruisers) or {}).get("stations") or {})
 
 
 def tabled_nations(tree: Tree) -> dict[str, set[str]]:
@@ -1211,10 +1225,8 @@ def tabled_nations(tree: Tree) -> dict[str, set[str]]:
     for table in ("trader_kinds", "fisher_kinds", "names", "cruiser_names"):
         out[f"business.{table}"] = {str(k) for k in (tree.business_doc.get(table) or {})}
     out["business.neutrals"] = {str(n) for n in tree.business_doc.get("neutrals") or []}
-    cruisers = tree.data / "captains" / "cruiser.yaml"
-    if cruisers.exists():
-        stations = (read_yaml(cruisers) or {}).get("stations") or {}
-        out["cruiser.stations"] = {str(k) for k in stations}
+    if (tree.data / "captains" / "cruiser.yaml").exists():
+        out["cruiser.stations"] = {str(k) for k in _cruiser_stations(tree)}
     return {table: names - {"default"} for table, names in out.items()}
 
 
@@ -1837,17 +1849,34 @@ def check_world(
 ) -> None:
     """A whole world of the day against the readers' road. What a world can add to the
     list is only what does not turn on the die: that a scenario's block of wars is read by
-    nothing, and a disagreement of the two roads (a holder, a state, the wars, a squadron
-    drawn that the rule does not admit, a vessel drawn that the tables do not admit, the
-    line it serves). Which vessels the business draws is the seed's and the chart's, so a
-    vessel drawn makes no finding of its own: where she shows a finding the cheap road
-    already makes (a nation not in being, a fit of a later year, colours out of their
-    dates) she is evidence for it (`Audit.seen`) and nothing more."""
+    nothing, that the game could not begin the day at all, and a disagreement of the two
+    roads (a holder, a state, the wars, a blockade drawn or not drawn against the rule, a
+    vessel's fit or colours, the line it serves). Which vessels the business draws is the
+    seed's and the chart's, so a vessel drawn makes no finding of its own: where she shows
+    a finding the cheap road already makes (a nation not in being, a fit of a later year,
+    colours out of their dates) she is evidence for it (`Audit.seen`) and nothing more."""
     # the day's world carries a scenario's own table of no war at all: if the World read
     # the block, it would be at peace with all
     block = {"as_of": day.isoformat(), "wars": [], "letters_of_marque": [], "source": "the audit"}
-    world = world if world is not None else make_world(day, station, block, seed)
     where = f"{station} {day}"
+    if world is None:
+        try:
+            world = make_world(day, station, block, seed)
+        except Exception as exc:
+            # a day the game refuses to begin is a finding with the game's own words, never
+            # the audit's crash (a port held by a nation the table has not: the business
+            # draws a trader under the holder and `ships.vessel_from_spec` refuses her)
+            # (a KeyError says its words quoted and escaped: its own argument is read)
+            said = exc.args[0] if isinstance(exc, KeyError) and exc.args else exc
+            words = " ".join(str(said).split())
+            audit.add(
+                "a",
+                f"a-no-world:{station}",
+                "the game could not begin a world on the day",
+                day,
+                worst=[f"{where}: {type(exc).__name__}: {words[:160]}"],
+            )
+            return
     table = {frozenset(w["between"]) for w in tree.nations.wars}
     wars = {frozenset(w["between"]) for w in world.nations.wars}
     if getattr(world.scenario, "nations", None) is not None and not world.scenario.nations["wars"]:
@@ -1895,38 +1924,27 @@ def check_world(
         for s in _sets(world)
         if str(getattr(s, "regime", "")) == "on blockade"
     }
-    # a squadron drawn that the rule does not admit is a disagreement; one admitted and
-    # not drawn is the draw's (the business draws none where its plan would cross the
-    # land, `business._put`), and is said, not found
-    for pid in sorted(drawn - expected):
+    # both ways, since whether a blockade is drawn turns on no die: the gates of
+    # `business._blockades` are the port within the region, the war, the entry's dates,
+    # the chart's feature and the guard of the land in `_put`, and the seed picks only the
+    # names. One the rule admits that the world has not is a fact of the chart's or a
+    # port's data, or a fault in the drawing
+    for pid in sorted(drawn ^ expected):
         audit.add(
             "a",
             f"a-blockade:{pid}",
-            "the world draws a blockade the readers' road does not admit",
+            "the world draws a blockade the readers' road does not admit"
+            if pid in drawn
+            else "the readers' road admits a blockade the world does not draw",
             day,
             worst=[where],
         )
-    for pid in sorted(expected - drawn):
-        audit.see(f"b-not-drawn:{pid}", where)
-    # the vessels the world draws: each must be one the tables admit; what she shows
-    # besides is evidence for a finding the cheap road makes
-    tabled = tabled_nations(tree)
-    unknown = {n: t for t, names in sorted(tabled.items(), reverse=True) for n in names}
+    # the vessels the world draws: what one shows is evidence for a finding the cheap road
+    # makes. (None is of a nation the table has not: `ships.vessel_from_spec` asks
+    # `Nations.get`, which refuses her, and the world is not begun: `a-no-world:` above.)
     for v in _vessels(world):
         nid = str(getattr(v, "nation", "") or "")
-        if nid and nid not in tree.nations.nations:
-            if nid in unknown:
-                audit.see(f"v-nation-unknown:{unknown[nid]}", f"a vessel of {nid} off {where}")
-            else:
-                audit.add(
-                    "a",
-                    f"a-vessel-nation:{nid}",
-                    "a vessel drawn under a nation neither the table nor the business's "
-                    "tables name",
-                    day,
-                    worst=[where],
-                )
-        elif nid and ref is not None and not ref.exists(nid, day):
+        if nid in tree.nations.nations and ref is not None and not ref.exists(nid, day):
             audit.see(f"r-nation:{nid}", f"a vessel drawn off {where}")
         file = name_of(getattr(v, "ship_file", "") or "")
         fit = str(getattr(v, "fit", "") or default_fit(tree, file))

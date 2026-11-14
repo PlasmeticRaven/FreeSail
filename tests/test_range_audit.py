@@ -23,9 +23,11 @@ f-dates-form, f-signal-nearest, f-fashion), the days' (d-none, d-gap), the light
 (l-by-year), the words' (x-as-of, x-words), the code's years (e-year), the classing's
 (c-unclassed, c-unparsed, c-dead-row, c-snap-back, c-unread), the reference's (r-holder,
 r-port-blockade, r-nation, r-war-at-peace, r-war-absent, r-blockade) and the two roads'
-(a-wars, a-holder, a-state, a-blockade, a-vessel-nation, a-vessel-fit, a-colours,
-a-words). No finding stands on which vessels a world's seed draws: a vessel drawn is
-evidence for a finding the cheap road makes, and the list is the same at any seed. The
+(a-wars, a-holder, a-state, a-blockade both ways, a-vessel-fit, a-colours, a-words,
+a-no-world). The blockade not drawn and the world that will not begin are planted on the
+game's own worlds as well (slow). No finding stands on which vessels a world's seed draws:
+a vessel drawn is evidence for a finding the cheap road makes, and the list is the same at
+any seed. The
 ten of check (u) count what a tree holds and are counted here on a small one; they are
 not planted otherwise.
 Truths 7-590 to 7-593 are in test_known_truths.py.
@@ -1088,11 +1090,18 @@ def test_the_two_roads_agree_on_a_world_made_from_the_readers_and_differ_when_pl
         "a-holder:genoa",
         "a-state:valletta",
         "a-blockade:plymouth",
+        "a-blockade:brest",
     }
-    # a squadron the rule admits and the world has not drawn is the draw's, said and not
-    # found (the business draws none where its plan would cross the land)
-    assert "a-blockade:brest" not in planted.findings
-    assert planted.seen["b-not-drawn:brest"] == ["rochefort 1805-07-01"]
+    # both ways, each in its own words: a blockade is no draw (the seed picks only the
+    # names), so one the rule admits and the world has not is a fact, found
+    assert planted.findings["a-blockade:plymouth"].words == (
+        "the world draws a blockade the readers' road does not admit"
+    )
+    assert planted.findings["a-blockade:brest"].words == (
+        "the readers' road admits a blockade the world does not draw"
+    )
+    assert planted.findings["a-blockade:brest"].worst == ["rochefort 1805-07-01"]
+    assert not planted.seen
 
 
 def _vessel(nation, file, fit="", description=""):
@@ -1164,13 +1173,13 @@ def test_a_vessel_drawn_is_evidence_and_never_a_finding_of_its_own(small, monkey
 
 
 def test_a_vessel_the_tables_do_not_admit_is_a_disagreement_of_the_roads(small, monkeypatch):
-    """What can be drawn is the tables': a vessel under a nation neither the nations'
-    table nor the business's tables name, a brig-sloop with a fit that is not her
+    """What can be drawn is the tables': a brig-sloop with a fit that is not her
     description's, a flag no occasion of her colours names, a served line that is not the
-    readers' road's: each a disagreement, since the cheap road would not have known her."""
+    readers' road's: each a disagreement, since the cheap road would not have known her.
+    (A vessel under a nation the table has not is no case: the game cannot draw one, and
+    the world that would is not begun; the next test and the slow tier's plant.)"""
     day = date(1805, 7, 1)
     vessels = [
-        _vessel("atlantis", "data/ships/smack.yaml", description="smack"),
         _vessel(
             "britain", "data/ships/brig.yaml", fit="a fit of her own", description="brig-sloop"
         ),
@@ -1188,25 +1197,36 @@ def test_a_vessel_the_tables_do_not_admit_is_a_disagreement_of_the_roads(small, 
     audit = A.Audit()
     A.check_world(audit, small, day, "rochefort", None, world)
     assert set(audit.findings) == {
-        "a-vessel-nation:atlantis",
         "a-vessel-fit:brig:a fit of her own",
         "a-colours:france:flag of an admiral",
         "a-words",
     }
-    # a nation a table of the business's is keyed by is admitted, and is the table's
-    # finding on the cheap road: the vessel under it is evidence, no disagreement
-    doc = {**small.business_doc, "neutrals": [*small.business_doc["neutrals"], "atlantis"]}
-    tabled = _planted(small, business_doc=doc)
-    again = A.Audit()
-    one = _made_world(small, day, vessels=SimpleNamespace(vessels=vessels[:1]))
-    A.check_world(again, tabled, day, "rochefort", None, one)
-    assert not again.findings
-    assert again.seen == {
-        "v-nation-unknown:business.neutrals": ["a vessel of atlantis off rochefort 1805-07-01"]
-    }
-    cheap = A.Audit()
-    A.check_vessels(cheap, tabled, SOME_DAYS)
-    assert cheap.findings["v-nation-unknown:business.neutrals"].worst == ["atlantis"]
+
+
+def test_a_day_the_game_cannot_begin_is_a_finding_and_not_the_audits_fall(small, monkeypatch):
+    """A world the audit cannot build is a finding with the day, the station and the
+    game's own words; the audit goes on to the next day. (The game's refusal itself is
+    planted on the game in the slow tier: a port given to a nation the table has not.)"""
+
+    def refuse(day, station, block, seed):
+        if station == "ushant":
+            raise KeyError("no nation 'atlantis' in the table\n   (the nations are ...)")
+        return _made_world(small, day)
+
+    monkeypatch.setattr(A, "make_world", refuse)
+    audit = A.Audit()
+    A.check_world(audit, small, date(1805, 7, 1), "ushant", None)
+    A.check_world(audit, small, date(1806, 7, 1), "ushant", None)
+    A.check_world(audit, small, date(1805, 7, 1), "rochefort", None)
+    assert set(audit.findings) == {"a-no-world:ushant"}
+    found = audit.findings["a-no-world:ushant"]
+    assert found.basis == A.MECHANICAL and found.years() == "1805-1806"
+    assert found.worst[0] == (
+        "ushant 1805-07-01: KeyError: no nation 'atlantis' in the table (the nations are ...)"
+    )
+    assert audit.worlds == [(date(1805, 7, 1), "rochefort")]
+    # only a whole world makes it, so a run without worlds is not asked for it
+    assert "a-no-world:ushant".startswith(A.DEAR_ONLY)
 
 
 # ---------------------------------------------------------------------------
@@ -1266,22 +1286,90 @@ def test_the_worlds_off_leghorn_draw_differently_by_the_seed_and_find_the_same(t
     reference's finding by the cheap road whatever is drawn."""
     ref = A.load_reference()
     block = {"as_of": "x", "wars": [], "letters_of_marque": [], "source": "the audit"}
-    draws, found = set(), set()
+    draws, found = {}, set()
     with A.fast_yaml():
         for year in (1792, 1796):
             day = date(year, 7, 1)
             for seed in (7, 11, 1805):
                 world = A.make_world(day, "leghorn", block, seed)
-                draws.add(frozenset((v.nation, v.description, v.name) for v in A._vessels(world)))
+                draws[year, seed] = frozenset(
+                    (v.nation, v.description, v.name) for v in A._vessels(world)
+                )
                 audit = A.Audit()
                 A.check_world(audit, tree, day, "leghorn", ref, world)
                 found.add(frozenset(audit.findings))
-    assert len(draws) > 1  # the die did move
+    # the die did move: the same day draws differently at each two of the seeds
+    for year in (1792, 1796):
+        assert draws[year, 7] != draws[year, 11], year
+        assert draws[year, 7] != draws[year, 1805], year
+        assert draws[year, 11] != draws[year, 1805], year
     assert found == {frozenset({"w-block-unread"})}
     cheap = A.Audit()
     A.check_ports(cheap, tree, [date(1792, 7, 1), date(1796, 7, 1)], ref)
     A.check_wars(cheap, tree, [date(1792, 7, 1), date(1796, 7, 1)], ref)
     assert {"r-holder:leghorn", "r-nation:etruria", "r-nation:liguria"} <= set(cheap.findings)
+
+
+def test_a_blockade_the_rule_admits_and_the_game_does_not_draw_is_found(tree, monkeypatch):
+    """Planted on the game itself. Off Ushant on 1 July 1805 the business draws the
+    blockade of Brest and the two roads agree; at another seed it draws it again (the die
+    picks only the names). With the business's `_put` made to refuse Brest's blockaders,
+    as its guard of the land would, the same world has no such squadron and the audit
+    finds the blockade the rule admits and the world does not draw."""
+    import freesail.world.business as business
+
+    day = date(1805, 7, 1)
+    for seed in (None, 11):
+        agreed = A.Audit()
+        with A.fast_yaml():
+            A.check_world(agreed, tree, day, "ushant", None, seed=seed)
+        assert set(agreed.findings) == {"w-block-unread"}, seed
+    real = business.Business._put
+
+    def refused(self, kind, *args, **kwargs):
+        if kind == "blockade" and "the blockade of Brest" in str(args[-1]):
+            return None
+        return real(self, kind, *args, **kwargs)
+
+    monkeypatch.setattr(business.Business, "_put", refused)
+    planted = A.Audit()
+    with A.fast_yaml():
+        A.check_world(planted, tree, day, "ushant", None)
+    assert set(planted.findings) == {"w-block-unread", "a-blockade:brest"}
+    found = planted.findings["a-blockade:brest"]
+    assert found.words == "the readers' road admits a blockade the world does not draw"
+    assert found.worst == ["ushant 1805-07-01"]
+
+
+def test_a_port_of_a_nation_the_table_has_not_stops_the_game_and_not_the_audit(tree, monkeypatch):
+    """Planted on the game itself: Plymouth read as held by a nation the table has not.
+    The game cannot begin the day (the business draws a trader under the holder and
+    `ships.vessel_from_spec` asks the table for her nation); the audit says so in the
+    game's words, and the cheap road finds the holder by its own key."""
+    import freesail.world.ports as ports
+
+    real = ports.load_port
+
+    def given(path, *args, **kwargs):
+        port = real(path, *args, **kwargs)
+        if port.id == "plymouth":
+            port.nation = "atlantis"
+        return port
+
+    monkeypatch.setattr(ports, "load_port", given)
+    day = date(1805, 7, 1)
+    audit = A.Audit()
+    with A.fast_yaml():
+        A.check_world(audit, tree, day, "ushant", None)
+    assert set(audit.findings) == {"a-no-world:ushant"}
+    words = audit.findings["a-no-world:ushant"].worst[0]
+    assert words.startswith("ushant 1805-07-01: KeyError: no nation 'atlantis' in the table")
+    assert not audit.worlds
+    plymouth = copy.copy(tree.ports["plymouth"])
+    plymouth.nation = "atlantis"
+    cheap = A.Audit()
+    A.check_ports(cheap, _planted(tree, ports={**tree.ports, "plymouth": plymouth}), [day], None)
+    assert "p-holder-unknown:plymouth" in cheap.findings
 
 
 def test_the_mechanical_findings_stand_without_the_reference(tree, sampled):

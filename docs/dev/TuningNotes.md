@@ -28714,7 +28714,7 @@ way, and the helpers' reports.
 **What was built.** `tools/audit_range.py` (the sweep), `tools/range/audit-known.yaml` (the
 105 findings of the first full sweep, each owned), `tools/range/reference.yaml` (the wars,
 the peaces and the nations' lifetimes of 1792 to 1825, FROM MEMORY, read by nothing in the
-game), `tests/test_range_audit.py` (43 fast tests and nine slow), truths 7-590 to 7-593, and
+game), `tests/test_range_audit.py` (44 fast tests and eleven slow), truths 7-590 to 7-593, and
 the document. No file under `freesail/` changed and none under `data/`: the audit's two
 files lie beside the tool, under `tools/range/` (first laid under `data/range/` and moved
 on the lead's reading, below).
@@ -28961,19 +28961,16 @@ below:
   world's part made evidence.
 - `x-as-of` from a world: the served line turns on no draw; the world's part made
   evidence, and a line that differs from the readers' road's a disagreement (`a-words`).
-- `a-blockade:` (the two roads on a blockade): it fired both ways, and a squadron the rule
-  admits is not drawn where the business's plan would cross the land (`business._put`),
-  which a chart merge or a seed can bring about. **One way now:** a squadron drawn that
-  the rule does not admit is a disagreement; one admitted and not drawn is said as
-  evidence. JUDGEMENT, for the lead to rule: this gives up catching a blockade that is
-  never drawn at all.
+- `a-blockade:` (the two roads on a blockade): the builder first took it for a draw and
+  made it one way. That was wrong, and the lead ruled it back (below): whether a blockade
+  is drawn turns on no die, so it is found **both ways**, as it was.
 - `a-holder:`, `a-state:`, `a-wars` and `w-block-unread` turn on no draw (the ports and
   the table are loaded, not drawn) and stand.
 
-What a world can add to the list now: `w-block-unread`, and a disagreement of the roads,
-among them three new ones for a vessel the tables do not admit (`a-vessel-nation:`,
-`a-vessel-fit:`, `a-colours:`). `Audit.seen` holds what the worlds happened to show and is
-printed apart.
+What a world can add to the list now: `w-block-unread`, a day the game cannot begin
+(`a-no-world:`, below), and a disagreement of the roads, among them two new ones for a
+vessel the tables do not admit (`a-vessel-fit:`, `a-colours:`). `Audit.seen` holds what
+the worlds happened to show and is printed apart.
 
 *Found by the mend:* `data/captains/cruiser.yaml` has package 74's thirteen prize keys
 under `stations:` and not under `thresholds:`; the business reads each as a nation with
@@ -29001,6 +28998,39 @@ given to Liguria is `r-holder:plymouth` in the years Liguria was not. (4) A vess
 in a made world under a nation not in being, with a fit of a later year and under the
 ensign of 1801 makes no finding and the same world without her makes the same; a vessel
 the tables do not admit makes a disagreement.
+
+**The lead's reading of 9d70e89 (four small things).** The reader's sweeps held the
+ratchet (the sampled sweep at four seeds, 315 whole worlds at three more); four things
+were owed and are mended.
+
+- *The blockade, both ways again.* The builder's premise did not hold. In
+  `business._blockades` the gates are the port within the region, the war, the entry's
+  dates, the chart's feature and the guard of the land in `_put`; `captains.station_off`
+  is a fixed sweep of bearings; the seed picks only the ships' names. So a blockade the
+  rule admits and a world has not is a fact of the chart's or a port's data, or a fault in
+  the drawing, and `a-blockade:<port>` is found both ways, each in its own words. Planted
+  on a made world, and on the game: off Ushant on 1 July 1805 the business draws Brest's
+  blockade at two seeds; with `_put` made to refuse her blockaders the audit finds
+  `a-blockade:brest`.
+- *A day the game cannot begin.* A port given to a nation the table has not stops the
+  game: the business draws a trader under the holder and `ships.vessel_from_spec` asks
+  `Nations.get`, which raises. The audit fell with it. Now it is a finding,
+  `a-no-world:<station>`, with the day and the game's own words, and the sweep goes on.
+  Planted on the game (Plymouth read as another's). For the same reason no real world can
+  hold a vessel of a nation the table has not: `a-vessel-nation:` and the evidence said
+  under `v-nation-unknown:` were unreachable and are out.
+- *The Leghorn test* asked only that the draws pooled over two years were more than one,
+  which a seed that did nothing would pass. It asks now that the same day draws
+  differently at each two of the three seeds.
+- *The five `r-nation:` reasons* named an Etrurian and a Ligurian trader seen off Leghorn,
+  untrue of the Batavian Republic (which holds no port of the tree), the Order and the
+  Papal State, and a draw besides. Each now says only what is true of all five.
+
+Besides: the descriptions the business draws now count the kinds of the cruisers'
+stations (the cutter; no finding moves, it changes only which words a fit's finding
+would say). No figure of the document nor of truths 7-590 to 7-593 moves: the list is the
+same 105 by key, count and years; the file has 44 fast tests where it had 43 and 11 slow
+where it had 9.
 
 ### The helpers' reports, kept (package 103a)
 
