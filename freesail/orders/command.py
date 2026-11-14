@@ -256,17 +256,29 @@ def _the_one_he_means(root: Any, known: list[Any], said: str) -> Any:
             return v
     aboard = getattr(root, "hulls", {}).get(here) if here else None
     pos = getattr(aboard, "position", None) or getattr(root, "position", None)
+    asked, where = known, " in more than one place"
     if pos is not None:
         near = [
             v for v in known if bearing_and_distance(pos, v.position)[1] / 1852.0 <= BOAT_BETWEEN_NM
         ]
         if len(near) == 1:
             return near[0]
+        if near:
+            # the ones within a boat's pull are the question; a far one of the name is not
+            asked, where = near, " here"
     shown = said.removeprefix("the ").removeprefix("The ")
+    # each named by what ship_for_him answers to: her hull's id, else her own id
+    ids = ", ".join(str(v.crew.id) if v.crew is not None else str(v.id) for v in asked)
     raise OrderError(
-        f"Ships of yours answer to the {shown} in more than one place; go aboard her, or "
-        "alongside her, and give the order there."
+        f"{_count_ships(len(asked))} of yours answer to the {shown}{where}; name her by her "
+        f"id ({ids}), or give the order aboard her."
     )
+
+
+def _count_ships(n: int) -> str:
+    from freesail.combat.guns import count_words
+
+    return f"{count_words(n).capitalize()} ships"
 
 
 def _prize_not_condemned(hull: Any) -> bool:

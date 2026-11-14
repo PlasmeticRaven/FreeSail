@@ -27935,6 +27935,48 @@ brief's steps 1 and 2).
   by his captor's muster row, and his captor's muster still counts him; mending it moves
   test_prizes' captor count from 256 to 255 and the prize's from 8 to 9.
 
+**The owner's last round** (five only, mended on top of 377c5b13; each test fails with its
+mend taken out, shown by hand):
+1. *A person's post travels with his row.* Cause: `musters.join` clears every post, and the
+   person's row went through it. Mend: `Registry._row_follows` (people.py) reads his post
+   before the move and gives it back where his new ship has nobody in it; where she has,
+   he is carried by his rating: Mr Pascoe, the Sherbourne's boatswain, sent to a Fly that
+   has hers, reads "Mr. <his whole name>, <his rating>." (the officers' line, `_post_line`,
+   never "None"). The player at the take-up: he holds her
+   captain's post where nobody holds it ("Captain Adam Bowen."), else he keeps his own.
+   An id given on the way in (`rehome`, `join`) is tried against the muster until it is
+   one she has not got, by any road. Tests: both musters' lines after the take-up and the
+   transfer; a surgeon moved to a ship with none is `Health(hull).surgeon()`; three ships,
+   no id borne twice.
+2. *Men who come aboard a ship at quarters are on her bill.* Cause: `join` reindexed and
+   left them unbilled. Mend: `Quarters.tell_off_rest`, the last step of `beat` itself
+   (idlers to the powder, marines to the marines, the rest to the trimmers), is called by
+   `join` while she is at quarters; `beat`'s bill is unchanged by construction (the
+   quarters and combat suites run whole). Test: eight hands sent to a ship beaten to
+   quarters, none unbilled.
+3. *The take-up: one anchor riding, another marked down out of reach.* Cause: the riding
+   branch returned with the far one down. Mend: `_weighed_out_of_reach` (command.py) sets
+   it at the bows, its cable in (stowed, no ground, no scope, not brought up), in both
+   branches. Test: riding by one, the other weighed.
+4. *Three sentences.* "one was asked" (the verb by the number); a hand named with dots
+   ("Danl. Ellicott") is compared with the dots read as spaces, tested over every
+   no-person row of every company file; "You are not moved by a transfer" offers taking
+   command of her only where `_his_to_take` allows it; two of his ships of one name within
+   a boat's pull: "Two ships of yours answer to the Fly here; name her by her id (ship-2,
+   ship-3), or give the order aboard her." — counted over the near ones only (a far one
+   of the name is not the question; found by the test), each named by an id
+   `ship_for_him` answers.
+5. *The wound test.* It asserts the row his id finds is Adam Bowen's and not Thos.
+   Bradley's (her late master, who bore the id he came with), and that Bradley's row,
+   post, name and reading stay whole. With the row move taken out it fails on the row.
+
+**Listed, not built** (the owner's reader, for the next package):
+- his role reads "master" on the Fly after the take-up;
+- "transfer the hands" is refused by berths rather than sending as many as she berths;
+- "Micajah Kemp, her carpenter's crew, is one of ...";
+- a marine named is told he is one of her hands;
+- a ship laid in 1.9 m with an 11 ft draught is only warned.
+
 
 
 ## Package 105: Sicily and Malta (2026-11-12)

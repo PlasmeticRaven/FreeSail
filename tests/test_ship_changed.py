@@ -593,6 +593,27 @@ def test_two_ships_of_one_name_his_own_is_the_one_he_means():
     assert ship_for_him(w, "the Fly") is hull
     put_aboard(w, me, hull, "quarterdeck", by="the boat")
     assert ship_for_him(w, "the Fly") is hull  # the one he is aboard
+    # both his and both within a boat's pull of the ship he is aboard: he is asked to name her
+    # by her id, which is answered (the last round, item 4)
+    _wo(
+        w,
+        'ship: a schooner "Fly" of Britain at 50 09.9 N 5 02.3 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    other = [v for v in w.sea_vessels.vessels if v.name == "Fly" and v not in (stranger, fly)][0]
+    other, other_hull = K.station_world(w, other.id)
+    command.give(w, other, me, by="the test")
+    put_aboard(w, me, w.first_hull, "quarterdeck", by="the boat")
+    from freesail.orders.errors import OrderError
+
+    with pytest.raises(OrderError) as asked:
+        ship_for_him(w, "the Fly")
+    said = str(asked.value)
+    assert said.startswith("Two ships of yours answer to the Fly here; name her by her id ("), said
+    assert (
+        ship_for_him(w, str(hull.id)) is hull and ship_for_him(w, str(other_hull.id)) is other_hull
+    )
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")  # aboard her, she is the one meant
     e = w.submit('take command of the "Fly"')
     assert e.kind == "ship.taken_up", e.text
     assert w.players is hull

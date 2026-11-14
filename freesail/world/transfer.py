@@ -745,10 +745,19 @@ def _why_not_moved(root: Any, giver: Any, key: str, words: str, me: Any) -> str:
         if not _answers_to(p, key, whole_name(giver, p)):
             continue
         if p is me:
-            return (
-                "You are not moved by a transfer: go across in the boat yourself, or take "
-                "command of her."
-            )
+            # only what he can do there (the last round, item 4): taking command of her is
+            # offered where she is his to take up and not his already
+            from freesail.world.command import _his_to_take
+
+            if (
+                giver is not getattr(root, "players", None)
+                and _his_to_take(root, me, giver) is None
+            ):
+                return (
+                    "You are not moved by a transfer: go across in the boat yourself, or take "
+                    "command of her."
+                )
+            return "You are not moved by a transfer: go across in the boat yourself."
         if getattr(p, "confined_to", ""):
             return (
                 f"{p.name} is a prisoner aboard the {_name(giver)}; her prisoners stay where "
@@ -762,7 +771,10 @@ def _why_not_moved(root: Any, giver: Any, key: str, words: str, me: Any) -> str:
     for s in getattr(crew, "sailors", []) or []:
         trade = str(getattr(s, "trade", "") or "").lower()
         name = " ".join(str(s.name).lower().replace(".", " ").split())
-        if key.removeprefix("the ") != trade and key.replace(".", " ") != name:
+        # the stops read away on both sides alike (the last round, item 4: 'Danl. Ellicott'
+        # was compared with two spaces where the muster's name had one)
+        said = " ".join(key.replace(".", " ").split())
+        if key.removeprefix("the ") != trade and said != name:
             continue
         who = f"{s.name}, her {trade}," if trade else s.name
         if s.station is Station.IDLERS:
@@ -831,7 +843,7 @@ def _draw(
         if len(got) < n:
             raise TransferError(
                 f"The {_name(giver)} has {_rating_words(len(got), rating)} fit and free; "
-                f"{_number(n)} were asked."
+                f"{_number(n)} {'was' if n == 1 else 'were'} asked."
             )
         chosen += got
     if count:
@@ -839,7 +851,7 @@ def _draw(
         if len(got) < count:
             raise TransferError(
                 f"The {_name(giver)} has {_count_words(len(got))} fit and free; "
-                f"{_count_words(count)} were asked."
+                f"{_count_words(count)} {'was' if count == 1 else 'were'} asked."
             )
         chosen += got
     return chosen

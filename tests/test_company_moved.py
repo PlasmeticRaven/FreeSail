@@ -1036,12 +1036,22 @@ def test_a_wound_given_after_the_move_lands_on_the_man_moved():
     a wound written to it is his ('Mr Bowen, wounded'), never her late master's."""
     w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
     crew = fly.ship.extra["crew"]
+    master = crew.posts["master"]  # her late master, who bore the id 's001' he came with
+    assert master.name == "Thos. Bradley", master
     row = _row(fly, me)
+    # the row his id finds is his own (his whole name), not the late master's (the last
+    # round, item 5: before, a row of either man passed)
+    assert row is not None and row is not master and row.name == "Adam Bowen", row
     others = [s for s in crew.sailors if s is not row]
     row.hurt = "wounded"
     said = w.submit("where is mr bowen").text
     assert "Mr Bowen, wounded" in said, said
     assert not any(s.hurt for s in others)
+    # the other man stays whole: his row, his post, his name, and no wound in his reading
+    assert crew.by_id[master.id] is master and crew.posts["master"] is master
+    assert master.name == "Thos. Bradley" and not master.hurt and master.fit
+    said = w.submit("where is mr bradley").text
+    assert "wounded" not in said and "Bradley" in said, said
 
 
 def test_what_she_keeps_is_counted_as_what_she_wants():
@@ -1100,3 +1110,150 @@ def test_the_words_of_the_cuts_reading():
     hand = next(s for s in TR._sail_hands(fly))
     e = w.submit(f"transfer {hand.name} from the Fly to the Sherbourne")
     assert e.kind == "order.rejected" and "her hands go by their number" in e.text, e.text
+
+
+# -- the last round, item 1: a person's post travels with his row; ids never twice -----------
+
+
+def _officer_lines(hull) -> list[str]:
+    return [
+        x for x in hull.ship.extra["crew"].describe(hull.clock) if x.startswith(("Mr.", "Captain"))
+    ]
+
+
+def test_a_moved_officer_keeps_his_post_where_she_has_none_and_reads_by_his_rating_else():
+    """The last round, item 1 (ruled): his post is his own and travels with his row. At the
+    take-up he commands her, and holds her captain's post where nobody does ('Captain Adam
+    Bowen.'); her late master keeps his. A boatswain moved to a ship that has one is carried
+    by his rating ('Mr. Silas Pascoe, <his rating>.'), never 'None'."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    assert "Captain Adam Bowen." in _officer_lines(fly), _officer_lines(fly)
+    assert "Mr. Thos. Bradley, master." in _officer_lines(fly)
+    assert not any("Bowen" in x for x in _officer_lines(cutter))
+    pascoe = next(p for p in cutter.people.people if p.name == "Mr Pascoe")
+    whole = TR.whole_name(cutter, pascoe)
+    e = w.submit("transfer Mr Pascoe from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    _until_home(w, cutter)
+    row = fly.ship.extra["crew"].by_id[pascoe.sailor_id]
+    assert row.post is None  # the Fly has her boatswain
+    assert f"Mr. {whole}, {row.rating.value}." in _officer_lines(fly), _officer_lines(fly)
+    assert not any("None" in x for x in _officer_lines(fly) + _officer_lines(cutter))
+    assert not any(whole in x for x in _officer_lines(cutter))
+
+
+def test_a_surgeon_moved_to_a_ship_with_none_is_her_surgeon():
+    """The last round, item 1: run, not read. Her boatswain made her surgeon by his row's post,
+    moved to the Fly (who has none): the Fly's health keeper finds him her surgeon, and the
+    Sherbourne's finds none."""
+    from freesail.crew.health import Health
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    pascoe = next(p for p in cutter.people.people if p.name == "Mr Pascoe")
+    crew = cutter.ship.extra["crew"]
+    crew.by_id[pascoe.sailor_id].post = "surgeon"
+    crew.reindex()
+    assert Health(cutter).surgeon() is crew.by_id[pascoe.sailor_id]
+    assert Health(fly).surgeon() is None
+    e = w.submit("transfer Mr Pascoe from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    _until_home(w, cutter)
+    surgeon = Health(fly).surgeon()
+    assert surgeon is not None and surgeon.id == pascoe.sailor_id
+    assert Health(cutter).surgeon() is None
+    assert any(
+        x.endswith(", surgeon.") and TR.whole_name(fly, pascoe) in x for x in _officer_lines(fly)
+    )
+
+
+def test_no_two_men_bear_one_id_by_way_of_a_third_ship():
+    """The last round, item 1: a Sherbourne man moved to the Fly is told apart by the ship he
+    came from; a third ship's man of the same id, come by the Sherbourne to the Fly, is told
+    apart again, never given the id the Fly has already."""
+    from freesail.world import crews as K
+    from freesail.world.musters import join, take_out
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    _wo(
+        w,
+        'ship: a cutter "Wren" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    wren, wren_hull = K.station_world(w, "Wren")
+    first = next(s for s in TR._hands(cutter) if s.id in fly.ship.extra["crew"].by_id)
+    sid = first.id
+    take_out(cutter, [first])
+    join(fly, [first], came_from=str(cutter.id))
+    second = wren_hull.ship.extra["crew"].by_id[sid]
+    take_out(wren_hull, [second])
+    join(cutter, [second], came_from=str(wren_hull.id))
+    take_out(cutter, [second])
+    join(fly, [second], came_from=str(cutter.id))
+    ids = [s.id for s in fly.ship.extra["crew"].sailors]
+    assert len(ids) == len(set(ids)), [i for i in ids if ids.count(i) > 1]
+    assert first.id != second.id
+
+
+def test_men_who_come_aboard_a_ship_at_quarters_are_on_her_bill():
+    """The last round, item 2 (ruled): the Fly beats to quarters while the Sherbourne's boat
+    has a load in her; the men who arrive are told off to her bill as her own hands left over
+    are when quarters is beaten (the trimmers, the powder, the marines), none unbilled, and
+    nobody already at quarters moved."""
+    from freesail.crew.model import Station
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    before = {s.id for s in TR._hands(fly)}
+    e = w.submit("transfer eight hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    assert w.submit("beat to quarters").kind != "order.rejected"
+    quarters = fly.ship.extra["quarters"]
+    billed = {s.id: s.quarters for s in TR._hands(fly) if s.quarters}
+    _until_home(w, cutter)
+    assert quarters.at_quarters
+    came = [s for s in TR._hands(fly) if s.id not in before]
+    assert len(came) == 8
+    unbilled = [
+        s.id
+        for s in fly.ship.extra["crew"].sailors
+        if s.fit and s.station is not Station.QUARTERDECK and not s.quarters
+    ]
+    assert not unbilled, unbilled
+    assert {s.id: s.quarters for s in TR._hands(fly) if s.id in billed} == billed
+
+
+def test_the_last_rounds_sentences():
+    """The last round, item 4: the verb by the number ('one was asked'); and 'you are not
+    moved' offers taking command of her only where she is his to take up (here she is his
+    own ship already)."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    e = w.submit("transfer one marine from the Fly to the Sherbourne")
+    assert e.kind == "order.rejected", e.text
+    assert e.text.endswith("The Fly has no marines fit and free; one was asked."), e.text
+    e = w.submit("transfer Mr Bowen from the Fly to the Sherbourne")
+    assert e.text.endswith("You are not moved by a transfer: go across in the boat yourself."), (
+        e.text
+    )
+
+
+@pytest.mark.parametrize("stem", COMPANY_FILES)
+def test_every_hand_of_every_muster_is_answered_by_his_name(stem):
+    """The last round, item 4, over the data: every row of every company file's muster that is
+    no person of hers, said by his name as the muster has it ('Danl. Ellicott', 'Abm.
+    Russell'), is answered as the man he is (one of her idlers, or one of her hands), never
+    'nobody answers'."""
+    import yaml
+
+    from freesail.api.session import make_world
+
+    doc = yaml.safe_load((Path(__file__).parent.parent / f"data/people/{stem}.yaml").read_text())
+    w = make_world(7, doc["ship"])
+    me = knowledge.players_person(w)
+    giver = w.players
+    persons = {p.sailor_id for p in giver.people.people}
+    for s in giver.ship.extra["crew"].sailors:
+        if s.id in persons:
+            continue
+        key = " ".join(s.name.replace('"', " ").split()).lower()
+        said = TR._why_not_moved(w, giver, key, s.name, me)
+        assert not said.startswith("Nobody"), (stem, s.name, said)
+        assert s.name in said, (stem, s.name, said)

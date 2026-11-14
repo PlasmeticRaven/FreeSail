@@ -265,3 +265,30 @@ def test_laid_in_shoal_water_her_log_carries_the_let_go_orders_warning(monkeypat
     w.run(2)
     warned = [x for x in list(hull.log)[n:] if x.kind == "anchor.depth_warning"]
     assert warned, [f"{x.kind}: {x.text}" for x in list(hull.log)[n:]]
+
+
+def test_riding_by_one_anchor_another_marked_down_out_of_reach_is_weighed():
+    """The last round, item 3: one anchor riding on her own ground and another marked down on
+    ground a mile off: the riding one as it is, the far one at the bows with its cable in, a
+    state; an hour on, the riding anchor alone is down."""
+    from freesail.evolutions.scripts import _let_go
+    from freesail.world.movement import put_aboard
+
+    w, v, hull, me = _asleep("an anchorage", "brig-sloop")
+    ship = hull.ship
+    tackle = ground_tackle(ship)
+    best = next(x for x in tackle.anchors if x.id == "best_bower")
+    _let_go(ship, best, 12.0)
+    best.scope_m, best.brought_up = 60.0, True
+    riding = (best.ground_x, best.ground_y, best.scope_m)
+    far = next(x for x in tackle.anchors if x.id == "small_bower")
+    far.state = AnchorState.DOWN
+    far.ground_x, far.ground_y = float(ship.dyn.x) + 1861.0, float(ship.dyn.y)
+    far.scope_m = 100.0
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    command.take_up(w, me, hull)
+    assert (best.ground_x, best.ground_y, best.scope_m) == riding
+    assert far.state is AnchorState.STOWED and far.ground_x is None and far.scope_m == 0.0
+    w.run(3600)
+    assert far.state is AnchorState.STOWED
+    assert [a for a in tackle.anchors if a.state is AnchorState.DOWN] == [best]

@@ -262,7 +262,7 @@ def take_up(
     # -- the act, in order (§2.3) --
     registry = getattr(root, "registry", None)
     if registry is not None:
-        registry.rehome(person, str(hull.id), row=True)
+        registry.rehome(person, str(hull.id), row=True, commands=True)
     person.confined_to = ""
     captain = getattr(hull, "captain", None)
     if captain is not None and getattr(captain, "commands", False):
@@ -376,7 +376,9 @@ def laid_at_her_anchor(hull: Any) -> str | None:
     down = [a for a in anchors if a.state is AnchorState.DOWN]
     riding = [a for a in down if _ground_within_scope(ship, a)]
     if riding:
-        # she rides by her own ground already: her tackle as it is, moored or at one anchor
+        # she rides by her own ground already: those anchors as they are, moored or at one;
+        # any other marked down on ground out of her reach weighed (the last round, item 3)
+        _weighed_out_of_reach([a for a in down if a not in riding])
         _nothing_set_no_way(ship)
         hull._far_anchored = True
         return None
@@ -407,13 +409,7 @@ def laid_at_her_anchor(hull: Any) -> str | None:
             data={"id": str(hull.id), "why": why},
         )
         return why
-    for a in down:
-        if a is not chosen:
-            # out of her reach: weighed with the far body's move, as her far body left her
-            a.state = AnchorState.STOWED
-            a.ground_x = a.ground_y = None
-            a.scope_m = 0.0
-            a.brought_up = a.taut = a.dragging = False
+    _weighed_out_of_reach([a for a in down if a is not chosen])
     _nothing_set_no_way(ship)
     ship.extra["water_depth_m"] = depth
     _let_go(ship, chosen, depth)
@@ -424,6 +420,18 @@ def laid_at_her_anchor(hull: Any) -> str | None:
     _anchoring_warnings(ship, chosen, depth, chosen.scope_m)
     hull._far_anchored = True
     return None
+
+
+def _weighed_out_of_reach(anchors: list[Any]) -> None:
+    """Anchors marked down on ground out of her reach, weighed as her far body left her: at
+    the bows, the cable in, a state (no evolution)."""
+    from freesail.ship.parts import AnchorState
+
+    for a in anchors:
+        a.state = AnchorState.STOWED
+        a.ground_x = a.ground_y = None
+        a.scope_m = 0.0
+        a.brought_up = a.taut = a.dragging = False
 
 
 def _ground_within_scope(ship: Any, anchor: Any) -> bool:

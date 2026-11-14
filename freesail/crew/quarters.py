@@ -274,11 +274,12 @@ class Quarters:
         if len(divisions[POWDER]) < powder_n:
             rest = [s for s in pool if s.station not in (Station.MARINES, Station.IDLERS)]
             divisions[POWDER] += take(rest, powder_n - len(divisions[POWDER]), POWDER)
-        divisions[POWDER] += take(by_station[Station.IDLERS], len(pool), POWDER)
-        divisions[MARINES] += take(by_station[Station.MARINES], len(pool), MARINES)
-        divisions[TRIMMERS] += take(pool, len(pool), TRIMMERS)
         self.crews = crews
         self.divisions = divisions
+        # the hands the bill has not placed: every idler to the powder, every marine to the
+        # marines' division, the rest to the trimmers (`tell_off_rest`, the one road a man
+        # joining her at quarters is billed by too)
+        self.tell_off_rest([s for s in pool if s.id not in taken])
         self.at_quarters = True
         self.since = tick
         crew.all_hands_called = True
@@ -288,6 +289,25 @@ class Quarters:
             s.turned_up = True
         self._to_stations()
         return self._beat_lines()
+
+    def tell_off_rest(self, men: list[Sailor]) -> None:
+        """Hands the bill has not placed told off as beat to quarters tells off its own: an
+        idler to the powder, a marine to the marines' division, any other to the trimmers;
+        each turned up. Called by `beat` for her hands left over, and for men who come aboard
+        her while she is at quarters (package 60, the last round, item 2: they were on no
+        bill), nobody else moved."""
+        for s in men:
+            if not s.fit or s.station is Station.QUARTERDECK:
+                continue
+            if s.station is Station.IDLERS:
+                where = POWDER
+            elif s.station is Station.MARINES:
+                where = MARINES
+            else:
+                where = TRIMMERS
+            s.quarters = where
+            self.divisions.setdefault(where, []).append(s)
+            s.turned_up = True
 
     def stand_down(self) -> None:
         """The guns secured or the hands piped down: every man back under the watch bill."""

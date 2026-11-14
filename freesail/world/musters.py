@@ -126,7 +126,13 @@ def join(hull: Any, men: list[Sailor], came_from: str = "") -> None:
     taken = {s.id for s in crew.sailors}
     for s in men:
         if s.id in taken and came_from:
-            s.id = f"{s.id}:{came_from}"
+            # never an id her muster has already, by whatever road he came (package 60, the
+            # last round, item 1: by way of a third ship two men bore one id)
+            wanted, n = f"{s.id}:{came_from}", 2
+            s.id = wanted
+            while s.id in taken:
+                s.id = f"{wanted}:{n}"
+                n += 1
         taken.add(s.id)
         s.post = None
         s.at = None
@@ -140,3 +146,8 @@ def join(hull: Any, men: list[Sailor], came_from: str = "") -> None:
             s.watch = Watch.STARBOARD if star <= lar else Watch.LARBOARD
         crew.sailors.append(s)
     crew.reindex()
+    quarters = extra.get("quarters")
+    if quarters is not None and getattr(quarters, "at_quarters", False):
+        # come aboard her at quarters: told off to her bill as her own hands left over are
+        # when quarters is beaten (package 60, the last round, item 2), nobody else moved
+        quarters.tell_off_rest(list(men))
