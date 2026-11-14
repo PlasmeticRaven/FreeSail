@@ -765,13 +765,14 @@ def test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth_where_she_lie
 
 
 @pytest.mark.parametrize("charted", [None, 2000.0], ids=["no depth known", "beyond her cable"])
-def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted):
+def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted, monkeypatch):
     """The lead's third reading, item 4 (JUDGEMENT): where her far body rode at an anchor but no
     anchor can hold her now (no depth known, or more water than her cable reaches), she wakes
     lying to with what lying to sets, no anchor marked down, and her log says why."""
     w, v, crew = _raven_anchored_far()
     crew.ship.extra["water_depth_m"] = None
-    crew.chart.depth_at = lambda position: charted
+    # the chart is shared between worlds: patched for this test alone, and given back
+    monkeypatch.setattr(crew.chart, "depth_at", lambda position: charted)
     K.promote(w, v)
     assert not crew.at_anchor
     lying = [x for x in crew.log if x.kind == "ship.hove_to"]
