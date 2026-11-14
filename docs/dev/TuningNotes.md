@@ -28849,3 +28849,175 @@ the same: absent under the chart of `channel-west` alone (None at 47.70 N 6 W), 
 under `atlantic-east` beyond every layer (57 N 6 W, its 140 m read). No skip by platform.
 Grepping the chart's and the audit's tests for `symlink`, `os.link` and `hardlink`: no other
 test makes a link.
+
+### The open edges read the water (M1; the lead's ruling of 2026-11-14; an engine step)
+
+**The cause** (measured after step 2's stop). `tide._open_edges` (package 94) kept a block's
+edge open wherever a charted box no block holds lay beyond it: `charted_bounds`, every
+region's and layer's box, water or land. A box is not water. The corridor's box runs to 1 W
+over Iberia and France, so 11 of the 38 open edges lay mostly over land (6,158 miles of edge,
+69% facing water). The Mediterranean's boxes, from 6 W, would have made 77 edges, 47% water
+and 43 over land. Wherever the eleven are within their reach, the taper blended a block's
+water toward theirs across that land.
+
+**The mend, where the cause lives.** An edge is open only along the stretches where the chart
+answers water just beyond it. The tool writes the stretches into the manifest at each build
+(`open_edges:`, beside the tide regions), from the chart it has just written. It samples every
+0.01 degree along each of package 94's candidate edges, the water read 0.01 degree beyond
+on the side outside every block (`tide.candidate_edges`, `tide.water_stretches`: one source,
+which the tool and the truths call). The tide reads the stretches as data
+(`tide.open_stretches`), and so the fill raise reads the same water (`mean_level_grid`
+builds its tide by `load_tide`). A manifest without the key, and a tide given its regions,
+read the boxes as before: every synthetic manifest of the tests and any older tree is
+unmoved (truth 7-572). The same tree gives the same stretches, rounded to the
+micro-degree. Today's chart: 38 candidate edges, 39 stretches facing water.
+
+**What it moves, by design: 21 water points of 80,260** (every region's and tide region's
+water on a 0.05-degree grid, old beside new):
+
+| region | points | where | level, old to new (m) | M2, old to new (m) |
+|---|---|---|---|---|
+| biscay-north | 13 | 47.875 to 47.975 N, 4.575 to 3.975 W: the Iroise's south side, Audierne bay and Concarneau | worst 3.289 to 3.085 at 47.875 N 3.975 W | 1.561 to 1.486 there |
+| channel-east | 3 | 49.375 N, 0.875 to 0.775 W (the Seine bay at 1 W) | 4.575 to 4.579 | 1.615 to 1.592 |
+| channel-mid | 4 | 50.775 N, 1.325 to 1.175 W (the Solent's west) | unchanged | 1.121 to 1.122 |
+| solent | 1 | 50.745 N 1.175 W | unchanged | 1.293 to 1.293 (under a millimetre) |
+
+The nearest moved point is 14 miles from the Diamond's patrol centre (she patrols within
+eight). Harpy's water is unmoved. **Package 94's tabled case is closed:** Concarneau's gauge
+lies 7.6 miles inside Biscay north from 48 N, across Brittany's land, and its water read the
+taper toward the eleven across that land (the level 3.29 m where the gauge's own is 3.06
+m). The edge at 48 N east of 4.5 W faces land, is no longer open, and the water there is the
+block's own (3.09 m, M2 1.49 m against the gauge's 1.48). Truth 7-571: every stretch the tide
+reads faces water; on step 2's tree, 3,157 samples on 13 edges faced land. Truth 7-572: a
+manifest without the key reads the 38 edges, and Concarneau's 3.289 m, as before.
+
+**The other readers of a box as if it were charted water** (for the cold review; not mended):
+
+- **`Chart.bounds`, the chart's limits** (the envelope of the regions' and layers' boxes).
+  The scenario's refusal of a start outside it (`core/world.py:786`) lets through a start
+  on water nothing charts inside the envelope, and refuses none on charted water outside
+  it. The ship's placing and the hand anchor (`world/orders.py:1359`, `4234`) read the
+  depth only within it. The lookout's "The chart has nothing to the <quarter> of this; the
+  coast beyond is uncharted." (`world/lookout.py:551`, `Chart.edge_near`) is said within ten
+  miles of the envelope's edge, not of the last water the chart answers: where the
+  envelope's box runs past the charted water (the Adriatic north of 42.5 N, inside the
+  envelope's east of 16.69 E, before level 0), nothing is said. Level 0 now answers most
+  such water.
+- **`world/business.py:290`:** a start in no region takes the whole envelope as its trade
+  area, land and uncharted water with it.
+- The browser's chart block (`api/queries.py`, `ui/harbour.py`) shows the envelope, for
+  display only.
+- Not this cause: `tide.region_bounds` (membership of a gauge's block, rightly by its box),
+  the weather's `box_at` and the streams' `book_limits` (boxes of weather and of statements),
+  the audit's check (a) (ownership by bounds, the water read from the tiles).
+
+**What M1 commits, by the chart session's cautions of 2026-11-14** (the cold review: tiles in
+plain git make a clone of about a gigabyte, and many data keys are read by nothing):
+
+- `open_edges:` holds `stretches:` alone, which the tide reads. The rule and its step live in
+  the code (`tide.water_stretches`, `OPEN_EDGE_STEP_DEG`) and here, not in the data.
+- **A rebuild commits a tile only where its arrays changed.** Biscay north's rebuild changes 5
+  tiles' arrays and gives its other 87 byte for byte as committed. Channel-mid's changes the
+  arrays of 2 tiles by M1 (175200_-4416, 176736_-4416). Its 75 other tiles differ only by
+  their zip entries' clock dates (built before `save_tile`, package 39e) and are left out,
+  their old bytes and manifest records kept. The drift's 2 tiles (181344_-4416,
+  182880_-4416) and its coast wait for the lead's word on (b2).
+
+**M1's whole effect on the tide** (every region's and tide region's points on the 0.05-degree
+grid, the tide with the manifest's stretches against the same manifest without them; land
+points and water both, the water by the chart's depth):
+
+| region | points moved | of them water | the worst water: level, old to new | M2, old to new |
+|---|---|---|---|---|
+| biscay-north | 222 | 13 | 3.289 to 3.085 m at 47.875 N 3.975 W | 1.561 to 1.486 m |
+| biscay-south | 318 | 0 | (land only: the Pyrenees' and the Landes' side of 42 N and 0.9 W) | |
+| portugal | 20 | 0 | (land only: Spain beside 6 W) | |
+| channel-east | 40 | 3 | 4.575 to 4.579 m at 49.375 N 0.875 W | 1.615 to 1.592 m |
+| channel-mid | 55 | 4 | 2.986 to 2.986 m at 50.775 N 1.325 W | 1.121 to 1.122 m |
+| solent | 52 | 1 | 3.158 to 3.158 m at 50.745 N 1.175 W | 1.293 to 1.293 m |
+
+Every other region and tide region: none moved. **Every place of both epitomes and every
+port's anchorage, outer road and mooring**, the spring range (2 × (M2 + S2)) old beside new:
+one moves by more than a tenth of a foot, **Norie's Concarneau, 13.92 to 13.26 ft**. No other
+place or port moves that far.
+
+**The pins M1 moves, by design (the lead's ruling of 2026-11-14):**
+
+1. Truth 94's seam pairs (`test_known_truths`, the seam's taper): the pair on 1 W at 49.1 N
+   is kept and pinned to what is now true. West of 1 W there is Normandy's land by
+   Saint-Lô, so the edge is no open edge: `taper_at(49.1 N, 0.997 W)` 0.0003 to **1.0**.
+   The pin had held the taper across land, the fault M1 mends. Its four other pairs on 1 W
+   and its two in the Iroise are unmoved (0.0003).
+2. Norie's Concarneau (`data/tides/establishments.yaml`): its rise is JUDGEMENT. Faden 1793,
+   p. 66, gives the hour alone, and no source on file gives the rise. By package 37j's rule
+   it is the world's spring range to the foot: **14 to 13 ft**, the model's 13.92 ft before
+   M1 (package 94's taper across Brittany's land, when it was raised from 13) and 13.26 ft
+   now. `test_tide`'s band of 0.6 ft is not widened.
+3. `test_chart`'s recipe-form test: the tool now reads the chart it writes, and the fixture's
+   empty placeholder tiles could not be read (numpy's `EOFError`, with no path). Mended both
+   halves. The fixture writes tiles the chart can read, with nothing in them. **A tile that
+   cannot be read is named and stops the build**: `Tile.load` raises a `ChartError` that
+   names the file, which serves every reader, and the tool's open edges turn it into its
+   stop. The test now holds both: the carry-over as before, and the stop by name with the
+   corridor's tiles made unreadable.
+
+**Where else a failed read is swallowed** (for the cold review; not mended, outside the
+brief). The tool swallows none: its one `except` asks GEBCO's app again after a reset, and
+raises on the last try. In the runtime, nine readers catch every exception about a chart
+read and take it as "beyond the chart's field" or "a chart with no field here":
+`orders/navigation.py:1111`, `world/ships.py:1699`, `world/captains.py:679`, `1149`, `1548`
+and `1676`, `world/brains.py:109`, `ui/harbour.py:447`, `world/prizes.py:1033`. With
+`Tile.load`'s named error, an unreadable tile there is still passed over as no chart.
+
+### Owed, not built (the owner's hold of 2026-11-14): the raise's check, and channel-mid's drift
+
+**The check.** The fill raise (`mean_level_grid`) is one source with the tide (package 93),
+but nothing notices when the tide's rule moves and a region's tiles keep the old raise. The
+check: the tool records at each region's build a hash of the raise grid it used, and a test
+recomputes the grid from today's tide and fails where they differ. **Cost:** recomputing all
+19 regions' grids from today's tide takes 10.7 s (162,891 cells; measured on this machine
+under another run), so it fits the fast tier. A baseline wants a control rebuild of each
+region with today's code, which proves its committed tiles are what that raise gives: about
+10 to 15 minutes a region with its fetch, some 3 to 4 hours for the 19, mostly fetching
+EMODnet and GEBCO. A region not yet baselined would be listed as unknown, not passed. **It
+would have caught** channel-mid's drift (below), at package 94's merge, and M1's own seven
+tiles before they were found by hand.
+
+**Channel-mid's drift.** Its committed tiles do not rebuild to themselves with today's code.
+The control was step 2's code at 7465f50 rebuilding `--region channel-mid` from a fresh
+fetch (EMODnet DTM 2024 and GEBCO 2025 extracts, the recipe's boxes). It differs from the
+committed tiles in **4 tiles' arrays**:
+
+| tile | cells | arrays |
+|---|---|---|
+| 2/175200_-4416 | 4,100 | elevation |
+| 2/176736_-4416 | 12,893 | elevation |
+| 2/181344_-4416 | 2,507 | elevation; the distance field in 33 cells |
+| 2/182880_-4416 | 48,925 | elevation; the distance field in 1 cell |
+
+Its coast file differs too. Its other 75 tiles differ only by their zip entries' clock dates
+(built before `save_tile`, package 39e); their arrays are equal. The four are the column from
+1.23 W, from the Seine bay to Spithead and Selsey, over the water of the Solent's tide region
+and the seam at 1 W. They were last written on 2026-10-30, at package 93's rebuild. **The
+cause, as far as known:** package 94 gave the Solent its own tide region and the seams their
+taper after channel-mid was last built, which moved the raise there, and channel-mid was
+never rebuilt on it; nothing noticed. Not proven: the control rebuilds with today's fetch,
+and a change in the services' data since 30 October would show the same way. The distance
+field's changes (34 cells) say a shore moved by the raise in the Solent's water.
+
+**The drift's cause, checked by what is on the disk (the lead's ruling of 2026-11-14).** The
+build cache does not hold channel-mid's source extracts as they were at package 93's rebuild:
+the three in it (EMODnet's `elevation` and `elevation_max` over 48.15 to 51.3 N and 3.7 to
+0.7 W, GEBCO's over 48.05 to 51.4 N and 3.8 to 0.6 W) were fetched on 2026-11-14 for M1's
+rebuild. Each differs in its checksum from the manifest's record of 2026-10-09, which proves
+nothing: ERDDAP's netCDF and GEBCO's zip carry their own dates of making. So the cause stays
+**unproven, with two hypotheses**: package 94's raise since the rebuild of 2026-10-30 (the
+Solent's tide region and the seam's taper), or a change in the services' data since 2026-10-09.
+A rebuild from the extracts of 2026-10-09, or a comparison of their arrays with today's, would
+decide it. Owed with the raise's check. Nothing of the control's rebuild is committed.
+
+**M1 commits tree b1** (the lead's ruling of 2026-11-14): biscay-north's five tiles and
+channel-mid's two by M1 alone (`2/175200_-4416`, `2/176736_-4416`: the committed arrays with
+M1's change, the M1 rebuild less the control, cell by cell), the manifest's records of their
+bytes, and `open_edges:`. Left out: biscay-north's 87 other tiles (byte for byte), channel-mid's
+75 others (clock dates only), the drift's two tiles and channel-mid's coast.

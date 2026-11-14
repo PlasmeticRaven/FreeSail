@@ -1349,14 +1349,30 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     fake.mkdir()
     last = yaml.safe_load((CHARTS / "manifest.yaml").read_text(encoding="utf-8"))
     (fake / "manifest.yaml").write_text(yaml.safe_dump(last, sort_keys=False), encoding="utf-8")
+
+    # package 112: the tool reads the chart it writes (the tide's open edges), so the
+    # fixture's tiles are tiles the chart can read, with nothing in them (old: empty files)
+    def nothing(path: Path, level: int, t: dict) -> None:
+        np.savez_compressed(
+            path,
+            elevation=np.full((512, 512), -32768, dtype=np.int16),
+            level=np.int16(level),
+            unit_m=np.float32(0.1),
+            cell_sec=np.float32(3.0),
+            south_sec=np.int64(t["south_sec"]),
+            west_sec=np.int64(t["west_sec"]),
+            nodata=np.int16(-32768),
+            min_depth_m=np.float32(np.nan),
+        )
+
     for level, tiles in last["regions"]["channel-west"]["tiles"].items():
         (fake / "tiles" / str(level)).mkdir(parents=True, exist_ok=True)
         for t in tiles:
-            (fake / "tiles" / str(level) / f"{t['name']}.npz").write_bytes(b"")
+            nothing(fake / "tiles" / str(level) / f"{t['name']}.npz", int(level), t)
     folder = fake / last["corridors"][CORRIDOR]["folder"]
     folder.mkdir(parents=True)
     for t in last["corridors"][CORRIDOR]["tiles"]:
-        (folder / f"{t['name']}.npz").write_bytes(b"")
+        nothing(folder / f"{t['name']}.npz", 1, t)
     (fake / "features").mkdir()
     (fake / "overrides").mkdir()
     monkeypatch.setattr(tool, "CHARTS_DIR", fake)
@@ -1374,6 +1390,12 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     report = []
     tool.Build(tmp_path, True, report).write_manifest({}, {}, {}, {})
     assert any("channel-west has tiles missing" in line for line in report)
+    # package 112: a tile the manifest lists and the chart cannot read stops the build, by
+    # its name, and is never passed over (the tide's open edges read the corridor here)
+    for t in last["corridors"][CORRIDOR]["tiles"]:
+        (folder / f"{t['name']}.npz").write_bytes(b"")
+    with pytest.raises(SystemExit, match=r"the tile .*\.npz cannot be read"):
+        tool.Build(tmp_path, True, []).write_manifest({}, {}, {}, {})
 
 
 # ---------------------------------------------------------------------------
