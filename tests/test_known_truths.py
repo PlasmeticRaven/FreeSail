@@ -8136,8 +8136,19 @@ def test_truth_7_134_two_cutters_at_pistol_shot_one_broadside_strikes_and_the_da
     ship (rule 1)."""
     w, v, enemy, battery = _two_cutters_at_pistol_shot()
     assert battery.target == v.id and battery.engaged == "starboard"
+    # package 115 D1 (the lead's hold ruling): the fire held now stays held, so the word is
+    # given when the engaged side is run out and primed (30 s after the engage, measured:
+    # every starboard gun loaded, run out and primed, none fired). OLD: the word at once,
+    # the engage having turned the hold into "as they bear", and the first minute's fire
+    # (two or more) was the guns' own as they bore; NEW: the broadside at the word, three
+    # shot, one struck her
+    assert not any(g.fired for g in w.ship.guns.values())
+    w.run(30)
+    side = [g for g in w.ship.guns.values() if g.side == "starboard" and g.serves]
+    assert all(battery.ready(g) for g in side) and not any(g.fired for g in side)
     said = w.submit("fire")
     assert said.kind == "guns.fire", said.text
+    assert "3 guns ready to go together" in said.text, said.text
     w.run(70)
     fired = [e for e in w.log if e.kind == "action.fired"]
     assert fired and fired[0].data["fired"] >= 2, [e.text for e in fired]

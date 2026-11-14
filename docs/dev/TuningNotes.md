@@ -29431,3 +29431,15 @@ beside new with the line-by-line difference.**
   reads the stations a seat holds), so his log is still the nobody-seated log with his
   orders in it; its lines follow the merchant passage's (3115 to 3108), its digest c0bf4b51621ad91f to
   de0f8c03bd2663df.
+
+**Truth 7-134 and the held battery (correcting the builder's first report).** The first report
+said a battery under `hold your fire` is not served ready; measured again, it is: the cutter's
+starboard guns, both sides loaded before the engage, are each loaded, run out and primed within
+thirty seconds of `engage her to starboard` under the hold, none fired (the side is run out and
+primed only once it is engaged, `Battery.serving`). The first measure read the guns one second
+after the engage. So `combat/guns.py` is not touched. The truth gave the word at once: with the
+old override the engage had turned the hold into "as they bear", and its "fired >= 2" was the
+guns' own fire as they bore; with the hold standing the word, given one second after, found one
+gun ready. The truth now gives the word when the side is ready (thirty seconds, asserted ready
+and unfired), its sentence and every figure as they were: "Three shot at a cutter: one struck
+her and two wide."
