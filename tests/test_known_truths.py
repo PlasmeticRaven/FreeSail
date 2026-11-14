@@ -8519,7 +8519,10 @@ def test_truth_7_141_firing_on_a_sail_not_made_out_as_an_enemy_is_told_not_refus
     """Rule 3, the least of it (the brief's item 7): a ship that fires on a sail not at war
     with her is not refused; the consequence is told once (`action.unrecognised`) and her
     state carries it (`ship.extra["outlaw"]`) for the ports' stance to read; 71's colours,
-    private signal and hail plug in where the lookout's nation is read."""
+    private signal and hail plug in where the lookout's nation is read. The sail is named
+    (the lead's last list of 2026-11-14, item 1): 'her' is the nearest enemy who may be
+    fought and, with none in sight, the order is refused in words, where it fell back to the
+    nearest sail, the road this truth took to the American cutter."""
     from freesail.combat.guns import battery_of
 
     w = make_world(SEED, CUTTER, _action_scenario())
@@ -8529,7 +8532,7 @@ def test_truth_7_141_firing_on_a_sail_not_made_out_as_an_enemy_is_told_not_refus
     enemy.ship.dyn.heading = heading
     w.submit("hold your fire")
     w.run(65)
-    said = w.submit("engage her to starboard")
+    said = w.submit("engage the cutter to starboard")
     assert said.kind == "guns.engage"
     w.submit("fire")
     w.run(70)
@@ -11523,7 +11526,9 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
     Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, in her
     squadron under her orders; a thousand ticks to settle, then the best of three timed thousands,
     at the end of each the crewed ships at `CREWED_CAP`, every 74 within `CREWED_NM` of her and in
-    company, and no line of an action in her log. At least `CREWED_FLOOR_TICKS_S` (60) a second on
+    company, and no line of an action in her log nor in any 74's own (the lead's last list of
+    2026-11-14, item 6: the sentence below said "one another" and the clause read her log alone,
+    where a 74 firing on a 74 is said in theirs). At least `CREWED_FLOOR_TICKS_S` (60) a second on
     the build machine. **What the last clause proves, and no more** (the lead's readings of
     cda12ec9, (C7)): every ship of her world is British and of one squadron, and no enemy is put
     in it, so that "no line of an action" can fail only if friends fire on friends: it proves that
@@ -11594,6 +11599,8 @@ def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
             assert nm <= K.CREWED_NM, (v.name, nm)
             assert v.crew.captain.state == "in company", (v.name, v.crew.captain.state)
     assert not [e.text for e in w.log if e.kind.startswith("action.")]
+    for v in fours:
+        assert not [e.text for e in v.crew.log.all() if e.kind.startswith("action.")], v.name
     assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
 
 

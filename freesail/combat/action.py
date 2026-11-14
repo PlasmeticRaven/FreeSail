@@ -19,7 +19,16 @@ out as an enemy (her colours not read, or her nation not at war with the firer's
 refused: the firer's log says so and the consequence (every port and ship that hears of
 it treats her as a pirate: `ship.extra["outlaw"]`, which the ports' stance reads), and the
 mark's captain treats the firer as an enemy from then on (`fired_on`), whatever her
-colours.
+colours: the shot is written in the one record of who has fired on whom (`relations.fired`;
+the lead's last list of 2026-11-14, item 2), which the far rounds write too and every judge of
+the mark reads, her far brain and her hull's captain alike.
+
+**A mark that changes hands** (the lead's last list, item 5): the battery's mark is a relation
+laid on her people, and a change of hands (`relations.changed_hands`: taken, retaken, restored)
+tells her World; at its next tick the one answer (`relations.still`, `MARK`) is asked of her as
+she now is, and where she is no mark the fire is held and the deck told why, as a strike holds
+it (`_watch_struck`). Before it the guns fired as they bore into a French prize retaken by a
+British cruiser, her own people aboard and her own colours up.
 
 **The strike.** Once a minute each ship under fire judges her morale (`morale.py`); under
 the doctrine's line the colours are struck: the battery holds, the state is written for
@@ -40,12 +49,14 @@ from freesail.combat.shot import range_words
 from freesail.core.events import Severity
 from freesail.crew.model import number_words
 from freesail.crew.quarters import quarters_of
+from freesail.world import relations as R
 from freesail.world.geo import bearing_and_distance
 from freesail.world.ships import PLAYER_ID
 
 __all__ = ["GUNNERY_STREAM", "strike", "target_of", "tick_action"]
 
 GUNNERY_STREAM = "gunnery"
+_CHANGED_HANDS = R.CHANGED_HANDS
 
 
 class _LazyStream:
@@ -87,6 +98,8 @@ def tick_action(world: Any) -> None:
         units.wrap_pi(target.bearing_rad - firer.heading_rad) if target is not None else None
     )
     rng = _LazyStream(world)  # the gunnery's stream opened at the first shot, not before
+    if _CHANGED_HANDS in (getattr(ship, "extra", None) or {}):
+        _watch_changed_hands(world, battery)
     fired_before = battery.rounds_fired
     opened_before = dict(battery.opened_fire_at)
     battery.tick(1.0, quarters, firer, target, rng, tick, HITS.resolve_shot)
@@ -261,15 +274,11 @@ def _fired_on(world: Any, battery: Battery, target: Target, tick: int, opened_be
                     f"{_cap(words)} opens fire on us at {range_words(target.range_m)}.",
                     data={"firer": firer_id, "range_m": round(target.range_m)},
                 )
-        captain = getattr(target.world, "captain", None)
-        if captain is not None:
-            captain.fired_on.add(firer_id)
+        R.fired(world, firer_id, target.id)  # her captain's and her brain's one record
     else:
         if signal:
             return
-        brain = getattr(target.body, "brain", None)
-        if brain is not None:
-            brain.fired_on.add(firer_id)
+        R.fired(world, firer_id, target.id)
     if first:
         _recognition(world, target)
 
@@ -561,6 +570,49 @@ def _watch_struck(world: Any, battery: Battery, tick: int) -> None:
         if battery.target == v.id:
             battery.mode = FireMode.HOLD
             battery.word = None
+
+
+def _watch_changed_hands(world: Any, battery: Battery) -> None:
+    """The battery's mark has changed hands since the fire was laid on her (the module's head;
+    `relations.changed_hands` tells her World): asked of her as she now is by the one answer
+    (`relations.MARK`, her captain's judgement), and where she is no mark, the fire laid on her held
+    (the guns, and the marines and the small arms, who fire at the battery's mark) and the deck told
+    why; still a mark to her by the one answer, the fire goes on."""
+    from freesail.combat.small_arms import Musketry
+    from freesail.world import prizes as P
+
+    extra = world.ship.extra
+    told = extra.pop(_CHANGED_HANDS, None) or ()
+    target = str(battery.target or "")
+    if not target or target not in told:
+        return
+    m = extra.get("musketry")
+    m = m if isinstance(m, Musketry) else None
+    guns = not (battery.mode is FireMode.HOLD and battery.word is None)
+    arms = m is not None and (m.mode != "hold" or (m.served and m.small_arms_mode != "hold"))
+    if not guns and not arms:
+        return  # no fire laid on her: nothing to hold
+    judge = getattr(world, "captain", None)
+    if R.still(world, _own_id(world), target, R.MARK, judge=judge):
+        return
+    if guns:
+        battery.mode = FireMode.HOLD
+        battery.word = None
+    if arms:
+        m.mode = "hold"
+        m.small_arms_mode = "hold"
+    held = " and ".join(x for x, on in (("the guns", guns), ("the small arms", arms)) if on)
+    v = R.ship_of(world, target)
+    rec = P.record_of(v) if v is not None else None
+    back = (rec or {}).get("retaken") or (rec or {}).get("restored")
+    how = f"is {back[0]}" if isinstance(back, (tuple, list)) and back else "has changed hands"
+    words = _words_in(world, target, str(getattr(v, "name", "") or "the mark"))
+    world.record(
+        Severity.URGENT,
+        "action.mark_changed_hands",
+        f"{_cap(words)} {how}: {held} hold their fire.",
+        data={"id": target, "guns": guns, "small_arms": arms},
+    )
 
 
 # -- names ---------------------------------------------------------------------------------

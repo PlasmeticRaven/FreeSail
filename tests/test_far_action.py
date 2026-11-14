@@ -572,12 +572,31 @@ def test_no_round_at_a_prize_and_the_captor_and_her_prize_keep_company():
     fired into the prize the minute she was made (five killed, eleven wounded), she "struck"
     again and lay to, and the frigate was on passage at 240 with her prize 1.9 miles astern by
     1200 and 6.4 by 3600; with the round alone mended, the prize kept her station leg but fell
-    astern half a mile an hour (3.1 miles at 21,600), the set's pace leaving its prizes out."""
+    astern half a mile an hour (3.1 miles at 21,600), the set's pace leaving its prizes out.
+
+    **For its own reason** (the lead's last list of 2026-11-14, item 7): her captor's own prize is
+    kept from his rounds twice, by `MARK`'s "nobody's prize" and by his knowledge (his own prize,
+    `Judgement._prize_of_ours`, is no enemy), so that the test passed with `MARK`'s prize check
+    taken out. At the cut-out minute a French frigate is put 0.6 miles off her (within the reach of
+    her guns), `engaging` her: the brig is her own nation's ship under a British prize crew and
+    British colours, an enemy to her by all she knows, and only "nobody's prize" keeps the rounds
+    from her (she is taken back by coming up, never fought); no pair is made, and the frigate
+    leaves the sea before the minute runs. With the prize check taken out the pair is made and the
+    test fails there."""
+    from freesail.world import relations as R
+
     w, f, g = _a_brig_cut_out()
     w.run(60)
     assert f.brain.history[-1] == (120, "engaging") and P.is_prize(g)
     assert P.record_of(g)["captor"] == f.id and P.record_of(g)["how"] == "cut out"
     assert not g.damage and not f.damage and "far" not in w.rng.stream_names()
+    off = destination(g.position, 90.0, 0.6 * units.NAUTICAL_MILE)
+    at = {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg}
+    h = put(w, "frigate", "france", at, "bound for Brest", "bound for Brest", name="Renard")
+    h.brain.state, h.brain._stranger = "engaging", g.id
+    assert FA.reach_m(h) > 0.6 * units.NAUTICAL_MILE
+    assert not R.still(w, h, g, R.MARK) and FA._pairs(w) == []
+    h.done = True
     worst = 0.0
     for _ in range(240):
         w.run(60)
@@ -592,11 +611,43 @@ def test_no_round_at_a_prize_and_the_captor_and_her_prize_keep_company():
 def test_the_rounds_choose_no_prize_no_struck_ship_and_none_of_her_own_side():
     """(F3) at `_pairs`' own level: a far ship engaging a mark makes a pair while the mark is an
     enemy on the sea, her colours up and nobody's prize; struck, a prize, showing her own colours,
-    a friend by the hail, or gone, no round."""
+    a friend by the hail, or gone, no round. **For its own reason** (the lead's last list of
+    2026-11-14, item 7): a prize of her own is kept from her rounds by her knowledge as well
+    (`Judgement._prize_of_ours`), so that the test passed with `MARK`'s prize check taken out; the
+    prize is tried first as one of the enemy's, a British merchant brig under a French prize crew
+    and French colours, whom only "nobody's prize" keeps from the British frigate's rounds (she is
+    taken back by coming up). With the prize check taken out, the pair is made and the test fails
+    there."""
     from freesail.world import signalling
     from freesail.world import signals as S
 
     w, f, g = _a_brig_cut_out()
+    north = destination(f.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+    hope = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": north.lat_deg, "lon_deg": north.lon_deg},
+        "bound for Falmouth",
+        name="Hope",
+    )
+    east = destination(hope.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+    renard = put(
+        w,
+        "frigate",
+        "france",
+        {"lat_deg": east.lat_deg, "lon_deg": east.lon_deg},
+        "bound for Brest",
+        name="Renard",
+    )
+    hope.struck = True
+    P.possess(w, renard, hope, by="a test", said=False)
+    renard.done = True
+    f.brain._stranger = hope.id
+    f.brain.state = "engaging"
+    assert P.is_prize(hope) and hope.nation_shown == "france"
+    assert FA._pairs(w) == []  # an enemy's prize: taken back by coming up, never fought
+    hope.done = True
     g.brain.state = "on passage"
     f.brain._stranger = g.id
     f.brain.state = "engaging"
@@ -707,8 +758,13 @@ def test_a_signal_to_engage_or_chase_with_nobody_for_it_leaves_her_as_she_was_sa
     with none she holds on as she was, and her story says so (for the chase, her commander and
     the player's ship spoken, so that no stranger is in sight). OLD BESIDE NEW: at 53c14457, to
     engage, she went engaging at the signal's minute (tick 300) with no mark, lay to ten minutes
-    and was on passage at 960; to chase, she went chasing nobody."""
+    and was on passage at 960; to chase, she went chasing nobody. **Her words true** (the lead's
+    last list of 2026-11-14, item 6): with her commander and the player's ship in sight and both
+    spoken, she says "no stranger in sight", where she said "no sail in sight" (20a8e2e3); to
+    engage, "no enemy within reach to engage" (an enemy within reach who is no mark, struck or a
+    prize, is within reach still), where she said "no enemy within reach"."""
     from freesail.world import signals as S
+    from freesail.world.brains import perceive_vessel
 
     w, boss, mate, _foe = _under_orders(None)
     if signal == "general chase":
@@ -720,7 +776,13 @@ def test_a_signal_to_engage_or_chase_with_nobody_for_it_leaves_her_as_she_was_sa
         assert mate.brain.state == "on passage", (w.clock.tick, mate.brain.history)
     assert [s for _, s in mate.brain.history] == ["on passage"]
     said = [words for _, words in mate.story if "holds on as she was" in words]
-    nobody = "no enemy within reach" if signal == "engage the enemy" else "no sail in sight"
+    if signal == "engage the enemy":
+        nobody = "no enemy within reach to engage"
+    else:
+        nobody = "no stranger in sight"
+        in_sight = {s["id"] for s in perceive_vessel(w, mate, mate.brain).strangers}
+        assert {boss.id, "the ship"} <= in_sight  # sails in sight, all spoken
+        assert "no sail in sight" not in said[0]
     assert len(said) == 1 and nobody in said[0], mate.story[-3:]
 
 

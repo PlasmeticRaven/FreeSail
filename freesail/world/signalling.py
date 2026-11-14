@@ -314,10 +314,11 @@ def _obey(cap: Any, locker: S.Locker, h: S.Hoist, sender: str, tick: int, near: 
     state = does.get("state")
     if state:
         near_s = None
+        in_sight = False
         if state in ("chasing", "investigating a stranger"):
-            near_s = (
-                cap._nearest_stranger(_perceive(cap)) if hasattr(cap, "_nearest_stranger") else None
-            )
+            p = _perceive(cap)
+            in_sight = bool(getattr(p, "strangers", None))
+            near_s = cap._nearest_stranger(p) if hasattr(cap, "_nearest_stranger") else None
             if near_s is not None:
                 cap._stranger = near_s.get("id")
         if getattr(cap, "state", None) == state or state not in (
@@ -331,13 +332,18 @@ def _obey(cap: Any, locker: S.Locker, h: S.Hoist, sender: str, tick: int, near: 
         # cda12ec9, (F5)): the sail nearest for a chase or a look, an enemy within the breaking-
         # off distance by her own judgement for the action (`_enemy_within`, the one answer's
         # `MARK` on the far body); with none she holds on as she was, and says so, where she went
-        # engaging nobody, lay to ten minutes and rejoined (or chased nobody and left the sea)
+        # engaging nobody, lay to ten minutes and rejoined (or chased nobody and left the sea).
+        # Her words say what she found (the lead's last list of 2026-11-14, item 6): "no sail in
+        # sight" only with none in sight, "no stranger in sight" where every sail in sight is
+        # spoken or given up; "no enemy within reach to engage", for an enemy within reach who is
+        # no mark (struck, a prize) is within reach still
         meaning = h.meaning.lower()
         if state in ("chasing", "investigating a stranger") and near_s is None:
-            _say(cap, tick, f"By {by}'s signal: {meaning}; no sail in sight, {AS_SHE_WAS}.")
+            nobody = "no stranger in sight" if in_sight else "no sail in sight"
+            _say(cap, tick, f"By {by}'s signal: {meaning}; {nobody}, {AS_SHE_WAS}.")
             return
         if state == "engaging" and _no_enemy_within_reach(cap):
-            words = f"By {by}'s signal: {meaning}; no enemy within reach, {AS_SHE_WAS}."
+            words = f"By {by}'s signal: {meaning}; no enemy within reach to engage, {AS_SHE_WAS}."
             _say(cap, tick, words)
             return
         try:

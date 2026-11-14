@@ -333,7 +333,8 @@ class FarCaptain(Judgement):
         self._stranger: str | None = None
         self.spoken_ids: set[str] = set()
         self.given_up: set[str] = set()
-        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
+        # the ships that fired on her (package 70): her row of the one record (`Judgement.
+        # fired_on`, `relations.fired_on`), shared with her hull's captain
         self.recognised: dict[str, dict[str, Any]] = {}  # package 71: by signal or hail
         self.pirates: set[str] = set()  # seen to fire under false colours (package 71)
         self._business: dict[str, Any] = {}
