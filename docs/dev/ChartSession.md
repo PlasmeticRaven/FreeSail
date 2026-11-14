@@ -592,3 +592,18 @@ browser plans unmoved.
   under review. This session and its builders do not read or write the review's sessions or
   `docs/reviews/`; a finding that touches the chart comes through the lead.
 - 111's last step is still with its builder (the sampler's step); the seven tracks wait for it.
+
+### 2026-11-14, 04:50: THE OWNER'S WORD ON MENDS (through the lead)
+
+"as long as we make sure to plan our fixes for them so as to build for generality rather
+than fixing the symptom." Every mend from a reading: the general cause named, mended where it
+lives so every reader of the same thing is served, where else it was looked for and what was
+found, tested at that level; and when this session reads a mended hash, it says of each mend
+which kind it is. Passed to both builders. Applied now: 112 to name the cause of the
+Mediterranean's tide move before step 3 (I take it to be `tide.charted_bounds` reading a
+layer's box as water) and to propose the general mend (an engine change, the lead's word);
+the symlink test mended in the shared way tests build a chart tree. 111's sampler, when it
+returns: the cause a fixed step unrelated to the grid's cell, and where else a fixed step
+samples the chart, in the audit and the game. **My own seven tracks** are drawn to the same
+rule: the cause of their drying legs named (a leg's line, not the port, crossing a mole or a
+point), not each leg nudged.
