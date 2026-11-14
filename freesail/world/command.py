@@ -319,16 +319,90 @@ def take_up(
 def _woken_at_her_anchor(root: Any, hull: Any, vessel: Any) -> None:
     """The ship he takes up woken at once, if she sleeps in the far shape (the player's own
     ship is awake always, and `crews.switch` wakes no hull that is his: the lead's reading of
-    ab0ade58, item 1), riding as her far body lay (`crews.rides_as_she_lay`: at her anchor
-    where it rode at one, nothing set); an awake hull as she lies."""
+    ab0ade58, item 1). An awake hull is taken up as she lies."""
+    woken_at_her_anchor(root, vessel)
+
+
+def woken_at_her_anchor(root: Any, vessel: Any) -> None:
+    """A sleeping hull woken for him, at his take-up or as he steps aboard her
+    (`movement`'s boarding): by the trunk's wake, and where her far body rode at an anchor
+    (her plan's leg, kept while she slept), laid at it whole (`laid_at_her_anchor`)."""
     from freesail.world import crews
 
     crew = getattr(vessel, "crew", None)
-    if crew is not None and not getattr(crew, "awake", True):
-        crews.promote(root, vessel)
-    # an awake hull is taken up as she lies, at anchor or under way (the third reading of
-    # 52d99b9a, item 2: her plan is not kept while she is awake, and a ship making way was
-    # furled and anchored by it)
+    if crew is None or getattr(crew, "awake", True):
+        return
+    plan = getattr(vessel, "plan", None) or []
+    rode = bool(plan) and plan[0][0] == "anchor"
+    crews.promote(root, vessel)
+    if rode:
+        laid_at_her_anchor(vessel.crew)
+
+
+def laid_at_her_anchor(hull: Any) -> str | None:
+    """A ship taken up asleep whose far body rode at an anchor, laid at it in one state (the
+    lead's cut of package 60, ruling 3): one anchor, the first `scripts.cannot_anchor` passes,
+    down on the ground under her at the scope the chart's depth where she lies wants, brought
+    up; nothing set; no way. An anchor marked down on other ground (where she fell asleep,
+    before her far body moved) is laid again under her, never left to hold her a mile off.
+    Where no anchor can hold her, nothing is done beyond the trunk's wake and her log says why
+    in one line. A state, set at once: no evolution is started, and nothing here can refuse
+    or raise. Returns why none holds, or None where she is laid."""
+    from freesail.evolutions.scripts import _let_go, _scope_plan, cannot_anchor
+    from freesail.ship.parts import AnchorState, SailState, ground_tackle
+
+    ship = hull.ship
+    tackle = ground_tackle(ship)
+    anchors = list(tackle.anchors) if tackle is not None else []
+    depth = None
+    chart = getattr(hull, "chart", None)
+    if chart is not None and hull.position is not None:
+        charted = chart.depth_at(hull.position)
+        if charted is not None:
+            depth = float(charted) + float(getattr(hull, "tide_height_m", 0.0) or 0.0)
+    chosen, whys = None, []
+    for a in anchors:
+        # one marked down is asked as if at her bows: it is to be laid again under her
+        was = a.state
+        if was is AnchorState.DOWN:
+            a.state = AnchorState.READY
+        why = cannot_anchor(ship, a, depth)
+        a.state = was
+        if why is None:
+            chosen = a
+            break
+        whys.append(why)
+    if chosen is None:
+        why = whys[0] if whys else cannot_anchor(ship, None, depth)
+        hull.record(
+            Severity.NOTABLE,
+            "ship.not_anchored",
+            f"No anchor of hers will hold her where she lies ({why}).",
+            data={"id": str(hull.id), "why": why},
+        )
+        return why
+    for a in anchors:
+        if a.state is AnchorState.DOWN:
+            # weighed with the far body's move, in the state the far body left her in
+            a.state = AnchorState.STOWED
+            a.ground_x = a.ground_y = None
+            a.scope_m = 0.0
+            a.brought_up = a.taut = a.dragging = False
+    for sail in ship.sails.values():
+        if sail.is_set:
+            sail.state = SailState.FURLED
+    dyn = ship.dyn
+    dyn.u = dyn.v = 0.0
+    if hasattr(dyn, "speed"):
+        dyn.speed = 0.0
+    if hasattr(dyn, "r"):
+        dyn.r = 0.0
+    ship.extra["water_depth_m"] = depth
+    _let_go(ship, chosen, depth)
+    chosen.scope_m = _scope_plan(chosen, depth, None)[0]
+    chosen.brought_up = True
+    hull._far_anchored = True
+    return None
 
 
 def _seat_follows(root: Any, person: Any, hull: Any) -> None:

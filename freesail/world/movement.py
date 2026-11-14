@@ -1222,14 +1222,15 @@ def _drivers_follow(world: Any, person: Any, hull: Any) -> None:
     root.followed = str(hull.id)
     # a sleeping hull he goes aboard is woken (package 60, the lead's second reading of
     # 4dda3dfe, item 3): followed she is stepped, and asleep she sailed on with her file's
-    # sail set and no anchor down; woken, she rides as her far body lay
-    # (`crews.rides_as_she_lay`)
+    # sail set and no anchor down; woken by the trunk's wake, and where her far body rode at
+    # an anchor laid at it whole (`command.laid_at_her_anchor`, the cut's ruling 3: this is
+    # where a ship he takes up asleep is woken, before his order)
     vessel = getattr(hull, "vessel", None)
     sleeping = getattr(vessel, "crew", None)
     if vessel is not None and sleeping is not None and not sleeping.awake and not vessel.done:
-        from freesail.world.crews import promote
+        from freesail.world.command import woken_at_her_anchor
 
-        promote(root, vessel)
+        woken_at_her_anchor(root, vessel)
     with root.as_hull(hull):
         root.record(
             Severity.ROUTINE,

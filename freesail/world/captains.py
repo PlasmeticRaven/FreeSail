@@ -2721,10 +2721,7 @@ class Captain(Judgement):
             return "keeping station"
         return "on passage"  # a member of a set: `_enter` makes it `in company` (package 72)
 
-    def _enter(self, state: str, quiet: bool = False) -> None:
-        """Her captain into a state: his book for it loaded and said; `quiet` at a wake
-        (package 60, the fourth reading: the wake adds no line but its own), the book loaded
-        and the state taken without a line."""
+    def _enter(self, state: str) -> None:
         world = self.world
         # package 72 (spec M7 §21): a member of a set enters `in company` where her
         # doctrine would enter a plan state; the set is the parent World's, and the
@@ -2736,17 +2733,14 @@ class Captain(Judgement):
         state = plan_state_of(root, own, state)
         old = self.state
         if old is not None:
-            self._leave(old, quiet=quiet)
+            self._leave(old)
         self.state = state
         self._state_entered = world.clock.tick
         lines = self._book_lines(state)
         runtime = getattr(world, "standing", None)
         loaded = []
         if runtime is not None and lines:
-            loaded = runtime.load_book(state, lines, actor_for(state), quiet=quiet)
-        if quiet:
-            self._on_enter(state, old)
-            return
+            loaded = runtime.load_book(state, lines, actor_for(state))
         said = f"{self.name}: {state}"
         if self.intent is not None:
             said += f" ({self.intent.words})"
@@ -2761,10 +2755,10 @@ class Captain(Judgement):
         )
         self._on_enter(state, old)
 
-    def _leave(self, state: str, quiet: bool = False) -> None:
+    def _leave(self, state: str) -> None:
         runtime = getattr(self.world, "standing", None)
         if runtime is not None:
-            runtime.unload_book(state, actor_for(state), quiet=quiet)
+            runtime.unload_book(state, actor_for(state))
 
     def _book_lines(self, state: str) -> list[str]:
         """The state's book from the doctrine's template, the placeholders filled with
