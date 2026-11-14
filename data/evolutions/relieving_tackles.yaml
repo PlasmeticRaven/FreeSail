@@ -1,17 +1,14 @@
 # The relieving tackles rove to the tiller when the wheel or the tiller ropes are shot away
-# (scripted, RelievingTacklesScript in evolutions/repair_scripts.py; package 115 D4 (e), the
-# cold review of 2026-11-14, 5.3 item 8: `combat.hits` writes "the helm is lost until the
-# relieving tackles are rove" and nothing could rove them). Two luff tackles hooked to the
-# tiller's end below and manned there, the helm's orders passed down: Steel 1794, vol. 1,
-# RELIEVING-TACKLES, "used when the tiller-ropes are damaged, have one end made fast to a
-# rope strap, with a thimble on each side of the tiller, and the other end to an eye-bolt in
-# the side" (docs/references/steel/steel-1794-rigging-and-seamanship-vol1-ocr.txt, l. 25825);
-# Luce 1884, the quarter bill: "at the relieving tackles, an officer or quartermaster, with a
-# few men to steer the vessel in case the wheel or tiller-ropes are shot away" (docs/
-# references/luce/luce-1884-textbook-of-seamanship-ocr.txt, l. 21775; and l. 6002). Falconer
-# 1780's RELIEVING-TACKLES are the careening tackles, another use of the name. One phase,
-# `reeve`; at its end `helm_lost` is cleared and the helm answers. Her steering meanwhile is
-# the physics' as before (physics/hull.py holds the rudder where it was).
+# (scripted, RelievingTacklesScript in evolutions/repair_scripts.py). The hit that takes the
+# wheel says the helm is lost until the relieving tackles are rove, and this is their rigging:
+# two tackles hooked to the tiller's end below and manned there, the helm's orders passed
+# down. Steel 1794, vol. 1, RELIEVING-TACKLES, "used when the tiller-ropes are damaged, have
+# one end made fast to a rope strap, with a thimble on each side of the tiller, and the other
+# end to an eye-bolt in the side"; Luce 1884, the quarter bill: "at the relieving tackles, an
+# officer or quartermaster, with a few men to steer the vessel in case the wheel or
+# tiller-ropes are shot away". Falconer 1780's RELIEVING-TACKLES are the careening tackles,
+# another use of the name. One phase, `reeve`; at its end the helm answers again. Her
+# steering meanwhile is as it was, the rudder held where the shot left it.
 id: relieving_tackles
 verb: relieving_tackles
 applies_to: {class: ship}

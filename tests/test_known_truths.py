@@ -17695,6 +17695,10 @@ def test_truth_7_621_the_officer_does_not_send_the_same_words_down_twice_within_
     w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
     w.run(9000)
     _said(w, "shape a course for Plymouth")
+    # below by his own order: since package 115 D4 (c) the day's work no longer
+    # takes the player's own person below, which is how the reviewer's captain came to be
+    # sent the eight reports; a captain below by his own choice is sent them still
+    _said(w, "go below")
     w.run(7200 + 14400)
     made = [e for e in w.log if e.kind == reports.REPORT_MADE]
     assert made, "no report sent down in the passage"

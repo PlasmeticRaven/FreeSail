@@ -446,11 +446,14 @@ def tick(world: Any) -> None:
         if _reported_lately(log, what, now):
             continue  # he was told this in these words, and has not been up since
         more = "" if n == 1 else f" ({_count_words(n)} the same)"
+        data = {"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who}
+        if n > 1:
+            data["n"] = n  # a report of one line keeps its data as it was, and its digest
         world.record(
             Severity.NOTABLE,
             REPORT_MADE,
             f"{who} sent down to the captain, {_place_words(place)}: {what}{more}.",
-            data={"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who, "n": n},
+            data=data,
         )
 
 
