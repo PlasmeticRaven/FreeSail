@@ -1511,9 +1511,12 @@ def test_console_flag_reads_the_file_at_the_start(tmp_path, monkeypatch):
 
 
 def test_server_driver_reads_a_file_and_answers_the_book(tmp_path):
+    from freesail.ui.places import Places
+
     path = tmp_path / "starter.orders"
     path.write_text(NIGHT + "\n" + KEEP_FULL + "\n", encoding="utf-8")
     d = Driver(frigate())
+    d.places = Places(tmp_path)  # a book over the server lies in its folders (package 115)
     e = d.submit(f"read the standing orders from {path}")
     assert e.kind == "driver.standing_orders" and e.text == f"Read 2 standing orders from {path}."
     assert len(d.world.standing.book) == 2

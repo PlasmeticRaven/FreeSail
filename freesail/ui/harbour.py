@@ -69,11 +69,12 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from freesail import settings as settings_mod
 from freesail.settings import SettingsError
+from freesail.ui.places import PlaceRefused, Places
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIR = ROOT / "client"
@@ -292,6 +293,10 @@ class Harbour:
         self.started = started
         self.game_url = game_url
         self.client_dir = CLIENT_DIR
+        # the page as served: the server's guard puts the game's mark in it (package 115)
+        self.page: Any = lambda path, host="": FileResponse(path, media_type="text/html")
+        # the server's folders (package 115, part A): the app gives the driver's
+        self.places = Places(saves_dir, self.scenarios_place)
         self.doors: dict[str, Door] = {}
         self._ids = itertools.count(1)
         self.game: dict[str, Any] = {}  # what the harbour started, in words
@@ -522,9 +527,18 @@ class Harbour:
         load = str(choices.get("load") or "").strip()
         if not (scenario or ship or load):
             raise HarbourError("Choose a scenario, a ship or a save to load.")
-        args.scenario = scenario or None
-        args.ship = ship or None
-        args.load = load or None
+        # every file the start names lies in the server's folders (package 115, part A),
+        # a save in the saves place or the game's folder; refused in words, unopened
+        try:
+            args.scenario = str(self.places.readable(scenario, "scenario")) if scenario else None
+            args.ship = str(self.places.readable(ship, "ship's file")) if ship else None
+            args.load = str(self.places.save_to_load(load)) if load else None
+            book = str(choices.get("standing_orders") or "").strip()
+            args.standing_orders = str(self.places.book(book)) if book else None
+            brief = str(choices.get("director_brief") or "").strip()
+            args.director_brief = self.places.brief(brief) if brief else None
+        except PlaceRefused as e:
+            raise HarbourError(str(e), 403) from None
 
         def number(name: str, kind: type, default: Any = None) -> Any:
             value = choices.get(name)
@@ -556,8 +570,6 @@ class Harbour:
         if business not in ("", "on", "off"):
             raise HarbourError("The business is on, off, or as the scenario says.")
         args.business = business or None
-        args.director_brief = str(choices.get("director_brief") or "").strip() or None
-        args.standing_orders = str(choices.get("standing_orders") or "").strip() or None
         args.ease_on_station = bool(choices.get("ease_on_station"))
         lines: list[str] = []
         try:
@@ -1022,6 +1034,7 @@ class Harbour:
 
         if not isinstance(fields, dict):
             raise HarbourError("A scenario is a mapping of fields.")
+        fields, said = self._fields_in_places(fields)
         original, _ = self._original(source)
         try:
             text = scenario_text(fields, original)
@@ -1035,12 +1048,15 @@ class Harbour:
                 world = make_scenario_world(sf)
                 begin(world, sf)
             except (ScenarioError, OSError, ValueError, KeyError) as e:
-                raise HarbourError(_scenario_words(str(e), p)) from None
+                raise HarbourError(self._in_their_words(_scenario_words(str(e), p), said)) from None
             refused = [e for e in world.log if e.kind == "order.rejected"]
             if refused:
                 raise HarbourError(
-                    "A first order or standing order was refused: "
-                    + "; ".join(e.text for e in refused[:3])
+                    self._in_their_words(
+                        "A first order or standing order was refused: "
+                        + "; ".join(e.text for e in refused[:3]),
+                        said,
+                    )
                 )
             seat = sf.player_seat
             if seat:
@@ -1050,8 +1066,54 @@ class Harbour:
                     seat_station(world, seat)
                 except Exception as e:  # noqa: BLE001  (OrderError, in words)
                     raise HarbourError(f"stations: {e}") from None
-            lines = [ln.replace(str(p), "this scenario") for ln in sf.lines() + guard_lines(world)]
+            lines = [
+                self._in_their_words(ln.replace(str(p), "this scenario"), said)
+                for ln in sf.lines() + guard_lines(world)
+            ]
         return {"text": text, "lines": lines}
+
+    def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
+        """The files a scenario's fields name (her ship's file, the books, a director's
+        brief) lie in the server's folders (package 115, part A), or the maker refuses them
+        in words before the scenario is loaded and any of them opened. The fields to prove,
+        each such file given by the path it was found at (the path checked is the path
+        opened, whatever folder the server was started from); the fields written are the
+        player's own words, unchanged."""
+        import copy
+
+        out = copy.deepcopy(fields)
+        said: dict[str, str] = {}  # each path as found -> the player's own words for it
+
+        def found(given: str, path: Any) -> str:
+            said[str(path)] = given
+            return str(path)
+
+        try:
+            ship = out.get("ship")
+            if isinstance(ship, dict) and ship.get("file"):
+                given = str(ship["file"])
+                ship["file"] = found(given, self.places.readable(given, "ship's file"))
+            if out.get("standing_orders"):
+                out["standing_orders"] = [
+                    found(str(b), self.places.book(str(b)))
+                    for b in out.get("standing_orders") or []
+                ]
+            director = out.get("director")
+            if isinstance(director, dict) and isinstance(director.get("brief"), str):
+                given = director["brief"]
+                director["brief"] = found(given, self.places.brief(given))
+        except PlaceRefused as e:
+            raise HarbourError(str(e), 403) from None
+        return out, said
+
+    @staticmethod
+    def _in_their_words(text: str, said: dict[str, str]) -> str:
+        """The proof's words with each file named as the player named it, not as it was
+        found (its whole path)."""
+        for path, given in sorted(said.items(), key=lambda kv: -len(kv[0])):
+            if path != given:
+                text = text.replace(path, given)
+        return text
 
     def save_scenario(
         self,
@@ -1126,9 +1188,9 @@ def harbour_routes(h: Harbour) -> APIRouter:
         except SettingsError as e:
             raise HTTPException(status_code=400, detail=str(e)) from None
 
-    @router.get("/harbour")
-    def harbour_page() -> FileResponse:
-        return FileResponse(h.client_dir / "harbour.html", media_type="text/html")
+    @router.get("/harbour", response_model=None)
+    def harbour_page(request: Request) -> Response:
+        return h.page(h.client_dir / "harbour.html", request.headers.get("host", ""))
 
     @router.get("/api/harbour/state")
     def api_state() -> JSONResponse:
