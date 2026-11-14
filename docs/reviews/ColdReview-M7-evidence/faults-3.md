@@ -7,12 +7,37 @@ process. The scratch copy is not a git checkout, and the real tree is a shallow 
 without `f5be9110` (`git cat-file -t f5be9110`: "Not a valid object name"), so the
 "against git" tests skip in both.
 
-| No. | Test | Fault | Baseline | Result | s |
+| No. | Test (file::name) | Fault | Baseline | Result | s |
 |---|---|---|---|---|---|
-| 06-1 | test_hull.py::test_leeway_change_is_noted_at_most_once_a_minute | once-a-minute clause deleted | pass | SURVIVED | 1 |
-| 06-2 | test_hull.py::test_all_four_ships_run_under_bare_poles | sail and spar windage return 0 | pass | SURVIVED | 2 |
-| 06-3 | test_hull_cutter.py::test_the_drawn_hull_is_reported_beside_the_filed_figures | drawn displacement x 1.10 | pass | SURVIVED | 1 |
-| 06-4 | test_hull_cutter.py::test_a_diff_of_her_physics_keys_against_git_shows_none, test_hull_brig.py::test_no_figure_..._moved[brig.yaml] | cutter main mast rating +20 kN, brig GM +0.2 m, generator and files alike | skip | SURVIVED (skip) | 1 |
+| 06-1 | test_hull.py::test_leeway_change_is_noted_at_most_once_a_minute | once-a-minute clause deleted | pass | SURVIVED (suite too) | 1 |
+| 06-2 | test_hull.py::test_all_four_ships_run_under_bare_poles | sail and spar windage 0 | pass | SURVIVED (test_sea kills) | 2 |
+| 06-3 | test_hull_cutter.py::test_the_drawn_hull_is_reported_beside_the_filed_figures | drawn displacement x 1.10 | pass | SURVIVED (lugger, brig pins kill) | 1 |
+| 06-4 | test_hull_cutter.py::test_a_diff_of_her_physics_keys_against_git_shows_none; test_hull_brig.py::test_no_figure_the_physics_or_the_gunnery_reads_moved[data/ships/brig.yaml] | cutter mast rating +20 kN, brig GM +0.2 m, generator and files alike | **skip** | SURVIVED (skip; suite too) | 1 |
+| 06-5 | test_indefatigable.py::test_her_drawn_hull_stands_within_its_bands_and_moves_nothing | 64's QD port half-breadths in 0.2 m | pass | KILLED | 2 |
+| 06-A1 | (no test) leeway line flood | as 06-1; 5 tests run | - | SURVIVED | 1-11 |
+| 06-A2 | (no test) no windage under bare poles | as 06-2; 3 tests run | - | KILLED | 1-3 |
+| 06-A3 | (no test) rating changed in the generator | as 06-4 | - | SURVIVED | - |
+| 07-1 | test_longitude.py::test_the_lookouts_estimate_is_drawn_once_and_held_while_she_makes_no_way | log line's estimate from the true distance | pass | SURVIVED (test_lookout kills) | 12 |
+| 07-2 | test_mends_109.py::test_words_of_the_dialect_go_to_the_dialect (2 cases) | latitude-sight synonyms moved to "work up the reckoning" | pass | SURVIVED (truth 7-540 kills) | 7 |
+| 07-3 | test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks | "Not to be had in the cabin" kept for ever | pass | SURVIVED (suite too) | 13 |
+| 07-4 | test_knowledge.py::test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone | word not written in other hulls' logs | pass | SURVIVED (say-is-heard test kills) | 22 |
+| 07-5 | test_longitude.py::test_the_dialect_reads_the_new_rows_for_nothing_and_the_events_are_named | "east of" / "west of" swapped | pass | SURVIVED (test_reckoning kills) | 7 |
+| 07-6 | test_mcp_server.py::test_the_chart_and_the_ships_view_come_as_images_drawn_by_the_open_page | `pic = None` in `Desk.picture` | pass | KILLED | 3 |
+| 07-B1 | (no test) lugger forereaches hove to | helm untended, jib drawing, luggers only | - | SURVIVED | 8 |
+| 07-B2 | (no test) `at a sounding` never fires | dispatch skips the event | - | KILLED (truth 66) | 33 |
+| 07-B3 | (no test) word left standing behind shut ports | `self.word = None` removed | pass | KILLED (as predicted) | 2 |
+| 08-1 | test_officer.py::test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_watch; ::test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_conversation | size threshold deleted | pass | SURVIVED, SURVIVED (2 others kill) | 4, 5 |
+| 08-2 | test_orders.py::test_table[frigate: veer cable], [frigate: veer to ninety fathoms] | "veer cable" starts heave_in | pass | SURVIVED (test_anchor kills) | 2 |
+| 08-3 | test_orders_m4a.py::test_trim_the_sail_and_tend_the_sheets (15 cases) | trimmed_sheets reversed | pass | SURVIVED | 8 |
+| 08-4 | test_ordnance.py::test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sound | reserve dropped from real `wanting` | pass | SURVIVED (2 others kill) | 4 |
+| 08-5 | test_people.py::test_send_for_brings_a_man_to_where_the_captain_is_by_the_messenger | `PASS_THE_WORD_S = 3600` | pass | SURVIVED (suite too) | 14 |
+| 08-6 | test_orders.py::test_take_a_fix_is_completed_from_the_marks_in_sight | "A and B and A" offered first | pass | SURVIVED | 8 |
+| 08-A | (no test) messenger an hour | as 08-5; 5 tests run | - | SURVIVED | 14-22 |
+| 08-B | (no test) real magazine without the reserve | as 08-4 | - | KILLED | 3, 1 |
+| 08-C | claim, not a fault: handover at 16,384 | pristine code | - | CLAIM STANDS (worse) | - |
+
+"(suite too)" means that no other test run caught it either; "(X kills)" names the test
+outside the named one that failed with the fault in.
 
 ## 06-1 Leeway noted more than once a minute
 
@@ -106,7 +131,6 @@ shallow checkout, and nothing else pins those two figures.
 
 ## 06-5 The 64's quarterdeck ports moved in 0.2 m
 
-| 06-5 | test_indefatigable.py::test_her_drawn_hull_stands_within_its_bands_and_moves_nothing | QD port half-breadths in 0.2 m | pass | KILLED | 2 |
 
 ```
 --- mut/tools/ships/indefatigable.py
@@ -148,7 +172,6 @@ run).
 
 ## 07-1 The lookout's log line carries the true distance
 
-| 07-1 | test_longitude.py::test_the_lookouts_estimate_is_drawn_once_and_held_while_she_makes_no_way | log line's estimate from true distance | pass | SURVIVED | 12 |
 
 ```
 --- mut/freesail/world/lookout.py
@@ -174,7 +197,6 @@ fails, `AssertionError: assert ('three leagues' == 'four leagues'` (line 102).
 
 ## 07-2 The latitude's sight sent to "work up the reckoning"
 
-| 07-2 | test_mends_109.py::test_words_of_the_dialect_go_to_the_dialect (both cases) | two synonyms moved to the wrong order | pass | SURVIVED | 7 |
 
 ```
 --- mut/data/vocabulary.yaml
@@ -200,7 +222,6 @@ fails, `AssertionError: assert ('reckoning.worked' == 'order.rejected'` (line 16
 
 ## 07-3 The "Not to be had in the cabin" line kept after he comes on deck
 
-| 07-3 | test_knowledge.py::test_a_captain_in_the_cabin_reads_the_cabins_and_not_the_decks | first non-None elsewhere line kept for ever | pass | SURVIVED | 13 |
 
 ```
 --- mut/freesail/agents/harness.py
@@ -234,7 +255,6 @@ fault, all pass: `::test_knowledge_all_turns_the_rule_off` (line 311),
 
 ## 07-4 A word said on deck no longer written in the other hulls' logs
 
-| 07-4 | test_knowledge.py::test_the_boat_away_with_the_player_reads_the_ship_by_sight_and_hail_alone | loop recording the word on other hulls deleted | pass | SURVIVED | 22 |
 
 ```
 --- mut/freesail/orders/stations.py
@@ -268,7 +288,6 @@ see); the fault is caught by the suite.
 
 ## 07-5 "is east of" and "is west of" swapped in the dialect
 
-| 07-5 | test_longitude.py::test_the_dialect_reads_the_new_rows_for_nothing_and_the_events_are_named | east_of and west_of swapped | pass | SURVIVED | 7 |
 
 ```
 --- mut/freesail/standing/grammar.py
@@ -293,7 +312,6 @@ elsewhere: `test_reckoning.py::test_the_dialect_reads_the_new_rows_for_nothing` 
 
 ## 07-6 Every keyed fetch of a picture answers 404
 
-| 07-6 | test_mcp_server.py::test_the_chart_and_the_ships_view_come_as_images_drawn_by_the_open_page | `pic = None` in `Desk.picture` | pass | KILLED | 3 |
 
 ```
 --- mut/freesail/agents/remote.py
@@ -396,7 +414,6 @@ predicted.
 
 ## 08-1 The handover note asked for whatever the conversation's size
 
-| 08-1 | test_officer.py::test_the_handover_is_asked_for_at_a_reserve_in_tokens_and_of_an_officer_off_watch; ::test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_conversation | `if size < threshold: return` deleted | pass, pass | SURVIVED, SURVIVED | 4, 5 |
 
 ```
 --- mut/freesail/agents/harness.py
@@ -451,7 +468,6 @@ gives exactly this budget was read from the test at 999, not run through a serve
 
 ## 08-2 "veer cable" starts the heave-in
 
-| 08-2 | test_orders.py::test_table[frigate: veer cable], [frigate: veer to ninety fathoms] | `"veer cable": "heave_in"` | pass, pass | SURVIVED, SURVIVED | 2 |
 
 ```
 --- mut/freesail/orders/ground_tackle.py
@@ -471,7 +487,6 @@ fails, `assert abs(best.scope_fathoms - 60.0) < 0.5` / `AssertionError: assert (
 
 ## 08-3 The sheets trimmed reported in reverse
 
-| 08-3 | test_orders_m4a.py::test_trim_the_sail_and_tend_the_sheets (all 15 cases, among them [tend the sheets], [trim the headsails], [tend sheets], [trim the sheets]) | `trimmed_sheets` reversed | pass | SURVIVED | 8 |
 
 ```
 --- mut/freesail/orders/verbs.py
@@ -492,7 +507,6 @@ weight to the suite is that the assertion on the sheets' names is void.
 
 ## 08-4 The real magazine never wants its barrels below made up
 
-| 08-4 | test_ordnance.py::test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sound | reserve dropped from `Magazine.wanting` | pass | SURVIVED | 4 |
 
 ```
 --- mut/freesail/ship/parts.py
@@ -513,7 +527,6 @@ for the named test; **KILLED** for the reader's fault B (the real `wanting`), tw
 
 ## 08-5 The messenger takes an hour
 
-| 08-5 | test_people.py::test_send_for_brings_a_man_to_where_the_captain_is_by_the_messenger | `PASS_THE_WORD_S = 3600` | pass | SURVIVED | 14 |
 
 ```
 --- mut/freesail/world/people.py
@@ -536,7 +549,6 @@ reads the time names the constant (13 uses, in `test_people.py`, `test_letters.p
 
 ## 08-6 A fix offered with the first mark again for its third
 
-| 08-6 | test_orders.py::test_take_a_fix_is_completed_from_the_marks_in_sight | `... and A and B and A` offered, first among the threes | pass | SURVIVED | 8 |
 
 The reader gave no line; `_fix_offers` is at `freesail/orders/complete.py:373-395`. The
 second of his two forms was planted (the first, the marks reversed, would be caught by the
@@ -559,3 +571,30 @@ offer to be rejected and passed by 2375's second leg; in fact the game takes it 
 (`reckoning.fix`, "Fixed by cross bearings: St Mawes castle NNW, Manacle Point WSW; the lines
 cut at 80 degrees"): a two-mark fix under three-mark words, the repeated mark dropped without
 a word. **SURVIVED**.
+
+## Count
+
+Faults planted against a named test: 17. **Survived 15, killed 2** (06-5, 07-6), not run 0.
+Of the 15 that the named test let through, 9 were caught by some other test in the suite
+when I looked for one (06-2, 06-3, 07-1, 07-2, 07-4, 07-5, 08-1, 08-2, 08-4), and 6 got past
+every test I ran (06-1, 06-4, 07-3, 08-3, 08-5, 08-6). Of the readers' "no test would catch
+it" faults: 6 tried as faults (06-A1, 06-A2, 07-B1, 07-B2, 07-B3, and 08-B as 08-4), 3 of
+them SURVIVED (06-A1, 07-B1, 08-A; 06-A3 is 06-4) and 3 KILLED (06-A2, 07-B2, 08-B; 07-B3 was
+predicted to be caught and was). The claim 08-C stands on the pristine code. One baseline
+did not pass: the two "against git" tests of 06-4 skip in this checkout, as they will in any
+shallow clone, and so cannot fail.
+
+What the survivals have in common: the assertion that carries the test's name is made void by
+a fallback (`or True`, `or len(...) == len(...)`, `>= 0.0`, `in (True, False)`), a guard
+that is never true (`if bearing_cables(...) <= 4` on metres taken for miles, a skip when a
+commit is absent), a figure read back from the constant under test (`PASS_THE_WORD_S`), or a
+check on the first sample when the change comes later; and the things a player sees over
+time (how often a line comes, which way she moves, how long a man takes) are where those
+voids sit. The suite as a whole is better than the named tests: more than half of the
+survivals are caught somewhere else, usually by an older truth or a pin in a neighbouring
+file, so the cost is mostly that the named tests prove less than their names say, and
+the six that nothing caught are the ones to mend.
+
+Not done: the first form of 08-6 (marks reversed) was not run; the reader's "three or four
+knots" for 07-B1 was not reached (the planted fault gives about two); no test file was run
+whole except `tests/test_lug.py` (8 s) and the 15 cases of the 08-3 test.
