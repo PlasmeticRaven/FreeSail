@@ -143,6 +143,9 @@ def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[
     """(where, names) for every checkpoint of the game's own the census takes."""
     for path in sorted(FIXTURES.glob("*.checkpoint")):
         yield f"the kept save {path.name}", names_of_file(path)
+    for path in sorted(FIXTURES.glob("*.json")):
+        say(f"  {path.name}, played on")
+        yield f"the kept save {path.name}, played on", census_of_kept_save(path)
     for path in scenario_files():
         say(f"  {path.name}")
         # ten minutes (an evolution under way) and the long run (what the hours bring)
@@ -155,10 +158,79 @@ def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[
     yield "the wardroom", census_of_wardroom()
 
 
+def census_of_kept_save(path: Path, run_s: int = 3600):
+    """A kept save taken up as a player takes one up (from its checkpoint), a station left
+    in it taken again by a model, played on for an hour and checkpointed again: a station's
+    sample open, a model's transcript under way."""
+    from freesail.agents import Fake
+    from freesail.core import replay
+
+    world, _ = replay.load(path, replay_anyway=True)
+    for h in list((getattr(world, "agents", None) or {}).values()):
+        # a station left in the save taken again by a model, as a player's door takes it
+        if getattr(h.agent, "released", False) and hasattr(h, "reseat"):
+            h.reseat(Fake(["Aye."], loop=True), identity="the census", door="mcp", save=None)
+    world.run(run_s)
+    return names_of_bytes(replay.checkpoint_bytes(world))
+
+
 def census_of_wardroom():
     from freesail.core import replay
 
     return names_of_bytes(replay.checkpoint_bytes(wardroom_world()))
+
+
+def kin(names: set[tuple[str, str]]) -> set[tuple[str, str]]:
+    """The classes of the game's kin to the census's: for each class the census met, every
+    class of the game that shares a class of the game with it (its subclasses, and its
+    base's other subclasses: every evolution's script beside the scripts met, `CrewedWorld`
+    beside `World`), and every record (a dataclass or an enum) of a module the census met a
+    class of, by its exact name. JUDGEMENT: play reaches a script, a world or a record of a
+    family by roads no census of scenarios walks whole (a boom shifted, a ship crewed close
+    by, the captain's grant to his officer), and a class of the family, or a record of the
+    same module, is the same kind of state; a function, a name of another library, and a
+    class of a module no checkpoint holds are admitted only as met."""
+    import importlib
+    import pkgutil
+
+    import freesail
+
+    for m in pkgutil.walk_packages(freesail.__path__, "freesail."):
+        if not m.name.endswith("__main__"):
+            importlib.import_module(m.name)
+
+    def below(c: type):  # type: ignore[no-untyped-def]
+        for s in c.__subclasses__():
+            yield s
+            yield from below(s)
+
+    import dataclasses
+    import enum
+    import inspect
+
+    out: set[tuple[str, str]] = set()
+    for module in {m for m, _ in names if m.startswith("freesail.")}:
+        # the module's other records: its dataclasses and its enums, data made from their
+        # fields alone (the captain's grant beside the stand-by, a fishing ground's lot)
+        mod = importlib.import_module(module)
+        for _, c in inspect.getmembers(mod, inspect.isclass):
+            if c.__module__ == module and (dataclasses.is_dataclass(c) or issubclass(c, enum.Enum)):
+                out.add((module, c.__qualname__))
+    for module, name in names:
+        if not module.startswith("freesail."):
+            continue
+        obj: object = importlib.import_module(module)
+        for part in name.split("."):
+            obj = getattr(obj, part, None)
+        if not isinstance(obj, type):
+            continue
+        for family in obj.__mro__:
+            if not family.__module__.startswith("freesail."):
+                continue
+            for s in below(family):
+                if s.__module__.startswith("freesail.") and "<locals>" not in s.__qualname__:
+                    out.add((s.__module__, s.__qualname__))
+    return out
 
 
 def write_list(names: set[tuple[str, str]]) -> str:
@@ -191,6 +263,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{where}: not in the list: {sorted(lacking)}")
         found |= names
     found.discard(("builtins", "getattr"))  # admitted by BOUND_METHODS alone, never by name
+    while not kin(found) <= found:  # the kin of the kin, until nothing more comes
+        found |= kin(found)
     print(f"{len(found)} names in the census; {len(ADMITTED)} in the list.")
     print(f"bound methods admitted: {sorted(BOUND_METHODS)}")
     unused = ADMITTED - found

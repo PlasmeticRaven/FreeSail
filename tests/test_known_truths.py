@@ -17808,6 +17808,7 @@ def _census_cases():
         for what, n, run_s, orders in C.WORLDS
     ]
     cases += [pytest.param("wardroom", None, 0, (), id="the-wardroom")]
+    cases += [pytest.param("kin", None, 0, (), id="the-list-holds-its-kin")]
     return cases
 
 
@@ -17827,7 +17828,9 @@ def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list
 
     from freesail.core.checkpoint_names import ADMITTED
 
-    if kind == "wardroom":
+    if kind == "kin":
+        names = C.kin(set(ADMITTED))  # every class of the game kin to one the list admits
+    elif kind == "wardroom":
         names = C.census_of_wardroom()
     elif kind == "fixture":
         names = C.names_of_file(path)
