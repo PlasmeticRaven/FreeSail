@@ -1610,13 +1610,17 @@ def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away
     her weather side, against its mast. "Fill away" dips it first, as she lies (Ext §5.7's as-built
     note): lowered at the order, hoisted on the starboard side when its time is done, its sheet
     drawn for the wind she will have full and by, and then she is let fall off and filled away,
-    each said. Seed 7, 15 kn, from her settle, hove to at +108 s (old +106) and the shift 60 s
-    after: forced round 20 s after the shift, the order 40 s after that; the dip's words at +1 s,
-    she lying 65-85 degrees off while its yard is on deck (as she lies with it clewed up, D4 (a));
-    hoisted and "Hauled aft the head sheets" at +177 s, "Filled away on the larboard tack" at +244
-    s; at +300 s it draws clear of its mast as at her settle (61.8 m2), at 4.04 kn. Old, before her
-    boy was a landsman (the lead's ruling (8) of 2026-11-09; the dip is all hands' work, the boy
-    among them): hoisted at +158 s, filled away at +218 s, at 4.15 kn. Before B3.3b she
+    each said. Seed 7, 15 kn, from her settle, hove to at +104 s and the shift 60 s after: forced
+    round 20 s after the shift, the order 40 s after that; the dip's words at +1 s, she lying 65-85
+    degrees off while its yard is on deck (as she lies with it clewed up, D4 (a)); hoisted and
+    "Hauled aft the head sheets" at +144 s, "Filled away on the larboard tack" at +199 s; at +300 s
+    it draws clear of its mast as at her settle (61.8 m2), at 4.15 kn. Her fill-away is worked by
+    her own six (her file's `hands:`, the lead's (C2) of 2026-11-14), all hands up: her six seamen,
+    the cook no longer at the braces. Old (53c14457, the file's twelve clamped to her seven, the
+    cook among them): hove to at +107 s, hoisted at +169 s, filled away at +233 s, 4.11 kn (as
+    first written, +108, +177 and +244 s, 4.04 kn). Old, before her boy was a landsman (the lead's
+    ruling (8) of 2026-11-09; the dip is all hands' work, the boy among them): hoisted at +158 s,
+    filled away at +218 s, at 4.15 kn. Before B3.3b she
     was filled away at +59 s with it drawing against its mast to the end, two-thirds of that
     (41.3 m2), at 3.13 kn, and no line said so; at her step 5's +2.25 in 8 kn she was forced round
     of herself and filled away so (41.4 m2, 2.23 kn, her review). Dipped as she fell off instead
@@ -1656,7 +1660,7 @@ def test_forced_round_hove_to_her_kept_settee_is_dipped_first_and_she_fills_away
     hauled = "Hauled aft the head sheets; kept the helm a-lee to let her fall off."
     assert _first_tick(world, start, dip) == 1
     up = _first_tick(world, start, hoisted)
-    assert up is not None and abs(up - 177) <= 10, [e.text for e in _after(world, start)]
+    assert up is not None and abs(up - 144) <= 10, [e.text for e in _after(world, start)]
     assert _first_tick(world, start, hauled) == up  # then she is let fall off
     filled = [e for e in _after(world, start) if e.kind == "ship.filled_away"]
     assert len(filled) == 1 and filled[0].text.startswith("Filled away on the larboard tack")
@@ -2169,6 +2173,17 @@ NINE_DECK = [
     ("take_in_settee", SETTEE, "set", 6),
     ("dip_settee", SETTEE, "set", 6),
 ]
+# the manoeuvres a watch on deck is asked for without a call (the lead's (C2) of 2026-11-14: every
+# numbered one; the rest call all hands by their files), worked by the watch alone, the officer of
+# the watch giving them: no post is counted for a manoeuvre (`scripts.HELM_MANOEUVRES`). Heaving to
+# and filling away want her own six (her file's `hands:`), scudding and backing and filling six by
+# their files.
+NINE_MANOEUVRES = [
+    ("heave_to", 6),
+    ("fill_away", 6),
+    ("scud", 6),
+    ("back_and_fill", 6),
+]
 # her work aloft beside it: no post goes aloft (loosing and furling, the settee from furled)
 NINE_ALOFT = [
     ("set_square", "fore.topsail", "furled", 6),
@@ -2222,7 +2237,7 @@ def _her_request(w, eid: str, sid: str | None, state: str | None):
     if evo.script is not None:
         inst.script = SCRIPTS[evo.script](ship, params, runner._timing(ship, evo))
     inst.holds = runner._holds(ship, inst)
-    inst.want = CrewRequest.from_mapping(evo.crew)
+    inst.want = CrewRequest.from_mapping(runner._crew_line(ship, evo))
     runner.instances.append(inst)
     began = runner._take_hands(ship, inst, crew)
     by = [s.post or s.station.value for s in inst.assignment.hands] if began else []
@@ -2246,7 +2261,14 @@ def test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_t
     night the watch's three and the post begin it, four (enough for a take in of four); by day the
     three, the cook and the post, five (a take in of four enough with the three and the cook, the
     post not taken). Nothing calls all hands. Her work aloft (loosing and furling, the settee from
-    furled) is begun short by the watch's three alone, no post going aloft.
+    furled) is begun short by the watch's three alone, no post going aloft. And every manoeuvre a
+    watch on deck is asked for without a call (the lead's (C2) of 2026-11-14), each by the watch
+    alone, no post counted for a manoeuvre: heaving to and filling away (her own six, her file's
+    `hands:`), scudding and backing and filling (six by their files), begun short by the three, by
+    day with the cook. Old (53c14457): by night heaving to and filling away waited ("Not hands
+    enough on deck to heave to; there are but three to spare."), the files' twelve clamped to her
+    company's seven, the three under half; by day begun by the three and the cook, four of seven.
+    At her eight (the clamp six) the starboard's three began both.
     Old (her eight, bfb10c6f; docs/dev/TuningNotes.md, "The lead's rulings 8 and 11"): the
     starboard watch's three began every one of these short (four by day with the cook); the
     larboard's two by night began none but a head sail's take in, the settee's calling all hands
@@ -2275,6 +2297,15 @@ def test_at_nine_either_watch_begins_every_watchs_deck_work_with_the_master_or_t
         label = (eid, sid, watch, hour)
         assert began and not called and inst.assignment.wanted == wanted, label
         assert len(by) == 3 and not {"master", "mate", "idlers"} & set(by), (label, by)
+    for eid, wanted in NINE_MANOEUVRES:
+        w = _her_watch_at(hour, watch)
+        began, inst, by, called = _her_request(w, eid, None, None)
+        label = (eid, watch, hour)
+        assert began and not called and not inst.want.all_hands, (label, by)
+        assert inst.assignment.wanted == wanted, label
+        assert ("idlers" in by) == (hour == 12), (label, by)
+        assert len([b for b in by if b != "idlers"]) == 3, (label, by)
+        assert not {"master", "mate"} & set(by), (label, by)
 
 
 @pytest.mark.parametrize(

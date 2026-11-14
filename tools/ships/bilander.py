@@ -1344,6 +1344,22 @@ HEADER = (
 REPORT: dict = {}
 
 
+# Her own number of hands for the two manoeuvres a watch is asked for by night without a call
+# (the lead's (C2) of 2026-11-14), over their files' twelve: six, her seamen of both watches, so
+# that either watch's three begin them, short, as the starboard's three did at her eight. The
+# files' twelve is clamped to what her company could ever put to the work, and at her nine that
+# is seven (her six seamen and the cook), of which three are under half; at her eight it was six.
+# Six moves no other ship's figure and no line of hers with all hands up but the hand the cook was.
+WATCH_MANOEUVRE_HANDS = {"heave_to": 6, "fill_away": 6}
+HANDS_NOTE = (
+    "Her own number of hands for an evolution, over its file's: heaving to and filling away, six, "
+    "her seamen of both watches, so that either watch of three begins them by night, short, as the "
+    "starboard's three did at her eight; the files' twelve, clamped to what her company could "
+    "ever give, is seven at her nine (her six seamen and the cook), and three are under half of "
+    "it (the lead's (C2) of 2026-11-14; judgement)."
+)
+
+
 def write(out_dir: str, p: Particulars) -> None:
     """Build her file and dump it to `out_dir`: the hull, the masts and yards, the square sails,
     the settee, the head and the spritsail, the main topmast staysail and the storm canvas, the
@@ -1393,6 +1409,7 @@ def write(out_dir: str, p: Particulars) -> None:
     armament(b, guns)
     quarter_bill(b, guns)
     hold_pumps_boat(b)
+    b.hands(HANDS_NOTE, WATCH_MANOEUVRE_HANDS)
     b.descriptions([DESCRIPTION])
     b.dump(os.path.join(out_dir, "bilander.yaml"), HEADER)
 

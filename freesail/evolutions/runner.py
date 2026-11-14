@@ -384,7 +384,7 @@ class Runner:
         inst.holds = self._holds(ship, inst)
         if self._crew(ship) is not None:
             try:
-                inst.want = hands.CrewRequest.from_mapping(evo.crew)
+                inst.want = hands.CrewRequest.from_mapping(self._crew_line(ship, evo))
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
@@ -591,6 +591,19 @@ class Runner:
         spec = getattr(ship, "spec", None)
         own = (getattr(spec, "timing", None) or {}).get(evo.id)
         return {**evo.timing, **own} if own else evo.timing
+
+    @staticmethod
+    def _crew_line(ship: Ship, evo: registry.Evolution) -> dict[str, Any]:
+        """The work's crew line: its file's, with the ship file's own number of hands for that
+        evolution over the file's where her file gives one (`ShipSpec.hands`; package 75, the
+        lead's (C2) of 2026-11-14: the bilander's heave-to and filling away, six of her, so that
+        either watch's three begin them by night at her nine as the starboard's three did at her
+        eight, where the ninth hand had lifted the company's clamp on the file's twelve from six
+        to seven). Every other ship and evolution, the file's own; a spec pickled before it, the
+        file's own."""
+        spec = getattr(ship, "spec", None)
+        own = (getattr(spec, "hands", None) or {}).get(evo.id)
+        return {**evo.crew, "hands": own} if own else evo.crew
 
     def _check_party(self, ship: Ship, inst: Instance) -> None:
         """An order that names its hands (`with the idlers`, `send the starboard watch
@@ -1357,7 +1370,7 @@ class Runner:
 
     def _want(self, inst: Instance) -> hands.CrewRequest:
         if inst.want is None:
-            inst.want = hands.CrewRequest.from_mapping(inst.evo.crew)
+            inst.want = hands.CrewRequest.from_mapping(self._crew_line(self.ship, inst.evo))
         return inst.want
 
     def _subject_mast(self, ship: Ship, inst: Instance) -> str | None:

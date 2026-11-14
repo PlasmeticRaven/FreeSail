@@ -1120,6 +1120,7 @@ class Builder:
         self.boat_notes: dict[tuple[str, ...], str] = {}
         self.oars_note: str = ""
         self.timing_note: str = ""
+        self.hands_note: str = ""
         # package 75 (SW-4; Build-Ships.md §9.2): each lower mast's channel as (fore end,
         # after end), metres from the mast's own x, where her hull's module gives them from
         # her sheet; read by `pivot_arc_from_rig` alone and written to no file
@@ -1287,6 +1288,13 @@ class Builder:
             for eid, keys in figures.items()
         }
         self.timing_note = note
+
+    def hands(self, note, figures):
+        """The `hands:` section (package 75, the lead's (C2) of 2026-11-14): the ship's own number
+        of hands for an evolution whose file asks a number, {evolution id: hands}, over the
+        evolution file's (`ShipSpec.hands`, `Runner._crew_line`); `note` above the section."""
+        self.doc["hands"] = {eid: int(n) for eid, n in figures.items()}
+        self.hands_note = note
 
     def pumps(self, note, entries):
         """The `pumps:` list (package 73, spec M7 §13) from (id, kind, name, tons_per_hour,
@@ -1633,6 +1641,8 @@ class Builder:
             # the ship's own timing figures (package 75, B7), noted as the hold is
             if line.startswith("timing:") and getattr(self, "timing_note", ""):
                 out.append("# " + self.timing_note)
+            if line.startswith("hands:") and getattr(self, "hands_note", ""):
+                out.append("# " + self.hands_note)
             if line.startswith("boats:"):
                 in_boats = True
                 note = self.boat_notes.get(("section",))

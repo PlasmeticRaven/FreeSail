@@ -1413,3 +1413,7 @@ boats:
   oars: 6
   crew: 7
   tons: 0.4
+# Her own number of hands for an evolution, over its file's: heaving to and filling away, six, her seamen of both watches, so that either watch of three begins them by night, short, as the starboard's three did at her eight; the files' twelve, clamped to what her company could ever give, is seven at her nine (her six seamen and the cook), and three are under half of it (the lead's (C2) of 2026-11-14; judgement).
+hands:
+  heave_to: 6
+  fill_away: 6
