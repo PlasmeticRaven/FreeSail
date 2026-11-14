@@ -17648,3 +17648,65 @@ def test_truth_7_545_no_goal_square_has_a_mark_on_dry_ground_or_a_leg_across_the
                     -4.9371,
                 )
     assert squares == 33, squares
+
+
+@pytest.mark.slow
+def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
+    """Package 112, step 1: one ordered list of layers a level. For every chart and every
+    region the manifest names, every tile its levels list is read through the runtime and
+    compared cell for cell with the tile derived from the manifest alone: a region's own
+    tile as it lies; at level 1 the first layer in the chart's order that has the tile,
+    each later layer that has it filling only the NODATA cells left; nothing at level 0
+    while no world tile is committed, and never under a chart of one region. The
+    elevation, the distance field, the blocks' and the tile's shoalest soundings."""
+    import numpy as np
+
+    from freesail.world.chart import Chart, Tile, chart_names, load_manifest
+
+    root = Path(__file__).resolve().parents[1] / "data" / "charts"
+    manifest = load_manifest(root)
+    charts = manifest["charts"]
+    read = 0
+    for name in chart_names(manifest):
+        chart = Chart(name, manifest, root)
+        spec = charts.get(name)
+        regions = spec["regions"] if spec else [name]
+        layers = []
+        if spec:
+            names = spec.get("layers") or [spec["corridor"], *spec.get("corridors_beside", [])]
+            layers = [manifest["corridors"][n] for n in names]
+        expected: dict[int, dict[str, list[Path]]] = {}
+        for r in regions:
+            for lv, tiles in (manifest["regions"][r].get("tiles") or {}).items():
+                level = expected.setdefault(int(lv), {})  # a level listed empty is kept
+                for t in tiles:
+                    level[t["name"]] = [root / "tiles" / str(lv) / f"{t['name']}.npz"]
+        for layer in layers:
+            for t in layer["tiles"]:
+                path = root / layer["folder"] / f"{t['name']}.npz"
+                if path.exists():
+                    expected.setdefault(int(layer["level"]), {}).setdefault(t["name"], []).append(
+                        path
+                    )
+        assert [lv.level for lv in chart.levels] == sorted(expected, reverse=True), name
+        assert spec is not None or all(lv.level >= 2 for lv in chart.levels), name
+        for lv in chart.levels:
+            assert set(lv.paths) == set(expected[lv.level]), (name, lv.level)
+            for tname, paths in expected[lv.level].items():
+                want = Tile.load(paths[0])
+                for more in paths[1:]:
+                    want = want.filled_from(Tile.load(more))
+                got = lv.tile(want.south_sec, want.west_sec)
+                assert np.array_equal(got.elevation, want.elevation), (name, tname)
+                if want.dist is not None:
+                    assert np.array_equal(got.dist, want.dist), (name, tname)
+                if want.min_blocks_m is not None:
+                    assert np.array_equal(got.min_blocks_m, want.min_blocks_m, equal_nan=True), (
+                        name,
+                        tname,
+                    )
+                assert got.min_depth_m == want.min_depth_m or (
+                    np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
+                ), (name, tname)
+                read += 1
+    assert read == 4593  # 21 charts' tiles, as the step's proof counted them

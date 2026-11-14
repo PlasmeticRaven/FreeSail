@@ -2314,3 +2314,131 @@ def test_an_island_the_grid_lacks_is_ground_and_one_the_grid_holds_is_a_mark():
     belle = whole.feature("belle-isle")
     assert belle.kind == "island" and belle.extent_m == 9000 and not belle.is_ground
     assert not [f for f in whole.dangers_about(belle.position, 30.0) if f.id == "belle-isle"]
+
+
+# -- package 112, step 1: the layers' order --------------------------------------------
+
+
+def _layer_tile(path: Path, cells: np.ndarray, south_sec: int = 0, west_sec: int = 0) -> None:
+    """A level-1 tile in the corridor's form, its elevation `cells` (NODATA where NaN)."""
+    nodata = -32768
+    elev = np.where(np.isnan(cells), nodata, np.rint(cells)).astype(np.int16)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        path,
+        elevation=elev,
+        level=np.int16(1),
+        unit_m=np.float32(1.0),
+        cell_sec=np.float32(30.0),
+        south_sec=np.int64(south_sec),
+        west_sec=np.int64(west_sec),
+        nodata=np.int16(nodata),
+        dist=np.zeros(cells.shape, dtype=np.uint16),
+        min_depth_m=np.float32(float(-np.nanmax(cells))),
+        min_blocks_m=np.full((16, 16), np.float32(-np.nanmax(cells))),
+        min_block_cells=np.int16(32),
+    )
+
+
+def _layered_manifest(tmp_path: Path, spec: dict, **world) -> dict:
+    """A manifest of one region-less chart over three level-1 layers that list one tile
+    each, the same tile: the first holds the west third of it, the second the middle and
+    the west, the third the whole."""
+    name = "0_0"
+    thirds = np.full((512, 512), np.nan)
+    first, second, third = thirds.copy(), thirds.copy(), thirds.copy()
+    first[:, :170] = -10.0
+    second[:, :340] = -20.0
+    third[:, :] = -30.0
+    corridors = {}
+    for layer, cells in (("one", first), ("two", second), ("three", third)):
+        _layer_tile(tmp_path / "tiles" / "1" / layer / f"{name}.npz", cells)
+        corridors[layer] = {
+            "level": 1,
+            "bounds": {"south": 0.1, "north": 4.0, "west": 0.1, "east": 4.0},
+            "folder": f"tiles/1/{layer}",
+            "tiles": [{"name": name}],
+        }
+    levels = load_manifest()["levels"]
+    return {
+        "levels": levels,
+        "regions": {},
+        "corridors": corridors,
+        "charts": {"sea": {"regions": [], **spec}},
+        **world,
+    }
+
+
+def test_the_layers_of_a_level_answer_in_the_charts_order(tmp_path):
+    """Package 112, step 1: one ordered list of layers a level. Where two layers list a
+    tile, the first answers in it and each later layer fills only the cells the ones
+    before it left NODATA (106a's rule for the layer beside the corridor, made the rule
+    of every layer); the `layers:` list and 106a's `corridor:` with `corridors_beside:`
+    are one form."""
+    manifest = _layered_manifest(tmp_path, {"layers": ["two", "one", "three"]})
+    chart = Chart("sea", manifest, tmp_path)
+    tile = chart.levels[0].tile(0, 0)
+    row = tile.elevation[100]
+    assert (row[:340] == -20).all() and (row[340:] == -30).all()  # two, then three
+    manifest = _layered_manifest(tmp_path, {"layers": ["one", "two", "three"]})
+    row = Chart("sea", manifest, tmp_path).levels[0].tile(0, 0).elevation[100]
+    assert (row[:170] == -10).all() and (row[170:340] == -20).all() and (row[340:] == -30).all()
+    old = _layered_manifest(tmp_path, {"corridor": "one", "corridors_beside": ["two", "three"]})
+    old_chart = Chart("sea", old, tmp_path)
+    assert np.array_equal(old_chart.levels[0].tile(0, 0).elevation[100], row)
+    assert [c["folder"] for c in old_chart.layers] == [
+        "tiles/1/one",
+        "tiles/1/two",
+        "tiles/1/three",
+    ]
+    assert old_chart.corridor is old_chart.layers[0]
+    both = _layered_manifest(tmp_path, {"layers": ["one"], "corridor": "two"})
+    with pytest.raises(C.ChartError, match="names its layers twice"):
+        Chart("sea", both, tmp_path)
+    missing = _layered_manifest(tmp_path, {"layers": ["one", "four"]})
+    with pytest.raises(C.ChartError, match="the layer 'four'"):
+        Chart("sea", missing, tmp_path)
+
+
+def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_region(tmp_path):
+    """Package 112, step 1 (the chart session's ruling on step 0): the world's level 0
+    lies under a chart of the manifest's `charts:`, where no layer answers, and never
+    under a chart of one region: a checkpoint's reload of a Channel save takes the chart
+    of `channel-west` alone (`core/replay.py`), and it answers exactly as it did whatever
+    the world's tiles on the disk."""
+    manifest = load_manifest()
+    root = tmp_path / "charts"
+    root.mkdir()
+    for item in CHARTS.iterdir():
+        if item.name != "tiles":
+            (root / item.name).symlink_to(item)
+    (root / "tiles").mkdir()
+    for lv in ("1", "2", "3"):
+        (root / "tiles" / lv).symlink_to(CHARTS / "tiles" / lv)
+    # a world tile over the water south of channel-west's tiles (47.70 N 6 W)
+    span = 150 * 512
+    s = -90 * 3600 + ((47 + 90) * 3600 // span) * span
+    w = -180 * 3600 + ((-7 + 180) * 3600 // span) * span
+    path = root / "tiles" / "0" / f"{s}_{w}.npz"
+    path.parent.mkdir()
+    np.savez(
+        path,
+        elevation=np.full((512, 512), -70, dtype=np.int16),
+        level=np.int16(0),
+        unit_m=np.float32(2.0),
+        cell_sec=np.float32(150.0),
+        south_sec=np.int64(s),
+        west_sec=np.int64(w),
+        nodata=np.int16(-32768),
+        min_depth_m=np.float32(140.0),
+    )
+    manifest = dict(manifest)
+    manifest["world"] = dict(manifest["world"], tiles=[{"name": f"{s}_{w}"}])
+    south = Position(47.70, -6.0)
+    alone = Chart("channel-west", manifest, root)
+    assert [lv.level for lv in alone.levels] == [3, 2]
+    assert alone.depth_at(south) is None
+    whole = Chart(WHOLE, manifest, root)
+    assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
+    assert whole.level_at(south) == 1  # the corridor answers before the world
+    assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
