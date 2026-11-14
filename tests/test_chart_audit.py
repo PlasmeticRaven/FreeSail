@@ -389,3 +389,26 @@ def test_an_unreadable_track_mark_is_an_error_at_the_load_and_a_finding(tmp_path
         plain, chart, A.Water(chart), _port_file(tmp_path / "x", "augusta", lambda d: None)
     )
     assert "f-mark:augusta" not in plain.keys()
+
+
+def test_no_ports_way_in_goes_on_past_its_anchor(chart):
+    """The chart session's tracks step (the lead's ruling of 2026-11-14): a port's way in
+    from the sea as the business plans it (`ships.approach_plan`) ends at its first anchor,
+    by the same function the far body's course does (`ships.to_first_anchor`), so the plan
+    the audit reads is the plan as sailed. Old: a track from the sea that reached the
+    anchorage went on to the road and the inner track after it, a leg no ship sails (nine
+    ports: Favignana, Le Havre, Portsmouth, San Fiorenzo, St Helier, St Malo, Torbay,
+    Trapani, Weymouth)."""
+    from types import SimpleNamespace
+
+    from freesail.world.ports import load_port, port_files
+    from freesail.world.ships import approach_plan
+
+    world = SimpleNamespace(chart=chart, dealings=None)
+    past = []
+    for pid, path in sorted(port_files().items()):
+        plan = approach_plan(world, load_port(path, chart))
+        kinds = [leg[0] for leg in plan]
+        if "anchor" in kinds and kinds.index("anchor") != len(kinds) - 1:
+            past.append(pid)
+    assert past == []

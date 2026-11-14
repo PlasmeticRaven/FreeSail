@@ -1419,6 +1419,20 @@ def approach_plan(world: Any, port: Any) -> list[tuple[Any, ...]]:
     anchorage = ("to", port.anchorage.position, port.anchorage.name)
     if not any(len(leg) > 1 and leg[1] == anchorage[1] for leg in plan):
         plan.append(anchorage)
+    return to_first_anchor(plan)
+
+
+def to_first_anchor(plan: list[tuple[Any, ...]]) -> list[tuple[Any, ...]]:
+    """A plan as sailed: to its first anchor and no further (the chart session's tracks
+    step, the lead's ruling of 2026-11-14). A far body rides at an anchor until her captain
+    lays her a new plan, and a crewed captain clears his legs when he sails, so no leg after
+    the first anchor is ever sailed; a track from the sea that reaches the anchorage, then
+    the road and the inner track after it, is cut here, so that the plan the audit reads is
+    the plan as sailed. Measured: channel-east with its business, 48 game hours, 105 plans
+    laid with a leg past an anchor and 3,272 vessel-minutes at anchor, no such leg sailed."""
+    for i, leg in enumerate(plan):
+        if leg and leg[0] == "anchor":
+            return plan[: i + 1]
     return plan
 
 
@@ -1445,11 +1459,7 @@ def port_course(world: Any, vessel: Any, port: Any, via: str = "") -> list[tuple
     # (Torbay's track to sea begins at Brixham road); and the plan ends at the first anchor
     # in the port she is bound for (a track whose road follows its anchorage)
     legs = [leg for leg in legs if not (leg.kind == "anchorage" and leg.port == departing)]
-    plan = _plan_of_legs(legs)
-    for i, leg in enumerate(plan):
-        if leg[0] == "anchor":
-            plan = plan[: i + 1]
-            break
+    plan = to_first_anchor(_plan_of_legs(legs))
     crossing = land_crossing(world, here, plan)
     if crossing:
         way = f" via {via}" if via else ""
