@@ -877,3 +877,10 @@ ports:
   santa-cruz-de-la-palma: spain
   san-sebastian-de-la-gomera: spain
   cabras: spain
+  # package 106b: Morocco's Atlantic coast, the Emperor's (Mazagan Portugal's until 1769)
+  larache: morocco
+  rabat: morocco
+  mazagan: portugal  # its first row (Portugal's until 1769), as Valletta's is the Order's
+  safi: morocco
+  mogador: morocco
+  agadir: morocco

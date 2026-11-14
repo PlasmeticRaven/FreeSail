@@ -1019,6 +1019,56 @@ next blocks (106b's African coast first):
   fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
   both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.
 
+## Morocco's Atlantic coast (package 106b, as built)
+
+Four regions, Cape Spartel to Cape Juby: `morocco-larache` (34.16 to 35.5 N, 7.62666 to 5.92001
+W), `morocco-sallee` (31.6 to 34.16 N, 10.61332 to 6.34668 W), `morocco-mogador` (29.46666 to
+31.6 N, 11.03999 to 9.33334 W) and `morocco-noun` (27.33334 to 29.46666 N, 13.17334 to 9.33334
+W): 117 level-2 tiles and 30 level-3, 19.96 MiB. The northernmost abuts the Strait at 35.5 N
+("2 kept"), the southernmost the Canaries' east bound ("5 kept"), the Mogador region the Noun's
+north bound (its row below is the Noun's, built first: "3 kept"). What it found, for the next
+blocks (the African coast south of the Canaries first, if the owner books it):
+
+- **A diagonal coast wants stepped boxes.** One box a region over a coast that runs four degrees
+  west in eight of latitude holds a triangle of open sea and one of land: the brief's two boxes
+  measured 149 to 159 tiles and 27 to 28 MiB, the four stepped boxes (split at row edges, each
+  reaching two tile columns seaward of its rows' coast) 104 and 19 MiB. Measure the coast row by
+  row against the tile grid (the coarse layers' land and water are enough) before choosing.
+- **Where no coarse layer lies under a block's land, write every tile.** The world's level 0 is
+  not committed: `skip_dry_tiles` leaves a query on the land beyond the corridor's data (31.9 N)
+  and east of `atlantic-south` (9.34 W) answering nothing. `morocco-sallee`, whose southern row
+  is such land, writes all its tiles (package 79b's rule).
+- **A gaugeless block's neighbours' gauges are of its sea, not merely nearest.** The Strait's
+  gauges are the nearest to Larache and Sallee, but their M2 of 0.3 to 0.4 m is the Strait's
+  inner water and none has a level read (the level would fall to the eleven's 3.98 m): the
+  chart session's ruling took the Atlantic's, Cadiz and Huelva for the northern two (Huelva's
+  level 1.96 m), Arrecife and Puerto de Cabras for the southern (1.53 to 1.60 m). The seam at
+  31.6 N between the two pairs is a step (M2 1.04 to 0.82 m, the phase 57 to 35 degrees), far
+  from every gauge. Name the audit's sea so that the gauges' seas meet it (`SEAS_THAT_MEET`).
+- **A box that takes no water another box answers goes last in the file.** `box_at` takes the
+  first box holding a point; the `morocco` box, last, answers only the water that lay in no box
+  (east of 9 W from 30 to 36 N, the Strait's southern half with it), and the regions' water west
+  of 9 W stays Madeira's and the Canaries': the audit's `d-split` for two regions, by design.
+- **The grid closes the rivers.** EMODnet holds the Lucos, the Seboo and the Bu Regreg as land
+  behind bars of one to three metres; the period's small craft went in at high water. The ports
+  lie in their roads, as the pilots put ships of burden; a bar truth reads the grid's own bar
+  with the world's tide.
+- **The modern port is the grid's land again** (106a's finding): Agadir's moles enclose the
+  first place of the period's road, and Mogador's two passages into the harbour within the island
+  read 0.0 and 0.5 m where Purdy has five fathoms. Map the cells about every road at a hundred
+  metres before placing it; a harbour the grid will not let a trader into is a mark, its port's
+  spots in the road.
+- **A coast that bulges seaward at its capes wants a lane mark beyond the bulge.** Every straight
+  line from the northern ports to the southern crossed Cape Cantin or Cape Ghir; the southern
+  three's tracks run out to one mark ten miles west of Cape Cantin (Santa Cruz's by an offing
+  west of Cape Ghir), Rabat's to an offing clear of Dar el Beida, and no pair is refused.
+- **The business is a region's.** A region with one port (Larache) draws no trader; the coast's
+  own exchanges (Rabat's cotton, Saffi's almonds, Agadeer's dried fish) give the others routes.
+- **A scenario's book on a lee shore with a current**: the account ran five miles to the
+  westward of the truth over two days, and a book shaped for the road drove her onto the bank
+  under Mogador's island; the marks' rings are their scale (ten miles for an offing), and she
+  heaves to in the offing.
+
 ## The coarse seas (package 112, steps 1 and 2)
 
 **The sea is coarse and whole; the fine detail is for water near the land.** A chart names

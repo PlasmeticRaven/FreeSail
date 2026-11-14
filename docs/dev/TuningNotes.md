@@ -28732,6 +28732,307 @@ added and nothing else (the audit's check (d) run on each).
 - The wars table's undated war makes the islands hostile to a King's ship after 1808, as
   Barcelona's head says.
 
+## Package 106b: Morocco's Atlantic coast (2026-11-13)
+
+### Step 0, the measurement (nothing under `data/charts/` committed)
+
+Measured on the trunk at 237b4641 in a scratch worktree (never committed): measuring recipes
+built with `tools/build_charts.py --region` into a fresh cache, the audit run on the result,
+the tiles weighed from the manifest's bytes. The fill was raised by the eleven's level (3.98 m,
+no gauge of the block's yet): the bytes move a little when the block is rebuilt on its own
+water. Harbour boxes for the measure were placed FROM MEMORY.
+
+**The sources.** Purdy 1825 (on file) describes the whole coast, Cape Spartel to Cape Noon
+and Bojador (from l. 22171: "Between Cape Spartel and Cape Cantin ... regular soundings
+towards the shore ... no harbours of consequence"; Arzila, El Araiche, Old and New Mamora,
+Fedala, Anafee, Azamor, Mazagan, Cape Blanco of the north, Cape Cantin, Saffi, Mogador, Cape
+Geer, Agadeer or Santa Cruz, to Cape Noon; the variation "between Cape Spartel and Saffi Bay
+22 to 24 W", l. 4162): the block's pilot. The Oriental Navigator 1801 has nothing of this coast;
+Glas 1764 names Sallee once (l. 13751). Tofiño's Atlantic *Derrotero* (1789, `A302201`)
+reaches and has no text of Africa: its introduction (l. 417) says the charts of the coast "from
+Cape Espartel to Cape Verde" were made in 1776 by Varela and Borda, a memoir promised and not
+printed there; the charts are the atlas's, not yet found. Jackson's *Account of the Empire of
+Marocco* (1809, `accountofempireo00jack`, NOT_IN_COPYRIGHT, OCR 559,124 bytes) reaches: the
+ports, the trade, the harbours and the captives held in the Sahara (decision 68's matter).
+
+**The source grid.** EMODnet's DTM 2024 covers the whole coast (its grid runs from 15 N): of
+5,610 shelf cells sampled at 1.5′ (under 100 m), 5,459 are interpolated (`interpolation_flag`
+1), 151 surveyed, mostly in the Strait's approach. GEBCO under it for the land. TICON's file
+(SHA-256 7055f8ed...6514, as before) has **no gauge** between Ceuta and Fuerteventura.
+
+**The tile grid against the coast.** The coast runs diagonally, four degrees of longitude over
+eight of latitude: Spartel 5.92 W, Rabat's column 6.77 W, Cape Cantin's 9.33 W, Mogador's
+9.76 W at 31.5 N, Cape Juby 12.92 W at 27.95 N. One box over a diagonal coast holds a triangle
+of open sea and one of land. The land's tiles are skipped (`skip_dry_tiles`) where a coarse
+layer answers, except the eight of the row 31.6 to 32.03 N east of 9.34 W (no layer there south
+of 31.9 N). **Mogador (31.51 N) lies south of 31.6 N**: the southern region's port.
+
+| option | regions | level-2 tiles written | MiB (level 2) | with the measured level 3 |
+| --- | --- | --- | --- | --- |
+| A1, the brief's two boxes, coast + 1 column | 31.60001–35.5 N × 10.18666–5.92001 W; 27.33334–31.6 N × 13.17334–9.33334 W | 75 + 74 = 149 | 25.87 | 27.39 |
+| A2, two boxes, coast + 2 | the north's west 10.61332 W | 85 + 74 = 159 | 26.60 | 28.12 |
+| B1, four boxes, coast + 1 | 31.6–34.16 × 10.19 W; 34.16–35.5 × 7.2 W; 27.33–29.47 × 13.17 W; 29.47–31.6 × 10.61 W | 38 + 9 + 26 + 15 = 88 | 13.79 | 15.30 |
+| B2, four boxes, coast + 2 | the same rows; west 10.61, 7.63, 13.17, 11.04 W | 44 + 13 + 26 + 21 = 104 | 17.15 | 18.66 |
+
+Level 3: 24 tiles, 1.52 MiB for eight harbour boxes; the coasts 0.25 MB a region. Every
+region is under 40 MiB in every option. The southern box cannot be narrowed: its rows 27.33
+to 29.47 N must reach the Canaries' east bound (13.17334 W), its rows to 31.6 N lie three
+degrees east of it. The four-box options split each region at a row edge (34.16 N; 29.46666 N,
+the Canaries' own north bound) and are the strip the brief asks for; the open sea west of
+their bounds is the coarse layers' (the corridor north of 31.9 N, `atlantic-south` south of
+it), whose water reaches every tile's edge.
+
+**The seams.** Against `strait` "2 kept" (its row 35.44 to 35.87 N, columns 6.77 to 5.92 W);
+against `canaries` "5 kept" (its column 13.6 to 13.17 W, rows 27.33 to 29.47 N); against the
+coarse layers nothing (another level). `git status` after the build: new files only, no tile,
+coast or index of another region changed; the manifest only adds the two entries (and its
+build hash). The coast south of 27.76 N between 13.6 and 13.17 W (by Tarfaya's south) lies in
+`canaries`' bounds and tiles already.
+
+**The gauges, by the rule for a block with none.** The neighbours' nearest within the reach:
+for the south, Arrecife (1.60 m, REDMAR) and Puerto de Cabras (1.53) of the Canaries, 154 to
+268 miles from its water, M2 0.81 to 0.84 m; listing it after `canaries`. For the north, the
+Strait's: Tarifa (55 miles from Larache, 287 from Safi), Ceuta, and Cadiz (`[portugal,
+strait]`): **none of them has a level read**, so the north's level falls to the eleven's
+(Le Conquet's 3.98 m), and Tarifa's and Ceuta's M2 (0.41, 0.30 m) is the Strait's inner tide,
+not the Atlantic coast's (about a metre, FROM MEMORY; Cadiz 1.03 m). Arrecife and Cabras
+reach the north's water south of about 33.5 N only (Dar el Beida is 410 miles off). Tarifa's
+level is readable: REDMAR 3540, NMM 69 cm and BMMI −10 cm on the gauge's zero (2010 to
+2017), **0.79 m above LAT**; Cadiz and Ceuta are not in REDMAR. Reading it would move the
+Strait's water (its level today the eleven's, the audit's `c-level:strait`): the lead's.
+
+**The audit, sampled, on the measuring build** (the two-box option A2, the sea named
+`morocco`): nine findings the list lacks. `a-unowned:morocco-north:north` (the tiles of the
+row 35.44 to 35.87 N west of 6.77 W, 4,117 square miles north of 35.5 N in no bounds),
+`a-unowned:morocco-south:west` (the column 13.6 to 13.17 W, 29.47 to 31.6 N, 2,822 square
+miles), `c-far` for each (no gauge yet), `d-no-box:morocco-north` and `d-split` for each
+(madeira 87 %, portugal 12 %; canaries and madeira half and half), `e-no-book` and
+`e-no-stream:morocco-north`. The gauges, the weather box, the `book_limits` box east of 9.34 W
+and a stream area mend the c, d and e ones. Option B leaves of the a-findings only the one or
+two tiles of the row 35.44 N west of 6.77 W (some 500 to 900 square miles north of 35.5 N).
+The strait's own `a-unowned:strait:west` now lies beside morocco-north's bounds; unchanged.
+
+**The shore's sweep** (EMODnet silent, GEBCO under 3 m): the north 590 cells in 20 places
+(the largest the lagoon of Moulay Bousselham, 34.85 N 6.28 W; the Tangier shore; Safi; Cape
+Blanco of the north); the south 2,415 in 79 (the lagoon of Khenifiss, 27.8 N 12.4 to 12.9 W):
+real water, to say so after the rebuild on the block's own water.
+
+### Step 1, the block built on the chart session's rulings (2026-11-13)
+
+**The rulings** (the chart session on step 0): four regions, coast + 2, split at 34.16, 31.6 and
+29.46666 N, named `morocco-larache`, `morocco-sallee`, `morocco-mogador`, `morocco-noun`; the
+gauges the Atlantic's only (Cadiz and Huelva the northern two, Arrecife and Puerto de Cabras the
+southern; Tarifa's REDMAR level not read); the sea `morocco` with `SEAS_THAT_MEET` {morocco,
+atlantic, canaries}; one weather box `morocco` over the regions' water and the water east of 9 W
+from 30 to 36 N, taking none another box answers; `book_limits` boxes over the four.
+
+**The build.** Built three times from the step 0 cache (`--skip-fetch`): without the gauges'
+listings (the tide refuses a `block:` the manifest does not name), with them (the fill raise
+follows the tide), and after the features (the index). Sizes: larache 13 level-2 tiles 2.83 MiB
+and 6 level-3 0.36; sallee 60 and 7.15 (every tile written, its row 31.6 to 32.03 N east of 9.34
+W under no coarse layer) and 16 level-3 0.96; mogador 18 and 4.02, 8 level-3 0.52; noun 26 and
+4.11; 19.96 MiB in all. Kept: the Strait's 2, the Canaries' 5, the Noun's 3 under Mogador's
+bound. `git status` after each build: new files, the manifest, nothing of another region's. The
+fill raised by 1.47 to 1.96 m within the bounds (3.98 m in the tiles' water beyond them, the
+eleven's). The sweep: larache 513 cells (the lagoon of Moulay Bousselham, Tangier's shore),
+sallee 118 (Safi, Cape Blanco, Dar el Beida's port), mogador 166 (Agadir's port, Mogador's
+island), noun 7,484 (the lagoon of Khenifiss and its sebkha, 27.98 N 12.33 W): real water, left
+as water.
+
+**The water each region gets** (`Tide.constants_at`): the northern two M2 1.035 m at 57 degrees on
+Huelva's level 1.96 m (Cadiz's having none); the southern two 0.82 m at 35 degrees on 1.56 to
+1.57 m. The seam at 31.6 N between the pairs is a step, far from every gauge. Norie's table gains
+two places: Mogador, Purdy's 4h and 10 to 12 feet (the OCR's "4b." and "lu to 12"; the world's
+hour 0h 44m: the master's is the period's), and "Coast of Marocco" at Rabat, the world's hour
+(1h 40m) and spring range (9 feet), JUDGEMENT.
+
+**The weather.** The box `morocco` (27.33334 to 36 N, 13.17334 to 5 W), last in the file, Madeira's
+rows carried to the coast, PROVISIONAL; Purdy's words in each row's note (p. 152: the summer's N.
+by E. to N.E. along the coast, the winter's S.W. and S.S.W.; p. 155: the Liali at Mogador). It
+takes no water another box answers (`box_at` first-match); the water it answers lay in no box and
+took the nearest: the coast from Spartel to Safi east of 9 W and the Strait's southern half
+(35.5 to 36 N between 6.5 and 5 W). **What it moves:** a ship there drew her systems from
+Portugal's or the Mediterranean's box by nearness and now draws from this one; the Strait's
+scenario sails into 35 57 N 5 48 W. The Strait's truths and the recorded passages were run (the
+gate's figures below). The audit's `d-no-box:strait` is no longer found and its `d-split:strait`
+reads "morocco 62 %, portugal 38 %" (the known list's change waits for package 111's step 2b,
+below).
+
+**By design, old beside new (the chart session's word, for the lead):** the Strait's southern
+half (35.5 to 36 N, 6.5 to 5 W) is answered by the box `morocco`, where the nearest box,
+`portugal`, answered it before. It moves: `tests/test_scenarios.py`'s Strait passage (its
+`box_at(35.7, -5.5)` "portugal", now "morocco"), the audit's `d-no-box:strait` (no longer found)
+and `d-split:strait`'s shares (portugal 85 %, mediterranean-west 15 % on the sampled sweep before;
+morocco 62 %, portugal 38 % sampled and 59 %, 41 % on the full sweep now, its count 352 unchanged).
+**What reads that water, and the proof it is unmoved:** no recorded passage (the gate's passages
+are the Channel's); of the scenarios only `strait.yaml` sails into it (35 57 N 5 48 W), and its
+weather is pinned (`weather:` its winds and systems): sailed 24 hours at seed 7 with the branch's
+climatology and with the trunk's, the log's digest is `3fadc5de293ad9fe` both ways and she ends in
+36.0749 N 5.4253 W both ways. The tests that name a position in that water read the tide or the
+chart (`MID_STRAIT`, 36.0 N 5.6 W) or a business world at 36.0 N, which Portugal's box, first in
+the file, still answers; the slow tier of the known truths and scenarios passed whole but the
+audit's full sweep (below), the Strait's truths among them.
+
+**The streams.** Two areas, before the Canaries' open sea: `morocco-coast-north` (S.W. by S., a
+knot: Purdy pp. 152 and 154) and `morocco-coast-south` (south, a knot: pp. 156 to 157, the set in
+toward the land said and not carried). The set is the pilot's own word; the directions' test
+holds such a set unjudged (`PERIOD_SETS`).
+
+**The marks** (34, every position probed against the tiles, each move in `fix`): Arzila, El
+Araiche with its road and bar, Old Mamora, Mehedia with its road and the Seboo's bar, Sallee,
+Rabat, the Tower of Hassan (55 m, Purdy's 180 feet), Sallee road and the Bu Regreg's bar, Fedala
+and its road, Dar el Beida, Azamor, Mazagan with its road and its ledge, Cape Blanco, Cape Cantin
+and its ledge, Saffi and its summer road, Mogador with its island, road and harbour, Cape Sem,
+Cape Tefelneh, Cape Geer and its reef, Agadeer and its road, the mouth of the Wad Noun. Not
+entered: the Cleveland Reef (Purdy p. 156 and his dangers, "three feet ... nine leagues from the
+coast" in 30 45 N, Captain Cleveland 1765), the grid having ocean depths there and the modern
+chart (FROM MEMORY) no reef: a danger the period gives and the world does not (a finding, for the
+chart session); the Peak of Fas (its place not fixed by the bearings). No light in 1805.
+
+**The ports** (six; decision 67, every place the sources support with a road and a trade):
+El Araiche, Sallee and Rabat, Mazagan, Saffi, Mogador, Santa Cruz (Agadeer). Marks only, by the
+same sources: Mamora ("a poor neglected place", the port evacuated, Jackson l. 4260 and 605),
+Fedala (abandoned after the corn was shipped, l. 4508), Dar el Beida ("now in ruins, ... several
+huts", l. 4518), Arzila ("no trade carried on", l. 4206), Azamor ("not adapted to commerce", l.
+4543; no anchorage, Purdy p. 154), the Wad Noun (no road named: "but two roads fit for shipping
+between Santa Cruz and Cape Bojador", which neither pilot names, l. 5007). **Dated rows**
+(package 105's form, seeding the port on its day): El Araiche's `closed_to` from 1780 and Santa
+Cruz's from 1773 (the Europeans and the Americans; Jackson's years, the days JUDGEMENT); Mazagan's
+holder Portugal's until 1769 (the day FROM MEMORY); Saffi's and Mazagan's markets, the corn shipped
+abroad until Soliman's accession and cheap at home after his ban (Jackson l. 4524 to 4533; the
+day FROM MEMORY; first drafted the other way and corrected by the independent check of every
+citation, which found 12 of some 160 wanting, all mended); Mogador's market, pilot, yard and
+pool from its founding in 1760. **Decision 68**, in the heads of Rabat (Sallee's corsairs and the
+dungeon of its European captives; Rabat's walls built by enslaved Spaniards; Muley Ismael's black
+troops), Mogador (the ransom of the crews wrecked on the desert coast; the caravans' enslaved
+Africans from Timbuctoo) and Santa Cruz (the same caravans; the wrecked seamen sold among the
+Arabs), with their years and lines; no cargo a person, no scenario on it.
+
+**The tracks, read against the pilots' channel words, with the least depth at datum along each
+leg** (correction 4; sampled every 50 m; under 3 m a finding):
+
+| port | leg | the pilot's words, and the hand each mark falls on going in | least |
+| --- | --- | --- | --- |
+| Rabat | road to 33 54 N 7 54 W, and back | "lie out of the river near Rabat ... between the mosque and the Tower of Hassan" (Jackson l. 4445): coming in from the WSW the tower ahead, a little on the port hand | 25.8 m |
+| Saffi | road to 32 36 N 9 36 W, and back | "the North point ... a little to the northward of N.N.E., the high castle S.E. by E." (Purdy p. 155): coming in from the NW the North point and its low tower on the port hand, the castle ahead | 23.6 m |
+| Mogador | road to 32 36 N 9 36 W, and back | "anchor at about 1 1/2 mile westward of the Skala" (p. 155): coming down from the north the island and the town on the port hand | 30.9 m |
+| Agadeer | road to 30 36 N 10 12 W | "run along by the land of the cape till you are before the castle" (p. 157): going in from the offing Cape Geer on the port hand, the castle ahead | 6.1 m |
+| Agadeer | 30 36 N 10 12 W to 32 36 N 9 36 W | the open sea west of Cape Geer's reef ("not nearer than 30 fathoms") and of Cape Sem's bank | 38.7 m |
+| every port | road to mooring | El Araiche 8.5 m, Rabat 10.4, Mazagan 3.9, Saffi 10.0, Mogador 17.7, Agadeer 8.8 | |
+
+El Araiche and Mazagan need none (every pair among the northern three and to the mark off Cantin
+is clear). **Findings:** **the tide steps at 31.6 N**, the seam between the two pairs of gaugeless regions
+(Cadiz's and Huelva's water north of it, Arrecife's and Puerto de Cabras's south): M2 1.035 m at
+57 degrees to 0.82 m at 35 degrees, the level 1.96 m to 1.57 m, in a cable. In the how-to's words
+a seam between two blocks far from every gauge (Huelva some 360 miles off, Arrecife some 240)
+stays a step; no taper is laid between two blocks. **Mogador's harbour within the island** is
+not reached in the grid: its north passage reads 0.0 m and its south 0.5 m at the datum, where
+Purdy has five fathoms in the north one; the port's spots are in the road, as Purdy and Jackson
+put ships of war and of burden (the chart session's word: kept so, the finding listed). The rivers of El Araiche, Mamora and Sallee are the grid's land behind
+bars of 1 to 3 m (a way the pilots reserve for vessels of 100 tons at high water; no trader's in
+the world); Mogador's two passages into the harbour within the island read 0.0 m (north) and 0.5 m
+(south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
+the road; Agadir's modern moles enclose the period's road's first place (moved south of them).
+
+**The cold review's two cautions** (the chart session, 2026-11-14): no tile is rebuilt or
+committed but the four regions' own (every other region's files byte for byte, `git status` at
+each build); and the six port files give no key the game reads nowhere, beyond the form: their
+`tide: establishment:` was taken out (read by nothing: the master's hours are the epitome's
+places, `data/tides/establishments.yaml`, by position). Kept **only for the form**: `datum:
+unverified` (the how-to's: a top-level key the machinery does not read, which says no period
+sheet was read with its datum) and `tide: leave_on: ebb` (read by no code; `tests/test_ports.py`
+holds every port file to it).
+
+**The mends, by their causes** (the owner's word of 2026-11-14 through the lead: build for
+generality, not the symptom):
+
+- *`test_ordnance`'s count of ports without a block.* Cause: a hand-kept tally of each block's
+  ports (27 + 8 + ... + 7), which every new block had to edit, beside an assertion that already
+  states the property (`with_block == set(BLOCKS)`). Mended where the cause lives, in the test:
+  every port file is loaded, the eleven carry their blocks and every other port none, the count
+  the files' own. Looked for the same elsewhere (a total summed by hand from blocks' counts, in
+  every test file): truth 7-570's `read == 4593` (package 112's, the tiles read summed by hand
+  from the step's proof; raised here by Morocco's 2 x 147, old beside new) is the same cause in
+  another package's truth, **named and not mended**; the region lists of `test_chart`,
+  `test_geo` and `test_tide` and the ports' lists of `test_ports` and `test_nations` are
+  inventories by design (each block names what it adds), not tallies.
+- *Truth 7-530's exclusion.* Cause: the exemption was a hand list of package 105's ports, held
+  out whether they had dated rows or not, so that a new dated port broke it and a listed port
+  without rows went unchecked. Mended in the truth: a port is held out only when it has dated
+  rows and a package names it with the truth that pins them (105's set, 7-531 on; 106b's,
+  7-557); every other port is checked, 105's nine without dated keys now among them (they
+  pass), and a new dated port fails until its truth is named.
+- *`test_scenarios`' box over the Strait's southern half.* Cause: charted water in no box of the
+  climatology, which took the nearest box by distance. Mended where the cause lives, the
+  climatology: the box `morocco` over the water east of 9 W from 30 to 36 N that lay in no box
+  (the ruling), the test now pinning the box that answers. The same cause elsewhere is the
+  audit's check (d), which finds it everywhere: `d-no-box` for the Balearics, Biscay south and
+  the Ligurian sea, in other blocks' ground, **named and not mended**.
+- *The directions' test and a period's set.* Cause: the test held that every stream area's set
+  but the open Channel's is the world's axis rounded, judgement. The coast's two areas give the
+  pilot's own point: a named set of areas whose set is the period's (`PERIOD_SETS`), each held to
+  its axis within half a point and unjudged; no other area was of that kind.
+
+**The scenario** (`morocco.yaml`): a British merchant brig from Gibraltar for Mogador, from four
+leagues off El Araiche by the offing of Sallee and the mark west of Cape Cantin; hove to fifteen
+miles west of Mogador at 41.4 hours at seed 7, drifting off the land. Sailed to the road itself
+her account (five miles west of the truth after two days) drove her onto the bank south of the
+island, and hove to seven miles off she drifted ashore under Cape Sem in four hours: the book
+heaves to in the offing.
+
+**The audit, sampled** (`tools/audit_chart.py --known`): three findings the known list lacks,
+`a-unowned:morocco-larache:north` (the two tiles of the row 35.44 to 35.87 N west of 6.77 W, 915
+square miles north of 35.5 N: the ruling's "lead's list", 112's seas to own it),
+`d-split:morocco-sallee` (madeira 70 %, morocco 30 %) and `d-split:morocco-mogador` (madeira 78 %,
+canaries 22 %), both the box's order by design; and `d-no-box:strait` no longer found; the full sweep also no longer finds `a-unowned:strait:south-west` (the Strait's tiles south of 35.5 N and west of 6.5 W, 35 26.4 N 6 46.4 W: morocco-larache's bounds hold that water now), which the sampled sweep had not reached; both leave the list, mended by the block. **The known
+list's edit waits for package 111's step 2b on the trunk** (correction 6): the three entered with
+their owners and `d-no-box:strait` taken out, then the trunk re-merged by a merge commit.
+
+
+### The join with package 112 (2026-11-14, the lead's ruling of 10:40, on the trunk at 96e5e76c)
+
+**How.** The trunk merged by a merge commit; `tools/build_charts.py` merged by itself (CHARTS
+holds `layers:` and Morocco's four regions together). The manifest, a generated file, was not
+merged by hand: the trunk's taken whole, Morocco's four region entries put into it from 106b's
+old manifest only to let the tide load (a gauge's `block:` must name a region the manifest
+has), and then the tool wrote it again, `--region` for the four in turn with `--skip-fetch
+--reuse-world`, from step 1's cache. **What did not move:** every tile, coast and features file,
+2,619 of them, the same SHA-256 before and after the rebuild (the trunk's and 106b's); the
+manifest against the trunk's, entry by entry: the same top-level keys, every trunk region's entry
+the same, nothing lost; differing only in the build hash, Morocco's four entries (each the same as
+106b's old manifest's), the chart's region list (the four appended after the Salvages, `layers:`
+kept), the two sources' fetch records (Morocco's six subsets added, none lost; EMODnet's
+`status` the tool's "fetched", this run having read them) and `open_edges:` below.
+**The open edges** (M1's stretches): 39 on the trunk, 45 now; 34 kept; the Strait's south edge
+from 6.5 to 6.03 W and the Canaries' east edge from 27.69 to 29.47 N are seams with Morocco's
+regions now and leave; the stretch at 35.5 N east of 5.12 W is re-cut to 5.120001 W; nine are new,
+eight with Morocco's regions, each facing open water, and that re-cut one (Larache's north edge west of 6.5 W and its west
+edge, Sallee's north and west edges, Mogador's north and west, the Noun's north). **M1's effect
+on the tide in and beside Morocco:** none. On the 0.05 degree grid from 26.9 to 36 N and 14 to 5
+W (33,123 points), read through 106b's old tree and the joined one, not one point's level or
+constituent moved (the eleven, toward which a taper is laid, are beyond reach of this water);
+so the worst water is unmoved, the six ports' spring ranges are as before (El Araiche, Rabat,
+Mazagan, Saffi 2.82 m on 1.96 m, M2 1.034 to 1.036 m; Mogador and Agadeer 2.27 m on 1.57 m, M2
+0.823 m), and the tide's step at 31.6 N stands as measured. **Truth 7-570's count:** 4,668 on the
+trunk, 4,887 on 106b's old tree (before 112's step 2), 4,962 joined (4,668 + 2 x 147).
+**Truth 7-572 (M1's: a manifest read without `open_edges:`)**, missed by the join's narrow gate
+(a fast test; cloud run 102 failed on it): the candidate edges, every edge of a block beyond
+which a charted box lies, are 38 on the trunk and 49 joined (38 + 11), the pin moved old beside
+new. Thirteen come with Morocco's regions and two leave: eight face open sea (Larache's north
+edge west of 6.5 W and its west edge; Sallee's north edge west of 7.63 W and its west edge, in
+two stretches about the coarse layers' seam at 31.9 to 32 N; Mogador's north edge west of 10.61
+W and its west edge; the Noun's north edge west of 11.04 W: eight of the nine stretches above,
+the ninth the re-cut below);
+four face land (the Noun's south edge at 27.33 N over the Sahara's shore, Larache's east edge at
+5.92 W, Sallee's east edge at 6.35 W and the step at 34.16 N between them, over Morocco's
+interior), which the old reading takes for open and M1's stretches do not; and the Strait's
+south edge east of 5.92 W is re-cut. The Strait's south edge west of 5.92 W and the Canaries'
+east edge become seams. No Moroccan edge faces the Canaries' or the Strait's box: the old rule's
+"every edge a charted box lies beyond is open" holds of the thirteen as a description of that
+reading, and its fault (land counted open) is the four's, which M1 mends.
+**Owed:** two chart packages built side by side cannot both land without one of them rebuilding
+the manifest, because the manifest is one generated file for every region.
+
 ## Package 109, step 5: the vessels kept off the land (note 3), as ruled
 
 Step 5 asked that the unchecked legs be led round the land by the road the plain legs take,
