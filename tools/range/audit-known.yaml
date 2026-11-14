@@ -12,9 +12,20 @@
 # adds its findings here with their reasons. This list is findings owned, never a way round
 # a failure.
 #
-# The owners are three. "a data fault for milestone 7c": the data lacks a date, a row or a
-# form, and the data work mends it. "an engine fault": the code reads a date it should not,
-# or does not read one it should; listed and reported, not mended by the audit. "a judgement
+# FOR A BUILDER. The ratchet reads the whole tree and makes whole worlds, so it is the slow
+# tier's. The checks a push runs are the fast tier (Linux and Windows) and do not include
+# it; the whole suite is the lead's run on each trial merge, on Linux, and on Windows only
+# when asked. So a port file added with its holder, its state or its market as one value
+# passes the fast tier and fails at the merge: every `p-undated:` count goes over its
+# ceiling. Before you push data, run `python tools/audit_range.py --known --no-worlds` (a
+# few seconds): it marks what the list lacks and says which counts are over.
+#
+# The owners are three, and the rule between the first two is what would clear the finding,
+# not what it is about. "a data fault for milestone 7c": a change to data alone, read by
+# today's readers, clears it (the test plants that change for every finding so owned). "an
+# engine fault": a reader or a key must come first, and no change of data clears it; its
+# reason says what the check must become when that form exists. Listed and reported, not
+# mended by the audit. "a judgement
 # to be read against a source": the finding rests on `tools/range/reference.yaml`, a table
 # written FROM MEMORY and read by nothing in the game (`basis: reference`); these are a kind
 # of their own, counted apart, and the mechanical findings stand whole without them.
@@ -136,11 +147,11 @@ known:
   reason: '`prize_court._at_war_at` reads the war''s `since` and the stance does not: before that day a ship is an enemy to the lookout and no enemy to the court, which restores her'
   most: 1
 - key: w-no-end
-  what: 'no war of the table has an end and the table holds no peace: each is in force on every day'
+  what: wars the table as loaded gives no end, each in force on every day (the loader keeps none and the table holds no peace)
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'no data can mend it: `nations.load_nations` keeps a war''s `since` and would drop an `until`, and `Nations.at_war` reads no date at all (w-before-since:, w-court:); the table''s form and its reader are the engine''s, and the rows of 1792 to 1825 are 7c''s once there is a form to hold them'
+  reason: 'counts the wars the table as loaded gives no `until`: `nations.load_nations` keeps none and `Nations.at_war` reads no date (w-before-since:, w-court:), so no change of data clears it. When the loader keeps an end the check stands as it is, a war with its end is counted no more, and the ends of 1792 to 1825 are 7c''s'
   most: 3
 - key: w-relations:algiers+order-of-st-john
   what: the nation's `relations` say war in words and the table has none (the words are read by nothing)
@@ -175,42 +186,42 @@ known:
   years: 1792-1795
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: v-fit-ahead:frigate-36:amazon class 1795
   what: a frigate sails the fit 'amazon class 1795' on days before 1795 (the business draws her)
   years: 1792-1794
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: v-fit-ahead:hermaphrodite-brig:as taken 1814
   what: a hermaphrodite brig sails the fit 'as taken 1814' on days before 1814 (a scenario may name her)
   years: 1792-1813
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: v-fit-ahead:lugger:gun lugger 1795
   what: a privateer lugger sails the fit 'gun lugger 1795' on days before 1795 (a scenario may name her)
   years: 1792-1794
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: v-fit-ahead:razee-44:as carried 1796
   what: a razee sails the fit 'as carried 1796' on days before 1796 (a scenario may name her)
   years: 1792-1795
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: v-fit-ahead:seventy-four:arrogant class 1795
   what: a seventy-four sails the fit 'arrogant class 1795' on days before 1795 (a scenario may name her)
   years: 1792-1794
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'the description''s only fit is of a later year than the day and no year is consulted when she is drawn: the early years want an earlier fit or another class'
+  reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
 - key: f-colours:britain
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
@@ -251,36 +262,36 @@ known:
   what: the flag's dates '-1806, 1815-' are in a form the engine's reader of dates cannot read
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'two spans in one `dates` (''-1806, 1815-''): `flags._in_dates` reads one span and would refuse this one if anything read it'
+  owner: an engine fault
+  reason: the colours hold one row to a flag and `flags._in_dates` reads one span to a row, so a flag flown in two spells ('-1806, 1815-') has no form, and the colours' dates are read by nothing besides (c-unread:colours-dates). When the colours are read by the year the check must ask that every row's dates be ones that reader reads
   most: 1
 - key: f-signal-nearest:britain
   what: signal flags with no drawing for the day's year, served the nearest year's
   years: 1792-1799, 1811-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: the root's flags have rows for some years only; `drawing_of` answers the nearest year's and does not refuse (decision 66)
+  reason: the root's flags have rows for some years only; `drawing_of` answers the nearest year's and does not refuse (decision 66). A row for the years wanting, in the form the reader reads today, clears it
   most: 13
 - key: d-gap:france
   what: years in which the root keeps no day at all
   years: '1805'
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: the root's days leave the year with none kept (France between the Republic's fêtes, to 1804, and the Saint-Napoléon, from 1806)
+  reason: the root's days leave the year with none kept (France between the Republic's fêtes, to 1804, and the Saint-Napoléon, from 1806). A day with its years, in the form `flags.days_on` reads today, clears it
   most: 1
 - key: d-none
   what: nations whose ships dress on no day of the year (no days file)
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: only Britain, France and Spain have a days file; the other thirteen nations' ships dress on no day
+  reason: only Britain, France and Spain have a days file; the other thirteen nations' ships dress on no day. A days file for a nation's root, in the form `flags.load_days` reads today, takes her out of the count
   most: 13
 - key: l-by-year
   what: 'lights first lit or put out within the range are dated by the year alone: lit from its first day, dark from the day after its last'
   years: 1792-1793, 1795, 1805, 1812, 1818, 1822-1823, 1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'a light''s `lit` gives years, not days (JUDGEMENT: small; the sources mostly give no day)'
+  owner: an engine fault
+  reason: '`chart.Feature.lit_in` takes a year, so no data can give a light the day it was first lit. When the reader takes a day the check must count the lights of the range that give a year alone (JUDGEMENT: small; the sources mostly give no day)'
   most: 12
 - key: x-as-of
   what: the table she sailed with is served as of 1 June 1805 on a day before it or in a later year
@@ -294,35 +305,35 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year (JUDGEMENT: which keys are served is the classing''s reading)'
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
   most: 4
 - key: x-words:people-words
   what: served words that name a year yet to come on the day (a work of 1806 cited in 1805, a flag of 1820 described in 1792)
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year (JUDGEMENT: which keys are served is the classing''s reading)'
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
   most: 10
 - key: x-words:port-blockade-since
   what: served words that name a year yet to come on the day (a work of 1806 cited in 1805, a flag of 1820 described in 1792)
   years: 1792-1804
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year (JUDGEMENT: which keys are served is the classing''s reading)'
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
   most: 2
 - key: x-words:port-pilot-words
   what: served words that name a year yet to come on the day (a work of 1806 cited in 1805, a flag of 1820 described in 1792)
   years: 1792-1803
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year (JUDGEMENT: which keys are served is the classing''s reading)'
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
   most: 1
 - key: x-words:ship-words
   what: served words that name a year yet to come on the day (a work of 1806 cited in 1805, a flag of 1820 described in 1792)
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year (JUDGEMENT: which keys are served is the classing''s reading)'
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
   most: 17
 - key: e-year:freesail/api/viewer_flags.py
   what: a year or a date fixed in the code
@@ -363,71 +374,71 @@ known:
   what: no signal book carries the days it was in force
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'no book says when it came into force or went out: Popham''s telegraph of 1803 and the night book of 1799 serve 1792; the lead''s ruling C'
+  owner: an engine fault
+  reason: 'a book''s form has no days in force and `signals.load_books` reads none: no change of data clears a count of every book. When the form has them the check must count the books without them and the days on which a root has no book in force (Popham''s telegraph of 1803 and the night book of 1799 serve 1792 today); the lead''s ruling C'
   most: 30
 - key: u-colours-words
   what: the words of a nation's colours and flag are one value for each nation
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: '`colours` and `flag` are the words of 1805 for every year: the tricolour before 1794 and after 1814, the Union before 1801'
+  owner: an engine fault
+  reason: '`colours` and `flag` are one line a nation, read whole by `load_nations`: no change of data clears a count of every nation that has them. When the words are chosen by the year, as the colours must be (c-unread:colours-dates), the check must count the nations whose words do not change where their colours do'
   most: 16
 - key: u-letters
   what: who issues letters of marque is one value for each nation, war or peace
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: '`letters_of_marque` is true or false for the range: a nation at peace issues them against nobody, and the scenario''s own list is read by nothing'
+  owner: an engine fault
+  reason: '`letters_of_marque` is one truth-value a nation, read whole by `load_nations`, and a scenario''s own list is read by nothing (w-block-unread): no change of data clears a count of every nation that has the key. When the table can say against whom and from when, the check must count the nations whose letters outlast their wars'
   most: 16
 - key: u-names
   what: the names the business gives its ships are one list for each nation
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the trade's and the cruisers' names are one list a nation for the range (a Général-Ernouf in 1792)
+  owner: an engine fault
+  reason: 'the business draws a ship''s name from one list a nation whatever the year (a Général-Ernouf in 1792): no change of data clears a count of the lists. When a name can carry its years the check must count the names without them'
   most: 9
 - key: u-nations
-  what: no nation of the table carries the days it was in being
+  what: nations the table as loaded gives no days of being (the loader reads none)
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'no data can mend it: `nations.load_nations` reads no lifetime and no reader asks whether a nation is in being on a day, so the Batavian Republic, Liguria, Etruria and the Order stand on every day of the range; the form is the engine''s (the reference''s findings r-nation: say which years bite)'
+  reason: 'counts the nations the table as loaded gives neither `since` nor `until`: `nations.load_nations` reads no lifetime and no reader asks whether a nation is in being, so no change of data clears it. When the loader reads a lifetime under those names the check stands as it is (under other names it must read those); the reference''s r-nation: say which years bite'
   most: 16
 - key: u-private
   what: the private signals' form carries no days in force (the tables themselves are made by the running year and month)
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the private signals' form is one for the range; the tables are made by the running year and month under the seed, so each month has its own (no fault in that)
+  owner: an engine fault
+  reason: 'the private signals'' form is one for the range and no reader takes days in force: no change of data clears a count of every root''s form. The tables themselves are made by the running year and month under the seed, each month its own, and that is no fault. When the form has days in force the check must count the roots without them'
   most: 6
 - key: u-prize-shares
   what: nations with no prize scheme of their own, given Britain's by the day
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: only Britain has schemes by date (1708 and 1808); France and Spain are given Britain's classes and the rest fall to hers
+  reason: only Britain has schemes by date (1708 and 1808); France and Spain are given Britain's classes and the rest fall to hers. A scheme of her own for a nation, in the form `prize_court.scheme_for` reads today, takes her out of the count
   most: 13
 - key: u-regulations
   what: the files that state a regulation, an instruction or a custom carry no days in force
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the Regulations of 1806, the convoy's rules and the ration are stated as rules with no day in force and serve every year; the lead's ruling C
+  owner: an engine fault
+  reason: 'the files state a regulation, an instruction or a custom as a rule, and their readers take no day in force: no change of data clears a count of the files. When a rule can carry its days the check must count the rules without them (the Regulations of 1806, the convoy''s rules and the ration serve every year today); the lead''s ruling C'
   most: 10
 - key: u-ships
   what: 'no ship file dates as data when her class was afloat, or when she was so fitted and so armed: the years stand only in fits'' names and in words'
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'the ship schema has no key for a year: when a class was afloat, and when she was so fitted and so armed, stand only in fits'' names and in `era_notes`; the lead''s ruling C on the ground report'
+  owner: an engine fault
+  reason: 'the ship schema has no key for a year and no reader chooses a class or a fit by the day: no change of data clears a count of every ship file. When the schema has such a key the check must count the ship files that lack it, and the days on which a description has no ship afloat; the lead''s ruling C on the ground report'
   most: 18
 - key: u-trade
   what: who trades, in what, as a neutral or not, and at what price is one value for the range
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'who trades, in what hull, who is a neutral and what a prize is worth are June 1805''s: the United States, Denmark and Portugal neutral on every day'
+  owner: an engine fault
+  reason: 'who trades, in what hull, who is a neutral and what a prize is worth are single tables read whole by the business: no change of data clears a count of the tables. When a table''s rows can carry their days the check must count the rows without them (the United States, Denmark and Portugal are neutral on every day today)'
   most: 5
 - key: c-snap-back:blockades-dates
   what: 'both by the scenario''s choice: a blockade raised or laid in play is drawn again or not by the record''s dates the next time the region is peopled, under `follows_history`'
@@ -475,8 +486,8 @@ known:
   what: 'the data carries it and the game reads it not: nothing: `load_nations` does not take the key; war and peace between the later nations stand only in these words'
   years: 1792-1825
   basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: the later nations' wars and peaces are written as words under `relations` and not as rows of `wars`; the loader takes no such key
+  owner: an engine fault
+  reason: the words hold dated wars and peaces for which the table has no form (it holds no peace and no end, w-no-end); the wars among them are the data's already (w-relations:). When the table can hold a peace and its days the check must ask that no dated relation stands in words alone
   most: 25
 - key: c-unread:scenario-papers
   what: 'the data carries it and the game reads it not: kept in `Scenario.papers`; no code reads either (the almanac''s figures are computed from the clock)'

@@ -47,12 +47,25 @@ kind of its own (`basis: reference`, its key beginning `r-`, its owner "a judgem
 read against a source"), counted and listed apart. The mechanical findings are the same
 with the reference thrown away (`--no-reference`; the test holds it).
 
-**Whose a finding is.** A data fault is one the data work can mend by writing rows the
-game already reads. Where no data can mend it, it is the engine's, whatever rows are
-wanting besides: the wars' want of an end (`w-no-end`: the loader keeps no `until` and the
-stance reads no date), the nations' want of a lifetime (`u-nations`), and the colours worn
-whatever the year (`f-colours:`, five: their dates are read by nothing,
-`c-unread:colours-dates`).
+**Whose a finding is: the rule.** An owner is written by what would clear the finding,
+not by what the finding is about. A finding is the **data's** only if a change to data
+alone, read by today's readers, clears it: a port's holder written as rows, a war entered
+in the table, a blockade given its dates, a description given an earlier fit, a flag a
+row for the years wanting, a nation a day, the words rewritten, a nation a prize scheme.
+The test plants that change for every kind of finding so owned, and a kind with no such
+planting cannot be owned as the data's. A finding is the **engine's** (the form's) if a
+reader or a key must come first, whatever rows are wanting besides; and where the check
+itself must change when that form exists, the finding's reason in the known list says what
+it must become. So the engine's are: a scenario's own block of wars read by nothing; the
+wars before their beginning and before the court, and their want of an end (the loader keeps no `until`; the check counts the wars the
+loaded table gives none, and a war with its end would leave the count); the colours worn
+whatever the year and their dates in a form no reader reads; the lights dated by the year
+(their reader takes a year); the table's day served; the years fixed in code; nine of the
+ten elements no data dates (ships, books, private signals, regulations, names, the trade,
+letters of marque, the colours' words: each an unconditional count that no change of data
+could clear; and the nations, counted where the loaded table gives no `since` and no
+`until`); and all eight of the classing's. By the rule 28 findings are the data's and 38
+the engine's.
 
 **What a finding is.** A key (the check and what it is of, never a count or a day), what
 it is in words, the years of the sampled days it bites, a count of the things concerned,
@@ -68,9 +81,19 @@ holder, a war and a vessel out of the reference's years, and the two roads made 
 disagree on a world built by hand. The ten of check (u) count what a tree holds and are
 counted on a small one; they are not planted otherwise. All of that is cheap and is the
 fast tier's. The ratchet itself (the sampled sweep and the full sweep against the known
-list, on the whole tree with whole worlds) is the slow tier's, which the cloud runs at
-every merge: by the suite's own rule a test of five seconds or more is slow, and the
-sampled sweep is twenty by the quick loader and forty by the game's own (section 7).
+list, on the whole tree with whole worlds) is the slow tier's: by the suite's own rule a
+test of five seconds or more is slow, and the sampled sweep is twenty by the quick loader
+and forty by the game's own (section 7).
+
+**For a builder: when the ratchet is tried.** The checks a push runs are the fast tier, on
+Linux and on Windows, and the ratchet is not in it. The whole suite is the lead's run on
+each trial merge, on Linux, and on Windows only when asked. So the ratchet on the real
+tree is tried at each merge on Linux and not on a push. A builder who adds a port file
+with its holder, its state or its market as one value sees nothing in the fast tier, and
+at the merge all seven `p-undated:` counts go over their ceilings. Before pushing data,
+run `python tools/audit_range.py --known --no-worlds` (a few seconds): it marks a finding
+the list lacks, names a listed one the sweep no longer makes, and says which counts are
+over their ceiling. The same words stand at the head of the known list.
 
 **A path as a key.** A file enters a finding's key, and is matched against the classing,
 only through one function (`key_of`: its path under its folder, with forward slashes), so
@@ -176,8 +199,8 @@ The full sweep makes **105 findings: 66 mechanical and 39 that rest on the refer
 
 | Owner | Mechanical | Reference |
 |---|---|---|
-| a data fault for milestone 7c | 39 | 0 |
-| an engine fault | 27 | 0 |
+| a data fault for milestone 7c | 28 | 0 |
+| an engine fault | 38 | 0 |
 | a judgement to be read against a source | 0 | 39 |
 | all | 66 | 39 |
 

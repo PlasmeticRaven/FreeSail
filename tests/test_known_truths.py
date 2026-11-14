@@ -17491,13 +17491,16 @@ def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_
     }
 
 
-def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_part_of_the_build():
+def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_part_of_the_build(
+    tmp_path,
+):
     """Package 103a, as mended on the lead's reading: a file is a key by its path under
     its folder with forward slashes (`key_of`), so that the classing holds the same keys
     and the known list the same findings on Windows as elsewhere; and the known list and
     the reference lie under tools/range/, outside what the build's fingerprint hashes
-    (`core.world.fingerprint_of`: freesail/ and data/), so that a finding owned or mended
-    changes no build and no save reads as another's."""
+    (`core.world.fingerprint_of`: freesail/ and data/). On a made root an entry taken out
+    of a list under tools/ moves no fingerprint, and the same list under data/ moves it:
+    a finding owned or mended changes no build, and no save reads as another's."""
     from pathlib import PureWindowsPath
 
     from freesail.core.world import fingerprint_of
@@ -17512,7 +17515,16 @@ def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_par
     )
     root = Path(__file__).resolve().parents[1]
     for path in (A.KNOWN_PATH, A.REFERENCE_PATH):
-        assert path.is_file() and path.relative_to(root).parts[0] == "tools"
+        assert path.is_file() and path.relative_to(root).parts[:2] == ("tools", "range")
     assert not (root / "data" / "range").exists()
-    # the fingerprint is of freesail/ and data/ alone: tools/ moves it not
-    assert fingerprint_of(root / "tools") == fingerprint_of(root / "docs")
+    for folder in ("freesail", "data", "tools/range"):
+        (tmp_path / folder).mkdir(parents=True)
+    (tmp_path / "freesail" / "a.py").write_text("X = 1\n", encoding="utf-8")
+    (tmp_path / "data" / "a.yaml").write_text("a: 1\n", encoding="utf-8")
+    listed = tmp_path / "tools" / "range" / "audit-known.yaml"
+    listed.write_text("known: [one, two]\n", encoding="utf-8")
+    before = fingerprint_of(tmp_path)
+    listed.write_text("known: [one]\n", encoding="utf-8")
+    assert fingerprint_of(tmp_path) == before
+    (tmp_path / "data" / "audit-known.yaml").write_text("known: [one]\n", encoding="utf-8")
+    assert fingerprint_of(tmp_path) != before

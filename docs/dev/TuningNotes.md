@@ -28714,7 +28714,7 @@ way, and the helpers' reports.
 **What was built.** `tools/audit_range.py` (the sweep), `tools/range/audit-known.yaml` (the
 105 findings of the first full sweep, each owned), `tools/range/reference.yaml` (the wars,
 the peaces and the nations' lifetimes of 1792 to 1825, FROM MEMORY, read by nothing in the
-game), `tests/test_range_audit.py` (27 fast tests and seven slow), truths 7-590 to 7-593, and
+game), `tests/test_range_audit.py` (40 fast tests and seven slow), truths 7-590 to 7-593, and
 the document. No file under `freesail/` changed and none under `data/`: the audit's two
 files lie beside the tool, under `tools/range/` (first laid under `data/range/` and moved
 on the lead's reading, below).
@@ -28790,8 +28790,8 @@ tier of the test file is about 1 s (4 s without libyaml) and truths 7-592 and 7-
 a second (2.3 s); the slow tier's fixture 19 s (41 s), truths 7-590 and 7-591 2.7 s and
 1.1 s (13 s and 7 s), the loaders' comparison 7.8 s.
 
-**The findings** (the full sweep): 105, of which 66 mechanical (39 data faults for
-milestone 7c, 27 engine faults) and 39 that rest on the reference. By check: the ports 9,
+**The findings** (the full sweep): 105, of which 66 mechanical (28 data faults for
+milestone 7c, 38 engine faults, by the rule of the second reading below) and 39 that rest on the reference. By check: the ports 9,
 the wars 11, the blockades 1, the vessels 6, the flags 7, the days 2, the lights 1, the
 words 6, the code's years 5, what no data dates 10, the classing 8, the reference 39, the
 two roads' agreement none. The sampled sweep makes all but `r-vessel:etruria`.
@@ -28853,7 +28853,8 @@ test at that level. No file under `freesail/` or `data/` changed.
    owned as data faults and no data can mend them (the loader keeps no `until` and the
    stance reads no date; the colours' dates are read by nothing; no reader asks whether a
    nation is in being). They are the engine's now, each reason naming the finding that
-   says why: 39 data faults, 27 engine faults, 39 judgements. The test of the known list
+   says why: 39 data faults, 27 engine faults, 39 judgements (the rule itself came with the
+   second reading, below, and moved eleven more). The test of the known list
    holds the seven.
 5. **What the sweep cannot see, with its cases,** in the document's section 5: a port held
    by another nation that was in being (Toulon, Port Mahon, Bastia, Porto Ferrajo,
@@ -28879,6 +28880,53 @@ test at that level. No file under `freesail/` or `data/` changed.
    own words have it; the settlement at Tangier is remembered as of October (the 12th, not
    sure), and the row ends the day before, marked FROM MEMORY where it leaves the tree,
    confidence low. Neither moves a finding's years.
+
+### After the lead's second reading of 5a6c1f7 (2026-11-14)
+
+A second reader tried each of the eight by probes of its own (the keys through Windows
+paths over the real tree, the fingerprint, the fast tier without libyaml, six checks
+broken in a scratch copy and each caught) and the lead sent four more, none large.
+
+1. **The owners, by their cause.** *Cause:* an owner was written by what the finding is
+   about, not by what would clear it. The first reading mended the three named; the same
+   mistake stood in eleven more. *The rule,* now in the known list's head, the document
+   and the tool: a finding is the data's only if a change to data alone, read by today's
+   readers, clears it; it is the engine's if a reader or a key must come first, and where
+   the check must change when that form exists its reason says what it must become.
+   *Every entry tried against it* (all 105): eleven moved to the engine (`u-ships`,
+   `u-books`, `u-private`, `u-regulations`, `u-names`, `u-trade`, `u-letters`,
+   `u-colours-words`, each an unconditional count; `l-by-year`, whose reader takes a year;
+   `f-dates-form:`, a form no reader reads; `c-unread:nations-relations`, dated peaces the
+   table has no form for), and none moved to the data: 28 the data's, 38 the engine's, 39
+   judgements. JUDGEMENT: the six `v-fit-ahead:` stay the data's, since an earlier fit or
+   class for the description clears each by today's readers, though a fit chosen by the
+   day would want a reader. *Two checks counted elements and not what was missing,* so
+   that no mend of the engine would have cleared them: `w-no-end` now counts the wars the
+   loaded table gives no `until`, and `u-nations` the nations it gives neither `since` nor
+   `until` (all of them today, the loader keeping neither). *Tests:* for each of the
+   eleven kinds owned as the data's, a planting in which the finding is made and a change
+   of data alone clears it (`DATA_CLEARS`), and the known list's test refuses a data
+   owner for a kind with no such planting; a war planted with an end and a nation with
+   its days leave the two counts; the thirteen reasons that must say what the check
+   becomes are held to say it.
+2. **Truth 7-593's last assertion was vacuous** (it compared the fingerprints of two
+   folders with neither `freesail/` nor `data/` in them). The truth now makes a root and
+   shows what the fast test shows: a list changed under `tools/` moves no fingerprint, the
+   same under `data/` does.
+3. **The loaders' comparison** let -0.0 pass for 0.0 (the data holds -0.0 in three files),
+   a datetime for another of the same instant and a different offset, and 1 for True
+   inside a set or a tuple, and refused nan for nan. It compares a float by its `repr`
+   (its sign and its bits), goes into sets and tuples by type as into lists and dicts,
+   and compares a datetime with its offset; its own fast test plants each. The two
+   loaders still agree on all 437 files.
+4. **When the ratchet is tried,** said as it is and where a builder reads it (the known
+   list's head, the document's section 1, the failing test's own words): a push runs the
+   fast tier on Linux and Windows, without the ratchet; the whole suite is the lead's run
+   on each trial merge, on Linux, and on Windows when asked. A port added with one value
+   where the range wants rows passes the push and sends the seven `p-undated:` counts
+   over their ceilings at the merge. `python tools/audit_range.py --known --no-worlds`
+   (a few seconds) now names a listed finding no longer made and each count over its
+   ceiling, and a run with no worlds is not asked for what only a world makes.
 
 ### The helpers' reports, kept (package 103a)
 

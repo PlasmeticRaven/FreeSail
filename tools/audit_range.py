@@ -67,6 +67,12 @@ its path under its folder with forward slashes, the same on every machine. The k
 and the reference lie under `tools/range/`, not under `data/`, which the build's
 fingerprint hashes whole.
 
+**Whose a finding is.** A finding is the data's only if a change to data alone, read by
+today's readers, clears it. It is the engine's (the form's) if a reader or a key must come
+first; its reason in the known list then says what the check must become when that form
+exists. The test holds the rule: every finding owned as data has a planting in which a
+change of data alone clears it.
+
 Figures marked JUDGEMENT are the audit's own choices of what counts as a finding.
 """
 
@@ -1027,15 +1033,19 @@ def check_wars(audit: Audit, tree: Tree, days: list[date], ref: Reference | None
                     "day (the court reads the war's `since`, the stance does not)",
                     split,
                 )
-    if nations.wars:
+    # the wars the table as loaded gives no end (`until`, as the ports' rows and the
+    # blockades have it): the loader keeps none today, so every war is counted; a war the
+    # loader came to keep an end for would not be
+    unended = [w for w in nations.wars if not w.get("until")]
+    if unended:
         audit.add(
             "w",
             "w-no-end",
-            "no war of the table has an end and the table holds no peace: each is in force "
-            "on every day",
+            "wars the table as loaded gives no end, each in force on every day (the loader "
+            "keeps none and the table holds no peace)",
             days,
-            count=len(nations.wars),
-            worst=[pair_key(*w["between"]) for w in nations.wars],
+            count=len(unended),
+            worst=[pair_key(*w["between"]) for w in unended],
         )
     # what the nations' `relations` say in words, against the table
     said = _relations_at_war(tree.nations_doc)
@@ -1519,10 +1529,16 @@ def check_undated(audit: Audit, tree: Tree, days: list[date]) -> None:
         if things:
             audit.add("u", key, words, days, count=len(things), worst=things[:6])
 
+    # the nations the table as loaded gives neither a first day nor a last (`since`,
+    # `until`): the loader reads none today, so every nation is counted
     one(
         "u-nations",
-        "no nation of the table carries the days it was in being",
-        sorted(nations),
+        "nations the table as loaded gives no days of being (the loader reads none)",
+        sorted(
+            nid
+            for nid, n in nations.items()
+            if getattr(n, "since", None) is None and getattr(n, "until", None) is None
+        ),
     )
     one(
         "u-letters",
@@ -1955,13 +1971,22 @@ def unlisted(audit: Audit, known: dict[str, dict[str, Any]]) -> list[Finding]:
     return [f for k, f in sorted(audit.findings.items()) if k not in known]
 
 
-def no_longer(audit: Audit, known: dict[str, dict[str, Any]], full: bool) -> list[str]:
+# The findings only a whole world makes: not asked of a run that makes none.
+DEAR_ONLY = ("w-block-unread", "r-vessel:", "v-nation-unknown:", "a-")
+
+
+def no_longer(
+    audit: Audit, known: dict[str, dict[str, Any]], full: bool, worlds: bool = True
+) -> list[str]:
     """The listed findings the sweep no longer makes (a sampled sweep is not asked for
-    those marked `sweep: full`)."""
+    those marked `sweep: full`, nor a run with no whole worlds for those only a world
+    makes)."""
     return sorted(
         k
         for k, e in known.items()
-        if k not in audit.findings and (full or e.get("sweep") != "full")
+        if k not in audit.findings
+        and (full or e.get("sweep") != "full")
+        and (worlds or not k.startswith(DEAR_ONLY))
     )
 
 
@@ -2056,12 +2081,17 @@ def main(argv: list[str] | None = None) -> int:
     print(report(audit, known))
     if known is not None:
         new = unlisted(audit, known)
-        gone = no_longer(audit, known, args.full)
+        gone = no_longer(audit, known, args.full, worlds=not args.no_worlds)
+        over = over_ceiling(audit, known)
+        for key in gone:
+            print(f"- {key}: listed, and the sweep no longer makes it (take its entry out)")
+        for f in over:
+            print(f"^ {f.key}: {f.count}, over its ceiling of {known[f.key]['most']}")
         print(
-            f"== {len(new)} finding(s) the known list lacks; {len(gone)} it lists and the "
-            "sweep no longer makes"
+            f"== {len(new)} finding(s) the known list lacks (marked !); {len(gone)} it lists "
+            f"and the sweep no longer makes; {len(over)} count(s) over their ceiling"
         )
-        return 1 if new or gone else 0
+        return 1 if new or gone or over else 0
     return 0
 
 

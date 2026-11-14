@@ -33,7 +33,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import sys
-from datetime import date
+from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from types import SimpleNamespace
 
@@ -101,6 +101,13 @@ def sampled(tree):
     return A.run(tree=tree)
 
 
+CEILING_WORDS = (
+    "counts above their ceiling (a port or a ship added with a value where the range wants "
+    "dated rows raises the count: date it, or raise the ceiling in "
+    "tools/range/audit-known.yaml with its reason):\n"
+)
+
+
 def _planted(tree, **changes):
     """The tree with some of its parts replaced, the rest shared."""
     return A.Tree(**{**{f: getattr(tree, f) for f in tree.__dataclass_fields__}, **changes})
@@ -149,11 +156,33 @@ def test_the_known_list_holds_each_finding_owned():
         if "most" in e:
             assert isinstance(e["most"], int) and e["most"] >= 1, e["key"]
         assert e.get("sweep", "full") == "full", e["key"]
-    owner = {e["key"]: e["owner"] for e in entries}
-    engines = ["w-no-end", "u-nations", *(k for k in owner if k.startswith("f-colours:"))]
-    assert len(engines) == 7
+    # the rule of the owners: a finding is the data's only if a change to data alone,
+    # read by today's readers, clears it, and every kind so owned has that planting
+    # (`DATA_CLEARS`, below); where a reader or a key must come first it is the engine's,
+    # and where the check itself must change its reason says what it must become
+    by_owner = {e["key"]: e for e in entries}
+    data = {k for k, e in by_owner.items() if e["owner"] == A.OWNERS[0]}
+    engine = {k for k, e in by_owner.items() if e["owner"] == A.OWNERS[1]}
+    assert {k.split(":")[0] for k in data} <= set(DATA_CLEARS), sorted(
+        {k.split(":")[0] for k in data} - set(DATA_CLEARS)
+    )
+    assert len(data) == 28 and len(engine) == 38
+    engines = [k for k in by_owner if k[0] in "ue" or k.startswith(("f-colours:", "c-"))]
+    engines += ["w-no-end", "l-by-year", "x-as-of", "w-block-unread"]
+    engines += [k for k in by_owner if k.startswith(("w-before-since:", "w-court:"))]
+    engines.remove("u-prize-shares")
     for key in engines:
-        assert owner[key] == "an engine fault", key
+        assert by_owner[key]["owner"] == "an engine fault", key
+    assert set(engines) | {k for k in by_owner if k.startswith("f-dates-form:")} == engine
+    must_change = [k for k in engine if k[0] in "ul" or k.startswith("f-dates-form:")]
+    must_change += ["w-no-end", "c-unread:nations-relations"]
+    assert len(must_change) == 13
+    for key in must_change:
+        reason = by_owner[key]["reason"]
+        assert "When " in reason and "the check " in reason, key
+    head = A.KNOWN_PATH.read_text(encoding="utf-8").split("known:")[0]
+    assert "a change to data alone" in head and "FOR A BUILDER" in head
+    assert "fails at the merge" in head and "--known --no-worlds" in head
 
 
 def test_a_path_is_the_same_key_on_any_machine():
@@ -704,6 +733,258 @@ def test_what_no_data_dates_is_counted_element_by_element(small):
 
 
 # ---------------------------------------------------------------------------
+# The rule of the owners: what a change of data alone clears (fast)
+# ---------------------------------------------------------------------------
+
+
+def _clear_p_undated(small, mp):
+    keys = ("nation", *A.DATED_KEYS)
+    rows = {
+        pid: {**doc, **{k: [{k: doc.get(k), "source": "planted"}] for k in keys}}
+        for pid, doc in small.port_docs.items()
+    }
+    before, after = A.Audit(), A.Audit()
+    A.check_ports(before, small, SOME_DAYS, None)
+    A.check_ports(after, _planted(small, port_docs=rows), SOME_DAYS, None)
+    return before, after, [f"p-undated:{k}" for k in keys]
+
+
+def _clear_p_blockade_words(small, mp):
+    docs = dict(small.port_docs)
+    docs["cadiz"] = {
+        **docs["cadiz"],
+        "blockade": {**docs["cadiz"]["blockade"], "since": "1805-01-01"},
+    }
+    before, after = A.Audit(), A.Audit()
+    A.check_ports(before, small, SOME_DAYS, None)
+    A.check_ports(after, _planted(small, port_docs=docs), SOME_DAYS, None)
+    return before, after, ["p-blockade-words:cadiz"]
+
+
+def _clear_p_blockade_before(small, mp):
+    ports = dict(small.ports)
+    cadiz = copy.copy(ports["cadiz"])
+    cadiz.blockade = {**cadiz.blockade, "since": "1792-01-01"}
+    ports["cadiz"] = cadiz
+    before, after = A.Audit(), A.Audit()
+    A.check_ports(before, small, SOME_DAYS, None)
+    A.check_ports(after, _planted(small, ports=ports), SOME_DAYS, None)
+    return before, after, ["p-blockade-before:cadiz"]
+
+
+def _clear_w_relations(small, mp):
+    nations = copy.copy(small.nations)
+    nations.wars = [
+        *small.nations.wars,
+        *(
+            {"between": pair, "since": None, "source": "planted"}
+            for pair in (
+                ("algiers", "portugal"),
+                ("order-of-st-john", "algiers"),
+                ("order-of-st-john", "tunis"),
+            )
+        ),
+    ]
+    before, after = A.Audit(), A.Audit()
+    A.check_wars(before, small, SOME_DAYS, None)
+    A.check_wars(after, _planted(small, nations=nations), SOME_DAYS, None)
+    return (
+        before,
+        after,
+        [
+            "w-relations:algiers+portugal",
+            "w-relations:algiers+order-of-st-john",
+            "w-relations:order-of-st-john+tunis",
+        ],
+    )
+
+
+def _clear_b_undated(small, mp):
+    nations = copy.copy(small.nations)
+    britain = copy.copy(nations.nations["britain"])
+    dated = [
+        {"port": "brest", "since": date(1803, 5, 18)} if entry == "brest" else entry
+        for entry in britain.naval["blockades"]
+    ]
+    object.__setattr__(britain, "naval", {**britain.naval, "blockades": dated})
+    nations.nations = {**nations.nations, "britain": britain}
+    before, after = A.Audit(), A.Audit()
+    A.check_blockades(before, small, SOME_DAYS, None)
+    A.check_blockades(after, _planted(small, nations=nations), SOME_DAYS, None)
+    return before, after, ["b-undated:britain:brest"]
+
+
+def _clear_v_fit_ahead(small, mp):
+    docs = dict(small.ship_docs)
+    brig = copy.deepcopy(docs["brig.yaml"])
+    brig["ship"]["descriptions"]["brig-sloop"]["fit"] = "an older class's carronades"
+    docs["brig.yaml"] = brig
+    before, after = A.Audit(), A.Audit()
+    A.check_vessels(before, small, SOME_DAYS)
+    A.check_vessels(after, _planted(small, ship_docs=docs), SOME_DAYS)
+    return before, after, ["v-fit-ahead:brig:diligence class 1796"]
+
+
+def _clear_f_signal_nearest(small, mp):
+    plain = SimpleNamespace(flags={}, occasions=[], nations={})
+    mp.setattr(A.F, "file_for_nation", lambda nations, nid: plain)
+    mp.setattr(A, "flag_roots", lambda: ["made"])
+    mp.setattr(A, "_fashions", lambda root: ())
+    some = [_flag("numeral 1", "1799-1810")]
+    mp.setattr(A.F, "load_signal_flags", lambda root: SimpleNamespace(rows=some))
+    before = A.Audit()
+    A.check_flags(before, small, SOME_DAYS)
+    more = [*some, _flag("numeral 1", "-1798"), _flag("numeral 1", "1811-")]
+    mp.setattr(A.F, "load_signal_flags", lambda root: SimpleNamespace(rows=more))
+    after = A.Audit()
+    A.check_flags(after, small, SOME_DAYS)
+    return before, after, ["f-signal-nearest:made"]
+
+
+def _days_audits(small, mp, before_days, after_days, key):
+    mp.setattr(A, "flag_roots", lambda: ["britain"])
+    mp.setattr(A.F, "load_days", before_days)
+    before = A.Audit()
+    A.check_days(before, small, SOME_DAYS)
+    mp.setattr(A.F, "load_days", after_days)
+    after = A.Audit()
+    A.check_days(after, small, SOME_DAYS)
+    return before, after, [key]
+
+
+def _clear_d_none(small, mp):
+    day = (A.F.Day("a day", 6, 4, "", ("dress",), 21, "planted"),)
+    return _days_audits(
+        small, mp, lambda root: day if root == "britain" else (), lambda root: day, "d-none"
+    )
+
+
+def _clear_d_gap(small, mp):
+    old = A.F.Day("the old king's birthday", 6, 4, "1760-1799", ("dress",), 21, "planted")
+    new = A.F.Day("the new king's birthday", 8, 12, "1802-", ("dress",), 21, "planted")
+    between = A.F.Day("the regent's day", 1, 1, "1800-1801", ("dress",), 21, "planted")
+    return _days_audits(
+        small, mp, lambda root: (old, new), lambda root: (old, between, new), "d-gap:britain"
+    )
+
+
+def _clear_x_words(small, mp):
+    cited = [("people/made.yaml", "wardroom.#.brief", "He keeps the Regulations of 1806.")]
+    plain = [("people/made.yaml", "wardroom.#.brief", "He keeps the Regulations by him.")]
+    before, after = A.Audit(), A.Audit()
+    A.check_words(before, small, SOME_DAYS, cited)
+    A.check_words(after, small, SOME_DAYS, plain)
+    return before, after, ["x-words:people-words"]
+
+
+def _clear_u_prize_shares(small, mp):
+    doc = dict(small.business_doc)
+    doc["prize_shares"] = [
+        *doc["prize_shares"],
+        *({"nation": nid, "classes": "british"} for nid in small.nations.nations),
+    ]
+    before, after = A.Audit(), A.Audit()
+    A.check_undated(before, small, SOME_DAYS)
+    A.check_undated(after, _planted(small, business_doc=doc), SOME_DAYS)
+    return before, after, ["u-prize-shares"]
+
+
+# A kind of finding (its key before the colon) to the planting in which a change of data
+# alone, read by today's readers, clears it. A finding of a kind not here cannot be owned
+# as the data's (`test_the_known_list_holds_each_finding_owned`).
+DATA_CLEARS = {
+    "p-undated": _clear_p_undated,
+    "p-blockade-words": _clear_p_blockade_words,
+    "p-blockade-before": _clear_p_blockade_before,
+    "w-relations": _clear_w_relations,
+    "b-undated": _clear_b_undated,
+    "v-fit-ahead": _clear_v_fit_ahead,
+    "f-signal-nearest": _clear_f_signal_nearest,
+    "d-none": _clear_d_none,
+    "d-gap": _clear_d_gap,
+    "x-words": _clear_x_words,
+    "u-prize-shares": _clear_u_prize_shares,
+}
+
+
+@pytest.mark.parametrize("kind", sorted(DATA_CLEARS))
+def test_a_finding_owned_as_the_datas_is_cleared_by_a_change_of_data_alone(
+    kind, small, monkeypatch
+):
+    """The rule of the owners, held: for each kind of finding the known list owns as a
+    data fault, the finding is made, then a change to the data alone (a port's rows, a
+    war entered in the table, a blockade's date, another fit, a flag's row, a day, the
+    words, a prize scheme), read by the readers as they are, and the finding is gone."""
+    before, after, keys = DATA_CLEARS[kind](small, monkeypatch)
+    assert keys
+    for key in keys:
+        assert key.split(":")[0] == kind
+        assert key in before.findings, key
+        assert key not in after.findings, key
+
+
+def test_a_war_with_an_end_and_a_nation_with_its_days_are_counted_no_more(small):
+    """`w-no-end` and `u-nations` count what the table as loaded lacks, not what it holds:
+    a war the loader came to keep an `until` for, and a nation it gave a `since` or an
+    `until`, leave the counts; no change of data does that today, the loader keeping
+    neither, so both are the engine's."""
+    nations = copy.copy(small.nations)
+    nations.wars = [
+        {"between": ("britain", "france"), "since": date(1803, 5, 18), "until": date(1814, 5, 29)},
+        {"between": ("britain", "spain"), "since": date(1804, 12, 12), "until": None},
+        {"between": ("britain", "batavian-republic"), "since": date(1803, 6, 17)},
+    ]
+    audit = A.Audit()
+    A.check_wars(audit, _planted(small, nations=nations), SOME_DAYS, None)
+    found = audit.findings["w-no-end"]
+    assert found.count == 2 and found.worst == ["britain+spain", "batavian-republic+britain"]
+    nations.wars = [dict(w, until=date(1814, 5, 29)) for w in nations.wars]
+    ended = A.Audit()
+    A.check_wars(ended, _planted(small, nations=nations), SOME_DAYS, None)
+    assert "w-no-end" not in ended.findings
+    # as loaded today no war has an end: all three are counted
+    today = A.Audit()
+    A.check_wars(today, small, SOME_DAYS, None)
+    assert today.findings["w-no-end"].count == len(small.nations.wars) == 3
+
+    def with_days(n, **days):
+        return SimpleNamespace(**{f: getattr(n, f) for f in n.__dataclass_fields__}, **days)
+
+    table = dict(small.nations.nations)
+    table["liguria"] = with_days(table["liguria"], since=date(1797, 6, 14), until=date(1805, 6, 3))
+    table["order-of-st-john"] = with_days(table["order-of-st-john"], until=date(1798, 6, 11))
+    lived = copy.copy(small.nations)
+    lived.nations = table
+    counted = A.Audit()
+    A.check_undated(counted, _planted(small, nations=lived), SOME_DAYS)
+    found = counted.findings["u-nations"]
+    assert found.count == len(table) - 2
+    assert not {"liguria", "order-of-st-john"} & set(found.worst)
+    assert today.findings.get("u-nations") is None  # another check's
+    all_of_them = A.Audit()
+    A.check_undated(all_of_them, small, SOME_DAYS)
+    assert all_of_them.findings["u-nations"].count == len(table)
+
+
+def test_a_run_with_no_worlds_is_not_asked_for_what_only_a_world_makes():
+    known = {
+        "w-block-unread": {},
+        "r-vessel:etruria": {"sweep": "full"},
+        "p-undated:nation": {},
+        "x-as-of": {},
+    }
+    audit = A.Audit()
+    audit.add("x", "x-as-of", "words", [date(1792, 7, 1)])
+    assert A.no_longer(audit, known, full=False) == ["p-undated:nation", "w-block-unread"]
+    assert A.no_longer(audit, known, full=True) == [
+        "p-undated:nation",
+        "r-vessel:etruria",
+        "w-block-unread",
+    ]
+    assert A.no_longer(audit, known, full=True, worlds=False) == ["p-undated:nation"]
+
+
+# ---------------------------------------------------------------------------
 # The two roads, planted on a made world (fast)
 # ---------------------------------------------------------------------------
 
@@ -818,7 +1099,7 @@ def test_the_sampled_sweep_is_the_known_list(sampled):
     gone = A.no_longer(sampled, known, full=False)
     assert not gone, f"listed findings the sampled sweep no longer makes (take them out): {gone}"
     over = A.over_ceiling(sampled, known)
-    assert not over, "counts above their ceiling:\n" + "\n".join(
+    assert not over, CEILING_WORDS + "\n".join(
         f"{f.key}: {f.count} > {known[f.key]['most']}" for f in over
     )
     for f in sampled.findings.values():
@@ -921,7 +1202,9 @@ def test_the_full_sweep_is_the_known_list_exactly(tree):
     gone = A.no_longer(audit, known, full=True)
     assert not gone, f"listed findings the full sweep no longer makes (take them out): {gone}"
     over = A.over_ceiling(audit, known)
-    assert not over, [(f.key, f.count) for f in over]
+    assert not over, CEILING_WORDS + "\n".join(
+        f"{f.key}: {f.count} > {known[f.key]['most']}" for f in over
+    )
     wrong = {
         k: (f.years(), known[k]["years"])
         for k, f in audit.findings.items()
@@ -933,18 +1216,32 @@ def test_the_full_sweep_is_the_known_list_exactly(tree):
 
 
 def _same(a, b) -> bool:
-    """Two documents the same value by value and type by type: True is not 1 and 1 is not
-    1.0, as `==` would have them."""
+    """Two documents the same value by value and type by type, as `==` would not have
+    them: True is not 1 and 1 is not 1.0, in a list, a dict, a tuple or a set alike; a
+    float is its sign and its bits (-0.0 is not 0.0, and nan is nan); a datetime is its
+    instant and its offset."""
     if type(a) is not type(b):
         return False
     if isinstance(a, dict):
         return (
-            list(a) == list(b)
+            len(a) == len(b)
+            and all(_same(x, y) for x, y in zip(a, b, strict=True))
             and all(_same(a[k], b[k]) for k in a)
-            and all(type(x) is type(y) for x, y in zip(a, b, strict=True))
         )
-    if isinstance(a, list):
+    if isinstance(a, list | tuple):
         return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b, strict=True))
+    if isinstance(a, set | frozenset):
+
+        def order(items):
+            return sorted(items, key=lambda x: (type(x).__name__, repr(x)))
+
+        return len(a) == len(b) and all(
+            _same(x, y) for x, y in zip(order(a), order(b), strict=True)
+        )
+    if isinstance(a, float):
+        return repr(a) == repr(b)
+    if isinstance(a, datetime):
+        return a == b and a.utcoffset() == b.utcoffset()
     return a == b
 
 
@@ -953,6 +1250,21 @@ def test_same_is_by_type_as_well_as_by_value():
     assert not _same({"a": 1}, {"a": 1.0}) and not _same([True], [1]) and not _same(1, True)
     assert not _same({1: "a"}, {True: "a"}) and not _same({"a": 1, "b": 2}, {"b": 2, "a": 1})
     assert not _same([1, 2], [1]) and not _same({"a": [1]}, {"a": (1,)})
+    # a float by its sign and its bits
+    assert _same(-0.0, -0.0) and not _same(-0.0, 0.0) and not _same([0.0], [-0.0])
+    assert _same(float("nan"), float("nan")) and _same({"a": float("nan")}, {"a": float("nan")})
+    assert not _same(1.0, 1.0000000000000002)
+    # a set and a tuple by type, as a list and a dict
+    assert _same({1, "a"}, {"a", 1}) and not _same({1}, {True}) and not _same({1, 2}, {1.0, 2})
+    assert _same((1, 2.0), (1, 2.0)) and not _same((1,), (True,)) and not _same((1, 2), (1,))
+    assert not _same(frozenset({1}), {1})
+    # a datetime by its instant and its offset; a date is no datetime
+    utc = UTC
+    noon = datetime(1805, 6, 1, 12, tzinfo=utc)
+    assert _same(noon, datetime(1805, 6, 1, 12, tzinfo=utc))
+    assert not _same(noon, datetime(1805, 6, 1, 13, tzinfo=timezone(timedelta(hours=1))))
+    assert not _same(noon, datetime(1805, 6, 1, 12))
+    assert not _same(date(1805, 6, 1), datetime(1805, 6, 1))
 
 
 @pytest.mark.slow
