@@ -1429,7 +1429,7 @@ def to_first_anchor(plan: list[tuple[Any, ...]]) -> list[tuple[Any, ...]]:
     the first anchor is ever sailed; a track from the sea that reaches the anchorage, then
     the road and the inner track after it, is cut here, so that the plan the audit reads is
     the plan as sailed. Measured: channel-east with its business, 48 game hours, 105 plans
-    laid with a leg past an anchor and 3,272 vessel-minutes at anchor, no such leg sailed."""
+    laid with a leg past an anchor and 3,272 vessel-ticks at anchor, no such leg sailed."""
     for i, leg in enumerate(plan):
         if leg and leg[0] == "anchor":
             return plan[: i + 1]
