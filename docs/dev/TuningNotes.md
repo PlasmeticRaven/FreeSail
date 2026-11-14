@@ -27931,7 +27931,9 @@ brief's steps 1 and 2).
 - `come alongside the Fly` chooses a stranger of the name three leagues off;
 - the Fly's long-boat cannot be manned;
 - a far order anchors a ship where the water dries;
-- the prize master's row stays in his captor's muster (item 1; pins).
+- for the owner's review (ruled; package 74's road): a prize master is still read on his prize
+  by his captor's muster row, and his captor's muster still counts him; mending it moves
+  test_prizes' captor count from 256 to 255 and the prize's from 8 to 9.
 
 
 
