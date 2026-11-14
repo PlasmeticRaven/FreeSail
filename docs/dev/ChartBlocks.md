@@ -945,6 +945,20 @@ own guard (`tracks:` where a straight line is not); (g) no mark of the land aflo
 danger ashore beyond the grid's grain, an islet the grid lacks given as one, every light
 dated; (h) its scenario starting on its water.
 
+**A port's `tracks:` are the way the land allows, not a sounded channel.** The game's guard
+(`ships.land_crossing`) judges land only, a cable's grain, and skips a cable at each end of a
+leg; it does not judge depth. So the audit reads each leg of every port's tracks, the way in
+as the business plans it and the way out by the track to sea. It samples the grid every 20 m,
+and again every 2 m along any leg whose 20 m reading is under 8 m, and takes the least depth
+there at the chart's datum (a negative figure is ground that dries). The step is finer than the
+finest cell under any track (15.4 m): a 20 m step alone stepped over shoals one cell wide. A
+block with cells finer than 4 m measures the step again (halving it must move no port's least
+by more than a tenth of a metre).
+A leg under 3 m is a finding, `f-shallow:<port>` (JUDGEMENT: about a laden trader's ten feet,
+at the datum near the lowest water). A block that gives a port tracks draws them through
+water at least that deep where the grid has it, within the pilot's sides. Where it has not, the
+track stands with its least depth said in the port file beside it, and the finding is listed.
+
 ## The ocean carried south, the Canaries and the Salvages (package 106a, as built)
 
 `canaries` (27.33334 to 29.46666 N, 18.29332 to 13.17334 W, 60 level-2 tiles, 12.5 MB) and
