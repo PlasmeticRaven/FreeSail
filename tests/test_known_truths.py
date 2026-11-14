@@ -16110,12 +16110,14 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     assert len(files) >= 90
     days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
     for pid, path in files.items():
-        # 105's own, whose rows are their truths' (7-531 on); package 106b's dated five, theirs
-        # (7-557). Old: 105's set alone
-        if pid in PACKAGE_105_PORTS | PACKAGE_106B_DATED_PORTS:
-            continue
         loads = [load_port(path, chart, None, when) for when in days]
-        assert loads[0].dated == (), pid
+        # a port with dated rows is held out only if a package names it with the truth that
+        # pins its rows (105's, 7-531 on; 106b's, 7-557), so that a new dated port fails here
+        # until its truth is named, and a named port without rows is checked as every other.
+        # Old: 105's set alone, its ports held out whether they had rows or not
+        if loads[0].dated:
+            assert pid in PACKAGE_105_PORTS | PACKAGE_106B_DATED_PORTS, pid
+            continue
         for key in DATED_KEYS:
             assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
 

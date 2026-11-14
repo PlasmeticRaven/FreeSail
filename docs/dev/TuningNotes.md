@@ -28422,6 +28422,36 @@ the world); Mogador's two passages into the harbour within the island read 0.0 m
 (south) where Purdy has five fathoms in the north one: the harbour is a mark, the port's spots in
 the road; Agadir's modern moles enclose the period's road's first place (moved south of them).
 
+**The mends, by their causes** (the owner's word of 2026-11-14 through the lead: build for
+generality, not the symptom):
+
+- *`test_ordnance`'s count of ports without a block.* Cause: a hand-kept tally of each block's
+  ports (27 + 8 + ... + 7), which every new block had to edit, beside an assertion that already
+  states the property (`with_block == set(BLOCKS)`). Mended where the cause lives, in the test:
+  every port file is loaded, the eleven carry their blocks and every other port none, the count
+  the files' own. Looked for the same elsewhere (a total summed by hand from blocks' counts, in
+  every test file): truth 7-570's `read == 4593` (package 112's, the tiles read summed by hand
+  from the step's proof; raised here by Morocco's 2 x 147, old beside new) is the same cause in
+  another package's truth, **named and not mended**; the region lists of `test_chart`,
+  `test_geo` and `test_tide` and the ports' lists of `test_ports` and `test_nations` are
+  inventories by design (each block names what it adds), not tallies.
+- *Truth 7-530's exclusion.* Cause: the exemption was a hand list of package 105's ports, held
+  out whether they had dated rows or not, so that a new dated port broke it and a listed port
+  without rows went unchecked. Mended in the truth: a port is held out only when it has dated
+  rows and a package names it with the truth that pins them (105's set, 7-531 on; 106b's,
+  7-557); every other port is checked, 105's nine without dated keys now among them (they
+  pass), and a new dated port fails until its truth is named.
+- *`test_scenarios`' box over the Strait's southern half.* Cause: charted water in no box of the
+  climatology, which took the nearest box by distance. Mended where the cause lives, the
+  climatology: the box `morocco` over the water east of 9 W from 30 to 36 N that lay in no box
+  (the ruling), the test now pinning the box that answers. The same cause elsewhere is the
+  audit's check (d), which finds it everywhere: `d-no-box` for the Balearics, Biscay south and
+  the Ligurian sea, in other blocks' ground, **named and not mended**.
+- *The directions' test and a period's set.* Cause: the test held that every stream area's set
+  but the open Channel's is the world's axis rounded, judgement. The coast's two areas give the
+  pilot's own point: a named set of areas whose set is the period's (`PERIOD_SETS`), each held to
+  its axis within half a point and unjudged; no other area was of that kind.
+
 **The scenario** (`morocco.yaml`): a British merchant brig from Gibraltar for Mogador, from four
 leagues off El Araiche by the offing of Sallee and the mark west of Cape Cantin; hove to fifteen
 miles west of Mogador at 41.4 hours at seed 7, drifting off the land. Sailed to the road itself
