@@ -365,6 +365,11 @@ def _called_lately(log: Any, kind: str, now: int) -> bool:
     return False
 
 
+def _count_words(n: int) -> str:
+    words = ("", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+    return words[n] if n < len(words) else str(n)
+
+
 def _reported_lately(log: Any, what: str, now: int) -> bool:
     """Whether the same words were sent down to the captain within the hour and he has not
     come on deck since: the officer does not send the messenger down again to say what the
@@ -427,17 +432,25 @@ def tick(world: Any) -> None:
 
     if knowledge.is_asleep(world, cap):
         return  # the messenger lets him sleep; by night the line was a call
+    # the minute's lines gathered by their words: one report for lines said alike (eight
+    # sails of the world's business each "the sail on the larboard quarter lost sight of"),
+    # the first said whole and the count after it (package 115 D4 (b))
+    gathered: dict[str, tuple[Any, int]] = {}
     for e in _lines_at(log, now - MESSENGER_S):
         what = _what(e)
         if what is None or _why_called(world, e, what) is not None:
             continue  # nothing to report, or it was a call already
+        first, n = gathered.get(what, (e, 0))
+        gathered[what] = (first, n + 1)
+    for what, (e, n) in gathered.items():
         if _reported_lately(log, what, now):
             continue  # he was told this in these words, and has not been up since
+        more = "" if n == 1 else f" ({_count_words(n)} the same)"
         world.record(
             Severity.NOTABLE,
             REPORT_MADE,
-            f"{who} sent down to the captain, {_place_words(place)}: {what}.",
-            data={"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who},
+            f"{who} sent down to the captain, {_place_words(place)}: {what}{more}.",
+            data={"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who, "n": n},
         )
 
 

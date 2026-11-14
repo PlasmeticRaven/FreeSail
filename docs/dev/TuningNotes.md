@@ -29214,3 +29214,99 @@ listed answers, the later fill, and the two forms are one. They also hold the wo
 synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (its levels
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
+
+## Package 115, part D: the newcomer's trips (2026-11-14)
+
+From the cold review of 2026-11-14 (`docs/reviews/ColdReview-M7.md` 1.5, 5.3, F2.11), each
+trip played at the prompt from a scenario started as the harbour starts it, its cause read,
+mended where it lives, and tested by the same door (truths 7-615 to 7-627, at the end of
+`tests/test_known_truths.py`). The lead's rulings of the same day stand over each.
+
+**D1, the guns.** The first action with the orders its header lists less one: the answers
+"The guns are firing as they bear already" and "loading with round shot already" were given
+with every gun lashed, and nothing fired. Three causes: the answers of the standing
+intentions (`orders/gunnery.py`) spoke of the battery's intention as of the guns; the beat
+(`orders/crew.py`) did not say the guns were still secured; the player's order made the
+rules captain stand aside (decision 41) before his `engaging` state, where he casts loose,
+and the aside said nothing of it. Measured, differing from the review: the beat at 10:02 is
+before his first judgement (10:05) and does not move him; `engage her to starboard` at
+10:07 does. The period, the lead's ruling: casting loose is its own word (Falconer 1780,
+EXERCISE: "1st. Silence. 2d. Cast loose your guns."; QUARTERS says nothing of the guns).
+Mended in four functions: `gunnery.execute` hands every answer of the intentions to
+`_true_of_the_guns` (new, with `_guns_state`): with a gun loose the answer is as it was;
+with none, "So ordered already: firing as they bear. The guns are secured: none is loaded,
+run out or fired until they are cast loose; say 'cast loose the guns'." (or "being cast
+loose" while they are); `cease firing` no longer says the guns are loaded and run out.
+`crew.beat_to_quarters` adds "The guns are secured: 'cast loose the guns' to serve them.";
+`captains.player_hand` says "the deck is yours", and "and her guns are secured" with an
+enemy in sight (`_enemy_in_sight`, new). Nothing in `crew/quarters.py`, `crew/hands.py`,
+`evolutions/runner.py` or `combat/` (package 75's ground).
+
+**D2, the purchase with the boat lost.** Reproduced at refute-03's figures (£500, £494,
+£248, nothing delivered). The cause: `trade`, `trade_together` and `trade_list` each paid,
+moved the market and broke out the hold before `_send_boat` refused a lost boat. Mended by
+one function, `Dealings._bargain`, by which every door strikes: weighed whole, refused in
+words before anything moves, the boat sent first and the money moved only when she is away
+for the goods (JUDGEMENT, the lead's word: paid once the boat is away, not at her return).
+The three doors keep their own words. The lost boat's refusal says her name once. A boat
+lost after she is away (the lead's question): measured before, the coal's £6 gone, nothing
+said, and "The boat hoisted in" two hours later of a boat that was lost. Mended in the
+errand itself (`SendBoatScript`, which keeps what it carries): it ends and says "the 3 tons
+of coal bought are lost with her, £6 paid for them and not to be had again"; goods sold and
+lost before landing keep the money taken (JUDGEMENT); `send_boat.yaml`'s `on_fail` reads
+"{boat_cap}'s errand is not done: ..." (it said "could not go" of a boat that went).
+`world/boats.py` is not touched. Checked and not of this cause: the yard's demand, the
+recruits and the lighter pay at the order and deliver by the port's own job, not the ship's
+boat; found on the way, for others: those jobs deliver whether or not she still lies in the
+port, and "The boat cut adrift by order" is logged twice for one order (`boats.py`).
+
+**D3, the starter book by rig.** Measured on every ship file: refused in part on the cutter,
+the smack, the lugger, the bilander, both schooners and the five boats; whole on the square
+rigs. Mended where a book file is read (`standing.book.fit_to_rig`, called by
+`ui.console.read_standing_orders`, the console's, the server's and the scenarios' one
+reading; the lead's ruling: one book for any rig): a clause naming a family of sails she
+carries none of (`SAIL_FAMILIES`, the ship files' own plural groups) is left out, a rule
+left empty is left out, and her log says so ("The book fitted to her rig, for she carries no
+studdingsails nor royals: 'night routine' left out; 'morning sail' left out; 'shorten sail
+for weather' without its studdingsails and royals."). A standing order typed at the prompt
+refuses as before. What it moves in the six scenarios that load the book onto such a rig is
+measured for the lead before any pin moves.
+
+**D4, the small items.** (a) "a stranger in sight is no stranger in sight": a clause's
+words (`standing.rules.Clause.describe`) now say a reading's words of absence alone.
+(b) The same report sent down eight times in twelve minutes: eight different sails of the
+world's business, each lost from sight in the same words (for the lookout's owner: the
+lookout names them alike). `world.reports.tick` gathers a minute's same-worded lines into
+one report, the first whole and the count after it, and does not send words the captain was
+told within the hour until he has been on deck (`_reported_lately`, as `_called_lately` is
+the calls'). (c) The player's own person moved below at noon: a cutter whose master
+commands, the master the player's person, `occupy("below")` by the day's work. The lead's
+ruling: the player's person is never moved by a routine. `Navigation._below_to_work` sends
+the master below for the day's work, the time sight and the lunar's clearing unless he is
+the player's own person with the deck his (no rules captain commanding her for him); then
+he works it where he stands, said in the log. Where else a routine moves a person: the sights
+bring the master on deck (`occupy("on deck")`, the noon and the lunar, left: the sight is
+taken on deck); the surgeon's cockpit (a wound, not a routine); the needs' sleep (by his own
+order or where he stands). (d) The dispatches gain their 'let go the best bower'; every
+scenario that says she lies at anchor is tested to be riding in her port at two minutes. The
+merchant brig is left out of that test: her 'let go' wants twelve forecastle hands
+(`let_go_anchor.yaml`) and her company is sixteen, on the trunk and on package 75's branch
+alike; the deeper cause, not built: a scenario's opening state made by an order that can
+wait or fail. (e) The wheel shot away, never mended: `rig the relieving tackles`
+(`orders/damage.py`, `RelievingTacklesScript`, `data/evolutions/relieving_tackles.yaml`, five
+minutes and six hands JUDGEMENT; Falconer's RELIEVING-TACKLES are the careening tackles, and
+the tiller's use is UNVERIFIED here), the hit's line naming the order, the rules captain
+giving it before any other repair; the physics untouched. Measured at seed 6: lost at
+10:17, rove at 10:22. `boats_stove` is the same shape and is left. (f) "Tacked ... heading
+SSE (158°)" with her head NE: `TackScript.words` names her own heading when the tack ends by
+the timeout; the test that pinned the wrong heading is corrected (old "SSE (158°)", new "NE
+by N (35°)"). (g) "a quarter past twelve at noon": `world.tide.time_words` says the noon
+hour past noon is the afternoon's. "13 fathoms" beside "thirteen fathoms" (three spellers, 52
+call sites) is noted and not mended. (h) A misspelt sail offered its halyard:
+`orders.resolve.NounTable.add` let a part's raw id, entered first unsuggested, keep its
+plain words out of the hints (22 of 38 sails on the frigate); the plain words are the hint
+now. (i) A mistyped `world:` line ended the console: `World._apply_world_order` reads the
+line inside the refusal's reach, and a save holding it replays to the same refusal.
+(j) Recruits given another man's number: `Crew.issued` and `Crew.next_number` number them
+after the highest ever given (the dead and a prize crew included; a prize crew numbered by
+her captor's books); a checkpoint from before reads the books.

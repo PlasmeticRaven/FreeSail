@@ -63,5 +63,12 @@ weather:
   background:
     {hpa: 1016, gradient_hpa_per_100km: 0.5, high_toward_deg: 200}
 
+# She lies in Carrick Road, the usual anchorage, as her position says: her anchor down at
+# the start, as the merchant scenarios in the same road let theirs go (package 115 D4 (d):
+# the cold review's 5.3 item 7, she began under way with no anchor down, so that 'send the
+# boat ashore' and 'buy' were refused at the first minute).
+orders:
+  - let go the best bower
+
 director:
   brief: dispatches

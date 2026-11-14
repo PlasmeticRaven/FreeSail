@@ -17889,3 +17889,44 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
         w.run(30)
         seen.append(float(w.ship.dyn.rudder))
     assert abs(seen[0] - seen[1]) > 0.2, ("the rudder did not answer the helm", held, seen)
+
+
+# the merchant brig's case waits on package 75's people (the lead's ruling of 2026-11-14 on
+# package 115 D4 (d)): her opening 'let go the best bower' waits for twelve forecastle hands
+# her company of sixteen never spares, on the trunk and on that branch alike
+_OPENING_UNTIL_75 = {"merchant-brig.yaml"}
+_SAYS_AT_ANCHOR = re.compile(r"\bat anchor\b|\bthe usual anchorage\b|\blies at\b|\briding\b", re.I)
+_SAYS_NOT = re.compile(r"\bunmoored\b|\bno anchor down\b", re.I)
+
+
+def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor():
+    """The cold review's 5.3 item 7 (play/console-4): the dispatches began "in Carrick Road,
+    the usual anchorage" (its file's words) under way with no anchor down, so that 'send the
+    boat ashore' and 'buy' were refused at the first minute. The cause: a scenario's opening
+    state at anchor is made by an opening order, and this file had none (the deeper cause,
+    for the notes: a state made by an order that can wait or fail; the merchant brig's waits
+    for hands for ever, left for package 75's people). Mended: the dispatches let go as the
+    merchant scenarios in the same road do. Every scenario started as the harbour starts it:
+    one whose opening words (the header and the position line) say she lies at anchor, and
+    not that she is unmoored or under way, is riding at anchor in her port at two minutes."""
+    import glob
+
+    tried = 0
+    for path in sorted(glob.glob("data/scenarios/*.yaml")):
+        name = path.rsplit("/", 1)[-1]
+        raw = open(path, encoding="utf-8").read().splitlines()
+        words = " ".join(
+            [ln for ln in raw if ln.startswith("#")][:30]
+            + [ln.split("#", 1)[1] for ln in raw if ln.startswith("position:") and "#" in ln]
+        )
+        if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
+            continue
+        if name in _OPENING_UNTIL_75:
+            continue
+        w = _harbour_game(path)
+        if getattr(w, "ship", None) is None or not hasattr(w.ship, "dyn"):
+            continue
+        w.run(120)
+        tried += 1
+        assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
+    assert tried >= 8, tried
