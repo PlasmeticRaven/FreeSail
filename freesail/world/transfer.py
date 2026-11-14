@@ -104,6 +104,16 @@ def _laid_up(hull: Any) -> bool:
     return str(getattr(vessel, "regime", "") or "") == "in ordinary"
 
 
+def _sail_hands(hull: Any) -> list[Any]:
+    """Her fit hands at her sail-handling stations: what she is worked by, counted as her want
+    is (`worked_by`: one watch at those stations; the cut's reading, item 2: the idlers, the
+    marines and the unfit are not counted as working her)."""
+    crew = getattr(getattr(hull, "ship", None), "extra", {}).get("crew")
+    if crew is None:
+        return []
+    return [s for s in crew.sailors if s.station.value in _SAIL_STATIONS and s.fit]
+
+
 def _hands(hull: Any) -> list[Any]:
     """Her hands: the muster's men off the quarterdeck (its rows are her officers, persons of
     her company counted as such, not twice)."""
@@ -330,6 +340,15 @@ def transfer(
             f"command of ..., and lay the {_name(giver)} up')."
         )
     _company_his(giver, receiver)
+    for h in (giver, receiver):
+        # the cut's reading, item 4 (ruled): never at quarters, where it took the man at the
+        # helm and billed nobody it brought
+        quarters = (getattr(h.ship, "extra", None) or {}).get("quarters")
+        if quarters is not None and getattr(quarters, "at_quarters", False):
+            raise TransferError(
+                f"The {_name(h)} is at quarters: her people are at their guns and stations. "
+                "Secure the guns, or pipe down, and then transfer them."
+            )
     metres = _between_m(giver, receiver)
     if metres is None or metres / units.NAUTICAL_MILE > BOAT_BETWEEN_NM:
         raise TransferError(
@@ -352,13 +371,17 @@ def transfer(
     else:
         wants = worked_by(giver)
     persons = _persons(root, giver, rest, laid)
-    men = _draw(giver, every, by_rating, count, keep=wants)
+    # what she keeps is counted as her want is (the cut's reading, item 2): laid up, her
+    # ship-keepers (any hand); else her fit hands at her sail stations
+    kept_by = _hands if laid else _sail_hands
+    men = _draw(giver, every, by_rating, count, keep=wants, kept_by=kept_by)
     if not men and not persons:
         raise TransferError(
             f"Transfer whom? Say 'transfer the people and the hands to the {_name(receiver)}', "
             f"'transfer twenty hands to the {_name(receiver)}', or name them."
         )
-    keeps = len(_hands(giver)) - len(men)
+    going = {id(s) for s in men}
+    keeps = sum(1 for s in kept_by(giver) if id(s) not in going)
     if keeps < wants:
         raise TransferError(
             f"The {_name(giver)} would keep {_count_words(keeps)}; she wants "
@@ -724,7 +747,12 @@ def _answers_to(person: Any, key: str, whole: str = "") -> bool:
 
 
 def _draw(
-    giver: Any, every: bool, by_rating: dict[str, int], count: int, keep: int = 0
+    giver: Any,
+    every: bool,
+    by_rating: dict[str, int],
+    count: int,
+    keep: int = 0,
+    kept_by: Any = None,
 ) -> list[Any]:
     """The hands drawn by the prize crew's draw (`musters.draw`): fit, at no work, no post,
     in the muster's order; the order's ratings first. 'The hands' are every one of them she can
@@ -732,15 +760,25 @@ def _draw(
     from freesail.world.musters import draw
 
     if every:
-        spare = max(0, len(_hands(giver)) - keep)
-        return draw(giver, spare)
+        # every hand she can spare: all that may be drawn, less as many of her working hands as
+        # leave her `keep` at her sail stations (counted as her want is: `_sail_hands`)
+        drawn = draw(giver, len(_hands(giver)))
+        working = {id(s) for s in (kept_by or _sail_hands)(giver)}
+        kept = len(working) - sum(1 for s in drawn if id(s) in working)
+        out: list[Any] = []
+        for s in reversed(drawn):
+            if kept < keep and id(s) in working:
+                kept += 1
+                continue
+            out.append(s)
+        return list(reversed(out))
     chosen: list[Any] = []
     for rating, n in by_rating.items():
         got = draw(giver, n, rating=rating, taken={s.id for s in chosen})
         if len(got) < n:
             raise TransferError(
-                f"The {_name(giver)} has {_count_words(len(got))} {rating} fit and free; "
-                f"{_count_words(n)} were asked."
+                f"The {_name(giver)} has {_rating_words(len(got), rating)} fit and free; "
+                f"{_number(n)} were asked."
             )
         chosen += got
     if count:
@@ -801,6 +839,25 @@ def _who_words(men: list[Any], persons: list[Any]) -> str:
     if men:
         names.append(_count_words(len(men), "hand"))
     return _and(names) if names else "nobody"
+
+
+# The ratings in the muster's words, one and many (the cut's reading, item 6: "no hands
+# marine" was said).
+_RATING_WORDS = {
+    "able": ("able seaman", "able seamen"),
+    "ordinary": ("ordinary seaman", "ordinary seamen"),
+    "landsman": ("landsman", "landsmen"),
+    "petty officer": ("petty officer", "petty officers"),
+    "marine": ("marine", "marines"),
+}
+
+
+def _rating_words(n: int, rating: str) -> str:
+    """'no marines', 'one able seaman', 'three landsmen'."""
+    from freesail.combat.guns import count_words
+
+    one, many = _RATING_WORDS.get(rating, (rating, rating))
+    return f"{count_words(n)} {one if n == 1 else many}"
 
 
 def _count_words(n: int, what: str = "hand") -> str:

@@ -349,19 +349,36 @@ def woken_at_her_anchor(root: Any, vessel: Any) -> None:
 
 def laid_at_her_anchor(hull: Any) -> str | None:
     """A ship taken up asleep whose far body rode at an anchor, laid at it in one state (the
-    lead's cut of package 60, ruling 3): one anchor, the first `scripts.cannot_anchor` passes,
-    down on the ground under her at the scope the chart's depth where she lies wants, brought
-    up; nothing set; no way. An anchor marked down on other ground (where she fell asleep,
-    before her far body moved) is laid again under her, never left to hold her a mile off.
-    Where no anchor can hold her, nothing is done beyond the trunk's wake and her log says why
-    in one line. A state, set at once: no evolution is started, and nothing here can refuse
-    or raise. Returns why none holds, or None where she is laid."""
-    from freesail.evolutions.scripts import _let_go, _scope_plan, cannot_anchor
-    from freesail.ship.parts import AnchorState, SailState, ground_tackle
+    lead's cut of package 60, ruling 3; the cut's reading, item 5): nothing set; no way; and
+    her ground tackle as follows. Where she rides already by an anchor whose ground lies within
+    her cable's scope of her (moored, or at a single anchor), her tackle is left exactly as it
+    is. Else one anchor goes down on the ground under her at the scope the chart's depth where
+    she lies wants, brought up: an anchor already down (on ground out of her reach: where she
+    fell asleep, before her far body moved) preferred to a stowed one, the first that
+    `scripts.cannot_anchor` passes; any other marked down on ground out of reach is weighed in
+    the state her far body left her. Where the water is shoaler than the let-go order would
+    warn of, her log carries the order's own warnings. Where no anchor can hold her, nothing is
+    done beyond the trunk's wake and her log says why in one line. A state, set at once: no
+    evolution is started, and nothing here can refuse or raise. Returns why none holds, or
+    None where she lies at an anchor."""
+    from freesail.evolutions.scripts import (
+        _anchoring_warnings,
+        _let_go,
+        _scope_plan,
+        cannot_anchor,
+    )
+    from freesail.ship.parts import AnchorState, ground_tackle
 
     ship = hull.ship
     tackle = ground_tackle(ship)
     anchors = list(tackle.anchors) if tackle is not None else []
+    down = [a for a in anchors if a.state is AnchorState.DOWN]
+    riding = [a for a in down if _ground_within_scope(ship, a)]
+    if riding:
+        # she rides by her own ground already: her tackle as it is, moored or at one anchor
+        _nothing_set_no_way(ship)
+        hull._far_anchored = True
+        return None
     depth = None
     chart = getattr(hull, "chart", None)
     if chart is not None and hull.position is not None:
@@ -369,11 +386,11 @@ def laid_at_her_anchor(hull: Any) -> str | None:
         if charted is not None:
             depth = float(charted) + float(getattr(hull, "tide_height_m", 0.0) or 0.0)
     chosen, whys = None, []
-    for a in anchors:
-        # one marked down is asked as if at her bows: it is to be laid again under her
+    # an anchor already down first (laid again under her), then those at her bows
+    for a in down + [a for a in anchors if a.state is not AnchorState.DOWN]:
         was = a.state
         if was is AnchorState.DOWN:
-            a.state = AnchorState.READY
+            a.state = AnchorState.READY  # asked as if at her bows: it is to be laid again
         why = cannot_anchor(ship, a, depth)
         a.state = was
         if why is None:
@@ -389,13 +406,41 @@ def laid_at_her_anchor(hull: Any) -> str | None:
             data={"id": str(hull.id), "why": why},
         )
         return why
-    for a in anchors:
-        if a.state is AnchorState.DOWN:
-            # weighed with the far body's move, in the state the far body left her in
+    for a in down:
+        if a is not chosen:
+            # out of her reach: weighed with the far body's move, as her far body left her
             a.state = AnchorState.STOWED
             a.ground_x = a.ground_y = None
             a.scope_m = 0.0
             a.brought_up = a.taut = a.dragging = False
+    _nothing_set_no_way(ship)
+    ship.extra["water_depth_m"] = depth
+    _let_go(ship, chosen, depth)
+    chosen.scope_m = _scope_plan(chosen, depth, None)[0]
+    chosen.brought_up = True
+    # the let-go order's own warnings (the deep road, the cable, the swinging room, the water
+    # at low water against her draught)
+    _anchoring_warnings(ship, chosen, depth, chosen.scope_m)
+    hull._far_anchored = True
+    return None
+
+
+def _ground_within_scope(ship: Any, anchor: Any) -> bool:
+    """Whether an anchor down has its ground within her cable's scope of her hawse."""
+    import math
+
+    from freesail.physics.anchor import hawse_position
+
+    if anchor.ground_x is None or anchor.ground_y is None:
+        return False
+    hx, hy = hawse_position(ship)
+    return math.hypot(hx - anchor.ground_x, hy - anchor.ground_y) <= float(anchor.scope_m) + 1.0
+
+
+def _nothing_set_no_way(ship: Any) -> None:
+    """Every sail set furled, and her way taken off."""
+    from freesail.ship.parts import SailState
+
     for sail in ship.sails.values():
         if sail.is_set:
             sail.state = SailState.FURLED
@@ -405,12 +450,6 @@ def laid_at_her_anchor(hull: Any) -> str | None:
         dyn.speed = 0.0
     if hasattr(dyn, "r"):
         dyn.r = 0.0
-    ship.extra["water_depth_m"] = depth
-    _let_go(ship, chosen, depth)
-    chosen.scope_m = _scope_plan(chosen, depth, None)[0]
-    chosen.brought_up = True
-    hull._far_anchored = True
-    return None
 
 
 def _seat_follows(root: Any, person: Any, hull: Any) -> None:

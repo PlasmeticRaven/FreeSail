@@ -1038,3 +1038,40 @@ def test_a_wound_given_after_the_move_lands_on_the_man_moved():
     said = w.submit("where is mr bowen").text
     assert "Mr Bowen, wounded" in said, said
     assert not any(s.hurt for s in others)
+
+
+def test_what_she_keeps_is_counted_as_what_she_wants():
+    """The cut's reading, item 2: her want is one watch at her sail-handling stations, and what
+    she keeps is counted the same way, her fit hands at those stations (before, every hand off
+    the quarterdeck, the idlers and the unfit among them). One more than she can spare is
+    refused, the words counting her sail hands."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    want = TR.worked_by(cutter)
+    sail = len(TR._sail_hands(cutter))
+    spare = sail - want
+    assert spare > 0 and len(TR._hands(cutter)) > sail  # idlers and others besides
+    e = w.submit(f"transfer {spare + 1} hands from the Sherbourne to the Fly")
+    assert e.kind == "order.rejected", e.text
+    assert f"would keep {TR._number(want - 1)}" in e.text and f"wants {TR._number(want)}" in e.text
+    e = w.submit(f"transfer {spare} hands from the Sherbourne to the Fly")
+    assert e.kind == "company.transfer", e.text
+    _until_home(w, cutter)
+    assert len(TR._sail_hands(cutter)) == want
+
+
+@pytest.mark.parametrize("which", ["Fly", "Sherbourne"])
+def test_a_transfer_is_refused_while_either_ship_is_at_quarters(which):
+    """The cut's reading, item 4 (ruled): a transfer at quarters took the man at the helm and
+    billed nobody it brought; it is refused while either ship is at quarters, saying what to
+    do first, nothing moved."""
+    w, cutter, fly, me = cutter_and_the_fly_taken_up(", and leave the Sherbourne to Mr Pearce")
+    ship = fly if which == "Fly" else cutter
+    e = ship.submit("beat to quarters") if ship is not fly else w.submit("beat to quarters")
+    w.run(60)
+    quarters = ship.ship.extra.get("quarters")
+    assert quarters is not None and quarters.at_quarters, e.text
+    hands = len(TR._hands(cutter)), len(TR._hands(fly))
+    e = w.submit("transfer two hands from the Sherbourne to the Fly")
+    assert e.kind == "order.rejected", e.text
+    assert f"The {which} is at quarters" in e.text and "Secure the guns, or pipe down" in e.text
+    assert (len(TR._hands(cutter)), len(TR._hands(fly))) == hands

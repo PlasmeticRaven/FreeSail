@@ -561,3 +561,36 @@ def test_he_knows_of_his_own_prize_and_his_consort_wherever_they_are():
             ship_for_him(w, name)
         said = str(refused.value)
         assert "no ship called" not in said and "beyond a boat's reach" in said, said
+
+
+def test_two_ships_of_one_name_his_own_is_the_one_he_means():
+    """The cut's reading, item 3: a stranger brig 'Fly' on the sea first, and the 'Fly' given
+    him in Carrick Road with him aboard her. Every ship of the name is asked whether he knows
+    of her, so 'take command of the Fly' is his own, never "no ship called"; and where two of
+    his answer, the one he is aboard is meant."""
+    from freesail.orders.command import ship_for_him
+    from freesail.world import crews as K
+
+    w = at_anchor_in(CARRICK_ROAD)
+    w.crewed_settings = {"cap": 0}
+    _wo(w, 'ship: a brig "Fly" of France at 48 30 N 7 30 W, bound for Brest')
+    _wo(
+        w,
+        'ship: a schooner "Fly" of Britain at 50 09.9 N 5 02.3 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+    )
+    stranger, fly = [v for v in w.sea_vessels.vessels if v.name == "Fly"]
+    fly, hull = K.station_world(w, fly.id)
+    me = knowledge.players_person(w)
+    command.give(w, fly, me, by="the test")
+    assert not knowledge.knows_of(w, stranger) and knowledge.knows_of(w, fly)
+    assert ship_for_him(w, "the Fly") is hull
+    # both his: the one within a boat's pull of the ship he is aboard is meant
+    command.give(w, stranger, me, by="the test")
+    assert knowledge.knows_of(w, stranger)
+    assert ship_for_him(w, "the Fly") is hull
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    assert ship_for_him(w, "the Fly") is hull  # the one he is aboard
+    e = w.submit('take command of the "Fly"')
+    assert e.kind == "ship.taken_up", e.text
+    assert w.players is hull

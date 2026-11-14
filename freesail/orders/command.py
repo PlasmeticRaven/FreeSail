@@ -202,17 +202,30 @@ def ship_for_him(root: Any, words: str) -> Any:
     vessels = getattr(root, "vessels", None)
     # a hull's id is a name like any other: answered only where he knows of her (the cut's
     # ruling 4; the fifth reading's item 6: an id gave a stranger's true name away)
+    from freesail.world.knowledge import knows_of
+
     by_id = hulls.get(key)
     vessel = getattr(by_id, "vessel", None) if by_id is not None else None
-    if vessel is None:
-        vessel = vessels.find(said) if vessels is not None else None
+    if vessel is None and vessels is not None:
+        # every ship of the name asked whether he knows of her (the cut's reading, item 3: the
+        # first of a name was taken, and his own ship refused for a stranger's of it)
+        named = [
+            v
+            for v in getattr(vessels, "vessels", [])
+            if not v.done
+            and key in (v.id.lower(), v.name.lower(), v.name.lower().removeprefix("the "))
+        ]
+        known = [v for v in named if knows_of(root, v)]
+        if len(known) > 1:
+            vessel = _the_one_he_means(root, known, said)
+        else:
+            vessel = known[0] if known else (named[0] if named else None)
     by_sight = False
     if vessel is None:
         vessel = vessel_in_sight(root, said)
         by_sight = vessel is not None
     shown = said.removeprefix("the ").removeprefix("The ")
     unknown = f"You know of no ship called the {shown} hereabouts."
-    from freesail.world.knowledge import knows_of
 
     # one answer to whether he knows of her (`knowledge.knows_of`: his own ships, a sail in
     # sight whose name is made out); a sail named by what is made out of her and no more is
@@ -226,6 +239,36 @@ def ship_for_him(root: Any, words: str) -> Any:
     if vessel.crew is None:
         raise OrderError(f"The {vessel.name} lies beyond a boat's reach of you.")
     return vessel.crew
+
+
+def _the_one_he_means(root: Any, known: list[Any], said: str) -> Any:
+    """Of two or more ships of his of one name, the one he can mean: the one he is aboard,
+    else the one nearest him by a clear margin (within a boat's pull, where the others are
+    not); else a question in words."""
+    from freesail.world import knowledge
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.movement import BOAT_BETWEEN_NM
+
+    me = knowledge.players_person(root)
+    here = str(getattr(me, "hull", "") or "")
+    for v in known:
+        if v.crew is not None and str(v.crew.id) == here:
+            return v
+    aboard = getattr(root, "hulls", {}).get(here) if here else None
+    pos = getattr(aboard, "position", None) or getattr(root, "position", None)
+    if pos is not None:
+        near = [
+            v
+            for v in known
+            if bearing_and_distance(pos, v.position)[1] / 1852.0 <= BOAT_BETWEEN_NM
+        ]
+        if len(near) == 1:
+            return near[0]
+    shown = said.removeprefix("the ").removeprefix("The ")
+    raise OrderError(
+        f"Ships of yours answer to the {shown} in more than one place; go aboard her, or "
+        "alongside her, and give the order there."
+    )
 
 
 def _prize_not_condemned(hull: Any) -> bool:

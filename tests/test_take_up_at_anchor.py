@@ -208,3 +208,60 @@ def test_between_his_boarding_and_his_order_she_rides_at_her_anchor(place):
     assert _laid(hull) is a
     command.take_up(w, me, hull)
     assert w.players is hull and _laid(hull) is a
+
+
+def test_a_ship_moored_by_her_own_ground_keeps_her_tackle_exactly():
+    """The cut's reading, item 5 (ruled): a brig moored by her small bower and her sheet
+    anchor, each on ground within its scope of her, taken up: her tackle is left exactly as it
+    is (both down on their ground, the best bower at the bows), nothing set, no way."""
+    from freesail.evolutions.scripts import _let_go
+    from freesail.world.movement import put_aboard
+
+    w, v, hull, me = _asleep("an anchorage", "brig-sloop")
+    ship = hull.ship
+    tackle = ground_tackle(ship)
+    depth = 12.0
+    moored = {}
+    for aid in ("small_bower", "sheet"):
+        a = next(x for x in tackle.anchors if x.id == aid)
+        _let_go(ship, a, depth)
+        a.scope_m, a.brought_up = 60.0, True
+        moored[aid] = (a.state, a.ground_x, a.ground_y, a.scope_m)
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    command.take_up(w, me, hull)
+    for a in tackle.anchors:
+        if a.id in moored:
+            assert (a.state, a.ground_x, a.ground_y, a.scope_m) == moored[a.id], a.id
+        else:
+            assert a.state is not AnchorState.DOWN, a.id
+    assert not [s for s, x in ship.sails.items() if x.is_set]
+
+
+def test_an_anchor_already_down_is_laid_again_before_a_stowed_one():
+    """The cut's reading, item 5: where no anchor down lies within her reach, an anchor already
+    down (its ground out of her reach) is the one laid again under her, before a stowed one."""
+    from freesail.world.movement import put_aboard
+
+    w, v, hull, me = _asleep("an anchorage", "brig-sloop")
+    ship = hull.ship
+    sheet = next(x for x in ground_tackle(ship).anchors if x.id == "sheet")
+    sheet.state = AnchorState.DOWN
+    sheet.ground_x, sheet.ground_y = float(ship.dyn.x) + 1852.0, float(ship.dyn.y)
+    sheet.scope_m = 100.0
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    command.take_up(w, me, hull)
+    assert _laid(hull) is sheet
+
+
+def test_laid_in_shoal_water_her_log_carries_the_let_go_orders_warning(monkeypatch):
+    """The cut's reading, item 5: laid where the water is shoaler than the let-go order would
+    warn of (a brig in two metres), her log carries the order's own warning."""
+    from freesail.world.movement import put_aboard
+
+    w, v, hull, me = _asleep("ordinary", "brig-sloop")
+    monkeypatch.setattr(hull.chart, "depth_at", lambda position: 1.9)
+    n = len(list(hull.log))
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    w.run(2)
+    warned = [x for x in list(hull.log)[n:] if x.kind == "anchor.depth_warning"]
+    assert warned, [f"{x.kind}: {x.text}" for x in list(hull.log)[n:]]
