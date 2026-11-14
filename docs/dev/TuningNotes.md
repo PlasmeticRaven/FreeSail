@@ -30164,6 +30164,65 @@ would say). No figure of the document nor of truths 7-590 to 7-593 moves: the li
 same 105 by key, count and years; the file has 44 fast tests where it had 43 and 11 slow
 where it had 9.
 
+**The trunk merged once, with Morocco (package 106b).** At the lead's word the trunk at
+4570c804 was merged into the branch, this once, because the ratchet did its work on it:
+with 106b's six ports (Larache, Rabat, Mazagan, Safi, Mogador, Agadir) the readers' road
+found nothing the list lacked and nothing gone, and ten counts over their ceilings. The
+trunk without 106b moved none. Each was read before it was raised (old and new):
+
+- `p-undated:nation` 101 and 106 (Agadir, Larache, Mogador, Rabat, Safi; Mazagan's holder
+  is dated), `state` 120 and 126 (all six), `dockyard` 119 and 124, `pilot` 119 and 124,
+  `crew_pool` 121 and 126 (all but Mogador), `closed_to` 121 and 125 (Mazagan, Mogador,
+  Rabat, Safi), `market` 121 and 124 (Agadir, Larache, Rabat): each a field written as
+  one value, as every other port's is. Ceilings raised, the reason naming the ports.
+- `c-unread:scenario-papers` 92 and 94: `data/scenarios/morocco.yaml`'s almanac and
+  chart's year, as forty-six scenarios carried them. Ceiling raised.
+- `c-snap-back:port-dated-keys` 16 and 28 by the count as built, and `port-holder` 51 and
+  53. These were not undated fields but the opposite: Morocco's builder dated fields from
+  Jackson 1809, and the rows counted every dated value. Eight of the twelve new dates are
+  before 1792 (Mogador's four of 1760, Agadir's closure of 1773, Larache's of 1780), and
+  Mazagan's holder's two are of 1769: no day of play can put any of them back. Only
+  Mazagan's and Safi's markets, each turning on 1 March 1792, are the listed kind. The
+  builder stopped and asked; the lead ruled that **the two rows count only the dates
+  within 1792 to 1825**, since a ceiling must never stop a builder for dating a field from
+  a source. So the dated keys are 16 before and 20 after (ceiling 20), and the holders 50
+  before and 50 after (51 by the old count, a date of 1738 among them; ceiling 50). A
+  fast test holds that a date before or after the range is not counted and one inside,
+  the range's first and last days among them, is.
+- A row that begins before the range (Mogador "since 1760") stays as it was: dated, from
+  a source, not undated (the lead's ruling).
+
+*Three stations more.* None of the six ports lay within the region of any of the audit's
+seven stations, so the dear road saw nothing of Morocco. The lead ruled a station into
+each of Morocco's regions that holds a port, every fourth year as the Mediterranean ones
+are, since an audit should see every coast that has a port: `larache` at 35.3 N 6.5 W
+(Larache), `mazagan` at 33.4 N 8.9 W (Rabat, Mazagan, Safi) and `mogador` at 31.3 N
+10.2 W (Mogador, Agadir). The fourth region, `morocco-noun`, has no port and no station.
+The full sweep's whole worlds are 165 where they were 138. Their twenty-seven worlds draw
+Moroccan merchant brigs and a British frigate (off Larache, a region of one port, the
+frigate alone); the roads agree and they find only `w-block-unread`.
+
+*What else moved, old and new:* the ports 121 and 127; the YAML files under `data/` 437
+and 448; the dated values classed 5,545 and 5,710; the sampled days 202 and 204 (either
+side of 1 March 1792), 323 and 325 with the reference's; the full sweep's days 1,146 and
+1,148 (1,256 and 1,258). The list is the same 105 by key, owner and years; no figure of
+truths 7-590 to 7-593 moved. The file has 45 fast tests where it had 44. The full sweep
+on the merged tree: 22 min 8 s on the scratch tree with the one station off Mazagan (147 worlds, 1,322 s).
+
+**For whoever adds a port next.** The ratchet will stop you at the counts, and it is
+meant to. A field of a port written as one value raises its `p-undated:` count: it says
+the value is true on every day from 1792 to 1825. Better, date it from a source: rows
+with `since` and `until`, or one row that begins before the range where the source says
+it held throughout (a row dated outside the range raises nothing). A row dated inside
+the range raises a `c-snap-back:port-` count, which is the engine's exposure and no fault
+of yours. A scenario with `papers.almanac` and `papers.chart.year` raises
+`c-unread:scenario-papers`. Run `python tools/audit_range.py --known --no-worlds` before
+pushing data; then raise the ceiling (`most:`) in `tools/range/audit-known.yaml` to the
+new count, say in its `reason:` which ports and which package, and tell the lead, who
+passes it. Only for more of the same kind: a finding the list lacks is a new key with
+its own entry and owner. The same words are in docs/dev/RangeAudit.md (section 1) and at
+the head of the known list.
+
 ### The helpers' reports, kept (package 103a)
 
 Two read-only helpers were used, one for the classing's readers and one for the map of the

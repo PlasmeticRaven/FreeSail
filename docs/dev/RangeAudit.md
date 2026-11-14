@@ -2,7 +2,8 @@
 
 Decision 69 (docs/DesignProposal.md) fixed a goal that can be checked: a game begun on any
 day from 1792 to 1825 finds a world depicted accurately and working. This document is the
-measurement of how far the tree is from that, made at the trunk's 504a250 by
+measurement of how far the tree is from that, made at the trunk's 504a250 and brought up
+to the trunk's 4570c804 with Morocco's six ports (package 106b; section 9 has old beside new), by
 `tools/audit_range.py`, with the classing of every dated key of the data and the map of the
 research on file. Nothing was mended and no data changed. What it finds is the brief of
 milestone 7c's data work and of package 103b's design.
@@ -29,7 +30,7 @@ days' and the lights' readers. The dear road makes a whole rules-only world on a
 (a frigate, the business on, the whole chart) for what only a world shows: the vessels the
 business draws and what they wear, the blockading squadrons, the lines the world serves of
 itself. On every whole-world day the two roads are compared on what both can see (the
-holder and the state of each of the 121 ports, the wars, the blockades drawn), so that the
+holder and the state of each of the 127 ports, the wars, the blockades drawn), so that the
 cheap road is proved against the dear one. They agreed on every day tried: no finding of
 check (a).
 
@@ -58,7 +59,7 @@ in the drawing. No vessel can be drawn under a nation the table has not
 of that name. What the worlds happen to show of a finding already made is printed apart,
 as evidence. The list is the same at any seed (`--seed`; the slow tier tries three).
 
-**The days.** A day in every year of the range (1 July, JUDGEMENT) and the days either side of every date the data itself names: a port's dated rows, a war's beginning, the table's own day, a blockade's dates, a prize scheme's, and the first and last years of a flag, a fashion, a national day and a light. That is 202 days (168 of the data's naming, 34 of the years'). The findings that rest on the reference are looked for on those days and on the days either side of the reference's own dates as well, 323 in all; the mechanical findings never on the reference's days. `--full` adds every national day in every year of the range with the day after it (1146 days; 1256 with the reference's). Whole worlds: 4 in the sampled sweep (off Ushant on 1 July 1792, off Rochefort on 1 July 1802 and 1805, off Cadiz on 1 July 1814) and 138 in the full one (off Ushant, Rochefort and Cadiz on 1 July of every year; off Gibraltar, Toulon, Leghorn and Malta every fourth year). Deterministic: the same seed and tree give the same findings.
+**The days.** A day in every year of the range (1 July, JUDGEMENT) and the days either side of every date the data itself names: a port's dated rows, a war's beginning, the table's own day, a blockade's dates, a prize scheme's, and the first and last years of a flag, a fashion, a national day and a light. That is 204 days (170 of the data's naming, 34 of the years'). The findings that rest on the reference are looked for on those days and on the days either side of the reference's own dates as well, 325 in all; the mechanical findings never on the reference's days. `--full` adds every national day in every year of the range with the day after it (1148 days; 1258 with the reference's). Whole worlds: 4 in the sampled sweep (off Ushant on 1 July 1792, off Rochefort on 1 July 1802 and 1805, off Cadiz on 1 July 1814) and 165 in the full one (off Ushant, Rochefort and Cadiz on 1 July of every year; off Gibraltar, Toulon, Leghorn, Malta, Larache, Mazagan and Mogador every fourth year). Deterministic: the same seed and tree give the same findings.
 
 **The reference.** The tree is silent on which wars and which nations are a day's own (its
 table is June 1805's, with no end to any war and no lifetime to any nation), so without a
@@ -122,6 +123,22 @@ run `python tools/audit_range.py --known --no-worlds` (a few seconds): it marks 
 the list lacks, names a listed one the sweep no longer makes, and says which counts are
 over their ceiling. The same words stand at the head of the known list.
 
+**For whoever adds a port next.** The ratchet will stop you at the counts, as it stopped
+Morocco's six ports (package 106b), and it is meant to. A field written as one value
+(`nation`, `state`, `dockyard`, `closed_to`, `market`, `crew_pool`, `pilot`) raises that
+field's `p-undated:` count by one: it says the value is true on every day from 1792 to
+1825. Better, date it: rows with `since` and `until` from a source, or one row that
+begins before the range where the source says it held throughout. A row dated before
+1792 or after 1825 raises no count. A row dated inside the range raises
+`c-snap-back:port-holder` or `c-snap-back:port-dated-keys`: that is no fault of yours (it
+counts what the engine could put back in play until package 103b's design is built), and
+its ceiling is raised. A new scenario with `papers.almanac` and `papers.chart.year`
+raises `c-unread:scenario-papers` by two. In each case run the command above, then raise
+the ceiling (`most:`) in `tools/range/audit-known.yaml` to the new count and say why in
+its `reason:` (which ports, which package), and tell the lead, who passes it. Raise a
+ceiling only for more of the same kind; a finding the list lacks (marked `!`) is a new
+key and wants its own entry and owner.
+
 **A path as a key.** A file enters a finding's key, and is matched against the classing,
 only through one function (`key_of`: its path under its folder, with forward slashes), so
 that the keys and the known list are the same on Windows as elsewhere.
@@ -131,7 +148,7 @@ that the keys and the known list are the same on Windows as elsewhere.
 The tool scans every YAML file under `data/` (less the chart's tiles and coast, which hold
 no words, and the audit's own two files) for a key that carries a year or a date: a date,
 words that name a year, a whole number of a year under a key whose name is a date's, and a
-key whose own name carries a year (a fit's). At 504a250 it finds 5,545 such values, in 29 of the table's 30 rows: 4,496 words, 249 script, 235 calendar-read, 207 the builders' own date, 142 read by nothing, 74 both by the scenario's choice, 54 seed, 48 a name carrying a year, 40 words, served. Every one is in a row of the table
+key whose own name carries a year (a fit's). At 4570c804 it finds 5,710 such values, in 29 of the table's 30 rows: 4,608 words, 256 script, 235 calendar-read, 236 the builders' own date, 144 read by nothing, 88 both by the scenario's choice, 55 seed, 48 a name carrying a year, 40 words, served (5,545 at 504a250). Every one is in a row of the table
 below, which the tool holds as data (`CLASSING`) and prints (`--classing`); a key in no row
 is a finding (`c-unclassed`), and truth 7-591 holds the table complete.
 
@@ -183,10 +200,13 @@ The classes:
 
 **What the table says, shortly.**
 
-- Only the ports are seeded by the day: their holder and their six dated keys. Of 121
-  port files 20 give the holder as rows (13 with dates, the seven Canaries files one row
+- Only the ports are seeded by the day: their holder and their six dated keys. Of 127
+  port files 21 give the holder as rows (14 with dates, the seven Canaries files one row
   that says "through the range"), Valletta dates its state, its yard and its pilot, and
-  Messina its yard and its pilot. No file dates a closure, a market or a crews' pool.
+  Messina its yard and its pilot. Of Morocco's ports Mazagan and Safi date their markets
+  (1 March 1792); Mogador dates its yard, its pilot, its market and its crews' pool from
+  its building in 1760, and Agadir and Larache a closure of 1773 and of 1780, all before
+  the range. No other file dates a closure, a market or a crews' pool.
 - The wars are not seeded at all. The World loads the table of June 1805 whole on any
   first day; the stance and the business read no date; the prize court alone reads a war's
   `since`, against the running clock.
@@ -195,7 +215,7 @@ The classes:
   shares. These are the calendar's own and are no fault under decision 69 (c), unless play
   is one day to kill a king or change a government (the days) or make law (the shares).
 - Read by nothing: the national colours' `dates` (a ship wears her occasion's flag
-  whatever the year), a scenario's `papers.almanac` and `papers.chart.year` (set by 46
+  whatever the year), a scenario's `papers.almanac` and `papers.chart.year` (set by 47
   scenarios), the nations' `relations` (where the later nations' wars stand in words), and
   a scenario's own `nations:` block.
 - `Port.on_day` and `Port.nation_on`, which put a port to a day whatever play has made of
@@ -205,7 +225,9 @@ The classes:
 **The list package 103b needs: what the clock would put back.** Decision 69 (c): what play
 owns, the calendar must not snap back. Five rows of the table are read against the running
 clock (always, or under `follows_history`) and govern something play could change. Each is
-a finding (`c-snap-back:`), owned as an engine fault for the design:
+a finding (`c-snap-back:`), owned as an engine fault for the design. The two rows of the
+ports count only the dates within the range, which are what a day of play can put back: a
+field dated from a source before 1792 is true on every day of it and raises nothing.
 
 | Row | What play could change | What the clock then does |
 |---|---|---|
@@ -247,7 +269,7 @@ The full sweep makes **105 findings: 67 mechanical and 38 that rest on the refer
 | (u) what no data dates | 10 | ten elements with no dates |
 | (c) the classing | 8 | five keys the clock would put back, three read by nothing |
 | (r) the reference | 38 | 4 `r-blockade`, 3 `r-holder`, 5 `r-nation`, 1 `r-port-blockade`, 22 `r-war-absent`, 3 `r-war-at-peace` |
-| (a) the two roads agree | 0 | no disagreement on any of 138 whole worlds |
+| (a) the two roads agree | 0 | no disagreement on any of 165 whole worlds |
 
 **By year** (how many findings bite a day sampled in the year; the full sweep):
 
@@ -309,8 +331,8 @@ how wrong the world is when he does.
    Batavian Republic is Britain's enemy in 1792, three years before it was, and in 1825,
    nineteen after it ceased; Leghorn is Etruria's and Genoa Liguria's in 1792; the states
    that held those places before and after are not in the table at all.
-6. **Most ports are held as in 1805, with nothing to say so** (`p-undated:nation`, 101
-   ports; `p-undated:closed_to`, `market`, `crew_pool`, 121 each). The audit cannot see
+6. **Most ports are held as in 1805, with nothing to say so** (`p-undated:nation`, 106
+   ports; `p-undated:closed_to` 125, `market` 124, `crew_pool` 126). The audit cannot see
    which of these are wrong, only that the file does not say; section 5 lists, FROM
    MEMORY, the holders a player would miss first (Toulon in 1793, Corsica in 1794 to
    1796, Minorca in 1798 to 1802, Lisbon in 1807 and 1808).
@@ -359,7 +381,7 @@ read this as the list of them.
 
 1. *A port held by another nation that was in being.* The reference catches a holder that
    did not exist (Leghorn's Etruria in 1792); it cannot catch one that did. All of these
-   are inside the one aggregate finding `p-undated:nation` (101 ports whose file gives the
+   are inside the one aggregate finding `p-undated:nation` (106 ports whose file gives the
    holder as one word), which cannot tell them from Falmouth. FROM MEMORY, none checked:
    Toulon, the allies' from late August to 19 December 1793; Port Mahon, British from
    November 1798 to 1802; Bastia (and San Fiorenzo and Ajaccio), the British kingdom of
@@ -382,7 +404,7 @@ read this as the list of them.
    can find nothing for them in any year, though what the lookout is told of their colours
    (`u-colours-words`) is one line for the range.
 
-**Whether an undated value is wrong.** `p-undated:nation` counts 101 ports whose holder is
+**Whether an undated value is wrong.** `p-undated:nation` counts 106 ports whose holder is
 one word. For most the word is right through the range (Falmouth, Brest). The audit
 cannot tell those from the ones below, which are the builder's memory and the helpers'
 reading of the files' own comments, set down so that 7c knows where to look first. All
@@ -413,8 +435,12 @@ business draws on later days, what a port does when its row changes under
 `follows_history`, and whether a world at peace has anything to do (decision 69 (d)) are
 not measured.
 
-**Beyond the stations.** Whole worlds were begun at seven places in seven of the chart's
-twenty regions; what the business draws in the other thirteen is unseen.
+**Beyond the stations.** Whole worlds were begun at ten places in ten of the chart's
+twenty-four regions; what the business draws in the other fourteen is unseen. Three were
+added with Morocco's ports (package 106b), none of which lay in the region of any of the
+first seven: an audit should see every coast that has a port (the lead's ruling). They
+are off Larache, off Mazagan (Rabat, Mazagan, Safi) and off Mogador (Mogador, Agadir),
+one in each of Morocco's regions that holds a port.
 
 **Outside `freesail/` and `data/`.** The browser's map falls back to the year 1805 where a
 snapshot gives none (the client's `map.js`); the check of the code's years reads Python
@@ -502,15 +528,15 @@ needs libyaml; the second is what a machine without it pays, as the build machin
 
 | What | With libyaml's loader | By the pure-Python loader alone |
 |---|---|---|
-| The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 202 days (323 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
+| The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 204 days (325 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
 | The fast tier of `tests/test_range_audit.py` (44 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
 | Truths 7-592 and 7-593 (fast) | under a second | 2.3 s |
 | The slow tier of the file: the sampled sweep's fixture, with the tests that read the whole tree | 19 s, and 4 s for the rest | 41 s for the fixture (the lead's measurement) |
 | The slow tier's proof that no draw moves the list: the sampled sweep at two more seeds; six whole worlds off Leghorn at three seeds | 41 s; 60 s | not measured |
 | The slow tier's two plants on the game's own worlds: a blockade not drawn (three worlds off Ushant); a port of a nation the table has not | 16 s; 2 s | not measured |
 | Truths 7-590 and 7-591 (slow) | 2.7 s and 1.1 s | 13 s and 7 s (the lead's measurement) |
-| The full sweep (`--full`), and its slow test | 11 min 18 s at 504a250: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s. On a scratch merge with the trunk's trial tree of 14 November (ffb27b5b) the same test took 20 min 41 s, beside another run: the trunk's worlds cost more to make | not measured |
-| The two loaders compared file for file (slow) | 7.8 s for the 437 YAML files under `data/` | skipped, with its reason: there is no second loader to compare |
+| The full sweep (`--full`), and its slow test | 11 min 18 s at 504a250: 138 whole worlds 672 s; the cheap road over 1,146 days about 3 s. On a scratch merge with the trunk's trial tree of 14 November (ffb27b5b) the same test took 20 min 41 s, beside another run: the trunk's worlds cost more to make. At 4570c804 with Morocco's ports and the three stations off its coast: 22 min 8 s on the scratch tree with the one station off Mazagan (147 worlds, 1,322 s) | not measured |
+| The two loaders compared file for file (slow) | 7.8 s for the 437 YAML files under `data/` at 504a250 (448 with the trunk and Morocco) | skipped, with its reason: there is no second loader to compare |
 
 The dear road is all of the cost. A whole world by the game's own loader takes ten to
 nineteen seconds, most of it reading ship files; by libyaml's two to six, the rest being
@@ -522,7 +548,7 @@ slow lists of `tests/conftest.py`, and the fast tier keeps the plantings on smal
 data, the key function, the fingerprint and the classing's table. The first build had the
 sampled sweep in the fast tier, at four whole worlds where the lead had asked for about
 six within thirty seconds; with the sweep in the slow tier the four stand (each chosen for
-a year the others do not show) and the full sweep's 138 are beside them.
+a year the others do not show) and the full sweep's 165 are beside them.
 
 In the building: two read-only helpers, one for the readers of each dated key and one for
 the map of section 6 (their reports are in docs/dev/TuningNotes.md); no paid call, nothing
@@ -577,3 +603,45 @@ Found for others and not mended (each is in the known list or said here):
   reads the vessel's ship file again for every vessel drawn. With libyaml's loader the
   same world takes two to six seconds. Not mended; the audit uses the quicker loader for
   itself alone.
+
+## 9. After Morocco (package 106b): what moved
+
+The trunk at 4570c804 was merged into the audit's branch once, at the lead's word, with
+package 106b's six ports (Larache, Rabat, Mazagan, Safi, Mogador, Agadir), their four
+regions and a scenario. The trunk without them moved no count. The list is the same 105
+findings by key; ten counts went over their ceilings, and each was read before it was
+raised.
+
+| Count | Before | After | What raised it |
+|---|---|---|---|
+| `p-undated:nation` | 101 | 106 | Agadir, Larache, Mogador, Rabat, Safi: the holder one word (Mazagan's is dated: Portugal's to 10 March 1769) |
+| `p-undated:state` | 120 | 126 | all six |
+| `p-undated:dockyard` | 119 | 124 | all but Mogador |
+| `p-undated:pilot` | 119 | 124 | all but Mogador |
+| `p-undated:crew_pool` | 121 | 126 | all but Mogador |
+| `p-undated:closed_to` | 121 | 125 | Mazagan, Mogador, Rabat, Safi |
+| `p-undated:market` | 121 | 124 | Agadir, Larache, Rabat |
+| `c-unread:scenario-papers` | 92 | 94 | `data/scenarios/morocco.yaml`'s almanac and chart's year |
+| `c-snap-back:port-dated-keys` | 16 | 20 | Mazagan's and Safi's markets, each turning on 1 March 1792 |
+| `c-snap-back:port-holder` | 51 | 50 | the count's rule, below |
+
+The first eight are more of a known kind, written as the other ports and scenarios are,
+and their ceilings are raised with that reason. The last two showed a fault of the count
+itself. The snap-back rows counted every dated value in the ports' rows, and Morocco's
+builder had dated fields from a source (Jackson 1809): twelve dates, eight of them before
+1792 (Mogador's four of 1760, Agadir's closure of 1773, Larache's of 1780), which no day
+of play can put back; and Mazagan's holder of 1769. Counted so, the ceiling would have
+stopped a builder for dating a field, which is what the range wants of him. The lead
+ruled: the two rows count only the dates within 1792 to 1825. By that rule the dated keys
+are 16 on the old tree and 20 with Morocco, and the holders 50 on both (51 by the old
+rule on the old tree, a date of 1738 among them; 53 by the old rule with Morocco).
+
+What else moved: the ports 121 and 127; the YAML files under `data/` 437 and 448; the
+dated values classed 5,545 and 5,710; the sampled days 202 and 204 (the two days either
+side of 1 March 1792), 323 and 325 with the reference's, the full sweep's 1,146 and 1,148
+(1,256 and 1,258); the chart's regions 20 and 24; the stations seven and ten, the full
+sweep's whole worlds 138 and 165. The twenty-seven worlds off Larache, Mazagan and
+Mogador draw Moroccan merchant brigs and a British frigate (off Larache, a region of one
+port, the frigate alone) and find what every world finds (`w-block-unread`); the two
+roads agree on them. No finding's
+key, owner or years moved, nor any figure of truths 7-590 to 7-593.

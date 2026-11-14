@@ -381,6 +381,40 @@ def test_a_row_that_holds_no_key_and_the_keys_the_clock_puts_back_are_found(smal
 # ---------------------------------------------------------------------------
 
 
+def test_a_ports_date_outside_the_range_can_put_nothing_back_and_is_not_counted(small):
+    """The two rows of a port's dated keys count what a day of play can put back: a date
+    within 1792 to 1825. A field dated from a source before the range (Mogador built in
+    1760, Mazagan given up in 1769: package 106b) is true on every day of it and raises no
+    count, so that no ceiling stops a builder for dating a field. The row still holds its
+    keys (no dead row), and a row of spans counts every value as before."""
+    scan = [
+        ("ports/mogador.yaml", "market.#.since", date(1760, 1, 1)),
+        ("ports/safi.yaml", "market.#.until", date(1792, 2, 29)),
+        ("ports/safi.yaml", "market.#.since", "1792-03-01"),
+        ("ports/made.yaml", "state.#.since", date(1826, 1, 1)),
+        ("ports/mazagan.yaml", "nation.#.until", date(1769, 3, 10)),
+        ("ports/mazagan.yaml", "nation.#.since", date(1769, 3, 11)),
+        ("signals/britain/days.yaml", "days.#.years", "1660-1700"),
+    ]
+    audit = A.Audit()
+    A.check_classing(audit, small, SOME_DAYS, scan)
+    assert audit.findings["c-snap-back:port-dated-keys"].count == 2
+    assert "c-snap-back:port-holder" not in audit.findings
+    assert "c-dead-row:port-holder" not in audit.findings
+    assert audit.findings["c-snap-back:days-years"].count == 1
+    # the first and the last day of the range are within it; the days beside them are not
+    edges = [
+        ("ports/made.yaml", "nation.#.until", A.RANGE_SINCE - timedelta(days=1)),
+        ("ports/made.yaml", "nation.#.since", A.RANGE_SINCE),
+        ("ports/made.yaml", "nation.#.until", A.RANGE_UNTIL),
+        ("ports/made.yaml", "nation.#.since", A.RANGE_UNTIL + timedelta(days=1)),
+    ]
+    again = A.Audit()
+    A.check_classing(again, small, SOME_DAYS, scan + edges)
+    assert again.findings["c-snap-back:port-holder"].count == 2
+    assert [r.id for r in A.CLASSING if r.days_in_range] == ["port-holder", "port-dated-keys"]
+
+
 def test_the_readers_road_puts_a_port_as_a_scenario_begun_that_day_finds_it(small):
     """The cheap road's port of a day is `load_port`'s with the day: the holder, the
     state and its blockaders, the yard, the pilot, the closures."""

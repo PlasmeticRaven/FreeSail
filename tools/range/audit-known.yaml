@@ -21,6 +21,16 @@
 # ceiling. Before you push data, run `python tools/audit_range.py --known --no-worlds` (a
 # few seconds): it marks what the list lacks and says which counts are over.
 #
+# ADDING A PORT OR A SCENARIO. A field of a port written as one value raises its
+# `p-undated:` count: better, date it from a source (rows with `since` and `until`; a row
+# dated outside 1792 to 1825 raises nothing). A row dated inside the range raises a
+# `c-snap-back:port-` count, which is the engine's fault and not yours. A scenario's
+# `papers.almanac` and `papers.chart.year` raise `c-unread:scenario-papers`. Then raise the
+# ceiling (`most:`) to the new count, say in the `reason:` which ports and which package,
+# and tell the lead, who passes it. Only for more of the same kind: a finding the list
+# lacks is a new key with its own entry and owner. (Morocco's six ports, package 106b,
+# were the first; docs/dev/RangeAudit.md section 9.)
+#
 # The owners are three, and the rule between the first two is what would clear the finding,
 # not what it is about. "a data fault for milestone 7c": a change to data alone, read by
 # today's readers, clears it (the test plants that change for every finding so owned). "an
@@ -54,50 +64,50 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'no file dates a closure: a decree, a quarantine or a prefect''s order of 1805 holds from 1792 to 1825'
-  most: 121
+  reason: 'no file dates a closure within the range: a decree, a quarantine or a prefect''s order of 1805 holds from 1792 to 1825 (Agadir''s and Larache''s rows are dated, both before 1792). Ceiling raised from 121: of Morocco''s six ports (package 106b) Mazagan, Mogador, Rabat and Safi are written as the others are'
+  most: 125
 - key: p-undated:crew_pool
   what: '`crew_pool` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: no file dates its crews' pool
-  most: 121
+  reason: 'no file dates its crews'' pool but Mogador''s, from its building in 1760. Ceiling raised from 121: of Morocco''s six ports (package 106b) the other five are written as the others are'
+  most: 126
 - key: p-undated:dockyard
   what: '`dockyard` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: only Valletta and Messina date their yards; a yard built or given up within the range reads as it stood in 1805
-  most: 119
+  reason: 'only Valletta and Messina date their yards within the range (Mogador''s is dated from its building in 1760); a yard built or given up within the range reads as it stood in 1805. Ceiling raised from 119: of Morocco''s six ports (package 106b) the other five are written as the others are'
+  most: 124
 - key: p-undated:market
   what: '`market` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'no file dates its market: the goods and the prices are one table for the range, and no price on file is of a year'
-  most: 121
+  reason: 'no file dates its market but Mazagan''s and Safi''s (each turning on 1 March 1792) and Mogador''s (from 1760): the goods and the prices are one table for the range, and no price on file is of a year. Ceiling raised from 121: of Morocco''s six ports (package 106b) Agadir, Larache and Rabat are written as the others are'
+  most: 124
 - key: p-undated:nation
   what: '`nation` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: the file gives the holder as one word and does not say it held through the range; 7c reads each port against the range and writes the rows, or one row that says so with its source, as the Canaries' files do
-  most: 101
+  reason: 'the file gives the holder as one word and does not say it held through the range; 7c reads each port against the range and writes the rows, or one row that says so with its source, as the Canaries'' files do. Ceiling raised from 101: of Morocco''s six ports (package 106b) five are written as the others are (Mazagan''s holder is dated)'
+  most: 106
 - key: p-undated:pilot
   what: '`pilot` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: only Valletta and Messina date their pilots
-  most: 119
+  reason: 'only Valletta and Messina date their pilots within the range (Mogador''s is dated from 1760). Ceiling raised from 119: of Morocco''s six ports (package 106b) the other five are written as the others are'
+  most: 124
 - key: p-undated:state
   what: '`state` is one value in these ports'' files, read as true on every day of the range'
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: only Valletta dates its state; a port open or blockaded is so on every day
-  most: 120
+  reason: 'only Valletta dates its state; a port open or blockaded is so on every day. Ceiling raised from 120: Morocco''s six ports (package 106b) are written as the others are'
+  most: 126
 - key: w-before-since:batavian-republic+britain
   what: the war is in force on days before its own beginning (1803-06-17)
   years: 1792-1803
@@ -467,15 +477,15 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'as the holder: under `follows_history` a row''s event overwrites a director''s closure or price. For package 103b''s design'
-  most: 16
+  reason: 'as the holder: under `follows_history` a row''s event overwrites a director''s closure or price. For package 103b''s design. Counts the dates within 1792 to 1825 only, what a day of play can put back: a field dated from a source before the range raises nothing here. Ceiling raised from 16: Mazagan''s and Safi''s markets of 1 March 1792 (package 106b), dated as Messina''s and Valletta''s rows are'
+  most: 20
 - key: c-snap-back:port-holder
   what: 'both by the scenario''s choice: a port taken or given up in play is the record''s holder''s again on the next day one of its rows begins or ends (no order takes a port yet; decision 69 (c) means one will)'
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'decision 69 (c): what play owns the calendar must not put back; under `follows_history` a row''s event sets the holder whatever play has made of the port. For package 103b''s design'
-  most: 51
+  reason: 'decision 69 (c): what play owns the calendar must not put back; under `follows_history` a row''s event sets the holder whatever play has made of the port. For package 103b''s design. Counts the dates within 1792 to 1825 only, what a day of play can put back (51 before: a date of 1738 is out, and Mazagan''s of 1769 is not counted)'
+  most: 50
 - key: c-snap-back:wars-since
   what: 'calendar-read: a war the world is in by its table is no war to the prize court before the record''s day, and a war declared in play (`Nations.declare_war`) carries its day in words or none, which the court reads as never or as always'
   years: 1792-1825
@@ -502,8 +512,8 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: '`papers.almanac` and `papers.chart.year` are set by forty-six scenarios and read by no code: the chart and the almanac a ship carries are the same on every day'
-  most: 92
+  reason: '`papers.almanac` and `papers.chart.year` are set by forty-seven scenarios and read by no code: the chart and the almanac a ship carries are the same on every day. Ceiling raised from 92: data/scenarios/morocco.yaml (package 106b) carries both, written as the others are'
+  most: 94
 - key: r-blockade:britain:brest
   what: drawn on days the reference has britain at peace with the port's holder
   years: 1792-1793, 1802-1803, 1814-1825

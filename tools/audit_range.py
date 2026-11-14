@@ -172,6 +172,10 @@ STATIONS = {
     "toulon": (43.0, 5.9),  # the gulf of Lion
     "leghorn": (43.4, 10.0),  # the Ligurian sea: Etruria, Liguria
     "malta": (35.95, 14.65),  # the Order's, France's, the King's
+    # the coast of Morocco (package 106b), a station in each of its regions that has a port
+    "larache": (35.3, -6.5),  # Larache
+    "mazagan": (33.4, -8.9),  # Rabat, Mazagan, Safi
+    "mogador": (31.3, -10.2),  # Mogador, Agadir
 }
 SAMPLED_WORLDS = (
     (date(1792, 7, 1), "ushant"),  # before any war of the range
@@ -180,7 +184,15 @@ SAMPLED_WORLDS = (
     (date(1814, 7, 1), "cadiz"),  # the peace of Paris, Spain long an ally
 )
 FULL_STATIONS_EVERY_YEAR = ("ushant", "rochefort", "cadiz")
-FULL_STATIONS_SOME_YEARS = ("gibraltar", "toulon", "leghorn", "malta")
+FULL_STATIONS_SOME_YEARS = (
+    "gibraltar",
+    "toulon",
+    "leghorn",
+    "malta",
+    "larache",
+    "mazagan",
+    "mogador",
+)
 FULL_SOME_YEARS_STEP = 4
 WORLD_SEED = 7
 WORLD_SHIP = "data/ships/frigate-36.yaml"
@@ -234,6 +246,9 @@ class Row:
     reader: str
     play: str = ""
     optional: bool = False  # a key the format has and no file yet carries
+    # the row's values are days, and only one within the range can be put back in play: its
+    # snap-back counts those (a row dated before 1792 is true on every day of the range)
+    days_in_range: bool = False
 
 
 SOURCE_PATHS = (
@@ -259,6 +274,7 @@ CLASSING: tuple[Row, ...] = (
         "a port taken or given up in play is the record's holder's again on the next day one "
         "of its rows begins or ends (no order takes a port yet; decision 69 (c) means one "
         "will)",
+        days_in_range=True,
     ),
     Row(
         "port-dated-keys",
@@ -270,6 +286,7 @@ CLASSING: tuple[Row, ...] = (
         "the director's `port <id>: closed to` and `open to`, a price order, and whatever "
         "play does to a yard, a pilot or a crew's pool are overwritten on the next day a row "
         "of that key begins or ends",
+        days_in_range=True,
     ),
     Row(
         "port-blockade-since",
@@ -1736,13 +1753,17 @@ def check_classing(
             days,
         )
     used: dict[str, int] = defaultdict(int)
+    in_play: dict[str, int] = defaultdict(int)  # the values a day of the range can put back
     unclassed: dict[tuple[str, str], int] = defaultdict(int)
-    for rel, path, _value in scan:
+    for rel, path, value in scan:
         row = row_of(rel, path)
         if row is None:
             unclassed[(_file_kind(rel), path)] += 1
-        else:
-            used[row.id] += 1
+            continue
+        used[row.id] += 1
+        day = _as_day(value) if row.days_in_range else None
+        if not row.days_in_range or (day is not None and in_range(day)):
+            in_play[row.id] += 1
     for (kind, path), n in sorted(unclassed.items()):
         audit.add(
             "c",
@@ -1757,13 +1778,15 @@ def check_classing(
                 continue
             audit.add("c", f"c-dead-row:{row.id}", "a row of the classing that holds no key", days)
             continue
-        if row.kind in (CALENDAR, BOTH) and row.play:
+        # a row of days dated wholly outside the range can put nothing back in it: a
+        # builder who dates a field from a source before 1792 raises no count here
+        if row.kind in (CALENDAR, BOTH) and row.play and in_play[row.id]:
             audit.add(
                 "c",
                 f"c-snap-back:{row.id}",
                 f"{row.kind}: {row.play}",
                 days,
-                count=used[row.id],
+                count=in_play[row.id],
             )
         if row.kind == UNREAD:
             audit.add(
