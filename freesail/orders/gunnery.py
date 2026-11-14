@@ -283,6 +283,24 @@ def _true_of_the_guns(ship: Any, verb: str, result: Result) -> Result:
     if state == "loose":
         return result
     kind, text, data = result
+    if verb == "engage" and state == "secured":
+        # engage is the order to fight her: with the guns secured it begins casting them
+        # loose itself, by the order 'cast loose the guns' and its evolution (one road, the
+        # rules captain's and the player's), and says so (the owner's word of 2026-11-14:
+        # "it is an explicit order for engaging, so it stands to reason that the gun would
+        # be cast loose on it"; package 115 D1)
+        from freesail.orders import handle
+
+        side = data.get("side") or getattr(battery_of(ship), "engaged", None) or ""
+        try:
+            handle(ship, "cast loose the guns")
+        except OrderError as e:
+            return kind, f"{text} The guns are secured and cannot be cast loose now: {e}", data
+        where = "on both sides" if side == "both" else f"to {side}" if side else ""
+        text += f" The guns are being cast loose; she engages {where} when they are.".replace(
+            "  ", " "
+        )
+        return kind, text, data | {"guns": "casting", "cast_loose_by": "engage"}
     if verb == "cease firing":
         text = "Cease firing: no gun fires but at the word."
     else:

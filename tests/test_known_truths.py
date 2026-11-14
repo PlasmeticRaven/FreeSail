@@ -17667,22 +17667,20 @@ def test_truth_7_621_the_officer_does_not_send_the_same_words_down_twice_within_
 
 def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_to_be_yours():
     """The cold review's 1.5 and 5.3 item 1 (play/console-2): the first action, the orders its
-    header lists less one (`beat to quarters`, `engage her to starboard`, `fire as they
-    bear`), and the game answered "The guns are firing as they bear already" with every gun
-    lashed; nothing fired in an hour and nothing said why. The cause, read and measured: the
-    answers of the standing intentions spoke of the battery's intention as of the guns; the
-    beat did not say the guns were still secured; and the player's order made Mr Bowen stand
-    aside (decision 41) before he reached the state in which he casts loose, unsaid. Casting
-    loose stays its own word, as the period had it (Falconer 1780, EXERCISE: "1st. Silence.
-    2d. Cast loose your guns."; the lead's ruling of 2026-11-14). Mended: each answer is made
-    true of the guns (`orders.gunnery._true_of_the_guns`), the beat and the aside say what is
-    so and what to order next. The reviewer's orders as he gave them: every answer of the gun
-    deck while no gun is loose says they are secured and names the order, and it is so; the
-    aside says the deck is the player's and her guns secured; and `cast loose the guns`,
-    once given, has them served and firing at her."""
+    header lists less one, and the game answered "The guns are firing as they bear already"
+    with every gun lashed; nothing fired in an hour and nothing said why. The cause, read and
+    measured: the answers of the standing intentions spoke of the battery's intention as of
+    the guns; the beat did not say the guns were still secured; and the player's order made
+    Mr Bowen stand aside (decision 41) before he reached the state in which he casts loose,
+    unsaid. Casting loose stays its own word at the beat, as the period had it (Falconer 1780,
+    EXERCISE: "1st. Silence. 2d. Cast loose your guns."; the lead's ruling of 2026-11-14), and
+    engage casts loose (truth 7-628). Mended: each answer is made true of the guns
+    (`orders.gunnery._true_of_the_guns`), the beat and the aside say what is so and what to
+    order next. The beat, then the intentions a newcomer gives before he engages: every
+    answer while no gun is loose says they are secured and names the order, and it is so;
+    the aside says the deck is the player's and her guns secured."""
     w = _harbour_game("data/scenarios/first-action.yaml")
     w.run(120)
-    answers = []
 
     def secured() -> bool:
         return not any(g.cast_loose for g in w.ship.guns.values() if g.serves)
@@ -17691,31 +17689,60 @@ def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_
     assert e.kind == "crew.quarters" and secured()
     assert "The guns are secured: 'cast loose the guns' to serve them." in e.text, e.text
     w.run(300)
-    for order in ("engage her to starboard", "fire as they bear", "load with round shot"):
+    answers = []
+    for order in (
+        "fire as they bear",
+        "load with round shot",
+        "aim at her rigging",
+        "cease firing",
+    ):
         answers.append(_said(w, order))
         w.run(30)
-    w.run(240)
-    answers.append(_said(w, "fire as they bear"))
     assert secured(), "the guns came loose with nobody's word"
     for a in answers:
         assert a.kind.startswith("guns."), a.text
         assert "The guns are secured" in a.text and "'cast loose the guns'" in a.text, a.text
         assert not a.text.startswith("The guns are firing"), a.text
+        assert "loaded and run out" not in a.text, a.text
     aside = [x for x in w.log if x.kind == "captain.aside"]
     assert aside and "the deck is yours, and her guns are secured" in aside[0].text, aside
     # the lines the guns' own standing orders gave at the beat are true too
     by_book = [x for x in w.log if x.kind in ("guns.aim", "guns.load") and x.tick <= 180]
     assert by_book and all("The guns are secured" in x.text for x in by_book), by_book
     assert w.readings.value("guns")["cast_loose"] is False
-    # the word given, the guns are served and fired at her
-    e = _said(w, "cast loose the guns")
+
+
+def test_truth_7_628_engage_casts_the_guns_loose_and_the_reviewers_own_orders_fight_her():
+    """The owner's word of 2026-11-14 on package 115 D1: "it is an explicit order for engaging,
+    so it stands to reason that the gun would be cast loose on it." `engage` given with the
+    guns secured begins casting them loose by the order 'cast loose the guns' and its
+    evolution (the one road the rules captain and the player take), and says so. The first
+    action as the harbour starts it and the reviewer's own three orders, `beat to quarters`,
+    `engage her to starboard`, `fire as they bear`, and no other order: the engage's answer
+    says the guns are being cast loose; they are cast loose within the evolution's time with
+    the crews coming to them, loaded and run out, and her own guns fire at the privateer
+    once she bears within their reach (measured: cast loose four minutes after the word,
+    the first broadside forty-two minutes after it, as the range closes)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert "The guns are being cast loose; she engages to starboard when they are." in e.text
+    w.run(300)
+    f = _said(w, "fire as they bear")
+    assert "secured" not in f.text, f.text
+    loose = [x for x in w.log if x.kind == "guns.cast_loose" and x.tick > e.tick]
+    assert loose and loose[0].tick - e.tick <= 600, loose
     fired = []
-    for _ in range(40):
+    for _ in range(90):
         w.run(60)
-        fired = [x for x in w.log if x.kind == "action.fired_at" and x.tick > e.tick]
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
         if fired:
             break
-    assert not secured() and fired, "cast loose and nothing fired in forty minutes"
+    assert fired, "the guns cast loose and nothing fired in an hour and a half"
+    assert any(g.fired for g in w.ship.guns.values())
 
 
 def test_truth_7_623_recruits_are_numbered_after_every_man_the_books_have_borne():
