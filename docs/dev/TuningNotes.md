@@ -27761,6 +27761,10 @@ failed, in four groups:
 
 ### The cut: steps 1 and 2 on the trunk's sleep and wake (2026-11-14)
 
+The owner's word: steps 3 to 5 (owner, price and sale; the errand ashore; the truths and the
+scenario) go back to the held list. The package closes as steps 1 and 2 when the cut is read
+and merged.
+
 The owner's word, by the lead, at the fifth reading: no more rounds of mends to the sleep and
 wake. The briefed work (steps 1 and 2) is closed out. What is not the brief's goes to a
 package of its own, the package of the two bodies. The lead's cut, built as commits forward
@@ -27802,17 +27806,19 @@ The tests:
   brought up; an anchor marked down elsewhere laid again under her; nothing set; no way.
   Where none holds: "No anchor of hers will hold her where she lies (...)." and nothing else.
   No evolution is started, and nothing in it can refuse or raise.
-- *Called* where a ship of his is woken for him: at the take-up, and as he steps aboard her.
-  `movement`'s boarding wake is the package's own (the second reading, item 3), and in play it
-  wakes her before his order. Called from the take-up alone, she would ride under topsails with
-  no anchor between his boarding and his order. That is told to the lead.
+- *Called* by two callers, both the package's own, the same function, never from promote or
+  station_world: the take-up (`command._woken_at_her_anchor`), and his stepping aboard her
+  (`movement`'s boarding wake, the second reading's item 3), which in play wakes her before
+  his order. The lead ruled the second caller in.
 - *Test*: `tests/test_take_up_at_anchor.py`:
   - every hull file, at an anchorage and in ordinary: the state, then an hour on. The anchor
     bites within a band as she first comes back on her cable, then the ground does not move
     and she is not dragging;
   - no bottom, too deep, every anchor lost: the one line, no anchor down, nothing in hand;
   - an anchor on ground a mile off, laid again under her;
-  - a second take-up.
+  - a second take-up;
+  - between his boarding and his order (ten minutes aboard), she rides at her anchor with
+    nothing set, at an anchorage and in ordinary.
 
 **Whom he knows of, and the refusals** (ruling 4; 0c6e76c4).
 - *Cause*: a hull's id was answered before `knows_of`, giving a stranger's name away; his
@@ -27870,10 +27876,11 @@ back to a ship of his that has lain asleep, on the cut):
 - An officer left in port cannot be sent to sea: the King's ship's doctrine leaves "in port"
   only "on: under way", and nobody weighs. The take-up's tail refuses the errand in words (ruling
   5 (a)); a gap for the owner.
-- A ship he leaves under way under an intent, at her voyage's end, is made done by her far
-  captain (`FarCaptain._in_port`). She is off the sea, and released unless she is the first hull.
-  "Never lost" holds for the first hull and for a ship left with no intent, not for one left
-  with an errand (ruling 5 (b), stopped).
+- A ship he leaves under way with an errand is taken off the sea by her far captain at her
+  voyage's end (`FarCaptain._in_port`), and cannot be had again, her company with her, unless
+  she is the first hull. "Never lost" holds for the first hull and for a ship left with no
+  errand. It is the trunk's brain (ruling 5 (b), out), for the package of the two bodies or the
+  owner's list.
 - A sleeping far body anchors by its plan or by the far order in any depth. The far body lies
   to the same way for every rig.
 

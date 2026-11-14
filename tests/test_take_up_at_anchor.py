@@ -190,3 +190,21 @@ def test_an_errand_for_the_old_ship_at_her_anchor_is_refused_in_words():
         "will weigh of his own accord. Leave her to him, or lay her up."
     ), str(refused.value)
     assert w.players is old  # nothing changed
+
+
+@pytest.mark.parametrize("place", PLACES)
+def test_between_his_boarding_and_his_order_she_rides_at_her_anchor(place):
+    """The cut's ruling 3, its second caller: his stepping aboard her (`movement`'s boarding
+    wake) wakes her before his order, and lays her at her anchor as the take-up does; for
+    the minutes until he gives it she rides at her anchor with nothing set, and the take-up
+    finds her so."""
+    from freesail.world.movement import put_aboard
+
+    w, v, hull, me = _asleep(place)
+    put_aboard(w, me, hull, "quarterdeck", by="the boat")
+    assert hull.awake  # woken by his boarding
+    a = _laid(hull)
+    w.run(600)  # ten minutes aboard before his order
+    assert _laid(hull) is a
+    command.take_up(w, me, hull)
+    assert w.players is hull and _laid(hull) is a
