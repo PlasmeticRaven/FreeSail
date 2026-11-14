@@ -544,3 +544,10 @@ layer that lists a tile answers, later ones fill NODATA; the uncommitted Atlanti
 last, the world under a `charts:` chart only. Proven cell for cell over 4,593 tiles of 21
 charts (truth 7-570). Read by me: nothing a clone reads moves. Sent to the lead; 112 told to
 go on with step 2 (the layers laid as ruled), the seas and the judged level after 111's 2b.
+
+### 2026-11-14, 02:35: merged on the trunk
+
+The reload mend (9ab10a4d, run 90) and 112's step 1 (b481938e, run 91) are merged; 109
+closed. Truth 7-570 reads every tile and lengthened the cloud run by half an hour: 112 to
+give its cost and a sampled form in step 2's report. 111's step 2b expected within the hour,
+its redrawn tracks for this session to read.
