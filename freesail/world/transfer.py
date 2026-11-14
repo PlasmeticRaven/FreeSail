@@ -407,7 +407,9 @@ def _by_the_gangway(
 
 def boat_lost(root: Any, giver: Any, state: Any) -> str:
     """The giving ship's boat lost with a transfer's load in her or told off for her (the
-    lead's ruling on the second reading of 4dda3dfe): the men told off and not yet embarked
+    lead's ruling on the second reading of 4dda3dfe), or with a person she carries on any
+    errand (the third reading, item 6: the same rule; ashore or at another ship, the other
+    ship where she was sent to one, her own otherwise): the men told off and not yet embarked
     back in their watches; the men and the persons in her picked up by the nearer of the two
     ships (JUDGEMENT: `boats.lose_boat` gives the script's boat's own crew no fate, being no
     persons, and no drowning is invented here), the hands into her watches and the persons

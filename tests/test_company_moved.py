@@ -330,6 +330,25 @@ def test_men_coming_home_are_told_apart_from_men_come_aboard_meanwhile():
     assert all(" for Fly" not in x and " for Sherbourne" not in x for x in later)
 
 
+def test_a_person_in_a_boat_lost_on_an_errand_to_another_ship_is_picked_up():
+    """The lead's third reading of 52d99b9a, item 6 (the trunk's own): `send the boat to the
+    Sherbourne with Mr Bradley`, the boat swamped on the way: he is picked up by the nearer
+    ship (his own, so soon), aboard her and said; before, he was left in no hull and not
+    dead."""
+    from freesail.world.boats import lose_boat
+
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    bradley = next(p for p in fly.people.people if p.name == "Mr Bradley")
+    e = w.submit("send the boat to the Sherbourne with Mr Bradley")
+    assert e.kind != "order.rejected", e.text
+    w.run(120)
+    assert bradley.hull is None and bradley.where == "boat"
+    lose_boat(w, fly, "swamped")
+    assert str(bradley.hull) == str(fly.id) and not bradley.dead
+    lost = [x for x in fly.log if x.kind == "boat.lost"][-1].text
+    assert "Mr Bradley picked up by her own side" in lost, lost
+
+
 def _came_aboard(hull, since=0):
     return [x for x in hull.log if x.kind == "company.came_aboard" and x.tick >= since]
 

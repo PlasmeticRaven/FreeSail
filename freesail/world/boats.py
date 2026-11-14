@@ -936,9 +936,10 @@ def lose_boat(world: Any, ship_hull: Any, how: str, words: str = "") -> str:
             vessel.done = True
         release_done(world)
     saved = ""
-    if getattr(state, "load_of", 0):
-        # a load of a transfer in her or told off for her (package 60): never lost from every
-        # muster and log, nor a person left nowhere (`transfer.boat_lost`)
+    if getattr(state, "load_of", 0) or (state.away and not state.hull and state.people):
+        # a load of a transfer in her or told off for her (package 60), or a person she
+        # carries on any errand (the lead's third reading of 52d99b9a, item 6): never lost from
+        # every muster and log, nor a person left nowhere (`transfer.boat_lost`)
         from freesail.world.transfer import boat_lost
 
         saved = boat_lost(_root(world), ship_hull, state)
