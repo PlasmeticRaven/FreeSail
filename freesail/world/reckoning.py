@@ -4180,6 +4180,19 @@ class Navigation:
                     break
         if not mine:
             return False
+        # and he is her captain (a vessel whose master commands, `People.captain`): a master
+        # who keeps the master's station under another captain goes below for his day's work
+        # as the master's own duty, a model at that station as the rules' master does (truth
+        # 7-375); it is the captain's person, the player's own, that no routine moves
+        people = getattr(world, "people", None)
+        try:
+            in_command = (
+                people is not None and getattr(people.captain, "mirror", None) is self.master
+            )
+        except Exception:  # noqa: BLE001  (a world with no people)
+            in_command = False
+        if not in_command:
+            return False
         captain = getattr(world, "captain", None)
         handed = (
             captain is not None
