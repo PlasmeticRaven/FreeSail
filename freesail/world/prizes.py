@@ -191,14 +191,16 @@ def is_prize(vessel: Any) -> bool:
 
 
 def prizes_of(world: Any, captor_id: str) -> list[Any]:
-    """Every prize a captor holds now, by her id (the player's `PLAYER_ID`)."""
+    """Every prize a captor holds now, by her id (the player's `PLAYER_ID`): each still her prize
+    by the one answer (`relations.still`, `PRIZE`)."""
+    from freesail.world import relations as R
+
     sea = getattr(world, "vessels", None)
-    out = []
-    for v in list(getattr(sea, "vessels", []) or []):
-        rec = record_of(v)
-        if rec and is_prize(v) and str(rec.get("captor")) == str(captor_id) and not v.done:
-            out.append(v)
-    return out
+    return [
+        v
+        for v in list(getattr(sea, "vessels", []) or [])
+        if R.still(world, str(captor_id), v, R.PRIZE)
+    ]
 
 
 def _story(vessel: Any, tick: int, words: str) -> None:
@@ -1368,7 +1370,12 @@ def take_prisoners_aboard(
 
 
 def _captor_near(world: Any, prize: Any, rec: dict[str, Any]) -> bool:
-    """A ship of the captor's nation within the cover distance (awake or far)."""
+    """A ship of the captor's nation within the cover distance (awake or far) who could support
+    her prize crew: the one answer (`relations.still`, `SUPPORT` within `COVER_NM`: on the sea,
+    not struck, nobody's prize; the lead's readings of cda12ec9, the far fight's family), so that
+    another prize of hers, or a ship of hers struck, holds no prisoners down."""
+    from freesail.world import relations as R
+
     sea = getattr(world, "vessels", None)
     if sea is None:
         return False
@@ -1377,8 +1384,7 @@ def _captor_near(world: Any, prize: Any, rec: dict[str, Any]) -> bool:
         if o is prize or o.done or str(o.nation) != nation:
             continue
         if str(o.id) == str(rec.get("captor")) or getattr(o, "brain", None) is not None:
-            _, d = _bearing_distance(prize.position, o.position)
-            if d <= COVER_NM * units.NAUTICAL_MILE:
+            if R.still(world, prize, o, R.SUPPORT, within_nm=COVER_NM):
                 return True
     return False
 
@@ -1646,8 +1652,12 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
         hull = _hull(v)
         if hull is not None and hull.awake:
             continue  # the near captain's own work (`Captain._take_possession`)
+        from freesail.world import relations as R
+
         prey = sea.get(str(brain._stranger or ""))
-        if prey is None or prey.done or not getattr(prey, "struck", False) or is_prize(prey):
+        if prey is None or not R.still(world, v, prey, R.STRUCK):
+            # (the lead's readings of cda12ec9, (F2)): no longer hers to take, by the one answer;
+            # her judgement gives her up at its next minute (`Judgement._prize_taken`)
             continue
         _, d = _bearing_distance(v.position, prey.position)
         if d > HAIL_REACH_M:

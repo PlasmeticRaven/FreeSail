@@ -569,13 +569,17 @@ class Squadron:
         self, world: Any, course_deg: float, wind_from_deg: float, wind_kn: float
     ) -> float | None:
         """The set's pace: the slowest member's best on the course at the wind, times the
-        book's factor; None when no member sails in company (the commander alone)."""
+        book's factor; None when no member sails in company (the commander alone). A prize on
+        her station leg is a member in company like any other (the lead's readings of
+        cda12ec9, (F3): "the captor and her prize keep company as the records say"; before,
+        the prizes were left out of the pace, so that a prize slower than her captor fell
+        astern half a mile an hour without end, "in company" and never lost)."""
         best: float | None = None
         detached = {
             m for d in self.divisions.values() if d.detached for m in (d.leader, *d.members)
         }
         for m in self.others():
-            if m in detached or m in self.prizes or m == PLAYER_ID:
+            if m in detached or m == PLAYER_ID:
                 continue
             body = _body(world, m)
             if body is None or getattr(body, "done", False):
@@ -1598,6 +1602,13 @@ def _armed_enemy_alongside(world: Any, prey: Any) -> Any:
 
 
 def _covered(world: Any, prey: Any) -> bool:
+    """A man of war of her nation within `COVER_NM` who could support her: the one answer
+    (`relations.still`, `SUPPORT` within the cover distance: on the sea, not struck, nobody's
+    prize; the lead's readings of cda12ec9, the far fight's family), so that a man of war of hers
+    struck, or a prize of her nation's (a man of war's hull under a prize crew), covers nobody,
+    nor the player's King's ship when she has struck."""
+    from freesail.world import relations as R
+
     for o in world.vessels.vessels:
         if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
             continue
@@ -1608,17 +1619,15 @@ def _covered(world: Any, prey: Any) -> bool:
             and str(getattr(o, "description", "")) not in _MAN_OF_WAR_DESCRIPTIONS
         ):
             continue
-        _, d = bearing_and_distance(o.position, prey.position)
-        if d <= COVER_NM * units.NAUTICAL_MILE:
+        if R.still(world, prey, o, R.SUPPORT, within_nm=COVER_NM):
             return True
     shadow_pos = getattr(world, "position", None)
     ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
-        _, d = bearing_and_distance(shadow_pos, prey.position)
         from freesail.world.captains import _is_kings_ship
 
-        if d <= COVER_NM * units.NAUTICAL_MILE and _is_kings_ship(world):
+        if R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM) and _is_kings_ship(world):
             return True
     return False
 

@@ -547,12 +547,27 @@ class FarCaptain(Judgement):
         v = self.world.vessels.get(str(s.get("id") or ""))
         return bool(v is not None and getattr(v, "struck", False))
 
+    def _may_fight(self, s: dict[str, Any]) -> bool:
+        """The far rounds' mark (the lead's readings of cda12ec9, (F3)): the one answer,
+        `relations.MARK`, which `far_action._pairs` asks of every round, so that the stimuli
+        that take her into the action and out of it (`enemy in range`, `enemy out of range`)
+        and the mark she takes in it (`_engaging_mark`) agree with the rounds: no struck ship,
+        no prize (taken back by coming up, `squadrons.far_captures`, never fought) and none she
+        knows of her own side."""
+        from freesail.world import relations as R
+
+        return R.still(self.world, self.vessel, str(s.get("id") or ""), R.MARK, judge=self)
+
     def _own_vessel_id(self) -> str:
         return str(self.vessel.id)
 
     def _enemy_struck(self, p: Perception) -> bool:
         # the far body has no battery: the nearest enemy within the breaking-off distance
-        # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure)
+        # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure), by the
+        # one answer (`relations.STRUCK`, the lead's readings of cda12ec9, (F2)): nobody's prize
+        # yet, and struck to her or to no other who is there to take her
+        from freesail.world import relations as R
+
         th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
         for s in p.strangers:
             if s.get("estimate_m") is None:
@@ -564,7 +579,7 @@ class FarCaptain(Judgement):
                 continue
             if float(s["estimate_m"]) / units.NAUTICAL_MILE > float(th("break_off_nm", 2.0)):
                 continue
-            if self._stranger_struck(s):
+            if R.still(self.world, self.vessel, str(s.get("id") or ""), R.STRUCK):
                 self._stranger = str(s.get("id") or "")  # the mark he takes possession of
                 return True
         return False
@@ -649,41 +664,39 @@ class FarCaptain(Judgement):
 
     def _engaging_mark(self, p: Perception) -> dict[str, Any] | None:
         """The enemy engaged, as the near captain's `Captain._mark` takes theirs (package 75, the
-        lead's ruling (2) of 2026-11-13): the mark in hand while she is in sight, else the
-        nearest enemy within the breaking-off distance, which is the one the `enemy in range`
-        stimulus read when she goes engaging from a plan state with no mark in hand."""
+        lead's ruling (2) of 2026-11-13): the mark in hand while she is in sight and still a mark
+        (`_may_fight`, the one answer: the lead's readings of cda12ec9, (F2)), else the nearest
+        enemy within the breaking-off distance, which is the one the `enemy in range` stimulus
+        read when she goes engaging from a plan state with no mark in hand."""
         th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
         if self._stranger is not None:
             for s in p.strangers:
                 if s.get("id") == self._stranger and s.get("estimate_m") is not None:
-                    return s
+                    if self._may_fight(s):
+                        return s
+                    break
         return self._enemy_within(p, float(th("break_off_nm", 2.0)))
-
-    def _on_the_sea(self, sid: Any) -> bool:
-        """Whether a chase leg to `sid` has a ship to steer for (`Vessel._target_of`): the
-        player's ship while she has a place, another vessel while she is on the sea."""
-        if sid is None:
-            return False
-        if sid == PLAYER_ID:
-            return getattr(self.world, "position", None) is not None
-        other = self.world.vessels.get(str(sid))
-        return other is not None and not other.done
 
     def _take_mark(self, p: Perception) -> None:
         """Engaging, a mark kept in hand as chasing keeps its stranger (package 75, the lead's
         ruling (2) of 2026-11-13): none in hand or the mark lost from sight, the nearest enemy
         within the breaking-off distance is taken (`_engaging_mark`) and the chase leg laid to
         her at the doctrine's range; with none in sight the mark in hand is kept while she is
-        on the sea, the leg following her until `enemy out of range` ends the action; with no
-        mark on the sea at all she lies to where she is, so that no chase of nobody is laid
-        (`Vessel.tick` drops such a leg and, the plan empty, takes her from the sea). On the
-        road from a plan state alone (`PASSAGE_HELD`, the review's mends): her passage is held
-        and taken up when the action ends."""
+        on the sea and still a mark, the leg following her until `enemy out of range` ends the
+        action; with no mark at all (none on the sea, or the one in hand no longer a mark by the
+        one answer, `relations.MARK`: struck, taken, of her own side; the lead's readings of
+        cda12ec9, (F2)) she lies to where she is, so that no chase of nobody is laid
+        (`Vessel.tick` drops such a leg and, the plan empty, takes her from the sea), nor a chase
+        of another's prize. On the road from a plan state alone (`PASSAGE_HELD`, the review's
+        mends): her passage is held and taken up when the action ends."""
         from freesail.combat.far_action import engage_range_m
+        from freesail.world import relations as R
 
         mark = self._engaging_mark(p)
         sid = mark.get("id") if mark is not None else self._stranger
-        if not self._on_the_sea(sid):
+        if mark is None and not R.still(
+            self.world, self.vessel, str(sid or ""), R.MARK, judge=self
+        ):
             self._stranger = None
             if self.vessel.plan[:1] != [("lie_to", math.inf)]:
                 self.vessel.plan = [("lie_to", math.inf)]
