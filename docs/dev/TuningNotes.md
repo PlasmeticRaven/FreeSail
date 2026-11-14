@@ -28024,6 +28024,46 @@ trunk at eb2c8fe1 (no conflict; it adds 112's truth 7-570 and nothing of package
 pushed at 02:45, before the ruling to build on 1e28b0b, and taking it back would need a
 force-push. This step is built on it, and no trunk since is merged.
 
+### The chart read along a line at a fixed step (the lead's ruling of 2026-11-14, 04:49 UTC)
+
+The cause of the Setúbal miss was a step chosen without regard to the grid's cell. The finest
+cell under any port's track is 15.4 m (a harbour patch); the coarsest 92.6 m. Every place the
+audit or the game reads the chart along a line at a fixed step, with its step:
+
+**The audit's own (mended by the halving test, or shown to need none):**
+- `f-shallow`, the depth along each track: 20 m, now 20 m and 2 m where under 8 m (above).
+- `f-open`, the sixteen 6-mile rays from a way's first mark to open water: judged by the game's
+  guard. Read again every 2 m for dry ground besides, no port's verdict changes (none of the
+  rays the guard passes crosses dry ground before a clear one is found). No mend.
+- `f-in` and `f-out`: the game's guard itself, by design (the check says what the game
+  refuses). `_crossing_point` only finds where the guard's refused leg meets the land, at the
+  guard's own step. No mend; the guard's step is listed below. The tracks' dry ground the guard
+  misses is found all the same by `f-shallow` at 2 m (a negative depth).
+- The checks (a) to (e) and the scenarios' (h) read areas, not lines, on a grid of 0.25° (the
+  sampled sweep) or 0.05° (the full one); their grain is the sweep's by design and not a step
+  along a line.
+
+**The game's (listed, not mended; for the lead's list):**
+
+| Where | Step along the line | Finest cell read | What a too-coarse step lets through |
+|---|---|---|---|
+| `ships.land_crossing`, through `Chart.line_shore` (the far-detail guard) | a third of a cable (61.7 m) within two cables of the shore; the distance field's own figure farther off; the first and last cable not tried | 15.4 m | Measured: a leg judged clear across dry ground up to about 60 m wide. Three port legs today: Civita Vecchia's to 42 05.53 N 11 47.00 E (ground drying 0.3 m at 42 05.4 N 11 46.9 E), and Santa Cruz de Tenerife's two to its road (1.6 m at 28 28.4 N 16 14.2 W). Unchanged between a 4 m and a 2 m reading. |
+| `Planner.clear` (the captain's sea route), through `line_shore` with the offing (3 miles at sea, a quarter-mile for the pilot's joining leg) | as above | 15.4 m | Little: land between two steps 62 m apart lies within 31 m of one of them, well inside any offing, so the leg is refused as a near pass. The berth off the charted dangers is by `line_passes`, exact geometry and no step. |
+| The lookout's land ahead (`lookout.py`, `LAND_AHEAD_STEP_M`) | 20 m within 120 m of the shore, depth read for dry ground | 15.4 m | One cell of dry ground, a rock or a spit 15 m across, stepped over: the cry of land ahead late or not given. The same fault as `f-shallow`'s. |
+| The pilot's shoal warning (`Chart.shoal_ahead`, from `dealings.py` twice and the readings in `api/readings.py`) | one cable (185 m) | 15.4 m | A shoal narrower than a cable, a bar or a ledge across the track, stepped over: no warning given. |
+| The side of the deeper water (`Chart._deeper_side`) | one cable out to ten either side | 15.4 m | A channel narrower than a cable unseen: the wrong side said, or neither. |
+| The contour search for the master's soundings (`Chart.contour_point`, `depth_span`; `reckoning.py`) | rings half a mile apart, a cable at finest | 15.4 m | A contour narrower than the ring's step missed: a sounding the chart cannot place. |
+
+The first is the one the lead asked to look for first: a leg judged clear that crosses land
+narrower than the step. It happens today on two ports' tracks, and both are in the known list.
+
+**The suites at 623ca5a** (measured in a clean worktree pinned at that hash). Ruff check and
+format were clean. The browser file, whole under `--slow -m "not pace"`: 13 passed, none skipped.
+The slow tier of the touched modules and the known truths (`test_mends_109` with them): 235
+passed and the same 8 xfailed, none skipped. The nine busy scenarios drew the same as at the
+last measure, vessel for vessel. The fast tier, whole: 7,623 passed and 1 xfailed, exit 0. The
+pace tests ran alone and last at the hash reported, which adds these notes alone to 623ca5a.
+
 ## The chart session: the calendar and the world (decision 69; the lead's ruling of 2026-11-13)
 
 **What changed.** A port's dated record seeds the port on the scenario's first day and the
