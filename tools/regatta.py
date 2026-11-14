@@ -529,7 +529,9 @@ def run_door(
     desk.race = True  # and tells it the session is a race (package 42b)
     http = TestClient(app)
     out = out or sys.stdout
-    argv = ["--game", "http://regatta", "--station", "captain", *door_argv]
+    # the door names the game at the machine's own address, as every door does (package 115:
+    # the server answers no other name)
+    argv = ["--game", "http://localhost", "--station", "captain", *door_argv]
     got: dict[str, Any] = {}
 
     def door() -> None:
