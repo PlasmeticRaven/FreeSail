@@ -231,17 +231,22 @@ _PEOPLE = frozenset({"the people", "all the people", "her people"})
 
 
 def name_shaped(part: str) -> bool:
-    """Whether a part of the list has the shape of a name (the grammar's `name`): one to four
-    words after an optional title or 'the', each of letters and digits with a hyphen or an
-    apostrophe within (the stop of a contraction read away)."""
+    """Whether a part of the list has the shape of a name (the grammar's `name`): one word
+    alone, or one to four words after an optional title or 'the', each of letters (of any
+    alphabet) and digits with a hyphen or an apostrophe within (the stop of a contraction read
+    away)."""
     words = part.replace(".", " ").lower().split()
     if not words or any(not _WORD.match(w) for w in words):
         return False
+    if len(words) == 1:
+        return True  # a surname, or a role that is a title's word ('lieutenant', 'captain')
     body = words[1:] if words[0] in _TITLES or words[0] == "the" else words
     return 1 <= len(body) <= 4
 
 
-_WORD = re.compile(r"^[a-z0-9](?:[a-z0-9'\-]*[a-z0-9])?$")
+# a word of a name: letters (of any alphabet: 'Hervé') and digits, a hyphen or an apostrophe
+# within ('Smith-Jones', "O'Brien", "master's", '2nd')
+_WORD = re.compile(r"^[^\W_](?:[\w'\-]*[^\W_])?$")
 
 
 def _not_understood(part: str) -> str:
@@ -668,7 +673,7 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
             ]
             continue
         key = " ".join(words.replace('"', " ").split()).lower()
-        found = [p for p in hers if _answers_to(p, key)]
+        found = [p for p in hers if _answers_to(p, key, whole_name(giver, p))]
         if not found:
             raise TransferError(f"Nobody of the {_name(giver)}'s answers to '{words}' aboard her.")
         if len(found) > 1:
@@ -684,12 +689,23 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
     return out
 
 
-def _answers_to(person: Any, key: str) -> bool:
+def whole_name(hull: Any, person: Any) -> str:
+    """His whole name as the muster drew it ('Silas Pascoe' for Mr Pascoe), where he has a
+    sailor of the ship's crew behind him; '' where he has none."""
+    sid = getattr(person, "sailor_id", None)
+    crew = (getattr(getattr(hull, "ship", None), "extra", None) or {}).get("crew")
+    sailor = crew.by_id.get(sid) if crew is not None and sid else None
+    return str(getattr(sailor, "name", "") or "")
+
+
+def _answers_to(person: Any, key: str, whole: str = "") -> bool:
     """Whether a name-shaped part names this person (the grammar's `name`): his address whole
     ('Mr Pascoe', 'Richd. Oliver') or without its title ('pascoe', 'john smith' for Mr John
-    Smith), his role with 'the' or without ('the boatswain', 'master-at-arms'), or his surname
-    after any title ('Mr Oliver', 'Captain Bowen'); the stops of a contraction read away on
-    both sides. Never a part's last word alone where the part is more than a surname."""
+    Smith), his whole name as the muster drew it, with a title or without ('Silas Pascoe',
+    'Mr Silas Pascoe'), his role with 'the' or without ('the boatswain', 'master-at-arms'), or
+    his surname after any title ('Mr Oliver', 'Captain Bowen'); the stops of a contraction
+    read away on both sides. Never a part's last word alone where the part is more than a
+    surname."""
     name = " ".join(str(getattr(person, "name", "")).lower().replace(".", " ").split())
     role = " ".join(str(getattr(person, "role", "")).lower().split())
     key = " ".join(key.lower().replace(".", " ").split())
@@ -698,6 +714,10 @@ def _answers_to(person: Any, key: str) -> bool:
     words = key.split()
     bare = name.split()[1:] if name.split()[0] in _TITLES else name.split()
     if key == name or words == bare or key.removeprefix("the ") == role:
+        return True
+    drawn = " ".join(whole.lower().replace(".", " ").split()).split()
+    untitled = words[1:] if words and words[0] in _TITLES else words
+    if drawn and untitled == drawn:
         return True
     surname = name.split()[-1]
     return words == [surname] or (len(words) == 2 and words[0] in _TITLES and words[1] == surname)

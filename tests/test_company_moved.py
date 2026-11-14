@@ -12,6 +12,7 @@ and the boat is home again.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -397,7 +398,80 @@ LIST_SHAPES = [
     ("Mr Nobody", "answers to 'Mr Nobody'", 0),
     ("the purser", "answers to 'the purser'", 0),
     ("Oliver Cromwell", "answers to 'Oliver Cromwell'", 0),
+    # good shapes of a name that nobody of hers answers to (the fourth reading, item 5):
+    # read as names and answered in his words, never refused as not understood
+    ("Mr Smith-Jones", "answers to 'Mr Smith-Jones'", 0),
+    ("the 2nd mate", "answers to 'the 2nd mate'", 0),
+    ("the master-at-arms", "answers to 'the master-at-arms'", 0),
+    ("Mr John Henry Smith", "answers to 'Mr John Henry Smith'", 0),
+    ("john henry smith", "answers to 'john henry smith'", 0),
 ]
+
+COMPANY_FILES = sorted(
+    p.stem for p in (Path(__file__).parent.parent / "data/people").glob("*.yaml")
+)
+
+
+def _sayings(person, whole: str) -> list[str]:
+    """Each way the grammar says a person (ruling C on the fourth reading): his address whole,
+    his whole name as drawn, with his title and without, his surname alone and after his title,
+    and his role with 'the' and without."""
+    address = person.name
+    first = address.split()[0]
+    title = first if first.lower().rstrip(".") in TR._TITLES else ""
+    surname = address.split()[-1]
+    out = [address, surname, f"{title} {surname}".strip(), person.role, f"the {person.role}"]
+    if whole:
+        out += [whole, f"{title} {whole}".strip(), whole.lower()]
+    return list(dict.fromkeys(out))
+
+
+@pytest.mark.parametrize("stem", COMPANY_FILES)
+def test_every_person_of_every_company_is_answered_by_the_grammar(stem):
+    """Ruling C on the fourth reading: the grammar tested over the data. Every person of the
+    company file's ship, and every role of the file, said by his whole name, his surname, his
+    title and surname, and his role (with 'the' and without), is read by `read_counts` as one
+    name, and answered by that one person; where another of hers answers to the same words (a
+    shared surname or role), the order is refused naming each, and him among them."""
+    import yaml
+
+    from freesail.api.session import make_world
+
+    doc = yaml.safe_load((Path(__file__).parent.parent / f"data/people/{stem}.yaml").read_text())
+    w = make_world(7, doc["ship"])
+    me = knowledge.players_person(w)
+    giver = w.players
+    people = [p for p in giver.people.people if p is not me]
+    # the flag party (`flag: true`) is of no ship's company, aboard only under a hoisted flag
+    roles = {
+        str(e.get("role"))
+        for e in doc.get("wardroom") or []
+        if isinstance(e, dict) and not e.get("flag")
+    }
+    aboard = {p.role for p in giver.people.people}
+    assert roles and roles <= aboard, (stem, roles - aboard)
+    assert people, stem
+    for person in people:
+        whole = TR.whole_name(giver, person)
+        for said in _sayings(person, whole):
+            every, by_rating, count, rest = TR.read_counts(said)
+            assert (every, by_rating, count, rest) == (False, {}, 0, [said]), (stem, said)
+            sharing = [
+                p
+                for p in people
+                if p is person
+                or p.role == person.role
+                and said.lower().removeprefix("the ") == person.role.lower()
+                or p.name.split()[-1] == person.name.split()[-1]
+                and said.split()[-1] == person.name.split()[-1]
+            ]
+            if len(sharing) == 1:
+                assert TR._persons(w, giver, rest) == [person], (stem, said)
+                continue
+            with pytest.raises(TR.TransferError) as refused:
+                TR._persons(w, giver, rest)
+            assert "each answer to" in str(refused.value), (stem, said, str(refused.value))
+            assert person.name in str(refused.value), (stem, said, str(refused.value))
 
 
 def test_the_list_of_those_who_go_is_read_by_its_grammar():
@@ -888,3 +962,23 @@ def test_a_save_with_a_transfer_replays_to_the_same_logs(tmp_path):
     assert copy.hulls[fid].log.digest() == w.hulls[fid].log.digest()
     assert copy.first_hull.log.digest() == w.first_hull.log.digest()
     assert len(TR._hands(copy.hulls[fid])) == len(TR._hands(fly))
+
+
+def test_a_scenarios_whole_name_answers_without_its_title():
+    """The fourth reading, item 5: 'john smith' answers for Mr John Smith (a name a scenario
+    gives whole), as do 'Mr Smith', 'Smith' and 'Mr John Smith'; 'john' alone and 'Mr John' do
+    not, the surname being the last word of the name."""
+    from types import SimpleNamespace
+
+    smith = SimpleNamespace(name="Mr John Smith", role="supercargo")
+    for said in (
+        "john smith",
+        "John Smith",
+        "Mr John Smith",
+        "mr smith",
+        "Smith",
+        "the supercargo",
+    ):
+        assert TR.name_shaped(said.lower()) and TR._answers_to(smith, said), said
+    for said in ("john", "Mr John", "John Smith Jones"):
+        assert not TR._answers_to(smith, said), said
