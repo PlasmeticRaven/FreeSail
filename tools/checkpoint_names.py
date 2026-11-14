@@ -5,13 +5,17 @@
 
 A checkpoint (`freesail/core/replay.py`) is a pickle, and a pickle names the classes and
 functions its loading calls. The loader admits an exact list of those names
-(`freesail/core/checkpoint_names.py`, `ADMITTED`) and nothing else. This tool makes the list
-from what the game's own checkpoints hold: every scenario under `data/scenarios/` begun as
-the harbour begins it (the server's `prepare_game`) and run `RUN_S` seconds of the game and
-checkpointed; the kept saves under `tests/fixtures/saves/`; a fight; a port, a ship in it
-and her business; the far world. Truth 7-606 (`tests/test_known_truths.py`) takes the
-same census and fails when any checkpoint of the game's own holds a name the list lacks,
-so that a new class in a checkpoint is added to the list on purpose and seen in the diff.
+(`freesail/core/checkpoint_names.py`, `ADMITTED`) and nothing else. This tool makes the
+list from what the game's own checkpoints hold: every scenario under `data/scenarios/`
+begun as the harbour begins it (the server's `prepare_game`), run and checkpointed; the
+kept saves under `tests/fixtures/saves/`; a fight; a port, a ship in it and her business;
+the far world; and the wardroom (`wardroom_world`: the stations seated as play seats them,
+the watcher, the player at a seat, a captain and an officer at work). The list is written
+from a long census (`LIST_RUN_S`, two hours of each scenario, where the fishermen's gear
+is out and the people's needs have come due); truth 7-606 (`tests/test_known_truths.py`)
+takes the short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own
+holds a name the list lacks, so that a new class in a checkpoint is added to the list on
+purpose and seen in the diff.
 
 The census reads the game's own pickles with a recording loader; it never reads a
 checkpoint from elsewhere.
@@ -34,6 +38,7 @@ SCENARIOS = ROOT / "data" / "scenarios"
 FIXTURES = ROOT / "tests" / "fixtures" / "saves"
 LIST_FILE = ROOT / "freesail" / "core" / "checkpoint_names.py"
 RUN_S = 600  # ten minutes of each scenario: its routine, its runner and its book under way
+LIST_RUN_S = 7200  # the list's census: two hours of each (JUDGEMENT: past the first watch)
 
 # The game's own worlds beyond the scenarios' openings (name, scenario, seconds run, orders
 # given first): a fight with the guns cast loose and fired, a port with the ship's business
@@ -90,6 +95,40 @@ def scenario_world(path: Path, run_s: int, orders: tuple[str, ...] = ()):
     return world
 
 
+def wardroom_world(run_s: int = 3600):
+    """The stations seated, as play seats them: a scenario begun as the harbour begins it
+    with the scripted watcher and the player at the master's seat, the fake captain and
+    the fake officer each through a harness of his own, the captain giving the officer the
+    deck and his word, the officer at work and standing by; run an hour."""
+    from freesail.agents import Fake, Harness, Reply, SamplingPolicy, call
+    from freesail.agents.agent import captain, officer
+    from freesail.agents.fake import captain_of_the_ship
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(
+        ["--scenario", str(SCENARIOS / "merchant-cutter.yaml"), "--watcher", "fake"]
+        + ["--seat", "master"]
+    )
+    world = prepare_game(args, say=lambda _line: None)
+    policy = SamplingPolicy.in_lockstep(600, "notable", "urgent")
+    orders = ["trim sails", "heave the log"]
+
+    def keep_her(last, turns):  # type: ignore[no-untyped-def]
+        if "tool_results" in last:
+            return Reply()
+        if orders:
+            return Reply(calls=(call("submit_order", text=orders.pop(0)),))
+        return Reply(calls=(call("stand_by", until="eight bells"),))
+
+    oh = Harness(world, officer(policy, world=world), Fake([keep_her], loop=True), save=None)
+    oh.start()
+    words = ["you have the deck", "you may work the ship", "ask the master for a course"]
+    ch = Harness(world, captain(policy, world=world), captain_of_the_ship(words), save=None)
+    ch.start()
+    world.run(run_s)
+    return world
+
+
 def scenario_files() -> list[Path]:
     return sorted(SCENARIOS.glob("*.yaml"))
 
@@ -100,16 +139,24 @@ def census_of_scenario(path: Path, run_s: int = RUN_S, orders: tuple[str, ...] =
     return names_of_bytes(replay.checkpoint_bytes(scenario_world(path, run_s, orders)))
 
 
-def census(say=print) -> Iterator[tuple[str, set[tuple[str, str]]]]:
+def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[str, str]]]]:
     """(where, names) for every checkpoint of the game's own the census takes."""
     for path in sorted(FIXTURES.glob("*.checkpoint")):
         yield f"the kept save {path.name}", names_of_file(path)
     for path in scenario_files():
         say(f"  {path.name}")
-        yield f"the scenario {path.name}", census_of_scenario(path)
+        yield f"the scenario {path.name}", census_of_scenario(path, run_s)
     for what, name, run_s, orders in WORLDS:
         say(f"  {what}")
         yield what, census_of_scenario(SCENARIOS / name, run_s, orders)
+    say("  the wardroom")
+    yield "the wardroom", census_of_wardroom()
+
+
+def census_of_wardroom():
+    from freesail.core import replay
+
+    return names_of_bytes(replay.checkpoint_bytes(wardroom_world()))
 
 
 def write_list(names: set[tuple[str, str]]) -> str:

@@ -17770,6 +17770,7 @@ def _census_cases():
         pytest.param("scenario", C.SCENARIOS / n, run_s, orders, id=what)
         for what, n, run_s, orders in C.WORLDS
     ]
+    cases += [pytest.param("wardroom", None, 0, (), id="the-wardroom")]
     return cases
 
 
@@ -17780,7 +17781,8 @@ def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list
     """Package 115, part B, item 1: the loader's list is exact and made from what the
     game's own checkpoints hold. Each checkpoint of the census (`tools/checkpoint_names.py`:
     every scenario begun as the harbour begins it and run ten minutes, the kept saves, a
-    fight with the guns cast loose and fired, a port, the far world) is read with every name
+    fight with the guns cast loose and fired, a port, the far world, the wardroom with its
+    stations seated) is read with every name
     it calls recorded, and every name is one the list admits; a class new to a checkpoint
     fails here until it is added to the list on purpose, by the tool. `getattr` is admitted
     only for the bound methods the older checkpoints hold, each by its class and name."""
@@ -17788,11 +17790,15 @@ def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list
 
     from freesail.core.checkpoint_names import ADMITTED
 
-    names = (
-        C.names_of_file(path) if kind == "fixture" else C.census_of_scenario(path, run_s, orders)
-    )
+    if kind == "wardroom":
+        names = C.census_of_wardroom()
+    elif kind == "fixture":
+        names = C.names_of_file(path)
+    else:
+        names = C.census_of_scenario(path, run_s, orders)
     lacking = sorted(names - ADMITTED - {("builtins", "getattr")})
-    assert not lacking, f"{path.name} holds names the list lacks: {lacking}"
+    where = path.name if path is not None else kind
+    assert not lacking, f"{where} holds names the list lacks: {lacking}"
 
 
 def test_truth_7_607_every_kept_save_loads_from_its_checkpoint_as_before():
