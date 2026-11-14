@@ -40,7 +40,7 @@ but the arithmetic of what it reports. It changes nothing. The checks, by letter
 (h) **the scenarios**: each one's start inside its chart and on its water, and the ports
     it names present.
 
-**The ratchet** (`data/charts/audit-known.yaml`): every finding of the first run listed by
+**The ratchet** (`tools/audit_chart_known.yaml`): every finding of the first run listed by
 its key, with its place, its reason in a line and whose it is; `tests/test_chart_audit.py`
 passes on those and fails on any finding not listed (a sampled grid in the fast tier, the
 full sweep in the slow), so that every later block comes in clean or says what it adds.
@@ -83,7 +83,11 @@ from freesail.world.chart import (  # noqa: E402
 from freesail.world.geo import Position, bearing_and_distance, destination  # noqa: E402
 from freesail.world.weather import load_climatology  # noqa: E402
 
-KNOWN_PATH = ROOT / "data" / "charts" / "audit-known.yaml"
+# beside the tool and not under data/ (package 111's ruling 4, the chart session's tracks step;
+# old: data/charts/audit-known.yaml): the build's fingerprint hashes every file under data/
+# (`core/world.fingerprint_of`), so an edit of a list the game never reads changed the build
+# and made earlier saves another build's
+KNOWN_PATH = ROOT / "tools" / "audit_chart_known.yaml"
 PORTS_DIR = ROOT / "data" / "ports"
 SCENARIOS_DIR = ROOT / "data" / "scenarios"
 NATIONS_PATH = ROOT / "data" / "nations.yaml"
@@ -195,17 +199,14 @@ OPEN_WATER_DEPTH_M = 20.0
 # (JUDGEMENT: three metres, about a laden trader's draught of ten feet, against the grid's
 # datum near the lowest water; the period's pilots give the channel at low water in fathoms,
 # so a leg the grid gives less than that may be one no trader floats in at low water, or the
-# grid's grain over a narrow channel). Each leg is read every TRACK_COARSE_STEP_M first, and
-# a leg whose coarse least is under TRACK_REFINE_BELOW_M is read again every TRACK_STEP_M.
-# JUDGEMENT, measured (package 111, the lead's ruling of 2026-11-14): the finest cell under any
-# port's track is 15.4 m, and over the 92 ports with tracks, halving 2 m to 1 m moves no port's
-# least by more than 0.08 m and no count of shallow legs (20 m stepped over Setubal's 1.2 m
-# shoal and read 2.3 m). A leg left at the coarse reading read at most 2.54 m less at 2 m, so
-# the refinement takes every leg under 8 m (three metres, that move and a margin): over the 92,
-# every leg that reads under 8 m at 2 m is read at 2 m, at a third of the cost of reading all.
-TRACK_STEP_M = 2.0
-TRACK_COARSE_STEP_M = 20.0
-TRACK_REFINE_BELOW_M = 8.0
+# grid's grain over a narrow channel). Each leg is read by the chart's one reader of a line's
+# least depth (`Chart.least_depth_along`): the true least of the chart's own surface along the
+# leg, with no step and no margin (the lead's ruling of 2026-11-14, 11:00, on the reader's
+# finding that a reading half a cell apart steps over a lone head off its centre). Old, in
+# this step's first hash: every half cell of the finest level and again every 2 m (the old
+# TRACK_STEP_M) under 8 m (TRACK_REFINE_BELOW_M); before it, package 111's every 20 m
+# (TRACK_COARSE_STEP_M). A leg the chart knows nothing along is a finding of its own
+# (`f-unread`), never a shorter count.
 TRACK_LEAST_DEPTH_M = 3.0
 
 # A stream area's polygon tried for water on a grid of this many points a side over its
@@ -926,37 +927,20 @@ def _crossing_point(chart: Chart, start: Position, plan: list[tuple[Any, ...]]) 
 
 def _least_depth(
     chart: Chart, start: Position, plan: list[tuple[Any, ...]]
-) -> list[tuple[float, Position, str]]:
+) -> list[tuple[float | None, Position | None, str]]:
     """Each leg's least charted depth (metres at the datum, negative where it dries), the
-    place of it and the leg's end's name, sampled along the great circle of the leg, its
-    ends among them: every `TRACK_COARSE_STEP_M`, and every `TRACK_STEP_M` again where the
-    coarse least is under `TRACK_REFINE_BELOW_M`."""
-
-    def sampled(a: Position, b: Position, step: float) -> tuple[float, Position] | None:
-        bearing, dist = bearing_and_distance(a, b)
-        n = max(1, int(dist / step))
-        least: tuple[float, Position] | None = None
-        for i in range(n + 1):
-            p = destination(a, bearing, dist * i / n)
-            e = chart.elevation_at(p)
-            if e is None:
-                continue
-            if least is None or -e < least[0]:
-                least = (-e, p)
-        return least
-
-    out: list[tuple[float, Position, str]] = []
+    place of it and the leg's end's name, the true least of the chart's surface along the
+    great circle of the leg (`Chart.least_depth_along`); (None, None, name) for a leg the
+    chart knows nothing along."""
+    out: list[tuple[float | None, Position | None, str]] = []
     here = start
     for leg in plan:
         if len(leg) < 2 or not isinstance(leg[1], Position):
             continue  # an order of the plan's that is no leg (as the guard skips it)
         there = leg[1]
-        least = sampled(here, there, TRACK_COARSE_STEP_M)
-        if least is not None and least[0] < TRACK_REFINE_BELOW_M:
-            least = sampled(here, there, TRACK_STEP_M)
-        if least is not None:
-            name = str(leg[2]) if len(leg) > 2 else fmt(there.lat_deg, there.lon_deg)
-            out.append((least[0], least[1], name))
+        least = chart.least_depth_along(here, there)
+        name = str(leg[2]) if len(leg) > 2 else fmt(there.lat_deg, there.lon_deg)
+        out.append((least[0], least[1], name) if least is not None else (None, None, name))
         here = there
     return out
 
@@ -994,7 +978,7 @@ def check_ports(
     ports_dir: Path = PORTS_DIR,
     nations_path: Path = NATIONS_PATH,
 ) -> None:
-    from freesail.world.ports import load_port
+    from freesail.world.ports import UnreadableMark, load_port
     from freesail.world.ships import approach_plan, land_crossing
 
     table = yaml.safe_load(nations_path.read_text(encoding="utf-8")) or {}
@@ -1011,10 +995,34 @@ def check_ports(
         pid = path.stem
         try:
             port = load_port(path, chart)
+        except UnreadableMark as e:
+            # a track mark the planner cannot read (the chart session's tracks step): a
+            # finding of its own, never a skipped leg
+            audit.add(Finding("f", f"f-mark:{pid}", "", 1, f"a track mark is unreadable: {e}"))
+            continue
         except Exception as e:  # noqa: BLE001 - said as a finding
             audit.add(Finding("f", f"f-load:{pid}", "", 1, f"the port file does not load: {e}"))
             continue
         home = chart.region_at(port.anchorage.position) or ""
+        # a track's mark the whole chart has not, by its id or its name: the planner would
+        # skip it without a word (the chart session's tracks step)
+        missing = [
+            str(words)
+            for marks in port.tracks.values()
+            for words in marks
+            if not str(words)[:1].isdigit()
+            and not (chart.feature(" ".join(str(words).split())) or chart.find_feature(str(words)))
+        ]
+        if missing:
+            audit.add(
+                Finding(
+                    "f",
+                    f"f-mark:{pid}",
+                    home,
+                    len(missing),
+                    f"{port.name}'s tracks name a mark the chart has not: {missing[0]}",
+                )
+            )
         for which in ("outer_road", "anchorage", "mooring", "shore"):
             spot = getattr(port, which)
             p = spot.position
@@ -1198,7 +1206,19 @@ def check_ports(
             legs = _least_depth(chart, first, plan[1:]) + _least_depth(
                 chart, port.anchorage.position, out
             )
-            shallow = [leg for leg in legs if leg[0] < TRACK_LEAST_DEPTH_M]
+            unread = [leg for leg in legs if leg[0] is None]
+            if unread:
+                audit.add(
+                    Finding(
+                        "f",
+                        f"f-unread:{pid}",
+                        home,
+                        len(unread),
+                        f"{port.name}'s tracks cross water the chart knows nothing of on "
+                        f"{len(unread)} of {len(legs)} legs, the first the leg to {unread[0][2]}",
+                    )
+                )
+            shallow = [leg for leg in legs if leg[0] is not None and leg[0] < TRACK_LEAST_DEPTH_M]
             if shallow:
                 d, where, name = min(shallow, key=lambda leg: leg[0])
                 audit.add(

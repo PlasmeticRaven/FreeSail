@@ -111,7 +111,8 @@ closed_to: []
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: by Outão, three
 # cables off its tower; the pilot's marks are transits of buildings the chart lacks.
-# Its least depth along the way, by the grid at its datum read every 2 m: 1.2 m,
+# Its least depth along the way, by the grid at its datum, the true least of its surface
+# along each leg (the chart session's tracks step; old: read every 2 m): 1.1 m (old 1.2 m),
 # on the leg to 38 25.97 N 9 03.72 W (5 of 11 legs under 3 m): the grid has no deeper way
 # within the pilot's sides, so the track stands and the audit lists it (f-shallow).
 tracks:

@@ -83,7 +83,7 @@ import yaml
 
 from freesail import units
 from freesail.world import ordnance
-from freesail.world.geo import Position, bearing_and_distance
+from freesail.world.geo import Position, bearing_and_distance, parse_position
 from freesail.world.people import Message
 
 __all__ = [
@@ -660,6 +660,33 @@ def port_files(root: Path = PORTS_DIR) -> dict[str, Path]:
     return {p.stem: p for p in sorted(root.glob("*.yaml"))}
 
 
+class UnreadableMark(ValueError):
+    """A track mark neither a feature of the chart nor a position in the dialect's form
+    (the chart session's tracks step, the lead's ruling of 2026-11-14: a mark the planner
+    cannot read was skipped without a word, so a file described legs no ship sailed)."""
+
+
+def _check_track_marks(tracks: dict[str, list[str]], where: str) -> None:
+    """Every mark of a port's tracks written as the planner reads it (`captains._mark`): a
+    feature by its id or name, or a position in the dialect's one form. A mark that begins
+    with a figure is a position and must read as one; an `UnreadableMark` in words naming the
+    file and the mark otherwise. Whether a named feature is on the chart is the audit's to
+    say (`f-mark`), since a world on a chart of one region loads every port's file."""
+    for which, marks in tracks.items():
+        for words in marks:
+            text = " ".join(str(words).split())
+            if not text[:1].isdigit():
+                continue
+            try:
+                parse_position(text)
+            except ValueError:
+                raise UnreadableMark(
+                    f"{where}: the {which} track's mark '{text}' is not a position in the form "
+                    "the orders read (e.g. 37 03.00 N 15 18.50 E); a mark the planner cannot "
+                    "read would be skipped and the leg not sailed"
+                ) from None
+
+
 def load_port(
     path: str | Path,
     chart: Any = None,
@@ -734,6 +761,8 @@ def load_port(
                 )
             )
     nations = _nations(doc.get("nation"), where)
+    tracks = {str(k): [str(m) for m in (v or [])] for k, v in (doc.get("tracks") or {}).items()}
+    _check_track_marks(tracks, where)
     return Port(
         reach_nm=float(doc.get("reach_nm", IN_PORT_NM)),
         id=str(doc.get("id") or p.stem),
@@ -758,7 +787,7 @@ def load_port(
         letters=letters,
         news=[str(x) for x in (state.get("news") or [])],
         path=where,
-        tracks={str(k): [str(m) for m in (v or [])] for k, v in (doc.get("tracks") or {}).items()},
+        tracks=tracks,
         state=port_state,
         blockade=blockade,
         places=tuple(dict(x) for x in (doc.get("places") or []) if isinstance(x, dict)),
