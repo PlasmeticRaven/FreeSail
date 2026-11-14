@@ -94,7 +94,7 @@ def execute(ship: Any, order: Order) -> Result:
     person = knowledge.players_person(root)
     if person is None:
         raise OrderError("You are aboard no ship here to take command of another.")
-    words, how, who, intent = parse(order.object or "", _ship_name(root))
+    words, how, who, intent = parse(said_after_verb(order), _ship_name(root))
     key = words.lower().removeprefix("the ")
     if key == "prize" or key.endswith(" prize") or key.startswith("prize "):
         raise OrderError(PRIZE_WORDS)
@@ -128,13 +128,7 @@ def _transfer(ship: Any, order: Order) -> Result:
         raise OrderError("You are aboard no ship here to move her people.")
     # the words after the verb as said, their commas kept (the order's `object` has them read
     # away, and a list of names is read by them: the lead's second reading of 4dda3dfe)
-    said = str(order.text or "")
-    phrase = str(order.verb_phrase or "")
-    if phrase and said.lower().startswith(phrase.lower()):
-        said = said[len(phrase) :]
-    else:
-        said = str(order.object or "")
-    text = " ".join(said.split()).strip().rstrip(".")
+    text = said_after_verb(order).strip().rstrip(".")
     m = _TRANSFER.match(text)
     if m is None:
         mine = _ship_name(root)
@@ -152,7 +146,7 @@ def _transfer(ship: Any, order: Order) -> Result:
         # Muster" read as a name): one order at a time
         ship_words, rest = (x.strip() for x in to.split(",", 1))
         raise OrderError(
-            f"One order at a time: '... to {ship_words}', and then '{rest}' as an order of its own."
+            f"One order at a time: the transfer to {ship_words} first, and '{rest}' after it."
         )
     receiver = named(to)
     giver = named(m.group("giver")) if m.group("giver") else None
@@ -167,6 +161,17 @@ def _transfer(ship: Any, order: Order) -> Result:
     except TransferError as e:
         raise OrderError(str(e)) from None
     return "company.transfer", said, {"verb": order.verb, "level": 1, **data}
+
+
+def said_after_verb(order: Order) -> str:
+    """The words after the verb as he said them (`Order.said`: their case, stops and commas
+    kept), so that a ship's name or a list is read by them and given back as he typed them;
+    the order's object where no words were kept."""
+    raw = str(getattr(order, "said", "") or "").split()
+    phrase = str(order.verb_phrase or "").split()
+    if raw and phrase and [w.lower() for w in raw[: len(phrase)]] == [w.lower() for w in phrase]:
+        return " ".join(raw[len(phrase) :])
+    return " ".join(str(order.object or "").split())
 
 
 def _ship_name(root: Any) -> str:
@@ -198,15 +203,22 @@ def ship_for_him(root: Any, words: str) -> Any:
         return hulls[key]
     vessels = getattr(root, "vessels", None)
     vessel = vessels.find(said) if vessels is not None else None
+    by_sight = False
     if vessel is None:
         vessel = vessel_in_sight(root, said)
-    name = " ".join(w[:1].upper() + w[1:] for w in key.split()) or "that ship"
-    unknown = f"You know of no ship called the {name} hereabouts."
+        by_sight = vessel is not None
+    shown = said.removeprefix("the ").removeprefix("The ")
+    unknown = f"You know of no ship called the {shown} hereabouts."
     from freesail.world.knowledge import knows_of
 
-    # a ship he does not know of is to him as a name of no ship (the fourth round: one answer,
-    # `knowledge.knows_of`, his ships, a sail in sight, a name his log has said)
-    if vessel is None or vessel.done or not knows_of(root, vessel):
+    # one answer to whether he knows of her (`knowledge.knows_of`: his own ships, a sail in
+    # sight whose name is made out); a sail named by what is made out of her and no more is
+    # no ship of his, and her name is never said back (the lead's fourth reading)
+    if vessel is None or vessel.done:
+        raise OrderError(unknown)
+    if not knows_of(root, vessel):
+        if by_sight:
+            raise OrderError(f"The {shown} is no ship of yours.")
         raise OrderError(unknown)
     if vessel.crew is None:
         raise OrderError(f"The {vessel.name} lies beyond a boat's reach of you.")

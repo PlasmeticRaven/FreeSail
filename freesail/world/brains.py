@@ -912,8 +912,23 @@ class FarCaptain(Judgement):
                 )
             return
         self.over_head = None
-        if self.state is not None and self.state not in ("in distress",):
-            captain._enter(self.state)
+        folded = self.__dict__.pop("folded_at_sleep", None)
+        if folded is not None and folded == (self.state, captain.state):
+            # her far captain's state as it was when she fell asleep, and her near captain's
+            # as he left it: nothing changed while she slept, and the wake changes nothing
+            # (package 60, ruling A on the fourth reading: a near captain with no state of
+            # his own was given the far body's default 'on passage' at the wake, and filled
+            # her away from lying to)
+            return
+        if (
+            self.state is not None
+            and self.state not in ("in distress",)
+            and self.state != captain.state
+        ):
+            # entered where her far brain's state differs from her captain's, and quietly
+            # (package 60, the fourth reading: re-entered at every wake, his book unloaded and
+            # loaded again and said; the wake adds no line but its own)
+            captain._enter(self.state, quiet=True)
 
     def fold_back(self, captain: Captain) -> None:
         """The near body's state folded back into the brain at the demotion."""
@@ -934,6 +949,9 @@ class FarCaptain(Judgement):
         self.state = None
         self.last_judged = -1
         self._enter(state)
+        # the two states as she fell asleep, so that the wake knows whether her far captain
+        # changed his while she slept (`fold_in`)
+        self.folded_at_sleep = (self.state, captain.state)
         near_until = getattr(captain, "over_head_until", None)
         near_world = getattr(captain, "world", None)
         left = None

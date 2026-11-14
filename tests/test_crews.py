@@ -773,7 +773,8 @@ def test_a_ship_woken_at_her_anchor_lets_it_go_in_the_charts_depth_where_she_lie
 def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted, monkeypatch):
     """The lead's third reading, item 4 (JUDGEMENT): where her far body rode at an anchor but no
     anchor can hold her now (no depth known, or more water than her cable reaches), she wakes
-    lying to with what lying to sets, no anchor marked down, and her log says why."""
+    and heaves to by the road the order takes (ruling A on the fourth reading: her hands work
+    the evolution, no sail named), no anchor marked down, and her log says why."""
     w, v, crew = _raven_anchored_far()
     crew.ship.extra["water_depth_m"] = None
     # the chart is shared between worlds: patched for this test alone, and given back
@@ -781,9 +782,14 @@ def test_where_no_anchor_can_hold_her_she_wakes_lying_to_and_says_so(charted, mo
     K.promote(w, v)
     assert not crew.at_anchor
     lying = [x for x in crew.log if x.kind == "ship.hove_to"]
-    assert lying and "lies to" in lying[-1].text, [x.text for x in lying]
-    topsails = set(crew.ship.groups.get("topsails", []))
-    assert {s for s, x in crew.ship.sails.items() if x.is_set} <= topsails
+    assert lying and lying[0].text.startswith("No anchor will hold her here ("), lying[0].text
+    assert lying[0].text.endswith("; she heaves to."), lying[0].text
+    for _ in range(20):
+        w.run(60)
+        if crew.ship.extra.get("hove_to"):
+            break
+    assert crew.ship.extra.get("hove_to") and not crew.at_anchor
+    assert K.how_she_lies(v) == K.LYING_TO
 
 
 def test_how_she_lies_is_one_answer_from_her_own_state():
@@ -827,8 +833,9 @@ def test_a_ship_under_way_put_to_sleep_is_not_frozen_at_the_anchor_she_weighed()
         assert v.plan[0][0] == "anchor"
         K.demote(w, v)
         assert v.plan[0][0] != "anchor" and not crew._far_anchored
-        # her captain's brain plans her passage; with none, she lies to
-        assert K.how_she_lies(v) == (K.LYING_TO if brainless else K.UNDER_WAY), brainless
+        # under way as she lay (ruling A: with no far captain her course is held, where
+        # before she was laid to, and woke lying to from under way)
+        assert K.how_she_lies(v) == K.UNDER_WAY, brainless
 
 
 def test_the_far_course_for_a_port_is_laid_by_the_tracks_and_ends_at_her_anchor():

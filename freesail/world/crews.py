@@ -394,6 +394,7 @@ def far_tick(hull: Any) -> None:
     world = hull.world
     v = hull.vessel
     mirror_far(hull)
+    tackle_as_she_lies(v, hull)
     anchored = bool(v.plan) and v.plan[0][0] == "anchor"
     if anchored and not hull._far_anchored:
         # brought to an anchor by the plan's own last leg (a course for a port by the
@@ -503,6 +504,11 @@ def _sail_state_of(crew: CrewedWorld) -> str:
     """The far body's word for her sail from the crewed ship's rig."""
     if crew.at_anchor:
         return "at anchor"
+    if (getattr(crew.ship, "extra", None) or {}).get("hove_to"):
+        # hove to by the order (`HeaveToScript`'s record, which the watch keeps her by): the
+        # one answer reads it (package 60, the fourth reading; the readings' manoeuvre had
+        # gone by, and a ship hove to was read, and mirrored, as under plain sail)
+        return "lying to"
     manoeuvre = str(crew.readings.value("manoeuvre_in_hand") or "")
     if manoeuvre in ("hove to", "heaving to"):
         return "lying to"
@@ -580,12 +586,34 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
             _to_full(vessel)
             woken_true(vessel.crew)
             rides_as_she_lay(vessel, vessel.crew, lies)
+            lies_as_her_far_body(vessel.crew, lies)
         return vessel.crew
     lies = how_she_lies(vessel)
     crew = make_hull(world, vessel)
     woken_true(crew)
     rides_as_she_lay(vessel, crew, lies)
+    lies_as_her_far_body(crew, lies)
     return crew
+
+
+def lies_as_her_far_body(crew: Any, lies: str) -> None:
+    """A woken hull brought to lie as her far body lay (ruling A on the fourth reading): lying
+    to by the road the order `heave to` takes, out of it by `fill away`'s (the evolutions, her
+    hands working them), never by naming a sail; at anchor by `rides_as_she_lay`. Nothing
+    where she lies so already, or the work is in hand."""
+    if crew is None or lies == AT_ANCHOR:
+        return
+    hove = bool((getattr(crew.ship, "extra", None) or {}).get("hove_to"))
+    runner = (getattr(crew.ship, "extra", None) or {}).get("evolutions")
+    if runner is None:
+        return
+    from freesail.orders.verbs import SHIP_SUBJECT
+
+    with crew.world.as_hull(crew):
+        if lies == LYING_TO and not hove:
+            runner.start(crew.ship, "heave_to", SHIP_SUBJECT)
+        elif lies == UNDER_WAY and hove:
+            runner.start(crew.ship, "fill_away", SHIP_SUBJECT)
 
 
 # How a ship lies, the one answer (package 60, the lead's fourth round): at anchor, lying to
@@ -612,15 +640,60 @@ def how_she_lies(vessel: Any) -> str:
     return UNDER_WAY
 
 
+# How far ahead a hull with no far brain, put to sleep under way, keeps on along her heading
+# (JUDGEMENT: a day's run and more; she lies to when she comes to it, as such a hull does).
+KEEP_ON_NM = 60.0
+
+
+def _plan_as_she_lies(vessel: Any, crew: Any, lay: str) -> list[tuple[Any, ...]]:
+    """The far plan of a hull with no far brain, from how she lies as she falls asleep."""
+    if lay == AT_ANCHOR:
+        return [("anchor", "")]
+    if lay == LYING_TO or crew.position is None:
+        return [("lie_to", math.inf)]
+    heading = math.radians(float(getattr(crew, "heading_deg", 0.0) or 0.0))
+    ahead = KEEP_ON_NM * units.NAUTICAL_MILE
+    mark = crew.position.advanced(ahead * math.sin(heading), ahead * math.cos(heading))
+    return [("to", mark, "her course held")]
+
+
+def tackle_as_she_lies(vessel: Any, crew: Any) -> None:
+    """A sleeping hull's tackle made to agree with her far body (package 60, the lead's fourth
+    reading, ruling A): a far body not riding at an anchor has weighed it, so no anchor of hers
+    is marked down off the ground under her (her far body sailed 11 km in an hour with the
+    best bower down, and the wake believed it). The far body riding at one keeps hers."""
+    if crew is None or getattr(crew, "awake", False) or not getattr(crew, "at_anchor", False):
+        return
+    if how_she_lies(vessel) == AT_ANCHOR:
+        return
+    from freesail.ship.parts import AnchorState, ground_tackle
+
+    tackle = ground_tackle(crew.ship)
+    for a in tackle.down() if tackle is not None else []:
+        a.state = AnchorState.STOWED
+        a.ground_x = a.ground_y = None
+        a.scope_m = 0.0
+        a.brought_up = False
+        a.taut = False
+        a.dragging = False
+
+
 def woken_true(crew: Any) -> None:
     """Her place's water brought true as she wakes, for every reader (package 60, the lead's
     fourth round; the third reading's item 1): a sleeping hull's far tick refreshes none of
     what her own tick keeps of the place she lies in, so she woke with the depth, the bottom,
     the stream and the tide of where she fell asleep (`World._tick_tide`, run now with her
-    current, says nothing while she is not at anchor). The sea and the weather keep their own
+    current, its speech held: the turn of the tide is not said of a sleep). The sea and the
+    weather keep their own
     minute and are not run here (each says a line when its words change)."""
     if crew is None or getattr(crew, "tide", None) is None:
         return
+    # the refresh without the tick's speech: the turn of the tide and a drag are hers to say
+    # from her next minute, as they come, never of the sleep (the fourth reading, item 3)
+    crew._tide_was_flood = None
+    dragging = getattr(crew, "_dragging", None)
+    if hasattr(dragging, "clear"):
+        dragging.clear()
     with crew.world.as_hull(crew):
         crew.world._tick_tide()
 
@@ -646,23 +719,28 @@ def rides_as_she_lay(vessel: Any, crew: Any, lies: str = "") -> None:
     tackle = ground_tackle(ship)
     depth = _water_depth(ship)
     anchors = list(tackle.anchors) if tackle is not None else []
-    why = cannot_anchor(ship, None, depth)
     anchor = None
+    whys = []
     for a in anchors:
-        why = cannot_anchor(ship, a, depth)
-        if why is None:
+        said = cannot_anchor(ship, a, depth)
+        if said is None:
             anchor = a
             break
-    ship.dyn.u = ship.dyn.v = 0.0
+        whys.append(said)
     if anchor is None or depth is None:
-        _set_sail(crew, LYING_TO)
+        # no anchor will hold her: she heaves to, by the order's own road, and her far plan
+        # lies to with her, so that her captain does not sail her on the anchor's leg
+        why = whys[0] if whys else cannot_anchor(ship, None, depth)
+        vessel.plan = [("lie_to", math.inf)]
         crew.record(
             Severity.NOTABLE,
             "ship.hove_to",
-            f"{vessel.name} at full detail again where she cannot anchor ({why}): she lies to.",
+            f"No anchor will hold her here ({why}); she heaves to.",
             data={"id": vessel.id, "why": why},
         )
+        lies_as_her_far_body(crew, LYING_TO)
         return
+    ship.dyn.u = ship.dyn.v = 0.0
     for sail in ship.sails.values():
         if sail.is_set:
             sail.state = SailState.FURLED
@@ -685,12 +763,22 @@ def _to_full(vessel: Any) -> None:
     crew.awake = True
     vessel.detail = "crewed"
     mirror_far(crew)
+    hove = (getattr(crew.ship, "extra", None) or {}).get("hove_to")
+    if isinstance(hove, dict) and "off_at_sleep" in hove and vessel.sail_state == LYING_TO:
+        # hove to as she slept: her head laid to the wind as she lay, no way on her
+        crew.ship.dyn.heading = units.wrap_pi(
+            float(crew.wind.direction_from) + float(hove.pop("off_at_sleep"))
+        )
+        crew.ship.dyn.u = crew.ship.dyn.v = 0.0
     if getattr(vessel, "damage", None):
         # what the far rounds did to her while she slept, into her parts (package 74, step 4)
         from freesail.combat.far_action import far_damage_into_parts
 
         far_damage_into_parts(crew, vessel.damage)
-    if _sail_state_of(crew) != vessel.sail_state:
+    near = _sail_state_of(crew)
+    if near != vessel.sail_state and LYING_TO not in (near, vessel.sail_state):
+        # her sail as the far body's word where the plan changed it; lying to, or out of it,
+        # by the order's own road (`lies_as_her_far_body`), never by naming a sail
         _set_sail(crew, vessel.sail_state)
     if crew.navigation is not None and crew.position is not None:
         crew.navigation.reckoning.set_position(
@@ -767,14 +855,28 @@ def demote(world: World, vessel: Any) -> None:
         write_damage(vessel, crew)
     seated = any(not h.agent.released for h in crew.agents.values())
     vessel.detail = "far"  # near by distance from here, as a hull-less vessel (step 6)
+    hove = (getattr(crew.ship, "extra", None) or {}).get("hove_to")
+    if isinstance(hove, dict):
+        # how she lay to the wind, hove to, as she fell asleep: the wake lays her so again
+        # on the wind as it then blows (ruling A: the far body's own heading is the wind's
+        # and a beam, and a ship laid to it fell off and sailed)
+        hove["off_at_sleep"] = float(
+            units.wrap_pi(float(crew.ship.dyn.heading) - float(crew.wind.direction_from))
+        )
     # how she lay as she fell asleep, from her own state (the fourth round: her plan is not
     # kept while she is awake, and a ship weighed and under way kept the leg of the anchor and
     # was frozen at it by the far ticks)
     lay = how_she_lies(vessel)
-    if lay != AT_ANCHOR and vessel.plan and vessel.plan[0][0] == "anchor":
+    if vessel.brain is None:
+        # a hull with no far brain to plan for her: her far body lies as she lies (ruling A:
+        # a sleep changes nothing of it), at her anchor, lying to, or keeping on along her
+        # heading under her sail
+        vessel.plan = _plan_as_she_lies(vessel, crew, lay)
+    elif lay != AT_ANCHOR and vessel.plan and vessel.plan[0][0] == "anchor":
         vessel.plan = [("lie_to", math.inf)] + list(vessel.plan[1:])
     crew.awake = False
-    crew._far_anchored = lay == AT_ANCHOR
+    crew._far_anchored = lay == AT_ANCHOR and how_she_lies(vessel) == AT_ANCHOR
+    tackle_as_she_lies(vessel, crew)
     if seated:
         crew.record(
             Severity.URGENT,

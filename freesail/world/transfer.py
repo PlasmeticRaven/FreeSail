@@ -17,6 +17,7 @@ they stand and said in her log, and checked again as the boat comes to where she
 from __future__ import annotations
 
 import math
+import re
 from typing import Any
 
 from freesail import units
@@ -182,8 +183,12 @@ def read_counts(words: str) -> tuple[bool, dict[str, int], int, list[str]]:
         collective := "the people" | "all the people" | "her people"
                     | "the hands" | "all the hands" | "all hands"
         count      := number ("hands" | "hand" | "men" | "seamen" | a rating)
-        name       := [title] word [word]       (her whole name, a surname, a title and one)
-                    | "the" word [word]          (a role: "the boatswain", "the first mate")
+        name       := [title] word {word}       (a person's address, whole or without its
+                                                title, a surname, a title and a surname;
+                                                at most four words after the title)
+                    | ["the"] word {word}        (a role: "the boatswain", "master-at-arms",
+                                                "the lieutenant of marines", "the 2nd mate")
+        word       := letters and digits, with a hyphen or an apostrophe within
 
     No word excludes (there is no "but" or "except"), and none joins but the comma and "and";
     a part that is none of these is refused, saying it was not understood. Whether a name is
@@ -226,27 +231,32 @@ _PEOPLE = frozenset({"the people", "all the people", "her people"})
 
 
 def name_shaped(part: str) -> bool:
-    """Whether a part of the list has the shape of a name (the grammar's `name`): one or two
-    words, or a title or 'the' and one or two words; letters, a stop of a contraction or an
-    apostrophe alone."""
-    words = part.replace(".", " ").split()
-    if not words or any(not w.replace("'", "").isalpha() for w in words):
+    """Whether a part of the list has the shape of a name (the grammar's `name`): one to four
+    words after an optional title or 'the', each of letters and digits with a hyphen or an
+    apostrophe within (the stop of a contraction read away)."""
+    words = part.replace(".", " ").lower().split()
+    if not words or any(not _WORD.match(w) for w in words):
         return False
-    head = words[0].lower()
-    body = words[1:] if head in _TITLES or head == "the" else words
-    return 1 <= len(body) <= 2
+    body = words[1:] if words[0] in _TITLES or words[0] == "the" else words
+    return 1 <= len(body) <= 4
+
+
+_WORD = re.compile(r"^[a-z0-9](?:[a-z0-9'\-]*[a-z0-9])?$")
 
 
 def _not_understood(part: str) -> str:
+    """The refusal of a part that is no name, count or collective, his words given back as he
+    said them, in the ship's voice (the lead's fourth reading, item 6)."""
     return (
-        f"Not understood: '{part}'. The order reads a list of those who go, joined by commas "
-        "and 'and': each a name of hers ('Mr Pascoe', 'Oliver', 'the boatswain'), a number of "
-        "hands or of a rating ('twelve hands', 'six able seamen'), 'the people' or 'the hands'."
+        f"Who is meant by '{part}'? Name each who goes, as 'Mr Pascoe' or 'the boatswain', or "
+        "say how many hands, or 'the people', or 'the hands'."
     )
 
 
 # The titles a surname may be said with.
-_TITLES = frozenset({"mr", "mister", "mrs", "miss", "captain", "lieutenant", "doctor", "dr"})
+_TITLES = frozenset(
+    {"mr", "mister", "mrs", "miss", "captain", "lieutenant", "sergeant", "doctor", "dr"}
+)
 
 
 def _split_and(text: str) -> list[str]:
@@ -660,9 +670,10 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
         key = " ".join(words.replace('"', " ").split()).lower()
         found = [p for p in hers if _answers_to(p, key)]
         if not found:
-            raise TransferError(
-                f"Nobody of the {_name(giver)}'s answers to '{_as_a_name(words)}' aboard her."
-            )
+            raise TransferError(f"Nobody of the {_name(giver)}'s answers to '{words}' aboard her.")
+        if len(found) > 1:
+            names = ", ".join(p.name for p in found[:-1]) + f" and {found[-1].name}"
+            raise TransferError(f"{names} each answer to '{words}'; name the one who goes.")
         if left_to and found[0].id == left_to:
             raise TransferError(
                 f"{found[0].name} has the {_name(giver)} left in his charge; he stays in her "
@@ -674,19 +685,21 @@ def _persons(root: Any, giver: Any, rest: list[str], laid: bool = False) -> list
 
 
 def _answers_to(person: Any, key: str) -> bool:
-    """A name as said, whole ('Mr Pascoe', 'Richd. Oliver', 'Oliver', 'Mr Oliver') or a role
-    ('the boatswain'): the stops of a name's contraction read away on both sides."""
+    """Whether a name-shaped part names this person (the grammar's `name`): his address whole
+    ('Mr Pascoe', 'Richd. Oliver') or without its title ('pascoe', 'john smith' for Mr John
+    Smith), his role with 'the' or without ('the boatswain', 'master-at-arms'), or his surname
+    after any title ('Mr Oliver', 'Captain Bowen'); the stops of a contraction read away on
+    both sides. Never a part's last word alone where the part is more than a surname."""
     name = " ".join(str(getattr(person, "name", "")).lower().replace(".", " ").split())
-    role = str(getattr(person, "role", "")).lower()
-    key = " ".join(key.replace(".", " ").split())
+    role = " ".join(str(getattr(person, "role", "")).lower().split())
+    key = " ".join(key.lower().replace(".", " ").split())
     if not key or not name:
         return False
-    if key == name or key.removeprefix("the ") == role:
-        return True
-    # his surname alone, or with a title: the whole part one name (the third reading, item 3:
-    # a part matched by its last word moved the wrong man)
-    surname = name.split()[-1]
     words = key.split()
+    bare = name.split()[1:] if name.split()[0] in _TITLES else name.split()
+    if key == name or words == bare or key.removeprefix("the ") == role:
+        return True
+    surname = name.split()[-1]
     return words == [surname] or (len(words) == 2 and words[0] in _TITLES and words[1] == surname)
 
 
@@ -774,14 +787,6 @@ def _count_words(n: int, what: str = "hand") -> str:
     from freesail.combat.guns import count_words
 
     return f"{count_words(n)} {what}" + ("" if n == 1 else "s")
-
-
-def _as_a_name(words: str) -> str:
-    """The order's words (normalised to the lower case) said as a name: 'Mr Nobody'."""
-    if words.lower().startswith("the "):
-        return words.lower()  # a role, as said: 'the cook'
-    small = {"the", "of", "and", "a", "an"}
-    return " ".join(w if w in small else w[:1].upper() + w[1:] for w in words.split())
 
 
 def _number(n: int) -> str:

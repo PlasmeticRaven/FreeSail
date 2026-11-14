@@ -853,14 +853,12 @@ def players_station(world: Any) -> str:
 
 
 def knows_of(world: Any, vessel: Any) -> bool:
-    """Whether the player knows of this ship (package 60, the lead's fourth round: one question,
-    one answer, wherever an order of his names a ship): she is his (the ship he commands, one
-    he has left, one given him); she is in sight now, as his lookout names a sail; or her name
-    has been said in his own ship's log in a line that reaches somebody aboard (met, hailed,
-    sighted by name, told of; never the record's own lines, the director's world orders among
-    them). A ship he knows of by none of these is to him as a name of no ship is."""
+    """Whether the player knows of this ship (package 60; the lead's ruling on the fourth
+    reading: one answer, no search of a log): she is one of his own (the ship he commands, one
+    he has left, one given him), or a sail in sight whose name his lookout has made out (the
+    lookout's own record of what is made out of each sail, and a name she has given). Of every
+    other ship he knows nothing, which is true of one once met and now gone."""
     from freesail.world.command import HULLS_LEFT, given_to
-    from freesail.world.lookout import vessel_in_sight
 
     root = _root(world)
     vid = str(getattr(vessel, "id", "") or "")
@@ -869,22 +867,29 @@ def knows_of(world: Any, vessel: Any) -> bool:
         return True
     if vid in set(root.__dict__.get(HULLS_LEFT) or ()) or given_to(root, vid):
         return True
+    return named_in_sight(players, vessel)
+
+
+def named_in_sight(hull: Any, vessel: Any) -> bool:
+    """Whether this ship is a sail in sight of the hull whose name her lookout has made out:
+    her name among the words made out of her, or given by her hail (`Lookout._sail_known`,
+    `Lookout._sail_ident`)."""
+    import re
+
+    lookout = getattr(hull, "lookout", None)
     name = str(getattr(vessel, "name", "") or "")
-    if not name:
+    if lookout is None or not name:
         return False
-    if players is not None:
-        with root.as_hull(players):
-            if vessel_in_sight(root, name) is vessel:
-                return True
-        for e in getattr(players, "log", ()):
-            # a line that reaches somebody aboard (the record's own, a world order's, never:
-            # the director's word that puts a ship on the sea is not his knowing of her)
-            kind = str(getattr(e, "kind", "") or "")
-            if reach_of(kind) == "record" or kind.startswith("order."):
-                # nor his own order naming her, given or refused: his word is not her news
-                continue
-            if name in str(getattr(e, "text", "")):
-                return True
+    pattern = re.compile(rf"\b{re.escape(name.lower())}\b")
+    known = getattr(lookout, "_sail_known", {}) or {}
+    ident = getattr(lookout, "_sail_ident", {}) or {}
+    for s in getattr(lookout, "sightings", ()) or ():
+        if getattr(s, "seen_as", "") != "sail" or str(s.feature.modern) != str(vessel.id):
+            continue
+        fid = s.feature.id
+        given = str((ident.get(fid) or {}).get("name") or "").lower()
+        if given == name.lower() or pattern.search(str(known.get(fid, "")).lower()):
+            return True
     return False
 
 

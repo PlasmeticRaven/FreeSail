@@ -382,17 +382,18 @@ def test_a_person_in_a_boat_lost_on_an_errand_to_another_ship_is_picked_up():
 LIST_SHAPES = [
     ("Mr Pascoe and two hands", {"Mr Pascoe"}, 2),
     ("Mr Pascoe, Richd. Oliver and two hands", {"Mr Pascoe", "Richd. Oliver"}, 2),
+    ("Mr Pascoe; Richd. Oliver", {"Mr Pascoe", "Richd. Oliver"}, 0),  # as said: a list
     ("Pascoe and Oliver", {"Mr Pascoe", "Richd. Oliver"}, 0),
     ("Mr Oliver", {"Richd. Oliver"}, 0),
     ("the boatswain and the boy", {"Mr Pascoe", "Richd. Oliver"}, 0),
+    ("boatswain", {"Mr Pascoe"}, 0),
     ("the people and two hands", {"Mr Pascoe", "Richd. Oliver"}, 2),
     ("six able seamen, and four ordinary", set(), 10),
-    ("all the people but Mr Pascoe", "Not understood: 'all the people but mr pascoe'", 0),
-    ("Mr Pascoe with Richd. Oliver", "Not understood", 0),
-    ("the Sherbourne's cook Oliver", "Not understood", 0),
-    ("Mr Pascoe; Richd. Oliver", "Not understood", 0),  # its semicolon read away
-    ("some of the men", "Not understood", 0),
-    ("two dozen barrels", "Not understood", 0),
+    ("all the people but Mr Pascoe", "Who is meant by 'all the people but Mr Pascoe'?", 0),
+    ("two dozen barrels", "Who is meant by 'two dozen barrels'?", 0),
+    ("Mr Pascoe with Richd. Oliver", "answers to 'Mr Pascoe with Richd. Oliver'", 0),
+    ("the Sherbourne's cook Oliver", "answers to 'the Sherbourne's cook Oliver'", 0),
+    ("some of the men", "answers to 'some of the men'", 0),
     ("Mr Nobody", "answers to 'Mr Nobody'", 0),
     ("the purser", "answers to 'the purser'", 0),
     ("Oliver Cromwell", "answers to 'Oliver Cromwell'", 0),
@@ -405,15 +406,10 @@ def test_the_list_of_those_who_go_is_read_by_its_grammar():
     name; no word that excludes), each shape of the table read as it says or refused saying
     what was not understood; and a name is a whole name, never a part's last word (before,
     'all the people but Mr Pascoe' sent him alone, 'Mr Pascoe with Richd. Oliver' Oliver)."""
-    from freesail.orders.grammar import parse
-
     w, cutter, fly, me = cutter_and_the_fly_taken_up()
     hands = len(TR._hands(cutter))
     for said, want, n in LIST_SHAPES:
-        # the words as the order hands them on (its normalising: lower case, stops and the
-        # semicolon read away), and the reading of them
-        text = parse(cutter.ship, f"transfer {said} to the Fly").text
-        words = text.removeprefix("transfer ").removesuffix(" to the fly")
+        words = said  # as the order hands them on (`Order.said`: as he typed them)
         if isinstance(want, set):
             every, by_rating, count, rest = TR.read_counts(words)
             moved = {p.name for p in TR._persons(w, cutter, rest, laid=True)}
@@ -668,20 +664,64 @@ def test_a_ships_name_is_answered_in_the_orders_own_words():
     with pytest.raises(OrderError, match="^You command no ship here"):
         ship_for_him(types.SimpleNamespace(observed=True), "the Fly")
     assert ship_for_him(w, "the ship") is fly and ship_for_him(w, "Fly") is fly
-    # the one answer to 'does he know of this ship' (`knowledge.knows_of`), by its cases: the
-    # ship he commands, the one he left, a sail in sight; and not a ship put on the sea by the
-    # director's word ninety miles off, though the record names her
+
+
+def test_he_knows_of_his_own_ships_and_of_a_sail_in_sight_whose_name_is_made_out():
+    """The lead's ruling on the fourth reading (no search of a log): `knowledge.knows_of` by its
+    cases. His own three kinds (the ship he commands, the one he left, one given him); a sail
+    close aboard whose name the lookout has made out; a sail in sight not yet named (answered by
+    what is made out of her, her name never said back); ships named like a port and like a
+    sail, unknown to him; a ship met and gone."""
+    from freesail.world import crews as K
+    from freesail.world.geo import parse_position
     from freesail.world.knowledge import knows_of
 
-    _wo(
-        w,
+    w, cutter, fly, me = cutter_and_the_fly_taken_up()
+    for spec in (
         'ship: a brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
         "intent: bound for Falmouth",
-    )
+        'ship: a lugger "Kestrel" of Britain at 50 07.2 N 4 58.5 W, bound for Falmouth, '
+        "intent: bound for Falmouth",
+        'ship: a brig "Falmouth" of Britain at 49 00 N 6 30 W, bound for Plymouth, '
+        "intent: bound for Plymouth",
+        'ship: a brig "Jib" of Britain at 49 00 N 6 40 W, bound for Plymouth, '
+        "intent: bound for Plymouth",
+        # at Plymouth's anchorage, forty miles off: given him in play, never in sight
+        'ship: a brig "Lark" of Britain at 50 20.5 N 4 08.9 W, bound for Plymouth, '
+        "intent: bound for Plymouth",
+    ):
+        _wo(w, spec)
+    _wo(w, f'command: a new command for {me.name}: the brig "Lark" at Plymouth')
+    w.run(180)
+
+    def known(name):
+        return knows_of(w, w.sea_vessels.find(name))
+
+    assert known("Fly") and known("Sherbourne") and known("Lark")  # his three kinds
+    # close aboard, what she is made out ('a merchant brig, deep laden') and not her name
+    assert not known("Hind")
+    e = w.submit("transfer two hands to the brig")
+    assert e.kind == "order.rejected" and "The brig is no ship of yours." in e.text, e.text
+    assert "Hind" not in e.text
+    assert w.submit("hail the brig").kind == "hail.answered"  # 'The Hind of Plymouth ...'
+    w.run(60)
+    assert known("Hind")  # her name made out, by her hail
+    assert not known("Kestrel") and not known("Falmouth") and not known("Jib")
+    e = w.submit("transfer two hands to the lugger")
+    assert e.kind == "order.rejected" and "The lugger is no ship of yours." in e.text, e.text
+    assert "Kestrel" not in e.text
+    for name in ("Falmouth", "Jib", "Kestrel"):
+        e = w.submit(f"transfer two hands to the {name}")
+        assert f"You know of no ship called the {name} hereabouts." in e.text, e.text
+    e = w.submit("transfer two hands to the Hind")
+    assert "The Hind is not yours to man" in e.text, e.text
+    # the Hind gone out of sight: met and gone, and he knows of her no longer
+    hind = w.sea_vessels.find("Hind")
+    if hind.crew is not None and hind.crew.awake:
+        K.demote(w, hind)
+    hind.position = parse_position("48 30 N 7 30 W")
     w.run(120)
-    seen = {name: knows_of(w, w.sea_vessels.find(name)) for name in ("Fly", "Sherbourne", "Hind")}
-    assert seen == {"Fly": True, "Sherbourne": True, "Hind": True}, seen
-    assert not knows_of(w, w.sea_vessels.find("Distant"))
+    assert not known("Hind")
 
 
 def test_the_refusals_played_by_the_order():
@@ -699,6 +739,8 @@ def test_the_refusals_played_by_the_order():
         'ship: a brig "Hind" of Britain at 50 09.8 N 5 02.2 W, bound for Falmouth, '
         "intent: bound for Falmouth",
     )
+    w.run(60)
+    assert w.submit("hail the brig").kind == "hail.answered"  # her name known by her answer
     w.run(60)
     e = w.submit("transfer two hands to the Hind")
     assert e.kind == "order.rejected" and "The Hind is not yours to man" in e.text, e.text
