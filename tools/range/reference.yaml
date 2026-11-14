@@ -1,0 +1,116 @@
+# The range's audit: the reference it measures the wars and the nations against (package
+# 103a, `tools/audit_range.py`; the lead's ruling B on the ground report, 2026-11-14).
+#
+# THIS IS NOT RESEARCH, AND IT IS NOT THE GAME'S DATA. Nothing under freesail/ reads this
+# file; only the audit does. The game's own tree is silent on which wars and which nations
+# are a day's own (data/nations.yaml carries the wars of June 1805 with no end and no peace,
+# and no nation with a lifetime), so the audit could say only "undated". This table lets it
+# say what is wrong on a day: the wars and the peaces between the nations data/nations.yaml
+# names, the general peaces, and the lifetimes of those nations, from 1792 to 1825, and
+# nothing more. Every row is marked FROM MEMORY with the writer's confidence, unless a work
+# on file already gives it, when the row cites where the tree cites it and drops the mark.
+# Milestone 7c reads every row against a source before any of it becomes the game's data.
+# A finding that rests on this file is a kind of its own (`basis: reference`, its owner "a
+# judgement to be read against a source") and is counted apart from the mechanical findings,
+# which stand whole if this file is thrown away.
+#
+# The form. `since` and `until` are days, both counted in, as the game's dated rows are
+# (`ports._dated_nation`): a war's `until` is the last day of the war, the day before the
+# peace was signed or ratified; a row with no `since` began before the range and one with no
+# `until` outlasts it. `days:` says how far the days themselves are known: "known" (the day
+# remembered or cited), "month" (the month remembered; the day entered is the one
+# remembered where the note gives one and says it is not sure, else the month's first or last),
+# "year" (the year only, the day put at 1 January or 31 December). `confidence:` is the
+# writer's own, of the years and of the days: high, medium or low. A JUDGEMENT is said in
+# the note.
+#
+# What is left out on purpose, said and not invented: every nation the table does not name
+# (the Dutch Republic before 1795 and the kingdom of Holland after 1806, the Empire and
+# Austria, Russia, Prussia, Sweden, the Porte, Tripoli, Tuscany before 1801, the Republic
+# of Genoa before 1797, Murat's Naples, the kingdom of Italy); France's changes of
+# government (the Republic, the Empire, the two restorations), which change her flag and
+# her words and are no change of nation here; who held which port (the ports' files' own
+# business); and a war between Algiers and Tunis remembered in the years after 1807, whose
+# dates are not remembered.
+
+range: {since: 1792-01-01, until: 1825-12-31}
+
+lifetimes:
+  # The eleven nations taken as standing through the whole range (JUDGEMENT; each note says
+  # what changed within it that the table's one name hides).
+  - {nation: britain, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range; Great Britain to 31 December 1800 and the United Kingdom from 1 January 1801, when her flag changed"}
+  - {nation: france, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range, under five governments: the kingdom to September 1792, the Republic, the Empire from May 1804, the Bourbons from April 1814, the Hundred Days of 1815 and the Bourbons again"}
+  - {nation: spain, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range; from 1808 to 1813 two governments, Joseph's at Madrid and the juntas' and the Cortes' at Seville and Cadiz, of which the table's Spain is taken as the second (JUDGEMENT)"}
+  - {nation: portugal, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range; the court in Brazil from November 1807 to 1821"}
+  - {nation: denmark, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range; with Norway to January 1814"}
+  - {nation: united-states, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range"}
+  - {nation: morocco, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range"}
+  - {nation: algiers, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range, a regency of the Porte's in name"}
+  - {nation: tunis, mark: FROM MEMORY, confidence: high, days: known, note: "the whole range, a regency of the Porte's in name"}
+  - {nation: naples, mark: FROM MEMORY, confidence: medium, days: known, note: "the whole range as the Bourbon king's state (JUDGEMENT): on the mainland to February 1806 and from May 1815, in Sicily alone between, the mainland then Joseph's and Murat's kingdom, which the table does not name; the kingdom of the Two Sicilies in name from December 1816"}
+  - {nation: sardinia, mark: FROM MEMORY, confidence: medium, days: known, note: "the whole range as the King of Sardinia's state (JUDGEMENT): Piedmont, Savoy and Nice with the island to 1796 and 1798, the island alone from December 1798 to May 1814, the mainland again and Genoa with it from 1815"}
+  # The five that begin or end within the range.
+  - {nation: batavian-republic, since: 1795-01-19, until: 1806-06-04, mark: FROM MEMORY, confidence: medium, days: known, note: "proclaimed 19 January 1795 as the French entered Amsterdam; made the kingdom of Holland for Louis Bonaparte on 5 June 1806. Before it the Dutch Republic of the Stadtholder, Britain's ally; after it Holland, annexed to France in July 1810, and the Netherlands from the end of 1813: none of them in the table"}
+  - {nation: liguria, since: 1797-06-14, until: 1805-06-03, source: "the end: data/ports/genoa.yaml (the decree of 4 June 1805 annexing the Ligurian Republic, itself FROM MEMORY there)", mark: FROM MEMORY, confidence: medium, days: known, note: "the Ligurian Republic made of the Republic of Genoa on 14 June 1797; the mark stands because the tree's own row is from memory. Before it the Republic of Genoa, neutral; after 1814 Genoa the King of Sardinia's"}
+  - {nation: etruria, since: 1801-03-21, until: 1807-12-09, source: "data/nations.yaml, the comment over `etruria:` (the treaty of Aranjuez of 21 March 1801; annexed to France in December 1807; both FROM MEMORY there)", mark: FROM MEMORY, confidence: medium, days: known, note: "the day of December 1807 remembered as the 10th. Before it the Grand Duchy of Tuscany; after it departments of the French Empire to 1814, then the Grand Duchy again"}
+  - {nation: papal-state, until: 1798-02-14, mark: FROM MEMORY, confidence: medium, days: known, note: "to the Roman Republic proclaimed on 15 February 1798 under Berthier's army"}
+  - {nation: papal-state, since: 1800-07-03, until: 1809-05-16, mark: FROM MEMORY, confidence: low, days: known, note: "from Pius VII's entry into Rome, 3 July 1800 (the Roman Republic fell to the Neapolitans in September 1799: who held Civita Vecchia between is not remembered), to Napoleon's decree of 17 May 1809 annexing what was left of the state; the French in Ancona from November 1805 and in Rome from February 1808 (data/nations.yaml, the comment over `papal-state:`, FROM MEMORY there)"}
+  - {nation: papal-state, since: 1814-05-24, mark: FROM MEMORY, confidence: medium, days: known, note: "from Pius VII's return to Rome, 24 May 1814"}
+  - {nation: order-of-st-john, until: 1798-06-11, source: "data/nations.yaml, the comment over `order-of-st-john:`: the capitulation to Bonaparte of 12 June 1798 (James 1837, vol. 2, p. 170)", confidence: high, days: known, note: "the Order as sovereign of Malta, to the day before the capitulation, as the Maltese ports' dated rows have it; landless after it (JUDGEMENT: no nation of the game's once it holds no port), though the treaty of Amiens of 25 March 1802 restored it on paper (James vol. 3, p. 152, as the same comment cites it)"}
+
+wars:
+  # -- Britain and France
+  - {between: [britain, france], since: 1793-02-01, until: 1802-03-24, source: "the end: data/nations.yaml, the comment over `order-of-st-john:` (the treaty of Amiens of 25 March 1802, James 1837, vol. 3, p. 152)", mark: FROM MEMORY, confidence: high, days: known, note: "the Convention's declaration of war on Britain and the Stadtholder, 1 February 1793 (from memory; no work on file is cited for it). The preliminaries were signed on 1 October 1801 and the fighting at sea stopped by stages after them"}
+  - {between: [britain, france], since: 1803-05-18, until: 1814-05-29, source: "the end: docs/design/Design-Ship-PrinceDeNeufchatel.md §11.2 (the treaty signed at Paris on 30 May 1814, James vol. 6, p. 229)", mark: FROM MEMORY, confidence: high, days: known, note: "Britain's declaration of 18 May 1803, as data/nations.yaml has it, from memory there. Napoleon abdicated in April 1814 and a convention of 23 April stopped the fighting"}
+  - {between: [britain, france], since: 1815-03-25, until: 1815-07-07, mark: FROM MEMORY, confidence: low, days: known, note: "the Hundred Days. JUDGEMENT: no war was declared on France; the allies outlawed Bonaparte on 13 March and bound themselves against him on 25 March 1815; he abdicated on 22 June and the allies entered Paris on 7 July. The second treaty of Paris was signed on 20 November 1815"}
+  # -- Britain and Spain
+  - {between: [britain, spain], since: 1796-10-05, until: 1802-03-24, mark: FROM MEMORY, confidence: medium, days: known, note: "Spain's declaration of war after the treaty of San Ildefonso of August 1796; the day remembered as 5 October 1796, and given by some as the 8th. Ended at Amiens"}
+  - {between: [britain, spain], since: 1804-12-12, until: 1808-07-03, source: "the beginning: data/ports/barcelona.yaml (Spain's declaration of 12 December 1804, James 1837, vol. 3, p. 200); Spain Britain's ally from the summer of 1808 (James vol. 4, pp. 294 to 295, as the same file cites it)", confidence: medium, days: known, note: "the last day FROM MEMORY: the King's proclamation of peace with Spain, 4 July 1808; the treaty itself of January 1809"}
+  # -- France and Spain
+  - {between: [france, spain], since: 1793-03-07, until: 1795-07-21, mark: FROM MEMORY, confidence: medium, days: known, note: "the Convention's declaration of 7 March 1793 to the peace of Basle, 22 July 1795"}
+  - {between: [france, spain], since: 1808-06-06, until: 1814-05-29, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: the Spain of the juntas against Napoleon. Madrid rose on 2 May 1808; the junta of Seville declared war on 6 June. The end put at the general peace of 30 May 1814 (the treaty of Valençay of December 1813 was not ratified by the Cortes)"}
+  - {between: [france, spain], since: 1823-04-07, until: 1823-09-30, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT whether it is a war in the table's sense: the French army's march into Spain for Ferdinand VII against the Cortes; the Bidassoa crossed on 7 April 1823, Cadiz blockaded by a French squadron and given up at the end of September"}
+  # -- Britain and the Batavian Republic
+  - {between: [britain, batavian-republic], since: 1795-05-16, until: 1802-03-24, mark: FROM MEMORY, confidence: low, days: known, note: "the year is sure and the day is not: Dutch ships were stopped in British ports from January 1795, the republic bound itself to France at The Hague on 16 May 1795 (the day entered here), and Britain's own declaration is remembered as of September 1795. Ended at Amiens"}
+  - {between: [britain, batavian-republic], since: 1803-06-17, until: 1806-06-04, mark: FROM MEMORY, confidence: medium, days: known, note: "the beginning as data/nations.yaml has it (from memory there, 'the day uncertain'); the end the republic's own, the war going on against Holland, which the table does not name"}
+  # -- Britain and the United States; France and the United States
+  - {between: [britain, united-states], since: 1812-06-18, until: 1815-02-17, source: "docs/design/Design-Ship-PrinceDeNeufchatel.md §11.2: the war from 18 June 1812 (James vol. 5, pp. 253 and 360); the treaty signed at Ghent on 24 December 1814 and ratified at Washington on 18 February 1815 (James vol. 6, p. 236)", confidence: high, days: known, note: "the last day the day before the ratification as James gives it"}
+  - {between: [france, united-states], since: 1798-07-07, until: 1800-09-29, mark: FROM MEMORY, confidence: medium, days: known, note: "JUDGEMENT: the undeclared war at sea. Congress annulled the French treaties on 7 July 1798 and let American ships of war take French armed vessels; ended by the convention of 30 September 1800"}
+  # -- Britain and Denmark
+  - {between: [britain, denmark], since: 1801-03-30, until: 1801-04-08, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: the Baltic expedition without a declared war. The fleet passed the Sound on 30 March 1801, fought off Copenhagen on 2 April, and an armistice was signed on 9 April; Danish ships had been embargoed in British ports since January"}
+  - {between: [britain, denmark], since: 1807-08-16, until: 1814-01-13, mark: FROM MEMORY, confidence: medium, days: known, note: "the landing in Zealand of 16 August 1807 and the bombardment of Copenhagen in September, to the treaty of Kiel of 14 January 1814"}
+  # -- France, Spain and Portugal
+  - {between: [france, portugal], since: 1793-09-26, until: 1801-09-28, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: Portugal never declared it; she bound herself to Britain by a treaty remembered as of 26 September 1793 and sent troops to Roussillon and a squadron to the Channel fleet, and France treated her as an enemy until the treaty of Madrid of 29 September 1801"}
+  - {between: [france, portugal], since: 1807-11-19, until: 1814-05-29, mark: FROM MEMORY, confidence: medium, days: known, note: "Junot's army over the frontier on 19 November 1807 and in Lisbon on the 30th, to the general peace"}
+  - {between: [spain, portugal], since: 1801-02-27, until: 1801-06-05, mark: FROM MEMORY, confidence: low, days: month, note: "the war of the Oranges. Spain declared war late in February 1801 (the day remembered as the 27th and not sure) and her army crossed the frontier on 20 May; to the treaty of Badajoz of 6 June 1801. The year and the treaty are remembered with more confidence than the first day"}
+  - {between: [spain, portugal], since: 1807-11-19, until: 1808-06-05, mark: FROM MEMORY, confidence: low, days: known, note: "JUDGEMENT: Spanish divisions marched into Portugal with Junot under the treaty of Fontainebleau; ended in fact by the Spanish rising, the last day put at the day before the junta of Seville's declaration against France"}
+  # -- France and the Italian states
+  - {between: [france, naples], since: 1793-07-12, until: 1796-10-09, mark: FROM MEMORY, confidence: medium, days: known, note: "Naples bound to Britain by the treaty of 12 July 1793; an armistice in June 1796 and the peace of Paris of 10 October 1796"}
+  - {between: [france, naples], since: 1798-11-23, until: 1801-03-27, source: "the end: data/nations.yaml, the comment over `naples:` (the treaty of Florence of 28 March 1801, James vol. 3, p. 77)", mark: FROM MEMORY, confidence: medium, days: known, note: "the Neapolitan army's march on Rome, remembered as of 23 November 1798; the beginning from memory"}
+  - {between: [france, naples], since: 1806-02-08, until: 1815-05-20, source: "data/nations.yaml, `naples.relations.france` (war and the French occupation from February 1806, FROM MEMORY there); the end as data/ports/reggio.yaml and scilla.yaml have it (FROM MEMORY there)", mark: FROM MEMORY, confidence: medium, days: known, note: "the French over the frontier on 8 February 1806; the Bourbon king in Sicily at war with France and with Murat's Naples until Murat's fall, the convention of Casalanza of 20 May 1815"}
+  - {between: [france, sardinia], since: 1792-09-21, until: 1796-05-14, mark: FROM MEMORY, confidence: medium, days: known, note: "the French into Savoy and Nice in September 1792 (the day remembered as the 21st or 22nd), to the peace of Paris of 15 May 1796 after the armistice of Cherasco of 28 April. Carloforte's French months of 1793 are within it (data/ports/carloforte.yaml, Smyth 1828). What the king in his island was to France from December 1798 to 1802 is not remembered and not entered; data/nations.yaml has him at peace and rigidly neutral in 1805 (James vol. 3, p. 176)"}
+  - {between: [france, papal-state], since: 1796-06-19, until: 1796-06-22, mark: FROM MEMORY, confidence: low, days: month, note: "Bonaparte's entry into the Legations and the armistice of Bologna of 23 June 1796; the first day not remembered"}
+  - {between: [france, papal-state], since: 1797-02-01, until: 1797-02-18, mark: FROM MEMORY, confidence: low, days: month, note: "the march on Rome of February 1797 to the peace of Tolentino of 19 February; the first day not remembered"}
+  - {between: [france, order-of-st-john], since: 1798-06-10, until: 1798-06-11, source: "data/nations.yaml, `order-of-st-john.relations.france` and the comment over the nation: Bonaparte's landing of 10 June 1798 and the capitulation of the 12th (James 1837, vol. 2, p. 170)", confidence: high, days: known, note: "two days, to the day before the capitulation"}
+  # -- The Barbary regencies (the least sure rows of the table)
+  - {between: [order-of-st-john, algiers], until: 1798-06-11, source: "data/nations.yaml, `order-of-st-john.relations.algiers`: the Order's standing war against the Barbary corsairs (Smyth 1824, p. 202)", confidence: medium, days: known, note: "a standing war from before the range, to the Order's end at Malta"}
+  - {between: [order-of-st-john, tunis], until: 1798-06-11, source: "data/nations.yaml, `order-of-st-john.relations.tunis` ('as Algiers'')", confidence: medium, days: known, note: "as the row above"}
+  - {between: [algiers, portugal], until: 1813-12-31, source: "data/nations.yaml, `algiers.relations.portugal` (war, a truce of 1793 broken and no peace until 1813; FROM MEMORY there)", mark: FROM MEMORY, confidence: low, days: year, note: "from before the range to a peace remembered as of 1813; the truce of 1793 let the corsairs into the Atlantic and is not entered as a peace (JUDGEMENT)"}
+  - {between: [algiers, united-states], until: 1795-09-04, source: "data/nations.yaml, `algiers.relations.united-states` (peace by the treaty of 1795, James vol. 3, pp. 168 to 169)", mark: FROM MEMORY, confidence: medium, days: known, note: "American ships taken from 1785 and again in 1793; the treaty's day remembered as 5 September 1795"}
+  - {between: [algiers, united-states], since: 1815-03-03, until: 1815-06-29, mark: FROM MEMORY, confidence: medium, days: known, note: "the Act of Congress of 3 March 1815 to Decatur's treaty, remembered as of 30 June 1815"}
+  - {between: [algiers, france], since: 1798-12-01, until: 1801-12-16, source: "data/nations.yaml, `algiers.relations.france` (peace since the treaty of December 1801, after the rupture over Egypt in 1798; FROM MEMORY there)", mark: FROM MEMORY, confidence: low, days: month, note: "the Dey's rupture on the Porte's order after the landing in Egypt, remembered as of December 1798; the treaty's day remembered as 17 December 1801"}
+  - {between: [tunis, france], since: 1799-01-01, until: 1802-02-22, mark: FROM MEMORY, confidence: low, days: year, note: "the Bey's rupture on the Porte's order, the year not sure (the end of 1798 or the beginning of 1799); a treaty remembered as of 23 February 1802"}
+  - {between: [algiers, britain], since: 1816-08-27, until: 1816-08-29, mark: FROM MEMORY, confidence: medium, days: known, note: "JUDGEMENT: Lord Exmouth's bombardment of 27 August 1816 and the Dey's submission within three days"}
+  - {between: [algiers, britain], since: 1824-01-01, until: 1824-07-31, mark: FROM MEMORY, confidence: low, days: year, note: "a rupture with the consul and a blockade by a British squadron in 1824, ended by a convention in the summer; the months not sure"}
+  - {between: [algiers, naples], until: 1816-04-30, mark: FROM MEMORY, confidence: low, days: month, note: "the corsairs' standing war on the Neapolitan and Sicilian flag, to the treaties Lord Exmouth made for Naples in April 1816. data/nations.yaml has no entry for the pair"}
+  - {between: [algiers, sardinia], until: 1816-04-30, mark: FROM MEMORY, confidence: low, days: month, note: "as the row above, for the King of Sardinia"}
+  - {between: [tunis, naples], until: 1816-04-30, mark: FROM MEMORY, confidence: low, days: month, note: "as the rows above; data/nations.yaml, `tunis.relations.naples`, says UNVERIFIED, taken as peace"}
+  - {between: [tunis, sardinia], until: 1816-04-30, source: "data/nations.yaml, `tunis.relations.sardinia`: the regency's corsairs raided San Pietro in 1798 and carried off 850 of its people, ransomed only in 1805 (Smyth 1828, p. 309)", mark: FROM MEMORY, confidence: low, days: month, note: "the raid is on file; that it was a standing war, and its end in April 1816, are from memory"}
+  - {between: [morocco, united-states], since: 1802-06-01, until: 1803-10-11, source: "the beginning: data/nations.yaml, `morocco.relations.united-states` (Morocco had declared war in June 1802; the encyclopaedia's articles, read 2026-10-10)", mark: FROM MEMORY, confidence: low, days: month, note: "the end is not the tree's: the tree has peace since September 1803, when Preble met the Emperor at Tangier; the settlement at Tangier is remembered as of October 1803 (the day as the 12th and not sure), and the row ends the day before it. To be read against a source before either month is taken"}
+
+# The general peaces, for the report and the sampling (each is the absence of the wars
+# above, not a row the audit reads for a finding of its own).
+peaces:
+  - {name: "the peace of Amiens", since: 1802-03-25, until: 1803-05-17, source: "data/nations.yaml (the treaty of Amiens of 25 March 1802, James 1837, vol. 3, p. 152; Britain's declaration of 18 May 1803, from memory there)", mark: FROM MEMORY, confidence: high, days: known, note: "Britain at peace with every nation of the table; France at peace with all of them but, by this table, none"}
+  - {name: "the first peace of Paris", since: 1814-05-30, until: 1815-03-24, source: "docs/design/Design-Ship-PrinceDeNeufchatel.md §11.2 (James vol. 6, p. 229)", mark: FROM MEMORY, confidence: medium, days: known, note: "peace in Europe; Britain and the United States still at war to February 1815"}
+  - {name: "the general peace", since: 1815-11-20, mark: FROM MEMORY, confidence: high, days: known, note: "from the second treaty of Paris to the end of the range, but for Algiers (1816, 1824) and the French in Spain (1823)"}
