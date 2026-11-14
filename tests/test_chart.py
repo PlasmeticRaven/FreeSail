@@ -2405,21 +2405,18 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     under a chart of one region: a checkpoint's reload of a Channel save takes the chart
     of `channel-west` alone (`core/replay.py`), and it answers exactly as it did whatever
     the world's tiles on the disk."""
+    # the chart's own data as it lies, and a world of one synthetic tile in the test's own
+    # folder, which the manifest's `world:` entry names by its absolute folder (no copy of
+    # the chart and no link: a link wants a privilege on Windows, WinError 1314)
     manifest = load_manifest()
-    root = tmp_path / "charts"
-    root.mkdir()
-    for item in CHARTS.iterdir():
-        if item.name != "tiles":
-            (root / item.name).symlink_to(item)
-    (root / "tiles").mkdir()
-    for lv in ("1", "2", "3"):
-        (root / "tiles" / lv).symlink_to(CHARTS / "tiles" / lv)
+    root = CHARTS
     # a world tile over the water south of channel-west's tiles (47.70 N 6 W)
     span = 150 * 512
     s = -90 * 3600 + ((47 + 90) * 3600 // span) * span
     w = -180 * 3600 + ((-7 + 180) * 3600 // span) * span
-    path = root / "tiles" / "0" / f"{s}_{w}.npz"
-    path.parent.mkdir()
+    folder = tmp_path / "world"
+    path = folder / f"{s}_{w}.npz"
+    folder.mkdir()
     np.savez(
         path,
         elevation=np.full((512, 512), -70, dtype=np.int16),
@@ -2432,7 +2429,7 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
         min_depth_m=np.float32(140.0),
     )
     manifest = dict(manifest)
-    manifest["world"] = dict(manifest["world"], tiles=[{"name": f"{s}_{w}"}])
+    manifest["world"] = dict(manifest["world"], folder=str(folder), tiles=[{"name": f"{s}_{w}"}])
     south = Position(47.70, -6.0)
     alone = Chart("channel-west", manifest, root)
     assert [lv.level for lv in alone.levels] == [3, 2]
@@ -2441,3 +2438,4 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     assert whole.level_at(south) == 1  # the corridor answers before the world
     assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
+    assert whole.depth_at(Position(57.0, -6.0)) == 140.0  # the synthetic tile's, read

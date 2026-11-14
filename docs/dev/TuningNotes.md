@@ -28838,3 +28838,14 @@ them (truth 7-532's east bound and truth 7-521's fills) did not move once it was
    explains the cloud's longer run.
 
 The seven pass. test_longitude's chart-edge line does not move: it reads the bounds.
+
+**A test without links (the lead's word, 2026-11-14).** Step 1's
+`test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_region` built its
+tree with symbolic links, which Windows refuses without a privilege (WinError 1314, on the
+owner's machine). It now reads the chart's own data where it lies, and a world of one
+synthetic tile in the test's folder, named by the manifest's `world:` entry through an
+absolute `folder` (`_present` joins it to the root, and an absolute path stands). It proves
+the same: absent under the chart of `channel-west` alone (None at 47.70 N 6 W), present
+under `atlantic-east` beyond every layer (57 N 6 W, its 140 m read). No skip by platform.
+Grepping the chart's and the audit's tests for `symlink`, `os.link` and `hardlink`: no other
+test makes a link.
