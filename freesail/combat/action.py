@@ -573,11 +573,14 @@ def _watch_struck(world: Any, battery: Battery, tick: int) -> None:
 
 
 def _watch_changed_hands(world: Any, battery: Battery) -> None:
-    """The battery's mark has changed hands since the fire was laid on her (the module's head;
+    """The battery's mark has changed hands since she was laid on (the module's head;
     `relations.changed_hands` tells her World): asked of her as she now is by the one answer
-    (`relations.MARK`, her captain's judgement), and where she is no mark, the fire laid on her held
-    (the guns, and the marines and the small arms, who fire at the battery's mark) and the deck told
-    why; still a mark to her by the one answer, the fire goes on."""
+    (`relations.MARK`, her captain's judgement). Where she is no mark, the battery loses her as its
+    mark whether or not it was firing (the lead's last list, item 5, as sent back: a mark left
+    standing in a held battery was fired into by a later "fire as they bear", or by a book's
+    standing "open fire" reading her range), the fire laid on her is held (the guns, and the marines
+    and the small arms, who fire at the battery's mark), and the deck is told once; still a mark to
+    her by the one answer, she stays the mark and the fire goes on."""
     from freesail.combat.small_arms import Musketry
     from freesail.world import prizes as P
 
@@ -586,32 +589,38 @@ def _watch_changed_hands(world: Any, battery: Battery) -> None:
     target = str(battery.target or "")
     if not target or target not in told:
         return
+    judge = getattr(world, "captain", None)
+    if R.still(world, _own_id(world), target, R.MARK, judge=judge):
+        return
     m = extra.get("musketry")
     m = m if isinstance(m, Musketry) else None
     guns = not (battery.mode is FireMode.HOLD and battery.word is None)
     arms = m is not None and (m.mode != "hold" or (m.served and m.small_arms_mode != "hold"))
-    if not guns and not arms:
-        return  # no fire laid on her: nothing to hold
-    judge = getattr(world, "captain", None)
-    if R.still(world, _own_id(world), target, R.MARK, judge=judge):
-        return
+    # she is no mark: given up as the battery's mark, firing or not, so that nothing reads her
+    battery.target = None
+    battery.target_words = ""
+    battery.target_relative_rad = None
     if guns:
         battery.mode = FireMode.HOLD
         battery.word = None
     if arms:
         m.mode = "hold"
         m.small_arms_mode = "hold"
-    held = " and ".join(x for x, on in (("the guns", guns), ("the small arms", arms)) if on)
     v = R.ship_of(world, target)
     rec = P.record_of(v) if v is not None else None
     back = (rec or {}).get("retaken") or (rec or {}).get("restored")
     how = f"is {back[0]}" if isinstance(back, (tuple, list)) and back else "has changed hands"
     words = _words_in(world, target, str(getattr(v, "name", "") or "the mark"))
+    if guns or arms:
+        held = " and ".join(x for x, on in (("the guns", guns), ("the small arms", arms)) if on)
+        said = f"{_cap(words)} {how}: {held} hold their fire."
+    else:
+        said = f"{_cap(words)} {how}: she is the guns' mark no longer."
     world.record(
         Severity.URGENT,
         "action.mark_changed_hands",
-        f"{_cap(words)} {how}: {held} hold their fire.",
-        data={"id": target, "guns": guns, "small_arms": arms},
+        said,
+        data={"id": target, "guns": guns, "small_arms": arms, "mark_given_up": True},
     )
 
 

@@ -372,6 +372,127 @@ def test_a_mark_that_changes_hands_under_fire_is_judged_anew_and_the_fire_held(h
     assert said[0].text == f"A merchant brig is {how}: the guns hold their fire."
     # the minute's line after the change says the shot of that minute before it, and none after
     assert not [e for e in w.log if e.kind == "action.fired" and e.tick > at + 60]
+    assert battery.target is None  # given up as the mark (item 5, as sent back)
+
+
+# -- item 5, as sent back (nudge 13): a held battery, a standing order and a crewed hull ----------
+
+
+def _held_and_retaken():
+    """`_firing_into_an_enemys_prize`, the fire then held ("hold your fire"), and the French prize
+    retaken by the Amethyst while no gun is firing: the tick of the change and the battery."""
+    w, brig, am = _firing_into_an_enemys_prize()
+    battery = battery_of(w.ship)
+    assert w.submit("hold your fire").kind == "guns.mode"
+    w.run(30)
+    assert battery.target == brig.id and battery.mode is FireMode.HOLD
+    P.retake(w, brig, by="the Amethyst coming up", how="retaken", captor=am)
+    at = w.clock.tick
+    w.run(60)
+    return w, brig, battery, at
+
+
+def test_a_held_battery_gives_up_a_mark_that_changes_hands_and_fires_no_more_at_her():
+    """Item 5 as the lead sent it back (2026-11-14, 22:00 UTC; the owner's word). The cause: MARK
+    was asked once, at the tick of the change, and only of fire being laid then, so a mark that was
+    no longer one stayed standing in a held battery. Mended where it lives
+    (`combat.action._watch_changed_hands`): at the change every battery laid on her loses her as
+    its mark whether or not it is firing, the deck told once in true words; and an order to fire as
+    they bear with no mark standing is answered as one with no mark is (`orders.gunnery._mode`).
+    The reader's case: the fire held, the prize retaken, then "fire as they bear". Old (2190ce29):
+    the retaken British brig still the mark, the order accepted, 27 shot into her in two minutes,
+    no word from the deck."""
+    w, brig, battery, at = _held_and_retaken()
+    assert battery.target is None
+    said = [e for e in w.log if e.kind == "action.mark_changed_hands"]
+    assert len(said) == 1 and said[0].tick == at + 1, [e.text for e in said]
+    assert said[0].text == "A merchant brig is retaken: she is the guns' mark no longer."
+    before = battery.rounds_fired
+    r = w.submit("fire as they bear")
+    assert r.kind == "guns.mode" and "No mark is engaged" in r.text, r.text
+    w.run(120)
+    assert battery.rounds_fired == before and battery.target is None
+
+
+def test_a_standing_open_fire_reads_no_range_of_a_mark_that_changed_hands():
+    """Item 5 as sent back, the book's standing order "open fire: when the range is under N cables
+    then fire as they bear" (every captain's book has it), which reads the battery's mark's range
+    (`api.action_readings._range`), run against the retaken prize with the fire held. Old
+    (2190ce29): her range read from the mark left standing, the order carried out with no word of
+    the player's, and shot into her. Now the mark is given up, the range reads nothing, and no
+    gun fires."""
+    w, brig, battery, _at_change = _held_and_retaken()
+    before = battery.rounds_fired
+    r = w.submit(
+        'standing order "open fire": when the range is under 5 cables then fire as they bear'
+    )
+    assert r.kind != "order.rejected", r.text
+    w.run(180)
+    assert battery.target is None and battery.mode is FireMode.HOLD
+    assert battery.rounds_fired == before
+
+
+def test_a_crewed_rules_hull_firing_into_a_prize_gives_her_up_when_she_is_retaken():
+    """Item 5 as sent back, on a crewed hull that WAS firing before the change: a British frigate
+    under her rules captain, her guns ready, a French-held British brig put on her starboard beam
+    a fifth of a mile off, engaged and fired into; the brig then retaken by the Amethyst. The hull's
+    battery gives her up as its mark and holds its fire, her own deck told once in her log (her
+    World judges, `relations.changed_hands` telling it). Old (2190ce29): the same hold (the guns
+    were firing), the mark left standing."""
+    w = world_at(49.5, -5.5)
+    w.crewed_settings = {"cap": 2}
+    w.submit("heave to")
+    w.run(60)
+    north = destination(w.position, 0.0, 1.0 * units.NAUTICAL_MILE)
+    th = put(
+        w,
+        "frigate",
+        "britain",
+        _at(north),
+        "bound for Falmouth",
+        "bound for Falmouth",
+        name="Thetis",
+    )
+    hx = th.crew if th.crew is not None else crews.promote(w, th)
+    cap = hx.captain
+    for order, then in (
+        ("beat to quarters", 120),
+        ("cast loose the guns", 200),
+        ("load with round shot", 0),
+        ("run out the guns", 240),
+    ):
+        cap.give(order, why="a test")
+        w.run(then)
+    head = math.degrees(float(hx.ship.heading))
+    s = destination(th.position, (head + 90.0) % 360.0, 0.2 * units.NAUTICAL_MILE)
+    brig = put(w, "merchant brig", "britain", _at(s), "bound for Falmouth", "bound for Falmouth")
+    _taken_by_the_french(w, brig, east_nm=1.5)
+    brig.plan = [("lie_to", math.inf)]
+    brig.brain = None
+    far = destination(w.position, 200.0, 3.0 * units.NAUTICAL_MILE)
+    am = put(
+        w,
+        "frigate",
+        "britain",
+        _at(far),
+        "cruising off the Lizard within 20 miles",
+        intent="cruise off the Lizard within 20 miles",
+        name="Amethyst",
+    )
+    w.run(60)
+    assert cap.give("engage the merchant brig to starboard", why="a test").kind == "guns.engage"
+    battery = battery_of(hx.ship)
+    w.run(180)
+    before = battery.rounds_fired
+    assert before > 0 and battery.target == brig.id
+    P.retake(w, brig, by="the Amethyst coming up", how="retaken", captor=am)
+    at = w.clock.tick
+    w.run(300)
+    assert battery.target is None and battery.mode is FireMode.HOLD
+    assert battery.rounds_fired == before
+    said = [e for e in hx.log if e.kind == "action.mark_changed_hands"]
+    assert len(said) == 1 and said[0].tick == at + 1, [e.text for e in said]
+    assert said[0].text == "A merchant brig is retaken: the guns hold their fire."
 
 
 # -- the review of 0dcdb8cf: the player's ship's own names, and the hail ---------------------------

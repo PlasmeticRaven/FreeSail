@@ -600,6 +600,17 @@ def _mode(ship: Any, battery: Battery, mode: FireMode) -> Result:
         FireMode.BY_DIVISIONS: "Fire by divisions: the forward and the after guns by turns.",
         FireMode.HOLD: "Hold your fire: no gun fires but by name or at the word.",
     }[mode]
+    if mode is not FireMode.HOLD and battery.target is None:
+        # no mark standing (none engaged, or one given up when she changed hands: the lead's last
+        # list, item 5): the doctrine stands for the mark to come, and the order is answered as
+        # one to fire with no mark is (`_fire`), never as if a gun would fire
+        battery.mode = mode
+        battery.word = None
+        return (
+            "guns.mode",
+            f"{words} No mark is engaged: say 'engage her to starboard' to lay the guns.",
+            {"verb": "fire mode", "level": 1, "mode": str(mode), "no_mark": True},
+        )
     if battery.mode is mode:
         return (
             "guns.mode",

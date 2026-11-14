@@ -21746,6 +21746,62 @@ when she bears on the other side (`Captain._engaging`) is the order's "her", the
 may be fought, which may be another than the battery's mark he keeps (`Captain._mark`): older, the
 order's rule, item 51.
 
+### Item 5, as sent back (the lead's note of 2026-11-14, 22:00 UTC, nudge 13)
+
+Two more readers found 2190ce29 sound but for item 5; the owner's word: "Sending the item back to
+finish is quite alright, but I would like to get to wrapping up what is in flight without too much
+more finagling."
+
+**The cause.** MARK was asked once, at the tick of the change, and only of fire being laid then
+(`combat.action._watch_changed_hands` returned where no gun was firing), so a mark that was no longer
+one stayed standing in a held battery: read by a later "fire as they bear", and by a book's
+standing "open fire" through her range (`api.action_readings._range`).
+
+**The mend, where it lives.**
+- At a change of hands every battery laid on her asks the one answer of her as she now is. Where
+  she is no mark, the battery loses her as its mark whether or not it is firing (`target`,
+  `target_words` and `target_relative_rad` given up). The fire laid on her is held, and the deck is
+  told once:
+  - "A merchant brig is retaken: the guns hold their fire." where it was firing;
+  - "A merchant brig is retaken: she is the guns' mark no longer." where none was.
+- An order to fire as they bear or by divisions with no mark standing is answered as an order with
+  no mark is (`orders.gunnery._mode`): the doctrine stands for the mark to come, and the answer says
+  "No mark is engaged: say 'engage her to starboard' to lay the guns." It never answers as if a gun
+  would fire.
+
+**Where else it was looked for.**
+- The far rounds re-ask MARK every round (`_pairs`).
+- `Captain._mark` and the engage order ask it at their choice.
+- The struck mark is held by `_watch_struck`, where the struck ship stays the mark for the possession.
+- Musketry fires at the battery's mark, so it is served by the same giving up.
+- Nothing else reads the battery's mark across a change of hands.
+
+**Measured, old (2190ce29) beside new**, the player's frigate at quarters, firing into a French-held
+British brig a quarter of a mile on her beam, the Amethyst three miles north, seed 7:
+- The fire held, the brig retaken, then "fire as they bear": old, the retaken brig still the mark and
+  the order accepted (the reader's 27 shot in two minutes); new, the mark given up at the tick after
+  the change, the order answered with no mark engaged, no shot.
+- The book's standing "open fire: when the range is under 5 cables then fire as they bear", entered
+  after the retake with the fire held: old, "Fire as they bear" at once and 34 shot into her in
+  three minutes (63 to 97), no word of the player's; new, no shot (63 to 63), the range reading
+  nothing.
+- A crewed British frigate under her rules captain, her guns ready, the brig put on her starboard
+  beam a fifth of a mile off and engaged, 13 rounds fired, then the brig retaken: her battery gives
+  her up and holds its fire, said once in her own log.
+
+**Tests** (`tests/test_far_last_list.py`; each fails on 2190ce29's code):
+`test_a_held_battery_gives_up_a_mark_that_changes_hands_and_fires_no_more_at_her`,
+`test_a_standing_open_fire_reads_no_range_of_a_mark_that_changed_hands` and
+`test_a_crewed_rules_hull_firing_into_a_prize_gives_her_up_when_she_is_retaken`; the firing case's
+test also asserts the mark given up.
+
+**Lines that change:**
+- "... she is the guns' mark no longer." (new, `action.mark_changed_hands`);
+- the fire-mode orders' answer with no mark standing, which adds "No mark is engaged: say 'engage
+  her to starboard' to lay the guns.";
+- no recorded passage. The four whole logs are as at 2190ce29, and the captain's trials are
+  unchanged.
+
 ## The lead's ruling 10, one road (package 75) (2026-11-13)
 
 The lead's note of 2026-11-13 at 04:11 UTC (`docs/dev/M7-WorkPackages.md`, at its end), ruling
@@ -23948,6 +24004,26 @@ built** ("The last list's review mends", below):
     20a8e2e3; the library now says when they are read (F5), and whether such work should stop with
     its sail (`Runner._tick_script` reading them each tick, which would move lines) is the lead's
     ruling.
+
+68. Two works still named by their ids beyond 64's five, which the naming sweep cannot see
+    because the pinned words are the id-words: `serve_small_arms` ("Belayed serving small arms",
+    where its own order says "serve out the small arms") and `rig_preventers` ("rig preventers").
+    The readers of 2190ce29.
+69. The gerund rule (`Runner._doing` making the gerund from `work:`) is wrong for verbs not yet in
+    the data (refit, occur, prefer). The readers of 2190ce29.
+70. A kedge whose standing condition fails in the pull out leaves the long-boat away (reached only
+    by a made hold). The readers of 2190ce29.
+71. `send_boat`'s plan gone stale when she has drifted while held. The readers of 2190ce29.
+72. An old save's outcome lines keep the old words. The readers of 2190ce29.
+73. `_fold_old_book` made a no-op, and the near battery's write to the one record of who fired, are
+    caught by no test. The readers of 2190ce29.
+74. A consort of the player's, taken and retaken, does not come back under his orders. The readers
+    of 2190ce29.
+75. A struck captor still holds her prize. The readers of 2190ce29.
+76. The allies' table has no dates. The readers of 2190ce29.
+77. `engage her to starboard` accepts a mark to larboard. The readers of 2190ce29.
+78. Taking possession raises for a captor whose nation has no port. The readers of 2190ce29.
+79. A read of `Judgement.fired_on` makes empty rows in the record. The readers of 2190ce29.
 
 ### Phase 5's integration: the truths moved, and these records
 
