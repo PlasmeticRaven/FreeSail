@@ -115,17 +115,7 @@ crew_pool:
 
 closed_to: []
 
-# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
-# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
-# game's land guard passes in and out; read against the pilot's channel: from the west round
-# Point Liche into the sound, as the pilot has it.
-# Its least depth along the way, by the grid at its datum: 5.5 m, drawn through
-# water of 3 m and more on every leg.
-# The tracks before, which the guard refused:
-#   to_sea: [agincourt-sound, maddalena-road, 41 13 N 9 18 E]
-#   from_sea: [41 13 N 9 18 E, maddalena-road, agincourt-sound]
-#   in: [agincourt-sound]
 tracks:
-  to_sea: [41 12.25 N 9 24.44 E, 41 12.83 N 9 20.53 E]
-  from_sea: [41 12.83 N 9 20.53 E, maddalena-road]
-  in: [maddalena-road, agincourt-sound]
+  to_sea: [agincourt-sound, maddalena-road, 41 13 N 9 18 E]
+  from_sea: [41 13 N 9 18 E, maddalena-road, agincourt-sound]
+  in: [agincourt-sound]

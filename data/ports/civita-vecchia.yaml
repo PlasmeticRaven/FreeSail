@@ -104,18 +104,7 @@ crew_pool:
 
 closed_to: []
 
-# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
-# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
-# game's land guard passes in and out; read against the pilot's channel: to the port's mouth
-# from the south-west in mid-channel.
-# Its least depth along the way, by the grid at its datum: ground drying 0.6 m, on the leg to
-# 42 05.53 N 11 47.00 E (4 of 6 legs under 3 m): the grid has no deeper way within the
-# pilot's sides, so the track stands and the audit lists it (f-shallow).
-# The tracks before, which the guard refused:
-#   to_sea: [civita-vecchia-port, civita-vecchia-road, 42 03 N 11 42 E]
-#   from_sea: [42 03 N 11 42 E, civita-vecchia-road, civita-vecchia-port]
-#   in: [civita-vecchia-port]
 tracks:
-  to_sea: [42 05.38 N 11 47.00 E, 42 03.16 N 11 43.94 E]
-  from_sea: [42 03.16 N 11 43.94 E, civita-vecchia-road]
-  in: [civita-vecchia-road, 42 05.53 N 11 47.00 E, civita-vecchia-port]
+  to_sea: [civita-vecchia-port, civita-vecchia-road, 42 03 N 11 42 E]
+  from_sea: [42 03 N 11 42 E, civita-vecchia-road, civita-vecchia-port]
+  in: [civita-vecchia-port]

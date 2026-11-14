@@ -273,6 +273,13 @@ REACH: dict[str, str] = {
     "ship.hove_to": "aboard",
     "ship.filled_away": "aboard",
     "ship.command_passes": "aboard",
+    "ship.taken_up": "aboard",  # package 60: a captain takes command of her, or leaves her
+    # package 60, step 2: her people and hands moved to another ship of his, and come aboard
+    "company.transfer": "aboard",
+    "company.came_aboard": "aboard",
+    "company.came_back": "aboard",
+    "company.went_across": "aboard",
+    "company.picked_up": "aboard",
     "ground.kedge_home": "deck",
     "ground.master": "deck",
     "spar.carried_away": "wakes",
@@ -787,6 +794,8 @@ def player_hull(world: Any) -> Any:
     players = getattr(root, "players", None)
     if players is None or is_observer(players):
         return None
+    if (getattr(root, "__dict__", None) or {}).get("_players"):
+        return players  # he has taken command of her (package 60): `--ship` stood at the start
     hulls = getattr(root, "hulls", None) or {}
     log = getattr(players, "log", None)
     if log is None or not hulls:

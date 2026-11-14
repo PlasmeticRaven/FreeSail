@@ -104,17 +104,7 @@ crew_pool:
 
 closed_to: []
 
-# Package 111, step 2b (the lead's ruling of 2026-11-13): the way in and out over the
-# grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
-# game's land guard passes in and out; read against the pilot's channel: up the middle of
-# the bay by its leading mark, as the pilot has it.
-# Its least depth along the way, by the grid at its datum: 15.0 m, drawn through
-# water of 3 m and more on every leg.
-# The tracks before, which the guard refused:
-#   to_sea: [villefranche-road, 43 40 N 7 18 E]
-#   from_sea: [43 40 N 7 18 E, villefranche-road]
-#   in: [villefranche-road]
 tracks:
-  to_sea: [43 39.24 N 7 18.82 E]
-  from_sea: [43 39.24 N 7 18.82 E, villefranche-road]
+  to_sea: [villefranche-road, 43 40 N 7 18 E]
+  from_sea: [43 40 N 7 18 E, villefranche-road]
   in: [villefranche-road]

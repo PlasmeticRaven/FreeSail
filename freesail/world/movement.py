@@ -303,7 +303,18 @@ def where_words(world: Any, person: Any) -> str:
 # moves, his needs, a question or a reading, a free line, a word said (the stations'
 # sentences are not orders of the vocabulary and come another way).
 VISITOR_VERBS = frozenset(
-    {"go to", "go below", "come on deck", "go aloft", "come aboard", "go ashore"}
+    # package 60: `take command of` her is given aboard her as a visitor, the act's own; and
+    # `transfer` her people to his ship, aboard either (step 2)
+    {
+        "go to",
+        "go below",
+        "come on deck",
+        "go aloft",
+        "come aboard",
+        "go ashore",
+        "take command of",
+        "transfer",
+    }
 )
 VISITOR_OBJECTS = frozenset({"query", "needs", "free"})
 # What a captive's prompt performs (package 74; the owner's play of 2026-11-09), and nothing
@@ -1089,7 +1100,9 @@ def put_aboard(
         return "person.aboard", f"{person.name} is aboard the {hull_name(hull)} already.", {}
     whence = ""
     if was is not None:
-        whence = f" from the {hull_name(was)}"
+        came_from = hull_name(was)  # "the Amazon's launch" carries its own article
+        the = "" if came_from.lower().startswith("the ") else "the "
+        whence = f" from {the}{came_from}"
     elif was_where in ("boat", "cutter"):
         home = hull_of(world, getattr(person, "home", ""))
         whence = f" from the {hull_name(home)}'s boat" if home is not None else " from the boat"
@@ -1207,6 +1220,16 @@ def _drivers_follow(world: Any, person: Any, hull: Any) -> None:
     if his is not person:
         return
     root.followed = str(hull.id)
+    # a sleeping hull he goes aboard is woken (package 60, the lead's second reading of
+    # 4dda3dfe, item 3): followed she is stepped, and asleep she sailed on with her file's
+    # sail set and no anchor down; woken, she rides as her far body lay
+    # (`crews.rides_as_she_lay`)
+    vessel = getattr(hull, "vessel", None)
+    sleeping = getattr(vessel, "crew", None)
+    if vessel is not None and sleeping is not None and not sleeping.awake and not vessel.done:
+        from freesail.world.crews import promote
+
+        promote(root, vessel)
     with root.as_hull(hull):
         root.record(
             Severity.ROUTINE,
