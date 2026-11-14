@@ -11,7 +11,7 @@ Liveness checks (the "is the fault live" one-liners) were run as `PYTHONPATH=. p
 <script>` from the scratch copy: without `PYTHONPATH=.` a script outside the tree imports a
 different `freesail` (an installed copy), which I found once (fault 9-1) and corrected.
 
-## Table
+## Table (tests-09; the tables of tests-10 and tests-11 head their own sections)
 
 | # | Test (file::name) | Fault | Baseline | Result | s |
 |---|---|---|---|---|---|
@@ -423,3 +423,224 @@ test_routine's named test passes (rc=0, 2 s). tests/test_hands.py::test_crew_fac
 E       assert 1.15 == 1.125 ± 1.1e-06
 ```
 
+## tests-11
+
+| # | Test (file::name) | Fault | Baseline | Result | s |
+|---|---|---|---|---|---|
+| 11-1 | test_the_ship_herself.py::test_every_stations_brief_opens_its_situation_with_the_ship | the watcher's brief not told his ship | pass (23 s) | SURVIVED | 24 |
+| 11-2 | test_via.py::test_an_intent_by_way_of_marks_gives_the_captain_the_legs | `legs_for` returns `[]` with no via | pass (8 s) | SURVIVED | 8 |
+| 11-3 | test_standing.py::test_the_dwell_waits_for_the_evolution_the_firing_started | `_still_working` returns False | pass (7 s) | KILLED | 4 |
+| 11-4 | test_world.py::test_wind_does_not_die_and_stays_near_base | the scenario's wind halved at set-up | pass (2 s) | SURVIVED | 3 |
+| 11-5 | test_staying.py::test_turning_truths_the_small_vessels_turn_in_their_own_lengths[cutter-band1-fastest_band1] | cutter's rudder 1.2 to 0.96 m², and to 0.85 m² | pass (3 s) | SURVIVED (both) | 3 + 3 |
+| 11-6 | test_studding.py::test_studding_sails_draw_at_nine_points[schooner] | the schooner's studding sails always stalled | **xfailed** (5 s) | SURVIVED (xfailed again) | 5 |
+| 11-N1a | (no test claimed) test_indefatigable.py::test_her_ship_files_posts_and_people_agree_with_her_wardroom_files[data/ships/sixty-four.yaml] | the 64's first two posts swapped in data/people | pass (1 s) | KILLED | 1 |
+| 11-N1b | (no test claimed) test_ship_particulars.py::test_generator_reproduces_the_committed_files | the smack's two posts swapped in data/people | pass (2 s) | KILLED | 3 |
+| 11-N2 | (no test claimed) test_bellerophon.py::test_her_boats_pumps_hold_and_stores | the 74's four chain pumps removed | pass (1 s) | KILLED | 2 |
+| 11-N3 | (no test claimed) a slow test renamed into the fast tier | not a fault in the game | n/a | NOT RUN | - |
+
+### 11-1 SURVIVED
+
+```diff
+--- mut/freesail/agents/harness.py
++++ freesail/agents/harness.py
+@@ -1153,7 +1153,7 @@
+-            ship="" if self._is_directors else R.ship_words(world),
++            ship="" if (self._is_directors or self.station.name == "watcher") else R.ship_words(world),
+```
+
+Named test rc=0 (24 s): it builds the brief itself with `ship=R.ship_words(w)`
+(tests/test_the_ship_herself.py:124-132), so the harness's choice is never exercised. Live,
+the watcher seated by the harness (`stationed(w, ..., st=agent.watcher(world=w))`, the helper
+of :150):
+
+```
+fault:    watcher situation starts: The last 8 lines of the log:   Morning watch, 4 bells (06:00) ...
+pristine: watcher situation starts: The ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; ...
+```
+
+The reader's claim stands.
+
+### 11-2 SURVIVED
+
+```diff
+--- mut/freesail/world/captains.py
++++ freesail/world/captains.py
+@@ -1429,6 +1429,8 @@
+     def legs_for(self, intent: Intent, start: Position, departing: str = "") -> list[Leg]:
++        if not intent.via:
++            return []
+```
+
+Named test rc=0 (8 s): `assert [lg.kind for lg in plain] == ["to"] or all(lg.kind != "via"
+for lg in plain)` (tests/test_via.py:132) is true of `[]`. Live: tests/test_captains.py::test_the_planner_joins_the_ports_tracks_and_the_common_track_by_the_iroise
+fails (baseline pass, 8 s):
+
+```
+>       assert words[:3] == ["Falmouth outer road", "50 00 N 4 57 W", "49 52 N 5 06 W"]
+E       AssertionError: assert [] == ['Falmouth ou... 52 N 5 06 W']
+```
+
+The claim about the named test stands; the suite catches the fault elsewhere.
+
+### 11-3 KILLED (the reader's suspicion refuted)
+
+```diff
+--- mut/freesail/standing/runtime.py
++++ freesail/standing/runtime.py
+@@ -500,6 +500,7 @@
+     def _still_working(self, rule: Rule) -> bool:
++        return False
+```
+
+The reef outlasts the dwell at seed 7, so the guarded assertion is reached:
+
+```
+>           assert not rule.armed, "the reef still in hand: not yet re-armed"
+E           AssertionError: the reef still in hand: not yet re-armed
+```
+
+The test is conditional (tests/test_standing.py:1229) and would go blind if the reef were
+ever made quicker than 301 s, but as it stands it catches the fault.
+
+### 11-4 SURVIVED
+
+```diff
+--- mut/freesail/core/world.py
++++ freesail/core/world.py
+@@ -809,7 +809,7 @@
+         wind_params = WindParams.from_nautical(
+             self.scenario.wind_from_deg,
+-            self.scenario.wind_speed_kn,
++            self.scenario.wind_speed_kn * 0.5,
+```
+
+Named test rc=0 (3 s). Live: the test's own world after six hours, 8.48 kn under the fault
+against 16.97 kn pristine. Its band `5 < kn < 30` (tests/test_world.py:67) for a 15-knot base
+holds both. I did not look for other tests that would catch it.
+
+### 11-5 SURVIVED
+
+```diff
+--- mut/data/ships/cutter.yaml
++++ data/ships/cutter.yaml
+@@ -79,7 +79,7 @@
+   rudder:
+-    area_m2: 1.2
++    area_m2: 0.96
+```
+
+and a second run at `area_m2: 0.85`. Measured with the test's own `turning_circle`:
+
+| rudder m² | circle (lengths) | swing (deg/s) | circle change |
+|---|---|---|---|
+| 1.2 (pristine) | 4.93 | 4.97 | |
+| 0.96 (a fifth less, as the reader said) | 5.59 | 4.33 | +13% |
+| 0.85 | 5.99 | 3.99 | +21% |
+
+Both runs rc=0 (3 s each): the band is 3.5 to 6.0 lengths and 3.5 to 7.0 deg/s
+(tests/test_staying.py:116). At 0.96 m² test_the_cutter_swings_twice_as_fast_as_the_frigate
+also passed (5 s). A circle grown by a fifth passes; the band is about 20% wide above the
+measured figure. Not run: tests/test_ship_particulars.py::test_generator_reproduces_the_committed_files,
+which would fail on any hand edit of a ship file (see 11-N1b and 11-N2) but says nothing of
+turning; the same fault made in the generator's source would pass it.
+
+### 11-6 SURVIVED (and the baseline does not pass)
+
+Baseline: the test is **xfailed** before any fault (`XFAIL ... the schooner's setup in irons
+(package 37p ...)`, `-rxX`, 5 s), by the strict mark at tests/test_studding.py:203-212. The
+schooner's case of "studding sails draw at nine points" is already broken in the game and
+recorded as expected.
+
+```diff
+--- mut/freesail/physics/sails.py
++++ freesail/physics/sails.py
+@@ -1014,6 +1014,8 @@
+     cls = SAIL_CLASSES["studding"]
++    if "schooner" in str(getattr(getattr(ship, "spec", None), "rig", "")):
++        return 1.0
+```
+
+Live: `studding_stall` gives 1.0 for the schooner's four studding sails at 3 rad off the bow,
+0.0 for the frigate's. Run with `-rxX` (no `-x`): `XFAIL ... 1 xfailed in 5.35s`. The strict
+xfail would turn red only if the schooner's studding sails began to draw; any further break
+of them is reported as expected. The reader's prediction stands exactly.
+
+### 11-N1 KILLED (refuted, both ways)
+
+The reader named smack, lugger and merchant-brig among the files whose posts no test checks.
+Their people files do carry posts (`post: true`; the smack's are master and mate).
+
+**11-N1a**, the 64: the captain's and first lieutenant's entries swapped in
+data/people/sixty-four.yaml (lines 34-56, 22 lines moved). tests/test_indefatigable.py:1203
+runs test_wardroom's check on the 64 and the razee:
+
+```
+>       assert [p.post for p in spec.crew.posts] == wardroom.posts, stem
+E       AssertionError: sixty-four
+E       assert ['captain', '...utenant', ...] == ['first lieut...utenant', ...]
+```
+
+**11-N1b**, the smack: master's and mate's entries swapped in data/people/smack.yaml (lines
+19-38); live, `PE.load_wardroom("data/ships/smack.yaml").posts == ['mate', 'master']`.
+test_wardroom.py::test_the_ship_files_posts_and_people_agree_with_the_wardroom_files passes
+(rc=0, 2 s: its four ships omit the smack), as the reader said; but the generator test
+regenerates the ship files from the people files and fails:
+
+```
+E           AssertionError: smack.yaml differs from what tools/gen_ships.py writes; edit the generator and rerun it
+```
+
+"Without regenerating the ship file" is exactly what test_generator_reproduces_the_committed_files
+catches, for every ship.
+
+### 11-N2 KILLED (refuted)
+
+The four `pump.chain.*` entries deleted from data/ships/seventy-four.yaml (lines 5640-5660;
+two hand pumps left).
+
+```
+>       assert [p.kind for p in spec.pumps] == ["chain"] * 4 + ["hand"] * 2
+E       AssertionError: assert ['hand', 'hand'] == ['chain', 'ch...hand', 'hand']
+```
+
+(tests/test_bellerophon.py::test_her_boats_pumps_hold_and_stores, baseline pass, 1 s). The
+generator test also fails on the edit. I did not try the 64 or the razee.
+
+### 11-N3 NOT RUN
+
+A slow test renamed into the fast tier is a fault in the test list, not in the game. Nothing
+to plant and run.
+
+## Count
+
+29 faults or variants tried: 18 against named tests (9-1 to 9-6, 10-1 to 10-6, 11-1 to
+11-6) and 11 of the readers' "no test would catch it" (9-N1, 9-N2, 9-N3a, 9-N3b, 10-A, 10-B,
+10-C, 11-N1a, 11-N1b, 11-N2, 11-N3). 11-5's two rudder sizes count as one.
+
+- **SURVIVED: 19.** Named: 9-1, 9-2, 9-3, 9-4, 9-5, 9-6, 10-1, 10-2, 10-3, 10-4, 10-5,
+  10-6, 11-1, 11-2, 11-4, 11-5, 11-6 (17 of 18). Uncaught: 9-N3b, 10-B.
+- **KILLED: 9.** Named: 11-3. Uncaught claims refuted: 9-N1, 9-N2, 9-N3a, 10-A, 10-C,
+  11-N1a, 11-N1b, 11-N2 (8 of 11).
+- **NOT RUN: 1.** 11-N3 (not a fault in the game).
+
+What the survivals have in common: the named test never reaches the code its name promises,
+because it supplies the answer itself (a `FakeMagazine`, a monkeypatched `begin_exercise`, a
+test-local `FATIGUE_WEIGHT`, the ship words passed into `Brief.build`, the source text
+grepped), or its assertion is a tautology or vacuous (`x == x`, `all()` of an empty list,
+`.get(..., "wasp")` on a key never set, `... or rec["prisoners"]`, `or all(...)` of `[]`, a
+guard whose date never meets its condition, a strict xfail). In eight of the seventeen another
+test elsewhere in the suite does catch the same fault (9-1, 9-2, 9-4, 9-6, 10-1, 10-3, 10-4,
+11-2); in the rest (9-3, 9-5, 10-2, 10-5, 10-6, 11-1, 11-4, 11-5, 11-6) I found none, though
+I looked only as far as each section says.
+
+## What I did not do
+
+- I did not run the whole 1,095-case `test_every_form_in_the_forms_tables_is_taken`; only the
+  five chapter-13 `veer` ids the fault touches.
+- I did not run truth 56's baseline (10-A) or the baselines of the four tests in 9-N3b and
+  the three in 10-B, all of which passed with the fault in.
+- I did not start the server for 10-5; the fault's liveness there is by reading.
+- I did not look for other tests that catch 11-4 or 11-1.
+- Running a check script once from the pristine copy (to compare a reading, 9-N3b) left
+  Python bytecode caches under `.../scratchpad/mut/tests/__pycache__` and `.../mut/freesail`;
+  no source file there was changed.
