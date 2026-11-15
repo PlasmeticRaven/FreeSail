@@ -40,7 +40,9 @@ Routes (`harbour_routes`):
                                            and the client's file as it would be; written
                                            only with write: true
     POST /api/harbour/shortcut             {write?} -> the shortcut's path and text
-    POST /api/harbour/doors                {door: api|local, station, ship?} -> started
+    POST /api/harbour/doors                {door: api|local, station, ship?, model?} ->
+                                           started (model: one the settings can call, for
+                                           the API door)
     GET  /api/harbour/doors/{id}           ?since=N: its output from line N
     POST /api/harbour/doors/{id}/say       {text}: a line to its terminal (the owner's
                                            word in a consent conversation)
@@ -974,6 +976,9 @@ class Harbour:
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
+                # who the scenario says holds each station (step 9): the page offers the
+                # doors of those it gives to a model
+                "plan": self.plan(scenario),
             }
         return {"lines": lines, "game": self.game_state()}
 
@@ -1004,8 +1009,56 @@ class Harbour:
                 ),
                 "director": brief.name if brief is not None else "",
                 "chosen": dict(self.game),
+                # the stations' table (package 96b, step 9): the other ships with a captain
+                # of their own, whose captain's station a door may ask for
+                "captains": self._captains(w) if self.started else [],
             }
         return out
+
+    @staticmethod
+    def _captains(world: Any) -> list[str]:
+        """The other ships on the sea with a captain of their own (an intent or a free
+        intent: a brain), by name: those whose captain's station a model's door may ask for
+        (the doors' `--ship`)."""
+        out: list[str] = []
+        vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
+        own = getattr(getattr(world, "vessel", None), "id", None)
+        for v in vessels:
+            if getattr(v, "brain", None) is None or getattr(v, "done", False):
+                continue
+            if own is not None and getattr(v, "id", None) == own:
+                continue
+            name = str(getattr(v, "name", "") or "")
+            if name and name not in out:
+                out.append(name)
+        return out
+
+    def plan(self, scenario: str) -> dict[str, str]:
+        """Who the scenario says holds each station of the player's ship (its `stations:`;
+        package 59, read by the page from step 9 of package 96b: the game itself reads only
+        the player's seat): the station's name to player, model or rules; {} where the
+        scenario says none or cannot be read."""
+        if not scenario:
+            return {}
+        from freesail.world.scenarios import ScenarioError, read_scenario_text
+
+        try:
+            _text, fields = read_scenario_text(self.scenario_path(scenario))
+        except (HarbourError, OSError, ScenarioError):
+            return {}
+        stations = fields.get("stations")
+        if not isinstance(stations, dict):
+            return {}
+        return {
+            " ".join(str(k).lower().split()): " ".join(str(v).lower().split())
+            for k, v in stations.items()
+        }
+
+    def models(self) -> dict[str, str]:
+        """The models the stations' table offers for the API door: those the settings can
+        call, by name to dialect (the door's own first). Their names go to the page and the
+        door's command line, as the settings' form already shows them; never to a log."""
+        return self.callable_models()
 
     def stations(self) -> list[dict[str, Any]]:
         """The stations held and by whom: the agent API's (a model's, through a door) and
@@ -1054,6 +1107,7 @@ class Harbour:
             "game": self.game_state(),
             "stations": self.stations(),
             "doors": [door.state() for door in self.doors.values()],
+            "models": self.models(),
             "saves": self.saves(),
             "settings": {"path": str(self.path), "error": error},
             "credential": settings_mod.credential_words(),
@@ -1123,11 +1177,17 @@ class Harbour:
             out["written"] = True
         return out
 
-    def door_argv(self, kind: str, station: str, ship: str = "", seat_model: str = "") -> list[str]:
+    def door_argv(
+        self, kind: str, station: str, ship: str = "", seat_model: str = "", model: str = ""
+    ) -> list[str]:
         """A door's command line from the settings: the module's own flags, nothing more.
         `seat_model` is a director's seat's model (package 67): one of the models the
         settings can call, with its dialect, and the seated door's fold where the settings
-        name one (`--budget-tokens`)."""
+        name one (`--budget-tokens`). `model` is the owner's own choice for a door he starts
+        from the stations' table (package 96b, step 9): one of the same models the settings
+        can call, with its dialect, and nothing more (no seat's fold: it is no seat of the
+        director's); "" is the API door's own model, as before."""
+        chosen = seat_model or model
         s, error = self.settings_or_defaults()
         if error:
             raise HarbourError(error)
@@ -1137,14 +1197,14 @@ class Harbour:
             raise HarbourError("Name the station the door asks for.")
         if kind == "api":
             d = doors.get("api") or {}
-            if seat_model:
+            if chosen:
                 known = settings_mod.callable_models(s)
-                if seat_model not in known:
+                if chosen not in known:
                     raise HarbourError(
                         "The settings call no model by that name (the API door's model and "
                         "the models beside it, doors.api.models)."
                     )
-                model, dialect = seat_model, known[seat_model]
+                model, dialect = chosen, known[chosen]
             else:
                 model, dialect = str(d.get("model") or ""), str(d.get("dialect") or "")
             if not model:
@@ -1161,6 +1221,11 @@ class Harbour:
             if seat_model and d.get("seat_budget_tokens") not in (None, ""):
                 argv += ["--budget-tokens", str(d["seat_budget_tokens"])]
         elif kind == "local":
+            if model:
+                raise HarbourError(
+                    "The local runner serves the one model its settings name; a model is "
+                    "chosen for the API door alone."
+                )
             d = doors.get("local") or {}
             argv = [sys.executable, "-m", "freesail.agents.local", "--game", self.game_url]
             argv += ["--endpoint", str(d.get("endpoint") or "http://127.0.0.1:8080")]
@@ -1182,11 +1247,12 @@ class Harbour:
         seat: str = "",
         seat_model: str = "",
         by: str = "",
+        model: str = "",
     ) -> dict[str, Any]:
         """A door started as the server's subprocess: the owner's from the page, or a
         director's seat's (package 67: `seat` its key, `seat_model` its model, `by` "the
         director"), shown in the doors tab beside the owner's and marked so."""
-        argv = self.door_argv(kind, station, ship, seat_model=seat_model)
+        argv = self.door_argv(kind, station, ship, seat_model=seat_model, model=model)
         if not self.started:
             raise HarbourError("Start a game first: a door is a client of the game in play.")
         env = dict(os.environ)
@@ -1498,7 +1564,8 @@ class Harbour:
         if idle:
             out.append(
                 f"  To know: the game itself reads only the station you hold; 'model' and "
-                f"'rules' ({', '.join(idle)}) seat nobody when the game starts."
+                f"'rules' ({', '.join(idle)}) seat nobody when the game starts. The harbour's "
+                "stations tab offers the door of each station given to a model."
             )
         with contextlib.suppress(ValueError, TypeError):
             year = int(str(fields.get("start"))[:4]) if fields.get("start") else 1805
@@ -1776,6 +1843,7 @@ def harbour_routes(h: Harbour) -> APIRouter:
             str(body.get("door") or ""),
             str(body.get("station") or ""),
             str(body.get("ship") or ""),
+            model=" ".join(str(body.get("model") or "").split()),
         )
 
     @router.get("/api/harbour/doors/{ident}")

@@ -752,6 +752,108 @@ def test_the_api_door_started_from_the_harbour_seats_its_station_and_is_stopped(
             live.close()
 
 
+SECOND = "made-up-model-8"  # a second name of no model
+
+
+def test_a_door_is_started_for_a_station_with_a_model_chosen_from_the_settings_list(
+    tmp_path, monkeypatch
+):
+    """Package 96b, step 9 (docs/design/Design-Harbour.md §2.6; the owner's point of
+    2026-10-18: two models at two stations wanted two settings files). One settings file
+    names the API door's model and a second beside it (`doors.api.models`); the page's
+    state offers both; a door started for a station with the second chosen is that model's
+    door (its name and its dialect on the door's own command line, no seat's fold), is
+    seated through the game's own consent records as any door is, and is shown holding
+    the station; a model the settings do not name is refused in words and no door is
+    started, and so is a model named for the local runner."""
+    pytest.importorskip("anthropic")
+    from messages_api import MODEL, MessagesServer
+
+    from freesail.agents import consent
+
+    key = "a-test-key-of-no-account-0123456789"
+    with MessagesServer(key, models={MODEL: MODEL, SECOND: SECOND}) as api:
+        port = Port(
+            tmp_path,
+            {
+                "doors": {
+                    "api": {
+                        "model": MODEL,
+                        "models": [SECOND],
+                        "flags": ["--base-url", api.url],
+                        "seat_budget_tokens": "80000",
+                    }
+                }
+            },
+        )
+        argv = port.harbour.door_argv("api", "watcher", model=SECOND)
+        assert argv[argv.index("--model") + 1] == SECOND and "--budget-tokens" not in argv
+        own = port.harbour.door_argv("api", "watcher")  # the door's own model, as before
+        assert own[own.index("--model") + 1] == MODEL
+        consent.Record(SECOND, "a test runtime", "2026-11-15", consent.YES, answer="Yes.").write(
+            port.records
+        )
+        monkeypatch.setenv("FREESAIL_API_KEY", key)
+        monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.null.Keyring")
+        live = Live(port)
+        try:
+            import httpx
+
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
+                state = c.get("/api/harbour/state").json()
+                assert list(state["models"]) == [MODEL, SECOND]
+                c.post(
+                    "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
+                )
+                for body in (
+                    {"door": "api", "station": "watcher", "model": "a-model-nobody-named"},
+                    {"door": "local", "station": "watcher", "model": SECOND},
+                ):
+                    r = c.post("/api/harbour/doors", json=body)
+                    assert r.status_code == 400, r.text
+                assert c.get("/api/harbour/state").json()["doors"] == []
+                d = c.post(
+                    "/api/harbour/doors",
+                    json={"door": "api", "station": "watcher", "model": SECOND},
+                ).json()
+
+                def held() -> Any:
+                    st = c.get("/api/harbour/state").json()["stations"]
+                    return [s for s in st if s["station"] == "watcher" and s["holder"] == SECOND]
+
+                try:
+                    seated = _until(held, 90)
+                except AssertionError:
+                    out = c.get(f"/api/harbour/doors/{d['id']}").json()["output"]
+                    raise AssertionError("\n".join(out)) from None
+                assert seated[0]["door"] == "api"
+                assert c.post(f"/api/harbour/doors/{d['id']}/stop").json()["state"] == "stopped"
+        finally:
+            live.close()
+
+
+def test_the_scenarios_plan_of_its_stations_and_the_other_captains_are_in_the_state(port, client):
+    """Package 96b, step 9: what the stations' table is drawn from. The scenario's
+    `stations:` (which the game reads only for the player's seat) comes to the page as the
+    plan of the game started; the other ships with a captain of their own are named, each
+    a station a door may ask for; a game from a scenario that says nothing has no plan."""
+    port.place.mkdir(parents=True, exist_ok=True)
+    mine = port.place / "planned.yaml"
+    mine.write_text(
+        (SCENARIOS / "tender.yaml").read_text(encoding="utf-8")
+        + "\nstations:\n  officer: model\n  master: rules\n",
+        encoding="utf-8",
+    )
+    r = client.post("/api/harbour/start", json={"scenario": str(mine)})
+    assert r.status_code == 200, r.text
+    game = client.get("/api/harbour/state").json()["game"]
+    assert game["chosen"]["plan"] == {"officer": "model", "master": "rules"}
+    assert game["captains"] == ["Raven"]
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-passage.yaml"})
+    game = client.get("/api/harbour/state").json()["game"]
+    assert game["chosen"]["plan"] == {} and game["captains"] == []
+
+
 # ---------------------------------------------------------------------------
 # The page in the browser
 # ---------------------------------------------------------------------------
@@ -1474,6 +1576,92 @@ def test_in_the_browser_the_day_the_weather_and_the_ports_are_set_whole(browser_
     assert "closed_to" in pg.input_value("#m-ports-state")
     assert "their state said of brest" in pg.inner_text('#maker [data-line="sea"]')
     assert "the world keeps to the course of history" in pg.inner_text('#maker [data-line="day"]')
+    assert errors == []
+
+
+def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered(browser_page):
+    """Package 96b, step 9 (its step's own trial, as far as a test may go without a model):
+    the settings' form takes a second model for the API door, one a line; a scenario of the
+    player's own gives the officer's station to a model; started, the stations tab shows
+    one table of who is where: the player at the captain's prompt, the officer's station
+    the scenario's plan with the API door chosen and both models offered, the director's
+    above the game, the Raven's captain a row of her own; "start the doors the scenario
+    asks for" starts the officer's door with the model chosen (its pane opens; the door
+    itself asks its model's consent, and here finds no API to reach). The director's grant
+    is set in the sheet."""
+    pg, live, port, errors = browser_page
+    port.place.mkdir(parents=True, exist_ok=True)
+    (port.place / "planned.yaml").write_text(
+        (SCENARIOS / "tender.yaml").read_text(encoding="utf-8") + "\nstations:\n  officer: model\n",
+        encoding="utf-8",
+    )
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=doors]")
+    assert pg.is_visible("#t-none") and not pg.is_visible("#t-stations")
+    assert "You sit at one" in pg.inner_text("section[data-page=doors]")
+    # the settings: the door's own model and a second, one a line
+    pg.click("nav.tabs button[data-tab=settings]")
+    pg.fill('#settings [data-set="doors.api.model"]', PLACEHOLDER)
+    pg.fill("#st-models", SECOND + "\nmade-up-model-9, openrouter")
+    pg.fill('#settings [data-set="doors.api.flags"]', "--base-url http://127.0.0.1:9")
+    pg.click("#btn-settings-save")
+    pg.wait_for_function("document.getElementById('st-words').textContent.indexOf('Kept') >= 0")
+    kept = S.load_settings(port.settings_path)["doors"]["api"]["models"]
+    assert kept == [SECOND, {"name": "made-up-model-9", "dialect": "openrouter"}]
+    assert pg.input_value("#st-models") == SECOND + "\nmade-up-model-9, openrouter"
+    # the game from the planned scenario
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "planned.yaml"),
+    )
+    assert status == 200
+    pg.click("nav.tabs button[data-tab=doors]")
+    pg.wait_for_selector("#t-stations tbody tr", timeout=10_000)
+    rows = pg.eval_on_selector_all(
+        "#t-stations tbody tr",
+        "els => els.map(e => "
+        "Array.from(e.querySelectorAll('td')).slice(0, 4).map(t => t.textContent))",
+    )
+    assert rows[0] == ["Amazon (yours)", "the captain", "you, at the prompt", ""]
+    assert rows[1] == ["Amazon (yours)", "the officer", "the game's own", "a model"]
+    assert rows[5][:3] == ["above the game", "the director", "the game's own"]
+    assert rows[6][:3] == ["Raven", "the captain", "the game's own"] and len(rows) == 7
+    officer = pg.locator("#t-stations tr[data-row='officer|']")
+    assert officer.locator(".t-door").input_value() == "api"
+    offered = officer.locator(".t-model option").evaluate_all("els => els.map(e => e.value)")
+    assert offered == ["", PLACEHOLDER, SECOND, "made-up-model-9"]
+    assert pg.locator("#t-stations tr[data-row='captain|'] .t-start").is_disabled()
+    assert "gives one station to a model" in pg.inner_text("#t-says")
+    # a row with no door chosen says so; the planned one is started with the model chosen
+    pg.locator("#t-stations tr[data-row='captain|Raven'] .t-start").click()
+    assert "Choose the door" in pg.inner_text("#t-error")
+    officer.locator(".t-model").select_option(SECOND)
+    pg.click("#btn-t-all")
+    pg.wait_for_selector(".door-pane", timeout=20_000)
+    assert "API door at the officer" in pg.inner_text(".door-pane .door-words")
+    door = next(iter(port.harbour.doors.values()))
+    assert door.argv[door.argv.index("--model") + 1] == SECOND
+    assert door.station == "officer" and door.ship == ""
+    port.harbour.close()
+    # the director's grant, in the sheet
+    grant = pg.evaluate(
+        """async (names) => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/directed-passage.yaml');
+            const set = (sel, v) => { const el = document.querySelector(sel); el.value = v;
+                el.dispatchEvent(new Event('input', { bubbles: true })); };
+            set('#maker [data-field="director.models"]', names);
+            set('#maker [data-field="director.seats"]', '2');
+            return h.collect().director;
+        }""",
+        f"{PLACEHOLDER}, {SECOND}",
+    )
+    assert grant["models"] == [PLACEHOLDER, SECOND] and grant["seats"] == 2
+    assert grant["brief"] == "quiet-passage"
+    assert "the director may seat two models" in pg.inner_text('#maker [data-line="stations"]')
     assert errors == []
 
 

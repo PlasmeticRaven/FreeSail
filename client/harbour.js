@@ -325,6 +325,7 @@
       li(st, line + (x.holder && !said ? "  [" + x.holder + (x.door ? ", " + x.door : "") + "]" : ""));
     });
     fillSaves(s.saves);
+    fillStations(s);
     var gd = $("g-doors");
     clear(gd);
     if (!s.doors.length) li(gd, "none started from the harbour", "muted");
@@ -439,6 +440,106 @@
       show($("d-desktop-text"), "Written to " + r.path + (r.backup ? " (the old file kept as " + r.backup + ")" : "") + ". Quit the desktop client fully and start it again.\n\n" + r.text);
       $("btn-desktop-write").disabled = true;
     }).catch(function (e) { show($("d-desktop-text"), e.message); });
+  });
+
+  // -- who is where (package 96b, step 9; docs/design/Design-Harbour.md §2.6) -----------
+  //
+  // One table for the game in play: each station of the player's ship, the director's
+  // above the game, and the captain's of every other ship with a captain of her own; who
+  // holds it now, what the scenario says of it, and a door to give it to a model: the API
+  // door with one of the models the settings can call, or the local runner. A door asks
+  // its model for consent in its own pane, as ever: the table starts the door and no more.
+
+  var SHIP_STATIONS = ["captain", "officer", "master", "lookout", "passenger"];
+  var tableKey = "";
+  function heldWords(s, station, ship) {
+    var held = s.stations.filter(function (x) {
+      var st = String(x.station || "").toLowerCase();
+      return (st === station || st.indexOf(station) >= 0) && String(x.ship || "") === ship;
+    })[0];
+    if (held) return held.holder === "the player" ? "you" : (held.holder || "a model") + (held.door ? " (" + held.door + ")" : "");
+    var door = s.doors.filter(function (d) { return d.state === "running" && d.station === station && String(d.ship || "") === ship; })[0];
+    if (door) return "a door is asking (" + (door.door === "api" ? "the API door" : "the local runner") + ")";
+    if (station === "captain" && !ship && s.game.seat.indexOf("captain's prompt") >= 0) return "you, at the prompt";
+    return "the game's own";
+  }
+  function fillStations(s) {
+    var g = s.game, plan = (g.chosen && g.chosen.plan) || {};
+    var models = Object.keys(s.models || {});
+    var key = JSON.stringify([g.started, g.title, g.seed, g.captains, plan, models, s.stations, s.doors.map(function (d) { return [d.id, d.state]; }), g.seat]);
+    if (key === tableKey) return;
+    tableKey = key;
+    var body = $("t-stations").querySelector("tbody");
+    var kept = {};
+    body.querySelectorAll("tr").forEach(function (tr) { kept[tr.getAttribute("data-row")] = [tr.querySelector(".t-door").value, tr.querySelector(".t-model").value]; });
+    clear(body);
+    $("t-none").hidden = !!g.started;
+    $("t-stations").hidden = !g.started;
+    if (!g.started) { $("btn-t-all").disabled = true; $("t-says").textContent = ""; return; }
+    var rows = SHIP_STATIONS.map(function (st) { return [g.ship || "your ship", st, ""]; });
+    rows.push(["above the game", "director", ""]);
+    (g.captains || []).forEach(function (name) { rows.push([name, "captain", name]); });
+    var asked = 0;
+    rows.forEach(function (r) {
+      var station = r[1], ship = r[2], id = station + "|" + ship;
+      var tr = document.createElement("tr");
+      tr.setAttribute("data-row", id);
+      tr.setAttribute("data-station", station);
+      tr.setAttribute("data-ship", ship);
+      var held = heldWords(s, station, ship);
+      var says = ship ? "" : plan[station] || "";
+      [r[0] + (ship ? "" : station === "director" ? "" : " (yours)"), "the " + station, held, says === "player" ? "you" : says === "model" ? "a model" : says === "rules" ? "the game's own" : ""].forEach(function (w, i) {
+        var td = document.createElement("td");
+        td.textContent = w;
+        if (i === 2) td.className = "t-held";
+        tr.appendChild(td);
+      });
+      var free = held === "the game's own";
+      var td = document.createElement("td");
+      var door = document.createElement("select");
+      door.className = "t-door";
+      option(door, "", "");
+      option(door, "api", "the API door");
+      option(door, "local", "the local runner");
+      td.appendChild(door);
+      tr.appendChild(td);
+      td = document.createElement("td");
+      var model = document.createElement("select");
+      model.className = "t-model";
+      option(model, "", models.length ? "the door's own (" + models[0] + ")" : "none named in the settings");
+      models.forEach(function (m) { option(model, m); });
+      td.appendChild(model);
+      tr.appendChild(td);
+      if (kept[id]) { door.value = kept[id][0]; model.value = kept[id][1]; }
+      else if (says === "model" && free) door.value = "api";
+      model.disabled = door.value !== "api";
+      door.addEventListener("change", function () { model.disabled = door.value !== "api"; });
+      td = document.createElement("td");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "t-start";
+      b.textContent = "start its door";
+      b.disabled = !free;
+      b.addEventListener("click", function () { startRow(tr); });
+      td.appendChild(b);
+      tr.appendChild(td);
+      if (says === "model" && free) { tr.classList.add("t-asked"); asked += 1; }
+      body.appendChild(tr);
+    });
+    $("btn-t-all").disabled = !asked;
+    $("t-says").textContent = asked ? "The scenario gives " + plural(asked, "station", "stations") + " to a model, not yet held." : Object.keys(plan).length ? "" : "This game's scenario says nothing of its stations: you are where you chose, and the rest are the game's own.";
+  }
+  function startRow(tr) {
+    var door = tr.querySelector(".t-door").value;
+    if (!door) { show($("t-error"), "Choose the door for the " + tr.getAttribute("data-station") + "'s station: the API door or the local runner."); return Promise.resolve(); }
+    show($("t-error"), "");
+    return api("POST", "/api/harbour/doors", {
+      door: door, station: tr.getAttribute("data-station"), ship: tr.getAttribute("data-ship"),
+      model: door === "api" ? tr.querySelector(".t-model").value : "",
+    }).then(paneFor).catch(function (e) { show($("t-error"), e.message); });
+  }
+  $("btn-t-all").addEventListener("click", function () {
+    document.querySelectorAll("#t-stations tr.t-asked").forEach(startRow);
   });
 
   function startDoor(kind) {
@@ -1123,6 +1224,8 @@
     $("m-ports-state").value = blocks.ports || "";
     fillShipFit(getPath(fields, "ship.file"), getPath(fields, "ship.fit"));
     fillPosts(getPath(fields, "ship.file"));
+    // `director: observe` is a word, not a mapping: its grant has no fields to fill
+    document.querySelectorAll('#maker [data-field^="director."]').forEach(function (el) { el.disabled = typeof fields.director === "string"; });
     fillChron(fields);
     fillThings(fields.things);
     clear($("m-people").querySelector("tbody"));
@@ -1602,6 +1705,12 @@
       var key = el.getAttribute("data-set").split(".").pop();
       if (r.defaults && r.defaults[key] && !el.value) el.placeholder = r.defaults[key];
     });
+    // the API door's other models (package 96b, step 9): one a line, "name" or
+    // "name, dialect", as the settings keep them (a name, or {name, dialect})
+    var others = getPath(settings, "doors.api.models") || [];
+    $("st-models").value = others.map(function (m) {
+      return m && typeof m === "object" ? (m.name || "") + (m.dialect ? ", " + m.dialect : "") : String(m);
+    }).join("\n");
   }
   function loadSettings() { return api("GET", "/api/harbour/settings").then(fillSettings); }
   $("settings").addEventListener("submit", function (ev) {
@@ -1615,6 +1724,11 @@
       else v = el.value.trim();
       setPath(s, k, v);
     });
+    setPath(s, "doors.api.models", $("st-models").value.split("\n").map(function (line) {
+      var parts = line.split(",").map(function (x) { return x.trim(); });
+      if (!parts[0]) return null;
+      return parts[1] ? { name: parts[0], dialect: parts[1] } : parts[0];
+    }).filter(Boolean));
     show($("st-refusal"), "");
     api("POST", "/api/harbour/settings", { settings: s }).then(function (r) {
       show($("st-words"), "Kept in " + r.path + ".");

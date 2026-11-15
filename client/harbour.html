@@ -19,7 +19,7 @@
   <nav class="tabs" role="tablist">
     <button type="button" data-tab="begin" class="active" role="tab">begin</button>
     <button type="button" data-tab="game" role="tab">game</button>
-    <button type="button" data-tab="doors" role="tab">doors</button>
+    <button type="button" data-tab="doors" role="tab">stations</button>
     <button type="button" data-tab="maker" role="tab">scenario maker</button>
     <button type="button" data-tab="settings" role="tab">settings</button>
   </nav>
@@ -137,7 +137,22 @@
 <!-- ======================= the doors ======================= -->
 <section class="tab-page" data-page="doors" hidden>
   <div class="panel">
-    <div class="panel-head"><span>The stations for the doors</span><span class="hint">one desktop entry, or one door, per station ticked</span></div>
+    <div class="panel-head"><span>Who is where</span><span class="hint">the stations of the game in play</span></div>
+    <p class="note">A station is a post: the captain's, the officer of the watch's, the master's, the lookout's, a passenger's; and above the game, the director's. You sit at one. A model can be given another, through a door. The game's own people hold the rest.</p>
+    <table class="rows stations-table" id="t-stations">
+      <thead><tr><th>ship</th><th>station</th><th>held by</th><th>the scenario says</th><th>give it to a model, through</th><th>its model</th><th></th></tr></thead><tbody></tbody>
+    </table>
+    <p id="t-none" class="note">No game is in play: start one, and its stations are here.</p>
+    <div class="form-actions">
+      <button id="btn-t-all" type="button" disabled>start the doors the scenario asks for</button>
+      <span class="muted" id="t-says"></span>
+    </div>
+    <p id="t-error" class="refusal" hidden></p>
+    <p class="note">A door asks its model for its consent before it takes the station, in its own pane below; your word there is yours to give. The API door's models are those the settings name (the settings tab); the local runner serves the one model its settings name. The desktop client takes a station by its own entry, written below.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span>The stations for the desktop client's entries, and a door by hand</span><span class="hint">one desktop entry, or one door, per station ticked</span></div>
     <div class="form-grid">
       <fieldset class="checks" id="d-stations"></fieldset>
       <label>On another ship <input id="d-ship" type="text" placeholder="her name or id, else your own"></label>
@@ -297,6 +312,12 @@
       <fieldset data-part="stations" class="folded"><legend>The stations and the director</legend>
         <p class="fold-line wide" data-line="stations"></p>
         <div class="wide station-holders" id="m-stations"></div>
+        <p class="note wide">Who holds each station of your ship at the start. "player" seats you there. "model" is a plan: when the game is started the harbour's stations tab offers that station's door. "rules" (or nothing) leaves it to the game's own.</p>
+        <p class="not-yet wide">Who holds a station aboard another ship: a scenario cannot say this yet; her captain's door is started from the stations tab once the game is in play.</p>
+        <p class="note wide">The director is a model above the game that shapes the voyage within its brief. What it is granted is which models it may put in command of another ship (each asked for its consent first), and how many: at once, and in the whole voyage.</p>
+        <label class="wide" title="the models the director may seat on other ships, each by its exact name, as the settings name them">The director may seat <input id="m-grant-models" data-field="director.models" data-kind="csv" type="text" placeholder="the models' exact names, with commas between"></label>
+        <label title="how many it may have seated at once; empty: one">Seats at once <input data-field="director.seats" data-kind="number" type="number" min="0" step="1"></label>
+        <label title="how many seatings in the whole voyage; empty: as many as at once">Seats in the voyage <input data-field="director.seats_in_voyage" data-kind="number" type="number" min="0" step="1"></label>
         <label>Brief <select id="m-brief-mode" data-field="director" data-kind="director">
             <option value="">no director</option>
             <option value="starter">a starter</option>
@@ -366,6 +387,7 @@
         <label class="wide">Model <input data-set="doors.api.model" type="text" placeholder="exactly as the API knows it"></label>
         <label>Dialect <select data-set="doors.api.dialect"><option>anthropic</option><option>openrouter</option></select></label>
         <label>Effort <input data-set="doors.api.effort" type="text"></label>
+        <label class="wide" title="the other models the API door may call, one a line, each exactly as the API knows it; a model of the other dialect as 'its name, openrouter'. These, and the door's own model above, are the models offered at a station and to a director's grant">Its other models <textarea id="st-models" rows="3" placeholder="one model a line, exactly as the API knows it&#10;another model, openrouter"></textarea></label>
         <label class="wide">Flags <input data-set="doors.api.flags" data-list="1" type="text" placeholder="--cadence watch"></label>
         <label class="wide" title="where a director's seat's API door folds its conversation: tokens (80000) or a share of the model's context (0.4, 40%, 2/5); empty, two fifths">Seat's fold <input data-set="doors.api.seat_budget_tokens" type="text" placeholder="two fifths of the context"></label>
       </fieldset>

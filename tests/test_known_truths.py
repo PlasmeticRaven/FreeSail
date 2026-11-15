@@ -21881,3 +21881,76 @@ def test_truth_7_409_the_day_the_weather_and_the_ports_are_set_whole_and_the_unr
         assert harbour.blocks_of(whole)["ports"].startswith("falmouth: {}")
     finally:
         harbour.close()
+
+
+def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_the_plan(tmp_path):
+    """Package 96b, step 9 (docs/design/Design-Harbour.md §1.2 rows 28 and 34, §1.4 trap 1,
+    §2.6; the owner's points of 2026-10-18: the stations and the seats three notions with
+    one word, and several models wanting several settings files). The harbour's state
+    names every model the one settings file can call through the API door (its own and
+    those beside it); a door's command line for a station takes any one of them by name,
+    with that model's dialect and no seat's fold, and refuses in words a name the settings
+    do not have, and any model named for the local runner; the door's own model is used
+    when none is chosen, as before, and a director's seat's door is as it was. The
+    scenario's `stations:`, which the game reads for the player's seat alone, is the page's
+    plan for the game started, and the other ships with a captain of their own are named
+    for the table. No model is named here: the names are made up."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    first, second, third = "placeholder-410-a", "placeholder-410-b", "placeholder-410-c"
+    settings = _harbour_settings(
+        tmp_path,
+        api={
+            "model": first,
+            "models": [second, {"name": third, "dialect": "openrouter"}],
+            "seat_budget_tokens": "80000",
+        },
+    )
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=settings, saves_dir=tmp_path / "s")
+    try:
+        assert harbour.state()["models"] == {
+            first: "anthropic",
+            second: "anthropic",
+            third: "openrouter",
+        }
+
+        def said(argv: list[str], flag: str) -> str:
+            return argv[argv.index(flag) + 1]
+
+        own = harbour.door_argv("api", "officer")
+        assert said(own, "--model") == first and "--budget-tokens" not in own
+        chosen = harbour.door_argv("api", "officer", model=third)
+        assert (said(chosen, "--model"), said(chosen, "--dialect")) == (third, "openrouter")
+        assert said(chosen, "--station") == "officer" and "--budget-tokens" not in chosen
+        aboard = harbour.door_argv("api", "captain", "Raven", model=second)
+        assert (said(aboard, "--model"), said(aboard, "--ship")) == (second, "Raven")
+        seat = harbour.door_argv("api", "captain", "Raven", seat_model=second)
+        assert said(seat, "--budget-tokens") == "80000"  # a director's seat's, as it was
+        with pytest.raises(HarbourError, match="call no model by that name"):
+            harbour.door_argv("api", "officer", model="a-model-nobody-named")
+        with pytest.raises(HarbourError, match="local runner serves the one model"):
+            harbour.door_argv("local", "officer", model=second)
+        with pytest.raises(HarbourError, match="Start a game first"):
+            harbour.start_door("api", "officer", model=second)
+        # the plan and the captains
+        own_place = settings.parent / "scenarios"
+        own_place.mkdir(parents=True, exist_ok=True)
+        planned = own_place / "planned.yaml"
+        planned.write_text(
+            (HARBOUR_ROOT / "data" / "scenarios" / "tender.yaml").read_text(encoding="utf-8")
+            + "\nstations:\n  officer: model\n  lookout: player\n",
+            encoding="utf-8",
+        )
+        harbour.start({"scenario": str(planned)})
+        game = harbour.state()["game"]
+        assert game["chosen"]["plan"] == {"officer": "model", "lookout": "player"}
+        assert game["captains"] == ["Raven"]
+        assert "lookout" in game["seat"]  # the game's own reading: the player's seat
+        assert driver.world.agents == {} or all(
+            a.agent.released or "lookout" in k for k, a in driver.world.agents.items()
+        )  # "model" seats nobody by itself: the page offers the door
+    finally:
+        harbour.close()
