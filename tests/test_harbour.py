@@ -156,9 +156,12 @@ def test_the_first_game_is_the_primers_chapter_7_and_its_log_is_the_bare_ships(c
     """Package 96b, step 2 (docs/design/Design-Harbour.md §3.3): the first panel's game is
     the scenario "A first passage", the primer's chapter 7 made startable from the page.
     The chapter's own command is a bare frigate with `--seed 7 --wind 0,15 --heading 293`;
-    the scenario gives the same log line for line through the chapter's first block (plain
-    sail, braced sharp up, eight minutes), but for the opening line, which carries the
-    scenario's name where the bare ship's says "Open water"."""
+    the scenario gives the same log line for line through all five of the chapter's
+    frigate blocks, typed as the chapter has them (an hour and a quarter: plain sail and
+    the braces, the tack, the wear and the rest), but for the opening line, which carries
+    the scenario's name where the bare ship's says "Open water"."""
+    import re
+
     from freesail.api.session import make_world
     from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
@@ -178,15 +181,27 @@ def test_the_first_game_is_the_primers_chapter_7_and_its_log_is_the_bare_ships(c
     assert sf.seed == 7 and not sf.standing_orders and not sf.orders
     b = make_scenario_world(sf)
     begin(b, sf)
-    for w in (a, b):
-        w.submit("set plain sail")
-        w.submit("brace sharp up on the starboard tack")
-        w.run(480)
+    chapter = (ROOT / "docs" / "primer" / "07-a-first-passage.md").read_text(encoding="utf-8")
+    blocks = re.findall(r"```orders frigate[^\n]*\n(.*?)```", chapter, re.S)[:5]
+    assert len(blocks) == 5
+    given = 0
+    for block in blocks:
+        for line in (ln.strip() for ln in block.strip().splitlines()):
+            if not line or line.startswith("#") or line == "state":
+                continue
+            ticks = re.fullmatch(r"tick (\d+)", line)
+            for w in (a, b):
+                if ticks:
+                    w.run(int(ticks.group(1)))
+                else:
+                    w.submit(line)
+            given += 1
+    assert given > 20 and a.clock.tick == b.clock.tick > 4000
     la = [(e.tick, e.kind, e.text) for e in a.log]
     lb = [(e.tick, e.kind, e.text) for e in b.log]
     assert la[0][2].startswith("Open water.") and lb[0][2].startswith("A first passage.")
     assert la[0][2].split(". ", 1)[1] == lb[0][2].split(". ", 1)[1]
-    assert la[1:] == lb[1:] and len(la) > 20
+    assert la[1:] == lb[1:] and len(la) > 150
 
 
 def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, client):
@@ -355,7 +370,10 @@ def test_the_systems_and_the_ports_state_are_read_as_words_and_refused_in_words(
         "/api/harbour/scenario", params={"path": "data/scenarios/blockade.yaml"}
     ).json()
     fields, blocks = read["fields"], read["blocks"]
-    assert blocks["ports"] == "" and "name: the low" in blocks["systems"]
+    # the blockade's ports are a list: the box holds it as the mapping it means, each port
+    # with nothing said of it, so that a state added there keeps the other ports
+    assert blocks["ports"] == "brest: {}\nfalmouth: {}\nplymouth: {}\ntorbay: {}\n"
+    assert "name: the low" in blocks["systems"]
 
     def prove(**sent):
         return client.post(
@@ -384,6 +402,77 @@ def test_the_systems_and_the_ports_state_are_read_as_words_and_refused_in_words(
     assert "closed_to: [britain]" in state.json()["text"]
     assert prove(ports="- brest").status_code == 400
     assert prove(tides="x").status_code == 400
+    # a port closed in the box as it came up: the other ports are still in play
+    closed = prove(ports=blocks["ports"].replace("brest: {}", "brest: {closed_to: [britain]}"))
+    assert "The ports: brest, falmouth, plymouth, torbay." in closed.json()["lines"]
+
+
+def test_a_box_of_the_files_words_takes_no_anchor_no_alias_and_no_more_than_its_length(
+    port, client, monkeypatch
+):
+    """Package 96b, the final list, item 1 (the whole-page reader's finding): 574 bytes of
+    nested YAML aliases in the ports' box held the server at full CPU and gigabytes. The
+    box's words take no anchor and no alias, and no more than their length: refused in
+    words by the text's tokens before anything is loaded (the loader is never called), at
+    the proof and at the save; words with none pass as before."""
+    import yaml as yaml_mod
+
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/blockade.yaml"}
+    ).json()["fields"]
+    bomb = "a: &a [x, x, x, x, x, x, x, x, x]\nb: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a]\n"
+    bomb += "c: &c [*b, *b, *b, *b, *b, *b, *b, *b, *b]\nbrest: {news: *c}\n"
+    loads: list[str] = []
+    real = yaml_mod.safe_load
+    monkeypatch.setattr(yaml_mod, "safe_load", lambda text: loads.append(str(text)) or real(text))
+    started = time.monotonic()
+    for route, body in (
+        ("/api/harbour/scenario/prove", {"fields": fields, "blocks": {"ports": bomb}}),
+        ("/api/harbour/scenario", {"fields": fields, "blocks": {"ports": bomb}, "name": "bomb"}),
+        (
+            "/api/harbour/scenario/prove",
+            {"fields": fields, "blocks": {"systems": "- &s {name: a}"}},
+        ),
+        ("/api/harbour/scenario/prove", {"fields": fields, "blocks": {"ports": "x: 1\n" * 5000}}),
+    ):
+        r = client.post(route, json=body)
+        assert r.status_code == 400, (route, r.text[:200])
+        why = r.json()["detail"]
+        assert "an anchor or an alias (& or *)" in why or "at most" in why, why
+    assert time.monotonic() - started < 5.0
+    assert not [text for text in loads if "&" in text or len(text) > 20_000]
+    assert not (port.place / "bomb.yaml").exists()
+    ok = client.post(
+        "/api/harbour/scenario/prove",
+        json={"fields": fields, "blocks": {"ports": "brest: {news: ['R & R, *as ever*']}\n"}},
+    )
+    assert ok.status_code == 200, ok.text  # the signs within a quoted word are words
+
+
+def test_the_proof_says_a_port_leaned_on_that_is_not_in_play(client):
+    """The final list, item 2: the ports in play named, and a port a ship is leaving or a
+    price list aboard not among them, said at the proof."""
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/merchant-passage.yaml"}
+    ).json()["fields"]
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert not [ln for ln in r.json()["lines"] if "ports in play" in ln or "port in play" in ln]
+    fields["ports"] = ["brest"]
+    fields["ships"][0]["departing"] = "plymouth"
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    said = [ln.strip() for ln in r.json().get("lines", []) if "To know" in ln]
+    if r.status_code == 200:
+        assert any("is leaving plymouth, which is not among the ports in play" in ln for ln in said)
+        assert any("the price list of falmouth is aboard" in ln for ln in said)
+    else:  # the game's own refusal of the port she leaves comes first, in its words
+        assert "plymouth" in r.json()["detail"].lower()
+        warned = port_warnings(fields)
+        assert any("is leaving plymouth" in ln for ln in warned)
+        assert any("the price list of falmouth is aboard" in ln for ln in warned)
+
+
+def port_warnings(fields: dict[str, Any]) -> list[str]:
+    return Harbour.unread_warnings(None, fields)
 
 
 # The controls whose own label is their sentence (a tick box's words, a box of the file's
@@ -1892,6 +1981,56 @@ def test_in_the_browser_each_setting_says_what_it_is_and_a_doors_flags_are_named
     ]
     assert kept["api"]["flags"] == ["--cadence", "watch"]
     assert port.harbour.door_argv("local", "officer")[-8:] == kept["local"]["flags"]
+    assert errors == []
+
+
+def test_in_the_browser_the_final_lists_small_things_are_so(browser_page):
+    """Package 96b, the final list, items 3 to 5: a lesson started from the game tab with
+    "where you stand" left to the game is seated as its shelf entry says, and the choice
+    says so; a chronometer ticked with no maker writes none, and the sheet says "a
+    chronometer"; and every sentence of the words' file is ON THE PAGE under its control,
+    the one whose control has no label of its own among them."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    words = page_words()
+    shown = pg.evaluate(
+        """() => Object.fromEntries(Array.from(document.querySelectorAll('.says[data-says]'))
+            .map(s => [s.getAttribute('data-says'), s.textContent]))"""
+    )
+    assert shown == words
+    assert pg.evaluate(
+        """() => { const s = document.querySelector('.says[data-says="#m-pick"]');
+            return s.previousElementSibling.contains(document.getElementById('m-pick')); }"""
+    )
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.select_option("#s-scenario", "data/scenarios/lesson-reckoning.yaml")
+    assert pg.inner_text("#s-seat option >> nth=0") == "as this game says: the officer"
+    pg.select_option("#s-scenario", "data/scenarios/lesson-landfall.yaml")
+    assert pg.inner_text("#s-seat option >> nth=0") == "as the scenario says (else the captain)"
+    pg.select_option("#s-scenario", "data/scenarios/lesson-reckoning.yaml")
+    pg.click("#btn-start")
+    pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
+    with port.driver.lock:
+        seat = port.driver.world.player_seat
+        assert seat is not None and "officer" in seat.station.name
+    pg.select_option("#s-seat", "captain")  # his own choice wins over the shelf's
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('in-play-line').textContent.indexOf(\"captain's prompt\") >= 0",
+        timeout=60_000,
+    )
+    # a chronometer with no maker said
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.click("#btn-m-new")
+    pg.click("#maker fieldset[data-part=papers] > legend")
+    pg.check("#m-chron-on")
+    line = pg.inner_text('#maker [data-line="papers"]')
+    assert "a chronometer;" in line and "by the chronometer" not in line
+    made = pg.evaluate("() => window.freesailHarbour.collect().papers")
+    assert made == {"chronometer": {}}
+    pg.fill("#m-chron [data-chron=maker]", "Arnold")
+    assert "a chronometer by Arnold" in pg.inner_text('#maker [data-line="papers"]')
     assert errors == []
 
 
