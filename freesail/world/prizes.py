@@ -49,8 +49,11 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.crew.model import Crew, Rating, Sailor, Station, Watch, number_words
-from freesail.world.ships import PLAYER_ID
+from freesail.crew.model import Crew, Rating, Sailor, Station, number_words
+from freesail.world.hulls import players_id
+from freesail.world.musters import deal_watches as _watches
+from freesail.world.musters import remuster
+from freesail.world.musters import take_out as _take_out
 
 __all__ = [
     "COVER_NM",
@@ -191,14 +194,16 @@ def is_prize(vessel: Any) -> bool:
 
 
 def prizes_of(world: Any, captor_id: str) -> list[Any]:
-    """Every prize a captor holds now, by her id (the player's `PLAYER_ID`)."""
+    """Every prize a captor holds now, by her id (the player's `PLAYER_ID`): each still her prize
+    by the one answer (`relations.still`, `PRIZE`)."""
+    from freesail.world import relations as R
+
     sea = getattr(world, "vessels", None)
-    out = []
-    for v in list(getattr(sea, "vessels", []) or []):
-        rec = record_of(v)
-        if rec and is_prize(v) and str(rec.get("captor")) == str(captor_id) and not v.done:
-            out.append(v)
-    return out
+    return [
+        v
+        for v in list(getattr(sea, "vessels", []) or [])
+        if R.still(world, str(captor_id), v, R.PRIZE)
+    ]
 
 
 def _story(vessel: Any, tick: int, words: str) -> None:
@@ -384,87 +389,13 @@ def prize_crew_size(captor_fit: int, prize_complement: int, doctrine: Any) -> in
 # -- the muster swapped ---------------------------------------------------------------------
 
 
-def remuster(hull: Any, crew: Crew) -> int:
-    """The hull's working company is `crew` from here: `ship.extra["crew"]`, the routine
-    re-pointed (its all-hands call dropped), the quarter bill reckoned afresh at the next
-    beat. Returns how many keepers were re-pointed (the audit's figure)."""
-    ship = hull.ship
-    extra = ship.extra
-    moved = 0
-    crew.reindex()
-    extra["crew"] = crew
-    moved += 1
-    routine = extra.get("routine")
-    if routine is not None:
-        routine.crew = crew
-        routine._coming = []
-        routine._called_at = None
-        routine._aloft_ids = frozenset()
-        routine._aloft_instances = set()
-        moved += 1
-    if extra.pop("quarters", None) is not None:
-        moved += 1
-    battery = extra.get("battery")
-    if battery is not None and hasattr(battery, "mode"):
-        from freesail.combat.guns import FireMode
-
-        battery.mode = FireMode.HOLD
-        battery.word = None
-    # the hull's people read the registry (84's one registry); nothing of theirs is cached
-    return moved
-
-
-def _watches(sailors: list[Sailor]) -> None:
-    for i, s in enumerate(sorted(sailors, key=lambda x: x.id)):
-        if s.station in (Station.QUARTERDECK, Station.IDLERS):
-            s.watch = Watch.NONE
-        else:
-            s.watch = (Watch.STARBOARD, Watch.LARBOARD)[i % 2]
-        s.at = None
-        s.quarters = ""
-        s.turned_up = False
-
-
 def _draw_prize_crew(captor_hull: Any, n: int, party: list[Sailor] | None) -> list[Sailor]:
     """The men put aboard her: the party on her deck first (the boarders, whole and at no
-    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler."""
-    crew = captor_hull.ship.extra.get("crew")
-    if crew is None:
-        return []
-    chosen: list[Sailor] = []
-    if party:
-        for s in party:
-            if s.fit and s.at is None and s.station not in (Station.QUARTERDECK, Station.IDLERS):
-                chosen.append(s)
-            if len(chosen) >= n:
-                break
-    if len(chosen) < n:
-        taken = {s.id for s in chosen}
-        for s in crew.sailors:
-            if len(chosen) >= n:
-                break
-            if s.id in taken or not s.fit or s.at is not None or s.post:
-                continue
-            if s.station in (Station.QUARTERDECK, Station.MARINES, Station.IDLERS):
-                continue
-            chosen.append(s)
-    return chosen
+    work), then the captor's fit seamen at no work by id, never a post, a marine or an idler
+    (`musters.draw`, shared with package 60's transfer)."""
+    from freesail.world.musters import draw
 
-
-def _take_out(captor_hull: Any, men: list[Sailor]) -> None:
-    """The men out of the captor's muster and off her quarter bill."""
-    crew = captor_hull.ship.extra.get("crew")
-    if crew is None:
-        return
-    ids = {s.id for s in men}
-    crew.sailors = [s for s in crew.sailors if s.id not in ids]
-    crew.reindex()
-    quarters = captor_hull.ship.extra.get("quarters")
-    if quarters is not None:
-        for gc in quarters.crews.values():
-            gc.members = [s for s in gc.members if s.id not in ids]
-        for name, division in list(quarters.divisions.items()):
-            quarters.divisions[name] = [s for s in division if s.id not in ids]
+    return draw(captor_hull, n, party)
 
 
 def _confine_people(hull: Any, tick: int) -> dict[str, str]:
@@ -587,8 +518,14 @@ def _bearing_distance(a: Any, b: Any) -> tuple[float, float]:
 
 
 def _nation_words(world: Any, vessel: Any, nation_id: str) -> None:
+    """Her nation and its words: the one road by which a ship changes hands (taken, retaken,
+    restored), and so where she becomes a new party to every judge on the sea and her own judges
+    to every ship (`relations.changed_hands`; the whole-change review of 80e703c7, gundeck-1)."""
+    from freesail.world import relations as R
+
     n = _nation_of(world, nation_id)
     vessel.nation = str(nation_id)
+    R.changed_hands(world, vessel)
     if n is not None:
         vessel.colours = n.colours
         vessel.flag = getattr(n, "flag", "")
@@ -607,6 +544,13 @@ def _set_colours(world: Any, vessel: Any, nation_id: str, over: str, tick: int) 
         hull.ship.extra["signals"] = locker  # one object (71)
         hull.ship.extra.pop("struck", None)
     vessel.struck = False
+    # the strike's record ends with the strike (the whole-change review of 80e703c7, engine-2):
+    # her colours given back, she is struck to nobody, and a later strike by a road that names no
+    # taker is to no one known (`relations.STRUCK`), its hour counted from then
+    damage = getattr(vessel, "damage", None)
+    if isinstance(damage, dict):
+        damage.pop("struck_to", None)
+        damage.pop("struck_tick", None)
 
 
 def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
@@ -616,8 +560,8 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
 
     vessel.role = role
     brain = getattr(vessel, "brain", None)
-    if brain is None and str(getattr(vessel, "id", "")) == PLAYER_ID:
-        brain = None  # the player's own hull is awake always: no far brain for her
+    if brain is None and str(getattr(vessel, "id", "")) == players_id(world):
+        brain = None  # the player's ship is awake always: no far brain for her (60: his now)
     elif brain is None:
         brain = FarCaptain(_root(world), vessel, words, role=role)
         vessel.brain = brain
@@ -632,7 +576,6 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
         from freesail.world.captains import load_doctrine
 
         brain.doctrine = load_doctrine(role)
-        brain.fired_on = set()
         brain._stranger = None
         brain.state = None
         brain.planned = False
@@ -648,7 +591,6 @@ def _give_intent(world: Any, vessel: Any, words: str, role: str) -> None:
             cap.set_intent(words)
         except ValueError:
             cap.set_intent(words, free=True)
-        cap.fired_on = set()
         cap._stranger = None
 
 
@@ -671,7 +613,7 @@ def possess(
     if rec and is_prize(prize) and str(rec.get("nation_was")) == str(captor.nation):
         return retake(world, prize, by=f"{captor.name} coming up", how="retaken", captor=captor)
     captor_hull, prize_hull = _hull(captor), _hull(prize)
-    if str(prize.id) == PLAYER_ID and captor_hull is None:
+    if str(prize.id) == players_id(world) and captor_hull is None:
         # the player's ship taken by a far body (the design's §3.1): her captor is made a
         # hull and woken, a dealing of the first rank under the cap, so that the captive is
         # aboard a real hull with places, a company and a log
@@ -752,13 +694,18 @@ def possess(
         men = _draw_prize_crew(captor_hull, n, party)
         _take_out(captor_hull, men)
         old_crew = prize_hull.ship.extra.get("crew")
-        new_crew = Crew(ship_name=str(prize.name), sailors=list(men))
+        # the prize crew numbered by her captor's books (package 115 D4): a man entered
+        # aboard the prize is numbered after the captor's highest, so that her men come back
+        # with numbers no other of the company has
+        took = captor_hull.ship.extra.get("crew")
+        issued = took.next_number() if took is not None else 0
+        new_crew = Crew(ship_name=str(prize.name), sailors=list(men), issued=issued)
         _watches(new_crew.sailors)
         for s in old_crew.sailors if old_crew is not None else []:
             s.at = None
             s.quarters = ""
         remuster(prize_hull, new_crew)
-        if str(prize.id) == PLAYER_ID:
+        if str(prize.id) == players_id(world):
             # the player's person taken aboard the captor (the captive's channel, §3.1)
             from freesail.world.captive import player_taken
 
@@ -799,30 +746,11 @@ def possess(
             # from words (the design's §2.6)
             fill_far_prize(prize_hull, record, nation_was, tick)
     prize.prize = record
-    _no_enemy_now(captor, captor_hull, prize)
+    # what her captor knew her an enemy by (her shot at him, a pirate's act, the signal or the
+    # hail) went with her change of hands (`_nation_words`, `relations.changed_hands`); she is
+    # his prize from now and judged so (`Judgement._prize_of_ours`)
     _lines(world, captor, prize, record, said)
     return record
-
-
-def _no_enemy_now(captor: Any, captor_hull: Any, prize: Any) -> None:
-    """The taking clears the prize from what her captor knew her an enemy by: her shot at
-    him (`fired_on`), a pirate's act (`pirates`), the signal or the hail (`recognised`); she
-    is his prize from now and judged so (`Judgement._prize_of_ours`)."""
-    sid = str(prize.id)
-    judges = (
-        getattr(captor, "brain", None),
-        getattr(captor_hull, "captain", None) if captor_hull is not None else None,
-    )
-    for judge in judges:
-        if judge is None:
-            continue
-        for name in ("fired_on", "pirates"):
-            held = getattr(judge, name, None)
-            if isinstance(held, set):
-                held.discard(sid)
-        known = getattr(judge, "recognised", None)
-        if isinstance(known, dict) and (known.get(sid) or {}).get("enemy"):
-            known[sid] = {**known[sid], "enemy": False}
 
 
 def _service_of(captor: Any) -> str:
@@ -945,9 +873,19 @@ def fill_far_prize(hull: Any, record: dict[str, Any], nation_was: str, tick: int
     keep = hands[:n]
     keep_ids = {s.id for s in keep}
     rest = [s for s in crew.sailors if s.id not in keep_ids]
-    new_crew = Crew(ship_name=str(crew.ship_name), sailors=list(keep))
+    new_crew = Crew(ship_name=str(crew.ship_name), sailors=list(keep), issued=crew.next_number())
     _watches(new_crew.sailors)
-    old_crew = Crew(ship_name=str(crew.ship_name), sailors=list(rest), dead=list(crew.dead))
+    old_crew = Crew(
+        ship_name=str(crew.ship_name),
+        sailors=list(rest),
+        dead=list(crew.dead),
+        issued=crew.next_number(),
+    )
+    if getattr(crew, "post_watches", None):
+        # a merchantman's master and mate keep the watches they head, so that retaken they haul
+        # with them again (the lead's ruling 11 of 2026-11-13; `hands.post_watch`), as the near
+        # prize's company, kept whole, keeps them
+        old_crew.post_watches = dict(crew.post_watches)
     for s in old_crew.sailors:
         s.at = None
         s.quarters = ""
@@ -1071,12 +1009,20 @@ def retake(world: Any, prize: Any, *, by: str, how: str, captor: Any = None) -> 
     rec["retaken"] = (how, by, tick)
     if captor is not None:
         rec["recaptor"] = str(captor.id)  # the salvors (the design's §5.2)
-        cb = getattr(captor, "brain", None)
-        if cb is not None:
+        captor_hull = _hull(captor)
+        for cb in (
+            getattr(captor, "brain", None),
+            getattr(captor_hull, "captain", None) if captor_hull is not None else None,
+        ):
+            if cb is None:
+                continue
             # the recaptor's captain has his mark no more (package 74, step 4: wired, the
             # far cruiser came up `engaging` and stayed so over a ship of his own nation):
-            # spoken, she is a stranger no more, and he resumes his passage
-            cb.spoken_ids.add(str(prize.id))
+            # spoken, she is a stranger no more, and he resumes his passage; his hull's captain
+            # the same where she is crewed (the whole-change review of 80e703c7, gundeck-2)
+            spoken = getattr(cb, "spoken_ids", None)
+            if isinstance(spoken, set):
+                spoken.add(str(prize.id))
             if str(getattr(cb, "_stranger", "") or "") == str(prize.id) and cb.state in (
                 "engaging",
                 "chasing",
@@ -1363,7 +1309,12 @@ def take_prisoners_aboard(
 
 
 def _captor_near(world: Any, prize: Any, rec: dict[str, Any]) -> bool:
-    """A ship of the captor's nation within the cover distance (awake or far)."""
+    """A ship of the captor's nation within the cover distance (awake or far) who could support
+    her prize crew: the one answer (`relations.still`, `SUPPORT` within `COVER_NM`: on the sea,
+    not struck, nobody's prize; the lead's readings of cda12ec9, the far fight's family), so that
+    another prize of hers, or a ship of hers struck, holds no prisoners down."""
+    from freesail.world import relations as R
+
     sea = getattr(world, "vessels", None)
     if sea is None:
         return False
@@ -1372,8 +1323,7 @@ def _captor_near(world: Any, prize: Any, rec: dict[str, Any]) -> bool:
         if o is prize or o.done or str(o.nation) != nation:
             continue
         if str(o.id) == str(rec.get("captor")) or getattr(o, "brain", None) is not None:
-            _, d = _bearing_distance(prize.position, o.position)
-            if d <= COVER_NM * units.NAUTICAL_MILE:
+            if R.still(world, prize, o, R.SUPPORT, within_nm=COVER_NM):
                 return True
     return False
 
@@ -1641,8 +1591,12 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
         hull = _hull(v)
         if hull is not None and hull.awake:
             continue  # the near captain's own work (`Captain._take_possession`)
+        from freesail.world import relations as R
+
         prey = sea.get(str(brain._stranger or ""))
-        if prey is None or prey.done or not getattr(prey, "struck", False) or is_prize(prey):
+        if prey is None or not R.still(world, v, prey, R.STRUCK):
+            # (the lead's readings of cda12ec9, (F2)): no longer hers to take, by the one answer;
+            # her judgement gives her up at its next minute (`Judgement._prize_taken`)
             continue
         _, d = _bearing_distance(v.position, prey.position)
         if d > HAIL_REACH_M:

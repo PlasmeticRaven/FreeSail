@@ -320,6 +320,45 @@ def load_wardroom(ship_file: str | Path | None) -> Wardroom | None:
     return _wardroom(str(p)) if p is not None else None
 
 
+# The watches a post may head (package 75, the lead's ruling 11 of 2026-11-13).
+POST_WATCHES = ("starboard", "larboard")
+
+
+@functools.lru_cache(maxsize=16)
+def _post_watches(path: str) -> tuple[tuple[str, str], ...]:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    out: list[tuple[str, str]] = []
+    for i, entry in enumerate(raw.get("wardroom") or []):
+        if not isinstance(entry, dict) or entry.get("watch") is None:
+            continue
+        heads = " ".join(str(entry["watch"]).lower().split())
+        role = " ".join(str(entry.get("role") or "").lower().split())
+        if not entry.get("post"):
+            raise ValueError(
+                f"{path}, wardroom {i + 1}: the {role} heads the {heads} watch, but only a post "
+                "heads a watch (the merchantman's master and mate)."
+            )
+        if heads not in POST_WATCHES:
+            raise ValueError(
+                f"{path}, wardroom {i + 1}: the {role} heads the {heads!r} watch; say starboard "
+                "or larboard."
+            )
+        out.append((role, heads))
+    return tuple(out)
+
+
+def post_watches(ship_file: str | Path | None) -> dict[str, str]:
+    """The watch each post heads where the ship's wardroom file gives one, {post: "starboard" or
+    "larboard"} (package 75, the lead's ruling 11 of 2026-11-13: a merchantman's master and mate,
+    who haul with it on deck where its whole number is under the work's want; the master the
+    larboard and the mate the starboard, JUDGEMENT, the mate's as the people's turn keeps them,
+    `WATCH_KEEPERS`). Read at the muster into `Crew.post_watches` (`api.session.attach_crew`);
+    empty for a ship without a wardroom file or whose posts keep no watch. Raises ValueError in
+    words for a watch that is not one, or one given to a role that is no post."""
+    p = wardroom_path(ship_file)
+    return dict(_post_watches(str(p))) if p is not None else {}
+
+
 # A person made as aboard before a registry has adopted him (package 84, step 2): he is
 # aboard his home hull, whichever that proves to be when `People.add` or `People._build`
 # adopts him; the sentinel is never a hull's id and never outlives the adoption.
@@ -521,6 +560,15 @@ class Message:
     thing: str = ""
 
 
+def _unused(wanted: str, taken: set[str]) -> str:
+    """`wanted`, or it with a count after it, so that it is no id of `taken`."""
+    out, n = wanted, 2
+    while out in taken:
+        out = f"{wanted}:{n}"
+        n += 1
+    return out
+
+
 class Registry:
     """**The persons and the things of the world, one registry** (package 84, step 2; the
     design's §2.3), kept on the World (`world.registry`) and shared by every World of the
@@ -604,17 +652,72 @@ class Registry:
                     del persons[i]
                     return
 
-    def rehome(self, person: Person, hull_id: str) -> None:
+    def rehome(
+        self, person: Person, hull_id: str, row: bool = False, commands: bool = False
+    ) -> None:
         """A person given another home (a prize master, 74): moved between the lists. A
         company's ids are its muster's posts (`first_lieutenant`), so a man rehomed into a
         company that has his post already is told apart by his old home's id after a colon
         (`first_lieutenant:the ship`); `People.captain` and the records read the id as it
-        stands after the move."""
+        stands after the move. With `row`, his muster row moves with him (package 60's moves:
+        the take-up, the transfer, a boat's company joining); the prize master's road (74's)
+        keeps his row in his captor's muster, as its counts are pinned."""
+        old_home = str(getattr(person, "home", "") or "")
         self.remove(person)
-        if any(p.id == person.id for p in self.company(hull_id)):
-            person.id = f"{person.id}:{person.home}"
+        taken = {p.id for p in self.company(hull_id)}
+        if person.id in taken:
+            # told apart by his old home, and never an id she has already, by whatever road he
+            # came (the last round, item 1: by way of a third ship two men bore one id)
+            person.id = _unused(f"{person.id}:{person.home}", taken)
         person.home = hull_id
         self.company(hull_id).append(person)
+        if row:
+            self._row_follows(person, old_home, hull_id, commands=commands)
+
+    def _row_follows(
+        self, person: Person, old_home: str, hull_id: str, commands: bool = False
+    ) -> None:
+        """His muster row moved with him (package 60, the cut's reading, item 1: a person's row
+        travels with the person): out of his old ship's muster and into his new one's as her
+        watches stand (`musters.take_out`, `musters.join`), his `sailor_id` the id it has
+        there (told apart by the ship he came from where hers has it already). Nothing where
+        he has no row, or it is not in his old ship's muster."""
+        sid = getattr(person, "sailor_id", None)
+        if not sid or old_home == hull_id:
+            return
+        old_hull, new_hull = self._hull(old_home), self._hull(hull_id)
+        if old_hull is None or new_hull is None:
+            return
+        old_crew = (getattr(old_hull.ship, "extra", None) or {}).get("crew")
+        sailor = old_crew.by_id.get(sid) if old_crew is not None else None
+        if sailor is None:
+            return
+        from freesail.world.musters import join, take_out
+
+        post = sailor.post
+        take_out(old_hull, [sailor])
+        join(new_hull, [sailor], came_from=old_home)
+        person.sailor_id = sailor.id
+        # his post is his own and comes with his row (the last round, item 1): held in her
+        # where she has nobody in it, else he is carried by his rating without it; the man who
+        # takes her command holds her captain's post where nobody holds it
+        crew = new_hull.ship.extra["crew"]
+        if commands and "captain" not in crew.posts:
+            post = "captain"
+        if post and post not in crew.posts:
+            sailor.post = post
+            crew.reindex()
+
+    def _hull(self, hull_id: str) -> Any:
+        """The hull whose company is registered under `hull_id`, or None."""
+        company = self.companies.get(hull_id)
+        if company is None:
+            return None
+        from freesail.world.hulls import world_of
+
+        root = world_of(getattr(company, "world", None))
+        hulls = getattr(root, "hulls", None) or {}
+        return hulls.get(hull_id)
 
     def adopt_old(self, company: Any, hull_id: str) -> None:
         """A `People` from a checkpoint written before the registry (its persons and things
@@ -934,6 +1037,37 @@ class People:
             sailor = crew.by_id.get(p.sailor_id)
             if sailor is not None:
                 sailor.name = bare or name
+
+    def works_on_deck(self, sailor: Any) -> bool:
+        """Whether the person who is this post is aboard, well, free and on deck, so that they may
+        work with their watch (package 75, the lead's ruling 11 of 2026-11-13, on ruling 9's probe;
+        `Runner._working_posts`): True before the people are made (none has moved yet) and for a
+        post no person is."""
+        return self.off_the_deck(sailor) is None
+
+    def off_the_deck(self, sailor: Any) -> str | None:
+        """Why the person who is this post may not work with their watch, in a few words for
+        the belayed line ("gone below", "at the lunar", "sent for"), or None where they may
+        (`works_on_deck`; `Runner._posts_off_the_work`, the review of the lead's ruling 11)."""
+        if not self._built:
+            return None
+        p = next((x for x in self.people if x.sailor_id == sailor.id), None)
+        if p is None:
+            return None
+        if p.dead:
+            return "dead"
+        if p.sick:
+            return "sick"
+        if p.confined_to:
+            return "confined"
+        if not p.aboard or p.where not in ("quarterdeck", "deck"):
+            place = PLACES.get(p.where)
+            return "gone below" if place is not None and place.below else place_words(p.where)
+        if p.occupied:
+            return f"at the {p.task}"
+        if p.pending:
+            return "sent for"
+        return None
 
     # -- finding ------------------------------------------------------------------
 

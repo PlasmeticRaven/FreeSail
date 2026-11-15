@@ -529,7 +529,7 @@ needs libyaml; the second is what a machine without it pays, as the build machin
 | What | With libyaml's loader | By the pure-Python loader alone |
 |---|---|---|
 | The sampled sweep (`python tools/audit_range.py`) | about 20 s: the tree and the scan under 2 s, the code's years 2 s, every other check of the cheap road over 204 days (325 with the reference's) under half a second together, four whole worlds 15 s (two to six seconds each) | about 45 s: the tree and the scan 14 s, four whole worlds 29 s |
-| The fast tier of `tests/test_range_audit.py` (44 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
+| The fast tier of `tests/test_range_audit.py` (45 tests) | about 1 s | about 4 s, the small tree's fixture 2.4 s of it |
 | Truths 7-592 and 7-593 (fast) | under a second | 2.3 s |
 | The slow tier of the file: the sampled sweep's fixture, with the tests that read the whole tree | 19 s, and 4 s for the rest | 41 s for the fixture (the lead's measurement) |
 | The slow tier's proof that no draw moves the list: the sampled sweep at two more seeds; six whole worlds off Leghorn at three seeds | 41 s; 60 s | not measured |

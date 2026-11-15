@@ -374,6 +374,7 @@ def execute(ship: Any, order: Order) -> Result:
         )
     runner = verbs.runner_of(ship)
     text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params)
+    _waits_for_the_anchor(ship, runner, evo)
     data = {
         "verb": verb,
         "level": 1,
@@ -382,6 +383,47 @@ def execute(ship: Any, order: Order) -> Result:
         "failed": [],
     }
     return "evolution.started", text, data
+
+
+# The work that ends with her brought up, and the anchor work given behind it that waits for
+# it and is begun as soon as she is (package 60's review: since `scripts.ANCHOR_WORK_KEPT`
+# a weigh given as she came to an anchor ran when she was brought up, with no word).
+_BRINGS_HER_UP = ("come_to_anchor", "let_go_anchor", "moor")
+_WAITS_FOR_THE_ANCHOR = {"weigh_anchor": "The weigh", "unmoor": "The unmoor"}
+
+
+def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> None:
+    """A line at the order when a weigh or an unmoor waits for her coming to an anchor: it
+    is begun as soon as she is brought up, every ship's."""
+    what = _WAITS_FOR_THE_ANCHOR.get(evo)
+    instances = list(getattr(runner, "instances", None) or [])
+    if what is None or not instances or not getattr(instances[-1], "waiting", False):
+        return
+    mine = instances[-1]
+    ahead = next(
+        (
+            i
+            for i in instances
+            if i is not mine
+            and getattr(getattr(i, "evo", None), "id", "") in _BRINGS_HER_UP
+            and i.holds & mine.holds
+        ),
+        None,
+    )
+    if ahead is None:
+        return
+    doing = {
+        "come_to_anchor": "she is coming to an anchor",
+        "let_go_anchor": "the anchor is letting go",
+        "moor": "she is mooring",
+    }[ahead.evo.id]
+    ship.note(
+        "notable",
+        "evolution.waiting",
+        f"{what} waits for the anchor: {doing}, and it is begun as soon as she is brought up.",
+        verbs.SHIP_SUBJECT,
+        {"evolution": evo, "waits_for": ahead.evo.id},
+    )
 
 
 class _Reading:

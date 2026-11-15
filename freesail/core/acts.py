@@ -144,14 +144,16 @@ def target_of(world: Any, entry: dict[str, Any]) -> Any:
 
 def act_target_of(world: Any, entry: dict[str, Any]) -> Any:
     """The world an act is given to again (`give`): as `target_of`, but an act keyed "" is
-    the player's own hull's (`hull_id_of`), not the followed hull's as an input's is
+    the game's first hull's (`hull_id_of`; package 60), not the followed hull's as an input's is
     (`World.submit` names a hull only when she is not followed), so it is given to her by
     her own handle when another hull is current or followed (package 97: under `follow` it
     landed on the followed hull); the World itself otherwise, as in every recorded passage."""
     if not str(entry.get("ship") or ""):
-        players = getattr(world, "players", None)
-        if players is not None and getattr(world, "own", None) is not players:
-            return players
+        # the game's first hull (package 60: "" is `PLAYER_ID`'s, the first hull's for the
+        # whole game, whichever ship is the player's; the same hull in every save before)
+        first = (getattr(world, "__dict__", None) or {}).get("_own")
+        if first is not None and getattr(world, "own", None) is not first:
+            return first
     return target_of(world, entry)
 
 
@@ -493,10 +495,21 @@ def decode(v: Any) -> Any:
             module, _, name = str(v["__class__"]).partition(":")
             if not module.startswith("freesail."):
                 raise ValueError(f"an act names {module}:{name}, which an act may not hold")
+            # a record of the game's, defined in that module of the game by that name
+            # (package 115, part B: the same cause as the checkpoint's, a name from a file
+            # walked through whatever a module of the game imports; no walk now leaves the
+            # module the name says, and nothing but a record class is made)
             cls: Any = importlib.import_module(module)
             for part in name.split("."):
-                cls = getattr(cls, part)
-            if not dataclasses.is_dataclass(cls):
+                cls = cls.__dict__.get(part) if isinstance(cls, type) else vars(cls).get(part)
+                if cls is None:
+                    break
+            if (
+                not isinstance(cls, type)
+                or not dataclasses.is_dataclass(cls)
+                or cls.__module__ != module
+                or cls.__qualname__ != name
+            ):
                 raise ValueError(f"an act names {module}:{name}, which is no record of the game")
             return cls(**{k: decode(x) for k, x in v["fields"].items()})
         return {k: decode(x) for k, x in v.items()}

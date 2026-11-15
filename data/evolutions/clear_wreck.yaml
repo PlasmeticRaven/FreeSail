@@ -25,6 +25,12 @@
 # weather factor and the crew factor make them.
 id: clear_wreck
 verb: cut_away
+# The work's words before the part's name (`work:`, the lead's last list of 2026-11-14, 9, and the
+# review of 0dcdb8cf, F4): "to clear away the wreck of the fore mast" and "clearing away the wreck
+# of the fore mast", the words of its own lines ("Clear away the wreck of the {wreck}!"), where its
+# verb's read "cut away the fore mast", another work's (`cut_away_mast`), and untrue of a spar sent
+# down on deck.
+work: clear away the wreck of
 applies_to: {class: part}
 script: clear_wreck
 params: {aloft: [secure, sails]}

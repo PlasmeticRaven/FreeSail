@@ -2,7 +2,9 @@
 
     engage her to starboard         the mark and the side: a standing intention the battery
     engage the brig to larboard     keeps (the engaged side's guns served and fired at her);
-    engage on both sides            'her' or nothing is the enemy nearest, else the sail nearest
+    engage on both sides            'her' or nothing is the enemy nearest who may be fought;
+                                    with none, refused: a sail named is engaged as named;
+                                    refused, her own colours struck
     load with round shot            the charge the guns are loaded with from now (round, chain,
                                     grape, double, a blank cartridge); a loaded gun keeps its
                                     charge until it is fired
@@ -66,6 +68,14 @@ guns, being places of the ship besides), "the poop" and "the poop carronades", e
 without, name that deck's broadside guns (its carronades alone where "carronades" is said), in
 `guns_named` and so in the director's and the world orders' slots that read it. Words that name
 no gun of hers are refused as before.
+
+**A number with its deck** (package 75, B7.d: Bel-D §5.2 item 6, the lead's answer (3) of
+2026-10-29): a ship whose file numbers her guns by deck (the 74 and the 64) has a No. 3 on each
+deck, each deck's pairs from No. 1 forward as the period numbered them, and her gun is named with
+its deck: "No. 3 starboard gun of the lower deck" (its name), "No. 3 on the lower deck", "the
+lower deck's No. 3", "No. 2 gun of the poop", the deck in the words a deck is named by above. A
+bare number names no gun of hers, and "fire" refuses it in words, naming the decks that have one.
+Every other ship's numbers are said as before, bare.
 """
 
 from __future__ import annotations
@@ -90,7 +100,16 @@ from freesail.orders import numbers
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
-from freesail.ship.parts import BARREL_LB, Charge, Gun, fit_levels, gun_words, kind_rank, magazine
+from freesail.ship.parts import (
+    BARREL_LB,
+    DECK_SAID,
+    Charge,
+    Gun,
+    fit_levels,
+    gun_words,
+    kind_rank,
+    magazine,
+)
 from freesail.ship.schema import DECK_WORDS
 
 __all__ = ["GUNNERY_VERBS", "check", "execute", "guns_named"]
@@ -210,6 +229,16 @@ _DECK_OF_WORD = {
     "forecastle": "forecastle",
     "poop": "roundhouse",
 }
+# A number with its deck on a ship numbered by deck (package 75, B7.d; the module's head), its side
+# already taken out: "No. 3 gun of the lower deck", "No. 3 on the lower deck", "the lower deck's
+# No. 3", "the poop's No. 2".
+_A_DECK = (
+    r"(?P<deck>(?:lower|upper|main|middle|gun)(?:\s+|-)deck|quarterdeck|quarter deck|quarter-deck"
+    r"|forecastle|poop)"
+)
+_A_NUMBER = r"(?:no|number|num)?\s*(?P<n>\d+)\s*(?:gun|carronade)?"
+_NUMBER_OF_A_DECK = re.compile(rf"^(?:the\s+)?{_A_NUMBER}\s+(?:of|on)\s+(?:the\s+)?{_A_DECK}$")
+_A_DECKS_NUMBER = re.compile(rf"^(?:the\s+)?{_A_DECK}(?:'s)?\s+{_A_NUMBER}$")
 _WORD_NUMBERS = {
     "one": 1,
     "two": 2,
@@ -234,6 +263,137 @@ _WORD_NUMBERS = {
 
 
 def execute(ship: Any, order: Order) -> Result:
+    """An order of the gun deck, its answer made true of the guns (`_true_of_the_guns`)."""
+    return _true_of_the_guns(ship, order.verb, _execute(ship, order))
+
+
+# the orders that set the battery's standing intentions, whose answers say the guns' state
+_INTENTIONS = frozenset(
+    {
+        "engage",
+        "load",
+        "run out the guns",
+        "run in the guns",
+        "aim at",
+        "fire as they bear",
+        "fire by divisions",
+        "hold your fire",
+        "fire on the roll",
+        "cease firing",
+        # every order that asks the guns to fire (the lead's reading of part D at 60af48e,
+        # item 3): `fire` and its forms, a broadside, a gun by name, a gun to leeward
+        "fire",
+    }
+)
+
+
+def _guns_state(ship: Any) -> str:
+    """'loose' when a gun that serves is cast loose, 'casting' while the crews cast them
+    loose, else 'secured' (no gun that serves is loose)."""
+    guns = [g for g in getattr(ship, "guns", {}).values() if g.serves]
+    if not guns or any(g.cast_loose for g in guns):
+        return "loose"
+    runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+    for inst in getattr(runner, "instances", None) or []:
+        if getattr(getattr(inst, "evo", None), "id", "") == "cast_loose_guns":
+            return "casting"
+    return "secured"
+
+
+def _true_of_the_guns(ship: Any, verb: str, result: Result) -> Result:
+    """The answer to an order of the standing intentions made true of the guns (the cold
+    review of 2026-11-14, 1.5 and 5.3 item 1; package 115 D1). An intention is the battery's
+    and stands for the guns when they are served: with every gun secured, "The guns are
+    firing as they bear already" was said of guns lashed in their ports, and the action was
+    fought with them silent and nothing said why. With a gun cast loose the answer is as it
+    was; with none, it says the order stands, what is so, and what to order next. Casting
+    loose stays its own word (Falconer 1780, EXERCISE: "1st. Silence. 2d. Cast loose your
+    guns."): the beat sends the men to quarters, the guns are cast loose at the word."""
+    if verb not in _INTENTIONS:
+        return result
+    state = _guns_state(ship)
+    if state == "loose":
+        return result
+    kind, text, data = result
+    if verb == "engage" and state == "secured":
+        # engage is the order to fight her: with the guns secured it begins casting them
+        # loose itself, by the order 'cast loose the guns' and its evolution (one road, the
+        # rules captain's and the player's), and says so (the owner's word of 2026-11-14:
+        # "it is an explicit order for engaging, so it stands to reason that the gun would
+        # be cast loose on it"; package 115 D1)
+        from freesail.orders import handle
+
+        side = data.get("side") or getattr(battery_of(ship), "engaged", None) or ""
+        try:
+            handle(ship, "cast loose the guns")
+        except OrderError as e:
+            return kind, f"{text} The guns are secured and cannot be cast loose now: {e}", data
+        where = "on both sides" if side == "both" else f"to {side}" if side else ""
+        if data.get("held"):
+            # one true sentence, not "held" and "engages when they are" both (the lead's
+            # reading of part D at 60af48e, item 6): cast loose, they stay held
+            text = text.replace(
+                f" The guns are held {data['held']}: 'fire as they bear' to open.", ""
+            )
+            text += (
+                f" The guns are being cast loose, and held {data['held']} when they are: "
+                "'fire as they bear' to open."
+            )
+        else:
+            text += f" The guns are being cast loose; she engages {where} when they are."
+        return kind, text.replace("  ", " "), data | {"guns": "casting", "cast_loose_by": "engage"}
+    if verb == "cease firing":
+        text = "Cease firing: no gun fires but at the word."
+    elif verb == "fire":
+        # the word stands for the guns when they are served, never "as soon as it is
+        # ready" of a gun lashed in its port, nor "no gun loaded" of guns loaded and secured
+        text = text.replace(
+            "no gun of it is loaded and run out yet; the word stands until one bears",
+            "the word stands until a gun of it is cast loose, run out and bears",
+        )
+        text = text.replace("as soon as it is ready", "as soon as it is cast loose and ready")
+        text = text.replace("as soon as ready", "as soon as cast loose and ready")
+    else:
+        m = re.match(r"The guns are (.+) already\.$", text)
+        if m:
+            text = f"So ordered already: {m.group(1)}."
+    if state == "casting":
+        text += " The guns are being cast loose; they are served when it is done."
+    else:
+        loaded = [g for g in ship.guns.values() if g.serves and g.loaded]
+        if loaded:
+            # guns secured with their charge in them (secured after an action): they are
+            # loaded, and lashed (the lead's reading of part D at 60af48e, item 3)
+            from freesail.crew.model import number_words
+
+            many = len(loaded)
+            text += (
+                f" The guns are secured, {number_words(many)} of them loaded: none is run "
+                f"out or fired until they are cast loose; {_to_cast_loose(ship)}."
+            )
+            if many == len([g for g in ship.guns.values() if g.serves]):
+                text = text.replace(f"{number_words(many)} of them loaded", "all loaded")
+        else:
+            text += (
+                " The guns are secured: none is loaded, run out or fired until they are cast "
+                f"loose; {_to_cast_loose(ship)}."
+            )
+    return kind, text, data | {"guns": state}
+
+
+def _to_cast_loose(ship: Any) -> str:
+    """The order that casts the guns loose from where she is: 'cast loose the guns' wants
+    the hands at quarters and refuses before the beat (`CastLooseScript.check`), so before
+    it the hint names the beat first (the lead's reading of part D at 60af48e, item 6)."""
+    from freesail.crew.quarters import quarters_of
+
+    q = quarters_of(ship)
+    if q is None or not getattr(q, "at_quarters", False):
+        return "say 'beat to quarters', then 'cast loose the guns'"
+    return "say 'cast loose the guns'"
+
+
+def _execute(ship: Any, order: Order) -> Result:
     battery = battery_of(ship)
     if battery is None:
         raise OrderError("She carries no guns.")
@@ -329,6 +489,14 @@ def _side_of(said: str) -> tuple[str | None, str]:
 
 
 def _engage(ship: Any, battery: Battery, said: str) -> Result:
+    if (getattr(ship, "extra", None) or {}).get("struck"):
+        # her own state before any mark (the review of 0dcdb8cf, F6): a ship that has struck
+        # fights nobody (`relations.still`'s holder struck), and the order's "her" said so as
+        # "no enemy in sight to engage" with an enemy in sight; a mark named was taken, "the guns
+        # to fire as they bear", for guns that stay silent
+        raise OrderError(
+            "Our own colours are struck: the guns are silent; she lies to for her captor."
+        )
     # practice and resupply: a notional mark's words before the side's (`_side_of` refuses
     # a bare 'starboard' among them), and the cask's before the sail's
     notional = _notional_of(ship, said)
@@ -352,28 +520,78 @@ def _engage(ship: Any, battery: Battery, said: str) -> Result:
             f"Engage {words} to which side? Say 'engage her to starboard' or 'to larboard', "
             f"or 'on both sides'."
         )
-    if battery.mode is FireMode.HOLD:
+    held = battery.mode is FireMode.HOLD and _hold_binds(ship, battery)
+    if battery.mode is FireMode.HOLD and not held:
         changed.append("the guns to fire as they bear")
         battery.mode = FireMode.AS_THEY_BEAR
+        battery.held_by_order = ""  # the hold is loosed
     if battery.exercise:
         battery.end_exercise()  # practice and resupply: an engage ends the dumb show
         changed.append("the exercise over")
+    data = {"verb": "engage", "level": 1, "target": target_id, "side": battery.engaged}
+    if held:
+        data["held"] = _held_words(ship, battery)
     if not changed:
-        return (
-            "guns.engage",
-            f"She is engaging {words} to {battery.engaged} already.",
-            {"verb": "engage", "level": 1, "target": target_id, "side": battery.engaged},
-        )
+        where = "on both sides" if battery.engaged == "both" else f"to {battery.engaged}"
+        if held:
+            # not "engaging already" of a battery that is held (the lead's reading of part
+            # D at 60af48e, item 1): she has the mark and the side, and her guns are held
+            text = f"She has {words} for her mark {where}, and her guns are held"
+            return "guns.engage", f"{text} {data['held']}: 'fire as they bear' to open.", data
+        return "guns.engage", f"She is engaging {words} {where} already.", data
     text = f"Engage {words} to {battery.engaged}: " + ", ".join(changed) + "."
     if battery.engaged == "both":
         text = f"Engage {words} on both sides: " + ", ".join(changed) + "."
-    data = {"verb": "engage", "level": 1, "target": target_id, "side": battery.engaged}
+    if held:
+        # the later explicit order about firing stands (the lead's ruling of 2026-11-14 on
+        # package 115 D1, JUDGEMENT): after 'hold your fire' or 'cease firing', engage takes
+        # her for the mark and holds; before, it turned the hold into "as they bear"
+        text += f" The guns are held {data['held']}: 'fire as they bear' to open."
     return "guns.engage", text, data
 
 
+def _order_hand(ship: Any) -> str:
+    """Whose order is being carried out: the actor the World keeps on the ship while its
+    handler runs (`core.world.ORDER_ACTOR`; '' outside an order)."""
+    return str((getattr(ship, "extra", None) or {}).get("order_actor") or "")
+
+
+def _by_the_rules(actor: str) -> bool:
+    """An order of the rules captain's judgement (`world.captains.actor_for`)."""
+    from freesail.core.world import CAPTAIN_RULE_PREFIX
+
+    return str(actor).startswith(CAPTAIN_RULE_PREFIX)
+
+
+def _hold_binds(ship: Any, battery: Battery) -> bool:
+    """Whether the battery's hold stands against this engage. The hand that held is the hand
+    that must loose (the lead's ruling of 2026-11-14 on package 115 D1, JUDGEMENT, and its
+    reading of part D at 60af48e, item 1): an explicit hold binds a later engage, save that a
+    hold by the rules captain's book ('hold your fire (until she is within the book's
+    range)', at every entry to engaging) never binds the player's own engage, which opens
+    fire as it did before the ruling. A player's hold binds the rules captain's engage too,
+    as at 60af48e."""
+    holder = getattr(battery, "held_by_order", "") or ""
+    if not holder:
+        return False
+    if holder is True:  # an older battery's flag, before the hand was kept
+        return True
+    return not (_by_the_rules(str(holder)) and not _by_the_rules(_order_hand(ship)))
+
+
+def _held_words(ship: Any, battery: Battery) -> str:
+    """Whose hold it is, in the answer's words: never "at your order" of an order the player
+    did not give."""
+    holder = getattr(battery, "held_by_order", "") or ""
+    if isinstance(holder, str) and _by_the_rules(holder):
+        return "by the captain's book"
+    return "at your order"
+
+
 def _mark(ship: Any, words: str) -> tuple[str, str]:
-    """The sail the words name among those in sight: 'her' or nothing is the nearest
-    enemy, else the nearest sail; a rig's word, a name or an id otherwise."""
+    """The sail the words name among those in sight: 'her' or nothing is the nearest sail
+    her captain holds an enemy and may fight (`_enemy_to_engage`), refused in words with
+    none; a rig's word, a name or an id otherwise (the player's own choice of mark)."""
     world = world_of(ship)
     lookout = getattr(world, "lookout", None) if world is not None else None
     if world is None or lookout is None:
@@ -386,20 +604,13 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
         if want.startswith(lead) and want not in _HER:
             want = want[len(lead) :]
     if not want or words.lower() in _HER:
-        nations = getattr(world, "nations", None)
-        ports = getattr(world, "dealings", None)
-        own = getattr(ports, "ship_nation", None)
-        enemies = [
-            i
-            for i in items
-            if i.get("nation")
-            and own
-            and nations is not None
-            and nations.at_war(str(i["nation"]), str(own))
-        ]
-        fired = _fired_on(world)
-        enemies += [i for i in items if i.get("id") in fired and i not in enemies]
-        pick = enemies[0] if enemies else items[0]
+        pick = _enemy_to_engage(world, items)
+        if pick is None:
+            seen = ", ".join(_name_of(world, i) for i in items)
+            raise OrderError(
+                f"There is no enemy in sight to engage: name the sail to engage her "
+                f"('engage the brig to starboard'); in sight: {seen}."
+            )
         return str(pick["id"]), _name_of(world, pick)
     for i in items:
         v = world.vessels.get(str(i["id"])) if hasattr(world, "vessels") else None
@@ -413,6 +624,39 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
     raise OrderError(f"No sail in sight answers to '{words}'; in sight: {seen}.")
 
 
+def _enemy_to_engage(world: Any, items: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The order's 'her' (the lead's last list of 2026-11-14, item 1): the nearest sail in sight
+    (`items` are the lookout's, nearest first) that her captain holds an enemy (by her colours at
+    war with his nation, her shot at him, the private signal or the hail: `Captain._is_enemy`, his
+    judgement of the stimuli) and may fight (the one answer, `relations.MARK`: not struck, nobody's
+    prize, none of his side); None with none such, for the order is then refused in words. One
+    rule for the player's order and the rules captain's ("engage her", given when his own judgement
+    has an enemy in range), so that no sail is chosen the rule would not choose: before it, with no
+    enemy who might be fought in sight (a British merchant brig taken by the French, the only
+    enemy), the order took the first sail in sight, whoever she was, and laid the guns on a British
+    brig-sloop a third of a mile off."""
+    from freesail.world import relations as R
+    from freesail.world.signals import own_id
+
+    captain = getattr(world, "captain", None)
+    is_enemy = getattr(captain, "_is_enemy", None)
+    nations = getattr(world, "nations", None)
+    ports = getattr(world, "dealings", None)
+    own = getattr(ports, "ship_nation", None)
+    me = own_id(world)
+    for i in items:
+        if callable(is_enemy):
+            enemy = bool(is_enemy(i))
+        else:
+            shown = i.get("nation")
+            at_war = bool(shown and own and nations is not None)
+            fired = R.has_fired(world, str(i.get("id") or ""), me)
+            enemy = (at_war and nations.at_war(str(shown), str(own))) or fired
+        if enemy and R.still(world, me, str(i.get("id") or ""), R.MARK, judge=captain):
+            return i
+    return None
+
+
 def _name_of(world: Any, item: dict[str, Any]) -> str:
     lookout = getattr(world, "lookout", None)
     if lookout is not None:
@@ -423,12 +667,6 @@ def _name_of(world: Any, item: dict[str, Any]) -> str:
         except Exception:  # noqa: BLE001
             pass
     return str(item.get("known") or "the sail")
-
-
-def _fired_on(world: Any) -> set[str]:
-    captain = getattr(world, "captain", None)
-    fired = getattr(captain, "fired_on", None) if captain is not None else None
-    return set(fired or ())
 
 
 # -- the standing intentions ---------------------------------------------------------------
@@ -542,7 +780,20 @@ def _mode(ship: Any, battery: Battery, mode: FireMode) -> Result:
         FireMode.BY_DIVISIONS: "Fire by divisions: the forward and the after guns by turns.",
         FireMode.HOLD: "Hold your fire: no gun fires but by name or at the word.",
     }[mode]
+    if mode is not FireMode.HOLD and battery.target is None:
+        # no mark standing (none engaged, or one given up when she changed hands: the lead's last
+        # list, item 5): the doctrine stands for the mark to come, and the order is answered as
+        # one to fire with no mark is (`_fire`), never as if a gun would fire
+        battery.mode = mode
+        battery.word = None
+        return (
+            "guns.mode",
+            f"{words} No mark is engaged: say 'engage her to starboard' to lay the guns.",
+            {"verb": "fire mode", "level": 1, "mode": str(mode), "no_mark": True},
+        )
     if battery.mode is mode:
+        if mode is FireMode.HOLD:
+            battery.held_by_order = _order_hand(ship) or "captain"  # said, though held
         return (
             "guns.mode",
             f"The guns are {'holding their fire' if mode is FireMode.HOLD else f'firing {mode}'} "
@@ -551,6 +802,9 @@ def _mode(ship: Any, battery: Battery, mode: FireMode) -> Result:
         )
     battery.mode = mode
     battery.word = None
+    # an explicit hold stands against a later engage (`_engage`); an order to fire ends it
+    # (whose hold it is, by the order's actor: `_hold_binds`)
+    battery.held_by_order = (_order_hand(ship) or "captain") if mode is FireMode.HOLD else ""
     return "guns.mode", words, {"verb": "fire mode", "level": 1, "mode": str(mode)}
 
 
@@ -613,11 +867,59 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
         if not deck:
             return {"guns": guns}
         return {"guns": guns, "deck": deck, "deck_side": _side_said(w)}
+    on_each = _a_number_on_each_deck(ship, w)
+    if on_each:
+        raise OrderError(on_each)
     raise OrderError(
         f"Fire what? Say 'fire' for the broadside at the word, 'fire the starboard broadside', "
-        f"'fire No. 3 gun', 'fire the bow chaser', 'fire the pivot gun', 'fire a shot across "
-        f"her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
+        f"'fire No. 3 gun{_of_her_gun_deck(ship)}', 'fire the bow chaser', 'fire the pivot gun', "
+        f"'fire a shot across her bows' or 'fire a gun to leeward'; '{said}' names no gun of hers."
     )
+
+
+def _numbered_by_deck(guns: dict[str, Gun]) -> bool:
+    """Whether her guns are numbered by deck (package 75, B7.d: her file's armament says so)."""
+    return any(g.by_deck for g in guns.values())
+
+
+def _of_her_gun_deck(ship: Any) -> str:
+    """' of the lower deck' after a number in a refusal's example on a ship numbered by deck
+    (package 75, B7.d), her lowest deck with broadside guns, else ''."""
+    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
+    if not _numbered_by_deck(guns):
+        return ""
+    decks = [g.deck for g in guns.values() if g.place == "broadside" and g.deck in DECK_WORDS]
+    return f" of {DECK_SAID[min(decks, key=DECK_WORDS.index)]}" if decks else ""
+
+
+def _a_number_on_each_deck(ship: Any, w: str) -> str:
+    """A bare number refused in words on a ship numbered by deck (package 75, B7.d; Bel-D §5.2
+    item 6): 'She has a No. 3 starboard gun on the lower deck, the upper deck and the
+    quarterdeck: name the deck, as 'fire No. 3 starboard gun of the lower deck'.' Empty where
+    the words are no bare number, her guns are numbered on across her decks, or no deck of hers
+    has the number (the words then name no gun of hers, as before)."""
+    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
+    if not _numbered_by_deck(guns):
+        return ""
+    words = [str(_WORD_NUMBERS.get(x, x)) for x in w.replace(".", " ").split()]
+    side = _side_said(w)
+    m = _GUN_NUMBER.match(" ".join(x for x in words if x not in ("starboard", "larboard", "port")))
+    if m is None:
+        return ""
+    n = int(m.group(1))
+    decks = {
+        g.deck
+        for g in guns.values()
+        if g.place == "broadside"
+        and g.number == n
+        and g.deck in DECK_WORDS
+        and (side is None or g.side == side)
+    }
+    if not decks:
+        return ""
+    said = [DECK_SAID[d] for d in sorted(decks, key=DECK_WORDS.index)]
+    gun = f"No. {n} {side + ' ' if side else ''}gun"
+    return f"She has a {gun} on {_and(said)}: name the deck, as 'fire {gun} of {said[0]}'."
 
 
 def guns_named(ship: Any, words: str) -> list[str]:
@@ -684,6 +986,34 @@ def _guns_of_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str
     ]
 
 
+def _number_on_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str] | None:
+    """The broadside guns of the number on the deck the words name ('No. 3 gun of the lower deck',
+    'the lower deck's No. 3', 'No. 2 on the poop'; package 75, B7.d, on a ship numbered by deck),
+    on the side if one was said; None where the words say no number with a deck, and [] where
+    that deck has no such number of hers."""
+    m = _NUMBER_OF_A_DECK.match(w2) or _A_DECKS_NUMBER.match(w2)
+    if m is None:
+        return None
+    broadside = [g for g in guns.values() if g.place == "broadside"]
+    said = m.group("deck")
+    gun_deck = re.match(r"^(lower|upper|main|middle|gun)(?:\s+|-)deck$", said)
+    if gun_deck is None:
+        deck = _DECK_OF_WORD[said]
+    elif gun_deck.group(1) == "gun":
+        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
+        if not decks:
+            return []
+        deck = min(decks, key=DECK_WORDS.index)
+    else:
+        deck = _DECK_OF_WORD[gun_deck.group(1)]
+    n = int(m.group("n"))
+    return [
+        g.id
+        for g in broadside
+        if g.deck == deck and g.number == n and (side is None or g.side == side)
+    ]
+
+
 def _guns_named(ship: Any, w: str) -> list[str]:
     guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
     words = w.replace(".", " ").split()
@@ -694,11 +1024,20 @@ def _guns_named(ship: Any, w: str) -> list[str]:
         if name in words:
             side = s
             w2 = " ".join(x for x in words if x != name)
-    by_deck = _guns_of_a_deck(guns, w2, side)
-    if by_deck is not None:
-        return by_deck
+    numbered_by_deck = _numbered_by_deck(guns)
+    if numbered_by_deck:
+        on_a_deck = _number_on_a_deck(guns, w2, side)
+        if on_a_deck is not None:
+            return on_a_deck
+    of_a_deck = _guns_of_a_deck(guns, w2, side)
+    if of_a_deck is not None:
+        return of_a_deck
     m = _GUN_NUMBER.match(w2)
     if m:
+        if numbered_by_deck:
+            # a No. 3 on each deck (package 75, B7.d): a bare number names none of them, and
+            # 'fire' says so (`_a_number_on_each_deck`)
+            return []
         n = int(m.group(1))
         out = [
             g.id
@@ -903,6 +1242,8 @@ def _priority(ship: Any, quarters: Any, verb: str) -> Result:
 def _cease(ship: Any, battery: Battery) -> Result:
     was = battery.mode
     battery.mode = FireMode.HOLD
+    # an explicit order about firing (see `_engage`), kept with whose order it was
+    battery.held_by_order = _order_hand(ship) or "captain"
     battery.word = None
     battery.single = []
     battery.across_bows = False

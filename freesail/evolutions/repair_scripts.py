@@ -440,6 +440,21 @@ class FishSparScript(PhasedScript):
             return f"the {name} is sound enough; a fish would add nothing to it"
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the spar neither carried away nor sent down, which the fish's own
+        going never does (`Script.standing`)."""
+        spar = self.spar if self.spar is not None else self._subject(words)
+        if spar is None:
+            return None
+        name = _name(self.ship, spar.id)
+        if spar.wrecked:
+            return (
+                f"the {name} is carried away, not sprung; clear the wreck and shift it for a spare"
+            )
+        if spar.sent_down:
+            return f"the {name} is sent down on deck; it is fished when it stands"
+        return None
+
     def begin(self, words: dict[str, Any]) -> None:
         if self.spar is None:
             self.spar = self._subject(words)
@@ -500,6 +515,16 @@ class CutAwayMastScript(PhasedScript):
             return f"the {name} is no lower mast; a topmast is sent down, not cut away"
         if spar.wrecked:
             return f"the {name} is carried away already; clear the wreck"
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until the axes have done (the mast goes over the side at the end of `axes`, by the
+        work's own going): the mast not carried away already (`Script.standing`)."""
+        spar = self.spar if self.spar is not None else self._subject(words)
+        if spar is None or self.phase not in ("ready", "axes"):
+            return None
+        if spar.wrecked:
+            return f"the {_name(self.ship, spar.id)} is carried away already; clear the wreck"
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -883,6 +908,45 @@ class SetUpRiggingScript(PhasedScript):
         }
 
 
+class RelievingTacklesScript(PhasedScript):
+    """The relieving tackles rove to the tiller when the wheel or its ropes are shot away
+    (`ship.extra["helm_lost"]`, `combat.hits`): one phase, `reeve`, the tackles hooked to the
+    tiller's end below and manned there; at its end the helm answers again, steered from the
+    gunroom by the tackles (the cold review of 2026-11-14, 5.3 item 8; package 115 D4 (e): the
+    hit's own line promised it and nothing kept the promise). What steering she has
+    meanwhile is the physics' as before (the rudder held where it was)."""
+
+    holds_subject = False
+
+    DEFAULTS = {"reeve": 300.0}
+
+    def holds(self) -> set[str]:
+        return {"the tiller"}
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        if not self.ship.extra.get("helm_lost"):
+            return "the helm answers; there is no need of the relieving tackles"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.start_phases(["reeve"])
+
+    def end_phase(self, name: str) -> None:
+        lost = self.ship.extra.pop("helm_lost", None)
+        self.ship.extra["helm_by_tackles"] = str(lost or "the wheel shot away")
+
+    def left_words(self) -> str | None:
+        """Belayed before they are rove: what is so (the lead's reading of part D at
+        60af48e, item 6: "the helm and the yards left as they stand at reeve")."""
+        return "the tackles not rove, the helm lost as the shot left it"
+
+    def words(self) -> dict[str, Any]:
+        return {
+            "done": "The relieving tackles are rove to the tiller and manned below: the helm "
+            "answers again, steered by the tackles.",
+        }
+
+
 REPAIR_SCRIPTS: dict[str, type[PhasedScript]] = {
     "batten_down": BattenDownScript,
     "plug_shot_hole": PlugShotHoleScript,
@@ -892,4 +956,5 @@ REPAIR_SCRIPTS: dict[str, type[PhasedScript]] = {
     "jury_mast": JuryMastScript,
     "rig_preventers": RigPreventersScript,
     "set_up_rigging": SetUpRiggingScript,
+    "relieving_tackles": RelievingTacklesScript,
 }

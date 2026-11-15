@@ -8,12 +8,19 @@
 # sail as a lug's, 8 to 85 degrees. No period
 # timing was found: the times are a square sail's loosing and letting go and a lug's hoisting
 # (judgement).
+#
+# Where the hands on deck are too few to begin it, as a small coaster's watch of two by night,
+# all hands are called for it and piped down after, as a small company was turned up for
+# any work of her great sail (judgement; no source on her watches was found).
 
 # Build notes (not served by the library's catalogue):
 # Package 75, B3.3: docs/design/Design-ShipsEngineExtensions.md §5.3 (Falconer 1780, YARD, for
 # the furl aloft; set_square's loose and let-go, dip_lug's hoist). The angle is `wanted_sheet`'s,
 # by the class whose trim the sail takes (the lug's). Six hands, which a company of eight
 # meets with a watch of four on deck (D43; `hands.SHORT_HANDED_SHARE`).
+# Package 75, the lead's ruling (1) of 2026-11-10 (the bilander's short watch): `too_few: all
+# hands` (`hands.CrewRequest.calls_all_hands`, `Runner._watch_too_few`), on the settee's
+# files alone so that no other ship's work changes.
 id: set_settee
 verb: set
 applies_to: {class: settee}
@@ -61,5 +68,5 @@ on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the main top's men loose it aloft, the afterguard and the forecastlemen man its tack and
 # sheet (judgement, as set_square's stations)
-crew: {hands: 6, rating: ordinary, stations: [topmen, afterguard, forecastle]}
+crew: {hands: 6, rating: ordinary, stations: [topmen, afterguard, forecastle], too_few: all hands}
 source: "Lescallier 1791 p. 390 (the settee set and clewed up as a square sail); Falconer 1780, YARD; set_square's and dip_lug's times (judgement)"

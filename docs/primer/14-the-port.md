@@ -433,6 +433,37 @@ The best bower let go in five fathoms.
 
 The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco priced for the Cornish run, beside the wine, the salt and the canvas of the coast. Those prices are judgement and the file says so; no price current of Roscoff is in the references. The English smugglers who bought there came under false colours or by licence; the port reads a ship's nation and not the colours she shows (chapter 23), so an English ship that stands in for Roscoff is met as an enemy whatever she hoists.
 
+## Taking command of another ship
+
+A ship can be given you in the running game: the director's appointment ("Captain Bowen is
+appointed to the merchant brig Fly, lying at Falmouth") makes her yours to take, where she lies.
+Go aboard her in your own boat (`go to the boat`, then `come alongside the Fly`), and once you
+stand on her deck say `take command of her`. From that order she is your ship: her people's
+captain is you, your journal and your record come with you, the prompt and the play log are hers,
+and both ships' logs say so. Your old ship is left to her senior officer, the first lieutenant in
+a King's ship, unless you lay her up at the port's anchorage (`take command of her, and lay the
+Amazon up`) or name whom she is left to (`take command of her, and leave the Amazon to Mr
+Pearce`). Lying at her anchor she stays there in his charge, for nobody aboard her weighs of his
+own accord; under way you may give her an errand as well (`..., and leave the Amazon to Mr Pearce
+to cruise off the Lizard within 10 miles`). Her purse, her hold, her
+papers, her stores and her standing orders stay with her: they are hers. A ship not given you,
+a ship in a squadron, a ship whose captain's station is held, and a ship you are not aboard are
+refused in words. The save keeps the game as it began, and the change is your order in it, so a
+replay takes command of her again at the same minute.
+
+Her people are hers, but men can be moved between two ships of yours lying within a boat's pull:
+`transfer fifteen hands to the Fly`, `transfer six able seamen and four ordinary to the Fly`,
+`transfer Mr Cannon and two hands to the Sherbourne`, or `transfer the people and the hands to
+the Fly` from a ship laid up, which leaves her ship-keepers. The boat takes them across, twelve
+to a load, at her own pace as she goes to any ship (hoisted out, the pull, five minutes
+alongside, the pull back); every man told off leaves his ship's watch at the order, and each load
+joins the other ship's watches as they stand and is said in her log as it comes up her side.
+Lying alongside, they go over the gangway at once. A King's ship's people are borne on the King's
+books and turned over by the Admiralty's order, not by her captain's, and are refused in words;
+so is a ship left unable to be worked, a ship past her berths, a name nobody answers to, the
+officer a ship is left to, your own ship laid up under you, and a transfer while the boat is
+away or lost.
+
 ## The forms, in a table
 
 | Form | Also taken | What it does |
@@ -441,6 +472,8 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `where is the master` | `where is the carpenter`, `where is the pilot` | one person's place and state; refused in words for a name not aboard |
 | `where am I` | | where you are: aboard and your place, in the boat, ashore at the port's place, or aboard another ship as a visitor |
 | `send the boat to the Medusa with Mr Veale` | `send the boat to the Medusa for Mr Veale` | the boat to another ship lying within a boat's pull (a mile): whoever is named goes aboard her, or steps into the boat there to come back; a person who goes keeps his station, as a visitor's voice in her, and has it again when he comes home |
+| `take command of her` | `take command of the Fly`, `shift into the Fly`, `take command of her, and lay the Amazon up` | aboard a ship given you: she is your ship from here, the old one left to her senior officer or laid up as the tail says |
+| `transfer fifteen hands to the Fly` | `transfer six able seamen and four ordinary to the Fly`, `transfer Mr Cannon and two hands to the Sherbourne`, `send across twelve hands to the Fly` | men moved by the boat between two ships of yours within her pull, twelve a load at her own pace, or over the gangway alongside; refused in words for a King's ship's people, a ship left unworkable, a ship past her berths |
 | `send for the master` | `pass the word for the carpenter`, `call the surgeon` | the messenger goes; he comes to where the captain is a minute later |
 | `call the captain: land close ahead` | `call the captain`, `send for the captain` | the officer of the watch's order: he sends for the captain below or asleep, and the line wakes him; refused from the captain himself, and when the captain is on deck (he sees it: say it to him) |
 | `go below` | `go to the cabin` | the captain to his cabin; anyone else to his berth below |

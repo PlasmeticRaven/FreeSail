@@ -113,7 +113,6 @@ def test_words_of_the_dialect_go_to_the_dialect(words, kind):
     [
         ("open the gunports", "the ports open as the guns are run out"),
         ("open the ports", "the ports open as the guns are run out"),
-        ("take command of the prize", "take possession of her"),
         ("take a sight", "observe the sun"),
     ],
 )
@@ -121,6 +120,25 @@ def test_words_naming_what_happens_of_itself_are_answered_so(words, answer):
     w = frigate()
     why = refused(w.submit(words))
     assert answer in why.lower() or answer in why, why
+
+
+def test_take_command_of_the_prize_is_answered_by_its_road():
+    """Package 109's case of 'take command' as it was (a refused phrase), kept beside package 60's
+    order of those words: of a prize, the words are answered with possession's road."""
+    w = frigate()
+    why = refused(w.submit("take command of the prize"))
+    assert "take possession of her" in why, why
+    why = refused(w.submit("assume command of the prize"))
+    assert "take possession of her" in why, why
+
+
+def test_take_command_of_a_ship_his_to_take_is_package_60s_order():
+    """Package 60 (the lead's reconciling of 2026-11-13): 'take command of her' aboard a ship
+    given him is the order that changes his ship, not 109's refused phrase."""
+    from tests.test_ship_changed import fly_taken_up
+
+    w, fly, me, e = fly_taken_up()
+    assert e.kind == "ship.taken_up" and w.players is w.hulls[str(fly.id)]
 
 
 @pytest.mark.parametrize(
@@ -227,7 +245,10 @@ def _since(w, n):
 def test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_down():
     """On the trunk 'go ashore' in the morning watch waited two hours ("Not hands enough on
     deck to send boat; there are but two to spare") and he sat in the boat. Now all hands
-    are called for her, she is manned and hoisted out, and the hands are piped down."""
+    are called for her, she is manned and hoisted out, and the hands are piped down. The call's
+    words name the work by the one road for its name since the lead's last list of 2026-11-14 (9):
+    "All hands! (to send the boat)", where it was "All hands! (to send boat)", her evolution's id
+    (20a8e2e3 and before)."""
     w = _anchored_bilander()
     n = len(w.log)
     assert w.submit("go ashore").kind == "order.accepted"
@@ -235,7 +256,7 @@ def test_the_watch_too_few_to_send_the_boat_calls_all_hands_and_pipes_down():
     kinds = [e.kind for e in _since(w, n)]
     assert "evolution.waiting" not in kinds
     called = next(e for e in _since(w, n) if e.kind == "crew.all_hands")
-    assert called.text == "All hands! (to send boat)"
+    assert called.text == "All hands! (to send the boat)"  # 20a8e2e3: "(to send boat)"
     assert kinds.index("crew.all_hands") < kinds.index("crew.piped_down")
     assert kinds.index("crew.piped_down") <= kinds.index("evolution.started")
     assert "boat.away" in kinds

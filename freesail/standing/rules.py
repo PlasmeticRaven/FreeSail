@@ -344,6 +344,11 @@ class Clause:
         ):
             # "she is hove to", not "she is hove to, not not hove to"; "the land is not in
             # sight", not "the land is not in sight, not in sight" (package 33c)
+            if said.startswith("no "):
+                # the reading's words are a whole sentence of what is not there: "no
+                # stranger in sight", not "a stranger in sight is no stranger in sight" (the
+                # cold review of 2026-11-14, 5.3 item 4; package 115 D4)
+                return said
             return f"{self.phrase} {verb} {said}"
         return f"{self.phrase} {verb} {said}, not {self.comparison.text}"
 

@@ -43,7 +43,7 @@ When a model connects, the log says `The watcher takes the station; sampled ever
 
 **Standing by.** A stand-by ends the model's turn at once: it is not asked anything more until the stand-by ends (playtest 4's model, told "Standing by until a glass" and asked again, stood by thirteen times in a turn that never closed). The turn that ends it begins by saying so (*You stood by until a glass at ...; it is now ...*), and names the calls that ran before the stand-by in the same reply; at the API door and the local runner those calls are answered with the results they returned (the harness keeps them on the turn, `Reply.ran`), the stand-by with its words, and only the calls after it with *Not run: a stand-by earlier in the reply ended your turn* (package 85; the model officer's first point: an order given before the stand-by was told "not run"). In action `a notable event` is a hit, a strike or a change of state, not every minute's discharge: the firer's minute line is routine unless a shot struck or the fire opened, and at quarters the trimmers' yard-by-yard lines are routine (package 85; the officer's fourth point). The model may stand by until an event (`eight bells`, `sunset`, `a strain warning`, ...), an interval (`a glass`, `an hour`, `5 minutes`, `ten minutes`), `a notable event` or `an urgent event`. **The weather's events** (package 31c; playtest 11's third finding: "the watcher's work is weather"): `a wind shift` (the ten minutes' mean wind a point or more from where it stood in the turn the model last read), `the glass falling fast` (its tendency coming to falling fast), `the glass turning` (the last hour's change going against the three hours', three hundredths each way: the rise after the low; on the gate's day under systems at 01:53, fifty minutes after the low's bottom), each of the glass's two once until it has been an hour without (its words hover about their thresholds, and a fall that eases and comes again inside the hour is the same fall), `the sea getting up` (its words changing upward), `a change in the sky` (the sky's or the weather's line in the log), and `a squall`; the standing orders have the same events (`at the glass falling fast then ...`). **Nothing it stands by for is skipped** (playtest 11: *eight bells* asked at 03:58 woke the watcher at 08:00): if the bell or the event came while its call was on its way (after the turn it read, before the stand-by reached the game), it wakes at once, the log saying so (*Eight bells, which came at ... while your call was on its way*); and a stand-by asked for while the game has the floor, as when the model calls again after a call was cut off, is taken from then. While it stands by the model may still read, write in its journal (package 31c: the journal was refused then) and shelve a book; the stand-by goes on. Whatever it stands by for, **an urgent line in the log wakes it at once** (something carried away, taken aback), the line named as the reason; the **notable lines** logged while it stood by come with the turn that wakes it, counted and listed, besides the log as ever. A stand-by is a decision not to be sampled, not a decision to be blind (the owner's ruling, 2026-09-28). **At 1x a glass is half an hour of real time**: for a watcher that speaks every glass, run the clock at `time 30` or `time 60` (a glass in a minute or in thirty seconds), or sail and let the notable events bring its turns.
 
-Other flags of the game: `--lockstep` (section 8), `--consent-records DIR` (where the consent records are read and written; `docs/agents/consent` by default), `--saves DIR` (where the game is saved when a station is released; `saves` by default), `--port 8001` (another port; the doors then need `--game http://localhost:8001`), `--standing-orders data/standing_orders/starter.orders`, `--watcher fake` (the scripted watcher of section 9, in place of a model).
+Other flags of the game: `--lockstep` (section 8), `--consent-records DIR` (where the consent records are read and written; `docs/agents/consent` by default), `--saves DIR` (where the game is saved when a station is released; `saves` by default), `--port 8001` (another port; the doors then need `--game http://localhost:8001`; a door is run on the machine the game runs on, since from another machine the game asks of a door the mark its printed address carries, and no door as it ships sends one: package 115), `--standing-orders data/standing_orders/starter.orders`, `--watcher fake` (the scripted watcher of section 9, in place of a model).
 
 ## 3. Claude Desktop
 
@@ -731,8 +731,8 @@ her range in cables by his estimate, 'struck'), `range`, `colours`, `quarter_bil
 cable, so her bearing this minute does not re-send the row. The fall of shot and the hits
 are notable lines (`action.fired`, `action.hit`), the casualties urgent ones with the named
 people's own lines (`person.hurt`), and the bill's word when hands are robbed for sail work
-(`quarters.robbed`: "Tacking ship at quarters: 84 hands taken from the guns, half of each
-crew; the guns go on short-handed").
+(`quarters.robbed`: "Tacking ship at quarters: 67 hands taken from the bow chasers and the
+guns, Nos. 10 to 13 and 15 to 17; the guns go on short-handed").
 
 **The tripwires and the events.** A stand-by may wait for `a sail within <n> cables`
 (judged by the lookout's estimate, never the truth) beside the earlier instruments, and for
@@ -740,11 +740,21 @@ the action's events by their words: `she opens fire`, `a warning shot`, `a shot 
 `a man killed`, `a gun dismounted`, `a spar shot away`, `her colours come down`, `the enemy
 strikes`, `the colours struck`, `at quarters`, `cleared for action`, `the guns cast loose`,
 `the magazine empty`, `the lee ports shut`, `the lee ports opened`; the same words serve a
-standing order's `at`. The two ports' words go by the log's line for a deck and side, the
-lee's alone (or a port's on the centre line, or one shut while she is upright): since the roll
-(package 75, L3) the weather's ports can shut as well, by the roll less the heel, and their
-line answers neither word, standing in the log and in `the guns` (`ports shut`, by side).
-They are silent while the guns are secured (package 75).
+standing order's `at`. The two ports' words go by the log's line, said once a change of state
+for a deck and side ("The lee lower-deck ports are shut, the sea at their sills."; "The lee
+upper-deck ports are opened again, their sills clear of the sea."), the lee's alone (or a
+port's on the centre line, or one shut while she is upright; a side opening as she comes
+upright is said the lee's, as it was while she heeled): since the roll (package 75, L3) the
+weather's ports can shut as well, by the roll less the heel, and their line ("The weather
+...") answers neither word, standing in the log and in `the guns` (`ports shut`, by side).
+A deck's side is shut from the first of its ports to shut until the last has opened, and a
+port is opened again only once its sill stands six inches clear of the water's line and the
+sea has kept from it a full minute (`ports.PORT_HOLD_S`, the hold), so that `the lee ports
+opened` comes a minute at least after the sea last reached a sill, and a port the sea reaches
+again within the minute starts its minute afresh. They are silent while the guns are secured:
+the line is said at a port's shutting while a gun of that deck's side is cast loose, or at the
+casting loose with the port shut already, and a side so said says its opening (package 75;
+`combat/ports.py`; registered in `api/practice_readings.py` beside the guns' other lines).
 
 **The cost of thinking against the cycle.** The station's line closes with the ship's time
 since the model's last reply (package 58a). Against the cycle's figures (truth 7-135: a

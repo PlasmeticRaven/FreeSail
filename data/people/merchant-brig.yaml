@@ -21,6 +21,11 @@ stations:
 wardroom:
   - role: master
     post: true
+    # heads the larboard watch and hauls with it on deck where its whole number is under the
+    # work's want (package 75, the lead's ruling 11 of 2026-11-13, the owner's word): a
+    # merchantman's master and mate each head a watch; the sides JUDGEMENT, the mate the
+    # starboard as the people's turn keeps them (world/people.py)
+    watch: larboard
     rank: master
     station: the command
     place: quarterdeck
@@ -32,6 +37,11 @@ wardroom:
       and the purse. He works the reckoning himself when the mate has the deck.
   - role: mate
     post: true
+    # heads the starboard watch and hauls with it on deck where its whole number is under the
+    # work's want (package 75, the lead's ruling 11 of 2026-11-13, the owner's word): a
+    # merchantman's master and mate each head a watch; the sides JUDGEMENT, the mate the
+    # starboard as the people's turn keeps them (world/people.py)
+    watch: starboard
     rank: mate
     station: the mate's
     place: quarterdeck

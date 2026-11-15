@@ -104,6 +104,9 @@ class Order:
     object: str | None = None  # the noun phrase as spoken, without 'the' or side
     side_word: str | None = None  # starboard | larboard | port | weather | lee | both
     modifiers: dict[str, Any] = field(default_factory=dict)
+    # the order as it was said, its case and its stops kept (package 60: the transfer's list
+    # reads it, and gives the player's words back as he typed them); "" where none was kept
+    said: str = ""
 
     @property
     def spec(self) -> VerbSpec:
@@ -127,7 +130,14 @@ DIVISION_HAILS: tuple[str, ...] = (
 
 
 def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
-    """Parse one order against this ship's vocabulary. Raises OrderError."""
+    """Parse one order against this ship's vocabulary. Raises OrderError. The order keeps the
+    words as said (`Order.said`)."""
+    order = _parse(ship, text, vocab)
+    order.said = " ".join(str(text).split())
+    return order
+
+
+def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     vocab = vocab or load_vocabulary()
     norm = normalise(text).replace("°", " degrees ")
     norm = " ".join(norm.split())
@@ -193,6 +203,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "fight",  # package 73: the marines, the small arms and the boarders
         "boat",  # package 82: the boat's mark to pull for
         "prize",  # package 74: the ship taken possession of, the prisoners, the prize burnt
+        "command",  # package 60: the ship he takes command of, the old ship settled
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by

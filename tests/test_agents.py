@@ -1665,14 +1665,14 @@ def test_the_console_stations_the_scripted_watcher_and_prints_its_lines(tmp_path
 
 
 def test_the_server_snapshot_carries_the_agents():
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
     world = frigate_world()
     station_watcher(world, "fake")
     driver = Driver(world)
-    with TestClient(create_app(driver)) as client:
+    with PageClient(create_app(driver)) as client:
         agents = client.get("/api/state").json()["agents"]
         assert agents[0]["station"] == "watcher" and agents[0]["state"] == "stationed"
         r = client.post("/api/order", json={"text": "ask the watcher how she lies"})
@@ -1892,7 +1892,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # (97 before it; the owner's tree, before 73, had 88 for 87); and package 75's lateen six
     # (set, take in, furl, reef, shake out and trim its sheet; 98 before them), and its settee
     # four (set, take in, furl and dip; 104 before them)
-    assert "108 evolutions; the list about" in contents
+    # ... and package 115's relieving tackles (relieving_tackles.yaml; 108 before it)
+    assert "109 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)
