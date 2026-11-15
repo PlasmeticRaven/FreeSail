@@ -21465,11 +21465,12 @@ def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_o
     milestone 7, 1.5 and 5.3 item 14: forty-seven scenarios in alphabetical order, "The
     gate's day" beside "The first action", the ship's boats among the ships). The harbour's
     catalogue gives every scenario of the game a shelf the shelves' file names, none left
-    unsorted; the lessons first of the game's, in the primer's order; the gates' days and
-    the acceptance walks on the one shelf marked to be shown only when asked for; every
-    other shelf shown; and no ship's boat among the ships a bare game starts in. The shelves
-    are read from a file of the page's own (`data/harbour/shelves.yaml`), outside
-    `data/scenarios/`, so that no scenario file was changed to sort them."""
+    unsorted; the game to begin with first and the lessons after it, in the primer's
+    order; the gates' days and the acceptance walks on the one shelf marked to be shown
+    only when asked for; every other shelf shown; and no ship's boat among the ships a
+    bare game starts in. The shelves are read from a file of the page's own
+    (`data/harbour/shelves.yaml`), outside `data/scenarios/`, so that no scenario file
+    was changed to sort them."""
     pytest.importorskip("fastapi")
     from freesail.ui.harbour import GAME_SCENARIOS, SHELVES_FILE, Harbour
     from freesail.ui.server import Driver
@@ -21487,7 +21488,8 @@ def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_o
     game = {Path(s["path"]).stem: s for s in cat["scenarios"]}
     assert set(game) == {p.stem for p in GAME_SCENARIOS.glob("*.yaml")}
     assert all(s["shelf"] in shelves and s["says"] for s in game.values())
-    assert [Path(s["path"]).stem for s in cat["scenarios"][:4]] == [
+    assert [Path(s["path"]).stem for s in cat["scenarios"][:5]] == [
+        "first-passage",
         "lesson-landfall",
         "lesson-reckoning",
         "lesson-falmouth",
@@ -21497,3 +21499,39 @@ def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_o
     assert {n for n in game if n.startswith("gate-")} <= kept
     assert kept == {n for n in game if n.startswith("gate-")} | {"squadron", "tender"}
     assert cat["ships"] and not [s for s in cat["ships"] if Path(s).stem.startswith("boat-")]
+
+
+def test_truth_7_403_the_harbour_opens_on_a_first_game_which_is_the_primers_chapter_7(tmp_path):
+    """Package 96b, step 2 (docs/design/Design-Harbour.md §3.1, §3.3; the cold review of
+    milestone 7, "a stranger cannot begin": the opening page a form with no first game, and
+    the primer's own first passage a bare ship with flags the page did not have). The
+    harbour's catalogue names one game to begin with, the scenario "A first passage", with
+    the lines said beside its button, and the four lessons after it; the page's own start
+    takes it up with nothing else chosen, the clock held at tick 0, the player the captain
+    at the prompt, the frigate lying as the chapter has her (head WNW, a north wind of
+    fifteen knots, nothing set), on a World of the chapter's seed."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    cat = harbour.catalogue()
+    first = cat["first_game"]
+    assert first["name"] == "A first passage" and first["says"]
+    assert Path(first["path"]).stem == Path(cat["scenarios"][0]["path"]).stem == "first-passage"
+    lessons = [s for s in cat["scenarios"] if s["shelf"] == "lessons"]
+    assert len(lessons) == 4 and [s["seat"] for s in lessons] == ["", "officer", "", ""]
+    started = harbour.start({"scenario": first["path"]})
+    try:
+        world = driver.world
+        assert world.seed == 7 and world.clock.tick == 0 and not driver.running
+        assert world.player_seat is None
+        assert started["game"]["title"] == "A first passage"
+        opening = next(e.text for e in world.log if e.kind == "world.start")
+        assert opening == (
+            "A first passage. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+        )
+        assert not [n for n, s in world.ship.sails.items() if getattr(s, "set_fraction", 0) > 0]
+    finally:
+        harbour.close()

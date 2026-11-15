@@ -107,8 +107,81 @@
     scenarioSays();
   }
 
+  // -- begin (package 96b, step 2; docs/design/Design-Harbour.md §3.1) -------------------
+  //
+  // The first panel: one game named to begin with, the lessons as lessons, the newest save,
+  // and the way to all the games. No seed, pace or seat is asked: each button starts its
+  // game with the scenario's own choices (and the seat its shelf entry names), the clock
+  // held, and goes to the game's page.
+
+  function beginStart(body, button) {
+    var words = $("b-words");
+    document.querySelectorAll(".begin button").forEach(function (b) { b.disabled = true; });
+    words.classList.remove("refusal");
+    show(words, "Starting...");
+    return api("POST", "/api/harbour/start", body).then(function () {
+      window.location.href = "/";
+    }).catch(function (e) {
+      show(words, e.message);
+      words.classList.add("refusal");
+      document.querySelectorAll(".begin button").forEach(function (b) { b.disabled = false; });
+    });
+  }
+
+  function fillBegin() {
+    var first = cat.first_game;
+    $("b-first").hidden = !first;
+    if (first) {
+      $("btn-b-first").textContent = "begin: " + first.name;
+      $("btn-b-first").setAttribute("data-path", first.path);
+      var says = $("b-first-says");
+      clear(says);
+      first.says.forEach(function (w) { li(says, w); });
+    }
+    var lessons = cat.scenarios.filter(function (s) { return s.shelf === "lessons"; });
+    $("b-lessons-block").hidden = !lessons.length;
+    var list = $("b-lessons");
+    clear(list);
+    lessons.forEach(function (s) {
+      var item = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = s.name;
+      b.setAttribute("data-path", s.path);
+      b.addEventListener("click", function () { beginStart({ scenario: s.path, seat: s.seat || "" }, b); });
+      item.appendChild(b);
+      var w = document.createElement("span");
+      w.textContent = " " + s.says;
+      item.appendChild(w);
+      list.appendChild(item);
+    });
+  }
+  $("btn-b-first").addEventListener("click", function () {
+    beginStart({ scenario: $("btn-b-first").getAttribute("data-path"), seat: "" }, $("btn-b-first"));
+  });
+  $("btn-b-save").addEventListener("click", function () {
+    beginStart({ load: $("btn-b-save").getAttribute("data-save") }, $("btn-b-save"));
+  });
+  $("btn-b-all").addEventListener("click", function () { tab("game"); });
+
+  function beginState(s) {
+    var g = s.game;
+    $("b-playing").hidden = !g.started;
+    if (g.started) {
+      $("b-playing-says").textContent = (g.title || "A ship on open water") + (g.ship ? ": " + g.ship : "") + ", " + g.stamp + ". " + (g.running ? "The clock runs." : "The clock is held until you say go.");
+    }
+    var newest = s.saves && s.saves.saves.length ? s.saves.saves[0] : null;
+    $("b-save").hidden = !newest;
+    if (newest && $("btn-b-save").getAttribute("data-save") !== newest.name) {
+      $("btn-b-save").textContent = "take up: " + newest.name;
+      $("btn-b-save").setAttribute("data-save", newest.name);
+      $("b-save-says").textContent = "Your newest save, written " + newest.written + ", in " + s.saves.place + ". The game tab takes up any other.";
+    }
+  }
+
   function fillCatalogue() {
     fillScenarios();
+    fillBegin();
     var ship = $("s-ship");
     clear(ship);
     cat.ships.forEach(function (s) { option(ship, s); });
@@ -231,6 +304,7 @@
     clear(cr);
     s.credential.forEach(function (w) { li(cr, w); });
     s.doors.forEach(paneFor);
+    beginState(s);
     harbour.state = s;
   }
 

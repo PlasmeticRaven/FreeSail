@@ -125,7 +125,7 @@ def test_the_scenarios_stand_on_their_shelves_and_the_boats_are_no_ship_to_start
     (port.place / "mine.yaml").write_text("name: A passage of mine\n", encoding="utf-8")
     cat = client.get("/api/harbour/catalogue").json()
     by_id = {s["id"]: s for s in cat["shelves"]}
-    assert [s["id"] for s in cat["shelves"]][:2] == ["yours", "lessons"]
+    assert [s["id"] for s in cat["shelves"]][:3] == ["yours", "first", "lessons"]
     assert by_id["tests"]["hidden"] is True
     assert not any(s["hidden"] for s in cat["shelves"] if s["id"] != "tests")
     assert "unsorted" not in by_id  # every scenario of the game is named on a shelf
@@ -150,6 +150,57 @@ def test_the_scenarios_stand_on_their_shelves_and_the_boats_are_no_ship_to_start
     )
     assert [s["id"] for s in shelved] == ["tests", "unsorted"]
     assert shelved[-1]["hidden"] is False
+
+
+def test_the_first_game_is_the_primers_chapter_7_and_its_log_is_the_bare_ships(client):
+    """Package 96b, step 2 (docs/design/Design-Harbour.md §3.3): the first panel's game is
+    the scenario "A first passage", the primer's chapter 7 made startable from the page.
+    The chapter's own command is a bare frigate with `--seed 7 --wind 0,15 --heading 293`;
+    the scenario gives the same log line for line through the chapter's first block (plain
+    sail, braced sharp up, eight minutes), but for the opening line, which carries the
+    scenario's name where the bare ship's says "Open water"."""
+    from freesail.api.session import make_world
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    cat = client.get("/api/harbour/catalogue").json()
+    first = cat["first_game"]
+    assert first["path"] == "data/scenarios/first-passage.yaml"
+    assert first["name"] == "A first passage" and len(first["says"]) == 3
+    entry = next(s for s in cat["scenarios"] if s["path"] == first["path"])
+    assert entry["shelf"] == "first" and cat["scenarios"][0] == entry
+    reckoning = next(s for s in cat["scenarios"] if s["path"].endswith("lesson-reckoning.yaml"))
+    assert reckoning["seat"] == "officer" and entry["seat"] == ""
+
+    bare = Scenario()
+    bare.wind_from_deg, bare.wind_speed_kn, bare.ship_heading_deg = 0.0, 15.0, 293.0
+    a = make_world(7, "data/ships/frigate-36.yaml", bare)
+    sf = load_scenario(SCENARIOS / "first-passage.yaml")
+    assert sf.seed == 7 and not sf.standing_orders and not sf.orders
+    b = make_scenario_world(sf)
+    begin(b, sf)
+    for w in (a, b):
+        w.submit("set plain sail")
+        w.submit("brace sharp up on the starboard tack")
+        w.run(480)
+    la = [(e.tick, e.kind, e.text) for e in a.log]
+    lb = [(e.tick, e.kind, e.text) for e in b.log]
+    assert la[0][2].startswith("Open water.") and lb[0][2].startswith("A first passage.")
+    assert la[0][2].split(". ", 1)[1] == lb[0][2].split(". ", 1)[1]
+    assert la[1:] == lb[1:] and len(la) > 20
+
+
+def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, client):
+    saves = port.tmp / "saves"
+    saves.mkdir(parents=True, exist_ok=True)
+    (saves / "older.json").write_text("not a save: its name alone is listed", encoding="utf-8")
+    (saves / "newer.json").write_text("{}", encoding="utf-8")
+    os.utime(saves / "older.json", (1_700_000_000, 1_700_000_000))
+    (saves / "newer.checkpoint").write_text("", encoding="utf-8")
+    (saves / "notes.txt").write_text("", encoding="utf-8")
+    state = client.get("/api/harbour/state").json()["saves"]
+    assert state["place"] == str(saves.resolve())
+    assert [s["name"] for s in state["saves"]] == ["newer", "older"]
+    assert state["saves"][1]["written"].startswith("2023-11-1")
 
 
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
@@ -561,6 +612,7 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
     assert pg.inner_text("#status") == "no game yet"
     # a game with a seat and a director's brief
+    pg.click("nav.tabs button[data-tab=game]")
     pg.select_option("#s-scenario", "data/scenarios/directed-passage.yaml")
     pg.select_option("#s-seat", "officer")
     pg.select_option("#s-brief", "dispatches")
@@ -615,13 +667,17 @@ def test_in_the_browser_the_list_is_by_shelf_and_the_tests_scenarios_come_with_t
     pg, live, port, errors = browser_page
     pg.goto(live.url + "/harbour")
     pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
     shelves = pg.eval_on_selector_all("#s-scenario optgroup", "els => els.map(e => e.label)")
-    assert shelves[0] == "Lessons" and "Kept for tests and gates" not in shelves
+    assert shelves[:2] == ["Begin here", "Lessons"] and "Kept for tests and gates" not in shelves
     listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
-    assert listed[0] == "data/scenarios/lesson-landfall.yaml"
+    assert listed[:2] == [
+        "data/scenarios/first-passage.yaml",
+        "data/scenarios/lesson-landfall.yaml",
+    ]
     assert "data/scenarios/gate-4c-day.yaml" not in listed
     assert "data/scenarios/squadron.yaml" not in listed
-    assert "the Lizard" in pg.inner_text("#s-says")
+    assert "chapter 7" in pg.inner_text("#s-says")
     pg.select_option("#s-scenario", "data/scenarios/first-action.yaml")
     assert "privateer" in pg.inner_text("#s-says") and "first-action.yaml" in pg.inner_text(
         "#s-says"
@@ -637,6 +693,59 @@ def test_in_the_browser_the_list_is_by_shelf_and_the_tests_scenarios_come_with_t
     assert "data/scenarios/gate-4c-day.yaml" not in listed
     ships = pg.eval_on_selector_all("#s-ship option", "els => els.map(e => e.value)")
     assert "data/ships/cutter.yaml" in ships and not [s for s in ships if "boat-" in s]
+    assert errors == []
+
+
+def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button(browser_page):
+    """Package 96b, step 2: a fresh page opens on the first panel, with no form on it: the
+    first game named, the four lessons numbered in the primer's order, no saved game where
+    there is none, and the way to all the games. The first game's button starts it and
+    goes to the game's page, the clock held; back at the harbour the panel leads with the
+    game in play."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    assert pg.is_visible("section[data-page=begin]") and not pg.is_visible("#start-form")
+    assert (
+        pg.locator("section[data-page=begin] input, section[data-page=begin] select").count() == 0
+    )
+    assert pg.inner_text("#btn-b-first") == "begin: A first passage"
+    assert "chapter 7" in pg.inner_text("#b-first-says")
+    lessons = pg.eval_on_selector_all("#b-lessons button", "els => els.map(e => e.textContent)")
+    assert lessons == [
+        "A landfall on one headland",
+        "The officer's own reckoning, off the Lizard",
+        "Pilot water, Black Head to Falmouth road",
+        "A night off a lee shore, the Nare Head to the Deadman",
+    ]
+    assert not pg.is_visible("#b-save") and not pg.is_visible("#b-playing")
+    pg.click("#btn-b-all")
+    assert pg.is_visible("#start-form")
+    pg.click("nav.tabs button[data-tab=begin]")
+    pg.click("#btn-b-first")
+    pg.wait_for_function(
+        "document.getElementById('ship-name') && "
+        "document.getElementById('status').textContent === 'connected'",
+        timeout=60_000,
+    )
+    assert not pg.url.endswith("/harbour")
+    with port.driver.lock:
+        assert port.driver.world.scenario.name == "A first passage"
+        assert not port.driver.running and port.driver.world.clock.tick == 0
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=begin]")
+    pg.wait_for_selector("#b-playing:not([hidden])", timeout=10_000)
+    assert "A first passage" in pg.inner_text("#b-playing-says")
+    assert "held" in pg.inner_text("#b-playing-says")
+    # a lesson that is the officer's own seats the player at the officer's station
+    pg.click("#b-lessons button[data-path='data/scenarios/lesson-reckoning.yaml']")
+    pg.wait_for_function(
+        "document.getElementById('status').textContent === 'connected'", timeout=60_000
+    )
+    with port.driver.lock:
+        seat = port.driver.world.player_seat
+        assert seat is not None and "officer" in seat.station.name
     assert errors == []
 
 
