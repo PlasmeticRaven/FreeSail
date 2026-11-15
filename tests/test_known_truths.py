@@ -21581,3 +21581,47 @@ def test_truth_7_404_the_harbours_start_takes_the_ship_aboard_a_bare_ships_wind_
         assert taken["game"]["chosen"]["load"] == "kept-404"
     finally:
         harbour.close()
+
+
+def test_truth_7_405_the_sheet_keeps_what_it_does_not_show_and_the_page_has_its_parts(tmp_path):
+    """Package 96b, step 4 (docs/design/Design-Harbour.md §2.3): the scenario maker's form
+    folded into parts, each a line when closed. The fold is the page's own and touches
+    nothing the maker writes: a scenario with keys the form has no field for (the blockade:
+    its squadron, its weather's system, another ship's intent and squadron) read by the
+    page's server and written again with nothing changed is the same file byte for byte;
+    and the page carries the nine parts in their order, each with its line, every field the
+    maker had still in it."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import CLIENT_DIR, GAME_SCENARIOS, Harbour
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/blockade.yaml")
+    assert read["fields"]["squadrons"] and read["fields"]["weather"]["systems"]
+    saved = harbour.save_scenario(read["fields"], "blockade", source=read["path"])
+    assert Path(saved["path"]).read_bytes() == (GAME_SCENARIOS / "blockade.yaml").read_bytes()
+    page = (CLIENT_DIR / "harbour.html").read_text(encoding="utf-8")
+    parts = re.findall(r'<fieldset data-part="([a-z]+)" class="folded">', page)
+    assert parts == [
+        "day",
+        "ship",
+        "start",
+        "papers",
+        "weather",
+        "ships",
+        "sea",
+        "orders",
+        "stations",
+    ]
+    assert [f'data-line="{p}"' in page for p in parts] == [True] * 9
+    for field in (
+        "name", "seed", "start", "nation", "ship.file", "ship.heading_deg", "ship.glass",
+        "ship.instrument", "cargo.purse_pounds", "intent", "region", "position", "weather",
+        "business", "crewed.cap", "crewed.range_nm", "ports", "ships", "world_orders",
+        "standing_orders", "orders", "director",
+    ):  # fmt: skip
+        assert f'data-field="{field}"' in page, field

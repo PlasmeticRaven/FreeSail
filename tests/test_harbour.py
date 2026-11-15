@@ -694,7 +694,10 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
         assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
         saved = port.place / f"{stem}.yaml"
         assert saved.read_bytes() == (SCENARIOS / f"{stem}.yaml").read_bytes(), stem
-    # one field changed in the form: that field alone written again
+    # one field changed in the form: that field alone written again (the part opened
+    # first: the sheet is folded, package 96b, step 4)
+    assert not pg.is_visible('#maker [data-field="seed"]')
+    pg.click("#maker fieldset[data-part=day] > legend")
     pg.fill('#maker [data-field="seed"]', "11")
     pg.fill("#m-name", "dispatches-11")
     pg.click("#btn-m-save")
@@ -857,6 +860,105 @@ def test_in_the_browser_a_game_says_what_it_is_and_a_save_is_taken_up_from_the_l
     with port.driver.lock:
         opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
     assert "Wind N, 15 knots" in opening and "(293°)" in opening
+    assert errors == []
+
+
+def test_in_the_browser_the_sheet_is_folded_and_each_part_says_what_is_set(browser_page):
+    """Package 96b, step 4 (docs/design/Design-Harbour.md §2.3): "change this scenario" on
+    the game tab reads it into the sheet; every part is closed to a line written from the
+    fields, so that the whole scenario reads with nothing opened (the squadron and the
+    weather's system that the form has no field for among them); a part's name opens it,
+    and a field changed changes its line; saved with nothing changed it is the same file;
+    a written brief touched in the form keeps the examples the form does not show; and the
+    game in play is a line at the head of every tab."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    assert pg.inner_text("#in-play-line") == "no game yet" and not pg.is_visible("#g-title")
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.select_option("#s-scenario", "data/scenarios/blockade.yaml")
+    pg.click("#btn-s-change")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('blockade') >= 0")
+    assert pg.is_visible("#maker") and pg.is_visible("#in-play-line")
+    parts = pg.eval_on_selector_all(
+        "#maker fieldset[data-part]", "els => els.map(e => e.getAttribute('data-part'))"
+    )
+    assert parts == [
+        "day",
+        "ship",
+        "start",
+        "papers",
+        "weather",
+        "ships",
+        "sea",
+        "orders",
+        "stations",
+    ]
+    assert pg.locator("#maker fieldset[data-part]:not(.folded)").count() == 0
+    assert not pg.is_visible('#maker [data-field="seed"]') and not pg.is_visible("#m-ships")
+
+    def line(part: str) -> str:
+        return pg.inner_text(f'#maker [data-line="{part}"]')
+
+    assert (
+        line("day") == '"The blockade of Brest blown off"; 12 June 1805, 10:00; seed 7; of Britain.'
+    )
+    assert line("ship").startswith("The frigate-36; her file's own fit of guns; a glass aboard")
+    assert "on the chart of channel-west; heading 20°" in line("start")
+    assert "one weather system written out (the low)" in line("weather").lower()
+    assert line("ships") == (
+        "Three ships: Naiad of Britain, Nimble of Britain, Hortense of France; "
+        "the inshore squadron, a squadron in line ahead."
+    )
+    assert line("sea").startswith("Four ports: brest, falmouth, plymouth, torbay")
+    assert "first order: set plain sail" in line("orders") and "Ushant" in line("orders")
+    assert line("stations") == "You are the captain; nobody else is said; no director."
+    # a part opened by its name; a field changed changes its line
+    pg.click("#maker fieldset[data-part=day] > legend")
+    assert pg.is_visible('#maker [data-field="seed"]')
+    pg.fill('#maker [data-field="seed"]', "11")
+    assert "seed 11" in line("day")
+    pg.click("#btn-m-open")
+    assert pg.is_visible("#m-ships") and pg.is_visible("#m-chart")
+    pg.click("#btn-m-close")
+    assert pg.locator("#maker fieldset[data-part]:not(.folded)").count() == 0
+    # read again and saved with nothing changed: the same file, the squadron and all
+    pg.click("#btn-m-read")
+    pg.wait_for_function("window.freesailHarbour.foldLines && true")
+    pg.wait_for_function(
+        "document.querySelector('#maker [data-line=day]').textContent.indexOf('seed 7') >= 0"
+    )
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    assert (port.place / "blockade.yaml").read_bytes() == (SCENARIOS / "blockade.yaml").read_bytes()
+    # a brief written out, with examples the form has no field for: the tone changed in the
+    # form, and the examples are written again with it
+    own = port.place / "briefed.yaml"
+    own.write_text(
+        (SCENARIOS / "first-passage.yaml").read_text(encoding="utf-8")
+        + "director:\n  brief:\n    name: Mine\n    tone: quiet\n"
+        + "    limits: {nobody_dies: true, a_limit_of_mine: 3}\n"
+        + "    examples:\n      - 'ship \"Nancy\": order heave to'\n",
+        encoding="utf-8",
+    )
+    fields = pg.evaluate(
+        """async (path) => {
+            const h = window.freesailHarbour;
+            await h.readScenario(path);
+            const tone = document.querySelector('#m-brief-written [data-brief=tone]');
+            tone.value = 'a quiet passage indeed';
+            tone.dispatchEvent(new Event('input', { bubbles: true }));
+            return h.collect();
+        }""",
+        str(own),
+    )
+    brief = fields["director"]["brief"]
+    assert brief["tone"] == "a quiet passage indeed" and brief["name"] == "Mine"
+    assert brief["examples"] == ['ship "Nancy": order heave to']
+    assert brief["limits"] == {"nobody_dies": True, "a_limit_of_mine": 3}
+    assert "Mine" in line("stations")
     assert errors == []
 
 

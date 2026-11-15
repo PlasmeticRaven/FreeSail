@@ -29,6 +29,22 @@
 
 <main class="harbour-main">
 
+<!-- the game in play, a line at the head of every tab (package 96b, step 4) -->
+<details id="in-play" class="panel in-play">
+  <summary><span class="in-play-head">In play</span> <span id="in-play-line">no game yet</span> <span class="hint" id="game-clock"></span></summary>
+    <dl class="instruments" id="game-state">
+      <dt>Game</dt><dd id="g-title" class="wrap"></dd>
+      <dt>Ship</dt><dd id="g-ship"></dd>
+      <dt>Ship's time</dt><dd id="g-stamp"></dd>
+      <dt>Seed</dt><dd id="g-seed"></dd>
+      <dt>The player</dt><dd id="g-seat" class="wrap"></dd>
+      <dt>Director</dt><dd id="g-director" class="wrap"></dd>
+      <dt>Pace</dt><dd id="g-pace"></dd>
+      <dt>Stations</dt><dd><ul id="g-stations" class="plain-list"></ul></dd>
+      <dt>Doors</dt><dd><ul id="g-doors" class="plain-list"></ul></dd>
+    </dl>
+</details>
+
 <!-- ======================= begin (package 96b, step 2) ======================= -->
 <section class="tab-page" data-page="begin">
   <div class="panel begin">
@@ -65,21 +81,6 @@
 <!-- ======================= the game ======================= -->
 <section class="tab-page" data-page="game" hidden>
   <div class="panel">
-    <div class="panel-head"><span>In play</span><span class="hint" id="game-clock"></span></div>
-    <dl class="instruments" id="game-state">
-      <dt>Game</dt><dd id="g-title" class="wrap"></dd>
-      <dt>Ship</dt><dd id="g-ship"></dd>
-      <dt>Ship's time</dt><dd id="g-stamp"></dd>
-      <dt>Seed</dt><dd id="g-seed"></dd>
-      <dt>The player</dt><dd id="g-seat" class="wrap"></dd>
-      <dt>Director</dt><dd id="g-director" class="wrap"></dd>
-      <dt>Pace</dt><dd id="g-pace"></dd>
-      <dt>Stations</dt><dd><ul id="g-stations" class="plain-list"></ul></dd>
-      <dt>Doors</dt><dd><ul id="g-doors" class="plain-list"></ul></dd>
-    </dl>
-  </div>
-
-  <div class="panel">
     <div class="panel-head"><span>A new game</span><span class="hint">choose a game, where you stand and how the clock runs; the clock is held until you say go</span></div>
     <form id="start-form" class="form-grid" autocomplete="off">
       <label>From
@@ -108,6 +109,7 @@
       <div class="form-actions wide">
         <button id="btn-start" type="submit">start the game</button>
         <a id="btn-to-game" class="harbour-link" href="/" hidden>go to the game</a>
+        <button id="btn-s-change" type="button" class="from from-scenario" title="open this scenario in the scenario maker, to change it and save it as one of yours">change this scenario</button>
       </div>
       <details id="s-more" class="wide more">
         <summary>more for this game</summary>
@@ -175,28 +177,40 @@
       <span id="m-source" class="muted"></span>
     </div>
     <form id="maker" class="maker" autocomplete="off">
-      <fieldset><legend>The day</legend>
+      <div class="form-actions fold-actions">
+        <span class="muted">Each part says in a line what is set; click a part's name to open it.</span>
+        <button type="button" id="btn-m-open">open every part</button>
+        <button type="button" id="btn-m-close">close every part</button>
+      </div>
+      <fieldset data-part="day" class="folded"><legend>The day</legend>
+        <p class="fold-line wide" data-line="day"></p>
         <label>Name <input data-field="name" data-kind="text" type="text"></label>
         <label>Seed <input data-field="seed" data-kind="number" type="number" step="1"></label>
         <label>Start <input data-field="start" data-kind="text" type="text" placeholder="1805-06-12T05:00"></label>
         <label>Nation <select data-field="nation" data-kind="select" data-options="nations"></select></label>
       </fieldset>
-      <fieldset><legend>The ship</legend>
+      <fieldset data-part="ship" class="folded"><legend>Your ship</legend>
+        <p class="fold-line wide" data-line="ship"></p>
         <label>Ship file <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
         <label>Heading <input data-field="ship.heading_deg" data-kind="number" type="number" step="any"></label>
         <label class="check"><input data-field="ship.glass" data-kind="bool" type="checkbox"> she carries a glass</label>
         <label>Instrument <select data-field="ship.instrument" data-kind="select"><option value=""></option><option>octant</option><option>sextant</option></select></label>
-        <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
-        <label class="wide">Intent <input data-field="intent" data-kind="text" type="text" placeholder="the captain's intent: trade tin from Falmouth to Plymouth"></label>
       </fieldset>
-      <fieldset><legend>The start</legend>
+      <fieldset data-part="start" class="folded"><legend>The start</legend>
+        <p class="fold-line wide" data-line="start"></p>
         <label>A port's road <select id="m-port"></select></label>
         <label>Region <select data-field="region" data-kind="select" data-options="regions"></select></label>
         <label>Latitude <input id="m-lat" data-field="position" data-kind="position" type="number" step="any"></label>
         <label>Longitude <input id="m-lon" data-field="position" data-kind="position" type="number" step="any"></label>
         <div class="wide chart-wrap"><canvas id="m-chart" width="640" height="420" title="click to prick the start on the chart"></canvas></div>
       </fieldset>
-      <fieldset><legend>The weather</legend>
+      <fieldset data-part="papers" class="folded"><legend>Her papers, her purse and her people</legend>
+        <p class="fold-line wide" data-line="papers"></p>
+        <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
+        <p class="note wide">Her papers, her people and the things aboard are kept as the file has them; the line above says what it has.</p>
+      </fieldset>
+      <fieldset data-part="weather" class="folded"><legend>The weather</legend>
+        <p class="fold-line wide" data-line="weather"></p>
         <label>Weather <select id="m-weather-mode" data-field="weather" data-kind="weather">
             <option value="">as written</option>
             <option value="climatology">the month's climatology</option>
@@ -208,29 +222,34 @@
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-wind-add">a waypoint more</button></div>
       </fieldset>
-      <fieldset><legend>The sea about her</legend>
-        <label>Business <select data-field="business" data-kind="business"><option value=""></option><option value="on">on</option><option value="off">off</option></select></label>
-        <label>Crewed cap <input data-field="crewed.cap" data-kind="number" type="number" step="1"></label>
-        <label>Crewed range (miles) <input data-field="crewed.range_nm" data-kind="number" type="number" step="any"></label>
-        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest"></label>
+      <fieldset data-part="ships" class="folded"><legend>The other ships</legend>
+        <p class="fold-line wide" data-line="ships"></p>
         <table class="rows wide" id="m-ships" data-field="ships" data-kind="ships">
           <thead><tr><th>id</th><th>description</th><th>name</th><th>nation</th><th>position</th><th>intent (goal)</th><th>colours</th><th></th></tr></thead><tbody></tbody>
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another sail</button></div>
+      </fieldset>
+      <fieldset data-part="sea" class="folded"><legend>The sea about her</legend>
+        <p class="fold-line wide" data-line="sea"></p>
+        <label>Business <select data-field="business" data-kind="business"><option value=""></option><option value="on">on</option><option value="off">off</option></select></label>
+        <label>Crewed cap <input data-field="crewed.cap" data-kind="number" type="number" step="1"></label>
+        <label>Crewed range (miles) <input data-field="crewed.range_nm" data-kind="number" type="number" step="any"></label>
+        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest"></label>
         <table class="rows wide" id="m-world-orders" data-field="world_orders" data-kind="world_orders">
           <thead><tr><th>at</th><th>world order</th><th></th></tr></thead><tbody></tbody>
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-order-add">a world order by time</button></div>
       </fieldset>
-      <fieldset><legend>The orders</legend>
+      <fieldset data-part="orders" class="folded"><legend>The orders</legend>
+        <p class="fold-line wide" data-line="orders"></p>
+        <label class="wide">Intent <input data-field="intent" data-kind="text" type="text" placeholder="the captain's intent: trade tin from Falmouth to Plymouth"></label>
         <div class="wide checks" id="m-books" data-field="standing_orders" data-kind="books"></div>
         <label class="wide">A drafted book <textarea id="m-book" rows="3" placeholder="standing orders of your own, written beside the scenario as its .orders file"></textarea></label>
         <label class="wide">First orders <textarea data-field="orders" data-kind="lines" rows="3" placeholder="one order a line, given at tick 0"></textarea></label>
       </fieldset>
-      <fieldset><legend>The stations and who holds them</legend>
+      <fieldset data-part="stations" class="folded"><legend>The stations and the director</legend>
+        <p class="fold-line wide" data-line="stations"></p>
         <div class="wide station-holders" id="m-stations"></div>
-      </fieldset>
-      <fieldset><legend>The director</legend>
         <label>Brief <select id="m-brief-mode" data-field="director" data-kind="director">
             <option value="">no director</option>
             <option value="starter">a starter</option>

@@ -452,3 +452,15 @@ p.note { margin: 6px 12px; font-size: 12.5px; color: var(--ink-soft); }
 .harbour details.more { border-top: 1px solid var(--rule); padding-top: 6px; }
 .harbour details.more > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-soft); }
 .harbour details.more > .form-grid { padding: 8px 0 0; }
+
+/* package 96b, step 4: the sheet folded; the game in play as a line at the head */
+.maker fieldset[data-part] > legend { cursor: pointer; }
+.maker fieldset[data-part] > legend::before { content: "\25BE  "; color: var(--ink-soft); }
+.maker fieldset.folded > legend::before { content: "\25B8  "; }
+.maker fieldset.folded > :not(legend):not(.fold-line) { display: none; }
+.maker p.fold-line { margin: 0; font-size: 13px; color: var(--ink); }
+.maker fieldset:not(.folded) > p.fold-line { color: var(--ink-soft); }
+.harbour details.in-play { padding: 0; }
+.harbour details.in-play > summary { cursor: pointer; padding: 6px 12px; font-size: 13px; }
+.harbour details.in-play .in-play-head { text-transform: uppercase; letter-spacing: 0.06em; font-size: 11.5px; color: var(--ink-soft); margin-right: 8px; }
+.harbour details.in-play .hint { margin-left: 10px; }
