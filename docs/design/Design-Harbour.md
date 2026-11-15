@@ -433,7 +433,7 @@ The Play tab's list is no longer alphabetical. It is six shelves, each with a li
 - Each scenario shows one sentence under its name: what ship, where, and what there is to do. Today that sentence exists only as a comment at the head of each file, written for the builders.
 - A scenario in a year other than 1805 says its year. One that keeps to the course of history says so, as now.
 
-**Where the sorting is kept.** In one new file beside the scenarios, read by the page alone: for each scenario its shelf, its place on the shelf and its sentence; and at its head, which scenario is the first game. No scenario file is touched, so nothing the tests have recorded moves. A scenario the file does not name (a new one, before anyone has sorted it) goes on a shelf called "Not yet sorted", so that nothing is ever hidden by forgetting. The other way to do it is a line in each scenario file; I have not chosen it because it changes 48 files that tests read (section 5, question 6).
+**Where the sorting is kept.** In one new file with the page's own files (as built: `client/harbour-shelves.yaml`; not under `data/`, which is the game's data, audited and hashed into a save's stamp), read by the page alone: for each scenario its shelf, its place on the shelf and its sentence; and at its head, which scenario is the first game. No scenario file is touched, so nothing the tests have recorded moves. A scenario the file does not name (a new one, before anyone has sorted it) goes on a shelf called "Not yet sorted", so that nothing is ever hidden by forgetting. The other way to do it is a line in each scenario file; I have not chosen it because it changes 48 files that tests read (section 5, question 6).
 
 ### 3.3 The first game
 

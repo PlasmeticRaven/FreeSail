@@ -17,7 +17,8 @@
   <span class="ship-name">the harbour</span>
   <span class="spacer"></span>
   <nav class="tabs" role="tablist">
-    <button type="button" data-tab="game" class="active" role="tab">game</button>
+    <button type="button" data-tab="begin" class="active" role="tab">begin</button>
+    <button type="button" data-tab="game" role="tab">game</button>
     <button type="button" data-tab="doors" role="tab">doors</button>
     <button type="button" data-tab="maker" role="tab">scenario maker</button>
     <button type="button" data-tab="settings" role="tab">settings</button>
@@ -28,8 +29,41 @@
 
 <main class="harbour-main">
 
+<!-- ======================= begin (package 96b, step 2) ======================= -->
+<section class="tab-page" data-page="begin">
+  <div class="panel begin">
+    <div class="panel-head"><span>Begin</span><span class="hint">a sailing ship of 1805, sailed by typing orders in the words of the time</span></div>
+    <div id="b-playing" class="begin-block" hidden>
+      <h3>Your game</h3>
+      <p id="b-playing-says"></p>
+      <div class="form-actions"><a id="b-to-game" class="harbour-link begin-go" href="/">go to your game</a></div>
+    </div>
+    <div id="b-first" class="begin-block" hidden>
+      <h3>Your first game</h3>
+      <ul id="b-first-says" class="plain-list"></ul>
+      <div class="form-actions"><button id="btn-b-first" type="button" class="begin-go"></button></div>
+    </div>
+    <div id="b-lessons-block" class="begin-block" hidden>
+      <h3>The lessons</h3>
+      <p class="note">The primer's lessons, in its order (chapter 18, docs/primer/18-lessons.md in the game's folder).</p>
+      <ol id="b-lessons" class="begin-lessons"></ol>
+    </div>
+    <div id="b-save" class="begin-block" hidden>
+      <h3>Take up a saved game</h3>
+      <p id="b-save-says"></p>
+      <div class="form-actions"><button id="btn-b-save" type="button"></button></div>
+    </div>
+    <div class="begin-block">
+      <h3>All the games</h3>
+      <p>Passages, trade, actions and squadrons, and games with a director above them, each with its choices.</p>
+      <div class="form-actions"><button id="btn-b-all" type="button">see all the games</button></div>
+    </div>
+    <p id="b-words" class="words" hidden></p>
+  </div>
+</section>
+
 <!-- ======================= the game ======================= -->
-<section class="tab-page" data-page="game">
+<section class="tab-page" data-page="game" hidden>
   <div class="panel">
     <div class="panel-head"><span>In play</span><span class="hint" id="game-clock"></span></div>
     <dl class="instruments" id="game-state">

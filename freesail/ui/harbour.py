@@ -23,9 +23,11 @@ Routes (`harbour_routes`):
 
     GET  /harbour                          the page
     GET  /api/harbour/state                the game, the stations held, the doors, the
-                                           settings' place, the credential store's state
+                                           saves in the saves place by name, the settings'
+                                           place, the credential store's state
     GET  /api/harbour/catalogue            the scenarios (each with its shelf and its
                                            sentence, in the shelves' order), the shelves,
+                                           the first game the page names,
                                            the ships, seats, stations, briefs, books, ports,
                                            regions and nations
     POST /api/harbour/start                {scenario | ship | load, seed, seat, time, pace,
@@ -85,8 +87,12 @@ GAME_SCENARIOS = ROOT / "data" / "scenarios"
 GAME_BOOKS = ROOT / "data" / "standing_orders"
 SHIPS_DIR = ROOT / "data" / "ships"
 # The page's shelves (package 96b, step 1; docs/design/Design-Harbour.md §3.2): which shelf
-# each of the game's scenarios stands on, read by the page alone.
-SHELVES_FILE = ROOT / "data" / "harbour" / "shelves.yaml"
+# each of the game's scenarios stands on, read by the page alone. With the page's own files
+# and not under `data/`: that folder is the game's data, every dated key of which the
+# range's audit classes (`tools/audit_range.py`) and every file of which is hashed into the
+# rules' stamp a save carries (`core.world.fingerprint_of`), and a re-sorting of the page's
+# list is no change of the rules.
+SHELVES_FILE = CLIENT_DIR / "harbour-shelves.yaml"
 # The two shelves the file never names: the player's own scenarios, first; and the game's
 # scenarios no shelf names, last, so that none is hidden by being forgotten.
 SHELF_OWN = {"id": "yours", "title": "Yours", "says": "Scenarios of your own.", "hidden": False}
@@ -110,6 +116,7 @@ STOP_WAIT_S = 6.0
 # second in the doors' loop, and its last words take a moment more).
 SEAT_DOOR_GRACE_S = 20.0
 COAST_STEP_DEG = 0.01  # the harbour's chart keeps a point about every half mile
+SAVES_LISTED = 30  # the page lists this many saves, the newest first
 
 
 class HarbourError(Exception):
@@ -427,6 +434,7 @@ class Harbour:
         return {
             "scenarios": scenarios,
             "shelves": shelves,
+            "first_game": self.first_game(scenarios),
             "ships": [_rel(p) for p in sorted(SHIPS_DIR.glob("*.yaml")) if not _is_boat(p)],
             "seats": list(SEATS),
             "stations": list(STATIONS),
@@ -466,7 +474,7 @@ class Harbour:
         return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}
 
     def shelves(self) -> list[dict[str, Any]]:
-        """The shelves as the file has them (`data/harbour/shelves.yaml`): each its id, its
+        """The shelves as the file has them (`client/harbour-shelves.yaml`): each its id, its
         title, its line, whether it is shown only when asked for, and its scenarios in
         order, each `{file, says}`. A file that is missing or cannot be read gives no
         shelves, and every scenario then stands unsorted: the list is never lost to it."""
@@ -492,17 +500,62 @@ class Harbour:
                                 {
                                     "file": str(s.get("file") or "").strip(),
                                     "says": " ".join(str(s.get("says") or "").split()),
+                                    "seat": " ".join(str(s.get("seat") or "").lower().split()),
                                 }
                                 for s in shelf.get("scenarios") or []
                                 if isinstance(s, dict)
                             ],
                         }
                     )
+                first = doc.get("first_game")
+                if isinstance(first, dict) and str(first.get("file") or "").strip():
+                    says = first.get("says") or []
+                    says = [says] if isinstance(says, str) else list(says)
+                    Harbour._first = {
+                        "file": str(first["file"]).strip(),
+                        "says": [" ".join(str(x).split()) for x in says if str(x).strip()],
+                    }
+                else:
+                    Harbour._first = None
             Harbour._shelves = (mtime, out)
             cached = Harbour._shelves
         return cached[1]
 
     _shelves: tuple[float, list[dict[str, Any]]] | None = None
+    _first: dict[str, Any] | None = None
+
+    def first_game(self, scenarios: list[dict[str, Any]]) -> dict[str, Any] | None:
+        """The game the first panel names (package 96b, step 2): the shelves' file's
+        `first_game`, as `{path, name, says: [lines]}`; None where the file names none or
+        names a scenario that is not there (the panel then offers the lessons alone)."""
+        self.shelves()
+        first = Harbour._first
+        if first is None:
+            return None
+        for entry in scenarios:
+            if not entry["own"] and Path(entry["path"]).stem == first["file"]:
+                return {"path": entry["path"], "name": entry["name"], "says": first["says"]}
+        return None
+
+    def saves(self) -> dict[str, Any]:
+        """The saves in the saves place, newest first (package 96b, step 2: the first
+        panel's "take up a saved game"): each by its name as `save NAME` wrote it and the
+        time its file was written. Their names alone: no save is opened."""
+        place = self.places.saves
+        found: list[tuple[float, str]] = []
+        with contextlib.suppress(OSError):
+            for p in place.glob("*.json"):
+                with contextlib.suppress(OSError):
+                    if p.is_file():
+                        found.append((p.stat().st_mtime, p.stem))
+        found.sort(reverse=True)
+        return {
+            "place": str(place),
+            "saves": [
+                {"name": name, "written": time.strftime("%Y-%m-%d %H:%M", time.localtime(at))}
+                for at, name in found[:SAVES_LISTED]
+            ],
+        }
 
     def _shelve(self, scenarios: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Each scenario of the list given its shelf, its place on it and its sentence
@@ -510,19 +563,22 @@ class Harbour:
         own first, then the file's shelves, then the game's scenarios no shelf names.
         Returns the shelves that hold a scenario, in that order, each `{id, title, says,
         hidden}`."""
-        named: dict[str, tuple[int, int, str, str]] = {}
+        named: dict[str, tuple[int, int, str, str, str]] = {}
         file_shelves = self.shelves()
         for i, shelf in enumerate(file_shelves, start=1):
             for j, s in enumerate(shelf["scenarios"]):
-                named.setdefault(s["file"], (i, j, shelf["id"], s["says"]))
+                named.setdefault(s["file"], (i, j, shelf["id"], s["says"], s["seat"]))
         last = len(file_shelves) + 1
         for n, entry in enumerate(scenarios):
+            entry["seat"] = ""
             if entry["own"]:
                 at, entry["shelf"], entry["says"] = (0, n), SHELF_OWN["id"], ""
             else:
                 stem = Path(entry["path"]).stem
-                i, j, shelf_id, says = named.get(stem, (last, n, SHELF_UNSORTED["id"], ""))
-                at, entry["shelf"], entry["says"] = (i, j), shelf_id, says
+                i, j, shelf_id, says, seat = named.get(
+                    stem, (last, n, SHELF_UNSORTED["id"], "", "")
+                )
+                at, entry["shelf"], entry["says"], entry["seat"] = (i, j), shelf_id, says, seat
             entry["order"] = at
         scenarios.sort(key=lambda e: e["order"])
         for n, entry in enumerate(scenarios):
@@ -789,6 +845,7 @@ class Harbour:
             "game": self.game_state(),
             "stations": self.stations(),
             "doors": [door.state() for door in self.doors.values()],
+            "saves": self.saves(),
             "settings": {"path": str(self.path), "error": error},
             "credential": settings_mod.credential_words(),
             "desktop": {"path": str(desktop), "entries": present},

@@ -2,14 +2,37 @@
 # shelf of the harbour's page each of the game's scenarios stands on, in what order, and
 # the one sentence the page says of it. Read by the harbour's page alone
 # (freesail/ui/harbour.py, `Harbour.shelves`); the game reads nothing here, and no scenario
-# file says its own shelf, so that sorting the list moves no scenario.
+# file says its own shelf, so that sorting the list moves no scenario. It lies with the
+# page's files and not under data/: data/ is the game's data, which the range's audit
+# classes key by key and the rules' stamp of a save hashes file by file, and the page's
+# sorting is neither.
 #
 # A scenario is named by its file's name without `.yaml`. A scenario of data/scenarios/
 # that no shelf names stands on the page's last shelf, "Not yet sorted", so that a new
 # scenario is never hidden by being forgotten here. A shelf marked `hidden: true` is shown
 # only when the page's tick box asks for it: the scenarios kept for tests and gates.
+#
+# `first_game` (step 2; the design's §3.1 and §3.3) is the game the page's first panel
+# names for a newcomer: a scenario of a shelf below, and the lines said beside its button.
+# The lessons of that panel are the shelf `lessons`, in its order. A scenario's `seat` is
+# the station the first panel's button seats the player at (the lesson that is the
+# officer's own); the page's other lists leave the seat to the player.
+
+first_game:
+  file: first-passage
+  says:
+    - The frigate Amazon in open water, a north wind of fifteen knots; no land, no other sail, nothing to hit.
+    - About an hour and a quarter. You make sail, brace the yards, tack her and wear her.
+    - The primer's chapter 7 goes with it, line by line (docs/primer/07-a-first-passage.md in the game's folder).
 
 shelves:
+  - id: first
+    title: Begin here
+    says: The game to begin with.
+    scenarios:
+      - file: first-passage
+        says: The frigate in open water with a north wind; make sail, brace up, tack and wear, with the primer's chapter 7 beside you.
+
   - id: lessons
     title: Lessons
     says: The primer's lessons, in the primer's order (chapter 18).
@@ -17,6 +40,7 @@ shelves:
       - file: lesson-landfall
         says: The frigate standing in from sea at night; raise the Lizard and say where you are.
       - file: lesson-reckoning
+        seat: officer
         says: You are the officer of the watch off the Lizard; work the reckoning for yourself before noon.
       - file: lesson-falmouth
         says: Pilot water from Black Head to Falmouth road; cross bearings, a pilot, and an anchor let go in a tideway.
