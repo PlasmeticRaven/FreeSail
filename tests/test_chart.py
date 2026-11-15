@@ -21,6 +21,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -185,12 +186,14 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
     total += (CHARTS / region["coast"]).stat().st_size
     total += (CHARTS / region["features"]).stat().st_size
     assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
-    # the world and the Atlantic are built by the tool and never committed (spec M5 §10):
-    # the manifest says so, and no tile of theirs is in the repository's files
+    # the Atlantic at level 1 is built by the tool and never committed (spec M5 §10), and
+    # the world's level 0 was not either until package 112 (old: `committed` False for
+    # both; new, by the lead's ruling: level 0 committed over the Atlantic and the
+    # Mediterranean, 70 S to 75 N and 100 W to 40 E, its tiles under tiles/0/)
     tool = build_tool()
     for key, level, flag in (("world", 0, "--world"), ("atlantic", 1, "--atlantic")):
         entry = manifest[key]
-        assert entry["level"] == level and entry["committed"] is False
+        assert entry["level"] == level and entry["committed"] is (key == "world")
         assert flag in entry["built_by"]
         for t in entry.get("tiles") or []:
             # a tile the tool made here is named by its corner in whole seconds
@@ -206,12 +209,18 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
         check=False,
     ).stdout.split()
     # package 38: the corridor's folder is the one thing under tiles/1/ the repository
-    # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed
-    corridor = manifest["charts"]["atlantic-east"]["corridor"]
-    # package 106a: and the layer beside it, the ocean carried south, committed the same way
-    names = [corridor] + list(manifest["charts"]["atlantic-east"].get("corridors_beside") or [])
-    folders = [manifest["corridors"][n]["folder"] for n in names]
+    # carries (spec M6 §26); the Atlantic beyond it is still fetched and not committed;
+    # package 106a: and the layer beside it, committed the same way; package 112: the
+    # chart's layers as one list (old: `corridor:` and `corridors_beside:`), and the
+    # world's level 0, its tiles exactly the manifest's
+    names = list(manifest["charts"]["atlantic-east"]["layers"])
+    folders = [manifest["corridors"][n]["folder"] for n in names] + ["tiles/0"]
     assert all(any(t.startswith(f"data/charts/{f}/") for f in folders) for t in tracked), tracked
+    world = sorted(t for t in tracked if t.startswith("data/charts/tiles/0/"))
+    assert world == sorted(
+        f"data/charts/tiles/0/{t['name']}.npz" for t in manifest["world"]["tiles"]
+    )
+    assert len(world) == 63
 
 
 # ---------------------------------------------------------------------------
@@ -889,6 +898,9 @@ OFF_LISBON = Position(38.6, -9.4)
 # package 39d: off Lisbon is the Portugal block's now; the corridor's own coast is Morocco's
 # (no block reaches south of 35.5 N on the Atlantic side)
 OFF_MOROCCO = Position(34.0, -7.0)
+# package 106b: off Morocco is a region's water now (morocco-sallee); the corridor's own
+# water is west of the coast's strip, 34 N 11 W
+WEST_OF_MOROCCO = Position(34.0, -11.0)
 OFF_FINISTERRE = Position(42.9, -9.4)
 FUNCHAL_TOWN = Position(32.65, -16.91)
 # package 106a: 31 N 10 W is the ocean carried south's now (the layer beside the corridor);
@@ -926,10 +938,16 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["sicily"]  # package 105: Sicily and Malta, south of 38.5 N and east of Cape Bon
 
     regions += ["canaries", "salvages"]  # package 106a, over the ocean carried south
+    # package 106b: Morocco's Atlantic coast, four regions north to south
+    regions += ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
     assert manifest["charts"][WHOLE]["regions"] == regions
-    assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
+    # package 112: the layers as one ordered list (old: `corridor:` the corridor and
+    # `corridors_beside:` the south's), the corridor first; and level 0 under the chart
+    # (old: levels [3, 2, 1])
+    layers = [CORRIDOR, "atlantic-south", "atlantic-verde"]
+    assert manifest["charts"][WHOLE]["layers"] == layers
     assert whole.region == whole.name == WHOLE and whole.regions == regions
-    assert [lv.level for lv in whole.levels] == [3, 2, 1]
+    assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
     # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
     # 32 W with the corridor widened to them); the Channel's east block 51.5 N and 2.5 E
@@ -940,12 +958,15 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # package 111's step 2a: Madeira's south bound to its tiles' edge, 31.60001 N (was 32.0);
     # package 105: the east to 16.69332 E (was 15.5); package 106a: the south limit the ocean
     # carried south's, the Canaries' row of the level-1 grid a hair inside its edge (25.2 N)
-    assert manifest["charts"][WHOLE]["corridors_beside"] == ["atlantic-south"]
-    assert whole.bounds == (25.2001, 51.5, west, 16.69332)
-    assert whole.bounds_words() == f"25.2001 to 51.5 N, {abs(west):g} W to 16.6933 E"
+    # package 112: the south limit the ocean to the Cape Verde Islands' (old 25.2001 N, the
+    # Canaries' row); the east still Sicily's (the Mediterranean's layers come with the seas)
+    assert whole.bounds == (12.4001, 51.5, west, 16.69332)
+    assert whole.bounds_words() == f"12.4001 to 51.5 N, {abs(west):g} W to 16.6933 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
-    assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
+    # package 106b: off Morocco (34 N 7 W, off Sallee) is now a region's water; old: None
+    assert whole.region_at(LIZARD) == "channel-west"
+    assert whole.region_at(OFF_MOROCCO) == "morocco-sallee"
     assert whole.region_at(OFF_LISBON) == "portugal"  # package 39d
     # the features of every region, indexed together, and every region's coast
     mid = load_chart(MID)
@@ -967,6 +988,10 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
 
     canaries = load_chart("canaries")  # package 106a
     salvages = load_chart("salvages")  # package 106a
+    morocco = [
+        load_chart(r)
+        for r in ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
+    ]  # package 106b
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -987,6 +1012,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | sicily.features.keys()
         | canaries.features.keys()
         | salvages.features.keys()
+        | set().union(*(m.features.keys() for m in morocco))
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -1008,6 +1034,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
 
     assert all(whole.region_of[fid] == "canaries" for fid in canaries.features)  # 106a
     assert all(whole.region_of[fid] == "salvages" for fid in salvages.features)  # 106a
+    for m in morocco:  # package 106b
+        assert all(whole.region_of[fid] == m.region for fid in m.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -1031,6 +1059,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(sicily.coast_lines())
         + len(canaries.coast_lines())
         + len(salvages.coast_lines())
+        + sum(len(m.coast_lines()) for m in morocco)
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -1084,27 +1113,41 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
             check=False,
         ).stdout.split()
         assert len(tracked) == len(entry["tiles"]), "the corridor's tiles are committed"
-    # the tile carries the distance field, so a landfall over the corridor is a landfall
-    lv = load_chart(WHOLE).levels[-1]
+    # the tile carries the distance field, so a landfall over the corridor is a landfall:
+    # the coarsest level that has a field is the corridor's (old: `levels[-1]`, the
+    # coarsest level, which since package 112 is the world's level 0, which has none)
+    levels = load_chart(WHOLE).levels
+    assert levels[-1].level == 0
+    lv = next(lv for lv in levels if lv.level == 1)
     tile = lv.tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
     assert tile is not None and tile.level == 1 and tile.dist is not None
+    world = levels[-1].tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
+    assert world is not None and world.dist is None
 
 
 def test_a_query_asks_the_finest_level_and_falls_back_to_the_corridor_and_to_none(whole):
     """Across the chart: a region's level where the region is, the corridor at level 1
     beyond it, None beyond the corridor's fetch box; the level's `use` says which."""
     assert whole.level_at(CARRICK_ROADS) == 3 and whole.level_at(MID_CHANNEL) == 2
-    assert whole.level_at(OFF_MOROCCO) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
+    # package 106b: off Morocco (34 N 7 W) is morocco-sallee's level 2 now; old: level 1,
+    # the corridor's. The corridor's queries are asked west of the coast's strip instead
+    assert whole.level_at(OFF_MOROCCO) == 2
+    assert whole.level_at(WEST_OF_MOROCCO) == 1 and whole.level_at(Position(45.0, -20.0)) == 1
     assert whole.use_at(MID_CHANNEL) == "a region: coast and approaches"
-    assert whole.use_at(OFF_MOROCCO) == "the Atlantic: passages and landfalls"
+    assert whole.use_at(WEST_OF_MOROCCO) == "the Atlantic: passages and landfalls"
     assert 30.0 < whole.depth_at(OFF_MOROCCO) < 200.0
     assert 100.0 < whole.depth_at(OFF_FINISTERRE) < 200.0
     assert whole.depth_at(FUNCHAL_TOWN) < 0.0  # the town stands above the sea
-    assert whole.depth_at(BEYOND_THE_CORRIDOR) is None  # a tile, but nothing in it
+    # a corridor tile with nothing in it there; since package 112 the world's level 0
+    # answers its depth (old: None), and no shore distance (it has no field)
+    assert 5000.0 < whole.depth_at(BEYOND_THE_CORRIDOR) < 6000.0
+    assert whole.level_at(BEYOND_THE_CORRIDOR) == 1  # the corridor's tile is listed there
     assert whole.coast_distance(BEYOND_THE_CORRIDOR) is None
-    assert whole.tile_min_depth(OFF_MOROCCO) is not None
-    # the corridor's cell is a kilometre; a region's a hundred metres
-    assert 900.0 < whole.cell_m_at(OFF_MOROCCO) < 1000.0 and whole.cell_m_at(MID_CHANNEL) < 100.0
+    assert whole.tile_min_depth(WEST_OF_MOROCCO) is not None  # package 106b; old: OFF_MOROCCO
+    # the corridor's cell is a kilometre; a region's a hundred metres (package 106b: asked west
+    # of Morocco's strip; old: OFF_MOROCCO)
+    assert 900.0 < whole.cell_m_at(WEST_OF_MOROCCO) < 1000.0
+    assert whole.cell_m_at(MID_CHANNEL) < 100.0
     # the nearest shore and its name over the corridor: the ground itself, no name
     shore = whole.nearest_shore(OFF_FINISTERRE)
     assert (
@@ -1224,8 +1267,11 @@ def test_the_lookouts_words_are_honest_over_the_corridor():
     from freesail.world.lookout import COARSE_CELL_M
 
     # package 39d: the Rock of Lisbon is the Portugal block's; the corridor's coast is
-    # Morocco's, two miles off the shore by Rabat
-    off_roca = destination(Position(33.955, -6.94), 300.0, 2.0 * units.NAUTICAL_MILE)
+    # Morocco's, two miles off the shore by Rabat. Package 106b: Morocco's coast is the
+    # block's to Cape Juby (27.33 N); the coarse coast is the desert's south of it, under
+    # the layer beside the corridor, two miles off the shore at 26.5 N (old: by Rabat,
+    # 33.955 N 6.94 W)
+    off_roca = destination(Position(26.5, -13.95), 300.0, 2.0 * units.NAUTICAL_MILE)
     sc = Scenario(
         start_time=datetime(1805, 6, 1, 10, 0),
         wind_from_deg=0.0,
@@ -1292,7 +1338,7 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     tool = build_tool()
     for key in ("title", "bounds", "fetch", "harbours", "sources"):
         assert key in tool.REGIONS["channel-west"], key
-    assert tool.CORRIDORS[CORRIDOR]["level"] == 1 and tool.CHARTS[WHOLE]["corridor"] == CORRIDOR
+    assert tool.CORRIDORS[CORRIDOR]["level"] == 1 and tool.CHARTS[WHOLE]["layers"][0] == CORRIDOR
     assert tool.main(["--check", "channel-west"]) == 0
     out = capsys.readouterr().out
     for words in (
@@ -1327,14 +1373,30 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     fake.mkdir()
     last = yaml.safe_load((CHARTS / "manifest.yaml").read_text(encoding="utf-8"))
     (fake / "manifest.yaml").write_text(yaml.safe_dump(last, sort_keys=False), encoding="utf-8")
+
+    # package 112: the tool reads the chart it writes (the tide's open edges), so the
+    # fixture's tiles are tiles the chart can read, with nothing in them (old: empty files)
+    def nothing(path: Path, level: int, t: dict) -> None:
+        np.savez_compressed(
+            path,
+            elevation=np.full((512, 512), -32768, dtype=np.int16),
+            level=np.int16(level),
+            unit_m=np.float32(0.1),
+            cell_sec=np.float32(3.0),
+            south_sec=np.int64(t["south_sec"]),
+            west_sec=np.int64(t["west_sec"]),
+            nodata=np.int16(-32768),
+            min_depth_m=np.float32(np.nan),
+        )
+
     for level, tiles in last["regions"]["channel-west"]["tiles"].items():
         (fake / "tiles" / str(level)).mkdir(parents=True, exist_ok=True)
         for t in tiles:
-            (fake / "tiles" / str(level) / f"{t['name']}.npz").write_bytes(b"")
+            nothing(fake / "tiles" / str(level) / f"{t['name']}.npz", int(level), t)
     folder = fake / last["corridors"][CORRIDOR]["folder"]
     folder.mkdir(parents=True)
     for t in last["corridors"][CORRIDOR]["tiles"]:
-        (folder / f"{t['name']}.npz").write_bytes(b"")
+        nothing(folder / f"{t['name']}.npz", 1, t)
     (fake / "features").mkdir()
     (fake / "overrides").mkdir()
     monkeypatch.setattr(tool, "CHARTS_DIR", fake)
@@ -1352,6 +1414,12 @@ def test_the_recipe_form_the_checks_and_a_region_build_that_leaves_the_rest_unto
     report = []
     tool.Build(tmp_path, True, report).write_manifest({}, {}, {}, {})
     assert any("channel-west has tiles missing" in line for line in report)
+    # package 112: a tile the manifest lists and the chart cannot read stops the build, by
+    # its name, and is never passed over (the tide's open edges read the corridor here)
+    for t in last["corridors"][CORRIDOR]["tiles"]:
+        (folder / f"{t['name']}.npz").write_bytes(b"")
+    with pytest.raises(SystemExit, match=r"the tile .*\.npz cannot be read"):
+        tool.Build(tmp_path, True, []).write_manifest({}, {}, {}, {})
 
 
 # ---------------------------------------------------------------------------
@@ -2383,21 +2451,18 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     under a chart of one region: a checkpoint's reload of a Channel save takes the chart
     of `channel-west` alone (`core/replay.py`), and it answers exactly as it did whatever
     the world's tiles on the disk."""
+    # the chart's own data as it lies, and a world of one synthetic tile in the test's own
+    # folder, which the manifest's `world:` entry names by its absolute folder (no copy of
+    # the chart and no link: a link wants a privilege on Windows, WinError 1314)
     manifest = load_manifest()
-    root = tmp_path / "charts"
-    root.mkdir()
-    for item in CHARTS.iterdir():
-        if item.name != "tiles":
-            (root / item.name).symlink_to(item)
-    (root / "tiles").mkdir()
-    for lv in ("1", "2", "3"):
-        (root / "tiles" / lv).symlink_to(CHARTS / "tiles" / lv)
+    root = CHARTS
     # a world tile over the water south of channel-west's tiles (47.70 N 6 W)
     span = 150 * 512
     s = -90 * 3600 + ((47 + 90) * 3600 // span) * span
     w = -180 * 3600 + ((-7 + 180) * 3600 // span) * span
-    path = root / "tiles" / "0" / f"{s}_{w}.npz"
-    path.parent.mkdir()
+    folder = tmp_path / "world"
+    path = folder / f"{s}_{w}.npz"
+    folder.mkdir()
     np.savez(
         path,
         elevation=np.full((512, 512), -70, dtype=np.int16),
@@ -2410,7 +2475,7 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
         min_depth_m=np.float32(140.0),
     )
     manifest = dict(manifest)
-    manifest["world"] = dict(manifest["world"], tiles=[{"name": f"{s}_{w}"}])
+    manifest["world"] = dict(manifest["world"], folder=str(folder), tiles=[{"name": f"{s}_{w}"}])
     south = Position(47.70, -6.0)
     alone = Chart("channel-west", manifest, root)
     assert [lv.level for lv in alone.levels] == [3, 2]
@@ -2419,3 +2484,317 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     assert [lv.level for lv in whole.levels] == [3, 2, 1, 0]
     assert whole.level_at(south) == 1  # the corridor answers before the world
     assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
+    assert whole.depth_at(Position(57.0, -6.0)) == 140.0  # the synthetic tile's, read
+
+
+# -- the chart session's tracks step: the least depth along a line ---------------------
+
+
+# the level-3 tile of the global grid holding 0.01 N 0.01 E (tiles of 512 cells of half a
+# second, counted from 90 S and 180 W), its south and west edges in seconds
+HARBOUR_SOUTH_SEC = -90 * 3600 + int((90.01 * 3600 / 0.5) // 512) * 256
+HARBOUR_WEST_SEC = -180 * 3600 + int((180.01 * 3600 / 0.5) // 512) * 256
+L3 = 0.5 / 3600.0  # a level-3 cell in degrees
+L2 = 3.0 / 3600.0  # a level-2 cell
+
+
+def _made_tile(folder: Path, level: int, south_sec: int, west_sec: int, depth_m) -> str:
+    """A tile of `level` with its south-west corner at (south_sec, west_sec), its cells the
+    depths `depth_m` (512 by 512, metres at the datum, negative where it dries)."""
+    cell = 0.5 if level == 3 else 3.0
+    name = f"{south_sec}_{west_sec}"
+    elev = np.rint(-np.asarray(depth_m, dtype=float) * 10.0).astype(np.int16)
+    folder.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        folder / f"{name}.npz",
+        elevation=elev,
+        level=np.int16(level),
+        unit_m=np.float32(0.1),
+        cell_sec=np.float32(cell),
+        south_sec=np.int64(south_sec),
+        west_sec=np.int64(west_sec),
+        nodata=np.int16(-32768),
+        dist=np.zeros(elev.shape, dtype=np.uint16),
+        min_depth_m=np.float32(float(np.min(depth_m))),
+    )
+    return name
+
+
+def _made_chart(tmp_path: Path, tiles: list[tuple[int, int, int, Any]]) -> Chart:
+    """A made chart of the given tiles (level, south_sec, west_sec, depths), each its own
+    layer, finest first, under one region-less chart by the equator."""
+    corridors, layers = {}, []
+    for k, (level, south, west, depth) in enumerate(tiles):
+        layer = f"made-{k}"
+        name = _made_tile(tmp_path / "tiles" / str(level) / layer, level, south, west, depth)
+        span = (0.5 if level == 3 else 3.0) * 512 / 3600.0
+        corridors[layer] = {
+            "level": level,
+            "bounds": {
+                "south": south / 3600.0 + 1e-4,
+                "north": south / 3600.0 + span - 1e-4,
+                "west": west / 3600.0 + 1e-4,
+                "east": west / 3600.0 + span - 1e-4,
+            },
+            "folder": f"tiles/{level}/{layer}",
+            "tiles": [{"name": name}],
+        }
+        layers.append(layer)
+    manifest = {
+        "levels": load_manifest()["levels"],
+        "regions": {},
+        "corridors": corridors,
+        "charts": {"sea": {"regions": [], "layers": layers}},
+    }
+    return Chart("sea", manifest, tmp_path)
+
+
+def _brute_least(chart: Chart, a: Position, b: Position, step_m: float) -> float:
+    """The least of the chart's surface read every `step_m` along the straight line in
+    degrees from `a` to `b` (the reader's own chord for a line this short)."""
+    _, dist = bearing_and_distance(a, b)
+    n = max(1, int(math.ceil(dist / step_m)))
+    best = math.inf
+    for k in range(n + 1):
+        t = k / n
+        d = chart.depth_at(
+            Position(
+                a.lat_deg + (b.lat_deg - a.lat_deg) * t, a.lon_deg + (b.lon_deg - a.lon_deg) * t
+            )
+        )
+        if d is not None:
+            best = min(best, d)
+    return best
+
+
+def _lines_by(rng, centre: Position, cell_deg: float, n: int, half_m: float, off_cells: float):
+    """`n` random straight lines of 2 x `half_m` at any bearing, passing within
+    `off_cells` of a cell of `cell_deg` from `centre`."""
+    out = []
+    for _ in range(n):
+        bearing = rng.uniform(0.0, 360.0)
+        off = rng.uniform(-off_cells, off_cells) * cell_deg
+        side = rng.uniform(-off_cells, off_cells) * cell_deg
+        mid = Position(centre.lat_deg + off, centre.lon_deg + side)
+        out.append((destination(mid, bearing, -half_m), destination(mid, bearing, half_m)))
+    return out
+
+
+def _assert_exact(chart: Chart, lines, step_m: float = 0.01, tol_m: float = 0.015) -> None:
+    for a, b in lines:
+        got = chart.least_depth_along(a, b)
+        assert got is not None
+        brute = _brute_least(chart, a, b, step_m)
+        # the true least is at or under every reading, and a reading every centimetre
+        # comes within a slope's centimetre of it
+        assert got[0] <= brute + 1e-6, (a, b, got[0], brute)
+        assert brute - got[0] <= tol_m, (a, b, got[0], brute)
+
+
+def test_a_lines_least_depth_is_the_true_least_by_a_lone_cell_whatever_its_height(tmp_path):
+    """The lead's ruling of 2026-11-14, 11:00 (the reader's finding: 13 of 750 random lines by
+    a lone cell read three metres and more where the truth is under three, a half cell's
+    step and an 8 m margin): `Chart.least_depth_along` is the true least of the chart's own
+    surface along a line, with no step. A level-3 grid 30 m deep with one cell standing at
+    2, 0, -3, -6 or -10 m; random lines at any bearing within 0.8 of a cell of its centre,
+    each read against the same surface every centimetre (old: a reading every half cell and
+    again every 2 m under 8 m)."""
+    rng = np.random.default_rng(7)
+    for k, head in enumerate((2.0, 0.0, -3.0, -6.0, -10.0)):
+        depth = np.full((512, 512), 30.0)
+        depth[256, 300] = head
+        chart = _made_chart(tmp_path / str(k), [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, depth)])
+        centre = Position(
+            HARBOUR_SOUTH_SEC / 3600.0 + 256.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 300.5 * L3
+        )
+        _assert_exact(chart, _lines_by(rng, centre, L3, 30, 20.0, 0.8))
+        # through the centre the least is the head itself, a centimetre's rounding aside
+        a, b = destination(centre, 128.0, -30.0), destination(centre, 128.0, 30.0)
+        assert chart.least_depth_along(a, b)[0] <= head + 0.05
+
+
+def test_a_lines_least_depth_is_the_true_least_over_a_ridge_and_across_edges(tmp_path):
+    """The same rule over a ridge of cells crossed at a slant, across the edge between two
+    tiles of one level (a shoal by the seam), and across a level's edge, where a harbour
+    patch ends and the region's coarser cells answer (each lookup falls to the level that
+    answers there, and the line's least is the least of all its pieces)."""
+    rng = np.random.default_rng(11)
+    ridge = np.full((512, 512), 25.0)
+    ridge[250, 280:330] = 1.5
+    chart = _made_chart(tmp_path / "ridge", [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, ridge)])
+    centre = Position(HARBOUR_SOUTH_SEC / 3600.0 + 250.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 305 * L3)
+    _assert_exact(chart, _lines_by(rng, centre, L3, 30, 25.0, 3.0))
+    # two tiles side by side, the east one shoaler, a head on its first column
+    west_tile = np.full((512, 512), 30.0)
+    east_tile = np.full((512, 512), 18.0)
+    east_tile[200, 0] = 0.5
+    span = 256  # a level-3 tile's span in seconds
+    chart = _made_chart(
+        tmp_path / "seam",
+        [
+            (3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, west_tile),
+            (3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC + span, east_tile),
+        ],
+    )
+    seam = Position(HARBOUR_SOUTH_SEC / 3600.0 + 200.5 * L3, (HARBOUR_WEST_SEC + span) / 3600.0)
+    _assert_exact(chart, _lines_by(rng, seam, L3, 30, 25.0, 1.5))
+    # a level-3 patch over a level-2 region 12 m deep with a head of its own just east of
+    # the patch, lines from the patch out over the region's cells
+    patch = np.full((512, 512), 20.0)
+    edge_lon = (HARBOUR_WEST_SEC + span) / 3600.0
+    head_lat = HARBOUR_SOUTH_SEC / 3600.0 + 100 * L3
+    # the level-2 tile holding the patch's east edge at the head's latitude
+    s2 = -90 * 3600 + int(((head_lat + 90.0) * 3600 / 3.0) // 512) * 1536
+    w2 = -180 * 3600 + int(((edge_lon + 180.0) * 3600 / 3.0) // 512) * 1536
+    region = np.full((512, 512), 12.0)
+    row = int((head_lat - s2 / 3600.0) / L2)
+    col = int((edge_lon - w2 / 3600.0) / L2) + 1
+    region[row, col] = 1.0
+    chart = _made_chart(
+        tmp_path / "level",
+        [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, patch), (2, s2, w2, region)],
+    )
+    head = Position(s2 / 3600.0 + (row + 0.5) * L2, w2 / 3600.0 + (col + 0.5) * L2)
+    assert chart.level_at(destination(head, 270.0, 200.0)) == 3 and chart.level_at(head) == 2
+    _assert_exact(chart, _lines_by(rng, head, L2, 20, 200.0, 0.8), step_m=0.05, tol_m=0.02)
+
+
+def test_setubals_shoal_is_read_at_its_true_least(whole):
+    """The case that showed a half cell's step too coarse (the chart session's measure of
+    the pilot's readers, 2026-11-14): Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to
+    38 25.97 N 9 03.72 W over level 2's cells of 92.6 m, falls in a V to its least some 561 m
+    along, between a reading every half cell (36 m: 3.36 and 3.66 m) and a cable's (1.72 m).
+    The true least is 1.13 m, at or under a reading every 2 cm."""
+    from freesail.world.geo import parse_position
+
+    a = parse_position("38 26.02 N 9 04.46 W")
+    b = parse_position("38 25.97 N 9 03.72 W")
+    least, where = whole.least_depth_along(a, b)
+    assert 1.10 < least < 1.16, least
+    # read every 2 cm about the V along the reader's own chord (the line straight in degrees
+    # from `a` to `b`, which a leg this short is)
+    _, dist = bearing_and_distance(a, b)
+
+    def on(t: float) -> Position:
+        return Position(
+            a.lat_deg + (b.lat_deg - a.lat_deg) * t, a.lon_deg + (b.lon_deg - a.lon_deg) * t
+        )
+
+    s, e = on(540.0 / dist), on(580.0 / dist)
+    assert least <= _brute_least(whole, s, e, 0.02) + 1e-6
+    assert 38.43 < where.lat_deg < 38.44 and -9.07 < where.lon_deg < -9.06
+
+
+def test_a_line_clipping_a_finer_tiles_corner_reads_its_rock(tmp_path):
+    """The reader's item 2 (2026-11-14, 11:00): a line that clips a finer tile's corner for a
+    short stretch is read by that tile there (old: the step of one level chosen for the whole
+    line by sampling every quarter of a tile's span, so a 1,729 m line over a level-3 tile for
+    785 m read 14.0 m over a two-cell rock drying to nothing). A level-3 tile with a rock of
+    two cells by its north-east corner, over a level-2 region 20 m deep; lines across the
+    corner at several slants against a reading every 5 cm."""
+    rng = np.random.default_rng(3)
+    patch = np.full((512, 512), 20.0)
+    patch[508, 508:510] = -0.5  # two cells drying half a metre, four cells from the corner
+    corner = Position(HARBOUR_SOUTH_SEC / 3600.0 + 512 * L3, HARBOUR_WEST_SEC / 3600.0 + 512 * L3)
+    s2 = -90 * 3600 + int(((corner.lat_deg + 90.0) * 3600 / 3.0) // 512) * 1536
+    w2 = -180 * 3600 + int(((corner.lon_deg + 180.0) * 3600 / 3.0) // 512) * 1536
+    region = np.full((512, 512), 20.0)
+    chart = _made_chart(
+        tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, patch), (2, s2, w2, region)]
+    )
+    rock = Position(HARBOUR_SOUTH_SEC / 3600.0 + 508.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 509 * L3)
+    assert chart.level_at(rock) == 3 and chart.level_at(destination(corner, 45.0, 300.0)) == 2
+    for bearing in (100.0, 135.0, 170.0, 300.0):
+        a, b = destination(rock, bearing, -900.0), destination(rock, bearing, 830.0)
+        least = chart.least_depth_along(a, b)
+        assert least is not None and least[0] < 0.0, (bearing, least)
+    _assert_exact(chart, _lines_by(rng, rock, L3, 20, 400.0, 0.8), step_m=0.05, tol_m=0.05)
+
+
+def test_the_first_place_under_a_draught_is_found_where_the_surface_first_falls_under_it(
+    tmp_path,
+):
+    """The line's second answer (the lead's ruling of 2026-11-14, 11:05): `Chart.first_under`
+    gives the first place along the line where the chart's surface is under a draught, by the
+    first root of each piece's quadratic in order; against a reading every 5 mm along random
+    lines by a lone cell, within a centimetre of the first reading under it."""
+    rng = np.random.default_rng(5)
+    depth = np.full((512, 512), 30.0)
+    depth[256, 300] = 1.0
+    chart = _made_chart(tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, depth)])
+    centre = Position(
+        HARBOUR_SOUTH_SEC / 3600.0 + 256.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 300.5 * L3
+    )
+    found = 0
+    for a, b in _lines_by(rng, centre, L3, 30, 20.0, 0.6):
+        _, dist = bearing_and_distance(a, b)
+        got = chart.first_under(a, b, 12.0)
+        n = int(dist / 0.005)
+        first = None
+        for k in range(n + 1):
+            t = k / n
+            d = chart.depth_at(
+                Position(
+                    a.lat_deg + (b.lat_deg - a.lat_deg) * t,
+                    a.lon_deg + (b.lon_deg - a.lon_deg) * t,
+                )
+            )
+            if d is not None and d < 12.0:
+                first = dist * t
+                break
+        if first is None:
+            assert got is None or got[1] >= 11.99
+            continue
+        found += 1
+        assert got is not None and abs(got[0] - first) < 0.01, (got, first)
+        assert got[1] <= 12.0 + 1e-6
+    assert found >= 10
+    assert (
+        chart.first_under(
+            Position(centre.lat_deg + 0.01, centre.lon_deg),
+            Position(centre.lat_deg + 0.011, centre.lon_deg),
+            12.0,
+        )
+        is None
+    )
+
+
+@pytest.mark.slow
+def test_every_port_legs_least_is_at_or_under_a_reading_every_metre(whole):
+    """The exact least on every leg of every port's tracks (under 20 km), against a reading
+    every metre along the great circle: at or under it, within a centimetre over (the reading
+    every metre a point of the same surface; the chord's line straight in degrees, at 500 m,
+    differs from the great circle by millimetres)."""
+    from freesail.world.ports import load_port, port_files
+
+    over = []
+    for pid, path in sorted(port_files().items()):
+        port = load_port(path, whole)
+        tracks = port.tracks or {}
+        for name, seq in tracks.items():
+            marks = []
+            for words in seq:
+                f = whole.feature(str(words))
+                if f is not None:
+                    marks.append(f.position)
+                else:
+                    try:
+                        from freesail.world.geo import parse_position
+
+                        marks.append(parse_position(str(words)))
+                    except ValueError:
+                        continue
+            for a, b in zip(marks, marks[1:], strict=False):
+                bearing, dist = bearing_and_distance(a, b)
+                if dist > 20_000.0 or dist < 1.0:
+                    continue
+                got = whole.least_depth_along(a, b)
+                reads = [
+                    whole.depth_at(destination(a, bearing, float(k))) for k in range(int(dist) + 1)
+                ]
+                reads = [d for d in reads if d is not None]
+                if got is None or not reads:
+                    continue
+                if got[0] > min(reads) + 0.01:
+                    over.append((pid, name, round(got[0], 3), round(min(reads), 3)))
+    assert not over, over

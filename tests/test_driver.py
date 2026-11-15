@@ -1582,7 +1582,8 @@ def test_the_driver_filed_as_the_spanker_is_the_spanker_to_the_physics():
 
 
 # ---------------------------------------------------------------------------
-# Truth 7-230 (the lead's allotment, 2026-10-29)
+# Truth 7-230's worlds (the lead's allotment, 2026-10-29); the truth in
+# tests/test_known_truths.py since Phase 5
 # ---------------------------------------------------------------------------
 
 
@@ -1659,76 +1660,3 @@ def test_the_toggle_on_the_shift_under_way_moves_its_time_by_the_booms_phase(tmp
     assert abs(sum(took.values()) - sum(took_old.values()) - took["rig_out_boom"]) <= 4
     assert with_key.ship.spars[BOOM].rigged_out is True
     assert without.ship.spars[BOOM].rigged_out is True
-
-
-def test_truth_7_230_the_driver_is_the_spanker_to_the_physics_and_shifts_in_about_15_minutes(
-    tmp_path,
-):
-    """Truth 7-230 (Build-Ships.md §15; Ext §17.7, §17.11; the lead's allotment of 2026-10-29): *the
-    driver, filed as the frigate's spanker, is the spanker to the physics, and the shift of the
-    mizen for the driver takes about fifteen minutes*: about thirteen until its boom went with it
-    (Ext §17.11, the lead's approval of 2026-10-30). Steel's driver boomsail is bent "instead
-    of the mizen, ... exactly the same, only the foot of the sail is extended on the boom"
-    (Steel 1794 vol. I, OCR l. 24536-24538), in light fair winds (l. 13819-13821); *Venus* split
-    her spanker, unbent it and bent the mizen (Jackson, *Logs* vol. 1, OCR l. 11064-11076).
-
-    1. **Row 3'** (Ext §17.5): the spanker re-filed in memory as a lateen cut at the mast, on a
-       lateen yard in the gaff's place and on her boom, has her balanced speed and her sails'
-       yaw moment at 50, 60, 90, 120 and 150 degrees in fifteen knots equal to the spanker's as
-       filed within 0.01 kn and 1 kN m (measured equal to the last figure: 2.21, 4.29, 8.19,
-       7.86, 6.53 kn; -45, -15, 102, 89, -31 kN m).
-    2. **The shift at her company**: the fixture (`frigate_with_driver()`, the frigate's company
-       with the 64's driver and course) under plain sail in ten knots 120 degrees off, at seed
-       7. "Shift the mizen for the driver": the course, drawing, is taken in, unbent, sent down
-       while the driver is swayed up, the boom rigged out, the driver bent and set, in that
-       order; each phase between its file's time and a quarter more (measured 102, 206, 171,
-       137, 274 and 137 s against 90, 180, 150, 120, 240 and 120: her hands and the weather's
-       factor, 1.13-1.14); the whole between fifteen and nineteen minutes (measured 1,027 s,
-       seventeen minutes and seven seconds; 900 s at the file's times). **Old beside new** (Ext
-       §17.11, the boom's phase of 120 s by the hands' factor, and nothing else): five phases to
-       six; the band of the whole, thirteen to sixteen minutes to fifteen to nineteen; measured
-       890 s to 1,027 s; 780 s to 900 s at the file's times. The course's canvas goes down to
-       the sail room and the count of spares stands. "Trim sails" trims the driver free to the
-       wind (measured 59.6 degrees, 83 degrees of apparent wind; 60.8 and 84 before the boom's
-       phase, her way a little changed by the 137 s) and it draws ahead as her after sail. (The
-       shift sets it where its own sheet lies, flat aft at the gaff's floor, as it sets the
-       frigate's storm mizzen at its own: `ShiftScript`, "its sheet and yard stand as the old
-       sail's did". Measured, not pinned.)
-
-    **The clauses on the 64 herself** (Ext §17.7; Build-Ships.md §2.6) are B1's, in
-    `tests/test_indefatigable.py`, on `sixty-four.yaml` since her stage B: her shift at her own
-    company; her polar with the driver bent and set above the course's from 90 to 150 degrees in
-    ten knots (on this fixture, the 64's driver and course on the frigate's hull, it holds: 5.75,
-    5.57 and 4.47 kn against 5.60, 5.38 and 4.39, the driver bringing 59, 38 and 10 kN m more
-    weather helm; measured, not pinned here); and the driver hauled aft at helm's a-lee and
-    brailed up hove to on her file. Her band moves with her regeneration, when her file carries
-    the key. Seed 7, the owner's machine."""
-    filed = _row(_rigged_for_plain_sail(str(FRIGATE)))
-    model = _row(_spanker_refiled())
-    for (kn1, yaw1), (kn3, yaw3) in zip(filed, model, strict=True):
-        assert abs(kn3 - kn1) <= 0.01 and abs(yaw3 - yaw1) <= 1.0
-
-    world = _fair_wind_world(tmp_path)
-    ship = world.ship
-    course, driver = ship.sails[COURSE], ship.sails[DRIVER]
-    assert course.is_set and driver.state is SailState.UNBENT
-    spares = scripts.spare_sails(ship)
-    start = world.clock.tick
-    took, began = _shifted_under_way(world, SHIFT_OUT_S)
-    for phase, seconds in SHIFT_OUT_S.items():
-        assert seconds <= took[phase] <= 1.25 * seconds, took
-    whole = sum(took.values())
-    assert 15 * 60 <= whole <= 19 * 60, whole
-    shifted = [e for e in _after(world, start) if e.kind == "sail.shifted"]
-    assert len(shifted) == 1 and shifted[0].tick == began + whole
-    assert course.state is SailState.UNBENT and ship.spars[BOOM].rigged_out is True
-    assert _in_the_room(ship) == [(COURSE, COURSE_CANVAS_NO)]
-    assert scripts.spare_sails(ship) == spares
-    assert world.submit("trim sails").kind == "sail.trimmed"
-    for _ in range(200):
-        world.tick()
-    assert scripts.after_gaff_sails(ship) == [driver]
-    assert driver.is_set and driver.thrust_kn > 0.0
-    want = yard_trim.wanted_sheet_angle(driver.curve_class, ship.dyn.apparent_wind_angle)
-    assert _deg(driver.sheet_angle) == pytest.approx(_deg(want), abs=5.0)
-    assert GAFF_FLOOR_DEG < _deg(driver.sheet_angle) < CEILING_DEG

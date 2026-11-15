@@ -537,6 +537,23 @@ def read_checkpoint(path: str | Path) -> tuple[dict[str, Any], World]:
     return header, world
 
 
+def _rig_word_now(vessel: Any) -> None:
+    """A far vessel's rig's word (`Vessel.kind`) read again from her description, where she has one
+    the descriptions know, as `ships.vessel_from_spec` gives it a new game; any other vessel (a
+    pilot's boat, a shadow of no description) as she was saved."""
+    from freesail.world import ships
+
+    key = str(getattr(vessel, "description", "") or "")
+    if key not in ships.DESCRIPTIONS:
+        return
+    try:
+        rig = ships.description(key).get("rig")
+    except Exception:  # noqa: BLE001 - a file the descriptions no longer read: as saved
+        return
+    if rig:
+        vessel.kind = str(rig)
+
+
 def _rebind(world: World, _seen: set[int] | None = None) -> None:
     # each World once (found on the way by package 58a: a crewed vessel's World lists the
     # parent's other vessels, so with two crewed at once each rebound the other's World
@@ -605,6 +622,12 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
 
         rebind_hooks(ship)
     for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
+        # her rig's word as her description gives it now (`ships.description`, as a new game makes
+        # her): a word of the files copied into the pickle and read from there went stale across
+        # the save, and a 74 saved before the lead's ruling 17 loaded "a ship", a frigate's class
+        # at every distance, where the build that wrote her read her a ship of the line's (the
+        # whole-change review of 80e703c7, engine-4)
+        _rig_word_now(v)
         # a crewed vessel's own World (package 43): rebound as the parent is
         if getattr(v, "crew", None) is not None:
             _rebind(v.crew, seen)
@@ -862,14 +885,16 @@ def load_report(
                     transcripts=transcripts_in(data),
                 )
                 if not same_build(written_by):
-                    report.words = [
+                    report.words += [
                         f"The checkpoint was written by another build "
                         f"({build_words(written_by)}) and is read by this one "
                         f"({build_words(build_stamp())}): the game goes on from where it "
                         "was saved, under this build's rules."
                     ]
+                report.words += followed_body_words(data, "checkpoint")
                 return world, report
     report = check_replay(data, path, replay_anyway, why)
+    report.words += followed_body_words(data, "replay")
     world = replay(data, ship_factory, until_tick=until_tick, road=report.road)
     if until_tick is not None and until_tick < int(data["end_tick"]):
         report.words.append(
@@ -907,3 +932,39 @@ def load(
     whole report; the rule and the refusal are its)."""
     world, report = load_report(path, ship_factory, replay_anyway)
     return world, report.how
+
+
+def followed_body_words(data: dict[str, Any], how: str) -> list[str]:
+    """The loader's words for a save from before the followed hull's far body was kept at
+    her truth (package 60, the design's §9.2; the lead's ruling of 2026-11-12) that was
+    played aboard another ship than her first (`--ship`, or `follow` of another hull): her
+    body stood off her hull there and stands at it here, so the ships about her see another
+    sea and the game parts from the one played. No legacy mode: said, not hidden."""
+    if data.get("followed_body"):
+        return []
+    away = False
+    for entry in data.get("inputs") or []:
+        line = entry.get("line") if isinstance(entry, dict) else None
+        if not isinstance(line, dict):
+            continue
+        kind = str(line.get("kind") or "")
+        ship = (line.get("data") or {}).get("ship")
+        if kind == "driver.left" or (
+            kind == "driver.follow" and ship not in (None, "", "the ship")
+        ):
+            away = True
+            break
+    if not away:
+        return []
+    goes_on = (
+        "the game goes on from where it was saved, and from here it is not the game that build "
+        "would have played"
+        if how == "checkpoint"
+        else "the replay agrees with the game as played for its first minutes aboard her and "
+        "parts from it after"
+    )
+    return [
+        "This save is from a build before the followed ship's body was kept at her truth, and "
+        "was played aboard another ship than her first: her body stood off her hull then and "
+        f"stands at it now, so the ships about her see another sea; {goes_on}."
+    ]

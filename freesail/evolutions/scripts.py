@@ -982,6 +982,15 @@ class Script:
     # the settees a manoeuvre holds from the order (`_hold_settees`), read by the runner
     order_settees: frozenset[str] = frozenset()
 
+    @property
+    def crew_away(self) -> bool:
+        """Whether the hands this work holds are out of the ship now (the boat away from her
+        side: `SendBoatScript`, `LayOutKedgeScript`), so not on board for a watch's whole number
+        (`Runner._watch_whole`; package 75, the lead's ruling 11 of 2026-11-13), and a post who
+        hauled at her falls stays aboard (`Runner._posts_off_the_work`). No other work takes its
+        hands away."""
+        return False
+
     def holds(self) -> set[str]:
         return {self.ship.name}
 
@@ -1001,7 +1010,28 @@ class Script:
         return set()
 
     def check(self, words: dict[str, Any]) -> str | None:
-        """An extra precondition in code. Returns the reason it fails, or None."""
+        """An extra precondition in code, the beginning's: read once, as the work begins, against
+        the world as the work finds it, and free to lay the work's plan from it. Returns the
+        reason it fails, or None."""
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """What of the work's preconditions stands through it: what the world can make false
+        while the work is held and its own going never does (a mast carried away by the wind
+        before the axes have done; the anchor lost). Read whenever held work is taken up again
+        (`Runner._failing_condition`'s `begun`), as the file's `requires` are, where `check`, the
+        beginning's, is not: the work's own going makes the beginning's false (the kedge's boat
+        away with it), and it lays the plan anew (the lead's (C1) of 2026-11-14). Returns the
+        reason it fails, or None; None for work that has none (the whole-change review of
+        80e703c7, sailing-2: with the whole check left unread on a resume, a main mast carried
+        away while her cutting away lay held was cut away and wrecked a second time).
+
+        Every script a post can hold states it, here or in its file's `requires` (the lead's last
+        list of 2026-11-14, 8: the veer, backing and catting and fishing the anchor, the kedge, the
+        signal and the four trims, beside the letting go, the cutting away and the fish); refused,
+        the work is said in its `on_fail` and never run on (`Runner._try_resume`). The scripts a
+        post can hold whose beginning nothing in the world makes false while they lie held keep
+        None, each named with its reason by `tests/test_held_work.py`'s sweep."""
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -1828,13 +1858,18 @@ class TackScript(Script):
         braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        heading = self.new_course
         if self.timed_out:
             new = self.ship.dyn.tack
+            # and the heading she lies on, read from her, not the course she was put about
+            # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
+            # up on the starboard tack, heading SSE (158°)" with her head at NE)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
-            "new_course": units.format_heading(self.new_course),
+            "new_course": units.format_heading(heading),
         } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:
@@ -2576,12 +2611,15 @@ def _hove_to_no_longer(
 
     The line is worded on what the dip does, its own lines after it (docs/dev/TuningNotes.md,
     "The review's mends of the two builds"):
-    begun, "The watch dips the mainsail, lying against its mast."; waiting, for hands (the
-    bilander's larboard watch of two by night) or its turn, "The mainsail, lying against its
-    mast, is to be dipped.", and it begins when there are hands for it (the watch changed, or all
-    hands called); refused, nothing of a dip, and the refusal's line. Worded before it was begun,
-    the line said the watch dipped it on the tick the dip was found to wait for hands, and the
-    settee stayed against its mast to the watch's end."""
+    begun, "The watch dips the mainsail, lying against its mast."; begun by all hands called for
+    it, the watch on deck too few (the bilander's larboard watch of two by night; the settee's
+    files' `too_few: all hands`, the lead's ruling (1) of 2026-11-10), "The watch calls all hands
+    to dip the mainsail, lying against its mast.", the call's own line after it; waiting, for
+    hands or its turn, "The mainsail, lying against its mast, is to be dipped.", and it begins
+    when there are hands for it (the watch changed, or all hands called); refused, nothing of a
+    dip, and the refusal's line. Worded before it was begun, the line said the watch dipped it on
+    the tick the dip was found to wait for hands, and the settee stayed against its mast to the
+    watch's end."""
     dyn = ship.dyn
     end_lying_to(ship)
     dyn.helm_mode = HelmMode.FULL_AND_BY
@@ -2591,6 +2629,7 @@ def _hove_to_no_longer(
     notes = getattr(ship, "notes", None)
     at = len(notes) if isinstance(notes, list) else 0  # the line goes before the dip's own
     begun: list[Sail] = []
+    called: list[Sail] = []  # begun by all hands called for it (`Runner._watch_too_few`)
     waiting: list[Sail] = []
     after: list[tuple[str, str, str]] = []
     for sl in dip:
@@ -2615,6 +2654,8 @@ def _hove_to_no_longer(
             continue  # failed as it began: the dip's own line says so
         if not inst.waiting:
             begun.append(sl)
+            if inst.all_hands:
+                called.append(sl)  # the dip's own file is a watch's work: all hands were called
             continue
         waiting.append(sl)
         if inst.waiting_for is None:
@@ -2622,8 +2663,11 @@ def _hove_to_no_longer(
     said = ""
     if begun:
         mast = "its mast" if len(begun) == 1 else "their masts"
-        said += f" The watch dips {names_of_sails(ship, begun)}, lying against {mast}."
+        who = "The watch calls all hands to dip" if called else "The watch dips"
+        said += f" {who} {names_of_sails(ship, begun)}, lying against {mast}."
         data["settees_dipped"] = [sl.id for sl in begun]
+        if called:
+            data["all_hands_called"] = True
     if waiting:
         one = len(waiting) == 1
         mast, be = ("its mast", "is") if one else ("their masts", "are")
@@ -3811,7 +3855,11 @@ class SendDownScript(PhasedScript):
                 f"{'is' if len(standing) == 1 else 'are'} still aloft."
             )
         if not self.clear_away and self.clew:
-            doing = str(self.params.get("doing") or f"{verb}ing the {what}")
+            # the work's name from the runner's one road (`Runner._format_context`'s 'doing'),
+            # where the file kept a copy of its own in its params, "striking the topmasts", beside
+            # the runner's (the lead's last list of 2026-11-14, 9); the file's `work:` now (the
+            # review of 0dcdb8cf, F7)
+            doing = str(words.get("doing") or "the work")
             return (
                 f"{_names(ship, self.clew)[:1].upper()}{_names(ship, self.clew)[1:]} "
                 f"{'is' if len(self.clew) == 1 else 'are'} set; take "
@@ -6447,6 +6495,12 @@ def _riding(ship: Ship, wind: Wind | None) -> str:
     return riding_words(ship, state, wind_from)
 
 
+def _not_down(anchor: Any, riding: Any) -> str:
+    """An anchor that is not down, beside the one she rides by: 'the small bower is a-cockbill,
+    not down; she rides by the best bower'."""
+    return f"{anchor.name} is {anchor.state.value}, not down; she rides by {riding.name}"
+
+
 class _AnchorScript(Script):
     """What the anchor scripts share: the tackle found, the anchor named, the cable
     veered or hove by the fathom at a rate."""
@@ -6482,12 +6536,7 @@ class _AnchorScript(Script):
         `weigh the small bower` weighed it, without a word)."""
         riding = self.tackle.riding_by()
         if riding is None:
-            hanging = hanging_anchor(self.tackle, self.params.get("anchor"))
-            if hanging is not None:
-                # package 37k (game 10: `weigh the best bower` was answered "no anchor is
-                # down" with the best bower hanging at the bows after a belay)
-                return f"no anchor is down: {anchor_left_words(hanging)}"
-            return "no anchor is down"
+            return self._none_down()
         named = self.params.get("anchor")
         if not named:
             self.anchor = riding
@@ -6496,9 +6545,31 @@ class _AnchorScript(Script):
         if anchor is None:
             return f"no anchor aboard answers to '{named}'; she rides by {riding.name}"
         if not anchor.down:
-            return f"{anchor.name} is {anchor.state.value}, not down; she rides by {riding.name}"
+            return _not_down(anchor, riding)
         self.anchor = anchor
         return None
+
+    def _none_down(self) -> str:
+        """No anchor down, in words: where one hangs at the bows, where (package 37k: in game 10
+        `weigh the best bower` was answered "no anchor is down" with the best bower hanging at
+        the bows after a belay)."""
+        hanging = hanging_anchor(self.tackle, self.params.get("anchor"))
+        if hanging is not None:
+            return f"no anchor is down: {anchor_left_words(hanging)}"
+        return "no anchor is down"
+
+    def _still_down(self) -> str | None:
+        """What work on an anchor down needs still true as it is taken up after lying held
+        (`Script.standing`): the anchor it works still down, which its own going never changes
+        and the world does (a cable parted while the work lay held, `physics.anchor`). In the
+        beginning's words (`_worked`): no anchor down, or the anchor's state and the one she
+        rides by. None while it is down, or before the work has an anchor."""
+        if self.anchor is None or self.anchor.down:
+            return None
+        riding = self.tackle.riding_by()
+        if riding is None:
+            return self._none_down()
+        return _not_down(self.anchor, riding)
 
     def _veer(self, dt: float, factor: float, target_m: float, rate_key: str) -> bool:
         """The cable veered toward `target_m` at the file's rate; True when there."""
@@ -6569,8 +6640,20 @@ class _AnchorScript(Script):
         return d
 
 
-# The work that waits on at anchor when she comes to (package 45c): the boat's errand.
-ANCHOR_WORK_KEPT = frozenset({"send_boat"})
+# The work that waits on at anchor when she comes to (package 45c): the boat's errand; and
+# the order to weigh or unmoor given while the sail was furled (package 60: given by the new
+# captain at his taking command, as she finished coming to under her late master, it was
+# belayed with no word and she lay at anchor two hours), which is anchor work, not sail work.
+ANCHOR_WORK_KEPT = frozenset({"send_boat", "weigh_anchor", "unmoor"})
+# The work a post's leaving held (`Runner._hold`, the lead's ruling 11 of 2026-11-13) that coming to
+# anchor or getting under way does not do away with, by its subject's class: the ship's own work
+# (battening down, the cable, the kedge, the small arms) and her repairs (a spar cut away, fished
+# or shifted, a wreck cleared, a line rove). It stays held and is taken up where it stood when the
+# hands are piped down (`Runner._try_resume`), as the boat's errand waits on (the whole-change
+# review of 80e703c7, sailing-1 and engine-1). The ship's work on her sails, all of them at once
+# (furling all sail, loosing them to dry), is sail work and goes with it.
+HELD_ON_AT_ANCHOR = frozenset({"ship", "spar", "part", "line"})
+SAIL_WORK_OF_THE_SHIP = frozenset({"furl_all", "loose_sails_to_dry"})
 
 
 def _belay_held_work(ship: Ship) -> None:
@@ -6581,15 +6664,35 @@ def _belay_held_work(ship: Ship) -> None:
     finds no sail to trim). The boat's errand is not sail work and is anchor work: it
     waits on for its hands and goes when they are free (package 45c, the owner's ghosted
     boat: sent ashore at Guernsey while all hands brought her to, it was belayed here with
-    no line, and the boat's state left 'hoisting out' for ever)."""
+    no line, and the boat's state left 'hoisting out' for ever).
+
+    The pause has two causes since the lead's ruling 11 (`Instance.held_for`): a manoeuvre's
+    belay, which holds the step-list sail work in hand, and a post's leaving work under half its
+    hands, which holds any work, scripted or not. Work a post's leaving held is belayed here only
+    where it is sail work; the ship's own work and her repairs (`HELD_ON_AT_ANCHOR`) stay held and
+    are taken up after the pipe-down. Read as decision 25's, a hatch half battened down by three
+    and the master, the master gone to the conn for coming to anchor, was ended here without a word
+    after its "Belayed battening down" had said it would be taken up (the whole-change review of
+    80e703c7, sailing-1 and engine-1)."""
+    from freesail.evolutions.runner import HELD_BY_POST
+
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "belay"):
         return
+
+    def kept(i: Any) -> bool:
+        evo = getattr(i, "evo", None)
+        if getattr(evo, "id", "") in ANCHOR_WORK_KEPT:
+            return True
+        if getattr(i, "paused", False) and getattr(i, "held_for", None) == HELD_BY_POST:
+            cls = str((getattr(evo, "applies_to", None) or {}).get("class"))
+            return cls in HELD_ON_AT_ANCHOR and getattr(evo, "id", "") not in SAIL_WORK_OF_THE_SHIP
+        return False
+
     held = [
         i
         for i in runner.instances
-        if (getattr(i, "paused", False) or getattr(i, "waiting", False))
-        and getattr(getattr(i, "evo", None), "id", "") not in ANCHOR_WORK_KEPT
+        if (getattr(i, "paused", False) or getattr(i, "waiting", False)) and not kept(i)
     ]
     if held:
         runner.belay(ship, held)
@@ -6761,6 +6864,28 @@ def _anchoring_warnings(
 # this is no road (`_deep_road_warning`). Twenty fathoms: deeper than any road of the
 # directions, by three; judgement.
 DEEP_ROAD_FATHOMS = 20.0
+
+
+def cannot_anchor(
+    ship: Ship, anchor: Any, depth_m: float | None, where: str = "here"
+) -> str | None:
+    """Can she anchor here by this anchor in this depth: the one answer the let-go
+    evolutions and a ship woken at her anchor ask (package 60, the lead's fourth round: one
+    question, one answer): None where she can; else why, in the forecastle's words: no anchor
+    that can be let go, the anchor lost or not ready, no bottom here, or the ground too deep
+    for her cable (`_too_deep`). The evolutions' own checks before it (no tackle, at anchor
+    already, aground, an anchor named that she has not) stay theirs."""
+    from freesail.ship.parts import AnchorState, ground_tackle
+
+    if anchor is None:
+        return "she has no anchor that can be let go"
+    if anchor.state is AnchorState.LOST:
+        return f"{anchor.name} is lost"
+    if not can_let_go(anchor):
+        return f"{anchor.name} is {anchor.state.value}"
+    if depth_m is None:
+        return "no bottom here to anchor in"
+    return _too_deep(ground_tackle(ship), anchor, depth_m, where)
 
 
 def _too_deep(tackle: Any, anchor: Any, depth_m: float, where: str) -> str | None:
@@ -6939,20 +7064,16 @@ class ComeToAnchorScript(_AnchorScript):
         self.anchor = self._named(self.params.get("anchor"))
         if self.anchor is None:
             return f"no anchor aboard answers to '{self.params.get('anchor')}'"
-        if not can_let_go(self.anchor):
-            return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
-        if depth is None:
-            return "no bottom here to anchor in"
-        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         wanted = self.params.get("depth_fathoms")
-        if wanted:
+        if wanted and depth is not None and can_let_go(self.anchor):
             # "come to an anchor in twelve fathoms": the depth to let go in, as the primer
             # has it; she stands on until the lead calls it (package 37f)
             self.let_go_depth = units.fathoms_to_m(float(wanted))
             depth = self.let_go_depth
-        if why := _too_deep(self.tackle, self.anchor, depth, "there" if wanted else "here"):
+        if why := cannot_anchor(self.ship, self.anchor, depth, "there" if wanted else "here"):
             return why
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -7266,16 +7387,10 @@ class LetGoAnchorScript(_AnchorScript):
 
         if self.anchor.state is AnchorState.DOWN:
             return f"{self.anchor.name} is down already"
-        if self.anchor.state is AnchorState.LOST:
-            return f"{self.anchor.name} is lost"
-        if not can_let_go(self.anchor):
-            return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
-        if depth is None:
-            return "no bottom here to anchor in"
-        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
-        if (why := _too_deep(self.tackle, self.anchor, depth, "here")) is not None:
+        if (why := cannot_anchor(self.ship, self.anchor, depth, "here")) is not None:
             return why
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -7287,6 +7402,24 @@ class LetGoAnchorScript(_AnchorScript):
                 f"{self.anchor.name} has but {_fathoms_words(self.anchor.cable_fathoms)} of "
                 f"cable bent to it"
             )
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: she is not aground and the anchor is not lost; and before it is let
+        go (`stand_clear`), a bottom here within reach of her cable (she may drift while the work
+        lies held)."""
+        if self.ship.extra.get("aground"):
+            return "she is aground"
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and self.anchor.state is AnchorState.LOST:
+            return f"{self.anchor.name} is lost"
+        if self.phase == "stand_clear" and self.anchor is not None:
+            depth = _water_depth(self.ship)
+            if depth is None:
+                return "no bottom here to anchor in"
+            if (why := _too_deep(self.tackle, self.anchor, depth, "here")) is not None:
+                return why
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -7371,6 +7504,16 @@ class VeerCableScript(_AnchorScript):
             return f"the whole cable is out on {self.anchor.name}, {whole_words}"
         self.target = min(self.target, whole)
         return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the anchor it veers on still down (`_still_down`), refused in the
+        beginning's words; the scope and its target are the beginning's plan, which the veer's
+        own going makes false and is not read again. A veer held by a post's leaving, its anchor
+        lost while it lay held, veered the lost anchor's cable to the target when it was taken up
+        ("Veered to fifty-six fathoms on the best bower.", the lead's last list of 2026-11-14, 8;
+        cda12ec9, which read the whole check again, refused it in these words)."""
+        why = self._still_down()
+        return f"{why} to veer on" if why == "no anchor is down" else why
 
     def begin(self, words: dict[str, Any]) -> None:
         self.phase = "veer"
@@ -7697,6 +7840,20 @@ class CatAndFishScript(_AnchorScript):
             return f"{self.anchor.name} is {self.anchor.state.value}"
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until it is catted and fished at its end: the anchor still hanging at the bows, aweigh
+        or catted (its own going takes it from the one to the other), refused in the beginning's
+        words where it is not (let go again while the work lay held: the lead's last list of
+        2026-11-14, 8)."""
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and self.anchor.state not in (
+            AnchorState.AWEIGH,
+            AnchorState.CATTED,
+        ):
+            return f"{self.anchor.name} is {self.anchor.state.value}"
+        return None
+
     def begin(self, words: dict[str, Any]) -> None:
         from freesail.ship.parts import AnchorState
 
@@ -7743,6 +7900,19 @@ class BackAnchorScript(_AnchorScript):
         if self.stream is None:
             return "she carries no stream anchor"
         if self.stream.state is not AnchorState.STOWED:
+            return f"the stream anchor is {self.stream.state.value}"
+        return None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until the stream goes down at its end: the anchor it backs still down (its cable not
+        parted while the work lay held) and the stream still at the bows, refused in the
+        beginning's words (the lead's last list of 2026-11-14, 8)."""
+        from freesail.ship.parts import AnchorState
+
+        if self.anchor is not None and not self.anchor.down:
+            riding = self.tackle.riding_by()
+            return "no anchor is down to back" if riding is None else _not_down(self.anchor, riding)
+        if self.stream is not None and self.stream.state is not AnchorState.STOWED:
             return f"the stream anchor is {self.stream.state.value}"
         return None
 
@@ -8682,6 +8852,14 @@ class LayOutKedgeScript(_AnchorScript):
 
     holds_subject = True
 
+    # the phases with the boat's crew in her, away from the ship's side (hoisting out, slinging
+    # the kedge and hoisting in are deck work): the review of the lead's ruling 11
+    CREW_AWAY_PHASES = ("pull_out", "pull_back")
+
+    @property
+    def crew_away(self) -> bool:
+        return self.phase in self.CREW_AWAY_PHASES
+
     def holds(self) -> set[str]:
         return {self.ship.name, "the boat"}
 
@@ -8731,6 +8909,39 @@ class LayOutKedgeScript(_AnchorScript):
         pace = units.knots_to_ms(self.timing_value("boat_pace_kn", 4.0))
         self.pull_s = self.out_m / max(pace, 0.1)
         return None
+
+    # the phases before the kedge is let go from the boat (at the end of `pull_out`)
+    BEFORE_LET_GO = ("ready", "hoist_out", "sling", "pull_out")
+    # the phases with the boat alongside, hoisting out or in (deck work)
+    ALONGSIDE = ("hoist_out", "sling", "hoist_in")
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Until the kedge is let go from the boat: the kedge still in the ship, and a bottom here
+        to lay it in (she may drift while the work lies held: her cable parted), refused in the
+        beginning's words (the lead's last list of 2026-11-14, 8). The boat away with it and the
+        hawser's length are the beginning's, which its own going makes so; once the kedge is let
+        go nothing of its beginning stands, the boat pulling back and hoisted in."""
+        from freesail.ship.parts import AnchorState
+
+        if self.phase not in self.BEFORE_LET_GO or self.anchor is None:
+            return None
+        if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
+            return f"the kedge is {self.anchor.state.value}"
+        if _water_depth(self.ship) is None:
+            return "no bottom here to lay a kedge in"
+        return None
+
+    def belayed(self) -> None:
+        """Belayed, or refused as it is taken up, with the boat alongside (hoisting out, the kedge
+        slinging, hoisting in): the boat is in the ship again and free, not left away on an errand
+        nobody runs on (the lead's last list of 2026-11-14, 8: before it the boat's state stayed
+        'hoisting out' for good, and every kedge after was refused, "the long-boat is away").
+        Away from her side the boat is left as she is."""
+        if self.ports is None or self.phase not in self.ALONGSIDE:
+            return
+        from freesail.world.ports import BoatState
+
+        self.ports.boat = BoatState(boat_id=self.ports.boat.boat_id, boat_name=self.boat_name)
 
     def begin(self, words: dict[str, Any]) -> None:
         from freesail.world.ports import BoatState
@@ -8860,6 +9071,13 @@ class SendBoatScript(Script):
         self.boat_name = "the boat"
         self.ports: Any = None
 
+    # the phases with her crew in her, away from the ship's side (hoisting out and in is deck work)
+    CREW_AWAY_PHASES = ("pull_out", "ashore", "pull_back")
+
+    @property
+    def crew_away(self) -> bool:
+        return self.phase in self.CREW_AWAY_PHASES
+
     def holds(self) -> set[str]:
         return {"the boat"}
 
@@ -8888,6 +9106,14 @@ class SendBoatScript(Script):
             if item.get("kind") in ("purchase", "sale")
         )
         self.ashore_s = float(BOAT_ASHORE_S.get(errand, 1800)) + tons * LIGHTER_S_PER_TON
+        # what she carries on the errand, kept by the errand itself: the boat's state is made
+        # afresh when she is lost (`world.boats.lose_boat`), and the goods with it
+        self.carried = [
+            dict(item)
+            for item in self.ports.boat.carrying
+            if item.get("kind") in ("purchase", "sale")
+        ]
+        self.port_id = self.ports.boat.port_id  # the market of her errand, kept with them
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -8901,6 +9127,17 @@ class SendBoatScript(Script):
             self.ship.note(severity.value, kind, text, self.ship.name, data)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.ports is not None and getattr(self.ports.boat, "lost", None):
+            # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
+            # and what was bought or sold in her is said lost with her, paid once and never
+            # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
+            # a sale is had when the goods are landed: lost before she reached the quay, it
+            # is void (the lead's reading of part D at 60af48e, item 4)
+            landed = self.phase in ("ashore", "pull_back", "hoist_in")
+            carried = list(getattr(self, "carried", []) or [])
+            port_id = getattr(self, "port_id", None)
+            self.fail(self.ports.lost_on_errand(carried, landed=landed, port_id=port_id))
+            return
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":

@@ -238,6 +238,26 @@ def beat_to_quarters(ship: Ship, order: Order) -> Result:
     tick = int(world.clock.tick) if world is not None else 0
     lines = quarters.beat(tick)
     data: dict[str, Any] = {"verb": order.verb, "level": 1, "quarters": quarters.describe()}
+    guns = [g for g in getattr(ship, "guns", {}).values() if g.serves]
+    if guns and not any(g.cast_loose for g in guns):
+        # the men at quarters, the guns still secured: casting loose is its own word (Falconer
+        # 1780, EXERCISE: "1st. Silence. 2d. Cast loose your guns."), and the reply says so
+        # (the cold review of 2026-11-14, 1.5; package 115 D1)
+        lines.append("The guns are secured: 'cast loose the guns' to serve them.")
+    battery = getattr(ship, "extra", {}).get("battery")
+    if (
+        battery is not None
+        and str(getattr(battery, "mode", "")) == "hold"
+        and getattr(battery, "held_by_order", "")
+    ):
+        # a hold given before the beat (`hold your fire`, `cease firing`) stands at quarters
+        # until an order to fire (the lead's ruling of 2026-11-14 on package 115 D1): the
+        # beat says so, not a silent battery after it (its reading of part D, item 6)
+        from freesail.orders.gunnery import _held_words
+
+        lines.append(
+            f"The guns are held {_held_words(ship, battery)}: 'fire as they bear' to open."
+        )
     return "crew.quarters", "Beat to quarters! " + " ".join(lines), data
 
 
@@ -251,34 +271,27 @@ CREW_VERBS: dict[str, Callable[[Ship, Order], Result]] = {
 
 
 def all_hands_work(ship: Ship) -> str | None:
-    """A sentence if an all-hands evolution is still at work, else None."""
+    """A sentence if all-hands work is still at work, else None: the work named as the log names
+    the work in hand (`Runner.doing`), "furling all sail", where this named it again from its
+    verb, "furling all" (the lead's (C8) of 2026-11-14: one place names the work). All-hands work
+    is the request as it was made (`Instance.all_hands`): a file's all-hands work, and work made
+    all-hands work for itself because its watch was too few (`Runner._made_all_hands`, the lead's
+    ruling (1) of 2026-11-10), which this read from the file's crew line alone, so that "pipe
+    down" was taken while all hands were at a take in called for itself (the whole-change review
+    of 80e703c7, sailing-6: the plan read where the work's own state should be)."""
     runner = ship.extra.get("evolutions")
-    if runner is None or not hasattr(runner, "in_progress"):
+    if runner is None or not hasattr(runner, "work"):
         return None
-    for entry in runner.in_progress():
-        if entry.get("waiting") or entry.get("paused"):
+    for inst in runner.work():
+        if inst.waiting or inst.paused:
             continue
-        evo = registry.get(entry["id"])
-        if evo is None or not _is_all_hands(evo):
+        evo = inst.evo
+        if not (getattr(inst, "all_hands", False) or _is_all_hands(evo)):
             continue
         if evo.id in ABOUT_SHIP:
             return "The hands are still about ship; wait for her to come round."
-        return (
-            f"All hands are still at work ({_doing(ship, evo, entry['subject'])}); "
-            f"pipe down when it is done."
-        )
+        return f"All hands are still at work ({runner.doing(inst)}); pipe down when it is done."
     return None
-
-
-def _doing(ship: Ship, evo: registry.Evolution, subject: str) -> str:
-    from freesail.evolutions.runner import gerund, part_name
-
-    verb = evo.verb.replace("_", " ")
-    first, _, rest = verb.partition(" ")
-    doing = f"{gerund(first)} {rest}".strip()
-    if subject in ship.parts:
-        return f"{doing} the {part_name(ship, subject)}"
-    return doing
 
 
 def _is_all_hands(evo: registry.Evolution) -> bool:

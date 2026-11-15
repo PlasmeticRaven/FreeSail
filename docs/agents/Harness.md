@@ -731,8 +731,8 @@ her range in cables by his estimate, 'struck'), `range`, `colours`, `quarter_bil
 cable, so her bearing this minute does not re-send the row. The fall of shot and the hits
 are notable lines (`action.fired`, `action.hit`), the casualties urgent ones with the named
 people's own lines (`person.hurt`), and the bill's word when hands are robbed for sail work
-(`quarters.robbed`: "Tacking ship at quarters: 84 hands taken from the guns, half of each
-crew; the guns go on short-handed").
+(`quarters.robbed`: "Tacking ship at quarters: 67 hands taken from the bow chasers and the
+guns, Nos. 10 to 13 and 15 to 17; the guns go on short-handed").
 
 **The tripwires and the events.** A stand-by may wait for `a sail within <n> cables`
 (judged by the lookout's estimate, never the truth) beside the earlier instruments, and for
@@ -740,11 +740,21 @@ the action's events by their words: `she opens fire`, `a warning shot`, `a shot 
 `a man killed`, `a gun dismounted`, `a spar shot away`, `her colours come down`, `the enemy
 strikes`, `the colours struck`, `at quarters`, `cleared for action`, `the guns cast loose`,
 `the magazine empty`, `the lee ports shut`, `the lee ports opened`; the same words serve a
-standing order's `at`. The two ports' words go by the log's line for a deck and side, the
-lee's alone (or a port's on the centre line, or one shut while she is upright): since the roll
-(package 75, L3) the weather's ports can shut as well, by the roll less the heel, and their
-line answers neither word, standing in the log and in `the guns` (`ports shut`, by side).
-They are silent while the guns are secured (package 75).
+standing order's `at`. The two ports' words go by the log's line, said once a change of state
+for a deck and side ("The lee lower-deck ports are shut, the sea at their sills."; "The lee
+upper-deck ports are opened again, their sills clear of the sea."), the lee's alone (or a
+port's on the centre line, or one shut while she is upright; a side opening as she comes
+upright is said the lee's, as it was while she heeled): since the roll (package 75, L3) the
+weather's ports can shut as well, by the roll less the heel, and their line ("The weather
+...") answers neither word, standing in the log and in `the guns` (`ports shut`, by side).
+A deck's side is shut from the first of its ports to shut until the last has opened, and a
+port is opened again only once its sill stands six inches clear of the water's line and the
+sea has kept from it a full minute (`ports.PORT_HOLD_S`, the hold), so that `the lee ports
+opened` comes a minute at least after the sea last reached a sill, and a port the sea reaches
+again within the minute starts its minute afresh. They are silent while the guns are secured:
+the line is said at a port's shutting while a gun of that deck's side is cast loose, or at the
+casting loose with the port shut already, and a side so said says its opening (package 75;
+`combat/ports.py`; registered in `api/practice_readings.py` beside the guns' other lines).
 
 **The cost of thinking against the cycle.** The station's line closes with the ship's time
 since the model's last reply (package 58a). Against the cycle's figures (truth 7-135: a

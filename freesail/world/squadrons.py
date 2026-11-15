@@ -569,13 +569,17 @@ class Squadron:
         self, world: Any, course_deg: float, wind_from_deg: float, wind_kn: float
     ) -> float | None:
         """The set's pace: the slowest member's best on the course at the wind, times the
-        book's factor; None when no member sails in company (the commander alone)."""
+        book's factor; None when no member sails in company (the commander alone). A prize on
+        her station leg is a member in company like any other (the lead's readings of
+        cda12ec9, (F3): "the captor and her prize keep company as the records say"; before,
+        the prizes were left out of the pace, so that a prize slower than her captor fell
+        astern half a mile an hour without end, "in company" and never lost)."""
         best: float | None = None
         detached = {
             m for d in self.divisions.values() if d.detached for m in (d.leader, *d.members)
         }
         for m in self.others():
-            if m in detached or m in self.prizes or m == PLAYER_ID:
+            if m in detached or m == PLAYER_ID:
                 continue
             body = _body(world, m)
             if body is None or getattr(body, "done", False):
@@ -1202,7 +1206,18 @@ class Squadron:
                 f"'{spec.get('formation')}' is no formation; say one of {', '.join(FORMATIONS)}."
             )
         commander = str(spec.get("commander") or PLAYER_ID)
-        if commander.lower() in ("the ship", "us", "the player", "the player's ship", "our ship"):
+        players = ("the ship", "us", "the player", "the player's ship", "our ship")
+        mine = commander.lower() in players or any(
+            str(m).lower() in ("the ship", "us") for m in spec.get("members") or []
+        )
+        if mine and _changed_ships(world):
+            # a set's command is not carried to another hull yet (package 60, the design's
+            # §2.5): every reader of a set takes `PLAYER_ID` for the player's ship
+            raise ValueError(
+                "the player has taken command of another ship; a set of his is not formed "
+                "in her yet: give the set another commander"
+            )
+        if commander.lower() in players:
             commander = PLAYER_ID
         else:
             v = world.vessels.find(commander)
@@ -1573,7 +1588,14 @@ def _yields(body: Any) -> bool:
     return "merchant" in str(getattr(body, "description", "") or "")
 
 
-def _armed_enemy_alongside(world: Any, prey: Any) -> Any:
+def _armed_enemy_alongside(world: Any, prey: Any, retake_for: str | None = None) -> Any:
+    """An armed enemy of hers alongside who has her in hand (chasing, engaging or investigating
+    her). A crewed ship's captain is her hull's, and she brings a far ship to only to take back a
+    prize of her own nation (`retake_for`, the prize's old nation): the near body never fights a
+    prize under a prize crew (`Judgement._may_fight`, `relations.MARK`), so she takes her back by
+    coming up as the far body does (the whole-change review of 80e703c7, gundeck-2: a crewed King's
+    frigate chased an enemy-held British prize for an hour and never had her); any other
+    bringing-to by a crewed ship is the near fight's, 70's."""
     nations = getattr(world, "nations", None)
     if nations is None:
         return None
@@ -1581,16 +1603,20 @@ def _armed_enemy_alongside(world: Any, prey: Any) -> Any:
         if o is prey or getattr(o, "done", False) or getattr(o, "struck", False):
             continue
         brain = getattr(o, "brain", None)
-        if brain is None or brain.state not in ("chasing", "engaging", "investigating a stranger"):
+        crewed = getattr(o, "crew", None) is not None and o.crew.shape == "full"
+        if crewed and (retake_for is None or str(o.nation) != str(retake_for)):
+            continue  # the near fight is 70's
+        captain = getattr(o.crew, "captain", None) if crewed else brain
+        if captain is None:
             continue
-        if str(getattr(brain, "_stranger", "") or "") != str(prey.id):
+        if captain.state not in ("chasing", "engaging", "investigating a stranger"):
+            continue
+        if str(getattr(captain, "_stranger", "") or "") != str(prey.id):
             continue
         if getattr(brain, "role", "") not in _ARMED_ROLES:
             continue
         if not nations.at_war(str(o.nation), str(prey.nation)):
             continue
-        if getattr(o, "crew", None) is not None and o.crew.shape == "full":
-            continue  # the near fight is 70's
         _, d = bearing_and_distance(o.position, prey.position)
         if d <= CUT_OUT_M:
             return o
@@ -1598,6 +1624,13 @@ def _armed_enemy_alongside(world: Any, prey: Any) -> Any:
 
 
 def _covered(world: Any, prey: Any) -> bool:
+    """A man of war of her nation within `COVER_NM` who could support her: the one answer
+    (`relations.still`, `SUPPORT` within the cover distance: on the sea, not struck, nobody's
+    prize; the lead's readings of cda12ec9, the far fight's family), so that a man of war of hers
+    struck, or a prize of her nation's (a man of war's hull under a prize crew), covers nobody,
+    nor the player's King's ship when she has struck."""
+    from freesail.world import relations as R
+
     for o in world.vessels.vessels:
         if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
             continue
@@ -1608,17 +1641,15 @@ def _covered(world: Any, prey: Any) -> bool:
             and str(getattr(o, "description", "")) not in _MAN_OF_WAR_DESCRIPTIONS
         ):
             continue
-        _, d = bearing_and_distance(o.position, prey.position)
-        if d <= COVER_NM * units.NAUTICAL_MILE:
+        if R.still(world, prey, o, R.SUPPORT, within_nm=COVER_NM):
             return True
     shadow_pos = getattr(world, "position", None)
     ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
-        _, d = bearing_and_distance(shadow_pos, prey.position)
         from freesail.world.captains import _is_kings_ship
 
-        if d <= COVER_NM * units.NAUTICAL_MILE and _is_kings_ship(world):
+        if R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM) and _is_kings_ship(world):
             return True
     return False
 
@@ -1637,13 +1668,14 @@ def far_captures(world: Any) -> list[tuple[Any, ...]]:
             continue
         if getattr(prey, "crew", None) is not None and prey.crew.shape == "full":
             continue
-        captor = _armed_enemy_alongside(world, prey)
-        if captor is None or _covered(world, prey):
-            continue
         from freesail.world import signals as S
         from freesail.world.prizes import is_prize, possess, record_of
 
         rec = record_of(prey)
+        nation_was = str(rec.get("nation_was") or "") if is_prize(prey) and rec else None
+        captor = _armed_enemy_alongside(world, prey, nation_was)
+        if captor is None or _covered(world, prey):
+            continue
         if is_prize(prey) and rec and str(rec.get("nation_was")) == str(captor.nation):
             # a prize of his own nation under her prize crew (package 74, the design's §2.8):
             # retaken by him coming up, her prize crew striking to him with no help near
@@ -1750,3 +1782,11 @@ def keep_station(vessel: Any, world: Any, dt: float, wind_from: float, wind_kn: 
     vessel.position = vessel.position.advanced(step * math.sin(rad), step * math.cos(rad))
     vessel.distance_run_m += step
     vessel._stream(world, dt)
+
+
+def _changed_ships(world: Any) -> bool:
+    """Whether the player has taken command of a ship other than the game's first hull
+    (package 60)."""
+    from freesail.world.hulls import players_id
+
+    return players_id(world) != PLAYER_ID

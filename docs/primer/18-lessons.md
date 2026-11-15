@@ -249,7 +249,7 @@ She kept the sea all night, and at dawn the only land in sight was the Lizard's 
 **The usual mistake.** `trim sails` where `brace sharp up` was meant, and nobody looking to see that she came about. In another run of the same scenario the officer kept her full and by and then trimmed the sails, which braced the yards to the wind where it was as she paid off, abaft the beam; she ran east at nine knots on a reach, missed stays at ten, fell off on the old tack, and stood on in the dark:
 
 ```
-  First watch (20:10)  Braced twelve yards to the wind, 103° on the starboard quarter, abaft the beam; trimming the sheets of the mizzen spanker, the fore topmast staysail and the jib.
+  First watch (20:10)  Braced twelve yards to the wind, 103° on the starboard quarter, abaft the beam; trimming the sheets of the spanker, the fore topmast staysail and the jib.
   First watch (21:00)  Hove the log: nine knots and three quarters.
   First watch (21:22)  The deep-sea lead would not get bottom with the way she has on; bring her to, or shorten sail, and try again.
 ! First watch (22:23)  Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets; ease off the spanker sheet.

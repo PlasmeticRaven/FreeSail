@@ -802,6 +802,76 @@ REGIONS: dict[str, dict[str, Any]] = {
         # the block's gauges (decided before the build, the lead's ruling of 2026-11-11)
         "fill_to_chart_datum": True,
     },
+    # package 106b: Morocco's Atlantic coast, Cape Spartel to Cape Juby, as four regions
+    # (the chart session's ruling on the measure: the coast runs diagonally, and one box a
+    # region held a triangle of open sea; four boxes split at the row edges 34.16 N, 31.6 N
+    # and 29.46666 N hold the coast and two tile columns seaward, about forty miles). The
+    # open sea west of their bounds is the coarse layers' (the corridor north of 31.9 N,
+    # `atlantic-south` south of it). Each bound a hair inside its tile edge, or on a
+    # neighbour's: `morocco-larache`'s north is the Strait's 35.5 N (its tiles of the row
+    # 35.44 to 35.87 N east of 6.77 W are the Strait's, "2 kept"), `morocco-noun`'s west the
+    # Canaries' east (13.17334 W; their column 13.6 to 13.17 W is theirs, "5 kept"), and
+    # `morocco-mogador`'s south `morocco-noun`'s north (29.46666 N; the row below is the
+    # Noun's, built first). The harbours: a level-3 patch for each port's road from EMODnet,
+    # no override (no period plan read with its datum: the port files say `datum:
+    # unverified`). The tide: no gauge on the coast; by the rule for a block with none the
+    # Atlantic neighbours' nearest serve it (Cadiz and Huelva the northern two, Arrecife and
+    # Puerto de Cabras the southern), so the fill is raised by that water. The dry tiles are
+    # skipped where a coarse layer answers; `morocco-sallee`, whose southern row east of
+    # 9.34 W no layer holds, writes every tile.
+    "morocco-larache": {
+        "title": "Morocco's Atlantic coast north: Cape Spartel to Mamora, Arzila and Larache",
+        "bounds": {"south": 34.16, "north": 35.5, "west": -7.62666, "east": -5.92001},
+        # the measure's fetch over the northern half (the tiles 34.16 to 35.87 N, 7.63 to
+        # 5.92 W lie within it)
+        "fetch": {"south": 31.5, "north": 35.97, "west": -10.72, "east": -5.82},
+        "harbours": {
+            "larache": {"south": 35.17, "north": 35.23, "west": -6.20, "east": -6.13},
+            "mamora": {"south": 34.24, "north": 34.29, "west": -6.72, "east": -6.64},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
+    "morocco-sallee": {
+        "title": "Morocco's Atlantic coast: Sallee and Rabat to Cape Cantin and Safi",
+        "bounds": {"south": 31.6, "north": 34.16, "west": -10.61332, "east": -6.34668},
+        "fetch": {"south": 31.5, "north": 35.97, "west": -10.72, "east": -5.82},
+        "harbours": {
+            "sallee-rabat": {"south": 34.01, "north": 34.06, "west": -6.88, "east": -6.80},
+            "fedala": {"south": 33.69, "north": 33.73, "west": -7.43, "east": -7.36},
+            "dar-el-beida": {"south": 33.59, "north": 33.63, "west": -7.66, "east": -7.58},
+            "mazagan": {"south": 33.23, "north": 33.28, "west": -8.55, "east": -8.48},
+            "safi": {"south": 32.28, "north": 32.33, "west": -9.29, "east": -9.22},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        # every tile written: its row 31.6 to 32.03 N east of 9.34 W lies under no coarse
+        # layer (the corridor's data begins at 31.9 N, `atlantic-south` ends at 9.34 W),
+        # and the world's level is not committed, so a dry tile left out there answers
+        # nothing (package 79b's rule)
+    },
+    "morocco-mogador": {
+        "title": "Morocco's Atlantic coast: Mogador, Cape Ghir and Santa Cruz of Agadir",
+        "bounds": {"south": 29.46666, "north": 31.6, "west": -11.03999, "east": -9.33334},
+        "fetch": {"south": 27.23, "north": 31.7, "west": -13.7, "east": -9.23},
+        "harbours": {
+            "mogador": {"south": 31.48, "north": 31.53, "west": -9.81, "east": -9.75},
+            "agadir": {"south": 30.39, "north": 30.45, "west": -9.68, "east": -9.59},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
+    "morocco-noun": {
+        "title": "Morocco's Atlantic coast south: the Sus and the Wad Noun to Cape Juby",
+        "bounds": {"south": 27.33334, "north": 29.46666, "west": -13.17334, "east": -9.33334},
+        "fetch": {"south": 27.23, "north": 31.7, "west": -13.7, "east": -9.23},
+        "harbours": {},
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+        "skip_dry_tiles": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -842,6 +912,19 @@ CORRIDORS: dict[str, dict[str, Any]] = {
         "source": "gebco_2025",
         "folder": "tiles/1/atlantic-south",
         "beside": "atlantic-corridor",
+    },
+    # package 112: the ocean carried south from the Canaries' row to the Cape Verde
+    # Islands' (12.4 to 25.2 N), from the column from 26.4 W (Santo Antao's west point is
+    # 25.36 W) to the African coast; it shares no tile with the layers before it
+    "atlantic-verde": {
+        "title": "The ocean south: the Canaries' row to the Cape Verde Islands",
+        "level": 1,
+        "bounds": {"south": 12.4001, "north": 25.1999, "west": -26.3999, "east": -9.34},
+        "fetch": {"south": 12.3, "north": 25.3, "west": -26.5, "east": -9.23},
+        "datum": "mean sea level",
+        "source": "gebco_2025",
+        "folder": "tiles/1/atlantic-verde",
+        "beside": "atlantic-south",
     },
 }
 
@@ -925,15 +1008,29 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 106a: the Canaries and the Salvages, over the ocean carried south
             "canaries",
             "salvages",
+            # package 106b: Morocco's Atlantic coast, north to south
+            "morocco-larache",
+            "morocco-sallee",
+            "morocco-mogador",
+            "morocco-noun",
         ],
-        "corridor": "atlantic-corridor",
-        # package 106a: coarse layers read after the corridor, each answering only where
-        # the layers before it have nothing (`CORRIDORS[...]["beside"]`)
-        "corridors_beside": ["atlantic-south"],
+        # package 112: the coarse layers as one ordered list (freesail/world/chart.py): at
+        # each level the first that lists a tile answers in it, a later one filling only
+        # its NODATA (the corridor, then 106a's layer beside it, then the ocean south to
+        # the Cape Verde Islands); the Mediterranean's layers come with the seas (its step
+        # 3: laid now, their bounds made the Gulf of Lion's and Biscay's edges open to the
+        # eleven's taper, the chart session's ruling of 2026-11-14)
+        "layers": ["atlantic-corridor", "atlantic-south", "atlantic-verde"],
     },
 }
 
-WORLD = {"level": 0, "south": -90.0, "north": 90.0, "west": -180.0, "east": 180.0}
+# Level 0 (package 112, the lead's ruling of 2026-11-13): the Atlantic and the
+# Mediterranean, 70 S to 75 N and 100 W to 40 E, COMMITTED under tiles/0/ (63 tiles, about
+# 11 MB); the rest of the world is not. Each tile is the GEBCO cells of its own place
+# decimated and clipped, nothing read across a tile's edge (no distance field at this
+# level), so widening the box to the globe later writes the other tiles and moves no tile
+# laid now (measured: the 63 tiles of the box byte for byte the world's build's).
+WORLD = {"level": 0, "south": -70.0, "north": 75.0, "west": -100.0, "east": 40.0}
 ATLANTIC = {"level": 1, "south": -60.0, "north": 70.0, "west": -100.0, "east": 20.0}
 
 # A corridor tile's blocks of cells whose shoalest sounding is kept beside the tile's
@@ -2820,19 +2917,14 @@ class Build:
         for cname, cspec in CHARTS.items():
             present = [r for r in cspec["regions"] if r in regions]
             absent = [r for r in cspec["regions"] if r not in regions]
-            corridor = cspec.get("corridor")
-            if corridor and corridor not in corridors:
-                self.log(f"The chart {cname} names the corridor {corridor}, not built: left out.")
-                corridor = None
-            beside = [c for c in cspec.get("corridors_beside") or [] if c in corridors]
-            for c in cspec.get("corridors_beside") or []:
+            layers = [c for c in cspec.get("layers") or [] if c in corridors]
+            for c in cspec.get("layers") or []:
                 if c not in corridors:
-                    self.log(f"The chart {cname} names the corridor {c}, not built: left out.")
+                    self.log(f"The chart {cname} names the layer {c}, not built: left out.")
             charts[cname] = {
                 "title": cspec["title"],
                 "regions": present,
-                **({"corridor": corridor} if corridor else {}),
-                **({"corridors_beside": beside} if corridor and beside else {}),
+                **({"layers": layers} if layers else {}),
                 **({"regions_not_built": absent} if absent else {}),
             }
         sources = {}
@@ -2915,21 +3007,79 @@ class Build:
             # developer's machine and never committed (spec M5 §10): the manifest says so,
             # lists their tiles only when this build made them, and the runtime reads
             # only the tiles that are present
-            "world": _fetched_level(gebco_levels.get("0"), 0, WORLD, "--world"),
+            "world": _fetched_level(gebco_levels.get("0"), 0, WORLD, "--world", last.get("world")),
             "atlantic": _fetched_level(gebco_levels.get("1"), 1, ATLANTIC, "--atlantic"),
             "sources": sources,
             "attribution": attribution,
             "notes": notes,
         }
         path = CHARTS_DIR / "manifest.yaml"
-        path.write_text(
-            "# The chart data's manifest (spec M5 §10; C §5.2), written by tools/build_charts.py.\n"
-            "# Every source with its licence, attribution, URL, retrieval date and checksum; the\n"
-            "# regions and their tiles; the attribution block the game shows in its about text.\n"
-            + yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=100),
-            encoding="utf-8",
-        )
+
+        def write() -> None:
+            path.write_text(
+                "# The chart data's manifest (spec M5 §10; C §5.2), written by "
+                "tools/build_charts.py.\n"
+                "# Every source with its licence, attribution, URL, retrieval date and "
+                "checksum; the\n"
+                "# regions and their tiles; the attribution block the game shows in its "
+                "about text.\n"
+                + yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=100),
+                encoding="utf-8",
+            )
+
+        write()
+        # package 112 (the lead's ruling of 2026-11-14): the tide's open edges, kept only
+        # along the stretches where the chart just written answers water beyond them, so
+        # that a box over the land opens no block's edge; written beside the tide regions and
+        # read by the tide (and so by the fill raise) as data
+        stretches = self.open_stretches(path, manifest)
+        items = list(manifest.items())
+        at = [k for k, _ in items].index("tide_regions") + 1
+        items.insert(at, ("open_edges", stretches))
+        manifest = dict(items)
+        write()
         return path
+
+    def open_stretches(self, path: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+        """The tide's open edges for the manifest at `path` (`tide.candidate_edges`, package
+        94's rule over the boxes), kept where the chart answers water just beyond
+        (`tide.water_stretches`): the water of the manifest's first chart, or of its
+        regions where it names none."""
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from freesail.world import chart as world_chart
+        from freesail.world import tide as world_tide
+        from freesail.world.geo import Position
+
+        for cache in (
+            world_tide._REGION_BOUNDS,
+            world_tide._CHARTED_BOUNDS,
+            world_tide._OPEN_STRETCHES,
+        ):
+            cache.pop(str(path), None)
+        edges, blocks = world_tide.candidate_edges(path, TIDES_CONSTITUENTS)
+        names = list(manifest.get("charts") or {}) or list(manifest.get("regions") or {})
+        charts = [world_chart.Chart(n, manifest, CHARTS_DIR) for n in names[:1]]
+
+        def is_water(lat: float, lon: float) -> bool:
+            for c in charts:
+                d = c.depth_at(Position(lat, lon))
+                if d is not None:
+                    return d > 0.0
+            return False
+
+        try:
+            stretches = world_tide.water_stretches(edges, blocks, is_water)
+        except world_chart.ChartError as e:
+            # a tile the manifest lists and the chart cannot read stops the build, named
+            raise SystemExit(f"the tide's open edges could not be read from the chart: {e}") from e
+        self.log(
+            f"The tide's open edges: {len(edges)} edges of the boxes, {len(stretches)} "
+            "stretches facing water"
+        )
+        # the stretches alone: the tide reads them and nothing else (the rule is
+        # `tide.water_stretches`'s, its step `tide.OPEN_EDGE_STEP_DEG`)
+        return {"stretches": [list(x) for x in stretches]}
 
 
 def _last_manifest() -> dict[str, Any]:
@@ -2975,24 +3125,47 @@ def _tiles_present(tiles: dict[str, Any], folder: Path) -> bool:
 
 
 def _fetched_level(
-    built: dict[str, Any] | None, level: int, box: dict[str, float], flag: str
+    built: dict[str, Any] | None,
+    level: int,
+    box: dict[str, float],
+    flag: str,
+    last: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """The manifest's entry for a level the tool builds and the repository does not carry
-    (the world and the Atlantic, spec M5 §10): its box, the flag that builds it, `committed:
-    false`, and its tiles only when this build made them."""
+    """The manifest's entry for a level the tool builds from GEBCO's global tiles: the
+    Atlantic at level 1, built on the developer's machine and not committed (spec M5
+    §10), and the world's level 0, committed over the Atlantic and the Mediterranean
+    since package 112. Its box, the flag that builds it and its tiles when this build made
+    them; for the committed world, the last manifest's tiles when this build did not and
+    they are present (carried as a corridor is, so that a region's build keeps them)."""
+    committed = level == 0
     entry: dict[str, Any] = {
         "level": level,
         "bounds": {k: v for k, v in box.items() if k != "level"},
-        "committed": False,
+        "committed": committed,
         "built_by": f"python tools/build_charts.py {flag}",
         "note": (
-            "built by the tool on the developer's machine and not committed; the runtime "
-            "reads the tiles that are present under tiles/<level>/ and nothing else"
+            "committed (package 112, the lead's ruling): the Atlantic and the Mediterranean; "
+            "the runtime reads these tiles under a chart of the manifest's charts, after "
+            "every layer, and never under a chart of one region; the rest of the world, "
+            "built later, moves no tile laid now"
+            if committed
+            else "built by the tool on the developer's machine and not committed; the "
+            "runtime reads the tiles that are present under tiles/<level>/ and nothing else"
         ),
     }
     if built:
         entry["tiles"] = built["tiles"]
         entry["bytes"] = built["bytes"]
+    elif (
+        committed
+        and last
+        and last.get("tiles")
+        and all(
+            (CHARTS_DIR / "tiles" / str(level) / f"{t['name']}.npz").exists() for t in last["tiles"]
+        )
+    ):
+        entry["tiles"] = last["tiles"]
+        entry["bytes"] = last.get("bytes")
     else:
         entry["tiles"] = []
     return entry

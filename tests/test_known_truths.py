@@ -87,6 +87,7 @@ from freesail import units
 from freesail.api.session import make_world
 from freesail.core.events import Severity
 from freesail.core.world import Scenario, World
+from tests.test_lee_ports import LOWEST_LEE_PORT, RAZEE_DECKS  # truth 7-190's rows
 
 FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
@@ -2522,7 +2523,10 @@ GATE_5A_SEA_TICKS = {
 # storm line); the topgallants again two seconds later; nothing lost.
 # the well's order gone from the starter book, and its two held lines with it (2026-10-21)
 GATE_5A_DAY_LINES = 623  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
-GATE_5A_DAY_DIGEST = "1680cb1391720dd8"  # bff57a00218b7ec5 at 57 (a235022bc8bf8bc7 at 45c)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1680cb1391720dd8; TuningNotes)
+GATE_5A_DAY_DIGEST = "0325e18ce782b58b"  # the trim's words (1680cb1391720dd8 before)
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2971,8 +2975,11 @@ GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
 GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
 GATE_5B_DIGEST = (
-    "9a1f2802ba7c6533"  # the well (2026-10-21; c8c81b7617e4e0fd at 56, 5f682b9f676a2db4 at 57)
+    "2c38f76132521e4e"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3027,6 +3034,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
+# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
+# the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
+# left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
 GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
@@ -3038,7 +3048,10 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # done" list; every tick and every other line the same; the toggle (`storm.listed_lines` made
 # the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
 # (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
-GATE_5B_SCHOONER_DIGEST = "3a1698037811b753"  # 75's ruled build (3)
+# 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
+GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -3050,7 +3063,10 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
 # proved by bisection (the old word restored gives 6f062dc60419f52c again; TuningNotes, B3.4);
 # before it: 6f062dc60419f52c, the well, 2026-10-21; 155a46cede6c96a3 at 57, e358748a1eae5fc6 at 45
-GATE_5B_THICK_DIGEST = "9ce8174ebc6948c6"  # ruling 2 (6f062dc60419f52c before it, above)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
+GATE_5B_THICK_DIGEST = "f119ec763d2b442e"  # the trim's words (9ce8174ebc6948c6 at ruling 2)
 
 
 def the_landfall(log):
@@ -4124,7 +4140,14 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # package 75, SW-4: the Palinure made out "a brig-sloop of war, ten ports a side" (RMG ZAZ4491,
 # read), where the words had sixteen; every tick and line the same, proved by bisection (the
 # word put back gives 5a62f6fca122c6ad again; docs/dev/TuningNotes.md, SW-4)
-GATE_5C_CRUISE_DIGEST = "1e7f8ab24b84e6f7"  # SW-4 (5a62f6fca122c6ad at 58a; 728522e26dd25a49 at 56)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives 1e7f8ab24b84e6f7; TuningNotes)
+# 75's words, passed by the lead by its lines (1e7f8ab24b84e6f7 on the trunk before); the trim's
+# words (1e7f8ab24b84e6f7 at SW-4)
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
+GATE_5C_CRUISE_DIGEST = "bdd6ce8a97a33140"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4251,7 +4274,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
 # closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
-GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
+# before)
+GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4259,7 +4284,11 @@ GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
-GATE_5C_MERCHANT_DIGEST = "40bcef34afd0cec4"  # package 98, step 5 (6436eb06a665f379 at 65)
+# 75's words, passed by the lead by its lines (40bcef34afd0cec4 before); package 98, step 5
+# (6436eb06a665f379 at 65)
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
+GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
 
 
 def _people(world) -> list[dict]:
@@ -4719,7 +4748,9 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-GATE_6A_INTENT_DIGEST = "9d9efe6b21c17060"  # package 98, step 5 (8744d3e56cfc9508 at 65)
+# 75's words, passed by the lead by its lines (9d9efe6b21c17060 before); package 98, step 5
+# (8744d3e56cfc9508 at 65)
+GATE_6A_INTENT_DIGEST = "5d3cbbc5f4d33b84"
 
 
 @pytest.fixture(scope="module")
@@ -4904,7 +4935,11 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "c0bf4b51621ad91f"  # package 98, step 5 (7076e667c2bc41e3 at 65)
+# 75's words, passed by the lead by its lines (c0bf4b51621ad91f before); package 98, step 5
+# (7076e667c2bc41e3 at 65)
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -8135,8 +8170,19 @@ def test_truth_7_134_two_cutters_at_pistol_shot_one_broadside_strikes_and_the_da
     ship (rule 1)."""
     w, v, enemy, battery = _two_cutters_at_pistol_shot()
     assert battery.target == v.id and battery.engaged == "starboard"
+    # package 115 D1 (the lead's hold ruling): the fire held now stays held, so the word is
+    # given when the engaged side is run out and primed (30 s after the engage, measured:
+    # every starboard gun loaded, run out and primed, none fired). OLD: the word at once,
+    # the engage having turned the hold into "as they bear", and the first minute's fire
+    # (two or more) was the guns' own as they bore; NEW: the broadside at the word, three
+    # shot, one struck her
+    assert not any(g.fired for g in w.ship.guns.values())
+    w.run(30)
+    side = [g for g in w.ship.guns.values() if g.side == "starboard" and g.serves]
+    assert all(battery.ready(g) for g in side) and not any(g.fired for g in side)
     said = w.submit("fire")
     assert said.kind == "guns.fire", said.text
+    assert "3 guns ready to go together" in said.text, said.text
     w.run(70)
     fired = [e for e in w.log if e.kind == "action.fired"]
     assert fired and fired[0].data["fired"] >= 2, [e.text for e in fired]
@@ -8344,11 +8390,21 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
     """Spec M7 §8 and §8a: "a tack with the guns run out takes longer than the same tack
     cleared", by the fighting book's priority (the design of item 1). The frigate close
     hauled on the starboard tack (truth 10's world): cleared, she tacks in 447 s at seed
-    7; at quarters with the guns run out under `sail before guns` the bill lends the tack
-    half of every gun's crew (84 hands, said from where) and she tacks in 436 s with the
-    guns gone short; under `guns before sail` the trimmers alone have her, and she tacks
-    in 642 s. The player never queues a thing: the order is given and the bill finds the
-    hands."""
+    7. At quarters with the guns run out the tack is worked as package 75's B7.c has it
+    (`docs/design/Design-Ship-Bellerophon.md` §6.7, as mended at its review): its party is
+    one watch, 111 hands, worked first by her 44 trimmers, her helm, powder, carpenter's
+    crew and surgeon's mates keeping their stations. Under `sail before guns` the bill lends
+    the rest, 67 hands, whole crews from the end that bears least (the bow chasers and the
+    guns, Nos. 10 to 13 and 15 to 17, said from where), and she tacks in 468 s; under `guns
+    before sail` nothing is lent, the tack goes short (44 hands of 111, said), its crew
+    factor 111/44 through it, and she tacks in 453 s, slower than cleared (from 290 and 295
+    degrees, 528 and 458 s against 343 and 370 cleared). Before B7.c the bill lent half of
+    every gun's crew (84 hands) and she tacked in 436 s under `sail before guns` and 642 s
+    under `guns before sail`, the tack counting every man at the guns as wanted for it; at
+    B7.c, before its review, the tack drew on every hand idle at quarters (76, the helm and
+    the powder among them), lent 44 and tacked in 468 s, and under `guns before sail` went
+    short 76 of 111 in 433 s, quicker than cleared. The player never queues a thing: the
+    order is given and the bill finds the hands."""
 
     def tack(at_quarters: bool, priority: str = "sail before guns"):
         w = close_hauled_on_starboard(FRIGATE, heading=292.5)
@@ -8361,20 +8417,28 @@ def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_
             w.run(120)
         t0 = w.clock.tick
         w.submit("tack ship")
+        runner = w.ship.extra["evolutions"]
+        inst = next(i for i in runner.instances if i.evo.id == "tack")
+        factor = runner._crew_factor(inst, False)
         done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
         assert done and done[0].kind == "ship.tacked", (priority, [e.text for e in done])
         robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
-        return seconds, robbed
+        short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
+        return seconds, robbed, short, factor
 
-    cleared, none_robbed = tack(False)
+    cleared, none_robbed, _, _ = tack(False)
     assert not none_robbed and 285 <= cleared <= 600
-    sail_first, robbed = tack(True)
-    assert robbed and robbed[0].data["hands"] >= 40, [r.text for r in robbed]
-    assert "taken from the guns" in robbed[0].text
+    sail_first, robbed, short, factor = tack(True)
+    # what the watch wants beyond the trimmers (111 - 44), not half of every crew (84)
+    assert [r.data["hands"] for r in robbed] == [111 - 44], [r.text for r in robbed]
+    assert "taken from the bow chasers and the guns, Nos." in robbed[0].text, robbed[0].text
+    assert not short and factor == pytest.approx(1.0, abs=1e-3), ([e.text for e in short], factor)
     assert sail_first <= cleared * 1.15, f"{sail_first} s against {cleared} s cleared"
-    guns_first, robbed2 = tack(True, "guns before sail")
+    guns_first, robbed2, short2, factor2 = tack(True, "guns before sail")
     assert not robbed2
-    assert guns_first >= cleared * 1.25, f"{guns_first} s against {cleared} s cleared"
+    assert short2 and (short2[0].data["hands_got"], short2[0].data["hands_wanted"]) == (44, 111)
+    assert factor2 == pytest.approx(111 / 44, abs=1e-3), factor2
+    assert cleared < guns_first <= 600, f"{guns_first} s against {cleared} s cleared"
 
 
 def test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why():
@@ -8495,7 +8559,10 @@ def test_truth_7_141_firing_on_a_sail_not_made_out_as_an_enemy_is_told_not_refus
     """Rule 3, the least of it (the brief's item 7): a ship that fires on a sail not at war
     with her is not refused; the consequence is told once (`action.unrecognised`) and her
     state carries it (`ship.extra["outlaw"]`) for the ports' stance to read; 71's colours,
-    private signal and hail plug in where the lookout's nation is read."""
+    private signal and hail plug in where the lookout's nation is read. The sail is named
+    (the lead's last list of 2026-11-14, item 1): 'her' is the nearest enemy who may be
+    fought and, with none in sight, the order is refused in words, where it fell back to the
+    nearest sail, the road this truth took to the American cutter."""
     from freesail.combat.guns import battery_of
 
     w = make_world(SEED, CUTTER, _action_scenario())
@@ -8505,7 +8572,7 @@ def test_truth_7_141_firing_on_a_sail_not_made_out_as_an_enemy_is_told_not_refus
     enemy.ship.dyn.heading = heading
     w.submit("hold your fire")
     w.run(65)
-    said = w.submit("engage her to starboard")
+    said = w.submit("engage the cutter to starboard")
     assert said.kind == "guns.engage"
     w.submit("fire")
     w.run(70)
@@ -10476,18 +10543,21 @@ def test_truth_7_180_the_boarders_are_repulsed_by_a_whole_company_awake_and_the_
     assert f.lost_attack > f.lost_defence > 0
 
 
-def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colours_come_down():
-    """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
-    their guns and the deck held by her marines, the helm, the trimmers and the
-    quarterdeck, the boarders with their arms served out carry it in a few rounds: her
-    colours come down 'carried by boarding' (the strike's own line, the far body struck for
-    the moment of it), and (package 74, step 2: the officer on the deck won takes possession
-    at once) she is a prize of ours alongside, her record saying how; the losses by name on
-    both bills, hers the prisoners'. The pin moved by 74: on the trunk she lay struck and no
-    prize; the fight's bands are as they were."""
+def test_truth_7_181a_a_frigates_deck_held_by_her_marines_at_her_own_temper_holds():
+    """Spec M7 §11a, the deck held; restated by the lead's ruling of 2026-11-14 on package 115
+    D1 (the owner told). OLD SENTENCE: "the boarders carry a deck held by the marines and the
+    colours come down". It passed because the French frigate, never fired on, was given the
+    default temper (0.70) by the boarding's asking where her own captain's doctrine gives
+    0.88 (`combat.morale.morale_of`, mended). NEW SENTENCE: at her own temper a frigate's
+    deck held by her marines, the helm, the trimmers and the quarterdeck HOLDS against a
+    boarding party of about her defenders' number: the boarders are repulsed, her temper
+    above theirs in every round, and they lose more men than she does. Round table at seed 7
+    (attacker men, temper | defender men, temper): old r1 98, .647 | 118, .700 ... r10 95,
+    .374 | 92, .291 carried (lost 43 and 55); new r1 100, .632 | 118, .877 ... r9 94, .291 |
+    99, .597 repulsed (lost 59 and 44). Asserted by direction, not by its figures. The deck
+    carried when her defenders are reduced is truth 7-181b."""
     from freesail.combat import boarding as B
     from freesail.combat import small_arms as SA
-    from freesail.world import prizes as P
     from tests.test_fight import _alongside
 
     w, v, enemy = _alongside(10.0, her_quarters=True)
@@ -10502,12 +10572,54 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
         if f is not None and f.over:
             break
     f = B.fight_of(w.ship)
-    assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
-    assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
-    assert events(w, "action.carried") and events(w, "prize.taken")
-    assert P.is_prize(v) and not v.struck and P.record_of(v)["how"] == "carried by boarding"
-    assert f.lost_defence > f.lost_attack > 0
-    assert "of them hurt" in enemy.readings.words("prisoners")
+    assert f.over == "repulsed", (f.over, f.round)
+    rounds = [e.data for e in events(w, "action.boarding")]
+    assert rounds and all(r["temper_defence"] > r["temper_attack"] for r in rounds), rounds
+    assert f.lost_attack > f.lost_defence > 0
+    assert not v.struck and not enemy.ship.extra.get("struck")
+
+
+def test_truth_7_181b_a_deck_is_carried_when_its_defenders_are_reduced_the_contests_sum():
+    """The deck carried, the second of 7-181's two sentences (the lead's ruling of 2026-11-14
+    on package 115 D1). A TEST OF THE CONTEST'S SUM, NOT OF A FIGHT: no road the game offers
+    today brings a frigate's boarders to a reduced French frigate (measured: her fit men put
+    on the sick list a tenth at a time by the world's own order, 264 to 161, and the boarders
+    still repulsed, their own temper falling under its line; our fire drives the two ships
+    out of the grapnel's throw and in forty minutes takes eleven of her men; the brigs the
+    far detail offers carry no marines and drift beyond the throw), so the rule is tried at
+    its own level: the men, their arms, the tempers and the cover in, the end out, by the
+    contest's own `_strength` and `_verdict`. A hundred boarders at temper 0.6 against her
+    marines and deck stations at her own 0.88: carried under 34 defenders, contested from 35
+    to 136, repulsed from 137; and carried at any number when her temper falls under her
+    line, repulsed when theirs does."""
+    from freesail.combat.boarding import CONTEST_ROUNDS, _strength, _verdict
+
+    def end(boarders, ta, defenders, td, line_a=0.3, line_d=0.3, round_no=3):
+        sa = _strength([(None, 1.0)] * boarders, ta, 1.0)
+        sd = _strength([(None, 1.0)] * defenders, td, 1.0)
+        return _verdict(boarders, sa, ta, line_a, defenders, sd, td, line_d, round_no)
+
+    table = [
+        # (boarders, their temper, defenders, her temper) -> the end
+        ((100, 0.6, 30, 0.88), "carried"),
+        ((100, 0.6, 32, 0.88), "carried"),
+        ((100, 0.6, 34, 0.88), "carried"),
+        ((100, 0.6, 35, 0.88), ""),
+        ((100, 0.6, 37, 0.88), ""),
+        ((100, 0.6, 40, 0.88), ""),
+        ((100, 0.6, 118, 0.88), ""),
+        ((100, 0.6, 135, 0.88), ""),
+        ((100, 0.6, 136, 0.88), ""),
+        ((100, 0.6, 137, 0.88), "repulsed"),
+        ((100, 0.6, 140, 0.88), "repulsed"),
+        ((100, 0.6, 118, 0.29), "carried"),  # her temper under her line
+        ((100, 0.29, 118, 0.88), "repulsed"),  # theirs under theirs
+        ((100, 0.6, 0, 0.88), "carried"),
+        ((0, 0.6, 118, 0.88), "repulsed"),
+    ]
+    for (b, ta, d, td), want in table:
+        assert end(b, ta, d, td) == want, ((b, ta, d, td), end(b, ta, d, td), want)
+    assert end(100, 0.6, 118, 0.88, round_no=CONTEST_ROUNDS) == "contested"
 
 
 def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():
@@ -10630,6 +10742,1609 @@ def test_truth_7_184_the_leak_scenario_mans_the_pumps_at_a_foot_and_left_alone_l
     gm = float(w2.ship.hull.gm_m)
     assert 0.6 < gm < 0.85 and gm0 == pytest.approx(1.1, abs=0.05), (gm0, gm)
     assert not w2.ship_lost
+
+
+# ---------------------------------------------------------------------------
+# Package 75: the ships (docs/design/Build-Ships.md §15): truths 7-185 to 7-199, and 7-230 of
+# the spare block 7-230 to 7-239 the lead gave the package (2026-10-28), each drafted in its
+# builder's file and moved here at Phase 5 (2026-11-14), its helpers where they live; truth
+# 7-231 of the same block stands beside the far fight's truths (after 7-369), as its row says
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_185_the_generator_writes_every_file_and_every_port_gun_stands_on_its_port(
+    tmp_path,
+):
+    """Package 75, B8 at SW-2 (Build-Ships.md §15, row 7-185; the brief's item 6), drafted in
+    `tests/test_profiles.py` and moved here at Phase 5 (2026-11-14), its helpers and its bands
+    where they live. On no world and no seed: the generator run into a scratch directory. The
+    generated set equals the committed set and each file is equal, compared as text. Every port
+    gun of every fit of every file names its deck and stands on a triple of that deck within
+    0.01 m, its (x_m, height_m) to the triple's x and sill. Each file's lowest sill in its
+    source's band (`LOWEST_SILL_BANDS`, the brig's old beside new): measured 2.19, 1.57, 1.57,
+    1.00, 0.95, 0.95, 1.53 and 1.98 m (the owner's machine, 2026-10-31). **Re-run at Phase 5
+    with every file** (§15), on the merged tree: eighteen files (thirteen hulls and the five
+    boats), 582 port guns over every fit, each on its triple. The new ships' lowest sills are
+    their own truths', not this table's: the *Neufchatel*'s 1.50 m (7-192), the 74's 1.57 m
+    (7-194); and the bilander's 1.34 m is her design's, the deck at her waist and sixteen inches
+    (Bil-D §3.2; `tests/test_bilander.py`), no source giving a bilander's sill."""
+    import subprocess
+
+    from freesail.combat.ports import PORT_PLACES
+    from freesail.ship.profile import ports_of
+    from tests.test_profiles import LOWEST_SILL_BANDS, ROOT, SHIP_FILES, SHIP_NAMES, _ship_spec
+
+    out = tmp_path / "ships"
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "gen_ships.py"), str(out)],
+        check=True,
+        cwd=ROOT,
+        capture_output=True,
+    )
+    assert sorted(p.name for p in out.iterdir()) == sorted(p.name for p in SHIP_FILES)
+    for path in SHIP_FILES:
+        made = (out / path.name).read_text(encoding="utf-8")
+        assert made == path.read_text(encoding="utf-8"), path.name
+    guns_seen = 0
+    for name in SHIP_NAMES:
+        spec = _ship_spec(name)
+        p = spec.hull.profile
+        fits = spec.armament.fits if spec.armament is not None else {}
+        for fit_name, fit in fits.items():
+            for gun in fit.guns:
+                if gun.place not in PORT_PLACES:
+                    continue
+                guns_seen += 1
+                assert gun.deck, (name, gun.id)
+                on = [
+                    t
+                    for t in ports_of(p, gun.deck)
+                    if abs(t[0] - gun.x_m) <= 0.01 and abs(t[1] - gun.height_m) <= 0.01
+                ]
+                assert on, (name, fit_name, gun.id, gun.deck, gun.x_m, gun.height_m)
+    assert guns_seen > 100
+    for name, (low, high) in LOWEST_SILL_BANDS.items():
+        p = _ship_spec(name).hull.profile
+        lowest = min(sill for _word, triples in p.ports_m for _x, sill, _hb in triples)
+        assert low <= lowest <= high, (name, lowest)
+    for name in ("lugger", "smack"):
+        assert not _ship_spec(name).hull.profile.ports_m, name
+
+
+def test_truth_7_186_her_particulars_hold_their_sources_and_the_razee_is_the_64_cut_down():
+    """Package 75, B1, stage A (Build-Ships.md §15, row 7-186), drafted in
+    `tests/test_indefatigable.py` and moved here at Phase 5 (2026-11-14), its helpers where they
+    live; the figures by her files, measured on the owner's machine (2026-10-28) and holding on
+    the merged tree. Indf §14 truth 1, the brief's item 6. Both files load. Beam 13.5 ± 0.1 m (44 ft
+    5 in, Winfield 1793-1817 p. 100), load line 48.8 ± 0.3 m (160 ft on WL1, measured), draughts
+    6.33 and 5.88 ± 0.1 m (measured on ZAZ1407 and ZAZ2371). The razee's profile below the old
+    upper deck is the 64's raised by her rise, 0.44 ± 0.02 m, point by point: her keel, stem
+    and counter, her wales, her midship section, her gun deck (the 64's lower deck) and its
+    thirteen ports, her quarterdeck (the old upper deck); 0.44-0.45 by the files. The lowest
+    gun-deck sills 1.53 and 1.98 ± 0.03 m (5.02 ft above WL1 on ZAZ1407; ZAZ2371's 1.96). Each
+    lower mast's head lower by its cut (6 ft 3 in, 6 ft 7 in, 6 ft 9 in: Ind §3.3) less the
+    rise, ± 0.1 m for the heights kept to the decimetre (1.43, 1.53 and 1.63 m by the files).
+    26 long 24-pounders in every fit of both files. Complements 491 and 330, marines 84 and 50
+    (the Regulations' columns; James vol. 1 p. 454). Four bowers of 57 cwt in both (Steel's
+    64). Pinned at once: nothing here moves at stage B."""
+    from freesail.ship.loader import load_ship
+    from freesail.ship.profile import interp, ports_of
+    from tests.test_indefatigable import CUT_FT, CWT_KG, FT, RAZEE, RISE_M, SIXTY_FOUR, above_water
+
+    s64, s = load_ship(SIXTY_FOUR), load_ship(RAZEE)
+    h64, h = s64.hull.spec, s.hull.spec
+    for hull in (h64, h):
+        assert abs(hull.beam_m - 13.5) <= 0.1
+        assert abs(hull.length_waterline_m - 48.8) <= 0.3
+    assert abs(h64.draught_m - 6.33) <= 0.1 and abs(h.draught_m - 5.88) <= 0.1
+    p64, p = h64.profile, h.profile
+    old_upper = dict(p64.decks_m)["upper"]
+
+    def raised(old, new):
+        assert abs(new - old - RISE_M) <= 0.02, (old, new)
+
+    def below_old_upper(x, z):
+        return z < interp(old_upper, x)
+
+    for (x0, z0), (x1, z1) in zip(p64.keel_m, p.keel_m, strict=True):
+        assert x0 == x1
+        raised(z0, z1)
+    compared = 0
+    for line64, line in ((p64.stem_m, p.stem_m), (p64.stern_m, p.stern_m)):
+        for (x0, z0), (x1, z1) in zip(line64, line, strict=False):
+            if x0 == x1 and below_old_upper(x0, z0):
+                raised(z0, z1)
+                compared += 1
+    assert compared >= 15  # the stem to the old upper deck and the counter
+    for w64, w in zip(p64.wales_m, p.wales_m, strict=True):
+        assert w64[0] == w[0]
+        raised(w64[1], w[1])
+        raised(w64[2], w[2])
+    for (z0, hb0), (z1, hb1) in zip(p64.section_m, p.section_m, strict=True):
+        assert hb0 == hb1
+        if z0 < interp(old_upper, 0.0):
+            raised(z0, z1)
+    lower64, gun_deck = dict(p64.decks_m)["lower"], dict(p.decks_m)["upper"]
+    for (x0, z0), (x1, z1) in zip(lower64, gun_deck, strict=True):
+        assert x0 == x1
+        raised(z0, z1)
+    for x, z in dict(p.decks_m)["quarterdeck"]:
+        raised(interp(old_upper, x), z)
+    for (x0, z0, hb0), (x1, z1, hb1) in zip(
+        ports_of(p64, "lower"), ports_of(p, "upper"), strict=True
+    ):
+        assert (x0, hb0) == (x1, hb1)
+        raised(z0, z1)
+    assert abs(min(z for _x, z, _hb in ports_of(p64, "lower")) - 1.53) <= 0.03
+    assert abs(min(z for _x, z, _hb in ports_of(p, "upper")) - 1.98) <= 0.03
+    for mast, cut_ft in CUT_FT.items():
+        lower = above_water(s64, f"{mast}.mast") - above_water(s, f"{mast}.mast")
+        assert abs(lower - (cut_ft * FT - RISE_M)) <= 0.1, (mast, lower)
+    for ship in (s64, s):
+        for fit in ship.spec.armament.fits.values():
+            long_24s = [g for g in fit.guns if g.kind == "long" and g.pounder == 24]
+            assert len(long_24s) == 26, fit.name
+        anchors = ship.spec.ground_tackle.anchors
+        bowers = [a for a in anchors if abs(a.weight_kg - 57 * CWT_KG) <= 1.0]
+        assert len(bowers) == 4 and {a.kind for a in bowers} <= {"bower", "sheet"}
+    assert (s64.spec.crew.complement, s.spec.crew.complement) == (491, 330)
+    assert (s64.spec.crew.stations["marines"], s.spec.crew.stations["marines"]) == (84, 50)
+
+
+def test_truth_7_187_the_razee_is_lighter_stiffer_and_faster_than_the_64_she_was_cut_from():
+    """Package 75, B1 (Build-Ships.md §15, row 7-187), drafted in `tests/test_indefatigable.py`
+    and moved here at Phase 5 (2026-11-14), its helpers where they live; the figures measured on
+    the owner's machine at seed 7 (2026-10-28 to 30) and holding on the merged tree. The plan's
+    (Phase 5); Indf §14 truth 2. The razee displaces less than the 64 by the
+    slice measured between their lines, 238-244 tons of 35 cu ft (Ind §2.3.3; 241.1 by the
+    files); she draws 0.44 ± 0.03 m less (0.45); her righting moment at 10 degrees of heel is
+    greater by at least 4% (1,925 t at 1.65 m against 2,170 t at 1.35 m: 8.4% by the files);
+    and under plain sail on a beam reach in fifteen knots she heels less (the known truths'
+    polar form at seed 7: the razee 4.28 deg at 7.86 kn, stage A 4.04 at 7.79; the 64 4.90 deg at
+    7.55 kn, stage A 4.6 at 7.50; the frigate-36 5.46 deg at 7.97 kn). Pinned at once.
+
+    **The speed clause, pinned at stage B** (Build-Ships.md §15): her speed greater at every
+    angle from her closest to 180 degrees in 15 and 25 kn (`polar_of`: by 0.15-0.38 kn in 15 kn
+    and 0.33-0.69 kn in 25 kn; with the spanker at 191 m2 0.13-0.36 and 0.32-0.67; on the 64's
+    stand-in 0.16-0.34 and 0.33-0.66).
+
+    **Not pinned: the razee outsailing the frigate-36** (Indf §14 truth 4; D24; the Virginie
+    chase). Her best in 25 kn, 11.64 kn, meets the chase's mean of 11.2 and stands 0.01 over the
+    frigate-36's; but in 15 kn she is under the frigate-36 close-hauled and running large
+    (`polar_of`: 60 deg 4.15 against 4.29, 70 deg 6.00 against 6.14, 120 deg 7.64 against 7.86, 130
+    deg 7.26 against 7.40, 140 deg 6.86 against 6.99, 150 deg 6.43 against 6.53; with the spanker
+    at 191 m2 4.14, 5.99, 7.63, 7.25, 6.85, 6.43; stage A 4.17, 5.97, 7.60, 7.21, 6.81, 6.39), and
+    sailed (60 deg 3.53 against 3.63, 120 deg 7.51 against 7.53; stage A 3.60 and 7.47).
+    `hull_speed_kn` at the top of D24's band, 14.5, raises her
+    15-kn figures at those angles by 0.03 kn at most (7.67, 7.28, 6.88, 6.45; 60 deg not at all, 70
+    deg by 0.01); `clr_x_m` does not reach the polar (+4.1 to +5.1 m measured, no figure moved); the
+    brace limits move only with a source. Reported, not forced (Indf §9). The owner (2026-10-29;
+    Indf §17) leaves it to the tuning of both ships against the period's accounts, neither presumed
+    the one at fault: the razee may be right and the frigate-36 too fast, or the razee too slow
+    and the frigate-36 right."""
+    from freesail.ship.loader import load_spec
+    from tests.test_indefatigable import RAZEE, SIXTY_FOUR
+
+    s64, s = load_spec(SIXTY_FOUR), load_spec(RAZEE)
+    slice_tons = (s64.hull.displacement_kg - s.hull.displacement_kg) / units.LONG_TON
+    assert 238.0 <= slice_tons <= 244.0, f"{slice_tons:.1f} tons"
+    assert abs(s64.hull.draught_m - s.hull.draught_m - 0.44) <= 0.03
+
+    def righting(world):
+        hull = world.ship.hull
+        return hull.spec.displacement_kg * units.G * hull.gm_m * math.sin(math.radians(10.0))
+
+    w64 = under_plain_sail(SIXTY_FOUR, 90.0)
+    w = under_plain_sail(RAZEE, 90.0)
+    assert righting(w) >= 1.04 * righting(w64)
+    heel64, heel = abs(math.degrees(w64.ship.dyn.heel)), abs(math.degrees(w.ship.dyn.heel))
+    assert 2.0 <= heel < heel64 <= 8.0, (heel, heel64)
+    for world in (w64, w):  # both on the beam reach with way on
+        assert units.ms_to_knots(world.ship.dyn.speed) > 6.5
+    from freesail.world import ships as S
+
+    p64, p = S.polar_of(SIXTY_FOUR), S.polar_of(RAZEE)
+    for wind in (15.0, 25.0):
+        for angle in p.angles_deg:
+            if angle >= p.closest_deg:
+                assert p.speed_kn(angle, wind) > p64.speed_kn(angle, wind), (angle, wind)
+
+
+def test_truth_7_188_her_broadside_against_the_frigate_36s_by_70s_rule():
+    """Package 75, B1, stage A (Build-Ships.md §15, row 7-188), drafted in
+    `tests/test_indefatigable.py` and moved here at Phase 5 (2026-11-14), its helper `_interval`
+    where it lives; the figures measured on the owner's machine at seed 7 (2026-10-28) and
+    holding on the merged tree (the razee's 1795 fit's own trimmers, the lead's ruling 13, touch
+    neither the weight, which is guns alone, nor the rate, which is her default fit's, as
+    carried 1796). The brief's item 6; Indf §14 truth 3. By 70's rule (`far_ship`: one side's
+    broadside guns and every chaser, `combat/far.py`), the razee's broadside weighs 510 lb as razeed
+    in 1795 and 714 lb as carried from 1796, against the frigate-36's 421: ratios 1.21 and 1.70
+    ± 0.05 (counts; James's 702 for 1796 counts one 12-pounder, Indf §18 item 2). The 64's,
+    600 lb as built (1.43), is pinned beside them. The bands hold the frigate-36's quarterdeck
+    as the owner keeps it, and the 416 lb it would weigh corrected (Indf §16 item 14). Her rate,
+    in truth 7-135's form on her own files at seed 7: the mean interval of a starboard long
+    24-pounder over twenty minutes at a mark abeam, within the frigate's bands, 90-125 s with
+    the full company and 140-210 s with a quarter of each crew struck down. Measured: the razee
+    as carried 1796 108 s and 195 s, the 64 as built 103 s and 185 s; three of a 24-pounder's
+    eleven (Falconer) struck down."""
+    from freesail.combat.far import far_ship
+    from tests.test_indefatigable import FRIGATE, RAZEE, SIXTY_FOUR, _interval
+
+    frigate = far_ship(FRIGATE, "britain").broadside_lb
+    # her 421 lb as the owner keeps her quarterdeck, or the 416 it would weigh corrected
+    assert 416.0 <= frigate <= 421.0
+    razeed = far_ship(RAZEE, "britain", fit="as razeed 1795").broadside_lb
+    carried = far_ship(RAZEE, "britain").broadside_lb
+    assert (razeed, carried) == (510.0, 714.0)
+    assert abs(razeed / frigate - 1.21) <= 0.05 and abs(carried / frigate - 1.70) <= 0.05
+    assert far_ship(SIXTY_FOUR, "britain").broadside_lb == 600.0
+    for path in (RAZEE, SIXTY_FOUR):
+        full = _interval(path, 0.0)
+        assert 90.0 <= full <= 125.0, f"{path}: {full:.0f} s"
+        short = _interval(path, 0.25)
+        assert 140.0 <= short <= 210.0, f"{path}: {short:.0f} s"
+        assert short >= full * 1.3
+
+
+def test_truth_7_189_the_64_handles_as_a_ship_with_her_mizen_yard_and_her_spritsails(tmp_path):
+    """Truth 7-189 (package 75, B1 at stage B, after B3.1 and B3.2; Build-Ships.md §15; Ext §10.3
+    item 4; D8 (b), D9 (c)), drafted in `tests/test_indefatigable.py` and moved here at Phase 5
+    (2026-11-14), its helpers where they live; measured on the owner's machine and holding on the
+    merged tree. On `sixty-four.yaml` at
+    seed 7, fifteen knots, six points off under plain sail. "Mainsail haul" swings the main and
+    mizzen yards alone, the yards under the bowsprit going with the head yards at "let go and
+    haul"; the mizen yard is never braced; the course is hauled aft at helm's a-lee (7-230's
+    clause, below) and brailed up hove to. Hove to with the spritsail and the sprit topsail set by
+    name first, they are clewed up; she lies to within truth 12's band (below 1.6 kn, 45 to 65
+    degrees off, the heading steady within 15; measured 56-63 degrees off and 1.11 kn on the
+    course, no aback). Her classing as the frigate's row is `tests/test_indefatigable.py`'s
+    `test_her_classing_is_the_frigates_row_counting_the_head_on_the_masts`."""
+    from freesail.evolutions import scripts
+    from freesail.ship.parts import SailState
+    from tests.test_indefatigable import _after, _until, _world
+
+    world = _world(tmp_path)
+    ship = world.ship
+    assert ship.sails["mizzen.course"].is_set
+    assert world.submit("tack ship").kind == "order.accepted"
+    _until(world, "Mainsail haul", 500)
+    runner = ship.extra["evolutions"]
+    (tack,) = [i.script for i in runner.instances if isinstance(i.script, scripts.TackScript)]
+    assert {y.id for y in tack.swing.yards} == {y.id for y in tack.after}
+    assert {ship.mast_of(y).id for y in tack.swing.yards} == {"main.mast", "mizzen.mast"}
+    assert {"spritsail.yard", "sprit_topsail.yard"} <= {y.id for y in tack.head}
+    assert ship.spars["mizzen.yard"].brace_angle == 0.0
+    _until(world, "Let go and haul", 700)
+    assert {"spritsail.yard", "sprit_topsail.yard"} <= {y.id for y in tack.swing.yards}
+    _until(world, "Tacked", 1200)
+    assert ship.spars["mizzen.yard"].brace_angle == 0.0
+    for text in ("set the spritsail", "set the sprit topsail"):
+        world.submit(text)
+    for _ in range(600):
+        world.tick()
+    assert ship.sails["spritsail"].is_set and ship.sails["sprit_topsail"].is_set
+    start = world.clock.tick
+    world.submit("heave to")
+    for _ in range(300):
+        world.tick()
+    assert units.ms_to_knots(ship.dyn.speed) < 1.6, "not stopped within five minutes"
+    offs, speeds = [], []
+    for _ in range(600):
+        world.tick()
+        offs.append(abs(math.degrees(units.wrap_pi(ship.dyn.heading - world.wind.direction_from))))
+        speeds.append(units.ms_to_knots(ship.dyn.speed))
+    texts = [e.text for e in _after(world, start)]
+    assert any(e.kind == "ship.hove_to" for e in _after(world, start)), texts
+    assert not [e for e in _after(world, start) if e.kind == "ship.aback"]
+    assert "Clewed up the fore topgallant, the spritsail and the sprit topsail." in texts
+    for sid in ("spritsail", "sprit_topsail"):
+        assert ship.sails[sid].state is SailState.IN_THE_GEAR
+    assert ship.sails["mizzen.course"].state is SailState.IN_THE_GEAR
+    assert ship.spars["mizzen.yard"].brace_angle == 0.0
+    assert max(speeds) < 1.6
+    assert all(45.0 <= o <= 65.0 for o in offs), (min(offs), max(offs))
+    assert max(offs) - min(offs) <= 30.0
+
+
+def test_truth_7_189_she_stays_quickly_and_wears_with_her_mizen_brailed():
+    """Truth 7-189's clause of her mizen against the Bellona's report, that she stayed and wore
+    quickly (Lavery 1985 p. 9; Bel §9; Ext §12 lens 4), judgement for a 64 of her class, drafted in
+    `tests/test_indefatigable.py` and moved here at Phase 5 (2026-11-14); measured on the owner's
+    machine and holding on the merged tree. On `sixty-four.yaml` at seed 7 in fifteen knots.
+    Measured, in truth 10's form, from 290, 292.5 and 295 degrees: 244, 251 and 266 s, gaining 104,
+    94 and 67 m (the course's tack at 9.43 m 246, 252 and 262 s, 105, 95 and 66 m), under Luce's
+    five minutes and well under the frigate-36's 343, 447 and 370 s (51, -37 and 25 m), which are
+    tacked here, so that the clause says what it claims if she is retuned. The band: quicker than
+    the frigate-36's quickest (the report's "quickly", which gives no time) and no quicker than four
+    minutes, a round floor of judgement that stands 4 s under her quickest and has no source (stage
+    A, her stand-in mizen course, 259, 283 and 327 s). She is under truth 10's 285 s at all three
+    headings, where stage A was at two; that band is not asked of her here, for the lead to rule.
+    What sets it (TuningNotes, measured) is her small after sail against her lead, not the yards
+    under her bowsprit: she is no quicker through the wind than the frigate-36, 124-132 s to "let go
+    and haul" against 108-112, and falls off to her course sooner on the new tack. In truth 11's
+    form she wears in 497 s (the frigate-36 513 s, within truth 11's six to twelve minutes), the
+    mizen course brailed at "up helm" and hauled out by the wind, its yard never braced; so the
+    model gives her no more than a quarter of a minute's quickness wearing, and that is reported,
+    not forced.
+
+    **Measured and not pinned: lying to as the Bellona did, under the mainsail and mizen staysail**
+    (Lavery 1985, Table 2; Bel §9). With all else in and the helm a-lee she swings 44-70 deg off at
+    1.1 kn in 15 kn, 42-78 at 1.8 in 25 kn, as the frigate-36 does (42-76 at 1.5; 41-85 at 1.5): no
+    steady lie in the model, where "heave to" gives truth 12's (above)."""
+    from freesail.ship.parts import SailState
+    from tests.test_indefatigable import SIXTY_FOUR, _after, _until
+
+    frigate = []
+    for heading in (290.0, 292.5, 295.0):
+        world = close_hauled_on_starboard(FRIGATE, heading=heading)
+        world.submit("tack ship")
+        done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
+        assert [e.kind for e in done] == ["ship.tacked"], heading
+        frigate.append(seconds)
+    for heading in (290.0, 292.5, 295.0):
+        world = close_hauled_on_starboard(SIXTY_FOUR, heading=heading)
+        y_before = world.ship.dyn.y
+        world.submit("tack ship")
+        done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
+        assert [e.kind for e in done] == ["ship.tacked"], heading
+        assert 240 <= seconds < min(frigate), (heading, seconds, frigate)
+        assert world.ship.dyn.y > y_before, heading
+        assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
+
+    world = close_hauled_on_starboard(SIXTY_FOUR)
+    course = world.ship.sails["mizzen.course"]
+    start = world.clock.tick
+    world.submit("wear ship")
+    _until(world, "Up helm", 60)
+    assert "brail up the mizzen course" in next(
+        e.text for e in _after(world, start) if "Up helm" in e.text
+    )
+    assert course.state is SailState.IN_THE_GEAR
+    _until(world, "Haul out the mizzen course!", 700)
+    done, _seconds = until(world, ("ship.wore", "evolution.failed"), 400)
+    assert [e.kind for e in done] == ["ship.wore"]
+    assert 360 <= world.clock.tick - start <= 720, world.clock.tick - start
+    assert course.is_set and world.ship.dyn.tack == "larboard"
+    assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
+
+
+@pytest.mark.parametrize("path,fit,deck,figure,count", LOWEST_LEE_PORT)
+def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_roll_sooner(
+    path, fit, deck, figure, count
+):
+    """Package 75, B8 at L3 (Build-Ships.md §15, row 7-190; the lead's ruling; the owner's rule,
+    Bel §13.1 answer 7: the dip is the heel toward the gun's side plus the roll's amplitude),
+    drafted in `tests/test_lee_ports.py` and moved here at Phase 5 (2026-11-14), its rows
+    (`LOWEST_LEE_PORT`) and its helpers where they live; passing on the merged tree at every
+    figure below. Each armed
+    file's default fit in a World that keeps a sea (`sea: true`, six knots, seed 7), her heel
+    to starboard and her roll set by hand on the World's own names (`ship.dyn.heel`,
+    `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
+    digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
+    14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18 and the 74's lower deck's 10.35 degrees
+    (±0.05). With no roll, no port of that deck shut half a degree below that heel, and that port
+    shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3 and 6 of the deck's lee ports; with a
+    roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
+    amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
+    port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
+    before it). Measured on the owner's machine, 2026-11-05, at L3; the *Neufchatel*'s line
+    2026-11-07, at her landing (B2); the 74's 2026-11-10, at her step 4 (B7) and again at its
+    review's re-trace (10.38 to 10.35), her truth 7-195
+    being her step 6's. She is built with no fit named, so that the row's fit is her file's
+    default (since L3's review: the fit was named, and the line could not fail)."""
+    from tests.test_lee_ports import HOLD, ROLL_SET_DEG, _in_a_sea, _open_then_shut
+
+    w = _in_a_sea(path)
+    assert w.ship.fit == fit
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
+
+
+def test_truth_7_190_the_frigates_lee_ports_stand_open_at_the_seventy_fours_shut_heel():
+    """7-190's clause (Bel §6.1, P5, "the frigate unmoved"; `Design-Ship-Bellerophon.md` §14.3
+    leaves it to this truth), drafted in `tests/test_lee_ports.py` and moved here at Phase 5, as
+    above. At the 74's 10.35 degrees of heel
+    alone (`SEVENTY_FOURS_SHUT_DEG`: her file's since her step 6, B7; §15's and Bel's 10.6 before
+    it) every port of the frigate-36 stands open, heeled to either side, her lowest shutting at
+    19.7 on her drawn hull (Bel's 21.0 was her first written sill); and with a roll of 4 degrees
+    on her motion as well."""
+    from tests.test_lee_ports import (
+        FRIGATE,
+        ROLL_SET_DEG,
+        SEVENTY_FOURS_SHUT_DEG,
+        _in_a_sea,
+        _lowest_lee,
+        _ports_at,
+    )
+
+    w = _in_a_sea(FRIGATE, None)
+    assert _lowest_lee(w, "upper")[1] == pytest.approx(19.7, abs=0.05)
+    for tick, roll in enumerate((0.0, ROLL_SET_DEG)):
+        assert _ports_at(w, SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick) == frozenset()
+        assert _ports_at(w, -SEVENTY_FOURS_SHUT_DEG, roll, 2 * tick + 1) == frozenset()
+
+
+@pytest.mark.parametrize("deck,figure,count", RAZEE_DECKS)
+def test_truth_7_190_the_razees_lee_ports_deck_by_deck(deck, figure, count):
+    """The razee's lee ports, lines of 7-190 (§15; Indf §3.4, 10.6 and 14.5 heel alone): her
+    main battery is the 64's lower deck raised by her rise, and shuts at 14.5 for the 64's
+    10.55 on the drawn hulls (3.95 degrees later, ±0.1); her quarterdeck at 42.02 and her
+    forecastle at 43.84. Each open half a degree below and shut a degree above, and a roll's
+    amplitude sooner, as the truth's row, with 6, 1 and 1 of the deck's lee ports. Drafted in
+    `tests/test_lee_ports.py` and moved here at Phase 5, as above (`RAZEE_DECKS` where it
+    lives). Each of her default fit and the 64's."""
+    from tests.test_lee_ports import (
+        HOLD,
+        RAZEE,
+        ROLL_SET_DEG,
+        SIXTY_FOUR,
+        _in_a_sea,
+        _lowest_lee,
+        _open_then_shut,
+    )
+
+    w = _in_a_sea(RAZEE)
+    assert w.ship.fit == "as carried 1796"
+    assert _open_then_shut(w, deck, figure, 0.0, 0) == (0, count)
+    assert _open_then_shut(w, deck, figure, ROLL_SET_DEG, 4 * HOLD) == (0, count)
+    if deck == "upper":
+        her = _lowest_lee(w, "upper")[1]
+        sixty_four = _in_a_sea(SIXTY_FOUR)
+        assert sixty_four.ship.fit == "ardent class 1784"
+        was = _lowest_lee(sixty_four, "lower")[1]
+        assert her - was == pytest.approx(3.95, abs=0.1)
+
+
+def test_truth_7_190_covers_every_armed_file():
+    """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
+    in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
+    carries none, so that a ship file added or rearmed is not passed by in silence. Today the
+    nine: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), and the 74
+    (package 75, B7; old: eight files); the bilander's guns are her armed fit's, not her default
+    (unarmed). Drafted in `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
+    from freesail.combat import ports
+    from freesail.ship.loader import load_ship
+    from tests.test_lee_ports import LOWEST_LEE_PORT
+
+    armed = {
+        path.as_posix()
+        for path in sorted(Path("data/ships").glob("*.yaml"))
+        if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
+    }
+    assert armed == {row[0] for row in LOWEST_LEE_PORT}
+    assert len(armed) == 9
+
+
+def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside():
+    """Package 75, B8 at SW-4 (Build-Ships.md §15, row 7-191; the brief's item 4: "an Indiaman is
+    not a merchantman who strikes at the first telling broadside"), drafted in
+    `tests/test_subtypes.py` and moved here at Phase 5 (2026-11-14), its world
+    (`_one_broadside_into_the_brig`) where it lives; passing on the merged tree at every figure
+    below, slow by its node id as it was (tests/conftest.py, `SLOW_TESTS`). The merchant brig, her
+    own file's sixteen men and four 6-pounders, given `role: indiaman` and `role: merchant` by her
+    scenario entry, crewed a cable off the French cutter's starboard beam; one broadside at the
+    word, three 12-pounder carronades (36 pounds to her 12), the fire held after it. At seed 7
+    (measured on the owner's machine, 2026-11-06) the one broadside is the same in both: three
+    fired, one struck her, one killed and one wounded. As a merchantman she strikes at it, her
+    figure 0.12 under the merchant's 0.4 (two of sixteen hurt and the odds); as an Indiaman she
+    holds her colours through the ten minutes, her figure at its least 0.27 over the Indiaman's
+    0.25. Each half can fail: the Indiaman's strikes if her role is not carried to her crewed
+    captain or her book's figures are the merchant's, and the merchantman's holds if no shot tells
+    or his line is the Indiaman's."""
+    from tests.test_subtypes import _one_broadside_into_the_brig
+
+    out = {role: _one_broadside_into_the_brig(role) for role in ("indiaman", "merchant")}
+    broadsides = {}
+    for role, (v, brig, w, _least) in out.items():
+        assert brig.captain.role == role and v.brain.role == role
+        assert brig.ship.spec.crew.complement == 16 and len(brig.ship.guns) == 4
+        fired = [(e.data["fired"], e.data["struck"]) for e in w.log if e.kind == "action.fired"]
+        hit = [
+            (e.data["hits"], e.data["killed"], e.data["wounded"])
+            for e in brig.log
+            if e.kind == "action.hit"
+        ]
+        broadsides[role] = (fired, hit)
+    # one broadside, the same broadside into both
+    assert broadsides["indiaman"] == broadsides["merchant"] == ([(3, 1)], [(1, 1, 1)])
+    v, brig, _w, _least = out["merchant"]
+    line = [e for e in brig.log if e.kind == "action.struck"]
+    assert v.struck and brig.captain.state == "struck" and line
+    assert line[0].data["by_rule"] and line[0].data["strike_below"] == 0.4
+    assert line[0].data["morale"] == 0.12 and brig.ship.extra["morale"].value == pytest.approx(
+        0.123, abs=0.001
+    )
+    assert "two of 16 hurt, against a broadside of 36 pounds to our 12" in line[0].text
+    v, brig, _w, least = out["indiaman"]
+    assert not v.struck and not brig.ship.extra.get("struck")
+    assert not [e for e in brig.log if e.kind == "action.struck"]
+    m = brig.ship.extra["morale"]
+    assert m.strike_below == 0.25 and least == pytest.approx(0.273, abs=0.001)
+    assert least >= m.strike_below
+
+
+def test_truth_7_192_the_prince_de_neufchatels_particulars_hold_their_sources():
+    """Package 75, B2 (Build-Ships.md §15, row 7-192); Neuf-D §14 truth 1, drafted in
+    `tests/test_neufchatel.py` and moved here at Phase 5 (2026-11-14), its helpers where they
+    live, holding on the merged tree. Her file
+    loads, `ship.rig` 'hermaphrodite brig'; LWL 32.7 +-0.2 m (107.3 ft between the rabbets,
+    ZAZ6177), beam 7.82 +-0.05 m (25 ft 8 in, Winfield 1793-1817 pp. 335-336), draught 3.16 +-0.08
+    m (10.36 ft mean to the false keel), 288 +-10 t, lateral area 102 +-5 m2. Her masts 13.3 +-0.3 m
+    apart at the deck (43.7 ft, Neuf §2.7), raking 12.4 and 10.3 +-0.7 degrees; four square yards
+    on the fore and a boomless gaff sail; a gaff mainsail on a boom of 19.6 +-0.3 m (64.2 ft); the
+    fore yard 19.8 +-0.5 m (65 ft). Eleven port triples a side; every gun on one within 0.01 m; her
+    lowest sill 1.50 +-0.03 m (4 ft 11 in, task 1's checker confirming it). Her default fit 16 x
+    12-pounder carronades and 2 long 6-pounders, 18 pieces, 108 lb by 70's rule; her complement
+    130 with a captain and five lieutenants among her posts (Cobb 1841 p. 40); the names
+    `american`. Her rig read as Cobb's (p. 38): one mast with yards, not square-rigged, her main a
+    schooner's. Her description in her file: 'hermaphrodite brig', 'a brig' at a distance, the
+    role `privateer`, her default fit; size rank 2. The index clause (her road's step 6):
+    `description('hermaphrodite brig')` gives her file and those words, and 'a hermaphrodite brig'
+    names her. Arithmetic on her file alone (`load_spec`, `file_descriptions`, `description`,
+    `far_ship`), the same on every machine; none of it moved with her road's step 5, whose knobs
+    were her hull speed (12.9 kept), her clr (+0.3 to +0.1, for her helm) and her GM (2.1 kept,
+    within 2.0-2.2)."""
+    from freesail.combat.far import far_ship
+    from freesail.evolutions import scripts
+    from freesail.physics.sails import _square_rigged
+    from freesail.ship.loader import load_ship
+    from freesail.ship.profile import ports_of
+    from freesail.world import captains as C
+    from freesail.world import ships as S
+    from tests.test_neufchatel import FIT, HER, guns_by
+
+    ship = load_ship(HER)
+    spec = ship.spec
+    hull = spec.hull
+    assert spec.rig == "hermaphrodite brig"
+    assert abs(hull.length_waterline_m - 32.7) <= 0.2
+    assert abs(hull.beam_m - 7.82) <= 0.05
+    assert abs(hull.draught_m - 3.16) <= 0.08
+    assert abs(hull.displacement_kg - 288000.0) <= 10000.0
+    assert abs(hull.lateral_area_m2 - 102.0) <= 5.0
+    spars = {s.id: s for s in spec.spars}
+    fore, main = spars["fore.mast"], spars["main.mast"]
+    assert abs((fore.x_m - main.x_m) - 13.3) <= 0.3
+    assert abs(main.rake_deg - 12.4) <= 0.7 and abs(fore.rake_deg - 10.3) <= 0.7
+    fore_yards = [y.id for y in scripts.working_yards(ship) if ship.mast_of(y).id == "fore.mast"]
+    assert len(fore_yards) == 4
+    fg = ship.sails["fore.sail"]
+    assert fg.cls == "gaff" and "boom" not in fg.roles
+    ms = ship.sails["main.sail"]
+    assert ms.cls == "gaff" and ms.roles["boom"] == "main.boom"
+    assert abs(ship.spars["main.boom"].length_m - 19.6) <= 0.3
+    assert abs(ship.spars["fore.yard"].length_m - 19.8) <= 0.5
+    triples = ports_of(hull.profile, "upper")
+    assert len(triples) == 11
+    fit = spec.armament.fits[spec.armament.default]
+    for g in fit.guns:
+        assert any(
+            abs(g.x_m - x) <= 0.01 and abs(g.height_m - z) <= 0.01 for x, z, _hb in triples
+        ), g.id
+    assert abs(min(z for _x, z, _hb in triples) - 1.50) <= 0.03
+    assert spec.armament.default == FIT
+    assert guns_by(fit) == {
+        ("carronade", 12, "broadside", "upper"): 16,
+        ("long", 6, "bow", "upper"): 2,
+    }
+    assert far_ship(HER, "united-states").broadside_lb == 108.0
+    crew = spec.crew
+    assert crew.complement == 130 and crew.names == "american"
+    posts = [p.post for p in crew.posts]
+    assert "captain" in posts and sum(1 for p in posts if p.endswith(" lieutenant")) == 5
+    assert [m.id for m in scripts._masts_with_yards(ship)] == ["fore.mast"]
+    assert _square_rigged(ship) is False
+    assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == [
+        "main.topsail.yard",
+        "main.topgallant.yard",
+        "main.topgallant",
+    ]
+    own = S.file_descriptions(HER)["hermaphrodite brig"]
+    assert (own["rig"], own["roles"], own["fit"]) == ("a brig", ["privateer"], FIT)
+    assert C.SIZE_RANK["hermaphrodite brig"] == 2
+    # the index clause (her road's step 6)
+    d = S.description("hermaphrodite brig")
+    assert (d["file"], d["rig"], d["what"]) == (HER, "a brig", own["what"])
+    assert S.description_key("a hermaphrodite brig") == "hermaphrodite brig"
+
+
+def test_truth_7_193_her_polars_best_point_from_her_accounts():
+    """Package 75, B2 (Build-Ships.md §15, row 7-193); Neuf-D §14 truth 2, drafted in
+    `tests/test_neufchatel.py` and moved here at Phase 5 (2026-11-14), holding on the merged
+    tree. Her best speed in 25 kn of wind under plain sail (`polar_of`)
+    within her accounts' band, 11.5 to 13.0 kn: Cobb 1841's 12.5 knots twice, running (p. 54,
+    out of Boston with the yards squared, the unit loose; p. 138, the gale chase), the band
+    judgement (Neuf-D §9), held wherever the engine puts it (the owner, 2026-10-29: "don't worry
+    about tuning for best speed running"; the lead's answer 5 at Neuf-D §17). Her pointing: her
+    `closest_deg` no wider than the frigate-36's, and her speed at 60 and 70 degrees off in 15
+    and 25 kn above the frigate-36's ("we could haul closer upon the wind than the enemy", Cobb
+    p. 96, her strongest evidence), pinned because her file bears it out.
+
+    Measured on the owner's machine, 2026-11-08, her start figures standing (`hull_speed_kn`
+    12.9) and her fore staysail the triangle that fits forward of the fore mast, 46 m2 (the lead's
+    ruling of 2026-11-07, B2b: the design's working 93 m2 a derivation of its own): her best in 25
+    kn 12.07 kn, inside the band as before (old beside new: 12.22 with the 93 m2, 12.27 before the
+    jib's mend of the reviews of 2026-11-07). **Reported, not pinned:** the best point's angle, 90
+    degrees (12.06 kn at 100; 12.22 and 12.20 before), where her accounts were running; at 150
+    degrees 9.92 kn and dead before it 9.35 (10.00 and 9.42 before; the frigate-36 10.01 and
+    9.23); sailed with her studding sails set, 11.12 and 10.37 kn (11.17 and 10.36 before) against
+    the frigate-36's 11.70 and 10.76, so that the frigate gains on her running as the frigates did
+    (Cobb p. 97). Her closest 40 degrees against the frigate's 50; at 60 and 70 degrees 6.30 and
+    7.14 kn in 15 kn against the frigate's 4.29 and 6.14, and 9.54 and 10.60 in 25 kn against 7.03
+    and 9.62 (6.53, 7.34, 9.81 and 10.80 before), the slimmest margin 0.98 kn at 70 degrees in 25
+    kn (1.18 before; Neuf-D §9's 0.8 on its stand-in). Arithmetic on the files ("the same on every
+    machine", world/ships.py)."""
+    from freesail.world.ships import polar_of
+    from tests.test_neufchatel import FRIGATE, HER
+
+    hers, frigate = polar_of(HER), polar_of(FRIGATE)
+    best = max(hers.speeds_kn[hers.winds_kn.index(25.0)])
+    assert 11.5 <= best <= 13.0, best
+    assert hers.closest_deg <= frigate.closest_deg
+    for wind in (15.0, 25.0):
+        for off in (60.0, 70.0):
+            assert hers.speed_kn(off, wind) > frigate.speed_kn(off, wind), (off, wind)
+
+
+def test_truth_7_194_her_particulars_hold_their_sources():
+    """Package 75, B7 (Build-Ships.md §15, row 7-194; Bel-D §14.2), drafted in
+    `tests/test_bellerophon.py` and moved here at Phase 5 (2026-11-14), its helpers where they
+    live, holding on the merged tree; pinned at her step 5, on `seventy-four.yaml` as it loads. Her
+    beam 46 ft 9 in (ZAZ1357's table) 14.25 ± 0.05 m; her waterline 168 ft 51.2 ± 0.3 m; her draught
+    to K 6.46 ± 0.10 m at her water, the Channel line; her displacement within Bel's H1 band, 2,490
+    to 2,900 t, and within the measured lines' 2,560 to 2,660 t at her line (Bel-D §2.1, either
+    conversion); her GM within 1.2 to 1.5 m. Her lowest lower-deck sill 1.57 ± 0.01 m above her
+    water (the Bellona's 5 ft 2 in at Channel draught, Lavery 1985 p. 9, Table 2), the side at it
+    6.90 to 7.09 m (6.92 moulded, 7.04 with the plank; 7.04 measured). Her ports a side 14, 14 and
+    7, the forecastle's 2 (Bel H3; the forecastle's third place a carronade's over the rail), the
+    lower 3 ft 4 3/4 in by 2 ft 8 1/2 in, 1.04 by 0.83 m (Bel-D §3.2's 0.82 a rounding slip). Her
+    main mast within 107 ft 4 1/2 in to 108 ft from its heel to its head (Steel's rule; Lavery
+    Table 10: 108 ft, its heel 5.11 ft above the keel's top), the mizen yard 86 ft 6 in ± 1%.
+    Twenty-eight long 32-pounders of 55 cwt on her lower deck in every fit; 74, 82 and 78 pieces;
+    broadsides by 70's rule 781 and 867 lb (James vol. 1, Abstracts No. 1 and 3) and 938 lb. Her
+    crews to the pair 13, 9, 7 and 6 for the 32s, 18s, 12s and 9s (Falconer 1780) and 4 to a
+    carronade (Douglas 1829 art. 136). Her complement 590 (the 1807 column), five lieutenants, 111
+    marines of whom eleven officers and NCOs (the column's: her notes, and her people file's
+    captain, lieutenant and serjeant drawn from them); filling 18; exercise 9. Four bowers of 67
+    cwt, a stream of 16 and a kedge of 8 on seven 22-in cables (Steel 1794; Lavery p. 15, Table 4);
+    six boats (Lavery p. 16, Table 5). "A ship of the line" names her description, rank 4. Pins
+    states and bands, no digest."""
+    from freesail.combat.far import far_ship
+    from freesail.ship.loader import load_ship
+    from freesail.ship.profile import ports_of
+    from freesail.world import captains as C
+    from freesail.world import ships as S
+    from tests.test_bellerophon import (
+        CWT_KG,
+        FIT_1793,
+        FIT_1795,
+        FIT_1812,
+        FT,
+        MIDSHIPS_FT,
+        SEVENTY_FOUR,
+        above_wl1_ft,
+    )
+
+    ship = load_ship(SEVENTY_FOUR)
+    spec, h = ship.spec, ship.hull.spec
+    assert abs(h.beam_m - 14.25) <= 0.05
+    assert abs(h.length_waterline_m - 51.2) <= 0.3
+    assert abs(h.draught_m - 6.46) <= 0.10
+    assert 2_490_000 <= h.displacement_kg <= 2_900_000
+    assert 2_560_000 <= h.displacement_kg <= 2_660_000
+    assert 1.2 <= h.gm_m <= 1.5
+    p = h.profile
+    _x, sill, half = min(ports_of(p, "lower"), key=lambda t: t[1])
+    assert abs(sill - 1.57) <= 0.01
+    assert 6.90 <= half <= 7.09
+    counts = {deck: len(ports_of(p, deck)) for deck in ("lower", "upper", "quarterdeck")}
+    assert counts == {"lower": 14, "upper": 14, "quarterdeck": 7}
+    forecastle = [g for g in spec.armament.fits[FIT_1793].guns if g.deck == "forecastle"]
+    assert len({g.number for g in forecastle}) == 2  # the forecastle's two ports a side
+    width, depth = dict(p.port_size_m)["lower"]
+    assert (round(width, 2), round(depth, 2)) == (1.04, 0.83)
+    main = ship.spars["main.mast"]
+    x_ft = MIDSHIPS_FT + main.x_m / FT
+    heel_ft = -(18.89 + 1.72 * (MIDSHIPS_FT - x_ft) / 168.0) + 5.11  # above WL1 (Bel §5.2)
+    head_ft = above_wl1_ft(h.deck_height_m + main.height_m)
+    length_ft = (head_ft - heel_ft) / math.cos(main.rake)
+    assert 107.0 + 4.5 / 12.0 <= length_ft <= 108.0 + 0.4, length_ft  # heights to the decimetre
+    assert abs(ship.spars["mizzen.yard"].length_m / (86.5 * FT) - 1.0) <= 0.01
+    arm = spec.armament
+    for fit, pieces, lb in ((FIT_1793, 74, 781.0), (FIT_1795, 82, 867.0), (FIT_1812, 78, 938.0)):
+        guns = arm.fits[fit].guns
+        assert len(guns) == pieces, fit
+        lower = [g for g in guns if g.deck == "lower"]
+        assert len(lower) == 28 and all(
+            (g.kind, g.pounder, g.weight_cwt) == ("long", 32, 55.0) for g in lower
+        ), fit
+        assert far_ship(SEVENTY_FOUR, "britain", fit=fit).broadside_lb == lb, fit
+        crews = {(g.kind, int(g.pounder)): g.crew for g in guns}
+        for (kind, pounder), crew in crews.items():
+            want = 4 if kind == "carronade" else {32: 13, 18: 9, 12: 7, 9: 6}[pounder]
+            assert crew == want, (fit, kind, pounder)
+        assert arm.fits[fit].exercise_charges == 9
+    crew = spec.crew
+    assert crew.complement == 590
+    assert sum(1 for q in crew.posts if q.post.endswith(" lieutenant")) == 5
+    assert crew.stations["marines"] == 111
+    assert {"captain of marines", "lieutenant of marines", "sergeant of marines"} <= {
+        q.role for q in crew.people if q.station == "marines"
+    }
+    assert crew.quarter_bill.filling == 18
+    anchors = spec.ground_tackle.anchors
+    bowers = [a for a in anchors if abs(a.weight_kg - 67 * CWT_KG) <= 1.0]
+    assert len(bowers) == 4 and all(a.cable_in == 22.0 for a in bowers)
+    weights = sorted(round(a.weight_kg / CWT_KG) for a in anchors if a not in bowers)
+    assert weights == [8, 16]
+    assert sum(a.cable_fathoms for a in bowers) / 100.0 == 7.0  # seven cables of 100 fathoms
+    assert len(spec.boats) == 6
+    assert S.description_key("a ship of the line") == "seventy-four"
+    assert C.size_of_file(SEVENTY_FOUR) == 4
+
+
+def test_truth_7_195_her_lowest_lower_deck_port_shuts_at_the_bellonas_heel():
+    """Package 75, B7, her step 6 (Build-Ships.md §15, row 7-195; Bel-D §14.3, in truth 7-190's
+    form), drafted in `tests/test_bellerophon.py` and moved here at Phase 5 (2026-11-14), her sea
+    and its helpers where they live; passing on the merged tree at every figure below. "her lower
+    deck's 32-pounders and their ports' sills against the heel" (the brief, item 3). The
+    Bellona's lowest gun-deck port 5 ft 2 in above the water at her best Channel draught (Lavery
+    1985 p. 9, Table 2), her own lowest sill (L7, the lower deck's pair No. 8 at x -2.15 m, found
+    by its triple, the least sill, never by its number) 1.57 m on her drawn side of 7.04 m: by
+    `shot.lee_port_shut` it is open at 9.9 degrees of heel alone and shut at 10.9, its threshold
+    10.35 (within 10.2-10.7: Bel-D's 10.35 on 7.04, the dead flat re-traced on its own line at the
+    review of 2026-11-10, 10.38 on 7.02 before it; 10.58 the source's 5 ft 2 in on the moulded
+    22.7 ft, the brief's 10.6; the lead's answer (11)). On her battery, raised from upright: open
+    at 9.9, shut at 10.9 with the four ports whose thresholds lie under it; still shut at 9.9 on
+    the way down, within the minute's hold and once it has run (the six inches to reopen: below
+    9.11); open at 8.6, the minute run. **A roll's amplitude sooner** (the owner's rule, Bel §13.1
+    answer 7): with a roll of 4 degrees on her motion it is open at 5.8 degrees of heel and shut at
+    6.9. **The
+    log:** "The lee lower-deck ports are shut, the sea at their sills." once at the change, her
+    guns cast loose. Her weather side open throughout. Measured at seed 7 on the owner's machine,
+    2026-11-10.
+
+    **Recorded, not pinned (Bel-D §14.3's condition): in ordinary sailing**, close-hauled six
+    points off under plain sail, no book, a steady wind with no gusts: her heel settles at 7.73
+    degrees in 22 kn, 9.23 in 24 and 16.55 at its most in 32 (measured); but in 24 kn the setting
+    of sail heels her to 10.72 for a moment, the two lowest ports shut and stay shut at the steady
+    9.23 (they reopen below 9.11 and 9.18), so "open at 24 kn" does not hold with a degree's
+    margin; in 23 kn she peaks at 9.88 and none shuts; in 32 kn twelve of the fourteen are shut.
+    In the World's gusts at 24 kn (answer 8's "or in gusts at 24 kn") a lee lower port of hers is
+    shut for 31% of the hour, her heel 6.9 to 16.3 degrees (measured again on her re-traced side,
+    2026-11-10: one port and 30% before). The period's own cases are swell and rolling, not
+    steady heel (the Blenheim, the Monarch, the Droits de l'Homme: Bel §6.1), which the roll's
+    clause serves."""
+    from freesail.combat import shot
+    from freesail.ship.profile import ports_of
+    from tests.test_bellerophon import ROLL_DEG, _hold_ticks, _in_her_sea, _ports_at
+
+    w = _in_her_sea()
+    ship = w.ship
+    x, sill, half = min(ports_of(ship.hull.spec.profile, "lower"), key=lambda t: t[1])
+    assert x == pytest.approx(-2.15, abs=0.005)
+    assert not shot.lee_port_shut(sill, 9.9, half)
+    assert shot.lee_port_shut(sill, 10.9, half)
+    threshold = math.degrees(math.asin((sill - shot.PORT_SHUT_M) / half))
+    assert 10.2 <= threshold <= 10.7, threshold
+    (lowest,) = [
+        g.id
+        for g in ship.guns.values()
+        if g.deck == "lower" and g.side == "starboard" and (g.x_m, g.height_m) == (x, sill)
+    ]
+    for g in ship.guns.values():
+        g.cast_loose = True
+        g.run_out = True
+    ship.drain_notes()
+    hold = _hold_ticks()
+    assert not _ports_at(w, 0.0, 0.0, 0)
+    assert lowest not in _ports_at(w, 9.9, 0.0, 1)
+    shut = _ports_at(w, 10.9, 0.0, 2)
+    assert lowest in shut and len(shut) == 4
+    assert all(ship.guns[g].deck == "lower" and ship.guns[g].side == "starboard" for g in shut)
+    lines = [n for n in ship.drain_notes() if len(n) == 5 and n[1] == "guns.ports_shut"]
+    assert [n[2] for n in lines] == ["The lee lower-deck ports are shut, the sea at their sills."]
+    assert _ports_at(w, 9.9, 0.0, 3) == shut  # down again within the minute
+    assert _ports_at(w, 9.9, 0.0, 3 + hold) == shut  # the minute run, the six inches not cleared
+    assert not [n for n in ship.drain_notes() if len(n) == 5 and n[1] == "guns.ports_shut"]
+    assert not _ports_at(w, 8.6, 0.0, 4 + hold)  # six inches clear and the minute run: open
+    # a roll's amplitude sooner, raised from upright
+    at = 10 + 3 * hold
+    assert not _ports_at(w, 0.0, 0.0, at)
+    assert lowest not in _ports_at(w, 5.8, ROLL_DEG, at + 1)
+    assert lowest in _ports_at(w, 6.9, ROLL_DEG, at + 2)
+
+
+def test_truth_7_195_her_lee_lower_deck_guns_shut_by_the_rules_count():
+    """Truth 7-195's battery clause (Bel-D §14.3), drafted in `tests/test_bellerophon.py` and
+    moved here at Phase 5, as above (`LEE_LOWER_SHUT_AT` where it lives): her default fit,
+    her guns cast loose and run out, heeled to starboard by hand and raised from upright, so that
+    the six inches of reopening do not bite; at heels each 0.3 degree or more from every one of
+    her lower ports' thresholds (`LEE_LOWER_SHUT_AT`), `Battery._shut` holds her lee lower-deck
+    guns in the counts the rule gives: none at 10.0, eight at 12.4, ten at 13.7, twelve at 16.0,
+    all fourteen at 19.4. No upper-deck gun is shut below 25 degrees (her lowest upper port's
+    threshold 32.37), nor any of the quarterdeck's, the forecastle's or the poop's, and the
+    weather side stands open."""
+    from tests.test_bellerophon import LEE_LOWER_SHUT_AT, _in_her_sea, _ports_at
+
+    w = _in_her_sea()
+    for g in w.ship.guns.values():
+        g.cast_loose = True
+        g.run_out = True
+    assert not _ports_at(w, 0.0, 0.0, 0)
+    for tick, (heel, count) in enumerate(LEE_LOWER_SHUT_AT, start=1):
+        shut = _ports_at(w, heel, 0.0, tick)
+        lee_lower = [g for g in shut if w.ship.guns[g].deck == "lower"]
+        assert len(lee_lower) == count, (heel, len(lee_lower))
+        assert all(w.ship.guns[g].side == "starboard" for g in shut), heel
+        assert len(shut) == count, heel  # no gun of another deck
+    shut = _ports_at(w, 25.0, 0.0, len(LEE_LOWER_SHUT_AT) + 1)
+    assert {w.ship.guns[g].deck for g in shut} == {"lower"} and len(shut) == 14
+
+
+@pytest.mark.pace
+def test_truth_7_196_a_seventy_four_crewed_holds_the_crewed_floor():
+    """Truth 7-196 as its crewed clause alone (package 75, B7, her step 6; Build-Ships.md §15,
+    row 7-196; Bel-D §14.4): "the pace of a 74 crewed measured against the floors" (the brief,
+    item 3). Drafted in `tests/test_bellerophon.py` and moved here at Phase 5 (2026-11-14), her
+    constants where they live. **Its figures, in its words:** the best of three timed thousands
+    of ticks at least `CREWED_FLOOR_TICKS_S`, 60 a second; measured 150, 151 and 147 on the
+    owner's machine (seed 7, 2026-11-13), the three 74s at 0.29 to 2.79 miles of her and in
+    company at the end of every thousand, no shot fired. **Her clause alone is not here:** truth
+    51's form with her file in the frigate's place, at least the build machine's floor of 500
+    ticks a second, is recorded and not pinned, by the lead's answer (5) ("pinned only if the
+    build machine leaves a tenth's margin, 550 or more; else recorded, and no floor lowered") and
+    the lead's measurement at her merge (2026-11-10, the build machine quiet, the best of three
+    thousands in each of three runs): 505, 476 and 492 ticks a second, the frigate 524 and 516 in
+    the same runs; on the owner's machine 474, 477, 483 and 490 (the frigate-36 505 and 631, the
+    64 484 and 486). She runs about a twentieth slower than the frigate, and the frigate holds
+    the floor by less than that; the lead took that test out at her merge, and `tools/pace.py
+    seventy-four` measures it still. Truth 88's form (tests/test_crews.py), marked `pace` by hand
+    as truths 88 and 7-138 are, so that tests/conftest.py routes it to the pace run, alone after
+    the rest. **Its place differs from
+    truth 88's:** truth 88's frigate lies at 49 30 N 5 30 W, about thirty miles from the Lizard,
+    where 74s keeping a station off the Lizard would sail for it and pass the crewed range's
+    demotion within the measure; here the frigate lies about three miles south of it, her plain sail
+    set and then hove to (truth 88's "heave to" at the first tick is refused, no sail being set:
+    Bel-D §18 item 20), and three 74s of her file are put one to three miles from her, in her
+    squadron under her orders; a thousand ticks to settle, then the best of three timed thousands,
+    at the end of each the crewed ships at `CREWED_CAP`, every 74 within `CREWED_NM` of her and in
+    company, and no line of an action in her log nor in any 74's own (the lead's last list of
+    2026-11-14, item 6: the sentence below said "one another" and the clause read her log alone,
+    where a 74 firing on a 74 is said in theirs). At least `CREWED_FLOOR_TICKS_S` (60) a second on
+    the build machine. **What the last clause proves, and no more** (the lead's readings of
+    cda12ec9, (C7)): every ship of her world is British and of one squadron, and no enemy is put
+    in it, so that "no line of an action" can fail only if friends fire on friends: it proves that
+    three crewed King's ships under her orders, in her set, neither challenge her nor one another
+    into an action over the measure, and nothing of how a crewed 74 meets an enemy, which the far
+    fight's truths try (7-231, `tests/test_far_action.py`). Her world is left as it is (the
+    docstring chosen, not an enemy in sight who is not engaged): it is a pace truth whose world
+    was settled by measurement, and an enemy in sight would change what it times. **Her world,
+    plainly** (the lead's ruling (1) of 2026-11-13): truth 88's
+    frigate carries no private signal and, under no rules captain, answers none; three King's ships
+    each keeping the station off the Lizard alone challenged her and one another, took her (and one
+    another) for men of war under false colours and fired into her, and since package 74 her captor
+    goes home with her prize, so that load no longer lasted the measure. Given the day's private
+    signals and answering each challenge by order, she is still judged unanswered by one of three
+    challenging her in one minute (each reply goes to the last challenge read), and one 74 judges
+    another so. In her squadron, under her orders, the three know her by the book's own road
+    (package 71's least relation, package 72's set): a member in company challenges nobody. **They
+    do not keep their stations** (the review's mends): the frigate lies to, heading NW by N at a
+    knot and a half, and a crewed member ahead of her station steers the flag's course with her sail
+    shortened, which drops her back only on a flag with way on; so the three straggle by the set's
+    own lines (S0 at tick 1560, S1 at 3060, S2 at 3840), and S2 opens on the frigate's heading at
+    about six knots, 2.79 miles at the third end, past `CREWED_NM` between ticks 8,400 and 8,650
+    (3.87 and 4.18 miles): the clause holds within its 4,900 ticks, and that is its margin.
+    Measured on the owner's machine (seed 7, 2026-11-13): the best of three thousands 150, 151 and
+    147 ticks a second in three runs; the 74s at 0.29 to 2.79 miles at the ends of the thousands
+    and at most 2.79 at any tick of them, in company throughout, no shot fired. The old world and
+    its figures, old beside new, in docs/dev/TuningNotes.md, "The lead's notes of 2026-11-12 and
+    13, built"."""
+    import time
+
+    from freesail.world import crews as K
+    from freesail.world import squadrons as Q
+    from freesail.world.geo import bearing_and_distance
+    from tests.test_bellerophon import OFF_THE_LIZARD, SEVENTY_FOUR, SEVENTY_FOURS_AT
+    from tests.test_brains import put, world_at
+
+    w = world_at(*OFF_THE_LIZARD)
+    w.submit("set plain sail")
+    w.run(900)
+    assert w.submit("heave to").kind == "order.accepted"
+    goal = "patrolling off the Lizard within 2 miles"
+    intent = "keep the station off the Lizard within 2 miles"
+    fours = [
+        put(w, "seventy-four", "britain", where, goal, intent, name=f"S{i}")
+        for i, where in enumerate(SEVENTY_FOURS_AT)
+    ]
+    assert all(v.ship_file == SEVENTY_FOUR for v in fours)
+    ours = Q.Squadron(
+        id="ours",
+        name="our squadron",
+        kind="squadron",
+        nation="britain",
+        members=["the ship"] + [v.id for v in fours],
+        goal=goal,
+        formation="line ahead",
+    )
+    w.squadrons.add(ours, w)
+    assert ours.commander == "the ship"
+    w.run(1000)
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        w.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+        assert len(w.vessels.crewed_ids) == K.CREWED_CAP
+        for v in fours:
+            nm = bearing_and_distance(w.position, v.position)[1] / units.NAUTICAL_MILE
+            assert nm <= K.CREWED_NM, (v.name, nm)
+            assert v.crew.captain.state == "in company", (v.name, v.crew.captain.state)
+    assert not [e.text for e in w.log if e.kind.startswith("action.")]
+    for v in fours:
+        assert not [e.text for e in v.crew.log.all() if e.kind.startswith("action.")], v.name
+    assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
+
+
+def test_truth_7_197_her_particulars_hold_their_sources_and_she_lies_as_close_as_a_brig():
+    """Truth 7-197 (package 75, B4; Bil-D §14; Build-Ships.md §15), whole, drafted in
+    `tests/test_bilander.py` and moved here at Phase 5 (2026-11-14), its helpers where they live
+    (her generator module's figures read through `her_module_figures`, as that file's `module`
+    fixture reads them): her particulars hold their sources, and by the wind she lies as close
+    as a brig. Measured on her file at her step 4 (the owner's machine, 2026-11-08), each band
+    its source's, and holding on the merged tree:
+    - her hull: LWL 21.52 m against Chapman's 70.6 ft, +-1.5-2 ft (21.5 +- 0.5); beam 5.91 m
+      against Chapman's 19.4 ft, +-1.5% (+- 0.1); draught 3.51 m against Lloyd's 11 and 12 ft
+      (+- 0.16); burthen by the old measure 118 and 128 tons, D6 (a)'s "about 130" (118-130);
+      her waist rail 1.65 m above the water against Chapman's 5.3-5.5 ft (+- 0.05);
+    - her settee to D5 (a): luff over leech 0.16, leech and foot over head 0.72 (+- 0.02, Gwyn's
+      ratios); the head at 44 degrees (+- 1) and 0.68 of the rail length (Gwyn's 534 px of 785),
+      its yard cut to it (B5.4's finding: the drawing draws a settee's yard as its head; her
+      design's §14 had the yard 0.72 of the rail length, Gwyn's 564 px, before her step 2 cut it,
+      old beside new: 16.59 to 15.68 m); slung a third along throat to peak on the main mast's
+      raked line (within 0.1 m); the peak 0.088 of the rail length inside the taffrail (0.07-0.11,
+      Gwyn's 0.09 +- 0.02); `settee` and `dipping` true; one unsided sheet;
+    - her rig to Gwyn's shares above the waist rail: the main top 0.35 (+- 0.02), the main truck
+      0.95 and the fore truck 0.85 (+- 0.03); Chapman's yards: the fore yard 12.44 m, the topsail
+      yards 9.14 and 9.36 m (+- 0.2); a dry yard on the main and no royal (D40 (a));
+    - her company of nine, two in the main top (the lead's ruling 8 of 2026-11-13, on ruling 11,
+      JUDGEMENT within the sourced eight to nine; old: eight, D43; Ext §5.1); `heave_to_aback` on
+      the main mast and no other (D4 (a));
+    - her fits: unarmed by default (the brief, item 3), the armed merchant four long 3-pounders and
+      four half-pounder swivels (Lloyd's Elizabeth, "4-3 P."; D41 (a));
+    - her description at rank 1, "merchant" in what she is made out to be (D16 (a));
+    - **rule 1** (D46 rule 1; Ext §5.9; Steel 1794 vol. I p. 237, Lescallier p. 380: lateen craft
+      lie a point nearer the wind than square-riggers, five points against six; with a square fore
+      she does not gain the whole point, Research-Bilander-2026-10.md §4, judgement): her
+      `closest_deg` and `beat_deg(15)` no wider than the brig's 50 and 60 degrees at this head.
+      Measured: 50 and 60, the beat by 0.06 kn of way to windward over 70 degrees. To be measured
+      again on D44 (c)'s settee row had rule 5 taken it (Bil-D §14): on her file it did not (her
+      step 5, `test_rule_5_on_her_file_holds_held_aback_near_its_trim_and_never_in_stays`), so the
+      clause stands as measured here."""
+    from collections import Counter
+
+    from freesail.ship.loader import load_ship, load_spec
+    from freesail.world.ships import polar_of
+    from tests.test_bilander import (
+        ARMED,
+        BRIG,
+        DATUM_M,
+        HER,
+        RAIL_LENGTH_M,
+        above_water,
+        gwyn_share,
+        her_module_figures,
+        settee_corners,
+    )
+
+    module = her_module_figures()
+
+    ship = load_ship(HER)
+    spec = load_spec(HER)
+    hull = spec.hull
+    assert abs(hull.length_waterline_m - 21.5) <= 0.5 and abs(hull.beam_m - 5.91) <= 0.1
+    assert abs(hull.draught_m - 3.51) <= 0.16
+    b = 19.4
+    for length in (70.6, 75.6):  # her waterline and her taffrail to stem head, ft
+        assert 118.0 - 0.5 <= (length - 0.6 * b) * b * b / 2.0 / 94.0 <= 130.0
+    waist = min(z for _x, z in hull.profile.rail_m)
+    assert abs(waist - 1.65) <= 0.05
+    spars, sails = {x.id: x for x in spec.spars}, {x.id: x for x in spec.sails}
+    settee = sails["main.settee"]
+    tack, throat, peak, clew = settee_corners(sails)
+    head, leech = math.dist(throat, peak), math.dist(peak, clew)
+    assert abs(math.dist(tack, throat) / leech - 0.16) <= 0.02
+    assert abs(leech / head - 0.72) <= 0.02 and abs(math.dist(tack, clew) / head - 0.72) <= 0.02
+    assert abs(math.degrees(math.atan2(peak[1] - throat[1], throat[0] - peak[0])) - 44.0) <= 1.0
+    yard = spars["main.lug_yard"]
+    assert abs(yard.length_m / RAIL_LENGTH_M - 534.0 / 785.0) <= 0.02
+    assert abs(yard.length_m - head) <= 0.02
+    sx, sz = throat[0] + (peak[0] - throat[0]) / 3.0, throat[1] + (peak[1] - throat[1]) / 3.0
+    main = spars["main.mast"]
+    assert abs(sx - (main.x_m - math.tan(math.radians(main.rake_deg)) * (sz - DATUM_M))) <= 0.1
+    taffrail = hull.profile.rail_m[0][0]
+    assert 0.07 <= (peak[0] - taffrail) / RAIL_LENGTH_M <= 0.11
+    assert settee.settee and settee.dipping
+    sheets = [ln for ln in spec.lines if ln.cls == "sheet" and ln.of == "main.settee"]
+    assert len(sheets) == 1 and sheets[0].side is None
+    assert abs(gwyn_share(module["rig"]["main"]["top"]) - 0.35) <= 0.02
+    truck = {
+        m: above_water(spars, f"{m}.mast")
+        + spars[f"{m}.topmast"].height_m
+        + spars[f"{m}.topgallant_mast"].height_m
+        for m in ("fore", "main")
+    }
+    assert abs(gwyn_share(truck["main"]) - 0.95) <= 0.03
+    assert abs(gwyn_share(truck["fore"]) - 0.85) <= 0.03
+    for yid, metres in (
+        ("fore.yard", 12.44),
+        ("fore.topsail.yard", 9.14),
+        ("main.topsail.yard", 9.36),
+    ):
+        assert abs(spars[yid].length_m - metres) <= 0.2, yid
+    assert "main.crossjack.yard" in spars and not [s for s in spars if "royal" in s]
+    assert spec.crew.complement == 9 and spec.crew.stations["main_top"] == 2  # old: 8
+    assert [s.id for s in ship.spars.values() if s.heave_to_aback] == ["main.mast"]
+    arm = spec.armament
+    assert arm.default == "unarmed" and arm.fit(None) is None
+    assert Counter((g.kind, g.pounder) for g in arm.fits[ARMED].guns) == {
+        ("long", 3.0): 4,
+        ("swivel", 0.5): 4,
+    }
+    from freesail.world import captains as C
+    from freesail.world import ships as S
+
+    d = S.description("bilander")
+    assert C.size_of_file(HER) == 1 and C.size_rank_of(d["what"]) == 1
+    assert "merchant" in d["what"]
+    brig, p = polar_of(BRIG), polar_of(HER)
+    assert (brig.closest_deg, brig.beat_deg(15.0)) == (50.0, 60.0)
+    assert p.closest_deg <= brig.closest_deg and p.beat_deg(15.0) <= brig.beat_deg(15.0)
+
+
+@pytest.mark.parametrize(
+    "knots, lowered_s, haul_s, factor",
+    [(15.0, 155, 97, 1.33), (20.0, 161, 96, 1.51)],
+)
+def test_truth_7_198_the_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_and_dipped_last(
+    tmp_path, knots, lowered_s, haul_s, factor
+):
+    """Truth 7-198 on the fixture (package 75, B3.3; Ext §10.3 item 1; D46 rules 2 and 3, D3(b)),
+    drafted in `tests/test_settee.py` and moved here at Phase 5 (2026-11-14), its helpers where
+    they live; holding on the merged tree. Its clause on her own file is the next truth's. In
+    stays the settee is
+    kept drawing as a ship's mizen is, its ourse braced to leeward as the helm goes down, and its
+    yard is changed last, after the head yards are swung. Each rule is carried over by judgement
+    from a ship's mizen (Bourdé 1765 p. 87; Steel 1794 vol. II p. 316; Boteler p. 163) to the
+    bilander's settee, which Röding (1794 vol. II col. 581) has lowered and shifted round in going
+    about (D1(a)); rule 2 is pinned on her own dip, the yard lowered and passed round, not against
+    a brig (D46(d)).
+
+    The fixture `brig_with_settee()` at seed 7, from close-hauled on the starboard tack in 15 and
+    20 kn (B3.4's settle: 2,400 s at 292.5 degrees, 67.5 degrees off). Measured on the owner's
+    machine (2026-11-07), B3.3: at helm's a-lee + 1 tick the settee set at its floor, 8 degrees,
+    the words "haul aft the mainsail sheet and brace the ourse to leeward"; "Let go and haul" at
+    97 s and 96 s; the head yards' swing ended and the yard lowered at 155 s and 161 s ("Dip the
+    mainsail: lower the yard, pass it round abaft the mast ..."); down 159 and 181 ticks
+    (`SETTEE_DIP_S` 120 by her factor of 1.33 and 1.51), its side larboard to starboard; hoisted at
+    314 s and 342 s, "Tacked" at 318 s and 342 s; at +400 s on the larboard tack 67.7 and 66.8
+    degrees off. Judged by her heading and tack at a set time, never by the "Tacked" line
+    (D13(a)). Rule 5's clause is not pinned here: in her own tack at seed 7 the settee is never
+    aback (its single sheet lies it to leeward of the wind; Ext §5.10's measure, the tuning notes),
+    so that half goes to the lead. Measured again on the bilander's file at B4 (the next test).
+    The words since, every tick the same (B3.4b, the lead's ruling (2) of 2026-11-07; Luce 1884
+    pp. 421, 428, 446): her after yards hauled by "Main-topsail haul." with her fore tack kept
+    fast, and that line "Rise fore tack and sheet. Let go and haul. ..." (at 97 s in 15 kn), where
+    they were "Rise tacks and sheets. Main-topsail haul." and "Let go and haul. ..."."""
+    from freesail.evolutions import scripts
+    from tests.test_settee import LUG_FLOOR_DEG, SETTEE, _after, _deg, _first_tick, _rel_deg, _world
+
+    world = _world(tmp_path, knots=knots)
+    settee = world.ship.sails[SETTEE]
+    start = world.clock.tick
+    world.submit("tack ship")
+    world.tick()
+    assert settee.is_set and _deg(settee.sheet_angle) == pytest.approx(LUG_FLOOR_DEG, abs=1.0)
+    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
+    assert "haul aft the mainsail sheet and brace the ourse to leeward" in line, line
+    sides, lowered = [], []
+    for i in range(2, 601):
+        world.tick()
+        if settee.yard_lowered:
+            lowered.append(i)
+        sides.append(settee.lug_side)
+        if i == 400:
+            at_400 = (world.ship.dyn.tack, abs(_rel_deg(world)))
+    haul = _first_tick(world, start, "Let go and haul")
+    swung = _first_tick(world, start, "Dip the mainsail: lower the yard")
+    tacked = _first_tick(world, start, "Tacked")
+    hoisted = _first_tick(world, start, "Dipped the mainsail; hoisted on the starboard side")
+    assert abs(haul - haul_s) <= 5 and haul < swung
+    assert lowered[0] >= swung and abs(lowered[0] - lowered_s) <= 10
+    down = len(lowered)
+    assert lowered == list(range(lowered[0], lowered[0] + down))  # one spell, not two
+    assert abs(down - scripts.SETTEE_DIP_S * factor) <= 10
+    assert sides[0] == "larboard" and sides[-1] == "starboard"
+    assert hoisted is not None and tacked is not None and tacked >= hoisted
+    assert at_400[0] == "larboard" and abs(at_400[1] - 67.5) <= 5.0
+
+
+@pytest.mark.parametrize(
+    "knots, haul_s, lowered_s, factor",
+    [(15.0, 90, 149, 1.342), (20.0, 93, 159, 1.517)],
+)
+def test_truth_7_198_her_settee_in_stays_is_kept_drawing_its_ourse_to_leeward_and_dipped_last(
+    knots, haul_s, lowered_s, factor
+):
+    """Truth 7-198 on her file (package 75, B4, on B3.3; Bil-D §14; Ext §10.3 item 1; D46 rules 2
+    and 3, D3 (b)), drafted on the fixture by B3.3 (the test above), measured again on her file in
+    `tests/test_bilander.py` and moved here at Phase 5 (2026-11-14), its helpers where they live;
+    holding on the merged tree at her nine (the lead's ruling 8 of 2026-11-13): in stays her settee
+    is kept drawing as a ship's mizen is, its ourse braced to leeward as the helm goes down, and its
+    yard is changed last, after the head yards are swung. Each rule is carried over by judgement
+    from a ship's mizen (Bourdé 1765 p. 87; Steel 1794 vol. II p. 316; Boteler p. 163) to her
+    settee, which Röding (1794 vol. II col. 581) has lowered and shifted round in going about (D1
+    (a)); rule 2 is pinned on her own dip, the yard lowered and passed round and by how many hands
+    (D46 (d)), not against a brig.
+
+    Her file at seed 7 from her settle (close-hauled on the starboard tack, 67.5 degrees off),
+    15 and 20 kn, measured on the owner's machine at her `clr_x_m` +2.0 (her review, 2026-11-08;
+    at her step 5's +2.25 each tick within a second of these): at helm's a-lee + 1 tick the
+    settee set at its floor, 8 degrees, the words "haul aft the mainsail sheet and brace the ourse
+    to leeward"; her after yards hauled by "Main-topsail haul." at 32 s and 28 s (the lead's
+    ruling (2)(d) of 2026-11-07, as on the fixture), her fore tack risen apart, "Rise fore tack
+    and sheet. Let go and haul. ..." at 90 s and 93 s (89 and 93 at +2.25; the fixture's 97 and
+    96); the head yards' swing ended and the yard lowered at 149 s and 159 s ("Dip the mainsail:
+    lower the yard, pass it round abaft the mast ..."; 148 and 160 at +2.25; the fixture's 155
+    and 161); down in one spell of 161 and 182 ticks (`SETTEE_DIP_S` 120 by her factor of 1.342
+    and 1.517; the fixture's 1.33 and 1.51), its side larboard to starboard; hoisted and
+    "Tacked" at 310 s and 341 s (309 and 342 at +2.25; the fixture's 318 and 342), the report's
+    tick recorded and not pinned, only its order after the hoist (D13 (a); her review); at +400 s
+    on the larboard tack 67.4 and 66.5 degrees off. **Rule 2's hands:** six at
+    her dip, the tack's all hands (her two fore topmen, her two main topmen, the afterguard's hand
+    and the cook), the master and the mate on the quarterdeck. At her nine (the lead's rulings 8
+    and 11 of 2026-11-13) seven, the afterguard's two among them, the posts still on the
+    quarterdeck (a manoeuvre is never a post's work), every other figure within its band (haul 92
+    and 93 s, lowered 151 and 159 s, down 161 and 182 ticks, at +400 s 67.4 and 66.6 off).
+    **Rule 5 in stays:** her settee is never aback from helm's a-lee to "Tacked", where her main
+    topsail is (the static case, `test_rule_5_...`). Judged by her heading and tack at a set
+    time, never by the "Tacked" line (D13 (a))."""
+    from freesail.evolutions import scripts
+    from tests.test_bilander import (
+        LUG_FLOOR_DEG,
+        SETTEE,
+        _after,
+        _first_tick,
+        _her_settle,
+        _rel_deg,
+    )
+
+    world = _her_settle(knots)
+    settee = world.ship.sails[SETTEE]
+    start = world.clock.tick
+    world.submit("tack ship")
+    world.tick()
+    assert settee.is_set
+    assert math.degrees(abs(settee.sheet_angle)) == pytest.approx(LUG_FLOOR_DEG, abs=1.0)
+    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
+    assert "haul aft the mainsail sheet and brace the ourse to leeward" in line, line
+    runner = world.ship.extra["evolutions"]
+    sides, lowered, backed, at_dip = [], [], 0, set()
+    for i in range(2, 601):
+        world.tick()
+        if settee.yard_lowered:
+            lowered.append(i)
+            (tack,) = [x for x in runner.instances if isinstance(x.script, scripts.TackScript)]
+            at_dip.add(tuple(sorted(h.station.value for h in tack.assignment.hands)))
+        if settee.is_set and settee.backed:
+            backed += 1
+        sides.append(settee.lug_side)
+        if i == 400:
+            at_400 = (world.ship.dyn.tack, abs(_rel_deg(world)))
+    texts = [e.text for e in _after(world, start)]
+    assert "Main-topsail haul." in texts
+    assert any(t.startswith("Rise fore tack and sheet. Let go and haul.") for t in texts)
+    haul = _first_tick(world, start, "Let go and haul")
+    swung = _first_tick(world, start, "Dip the mainsail: lower the yard")
+    tacked = _first_tick(world, start, "Tacked")
+    hoisted = _first_tick(world, start, "Dipped the mainsail; hoisted on the starboard side")
+    assert _first_tick(world, start, "Main-topsail haul.") < haul
+    assert abs(haul - haul_s) <= 5 and haul < swung
+    assert lowered[0] >= swung and abs(lowered[0] - lowered_s) <= 10
+    down = len(lowered)
+    assert lowered == list(range(lowered[0], lowered[0] + down))  # one spell, not two
+    assert abs(down - scripts.SETTEE_DIP_S * factor) <= 10
+    assert sides[0] == "larboard" and sides[-1] == "starboard"
+    assert hoisted is not None and tacked is not None and tacked >= hoisted  # the order alone
+    assert at_dip == {
+        ("afterguard", "afterguard", "fore_top", "fore_top", "idlers", "main_top", "main_top")
+    }  # rule 2: seven of her nine, the posts on the quarterdeck (old: six of her eight)
+    assert backed == 0  # rule 5: never aback in her tack
+    assert at_400[0] == "larboard" and abs(at_400[1] - 67.5) <= 5.0
+
+
+@pytest.mark.parametrize("knots, crossed_s, hoisted_s", [(15.0, 66, 152), (20.0, 55, 168)])
+def test_truth_7_199_in_wearing_the_settee_is_lowered_as_she_bears_up_and_hoisted_past_the_wind(
+    tmp_path, knots, crossed_s, hoisted_s
+):
+    """Truth 7-199 on the fixture (package 75, B3.3; Ext §10.3 item 2; D46(d) rule 4 as reworded),
+    drafted in `tests/test_settee.py` and moved here at Phase 5 (2026-11-14), its helpers where
+    they live; holding on the merged tree. Its clause on her own file is the next truth's. In
+    wearing the settee is
+    lowered as she bears up and hoisted again on the new lee once the stern is past the wind.
+    Steel's order for a ship's mizen (1794 vol. II pp. 321-322: hauled up as she bears up, hauled
+    out "as soon as the stern has passed the wind"), carried over by judgement to the dip D1(a)
+    gives the settee; the truth pins the order of events, not a clewing up.
+
+    The fixture at seed 7, from close-hauled on the starboard tack in 15 and 20 kn (B3.4's settle).
+    Measured on the owner's machine (2026-11-07), B3.3: lowered at "up helm" + 1 tick ("Up helm;
+    lower the mainsail; brace in the after yards"); the wind across the stern to the larboard
+    quarter at 66 s and 55 s; hoisted at 152 s and 168 s, the wind then 99.6 and 133.6 degrees on
+    the larboard side ("Hoisted the mainsail on the starboard side, to leeward of the mast; the
+    wind is past the stern."); "Wore" at 478 s and 520 s; at +600 s on the larboard tack 67.3
+    degrees off, both. Judged by her heading and tack at a set time (D13(a)). Measured again on the
+    bilander's file at B4 (the next test)."""
+    from tests.test_settee import SETTEE, _after, _rel_deg, _world
+
+    world = _world(tmp_path, knots=knots)
+    settee = world.ship.sails[SETTEE]
+    start = world.clock.tick
+    world.submit("wear ship")
+    lowered, crossed, hoist = [], None, None
+    for i in range(1, 601):
+        world.tick()
+        rel = _rel_deg(world)
+        if settee.yard_lowered:
+            lowered.append(i)
+        if crossed is None and rel < 0 and abs(rel) > 90:
+            crossed = i
+        if hoist is None and lowered and not settee.yard_lowered:
+            hoist = (i, rel)
+        if i == 600:
+            at_600 = (world.ship.dyn.tack, abs(rel))
+    up = next(e.text for e in _after(world, start) if "Up helm" in e.text)
+    assert "Up helm; lower the mainsail; brace in the after yards" in up, up
+    assert lowered and lowered[0] <= 5
+    assert abs(crossed - crossed_s) <= 10 and abs(hoist[0] - hoisted_s) <= 10
+    assert hoist[0] > crossed and hoist[1] < 0.0  # the wind on the new side of the stern
+    assert settee.is_set and settee.lug_side == "starboard"
+    assert at_600[0] == "larboard" and abs(at_600[1] - 67.5) <= 5.0
+
+
+@pytest.mark.parametrize("knots, crossed_s, hoisted_s", [(15.0, 58, 153), (20.0, 48, 168)])
+def test_truth_7_199_in_wearing_her_settee_is_lowered_as_she_bears_up_and_hoisted_past_the_wind(
+    knots, crossed_s, hoisted_s
+):
+    """Truth 7-199 on her file (package 75, B4, on B3.3; Bil-D §14; Ext §10.3 item 2; D46 (d) rule
+    4 as reworded), drafted on the fixture by B3.3 (the test above), measured again on her file in
+    `tests/test_bilander.py` and moved here at Phase 5 (2026-11-14), its helpers where they live;
+    holding on the merged tree at her nine: in wearing her settee
+    is lowered as she bears up and hoisted again on the new lee once her stern is past the wind.
+    Steel's order for a ship's mizen (1794 vol. II pp. 321-322: hauled up as she bears up, hauled
+    out "as soon as the stern has passed the wind"), carried over by judgement to the dip D1 (a)
+    gives the settee; the truth pins the order of events, not a clewing up.
+
+    Her file at seed 7 from her settle, 15 and 20 kn, measured at her `clr_x_m` +2.0 (her review,
+    2026-11-08): lowered at "up helm" + 1 tick ("Up helm; lower the mainsail; brace in the after
+    yards"); the wind across her stern to the larboard quarter at 58 s and 48 s (57 and 48 at her
+    step 5's +2.25; the fixture's 66 and 55); hoisted at 153 s and 168 s (the fixture's 152 and
+    168), the wind then 120.5 and 121.7 degrees on her larboard side (121.4 and 120.4 at +2.25)
+    ("Hoisted the mainsail on the starboard side, to leeward of the mast; the wind is past the
+    stern."); "Wore" at 472 s and 517 s (472 and 516 at +2.25; the fixture's 478 and 520), the
+    report's tick recorded and not pinned, only its order after the hoist (her review); at +600 s
+    on the larboard tack 67.5 and 67.4 degrees off. Judged by her heading and tack at a set time
+    (D13 (a))."""
+    from tests.test_bilander import SETTEE, _after, _first_tick, _her_settle, _rel_deg
+
+    world = _her_settle(knots)
+    settee = world.ship.sails[SETTEE]
+    start = world.clock.tick
+    world.submit("wear ship")
+    lowered, crossed, hoist = [], None, None
+    for i in range(1, 601):
+        world.tick()
+        rel = _rel_deg(world)
+        if settee.yard_lowered:
+            lowered.append(i)
+        if crossed is None and rel < 0 and abs(rel) > 90:
+            crossed = i
+        if hoist is None and lowered and not settee.yard_lowered:
+            hoist = (i, rel)
+        if i == 600:
+            at_600 = (world.ship.dyn.tack, abs(rel))
+    up = next(e.text for e in _after(world, start) if "Up helm" in e.text)
+    assert "Up helm; lower the mainsail; brace in the after yards" in up, up
+    assert lowered and lowered[0] <= 5
+    assert abs(crossed - crossed_s) <= 10 and abs(hoist[0] - hoisted_s) <= 10
+    assert hoist[0] > crossed and hoist[1] < 0.0  # the wind on the new side of the stern
+    texts = [e.text for e in _after(world, start)]
+    assert (
+        "Hoisted the mainsail on the starboard side, to leeward of the mast; the wind is past the "
+        "stern." in texts
+    )
+    wore = _first_tick(world, start, "Wore")
+    assert wore is not None and wore > hoist[0]  # the order alone (D13 (a))
+    assert settee.is_set and settee.lug_side == "starboard"
+    assert at_600[0] == "larboard" and abs(at_600[1] - 67.5) <= 5.0
+
+
+def test_truth_7_230_the_driver_is_the_spanker_to_the_physics_and_shifts_in_about_15_minutes(
+    tmp_path,
+):
+    """Truth 7-230 (package 75, B3 at B3.5; the first of the spare block 7-230 to 7-239 the lead
+    gave the package on 2026-10-28, its 7-231 beside the far fight's truths), drafted in
+    `tests/test_driver.py` and moved here at Phase 5 (2026-11-14), its helpers where they live;
+    holding on the merged tree (Build-Ships.md §15; Ext §17.7, §17.11; the lead's allotment of
+    2026-10-29): *the driver, filed as the frigate's spanker, is the spanker to the physics, and the
+    shift of the mizen for the driver takes about fifteen minutes*: about thirteen until its boom
+    went with it (Ext §17.11, the lead's approval of 2026-10-30). Steel's driver boomsail is bent
+    "instead of the mizen, ... exactly the same, only the foot of the sail is extended on the boom"
+    (Steel 1794 vol. I, OCR l. 24536-24538), in light fair winds (l. 13819-13821); *Venus* split
+    her spanker, unbent it and bent the mizen (Jackson, *Logs* vol. 1, OCR l. 11064-11076).
+
+    1. **Row 3'** (Ext §17.5): the spanker re-filed in memory as a lateen cut at the mast, on a
+       lateen yard in the gaff's place and on her boom, has her balanced speed and her sails'
+       yaw moment at 50, 60, 90, 120 and 150 degrees in fifteen knots equal to the spanker's as
+       filed within 0.01 kn and 1 kN m (measured equal to the last figure: 2.21, 4.29, 8.19,
+       7.86, 6.53 kn; -45, -15, 102, 89, -31 kN m).
+    2. **The shift at her company**: the fixture (`frigate_with_driver()`, the frigate's company
+       with the 64's driver and course) under plain sail in ten knots 120 degrees off, at seed
+       7. "Shift the mizen for the driver": the course, drawing, is taken in, unbent, sent down
+       while the driver is swayed up, the boom rigged out, the driver bent and set, in that
+       order; each phase between its file's time and a quarter more (measured 102, 206, 171,
+       137, 274 and 137 s against 90, 180, 150, 120, 240 and 120: her hands and the weather's
+       factor, 1.13-1.14); the whole between fifteen and nineteen minutes (measured 1,027 s,
+       seventeen minutes and seven seconds; 900 s at the file's times). **Old beside new** (Ext
+       §17.11, the boom's phase of 120 s by the hands' factor, and nothing else): five phases to
+       six; the band of the whole, thirteen to sixteen minutes to fifteen to nineteen; measured
+       890 s to 1,027 s; 780 s to 900 s at the file's times. The course's canvas goes down to
+       the sail room and the count of spares stands. "Trim sails" trims the driver free to the
+       wind (measured 59.6 degrees, 83 degrees of apparent wind; 60.8 and 84 before the boom's
+       phase, her way a little changed by the 137 s) and it draws ahead as her after sail. (The
+       shift sets it where its own sheet lies, flat aft at the gaff's floor, as it sets the
+       frigate's storm mizzen at its own: `ShiftScript`, "its sheet and yard stand as the old
+       sail's did". Measured, not pinned.)
+
+    **The clauses on the 64 herself** (Ext §17.7; Build-Ships.md §2.6) are B1's, in
+    `tests/test_indefatigable.py`, on `sixty-four.yaml` since her stage B: her shift at her own
+    company; her polar with the driver bent and set above the course's from 90 to 150 degrees in
+    ten knots (on this fixture, the 64's driver and course on the frigate's hull, it holds: 5.75,
+    5.57 and 4.47 kn against 5.60, 5.38 and 4.39, the driver bringing 59, 38 and 10 kN m more
+    weather helm; measured, not pinned here); and the driver hauled aft at helm's a-lee and
+    brailed up hove to on her file. Her band moves with her regeneration, when her file carries
+    the key. Seed 7, the owner's machine."""
+    from freesail.evolutions import scripts
+    from freesail.evolutions import trim as yard_trim
+    from freesail.ship.parts import SailState
+    from freesail.world.ships import _rigged_for_plain_sail
+    from tests.test_driver import (
+        BOOM,
+        CEILING_DEG,
+        COURSE,
+        COURSE_CANVAS_NO,
+        DRIVER,
+        FRIGATE,
+        GAFF_FLOOR_DEG,
+        SHIFT_OUT_S,
+        _after,
+        _deg,
+        _fair_wind_world,
+        _in_the_room,
+        _row,
+        _shifted_under_way,
+        _spanker_refiled,
+    )
+
+    filed = _row(_rigged_for_plain_sail(str(FRIGATE)))
+    model = _row(_spanker_refiled())
+    for (kn1, yaw1), (kn3, yaw3) in zip(filed, model, strict=True):
+        assert abs(kn3 - kn1) <= 0.01 and abs(yaw3 - yaw1) <= 1.0
+
+    world = _fair_wind_world(tmp_path)
+    ship = world.ship
+    course, driver = ship.sails[COURSE], ship.sails[DRIVER]
+    assert course.is_set and driver.state is SailState.UNBENT
+    spares = scripts.spare_sails(ship)
+    start = world.clock.tick
+    took, began = _shifted_under_way(world, SHIFT_OUT_S)
+    for phase, seconds in SHIFT_OUT_S.items():
+        assert seconds <= took[phase] <= 1.25 * seconds, took
+    whole = sum(took.values())
+    assert 15 * 60 <= whole <= 19 * 60, whole
+    shifted = [e for e in _after(world, start) if e.kind == "sail.shifted"]
+    assert len(shifted) == 1 and shifted[0].tick == began + whole
+    assert course.state is SailState.UNBENT and ship.spars[BOOM].rigged_out is True
+    assert _in_the_room(ship) == [(COURSE, COURSE_CANVAS_NO)]
+    assert scripts.spare_sails(ship) == spares
+    assert world.submit("trim sails").kind == "sail.trimmed"
+    for _ in range(200):
+        world.tick()
+    assert scripts.after_gaff_sails(ship) == [driver]
+    assert driver.is_set and driver.thrust_kn > 0.0
+    want = yard_trim.wanted_sheet_angle(driver.curve_class, ship.dyn.apparent_wind_angle)
+    assert _deg(driver.sheet_angle) == pytest.approx(_deg(want), abs=5.0)
+    assert GAFF_FLOOR_DEG < _deg(driver.sheet_angle) < CEILING_DEG
+
+
+@pytest.mark.parametrize("bent", [True, False], ids=["driver", "course"])
+def test_truth_7_230_the_64s_clauses_her_after_sail_at_helms_a_lee_and_hove_to(tmp_path, bent):
+    """Truth 7-230's clause left for B1 (Ext §17.7), drafted in `tests/test_indefatigable.py` and
+    moved here at Phase 5 (2026-11-14), its helpers where they live; holding on the merged tree.
+    On `sixty-four.yaml`: the driver, bent and
+    set, is her after sail on the paths by `drives_aft`: hauled flat aft at helm's a-lee, its words
+    naming it and the bowline, and brailed up hove to; the course likewise, the driver then
+    untouched in the sail room. Seed 7, fifteen knots, six points off."""
+    from freesail.ship.parts import SailState
+    from tests.test_indefatigable import _after, _until, _world
+
+    world = _world(tmp_path, bent)
+    after = world.ship.sails["mizzen.driver" if bent else "mizzen.course"]
+    assert after.is_set
+    name = "driver" if bent else "mizzen course"
+    start = world.clock.tick
+    world.submit("tack ship")
+    _until(world, "Helm's a-lee", 500)
+    line = next(e.text for e in _after(world, start) if "Helm's a-lee" in e.text)
+    assert f"haul aft the {name} sheet and brace the bowline to leeward" in line, line
+    assert after.is_set and math.degrees(abs(after.sheet_angle)) == pytest.approx(18.0, abs=0.01)
+    assert world.ship.spars["mizzen.yard"].brace_angle == 0.0
+    if not bent:
+        assert world.ship.sails["mizzen.driver"].state is SailState.UNBENT
+    _until(world, "Tacked", 900)
+    start = world.clock.tick
+    world.submit("heave to")
+    for _ in range(600):
+        world.tick()
+    texts = [e.text for e in _after(world, start)]
+    assert any(e.kind == "ship.hove_to" for e in _after(world, start)), texts
+    assert any(f"brailed up the {name}" in t for t in texts), texts
+    assert after.state is SailState.IN_THE_GEAR
+    if not bent:
+        assert world.ship.sails["mizzen.driver"].state is SailState.UNBENT
+
+
+def test_truth_7_230_the_64s_clauses_her_shift_and_her_polar_with_the_driver():
+    """Truth 7-230's clauses left for B1 (Ext §17.7; Steel 1794 vol. I, OCR l. 13819-13821 and
+    24536-24538; *Venus*'s shift), drafted in `tests/test_indefatigable.py` and moved here at
+    Phase 5 (2026-11-14), its helpers where they live; holding on the merged tree. On
+    `sixty-four.yaml`.
+
+    1. **The shift at her company**, under plain sail in ten knots 120 degrees off, seed 7: the
+       course, drawing, taken in, unbent, sent down while the driver is swayed up, the boom rigged
+       out (Ext §17.11), the driver bent and set, in that order; each phase between its file's time
+       and a quarter more (measured 102, 205, 171, 137, 273 and 137 s against 90, 180, 150, 120, 240
+       and 120; the boom's rigged out by the state of the spar), the whole between fifteen and
+       nineteen minutes (1,025 s; old beside new, five phases of 888 s and the band thirteen to
+       sixteen). Trimmed, it draws ahead (5.07 kn against 4.93 under the course). Shifted back the
+       boom comes in after the unbend, 102, 205, 137, 171, 273 and 137 s, 1,025 s.
+    2. **Her polar with the driver**, bent and set in the course's place, above the course's from
+       90 to 150 degrees in ten knots, Steel's "light fair winds" (by `_balanced_speed_ms`, kn, the
+       course then the driver: 90 deg 5.32, 5.46; 120 deg 5.04, 5.18; 150 deg 4.26, 4.32; and in
+       six knots 3.23, 3.32; 3.05, 3.14; 2.56, 2.60). It holds, and is pinned.
+
+    **Measured and not pinned: her tack with the driver bent** (Ext §17.7 as built; Steel's "light
+    fair winds", Ext §17.1). "Tacked" from six points off in 15 kn 479 s against 251 s with the
+    course, in 10 kn 494 against 279; from 75 deg in 8 kn 506 against 344; she comes through the
+    wind in the same time, and the driver's 38-77 kN m of weather helm from 60 to 120 deg in 10 kn
+    keeps her from falling off on the new tack. It is the sail of a fair wind, as Steel has it, and
+    the sail to shift before working to windward: docs/dev/TuningNotes.md, the table."""
+    from freesail.ship.loader import ship_from_dict
+    from freesail.ship.parts import SailState
+    from freesail.world.ships import _balanced_speed_ms
+    from tests.test_indefatigable import (
+        RIG_BOOM_S,
+        SHIFT_S,
+        SIXTY_FOUR,
+        _after,
+        _in_the_room,
+        doc_of,
+        her_doc_with_the_driver_bent,
+    )
+
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=240.0,
+        ship_speed_kn=4.0,
+    )
+    world = make_world(7, SIXTY_FOUR, scenario)
+    world.submit("set plain sail")
+    for i in range(1200):
+        if i >= 400 and i % 120 == 40:
+            world.submit("trim sails")
+        world.tick()
+    ship = world.ship
+    course, driver = ship.sails["mizzen.course"], ship.sails["mizzen.driver"]
+    boom = ship.spars["mizzen.boom"]
+    assert course.is_set and driver.state is SailState.UNBENT and boom.rigged_out is False
+    start = world.clock.tick
+    assert world.submit("shift the mizen for the driver").kind == "order.accepted"
+    ends = {}
+    for _ in range(1500):
+        world.tick()
+        now = world.clock.tick
+        room = [kind for kind, _no in _in_the_room(ship)]
+        seen = (
+            ("take_in", course.state is SailState.IN_THE_GEAR),
+            ("unbend", course.state is SailState.UNBENT),
+            ("send_up", "mizzen.driver" not in room),
+            ("rig_out_boom", boom.rigged_out),
+            ("bend", driver.state is not SailState.UNBENT),
+            ("set", driver.is_set),
+        )
+        for phase, done in seen:
+            if done and phase not in ends:
+                ends[phase] = now
+        if driver.is_set:
+            break
+    began = next(
+        e.tick for e in _after(world, start) if e.kind == "evolution.started" and "shift" in e.text
+    )
+    times = dict(SHIFT_S, rig_out_boom=RIG_BOOM_S)
+    in_order = ["take_in", "unbend", "send_up", "rig_out_boom", "bend", "set"]
+    assert list(ends) == in_order, ends
+    marks = [began, *(ends[phase] for phase in in_order)]
+    took = {phase: marks[i + 1] - marks[i] for i, phase in enumerate(in_order)}
+    for phase in in_order:
+        assert times[phase] <= took[phase] <= 1.25 * times[phase], took
+    assert 15 * 60 <= ends["set"] - began <= 19 * 60
+    assert course.state is SailState.UNBENT
+    assert boom.rigged_out is True
+
+    # and back, the boom's other phase, her way on as she draws under the driver
+    start = world.clock.tick
+    assert world.submit("shift the driver for the mizen").kind == "order.accepted"
+    ends = {}
+    for _ in range(1500):
+        world.tick()
+        now = world.clock.tick
+        room = [kind for kind, _no in _in_the_room(ship)]
+        seen = (
+            ("take_in", driver.state is SailState.IN_THE_GEAR),
+            ("unbend", driver.state is SailState.UNBENT),
+            ("rig_in_boom", not boom.rigged_out),
+            ("send_up", "mizzen.driver" in room),
+            ("bend", course.state is not SailState.UNBENT),
+            ("set", course.is_set),
+        )
+        for phase, done in seen:
+            if done and phase not in ends:
+                ends[phase] = now
+        if course.is_set:
+            break
+    began = next(
+        e.tick for e in _after(world, start) if e.kind == "evolution.started" and "shift" in e.text
+    )
+    times = dict(SHIFT_S, rig_in_boom=RIG_BOOM_S)
+    in_order = ["take_in", "unbend", "rig_in_boom", "send_up", "bend", "set"]
+    assert list(ends) == in_order, ends
+    marks = [began, *(ends[phase] for phase in in_order)]
+    took = {phase: marks[i + 1] - marks[i] for i, phase in enumerate(in_order)}
+    for phase in in_order:
+        assert times[phase] <= took[phase] <= 1.25 * times[phase], took
+    assert 15 * 60 <= ends["set"] - began <= 19 * 60
+    assert driver.state is SailState.UNBENT and boom.rigged_out is False
+
+    def rigged(doc, driver_set):
+        ship = ship_from_dict(doc, "sixty-four.yaml")
+        for sid in ship.groups["plain sail"]:
+            if sid != "mizzen.course" or not driver_set:
+                ship.sails[sid].state = SailState.SET
+        if driver_set:
+            ship.sails["mizzen.driver"].state = SailState.SET
+        return ship
+
+    with_course = rigged(doc_of(SIXTY_FOUR), False)
+    with_driver = rigged(her_doc_with_the_driver_bent(), True)
+    for angle in (90, 100, 110, 120, 130, 140, 150):
+        kn_c = units.ms_to_knots(_balanced_speed_ms(with_course, angle, 10.0))
+        kn_d = units.ms_to_knots(_balanced_speed_ms(with_driver, angle, 10.0))
+        assert kn_d > kn_c, (angle, kn_c, kn_d)
 
 
 @pytest.mark.slow
@@ -12752,9 +14467,16 @@ def test_truth_7_312_a_cable_either_side_of_1_w_the_tide_is_within_a_tenth_of_a_
     # east's since package 94's item 4, a seam between two blocks: truth 7-313; with
     # Portsmouth's gauge serving both by the rule of the seams, step 5, its step at
     # 50.9 N is 2.09 ft, 3.0 before the rule, and it stays out)
-    for lat in (49.1, 49.5, 50.0, 50.3, 50.6):
+    for lat in (49.5, 50.0, 50.3, 50.6):
         cable = 0.1 / 60.0 / math.cos(math.radians(lat))
         pairs.append((Position(lat, -1.0 + cable), Position(lat, -1.0 - cable)))
+    # package 112 (M1, the lead's ruling of 2026-11-14): at 49.1 N the water west of 1 W is
+    # Normandy's land (by Saint-Lo), so the edge there is no open edge and the block's water
+    # is its own to the bound: the taper whole (old: 0.0003, the taper across the land, the
+    # fault M1 mends; new: 1.0), and no step across land is pinned
+    cable = 0.1 / 60.0 / math.cos(math.radians(49.1))
+    normandy = Position(49.1, -1.0 + cable)
+    assert tide.blocks_at(normandy) and tide.taper_at(normandy) == 1.0
     for lon in (-4.7, -4.9):
         pairs.append((Position(48.0 - 0.1 / 60.0, lon), Position(48.0 + 0.1 / 60.0, lon)))
     for inside, outside in pairs:
@@ -14890,6 +16612,35 @@ def test_truth_7_369_the_cut_out_is_carried_from_hailing_distance_to_its_end_by_
     test_a_packet_that_fights_is_brought_to_by_the_privateers_rounds_and_taken()
 
 
+@pytest.mark.slow
+def test_truth_7_231_a_far_ship_of_war_that_engages_from_her_passage_keeps_the_sea_and_closes():
+    """Package 75's (the lead's ruling (2) of 2026-11-13; its number the next of the spare block
+    7-230 to 7-239 the lead gave the package on 2026-10-28, set here beside the far fight's
+    truths it stands with): a far ship of war that goes engaging from her passage takes the mark
+    the stimulus read, as the near captain's `_mark` takes it, keeps the sea and closes her
+    enemy, the far rounds fought to the strike and the possession (at seed 7 two 74s a mile
+    apart, both engaging at tick 120, the Hero struck at 1200 after seven rounds, possessed at
+    1260); the action done, she takes up the passage she held when she went engaging (the
+    review's mends of the lead's notes of 12 and 13 November: the Foudroyant on passage at 1320
+    with her plan of tick 120, closing its first mark every minute of the half hour after, her
+    prize in company, the set's pace counting its prize since the lead's readings of cda12ec9,
+    (F3)); and engaging she keeps a mark in hand as chasing does: the nearest enemy within the
+    breaking-off distance when the mark is lost from sight, the mark kept while she is on the
+    sea, and with none she lies to, never a chase of nobody; the mark hidden or gone, the action
+    ends by `enemy out of range` at tick 840 and her passage is taken up. Checked at Phase 5
+    (2026-11-14): in its form beside the far fight's truths, which call their tests where they
+    live (`tests/test_far_action.py`), and passing on the merged tree; measured on the owner's
+    machine."""
+    from tests.test_far_action import (
+        test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy,
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody,
+    )
+
+    test_a_far_ship_of_war_engaging_from_her_passage_keeps_the_sea_and_closes_her_enemy()
+    for case in ("another-in-sight", "none-in-sight", "none-on-the-sea"):
+        test_engaging_she_keeps_a_mark_in_hand_as_chasing_does_and_never_chases_nobody(case)
+
+
 def test_truth_7_362_the_prize_money_is_paid_at_the_port_by_the_eighths_and_shared_in_sight():
     """The design's §5.2 and §5.3 (step 5; the brief's §20 second truth): the French brig taken
     in Falmouth's road is condemned by the court (France at war with Britain at the taking),
@@ -16072,6 +17823,74 @@ def test_truth_7_519_the_frigate_sails_from_port_mahon_to_the_fort_genois_by_her
     assert any("Seven Capes" in t for t in seen) and any("Cape de Fer" in t for t in seen)
 
 
+# Package 60: a ship bought, and the player's ship changed in play (truths 7-480 onward;
+# `docs/design/Design-ShipBought.md`, its gate §13). Step 1: the change of ship and the
+# followed ship's far body; the tests beside them are tests/test_ship_changed.py.
+
+
+def test_truth_7_480_the_player_takes_command_of_a_ship_given_him_and_aboard_her():
+    """A ship given the player's person by the director's word in play (the `command:` form,
+    she lying at Falmouth) is taken up by his own order aboard her: his person, his command
+    and his journal go with him, the player's ship is she, and both logs say so."""
+    from freesail.world import command, knowledge
+    from tests.test_ship_changed import fly_taken_up
+
+    w, fly, me, e = fly_taken_up()
+    hull = w.hulls[str(fly.id)]
+    assert w.players is hull and w.first_hull is not hull
+    assert knowledge.players_person(w) is me and hull.people.captain is me
+    assert me.home == str(fly.id) and knowledge.players_visitor(w) is None
+    assert sum(1 for x in hull.log if x.kind == command.TAKEN_UP) == 1
+    assert sum(1 for x in w.first_hull.log if x.kind == command.TAKEN_UP) == 1
+
+
+def test_truth_7_481_the_followed_ships_far_body_stands_at_her_truth():
+    """The ship the player is aboard and the drivers follow (`--ship`, and his ship after a
+    change of ship) is where the other sail see her: her far body within fifty metres of her
+    truth every five minutes for twenty (it was 934 m off after five and 3,803 m after twenty
+    before package 60's step 1)."""
+    from tests.test_ship_changed import followed_body_off_m
+
+    off = followed_body_off_m(20)
+    assert len(off) == 4 and max(off) < 50.0, off
+
+
+@pytest.mark.slow
+def test_truth_7_482_a_save_with_a_change_of_ship_replays_across_the_two_ships(tmp_path):
+    """A save written after the change, with his orders after it, replays to the same log of
+    each ship, its first block the game's first hull's (the frigate's file), the player's ship
+    the Fly again and his person hers; a checkpoint taken after the change carries on to the
+    same logs; a save with no change carries no `player_ship`."""
+    from tests import test_ship_changed as T
+
+    T.test_the_save_replays_across_the_two_ships_its_first_block_the_first_hulls(tmp_path)
+    T.test_a_save_with_no_change_carries_no_player_ship_and_the_split_reads_as_before()
+
+
+def test_truth_7_483_the_old_ship_is_settled_and_never_lost_from_the_world():
+    """The old ship is left to her senior officer (a King's ship) and kept in the world half
+    an hour on, her hull among the hulls, her company whole and her far body planned; laid up
+    at Falmouth by the order's tail she is in ordinary at the anchorage."""
+    from tests import test_ship_changed as T
+
+    T.test_the_old_ship_is_kept_in_the_world_with_her_company()
+    T.test_the_old_ship_laid_up_at_falmouth()
+
+
+def test_truth_7_484_the_people_and_the_hands_move_by_one_order_in_the_boats_loads():
+    """Package 60, step 2 (the design's §6; the lead's reading of ab0ade58): the people and the
+    hands move by one order within a boat's pull, by the dealings' road to another hull, twelve
+    a load at the boat's own pace, every man told off out of the giving muster at the order and
+    each load into the receiver's watches as they stand, each person rehomed before he is put
+    aboard; refused in words saying how many she wants where either could not be worked, or
+    where the receiver would not berth them."""
+    from tests import test_company_moved as T
+
+    T.test_fifteen_hands_go_across_in_two_loads_by_the_boats_road()
+    T.test_a_person_by_name_is_rehomed_to_the_ship_he_goes_to()
+    T.test_the_refusals_in_words()
+
+
 @pytest.mark.parametrize("root", ["britain", "france", "spain", "naples", "united-states", "basic"])
 def test_truth_7_501_every_flag_a_hoist_can_hold_has_a_drawing_marked_plate_or_made(root):
     """Package 102, step 2: every flag a hoist of the root's books can hold, and every flag
@@ -16098,6 +17917,9 @@ PACKAGE_105_PORTS = frozenset(
         "scilla",
     }
 )
+# package 106b: Morocco's five ports with dated rows (Rabat has none), whose rows are their
+# truths' (7-557), held out of 7-530 as 105's are
+PACKAGE_106B_DATED_PORTS = frozenset({"larache", "mazagan", "safi", "mogador", "agadir"})
 
 
 def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_rows():
@@ -16114,10 +17936,14 @@ def test_truth_7_530_every_older_port_answers_on_its_day_as_before_the_dated_row
     assert len(files) >= 90
     days = (None, datetime(1700, 1, 1), datetime(1805, 6, 20, 12, 0), datetime(1900, 1, 1))
     for pid, path in files.items():
-        if pid in PACKAGE_105_PORTS:  # 105's own, whose rows are their truths' (7-531 on)
-            continue
         loads = [load_port(path, chart, None, when) for when in days]
-        assert loads[0].dated == (), pid
+        # a port with dated rows is held out only if a package names it with the truth that
+        # pins its rows (105's, 7-531 on; 106b's, 7-557), so that a new dated port fails here
+        # until its truth is named, and a named port without rows is checked as every other.
+        # Old: 105's set alone, its ports held out whether they had rows or not
+        if loads[0].dated:
+            assert pid in PACKAGE_105_PORTS | PACKAGE_106B_DATED_PORTS, pid
+            continue
         for key in DATED_KEYS:
             assert all(getattr(p, key) == getattr(loads[0], key) for p in loads[1:]), (pid, key)
 
@@ -16339,11 +18165,15 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
         "d-split:balearics",
         "d-split:ligurian-sea",  # package 111's step 2a: its east bound to 11.1466 E
         "d-split:salvages",
+        # package 106b: the box `morocco` last in the file, taking no water another box answers:
+        # the two regions west of 9 W split with Madeira's and the Canaries' boxes, by design
+        "d-split:morocco-sallee",
+        "d-split:morocco-mogador",
     }
+    # package 106b: "d-no-box:strait" no longer found, its water the box `morocco`'s (old: listed)
     assert {k for k in keys if k.startswith("d-no-box:")} == {
         "d-no-box:balearics",
         "d-no-box:biscay-south",
-        "d-no-box:strait",
         "d-no-box:ligurian-sea",  # package 111's step 2a: the strip 42.5 to 42.68 N east of 11 E
     }
 
@@ -16351,7 +18181,7 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
 @pytest.mark.slow
 def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
-    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    findings `tools/audit_chart_known.yaml` owns, each within its count's ceiling."""
     A = _audit_tool()
     audit = A.run(A.FULL_STEP_DEG)
     known = A.load_known()
@@ -16385,10 +18215,14 @@ def test_truth_7_502_a_hoist_flying_is_served_at_its_place_and_gone_when_it_come
 def test_truth_7_542_the_watch_too_few_for_the_boat_calls_all_hands_and_she_is_belayed_alongside():
     """Package 109, step 2 (the owner's note 1): the bilander at anchor in Brixham road in
     the morning watch, her larboard watch of two on deck: 'go ashore' calls all hands for
-    the boat ("All hands! (to send boat)"), she is manned, the hands are piped down and she
+    the boat ("All hands! (to send the boat)"), she is manned, the hands are piped down and she
     is away within ten minutes, where on the trunk she waited until the watch changed at
     06:00; and a person in the boat that has not left the ship's side belays her, and is
-    on deck again."""
+    on deck again. The call's words, old beside new: "All hands! (to send boat)" to "All hands!
+    (to send the boat)" (package 75, the lead's last list of 2026-11-14, 9: the line that names
+    the work the hands are wanted for named it by its evolution's id; one road now names the
+    work in both forms, the work's file's words, `Runner._describe`); its kinds, ticks and counts
+    as before."""
     w = _channel_east("data/ships/bilander.yaml")
     w.submit("let go the anchor")
     w.run(7800)
@@ -17047,7 +18881,10 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     from freesail.world.geo import Position
 
     chart = load_chart("atlantic-east")
-    assert chart.bounds[0] == pytest.approx(25.2, abs=0.001)
+    # package 112: the south limit is the ocean's to the Cape Verde Islands', 12.4 N (old:
+    # 25.2 N, this package's layer's); the layer's own south bound is as it was
+    assert chart.bounds[0] == pytest.approx(12.4, abs=0.001)
+    assert chart.spec["layers"][1] == "atlantic-south"
     holes = []
     for i in range(int((31.9 - 25.3) / 0.1) + 1):
         lat = 25.3 + 0.1 * i
@@ -17060,7 +18897,8 @@ def test_truth_7_520_the_ocean_answers_to_the_canaries_row_and_a_scenario_starts
     w = _can_at(31.0, -16.0, datetime(1805, 6, 20, 12, 0))
     assert w.chart.level_at(w.position) == 1 and w.chart.depth_at(w.position) > 3000.0
     with pytest.raises(ValueError, match="outside the chart"):
-        _can_at(25.1, -20.0, datetime(1805, 6, 20, 12, 0))
+        # package 112: a start south of the new limit (old: 25.1 N 20 W, now within them)
+        _can_at(12.3, -20.0, datetime(1805, 6, 20, 12, 0))
 
 
 def test_truth_7_521_the_corridors_tiles_answer_through_the_new_layer_exactly_as_before():
@@ -17298,6 +19136,318 @@ def test_truth_7_529_the_frigate_from_funchal_looks_into_santa_cruz_road_by_her_
     assert any("Fixed by cross bearings" in e.text for e in w.log if e.kind == "reckoning.fix")
 
 
+# ---------------------------------------------------------------------------
+# Package 106b: Morocco's Atlantic coast, Cape Spartel to Cape Juby, as four regions (truths
+# 7-550 to 7-559). States, counts and bands; no digest.
+# ---------------------------------------------------------------------------
+
+MOROCCO_REGIONS = ["morocco-larache", "morocco-sallee", "morocco-mogador", "morocco-noun"]
+MOROCCO_PORTS = ["larache", "rabat", "mazagan", "safi", "mogador", "agadir"]
+
+
+def _mor_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart off Morocco's coast at seed 7, the six ports loaded, the
+    summer's wind along the coast from the north-north-east (Purdy 1825, p. 152)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 20.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 14.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", MOROCCO_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_550_the_four_regions_abut_each_other_and_their_neighbours_with_no_gap():
+    """The brief's item 6, the seams: the four regions' bounds meet each other's exactly
+    (34.16 N, 31.6 N, 29.46666 N), the northernmost the Strait's 35.5 N and the southernmost
+    the Canaries' east bound; no probe of their water lies in two regions' bounds, every one
+    answers a region's depth at level 2 or 3, and the tiles the Strait and the Canaries list
+    are theirs and in none of the four's lists."""
+    import yaml
+
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    b = {r: chart.region_bounds[r] for r in [*MOROCCO_REGIONS, "strait", "canaries"]}
+    assert b["morocco-larache"][1] == b["strait"][0] == 35.5
+    assert b["morocco-larache"][0] == b["morocco-sallee"][1] == 34.16
+    assert b["morocco-sallee"][0] == b["morocco-mogador"][1] == 31.6
+    assert b["morocco-mogador"][0] == b["morocco-noun"][1] == 29.46666
+    assert b["morocco-noun"][2] == b["canaries"][3] == -13.17334
+    holes, doubles = [], []
+    for r in MOROCCO_REGIONS:
+        s, n, w, e = b[r]
+        for i in range(1, 20):
+            for j in range(1, 20):
+                p = Position(s + (n - s) * i / 20, w + (e - w) * j / 20)
+                depth = chart.depth_at(p)
+                if depth is None or depth <= 0.0:
+                    continue
+                if chart.level_at(p) < 2:
+                    holes.append((r, p))
+                held = [
+                    x
+                    for x, (s2, n2, w2, e2) in chart.region_bounds.items()
+                    if s2 < p.lat_deg < n2 and w2 < p.lon_deg < e2
+                ]
+                if len(held) != 1:
+                    doubles.append((r, p, held))
+    assert not holes and not doubles
+    manifest = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data/charts/manifest.yaml").read_text("utf-8")
+    )
+    mine = {t["name"] for r in MOROCCO_REGIONS for t in manifest["regions"][r]["tiles"]["2"]}
+    for neighbour in ("strait", "canaries"):
+        theirs = {t["name"] for t in manifest["regions"][neighbour]["tiles"]["2"]}
+        assert not mine & theirs
+
+
+def test_truth_7_551_tangier_to_mogador_and_mogador_to_lanzarote_on_charted_water():
+    """The brief's item 6: a ship's way from Tangier road round Cape Spartel, down the coast
+    by the offing of Sallee and the mark west of Cape Cantin to Mogador road, and from Mogador
+    by the open sea to the Puerto de Naos of Lanzarote, answers a depth of water every 200th
+    of each leg, on the regions' tiles or the coarse layer, and never less than eight metres."""
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    ways = {
+        "tangier to mogador": [
+            (35.80, -5.79),
+            (35.86, -5.95),
+            (35.25, -6.40),
+            (33.9, -7.9),
+            (32.6, -9.6),
+            (31.515, -9.80),
+        ],
+        "mogador to lanzarote": [
+            (31.515, -9.80),
+            (31.3, -10.1),
+            (28.8, -13.75),
+            (28.93, -13.52),
+            (28.9636, -13.5352),
+        ],
+    }
+    for name, pts in ways.items():
+        least, levels = float("inf"), set()
+        for (a1, o1), (a2, o2) in zip(pts, pts[1:], strict=False):
+            for i in range(201):
+                t = i / 200
+                p = Position(a1 + (a2 - a1) * t, o1 + (o2 - o1) * t)
+                depth = chart.depth_at(p)
+                assert depth is not None, (name, p)
+                least = min(least, depth)
+                levels.add(chart.level_at(p))
+        # measured: 24.6 m (off Tangier) and 8.0 m (in the Puerto de Naos)
+        assert least >= 7.5, name
+        assert 2 in levels
+    assert 1 in {chart.level_at(Position(30.0, -11.5))}  # the open sea the coarse layer's
+
+
+def test_truth_7_552_the_bar_of_el_araiche_refuses_a_frigate_at_low_water():
+    """The brief's item 6: the bar of El Araiche's river admits vessels of a hundred tons at
+    high water (Purdy 1825, p. 152). On the world's own tide at springs (June 1805, Huelva's
+    and Cadiz's water) a frigate drawing eighteen feet has too little over the bar at low
+    water and a vessel of a hundred tons (eight feet, JUDGEMENT) crosses at high water; the
+    river within is the grid's land (the block's finding)."""
+    from freesail.world import tide as T
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    chart = load_chart("atlantic-east")
+    tide = T.load_tide()
+    bar = chart.feature("larache-bar").position
+    depth = chart.depth_at(bar)
+    assert 1.5 < depth < 3.5
+    heights = [
+        tide.height_at(bar, datetime(1805, 6, 12) + timedelta(minutes=10 * i))
+        for i in range(6 * 25)
+    ]
+    frigate, hundred_tons = 18 * 0.3048, 8 * 0.3048
+    assert depth + min(heights) < frigate
+    assert depth + max(heights) > hundred_tons + 1.0
+    assert chart.depth_at(Position(35.195, -6.140)) < 0.0  # within: the grid's land
+
+
+def test_truth_7_553_each_ports_road_is_as_its_pilot_has_it_and_its_holder_on_its_day():
+    """The brief's item 3: the six roads in the pilots' depths and bottoms (Purdy 1825 and
+    Jackson 1809): El Araiche's seven fathoms off the bar, Sallee's road foul with lost anchors,
+    Mazagan's clear sand two miles off, Saffi's summer road in sixteen fathoms of fine grey sand,
+    Mogador's a mile and a half west of the Long Battery, Agadeer's under the mountain; each the
+    Emperor's and neutral to a King's ship in June 1805 but El Araiche and Agadeer, closed to the
+    Europeans' trade since 1780 and 1773; Mazagan Portugal's on a day of 1768."""
+    w = _mor_at(33.5, -8.0, datetime(1805, 6, 15, 12, 0))
+    bands = {
+        "larache": (8.0, 18.0, "sand"),
+        "rabat": (18.0, 35.0, "anchors"),
+        "mazagan": (15.0, 30.0, "clear sand"),
+        "safi": (22.0, 35.0, "grey sand"),
+        "mogador": (25.0, 45.0, "sand"),
+        "agadir": (6.0, 14.0, "ledge"),
+    }
+    assert sorted(w.ports.ports) == sorted(MOROCCO_PORTS)
+    for pid, (lo, hi, bottom) in bands.items():
+        port = w.ports.ports[pid]
+        depth = w.chart.depth_at(port.anchorage.position)
+        assert lo < depth < hi, (pid, depth)
+        assert bottom in (w.chart.bottom_near(port.anchorage.position) or ""), pid
+        assert port.nation == "morocco"
+        want = "closed" if pid in ("larache", "agadir") else "neutral"
+        assert w.dealings.stance(port) == want, pid
+    old = _mor_at(33.5, -8.0, datetime(1768, 6, 15, 12, 0))
+    assert old.ports.ports["mazagan"].nation == "portugal"
+    assert old.ports.ports["larache"].closed_to == []
+    assert old.ports.ports["agadir"].closed_to == []
+
+
+def test_truth_7_554_the_coasts_tide_is_the_atlantics_and_the_master_has_its_two_places():
+    """The brief's item 5, by the rule for a block with no gauge (the chart session's ruling):
+    the northern two read Cadiz's and Huelva's water, an M2 of 1.03 m on Huelva's level 1.96 m;
+    the southern two Arrecife's and Puerto de Cabras's, 0.82 m on 1.57 m; the Strait's inner
+    gauges serve none of them. The master's Norie has Mogador at four o'clock and ten to twelve
+    feet (Purdy 1825, p. 155) and the coast to the north at the world's hour, judgement."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    for lat, lon in ((35.215, -6.165), (34.045, -6.86), (32.3039, -9.2746)):
+        level, k = tide.constants_at(Position(lat, lon))
+        assert level == pytest.approx(1.96, abs=0.01)
+        assert k["M2"][0] == pytest.approx(1.035, abs=0.005)
+    for lat, lon in ((31.515, -9.80), (30.402, -9.628), (28.9, -10.6)):
+        level, k = tide.constants_at(Position(lat, lon))
+        assert 1.55 < level < 1.60 and 0.81 < k["M2"][0] < 0.83
+    served = {b for g in tide.block_gauges for b in g.blocks[1:] if b.startswith("morocco")}
+    assert served == set(MOROCCO_REGIONS)
+    for g in tide.block_gauges:
+        if g.id in ("tarifa", "ceuta", "gibraltar", "algeciras"):
+            assert not [b for b in g.blocks if b.startswith("morocco")]
+    mogador = T.Epitome.load("norie").by_name("Mogador")
+    assert (mogador.hw_h, mogador.hw_m, mogador.spring_rise_ft) == (4, 0, 11.0)
+    coast = T.Epitome.load("norie").by_name("Coast of Marocco")
+    assert coast.rise_judgement and coast.spring_rise_ft == 9.0
+
+
+def test_truth_7_555_the_weather_box_takes_no_water_another_box_answers_and_the_set_is_south():
+    """The brief's item 4 and 5: the box `morocco`, last in the file, answers the coast's water
+    east of 9 W from Spartel to Safi, which lay in no box; the coast's water west of 9 W is
+    Madeira's and the Canaries' boxes' as before; Purdy's current sets S.W. by S. a knot along
+    the coast north of Cantin and southward a knot south of Mogador."""
+    from freesail.world import tide as T
+    from freesail.world.geo import Position
+    from freesail.world.weather import load_climatology
+
+    clim = load_climatology()
+    assert list(clim.boxes)[-1] == "morocco"
+    assert clim.box_at(34.05, -6.9).name == "morocco"
+    assert clim.box_at(32.3, -9.27).name == "madeira"
+    assert clim.box_at(30.4, -9.7).name == "madeira"
+    assert clim.box_at(28.9, -10.6).name == "canaries"
+    assert clim.box_at(38.7, -9.5).name == "portugal"
+    tide = T.load_tide()
+    north = tide.area_at(Position(33.5, -8.0))
+    south = tide.area_at(Position(30.0, -10.5))
+    assert north.id == "morocco-coast-north" and (north.current_toward_deg, north.current_kn) == (
+        214.0,
+        1.0,
+    )
+    assert south.id == "morocco-coast-south" and south.current_toward_deg == 180.0
+    book = T.load_directions()
+    assert book.area_at(Position(33.5, -8.0)).current_point == "SW by S"
+
+
+def test_truth_7_556_the_business_trades_cotton_south_and_almonds_and_fish_north():
+    """The brief's item 3 for regions the business can people: Rabat's cotton dear at Saffi and
+    Saffi's almonds dear at Rabat, in the region of Sallee; Agadeer's dried fish dear at Mogador
+    in Mogador's; no route refused, every port's tracks clear of the land."""
+    w = _mor_at(33.5, -8.0, datetime(1805, 6, 15, 12, 0), business="on")
+    assert w.business.region == "morocco-sallee"
+    routes = {(a.id, b.id, good) for _r, a, b, good in w.business.routes()}
+    assert ("rabat", "safi", "cotton") in routes and ("safi", "rabat", "almonds") in routes
+    assert w.business.refused == set()
+    s = _mor_at(31.0, -10.0, datetime(1805, 6, 15, 12, 0), business="on")
+    assert s.business.region == "morocco-mogador"
+    assert ("agadir", "mogador", "salt fish") in {
+        (a.id, b.id, good) for _r, a, b, good in s.business.routes()
+    }
+    assert all(
+        b.business._leaves_clear(p) and b.business._arrives_clear(p)
+        for b in (w, s)
+        for p in b.business.ports()
+    )
+
+
+def test_truth_7_557_the_ports_rows_seed_each_port_on_its_day():
+    """The brief's item 3 and decision 69: each port's dated rows read on a scenario's first
+    day, the port then the world's. Saffi's and Mazagan's corn shipped abroad under Sidi Mohammed
+    and cheap at home since Soliman forbade its export, the land lying fallow (Jackson 1809, l.
+    4524 to 4533); Mogador's market
+    from its founding in 1760; El Araiche open to the Europeans in 1775 and closed in 1805."""
+    from freesail.world import ports as PT
+
+    root = Path(__file__).resolve().parents[1] / "data" / "ports"
+    for pid in ("safi", "mazagan"):
+        before = PT.load_port(root / f"{pid}.yaml", when=datetime(1785, 6, 1))
+        after = PT.load_port(root / f"{pid}.yaml", when=datetime(1805, 6, 1))
+        assert before.market.goods["wheat"].price >= 1.5 * after.market.goods["wheat"].price
+    assert "almonds" in PT.load_port(root / "mogador.yaml", when=datetime(1805, 6, 1)).market.goods
+    assert not PT.load_port(root / "mogador.yaml", when=datetime(1750, 6, 1)).market.goods
+    larache = root / "larache.yaml"
+    assert PT.load_port(larache, when=datetime(1775, 6, 1)).closed_to == []
+    assert "britain" in PT.load_port(larache, when=datetime(1805, 6, 1)).closed_to
+
+
+def test_truth_7_558_the_tower_of_hassan_is_seen_and_the_ledges_take_a_frigate():
+    """The brief's item 2: the Tower of Hassan, a hundred and eighty feet (Purdy 1825, p. 153),
+    is a mark of the lookout's; a frigate drawing eighteen feet over the ledge off Cape Cantin
+    or off Mazagan's west point takes the ground at low water."""
+    from freesail.world.chart import load_chart
+
+    chart = load_chart("atlantic-east")
+    tower = chart.feature("tower-of-hassan")
+    assert tower.kind == "tower" and tower.height_m == 55.0
+    for fid in ("cantin-ledge", "mazagan-ledge"):
+        f = chart.feature(fid)
+        hit = chart.danger_under(f.position, 0.0, 40.0, 5.5, tide_m=0.5)
+        assert hit is not None, fid
+
+
+@pytest.mark.slow
+def test_truth_7_559_the_brig_from_gibraltar_heaves_to_off_mogador_by_her_short_book():
+    """The brief's item 6: the block's scenario (`morocco.yaml`, June 1805) sailed at seed 7 by
+    its short book: from off El Araiche down the coast by the offing of Sallee and the mark west
+    of Cape Cantin, with the land in sight, to heave to fifteen miles west of Mogador on the
+    second day, through the two northern regions and without touching ground."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "morocco.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 5
+    regions = set()
+    for _ in range(46):
+        w.run(3600)
+        regions.add(w.chart.region_at(w.position))
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    # measured at seed 7: hove to in 31 39 N, a mile north of Mogador's region
+    assert {"morocco-larache", "morocco-sallee"} <= regions
+    hove = [e for e in w.log if "By standing order 'off Mogador'" in e.text]
+    # measured at seed 7: hove to at 41.4 hours, 15 miles west of the town
+    assert hove and 36 * 3600 < hove[0].tick < 46 * 3600
+    _b, dist = bearing_and_distance(w.position, Position(31.513, -9.77))
+    assert 8.0 * units.NAUTICAL_MILE < dist < 25.0 * units.NAUTICAL_MILE
+    seen = {e.text for e in w.log if e.kind == "lookout.sighting"}
+    assert any("Cape Cantin" in t for t in seen)
+
+
 def test_truth_7_545_no_goal_square_has_a_mark_on_dry_ground_or_a_leg_across_the_land():
     """Package 109, step 5 (the lead's ruling: a mark on dry ground is a plain fault): every
     scenario's ship patrolling a goal's square (package 43's four marks about the station, as
@@ -17380,6 +19530,12 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     expected.setdefault(int(layer["level"]), {}).setdefault(t["name"], []).append(
                         path
                     )
+        if spec and manifest["world"].get("tiles"):
+            # package 112: the world's level 0, committed, after every layer, under a
+            # chart of the manifest's charts only
+            level0 = expected.setdefault(0, {})
+            for t in manifest["world"]["tiles"]:
+                level0.setdefault(t["name"], [root / "tiles" / "0" / f"{t['name']}.npz"])
         assert [lv.level for lv in chart.levels] == sorted(expected, reverse=True), name
         assert spec is not None or all(lv.level >= 2 for lv in chart.levels), name
         for lv in chart.levels:
@@ -17401,7 +19557,1065 @@ def test_truth_7_570_every_charts_every_tile_reads_as_the_manifest_lays_it():
                     np.isnan(got.min_depth_m) and np.isnan(want.min_depth_m)
                 ), (name, tname)
                 read += 1
-    assert read == 4593  # 21 charts' tiles, as the step's proof counted them
+    # 21 charts' tiles, as the step's proof counted them (step 1: 4,593; step 2 with the
+    # ocean to Cape Verde's 12 tiles at level 1 and the world's 63 at level 0: 4,668). Package
+    # 106b: Morocco's four regions add 117 level-2 and 30 level-3 tiles, each read under the
+    # whole chart and under its own region's. Old: 4,668 on the trunk; 4,887 on 106b's tree
+    # before step 2 (4,593 + 2 x 147); joined, 4,668 + 2 x 147
+    assert read == 4668 + 2 * 147
+
+
+def test_truth_7_571_no_open_edge_of_any_block_faces_land():
+    """Package 112 (the lead's ruling of 2026-11-14, M1): the seam's taper (package 94) is
+    toward the water beyond a block's open edge, and an edge is open only where the chart
+    answers water beyond it. A charted box beyond an edge is no proof of water: the
+    corridor's box over Spain's and France's land had opened Portugal's, Biscay's and
+    Brittany's landward edges, and a layer's box over the Pyrenees the Gulf of Lion's,
+    whose water read Saint-Malo's 6.6 m level. Every stretch of every open edge the tide
+    reads is read again here, every hundredth of a degree, a hundredth of a degree beyond
+    it on the side outside every block: the chart answers water there."""
+    import freesail.world.tide as T
+    from freesail.world.chart import load_chart
+    from freesail.world.geo import Position
+
+    tide = T.load_tide()
+    chart = load_chart("atlantic-east")
+    blocks = list(tide.block_bounds.values())
+
+    def outside(lat: float, lon: float) -> bool:
+        return not any(s <= lat <= n and w <= lon <= e for s, n, w, e in blocks)
+
+    assert tide.open_edges, "the blocks have open edges"
+    land = []
+    for axis, at, lo, hi in tide.open_edges:
+        steps = max(1, int(round((hi - lo) / 0.01)))
+        for i in range(steps):
+            x = lo + (i + 0.5) * (hi - lo) / steps
+            for off in (0.01, -0.01):
+                lat, lon = (at + off, x) if axis == "lat" else (x, at + off)
+                if outside(lat, lon):
+                    depth = chart.depth_at(Position(lat, lon))
+                    if depth is None or depth <= 0.0:
+                        land.append((axis, at, round(x, 3)))
+                    break
+    assert land == [], land[:10]
+
+
+def test_truth_7_572_a_manifest_without_the_open_edges_reads_the_boxes_as_before(tmp_path):
+    """Package 112, M1's other side: a manifest with no `open_edges:` (a tree built before
+    the step, or a manifest a test writes) reads the boxes as package 94 did, every edge a
+    charted box lies beyond being open; the same tree with the key reads the stretches the
+    tool wrote. At Concarneau's water, 7.6 miles inside Biscay north from 48 N across
+    Brittany's land, the tide is the old taper's without the key and the block's own with it
+    (package 94's tabled case)."""
+    import yaml
+
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    root = Path(__file__).resolve().parents[1] / "data" / "charts" / "manifest.yaml"
+    doc = yaml.safe_load(root.read_text(encoding="utf-8"))
+    assert doc["open_edges"]["stretches"]
+    del doc["open_edges"]
+    old = tmp_path / "manifest.yaml"
+    old.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    before = T.load_tide(manifest=old)
+    edges, _ = T.candidate_edges(old)
+    assert T.open_stretches(old) is None
+    # package 106b: Morocco's four regions. Old: 38 on the trunk. New: 38 + 11 = 49, thirteen edges
+    # added and two become seams: added, facing open sea, Larache's north edge west of 6.5 W and its
+    # west edge, Sallee's north edge west of 7.63 W and its west edge (31.6 to 31.9 and 32 to 34.16
+    # N, the coarse layers' seam between), Mogador's north edge west of 10.61 W and its west edge,
+    # and the Noun's north edge west of 11.04 W (the eight M1's stretches list beside the re-cut
+    # below); facing land (open by this old reading, not by the stretches), the Noun's south edge at
+    # 27.33 N, Larache's east edge at 5.92 W, Sallee's east edge at 6.35 W and the step at 34.16 N
+    # between them; and the Strait's south edge east of 5.92 W re-cut. Become seams: the Strait's
+    # south edge west of 5.92 W (Larache's now) and the Canaries' east edge (the Noun's)
+    assert sorted(before.open_edges) == sorted(edges) and len(edges) == 38 + 11
+    now = T.load_tide()
+    assert now.open_edges == [tuple(x) for x in T.open_stretches()]
+    concarneau = Position(47.875, -3.975)
+    old_level = before.constants_at(concarneau)[0]
+    new_level = now.constants_at(concarneau)[0]
+    assert old_level == pytest.approx(3.289, abs=0.001)
+    assert new_level == pytest.approx(3.085, abs=0.001)
+
+
+# ---------------------------------------------------------------------------
+# Package 103a: the range's audit (truths 7-590 to 7-593; 7-590 and 7-591 read the whole
+# tree and are the slow tier's, `tests/conftest.py`)
+# ---------------------------------------------------------------------------
+
+
+def _range_tool():
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("audit_range", root / "tools" / "audit_range.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("audit_range", mod)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
+    """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
+    in every year from 1792 to 1825 and on the days either side of every date the data
+    names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
+    other: 61 mechanical (the code's own years and the one finding only a whole world
+    makes left to the audit's own test), among them the three wars of June 1805 in force
+    before their own beginnings and before the prize court at peace, and 38 that rest on
+    the reference of the wars and the nations' lifetimes
+    (`tools/range/reference.yaml`, FROM MEMORY, read by nothing in the game). Every listed
+    finding is owned: a data fault for milestone 7c, an engine fault, or a judgement to be
+    read against a source, which every finding of the reference's kind is."""
+    A = _range_tool()
+    letters = "".join(c for c in A.LETTERS if c not in "ea")  # the code's years are slower
+    audit = A.run(letters=letters, worlds=False)
+    known = A.load_known()
+    assert not A.unlisted(audit, known)
+    cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
+    assert audit.keys() == cheap - {"w-block-unread"}
+    assert len(audit.keys(A.MECHANICAL)) == 61
+    assert len(audit.keys(A.REFERENCE)) == 38
+    for foe in ("france", "spain", "batavian-republic"):
+        pair = "+".join(sorted(("britain", foe)))
+        assert {f"w-before-since:{pair}", f"w-court:{pair}"} <= audit.keys()
+    assert all(known[k]["owner"] in A.OWNERS for k in audit.keys())
+    assert {known[k]["owner"] for k in audit.keys(A.REFERENCE)} == {A.OWNERS[2]}
+    assert {d.year for d in audit.days} == set(range(1792, 1826))
+
+
+def test_truth_7_591_every_dated_key_of_the_data_is_in_the_classing():
+    """Package 103a, the classing's completeness: every key under data/ that carries a
+    year or a date (a date, words that name a year, a whole number of a year under a
+    date's key, a fit's name with its year) is in a row of the classing
+    (`tools/audit_range.py`, `CLASSING`; the table in docs/dev/RangeAudit.md), which says
+    how the code reads it: a seed, calendar-read, both by the scenario's choice, a script,
+    read by nothing, or words; and every row but the scenario's own `nations:` block,
+    which no shipped scenario carries, holds a key."""
+    A = _range_tool()
+    scan = A.scan_dated()
+    assert len(scan) > 5000
+    assert all(A.row_of(rel, path) is not None for rel, path, _v in scan)
+    held = {A.row_of(rel, path).id for rel, path, _v in scan}
+    assert {r.id for r in A.CLASSING} - held == {"scenario-nations"}
+    kinds = {r.id: r.kind for r in A.CLASSING}
+    assert kinds["port-holder"] == kinds["port-dated-keys"] == kinds["blockades-dates"] == A.BOTH
+    assert kinds["wars-since"] == kinds["prize-shares"] == kinds["lights-years"] == A.CALENDAR
+    assert kinds["colours-dates"] == kinds["scenario-papers"] == A.UNREAD
+    assert kinds["scenario-start"] == A.SEED
+    # the calendar-read keys that play could change, which decision 69 (c) designs out
+    assert sorted(r.id for r in A.CLASSING if r.kind in (A.CALENDAR, A.BOTH) and r.play) == [
+        "blockades-dates",
+        "days-years",
+        "port-dated-keys",
+        "port-holder",
+        "wars-since",
+    ]
+
+
+def test_truth_7_592_a_world_begun_in_1792_is_at_the_wars_of_1805_and_its_court_at_peace():
+    """Package 103a, as measured and not as wanted: the wars carry a beginning and no end
+    and the World takes the table whole, so on 1 July 1792 the stance has Britain at war
+    with France, Spain and the Batavian Republic (which was not yet), while the prize
+    court, which alone reads a war's `since`, has her at peace with all three; on 1 July
+    1805 the two agree. A blockade of Brest is the business's on both days, and
+    Rochefort's only between 1 June 1803 and 12 July 1805."""
+    from datetime import date
+
+    A = _range_tool()
+    ports = ("brest", "rochefort", "ferrol", "cadiz", "lorient")
+    tree = A.load_tree(ports=ports, ships=(), scenarios=False)
+    foes = ("france", "spain", "batavian-republic")
+    for day, court in ((date(1792, 7, 1), False), (date(1805, 7, 1), True)):
+        for foe in foes:
+            assert A.table_at_war(tree, "britain", foe)
+            assert A.court_at_war(tree, "britain", foe, day) is court, (day, foe)
+    assert {p for _n, p, _i in A.blockades_on(tree, date(1792, 7, 1))} == {"brest"}
+    assert {p for _n, p, _i in A.blockades_on(tree, date(1805, 7, 1))} == {
+        "brest",
+        "rochefort",
+        "ferrol",
+        "cadiz",
+    }
+
+
+def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_part_of_the_build(
+    tmp_path,
+):
+    """Package 103a, as mended on the lead's reading: a file is a key by its path under
+    its folder with forward slashes (`key_of`), so that the classing holds the same keys
+    and the known list the same findings on Windows as elsewhere; and the known list and
+    the reference lie under tools/range/, outside what the build's fingerprint hashes
+    (`core.world.fingerprint_of`: freesail/ and data/). On a made root an entry taken out
+    of a list under tools/ moves no fingerprint, and the same list under data/ moves it:
+    a finding owned or mended changes no build, and no save reads as another's."""
+    from pathlib import PureWindowsPath
+
+    from freesail.core.world import fingerprint_of
+
+    A = _range_tool()
+    data = PureWindowsPath(r"C:\work\FreeSail\data")
+    key = A.key_of(data / "signals" / "britain" / "days.yaml", data)
+    assert key == "signals/britain/days.yaml"
+    assert A.row_of(key, "days.#.years").id == "days-years"
+    assert A.row_of(A.key_of(data / "ports" / "genoa.yaml", data), "nation.#.since").id == (
+        "port-holder"
+    )
+    root = Path(__file__).resolve().parents[1]
+    for path in (A.KNOWN_PATH, A.REFERENCE_PATH):
+        assert path.is_file() and path.relative_to(root).parts[:2] == ("tools", "range")
+    assert not (root / "data" / "range").exists()
+    for folder in ("freesail", "data", "tools/range"):
+        (tmp_path / folder).mkdir(parents=True)
+    (tmp_path / "freesail" / "a.py").write_text("X = 1\n", encoding="utf-8")
+    (tmp_path / "data" / "a.yaml").write_text("a: 1\n", encoding="utf-8")
+    listed = tmp_path / "tools" / "range" / "audit-known.yaml"
+    listed.write_text("known: [one, two]\n", encoding="utf-8")
+    before = fingerprint_of(tmp_path)
+    listed.write_text("known: [one]\n", encoding="utf-8")
+    assert fingerprint_of(tmp_path) == before
+    (tmp_path / "data" / "audit-known.yaml").write_text("known: [one]\n", encoding="utf-8")
+    assert fingerprint_of(tmp_path) != before
+
+
+# -- package 115, part D: the newcomer's trips (truths 7-615 to 7-629) -----------------------
+# The cold review of 2026-11-14 (docs/reviews/ColdReview-M7.md 1.5, 5.3): each trip met at the
+# prompt, and each test here comes in by the player's door: the scenario started as the
+# harbour starts it (`ui.server.prepare_game`, the road the harbour's new game takes), the
+# rules captain and the books as the player finds them, and the orders typed as a newcomer
+# types them, each through `World.submit` as the console and the socket give them.
+
+
+def _harbour_game(scenario: str, *flags: str):
+    """A game started as the harbour starts it: the server's own command line and
+    `prepare_game`, every step in its order."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", scenario, *flags])
+    return prepare_game(args, say=lambda _line: None)
+
+
+def _said(world, order: str):
+    """An order typed at the prompt, and the line the game answered it with."""
+    return world.submit(order)
+
+
+def test_truth_7_615_a_bargain_with_the_boat_lost_takes_nothing_by_any_road_and_one_is_had():
+    """The cold review's 5.3 item 2 (code-03 R1, refute-03): with the boat cut adrift, `buy
+    three tons of coal` answered "Order not carried out" and the purse went £500 to £494,
+    and the two goods together to £248, the market moved and nothing came. The cause: the
+    three doors of the market (`trade`, `trade_together`, `trade_list`) each paid and moved
+    the market before the boat was sent, and the boat's refusal came after. Mended where it
+    lives: one bargaining function (`Dealings._bargain`) by which every door strikes, which
+    sends the boat first and pays only when she is away for the goods. The three roads by the
+    boat as one table, from the merchant cutter at anchor in Carrick Road with the list of
+    Falmouth aboard (her own file's opening): each refused with the boat lost, twice, the
+    purse, the market and the hold as they were; and each, with a boat, paid once and had."""
+    from freesail.world.places import pounds_words
+
+    roads = [
+        ("one", ["buy three tons of coal"], {"coal": 3.0}),
+        ("together", ["buy three tons of coal and two tons of tin"], {"coal": 3.0, "tin": 2.0}),
+        (
+            "the manifest",
+            [
+                'draft a book "cargo": buy 3 tons of coal; buy 2 tons of tin',
+                'give the book "cargo" to the boat',
+            ],
+            {"coal": 3.0, "tin": 2.0},
+        ),
+    ]
+    for road, orders, goods in roads:
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)  # the best bower down (her opening order) and she lies in Falmouth
+        assert w.dealings.in_port() is not None, road
+        market = w.dealings.in_port().market
+        purse, net, hold = w.purse.pounds, dict(market.net_sold), dict(w.hold.goods)
+        e = _said(w, "cut the boat adrift")
+        assert w.dealings.boat.lost, (road, e.text)
+        for _ in range(2):  # a newcomer told nothing will try again
+            for order in orders:
+                e = _said(w, order)
+            assert e.kind == "order.rejected", (road, e.text)
+            assert "The boat is lost: cut adrift" in e.text, (road, e.text)
+            assert "the boat lost" not in e.text, (road, e.text)  # said once, not twice
+            assert w.purse.pounds == purse, road
+            assert dict(market.net_sold) == net, road
+            assert dict(w.hold.goods) == hold, road
+        w.run(3600)
+        assert w.purse.pounds == purse and dict(w.hold.goods) == hold, road
+        # the same road with her boat: paid once, and the goods had when she is back
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)
+        purse = w.purse.pounds
+        for order in orders:
+            e = _said(w, order)
+        assert e.kind == "market.bargain", (road, e.text)
+        paid = purse - w.purse.pounds
+        assert paid > 0 and f"The purse: {pounds_words(w.purse.pounds)}" in e.text, road
+        for _ in range(180):
+            if not w.dealings.boat.away:
+                break
+            w.run(60)
+        assert not w.dealings.boat.away, road
+        for good, tons in goods.items():
+            assert w.hold.goods.get(good) == pytest.approx(tons), (road, good)
+        assert w.purse.pounds == pytest.approx(purse - paid), road
+
+
+def test_truth_7_616_a_sale_with_the_boat_lost_keeps_the_goods_in_the_hold_and_the_money_ashore():
+    """The sale's road of the same fault (refute-03: "on a sale the goods vanish and the
+    player is paid", by the code, not run): goods bought and had by the boat, the boat then
+    cut adrift, and `sell two tons of tin` is refused with the tin still in the hold and the
+    purse as it was."""
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    e = _said(w, "buy two tons of tin")
+    assert e.kind == "market.bargain", e.text
+    for _ in range(180):
+        if not w.dealings.boat.away:
+            break
+        w.run(60)
+    assert w.hold.goods.get("tin") == pytest.approx(2.0)
+    _said(w, "cut the boat adrift")
+    purse = w.purse.pounds
+    for order in ("sell two tons of tin", "sell one ton of tin and one ton of tin"):
+        e = _said(w, order)
+        assert e.kind == "order.rejected" and "The boat is lost" in e.text, e.text
+        assert w.hold.goods.get("tin") == pytest.approx(2.0)
+        assert w.purse.pounds == purse
+
+
+def test_truth_7_617_a_rule_held_back_by_no_stranger_says_so_once_and_it_is_so():
+    """The cold review's 5.3 item 4: in the first action, Mr Bowen's 'more of her' at a sail
+    made out answered "not carried out; a stranger in sight is no stranger in sight". The
+    cause: a clause's words for the log (`standing.rules.Clause.describe`) joined the
+    reading's name, "is" and the reading's own words, and this reading's words are a whole
+    sentence of absence. Mended there: words of absence ("no ...") are said alone. The
+    first action as the harbour starts it, run to that line: it reads "no stranger in sight",
+    and the lookout has indeed no stranger then (the cutter made out is known)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    line = None
+    for _ in range(20):
+        w.run(30)
+        held = [
+            e
+            for e in w.log
+            if "'more of her'" in e.text and "not carried out" in e.text and "stranger" in e.text
+        ]
+        if held:
+            line = held[0]
+            break
+    assert line is not None, "the rule was never held back in the first ten minutes"
+    assert line.text.endswith("not carried out; no stranger in sight."), line.text
+    assert "is no stranger" not in line.text
+    assert w.readings.words("stranger_in_sight") == "no stranger in sight"
+
+
+def test_truth_7_618_the_noon_hour_past_noon_is_the_afternoon_in_every_mouth():
+    """The cold review's 5.3 item 10: "High water at Ramhead about a quarter past twelve at
+    noon". The cause: `world.tide.time_words` gave the whole hour from noon to one "at
+    noon". Mended there (the one speller of a time of day in words; the reckoning's own
+    lines say the clock's figures): the time past noon is the afternoon's, noon itself
+    "noon". The schooner in Carrick Road as the harbour starts her, asking the tide as a
+    newcomer asks it; and every quarter of the day by the speller itself, so that no other
+    hour is said wrong."""
+    from freesail.world.tide import time_words
+
+    w = _harbour_game("data/scenarios/merchant-schooner-plymouth.yaml")
+    e = _said(w, "the tide by the almanac")
+    assert "a quarter past twelve in the afternoon" in e.text, e.text
+    assert "at noon" not in e.text
+    for q in range(96):
+        words = time_words(q / 4.0)
+        assert ("at noon" not in words) and (words == "noon") == (q == 48), (q, words)
+        if 48 < q < 68:
+            assert words.endswith("in the afternoon"), (q, words)
+
+
+def test_truth_7_619_a_mistyped_world_line_is_refused_in_words_and_the_game_goes_on(tmp_path):
+    """The cold review's 5.3 item 12: a mistyped `world:` line ended the console with a
+    traceback. The cause: `World._apply_world_order` read the line outside the refusal's
+    reach (only the carrying out was caught), after the line was journaled, so the console's
+    loop, the socket's and a replay of a save holding it all raised. Mended there: the
+    reading is inside it. The first action as the harbour starts it, at the console's own
+    door: each mistyped line is answered "not carried out" in the world's words, the console
+    plays on, and a save holding the lines replays to the same log."""
+    import io
+
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.ui.console import Console
+
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    out = io.StringIO()
+    con = Console(w, out=out)
+    for line in (
+        "world: wether: a gale from the west",
+        "world: weather a gale",
+        "world: : :",
+        "world: ship",
+    ):
+        con.handle_line(line)
+    con.handle_line("tick 60")
+    con.handle_line("state")
+    text = out.getvalue()
+    refused = [e for e in w.log if e.kind == "world.order" and e.data.get("result") == "refused"]
+    assert len(refused) == 4, [e.text for e in refused]
+    assert all(e.text.startswith("World order (") and "not carried out" in e.text for e in refused)
+    assert "Traceback" not in text and "Sherbourne: heading" in text
+    path = replay_mod.save_to_file(w, tmp_path / "mistyped.json", checkpoint=False)
+    copy = replay_mod.replay(replay_mod.load_file(path), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+
+
+def test_truth_7_620_a_misspelt_sail_is_offered_the_sail_on_every_readme_ship():
+    """The cold review's 5.3 item 11: on the README's frigate `set the fore topsial` was
+    answered "did you mean the fore topsail lift, the fore topsail halyard or the fore
+    topsail sheet?", and never the fore topsail. The cause: `orders.resolve.NounTable.add`
+    entered a part's raw id first ("fore.topsail", unsuggested) under the same key as its
+    plain words, so the plain words never went into the hints (22 of 38 sails on the frigate
+    were never offered as themselves). Mended there: the plain words are the hint for the
+    part they still name. On each ship of the README's first commands, started as the README
+    starts her, every sail misspelt in its own word at the prompt is offered as itself."""
+    import re
+
+    from freesail.orders.resolve import key
+    from freesail.ui.server import prepare_game, server_parser
+
+    readme = [
+        ("data/ships/frigate-36.yaml", "293"),
+        ("data/ships/topsail-schooner.yaml", "300"),
+        ("data/ships/cutter.yaml", "300"),
+        ("data/ships/brig.yaml", "295"),
+    ]
+    sides = {"starboard", "larboard"}
+    for ship_file, heading in readme:
+        args = server_parser().parse_args(
+            [ship_file, "--seed", "7", "--wind", "0,15", "--heading", heading]
+        )
+        w = prepare_game(args, say=lambda _line: None)
+        tried = 0
+        for sid in w.ship.sails:
+            words = key(sid).split()
+            own = [x for x in words if x not in sides]
+            plain = " ".join(own)
+            long = max(own, key=len)
+            if len(long) < 5:
+                continue
+            miss = " ".join(x if x != long else x[:-2] + x[-1] + x[-2] for x in words)
+            e = _said(w, f"set the {miss}")
+            hint = re.search(r"did you mean (.*?)\? \(", e.text)
+            if e.kind == "order.rejected" and hint:
+                tried += 1
+                offered = hint.group(1).replace(" or ", ", ").split(", ")
+                assert any(o.endswith(f"the {plain}") or o == f"the {key(sid)}" for o in offered), (
+                    ship_file,
+                    miss,
+                    e.text,
+                )
+        assert tried >= 5, (ship_file, tried)
+
+
+def test_truth_7_621_the_officer_does_not_send_the_same_thing_down_twice_within_the_hour():
+    """The cold review's 5.3 item 5 (play/console-4, 12:17 to 12:29): "the sail on the
+    larboard quarter lost sight of" sent down to the captain eight times in twelve minutes.
+    Measured: eight sails of the world's business, each lost from sight in the same words.
+    The cause: `world.reports.tick` sent every reportable line with no guard, where the calls
+    have one (`_called_lately`). Mended there (`_reported_lately`): words sent down within
+    the hour are not sent again until the captain has been on deck. The dispatches as the
+    harbour starts them, the reviewer's own orders: the reports still go down, and no words
+    go down twice in the hour with the captain below throughout."""
+    from freesail.world import reports
+
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    w.run(9000)
+    _said(w, "shape a course for Plymouth")
+    # below by his own order: since package 115 D4 (c) the day's work no longer
+    # takes the player's own person below, which is how the reviewer's captain came to be
+    # sent the eight reports; a captain below by his own choice is sent them still
+    _said(w, "go below")
+    w.run(7200 + 14400)
+    made = [e for e in w.log if e.kind == reports.REPORT_MADE]
+    assert made, "no report sent down in the passage"
+    # the same thing is not sent down twice in the hour: the same kind of line of the same
+    # sail or mark (`reports._subject`), the captain below throughout
+    told: dict[tuple[str, str], int] = {}
+    for e in w.log:
+        if e.kind == "captain.on_deck":
+            told.clear()
+        what = reports._what(e)
+        if what is None or not [m for m in made if m.tick == e.tick + reports.MESSENGER_S]:
+            continue
+        subject = reports._subject(e, what)
+        if subject in told and e.tick - told[subject] <= 3600:
+            again = [
+                m
+                for m in made
+                if m.tick == e.tick + reports.MESSENGER_S
+                and m.data["of"] == e.kind
+                and (m.data["text"] == what or m.data.get("n"))
+            ]
+            assert not again or any(
+                reports._subject(x, reports._what(x) or "") != subject
+                for x in w.log
+                if x.tick == e.tick and x.kind == e.kind and x is not e
+            ), (e.ship_time, e.text)
+        told.setdefault(subject, e.tick)
+
+    # and a different sail is a different report (the lead's reading of part D at 60af48e,
+    # item 2: four sails sighted "on the larboard bow" in an hour, the base sending four
+    # reports and the gathering by words one): below from the start, every sail the lookout
+    # hails by day is sent down, a minute's sails alike as the lookout says them
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    _said(w, "go below")
+    w.run(9000)
+    hailed: dict[int, int] = {}
+    for e in w.log:
+        if e.kind == "lookout.sighting" and str(e.data.get("id", "")).startswith("sail:"):
+            hailed[e.tick] = hailed.get(e.tick, 0) + 1
+    assert len([n for n in hailed.values()]) >= 8, hailed
+    sent = {
+        e.tick - reports.MESSENGER_S: e
+        for e in w.log
+        if e.kind == reports.REPORT_MADE
+        and e.data["of"] == "lookout.sighting"
+        and "sail" in e.data["text"]
+    }
+    for tick, n in hailed.items():
+        assert tick in sent, (tick, n)
+        assert sent[tick].data.get("n", 1) == n, (tick, n, sent[tick].text)
+        if n > 1:
+            words = {2: "two", 3: "three", 4: "four"}[n]
+            assert f": {words} sail sighted" in sent[tick].text, sent[tick].text
+            assert "the same" not in sent[tick].text, sent[tick].text
+
+
+def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_to_be_yours():
+    """The cold review's 1.5 and 5.3 item 1 (play/console-2): the first action, the orders its
+    header lists less one, and the game answered "The guns are firing as they bear already"
+    with every gun lashed; nothing fired in an hour and nothing said why. The cause, read and
+    measured: the answers of the standing intentions spoke of the battery's intention as of
+    the guns; the beat did not say the guns were still secured; and the player's order made
+    Mr Bowen stand aside (decision 41) before he reached the state in which he casts loose,
+    unsaid. Casting loose stays its own word at the beat, as the period had it (Falconer 1780,
+    EXERCISE: "1st. Silence. 2d. Cast loose your guns."; the lead's ruling of 2026-11-14), and
+    engage casts loose (truth 7-628). Mended: each answer is made true of the guns
+    (`orders.gunnery._true_of_the_guns`), the beat and the aside say what is so and what to
+    order next. The beat, then the intentions a newcomer gives before he engages: every
+    answer while no gun is loose says they are secured and names the order, and it is so;
+    the aside says the deck is the player's and her guns secured."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+
+    def secured() -> bool:
+        return not any(g.cast_loose for g in w.ship.guns.values() if g.serves)
+
+    e = _said(w, "beat to quarters")
+    assert e.kind == "crew.quarters" and secured()
+    assert "The guns are secured: 'cast loose the guns' to serve them." in e.text, e.text
+    w.run(300)
+    answers = []
+    for order in (
+        "fire as they bear",
+        "load with round shot",
+        "aim at her rigging",
+        "cease firing",
+    ):
+        answers.append(_said(w, order))
+        w.run(30)
+    assert secured(), "the guns came loose with nobody's word"
+    for a in answers:
+        assert a.kind.startswith("guns."), a.text
+        assert "The guns are secured" in a.text and "'cast loose the guns'" in a.text, a.text
+        assert not a.text.startswith("The guns are firing"), a.text
+        assert "loaded and run out" not in a.text, a.text
+    aside = [x for x in w.log if x.kind == "captain.aside"]
+    assert aside and "the deck is yours, and her guns are secured" in aside[0].text, aside
+    # the lines the guns' own standing orders gave at the beat are true too
+    by_book = [x for x in w.log if x.kind in ("guns.aim", "guns.load") and x.tick <= 180]
+    assert by_book and all("The guns are secured" in x.text for x in by_book), by_book
+    assert w.readings.value("guns")["cast_loose"] is False
+
+    # every order that asks the guns to fire (the lead's reading of part D at 60af48e, item
+    # 3): after an action fought, the guns secured with three still loaded and the mark and
+    # side still engaged, the hands beat to quarters again; `fire` and its forms each say
+    # the word stands for the guns when they are cast loose, that three are loaded and none
+    # is run out, and name the order; and nothing fires on them
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    _said(w, "engage her to starboard")
+    w.run(3300)
+    assert [x for x in w.log if x.kind == "action.fired"], "no action fought"
+    _said(w, "secure the guns")
+    w.run(600)
+    _said(w, "beat to quarters")
+    w.run(30)
+    assert secured() and sum(1 for g in w.ship.guns.values() if g.loaded) == 3
+    battery = w.ship.extra["battery"]
+    assert battery.engaged == "starboard" and battery.target
+    orders = (
+        "fire",
+        "fire a gun to leeward",
+        "fire the starboard broadside",
+        "fire number one starboard gun",
+        "fire as they bear",
+        "fire by divisions",
+    )
+    for order in orders:
+        a = _said(w, order)
+        assert a.kind.startswith("guns."), (order, a.text)
+        assert "The guns are secured, three of them loaded: none is run out or fired" in a.text
+        assert a.text.endswith("say 'cast loose the guns'."), (order, a.text)
+        assert "no gun of it is loaded" not in a.text, (order, a.text)
+        assert "as soon as it is ready" not in a.text, (order, a.text)
+        assert "as soon as ready" not in a.text, (order, a.text)
+    last = w.clock.tick
+    w.run(600)
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > last]
+
+
+def test_truth_7_628_engage_casts_the_guns_loose_and_the_reviewers_own_orders_fight_her():
+    """The owner's word of 2026-11-14 on package 115 D1: "it is an explicit order for engaging,
+    so it stands to reason that the gun would be cast loose on it." `engage` given with the
+    guns secured begins casting them loose by the order 'cast loose the guns' and its
+    evolution (the one road the rules captain and the player take), and says so. The first
+    action as the harbour starts it and the reviewer's own three orders, `beat to quarters`,
+    `engage her to starboard`, `fire as they bear`, and no other order: the engage's answer
+    says the guns are being cast loose; they are cast loose within the evolution's time with
+    the crews coming to them, loaded and run out, and her own guns fire at the privateer
+    once she bears within their reach (measured: cast loose four minutes after the word,
+    the first broadside forty-two minutes after it, as the range closes)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert "The guns are being cast loose; she engages to starboard when they are." in e.text
+    w.run(300)
+    f = _said(w, "fire as they bear")
+    assert "secured" not in f.text, f.text
+    loose = [x for x in w.log if x.kind == "guns.cast_loose" and x.tick > e.tick]
+    assert loose and loose[0].tick - e.tick <= 600, loose
+    fired = []
+    for _ in range(90):
+        w.run(60)
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
+        if fired:
+            break
+    assert fired, "the guns cast loose and nothing fired in an hour and a half"
+    assert any(g.fired for g in w.ship.guns.values())
+
+
+def test_truth_7_623_recruits_are_numbered_after_every_man_the_books_have_borne():
+    """The cold review's 5.3 item 13 (code-03 R2): recruits were given numbers another man
+    held (`s264` twice). The cause: `Dealings._muster_recruits` numbered from the length of
+    the list, which falls when a man is buried or sent away in a prize crew. Mended at the
+    books (`crew.model.Crew.issued`, `next_number`): numbers run on from the highest ever
+    given; a prize crew is numbered by her captor's books. The prize brought home as the
+    harbour starts her: her prize crew is out at 10:02 (256 men borne, numbers to s264), she
+    is in Falmouth by the evening by her captain's own plan, and four able seamen entered
+    come aboard with numbers no man borne, dead or away in a prize has."""
+    w = _harbour_game("data/scenarios/prize-home.yaml")
+    for _ in range(14 * 6):
+        w.run(600)
+        if w.dealings.in_port() is not None:
+            break
+    assert w.dealings.in_port() is not None, "she never came into port"
+    crew = w.ship.extra["crew"]
+    before = {s.id for s in crew.sailors}
+    assert len(before) < crew.next_number(), "nobody away: the case is not met"
+    # her purse is empty as she comes home: the owner's word at the console's own door puts
+    # the bounty in it (`world: aboard: ...`, the live world order)
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+
+    w.world_order(
+        "aboard: twenty pounds paid into the purse by the prize agent",
+        source=LIVE_WORLD_ORDER_SOURCE,
+    )
+    e = _said(w, "enter four able seamen")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(30 * 6):
+        w.run(600)
+        if len(crew.sailors) > len(before):
+            break
+    new = [s for s in crew.sailors if s.id not in before]
+    assert len(new) == 4, [s.id for s in new]
+    ids = [s.id for s in crew.sailors]
+    assert len(ids) == len(set(ids)), "two men borne under one number"
+    away = {s.id for s in crew.dead}
+    for rec in (w.ship.extra.get("prize_crews") or {}).values():
+        away |= {s.id for s in rec}
+    for hull in getattr(w, "hulls", {}).values():
+        other = (getattr(getattr(hull, "ship", None), "extra", None) or {}).get("crew")
+        if other is not None and other is not crew:
+            away |= {s.id for s in other.sailors}
+    assert not ({s.id for s in new} & away), "a recruit given a number a man away holds"
+
+
+def test_truth_7_624_a_boat_lost_on_her_errand_says_the_goods_went_with_her_paid_once():
+    """The lead's word of 2026-11-14 on package 115 D2: a bargain is paid once the boat is away
+    for the goods; what becomes of them if she is lost after? Measured at the prompt before
+    the mend: the boat stove while away for three tons of coal, £6 gone, nothing said of the
+    coal, and two hours later "The boat hoisted in" of a boat that was lost. The cause: the
+    boat's errand (`SendBoatScript`) ran on when its boat was gone, and nothing kept or said
+    what was in her. Mended there: the errand keeps what it carries, ends when its boat is
+    lost and says the goods are lost with her and paid for once; she is not hoisted in. The
+    merchant cutter at anchor as the harbour starts her, coal bought, the boat stove by the
+    owner's word at the console's door while she is away: the line says so, the purse is
+    what it was after the bargain, the hold empty, and another bargain is refused unpaid."""
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    e = _said(w, "buy three tons of coal")
+    assert e.kind == "market.bargain", e.text
+    paid = w.purse.pounds
+    w.run(600)
+    assert w.dealings.boat.away
+    w.world_order("aboard: the boat stove", source=LIVE_WORLD_ORDER_SOURCE)
+    w.run(60)
+    said = [x for x in w.log if "errand is not done" in x.text]
+    assert said and "the 3 tons of coal bought are lost with her, £6 paid" in said[0].text, said
+    w.run(7200)
+    assert not [x for x in w.log if x.kind == "boat.in" and x.tick > e.tick], (
+        "a lost boat hoisted in"
+    )
+    assert w.purse.pounds == paid and not w.hold.goods.get("coal")
+    again = _said(w, "buy three tons of coal")
+    assert again.kind == "order.rejected" and "The boat is lost" in again.text
+    assert w.purse.pounds == paid
+
+    # the sale, one row more (the lead's reading of part D at 60af48e, item 4: "the money
+    # taken stands" had the market pay for tin it never had): a sale is had when the goods
+    # are landed; the boat stove while she pulls for the shore with the tin, he has neither
+    # tin nor money, and the market is as it was before the sale
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    assert _said(w, "buy two tons of tin").kind == "market.bargain"
+    w.run(3 * 3600)
+    assert w.hold.goods.get("tin") == 2.0 and not w.dealings.boat.away
+    before = w.purse.pounds
+    sold = _said(w, "sell two tons of tin")
+    assert sold.kind == "market.bargain" and "the boat lands it" in sold.text, sold.text
+    port = w.dealings.ports[w.dealings.boat.port_id]
+    market_before_sale = port.market.net_sold.get("tin", 0.0) - 2.0
+    w.run(600)
+    assert w.dealings.boat.phase == "pulling for the shore"
+    w.world_order("aboard: the boat stove", source=LIVE_WORLD_ORDER_SOURCE)
+    w.run(60)
+    said = [x.text for x in w.log if "errand is not done" in x.text]
+    assert said and (
+        "the 2 tons of tin to be sold went down in her before they were landed: the sale is "
+        "void, and the £245 taken for them is paid back" in said[0]
+    ), said
+    assert w.purse.pounds == before and not w.hold.goods.get("tin")
+    assert port.market.net_sold.get("tin", 0.0) == market_before_sale
+
+
+def test_truth_7_625_the_starter_book_fits_every_rig_and_says_what_it_left_out():
+    """The cold review's 5.3 item 3 (play/console-2): the starter book refused three of its
+    seven rules on the first action's cutter ("There is no such part as the royals in this
+    ship"). Measured on every ship file: refused on the cutter, the smack, the lugger, the
+    bilander, both schooners and every boat; whole on the square rigs. The cause: the book
+    is written for a ship with royals and studdingsails, and a clause naming a family of
+    sails she has none of refused the whole rule. Mended where the book is read
+    (`standing.book.fit_to_rig`, by `ui.console.read_standing_orders`, the console's and the
+    server's and the scenarios' one reading; the lead's ruling of 2026-11-14: one book for any
+    rig): such a clause is left out, a rule with nothing left out whole, and her log says
+    what in her own words. On every ship file, the book read at the prompt as a newcomer
+    reads it, by `read the standing orders from` the starter book's path, the book held
+    empty before: nothing refused, every rule entered or said left out, and the line true
+    of her (each family it names, she has none of; each she has, it does not name)."""
+    import glob
+    import io
+
+    from freesail.standing.book import SAIL_FAMILIES
+    from freesail.ui.console import STARTER_BOOK, Console
+    from freesail.ui.server import prepare_game, server_parser
+
+    families_in_files = set()
+    for ship_file in sorted(glob.glob("data/ships/*.yaml")):
+        w = prepare_game(
+            server_parser().parse_args([ship_file, "--seed", "7"]), say=lambda _l: None
+        )
+        ship = w.ship
+        for name, members in ship.groups.items():
+            if (
+                " " not in name
+                and name.endswith("s")
+                and members
+                and all(m in ship.sails for m in members)
+            ):
+                families_in_files.add(name)
+        assert len(w.standing.book) == 0, ship_file
+        n0 = len(w.log)
+        Console(w, out=io.StringIO()).handle_line(f"read the standing orders from {STARTER_BOOK}")
+        new = w.log[n0:]
+        refused = [e.text for e in new if e.kind == "order.rejected"]
+        assert not refused, (ship_file, refused)
+        fitted = [e for e in new if e.kind == "book.fitted"]
+        lacks = {f for f in SAIL_FAMILIES if f not in ship.groups}
+        if fitted:
+            head = fitted[0].text.split(":", 1)[0]
+            for f in SAIL_FAMILIES:
+                assert (f in head) == (f in lacks and f in fitted[0].text), (ship_file, f, head)
+            for e in new:
+                if e.kind == "order.accepted":
+                    assert not any(f"the {f}" in e.text for f in lacks), (ship_file, e.text)
+        else:
+            assert not ({"royals", "studdingsails"} & lacks), ship_file
+        assert len(w.standing.book) >= 4, (ship_file, len(w.standing.book))
+        # no rule fitted down to taking in only what nothing in the book sets, which could
+        # only refuse at its every firing (the lead's reading of part D at 60af48e, item 6:
+        # the schooner's night routine, "Nothing done: ... already furled" at each sunset)
+        texts = [r.text for r in w.standing.book.rules]
+        for r in w.standing.book.rules:
+            acts = [a.strip() for a in r.text.split(" then ", 1)[-1].split(";")]
+            if not all(a.startswith("take in the ") for a in acts):
+                continue
+            fams = [a.removeprefix("take in the ").split(",")[0].strip() for a in acts]
+            sets = [t for t in texts if any(f"set the {f}" in t for f in fams)]
+            unfitted = [ln for ln in open(STARTER_BOOK, encoding="utf-8") if r.name in ln]
+            assert sets or any(r.text.split(" then ", 1)[-1] in ln for ln in unfitted), (
+                ship_file,
+                r.text,
+            )
+    # the families the fitting knows are the ship files' own: a new one is added on purpose
+    assert families_in_files <= SAIL_FAMILIES, families_in_files - SAIL_FAMILIES
+
+    # and the rules captain's own books are not refused for a rule the game fitted: the
+    # first action's cutter, the starter book loaded at her opening, its 'shorten sail for
+    # weather' fitted; the book 'keeping station' says only what it said before the fitting
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(1800)
+    clash = [e.text for e in w.log if "held already" in e.text and "keeping station" in e.text]
+    assert clash and not [t for t in clash if "'shorten sail for weather'" in t], clash
+
+
+def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_she_answers():
+    """The cold review's 5.3 item 8: the wheel shot away for good. The hit said "the helm is
+    lost until the relieving tackles are rove", and nothing could rove them: no order, no
+    evolution, nothing in the rules captain's repairs (`combat.hits`, `physics.hull` holding
+    the rudder where it was). Mended (the lead's ruling of 2026-11-14: the game's own line
+    promises it): `rig the relieving tackles`, an evolution of the repairs' pattern whose end
+    clears the loss, the hit's line naming the order, and the rules captain's `_repairs`
+    giving it first. The first action at seed 6 as the harbour starts it (the wheel lost at
+    seventeen minutes): the order given at the prompt on the minute the wheel goes, and the
+    loss is cleared within the quarter hour, the rudder following the helm's order.
+
+    What the helm does with the wheel shot away and before the tackles are rove is not here:
+    nothing reads the tackles (`helm_by_tackles`), and she steers meanwhile exactly as before
+    (the lead's reading of part D at 60af48e, item 6; the question put to the owner, in the
+    notes). Its words are true (the same reading): given twice, said once; the hands' work
+    named as the log names it; `belay the relieving tackles` belays it and says how she is
+    left; and the wheel, once shot away, is not shot away again with the tackles rove."""
+    w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
+    for _ in range(90):
+        w.run(30)
+        if w.ship.extra.get("helm_lost"):
+            break
+    assert w.ship.extra.get("helm_lost"), "the wheel was not lost at seed 6 this time"
+    line = [e for e in w.log if e.kind == "helm.shot_away"][-1]
+    assert "'rig the relieving tackles'" in line.text
+    held = float(w.ship.dyn.rudder)
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    twice = _said(w, "rig the relieving tackles")
+    assert twice.text.endswith("The hands are rigging the relieving tackles already."), twice.text
+    b = _said(w, "belay the relieving tackles")
+    assert b.kind == "work.belayed", b.text
+    assert b.text == (
+        "Belayed rigging the relieving tackles; the tackles not rove, the helm lost as the "
+        "shot left it."
+    ), b.text
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    short = [x.text for x in w.log if x.kind == "evolution.short_handed" and x.tick >= e.tick]
+    assert not [t for t in short if t.endswith("the rest are relieving tackles.")], short
+    for _ in range(30):
+        w.run(30)
+        if not w.ship.extra.get("helm_lost"):
+            break
+    assert not w.ship.extra.get("helm_lost"), "the tackles never rove"
+    assert [x for x in w.log if x.kind == "helm.relieved"], "nothing said the helm answers"
+    seen = []
+    for order in ("steer north-west", "steer east"):
+        said = _said(w, order)
+        assert said.kind != "order.rejected", said.text
+        w.run(30)
+        seen.append(float(w.ship.dyn.rudder))
+    assert abs(seen[0] - seen[1]) > 0.2, ("the rudder did not answer the helm", held, seen)
+    rove = [x.tick for x in w.log if x.kind == "helm.relieved"][0]
+    w.run(1800)
+    again = [x for x in w.log if x.kind == "helm.shot_away" and x.tick > rove]
+    assert not again, [x.text for x in again]
+
+
+# the merchant brig's case waits on package 75's people (the lead's ruling of 2026-11-14 on
+# package 115 D4 (d)): her opening 'let go the best bower' waits for twelve forecastle hands
+# her company of sixteen never spares, on the trunk and on that branch alike
+_OPENING_UNTIL_75 = {"merchant-brig.yaml"}
+_SAYS_AT_ANCHOR = re.compile(r"\bat anchor\b|\bthe usual anchorage\b|\blies at\b|\briding\b", re.I)
+_SAYS_NOT = re.compile(r"\bunmoored\b|\bno anchor down\b", re.I)
+
+
+def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor():
+    """The cold review's 5.3 item 7 (play/console-4): the dispatches began "in Carrick Road,
+    the usual anchorage" (its file's words) under way with no anchor down, so that 'send the
+    boat ashore' and 'buy' were refused at the first minute. The cause: a scenario's opening
+    state at anchor is made by an opening order, and this file had none (the deeper cause,
+    for the notes: a state made by an order that can wait or fail; the merchant brig's waits
+    for hands for ever, left for package 75's people). Mended: the dispatches let go as the
+    merchant scenarios in the same road do. Every scenario started as the harbour starts it:
+    one whose opening words (the header and the position line) say she lies at anchor, and
+    not that she is unmoored or under way, is riding at anchor in her port at two minutes;
+    in the place her position's words name, and named in her header by her own name (the
+    lead's reading of part D at 60af48e, item 7: the schooner of Plymouth's header and place
+    said Falmouth and Carrick Road, the merchant ship's and the merchant cutter's described
+    the schooner Speedwell; the three headers rewritten true)."""
+    import glob
+
+    import yaml
+
+    # the ships' own names, file by file: a header naming one must name her own (the lead's
+    # reading of part D at 60af48e, item 7: the merchant ship's header described the schooner
+    # Speedwell, and she is the Amazon)
+    ship_names = set()
+    for f in glob.glob("data/ships/*.yaml"):
+        spec = yaml.safe_load(open(f, encoding="utf-8")) or {}
+        n = str((spec.get("ship") or {}).get("name") or "")
+        if n and not n.startswith("the "):
+            ship_names.add(n)
+    tried = 0
+    under_way = 0
+    for path in sorted(glob.glob("data/scenarios/*.yaml")):
+        name = path.rsplit("/", 1)[-1]
+        raw = open(path, encoding="utf-8").read().splitlines()
+        place = " ".join(
+            ln.split("#", 1)[1] for ln in raw if ln.startswith("position:") and "#" in ln
+        )
+        words = " ".join([ln for ln in raw if ln.startswith("#")][:30] + [place])
+        if re.search(r"\bunder way\b", place):
+            # her place says she is under way (the dispatches, the lead's ruling (b) of
+            # 2026-11-14: an anchor at her opening sent her rules captain onto the Black Rock
+            # at 09:54, so she begins under way as before and her words say so)
+            w = _harbour_game(path)
+            w.run(120)
+            assert not w.dealings.anchored, (name, place)
+            under_way += 1
+            continue
+        if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
+            continue
+        if name in _OPENING_UNTIL_75:
+            # the merchant brig's opening waits for hands (package 75's people): nothing is
+            # asserted of her here, neither her anchor nor her place nor her name
+            continue
+        w = _harbour_game(path)
+        if getattr(w, "ship", None) is None or not hasattr(w.ship, "dyn"):
+            continue
+        w.run(120)
+        tried += 1
+        assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
+        # her place, where her position's words name it: the port she lies in, its road or
+        # its anchorage (the schooner of Plymouth's said Carrick Road, and she lies in the
+        # Sound)
+        port = w.dealings.in_port()
+        spots = [port.name] + [
+            str(getattr(getattr(port, r, None), "name", "") or "")
+            for r in ("anchorage", "outer_road", "mooring")
+        ]
+        assert any(x and x.lower() in place.lower() for x in spots), (name, place, spots)
+        # and her name, where the header names a ship of the files: her own, or a sail of
+        # the scenario's own list
+        header = " ".join(
+            ln for ln in raw[: next(i for i, ln in enumerate(raw) if not ln.startswith("#"))]
+        )
+        spec = yaml.safe_load("\n".join(raw)) or {}
+        others = {str(x.get("name") or "") for x in spec.get("ships") or []}
+        named = {n for n in ship_names if re.search(rf"\b{re.escape(n)}\b", header)}
+        assert named <= {w.ship.name} | others, (name, w.ship.name, named)
+    assert tried >= 8 and under_way >= 1, (tried, under_way)
+
+
+def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds():
+    """The lead's ruling of 2026-11-14 on package 115 D1 (JUDGEMENT, put to the owner): the
+    later explicit order about firing stands. `_engage` turned a held battery to "as they
+    bear"; with the guns secured that did nothing, and with engage casting loose it fired on
+    a player who had just said hold. The first action as the harbour starts it: `beat to
+    quarters`, `hold your fire`, `engage her to starboard`: the engage takes her for the
+    mark, casts loose, and holds, saying so and naming the order that opens; nothing fires
+    in the next forty minutes; `fire as they bear` then opens. Without the hold, engage fights
+    as they bear (truth 7-628).
+
+    The hand that held is the hand that must loose (the lead's reading of part D at 60af48e,
+    item 1): the rules captain's own hold ("hold your fire (until she is within the book's
+    range)", at his every entry to engaging) does not bind the player's engage, which opens as
+    the base's did, the same shot at the same seconds; and no answer says "at your order" of
+    a hold he did not give, nor "engaging already" of a battery that is held. The engage on a
+    held battery with the guns secured says one thing of them: cast loose, and held."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    _said(w, "hold your fire")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert e.text.endswith(
+        "The guns are being cast loose, and held at your order when they are: "
+        "'fire as they bear' to open."
+    ), e.text
+    assert "engages to starboard when they are" not in e.text, e.text
+    assert e.text.count("held at your order") == 1, e.text
+    again = _said(w, "engage her to starboard")
+    assert "already" not in again.text and "her guns are held at your order" in again.text, (
+        again.text
+    )
+    battery = w.ship.extra["battery"]
+    assert battery.mode.value == "hold" and battery.target, (battery.mode, battery.target)
+    for _ in range(40):
+        w.run(60)
+    assert any(g.cast_loose for g in w.ship.guns.values()), "never cast loose"
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick], "fired, held"
+    opened = _said(w, "fire as they bear")
+    assert opened.kind == "guns.mode", opened.text
+    fired = []
+    for _ in range(60):
+        w.run(60)
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > opened.tick]
+        if fired:
+            break
+    assert fired, "opened and nothing fired in an hour"
+
+    # the rules captain's own hold, and the player's engage after it
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    held = [x for x in w.log if x.text.startswith("By the captain, engaging: holding your fire")]
+    assert held, "the captain's book held no fire on engaging"
+    e = _said(w, "engage her to starboard")
+    assert e.text.startswith("Engage a cutter to starboard: the guns to fire as they bear."), e.text
+    assert "your order" not in e.text and "already" not in e.text, e.text
+    w.run(3600)
+    fired = [x.tick for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
+    assert fired[:3] == [3720, 3780, 3840], fired[:3]  # the base's own, to the second
+    other = _said(w, "engage her to larboard")
+    assert "your order" not in other.text, other.text
+
+    # `cease firing` before the beat: its hint is the order that works from there, and its
+    # hold (meant: an explicit order about firing, standing until an order to fire) is said
+    # again at the beat, not found later in a silent battery
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    c = _said(w, "cease firing")
+    assert c.text.endswith("say 'beat to quarters', then 'cast loose the guns'."), c.text
+    b = _said(w, "beat to quarters")
+    assert b.text.endswith("The guns are held at your order: 'fire as they bear' to open."), b.text
+    assert _said(w, "cast loose the guns").kind != "order.rejected"
 
 
 # ---------------------------------------------------------------------------

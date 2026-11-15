@@ -5,6 +5,9 @@
 # for a frigate is the truth to hit; the time is the physics' to make.
 id: wear
 verb: wear
+# The work in words (`work:`), read for both forms of its name: "to wear ship", "wearing ship"
+# (the runner's one road, the lead's last list of 2026-11-14, 9; it was a rule of its own there).
+work: wear ship
 applies_to: {class: ship}
 script: wear
 preconditions:

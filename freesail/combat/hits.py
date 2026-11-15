@@ -209,12 +209,20 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
         for g in getattr(ship, "guns", {}).values()
         if ((g.side == side and g.place == "broadside") or g.place == "pivot") and not g.dismounted
     ]
-    if aft and rng.random() < HELM_SHOT_SHARE and not ship.extra.get("helm_lost"):
+    if (
+        aft
+        and rng.random() < HELM_SHOT_SHARE
+        and not ship.extra.get("helm_lost")
+        # the wheel is shot away once: with the relieving tackles rove she steers from below
+        # (the lead's reading of part D at 60af48e, item 6)
+        and not ship.extra.get("helm_by_tackles")
+    ):
         ship.extra["helm_lost"] = "the wheel shot away"
         ship.note(
             "urgent",
             "helm.shot_away",
-            "The wheel is shot away; the helm is lost until the relieving tackles are rove.",
+            "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
+            "'rig the relieving tackles'.",
             None,
             {"tick": tick},
         )
@@ -258,7 +266,13 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
             _casualties(ship, keeper, mean, g.x_m, "gun", rng, tick)
         else:
             g.condition = max(0.0, g.condition - GUN_WOUND)
-            keeper.minute.append(("gun", f"{g.name}'s carriage struck"))
+            # a gun named by deck (package 75, B7.d) says "the carriage of" it, so that the deck
+            # is not read as the possessive's (the lead's ruling (4) of 2026-11-12); every other
+            # gun's words as before
+            struck = (
+                f"the carriage of {g.name} struck" if g.of_deck else f"{g.name}'s carriage struck"
+            )
+            keeper.minute.append(("gun", struck))
             _casualties(ship, keeper, MEN_HURT_DECK * scale * grape, g.x_m, "gun", rng, tick)
         return seen
     _casualties(ship, keeper, MEN_HURT_DECK * scale * grape, x_m, "deck", rng, tick)

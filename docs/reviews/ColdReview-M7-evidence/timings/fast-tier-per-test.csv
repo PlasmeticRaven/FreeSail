@@ -5876,7 +5876,7 @@ seconds,outcome,test
 0.07,passed,test_agents.py::test_the_watchers_brief_says_candour_is_welcome
 0.07,passed,test_standing.py::test_the_sea_getting_up_is_its_words_upward_and_the_glass_turning_its_hour_against_three
 0.07,passed,test_rig_classing.py::test_a_ships_sails_and_spars_are_pickled_as_before_stage_0e[lugger]
-0.07,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field0-anything]
+0.07,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field0: a made-up key's shape, masked]
 0.07,passed,test_strain.py::test_same_seed_same_outcome
 0.07,passed,test_subtypes.py::test_each_rows_fit_and_roles_are_the_tables[lugger.yaml-privateer lugger]
 0.07,passed,test_driver.py::test_on_every_file_the_one_place_rule_is_the_rule_it_was[smack]
@@ -6772,7 +6772,7 @@ seconds,outcome,test
 0.00,passed,test_in_world.py::test_the_station_briefs_are_in_world[director.SEAT_AND_CHANNEL_BRIEF]
 0.00,passed,test_profile.py::test_a_gun_and_a_hull_are_pickled_as_before_while_the_new_keys_hold_their_defaults
 0.00,passed,test_profiles.py::test_from_steel_table_gives_the_notes_figures_for_steels_36
-0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field1-anything]
+0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field1: a made-up key's shape, masked]
 0.00,passed,test_ship_loader.py::test_bad_yaml_is_a_sentence
 0.00,passed,test_strain.py::test_carries_away_for_certain_when_condition_reaches_zero
 0.00,passed,test_checkpoint.py::test_the_packages_own_save_replays_only_under_the_build_that_made_it
@@ -6825,7 +6825,7 @@ seconds,outcome,test
 0.00,passed,test_sails.py::test_fore_and_aft_sail_at_zero_angle_of_attack_gives_no_lift
 0.00,passed,test_sails.py::test_gaff_sail_on_a_run_wants_squaring_off
 0.00,passed,test_sails.py::test_luff_angle_is_exposed_for_the_helm
-0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field2-x]
+0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field2: a made-up key's shape, masked]
 0.00,passed,"test_standing.py::test_table[frigate: standing order ""x"": when the true wind exceeds 30 knots for 0]"
 0.00,passed,test_weather_script.py::test_a_scenario_file_that_cannot_be_read_says_why[- a list\n-a mapping of fields]
 0.00,passed,test_hull_form.py::test_the_schema_refuses_the_shape_keys_in_words[the sections aft]
@@ -6875,9 +6875,9 @@ seconds,outcome,test
 0.00,passed,test_rig_classing.py::test_a_boom_spreads_a_lateen_cut_at_the_mast_and_is_refused_on_a_whole_one
 0.00,passed,test_sails.py::test_only_set_sails_drive
 0.00,passed,test_server.py::test_the_server_takes_the_ease_on_station_flag
-0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field3-sk-ant-abcdefghijklmnopqrstuvwxyz0123]
-0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field4-value4]
-0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field5-Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3Ab3]
+0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field3: a made-up key's shape, masked]
+0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field4: a made-up key's shape, masked]
+0.00,passed,test_settings.py::test_a_key_in_any_shape_is_refused_and_nothing_is_written[field5: a made-up key's shape, masked]
 0.00,passed,test_settings.py::test_the_key_the_credential_store_holds_is_refused_anywhere_in_the_file
 0.00,passed,test_hull_cutter.py::test_each_line_is_the_notes[rail_m]
 0.00,passed,test_hull_cutter.py::test_the_notes_section_table_is_its_list_of_points

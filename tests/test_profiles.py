@@ -22,7 +22,8 @@ Every hull in those tests is built in the test; a ship file is written only into
 From SW-2 and SW-2b.2 (§5.6, §15), at the end, the ship files themselves: every file's rail above
 its decks and sills and a mark on every shape line; each port triple's gap to the drawn side at its
 sill and the drawn displacement and depth beside the filed ones, reported; the pair check, with
-`SAME_HULL_BY_INTENT`; and truth 7-185, drafted here as §15 has it, its bands old beside new.
+`SAME_HULL_BY_INTENT`; and truth 7-185's bands, old beside new, the truth itself drafted here as
+§15 has it and moved into `tests/test_known_truths.py` at Phase 5 (2026-11-14).
 """
 
 from __future__ import annotations
@@ -33,8 +34,6 @@ import importlib.util
 import inspect
 import itertools
 import math
-import subprocess
-import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -42,10 +41,9 @@ import numpy as np
 import pytest
 import yaml
 
-from freesail.combat.ports import PORT_PLACES
 from freesail.ship import form as drawn
 from freesail.ship.loader import load_ship, load_spec, spec_from_dict
-from freesail.ship.profile import interp, ports_of, rail_at
+from freesail.ship.profile import interp, rail_at
 from freesail.ship.schema import PROFILE_KEYS, HullForm, HullStern
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1021,7 +1019,7 @@ def test_the_pair_check_every_two_files_differ_or_stand_as_one_class_in_two_role
         assert "one class" in reason, pair
 
 
-# -- truth 7-185 (§15), drafted here for Phase 5 to move ------------------------------------------
+# -- truth 7-185's bands (§15); the truth in tests/test_known_truths.py since Phase 5 ------------
 
 FT = 0.3048
 # Each file's lowest sill in its source's band, metres (§5.4, §15; §5.0 principles 5 and 12: her own
@@ -1050,50 +1048,3 @@ LOWEST_SILL_BANDS = {
     "sixty-four": (1.53 - 0.03, 1.53 + 0.03),
     "razee-44": (1.98 - 0.03, 1.98 + 0.03),
 }
-
-
-def test_truth_7_185_the_generator_writes_every_file_and_every_port_gun_stands_on_its_port(
-    tmp_path,
-):
-    """The brief's item 6, §15, on no world and no seed: the generator run into a scratch directory
-    (the owner's machine, 2026-10-31). The generated set equals the committed set and each file is
-    equal, compared as text. Every port gun of every fit of every file names its deck and stands on
-    a triple of that deck within 0.01 m, its (x_m, height_m) to the triple's x and sill. Each file's
-    lowest sill in its source's band (`LOWEST_SILL_BANDS`, the brig's old beside new): measured
-    2.19, 1.57, 1.57, 1.00, 0.95, 0.95, 1.53 and 1.98 m. A new ship's sill is her own truth's until
-    Phase 5 re-runs this with every file (§15)."""
-    out = tmp_path / "ships"
-    subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "gen_ships.py"), str(out)],
-        check=True,
-        cwd=ROOT,
-        capture_output=True,
-    )
-    assert sorted(p.name for p in out.iterdir()) == sorted(p.name for p in SHIP_FILES)
-    for path in SHIP_FILES:
-        made = (out / path.name).read_text(encoding="utf-8")
-        assert made == path.read_text(encoding="utf-8"), path.name
-    guns_seen = 0
-    for name in SHIP_NAMES:
-        spec = _ship_spec(name)
-        p = spec.hull.profile
-        fits = spec.armament.fits if spec.armament is not None else {}
-        for fit_name, fit in fits.items():
-            for gun in fit.guns:
-                if gun.place not in PORT_PLACES:
-                    continue
-                guns_seen += 1
-                assert gun.deck, (name, gun.id)
-                on = [
-                    t
-                    for t in ports_of(p, gun.deck)
-                    if abs(t[0] - gun.x_m) <= 0.01 and abs(t[1] - gun.height_m) <= 0.01
-                ]
-                assert on, (name, fit_name, gun.id, gun.deck, gun.x_m, gun.height_m)
-    assert guns_seen > 100
-    for name, (low, high) in LOWEST_SILL_BANDS.items():
-        p = _ship_spec(name).hull.profile
-        lowest = min(sill for _word, triples in p.ports_m for _x, sill, _hb in triples)
-        assert low <= lowest <= high, (name, lowest)
-    for name in ("lugger", "smack"):
-        assert not _ship_spec(name).hull.profile.ports_m, name

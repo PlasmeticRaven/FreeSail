@@ -3635,3 +3635,264 @@ boxes:
           radius_km: {min: 1200, max: 1800}
           life_h: {min: 120, max: 360}
         check: {westerly_pct: 16, easterly_pct: 16, southerly_pct: 14, northerly_pct: 48, gust31_days: 3, gust54_days: 0}
+  # package 106b: Morocco's Atlantic coast (the chart session's ruling): one box over the
+  # four regions' water and the water east of 9 W from 30 to 36 N that lay in no box (the
+  # Strait's southern half and the coast from Spartel to Safi took the nearest box,
+  # Portugal's or Madeira's). LAST in the file, so that it takes no water another box
+  # answers (`Climatology.box_at` takes the first box that holds a point): the regions'
+  # water west of 9 W stays Madeira's and the Canaries' boxes'. PROVISIONAL: Madeira's rows
+  # carried to the coast unchanged, the pilot's words on the coast's winds in each row's note
+  # (Purdy 1825, p. 152, of the coast from Larache to Mamora: "In the summer, the wind
+  # generally prevails from N. by E. to N.E. along the coast. During winter, there is a
+  # blustering S.W. and S.S.W. wind; and, in this season, when it begins to chop about to the
+  # South or S.E., shipping must get off, for then it commonly shifts to the S.W. and W.S.W.,
+  # with foul weather"; p. 155, at Mogador: "A winter seldom passes but some ships are driven
+  # a shore by the S.W. winds; and this happens generally between the 8th of December and the
+  # 18th of January"). Neither pilot gives a monthly figure; the winter's south-westerly
+  # gales on a lee shore are said and not carried, as the Canaries' island lee is.
+  morocco:
+    title: "Morocco's Atlantic coast and the Strait's southern shore"
+    bounds: {south: 27.33334, north: 36.0, west: -13.17334, east: -5.0}
+    provisional: true
+    source: "judgement: the madeira box's rows carried to the coast (FROM MEMORY of the pilot charts' roses, NOT READ); the coast's winds in words from Purdy 1825, pp. 152 and 155; package 106b"
+    months:
+      1:
+        name: January
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'During winter, there is a blustering S.W. and S.S.W. wind', and p. 155 at Mogador the S.W. gales between the 8th of December and the 18th of January, 'the only period dangerous to shipping in the bay' (not carried: the row is the trade's)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
+      2:
+        name: February
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'During winter, there is a blustering S.W. and S.S.W. wind', and p. 155 at Mogador the S.W. gales between the 8th of December and the 18th of January, 'the only period dangerous to shipping in the bay' (not carried: the row is the trade's)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
+      3:
+        name: March
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: the summer's N. by E. to N.E. along the coast, the winter's S.W. and S.S.W."
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 48, gust31_days: 3, gust54_days: 0}
+      4:
+        name: April
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: the summer's N. by E. to N.E. along the coast, the winter's S.W. and S.S.W."
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.8
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 55, gust31_days: 2, gust54_days: 0}
+      5:
+        name: May
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'In the summer, the wind generally prevails from N. by E. to N.E. along the coast'"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 60, gust31_days: 2, gust54_days: 0}
+      6:
+        name: June
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'In the summer, the wind generally prevails from N. by E. to N.E. along the coast'"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.3
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 65, gust31_days: 2, gust54_days: 0}
+      7:
+        name: July
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'In the summer, the wind generally prevails from N. by E. to N.E. along the coast'"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 70, gust31_days: 3, gust54_days: 0}
+      8:
+        name: August
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'In the summer, the wind generally prevails from N. by E. to N.E. along the coast'"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 70, gust31_days: 3, gust54_days: 0}
+      9:
+        name: September
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'In the summer, the wind generally prevails from N. by E. to N.E. along the coast'"
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.25, high_toward_deg: 330}
+        lows_per_month: 0.4
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 330, spread: 40}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 8, easterly_pct: 20, southerly_pct: 6, northerly_pct: 60, gust31_days: 2, gust54_days: 0}
+      10:
+        name: October
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: the summer's N. by E. to N.E. along the coast, the winter's S.W. and S.S.W."
+        background_hpa: 1017
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 0.8
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 52, gust31_days: 2, gust54_days: 0}
+      11:
+        name: November
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: the summer's N. by E. to N.E. along the coast, the winter's S.W. and S.S.W."
+        background_hpa: 1018
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.2
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 3, gust54_days: 0.3}
+      12:
+        name: December
+        note: "judgement: the madeira box's row carried to the coast unchanged (JUDGEMENT; its figures FROM MEMORY of the pilot charts' roses for the 30 to 35 N squares, NOT READ); Purdy 1825 p. 152: 'During winter, there is a blustering S.W. and S.S.W. wind', and p. 155 at Mogador the S.W. gales between the 8th of December and the 18th of January, 'the only period dangerous to shipping in the bay' (not carried: the row is the trade's)"
+        background_hpa: 1019
+        gradient: {hpa_per_100km: 0.18, high_toward_deg: 320}
+        lows_per_month: 1.5
+        track_bearing_deg: {mean: 60, spread: 30}
+        closest_approach_km: {mean: 900, spread: 400}
+        speed_kn: {min: 12, max: 30}
+        central_hpa: {mean: 1000, spread: 6, floor: 985}
+        radius_km: {min: 350, max: 600}
+        life_h: {min: 48, max: 96}
+        high:
+          probability: 0.85
+          bearing_deg: {mean: 320, spread: 70}
+          distance_km: {min: 800, max: 1500}
+          anomaly_hpa: {min: 10, max: 18}
+          radius_km: {min: 1200, max: 1800}
+          life_h: {min: 120, max: 360}
+        check: {westerly_pct: 15, easterly_pct: 12, southerly_pct: 12, northerly_pct: 45, gust31_days: 4, gust54_days: 0.3}
