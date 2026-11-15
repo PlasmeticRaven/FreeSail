@@ -464,3 +464,14 @@ p.note { margin: 6px 12px; font-size: 12.5px; color: var(--ink-soft); }
 .harbour details.in-play > summary { cursor: pointer; padding: 6px 12px; font-size: 13px; }
 .harbour details.in-play .in-play-head { text-transform: uppercase; letter-spacing: 0.06em; font-size: 11.5px; color: var(--ink-soft); margin-right: 8px; }
 .harbour details.in-play .hint { margin-left: 10px; }
+
+/* package 96b, step 5: the ship's card; a line the game does not yet take */
+.maker .ship-cards { display: flex; flex-direction: column; gap: 8px; }
+.maker .ship-card { border: 1px solid var(--rule); border-radius: 3px; padding: 8px 10px; background: var(--paper); }
+.maker .ship-card .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 14px; }
+.maker .ship-card p.card-says { margin: 6px 0 4px; font-size: 12.5px; color: var(--ink-soft); }
+.maker .ship-card .card-place { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 4px; font-size: 12px; color: var(--ink-soft); }
+.maker .ship-card .card-place input { width: 9.5em; }
+.maker .ship-card .card-remove { margin-top: 6px; font-size: 11.5px; }
+.maker p.not-yet { margin: 2px 0; font-size: 12px; color: var(--ink-soft); font-style: italic; }
+.maker p.not-yet::before { content: "not yet: "; font-style: normal; }

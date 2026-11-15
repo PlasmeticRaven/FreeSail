@@ -21625,3 +21625,78 @@ def test_truth_7_405_the_sheet_keeps_what_it_does_not_show_and_the_page_has_its_
         "standing_orders", "orders", "director",
     ):  # fmt: skip
         assert f'data-field="{field}"' in page, field
+
+
+def test_truth_7_406_the_ships_card_is_filled_from_the_games_own_kinds_fits_and_roles(tmp_path):
+    """Package 96b, step 5 (docs/design/Design-Harbour.md §2.4): every ship is set up on
+    one card, whose blanks are the game's own words. The harbour's catalogue gives each
+    kind another ship may be her ship file, the fit she carries as that kind and the roles
+    her file gives her, and each ship file its fits and the one carried when none is said,
+    as `world.ships.description` and the file's `armament` have them; a scenario written
+    from them (the player's cutter named and under long guns, a revenue cutter, a French
+    privateer lugger under British colours, a role of her kind's) is proved by the maker as
+    the game loads it; and the proof says, without refusing, a fit a ship's kind has not
+    and a heading the game reads nowhere."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+    from freesail.world.ships import DESCRIPTIONS, description
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    cat = harbour.catalogue()
+    assert [k["id"] for k in cat["kinds"]] == list(DESCRIPTIONS)
+    for k in cat["kinds"]:
+        d = description(k["id"])
+        assert (k["file"], k["fit"], k["roles"]) == (
+            d["file"],
+            str(d.get("fit") or ""),
+            list(d.get("roles") or []),
+        )
+        assert k["file"] in cat["fits"]
+        assert not k["fit"] or k["fit"] == "unarmed" or k["fit"] in cat["fits"][k["file"]]["fits"]
+    fields = {
+        "name": "Two cutters",
+        "seed": 7,
+        "start": "1805-06-12T05:00",
+        "position": {"lat_deg": 50.1631, "lon_deg": -5.0345},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/cutter.yaml", "name": "Swift", "fit": "long guns"},
+        "papers": {"service": "kings"},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": "vigilant",
+                "description": "revenue cutter",
+                "name": "Vigilant",
+                "nation": "britain",
+                "position": "50 4.1 N 4 58.9 W",
+                "goal": "bound for Plymouth",
+                "role": "revenue",
+            },
+            {
+                "id": "furet",
+                "description": "privateer lugger",
+                "name": "Furet",
+                "nation": "france",
+                "position": "50 4.1 N 5 5.3 W",
+                "goal": "bound for Plymouth",
+                "colours": "britain",
+            },
+        ],
+    }
+    proved = harbour.prove(fields)
+    assert not [ln for ln in proved["lines"] if "To know" in ln]
+    assert any("revenue cutter Vigilant" in ln for ln in proved["lines"])
+    fields["ships"][0]["role"] = "privateer"  # no role of a revenue cutter's: the game's refusal
+    with pytest.raises(Exception, match="no role a revenue cutter takes"):
+        harbour.prove(fields)
+    fields["ships"][0]["role"] = "revenue"
+    fields["ships"][1]["fit"] = "long tom"  # the schooner's, not the lugger's
+    fields["ships"][1]["heading_deg"] = 270
+    said = [ln for ln in harbour.prove(fields)["lines"] if "To know" in ln]
+    assert len(said) == 2 and "long tom" in said[0] and "read by nothing" in said[1]

@@ -249,6 +249,45 @@ def test_a_game_is_started_aboard_another_ship_and_a_bare_ship_with_her_wind_and
         assert "wind" in r.json()["detail"] or "heading" in r.json()["detail"]
 
 
+def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_fits(client):
+    """Package 96b, step 5: what the ship's card fills its blanks from, the game's own
+    (`world.ships.description`, each ship file's `armament`): nothing invented by the page."""
+    cat = client.get("/api/harbour/catalogue").json()
+    kinds = {k["id"]: k for k in cat["kinds"]}
+    assert list(kinds) == cat["descriptions"]
+    revenue = kinds["revenue cutter"]
+    assert revenue["file"] == "data/ships/cutter.yaml" and revenue["fit"] == "long guns"
+    assert revenue["roles"] == ["revenue"] and "cutter" in revenue["rig"]
+    assert kinds["merchant brig"]["roles"] == ["merchant", "packet", "indiaman"]
+    assert kinds["sixty-four"]["roles"] == []  # her file gives her kind none
+    cutter = cat["fits"]["data/ships/cutter.yaml"]
+    assert cutter == {"fits": ["carronades", "long guns"], "default": "carronades"}
+    assert len(cat["fits"]["data/ships/seventy-four.yaml"]["fits"]) == 3
+    assert set(cat["fits"]) == set(cat["ships"])  # every ship offered, and no boat
+
+
+def test_the_proof_says_a_fit_her_kind_has_not_and_a_heading_read_by_nothing(client):
+    """Package 96b, step 5 (the design's traps 4 and 5): the loader takes another ship's
+    fit unchecked and refuses her only when she is promoted, and reads her heading
+    nowhere; the maker's proof says both, and proves the scenario as the game does."""
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/first-action.yaml"}
+    ).json()["fields"]
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200 and not [ln for ln in r.json()["lines"] if "To know" in ln]
+    fields["ships"][0]["fit"] = "forty carronades"
+    fields["ships"][0]["heading_deg"] = 90
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200, r.text
+    said = [ln for ln in r.json()["lines"] if "To know" in ln]
+    assert len(said) == 2 and "forty carronades" in said[0] and "is none of her file's" in said[0]
+    assert "heading is read by nothing" in said[1]
+    fields["ships"][0]["fit"] = "unarmed"
+    del fields["ships"][0]["heading_deg"]
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert not [ln for ln in r.json()["lines"] if "To know" in ln]
+
+
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
@@ -907,8 +946,8 @@ def test_in_the_browser_the_sheet_is_folded_and_each_part_says_what_is_set(brows
     assert "on the chart of channel-west; heading 20°" in line("start")
     assert "one weather system written out (the low)" in line("weather").lower()
     assert line("ships") == (
-        "Three ships: Naiad of Britain, Nimble of Britain, Hortense of France; "
-        "the inshore squadron, a squadron in line ahead."
+        "Three ships: Naiad of Britain, a frigate; Nimble of Britain, a brig-sloop; "
+        "Hortense of France, a frigate; the inshore squadron, a squadron in line ahead."
     )
     assert line("sea").startswith("Four ports: brest, falmouth, plymouth, torbay")
     assert "first order: set plain sail" in line("orders") and "Ushant" in line("orders")
@@ -959,6 +998,105 @@ def test_in_the_browser_the_sheet_is_folded_and_each_part_says_what_is_set(brows
     assert brief["examples"] == ['ship "Nancy": order heave to']
     assert brief["limits"] == {"nobody_dies": True, "a_limit_of_mine": 3}
     assert "Mine" in line("stations")
+    assert errors == []
+
+
+def test_in_the_browser_every_ship_is_set_up_on_her_card_and_the_scenario_made_is_played(
+    browser_page,
+):
+    """Package 96b, step 5 (docs/design/Design-Harbour.md §2.4; its step's own trial): a
+    scenario made from the form with the player's cutter named and under long guns, a
+    revenue cutter under her kind's own guns and a French privateer lugger under British
+    colours, each on a card whose blanks are her kind's own words; proved, saved, and
+    started: the file says what was chosen and the game has the three ships. What the
+    game does not take is said on the card, greyed. A scenario read with what the card
+    has no plain field for (a place written as latitude and longitude) is saved the same."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option("#m-port", "falmouth")
+    fits = pg.eval_on_selector_all("#m-ship-fit option", "els => els.map(e => e.value)")
+    assert fits == ["", "carronades", "long guns", "unarmed"]
+    pg.select_option("#m-ship-fit", "long guns")
+    pg.fill('#maker [data-field="ship.name"]', "Swift")
+    pg.select_option('#maker [data-field="papers.service"]', "kings")
+    assert pg.locator("#maker fieldset[data-part=ship] p.not-yet").count() == 3
+    for kind, name, nation, colours, bearing in (
+        ("revenue cutter", "Vigilant", "britain", "", "160"),
+        ("privateer lugger", "Furet", "france", "britain", "200"),
+    ):
+        pg.click("#btn-m-ship-add")
+        card = pg.locator("#m-ships .ship-card").last
+        card.locator("[data-col=description]").select_option(kind)
+        card.locator("[data-col=name]").fill(name)
+        card.locator("[data-col=nation]").select_option(nation)
+        card.locator("[data-col=goal]").fill("bound for Plymouth")
+        assert not card.locator("[data-col=role]").is_visible()
+        card.locator("summary").click()
+        if colours:
+            card.locator("[data-col=colours]").select_option(colours)
+        card.locator(".card-bearing").fill(bearing)
+        card.locator(".card-miles").fill("6")
+        card.locator(".card-put").click()
+        assert card.locator("[data-col=position]").input_value().startswith("50 4.1 N")
+        assert card.locator("p.not-yet").count() == 3
+    first = pg.locator("#m-ships .ship-card").first
+    assert "long guns" in first.locator(".card-says").inner_text()
+    assert first.locator("[data-col=role] option").all_text_contents()[1:] == ["revenue"]
+    assert first.locator("[data-col=fit] option").first.inner_text() == "her kind's own (long guns)"
+    pg.click("#btn-m-close")
+    assert pg.inner_text('#maker [data-line="ships"]') == (
+        "Two ships: Vigilant of Britain, a revenue cutter; "
+        "Furet of France, a privateer lugger under the colours of Britain."
+    )
+    assert "Swift; her fit long guns; a King's ship" in pg.inner_text('#maker [data-line="ship"]')
+    pg.fill("#m-name", "two-cutters")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "two-cutters.yaml").read_text(encoding="utf-8"))
+    assert made["ship"]["name"] == "Swift" and made["ship"]["fit"] == "long guns"
+    assert made["papers"] == {"service": "kings"}
+    assert [(s["description"], s["name"], s.get("colours")) for s in made["ships"]] == [
+        ("revenue cutter", "Vigilant", None),
+        ("privateer lugger", "Furet", "britain"),
+    ]
+    r = pg.evaluate(
+        """async (path) => {
+            const r = await fetch('/api/harbour/start', {method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({scenario: path})});
+            return r.status;
+        }""",
+        str(port.place / "two-cutters.yaml"),
+    )
+    assert r == 200
+    with port.driver.lock:
+        world = port.driver.world
+        assert world.ship.name == "Swift"
+        assert {"Furet", "Vigilant"} <= {v.name for v in world.vessels.vessels}
+    # the tender: the Raven's place is written as latitude and longitude, which the card
+    # shows and does not change; her goal changed, the rest of her entry is as it was
+    fields = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/tender.yaml');
+            const card = document.querySelector('#m-ships .ship-card');
+            const where = card.querySelector('[data-col=position]');
+            const goal = card.querySelector('[data-col=goal]');
+            goal.value = goal.value + ' ';
+            goal.dispatchEvent(new Event('input', { bubbles: true }));
+            return {disabled: where.disabled, ships: h.collect().ships, was: h.loaded.fields.ships};
+        }"""
+    )
+    assert fields["ships"] == fields["was"]
+    assert fields["disabled"] == isinstance(fields["was"][0]["position"], dict)
     assert errors == []
 
 
