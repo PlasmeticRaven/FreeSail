@@ -88,12 +88,17 @@
       if (group.children.length) sel.appendChild(group);
     });
   }
+  // a scenario that begins in another year than 1805 (the design's trap 3): said wherever
+  // the year is, in the words the proof uses
+  function yearWords(year) {
+    return "She begins in " + year + ". The ports are as they stood on that day; the wars are those of June 1805, whatever the year.";
+  }
   function scenarioSays() {
     var path = $("s-scenario").value;
     var s = (cat.scenarios || []).filter(function (x) { return x.path === path; })[0];
     var shelf = s && (cat.shelves || []).filter(function (x) { return x.id === s.shelf; })[0];
     var words = "";
-    if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")";
+    if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")" + (s.year && s.year !== 1805 ? "  " + yearWords(s.year) : "");
     $("s-says").textContent = words;
     scenarioSaid(path);
   }
@@ -1086,8 +1091,36 @@
   }
 
   /** The form's fields from a scenario's (`fields`, as the server read them). */
+  // the two blocks offered as the file's own words (package 96b, step 8): sent to the
+  // proof and the save only when they were touched, so that an untouched block is the
+  // scenario's own, byte for byte
+  var dirtyBlocks = {};
+  document.querySelectorAll("#maker [data-block]").forEach(function (el) {
+    el.addEventListener("input", function () { dirtyBlocks[el.getAttribute("data-block")] = true; });
+  });
+  function blocksToSend() {
+    var out = {}, any = false;
+    document.querySelectorAll("#maker [data-block]").forEach(function (el) {
+      var k = el.getAttribute("data-block");
+      if (dirtyBlocks[k] || (fresh && el.value.trim())) { out[k] = el.value; any = true; }
+    });
+    return any ? out : undefined;
+  }
+  $("btn-m-ports-region").addEventListener("click", function () {
+    var region = $("maker").querySelector('[data-field="region"]').value;
+    var el = $("maker").querySelector('[data-field="ports"]');
+    if (!region || el.disabled) return;
+    el.value = cat.ports.filter(function (x) { return x.region === region; }).map(function (x) { return x.id; }).join(", ");
+    markDirty("ports");
+    foldLines();
+  });
+
   function fillForm(fields, positionDeg) {
     dirty = {};
+    dirtyBlocks = {};
+    var blocks = (loaded && loaded.blocks) || {};
+    $("m-systems").value = blocks.systems || "";
+    $("m-ports-state").value = blocks.ports || "";
     fillShipFit(getPath(fields, "ship.file"), getPath(fields, "ship.fit"));
     fillPosts(getPath(fields, "ship.file"));
     fillChron(fields);
@@ -1182,6 +1215,9 @@
       if (f.seed !== undefined) bits.push("seed " + f.seed);
       if (f.nation) bits.push("of " + nationWords(f.nation));
       if (f.follows_history === true) bits.push("the world keeps to the course of history");
+      var yr = /^(\d{4})/.exec(String(f.start || ""));
+      $("m-year-says").textContent = yr && Number(yr[1]) !== 1805 ? yearWords(Number(yr[1])) : "";
+      if (yr && Number(yr[1]) !== 1805) bits.push("the ports as on that day, the wars those of June 1805");
       if (f.knowledge === "all") bits.push("everyone knows everything (for testing)");
     } else if (part === "ship") {
       if (!ship) bits.push(typeof f.ship === "string" || (f.director === "observe") ? "No ship of your own: the world is watched from the director's station" : "No ship file chosen: a point on the sea");
@@ -1218,6 +1254,7 @@
       var w = f.weather, wind = f.wind || {};
       var pinned = Array.isArray(w) ? w : w && Array.isArray(w.wind) ? w.wind : [];
       var systems = w && !Array.isArray(w) && Array.isArray(w.systems) ? w.systems : [];
+      if (dirtyBlocks.systems) bits.push("the systems' words changed here (the proof reads them)");
       if (pinned.length) bits.push("The wind pinned by the hour, " + plural(pinned.length, "waypoint", "waypoints") + ", from " + pinned[0].from_deg + "° at " + pinned[0].knots + " knots");
       if (systems.length) bits.push(plural(systems.length, "weather system", "weather systems") + " written out (" + systems.map(function (x) { return x.name || x.kind || "a system"; }).join(", ") + ")");
       if (w && !Array.isArray(w) && w.climatology) bits.push("the month's own weather");
@@ -1235,8 +1272,16 @@
       if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : "") + ((x.members || []).length ? " (" + x.members.join(", ") + ")" : ""); }).join("; "));
     } else if (part === "sea") {
       var ports = f.ports;
+      if (dirtyBlocks.ports) bits.push("the ports' state changed here (the proof reads it)");
       if (ports === undefined) bits.push("Every port of the chart");
-      else { var ids = Array.isArray(ports) ? ports : Object.keys(ports); bits.push(cap(plural(ids.length, "port", "ports")) + (ids.length ? ": " + ids.join(", ") : "")); }
+      else {
+        var ids = Array.isArray(ports) ? ports : Object.keys(ports);
+        bits.push(cap(plural(ids.length, "port", "ports")) + (ids.length ? ": " + ids.join(", ") : ""));
+        if (!Array.isArray(ports)) {
+          var said = ids.filter(function (k) { return ports[k] && Object.keys(ports[k]).length; });
+          if (said.length) bits.push("their state said of " + said.join(", "));
+        }
+      }
       bits.push(f.business === undefined || f.business === false || f.business === "off" || f.business === 0 ? "no traffic of the sea's own" : "the sea's traffic " + (f.business === true || f.business === "on" ? "on" : "at " + f.business));
       if (f.crewed) bits.push("crewed ships: " + (f.crewed.cap !== undefined ? f.crewed.cap : "three") + " at once within " + (f.crewed.range_nm !== undefined ? f.crewed.range_nm : "four") + " miles");
       if ((f.world_orders || []).length) bits.push(plural(f.world_orders.length, "world order", "world orders") + " by the clock");
@@ -1436,7 +1481,7 @@
   });
 
   function proveOrSave(save) {
-    var body = { fields: collect(), source: fresh ? "" : loaded.path };
+    var body = { fields: collect(), source: fresh ? "" : loaded.path, blocks: blocksToSend() };
     var path = "/api/harbour/scenario/prove";
     if (save) {
       body.name = $("m-name").value;
