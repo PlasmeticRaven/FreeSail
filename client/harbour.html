@@ -19,7 +19,7 @@
   <nav class="tabs" role="tablist">
     <button type="button" data-tab="begin" class="active" role="tab">begin</button>
     <button type="button" data-tab="game" role="tab">game</button>
-    <button type="button" data-tab="doors" role="tab">doors</button>
+    <button type="button" data-tab="doors" role="tab">stations</button>
     <button type="button" data-tab="maker" role="tab">scenario maker</button>
     <button type="button" data-tab="settings" role="tab">settings</button>
   </nav>
@@ -28,6 +28,22 @@
 </header>
 
 <main class="harbour-main">
+
+<!-- the game in play, a line at the head of every tab (package 96b, step 4) -->
+<details id="in-play" class="panel in-play">
+  <summary><span class="in-play-head">In play</span> <span id="in-play-line">no game yet</span> <span class="hint" id="game-clock"></span></summary>
+    <dl class="instruments" id="game-state">
+      <dt>Game</dt><dd id="g-title" class="wrap"></dd>
+      <dt>Ship</dt><dd id="g-ship"></dd>
+      <dt>Ship's time</dt><dd id="g-stamp"></dd>
+      <dt>Seed</dt><dd id="g-seed"></dd>
+      <dt>The player</dt><dd id="g-seat" class="wrap"></dd>
+      <dt>Director</dt><dd id="g-director" class="wrap"></dd>
+      <dt>Pace</dt><dd id="g-pace"></dd>
+      <dt>Stations</dt><dd><ul id="g-stations" class="plain-list"></ul></dd>
+      <dt>Doors</dt><dd><ul id="g-doors" class="plain-list"></ul></dd>
+    </dl>
+</details>
 
 <!-- ======================= begin (package 96b, step 2) ======================= -->
 <section class="tab-page" data-page="begin">
@@ -65,21 +81,6 @@
 <!-- ======================= the game ======================= -->
 <section class="tab-page" data-page="game" hidden>
   <div class="panel">
-    <div class="panel-head"><span>In play</span><span class="hint" id="game-clock"></span></div>
-    <dl class="instruments" id="game-state">
-      <dt>Game</dt><dd id="g-title" class="wrap"></dd>
-      <dt>Ship</dt><dd id="g-ship"></dd>
-      <dt>Ship's time</dt><dd id="g-stamp"></dd>
-      <dt>Seed</dt><dd id="g-seed"></dd>
-      <dt>The player</dt><dd id="g-seat" class="wrap"></dd>
-      <dt>Director</dt><dd id="g-director" class="wrap"></dd>
-      <dt>Pace</dt><dd id="g-pace"></dd>
-      <dt>Stations</dt><dd><ul id="g-stations" class="plain-list"></ul></dd>
-      <dt>Doors</dt><dd><ul id="g-doors" class="plain-list"></ul></dd>
-    </dl>
-  </div>
-
-  <div class="panel">
     <div class="panel-head"><span>A new game</span><span class="hint">choose a game, where you stand and how the clock runs; the clock is held until you say go</span></div>
     <form id="start-form" class="form-grid" autocomplete="off">
       <label>From
@@ -90,36 +91,37 @@
         </select></label>
       <label class="from from-scenario span-3">Scenario <select id="s-scenario"></select></label>
       <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
-      <label class="from from-ship" hidden title="where the wind blows from, in degrees, and its knots; empty: south-west, fifteen knots">Wind (from, knots) <input id="s-wind" type="text" placeholder="225,15"></label>
-      <label class="from from-ship" hidden title="her heading at the start, in degrees; empty: north">Heading <input id="s-heading" type="number" min="0" max="360" step="any" placeholder="0"></label>
+      <label class="from from-ship" hidden>Wind (from, knots) <input id="s-wind" type="text" placeholder="225,15"></label>
+      <label class="from from-ship" hidden>Heading <input id="s-heading" type="number" min="0" max="360" step="any" placeholder="0"></label>
       <label class="from from-load" hidden>Saved game <select id="s-load-pick"></select></label>
-      <label class="from from-load span-2" hidden title="a save by its name in the saves place; the list fills this in">Its name <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
+      <label class="from from-load span-2" hidden>Its name <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
       <p id="s-says" class="note wide from from-scenario shelf-says"></p>
       <pre id="s-lines" class="words wide from from-scenario said-lines" hidden></pre>
       <p id="s-load-says" class="note wide from from-load" hidden></p>
-      <label title="the station you sit at: the captain's, or one below his, or the director's above the game">Where you stand <select id="s-seat"></select></label>
-      <label class="from from-scenario" id="s-aboard-label" hidden title="the ship you are aboard at the start, when it is not your own: one with a captain of her own">Aboard <select id="s-aboard"></select></label>
-      <label title="how the clock runs when a model holds a station">The clock <select id="s-pace">
+      <label>Where you stand <select id="s-seat"></select></label>
+      <label class="from from-scenario" id="s-aboard-label" hidden>Aboard <select id="s-aboard"></select></label>
+      <label>The clock <select id="s-pace">
           <option value="free">at my own pace (free-running)</option>
           <option value="rule">slowed while a model is thinking (the pace rule)</option>
           <option value="lockstep">waits for the models (lockstep)</option>
         </select></label>
-      <label title="game seconds to a real second">Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
+      <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
       <div class="form-actions wide">
         <button id="btn-start" type="submit">start the game</button>
         <a id="btn-to-game" class="harbour-link" href="/" hidden>go to the game</a>
+        <button id="btn-s-change" type="button" class="from from-scenario" title="open this scenario in the scenario maker, to change it and save it as one of yours">change this scenario</button>
       </div>
       <details id="s-more" class="wide more">
         <summary>more for this game</summary>
         <div class="form-grid">
-          <label title="the same seed gives the same weather, names and chances; empty: the scenario's own">Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
-          <label title="traders, fishermen and cruisers the game puts on the sea for itself">The sea's traffic <select id="s-business">
+          <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
+          <label>The sea's traffic <select id="s-business">
               <option value="">as the scenario says</option>
               <option value="on">on</option>
               <option value="off">off</option>
             </select></label>
-          <label title="how many other ships near you are sailed man by man at once; empty: three">Ships fully crewed at once <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="three"></label>
-          <label title="a ship is given her full crew inside this distance; empty: four miles">Within (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="four"></label>
+          <label>Ships fully crewed at once <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="three"></label>
+          <label>Within (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="four"></label>
           <label>Director's brief <select id="s-brief"></select></label>
           <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
           <label>Standing orders <select id="s-book"></select></label>
@@ -135,7 +137,22 @@
 <!-- ======================= the doors ======================= -->
 <section class="tab-page" data-page="doors" hidden>
   <div class="panel">
-    <div class="panel-head"><span>The stations for the doors</span><span class="hint">one desktop entry, or one door, per station ticked</span></div>
+    <div class="panel-head"><span>Who is where</span><span class="hint">the stations of the game in play</span></div>
+    <p class="note">A station is a post: the captain's, the officer of the watch's, the master's, the lookout's, a passenger's; and above the game, the director's. You sit at one. A model can be given another, through a door. The game's own people hold the rest.</p>
+    <table class="rows stations-table" id="t-stations">
+      <thead><tr><th>ship</th><th>station</th><th>held by</th><th>the scenario says</th><th>give it to a model, through</th><th>its model</th><th></th></tr></thead><tbody></tbody>
+    </table>
+    <p id="t-none" class="note">No game is in play: start one, and its stations are here.</p>
+    <div class="form-actions">
+      <button id="btn-t-all" type="button" disabled>start the doors the scenario asks for</button>
+      <span class="muted" id="t-says"></span>
+    </div>
+    <p id="t-error" class="refusal" hidden></p>
+    <p class="note">A door asks its model for its consent before it takes the station, in its own pane below; your word there is yours to give. The API door's models are those the settings name (the settings tab); the local runner serves the one model its settings name. The desktop client takes a station by its own entry, written below.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span>The stations for the desktop client's entries, and a door by hand</span><span class="hint">one desktop entry, or one door, per station ticked</span></div>
     <div class="form-grid">
       <fieldset class="checks" id="d-stations"></fieldset>
       <label>On another ship <input id="d-ship" type="text" placeholder="her name or id, else your own"></label>
@@ -175,28 +192,72 @@
       <span id="m-source" class="muted"></span>
     </div>
     <form id="maker" class="maker" autocomplete="off">
-      <fieldset><legend>The day</legend>
+      <div class="form-actions fold-actions">
+        <span class="muted">Each part says in a line what is set; click a part's name to open it.</span>
+        <button type="button" id="btn-m-open">open every part</button>
+        <button type="button" id="btn-m-close">close every part</button>
+      </div>
+      <fieldset data-part="day" class="folded"><legend>The day</legend>
+        <p class="fold-line wide" data-line="day"></p>
         <label>Name <input data-field="name" data-kind="text" type="text"></label>
         <label>Seed <input data-field="seed" data-kind="number" type="number" step="1"></label>
         <label>Start <input data-field="start" data-kind="text" type="text" placeholder="1805-06-12T05:00"></label>
         <label>Nation <select data-field="nation" data-kind="select" data-options="nations"></select></label>
+        <label class="check wide"><input data-field="follows_history" data-kind="bool" type="checkbox"> the world keeps to the course of history after the first day</label>
+        <label>What a person may know <select data-field="knowledge" data-kind="select"><option value=""></option><option value="place">what his place allows (the rule)</option><option value="all">everything (for testing)</option></select></label>
+        <p class="note wide" id="m-year-says"></p>
       </fieldset>
-      <fieldset><legend>The ship</legend>
-        <label>Ship file <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
+      <fieldset data-part="ship" class="folded"><legend>Your ship</legend>
+        <p class="fold-line wide" data-line="ship"></p>
+        <label>What she is <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
+        <label>Her name <input data-field="ship.name" data-kind="text" type="text" placeholder="her file's own"></label>
+        <label>Her fit of guns <select id="m-ship-fit" data-field="ship.fit" data-kind="select"></select></label>
+        <label>Her service <select data-field="papers.service" data-kind="select"><option value=""></option><option value="kings">a King's ship</option><option value="privateer">a privateer</option><option value="merchant">a merchantman</option></select></label>
         <label>Heading <input data-field="ship.heading_deg" data-kind="number" type="number" step="any"></label>
+        <label>Speed (knots) <input data-field="ship.speed_kn" data-kind="number" type="number" step="any" min="0"></label>
         <label class="check"><input data-field="ship.glass" data-kind="bool" type="checkbox"> she carries a glass</label>
         <label>Instrument <select data-field="ship.instrument" data-kind="select"><option value=""></option><option>octant</option><option>sextant</option></select></label>
-        <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
-        <label class="wide">Intent <input data-field="intent" data-kind="text" type="text" placeholder="the captain's intent: trade tin from Falmouth to Plymouth"></label>
+        <p class="not-yet wide">Her role (a cruiser, a packet, a commodore): the game does not yet take this for your own ship; her service above is what it takes.</p>
+        <p class="not-yet wide">Her colours at the start (none shown, or another nation's): the game does not yet take this for your own ship; she shows her own, and the orders in play change them.</p>
+        <p class="not-yet wide">Her company (how many, how good): the game does not yet take this; she is mustered from her file. Her officers' names and skill are in "her papers, her purse and her people".</p>
       </fieldset>
-      <fieldset><legend>The start</legend>
+      <fieldset data-part="start" class="folded"><legend>The start</legend>
+        <p class="fold-line wide" data-line="start"></p>
         <label>A port's road <select id="m-port"></select></label>
         <label>Region <select data-field="region" data-kind="select" data-options="regions"></select></label>
         <label>Latitude <input id="m-lat" data-field="position" data-kind="position" type="number" step="any"></label>
         <label>Longitude <input id="m-lon" data-field="position" data-kind="position" type="number" step="any"></label>
         <div class="wide chart-wrap"><canvas id="m-chart" width="640" height="420" title="click to prick the start on the chart"></canvas></div>
       </fieldset>
-      <fieldset><legend>The weather</legend>
+      <fieldset data-part="papers" class="folded"><legend>Her papers, her purse and her people</legend>
+        <p class="fold-line wide" data-line="papers"></p>
+        <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
+        <label>In her hold <input id="m-goods" data-field="cargo.goods" data-kind="goods" type="text" placeholder="tin 20, pilchards 4.5"></label>
+        <label>Price lists aboard <input data-field="papers.price_lists" data-kind="csv" type="text" placeholder="falmouth, plymouth"></label>
+        <label>The master's epitome <select data-field="papers.epitome" data-kind="select"><option value=""></option><option value="norie">Norie's</option><option value="moore">Moore's</option></select></label>
+        <label>Private signals <select data-field="papers.private_signals" data-kind="tri"><option value=""></option><option value="true">she carries them</option><option value="false">she has none</option></select></label>
+        <label>Other signal books held <input id="m-signal-books" data-field="papers.signal_books" data-kind="csv" type="text" placeholder="france"></label>
+        <div class="wide chron" id="m-chron" data-field="papers.chronometer" data-kind="chron">
+          <label class="check"><input id="m-chron-on" type="checkbox"> she carries a chronometer</label>
+          <span class="muted">With one the master finds the longitude by the time it keeps; without, by the reckoning and the lunar distances alone. Its certificate says its rate; its true drift is the game's secret unless you say it.</span>
+          <div class="card-grid" id="m-chron-fields">
+            <label>Its maker <input data-chron="maker" type="text" placeholder="Earnshaw"></label>
+            <label>Rated on <input data-chron="rated" type="text" placeholder="1805-05-01"></label>
+            <label>Its rate (seconds a day) <input data-chron="rate_s_per_day" data-num="1" type="number" step="any" placeholder="0"></label>
+            <label>Its true drift <input data-chron="drift" type="text" placeholder="seeded"></label>
+          </div>
+          <span id="m-chron-said" class="muted"></span>
+        </div>
+        <p class="note wide">Her people. An officer of her muster is named here by his post: give him a name, a skill (0 to 1; 0.7 when not said) or a place aboard. A role her muster has not makes a person beside it: a supercargo, a passenger; ashore at a port if you say so.</p>
+        <table class="rows wide" id="m-people" data-field="people" data-kind="people">
+          <thead><tr><th>post or role</th><th>name</th><th>skill</th><th>place</th><th>ashore</th><th>at the port</th><th></th></tr></thead><tbody></tbody>
+        </table>
+        <div class="form-actions wide"><button type="button" id="btn-m-person-add">another person</button><datalist id="m-posts"></datalist></div>
+        <p class="not-yet wide">Who a person is in this story (his rank, his traits, a line of his history, his brief): the game does not yet take this from a scenario; his character is his ship's wardroom file's, the same in every scenario.</p>
+        <label class="wide">Things aboard or ashore <textarea id="m-things" data-field="things" data-kind="things" rows="2" placeholder="a sealed packet, in the captain's keeping"></textarea></label>
+      </fieldset>
+      <fieldset data-part="weather" class="folded"><legend>The weather</legend>
+        <p class="fold-line wide" data-line="weather"></p>
         <label>Weather <select id="m-weather-mode" data-field="weather" data-kind="weather">
             <option value="">as written</option>
             <option value="climatology">the month's climatology</option>
@@ -207,30 +268,56 @@
           <thead><tr><th>at</th><th>from (deg)</th><th>knots</th><th>air</th><th></th></tr></thead><tbody></tbody>
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-wind-add">a waypoint more</button></div>
+        <p class="note wide">One fixed wind, where the wind is not pinned by the hour and there is no month's weather or system: where it blows from and its knots (empty: south-west, fifteen knots).</p>
+        <label>The fixed wind from (degrees) <input data-field="wind.from_deg" data-kind="number" type="number" min="0" max="360" step="any"></label>
+        <label>Its knots <input data-field="wind.knots" data-kind="number" type="number" min="0" step="any"></label>
+        <label>How gusty <input data-field="wind.gustiness" data-kind="number" type="number" min="0" max="1" step="any" placeholder="0.3"></label>
+        <label>How shifting <input data-field="wind.variability" data-kind="number" type="number" min="0" max="1" step="any" placeholder="0.3"></label>
+        <label>The air <select data-field="wind.air_mass" data-kind="select"><option value=""></option><option>neutral</option><option>warm</option><option>unstable</option></select></label>
+        <label>The season's bounds <select data-field="weather_bound" data-kind="select"><option value=""></option><option value="seasonal">held within the season's</option><option value="off">not held</option></select></label>
+        <label>A current (knots) <input data-field="current.knots" data-kind="number" type="number" min="0" step="any"></label>
+        <label>Setting toward (degrees) <input data-field="current.toward_deg" data-kind="number" type="number" min="0" max="360" step="any"></label>
+        <label class="wide">Weather systems, in the file's own words (a low or a high, its radius, its fronts, and its track by the hour). They give the sky and the glass, and the wind too where no wind is pinned. Changed here, they are proved with the rest; emptied, they are taken out.
+          <textarea id="m-systems" data-block="systems" rows="7" spellcheck="false" placeholder="- name: the low&#10;  kind: low&#10;  radius_km: 450&#10;  fronts: {warm_deg: 140, cold_deg: 300}&#10;  track:&#10;    - {at: 1805-06-12T05:00, x_km: -300, y_km: 500, hpa: 990}&#10;    - {at: 1805-06-13T05:00, x_km: 300, y_km: 600, hpa: 996}"></textarea></label>
       </fieldset>
-      <fieldset><legend>The sea about her</legend>
+      <fieldset data-part="ships" class="folded"><legend>The other ships</legend>
+        <p class="fold-line wide" data-line="ships"></p>
+        <div class="wide ship-cards" id="m-ships" data-field="ships" data-kind="ships"></div>
+        <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another ship</button></div>
+        <p class="note wide">A squadron or a convoy is a set of the ships above, yours among them if you like: one commander, a formation, and the others keeping their stations on her.</p>
+        <div class="wide ship-cards" id="m-squadrons" data-field="squadrons" data-kind="squadrons"></div>
+        <div class="form-actions wide"><button type="button" id="btn-m-squadron-add">another squadron or convoy</button></div>
+      </fieldset>
+      <fieldset data-part="sea" class="folded"><legend>The sea about her</legend>
+        <p class="fold-line wide" data-line="sea"></p>
         <label>Business <select data-field="business" data-kind="business"><option value=""></option><option value="on">on</option><option value="off">off</option></select></label>
         <label>Crewed cap <input data-field="crewed.cap" data-kind="number" type="number" step="1"></label>
         <label>Crewed range (miles) <input data-field="crewed.range_nm" data-kind="number" type="number" step="any"></label>
-        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest"></label>
-        <table class="rows wide" id="m-ships" data-field="ships" data-kind="ships">
-          <thead><tr><th>id</th><th>description</th><th>name</th><th>nation</th><th>position</th><th>intent (goal)</th><th>colours</th><th></th></tr></thead><tbody></tbody>
-        </table>
-        <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another sail</button></div>
+        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest (empty: every port of the chart)"></label>
+        <div class="form-actions wide"><button type="button" id="btn-m-ports-region">every port of her region</button></div>
+        <label class="wide">The ports' state at the start, in the file's own words: each port in play by its id, and under it what is said of it (closed to a nation, blockaded and by whom, letters waiting, news). Where this is filled, it is the list of ports too, and the line above is left as it is.
+          <textarea id="m-ports-state" data-block="ports" rows="5" spellcheck="false" placeholder="brest:&#10;  closed_to: [britain]&#10;  state: blockaded&#10;  news: [&quot;The fleet lies in the road.&quot;]&#10;falmouth: {}"></textarea></label>
         <table class="rows wide" id="m-world-orders" data-field="world_orders" data-kind="world_orders">
           <thead><tr><th>at</th><th>world order</th><th></th></tr></thead><tbody></tbody>
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-order-add">a world order by time</button></div>
       </fieldset>
-      <fieldset><legend>The orders</legend>
+      <fieldset data-part="orders" class="folded"><legend>The orders</legend>
+        <p class="fold-line wide" data-line="orders"></p>
+        <label class="wide">Intent <input data-field="intent" data-kind="text" type="text" placeholder="the captain's intent: trade tin from Falmouth to Plymouth"></label>
         <div class="wide checks" id="m-books" data-field="standing_orders" data-kind="books"></div>
         <label class="wide">A drafted book <textarea id="m-book" rows="3" placeholder="standing orders of your own, written beside the scenario as its .orders file"></textarea></label>
         <label class="wide">First orders <textarea data-field="orders" data-kind="lines" rows="3" placeholder="one order a line, given at tick 0"></textarea></label>
       </fieldset>
-      <fieldset><legend>The stations and who holds them</legend>
+      <fieldset data-part="stations" class="folded"><legend>The stations and the director</legend>
+        <p class="fold-line wide" data-line="stations"></p>
         <div class="wide station-holders" id="m-stations"></div>
-      </fieldset>
-      <fieldset><legend>The director</legend>
+        <p class="note wide">Who holds each station of your ship at the start. "player" seats you there. "model" is a plan: when the game is started the harbour's stations tab offers that station's door. "rules" (or nothing) leaves it to the game's own.</p>
+        <p class="not-yet wide">Who holds a station aboard another ship: a scenario cannot say this yet; her captain's door is started from the stations tab once the game is in play.</p>
+        <p class="note wide">The director is a model above the game that shapes the voyage within its brief. What it is granted is which models it may put in command of another ship (each asked for its consent first), and how many: at once, and in the whole voyage.</p>
+        <label class="wide">The director may seat <input id="m-grant-models" data-field="director.models" data-kind="csv" type="text" placeholder="the models' exact names, with commas between"></label>
+        <label>Seats at once <input data-field="director.seats" data-kind="number" type="number" min="0" step="1"></label>
+        <label>Seats in the voyage <input data-field="director.seats_in_voyage" data-kind="number" type="number" min="0" step="1"></label>
         <label>Brief <select id="m-brief-mode" data-field="director" data-kind="director">
             <option value="">no director</option>
             <option value="starter">a starter</option>
@@ -275,6 +362,12 @@
     <div class="panel-head"><span>The settings</span><span class="hint" id="st-path"></span></div>
     <p class="note">Kept outside the game's folder; a flag given on a command line wins over them for that run. <b>No key is kept here</b>: the API door's key stays in the credential store (<code>py -m freesail.agents.api --store-key</code>). A model's name may live here, and nowhere in the repository, a save or a log.</p>
     <ul id="st-credential" class="plain-list muted"></ul>
+    <div class="guard-says">
+      <h3>This game answers its own page alone</h3>
+      <p>While the game runs, no other web page open in this browser can watch it, give it an order or reach a file through it: the server writes a mark into its own pages and refuses anything that does not carry it. Nothing is asked of you on this machine.</p>
+      <p>To play from another device (a tablet beside the chart table), set "the address it answers at" below to 0.0.0.0 and start the game again: its terminal then prints one address to open on the other device, once. Whoever has that address can play the game, so give it only to a device of your own. The settings, the desktop client's file, the shortcut and the doors are changed only at this machine.</p>
+      <p id="st-saves-says"></p>
+    </div>
     <form id="settings" class="form-grid" autocomplete="off">
       <fieldset class="wide"><legend>The game's defaults</legend>
         <label>Seat <input data-set="game.seat" type="text" placeholder="the captain at the prompt"></label>
@@ -283,6 +376,7 @@
         <label>Crewed cap <input data-set="game.crewed.cap" data-num="1" type="number" step="1"></label>
         <label>Crewed range <input data-set="game.crewed.range_nm" data-num="1" type="number" step="any"></label>
         <label>Port <input data-set="server.port" data-num="1" type="number" step="1"></label>
+        <label>The address it answers at <input data-set="server.host" type="text" placeholder="127.0.0.1"></label>
         <label class="check"><input data-set="server.open_browser" type="checkbox"> open the browser at the start</label>
       </fieldset>
       <fieldset class="wide"><legend>The places</legend>
@@ -300,13 +394,20 @@
         <label class="wide">Model <input data-set="doors.api.model" type="text" placeholder="exactly as the API knows it"></label>
         <label>Dialect <select data-set="doors.api.dialect"><option>anthropic</option><option>openrouter</option></select></label>
         <label>Effort <input data-set="doors.api.effort" type="text"></label>
-        <label class="wide">Flags <input data-set="doors.api.flags" data-list="1" type="text" placeholder="--cadence watch"></label>
-        <label class="wide" title="where a director's seat's API door folds its conversation: tokens (80000) or a share of the model's context (0.4, 40%, 2/5); empty, two fifths">Seat's fold <input data-set="doors.api.seat_budget_tokens" type="text" placeholder="two fifths of the context"></label>
+        <label class="wide">Its other models <textarea id="st-models" rows="3" placeholder="one model a line, exactly as the API knows it&#10;another model, openrouter"></textarea></label>
+        <label>How often its model is asked <select id="st-api-cadence"><option value=""></option><option value="glass">every glass (half an hour)</option><option value="watch">every watch</option><option value="events">only when something happens</option></select></label>
+        <label class="check"><input id="st-api-ask-again" type="checkbox"> put the consent question again</label>
+        <label class="wide">Its other flags <input id="st-api-flags" type="text" placeholder="--max-reply 2000"></label>
+        <label class="wide">Seat's fold <input data-set="doors.api.seat_budget_tokens" type="text" placeholder="two fifths of the context"></label>
       </fieldset>
       <fieldset class="wide"><legend>The local runner</legend>
         <label class="wide">Endpoint <input data-set="doors.local.endpoint" type="text"></label>
         <label>Model <input data-set="doors.local.model" type="text"></label>
-        <label class="wide">Flags <input data-set="doors.local.flags" data-list="1" type="text" placeholder="--ctx 32768 --seed 7"></label>
+        <label>How often its model is asked <select id="st-local-cadence"><option value=""></option><option value="glass">every glass (half an hour)</option><option value="watch">every watch</option><option value="events">only when something happens</option></select></label>
+        <label>Pictures offered <select id="st-local-pictures"><option value=""></option><option value="auto">where its server says the model reads them</option><option value="yes">yes</option><option value="no">no</option></select></label>
+        <label>Its context (tokens) <input id="st-local-ctx" type="number" min="0" step="1" placeholder="the server's"></label>
+        <label class="check"><input id="st-local-ask-again" type="checkbox"> put the consent question again</label>
+        <label class="wide">Its other flags <input id="st-local-flags" type="text" placeholder="--seed 7 --temperature 0.7"></label>
       </fieldset>
       <div class="form-actions wide">
         <button id="btn-settings-save" type="submit">keep the settings</button>
@@ -320,6 +421,7 @@
 </section>
 
 </main>
+<script src="/client/harbour-words.js"></script>
 <script src="/client/harbour.js"></script>
 </body>
 </html>
