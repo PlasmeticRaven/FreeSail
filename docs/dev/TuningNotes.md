@@ -29318,3 +29318,7 @@ Truth 85 (a game saved with three stations seated, loaded from its checkpoint) f
 **The maker's words after its mend** (found by the slow tier at 955cd23, `tests/test_harbour.py`): proving with the paths it checked, the maker's refusals and lines named a file by its whole path where the player had named it `data/ships/nope.yaml`. *Mended:* the proof keeps each path as found beside the player's words for it, and gives its words back in the player's (`Harbour._in_their_words`), per request.
 
 **A practice at the great guns** (found by the truths' slow tier at cb8c8ef, truth 7-171): `combat.marks.Practice` and `Cask`, a module no census had reached (a practice begins only when it is ordered). The census sails the owner's practice (`practice_world`: quarters, a battery exercised, a cask heaved over and engaged), and 7-606 has it as a case. 326 names.
+
+### Parts A and B, the join (the owner's word of 2026-11-15)
+
+**Stage 1: a boat away.** The census takes a boat away as a hull of the one world, as the game sends her (`boat_world`: the naval cruise's frigate at anchor, `go to the launch`, `give way`, `step the mast`, `set the lug`, a quarter of an hour under it); the name it adds is `freesail.physics.oars.Oars` (her hull, her crew and her people were in the list already). 327 names. Truth 7-606 has it as a case.

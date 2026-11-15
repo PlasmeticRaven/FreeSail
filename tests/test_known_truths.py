@@ -17809,6 +17809,7 @@ def _census_cases():
     ]
     cases += [pytest.param("wardroom", None, 0, (), id="the-wardroom")]
     cases += [pytest.param("practice", None, 0, (), id="a-practice-at-the-great-guns")]
+    cases += [pytest.param("boat", None, 0, (), id="a-boat-away-under-oars-and-sail")]
     cases += [pytest.param("kin", None, 0, (), id="the-list-holds-its-kin")]
     return cases
 
@@ -17829,7 +17830,9 @@ def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list
 
     from freesail.core.checkpoint_names import ADMITTED
 
-    if kind == "practice":
+    if kind == "boat":
+        names = C.census_of_boat()
+    elif kind == "practice":
         names = C.census_of_practice()
     elif kind == "kin":
         names = C.kin(set(ADMITTED))  # every class of the game kin to one the list admits

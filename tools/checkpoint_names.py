@@ -8,15 +8,17 @@ functions its loading calls. The loader admits an exact list of those names
 (`freesail/core/checkpoint_names.py`, `ADMITTED`) and nothing else. This tool makes the
 list from what the game's own checkpoints hold: every scenario under `data/scenarios/`
 begun as the harbour begins it (the server's `prepare_game`), run and checkpointed; the
-kept saves under `tests/fixtures/saves/`; a fight; a port, a ship in it and her business;
-the far world; and the wardroom (`wardroom_world`: the stations seated as play seats them,
-the watcher, the player at a seat, a captain and an officer at work); and a
-practice at the great guns (`practice_world`: a cask heaved over and engaged). The list is written
-from a long census (`LIST_RUN_S`, two hours of each scenario, where the fishermen's gear
-is out and the people's needs have come due); truth 7-606 (`tests/test_known_truths.py`)
-takes the short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own
-holds a name the list lacks, so that a new class in a checkpoint is added to the list on
-purpose and seen in the diff.
+kept saves under `tests/fixtures/saves/`, and each played on with a station left in it
+taken again; a fight; a port, a ship in it and her business; the far world; the wardroom
+(`wardroom_world`: the stations seated as play seats them, the watcher, the player at a
+seat, a captain and an officer at work); a practice at the great guns (`practice_world`: a
+cask heaved over and engaged); and a boat away as a hull (`boat_world`: under oars, then
+under her lug). The list is written from a long census (`LIST_RUN_S`, two hours of each
+scenario, where the fishermen's gear is out and the people's needs have come due) and the
+kin of every class it meets (`kin`); truth 7-606 (`tests/test_known_truths.py`) takes the
+short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own holds a
+name the list lacks, so that a new class in a checkpoint is added to the list on purpose
+and seen in the diff.
 
 The census reads the game's own pickles with a recording loader; it never reads a
 checkpoint from elsewhere.
@@ -159,6 +161,8 @@ def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[
     yield "the wardroom", census_of_wardroom()
     say("  a practice at the great guns")
     yield "a practice at the great guns", census_of_practice()
+    say("  a boat away")
+    yield "a boat away", census_of_boat()
 
 
 def census_of_kept_save(path: Path, run_s: int = 3600):
@@ -197,6 +201,33 @@ def practice_world():
         world.submit(order)
         world.run(then)
     return world
+
+
+def boat_world():
+    """A boat away as a hull of the one world (package 82), as the game sends her: the
+    frigate of the naval cruise at anchor, `go to the launch` (her coxswain and oarsmen in
+    her, the player with them), `give way` under oars, `step the mast`, `set the lug`, and
+    sailed so a quarter of an hour."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", str(SCENARIOS / "naval-cruise.yaml")])
+    world = prepare_game(args, say=lambda _line: None)
+    world.run(60)
+    for order, then in (
+        ("go to the launch", 30),
+        ("give way", 600),
+        ("step the mast", 300),
+        ("set the lug", 900),
+    ):
+        world.submit(order)
+        world.run(then)
+    return world
+
+
+def census_of_boat():
+    from freesail.core import replay
+
+    return names_of_bytes(replay.checkpoint_bytes(boat_world()))
 
 
 def census_of_practice():

@@ -141,6 +141,7 @@ ADMITTED: frozenset[tuple[str, str]] = frozenset(
         ("freesail.physics.motion", "Motion"),
         ("freesail.physics.motion", "MotionReading"),
         ("freesail.physics.motion", "Particulars"),
+        ("freesail.physics.oars", "Oars"),
         ("freesail.physics.sails", "SailClass"),
         ("freesail.physics.sails", "SailForces"),
         ("freesail.physics.sails", "_Drawing"),
