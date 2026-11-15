@@ -286,18 +286,104 @@ def test_the_proof_says_a_fit_her_kind_has_not_and_a_heading_read_by_nothing(cli
         "/api/harbour/scenario", params={"path": "data/scenarios/first-action.yaml"}
     ).json()["fields"]
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
-    assert r.status_code == 200 and not [ln for ln in r.json()["lines"] if "To know" in ln]
+
+    def of_ships(lines):  # the proof's lines on the ships (step 8 added others)
+        return [ln for ln in lines if "To know" in ln and ("fit" in ln or "heading" in ln)]
+
+    assert r.status_code == 200 and not of_ships(r.json()["lines"])
     fields["ships"][0]["fit"] = "forty carronades"
     fields["ships"][0]["heading_deg"] = 90
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
     assert r.status_code == 200, r.text
-    said = [ln for ln in r.json()["lines"] if "To know" in ln]
+    said = of_ships(r.json()["lines"])
     assert len(said) == 2 and "forty carronades" in said[0] and "is none of her file's" in said[0]
     assert "heading is read by nothing" in said[1]
     fields["ships"][0]["fit"] = "unarmed"
     del fields["ships"][0]["heading_deg"]
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
-    assert not [ln for ln in r.json()["lines"] if "To know" in ln]
+    assert not of_ships(r.json()["lines"])
+
+
+def test_the_keys_the_proof_takes_for_the_loaders_are_the_keys_the_loader_reads():
+    """Package 96b, step 8: the maker's proof says of a key the loader does not read that it
+    does nothing. The page's server keeps the loader's keys as a list (it may not change
+    the loader); this holds the list to the loader's own source, every key it asks its
+    file for, so that a key the loader learns to read is not said to be read by nothing."""
+    import re
+
+    from freesail.ui.harbour import LOADER_KEYS
+
+    source = (ROOT / "freesail" / "world" / "scenarios.py").read_text(encoding="utf-8")
+    body = source[source.index("def load_scenario(") : source.index("STATION_HOLDERS = (")]
+    asked = set(re.findall(r'(?<![a-z_])raw\.get\("([a-z_]+)"', body))
+    asked |= set(re.findall(r'raw\["([a-z_]+)"\]', body))
+    asked |= set(re.findall(r'"([a-z_]+)" in raw\b', body))
+    assert asked == set(LOADER_KEYS), sorted(asked ^ set(LOADER_KEYS))
+
+
+def test_the_proof_says_what_the_game_reads_nowhere_and_the_year_that_is_not_1805(client):
+    """Package 96b, step 8 (the design's traps 1, 2, 3 and 6)."""
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/the-faro.yaml"}
+    ).json()["fields"]
+    fields["weather_bund"] = "seasonal"  # a key misspelt
+    fields["stations"] = {"captain": "model", "officer": "player"}
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200, r.text
+    said = [ln.strip() for ln in r.json()["lines"] if "To know" in ln]
+    assert any("'weather_bund' is no key the game reads" in ln for ln in said)
+    assert any(
+        "the chart's year and the almanac in her papers are read by nothing" in ln for ln in said
+    )
+    assert any("'model' and 'rules' (captain) seat nobody" in ln for ln in said)
+    assert any(
+        "she begins in 1808" in ln and "the wars are those of June 1805" in ln for ln in said
+    )
+    cat = client.get("/api/harbour/catalogue").json()
+    years = {Path(s["path"]).stem: s["year"] for s in cat["scenarios"]}
+    assert years["the-faro"] == 1808 and years["tarragona"] == 1809
+    assert years["first-action"] == 1805 and years["first-passage"] is None
+
+
+def test_the_systems_and_the_ports_state_are_read_as_words_and_refused_in_words(client):
+    """Package 96b, step 8 (the design's §2.5): the two blocks offered as the file's own
+    words. A scenario's systems and its ports' state come to the page as text; text sent
+    back is read into the fields before the proof (only the blocks sent), and words that
+    are no YAML, or not of the block's shape, are refused in words; what a system may say
+    is the loader's to refuse, as ever."""
+    read = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/blockade.yaml"}
+    ).json()
+    fields, blocks = read["fields"], read["blocks"]
+    assert blocks["ports"] == "" and "name: the low" in blocks["systems"]
+
+    def prove(**sent):
+        return client.post(
+            "/api/harbour/scenario/prove",
+            json={"fields": fields, "source": read["path"], "blocks": sent},
+        )
+
+    assert prove().json()["text"] == read["text"]  # nothing sent: the file as it was
+    assert prove(systems=blocks["systems"]).json()["text"] == read["text"]  # the same words
+    renamed = prove(systems=blocks["systems"].replace("the low", "the deep low"))
+    assert renamed.status_code == 200 and "the deep low (low" in "\n".join(renamed.json()["lines"])
+    none = prove(systems="")
+    assert none.status_code == 400 and "pinned sky" in none.json()["detail"]  # the loader's
+    for words, why in (
+        ("- name: [", "could not be read"),
+        ("name: the low", "are a list"),
+        ("- {name: a low, kind: typhoon, track: []}", "typhoon"),
+    ):
+        r = prove(systems=words)
+        assert r.status_code == 400 and why in r.json()["detail"], (words, r.text)
+    state = prove(
+        ports="brest:\n  closed_to: [britain]\n  news: ['The fleet is in.']\nfalmouth: {}\n"
+    )
+    assert state.status_code == 200, state.text
+    assert "The ports: brest, falmouth." in state.json()["lines"]
+    assert "closed_to: [britain]" in state.json()["text"]
+    assert prove(ports="- brest").status_code == 400
+    assert prove(tides="x").status_code == 400
 
 
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
@@ -1311,6 +1397,83 @@ def test_in_the_browser_a_chronometer_and_a_supercargo_are_added_and_are_in_the_
         }"""
     )
     assert out == {"on": True, "maker": "Arnold", "same": True}
+    assert errors == []
+
+
+def test_in_the_browser_the_day_the_weather_and_the_ports_are_set_whole(browser_page):
+    """Package 96b, step 8 (its step's own trial): a scenario of 1808 says on the page that
+    its ports are that day's and its wars June 1805's, on the game tab and in the sheet; a
+    scenario made with the world keeping to the course of history, one fixed wind and its
+    air, a current, the ports of her region, a weather system and a port's state written in
+    the two boxes is proved and saved as the file a hand would write; and a scenario read
+    and saved with the boxes untouched is the same file."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.select_option("#s-scenario", "data/scenarios/the-faro.yaml")
+    assert "She begins in 1808. The ports are as they stood on that day" in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/first-action.yaml")
+    assert "She begins in" not in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/the-faro.yaml")
+    pg.click("#btn-s-change")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('the-faro') >= 0")
+    assert "the wars those of June 1805" in pg.inner_text('#maker [data-line="day"]')
+    pg.click("#maker fieldset[data-part=day] > legend")
+    assert "She begins in 1808" in pg.inner_text("#m-year-says")
+    # the blockade read and saved with the boxes untouched: the same file
+    pg.select_option("#m-pick", "data/scenarios/blockade.yaml")
+    pg.click("#btn-m-read")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('blockade') >= 0")
+    assert "name: the low" in pg.input_value("#m-systems")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert (port.place / "blockade.yaml").read_bytes() == (SCENARIOS / "blockade.yaml").read_bytes()
+    # a scenario made with the day, the weather and the ports whole
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option("#m-port", "falmouth")
+    pg.fill('#maker [data-field="start"]', "1805-06-12T05:00")
+    pg.check('#maker [data-field="follows_history"]')
+    pg.select_option("#m-weather-mode", "")
+    pg.fill('#maker [data-field="wind.from_deg"]', "270")
+    pg.fill('#maker [data-field="wind.knots"]', "18")
+    pg.select_option('#maker [data-field="wind.air_mass"]', "unstable")
+    pg.fill('#maker [data-field="current.knots"]', "1.5")
+    pg.fill('#maker [data-field="current.toward_deg"]', "90")
+    pg.click("#btn-m-ports-region")
+    listed = pg.input_value('#maker [data-field="ports"]')
+    assert "falmouth" in listed and "plymouth" in listed and "brest" in listed
+    pg.fill(
+        "#m-systems",
+        "- name: the high\n  kind: high\n  radius_km: 800\n  track:\n"
+        "    - {at: 1805-06-12T05:00, x_km: 200, y_km: -300, hpa: 1026}\n"
+        "    - {at: 1805-06-13T05:00, x_km: 300, y_km: -300, hpa: 1024}\n",
+    )
+    pg.fill("#m-ports-state", "falmouth: {}\nbrest:\n  closed_to: [britain]\n")
+    assert "systems' words changed here" in pg.inner_text('#maker [data-line="weather"]')
+    pg.fill("#m-name", "the-day-whole")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "the-day-whole.yaml").read_text(encoding="utf-8"))
+    assert made["follows_history"] is True
+    assert made["wind"] == {"from_deg": 270, "knots": 18, "air_mass": "unstable"}
+    assert made["current"] == {"knots": 1.5, "toward_deg": 90}
+    assert made["weather"]["systems"][0]["name"] == "the high"
+    assert made["ports"] == {"falmouth": {}, "brest": {"closed_to": ["britain"]}}
+    said = pg.inner_text("#m-words")
+    assert "The world keeps to the course of history" in said and "the high (high" in said
+    assert "A current of 1.5 knots sets toward E" in said and "The ports: falmouth, brest." in said
+    # read back: the sheet says it, the boxes hold the words
+    assert "the high" in pg.input_value("#m-systems")
+    assert "closed_to" in pg.input_value("#m-ports-state")
+    assert "their state said of brest" in pg.inner_text('#maker [data-line="sea"]')
+    assert "the world keeps to the course of history" in pg.inner_text('#maker [data-line="day"]')
     assert errors == []
 
 

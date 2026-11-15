@@ -188,6 +188,9 @@
         <label>Seed <input data-field="seed" data-kind="number" type="number" step="1"></label>
         <label>Start <input data-field="start" data-kind="text" type="text" placeholder="1805-06-12T05:00"></label>
         <label>Nation <select data-field="nation" data-kind="select" data-options="nations"></select></label>
+        <label class="check wide" title="ticked: the ports change hands and their state as the record has it, each on its own day, while the game runs. Unticked: the record sets the first day alone, and the world goes its own way after"><input data-field="follows_history" data-kind="bool" type="checkbox"> the world keeps to the course of history after the first day</label>
+        <label title="who may know what: by his place aboard (the rule), or everyone everything (for testing alone)">What a person may know <select data-field="knowledge" data-kind="select"><option value=""></option><option value="place">what his place allows (the rule)</option><option value="all">everything (for testing)</option></select></label>
+        <p class="note wide" id="m-year-says"></p>
       </fieldset>
       <fieldset data-part="ship" class="folded"><legend>Your ship</legend>
         <p class="fold-line wide" data-line="ship"></p>
@@ -250,6 +253,17 @@
           <thead><tr><th>at</th><th>from (deg)</th><th>knots</th><th>air</th><th></th></tr></thead><tbody></tbody>
         </table>
         <div class="form-actions wide"><button type="button" id="btn-m-wind-add">a waypoint more</button></div>
+        <p class="note wide">One fixed wind, where the wind is not pinned by the hour and there is no month's weather or system: where it blows from and its knots (empty: south-west, fifteen knots).</p>
+        <label>The fixed wind from (degrees) <input data-field="wind.from_deg" data-kind="number" type="number" min="0" max="360" step="any"></label>
+        <label>Its knots <input data-field="wind.knots" data-kind="number" type="number" min="0" step="any"></label>
+        <label title="how much the wind gusts, 0 to 1; empty: 0.3">How gusty <input data-field="wind.gustiness" data-kind="number" type="number" min="0" max="1" step="any" placeholder="0.3"></label>
+        <label title="how much its direction wanders, 0 to 1; empty: 0.3">How shifting <input data-field="wind.variability" data-kind="number" type="number" min="0" max="1" step="any" placeholder="0.3"></label>
+        <label title="the air under a fixed or a pinned wind: warm (steady), neutral, or unstable (squally)">The air <select data-field="wind.air_mass" data-kind="select"><option value=""></option><option>neutral</option><option>warm</option><option>unstable</option></select></label>
+        <label title="hold the month's weather within what the season gives">The season's bounds <select data-field="weather_bound" data-kind="select"><option value=""></option><option value="seasonal">held within the season's</option><option value="off">not held</option></select></label>
+        <label title="a current the master does not know of: its knots">A current (knots) <input data-field="current.knots" data-kind="number" type="number" min="0" step="any"></label>
+        <label title="where the current sets toward, in degrees">Setting toward (degrees) <input data-field="current.toward_deg" data-kind="number" type="number" min="0" max="360" step="any"></label>
+        <label class="wide">Weather systems, in the file's own words (a low or a high, its radius, its fronts, and its track by the hour). They give the sky and the glass, and the wind too where no wind is pinned. Changed here, they are proved with the rest; emptied, they are taken out.
+          <textarea id="m-systems" data-block="systems" rows="7" spellcheck="false" placeholder="- name: the low&#10;  kind: low&#10;  radius_km: 450&#10;  fronts: {warm_deg: 140, cold_deg: 300}&#10;  track:&#10;    - {at: 1805-06-12T05:00, x_km: -300, y_km: 500, hpa: 990}&#10;    - {at: 1805-06-13T05:00, x_km: 300, y_km: 600, hpa: 996}"></textarea></label>
       </fieldset>
       <fieldset data-part="ships" class="folded"><legend>The other ships</legend>
         <p class="fold-line wide" data-line="ships"></p>
@@ -264,7 +278,10 @@
         <label>Business <select data-field="business" data-kind="business"><option value=""></option><option value="on">on</option><option value="off">off</option></select></label>
         <label>Crewed cap <input data-field="crewed.cap" data-kind="number" type="number" step="1"></label>
         <label>Crewed range (miles) <input data-field="crewed.range_nm" data-kind="number" type="number" step="any"></label>
-        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest"></label>
+        <label class="wide" title="the ports in play, by their ids; empty: every port of the chart">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest (empty: every port of the chart)"></label>
+        <div class="form-actions wide"><button type="button" id="btn-m-ports-region">every port of her region</button></div>
+        <label class="wide">The ports' state at the start, in the file's own words: each port in play by its id, and under it what is said of it (closed to a nation, blockaded and by whom, letters waiting, news). Where this is filled, it is the list of ports too, and the line above is left as it is.
+          <textarea id="m-ports-state" data-block="ports" rows="5" spellcheck="false" placeholder="brest:&#10;  closed_to: [britain]&#10;  state: blockaded&#10;  news: [&quot;The fleet lies in the road.&quot;]&#10;falmouth: {}"></textarea></label>
         <table class="rows wide" id="m-world-orders" data-field="world_orders" data-kind="world_orders">
           <thead><tr><th>at</th><th>world order</th><th></th></tr></thead><tbody></tbody>
         </table>

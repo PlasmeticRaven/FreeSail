@@ -139,6 +139,42 @@ def _rel(path: Path) -> str:
         return str(path)
 
 
+# The keys of a scenario file the loader reads (`world.scenarios.load_scenario`, by its
+# own reading: every `raw.get` and `raw[...]` of it): a key outside these is passed over by
+# the game in silence, and the maker's proof says so (package 96b, step 8).
+LOADER_KEYS = frozenset(
+    """name start latitude_deg position region chart follows_history ship director knowledge
+    wind glass papers epitome instrument chronometer nation nations people cargo ports ships
+    things crewed squadrons weather_bound business world_orders current weather seed
+    standing_orders intent orders stations""".split()
+)
+
+
+def year_words(year: int) -> str:
+    """What the page says of a scenario that begins in another year than 1805 (the
+    design's trap 3; the owner's answer to its question 5: said on the page)."""
+    return (
+        f"she begins in {year}. The ports are as they stood on that day; the wars are those "
+        "of June 1805, whatever the year."
+    )
+
+
+def _plain(value: Any) -> Any:
+    """A value read from YAML as the scenario's fields carry one: a day or a time as its
+    words (the fields are JSON, and the loader reads the words)."""
+    import datetime as dt
+
+    if isinstance(value, dict):
+        return {str(k): _plain(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_plain(v) for v in value]
+    if isinstance(value, dt.datetime):
+        return value.isoformat(timespec="minutes")
+    if isinstance(value, dt.date):
+        return value.isoformat()
+    return value
+
+
 _boats: dict[str, tuple[float, bool]] = {}
 
 
@@ -462,7 +498,7 @@ class Harbour:
             "scenarios_place": str(own),
         }
 
-    _names: dict[str, tuple[float, str]] = {}
+    _names: dict[str, tuple[float, str, int | None]] = {}
 
     def _scenario_entry(self, path: Path, own: bool) -> dict[str, Any]:
         """A scenario for the lists: its path as a driver takes it and its name (read once
@@ -475,15 +511,24 @@ class Harbour:
         cached = Harbour._names.get(key)
         if cached is None or cached[0] != mtime:
             name = path.stem
+            year: int | None = None
             with contextlib.suppress(OSError, yaml.YAMLError, AttributeError):
                 doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
                 name = str(doc.get("name") or path.stem)
+                with contextlib.suppress(ValueError, TypeError):
+                    year = int(str(doc.get("start"))[:4]) if doc.get("start") else None
                 if doc.get("follows_history") is True:
                     # decision 69: said on the harbour's page in the world's words
                     name += ", keeping to the course of history"
-            Harbour._names[key] = (mtime, name)
+            Harbour._names[key] = (mtime, name, year)
             cached = Harbour._names[key]
-        return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}
+        return {
+            "path": _rel(path) if not own else str(path),
+            "name": cached[1],
+            "own": own,
+            # the year she begins in (package 96b, step 8), where the file says a day
+            "year": cached[2],
+        }
 
     def shelves(self) -> list[dict[str, Any]]:
         """The shelves as the file has them (`client/harbour-shelves.yaml`): each its id, its
@@ -1340,7 +1385,126 @@ class Harbour:
             "fields": fields,
             "position_deg": where,  # for the form's latitude and longitude
             **self._said(p, fields),
+            "blocks": self.blocks_of(fields),
         }
+
+    # -- what is offered as the file's own words (package 96b, step 8; the design's §2.5) --
+
+    BLOCKS = ("systems", "ports")
+
+    @staticmethod
+    def blocks_of(fields: dict[str, Any]) -> dict[str, str]:
+        """The two blocks of a scenario the sheet shows as the file's own words and not as
+        fields: the weather's systems (`weather: systems`: a low, its fronts and its track
+        by the hour) and the ports' state (`ports` as a mapping: a port closed, blockaded,
+        its letters and its news). Each as YAML text, "" where the scenario has none."""
+        weather = fields.get("weather")
+        systems = weather.get("systems") if isinstance(weather, dict) else None
+        ports = fields.get("ports")
+
+        def text(value: Any) -> str:
+            return yaml.safe_dump(
+                value, sort_keys=False, allow_unicode=True, default_flow_style=None, width=92
+            )
+
+        return {
+            "systems": text(systems) if systems else "",
+            "ports": text(ports) if isinstance(ports, dict) and ports else "",
+        }
+
+    def with_blocks(self, fields: Any, blocks: Any) -> Any:
+        """The fields with the blocks the page sent as words read into them (only the
+        blocks it sent: an untouched block is not sent, and the scenario's own is kept).
+        The systems' words are a list of systems, laid under `weather: systems` ("" takes
+        them out); the ports' words a mapping of each port to its state, which becomes
+        `ports` whole ("" leaves `ports` as the fields have it). Refused in words when the
+        text is no YAML or not of that shape; what each system and each port's state may
+        say is the loader's to refuse, at the proof."""
+        if not isinstance(blocks, dict) or not isinstance(fields, dict):
+            return fields
+        import copy
+
+        out = copy.deepcopy(fields)
+        for name, words in blocks.items():
+            if name not in self.BLOCKS:
+                raise HarbourError(f"There is no block '{name}'; the sheet has systems and ports.")
+            try:
+                value = yaml.safe_load(str(words or "")) if str(words or "").strip() else None
+            except yaml.YAMLError as e:
+                where = getattr(e, "problem_mark", None)
+                at = f", line {where.line + 1}" if where is not None else ""
+                raise HarbourError(
+                    f"The {name}' words could not be read{at}: {getattr(e, 'problem', e)}."
+                ) from None
+            value = _plain(value)
+            if name == "systems":
+                weather = out.get("weather")
+                if isinstance(weather, list):  # the old form, the pinned wind alone
+                    weather = {"wind": weather}
+                weather = dict(weather) if isinstance(weather, dict) else {}
+                if value is None:
+                    weather.pop("systems", None)
+                elif isinstance(value, list):
+                    weather["systems"] = value
+                else:
+                    raise HarbourError(
+                        "The weather's systems are a list, each beginning '- name:' with its "
+                        "kind, radius_km, fronts and track."
+                    )
+                if weather:
+                    out["weather"] = weather
+                else:
+                    out.pop("weather", None)
+            elif value is not None:
+                if not isinstance(value, dict):
+                    raise HarbourError(
+                        "The ports' state is each port's id and under it what is said of it "
+                        "(closed_to, state, blockade, letters, news), as 'brest: {closed_to: "
+                        "[britain]}'."
+                    )
+                out["ports"] = value
+        return out
+
+    def unread_warnings(self, fields: dict[str, Any]) -> list[str]:
+        """What a scenario says that the game reads nowhere, said at the proof (the
+        design's traps 1, 2, 3 and 6): a key the loader does not know; the chart's year
+        and the almanac; the `nations:` block; a station held by "model" or "rules"; and,
+        of a scenario that begins in another year than 1805, that its ports are that day's
+        and its wars June 1805's."""
+        out: list[str] = []
+        for key in fields:
+            if str(key) not in LOADER_KEYS:
+                out.append(
+                    f"  To know: '{key}' is no key the game reads; it is kept in the file and "
+                    "does nothing (a key misspelt is passed over in silence)."
+                )
+        papers = fields.get("papers") if isinstance(fields.get("papers"), dict) else {}
+        unread = [
+            w for k, w in (("chart", "the chart's year"), ("almanac", "the almanac")) if k in papers
+        ]
+        if unread:
+            out.append(
+                f"  To know: {' and '.join(unread)} in her papers "
+                f"{'are' if len(unread) > 1 else 'is'} read by nothing in the game."
+            )
+        if fields.get("nations") is not None:
+            out.append(
+                "  To know: the nations' block (the wars and the letters of marque of this "
+                "scenario's day) is checked and kept, and read by nothing yet: the wars in "
+                "play are those of June 1805."
+            )
+        stations = fields.get("stations") if isinstance(fields.get("stations"), dict) else {}
+        idle = [str(k) for k, v in stations.items() if str(v).lower().strip() in ("model", "rules")]
+        if idle:
+            out.append(
+                f"  To know: the game itself reads only the station you hold; 'model' and "
+                f"'rules' ({', '.join(idle)}) seat nobody when the game starts."
+            )
+        with contextlib.suppress(ValueError, TypeError):
+            year = int(str(fields.get("start"))[:4]) if fields.get("start") else 1805
+            if year != 1805:
+                out.append("  To know: " + year_words(year))
+        return out
 
     @staticmethod
     def _said(p: Path, fields: dict[str, Any]) -> dict[str, Any]:
@@ -1431,7 +1595,8 @@ class Harbour:
             lines = [
                 self._in_their_words(ln.replace(str(p), "this scenario"), said)
                 for ln in sf.lines() + guard_lines(world)
-            ] + self.ship_warnings(fields)
+            ]
+            lines += self.ship_warnings(fields) + self.unread_warnings(fields)
         return {"text": text, "lines": lines}
 
     def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
@@ -1640,18 +1805,24 @@ def harbour_routes(h: Harbour) -> APIRouter:
 
     @router.post("/api/harbour/scenario/prove")
     def api_scenario_prove(body: dict[str, Any]) -> JSONResponse:
-        return call(h.prove, body.get("fields") or {}, str(body.get("source") or ""))
+        def prove() -> dict[str, Any]:
+            fields = h.with_blocks(body.get("fields") or {}, body.get("blocks"))
+            return h.prove(fields, str(body.get("source") or ""))
+
+        return call(prove)
 
     @router.post("/api/harbour/scenario")
     def api_scenario_save(body: dict[str, Any]) -> JSONResponse:
-        return call(
-            h.save_scenario,
-            body.get("fields") or {},
-            str(body.get("name") or ""),
-            str(body.get("source") or ""),
-            str(body.get("book") or ""),
-            bool(body.get("overwrite")),
-        )
+        def save() -> dict[str, Any]:
+            return h.save_scenario(
+                h.with_blocks(body.get("fields") or {}, body.get("blocks")),
+                str(body.get("name") or ""),
+                str(body.get("source") or ""),
+                str(body.get("book") or ""),
+                bool(body.get("overwrite")),
+            )
+
+        return call(save)
 
     @router.get("/api/harbour/chart")
     def api_chart(region: str = "channel-west") -> JSONResponse:

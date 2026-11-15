@@ -21816,3 +21816,68 @@ def test_truth_7_408_the_papers_the_purse_and_the_people_are_set_from_the_sheet(
         assert world.scenario.cargo["goods"] == {"tin": 12.0}
     finally:
         harbour.close()
+
+
+def test_truth_7_409_the_day_the_weather_and_the_ports_are_set_whole_and_the_unread_is_said(
+    tmp_path,
+):
+    """Package 96b, step 8 (docs/design/Design-Harbour.md §1.3 rows 40, 79 to 85 and 91,
+    §1.4 traps 1 to 3 and 6, §2.5). From the sheet: the world keeping to the course of
+    history, one fixed wind with its air, a current, a weather system and a port's state
+    (the two as the file's own words, read by the page's server into the fields), proved
+    as the game loads them and so in the game: the world follows history, the port is
+    closed to Britain, the system is the weather's. And the proof says, without refusing,
+    what the game reads nowhere: a key misspelt, the chart's year and the almanac, the
+    nations' block, a station given to "model"; and of a scenario of another year, that
+    its ports are that day's and its wars June 1805's."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    fields = {
+        "name": "The day whole",
+        "seed": 7,
+        "start": "1808-04-20T05:00",
+        "position": {"lat_deg": 50.1631, "lon_deg": -5.0345},
+        "region": "channel-west",
+        "nation": "britain",
+        "follows_history": True,
+        "ship": {"file": "data/ships/cutter.yaml", "heading_deg": 190},
+        "wind": {"from_deg": 270, "knots": 18, "air_mass": "unstable"},
+        "current": {"knots": 1.5, "toward_deg": 90},
+        "papers": {"chart": {"year": 1804}, "almanac": 1808},
+        "weather_bund": "seasonal",
+        "stations": {"captain": "model"},
+    }
+    blocks = {
+        "systems": "- name: the high\n  kind: high\n  radius_km: 800\n  track:\n"
+        "    - {at: 1808-04-20T05:00, x_km: 200, y_km: -300, hpa: 1026}\n"
+        "    - {at: 1808-04-21T05:00, x_km: 300, y_km: -300, hpa: 1024}\n",
+        "ports": "falmouth: {}\nbrest:\n  closed_to: [britain]\n",
+    }
+    whole = harbour.with_blocks(fields, blocks)
+    assert whole["weather"]["systems"][0]["track"][0]["at"] == "1808-04-20T05:00"
+    assert whole["ports"]["brest"] == {"closed_to": ["britain"]} and "ports" not in fields
+    lines = harbour.prove(whole)["lines"]
+    said = [ln.strip() for ln in lines if "To know" in ln]
+    assert len(said) == 4, said
+    assert "'weather_bund' is no key the game reads" in said[0]
+    assert "the chart's year and the almanac" in said[1]
+    assert "'model' and 'rules' (captain) seat nobody" in said[2]
+    assert "she begins in 1808" in said[3] and "June 1805" in said[3]
+    saved = harbour.save_scenario(whole, "the-day-whole")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        world = driver.world
+        assert world.scenario.follows_history is True
+        assert world.scenario.current == {"knots": 1.5, "toward_deg": 90.0}
+        assert [s["name"] for s in world.scenario.systems] == ["the high"]
+        assert set(world.scenario.ports) == {"falmouth", "brest"}
+        assert world.scenario.ports["brest"]["closed_to"] == ["britain"]
+        with pytest.raises(HarbourError, match="could not be read"):
+            harbour.with_blocks(fields, {"systems": "- name: ["})
+        assert harbour.blocks_of(whole)["ports"].startswith("falmouth: {}")
+    finally:
+        harbour.close()
