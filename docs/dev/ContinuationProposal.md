@@ -6,6 +6,8 @@ It draws on three things: the cold review of 14 November (`docs/reviews/ColdRevi
 
 ## 1. Where the game stands
 
+**Since this was written (15 November, morning): all six are merged.** Part D merged after its cloud run; parts A and B were un-parked by the owner, joined by their builder and merged. The owner agreed what runs before the gate: `docs/dev/ScopeCards-BeforeTheGate.md`. The owner's saves, replayed on the trunk with five of the six in: ten of twelve end at the same tick, place and state as on the version he played, with the same orders refused; the logs differ in wording.
+
 ### The six things that were in flight on 14 November
 
 | Piece | Outcome | What a player has from it |
