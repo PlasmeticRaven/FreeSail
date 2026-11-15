@@ -308,6 +308,9 @@
     $("g-pace").textContent = g.started ? (PACES[g.pace] || g.pace) + ", " + g.compression + "x" : "";
     $("game-clock").textContent = g.started ? (g.running ? "the clock runs" : "the clock is held until the driver says go") : "";
     $("to-game").hidden = !g.started;
+    $("in-play-line").textContent = g.started
+      ? (g.title || "a ship on open water") + (g.ship ? ", " + g.ship : "") + ", " + g.stamp + "; " + g.seat
+      : "no game yet";
     var st = $("g-stations");
     clear(st);
     if (!s.stations.length) li(st, "none held", "muted");
@@ -739,7 +742,129 @@
     else { $("m-brief-named").value = String(brief); briefMode("named"); }
     dirty = {};
     drawChart();
+    foldLines();
   }
+
+  // -- the sheet folded (package 96b, step 4; docs/design/Design-Harbour.md §2.3) --------
+  //
+  // Each part of the scenario is a line when closed, written from the fields as the form
+  // would write them now, so that the whole scenario reads without a part opened; a part's
+  // name opens and closes it.
+
+  function plural(n, one, many) {
+    var words = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    return (n >= 0 && n <= 10 ? words[n] : String(n)) + " " + (n === 1 ? one : many);
+  }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function nationWords(id) { return String(id).split("-").map(cap).join(" "); }
+  function stem(path) { return String(path || "").split(/[\\/]/).pop().replace(/\.(yaml|yml|orders)$/, ""); }
+  function whenWords(start) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(String(start || ""));
+    if (!m) return start ? String(start) : "";
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return Number(m[3]) + " " + months[Number(m[2]) - 1] + " " + m[1] + (m[4] ? ", " + m[4] + ":" + m[5] : "");
+  }
+  function lineOf(part, f) {
+    var bits = [], ship = f.ship && typeof f.ship === "object" ? f.ship : null;
+    if (part === "day") {
+      bits.push(f.name ? '"' + f.name + '"' : "No name yet");
+      bits.push(f.start ? whenWords(f.start) : "the game's own first day (1 June 1805, 04:00)");
+      if (f.seed !== undefined) bits.push("seed " + f.seed);
+      if (f.nation) bits.push("of " + nationWords(f.nation));
+      if (f.follows_history === true) bits.push("the world keeps to the course of history");
+      if (f.knowledge === "all") bits.push("everyone knows everything (for testing)");
+    } else if (part === "ship") {
+      if (!ship) bits.push(typeof f.ship === "string" || (f.director === "observe") ? "No ship of your own: the world is watched from the director's station" : "No ship file chosen: a point on the sea");
+      else {
+        bits.push((ship.file ? "The " + stem(ship.file) : "No ship file chosen") + (ship.name ? " " + ship.name : ""));
+        bits.push(ship.fit ? "her fit " + ship.fit : "her file's own fit of guns");
+        bits.push(ship.glass ? "a glass aboard" : "no glass");
+        bits.push((ship.instrument || f.instrument || "octant") === "sextant" ? "a sextant" : "an octant");
+      }
+    } else if (part === "start") {
+      var lat = $("m-lat").value, lon = $("m-lon").value;
+      if (lat !== "" && lon !== "") bits.push(Math.abs(Number(lat)).toFixed(2) + "° " + (Number(lat) >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(2) + "° " + (Number(lon) >= 0 ? "E" : "W"));
+      else bits.push("No place on a chart: the endless plane");
+      if (f.chart || f.region) bits.push("on the chart of " + (f.chart || f.region));
+      if (ship && ship.heading_deg !== undefined) bits.push("heading " + ship.heading_deg + "°");
+      if (ship && ship.speed_kn) bits.push(ship.speed_kn + " knots on her");
+    } else if (part === "papers") {
+      var cargo = f.cargo || {}, papers = f.papers || {};
+      bits.push("Purse £" + (cargo.purse_pounds || 0));
+      var goods = Object.keys(cargo.goods || {});
+      if (goods.length) bits.push("in the hold " + goods.map(function (g) { return cargo.goods[g] + " tons of " + g; }).join(", "));
+      var chron = (ship && ship.chronometer) || f.chronometer || papers.chronometer;
+      bits.push(chron ? "a chronometer" + (chron.maker ? " by " + chron.maker : "") : "no chronometer");
+      var ep = (ship && ship.epitome) || f.epitome || papers.epitome;
+      if (ep) bits.push(cap(String(ep)) + "'s epitome");
+      if ((papers.price_lists || []).length) bits.push("the price lists of " + papers.price_lists.join(", "));
+      if (papers.service) bits.push("in service as " + papers.service);
+      if (papers.private_signals !== undefined) bits.push(papers.private_signals ? "the private signals carried" : "no private signals");
+      if ((papers.signal_books || []).length) bits.push("the signal books of " + papers.signal_books.join(", "));
+      var people = f.people || [];
+      bits.push(people.length ? "people said: " + people.map(function (x) { return (x.name ? x.name + ", " : "") + "the " + x.role + (x.skill !== undefined ? " (skill " + x.skill + ")" : ""); }).join("; ") : "her people as her wardroom has them");
+      if ((f.things || []).length) bits.push(plural(f.things.length, "thing", "things") + " aboard or ashore");
+    } else if (part === "weather") {
+      var w = f.weather, wind = f.wind || {};
+      var pinned = Array.isArray(w) ? w : w && Array.isArray(w.wind) ? w.wind : [];
+      var systems = w && !Array.isArray(w) && Array.isArray(w.systems) ? w.systems : [];
+      if (pinned.length) bits.push("The wind pinned by the hour, " + plural(pinned.length, "waypoint", "waypoints") + ", from " + pinned[0].from_deg + "° at " + pinned[0].knots + " knots");
+      if (systems.length) bits.push(plural(systems.length, "weather system", "weather systems") + " written out (" + systems.map(function (x) { return x.name || x.kind || "a system"; }).join(", ") + ")");
+      if (w && !Array.isArray(w) && w.climatology) bits.push("the month's own weather");
+      if (!pinned.length && !systems.length && !(w && !Array.isArray(w) && w.climatology)) bits.push("One fixed wind, from " + (wind.from_deg !== undefined ? wind.from_deg : 225) + "° at " + (wind.knots !== undefined ? wind.knots : 15) + " knots");
+      if (w && !Array.isArray(w) && w.sky) bits.push("the sky pinned");
+      if (f.weather_bound) bits.push("held to the season's bounds");
+      if (f.current && f.current.knots) bits.push("a current of " + f.current.knots + " knots");
+    } else if (part === "ships") {
+      var ships = f.ships || [], sets = f.squadrons || [];
+      if (!ships.length) bits.push("None");
+      else bits.push(cap(plural(ships.length, "ship", "ships")) + ": " + ships.map(function (x) { return (x.name || x.id || x.description) + (x.nation ? " of " + nationWords(x.nation) : ""); }).join(", "));
+      if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : ""); }).join("; "));
+    } else if (part === "sea") {
+      var ports = f.ports;
+      if (ports === undefined) bits.push("Every port of the chart");
+      else { var ids = Array.isArray(ports) ? ports : Object.keys(ports); bits.push(cap(plural(ids.length, "port", "ports")) + (ids.length ? ": " + ids.join(", ") : "")); }
+      bits.push(f.business === undefined || f.business === false || f.business === "off" || f.business === 0 ? "no traffic of the sea's own" : "the sea's traffic " + (f.business === true || f.business === "on" ? "on" : "at " + f.business));
+      if (f.crewed) bits.push("crewed ships: " + (f.crewed.cap !== undefined ? f.crewed.cap : "three") + " at once within " + (f.crewed.range_nm !== undefined ? f.crewed.range_nm : "four") + " miles");
+      if ((f.world_orders || []).length) bits.push(plural(f.world_orders.length, "world order", "world orders") + " by the clock");
+    } else if (part === "orders") {
+      var books = (f.standing_orders || []).map(stem);
+      bits.push(books.length ? "The " + books.join(" and the ") + " book" + (books.length > 1 ? "s" : "") : "No book of standing orders");
+      if ($("m-book").value.trim()) bits.push("a book drafted here");
+      var orders = f.orders || [];
+      bits.push(orders.length ? (orders.length === 1 ? "first order: " + orders[0] : plural(orders.length, "first order", "first orders") + ", the first: " + orders[0]) : "no first orders");
+      if (f.intent) bits.push("intent: " + f.intent);
+    } else if (part === "stations") {
+      var st = f.stations || {}, who = Object.keys(st);
+      bits.push(who.length ? who.map(function (k) { return "the " + k + ": " + (st[k] === "player" ? "you" : st[k] === "model" ? "a model" : "the game's own"); }).join(", ") : "You are the captain; nobody else is said");
+      var d = f.director, brief = d && typeof d === "object" ? d.brief : undefined;
+      if (d === "observe" || (d && d.observe)) bits.push("the world observed");
+      bits.push(brief === undefined || brief === null ? "no director" : "a director on the brief " + (typeof brief === "object" ? '"' + (brief.name || "written here") + '"' : brief));
+      if (d && typeof d === "object" && (d.models || []).length) bits.push("the director may seat " + plural(d.models.length, "model", "models"));
+    }
+    return cap(bits.join("; ")) + ".";
+  }
+  function foldLines() {
+    if (!cat) return;
+    var f;
+    try { f = collect(); } catch (e) { return; }
+    document.querySelectorAll("#maker [data-line]").forEach(function (p) {
+      p.textContent = lineOf(p.getAttribute("data-line"), f);
+    });
+  }
+  harbour.foldLines = foldLines;
+  function fold(fs, folded) {
+    fs.classList.toggle("folded", folded);
+    if (!folded && fs.getAttribute("data-part") === "start") drawChart();
+  }
+  document.querySelectorAll("#maker fieldset[data-part] > legend").forEach(function (lg) {
+    lg.addEventListener("click", function () { fold(lg.parentNode, !lg.parentNode.classList.contains("folded")); });
+  });
+  $("btn-m-open").addEventListener("click", function () { document.querySelectorAll("#maker fieldset[data-part]").forEach(function (fs) { fold(fs, false); }); });
+  $("btn-m-close").addEventListener("click", function () { document.querySelectorAll("#maker fieldset[data-part]").forEach(function (fs) { fold(fs, true); }); });
+  $("maker").addEventListener("input", foldLines);
+  $("maker").addEventListener("change", foldLines);
+  $("maker").addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON" || ev.target.tagName === "CANVAS") setTimeout(foldLines, 0); });
 
   function valueOf(el) {
     var kind = el.getAttribute("data-kind");
@@ -813,7 +938,26 @@
       var d = f.director && typeof f.director === "object" ? f.director : {};
       if (mode2 === "starter") d.brief = $("m-brief-starter").value;
       else if (mode2 === "named") d.brief = $("m-brief-named").value.trim();
-      else if (mode2 === "written") d.brief = writtenBrief();
+      else if (mode2 === "written") {
+        // the form shows a brief's name, tone, challenge, limits, cadence and budget: what
+        // else the brief read holds (its examples, a limit the form has no field for) is
+        // kept as it was, so that touching the form drops nothing it does not show
+        var prev = d.brief && typeof d.brief === "object" ? deep(d.brief) : {};
+        var now = writtenBrief();
+        ["name", "tone", "challenge", "cadence"].forEach(function (k) { delete prev[k]; });
+        ["limits", "budget"].forEach(function (k) {
+          var shown = {};
+          document.querySelectorAll('#m-brief-written [data-brief^="' + k + '."]').forEach(function (el) { shown[el.getAttribute("data-brief").split(".")[1]] = true; });
+          var rest = {};
+          Object.keys(prev[k] && typeof prev[k] === "object" ? prev[k] : {}).forEach(function (x) { if (!shown[x]) rest[x] = prev[k][x]; });
+          delete prev[k];
+          var merged = now[k] || {};
+          Object.keys(rest).forEach(function (x) { merged[x] = rest[x]; });
+          if (Object.keys(merged).length) now[k] = merged;
+        });
+        Object.keys(prev).forEach(function (k) { now[k] = prev[k]; });
+        d.brief = now;
+      }
       else delete d.brief;
       if (Object.keys(d).length && (d.brief === undefined || d.brief !== "")) f.director = d; else delete f.director;
     }
@@ -837,6 +981,14 @@
   }
   harbour.readScenario = readScenario;
 
+  // "change this scenario" on the game tab: the scenario chosen there, read into the sheet
+  $("btn-s-change").addEventListener("click", function () {
+    var path = $("s-scenario").value;
+    if (!path) return;
+    $("m-pick").value = path;
+    tab("maker");
+    readScenario(path).catch(function (e) { show($("m-refusal"), e.message); });
+  });
   $("btn-m-read").addEventListener("click", function () {
     readScenario($("m-pick").value).catch(function (e) { show($("m-refusal"), e.message); });
   });
