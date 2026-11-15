@@ -66,3 +66,39 @@ What I propose: **the design covers both layers, and the build before the gate i
 
 1. **The adversarial seats.** Package 74 drafted a further revision (`docs/design/ConsentRevision-AdversarialSeats.md`): the words that would let a model be asked to captain a ship that fights a human's. Until it is approved the game refuses that seat. It can ride in this one revision, so that no model is asked twice, or stay out. If the gate is to have a model commanding an enemy, it has to be in. I would put it in: the asking is the same asking, and leaving it out means a second round later.
 2. **The director's limits** (package 115, part C: approved by the owner on 14 November, not begun). The brief speaks of the director, and part C changes what the director may do. If part C is to be built at all before the next revision, it should be built before this one, or the brief is revised twice. I would run part C as a small card of its own between the harbour's build and this revision. If the owner would rather keep the list before the gate to the two he named, the revision goes ahead without it and says of the director only what is true today.
+
+## Card 3. Package 96b: the harbour, built (proposed 2026-11-15 from the design the owner answered)
+
+**The owner's answers to the design's questions, 2026-11-15:** "Yes to each question, as proposed, except for number 10, as I think we can handle running this without cutting any steps." So: the first game is the primer's chapter 7 written as a scenario, "A first passage"; one card for every ship with the lines the game does not yet take shown greyed; the flags a ship carries wait with the deeper layer; two text boxes for the weather's systems and a port's letters; the year's sentence said on the page; the shelves kept in one new file; the sorting as proposed, the seven tests' and gates' scenarios behind a tick box; one list of models for the API door; the page reads a scenario's "a model" for his own ship and offers the door; the three small faults listed for the gate. **All eleven steps are built; none is cut.**
+
+**And on the tests, his word:** "The key to making sure this work doesn't take 10 days is that we use the suites intelligently here. Since this is meta-game code, we can probably carefully constrain or even bypass the suites for most of the steps here." The gate below is built on that.
+
+| Field | |
+|---|---|
+| **Purpose** | As card 1: the owner can start any game the build can play from the harbour's page, without editing a file; an experienced player reaches everything; a newcomer is offered a first game. |
+| **Builds** | The eleven steps of `docs/design/Design-Harbour.md`, section 4, in its order, as answered above. Each step leaves the page working and is merged alone. |
+| **Does not build** | Anything that changes how the game reads a scenario (the design's list a to i). The deeper layer. The locker. The guided first passage. The director's limits. Anything of the consent work. A second local runner. |
+| **May change** | **Only these:** the page's own files (`client/harbour.html`, `client/harbour.js`, the harbour's part of `client/style.css`, one new file of the page's sentences); the page's own server (`freesail/ui/harbour.py`); one new file of shelves; in step 2 one new scenario, "A first passage", of keys the game reads today; in step 9 the settings form showing the list of models it already keeps; in step 11 the primer's chapter on starting a game and the README's paragraph; the tests of these. **A step that needs any other file stops, and the builder tells the lead before touching it.** |
+| **How the owner tries it** | Each step by its own line in the design ("the owner tries it by"). He may try each as it lands, or wait for the three natural stopping points: after step 3 (the newcomer's page), after step 7 (every ship, squadrons, papers and people), after step 11 (the whole). |
+| **Size** | The design counts nine to twelve working days of building. With the gate below, the calendar should be set by how fast the owner wants to try the steps, not by the tests: a few days. If a step proves not to be the page only, it stops there and comes back to the owner. |
+| **Comes after** | The design document on the trunk. |
+| **Who** | The session that wrote the design, which has the inventory in its head. |
+
+### The gate for this package: narrow where the step is the page only
+
+The whole suite takes over an hour on the cloud and tests the ship, the sea and the fight. A step that changes only the page cannot move any of that, **provided it really does change only the page.** So the rule has two halves: a narrow gate, and a mechanical check that the step earned it.
+
+**For every step:**
+1. **The paths are checked, not trusted.** Before a step merges, the lead lists every file it changed and compares them with the "may change" list above. One file outside it, and the step gets the whole suite or goes back.
+2. **The narrow gate:** lint; the page's own tests and the server's (the harbour's, the settings', and the guard's truths from package 115, so that every new road the page opens is behind the guard); the browser plans, which drive the real page; and the one test that reads every file of the repository. Minutes, not an hour.
+3. **The lead reads the step's changes** before it merges.
+
+**The exceptions, which get more:**
+- **Step 2 adds a scenario.** Thirty-six test files walk the scenarios, and several count them. It gets the whole suite on the cloud before it merges, like any package.
+- **Step 9 starts doors for models.** It gets the doors' and the stations' tests as well, and an independent reading of its own, because it is where the page touches what a model is asked.
+- **Step 11 changes the primer.** It gets the primer's tests.
+
+**The whole suite still runs, after and not before:** on the trunk at the three stopping points (after steps 3, 7 and 11). If one of those runs is red, the next step waits until it is mended. And the whole page gets one independent reading at the end, before the gate.
+
+What is given up, said plainly: between stopping points the trunk carries page changes that the whole suite has not yet run over. The path check is what makes that safe. What is not given up: the guard's tests on every step, a reading of every step, and the owner trying each step by hand, which for a page is the test that finds the most.
+
