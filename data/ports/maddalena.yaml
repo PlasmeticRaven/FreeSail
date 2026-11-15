@@ -119,7 +119,8 @@ closed_to: []
 # grid's own water, JUDGEMENT (no source gives the channel's positions), the way the
 # game's land guard passes in and out; read against the pilot's channel: from the west round
 # Point Liche into the sound, as the pilot has it.
-# Its least depth along the way, by the grid at its datum read every 2 m: 5.3 m,
+# Its least depth along the way, by the grid at its datum, the true least of its surface
+# along each leg (the chart session's tracks step; old: read every 2 m): 5.2 m (old 5.3 m),
 # drawn through water of 3 m and more on every leg.
 # The tracks before, which the guard refused:
 #   to_sea: [agincourt-sound, maddalena-road, 41 13 N 9 18 E]

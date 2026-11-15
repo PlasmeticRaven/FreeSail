@@ -36250,6 +36250,186 @@ synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (i
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
 
+## The chart session's tracks step: the least depth along a line, and seven ports' tracks (2026-11-14)
+
+By package 111's rulings 1, 3 and 4 as merged (the record's "Package 111, step 2b ... PACKAGE
+111 CLOSED"), on the trunk at 848bbcae.
+
+**One reader of a line's least depth, the true least of the chart's surface.**
+`Chart.least_depth_along(a, b)` gives the least depth along the great circle with no step and
+no margin. This is the lead's ruling of 11:00 on the independent reader's finding, which the
+chart session's own measure found too, at Setúbal.
+
+How it reads:
+- The lookup is bilinear between cell centres. Along a straight line within one square of four
+  centres the depth is therefore a quadratic, least at an end or at its turning point.
+- The line is cut into chords of at most 500 m (`LINE_CHORD_M`), each straight in degrees
+  between two points of the great circle; at 500 m the two differ by millimetres. At 2 km two
+  of Setúbal's legs read 1.1 and 1.5 cm over a reading every metre along the great circle,
+  where the surface is steep; at 500 m every port leg is at or under it within a centimetre.
+- Each chord is cut again (`Chart._line_pieces`): at every level's tile edges, and, where that
+  level has a tile, at its cell edges and its centre lines. These are every place the
+  surface's formula may change: a square of four centres, a corner unknown where the lookup
+  falls back to the nearest cell, or a finer level beginning or ending.
+- On each piece (`LinePiece.readings`) the depth is read at the ends and the middle, and at the
+  quadratic's turning point where that is a least within the piece.
+
+Old, in this step's first hash (84fdbcc8): a first reading every half cell of one level
+(`Chart.line_step_m`, the level chosen for the whole line by sampling a quarter of a tile's
+span), and a second every 2 m under 8 m. That reader stepped over a head three ways:
+- Off a cell's axis. Half a cell reads three quarters of a lone cell's rise only along the
+  cell's axis through its centre: a diagonal reads about 0.68 of it, an off-centre line less.
+  The reader's made grid gave 13 lines of 750 read three metres and more where the truth is
+  under three (9.51 m where it is 1.79 m), so the first reading stayed above 8 m and the
+  second never ran.
+- At a level's corner. A line clipping a finer tile's corner for less than a quarter of a
+  tile's span was read at the coarser step: a 1,729 m line over a level-3 tile for 785 m read
+  14.0 m over a two-cell rock drying to nothing.
+- At Setúbal's V, on the real chart: the best single picture of the fault. The leg from
+  38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W (1,078 m, level 2, cells 92.6 m by 72.6 m),
+  read every metre (the depth at the datum, metres along it in brackets):
+
+  | 500 | 512 | 524 | 536 | 548 | 554 | 560 | 566 | 572 | 584 | 596 | 614 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|
+  | 10.33 | 8.28 | 6.34 | 4.51 | 2.80 | 1.99 | 1.20 | 1.84 | 2.62 | 4.12 | 5.56 | 7.59 |
+
+  Its least is 1.18 m at 561 m (1.13 m by the exact least): a V to the line's crossing of the
+  centre lines, where the bilinear surface breaks. A cable's step happened to land at 555 and
+  556 m (1.85 and 1.72 m); half a cell's (36.3 m) at 544 and 580 m (3.36 and 3.66 m), so it
+  read the shoal two metres too deep. Only the 2 m second reading under 8 m caught it, and the
+  pilot's look ahead has no second reading. The depth is the interpolated surface itself
+  (`depth_at`), not a block's shoalest sounding (`tile_min_depth`).
+`line_step_m` is gone with it: no reader along a line needs a step now.
+
+The audit's `_least_depth` (check (f)) reads only this. `TRACK_STEP_M` and
+`TRACK_REFINE_BELOW_M` are out, as `TRACK_COARSE_STEP_M` went before them. A leg the chart knows
+nothing along is now a finding of its own (`f-unread`), not a shorter count (the reader's item
+4); none today.
+
+Measured on the tree as built (check (f) whole):
+- 10.6 to 12.2 s by the machine's load (500 m chords), against 8.2 s stepped: the exact least
+  costs a third to a half as much again;
+- the same 30 findings, the 12 `f-shallow` counts unchanged;
+- words moved by a tenth or a leg's name: Paimboeuf 1.9 to 1.8 m, Setúbal 1.2 to 1.1 m;
+  St Malo's, Oporto's and the Goletta's leg named.
+
+What a coarse cell can hold (the lead's ruling of 07:47, item 4). A level-2 cell is 92.6 m
+square and holds one depth, its survey's for that whole square. A head, a rock or a bar
+narrower than that is in the grid only as far as it moved its cell's figure. On level-2 water,
+then, the audit proves that the grid's surface nowhere along the line is under 3 m. It does
+not prove that no head under 3 m stands there: nothing finer can be read where the grid
+itself is no finer. The same holds tenfold over level 1.
+
+The tests:
+- In `tests/test_chart.py`, the true least by a lone cell standing at 2, 0, -3, -6 and -10 m in
+  30 m of water. Thirty random lines by each, at any bearing within 0.8 of a cell of its
+  centre, each read against the same surface every centimetre: at or under every reading, and
+  within 1.5 cm of the least of them.
+- The same over a ridge of fifty cells crossed at a slant; across the edge between two tiles of
+  one level (a head on the seam); and across a level's edge, from a harbour patch out over a
+  region's coarser cells to a head of the region's own.
+- Setúbal's leg on the real chart: its least 1.13 m, at or under a reading every 2 cm about the
+  V.
+- `tests/test_chart_audit.py`'s Setúbal test: the audit reads 1.1 m, and a reader stepping
+  every 20 m in its place reads the leg over 2 m. Old: the old step set on the stepped reader's
+  two readings.
+
+**Seven ports' tracks.** Searched for the deepest way from each anchorage to open water: a
+widest-path search on a 10 m lattice, simplified to the fewest marks whose legs keep a floor.
+Every leg was read by the reader above and passed by the game's guard.
+
+| Port | Old least (the leg) | New least | What moved |
+|---|---|---|---|
+| Messina | ground drying 4.0 m (the road to the harbour, across the shore) | 34.2 m | out east of the road first, then down the Marina's side to the mouth, west of the islands that stand for the Braccio |
+| Syracuse | 0.5 m (east over the grid's shoal off Ortygia) | 5.0 m | out through the middle third of the mouth (Smyth's Plemmyrium shoal to the south); from the sea to off the mouth, the inner track on to the harbour |
+| Palermo | 0.0 m (across a modern pier) | 4.4 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
+| Lampedusa | 0.4 m (the harbour to its road) | 6.4 m | by the mouth's deeper side; from the sea to the road, the inner track on |
+| Catania | 1.1 m (the road into the mole) | 5.0 m | in by the north, past the piers' heads (Smyth: the lava on the south, the piers on the north) |
+| Santa Cruz de Tenerife | ground drying 1.6 m | 55.6 m | the road's spot lay within the grid's modern Dique (the deepest way out within 5 km dried 0.0 m): the road moved 547 m east to Purdy's half a mile in 30 to 35 fathoms (the grid 55.6 m), the berth 342 m to the grid's 10.5 m; the tracks stand |
+| Porto Paolo | ground drying 2.1 m | 14.2 m | the spot lay within the modern basin, closed by the grid's breakwater (the deepest way out 0.5 m): moved 413 m south to Smyth's entrance in seven to ten fathoms (the grid 14.2 m), its fathoms 5 to 8; the tracks stand |
+
+Their known-list entries go as they are mended (seven out). The last two were mended at their
+cause, by the lead's ruling of 07:47: the spot, not the track, was the modern grid's. Each moved
+to the road its pilot gives, the source and the grid's depth said beside it in the features
+file and the port file; nothing else of either port moved. What reads them:
+- the boat's pull from the anchorage to the shore: Santa Cruz 1,051 m to 1,489 m, Porto Paolo
+  1,403 m to 1,771 m;
+- truth 7-524's band for Santa Cruz's road (40 to 80 m): 61.7 m to 55.6 m, within it;
+- truth 7-529's frigate, her nearest to the road (2 to 3.5 miles, measured 2.96): see below.
+- the pilot's station, which is the same feature (`pilot: station:` in both files): his boat
+  now cruises from the moved road, 547 m east at Santa Cruz (cruising 3 miles) and 413 m south
+  at Porto Paolo (2 miles). A ship takes her pilot that much farther out, well within his
+  cruising ground, and the way from where he boards to the anchorage is the same open water.
+No scenario begins or ends at either spot.
+
+Three of the five shared one cause beside the shoal, which is the plan and not the track. The
+business's way in (`ships.approach_plan`) is the track from the sea, then the outer road where
+that track does not pass it, then the inner track. Lampedusa's, Palermo's and Syracuse's tracks
+from the sea ran on to the anchorage, so the plan went back out to the road and straight in
+again over the shoal. Their tracks from the sea now end at the road, as Messina's and Catania's
+already did. Looked for in the other ports: the audit reads the whole plan, so any other port
+so drawn would show a shallow leg; none of the 19 findings is of this kind.
+
+Palermo's grid is the modern port. Its way is the grid's deepest, not the pilot's picture of
+brushing the mole-head (said in the file).
+
+**Faden's sunken rock north-east of Roustel** (St Peter Port; p. 32, the OCR's lines 4249 to
+4251, "About :oo yards"): the track passes Roustel at 220 m, about 240 yards. It keeps "that
+distance" if the figure is 100 or 200 yards and not if it is 300. The rock itself, at each of
+those distances north-east of Roustel, the track passes at 224, 213 and 158 m. Said in the
+port's file.
+
+This corrects my earlier reading, which the lead's ruling repeated ("clears 100 yards but not
+200"): measured on the tracks as merged, it clears 200 too.
+
+**The known list moves out of `data/`** (ruling 4) to `tools/audit_chart_known.yaml`, beside
+the tool. The build's fingerprint hashes every file under `data/` (`core/world.fingerprint_of`),
+so an edit of a list the game never reads changed the build and made earlier saves another
+build's. The move itself changes the fingerprint once, as every data change of the step does.
+A test holds the list beside the tool and nothing at the old path.
+
+**The land guard (ruling 3), on the tracks as merged.** It stays listed and unmended; a second
+way through is recorded here for the lead's list. A crossing is called only at a stepped point,
+and only beyond the first cable and short of the last (`land_crossing`'s skips), so dry ground
+within a cable of a leg's ends is not tried even where the end is a mark at sea and not a
+place on the shore.
+- Civita Vecchia's way in, the road to 42 05.53 N 11 47.00 E (538 m), crosses 138 m of ground
+  drying 0.6 m from 329 to 466 m along. The last stepped point tried is at 309 m and the last
+  cable is skipped, so the guard reports a near pass of 22.7 m.
+- Its way out's first leg crosses 50 m of ground drying 0.4 m, 7 to 56 m from its first mark.
+  That is within the first cable, so it is not tried.
+- Santa Cruz de Tenerife's two legs cross 45 m of ground 1.6 m above the datum and are reported
+  as near passes of 19.4 and 19.0 m.
+
+**Where else a fixed step samples the chart along a line** (package 111's table above, checked
+against the code). It holds, and lacks one: `dealings._leg_made`, the pilot's judging of a leg
+he lays. That reads `dangers_ahead` (the charted features, no step) and then the water under
+her every half cable (92.6 m) by `_water_for`; it is in the game's step of its own (ruling 2)
+with `shoal_ahead`.
+
+Not along a line, and not in the table by design: `captains` (the joining mark, sought out from
+the shore by half cables), `orders` (rings of half cables to the nearest water), and the
+contour searches. `core/world.py`'s halves of a cable are words; `orders/station.py`'s
+`SAIL_STEP_M` is not the chart. The guard and the lookout stay as they are (ruling 3, and the
+lead's 06:15 ruling).
+
+**The twelve `f-shallow` entries left, by cause** (the lead's ruling of 07:47, item 3; each cause
+also written in its known-list reason). The three causes are: (1) the spot lies inside modern
+works the grid encloses; (2) the grid's grain over a channel the pilots give deeper; (3) a bar
+or shoal the pilots give too. Measured by the deepest way on a 25 to 40 m lattice from the
+anchorage or road to the road or open water.
+- (3), a bar or shoal the pilots give too: Calais (dry at low water), Dunkirk (the Splinter's
+  six or eight feet), Poole (the bar's six to eight feet; the grid's deepest way 2.0 m), St Malo
+  (the drying shelves), Oporto (the bar; 1.5 m), Setúbal (the bar), Paimboeuf (the Loire's
+  ledges; 3.3 m off the pilot's side, JUDGEMENT) and Rochefort (the Charente; 3.1 m, JUDGEMENT).
+- (1), the spot inside modern works: Genoa (the deepest way from the anchorage to open water
+  dries 0.1 m), Bougie (from the road, dries 0.4 m) and Civita Vecchia (the anchorage itself
+  2.9 m within the modern harbour, the pilot's two entrances under its moles). Named to the
+  lead, not moved.
+- None of the three: the Goletta, where the grid has a way of 6.2 m from the road to the
+  track's first mark that the track does not take. Named to the lead, not redrawn.
+- (2) none clearly: where the pilots give a figure at the worst point, it is a bar's or a
+  shoal's.
 ### The lead's answers on step 0 (2026-11-13, through the chart session)
 
 1. **Level 0** covers the Atlantic and the Mediterranean, 70 S to 75 N and 100 W to 40 E. The
@@ -37124,530 +37304,22 @@ Cited and not held, as the helper found them: Lempriere 1800 (nations.yaml); Oma
 files) and Lavery (22 data files); Troude; Lloyd's Register; "the encyclopaedia" in 21
 feature files; Trinity House's pages; Whewell 1833; Tomlins and Raithby's Statutes.
 
-## Package 115, part D: the newcomer's trips (2026-11-14)
+## Package 75's eight pins, re-measured by the lead at the merge (2026-11-15)
 
-From the cold review of 2026-11-14 (`docs/reviews/ColdReview-M7.md` 1.5, 5.3, F2.11), each
-trip played at the prompt from a scenario started as the harbour starts it, its cause read,
-mended where it lives, and tested by the same door (truths 7-615 to 7-627, at the end of
-`tests/test_known_truths.py`). The lead's rulings of the same day stand over each.
+Package 75's words (every work named as an order names it; the sails by their plain names) change lines of eight recorded logs. The ships session cannot measure them (the whole logs do not reproduce on its Windows machine), so the lead measured them on the build machine: the staged tree run whole on the cloud (run 105, then run 107 at the merged hash), and each log dumped line by line on the trunk and on the staged tree and compared (`Log.digest()`'s own canonical lines).
 
-**D1, the guns.** The first action with the orders its header lists less one: the answers
-"The guns are firing as they bear already" and "loading with round shot already" were given
-with every gun lashed, and nothing fired. Three causes: the answers of the standing
-intentions (`orders/gunnery.py`) spoke of the battery's intention as of the guns; the beat
-(`orders/crew.py`) did not say the guns were still secured; the player's order made the
-rules captain stand aside (decision 41) before his `engaging` state, where he casts loose,
-and the aside said nothing of it. Measured, differing from the review: the beat at 10:02 is
-before his first judgement (10:05) and does not move him; `engage her to starboard` at
-10:07 does. The period, the lead's ruling: casting loose is its own word (Falconer 1780,
-EXERCISE: "1st. Silence. 2d. Cast loose your guns."; QUARTERS says nothing of the guns).
-Mended in four functions: `gunnery.execute` hands every answer of the intentions to
-`_true_of_the_guns` (new, with `_guns_state`): with a gun loose the answer is as it was;
-with none, "So ordered already: firing as they bear. The guns are secured: none is loaded,
-run out or fired until they are cast loose; say 'cast loose the guns'." (or "being cast
-loose" while they are); `cease firing` no longer says the guns are loaded and run out.
-`crew.beat_to_quarters` adds "The guns are secured: 'cast loose the guns' to serve them.";
-`captains.player_hand` says "the deck is yours", and "and her guns are secured" with an
-enemy in sight (`_enemy_in_sight`, new). Nothing in `crew/quarters.py`, `crew/hands.py`,
-`evolutions/runner.py` or `combat/` (package 75's ground).
+| Pin | Lines | Old | New | What differs |
+|---|---|---|---|---|
+| `GATE_5B_SCHOONER_DIGEST` | 766 | 3a1698037811b753 | b5f35676ef8183d0 | 52 lines, wording only |
+| `GATE_5C_CRUISE_DIGEST` | 2,242 | 1e7f8ab24b84e6f7 | 81b0b08a63bf068e | wording only |
+| `GATE_5C_MERCHANT_DIGEST` (and truth 77) | 3,103 | 40bcef34afd0cec4 | ad35e60bf5d3737d | 153 lines, wording only |
+| `GATE_6A_INTENT_DIGEST` | 2,079 | 9d9efe6b21c17060 | 5d3cbbc5f4d33b84 | wording only |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | 3,115 | c0bf4b51621ad91f | 2cc02c95ad794bc8 | 153 lines, wording only |
+| `TRIAL_STATION_GALE_DIGEST` | 1,722 | 04f2fcd0fe9023a4 | b12065ef819367b3 | wording only |
+| `TRIAL_TRADE_THICK_DIGEST` | 426 | cfa538b19cb0d2fe | 506bf46eaa6d66fe | wording only |
+| the privateer trial | 1,594 | aa04702e062bc64b | 48c8948f87088a76 | wording, and three lines |
 
-**D2, the purchase with the boat lost.** Reproduced at refute-03's figures (£500, £494,
-£248, nothing delivered). The cause: `trade`, `trade_together` and `trade_list` each paid,
-moved the market and broke out the hold before `_send_boat` refused a lost boat. Mended by
-one function, `Dealings._bargain`, by which every door strikes: weighed whole, refused in
-words before anything moves, the boat sent first and the money moved only when she is away
-for the goods (JUDGEMENT, the lead's word: paid once the boat is away, not at her return).
-The three doors keep their own words. The lost boat's refusal says her name once. A boat
-lost after she is away (the lead's question): measured before, the coal's £6 gone, nothing
-said, and "The boat hoisted in" two hours later of a boat that was lost. Mended in the
-errand itself (`SendBoatScript`, which keeps what it carries): it ends and says "the 3 tons
-of coal bought are lost with her, £6 paid for them and not to be had again"; goods sold and
-lost before landing keep the money taken (JUDGEMENT); `send_boat.yaml`'s `on_fail` reads
-"{boat_cap}'s errand is not done: ..." (it said "could not go" of a boat that went).
-`world/boats.py` is not touched. Checked and not of this cause: the yard's demand, the
-recruits and the lighter pay at the order and deliver by the port's own job, not the ship's
-boat; found on the way, for others: those jobs deliver whether or not she still lies in the
-port, and "The boat cut adrift by order" is logged twice for one order (`boats.py`).
+"Wording only" means: with the known changes of words put back (fore sail to foresail, main sail to mainsail, the log and the lead named as orders name them, lie a-try, cast loose the guns, make the signal, the spanker and the gaff topsail by their plain names), no line differs, at the same tick and of the same kind. The privateer trial's three lines are `make all sail` on the schooner no longer answering "'set the square sail': 'set' was understood, but 'square' belongs with 'brace'", which the lead's ruling (6) of 10 November meant gone. No line count moves. The item sent back (a mark that changes hands) moves none of them: the eight pass on the merged tree.
 
-**D3, the starter book by rig.** Measured on every ship file: refused in part on the cutter,
-the smack, the lugger, the bilander, both schooners and the five boats; whole on the square
-rigs. Mended where a book file is read (`standing.book.fit_to_rig`, called by
-`ui.console.read_standing_orders`, the console's, the server's and the scenarios' one
-reading; the lead's ruling: one book for any rig): a clause naming a family of sails she
-carries none of (`SAIL_FAMILIES`, the ship files' own plural groups) is left out, a rule
-left empty is left out, and her log says so ("The book fitted to her rig, for she carries no
-studdingsails nor royals: 'night routine' left out; 'morning sail' left out; 'shorten sail
-for weather' without its studdingsails and royals."). A standing order typed at the prompt
-refuses as before. What it moves in the six scenarios that load the book onto such a rig is
-measured for the lead before any pin moves.
+The one who moved the words (the ships session) did not measure or pass the pins; the lead measured them, and the two independent readers of the hash passed the changes of wording they rest on.
 
-**D4, the small items.** (a) "a stranger in sight is no stranger in sight": a clause's
-words (`standing.rules.Clause.describe`) now say a reading's words of absence alone.
-(b) The same report sent down eight times in twelve minutes: eight different sails of the
-world's business, each lost from sight in the same words (for the lookout's owner: the
-lookout names them alike). `world.reports.tick` gathers a minute's same-worded lines into
-one report, the first whole and the count after it, and does not send words the captain was
-told within the hour until he has been on deck (`_reported_lately`, as `_called_lately` is
-the calls'). (c) The player's own person moved below at noon: a cutter whose master
-commands, the master the player's person, `occupy("below")` by the day's work. The lead's
-ruling: the player's person is never moved by a routine. `Navigation._below_to_work` sends
-the master below for the day's work, the time sight and the lunar's clearing unless he is
-the player's own person with the deck his (no rules captain commanding her for him); then
-he works it where he stands, said in the log. Where else a routine moves a person: the sights
-bring the master on deck (`occupy("on deck")`, the noon and the lunar, left: the sight is
-taken on deck); the surgeon's cockpit (a wound, not a routine); the needs' sleep (by his own
-order or where he stands). (d) The dispatches gain their 'let go the best bower'; every
-scenario that says she lies at anchor is tested to be riding in her port at two minutes. The
-merchant brig is left out of that test: her 'let go' wants twelve forecastle hands
-(`let_go_anchor.yaml`) and her company is sixteen, on the trunk and on package 75's branch
-alike; the deeper cause, not built: a scenario's opening state made by an order that can
-wait or fail. (e) The wheel shot away, never mended: `rig the relieving tackles`
-(`orders/damage.py`, `RelievingTacklesScript`, `data/evolutions/relieving_tackles.yaml`, the
-tiller's use by Steel 1794, RELIEVING-TACKLES, "used when the tiller-ropes are damaged", and
-Luce 1884's quarter bill, "at the relieving tackles, an officer or quartermaster, with a few
-men to steer the vessel in case the wheel or tiller-ropes are shot away", both on file under
-docs/references/; Falconer's RELIEVING-TACKLES are the careening tackles; the five minutes and
-six hands JUDGEMENT), the hit's line naming the order, the rules captain
-giving it before any other repair; the physics untouched. Measured at seed 6: lost at
-10:17, rove at 10:22. `boats_stove` is the same shape and is left. (f) "Tacked ... heading
-SSE (158°)" with her head NE: `TackScript.words` names her own heading when the tack ends by
-the timeout; the test that pinned the wrong heading is corrected (old "SSE (158°)", new "NE
-by N (35°)"). (g) "a quarter past twelve at noon": `world.tide.time_words` says the noon
-hour past noon is the afternoon's. "13 fathoms" beside "thirteen fathoms" (three spellers, 52
-call sites) is noted and not mended. (h) A misspelt sail offered its halyard:
-`orders.resolve.NounTable.add` let a part's raw id, entered first unsuggested, keep its
-plain words out of the hints (22 of 38 sails on the frigate); the plain words are the hint
-now. (i) A mistyped `world:` line ended the console: `World._apply_world_order` reads the
-line inside the refusal's reach, and a save holding it replays to the same refusal.
-(j) Recruits given another man's number: `Crew.issued` and `Crew.next_number` number them
-after the highest ever given (the dead and a prize crew included; a prize crew numbered by
-her captor's books); a checkpoint from before reads the books.
-
-**D1, continued: engage, the temper, the hold (the owner's and the lead's rulings of the same
-day).** `engage` given with the guns secured casts them loose by the order 'cast loose the
-guns' (`orders.handle`, the one road), in `_true_of_the_guns`. In the fight tests'
-`_alongside` (beat, hold your fire, engage, grapple, boarders away) the boarding then ended
-"repulsed" where it ended "carried". Measured round by round on truth 7-181 (attacker men,
-temper | defender men, temper): old r1 98, .647 | 118, .700, carried at r10 (lost 43 and 55);
-new r1 100, .632 | 118, .877, repulsed at r9 (lost 59 and 44). The men were the same; her
-TEMPER was not. `combat.morale.morale_of` made a ship's morale at its first asking, from her
-captain's doctrine only when the asker handed it in: our fire's reckoning
-(`action._judge_morale`) did, the boarding (`boarding._morale`) did not, so a ship boarded
-before she was fired on started at `DEFAULT_START` 0.7 and not her own figure. Mended there
-(`_doctrine_of`: her World's captain); the far fight already made hers from the brain's
-doctrine. Nothing else in `combat/` is made at its first asking from a caller's figure. And
-`_engage` turned a held battery to "as they bear", which with the guns secured did nothing and
-with them loose fired on a player who had just said hold: an explicit `hold your fire` or
-`cease firing` (`battery.held_by_order`) now stands against a later engage, which takes her for
-the mark, casts loose and holds ("The guns are held at your order: 'fire as they bear' to
-open."); an order to fire, and securing the guns, clear it (the lead's JUDGEMENT). Found, not
-mended: ordered at her own prompt to engage the player's frigate alongside, a French
-frigate's guns are cast loose, loaded and run out at ten metres and fire nothing in an hour;
-two frigates at ten metres drift beyond a grapnel's throw (thirty) within minutes of opening
-fire, and `lay her aboard` did not close them again in half an hour; pistol-shot fire takes
-about a man a minute from a company of 264.
-
-**F2.11 as found (owed, not mended here).** The same men serve the guns and are counted as
-boarders: `combat.boarding.boarders_of` draws the bill's boarders, the most skilled fit men of
-every station but the marines, the quarterdeck and the idlers, whether or not their guns are
-being served. And the defender's gun crews are not counted in the defence unless `repel
-boarders` is given: `boarding.defenders_of` takes the marines, the helm, the trimmers, the
-quarterdeck and the small-arms men, and every fit man on deck only when repelling.
-
-**The boarding truths restated (the lead's ruling of 2026-11-14, the owner told).** Truth
-7-181, OLD: "the boarders carry a deck held by the marines and the colours come down". NEW,
-two sentences: 7-181a, "at her own temper a frigate's deck held by her marines holds against
-a boarding party of about her defenders' number" (repulsed, her temper above the boarders'
-every round, more of theirs lost than of hers); 7-181b, "a deck is carried when its
-defenders are reduced", tried as the contest's sum (`boarding._strength` and the new
-`boarding._verdict`, taken out of `_round` unchanged), a table either side of the turns: a
-hundred boarders at 0.6 against defenders at her 0.88, carried under 34, contested 35 to 136,
-repulsed from 137; carried when her temper is under her line, repulsed when theirs is. The
-round tables at seed 7 (attacker men, temper | defender men, temper): trunk r1 98, .647 | 118,
-.700; r2 98, .586 | 113, .632; r5 96, .458 | 101, .495; r8 95, .412 | 93, .344; r10 95, .374 |
-92, .291, carried (lost 43 and 55). Mended: r1 100, .632 | 118, .877; r2 99, .548 | 114, .832;
-r5 96, .458 | 109, .726; r9 94, .291 | 99, .597, repulsed (lost 59 and 44). test_fight's
-boarders-carry-a-deck follows 7-181a (now "...are repulsed and both musters count it").
-Why the worldly roads to a carried deck failed, in the lead's order: her company shortened by
-the world's own order (`aboard "Medusa": the fever in the ship`, a tenth sick each; her fit
-264, 216, 196, 178, 161, her defenders 103, 78, 74, 60, 53) and the boarders still repulsed
-at rounds 7 to 15, their own temper falling under its line with 55 to 59 of them lost (the
-sick list does not touch her temper); a fight to reduce her drives the two out of the
-grapnel's throw (below). 7-325 and 7-351 (and the two deck-won tests of `test_between_hulls.py` they call)
-keep their sentences and board the weakest honest defender a frigate's boarders carry, by the
-lead's ruling (A): the far detail's privateer brig (the Prince de Neufchatel's hull, a
-hermaphrodite brig of 130, no marines), laid ten metres off by `tests/test_fight._laid_aboard`
-at the second before the lookout's minute so that the mark is engaged and the grapnels thrown
-three seconds after (laid as `_alongside` lays the frigate, a smaller ship drifts to 33 to 39
-metres, beyond the throw, within the lookout's minute). A French frigate would not serve:
-at her own temper her deck holds (7-181a). Measured over seeds 1 to 10: carried in the second
-round at every seed (ours lost 10 to 17, hers 9 to 24), the first lieutenant standing at each;
-over 11 to 80 he falls only at seed 60. The seeds, old beside new: the officer stands, OLD the
-frigate at seed 1 (Mr Freeman), NEW the brig at seed 1 (Mr Freeman, the same muster); the
-officer killed and the party leading on, OLD the frigate at seed 7 (Mr Pearce killed at 530 by
-"a blow of a tomahawk", Mr Ward leading on), NEW the brig at seed 60 (Mr Gordon killed at 701,
-"a pistol ball in the breast", Mr Bowen leading on). Each draw decides only whether the
-lieutenant stands or falls in the crossing and the rounds.
-
-**Owed, measured and not mended (for the owner at a gate, with the period's figures).** As
-the fight is built, boarding a ship of war cannot succeed (CORRECTED below, the lead's reading
-at 60af48e, item 5: by numbers it can; what this paragraph measured is a hundred boarders
-against a frigate's company, and only equal numbers at full temper fail). A French frigate alongside,
-grappled, her company shortened by the world's own order (`aboard "Medusa": the fever in the
-ship`, a tenth of her fit men sick each time), a hundred boarders away (her fit, her
-defenders, the end, ours lost and hers): no fever 264, 103, repulsed in round 7, 59 and 30; two
-216, 78, repulsed in 11, 59 and 56; three 196, 74, repulsed in 10, 59 and 44; four 178, 60,
-repulsed in 14, 55 and 68; five 161, 53, repulsed in 15, 57 and 65. The sick list does not
-touch her temper (morale counts the hurt, not the sick); the boarders' own temper falls under
-its line first; and against fifty-three defenders a hundred boarders still lose fifty-five to
-fifty-nine men. At
-pistol shot a frigate's fire takes about a man a minute from a company of 264, and her temper
-falls from 0.88 to 0.82 in forty minutes; two ships laid ten metres apart drift beyond the
-grapnel's throw (thirty) in a minute or two, and `lay her aboard` does not close it in thirty
-minutes; so that, as the fight is built, a player cannot bring about the boarding the old
-truth claimed.
-
-**The pins moved by design, re-pinned in one commit by the lead's word (2026-11-14), each old
-beside new with the line-by-line difference.**
-- The beat's reply (D1): `tests/test_bellerophon.py` (the 64's beat, and the one-gun-deck beat
-  on the cutter, the brig, the frigate, the hermaphrodite brig, the merchant brig, the
-  privateer schooner and the razee) and `tests/test_bilander.py` (the armed merchant fit): each
-  line as it was, with "The guns are secured: 'cast loose the guns' to serve them." after it.
-- The library's catalogue (D4 e): `tests/test_agents.py`, "108 evolutions" to "109
-  evolutions", the relieving tackles' file added (a model reading the catalogue reads it).
-- The naval cruise (gate 5c, 48 hours; `GATE_5C_CRUISE_DIGEST`): 2242 lines both, digest
-  1e7f8ab24b84e6f7 to 46300a9a567b80d7; the only difference, fifteen `standing.held` lines,
-  "not carried out; a stranger in sight is no stranger in sight." to "not carried out; no
-  stranger in sight." (D4 a). Truth 77 reads the same digest.
-- The schooner's passage (gate 5b, 17 hours; `GATE_5B_SCHOONER_LINES`, `_DIGEST`): 766 to 769
-  lines, 3a1698037811b753 to ef15ca96ee2ed052. At the start three refusals ("There is no such
-  part as the royals in this ship") become "The book fitted to her rig, for she carries no
-  royals: 'night routine' without its royals; 'morning sail' left out; 'shorten sail for
-  weather' without its royals." and the two rules entered (D3); at noon "Mr Travers works the
-  day's work where he stands." in place of his going below, and "Mr Travers came on deck, the
-  day's work done." gone (D4 c: no rules captain commands her, so the player at her prompt is
-  her master); at sunset the night routine refused, "take in the studdingsails ... already
-  furled". Nothing else: 'shorten sail for weather' never fires, the same landfall, pilot and
-  anchorage on the same ticks, she does not take the ground.
-- The merchant passage (gate 5c, 36 hours; `GATE_5C_MERCHANT_LINES`, `_DIGEST`): 3103 to 3096
-  lines, 40bcef34afd0cec4 to 82a1447152be8b82. At both noons "Mr Travers works the day's work
-  where he stands." in place of his going below (D4 c), and so, with the captain on deck, the
-  reports and calls the officer sent below to him then are not sent: "a sail sighted, on the
-  larboard bow", "the sail on the larboard quarter lost sight of", the two "came on deck"
-  lines, and five calls on the second day ("the Mingan bearing E by N, distant four miles: a
-  danger"; "her sails lifting ..."; "the Mingan ... steady and closing"; "land ahead ... she is
-  standing into it"; "the pilot warns ..."). Nothing else: her track, her bargains and her
-  anchorage are line for line the same. Truth 78 (the fake captain's merchant passage): the
-  same master seated by a model is a seated player's person too (`Navigation._players_own`
-  reads the stations a seat holds), so his log is still the nobody-seated log with his
-  orders in it; its lines follow the merchant passage's (3115 to 3108), its digest c0bf4b51621ad91f to
-  de0f8c03bd2663df.
-
-**Truth 7-134 and the held battery (correcting the builder's first report).** The first report
-said a battery under `hold your fire` is not served ready; measured again, it is: the cutter's
-starboard guns, both sides loaded before the engage, are each loaded, run out and primed within
-thirty seconds of `engage her to starboard` under the hold, none fired (the side is run out and
-primed only once it is engaged, `Battery.serving`). The first measure read the guns one second
-after the engage. So `combat/guns.py` is not touched. The truth gave the word at once: with the
-old override the engage had turned the hold into "as they bear", and its "fired >= 2" was the
-guns' own fire as they bore; with the hold standing the word, given one second after, found one
-gun ready. The truth now gives the word when the side is ready (thirty seconds, asserted ready
-and unfired), its sentence and every figure as they were: "Three shot at a cutter: one struck
-her and two wide."
-
-**D4 (d), the dispatches, as ruled at last (the lead's ruling (b) of 2026-11-14).** The anchor
-given to the dispatches' opening is taken out again: she begins under way in Carrick Road at
-five in the morning as the trunk has her, and her rules captain makes sail for Plymouth at
-05:05 and touches nowhere. Her words are made true the other way: the position line's comment
-was the only place that called the road "the usual anchorage" (the game serves none of it: not
-the harbour's line, not the primer), and it now says she is in Carrick Road under way, bound
-for Plymouth; truth 7-627 tests her as under way. FOUND, NOT MENDED (for the owner's list, the
-captain's pilotage, `world/captains.py`): from an anchor in Carrick Road her rules captain
-traded (42 tons of copper ore), got under way at 09:30 on the starboard tack, took the pilot
-at 09:43, put her about off Trefusis Point, was warned by the pilot at 09:46 ("the Black Rock
-nine cables ahead, right ahead; leave it to larboard"), shaped a course at 09:54 for 50 00 N
-4 57 W and struck the Black Rock at six knots, stove and making water, aground till the flood
-at 17:30; the three other rules captains leaving the same road from an anchor
-(merchant-intent, merchant-cutter, directed-passage) do not take the ground in eight hours.
-The cause read and not measured: a course shaped through the pilot's warning, nothing in his
-plan steering off the rock.
-
-**The lead's reading of part D at 60af48e (2026-11-14, read independently with a base copy
-beside it), mended on top of it.** Each at its cause, the measure old beside new.
-
-1. *The hold knows whose it is.* At 60af48e `held_by_order` was set by any `hold your fire`,
-   the rules captain's own among them ("hold your fire (until she is within the book's
-   range)" at his every entry to engaging, `world/captains.py`, not touched), so that after
-   it the player's `engage her to starboard` held the battery and said "She is engaging a
-   cutter to starboard already. The guns are being cast loose ..." (the first action, the
-   beat, 400 s, Mr Bowen holding at 480, the engage at 520): the guns ready by 10:14 and
-   silent. Mended in `orders/gunnery.py`: the hold keeps the actor of the order that gave it
-   (the World's `order_actor`, the same that `orders.crew.whose_order` reads), and
-   `_hold_binds` lets a rules captain's hold bind only a rules captain's engage; the player's
-   own hold binds either, as at 60af48e (the hand that held is the hand that must loose,
-   JUDGEMENT on the lead's ruling). `_held_words` never says "at your order" of a hold the
-   player did not give ("by the captain's book"), and an engage that changes nothing on a
-   held battery says "She has her for her mark to starboard, and her guns are held at your
-   order: 'fire as they bear' to open." instead of "engaging already". OLD (60af48e) beside
-   NEW and the base, the player's engage at 520: "She is engaging a cutter to starboard
-   already. The guns are being cast loose; they are served when it is done.", nothing fired;
-   NEW "Engage a cutter to starboard: the guns to fire as they bear. The guns are being cast
-   loose; they are served when it is done.", her shot at 3720, 3780 and 3840 s, the base's
-   own to the second (the base: "Engage a cutter to starboard: the guns to fire as they
-   bear.", the same three). Truth 7-629 carries both roads. Looked for elsewhere: the hold is
-   set in `_mode` and `_cease` only, and loosed by `_engage`'s turning it, `_mode` to fire,
-   and `SecureGunsScript.end_phase`.
-2. *A report gathered only of the same thing.* `world/reports._reported_lately` keyed on the
-   words, so that four sails sighted "on the larboard bow" in an hour went down as one
-   report. Mended: the same thing is the same kind of line of the same sail or mark (its
-   id; `_subject`), or of the same words where the line names nothing; a line of it reported
-   is one said a messenger's minute before a report of its kind. A minute's lines alike are
-   said as the lookout says them (`_gathered_words`): "three sail sighted on the starboard
-   beam", "two sail on the larboard quarter lost sight of"; the land once ("the land
-   sighted, right ahead", two marks or one); anything else "(two of them)". OLD (60af48e) "a
-   sail sighted, on the starboard beam (three the same)". The dispatches, below from the
-   start, nine hours: every sail the lookout hails by day is sent down (truth 7-621, its
-   second road), and nothing is sent twice in the hour of the same sail (its first). The
-   eight lines of the cold review's 5.3 item 5 were eight sails (measured at the time):
-   each is now its own report, as the lead ruled.
-3. *`fire` and its forms true of the guns.* `fire` was outside `_INTENTIONS`; it is in now,
-   and with the guns secured its answer says the word stands for the guns when they are cast
-   loose ("the word stands until a gun of it is cast loose, run out and bears"; "fires as
-   soon as it is cast loose and ready"), never "no gun of it is loaded" of guns loaded and
-   lashed: the secured note counts them ("The guns are secured, three of them loaded: none
-   is run out or fired until they are cast loose; say 'cast loose the guns'."), and is as
-   before when none is loaded. Truth 7-622, its second road (an action fought, the guns
-   secured with three loaded, the hands at quarters again): `fire`, `fire a gun to leeward`,
-   `fire the starboard broadside`, `fire number one starboard gun`, `fire as they bear`, `fire
-   by divisions`, each true, and nothing fires in ten minutes after.
-4. *A sale paid when the goods are landed.* `Dealings.lost_on_errand` said "the money taken
-   stands" of tin that went down before the quay. Now a sale lost before the boat reached the
-   quay (`SendBoatScript`'s phase before "ashore") is void: the price paid back from the
-   purse ("the sale of 2 tons of tin at Falmouth void: lost before they were landed"), the
-   market's `net_sold` as before the sale, and the words "the 2 tons of tin to be sold went
-   down in her before they were landed: the sale is void, and the £245 taken for them is paid
-   back". Landed and lost on the pull back, the sale stands ("were landed before she was
-   lost, and the sale stands"). The errand keeps its port (`SendBoatScript.port_id`), the
-   boat's state being made afresh when she is lost. Measured, the merchant cutter: £260 and
-   two tons of tin; sold, £505 and none; stove pulling for the shore, £260, no tin, the
-   market at -2 as before the sale (OLD at 60af48e: £505, no tin, the market at 0). Truth
-   7-624's row more. A purse short at the voiding (spent meanwhile) pays what it holds and
-   the words say the rest is owed; not reached in any test.
-5. *The deck carried tested whole.* The OLD carried test's assertions are back, each on an
-   honest road (`tests/test_fight.py`, "a seventy-four's boarders carry a frigate at quarters
-   by their numbers"): the 74 (`_alongside` now takes the ship file) at quarters, 216
-   boarders with their arms served, against the French frigate at quarters at her own
-   temper: carried in round 1 (ours lost 17, hers 20), `action.carried` "by our boarders'
-   hand", her strike "carried by boarding", a prize of ours (74's) and alongside, her people
-   the prize's prisoners and their hurt the fight's (20), "the last fight carried". CORRECTED:
-   my note above ("as the fight is built, boarding a ship of war cannot succeed"), which
-   repeated the lead's finding of the morning, was measured with a hundred boarders against a
-   frigate's company; by numbers a deck CAN be carried from a ship of war (the 74's in the
-   first round; a frigate's against one that has lost a third of her company in the second,
-   the reader's probe), and only equal numbers at full temper fail.
-6. *The small items.*
-   - The engage on a held battery with the guns secured said both "The guns are held at your
-     order ..." and "she engages to starboard when they are": now one sentence, "The guns are
-     being cast loose, and held at your order when they are: 'fire as they bear' to open."
-     (7-629 re-pinned to it).
-   - `cease firing` before the beat ended "say 'cast loose the guns'", which is then refused
-     ("beat to quarters first"): the hint now names the order that works from where she is
-     (`gunnery._to_cast_loose`: "say 'beat to quarters', then 'cast loose the guns'"). The
-     hold after `cease firing` is meant (an explicit order about firing, the lead's ruling of
-     the morning): it stands until an order to fire (`fire as they bear`, `fire by
-     divisions`; an engage looses only a hold that is not the player's own, by the captain's
-     book) or `secure the guns`; the beat now says so ("The guns are held at your
-     order: 'fire as they bear' to open."), not a silent battery after it.
-   - The schooner's fitted night routine refused at every sunset ("Nothing done: ...
-     studdingsails already furled", tick 58060 of the reader's run, 57533 of a bare ship file):
-     `standing.book.fit_to_rig` now leaves out a rule fitted down to taking in only sails
-     nothing in the book sets, and says so ("'night routine' left out, for it was left to take
-     in her studdingsails only, which nothing in the book sets"). A rule whole as written is
-     never touched (the frigate's night routine refuses its no-op clauses at sunset as on the
-     trunk). Truth 7-625 asserts it on every ship file.
-   - On the fore-and-aft vessels the rules captain's book 'keeping station' logged "has a
-     standing order 'shorten sail for weather', and one of that name is held already (the
-     captain's) ...": the starter's rule, refused whole on them before the fitting, is held now.
-     `standing.runtime._fitted_by_the_game` (read afresh from the starter book, so a save and a
-     replay say the same) lets such a rule stand without the line. The first action's opening
-     lines are now the base's eight (OLD at 60af48e: nine).
-   - The relieving tackles' words: the evolution's verb is `rig_the_relieving_tackles` (the
-     work as the log names it, "rigging the relieving tackles": "Only 15 hands to tack ship;
-     the rest are rigging the relieving tackles."); given twice, "The hands are rigging the
-     relieving tackles already." (`orders/damage.py`); `belay the relieving tackles` belays it
-     (a work noun of two words, `orders/work.py`, `more_work_nouns` in the vocabulary), "Belayed
-     rigging the relieving tackles; the tackles not rove, the helm lost as the shot left it."
-     (`RelievingTacklesScript.left_words`); and the wheel, once shot away, is not shot away
-     again with the tackles rove (`combat/hits.py`, the condition beside `helm_lost`; the draw
-     is taken as before).
-   - QUESTION FOR THE OWNER (put by the lead; not built): nothing reads `helm_by_tackles`, and
-     with the wheel shot away she steers exactly as before (`physics.hull` holds the rudder
-     only where the shot left it until a helm order moves it). Whether a wheel shot away
-     should stop the helm until the tackles are rove is a question of the fight's damage.
-     Truth 7-626 says so in its sentence; the order stands as built meanwhile.
-   - What a model is told that it was not, the whole of part D: the evolution catalogue's 109th
-     evolution (`data/evolutions/relieving_tackles.yaml`, its verb now
-     `rig_the_relieving_tackles`), its vocabulary entry and the work noun "relieving tackles",
-     the primer's row (docs/primer/25); and `data/evolutions/send_boat.yaml`'s fail text,
-     "{boat_cap}'s errand is not done: {reason}." (left out of the first list).
-   - The pins' table above: test_evolutions' "SSE (158°)" to "NE by N (35°)" (D4 f, the tack's
-     heading) was re-pinned in f7c5f083, with its mend, not in a95aebd.
-7. *The scenarios' openings, the place and the ship.* merchant-schooner-plymouth's header was
-   the merchant passage's word for word (the schooner from Falmouth for Brest, the weather
-   pinned) and its position's line said Carrick Road, and she lies in Plymouth Sound;
-   merchant-ship's header was the same passage's, of the schooner Speedwell, and she is the
-   Amazon on the frigate's file; looked for elsewhere, merchant-cutter's header was the same
-   copy (of the Speedwell; she is the cutter Sherbourne). The three headers rewritten true
-   (ship, place, day, purse, the season's weather), the schooner's place line "Plymouth
-   Sound: she rides at the anchorage in the Sound". Truth 7-627 now reads the place (the
-   position's words name her port, its road or its anchorage) and the ship (a name of the
-   ship files in the header is her own, or a sail of the scenario's own list) of every
-   scenario it tries; the merchant brig is held out, and the test says nothing is asserted
-   of her.
-
-**Listed by the reader as older, for the owner's list, not built here.** At a newcomer's
-`engage her to larboard` the rules captain did not stand aside and re-engaged to starboard;
-`strike the colours` is read as striking the fighting book's standing order "the colours";
-"sell five tons of tin and buy one ton of coal" refused as one cargo's name; the boat
-alongside in the same tick when the ship has sailed an hour; helm orders and `tack ship`
-accepted with the wheel shot away; a double full stop after `world: aboard: the boat stove`.
-
-**The wheel shot away: DECIDED, NOT BUILT (the owner's word of 2026-11-14, by the lead: "For
-a wheel shot away, yes, it ought to stop the helm until the damage is repaired"; held for the
-next milestone by the lead's order of the same evening).** The order `rig the relieving
-tackles` stands as built, its words mended (item 6 above). What the ground report found, for
-the builder of it:
-- The engine already stops the rudder: `physics/hull.steer` returns the rudder as it lay while
-  `ship.extra["helm_lost"]` stands, and `physics/integrate` (`d.rudder = hp.steer(ship, h)`) is
-  the one road from the helm to the rudder. Measured at the first action's seed 6, the tackles
-  belayed: the rudder 0.116 rad through `steer north-west` and `steer east`. What is untrue is
-  the words: every helm order is accepted ("Helm ordered: steer NW (315°).") and does nothing.
-- The doors a guard would stand at: `orders/verbs.execute`'s gate beside `_not_riding` (the
-  heading and points verbs and `HELM_VERBS`), `orders/navigation.steer_degrees` (shape a course,
-  the sailing directions, the course held pending), and the start of the evolutions whose
-  scripts give the helm (tack, wear, boxhaul, box off, back and fill, heave to, fill away, lie
-  a-try, scud, come to anchor, get under way); every actor comes through `World.submit` to them.
-- The rules captain's `_repairs` orders the tackles first (31 s after the hit at seed 6, rove
-  318 s later), but runs at most every 600 s and not at all hove to for weather, in distress,
-  or at his shortening wind (30 kn): with the wheel lost in a gale he never rigs them.
-- The rudder meanwhile, as it lay or trailing amidships (tiller ropes shot away leave the
-  tiller free), and whether the tackles steer slower: open, for the builder and the lead.
-- The odds as read: about one hit in 270 takes the wheel on the hull aim, one in 500 on the
-  rigging; the first action at seeds 1 to 8 loses it at seed 6 only.
-- The wheel itself made good (new tiller ropes rove, a spare wheel shipped): another repair
-  evolution, on the list.
-
-**The pins moved by the mends of the lead's reading at 60af48e, re-pinned in one commit, old
-beside new.** The fast tier whole at f84ec05 moved one pin besides the trunk's own key-shape
-test: `tests/test_bellerophon.py`, the deck fired to leeward (item 3, `fire` true of the guns;
-the beat leaves her guns secured). OLD "The starboard lower-deck guns to fire each as soon as
-it is ready, six guns; eight are behind ports the sea has shut." NEW "The starboard lower-deck
-guns to fire each as soon as it is cast loose and ready, six guns; eight are behind ports the
-sea has shut. The guns are secured: none is loaded, run out or fired until they are cast
-loose; say 'cast loose the guns'." The gate digests (the naval cruise, the schooner's and the
-merchant passages, the fake captain's) did not move: in neither passage does a minute bring
-two reports of the same words, and the schooner's book is fitted the same way there.
-
-## Package 115, parts A and B: the server and the saved game (2026-11-14)
-
-The cold review of milestone 7 (`docs/reviews/ColdReview-M7.md`, 5.4, 5.7, 6.1) found two things that made the game unsafe to hand to a friend. Part A mends the server, part B the saved game. Nothing is added; no pin moved. Truths 7-600 to 7-614.
-
-### Part A: the server answers its own page alone
-
-**For the owner, in a paragraph.** While the game's server runs, it is a little web site on your own machine, and any web page you have open in the same browser can try to talk to it. Before this package any such page could open the game's live feed, read everything in it, give the ship orders, and through the order line read your files and write over them. The server now asks three questions of every request before it touches the game. *Which name was used to reach it?* It answers only to `localhost`, an address in figures, your machine's own name, or the `--host` you gave; a hostile site can make its own name point at your machine (the trick is called DNS rebinding), and this question shuts that out. *Which page sent it?* A browser says which site a request comes from, and the game answers only its own page. *Does it carry the game's mark?* When the server starts it makes a random mark, which it writes into its own pages as it serves them; the page sends it back with every order and with its live feed, and no other page can read it. On your machine you notice none of this. From another device you open the address the terminal prints, which carries the mark. And the order line's files are kept to the game's own folders: `save NAME` writes into the saves place, and a book is read from the game's folders, so a path to anywhere else is refused and the file is never opened.
-
-**The causes, mended where they live.**
-
-1. *The server took a request from anywhere a browser could send one* (`ui/server.py`: no origin check, no Host check, no mark; the socket accepted every origin). Mended by one ASGI middleware around the whole app, `freesail/ui/guard.py` (`PageGuard`, `Guard.refusal`), so that every route and the socket pass the same three questions before the game is touched; the socket is refused at the handshake (403), before the hello and before its listener is added. Looked for elsewhere: the console's agents port (`Console.serve_agents`, an app of its own with `agent_routes` and no guard) has the same guard now (the doors' rule: Host and Origin; no page). The harbour's routes are inside the app and are covered. No other server exists in `freesail/` or `tools/` (grep for `FastAPI(`, `uvicorn`).
-2. *The socket took orders that no page sent* (`_receive_orders`: orders and driver commands over `/ws`). Closed at the lead's ruling, not guarded: the socket now reads what a page sends and passes it over, to see it go (`_until_gone`). One test sent an order over it (`tests/test_server.py::test_websocket_streams_events_and_snapshots`): it now gives the order by `/api/order` as the page does and checks that an order sent over the socket is not given.
-3. *A path that came in a request was opened as given* (`Driver.submit`'s `save PATH` and `read the standing orders from FILE`, `/api/driver`'s `save` and `standing_orders`, the harbour's start: scenario, ship, book, director's brief, save; the scenario maker's fields: the ship's file, the books, the brief; and `director: brief FILE.yaml` at the order line, a road the review did not name). Mended by one module, `freesail/ui/places.py` (`Places`: the saves place; the game's `data/`; the player's scenarios place; and for taking up a save, the game's folder too), used by every one of those roads; a path that leaves the folders is refused in words before it is opened. Paths are resolved and compared as paths; a Windows drive or share named on a system without them lies in no folder; `..` cannot climb out. The console and every command-line flag keep their paths (the person typing there owns the machine). The scenario reader (`Harbour.scenario_path`) was confined already and is unchanged.
-4. *The harbour's writes of programs were open to any device that held the page* (settings, the desktop client's file, the shortcut, the doors). At the lead's ruling (JUDGEMENT, his item 6) they answer only a client on the machine itself, mark or no mark (`guard.HERE_ONLY`).
-
-**What moves, old beside new; each meant.**
-
-| What | Before | Now |
-|---|---|---|
-| `save foo.json` at the browser's order line | written in the server's working folder: the game's folder under `py -m freesail` | `saves/foo.json` in the saves place; the reply names it |
-| `save C:\elsewhere\x.json`, `save ../x.json` over the server | written there | refused in words: where saves are kept, `save NAME`, the download for a copy |
-| `read the standing orders from /any/file` over the server | read, each line given as an order and a refused line echoed | refused before it is opened; the primer's `data/standing_orders/starter.orders` and a book by its name (`starter`) read as before |
-| The harbour's "a save" box with a path outside the saves place and the game's folder | taken up | refused in words naming the two ways it still loads (moved into the saves place; `py -m freesail --load PATH`) |
-| A socket or a POST from another site's page, from a foreign name, or without the mark | obeyed | 403 in the game's words, nothing done |
-| Another device under `--host` | the bare address | the printed address with the mark, once (a cookie keeps it for the page's later loads) |
-| The harbour's settings, desktop file, shortcut and doors from another device | answered | refused; at the machine itself as before |
-| An open page when the server is started again | reconnected by itself | on the machine, reconnects by itself: it reads the new mark from the page's own address first (`token.js`, `freesailFreshMark`); on another device it cannot (its old cookie is refused), and its status line says to open the address the terminal printed again |
-
-**Taken another way, and why.** The brief says a book is "named, not pathed"; the primer, the book's opening words and five scenario files tell the player `read the standing orders from data/standing_orders/starter.orders`, so a path inside the folders is honoured as well as a name. A refused line of a book inside the folders is still echoed (the book's own feature; the lead's ruling on A.3). GETs that only read are answered to a page on the machine itself without the mark (a foreign page cannot read their answers, and the Host question keeps a rebinding page out); `/api/director/log`, which records a reveal, asks the mark. JUDGEMENT: an address in figures passes the Host question, since a page can have such an origin only by being served from that address.
-
-**The tests, through the doors.** The guard's truths run the game's server as the owner runs it (`py -m freesail`, its own process: `tests/own_page.py`, `LiveGame`) and come at it with real sockets (the `websockets` library) and real requests (`httpx`): 7-600 the socket from a foreign origin, with the stolen mark from a foreign origin, with no mark, with a wrong one; 7-601 the order from a foreign origin, with no mark, at a foreign name (rebinding), a body-less POST, and the page itself refused at the foreign name; 7-602 the agents' doors as before and no page seating one; 7-603 the order line's save and book by `..`, absolute, a drive and a share, and the primer's line; 7-604 the harbour's start and maker; 7-609 another device (through the whole app with another device's address as its client: the container has no second device). The existing tests that play as the page now come in as the page does (`PageClient`: the game's address, its origin, its mark; `DoorClient` for a door), and the doors' tests name the game at `http://localhost:8000` as a door does, where they had `http://testserver`, which the Host question refuses.
-
-**Found for others, not mended.** `tests/test_api_door.py::test_no_file_of_the_repository_holds_the_shape_of_a_key` fails on the trunk as I found it: the cold review's evidence (`docs/reviews/ColdReview-M7-evidence/timings/fast-tier-per-test.csv`) holds a test's name with a key's shape in it. Not a key; the test or the file wants the lead's word.
-
-### Part B: a saved game is not a program
-
-**For the owner, in a paragraph.** Beside each save the game writes a checkpoint, a picture of the game's whole state that loads in a moment where replaying the voyage would take minutes. That picture is written in Python's own format, which can name functions to be called while it loads. The loader was meant to allow only the game's own pieces, but it allowed anything inside the game's modules, and those modules carry the operating system's functions with them, so a save folder sent by a stranger could run a program on your computer when you opened it. The loader now has an exact list of the 225 pieces the game's own checkpoints are made of, and nothing else; a checkpoint that names anything more is refused, and the save is replayed from its journal instead, as a save without a checkpoint always was.
-
-**The cause, mended where it lives.** `core/replay.py` `_Unpickler.find_class` admitted any name in a module beginning `freesail.` or `numpy`, and `builtins.getattr`; a dotted name is walked by the unpickler, so `freesail.settings` + `os.getcwd` was the operating system's function (the review's probe, `probes/checkpoint-allow-list.py`: confirmed at d3b8044, the three lines as the probe says). Now `find_class` admits `core/checkpoint_names.py`'s `ADMITTED` exactly (no prefix, no walk: a dotted name is a different string and is not in it), and `getattr` only as `_bound_method`, which hands back the two bound methods the older kept saves hold (`World._coast_of_plane`, `World._coast_trend_of_plane`, by the census of `tests/fixtures/saves/`) and refuses any other. The module docstring's sentence is made true: it now says what the loader admits and that before this package it did not.
-
-**The list, made from what the game's checkpoints hold.** `tools/checkpoint_names.py` takes the census: every one of the 47 scenarios begun as the harbour begins it (`prepare_game`) and run ten minutes; the five kept checkpoints under `tests/fixtures/saves/`; a fight (`first-action`, beat to quarters, cast loose, fire as they bear, half an hour); a port (`merchant-passage`, an hour); the far world (`madeira`, an hour; JUDGEMENT on which scenario stands for it). 226 names, `getattr` among them; 225 in the list. No name of numpy, `copyreg`, `pathlib` or the builtins' constructors is in any of them, so none is admitted (the old list's `set`, `frozenset`, `range`, `slice`, the `pathlib` classes, `enum`'s and `numpy` are gone). The tool's `--write` writes the list again from the census, byte for byte the file as committed. Truth 7-606 takes the same census, one case a checkpoint, and fails naming the case and the name when one holds a name the list lacks. Toggle: with `("freesail.world.hulls", "Hull")` taken out of the list, 7-606 failed (`lesson-falmouth.yaml holds names the list lacks: [('freesail.world.hulls', 'Hull')]`); put back, it passed.
-
-**What a save of the owner's would do.** A checkpoint that holds a name the census never met (a class reached only by play the census does not reach) is now passed over, said in the load's words ("the checkpoint beside it could not be read (CheckpointRefused: the checkpoint names ..., which a checkpoint may not hold)"), and the save is replayed from its journal: it still loads, by the slower road. Two kinds would not load at all, and neither is new in kind: a bare checkpoint with no save beside it, and a save of another build with a station's transcript in it whose checkpoint is refused (its replay asks `--replay-anyway`, as it always has). A checkpoint written on Windows names the same pieces (no path or platform class is in any checkpoint).
-
-**Where else the game reads a pickle or evaluates text from a file** (grep of `freesail/` and `tools/` for `pickle`, `Unpickler`, `eval(`, `exec(`, `compile(`, `marshal`, `shelve`, `yaml.load`, `np.load`, `import_module`, `__import__`, `runpy`):
-
-1. `core/acts.py` `decode`: a save's acts name a record as `module:Name`, and the loader imported the module and walked the name with `getattr` through whatever it imports, then made the class with the save's fields if it was a dataclass. The same cause; mended the same way in kind: the name is looked up in the class's own namespace, never walked through an attribute, and only a dataclass defined in that module under that name is made (`__module__` and `__qualname__` must be the save's words). JUDGEMENT, not an exact list: the acts' records are the game's own record classes, made only by their fields, never a function; a list would have to be kept in step with every record a station's state may hold. Truth 7-608.
-2. `agents/director.py` `_would_do`: the director's dry run copies the live world through the checkpoint's own loader. Its bytes are the game's own, in memory, never a file; left on the strict loader, so a world holding a name the list lacks says "not tried" in the dry run (it fails safe). Not changed: the file is part C's.
-3. `world/chart.py` `Tile.load`: `np.load` of the game's own tiles; numpy's default refuses a pickle, now said (`allow_pickle=False`).
-4. `world/tide.py`: `yaml.load` with `CSafeLoader`/`SafeLoader`, safe; every other YAML read in `freesail/` and `tools/` is `yaml.safe_load`.
-5. `evolutions/expr.py`: the evolutions' own small language, parsed and evaluated by its own grammar; no `eval` (`tests/test_evolutions.py` refuses `__import__('os')`).
-6. `tools/browser_probe.py` (a plan's `world: module:function`) and `tools/gen_ships.py` (`ships.<name>`) import by name from the repository's own files, never from a player's.
-
-No other `eval`, `exec`, `marshal` or `shelve` in either tree. Truths 7-605 (the review's checkpoint and five more roads, each beside a real save and taken up by `--load`: nothing run, the load's words, the replay's log the same), 7-606 (the census), 7-607 (every kept save taken up from its checkpoint as before), 7-608 (the acts).
-
-### Part A, after the independent reading (the lead's list of 2026-11-14, 13:05)
-
-**1. The director's brief read any `.yaml` on the disk** (with the mark: `director: brief /some/file.yaml`, `director: brief ../../some/file`). *Cause:* a lookup said to take a name that was never a lookup of names. `agents.director._starter` joined the player's words to the starters' folder (`BRIEFS_DIR / f"{key}.yaml"`), so `..` climbed out and an absolute key replaced the folder; `Places.brief` trusted it ("a starter's name, its file the game's own") and the director's reader asked it again for words with no suffix. *Mended at the cause, one rule in one place:* `freesail/core/names.py`: a name is a name (not empty, no separator of either system, no drive, not absolute, not `.` or `..`, no character Windows forbids in a name), and what it finds is checked by its resolved path to lie in the folder it was looked up in (`named_file`). `_starter` and `Places.book` go by it; `Places.brief` takes a `.yaml` only as a path in the reading folders, and refuses one word that is no name (a path without its suffix) as a path is refused. Truth 7-610; toggle: with `_starter` as it was, 7-610 failed ("The director's brief is given (.../outside/secret.yaml): SENTINEL...").
-
-**The roads by which a browser's words become a file by NAME, before and after** (each tried by 7-610 with `..`, an absolute path and a separator of either system, at files planted outside):
-
-| Road | Before | After |
-|---|---|---|
-| `director: brief NAME` at the order line; the harbour start's brief; the maker's `director.brief` | `_starter`: words joined to the folder (the hole) | `named_file` |
-| A book by its name (order line, harbour start, maker) | `Places.book`: `looks_like_path`, then `folder / name` unchecked (a name with `..` inside it was caught only as exactly `..`) | `named_file` |
-| A save by its name (`save NAME`; the harbour's load) | resolved and checked inside the saves place | the same, `is_name` for the suffix rule |
-| The harbour's scenario reader (`?path=`) | resolved and checked inside the game's and the player's scenarios | unchanged (checked by path) |
-| The harbour's chart (`?region=`) | a key of the chart manifest's tables; no file named by the words | unchanged |
-| The library (`topic`, `section`, `find`) | keys of the library's tables; a primer chapter by its number from the chapters listed | unchanged |
-| `/api/picture/{pid}`, `/api/agents/{station}/picture/{pid}` | a key of the easel's table in memory | unchanged |
-| `/api/marks/{id}` | a key of the chart's marks in memory | unchanged |
-| `/api/agents/{station}`, `/api/harbour/doors/{id}` | keys of tables in memory | unchanged |
-| Doctrines (`data/captains/<role>.yaml`), signal books, squadron books | joined names, but every name comes from the game's own data (a vessel's role is checked against `ROLES` where a world order makes one, `world/ships.py`); no browser's words reach them | unchanged; noted |
-
-**2. The maker checked a file from one folder and opened it from another.** *Probed:* `python -m freesail.ui.server` started from a scratch folder holding its own `data/standing_orders/starter.orders`: the maker's proof opened the ship's file and the book from the scratch folder (the ship's file not found there, the proof refused; a planted book would have been read). *Cause:* `_fields_in_places` resolved against the game's folder and handed the player's strings on. *Mended:* it hands the proof the paths it checked (the ship's file, the books, the brief), one base; the fields written stay the player's own words. Truth 7-611; toggle: with the strings handed on, 7-611 failed (`data/ships/smack.yaml: no such ship file.`).
-
-**3. The director's log revealed by another page of the same machine with the cookie alone.** *Ruled and mended:* the reveal (`MARKED_READINGS`) wants the mark in the request itself (the header or the address), never the cookie. *What the cookie is for:* a device other than the machine keeps the mark for its page's later loads (a link followed, the library's window), since those are navigations that carry no header. *Every request that accepts the cookie alone:* a GET or HEAD from a device other than the machine, of any route but `/api/director/log` (the pages, `/api/state`, `/api/log`, `/api/save`, `/api/ship`, `/api/chart`, `/api/complete`, `/api/library...`, `GET /api/marks`, `/api/director/channel`, and the harbour's GETs); on the machine itself those need no mark at all. No write, no socket and no reveal accepts it.
-
-**4. The small doors.** A request with its Host or its Origin twice is refused (the guard read the last, the framework the first). The mark is compared as bytes, so a mark of any characters is refused, never an error. `::ffff:127.0.0.1` is the machine (a server bound to `::`). The README's sentence on the saves place is made exact: `py -m freesail` gives the settings' saves place to the server (`__main__.py`, `ap.set_defaults(saves=...)`, then `create_app(saves_dir=args.saves)`); `python -m freesail.ui.server` without `--saves` uses `saves/` in the game's folder. Truth 7-612.
-
-**Listed, not changed (the lead's word):** `GET /api/save` needs no mark on the machine and answers as an attachment, so a page of another site can make the browser download a save of the game; nothing of it reaches that page (the browser keeps the answer from it), and it was so before.
-
-### Part B, the list widened (found by the fast tier at d14b57d)
-
-Truth 85 (a game saved with three stations seated, loaded from its checkpoint) failed: its checkpoint held `freesail.world.knowledge.Senses`, which no checkpoint of the census held, and was passed over for the replay. *Cause:* the census was too thin for the list's purpose: ten minutes of each scenario with no station seated. *Mended:* the census takes the wardroom (`wardroom_world`: the scripted watcher, the player at the master's seat, a fake captain and officer at work, an hour) and a long run of every scenario (`LIST_RUN_S`, two hours); the list is the union of the short and the long census, written by the tool. Six names came in: `knowledge.Senses`, `needs.Needs`, `fishing.GearOut`, `ground.Grounded`, `scripts.TackScript`, `scripts.BoxOffScript`; four of the short census's names are met only in the first ten minutes (an evolution under way: `CastLooseScript`, `MakeSignalScript`, `ServeSmallArmsScript`, `ports.Job`), which is why the list is the union. 231 names. Truth 7-606 takes the wardroom as a case of its own. The rest of the suite is the census's second net: every test that writes and reads a checkpoint fails when the list lacks a name, as truth 85 did. JUDGEMENT: a checkpoint of a long game of the owner's may still hold a name no census met; it is then passed over and the save replayed from its journal, said in the load's words.
-
-### Part A, the second reader's list (the lead's of 2026-11-14, 13:44)
-
-1. **A save and the harbour's load followed a link out of the saves place.** *Cause:* the path checked was not the path opened: the save was checked before `.json` was added, and the checkpoint beside it (another suffix) was never checked. *Mended* (`Places.save_target`, `save_to_load`, `final`): every file a save writes (the save and its checkpoint) and every file a load reads is checked by its final path, resolved after its suffix is added. Truth 7-613. On a system that lets this user make no link (Windows without the right) the links are not tried, since none can lead out there; the rest of the truth is.
-2. **Off the machine, the doors were open to anyone who could reach the port.** *Mended:* from another device a door's request wants the mark in the request (the header or the address), as every other request there does; on the machine the doors are as before. *Not built:* a road for a door run on another machine to carry the mark (the doors as they ship send none); the README and `docs/agents/Harness.md` say in a sentence each that a door is run on the machine the game runs on. Truth 7-614.
-3. **The door tests came as the page.** `DoorClient` (`tests/own_page.py`) comes as `agents.remote.GameClient` comes on the doors' routes (no mark, no origin), and as the page elsewhere; every test file that plays a door uses it. Toggle: with a door's request asked for the mark on the machine, the fast tier's door tests fail.
-4. **Faults no truth caught**, each now an assertion: the director's log with neither mark nor cookie (7-612); the cookie alone for an order (7-601); the Host asked of the socket (7-600, by a socket's opening written by hand); the harbour start's brief, the maker's books and the maker's brief out of the folders (7-604).
-5. **Words.** The saves place: one account in the README, `places.py` and this table (the `--saves` given; `py -m freesail` without it, the settings' place; `python -m freesail.ui.server` without it, the game's `saves/`); it is fixed for the run, and the harbour's Saves field says it is taken when the game's server is started again. The save's refusal says to copy the file from the saves place (the page has no download control). A wrong mark is refused as one ("this carried another"). The harbour's load box reads "the save's name, in the saves place"; `/api/driver`'s refusal says `save NAME` and `standing_orders BOOK`. An open page on another device after the server is started again says so.
-6. **The harbour's load took any file of the game's folder.** A load is a save's file: `.json` by its final path, in the saves place or lying directly in the game's folder or its `saves/`, checked before anything is opened. Truth 7-613 (`pyproject.toml`, `freesail/ui/guard.py`, a ship's file).
-7. **A NUL or an overlong name answered 500.** The name rule and `Places` take a path the system cannot make or ask about as no path, refused in words. Truth 7-613.
-
-### Part B, the list's kin (found by the fast tier at 04a04f2)
-
-`tests/test_driver.py` (a boom shifting through a checkpoint: `scripts.ShiftScript`) and `tests/test_hulls.py` (a crewed ship: `crews.CrewedWorld`) met names no census held, short or long. *Cause:* play reaches the states of a family (an evolution's script, a world) by roads no census of scenarios walks whole. *Mended:* the list takes the kin of every class the census met (`tools/checkpoint_names.py`, `kin`): every class of the game that shares a class of the game with it, its subclasses and its base's other subclasses, each by its exact name; a function, another library's name and a class with no kin are admitted only as met. JUDGEMENT. And the census takes each kept save taken up, a station left in it taken again by a model (as a door takes it), played on an hour and checkpointed again (`census_of_kept_save`): `agents.model.Sample`, a station's sample under way, came in so, which `tests/test_checkpoint.py` met in the playtest saves (a save of the owner's kind: with a station's transcript, it would not have been replayed without `--replay-anyway`). Then `agents.agent.Grant` (the captain's grant to his officer, in an older save played on): the kin take, besides the family, every record (a dataclass or an enum) of a module the checkpoints hold a class of, which is data made from its fields alone; the kin of the kin until nothing more comes. 324 names. Truth 7-606 has a case of its own that the list holds its kin. The rest of the suite stays the second net, as it was here twice.
-
-**The maker's words after its mend** (found by the slow tier at 955cd23, `tests/test_harbour.py`): proving with the paths it checked, the maker's refusals and lines named a file by its whole path where the player had named it `data/ships/nope.yaml`. *Mended:* the proof keeps each path as found beside the player's words for it, and gives its words back in the player's (`Harbour._in_their_words`), per request.
-
-**A practice at the great guns** (found by the truths' slow tier at cb8c8ef, truth 7-171): `combat.marks.Practice` and `Cask`, a module no census had reached (a practice begins only when it is ordered). The census sails the owner's practice (`practice_world`: quarters, a battery exercised, a cask heaved over and engaged), and 7-606 has it as a case. 326 names.

@@ -318,12 +318,6 @@ class Runtime:
             same = self.book.get(rule.name)
             if same is not None and same.book == name:
                 self.book.rules.remove(same)
-            elif same is not None and _fitted_by_the_game(ship, same):
-                # the player's rule of that name is the starter book's as the game fitted it to
-                # her rig (`standing.book.fit_to_rig`): it stands, and no line says the book's
-                # was refused for a rule the player never wrote (the lead's reading of part D
-                # at 60af48e, item 6); as on a square rig, where the starter's is held whole
-                continue
             elif same is not None:
                 world.record(
                     Severity.ROUTINE,
@@ -809,21 +803,3 @@ def _part_words(ship: Any, part: str) -> str:
     if hasattr(ship, "parts") and part in ship.parts:
         return "the " + resolve.display_name(ship, part)
     return part
-
-
-def _fitted_by_the_game(ship: Any, rule: Any) -> bool:
-    """Whether a rule of the player's book is a starter book's rule that the game fitted to
-    her rig as it was read (`standing.book.fit_to_rig`): its words are those of a line the
-    fitting changed. Read afresh from the file, so that a save and a replay say the same."""
-    from freesail.standing.book import fit_to_rig, read_orders_file
-    from freesail.ui.console import STARTER_BOOK
-
-    if getattr(rule, "book", ""):
-        return False
-    try:
-        written = read_orders_file(STARTER_BOOK)
-    except OSError:
-        return False
-    fitted, _words = fit_to_rig(ship, written)
-    changed = {" ".join(x.split()) for x in fitted} - {" ".join(x.split()) for x in written}
-    return " ".join(str(getattr(rule, "text", "")).split()) in changed

@@ -12,7 +12,7 @@
 name: The dispatches, Falmouth to Plymouth
 seed: 7
 start: 1805-06-12T05:00
-position: {lat_deg: 50.1631, lon_deg: -5.0345}   # in Carrick Road, under way at five in the morning, bound for Plymouth (the road's place by Imray 1874 p. 90)
+position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road, the usual anchorage (Imray 1874 p. 90)
 region: channel-west
 nation: britain
 ship:

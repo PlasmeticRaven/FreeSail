@@ -92,9 +92,7 @@ def _reads_as_work(ship: Ship, words: list[str], vocab: Vocabulary) -> bool:
     ws = strip_article(words)
     if not ws:
         return False
-    if ws[0] in vocab.work_nouns or " ".join(ws[:2]) in vocab.work_nouns:
-        return True
-    if _gerund_phrase(ws, vocab) is not None:
+    if ws[0] in vocab.work_nouns or _gerund_phrase(ws, vocab) is not None:
         return True
     try:
         grammar._match_verb(ws, vocab)
@@ -272,9 +270,6 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
         return {GROUND_TACKLE[verb]}
     if verb == "trim":
         return {str(vocab.evolutions["brace"])}
-    if verb == "rig the relieving tackles":
-        # `belay the relieving tackles` (the lead's reading of part D at 60af48e, item 6)
-        return {"relieving_tackles"}
     if verb == "send the boat":
         return {"send_boat"}  # `belay the boat` (package 109): the port's boat, on her errand
     from freesail.orders import ground_tackle  # local import: it imports the verbs
@@ -358,15 +353,11 @@ def _by_kind(
 ) -> tuple[list[Instance], str] | None:
     """A kind of work ('the reef', 'the reefs', 'the tack'), and its subject after 'in',
     'on' or 'of' if one is named ('the reef in the mainsail')."""
-    if not words:
+    if not words or words[0] not in vocab.work_nouns:
         return None
-    # a kind of two words ('the relieving tackles') before one
-    n = 2 if " ".join(words[:2]) in vocab.work_nouns else 1
-    if " ".join(words[:n]) not in vocab.work_nouns:
-        return None
-    verb = vocab.work_nouns[" ".join(words[:n])]
+    verb = vocab.work_nouns[words[0]]
     evos = _evolution_ids(verb, vocab)
-    rest = words[n:]
+    rest = words[1:]
     if rest and rest[0] in _JOINING:
         rest = rest[1:]
     subjects: set[str] | None = None

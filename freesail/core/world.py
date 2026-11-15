@@ -1736,16 +1736,10 @@ class World:
     def _apply_world_order(self, text: str, source: str, by: str = "") -> Event:
         from freesail.world import orders as world_orders
 
-        channel = ""
+        order = world_orders.parse(text)
+        if by:
+            order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
         try:
-            # the reading inside the refusal's reach as the carrying out is (the cold review
-            # of 2026-11-14, 5.3 item 12; package 115 D4): a line that is no world order is
-            # refused in words, never raised through the console's or the socket's loop, and
-            # a replay of the journal gives the same refusal again
-            order = world_orders.parse(text)
-            channel = order.channel
-            if by:
-                order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
             words, data = world_orders.apply(self, order)
             result = "done"
         except world_orders.WorldOrderError as e:
@@ -1764,7 +1758,7 @@ class World:
             "world.order",
             f"World order ({source}): {words}.",
             actor="driver",
-            data={"order": text, "source": str(source), "channel": channel, "result": result}
+            data={"order": text, "source": str(source), "channel": order.channel, "result": result}
             | data,
         )
 

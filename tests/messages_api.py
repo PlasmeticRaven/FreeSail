@@ -370,7 +370,7 @@ class Game:
     def __init__(self, tmp_path: Any, station: str = "watcher"):
         from pathlib import Path
 
-        from own_page import DoorClient
+        from fastapi.testclient import TestClient
 
         from freesail.api.session import make_world
         from freesail.core.world import Scenario
@@ -391,7 +391,7 @@ class Game:
             consent_records=self.records,
             saves_dir=self.saves,
         )
-        self.http = DoorClient(self.app)
+        self.http = TestClient(self.app)
         self.asked: list[dict[str, Any]] = []
 
     def page(self, width: int = 4, height: int = 3) -> None:
@@ -455,7 +455,7 @@ def run_door(game: Game, argv: list[str], environ: dict[str, str], inp: str = ""
 
     def run() -> None:
         got["code"] = api.main(
-            ["--game", "http://localhost:8000", *argv],
+            ["--game", "http://testserver", *argv],
             inp=io.StringIO(inp),
             out=got["out"],
             game_http=game.http,

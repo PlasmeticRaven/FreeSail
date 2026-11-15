@@ -217,7 +217,7 @@ def muster(
                 trade=trade,
             )
         )
-    return Crew(ship_name=ship_name, sailors=sailors, issued=len(sailors))
+    return Crew(ship_name=ship_name, sailors=sailors)
 
 
 def _draw_name(

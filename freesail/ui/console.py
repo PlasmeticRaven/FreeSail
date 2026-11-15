@@ -141,18 +141,11 @@ def read_standing_orders(world: World, path: str) -> int:
     """Give every standing order in a file to the world (spec M4 §3, §6). Each line is
     submitted as the captain's order, so each is journaled and replays; the log says what
     became of it. Returns how many were given. Shared by the console and the server."""
-    from freesail.standing.book import fit_to_rig, read_orders_file
+    from freesail.standing.book import read_orders_file
 
     if not path:
         raise OSError(2, "Say which file", path)
     lines = read_orders_file(path)
-    ship = getattr(world, "ship", None)
-    if ship is not None:
-        # one book for any rig, fitted to hers as it is read (package 115 D3): a clause for
-        # sails she carries none of is left out, and the log says so in her own words
-        lines, fitted = fit_to_rig(ship, lines)
-        if fitted:
-            world.record_driver(Severity.ROUTINE, "book.fitted", fitted, {"file": str(path)})
     for text in lines:
         world.submit(text)
     return len(lines)
@@ -909,10 +902,6 @@ class Console:
         self.desk = router.desk  # type: ignore[attr-defined]
         app = FastAPI(title="FreeSail agents")
         app.include_router(router)
-        # the doors' own rule (package 115, part A): no web page seats a station here either
-        from freesail.ui.guard import Guard, guard_app
-
-        guard_app(app, Guard((host,)))
         server = uvicorn.Server(uvicorn.Config(app, host=host, port=port, log_level="warning"))
         threading.Thread(target=server.run, daemon=True).start()
         return server

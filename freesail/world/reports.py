@@ -365,68 +365,6 @@ def _called_lately(log: Any, kind: str, now: int) -> bool:
     return False
 
 
-def _count_words(n: int) -> str:
-    words = ("", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
-    return words[n] if n < len(words) else str(n)
-
-
-def _subject(e: Any, what: str) -> tuple[str, str]:
-    """What a line is of: its kind and the thing it names (a sail's id, a mark's), else its
-    words. A different sail in the same words is a different report (the lead's reading of
-    part D at 60af48e, item 2: four sails sighted "on the larboard bow" in an hour, and three
-    never reported to a captain below)."""
-    d = e.data or {}
-    thing = str(d.get("id") or "").removeprefix("sail:")
-    return str(e.kind), thing or what
-
-
-def _reported_lately(log: Any, e: Any, what: str, now: int) -> bool:
-    """Whether the same thing was reported to the captain within the hour and he has not
-    come on deck since: the officer does not send the messenger down again to say what the
-    captain has just been told (the cold review of 2026-11-14, 5.3 item 5; package 115 D4:
-    "the sail on the larboard quarter lost sight of" sent down eight times in twelve
-    minutes). The same thing is the same kind of line of the same sail or mark (its id), or
-    of the same words where the line names nothing (`_subject`); a line of it reported is one
-    said a messenger's minute before a report of its kind. The reports' guard, as
-    `_called_lately` is the calls'."""
-    subject = _subject(e, what)
-    reported: set[int] = set()
-    i = len(log) - 1
-    while i >= 0:
-        x = log[i]
-        if x.tick < now - 3600 - MESSENGER_S:
-            return False
-        if x.kind == "captain.on_deck":
-            return False
-        if x.kind == REPORT_MADE and str((x.data or {}).get("of") or "") == subject[0]:
-            reported.add(int(x.tick) - MESSENGER_S)
-        elif x is not e and x.tick < e.tick and int(x.tick) in reported:
-            w = _what(x)
-            if w is not None and _subject(x, w) == subject:
-                return True
-        i -= 1
-    return False
-
-
-def _gathered_words(what: str, n: int) -> str:
-    """A minute's lines alike, as the lookout says them: "three sail sighted on the
-    starboard beam", "two sail on the larboard quarter lost sight of" (the lead's reading of
-    part D at 60af48e, item 2); the land once; the count after any other words."""
-    if n == 1:
-        return what
-    many = _count_words(n)
-    if what.startswith("a sail sighted, "):
-        return f"{many} sail sighted {what.removeprefix('a sail sighted, ')}"
-    if what == "a sail sighted":
-        return f"{many} sail sighted"
-    for lead in ("the sail ", "a sail "):
-        if what.startswith(lead) and what.endswith(" lost sight of"):
-            return f"{many} sail {what.removeprefix(lead)}"
-    if what.startswith("the land sighted"):
-        return what  # the land is the land, in two places or one
-    return f"{what} ({many} of them)"
-
-
 def tick(world: Any) -> None:
     """Each tick of a hull: the calls for the lines of the tick before (the officer sends
     at once), the reports for the lines of the minute before (the messenger's minute), the
@@ -469,27 +407,15 @@ def tick(world: Any) -> None:
 
     if knowledge.is_asleep(world, cap):
         return  # the messenger lets him sleep; by night the line was a call
-    # the minute's lines gathered by their words: one report for lines said alike (eight
-    # sails of the world's business each "the sail on the larboard quarter lost sight of"),
-    # the first said whole and the count after it (package 115 D4 (b))
-    gathered: dict[str, tuple[Any, int]] = {}
     for e in _lines_at(log, now - MESSENGER_S):
         what = _what(e)
         if what is None or _why_called(world, e, what) is not None:
             continue  # nothing to report, or it was a call already
-        if _reported_lately(log, e, what, now):
-            continue  # he was told of this very thing, and has not been up since
-        first, n = gathered.get(what, (e, 0))
-        gathered[what] = (first, n + 1)
-    for what, (e, n) in gathered.items():
-        data = {"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who}
-        if n > 1:
-            data["n"] = n  # a report of one line keeps its data as it was, and its digest
         world.record(
             Severity.NOTABLE,
             REPORT_MADE,
-            f"{who} sent down to the captain, {_place_words(place)}: {_gathered_words(what, n)}.",
-            data=data,
+            f"{who} sent down to the captain, {_place_words(place)}: {what}.",
+            data={"to": cap.name, "place": place, "of": e.kind, "text": what, "by": who},
         )
 
 
