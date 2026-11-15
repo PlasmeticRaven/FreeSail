@@ -958,8 +958,9 @@ def _one_broadside_into_the_brig(role: str):
     """The French cutter (the player's ship, her carronades at the word) and the British merchant
     brig Hope, crewed, lying to a cable off her starboard beam with her scenario's `role:`; one
     broadside fired at the word and the fire held as soon as it has gone (no second), then ten
-    minutes. Returns the brig's vessel and World, the cutter's World, and the least of the brig's
-    morale over the ten minutes."""
+    minutes (opened by `fire as they bear` after the engage, the player's own hold standing
+    against it since package 115 D; before, the word `fire`). Returns the brig's vessel and
+    World, the cutter's World, and the least of the brig's morale over the ten minutes."""
     from freesail.world import crews
 
     sc = Scenario(
@@ -1006,7 +1007,12 @@ def _one_broadside_into_the_brig(role: str):
     w.submit("engage her to starboard")
     w.run(1)
     t0 = w.clock.tick
-    assert w.submit("fire").kind == "guns.fire"
+    # package 115 D (the lead's ruling of 2026-11-15 on truth 7-191): the player's own hold
+    # is not lifted by `engage`, so the fire is opened by the explicit loosing. OLD `fire`, the
+    # word, which under the trunk's engage (the hold turned into "as they bear") was one gun at
+    # the word (No. 3, 273) and two as they bore (No. 1, 280; No. 2, 294); NEW `fire as they
+    # bear`, the same three guns as they bear
+    assert w.submit("fire as they bear").kind == "guns.mode"
     for _ in range(120):
         w.run(1)
         if any(e.kind == "action.fired" and e.tick >= t0 for e in w.log):

@@ -29650,3 +29650,16 @@ weather' without its royals."; at tick 58060 the sunset's refusal ("Standing ord
 routine': order not carried out ('take in the studdingsails'): Nothing done: ... already
 furled.") is gone (item 6). Nothing else: every other line and tick the same. The naval
 cruise, the merchant passage and the fake captain's did not move.
+
+**Truth 7-191's world amended by design (the lead's ruling (i) of 2026-11-15).** On the tree
+at f640de6 the truth failed ([(1, 1)] against [(3, 1)]); bisected to c4679f2, the hold standing
+against `engage` (the ruling of 2026-11-14 on D1). The guns' service is the same tick for tick
+in both trees; what changed is the mode: `_one_broadside_into_the_brig` gave `hold your fire`,
+`engage her to starboard`, `fire`, and leaned on the old engage to turn the hold into "as they
+bear". OLD: the word at 271 fired No. 3 alone at 273 (the word fires what is ready at the first
+tick any is) and the other two fired as they bore, No. 1 at 280 and No. 2 at 294: "Three shot
+at a merchant brig". Under the hold, Nos. 1 and 2 stood ready and silent. NEW: the helper opens
+by the explicit loosing, `fire as they bear` (answered `guns.mode`), the rest as it was; every
+figure of the truth unchanged (three fired, one struck, the merchantman striking, the Indiaman
+holding). The word's firing the first gun ready and not a whole side is older than part D and
+the fight's design: listed for the owner by the lead; `combat/guns.py` untouched.
