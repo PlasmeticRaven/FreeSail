@@ -36250,6 +36250,186 @@ synthetic tile at 47.70 N 6 W: absent under the chart of `channel-west` alone (i
 3 and 2, None there), present under `atlantic-east` beyond every layer (57 N 6 W), the
 corridor answering first at 47.70 N.
 
+## The chart session's tracks step: the least depth along a line, and seven ports' tracks (2026-11-14)
+
+By package 111's rulings 1, 3 and 4 as merged (the record's "Package 111, step 2b ... PACKAGE
+111 CLOSED"), on the trunk at 848bbcae.
+
+**One reader of a line's least depth, the true least of the chart's surface.**
+`Chart.least_depth_along(a, b)` gives the least depth along the great circle with no step and
+no margin. This is the lead's ruling of 11:00 on the independent reader's finding, which the
+chart session's own measure found too, at Setúbal.
+
+How it reads:
+- The lookup is bilinear between cell centres. Along a straight line within one square of four
+  centres the depth is therefore a quadratic, least at an end or at its turning point.
+- The line is cut into chords of at most 500 m (`LINE_CHORD_M`), each straight in degrees
+  between two points of the great circle; at 500 m the two differ by millimetres. At 2 km two
+  of Setúbal's legs read 1.1 and 1.5 cm over a reading every metre along the great circle,
+  where the surface is steep; at 500 m every port leg is at or under it within a centimetre.
+- Each chord is cut again (`Chart._line_pieces`): at every level's tile edges, and, where that
+  level has a tile, at its cell edges and its centre lines. These are every place the
+  surface's formula may change: a square of four centres, a corner unknown where the lookup
+  falls back to the nearest cell, or a finer level beginning or ending.
+- On each piece (`LinePiece.readings`) the depth is read at the ends and the middle, and at the
+  quadratic's turning point where that is a least within the piece.
+
+Old, in this step's first hash (84fdbcc8): a first reading every half cell of one level
+(`Chart.line_step_m`, the level chosen for the whole line by sampling a quarter of a tile's
+span), and a second every 2 m under 8 m. That reader stepped over a head three ways:
+- Off a cell's axis. Half a cell reads three quarters of a lone cell's rise only along the
+  cell's axis through its centre: a diagonal reads about 0.68 of it, an off-centre line less.
+  The reader's made grid gave 13 lines of 750 read three metres and more where the truth is
+  under three (9.51 m where it is 1.79 m), so the first reading stayed above 8 m and the
+  second never ran.
+- At a level's corner. A line clipping a finer tile's corner for less than a quarter of a
+  tile's span was read at the coarser step: a 1,729 m line over a level-3 tile for 785 m read
+  14.0 m over a two-cell rock drying to nothing.
+- At Setúbal's V, on the real chart: the best single picture of the fault. The leg from
+  38 26.02 N 9 04.46 W to 38 25.97 N 9 03.72 W (1,078 m, level 2, cells 92.6 m by 72.6 m),
+  read every metre (the depth at the datum, metres along it in brackets):
+
+  | 500 | 512 | 524 | 536 | 548 | 554 | 560 | 566 | 572 | 584 | 596 | 614 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|
+  | 10.33 | 8.28 | 6.34 | 4.51 | 2.80 | 1.99 | 1.20 | 1.84 | 2.62 | 4.12 | 5.56 | 7.59 |
+
+  Its least is 1.18 m at 561 m (1.13 m by the exact least): a V to the line's crossing of the
+  centre lines, where the bilinear surface breaks. A cable's step happened to land at 555 and
+  556 m (1.85 and 1.72 m); half a cell's (36.3 m) at 544 and 580 m (3.36 and 3.66 m), so it
+  read the shoal two metres too deep. Only the 2 m second reading under 8 m caught it, and the
+  pilot's look ahead has no second reading. The depth is the interpolated surface itself
+  (`depth_at`), not a block's shoalest sounding (`tile_min_depth`).
+`line_step_m` is gone with it: no reader along a line needs a step now.
+
+The audit's `_least_depth` (check (f)) reads only this. `TRACK_STEP_M` and
+`TRACK_REFINE_BELOW_M` are out, as `TRACK_COARSE_STEP_M` went before them. A leg the chart knows
+nothing along is now a finding of its own (`f-unread`), not a shorter count (the reader's item
+4); none today.
+
+Measured on the tree as built (check (f) whole):
+- 10.6 to 12.2 s by the machine's load (500 m chords), against 8.2 s stepped: the exact least
+  costs a third to a half as much again;
+- the same 30 findings, the 12 `f-shallow` counts unchanged;
+- words moved by a tenth or a leg's name: Paimboeuf 1.9 to 1.8 m, Setúbal 1.2 to 1.1 m;
+  St Malo's, Oporto's and the Goletta's leg named.
+
+What a coarse cell can hold (the lead's ruling of 07:47, item 4). A level-2 cell is 92.6 m
+square and holds one depth, its survey's for that whole square. A head, a rock or a bar
+narrower than that is in the grid only as far as it moved its cell's figure. On level-2 water,
+then, the audit proves that the grid's surface nowhere along the line is under 3 m. It does
+not prove that no head under 3 m stands there: nothing finer can be read where the grid
+itself is no finer. The same holds tenfold over level 1.
+
+The tests:
+- In `tests/test_chart.py`, the true least by a lone cell standing at 2, 0, -3, -6 and -10 m in
+  30 m of water. Thirty random lines by each, at any bearing within 0.8 of a cell of its
+  centre, each read against the same surface every centimetre: at or under every reading, and
+  within 1.5 cm of the least of them.
+- The same over a ridge of fifty cells crossed at a slant; across the edge between two tiles of
+  one level (a head on the seam); and across a level's edge, from a harbour patch out over a
+  region's coarser cells to a head of the region's own.
+- Setúbal's leg on the real chart: its least 1.13 m, at or under a reading every 2 cm about the
+  V.
+- `tests/test_chart_audit.py`'s Setúbal test: the audit reads 1.1 m, and a reader stepping
+  every 20 m in its place reads the leg over 2 m. Old: the old step set on the stepped reader's
+  two readings.
+
+**Seven ports' tracks.** Searched for the deepest way from each anchorage to open water: a
+widest-path search on a 10 m lattice, simplified to the fewest marks whose legs keep a floor.
+Every leg was read by the reader above and passed by the game's guard.
+
+| Port | Old least (the leg) | New least | What moved |
+|---|---|---|---|
+| Messina | ground drying 4.0 m (the road to the harbour, across the shore) | 34.2 m | out east of the road first, then down the Marina's side to the mouth, west of the islands that stand for the Braccio |
+| Syracuse | 0.5 m (east over the grid's shoal off Ortygia) | 5.0 m | out through the middle third of the mouth (Smyth's Plemmyrium shoal to the south); from the sea to off the mouth, the inner track on to the harbour |
+| Palermo | 0.0 m (across a modern pier) | 4.4 m | north by the grid's inner channel and east through the modern entrance; from the sea to the road, the inner track on |
+| Lampedusa | 0.4 m (the harbour to its road) | 6.4 m | by the mouth's deeper side; from the sea to the road, the inner track on |
+| Catania | 1.1 m (the road into the mole) | 5.0 m | in by the north, past the piers' heads (Smyth: the lava on the south, the piers on the north) |
+| Santa Cruz de Tenerife | ground drying 1.6 m | 55.6 m | the road's spot lay within the grid's modern Dique (the deepest way out within 5 km dried 0.0 m): the road moved 547 m east to Purdy's half a mile in 30 to 35 fathoms (the grid 55.6 m), the berth 342 m to the grid's 10.5 m; the tracks stand |
+| Porto Paolo | ground drying 2.1 m | 14.2 m | the spot lay within the modern basin, closed by the grid's breakwater (the deepest way out 0.5 m): moved 413 m south to Smyth's entrance in seven to ten fathoms (the grid 14.2 m), its fathoms 5 to 8; the tracks stand |
+
+Their known-list entries go as they are mended (seven out). The last two were mended at their
+cause, by the lead's ruling of 07:47: the spot, not the track, was the modern grid's. Each moved
+to the road its pilot gives, the source and the grid's depth said beside it in the features
+file and the port file; nothing else of either port moved. What reads them:
+- the boat's pull from the anchorage to the shore: Santa Cruz 1,051 m to 1,489 m, Porto Paolo
+  1,403 m to 1,771 m;
+- truth 7-524's band for Santa Cruz's road (40 to 80 m): 61.7 m to 55.6 m, within it;
+- truth 7-529's frigate, her nearest to the road (2 to 3.5 miles, measured 2.96): see below.
+- the pilot's station, which is the same feature (`pilot: station:` in both files): his boat
+  now cruises from the moved road, 547 m east at Santa Cruz (cruising 3 miles) and 413 m south
+  at Porto Paolo (2 miles). A ship takes her pilot that much farther out, well within his
+  cruising ground, and the way from where he boards to the anchorage is the same open water.
+No scenario begins or ends at either spot.
+
+Three of the five shared one cause beside the shoal, which is the plan and not the track. The
+business's way in (`ships.approach_plan`) is the track from the sea, then the outer road where
+that track does not pass it, then the inner track. Lampedusa's, Palermo's and Syracuse's tracks
+from the sea ran on to the anchorage, so the plan went back out to the road and straight in
+again over the shoal. Their tracks from the sea now end at the road, as Messina's and Catania's
+already did. Looked for in the other ports: the audit reads the whole plan, so any other port
+so drawn would show a shallow leg; none of the 19 findings is of this kind.
+
+Palermo's grid is the modern port. Its way is the grid's deepest, not the pilot's picture of
+brushing the mole-head (said in the file).
+
+**Faden's sunken rock north-east of Roustel** (St Peter Port; p. 32, the OCR's lines 4249 to
+4251, "About :oo yards"): the track passes Roustel at 220 m, about 240 yards. It keeps "that
+distance" if the figure is 100 or 200 yards and not if it is 300. The rock itself, at each of
+those distances north-east of Roustel, the track passes at 224, 213 and 158 m. Said in the
+port's file.
+
+This corrects my earlier reading, which the lead's ruling repeated ("clears 100 yards but not
+200"): measured on the tracks as merged, it clears 200 too.
+
+**The known list moves out of `data/`** (ruling 4) to `tools/audit_chart_known.yaml`, beside
+the tool. The build's fingerprint hashes every file under `data/` (`core/world.fingerprint_of`),
+so an edit of a list the game never reads changed the build and made earlier saves another
+build's. The move itself changes the fingerprint once, as every data change of the step does.
+A test holds the list beside the tool and nothing at the old path.
+
+**The land guard (ruling 3), on the tracks as merged.** It stays listed and unmended; a second
+way through is recorded here for the lead's list. A crossing is called only at a stepped point,
+and only beyond the first cable and short of the last (`land_crossing`'s skips), so dry ground
+within a cable of a leg's ends is not tried even where the end is a mark at sea and not a
+place on the shore.
+- Civita Vecchia's way in, the road to 42 05.53 N 11 47.00 E (538 m), crosses 138 m of ground
+  drying 0.6 m from 329 to 466 m along. The last stepped point tried is at 309 m and the last
+  cable is skipped, so the guard reports a near pass of 22.7 m.
+- Its way out's first leg crosses 50 m of ground drying 0.4 m, 7 to 56 m from its first mark.
+  That is within the first cable, so it is not tried.
+- Santa Cruz de Tenerife's two legs cross 45 m of ground 1.6 m above the datum and are reported
+  as near passes of 19.4 and 19.0 m.
+
+**Where else a fixed step samples the chart along a line** (package 111's table above, checked
+against the code). It holds, and lacks one: `dealings._leg_made`, the pilot's judging of a leg
+he lays. That reads `dangers_ahead` (the charted features, no step) and then the water under
+her every half cable (92.6 m) by `_water_for`; it is in the game's step of its own (ruling 2)
+with `shoal_ahead`.
+
+Not along a line, and not in the table by design: `captains` (the joining mark, sought out from
+the shore by half cables), `orders` (rings of half cables to the nearest water), and the
+contour searches. `core/world.py`'s halves of a cable are words; `orders/station.py`'s
+`SAIL_STEP_M` is not the chart. The guard and the lookout stay as they are (ruling 3, and the
+lead's 06:15 ruling).
+
+**The twelve `f-shallow` entries left, by cause** (the lead's ruling of 07:47, item 3; each cause
+also written in its known-list reason). The three causes are: (1) the spot lies inside modern
+works the grid encloses; (2) the grid's grain over a channel the pilots give deeper; (3) a bar
+or shoal the pilots give too. Measured by the deepest way on a 25 to 40 m lattice from the
+anchorage or road to the road or open water.
+- (3), a bar or shoal the pilots give too: Calais (dry at low water), Dunkirk (the Splinter's
+  six or eight feet), Poole (the bar's six to eight feet; the grid's deepest way 2.0 m), St Malo
+  (the drying shelves), Oporto (the bar; 1.5 m), Setúbal (the bar), Paimboeuf (the Loire's
+  ledges; 3.3 m off the pilot's side, JUDGEMENT) and Rochefort (the Charente; 3.1 m, JUDGEMENT).
+- (1), the spot inside modern works: Genoa (the deepest way from the anchorage to open water
+  dries 0.1 m), Bougie (from the road, dries 0.4 m) and Civita Vecchia (the anchorage itself
+  2.9 m within the modern harbour, the pilot's two entrances under its moles). Named to the
+  lead, not moved.
+- None of the three: the Goletta, where the grid has a way of 6.2 m from the road to the
+  track's first mark that the track does not take. Named to the lead, not redrawn.
+- (2) none clearly: where the pilots give a figure at the worst point, it is a bar's or a
+  shoal's.
 ### The lead's answers on step 0 (2026-11-13, through the chart session)
 
 1. **Level 0** covers the Atlantic and the Mediterranean, 70 S to 75 N and 100 W to 40 E. The
@@ -37124,6 +37304,25 @@ Cited and not held, as the helper found them: Lempriere 1800 (nations.yaml); Oma
 files) and Lavery (22 data files); Troude; Lloyd's Register; "the encyclopaedia" in 21
 feature files; Trinity House's pages; Whewell 1833; Tomlins and Raithby's Statutes.
 
+## Package 75's eight pins, re-measured by the lead at the merge (2026-11-15)
+
+Package 75's words (every work named as an order names it; the sails by their plain names) change lines of eight recorded logs. The ships session cannot measure them (the whole logs do not reproduce on its Windows machine), so the lead measured them on the build machine: the staged tree run whole on the cloud (run 105, then run 107 at the merged hash), and each log dumped line by line on the trunk and on the staged tree and compared (`Log.digest()`'s own canonical lines).
+
+| Pin | Lines | Old | New | What differs |
+|---|---|---|---|---|
+| `GATE_5B_SCHOONER_DIGEST` | 766 | 3a1698037811b753 | b5f35676ef8183d0 | 52 lines, wording only |
+| `GATE_5C_CRUISE_DIGEST` | 2,242 | 1e7f8ab24b84e6f7 | 81b0b08a63bf068e | wording only |
+| `GATE_5C_MERCHANT_DIGEST` (and truth 77) | 3,103 | 40bcef34afd0cec4 | ad35e60bf5d3737d | 153 lines, wording only |
+| `GATE_6A_INTENT_DIGEST` | 2,079 | 9d9efe6b21c17060 | 5d3cbbc5f4d33b84 | wording only |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | 3,115 | c0bf4b51621ad91f | 2cc02c95ad794bc8 | 153 lines, wording only |
+| `TRIAL_STATION_GALE_DIGEST` | 1,722 | 04f2fcd0fe9023a4 | b12065ef819367b3 | wording only |
+| `TRIAL_TRADE_THICK_DIGEST` | 426 | cfa538b19cb0d2fe | 506bf46eaa6d66fe | wording only |
+| the privateer trial | 1,594 | aa04702e062bc64b | 48c8948f87088a76 | wording, and three lines |
+
+"Wording only" means: with the known changes of words put back (fore sail to foresail, main sail to mainsail, the log and the lead named as orders name them, lie a-try, cast loose the guns, make the signal, the spanker and the gaff topsail by their plain names), no line differs, at the same tick and of the same kind. The privateer trial's three lines are `make all sail` on the schooner no longer answering "'set the square sail': 'set' was understood, but 'square' belongs with 'brace'", which the lead's ruling (6) of 10 November meant gone. No line count moves. The item sent back (a mark that changes hands) moves none of them: the eight pass on the merged tree.
+
+The one who moved the words (the ships session) did not measure or pass the pins; the lead measured them, and the two independent readers of the hash passed the changes of wording they rest on.
+
 ## Package 115, part D: the newcomer's trips (2026-11-14)
 
 From the cold review of 2026-11-14 (`docs/reviews/ColdReview-M7.md` 1.5, 5.3, F2.11), each
@@ -37544,6 +37743,31 @@ the beat leaves her guns secured). OLD "The starboard lower-deck guns to fire ea
 it is ready, six guns; eight are behind ports the sea has shut." NEW "The starboard lower-deck
 guns to fire each as soon as it is cast loose and ready, six guns; eight are behind ports the
 sea has shut. The guns are secured: none is loaded, run out or fired until they are cast
-loose; say 'cast loose the guns'." The gate digests (the naval cruise, the schooner's and the
-merchant passages, the fake captain's) did not move: in neither passage does a minute bring
-two reports of the same words, and the schooner's book is fitted the same way there.
+loose; say 'cast loose the guns'." CORRECTED by the slow tier (the note above was written
+from the fast tier, where the gates are not run): the schooner's passage (gate 5b,
+`GATE_5B_SCHOONER_LINES`, `_DIGEST`) moved, 769 to 766 lines, ef15ca96ee2ed052 to
+3bcbaeccd01fc4e5, re-pinned in the second commit of the re-pins (one more, against the lead's
+"one commit": the first was made before the slow tier had read the gates). Line by line, old
+beside new: at tick 0 "The book fitted to her rig, for she carries no royals: 'night routine'
+without its royals; 'morning sail' left out; 'shorten sail for weather' without its royals."
+and the night routine's two lines ("Order: standing order "night routine": at sunset then take
+in the studdingsails." and its "entered in the book") become the one line "The book fitted to
+her rig, for she carries no royals: 'night routine' left out, for it was left to take in her
+studdingsails only, which nothing in the book sets; 'morning sail' left out; 'shorten sail for
+weather' without its royals."; at tick 58060 the sunset's refusal ("Standing order 'night
+routine': order not carried out ('take in the studdingsails'): Nothing done: ... already
+furled.") is gone (item 6). Nothing else: every other line and tick the same. The naval
+cruise, the merchant passage and the fake captain's did not move.
+
+**Truth 7-191's world amended by design (the lead's ruling (i) of 2026-11-15).** On the tree
+at f640de6 the truth failed ([(1, 1)] against [(3, 1)]); bisected to c4679f2, the hold standing
+against `engage` (the ruling of 2026-11-14 on D1). The guns' service is the same tick for tick
+in both trees; what changed is the mode: `_one_broadside_into_the_brig` gave `hold your fire`,
+`engage her to starboard`, `fire`, and leaned on the old engage to turn the hold into "as they
+bear". OLD: the word at 271 fired No. 3 alone at 273 (the word fires what is ready at the first
+tick any is) and the other two fired as they bore, No. 1 at 280 and No. 2 at 294: "Three shot
+at a merchant brig". Under the hold, Nos. 1 and 2 stood ready and silent. NEW: the helper opens
+by the explicit loosing, `fire as they bear` (answered `guns.mode`), the rest as it was; every
+figure of the truth unchanged (three fired, one struck, the merchantman striking, the Indiaman
+holding). The word's firing the first gun ready and not a whole side is older than part D and
+the fight's design: listed for the owner by the lead; `combat/guns.py` untouched.

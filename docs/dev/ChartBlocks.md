@@ -922,7 +922,9 @@ region's bounds held. What it found, for the next blocks:
 
 **The audit, clean or declared.** `python tools/audit_chart.py --known` reads the whole
 chart as the game reads it and prints its findings by region, each marked `!` that
-`data/charts/audit-known.yaml` lacks; `--full` is the slow tier's sweep. A block runs it
+`tools/audit_chart_known.yaml` lacks (beside the tool and not under `data/`, since the chart
+session's tracks step, so that an edit of it leaves the build's fingerprint as it is); `--full`
+is the slow tier's sweep. A block runs it
 after its build and before its report, and comes in in one of two ways: **clean** (no `!`,
 and `tests/test_chart_audit.py` green in both tiers), or **declared**: each finding its
 block adds entered in the known list with its key, its place, its reason in a line, its
@@ -1017,7 +1019,7 @@ next blocks (106b's African coast first):
   island's metre and more of mean level for a fault; the Canaries and the Salvages are
   named there, the Salvages meeting both groups' seas. The audit found Palma's road in 38
   fathoms against the pilot's 15 or 20 and Santa Cruz's mooring on the modern breakwater,
-  both moved; what is left is listed, with its reason, in `data/charts/audit-known.yaml`.
+  both moved; what is left is listed, with its reason, in the known list (then `data/charts/audit-known.yaml`, since the chart session's tracks step `tools/audit_chart_known.yaml`).
 
 ## Morocco's Atlantic coast (package 106b, as built)
 

@@ -3034,9 +3034,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
-# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before)
-# 766 on the joined tree, as on the trunk: 115 D's 769 was its count before its own mend took the
-# fitted night routine out of the schooner's book (three lines)
+# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
+# the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
+# left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
 GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
@@ -3050,7 +3050,7 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
-# (b5f35676ef8183d0 with 75 alone; ef15ca96ee2ed052 on 115 D's own tree)
+# (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
 GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
@@ -18174,7 +18174,7 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
 @pytest.mark.slow
 def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
-    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    findings `tools/audit_chart_known.yaml` owns, each within its count's ceiling."""
     A = _audit_tool()
     audit = A.run(A.FULL_STEP_DEG)
     known = A.load_known()
