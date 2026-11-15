@@ -30,9 +30,10 @@ Routes (`harbour_routes`):
                                            the first game the page names,
                                            the ships, seats, stations, briefs, books, ports,
                                            regions and nations
-    POST /api/harbour/start                {scenario | ship | load, seed, seat, time, pace,
-                                           crewed_cap, crewed_range, business,
-                                           director_brief, standing_orders} -> the game
+    POST /api/harbour/start                {scenario | ship | load, seed, seat, aboard,
+                                           time, pace, crewed_cap, crewed_range, business,
+                                           director_brief, standing_orders, wind, heading}
+                                           -> the game
     GET  /api/harbour/settings             the settings and where they are kept
     POST /api/harbour/settings             {settings} -> kept (no key, truth 7b-110)
     POST /api/harbour/desktop              {stations: [...], ship?, write?} -> the entries
@@ -44,7 +45,8 @@ Routes (`harbour_routes`):
     POST /api/harbour/doors/{id}/say       {text}: a line to its terminal (the owner's
                                            word in a consent conversation)
     POST /api/harbour/doors/{id}/stop      stopped, its station released
-    GET  /api/harbour/scenario             ?path=: a scenario's text and fields
+    GET  /api/harbour/scenario             ?path=: a scenario's text and fields, its lines
+                                           as a driver says them, the ships to be aboard
     POST /api/harbour/scenario/prove       {fields, source?} -> the scenario's lines, or
                                            its refusal in words
     POST /api/harbour/scenario             {fields, source?, name, book?, overwrite?} ->
@@ -740,6 +742,29 @@ class Harbour:
             raise HarbourError("The business is on, off, or as the scenario says.")
         args.business = business or None
         args.ease_on_station = bool(choices.get("ease_on_station"))
+        # package 96b, step 3: the ship the player is aboard (the server's `--ship`), and
+        # the wind and the heading of a bare ship (`--wind`, `--heading`), as the command
+        # line has always taken them
+        args.aboard = " ".join(str(choices.get("aboard") or "").split()) or None
+        wind = str(choices.get("wind") or "").replace(" ", "")
+        if wind:
+            parts = wind.split(",")
+            try:
+                if len(parts) != 2:
+                    raise ValueError
+                from_deg, knots = float(parts[0]), float(parts[1])
+            except ValueError:
+                raise HarbourError(
+                    "The wind is where it blows from in degrees and its knots, as '225,15'."
+                ) from None
+            if not (0.0 <= from_deg <= 360.0 and 0.0 <= knots <= 100.0):
+                raise HarbourError(
+                    "The wind is from 0 to 360 degrees and of 0 to 100 knots, as '225,15'."
+                )
+            args.wind = f"{from_deg:g},{knots:g}"
+        args.heading = number("heading", float)
+        if args.heading is not None and not 0.0 <= args.heading <= 360.0:
+            raise HarbourError("The heading is from 0 to 360 degrees.")
         lines: list[str] = []
         try:
             world = server.prepare_game(args, say=lines.append)
@@ -762,6 +787,7 @@ class Harbour:
                 "ship": ship,
                 "load": load,
                 "seat": args.seat or "",
+                "aboard": args.aboard or "",
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
@@ -1175,7 +1201,34 @@ class Harbour:
             "text": text,
             "fields": fields,
             "position_deg": where,  # for the form's latitude and longitude
+            **self._said(p, fields),
         }
+
+    @staticmethod
+    def _said(p: Path, fields: dict[str, Any]) -> dict[str, Any]:
+        """What a scenario is, for the page to say before it is started (package 96b, step
+        3): the scenario's own lines as a driver prints them at the load (`lines`: the
+        author's view, the file's path left out), or the loader's refusal in words
+        (`refusal`); and the other ships the player may be aboard at the start (`aboard`:
+        those with a captain of their own, an intent or a free intent, by name), which is
+        what the server's `--ship` takes."""
+        from freesail.world.scenarios import ScenarioError, load_scenario
+
+        lines: list[str] = []
+        refusal = ""
+        try:
+            lines = [ln.replace(f" ({p})", "") for ln in load_scenario(p).lines()]
+        except (ScenarioError, OSError, ValueError, KeyError, yaml.YAMLError) as e:
+            refusal = _scenario_words(str(e), p)
+        ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+        aboard = [
+            str(s.get("name") or s.get("id"))
+            for s in ships
+            if isinstance(s, dict)
+            and (s.get("intent") or s.get("free_intent"))
+            and (s.get("name") or s.get("id"))
+        ]
+        return {"lines": lines, "refusal": refusal, "aboard": aboard}
 
     def _original(self, source: str) -> tuple[str | None, str]:
         if not source:

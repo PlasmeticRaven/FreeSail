@@ -80,42 +80,53 @@
   </div>
 
   <div class="panel">
-    <div class="panel-head"><span>A new game</span><span class="hint">the server's flags, as the page's controls; the clock held until you say go</span></div>
+    <div class="panel-head"><span>A new game</span><span class="hint">choose a game, where you stand and how the clock runs; the clock is held until you say go</span></div>
     <form id="start-form" class="form-grid" autocomplete="off">
       <label>From
         <select id="s-from">
           <option value="scenario">a scenario</option>
-          <option value="ship">a ship file</option>
-          <option value="load">a save</option>
+          <option value="ship">a bare ship on open water</option>
+          <option value="load">a saved game</option>
         </select></label>
-      <label class="from from-scenario">Scenario <select id="s-scenario"></select></label>
+      <label class="from from-scenario span-3">Scenario <select id="s-scenario"></select></label>
       <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
-      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
-      <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
-      <label>Your seat <select id="s-seat"></select></label>
-      <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
-      <label>Pace <select id="s-pace">
-          <option value="rule">the pace rule (1x while a model's sample is open)</option>
-          <option value="lockstep">lockstep (the clock waits for a door)</option>
-          <option value="free">free-running</option>
-        </select></label>
-      <label>Crewed cap <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="the machine's"></label>
-      <label>Crewed range (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="the machine's"></label>
-      <label>Business <select id="s-business">
-          <option value="">as the scenario says</option>
-          <option value="on">on</option>
-          <option value="off">off</option>
-        </select></label>
-      <label>Director's brief <select id="s-brief"></select></label>
-      <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
-      <label>Standing orders <select id="s-book"></select></label>
-      <label class="check"><input id="s-ease" type="checkbox"> ease to 1x when a station is sampled or speaks</label>
+      <label class="from from-ship" hidden title="where the wind blows from, in degrees, and its knots; empty: south-west, fifteen knots">Wind (from, knots) <input id="s-wind" type="text" placeholder="225,15"></label>
+      <label class="from from-ship" hidden title="her heading at the start, in degrees; empty: north">Heading <input id="s-heading" type="number" min="0" max="360" step="any" placeholder="0"></label>
+      <label class="from from-load" hidden>Saved game <select id="s-load-pick"></select></label>
+      <label class="from from-load span-2" hidden title="a save by its name in the saves place; the list fills this in">Its name <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
       <p id="s-says" class="note wide from from-scenario shelf-says"></p>
-      <label class="check wide from from-scenario"><input id="s-tests" type="checkbox"> show the scenarios kept for tests and gates</label>
-      <div class="form-actions">
+      <pre id="s-lines" class="words wide from from-scenario said-lines" hidden></pre>
+      <p id="s-load-says" class="note wide from from-load" hidden></p>
+      <label title="the station you sit at: the captain's, or one below his, or the director's above the game">Where you stand <select id="s-seat"></select></label>
+      <label class="from from-scenario" id="s-aboard-label" hidden title="the ship you are aboard at the start, when it is not your own: one with a captain of her own">Aboard <select id="s-aboard"></select></label>
+      <label title="how the clock runs when a model holds a station">The clock <select id="s-pace">
+          <option value="free">at my own pace (free-running)</option>
+          <option value="rule">slowed while a model is thinking (the pace rule)</option>
+          <option value="lockstep">waits for the models (lockstep)</option>
+        </select></label>
+      <label title="game seconds to a real second">Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
+      <div class="form-actions wide">
         <button id="btn-start" type="submit">start the game</button>
         <a id="btn-to-game" class="harbour-link" href="/" hidden>go to the game</a>
       </div>
+      <details id="s-more" class="wide more">
+        <summary>more for this game</summary>
+        <div class="form-grid">
+          <label title="the same seed gives the same weather, names and chances; empty: the scenario's own">Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
+          <label title="traders, fishermen and cruisers the game puts on the sea for itself">The sea's traffic <select id="s-business">
+              <option value="">as the scenario says</option>
+              <option value="on">on</option>
+              <option value="off">off</option>
+            </select></label>
+          <label title="how many other ships near you are sailed man by man at once; empty: three">Ships fully crewed at once <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="three"></label>
+          <label title="a ship is given her full crew inside this distance; empty: four miles">Within (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="four"></label>
+          <label>Director's brief <select id="s-brief"></select></label>
+          <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
+          <label>Standing orders <select id="s-book"></select></label>
+          <label class="check"><input id="s-ease" type="checkbox"> ease to 1x when a station is sampled or speaks</label>
+        </div>
+      </details>
+      <label class="check wide from from-scenario"><input id="s-tests" type="checkbox"> show the scenarios kept for tests and gates</label>
     </form>
     <pre id="start-words" class="words" hidden></pre>
   </div>
