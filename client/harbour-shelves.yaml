@@ -2,7 +2,10 @@
 # shelf of the harbour's page each of the game's scenarios stands on, in what order, and
 # the one sentence the page says of it. Read by the harbour's page alone
 # (freesail/ui/harbour.py, `Harbour.shelves`); the game reads nothing here, and no scenario
-# file says its own shelf, so that sorting the list moves no scenario.
+# file says its own shelf, so that sorting the list moves no scenario. It lies with the
+# page's files and not under data/: data/ is the game's data, which the range's audit
+# classes key by key and the rules' stamp of a save hashes file by file, and the page's
+# sorting is neither.
 #
 # A scenario is named by its file's name without `.yaml`. A scenario of data/scenarios/
 # that no shelf names stands on the page's last shelf, "Not yet sorted", so that a new

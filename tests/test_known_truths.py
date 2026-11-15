@@ -21469,8 +21469,9 @@ def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_o
     order; the gates' days and the acceptance walks on the one shelf marked to be shown
     only when asked for; every other shelf shown; and no ship's boat among the ships a
     bare game starts in. The shelves are read from a file of the page's own
-    (`data/harbour/shelves.yaml`), outside `data/scenarios/`, so that no scenario file
-    was changed to sort them."""
+    (`client/harbour-shelves.yaml`), outside `data/` altogether, so that no scenario file
+    was changed to sort them and a re-sorting moves neither the range's audit nor the
+    rules' stamp of a save."""
     pytest.importorskip("fastapi")
     from freesail.ui.harbour import GAME_SCENARIOS, SHELVES_FILE, Harbour
     from freesail.ui.server import Driver
@@ -21482,6 +21483,7 @@ def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_o
     )
     cat = harbour.catalogue()
     assert GAME_SCENARIOS not in SHELVES_FILE.parents
+    assert HARBOUR_ROOT / "data" not in SHELVES_FILE.parents
     shelves = {s["id"]: s for s in cat["shelves"]}
     assert "unsorted" not in shelves and "yours" not in shelves
     assert [s["id"] for s in cat["shelves"] if s["hidden"]] == ["tests"]

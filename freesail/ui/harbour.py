@@ -87,8 +87,12 @@ GAME_SCENARIOS = ROOT / "data" / "scenarios"
 GAME_BOOKS = ROOT / "data" / "standing_orders"
 SHIPS_DIR = ROOT / "data" / "ships"
 # The page's shelves (package 96b, step 1; docs/design/Design-Harbour.md §3.2): which shelf
-# each of the game's scenarios stands on, read by the page alone.
-SHELVES_FILE = ROOT / "data" / "harbour" / "shelves.yaml"
+# each of the game's scenarios stands on, read by the page alone. With the page's own files
+# and not under `data/`: that folder is the game's data, every dated key of which the
+# range's audit classes (`tools/audit_range.py`) and every file of which is hashed into the
+# rules' stamp a save carries (`core.world.fingerprint_of`), and a re-sorting of the page's
+# list is no change of the rules.
+SHELVES_FILE = CLIENT_DIR / "harbour-shelves.yaml"
 # The two shelves the file never names: the player's own scenarios, first; and the game's
 # scenarios no shelf names, last, so that none is hidden by being forgotten.
 SHELF_OWN = {"id": "yours", "title": "Yours", "says": "Scenarios of your own.", "hidden": False}
@@ -470,7 +474,7 @@ class Harbour:
         return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}
 
     def shelves(self) -> list[dict[str, Any]]:
-        """The shelves as the file has them (`data/harbour/shelves.yaml`): each its id, its
+        """The shelves as the file has them (`client/harbour-shelves.yaml`): each its id, its
         title, its line, whether it is shown only when asked for, and its scenarios in
         order, each `{file, says}`. A file that is missing or cannot be read gives no
         shelves, and every scenario then stands unsorted: the list is never lost to it."""
