@@ -450,6 +450,7 @@ class Harbour:
             "books": books,
             "descriptions": list(DESCRIPTIONS),
             "kinds": self.kinds(),
+            "squadrons": self.squadron_words(),
             "fits": self.fits(),
             "nations": list(load_nations().nations),
             "regions": self.regions(),
@@ -627,6 +628,21 @@ class Harbour:
                 )
             Harbour._kinds = out
         return Harbour._kinds
+
+    @staticmethod
+    def squadron_words() -> dict[str, Any]:
+        """What a squadron's card chooses from (package 96b, step 6): the game's own kinds
+        and formations (`world.squadrons.KINDS`, `FORMATIONS`), the books a set may sail by
+        (`data/squadrons/`), and the words that name the player's ship among the members."""
+        from freesail.world.squadrons import FORMATIONS, KINDS, PLAYER_ID
+
+        books = sorted(p.stem for p in (ROOT / "data" / "squadrons").glob("*.yaml"))
+        return {
+            "kinds": list(KINDS),
+            "formations": list(FORMATIONS),
+            "books": books,
+            "player": PLAYER_ID,
+        }
 
     def fits(self) -> dict[str, dict[str, Any]]:
         """Each ship file's fits of guns by name and the one she carries when none is said

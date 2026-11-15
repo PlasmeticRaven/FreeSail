@@ -21700,3 +21700,71 @@ def test_truth_7_406_the_ships_card_is_filled_from_the_games_own_kinds_fits_and_
     fields["ships"][1]["heading_deg"] = 270
     said = [ln for ln in harbour.prove(fields)["lines"] if "To know" in ln]
     assert len(said) == 2 and "long tom" in said[0] and "read by nothing" in said[1]
+
+
+def test_truth_7_407_a_squadron_is_made_from_the_sheet_by_the_games_own_kinds_and_formations(
+    tmp_path,
+):
+    """Package 96b, step 6 (docs/design/Design-Harbour.md §1.3 rows 108 and 109, §2.3: "a
+    scenario whose squadrons could not be set but by the file"). The harbour's catalogue
+    gives the squadron's card the game's own kinds and formations, the books a set sails
+    by and the words for the player's ship; a scenario with a convoy written as the card
+    writes it (its name, kind, formation, the player its commander, its members by id, in
+    the squadron's own entry and not on each ship) is proved by the maker and makes the
+    set in the game: a convoy in the order of sailing under the player's ship, the three
+    merchant brigs its members; and a formation that is none of the game's is refused in
+    the loader's words."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+    from freesail.world.squadrons import FORMATIONS, KINDS, PLAYER_ID
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    words = harbour.catalogue()["squadrons"]
+    assert words["kinds"] == list(KINDS) and words["formations"] == list(FORMATIONS)
+    assert words["player"] == PLAYER_ID and "convoy" in words["books"]
+    fields = {
+        "name": "A convoy of three",
+        "seed": 7,
+        "start": "1805-06-12T10:00",
+        "position": {"lat_deg": 49.85, "lon_deg": -5.2},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/brig.yaml", "heading_deg": 60},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": name.lower(),
+                "description": "merchant brig",
+                "name": name,
+                "nation": "britain",
+                "position": f"49 5{n} N 5 1{n} W",
+                "goal": "in company with the ship within 3 cables",
+            }
+            for n, name in enumerate(("Nancy", "Hope", "Providence"))
+        ],
+        "squadrons": [
+            {
+                "name": "the Falmouth trade",
+                "kind": words["kinds"][1],
+                "formation": "order of sailing",
+                "commander": words["player"],
+                "members": ["nancy", "hope", "providence"],
+            }
+        ],
+    }
+    harbour.prove(fields)
+    saved = harbour.save_scenario(fields, "a-convoy")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        sets = list(driver.world.squadrons.sets)
+        assert len(sets) == 1
+        assert (sets[0].kind, sets[0].formation) == ("convoy", "order of sailing")
+        assert sets[0].commander == PLAYER_ID
+        assert set(sets[0].members) == {PLAYER_ID, "nancy", "hope", "providence"}
+        fields["squadrons"][0]["formation"] = "a wedge"
+        with pytest.raises(HarbourError, match="no formation"):
+            harbour.prove(fields)
+    finally:
+        harbour.close()

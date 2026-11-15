@@ -264,6 +264,13 @@ def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_
     assert cutter == {"fits": ["carronades", "long guns"], "default": "carronades"}
     assert len(cat["fits"]["data/ships/seventy-four.yaml"]["fits"]) == 3
     assert set(cat["fits"]) == set(cat["ships"])  # every ship offered, and no boat
+    # step 6: what a squadron's card chooses from, the game's own
+    assert cat["squadrons"] == {
+        "kinds": ["squadron", "convoy"],
+        "formations": ["line ahead", "line abreast", "order of sailing", "close order"],
+        "books": ["blockade", "convoy", "squadron"],
+        "player": "the ship",
+    }
 
 
 def test_the_proof_says_a_fit_her_kind_has_not_and_a_heading_read_by_nothing(client):
@@ -819,6 +826,7 @@ def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button
     assert pg.is_visible("#start-form")
     pg.click("nav.tabs button[data-tab=begin]")
     pg.click("#btn-b-first")
+    pg.wait_for_url(live.url + "/", timeout=60_000)  # the game's page, before it is asked
     pg.wait_for_function(
         "document.getElementById('ship-name') && "
         "document.getElementById('status').textContent === 'connected'",
@@ -836,6 +844,7 @@ def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button
     assert "held" in pg.inner_text("#b-playing-says")
     # a lesson that is the officer's own seats the player at the officer's station
     pg.click("#b-lessons button[data-path='data/scenarios/lesson-reckoning.yaml']")
+    pg.wait_for_url(live.url + "/", timeout=60_000)
     pg.wait_for_function(
         "document.getElementById('status').textContent === 'connected'", timeout=60_000
     )
@@ -947,7 +956,8 @@ def test_in_the_browser_the_sheet_is_folded_and_each_part_says_what_is_set(brows
     assert "one weather system written out (the low)" in line("weather").lower()
     assert line("ships") == (
         "Three ships: Naiad of Britain, a frigate; Nimble of Britain, a brig-sloop; "
-        "Hortense of France, a frigate; the inshore squadron, a squadron in line ahead."
+        "Hortense of France, a frigate; the inshore squadron, a squadron in line ahead "
+        "(naiad, nimble)."
     )
     assert line("sea").startswith("Four ports: brest, falmouth, plymouth, torbay")
     assert "first order: set plain sail" in line("orders") and "Ushant" in line("orders")
@@ -1097,6 +1107,110 @@ def test_in_the_browser_every_ship_is_set_up_on_her_card_and_the_scenario_made_i
     )
     assert fields["ships"] == fields["was"]
     assert fields["disabled"] == isinstance(fields["was"][0]["position"], dict)
+    assert errors == []
+
+
+def test_in_the_browser_a_convoy_is_built_from_an_empty_sheet_and_one_read_is_kept(
+    browser_page,
+):
+    """Package 96b, step 6 (docs/design/Design-Harbour.md §2.3; its step's own trial): a
+    convoy built from an empty sheet: a King's brig-sloop the player's, three merchant
+    brigs on their cards, and a convoy's card with its kind, its formation, the player its
+    commander and the three ticked as its members; proved, saved and started, the game has
+    the set. A squadron read from a scenario and touched without a change is written as it
+    was; a member unticked leaves it."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option('#maker [data-field="ship.file"]', "data/ships/brig.yaml")
+    pg.fill("#m-lat", "49.85")
+    pg.fill("#m-lon", "-5.2")
+    pg.select_option('#maker [data-field="region"]', "channel-west")
+    pg.fill('#maker [data-field="orders"]', "")
+    for n, name in enumerate(("Nancy", "Hope", "Mary Ann")):
+        pg.click("#btn-m-ship-add")
+        card = pg.locator("#m-ships .ship-card").last
+        card.locator("[data-col=description]").select_option("merchant brig")
+        card.locator("[data-col=name]").fill(name)
+        card.locator("[data-col=nation]").select_option("britain")
+        card.locator("[data-col=goal]").fill("in company with the ship within 3 cables")
+        card.locator("summary").click()
+        card.locator("[data-col=id]").fill(name.lower().replace(" ", "-"))
+        card.locator(".card-bearing").fill(str(120 + 60 * n))
+        card.locator(".card-miles").fill("0.4")
+        card.locator(".card-put").click()
+        card.locator("[data-col=id]").dispatch_event("change")
+    pg.click("#btn-m-squadron-add")
+    sq = pg.locator("#m-squadrons .squadron-card").last
+    offered = sq.locator(".card-members input").evaluate_all("els => els.map(e => e.value)")
+    assert offered == ["the ship", "nancy", "hope", "mary-ann"]
+    assert sq.locator("[data-col=formation] option").all_text_contents()[1:] == [
+        "line ahead",
+        "line abreast",
+        "order of sailing",
+        "close order",
+    ]
+    sq.locator("[data-col=name]").fill("the Falmouth trade")
+    sq.locator("[data-col=kind]").select_option("convoy")
+    sq.locator("[data-col=formation]").select_option("order of sailing")
+    sq.locator("[data-col=commander]").select_option("the ship")
+    for member in ("nancy", "hope", "mary-ann"):
+        sq.locator(f".card-members input[value='{member}']").check()
+    pg.click("#btn-m-close")
+    assert pg.inner_text('#maker [data-line="ships"]').endswith(
+        "the Falmouth trade, a convoy in order of sailing (nancy, hope, mary-ann)."
+    )
+    pg.fill("#m-name", "a-convoy")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "a-convoy.yaml").read_text(encoding="utf-8"))
+    assert made["squadrons"] == [
+        {
+            "name": "the Falmouth trade",
+            "kind": "convoy",
+            "formation": "order of sailing",
+            "commander": "the ship",
+            "members": ["nancy", "hope", "mary-ann"],
+        }
+    ]
+    assert all("squadron" not in s for s in made["ships"])  # said once, in the squadron's entry
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "a-convoy.yaml"),
+    )
+    assert status == 200
+    with port.driver.lock:
+        sets = list(port.driver.world.squadrons.sets)
+        assert (
+            len(sets) == 1 and sets[0].kind == "convoy" and sets[0].formation == "order of sailing"
+        )
+        assert len(sets[0].members) == 4  # the commander, the player's, put first
+    # the blockade's squadron read, touched without a change, and with a member unticked
+    out = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/blockade.yaml');
+            const card = document.querySelector('#m-squadrons .squadron-card');
+            const name = card.querySelector('[data-col=name]');
+            name.dispatchEvent(new Event('input', { bubbles: true }));
+            const same = h.collect().squadrons;
+            const box = card.querySelector(".card-members input[value='nimble']");
+            box.checked = false;
+            box.dispatchEvent(new Event('change', { bubbles: true }));
+            return {same: same, was: h.loaded.fields.squadrons, less: h.collect().squadrons};
+        }"""
+    )
+    assert out["same"] == out["was"]
+    assert out["less"][0]["members"] == ["naiad"] and out["less"][0]["book"] == "blockade"
     assert errors == []
 
 

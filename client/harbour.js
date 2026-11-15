@@ -545,10 +545,12 @@
     if (t.hasAttribute("data-book")) markDirty("standing_orders");
     if (t.hasAttribute("data-brief")) markDirty("director");
     if (t.closest && t.closest("#m-ships")) markDirty("ships");
+    if (t.closest && t.closest("#m-squadrons")) markDirty("squadrons");
     if (t.closest && t.closest("#m-wind")) markDirty("weather");
     if (t.closest && t.closest("#m-world-orders")) markDirty("world_orders");
   });
   $("maker").addEventListener("input", function (ev) {
+    if (ev.target.closest && ev.target.closest("#m-squadrons")) markDirty("squadrons");
     var t = ev.target;
     if (t.hasAttribute("data-brief")) markDirty("director");
     if (t.closest && t.closest("#m-ships")) markDirty("ships");
@@ -769,6 +771,141 @@
       return item;
     }).filter(function (item) { return Object.keys(item).length; });
   }
+  // -- a squadron's card (package 96b, step 6; docs/design/Design-Harbour.md §2.3) -------
+  //
+  // A squadron or a convoy is a set of the scenario's ships, the player's among them if he
+  // likes: its name, its kind, its formation, its commander and its members ticked from
+  // the ships; the rest behind "more". The members are written in the squadron's own entry
+  // (`squadrons: members`), by each ship's id (her name where she has none) and the
+  // player's ship by the game's own words for her.
+
+  function shipChoices() {
+    var me = (cat.squadrons || {}).player || "the ship";
+    var out = [[me, "your own ship"]];
+    document.querySelectorAll("#m-ships .ship-card").forEach(function (card) {
+      var id = card.querySelector('[data-col="id"]').value.trim(), name = card.querySelector('[data-col="name"]').value.trim();
+      var key = id || name;
+      if (key) out.push([key, name || id]);
+    });
+    return out;
+  }
+  function squadronChoices(card) {
+    var choices = shipChoices();
+    var known = choices.map(function (c) { return c[0]; });
+    var cmd = card.querySelector('[data-col="commander"]');
+    setOptions(cmd, [["", "your own ship (when none is said)"]].concat(choices), cmd._kept !== undefined ? cmd._kept : cmd.value);
+    delete cmd._kept;
+    var box = card.querySelector(".card-members");
+    var ticked = card._members !== undefined ? card._members : Array.prototype.map.call(box.querySelectorAll("input:checked"), function (c) { return c.value; });
+    delete card._members;
+    clear(box);
+    ticked.forEach(function (m) { if (known.indexOf(m) < 0) choices.push([m, m + " (as written; no ship above)"]); });
+    choices.forEach(function (c) {
+      var l = document.createElement("label");
+      l.className = "check";
+      var x = document.createElement("input");
+      x.type = "checkbox";
+      x.value = c[0];
+      x.checked = ticked.indexOf(c[0]) >= 0;
+      l.appendChild(x);
+      l.appendChild(document.createTextNode(" " + c[1]));
+      box.appendChild(l);
+    });
+  }
+  var SQUADRON_HEAD = [["name", "Its name", "text", "the inshore squadron"], ["kind", "A squadron or a convoy", "kinds"], ["formation", "Its formation", "formations"], ["commander", "Its commander", "commander"]];
+  var SQUADRON_MORE = [
+    ["id", "Its id (for the orders)", "text"], ["interval_cables", "The interval between ships (cables)", "number"],
+    ["columns", "Columns (the order of sailing)", "number"], ["rendezvous", "Its rendezvous", "text", "Torbay"],
+    ["goal", "What it is about, when not its commander's own intent", "text"], ["book", "The book it sails by", "books"],
+    ["regime", "Its regime", "text", "in convoy"],
+  ];
+  function squadronField(card, box, spec) {
+    var col = spec[0], kind = spec[2], value = card._item[col], el;
+    var l = document.createElement("label");
+    l.appendChild(document.createTextNode(spec[1] + " "));
+    if (kind === "text" || kind === "number") {
+      el = document.createElement("input");
+      el.type = kind === "number" ? "number" : "text";
+      if (kind === "number") { el.step = "any"; el.setAttribute("data-kind", "number"); }
+      if (spec[3]) el.placeholder = spec[3];
+      el.value = value === undefined || value === null ? "" : String(value);
+    } else {
+      el = document.createElement("select");
+      var sq = cat.squadrons || { kinds: [], formations: [], books: [] };
+      var pairs = [["", kind === "kinds" ? "a squadron, or a convoy if it has merchantmen" : kind === "formations" ? "line ahead (a convoy: the order of sailing)" : kind === "books" ? "its kind's own" : ""]];
+      if (kind === "kinds") sq.kinds.forEach(function (k) { pairs.push([k, "a " + k]); });
+      else if (kind === "formations") sq.formations.forEach(function (k) { pairs.push([k, k]); });
+      else if (kind === "books") sq.books.forEach(function (k) { pairs.push([k, "the " + k + " book"]); });
+      if (kind === "commander") el._kept = value === undefined || value === null ? "" : String(value);
+      else setOptions(el, pairs, value);
+    }
+    el.setAttribute("data-col", col);
+    l.appendChild(el);
+    box.appendChild(l);
+    return el;
+  }
+  function squadronRow(item) {
+    var card = document.createElement("div");
+    card.className = "ship-card squadron-card";
+    card._item = item || {};
+    card._members = Array.isArray(card._item.members) ? card._item.members.map(String) : [];
+    var head = document.createElement("div");
+    head.className = "card-grid";
+    card.appendChild(head);
+    SQUADRON_HEAD.forEach(function (s) { squadronField(card, head, s); });
+    var mem = document.createElement("fieldset");
+    mem.className = "checks card-members-box";
+    var lg = document.createElement("legend");
+    lg.textContent = "Its members";
+    mem.appendChild(lg);
+    var box = document.createElement("div");
+    box.className = "card-members";
+    mem.appendChild(box);
+    card.appendChild(mem);
+    var more = document.createElement("details");
+    more.className = "more";
+    var sum = document.createElement("summary");
+    sum.textContent = "more about it";
+    more.appendChild(sum);
+    var grid = document.createElement("div");
+    grid.className = "card-grid";
+    more.appendChild(grid);
+    SQUADRON_MORE.forEach(function (s) { squadronField(card, grid, s); });
+    card.appendChild(more);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "card-remove";
+    b.textContent = "take it out";
+    b.addEventListener("click", function () { card.parentNode.removeChild(card); markDirty("squadrons"); foldLines(); });
+    card.appendChild(b);
+    $("m-squadrons").appendChild(card);
+    squadronChoices(card);
+  }
+  function refreshSquadrons() { document.querySelectorAll("#m-squadrons .squadron-card").forEach(squadronChoices); }
+  function squadronsOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-squadrons .squadron-card"), function (card) {
+      var item = deep(card._item) || {};
+      card.querySelectorAll("[data-col]").forEach(function (el) {
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = card._item[k];
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      var ticked = Array.prototype.map.call(card.querySelectorAll(".card-members input:checked"), function (c) { return c.value; });
+      var had = Array.isArray(card._item.members) ? card._item.members.map(String) : [];
+      var same = had.length === ticked.length && had.every(function (m) { return ticked.indexOf(m) >= 0; });
+      if (same) { if (card._item.members !== undefined) item.members = card._item.members; } // as written, in its order
+      else if (ticked.length) item.members = had.filter(function (m) { return ticked.indexOf(m) >= 0; }).concat(ticked.filter(function (m) { return had.indexOf(m) < 0; }));
+      else delete item.members;
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
+  }
+  $("btn-m-squadron-add").addEventListener("click", function () { squadronRow({}); markDirty("squadrons"); });
+  // the ships named above are the squadrons' choices: a ship added, renamed or taken out
+  $("m-ships").addEventListener("change", refreshSquadrons);
+  $("m-ships").addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON") setTimeout(refreshSquadrons, 0); });
+  $("btn-m-ship-add").addEventListener("click", function () { setTimeout(refreshSquadrons, 0); });
+
   var WIND_COLS = [["at", "text"], ["from_deg", "number"], ["knots", "number"], ["air_mass", "select", ["neutral", "warm", "unstable"]]];
   function windRow(item) {
     var tr = document.createElement("tr");
@@ -892,6 +1029,8 @@
     // the other sail, the world orders
     clear($("m-ships"));
     (fields.ships || []).forEach(shipRow);
+    clear($("m-squadrons"));
+    (Array.isArray(fields.squadrons) ? fields.squadrons : []).forEach(squadronRow);
     clear($("m-world-orders").querySelector("tbody"));
     (fields.world_orders || []).forEach(orderRow);
     // the books, the stations, the director
@@ -992,7 +1131,7 @@
         var flag = x.colours && ["shown", "none", "yes", "no", "true", "false", "hidden"].indexOf(String(x.colours)) < 0 ? " under the colours of " + nationWords(x.colours) : "";
         return (x.name || x.id || x.description) + (x.nation ? " of " + nationWords(x.nation) : "") + (x.description ? ", a " + x.description : "") + (x.fit ? " (" + x.fit + ")" : "") + flag;
       }).join("; "));
-      if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : ""); }).join("; "));
+      if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : "") + ((x.members || []).length ? " (" + x.members.join(", ") + ")" : ""); }).join("; "));
     } else if (part === "sea") {
       var ports = f.ports;
       if (ports === undefined) bits.push("Every port of the chart");
@@ -1091,6 +1230,10 @@
     if (on("ships")) {
       var ships = shipsOf();
       if (ships.length) f.ships = ships; else delete f.ships;
+    }
+    if (on("squadrons")) {
+      var sets = squadronsOf();
+      if (sets.length) f.squadrons = sets; else delete f.squadrons;
     }
     if (on("world_orders")) {
       var orders = rowsOf("m-world-orders", false);
@@ -1344,8 +1487,12 @@
     var t = null;
     try { t = sessionStorage.getItem("harbour-tab"); } catch (e) { /* none */ }
     if (t) tab(t);
-    harbour.ready = true;
-    poll();
+    // the game's state read once before the page says it is ready, so that what it shows
+    // of the game in play is true from the first moment
+    return api("GET", "/api/harbour/state").then(onState).catch(function () {}).then(function () {
+      harbour.ready = true;
+      setTimeout(poll, 1500);
+    });
   }).catch(function (e) {
     $("status").textContent = "the harbour could not be read: " + e.message;
     $("status").className = "bad";
