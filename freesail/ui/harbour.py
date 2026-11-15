@@ -24,8 +24,10 @@ Routes (`harbour_routes`):
     GET  /harbour                          the page
     GET  /api/harbour/state                the game, the stations held, the doors, the
                                            settings' place, the credential store's state
-    GET  /api/harbour/catalogue            the scenarios, ships, seats, stations, briefs,
-                                           books, ports, regions and nations
+    GET  /api/harbour/catalogue            the scenarios (each with its shelf and its
+                                           sentence, in the shelves' order), the shelves,
+                                           the ships, seats, stations, briefs, books, ports,
+                                           regions and nations
     POST /api/harbour/start                {scenario | ship | load, seed, seat, time, pace,
                                            crewed_cap, crewed_range, business,
                                            director_brief, standing_orders} -> the game
@@ -59,6 +61,7 @@ import collections
 import contextlib
 import itertools
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -81,6 +84,18 @@ CLIENT_DIR = ROOT / "client"
 GAME_SCENARIOS = ROOT / "data" / "scenarios"
 GAME_BOOKS = ROOT / "data" / "standing_orders"
 SHIPS_DIR = ROOT / "data" / "ships"
+# The page's shelves (package 96b, step 1; docs/design/Design-Harbour.md §3.2): which shelf
+# each of the game's scenarios stands on, read by the page alone.
+SHELVES_FILE = ROOT / "data" / "harbour" / "shelves.yaml"
+# The two shelves the file never names: the player's own scenarios, first; and the game's
+# scenarios no shelf names, last, so that none is hidden by being forgotten.
+SHELF_OWN = {"id": "yours", "title": "Yours", "says": "Scenarios of your own.", "hidden": False}
+SHELF_UNSORTED = {
+    "id": "unsorted",
+    "title": "Not yet sorted",
+    "says": "Scenarios of the game that no shelf names yet.",
+    "hidden": False,
+}
 
 # The player's seats at the start (the server's `--seat`): '' as the scenario says; the
 # captain at the prompt; the stations below and above (`agents.seat.SEAT_STATIONS`).
@@ -113,6 +128,32 @@ def _rel(path: Path) -> str:
         return path.resolve().relative_to(ROOT.resolve()).as_posix()
     except ValueError:
         return str(path)
+
+
+_boats: dict[str, tuple[float, bool]] = {}
+
+
+def _is_boat(path: Path) -> bool:
+    """Whether a ship's file is a ship's boat (its `ship: rig: boat`): the boats are carried
+    by the ships and are no ship to start a game in, so the page's list leaves them out
+    (package 96b, step 1). A file that cannot be read is listed, as before."""
+    key = str(path)
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        return False
+    cached = _boats.get(key)
+    if cached is None or cached[0] != mtime:
+        boat = False
+        with contextlib.suppress(OSError):
+            # her file's head alone (the ships' files are long, and the catalogue is asked
+            # for at every opening of the page): the line `  rig: boat` under `ship:`
+            with path.open(encoding="utf-8") as f:
+                head = f.read(8000)
+            boat = re.search(r"^  rig:[ \t]*boat[ \t]*$", head, re.M) is not None
+        _boats[key] = (mtime, boat)
+        cached = _boats[key]
+    return cached[1]
 
 
 # ---------------------------------------------------------------------------
@@ -373,6 +414,7 @@ class Harbour:
         own = self.scenarios_place()
         if own.is_dir():
             scenarios += [self._scenario_entry(p, own=True) for p in sorted(own.glob("*.yaml"))]
+        shelves = self._shelve(scenarios)
         books = [_rel(p) for p in sorted(GAME_BOOKS.glob("*.orders"))]
         if own.is_dir():
             books += [str(p) for p in sorted(own.glob("*.orders"))]
@@ -384,7 +426,8 @@ class Harbour:
                 )
         return {
             "scenarios": scenarios,
-            "ships": [_rel(p) for p in sorted(SHIPS_DIR.glob("*.yaml"))],
+            "shelves": shelves,
+            "ships": [_rel(p) for p in sorted(SHIPS_DIR.glob("*.yaml")) if not _is_boat(p)],
             "seats": list(SEATS),
             "stations": list(STATIONS),
             "holders": list(STATION_HOLDERS),
@@ -421,6 +464,76 @@ class Harbour:
             Harbour._names[key] = (mtime, name)
             cached = Harbour._names[key]
         return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}
+
+    def shelves(self) -> list[dict[str, Any]]:
+        """The shelves as the file has them (`data/harbour/shelves.yaml`): each its id, its
+        title, its line, whether it is shown only when asked for, and its scenarios in
+        order, each `{file, says}`. A file that is missing or cannot be read gives no
+        shelves, and every scenario then stands unsorted: the list is never lost to it."""
+        try:
+            mtime = SHELVES_FILE.stat().st_mtime
+        except OSError:
+            return []
+        cached = Harbour._shelves
+        if cached is None or cached[0] != mtime:
+            out: list[dict[str, Any]] = []
+            with contextlib.suppress(OSError, yaml.YAMLError, AttributeError, TypeError):
+                doc = yaml.safe_load(SHELVES_FILE.read_text(encoding="utf-8")) or {}
+                for shelf in doc.get("shelves") or []:
+                    if not isinstance(shelf, dict) or not str(shelf.get("id") or "").strip():
+                        continue
+                    out.append(
+                        {
+                            "id": str(shelf["id"]).strip(),
+                            "title": str(shelf.get("title") or shelf["id"]).strip(),
+                            "says": " ".join(str(shelf.get("says") or "").split()),
+                            "hidden": shelf.get("hidden") is True,
+                            "scenarios": [
+                                {
+                                    "file": str(s.get("file") or "").strip(),
+                                    "says": " ".join(str(s.get("says") or "").split()),
+                                }
+                                for s in shelf.get("scenarios") or []
+                                if isinstance(s, dict)
+                            ],
+                        }
+                    )
+            Harbour._shelves = (mtime, out)
+            cached = Harbour._shelves
+        return cached[1]
+
+    _shelves: tuple[float, list[dict[str, Any]]] | None = None
+
+    def _shelve(self, scenarios: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Each scenario of the list given its shelf, its place on it and its sentence
+        (`shelf`, `order`, `says`), and the list put in the shelves' order: the player's
+        own first, then the file's shelves, then the game's scenarios no shelf names.
+        Returns the shelves that hold a scenario, in that order, each `{id, title, says,
+        hidden}`."""
+        named: dict[str, tuple[int, int, str, str]] = {}
+        file_shelves = self.shelves()
+        for i, shelf in enumerate(file_shelves, start=1):
+            for j, s in enumerate(shelf["scenarios"]):
+                named.setdefault(s["file"], (i, j, shelf["id"], s["says"]))
+        last = len(file_shelves) + 1
+        for n, entry in enumerate(scenarios):
+            if entry["own"]:
+                at, entry["shelf"], entry["says"] = (0, n), SHELF_OWN["id"], ""
+            else:
+                stem = Path(entry["path"]).stem
+                i, j, shelf_id, says = named.get(stem, (last, n, SHELF_UNSORTED["id"], ""))
+                at, entry["shelf"], entry["says"] = (i, j), shelf_id, says
+            entry["order"] = at
+        scenarios.sort(key=lambda e: e["order"])
+        for n, entry in enumerate(scenarios):
+            entry["order"] = n
+        used = {e["shelf"] for e in scenarios}
+        every = [SHELF_OWN, *file_shelves, SHELF_UNSORTED]
+        return [
+            {k: shelf[k] for k in ("id", "title", "says", "hidden")}
+            for shelf in every
+            if shelf["id"] in used
+        ]
 
     def regions(self) -> list[dict[str, Any]]:
         from freesail.world.chart import load_manifest

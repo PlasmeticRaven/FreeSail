@@ -21453,3 +21453,47 @@ def test_truth_7_614_a_door_from_another_device_comes_with_the_mark_and_on_the_m
         assert marked.status_code != 403
     with TestClient(app, base_url="http://localhost:8000", client=ON_THE_MACHINE) as here:
         assert here.get("/api/agents").status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Package 96b: the harbour, built (docs/design/Design-Harbour.md §4; truths 7-402 to 7-419)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_off_it(tmp_path):
+    """Package 96b, step 1 (docs/design/Design-Harbour.md §3.2; the cold review of
+    milestone 7, 1.5 and 5.3 item 14: forty-seven scenarios in alphabetical order, "The
+    gate's day" beside "The first action", the ship's boats among the ships). The harbour's
+    catalogue gives every scenario of the game a shelf the shelves' file names, none left
+    unsorted; the lessons first of the game's, in the primer's order; the gates' days and
+    the acceptance walks on the one shelf marked to be shown only when asked for; every
+    other shelf shown; and no ship's boat among the ships a bare game starts in. The shelves
+    are read from a file of the page's own (`data/harbour/shelves.yaml`), outside
+    `data/scenarios/`, so that no scenario file was changed to sort them."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import GAME_SCENARIOS, SHELVES_FILE, Harbour
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    cat = harbour.catalogue()
+    assert GAME_SCENARIOS not in SHELVES_FILE.parents
+    shelves = {s["id"]: s for s in cat["shelves"]}
+    assert "unsorted" not in shelves and "yours" not in shelves
+    assert [s["id"] for s in cat["shelves"] if s["hidden"]] == ["tests"]
+    game = {Path(s["path"]).stem: s for s in cat["scenarios"]}
+    assert set(game) == {p.stem for p in GAME_SCENARIOS.glob("*.yaml")}
+    assert all(s["shelf"] in shelves and s["says"] for s in game.values())
+    assert [Path(s["path"]).stem for s in cat["scenarios"][:4]] == [
+        "lesson-landfall",
+        "lesson-reckoning",
+        "lesson-falmouth",
+        "lesson-lee-shore",
+    ]
+    kept = {n for n, s in game.items() if s["shelf"] == "tests"}
+    assert {n for n in game if n.startswith("gate-")} <= kept
+    assert kept == {n for n in game if n.startswith("gate-")} | {"squadron", "tender"}
+    assert cat["ships"] and not [s for s in cat["ships"] if Path(s).stem.startswith("boat-")]

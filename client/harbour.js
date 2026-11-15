@@ -65,26 +65,50 @@
 
   // -- the catalogue -------------------------------------------------------------------
 
+  // The scenarios by shelf (package 96b, step 1; docs/design/Design-Harbour.md §3.2): the
+  // catalogue gives each scenario its shelf and its sentence, in the shelves' order; a
+  // shelf kept for tests and gates is listed only when the tick box asks for it.
+  function showTests() { return $("s-tests").checked; }
   function scenarioOptions(sel, withNone) {
     clear(sel);
     if (withNone) option(sel, "", withNone);
-    var game = document.createElement("optgroup");
-    game.label = "the game's";
-    var own = document.createElement("optgroup");
-    own.label = "yours (" + cat.scenarios_place + ")";
-    cat.scenarios.forEach(function (s) {
-      var o = document.createElement("option");
-      o.value = s.path;
-      o.textContent = s.name + "  (" + s.path.split(/[\\/]/).pop() + ")";
-      (s.own ? own : game).appendChild(o);
+    (cat.shelves || []).forEach(function (shelf) {
+      if (shelf.hidden && !showTests()) return;
+      var group = document.createElement("optgroup");
+      group.label = shelf.id === "yours" ? "Yours (" + cat.scenarios_place + ")" : shelf.title;
+      group.setAttribute("data-shelf", shelf.id);
+      cat.scenarios.forEach(function (s) {
+        if (s.shelf !== shelf.id) return;
+        var o = document.createElement("option");
+        o.value = s.path;
+        o.textContent = s.name;
+        o.title = s.path.split(/[\\/]/).pop();
+        group.appendChild(o);
+      });
+      if (group.children.length) sel.appendChild(group);
     });
-    sel.appendChild(game);
-    if (own.children.length) sel.appendChild(own);
+  }
+  function scenarioSays() {
+    var path = $("s-scenario").value;
+    var s = (cat.scenarios || []).filter(function (x) { return x.path === path; })[0];
+    var shelf = s && (cat.shelves || []).filter(function (x) { return x.id === s.shelf; })[0];
+    var words = "";
+    if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")";
+    $("s-says").textContent = words;
+  }
+  function fillScenarios() {
+    var keep = { s: $("s-scenario").value, m: $("m-pick").value };
+    scenarioOptions($("s-scenario"));
+    scenarioOptions($("m-pick"));
+    if (keep.s) $("s-scenario").value = keep.s;
+    if (keep.m) $("m-pick").value = keep.m;
+    if ($("s-scenario").selectedIndex < 0) $("s-scenario").selectedIndex = 0;
+    if ($("m-pick").selectedIndex < 0) $("m-pick").selectedIndex = 0;
+    scenarioSays();
   }
 
   function fillCatalogue() {
-    scenarioOptions($("s-scenario"));
-    scenarioOptions($("m-pick"));
+    fillScenarios();
     var ship = $("s-ship");
     clear(ship);
     cat.ships.forEach(function (s) { option(ship, s); });
@@ -223,6 +247,12 @@
     document.querySelectorAll("#start-form .from").forEach(function (l) {
       l.hidden = !l.classList.contains("from-" + v);
     });
+  });
+  $("s-scenario").addEventListener("change", scenarioSays);
+  try { $("s-tests").checked = localStorage.getItem("harbour-tests") === "1"; } catch (e) { /* none */ }
+  $("s-tests").addEventListener("change", function () {
+    try { localStorage.setItem("harbour-tests", showTests() ? "1" : "0"); } catch (e) { /* none */ }
+    if (cat) fillScenarios();
   });
   $("s-brief").addEventListener("change", function () {
     $("s-brief-file-label").hidden = $("s-brief").value !== "*";

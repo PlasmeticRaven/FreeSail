@@ -115,6 +115,54 @@ def test_the_catalogue_lists_the_scenarios_ships_seats_stations_briefs_and_ports
     assert "data/standing_orders/starter.orders" in cat["books"]
 
 
+def test_the_scenarios_stand_on_their_shelves_and_the_boats_are_no_ship_to_start_in(port, client):
+    """Package 96b, step 1 (docs/design/Design-Harbour.md §3.2): the catalogue gives each
+    scenario its shelf and its sentence in the shelves' order, the player's own first; the
+    gates' and the tests' scenarios on a shelf marked hidden; a scenario of the game that
+    the shelves' file does not name on the last shelf, shown; the ship's boats out of the
+    ships offered for a bare start."""
+    port.place.mkdir(parents=True, exist_ok=True)
+    (port.place / "mine.yaml").write_text("name: A passage of mine\n", encoding="utf-8")
+    cat = client.get("/api/harbour/catalogue").json()
+    by_id = {s["id"]: s for s in cat["shelves"]}
+    assert [s["id"] for s in cat["shelves"]][:2] == ["yours", "lessons"]
+    assert by_id["tests"]["hidden"] is True
+    assert not any(s["hidden"] for s in cat["shelves"] if s["id"] != "tests")
+    assert "unsorted" not in by_id  # every scenario of the game is named on a shelf
+    entries = {Path(s["path"]).stem: s for s in cat["scenarios"]}
+    assert entries["mine"]["shelf"] == "yours" and entries["mine"]["own"] is True
+    assert cat["scenarios"][0]["path"].endswith("mine.yaml")
+    assert entries["gate-4c-day"]["shelf"] == "tests"
+    assert entries["squadron"]["shelf"] == "tests" and entries["tender"]["shelf"] == "tests"
+    assert entries["first-action"]["shelf"] == "actions" and entries["first-action"]["says"]
+    lessons = [Path(s["path"]).stem for s in cat["scenarios"] if s["shelf"] == "lessons"]
+    assert lessons == ["lesson-landfall", "lesson-reckoning", "lesson-falmouth", "lesson-lee-shore"]
+    assert [s["order"] for s in cat["scenarios"]] == list(range(len(cat["scenarios"])))
+    # the boats are carried by the ships, and are not ships to start in
+    assert "data/ships/frigate-36.yaml" in cat["ships"]
+    assert not [s for s in cat["ships"] if "boat-" in s]
+    # a scenario the file does not name is never hidden: the last shelf, shown
+    shelved = port.harbour._shelve(
+        [
+            {"path": "data/scenarios/a-new-one.yaml", "name": "A new one", "own": False},
+            {"path": "data/scenarios/gate-4c-day.yaml", "name": "The gate's day", "own": False},
+        ]
+    )
+    assert [s["id"] for s in shelved] == ["tests", "unsorted"]
+    assert shelved[-1]["hidden"] is False
+
+
+def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
+    from freesail.ui.harbour import SHELVES_FILE, Harbour
+
+    assert SHELVES_FILE.parent != SCENARIOS  # the tests that walk the scenarios do not meet it
+    named = [s["file"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"]]
+    assert len(named) == len(set(named))
+    there = {p.stem for p in SCENARIOS.glob("*.yaml")}
+    assert set(named) <= there, sorted(set(named) - there)
+    assert all(s["says"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"])
+
+
 def test_a_game_started_with_a_seat_and_a_brief_is_the_servers_game_taken_up_in_place(port, client):
     """Truth 7b-108's middle (the whole in test_known_truths): one server, its World
     replaced, the pages told, the clock held, the seat and the director's brief given by
@@ -555,6 +603,40 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
         "document.getElementById('status').textContent === 'connected'", timeout=30_000
     )
     assert "schooner" in pg.inner_text("#ship-name")
+    assert errors == []
+
+
+def test_in_the_browser_the_list_is_by_shelf_and_the_tests_scenarios_come_with_the_tick(
+    browser_page,
+):
+    """Package 96b, step 1: the page's scenarios by shelf, the lessons first; no gate's day
+    in the list until the tick box asks for the scenarios kept for tests and gates; the
+    sentence of the scenario chosen said under the list; no boat among the ships."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    shelves = pg.eval_on_selector_all("#s-scenario optgroup", "els => els.map(e => e.label)")
+    assert shelves[0] == "Lessons" and "Kept for tests and gates" not in shelves
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert listed[0] == "data/scenarios/lesson-landfall.yaml"
+    assert "data/scenarios/gate-4c-day.yaml" not in listed
+    assert "data/scenarios/squadron.yaml" not in listed
+    assert "the Lizard" in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/first-action.yaml")
+    assert "privateer" in pg.inner_text("#s-says") and "first-action.yaml" in pg.inner_text(
+        "#s-says"
+    )
+    pg.check("#s-tests")
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" in listed
+    assert pg.input_value("#s-scenario") == "data/scenarios/first-action.yaml"  # the choice kept
+    made = pg.eval_on_selector_all("#m-pick option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" in made
+    pg.uncheck("#s-tests")
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" not in listed
+    ships = pg.eval_on_selector_all("#s-ship option", "els => els.map(e => e.value)")
+    assert "data/ships/cutter.yaml" in ships and not [s for s in ships if "boat-" in s]
     assert errors == []
 
 
