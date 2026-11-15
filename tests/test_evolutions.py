@@ -854,7 +854,9 @@ def test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on():
     ship, and not the one she was put about for. In the stub world the frigate is turned through
     the wind and, her head yards swung, falls back on the old tack and lies there (the stub's
     physics), four knots of way and 55 degrees off on the starboard tack: at the timeout the line
-    is "Tacked; braced up on the starboard tack, heading SSE (158°).", where it said "the
+    is "Tacked; braced up on the starboard tack, heading NE by N (35°)." (package 115 D4: the
+    heading too is hers, read from her; it said "heading SSE (158°)", the course she was put
+    about for, until then), where it said "the
     larboard tack" (the main topgallant's rig with her fore yards shot away, sailed with the
     lead's ruling 3 of 2026-11-06 switched off, the same: the tuning notes, B3.4b). A tack ended
     steady on her course says the new tack as before (the tests above)."""
@@ -887,7 +889,10 @@ def test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on():
     _, notes = run(runner, ship, wind, falls_back)
     assert kinds(notes)[-1] == "ship.tacked"
     assert ship.dyn.tack == "starboard"
-    assert texts(notes)[-1] == "Tacked; braced up on the starboard tack, heading SSE (158°)."
+    # the heading she lies on, read from her (package 115 D4, the cold review's 5.3 item 9):
+    # old "heading SSE (158°)", the course she was put about for, with her head at NE; new
+    # her own head, NE by N, fallen back on the old tack
+    assert texts(notes)[-1] == "Tacked; braced up on the starboard tack, heading NE by N (35°)."
     # the tick her head yards' swing ended, and then the timeout's 300 s
     assert steady_ticks == EVOLUTIONS["tack"].timing["steady_timeout_s"] + 1
 

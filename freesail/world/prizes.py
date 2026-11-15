@@ -694,7 +694,12 @@ def possess(
         men = _draw_prize_crew(captor_hull, n, party)
         _take_out(captor_hull, men)
         old_crew = prize_hull.ship.extra.get("crew")
-        new_crew = Crew(ship_name=str(prize.name), sailors=list(men))
+        # the prize crew numbered by her captor's books (package 115 D4): a man entered
+        # aboard the prize is numbered after the captor's highest, so that her men come back
+        # with numbers no other of the company has
+        took = captor_hull.ship.extra.get("crew")
+        issued = took.next_number() if took is not None else 0
+        new_crew = Crew(ship_name=str(prize.name), sailors=list(men), issued=issued)
         _watches(new_crew.sailors)
         for s in old_crew.sailors if old_crew is not None else []:
             s.at = None
@@ -868,9 +873,14 @@ def fill_far_prize(hull: Any, record: dict[str, Any], nation_was: str, tick: int
     keep = hands[:n]
     keep_ids = {s.id for s in keep}
     rest = [s for s in crew.sailors if s.id not in keep_ids]
-    new_crew = Crew(ship_name=str(crew.ship_name), sailors=list(keep))
+    new_crew = Crew(ship_name=str(crew.ship_name), sailors=list(keep), issued=crew.next_number())
     _watches(new_crew.sailors)
-    old_crew = Crew(ship_name=str(crew.ship_name), sailors=list(rest), dead=list(crew.dead))
+    old_crew = Crew(
+        ship_name=str(crew.ship_name),
+        sailors=list(rest),
+        dead=list(crew.dead),
+        issued=crew.next_number(),
+    )
     if getattr(crew, "post_watches", None):
         # a merchantman's master and mate keep the watches they head, so that retaken they haul
         # with them again (the lead's ruling 11 of 2026-11-13; `hands.post_watch`), as the near

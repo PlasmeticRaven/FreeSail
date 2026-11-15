@@ -2102,3 +2102,32 @@ def test_the_owners_world_order_is_shown_him_as_given_and_no_one_elses_is():
     # the director's own: never the player's
     theirs = dataclasses.replace(e, data={**e.data, "source": "the director"})
     assert not K.owners_world_order(theirs) and not K.his_own(theirs, "captain")
+
+
+def test_the_captains_own_person_is_not_taken_below_by_the_days_work_in_a_vessel_he_commands():
+    """Package 115 D4 (c), the cold review's 5.3 item 6 (play/console-4): in the dispatches'
+    cutter the master is her captain, the player's own person, and the noon's day's work took
+    him to the gunroom for half an hour with no word of the player's. The lead's ruling: the
+    person a seated player is, human or model, is never moved by a routine; a master who
+    keeps the master's station under another captain goes below as before (truth 7-375, the
+    test above). The dispatches as the harbour starts them, riding in Carrick Road: the
+    player's hand on her after her captain's first judgement (an order of the ship's at the
+    prompt, so that the rules captain stands aside), and at noon her master, her captain,
+    works the day's work where he stands, said in the log, and is never in the gunroom."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", "data/scenarios/dispatches-falmouth.yaml"])
+    w = prepare_game(args, say=lambda _line: None)
+    w.run(600)
+    assert w.submit("hoist the colours").kind != "order.rejected"
+    assert w.captain.aside, "the rules captain did not stand aside"
+    captain = w.people.captain
+    assert captain.role == "master" and captain.mirror is w.navigation.master
+    places = []
+    while w.clock.ship_time.hour < 13:
+        w.run(300)
+        places.append(str(w.people.effective_place(captain) or ""))
+    here = [e.text for e in w.log if e.kind == "master.works_here"]
+    assert here and here[0] == f"{captain.name} works the day's work where he stands.", here
+    assert not [e for e in w.log if e.kind == "master.place" and "came on deck" in e.text]
+    assert all(p != "gunroom" for p in places), places

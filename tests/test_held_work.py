@@ -620,6 +620,8 @@ SHIP_WORK_WORDS = {
     "make_signal": ("make the signal", "making the signal"),  # file
     "moor": ("moor", "mooring"),
     "plug_shot_hole": ("plug the shot holes", "plugging the shot holes"),  # file
+    # package 115 D's, joined at the merge: named by its verb's own words
+    "relieving_tackles": ("rig the relieving tackles", "rigging the relieving tackles"),
     "rig_preventers": ("rig preventers", "rigging preventers"),
     "scud": ("scud", "scudding"),
     "secure_guns": ("secure the guns", "securing the guns"),  # file
@@ -1078,6 +1080,9 @@ NOTHING_STANDS = {
     "heave_mark": "it reads a world with a chart, which nothing takes away; its end reads it again",
     "plug_shot_hole": "its own going plugs the holes and spends the plugs, holding the carpenter; "
     "holes the world adds are more work, not less",
+    # package 115 D's, joined at the merge
+    "relieving_tackles": "the helm is lost until these tackles are rove and by nothing else; "
+    "held, the wheel is still shot away",
     "secure_guns": "its own going secures the guns; none is cast loose but by work at quarters",
     "send_boat": "it reads a port and a boat, which nothing takes away; it holds the boat",
     "serve_small_arms": "the arms are served out by this work alone, which holds them",
