@@ -2,7 +2,13 @@
 
 Written by the lead on 2026-11-15, after the owner's word of that morning: "the only thing I would run before a gate would be the package 96, as the harbour has become enough out of date, and wants access to the full current set of features enough that before I can jump in to a gate or proper testing, the harbour should be brought up to date, and further design of it both for an experienced user and for a newcomer considered. As well, a consent revision package (55(?) or a fresh one)."
 
-These are proposals of scope. Nothing here is begun. Each card is the owner's to agree, change or strike, and nothing is built from a card until he has.
+**Agreed by the owner, 2026-11-15:** "The order, card 1, and card 2 are approved. Adversarial seating should be included in the consent wording, and the director's limits may be included after a card between the harbour's build and revision." So:
+
+- **The order stands as written below,** with one card added: the director's limits (package 115, part C), a small card of its own, written when its turn comes, between the harbour's build and the consent revision.
+- **Card 1 stands,** with its choice settled as proposed: the design covers both layers; the build before the gate is the page only; the deeper layer (a ship's configuration as one thing in the game's code) is designed, left unbuilt, and decided after the gate.
+- **Card 2 stands,** with the adversarial seats' wording carried in the one revision.
+
+Nothing is begun until the two pieces in hand have merged (step 1 of the order).
 
 The form is the one proposed in `docs/dev/ContinuationProposal.md`, section 3.
 
@@ -12,8 +18,9 @@ The form is the one proposed in `docs/dev/ContinuationProposal.md`, section 3.
 2. **Package 96, first card: the harbour's design** (a document, no code).
 3. The owner reads the design and answers its questions.
 4. **Package 96, second card: the harbour's build**, written from the design he has agreed, in small steps.
-5. **The consent revision**, last, so that nothing built after it changes what a model was told.
-6. The gate script (one page) and the lead's own play of the trunk; then the owner's gate.
+5. **The director's limits** (package 115, part C), a small card of its own (added at the owner's agreement).
+6. **The consent revision**, last, so that nothing built after it changes what a model was told; the adversarial seats' wording in it.
+7. The gate script (one page) and the lead's own play of the trunk; then the owner's gate.
 
 One thing at a time. The four small mends named on 15 November (the wheel shot away, the merchant brig's anchor, `strike the colours`, the cruiser's prize keys) are not run before the gate; they go into the gate script as known.
 
