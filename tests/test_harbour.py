@@ -268,7 +268,7 @@ def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_
     posts = cat["posts"]["data/ships/frigate-36.yaml"]
     assert posts[:2] == ["captain", "first lieutenant"] and "master" in posts
     assert cat["posts"]["data/ships/privateer-schooner.yaml"] == []  # no wardroom file
-    assert {"britain", "france"} <= set(cat["signal_books"])
+    assert {"britain", "france"} <= set(cat["signal_books"]) and "basic" not in cat["signal_books"]
     # step 6: what a squadron's card chooses from, the game's own
     assert cat["squadrons"] == {
         "kinds": ["squadron", "convoy"],
@@ -286,18 +286,173 @@ def test_the_proof_says_a_fit_her_kind_has_not_and_a_heading_read_by_nothing(cli
         "/api/harbour/scenario", params={"path": "data/scenarios/first-action.yaml"}
     ).json()["fields"]
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
-    assert r.status_code == 200 and not [ln for ln in r.json()["lines"] if "To know" in ln]
+
+    def of_ships(lines):  # the proof's lines on the ships (step 8 added others)
+        return [ln for ln in lines if "To know" in ln and ("fit" in ln or "heading" in ln)]
+
+    assert r.status_code == 200 and not of_ships(r.json()["lines"])
     fields["ships"][0]["fit"] = "forty carronades"
     fields["ships"][0]["heading_deg"] = 90
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
     assert r.status_code == 200, r.text
-    said = [ln for ln in r.json()["lines"] if "To know" in ln]
+    said = of_ships(r.json()["lines"])
     assert len(said) == 2 and "forty carronades" in said[0] and "is none of her file's" in said[0]
     assert "heading is read by nothing" in said[1]
     fields["ships"][0]["fit"] = "unarmed"
     del fields["ships"][0]["heading_deg"]
     r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
-    assert not [ln for ln in r.json()["lines"] if "To know" in ln]
+    assert not of_ships(r.json()["lines"])
+
+
+def test_the_keys_the_proof_takes_for_the_loaders_are_the_keys_the_loader_reads():
+    """Package 96b, step 8: the maker's proof says of a key the loader does not read that it
+    does nothing. The page's server keeps the loader's keys as a list (it may not change
+    the loader); this holds the list to the loader's own source, every key it asks its
+    file for, so that a key the loader learns to read is not said to be read by nothing."""
+    import re
+
+    from freesail.ui.harbour import LOADER_KEYS
+
+    source = (ROOT / "freesail" / "world" / "scenarios.py").read_text(encoding="utf-8")
+    body = source[source.index("def load_scenario(") : source.index("STATION_HOLDERS = (")]
+    asked = set(re.findall(r'(?<![a-z_])raw\.get\("([a-z_]+)"', body))
+    asked |= set(re.findall(r'raw\["([a-z_]+)"\]', body))
+    asked |= set(re.findall(r'"([a-z_]+)" in raw\b', body))
+    assert asked == set(LOADER_KEYS), sorted(asked ^ set(LOADER_KEYS))
+
+
+def test_the_proof_says_what_the_game_reads_nowhere_and_the_year_that_is_not_1805(client):
+    """Package 96b, step 8 (the design's traps 1, 2, 3 and 6)."""
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/the-faro.yaml"}
+    ).json()["fields"]
+    fields["weather_bund"] = "seasonal"  # a key misspelt
+    fields["stations"] = {"captain": "model", "officer": "player"}
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200, r.text
+    said = [ln.strip() for ln in r.json()["lines"] if "To know" in ln]
+    assert any("'weather_bund' is no key the game reads" in ln for ln in said)
+    assert any(
+        "the chart's year and the almanac in her papers are read by nothing" in ln for ln in said
+    )
+    assert any("'model' and 'rules' (captain) seat nobody" in ln for ln in said)
+    assert any(
+        "she begins in 1808" in ln and "the wars are those of June 1805" in ln for ln in said
+    )
+    cat = client.get("/api/harbour/catalogue").json()
+    years = {Path(s["path"]).stem: s["year"] for s in cat["scenarios"]}
+    assert years["the-faro"] == 1808 and years["tarragona"] == 1809
+    assert years["first-action"] == 1805 and years["first-passage"] is None
+
+
+def test_the_systems_and_the_ports_state_are_read_as_words_and_refused_in_words(client):
+    """Package 96b, step 8 (the design's §2.5): the two blocks offered as the file's own
+    words. A scenario's systems and its ports' state come to the page as text; text sent
+    back is read into the fields before the proof (only the blocks sent), and words that
+    are no YAML, or not of the block's shape, are refused in words; what a system may say
+    is the loader's to refuse, as ever."""
+    read = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/blockade.yaml"}
+    ).json()
+    fields, blocks = read["fields"], read["blocks"]
+    assert blocks["ports"] == "" and "name: the low" in blocks["systems"]
+
+    def prove(**sent):
+        return client.post(
+            "/api/harbour/scenario/prove",
+            json={"fields": fields, "source": read["path"], "blocks": sent},
+        )
+
+    assert prove().json()["text"] == read["text"]  # nothing sent: the file as it was
+    assert prove(systems=blocks["systems"]).json()["text"] == read["text"]  # the same words
+    renamed = prove(systems=blocks["systems"].replace("the low", "the deep low"))
+    assert renamed.status_code == 200 and "the deep low (low" in "\n".join(renamed.json()["lines"])
+    none = prove(systems="")
+    assert none.status_code == 400 and "pinned sky" in none.json()["detail"]  # the loader's
+    for words, why in (
+        ("- name: [", "could not be read"),
+        ("name: the low", "are a list"),
+        ("- {name: a low, kind: typhoon, track: []}", "typhoon"),
+    ):
+        r = prove(systems=words)
+        assert r.status_code == 400 and why in r.json()["detail"], (words, r.text)
+    state = prove(
+        ports="brest:\n  closed_to: [britain]\n  news: ['The fleet is in.']\nfalmouth: {}\n"
+    )
+    assert state.status_code == 200, state.text
+    assert "The ports: brest, falmouth." in state.json()["lines"]
+    assert "closed_to: [britain]" in state.json()["text"]
+    assert prove(ports="- brest").status_code == 400
+    assert prove(tides="x").status_code == 400
+
+
+# The controls whose own label is their sentence (a tick box's words, a box of the file's
+# words with its explanation above it), and the one that is a button's choice.
+SAID_BY_ITS_LABEL = {"#m-chron-on", "#m-systems", "#m-ports-state", "#m-brief-from"}
+
+
+def page_controls() -> list[str]:
+    """Every control written in the page's HTML, by the selector the sentences are kept
+    under: its id, else its data-field, data-set, data-brief or data-chron."""
+    import re
+
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    out = []
+    for attrs in re.findall(r"<(?:input|select|textarea)\b([^>]*)>", page):
+        ident = re.search(r'\bid="([^"]+)"', attrs)
+        data = re.search(r'data-(field|set|brief|chron)="([^"]+)"', attrs)
+        assert ident or data, attrs
+        out.append(f"#{ident.group(1)}" if ident else f'[data-{data.group(1)}="{data.group(2)}"]')
+    return out
+
+
+def page_words() -> dict[str, str]:
+    text = (ROOT / "client" / "harbour-words.js").read_text(encoding="utf-8")
+    start = text.index("window.freesailHarbourWords = ") + len("window.freesailHarbourWords = ")
+    return json.loads(text[start : text.rindex(";")])
+
+
+def test_every_control_of_the_page_has_its_sentence_in_the_one_file():
+    """Package 96b, step 10 (docs/design/Design-Harbour.md §2.7; the owner's point of
+    2026-10-18: the flags unexplained where they are set): the page's sentences are one
+    file, one for each control the page's HTML has; none is left without, none of the
+    file's is for a control that is not there, and no sentence is left as a hover text."""
+    controls, words = page_controls(), page_words()
+    assert len(controls) > 110 and len(set(controls)) == len(controls)
+    assert set(controls) - set(words) == SAID_BY_ITS_LABEL
+    assert set(words) <= set(controls), sorted(set(words) - set(controls))
+    assert all(len(w) > 12 and w.endswith((".", ")")) for w in words.values())
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    import re
+
+    assert not re.search(r"<label\b[^>]*\btitle=", page)  # a control's words are under it
+    assert '<script src="/client/harbour-words.js"></script>' in page
+
+
+def test_the_primer_and_the_readme_name_the_tabs_and_the_first_game_the_page_has():
+    """Package 96b, step 11: the primer's paragraph on going aboard and the README's on the
+    harbour say what the page is: the tabs by the names on them, and the first game by the
+    name on its button."""
+    import re
+
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    tabs = re.findall(r'<button type="button" data-tab="[a-z]+"[^>]*>([^<]+)</button>', page)
+    assert tabs == ["begin", "game", "stations", "scenario maker", "settings"]
+    first = yaml_name(SCENARIOS / "first-passage.yaml")
+    for words in (
+        (ROOT / "docs" / "primer" / "01-the-ship.md").read_text(encoding="utf-8"),
+        (ROOT / "README.md").read_text(encoding="utf-8"),
+    ):
+        for tab in tabs:
+            assert f"**{tab}**" in words, tab
+        assert first in words and "chapter 7" in words
+        assert "the server's flags as its controls" not in words
+
+
+def yaml_name(path: Path) -> str:
+    import yaml
+
+    return str(yaml.safe_load(path.read_text(encoding="utf-8"))["name"])
 
 
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
@@ -664,6 +819,151 @@ def test_the_api_door_started_from_the_harbour_seats_its_station_and_is_stopped(
                 assert out[-1].endswith("stopped from the harbour. ==")
         finally:
             live.close()
+
+
+SECOND = "made-up-model-8"  # a second name of no model
+
+
+def test_a_door_is_started_for_a_station_with_a_model_chosen_from_the_settings_list(
+    tmp_path, monkeypatch
+):
+    """Package 96b, step 9 (docs/design/Design-Harbour.md §2.6; the owner's point of
+    2026-10-18: two models at two stations wanted two settings files). One settings file
+    names the API door's model and a second beside it (`doors.api.models`); the page's
+    state offers both; a door started for a station with the second chosen is that model's
+    door (its name and its dialect on the door's own command line, no seat's fold), is
+    seated through the game's own consent records as any door is, and is shown holding
+    the station; a model the settings do not name is refused in words and no door is
+    started, and so is a model named for the local runner."""
+    pytest.importorskip("anthropic")
+    from messages_api import MODEL, MessagesServer
+
+    from freesail.agents import consent
+
+    key = "a-test-key-of-no-account-0123456789"
+    with MessagesServer(key, models={MODEL: MODEL, SECOND: SECOND}) as api:
+        port = Port(
+            tmp_path,
+            {
+                "doors": {
+                    "api": {
+                        "model": MODEL,
+                        "models": [SECOND],
+                        "flags": ["--base-url", api.url],
+                        "seat_budget_tokens": "80000",
+                    }
+                }
+            },
+        )
+        argv = port.harbour.door_argv("api", "watcher", model=SECOND)
+        assert argv[argv.index("--model") + 1] == SECOND and "--budget-tokens" not in argv
+        own = port.harbour.door_argv("api", "watcher")  # the door's own model, as before
+        assert own[own.index("--model") + 1] == MODEL
+        consent.Record(SECOND, "a test runtime", "2026-11-15", consent.YES, answer="Yes.").write(
+            port.records
+        )
+        monkeypatch.setenv("FREESAIL_API_KEY", key)
+        monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.null.Keyring")
+        live = Live(port)
+        try:
+            import httpx
+
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
+                # the models are the settings', given to the page by the settings' route;
+                # the page's state carries no model's name of the settings (truth 7b-110)
+                state = c.get("/api/harbour/state")
+                assert "models" not in state.json()
+                assert MODEL not in state.text and SECOND not in state.text
+                api_door = c.get("/api/harbour/settings").json()["settings"]["doors"]["api"]
+                assert (api_door["model"], api_door["models"]) == (MODEL, [SECOND])
+                c.post(
+                    "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
+                )
+                for body in (
+                    {"door": "api", "station": "watcher", "model": "a-model-nobody-named"},
+                    {"door": "local", "station": "watcher", "model": SECOND},
+                ):
+                    r = c.post("/api/harbour/doors", json=body)
+                    assert r.status_code == 400, r.text
+                assert c.get("/api/harbour/state").json()["doors"] == []
+                d = c.post(
+                    "/api/harbour/doors",
+                    json={"door": "api", "station": "watcher", "model": SECOND},
+                ).json()
+
+                def held() -> Any:
+                    st = c.get("/api/harbour/state").json()["stations"]
+                    return [s for s in st if s["station"] == "watcher" and s["holder"] == SECOND]
+
+                try:
+                    seated = _until(held, 90)
+                except AssertionError:
+                    out = c.get(f"/api/harbour/doors/{d['id']}").json()["output"]
+                    raise AssertionError("\n".join(out)) from None
+                assert seated[0]["door"] == "api"
+                assert c.post(f"/api/harbour/doors/{d['id']}/stop").json()["state"] == "stopped"
+        finally:
+            live.close()
+
+
+def test_the_scenarios_plan_of_its_stations_and_the_other_captains_are_in_the_state(port, client):
+    """Package 96b, step 9: what the stations' table is drawn from. The scenario's
+    `stations:` (which the game reads only for the player's seat) comes to the page as the
+    plan of the game started; the other ships with a captain of their own are named, each
+    a station a door may ask for; a game from a scenario that says nothing has no plan."""
+    port.place.mkdir(parents=True, exist_ok=True)
+    mine = port.place / "planned.yaml"
+    mine.write_text(
+        (SCENARIOS / "tender.yaml").read_text(encoding="utf-8")
+        + "\nstations:\n  officer: model\n  master: rules\n",
+        encoding="utf-8",
+    )
+    r = client.post("/api/harbour/start", json={"scenario": str(mine)})
+    assert r.status_code == 200, r.text
+    game = client.get("/api/harbour/state").json()["game"]
+    assert game["chosen"]["plan"] == {"officer": "model", "master": "rules"}
+    assert game["captains"] == ["Raven"]
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-passage.yaml"})
+    game = client.get("/api/harbour/state").json()["game"]
+    assert game["chosen"]["plan"] == {} and game["captains"] == []
+
+
+def test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat(port, client):
+    """Package 96b, step 9, mended (the independent reader's findings): the page's state
+    passes on each seat's phase and its ship. A seat in its consent conversation is not a
+    station held, and a seat stopped (a consent declined, a door stopped before an answer)
+    is nobody's; another ship's captain asked for is said with her name, not on the
+    player's own captain's row. And a row the page offers changes nothing of what the game
+    admits: a model asked for as the captain of an enemy of the player's ship is refused
+    by the game in its own words, before any station is made."""
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
+    assert client.get("/api/harbour/state").json()["game"]["captains"] == ["Renard"]
+    seat = {"model_name": "made-up-b", "door": "api", "ship": "Renard"}
+    r = client.post("/api/agents/captain", json=seat)
+    assert r.status_code == 403 and "the game seats no model as the captain of the Renard" in r.text
+    assert client.get("/api/harbour/state").json()["stations"] == []
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
+    client.post("/api/agents/officer", json={"model_name": "made-up-a", "door": "api"})
+    client.post(
+        "/api/agents/captain", json={"model_name": "made-up-b", "door": "api", "ship": "Raven"}
+    )
+
+    def seats() -> list[tuple[str, str, str, str]]:
+        st = client.get("/api/harbour/state").json()["stations"]
+        return [(s["station"], s["ship"], s["holder"], s["phase"]) for s in st]
+
+    assert seats() == [
+        ("officer of the watch", "", "made-up-a", "consent"),
+        ("captain", "Raven", "made-up-b", "consent"),
+    ]
+    desk = port.driver.desk
+    for held in list(desk.seats.values()):
+        with port.driver.lock:
+            desk.release(held.station, "stopped by the test", held.key, held.ship)
+    assert seats() == [
+        ("officer of the watch", "", "made-up-a", "stopped"),
+        ("captain", "Raven", "made-up-b", "stopped"),
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -1216,6 +1516,13 @@ def test_in_the_browser_a_convoy_is_built_from_an_empty_sheet_and_one_read_is_ke
     )
     assert out["same"] == out["was"]
     assert out["less"][0]["members"] == ["naiad"] and out["less"][0]["book"] == "blockade"
+    # the blockade's file says the membership on each ship too (`squadron: inshore`): the
+    # Nimble unticked, her own word is cleared with the tick; the Naiad's stands
+    words = pg.evaluate(
+        """() => Object.fromEntries(window.freesailHarbour.collect().ships
+            .map(s => [s.id, s.squadron || '']))"""
+    )
+    assert words["nimble"] == "" and words["naiad"] == "inshore"
     assert errors == []
 
 
@@ -1311,6 +1618,280 @@ def test_in_the_browser_a_chronometer_and_a_supercargo_are_added_and_are_in_the_
         }"""
     )
     assert out == {"on": True, "maker": "Arnold", "same": True}
+    assert errors == []
+
+
+def test_in_the_browser_the_day_the_weather_and_the_ports_are_set_whole(browser_page):
+    """Package 96b, step 8 (its step's own trial): a scenario of 1808 says on the page that
+    its ports are that day's and its wars June 1805's, on the game tab and in the sheet; a
+    scenario made with the world keeping to the course of history, one fixed wind and its
+    air, a current, the ports of her region, a weather system and a port's state written in
+    the two boxes is proved and saved as the file a hand would write; and a scenario read
+    and saved with the boxes untouched is the same file."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.select_option("#s-scenario", "data/scenarios/the-faro.yaml")
+    assert "She begins in 1808. The ports are as they stood on that day" in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/first-action.yaml")
+    assert "She begins in" not in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/the-faro.yaml")
+    pg.click("#btn-s-change")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('the-faro') >= 0")
+    assert "the wars those of June 1805" in pg.inner_text('#maker [data-line="day"]')
+    pg.click("#maker fieldset[data-part=day] > legend")
+    assert "She begins in 1808" in pg.inner_text("#m-year-says")
+    # the blockade read and saved with the boxes untouched: the same file
+    pg.select_option("#m-pick", "data/scenarios/blockade.yaml")
+    pg.click("#btn-m-read")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('blockade') >= 0")
+    assert "name: the low" in pg.input_value("#m-systems")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert (port.place / "blockade.yaml").read_bytes() == (SCENARIOS / "blockade.yaml").read_bytes()
+    # a scenario made with the day, the weather and the ports whole
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option("#m-port", "falmouth")
+    pg.fill('#maker [data-field="start"]', "1805-06-12T05:00")
+    pg.check('#maker [data-field="follows_history"]')
+    pg.select_option("#m-weather-mode", "")
+    pg.fill('#maker [data-field="wind.from_deg"]', "270")
+    pg.fill('#maker [data-field="wind.knots"]', "18")
+    pg.select_option('#maker [data-field="wind.air_mass"]', "unstable")
+    pg.fill('#maker [data-field="current.knots"]', "1.5")
+    pg.fill('#maker [data-field="current.toward_deg"]', "90")
+    pg.click("#btn-m-ports-region")
+    listed = pg.input_value('#maker [data-field="ports"]')
+    assert "falmouth" in listed and "plymouth" in listed and "brest" in listed
+    pg.fill(
+        "#m-systems",
+        "- name: the high\n  kind: high\n  radius_km: 800\n  track:\n"
+        "    - {at: 1805-06-12T05:00, x_km: 200, y_km: -300, hpa: 1026}\n"
+        "    - {at: 1805-06-13T05:00, x_km: 300, y_km: -300, hpa: 1024}\n",
+    )
+    pg.fill("#m-ports-state", "falmouth: {}\nbrest:\n  closed_to: [britain]\n")
+    assert "systems' words changed here" in pg.inner_text('#maker [data-line="weather"]')
+    pg.fill("#m-name", "the-day-whole")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "the-day-whole.yaml").read_text(encoding="utf-8"))
+    assert made["follows_history"] is True
+    assert made["wind"] == {"from_deg": 270, "knots": 18, "air_mass": "unstable"}
+    assert made["current"] == {"knots": 1.5, "toward_deg": 90}
+    assert made["weather"]["systems"][0]["name"] == "the high"
+    assert made["ports"] == {"falmouth": {}, "brest": {"closed_to": ["britain"]}}
+    said = pg.inner_text("#m-words")
+    assert "The world keeps to the course of history" in said and "the high (high" in said
+    assert "A current of 1.5 knots sets toward E" in said and "The ports: falmouth, brest." in said
+    # read back: the sheet says it, the boxes hold the words
+    assert "the high" in pg.input_value("#m-systems")
+    assert "closed_to" in pg.input_value("#m-ports-state")
+    assert "their state said of brest" in pg.inner_text('#maker [data-line="sea"]')
+    assert "the world keeps to the course of history" in pg.inner_text('#maker [data-line="day"]')
+    assert errors == []
+
+
+def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered(browser_page):
+    """Package 96b, step 9 (its step's own trial, as far as a test may go without a model):
+    the settings' form takes a second model for the API door, one a line; a scenario of the
+    player's own gives the officer's station to a model; started, the stations tab shows
+    one table of who is where: the player at the captain's prompt, the officer's station
+    the scenario's plan with the API door chosen and both models offered, the director's
+    above the game, the Raven's captain a row of her own; "start the doors the scenario
+    asks for" starts the officer's door with the model chosen (its pane opens; the door
+    itself asks its model's consent, and here finds no API to reach). The director's grant
+    is set in the sheet."""
+    pg, live, port, errors = browser_page
+    port.place.mkdir(parents=True, exist_ok=True)
+    (port.place / "planned.yaml").write_text(
+        (SCENARIOS / "tender.yaml").read_text(encoding="utf-8") + "\nstations:\n  officer: model\n",
+        encoding="utf-8",
+    )
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=doors]")
+    assert pg.is_visible("#t-none") and not pg.is_visible("#t-stations")
+    assert "You sit at one" in pg.inner_text("section[data-page=doors]")
+    # the settings: the door's own model and a second, one a line
+    pg.click("nav.tabs button[data-tab=settings]")
+    pg.fill('#settings [data-set="doors.api.model"]', PLACEHOLDER)
+    pg.fill("#st-models", SECOND + "\nmade-up-model-9, openrouter")
+    pg.fill("#st-api-flags", "--base-url http://127.0.0.1:9")
+    pg.click("#btn-settings-save")
+    pg.wait_for_function("document.getElementById('st-words').textContent.indexOf('Kept') >= 0")
+    kept = S.load_settings(port.settings_path)["doors"]["api"]["models"]
+    assert kept == [SECOND, {"name": "made-up-model-9", "dialect": "openrouter"}]
+    assert pg.input_value("#st-models") == SECOND + "\nmade-up-model-9, openrouter"
+    # the game from the planned scenario
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "planned.yaml"),
+    )
+    assert status == 200
+    pg.click("nav.tabs button[data-tab=doors]")
+    pg.wait_for_selector("#t-stations tbody tr", timeout=10_000)
+    rows = pg.eval_on_selector_all(
+        "#t-stations tbody tr",
+        "els => els.map(e => "
+        "Array.from(e.querySelectorAll('td')).slice(0, 4).map(t => t.textContent))",
+    )
+    assert rows[0] == ["Amazon (yours)", "the captain", "you, at the prompt", ""]
+    assert rows[1] == ["Amazon (yours)", "the officer", "the game's own", "a model"]
+    assert rows[5][:3] == ["Amazon (yours)", "the watcher", "the game's own"]
+    assert rows[6][:3] == ["above the game", "the director", "the game's own"]
+    assert rows[7][:3] == ["Raven", "the captain", "the game's own"] and len(rows) == 8
+    officer = pg.locator("#t-stations tr[data-row='officer|']")
+    assert officer.locator(".t-door").input_value() == "api"
+    offered = officer.locator(".t-model option").evaluate_all("els => els.map(e => e.value)")
+    assert offered == ["", PLACEHOLDER, SECOND, "made-up-model-9"]
+    assert pg.locator("#t-stations tr[data-row='captain|'] .t-start").is_disabled()
+    assert "gives one station to a model" in pg.inner_text("#t-says")
+    # a row with no door chosen says so; the planned one is started with the model chosen
+    pg.locator("#t-stations tr[data-row='captain|Raven'] .t-start").click()
+    assert "Choose the door" in pg.inner_text("#t-error")
+    officer.locator(".t-model").select_option(SECOND)
+    pg.evaluate(
+        "() => { const b = document.getElementById('btn-t-all'); b.click(); b.click(); "
+        "document.querySelector(\"#t-stations tr[data-row='officer|'] .t-start\").click(); }"
+    )
+    pg.wait_for_selector(".door-pane", timeout=20_000)
+    assert "API door at the officer" in pg.inner_text(".door-pane .door-words")
+    door = next(iter(port.harbour.doors.values()))
+    assert door.argv[door.argv.index("--model") + 1] == SECOND
+    assert door.station == "officer" and door.ship == ""
+    # pressed twice before the page next reads the state: one door a row, not two
+    assert len(port.harbour.doors) == 1 and pg.is_disabled("#btn-t-all")
+    assert officer.locator(".t-start").is_disabled()
+    port.harbour.close()
+    # the state the table is drawn from carries no model's name of the settings
+    said = pg.evaluate("async () => (await fetch('/api/harbour/state')).text()")
+    assert PLACEHOLDER not in said and SECOND not in said and "made-up-model-9" not in said
+    # a seat in its consent conversation is asked, not held; stopped, the station is the
+    # game's own again and its door is offered; the Raven's is on the Raven's row
+    made = pg.evaluate(
+        """async () => {
+            const post = (path, body) => fetch(path, {method: 'POST',
+                headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+            const a = await post('/api/agents/master', {model_name: 'made-up-a', door: 'api'});
+            const b = await post('/api/agents/captain',
+                {model_name: 'made-up-b', door: 'api', ship: 'Raven'});
+            return [a.status, b.status];
+        }"""
+    )
+    assert made == [200, 200]
+    master = pg.locator("#t-stations tr[data-row='master|']")
+    raven = pg.locator("#t-stations tr[data-row='captain|Raven']")
+    pg.wait_for_function(
+        "document.querySelector(\"#t-stations tr[data-row='master|'] .t-held\").textContent"
+        ".indexOf('asked, not yet answered (made-up-a)') === 0",
+        timeout=10_000,
+    )
+    assert raven.locator(".t-held").inner_text() == "asked, not yet answered (made-up-b)"
+    assert master.locator(".t-start").is_disabled() and raven.locator(".t-start").is_disabled()
+    own = pg.locator("#t-stations tr[data-row='captain|'] .t-held").inner_text()
+    assert own == "you, at the prompt"
+    desk = port.driver.desk
+    for held in [s for s in desk.seats.values() if s.model_name.startswith("made-up-")]:
+        with port.driver.lock:
+            desk.release(held.station, "stopped by the test", held.key, held.ship)
+    pg.wait_for_function(
+        "document.querySelector(\"#t-stations tr[data-row='master|'] .t-held\").textContent"
+        ' === "the game\'s own"',
+        timeout=10_000,
+    )
+    assert raven.locator(".t-held").inner_text() == "the game's own"
+    assert not master.locator(".t-start").is_disabled()
+    assert not raven.locator(".t-start").is_disabled()
+    # the director's grant, in the sheet
+    grant = pg.evaluate(
+        """async (names) => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/directed-passage.yaml');
+            const set = (sel, v) => { const el = document.querySelector(sel); el.value = v;
+                el.dispatchEvent(new Event('input', { bubbles: true })); };
+            set('#maker [data-field="director.models"]', names);
+            set('#maker [data-field="director.seats"]', '2');
+            return h.collect().director;
+        }""",
+        f"{PLACEHOLDER}, {SECOND}",
+    )
+    assert grant["models"] == [PLACEHOLDER, SECOND] and grant["seats"] == 2
+    assert grant["brief"] == "quiet-passage"
+    assert "the director may seat two models" in pg.inner_text('#maker [data-line="stations"]')
+    assert errors == []
+
+
+def test_in_the_browser_each_setting_says_what_it_is_and_a_doors_flags_are_named_choices(
+    browser_page,
+):
+    """Package 96b, step 10: on every tab each control has its sentence under it; the
+    settings say how the game answers its own page alone, how another device is let in,
+    and where the saved games are kept; and a door's flags are choices with names (how
+    often its model is asked, the pictures, the context, the consent question put again)
+    with one line for the rest, kept in the settings as the one list of flags the door's
+    command line takes."""
+    pg, live, port, errors = browser_page
+    s = S.load_settings(port.settings_path)
+    s["doors"]["local"]["flags"] = ["--cadence", "watch", "--seed", "7", "--pictures", "no"]
+    s["doors"]["api"]["flags"] = ["--ask-again", "--cadence", "fortnightly"]
+    S.save_settings(s, port.settings_path)
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    bare = pg.evaluate(
+        """() => Array.from(document.querySelectorAll(
+            '#start-form input, #start-form select, #settings input, #settings select, ' +
+            '#settings textarea, #maker input, #maker select, #maker textarea, #d-ship'))
+          .filter(el => !el.closest('table') && !el.closest('.ship-card') &&
+                        !el.closest('#m-stations') && !el.closest('#m-books'))
+          .filter(el => !(el.closest('label') && el.closest('label').querySelector('.says')))
+          .map(el => '#' + el.id)"""
+    )
+    assert set(bare) == SAID_BY_ITS_LABEL
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.click("#s-more summary")
+    assert "More is truer and slower" in pg.inner_text("#start-form")
+    assert "drops to real time while a model at a station is answering" in pg.inner_text(
+        "#start-form"
+    )
+    pg.click("nav.tabs button[data-tab=settings]")
+    said = pg.inner_text("section[data-page=settings]")
+    assert "This game answers its own page alone" in said and "0.0.0.0" in said
+    assert f"Your saved games are kept in {port.tmp / 'saves'}" in said
+    # the flags read into their named choices; what the form does not know stays in the line
+    assert pg.input_value("#st-local-cadence") == "watch"
+    assert pg.input_value("#st-local-pictures") == "no"
+    assert pg.input_value("#st-local-flags") == "--seed 7"
+    assert pg.is_checked("#st-api-ask-again") and pg.input_value("#st-api-cadence") == ""
+    assert pg.input_value("#st-api-flags") == "--cadence fortnightly"
+    pg.select_option("#st-local-cadence", "events")
+    pg.fill("#st-local-ctx", "32768")
+    pg.uncheck("#st-api-ask-again")
+    pg.fill("#st-api-flags", "")
+    pg.select_option("#st-api-cadence", "watch")
+    pg.click("#btn-settings-save")
+    pg.wait_for_function("document.getElementById('st-words').textContent.indexOf('Kept') >= 0")
+    kept = S.load_settings(port.settings_path)["doors"]
+    assert kept["local"]["flags"] == [
+        "--cadence",
+        "events",
+        "--pictures",
+        "no",
+        "--ctx",
+        "32768",
+        "--seed",
+        "7",
+    ]
+    assert kept["api"]["flags"] == ["--cadence", "watch"]
+    assert port.harbour.door_argv("local", "officer")[-8:] == kept["local"]["flags"]
     assert errors == []
 
 
