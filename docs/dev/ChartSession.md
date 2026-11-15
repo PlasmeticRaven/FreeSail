@@ -522,3 +522,316 @@ the owner and the lead together. The cloud environment's setup script now instal
 `dev` and `server` extras in new sessions; running sessions (this one, 106b's, 112's) run
 `python3 -m pip install -e ".[dev,server]"` once, and each report says the browser plans
 played with none skipped.
+
+### 2026-11-13, 23:40: 106b's interim read (cd0faeb)
+
+- **Built:** four regions, 117 level-2 tiles and 30 level-3, 19.96 MiB in all; six ports;
+  34 marks; ~160 citations checked by an independent agent, 12 mended.
+- **The tide:** north M2 1.035 m and level 1.96 m (Huelva's); south M2 0.82 m and level
+  1.57 m. A step at 31.6 N.
+- **The weather:** box `morocco` last in the file. It also answers the Strait's southern
+  half, which no box held: by design, to name to the lead.
+- **Drafted for the known list:** a-unowned:morocco-larache:north (the lead's list),
+  d-split:morocco-sallee and :morocco-mogador (106b), d-no-box:strait out.
+- **Accepted; holding for 111's step 2b.** For the final: 7-530's exclusion in 105's form;
+  the Strait's weather move proven; the 31.6 N step and Mogador's harbour depths listed;
+  the browser plans run.
+
+### 2026-11-14, 00:05: 112's step 1 read and sent (690bcb4)
+
+The layers' order: one list per level in `chart.py`, 106a's two keys read as it; the first
+layer that lists a tile answers, later ones fill NODATA; the uncommitted Atlantic and world
+last, the world under a `charts:` chart only. Proven cell for cell over 4,593 tiles of 21
+charts (truth 7-570). Read by me: nothing a clone reads moves. Sent to the lead; 112 told to
+go on with step 2 (the layers laid as ruled), the seas and the judged level after 111's 2b.
+
+### 2026-11-14, 02:35: merged on the trunk
+
+The reload mend (9ab10a4d, run 90) and 112's step 1 (b481938e, run 91) are merged; 109
+closed. Truth 7-570 reads every tile and lengthened the cloud run by half an hour: 112 to
+give its cost and a sampled form in step 2's report. 111's step 2b expected within the hour,
+its redrawn tracks for this session to read.
+
+### 2026-11-14, 03:12: 111 step 2b read again (1e28b0b)
+
+St Peter Port now between La Rousse and Roustel (Roustel 1.2 cables to starboard; Faden's
+sunken rock NE of Roustel not a feature, the OCR's distance unreadable); St Malo listed;
+f-shallow agrees with my sampler at Poole and Civita Vecchia; four of the fifteen keep their
+sides. Setúbal's in-leg from Sesimbra's road to be rechecked by the builder. **Owed by this
+session after 111 merges:** Santa Cruz de Tenerife and the Sicilian six (Bougie and the
+Goletta are 104's, listed) redrawn by the pilots' sides with the least depth per leg, a small
+step of its own.
+
+### 2026-11-14, 03:30: the Setúbal point, and the seven tracks held
+
+The audit's f-shallow stepped over narrow shoals at 20 m (Setúbal 1.2 m, not 2.1; at 2 m
+Dartmouth 2.87, Ferrol 2.62, Lisbon 2.99, Santander 1.04, Poole 0.12; of mine Catania 1.07,
+Santa Cruz drying 1.53, Messina two legs). 111's builder chooses the step by halving (no
+port's least moving more than a tenth of a metre), adds Setúbal's shoal as a test, makes one
+more pass at its four. **My seven tracks wait for the mended check on the trunk, and are drawn
+with a sampler at least as fine.** The lead will ask me to sample 111's four again.
+
+### 2026-11-14, 03:50: 112's step 2 stopped and ruled (A)
+
+The Mediterranean layers' boxes (from 6 W, over Iberia and France) made 39 more blocks'
+edges open (77 for 38), and the seam's taper blended toward the eleven within their reach:
+the Gulf of Lion's level 0.51 to 6.62 m and M2 0.07 to 3.56 m at 43.04 N 3.03 E; the
+Gironde 3.35 to 4.49 m. Ruled (A): step 2 lays Cape Verde and level 0 only (proven to move
+no tide); the Mediterranean layers go to step 3, whose measure must meet a layer box over
+land opening a block's edge (boxes off the land, or an open edge read by its water, an
+engine change for the lead). The nine pins re-pinned; the passages, digests, saves and
+browser plans unmoved.
+
+### 2026-11-14, 04:45: the lead's three lines
+
+- 112 step 1's test of the world under a named chart makes a symlink, refused on the owner's
+  Windows machine (WinError 1314): its builder mends it in step 2 without a link and without
+  a platform skip, and says which other chart tests make links.
+- **The review portion is launched** (packages 114, the cold review, and 103a, the range's
+  audit, on the trunk at 504a2506). This branch and the builders' are work in flight, not
+  under review. This session and its builders do not read or write the review's sessions or
+  `docs/reviews/`; a finding that touches the chart comes through the lead.
+- 111's last step is still with its builder (the sampler's step); the seven tracks wait for it.
+
+### 2026-11-14, 04:50: THE OWNER'S WORD ON MENDS (through the lead)
+
+"as long as we make sure to plan our fixes for them so as to build for generality rather
+than fixing the symptom." Every mend from a reading: the general cause named, mended where it
+lives so every reader of the same thing is served, where else it was looked for and what was
+found, tested at that level; and when this session reads a mended hash, it says of each mend
+which kind it is. Passed to both builders. Applied now: 112 to name the cause of the
+Mediterranean's tide move before step 3 (I take it to be `tide.charted_bounds` reading a
+layer's box as water) and to propose the general mend (an engine change, the lead's word);
+the symlink test mended in the shared way tests build a chart tree. 111's sampler, when it
+returns: the cause a fixed step unrelated to the grid's cell, and where else a fixed step
+samples the chart, in the audit and the game. **My own seven tracks** are drawn to the same
+rule: the cause of their drying legs named (a leg's line, not the port, crossing a mole or a
+point), not each leg nudged.
+
+### 2026-11-14, 05:05: the open edges' cause, ruled (M1)
+
+The cause, found acting today: `tide._open_edges` opens a block's edge wherever any charted
+box lies beyond it, water or land (11 of today's 38 open edges mostly over land; the fill
+raise inherits it). **Ruled by the lead: M1**, its own engine step in 112 after step 2 and
+before step 3: the tool writes each block's open stretches (where the chart answers water just
+beyond) into the manifest, the tide and the fill raise read them, a manifest without the key
+reads as today. Measured first: (a) the fill raise's cells of committed tiles, (b) every
+passage, digest, truth and kept save in a scratch tree; the 21 points old beside new;
+package 94's Concarneau case closed; a truth at the cause's level; the other box-as-water
+readers listed for the cold review. M2 (boxes off the land) not taken.
+
+### 2026-11-14, 05:25: M1 built in scratch; a drift found in channel-mid
+
+M1 in a scratch tree: `open_edges:` written by the tool (39 stretches), the tide reading it,
+the 21 points exactly; truths 7-571 (no open stretch faces land) and 7-572 (an old manifest
+reads as before). The rebuild of biscay-north and channel-mid against a CONTROL (the same
+rebuild by step 2's code from the same cache) separates M1's 7 tiles (land heights; one
+cell beside water at the Seine bay) from a DRIFT already there: channel-mid's column from
+1.23 W (Spithead to Selsey) does not rebuild to itself, 4 tiles' arrays and the coast, a
+shore moved: likely package 94's Solent tide region, whose raise the tiles were never
+rebuilt on. Ruled by this session: commit only tiles whose arrays change. Held for the lead:
+(b) on M1's tiles alone and on M1 plus the drift; the drift's general cause (a tide rule
+moving the raise with nothing to notice) and a check at it (each region's raise grid hashed
+at build, recomputed by a test).
+
+### 2026-11-14, 06:05: 111's 623ca5ac sampled at 1 m
+
+The five (Santander 3.01, Dartmouth 3.08, Ferrol 3.42, Lisbon 3.06, Setúbal 1.17 m by my
+1 m reader) agree with their files within 0.02 m and keep their pilots' sides. The audit's
+2 m / 8 m rule falls short of 1 m by at most 2.54 m, on deep legs only, none across 3 m:
+sound on today's chart; its cause (a step unrelated to the cell) is named, and a step tied to
+the finest level under each leg proposed as the general mend, not blocking.
+
+### 2026-11-14, 06:10: the sampler's step, ruled into my seven-tracks step
+
+By the lead's ruling, in my own step after 111 merges, with the seven tracks and Faden's line:
+- the audit's track check reads first at **half the cell of the finest level under each leg**
+  (taken from the chart, not a constant), everywhere, and again at 2 m where under the margin
+  (the lead measured: 6.3 s as built, 7.7 s at 7.5 m, the 19 findings unchanged);
+- a test at the cause: the step asserted against the chart's own finest cell, and a planted
+  head one cell wide in deep water (a made grid) found at the new step and missed at 20 m;
+- where else a fixed step samples the chart along a line: 111's list checked against the code
+  and completed, the game's own guard listed and measured, not changed.
+Then the seven tracks on that check.
+
+### 2026-11-14, 06:09: where else a fixed step samples the chart along a line (read only)
+
+Read in the code while 111's step 2b waits; nothing changed. The finest cell is level 3's
+0.5″, about 15.4 m north and south (less east and west). The steps found:
+- `lookout._dry_ground_along`: 20 m (`LAND_AHEAD_STEP_M`) within 120 m of the shore, and
+  leaps by the distance field beyond it; dry ground only.
+- `chart.line_shore` (the game's guard `ships.land_crossing`, and captains, crews, reckoning):
+  a third of a cable (61.7 m) near the shore, each point searched a cable round by
+  `nearest_shore`; depth is not tried at all. (Corrected at 07:25, below: the search finds
+  the near pass, but a crossing is called only where a stepped point is itself on dry ground,
+  so a narrow run of dry ground between two points reads as a near pass.)
+- `chart.shoal_ahead` (dealings 1049 and 1894, `api/readings` 2099): a cable (185.2 m) of
+  `depth_at`, the pilot's warning of the depth. Not on 111's list.
+- `dealings._leg_made`: `dangers_ahead` (charted features, no step) and then `_water_for`
+  every half cable (92.6 m).
+- `captains` 1225 (a joining mark, half cables out from the shore), `orders` 1365 (rings of
+  half cables to the nearest water), `chart.CONTOUR_STEP_M` and `reckoning`'s contour step
+  (half a mile to a cable): searches for a point, not a line's soundings.
+- `core/world.py` 2799 and `orders/station.py`'s `SAIL_STEP_M` are not chart sampling.
+Measured: the least depth on each of the 311 port track legs read at each step against 1 m.
+The worst shortfall, legs short by more than 1 m: 20 m, 3.29 m, 7; 61.7 m, 24.83 m, 13;
+92.6 m, 42.2 m, 29; 185.2 m, 57.06 m, 59. The worst of each is Messina's first leg to sea,
+where the 1 m reader touches the datum beside the quay. These are depth readings along the
+line; for `line_shore`, whose test is dry ground searched round, they are an upper bound on
+what it misses, not a measure of it. For the lead: whether `shoal_ahead` and `_leg_made` take
+the grid-tied step too, in a step of their own.
+
+### 2026-11-14, 06:15: the lead's ruling on the survey
+
+1. One cause, one function: the least depth along a line lives once, in `chart.py`, its step
+   tied to the finest cell under the line. The audit's check (f) reads it; built with that use
+   in my seven-tracks step, as ruled at 06:10.
+2. `chart.shoal_ahead` and `dealings._leg_made` move to it in a step of their own after the seven
+   tracks, since they are the game's. I measure and tell the lead before committing: which
+   recorded passages, truths and trials print a different line, old beside new, and whether a ship
+   refuses or changes a leg; the pace on a passage in pilot water, before and after; and what the
+   finer reading finds on today's tracks that a cable's step missed. If nothing recorded moves and
+   the pace holds, I build it and report. If lines move, I stop and send each moved pin with its
+   reason.
+3. Left as they are: `line_shore` and `lookout._dry_ground_along`. They try for land, not for
+   depth. (The reason "searched a cable round" is corrected at 07:25, below.)
+4. 111 is not merged yet; the lead tells me when it lands.
+
+### 2026-11-14, 07:25: the owner's hold; 111's finding on `line_shore` checked
+
+The owner, through the lead: "I would like to close out what work is in flight, and we don't
+need to cut anything off immediately, but we should hold writing or starting any new packages
+for now." For the chart that means three things:
+- the work in flight is finished as briefed and closed: 112 (its steps and M1), 106b, my
+  tracks step, and the depth read along a line;
+- nothing new is proposed, briefed or begun after them;
+- a step that would grow beyond its brief stops and goes to the lead.
+106b and 112 are told (07:23).
+
+111 measured that `line_shore` judges clear a leg across dry ground up to about 60 m wide. My
+survey said it does not step over land. 111 is right on the mechanism; I was wrong.
+`nearest_shore` finds the ground beside a stepped point, but `line_shore` calls a crossing only
+where a stepped point is itself on dry ground. Otherwise it records a near pass.
+
+Run on the trunk's tracks, with `land_crossing`'s own arguments (a cable within, the first and
+last cable skipped):
+- Santa Cruz de Tenerife: `to_sea` leg 0 and `from_sea` leg 4 cross a run of dry ground 45 m
+  wide, 1.6 m above the datum, at 28.4729 N 16.2374 W. `line_shore` gives a near pass of 19.4 m
+  and 19.0 m, not a crossing. Missed.
+- Civita Vecchia: `to_sea` leg 0 and `from_sea` leg 1 cross 121 m of dry ground, 0.6 m above
+  the datum, at 42.0915 N 11.7825 E. `line_shore` gives a crossing. Found.
+  111's figure is 0.3 m at 42 05.4 N 11 46.9 E, and it found this one missed; it measured on
+  its own branch's tracks, which may differ from the trunk's. This is to be read again on
+  111's tracks once 111 is merged.
+The shore guard stays listed and unmended unless the lead rules otherwise. It is measured again
+in the depth-along-a-line step.
+
+Two samplers from 111's list go in the table:
+- `chart._deeper_side`: a cable a side, out to `SHOAL_SIDE_REACH_M`;
+- `chart.contour_point`: half a mile (`CONTOUR_STEP_M`).
+
+For my tracks step, by the lead's ruling: `data/charts/audit-known.yaml` lies under `data/`,
+which `fingerprint_of` hashes. Every edit of the known list therefore changes the build and
+makes earlier saves another build's. It moves with the tool's own files, the same ruling 103a
+has for its lists.
+
+The lead asked me to read the cold review's pages for the owner and its F2.2, 6.2 and 6.4. The
+read of `docs/reviews/` was refused in this session, as the standing rule has it. I have asked
+the lead to send what touches the chart through them.
+
+### 2026-11-14, 07:30: the cold review's points on the chart, through the lead
+
+These are the lead's words for the reviewer's points; I have not read the review myself. They
+change nothing in the steps in flight, and none of them is briefed.
+
+What the review says of the chart and its ports:
+- Most of the repository is binary tiles in plain git, so a clone is about a gigabyte.
+- Every world loads all twenty regions and all 121 ports; building one takes 6 to 11 s.
+- The ports are thin beside their number: no repair yard and no crew pool, and the market has
+  no demand.
+- Many port keys are read by nothing: the datum, the establishment, the currency and the
+  roads' bottoms.
+- The known-faults list holds 142 entries.
+- The tide has three constituents and no diurnal ones, and serves the open ocean from the
+  Channel's eleven gauges.
+- The coarse layers' level is counted twice.
+- The tracks follow the land, not sounded channels; 24 ports cannot be entered.
+- Region bounds are read by several loaders, and the weather boxes copy them by hand.
+- One stream area names a region that does not exist.
+- The audit keeps its own copy of the tide's blend, without the seam taper.
+- No schema refuses an unknown key.
+
+In closing 112 and 106b, take any cheap way a step in hand avoids making one of these worse,
+and say so. Two examples: rebuild no tile that does not need it (M1's "commit only tiles whose
+arrays change" already does this), and add no key that nothing reads.
+
+### 2026-11-14, 10:10: the tracks step, gated
+
+What the step built, by package 111's rulings and the lead's of 07:47; the full account is in
+TuningNotes, "The chart session's tracks step":
+- `Chart.least_depth_along` and `Chart.line_step_m`: one reader of a line's least depth, its
+  first step half the finest cell under the line. The audit's (f) reads it.
+- A test at the cause: a made grid with a rock one cell wide.
+- Five tracks redrawn: Messina, Syracuse, Palermo, Lampedusa and Catania. Three of them also had
+  their track from the sea end at the road, the plan's own cause.
+- Santa Cruz de Tenerife's and Porto Paolo's spots moved out of the modern works to their pilots'
+  roads; their tracks stand.
+- Faden's sunken rock in St Peter Port's file. My earlier "clears 100 yards but not 200" was
+  wrong: it clears 200 too.
+- The known list moved to `tools/audit_chart_known.yaml`, seven entries out, and each of the
+  twelve `f-shallow` left given its cause.
+
+Named to the lead and not mended: Genoa, Bougie and Civita Vecchia (their spots inside modern
+works); the Goletta (a 6.2 m way its track does not take); and the guard's first and last cable.
+
+The gate at d8235abc:
+- lint clean;
+- the fast tier whole: 7,625 passed, 1 xfail, and 1 failed, the trunk's key-shape test (mended
+  on the trunk at 9944c9eb, the lead's word: named, not rerun);
+- the slow tier of the ports, chart, audit, truths, browser probe, checkpoint and tide: 220
+  passed, 8 xfail, none skipped;
+- the pace tests alone and last.
+
+### 2026-11-14, 10:40: 106b's manifest, and what is owed
+
+The lead staged 106b and found four conflicts in `data/charts/manifest.yaml`. It is a generated
+file, so it is generated again by the tool from the cache, never merged by hand. 106b has been
+told how (10:33).
+
+Owed: two chart packages built side by side cannot both land without one of them rebuilding the
+manifest, because the manifest is one generated file for every region. 112's M1 (6a02c77) writes
+the manifest too (its `open_edges:` and the build hash), so it meets the same once 106b lands.
+Whether the manifest should be one file is not for now.
+
+### 2026-11-14, 22:00: the tracks step on the trunk with M1 and 106b, and its record
+
+The trunk at 4570c804 was merged in as 77aa3113. 106b's known-list changes came through the
+file's move (three added, two removed), and the appended sections of three files were kept
+from both sides. The step as it stands:
+- `Chart.least_depth_along`: the true least of the chart's surface along a line, read piece by
+  piece, in great-circle chords of 500 m;
+- `Chart.first_under`: the line's first place under a draught;
+- `ships.to_first_anchor`: the way in cut at its first anchor, as sailed;
+- `ports.UnreadableMark` and `f-mark`: a mark the planner cannot read;
+- `f-unread`: a leg the chart knows nothing along;
+- seven ports' ways (five tracks redrawn, two spots moved), ten marks in the dialect's form,
+  and Faden's line;
+- the known list moved to `tools/`.
+
+What the step moves of what is recorded, old beside new:
+- Tests (the only pins moved):
+  - `test_chart_audit.py`'s Setúbal test: the least, `1.0 < least < 1.35` becomes
+    `1.10 < least < 1.16` (the true least 1.13 m); its words "the least 1.2 m" become "the
+    least 1.1 m"; the old-step check, `TRACK_STEP_M` set to 20 m, becomes a reader stepping
+    every 20 m put in the true least's place;
+  - truth 7-565's docstring names the known list's new path.
+- The known list:
+  - seven `f-shallow` entries out: Catania, Lampedusa, Messina, Palermo, Porto Paolo, Santa Cruz
+    de Tenerife, Syracuse;
+  - St Malo's ceiling 6 to 4 (the doubled legs cut);
+  - Paimboeuf's and Setúbal's figures in their reasons by a tenth;
+  - each of the twelve left gives its cause.
+- Recorded passages, digests, kept saves and scenarios: none moved. Measured three times:
+  - the marks' new legs, 102 tests of the ports, scenarios, truths and audit;
+  - the cut at the first anchor, 63 of the checkpoint, business and digests;
+  - and the gate below.
