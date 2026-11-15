@@ -21881,3 +21881,115 @@ def test_truth_7_409_the_day_the_weather_and_the_ports_are_set_whole_and_the_unr
         assert harbour.blocks_of(whole)["ports"].startswith("falmouth: {}")
     finally:
         harbour.close()
+
+
+def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_the_plan(tmp_path):
+    """Package 96b, step 9 (docs/design/Design-Harbour.md §1.2 rows 28 and 34, §1.4 trap 1,
+    §2.6; the owner's points of 2026-10-18: the stations and the seats three notions with
+    one word, and several models wanting several settings files). The one settings file
+    names every model the API door can call (its own and those beside it), and the page's
+    state names none of them (truth 7b-110 stands); a door's command line for a station
+    takes any one of them by name,
+    with that model's dialect and no seat's fold, and refuses in words a name the settings
+    do not have, and any model named for the local runner; the door's own model is used
+    when none is chosen, as before, and a director's seat's door is as it was. The
+    scenario's `stations:`, which the game reads for the player's seat alone, is the page's
+    plan for the game started, and the other ships with a captain of their own are named
+    for the table. No model is named here: the names are made up."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    first, second, third = "placeholder-410-a", "placeholder-410-b", "placeholder-410-c"
+    settings = _harbour_settings(
+        tmp_path,
+        api={
+            "model": first,
+            "models": [second, {"name": third, "dialect": "openrouter"}],
+            "seat_budget_tokens": "80000",
+        },
+    )
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=settings, saves_dir=tmp_path / "s")
+    try:
+        from freesail import settings as S
+
+        assert S.callable_models(harbour.settings()) == {
+            first: "anthropic",
+            second: "anthropic",
+            third: "openrouter",
+        }
+        # the page takes these from the settings' route; its state names none (7b-110)
+        said = json.dumps(harbour.state())
+        assert not [name for name in (first, second, third) if name in said]
+
+        def said(argv: list[str], flag: str) -> str:
+            return argv[argv.index(flag) + 1]
+
+        own = harbour.door_argv("api", "officer")
+        assert said(own, "--model") == first and "--budget-tokens" not in own
+        chosen = harbour.door_argv("api", "officer", model=third)
+        assert (said(chosen, "--model"), said(chosen, "--dialect")) == (third, "openrouter")
+        assert said(chosen, "--station") == "officer" and "--budget-tokens" not in chosen
+        aboard = harbour.door_argv("api", "captain", "Raven", model=second)
+        assert (said(aboard, "--model"), said(aboard, "--ship")) == (second, "Raven")
+        seat = harbour.door_argv("api", "captain", "Raven", seat_model=second)
+        assert said(seat, "--budget-tokens") == "80000"  # a director's seat's, as it was
+        with pytest.raises(HarbourError, match="call no model by that name"):
+            harbour.door_argv("api", "officer", model="a-model-nobody-named")
+        with pytest.raises(HarbourError, match="local runner serves the one model"):
+            harbour.door_argv("local", "officer", model=second)
+        with pytest.raises(HarbourError, match="Start a game first"):
+            harbour.start_door("api", "officer", model=second)
+        # the plan and the captains
+        own_place = settings.parent / "scenarios"
+        own_place.mkdir(parents=True, exist_ok=True)
+        planned = own_place / "planned.yaml"
+        planned.write_text(
+            (HARBOUR_ROOT / "data" / "scenarios" / "tender.yaml").read_text(encoding="utf-8")
+            + "\nstations:\n  officer: model\n  lookout: player\n",
+            encoding="utf-8",
+        )
+        harbour.start({"scenario": str(planned)})
+        game = harbour.state()["game"]
+        assert game["chosen"]["plan"] == {"officer": "model", "lookout": "player"}
+        assert game["captains"] == ["Raven"]
+        assert "lookout" in game["seat"]  # the game's own reading: the player's seat
+        assert driver.world.agents == {} or all(
+            a.agent.released or "lookout" in k for k, a in driver.world.agents.items()
+        )  # "model" seats nobody by itself: the page offers the door
+    finally:
+        harbour.close()
+
+
+def test_truth_7_411_every_setting_of_the_harbour_is_explained_where_it_is_set():
+    """Package 96b, step 10 (docs/design/Design-Harbour.md §2.7; the owner's word of
+    2026-10-18 on the page as merged: "the settings tab does not say what the flags are or
+    what each does"). Every control written in the harbour's page (the new game's, the
+    sheet's, the stations' and the settings') has one sentence in a player's words, kept
+    in one file of the page's own and put under the control; the only controls without one
+    are those whose own label is the sentence. The words for the things the owner named:
+    the crewed ships, the pace, the seed, the sea's traffic and a seated model's memory
+    are said plainly."""
+    import json
+
+    client = HARBOUR_ROOT / "client"
+    page = (client / "harbour.html").read_text(encoding="utf-8")
+    text = (client / "harbour-words.js").read_text(encoding="utf-8")
+    start = text.index("window.freesailHarbourWords = ") + len("window.freesailHarbourWords = ")
+    words = json.loads(text[start : text.rindex(";")])
+    controls = []
+    for attrs in re.findall(r"<(?:input|select|textarea)\b([^>]*)>", page):
+        ident = re.search(r'\bid="([^"]+)"', attrs)
+        data = re.search(r'data-(field|set|brief|chron)="([^"]+)"', attrs)
+        controls.append(
+            f"#{ident.group(1)}" if ident else f'[data-{data.group(1)}="{data.group(2)}"]'
+        )
+    unsaid = set(controls) - set(words)
+    assert unsaid == {"#m-chron-on", "#m-systems", "#m-ports-state", "#m-brief-from"}
+    assert set(words) <= set(controls)
+    assert "sailed man by man" in words["#s-crewed-cap"]
+    assert "real time while a model at a station is answering" in words["#s-pace"]
+    assert "same weather" in words["#s-seed"] and "traders" in words["#s-business"].lower()
+    assert "folded into a summary" in words['[data-set="doors.api.seat_budget_tokens"]']
+    assert "applyWords" in (client / "harbour.js").read_text(encoding="utf-8")
