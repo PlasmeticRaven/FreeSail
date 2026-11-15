@@ -203,6 +203,52 @@ def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, cli
     assert state["saves"][1]["written"].startswith("2023-11-1")
 
 
+def test_a_scenario_says_what_it_is_before_it_is_started_and_who_may_be_gone_aboard(client):
+    """Package 96b, step 3: the page asks what a scenario is before the start: its own
+    lines as a driver prints them (the file's path left out), and the other ships with a
+    captain of their own, which the player may be aboard from the first minute."""
+    r = client.get("/api/harbour/scenario", params={"path": "data/scenarios/tender.yaml"}).json()
+    assert r["lines"][0] == "Scenario: The tender, Torbay for Plymouth and home."
+    assert any(ln.startswith("She starts at") for ln in r["lines"]) and r["refusal"] == ""
+    assert r["aboard"] == ["Raven"]
+    first = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/first-passage.yaml"}
+    ).json()
+    assert first["aboard"] == [] and first["lines"] == ["Scenario: A first passage."]
+
+
+def test_a_game_is_started_aboard_another_ship_and_a_bare_ship_with_her_wind_and_heading(
+    port, client
+):
+    """Package 96b, step 3: what the command line alone could say (`--ship NAME`, `--wind`,
+    `--heading`) said from the page's start; each refused in words when it is not so."""
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"}
+    )
+    assert r.status_code == 200, r.text
+    assert "Following the Raven." in r.json()["lines"]
+    assert r.json()["game"]["chosen"]["aboard"] == "Raven"
+    with port.driver.lock:
+        assert port.driver.world.followed_words == "Raven"
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"}
+    )
+    assert r.status_code == 400 and "Nobody" in r.json()["detail"]
+    # a bare ship with the primer's chapter 7 wind and heading
+    r = client.post(
+        "/api/harbour/start",
+        json={"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0, 15", "heading": "293"},
+    )
+    assert r.status_code == 200, r.text
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+    for bad in ({"wind": "north"}, {"wind": "400,15"}, {"wind": "10"}, {"heading": "999"}):
+        r = client.post("/api/harbour/start", json={"ship": "data/ships/cutter.yaml", **bad})
+        assert r.status_code == 400, (bad, r.text)
+        assert "wind" in r.json()["detail"] or "heading" in r.json()["detail"]
+
+
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
@@ -621,6 +667,8 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     pg.click("nav.tabs button[data-tab=game]")
     pg.select_option("#s-scenario", "data/scenarios/directed-passage.yaml")
     pg.select_option("#s-seat", "officer")
+    assert not pg.is_visible("#s-brief")  # behind "more for this game" (package 96b, step 3)
+    pg.click("#s-more summary")
     pg.select_option("#s-brief", "dispatches")
     pg.click("#btn-start")
     pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
@@ -752,6 +800,63 @@ def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button
     with port.driver.lock:
         seat = port.driver.world.player_seat
         assert seat is not None and "officer" in seat.station.name
+    assert errors == []
+
+
+def test_in_the_browser_a_game_says_what_it_is_and_a_save_is_taken_up_from_the_list(
+    browser_page,
+):
+    """Package 96b, step 3: the new game's panel as three choices and "more": the scenario
+    chosen says its own lines before the start; the ships to be aboard are offered where
+    the scenario has one; the rest is behind a step; a bare ship takes a wind and a
+    heading; and a saved game is picked from the list of the saves place."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.wait_for_function(
+        "document.getElementById('s-lines').textContent.indexOf('A first passage') >= 0"
+    )
+    assert not pg.is_visible("#s-aboard") and not pg.is_visible("#s-seed")
+    assert not pg.is_visible("#s-wind") and not pg.is_visible("#s-load-pick")
+    pg.check("#s-tests")
+    pg.select_option("#s-scenario", "data/scenarios/tender.yaml")
+    pg.wait_for_selector("#s-aboard", state="visible", timeout=10_000)
+    assert "Brixham" in pg.inner_text("#s-lines") or "50°" in pg.inner_text("#s-lines")
+    pg.select_option("#s-aboard", "Raven")
+    pg.click("#btn-start")
+    pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
+    assert "Following the Raven." in pg.inner_text("#start-words")
+    # a save written by the game in play is in the list, and is taken up from it
+    assert port.driver.save("step-three").kind == "driver.saved"
+    pg.select_option("#s-from", "load")
+    pg.wait_for_function(
+        "Array.prototype.some.call(document.getElementById('s-load-pick').options, "
+        "function (o) { return o.value === 'step-three'; })",
+        timeout=10_000,
+    )
+    assert str(port.tmp / "saves") in pg.inner_text("#s-load-says")
+    pg.select_option("#s-load-pick", "step-three")
+    assert pg.input_value("#s-load") == "step-three"
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('start-words').textContent.indexOf('step-three') >= 0",
+        timeout=60_000,
+    )
+    assert "refusal" not in (pg.get_attribute("#start-words", "class") or "")
+    # a bare ship: her wind and her heading beside her
+    pg.select_option("#s-from", "ship")
+    assert pg.is_visible("#s-wind") and not pg.is_visible("#s-lines")
+    pg.select_option("#s-ship", "data/ships/frigate-36.yaml")
+    pg.fill("#s-wind", "0,15")
+    pg.fill("#s-heading", "293")
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('g-title').textContent === 'Open water'", timeout=60_000
+    )
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert "Wind N, 15 knots" in opening and "(293°)" in opening
     assert errors == []
 
 

@@ -95,6 +95,28 @@
     var words = "";
     if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")";
     $("s-says").textContent = words;
+    scenarioSaid(path);
+  }
+  // What the game is, said before it is started (package 96b, step 3): the scenario's own
+  // lines as a driver prints them at the load, and the ships the player may be aboard.
+  var saidFor = "";
+  function scenarioSaid(path) {
+    saidFor = path;
+    show($("s-lines"), "");
+    $("s-lines").classList.remove("refusal");
+    var aboard = $("s-aboard");
+    clear(aboard);
+    option(aboard, "", "your own ship");
+    $("s-aboard-label").hidden = true;
+    if (!path) return;
+    api("GET", "/api/harbour/scenario?path=" + encodeURIComponent(path)).then(function (r) {
+      if (saidFor !== path) return; // another was chosen meanwhile
+      show($("s-lines"), r.refusal ? "This scenario does not load: " + r.refusal : r.lines.join("\n"));
+      $("s-lines").classList.toggle("refusal", !!r.refusal);
+      if ($("s-from").value !== "scenario") $("s-lines").hidden = true;
+      (r.aboard || []).forEach(function (name) { option(aboard, name, "the " + name); });
+      $("s-aboard-label").hidden = !(r.aboard || []).length || $("s-from").value !== "scenario";
+    }).catch(function () { /* the list still starts it; the start says why if it cannot */ });
   }
   function fillScenarios() {
     var keep = { s: $("s-scenario").value, m: $("m-pick").value };
@@ -188,7 +210,7 @@
     var seat = $("s-seat");
     clear(seat);
     cat.seats.forEach(function (s) {
-      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : "the " + s);
+      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : s === "director" ? "the director, above the game" : "the " + s);
     });
     var brief = $("s-brief");
     clear(brief);
@@ -294,6 +316,7 @@
       var said = x.holder && line.indexOf(x.holder) >= 0;
       li(st, line + (x.holder && !said ? "  [" + x.holder + (x.door ? ", " + x.door : "") + "]" : ""));
     });
+    fillSaves(s.saves);
     var gd = $("g-doors");
     clear(gd);
     if (!s.doors.length) li(gd, "none started from the harbour", "muted");
@@ -321,6 +344,29 @@
     document.querySelectorAll("#start-form .from").forEach(function (l) {
       l.hidden = !l.classList.contains("from-" + v);
     });
+    if (v === "scenario") {
+      $("s-lines").hidden = !$("s-lines").textContent;
+      $("s-aboard-label").hidden = $("s-aboard").options.length < 2;
+    }
+  });
+  // the saved games of the saves place, newest first (package 96b, step 3): picking one
+  // fills in its name; a name may still be typed (a save lying in the game's own folder)
+  var savesKey = "";
+  function fillSaves(saves) {
+    if (!saves) return;
+    var key = saves.place + "|" + saves.saves.map(function (x) { return x.name + x.written; }).join("|");
+    if (key === savesKey) return;
+    savesKey = key;
+    var pick = $("s-load-pick"), kept = pick.value;
+    clear(pick);
+    option(pick, "", saves.saves.length ? "(choose a saved game)" : "(none saved yet)");
+    saves.saves.forEach(function (x) { option(pick, x.name, x.name + "  (written " + x.written + ")"); });
+    pick.value = kept;
+    if (pick.selectedIndex < 0) pick.selectedIndex = 0;
+    $("s-load-says").textContent = "Saved games are kept in " + saves.place + ". At the game's order line, 'save NAME' writes one there. A save kept elsewhere is taken up by moving it there.";
+  }
+  $("s-load-pick").addEventListener("change", function () {
+    if ($("s-load-pick").value) $("s-load").value = $("s-load-pick").value;
   });
   $("s-scenario").addEventListener("change", scenarioSays);
   try { $("s-tests").checked = localStorage.getItem("harbour-tests") === "1"; } catch (e) { /* none */ }
@@ -342,6 +388,9 @@
       load: from === "load" ? $("s-load").value : "",
       seed: $("s-seed").value,
       seat: $("s-seat").value,
+      aboard: from === "scenario" ? $("s-aboard").value : "",
+      wind: from === "ship" ? $("s-wind").value : "",
+      heading: from === "ship" ? $("s-heading").value : "",
       time: $("s-time").value,
       pace: $("s-pace").value,
       crewed_cap: $("s-crewed-cap").value,

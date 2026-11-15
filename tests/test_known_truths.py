@@ -21537,3 +21537,47 @@ def test_truth_7_403_the_harbour_opens_on_a_first_game_which_is_the_primers_chap
         assert not [n for n, s in world.ship.sails.items() if getattr(s, "set_fraction", 0) > 0]
     finally:
         harbour.close()
+
+
+def test_truth_7_404_the_harbours_start_takes_the_ship_aboard_a_bare_ships_wind_and_a_save_by_name(
+    tmp_path,
+):
+    """Package 96b, step 3 (docs/design/Design-Harbour.md §1.1 rows 3, 7, 15 and 16, §2.2):
+    what only the command line could say is said from the page. The page's start puts the
+    player aboard another ship of the scenario from the first minute (the server's `--ship`:
+    his own left as she lies, the drivers following the other) and refuses in words a ship
+    that is not there; a bare ship takes her wind and her heading (`--wind`, `--heading`:
+    the primer's chapter 7 as its own command has it); the page's state lists the saves of
+    the saves place by name, and one is taken up by its name; and a scenario says its own
+    lines and the ships to be aboard before it is started."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    saves = tmp_path / "saves"
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=saves)
+    try:
+        said = harbour.read_scenario("data/scenarios/tender.yaml")
+        assert said["aboard"] == ["Raven"] and said["lines"][0].startswith("Scenario: The tender")
+        started = harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"})
+        assert "Following the Raven." in started["lines"]
+        assert driver.world.followed_words == "Raven"
+        with pytest.raises(HarbourError, match="Nobody"):
+            harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"})
+        harbour.start(
+            {"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0,15", "heading": 293}
+        )
+        opening = next(e.text for e in driver.world.log if e.kind == "world.start")
+        assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+        with pytest.raises(HarbourError, match="wind"):
+            harbour.start({"ship": "data/ships/frigate-36.yaml", "wind": "a gale"})
+        assert harbour.saves()["saves"] == []
+        driver.places = harbour.places  # as the app joins them: the saves place is the test's
+        assert driver.save("kept-404").kind == "driver.saved"
+        assert [s["name"] for s in harbour.saves()["saves"]] == ["kept-404"]
+        assert harbour.saves()["place"] == str(saves.resolve())
+        taken = harbour.start({"load": "kept-404"})
+        assert taken["game"]["chosen"]["load"] == "kept-404"
+    finally:
+        harbour.close()
