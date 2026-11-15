@@ -1034,15 +1034,16 @@ class Harbour:
 
         if not isinstance(fields, dict):
             raise HarbourError("A scenario is a mapping of fields.")
-        fields, said = self._fields_in_places(fields)
+        found, said = self._fields_in_places(fields)
         original, _ = self._original(source)
         try:
-            text = scenario_text(fields, original)
+            text = scenario_text(fields, original)  # the player's own words, as written
+            proved_text = scenario_text(found, original)  # each file as it was found
         except ScenarioError as e:
             raise HarbourError(f"The scenario was not written: {e}") from None
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "scenario.yaml"
-            p.write_text(text, encoding="utf-8")
+            p.write_text(proved_text, encoding="utf-8")
             try:
                 sf = load_scenario(p)
                 world = make_scenario_world(sf)

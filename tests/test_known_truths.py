@@ -21255,28 +21255,39 @@ def test_truth_7_611_the_maker_opens_the_file_it_checked_from_whatever_folder_it
 ):
     """Package 115, part A, the reader's finding 2: the scenario maker checked a book's path
     from the game's folder and opened it from the server's working folder. The server run
-    from a scratch folder that holds its own `data/standing_orders/starter.orders` (a line
-    of it a refused order that would come back in the maker's refusal): the maker proves a
-    scenario whose book is the game's `data/standing_orders/starter.orders`, and the book
-    read is the game's own, not the scratch folder's (before, the ship's file and the book
-    were opened from the scratch folder: the proof failed, or read the planted book)."""
+    from a scratch folder that holds its own `data/standing_orders/starter.orders`, its one
+    line an order no ship takes. First the maker is shown to read the books it is named: a
+    book of the player's own holding such a line is refused in the maker's words, the line
+    named. Then it proves a scenario whose book is the game's
+    `data/standing_orders/starter.orders`: the proof passes whole (her ship's file and the
+    book both found where they were checked; the game's book, fitted to her rig, holds no
+    order she refuses: part D's) and the planted line is nowhere in it, so the book read was
+    the game's. Before, the ship's file and the book were opened from the scratch folder:
+    the proof failed (no such ship file there), or read the planted book. The scenario's
+    text comes back in the player's own words."""
     from own_page import LiveGame
 
     planted = tmp_path / "data" / "standing_orders"
     planted.mkdir(parents=True)
     (planted / "starter.orders").write_text("SENTINEL-CWD-115 is no order\n", encoding="utf-8")
     with LiveGame(tmp_path, module="freesail.ui.server") as game:
+        own = game.settings.parent / "scenarios"
+        own.mkdir(parents=True, exist_ok=True)
+        (own / "mine.orders").write_text("SENTINEL-READ-115 is no order\n", encoding="utf-8")
         with game.page() as c:
             fields = c.get(
                 "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
             ).json()["fields"]
+            fields["standing_orders"] = [str(own / "mine.orders")]
+            read = c.post("/api/harbour/scenario/prove", json={"fields": fields})
             fields["standing_orders"] = ["data/standing_orders/starter.orders"]
             r = c.post("/api/harbour/scenario/prove", json={"fields": fields})
-    # her ship's file and the book both found where they were checked: the book read is
-    # the game's starter book (its night routine, which the smack's rig refuses, part D's
-    # matter), and the planted one is not read
-    assert "night routine" in r.text, r.text
+    assert read.status_code == 400 and "SENTINEL-READ-115" in read.text, read.text
+    assert r.status_code == 200, r.text
     assert "SENTINEL-CWD-115" not in r.text
+    text = r.json()["text"]
+    assert "file: data/ships/smack.yaml" in text
+    assert "standing_orders: [data/standing_orders/starter.orders]" in text
 
 
 def _raw_request(port: int, method: str, path: str, headers: list[str], body: bytes = b"") -> int:
