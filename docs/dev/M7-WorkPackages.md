@@ -5505,6 +5505,28 @@ Four things the owner said that evening, kept here in his words because they gov
 
 **Held as before:** step 3 of package 112 (the Mediterranean's layers) and the game's depth readers' step wait for the owner's design conversation.
 
+### Package 115, parts A and B (the server's guard and the saved game), at f68190d: read, and PARKED on its branch at the join (2026-11-15)
+
+**Not merged. Parked on `claude/pkg-115-ab` at f68190d under the closing rule,** for the owner's word: its one turn is spent (both readers' lists for part A mended; part B built and read), and what is left needs its builder once more. Nothing in it was found unsafe or wrong; what stops it is the join with what merged before it.
+
+**What it is, and how it read.**
+- **Part A, the server's guard:** a request is taken only from the game's own page (the host, the origin and a mark the page carries); the file orders are off the socket; a name given by the browser is a name and never a path; saves and loads are held to the saves place by the path actually opened. Read independently twice and both lists mended; every planted fault of the second list now fails a truth (7-600 to 7-604, 7-609 to 7-614).
+- **Part B, the saved game:** a checkpoint is loaded through an exact list of the names it may hold (`freesail/core/checkpoint_names.py`, written by `tools/checkpoint_names.py` from a census of the game's own checkpoints). Read independently once (the reader was cut short) and probed by the lead: **no code runs** from a hand-made checkpoint (every road tried is refused before anything is called; on the trunk today one of them still resolves); a true save loads from its checkpoint; with a needed name off the list the load falls back to a whole replay of the journal and says so.
+- **The owner's own saves** (twenty-nine, read as data through the loader) give the same report on the staged tree as on the trunk.
+
+**What it needs before it can merge (the join, found by the cloud on the chain of all six):**
+1. **The list written again by its tool on the final tree.** It lacks names that came in beside it: the chart's `LinePiece` (the tracks step) and, if part D merges, `RelievingTacklesScript` (truth 7-606, "the list holds its kin").
+2. **The census widened for a boat away under oars.** Package 60's truth 7-482 (a save across a change of ship) reads its checkpoint directly and is refused: `freesail.physics.oars.Oars`, which no case of the census reaches though the trunk has had it since package 82. A player's save taken with a boat away would today fall back to a replay.
+3. **Truth 7-611's proof.** It shows the starter book was read by finding the smack's refused "night routine"; part D fits the book to the rig, and that refusal is gone. It wants another honest proof.
+The tool's run is about two hours and did not survive this session's restarts; items 2 and 3 are a builder's. One bounded turn would do it: the trunk merged into the branch once, the three items, its gate, one hash.
+
+**To carry with it when it merges (listed, not built):**
+- **The guard's last gap, to be mended first in the next safety work:** a class on the list whose making reads a file can be called by a hand-made checkpoint with a path of its choosing (`places.Papers`; `brains.FarCaptain` with a role that walks out of its folder). A read, not a run, and the same on the trunk today; a path such as an endless device would hang the load. Until it is mended a checkpoint from a stranger is still not to be trusted.
+- A refused checkpoint is worded like a broken one; a comment cites a test file that does not exist (truth 7-606 is the check); fields that hold a path (`Wardroom.path`, `Vessel.ship_file`, `PilotSpec.cutter_file`, `BoatSpec.file`, `Books.root`, `Captain.books`) take their value from the checkpoint and were not followed into play.
+- Not built: a road for a door on another machine to carry the page's mark (doors are to be run on the machine the game runs on; the README and the harness's guide say so). One browser test of the harbour's reads the ship's name as soon as the page says "connected" and can race under load.
+- Not done by anyone: the planted faults of truths 7-605 to 7-608; the load's time, old against new.
+- **Part F (the consent work) was about to be begun by the builder under an earlier ruling of the lead's and was stopped:** nothing of it is built. Parts C and F wait for the owner.
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
