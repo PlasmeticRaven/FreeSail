@@ -119,7 +119,7 @@ What is left of the cold review's first step:
 
 The cold review's third step, and in my judgement the most valuable thing on this page for the game as a game:
 
-- A first game named on the opening page, in place of a form and a list of seventy-one scenarios in alphabetical order.
+- A first game named on the opening page, in place of a form and a list of forty-eight scenarios in alphabetical order.
 - The lessons listed as lessons; the test and gate scenarios taken out of the player's list.
 - The guided first passage with the sailing master, which the design proposal always meant the game to have.
 

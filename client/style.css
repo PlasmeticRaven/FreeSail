@@ -427,3 +427,19 @@ p.note { margin: 6px 12px; font-size: 12.5px; color: var(--ink-soft); }
 .door-pane .door-out { margin: 0; padding: 6px 8px; height: 16em; overflow-y: auto; white-space: pre-wrap; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
 .door-pane .door-say { flex: 1; }
 .door-pane.door-director { border-left: 3px solid var(--notable, #8a6d3b); } /* package 67: the director's seat's door */
+
+/* package 96b: the shelves; the sentence of the scenario chosen */
+.harbour p.shelf-says { margin: 0; color: var(--ink); }
+.harbour p.shelf-says[hidden] { display: none; }
+
+/* package 96b, step 2: the first panel (begin) */
+.begin .begin-block { padding: 8px 12px 10px; border-top: 1px solid var(--rule); }
+.begin .begin-block:first-of-type { border-top: none; }
+.begin .begin-block[hidden] { display: none; }
+.begin h3 { margin: 2px 0 4px; font-size: 14px; }
+.begin p { margin: 2px 0 6px; font-size: 13px; }
+.begin p.note { margin: 2px 0 6px; }
+.begin .form-actions { padding: 0; }
+.begin .begin-go { font-size: 14px; padding: 5px 14px; }
+.begin ol.begin-lessons { margin: 4px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.begin p.words { margin: 8px 12px; }
