@@ -21993,3 +21993,45 @@ def test_truth_7_411_every_setting_of_the_harbour_is_explained_where_it_is_set()
     assert "same weather" in words["#s-seed"] and "traders" in words["#s-business"].lower()
     assert "folded into a summary" in words['[data-set="doors.api.seat_budget_tokens"]']
     assert "applyWords" in (client / "harbour.js").read_text(encoding="utf-8")
+
+
+def test_truth_7_412_a_box_of_the_files_words_cannot_hold_the_server_and_keeps_the_ports(tmp_path):
+    """Package 96b, the final list (the whole-page reader's findings on step 8's boxes).
+    The words of a box take no anchor and no alias and no more than their length: a text of
+    nested aliases, which loaded as gigabytes, is refused in words by its tokens before
+    anything is loaded, in a moment; plain words pass as before. And a scenario whose ports
+    are a list shows them in the ports' box as the mapping they mean, so that a port's
+    state said there keeps every other port in play."""
+    pytest.importorskip("fastapi")
+    import time
+
+    from freesail.ui.harbour import BLOCK_MAX_CHARS, Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/merchant-passage.yaml")
+    fields = read["fields"]
+    assert isinstance(fields["ports"], list)
+    assert read["blocks"]["ports"] == "".join(f"{p}: {{}}\n" for p in fields["ports"])
+    bomb = "a: &a [x, x, x, x, x, x, x, x, x]\n"
+    for prev, name in zip("abcdefg", "bcdefgh", strict=True):
+        bomb += f"{name}: &{name} [" + ", ".join([f"*{prev}"] * 9) + "]\n"
+    bomb += "brest: {news: *h}\n"
+    assert len(bomb) < 600
+    started = time.monotonic()
+    for block in ("ports", "systems"):
+        with pytest.raises(HarbourError, match="an anchor or an alias"):
+            harbour.with_blocks(fields, {block: bomb})
+    with pytest.raises(HarbourError, match="at most"):
+        harbour.with_blocks(fields, {"ports": "x: 1\n" * (BLOCK_MAX_CHARS // 5 + 1)})
+    assert time.monotonic() - started < 2.0
+    closed = read["blocks"]["ports"].replace("brest: {}", "brest: {closed_to: [united-states]}")
+    whole = harbour.with_blocks(fields, {"ports": closed})
+    assert list(whole["ports"]) == fields["ports"]
+    assert whole["ports"]["brest"] == {"closed_to": ["united-states"]}
+    lines = harbour.prove(whole, read["path"])["lines"]
+    assert f"The ports: {', '.join(fields['ports'])}." in lines
