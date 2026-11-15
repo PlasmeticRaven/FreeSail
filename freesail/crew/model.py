@@ -331,4 +331,8 @@ def _figure(n: int) -> str:
 def _post_line(s: Sailor) -> str:
     if s.post == "captain":
         return f"Captain {s.name}."
+    if not s.post:
+        # an officer carried without a post (package 60: one come from another ship whose post
+        # she has filled already): by his rating, never "None"
+        return f"Mr. {s.name}, {s.rating.value}."
     return f"Mr. {s.name}, {s.post}."

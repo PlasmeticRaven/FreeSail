@@ -113,7 +113,6 @@ def test_words_of_the_dialect_go_to_the_dialect(words, kind):
     [
         ("open the gunports", "the ports open as the guns are run out"),
         ("open the ports", "the ports open as the guns are run out"),
-        ("take command of the prize", "take possession of her"),
         ("take a sight", "observe the sun"),
     ],
 )
@@ -121,6 +120,25 @@ def test_words_naming_what_happens_of_itself_are_answered_so(words, answer):
     w = frigate()
     why = refused(w.submit(words))
     assert answer in why.lower() or answer in why, why
+
+
+def test_take_command_of_the_prize_is_answered_by_its_road():
+    """Package 109's case of 'take command' as it was (a refused phrase), kept beside package 60's
+    order of those words: of a prize, the words are answered with possession's road."""
+    w = frigate()
+    why = refused(w.submit("take command of the prize"))
+    assert "take possession of her" in why, why
+    why = refused(w.submit("assume command of the prize"))
+    assert "take possession of her" in why, why
+
+
+def test_take_command_of_a_ship_his_to_take_is_package_60s_order():
+    """Package 60 (the lead's reconciling of 2026-11-13): 'take command of her' aboard a ship
+    given him is the order that changes his ship, not 109's refused phrase."""
+    from tests.test_ship_changed import fly_taken_up
+
+    w, fly, me, e = fly_taken_up()
+    assert e.kind == "ship.taken_up" and w.players is w.hulls[str(fly.id)]
 
 
 @pytest.mark.parametrize(
