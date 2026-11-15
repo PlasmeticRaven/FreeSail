@@ -21537,3 +21537,282 @@ def test_truth_7_403_the_harbour_opens_on_a_first_game_which_is_the_primers_chap
         assert not [n for n, s in world.ship.sails.items() if getattr(s, "set_fraction", 0) > 0]
     finally:
         harbour.close()
+
+
+def test_truth_7_404_the_harbours_start_takes_the_ship_aboard_a_bare_ships_wind_and_a_save_by_name(
+    tmp_path,
+):
+    """Package 96b, step 3 (docs/design/Design-Harbour.md §1.1 rows 3, 7, 15 and 16, §2.2):
+    what only the command line could say is said from the page. The page's start puts the
+    player aboard another ship of the scenario from the first minute (the server's `--ship`:
+    his own left as she lies, the drivers following the other) and refuses in words a ship
+    that is not there; a bare ship takes her wind and her heading (`--wind`, `--heading`:
+    the primer's chapter 7 as its own command has it); the page's state lists the saves of
+    the saves place by name, and one is taken up by its name; and a scenario says its own
+    lines and the ships to be aboard before it is started."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    saves = tmp_path / "saves"
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=saves)
+    try:
+        said = harbour.read_scenario("data/scenarios/tender.yaml")
+        assert said["aboard"] == ["Raven"] and said["lines"][0].startswith("Scenario: The tender")
+        started = harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"})
+        assert "Following the Raven." in started["lines"]
+        assert driver.world.followed_words == "Raven"
+        with pytest.raises(HarbourError, match="Nobody"):
+            harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"})
+        harbour.start(
+            {"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0,15", "heading": 293}
+        )
+        opening = next(e.text for e in driver.world.log if e.kind == "world.start")
+        assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+        with pytest.raises(HarbourError, match="wind"):
+            harbour.start({"ship": "data/ships/frigate-36.yaml", "wind": "a gale"})
+        assert harbour.saves()["saves"] == []
+        driver.places = harbour.places  # as the app joins them: the saves place is the test's
+        assert driver.save("kept-404").kind == "driver.saved"
+        assert [s["name"] for s in harbour.saves()["saves"]] == ["kept-404"]
+        assert harbour.saves()["place"] == str(saves.resolve())
+        taken = harbour.start({"load": "kept-404"})
+        assert taken["game"]["chosen"]["load"] == "kept-404"
+    finally:
+        harbour.close()
+
+
+def test_truth_7_405_the_sheet_keeps_what_it_does_not_show_and_the_page_has_its_parts(tmp_path):
+    """Package 96b, step 4 (docs/design/Design-Harbour.md §2.3): the scenario maker's form
+    folded into parts, each a line when closed. The fold is the page's own and touches
+    nothing the maker writes: a scenario with keys the form has no field for (the blockade:
+    its squadron, its weather's system, another ship's intent and squadron) read by the
+    page's server and written again with nothing changed is the same file byte for byte;
+    and the page carries the nine parts in their order, each with its line, every field the
+    maker had still in it."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import CLIENT_DIR, GAME_SCENARIOS, Harbour
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/blockade.yaml")
+    assert read["fields"]["squadrons"] and read["fields"]["weather"]["systems"]
+    saved = harbour.save_scenario(read["fields"], "blockade", source=read["path"])
+    assert Path(saved["path"]).read_bytes() == (GAME_SCENARIOS / "blockade.yaml").read_bytes()
+    page = (CLIENT_DIR / "harbour.html").read_text(encoding="utf-8")
+    parts = re.findall(r'<fieldset data-part="([a-z]+)" class="folded">', page)
+    assert parts == [
+        "day",
+        "ship",
+        "start",
+        "papers",
+        "weather",
+        "ships",
+        "sea",
+        "orders",
+        "stations",
+    ]
+    assert [f'data-line="{p}"' in page for p in parts] == [True] * 9
+    for field in (
+        "name", "seed", "start", "nation", "ship.file", "ship.heading_deg", "ship.glass",
+        "ship.instrument", "cargo.purse_pounds", "intent", "region", "position", "weather",
+        "business", "crewed.cap", "crewed.range_nm", "ports", "ships", "world_orders",
+        "standing_orders", "orders", "director",
+    ):  # fmt: skip
+        assert f'data-field="{field}"' in page, field
+
+
+def test_truth_7_406_the_ships_card_is_filled_from_the_games_own_kinds_fits_and_roles(tmp_path):
+    """Package 96b, step 5 (docs/design/Design-Harbour.md §2.4): every ship is set up on
+    one card, whose blanks are the game's own words. The harbour's catalogue gives each
+    kind another ship may be her ship file, the fit she carries as that kind and the roles
+    her file gives her, and each ship file its fits and the one carried when none is said,
+    as `world.ships.description` and the file's `armament` have them; a scenario written
+    from them (the player's cutter named and under long guns, a revenue cutter, a French
+    privateer lugger under British colours, a role of her kind's) is proved by the maker as
+    the game loads it; and the proof says, without refusing, a fit a ship's kind has not
+    and a heading the game reads nowhere."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+    from freesail.world.ships import DESCRIPTIONS, description
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    cat = harbour.catalogue()
+    assert [k["id"] for k in cat["kinds"]] == list(DESCRIPTIONS)
+    for k in cat["kinds"]:
+        d = description(k["id"])
+        assert (k["file"], k["fit"], k["roles"]) == (
+            d["file"],
+            str(d.get("fit") or ""),
+            list(d.get("roles") or []),
+        )
+        assert k["file"] in cat["fits"]
+        assert not k["fit"] or k["fit"] == "unarmed" or k["fit"] in cat["fits"][k["file"]]["fits"]
+    fields = {
+        "name": "Two cutters",
+        "seed": 7,
+        "start": "1805-06-12T05:00",
+        "position": {"lat_deg": 50.1631, "lon_deg": -5.0345},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/cutter.yaml", "name": "Swift", "fit": "long guns"},
+        "papers": {"service": "kings"},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": "vigilant",
+                "description": "revenue cutter",
+                "name": "Vigilant",
+                "nation": "britain",
+                "position": "50 4.1 N 4 58.9 W",
+                "goal": "bound for Plymouth",
+                "role": "revenue",
+            },
+            {
+                "id": "furet",
+                "description": "privateer lugger",
+                "name": "Furet",
+                "nation": "france",
+                "position": "50 4.1 N 5 5.3 W",
+                "goal": "bound for Plymouth",
+                "colours": "britain",
+            },
+        ],
+    }
+    proved = harbour.prove(fields)
+    assert not [ln for ln in proved["lines"] if "To know" in ln]
+    assert any("revenue cutter Vigilant" in ln for ln in proved["lines"])
+    fields["ships"][0]["role"] = "privateer"  # no role of a revenue cutter's: the game's refusal
+    with pytest.raises(Exception, match="no role a revenue cutter takes"):
+        harbour.prove(fields)
+    fields["ships"][0]["role"] = "revenue"
+    fields["ships"][1]["fit"] = "long tom"  # the schooner's, not the lugger's
+    fields["ships"][1]["heading_deg"] = 270
+    said = [ln for ln in harbour.prove(fields)["lines"] if "To know" in ln]
+    assert len(said) == 2 and "long tom" in said[0] and "read by nothing" in said[1]
+
+
+def test_truth_7_407_a_squadron_is_made_from_the_sheet_by_the_games_own_kinds_and_formations(
+    tmp_path,
+):
+    """Package 96b, step 6 (docs/design/Design-Harbour.md §1.3 rows 108 and 109, §2.3: "a
+    scenario whose squadrons could not be set but by the file"). The harbour's catalogue
+    gives the squadron's card the game's own kinds and formations, the books a set sails
+    by and the words for the player's ship; a scenario with a convoy written as the card
+    writes it (its name, kind, formation, the player its commander, its members by id, in
+    the squadron's own entry and not on each ship) is proved by the maker and makes the
+    set in the game: a convoy in the order of sailing under the player's ship, the three
+    merchant brigs its members; and a formation that is none of the game's is refused in
+    the loader's words."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+    from freesail.world.squadrons import FORMATIONS, KINDS, PLAYER_ID
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    words = harbour.catalogue()["squadrons"]
+    assert words["kinds"] == list(KINDS) and words["formations"] == list(FORMATIONS)
+    assert words["player"] == PLAYER_ID and "convoy" in words["books"]
+    fields = {
+        "name": "A convoy of three",
+        "seed": 7,
+        "start": "1805-06-12T10:00",
+        "position": {"lat_deg": 49.85, "lon_deg": -5.2},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/brig.yaml", "heading_deg": 60},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": name.lower(),
+                "description": "merchant brig",
+                "name": name,
+                "nation": "britain",
+                "position": f"49 5{n} N 5 1{n} W",
+                "goal": "in company with the ship within 3 cables",
+            }
+            for n, name in enumerate(("Nancy", "Hope", "Providence"))
+        ],
+        "squadrons": [
+            {
+                "name": "the Falmouth trade",
+                "kind": words["kinds"][1],
+                "formation": "order of sailing",
+                "commander": words["player"],
+                "members": ["nancy", "hope", "providence"],
+            }
+        ],
+    }
+    harbour.prove(fields)
+    saved = harbour.save_scenario(fields, "a-convoy")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        sets = list(driver.world.squadrons.sets)
+        assert len(sets) == 1
+        assert (sets[0].kind, sets[0].formation) == ("convoy", "order of sailing")
+        assert sets[0].commander == PLAYER_ID
+        assert set(sets[0].members) == {PLAYER_ID, "nancy", "hope", "providence"}
+        fields["squadrons"][0]["formation"] = "a wedge"
+        with pytest.raises(HarbourError, match="no formation"):
+            harbour.prove(fields)
+    finally:
+        harbour.close()
+
+
+def test_truth_7_408_the_papers_the_purse_and_the_people_are_set_from_the_sheet(tmp_path):
+    """Package 96b, step 7 (docs/design/Design-Harbour.md §1.3 rows 54 to 61 and 72 to 76;
+    the owner's points of 2026-10-18: he could not add a chronometer, and hoped to name the
+    people aboard). A scenario with the fields as the sheet's part writes them (a
+    chronometer with its maker and rate, the epitome, the private signals withheld, a
+    price list, goods in the hold, the master named and his skill said, a supercargo
+    beside the muster, a thing in the captain's keeping) is proved by the maker and is so
+    in the game: the chronometer aboard, the master of that name and skill, Mr Pentreath
+    among her people. The catalogue gives the page each ship's wardroom posts, so that the
+    sheet can say which roles are officers of her muster and which make a person more."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    cat = harbour.catalogue()
+    assert "master" in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    assert "supercargo" not in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    fields = harbour.read_scenario("data/scenarios/merchant-passage.yaml")["fields"]
+    fields["papers"] = {
+        **fields["papers"],
+        "chronometer": {"maker": "Earnshaw", "rate_s_per_day": 1.8, "drift": 0},
+        "private_signals": False,
+        "price_lists": ["falmouth", "brest"],
+    }
+    fields["people"] = [
+        {"role": "master", "skill": 0.5, "name": "Mr Tregenza"},
+        {"role": "supercargo", "name": "Mr Pentreath"},
+    ]
+    fields["cargo"] = {**(fields.get("cargo") or {}), "goods": {"tin": 12}}
+    fields["things"] = ["a sealed packet, in the captain's keeping"]
+    proved = harbour.prove(fields, "data/scenarios/merchant-passage.yaml")
+    assert any("She carries a chronometer by Earnshaw" in ln for ln in proved["lines"])
+    saved = harbour.save_scenario(fields, "with-a-chronometer")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        world = driver.world
+        assert world.scenario.chronometer["rate_s_per_day"] == 1.8
+        assert world.scenario.papers["private_signals"] is False
+        master = world.people.by_role("master")[0]
+        assert (master.name, master.skill) == ("Mr Tregenza", 0.5)
+        assert "Mr Pentreath" in {p.name for p in world.people.everyone}
+        assert world.scenario.cargo["goods"] == {"tin": 12.0}
+    finally:
+        harbour.close()

@@ -30,9 +30,10 @@ Routes (`harbour_routes`):
                                            the first game the page names,
                                            the ships, seats, stations, briefs, books, ports,
                                            regions and nations
-    POST /api/harbour/start                {scenario | ship | load, seed, seat, time, pace,
-                                           crewed_cap, crewed_range, business,
-                                           director_brief, standing_orders} -> the game
+    POST /api/harbour/start                {scenario | ship | load, seed, seat, aboard,
+                                           time, pace, crewed_cap, crewed_range, business,
+                                           director_brief, standing_orders, wind, heading}
+                                           -> the game
     GET  /api/harbour/settings             the settings and where they are kept
     POST /api/harbour/settings             {settings} -> kept (no key, truth 7b-110)
     POST /api/harbour/desktop              {stations: [...], ship?, write?} -> the entries
@@ -44,7 +45,8 @@ Routes (`harbour_routes`):
     POST /api/harbour/doors/{id}/say       {text}: a line to its terminal (the owner's
                                            word in a consent conversation)
     POST /api/harbour/doors/{id}/stop      stopped, its station released
-    GET  /api/harbour/scenario             ?path=: a scenario's text and fields
+    GET  /api/harbour/scenario             ?path=: a scenario's text and fields, its lines
+                                           as a driver says them, the ships to be aboard
     POST /api/harbour/scenario/prove       {fields, source?} -> the scenario's lines, or
                                            its refusal in words
     POST /api/harbour/scenario             {fields, source?, name, book?, overwrite?} ->
@@ -365,6 +367,9 @@ class Harbour:
         on_tend = getattr(driver, "on_tend", None)
         if callable(on_tend):
             on_tend(self.tend_seats)
+        # the ships' fits are read from their files, two seconds of reading for the
+        # seventeen: begun here, so that the page's first catalogue seldom waits for it
+        threading.Thread(target=self.fits, daemon=True).start()
 
     def _taken_up(self, old: Any, new: Any) -> None:
         """A new game in place: the seats' doors are the new World's to ask for."""
@@ -444,6 +449,13 @@ class Harbour:
             "briefs": briefs,
             "books": books,
             "descriptions": list(DESCRIPTIONS),
+            "kinds": self.kinds(),
+            "squadrons": self.squadron_words(),
+            "posts": self.posts(),
+            "signal_books": sorted(
+                p.name for p in (ROOT / "data" / "signals").iterdir() if p.is_dir()
+            ),
+            "fits": self.fits(),
             "nations": list(load_nations().nations),
             "regions": self.regions(),
             "ports": self.ports(),
@@ -590,6 +602,134 @@ class Harbour:
             for shelf in every
             if shelf["id"] in used
         ]
+
+    # -- the ships' kinds, fits and roles (package 96b, step 5) -------------------------
+
+    _kinds: list[dict[str, Any]] | None = None
+    _fits: dict[str, dict[str, Any]] | None = None
+    _fits_lock = threading.Lock()
+
+    def kinds(self) -> list[dict[str, Any]]:
+        """What another ship may be (`world.ships.DESCRIPTIONS`), each with her ship file,
+        her rig and what she is in the file's words, the fit she carries as that kind and
+        the roles her file gives her (package 75; "" and [] where the file gives none): the
+        ship's card fills its blanks from these and invents nothing."""
+        if Harbour._kinds is None:
+            from freesail.world.ships import DESCRIPTIONS, description
+
+            out = []
+            for key in DESCRIPTIONS:
+                d = description(key)
+                out.append(
+                    {
+                        "id": key,
+                        "file": str(d.get("file") or ""),
+                        "rig": str(d.get("rig") or ""),
+                        "what": str(d.get("what") or ""),
+                        "fit": str(d.get("fit") or ""),
+                        "roles": [str(r) for r in d.get("roles") or []],
+                    }
+                )
+            Harbour._kinds = out
+        return Harbour._kinds
+
+    _posts: dict[str, list[str]] | None = None
+
+    def posts(self) -> dict[str, list[str]]:
+        """The posts of each ship file's wardroom (package 96b, step 7): the roles of
+        `data/people/<her file's name>.yaml`, by her ship file, in the file's order; none
+        for a ship with no wardroom file. A person the scenario names by one of these is
+        the officer of her muster at that post; by any other role, a person added."""
+        if Harbour._posts is None:
+            out: dict[str, list[str]] = {}
+            for p in sorted(SHIPS_DIR.glob("*.yaml")):
+                if _is_boat(p):
+                    continue
+                roles: list[str] = []
+                with contextlib.suppress(OSError, yaml.YAMLError, AttributeError, TypeError):
+                    doc = yaml.safe_load(
+                        (ROOT / "data" / "people" / p.name).read_text(encoding="utf-8")
+                    )
+                    for entry in (doc or {}).get("wardroom") or []:
+                        role = " ".join(str(entry.get("role") or "").lower().split())
+                        if role and role not in roles:
+                            roles.append(role)
+                out[_rel(p)] = roles
+            Harbour._posts = out
+        return Harbour._posts
+
+    @staticmethod
+    def squadron_words() -> dict[str, Any]:
+        """What a squadron's card chooses from (package 96b, step 6): the game's own kinds
+        and formations (`world.squadrons.KINDS`, `FORMATIONS`), the books a set may sail by
+        (`data/squadrons/`), and the words that name the player's ship among the members."""
+        from freesail.world.squadrons import FORMATIONS, KINDS, PLAYER_ID
+
+        books = sorted(p.stem for p in (ROOT / "data" / "squadrons").glob("*.yaml"))
+        return {
+            "kinds": list(KINDS),
+            "formations": list(FORMATIONS),
+            "books": books,
+            "player": PLAYER_ID,
+        }
+
+    def fits(self) -> dict[str, dict[str, Any]]:
+        """Each ship file's fits of guns by name and the one she carries when none is said
+        (`armament.fits`, `armament.default`; a file with no armament has none): what the
+        player's `ship.fit` and another ship's `fit` may be. Read once (the ships' files
+        are long)."""
+        with Harbour._fits_lock:
+            if Harbour._fits is not None:
+                return Harbour._fits
+            from freesail.ship.loader import load_spec
+
+            out: dict[str, dict[str, Any]] = {}
+            for p in sorted(SHIPS_DIR.glob("*.yaml")):
+                if _is_boat(p):
+                    continue
+                names: list[str] = []
+                default = ""
+                with contextlib.suppress(Exception):  # a file that does not load has none
+                    armament = load_spec(_rel(p)).armament
+                    if armament is not None:
+                        names = [str(n) for n in armament.fits]
+                        default = str(armament.default or "")
+                out[_rel(p)] = {"fits": names, "default": default}
+            Harbour._fits = out
+        return Harbour._fits
+
+    def ship_warnings(self, fields: dict[str, Any]) -> list[str]:
+        """What the loader takes of the other ships and the game would refuse or pass over
+        later, said at the proof (the design's traps 4 and 5): a fit her kind's file has
+        not (refused only when she is promoted to a full crew), and a heading (read by
+        nothing: she heads for her first mark)."""
+        from freesail.ship.schema import UNARMED
+        from freesail.world.ships import description, description_key
+
+        out: list[str] = []
+        fits = self.fits()
+        ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+        for s in ships:
+            if not isinstance(s, dict):
+                continue
+            name = str(s.get("name") or s.get("id") or s.get("description") or "a ship")
+            key = description_key(str(s.get("description") or s.get("kind") or ""))
+            fit = " ".join(str(s.get("fit") or "").split())
+            if key is not None and fit and fit != UNARMED:
+                known = fits.get(str(description(key).get("file") or ""), {}).get("fits") or []
+                if fit not in known:
+                    has = ", ".join(known) if known else "none"
+                    out.append(
+                        f"  To know: {name}'s fit '{fit}' is none of her file's ({has}, or "
+                        f"{UNARMED}); the game takes it now and refuses her when she comes "
+                        "close and is given her full crew."
+                    )
+            if s.get("heading_deg") is not None:
+                out.append(
+                    f"  To know: {name}'s heading is read by nothing; another ship heads for "
+                    "the first mark of her goal."
+                )
+        return out
 
     def regions(self) -> list[dict[str, Any]]:
         from freesail.world.chart import load_manifest
@@ -740,6 +880,29 @@ class Harbour:
             raise HarbourError("The business is on, off, or as the scenario says.")
         args.business = business or None
         args.ease_on_station = bool(choices.get("ease_on_station"))
+        # package 96b, step 3: the ship the player is aboard (the server's `--ship`), and
+        # the wind and the heading of a bare ship (`--wind`, `--heading`), as the command
+        # line has always taken them
+        args.aboard = " ".join(str(choices.get("aboard") or "").split()) or None
+        wind = str(choices.get("wind") or "").replace(" ", "")
+        if wind:
+            parts = wind.split(",")
+            try:
+                if len(parts) != 2:
+                    raise ValueError
+                from_deg, knots = float(parts[0]), float(parts[1])
+            except ValueError:
+                raise HarbourError(
+                    "The wind is where it blows from in degrees and its knots, as '225,15'."
+                ) from None
+            if not (0.0 <= from_deg <= 360.0 and 0.0 <= knots <= 100.0):
+                raise HarbourError(
+                    "The wind is from 0 to 360 degrees and of 0 to 100 knots, as '225,15'."
+                )
+            args.wind = f"{from_deg:g},{knots:g}"
+        args.heading = number("heading", float)
+        if args.heading is not None and not 0.0 <= args.heading <= 360.0:
+            raise HarbourError("The heading is from 0 to 360 degrees.")
         lines: list[str] = []
         try:
             world = server.prepare_game(args, say=lines.append)
@@ -762,6 +925,7 @@ class Harbour:
                 "ship": ship,
                 "load": load,
                 "seat": args.seat or "",
+                "aboard": args.aboard or "",
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
@@ -1175,7 +1339,34 @@ class Harbour:
             "text": text,
             "fields": fields,
             "position_deg": where,  # for the form's latitude and longitude
+            **self._said(p, fields),
         }
+
+    @staticmethod
+    def _said(p: Path, fields: dict[str, Any]) -> dict[str, Any]:
+        """What a scenario is, for the page to say before it is started (package 96b, step
+        3): the scenario's own lines as a driver prints them at the load (`lines`: the
+        author's view, the file's path left out), or the loader's refusal in words
+        (`refusal`); and the other ships the player may be aboard at the start (`aboard`:
+        those with a captain of their own, an intent or a free intent, by name), which is
+        what the server's `--ship` takes."""
+        from freesail.world.scenarios import ScenarioError, load_scenario
+
+        lines: list[str] = []
+        refusal = ""
+        try:
+            lines = [ln.replace(f" ({p})", "") for ln in load_scenario(p).lines()]
+        except (ScenarioError, OSError, ValueError, KeyError, yaml.YAMLError) as e:
+            refusal = _scenario_words(str(e), p)
+        ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+        aboard = [
+            str(s.get("name") or s.get("id"))
+            for s in ships
+            if isinstance(s, dict)
+            and (s.get("intent") or s.get("free_intent"))
+            and (s.get("name") or s.get("id"))
+        ]
+        return {"lines": lines, "refusal": refusal, "aboard": aboard}
 
     def _original(self, source: str) -> tuple[str | None, str]:
         if not source:
@@ -1240,7 +1431,7 @@ class Harbour:
             lines = [
                 self._in_their_words(ln.replace(str(p), "this scenario"), said)
                 for ln in sf.lines() + guard_lines(world)
-            ]
+            ] + self.ship_warnings(fields)
         return {"text": text, "lines": lines}
 
     def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:

@@ -203,6 +203,103 @@ def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, cli
     assert state["saves"][1]["written"].startswith("2023-11-1")
 
 
+def test_a_scenario_says_what_it_is_before_it_is_started_and_who_may_be_gone_aboard(client):
+    """Package 96b, step 3: the page asks what a scenario is before the start: its own
+    lines as a driver prints them (the file's path left out), and the other ships with a
+    captain of their own, which the player may be aboard from the first minute."""
+    r = client.get("/api/harbour/scenario", params={"path": "data/scenarios/tender.yaml"}).json()
+    assert r["lines"][0] == "Scenario: The tender, Torbay for Plymouth and home."
+    assert any(ln.startswith("She starts at") for ln in r["lines"]) and r["refusal"] == ""
+    assert r["aboard"] == ["Raven"]
+    first = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/first-passage.yaml"}
+    ).json()
+    assert first["aboard"] == [] and first["lines"] == ["Scenario: A first passage."]
+
+
+def test_a_game_is_started_aboard_another_ship_and_a_bare_ship_with_her_wind_and_heading(
+    port, client
+):
+    """Package 96b, step 3: what the command line alone could say (`--ship NAME`, `--wind`,
+    `--heading`) said from the page's start; each refused in words when it is not so."""
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"}
+    )
+    assert r.status_code == 200, r.text
+    assert "Following the Raven." in r.json()["lines"]
+    assert r.json()["game"]["chosen"]["aboard"] == "Raven"
+    with port.driver.lock:
+        assert port.driver.world.followed_words == "Raven"
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"}
+    )
+    assert r.status_code == 400 and "Nobody" in r.json()["detail"]
+    # a bare ship with the primer's chapter 7 wind and heading
+    r = client.post(
+        "/api/harbour/start",
+        json={"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0, 15", "heading": "293"},
+    )
+    assert r.status_code == 200, r.text
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+    for bad in ({"wind": "north"}, {"wind": "400,15"}, {"wind": "10"}, {"heading": "999"}):
+        r = client.post("/api/harbour/start", json={"ship": "data/ships/cutter.yaml", **bad})
+        assert r.status_code == 400, (bad, r.text)
+        assert "wind" in r.json()["detail"] or "heading" in r.json()["detail"]
+
+
+def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_fits(client):
+    """Package 96b, step 5: what the ship's card fills its blanks from, the game's own
+    (`world.ships.description`, each ship file's `armament`): nothing invented by the page."""
+    cat = client.get("/api/harbour/catalogue").json()
+    kinds = {k["id"]: k for k in cat["kinds"]}
+    assert list(kinds) == cat["descriptions"]
+    revenue = kinds["revenue cutter"]
+    assert revenue["file"] == "data/ships/cutter.yaml" and revenue["fit"] == "long guns"
+    assert revenue["roles"] == ["revenue"] and "cutter" in revenue["rig"]
+    assert kinds["merchant brig"]["roles"] == ["merchant", "packet", "indiaman"]
+    assert kinds["sixty-four"]["roles"] == []  # her file gives her kind none
+    cutter = cat["fits"]["data/ships/cutter.yaml"]
+    assert cutter == {"fits": ["carronades", "long guns"], "default": "carronades"}
+    assert len(cat["fits"]["data/ships/seventy-four.yaml"]["fits"]) == 3
+    assert set(cat["fits"]) == set(cat["ships"])  # every ship offered, and no boat
+    # step 7: each ship's wardroom posts, and the signal books there are
+    posts = cat["posts"]["data/ships/frigate-36.yaml"]
+    assert posts[:2] == ["captain", "first lieutenant"] and "master" in posts
+    assert cat["posts"]["data/ships/privateer-schooner.yaml"] == []  # no wardroom file
+    assert {"britain", "france"} <= set(cat["signal_books"])
+    # step 6: what a squadron's card chooses from, the game's own
+    assert cat["squadrons"] == {
+        "kinds": ["squadron", "convoy"],
+        "formations": ["line ahead", "line abreast", "order of sailing", "close order"],
+        "books": ["blockade", "convoy", "squadron"],
+        "player": "the ship",
+    }
+
+
+def test_the_proof_says_a_fit_her_kind_has_not_and_a_heading_read_by_nothing(client):
+    """Package 96b, step 5 (the design's traps 4 and 5): the loader takes another ship's
+    fit unchecked and refuses her only when she is promoted, and reads her heading
+    nowhere; the maker's proof says both, and proves the scenario as the game does."""
+    fields = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/first-action.yaml"}
+    ).json()["fields"]
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200 and not [ln for ln in r.json()["lines"] if "To know" in ln]
+    fields["ships"][0]["fit"] = "forty carronades"
+    fields["ships"][0]["heading_deg"] = 90
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert r.status_code == 200, r.text
+    said = [ln for ln in r.json()["lines"] if "To know" in ln]
+    assert len(said) == 2 and "forty carronades" in said[0] and "is none of her file's" in said[0]
+    assert "heading is read by nothing" in said[1]
+    fields["ships"][0]["fit"] = "unarmed"
+    del fields["ships"][0]["heading_deg"]
+    r = client.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert not [ln for ln in r.json()["lines"] if "To know" in ln]
+
+
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
@@ -621,6 +718,8 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     pg.click("nav.tabs button[data-tab=game]")
     pg.select_option("#s-scenario", "data/scenarios/directed-passage.yaml")
     pg.select_option("#s-seat", "officer")
+    assert not pg.is_visible("#s-brief")  # behind "more for this game" (package 96b, step 3)
+    pg.click("#s-more summary")
     pg.select_option("#s-brief", "dispatches")
     pg.click("#btn-start")
     pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
@@ -646,7 +745,10 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
         assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
         saved = port.place / f"{stem}.yaml"
         assert saved.read_bytes() == (SCENARIOS / f"{stem}.yaml").read_bytes(), stem
-    # one field changed in the form: that field alone written again
+    # one field changed in the form: that field alone written again (the part opened
+    # first: the sheet is folded, package 96b, step 4)
+    assert not pg.is_visible('#maker [data-field="seed"]')
+    pg.click("#maker fieldset[data-part=day] > legend")
     pg.fill('#maker [data-field="seed"]', "11")
     pg.fill("#m-name", "dispatches-11")
     pg.click("#btn-m-save")
@@ -729,6 +831,7 @@ def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button
     assert pg.is_visible("#start-form")
     pg.click("nav.tabs button[data-tab=begin]")
     pg.click("#btn-b-first")
+    pg.wait_for_url(live.url + "/", timeout=60_000)  # the game's page, before it is asked
     pg.wait_for_function(
         "document.getElementById('ship-name') && "
         "document.getElementById('status').textContent === 'connected'",
@@ -746,12 +849,468 @@ def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button
     assert "held" in pg.inner_text("#b-playing-says")
     # a lesson that is the officer's own seats the player at the officer's station
     pg.click("#b-lessons button[data-path='data/scenarios/lesson-reckoning.yaml']")
+    pg.wait_for_url(live.url + "/", timeout=60_000)
     pg.wait_for_function(
         "document.getElementById('status').textContent === 'connected'", timeout=60_000
     )
     with port.driver.lock:
         seat = port.driver.world.player_seat
         assert seat is not None and "officer" in seat.station.name
+    assert errors == []
+
+
+def test_in_the_browser_a_game_says_what_it_is_and_a_save_is_taken_up_from_the_list(
+    browser_page,
+):
+    """Package 96b, step 3: the new game's panel as three choices and "more": the scenario
+    chosen says its own lines before the start; the ships to be aboard are offered where
+    the scenario has one; the rest is behind a step; a bare ship takes a wind and a
+    heading; and a saved game is picked from the list of the saves place."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.wait_for_function(
+        "document.getElementById('s-lines').textContent.indexOf('A first passage') >= 0"
+    )
+    assert not pg.is_visible("#s-aboard") and not pg.is_visible("#s-seed")
+    assert not pg.is_visible("#s-wind") and not pg.is_visible("#s-load-pick")
+    pg.check("#s-tests")
+    pg.select_option("#s-scenario", "data/scenarios/tender.yaml")
+    pg.wait_for_selector("#s-aboard", state="visible", timeout=10_000)
+    assert "Brixham" in pg.inner_text("#s-lines") or "50°" in pg.inner_text("#s-lines")
+    pg.select_option("#s-aboard", "Raven")
+    pg.click("#btn-start")
+    pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
+    assert "Following the Raven." in pg.inner_text("#start-words")
+    # a save written by the game in play is in the list, and is taken up from it
+    assert port.driver.save("step-three").kind == "driver.saved"
+    pg.select_option("#s-from", "load")
+    pg.wait_for_function(
+        "Array.prototype.some.call(document.getElementById('s-load-pick').options, "
+        "function (o) { return o.value === 'step-three'; })",
+        timeout=10_000,
+    )
+    assert str(port.tmp / "saves") in pg.inner_text("#s-load-says")
+    pg.select_option("#s-load-pick", "step-three")
+    assert pg.input_value("#s-load") == "step-three"
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('start-words').textContent.indexOf('step-three') >= 0",
+        timeout=60_000,
+    )
+    assert "refusal" not in (pg.get_attribute("#start-words", "class") or "")
+    # a bare ship: her wind and her heading beside her
+    pg.select_option("#s-from", "ship")
+    assert pg.is_visible("#s-wind") and not pg.is_visible("#s-lines")
+    pg.select_option("#s-ship", "data/ships/frigate-36.yaml")
+    pg.fill("#s-wind", "0,15")
+    pg.fill("#s-heading", "293")
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('g-title').textContent === 'Open water'", timeout=60_000
+    )
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert "Wind N, 15 knots" in opening and "(293°)" in opening
+    assert errors == []
+
+
+def test_in_the_browser_the_sheet_is_folded_and_each_part_says_what_is_set(browser_page):
+    """Package 96b, step 4 (docs/design/Design-Harbour.md §2.3): "change this scenario" on
+    the game tab reads it into the sheet; every part is closed to a line written from the
+    fields, so that the whole scenario reads with nothing opened (the squadron and the
+    weather's system that the form has no field for among them); a part's name opens it,
+    and a field changed changes its line; saved with nothing changed it is the same file;
+    a written brief touched in the form keeps the examples the form does not show; and the
+    game in play is a line at the head of every tab."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    assert pg.inner_text("#in-play-line") == "no game yet" and not pg.is_visible("#g-title")
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.select_option("#s-scenario", "data/scenarios/blockade.yaml")
+    pg.click("#btn-s-change")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('blockade') >= 0")
+    assert pg.is_visible("#maker") and pg.is_visible("#in-play-line")
+    parts = pg.eval_on_selector_all(
+        "#maker fieldset[data-part]", "els => els.map(e => e.getAttribute('data-part'))"
+    )
+    assert parts == [
+        "day",
+        "ship",
+        "start",
+        "papers",
+        "weather",
+        "ships",
+        "sea",
+        "orders",
+        "stations",
+    ]
+    assert pg.locator("#maker fieldset[data-part]:not(.folded)").count() == 0
+    assert not pg.is_visible('#maker [data-field="seed"]') and not pg.is_visible("#m-ships")
+
+    def line(part: str) -> str:
+        return pg.inner_text(f'#maker [data-line="{part}"]')
+
+    assert (
+        line("day") == '"The blockade of Brest blown off"; 12 June 1805, 10:00; seed 7; of Britain.'
+    )
+    assert line("ship").startswith("The frigate-36; her file's own fit of guns; a glass aboard")
+    assert "on the chart of channel-west; heading 20°" in line("start")
+    assert "one weather system written out (the low)" in line("weather").lower()
+    assert line("ships") == (
+        "Three ships: Naiad of Britain, a frigate; Nimble of Britain, a brig-sloop; "
+        "Hortense of France, a frigate; the inshore squadron, a squadron in line ahead "
+        "(naiad, nimble)."
+    )
+    assert line("sea").startswith("Four ports: brest, falmouth, plymouth, torbay")
+    assert "first order: set plain sail" in line("orders") and "Ushant" in line("orders")
+    assert line("stations") == "You are the captain; nobody else is said; no director."
+    # a part opened by its name; a field changed changes its line
+    pg.click("#maker fieldset[data-part=day] > legend")
+    assert pg.is_visible('#maker [data-field="seed"]')
+    pg.fill('#maker [data-field="seed"]', "11")
+    assert "seed 11" in line("day")
+    pg.click("#btn-m-open")
+    assert pg.is_visible("#m-ships") and pg.is_visible("#m-chart")
+    pg.click("#btn-m-close")
+    assert pg.locator("#maker fieldset[data-part]:not(.folded)").count() == 0
+    # read again and saved with nothing changed: the same file, the squadron and all
+    pg.click("#btn-m-read")
+    pg.wait_for_function("window.freesailHarbour.foldLines && true")
+    pg.wait_for_function(
+        "document.querySelector('#maker [data-line=day]').textContent.indexOf('seed 7') >= 0"
+    )
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    assert (port.place / "blockade.yaml").read_bytes() == (SCENARIOS / "blockade.yaml").read_bytes()
+    # a brief written out, with examples the form has no field for: the tone changed in the
+    # form, and the examples are written again with it
+    own = port.place / "briefed.yaml"
+    own.write_text(
+        (SCENARIOS / "first-passage.yaml").read_text(encoding="utf-8")
+        + "director:\n  brief:\n    name: Mine\n    tone: quiet\n"
+        + "    limits: {nobody_dies: true, a_limit_of_mine: 3}\n"
+        + "    examples:\n      - 'ship \"Nancy\": order heave to'\n",
+        encoding="utf-8",
+    )
+    fields = pg.evaluate(
+        """async (path) => {
+            const h = window.freesailHarbour;
+            await h.readScenario(path);
+            const tone = document.querySelector('#m-brief-written [data-brief=tone]');
+            tone.value = 'a quiet passage indeed';
+            tone.dispatchEvent(new Event('input', { bubbles: true }));
+            return h.collect();
+        }""",
+        str(own),
+    )
+    brief = fields["director"]["brief"]
+    assert brief["tone"] == "a quiet passage indeed" and brief["name"] == "Mine"
+    assert brief["examples"] == ['ship "Nancy": order heave to']
+    assert brief["limits"] == {"nobody_dies": True, "a_limit_of_mine": 3}
+    assert "Mine" in line("stations")
+    assert errors == []
+
+
+def test_in_the_browser_every_ship_is_set_up_on_her_card_and_the_scenario_made_is_played(
+    browser_page,
+):
+    """Package 96b, step 5 (docs/design/Design-Harbour.md §2.4; its step's own trial): a
+    scenario made from the form with the player's cutter named and under long guns, a
+    revenue cutter under her kind's own guns and a French privateer lugger under British
+    colours, each on a card whose blanks are her kind's own words; proved, saved, and
+    started: the file says what was chosen and the game has the three ships. What the
+    game does not take is said on the card, greyed. A scenario read with what the card
+    has no plain field for (a place written as latitude and longitude) is saved the same."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option("#m-port", "falmouth")
+    fits = pg.eval_on_selector_all("#m-ship-fit option", "els => els.map(e => e.value)")
+    assert fits == ["", "carronades", "long guns", "unarmed"]
+    pg.select_option("#m-ship-fit", "long guns")
+    pg.fill('#maker [data-field="ship.name"]', "Swift")
+    pg.select_option('#maker [data-field="papers.service"]', "kings")
+    assert pg.locator("#maker fieldset[data-part=ship] p.not-yet").count() == 3
+    for kind, name, nation, colours, bearing in (
+        ("revenue cutter", "Vigilant", "britain", "", "160"),
+        ("privateer lugger", "Furet", "france", "britain", "200"),
+    ):
+        pg.click("#btn-m-ship-add")
+        card = pg.locator("#m-ships .ship-card").last
+        card.locator("[data-col=description]").select_option(kind)
+        card.locator("[data-col=name]").fill(name)
+        card.locator("[data-col=nation]").select_option(nation)
+        card.locator("[data-col=goal]").fill("bound for Plymouth")
+        assert not card.locator("[data-col=role]").is_visible()
+        card.locator("summary").click()
+        if colours:
+            card.locator("[data-col=colours]").select_option(colours)
+        card.locator(".card-bearing").fill(bearing)
+        card.locator(".card-miles").fill("6")
+        card.locator(".card-put").click()
+        assert card.locator("[data-col=position]").input_value().startswith("50 4.1 N")
+        assert card.locator("p.not-yet").count() == 3
+    first = pg.locator("#m-ships .ship-card").first
+    assert "long guns" in first.locator(".card-says").inner_text()
+    assert first.locator("[data-col=role] option").all_text_contents()[1:] == ["revenue"]
+    assert first.locator("[data-col=fit] option").first.inner_text() == "her kind's own (long guns)"
+    pg.click("#btn-m-close")
+    assert pg.inner_text('#maker [data-line="ships"]') == (
+        "Two ships: Vigilant of Britain, a revenue cutter; "
+        "Furet of France, a privateer lugger under the colours of Britain."
+    )
+    assert "Swift; her fit long guns; a King's ship" in pg.inner_text('#maker [data-line="ship"]')
+    pg.fill("#m-name", "two-cutters")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "two-cutters.yaml").read_text(encoding="utf-8"))
+    assert made["ship"]["name"] == "Swift" and made["ship"]["fit"] == "long guns"
+    assert made["papers"] == {"service": "kings"}
+    assert [(s["description"], s["name"], s.get("colours")) for s in made["ships"]] == [
+        ("revenue cutter", "Vigilant", None),
+        ("privateer lugger", "Furet", "britain"),
+    ]
+    r = pg.evaluate(
+        """async (path) => {
+            const r = await fetch('/api/harbour/start', {method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({scenario: path})});
+            return r.status;
+        }""",
+        str(port.place / "two-cutters.yaml"),
+    )
+    assert r == 200
+    with port.driver.lock:
+        world = port.driver.world
+        assert world.ship.name == "Swift"
+        assert {"Furet", "Vigilant"} <= {v.name for v in world.vessels.vessels}
+    # the tender: the Raven's place is written as latitude and longitude, which the card
+    # shows and does not change; her goal changed, the rest of her entry is as it was
+    fields = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/tender.yaml');
+            const card = document.querySelector('#m-ships .ship-card');
+            const where = card.querySelector('[data-col=position]');
+            const goal = card.querySelector('[data-col=goal]');
+            goal.value = goal.value + ' ';
+            goal.dispatchEvent(new Event('input', { bubbles: true }));
+            return {disabled: where.disabled, ships: h.collect().ships, was: h.loaded.fields.ships};
+        }"""
+    )
+    assert fields["ships"] == fields["was"]
+    assert fields["disabled"] == isinstance(fields["was"][0]["position"], dict)
+    assert errors == []
+
+
+def test_in_the_browser_a_convoy_is_built_from_an_empty_sheet_and_one_read_is_kept(
+    browser_page,
+):
+    """Package 96b, step 6 (docs/design/Design-Harbour.md §2.3; its step's own trial): a
+    convoy built from an empty sheet: a King's brig-sloop the player's, three merchant
+    brigs on their cards, and a convoy's card with its kind, its formation, the player its
+    commander and the three ticked as its members; proved, saved and started, the game has
+    the set. A squadron read from a scenario and touched without a change is written as it
+    was; a member unticked leaves it."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.click("#btn-m-new")
+    pg.click("#btn-m-open")
+    pg.select_option('#maker [data-field="ship.file"]', "data/ships/brig.yaml")
+    pg.fill("#m-lat", "49.85")
+    pg.fill("#m-lon", "-5.2")
+    pg.select_option('#maker [data-field="region"]', "channel-west")
+    pg.fill('#maker [data-field="orders"]', "")
+    for n, name in enumerate(("Nancy", "Hope", "Mary Ann")):
+        pg.click("#btn-m-ship-add")
+        card = pg.locator("#m-ships .ship-card").last
+        card.locator("[data-col=description]").select_option("merchant brig")
+        card.locator("[data-col=name]").fill(name)
+        card.locator("[data-col=nation]").select_option("britain")
+        card.locator("[data-col=goal]").fill("in company with the ship within 3 cables")
+        card.locator("summary").click()
+        card.locator("[data-col=id]").fill(name.lower().replace(" ", "-"))
+        card.locator(".card-bearing").fill(str(120 + 60 * n))
+        card.locator(".card-miles").fill("0.4")
+        card.locator(".card-put").click()
+        card.locator("[data-col=id]").dispatch_event("change")
+    pg.click("#btn-m-squadron-add")
+    sq = pg.locator("#m-squadrons .squadron-card").last
+    offered = sq.locator(".card-members input").evaluate_all("els => els.map(e => e.value)")
+    assert offered == ["the ship", "nancy", "hope", "mary-ann"]
+    assert sq.locator("[data-col=formation] option").all_text_contents()[1:] == [
+        "line ahead",
+        "line abreast",
+        "order of sailing",
+        "close order",
+    ]
+    sq.locator("[data-col=name]").fill("the Falmouth trade")
+    sq.locator("[data-col=kind]").select_option("convoy")
+    sq.locator("[data-col=formation]").select_option("order of sailing")
+    sq.locator("[data-col=commander]").select_option("the ship")
+    for member in ("nancy", "hope", "mary-ann"):
+        sq.locator(f".card-members input[value='{member}']").check()
+    pg.click("#btn-m-close")
+    assert pg.inner_text('#maker [data-line="ships"]').endswith(
+        "the Falmouth trade, a convoy in order of sailing (nancy, hope, mary-ann)."
+    )
+    pg.fill("#m-name", "a-convoy")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "a-convoy.yaml").read_text(encoding="utf-8"))
+    assert made["squadrons"] == [
+        {
+            "name": "the Falmouth trade",
+            "kind": "convoy",
+            "formation": "order of sailing",
+            "commander": "the ship",
+            "members": ["nancy", "hope", "mary-ann"],
+        }
+    ]
+    assert all("squadron" not in s for s in made["ships"])  # said once, in the squadron's entry
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "a-convoy.yaml"),
+    )
+    assert status == 200
+    with port.driver.lock:
+        sets = list(port.driver.world.squadrons.sets)
+        assert (
+            len(sets) == 1 and sets[0].kind == "convoy" and sets[0].formation == "order of sailing"
+        )
+        assert len(sets[0].members) == 4  # the commander, the player's, put first
+    # the blockade's squadron read, touched without a change, and with a member unticked
+    out = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/blockade.yaml');
+            const card = document.querySelector('#m-squadrons .squadron-card');
+            const name = card.querySelector('[data-col=name]');
+            name.dispatchEvent(new Event('input', { bubbles: true }));
+            const same = h.collect().squadrons;
+            const box = card.querySelector(".card-members input[value='nimble']");
+            box.checked = false;
+            box.dispatchEvent(new Event('change', { bubbles: true }));
+            return {same: same, was: h.loaded.fields.squadrons, less: h.collect().squadrons};
+        }"""
+    )
+    assert out["same"] == out["was"]
+    assert out["less"][0]["members"] == ["naiad"] and out["less"][0]["book"] == "blockade"
+    assert errors == []
+
+
+def test_in_the_browser_a_chronometer_and_a_supercargo_are_added_and_are_in_the_game(
+    browser_page,
+):
+    """Package 96b, step 7 (docs/design/Design-Harbour.md §2.3; the owner's point of
+    2026-10-18, "he could not add a chronometer"; its step's own trial): the merchant
+    passage read into the sheet; a chronometer added with its maker and rate, the master
+    named and his skill changed, a supercargo named Mr Pentreath added beside the muster,
+    a thing, goods in the hold, a price list more and the private signals withheld; saved
+    and started, the game has each. A scenario read and saved with the part untouched is
+    the same file."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.select_option("#m-pick", "data/scenarios/merchant-passage.yaml")
+    pg.click("#btn-m-read")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('merchant') >= 0")
+    line = pg.inner_text('#maker [data-line="papers"]')
+    assert "no chronometer" in line and "the master (skill 0.9)" in line
+    pg.click("#maker fieldset[data-part=papers] > legend")
+    assert not pg.is_visible("#m-chron-fields")
+    assert pg.locator("#m-people tbody tr").count() == 1
+    posts = pg.eval_on_selector_all("#m-posts option", "els => els.map(e => e.value)")
+    assert "master" in posts and "mate" in posts
+    pg.check("#m-chron-on")
+    pg.fill("#m-chron [data-chron=maker]", "Earnshaw")
+    pg.fill("#m-chron [data-chron=rate_s_per_day]", "1.8")
+    pg.fill("#m-chron [data-chron=drift]", "0")
+    master = pg.locator("#m-people tbody tr").first
+    master.locator("[data-col=name]").fill("Mr Tregenza")
+    master.locator("[data-col=skill]").fill("0.5")
+    pg.click("#btn-m-person-add")
+    extra = pg.locator("#m-people tbody tr").last
+    extra.locator("[data-col=role]").fill("supercargo")
+    extra.locator("[data-col=name]").fill("Mr Pentreath")
+    pg.fill("#m-things", "a sealed packet, in the captain's keeping")
+    pg.fill("#m-goods", "tin 12")
+    pg.select_option('#maker [data-field="papers.private_signals"]', "false")
+    line = pg.inner_text('#maker [data-line="papers"]')
+    assert "a chronometer by Earnshaw" in line and "no private signals" in line
+    assert "Mr Tregenza, the master (skill 0.5), Mr Pentreath, the supercargo" in line
+    assert "in the hold 12 tons of tin" in line and "one thing aboard or ashore" in line
+    pg.fill("#m-name", "with-a-chronometer")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "with-a-chronometer.yaml").read_text(encoding="utf-8"))
+    assert made["papers"]["chronometer"] == {"maker": "Earnshaw", "rate_s_per_day": 1.8, "drift": 0}
+    assert made["papers"]["private_signals"] is False
+    assert made["people"] == [
+        {"role": "master", "skill": 0.5, "name": "Mr Tregenza"},
+        {"role": "supercargo", "name": "Mr Pentreath"},
+    ]
+    assert made["cargo"]["goods"] == {"tin": 12}
+    assert made["things"] == ["a sealed packet, in the captain's keeping"]
+    said = pg.inner_text("#m-words")
+    assert "She carries a chronometer by Earnshaw" in said and "its rate right" in said
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "with-a-chronometer.yaml"),
+    )
+    assert status == 200
+    with port.driver.lock:
+        world = port.driver.world
+        assert world.scenario.chronometer["maker"] == "Earnshaw"
+        names = {p.name for p in world.people.everyone}
+        assert "Mr Pentreath" in names and "Mr Tregenza" in names
+        assert world.people.by_role("master")[0].skill == 0.5
+    # the naval cruise, whose papers have a chronometer already: the part opened and a
+    # field of another part changed leaves the papers, the people and the hold as written
+    out = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/naval-cruise.yaml');
+            const on = document.getElementById('m-chron-on').checked;
+            const maker = document.querySelector('#m-chron [data-chron=maker]');
+            maker.dispatchEvent(new Event('input', { bubbles: true }));
+            const tr = document.querySelector('#m-people tbody tr');
+            const name = tr && tr.querySelector('[data-col=name]');
+            if (name) name.dispatchEvent(new Event('input', { bubbles: true }));
+            const f = h.collect(), was = h.loaded.fields;
+            const now = JSON.stringify([f.papers, f.people, f.cargo, f.things]);
+            const then = JSON.stringify([was.papers, was.people, was.cargo, was.things]);
+            return {on: on, maker: maker.value, same: now === then};
+        }"""
+    )
+    assert out == {"on": True, "maker": "Arnold", "same": True}
     assert errors == []
 
 

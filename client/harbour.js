@@ -95,6 +95,28 @@
     var words = "";
     if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")";
     $("s-says").textContent = words;
+    scenarioSaid(path);
+  }
+  // What the game is, said before it is started (package 96b, step 3): the scenario's own
+  // lines as a driver prints them at the load, and the ships the player may be aboard.
+  var saidFor = "";
+  function scenarioSaid(path) {
+    saidFor = path;
+    show($("s-lines"), "");
+    $("s-lines").classList.remove("refusal");
+    var aboard = $("s-aboard");
+    clear(aboard);
+    option(aboard, "", "your own ship");
+    $("s-aboard-label").hidden = true;
+    if (!path) return;
+    api("GET", "/api/harbour/scenario?path=" + encodeURIComponent(path)).then(function (r) {
+      if (saidFor !== path) return; // another was chosen meanwhile
+      show($("s-lines"), r.refusal ? "This scenario does not load: " + r.refusal : r.lines.join("\n"));
+      $("s-lines").classList.toggle("refusal", !!r.refusal);
+      if ($("s-from").value !== "scenario") $("s-lines").hidden = true;
+      (r.aboard || []).forEach(function (name) { option(aboard, name, "the " + name); });
+      $("s-aboard-label").hidden = !(r.aboard || []).length || $("s-from").value !== "scenario";
+    }).catch(function () { /* the list still starts it; the start says why if it cannot */ });
   }
   function fillScenarios() {
     var keep = { s: $("s-scenario").value, m: $("m-pick").value };
@@ -188,7 +210,7 @@
     var seat = $("s-seat");
     clear(seat);
     cat.seats.forEach(function (s) {
-      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : "the " + s);
+      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : s === "director" ? "the director, above the game" : "the " + s);
     });
     var brief = $("s-brief");
     clear(brief);
@@ -286,6 +308,9 @@
     $("g-pace").textContent = g.started ? (PACES[g.pace] || g.pace) + ", " + g.compression + "x" : "";
     $("game-clock").textContent = g.started ? (g.running ? "the clock runs" : "the clock is held until the driver says go") : "";
     $("to-game").hidden = !g.started;
+    $("in-play-line").textContent = g.started
+      ? (g.title || "a ship on open water") + (g.ship ? ", " + g.ship : "") + ", " + g.stamp + "; " + g.seat
+      : "no game yet";
     var st = $("g-stations");
     clear(st);
     if (!s.stations.length) li(st, "none held", "muted");
@@ -294,6 +319,7 @@
       var said = x.holder && line.indexOf(x.holder) >= 0;
       li(st, line + (x.holder && !said ? "  [" + x.holder + (x.door ? ", " + x.door : "") + "]" : ""));
     });
+    fillSaves(s.saves);
     var gd = $("g-doors");
     clear(gd);
     if (!s.doors.length) li(gd, "none started from the harbour", "muted");
@@ -321,6 +347,29 @@
     document.querySelectorAll("#start-form .from").forEach(function (l) {
       l.hidden = !l.classList.contains("from-" + v);
     });
+    if (v === "scenario") {
+      $("s-lines").hidden = !$("s-lines").textContent;
+      $("s-aboard-label").hidden = $("s-aboard").options.length < 2;
+    }
+  });
+  // the saved games of the saves place, newest first (package 96b, step 3): picking one
+  // fills in its name; a name may still be typed (a save lying in the game's own folder)
+  var savesKey = "";
+  function fillSaves(saves) {
+    if (!saves) return;
+    var key = saves.place + "|" + saves.saves.map(function (x) { return x.name + x.written; }).join("|");
+    if (key === savesKey) return;
+    savesKey = key;
+    var pick = $("s-load-pick"), kept = pick.value;
+    clear(pick);
+    option(pick, "", saves.saves.length ? "(choose a saved game)" : "(none saved yet)");
+    saves.saves.forEach(function (x) { option(pick, x.name, x.name + "  (written " + x.written + ")"); });
+    pick.value = kept;
+    if (pick.selectedIndex < 0) pick.selectedIndex = 0;
+    $("s-load-says").textContent = "Saved games are kept in " + saves.place + ". At the game's order line, 'save NAME' writes one there. A save kept elsewhere is taken up by moving it there.";
+  }
+  $("s-load-pick").addEventListener("change", function () {
+    if ($("s-load-pick").value) $("s-load").value = $("s-load-pick").value;
   });
   $("s-scenario").addEventListener("change", scenarioSays);
   try { $("s-tests").checked = localStorage.getItem("harbour-tests") === "1"; } catch (e) { /* none */ }
@@ -342,6 +391,9 @@
       load: from === "load" ? $("s-load").value : "",
       seed: $("s-seed").value,
       seat: $("s-seat").value,
+      aboard: from === "scenario" ? $("s-aboard").value : "",
+      wind: from === "ship" ? $("s-wind").value : "",
+      heading: from === "ship" ? $("s-heading").value : "",
       time: $("s-time").value,
       pace: $("s-pace").value,
       crewed_cap: $("s-crewed-cap").value,
@@ -493,10 +545,16 @@
     if (t.hasAttribute("data-book")) markDirty("standing_orders");
     if (t.hasAttribute("data-brief")) markDirty("director");
     if (t.closest && t.closest("#m-ships")) markDirty("ships");
+    if (t.closest && t.closest("#m-squadrons")) markDirty("squadrons");
+    if (t.closest && t.closest("#m-people")) markDirty("people");
+    if (t.closest && t.closest("#m-chron")) { markDirty("papers.chronometer"); chronShown(); }
     if (t.closest && t.closest("#m-wind")) markDirty("weather");
     if (t.closest && t.closest("#m-world-orders")) markDirty("world_orders");
   });
   $("maker").addEventListener("input", function (ev) {
+    if (ev.target.closest && ev.target.closest("#m-people")) markDirty("people");
+    if (ev.target.closest && ev.target.closest("#m-chron")) markDirty("papers.chronometer");
+    if (ev.target.closest && ev.target.closest("#m-squadrons")) markDirty("squadrons");
     var t = ev.target;
     if (t.hasAttribute("data-brief")) markDirty("director");
     if (t.closest && t.closest("#m-ships")) markDirty("ships");
@@ -535,22 +593,412 @@
     tr.appendChild(td);
   }
 
-  var SHIP_COLS = [
-    ["id", "text"], ["description", "select", "descriptions"], ["name", "text"],
-    ["nation", "select", "nations"], ["position", "text"], ["goal", "text"],
-    ["colours", "select", ["shown", "none"]],
+  // -- the ship's card (package 96b, step 5; docs/design/Design-Harbour.md §2.4) ---------
+  //
+  // One card for every ship. Another ship's is here: its head is what she is, her name,
+  // her nation, her fit and what she is about; the rest is behind "more about her". The
+  // card fills its blanks from her kind's own words (the catalogue's `kinds` and `fits`)
+  // and invents nothing; what the game does not take for another ship is said, greyed.
+  // A key of her entry the card has no field for, or whose value is not plain words, is
+  // kept as the file has it.
+
+  function kindOf(id) { return (cat.kinds || []).filter(function (k) { return k.id === id; })[0]; }
+  function fitsOf(file) { return (cat.fits || {})[file] || { fits: [], "default": "" }; }
+  function setOptions(sel, pairs, value) {
+    clear(sel);
+    pairs.forEach(function (p) { option(sel, p[0], p[1]); });
+    var v = value === undefined || value === null ? "" : String(value);
+    if (v !== "" && !pairs.some(function (p) { return p[0] === v; })) option(sel, v, v + "  (as written; not one of hers)");
+    sel.value = v;
+  }
+  function fitPairs(file, own) {
+    var f = fitsOf(file);
+    var pairs = [["", own || (f["default"] ? "her file's own (" + f["default"] + ")" : "her file's own")]];
+    f.fits.forEach(function (n) { pairs.push([n, n]); });
+    if (f.fits.indexOf("unarmed") < 0) pairs.push(["unarmed", "unarmed"]);
+    return pairs;
+  }
+  function fillShipFit(file, value) { setOptions($("m-ship-fit"), fitPairs(file), value); }
+  function degMin(v, pos, neg) {
+    var a = Math.abs(v), d = Math.floor(a), m = Math.round((a - d) * 600) / 10;
+    if (m >= 60) { d += 1; m = 0; }
+    return d + " " + m + " " + (v >= 0 ? pos : neg);
+  }
+  function positionWords(lat, lon) { return degMin(lat, "N", "S") + " " + degMin(lon, "E", "W"); }
+
+  var SHIP_HEAD = [
+    ["description", "What she is", "kinds"], ["name", "Her name", "text"], ["nation", "Her nation", "nations"],
+    ["fit", "Her fit of guns", "fit"], ["goal", "What she is about (her goal)", "text", "trading Falmouth to Plymouth; patrolling off the Lizard; bound for Brest"],
   ];
+  var SHIP_MORE = [
+    ["id", "Her id (for the orders and the squadrons)", "text"],
+    ["position", "Where she lies", "text", "49 50 N 5 30 W, or a place of the chart"],
+    ["role", "Her role", "role"],
+    ["colours", "Her colours at the start", "colours"],
+    ["intent", "A captain of her own, sailing her by this intent", "text", "trade tin from Falmouth to Brest"],
+    ["free_intent", "Or a goal in any words, for a model who is to command her", "text"],
+    ["squadron", "Her squadron (its id)", "text"],
+    ["under_the_orders_of", "Whose signals she obeys", "text", "the ship (yours), or another's name"],
+    ["lights", "Her lights at night", "lights"],
+    ["departing", "The port she is leaving", "ports"],
+    ["sailing_factor", "How well she sails (1 is her kind's own)", "number"],
+    ["letter", "A letter she carries for you", "text"],
+    ["regime", "Laid up", "regime"],
+    ["sortie", "When she is to come out, if laid up", "text"],
+  ];
+  function cardField(card, box, spec) {
+    var col = spec[0], kind = spec[2], value = card._item[col];
+    var l = document.createElement("label");
+    l.appendChild(document.createTextNode(spec[1] + " "));
+    var el;
+    if (kind === "text" || kind === "number") {
+      el = document.createElement("input");
+      el.type = kind === "number" ? "number" : "text";
+      if (kind === "number") { el.step = "any"; el.setAttribute("data-kind", "number"); }
+      if (spec[3]) el.placeholder = spec[3];
+      el.value = value === undefined || value === null ? "" : String(value);
+    } else {
+      el = document.createElement("select");
+      var pairs = [["", ""]];
+      if (kind === "kinds") (cat.kinds || []).forEach(function (k) { pairs.push([k.id, k.id]); });
+      else if (kind === "nations") cat.nations.forEach(function (n) { pairs.push([n, nationWords(n)]); });
+      else if (kind === "colours") {
+        pairs = [["", "shown (her own)"], ["shown", "shown (her own)"], ["none", "none shown"]];
+        cat.nations.forEach(function (n) { pairs.push([n, "false colours: " + nationWords(n)]); });
+      } else if (kind === "lights") pairs = pairs.concat([["none", "none"], ["stern lantern", "a stern lantern"], ["top lights", "top lights"], ["a lantern at her nets", "a lantern at her nets"]]);
+      else if (kind === "ports") cat.ports.forEach(function (x) { pairs.push([x.id, x.name]); });
+      else if (kind === "regime") pairs.push(["in ordinary", "in ordinary (laid up at the port she lies off)"]);
+      setOptions(el, pairs, value);
+    }
+    if (value !== null && typeof value === "object") {
+      // a value that is not plain words (a place as latitude and longitude, a letter with
+      // its origin): kept as the file has it, shown and not changed here
+      el.disabled = true;
+      if (el.tagName === "INPUT") { el.value = ""; el.placeholder = "written out in the file; kept as it is"; }
+    }
+    el.setAttribute("data-col", col);
+    l.appendChild(el);
+    box.appendChild(l);
+    return el;
+  }
+  function shipCardKind(card) {
+    var kind = kindOf(card.querySelector('[data-col="description"]').value);
+    var fit = card.querySelector('[data-col="fit"]'), role = card.querySelector('[data-col="role"]');
+    setOptions(fit, fitPairs(kind ? kind.file : "", kind && kind.fit ? "her kind's own (" + kind.fit + ")" : "her kind's own"), fit._kept !== undefined ? fit._kept : fit.value);
+    var roles = [["", kind && kind.roles.length ? "by what she is about (" + kind.roles.join(", ") + ")" : "her file gives her kind no role"]];
+    (kind ? kind.roles : []).forEach(function (r) { roles.push([r, r]); });
+    setOptions(role, roles, role._kept !== undefined ? role._kept : role.value);
+    delete fit._kept; delete role._kept;
+    var says = card.querySelector(".card-says");
+    says.textContent = kind ? cap(kind.what) + ", " + kind.rig + (kind.fit ? "; as that she carries " + kind.fit : "") + (kind.roles.length ? "; she may be " + kind.roles.join(", ") : "") + "." : "Choose what she is.";
+  }
   function shipRow(item) {
+    var card = document.createElement("div");
+    card.className = "ship-card";
+    card._item = item || {};
+    var head = document.createElement("div");
+    head.className = "card-grid";
+    card.appendChild(head);
+    SHIP_HEAD.forEach(function (s) {
+      var el = cardField(card, head, s[2] === "fit" ? [s[0], s[1], "select"] : s);
+      if (s[2] === "fit") el._kept = card._item.fit === undefined ? "" : card._item.fit;
+    });
+    var says = document.createElement("p");
+    says.className = "card-says";
+    card.appendChild(says);
+    var more = document.createElement("details");
+    more.className = "more";
+    var sum = document.createElement("summary");
+    sum.textContent = "more about her";
+    more.appendChild(sum);
+    var grid = document.createElement("div");
+    grid.className = "card-grid";
+    more.appendChild(grid);
+    SHIP_MORE.forEach(function (s) {
+      var el = cardField(card, grid, s[2] === "role" ? [s[0], s[1], "select"] : s);
+      if (s[2] === "role") el._kept = card._item.role === undefined ? "" : card._item.role;
+    });
+    // where she lies: by a port's road, or by a bearing and distance from your own ship
+    var place = document.createElement("div");
+    place.className = "card-place";
+    place.innerHTML = '<span>Put her</span> <select class="card-port"></select> <span>or</span> <input type="number" class="card-bearing" min="0" max="360" step="any" placeholder="bearing from you"> <input type="number" class="card-miles" min="0" step="any" placeholder="miles"> <button type="button" class="card-put">there</button>';
+    more.appendChild(place);
+    var port = place.querySelector(".card-port");
+    option(port, "", "(at a port's road)");
+    cat.ports.forEach(function (x) { option(port, x.id, x.name + ": " + x.road); });
+    var where = grid.querySelector('[data-col="position"]');
+    port.addEventListener("change", function () {
+      var x = cat.ports.filter(function (y) { return y.id === port.value; })[0];
+      if (!x || where.disabled) return;
+      where.value = positionWords(x.lat_deg, x.lon_deg);
+      markDirty("ships"); foldLines();
+    });
+    place.querySelector(".card-put").addEventListener("click", function () {
+      var lat = parseFloat($("m-lat").value), lon = parseFloat($("m-lon").value);
+      var brg = parseFloat(place.querySelector(".card-bearing").value), nm = parseFloat(place.querySelector(".card-miles").value);
+      if (!isFinite(lat) || !isFinite(lon) || !isFinite(brg) || !isFinite(nm) || where.disabled) return;
+      var rad = brg * Math.PI / 180;
+      var lat2 = lat + nm * Math.cos(rad) / 60;
+      var lon2 = lon + nm * Math.sin(rad) / (60 * Math.cos((lat + lat2) / 2 * Math.PI / 180));
+      where.value = positionWords(lat2, lon2);
+      markDirty("ships"); foldLines();
+    });
+    ["Her heading at the start: the game does not take this for another ship; she heads for the first mark of her goal.",
+     "Her people, her company and her cargo: the game does not yet take these for another ship; she is mustered from her file when she comes close.",
+     "Who holds a station aboard her: not written in a scenario yet; a door is started for her on the doors tab once the game is in play."].forEach(function (w) {
+      var p = document.createElement("p");
+      p.className = "not-yet";
+      p.textContent = w;
+      more.appendChild(p);
+    });
+    card.appendChild(more);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "card-remove";
+    b.textContent = "take her out";
+    b.addEventListener("click", function () { card.parentNode.removeChild(card); markDirty("ships"); foldLines(); });
+    card.appendChild(b);
+    card.querySelector('[data-col="description"]').addEventListener("change", function () { shipCardKind(card); });
+    $("m-ships").appendChild(card);
+    shipCardKind(card);
+  }
+  function shipsOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-ships .ship-card"), function (card) {
+      var item = deep(card._item) || {};
+      card.querySelectorAll("[data-col]").forEach(function (el) {
+        if (el.disabled) return;
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = card._item[k];
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had; // as it was, a number a number
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
+  }
+  // -- a squadron's card (package 96b, step 6; docs/design/Design-Harbour.md §2.3) -------
+  //
+  // A squadron or a convoy is a set of the scenario's ships, the player's among them if he
+  // likes: its name, its kind, its formation, its commander and its members ticked from
+  // the ships; the rest behind "more". The members are written in the squadron's own entry
+  // (`squadrons: members`), by each ship's id (her name where she has none) and the
+  // player's ship by the game's own words for her.
+
+  function shipChoices() {
+    var me = (cat.squadrons || {}).player || "the ship";
+    var out = [[me, "your own ship"]];
+    document.querySelectorAll("#m-ships .ship-card").forEach(function (card) {
+      var id = card.querySelector('[data-col="id"]').value.trim(), name = card.querySelector('[data-col="name"]').value.trim();
+      var key = id || name;
+      if (key) out.push([key, name || id]);
+    });
+    return out;
+  }
+  function squadronChoices(card) {
+    var choices = shipChoices();
+    var known = choices.map(function (c) { return c[0]; });
+    var cmd = card.querySelector('[data-col="commander"]');
+    setOptions(cmd, [["", "your own ship (when none is said)"]].concat(choices), cmd._kept !== undefined ? cmd._kept : cmd.value);
+    delete cmd._kept;
+    var box = card.querySelector(".card-members");
+    var ticked = card._members !== undefined ? card._members : Array.prototype.map.call(box.querySelectorAll("input:checked"), function (c) { return c.value; });
+    delete card._members;
+    clear(box);
+    ticked.forEach(function (m) { if (known.indexOf(m) < 0) choices.push([m, m + " (as written; no ship above)"]); });
+    choices.forEach(function (c) {
+      var l = document.createElement("label");
+      l.className = "check";
+      var x = document.createElement("input");
+      x.type = "checkbox";
+      x.value = c[0];
+      x.checked = ticked.indexOf(c[0]) >= 0;
+      l.appendChild(x);
+      l.appendChild(document.createTextNode(" " + c[1]));
+      box.appendChild(l);
+    });
+  }
+  var SQUADRON_HEAD = [["name", "Its name", "text", "the inshore squadron"], ["kind", "A squadron or a convoy", "kinds"], ["formation", "Its formation", "formations"], ["commander", "Its commander", "commander"]];
+  var SQUADRON_MORE = [
+    ["id", "Its id (for the orders)", "text"], ["interval_cables", "The interval between ships (cables)", "number"],
+    ["columns", "Columns (the order of sailing)", "number"], ["rendezvous", "Its rendezvous", "text", "Torbay"],
+    ["goal", "What it is about, when not its commander's own intent", "text"], ["book", "The book it sails by", "books"],
+    ["regime", "Its regime", "text", "in convoy"],
+  ];
+  function squadronField(card, box, spec) {
+    var col = spec[0], kind = spec[2], value = card._item[col], el;
+    var l = document.createElement("label");
+    l.appendChild(document.createTextNode(spec[1] + " "));
+    if (kind === "text" || kind === "number") {
+      el = document.createElement("input");
+      el.type = kind === "number" ? "number" : "text";
+      if (kind === "number") { el.step = "any"; el.setAttribute("data-kind", "number"); }
+      if (spec[3]) el.placeholder = spec[3];
+      el.value = value === undefined || value === null ? "" : String(value);
+    } else {
+      el = document.createElement("select");
+      var sq = cat.squadrons || { kinds: [], formations: [], books: [] };
+      var pairs = [["", kind === "kinds" ? "a squadron, or a convoy if it has merchantmen" : kind === "formations" ? "line ahead (a convoy: the order of sailing)" : kind === "books" ? "its kind's own" : ""]];
+      if (kind === "kinds") sq.kinds.forEach(function (k) { pairs.push([k, "a " + k]); });
+      else if (kind === "formations") sq.formations.forEach(function (k) { pairs.push([k, k]); });
+      else if (kind === "books") sq.books.forEach(function (k) { pairs.push([k, "the " + k + " book"]); });
+      if (kind === "commander") el._kept = value === undefined || value === null ? "" : String(value);
+      else setOptions(el, pairs, value);
+    }
+    el.setAttribute("data-col", col);
+    l.appendChild(el);
+    box.appendChild(l);
+    return el;
+  }
+  function squadronRow(item) {
+    var card = document.createElement("div");
+    card.className = "ship-card squadron-card";
+    card._item = item || {};
+    card._members = Array.isArray(card._item.members) ? card._item.members.map(String) : [];
+    var head = document.createElement("div");
+    head.className = "card-grid";
+    card.appendChild(head);
+    SQUADRON_HEAD.forEach(function (s) { squadronField(card, head, s); });
+    var mem = document.createElement("fieldset");
+    mem.className = "checks card-members-box";
+    var lg = document.createElement("legend");
+    lg.textContent = "Its members";
+    mem.appendChild(lg);
+    var box = document.createElement("div");
+    box.className = "card-members";
+    mem.appendChild(box);
+    card.appendChild(mem);
+    var more = document.createElement("details");
+    more.className = "more";
+    var sum = document.createElement("summary");
+    sum.textContent = "more about it";
+    more.appendChild(sum);
+    var grid = document.createElement("div");
+    grid.className = "card-grid";
+    more.appendChild(grid);
+    SQUADRON_MORE.forEach(function (s) { squadronField(card, grid, s); });
+    card.appendChild(more);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "card-remove";
+    b.textContent = "take it out";
+    b.addEventListener("click", function () { card.parentNode.removeChild(card); markDirty("squadrons"); foldLines(); });
+    card.appendChild(b);
+    $("m-squadrons").appendChild(card);
+    squadronChoices(card);
+  }
+  function refreshSquadrons() { document.querySelectorAll("#m-squadrons .squadron-card").forEach(squadronChoices); }
+  function squadronsOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-squadrons .squadron-card"), function (card) {
+      var item = deep(card._item) || {};
+      card.querySelectorAll("[data-col]").forEach(function (el) {
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = card._item[k];
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      var ticked = Array.prototype.map.call(card.querySelectorAll(".card-members input:checked"), function (c) { return c.value; });
+      var had = Array.isArray(card._item.members) ? card._item.members.map(String) : [];
+      var same = had.length === ticked.length && had.every(function (m) { return ticked.indexOf(m) >= 0; });
+      if (same) { if (card._item.members !== undefined) item.members = card._item.members; } // as written, in its order
+      else if (ticked.length) item.members = had.filter(function (m) { return ticked.indexOf(m) >= 0; }).concat(ticked.filter(function (m) { return had.indexOf(m) < 0; }));
+      else delete item.members;
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
+  }
+  $("btn-m-squadron-add").addEventListener("click", function () { squadronRow({}); markDirty("squadrons"); });
+  // the ships named above are the squadrons' choices: a ship added, renamed or taken out
+  $("m-ships").addEventListener("change", refreshSquadrons);
+  $("m-ships").addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON") setTimeout(refreshSquadrons, 0); });
+  $("btn-m-ship-add").addEventListener("click", function () { setTimeout(refreshSquadrons, 0); });
+
+  // -- her papers, her purse and her people (package 96b, step 7; the design's §2.3) -----
+
+  function goodsWords(goods) {
+    return Object.keys(goods || {}).map(function (g) { return g + " " + goods[g]; }).join(", ");
+  }
+  function goodsOf(text) {
+    // "tin 20, pilchards 4.5": each a good and its tons; undefined where none is said,
+    // null where a part cannot be read (the field is then left as the file has it)
+    var out = {}, parts = text.split(",").map(function (s) { return s.trim(); }).filter(Boolean), bad = false;
+    parts.forEach(function (part) {
+      var m = /^(.*\S)\s+(-?\d+(?:\.\d+)?)$/.exec(part);
+      if (!m) { bad = true; return; }
+      out[m[1].trim()] = Number(m[2]);
+    });
+    return bad ? null : parts.length ? out : undefined;
+  }
+  function chronShown() { $("m-chron-fields").hidden = !$("m-chron-on").checked; }
+  function fillChron(fields) {
+    var onShip = getPath(fields, "ship.chronometer") || fields.chronometer;
+    var c = getPath(fields, "papers.chronometer");
+    var locked = !!onShip;
+    $("m-chron-on").checked = !!(c || onShip);
+    $("m-chron-on").disabled = locked;
+    document.querySelectorAll("#m-chron [data-chron]").forEach(function (el) {
+      var v = (c || onShip || {})[el.getAttribute("data-chron")];
+      el.value = v === undefined || v === null ? "" : String(v);
+      el.disabled = locked;
+    });
+    $("m-chron")._item = c && typeof c === "object" ? c : {};
+    $("m-chron-said").textContent = locked ? "Her chronometer is written on the ship's own line of the file, which wins: kept as it is." : "";
+    chronShown();
+  }
+  function chronOf() {
+    if (!$("m-chron-on").checked) return undefined;
+    var item = deep($("m-chron")._item) || {};
+    document.querySelectorAll("#m-chron [data-chron]").forEach(function (el) {
+      var k = el.getAttribute("data-chron"), v = el.value.trim(), had = $("m-chron")._item[k];
+      if (v === "") delete item[k];
+      else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+      else item[k] = el.hasAttribute("data-num") || (k === "drift" && v.toLowerCase() !== "seeded" && isFinite(Number(v))) ? Number(v) : v;
+    });
+    if (!item.maker) item.maker = "the chronometer";
+    return item;
+  }
+  var PEOPLE_COLS = [["role", "text"], ["name", "text"], ["skill", "number"], ["place", "text"], ["ashore", "select", ["yes"]], ["port", "select", "ports"]];
+  function personRow(item) {
     var tr = document.createElement("tr");
     tr._item = item || {};
-    SHIP_COLS.forEach(function (c) {
-      var opts = typeof c[2] === "string" ? cat[c[2]] : c[2];
-      var el = cell(tr, tr._item[c[0]], c[1], opts);
+    PEOPLE_COLS.forEach(function (c) {
+      var opts = c[2] === "ports" ? cat.ports.map(function (x) { return x.id; }) : c[2];
+      var value = tr._item[c[0]];
+      if (c[0] === "ashore") value = value ? "yes" : undefined;
+      var el = cell(tr, value, c[1], opts);
       el.setAttribute("data-col", c[0]);
+      el.setAttribute("data-kind", c[1]);
+      if (c[0] === "role") { el.setAttribute("list", "m-posts"); el.placeholder = "master, supercargo"; }
+      if (c[0] === "skill") { el.min = "0"; el.max = "1"; el.placeholder = "0.7"; }
+      if (c[0] === "place") el.placeholder = "cabin";
     });
-    removeButton(tr, "ships");
-    $("m-ships").querySelector("tbody").appendChild(tr);
+    removeButton(tr, "people");
+    $("m-people").querySelector("tbody").appendChild(tr);
   }
+  function peopleOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-people tbody tr"), function (tr) {
+      var item = deep(tr._item) || {};
+      tr.querySelectorAll("[data-col]").forEach(function (el) {
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = tr._item[k];
+        if (k === "ashore") { if (v === "yes") item.ashore = had === undefined || !had ? true : had; else delete item.ashore; return; }
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
+  }
+  function fillPosts(file) {
+    var list = $("m-posts");
+    clear(list);
+    ((cat.posts || {})[file] || []).forEach(function (r) { option(list, r); });
+  }
+  $("btn-m-person-add").addEventListener("click", function () { personRow({}); markDirty("people"); });
+  function fillThings(things) {
+    var el = $("m-things"), list = Array.isArray(things) ? things : [];
+    var plain = list.every(function (x) { return typeof x === "string"; });
+    el.disabled = !plain;
+    el.value = plain ? list.join("\n") : "";
+    el.placeholder = plain ? "a sealed packet, in the captain's keeping" : "written out in the file (a thing with its name, where and description apart): kept as it is";
+  }
+
   var WIND_COLS = [["at", "text"], ["from_deg", "number"], ["knots", "number"], ["air_mass", "select", ["neutral", "warm", "unstable"]]];
   function windRow(item) {
     var tr = document.createElement("tr");
@@ -574,6 +1022,10 @@
     $("m-world-orders").querySelector("tbody").appendChild(tr);
   }
   $("btn-m-ship-add").addEventListener("click", function () { shipRow({}); markDirty("ships"); });
+  $("maker").querySelector('[data-field="ship.file"]').addEventListener("change", function (ev) {
+    fillPosts(ev.target.value);
+    fillShipFit(ev.target.value, $("m-ship-fit").value);
+  });
   $("btn-m-wind-add").addEventListener("click", function () { windRow({}); markDirty("weather"); setWeatherMode("pinned"); });
   $("btn-m-order-add").addEventListener("click", function () { orderRow({}); markDirty("world_orders"); });
 
@@ -636,6 +1088,12 @@
   /** The form's fields from a scenario's (`fields`, as the server read them). */
   function fillForm(fields, positionDeg) {
     dirty = {};
+    fillShipFit(getPath(fields, "ship.file"), getPath(fields, "ship.fit"));
+    fillPosts(getPath(fields, "ship.file"));
+    fillChron(fields);
+    fillThings(fields.things);
+    clear($("m-people").querySelector("tbody"));
+    (Array.isArray(fields.people) ? fields.people : []).forEach(personRow);
     document.querySelectorAll("#maker [data-field]").forEach(function (el) {
       var kind = el.getAttribute("data-kind");
       var path = el.getAttribute("data-field");
@@ -648,6 +1106,8 @@
       else if (kind === "business") el.value = v === true || v === "on" ? "on" : v === false || v === "off" ? "off" : v === undefined ? "" : String(v);
       else if (kind === "lines") el.value = Array.isArray(v) ? v.join("\n") : "";
       else if (kind === "csv") el.value = Array.isArray(v) ? v.join(", ") : v && typeof v === "object" ? "" : "";
+      else if (kind === "tri") el.value = v === true ? "true" : v === false ? "false" : "";
+      else if (kind === "goods") el.value = goodsWords(v);
     });
     var ports = fields.ports;
     $("maker").querySelector('[data-field="ports"]').disabled = !!(ports && !Array.isArray(ports));
@@ -668,8 +1128,10 @@
     }
     $("m-weather-said").textContent = systems ? "systems written by hand (" + w.systems.length + "), kept as written" : w === undefined ? "none said" : "";
     // the other sail, the world orders
-    clear($("m-ships").querySelector("tbody"));
+    clear($("m-ships"));
     (fields.ships || []).forEach(shipRow);
+    clear($("m-squadrons"));
+    (Array.isArray(fields.squadrons) ? fields.squadrons : []).forEach(squadronRow);
     clear($("m-world-orders").querySelector("tbody"));
     (fields.world_orders || []).forEach(orderRow);
     // the books, the stations, the director
@@ -690,7 +1152,132 @@
     else { $("m-brief-named").value = String(brief); briefMode("named"); }
     dirty = {};
     drawChart();
+    foldLines();
   }
+
+  // -- the sheet folded (package 96b, step 4; docs/design/Design-Harbour.md §2.3) --------
+  //
+  // Each part of the scenario is a line when closed, written from the fields as the form
+  // would write them now, so that the whole scenario reads without a part opened; a part's
+  // name opens and closes it.
+
+  function plural(n, one, many) {
+    var words = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    return (n >= 0 && n <= 10 ? words[n] : String(n)) + " " + (n === 1 ? one : many);
+  }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function nationWords(id) { return String(id).split("-").map(cap).join(" "); }
+  function stem(path) { return String(path || "").split(/[\\/]/).pop().replace(/\.(yaml|yml|orders)$/, ""); }
+  function whenWords(start) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(String(start || ""));
+    if (!m) return start ? String(start) : "";
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return Number(m[3]) + " " + months[Number(m[2]) - 1] + " " + m[1] + (m[4] ? ", " + m[4] + ":" + m[5] : "");
+  }
+  function lineOf(part, f) {
+    var bits = [], ship = f.ship && typeof f.ship === "object" ? f.ship : null;
+    if (part === "day") {
+      bits.push(f.name ? '"' + f.name + '"' : "No name yet");
+      bits.push(f.start ? whenWords(f.start) : "the game's own first day (1 June 1805, 04:00)");
+      if (f.seed !== undefined) bits.push("seed " + f.seed);
+      if (f.nation) bits.push("of " + nationWords(f.nation));
+      if (f.follows_history === true) bits.push("the world keeps to the course of history");
+      if (f.knowledge === "all") bits.push("everyone knows everything (for testing)");
+    } else if (part === "ship") {
+      if (!ship) bits.push(typeof f.ship === "string" || (f.director === "observe") ? "No ship of your own: the world is watched from the director's station" : "No ship file chosen: a point on the sea");
+      else {
+        bits.push((ship.file ? "The " + stem(ship.file) : "No ship file chosen") + (ship.name ? " " + ship.name : ""));
+        bits.push(ship.fit ? "her fit " + ship.fit : "her file's own fit of guns");
+        if (f.papers && f.papers.service) bits.push({ kings: "a King's ship", privateer: "a privateer", merchant: "a merchantman" }[f.papers.service] || "in service as " + f.papers.service);
+        bits.push(ship.glass ? "a glass aboard" : "no glass");
+        bits.push((ship.instrument || f.instrument || "octant") === "sextant" ? "a sextant" : "an octant");
+      }
+    } else if (part === "start") {
+      var lat = $("m-lat").value, lon = $("m-lon").value;
+      if (lat !== "" && lon !== "") bits.push(Math.abs(Number(lat)).toFixed(2) + "° " + (Number(lat) >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(2) + "° " + (Number(lon) >= 0 ? "E" : "W"));
+      else bits.push("No place on a chart: the endless plane");
+      if (f.chart || f.region) bits.push("on the chart of " + (f.chart || f.region));
+      if (ship && ship.heading_deg !== undefined) bits.push("heading " + ship.heading_deg + "°");
+      if (ship && ship.speed_kn) bits.push(ship.speed_kn + " knots on her");
+    } else if (part === "papers") {
+      var cargo = f.cargo || {}, papers = f.papers || {};
+      bits.push("Purse £" + (cargo.purse_pounds || 0));
+      var goods = Object.keys(cargo.goods || {});
+      if (goods.length) bits.push("in the hold " + goods.map(function (g) { return cargo.goods[g] + " tons of " + g; }).join(", "));
+      var chron = (ship && ship.chronometer) || f.chronometer || papers.chronometer;
+      bits.push(chron ? "a chronometer" + (chron.maker ? " by " + chron.maker : "") : "no chronometer");
+      var ep = (ship && ship.epitome) || f.epitome || papers.epitome;
+      if (ep) bits.push(cap(String(ep)) + "'s epitome");
+      if ((papers.price_lists || []).length) bits.push("the price lists of " + papers.price_lists.join(", "));
+      if (papers.private_signals !== undefined) bits.push(papers.private_signals ? "the private signals carried" : "no private signals");
+      if ((papers.signal_books || []).length) bits.push("the signal books of " + papers.signal_books.join(", "));
+      var people = f.people || [];
+      bits.push(people.length ? "people said: " + people.map(function (x) { return (x.name ? x.name + ", " : "") + "the " + x.role + (x.skill !== undefined ? " (skill " + x.skill + ")" : "") + (x.ashore ? ", ashore" + (x.port ? " at " + x.port : "") : ""); }).join(", ") : "her people as her wardroom has them");
+      if ((f.things || []).length) bits.push(plural(f.things.length, "thing", "things") + " aboard or ashore");
+    } else if (part === "weather") {
+      var w = f.weather, wind = f.wind || {};
+      var pinned = Array.isArray(w) ? w : w && Array.isArray(w.wind) ? w.wind : [];
+      var systems = w && !Array.isArray(w) && Array.isArray(w.systems) ? w.systems : [];
+      if (pinned.length) bits.push("The wind pinned by the hour, " + plural(pinned.length, "waypoint", "waypoints") + ", from " + pinned[0].from_deg + "° at " + pinned[0].knots + " knots");
+      if (systems.length) bits.push(plural(systems.length, "weather system", "weather systems") + " written out (" + systems.map(function (x) { return x.name || x.kind || "a system"; }).join(", ") + ")");
+      if (w && !Array.isArray(w) && w.climatology) bits.push("the month's own weather");
+      if (!pinned.length && !systems.length && !(w && !Array.isArray(w) && w.climatology)) bits.push("One fixed wind, from " + (wind.from_deg !== undefined ? wind.from_deg : 225) + "° at " + (wind.knots !== undefined ? wind.knots : 15) + " knots");
+      if (w && !Array.isArray(w) && w.sky) bits.push("the sky pinned");
+      if (f.weather_bound) bits.push("held to the season's bounds");
+      if (f.current && f.current.knots) bits.push("a current of " + f.current.knots + " knots");
+    } else if (part === "ships") {
+      var ships = f.ships || [], sets = f.squadrons || [];
+      if (!ships.length) bits.push("None");
+      else bits.push(cap(plural(ships.length, "ship", "ships")) + ": " + ships.map(function (x) {
+        var flag = x.colours && ["shown", "none", "yes", "no", "true", "false", "hidden"].indexOf(String(x.colours)) < 0 ? " under the colours of " + nationWords(x.colours) : "";
+        return (x.name || x.id || x.description) + (x.nation ? " of " + nationWords(x.nation) : "") + (x.description ? ", a " + x.description : "") + (x.fit ? " (" + x.fit + ")" : "") + flag;
+      }).join("; "));
+      if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : "") + ((x.members || []).length ? " (" + x.members.join(", ") + ")" : ""); }).join("; "));
+    } else if (part === "sea") {
+      var ports = f.ports;
+      if (ports === undefined) bits.push("Every port of the chart");
+      else { var ids = Array.isArray(ports) ? ports : Object.keys(ports); bits.push(cap(plural(ids.length, "port", "ports")) + (ids.length ? ": " + ids.join(", ") : "")); }
+      bits.push(f.business === undefined || f.business === false || f.business === "off" || f.business === 0 ? "no traffic of the sea's own" : "the sea's traffic " + (f.business === true || f.business === "on" ? "on" : "at " + f.business));
+      if (f.crewed) bits.push("crewed ships: " + (f.crewed.cap !== undefined ? f.crewed.cap : "three") + " at once within " + (f.crewed.range_nm !== undefined ? f.crewed.range_nm : "four") + " miles");
+      if ((f.world_orders || []).length) bits.push(plural(f.world_orders.length, "world order", "world orders") + " by the clock");
+    } else if (part === "orders") {
+      var books = (f.standing_orders || []).map(stem);
+      bits.push(books.length ? "The " + books.join(" and the ") + " book" + (books.length > 1 ? "s" : "") : "No book of standing orders");
+      if ($("m-book").value.trim()) bits.push("a book drafted here");
+      var orders = f.orders || [];
+      bits.push(orders.length ? (orders.length === 1 ? "first order: " + orders[0] : plural(orders.length, "first order", "first orders") + ", the first: " + orders[0]) : "no first orders");
+      if (f.intent) bits.push("intent: " + f.intent);
+    } else if (part === "stations") {
+      var st = f.stations || {}, who = Object.keys(st);
+      bits.push(who.length ? who.map(function (k) { return "the " + k + ": " + (st[k] === "player" ? "you" : st[k] === "model" ? "a model" : "the game's own"); }).join(", ") : "You are the captain; nobody else is said");
+      var d = f.director, brief = d && typeof d === "object" ? d.brief : undefined;
+      if (d === "observe" || (d && d.observe)) bits.push("the world observed");
+      bits.push(brief === undefined || brief === null ? "no director" : "a director on the brief " + (typeof brief === "object" ? '"' + (brief.name || "written here") + '"' : brief));
+      if (d && typeof d === "object" && (d.models || []).length) bits.push("the director may seat " + plural(d.models.length, "model", "models"));
+    }
+    return cap(bits.join("; ")) + ".";
+  }
+  function foldLines() {
+    if (!cat) return;
+    var f;
+    try { f = collect(); } catch (e) { return; }
+    document.querySelectorAll("#maker [data-line]").forEach(function (p) {
+      p.textContent = lineOf(p.getAttribute("data-line"), f);
+    });
+  }
+  harbour.foldLines = foldLines;
+  function fold(fs, folded) {
+    fs.classList.toggle("folded", folded);
+    if (!folded && fs.getAttribute("data-part") === "start") drawChart();
+  }
+  document.querySelectorAll("#maker fieldset[data-part] > legend").forEach(function (lg) {
+    lg.addEventListener("click", function () { fold(lg.parentNode, !lg.parentNode.classList.contains("folded")); });
+  });
+  $("btn-m-open").addEventListener("click", function () { document.querySelectorAll("#maker fieldset[data-part]").forEach(function (fs) { fold(fs, false); }); });
+  $("btn-m-close").addEventListener("click", function () { document.querySelectorAll("#maker fieldset[data-part]").forEach(function (fs) { fold(fs, true); }); });
+  $("maker").addEventListener("input", foldLines);
+  $("maker").addEventListener("change", foldLines);
+  $("maker").addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON" || ev.target.tagName === "CANVAS") setTimeout(foldLines, 0); });
 
   function valueOf(el) {
     var kind = el.getAttribute("data-kind");
@@ -707,6 +1294,7 @@
       var items = el.value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
       return items.length ? items : undefined;
     }
+    if (kind === "tri") return el.value === "true" ? true : el.value === "false" ? false : undefined;
     return undefined;
   }
 
@@ -719,7 +1307,7 @@
     document.querySelectorAll("#maker [data-field]").forEach(function (el) {
       var path = el.getAttribute("data-field");
       var kind = el.getAttribute("data-kind");
-      if (["text", "number", "select", "bool", "business", "lines", "csv"].indexOf(kind) < 0) return;
+      if (["text", "number", "select", "bool", "business", "lines", "csv", "tri"].indexOf(kind) < 0) return;
       if (!on(path) || el.disabled) return;
       var v = valueOf(el);
       if (kind === "bool" && all && !v) v = undefined;
@@ -742,8 +1330,29 @@
       } else if (all) delete f.weather;
     }
     if (on("ships")) {
-      var ships = rowsOf("m-ships", false);
+      var ships = shipsOf();
       if (ships.length) f.ships = ships; else delete f.ships;
+    }
+    if (on("cargo.goods")) {
+      var goods = goodsOf($("m-goods").value);
+      if (goods === undefined) delPath(f, "cargo.goods");
+      else if (goods !== null) setPath(f, "cargo.goods", goods);
+    }
+    if (on("papers.chronometer") && !$("m-chron-on").disabled) {
+      var chron = chronOf();
+      if (chron === undefined) delPath(f, "papers.chronometer"); else setPath(f, "papers.chronometer", chron);
+    }
+    if (on("people")) {
+      var people = peopleOf();
+      if (people.length) f.people = people; else delete f.people;
+    }
+    if (on("things") && !$("m-things").disabled) {
+      var things = $("m-things").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+      if (things.length) f.things = things; else delete f.things;
+    }
+    if (on("squadrons")) {
+      var sets = squadronsOf();
+      if (sets.length) f.squadrons = sets; else delete f.squadrons;
     }
     if (on("world_orders")) {
       var orders = rowsOf("m-world-orders", false);
@@ -764,7 +1373,26 @@
       var d = f.director && typeof f.director === "object" ? f.director : {};
       if (mode2 === "starter") d.brief = $("m-brief-starter").value;
       else if (mode2 === "named") d.brief = $("m-brief-named").value.trim();
-      else if (mode2 === "written") d.brief = writtenBrief();
+      else if (mode2 === "written") {
+        // the form shows a brief's name, tone, challenge, limits, cadence and budget: what
+        // else the brief read holds (its examples, a limit the form has no field for) is
+        // kept as it was, so that touching the form drops nothing it does not show
+        var prev = d.brief && typeof d.brief === "object" ? deep(d.brief) : {};
+        var now = writtenBrief();
+        ["name", "tone", "challenge", "cadence"].forEach(function (k) { delete prev[k]; });
+        ["limits", "budget"].forEach(function (k) {
+          var shown = {};
+          document.querySelectorAll('#m-brief-written [data-brief^="' + k + '."]').forEach(function (el) { shown[el.getAttribute("data-brief").split(".")[1]] = true; });
+          var rest = {};
+          Object.keys(prev[k] && typeof prev[k] === "object" ? prev[k] : {}).forEach(function (x) { if (!shown[x]) rest[x] = prev[k][x]; });
+          delete prev[k];
+          var merged = now[k] || {};
+          Object.keys(rest).forEach(function (x) { merged[x] = rest[x]; });
+          if (Object.keys(merged).length) now[k] = merged;
+        });
+        Object.keys(prev).forEach(function (k) { now[k] = prev[k]; });
+        d.brief = now;
+      }
       else delete d.brief;
       if (Object.keys(d).length && (d.brief === undefined || d.brief !== "")) f.director = d; else delete f.director;
     }
@@ -788,6 +1416,14 @@
   }
   harbour.readScenario = readScenario;
 
+  // "change this scenario" on the game tab: the scenario chosen there, read into the sheet
+  $("btn-s-change").addEventListener("click", function () {
+    var path = $("s-scenario").value;
+    if (!path) return;
+    $("m-pick").value = path;
+    tab("maker");
+    readScenario(path).catch(function (e) { show($("m-refusal"), e.message); });
+  });
   $("btn-m-read").addEventListener("click", function () {
     readScenario($("m-pick").value).catch(function (e) { show($("m-refusal"), e.message); });
   });
@@ -970,8 +1606,12 @@
     var t = null;
     try { t = sessionStorage.getItem("harbour-tab"); } catch (e) { /* none */ }
     if (t) tab(t);
-    harbour.ready = true;
-    poll();
+    // the game's state read once before the page says it is ready, so that what it shows
+    // of the game in play is true from the first moment
+    return api("GET", "/api/harbour/state").then(onState).catch(function () {}).then(function () {
+      harbour.ready = true;
+      setTimeout(poll, 1500);
+    });
   }).catch(function (e) {
     $("status").textContent = "the harbour could not be read: " + e.message;
     $("status").className = "bad";
