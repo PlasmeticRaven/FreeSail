@@ -37771,3 +37771,19 @@ by the explicit loosing, `fire as they bear` (answered `guns.mode`), the rest as
 figure of the truth unchanged (three fired, one struck, the merchantman striking, the Indiaman
 holding). The word's firing the first gun ready and not a whole side is older than part D and
 the fight's design: listed for the owner by the lead; `combat/guns.py` untouched.
+
+## The four gate pins with package 115 D joined to package 75, measured by the lead at the merge (2026-11-15)
+
+Package 115's part D and package 75 both move the recorded whole logs, and neither builder could measure the two together. The lead joined them on a scratch tree and measured there (the cloud's runs 112 and 116; the logs dumped line by line on the tree with package 75 alone and on the joined tree, and compared).
+
+| Pin | With 75 alone | Joined | Lines | What part D changes on top |
+|---|---|---|---|---|
+| `GATE_5B_SCHOONER_DIGEST` | b5f35676ef8183d0 | be166d89d06a1992 | 766 both | 8 lines: three refusals of the starter book become the book's fitting and one order entered; the master works the noon where he stands |
+| `GATE_5C_CRUISE_DIGEST` | 81b0b08a63bf068e | bdd6ce8a97a33140 | 2,242 both | 30 lines: the words of a standing order held |
+| `GATE_5C_MERCHANT_DIGEST` (and truth 77) | ad35e60bf5d3737d | 16272dee77120779 | 3,103 to 3,096 | 11 lines: the master's two; five calls and two reports no longer sent twice |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | 2cc02c95ad794bc8 | f47f7bc0daabc950 | 3,115 to 3,108 | the same 11 |
+
+In each, the lines part D changes on the joined tree are the lines it changes alone, kind for kind and count for count (its independent reader had passed those by reading every line, with the hourly positions identical). `GATE_5B_SCHOONER_LINES` is 766 on the joined tree, as on the trunk: part D's own 769 was its count before its own mend took the fitted night routine out of the schooner's book, and its builder measured 766 independently afterwards.
+
+Each constant carries the three values beside it: the trunk's before, with 75 alone, and joined. The lead measured; neither builder moved or passed them.
+
