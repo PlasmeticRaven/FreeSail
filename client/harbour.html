@@ -191,10 +191,17 @@
       </fieldset>
       <fieldset data-part="ship" class="folded"><legend>Your ship</legend>
         <p class="fold-line wide" data-line="ship"></p>
-        <label>Ship file <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
+        <label title="her class: the ship's file she is built from">What she is <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
+        <label title="her name; empty: her file's own">Her name <input data-field="ship.name" data-kind="text" type="text" placeholder="her file's own"></label>
+        <label title="the guns she carries: one of her file's fits; empty: her file's own">Her fit of guns <select id="m-ship-fit" data-field="ship.fit" data-kind="select"></select></label>
+        <label title="what service she is in; empty: by her captain and her file (a King's ship's or a merchantman's)">Her service <select data-field="papers.service" data-kind="select"><option value=""></option><option value="kings">a King's ship</option><option value="privateer">a privateer</option><option value="merchant">a merchantman</option></select></label>
         <label>Heading <input data-field="ship.heading_deg" data-kind="number" type="number" step="any"></label>
+        <label title="her speed through the water at the start, in knots; empty: none">Speed (knots) <input data-field="ship.speed_kn" data-kind="number" type="number" step="any" min="0"></label>
         <label class="check"><input data-field="ship.glass" data-kind="bool" type="checkbox"> she carries a glass</label>
         <label>Instrument <select data-field="ship.instrument" data-kind="select"><option value=""></option><option>octant</option><option>sextant</option></select></label>
+        <p class="not-yet wide">Her role (a cruiser, a packet, a commodore): the game does not yet take this for your own ship; her service above is what it takes.</p>
+        <p class="not-yet wide">Her colours at the start (none shown, or another nation's): the game does not yet take this for your own ship; she shows her own, and the orders in play change them.</p>
+        <p class="not-yet wide">Her company (how many, how good): the game does not yet take this; she is mustered from her file. Her officers' names and skill are in "her papers, her purse and her people".</p>
       </fieldset>
       <fieldset data-part="start" class="folded"><legend>The start</legend>
         <p class="fold-line wide" data-line="start"></p>
@@ -224,10 +231,8 @@
       </fieldset>
       <fieldset data-part="ships" class="folded"><legend>The other ships</legend>
         <p class="fold-line wide" data-line="ships"></p>
-        <table class="rows wide" id="m-ships" data-field="ships" data-kind="ships">
-          <thead><tr><th>id</th><th>description</th><th>name</th><th>nation</th><th>position</th><th>intent (goal)</th><th>colours</th><th></th></tr></thead><tbody></tbody>
-        </table>
-        <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another sail</button></div>
+        <div class="wide ship-cards" id="m-ships" data-field="ships" data-kind="ships"></div>
+        <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another ship</button></div>
       </fieldset>
       <fieldset data-part="sea" class="folded"><legend>The sea about her</legend>
         <p class="fold-line wide" data-line="sea"></p>

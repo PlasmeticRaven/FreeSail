@@ -587,21 +587,187 @@
     tr.appendChild(td);
   }
 
-  var SHIP_COLS = [
-    ["id", "text"], ["description", "select", "descriptions"], ["name", "text"],
-    ["nation", "select", "nations"], ["position", "text"], ["goal", "text"],
-    ["colours", "select", ["shown", "none"]],
+  // -- the ship's card (package 96b, step 5; docs/design/Design-Harbour.md §2.4) ---------
+  //
+  // One card for every ship. Another ship's is here: its head is what she is, her name,
+  // her nation, her fit and what she is about; the rest is behind "more about her". The
+  // card fills its blanks from her kind's own words (the catalogue's `kinds` and `fits`)
+  // and invents nothing; what the game does not take for another ship is said, greyed.
+  // A key of her entry the card has no field for, or whose value is not plain words, is
+  // kept as the file has it.
+
+  function kindOf(id) { return (cat.kinds || []).filter(function (k) { return k.id === id; })[0]; }
+  function fitsOf(file) { return (cat.fits || {})[file] || { fits: [], "default": "" }; }
+  function setOptions(sel, pairs, value) {
+    clear(sel);
+    pairs.forEach(function (p) { option(sel, p[0], p[1]); });
+    var v = value === undefined || value === null ? "" : String(value);
+    if (v !== "" && !pairs.some(function (p) { return p[0] === v; })) option(sel, v, v + "  (as written; not one of hers)");
+    sel.value = v;
+  }
+  function fitPairs(file, own) {
+    var f = fitsOf(file);
+    var pairs = [["", own || (f["default"] ? "her file's own (" + f["default"] + ")" : "her file's own")]];
+    f.fits.forEach(function (n) { pairs.push([n, n]); });
+    if (f.fits.indexOf("unarmed") < 0) pairs.push(["unarmed", "unarmed"]);
+    return pairs;
+  }
+  function fillShipFit(file, value) { setOptions($("m-ship-fit"), fitPairs(file), value); }
+  function degMin(v, pos, neg) {
+    var a = Math.abs(v), d = Math.floor(a), m = Math.round((a - d) * 600) / 10;
+    if (m >= 60) { d += 1; m = 0; }
+    return d + " " + m + " " + (v >= 0 ? pos : neg);
+  }
+  function positionWords(lat, lon) { return degMin(lat, "N", "S") + " " + degMin(lon, "E", "W"); }
+
+  var SHIP_HEAD = [
+    ["description", "What she is", "kinds"], ["name", "Her name", "text"], ["nation", "Her nation", "nations"],
+    ["fit", "Her fit of guns", "fit"], ["goal", "What she is about (her goal)", "text", "trading Falmouth to Plymouth; patrolling off the Lizard; bound for Brest"],
   ];
+  var SHIP_MORE = [
+    ["id", "Her id (for the orders and the squadrons)", "text"],
+    ["position", "Where she lies", "text", "49 50 N 5 30 W, or a place of the chart"],
+    ["role", "Her role", "role"],
+    ["colours", "Her colours at the start", "colours"],
+    ["intent", "A captain of her own, sailing her by this intent", "text", "trade tin from Falmouth to Brest"],
+    ["free_intent", "Or a goal in any words, for a model who is to command her", "text"],
+    ["squadron", "Her squadron (its id)", "text"],
+    ["under_the_orders_of", "Whose signals she obeys", "text", "the ship (yours), or another's name"],
+    ["lights", "Her lights at night", "lights"],
+    ["departing", "The port she is leaving", "ports"],
+    ["sailing_factor", "How well she sails (1 is her kind's own)", "number"],
+    ["letter", "A letter she carries for you", "text"],
+    ["regime", "Laid up", "regime"],
+    ["sortie", "When she is to come out, if laid up", "text"],
+  ];
+  function cardField(card, box, spec) {
+    var col = spec[0], kind = spec[2], value = card._item[col];
+    var l = document.createElement("label");
+    l.appendChild(document.createTextNode(spec[1] + " "));
+    var el;
+    if (kind === "text" || kind === "number") {
+      el = document.createElement("input");
+      el.type = kind === "number" ? "number" : "text";
+      if (kind === "number") { el.step = "any"; el.setAttribute("data-kind", "number"); }
+      if (spec[3]) el.placeholder = spec[3];
+      el.value = value === undefined || value === null ? "" : String(value);
+    } else {
+      el = document.createElement("select");
+      var pairs = [["", ""]];
+      if (kind === "kinds") (cat.kinds || []).forEach(function (k) { pairs.push([k.id, k.id]); });
+      else if (kind === "nations") cat.nations.forEach(function (n) { pairs.push([n, nationWords(n)]); });
+      else if (kind === "colours") {
+        pairs = [["", "shown (her own)"], ["shown", "shown (her own)"], ["none", "none shown"]];
+        cat.nations.forEach(function (n) { pairs.push([n, "false colours: " + nationWords(n)]); });
+      } else if (kind === "lights") pairs = pairs.concat([["none", "none"], ["stern lantern", "a stern lantern"], ["top lights", "top lights"], ["a lantern at her nets", "a lantern at her nets"]]);
+      else if (kind === "ports") cat.ports.forEach(function (x) { pairs.push([x.id, x.name]); });
+      else if (kind === "regime") pairs.push(["in ordinary", "in ordinary (laid up at the port she lies off)"]);
+      setOptions(el, pairs, value);
+    }
+    if (value !== null && typeof value === "object") {
+      // a value that is not plain words (a place as latitude and longitude, a letter with
+      // its origin): kept as the file has it, shown and not changed here
+      el.disabled = true;
+      if (el.tagName === "INPUT") { el.value = ""; el.placeholder = "written out in the file; kept as it is"; }
+    }
+    el.setAttribute("data-col", col);
+    l.appendChild(el);
+    box.appendChild(l);
+    return el;
+  }
+  function shipCardKind(card) {
+    var kind = kindOf(card.querySelector('[data-col="description"]').value);
+    var fit = card.querySelector('[data-col="fit"]'), role = card.querySelector('[data-col="role"]');
+    setOptions(fit, fitPairs(kind ? kind.file : "", kind && kind.fit ? "her kind's own (" + kind.fit + ")" : "her kind's own"), fit._kept !== undefined ? fit._kept : fit.value);
+    var roles = [["", kind && kind.roles.length ? "by what she is about (" + kind.roles.join(", ") + ")" : "her file gives her kind no role"]];
+    (kind ? kind.roles : []).forEach(function (r) { roles.push([r, r]); });
+    setOptions(role, roles, role._kept !== undefined ? role._kept : role.value);
+    delete fit._kept; delete role._kept;
+    var says = card.querySelector(".card-says");
+    says.textContent = kind ? cap(kind.what) + ", " + kind.rig + (kind.fit ? "; as that she carries " + kind.fit : "") + (kind.roles.length ? "; she may be " + kind.roles.join(", ") : "") + "." : "Choose what she is.";
+  }
   function shipRow(item) {
-    var tr = document.createElement("tr");
-    tr._item = item || {};
-    SHIP_COLS.forEach(function (c) {
-      var opts = typeof c[2] === "string" ? cat[c[2]] : c[2];
-      var el = cell(tr, tr._item[c[0]], c[1], opts);
-      el.setAttribute("data-col", c[0]);
+    var card = document.createElement("div");
+    card.className = "ship-card";
+    card._item = item || {};
+    var head = document.createElement("div");
+    head.className = "card-grid";
+    card.appendChild(head);
+    SHIP_HEAD.forEach(function (s) {
+      var el = cardField(card, head, s[2] === "fit" ? [s[0], s[1], "select"] : s);
+      if (s[2] === "fit") el._kept = card._item.fit === undefined ? "" : card._item.fit;
     });
-    removeButton(tr, "ships");
-    $("m-ships").querySelector("tbody").appendChild(tr);
+    var says = document.createElement("p");
+    says.className = "card-says";
+    card.appendChild(says);
+    var more = document.createElement("details");
+    more.className = "more";
+    var sum = document.createElement("summary");
+    sum.textContent = "more about her";
+    more.appendChild(sum);
+    var grid = document.createElement("div");
+    grid.className = "card-grid";
+    more.appendChild(grid);
+    SHIP_MORE.forEach(function (s) {
+      var el = cardField(card, grid, s[2] === "role" ? [s[0], s[1], "select"] : s);
+      if (s[2] === "role") el._kept = card._item.role === undefined ? "" : card._item.role;
+    });
+    // where she lies: by a port's road, or by a bearing and distance from your own ship
+    var place = document.createElement("div");
+    place.className = "card-place";
+    place.innerHTML = '<span>Put her</span> <select class="card-port"></select> <span>or</span> <input type="number" class="card-bearing" min="0" max="360" step="any" placeholder="bearing from you"> <input type="number" class="card-miles" min="0" step="any" placeholder="miles"> <button type="button" class="card-put">there</button>';
+    more.appendChild(place);
+    var port = place.querySelector(".card-port");
+    option(port, "", "(at a port's road)");
+    cat.ports.forEach(function (x) { option(port, x.id, x.name + ": " + x.road); });
+    var where = grid.querySelector('[data-col="position"]');
+    port.addEventListener("change", function () {
+      var x = cat.ports.filter(function (y) { return y.id === port.value; })[0];
+      if (!x || where.disabled) return;
+      where.value = positionWords(x.lat_deg, x.lon_deg);
+      markDirty("ships"); foldLines();
+    });
+    place.querySelector(".card-put").addEventListener("click", function () {
+      var lat = parseFloat($("m-lat").value), lon = parseFloat($("m-lon").value);
+      var brg = parseFloat(place.querySelector(".card-bearing").value), nm = parseFloat(place.querySelector(".card-miles").value);
+      if (!isFinite(lat) || !isFinite(lon) || !isFinite(brg) || !isFinite(nm) || where.disabled) return;
+      var rad = brg * Math.PI / 180;
+      var lat2 = lat + nm * Math.cos(rad) / 60;
+      var lon2 = lon + nm * Math.sin(rad) / (60 * Math.cos((lat + lat2) / 2 * Math.PI / 180));
+      where.value = positionWords(lat2, lon2);
+      markDirty("ships"); foldLines();
+    });
+    ["Her heading at the start: the game does not take this for another ship; she heads for the first mark of her goal.",
+     "Her people, her company and her cargo: the game does not yet take these for another ship; she is mustered from her file when she comes close.",
+     "Who holds a station aboard her: not written in a scenario yet; a door is started for her on the doors tab once the game is in play."].forEach(function (w) {
+      var p = document.createElement("p");
+      p.className = "not-yet";
+      p.textContent = w;
+      more.appendChild(p);
+    });
+    card.appendChild(more);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "card-remove";
+    b.textContent = "take her out";
+    b.addEventListener("click", function () { card.parentNode.removeChild(card); markDirty("ships"); foldLines(); });
+    card.appendChild(b);
+    card.querySelector('[data-col="description"]').addEventListener("change", function () { shipCardKind(card); });
+    $("m-ships").appendChild(card);
+    shipCardKind(card);
+  }
+  function shipsOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-ships .ship-card"), function (card) {
+      var item = deep(card._item) || {};
+      card.querySelectorAll("[data-col]").forEach(function (el) {
+        if (el.disabled) return;
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = card._item[k];
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had; // as it was, a number a number
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
   }
   var WIND_COLS = [["at", "text"], ["from_deg", "number"], ["knots", "number"], ["air_mass", "select", ["neutral", "warm", "unstable"]]];
   function windRow(item) {
@@ -626,6 +792,9 @@
     $("m-world-orders").querySelector("tbody").appendChild(tr);
   }
   $("btn-m-ship-add").addEventListener("click", function () { shipRow({}); markDirty("ships"); });
+  $("maker").querySelector('[data-field="ship.file"]').addEventListener("change", function (ev) {
+    fillShipFit(ev.target.value, $("m-ship-fit").value);
+  });
   $("btn-m-wind-add").addEventListener("click", function () { windRow({}); markDirty("weather"); setWeatherMode("pinned"); });
   $("btn-m-order-add").addEventListener("click", function () { orderRow({}); markDirty("world_orders"); });
 
@@ -688,6 +857,7 @@
   /** The form's fields from a scenario's (`fields`, as the server read them). */
   function fillForm(fields, positionDeg) {
     dirty = {};
+    fillShipFit(getPath(fields, "ship.file"), getPath(fields, "ship.fit"));
     document.querySelectorAll("#maker [data-field]").forEach(function (el) {
       var kind = el.getAttribute("data-kind");
       var path = el.getAttribute("data-field");
@@ -720,7 +890,7 @@
     }
     $("m-weather-said").textContent = systems ? "systems written by hand (" + w.systems.length + "), kept as written" : w === undefined ? "none said" : "";
     // the other sail, the world orders
-    clear($("m-ships").querySelector("tbody"));
+    clear($("m-ships"));
     (fields.ships || []).forEach(shipRow);
     clear($("m-world-orders").querySelector("tbody"));
     (fields.world_orders || []).forEach(orderRow);
@@ -778,6 +948,7 @@
       else {
         bits.push((ship.file ? "The " + stem(ship.file) : "No ship file chosen") + (ship.name ? " " + ship.name : ""));
         bits.push(ship.fit ? "her fit " + ship.fit : "her file's own fit of guns");
+        if (f.papers && f.papers.service) bits.push({ kings: "a King's ship", privateer: "a privateer", merchant: "a merchantman" }[f.papers.service] || "in service as " + f.papers.service);
         bits.push(ship.glass ? "a glass aboard" : "no glass");
         bits.push((ship.instrument || f.instrument || "octant") === "sextant" ? "a sextant" : "an octant");
       }
@@ -798,7 +969,6 @@
       var ep = (ship && ship.epitome) || f.epitome || papers.epitome;
       if (ep) bits.push(cap(String(ep)) + "'s epitome");
       if ((papers.price_lists || []).length) bits.push("the price lists of " + papers.price_lists.join(", "));
-      if (papers.service) bits.push("in service as " + papers.service);
       if (papers.private_signals !== undefined) bits.push(papers.private_signals ? "the private signals carried" : "no private signals");
       if ((papers.signal_books || []).length) bits.push("the signal books of " + papers.signal_books.join(", "));
       var people = f.people || [];
@@ -818,7 +988,10 @@
     } else if (part === "ships") {
       var ships = f.ships || [], sets = f.squadrons || [];
       if (!ships.length) bits.push("None");
-      else bits.push(cap(plural(ships.length, "ship", "ships")) + ": " + ships.map(function (x) { return (x.name || x.id || x.description) + (x.nation ? " of " + nationWords(x.nation) : ""); }).join(", "));
+      else bits.push(cap(plural(ships.length, "ship", "ships")) + ": " + ships.map(function (x) {
+        var flag = x.colours && ["shown", "none", "yes", "no", "true", "false", "hidden"].indexOf(String(x.colours)) < 0 ? " under the colours of " + nationWords(x.colours) : "";
+        return (x.name || x.id || x.description) + (x.nation ? " of " + nationWords(x.nation) : "") + (x.description ? ", a " + x.description : "") + (x.fit ? " (" + x.fit + ")" : "") + flag;
+      }).join("; "));
       if (sets.length) bits.push(sets.map(function (x) { return (x.name || x.id) + (x.kind === "convoy" ? ", a convoy" : ", a squadron") + (x.formation ? " in " + x.formation : ""); }).join("; "));
     } else if (part === "sea") {
       var ports = f.ports;
@@ -916,7 +1089,7 @@
       } else if (all) delete f.weather;
     }
     if (on("ships")) {
-      var ships = rowsOf("m-ships", false);
+      var ships = shipsOf();
       if (ships.length) f.ships = ships; else delete f.ships;
     }
     if (on("world_orders")) {

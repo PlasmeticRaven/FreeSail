@@ -367,6 +367,9 @@ class Harbour:
         on_tend = getattr(driver, "on_tend", None)
         if callable(on_tend):
             on_tend(self.tend_seats)
+        # the ships' fits are read from their files, two seconds of reading for the
+        # seventeen: begun here, so that the page's first catalogue seldom waits for it
+        threading.Thread(target=self.fits, daemon=True).start()
 
     def _taken_up(self, old: Any, new: Any) -> None:
         """A new game in place: the seats' doors are the new World's to ask for."""
@@ -446,6 +449,8 @@ class Harbour:
             "briefs": briefs,
             "books": books,
             "descriptions": list(DESCRIPTIONS),
+            "kinds": self.kinds(),
+            "fits": self.fits(),
             "nations": list(load_nations().nations),
             "regions": self.regions(),
             "ports": self.ports(),
@@ -592,6 +597,94 @@ class Harbour:
             for shelf in every
             if shelf["id"] in used
         ]
+
+    # -- the ships' kinds, fits and roles (package 96b, step 5) -------------------------
+
+    _kinds: list[dict[str, Any]] | None = None
+    _fits: dict[str, dict[str, Any]] | None = None
+    _fits_lock = threading.Lock()
+
+    def kinds(self) -> list[dict[str, Any]]:
+        """What another ship may be (`world.ships.DESCRIPTIONS`), each with her ship file,
+        her rig and what she is in the file's words, the fit she carries as that kind and
+        the roles her file gives her (package 75; "" and [] where the file gives none): the
+        ship's card fills its blanks from these and invents nothing."""
+        if Harbour._kinds is None:
+            from freesail.world.ships import DESCRIPTIONS, description
+
+            out = []
+            for key in DESCRIPTIONS:
+                d = description(key)
+                out.append(
+                    {
+                        "id": key,
+                        "file": str(d.get("file") or ""),
+                        "rig": str(d.get("rig") or ""),
+                        "what": str(d.get("what") or ""),
+                        "fit": str(d.get("fit") or ""),
+                        "roles": [str(r) for r in d.get("roles") or []],
+                    }
+                )
+            Harbour._kinds = out
+        return Harbour._kinds
+
+    def fits(self) -> dict[str, dict[str, Any]]:
+        """Each ship file's fits of guns by name and the one she carries when none is said
+        (`armament.fits`, `armament.default`; a file with no armament has none): what the
+        player's `ship.fit` and another ship's `fit` may be. Read once (the ships' files
+        are long)."""
+        with Harbour._fits_lock:
+            if Harbour._fits is not None:
+                return Harbour._fits
+            from freesail.ship.loader import load_spec
+
+            out: dict[str, dict[str, Any]] = {}
+            for p in sorted(SHIPS_DIR.glob("*.yaml")):
+                if _is_boat(p):
+                    continue
+                names: list[str] = []
+                default = ""
+                with contextlib.suppress(Exception):  # a file that does not load has none
+                    armament = load_spec(_rel(p)).armament
+                    if armament is not None:
+                        names = [str(n) for n in armament.fits]
+                        default = str(armament.default or "")
+                out[_rel(p)] = {"fits": names, "default": default}
+            Harbour._fits = out
+        return Harbour._fits
+
+    def ship_warnings(self, fields: dict[str, Any]) -> list[str]:
+        """What the loader takes of the other ships and the game would refuse or pass over
+        later, said at the proof (the design's traps 4 and 5): a fit her kind's file has
+        not (refused only when she is promoted to a full crew), and a heading (read by
+        nothing: she heads for her first mark)."""
+        from freesail.ship.schema import UNARMED
+        from freesail.world.ships import description, description_key
+
+        out: list[str] = []
+        fits = self.fits()
+        ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+        for s in ships:
+            if not isinstance(s, dict):
+                continue
+            name = str(s.get("name") or s.get("id") or s.get("description") or "a ship")
+            key = description_key(str(s.get("description") or s.get("kind") or ""))
+            fit = " ".join(str(s.get("fit") or "").split())
+            if key is not None and fit and fit != UNARMED:
+                known = fits.get(str(description(key).get("file") or ""), {}).get("fits") or []
+                if fit not in known:
+                    has = ", ".join(known) if known else "none"
+                    out.append(
+                        f"  To know: {name}'s fit '{fit}' is none of her file's ({has}, or "
+                        f"{UNARMED}); the game takes it now and refuses her when she comes "
+                        "close and is given her full crew."
+                    )
+            if s.get("heading_deg") is not None:
+                out.append(
+                    f"  To know: {name}'s heading is read by nothing; another ship heads for "
+                    "the first mark of her goal."
+                )
+        return out
 
     def regions(self) -> list[dict[str, Any]]:
         from freesail.world.chart import load_manifest
@@ -1293,7 +1386,7 @@ class Harbour:
             lines = [
                 self._in_their_words(ln.replace(str(p), "this scenario"), said)
                 for ln in sf.lines() + guard_lines(world)
-            ]
+            ] + self.ship_warnings(fields)
         return {"text": text, "lines": lines}
 
     def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
