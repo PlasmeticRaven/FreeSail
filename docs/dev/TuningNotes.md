@@ -36294,3 +36294,23 @@ Cited and not held, as the helper found them: Lempriere 1800 (nations.yaml); Oma
 (barcelona.yaml); Mahan and the 1799 day book (the squadrons' books); Winfield (nine ship
 files) and Lavery (22 data files); Troude; Lloyd's Register; "the encyclopaedia" in 21
 feature files; Trinity House's pages; Whewell 1833; Tomlins and Raithby's Statutes.
+
+## Package 75's eight pins, re-measured by the lead at the merge (2026-11-15)
+
+Package 75's words (every work named as an order names it; the sails by their plain names) change lines of eight recorded logs. The ships session cannot measure them (the whole logs do not reproduce on its Windows machine), so the lead measured them on the build machine: the staged tree run whole on the cloud (run 105, then run 107 at the merged hash), and each log dumped line by line on the trunk and on the staged tree and compared (`Log.digest()`'s own canonical lines).
+
+| Pin | Lines | Old | New | What differs |
+|---|---|---|---|---|
+| `GATE_5B_SCHOONER_DIGEST` | 766 | 3a1698037811b753 | b5f35676ef8183d0 | 52 lines, wording only |
+| `GATE_5C_CRUISE_DIGEST` | 2,242 | 1e7f8ab24b84e6f7 | 81b0b08a63bf068e | wording only |
+| `GATE_5C_MERCHANT_DIGEST` (and truth 77) | 3,103 | 40bcef34afd0cec4 | ad35e60bf5d3737d | 153 lines, wording only |
+| `GATE_6A_INTENT` | 2,079 | 9d9efe6b21c17060 | 5d3cbbc5f4d33b84 | wording only |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | 3,115 | c0bf4b51621ad91f | 2cc02c95ad794bc8 | 153 lines, wording only |
+| `TRIAL_STATION_GALE` | 1,722 | 04f2fcd0fe9023a4 | b12065ef819367b3 | wording only |
+| `TRIAL_TRADE_THICK` | 426 | cfa538b19cb0d2fe | 506bf46eaa6d66fe | wording only |
+| the privateer trial | 1,594 | aa04702e062bc64b | 48c8948f87088a76 | wording, and three lines |
+
+"Wording only" means: with the known changes of words put back (fore sail to foresail, main sail to mainsail, the log and the lead named as orders name them, lie a-try, cast loose the guns, make the signal, the spanker and the gaff topsail by their plain names), no line differs, at the same tick and of the same kind. The privateer trial's three lines are `make all sail` on the schooner no longer answering "'set the square sail': 'set' was understood, but 'square' belongs with 'brace'", which the lead's ruling (6) of 10 November meant gone. No line count moves. The item sent back (a mark that changes hands) moves none of them: the eight pass on the merged tree.
+
+The one who moved the words (the ships session) did not measure or pass the pins; the lead measured them, and the two independent readers of the hash passed the changes of wording they rest on.
+
