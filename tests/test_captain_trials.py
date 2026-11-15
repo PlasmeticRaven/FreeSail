@@ -82,7 +82,10 @@ TRIAL_STATION_STRANGER_LINES = 788  # package 84 step 6 (787 at 71; 756 at 56, t
 # package 75, SW-4: the brig-sloop made out "ten ports a side" (RMG ZAZ4491, read), where the
 # words had sixteen; every tick and line the same, proved by bisection (the word put back gives
 # d56963daf49d566a again; docs/dev/TuningNotes.md, SW-4)
-TRIAL_STATION_STRANGER_DIGEST = "c1d54413006885aa"  # SW-4 (d56963daf49d566a at 84 step 6)
+# package 75, the trim's words by the alias: the trim's reply names each sail by its file's
+# first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
+# the same, proved by bisection (the base head 93a15ee5 gives c1d54413006885aa; TuningNotes)
+TRIAL_STATION_STRANGER_DIGEST = "d1a7b668bec784ff"  # the trim's words (c1d54413006885aa at SW-4)
 
 
 @pytest.fixture(scope="module")
@@ -167,7 +170,9 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # package 58b: 864 lines and 4cb58e9ec1ab55c0, aground at 41415; the tree before it
 # (872aa61) gives 857 and cefe2cf5136fb4d9, aground at 44332 (the pin was stale before 58b)
 TRIAL_STATION_GALE_LINES = 1722  # package 88 (1014 on c168c51, aground 42394; 909 at 57)
-TRIAL_STATION_GALE_DIGEST = "04f2fcd0fe9023a4"  # package 88 (93274bb5f658a34f on c168c51)
+# 75's words, passed by the lead by its lines (04f2fcd0fe9023a4 before); package 88
+# (93274bb5f658a34f on c168c51)
+TRIAL_STATION_GALE_DIGEST = "b12065ef819367b3"
 
 
 @pytest.fixture(scope="module")
@@ -368,7 +373,9 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # "sixteen", the word served from brig.yaml's own descriptions; the one word put back gives
     # the old digest again, the states, the anchored ticks and the lines unmoved (the lead, on
     # the build machine, 2026-11-07)
-    "aa04702e062bc64b"  # package 76, item 8 (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
+    # 75's words, passed by the lead by its lines (aa04702e062bc64b before); package 76, item 8
+    # (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
+    "48c8948f87088a76"
     # 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
 )
 
@@ -440,7 +447,9 @@ TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
 # 14775 and was not yet brought up: the noon's longitude by account in its data moves in
 # the fifth decimal (-5.03015 to -5.03016); the old rule restored gives the old digest
 # package 68, riding: 3c2b220e06496db5 (ce964d9f346034de)
-TRIAL_TRADE_THICK_DIGEST = "cfa538b19cb0d2fe"  # package 58b (3c2b220e06496db5 at 68)
+# 75's words, passed by the lead by its lines (cfa538b19cb0d2fe before); package 58b
+# (3c2b220e06496db5 at 68)
+TRIAL_TRADE_THICK_DIGEST = "506bf46eaa6d66fe"
 
 
 @pytest.fixture(scope="module")

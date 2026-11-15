@@ -2160,7 +2160,8 @@ PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | st
         OFF_FALMOUTH,
         "belay heave the lead",
         _orders("heave the lead"),
-        took(("work.belayed",), ("Belayed heaving lead",)),
+        # the work by its name (the lead's (C8) of 2026-11-14; old "Belayed heaving lead")
+        took(("work.belayed",), ("Belayed heaving the lead",)),
     ),
     (
         "cutter",
@@ -2168,7 +2169,7 @@ PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | st
         OFF_FALMOUTH,
         "avast heave lead",
         _orders("heave the lead"),
-        took(("work.belayed",), ("Belayed heaving lead",)),
+        took(("work.belayed",), ("Belayed heaving the lead",)),
     ),
     ("cutter", "17:41", OFF_FALMOUTH, "tack ship", _reaching, still(("She is not close-hauled",))),
     # -- playtest 13, the brig (refused-brig.md: eighteen) -------------------------------
@@ -2675,11 +2676,13 @@ def test_two_bargains_in_one_order_are_two():
         ("frigate", "keep her close hauled", ok(kind="helm.order", text=["full and by"])),
         ("frigate", "bring her up", ok(kind="helm.order", text=["come up a point"])),
         ("frigate", "bring her up two points", ok(kind="helm.order", text=["two points"])),
-        # the sheets of a group of sails
+        # the sheets of a group of sails, each by the file's first plain alias, the cutter's
+        # fore staysail her "foresail" (package 75, the trim's words by the alias; old "the
+        # fore staysail")
         (
             "cutter",
             "trim the headsail sheets",
-            ok(kind="sail.trimmed", text=["The sheets of the fore staysail and the jib"]),
+            ok(kind="sail.trimmed", text=["The sheets of the foresail and the jib"]),
         ),
         # a headsail backed by its sheet, hauled to windward
         (

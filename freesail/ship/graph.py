@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 from freesail import units
 from freesail.ship.parts import Dynamics, Gun, Hull, Line, Part, Sail, Spar
-from freesail.ship.schema import FitSpec, ShipSpec
+from freesail.ship.schema import BY_DECK, FitSpec, ShipSpec
 from freesail.ship.stub import OrderError
 
 if TYPE_CHECKING:
@@ -52,6 +52,11 @@ class Ship:
         self.guns: dict[str, Gun] = (
             {g.id: Gun.from_spec(g) for g in self.fit_spec.guns} if self.fit_spec else {}
         )
+        # numbered by deck where her armament says so (package 75, B7.d:
+        # docs/design/Design-Ship-Bellerophon.md §5.2), read by each gun's name and crew's key
+        if spec.armament is not None and spec.armament.numbering == BY_DECK:
+            for gun in self.guns.values():
+                gun.by_deck = True
         self.parts: dict[str, Part] = {**self.spars, **self.sails, **self.lines, **self.guns}
         self.groups: dict[str, list[str]] = {g: list(m) for g, m in spec.groups.items()}
         self.aliases: dict[str, str] = dict(spec.aliases)

@@ -18,12 +18,13 @@ checklist for the viewer (Build-Ships.md §6's postscript); her broadside by 70'
 company, posts, marines and people file against Niles and Cobb; the beat to quarters on her fit,
 measured; her ground tackle against Steel's row, her boats, pumps, hold and stores; her
 description in her file and through the index; her round trip at seed 7 with no fit named; her
-line of the lee ports' truth (7-190), measured; and truth 7-192 with its index clause. Her road's
-step 5 (Neuf-D §9, §12.2 item 8, §14): her polar in tests/test_ships.py's form and truth 7-193, her
-best point; her helm as tuned (`clr_x_m`, truth 6's form); her light main yards' short swing at
-"Main-topsail haul."; her tack, wear and heave-to beside trial A's, her main topgallant set hove
-to; getting under way; "shorten sail" taking in her main topgallant; her gale's course reefs; and
-truth 9's two forms on her file.
+line of the lee ports' truth (7-190), measured; and truth 7-192 with its index clause (moved
+into tests/test_known_truths.py at Phase 5, 2026-11-14, with 7-193). Her road's step 5 (Neuf-D
+§9, §12.2 item 8, §14): her polar in tests/test_ships.py's form and truth 7-193, her best point; her
+helm as tuned (`clr_x_m`, truth 6's form); her light main yards' short swing at "Main-topsail
+haul."; her tack, wear and heave-to beside trial A's, her main topgallant set hove to; getting under
+way; "shorten sail" taking in her main topgallant; her gale's course reefs; and truth 9's two forms
+on her file.
 
 The figures quoted as measured were measured on the owner's machine (Windows 11, 2026-11-07);
 the bands are the sources' or judgement where they say so.
@@ -1293,40 +1294,6 @@ def test_her_polar_is_drawn_from_her_file_and_agrees_with_her_sailed_beam_reach(
     assert abs(p.speed_kn(90.0, 15.0) - sailed) <= 0.5, sailed
 
 
-def test_truth_7_193_her_polars_best_point_from_her_accounts():
-    """Neuf-D §14 truth 2 (Build-Ships.md §15), a draft for Phase 5 to move into
-    tests/test_known_truths.py. Her best speed in 25 kn of wind under plain sail (`polar_of`)
-    within her accounts' band, 11.5 to 13.0 kn: Cobb 1841's 12.5 knots twice, running (p. 54,
-    out of Boston with the yards squared, the unit loose; p. 138, the gale chase), the band
-    judgement (Neuf-D §9), held wherever the engine puts it (the owner, 2026-10-29: "don't worry
-    about tuning for best speed running"; the lead's answer 5 at Neuf-D §17). Her pointing: her
-    `closest_deg` no wider than the frigate-36's, and her speed at 60 and 70 degrees off in 15
-    and 25 kn above the frigate-36's ("we could haul closer upon the wind than the enemy", Cobb
-    p. 96, her strongest evidence), pinned because her file bears it out.
-
-    Measured on the owner's machine, 2026-11-08, her start figures standing (`hull_speed_kn`
-    12.9) and her fore staysail the triangle that fits forward of the fore mast, 46 m2 (the lead's
-    ruling of 2026-11-07, B2b: the design's working 93 m2 a derivation of its own): her best in 25
-    kn 12.07 kn, inside the band as before (old beside new: 12.22 with the 93 m2, 12.27 before the
-    jib's mend of the reviews of 2026-11-07). **Reported, not pinned:** the best point's angle, 90
-    degrees (12.06 kn at 100; 12.22 and 12.20 before), where her accounts were running; at 150
-    degrees 9.92 kn and dead before it 9.35 (10.00 and 9.42 before; the frigate-36 10.01 and
-    9.23); sailed with her studding sails set, 11.12 and 10.37 kn (11.17 and 10.36 before) against
-    the frigate-36's 11.70 and 10.76, so that the frigate gains on her running as the frigates did
-    (Cobb p. 97). Her closest 40 degrees against the frigate's 50; at 60 and 70 degrees 6.30 and
-    7.14 kn in 15 kn against the frigate's 4.29 and 6.14, and 9.54 and 10.60 in 25 kn against 7.03
-    and 9.62 (6.53, 7.34, 9.81 and 10.80 before), the slimmest margin 0.98 kn at 70 degrees in 25
-    kn (1.18 before; Neuf-D §9's 0.8 on its stand-in). Arithmetic on the files ("the same on every
-    machine", world/ships.py)."""
-    hers, frigate = polar_of(HER), polar_of(FRIGATE)
-    best = max(hers.speeds_kn[hers.winds_kn.index(25.0)])
-    assert 11.5 <= best <= 13.0, best
-    assert hers.closest_deg <= frigate.closest_deg
-    for wind in (15.0, 25.0):
-        for off in (60.0, 70.0):
-            assert hers.speed_kn(off, wind) > frigate.speed_kn(off, wind), (off, wind)
-
-
 # ---------------------------------------------------------------------------
 # Her helm as tuned, and her handling (Neuf-D §9, §12.2 item 8; her road's step 5)
 # ---------------------------------------------------------------------------
@@ -1678,82 +1645,3 @@ def test_truth_9_she_carries_plain_sail_in_twenty_knots_and_her_light_sails_go_i
     gone = [e for e in world.log if e.kind in CARRIED_AWAY]
     assert gone and all(e.severity.value == "urgent" for e in gone)
     assert any("royal" in e.subject or "topgallant" in e.subject for e in gone)
-
-
-# ---------------------------------------------------------------------------
-# Truth 7-192 (Build-Ships.md §15; Neuf-D §14 truth 1), drafted here for Phase 5
-# ---------------------------------------------------------------------------
-
-
-def test_truth_7_192_the_prince_de_neufchatels_particulars_hold_their_sources():
-    """Neuf-D §14 truth 1, a draft for Phase 5 to move into tests/test_known_truths.py. Her file
-    loads, `ship.rig` 'hermaphrodite brig'; LWL 32.7 +-0.2 m (107.3 ft between the rabbets,
-    ZAZ6177), beam 7.82 +-0.05 m (25 ft 8 in, Winfield 1793-1817 pp. 335-336), draught 3.16 +-0.08
-    m (10.36 ft mean to the false keel), 288 +-10 t, lateral area 102 +-5 m2. Her masts 13.3 +-0.3 m
-    apart at the deck (43.7 ft, Neuf §2.7), raking 12.4 and 10.3 +-0.7 degrees; four square yards
-    on the fore and a boomless gaff sail; a gaff mainsail on a boom of 19.6 +-0.3 m (64.2 ft); the
-    fore yard 19.8 +-0.5 m (65 ft). Eleven port triples a side; every gun on one within 0.01 m; her
-    lowest sill 1.50 +-0.03 m (4 ft 11 in, task 1's checker confirming it). Her default fit 16 x
-    12-pounder carronades and 2 long 6-pounders, 18 pieces, 108 lb by 70's rule; her complement
-    130 with a captain and five lieutenants among her posts (Cobb 1841 p. 40); the names
-    `american`. Her rig read as Cobb's (p. 38): one mast with yards, not square-rigged, her main a
-    schooner's. Her description in her file: 'hermaphrodite brig', 'a brig' at a distance, the
-    role `privateer`, her default fit; size rank 2. The index clause (her road's step 6):
-    `description('hermaphrodite brig')` gives her file and those words, and 'a hermaphrodite brig'
-    names her. Arithmetic on her file alone (`load_spec`, `file_descriptions`, `description`,
-    `far_ship`), the same on every machine; none of it moved with her road's step 5, whose knobs
-    were her hull speed (12.9 kept), her clr (+0.3 to +0.1, for her helm) and her GM (2.1 kept,
-    within 2.0-2.2)."""
-    ship = load_ship(HER)
-    spec = ship.spec
-    hull = spec.hull
-    assert spec.rig == "hermaphrodite brig"
-    assert abs(hull.length_waterline_m - 32.7) <= 0.2
-    assert abs(hull.beam_m - 7.82) <= 0.05
-    assert abs(hull.draught_m - 3.16) <= 0.08
-    assert abs(hull.displacement_kg - 288000.0) <= 10000.0
-    assert abs(hull.lateral_area_m2 - 102.0) <= 5.0
-    spars = {s.id: s for s in spec.spars}
-    fore, main = spars["fore.mast"], spars["main.mast"]
-    assert abs((fore.x_m - main.x_m) - 13.3) <= 0.3
-    assert abs(main.rake_deg - 12.4) <= 0.7 and abs(fore.rake_deg - 10.3) <= 0.7
-    fore_yards = [y.id for y in scripts.working_yards(ship) if ship.mast_of(y).id == "fore.mast"]
-    assert len(fore_yards) == 4
-    fg = ship.sails["fore.sail"]
-    assert fg.cls == "gaff" and "boom" not in fg.roles
-    ms = ship.sails["main.sail"]
-    assert ms.cls == "gaff" and ms.roles["boom"] == "main.boom"
-    assert abs(ship.spars["main.boom"].length_m - 19.6) <= 0.3
-    assert abs(ship.spars["fore.yard"].length_m - 19.8) <= 0.5
-    triples = ports_of(hull.profile, "upper")
-    assert len(triples) == 11
-    fit = spec.armament.fits[spec.armament.default]
-    for g in fit.guns:
-        assert any(
-            abs(g.x_m - x) <= 0.01 and abs(g.height_m - z) <= 0.01 for x, z, _hb in triples
-        ), g.id
-    assert abs(min(z for _x, z, _hb in triples) - 1.50) <= 0.03
-    assert spec.armament.default == FIT
-    assert guns_by(fit) == {
-        ("carronade", 12, "broadside", "upper"): 16,
-        ("long", 6, "bow", "upper"): 2,
-    }
-    assert far_ship(HER, "united-states").broadside_lb == 108.0
-    crew = spec.crew
-    assert crew.complement == 130 and crew.names == "american"
-    posts = [p.post for p in crew.posts]
-    assert "captain" in posts and sum(1 for p in posts if p.endswith(" lieutenant")) == 5
-    assert [m.id for m in scripts._masts_with_yards(ship)] == ["fore.mast"]
-    assert _square_rigged(ship) is False
-    assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == [
-        "main.topsail.yard",
-        "main.topgallant.yard",
-        "main.topgallant",
-    ]
-    own = S.file_descriptions(HER)["hermaphrodite brig"]
-    assert (own["rig"], own["roles"], own["fit"]) == ("a brig", ["privateer"], FIT)
-    assert C.SIZE_RANK["hermaphrodite brig"] == 2
-    # the index clause (her road's step 6)
-    d = S.description("hermaphrodite brig")
-    assert (d["file"], d["rig"], d["what"]) == (HER, "a brig", own["what"])
-    assert S.description_key("a hermaphrodite brig") == "hermaphrodite brig"

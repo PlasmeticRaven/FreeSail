@@ -16,7 +16,7 @@ p)` builds and dumps her file, and `build(out_dir)` is the generator's hook (`to
 its two headsails and the spritsail yard with its sail (§4.2, §4.3), the main topmast staysail,
 the storm canvas, the groups and the aliases (§4.5); her two fits, unarmed by default and the
 armed merchant, its guns on her ports and her rail, its magazine and the quarter bill set against
-it (§5); her company of eight, drawn from her wardroom file `data/people/bilander.yaml` (§6), her
+it (§5); her company of nine, drawn from her wardroom file `data/people/bilander.yaml` (§6), her
 stores, ground tackle, boat, pumps and hold (§7); her description at far detail (§8), whose
 index rows are hers in `freesail/world/ships.py`.
 
@@ -1322,7 +1322,7 @@ ERA_NOTES = (
     "as Edward Gwyn's British bilander of about 1780 (RMG PAG3828) on Steel 1805's brig collier's "
     "body; 118 tons burthen on her waterline and 128 on her length taffrail to stem head by the "
     "old measure; rigged to Gwyn's heights with Chapman's yards. Unarmed by default, a trader of "
-    "eight hands, with the armed merchant's four 3-pounders and four swivels for the editor "
+    "nine hands, with the armed merchant's four 3-pounders and four swivels for the editor "
     "(Lloyd's 1779 and 1782: the Elizabeth's guns). Not the Hopewell of Poole, a bilander of 150 "
     "tons built in 1749 and lengthened in 1756 (Lloyd's 1776, 1779), whose name she bears by the "
     "owner's answer of 2026-10-29. Undated. See tools/ships/bilander.py for every figure's source."
@@ -1342,6 +1342,22 @@ HEADER = (
 
 # What her rules compute from her own keys, for `her_report()`.
 REPORT: dict = {}
+
+
+# Her own number of hands for the two manoeuvres a watch is asked for by night without a call
+# (the lead's (C2) of 2026-11-14), over their files' twelve: six, her seamen of both watches, so
+# that either watch's three begin them, short, as the starboard's three did at her eight. The
+# files' twelve is clamped to what her company could ever put to the work, and at her nine that
+# is seven (her six seamen and the cook), of which three are under half; at her eight it was six.
+# Six moves no other ship's figure and no line of hers with all hands up but the hand the cook was.
+WATCH_MANOEUVRE_HANDS = {"heave_to": 6, "fill_away": 6}
+HANDS_NOTE = (
+    "Her own number of hands for an evolution, over its file's: heaving to and filling away, six, "
+    "her seamen of both watches, so that either watch of three begins them by night, short, as the "
+    "starboard's three did at her eight; the files' twelve, clamped to what her company could "
+    "ever give, is seven at her nine (her six seamen and the cook), and three are under half of "
+    "it (the lead's (C2) of 2026-11-14; judgement)."
+)
 
 
 def write(out_dir: str, p: Particulars) -> None:
@@ -1393,6 +1409,7 @@ def write(out_dir: str, p: Particulars) -> None:
     armament(b, guns)
     quarter_bill(b, guns)
     hold_pumps_boat(b)
+    b.hands(HANDS_NOTE, WATCH_MANOEUVRE_HANDS)
     b.descriptions([DESCRIPTION])
     b.dump(os.path.join(out_dir, "bilander.yaml"), HEADER)
 
@@ -2086,7 +2103,7 @@ FIT_NOTE = (
     "an editor may reason within: Kerrison's six 4-pounders (140 tons, 1781-1783) and Essex's two "
     "2-pounders (160 tons, 1781); neither is a fit. Her ports are cut for the fit in the waist "
     "bulwark (the owner's 'cutouts in the gunwale', 2026-10-29), Gwyn drawing her unpierced. Her "
-    "eight cannot man a side's guns, the helm and the sails together: at the beat the bill's "
+    "nine cannot man a side's guns, the helm and the sails together: at the beat the bill's "
     "trimmers and helmsman are told off first and the guns take what is left (her design's §5.4; "
     "the beat measured in docs/dev/TuningNotes.md)."
 )
@@ -2187,20 +2204,25 @@ def armament(b, guns) -> None:
     b.armament(GUNS_NOTE, g.UNARMED, [(ARMED_FIT, FIT_SOURCE, guns, magazine, FIT_NOTE)])
 
 
-# Her company, eight (D43; Bil-D §6.1): the posts her wardroom file's, the master and the mate
-# (data/people/bilander.yaml); two in each top, the main top's for the settee's loosing and
-# furling aloft (Ext §5.1 and its risk 10), the fore's alike (judgement); the boy in the
-# afterguard, the messenger, drawn by name; the cook. No forecastle station: the head sheets and
-# the anchors fall to the fore topmen by the hands' ranking (crew/hands.py), a company of eight
-# having no hand to spare for one.
-COMPLEMENT = 8
-STATIONS = {"fore_top": 2, "main_top": 2, "afterguard": 1, "idlers": 1}
+# Her company, nine (the lead's ruling 8 of 2026-11-13, built on ruling 11; JUDGEMENT within the
+# sourced range of eight to nine, the sources in the complement's note below; D43's eight before
+# it; Bil-D §6.1): the posts her wardroom file's, the master and the mate
+# (data/people/bilander.yaml), who head the two watches and haul with them on deck where the
+# watch's whole number is under the work's want (crew/hands.py, `post_watch`;
+# evolutions/runner.py, `Runner._working_posts`); two in each top, the main top's for the
+# settee's loosing and furling aloft (Ext §5.1 and its risk 10), the fore's alike (judgement);
+# two in the afterguard, an able seaman and the boy, the messenger, drawn by name, one to each
+# watch, so that her six seamen keep two watches of three; the cook. No forecastle station: the
+# head sheets and the anchors fall to the fore topmen by the hands' ranking (crew/hands.py), a
+# company of nine having no hand to spare for one.
+COMPLEMENT = 9
+STATIONS = {"fore_top": 2, "main_top": 2, "afterguard": 2, "idlers": 1}
 # Her shares (the lead's ruling (8) of 2026-11-09, package 75; judgement): able seamen and a boy,
-# no ordinary seaman, so that her five muster four able topmen and a landsman boy, as the
+# no ordinary seaman, so that her six muster five able seamen and a landsman boy, as the
 # merchant brig's boy is rated (data/people/merchant-brig.yaml); the merchant brig's own shares,
 # 0.70, 0.20 and 0.10, mustered the boy an able seaman (B4).
 RATINGS = {"able": 0.80, "ordinary": 0.0, "landsman": 0.20}
-# Her stores (Bil-D §7; judgement): water for eight at a gallon a man a day for two months is
+# Her stores (Bil-D §7; judgement): water for nine at a gallon a man a day for two months is
 # about two tons (252 gallons to the ton, data/crew/ration.yaml), and some over; provisions for
 # two months, a coaster's passage and its delays; the spare rope; a small trader's shot plugs,
 # the smack's.
@@ -2210,7 +2232,7 @@ CORDAGE_FATHOMS = 80
 SHOT_PLUGS = 2
 # The quarter bill beyond the gun crews (Bil-D §5.4; judgement): the merchant brig's trimmers, a
 # topman of each top; one at the helm; no hand at the powder beyond the cook; the merchant
-# brig's small arms, two, and a trader's boarders, three of her eight.
+# brig's small arms, two, and a trader's boarders, three of her nine.
 TRIMMERS = {"fore_top": 1, "main_top": 1}
 HELM = 1
 POWDER = 0
@@ -2233,12 +2255,23 @@ def company(b) -> None:
         (
             ("complement",),
             COMPLEMENT,
-            "Eight (D43): a coasting trader of about 130 tons, the master, the mate, four seamen, "
-            "a boy and a cook (judgement). No source gives a bilander's company (Research-"
-            "Bilander-2026-10.md §2.8): the Nancy of Boston, 170 tons and catalogued 'brigantine "
-            "or bilander', had ten in 1779 (TNA HCA 32/405/21, the catalogue); the merchant "
-            "brig's five men to a hundred tons gives six or seven, and a settee dipped by hand "
-            "at every tack wants the upper figure.",
+            "Nine (the lead's ruling 8 of 2026-11-13, built on ruling 11): the master, the mate, "
+            "six seamen in two watches of three, the boy among them, and a cook. JUDGEMENT within "
+            "the sourced range of eight to nine for a trader of her tons in her years: Macpherson, "
+            "Annals of Commerce (1805) vol. 4, pp. 287 and 331, the register's usual number of "
+            "men for England in 1793 and 1794, 13.8 and 14.0 tons a man, so 9.3 and 9.1 at her "
+            "128 tons (every trade together); the Transport Board's rule of 1797 for hired "
+            "transports, the master, five men and a boy to each hundred tons and a man for each "
+            "twenty tons beyond (R. K. Sutcliffe 2013, p. 30, citing TNA ADM 1/3733), eight at her "
+            "tons; TNA HCA 32, the prize papers' catalogue for 1776-83, British traders of 100 to "
+            "160 tons whose entries give their men, a median of 8 in the short-sea trades and 10 "
+            "on Atlantic voyages. Nine, not eight, so that either watch of three, with the master "
+            "or the mate where the watch is too small for the work, begins every watch's work on "
+            "deck by night and by day (the owner's word of 2026-11-13: her watches large enough "
+            "for the standard work that does not normally call all hands). Before it, eight (D43, "
+            "judgement): no source gives a bilander's company (Research-Bilander-2026-10.md §2.8); "
+            "the Nancy of Boston, 170 tons and catalogued 'brigantine or bilander', had ten in "
+            "1779 (TNA HCA 32/405/21, the catalogue).",
         ),
         (
             ("names",),
@@ -2250,7 +2283,7 @@ def company(b) -> None:
             STATIONS["fore_top"],
             "Hands per station, both watches together (Bil-D §6.1; judgement). No forecastle "
             "station: the head sheets and the anchors fall to the fore topmen by the hands' "
-            "ranking, a company of eight having no hand to spare for one. Fore topmen: 2, the "
+            "ranking, a company of nine having no hand to spare for one. Fore topmen: 2, the "
             "main top's alike.",
         ),
         (
@@ -2262,14 +2295,16 @@ def company(b) -> None:
         (
             ("stations", "afterguard"),
             STATIONS["afterguard"],
-            "Afterguard: the boy, 1, the messenger (the smack's and the merchant brig's).",
+            "Afterguard: 2, an able seaman and the boy, the messenger (the smack's and the "
+            "merchant brig's), one to each watch, so that her watches are three and three (the "
+            "lead's ruling 8 of 2026-11-13).",
         ),
         (("stations", "idlers"), STATIONS["idlers"], "Idlers: the cook."),
         (
             ("ratings", "able"),
             RATINGS["able"],
             "Share of the seamen by rating (judgement; the lead's ruling of 2026-11-09): a "
-            "coaster's able seamen and a boy, four able topmen and a landsman boy, as the "
+            "coaster's able seamen and a boy, five able seamen and a landsman boy, as the "
             "merchant brig's boy is rated; her shares (0.70, 0.20, 0.10) mustered the boy an "
             "able seaman. Able: 0.80.",
         ),
@@ -2294,7 +2329,7 @@ def company(b) -> None:
         (
             ("stores", "water_tons"),
             WATER_TONS,
-            "Water for two months: eight men at a gallon a day is about 2 tons, and some over "
+            "Water for two months: nine men at a gallon a day is about 2 tons, and some over "
             "(judgement).",
         ),
         (
@@ -2379,7 +2414,7 @@ def quarter_bill(b, guns) -> None:
         "sail before guns",
         {
             "helm": "One man at the helm, as the merchant brig's (judgement).",
-            "powder": "The powder beyond the idlers: none; the cook passes it (judgement: eight "
+            "powder": "The powder beyond the idlers: none; the cook passes it (judgement: nine "
             "hands, the boy among them, and six wanted at one side's 3-pounders).",
             "priority": "A merchantman's weapon is her heels: the sails before the guns "
             "(judgement), the merchant brig's.",

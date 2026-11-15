@@ -251,34 +251,27 @@ CREW_VERBS: dict[str, Callable[[Ship, Order], Result]] = {
 
 
 def all_hands_work(ship: Ship) -> str | None:
-    """A sentence if an all-hands evolution is still at work, else None."""
+    """A sentence if all-hands work is still at work, else None: the work named as the log names
+    the work in hand (`Runner.doing`), "furling all sail", where this named it again from its
+    verb, "furling all" (the lead's (C8) of 2026-11-14: one place names the work). All-hands work
+    is the request as it was made (`Instance.all_hands`): a file's all-hands work, and work made
+    all-hands work for itself because its watch was too few (`Runner._made_all_hands`, the lead's
+    ruling (1) of 2026-11-10), which this read from the file's crew line alone, so that "pipe
+    down" was taken while all hands were at a take in called for itself (the whole-change review
+    of 80e703c7, sailing-6: the plan read where the work's own state should be)."""
     runner = ship.extra.get("evolutions")
-    if runner is None or not hasattr(runner, "in_progress"):
+    if runner is None or not hasattr(runner, "work"):
         return None
-    for entry in runner.in_progress():
-        if entry.get("waiting") or entry.get("paused"):
+    for inst in runner.work():
+        if inst.waiting or inst.paused:
             continue
-        evo = registry.get(entry["id"])
-        if evo is None or not _is_all_hands(evo):
+        evo = inst.evo
+        if not (getattr(inst, "all_hands", False) or _is_all_hands(evo)):
             continue
         if evo.id in ABOUT_SHIP:
             return "The hands are still about ship; wait for her to come round."
-        return (
-            f"All hands are still at work ({_doing(ship, evo, entry['subject'])}); "
-            f"pipe down when it is done."
-        )
+        return f"All hands are still at work ({runner.doing(inst)}); pipe down when it is done."
     return None
-
-
-def _doing(ship: Ship, evo: registry.Evolution, subject: str) -> str:
-    from freesail.evolutions.runner import gerund, part_name
-
-    verb = evo.verb.replace("_", " ")
-    first, _, rest = verb.partition(" ")
-    doing = f"{gerund(first)} {rest}".strip()
-    if subject in ship.parts:
-        return f"{doing} the {part_name(ship, subject)}"
-    return doing
 
 
 def _is_all_hands(evo: registry.Evolution) -> bool:

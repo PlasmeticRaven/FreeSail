@@ -30,18 +30,30 @@ station (`tick`), so the guns refill as the tack ends, the forward guns first.
 
 **The bill by deck** (package 75, B7.b: `docs/design/Design-Ship-Bellerophon.md` §6.4, the
 owner's answer 9 and the lead's answers of 2026-10-29, items (1) and (2)), each part keyed so that
-it reaches no ship it was not ruled for. The bill's `marines` (her stage 0c's key, which only the
-74's file carries) keeps that many marines in their division at the beat, before the gun crews
-draw, and the long guns' lists then leave the marines out while the carronades keep them first
-(Falconer 1780, QUARTERS: the marines "generally quartered on the poop and forecastle, or
-gangway"). On a ship whose broadside guns stand on a `lower` deck (the two two-deckers), each
-crew keeps its deck; where they stand on the lower and the upper deck both, the beat says each
-deck's crews and men in a line ("The lower deck: 14 gun crews, 182 men."); and robbing
-takes, after the swivels and the chasers, first the lower-deck crews whose gun on the engaged
-side is shut by the sea, then the other decks' crews from the end that bears least, then the
-lower deck's from that end, its line naming the decks. A ship with no `lower` deck robs, says and
-pickles as before. The stations by deck are the thirds of the length on each deck, unchanged: no
-period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
+it reaches no ship it was not ruled for. The bill's `marines` (her stage 0c's key, which the 74's,
+the 64's and the razee's files carry) keeps that many marines in their division at the beat, before
+the gun crews draw, and the long guns' lists then leave the marines out while the carronades keep
+them first (Falconer 1780, QUARTERS: the marines "generally quartered on the poop and forecastle, or
+gangway"). A fit that gives its own `marines` (package 75, B1, the lead's ruling (4) of
+2026-11-13: the 64's 'ardent class 1794' and the razee's 'as razeed 1795') keeps that many in
+place of the bill's when she carries it; the long guns take none either way. A fit that gives its
+own `trimmers` (package 75, Phase 5, the lead's ruling 13 of 2026-11-14: the razee's 'as razeed
+1795') is told off by them in place of the bill's, so the bill is read on her fit by one road
+(`_on_her_fit`) for both keys. On a ship whose broadside guns stand on a `lower` deck (the two
+two-deckers), each crew keeps its deck; where they stand on the lower and the upper deck both, the
+beat says each deck's crews and men in a line ("The lower deck: 14 gun crews, 182 men."); and
+robbing takes, after the swivels and the chasers, first the lower-deck crews whose gun on the
+engaged side is shut by the sea, then the other decks' crews from the end that bears least, then
+the lower deck's from that end, its line naming the decks. A ship with no `lower` deck robs, says
+and pickles as before. The stations by deck are the thirds of the length on each deck, unchanged:
+no period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
+
+**Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
+whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
+number (`gun:lower:3`, `Gun.pair_key`), read here as `gun:3` is, its number the key's last part and
+its deck the middle (`_crew_number`); each crew keeps its deck, and the numbers said are each deck's
+own ("the upper deck, Nos. 11 to 14"). Every other ship's keys, and so its stations, its robbing
+and its words, are as before.
 
 Nothing here draws randomness.
 """
@@ -52,7 +64,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from freesail.crew.model import Crew, Rating, Sailor, Station, number_words
-from freesail.ship.parts import Gun
+from freesail.ship.parts import DECK_SAID, Gun
+from freesail.ship.schema import DECK_WORDS
 
 __all__ = [
     "CARPENTER",
@@ -79,11 +92,6 @@ SURGEON = "surgeon"
 # and the pumps, the surgeon's mates to the cockpit); the rest of the idlers pass powder.
 _TRADE_STATIONS = {"carpenter's crew": CARPENTER, "surgeon's mate": SURGEON}
 
-# The share of a gun crew told off for the sails at quarters (Luce 1884 ch. XX, the station
-# bill: the boarders and sail trimmers "told off from the guns' crews"; half, judgement):
-# an all-hands manoeuvre under `sail before guns` takes this much of each crew.
-TOLD_OFF_SHARE = 0.5
-
 # A gun forward of this share of the hull's length is a forward gun, abaft its negative an
 # after gun, for the stations that man it (the forecastlemen forward, the afterguard aft,
 # the waisters amidships: Luce 1884 ch. XX, the quarter bill by divisions; judgement).
@@ -93,16 +101,9 @@ FORWARD_SHARE = 1.0 / 6.0
 # first of all where the sea has shut their ports (Bel-D §6.4 item 4).
 LOWER = "lower"
 # The decks in the beat's lines, from below, and their words (`schema.DECK_WORDS`; the
-# `roundhouse` is the poop: Bel-D §3.5).
+# `roundhouse` is the poop: Bel-D §3.5; the words `parts.DECK_SAID`, a gun's name's since B7.d).
 _DECK_ORDER = ("lower", "middle", "upper", "quarterdeck", "forecastle", "roundhouse")
-_DECK_SAID = {
-    "lower": "the lower deck",
-    "middle": "the middle deck",
-    "upper": "the upper deck",
-    "quarterdeck": "the quarterdeck",
-    "forecastle": "the forecastle",
-    "roundhouse": "the poop",
-}
+_DECK_SAID = DECK_SAID
 
 
 @dataclass
@@ -177,12 +178,18 @@ class Quarters:
 
     def marines_to_guns(self) -> int:
         """The marines back to the carronades from their muskets: each short crew made up
-        from the division, the carronades first. Returns how many moved."""
+        from the division, the carronades first. Where her fit or her bill keeps marines in
+        their division (`_marines_kept`, package 75, B7.b and B1), the carronades alone take
+        them back, as at the beat: the long guns do not take marines (the lead's ruling (4) of
+        2026-11-13; the review's mends: before it every short crew, long guns too, drew from
+        the division). Returns how many moved."""
         division = self.divisions.get(MARINES, [])
         if not division:
             return 0
         moved = 0
         crews = sorted(self.crews.values(), key=lambda gc: (gc.kind != "carronade", gc.key))
+        if _marines_kept(self.ship) is not None:
+            crews = [gc for gc in crews if gc.kind == "carronade"]
         for gc in crews:
             while len(gc.members) < gc.wanted and division:
                 s = division.pop(0)
@@ -231,8 +238,9 @@ class Quarters:
             where = _TRADE_STATIONS.get(str(s.trade or ""))
             if where:
                 divisions[where] += take([s], 1, where)
-        # the trimmers by the bill's stations
-        trimmers = dict(getattr(bill, "trimmers", {}) or {})
+        # the trimmers by the bill's stations; her fit's own where it gives them (package 75,
+        # Phase 5, the lead's ruling 13)
+        trimmers = dict(_on_her_fit(ship, "trimmers") or {})
         for station_word, n in trimmers.items():
             st = Station(station_word)
             divisions[TRIMMERS] += take(by_station[st], int(n), TRIMMERS)
@@ -243,9 +251,9 @@ class Quarters:
         if len(divisions[HELM]) < helm_n:
             rest = [s for s in pool if s.station is not Station.MARINES]
             divisions[HELM] += take(rest, helm_n - len(divisions[HELM]), HELM)
-        # the marines the bill keeps in their division (package 75, B7.b: the bill's `marines`,
-        # which only the 74's file carries), before the gun crews draw
-        kept = getattr(bill, "marines", None)
+        # the marines the bill keeps in their division (package 75, B7.b: the bill's `marines`),
+        # before the gun crews draw; her fit's own where it gives them (package 75, B1)
+        kept = _marines_kept(ship)
         if kept is not None:
             divisions[MARINES] += take(by_station[Station.MARINES], int(kept), MARINES)
         # the gun crews, forward first, chasers next, the swivels last
@@ -340,34 +348,22 @@ class Quarters:
 
     # -- robbing by the fighting book's priority ----------------------------------------
 
-    def lend(
-        self, want: int, aloft: bool, bearing_fwd: bool | None, share: float | None = None
-    ) -> tuple[list[Sailor], str]:
+    def lend(self, want: int, aloft: bool, bearing_fwd: bool | None) -> tuple[list[Sailor], str]:
         """Free `want` hands for sail work by the priority: the swivels' and the chasers'
         crews first, then the broadside crews from the end that bears least (`bearing_fwd`
         true when the enemy is forward of the beam, so the after guns go first; None, the
-        after guns), whole crews before the next; then the marines; the powder last. With
-        `share` (an all-hands manoeuvre) each crew gives that share of its hands instead,
-        the guns going on short-handed. Returns the men freed (their `at` cleared) and the
-        words for the log ('from the larboard guns, Nos. 3 to 6' or ''); nothing under
-        `guns before sail`."""
+        after guns), whole crews before the next; then the marines; the powder last. An
+        all-hands manoeuvre is lent so too, for what its party wants beyond the trimmers and
+        the marines' division (package 75, B7.c: `evolutions/runner.py`, `_rob_the_guns`;
+        before it each crew gave half its hands, the share told off for the sails). Returns
+        the men freed (their `at` cleared) and the words for the log ('from the larboard
+        guns, Nos. 3 to 6' or ''); nothing under `guns before sail`."""
         if not self.at_quarters or want <= 0 or self.priority != "sail before guns":
             return [], ""
         from freesail.crew import hands as H
 
         freed: list[Sailor] = []
         from_guns: list[str] = []
-        if share is not None:
-            for gc in self.crews.values():
-                at = [s for s in gc.hands if H.can_work(s, aloft)]
-                n = int(len(at) * share)
-                for s in at[:n]:
-                    s.at = None
-                    freed.append(s)
-                if n:
-                    from_guns.append(gc.key)
-            words = f"from the guns, {_share_words(share)} of each crew" if freed else ""
-            return freed, words
         shut = self._shut_crews()
         order = sorted(self.crews.values(), key=lambda gc: _rob_order(gc, bearing_fwd, shut))
         for gc in order:
@@ -423,9 +419,9 @@ class Quarters:
         """'the swivels', 'the bow chasers', 'the guns, Nos. 7 to 9' for the crews robbed; on a
         ship whose crews keep their deck, the numbered crews by deck in the order given, 'the
         lower deck, Nos. 4 to 10, their ports shut, and the upper deck, Nos. 26 to 28'
-        (package 75, B7.b)."""
-        numbers = sorted(int(k[len(GUN_PREFIX) :]) for k in keys if k[len(GUN_PREFIX) :].isdigit())
-        others = [k for k in keys if not k[len(GUN_PREFIX) :].isdigit()]
+        (package 75, B7.b), each deck's own numbers on a ship numbered by deck (B7.d)."""
+        numbers = sorted(n for k in keys if (n := _crew_number(k)) is not None)
+        others = [k for k in keys if _crew_number(k) is None]
         parts: list[str] = []
         kinds: set[str] = set()
         for k in others:
@@ -506,7 +502,10 @@ class Quarters:
         lines = list(self._beat_lines())
         for gc in self.crews.values():
             guns = [self.ship.guns[g] for g in gc.guns if g in self.ship.guns]
-            name = guns[0].name if len(guns) == 1 else f"Nos. {guns[0].number} guns"
+            # a pair's name, with its deck on a ship numbered by deck (package 75, B7.d)
+            name = (
+                guns[0].name if len(guns) == 1 else f"Nos. {guns[0].number} guns{guns[0].of_deck}"
+            )
             at = len(gc.hands)
             state = "manned" if at >= gc.wanted else f"{at} of {gc.wanted}" if at else "unmanned"
             lines.append(f"{_cap(name)}: {state}.")
@@ -539,8 +538,19 @@ def _gun_order(g: Gun) -> tuple[int, float, str]:
 
 def _keeps_its_deck(guns: list[Gun]) -> bool:
     """Whether the crews keep their guns' deck: a ship whose broadside guns stand on a `lower`
-    deck (package 75, B7.b, keyed so; the lead's answer (2) of 2026-10-29)."""
-    return any(g.place == "broadside" and g.deck == LOWER for g in guns)
+    deck (package 75, B7.b, keyed so; the lead's answer (2) of 2026-10-29), or are numbered by
+    deck, so that a number is said with its deck (B7.d; the same two ships today)."""
+    return any(g.place == "broadside" and (g.deck == LOWER or g.by_deck) for g in guns)
+
+
+def _crew_number(key: str) -> int | None:
+    """The number of a broadside pair's crew from its key: `gun:3`, or on a ship numbered by
+    deck (package 75, B7.d) `gun:lower:3`, the key's last part the number and its middle the deck
+    (Bel-D §5.2 item 5); None for a chaser's, a swivel's or a pivot's (`gun:<the gun's id>`)."""
+    deck, _, n = key[len(GUN_PREFIX) :].rpartition(":")
+    if n.isdigit() and (not deck or deck in DECK_WORDS):
+        return int(n)
+    return None
 
 
 def _deck_rank(deck: str | None) -> int:
@@ -553,16 +563,16 @@ def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -
     shut, and the upper deck, Nos. 26 to 28'; the chasers and swivels (`parts`) first."""
     groups: list[tuple[str | None, bool, list[int]]] = []
     for gc in crews:
-        n = gc.key[len(GUN_PREFIX) :]
-        if not n.isdigit():
+        n = _crew_number(gc.key)
+        if n is None:
             continue
         tag = (gc.deck, gc.key in shut)
         for deck, is_shut, numbers in groups:
             if (deck, is_shut) == tag:
-                numbers.append(int(n))
+                numbers.append(n)
                 break
         else:
-            groups.append((gc.deck, gc.key in shut, [int(n)]))
+            groups.append((gc.deck, gc.key in shut, [n]))
     said = []
     for deck, is_shut, numbers in groups:
         numbers.sort()
@@ -578,6 +588,25 @@ def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -
     if len(said) == 1:
         return said[0]
     return ", ".join(said[:-1]) + ", and " + said[-1]
+
+
+def _on_her_fit(ship: Any, key: str) -> Any:
+    """The quarter bill's `key` as she carries her fit: the fit's own figure where it gives one
+    (`schema.FIT_OWN_BILL`: the marines, package 75, B1; the trimmers, Phase 5, the lead's
+    ruling 13), else the bill's, which is set against the default fit; None where neither gives
+    it. A fit pickled before a key reads as one without it, and so the bill's."""
+    own = getattr(getattr(ship, "fit_spec", None), key, None)
+    if own is not None:
+        return own
+    spec = getattr(getattr(ship, "spec", None), "crew", None)
+    return getattr(getattr(spec, "quarter_bill", None), key, None)
+
+
+def _marines_kept(ship: Any) -> int | None:
+    """The marines the quarter bill keeps in their division at the beat: her fit's own `marines`
+    (package 75, B1), else the bill's (B7.b); None where neither gives them, as on every ship
+    but the 74, the 64 and the razee."""
+    return _on_her_fit(ship, "marines")
 
 
 def _preferred_stations(
@@ -600,7 +629,7 @@ def _stations_for(gc: GunCrew, length_m: float, has_marines: bool) -> list[Stati
     # ch. XX): after the deck stations, in the order of the masts
     tops = [Station.FORE_TOP, Station.MAIN_TOP, Station.MIZZEN_TOP]
     fc, w, ag, m = Station.FORECASTLE, Station.WAISTERS, Station.AFTERGUARD, Station.MARINES
-    if not key.isdigit():
+    if _crew_number(gc.key) is None:
         if "swivel" in key:
             return [w, ag, fc, m, *tops]
         if "stern" in key:
@@ -622,7 +651,7 @@ def _rob_order(
     key = gc.key[len(GUN_PREFIX) :]
     if "swivel" in key:
         return (0, 0, 0.0, key)
-    if not key.isdigit():
+    if _crew_number(gc.key) is None:
         return (1, 0, 0.0, key)
     # by deck (package 75, B7.b): the lower deck's crews whose port is shut first, the other
     # decks' next, the lower deck's last; constant on a ship whose crews keep no deck
@@ -634,14 +663,6 @@ def _rob_order(
     # forward guns
     x = gc.x_m if bearing_fwd in (True, None) else -gc.x_m
     return (2, deck, x, key)
-
-
-def _share_words(share: float) -> str:
-    if abs(share - 0.5) < 1e-9:
-        return "half"
-    if abs(share - 1.0 / 3.0) < 1e-6:
-        return "a third"
-    return f"{share:.0%}"
 
 
 def _runs(numbers: list[int]) -> list[str]:
