@@ -214,7 +214,29 @@
       <fieldset data-part="papers" class="folded"><legend>Her papers, her purse and her people</legend>
         <p class="fold-line wide" data-line="papers"></p>
         <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
-        <p class="note wide">Her papers, her people and the things aboard are kept as the file has them; the line above says what it has.</p>
+        <label title="the goods in her hold at the start, each with its tons: tin 20, pilchards 4.5">In her hold <input id="m-goods" data-field="cargo.goods" data-kind="goods" type="text" placeholder="tin 20, pilchards 4.5"></label>
+        <label title="the price lists she starts with, by port">Price lists aboard <input data-field="papers.price_lists" data-kind="csv" type="text" placeholder="falmouth, plymouth"></label>
+        <label title="the master's book for the tides: Norie's (a ship of war's) or Moore's (a merchantman's); empty: by what she is">The master's epitome <select data-field="papers.epitome" data-kind="select"><option value=""></option><option value="norie">Norie's</option><option value="moore">Moore's</option></select></label>
+        <label title="her nation's private signals for the month: how a King's ship knows a friend. The game draws the table from the seed, the nation and the month: it is not written here, only whether she carries it. Empty: by her captain's role">Private signals <select data-field="papers.private_signals" data-kind="tri"><option value=""></option><option value="true">she carries them</option><option value="false">she has none</option></select></label>
+        <label title="other nations' signal books she holds beside her own (a captured book)">Other signal books held <input id="m-signal-books" data-field="papers.signal_books" data-kind="csv" type="text" placeholder="france"></label>
+        <div class="wide chron" id="m-chron" data-field="papers.chronometer" data-kind="chron">
+          <label class="check"><input id="m-chron-on" type="checkbox"> she carries a chronometer</label>
+          <span class="muted">With one the master finds the longitude by the time it keeps; without, by the reckoning and the lunar distances alone. Its certificate says its rate; its true drift is the game's secret unless you say it.</span>
+          <div class="card-grid" id="m-chron-fields">
+            <label>Its maker <input data-chron="maker" type="text" placeholder="Earnshaw"></label>
+            <label title="the day it was last rated; empty: the scenario's first day">Rated on <input data-chron="rated" type="text" placeholder="1805-05-01"></label>
+            <label title="seconds a day gained (or lost, with a minus) by its certificate">Its rate (seconds a day) <input data-chron="rate_s_per_day" data-num="1" type="number" step="any" placeholder="0"></label>
+            <label title="how far its true rate is from its certificate, in seconds a day; 'seeded' (or empty): drawn from the seed; 0: its rate is right">Its true drift <input data-chron="drift" type="text" placeholder="seeded"></label>
+          </div>
+          <span id="m-chron-said" class="muted"></span>
+        </div>
+        <p class="note wide">Her people. An officer of her muster is named here by his post: give him a name, a skill (0 to 1; 0.7 when not said) or a place aboard. A role her muster has not makes a person beside it: a supercargo, a passenger; ashore at a port if you say so.</p>
+        <table class="rows wide" id="m-people" data-field="people" data-kind="people">
+          <thead><tr><th>post or role</th><th>name</th><th>skill</th><th>place</th><th>ashore</th><th>at the port</th><th></th></tr></thead><tbody></tbody>
+        </table>
+        <div class="form-actions wide"><button type="button" id="btn-m-person-add">another person</button><datalist id="m-posts"></datalist></div>
+        <p class="not-yet wide">Who a person is in this story (his rank, his traits, a line of his history, his brief): the game does not yet take this from a scenario; his character is his ship's wardroom file's, the same in every scenario.</p>
+        <label class="wide" title="one thing a line: what it is, then where it is (a place aboard or ashore, or a person's keeping)">Things aboard or ashore <textarea id="m-things" data-field="things" data-kind="things" rows="2" placeholder="a sealed packet, in the captain's keeping"></textarea></label>
       </fieldset>
       <fieldset data-part="weather" class="folded"><legend>The weather</legend>
         <p class="fold-line wide" data-line="weather"></p>

@@ -264,6 +264,11 @@ def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_
     assert cutter == {"fits": ["carronades", "long guns"], "default": "carronades"}
     assert len(cat["fits"]["data/ships/seventy-four.yaml"]["fits"]) == 3
     assert set(cat["fits"]) == set(cat["ships"])  # every ship offered, and no boat
+    # step 7: each ship's wardroom posts, and the signal books there are
+    posts = cat["posts"]["data/ships/frigate-36.yaml"]
+    assert posts[:2] == ["captain", "first lieutenant"] and "master" in posts
+    assert cat["posts"]["data/ships/privateer-schooner.yaml"] == []  # no wardroom file
+    assert {"britain", "france"} <= set(cat["signal_books"])
     # step 6: what a squadron's card chooses from, the game's own
     assert cat["squadrons"] == {
         "kinds": ["squadron", "convoy"],
@@ -1211,6 +1216,101 @@ def test_in_the_browser_a_convoy_is_built_from_an_empty_sheet_and_one_read_is_ke
     )
     assert out["same"] == out["was"]
     assert out["less"][0]["members"] == ["naiad"] and out["less"][0]["book"] == "blockade"
+    assert errors == []
+
+
+def test_in_the_browser_a_chronometer_and_a_supercargo_are_added_and_are_in_the_game(
+    browser_page,
+):
+    """Package 96b, step 7 (docs/design/Design-Harbour.md §2.3; the owner's point of
+    2026-10-18, "he could not add a chronometer"; its step's own trial): the merchant
+    passage read into the sheet; a chronometer added with its maker and rate, the master
+    named and his skill changed, a supercargo named Mr Pentreath added beside the muster,
+    a thing, goods in the hold, a price list more and the private signals withheld; saved
+    and started, the game has each. A scenario read and saved with the part untouched is
+    the same file."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=maker]")
+    pg.select_option("#m-pick", "data/scenarios/merchant-passage.yaml")
+    pg.click("#btn-m-read")
+    pg.wait_for_function("document.getElementById('m-source').textContent.indexOf('merchant') >= 0")
+    line = pg.inner_text('#maker [data-line="papers"]')
+    assert "no chronometer" in line and "the master (skill 0.9)" in line
+    pg.click("#maker fieldset[data-part=papers] > legend")
+    assert not pg.is_visible("#m-chron-fields")
+    assert pg.locator("#m-people tbody tr").count() == 1
+    posts = pg.eval_on_selector_all("#m-posts option", "els => els.map(e => e.value)")
+    assert "master" in posts and "mate" in posts
+    pg.check("#m-chron-on")
+    pg.fill("#m-chron [data-chron=maker]", "Earnshaw")
+    pg.fill("#m-chron [data-chron=rate_s_per_day]", "1.8")
+    pg.fill("#m-chron [data-chron=drift]", "0")
+    master = pg.locator("#m-people tbody tr").first
+    master.locator("[data-col=name]").fill("Mr Tregenza")
+    master.locator("[data-col=skill]").fill("0.5")
+    pg.click("#btn-m-person-add")
+    extra = pg.locator("#m-people tbody tr").last
+    extra.locator("[data-col=role]").fill("supercargo")
+    extra.locator("[data-col=name]").fill("Mr Pentreath")
+    pg.fill("#m-things", "a sealed packet, in the captain's keeping")
+    pg.fill("#m-goods", "tin 12")
+    pg.select_option('#maker [data-field="papers.private_signals"]', "false")
+    line = pg.inner_text('#maker [data-line="papers"]')
+    assert "a chronometer by Earnshaw" in line and "no private signals" in line
+    assert "Mr Tregenza, the master (skill 0.5), Mr Pentreath, the supercargo" in line
+    assert "in the hold 12 tons of tin" in line and "one thing aboard or ashore" in line
+    pg.fill("#m-name", "with-a-chronometer")
+    pg.click("#btn-m-save")
+    pg.wait_for_function("window.freesailHarbour.busy === true", timeout=10_000)
+    pg.wait_for_function("window.freesailHarbour.busy === false", timeout=60_000)
+    assert not pg.is_visible("#m-refusal"), pg.inner_text("#m-refusal")
+    import yaml
+
+    made = yaml.safe_load((port.place / "with-a-chronometer.yaml").read_text(encoding="utf-8"))
+    assert made["papers"]["chronometer"] == {"maker": "Earnshaw", "rate_s_per_day": 1.8, "drift": 0}
+    assert made["papers"]["private_signals"] is False
+    assert made["people"] == [
+        {"role": "master", "skill": 0.5, "name": "Mr Tregenza"},
+        {"role": "supercargo", "name": "Mr Pentreath"},
+    ]
+    assert made["cargo"]["goods"] == {"tin": 12}
+    assert made["things"] == ["a sealed packet, in the captain's keeping"]
+    said = pg.inner_text("#m-words")
+    assert "She carries a chronometer by Earnshaw" in said and "its rate right" in said
+    status = pg.evaluate(
+        """async (path) => (await fetch('/api/harbour/start', {method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({scenario: path})})).status""",
+        str(port.place / "with-a-chronometer.yaml"),
+    )
+    assert status == 200
+    with port.driver.lock:
+        world = port.driver.world
+        assert world.scenario.chronometer["maker"] == "Earnshaw"
+        names = {p.name for p in world.people.everyone}
+        assert "Mr Pentreath" in names and "Mr Tregenza" in names
+        assert world.people.by_role("master")[0].skill == 0.5
+    # the naval cruise, whose papers have a chronometer already: the part opened and a
+    # field of another part changed leaves the papers, the people and the hold as written
+    out = pg.evaluate(
+        """async () => {
+            const h = window.freesailHarbour;
+            await h.readScenario('data/scenarios/naval-cruise.yaml');
+            const on = document.getElementById('m-chron-on').checked;
+            const maker = document.querySelector('#m-chron [data-chron=maker]');
+            maker.dispatchEvent(new Event('input', { bubbles: true }));
+            const tr = document.querySelector('#m-people tbody tr');
+            const name = tr && tr.querySelector('[data-col=name]');
+            if (name) name.dispatchEvent(new Event('input', { bubbles: true }));
+            const f = h.collect(), was = h.loaded.fields;
+            const now = JSON.stringify([f.papers, f.people, f.cargo, f.things]);
+            const then = JSON.stringify([was.papers, was.people, was.cargo, was.things]);
+            return {on: on, maker: maker.value, same: now === then};
+        }"""
+    )
+    assert out == {"on": True, "maker": "Arnold", "same": True}
     assert errors == []
 
 

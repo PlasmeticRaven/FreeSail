@@ -546,10 +546,14 @@
     if (t.hasAttribute("data-brief")) markDirty("director");
     if (t.closest && t.closest("#m-ships")) markDirty("ships");
     if (t.closest && t.closest("#m-squadrons")) markDirty("squadrons");
+    if (t.closest && t.closest("#m-people")) markDirty("people");
+    if (t.closest && t.closest("#m-chron")) { markDirty("papers.chronometer"); chronShown(); }
     if (t.closest && t.closest("#m-wind")) markDirty("weather");
     if (t.closest && t.closest("#m-world-orders")) markDirty("world_orders");
   });
   $("maker").addEventListener("input", function (ev) {
+    if (ev.target.closest && ev.target.closest("#m-people")) markDirty("people");
+    if (ev.target.closest && ev.target.closest("#m-chron")) markDirty("papers.chronometer");
     if (ev.target.closest && ev.target.closest("#m-squadrons")) markDirty("squadrons");
     var t = ev.target;
     if (t.hasAttribute("data-brief")) markDirty("director");
@@ -906,6 +910,95 @@
   $("m-ships").addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON") setTimeout(refreshSquadrons, 0); });
   $("btn-m-ship-add").addEventListener("click", function () { setTimeout(refreshSquadrons, 0); });
 
+  // -- her papers, her purse and her people (package 96b, step 7; the design's §2.3) -----
+
+  function goodsWords(goods) {
+    return Object.keys(goods || {}).map(function (g) { return g + " " + goods[g]; }).join(", ");
+  }
+  function goodsOf(text) {
+    // "tin 20, pilchards 4.5": each a good and its tons; undefined where none is said,
+    // null where a part cannot be read (the field is then left as the file has it)
+    var out = {}, parts = text.split(",").map(function (s) { return s.trim(); }).filter(Boolean), bad = false;
+    parts.forEach(function (part) {
+      var m = /^(.*\S)\s+(-?\d+(?:\.\d+)?)$/.exec(part);
+      if (!m) { bad = true; return; }
+      out[m[1].trim()] = Number(m[2]);
+    });
+    return bad ? null : parts.length ? out : undefined;
+  }
+  function chronShown() { $("m-chron-fields").hidden = !$("m-chron-on").checked; }
+  function fillChron(fields) {
+    var onShip = getPath(fields, "ship.chronometer") || fields.chronometer;
+    var c = getPath(fields, "papers.chronometer");
+    var locked = !!onShip;
+    $("m-chron-on").checked = !!(c || onShip);
+    $("m-chron-on").disabled = locked;
+    document.querySelectorAll("#m-chron [data-chron]").forEach(function (el) {
+      var v = (c || onShip || {})[el.getAttribute("data-chron")];
+      el.value = v === undefined || v === null ? "" : String(v);
+      el.disabled = locked;
+    });
+    $("m-chron")._item = c && typeof c === "object" ? c : {};
+    $("m-chron-said").textContent = locked ? "Her chronometer is written on the ship's own line of the file, which wins: kept as it is." : "";
+    chronShown();
+  }
+  function chronOf() {
+    if (!$("m-chron-on").checked) return undefined;
+    var item = deep($("m-chron")._item) || {};
+    document.querySelectorAll("#m-chron [data-chron]").forEach(function (el) {
+      var k = el.getAttribute("data-chron"), v = el.value.trim(), had = $("m-chron")._item[k];
+      if (v === "") delete item[k];
+      else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+      else item[k] = el.hasAttribute("data-num") || (k === "drift" && v.toLowerCase() !== "seeded" && isFinite(Number(v))) ? Number(v) : v;
+    });
+    if (!item.maker) item.maker = "the chronometer";
+    return item;
+  }
+  var PEOPLE_COLS = [["role", "text"], ["name", "text"], ["skill", "number"], ["place", "text"], ["ashore", "select", ["yes"]], ["port", "select", "ports"]];
+  function personRow(item) {
+    var tr = document.createElement("tr");
+    tr._item = item || {};
+    PEOPLE_COLS.forEach(function (c) {
+      var opts = c[2] === "ports" ? cat.ports.map(function (x) { return x.id; }) : c[2];
+      var value = tr._item[c[0]];
+      if (c[0] === "ashore") value = value ? "yes" : undefined;
+      var el = cell(tr, value, c[1], opts);
+      el.setAttribute("data-col", c[0]);
+      el.setAttribute("data-kind", c[1]);
+      if (c[0] === "role") { el.setAttribute("list", "m-posts"); el.placeholder = "master, supercargo"; }
+      if (c[0] === "skill") { el.min = "0"; el.max = "1"; el.placeholder = "0.7"; }
+      if (c[0] === "place") el.placeholder = "cabin";
+    });
+    removeButton(tr, "people");
+    $("m-people").querySelector("tbody").appendChild(tr);
+  }
+  function peopleOf() {
+    return Array.prototype.map.call(document.querySelectorAll("#m-people tbody tr"), function (tr) {
+      var item = deep(tr._item) || {};
+      tr.querySelectorAll("[data-col]").forEach(function (el) {
+        var k = el.getAttribute("data-col"), v = el.value.trim(), had = tr._item[k];
+        if (k === "ashore") { if (v === "yes") item.ashore = had === undefined || !had ? true : had; else delete item.ashore; return; }
+        if (v === "") delete item[k];
+        else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
+        else item[k] = el.getAttribute("data-kind") === "number" ? Number(v) : v;
+      });
+      return item;
+    }).filter(function (item) { return Object.keys(item).length; });
+  }
+  function fillPosts(file) {
+    var list = $("m-posts");
+    clear(list);
+    ((cat.posts || {})[file] || []).forEach(function (r) { option(list, r); });
+  }
+  $("btn-m-person-add").addEventListener("click", function () { personRow({}); markDirty("people"); });
+  function fillThings(things) {
+    var el = $("m-things"), list = Array.isArray(things) ? things : [];
+    var plain = list.every(function (x) { return typeof x === "string"; });
+    el.disabled = !plain;
+    el.value = plain ? list.join("\n") : "";
+    el.placeholder = plain ? "a sealed packet, in the captain's keeping" : "written out in the file (a thing with its name, where and description apart): kept as it is";
+  }
+
   var WIND_COLS = [["at", "text"], ["from_deg", "number"], ["knots", "number"], ["air_mass", "select", ["neutral", "warm", "unstable"]]];
   function windRow(item) {
     var tr = document.createElement("tr");
@@ -930,6 +1023,7 @@
   }
   $("btn-m-ship-add").addEventListener("click", function () { shipRow({}); markDirty("ships"); });
   $("maker").querySelector('[data-field="ship.file"]').addEventListener("change", function (ev) {
+    fillPosts(ev.target.value);
     fillShipFit(ev.target.value, $("m-ship-fit").value);
   });
   $("btn-m-wind-add").addEventListener("click", function () { windRow({}); markDirty("weather"); setWeatherMode("pinned"); });
@@ -995,6 +1089,11 @@
   function fillForm(fields, positionDeg) {
     dirty = {};
     fillShipFit(getPath(fields, "ship.file"), getPath(fields, "ship.fit"));
+    fillPosts(getPath(fields, "ship.file"));
+    fillChron(fields);
+    fillThings(fields.things);
+    clear($("m-people").querySelector("tbody"));
+    (Array.isArray(fields.people) ? fields.people : []).forEach(personRow);
     document.querySelectorAll("#maker [data-field]").forEach(function (el) {
       var kind = el.getAttribute("data-kind");
       var path = el.getAttribute("data-field");
@@ -1007,6 +1106,8 @@
       else if (kind === "business") el.value = v === true || v === "on" ? "on" : v === false || v === "off" ? "off" : v === undefined ? "" : String(v);
       else if (kind === "lines") el.value = Array.isArray(v) ? v.join("\n") : "";
       else if (kind === "csv") el.value = Array.isArray(v) ? v.join(", ") : v && typeof v === "object" ? "" : "";
+      else if (kind === "tri") el.value = v === true ? "true" : v === false ? "false" : "";
+      else if (kind === "goods") el.value = goodsWords(v);
     });
     var ports = fields.ports;
     $("maker").querySelector('[data-field="ports"]').disabled = !!(ports && !Array.isArray(ports));
@@ -1111,7 +1212,7 @@
       if (papers.private_signals !== undefined) bits.push(papers.private_signals ? "the private signals carried" : "no private signals");
       if ((papers.signal_books || []).length) bits.push("the signal books of " + papers.signal_books.join(", "));
       var people = f.people || [];
-      bits.push(people.length ? "people said: " + people.map(function (x) { return (x.name ? x.name + ", " : "") + "the " + x.role + (x.skill !== undefined ? " (skill " + x.skill + ")" : ""); }).join("; ") : "her people as her wardroom has them");
+      bits.push(people.length ? "people said: " + people.map(function (x) { return (x.name ? x.name + ", " : "") + "the " + x.role + (x.skill !== undefined ? " (skill " + x.skill + ")" : "") + (x.ashore ? ", ashore" + (x.port ? " at " + x.port : "") : ""); }).join(", ") : "her people as her wardroom has them");
       if ((f.things || []).length) bits.push(plural(f.things.length, "thing", "things") + " aboard or ashore");
     } else if (part === "weather") {
       var w = f.weather, wind = f.wind || {};
@@ -1193,6 +1294,7 @@
       var items = el.value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
       return items.length ? items : undefined;
     }
+    if (kind === "tri") return el.value === "true" ? true : el.value === "false" ? false : undefined;
     return undefined;
   }
 
@@ -1205,7 +1307,7 @@
     document.querySelectorAll("#maker [data-field]").forEach(function (el) {
       var path = el.getAttribute("data-field");
       var kind = el.getAttribute("data-kind");
-      if (["text", "number", "select", "bool", "business", "lines", "csv"].indexOf(kind) < 0) return;
+      if (["text", "number", "select", "bool", "business", "lines", "csv", "tri"].indexOf(kind) < 0) return;
       if (!on(path) || el.disabled) return;
       var v = valueOf(el);
       if (kind === "bool" && all && !v) v = undefined;
@@ -1230,6 +1332,23 @@
     if (on("ships")) {
       var ships = shipsOf();
       if (ships.length) f.ships = ships; else delete f.ships;
+    }
+    if (on("cargo.goods")) {
+      var goods = goodsOf($("m-goods").value);
+      if (goods === undefined) delPath(f, "cargo.goods");
+      else if (goods !== null) setPath(f, "cargo.goods", goods);
+    }
+    if (on("papers.chronometer") && !$("m-chron-on").disabled) {
+      var chron = chronOf();
+      if (chron === undefined) delPath(f, "papers.chronometer"); else setPath(f, "papers.chronometer", chron);
+    }
+    if (on("people")) {
+      var people = peopleOf();
+      if (people.length) f.people = people; else delete f.people;
+    }
+    if (on("things") && !$("m-things").disabled) {
+      var things = $("m-things").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+      if (things.length) f.things = things; else delete f.things;
     }
     if (on("squadrons")) {
       var sets = squadronsOf();

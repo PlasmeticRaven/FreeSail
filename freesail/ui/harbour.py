@@ -451,6 +451,10 @@ class Harbour:
             "descriptions": list(DESCRIPTIONS),
             "kinds": self.kinds(),
             "squadrons": self.squadron_words(),
+            "posts": self.posts(),
+            "signal_books": sorted(
+                p.name for p in (ROOT / "data" / "signals").iterdir() if p.is_dir()
+            ),
             "fits": self.fits(),
             "nations": list(load_nations().nations),
             "regions": self.regions(),
@@ -628,6 +632,31 @@ class Harbour:
                 )
             Harbour._kinds = out
         return Harbour._kinds
+
+    _posts: dict[str, list[str]] | None = None
+
+    def posts(self) -> dict[str, list[str]]:
+        """The posts of each ship file's wardroom (package 96b, step 7): the roles of
+        `data/people/<her file's name>.yaml`, by her ship file, in the file's order; none
+        for a ship with no wardroom file. A person the scenario names by one of these is
+        the officer of her muster at that post; by any other role, a person added."""
+        if Harbour._posts is None:
+            out: dict[str, list[str]] = {}
+            for p in sorted(SHIPS_DIR.glob("*.yaml")):
+                if _is_boat(p):
+                    continue
+                roles: list[str] = []
+                with contextlib.suppress(OSError, yaml.YAMLError, AttributeError, TypeError):
+                    doc = yaml.safe_load(
+                        (ROOT / "data" / "people" / p.name).read_text(encoding="utf-8")
+                    )
+                    for entry in (doc or {}).get("wardroom") or []:
+                        role = " ".join(str(entry.get("role") or "").lower().split())
+                        if role and role not in roles:
+                            roles.append(role)
+                out[_rel(p)] = roles
+            Harbour._posts = out
+        return Harbour._posts
 
     @staticmethod
     def squadron_words() -> dict[str, Any]:
