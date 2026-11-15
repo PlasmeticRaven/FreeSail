@@ -481,3 +481,9 @@ p.note { margin: 6px 12px; font-size: 12.5px; color: var(--ink-soft); }
 .maker .squadron-card fieldset.card-members-box { border: none; border-top: none; padding: 6px 0 2px; margin: 0; display: block; }
 .maker .squadron-card fieldset.card-members-box legend { font-size: 12px; color: var(--ink-soft); padding: 0; }
 .maker .squadron-card .card-members { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; }
+
+/* package 96b, step 7: her papers, her purse and her people */
+.maker .chron { display: flex; flex-direction: column; gap: 4px; border-top: 1px dotted var(--rule); border-bottom: 1px dotted var(--rule); padding: 6px 0; }
+.maker .chron .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 14px; }
+.maker .chron .card-grid[hidden] { display: none; }
+.maker .chron .muted, .maker .chron label.check { font-size: 12.5px; }

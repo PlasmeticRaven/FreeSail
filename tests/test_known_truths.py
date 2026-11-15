@@ -21768,3 +21768,51 @@ def test_truth_7_407_a_squadron_is_made_from_the_sheet_by_the_games_own_kinds_an
             harbour.prove(fields)
     finally:
         harbour.close()
+
+
+def test_truth_7_408_the_papers_the_purse_and_the_people_are_set_from_the_sheet(tmp_path):
+    """Package 96b, step 7 (docs/design/Design-Harbour.md §1.3 rows 54 to 61 and 72 to 76;
+    the owner's points of 2026-10-18: he could not add a chronometer, and hoped to name the
+    people aboard). A scenario with the fields as the sheet's part writes them (a
+    chronometer with its maker and rate, the epitome, the private signals withheld, a
+    price list, goods in the hold, the master named and his skill said, a supercargo
+    beside the muster, a thing in the captain's keeping) is proved by the maker and is so
+    in the game: the chronometer aboard, the master of that name and skill, Mr Pentreath
+    among her people. The catalogue gives the page each ship's wardroom posts, so that the
+    sheet can say which roles are officers of her muster and which make a person more."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    cat = harbour.catalogue()
+    assert "master" in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    assert "supercargo" not in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    fields = harbour.read_scenario("data/scenarios/merchant-passage.yaml")["fields"]
+    fields["papers"] = {
+        **fields["papers"],
+        "chronometer": {"maker": "Earnshaw", "rate_s_per_day": 1.8, "drift": 0},
+        "private_signals": False,
+        "price_lists": ["falmouth", "brest"],
+    }
+    fields["people"] = [
+        {"role": "master", "skill": 0.5, "name": "Mr Tregenza"},
+        {"role": "supercargo", "name": "Mr Pentreath"},
+    ]
+    fields["cargo"] = {**(fields.get("cargo") or {}), "goods": {"tin": 12}}
+    fields["things"] = ["a sealed packet, in the captain's keeping"]
+    proved = harbour.prove(fields, "data/scenarios/merchant-passage.yaml")
+    assert any("She carries a chronometer by Earnshaw" in ln for ln in proved["lines"])
+    saved = harbour.save_scenario(fields, "with-a-chronometer")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        world = driver.world
+        assert world.scenario.chronometer["rate_s_per_day"] == 1.8
+        assert world.scenario.papers["private_signals"] is False
+        master = world.people.by_role("master")[0]
+        assert (master.name, master.skill) == ("Mr Tregenza", 0.5)
+        assert "Mr Pentreath" in {p.name for p in world.people.everyone}
+        assert world.scenario.cargo["goods"] == {"tin": 12.0}
+    finally:
+        harbour.close()
