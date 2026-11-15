@@ -65,33 +65,152 @@
 
   // -- the catalogue -------------------------------------------------------------------
 
+  // The scenarios by shelf (package 96b, step 1; docs/design/Design-Harbour.md §3.2): the
+  // catalogue gives each scenario its shelf and its sentence, in the shelves' order; a
+  // shelf kept for tests and gates is listed only when the tick box asks for it.
+  function showTests() { return $("s-tests").checked; }
   function scenarioOptions(sel, withNone) {
     clear(sel);
     if (withNone) option(sel, "", withNone);
-    var game = document.createElement("optgroup");
-    game.label = "the game's";
-    var own = document.createElement("optgroup");
-    own.label = "yours (" + cat.scenarios_place + ")";
-    cat.scenarios.forEach(function (s) {
-      var o = document.createElement("option");
-      o.value = s.path;
-      o.textContent = s.name + "  (" + s.path.split(/[\\/]/).pop() + ")";
-      (s.own ? own : game).appendChild(o);
+    (cat.shelves || []).forEach(function (shelf) {
+      if (shelf.hidden && !showTests()) return;
+      var group = document.createElement("optgroup");
+      group.label = shelf.id === "yours" ? "Yours (" + cat.scenarios_place + ")" : shelf.title;
+      group.setAttribute("data-shelf", shelf.id);
+      cat.scenarios.forEach(function (s) {
+        if (s.shelf !== shelf.id) return;
+        var o = document.createElement("option");
+        o.value = s.path;
+        o.textContent = s.name;
+        o.title = s.path.split(/[\\/]/).pop();
+        group.appendChild(o);
+      });
+      if (group.children.length) sel.appendChild(group);
     });
-    sel.appendChild(game);
-    if (own.children.length) sel.appendChild(own);
+  }
+  function scenarioSays() {
+    var path = $("s-scenario").value;
+    var s = (cat.scenarios || []).filter(function (x) { return x.path === path; })[0];
+    var shelf = s && (cat.shelves || []).filter(function (x) { return x.id === s.shelf; })[0];
+    var words = "";
+    if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")";
+    $("s-says").textContent = words;
+    scenarioSaid(path);
+  }
+  // What the game is, said before it is started (package 96b, step 3): the scenario's own
+  // lines as a driver prints them at the load, and the ships the player may be aboard.
+  var saidFor = "";
+  function scenarioSaid(path) {
+    saidFor = path;
+    show($("s-lines"), "");
+    $("s-lines").classList.remove("refusal");
+    var aboard = $("s-aboard");
+    clear(aboard);
+    option(aboard, "", "your own ship");
+    $("s-aboard-label").hidden = true;
+    if (!path) return;
+    api("GET", "/api/harbour/scenario?path=" + encodeURIComponent(path)).then(function (r) {
+      if (saidFor !== path) return; // another was chosen meanwhile
+      show($("s-lines"), r.refusal ? "This scenario does not load: " + r.refusal : r.lines.join("\n"));
+      $("s-lines").classList.toggle("refusal", !!r.refusal);
+      if ($("s-from").value !== "scenario") $("s-lines").hidden = true;
+      (r.aboard || []).forEach(function (name) { option(aboard, name, "the " + name); });
+      $("s-aboard-label").hidden = !(r.aboard || []).length || $("s-from").value !== "scenario";
+    }).catch(function () { /* the list still starts it; the start says why if it cannot */ });
+  }
+  function fillScenarios() {
+    var keep = { s: $("s-scenario").value, m: $("m-pick").value };
+    scenarioOptions($("s-scenario"));
+    scenarioOptions($("m-pick"));
+    if (keep.s) $("s-scenario").value = keep.s;
+    if (keep.m) $("m-pick").value = keep.m;
+    if ($("s-scenario").selectedIndex < 0) $("s-scenario").selectedIndex = 0;
+    if ($("m-pick").selectedIndex < 0) $("m-pick").selectedIndex = 0;
+    scenarioSays();
+  }
+
+  // -- begin (package 96b, step 2; docs/design/Design-Harbour.md §3.1) -------------------
+  //
+  // The first panel: one game named to begin with, the lessons as lessons, the newest save,
+  // and the way to all the games. No seed, pace or seat is asked: each button starts its
+  // game with the scenario's own choices (and the seat its shelf entry names), the clock
+  // held, and goes to the game's page.
+
+  function beginStart(body, button) {
+    var words = $("b-words");
+    document.querySelectorAll(".begin button").forEach(function (b) { b.disabled = true; });
+    words.classList.remove("refusal");
+    show(words, "Starting...");
+    return api("POST", "/api/harbour/start", body).then(function () {
+      window.location.href = "/";
+    }).catch(function (e) {
+      show(words, e.message);
+      words.classList.add("refusal");
+      document.querySelectorAll(".begin button").forEach(function (b) { b.disabled = false; });
+    });
+  }
+
+  function fillBegin() {
+    var first = cat.first_game;
+    $("b-first").hidden = !first;
+    if (first) {
+      $("btn-b-first").textContent = "begin: " + first.name;
+      $("btn-b-first").setAttribute("data-path", first.path);
+      var says = $("b-first-says");
+      clear(says);
+      first.says.forEach(function (w) { li(says, w); });
+    }
+    var lessons = cat.scenarios.filter(function (s) { return s.shelf === "lessons"; });
+    $("b-lessons-block").hidden = !lessons.length;
+    var list = $("b-lessons");
+    clear(list);
+    lessons.forEach(function (s) {
+      var item = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = s.name;
+      b.setAttribute("data-path", s.path);
+      b.addEventListener("click", function () { beginStart({ scenario: s.path, seat: s.seat || "" }, b); });
+      item.appendChild(b);
+      var w = document.createElement("span");
+      w.textContent = " " + s.says;
+      item.appendChild(w);
+      list.appendChild(item);
+    });
+  }
+  $("btn-b-first").addEventListener("click", function () {
+    beginStart({ scenario: $("btn-b-first").getAttribute("data-path"), seat: "" }, $("btn-b-first"));
+  });
+  $("btn-b-save").addEventListener("click", function () {
+    beginStart({ load: $("btn-b-save").getAttribute("data-save") }, $("btn-b-save"));
+  });
+  $("btn-b-all").addEventListener("click", function () { tab("game"); });
+
+  function beginState(s) {
+    var g = s.game;
+    $("b-playing").hidden = !g.started;
+    if (g.started) {
+      $("b-playing-says").textContent = (g.title || "A ship on open water") + (g.ship ? ": " + g.ship : "") + ", " + g.stamp + ". " + (g.running ? "The clock runs." : "The clock is held until you say go.");
+    }
+    var newest = s.saves && s.saves.saves.length ? s.saves.saves[0] : null;
+    $("b-save").hidden = !newest;
+    if (newest && $("btn-b-save").getAttribute("data-save") !== newest.name) {
+      $("btn-b-save").textContent = "take up: " + newest.name;
+      $("btn-b-save").setAttribute("data-save", newest.name);
+      $("b-save-says").textContent = "Your newest save, written " + newest.written + ", in " + s.saves.place + ". The game tab takes up any other.";
+    }
   }
 
   function fillCatalogue() {
-    scenarioOptions($("s-scenario"));
-    scenarioOptions($("m-pick"));
+    fillScenarios();
+    fillBegin();
     var ship = $("s-ship");
     clear(ship);
     cat.ships.forEach(function (s) { option(ship, s); });
     var seat = $("s-seat");
     clear(seat);
     cat.seats.forEach(function (s) {
-      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : "the " + s);
+      option(seat, s, s === "" ? "as the scenario says (else the captain)" : s === "captain" ? "the captain, at the prompt" : s === "director" ? "the director, above the game" : "the " + s);
     });
     var brief = $("s-brief");
     clear(brief);
@@ -197,6 +316,7 @@
       var said = x.holder && line.indexOf(x.holder) >= 0;
       li(st, line + (x.holder && !said ? "  [" + x.holder + (x.door ? ", " + x.door : "") + "]" : ""));
     });
+    fillSaves(s.saves);
     var gd = $("g-doors");
     clear(gd);
     if (!s.doors.length) li(gd, "none started from the harbour", "muted");
@@ -207,6 +327,7 @@
     clear(cr);
     s.credential.forEach(function (w) { li(cr, w); });
     s.doors.forEach(paneFor);
+    beginState(s);
     harbour.state = s;
   }
 
@@ -223,6 +344,35 @@
     document.querySelectorAll("#start-form .from").forEach(function (l) {
       l.hidden = !l.classList.contains("from-" + v);
     });
+    if (v === "scenario") {
+      $("s-lines").hidden = !$("s-lines").textContent;
+      $("s-aboard-label").hidden = $("s-aboard").options.length < 2;
+    }
+  });
+  // the saved games of the saves place, newest first (package 96b, step 3): picking one
+  // fills in its name; a name may still be typed (a save lying in the game's own folder)
+  var savesKey = "";
+  function fillSaves(saves) {
+    if (!saves) return;
+    var key = saves.place + "|" + saves.saves.map(function (x) { return x.name + x.written; }).join("|");
+    if (key === savesKey) return;
+    savesKey = key;
+    var pick = $("s-load-pick"), kept = pick.value;
+    clear(pick);
+    option(pick, "", saves.saves.length ? "(choose a saved game)" : "(none saved yet)");
+    saves.saves.forEach(function (x) { option(pick, x.name, x.name + "  (written " + x.written + ")"); });
+    pick.value = kept;
+    if (pick.selectedIndex < 0) pick.selectedIndex = 0;
+    $("s-load-says").textContent = "Saved games are kept in " + saves.place + ". At the game's order line, 'save NAME' writes one there. A save kept elsewhere is taken up by moving it there.";
+  }
+  $("s-load-pick").addEventListener("change", function () {
+    if ($("s-load-pick").value) $("s-load").value = $("s-load-pick").value;
+  });
+  $("s-scenario").addEventListener("change", scenarioSays);
+  try { $("s-tests").checked = localStorage.getItem("harbour-tests") === "1"; } catch (e) { /* none */ }
+  $("s-tests").addEventListener("change", function () {
+    try { localStorage.setItem("harbour-tests", showTests() ? "1" : "0"); } catch (e) { /* none */ }
+    if (cat) fillScenarios();
   });
   $("s-brief").addEventListener("change", function () {
     $("s-brief-file-label").hidden = $("s-brief").value !== "*";
@@ -238,6 +388,9 @@
       load: from === "load" ? $("s-load").value : "",
       seed: $("s-seed").value,
       seat: $("s-seat").value,
+      aboard: from === "scenario" ? $("s-aboard").value : "",
+      wind: from === "ship" ? $("s-wind").value : "",
+      heading: from === "ship" ? $("s-heading").value : "",
       time: $("s-time").value,
       pace: $("s-pace").value,
       crewed_cap: $("s-crewed-cap").value,

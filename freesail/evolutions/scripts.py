@@ -1858,13 +1858,18 @@ class TackScript(Script):
         braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        heading = self.new_course
         if self.timed_out:
             new = self.ship.dyn.tack
+            # and the heading she lies on, read from her, not the course she was put about
+            # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
+            # up on the starboard tack, heading SSE (158°)" with her head at NE)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
-            "new_course": units.format_heading(self.new_course),
+            "new_course": units.format_heading(heading),
         } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:
@@ -6635,8 +6640,11 @@ class _AnchorScript(Script):
         return d
 
 
-# The work that waits on at anchor when she comes to (package 45c): the boat's errand.
-ANCHOR_WORK_KEPT = frozenset({"send_boat"})
+# The work that waits on at anchor when she comes to (package 45c): the boat's errand; and
+# the order to weigh or unmoor given while the sail was furled (package 60: given by the new
+# captain at his taking command, as she finished coming to under her late master, it was
+# belayed with no word and she lay at anchor two hours), which is anchor work, not sail work.
+ANCHOR_WORK_KEPT = frozenset({"send_boat", "weigh_anchor", "unmoor"})
 # The work a post's leaving held (`Runner._hold`, the lead's ruling 11 of 2026-11-13) that coming to
 # anchor or getting under way does not do away with, by its subject's class: the ship's own work
 # (battening down, the cable, the kedge, the small arms) and her repairs (a spar cut away, fished
@@ -6858,6 +6866,28 @@ def _anchoring_warnings(
 DEEP_ROAD_FATHOMS = 20.0
 
 
+def cannot_anchor(
+    ship: Ship, anchor: Any, depth_m: float | None, where: str = "here"
+) -> str | None:
+    """Can she anchor here by this anchor in this depth: the one answer the let-go
+    evolutions and a ship woken at her anchor ask (package 60, the lead's fourth round: one
+    question, one answer): None where she can; else why, in the forecastle's words: no anchor
+    that can be let go, the anchor lost or not ready, no bottom here, or the ground too deep
+    for her cable (`_too_deep`). The evolutions' own checks before it (no tackle, at anchor
+    already, aground, an anchor named that she has not) stay theirs."""
+    from freesail.ship.parts import AnchorState, ground_tackle
+
+    if anchor is None:
+        return "she has no anchor that can be let go"
+    if anchor.state is AnchorState.LOST:
+        return f"{anchor.name} is lost"
+    if not can_let_go(anchor):
+        return f"{anchor.name} is {anchor.state.value}"
+    if depth_m is None:
+        return "no bottom here to anchor in"
+    return _too_deep(ground_tackle(ship), anchor, depth_m, where)
+
+
 def _too_deep(tackle: Any, anchor: Any, depth_m: float, where: str) -> str | None:
     """'no anchoring ground here: forty-four fathoms and a half, and the small bower's
     hundred and twenty fathoms of cable give less than three times the depth, the least
@@ -7034,20 +7064,16 @@ class ComeToAnchorScript(_AnchorScript):
         self.anchor = self._named(self.params.get("anchor"))
         if self.anchor is None:
             return f"no anchor aboard answers to '{self.params.get('anchor')}'"
-        if not can_let_go(self.anchor):
-            return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
-        if depth is None:
-            return "no bottom here to anchor in"
-        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         wanted = self.params.get("depth_fathoms")
-        if wanted:
+        if wanted and depth is not None and can_let_go(self.anchor):
             # "come to an anchor in twelve fathoms": the depth to let go in, as the primer
             # has it; she stands on until the lead calls it (package 37f)
             self.let_go_depth = units.fathoms_to_m(float(wanted))
             depth = self.let_go_depth
-        if why := _too_deep(self.tackle, self.anchor, depth, "there" if wanted else "here"):
+        if why := cannot_anchor(self.ship, self.anchor, depth, "there" if wanted else "here"):
             return why
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -7361,16 +7387,10 @@ class LetGoAnchorScript(_AnchorScript):
 
         if self.anchor.state is AnchorState.DOWN:
             return f"{self.anchor.name} is down already"
-        if self.anchor.state is AnchorState.LOST:
-            return f"{self.anchor.name} is lost"
-        if not can_let_go(self.anchor):
-            return f"{self.anchor.name} is {self.anchor.state.value}"
         depth = _water_depth(self.ship)
-        if depth is None:
-            return "no bottom here to anchor in"
-        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
-        if (why := _too_deep(self.tackle, self.anchor, depth, "here")) is not None:
+        if (why := cannot_anchor(self.ship, self.anchor, depth, "here")) is not None:
             return why
+        whole = units.fathoms_to_m(self.anchor.cable_fathoms)
         scope = self.params.get("fathoms")
         if scope and units.fathoms_to_m(float(scope)) < depth:
             return (
@@ -9086,6 +9106,14 @@ class SendBoatScript(Script):
             if item.get("kind") in ("purchase", "sale")
         )
         self.ashore_s = float(BOAT_ASHORE_S.get(errand, 1800)) + tons * LIGHTER_S_PER_TON
+        # what she carries on the errand, kept by the errand itself: the boat's state is made
+        # afresh when she is lost (`world.boats.lose_boat`), and the goods with it
+        self.carried = [
+            dict(item)
+            for item in self.ports.boat.carrying
+            if item.get("kind") in ("purchase", "sale")
+        ]
+        self.port_id = self.ports.boat.port_id  # the market of her errand, kept with them
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -9099,6 +9127,17 @@ class SendBoatScript(Script):
             self.ship.note(severity.value, kind, text, self.ship.name, data)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.ports is not None and getattr(self.ports.boat, "lost", None):
+            # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
+            # and what was bought or sold in her is said lost with her, paid once and never
+            # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
+            # a sale is had when the goods are landed: lost before she reached the quay, it
+            # is void (the lead's reading of part D at 60af48e, item 4)
+            landed = self.phase in ("ashore", "pull_back", "hoist_in")
+            carried = list(getattr(self, "carried", []) or [])
+            port_id = getattr(self, "port_id", None)
+            self.fail(self.ports.lost_on_errand(carried, landed=landed, port_id=port_id))
+            return
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":

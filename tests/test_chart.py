@@ -21,6 +21,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -2484,3 +2485,316 @@ def test_the_world_lies_under_a_named_chart_and_never_under_a_chart_of_one_regio
     assert whole.level_at(south) == 1  # the corridor answers before the world
     assert whole.level_at(Position(57.0, -6.0)) == 0  # beyond every layer, the world
     assert whole.depth_at(Position(57.0, -6.0)) == 140.0  # the synthetic tile's, read
+
+
+# -- the chart session's tracks step: the least depth along a line ---------------------
+
+
+# the level-3 tile of the global grid holding 0.01 N 0.01 E (tiles of 512 cells of half a
+# second, counted from 90 S and 180 W), its south and west edges in seconds
+HARBOUR_SOUTH_SEC = -90 * 3600 + int((90.01 * 3600 / 0.5) // 512) * 256
+HARBOUR_WEST_SEC = -180 * 3600 + int((180.01 * 3600 / 0.5) // 512) * 256
+L3 = 0.5 / 3600.0  # a level-3 cell in degrees
+L2 = 3.0 / 3600.0  # a level-2 cell
+
+
+def _made_tile(folder: Path, level: int, south_sec: int, west_sec: int, depth_m) -> str:
+    """A tile of `level` with its south-west corner at (south_sec, west_sec), its cells the
+    depths `depth_m` (512 by 512, metres at the datum, negative where it dries)."""
+    cell = 0.5 if level == 3 else 3.0
+    name = f"{south_sec}_{west_sec}"
+    elev = np.rint(-np.asarray(depth_m, dtype=float) * 10.0).astype(np.int16)
+    folder.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        folder / f"{name}.npz",
+        elevation=elev,
+        level=np.int16(level),
+        unit_m=np.float32(0.1),
+        cell_sec=np.float32(cell),
+        south_sec=np.int64(south_sec),
+        west_sec=np.int64(west_sec),
+        nodata=np.int16(-32768),
+        dist=np.zeros(elev.shape, dtype=np.uint16),
+        min_depth_m=np.float32(float(np.min(depth_m))),
+    )
+    return name
+
+
+def _made_chart(tmp_path: Path, tiles: list[tuple[int, int, int, Any]]) -> Chart:
+    """A made chart of the given tiles (level, south_sec, west_sec, depths), each its own
+    layer, finest first, under one region-less chart by the equator."""
+    corridors, layers = {}, []
+    for k, (level, south, west, depth) in enumerate(tiles):
+        layer = f"made-{k}"
+        name = _made_tile(tmp_path / "tiles" / str(level) / layer, level, south, west, depth)
+        span = (0.5 if level == 3 else 3.0) * 512 / 3600.0
+        corridors[layer] = {
+            "level": level,
+            "bounds": {
+                "south": south / 3600.0 + 1e-4,
+                "north": south / 3600.0 + span - 1e-4,
+                "west": west / 3600.0 + 1e-4,
+                "east": west / 3600.0 + span - 1e-4,
+            },
+            "folder": f"tiles/{level}/{layer}",
+            "tiles": [{"name": name}],
+        }
+        layers.append(layer)
+    manifest = {
+        "levels": load_manifest()["levels"],
+        "regions": {},
+        "corridors": corridors,
+        "charts": {"sea": {"regions": [], "layers": layers}},
+    }
+    return Chart("sea", manifest, tmp_path)
+
+
+def _brute_least(chart: Chart, a: Position, b: Position, step_m: float) -> float:
+    """The least of the chart's surface read every `step_m` along the straight line in
+    degrees from `a` to `b` (the reader's own chord for a line this short)."""
+    _, dist = bearing_and_distance(a, b)
+    n = max(1, int(math.ceil(dist / step_m)))
+    best = math.inf
+    for k in range(n + 1):
+        t = k / n
+        d = chart.depth_at(
+            Position(
+                a.lat_deg + (b.lat_deg - a.lat_deg) * t, a.lon_deg + (b.lon_deg - a.lon_deg) * t
+            )
+        )
+        if d is not None:
+            best = min(best, d)
+    return best
+
+
+def _lines_by(rng, centre: Position, cell_deg: float, n: int, half_m: float, off_cells: float):
+    """`n` random straight lines of 2 x `half_m` at any bearing, passing within
+    `off_cells` of a cell of `cell_deg` from `centre`."""
+    out = []
+    for _ in range(n):
+        bearing = rng.uniform(0.0, 360.0)
+        off = rng.uniform(-off_cells, off_cells) * cell_deg
+        side = rng.uniform(-off_cells, off_cells) * cell_deg
+        mid = Position(centre.lat_deg + off, centre.lon_deg + side)
+        out.append((destination(mid, bearing, -half_m), destination(mid, bearing, half_m)))
+    return out
+
+
+def _assert_exact(chart: Chart, lines, step_m: float = 0.01, tol_m: float = 0.015) -> None:
+    for a, b in lines:
+        got = chart.least_depth_along(a, b)
+        assert got is not None
+        brute = _brute_least(chart, a, b, step_m)
+        # the true least is at or under every reading, and a reading every centimetre
+        # comes within a slope's centimetre of it
+        assert got[0] <= brute + 1e-6, (a, b, got[0], brute)
+        assert brute - got[0] <= tol_m, (a, b, got[0], brute)
+
+
+def test_a_lines_least_depth_is_the_true_least_by_a_lone_cell_whatever_its_height(tmp_path):
+    """The lead's ruling of 2026-11-14, 11:00 (the reader's finding: 13 of 750 random lines by
+    a lone cell read three metres and more where the truth is under three, a half cell's
+    step and an 8 m margin): `Chart.least_depth_along` is the true least of the chart's own
+    surface along a line, with no step. A level-3 grid 30 m deep with one cell standing at
+    2, 0, -3, -6 or -10 m; random lines at any bearing within 0.8 of a cell of its centre,
+    each read against the same surface every centimetre (old: a reading every half cell and
+    again every 2 m under 8 m)."""
+    rng = np.random.default_rng(7)
+    for k, head in enumerate((2.0, 0.0, -3.0, -6.0, -10.0)):
+        depth = np.full((512, 512), 30.0)
+        depth[256, 300] = head
+        chart = _made_chart(tmp_path / str(k), [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, depth)])
+        centre = Position(
+            HARBOUR_SOUTH_SEC / 3600.0 + 256.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 300.5 * L3
+        )
+        _assert_exact(chart, _lines_by(rng, centre, L3, 30, 20.0, 0.8))
+        # through the centre the least is the head itself, a centimetre's rounding aside
+        a, b = destination(centre, 128.0, -30.0), destination(centre, 128.0, 30.0)
+        assert chart.least_depth_along(a, b)[0] <= head + 0.05
+
+
+def test_a_lines_least_depth_is_the_true_least_over_a_ridge_and_across_edges(tmp_path):
+    """The same rule over a ridge of cells crossed at a slant, across the edge between two
+    tiles of one level (a shoal by the seam), and across a level's edge, where a harbour
+    patch ends and the region's coarser cells answer (each lookup falls to the level that
+    answers there, and the line's least is the least of all its pieces)."""
+    rng = np.random.default_rng(11)
+    ridge = np.full((512, 512), 25.0)
+    ridge[250, 280:330] = 1.5
+    chart = _made_chart(tmp_path / "ridge", [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, ridge)])
+    centre = Position(HARBOUR_SOUTH_SEC / 3600.0 + 250.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 305 * L3)
+    _assert_exact(chart, _lines_by(rng, centre, L3, 30, 25.0, 3.0))
+    # two tiles side by side, the east one shoaler, a head on its first column
+    west_tile = np.full((512, 512), 30.0)
+    east_tile = np.full((512, 512), 18.0)
+    east_tile[200, 0] = 0.5
+    span = 256  # a level-3 tile's span in seconds
+    chart = _made_chart(
+        tmp_path / "seam",
+        [
+            (3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, west_tile),
+            (3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC + span, east_tile),
+        ],
+    )
+    seam = Position(HARBOUR_SOUTH_SEC / 3600.0 + 200.5 * L3, (HARBOUR_WEST_SEC + span) / 3600.0)
+    _assert_exact(chart, _lines_by(rng, seam, L3, 30, 25.0, 1.5))
+    # a level-3 patch over a level-2 region 12 m deep with a head of its own just east of
+    # the patch, lines from the patch out over the region's cells
+    patch = np.full((512, 512), 20.0)
+    edge_lon = (HARBOUR_WEST_SEC + span) / 3600.0
+    head_lat = HARBOUR_SOUTH_SEC / 3600.0 + 100 * L3
+    # the level-2 tile holding the patch's east edge at the head's latitude
+    s2 = -90 * 3600 + int(((head_lat + 90.0) * 3600 / 3.0) // 512) * 1536
+    w2 = -180 * 3600 + int(((edge_lon + 180.0) * 3600 / 3.0) // 512) * 1536
+    region = np.full((512, 512), 12.0)
+    row = int((head_lat - s2 / 3600.0) / L2)
+    col = int((edge_lon - w2 / 3600.0) / L2) + 1
+    region[row, col] = 1.0
+    chart = _made_chart(
+        tmp_path / "level",
+        [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, patch), (2, s2, w2, region)],
+    )
+    head = Position(s2 / 3600.0 + (row + 0.5) * L2, w2 / 3600.0 + (col + 0.5) * L2)
+    assert chart.level_at(destination(head, 270.0, 200.0)) == 3 and chart.level_at(head) == 2
+    _assert_exact(chart, _lines_by(rng, head, L2, 20, 200.0, 0.8), step_m=0.05, tol_m=0.02)
+
+
+def test_setubals_shoal_is_read_at_its_true_least(whole):
+    """The case that showed a half cell's step too coarse (the chart session's measure of
+    the pilot's readers, 2026-11-14): Setúbal's way in, the leg from 38 26.02 N 9 04.46 W to
+    38 25.97 N 9 03.72 W over level 2's cells of 92.6 m, falls in a V to its least some 561 m
+    along, between a reading every half cell (36 m: 3.36 and 3.66 m) and a cable's (1.72 m).
+    The true least is 1.13 m, at or under a reading every 2 cm."""
+    from freesail.world.geo import parse_position
+
+    a = parse_position("38 26.02 N 9 04.46 W")
+    b = parse_position("38 25.97 N 9 03.72 W")
+    least, where = whole.least_depth_along(a, b)
+    assert 1.10 < least < 1.16, least
+    # read every 2 cm about the V along the reader's own chord (the line straight in degrees
+    # from `a` to `b`, which a leg this short is)
+    _, dist = bearing_and_distance(a, b)
+
+    def on(t: float) -> Position:
+        return Position(
+            a.lat_deg + (b.lat_deg - a.lat_deg) * t, a.lon_deg + (b.lon_deg - a.lon_deg) * t
+        )
+
+    s, e = on(540.0 / dist), on(580.0 / dist)
+    assert least <= _brute_least(whole, s, e, 0.02) + 1e-6
+    assert 38.43 < where.lat_deg < 38.44 and -9.07 < where.lon_deg < -9.06
+
+
+def test_a_line_clipping_a_finer_tiles_corner_reads_its_rock(tmp_path):
+    """The reader's item 2 (2026-11-14, 11:00): a line that clips a finer tile's corner for a
+    short stretch is read by that tile there (old: the step of one level chosen for the whole
+    line by sampling every quarter of a tile's span, so a 1,729 m line over a level-3 tile for
+    785 m read 14.0 m over a two-cell rock drying to nothing). A level-3 tile with a rock of
+    two cells by its north-east corner, over a level-2 region 20 m deep; lines across the
+    corner at several slants against a reading every 5 cm."""
+    rng = np.random.default_rng(3)
+    patch = np.full((512, 512), 20.0)
+    patch[508, 508:510] = -0.5  # two cells drying half a metre, four cells from the corner
+    corner = Position(HARBOUR_SOUTH_SEC / 3600.0 + 512 * L3, HARBOUR_WEST_SEC / 3600.0 + 512 * L3)
+    s2 = -90 * 3600 + int(((corner.lat_deg + 90.0) * 3600 / 3.0) // 512) * 1536
+    w2 = -180 * 3600 + int(((corner.lon_deg + 180.0) * 3600 / 3.0) // 512) * 1536
+    region = np.full((512, 512), 20.0)
+    chart = _made_chart(
+        tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, patch), (2, s2, w2, region)]
+    )
+    rock = Position(HARBOUR_SOUTH_SEC / 3600.0 + 508.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 509 * L3)
+    assert chart.level_at(rock) == 3 and chart.level_at(destination(corner, 45.0, 300.0)) == 2
+    for bearing in (100.0, 135.0, 170.0, 300.0):
+        a, b = destination(rock, bearing, -900.0), destination(rock, bearing, 830.0)
+        least = chart.least_depth_along(a, b)
+        assert least is not None and least[0] < 0.0, (bearing, least)
+    _assert_exact(chart, _lines_by(rng, rock, L3, 20, 400.0, 0.8), step_m=0.05, tol_m=0.05)
+
+
+def test_the_first_place_under_a_draught_is_found_where_the_surface_first_falls_under_it(
+    tmp_path,
+):
+    """The line's second answer (the lead's ruling of 2026-11-14, 11:05): `Chart.first_under`
+    gives the first place along the line where the chart's surface is under a draught, by the
+    first root of each piece's quadratic in order; against a reading every 5 mm along random
+    lines by a lone cell, within a centimetre of the first reading under it."""
+    rng = np.random.default_rng(5)
+    depth = np.full((512, 512), 30.0)
+    depth[256, 300] = 1.0
+    chart = _made_chart(tmp_path, [(3, HARBOUR_SOUTH_SEC, HARBOUR_WEST_SEC, depth)])
+    centre = Position(
+        HARBOUR_SOUTH_SEC / 3600.0 + 256.5 * L3, HARBOUR_WEST_SEC / 3600.0 + 300.5 * L3
+    )
+    found = 0
+    for a, b in _lines_by(rng, centre, L3, 30, 20.0, 0.6):
+        _, dist = bearing_and_distance(a, b)
+        got = chart.first_under(a, b, 12.0)
+        n = int(dist / 0.005)
+        first = None
+        for k in range(n + 1):
+            t = k / n
+            d = chart.depth_at(
+                Position(
+                    a.lat_deg + (b.lat_deg - a.lat_deg) * t,
+                    a.lon_deg + (b.lon_deg - a.lon_deg) * t,
+                )
+            )
+            if d is not None and d < 12.0:
+                first = dist * t
+                break
+        if first is None:
+            assert got is None or got[1] >= 11.99
+            continue
+        found += 1
+        assert got is not None and abs(got[0] - first) < 0.01, (got, first)
+        assert got[1] <= 12.0 + 1e-6
+    assert found >= 10
+    assert (
+        chart.first_under(
+            Position(centre.lat_deg + 0.01, centre.lon_deg),
+            Position(centre.lat_deg + 0.011, centre.lon_deg),
+            12.0,
+        )
+        is None
+    )
+
+
+@pytest.mark.slow
+def test_every_port_legs_least_is_at_or_under_a_reading_every_metre(whole):
+    """The exact least on every leg of every port's tracks (under 20 km), against a reading
+    every metre along the great circle: at or under it, within a centimetre over (the reading
+    every metre a point of the same surface; the chord's line straight in degrees, at 500 m,
+    differs from the great circle by millimetres)."""
+    from freesail.world.ports import load_port, port_files
+
+    over = []
+    for pid, path in sorted(port_files().items()):
+        port = load_port(path, whole)
+        tracks = port.tracks or {}
+        for name, seq in tracks.items():
+            marks = []
+            for words in seq:
+                f = whole.feature(str(words))
+                if f is not None:
+                    marks.append(f.position)
+                else:
+                    try:
+                        from freesail.world.geo import parse_position
+
+                        marks.append(parse_position(str(words)))
+                    except ValueError:
+                        continue
+            for a, b in zip(marks, marks[1:], strict=False):
+                bearing, dist = bearing_and_distance(a, b)
+                if dist > 20_000.0 or dist < 1.0:
+                    continue
+                got = whole.least_depth_along(a, b)
+                reads = [
+                    whole.depth_at(destination(a, bearing, float(k))) for k in range(int(dist) + 1)
+                ]
+                reads = [d for d in reads if d is not None]
+                if got is None or not reads:
+                    continue
+                if got[0] > min(reads) + 0.01:
+                    over.append((pid, name, round(got[0], 3), round(min(reads), 3)))
+    assert not over, over

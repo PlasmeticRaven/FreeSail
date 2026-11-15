@@ -6,6 +6,7 @@
 <title>FreeSail · the harbour</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M3 13h10l-1 2H4z%27 fill=%27%234a3d31%27/%3E%3Cpath d=%27M8 1v12M8 3l5 8H8z%27 fill=%27%23ece5d3%27 stroke=%27%233b3128%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/client/style.css">
+<script src="/client/token.js"></script>
 </head>
 <!-- The harbour (package 59; spec M7b §21d, §21e): a page of the game's own server. A new
      game from the server's flags as controls, the doors and the stations held, the
@@ -16,7 +17,8 @@
   <span class="ship-name">the harbour</span>
   <span class="spacer"></span>
   <nav class="tabs" role="tablist">
-    <button type="button" data-tab="game" class="active" role="tab">game</button>
+    <button type="button" data-tab="begin" class="active" role="tab">begin</button>
+    <button type="button" data-tab="game" role="tab">game</button>
     <button type="button" data-tab="doors" role="tab">doors</button>
     <button type="button" data-tab="maker" role="tab">scenario maker</button>
     <button type="button" data-tab="settings" role="tab">settings</button>
@@ -27,8 +29,41 @@
 
 <main class="harbour-main">
 
+<!-- ======================= begin (package 96b, step 2) ======================= -->
+<section class="tab-page" data-page="begin">
+  <div class="panel begin">
+    <div class="panel-head"><span>Begin</span><span class="hint">a sailing ship of 1805, sailed by typing orders in the words of the time</span></div>
+    <div id="b-playing" class="begin-block" hidden>
+      <h3>Your game</h3>
+      <p id="b-playing-says"></p>
+      <div class="form-actions"><a id="b-to-game" class="harbour-link begin-go" href="/">go to your game</a></div>
+    </div>
+    <div id="b-first" class="begin-block" hidden>
+      <h3>Your first game</h3>
+      <ul id="b-first-says" class="plain-list"></ul>
+      <div class="form-actions"><button id="btn-b-first" type="button" class="begin-go"></button></div>
+    </div>
+    <div id="b-lessons-block" class="begin-block" hidden>
+      <h3>The lessons</h3>
+      <p class="note">The primer's lessons, in its order (chapter 18, docs/primer/18-lessons.md in the game's folder).</p>
+      <ol id="b-lessons" class="begin-lessons"></ol>
+    </div>
+    <div id="b-save" class="begin-block" hidden>
+      <h3>Take up a saved game</h3>
+      <p id="b-save-says"></p>
+      <div class="form-actions"><button id="btn-b-save" type="button"></button></div>
+    </div>
+    <div class="begin-block">
+      <h3>All the games</h3>
+      <p>Passages, trade, actions and squadrons, and games with a director above them, each with its choices.</p>
+      <div class="form-actions"><button id="btn-b-all" type="button">see all the games</button></div>
+    </div>
+    <p id="b-words" class="words" hidden></p>
+  </div>
+</section>
+
 <!-- ======================= the game ======================= -->
-<section class="tab-page" data-page="game">
+<section class="tab-page" data-page="game" hidden>
   <div class="panel">
     <div class="panel-head"><span>In play</span><span class="hint" id="game-clock"></span></div>
     <dl class="instruments" id="game-state">
@@ -45,40 +80,53 @@
   </div>
 
   <div class="panel">
-    <div class="panel-head"><span>A new game</span><span class="hint">the server's flags, as the page's controls; the clock held until you say go</span></div>
+    <div class="panel-head"><span>A new game</span><span class="hint">choose a game, where you stand and how the clock runs; the clock is held until you say go</span></div>
     <form id="start-form" class="form-grid" autocomplete="off">
       <label>From
         <select id="s-from">
           <option value="scenario">a scenario</option>
-          <option value="ship">a ship file</option>
-          <option value="load">a save</option>
+          <option value="ship">a bare ship on open water</option>
+          <option value="load">a saved game</option>
         </select></label>
-      <label class="from from-scenario">Scenario <select id="s-scenario"></select></label>
+      <label class="from from-scenario span-3">Scenario <select id="s-scenario"></select></label>
       <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
-      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save file's path"></label>
-      <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
-      <label>Your seat <select id="s-seat"></select></label>
-      <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
-      <label>Pace <select id="s-pace">
-          <option value="rule">the pace rule (1x while a model's sample is open)</option>
-          <option value="lockstep">lockstep (the clock waits for a door)</option>
-          <option value="free">free-running</option>
+      <label class="from from-ship" hidden title="where the wind blows from, in degrees, and its knots; empty: south-west, fifteen knots">Wind (from, knots) <input id="s-wind" type="text" placeholder="225,15"></label>
+      <label class="from from-ship" hidden title="her heading at the start, in degrees; empty: north">Heading <input id="s-heading" type="number" min="0" max="360" step="any" placeholder="0"></label>
+      <label class="from from-load" hidden>Saved game <select id="s-load-pick"></select></label>
+      <label class="from from-load span-2" hidden title="a save by its name in the saves place; the list fills this in">Its name <input id="s-load" type="text" placeholder="the save's name, in the saves place"></label>
+      <p id="s-says" class="note wide from from-scenario shelf-says"></p>
+      <pre id="s-lines" class="words wide from from-scenario said-lines" hidden></pre>
+      <p id="s-load-says" class="note wide from from-load" hidden></p>
+      <label title="the station you sit at: the captain's, or one below his, or the director's above the game">Where you stand <select id="s-seat"></select></label>
+      <label class="from from-scenario" id="s-aboard-label" hidden title="the ship you are aboard at the start, when it is not your own: one with a captain of her own">Aboard <select id="s-aboard"></select></label>
+      <label title="how the clock runs when a model holds a station">The clock <select id="s-pace">
+          <option value="free">at my own pace (free-running)</option>
+          <option value="rule">slowed while a model is thinking (the pace rule)</option>
+          <option value="lockstep">waits for the models (lockstep)</option>
         </select></label>
-      <label>Crewed cap <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="the machine's"></label>
-      <label>Crewed range (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="the machine's"></label>
-      <label>Business <select id="s-business">
-          <option value="">as the scenario says</option>
-          <option value="on">on</option>
-          <option value="off">off</option>
-        </select></label>
-      <label>Director's brief <select id="s-brief"></select></label>
-      <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
-      <label>Standing orders <select id="s-book"></select></label>
-      <label class="check"><input id="s-ease" type="checkbox"> ease to 1x when a station is sampled or speaks</label>
-      <div class="form-actions">
+      <label title="game seconds to a real second">Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
+      <div class="form-actions wide">
         <button id="btn-start" type="submit">start the game</button>
         <a id="btn-to-game" class="harbour-link" href="/" hidden>go to the game</a>
       </div>
+      <details id="s-more" class="wide more">
+        <summary>more for this game</summary>
+        <div class="form-grid">
+          <label title="the same seed gives the same weather, names and chances; empty: the scenario's own">Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
+          <label title="traders, fishermen and cruisers the game puts on the sea for itself">The sea's traffic <select id="s-business">
+              <option value="">as the scenario says</option>
+              <option value="on">on</option>
+              <option value="off">off</option>
+            </select></label>
+          <label title="how many other ships near you are sailed man by man at once; empty: three">Ships fully crewed at once <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="three"></label>
+          <label title="a ship is given her full crew inside this distance; empty: four miles">Within (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="four"></label>
+          <label>Director's brief <select id="s-brief"></select></label>
+          <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
+          <label>Standing orders <select id="s-book"></select></label>
+          <label class="check"><input id="s-ease" type="checkbox"> ease to 1x when a station is sampled or speaks</label>
+        </div>
+      </details>
+      <label class="check wide from from-scenario"><input id="s-tests" type="checkbox"> show the scenarios kept for tests and gates</label>
     </form>
     <pre id="start-words" class="words" hidden></pre>
   </div>
@@ -238,7 +286,7 @@
         <label class="check"><input data-set="server.open_browser" type="checkbox"> open the browser at the start</label>
       </fieldset>
       <fieldset class="wide"><legend>The places</legend>
-        <label class="wide">Saves <input data-set="places.saves" type="text"></label>
+        <label class="wide">Saves <input data-set="places.saves" type="text" placeholder="saves beside the settings; taken when the game's server is started again"></label>
         <label class="wide">Your scenarios <input data-set="places.scenarios" type="text"></label>
         <label class="wide">Consent records <input data-set="places.consent_records" type="text" placeholder="the game's own (docs/agents/consent); read at the server's start"></label>
         <label class="wide">The desktop client's file <input data-set="places.desktop_config" type="text"></label>

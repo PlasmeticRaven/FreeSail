@@ -433,8 +433,12 @@ def _starter(name: str) -> DirectorBrief | None:
     key = " ".join(str(name).lower().split()).replace(" ", "-").removesuffix(".yaml")
     for article in ("a-", "an-", "the-"):
         key = key.removeprefix(article)
-    p = BRIEFS_DIR / f"{key}.yaml"
-    return DirectorBrief.load(p) if p.exists() else None
+    # a starter by its name and only its name, in the starters' folder (package 115: the
+    # words were joined to the folder, so that `..` or an absolute path read any file)
+    from freesail.core.names import named_file
+
+    p = named_file(BRIEFS_DIR, key, ".yaml")
+    return DirectorBrief.load(p) if p is not None else None
 
 
 def starter_briefs() -> list[str]:
@@ -1576,9 +1580,11 @@ def director_hull(world: Any) -> Any:
     """The hull the director's station is kept on, the player's own (`World.players`), read
     by her own handle whichever hull is current or followed (package 97: under `follow` the
     World's names read the followed hull, and the director's log, its station and its
-    holder are the game's one, on hers); the World itself where it has no hulls."""
-    players = getattr(world, "players", None)
-    return players if players is not None else world
+    holder are the game's one, on hers); the World itself where it has no hulls. Since
+    package 60 the game's first hull (`World.first_hull`) whichever ship is the player's,
+    so that the director's log stays one log for the game when he changes ship."""
+    first = getattr(world, "first_hull", None)
+    return first if first is not None else world
 
 
 def log_of(world: Any) -> Journal:

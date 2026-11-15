@@ -32,7 +32,7 @@ import pytest
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
-from fastapi.testclient import TestClient  # noqa: E402
+from own_page import PageClient  # noqa: E402
 
 from freesail import settings as S  # noqa: E402
 from freesail.core.world import Scenario, World  # noqa: E402
@@ -84,7 +84,7 @@ def port(tmp_path):
 
 @pytest.fixture
 def client(port):
-    with TestClient(port.app) as c:
+    with PageClient(port.app) as c:
         yield c
 
 
@@ -113,6 +113,157 @@ def test_the_catalogue_lists_the_scenarios_ships_seats_stations_briefs_and_ports
     falmouth = next(p for p in cat["ports"] if p["id"] == "falmouth")
     assert falmouth["road"] == "Carrick Road" and falmouth["region"] == "channel-west"
     assert "data/standing_orders/starter.orders" in cat["books"]
+
+
+def test_the_scenarios_stand_on_their_shelves_and_the_boats_are_no_ship_to_start_in(port, client):
+    """Package 96b, step 1 (docs/design/Design-Harbour.md §3.2): the catalogue gives each
+    scenario its shelf and its sentence in the shelves' order, the player's own first; the
+    gates' and the tests' scenarios on a shelf marked hidden; a scenario of the game that
+    the shelves' file does not name on the last shelf, shown; the ship's boats out of the
+    ships offered for a bare start."""
+    port.place.mkdir(parents=True, exist_ok=True)
+    (port.place / "mine.yaml").write_text("name: A passage of mine\n", encoding="utf-8")
+    cat = client.get("/api/harbour/catalogue").json()
+    by_id = {s["id"]: s for s in cat["shelves"]}
+    assert [s["id"] for s in cat["shelves"]][:3] == ["yours", "first", "lessons"]
+    assert by_id["tests"]["hidden"] is True
+    assert not any(s["hidden"] for s in cat["shelves"] if s["id"] != "tests")
+    assert "unsorted" not in by_id  # every scenario of the game is named on a shelf
+    entries = {Path(s["path"]).stem: s for s in cat["scenarios"]}
+    assert entries["mine"]["shelf"] == "yours" and entries["mine"]["own"] is True
+    assert cat["scenarios"][0]["path"].endswith("mine.yaml")
+    assert entries["gate-4c-day"]["shelf"] == "tests"
+    assert entries["squadron"]["shelf"] == "tests" and entries["tender"]["shelf"] == "tests"
+    assert entries["first-action"]["shelf"] == "actions" and entries["first-action"]["says"]
+    lessons = [Path(s["path"]).stem for s in cat["scenarios"] if s["shelf"] == "lessons"]
+    assert lessons == ["lesson-landfall", "lesson-reckoning", "lesson-falmouth", "lesson-lee-shore"]
+    assert [s["order"] for s in cat["scenarios"]] == list(range(len(cat["scenarios"])))
+    # the boats are carried by the ships, and are not ships to start in
+    assert "data/ships/frigate-36.yaml" in cat["ships"]
+    assert not [s for s in cat["ships"] if "boat-" in s]
+    # a scenario the file does not name is never hidden: the last shelf, shown
+    shelved = port.harbour._shelve(
+        [
+            {"path": "data/scenarios/a-new-one.yaml", "name": "A new one", "own": False},
+            {"path": "data/scenarios/gate-4c-day.yaml", "name": "The gate's day", "own": False},
+        ]
+    )
+    assert [s["id"] for s in shelved] == ["tests", "unsorted"]
+    assert shelved[-1]["hidden"] is False
+
+
+def test_the_first_game_is_the_primers_chapter_7_and_its_log_is_the_bare_ships(client):
+    """Package 96b, step 2 (docs/design/Design-Harbour.md §3.3): the first panel's game is
+    the scenario "A first passage", the primer's chapter 7 made startable from the page.
+    The chapter's own command is a bare frigate with `--seed 7 --wind 0,15 --heading 293`;
+    the scenario gives the same log line for line through the chapter's first block (plain
+    sail, braced sharp up, eight minutes), but for the opening line, which carries the
+    scenario's name where the bare ship's says "Open water"."""
+    from freesail.api.session import make_world
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    cat = client.get("/api/harbour/catalogue").json()
+    first = cat["first_game"]
+    assert first["path"] == "data/scenarios/first-passage.yaml"
+    assert first["name"] == "A first passage" and len(first["says"]) == 3
+    entry = next(s for s in cat["scenarios"] if s["path"] == first["path"])
+    assert entry["shelf"] == "first" and cat["scenarios"][0] == entry
+    reckoning = next(s for s in cat["scenarios"] if s["path"].endswith("lesson-reckoning.yaml"))
+    assert reckoning["seat"] == "officer" and entry["seat"] == ""
+
+    bare = Scenario()
+    bare.wind_from_deg, bare.wind_speed_kn, bare.ship_heading_deg = 0.0, 15.0, 293.0
+    a = make_world(7, "data/ships/frigate-36.yaml", bare)
+    sf = load_scenario(SCENARIOS / "first-passage.yaml")
+    assert sf.seed == 7 and not sf.standing_orders and not sf.orders
+    b = make_scenario_world(sf)
+    begin(b, sf)
+    for w in (a, b):
+        w.submit("set plain sail")
+        w.submit("brace sharp up on the starboard tack")
+        w.run(480)
+    la = [(e.tick, e.kind, e.text) for e in a.log]
+    lb = [(e.tick, e.kind, e.text) for e in b.log]
+    assert la[0][2].startswith("Open water.") and lb[0][2].startswith("A first passage.")
+    assert la[0][2].split(". ", 1)[1] == lb[0][2].split(". ", 1)[1]
+    assert la[1:] == lb[1:] and len(la) > 20
+
+
+def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, client):
+    saves = port.tmp / "saves"
+    saves.mkdir(parents=True, exist_ok=True)
+    (saves / "older.json").write_text("not a save: its name alone is listed", encoding="utf-8")
+    (saves / "newer.json").write_text("{}", encoding="utf-8")
+    os.utime(saves / "older.json", (1_700_000_000, 1_700_000_000))
+    (saves / "newer.checkpoint").write_text("", encoding="utf-8")
+    (saves / "notes.txt").write_text("", encoding="utf-8")
+    state = client.get("/api/harbour/state").json()["saves"]
+    assert state["place"] == str(saves.resolve())
+    assert [s["name"] for s in state["saves"]] == ["newer", "older"]
+    assert state["saves"][1]["written"].startswith("2023-11-1")
+
+
+def test_a_scenario_says_what_it_is_before_it_is_started_and_who_may_be_gone_aboard(client):
+    """Package 96b, step 3: the page asks what a scenario is before the start: its own
+    lines as a driver prints them (the file's path left out), and the other ships with a
+    captain of their own, which the player may be aboard from the first minute."""
+    r = client.get("/api/harbour/scenario", params={"path": "data/scenarios/tender.yaml"}).json()
+    assert r["lines"][0] == "Scenario: The tender, Torbay for Plymouth and home."
+    assert any(ln.startswith("She starts at") for ln in r["lines"]) and r["refusal"] == ""
+    assert r["aboard"] == ["Raven"]
+    first = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/first-passage.yaml"}
+    ).json()
+    assert first["aboard"] == [] and first["lines"] == ["Scenario: A first passage."]
+
+
+def test_a_game_is_started_aboard_another_ship_and_a_bare_ship_with_her_wind_and_heading(
+    port, client
+):
+    """Package 96b, step 3: what the command line alone could say (`--ship NAME`, `--wind`,
+    `--heading`) said from the page's start; each refused in words when it is not so."""
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"}
+    )
+    assert r.status_code == 200, r.text
+    assert "Following the Raven." in r.json()["lines"]
+    assert r.json()["game"]["chosen"]["aboard"] == "Raven"
+    with port.driver.lock:
+        assert port.driver.world.followed_words == "Raven"
+    r = client.post(
+        "/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"}
+    )
+    assert r.status_code == 400 and "Nobody" in r.json()["detail"]
+    # a bare ship with the primer's chapter 7 wind and heading
+    r = client.post(
+        "/api/harbour/start",
+        json={"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0, 15", "heading": "293"},
+    )
+    assert r.status_code == 200, r.text
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+    for bad in ({"wind": "north"}, {"wind": "400,15"}, {"wind": "10"}, {"heading": "999"}):
+        r = client.post("/api/harbour/start", json={"ship": "data/ships/cutter.yaml", **bad})
+        assert r.status_code == 400, (bad, r.text)
+        assert "wind" in r.json()["detail"] or "heading" in r.json()["detail"]
+
+
+def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
+    from freesail.ui.harbour import SHELVES_FILE, Harbour
+
+    # the page's own, with the page's files: not among the scenarios (the tests that walk
+    # them would take it for one), and not under data/ at all (the range's audit classes
+    # every dated key there, and the rules' fingerprint hashes every file there)
+    assert SHELVES_FILE.parent != SCENARIOS
+    assert ROOT / "data" not in SHELVES_FILE.parents
+    assert SHELVES_FILE == ROOT / "client" / "harbour-shelves.yaml" and SHELVES_FILE.is_file()
+    assert not (ROOT / "data" / "harbour").exists()
+    named = [s["file"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"]]
+    assert len(named) == len(set(named))
+    there = {p.stem for p in SCENARIOS.glob("*.yaml")}
+    assert set(named) <= there, sorted(set(named) - there)
+    assert all(s["says"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"])
 
 
 def test_a_game_started_with_a_seat_and_a_brief_is_the_servers_game_taken_up_in_place(port, client):
@@ -357,6 +508,11 @@ class Live:
             assert time.monotonic() < deadline and self.thread.is_alive()
             time.sleep(0.05)
 
+    @property
+    def page(self) -> dict[str, str]:
+        """The headers of the game's own page (package 115): its origin and its mark."""
+        return {"x-freesail-page": self.port.app.state.guard.token, "origin": self.url}
+
     def close(self) -> None:
         self.server.should_exit = True
         self.thread.join(timeout=15)
@@ -378,7 +534,7 @@ def test_a_door_that_dies_is_said_so_in_its_pane(tmp_path):
     try:
         import httpx
 
-        with httpx.Client(base_url=live.url, timeout=60) as c:
+        with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
             refused = c.post("/api/harbour/doors", json={"door": "local", "station": "watcher"})
             assert refused.status_code == 400 and "Start a game first" in refused.json()["detail"]
             c.post("/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"})
@@ -428,7 +584,7 @@ def test_the_api_door_started_from_the_harbour_seats_its_station_and_is_stopped(
         try:
             import httpx
 
-            with httpx.Client(base_url=live.url, timeout=60) as c:
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
                 c.post(
                     "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
                 )
@@ -508,8 +664,11 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
     assert pg.inner_text("#status") == "no game yet"
     # a game with a seat and a director's brief
+    pg.click("nav.tabs button[data-tab=game]")
     pg.select_option("#s-scenario", "data/scenarios/directed-passage.yaml")
     pg.select_option("#s-seat", "officer")
+    assert not pg.is_visible("#s-brief")  # behind "more for this game" (package 96b, step 3)
+    pg.click("#s-more summary")
     pg.select_option("#s-brief", "dispatches")
     pg.click("#btn-start")
     pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
@@ -550,6 +709,154 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
         "document.getElementById('status').textContent === 'connected'", timeout=30_000
     )
     assert "schooner" in pg.inner_text("#ship-name")
+    assert errors == []
+
+
+def test_in_the_browser_the_list_is_by_shelf_and_the_tests_scenarios_come_with_the_tick(
+    browser_page,
+):
+    """Package 96b, step 1: the page's scenarios by shelf, the lessons first; no gate's day
+    in the list until the tick box asks for the scenarios kept for tests and gates; the
+    sentence of the scenario chosen said under the list; no boat among the ships."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    shelves = pg.eval_on_selector_all("#s-scenario optgroup", "els => els.map(e => e.label)")
+    assert shelves[:2] == ["Begin here", "Lessons"] and "Kept for tests and gates" not in shelves
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert listed[:2] == [
+        "data/scenarios/first-passage.yaml",
+        "data/scenarios/lesson-landfall.yaml",
+    ]
+    assert "data/scenarios/gate-4c-day.yaml" not in listed
+    assert "data/scenarios/squadron.yaml" not in listed
+    assert "chapter 7" in pg.inner_text("#s-says")
+    pg.select_option("#s-scenario", "data/scenarios/first-action.yaml")
+    assert "privateer" in pg.inner_text("#s-says") and "first-action.yaml" in pg.inner_text(
+        "#s-says"
+    )
+    pg.check("#s-tests")
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" in listed
+    assert pg.input_value("#s-scenario") == "data/scenarios/first-action.yaml"  # the choice kept
+    made = pg.eval_on_selector_all("#m-pick option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" in made
+    pg.uncheck("#s-tests")
+    listed = pg.eval_on_selector_all("#s-scenario option", "els => els.map(e => e.value)")
+    assert "data/scenarios/gate-4c-day.yaml" not in listed
+    ships = pg.eval_on_selector_all("#s-ship option", "els => els.map(e => e.value)")
+    assert "data/ships/cutter.yaml" in ships and not [s for s in ships if "boat-" in s]
+    assert errors == []
+
+
+def test_in_the_browser_the_page_opens_on_begin_and_the_first_game_is_one_button(browser_page):
+    """Package 96b, step 2: a fresh page opens on the first panel, with no form on it: the
+    first game named, the four lessons numbered in the primer's order, no saved game where
+    there is none, and the way to all the games. The first game's button starts it and
+    goes to the game's page, the clock held; back at the harbour the panel leads with the
+    game in play."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    assert pg.is_visible("section[data-page=begin]") and not pg.is_visible("#start-form")
+    assert (
+        pg.locator("section[data-page=begin] input, section[data-page=begin] select").count() == 0
+    )
+    assert pg.inner_text("#btn-b-first") == "begin: A first passage"
+    assert "chapter 7" in pg.inner_text("#b-first-says")
+    lessons = pg.eval_on_selector_all("#b-lessons button", "els => els.map(e => e.textContent)")
+    assert lessons == [
+        "A landfall on one headland",
+        "The officer's own reckoning, off the Lizard",
+        "Pilot water, Black Head to Falmouth road",
+        "A night off a lee shore, the Nare Head to the Deadman",
+    ]
+    assert not pg.is_visible("#b-save") and not pg.is_visible("#b-playing")
+    pg.click("#btn-b-all")
+    assert pg.is_visible("#start-form")
+    pg.click("nav.tabs button[data-tab=begin]")
+    pg.click("#btn-b-first")
+    pg.wait_for_function(
+        "document.getElementById('ship-name') && "
+        "document.getElementById('status').textContent === 'connected'",
+        timeout=60_000,
+    )
+    assert not pg.url.endswith("/harbour")
+    with port.driver.lock:
+        assert port.driver.world.scenario.name == "A first passage"
+        assert not port.driver.running and port.driver.world.clock.tick == 0
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=begin]")
+    pg.wait_for_selector("#b-playing:not([hidden])", timeout=10_000)
+    assert "A first passage" in pg.inner_text("#b-playing-says")
+    assert "held" in pg.inner_text("#b-playing-says")
+    # a lesson that is the officer's own seats the player at the officer's station
+    pg.click("#b-lessons button[data-path='data/scenarios/lesson-reckoning.yaml']")
+    pg.wait_for_function(
+        "document.getElementById('status').textContent === 'connected'", timeout=60_000
+    )
+    with port.driver.lock:
+        seat = port.driver.world.player_seat
+        assert seat is not None and "officer" in seat.station.name
+    assert errors == []
+
+
+def test_in_the_browser_a_game_says_what_it_is_and_a_save_is_taken_up_from_the_list(
+    browser_page,
+):
+    """Package 96b, step 3: the new game's panel as three choices and "more": the scenario
+    chosen says its own lines before the start; the ships to be aboard are offered where
+    the scenario has one; the rest is behind a step; a bare ship takes a wind and a
+    heading; and a saved game is picked from the list of the saves place."""
+    pg, live, port, errors = browser_page
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.wait_for_function(
+        "document.getElementById('s-lines').textContent.indexOf('A first passage') >= 0"
+    )
+    assert not pg.is_visible("#s-aboard") and not pg.is_visible("#s-seed")
+    assert not pg.is_visible("#s-wind") and not pg.is_visible("#s-load-pick")
+    pg.check("#s-tests")
+    pg.select_option("#s-scenario", "data/scenarios/tender.yaml")
+    pg.wait_for_selector("#s-aboard", state="visible", timeout=10_000)
+    assert "Brixham" in pg.inner_text("#s-lines") or "50°" in pg.inner_text("#s-lines")
+    pg.select_option("#s-aboard", "Raven")
+    pg.click("#btn-start")
+    pg.wait_for_selector("#btn-to-game:not([hidden])", timeout=60_000)
+    assert "Following the Raven." in pg.inner_text("#start-words")
+    # a save written by the game in play is in the list, and is taken up from it
+    assert port.driver.save("step-three").kind == "driver.saved"
+    pg.select_option("#s-from", "load")
+    pg.wait_for_function(
+        "Array.prototype.some.call(document.getElementById('s-load-pick').options, "
+        "function (o) { return o.value === 'step-three'; })",
+        timeout=10_000,
+    )
+    assert str(port.tmp / "saves") in pg.inner_text("#s-load-says")
+    pg.select_option("#s-load-pick", "step-three")
+    assert pg.input_value("#s-load") == "step-three"
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('start-words').textContent.indexOf('step-three') >= 0",
+        timeout=60_000,
+    )
+    assert "refusal" not in (pg.get_attribute("#start-words", "class") or "")
+    # a bare ship: her wind and her heading beside her
+    pg.select_option("#s-from", "ship")
+    assert pg.is_visible("#s-wind") and not pg.is_visible("#s-lines")
+    pg.select_option("#s-ship", "data/ships/frigate-36.yaml")
+    pg.fill("#s-wind", "0,15")
+    pg.fill("#s-heading", "293")
+    pg.click("#btn-start")
+    pg.wait_for_function(
+        "document.getElementById('g-title').textContent === 'Open water'", timeout=60_000
+    )
+    with port.driver.lock:
+        opening = next(e.text for e in port.driver.world.log if e.kind == "world.start")
+    assert "Wind N, 15 knots" in opening and "(293°)" in opening
     assert errors == []
 
 
@@ -637,7 +944,7 @@ def test_the_harbour_starts_a_seats_door_as_the_directors_and_stops_it_when_the_
 
     monkeypatch.setattr(port.harbour, "start_door", start_door)
     monkeypatch.setattr(port.harbour, "_stop_seat_door", lambda door: door.stop())
-    with TestClient(port.app) as c:
+    with PageClient(port.app) as c:
         c.post("/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"})
         w = port.driver.world
         for name in (PLACEHOLDER, "placeholder-two", "placeholder-four"):

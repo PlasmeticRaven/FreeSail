@@ -20,23 +20,28 @@ nation: naples
 source: "Smyth 1824 pp. 180-186, App. pp. xvii-xix; Purdy 1826 pp. 144-145; Norie 1831 pp. 141-142"
 datum: unverified   # no period sheet read with its datum; the modern shore is the grid's
 
+# The spot moved out of the grid's modern basin to the entrance (the chart session's tracks
+# step, the lead's ruling of 2026-11-14): the breakwater closes the old spot in, so no way of
+# 3 m led out of it (the deepest 0.5 m). Smyth 1824, App. p. xix: 'five to three fathoms
+# inside and seven to ten at the entrance'; the grid 14.2 m (7.8 fathoms) at 36.6660 N
+# 15.1235 E. Old: 36.6697 N 15.1239 E in five fathoms, within the modern basin.
 outer_road:
   feature: porto-palo
   name: the entrance of Porto Paolo
-  lat_deg: 36.6697
-  lon_deg: 15.1239
-  depth_fathoms: 5
+  lat_deg: 36.6660
+  lon_deg: 15.1235
+  depth_fathoms: 8
 anchorage:
   feature: porto-palo
   name: Porto Paolo
-  lat_deg: 36.6697
-  lon_deg: 15.1239
+  lat_deg: 36.6660
+  lon_deg: 15.1235
 mooring:
   feature: porto-palo
   name: Porto Paolo
-  lat_deg: 36.6697
-  lon_deg: 15.1239
-  depth_fathoms: 5
+  lat_deg: 36.6660
+  lon_deg: 15.1235
+  depth_fathoms: 8
   bottom: sand and mud
 shore:
   feature: cape-passaro
@@ -102,6 +107,11 @@ crew_pool:
 
 closed_to: []
 
+# The tracks stand as they were; the spot moved out of the grid's modern basin (above), whose
+# breakwater the first leg crossed (ground drying 2.1 m). Each leg's least depth at the grid's
+# datum by the chart's own reader (`Chart.least_depth_along`, the chart session's tracks step):
+# the entrance to 36 39 N 15 09 E 14.2 m; on to 36 38 N 15 10 E 43.1 m; the way in the same
+# reversed.
 tracks:
   to_sea: [porto-palo, 36 39 N 15 09 E, 36 38 N 15 10 E]
   from_sea: [36 38 N 15 10 E, 36 39 N 15 09 E, porto-palo]

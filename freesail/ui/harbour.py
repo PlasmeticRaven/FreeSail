@@ -23,12 +23,17 @@ Routes (`harbour_routes`):
 
     GET  /harbour                          the page
     GET  /api/harbour/state                the game, the stations held, the doors, the
-                                           settings' place, the credential store's state
-    GET  /api/harbour/catalogue            the scenarios, ships, seats, stations, briefs,
-                                           books, ports, regions and nations
-    POST /api/harbour/start                {scenario | ship | load, seed, seat, time, pace,
-                                           crewed_cap, crewed_range, business,
-                                           director_brief, standing_orders} -> the game
+                                           saves in the saves place by name, the settings'
+                                           place, the credential store's state
+    GET  /api/harbour/catalogue            the scenarios (each with its shelf and its
+                                           sentence, in the shelves' order), the shelves,
+                                           the first game the page names,
+                                           the ships, seats, stations, briefs, books, ports,
+                                           regions and nations
+    POST /api/harbour/start                {scenario | ship | load, seed, seat, aboard,
+                                           time, pace, crewed_cap, crewed_range, business,
+                                           director_brief, standing_orders, wind, heading}
+                                           -> the game
     GET  /api/harbour/settings             the settings and where they are kept
     POST /api/harbour/settings             {settings} -> kept (no key, truth 7b-110)
     POST /api/harbour/desktop              {stations: [...], ship?, write?} -> the entries
@@ -40,7 +45,8 @@ Routes (`harbour_routes`):
     POST /api/harbour/doors/{id}/say       {text}: a line to its terminal (the owner's
                                            word in a consent conversation)
     POST /api/harbour/doors/{id}/stop      stopped, its station released
-    GET  /api/harbour/scenario             ?path=: a scenario's text and fields
+    GET  /api/harbour/scenario             ?path=: a scenario's text and fields, its lines
+                                           as a driver says them, the ships to be aboard
     POST /api/harbour/scenario/prove       {fields, source?} -> the scenario's lines, or
                                            its refusal in words
     POST /api/harbour/scenario             {fields, source?, name, book?, overwrite?} ->
@@ -59,6 +65,7 @@ import collections
 import contextlib
 import itertools
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -69,17 +76,34 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from freesail import settings as settings_mod
 from freesail.settings import SettingsError
+from freesail.ui.places import PlaceRefused, Places
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIR = ROOT / "client"
 GAME_SCENARIOS = ROOT / "data" / "scenarios"
 GAME_BOOKS = ROOT / "data" / "standing_orders"
 SHIPS_DIR = ROOT / "data" / "ships"
+# The page's shelves (package 96b, step 1; docs/design/Design-Harbour.md §3.2): which shelf
+# each of the game's scenarios stands on, read by the page alone. With the page's own files
+# and not under `data/`: that folder is the game's data, every dated key of which the
+# range's audit classes (`tools/audit_range.py`) and every file of which is hashed into the
+# rules' stamp a save carries (`core.world.fingerprint_of`), and a re-sorting of the page's
+# list is no change of the rules.
+SHELVES_FILE = CLIENT_DIR / "harbour-shelves.yaml"
+# The two shelves the file never names: the player's own scenarios, first; and the game's
+# scenarios no shelf names, last, so that none is hidden by being forgotten.
+SHELF_OWN = {"id": "yours", "title": "Yours", "says": "Scenarios of your own.", "hidden": False}
+SHELF_UNSORTED = {
+    "id": "unsorted",
+    "title": "Not yet sorted",
+    "says": "Scenarios of the game that no shelf names yet.",
+    "hidden": False,
+}
 
 # The player's seats at the start (the server's `--seat`): '' as the scenario says; the
 # captain at the prompt; the stations below and above (`agents.seat.SEAT_STATIONS`).
@@ -94,6 +118,7 @@ STOP_WAIT_S = 6.0
 # second in the doors' loop, and its last words take a moment more).
 SEAT_DOOR_GRACE_S = 20.0
 COAST_STEP_DEG = 0.01  # the harbour's chart keeps a point about every half mile
+SAVES_LISTED = 30  # the page lists this many saves, the newest first
 
 
 class HarbourError(Exception):
@@ -112,6 +137,32 @@ def _rel(path: Path) -> str:
         return path.resolve().relative_to(ROOT.resolve()).as_posix()
     except ValueError:
         return str(path)
+
+
+_boats: dict[str, tuple[float, bool]] = {}
+
+
+def _is_boat(path: Path) -> bool:
+    """Whether a ship's file is a ship's boat (its `ship: rig: boat`): the boats are carried
+    by the ships and are no ship to start a game in, so the page's list leaves them out
+    (package 96b, step 1). A file that cannot be read is listed, as before."""
+    key = str(path)
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        return False
+    cached = _boats.get(key)
+    if cached is None or cached[0] != mtime:
+        boat = False
+        with contextlib.suppress(OSError):
+            # her file's head alone (the ships' files are long, and the catalogue is asked
+            # for at every opening of the page): the line `  rig: boat` under `ship:`
+            with path.open(encoding="utf-8") as f:
+                head = f.read(8000)
+            boat = re.search(r"^  rig:[ \t]*boat[ \t]*$", head, re.M) is not None
+        _boats[key] = (mtime, boat)
+        cached = _boats[key]
+    return cached[1]
 
 
 # ---------------------------------------------------------------------------
@@ -292,6 +343,10 @@ class Harbour:
         self.started = started
         self.game_url = game_url
         self.client_dir = CLIENT_DIR
+        # the page as served: the server's guard puts the game's mark in it (package 115)
+        self.page: Any = lambda path, host="": FileResponse(path, media_type="text/html")
+        # the server's folders (package 115, part A): the app gives the driver's
+        self.places = Places(saves_dir, self.scenarios_place)
         self.doors: dict[str, Door] = {}
         self._ids = itertools.count(1)
         self.game: dict[str, Any] = {}  # what the harbour started, in words
@@ -368,6 +423,7 @@ class Harbour:
         own = self.scenarios_place()
         if own.is_dir():
             scenarios += [self._scenario_entry(p, own=True) for p in sorted(own.glob("*.yaml"))]
+        shelves = self._shelve(scenarios)
         books = [_rel(p) for p in sorted(GAME_BOOKS.glob("*.orders"))]
         if own.is_dir():
             books += [str(p) for p in sorted(own.glob("*.orders"))]
@@ -379,7 +435,9 @@ class Harbour:
                 )
         return {
             "scenarios": scenarios,
-            "ships": [_rel(p) for p in sorted(SHIPS_DIR.glob("*.yaml"))],
+            "shelves": shelves,
+            "first_game": self.first_game(scenarios),
+            "ships": [_rel(p) for p in sorted(SHIPS_DIR.glob("*.yaml")) if not _is_boat(p)],
             "seats": list(SEATS),
             "stations": list(STATIONS),
             "holders": list(STATION_HOLDERS),
@@ -416,6 +474,124 @@ class Harbour:
             Harbour._names[key] = (mtime, name)
             cached = Harbour._names[key]
         return {"path": _rel(path) if not own else str(path), "name": cached[1], "own": own}
+
+    def shelves(self) -> list[dict[str, Any]]:
+        """The shelves as the file has them (`client/harbour-shelves.yaml`): each its id, its
+        title, its line, whether it is shown only when asked for, and its scenarios in
+        order, each `{file, says}`. A file that is missing or cannot be read gives no
+        shelves, and every scenario then stands unsorted: the list is never lost to it."""
+        try:
+            mtime = SHELVES_FILE.stat().st_mtime
+        except OSError:
+            return []
+        cached = Harbour._shelves
+        if cached is None or cached[0] != mtime:
+            out: list[dict[str, Any]] = []
+            with contextlib.suppress(OSError, yaml.YAMLError, AttributeError, TypeError):
+                doc = yaml.safe_load(SHELVES_FILE.read_text(encoding="utf-8")) or {}
+                for shelf in doc.get("shelves") or []:
+                    if not isinstance(shelf, dict) or not str(shelf.get("id") or "").strip():
+                        continue
+                    out.append(
+                        {
+                            "id": str(shelf["id"]).strip(),
+                            "title": str(shelf.get("title") or shelf["id"]).strip(),
+                            "says": " ".join(str(shelf.get("says") or "").split()),
+                            "hidden": shelf.get("hidden") is True,
+                            "scenarios": [
+                                {
+                                    "file": str(s.get("file") or "").strip(),
+                                    "says": " ".join(str(s.get("says") or "").split()),
+                                    "seat": " ".join(str(s.get("seat") or "").lower().split()),
+                                }
+                                for s in shelf.get("scenarios") or []
+                                if isinstance(s, dict)
+                            ],
+                        }
+                    )
+                first = doc.get("first_game")
+                if isinstance(first, dict) and str(first.get("file") or "").strip():
+                    says = first.get("says") or []
+                    says = [says] if isinstance(says, str) else list(says)
+                    Harbour._first = {
+                        "file": str(first["file"]).strip(),
+                        "says": [" ".join(str(x).split()) for x in says if str(x).strip()],
+                    }
+                else:
+                    Harbour._first = None
+            Harbour._shelves = (mtime, out)
+            cached = Harbour._shelves
+        return cached[1]
+
+    _shelves: tuple[float, list[dict[str, Any]]] | None = None
+    _first: dict[str, Any] | None = None
+
+    def first_game(self, scenarios: list[dict[str, Any]]) -> dict[str, Any] | None:
+        """The game the first panel names (package 96b, step 2): the shelves' file's
+        `first_game`, as `{path, name, says: [lines]}`; None where the file names none or
+        names a scenario that is not there (the panel then offers the lessons alone)."""
+        self.shelves()
+        first = Harbour._first
+        if first is None:
+            return None
+        for entry in scenarios:
+            if not entry["own"] and Path(entry["path"]).stem == first["file"]:
+                return {"path": entry["path"], "name": entry["name"], "says": first["says"]}
+        return None
+
+    def saves(self) -> dict[str, Any]:
+        """The saves in the saves place, newest first (package 96b, step 2: the first
+        panel's "take up a saved game"): each by its name as `save NAME` wrote it and the
+        time its file was written. Their names alone: no save is opened."""
+        place = self.places.saves
+        found: list[tuple[float, str]] = []
+        with contextlib.suppress(OSError):
+            for p in place.glob("*.json"):
+                with contextlib.suppress(OSError):
+                    if p.is_file():
+                        found.append((p.stat().st_mtime, p.stem))
+        found.sort(reverse=True)
+        return {
+            "place": str(place),
+            "saves": [
+                {"name": name, "written": time.strftime("%Y-%m-%d %H:%M", time.localtime(at))}
+                for at, name in found[:SAVES_LISTED]
+            ],
+        }
+
+    def _shelve(self, scenarios: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Each scenario of the list given its shelf, its place on it and its sentence
+        (`shelf`, `order`, `says`), and the list put in the shelves' order: the player's
+        own first, then the file's shelves, then the game's scenarios no shelf names.
+        Returns the shelves that hold a scenario, in that order, each `{id, title, says,
+        hidden}`."""
+        named: dict[str, tuple[int, int, str, str, str]] = {}
+        file_shelves = self.shelves()
+        for i, shelf in enumerate(file_shelves, start=1):
+            for j, s in enumerate(shelf["scenarios"]):
+                named.setdefault(s["file"], (i, j, shelf["id"], s["says"], s["seat"]))
+        last = len(file_shelves) + 1
+        for n, entry in enumerate(scenarios):
+            entry["seat"] = ""
+            if entry["own"]:
+                at, entry["shelf"], entry["says"] = (0, n), SHELF_OWN["id"], ""
+            else:
+                stem = Path(entry["path"]).stem
+                i, j, shelf_id, says, seat = named.get(
+                    stem, (last, n, SHELF_UNSORTED["id"], "", "")
+                )
+                at, entry["shelf"], entry["says"], entry["seat"] = (i, j), shelf_id, says, seat
+            entry["order"] = at
+        scenarios.sort(key=lambda e: e["order"])
+        for n, entry in enumerate(scenarios):
+            entry["order"] = n
+        used = {e["shelf"] for e in scenarios}
+        every = [SHELF_OWN, *file_shelves, SHELF_UNSORTED]
+        return [
+            {k: shelf[k] for k in ("id", "title", "says", "hidden")}
+            for shelf in every
+            if shelf["id"] in used
+        ]
 
     def regions(self) -> list[dict[str, Any]]:
         from freesail.world.chart import load_manifest
@@ -522,9 +698,18 @@ class Harbour:
         load = str(choices.get("load") or "").strip()
         if not (scenario or ship or load):
             raise HarbourError("Choose a scenario, a ship or a save to load.")
-        args.scenario = scenario or None
-        args.ship = ship or None
-        args.load = load or None
+        # every file the start names lies in the server's folders (package 115, part A),
+        # a save in the saves place or the game's folder; refused in words, unopened
+        try:
+            args.scenario = str(self.places.readable(scenario, "scenario")) if scenario else None
+            args.ship = str(self.places.readable(ship, "ship's file")) if ship else None
+            args.load = str(self.places.save_to_load(load)) if load else None
+            book = str(choices.get("standing_orders") or "").strip()
+            args.standing_orders = str(self.places.book(book)) if book else None
+            brief = str(choices.get("director_brief") or "").strip()
+            args.director_brief = self.places.brief(brief) if brief else None
+        except PlaceRefused as e:
+            raise HarbourError(str(e), 403) from None
 
         def number(name: str, kind: type, default: Any = None) -> Any:
             value = choices.get(name)
@@ -556,9 +741,30 @@ class Harbour:
         if business not in ("", "on", "off"):
             raise HarbourError("The business is on, off, or as the scenario says.")
         args.business = business or None
-        args.director_brief = str(choices.get("director_brief") or "").strip() or None
-        args.standing_orders = str(choices.get("standing_orders") or "").strip() or None
         args.ease_on_station = bool(choices.get("ease_on_station"))
+        # package 96b, step 3: the ship the player is aboard (the server's `--ship`), and
+        # the wind and the heading of a bare ship (`--wind`, `--heading`), as the command
+        # line has always taken them
+        args.aboard = " ".join(str(choices.get("aboard") or "").split()) or None
+        wind = str(choices.get("wind") or "").replace(" ", "")
+        if wind:
+            parts = wind.split(",")
+            try:
+                if len(parts) != 2:
+                    raise ValueError
+                from_deg, knots = float(parts[0]), float(parts[1])
+            except ValueError:
+                raise HarbourError(
+                    "The wind is where it blows from in degrees and its knots, as '225,15'."
+                ) from None
+            if not (0.0 <= from_deg <= 360.0 and 0.0 <= knots <= 100.0):
+                raise HarbourError(
+                    "The wind is from 0 to 360 degrees and of 0 to 100 knots, as '225,15'."
+                )
+            args.wind = f"{from_deg:g},{knots:g}"
+        args.heading = number("heading", float)
+        if args.heading is not None and not 0.0 <= args.heading <= 360.0:
+            raise HarbourError("The heading is from 0 to 360 degrees.")
         lines: list[str] = []
         try:
             world = server.prepare_game(args, say=lines.append)
@@ -581,6 +787,7 @@ class Harbour:
                 "ship": ship,
                 "load": load,
                 "seat": args.seat or "",
+                "aboard": args.aboard or "",
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
@@ -664,6 +871,7 @@ class Harbour:
             "game": self.game_state(),
             "stations": self.stations(),
             "doors": [door.state() for door in self.doors.values()],
+            "saves": self.saves(),
             "settings": {"path": str(self.path), "error": error},
             "credential": settings_mod.credential_words(),
             "desktop": {"path": str(desktop), "entries": present},
@@ -993,7 +1201,34 @@ class Harbour:
             "text": text,
             "fields": fields,
             "position_deg": where,  # for the form's latitude and longitude
+            **self._said(p, fields),
         }
+
+    @staticmethod
+    def _said(p: Path, fields: dict[str, Any]) -> dict[str, Any]:
+        """What a scenario is, for the page to say before it is started (package 96b, step
+        3): the scenario's own lines as a driver prints them at the load (`lines`: the
+        author's view, the file's path left out), or the loader's refusal in words
+        (`refusal`); and the other ships the player may be aboard at the start (`aboard`:
+        those with a captain of their own, an intent or a free intent, by name), which is
+        what the server's `--ship` takes."""
+        from freesail.world.scenarios import ScenarioError, load_scenario
+
+        lines: list[str] = []
+        refusal = ""
+        try:
+            lines = [ln.replace(f" ({p})", "") for ln in load_scenario(p).lines()]
+        except (ScenarioError, OSError, ValueError, KeyError, yaml.YAMLError) as e:
+            refusal = _scenario_words(str(e), p)
+        ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+        aboard = [
+            str(s.get("name") or s.get("id"))
+            for s in ships
+            if isinstance(s, dict)
+            and (s.get("intent") or s.get("free_intent"))
+            and (s.get("name") or s.get("id"))
+        ]
+        return {"lines": lines, "refusal": refusal, "aboard": aboard}
 
     def _original(self, source: str) -> tuple[str | None, str]:
         if not source:
@@ -1022,25 +1257,30 @@ class Harbour:
 
         if not isinstance(fields, dict):
             raise HarbourError("A scenario is a mapping of fields.")
+        found, said = self._fields_in_places(fields)
         original, _ = self._original(source)
         try:
-            text = scenario_text(fields, original)
+            text = scenario_text(fields, original)  # the player's own words, as written
+            proved_text = scenario_text(found, original)  # each file as it was found
         except ScenarioError as e:
             raise HarbourError(f"The scenario was not written: {e}") from None
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "scenario.yaml"
-            p.write_text(text, encoding="utf-8")
+            p.write_text(proved_text, encoding="utf-8")
             try:
                 sf = load_scenario(p)
                 world = make_scenario_world(sf)
                 begin(world, sf)
             except (ScenarioError, OSError, ValueError, KeyError) as e:
-                raise HarbourError(_scenario_words(str(e), p)) from None
+                raise HarbourError(self._in_their_words(_scenario_words(str(e), p), said)) from None
             refused = [e for e in world.log if e.kind == "order.rejected"]
             if refused:
                 raise HarbourError(
-                    "A first order or standing order was refused: "
-                    + "; ".join(e.text for e in refused[:3])
+                    self._in_their_words(
+                        "A first order or standing order was refused: "
+                        + "; ".join(e.text for e in refused[:3]),
+                        said,
+                    )
                 )
             seat = sf.player_seat
             if seat:
@@ -1050,8 +1290,54 @@ class Harbour:
                     seat_station(world, seat)
                 except Exception as e:  # noqa: BLE001  (OrderError, in words)
                     raise HarbourError(f"stations: {e}") from None
-            lines = [ln.replace(str(p), "this scenario") for ln in sf.lines() + guard_lines(world)]
+            lines = [
+                self._in_their_words(ln.replace(str(p), "this scenario"), said)
+                for ln in sf.lines() + guard_lines(world)
+            ]
         return {"text": text, "lines": lines}
+
+    def _fields_in_places(self, fields: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
+        """The files a scenario's fields name (her ship's file, the books, a director's
+        brief) lie in the server's folders (package 115, part A), or the maker refuses them
+        in words before the scenario is loaded and any of them opened. The fields to prove,
+        each such file given by the path it was found at (the path checked is the path
+        opened, whatever folder the server was started from); the fields written are the
+        player's own words, unchanged."""
+        import copy
+
+        out = copy.deepcopy(fields)
+        said: dict[str, str] = {}  # each path as found -> the player's own words for it
+
+        def found(given: str, path: Any) -> str:
+            said[str(path)] = given
+            return str(path)
+
+        try:
+            ship = out.get("ship")
+            if isinstance(ship, dict) and ship.get("file"):
+                given = str(ship["file"])
+                ship["file"] = found(given, self.places.readable(given, "ship's file"))
+            if out.get("standing_orders"):
+                out["standing_orders"] = [
+                    found(str(b), self.places.book(str(b)))
+                    for b in out.get("standing_orders") or []
+                ]
+            director = out.get("director")
+            if isinstance(director, dict) and isinstance(director.get("brief"), str):
+                given = director["brief"]
+                director["brief"] = found(given, self.places.brief(given))
+        except PlaceRefused as e:
+            raise HarbourError(str(e), 403) from None
+        return out, said
+
+    @staticmethod
+    def _in_their_words(text: str, said: dict[str, str]) -> str:
+        """The proof's words with each file named as the player named it, not as it was
+        found (its whole path)."""
+        for path, given in sorted(said.items(), key=lambda kv: -len(kv[0])):
+            if path != given:
+                text = text.replace(path, given)
+        return text
 
     def save_scenario(
         self,
@@ -1126,9 +1412,9 @@ def harbour_routes(h: Harbour) -> APIRouter:
         except SettingsError as e:
             raise HTTPException(status_code=400, detail=str(e)) from None
 
-    @router.get("/harbour")
-    def harbour_page() -> FileResponse:
-        return FileResponse(h.client_dir / "harbour.html", media_type="text/html")
+    @router.get("/harbour", response_model=None)
+    def harbour_page(request: Request) -> Response:
+        return h.page(h.client_dir / "harbour.html", request.headers.get("host", ""))
 
     @router.get("/api/harbour/state")
     def api_state() -> JSONResponse:
