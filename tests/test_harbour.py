@@ -386,6 +386,49 @@ def test_the_systems_and_the_ports_state_are_read_as_words_and_refused_in_words(
     assert prove(tides="x").status_code == 400
 
 
+# The controls whose own label is their sentence (a tick box's words, a box of the file's
+# words with its explanation above it), and the one that is a button's choice.
+SAID_BY_ITS_LABEL = {"#m-chron-on", "#m-systems", "#m-ports-state", "#m-brief-from"}
+
+
+def page_controls() -> list[str]:
+    """Every control written in the page's HTML, by the selector the sentences are kept
+    under: its id, else its data-field, data-set, data-brief or data-chron."""
+    import re
+
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    out = []
+    for attrs in re.findall(r"<(?:input|select|textarea)\b([^>]*)>", page):
+        ident = re.search(r'\bid="([^"]+)"', attrs)
+        data = re.search(r'data-(field|set|brief|chron)="([^"]+)"', attrs)
+        assert ident or data, attrs
+        out.append(f"#{ident.group(1)}" if ident else f'[data-{data.group(1)}="{data.group(2)}"]')
+    return out
+
+
+def page_words() -> dict[str, str]:
+    text = (ROOT / "client" / "harbour-words.js").read_text(encoding="utf-8")
+    start = text.index("window.freesailHarbourWords = ") + len("window.freesailHarbourWords = ")
+    return json.loads(text[start : text.rindex(";")])
+
+
+def test_every_control_of_the_page_has_its_sentence_in_the_one_file():
+    """Package 96b, step 10 (docs/design/Design-Harbour.md §2.7; the owner's point of
+    2026-10-18: the flags unexplained where they are set): the page's sentences are one
+    file, one for each control the page's HTML has; none is left without, none of the
+    file's is for a control that is not there, and no sentence is left as a hover text."""
+    controls, words = page_controls(), page_words()
+    assert len(controls) > 110 and len(set(controls)) == len(controls)
+    assert set(controls) - set(words) == SAID_BY_ITS_LABEL
+    assert set(words) <= set(controls), sorted(set(words) - set(controls))
+    assert all(len(w) > 12 and w.endswith((".", ")")) for w in words.values())
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    import re
+
+    assert not re.search(r"<label\b[^>]*\btitle=", page)  # a control's words are under it
+    assert '<script src="/client/harbour-words.js"></script>' in page
+
+
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
@@ -1604,7 +1647,7 @@ def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered
     pg.click("nav.tabs button[data-tab=settings]")
     pg.fill('#settings [data-set="doors.api.model"]', PLACEHOLDER)
     pg.fill("#st-models", SECOND + "\nmade-up-model-9, openrouter")
-    pg.fill('#settings [data-set="doors.api.flags"]', "--base-url http://127.0.0.1:9")
+    pg.fill("#st-api-flags", "--base-url http://127.0.0.1:9")
     pg.click("#btn-settings-save")
     pg.wait_for_function("document.getElementById('st-words').textContent.indexOf('Kept') >= 0")
     kept = S.load_settings(port.settings_path)["doors"]["api"]["models"]
@@ -1662,6 +1705,71 @@ def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered
     assert grant["models"] == [PLACEHOLDER, SECOND] and grant["seats"] == 2
     assert grant["brief"] == "quiet-passage"
     assert "the director may seat two models" in pg.inner_text('#maker [data-line="stations"]')
+    assert errors == []
+
+
+def test_in_the_browser_each_setting_says_what_it_is_and_a_doors_flags_are_named_choices(
+    browser_page,
+):
+    """Package 96b, step 10: on every tab each control has its sentence under it; the
+    settings say how the game answers its own page alone, how another device is let in,
+    and where the saved games are kept; and a door's flags are choices with names (how
+    often its model is asked, the pictures, the context, the consent question put again)
+    with one line for the rest, kept in the settings as the one list of flags the door's
+    command line takes."""
+    pg, live, port, errors = browser_page
+    s = S.load_settings(port.settings_path)
+    s["doors"]["local"]["flags"] = ["--cadence", "watch", "--seed", "7", "--pictures", "no"]
+    s["doors"]["api"]["flags"] = ["--ask-again", "--cadence", "fortnightly"]
+    S.save_settings(s, port.settings_path)
+    pg.goto(live.url + "/harbour")
+    pg.wait_for_function("window.freesailHarbour && window.freesailHarbour.ready", timeout=60_000)
+    bare = pg.evaluate(
+        """() => Array.from(document.querySelectorAll(
+            '#start-form input, #start-form select, #settings input, #settings select, ' +
+            '#settings textarea, #maker input, #maker select, #maker textarea, #d-ship'))
+          .filter(el => !el.closest('table') && !el.closest('.ship-card') &&
+                        !el.closest('#m-stations') && !el.closest('#m-books'))
+          .filter(el => !(el.closest('label') && el.closest('label').querySelector('.says')))
+          .map(el => '#' + el.id)"""
+    )
+    assert set(bare) == SAID_BY_ITS_LABEL
+    pg.click("nav.tabs button[data-tab=game]")
+    pg.click("#s-more summary")
+    assert "More is truer and slower" in pg.inner_text("#start-form")
+    assert "drops to real time while a model at a station is answering" in pg.inner_text(
+        "#start-form"
+    )
+    pg.click("nav.tabs button[data-tab=settings]")
+    said = pg.inner_text("section[data-page=settings]")
+    assert "This game answers its own page alone" in said and "0.0.0.0" in said
+    assert f"Your saved games are kept in {port.tmp / 'saves'}" in said
+    # the flags read into their named choices; what the form does not know stays in the line
+    assert pg.input_value("#st-local-cadence") == "watch"
+    assert pg.input_value("#st-local-pictures") == "no"
+    assert pg.input_value("#st-local-flags") == "--seed 7"
+    assert pg.is_checked("#st-api-ask-again") and pg.input_value("#st-api-cadence") == ""
+    assert pg.input_value("#st-api-flags") == "--cadence fortnightly"
+    pg.select_option("#st-local-cadence", "events")
+    pg.fill("#st-local-ctx", "32768")
+    pg.uncheck("#st-api-ask-again")
+    pg.fill("#st-api-flags", "")
+    pg.select_option("#st-api-cadence", "watch")
+    pg.click("#btn-settings-save")
+    pg.wait_for_function("document.getElementById('st-words').textContent.indexOf('Kept') >= 0")
+    kept = S.load_settings(port.settings_path)["doors"]
+    assert kept["local"]["flags"] == [
+        "--cadence",
+        "events",
+        "--pictures",
+        "no",
+        "--ctx",
+        "32768",
+        "--seed",
+        "7",
+    ]
+    assert kept["api"]["flags"] == ["--cadence", "watch"]
+    assert port.harbour.door_argv("local", "officer")[-8:] == kept["local"]["flags"]
     assert errors == []
 
 

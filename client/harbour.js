@@ -47,6 +47,25 @@
   }
   function deep(x) { return x === undefined ? undefined : JSON.parse(JSON.stringify(x)); }
 
+  // -- each setting explained where it is set (package 96b, step 10) --------------------
+  //
+  // The page's sentences are one file (harbour-words.js): one for each control, by its
+  // selector. Each is put under its control, inside the control's label.
+  function applyWords() {
+    var words = window.freesailHarbourWords || {};
+    Object.keys(words).forEach(function (sel) {
+      var el = document.querySelector(sel);
+      if (!el || !words[sel]) return;
+      var label = el.closest("label");
+      if (!label || label.querySelector(".says")) return;
+      var s = document.createElement("span");
+      s.className = "says";
+      s.textContent = words[sel];
+      label.appendChild(s);
+    });
+  }
+  applyWords();
+
   // -- the tabs ------------------------------------------------------------------------
 
   function tab(name) {
@@ -325,6 +344,9 @@
       li(st, line + (x.holder && !said ? "  [" + x.holder + (x.door ? ", " + x.door : "") + "]" : ""));
     });
     fillSaves(s.saves);
+    // where the saved games are, as the server has it for this run (not the settings'
+    // field, which is taken only when the game is started again)
+    if (s.saves) $("st-saves-says").textContent = "Your saved games are kept in " + s.saves.place + ". At the game's order line, 'save NAME' writes one there; the game tab takes one up.";
     fillStations(s);
     var gd = $("g-doors");
     clear(gd);
@@ -1707,11 +1729,41 @@
     });
     // the API door's other models (package 96b, step 9): one a line, "name" or
     // "name, dialect", as the settings keep them (a name, or {name, dialect})
+    fillFlags("api", getPath(settings, "doors.api.flags") || []);
+    fillFlags("local", getPath(settings, "doors.local.flags") || []);
     var others = getPath(settings, "doors.api.models") || [];
     $("st-models").value = others.map(function (m) {
       return m && typeof m === "object" ? (m.name || "") + (m.dialect ? ", " + m.dialect : "") : String(m);
     }).join("\n");
   }
+  // A door's flags as named choices (package 96b, step 10): the settings keep one list of
+  // flags for each door, as its command line takes them; the form shows the ones a player
+  // chooses among by name and the rest as a line, and puts the list together again.
+  var FLAG_FIELDS = {
+    api: [["--cadence", "st-api-cadence", "value"], ["--ask-again", "st-api-ask-again", "flag"]],
+    local: [["--cadence", "st-local-cadence", "value"], ["--pictures", "st-local-pictures", "value"], ["--ctx", "st-local-ctx", "value"], ["--ask-again", "st-local-ask-again", "flag"]],
+  };
+  function fillFlags(door, flags) {
+    var rest = (flags || []).map(String);
+    FLAG_FIELDS[door].forEach(function (f) {
+      var el = $(f[1]), i = rest.indexOf(f[0]);
+      if (f[2] === "flag") { el.checked = i >= 0; if (i >= 0) rest.splice(i, 1); return; }
+      var known = i >= 0 && i + 1 < rest.length && (el.tagName !== "SELECT" || Array.prototype.some.call(el.options, function (o) { return o.value === rest[i + 1]; }));
+      el.value = known ? rest[i + 1] : "";
+      if (known) rest.splice(i, 2); // a value the form does not know stays in the line
+    });
+    $("st-" + door + "-flags").value = rest.join(" ");
+  }
+  function flagsOf(door) {
+    var out = [];
+    FLAG_FIELDS[door].forEach(function (f) {
+      var el = $(f[1]);
+      if (f[2] === "flag") { if (el.checked) out.push(f[0]); }
+      else if (el.value.trim() !== "") out.push(f[0], el.value.trim());
+    });
+    return out.concat($("st-" + door + "-flags").value.split(/\s+/).filter(Boolean));
+  }
+
   function loadSettings() { return api("GET", "/api/harbour/settings").then(fillSettings); }
   $("settings").addEventListener("submit", function (ev) {
     ev.preventDefault();
@@ -1724,6 +1776,8 @@
       else v = el.value.trim();
       setPath(s, k, v);
     });
+    setPath(s, "doors.api.flags", flagsOf("api"));
+    setPath(s, "doors.local.flags", flagsOf("local"));
     setPath(s, "doors.api.models", $("st-models").value.split("\n").map(function (line) {
       var parts = line.split(",").map(function (x) { return x.trim(); });
       if (!parts[0]) return null;

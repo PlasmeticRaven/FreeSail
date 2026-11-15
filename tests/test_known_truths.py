@@ -21954,3 +21954,36 @@ def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_t
         )  # "model" seats nobody by itself: the page offers the door
     finally:
         harbour.close()
+
+
+def test_truth_7_411_every_setting_of_the_harbour_is_explained_where_it_is_set():
+    """Package 96b, step 10 (docs/design/Design-Harbour.md §2.7; the owner's word of
+    2026-10-18 on the page as merged: "the settings tab does not say what the flags are or
+    what each does"). Every control written in the harbour's page (the new game's, the
+    sheet's, the stations' and the settings') has one sentence in a player's words, kept
+    in one file of the page's own and put under the control; the only controls without one
+    are those whose own label is the sentence. The words for the things the owner named:
+    the crewed ships, the pace, the seed, the sea's traffic and a seated model's memory
+    are said plainly."""
+    import json
+
+    client = HARBOUR_ROOT / "client"
+    page = (client / "harbour.html").read_text(encoding="utf-8")
+    text = (client / "harbour-words.js").read_text(encoding="utf-8")
+    start = text.index("window.freesailHarbourWords = ") + len("window.freesailHarbourWords = ")
+    words = json.loads(text[start : text.rindex(";")])
+    controls = []
+    for attrs in re.findall(r"<(?:input|select|textarea)\b([^>]*)>", page):
+        ident = re.search(r'\bid="([^"]+)"', attrs)
+        data = re.search(r'data-(field|set|brief|chron)="([^"]+)"', attrs)
+        controls.append(
+            f"#{ident.group(1)}" if ident else f'[data-{data.group(1)}="{data.group(2)}"]'
+        )
+    unsaid = set(controls) - set(words)
+    assert unsaid == {"#m-chron-on", "#m-systems", "#m-ports-state", "#m-brief-from"}
+    assert set(words) <= set(controls)
+    assert "sailed man by man" in words["#s-crewed-cap"]
+    assert "real time while a model at a station is answering" in words["#s-pace"]
+    assert "same weather" in words["#s-seed"] and "traders" in words["#s-business"].lower()
+    assert "folded into a summary" in words['[data-set="doors.api.seat_budget_tokens"]']
+    assert "applyWords" in (client / "harbour.js").read_text(encoding="utf-8")
