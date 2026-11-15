@@ -429,6 +429,32 @@ def test_every_control_of_the_page_has_its_sentence_in_the_one_file():
     assert '<script src="/client/harbour-words.js"></script>' in page
 
 
+def test_the_primer_and_the_readme_name_the_tabs_and_the_first_game_the_page_has():
+    """Package 96b, step 11: the primer's paragraph on going aboard and the README's on the
+    harbour say what the page is: the tabs by the names on them, and the first game by the
+    name on its button."""
+    import re
+
+    page = (ROOT / "client" / "harbour.html").read_text(encoding="utf-8")
+    tabs = re.findall(r'<button type="button" data-tab="[a-z]+"[^>]*>([^<]+)</button>', page)
+    assert tabs == ["begin", "game", "stations", "scenario maker", "settings"]
+    first = yaml_name(SCENARIOS / "first-passage.yaml")
+    for words in (
+        (ROOT / "docs" / "primer" / "01-the-ship.md").read_text(encoding="utf-8"),
+        (ROOT / "README.md").read_text(encoding="utf-8"),
+    ):
+        for tab in tabs:
+            assert f"**{tab}**" in words, tab
+        assert first in words and "chapter 7" in words
+        assert "the server's flags as its controls" not in words
+
+
+def yaml_name(path: Path) -> str:
+    import yaml
+
+    return str(yaml.safe_load(path.read_text(encoding="utf-8"))["name"])
+
+
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
