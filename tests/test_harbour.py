@@ -206,7 +206,13 @@ def test_the_state_lists_the_saves_by_name_newest_first_and_opens_none(port, cli
 def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     from freesail.ui.harbour import SHELVES_FILE, Harbour
 
-    assert SHELVES_FILE.parent != SCENARIOS  # the tests that walk the scenarios do not meet it
+    # the page's own, with the page's files: not among the scenarios (the tests that walk
+    # them would take it for one), and not under data/ at all (the range's audit classes
+    # every dated key there, and the rules' fingerprint hashes every file there)
+    assert SHELVES_FILE.parent != SCENARIOS
+    assert ROOT / "data" not in SHELVES_FILE.parents
+    assert SHELVES_FILE == ROOT / "client" / "harbour-shelves.yaml" and SHELVES_FILE.is_file()
+    assert not (ROOT / "data" / "harbour").exists()
     named = [s["file"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"]]
     assert len(named) == len(set(named))
     there = {p.stem for p in SCENARIOS.glob("*.yaml")}
