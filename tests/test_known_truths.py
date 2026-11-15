@@ -21886,9 +21886,10 @@ def test_truth_7_409_the_day_the_weather_and_the_ports_are_set_whole_and_the_unr
 def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_the_plan(tmp_path):
     """Package 96b, step 9 (docs/design/Design-Harbour.md §1.2 rows 28 and 34, §1.4 trap 1,
     §2.6; the owner's points of 2026-10-18: the stations and the seats three notions with
-    one word, and several models wanting several settings files). The harbour's state
-    names every model the one settings file can call through the API door (its own and
-    those beside it); a door's command line for a station takes any one of them by name,
+    one word, and several models wanting several settings files). The one settings file
+    names every model the API door can call (its own and those beside it), and the page's
+    state names none of them (truth 7b-110 stands); a door's command line for a station
+    takes any one of them by name,
     with that model's dialect and no seat's fold, and refuses in words a name the settings
     do not have, and any model named for the local runner; the door's own model is used
     when none is chosen, as before, and a director's seat's door is as it was. The
@@ -21911,11 +21912,16 @@ def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_t
     driver = Driver(World(seed=1805, scenario=Scenario()))
     harbour = Harbour(driver, settings_path=settings, saves_dir=tmp_path / "s")
     try:
-        assert harbour.state()["models"] == {
+        from freesail import settings as S
+
+        assert S.callable_models(harbour.settings()) == {
             first: "anthropic",
             second: "anthropic",
             third: "openrouter",
         }
+        # the page takes these from the settings' route; its state names none (7b-110)
+        said = json.dumps(harbour.state())
+        assert not [name for name in (first, second, third) if name in said]
 
         def said(argv: list[str], flag: str) -> str:
             return argv[argv.index(flag) + 1]

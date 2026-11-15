@@ -472,23 +472,53 @@
   // door with one of the models the settings can call, or the local runner. A door asks
   // its model for consent in its own pane, as ever: the table starts the door and no more.
 
-  var SHIP_STATIONS = ["captain", "officer", "master", "lookout", "passenger"];
+  var SHIP_STATIONS = ["captain", "officer", "master", "lookout", "passenger", "watcher"];
   var tableKey = "";
+  // The models the API door can call, from the settings the page already has (the door's
+  // own and those beside it), in the settings' order: the page's state carries no model's
+  // name of the settings (truth 7b-110).
+  function settingsModels() {
+    var a = (settings && settings.doors && settings.doors.api) || {}, out = [];
+    [a.model].concat(a.models || []).forEach(function (m) {
+      var name = m && typeof m === "object" ? m.name : m;
+      name = name === undefined || name === null ? "" : String(name).trim();
+      if (name && out.indexOf(name) < 0) out.push(name);
+    });
+    return out;
+  }
+  // Who holds a station now. Only a seated station is held; a seat still in its consent
+  // conversation is asked and not yet answered; a stopped seat (a consent declined, a door
+  // stopped) is nobody's, and the station is the game's own again with its door offered.
+  function stationOf(x) { return String(x.station || "").toLowerCase(); }
+  function seatsAt(s, station, ship) {
+    return s.stations.filter(function (x) {
+      var st = stationOf(x);
+      return (st === station || st.indexOf(station) === 0) && String(x.ship || "") === ship;
+    });
+  }
   function heldWords(s, station, ship) {
-    var held = s.stations.filter(function (x) {
-      var st = String(x.station || "").toLowerCase();
-      return (st === station || st.indexOf(station) >= 0) && String(x.ship || "") === ship;
-    })[0];
+    var at = seatsAt(s, station, ship);
+    var held = at.filter(function (x) { return (x.phase || "station") === "station"; })[0];
     if (held) return held.holder === "the player" ? "you" : (held.holder || "a model") + (held.door ? " (" + held.door + ")" : "");
+    var asked = at.filter(function (x) { return x.phase === "consent"; })[0];
+    if (asked) return "asked, not yet answered (" + (asked.holder || "a model") + ")";
     var door = s.doors.filter(function (d) { return d.state === "running" && d.station === station && String(d.ship || "") === ship; })[0];
     if (door) return "a door is asking (" + (door.door === "api" ? "the API door" : "the local runner") + ")";
     if (station === "captain" && !ship && s.game.seat.indexOf("captain's prompt") >= 0) return "you, at the prompt";
     return "the game's own";
   }
+  // a row whose door was asked for and is not yet in the state: no second door for it
+  var pendingRows = {};
   function fillStations(s) {
     var g = s.game, plan = (g.chosen && g.chosen.plan) || {};
-    var models = Object.keys(s.models || {});
-    var key = JSON.stringify([g.started, g.title, g.seed, g.captains, plan, models, s.stations, s.doors.map(function (d) { return [d.id, d.state]; }), g.seat]);
+    var models = settingsModels();
+    Object.keys(pendingRows).forEach(function (id) {
+      // the door asked for is in the state now (running, ended or stopped): no longer pending
+      var parts = id.split("|");
+      if (s.doors.some(function (d) { return d.id === pendingRows[id]; })) delete pendingRows[id];
+      else if (pendingRows[id] === true && s.doors.some(function (d) { return d.station === parts[0] && String(d.ship || "") === parts[1] && d.state === "running"; })) delete pendingRows[id];
+    });
+    var key = JSON.stringify([g.started, g.title, g.seed, g.captains, plan, models, s.stations, s.doors.map(function (d) { return [d.id, d.state]; }), g.seat, Object.keys(pendingRows)]);
     if (key === tableKey) return;
     tableKey = key;
     var body = $("t-stations").querySelector("tbody");
@@ -541,11 +571,11 @@
       b.type = "button";
       b.className = "t-start";
       b.textContent = "start its door";
-      b.disabled = !free;
+      b.disabled = !free || !!pendingRows[id];
       b.addEventListener("click", function () { startRow(tr); });
       td.appendChild(b);
       tr.appendChild(td);
-      if (says === "model" && free) { tr.classList.add("t-asked"); asked += 1; }
+      if (says === "model" && free && !pendingRows[id]) { tr.classList.add("t-asked"); asked += 1; }
       body.appendChild(tr);
     });
     $("btn-t-all").disabled = !asked;
@@ -554,13 +584,27 @@
   function startRow(tr) {
     var door = tr.querySelector(".t-door").value;
     if (!door) { show($("t-error"), "Choose the door for the " + tr.getAttribute("data-station") + "'s station: the API door or the local runner."); return Promise.resolve(); }
+    var id = tr.getAttribute("data-row");
+    if (pendingRows[id]) return Promise.resolve(); // asked for already: one door a row
     show($("t-error"), "");
+    pendingRows[id] = true;
+    tr.querySelector(".t-start").disabled = true;
+    tr.classList.remove("t-asked");
+    $("btn-t-all").disabled = !document.querySelector("#t-stations tr.t-asked");
     return api("POST", "/api/harbour/doors", {
       door: door, station: tr.getAttribute("data-station"), ship: tr.getAttribute("data-ship"),
       model: door === "api" ? tr.querySelector(".t-model").value : "",
-    }).then(paneFor).catch(function (e) { show($("t-error"), e.message); });
+    }).then(function (d) {
+      if (pendingRows[id]) pendingRows[id] = d.id; // held until the state shows this door
+      paneFor(d);
+    }).catch(function (e) {
+      delete pendingRows[id];
+      tableKey = "";
+      show($("t-error"), e.message);
+    });
   }
   $("btn-t-all").addEventListener("click", function () {
+    $("btn-t-all").disabled = true;
     document.querySelectorAll("#t-stations tr.t-asked").forEach(startRow);
   });
 
@@ -1010,6 +1054,22 @@
     b.textContent = "take it out";
     b.addEventListener("click", function () { card.parentNode.removeChild(card); markDirty("squadrons"); foldLines(); });
     card.appendChild(b);
+    // a member unticked is out of the set: where her own card names this squadron (a file
+    // may say the membership on the ship as well, and the game joins the two), that word is
+    // cleared with the tick, so that an untick is never a lie
+    box.addEventListener("change", function (ev) {
+      var x = ev.target;
+      if (x.type !== "checkbox" || x.checked) return;
+      var slug = function (s) { return String(s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); };
+      var mine = [slug(card.querySelector('[data-col="id"]').value), slug(card.querySelector('[data-col="name"]').value)].filter(Boolean);
+      document.querySelectorAll("#m-ships .ship-card").forEach(function (ship) {
+        var id = ship.querySelector('[data-col="id"]').value.trim(), name = ship.querySelector('[data-col="name"]').value.trim();
+        var word = ship.querySelector('[data-col="squadron"]');
+        if ((id || name) !== x.value || !word.value.trim() || mine.indexOf(slug(word.value)) < 0) return;
+        word.value = "";
+        markDirty("ships");
+      });
+    });
     $("m-squadrons").appendChild(card);
     squadronChoices(card);
   }
@@ -1729,6 +1789,8 @@
     });
     // the API door's other models (package 96b, step 9): one a line, "name" or
     // "name, dialect", as the settings keep them (a name, or {name, dialect})
+    tableKey = ""; // the stations' table offers the settings' models: drawn again
+    if (harbour.state) fillStations(harbour.state);
     fillFlags("api", getPath(settings, "doors.api.flags") || []);
     fillFlags("local", getPath(settings, "doors.local.flags") || []);
     var others = getPath(settings, "doors.api.models") || [];

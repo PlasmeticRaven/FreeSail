@@ -490,8 +490,13 @@ class Harbour:
             "kinds": self.kinds(),
             "squadrons": self.squadron_words(),
             "posts": self.posts(),
+            # the signal books a ship may hold beside her own: a nation's root. `basic`, the
+            # foundation every nation's books stand on, is left out: it is not shown to be a
+            # book a ship holds apart (the lead's ruling: not guessed)
             "signal_books": sorted(
-                p.name for p in (ROOT / "data" / "signals").iterdir() if p.is_dir()
+                p.name
+                for p in (ROOT / "data" / "signals").iterdir()
+                if p.is_dir() and p.name != "basic"
             ),
             "fits": self.fits(),
             "nations": list(load_nations().nations),
@@ -1054,12 +1059,6 @@ class Harbour:
             for k, v in stations.items()
         }
 
-    def models(self) -> dict[str, str]:
-        """The models the stations' table offers for the API door: those the settings can
-        call, by name to dialect (the door's own first). Their names go to the page and the
-        door's command line, as the settings' form already shows them; never to a log."""
-        return self.callable_models()
-
     def stations(self) -> list[dict[str, Any]]:
         """The stations held and by whom: the agent API's (a model's, through a door) and
         the player's seat."""
@@ -1067,14 +1066,39 @@ class Harbour:
         out: list[dict[str, Any]] = []
         with d.lock:
             if d.desk is not None:
+                # the desk lists, beside the stations held, the seats still in their consent
+                # conversation and the seats stopped (a consent declined, a door stopped
+                # before an answer), and those without their ship: each is passed on with
+                # its phase ("station": seated; "consent": asked, not yet answered;
+                # "stopped": nobody's), and an unseated seat's ship is had from the desk's
+                # own seat (package 96b, step 9's mend: the table counts only a seated
+                # station as held)
+                unseated = [s for s in d.desk.seats.values() if s.phase != "station"]
                 for st in d.desk.stations():
+                    phase = str(st.get("phase") or "station")
+                    ship = str(st.get("ship") or "")
+                    if phase != "station" and not ship:
+                        seat = next(
+                            (
+                                s
+                                for s in unseated
+                                if s.station == st.get("station")
+                                and s.model_name == st.get("model_name")
+                                and s.phase == phase
+                            ),
+                            None,
+                        )
+                        if seat is not None:
+                            unseated.remove(seat)
+                            ship = str(seat.ship or "")
                     out.append(
                         {
                             "station": st.get("station"),
-                            "ship": st.get("ship", ""),
+                            "ship": ship,
                             "holder": st.get("model_name") or "",
                             "door": st.get("door") or "",
                             "line": st.get("line") or "",
+                            "phase": phase,
                         }
                     )
             seat = getattr(d.world, "player_seat", None)
@@ -1088,6 +1112,7 @@ class Harbour:
                         "holder": "the player",
                         "door": "the browser",
                         "line": f"The {name}: the player, at the browser.",
+                        "phase": "station",
                     }
                 )
         return out
@@ -1107,7 +1132,6 @@ class Harbour:
             "game": self.game_state(),
             "stations": self.stations(),
             "doors": [door.state() for door in self.doors.values()],
-            "models": self.models(),
             "saves": self.saves(),
             "settings": {"path": str(self.path), "error": error},
             "credential": settings_mod.credential_words(),
@@ -1843,7 +1867,8 @@ def harbour_routes(h: Harbour) -> APIRouter:
             str(body.get("door") or ""),
             str(body.get("station") or ""),
             str(body.get("ship") or ""),
-            model=" ".join(str(body.get("model") or "").split()),
+            # a model's name as the settings have it: its ends stripped, nothing within
+            model=str(body.get("model") or "").strip(),
         )
 
     @router.get("/api/harbour/doors/{ident}")

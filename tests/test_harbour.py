@@ -268,7 +268,7 @@ def test_the_catalogue_gives_each_kind_her_file_fit_and_roles_and_each_file_her_
     posts = cat["posts"]["data/ships/frigate-36.yaml"]
     assert posts[:2] == ["captain", "first lieutenant"] and "master" in posts
     assert cat["posts"]["data/ships/privateer-schooner.yaml"] == []  # no wardroom file
-    assert {"britain", "france"} <= set(cat["signal_books"])
+    assert {"britain", "france"} <= set(cat["signal_books"]) and "basic" not in cat["signal_books"]
     # step 6: what a squadron's card chooses from, the game's own
     assert cat["squadrons"] == {
         "kinds": ["squadron", "convoy"],
@@ -869,8 +869,13 @@ def test_a_door_is_started_for_a_station_with_a_model_chosen_from_the_settings_l
             import httpx
 
             with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
-                state = c.get("/api/harbour/state").json()
-                assert list(state["models"]) == [MODEL, SECOND]
+                # the models are the settings', given to the page by the settings' route;
+                # the page's state carries no model's name of the settings (truth 7b-110)
+                state = c.get("/api/harbour/state")
+                assert "models" not in state.json()
+                assert MODEL not in state.text and SECOND not in state.text
+                api_door = c.get("/api/harbour/settings").json()["settings"]["doors"]["api"]
+                assert (api_door["model"], api_door["models"]) == (MODEL, [SECOND])
                 c.post(
                     "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
                 )
@@ -921,6 +926,44 @@ def test_the_scenarios_plan_of_its_stations_and_the_other_captains_are_in_the_st
     client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-passage.yaml"})
     game = client.get("/api/harbour/state").json()["game"]
     assert game["chosen"]["plan"] == {} and game["captains"] == []
+
+
+def test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat(port, client):
+    """Package 96b, step 9, mended (the independent reader's findings): the page's state
+    passes on each seat's phase and its ship. A seat in its consent conversation is not a
+    station held, and a seat stopped (a consent declined, a door stopped before an answer)
+    is nobody's; another ship's captain asked for is said with her name, not on the
+    player's own captain's row. And a row the page offers changes nothing of what the game
+    admits: a model asked for as the captain of an enemy of the player's ship is refused
+    by the game in its own words, before any station is made."""
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
+    assert client.get("/api/harbour/state").json()["game"]["captains"] == ["Renard"]
+    seat = {"model_name": "made-up-b", "door": "api", "ship": "Renard"}
+    r = client.post("/api/agents/captain", json=seat)
+    assert r.status_code == 403 and "the game seats no model as the captain of the Renard" in r.text
+    assert client.get("/api/harbour/state").json()["stations"] == []
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
+    client.post("/api/agents/officer", json={"model_name": "made-up-a", "door": "api"})
+    client.post(
+        "/api/agents/captain", json={"model_name": "made-up-b", "door": "api", "ship": "Raven"}
+    )
+
+    def seats() -> list[tuple[str, str, str, str]]:
+        st = client.get("/api/harbour/state").json()["stations"]
+        return [(s["station"], s["ship"], s["holder"], s["phase"]) for s in st]
+
+    assert seats() == [
+        ("officer of the watch", "", "made-up-a", "consent"),
+        ("captain", "Raven", "made-up-b", "consent"),
+    ]
+    desk = port.driver.desk
+    for held in list(desk.seats.values()):
+        with port.driver.lock:
+            desk.release(held.station, "stopped by the test", held.key, held.ship)
+    assert seats() == [
+        ("officer of the watch", "", "made-up-a", "stopped"),
+        ("captain", "Raven", "made-up-b", "stopped"),
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -1473,6 +1516,13 @@ def test_in_the_browser_a_convoy_is_built_from_an_empty_sheet_and_one_read_is_ke
     )
     assert out["same"] == out["was"]
     assert out["less"][0]["members"] == ["naiad"] and out["less"][0]["book"] == "blockade"
+    # the blockade's file says the membership on each ship too (`squadron: inshore`): the
+    # Nimble unticked, her own word is cleared with the tick; the Naiad's stands
+    words = pg.evaluate(
+        """() => Object.fromEntries(window.freesailHarbour.collect().ships
+            .map(s => [s.id, s.squadron || '']))"""
+    )
+    assert words["nimble"] == "" and words["naiad"] == "inshore"
     assert errors == []
 
 
@@ -1696,8 +1746,9 @@ def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered
     )
     assert rows[0] == ["Amazon (yours)", "the captain", "you, at the prompt", ""]
     assert rows[1] == ["Amazon (yours)", "the officer", "the game's own", "a model"]
-    assert rows[5][:3] == ["above the game", "the director", "the game's own"]
-    assert rows[6][:3] == ["Raven", "the captain", "the game's own"] and len(rows) == 7
+    assert rows[5][:3] == ["Amazon (yours)", "the watcher", "the game's own"]
+    assert rows[6][:3] == ["above the game", "the director", "the game's own"]
+    assert rows[7][:3] == ["Raven", "the captain", "the game's own"] and len(rows) == 8
     officer = pg.locator("#t-stations tr[data-row='officer|']")
     assert officer.locator(".t-door").input_value() == "api"
     offered = officer.locator(".t-model option").evaluate_all("els => els.map(e => e.value)")
@@ -1708,13 +1759,58 @@ def test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered
     pg.locator("#t-stations tr[data-row='captain|Raven'] .t-start").click()
     assert "Choose the door" in pg.inner_text("#t-error")
     officer.locator(".t-model").select_option(SECOND)
-    pg.click("#btn-t-all")
+    pg.evaluate(
+        "() => { const b = document.getElementById('btn-t-all'); b.click(); b.click(); "
+        "document.querySelector(\"#t-stations tr[data-row='officer|'] .t-start\").click(); }"
+    )
     pg.wait_for_selector(".door-pane", timeout=20_000)
     assert "API door at the officer" in pg.inner_text(".door-pane .door-words")
     door = next(iter(port.harbour.doors.values()))
     assert door.argv[door.argv.index("--model") + 1] == SECOND
     assert door.station == "officer" and door.ship == ""
+    # pressed twice before the page next reads the state: one door a row, not two
+    assert len(port.harbour.doors) == 1 and pg.is_disabled("#btn-t-all")
+    assert officer.locator(".t-start").is_disabled()
     port.harbour.close()
+    # the state the table is drawn from carries no model's name of the settings
+    said = pg.evaluate("async () => (await fetch('/api/harbour/state')).text()")
+    assert PLACEHOLDER not in said and SECOND not in said and "made-up-model-9" not in said
+    # a seat in its consent conversation is asked, not held; stopped, the station is the
+    # game's own again and its door is offered; the Raven's is on the Raven's row
+    made = pg.evaluate(
+        """async () => {
+            const post = (path, body) => fetch(path, {method: 'POST',
+                headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+            const a = await post('/api/agents/master', {model_name: 'made-up-a', door: 'api'});
+            const b = await post('/api/agents/captain',
+                {model_name: 'made-up-b', door: 'api', ship: 'Raven'});
+            return [a.status, b.status];
+        }"""
+    )
+    assert made == [200, 200]
+    master = pg.locator("#t-stations tr[data-row='master|']")
+    raven = pg.locator("#t-stations tr[data-row='captain|Raven']")
+    pg.wait_for_function(
+        "document.querySelector(\"#t-stations tr[data-row='master|'] .t-held\").textContent"
+        ".indexOf('asked, not yet answered (made-up-a)') === 0",
+        timeout=10_000,
+    )
+    assert raven.locator(".t-held").inner_text() == "asked, not yet answered (made-up-b)"
+    assert master.locator(".t-start").is_disabled() and raven.locator(".t-start").is_disabled()
+    own = pg.locator("#t-stations tr[data-row='captain|'] .t-held").inner_text()
+    assert own == "you, at the prompt"
+    desk = port.driver.desk
+    for held in [s for s in desk.seats.values() if s.model_name.startswith("made-up-")]:
+        with port.driver.lock:
+            desk.release(held.station, "stopped by the test", held.key, held.ship)
+    pg.wait_for_function(
+        "document.querySelector(\"#t-stations tr[data-row='master|'] .t-held\").textContent"
+        ' === "the game\'s own"',
+        timeout=10_000,
+    )
+    assert raven.locator(".t-held").inner_text() == "the game's own"
+    assert not master.locator(".t-start").is_disabled()
+    assert not raven.locator(".t-start").is_disabled()
     # the director's grant, in the sheet
     grant = pg.evaluate(
         """async (names) => {
