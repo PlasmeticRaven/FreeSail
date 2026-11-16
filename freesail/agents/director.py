@@ -384,11 +384,12 @@ class DirectorBrief:
         if lim.get("nobody_dies") and j.harm == world_orders.HARM_DEADLY:
             return "the brief says nobody dies, and that is a thing that kills"
         if key.startswith("weather.") and lim.get("wind_max_kn") is not None:
-            kn = _wind_kn_of(j)
+            kn = _wind_kn_of(world, j)
             if kn is not None and kn > float(lim["wind_max_kn"]):
                 return (
                     f"the brief allows no wind above {float(lim['wind_max_kn']):g} knots, and "
-                    f"that system would blow {kn:.0f} at its tightest"
+                    f"with that system it would blow {kn:.0f} where it is hardest (reckoned "
+                    "with every system standing, over the system's track)"
                 )
         if j.enemy is not None and lim.get("enemy_heaviest"):
             heavier = _enemy_heavier(j, str(lim["enemy_heaviest"]))
@@ -425,33 +426,85 @@ def _names_false_colours(world: Any, low: str) -> bool:
 
 
 def _peak_wind_kn(world: Any, body: str) -> float | None:
-    """The surface wind a `weather:` order's system would make at its tightest, in knots,
-    as the limit judges it (`_wind_kn_of`, on the channel's reading of the order); None
-    for an order that is no system the weather can append."""
+    """The hardest surface wind a `weather:` order would make, in knots, as the limit
+    judges it (`_wind_kn_of`, on the channel's reading of the order); None for an order
+    that is no system the weather can append."""
     j = world_orders.judged(world, world_orders.parse(body))
-    return _wind_kn_of(j) if j is not None else None
+    return _wind_kn_of(world, j) if j is not None else None
 
 
-def _wind_kn_of(j: Any) -> float | None:
-    """The surface wind a `weather:` order's system would make at its tightest, in knots
-    (the gradient of its bell at one radius, turned to the surface as the systems' wind
-    is), from what the channel read of the order (`Judged.fact`: its depth, its radius,
-    the background); None where the order names a system the weather has not, which the
-    channel answers itself."""
-    from freesail.world import weather as W
+# The wind limit's sampling (package 115, part C; the lead's list of 2026-11-16): the
+# rings about the ordered system's centre, in radii, the bearings on each, and how many
+# times of its life are looked at. A bell's wind is hardest on the ring at one radius; the
+# rings either side catch where the background's gradient or another system's adds to it.
+_WIND_RINGS = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
+_WIND_BEARINGS = 16
+_WIND_TIMES = 24
+_WIND_SPAN_MAX_H = 96.0
+# A wind is the order's making where it is this much harder than it stood without it.
+_WIND_MADE_KN = 1.0
 
-    hpa, radius = j.fact("hpa"), j.fact("radius_km")
-    if hpa is None or not radius:
+
+def _wind_kn_of(world: Any, j: Any) -> float | None:
+    """**The wind a `weather:` order would make, judged with what already stands** (the
+    lead's list of 2026-11-16: each system was judged alone, by its own bell's gradient, so
+    that four lows each under the limit blew far over it together, and the background's
+    gradient was left out). The weather's own functions are asked: the order is appended to
+    a copy of the world's systems (`Systems.append_system` or `append_waypoint`, as the
+    channel would), the copy is advanced through the system's track (`Systems.advance`),
+    and the surface wind (`Systems.surface_wind_at`) is read on rings about its centre
+    (`_WIND_RINGS` radii, `_WIND_BEARINGS` bearings), at the centres of every other system
+    standing and at the ship, at `_WIND_TIMES` times from now to the end of its track (four
+    days at the most): some 2,400 readings. Each is set beside the wind at the same point
+    and time without the order (a second copy, advanced alike), and the figure is the
+    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN` or more): a wind
+    the world already had is not laid to an order that did not raise it, and a high that
+    eases the field is not refused for the gale beside it. The world's own systems are not
+    touched. None where the order names a system the weather
+    has not, which the channel answers itself, or where the world keeps no systems."""
+    import copy
+    import math
+    from datetime import timedelta
+
+    append = j.fact("append")
+    systems = getattr(world, "systems", None)
+    if append is None or systems is None:
         return None
-    background = j.fact("background_hpa")
-    anomaly = abs(float(hpa) - float(W.BACKGROUND_HPA if background is None else background))
-    radius = float(radius)
-    # the bell's steepest gradient, hPa/km, at one radius: a e^-1/2 / R
-    g = anomaly * 0.6065306597 / radius
-    vg = W.GEOSTROPHIC_MS_PER_HPA_PER_100KM * g * 100.0
-    r_m = radius * 1000.0
-    vg = 2.0 * vg / (1.0 + (1.0 + 4.0 * vg / (W.CORIOLIS_50N * r_m)) ** 0.5)
-    return units.ms_to_knots(vg * W.SURFACE_SCALE)
+    trial, as_it_stood = copy.deepcopy(systems), copy.deepcopy(systems)
+    try:
+        system = append(trial)
+    except ValueError:
+        return None  # the weather refuses it: the channel says so when it is entered
+    if system is None:
+        return None
+    start = trial.now
+    end = max((p.at for p in system.track), default=start)
+    ramp = getattr(system, "ramp_until", None) or start
+    span_h = max(1.0, (max(end, ramp) - start).total_seconds() / 3600.0)
+    span_h = min(span_h + 1.0, _WIND_SPAN_MAX_H)
+    ship = (float(getattr(world, "ship_x_km", 0.0)), float(getattr(world, "ship_y_km", 0.0)))
+    made_ms = units.knots_to_ms(_WIND_MADE_KN)
+    hardest = 0.0
+    for i in range(_WIND_TIMES + 1):
+        when = start + timedelta(hours=span_h * i / _WIND_TIMES)
+        trial.advance(when)
+        as_it_stood.advance(when)
+        radius = float(system.radius_km)
+        points = [ship, *((float(s.x_km), float(s.y_km)) for s in trial.systems)]
+        for ring in _WIND_RINGS:
+            for k in range(_WIND_BEARINGS):
+                a = 2.0 * math.pi * k / _WIND_BEARINGS
+                points.append(
+                    (
+                        float(system.x_km) + ring * radius * math.cos(a),
+                        float(system.y_km) + ring * radius * math.sin(a),
+                    )
+                )
+        for x, y in points:
+            made = trial.surface_wind_at(x, y)[1]
+            if made > hardest and made - as_it_stood.surface_wind_at(x, y)[1] >= made_ms:
+                hardest = made
+    return units.ms_to_knots(hardest)
 
 
 def _enemy_heavier(j: Any, heaviest: str) -> str | None:
@@ -890,7 +943,10 @@ DIRECTOR_BRIEF = (
     "this station, and you are not asked to give one. You change the world the ship is in, "
     "in ways the sea could have produced on its own, so that the physics stays "
     "honest. Know what your hand reaches, for it does reach the player's own ship: a thing "
-    "found aboard her and a person of hers hurt ('aboard: ...'); her rules-based captain "
+    "found aboard her, a thing made or a sum paid aboard her, and a person of hers hurt "
+    "('aboard: ...'); a person made aboard her, brought aboard or sent ashore ('person: "
+    "...'); words in the mouth of one of her people ('say as ...'); a model seated at one "
+    "of her stations ('seat: ...'); she made a member of a squadron; her rules-based captain "
     "given an intent ('captain: intent ...', or her own name in 'ship \"<name>\": intent "
     "...'), who then makes sail and steers her by it until the player's next order takes "
     "her back; a strike or a prize, which makes her people prisoners and carries the "
@@ -1544,8 +1600,13 @@ def _read(
     reach_why = world_orders.reach(subject, order)
     if reach_why:
         return _Read(REACH, reach_why, order, free=free)
-    judgement = world_orders.judged(subject, order)
+    judgement, unread = world_orders.judged_or_why(subject, order)
     brief = brief_of(world)
+    if judgement is None and brief is not None and brief.limits:
+        # under a brief that sets a limit, an order the judgement cannot read is not handed
+        # on to be performed by another reading (the lead's list of 2026-11-16): it ends
+        # here, with the channel's own refusal
+        return _Read(MALFORMED, unread or "the channel cannot read it as said", order, None, free)
     if brief is not None:
         why = brief.limit_of(subject, order, judgement)
         if why:

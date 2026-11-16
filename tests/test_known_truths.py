@@ -22038,13 +22038,13 @@ def test_truth_7_412_a_box_of_the_files_words_cannot_hold_the_server_and_keeps_t
 
 
 # ---------------------------------------------------------------------------
-# Package 115, part C: the director's limits (truths 7-420 to 7-427; the cold review of
+# Package 115, part C: the director's limits (truths 7-462 to 7-469; the cold review of
 # 2026-11-14, decision 14; the owner's ruling of 2026-11-14). Each comes in by the
 # director's own door, the `world_order` tool of a director seated at the station.
 # ---------------------------------------------------------------------------
 
 
-def test_truth_7_420_the_director_is_free_by_default_the_players_own_ship_included():
+def test_truth_7_462_the_director_is_free_by_default_the_players_own_ship_included():
     """Under a brief that sets no limit the director's order reaches the player's own ship
     and is done: her rules captain given an intent by the captain's channel and by her own
     name, two acts spent, nothing refused."""
@@ -22060,7 +22060,7 @@ def test_truth_7_420_the_director_is_free_by_default_the_players_own_ship_includ
     assert D.budget_of(w).acts == 2 and "director.refused" not in log_kinds(w)
 
 
-def test_truth_7_421_hands_off_the_players_ship_holds_by_every_spelling():
+def test_truth_7_463_hands_off_the_players_ship_holds_by_every_spelling():
     """A brief that sets hands-off refuses the same act by each of its spellings, in words
     that name the limit: no act spent, her captain given no intent, four refusals logged."""
     from freesail.agents import director as D
@@ -22083,7 +22083,7 @@ def test_truth_7_421_hands_off_the_players_ship_holds_by_every_spelling():
     assert not any(b for b in D.starter_briefs() if D.resolve_brief(b).limits.get(D.HANDS_OFF))
 
 
-def test_truth_7_422_nobody_dies_has_something_to_refuse_and_every_starter_sets_it():
+def test_truth_7_464_nobody_dies_has_something_to_refuse_and_every_starter_sets_it():
     """The aboard table marks four things deadly (the grave wound; the boat stove, swamped
     or adrift while anyone is in her), and each of the six starter briefs refuses the grave
     wound of the player's own captain by the spelling that walked round it: nobody is hurt."""
@@ -22108,7 +22108,7 @@ def test_truth_7_422_nobody_dies_has_something_to_refuse_and_every_starter_sets_
     assert not [s for s in w.ship.extra["crew"].sailors if s.hurt]
 
 
-def test_truth_7_423_a_weight_the_limit_cannot_rank_is_refused_not_passed():
+def test_truth_7_465_a_weight_the_limit_cannot_rank_is_refused_not_passed():
     """Under "no enemy heavier than a cutter" a seventy-four by the words the ranking did
     not know is refused as heavier; under a limit whose own word names no class, no enemy
     passes at all; no ship is put on the sea by either."""
@@ -22126,7 +22126,7 @@ def test_truth_7_423_a_weight_the_limit_cannot_rank_is_refused_not_passed():
     assert w.vessels.find("Furet") is None
 
 
-def test_truth_7_424_the_directors_log_says_whom_each_act_reached():
+def test_truth_7_466_the_directors_log_says_whom_each_act_reached():
     """Three acts through the door, two of which reach the player's own ship: the director's
     log as the player reads it holds all three, and two of them say whom they reached."""
     from freesail.agents import director as D
@@ -22143,7 +22143,7 @@ def test_truth_7_424_the_directors_log_says_whom_each_act_reached():
     assert len(reached) == 2 and not any('"Nancy"' in x for x in reached)
 
 
-def test_truth_7_425_the_owners_orders_are_outside_the_brief():
+def test_truth_7_467_the_owners_orders_are_outside_the_brief():
     """The owner's world order is judged by the one table for what it is and by no brief:
     under hands-off the same order the director is refused is done for the owner."""
     from freesail.world import orders as WO
@@ -22158,7 +22158,7 @@ def test_truth_7_425_the_owners_orders_are_outside_the_brief():
     assert e.data["result"] == "done" and w.captain.intent is not None
 
 
-def test_truth_7_426_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in_words():
+def test_truth_7_468_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in_words():
     """The player's own ship laid up in ordinary through the director's door is answered in
     the game's words (she is in commission), where it raised an error; her regime stands."""
     from tests.test_director_limits import FREE, at_the_door
@@ -22169,7 +22169,7 @@ def test_truth_7_426_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in
     assert w.vessels.own.regime != "in ordinary" and w.ship.name == "Amazon"
 
 
-def test_truth_7_427_the_one_table_of_the_forms_is_the_channels_and_every_form_is_marked():
+def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_is_marked():
     """One table of the world-order forms, kept by the channel and read by the director:
     43 forms, each with a reach of the five and a harm; twenty-seven of them can reach the
     player's own ship, ten his person, three his prompt."""
