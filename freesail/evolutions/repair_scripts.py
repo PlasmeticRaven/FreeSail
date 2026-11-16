@@ -931,8 +931,15 @@ class RelievingTacklesScript(PhasedScript):
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["reeve"])
 
+    unwanted = False
+
     def end_phase(self, name: str) -> None:
         lost = self.ship.extra.pop("helm_lost", None)
+        if lost is None:
+            # the wheel repaired while they were reeving (package 116; the reader's finding):
+            # she steers by the wheel, and the tackles are not wanted
+            self.unwanted = True
+            return
         self.ship.extra["helm_by_tackles"] = str(lost or "the wheel shot away")
         # by the tackles she answers at a share of the wheel's rate (package 116, card 5:
         # the file's `helm_rate_share`, read by `physics.hull.steer`)
@@ -944,6 +951,8 @@ class RelievingTacklesScript(PhasedScript):
         return "the tackles not rove, the helm lost as the shot left it"
 
     def words(self) -> dict[str, Any]:
+        if self.unwanted:
+            return {"done": "The wheel is repaired; the relieving tackles are not wanted."}
         return {
             "done": "The relieving tackles are rove to the tiller and manned below: the helm "
             "answers again, steered by the tackles, and more slowly than by the wheel.",
