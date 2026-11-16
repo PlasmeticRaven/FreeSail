@@ -1433,8 +1433,6 @@ UNPERFORMED_HERE = {
     'squadron "the Channel squadron": join the Harpy': "only as a prize",
     'squadron "the Channel squadron": recall the inshore division': "has no division named",
     "convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth": "business is off",
-    # package 115 C: no prize lies at Falmouth on the test's seas
-    "port falmouth: the court condemns the Harpy": "is no prize",
     # package 72: the Harpy is at sea, not in ordinary
     'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days': (
         "is not in ordinary"
@@ -1454,7 +1452,7 @@ UNPERFORMED_HERE = {
 
 
 def _forms_worlds() -> list[Any]:
-    """The test's three seas for the forms, each made when first wanted: a fresh one; one
+    """The test's seas for the forms, each made when first wanted: a fresh one; one
     with the brig-sloop Harpy at far detail, 46 miles off with her captain's intent; and one
     with Harpy and the frigate Medusa three miles off and crewed, in sight of the frigate,
     Mr Fox and Mr Veale aboard, a low on the systems and a packet on the cabin table. No
@@ -1489,6 +1487,10 @@ def _forms_worlds() -> list[Any]:
             "bound for Falmouth",
             'squadron: "the Channel squadron" of Britain under the Medusa with the Nimble, keep '
             "the station off the Deadman within 8 miles",
+            # package 115 C: a French lugger thirty miles off made a prize of the Medusa's,
+            # for the prize court's sentence on her
+            'ship: a lugger "Furet" of France at 49 00 N 6 20 W, running home to Brest',
+            'ship "Furet": a prize of the Medusa',
         ):
             assert w.world_order(order, "the test").data["result"] == "done", order
         w.run(120)

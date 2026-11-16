@@ -505,14 +505,20 @@ def judged(world: Any, order: WorldOrder) -> Judged | None:
     order is one thing by every spelling. None for an order the channel cannot perform
     as said (its own refusal comes when it is entered); the rule of reach is apart
     (`reach`)."""
+    return judged_or_why(world, order)[0]
+
+
+def judged_or_why(world: Any, order: WorldOrder) -> tuple[Judged | None, str]:
+    """`judged`, and where the channel cannot perform the order as said, its own refusal in
+    words: (the judgement, "") or (None, why)."""
     was = getattr(_STATE, "judging", False)
     _STATE.judging = True
     try:
         apply(world, order)
     except _JudgedOnly as e:
-        return e.judgement
-    except WorldOrderError:
-        return None
+        return e.judgement, ""
+    except WorldOrderError as e:
+        return None, str(e).rstrip(".")
     finally:
         _STATE.judging = was
     raise RuntimeError(  # a handler that named no form performed the order while judging
@@ -572,8 +578,23 @@ def split_reason(text: str) -> tuple[str, str]:
     return text[: rm.start()].rstrip(), " ".join(rm.group("reason").split())
 
 
+# A reason's bracket anywhere in what is left once the one at the end is peeled.
+_REASON_LEFT = re.compile(r"\[\s*reason\s*:", re.I)
+
+
 def parse(text: str) -> WorldOrder:
+    """An order read from its words, once: the channel, the order with its one `[reason:
+    ...]` peeled from its end, and the reason. **This is the one reading** (package 115,
+    part C; the lead's list of 2026-11-16): what is judged and what is performed are the
+    `WorldOrder.text` it gives, in which no reason's bracket is left; an order that carries
+    a second bracket, or one that is not at its end, is refused here in words, so that no
+    later reader peels what an earlier one judged."""
     text, reason = split_reason(text)
+    if _REASON_LEFT.search(text):
+        raise WorldOrderError(
+            "an order carries one [reason: ...], at its end; this one has a second, or one "
+            "in its middle. Give the order with one reason after it"
+        )
     m = _HEAD.match(text)
     if m is None:
         raise WorldOrderError(
@@ -792,10 +813,31 @@ def _seat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
     m = seats._SEAT.match(" ".join(str(body).split()))
     if m is not None:
-        # the seat's own reading of whom it is for (`seats._resolve`): "" is this ship
-        target = seats._resolve(world, m.group("who"))
-        _touch(world, "seat", ships=[str(target.get("ship") or "") or _hull_id(world)])
+        _touch_seat(world, "seat", m.group("who"))
     return seats.hold(world, body)
+
+
+def _touch_seat(world: Any, key: str, who: str) -> None:
+    """A seat, or its giving up, says whom it is for by the seats' own reading (`seats.
+    _resolve`): a station of another ship is hers; a station of this ship is this ship's; the
+    voice of a person is his (aboard this ship it is done aboard her; ashore, and no man of
+    her company, it is the world's). Words the seats cannot read name nothing here: the
+    seats' own refusal follows, in their own order (the consent record before the ship)."""
+    from freesail.world import seats
+
+    try:
+        target = seats._resolve(world, who)
+    except WorldOrderError:
+        return
+    if target.get("ship"):
+        _touch(world, key, ships=[str(target["ship"])])
+    elif target.get("person"):
+        people = getattr(world, "people", None)
+        person = people.find(str(target["person"])) if people is not None else None
+        aboard = bool(target.get("aboard", True))
+        _touch(world, key, hull=world if aboard else None, persons=() if aboard else [person])
+    else:
+        _touch(world, key, hull=world)
 
 
 def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
@@ -810,8 +852,7 @@ def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if vessel is not None:
             _touch(world, "unseat", ships=[str(vessel.id)])
         else:
-            target = seats._resolve(world, who)
-            _touch(world, "unseat", ships=[str(target.get("ship") or "") or _hull_id(world)])
+            _touch_seat(world, "unseat", who)
     return seats.give_up(world, body)
 
 
@@ -900,13 +941,16 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if m:
         at = _time(m.group("at"))
         name = m.group("name")
-        system = systems.find(name)
         _touch(
             world,
             "weather.waypoint",
-            hpa=float(m.group("hpa")),
-            radius_km=float(system.radius_km) if system is not None else None,
-            background_hpa=float(systems.background_hpa),
+            # the same appending, for a limit to try on a copy of the systems
+            append=lambda trial, name=name, at=at, m=m: (
+                trial.append_waypoint(
+                    name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
+                ),
+                trial.find(name),
+            )[1],
         )
         try:
             reached = systems.append_waypoint(
@@ -944,9 +988,7 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         _touch(
             world,
             f"weather.{d['kind']}",
-            hpa=float(m.group("hpa")),
-            radius_km=float(d["radius_km"]),
-            background_hpa=float(systems.background_hpa),
+            append=lambda trial, d=d: trial.append_system(dict(d)),
         )
         try:
             systems.append_system(d)
@@ -1076,6 +1118,13 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         # her captain is carried a prisoner aboard her captor, and the prompt with him
         persons=[_players_own_person(world)] if hers else (),
         prompt=hers,
+        # taken by an enemy's ship she is an enemy's from now on: weighed as one put on
+        # the sea is (the lead's list of 2026-11-16)
+        enemy=_enemy_words(
+            world,
+            str(getattr(taken, "description", "") or getattr(taken, "what", "") or ""),
+            str(captor.nation),
+        ),
     )
     if P.is_prize(taken):
         raise WorldOrderError(f"{taken.name} is a prize already.")
@@ -3494,6 +3543,24 @@ def _aboard_thing(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         thing, where, moved = TH.make(world, _thing_words(body))
     except TH.ThingWordsError as e:
         raise WorldOrderError(str(e)) from None
+    # where it is put, and where a thing known is taken from: aboard this ship, or in the
+    # keeping of one aboard her, it is done to her; ashore, it is the world's (package 115,
+    # part C: `aboard: a cask of brandy, ashore at Falmouth` is no act upon the ship)
+    keeper = None
+    if where.get("keeper"):
+        people = getattr(world, "people", None)
+        keeper = next((x for x in people.all if x.id == where["keeper"]), None) if people else None
+    here = getattr(keeper, "aboard", True) if where.get("keeper") else where.get("place") != "shore"
+    if moved and TH.place_of(world, thing)[0] != "shore":
+        here = True
+    letter = _thing_words(body).lower().startswith(("a letter from", "letter from"))
+    _touch(
+        world,
+        "aboard.letter" if letter else "aboard.thing",
+        hull=world if here else None,
+        persons=[keeper] if keeper is not None and not here else (),
+        body=body,
+    )
     was = TH.where_words(world, thing, keeper_where=False) if moved else ""
     TH.put(thing, where)
     if not moved:
@@ -3857,8 +3924,6 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             _touch(world, "aboard.removed", hull=world, body=body)
             return _aboard_remove(world, removal)
         if "," in _thing_words(body):
-            letter = _thing_words(body).lower().startswith(("a letter from", "letter from"))
-            _touch(world, "aboard.letter" if letter else "aboard.thing", hull=world, body=body)
             return _aboard_thing(world, body)
         forms = "; ".join(_form_words(t) for t in aboard_table())
         raise WorldOrderError(
@@ -5578,7 +5643,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "port.court",
         "port",
         "port <id>: the court condemns | restores the <prize>",
-        ("port falmouth: the court condemns the Harpy",),
+        ("port falmouth: the court condemns the Furet",),
         "the prize court's sentence on a prize lying at the port, by the director's word: "
         "condemned to her captors or restored to her owners, the account in the prize's "
         "record; refused for a ship that is no prize, doubted where the court's own rule "

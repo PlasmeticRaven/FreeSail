@@ -606,3 +606,208 @@ def test_hands_off_holds_while_the_player_is_in_his_ships_boat():
         assert said.startswith("Refused"), (text, said)
         if "outside the brief" in said:
             assert "hands off the player's own ship" in said
+
+
+# ---------------------------------------------------------------------------
+# The lead's one list (2026-11-16)
+# ---------------------------------------------------------------------------
+
+
+def _door_of(w: World) -> Any:
+    h = seat_director(w, [])
+    return lambda text, dry_run=None: T.world_order(h.world, DIRECTOR, text, dry_run=dry_run)
+
+
+def test_two_reasons_brackets_get_past_no_limit_no_doubt_and_no_log():
+    """The hole the lead's reader found: with two `[reason: ...]` brackets the door peeled
+    one, judged an order that still carried the other (which no handler read, so that no
+    limit was asked), and the channel then peeled the second and performed it. There is one
+    reading now (`orders.parse`): a second bracket, or one in the order's middle, is
+    refused in words, and nothing is done."""
+    w, door = at_the_door("quiet-passage")
+    cap = captain_of(w).name
+    closed = list(w.ports.ports["brest"].closed_to)
+    for text in (
+        f"aboard: {cap} is badly hurt [reason: a] [reason: b]",
+        f"aboard the Amazon: {cap} is badly hurt [reason: a] [reason: b]",
+        "port brest: closed to Britain [reason: a] [reason: b]",
+        f"aboard: {cap} [reason: a] is badly hurt [reason: b]",
+        f"aboard: {cap} [reason: a] is badly hurt",
+    ):
+        for said in (door(text), door(text, dry_run=True)):
+            assert "the game has no way to do this as said" in said.lower(), (text, said)
+            assert "one [reason: ...], at its end" in said, (text, said)
+    assert not [s for s in w.ship.extra["crew"].sailors if s.hurt]
+    assert w.ports.ports["brest"].closed_to == closed and D.budget_of(w).acts == 0
+    w, door = at_the_door(HANDS_OFF)
+    said = door("aboard: a cask found stove [reason: a] [reason: b]")
+    assert "no way to do this as said" in said and D.budget_of(w).acts == 0
+    assert not [e for e in w.log.all() if e.kind == "aboard.found"]
+    with_one = door("aboard: a cask found stove [reason: a]")
+    assert with_one.startswith("Refused, outside the brief:")
+
+
+def test_what_the_door_performs_is_exactly_what_was_judged_or_nothing():
+    """The invariant: for every example of every form, with no reason, one, two, and one in
+    the order's middle, what the director's door performs is the order the judgement read
+    (the same form of the table, by the channel's own word of what it performed), or
+    nothing is performed. Under a brief that sets a limit an order the judgement cannot
+    read is not handed on at all."""
+    for brief in (FREE, "quiet-passage"):
+        w, door = at_the_door(brief, ticks=30)
+        entered(door, 'ship: a brig-sloop "Harpy" of Britain at 49 00 N 6 20 W, bound for Falmouth')
+        for f in WO.WORLD_ORDER_FORMS:
+            for x in f.examples:
+                head, _, tail = x.partition(": ")
+                for text in (
+                    x,
+                    f"{x} [reason: a]",
+                    f"{x} [reason: a] [reason: b]",
+                    f"{head}: [reason: a] {tail}",
+                ):
+                    try:
+                        j = WO.judged(w, WO.parse(text))
+                    except WO.WorldOrderError:
+                        j = None
+                    acts = D.budget_of(w).acts
+                    orders = len(w.world_orders)
+                    said = door(text)
+                    assert said.startswith(ENDS), (text, said)
+                    if said.startswith(("Done:", "Following ")):
+                        assert j is not None, (text, said)
+                        if j.form.key != "follow":
+                            assert WO.performed().form.key == j.form.key, (text, said)
+                    elif j is None and brief != FREE:
+                        # not handed on to the channel to be read another way
+                        assert len(w.world_orders) == orders, (text, said)
+                        assert D.budget_of(w).acts == acts, (text, said)
+
+
+def test_a_ship_that_becomes_an_enemys_is_weighed_as_one_put_on_the_sea():
+    """The lead's reader: under "no enemy heavier than a cutter" a British seventy-four was
+    put on the sea (a friend, unweighed) and then struck to a French cutter, and was a
+    French seventy-four. A ship struck to, or made a prize of, an enemy's ship is weighed
+    as an enemy made is; taken by a friend she is not."""
+    for taking in ("struck to the Petit", "a prize of the Petit"):
+        w, door = at_the_door("quiet-passage")
+        assert entered(
+            door, 'ship: a seventy-four "Big" of Britain at 48 30 N 6 30 W, bound for Plymouth'
+        ).startswith("Done:")
+        assert entered(
+            door, 'ship: a cutter "Petit" of France at 48 32 N 6 32 W, bound for Brest'
+        ).startswith("Done:")
+        for tail in ("", " [reason: the story]"):
+            said = door(f'ship "Big": {taking}{tail}')
+            assert said.startswith("Refused, outside the brief:"), (taking, said)
+            assert "no enemy heavier than a cutter" in said and "is heavier" in said
+        assert not P.is_prize(w.vessels.find("Big"))
+        # a cutter taken by the French is no heavier than the limit, and is done
+        assert entered(
+            door, 'ship: a cutter "Wasp" of Britain at 48 34 N 6 34 W, bound for Plymouth'
+        ).startswith("Done:")
+        assert entered(door, f'ship "Wasp": {taking}').startswith("Done:"), taking
+        # a French seventy-four cannot be put there to be taken by a friend, either
+        assert door(
+            'ship: a seventy-four "Gros" of France at 48 36 N 6 36 W, bound for Brest'
+        ).startswith("Refused, outside the brief:")
+
+
+def test_the_weight_is_asked_of_a_convoys_escort():
+    """`convoy: ... under a frigate from Brest ...` draws a French frigate with her convoy:
+    refused under "no enemy heavier than a cutter", as the frigate made by `ship:` is; a
+    British convoy under a frigate is a friend's, and is drawn."""
+    from tests.test_business import world_with
+
+    w = world_with("on")
+    D.set_brief(w, "quiet-passage", source="the test")
+    door = _door_of(w)
+    ships = len(w.vessels.active())
+    said = door("convoy: three merchantmen under a frigate from Brest for Falmouth")
+    assert said.startswith("Refused, outside the brief:"), said
+    assert "no enemy heavier than a cutter" in said and "frigate of France is heavier" in said
+    assert len(w.vessels.active()) == ships
+    said = entered(door, "convoy: three merchantmen under a frigate from Falmouth for Plymouth")
+    assert not said.startswith("Refused"), said
+
+
+def test_hands_off_does_not_refuse_what_is_the_worlds_ashore():
+    """The lead's reader: hands-off refused a seat for the voice of a pilot ashore, its
+    giving up, and a thing made ashore, each for want of a hull resolved. A person who is
+    not hers and not aboard her, and a thing ashore, are the world's: answered by the
+    channel as under any brief. A seat at a station of her own people is hers, and refused."""
+    w, door = at_the_door(HANDS_OFF)
+    assert entered(door, 'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest')
+    free, free_door = at_the_door(FREE)
+    entered(free_door, 'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest')
+    for text in (
+        "seat: a-made-up-model as Mr Fox for 3 samples",
+        "unseat: Mr Fox",
+        "aboard: a cask of brandy, ashore at Falmouth",
+    ):
+        said = entered(door, text)
+        assert "outside the brief" not in said, (text, said)
+        assert said.split(":")[0] == entered(free_door, text).split(":")[0], (text, said)
+    for text in (
+        "seat: a-made-up-model as master for 3 samples",
+        "seat: a-made-up-model as officer of the watch for 3 samples",
+        "seat: a-made-up-model as Mr Pearce for 3 samples",
+        "aboard: a cask of brandy, in the hold",
+    ):
+        said = door(text)
+        assert said.startswith("Refused, outside the brief:"), (text, said)
+        assert "the player's own ship" in said
+
+
+def test_the_wind_is_judged_with_every_system_standing():
+    """The lead's reader: four lows, each under the limit by its own bell, blew far over it
+    together; and one blew harder in the field than its bell alone, the background's
+    gradient left out. The limit asks the weather's own functions on a copy of the systems
+    with the order appended: the first low that would raise the wind over the limit
+    anywhere in its reach is refused, whatever stands already; the world's systems are not
+    touched by the asking."""
+    w = directed("quiet-passage", systems=[], climatology=True)
+    door = _door_of(w)
+    limit = float(D.brief_of(w).limits["wind_max_kn"])
+    standing = [s.name for s in w.systems.systems]
+    done = 0
+    for i in range(6):
+        text = f'weather: low "l{i}" radius 450 km at 1805-06-12T10:00 -800 800 1009'
+        kn = D._peak_wind_kn(w, text)
+        assert [s.name for s in w.systems.systems][: len(standing)] == standing
+        said = door(text)
+        if kn > limit:
+            assert said.startswith("Refused, outside the brief:") and "no wind above" in said
+            assert "with every system standing" in said
+        else:
+            assert said.startswith("Done:"), said
+            done += 1
+    assert 1 <= done < 6  # one alone passes; they do not all stack
+    # a deep one is refused alone, and by more than its own bell's estimate
+    deep = 'weather: low "deep" radius 450 km at 1805-06-12T10:00 -800 800 989'
+    assert D._peak_wind_kn(w, deep) > limit and door(deep).startswith("Refused, outside")
+
+
+def test_the_player_who_has_changed_ship_is_covered_aboard_his_new_ship():
+    """The player has taken command of another ship (`first_hull` is the ship he left):
+    "the player's own ship" is the ship he commands now, and hands-off covers her; the
+    ship he left, with no person and no prompt of his, is another ship."""
+    from tests.test_ship_changed import fly_taken_up
+
+    w, fly, me, _e = fly_taken_up()
+    assert w.players is not w.first_hull and str(w.players.id) == str(fly.id)
+    assert WO.players_hulls(w) == {str(fly.id)}
+    D.set_brief(w, HANDS_OFF, source="the test")
+    door = _door_of(w)
+    for text in (
+        "captain: intent bound for Plymouth",
+        "aboard: a cask found stove",
+        "aboard the Fly: a cask found stove",
+    ):
+        said = door(text)
+        assert said.startswith("Refused, outside the brief:"), (text, said)
+        assert "the player's own ship (the Fly)" in said, (text, said)
+    j = WO.judged(w, WO.parse("aboard the Amazon: a cask found stove"))
+    assert j is not None and j.reaches == {WO.ANOTHER_SHIP}
+    # the squadrons' literal 'the ship' is the game's first hull, the ship he left
+    j = WO.judged(w, WO.parse('squadron: "the old" of Britain under the ship, bound for Plymouth'))
+    assert j is None or j.reaches == {WO.ANOTHER_SHIP}
