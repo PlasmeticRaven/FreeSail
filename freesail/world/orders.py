@@ -5643,7 +5643,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "port.court",
         "port",
         "port <id>: the court condemns | restores the <prize>",
-        ("port falmouth: the court condemns the Harpy",),
+        ("port falmouth: the court condemns the Furet",),
         "the prize court's sentence on a prize lying at the port, by the director's word: "
         "condemned to her captors or restored to her owners, the account in the prize's "
         "record; refused for a ship that is no prize, doubted where the court's own rule "

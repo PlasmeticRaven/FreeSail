@@ -1558,17 +1558,16 @@ NO_FORM, UNCALLABLE, OVER, REACH, LIMIT, MALFORMED, DOUBT, GO = (
 )
 
 
-@dataclass(frozen=True)
-class _Read:
-    """A director's order as the one sequence judged it: where it stopped (`stage`) and
-    why, the order, what the channel says it is (`judgement`), and whether it costs no
-    act (an answer as a person asked; `follow`, a driver's line)."""
+# What `_read` gives: (the stage it stopped at, why, the order, what the channel says it is,
+# whether it costs no act). A plain tuple, made and let go inside one call of the door: it
+# is no record of the game's and no checkpoint holds one.
+_Read = tuple[str, str, Any, Any, bool]
 
-    stage: str
-    why: str = ""
-    order: world_orders.WorldOrder | None = None
-    judgement: Any = None
-    free: bool = False
+
+def _stopped(
+    stage: str, why: str = "", order: Any = None, judgement: Any = None, free: bool = False
+) -> _Read:
+    return (stage, why, order, judgement, free)
 
 
 def _read(
@@ -1579,11 +1578,10 @@ def _read(
     channel says the order is, `world_orders.judged`), the form at fault, the doubt.
     `on` is the world the order is judged on where it is not the world itself (the dry
     run's copy, so that a hull a judgement would make is made on the copy)."""
-    subject = world if on is None else on
     try:
         order = world_orders.parse(text)
     except world_orders.WorldOrderError as e:
-        return _Read(NO_FORM, str(e))
+        return _stopped(NO_FORM, str(e))
     follow = order.channel == "follow"
     # an answer to a question put to a person nobody holds costs no act (package 52), and
     # `follow` is a driver's line that costs none (package 82, item 6)
@@ -1594,31 +1592,36 @@ def _read(
     if order.channel == "seat":
         uncallable = uncallable_seat(world, order.text)
         if uncallable:
-            return _Read(UNCALLABLE, uncallable, order, free=free)
+            return _stopped(UNCALLABLE, uncallable, order, free=free)
     if (held_now or acts_used >= acts_allowed) and not free:
-        return _Read(OVER, "", order, free=free)
-    reach_why = world_orders.reach(subject, order)
+        return _stopped(OVER, "", order, free=free)
+    reach_why = world_orders.reach(world, order)  # a reading: nothing is made by it
     if reach_why:
-        return _Read(REACH, reach_why, order, free=free)
+        return _stopped(REACH, reach_why, order, free=free)
+    # the world the order is judged on: itself, or the dry run's copy, made only now that
+    # the order has come as far as its judgement (a copy is the dry run's whole cost)
+    subject = world if on is None else on()
     judgement, unread = world_orders.judged_or_why(subject, order)
     brief = brief_of(world)
     if judgement is None and brief is not None and brief.limits:
         # under a brief that sets a limit, an order the judgement cannot read is not handed
         # on to be performed by another reading (the lead's list of 2026-11-16): it ends
         # here, with the channel's own refusal
-        return _Read(MALFORMED, unread or "the channel cannot read it as said", order, None, free)
+        return _stopped(
+            MALFORMED, unread or "the channel cannot read it as said", order, None, free
+        )
     if brief is not None:
         why = brief.limit_of(subject, order, judgement)
         if why:
-            return _Read(LIMIT, why, order, judgement, free)
+            return _stopped(LIMIT, why, order, judgement, free)
     # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
     # a malformed order is answered honestly in words, never "doubted" alone, so that a
     # doubted order is one that can be performed when entered again
     malformed = world_orders.form_error(subject, order)
     if malformed:
-        return _Read(MALFORMED, malformed, order, judgement, free)
+        return _stopped(MALFORMED, malformed, order, judgement, free)
     doubted = world_orders.doubt(subject, order)
-    return _Read(DOUBT if doubted else GO, doubted or "", order, judgement, free)
+    return _stopped(DOUBT if doubted else GO, doubted or "", order, judgement, free)
 
 
 def _reached_words(judgement: Any) -> str:
@@ -1654,14 +1657,13 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     brief = brief_of(world)
     acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     bare, reason = world_orders.split_reason(text)
-    read = _read(world, text, b.acts, acts_allowed)
-    order, free, judgement = read.order, read.free, read.judgement
-    if read.stage == NO_FORM:
+    stage, why, order, judgement, free = _read(world, text, b.acts, acts_allowed)
+    if stage == NO_FORM:
         # no form the game has (the owner's refinement of 2026-10-17): answered honestly,
         # never as "not allowed"; entered again with a reason, logged as attempted
-        return _no_way(world, bare, reason, read.why, by)
+        return _no_way(world, bare, reason, why, by)
     assert order is not None
-    if read.stage == UNCALLABLE:
+    if stage == UNCALLABLE:
         # a seat for a model the harbour's settings cannot call (package 67): refused in
         # words before the World, the settings' model named to the director alone
         log.append(
@@ -1673,8 +1675,8 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         inputs = getattr(world, "inputs", None)
         if road == INPUT and inputs and inputs[-1].get("director_order") == text:
             inputs.pop()  # nothing given: a replay, with no harbour beside it, gives nothing
-        return f"Refused: {read.why}."
-    if read.stage == OVER:
+        return f"Refused: {why}."
+    if stage == OVER:
         words = (
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "
             "until the next day of the ship's time. The order was not given."
@@ -1685,36 +1687,36 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         if b.held_until is None:
             _hold(world, f"The day's budget of {acts_allowed} acts is spent")
         return words
-    if read.stage == REACH:
+    if stage == REACH:
         # the rule of reach (spec M7b §9; package 52): a refusal in words, the stations held
         # named, so that the director knows whom it may speak as
         log.append(
             director_hull(world),
-            f"Refused by the rule of reach: {order.text} ({read.why})",
+            f"Refused by the rule of reach: {order.text} ({why})",
             kind="director.refused",
             by=by,
         )
         if world_orders.is_hand(order):
             # the hand (package 62): no order through a captain a model or the player holds
             return (
-                f"Refused, by the rule of reach: {read.why}. The director gives no order "
+                f"Refused, by the rule of reach: {why}. The director gives no order "
                 "through a captain a model or the player holds."
             )
         return (
-            f"Refused, by the rule of reach: {read.why}. The director speaks as, moves and "
+            f"Refused, by the rule of reach: {why}. The director speaks as, moves and "
             "binds nobody a model or the player holds; the stations held now: "
             f"{world_orders.held_words(world)}."
         )
-    if read.stage == LIMIT:
+    if stage == LIMIT:
         log.append(
             director_hull(world),
-            f"Refused by the brief: {order.text} ({read.why})",
+            f"Refused by the brief: {order.text} ({why})",
             kind="director.refused",
             by=by,
         )
-        return f"Refused, outside the brief: {read.why}. The limits are the player's own."
-    if read.stage == MALFORMED:
-        return _no_way(world, order.text, order.reason, read.why, by)
+        return f"Refused, outside the brief: {why}. The limits are the player's own."
+    if stage == MALFORMED:
+        return _no_way(world, order.text, order.reason, why, by)
     reached = _reached_words(judgement)
     if order.channel == "follow":
         # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
@@ -1732,7 +1734,7 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
             director_hull(world), f"{e.text.rstrip('.')}{reached}.", kind="director.follow", by=by
         )
         return e.text
-    doubted = read.why if read.stage == DOUBT else ""
+    doubted = why if stage == DOUBT else ""
     if doubted and order.reason and not _doubt_shown(world, order.text):
         # a reason given on the first entry answers no doubt the director has seen (R-41: a
         # man carried nine miles ashore in a minute): the doubt is shown, and the order is
@@ -1818,30 +1820,42 @@ def dry_run(world: Any, text: str) -> str:
     acts_used = state.acts if today else 0
     held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
     followed = _follow_words(text)
-    copy = None if followed is not None else _copy(world)  # `follow` is read, never made
-    on = None if copy is None or isinstance(copy, str) else copy
-    read = _read(world, text, acts_used, acts_allowed, held_now, on=on)
-    order, free = read.order, read.free
-    if read.stage == NO_FORM:
+    copied: list[Any] = []
+
+    def on() -> Any:
+        # the copy the order is judged and tried on; the world itself where it cannot be
+        # copied (the order is then said not to have been tried)
+        copied.append(_copy(world))
+        return world if isinstance(copied[0], str) else copied[0]
+
+    stage, why, order, _judgement, free = _read(
+        world,
+        text,
+        acts_used,
+        acts_allowed,
+        held_now,
+        on=None if followed is not None else on,  # `follow` is read, never made
+    )
+    if stage == NO_FORM:
         return (
-            f"{DRY_RUN_HEAD} the game has no way to do this as said: {read.why.rstrip('.')}. "
+            f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}. "
             "The library's grammar topic lists the forms ('the world orders'), each with "
             "examples."
         )
     assert order is not None
-    if read.stage == UNCALLABLE:
-        return f"{DRY_RUN_HEAD} it would be refused: {read.why}."
-    if read.stage == OVER:
+    if stage == UNCALLABLE:
+        return f"{DRY_RUN_HEAD} it would be refused: {why}."
+    if stage == OVER:
         return (
             f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
             "is spent until the next day of the ship's time."
         )
-    if read.stage == REACH:
-        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {read.why}."
-    if read.stage == LIMIT:
-        return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {read.why}."
-    if read.stage == MALFORMED:
-        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {read.why.rstrip('.')}."
+    if stage == REACH:
+        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {why}."
+    if stage == LIMIT:
+        return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {why}."
+    if stage == MALFORMED:
+        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}."
     if followed is not None:
         # `follow` (package 82, item 6): read on the world as the drivers would, nothing moved
         from freesail.world.orders import WorldOrderError, hull_named
@@ -1863,7 +1877,8 @@ def dry_run(world: Any, text: str) -> str:
             f"{DRY_RUN_HEAD} it would be performed as a driver's line, no act spent: the "
             f"drivers would follow the {name}, her readings, her log and her chart theirs."
         )
-    doubted = read.why if read.stage == DOUBT else ""
+    doubted = why if stage == DOUBT else ""
+    copy = copied[0] if copied else _copy(world)
     would = copy if isinstance(copy, str) else _would_do(copy, order.text)
     if would.startswith(NOT_TRIED):
         # an order that could not be tried is never said to be performed (package 109)
