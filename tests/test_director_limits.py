@@ -848,3 +848,23 @@ def test_the_wind_is_not_stacked_past_the_limit_by_small_steps():
     high = float(w.systems.background_hpa) + 3.0
     ridge = f'weather: high "ridge" radius 600 km at 1805-06-13T04:00 900 -900 {high:g}'
     assert D._peak_wind_kn(w, ridge) < limit and door(ridge).startswith("Done:")
+
+
+def test_a_thing_ashore_moved_from_port_to_port_is_doubted_at_the_door_never_an_error():
+    """The cloud's finding on the list's mend (run 126): a thing that lies ashore, moved to
+    another port, reaches no hull, and the doubt was handed no hull to read it by and
+    raised. The doubt reads an `aboard` order by the hull it was resolved aboard, whether
+    or not the order reaches her: doubted in words at the door, and done with its reason."""
+    w, door = at_the_door(FREE)
+    assert entered(door, "aboard: a sealed packet, on the cabin table").startswith("Done:")
+    assert entered(door, "aboard: the packet, ashore at Falmouth").startswith("Done:")
+    moved = "aboard: the packet, ashore at Brest"
+    j = WO.judged(w, WO.parse(moved))
+    assert j.form.key == "aboard.thing" and j.reaches == {WO.THE_WORLD} and j.target is not None
+    assert "from one port to another" in WO.doubt(w, WO.parse(moved))
+    said = door(moved)
+    assert said.startswith("Doubted, not performed:") and "from one port to another" in said
+    assert door(moved, dry_run=True).startswith(
+        "Dry run, nothing performed and no act spent: it would be doubted"
+    )
+    assert door(f"{moved} [reason: the agent sent it on]").startswith("Done:")
