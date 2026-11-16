@@ -441,8 +441,14 @@ _WIND_RINGS = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
 _WIND_BEARINGS = 16
 _WIND_TIMES = 24
 _WIND_SPAN_MAX_H = 96.0
-# A wind is the order's making where it is this much harder than it stood without it.
-_WIND_MADE_KN = 1.0
+# A wind is the order's making where it is harder than it stood without it by any amount
+# the arithmetic can tell from none: a hundredth of a knot, far above the rounding of two
+# copies advanced alike (which agree to the last figure where the order changes nothing)
+# and far below any system a director would order. It was a knot, and a run of lows of
+# under a knot each on one centre then stacked past the limit, each judged to have made no
+# wind (the lead's reading of 2026-11-16): the step that carries the wind over the limit is
+# the one refused, however small it is.
+_WIND_MADE_KN = 0.01
 
 
 def _wind_kn_of(world: Any, j: Any) -> float | None:
@@ -457,7 +463,8 @@ def _wind_kn_of(world: Any, j: Any) -> float | None:
     standing and at the ship, at `_WIND_TIMES` times from now to the end of its track (four
     days at the most): some 2,400 readings. Each is set beside the wind at the same point
     and time without the order (a second copy, advanced alike), and the figure is the
-    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN` or more): a wind
+    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN`, a hundredth of a
+    knot, or more): a wind
     the world already had is not laid to an order that did not raise it, and a high that
     eases the field is not refused for the gale beside it. The world's own systems are not
     touched. None where the order names a system the weather
