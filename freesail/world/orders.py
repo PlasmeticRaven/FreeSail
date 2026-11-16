@@ -89,6 +89,7 @@ from __future__ import annotations
 import functools
 import math
 import re
+import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -96,7 +97,7 @@ from typing import Any
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.hulls import is_observer, players_id
+from freesail.world.hulls import is_observer, own_id, players_id, world_of
 
 __all__ = [
     "CHANNELS",
@@ -189,6 +190,345 @@ class WorldOrder:
     by: str = ""  # the purview it is given under (package 84, step 10): "" and the director's whole
 
 
+# ---------------------------------------------------------------------------
+# The one table's judgement (package 115, part C; the cold review of 2026-11-14, decision
+# 14 and 6.3 item 1): what an order IS, read where it is performed
+# ---------------------------------------------------------------------------
+
+# Whom a world order reaches. The first three are the player's: his ship (her hull, her
+# people, her stores, her command; the ship his prompt is aboard counts as his while he
+# is aboard her), his own person wherever his body is, and his prompt (which ship his
+# orders go to). The rest is another ship, or the world she sails in.
+PLAYERS_SHIP = "the player's ship"
+PLAYERS_PERSON = "the player's person"
+PLAYERS_PROMPT = "the player's prompt"
+ANOTHER_SHIP = "another ship"
+THE_WORLD = "the world"
+REACHES = (PLAYERS_SHIP, PLAYERS_PERSON, PLAYERS_PROMPT, ANOTHER_SHIP, THE_WORLD)
+THE_PLAYERS = frozenset((PLAYERS_SHIP, PLAYERS_PERSON, PLAYERS_PROMPT))
+
+# What an order can do to a person: nothing, a hurt, or death. Deadly is an act that
+# kills of itself (the lead's ruling of 2026-11-16): a grave wound, a boat lost with
+# anyone in her. A hazard the ship can answer (a seam working, foul water, a fever, an
+# enemy, the weather) is not deadly here, though men may die of it.
+HARM_NONE, HARM_HURT, HARM_DEADLY = "none", "hurt", "deadly"
+# In the table alone: the harm is the thing's own (`data/director/aboard.yaml`, `harm`).
+HARM_BY_THE_THING = "the thing's"
+
+
+@dataclass(frozen=True)
+class Form:
+    """One form of the world orders (package 58a; the cold review of 2026-10-22, R-42, and
+    the lugger director's first ask, "a complete director grammar with verified
+    examples"): its handle, its channel, its words with the slots in angle brackets, and
+    examples the tests perform (`tests/test_director.py`), so that a director who did not
+    write the forms need not learn them by refusal (37% of the lugger director's orders
+    failed, against 7% for the director who wrote the code). The examples in the station
+    brief and in the starter briefs are drawn from these, never written apart.
+
+    Package 115, part C: the form carries whom it CAN reach (`reach`, the widest it
+    reaches by any spelling: an order's own reach is judged where it is performed,
+    `judged`) and whether it can kill (`harm`). The table is the channel's
+    (`WORLD_ORDER_FORMS`, at the foot of this module); the director's module reads it."""
+
+    key: str
+    channel: str
+    words: str
+    examples: tuple[str, ...]
+    note: str = ""
+    reach: tuple[str, ...] = (THE_WORLD,)
+    harm: str = HARM_NONE
+
+
+@dataclass(frozen=True)
+class Judged:
+    """What a world order is, as the channel that performs it resolved it (`judged`): its
+    form, whom it reaches (of `REACHES`), its harm, the words for whom it reaches, and
+    what a limit may ask of it. `target` and `body` are an `aboard` order's hull and the
+    order with the hull's name peeled from its head; `enemy` is (the description as said,
+    the nation's name) of an enemy it puts on the sea, `weight` her rank by the tops'
+    words or None where they cannot rank her."""
+
+    form: Form
+    reaches: frozenset[str] = frozenset((THE_WORLD,))
+    harm: str = HARM_NONE
+    whom: str = ""
+    target: Any = None
+    body: str = ""
+    enemy: tuple[str, str] | None = None
+    weight: int | None = None
+    thing: str = ""
+    # what the handler read of the order that a limit may ask for (a system's depth and
+    # radius, a port's stance and nation, the hand's words, a new ship's colours)
+    facts: tuple[tuple[str, Any], ...] = ()
+
+    def fact(self, name: str, default: Any = None) -> Any:
+        return dict(self.facts).get(name, default)
+
+    @property
+    def the_players(self) -> bool:
+        """Whether the order reaches the player's ship, his person or his prompt."""
+        return bool(self.reaches & THE_PLAYERS)
+
+
+class _JudgedOnly(Exception):
+    """Raised by `_touch` while an order is being judged and not performed: the
+    judgement, carried out of the handler before it changes anything."""
+
+    def __init__(self, judgement: Judged) -> None:
+        super().__init__(judgement.form.key)
+        self.judgement = judgement
+
+
+# The judgement's state for the order being read on this thread, beside the World and
+# never on it (no save or checkpoint holds it): whether the order is being judged only,
+# and the judgement of the order being performed.
+_STATE = threading.local()
+
+
+def judging() -> bool:
+    """Whether the order in hand is being judged and not performed (`judged`): a handler
+    that would draw or make a thing to resolve a name does not, then."""
+    return bool(getattr(_STATE, "judging", False))
+
+
+def players_hulls(world: Any) -> frozenset[str]:
+    """The ids of the hulls that are the player's: his own ship, and the ship his prompt
+    is aboard (the followed hull of a played world); none in an observed world, which
+    has no ship of the player's."""
+    root = world_of(world) or world
+    players = getattr(root, "players", None)
+    if players is None or is_observer(players):
+        return frozenset()
+    ids = {str(getattr(players, "id", "") or own_id())}
+    followed = str(getattr(root, "followed", "") or "")
+    if followed:
+        ids.add(followed)
+    return frozenset(ids)
+
+
+def _hull_id(handle: Any) -> str:
+    """A hull's id from the handle a handler holds: the World (its names read the hull
+    followed or current), a hull, a vessel, or an id in words."""
+    if handle is None:
+        return ""
+    if isinstance(handle, str):
+        return handle
+    root = world_of(handle)
+    if root is not None and handle is root:
+        return str(getattr(getattr(root, "own", None), "id", "") or own_id())
+    return str(getattr(handle, "id", "") or "")
+
+
+def _ship_words(world: Any, hid: str) -> str:
+    root = world_of(world) or world
+    hull = (getattr(root, "hulls", None) or {}).get(hid)
+    name = str(getattr(getattr(hull, "ship", None), "name", "") or "")
+    if not name:
+        vessels = getattr(root, "vessels", None)
+        vessel = vessels.get(hid) if vessels is not None and hasattr(vessels, "get") else None
+        name = str(getattr(vessel, "name", "") or "")
+    return name
+
+
+def _touch(
+    world: Any,
+    key: str,
+    *,
+    hull: Any = None,
+    ships: Any = (),
+    persons: Any = (),
+    prompt: bool = False,
+    harm: str = "",
+    body: str = "",
+    enemy: tuple[str, str] | None = None,
+    thing: str = "",
+    aboard: Any = None,
+    **facts: Any,
+) -> None:
+    """A handler says what it is about to do, once every name is resolved and before
+    anything of the game is changed (one thing may have been made on the way, as
+    performing the order makes it: the hull of a far ship the order names, `hull_named`):
+    the form's handle, the hull it acts aboard, the ships and the persons it acts on,
+    whether it moves the player's prompt, and its harm. This is the one place an order's
+    reach is read, by the code that performs it, so that no spelling of an order is judged
+    as another order (package 115, part C). While the
+    order is only being judged (`judged`) it stops the handler here."""
+    form = form_of(key)
+    hers = players_hulls(world)
+    played = bool(hers)
+    reaches: set[str] = set()
+    said: list[str] = []
+    ids = [_hull_id(hull)] if hull is not None else []
+    ids += [_hull_id(x) for x in ships]
+    ids = [x for x in dict.fromkeys(ids) if x]
+    mine = None
+    if persons:
+        from freesail.world.knowledge import players_person
+
+        try:
+            mine = players_person(world_of(world) or world)
+        except Exception:  # noqa: BLE001  (a world with no muster has no person of his)
+            mine = None
+    for p in persons:
+        if p is None:
+            continue
+        if mine is not None and (p is mine or getattr(p, "name", None) == mine.name):
+            reaches.add(PLAYERS_PERSON)
+            said.append(f"the player's own person ({mine.name})")
+        elif getattr(p, "aboard", False) and str(getattr(p, "hull", "") or "") in hers:
+            ids.append(str(p.hull))
+        elif str(getattr(p, "home", "") or "") in hers and (
+            getattr(p, "sailor_id", None) or getattr(p, "station", "")
+        ):
+            # one of her company (a man of her muster, the holder of a station of hers)
+            # ashore, in her boat or aboard another ship is hers still; a person the world
+            # keeps ashore beside her people (a pilot, an agent) is the world's
+            ids.append(str(p.home))
+    for hid in dict.fromkeys(ids):
+        if hid in hers:
+            if PLAYERS_SHIP not in reaches:
+                name = _ship_words(world, hid)
+                own = hid == str(
+                    getattr(getattr(world_of(world) or world, "players", None), "id", "")
+                )
+                said.append(
+                    f"the player's own ship{f' (the {name})' if name else ''}"
+                    if own
+                    else f"the ship the player is aboard{f' (the {name})' if name else ''}"
+                )
+            reaches.add(PLAYERS_SHIP)
+        else:
+            reaches.add(ANOTHER_SHIP)
+    if prompt and played:
+        reaches.add(PLAYERS_PROMPT)
+        said.append("the player's prompt")
+    if not reaches:
+        reaches.add(THE_WORLD)
+    weight = None
+    if enemy is not None:
+        from freesail.world.captains import size_rank_of
+        from freesail.world.ships import description_key
+
+        said_whole = " ".join(str(enemy[0]).lower().split())
+        desc = said_whole.removeprefix("a ").removeprefix("an ").removeprefix("the ")
+        # ranked as the ship's maker reads her ('a 74' is a seventy-four), then by the
+        # words as said; None where neither names a class the tops rank
+        key = (description_key(said_whole) or description_key(desc)) if desc else None
+        weight = size_rank_of(key) if key else None
+        if weight is None:
+            weight = size_rank_of(desc)
+        enemy = (desc, enemy[1])
+    judgement = Judged(
+        form,
+        frozenset(reaches),
+        harm or (form.harm if form.harm != HARM_BY_THE_THING else HARM_NONE),
+        " and ".join(said),
+        # the hull an `aboard` order was resolved aboard, which the doubt reads her names
+        # by, whether or not the order reaches her (a thing put ashore from her words)
+        aboard if aboard is not None else hull,
+        body,
+        enemy,
+        weight,
+        thing,
+        tuple(sorted(facts.items())),
+    )
+    if judging():
+        raise _JudgedOnly(judgement)
+    if getattr(_STATE, "touched", None) is None:
+        _STATE.touched = judgement  # the order's own form: the first a handler names
+
+
+def performed() -> Judged | None:
+    """What the order last performed on this thread was, as its handler named it: the
+    owner's and a scenario's orders are read by the same table as the director's (they
+    meet no brief and no doubt; package 115, part C). None before any, or for an order
+    that was refused before it named a form."""
+    return getattr(_STATE, "touched", None)
+
+
+def _players_own_person(world: Any) -> Any:
+    """The player's one person (`knowledge.players_person`), or None where there is none."""
+    from freesail.world.knowledge import players_person
+
+    try:
+        return players_person(world_of(world) or world)
+    except Exception:  # noqa: BLE001  (a world with no muster has no person of his)
+        return None
+
+
+def _enemy_words(world: Any, description: str, nation_id: str) -> tuple[str, str] | None:
+    """(her description as said, her nation's name) where a ship of that nation is an
+    enemy of the player's ship (their nations at war), else None: what a brief's limit on
+    an enemy's weight asks of a form that puts a ship on the sea."""
+    ports = getattr(world, "dealings", None)
+    own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+    nations = getattr(world, "nations", None)
+    if not own or nations is None or not nation_id:
+        return None
+    try:
+        if not nations.at_war(str(nation_id), own):
+            return None
+        name = str(nations.get(str(nation_id)).name)
+    except Exception:  # noqa: BLE001  (a nation the table has not is nobody's enemy)
+        return None
+    return str(description), name
+
+
+def _in_commission_words(world: Any, vessel: Any) -> str | None:
+    """Why a ship cannot be laid up in ordinary, in words, or None (package 115, part C;
+    the fault met through the director's door on the player's own ship): a ship is laid
+    up by paying off her company at a port, and one that is in commission with her
+    people aboard and a captain commanding her from her own deck (the player's ship, the
+    ship his prompt is aboard, a ship a station of whose a model or the player holds) has
+    not been paid off. The rule is the ship's state, whoever gives the order."""
+    held = str(vessel.id) in players_hulls(world)
+    if not held:
+        crew = getattr(vessel, "crew", None)
+        try:
+            held = crew is not None and any(
+                who != "the player at the prompt" for _st, _p, who in held_stations(crew)
+            )
+        except Exception:  # noqa: BLE001  (a hull with no muster holds nobody)
+            held = False
+    if not held:
+        return None
+    return (
+        f"{vessel.name} is in commission, her captain commanding her and her people aboard: "
+        "a ship is laid up in ordinary when her company is paid off at a port, and hers "
+        "has not been"
+    )
+
+
+def judged(world: Any, order: WorldOrder) -> Judged | None:
+    """**What the order is** (package 115, part C): its form of the one table, whom it
+    reaches and its harm, read by the handler that would perform it up to the point
+    where every name is resolved, and nothing changed. The channel, the director's
+    limits, the doubt and the director's log all ask this and nothing else, so that an
+    order is one thing by every spelling. None for an order the channel cannot perform
+    as said (its own refusal comes when it is entered); the rule of reach is apart
+    (`reach`)."""
+    return judged_or_why(world, order)[0]
+
+
+def judged_or_why(world: Any, order: WorldOrder) -> tuple[Judged | None, str]:
+    """`judged`, and where the channel cannot perform the order as said, its own refusal in
+    words: (the judgement, "") or (None, why)."""
+    was = getattr(_STATE, "judging", False)
+    _STATE.judging = True
+    try:
+        apply(world, order)
+    except _JudgedOnly as e:
+        return e.judgement, ""
+    except WorldOrderError as e:
+        return None, str(e).rstrip(".")
+    finally:
+        _STATE.judging = was
+    raise RuntimeError(  # a handler that named no form performed the order while judging
+        f"the world order '{order.text}' was performed by a handler that names no form"
+    )
+
+
 # The purviews a world order may be given under (package 84, step 10; the design's 2.10):
 # the channels each may use, None for the whole channel; the director's and the bare order
 # pass whole, and an office of M8's would name its own. An unknown purview is refused.
@@ -214,6 +554,7 @@ def _follow(world: Any, body: str, by: str = "") -> tuple[str, dict[str, Any]]:
     m = _FOLLOW_BODY.match(body)
     if m is None:
         raise WorldOrderError("Say 'follow \"<ship>\"' or 'follow nobody'")
+    _touch(world, "follow", prompt=True)
     try:
         e = world.follow(m.group("who"), source=by or "the director")
     except ValueError as err:
@@ -240,8 +581,23 @@ def split_reason(text: str) -> tuple[str, str]:
     return text[: rm.start()].rstrip(), " ".join(rm.group("reason").split())
 
 
+# A reason's bracket anywhere in what is left once the one at the end is peeled.
+_REASON_LEFT = re.compile(r"\[\s*reason\s*:", re.I)
+
+
 def parse(text: str) -> WorldOrder:
+    """An order read from its words, once: the channel, the order with its one `[reason:
+    ...]` peeled from its end, and the reason. **This is the one reading** (package 115,
+    part C; the lead's list of 2026-11-16): what is judged and what is performed are the
+    `WorldOrder.text` it gives, in which no reason's bracket is left; an order that carries
+    a second bracket, or one that is not at its end, is refused here in words, so that no
+    later reader peels what an earlier one judged."""
     text, reason = split_reason(text)
+    if _REASON_LEFT.search(text):
+        raise WorldOrderError(
+            "an order carries one [reason: ...], at its end; this one has a second, or one "
+            "in its middle. Give the order with one reason after it"
+        )
     m = _HEAD.match(text)
     if m is None:
         raise WorldOrderError(
@@ -258,6 +614,8 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     outside = purview_allows(order.by, order.channel)
     if outside:
         raise WorldOrderError(outside)
+    if not judging():
+        _STATE.touched = None  # the form the handler names as it performs (`performed`)
     body = order.text
     if order.channel == "follow":
         return _follow(world, body, order.by)
@@ -405,6 +763,7 @@ def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise WorldOrderError(
             "A captain order is 'captain: intent <the intent in words>' or 'captain: carry on'."
         )
+    _touch(world, "captain", hull=world)
     try:
         if m.group("words").strip().lower() == "carry on":
             # decision 41 (package 40c): the ship given back to him after the player's hand
@@ -455,7 +814,33 @@ def _seat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     comes for it under that name is admitted under its budget (`seats.match`)."""
     from freesail.world import seats
 
+    m = seats._SEAT.match(" ".join(str(body).split()))
+    if m is not None:
+        _touch_seat(world, "seat", m.group("who"))
     return seats.hold(world, body)
+
+
+def _touch_seat(world: Any, key: str, who: str) -> None:
+    """A seat, or its giving up, says whom it is for by the seats' own reading (`seats.
+    _resolve`): a station of another ship is hers; a station of this ship is this ship's; the
+    voice of a person is his (aboard this ship it is done aboard her; ashore, and no man of
+    her company, it is the world's). Words the seats cannot read name nothing here: the
+    seats' own refusal follows, in their own order (the consent record before the ship)."""
+    from freesail.world import seats
+
+    try:
+        target = seats._resolve(world, who)
+    except WorldOrderError:
+        return
+    if target.get("ship"):
+        _touch(world, key, ships=[str(target["ship"])])
+    elif target.get("person"):
+        people = getattr(world, "people", None)
+        person = people.find(str(target["person"])) if people is not None else None
+        aboard = bool(target.get("aboard", True))
+        _touch(world, key, hull=world if aboard else None, persons=() if aboard else [person])
+    else:
+        _touch(world, key, hull=world)
 
 
 def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
@@ -463,6 +848,14 @@ def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     (`seats.give_up`): the seat given up, the station released with the director's note."""
     from freesail.world import seats
 
+    m = seats._UNSEAT.match(" ".join(str(body).split()))
+    if m is not None:
+        who = m.group("who").strip().strip('"')
+        vessel = world.vessels.find(who) if getattr(world, "vessels", None) else None
+        if vessel is not None:
+            _touch(world, "unseat", ships=[str(vessel.id)])
+        else:
+            _touch_seat(world, "unseat", who)
     return seats.give_up(world, body)
 
 
@@ -489,6 +882,7 @@ def _mark(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     desc = m.group("desc").strip().strip('"').strip()
     if not desc:
         raise WorldOrderError("A mark wants a description: 'mark: <description> at <place>'.")
+    _touch(world, "mark")
     found = place_position(world, m.group("where"))
     if found is None:
         raise WorldOrderError(f"'{m.group('where')}' is no position and no place of the chart.")
@@ -550,6 +944,17 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if m:
         at = _time(m.group("at"))
         name = m.group("name")
+        _touch(
+            world,
+            "weather.waypoint",
+            # the same appending, for a limit to try on a copy of the systems
+            append=lambda trial, name=name, at=at, m=m: (
+                trial.append_waypoint(
+                    name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
+                ),
+                trial.find(name),
+            )[1],
+        )
         try:
             reached = systems.append_waypoint(
                 name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
@@ -583,6 +988,11 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         }
         if m.group("warm"):
             d["fronts"] = {"warm_deg": float(m.group("warm")), "cold_deg": float(m.group("cold"))}
+        _touch(
+            world,
+            f"weather.{d['kind']}",
+            append=lambda trial, d=d: trial.append_system(dict(d)),
+        )
         try:
             systems.append_system(d)
         except ValueError as e:
@@ -703,6 +1113,22 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     from freesail.world import prizes as P
 
     taken, captor, how = _taken_parts(world, m)
+    hers = str(taken.id) in players_hulls(world)
+    _touch(
+        world,
+        "ship.struck" if how.startswith("struck") else "ship.prize",
+        ships=[str(taken.id), str(captor.id)],
+        # her captain is carried a prisoner aboard her captor, and the prompt with him
+        persons=[_players_own_person(world)] if hers else (),
+        prompt=hers,
+        # taken by an enemy's ship she is an enemy's from now on: weighed as one put on
+        # the sea is (the lead's list of 2026-11-16)
+        enemy=_enemy_words(
+            world,
+            str(getattr(taken, "description", "") or getattr(taken, "what", "") or ""),
+            str(captor.nation),
+        ),
+    )
     if P.is_prize(taken):
         raise WorldOrderError(f"{taken.name} is a prize already.")
     if str(taken.id) == players_id(world) and getattr(captor, "crew", None) is None:
@@ -765,6 +1191,7 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
         im = _INTENT_TAIL.match(m.group("goal"))
         if im:
+            _touch(world, "ship.intent", ships=[str(vessel.id)])
             # a brain given to a ship on the sea, or her intent changed (package 43); words
             # no form reads are taken as a free intent, said with the warning and why the
             # rules-based captain cannot sail by them (the owner's lead, 2026-10-26)
@@ -817,10 +1244,18 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             plan, cycle, goal = _goal_plan(world, m.group("goal"), vessel.position)
         except ValueError as e:
             raise WorldOrderError(str(e)) from None
+        _touch(world, "ship.goal", ships=[str(vessel.id)])
         vessel.plan, vessel.cycle, vessel.goal, vessel.tack = plan, cycle, goal, 0.0
         vessel.done = False
         return f"the goal of {vessel.name} changed: {goal}", {"id": vessel.id, "goal": goal}
     spec = new_ship_spec(world, body)
+    _touch(
+        world,
+        "ship.new",
+        enemy=_enemy_words(world, spec["description"], spec["nation"]),
+        colours=str(spec.get("colours") or ""),
+        said=" ".join(body.lower().split()),
+    )
     world.vessels.serial += 1
     try:
         vessel = vessel_from_spec(world, spec, world.vessels.serial)
@@ -857,6 +1292,10 @@ def _in_ordinary(world: Any, vessel: Any, port_words: str | None) -> tuple[str, 
     commission; the business commissions a nation's ships in ordinary by its knobs."""
     from freesail.world.regimes import put_in_ordinary
 
+    _touch(world, "ship.regime", ships=[str(vessel.id)])
+    in_commission = _in_commission_words(world, vessel)
+    if in_commission:
+        raise WorldOrderError(in_commission)
     ports = getattr(world, "dealings", None)
     port = None
     if port_words:
@@ -907,6 +1346,14 @@ def _commissioned(
             f"{vessel.name} is not in ordinary (she is {vessel.state}); a ship on the sea is "
             "given an intent with 'ship \"X\": intent <words>'."
         )
+    _touch(
+        world,
+        "ship.regime",
+        ships=[str(vessel.id)],
+        enemy=_enemy_words(
+            world, str(getattr(vessel, "description", "") or ""), str(vessel.nation)
+        ),
+    )
     delay_s = 0
     low = (when or "").lower().strip()
     if not low:
@@ -934,6 +1381,7 @@ def _orders_of(world: Any, vessel: Any, boss: str) -> tuple[str, dict[str, Any]]
     now on, as the scenario's `under_the_orders_of` sets it; `nobody` releases her."""
     who = " ".join(str(boss).split()).strip(" .'\"")
     low = who.lower()
+    _touch(world, "ship.orders_of", ships=[str(vessel.id)])
     if low in ("nobody", "no one", "none", "herself", "her own captain"):
         vessel.under_orders_of = ""
         crew = getattr(vessel, "crew", None)
@@ -1061,6 +1509,12 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         act = " ".join(m.group("act").split()).rstrip(".")
         low = act.lower()
         data: dict[str, Any] = {"squadron": sq.id}
+
+        def acted(*more: str) -> None:
+            # the set's own ships and whichever the act names: an act on a set is done to
+            # every ship of it
+            _touch(world, "squadron.act", ships=[*sq.members, str(sq.commander), *more])
+
         dm = _DIVISION.match(act)
         if dm:
             ids = _ids_named(world, dm.group("ships"), "be detached")
@@ -1074,6 +1528,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                         f"{sq._name_of(world, vid)} is no member of {sq.name}; the members: "
                         + ", ".join(sq._name_of(world, x) for x in sq.members)
                     )
+            acted(lead, *ids)
             d = sq.detach(world, dm.group("div").strip(), lead, ids)
             world.record(
                 Severity.NOTABLE,
@@ -1090,6 +1545,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             v = _ship_named(world, act[5:], "join the squadron")
             vid = "the ship" if v == "the ship" else str(v.id)
             _same_nation_or_refuse(world, sq.nation, vid, sq.name)
+            acted(vid)
             other = world.squadrons.of(vid)
             if other is not None and other is not sq:
                 other.leave(world, vid, f"to join {sq.name}")
@@ -1105,6 +1561,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                     f"{sq._name_of(world, vid)} commands {sq.name}; name another commander "
                     f"first ('squadron \"{sq.name}\": commander <ship>')."
                 )
+            acted(vid)
             sq.leave(world, vid, "detached by order")
             brain = getattr(v, "brain", None) if v != "the ship" else None
             if brain is not None:
@@ -1116,6 +1573,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         rm = _RECALL.match(act)
         if rm:
             name = rm.group("div").strip()
+            acted()
             d = sq.recall(world, name)
             if d is None:
                 raise WorldOrderError(
@@ -1137,6 +1595,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                 raise WorldOrderError(
                     f"'{formation}' is no formation; say one of {', '.join(FORMATIONS)}."
                 )
+            acted()
             sq.formation = formation
             if fm.group("cols"):
                 from freesail.orders.numbers import read_all
@@ -1149,6 +1608,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             return f"{sq.name} forms the {formation}", data | {"formation": formation}
         if low.startswith("goal "):
             words = act[5:].strip()
+            acted()
             sq._set_goal(world, words)
             sq.goal = words
             sq.made.pop("__goals__", None)  # a goal given is the set's own, not to be restored
@@ -1156,6 +1616,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if low.startswith("commander "):
             v = _ship_named(world, act[10:], "command the squadron")
             vid = "the ship" if v == "the ship" else str(v.id)
+            acted(vid)
             sq.set_commander(world, vid)
             return f"{sq._name_of(world, vid)} commands {sq.name}", data | {"commander": vid}
         if low.startswith("rendezvous "):
@@ -1165,9 +1626,11 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             found = place_position(world, place)
             if found is None:
                 raise WorldOrderError(f"The chart knows no place named {place!r} for a rendezvous.")
+            acted()
             sq.rendezvous = found[1]
             return f"the rendezvous of {sq.name}: {found[1]}", data | {"rendezvous": found[1]}
         if low in ("dissolve", "dissolved", "disperse", "part company"):
+            acted()
             world.squadrons.remove(sq, world)
             return f"{sq.name} dissolved: every ship on her own", data
         raise WorldOrderError(f"'{act}' is nothing a squadron does; say {_SQUADRON_FORMS_WORDS}.")
@@ -1197,6 +1660,7 @@ def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if x != "the ship" and "merchant" in str(getattr(world.vessels.get(x), "description", ""))
     )
     kind = "convoy" if merchant >= max(1, len(members) // 2) else "squadron"
+    _touch(world, "squadron.new", ships=list(members))
     sets = world.squadrons
     for x in members:
         other = sets.of(x)
@@ -1256,6 +1720,7 @@ def _convoy(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     n = read_all(m.group("n"))
     if not n or int(n) < 1:
         raise WorldOrderError(f"'{m.group('n')}' is no number of merchantmen.")
+    _touch(world, "convoy", enemy=_convoy_escort(world, m.group("escort"), m.group("a")))
     try:
         sq = business.draw_convoy(
             int(n), m.group("escort").strip(), m.group("a").strip(), m.group("b").strip()
@@ -1267,6 +1732,26 @@ def _convoy(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         f"{sq._name_of(world, sq.commander)}, {sq.goal}",
         {"squadron": sq.id, "members": list(sq.members), "goal": sq.goal},
     )
+
+
+def _convoy_escort(world: Any, escort_words: str, from_port: str) -> tuple[str, str] | None:
+    """(the escort's description, her nation's name) where a convoy's escort is an enemy
+    of the player's ship, else None, read as the business draws her (`draw_convoy`): a
+    description's own, of the first port's nation; a ship named, one of her kind and
+    nation."""
+    from freesail.world.ships import description_key
+
+    words = " ".join(str(escort_words).split()).removeprefix("a ").removeprefix("an ")
+    ports = getattr(world, "ports", None)
+    a = ports.find(from_port.strip()) if ports is not None and ports.ports else None
+    nation = str(getattr(a, "nation", "") or "")
+    desc = description_key(words)
+    if desc is None:
+        v = world.vessels.find(words.removeprefix("the "))
+        if v is None:
+            return None  # no escort the business can draw: its own refusal follows
+        desc, nation = str(v.description), str(v.nation)
+    return _enemy_words(world, desc, nation)
 
 
 def new_ship_spec(world: Any, body: str) -> dict[str, Any]:
@@ -1490,6 +1975,12 @@ def _hand(world: Any, name: str, words: str | None) -> tuple[str, dict[str, Any]
     vessel = world.vessels.find(name)
     if vessel is None or vessel.done:
         raise WorldOrderError(f"No ship named {name!r} is on the sea.")
+    _touch(
+        world,
+        "ship.crewed" if words is None else "ship.hand",
+        ships=[str(vessel.id)],
+        hand=" ".join(str(words or "").split()),
+    )
     try:
         if words is None:
             said = crews.ask_crewed(world, vessel)
@@ -1534,6 +2025,7 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         # a letter for one of the people (package 100, step 2): `for "<name>"`, handed him
         # sealed when it comes aboard; else the captain's
         addressee = (m.group("for") or "").strip()
+        _touch(world, "message.at")
         port.letters.append(
             Message(m.group("text"), m.group("origin").strip(), addressee or "captain")
         )
@@ -1549,6 +2041,7 @@ def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if port is None:
             raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
         origin = m.group("origin").strip()
+        _touch(world, "message.by")  # she comes to a ship from outside, by what she models
         to_words = (m.groupdict().get("to") or "").strip()
         target = hull_named(world, to_words) if to_words else world
         spec = {
@@ -1618,6 +2111,7 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         nation = world.nations.find(rest)
         if nation is None:
             raise WorldOrderError(f"'{rest}' is no nation of the table.")
+        _touch(world, "port", stance=what, nation=str(nation.id))
         if what == "closed to":
             if nation.id not in port.closed_to:
                 port.closed_to.append(nation.id)
@@ -1632,6 +2126,7 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     good = port.market.find(pm.group("good"))
     if good is None:
         raise WorldOrderError(f"{port.name} deals in no '{pm.group('good')}'.")
+    _touch(world, "port", stance="price of")
     good.price = float(pm.group("pounds"))
     return f"the price of {good.good} at {port.name} set at £{good.price:g} a ton", {
         "port": port.id,
@@ -1908,6 +2403,7 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
                 ashore_at = found.id
                 history.remove(phrase)
                 break
+    _touch(world, "person.make", hull=world if aboard else None)
     outline = Outline(
         role=role,
         rank=rank or role,
@@ -2081,6 +2577,8 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
 
     name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
     if m.groupdict().get("to"):
+        # by his own ship's boat: he is taken out of her, and her boat with him
+        _touch(world, "person.move", hull=world, persons=[world.people.find(name)])
         return _goes_aboard_by_the_boat(world, name, m.group("to"))
     ship_words = (m.groupdict().get("ship") or "").strip()
     if ship_words and _ship_words_own(world, ship_words) is False:
@@ -2092,6 +2590,7 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
                 f"Nobody named {name} is among the people; make him first: 'person: make "
                 f'"{name}", ...\'.'
             )
+        _touch(world, "person.move", hull=target, persons=[person])
         words, data = _comes_aboard_hull(world, target, person, m.group("station"))
         return _on_hull_words(world, target, words, data)
     person = world.people.find(name)
@@ -2104,6 +2603,8 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     stations = world.stations
     ports = getattr(world, "dealings", None)
     data: dict[str, Any] = {"person": person.name}
+    # aboard her he comes, or out of her he goes: either way it is done to this ship
+    _touch(world, "person.move", hull=world, persons=[person])
     if move.startswith("comes aboard"):
         said = []
         if not person.aboard:
@@ -2217,6 +2718,7 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     pid = re.sub(r"[^a-z0-9]+", "_", f"{role} {name}".lower()).strip("_")
     if world.people.find(name) is not None:
         raise WorldOrderError(f"{name} is among the people already.")
+    _touch(world, "person.named", hull=world if m.group("aboard") else None)
     if m.group("aboard"):
         place = (m.group("place") or "cabin").strip().lower().replace(" ", "_")
         if place not in PLACES:
@@ -2404,9 +2906,23 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.agents.journal import SAID_KIND, person_journal
     from freesail.world.places import place_words
 
-    person, words = _say_as_parts(world, body, draw=True)
+    # judged only, nobody is drawn into the people: the man is named and no more
+    person, words = _say_as_parts(world, body, draw=not judging())
     people = world.people
     voice = isinstance(person, Voice)
+    # a voice of the ship's own, or a person aboard her, speaks aboard her; ashore, he does not
+    # (a man of the muster named and not yet drawn has no hull of his own to read: he is of
+    # this ship's company, and aboard her)
+    hulls = getattr(world_of(world) or world, "hulls", None) or {}
+    elsewhere = not voice and (
+        not getattr(person, "aboard", True) or str(getattr(person, "hull", "") or "") in hulls
+    )
+    _touch(
+        world,
+        "say",
+        hull=None if elsewhere else world,
+        persons=[person] if elsewhere else (),
+    )
     if voice and person.place == "masthead":
         # the lookout's hail from the masthead reaches the deck (package 66)
         place, where = "masthead", "from the masthead"
@@ -2648,6 +3164,11 @@ STRAINED_LOOKBACK_S = 4 * 3600
 STRAINED_WIND_KN = 20.0
 
 
+# The conditions under which a deadly thing of the table kills (`deadly_when`; package
+# 115, part C): `manned`, while anyone is in the ship's boat, who is lost with her.
+DEADLY_WHEN = ("manned",)
+
+
 @functools.lru_cache(maxsize=1)
 def aboard_table(path: str = str(ABOARD_PATH)) -> list[dict[str, Any]]:
     """The things that may be found aboard (`data/director/aboard.yaml`), as the file has
@@ -2671,6 +3192,15 @@ def aboard_table(path: str = str(ABOARD_PATH)) -> list[dict[str, Any]]:
                     f"{path}: {d['id']}: {field_name} has no key {', '.join(unknown)}; "
                     f"the keys are {', '.join(sorted(known))}."
                 )
+        harm = str(d.get("harm", HARM_NONE) or HARM_NONE).lower()
+        if harm not in (HARM_NONE, HARM_HURT, HARM_DEADLY):
+            raise ValueError(f"{path}: {d['id']}: harm is none, hurt or deadly, not {harm!r}.")
+        when = str(d.get("deadly_when") or "").lower()
+        if when and (when not in DEADLY_WHEN or harm != HARM_DEADLY):
+            raise ValueError(
+                f"{path}: {d['id']}: deadly_when is one of {', '.join(DEADLY_WHEN)}, on a "
+                "thing whose harm is deadly."
+            )
         slots = {m.group(1) for form in d["words"] for m in _SLOT.finditer(str(form))}
         if len(slots) > 1 or any(len(_SLOT.findall(str(form))) > 1 for form in d["words"]):
             raise ValueError(f"{path}: {d['id']}: a thing names one slot in its words, once.")
@@ -3016,6 +3546,25 @@ def _aboard_thing(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         thing, where, moved = TH.make(world, _thing_words(body))
     except TH.ThingWordsError as e:
         raise WorldOrderError(str(e)) from None
+    # where it is put, and where a thing known is taken from: aboard this ship, or in the
+    # keeping of one aboard her, it is done to her; ashore, it is the world's (package 115,
+    # part C: `aboard: a cask of brandy, ashore at Falmouth` is no act upon the ship)
+    keeper = None
+    if where.get("keeper"):
+        people = getattr(world, "people", None)
+        keeper = next((x for x in people.all if x.id == where["keeper"]), None) if people else None
+    here = getattr(keeper, "aboard", True) if where.get("keeper") else where.get("place") != "shore"
+    if moved and TH.place_of(world, thing)[0] != "shore":
+        here = True
+    letter = _thing_words(body).lower().startswith(("a letter from", "letter from"))
+    _touch(
+        world,
+        "aboard.letter" if letter else "aboard.thing",
+        hull=world if here else None,
+        persons=[keeper] if keeper is not None and not here else (),
+        body=body,
+        aboard=world,
+    )
     was = TH.where_words(world, thing, keeper_where=False) if moved else ""
     TH.put(thing, where)
     if not moved:
@@ -3354,21 +3903,29 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     the purse or the hold, or a thing made or moved (package 53b); else a captive's parole
     set (package 74, the design's §3.2: `aboard the Renard: the parole of Captain Bowen
     given`); else refused in words naming the forms."""
-    if _aboard_match(world, body) is None:
-        from freesail.world.captive import read_parole_form, set_parole
+    found = _aboard_match(world, body)
+    if found is None:
+        from freesail.world.captive import _captives_aboard, read_parole_form, set_parole
 
         parole = read_parole_form(_thing_words(body))
         if parole is not None:
             name, given = parole
+            captive = next(
+                (p for p in _captives_aboard(world) if p.name.lower() == name.lower()), None
+            )
+            _touch(world, "prize.parole", hull=world, persons=[captive], body=body)
             # the line is the captor's log's, heard by the captive aboard her: it says what
             # he did and names no director (85's rule; the lead's find of 2026-11-11)
             text = set_parole(world, world, name, given, "")
             return text, {"parole": name, "given": given}
         tx = _transaction(body)
         if tx is not None:
+            key = {"received": "aboard.paid_in", "paid": "aboard.paid_out"}.get(tx[0])
+            _touch(world, key or f"aboard.{tx[0]}", hull=world, body=body)
             return _aboard_transaction(world, *tx)
         removal = _removal(body)
         if removal is not None:
+            _touch(world, "aboard.removed", hull=world, body=body)
             return _aboard_remove(world, removal)
         if "," in _thing_words(body):
             return _aboard_thing(world, body)
@@ -3376,7 +3933,40 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise WorldOrderError(
             f"An aboard order is one of the table's things ({forms}), or {ABOARD_FORMS}."
         )
+    thing, slot = found
+    hurt = None
+    if _slot_of(thing) == "person" and slot is not None:
+        hurt = next((x for x in world.people.people if x.id == slot), None)
+    _touch(
+        world,
+        "aboard.found",
+        hull=world,
+        persons=[hurt],
+        harm=thing_harm(world, thing),
+        body=body,
+        thing=str(thing["id"]),
+    )
     return _aboard_found(world, body)
+
+
+def thing_harm(world: Any, thing: dict[str, Any]) -> str:
+    """The harm of a thing found aboard as it would fall now (`data/director/aboard.yaml`,
+    `harm`; package 115, part C): the table's word, a `deadly` thing with a `deadly_when`
+    being deadly only while its condition holds (`manned`: anyone is in the ship's boat,
+    who is lost with her) and harmless else."""
+    harm = str(thing.get("harm", HARM_NONE) or HARM_NONE).lower()
+    when = str(thing.get("deadly_when") or "").lower()
+    if harm != HARM_DEADLY or not when:
+        return harm
+    if when == "manned":
+        from freesail.world.boats import manned_hull
+
+        try:
+            manned = manned_hull(world, world.own) is not None
+        except Exception:  # noqa: BLE001  (a ship with no boat has nobody in one)
+            manned = False
+        return HARM_DEADLY if manned else HARM_NONE
+    raise ValueError(f"the aboard table's deadly_when has no condition '{when}'")
 
 
 def _aboard_found(world: Any, body: str) -> tuple[str, dict[str, Any]]:
@@ -3931,6 +4521,7 @@ def _cartel(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world.captive import put_cartel
 
     port, persons, holder, who = _cartel_parts(world, body)
+    _touch(world, "prize.cartel", hull=holder, persons=persons)
     v = put_cartel(world, port, persons, holder, who)
     names = ", ".join(p.name for p in persons)
     text = (
@@ -3953,11 +4544,18 @@ def _court(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world import court as CM
 
     low = " ".join(body.lower().split())
+    root = world_of(world) or world
     try:
-        if low.startswith("court: read"):
-            return CM.read_log(world, body)
-        if low.startswith("court: the verdict"):
+        if low.startswith("court: read") or low.startswith("court: the verdict"):
+            # the court that sits is on a person: the accused is whom its words reach
+            rec = CM.sitting(world)
+            accused = CM._accused(root, rec) if rec is not None else None
+            key = "court.read" if low.startswith("court: read") else "court.verdict"
+            _touch(world, key, persons=[accused])
+            if key == "court.read":
+                return CM.read_log(world, body)
             return CM.verdict(world, body)
+        _touch(world, "court.sits", persons=[CM._parts_sit(root, body)[0]])
         return CM.sit(world, body)
     except CM.CourtError as e:
         raise WorldOrderError(str(e)) from None
@@ -3969,6 +4567,7 @@ def _command(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world import court as CM
 
     try:
+        _touch(world, "command.new", persons=[CM._parts_command(world_of(world) or world, body)[0]])
         return CM.new_command(world, body)
     except CM.CourtError as e:
         raise WorldOrderError(str(e)) from None
@@ -4011,6 +4610,7 @@ def _exchanged(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         if port is None:
             raise WorldOrderError(f"Say at which port {person.name} is exchanged.")
     was = f"ashore at {_port_words_of(world, person)}" if not person.aboard else "held aboard"
+    _touch(world, "person.exchanged", persons=[person])
     person.aboard = False
     person.where = "shore"
     person.port = port.id
@@ -4102,41 +4702,68 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
     `say as`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
     opened) are never doubted: a mind changed, a person's errand, a man's words and the
     owner's grant want no cause of the sea's."""
-    body = order.text
+    # the check is the form's, and the hull is the one the order was resolved to (package
+    # 115, part C): `aboard the Amazon: ...` is doubted as `aboard: ...` is, whatever hull
+    # is named at its head
+    j = judged(world, order)
+    if j is None:
+        return None  # an order the channel cannot perform is its own refusal, not a doubt
+    check = _DOUBTS.get(j.form.key)
+    if check is None:
+        return None
     try:
-        if order.channel == "ship":
-            return _doubt_ship(world, body)
-        if order.channel == "mark":
-            return _doubt_mark(world, body)
-        if order.channel == "weather":
-            return _doubt_weather(world, body)
-        if order.channel == "message":
-            return _doubt_message(world, body)
-        if order.channel == "port":
-            return _doubt_port(world, body)
-        if order.channel == "cartel":
-            return _doubt_cartel(world, body)
-        if order.channel == "court":
-            from freesail.world.court import court_doubt
-
-            return court_doubt(world, body)
-        if order.channel == "command":
-            from freesail.world.court import command_doubt
-
-            return command_doubt(world, body)
-        if order.channel == "aboard":
-            if _aboard_match(world, body) is None:
-                from freesail.world.captive import read_parole_form
-
-                if read_parole_form(_thing_words(_aboard_target(world, body)[1])) is not None:
-                    return _doubt_parole(world, body)
-                return _doubt_aboard_new(world, body)  # a thing or a transaction (53b)
-            return _doubt_aboard(world, body)
-        if order.channel == "person":
-            return _doubt_person(world, body)
+        return check(world, order.text, j)
     except WorldOrderError:
         return None  # a malformed order is the channel's own refusal, not a doubt
-    return None
+
+
+def _doubt_court(world: Any, body: str, j: Judged) -> str | None:
+    from freesail.world.court import court_doubt
+
+    return court_doubt(world, body)
+
+
+def _doubt_command(world: Any, body: str, j: Judged) -> str | None:
+    from freesail.world.court import command_doubt
+
+    return command_doubt(world, body)
+
+
+# The doubt's check by the form's handle (`WORLD_ORDER_FORMS`); a form with none is never
+# doubted (a mind changed, a person's errand, a man's words, the owner's grant).
+_DOUBTS: dict[str, Any] = {
+    "ship.new": lambda w, body, j: _doubt_ship(w, body),
+    "ship.hand": lambda w, body, j: _doubt_ship(w, body),
+    "ship.prize": lambda w, body, j: _doubt_ship(w, body),
+    "ship.struck": lambda w, body, j: _doubt_ship(w, body),
+    "mark": lambda w, body, j: _doubt_mark(w, body),
+    "weather.low": lambda w, body, j: _doubt_weather(w, body),
+    "weather.high": lambda w, body, j: _doubt_weather(w, body),
+    "weather.waypoint": lambda w, body, j: _doubt_weather(w, body),
+    "message.at": lambda w, body, j: _doubt_message(w, body),
+    "message.by": lambda w, body, j: _doubt_message(w, body),
+    "port": lambda w, body, j: _doubt_port(w, body),
+    "port.court": lambda w, body, j: _doubt_port(w, body),
+    "prize.cartel": lambda w, body, j: _doubt_cartel(w, body),
+    "court.sits": _doubt_court,
+    "court.read": _doubt_court,
+    "court.verdict": _doubt_court,
+    "command.new": _doubt_command,
+    # aboard: on the hull the order was resolved to, by her own names
+    "aboard.found": lambda w, body, j: _doubt_aboard(j.target, j.body),
+    "prize.parole": lambda w, body, j: _doubt_parole(w, body),
+    "aboard.thing": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.letter": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.removed": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.paid_in": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.paid_out": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.freight": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "aboard.debt": lambda w, body, j: _doubt_aboard_new(j.target, j.body),
+    "person.named": lambda w, body, j: _doubt_person(w, body),
+    "person.make": lambda w, body, j: _doubt_person(w, body),
+    "person.move": lambda w, body, j: _doubt_person(w, body),
+    "person.exchanged": lambda w, body, j: _doubt_person(w, body),
+}
 
 
 def _horizon(world: Any) -> tuple[float | None, bool]:
@@ -4456,8 +5083,27 @@ def _court_word(world: Any, port: Any, what: str, rest: str) -> tuple[str, dict[
     if not P.is_prize(prize) and not (P.record_of(prize) or {}).get("recaptor"):
         raise WorldOrderError(f"The {prize.name} is no prize; the court has nothing to sentence.")
     override = "condemned" if what.endswith("condemns") else "restored"
+    # the sentence is done to the prize herself, and to her captor's prize money
+    record = P.record_of(prize) or {}
+    _touch(
+        world,
+        "port.court",
+        ships=[str(prize.id), str(record.get("captor") or "")],
+        stance=what,
+        # restored, she is her old nation's again, her captain commanding her: where that
+        # nation is an enemy's she is an enemy put back on the sea, and is weighed as one
+        # made, struck or taken is (the lead's list of 2026-11-16)
+        enemy=_enemy_words(
+            world,
+            str(getattr(prize, "description", "") or getattr(prize, "what", "") or ""),
+            str(record.get("nation_was") or ""),
+        )
+        if override == "restored"
+        else None,
+    )
     account = PC.sentence(root, prize, port, override=override, by="the director")
-    words = f"{PC.court_name(port, False)} {override.replace('ed', 's')} the {prize.name}"
+    said = "condemns" if override == "condemned" else "restores"
+    words = f"{PC.court_name(port, False)} {said} the {prize.name}"
     return words, {
         "port": port.id,
         "prize": str(prize.id),
@@ -4746,3 +5392,632 @@ _PLAUSIBLE: dict[str, Any] = {
     "well_above": _plausible_well_above,
     "pumps_cannot": _plausible_pumps_idle,  # package 73
 }
+
+
+# ---------------------------------------------------------------------------
+# The one table of the world-order forms (package 58a; package 115, part C)
+# ---------------------------------------------------------------------------
+
+# Every form the channel performs, in the grammar's order (`freesail.world.orders`).
+WORLD_ORDER_FORMS: tuple[Form, ...] = (
+    Form(
+        "weather.low",
+        "weather",
+        'weather: low "<name>" radius <km> km [fronts <warm°> <cold°>] at <time> <x_km> '
+        "<y_km> <hPa>",
+        ('weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990',),
+        "a low appended to the systems, its centre km east and north of the start, at a time "
+        "of its track; it grows from nothing at the order's tick to its figure (an hour at "
+        "the least, else by its first point's time); a low deeper than the season's floor, or "
+        "a deep one near her out of a steady glass, is doubted",
+    ),
+    Form(
+        "weather.high",
+        "weather",
+        'weather: high "<name>" radius <km> km at <time> <x_km> <y_km> <hPa>',
+        ('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 300 -500 1024',),
+        "a high, the same; one above the season's ceiling, or a strong one near her out of a "
+        "glass that has not been rising, is doubted",
+    ),
+    Form(
+        "weather.waypoint",
+        "weather",
+        'weather: waypoint for "<name>" at <time> <x_km> <y_km> <hPa>',
+        ('weather: waypoint for "the low" at 1805-06-13T16:00 -100 400 988',),
+        "a waypoint after the last of a system's track; from a track already ended the "
+        "system goes from where it is now, reaching the waypoint an hour after the order at "
+        "the soonest; faster than the season's lows move, or deeper than its floor, doubted",
+    ),
+    Form(
+        "ship.new",
+        "ship",
+        'ship: <a description> "<name>" of <nation> at <place or position>, <goal>[, no '
+        "colours][, intent: <words>]",
+        (
+            'ship: a brig-sloop "Harpy" of France at 48 44 N 5 20 W, bound for the Start, no '
+            "colours, intent: run home to Brest",
+            'ship: a merchant brig "Two Brothers" of Britain at 49 50 N 5 30 W, trading '
+            "Falmouth to the Lizard",
+            'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth, '
+            "intent: keep the station off the Deadman within 8 miles",
+        ),
+        "a ship put on the sea: the description a kind the ships know ('a brig-sloop', 'a "
+        "French lugger', 'a small fishing lugger'), the goal 'bound for <place>', 'trading A "
+        "to B', 'patrolling off <place> within <n> miles', 'running home to <place>'; on the "
+        "land refused with the nearest water named; inside her horizon by day, doubted",
+    ),
+    Form(
+        "ship.intent",
+        "ship",
+        'ship "<name>": intent <words>',
+        ('ship "Harpy": intent keep the station off Ushant within 15 miles',),
+        "her captain's intent given or changed: a mind changed wants no cause; words no "
+        "intent's form reads are her free intent, the goal told to a model at her captain's "
+        "station, which her rules-based captain does not sail by: he lies her to, her "
+        "service's doctrine kept; the player's own ship named so, it is her rules-based "
+        "captain's, as 'captain: intent' is",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "ship.goal",
+        "ship",
+        'ship "<name>": <goal>',
+        ('ship "Harpy": running home to Brest',),
+        "the goal of a ship on the sea changed ('bound for <place>', 'trading A to B', "
+        "'patrolling off <place> within <n> miles', 'running home to <place>'): her plan "
+        "laid anew from where she is; a mind changed wants no cause",
+        reach=(PLAYERS_SHIP, ANOTHER_SHIP),
+    ),
+    Form(
+        "ship.hand",
+        "ship",
+        'ship "<name>": order <an order of her own grammar>[ for a watch | for two glasses | '
+        "for an hour | until <a sail within hail | a sail in sight | a landfall | hove to | at "
+        "anchor>]",
+        (
+            'ship "Harpy": order heave to',
+            'ship "Harpy": order give chase until a sail within hail',
+            'ship "Harpy": order carry on',
+            # the starter briefs' own (`data/director/briefs/*.yaml`, drawn from here)
+            'ship "Harpy": order give chase',
+            'ship "Harpy": order haul off',
+            'ship "Medusa": order give chase',
+            'ship "Medusa": order give chase until a sail within hail',
+            'ship "Medusa": order heave to',
+            'ship "Medusa": order fill away',
+            'ship "Lark": order shape a course for Falmouth',
+            'ship "Nancy": order heave to',
+            # package 71: the colours, the signals and the hail by her own grammar
+            'ship "Harpy": order hoist false colours',
+            'ship "Harpy": order hoist the colours',
+            'ship "Medusa": order make the signal to tack in succession',
+            'ship "Medusa": order make the signal enemy in sight bearing SW',
+            'ship "Medusa": order answer the signal',
+            'ship "Medusa": order hail her',
+        ),
+        "the hand: her captain's order as his own, held a glass or as named; refused where a "
+        "model or the player holds her captain",
+        reach=(ANOTHER_SHIP,),
+    ),
+    Form(
+        "ship.crewed",
+        "ship",
+        'ship "<name>": crewed',
+        ('ship "Harpy": crewed',),
+        "a far ship within the player's range made a full ship, the cap allowing",
+        reach=(ANOTHER_SHIP,),
+    ),
+    Form(
+        "aboard.found",
+        "aboard",
+        "aboard: <a thing found aboard, in the table's words>",
+        (
+            "aboard: the fore topmast is found sprung",
+            "aboard: a cask found stove",
+            "aboard: a seam found working",
+            "aboard: the water found foul",
+            "aboard: the leak stopped",
+            "aboard: the well pumped out",
+            "aboard: No. 3 starboard gun found dismounted",
+            "aboard: the cartridges found damp",
+            # package 73: the people's health
+            "aboard: a man taken ill",
+            "aboard: the fever in the ship",
+            "aboard: the first lieutenant is hurt",
+            "aboard: the surgeon taken ill",
+            "aboard the Harpy: a cask found stove",
+        ),
+        "a report of the ship's own people with what it does; with no cause (the table's "
+        "conditions), doubted",
+        reach=(
+            PLAYERS_SHIP,
+            PLAYERS_PERSON,
+            ANOTHER_SHIP,
+        ),
+        harm=HARM_BY_THE_THING,
+    ),
+    Form(
+        "aboard.thing",
+        "aboard",
+        "aboard: <a thing>, <where: a place aboard | ashore at <port>, at <place> | in the "
+        "keeping of <person>>[, <a few words of it>]",
+        (
+            "aboard: a sealed packet, on the cabin table, from the Custom House",
+            "aboard: a cask of brandy, in the hold",
+            "aboard: a letter for the port admiral, on the cabin table",
+            "aboard: the packet, in the keeping of Mr Veale",
+            "aboard the Harpy: a cask of brandy, in the hold",
+        ),
+        "a thing made, or moved when it is known; never into a held person's keeping",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.letter",
+        "aboard",
+        'aboard: a letter from <whom> to <whom>, <where>[, sealed]: "<its words>"',
+        (
+            'aboard: a letter from the agent to the captain, on the cabin table, sealed: "Your '
+            'cargo waits at the quay."',
+            'aboard: a letter from Mr Veale to the first lieutenant, in the gunroom: "Ask for '
+            'me at the Ship."',
+        ),
+        "a letter with its words, read by whoever has it in reach and breaks its seal; its "
+        "words shown to its reader alone",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.removed",
+        "aboard",
+        "aboard: remove <a thing>",
+        ("aboard: remove the sealed packet", "aboard: the packet removed"),
+        "a thing taken out of the world, as if it had never been; never out of a held "
+        "person's keeping, and doubted where it lies before a held person's eyes",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.paid_in",
+        "aboard",
+        "aboard: <a sum> paid into the purse by <person>[ for <what>]",
+        ("aboard: twenty guineas paid into the purse by Mr Veale",),
+        "a transaction with its cause, in the purse's ledger; from nobody, or from a payer "
+        "out of a boat's reach, doubted",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.paid_out",
+        "aboard",
+        "aboard: <a sum> paid from the purse to <person>[ for <what>]",
+        ("aboard: £6 paid from the purse to the pilot",),
+        "the same, out of the purse; below nothing, no way",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.freight",
+        "aboard",
+        "aboard: <n> tons of <good> freighted by <person> at <place> for <port>",
+        ("aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth",),
+        "a freight in the hold's manifest; more than the hold has room for, no way",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "aboard.debt",
+        "aboard",
+        "aboard: a debt of <a sum> owed <to | by> <person>[ for <what>]",
+        ("aboard: a debt of £30 owed to the chandler at Plymouth",),
+        "a debt in the purse's books",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "message.at",
+        "message",
+        'message: at <port> from <whom>: "<words>"',
+        ('message: at Brest from the agent: "The tin will fetch its price."',),
+        "a letter left at a port, for the boat to bring off when she is there",
+    ),
+    Form(
+        "message.by",
+        "message",
+        'message: by a cutter from <port> from <whom>: "<words>"',
+        (
+            'message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."',
+            'message: by a cutter from Falmouth from the agent to the Harpy: "Your cargo waits."',
+        ),
+        "a letter sent out to her by a cutter; from a port she is far from, doubted",
+    ),
+    Form(
+        "port",
+        "port",
+        "port <id>: <closed to | open to> <nation>; port <id>: price of <good> <pounds>",
+        ("port brest: closed to Britain", "port falmouth: price of tin 130"),
+        "a port's stance or a price; a price moved beyond the market's swing, doubted",
+    ),
+    Form(
+        "port.court",
+        "port",
+        "port <id>: the court condemns | restores the <prize>",
+        ("port falmouth: the court condemns the Furet",),
+        "the prize court's sentence on a prize lying at the port, by the director's word: "
+        "condemned to her captors or restored to her owners, the account in the prize's "
+        "record; refused for a ship that is no prize, doubted where the court's own rule "
+        "gives otherwise",
+        reach=(PLAYERS_SHIP, ANOTHER_SHIP),
+    ),
+    Form(
+        "mark",
+        "mark",
+        "mark: <a description> at <place or position>",
+        ("mark: a wreck, her masts showing at 49 58 N 5 16 W",),
+        "a point of interest the lookout sees as a mark; inside her horizon by day, doubted",
+    ),
+    Form(
+        "person.named",
+        "person",
+        'person: <role> "<name>" <aboard[ in the <place>] | ashore at <port>>',
+        (
+            'person: supercargo "Mr Pentreath" aboard in the cabin',
+            'person: agent "Mr Fox" ashore at Brest',
+        ),
+        "a person named, by role",
+        reach=(
+            PLAYERS_SHIP,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "person.make",
+        "person",
+        'person: make "<name>", <who he is>, <where>, <a line of his history>',
+        (
+            'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
+            "captain's father",
+            'person: make "Mr Gill", a merchant of forty, aboard the Harpy, in the cabin',
+        ),
+        "a person made from words, who stays in the world; aboard another ship, refused",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "person.move",
+        "person",
+        'person: "<name>" <comes aboard[ the <ship>][ as <station>] | goes ashore | goes '
+        "aboard the <ship> by the boat | leaves the ship at <port>>",
+        (
+            'person: "Mr Fox" comes aboard as master',
+            'person: "Mr Fox" goes ashore',
+            'person: "Mr Fox" leaves the ship at Falmouth',
+            'person: "Mr Veale" goes aboard the Medusa by the boat',
+        ),
+        "a person moved, or bound to a station; where no boat could carry him, doubted; a "
+        "held station's person, refused; aboard another ship by his ship's boat, where she "
+        "lies within a boat's pull, his station following him as a visitor's",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "ship.orders_of",
+        "ship",
+        'ship "<name>": under the orders of <ship | the ship | nobody>',
+        (
+            'ship "Harpy": under the orders of the ship',
+            'ship "Harpy": under the orders of the Medusa',
+            'ship "Harpy": under the orders of nobody',
+        ),
+        "whose signals command her: "
+        "the player's ship, another by her name, or nobody; a ship under orders answers "
+        "and obeys that ship's signals and no other's",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "ship.regime",
+        "ship",
+        'ship "<name>": in ordinary at <port>; ship "<name>": commissioned for <intent> [at '
+        "once | in <n> days]",
+        (
+            'ship "Harpy": in ordinary at Falmouth',
+            'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days',
+        ),
+        "the regimes: a hull laid up at a port's anchorage with no "
+        "company and no intent, and a ship in ordinary commissioned for an intent, at once or "
+        "after the regime's delay (two to five days when none is said); the business "
+        "commissions a nation's ships in ordinary by its knobs when the blockade is off",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "squadron.new",
+        "squadron",
+        'squadron: "<name>" of <nation> under <ship | the ship> [with <ship>, <ship>], <goal>',
+        (
+            'squadron: "the inshore squadron" of Britain under the Medusa with the Nimble, keep '
+            "the station off the Deadman within 8 miles",
+        ),
+        "a set made of ships on the sea: the commander, the members "
+        "in their order of sailing, the goal his intent; a convoy when the members are "
+        "merchantmen; the members keep their stations on him at far detail and by their "
+        "books when crewed, and read his signals",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "squadron.act",
+        "squadron",
+        'squadron "<name>": <join <ship> | detach <ship> | detach <ship>, <ship> as the <name> '
+        "division [under <ship>] | recall the <name> division | form the line ahead | form the "
+        "line abreast | form the order of sailing [in N columns] | form close order | goal "
+        "<words> | commander <ship> | rendezvous <place> | dissolve>",
+        (
+            'squadron "the Channel squadron": join the Harpy',
+            'squadron "the Channel squadron": form the line abreast',
+            'squadron "the Channel squadron": detach the Nimble as the inshore division',
+            'squadron "the Channel squadron": recall the inshore division',
+            'squadron "the Channel squadron": detach the Nimble',
+            'squadron "the Channel squadron": goal keep the station off Ushant within 12 miles',
+            'squadron "the Channel squadron": rendezvous the Lizard',
+        ),
+        "the set changed by the world: a ship joined or detached (she sails on her own), a "
+        "division detached under a leader and recalled, the formation, the goal (every "
+        "leader's intent), the commander, the rendezvous; dissolved, every ship her own",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "convoy",
+        "convoy",
+        "convoy: <n> merchantmen under <ship | a brig-sloop> from <port> for <port>",
+        ("convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth",),
+        "a convoy the world's business draws now, lying in the first port bound for the second "
+        "under an escort of the nation's kind; refused where the business is off",
+    ),
+    Form(
+        "say",
+        "say",
+        "say as <person, station or trade>: <his words>",
+        ('say as the cook: "Pease and pork, sir."', 'say as Mr Fox: "I knew your father, sir."'),
+        "words in the mouth of a person nobody holds, heard where he is",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "captain",
+        "captain",
+        "captain: intent <words>",
+        ("captain: intent trade tin from Falmouth to Brest",),
+        "the followed ship's rules-based captain given an intent: the followed ship is the "
+        "player's own unless the drivers follow another, and he makes sail and steers her "
+        "by it until the player's next order takes her back",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "seat",
+        "seat",
+        "seat: <the model's exact name> as captain of <ship> for <n> <samples | hours>",
+        ("seat: <the model's exact name> as captain of <ship> for 20 samples",),
+        "a model seated as the captain of another ship under the owner's grant; without "
+        "its consent record, the grant or the budget, refused",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "follow",
+        "follow",
+        'follow "<ship>" | follow nobody',
+        ('follow "the ship"',),
+        "the drivers' centre moved to the ship named, the player's by her name or 'the "
+        "ship', another's by her name (her hull made and woken under the cap); 'follow "
+        "nobody' gives an observed world its view back; a driver's line, not a world order, "
+        "costing no act; it moves the player's prompt, whose orders go to the ship followed",
+        reach=(
+            PLAYERS_PROMPT,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "unseat",
+        "unseat",
+        "unseat: <ship>[, <a note>]",
+        ("unseat: <ship>",),
+        "the seat stood down",
+        reach=(
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    # package 74 (spec M7 §19; docs/design/Design-Prizes.md §3): the captive's channel
+    Form(
+        "prize.parole",
+        "aboard",
+        'aboard the <ship>: the parole of "<name>" given | refused',
+        (
+            "aboard the Medusa: the parole of Captain Bowen given",
+            "aboard the Medusa: the parole of Captain Bowen refused",
+        ),
+        "a captive's parole set for a prisoner of rank aboard her whom nobody asks: given, "
+        "the cabin and the gunroom are his and the quarterdeck by day, his sword returned; "
+        "refused, the gunroom alone and a sentry at the door; doubted while her captain has "
+        "asked and waits his answer (the answer is the captive's to give), refused for a "
+        "person who is no prisoner of hers",
+        reach=(
+            PLAYERS_PERSON,
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "prize.cartel",
+        "cartel",
+        "cartel: a cartel from <port> for <persons>",
+        (
+            "cartel: a cartel from Brest for Captain Bowen",
+            "cartel: a cartel from Brest for the prisoners of the Amazon",
+        ),
+        "a cartel (a merchant brig under a flag of truce, whom no captain fires on and the "
+        "far captures pass by) put on the sea at the port's road for the persons named, who "
+        "steers for the hull that holds them, takes them off by the boat within hail and "
+        "lands them free at her port; refused for a person nobody holds prisoner, doubted "
+        "beyond a day's sail of the port",
+        reach=(
+            PLAYERS_PERSON,
+            PLAYERS_SHIP,
+            ANOTHER_SHIP,
+        ),
+    ),
+    # package 74, step 7: a ship made a prize or struck at a scenario's start (the director's
+    # cause, doubted after the first minute)
+    Form(
+        "ship.prize",
+        "ship",
+        'ship "<name>": a prize of the <captor>',
+        ('ship "Harpy": a prize of the Medusa',),
+        "a ship on the sea made a prize of another's by the director's word: her captor's "
+        "prize crew and prize master aboard her, her people prisoners, bound for his port; a "
+        "scenario's start (doubted after the first minute: afterwards she strikes to the guns)",
+        reach=(
+            PLAYERS_SHIP,
+            PLAYERS_PERSON,
+            PLAYERS_PROMPT,
+            ANOTHER_SHIP,
+        ),
+    ),
+    Form(
+        "ship.struck",
+        "ship",
+        'ship "<name>": struck to the <captor>',
+        ('ship "the ship": struck to the Harpy',),
+        "a ship struck to another and possessed, the player's own by her name or 'the ship' "
+        "(her captor promoted, the player a prisoner aboard her: chapter 27); a scenario's "
+        "start, doubted after the first minute",
+        reach=(
+            PLAYERS_SHIP,
+            PLAYERS_PERSON,
+            PLAYERS_PROMPT,
+            ANOTHER_SHIP,
+        ),
+    ),
+    # package 74 (spec M7 §20; docs/design/Design-Prizes.md §7): the court martial as the
+    # director's proceeding, and a new command as a scenario's start
+    Form(
+        "person.exchanged",
+        "person",
+        'person: "<name>" is exchanged at <port>',
+        ('person: "Captain Bowen" is exchanged at Falmouth',),
+        "a prisoner of war landed or held is exchanged and set ashore at the port's quay, a "
+        "prisoner no more, the exchange in his record; refused for a person who is no "
+        "prisoner, doubted within a day of his landing",
+        reach=(
+            PLAYERS_PERSON,
+            PLAYERS_SHIP,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "court.sits",
+        "court",
+        "court: sits on <person> for the loss of the <ship> at <port>",
+        ("court: sits on Captain Bowen for the loss of the Amazon at Falmouth",),
+        "a court martial sat at a place of the port on a person whose record has the loss of "
+        "a ship (refused for one who lost none): the president and the judge advocate found "
+        "there, the accused before them; its questions in-world ('say as the president of the "
+        "court: ...' heard at the place, the accused's 'say to the court: ...'); doubted where "
+        "he is not ashore at a port of his own nation",
+        reach=(
+            PLAYERS_PERSON,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "court.read",
+        "court",
+        "court: read the log of the action",
+        ("court: read the log of the action",),
+        "the judge advocate reads the action's lines of the lost ship's log to the court, so "
+        "that the proceeding has the facts without the director inventing them; refused while "
+        "no court sits",
+        reach=(
+            PLAYERS_PERSON,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "court.verdict",
+        "court",
+        "court: the verdict on <person>: <verdict>",
+        ("court: the verdict on Captain Bowen: acquitted with honour",),
+        "the sentence (acquitted with honour, acquitted, reprimanded, dismissed the ship, "
+        "dismissed the service) entered in his record and read as the court's, the order "
+        "never shown as sent; the court rises; refused for a sentence the court does not know",
+        reach=(
+            PLAYERS_PERSON,
+            THE_WORLD,
+        ),
+    ),
+    Form(
+        "command.new",
+        "command",
+        'command: a new command for <person>: the <description> "<name>" at <port>',
+        ('command: a new command for Captain Bowen: the cutter "Alert" at Plymouth',),
+        "a scenario file written under the saves' folder with his name as her captain, his "
+        "people who followed him and a copy of his record in his keeping, to be given to "
+        "either driver with --scenario (the answer names it, 'saves/<name>'; the world hears "
+        "the appointment alone); refused for a man dismissed the service or where a file of "
+        "that name stands that is not this appointment's, doubted for one dismissed his ship "
+        "within the year",
+        reach=(
+            PLAYERS_PERSON,
+            THE_WORLD,
+        ),
+    ),
+)
+
+
+def form_of(key: str) -> Form:
+    """The form by its handle (`WORLD_ORDER_FORMS`)."""
+    for f in WORLD_ORDER_FORMS:
+        if f.key == key:
+            return f
+    raise KeyError(key)

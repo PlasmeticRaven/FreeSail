@@ -60,6 +60,11 @@
 #     `pumps_cannot`: true, the ship's own pumps cannot do it (no pumps, no company, or
 #       the pumps manned and losing); false, they could (package 73).
 #   `harm`: `none`, `hurt` or `deadly`, and a brief with `nobody_dies` refuses the deadly.
+#     Deadly is a thing that kills of itself (a grave wound: three in ten die of it treated,
+#     six in ten not); a hazard the ship can answer (a seam working, foul water, a fever)
+#     is `hurt` or `none`, though men may die of it in the end.
+#   `deadly_when`: on a deadly thing, the condition under which it kills, harmless else:
+#     `manned`, while anyone is in the ship's boat (they are lost with her).
 #   `source`: where the thing is found in the period's books, or "judgement".
 things:
   # -- the guns (package 70; spec M7 §8, §9) ---------------------------------------------
@@ -286,7 +291,7 @@ things:
     cause: "a fall from the gangway"
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
     doubt: "a smooth sea and nothing working: a man is broken by a fall in a seaway, not at his ease"
-    harm: hurt
+    harm: deadly
   - id: surgeon_taken_ill
     words: ["the surgeon taken ill", "the surgeon is taken ill", "the surgeon fallen ill", "the surgeon is ill", "the surgeon down with a fever", "the doctor taken ill"]
     source: "the surgeons who took the fevers of their own sick berths (Trotter; the West India station's losses of surgeons, from memory); judgement"
@@ -333,7 +338,8 @@ things:
     effect: {boat_lost: stove}
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
     doubt: "she lies easy on a smooth sea: nothing has stove the boat"
-    harm: none
+    harm: deadly
+    deadly_when: manned
   - id: boat_swamped
     words: ["the boat swamped", "the boat found swamped", "the boat is swamped", "the boat swamped alongside"]
     source: Luce 1866, 'Boats' (a boat swamped alongside in a sea); the sea states a boat cannot live in
@@ -341,10 +347,12 @@ things:
     effect: {boat_lost: swamped}
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm", "slight", "a slight sea"]}
     doubt: "the sea is too slight to swamp a boat alongside"
-    harm: none
+    harm: deadly
+    deadly_when: manned
   - id: boat_adrift
     words: ["the boat cut adrift", "the boat gone adrift", "the boat adrift", "the boat found gone", "the boat's painter parted", "the painter parted"]
     source: Luce 1866, 'Boats' (the painter); a boat towing astern lost in the night
     report: "The boat is gone: her painter parted in the night and she went adrift astern."
     effect: {boat_lost: cut adrift}
-    harm: none
+    harm: deadly
+    deadly_when: manned
