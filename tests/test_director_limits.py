@@ -868,3 +868,41 @@ def test_a_thing_ashore_moved_from_port_to_port_is_doubted_at_the_door_never_an_
         "Dry run, nothing performed and no act spent: it would be doubted"
     )
     assert door(f"{moved} [reason: the agent sent it on]").startswith("Done:")
+
+
+# ---------------------------------------------------------------------------
+# The second reading's list (2026-11-16): a prize restored
+# ---------------------------------------------------------------------------
+
+
+def test_a_prize_restored_to_an_enemy_is_weighed_as_an_enemy_put_on_the_sea():
+    """The second reader's finding: a French seventy-four the owner put on the sea, struck
+    to the player's frigate by the director (rightly done: she is the King's then), and
+    then `port falmouth: the court restores the Gros`: she is French again with her captain
+    in command, under "no enemy heavier than a cutter". The court's restoring is weighed
+    as a strike or a prize to an enemy is: refused under the limit, done under none; and
+    the court's word is spelled."""
+    for brief in ("quiet-passage", FREE):
+        w, door = at_the_door(brief)
+        w.world_order(
+            'ship: a seventy-four "Gros" of France at 49 31 N 5 31 W, bound for Brest',
+            source="the owner",
+        )
+        assert entered(door, 'ship "Gros": struck to the Amazon').startswith("Done:")
+        gros = w.vessels.find("Gros")
+        assert P.is_prize(gros) and gros.nation == "britain"
+        restores = "port falmouth: the court restores the Gros"
+        j = WO.judged(w, WO.parse(restores))
+        assert j.form.key == "port.court" and j.enemy == ("seventy-four", "France")
+        said = entered(door, restores)
+        if brief == FREE:
+            assert said.startswith("Done:") and "restores the Gros" in said, said
+            assert "restors" not in said and gros.nation == "france"
+        else:
+            assert said.startswith("Refused, outside the brief:"), said
+            assert "no enemy heavier than a cutter" in said and "is heavier" in said
+            assert P.is_prize(gros) and gros.nation == "britain"
+            # condemned to her captors she stays the King's, and no enemy is put back
+            assert not entered(door, "port falmouth: the court condemns the Gros").startswith(
+                "Refused, outside the brief"
+            )

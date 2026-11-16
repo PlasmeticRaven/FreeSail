@@ -5084,14 +5084,26 @@ def _court_word(world: Any, port: Any, what: str, rest: str) -> tuple[str, dict[
         raise WorldOrderError(f"The {prize.name} is no prize; the court has nothing to sentence.")
     override = "condemned" if what.endswith("condemns") else "restored"
     # the sentence is done to the prize herself, and to her captor's prize money
+    record = P.record_of(prize) or {}
     _touch(
         world,
         "port.court",
-        ships=[str(prize.id), str((P.record_of(prize) or {}).get("captor") or "")],
+        ships=[str(prize.id), str(record.get("captor") or "")],
         stance=what,
+        # restored, she is her old nation's again, her captain commanding her: where that
+        # nation is an enemy's she is an enemy put back on the sea, and is weighed as one
+        # made, struck or taken is (the lead's list of 2026-11-16)
+        enemy=_enemy_words(
+            world,
+            str(getattr(prize, "description", "") or getattr(prize, "what", "") or ""),
+            str(record.get("nation_was") or ""),
+        )
+        if override == "restored"
+        else None,
     )
     account = PC.sentence(root, prize, port, override=override, by="the director")
-    words = f"{PC.court_name(port, False)} {override.replace('ed', 's')} the {prize.name}"
+    said = "condemns" if override == "condemned" else "restores"
+    words = f"{PC.court_name(port, False)} {said} the {prize.name}"
     return words, {
         "port": port.id,
         "prize": str(prize.id),
