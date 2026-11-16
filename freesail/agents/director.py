@@ -3,10 +3,20 @@
 whose tools are the world orders, the truth's readings, its own hidden log and the library,
 the journal and the stand-by every station has.
 
-**The one rule** (the proposal's §7.6): the director acts only through plausible causes. It
-cannot move the player's ship, change a sail or countermand an order; it changes the world
-the ship is in, and only in ways the simulation could have produced on its own. Every order
-of the ship's is refused at this station in words; the world orders are its hand.
+**The one rule** (the proposal's §7.6): the director acts through plausible causes. Every
+order of a ship's own grammar is refused at this station in words; the world orders are its
+hand, and they change the world the ship is in, in ways the simulation could have produced.
+
+**The director is free by default, the player's own ship, person and prompt included** (the
+owner's ruling of 2026-11-14; package 115, part C): a thing found aboard her, a wound, her
+rules-based captain given an intent, a strike, `follow`. Nothing refuses the director for
+being the director. **A brief's limits are real when a brief sets them, and only then**:
+they are judged on what the channel says an order is (`world_orders.judged`: its form of
+the one table, whom it reaches, its harm), never on its spelling, at this door and in its
+dry run alike (`_read`); a weight a limit cannot rank is refused. A brief may set `hands
+off the player's own ship` (`HANDS_OFF`; no starter does). No line is said to the player:
+every act that reaches his ship, his person or his prompt is in the director's log, in
+words that say whom it reached.
 
 **Doubted, not refused** (the owner, 2026-10-17, decision 50). The channel's feasibility
 check (`freesail.world.orders.doubt`) does not refuse an order that the simulation could not
@@ -121,8 +131,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BRIEFS_DIR = ROOT / "data" / "director" / "briefs"
 
 # The budget's defaults where a brief gives none (judgement: a sample a glass through the
-# day and the night is forty-eight; four acts a day keeps a quiet passage quiet; the brief
-# raises either).
+# day and the night is forty-eight; the brief sets either).
 DEFAULT_SAMPLES_A_DAY = 48
 # The acts no fewer than the samples (the owner, 2026-10-19): the budget is a tuning point,
 # not a constraint for the first testing; the dispatches test spent ten before a boarding.
@@ -167,6 +176,10 @@ KINDS: dict[str, str] = {
     "director.unperformed": (
         "an order the game has no way to perform as said, answered so and not performed"
     ),
+    "director.follow": (
+        "the drivers' centre moved to a ship by the director's word: the player's prompt "
+        "moved with it (packages 82 and 115)"
+    ),
     "director.budget": "the day's budget spent or renewed",
     "director.revealed": "the player asked for the log",
     "director.brief": "the brief given or changed",
@@ -195,6 +208,24 @@ _PEAK_RADIUS_SHARE = 1.0  # a Gaussian bell's gradient peaks at one radius from 
 # ---------------------------------------------------------------------------
 # The brief
 # ---------------------------------------------------------------------------
+
+# A limit a brief may set, and no starter sets (package 115, part C; the owner's ruling of
+# 2026-11-14): the director's hands off the player's own ship. Set, it refuses every order
+# the channel judges to reach her (her hull, her people, her stores, her command, her
+# stations), the player's own person or his prompt; what comes to her from outside by
+# what she models (the weather, a sail, a letter by a cutter, a port, a mark) is not hers.
+HANDS_OFF = "hands_off_the_players_ship"
+
+# What `nobody_dies` refuses, said as it is judged (the lead's ruling of 2026-11-16): an
+# act that kills of itself. Men may still die of what the ship has to answer.
+NOBODY_DIES_WORDS = (
+    "nobody dies by your hand: no act that kills of itself (a grave wound, a boat lost "
+    "with anyone in her); a hazard the ship can answer (a seam working, foul water or a "
+    "fever, an enemy, the weather) is not refused by it"
+)
+
+# `limit_of` with no judgement given asks the channel for one.
+_ASK: Any = object()
 
 
 @dataclass(frozen=True)
@@ -284,8 +315,13 @@ class DirectorBrief:
             )
         if lim.get("enemy_heaviest"):
             out.append(f"no enemy heavier than a {lim['enemy_heaviest']} put on the sea")
+        if lim.get(HANDS_OFF):
+            out.append(
+                "hands off the player's own ship: nothing done to her, her people, the "
+                "player's own person or his prompt"
+            )
         if lim.get("nobody_dies"):
-            out.append("nobody dies: nothing found aboard that would kill")
+            out.append(NOBODY_DIES_WORDS)
         if lim.get("the_war_as_it_is"):
             out.append("the war as it is: no port closed to or opened to the ship's own nation")
         if lim.get("the_chart_as_it_is"):
@@ -320,41 +356,56 @@ class DirectorBrief:
 
     # -- the limits, enforced by the channel ------------------------------------------
 
-    def limit_of(self, world: Any, order: world_orders.WorldOrder) -> str | None:
+    def limit_of(
+        self, world: Any, order: world_orders.WorldOrder, judgement: Any = _ASK
+    ) -> str | None:
         """Why the order is outside the brief, in words, or None: the refusal's reason
-        (spec M7b §4: enforced by the channel, not trusted to the model)."""
+        (spec M7b §4: enforced by the channel, not trusted to the model).
+
+        **A limit is judged on what the order is, never on how it is spelled** (package
+        115, part C; the cold review of 2026-11-14, decision 14): this asks the channel's
+        one judgement (`world_orders.judged`: the order's form of the one table, whom it
+        reaches, its harm, the enemy it puts on the sea, read by the handler that would
+        perform it) and nothing else, so that an order that names the ship another way,
+        or a hull at its head, meets the same limit. A weight a limit cannot rank is
+        refused, not passed. A brief with no limits refuses nothing."""
         lim = self.limits
-        body = order.text
-        if order.channel == "weather" and lim.get("wind_max_kn") is not None:
-            kn = _peak_wind_kn(world, body)
+        if not lim:
+            return None
+        j = world_orders.judged(world, order) if judgement is _ASK else judgement
+        if j is None:
+            return None  # the channel cannot perform it as said: its own words say why
+        key = j.form.key
+        if lim.get(HANDS_OFF) and j.the_players:
+            return (
+                "the brief keeps the director's hands off the player's own ship, and this "
+                f"reaches {j.whom}"
+            )
+        if lim.get("nobody_dies") and j.harm == world_orders.HARM_DEADLY:
+            return "the brief says nobody dies, and that is a thing that kills"
+        if key.startswith("weather.") and lim.get("wind_max_kn") is not None:
+            kn = _wind_kn_of(j)
             if kn is not None and kn > float(lim["wind_max_kn"]):
                 return (
                     f"the brief allows no wind above {float(lim['wind_max_kn']):g} knots, and "
                     f"that system would blow {kn:.0f} at its tightest"
                 )
-        if order.channel == "ship" and lim.get("enemy_heaviest"):
-            heavier = _enemy_heavier(world, body, str(lim["enemy_heaviest"]))
+        if j.enemy is not None and lim.get("enemy_heaviest"):
+            heavier = _enemy_heavier(j, str(lim["enemy_heaviest"]))
             if heavier:
                 return heavier
-        if order.channel == "aboard" and lim.get("nobody_dies"):
-            found = world_orders._aboard_match(world, body)
-            if found is not None and str(found[0].get("harm", "none")).lower() == "deadly":
-                return "the brief says nobody dies, and that is a thing that kills"
-        if order.channel == "ship" and lim.get("false_colours") is False:
-            low = " ".join(body.lower().split())
+        if j.form.channel == "ship" and lim.get("false_colours") is False:
+            low = " ".join(order.text.lower().split())
             if "false colours" in low or _names_false_colours(world, low):
                 return "the brief forbids your ships the ruse: no false colours"
-        if order.channel == "port" and lim.get("the_war_as_it_is"):
-            m = world_orders._PORT.match(body)
+        if key == "port" and lim.get("the_war_as_it_is"):
             ports = getattr(world, "dealings", None)
-            if m is not None and ports is not None and m.group("what").lower() != "price of":
-                nation = world.nations.find(m.group("rest").strip())
-                own = getattr(ports, "ship_nation", "")
-                if nation is not None and own and nation.id == own:
-                    return (
-                        "the brief keeps the war as it is: a port closed to or opened to the "
-                        "ship's own nation is the war changed"
-                    )
+            own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+            if j.fact("stance") in ("closed to", "open to") and own and j.fact("nation") == own:
+                return (
+                    "the brief keeps the war as it is: a port closed to or opened to the "
+                    "ship's own nation is the war changed"
+                )
         return None
 
 
@@ -374,26 +425,27 @@ def _names_false_colours(world: Any, low: str) -> bool:
 
 
 def _peak_wind_kn(world: Any, body: str) -> float | None:
+    """The surface wind a `weather:` order's system would make at its tightest, in knots,
+    as the limit judges it (`_wind_kn_of`, on the channel's reading of the order); None
+    for an order that is no system the weather can append."""
+    j = world_orders.judged(world, world_orders.parse(body))
+    return _wind_kn_of(j) if j is not None else None
+
+
+def _wind_kn_of(j: Any) -> float | None:
     """The surface wind a `weather:` order's system would make at its tightest, in knots
     (the gradient of its bell at one radius, turned to the surface as the systems' wind
-    is), or None for a waypoint that deepens nothing or an order that is no system."""
+    is), from what the channel read of the order (`Judged.fact`: its depth, its radius,
+    the background); None where the order names a system the weather has not, which the
+    channel answers itself."""
     from freesail.world import weather as W
 
-    m = world_orders._SYSTEM.match(body)
-    systems = getattr(world, "systems", None)
-    background = float(systems.background_hpa) if systems is not None else W.BACKGROUND_HPA
-    if m is not None:
-        anomaly = abs(float(m.group("hpa")) - background)
-        radius = float(m.group("r") or 500.0)
-    else:
-        m = world_orders._WAYPOINT.match(body)
-        if m is None or systems is None:
-            return None
-        system = systems.find(m.group("name"))
-        if system is None:
-            return None
-        anomaly = abs(float(m.group("hpa")) - background)
-        radius = float(system.radius_km)
+    hpa, radius = j.fact("hpa"), j.fact("radius_km")
+    if hpa is None or not radius:
+        return None
+    background = j.fact("background_hpa")
+    anomaly = abs(float(hpa) - float(W.BACKGROUND_HPA if background is None else background))
+    radius = float(radius)
     # the bell's steepest gradient, hPa/km, at one radius: a e^-1/2 / R
     g = anomaly * 0.6065306597 / radius
     vg = W.GEOSTROPHIC_MS_PER_HPA_PER_100KM * g * 100.0
@@ -402,29 +454,34 @@ def _peak_wind_kn(world: Any, body: str) -> float | None:
     return units.ms_to_knots(vg * W.SURFACE_SCALE)
 
 
-def _enemy_heavier(world: Any, body: str, heaviest: str) -> str | None:
-    """Why a `ship:` order puts an enemy heavier than the brief allows, or None. The
-    description and the limit are ranked by the same words (`captains.size_rank_of`,
-    the tops' ranking of a sail; package 68, R-38)."""
+def _enemy_heavier(j: Any, heaviest: str) -> str | None:
+    """Why the order puts an enemy heavier than the brief allows on the sea, or None. The
+    enemy and her weight are the channel's reading (`Judged.enemy`, `Judged.weight`: her
+    class as the ship's maker reads her description, ranked as the tops rank a sail;
+    package 68, R-38), whichever form puts her there: a new ship, a convoy's escort, a
+    ship in ordinary commissioned. **A weight the limit cannot rank is refused, not
+    passed** (package 115, part C): a description the ranking does not know, or a limit
+    whose own word it does not know, weighs nothing, and the order is not performed."""
     from freesail.world.captains import size_rank_of
 
-    m = world_orders._SHIP_NEW.match(body)
-    if m is None:
-        return None
-    nation = world.nations.find(m.group("nation"))
-    ports = getattr(world, "dealings", None)
-    own = getattr(ports, "ship_nation", "") if ports is not None else ""
-    if nation is None or not own or not world.nations.at_war(nation.id, own):
-        return None
-    desc = " ".join(m.group("desc").lower().split())
-    desc = desc.removeprefix("a ").removeprefix("an ").removeprefix("the ")
-    rank, limit = size_rank_of(desc), size_rank_of(heaviest)
-    if rank is None or limit is None:
-        return None
-    if rank > limit:
+    desc, nation = j.enemy
+    limit = size_rank_of(heaviest)
+    if limit is None:
+        return (
+            f"the brief allows no enemy heavier than a {heaviest}, and '{heaviest}' is no "
+            "class the ranking of a sail knows: no enemy can be weighed against it, and a "
+            "weight the limit cannot rank is refused, not passed"
+        )
+    if j.weight is None:
+        return (
+            f"the brief allows no enemy heavier than a {heaviest}, and a {desc} of {nation} "
+            "is of no class the ranking of a sail knows: a weight the limit cannot rank is "
+            "refused, not passed (say her class: a cutter, a brig, a frigate)"
+        )
+    if j.weight > limit:
         return (
             f"the brief allows no enemy heavier than a {heaviest}, and a {desc} of "
-            f"{nation.name} is heavier"
+            f"{nation} is heavier"
         )
     return None
 
@@ -650,7 +707,9 @@ def world_page() -> tuple[tuple[str, str], ...]:
         f"({', '.join(crews.HOLD_EVENT_NAMES)}), a day at most."
     )
     logs = (
-        "Every world order goes to your log, the director's, with its doubt and its reason, "
+        "Every world order goes to your log, the director's, with its doubt and its reason "
+        "(and, where it reached the player's own ship, his person or his prompt, with whom it "
+        "reached), "
         "and to the record as a line no station reads; the play log carries only its effects "
         "as the ship meets them: a ship put on the sea or a mark when the lookout sees it "
         "(nothing before); the weather as the glass, the sky and the wind change; a thing "
@@ -826,22 +885,34 @@ DIRECTOR_BRIEF = (
     "attempted, so that the record says what is good, bad, useful or useless and what the "
     "game should learn to do next. Try a wide variety of things; the record is the "
     "point.\n\n"
-    "The one rule: you act only through plausible causes. You cannot move the player's "
-    "ship, change a sail or countermand an order; every order of the ship's is refused at "
+    "The one rule: you act through plausible causes. You give no order of a ship's own "
+    "grammar: every order of the ship's is refused at "
     "this station, and you are not asked to give one. You change the world the ship is in, "
-    "and only in ways the sea could have produced on its own, so that the physics stays "
-    "honest and the player's agency whole. The channel keeps the rule with you: an order "
+    "in ways the sea could have produced on its own, so that the physics stays "
+    "honest. Know what your hand reaches, for it does reach the player's own ship: a thing "
+    "found aboard her and a person of hers hurt ('aboard: ...'); her rules-based captain "
+    "given an intent ('captain: intent ...', or her own name in 'ship \"<name>\": intent "
+    "...'), who then makes sail and steers her by it until the player's next order takes "
+    "her back; a strike or a prize, which makes her people prisoners and carries the "
+    "player aboard her captor; and 'follow', which moves the player's prompt to another "
+    "ship. These are the player's ship, his person and his agency: do them when the story "
+    "needs them and not otherwise. Each is written in your log as reaching her, which he "
+    "reads when he asks for it, and his brief may forbid them (hands off the player's own "
+    "ship; nobody dies). The channel keeps the rule with you: an order "
     "that the simulation could not have produced from where it is (a sail put inside the "
     "player's horizon in clear weather, a gale out of a steady glass, a letter from a port "
     "she is far from, a thing found aboard with no cause) is not refused but doubted: the "
     "result says why, and if you think the act still reasonable you may enter it again with "
     "a [reason: ...] at its end, and it will be logged and performed, the act, the doubt and "
     "your reason kept together. Only the player's own limits in his brief below refuse "
-    "outright, and the result says which; and the rule of reach, which is this: you speak "
+    "outright, and the result says which: a limit is judged on what an order does and "
+    "whom it reaches, by whatever words it is given; and the rule of reach, which is this: "
+    "you speak "
     "as anyone no model or player holds, never as a held station, whose words are its "
     "holder's own, and you move nobody held and bind nobody to a held station; such an "
     "order is refused, and the result names the stations held. So too your hand: no order "
-    "goes through a captain a model or the player holds, nor any of the player's own ship; "
+    'goes through a captain a model or the player holds, nor (\'ship "<name>": order '
+    "...') through the captain of the player's own ship; "
     "it is refused in words, and you may write to him instead. Her captain's order is a "
     "plausible cause of itself; it is doubted only where it is implausible for her (an "
     "anchor let go too deep for her cables, plain sail in a gale, a merchantman giving "
@@ -1415,12 +1486,97 @@ def _no_way(world: Any, text: str, reason: str, why: str, by: str) -> str:
 ACT, INPUT, REPLAY = "act", "input", "replay"
 
 
+# The stages of the one judgement a director's order passes (package 115, part C: the
+# door and its dry run read one sequence, `_read`, where each wrote its own): no form the
+# channel has; a seat the settings cannot call; the day's budget spent; the rule of
+# reach; the brief's limits; the form at fault; the channel's doubt; and nothing against it.
+NO_FORM, UNCALLABLE, OVER, REACH, LIMIT, MALFORMED, DOUBT, GO = (
+    "no form",
+    "uncallable",
+    "over the budget",
+    "reach",
+    "limit",
+    "malformed",
+    "doubt",
+    "go",
+)
+
+
+@dataclass(frozen=True)
+class _Read:
+    """A director's order as the one sequence judged it: where it stopped (`stage`) and
+    why, the order, what the channel says it is (`judgement`), and whether it costs no
+    act (an answer as a person asked; `follow`, a driver's line)."""
+
+    stage: str
+    why: str = ""
+    order: world_orders.WorldOrder | None = None
+    judgement: Any = None
+    free: bool = False
+
+
+def _read(
+    world: Any, text: str, acts_used: int, acts_allowed: int, held_now: bool = False, on: Any = None
+) -> _Read:
+    """**The one judgement sequence** of a director's order, performing nothing: the form,
+    the seat's door, the day's budget, the rule of reach, the brief's limits (on what the
+    channel says the order is, `world_orders.judged`), the form at fault, the doubt.
+    `on` is the world the order is judged on where it is not the world itself (the dry
+    run's copy, so that a hull a judgement would make is made on the copy)."""
+    subject = world if on is None else on
+    try:
+        order = world_orders.parse(text)
+    except world_orders.WorldOrderError as e:
+        return _Read(NO_FORM, str(e))
+    follow = order.channel == "follow"
+    # an answer to a question put to a person nobody holds costs no act (package 52), and
+    # `follow` is a driver's line that costs none (package 82, item 6)
+    free = follow or (
+        order.channel == "say"
+        and pending_for(world, getattr(world_orders.say_as_person(world, order.text), "name", ""))
+    )
+    if order.channel == "seat":
+        uncallable = uncallable_seat(world, order.text)
+        if uncallable:
+            return _Read(UNCALLABLE, uncallable, order, free=free)
+    if (held_now or acts_used >= acts_allowed) and not free:
+        return _Read(OVER, "", order, free=free)
+    reach_why = world_orders.reach(subject, order)
+    if reach_why:
+        return _Read(REACH, reach_why, order, free=free)
+    judgement = world_orders.judged(subject, order)
+    brief = brief_of(world)
+    if brief is not None:
+        why = brief.limit_of(subject, order, judgement)
+        if why:
+            return _Read(LIMIT, why, order, judgement, free)
+    # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
+    # a malformed order is answered honestly in words, never "doubted" alone, so that a
+    # doubted order is one that can be performed when entered again
+    malformed = world_orders.form_error(subject, order)
+    if malformed:
+        return _Read(MALFORMED, malformed, order, judgement, free)
+    doubted = world_orders.doubt(subject, order)
+    return _Read(DOUBT if doubted else GO, doubted or "", order, judgement, free)
+
+
+def _reached_words(judgement: Any) -> str:
+    """The log's words for whom an act reached, where it reached the player's ship, his
+    person or his prompt (package 115, part C: the director's log holds every such act in
+    words a reader follows); "" for an act that reached none of them."""
+    if judgement is None or not judgement.the_players or not judgement.whom:
+        return ""
+    return f"; it reached {judgement.whom}"
+
+
 def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     """A world order from the director (a model at the station, or the player at his
     seat): the day's budget, the brief's limits (a refusal), the channel's doubt (a doubt,
     unless the order carries its `[reason: ...]`), then the order through the channel
     (`World.world_order`, for the record only), each with its entry in the director's
-    log. Returns the words for the one who gave it."""
+    log. Returns the words for the one who gave it. Every order that reaches this door
+    ends done, doubted, refused or answered that the game has no way to do it; an act
+    that reaches the player's ship, his person or his prompt is logged as reaching it."""
     text = " ".join(str(text).split())
     if road == INPUT:
         inputs = getattr(world, "inputs", None)
@@ -1432,37 +1588,19 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # order, no act, nothing in the play log
         return answer_player(world, to_player, by=by or SOURCE)
     log = log_of(world)
-    followed = _follow_words(text)
-    if followed is not None:
-        # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
-        # moved as the console moves it, a driver's line journaled with the director as its
-        # source, no world order and no act
-        try:
-            e = world.follow(followed, source=by or SOURCE)
-        except ValueError as err:
-            log.append(
-                director_hull(world), f"Refused: {text} ({err})", kind="director.refused", by=by
-            )
-            return f"Refused: {err}."
-        log.append(director_hull(world), e.text, kind="director.follow", by=by)
-        return e.text
     renew(world)
     b = budget_of(world)
     brief = brief_of(world)
     acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     bare, reason = world_orders.split_reason(text)
-    try:
-        order = world_orders.parse(text)
-    except world_orders.WorldOrderError as e:
+    read = _read(world, text, b.acts, acts_allowed)
+    order, free, judgement = read.order, read.free, read.judgement
+    if read.stage == NO_FORM:
         # no form the game has (the owner's refinement of 2026-10-17): answered honestly,
         # never as "not allowed"; entered again with a reason, logged as attempted
-        return _no_way(world, bare, reason, str(e), by)
-    # an answer to a question put to a person nobody holds costs no act (package 52)
-    free = order.channel == "say" and pending_for(
-        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
-    )
-    uncallable = uncallable_seat(world, order.text) if order.channel == "seat" else None
-    if uncallable:
+        return _no_way(world, bare, reason, read.why, by)
+    assert order is not None
+    if read.stage == UNCALLABLE:
         # a seat for a model the harbour's settings cannot call (package 67): refused in
         # words before the World, the settings' model named to the director alone
         log.append(
@@ -1474,8 +1612,8 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         inputs = getattr(world, "inputs", None)
         if road == INPUT and inputs and inputs[-1].get("director_order") == text:
             inputs.pop()  # nothing given: a replay, with no harbour beside it, gives nothing
-        return f"Refused: {uncallable}."
-    if b.acts >= acts_allowed and not free:
+        return f"Refused: {read.why}."
+    if read.stage == OVER:
         words = (
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "
             "until the next day of the ship's time. The order was not given."
@@ -1486,44 +1624,54 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         if b.held_until is None:
             _hold(world, f"The day's budget of {acts_allowed} acts is spent")
         return words
-    reach_why = world_orders.reach(world, order)
-    if reach_why:
+    if read.stage == REACH:
         # the rule of reach (spec M7b §9; package 52): a refusal in words, the stations held
         # named, so that the director knows whom it may speak as
         log.append(
             director_hull(world),
-            f"Refused by the rule of reach: {order.text} ({reach_why})",
+            f"Refused by the rule of reach: {order.text} ({read.why})",
             kind="director.refused",
             by=by,
         )
         if world_orders.is_hand(order):
             # the hand (package 62): no order through a captain a model or the player holds
             return (
-                f"Refused, by the rule of reach: {reach_why}. The director gives no order "
+                f"Refused, by the rule of reach: {read.why}. The director gives no order "
                 "through a captain a model or the player holds."
             )
         return (
-            f"Refused, by the rule of reach: {reach_why}. The director speaks as, moves and "
+            f"Refused, by the rule of reach: {read.why}. The director speaks as, moves and "
             "binds nobody a model or the player holds; the stations held now: "
             f"{world_orders.held_words(world)}."
         )
-    if brief is not None:
-        why = brief.limit_of(world, order)
-        if why:
+    if read.stage == LIMIT:
+        log.append(
+            director_hull(world),
+            f"Refused by the brief: {order.text} ({read.why})",
+            kind="director.refused",
+            by=by,
+        )
+        return f"Refused, outside the brief: {read.why}. The limits are the player's own."
+    if read.stage == MALFORMED:
+        return _no_way(world, order.text, order.reason, read.why, by)
+    reached = _reached_words(judgement)
+    if order.channel == "follow":
+        # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
+        # moved as the console moves it, a driver's line journaled with the director as its
+        # source, no world order and no act; judged as every order is (it is the player's
+        # prompt that moves), and written in the log as reaching it
+        try:
+            e = world.follow(_follow_words(order.text) or "", source=by or SOURCE)
+        except ValueError as err:
             log.append(
-                director_hull(world),
-                f"Refused by the brief: {order.text} ({why})",
-                kind="director.refused",
-                by=by,
+                director_hull(world), f"Refused: {text} ({err})", kind="director.refused", by=by
             )
-            return f"Refused, outside the brief: {why}. The limits are the player's own."
-    # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
-    # a malformed order is answered honestly in words, never "doubted" alone, so that a
-    # doubted order is one that can be performed when entered again
-    malformed = world_orders.form_error(world, order)
-    if malformed:
-        return _no_way(world, order.text, order.reason, malformed, by)
-    doubted = world_orders.doubt(world, order)
+            return f"Refused: {err}."
+        log.append(
+            director_hull(world), f"{e.text.rstrip('.')}{reached}.", kind="director.follow", by=by
+        )
+        return e.text
+    doubted = read.why if read.stage == DOUBT else ""
     if doubted and order.reason and not _doubt_shown(world, order.text):
         # a reason given on the first entry answers no doubt the director has seen (R-41: a
         # man carried nine miles ashore in a minute): the doubt is shown, and the order is
@@ -1555,13 +1703,16 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         log.append(
             director_hull(world),
             f"Entered again with a reason: {order.text}; the doubt: {doubted or 'none'}; the "
-            f"reason: {order.reason}; performed: {done}",
+            f"reason: {order.reason}; performed: {done}{reached}",
             kind="director.reentered",
             by=by,
         )
     else:
         log.append(
-            director_hull(world), f"Given: {order.text}; {done}", kind="director.order", by=by
+            director_hull(world),
+            f"Given: {order.text}; {done}{reached}",
+            kind="director.order",
+            by=by,
         )
     tail = ""
     if b.acts >= acts_allowed and not free:
@@ -1591,14 +1742,45 @@ def dry_run(world: Any, text: str) -> str:
     """**The dry run** (package 58a; the cold review of 2026-10-22, R-42, the lugger
     director's ask that would make "the most difference"): what a world order would do,
     its doubt or its refusal, in the channel's own order of judgement (the day's budget,
-    the rule of reach, the brief's limits, the form, the doubt), performing nothing,
-    writing nothing in any log and spending no act. What it would do is read by performing
-    it on a copy of the world, which is then let go; the world itself is not touched, so a
-    replay is the same with the dry run or without. The doubt it shows is not a doubt on
-    the record (`_doubt_shown`): entered, the order is doubted there, and then entered
-    again with its [reason: ...] it is performed."""
+    the rule of reach, the brief's limits, the form, the doubt: the door's own sequence,
+    `_read`), performing nothing, writing nothing in any log and spending no act. It is
+    judged and tried on a copy of the world, which is then let go; the world itself is
+    not touched, so a replay is the same with the dry run or without. The doubt it shows
+    is not a doubt on the record (`_doubt_shown`): entered, the order is doubted there,
+    and then entered again with its [reason: ...] it is performed."""
     text = " ".join(str(text).split())
+    brief = brief_of(world)
+    acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
+    # the day's counts as they stand, read without renewing them (nothing is changed)
+    state = getattr(world, "director_state", None)
+    today = state is not None and isinstance(state, DayBudget) and state.day == day_of(world)
+    acts_used = state.acts if today else 0
+    held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
     followed = _follow_words(text)
+    copy = None if followed is not None else _copy(world)  # `follow` is read, never made
+    on = None if copy is None or isinstance(copy, str) else copy
+    read = _read(world, text, acts_used, acts_allowed, held_now, on=on)
+    order, free = read.order, read.free
+    if read.stage == NO_FORM:
+        return (
+            f"{DRY_RUN_HEAD} the game has no way to do this as said: {read.why.rstrip('.')}. "
+            "The library's grammar topic lists the forms ('the world orders'), each with "
+            "examples."
+        )
+    assert order is not None
+    if read.stage == UNCALLABLE:
+        return f"{DRY_RUN_HEAD} it would be refused: {read.why}."
+    if read.stage == OVER:
+        return (
+            f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
+            "is spent until the next day of the ship's time."
+        )
+    if read.stage == REACH:
+        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {read.why}."
+    if read.stage == LIMIT:
+        return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {read.why}."
+    if read.stage == MALFORMED:
+        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {read.why.rstrip('.')}."
     if followed is not None:
         # `follow` (package 82, item 6): read on the world as the drivers would, nothing moved
         from freesail.world.orders import WorldOrderError, hull_named
@@ -1620,42 +1802,8 @@ def dry_run(world: Any, text: str) -> str:
             f"{DRY_RUN_HEAD} it would be performed as a driver's line, no act spent: the "
             f"drivers would follow the {name}, her readings, her log and her chart theirs."
         )
-    brief = brief_of(world)
-    acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
-    bare, reason = world_orders.split_reason(text)
-    try:
-        order = world_orders.parse(text)
-    except world_orders.WorldOrderError as e:
-        return (
-            f"{DRY_RUN_HEAD} the game has no way to do this as said: {str(e).rstrip('.')}. "
-            "The library's grammar topic lists the forms ('the world orders'), each with "
-            "examples."
-        )
-    free = order.channel == "say" and pending_for(
-        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
-    )
-    # the day's counts as they stand, read without renewing them (nothing is changed)
-    state = getattr(world, "director_state", None)
-    today = state is not None and isinstance(state, DayBudget) and state.day == day_of(world)
-    acts_used = state.acts if today else 0
-    held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
-    if held_now or (acts_used >= acts_allowed and not free):
-        return (
-            f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
-            "is spent until the next day of the ship's time."
-        )
-    reach_why = world_orders.reach(world, order)
-    if reach_why:
-        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {reach_why}."
-    if brief is not None:
-        why = brief.limit_of(world, order)
-        if why:
-            return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {why}."
-    malformed = world_orders.form_error(world, order)
-    if malformed:
-        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {malformed.rstrip('.')}."
-    doubted = world_orders.doubt(world, order)
-    would = _would_do(world, order.text)
+    doubted = read.why if read.stage == DOUBT else ""
+    would = copy if isinstance(copy, str) else _would_do(copy, order.text)
     if would.startswith(NOT_TRIED):
         # an order that could not be tried is never said to be performed (package 109)
         why = would.removeprefix(NOT_TRIED)
@@ -1688,13 +1836,13 @@ def dry_run(world: Any, text: str) -> str:
 NOT_TRIED = "not tried: "
 
 
-def _would_do(world: Any, text: str) -> str:
-    """The words a world order would leave in the driver's line, read by performing it
-    on a copy of the world (the checkpoint's own pickling, `core.replay`), which is let
-    go; `NOT_TRIED` and the reason where it could not be tried. The copy is of the World
-    whatever handle the dry run was given: the director's tools hold his hull (package 97),
-    and a pickle rooted at a hull made the hull before its World, whose rebinding then
-    failed, so that every dry run said 'would be performed' in play (package 109)."""
+def _copy(world: Any) -> Any:
+    """A copy of the world to judge and try an order on (the checkpoint's own pickling,
+    `core.replay`), let go after; `NOT_TRIED` and the reason, in words, where the world
+    cannot be copied. The copy is of the World whatever handle the dry run was given: the
+    director's tools hold his hull (package 97), and a pickle rooted at a hull made the
+    hull before its World, whose rebinding then failed, so that every dry run said 'would
+    be performed' in play (package 109)."""
     import io
 
     from freesail.core import replay
@@ -1706,6 +1854,13 @@ def _would_do(world: Any, text: str) -> str:
     except Exception as e:  # noqa: BLE001  (a world that cannot be copied: said so)
         return f"{NOT_TRIED}the world could not be copied to try it ({type(e).__name__})"
     copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
+    return copy
+
+
+def _would_do(copy: Any, text: str) -> str:
+    """The words a world order would leave in the driver's line, read by performing it on
+    the dry run's copy of the world (`_copy`); `NOT_TRIED` and the reason where it failed
+    when it was tried."""
     try:
         e = copy._apply_world_order(text, SOURCE)
     except Exception as e:  # noqa: BLE001  (the order failed on the copy: said so)

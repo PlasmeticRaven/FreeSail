@@ -258,6 +258,12 @@ class Judged:
     enemy: tuple[str, str] | None = None
     weight: int | None = None
     thing: str = ""
+    # what the handler read of the order that a limit may ask for (a system's depth and
+    # radius, a port's stance and nation, the hand's words, a new ship's colours)
+    facts: tuple[tuple[str, Any], ...] = ()
+
+    def fact(self, name: str, default: Any = None) -> Any:
+        return dict(self.facts).get(name, default)
 
     @property
     def the_players(self) -> bool:
@@ -337,6 +343,7 @@ def _touch(
     body: str = "",
     enemy: tuple[str, str] | None = None,
     thing: str = "",
+    **facts: Any,
 ) -> None:
     """A handler says what it is about to do, once every name is resolved and before
     anything is changed: the form's handle, the hull it acts aboard, the ships and the
@@ -412,6 +419,7 @@ def _touch(
         enemy,
         weight,
         thing,
+        tuple(sorted(facts.items())),
     )
     if judging():
         raise _JudgedOnly(judgement)
@@ -875,7 +883,14 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if m:
         at = _time(m.group("at"))
         name = m.group("name")
-        _touch(world, "weather.waypoint")
+        system = systems.find(name)
+        _touch(
+            world,
+            "weather.waypoint",
+            hpa=float(m.group("hpa")),
+            radius_km=float(system.radius_km) if system is not None else None,
+            background_hpa=float(systems.background_hpa),
+        )
         try:
             reached = systems.append_waypoint(
                 name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
@@ -909,7 +924,13 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         }
         if m.group("warm"):
             d["fronts"] = {"warm_deg": float(m.group("warm")), "cold_deg": float(m.group("cold"))}
-        _touch(world, f"weather.{d['kind']}")
+        _touch(
+            world,
+            f"weather.{d['kind']}",
+            hpa=float(m.group("hpa")),
+            radius_km=float(d["radius_km"]),
+            background_hpa=float(systems.background_hpa),
+        )
         try:
             systems.append_system(d)
         except ValueError as e:
@@ -1030,8 +1051,6 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     from freesail.world import prizes as P
 
     taken, captor, how = _taken_parts(world, m)
-    if P.is_prize(taken):
-        raise WorldOrderError(f"{taken.name} is a prize already.")
     hers = str(taken.id) in players_hulls(world)
     _touch(
         world,
@@ -1041,6 +1060,8 @@ def _taken(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         persons=[_players_own_person(world)] if hers else (),
         prompt=hers,
     )
+    if P.is_prize(taken):
+        raise WorldOrderError(f"{taken.name} is a prize already.")
     if str(taken.id) == players_id(world) and getattr(captor, "crew", None) is None:
         from freesail.world.crews import promote
 
@@ -1159,7 +1180,13 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         vessel.done = False
         return f"the goal of {vessel.name} changed: {goal}", {"id": vessel.id, "goal": goal}
     spec = new_ship_spec(world, body)
-    _touch(world, "ship.new", enemy=_enemy_words(world, spec["description"], spec["nation"]))
+    _touch(
+        world,
+        "ship.new",
+        enemy=_enemy_words(world, spec["description"], spec["nation"]),
+        colours=str(spec.get("colours") or ""),
+        said=" ".join(body.lower().split()),
+    )
     world.vessels.serial += 1
     try:
         vessel = vessel_from_spec(world, spec, world.vessels.serial)
@@ -1879,7 +1906,12 @@ def _hand(world: Any, name: str, words: str | None) -> tuple[str, dict[str, Any]
     vessel = world.vessels.find(name)
     if vessel is None or vessel.done:
         raise WorldOrderError(f"No ship named {name!r} is on the sea.")
-    _touch(world, "ship.crewed" if words is None else "ship.hand", ships=[str(vessel.id)])
+    _touch(
+        world,
+        "ship.crewed" if words is None else "ship.hand",
+        ships=[str(vessel.id)],
+        hand=" ".join(str(words or "").split()),
+    )
     try:
         if words is None:
             said = crews.ask_crewed(world, vessel)
@@ -2002,8 +2034,8 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if port is None:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     what, rest = m.group("what").lower(), m.group("rest").strip()
-    _touch(world, "port")
     if what in ("the court condemns", "the court restores"):
+        _touch(world, "port", stance=what)
         # the prize court's sentence by the director's word (package 74, the design's §5.2):
         # the court's whim is a plausible cause; doubted where the rule gives otherwise
         return _court_word(world, port, what, rest)
@@ -2011,6 +2043,7 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         nation = world.nations.find(rest)
         if nation is None:
             raise WorldOrderError(f"'{rest}' is no nation of the table.")
+        _touch(world, "port", stance=what, nation=str(nation.id))
         if what == "closed to":
             if nation.id not in port.closed_to:
                 port.closed_to.append(nation.id)
@@ -2025,6 +2058,7 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     good = port.market.find(pm.group("good"))
     if good is None:
         raise WorldOrderError(f"{port.name} deals in no '{pm.group('good')}'.")
+    _touch(world, "port", stance="price of")
     good.price = float(pm.group("pounds"))
     return f"the price of {good.good} at {port.name} set at £{good.price:g} a ton", {
         "port": port.id,
@@ -5304,7 +5338,8 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "her captain's intent given or changed: a mind changed wants no cause; words no "
         "intent's form reads are her free intent, the goal told to a model at her captain's "
         "station, which her rules-based captain does not sail by: he lies her to, her "
-        "service's doctrine kept",
+        "service's doctrine kept; the player's own ship named so, it is her rules-based "
+        "captain's, as 'captain: intent' is",
         reach=(
             PLAYERS_SHIP,
             ANOTHER_SHIP,
@@ -5661,7 +5696,9 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "captain",
         "captain: intent <words>",
         ("captain: intent trade tin from Falmouth to Brest",),
-        "the followed ship's rules-based captain given an intent",
+        "the followed ship's rules-based captain given an intent: the followed ship is the "
+        "player's own unless the drivers follow another, and he makes sail and steers her "
+        "by it until the player's next order takes her back",
         reach=(
             PLAYERS_SHIP,
             ANOTHER_SHIP,
@@ -5687,7 +5724,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "the drivers' centre moved to the ship named, the player's by her name or 'the "
         "ship', another's by her name (her hull made and woken under the cap); 'follow "
         "nobody' gives an observed world its view back; a driver's line, not a world order, "
-        "costing no act",
+        "costing no act; it moves the player's prompt, whose orders go to the ship followed",
         reach=(
             PLAYERS_PROMPT,
             THE_WORLD,
