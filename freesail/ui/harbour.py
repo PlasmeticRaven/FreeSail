@@ -161,6 +161,21 @@ def year_words(year: int) -> str:
     )
 
 
+# The most a box of the file's own words takes (the longest block of the game's scenarios,
+# a day of systems, is under four thousand characters).
+BLOCK_MAX_CHARS = 20_000
+
+
+def _has_anchor_or_alias(text: str) -> bool:
+    """Whether YAML text carries an anchor (`&name`) or an alias (`*name`), by its tokens
+    alone: nothing is loaded, so a text of nested aliases costs its own length to refuse.
+    Text that cannot be scanned raises the scanner's error, which the caller says."""
+    return any(
+        isinstance(token, yaml.tokens.AnchorToken | yaml.tokens.AliasToken)
+        for token in yaml.scan(text)
+    )
+
+
 def _plain(value: Any) -> Any:
     """A value read from YAML as the scenario's fields carry one: a day or a time as its
     words (the fields are JSON, and the loader reads the words)."""
@@ -778,8 +793,8 @@ class Harbour:
                     )
             if s.get("heading_deg") is not None:
                 out.append(
-                    f"  To know: {name}'s heading is read by nothing; another ship heads for "
-                    "the first mark of her goal."
+                    f"  To know: {name}'s heading is read by nothing; another ship heads along "
+                    "the first leg of her goal."
                 )
         return out
 
@@ -1497,6 +1512,10 @@ class Harbour:
                 value, sort_keys=False, allow_unicode=True, default_flow_style=None, width=92
             )
 
+        if isinstance(ports, list):
+            # a list of ports is each of them with nothing said of it: the box comes up
+            # holding that, so that a port's state added there keeps the other ports
+            ports = {str(p): {} for p in ports}
         return {
             "systems": text(systems) if systems else "",
             "ports": text(ports) if isinstance(ports, dict) and ports else "",
@@ -1518,8 +1537,22 @@ class Harbour:
         for name, words in blocks.items():
             if name not in self.BLOCKS:
                 raise HarbourError(f"There is no block '{name}'; the sheet has systems and ports.")
+            text = str(words or "")
+            # refused before any load: a box's words longer than a scenario's block ever is,
+            # and any anchor or alias (a few hundred bytes of nested aliases load as
+            # gigabytes: the tokens are scanned, which builds nothing)
+            if len(text) > BLOCK_MAX_CHARS:
+                raise HarbourError(
+                    f"The {name}' words are {len(text)} characters; the box takes "
+                    f"{BLOCK_MAX_CHARS} at most."
+                )
             try:
-                value = yaml.safe_load(str(words or "")) if str(words or "").strip() else None
+                if _has_anchor_or_alias(text):
+                    raise HarbourError(
+                        "The box's words use an anchor or an alias (& or *), which the sheet "
+                        "does not take: write each thing out where it is said."
+                    )
+                value = yaml.safe_load(text) if text.strip() else None
             except yaml.YAMLError as e:
                 where = getattr(e, "problem_mark", None)
                 at = f", line {where.line + 1}" if where is not None else ""
@@ -1591,6 +1624,26 @@ class Harbour:
                 f"'rules' ({', '.join(idle)}) seat nobody when the game starts. The harbour's "
                 "stations tab offers the door of each station given to a model."
             )
+        ports = fields.get("ports")
+        if isinstance(ports, list | dict):
+            # the ports in play named, and a port the scenario leans on left out of them:
+            # the port a ship is leaving, and a price list aboard (the two that name a port
+            # by its id; the start is a place and a goal is words, neither a plain read)
+            play = {str(p) for p in ports}
+            ships = fields.get("ships") if isinstance(fields.get("ships"), list) else []
+            for s in ships:
+                port = str(s.get("departing") or "") if isinstance(s, dict) else ""
+                if port and port not in play:
+                    out.append(
+                        f"  To know: {s.get('name') or s.get('id') or 'a ship'} is leaving "
+                        f"{port}, which is not among the ports in play ({', '.join(sorted(play))})."
+                    )
+            lists = papers.get("price_lists") if isinstance(papers.get("price_lists"), list) else []
+            for port in [str(p) for p in lists if str(p) not in play]:
+                out.append(
+                    f"  To know: the price list of {port} is aboard, and {port} is not among "
+                    "the ports in play: a list counts only for a port in play."
+                )
         with contextlib.suppress(ValueError, TypeError):
             year = int(str(fields.get("start"))[:4]) if fields.get("start") else 1805
             if year != 1805:

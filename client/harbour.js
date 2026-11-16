@@ -57,11 +57,14 @@
       var el = document.querySelector(sel);
       if (!el || !words[sel]) return;
       var label = el.closest("label");
-      if (!label || label.querySelector(".says")) return;
       var s = document.createElement("span");
       s.className = "says";
+      s.setAttribute("data-says", sel);
       s.textContent = words[sel];
-      label.appendChild(s);
+      if (label) { if (!label.querySelector(".says")) label.appendChild(s); return; }
+      // a control with no label of its own (a list beside its button): under its row
+      s.classList.add("says-row");
+      el.parentNode.parentNode.insertBefore(s, el.parentNode.nextSibling);
     });
   }
   applyWords();
@@ -112,6 +115,10 @@
   function yearWords(year) {
     return "She begins in " + year + ". The ports are as they stood on that day; the wars are those of June 1805, whatever the year.";
   }
+  function shelfSeat(path) {
+    var s = (cat.scenarios || []).filter(function (x) { return x.path === path; })[0];
+    return (s && s.seat) || "";
+  }
   function scenarioSays() {
     var path = $("s-scenario").value;
     var s = (cat.scenarios || []).filter(function (x) { return x.path === path; })[0];
@@ -119,6 +126,10 @@
     var words = "";
     if (s) words = (shelf ? shelf.title + ". " : "") + (s.says || (shelf ? shelf.says : "")) + "  (" + s.path.split(/[\\/]/).pop() + ")" + (s.year && s.year !== 1805 ? "  " + yearWords(s.year) : "");
     $("s-says").textContent = words;
+    // the seat the game's own shelf entry names (a lesson that is the officer's own): where
+    // "where you stand" is left to the game, the start seats him there, and the choice says so
+    var first = $("s-seat").options[0];
+    if (first && first.value === "") first.textContent = s && s.seat ? "as this game says: the " + s.seat : "as the scenario says (else the captain)";
     scenarioSaid(path);
   }
   // What the game is, said before it is started (package 96b, step 3): the scenario's own
@@ -418,7 +429,7 @@
       ship: from === "ship" ? $("s-ship").value : "",
       load: from === "load" ? $("s-load").value : "",
       seed: $("s-seed").value,
-      seat: $("s-seat").value,
+      seat: $("s-seat").value || (from === "scenario" ? shelfSeat($("s-scenario").value) : ""),
       aboard: from === "scenario" ? $("s-aboard").value : "",
       wind: from === "ship" ? $("s-wind").value : "",
       heading: from === "ship" ? $("s-heading").value : "",
@@ -915,7 +926,7 @@
       where.value = positionWords(lat2, lon2);
       markDirty("ships"); foldLines();
     });
-    ["Her heading at the start: the game does not take this for another ship; she heads for the first mark of her goal.",
+    ["Her heading at the start: the game does not take this for another ship; she heads along the first leg of her goal.",
      "Her people, her company and her cargo: the game does not yet take these for another ship; she is mustered from her file when she comes close.",
      "Who holds a station aboard her: not written in a scenario yet; a door is started for her on the doors tab once the game is in play."].forEach(function (w) {
       var p = document.createElement("p");
@@ -1139,7 +1150,6 @@
       else if (had !== undefined && had !== null && String(had) === v) item[k] = had;
       else item[k] = el.hasAttribute("data-num") || (k === "drift" && v.toLowerCase() !== "seeded" && isFinite(Number(v))) ? Number(v) : v;
     });
-    if (!item.maker) item.maker = "the chronometer";
     return item;
   }
   var PEOPLE_COLS = [["role", "text"], ["name", "text"], ["skill", "number"], ["place", "text"], ["ashore", "select", ["yes"]], ["port", "select", "ports"]];

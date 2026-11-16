@@ -21993,3 +21993,197 @@ def test_truth_7_411_every_setting_of_the_harbour_is_explained_where_it_is_set()
     assert "same weather" in words["#s-seed"] and "traders" in words["#s-business"].lower()
     assert "folded into a summary" in words['[data-set="doors.api.seat_budget_tokens"]']
     assert "applyWords" in (client / "harbour.js").read_text(encoding="utf-8")
+
+
+def test_truth_7_412_a_box_of_the_files_words_cannot_hold_the_server_and_keeps_the_ports(tmp_path):
+    """Package 96b, the final list (the whole-page reader's findings on step 8's boxes).
+    The words of a box take no anchor and no alias and no more than their length: a text of
+    nested aliases, which loaded as gigabytes, is refused in words by its tokens before
+    anything is loaded, in a moment; plain words pass as before. And a scenario whose ports
+    are a list shows them in the ports' box as the mapping they mean, so that a port's
+    state said there keeps every other port in play."""
+    pytest.importorskip("fastapi")
+    import time
+
+    from freesail.ui.harbour import BLOCK_MAX_CHARS, Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/merchant-passage.yaml")
+    fields = read["fields"]
+    assert isinstance(fields["ports"], list)
+    assert read["blocks"]["ports"] == "".join(f"{p}: {{}}\n" for p in fields["ports"])
+    bomb = "a: &a [x, x, x, x, x, x, x, x, x]\n"
+    for prev, name in zip("abcdefg", "bcdefgh", strict=True):
+        bomb += f"{name}: &{name} [" + ", ".join([f"*{prev}"] * 9) + "]\n"
+    bomb += "brest: {news: *h}\n"
+    assert len(bomb) < 600
+    started = time.monotonic()
+    for block in ("ports", "systems"):
+        with pytest.raises(HarbourError, match="an anchor or an alias"):
+            harbour.with_blocks(fields, {block: bomb})
+    with pytest.raises(HarbourError, match="at most"):
+        harbour.with_blocks(fields, {"ports": "x: 1\n" * (BLOCK_MAX_CHARS // 5 + 1)})
+    assert time.monotonic() - started < 2.0
+    closed = read["blocks"]["ports"].replace("brest: {}", "brest: {closed_to: [united-states]}")
+    whole = harbour.with_blocks(fields, {"ports": closed})
+    assert list(whole["ports"]) == fields["ports"]
+    assert whole["ports"]["brest"] == {"closed_to": ["united-states"]}
+    lines = harbour.prove(whole, read["path"])["lines"]
+    assert f"The ports: {', '.join(fields['ports'])}." in lines
+
+
+# ---------------------------------------------------------------------------
+# Package 115, part C: the director's limits (truths 7-420 to 7-427; the cold review of
+# 2026-11-14, decision 14; the owner's ruling of 2026-11-14). Each comes in by the
+# director's own door, the `world_order` tool of a director seated at the station.
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_420_the_director_is_free_by_default_the_players_own_ship_included():
+    """Under a brief that sets no limit the director's order reaches the player's own ship
+    and is done: her rules captain given an intent by the captain's channel and by her own
+    name, two acts spent, nothing refused."""
+    from freesail.agents import director as D
+    from tests.test_director import log_kinds
+    from tests.test_director_limits import FREE, at_the_door
+
+    w, door = at_the_door(FREE)
+    assert w.captain.intent is None
+    assert door("captain: intent bound for Plymouth").startswith("Done:")
+    assert w.captain.intent is not None and "Plymouth" in w.captain.intent.words
+    assert door('ship "Amazon": intent bound for Falmouth').startswith("Done:")
+    assert D.budget_of(w).acts == 2 and "director.refused" not in log_kinds(w)
+
+
+def test_truth_7_421_hands_off_the_players_ship_holds_by_every_spelling():
+    """A brief that sets hands-off refuses the same act by each of its spellings, in words
+    that name the limit: no act spent, her captain given no intent, four refusals logged."""
+    from freesail.agents import director as D
+    from tests.test_director import log_kinds
+    from tests.test_director_limits import HANDS_OFF, at_the_door
+
+    w, door = at_the_door(HANDS_OFF)
+    spellings = (
+        "captain: intent bound for Plymouth",
+        "captain: bound for Plymouth",
+        'ship "Amazon": intent bound for Plymouth',
+        'ship "Amazon": bound for Plymouth',
+    )
+    for text in spellings:
+        said = door(text)
+        assert said.startswith("Refused, outside the brief:"), (text, said)
+        assert "hands off the player's own ship" in said
+    assert w.captain.intent is None and D.budget_of(w).acts == 0
+    assert log_kinds(w).count("director.refused") == len(spellings)
+    assert not any(b for b in D.starter_briefs() if D.resolve_brief(b).limits.get(D.HANDS_OFF))
+
+
+def test_truth_7_422_nobody_dies_has_something_to_refuse_and_every_starter_sets_it():
+    """The aboard table marks four things deadly (the grave wound; the boat stove, swamped
+    or adrift while anyone is in her), and each of the six starter briefs refuses the grave
+    wound of the player's own captain by the spelling that walked round it: nobody is hurt."""
+    from freesail.agents import director as D
+    from freesail.world import orders as WO
+    from tests.test_director_limits import at_the_door, captain_of
+
+    deadly = {t["id"]: t.get("deadly_when") for t in WO.aboard_table() if t["harm"] == "deadly"}
+    assert deadly == {
+        "person_badly_hurt": None,
+        "boat_stove": "manned",
+        "boat_swamped": "manned",
+        "boat_adrift": "manned",
+    }
+    starters = D.starter_briefs()
+    assert len(starters) == 6
+    for name in starters:
+        assert D.resolve_brief(name).limits.get("nobody_dies") is True, name
+    w, door = at_the_door("quiet-passage")
+    said = door(f"aboard the Amazon: {captain_of(w).name} is badly hurt [reason: the story]")
+    assert said.startswith("Refused, outside the brief:") and "nobody dies" in said
+    assert not [s for s in w.ship.extra["crew"].sailors if s.hurt]
+
+
+def test_truth_7_423_a_weight_the_limit_cannot_rank_is_refused_not_passed():
+    """Under "no enemy heavier than a cutter" a seventy-four by the words the ranking did
+    not know is refused as heavier; under a limit whose own word names no class, no enemy
+    passes at all; no ship is put on the sea by either."""
+    from tests.test_director_limits import at_the_door
+
+    w, door = at_the_door("quiet-passage")
+    ships = len(w.vessels.active())
+    for desc in ("a line-of-battle ship", "a 74"):
+        said = door(f'ship: {desc} "Brave" of France at 48 30 N 6 30 W, bound for Brest')
+        assert said.startswith("Refused, outside the brief:") and "is heavier" in said, desc
+    assert len(w.vessels.active()) == ships
+    w, door = at_the_door({"name": "Odd", "tone": "x", "limits": {"enemy_heaviest": "galleon"}})
+    said = door('ship: a cutter "Furet" of France at 48 30 N 6 30 W, bound for Brest')
+    assert said.startswith("Refused, outside the brief:") and "refused, not passed" in said
+    assert w.vessels.find("Furet") is None
+
+
+def test_truth_7_424_the_directors_log_says_whom_each_act_reached():
+    """Three acts through the door, two of which reach the player's own ship: the director's
+    log as the player reads it holds all three, and two of them say whom they reached."""
+    from freesail.agents import director as D
+    from tests.test_director_limits import FREE, at_the_door, entered
+
+    w, door = at_the_door(FREE)
+    assert door("captain: intent bound for Plymouth").startswith("Done:")
+    assert entered(door, "aboard the Amazon: a cask found stove").startswith("Done:")
+    brig = 'ship: a merchant brig "Nancy" of Britain at 49 00 N 6 20 W, bound for Falmouth'
+    assert entered(door, brig).startswith("Done:")
+    lines = [x for x in D.reveal(w, "the player") if "(order)" in x or "(reentered)" in x]
+    assert len(lines) == 3
+    reached = [x for x in lines if "it reached the player's own ship (the Amazon)" in x]
+    assert len(reached) == 2 and not any('"Nancy"' in x for x in reached)
+
+
+def test_truth_7_425_the_owners_orders_are_outside_the_brief():
+    """The owner's world order is judged by the one table for what it is and by no brief:
+    under hands-off the same order the director is refused is done for the owner."""
+    from freesail.world import orders as WO
+    from tests.test_director_limits import HANDS_OFF, at_the_door
+
+    w, door = at_the_door(HANDS_OFF)
+    order = "captain: intent bound for Plymouth"
+    assert door(order).startswith("Refused, outside the brief:") and w.captain.intent is None
+    judged = WO.judged(w, WO.parse(order))
+    assert judged.form.key == "captain" and judged.reaches == {WO.PLAYERS_SHIP}
+    e = w.world_order(order, source="the owner")
+    assert e.data["result"] == "done" and w.captain.intent is not None
+
+
+def test_truth_7_426_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in_words():
+    """The player's own ship laid up in ordinary through the director's door is answered in
+    the game's words (she is in commission), where it raised an error; her regime stands."""
+    from tests.test_director_limits import FREE, at_the_door
+
+    w, door = at_the_door(FREE)
+    said = door('ship "Amazon": in ordinary at Falmouth')
+    assert said.startswith("The game has no way to do this as said: Amazon is in commission")
+    assert w.vessels.own.regime != "in ordinary" and w.ship.name == "Amazon"
+
+
+def test_truth_7_427_the_one_table_of_the_forms_is_the_channels_and_every_form_is_marked():
+    """One table of the world-order forms, kept by the channel and read by the director:
+    43 forms, each with a reach of the five and a harm; twenty-seven of them can reach the
+    player's own ship, ten his person, three his prompt."""
+    from freesail.agents import director as D
+    from freesail.world import orders as WO
+
+    forms = WO.WORLD_ORDER_FORMS
+    assert D.WORLD_ORDER_FORMS is forms and len({f.key for f in forms}) == len(forms)
+    assert all(f.reach and set(f.reach) <= set(WO.REACHES) for f in forms)
+    assert [f.key for f in forms if f.harm == WO.HARM_BY_THE_THING] == ["aboard.found"]
+    count = {r: sum(1 for f in forms if r in f.reach) for r in WO.REACHES}
+    assert len(forms) == 43, len(forms)
+    assert (count[WO.PLAYERS_SHIP], count[WO.PLAYERS_PERSON], count[WO.PLAYERS_PROMPT]) == (
+        27,
+        10,
+        3,
+    ), count
