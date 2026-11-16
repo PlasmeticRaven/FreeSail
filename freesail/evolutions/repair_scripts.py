@@ -928,6 +928,13 @@ class RelievingTacklesScript(PhasedScript):
             return "the helm answers; there is no need of the relieving tackles"
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the wheel is still shot away. The wheel may be repaired while the
+        tackles lie held (the two hold different gear), and then they are not taken up again."""
+        if not self.ship.extra.get("helm_lost"):
+            return "the wheel is repaired; the relieving tackles are not wanted"
+        return None
+
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["reeve"])
 
