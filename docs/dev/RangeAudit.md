@@ -253,6 +253,8 @@ The full sweep makes **105 findings: 67 mechanical and 38 that rest on the refer
 | a judgement to be read against a source | 0 | 38 |
 | all | 67 | 38 |
 
+Since package 116 (card 5) mended `v-nation-unknown:cruiser.stations`: **104 findings, 66 mechanical**, 28 of them the data's; the tables of this section are as the audit first ran.
+
 **By check** (the full sweep):
 
 | Check | Findings | What they are |
