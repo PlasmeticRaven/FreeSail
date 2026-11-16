@@ -441,8 +441,14 @@ _WIND_RINGS = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
 _WIND_BEARINGS = 16
 _WIND_TIMES = 24
 _WIND_SPAN_MAX_H = 96.0
-# A wind is the order's making where it is this much harder than it stood without it.
-_WIND_MADE_KN = 1.0
+# A wind is the order's making where it is harder than it stood without it by any amount
+# the arithmetic can tell from none: a hundredth of a knot, far above the rounding of two
+# copies advanced alike (which agree to the last figure where the order changes nothing)
+# and far below any system a director would order. It was a knot, and a run of lows of
+# under a knot each on one centre then stacked past the limit, each judged to have made no
+# wind (the lead's reading of 2026-11-16): the step that carries the wind over the limit is
+# the one refused, however small it is.
+_WIND_MADE_KN = 0.01
 
 
 def _wind_kn_of(world: Any, j: Any) -> float | None:
@@ -457,7 +463,8 @@ def _wind_kn_of(world: Any, j: Any) -> float | None:
     standing and at the ship, at `_WIND_TIMES` times from now to the end of its track (four
     days at the most): some 2,400 readings. Each is set beside the wind at the same point
     and time without the order (a second copy, advanced alike), and the figure is the
-    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN` or more): a wind
+    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN`, a hundredth of a
+    knot, or more): a wind
     the world already had is not laid to an order that did not raise it, and a high that
     eases the field is not refused for the gale beside it. The world's own systems are not
     touched. None where the order names a system the weather
@@ -1792,6 +1799,10 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
 DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"
 
 
+class _NotCopied(Exception):
+    """The dry run's copy of the world could not be made: its words are the reason."""
+
+
 _FOLLOW = re.compile(r"^\s*follow\s+(?P<who>\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$", re.I)
 
 
@@ -1823,19 +1834,29 @@ def dry_run(world: Any, text: str) -> str:
     copied: list[Any] = []
 
     def on() -> Any:
-        # the copy the order is judged and tried on; the world itself where it cannot be
-        # copied (the order is then said not to have been tried)
+        # the copy the order is judged and tried on; where the world cannot be copied the
+        # order is neither judged nor tried, and the dry run says so (package 109): the
+        # world itself is never judged on by a dry run
         copied.append(_copy(world))
-        return world if isinstance(copied[0], str) else copied[0]
+        if isinstance(copied[0], str):
+            raise _NotCopied(copied[0])
+        return copied[0]
 
-    stage, why, order, _judgement, free = _read(
-        world,
-        text,
-        acts_used,
-        acts_allowed,
-        held_now,
-        on=None if followed is not None else on,  # `follow` is read, never made
-    )
+    try:
+        stage, why, order, _judgement, free = _read(
+            world,
+            text,
+            acts_used,
+            acts_allowed,
+            held_now,
+            on=None if followed is not None else on,  # `follow` is read, never made
+        )
+    except _NotCopied as e:
+        return (
+            f"{DRY_RUN_HEAD} it could not be tried: {str(e).removeprefix(NOT_TRIED)}. What "
+            "it would do is not known until it is entered; entered, it is judged as every "
+            "order is, and its answer says what it did."
+        )
     if stage == NO_FORM:
         return (
             f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}. "

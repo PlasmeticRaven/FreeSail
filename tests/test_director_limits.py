@@ -811,3 +811,60 @@ def test_the_player_who_has_changed_ship_is_covered_aboard_his_new_ship():
     # the squadrons' literal 'the ship' is the game's first hull, the ship he left
     j = WO.judged(w, WO.parse('squadron: "the old" of Britain under the ship, bound for Plymouth'))
     assert j is None or j.reaches == {WO.ANOTHER_SHIP}
+
+
+def test_the_wind_is_not_stacked_past_the_limit_by_small_steps():
+    """The lead's reading of the wind's mend: a reading counted only where the order made
+    the wind harder by a knot, so that lows of under a knot each on one centre were each
+    judged to have made no wind, and together blew past the limit. A run of weak lows on
+    one centre (each nine tenths of a hectopascal deep, under a knot of its own) is done
+    until the one that would carry the wind over the limit, which is refused, and not
+    before; and a high that eases the field beside a gale the owner put there is done."""
+    w = directed("quiet-passage", systems=[], climatology=True)
+    door = _door_of(w)
+    limit = float(D.brief_of(w).limits["wind_max_kn"])
+    weak = round(float(w.systems.background_hpa) - 0.9, 1)
+    done, was = 0, None
+    for i in range(40):
+        text = f'weather: low "w{i}" radius 450 km at 1805-06-12T10:00 -800 800 {weak}'
+        kn = D._peak_wind_kn(w, text)
+        assert was is None or kn - was < 1.0, (i, was, kn)  # each step under a knot
+        was = kn
+        said = door(text)
+        if kn > limit:
+            assert said.startswith("Refused, outside the brief:") and "no wind above" in said
+            break
+        assert said.startswith("Done:"), (i, kn, said)
+        done += 1
+    else:
+        raise AssertionError("forty weak lows on one centre were all done")
+    assert done >= 5 and limit < kn < limit + 1.0, (done, kn)
+    assert door(text).startswith("Refused, outside the brief:")  # and it stays refused
+    # a high beside a standing gale (the owner's, which meets no brief) is not refused for it
+    w = directed("quiet-passage", systems=[], climatology=True)
+    door = _door_of(w)
+    gale = 'weather: low "gale" radius 450 km at 1805-06-12T10:00 -1500 1500 965'
+    assert w.world_order(gale, source="the owner").data["result"] == "done"
+    high = float(w.systems.background_hpa) + 3.0
+    ridge = f'weather: high "ridge" radius 600 km at 1805-06-13T04:00 900 -900 {high:g}'
+    assert D._peak_wind_kn(w, ridge) < limit and door(ridge).startswith("Done:")
+
+
+def test_a_thing_ashore_moved_from_port_to_port_is_doubted_at_the_door_never_an_error():
+    """The cloud's finding on the list's mend (run 126): a thing that lies ashore, moved to
+    another port, reaches no hull, and the doubt was handed no hull to read it by and
+    raised. The doubt reads an `aboard` order by the hull it was resolved aboard, whether
+    or not the order reaches her: doubted in words at the door, and done with its reason."""
+    w, door = at_the_door(FREE)
+    assert entered(door, "aboard: a sealed packet, on the cabin table").startswith("Done:")
+    assert entered(door, "aboard: the packet, ashore at Falmouth").startswith("Done:")
+    moved = "aboard: the packet, ashore at Brest"
+    j = WO.judged(w, WO.parse(moved))
+    assert j.form.key == "aboard.thing" and j.reaches == {WO.THE_WORLD} and j.target is not None
+    assert "from one port to another" in WO.doubt(w, WO.parse(moved))
+    said = door(moved)
+    assert said.startswith("Doubted, not performed:") and "from one port to another" in said
+    assert door(moved, dry_run=True).startswith(
+        "Dry run, nothing performed and no act spent: it would be doubted"
+    )
+    assert door(f"{moved} [reason: the agent sent it on]").startswith("Done:")

@@ -5475,7 +5475,11 @@ DIRECTED_DAY_ORDERS = [
     "intent: bound for Falmouth",
     'ship: a cutter "Lark" of Britain at 49 28 N 5 40 W, bound for Falmouth',
     'weather: low "the gale" radius 450 km at 1805-06-12T22:00 -800 800 965',
-    'weather: low "a soft low" radius 500 km at 1805-06-12T16:00 -700 500 1006',
+    # package 115 C: 1010 hPa, which the brief's 27 knots admit with the summer field
+    # standing (24.8 knots at its hardest, judged by the weather's own functions). It was
+    # 1006: 11 knots by its own bell, which was all the limit then read, and 28.5 with the
+    # field, over the brief (`docs/dev/TuningNotes.md`, package 115, part C)
+    'weather: low "a soft low" radius 500 km at 1805-06-12T16:00 -700 500 1010',
     "aboard: a cask found stove",
     "aboard: the fore topmast is found sprung",
     "news: war declared between Britain and Denmark",
