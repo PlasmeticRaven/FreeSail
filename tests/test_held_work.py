@@ -622,6 +622,8 @@ SHIP_WORK_WORDS = {
     "plug_shot_hole": ("plug the shot holes", "plugging the shot holes"),  # file
     # package 115 D's, joined at the merge: named by its verb's own words
     "relieving_tackles": ("rig the relieving tackles", "rigging the relieving tackles"),
+    # package 116's: named by its verb's own words, as the tackles are
+    "repair_wheel": ("repair the wheel", "repairing the wheel"),
     "rig_preventers": ("rig preventers", "rigging preventers"),
     "scud": ("scud", "scudding"),
     "secure_guns": ("secure the guns", "securing the guns"),  # file
@@ -1081,8 +1083,12 @@ NOTHING_STANDS = {
     "plug_shot_hole": "its own going plugs the holes and spends the plugs, holding the carpenter; "
     "holes the world adds are more work, not less",
     # package 115 D's, joined at the merge
-    "relieving_tackles": "the helm is lost until these tackles are rove and by nothing else; "
-    "held, the wheel is still shot away",
+    # package 116: the wheel may now be repaired while the tackles lie held, and their end says
+    # then that they are not wanted. Old (package 115 D's): "the helm is lost until these tackles
+    # are rove and by nothing else; held, the wheel is still shot away".
+    "relieving_tackles": "the helm is lost until these tackles are rove or the wheel repaired; "
+    "held with the wheel repaired, their own end says they are not wanted",
+    "repair_wheel": "the wheel is made good by this work alone; held, it is still shot away",
     "secure_guns": "its own going secures the guns; none is cast loose but by work at quarters",
     "send_boat": "it reads a port and a boat, which nothing takes away; it holds the boat",
     "serve_small_arms": "the arms are served out by this work alone, which holds them",

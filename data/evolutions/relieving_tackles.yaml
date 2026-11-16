@@ -10,7 +10,7 @@
 # another use of the name. One phase, `reeve`; at its end the helm answers again. Her
 # steering meanwhile is as it was, the rudder held where the shot left it.
 #
-# Package 116 (card 5): by the tackles she answers more slowly than by the wheel.
+# By the tackles she answers more slowly than by the wheel.
 # `helm_rate_share` is the share of the wheel's rate (the rudder's `rate_deg_s` of her own
 # file) at which the tiller is hauled over by the tackles, the helm's orders passed below:
 # a half. That it is slower is Luce's (1884: with the relieving tackles hooked "you cannot

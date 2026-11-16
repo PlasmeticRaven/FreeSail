@@ -244,10 +244,14 @@ def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
     from pathlib import Path
 
     calling = {eid for eid, evo in EVOLUTIONS.items() if "too_few" in evo.crew}
-    assert calling == set(SETTEE_FILES) | {"send_boat"}
+    # package 116 (the lead's word of 2026-11-16, the merchant brig's anchor): letting go the
+    # anchor calls all hands too, for the brig's larboard watch of three. Old:
+    # `calling == set(SETTEE_FILES) | {"send_boat"}`.
+    assert calling == set(SETTEE_FILES) | {"send_boat", "let_go_anchor"}
     for eid in SETTEE_FILES:
         assert not hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).until_manned, eid
     assert hands.CrewRequest.from_mapping(EVOLUTIONS["send_boat"].crew).until_manned
+    assert not hands.CrewRequest.from_mapping(EVOLUTIONS["let_go_anchor"].crew).until_manned
     for eid in calling:
         assert hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).calls_all_hands, eid
     with_settee = set()

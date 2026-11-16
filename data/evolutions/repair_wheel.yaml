@@ -1,5 +1,5 @@
 # The wheel repaired after it or its ropes are shot away (scripted, RepairWheelScript in
-# evolutions/repair_scripts.py; package 116, card 5). The hit that takes the wheel leaves her
+# evolutions/repair_scripts.py). The hit that takes the wheel leaves her
 # with no helm; the relieving tackles (relieving_tackles.yaml) give her one from below, slower
 # than the wheel's; this is the wheel itself made good: new wheel-ropes rove from the barrel
 # to the tiller and the wheel's stanchions and spokes mended by the carpenter's crew. Luce
@@ -10,7 +10,6 @@
 # helm until it is done.
 id: repair_wheel
 verb: repair_the_wheel   # the work as the log names it: "repairing the wheel"
-work: repair the wheel
 applies_to: {class: ship}
 script: repair_wheel
 params: {}
