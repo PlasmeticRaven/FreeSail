@@ -346,10 +346,12 @@ def _touch(
     **facts: Any,
 ) -> None:
     """A handler says what it is about to do, once every name is resolved and before
-    anything is changed: the form's handle, the hull it acts aboard, the ships and the
-    persons it acts on, whether it moves the player's prompt, and its harm. This is the
-    one place an order's reach is read, by the code that performs it, so that no
-    spelling of an order is judged as another order (package 115, part C). While the
+    anything of the game is changed (one thing may have been made on the way, as
+    performing the order makes it: the hull of a far ship the order names, `hull_named`):
+    the form's handle, the hull it acts aboard, the ships and the persons it acts on,
+    whether it moves the player's prompt, and its harm. This is the one place an order's
+    reach is read, by the code that performs it, so that no spelling of an order is judged
+    as another order (package 115, part C). While the
     order is only being judged (`judged`) it stops the handler here."""
     form = form_of(key)
     hers = players_hulls(world)
@@ -375,6 +377,13 @@ def _touch(
             said.append(f"the player's own person ({mine.name})")
         elif getattr(p, "aboard", False) and str(getattr(p, "hull", "") or "") in hers:
             ids.append(str(p.hull))
+        elif str(getattr(p, "home", "") or "") in hers and (
+            getattr(p, "sailor_id", None) or getattr(p, "station", "")
+        ):
+            # one of her company (a man of her muster, the holder of a station of hers)
+            # ashore, in her boat or aboard another ship is hers still; a person the world
+            # keeps ashore beside her people (a pilot, an agent) is the world's
+            ids.append(str(p.home))
     for hid in dict.fromkeys(ids):
         if hid in hers:
             if PLAYERS_SHIP not in reaches:
@@ -2043,7 +2052,6 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     what, rest = m.group("what").lower(), m.group("rest").strip()
     if what in ("the court condemns", "the court restores"):
-        _touch(world, "port", stance=what)
         # the prize court's sentence by the director's word (package 74, the design's §5.2):
         # the court's whim is a plausible cause; doubted where the rule gives otherwise
         return _court_word(world, port, what, rest)
@@ -2851,7 +2859,18 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     people = world.people
     voice = isinstance(person, Voice)
     # a voice of the ship's own, or a person aboard her, speaks aboard her; ashore, he does not
-    _touch(world, "say", hull=world if voice else None, persons=() if voice else [person])
+    # (a man of the muster named and not yet drawn has no hull of his own to read: he is of
+    # this ship's company, and aboard her)
+    hulls = getattr(world_of(world) or world, "hulls", None) or {}
+    elsewhere = not voice and (
+        not getattr(person, "aboard", True) or str(getattr(person, "hull", "") or "") in hulls
+    )
+    _touch(
+        world,
+        "say",
+        hull=None if elsewhere else world,
+        persons=[person] if elsewhere else (),
+    )
     if voice and person.place == "masthead":
         # the lookout's hail from the masthead reaches the deck (package 66)
         place, where = "masthead", "from the masthead"
@@ -4655,6 +4674,7 @@ _DOUBTS: dict[str, Any] = {
     "message.at": lambda w, body, j: _doubt_message(w, body),
     "message.by": lambda w, body, j: _doubt_message(w, body),
     "port": lambda w, body, j: _doubt_port(w, body),
+    "port.court": lambda w, body, j: _doubt_port(w, body),
     "prize.cartel": lambda w, body, j: _doubt_cartel(w, body),
     "court.sits": _doubt_court,
     "court.read": _doubt_court,
@@ -4994,6 +5014,13 @@ def _court_word(world: Any, port: Any, what: str, rest: str) -> tuple[str, dict[
     if not P.is_prize(prize) and not (P.record_of(prize) or {}).get("recaptor"):
         raise WorldOrderError(f"The {prize.name} is no prize; the court has nothing to sentence.")
     override = "condemned" if what.endswith("condemns") else "restored"
+    # the sentence is done to the prize herself, and to her captor's prize money
+    _touch(
+        world,
+        "port.court",
+        ships=[str(prize.id), str((P.record_of(prize) or {}).get("captor") or "")],
+        stance=what,
+    )
     account = PC.sentence(root, prize, port, override=override, by="the director")
     words = f"{PC.court_name(port, False)} {override.replace('ed', 's')} the {prize.name}"
     return words, {
@@ -5546,6 +5573,17 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "port <id>: <closed to | open to> <nation>; port <id>: price of <good> <pounds>",
         ("port brest: closed to Britain", "port falmouth: price of tin 130"),
         "a port's stance or a price; a price moved beyond the market's swing, doubted",
+    ),
+    Form(
+        "port.court",
+        "port",
+        "port <id>: the court condemns | restores the <prize>",
+        ("port falmouth: the court condemns the Harpy",),
+        "the prize court's sentence on a prize lying at the port, by the director's word: "
+        "condemned to her captors or restored to her owners, the account in the prize's "
+        "record; refused for a ship that is no prize, doubted where the court's own rule "
+        "gives otherwise",
+        reach=(PLAYERS_SHIP, ANOTHER_SHIP),
     ),
     Form(
         "mark",

@@ -543,3 +543,66 @@ def test_a_change_to_the_directors_station_brief_puts_no_consent_question_again(
     assert consent.changed_sections(record, "runner") == []
     assert "director" not in " ".join(consent.RE_ASK_SECTIONS).lower()
     assert D.DIRECTOR_BRIEF not in text and "You are the director" not in text
+
+
+# ---------------------------------------------------------------------------
+# The independent reader's three (2026-11-16): each a spelling that got past hands-off
+# ---------------------------------------------------------------------------
+
+
+def test_hands_off_refuses_a_man_of_the_muster_spoken_as_and_her_people_ashore():
+    """A man of the muster named by his trade is drawn into her people only when he speaks:
+    judged before that, he had no hull to read and was taken for the world's. He is of her
+    company and aboard her. And one of her people gone ashore is hers still: he is not
+    spoken as, nor moved, under hands-off."""
+    w, door = at_the_door(HANDS_OFF)
+    for who in ("the cook", "the cooper", "the first lieutenant", "the hands"):
+        said = door(f'say as {who}: "Duff tonight, lads."')
+        assert said.startswith("Refused"), (who, said)
+        assert "outside the brief" not in said or "the player's own ship" in said, (who, said)
+    assert not [e for e in w.log.all() if e.kind == WO.PERSON_SPOKE_KIND]
+    # a person made ashore by the director is the world's, and speaks
+    assert entered(door, 'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest')
+    assert not door('say as Mr Fox: "A fine morning."').startswith("Refused, outside the brief")
+    # one of hers, put ashore by the owner, is hers wherever he is
+    w.world_order('person: "Mr Pascoe" goes ashore', source="the owner")
+    assert not w.people.find("Mr Pascoe").aboard
+    for text in ('say as Mr Pascoe: "Ahoy."', 'person: "Mr Pascoe" comes aboard'):
+        said = door(text)
+        assert said.startswith("Refused, outside the brief:"), (text, said)
+        assert "the player's own ship" in said
+
+
+def test_hands_off_refuses_the_prize_court_s_sentence_on_the_players_own_ship():
+    """`port <id>: the court condemns the <prize>` is done to the prize: where she is the
+    player's own ship (struck by the owner's order, which meets no brief), the director's
+    sentence on her reaches her and is refused; under no limits it is given."""
+    for brief in (HANDS_OFF, FREE):
+        w, door = at_the_door(brief)
+        w.world_order(
+            'ship: a frigate "Gloire" of France at 49 31 N 5 31 W, bound for Brest',
+            source="the owner",
+        )
+        w.world_order('ship "Amazon": struck to the Gloire', source="the owner")
+        assert P.is_prize(w.vessels.find("Amazon"))
+        j = WO.judged(w, WO.parse("port brest: the court condemns the Amazon"))
+        assert j.form.key == "port.court" and WO.PLAYERS_SHIP in j.reaches
+        said = entered(door, "port brest: the court condemns the Amazon")
+        if brief is HANDS_OFF:
+            assert said.startswith("Refused, outside the brief:"), said
+        else:
+            assert not said.startswith("Refused"), said
+
+
+def test_hands_off_holds_while_the_player_is_in_his_ships_boat():
+    """With the player down in the launch the drivers follow the boat; his ship named at an
+    `aboard` order's head is his ship still, and so is the boat he is in."""
+    w = hove_to_world()
+    D.set_brief(w, HANDS_OFF, source="the test")
+    h = seat_director(w, [])
+    assert w.submit("go to the launch").kind == "person.aboard"
+    for text in ("aboard the Amazon: a cask found stove", "aboard: a cask found stove"):
+        said = T.world_order(h.world, DIRECTOR, text)
+        assert said.startswith("Refused"), (text, said)
+        if "outside the brief" in said:
+            assert "hands off the player's own ship" in said

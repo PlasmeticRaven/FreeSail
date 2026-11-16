@@ -22171,7 +22171,7 @@ def test_truth_7_426_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in
 
 def test_truth_7_427_the_one_table_of_the_forms_is_the_channels_and_every_form_is_marked():
     """One table of the world-order forms, kept by the channel and read by the director:
-    42 forms, each with a reach of the five and a harm; twenty-six of them can reach the
+    43 forms, each with a reach of the five and a harm; twenty-seven of them can reach the
     player's own ship, ten his person, three his prompt."""
     from freesail.agents import director as D
     from freesail.world import orders as WO
@@ -22181,9 +22181,9 @@ def test_truth_7_427_the_one_table_of_the_forms_is_the_channels_and_every_form_i
     assert all(f.reach and set(f.reach) <= set(WO.REACHES) for f in forms)
     assert [f.key for f in forms if f.harm == WO.HARM_BY_THE_THING] == ["aboard.found"]
     count = {r: sum(1 for f in forms if r in f.reach) for r in WO.REACHES}
-    assert len(forms) == 42, len(forms)
+    assert len(forms) == 43, len(forms)
     assert (count[WO.PLAYERS_SHIP], count[WO.PLAYERS_PERSON], count[WO.PLAYERS_PROMPT]) == (
-        26,
+        27,
         10,
         3,
     ), count
