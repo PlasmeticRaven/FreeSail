@@ -427,6 +427,14 @@ def _touch(
         _STATE.touched = judgement  # the order's own form: the first a handler names
 
 
+def performed() -> Judged | None:
+    """What the order last performed on this thread was, as its handler named it: the
+    owner's and a scenario's orders are read by the same table as the director's (they
+    meet no brief and no doubt; package 115, part C). None before any, or for an order
+    that was refused before it named a form."""
+    return getattr(_STATE, "touched", None)
+
+
 def _players_own_person(world: Any) -> Any:
     """The player's one person (`knowledge.players_person`), or None where there is none."""
     from freesail.world.knowledge import players_person

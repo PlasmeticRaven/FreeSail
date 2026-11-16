@@ -375,6 +375,8 @@ def test_the_owners_world_order_meets_no_brief_and_no_doubt():
     assert j.form.key == "captain" and j.the_players
     e = w.world_order("captain: intent bound for Plymouth", source="the owner")
     assert e.data["result"] == "done" and "director.refused" not in log_kinds(w)
+    # the channel read the owner's order by the same table as it performed it
+    assert WO.performed().form.key == "captain" and WO.performed().the_players
 
 
 # ---------------------------------------------------------------------------
@@ -443,8 +445,18 @@ def test_every_form_given_to_the_players_own_ship_ends_done_doubted_or_refused(t
         for f in WO.WORLD_ORDER_FORMS:
             for x in f.examples:
                 for text in (_hers(x), f"{_hers(x)} [reason: the story]"):
+                    j = WO.judged(w, WO.parse(text))
                     said = door(text)
                     assert said.startswith(ENDS), (brief, text, said)
+                    if brief is not HANDS_OFF or j is None:
+                        continue
+                    # hands-off refuses each order judged to reach her, his person or his
+                    # prompt (the rule of reach before it, where a station is held), and
+                    # none that the channel judges to come to her from outside
+                    if j.the_players:
+                        assert said.startswith("Refused"), (text, sorted(j.reaches), said)
+                    else:
+                        assert not said.startswith("Refused, outside the brief"), (text, said)
 
 
 def test_a_ship_in_commission_is_not_laid_up_in_ordinary_whoever_asks():
