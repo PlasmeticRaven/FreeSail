@@ -1799,6 +1799,10 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
 DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"
 
 
+class _NotCopied(Exception):
+    """The dry run's copy of the world could not be made: its words are the reason."""
+
+
 _FOLLOW = re.compile(r"^\s*follow\s+(?P<who>\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$", re.I)
 
 
@@ -1830,19 +1834,29 @@ def dry_run(world: Any, text: str) -> str:
     copied: list[Any] = []
 
     def on() -> Any:
-        # the copy the order is judged and tried on; the world itself where it cannot be
-        # copied (the order is then said not to have been tried)
+        # the copy the order is judged and tried on; where the world cannot be copied the
+        # order is neither judged nor tried, and the dry run says so (package 109): the
+        # world itself is never judged on by a dry run
         copied.append(_copy(world))
-        return world if isinstance(copied[0], str) else copied[0]
+        if isinstance(copied[0], str):
+            raise _NotCopied(copied[0])
+        return copied[0]
 
-    stage, why, order, _judgement, free = _read(
-        world,
-        text,
-        acts_used,
-        acts_allowed,
-        held_now,
-        on=None if followed is not None else on,  # `follow` is read, never made
-    )
+    try:
+        stage, why, order, _judgement, free = _read(
+            world,
+            text,
+            acts_used,
+            acts_allowed,
+            held_now,
+            on=None if followed is not None else on,  # `follow` is read, never made
+        )
+    except _NotCopied as e:
+        return (
+            f"{DRY_RUN_HEAD} it could not be tried: {str(e).removeprefix(NOT_TRIED)}. What "
+            "it would do is not known until it is entered; entered, it is judged as every "
+            "order is, and its answer says what it did."
+        )
     if stage == NO_FORM:
         return (
             f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}. "

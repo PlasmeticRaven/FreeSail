@@ -343,6 +343,7 @@ def _touch(
     body: str = "",
     enemy: tuple[str, str] | None = None,
     thing: str = "",
+    aboard: Any = None,
     **facts: Any,
 ) -> None:
     """A handler says what it is about to do, once every name is resolved and before
@@ -423,7 +424,9 @@ def _touch(
         frozenset(reaches),
         harm or (form.harm if form.harm != HARM_BY_THE_THING else HARM_NONE),
         " and ".join(said),
-        hull,
+        # the hull an `aboard` order was resolved aboard, which the doubt reads her names
+        # by, whether or not the order reaches her (a thing put ashore from her words)
+        aboard if aboard is not None else hull,
         body,
         enemy,
         weight,
@@ -3560,6 +3563,7 @@ def _aboard_thing(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         hull=world if here else None,
         persons=[keeper] if keeper is not None and not here else (),
         body=body,
+        aboard=world,
     )
     was = TH.where_words(world, thing, keeper_where=False) if moved else ""
     TH.put(thing, where)
