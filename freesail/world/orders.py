@@ -792,8 +792,14 @@ def _seat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
     m = seats._SEAT.match(" ".join(str(body).split()))
     if m is not None:
-        # the seat's own reading of whom it is for (`seats._resolve`): "" is this ship
-        target = seats._resolve(world, m.group("who"))
+        # the seat's own reading of whom it is for (`seats._resolve`): "" is this ship. One
+        # it cannot read is `hold`'s to refuse below, in its own order of refusals (the
+        # consent record before the ship), and is judged as this ship's until then: what
+        # cannot be told to leave her alone is not said to
+        try:
+            target = seats._resolve(world, m.group("who"))
+        except WorldOrderError:
+            target = {}
         _touch(world, "seat", ships=[str(target.get("ship") or "") or _hull_id(world)])
     return seats.hold(world, body)
 
@@ -810,7 +816,10 @@ def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         if vessel is not None:
             _touch(world, "unseat", ships=[str(vessel.id)])
         else:
-            target = seats._resolve(world, who)
+            try:
+                target = seats._resolve(world, who)
+            except WorldOrderError:
+                target = {}  # `give_up` answers it below; judged as this ship's until then
             _touch(world, "unseat", ships=[str(target.get("ship") or "") or _hull_id(world)])
     return seats.give_up(world, body)
 
