@@ -584,6 +584,13 @@ def steer(ship: Ship, dt: float) -> float:
                 wanted = math.copysign(max_angle, -err)
         wanted = max(-max_angle, min(max_angle, wanted))
     rate = units.deg_to_rad(spec.rate_deg_s) * dt
+    if ship.extra.get("helm_by_tackles"):
+        # steered by the relieving tackles (package 116, card 5): the helm's orders passed
+        # below and the tiller hauled over by hand, the wheel's rate by the share the
+        # tackles' own file gives (data/evolutions/relieving_tackles.yaml,
+        # `helm_rate_share`; the script writes it here as they are rove). The helmsman's
+        # rate alone: no equation of the hull is touched.
+        rate *= float(ship.extra.get("helm_rate_share", 1.0))
     move = max(-rate, min(rate, wanted - d.rudder))
     return d.rudder + move
 

@@ -2414,6 +2414,11 @@ def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
         raise OrderError(
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
+    if scripts.helm_lost(ship):
+        # the wheel shot away and no relieving tackles rove (package 116, card 5): a course,
+        # full and by and the conning words are refused in the world's words, which say why
+        # and what to order; before, each was logged as carried out and she did not answer
+        raise OrderError(scripts.HELM_LOST_WORDS)
     if lying_to(ship) and (
         verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
     ):

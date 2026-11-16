@@ -275,6 +275,8 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
     if verb == "rig the relieving tackles":
         # `belay the relieving tackles` (the lead's reading of part D at 60af48e, item 6)
         return {"relieving_tackles"}
+    if verb == "repair the wheel":
+        return {"repair_wheel"}  # `belay the wheel` (package 116): the work by its own name
     if verb == "send the boat":
         return {"send_boat"}  # `belay the boat` (package 109): the port's boat, on her errand
     from freesail.orders import ground_tackle  # local import: it imports the verbs

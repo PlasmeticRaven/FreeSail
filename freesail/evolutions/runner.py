@@ -100,10 +100,12 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
+    HELM_LOST_WORDS,
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
     _world_of,
+    helm_lost,
     keep_full_and_by,
     keep_lying_to,
     lying_to_hands_off,
@@ -845,6 +847,13 @@ class Runner:
         (`Script.standing`: what the world can make false while the work is held and its own
         going never does; the whole-change review of 80e703c7, sailing-2: a mast carried away
         while her cutting away lay held was cut away again)."""
+        if not begun and inst.evo.id in HELM_MANOEUVRES - {"heave_to"} and helm_lost(ship):
+            # the wheel shot away and no relieving tackles rove (package 116, card 5): a
+            # manoeuvre that drives the helm is refused as it would begin, whoever gave it
+            # (the player, a standing order, the game's own captain); heave to stands, done
+            # by her sails. Before, a tack began and missed stays with the rudder held.
+            inst.done_already = False
+            return HELM_LOST_WORDS
         env = self._env(ship, inst)
         inst.done_already = False
         for cond in conditions:

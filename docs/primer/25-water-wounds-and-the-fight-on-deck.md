@@ -62,7 +62,14 @@ they lived.
     rig a jury mast         a spare topmast in the stump, two fifths of the mast
     rig the relieving tackles
                             the wheel shot away: two tackles hooked to the tiller below
-                            and manned, five minutes; the helm answers again
+                            and manned, five minutes; the helm answers again, at half
+                            the wheel's speed
+    repair the wheel        new wheel-ropes rove and the wheel made good, half an hour;
+                            she steers by the wheel again and the tackles are cast off
+
+With the wheel shot away and no tackles rove she has no helm: a course, the conning words,
+a tack or a wear are refused and say why. The sails still answer, and `heave to` brings her
+to by them.
 
 `the damage` names everything: the lines parted, running and standing, with the order that
 mends each, the sprung spars, the jury masts, the holed sails, the shot holes by place and
