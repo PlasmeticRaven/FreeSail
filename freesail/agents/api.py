@@ -848,7 +848,9 @@ class ApiModel:
                 )
                 return None
             self.finish = str(message.stop_reason or "")
-            if self.finish == "refusal":
+            # what the model wrote before the safeguards stopped it is read for the token
+            # first (package 117): holding it, the reply is passed on as the model's
+            if self.finish == "refusal" and opt_out_in(self.parse(message)) is None:
                 details = getattr(message, "stop_details", None)
                 category = getattr(details, "category", None) if details is not None else None
                 self.cut_off = (
@@ -857,7 +859,7 @@ class ApiModel:
                     + "; the turn ended with nothing done, and it is not asked again"
                 )
                 self._tell(f"{self.cut_off[0].upper()}{self.cut_off[1:]}.")
-                return Reply()
+                return Reply(raw=self.parse(message).raw)
             reply = self.parse(message)
             token = opt_out_in(reply) is not None  # the model's, cut off or not (package 117)
             served = {

@@ -149,6 +149,7 @@ import dataclasses
 import json
 import re
 import time
+import weakref
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any
@@ -476,6 +477,8 @@ HEARD_WORDS = {
     True: "answer(text) answers a question put to you; submit_order('say ...'), 'say to the "
     "<station> ...' or 'hail ...' says it in the world",
     False: "answer(text) answers a question put to you; this station has no voice on deck",
+    "director": "answer(text) answers a question put to you; your words reach the world "
+    "through world orders alone ('say as <person>: <his words>')",
 }
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
@@ -1231,12 +1234,29 @@ class Harness:
         station brief as it stands now (package 37g): the officer's and the watcher's
         words say how the deck goes to and fro and the three ways of stopping, and the
         words a checkpoint or a save of an earlier build holds say the old rule. A
-        station whose brief is not one of the two stock briefs is left as it is."""
+        station whose brief is not one of the stock briefs is left as it is. Since package
+        117 the officers of every number, the passenger and a person's voice are refreshed
+        too, so that a name an older brief held is not sent in the operator's voice."""
         import dataclasses
 
         st = self.station
-        if st.name == OFFICER and st.domain is not None:
+        try:  # the kind the ship binds the station by (package 53: 'second officer')
+            stations = getattr(self.world, "stations", None)
+            kind = stations.kind_of(st.name) if stations is not None else None
+        except Exception:  # noqa: BLE001
+            kind = None
+        from freesail.agents.agent import PASSENGER, PASSENGER_BRIEF, VISITOR_DOMAIN
+
+        if (st.name == OFFICER or kind == OFFICER) and st.domain is not None:
+            # the person by the code's words, the names in the situation (package 117)
             brief = OFFICER_BRIEF.format(person=PERSON_WORDS)
+        elif kind == PASSENGER and st.domain is not None and st.domain != VISITOR_DOMAIN:
+            from freesail.world.seats import VOICE_BRIEF, voice_where
+
+            if voice_where(self.world, st.name):  # a person's voice (package 52)
+                brief = VOICE_BRIEF.format(person=PERSON_WORDS, where="where the situation says")
+            else:
+                brief = PASSENGER_BRIEF.format(person=PERSON_WORDS)
         elif st.name == CAPTAIN and st.domain is not None:
             brief = CAPTAIN_BRIEF.format(person=PERSON_WORDS)
         elif st.name == MASTER and st.domain is not None:
@@ -3114,8 +3134,7 @@ class Harness:
                 f"answer was owed ({owed}); {number_words(a.empty_count)} in a row.",
                 kind="agent.empty_reply",
             )
-            heard = HEARD_WORDS[self.station.has_authority]
-            a.notices.append(NOTE_NOT_HEARD.format(owed=owed, heard=heard))
+            a.notices.append(NOTE_NOT_HEARD.format(owed=owed, heard=self._heard_words()))
         else:
             self.journal.append(
                 self.world,
@@ -3215,8 +3234,7 @@ class Harness:
                     f"{n} replies in a row where an answer was owed and nothing was said in the "
                     f"world ({noted} of them words written into the journal)"
                 )
-                heard = HEARD_WORDS[self.station.has_authority]
-                nudge = NUDGE_NOTED.format(n=n, token=OPT_OUT_TOKEN, heard=heard)
+                nudge = NUDGE_NOTED.format(n=n, token=OPT_OUT_TOKEN, heard=self._heard_words())
             else:
                 seen = f"{n} empty replies in a row where an answer was owed"
                 nudge = NUDGE_EMPTY.format(n=n, token=OPT_OUT_TOKEN)
@@ -4015,6 +4033,12 @@ class Harness:
             return
         self._handover_asked_at = size
         self.agent.notices.append(HANDOVER_ASK.format(size=size, budget=budget))
+
+    def _heard_words(self) -> str:
+        """The road to being heard at this station (package 117; `HEARD_WORDS`)."""
+        if self._is_directors:
+            return HEARD_WORDS["director"]
+        return HEARD_WORDS[self.station.has_authority]
 
     def _brief_end(self, start: int) -> int:
         """The index after the brief that begins at `start`: after the situation turn that
@@ -4951,14 +4975,18 @@ class Harness:
         """The game saved, by the saver the door gave, else by the game's own default
         (package 117: a station restored from a save or a checkpoint, or driven, had none,
         and "the game is saved" was said when nothing was written; the agent API's desk
-        gives the World its saves, `remote.Desk.mark`); a World with neither is saved in
-        memory only, as a test's is."""
+        gives the World its saves, `remote.Desk.mark`, kept beside the World in
+        `DEFAULT_SAVERS` and never on it, so that a checkpoint holds no desk); a World with
+        neither is saved in memory only, as a test's is."""
         if self.save_fn is not None:
             self.last_save = self.save_fn(self.world, reason)
             return
         from freesail.world.hulls import world_of
 
-        default = getattr(world_of(self.world), "default_saver", None)
+        try:
+            default = DEFAULT_SAVERS.get(world_of(self.world))
+        except TypeError:  # a handle that cannot be weakly held
+            default = None
         if default is not None:
             self.last_save = default(self.world, reason)
         else:
@@ -5279,6 +5307,14 @@ def _leavings(h: Harness) -> list[Leaving]:
             )
         )
     return out
+
+
+# The game's default saver by its World (package 117; `Harness._save`): given by the agent
+# API's desk (`remote.Desk.mark`), held weakly beside the World and never on it, since a
+# checkpoint pickles the World's own fields whole
+DEFAULT_SAVERS: weakref.WeakKeyDictionary[Any, Callable[[Any, str], str]] = (
+    weakref.WeakKeyDictionary()
+)
 
 
 def _every_station(world: Any) -> list[tuple[str, Any]]:

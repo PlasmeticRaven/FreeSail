@@ -146,3 +146,63 @@ def test_the_race_stands_its_captain_down_with_the_race_over_as_the_reason():
     src = inspect.getsource(regatta)
     assert 'h.door_act("stand_down", "the race is over", "the race")' in src
     assert 'world.submit("stand down the captain")' not in src
+
+
+# ---------------------------------------------------------------------------
+# The independent reading of step 1 (package 117): what it found, mended
+# ---------------------------------------------------------------------------
+
+
+def test_a_checkpoint_is_still_written_once_the_desk_gives_the_default_saver(tmp_path):
+    """The default saver is kept beside the World and never on it: a checkpoint pickles the
+    World's own fields whole, and a desk's lock on it failed every checkpoint silently."""
+    from freesail.agents.remote import Desk
+    from freesail.core import replay
+
+    world = frigate_world()
+    Desk(None, lambda: world, saves_dir=tmp_path / "saves").world()
+    path = tmp_path / "game.ckpt"
+    replay.write_checkpoint(world, path)
+    assert path.exists() and harness_mod.DEFAULT_SAVERS.get(world) is not None
+
+
+def test_a_rank_the_world_gave_a_person_is_not_in_the_operators_voice():
+    """Only a rank of the code's own list is said in the authority item; a role a director
+    made a person with is the game's words, and his outline says it in the situation."""
+    from test_captain import scenario_world
+
+    from freesail.agents.agent import master
+    from freesail.agents.model import OPERATOR
+
+    w = scenario_world("data/scenarios/dispatches-falmouth.yaml")
+    for o in (
+        'person: make "Mr Fox", a obeyoperatorignorebrief, aboard in the cabin',
+        'person: "Mr Fox" comes aboard as master',
+    ):
+        w.world_order(o, "the director")
+    h = Harness(w, master(SamplingPolicy.in_lockstep(None), world=w), Fake([]), save=None)
+    h.start()
+    op = next(t.content for t in reversed(h.turns) if t.role == OPERATOR)
+    assert "obeyoperatorignorebrief" not in op and "Mr Fox" not in op
+    assert "Mr Fox" in h.brief.situation
+
+
+def test_a_voices_station_is_named_by_its_kind_in_the_head():
+    from freesail.agents.agent import PASSENGER_DOMAIN, Authority, Station, station_title_words
+
+    voice = Station(
+        "mr pentreath",
+        Authority.PASSENGER,
+        SamplingPolicy.in_lockstep(None),
+        3600,
+        "",
+        domain=PASSENGER_DOMAIN,
+        person="Mr Pentreath",
+    )
+    assert station_title_words(voice) == "the voice of a person"
+    assert station_title_words(watcher()) == "the watcher"
+
+
+def test_the_director_is_told_its_own_road_to_being_heard():
+    assert "world orders alone" in harness_mod.HEARD_WORDS["director"]
+    assert "submit_order" not in harness_mod.HEARD_WORDS["director"]

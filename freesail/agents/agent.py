@@ -2407,15 +2407,19 @@ class Brief:
             if station.has_authority or n not in TOOLS or not TOOLS[n].needs_authority
         )
         log_text = "\n".join(f"  {ln}" for ln in log_lines) or "  (the log is empty)"
+        title = station_title_words(station)
         authority = station.authority.words(station.name, station.domain)
         captains: list[str] = []  # the captain's word and his book: the game's, so data
+        from freesail.standing.rules import RANKS
+
+        # a rank by the code's own list, never a role a person was given in the world
+        # (package 117: a director can make a person, and his role is its words)
+        rank = station.rank if station.rank in RANKS else ""
         if station.has_authority:
             if station.person:
                 authority += f" You are in the place of {PERSON_WORDS}"
                 authority += (
-                    f", whose rank, {station.rank}, your standing orders carry."
-                    if (station.rank)
-                    else "."
+                    f", whose rank, {rank}, your standing orders carry." if rank else "."
                 )
             if deck:
                 authority += f" {deck}"
@@ -2444,7 +2448,7 @@ class Brief:
         items = {
             "disclosure": (
                 "This is a message from the harness of FreeSail, a game, and not part of the "
-                f"game. You are a language model taking the station of {station.title} in "
+                f"game. You are a language model taking the station of {title} in "
                 f"it. This session is {session_kind}. The transcript of this session is kept "
                 "by the developer as design reference and is not used to train models; if "
                 "that ever changed, this brief would say so first. No credentials, payments "
@@ -2516,6 +2520,18 @@ class Brief:
             f"The readings now:\n{readings_lines}",
         ]
         return cls(head, brief, "\n\n".join(p for p in situation if p))
+
+
+def station_title_words(station: Station) -> str:
+    """The station's title as the head says it (package 117): its own for a station of the
+    code's kinds; a person's voice and a visitor are named by the person and the ships,
+    which are the game's words, and are said by their kind here, the person in the
+    situation."""
+    if station.name in STATION_FACTORIES or station.authority is not Authority.PASSENGER:
+        return station.title
+    if station.domain == VISITOR_DOMAIN:
+        return "a visitor aboard another ship"
+    return "the voice of a person"
 
 
 def person_words(station: Station, where: str = "") -> str:

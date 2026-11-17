@@ -82,7 +82,9 @@ or as the model server reports it, the turns and the replies, and nothing else.
 
 from __future__ import annotations
 
+import dataclasses
 import datetime as dt
+import json
 import secrets
 import threading
 import time
@@ -468,8 +470,8 @@ class Desk:
     def mark(self, world: Any) -> None:
         """Give a World the desk's default saver, where it has none (`Harness._save`)."""
         root = world_of(world)
-        if root is not None and getattr(root, "default_saver", None) is None:
-            root.default_saver = self._default_save
+        if root is not None and root not in harness_mod.DEFAULT_SAVERS:
+            harness_mod.DEFAULT_SAVERS[root] = self._default_save
 
     def _default_save(self, world: Any, reason: str) -> str:
         from freesail.core import replay as replay_mod
@@ -941,10 +943,18 @@ class Desk:
         in the consent conversation the empty reply is taken as before."""
         reply = Reply(
             str(body.get("text") or ""),
-            tuple(ToolCall.from_dict(c) for c in body.get("calls") or []),
+            tuple(_call_of(c) for c in body.get("calls") or [] if isinstance(c, dict)),
             body.get("raw") if body.get("raw") is None else str(body.get("raw")),
             served_tokens_of(body.get("served_tokens")),
         )
+        if opt_out_in(reply) is None:
+            # every other field the door sent of the model's is read for the token too
+            # (package 117): a call's fields beyond its name and args, a field of the body
+            # the desk does not take
+            sent = {k: v for k, v in body.items() if k not in DOOR_FIELDS}
+            whole = json.dumps(sent, ensure_ascii=False, default=str)
+            if _holds_token(whole):
+                reply = dataclasses.replace(reply, raw=f"{reply.raw or ''}\n{whole}".strip())
         cut = " ".join(str(body.get("cut_off") or "").split())
         with self.lock:
             seat = self._seat(name, body.get("key"), body.get("ship"))
@@ -1570,6 +1580,22 @@ def _station_line(d: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 # The door's half
 # ---------------------------------------------------------------------------
+
+
+# The fields of a reply's body that are the door's and not the model's (package 117)
+DOOR_FIELDS = ("key", "since", "ship", "served_tokens", "cut_off")
+
+
+def _holds_token(text: str) -> bool:
+    """Whether a text holds the token, by the one scan."""
+    return opt_out_in(Reply(raw=text)) is not None
+
+
+def _call_of(d: dict[str, Any]) -> ToolCall:
+    """A call from a reply's body: its name and its args, args that are not an object
+    given as none (the body is read for the token whole beside it)."""
+    args = d.get("args")
+    return ToolCall(str(d.get("name") or ""), dict(args) if isinstance(args, dict) else {})
 
 
 def turn_from_dict(d: dict[str, Any]) -> Turn:

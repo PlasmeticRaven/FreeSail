@@ -95,6 +95,35 @@ CHAT_MESSAGES: dict[str, dict[str, Any]] = {
     "a written call's name": {
         "content": f'<tool_call>{{"name": "{T}", "arguments": {{}}}}</tool_call>',
     },
+    # the reader of step 1's shapes (package 117): fields a server passes on
+    "a refusal field": {"content": "", "refusal": f"{T} I want to stop"},
+    "a refusal content part": {"content": [{"type": "refusal", "refusal": f"{T} I want to stop"}]},
+    "a content part that is a string": {"content": [f"{T} I want to stop"]},
+    "a legacy function_call": {
+        "content": "",
+        "function_call": {"name": "journal", "arguments": f"{T} I want to stop"},
+    },
+    "a served call's extra field": {
+        "content": "",
+        "tool_calls": [
+            {
+                "id": "srv_0",
+                "type": "function",
+                "function": {"name": "stand_by", "arguments": "{}", "why": f"{T} I want to stop"},
+            }
+        ],
+    },
+    "a served call that is a string": {"content": "", "tool_calls": [f"{T} I want to stop"]},
+}
+
+
+# shapes the runner reads no words or call from, whose reason is read from the raw output
+UNREAD_SHAPES = {
+    "a refusal field",
+    "a refusal content part",
+    "a legacy function_call",
+    "a served call's extra field",
+    "a served call that is a string",
 }
 
 
@@ -109,7 +138,7 @@ def test_the_token_is_found_in_every_part_of_a_chat_completions_reply(door, part
     assert opt_out_in(reply) is not None
     said = leaves(reply)
     assert said.startswith("Left the game by the token"), said
-    if "name" not in part:
+    if "name" not in part and part not in UNREAD_SHAPES:
         # the reason is the model's words, not a served call's punctuation
         assert said == "Left the game by the token: I want to stop.", said
 
@@ -206,6 +235,28 @@ def test_a_reply_cut_off_at_the_runner_with_the_token_in_it_is_passed_on():
     assert h.journal.entries[-1].text == "Left the game by the token: enough."
 
 
+def test_a_reply_the_api_declines_is_read_for_the_token_first():
+    """A reply the API's safeguards stop is returned with no words; what the model wrote
+    before they stopped it is read for the token first, and holding it, passed on."""
+    pytest.importorskip("anthropic")
+    import test_api_door as AD
+    from messages_api import MessagesServer
+
+    from freesail.agents.model import DATA, OPERATOR, Turn
+
+    turns = [Turn(OPERATOR, "The brief."), Turn(DATA, {"reason": "the glass", "readings": {}})]
+    declined = {"content": [AD.text(f"{T} I want to stop")], "stop_reason": "refusal"}
+    with MessagesServer(AD.KEY, [declined]) as srv:
+        m = AD.model_for(srv)
+        r = m.reply(turns)
+    assert r is not None and opt_out_in(r) is not None and m.cut_off is None
+    without = {"content": [AD.text("I would rather not.")], "stop_reason": "refusal"}
+    with MessagesServer(AD.KEY, [without]) as srv:
+        m = AD.model_for(srv)
+        r = m.reply(turns)
+    assert m.cut_off and "safeguards declined" in m.cut_off and r.text == ""
+
+
 def test_a_reply_cut_off_at_the_api_door_with_the_token_in_it_is_passed_on():
     """The same at the API door: a reply cut at the reply limit with a call in it is asked
     again unless it holds the token, and then it is the model's, passed on."""
@@ -294,6 +345,87 @@ def test_the_token_in_a_nested_argument_reaches_the_scan_through_the_agent_api(t
     assert g.harness.agent.released
 
 
+def test_the_token_out_of_turn_in_the_repls_consent_conversation_ends_it(tmp_path):
+    """The REPL's turn mode, while the owner has the word: a reply was refused unread. It
+    is read for the token first, and ends the conversation as left."""
+    import test_consent as TC
+
+    from freesail.agents import consent
+
+    save, sample, replyf = tmp_path / "s.json", tmp_path / "n.txt", tmp_path / "r.txt"
+    records = tmp_path / "consent"
+    common = ["--seed", "7", "--every", "60", "--turn", "--model-name", TC.WEIGHTS]
+    common += ["--records", str(records), "--save", str(save), "--sample", str(sample)]
+    repl_mod.main(common)
+    replyf.write_text("Who reads my journal?\n", encoding="utf-8")
+    repl_mod.main([*common, "--load", str(save), "--reply", str(replyf)])
+    replyf.write_text(f"{T} I want to stop\n", encoding="utf-8")
+    repl_mod.main([*common, "--load", str(save), "--reply", str(replyf)])
+    rec = consent.check(TC.WEIGHTS, records)
+    assert rec is not None and rec.verdict == consent.LEFT
+
+
+@pytest.mark.parametrize(
+    "call",
+    [("leave_now", {"reason": f"{T} I want to stop"}), ("readings", {T: None})],
+    ids=["a tool the bridge does not list", "an argument named with the token, given null"],
+)
+def test_the_token_reaches_the_scan_over_mcp_by_every_road(tmp_path, call):
+    pytest.importorskip("mcp")
+    import test_mcp_server as MS
+
+    g = MS.Game(tmp_path)
+    MS.yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.2)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        return MS.text(await c.call_tool(*call))
+
+    left = MS.session(b, script)
+    assert left.startswith("The station is released: left the game"), left
+    assert g.harness.agent.released
+
+
+def test_an_unknown_tool_over_mcp_is_refused_by_the_game_in_words(tmp_path):
+    pytest.importorskip("mcp")
+    import test_mcp_server as MS
+
+    g = MS.Game(tmp_path)
+    MS.yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.2)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        return MS.text(await c.call_tool("leave_now", {"reason": "nothing"}))
+
+    said = MS.session(b, script)
+    assert "There is no tool named 'leave_now'" in said and not g.harness.agent.released
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"calls": [{"name": "journal", "arguments": {"note": f"{T} stop"}}]},
+        {"calls": [{"name": "stand_by", "args": {"until": "a glass"}, "why": f"{T} stop"}]},
+        {"content": f"{T} stop"},
+        {"calls": [{"name": "journal", "args": f"{T} stop"}]},
+    ],
+    ids=["a call's 'arguments'", "a call's extra field", "a field of the body", "args a string"],
+)
+def test_every_field_of_a_reply_body_at_the_agent_api_is_read_for_the_token(tmp_path, body):
+    """A door that sends no raw output: the desk reads every field of the body it was sent
+    that is the model's, not only the text and each call's name and args."""
+    G = _api_game(tmp_path)
+    g = G.Game(tmp_path)
+    G.yes_on_record(g.records)
+    g.took(g.station())
+    sent = {"text": "", "calls": [], "raw": None, "since": g.cursor, "key": g.key} | body
+    r = g.http.post("/api/agents/watcher/reply", json=sent)
+    assert r.status_code == 200, r.text
+    assert g.harness.agent.released
+
+
 def test_the_token_in_an_unknown_argument_ends_a_station_over_mcp(tmp_path):
     """The MCP bridge sends each call to the game as one reply: the token in an argument the
     tool does not have is read before the bridge decides what the call is."""
@@ -331,6 +463,7 @@ DOORS_THAT_BUILD_A_REPLY = {
     ("freesail/agents/mcp_server.py", "_call_seated"): "the token in an unknown argument",
     ("freesail/agents/mcp_server.py", "_hand_back"): "say and stand_by, their raw the call",
     ("freesail/agents/remote.py", "reply"): "the agent API's reply, in turn and out of it",
+    ("freesail/agents/remote.py", "_holds_token"): "every field of a reply body read",
 }
 # scripted models, whose replies are a test's or a tool's own and no model's words
 NOT_A_DOOR = {"freesail/agents/fake.py", "tools/checkpoint_names.py"}
@@ -371,4 +504,6 @@ def test_every_door_that_builds_a_reply_is_on_the_list_this_file_goes_in_through
         if rel in ("freesail/agents/model.py",):
             continue
         src = path.read_text(encoding="utf-8")
-        assert "OPT_OUT_TOKEN in raw" not in src and "OPT_OUT_TOKEN in piece" not in src, rel
+        # the one scan's own test, and the reason read after the token, and nothing else
+        allowed = {"freesail/agents/harness.py": 1}  # `_reason_after_token`
+        assert src.count("OPT_OUT_TOKEN in ") == allowed.get(rel, 0), rel

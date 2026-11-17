@@ -637,6 +637,14 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
         text = Path(args.owner_reply).read_text(encoding="utf-8").strip()
         owner_replies.append(text)
         conv.owner_says(text)
+    elif (
+        conv.outcome is None
+        and args.reply
+        and conv.leave_out_of_turn(parse_reply(Path(args.reply).read_text(encoding="utf-8")))
+    ):
+        # a reply out of turn is read for the token before it is refused (package 117):
+        # it ends the conversation as left, the reply kept in the record
+        pass
     elif args.load and (args.reply or args.owner_reply):
         whose = (
             "the owner's (--owner-reply)"

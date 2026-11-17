@@ -763,8 +763,8 @@ class Bridge:
         the brief not yet read)."""
         from freesail.agents.remote import ASIDE_TOOLS
 
+        raw = _raw_of(name, args)
         args = {k: v for k, v in (args or {}).items() if v is not None}
-        raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
         if (
             name not in ASIDE_TOOLS
             or opt_out_in(Reply(calls=(ToolCall(name, args),), raw=raw)) is not None
@@ -806,8 +806,10 @@ class Bridge:
         call_id: int | None,
         progress: Progress | None,
     ) -> tuple[str, bool]:
+        # raw is the call as the client sent it, a null argument's name included (package
+        # 117); the arguments the game is given leave the nulls out, as before
+        raw = _raw_of(name, args)
         args = {k: v for k, v in (args or {}).items() if v is not None}
-        raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
         token = opt_out_in(Reply(calls=(ToolCall(name, args),), raw=raw)) is not None
         note = ""
         lost = self._take_lost()
@@ -1290,6 +1292,35 @@ RESOURCE_TOPICS: dict[str, str] = {
 }
 
 
+def _raw_of(name: str, args: Any) -> str:
+    """A call as the client sent it, for the token scan: its name and every argument, a
+    null one's name included."""
+    return json.dumps(
+        {"tool": name, "arguments": args or {}}, ensure_ascii=False, sort_keys=True, default=str
+    )
+
+
+class _Server(MCPServer):
+    """The SDK's server, with one thing more (package 117): a call to a tool it does not
+    list is not refused by the SDK before the game sees it, but goes to the game through
+    the bridge as one reply, so that the token in its name or any of its arguments is read
+    first, as at every door; the game then refuses the tool in words."""
+
+    bridge: Bridge
+
+    async def call_tool(self, name: str, arguments: dict[str, Any], context: Any = None) -> Any:
+        if self._tool_manager.get_tool(name) is not None:
+            return await super().call_tool(name, arguments, context)
+        from mcp.types import CallToolResult, TextContent
+
+        bridge = self.bridge
+        call_id = bridge.begin_call()
+        call = functools.partial(bridge.call, name, dict(arguments or {}), None, call_id=call_id)
+        out = await anyio.to_thread.run_sync(call, abandon_on_cancel=True)
+        bridge.delivered(call_id)
+        return CallToolResult(content=[TextContent(type="text", text=str(out))])
+
+
 def build_server(bridge: Bridge) -> MCPServer:
     """The MCP server over a bridge: package 27's tools with their own names and words,
     `say`, the library as resources (read from the game), the brief as a prompt and a
@@ -1311,7 +1342,8 @@ def build_server(bridge: Bridge) -> MCPServer:
         if name in offered
     ]
     mcp_tools.append(_tool(bridge, "say", SAY_DESCRIPTION, SAY_SCHEMA, ["text"]))
-    srv = MCPServer("freesail", instructions=INSTRUCTIONS, tools=mcp_tools)
+    srv = _Server("freesail", instructions=INSTRUCTIONS, tools=mcp_tools)
+    srv.bridge = bridge
 
     @srv.resource(
         "freesail://brief",

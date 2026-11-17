@@ -256,11 +256,11 @@ def test_nothing_real_passes_through_the_harness():
         for word in ("password", "credential", "payment", "card", "email", "address"):
             assert word not in tool.description.lower(), name
             assert all(word not in p for p in tool.params), name
+    situations = [t.content for t in fake.seen[0] if t.role == DATA and "situation" in t.content]
+    assert [set(d) for d in situations] == [{"reason", "situation"}]  # the seating's (117)
     for d in data_turns(fake):
         if "tool_results" in d:
             assert set(d) == {"tool_results"}
-        elif "situation" in d:  # the situation at the seating (package 117)
-            assert set(d) == {"reason", "situation"}
         else:
             # a sample after the first says its readings are the changes (package 31c),
             # and closes with what stands as before (package 58a)

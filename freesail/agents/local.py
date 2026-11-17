@@ -255,6 +255,8 @@ THINKING = re.compile(r"(?s)^\s*<think>.*?(?:</think>|$)")
 
 # A content part a server marks as the model's reasoning, not its words (package 45c).
 REASONING_PARTS = frozenset({"reasoning", "thinking", "reasoning_content"})
+# ...and the fields of a message a server keeps the reasoning in, apart from the reply
+REASONING_FIELDS = ("reasoning_content", "reasoning", "thinking", "reasoning_details")
 
 # A tool call a model writes in its text instead of the API's field (package 45c, the
 # owner's free models at the OpenRouter door): `<tool_call>{...}</tool_call>`, a fenced
@@ -880,12 +882,24 @@ class LocalModel:
         `raw` the content as sent (a call written in it included, whole) and then the
         calls as served, every field of each, so the scan sees every word."""
         content = message.get("content") or ""
+        # every field the model wrote that is not its words or its calls (a refusal, a
+        # content part of another shape, a legacy function_call, a field the server adds),
+        # its reasoning apart left out: kept for the token scan (package 117)
+        others: list[Any] = [
+            v
+            for k, v in message.items()
+            if k not in ("role", "content", "tool_calls", *REASONING_FIELDS) and v
+        ]
         if isinstance(content, list):  # content parts, a model's reasoning parts left out
-            content = "".join(
-                str(p.get("text", ""))
+            parts = [
+                p
                 for p in content
-                if isinstance(p, dict) and str(p.get("type", "text")) not in REASONING_PARTS
+                if not (isinstance(p, dict) and str(p.get("type", "text")) in REASONING_PARTS)
+            ]
+            content = "".join(
+                str(p.get("text", "")) if isinstance(p, dict) else str(p) for p in parts
             )
+            others += [p for p in parts if isinstance(p, dict) and set(p) - {"type", "text"}]
         content = str(content)
         # the content as the server sent it, before any written call is cut out of it:
         # raw keeps it whole, so that a word in any field of a written call is read by the
@@ -898,8 +912,17 @@ class LocalModel:
             content, written = calls_in_text(content)
             for name, args in written:
                 calls.append(ToolCall(name, args))
-        for tc in message.get("tool_calls") or []:
-            fn = tc.get("function") or {}
+        served_calls = message.get("tool_calls") or []
+        if not isinstance(served_calls, list):
+            served_calls = [served_calls]
+        for tc in served_calls:
+            if not isinstance(tc, dict):
+                others.append(tc)  # a call the runner cannot read is read for the token
+                continue
+            fn = tc.get("function") if isinstance(tc.get("function"), dict) else {}
+            others += [v for k, v in tc.items() if k not in ("id", "type", "function") and v]
+            if not isinstance(tc.get("function"), dict) and tc.get("function"):
+                others.append(tc["function"])
             name = str(fn.get("name", ""))
             raw_args = fn.get("arguments")
             if isinstance(raw_args, dict):
@@ -912,10 +935,13 @@ class LocalModel:
                 if not isinstance(args, dict):
                     args = {}
             calls.append(ToolCall(name, dict(args)))
-            served.append({"name": name, "arguments": raw_args})
+            extra = {k: v for k, v in fn.items() if k not in ("name", "arguments")}
+            served.append({"name": name, "arguments": raw_args, **extra})
         raw = sent
         if served:
             raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False, default=str)
+        if others:
+            raw += ("\n" if raw else "") + json.dumps(others, ensure_ascii=False, default=str)
         return Reply(text=content.strip(), calls=tuple(calls), raw=raw)
 
     def _failure(self, words: str, final: bool = False) -> None:
