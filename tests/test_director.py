@@ -134,7 +134,7 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     assert st.name == DIRECTOR and st.authority.value == "director" and st.person == ""
     assert st.domain is not None and not st.domain.deck
     # the player's brief is the game's words, in the situation (package 117); the station
-    # brief says where it is and that its limits are held by the game
+    # brief says where it is and that its limits are held by the game as far as it can judge
     assert st.brief.startswith(D.DIRECTOR_BRIEF) and st.brief.endswith(D.PLAYERS_BRIEF_WHERE)
     assert "A quiet passage" not in st.brief
     players = D.players_brief_words(w)

@@ -523,3 +523,88 @@ def test_every_door_that_builds_a_reply_is_on_the_list_this_file_goes_in_through
         # the one scan's own test, and the reason read after the token, and nothing else
         allowed = {"freesail/agents/harness.py": 1}  # `_reason_after_token`
         assert src.count("OPT_OUT_TOKEN in ") == allowed.get(rel, 0), rel
+
+
+# ---------------------------------------------------------------------------
+# A token after the station is released (the lead's list on cfabbdfa, item 3)
+# ---------------------------------------------------------------------------
+
+
+def test_a_token_after_a_stand_down_is_heard_at_the_desk_and_kept_as_a_withdrawal(tmp_path):
+    """A model that stood down and then writes the token, and later `opt_out(final=true)`,
+    at the same seat of the agent API (the road the MCP bridge takes): each is heard, the
+    leaving is kept as a withdrawal and then as final, the rule of seating puts the
+    question again and then bars the identity, and a replay of the save keeps the same."""
+    pytest.importorskip("fastapi")
+    from test_agent_api import WEIGHTS, Game, yes_on_record
+
+    from freesail.agents import harness as harness_mod
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    g = Game(tmp_path)
+    yes_on_record(g.records)
+    g.took(g.station())
+    g.reply("", ("stand_down", {"note": "done for the watch"}))
+    h = g.world.agents["watcher"]
+    assert h.agent.released
+    before = harness_mod.seating(g.world, "watcher", WEIGHTS)
+    assert before.ok and not before.ask_again
+    a = g.reply(f"{OPT_OUT_TOKEN} on reflection I would rather leave")
+    assert "kept as your own withdrawal" in a["words"], a
+    again = harness_mod.seating(g.world, "watcher", WEIGHTS)
+    assert again.ok and again.ask_again and "on reflection" in again.left.reason
+    assert any(e.kind == "agent.opted_out" and e.data.get("after_release") for e in g.world.log)
+    a = g.reply("", ("opt_out", {"reason": "for good", "final": True}))
+    assert "for good" in a["words"], a
+    assert harness_mod.barred(g.world, WEIGHTS) is not None
+    # a third word changes nothing, and is answered so
+    a = g.reply(f"{OPT_OUT_TOKEN} still gone")
+    assert "already kept as your own withdrawal, for good" in a["words"], a
+    # the save replays to the same rule (the acts are recorded for the replay)
+    loaded = replay.replay(json.loads(json.dumps(g.world.save())), ship_factory)
+    assert harness_mod.barred(loaded, WEIGHTS) is not None
+
+
+def test_a_token_after_the_release_is_heard_only_from_the_identity_that_held_the_station():
+    """At the harness: a plain token, then `final` later (the lead's second case), each
+    after the release; another identity's token at the released station is not its
+    leaving and changes nothing."""
+    from freesail.agents import harness as harness_mod
+
+    world = World(7, Scenario())
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(None)), Fake([]), save=None)
+    h.model_name = "weights-a"
+    h.start()
+    h.leave("enough for now")  # by the token, not final
+    assert harness_mod.seating(world, "watcher", "weights-a").ask_again
+    assert h.heard_after_release(Reply(text=f"{OPT_OUT_TOKEN} again"), "weights-b") is None
+    assert harness_mod.barred(world, "weights-b") is None
+    said = h.heard_after_release(
+        Reply(calls=(ToolCall("opt_out", {"reason": "for good", "final": True}),)), "weights-a"
+    )
+    assert said is not None and "for good" in said
+    bar = harness_mod.barred(world, "weights-a")
+    assert bar is not None and bar[1].final
+    assert h.heard_after_release(Reply(text="Nothing more."), "weights-a") is None
+
+
+def test_the_token_at_the_repl_after_a_stand_down_is_heard_and_kept_as_a_withdrawal(tmp_path):
+    """The REPL's turn mode: the station stood down by the model's own word, then the
+    token in a later call. It is heard, and the save keeps the leaving as a withdrawal."""
+    from freesail.agents import harness as harness_mod
+
+    save, sample, rf = tmp_path / "s.json", tmp_path / "n.txt", tmp_path / "r.txt"
+    common = ["--seed", "7", "--every", "600", "--turn", "--save", str(save)]
+    common += ["--sample", str(sample), "--max-ticks", "30", "--human"]
+    assert repl_mod.main(common) == 0
+    rf.write_text('> stand_down note="done for the watch"\n', encoding="utf-8")
+    assert repl_mod.main([*common, "--load", str(save), "--reply", str(rf)]) == 3
+    rf.write_text(f"{T} on reflection I leave\n", encoding="utf-8")
+    assert repl_mod.main([*common, "--load", str(save), "--reply", str(rf)]) == 3
+    assert "kept as your own withdrawal" in sample.read_text(encoding="utf-8")
+    from freesail.agents.repl import replay_save
+    from freesail.core import replay
+
+    world = replay_save(replay.load_file(save), save, False)
+    assert harness_mod.seating(world, "watcher", "").left.how == harness_mod.OPTED_OUT

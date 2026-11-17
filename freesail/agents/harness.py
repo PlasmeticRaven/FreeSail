@@ -1199,9 +1199,10 @@ class Harness:
         """Where the station's person is, for the situation's first line, where it is worth
         saying (a voice ashore: package 117 moved it out of his station brief); ""
         otherwise."""
+        from freesail.world.movement import visitor_where
         from freesail.world.seats import voice_where
 
-        return voice_where(self.world, self.station.name)
+        return visitor_where(self.world, self.station) or voice_where(self.world, self.station.name)
 
     def journal_words(self) -> str:
         """What a brief for a station taken again, and a sample that gives the deck,
@@ -1247,7 +1248,12 @@ class Harness:
             kind = None
         from freesail.agents.agent import PASSENGER, PASSENGER_BRIEF, VISITOR_DOMAIN
 
-        if (st.name == OFFICER or kind == OFFICER) and st.domain is not None:
+        if st.domain is not None and st.domain == VISITOR_DOMAIN:
+            # a visitor (package 82), the names in the situation (package 117)
+            from freesail.world.movement import VISITOR_BRIEF
+
+            brief = VISITOR_BRIEF.format(person=PERSON_WORDS)
+        elif (st.name == OFFICER or kind == OFFICER) and st.domain is not None:
             # the person by the code's words, the names in the situation (package 117)
             brief = OFFICER_BRIEF.format(person=PERSON_WORDS)
         elif kind == PASSENGER and st.domain is not None and st.domain != VISITOR_DOMAIN:
@@ -3479,7 +3485,12 @@ class Harness:
         to be had for the open turn, which ends with nothing done (`_cut_off`). Each act
         is recorded with the count of inputs before it as well as of orders, and a replay
         makes an act of the tick it is at only between ticks, where a door makes it
-        (`on_between_ticks`)."""
+        (`on_between_ticks`).
+
+        Package 117 adds "left_after" (`reason` the reason, `by` how, `final` as with
+        "leave"): the token or `opt_out` sent at a station already released, by the
+        identity that held it, which is made on a released station like a reseat; its
+        leaving is kept as a withdrawal (`heard_after_release`)."""
         if self.agent.released and act not in ACTS_ON_A_RELEASED_STATION:
             return None
         world = self.world
@@ -3494,7 +3505,7 @@ class Harness:
             "reason": reason,
             "by": by,
         }
-        if final and act == "leave":
+        if final and act in ("leave", "left_after"):
             entry["final"] = True
         if note and act == "shelve":
             entry["note"] = note  # package 45c: recorded only when given
@@ -3506,6 +3517,8 @@ class Harness:
             return self._reseat_now(reason, by)
         if act == "asked":
             return self._asked(reason, by)
+        if act == "left_after":
+            return self._left_after_release(reason, by, final)
         if act == "door":
             return self._door_changed(reason, by)
         if act == "leave":
@@ -3543,6 +3556,97 @@ class Harness:
         self.note(said, kind=CUT_OFF_KIND)
         if self._open is not None and not self.agent.released:
             self._end_sample()
+
+    def heard_after_release(self, reply: Reply, identity: str) -> str | None:
+        """The token or `opt_out` in a reply sent at this station after it was released,
+        by the identity that held it (the lead's list on cfabbdfa, item 3: until package
+        117 a later reply at a released seat was answered unread, so a model that stood
+        down and then wrote the token, or `opt_out(final=true)`, was kept as having stood
+        down and could be seated again in this game without the question). Heard by the
+        one scan and `leaving_of`, and made as a door's act ("left_after") so a replay
+        makes it again: the words to answer with, or None where the reply holds neither,
+        the station is not released, or the identity is another's."""
+        if not self.agent.released or self.conversation or identity != self.model_name:
+            return None
+        piece = opt_out_in(reply)
+        out = next((c for c in reply.calls if c.name == "opt_out"), None)
+        if piece is None and out is None:
+            return None
+        if piece is not None:
+            reason, how, final = leaving_of(reply, piece)
+        else:
+            reason = " ".join(str(out.args.get("reason", "")).split())
+            how, final = "the opt_out tool", tools.truthy(out.args.get("final", False))
+        return self.door_act("left_after", reason, how, final=final)
+
+    def _left_after_release(self, reason: str, how: str, final: bool) -> str:
+        """`heard_after_release` made: the identity's leaving kept as a withdrawal (and
+        final where `final` is set), so that the rule of seating puts the question again
+        before it is seated, or bars it; journaled, in the log, and saved."""
+        a = self.agent
+        identity = self.model_name
+        mine = [x for x in _leavings(self) if x.identity == identity]
+        last = mine[-1] if mine else None
+        if last is not None and last.how == OPTED_OUT and (last.final or not final):
+            return (
+                "The station is released, and your leaving is already kept as your own "
+                "withdrawal" + (", for good." if last.final else ".")
+            )
+        reason = " ".join(reason.split())
+        why = f": {reason}" if reason else ", giving no reason"
+        said = full_stop(f"{how}{why}")
+        who = identity or f"the {self.station.name}'s model"
+        final_words = (
+            f" This was final: {who} is not seated again in this game, at any station, and "
+            "the station stays open to another."
+            if final
+            else ""
+        )
+        self.note(
+            f"Left the game, the station already released, by {said}{final_words}",
+            kind="agent.opted_out",
+        )
+        data: dict[str, Any] = {
+            "reason": reason,
+            "how": how,
+            "leaving": "withdrawal",
+            "after_release": True,
+        }
+        if final:
+            data["final"] = True
+        self.world.record(
+            Severity.NOTABLE,
+            "agent.opted_out",
+            f"The {self.station.name}'s model, its station already released "
+            f"({full_stop(a.released_reason)[:-1]}), has left the game by {said}{final_words} "
+            "Its leaving is kept as a withdrawal.",
+            actor=self.actor,
+            data=data,
+        )
+        a.leavings = (
+            *a.leavings,
+            Leaving(
+                identity,
+                OPTED_OUT,
+                self.world.clock.tick,
+                self.world.clock.stamp(),
+                reason=reason,
+                final=bool(final),
+                by=how,
+            ),
+        )
+        if final:
+            a.no_return = True
+        self._save(f"the {self.station.name}'s model opted out after its release")
+        return (
+            "The station was already released; your leaving is now kept as your own "
+            "withdrawal"
+            + (
+                ", for good: you are not seated again in this game."
+                if final
+                else ": the consent question is put again before you are seated in this game."
+            )
+        )
 
     def _asked(self, identity: str, verdict: str) -> None:
         """The consent question was put again to an identity that had left this station
@@ -3641,7 +3745,7 @@ class Harness:
 
     # -- the deck (package 37; spec M5 §29; as package 37g has it) ------------------------
 
-    def give_deck(self, by: str = "the captain", name: str = "") -> str:
+    def give_deck(self, by: str = "the captain", name: str = "", by_a_model: bool = False) -> str:
         """`you have the deck` (or `Mr <name>, you have the deck`): the officer takes the
         deck. The sample that gives it says the captain's night orders (the book as it
         stands), every grant that stands and his general authority when it does, and
@@ -3669,6 +3773,12 @@ class Harness:
                 f"'{st.person}, you have the deck', or 'you have the deck'."
             )
         if a.paused:
+            if by_a_model:
+                raise OrderError(
+                    PAUSED_TO_A_MODEL.format(
+                        name=st.name, why=a.pause_reason, what="the deck is given him"
+                    )
+                )
             raise OrderError(
                 f"The {st.name} is paused ({a.pause_reason}); say 'resume the {st.name}' "
                 "first, and he has the deck as he held it, or give it when he is resumed."
@@ -4740,6 +4850,12 @@ class Harness:
                 f"There is no {self.station.name} at the station now; {a.released_reason}."
             )
         if a.paused:
+            if _a_model_speaking(speaker):
+                raise OrderError(
+                    PAUSED_TO_A_MODEL.format(
+                        name=self.station.name, why=a.pause_reason, what="a question reaches him"
+                    )
+                )
             raise OrderError(
                 f"The {self.station.name} is paused ({a.pause_reason}); say 'resume the "
                 f"{self.station.name}' first."
@@ -4788,6 +4904,12 @@ class Harness:
                 f"There is no {self.station.name} at the station now; {a.released_reason}."
             )
         if a.paused:
+            if _a_model_speaking(speaker):
+                raise OrderError(
+                    PAUSED_TO_A_MODEL.format(
+                        name=self.station.name, why=a.pause_reason, what="a word reaches him"
+                    )
+                )
             raise OrderError(
                 f"The {self.station.name} is paused ({a.pause_reason}); say 'resume the "
                 f"{self.station.name}' first."
@@ -5174,7 +5296,7 @@ def restore(world: World, data: dict[str, Any], model: Model | None = None) -> l
 CUT_OFF_KIND = "agent.cut_off"
 
 # The acts from outside the loop that are made on a released station (`door_act`).
-ACTS_ON_A_RELEASED_STATION = ("reseat", "asked")
+ACTS_ON_A_RELEASED_STATION = ("reseat", "asked", "left_after")
 
 # The bell a station with the deck is bound by (package 37g, item 4).
 EIGHT_BELLS = "eight bells"
@@ -5556,6 +5678,21 @@ def all_agents(world: Any) -> list[tuple[str, Any, Any]]:
                 words = name if hull is followed else f"{name} of {her}"
             out.append((words, h, hull))
     return out
+
+
+# What a model at its station is told of a paused station it would give the deck, ask or
+# tell (package 117, the lead's list on cfabbdfa, item 2): `resume` is refused from a
+# model's station (`orders.stations.REFUSED_TO_A_MODEL`), so it is not told to say it.
+PAUSED_TO_A_MODEL = (
+    "The {name} is paused ({why}). A pause is answered by the human, at the prompt, and not "
+    "by a station: when the human has resumed the {name}, {what}."
+)
+
+
+def _a_model_speaking(speaker: dict[str, str] | None) -> bool:
+    """Whether a sentence's speaker is a model at its station and not the player at his
+    seat (`orders.stations._a_model_speaks`, said again here to keep the import one way)."""
+    return speaker is not None and not str(speaker.get("words", "")).endswith(", the player")
 
 
 def visitor_words(world: Any, h: Any, host: str) -> str | None:
