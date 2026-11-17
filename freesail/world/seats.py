@@ -747,6 +747,26 @@ VOICE_BRIEF = (
 )
 
 
+def voice_where(world: Any, name: str) -> str:
+    """Where a voice's person is ("aboard", "ashore at Falmouth"), for the situation that
+    follows its brief (package 117); "" for a station that is no person's voice."""
+    stations = getattr(world, "stations", None)
+    try:
+        kind = stations.kind_of(name) if stations is not None else None
+    except Exception:  # noqa: BLE001
+        kind = None
+    if kind != VOICE_KIND:
+        return ""
+    person = stations.holder(name)
+    if person is None or name != _voice_name(person):
+        return ""  # a passenger's own station, or nobody's
+    if getattr(person, "aboard", True):
+        return "aboard"
+    ports = getattr(world, "ports", None)
+    port = ports.ports.get(person.port) if (ports is not None and person.port) else None
+    return f"ashore at {port.name}" if port is not None else "ashore"
+
+
 def voice_station(world: Any, name: str, policy: Any = None) -> Any:
     """The station of a person's voice (`VOICE_KIND`'s domain, bound to him): the
     passenger's station with his brief and his outline in place of the passenger's."""
@@ -755,6 +775,7 @@ def voice_station(world: Any, name: str, policy: Any = None) -> Any:
     from freesail.agents.agent import (
         A_WATCH_S,
         PASSENGER_DOMAIN,
+        PERSON_WORDS,
         Authority,
         Station,
         station_outline,
@@ -766,18 +787,13 @@ def voice_station(world: Any, name: str, policy: Any = None) -> Any:
     base = passenger_station(policy, world=world)
     if person is None:
         return dataclasses.replace(base, name=name)
-    if getattr(person, "aboard", True):
-        where = "aboard"
-    else:
-        ports = getattr(world, "ports", None)
-        port = ports.ports.get(person.port) if (ports is not None and person.port) else None
-        where = f"ashore at {port.name}" if port is not None else "ashore"
     return Station(
         name,
         Authority.PASSENGER,
         policy or base.policy,
         A_WATCH_S,
-        VOICE_BRIEF.format(person=person.name, where=where),
+        # his name and where he is are the game's, in the situation (package 117)
+        VOICE_BRIEF.format(person=PERSON_WORDS, where="where the situation says"),
         domain=PASSENGER_DOMAIN,
         person=person.name,
         rank=getattr(person, "role", "") or "",

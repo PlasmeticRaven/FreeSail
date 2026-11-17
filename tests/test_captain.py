@@ -160,10 +160,11 @@ def test_the_captains_station_has_the_players_whole_surface_and_the_deck_by_righ
 
 
 def test_the_captains_brief_head_says_the_voyage_the_ship_the_people_and_the_book():
-    """Spec M6 §3 (M4 §11 extended): the head's five items in order, and the situation
-    item opening with the voyage: the scenario's name, the intent or the book, the ship
-    and her nation, the people with their outlines; the authority item saying he has the
-    deck and carrying the book he inherits (the rules-based captain's state book)."""
+    """Spec M6 §3 (M4 §11 extended): the head's items in order, and the situation (the
+    first data turn after the brief since package 117) carrying the voyage: the scenario's
+    name, the intent or the book, the ship and her nation, the people with their outlines,
+    and the book he inherits (the rules-based captain's state book); the authority item
+    saying he has the deck."""
     world = scenario_world(INTENT)
     world.run(C.JUDGE_FIRST_S + 1)  # the rules-based captain enters his first state
     words = voyage_words(world)
@@ -175,14 +176,17 @@ def test_the_captains_brief_head_says_the_voyage_the_ship_the_people_and_the_boo
     brief = h.brief
     assert brief is not None
     text = brief.text()
-    assert text.index("This is a message from the harness") < text.index("The voyage: ")
+    situation = brief.situation
+    assert text.startswith("This is a message from the harness") and "The voyage: " in situation
+    assert "The voyage: " not in text
     assert "You have the deck, since" in text
-    assert "The captain's night orders" in text
+    assert "The captain's night orders" in text and "The captain's night orders" in situation
     # the in-port state's book is empty (the buying and the sailing are judgements): the
     # situation says the state through `the captain`, and the intent is in the voyage
-    assert "trade tin from Falmouth to Brest" in text
-    assert "  captain: " in text and "in port" in text
+    assert "trade tin from Falmouth to Brest" in situation
+    assert "  captain: " in situation and "in port" in situation
     assert h.turns[0].role == OPERATOR and h.turns[0].content == text
+    assert h.turns[1].content == brief.situation_turn()
     assert "primer 17" in text and "primer 16" in text
 
 

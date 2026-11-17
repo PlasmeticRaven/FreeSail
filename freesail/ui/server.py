@@ -902,6 +902,9 @@ class Driver:
             director_mod.unlisten(old, self._on_channel)
             director_mod.listen(world, self._on_channel)
             self.world = world
+            desk = getattr(self, "desk", None)
+            if desk is not None:
+                desk.mark(world)  # its default saver (package 117)
             self.lockstep = pace == PACE_LOCKSTEP
             self.pace = Pace(world, pace)
             if ease_on_station is not None:
@@ -1082,6 +1085,9 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
     from freesail.agents.remote import Desk, DeskError
 
     desk = Desk(lock, world, **desk_options)
+    # the World handed to the routes has the desk's default saver at once (package 117): a
+    # station seated in the game's own process that leaves before any request is saved
+    desk.mark(world())
     router = APIRouter()
 
     def call(fn: Callable[..., Any], *args: Any) -> JSONResponse:

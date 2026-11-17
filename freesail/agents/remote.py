@@ -82,7 +82,9 @@ or as the model server reports it, the turns and the replies, and nothing else.
 
 from __future__ import annotations
 
+import dataclasses
 import datetime as dt
+import json
 import secrets
 import threading
 import time
@@ -96,7 +98,6 @@ from freesail.agents import harness as harness_mod
 from freesail.agents.agent import (
     A_GLASS_S,
     CADENCES,
-    OPT_OUT_TOKEN,
     SESSION_PLAY,
     STATION_FACTORIES,
     SamplingPolicy,
@@ -112,6 +113,7 @@ from freesail.agents.model import (
     Reply,
     ToolCall,
     Turn,
+    opt_out_in,
     served_tokens_of,
 )
 from freesail.world.hulls import world_of
@@ -307,6 +309,7 @@ class Seat:
     no_pictures: bool = False
     key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
     left_at: str = ""  # the station this identity left by its own word, when it is asked again
+    left_harness: Any = None  # that station's harness, on whichever hull (package 117)
     phase: str = CONSENT
     conv: consent.Conversation | None = None
     harness: Harness | None = None
@@ -439,7 +442,7 @@ class Desk:
         today: dt.date | None = None,
     ):
         self.lock = lock
-        self.world = world
+        self._world = world
         self.game = game
         self.records_dir = Path(records_dir)
         self.saves_dir = Path(saves_dir)
@@ -455,6 +458,32 @@ class Desk:
         # the regatta's too (package 42b): every station seated here is told it is in a
         # race, whatever session its door asked for (`agent.session_kind_of`)
         self.race = False
+
+    def world(self) -> World:
+        """The driver's World now, marked with the game's default saver (package 117): a
+        station that leaves before any door has taken it up (one restored from a save or a
+        checkpoint, a driven one) saves the game to this desk's saves all the same."""
+        w = self._world()
+        self.mark(w)
+        return w
+
+    def mark(self, world: Any) -> None:
+        """Give a World the desk's default saver, where it has none (`Harness._save`)."""
+        root = world_of(world)
+        if root is not None and root not in harness_mod.DEFAULT_SAVERS:
+            harness_mod.DEFAULT_SAVERS[root] = self._default_save
+
+    def _default_save(self, world: Any, reason: str) -> str:
+        from freesail.core import replay as replay_mod
+
+        path = self.saves_dir / f"freesail-seed{world.seed}-tick{world.clock.tick}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        written = str(replay_mod.save_to_file(world, path))
+        self.say(
+            f"FreeSail: saved to {written} ({reason}); the log's digest is "
+            f"{world.log.digest()[:16]}."
+        )
+        return written
 
     # -- stationing ------------------------------------------------------------------
 
@@ -615,6 +644,7 @@ class Desk:
                 )
                 told = consent.again_words(decided.asked_why)
                 seat.left_at = decided.left_at
+                seat.left_harness = decided.left_harness
             elif kind == consent.CONSENT_KIND:
                 told = consent.why_again(model_name, self.records_dir, door, ask_again)
             if kind and self.on_record_only:
@@ -913,10 +943,18 @@ class Desk:
         in the consent conversation the empty reply is taken as before."""
         reply = Reply(
             str(body.get("text") or ""),
-            tuple(ToolCall.from_dict(c) for c in body.get("calls") or []),
+            tuple(_call_of(c) for c in body.get("calls") or [] if isinstance(c, dict)),
             body.get("raw") if body.get("raw") is None else str(body.get("raw")),
             served_tokens_of(body.get("served_tokens")),
         )
+        if opt_out_in(reply) is None:
+            # every other field the door sent of the model's is read for the token too
+            # (package 117): a call's fields beyond its name and args, a field of the body
+            # the desk does not take
+            sent = {k: v for k, v in body.items() if k not in DOOR_FIELDS}
+            whole = json.dumps(sent, ensure_ascii=False, default=str)
+            if _holds_token(whole):
+                reply = dataclasses.replace(reply, raw=f"{reply.raw or ''}\n{whole}".strip())
         cut = " ".join(str(body.get("cut_off") or "").split())
         with self.lock:
             seat = self._seat(name, body.get("key"), body.get("ship"))
@@ -927,7 +965,7 @@ class Desk:
             if seat.phase == CONSENT:
                 out = self._consent_reply(seat, reply)
             elif cut:
-                out = self._cut_off(seat, cut)
+                out = self._cut_off(seat, cut, reply)
             else:
                 out = self._station_reply(seat, reply)
             self.changed()
@@ -937,6 +975,11 @@ class Desk:
         conv = seat.conv
         assert conv is not None
         if conv.harness.open_sample is None:
+            # the token first, here too (package 117): a reply that holds it ends the
+            # conversation as left, before the owner's turn refuses anything
+            if conv.leave_out_of_turn(reply):
+                self._after_consent(seat)
+                return {"out_of_turn": True}
             if conv.waiting == consent.OWNER_TURN:
                 return {
                     "words": (
@@ -981,10 +1024,12 @@ class Desk:
             # the question was put again after an opt-out (package 37g, item 13): the
             # answer is kept beside the leaving, so that a no is held to and the question
             # is not put again at each start
-            left = seat.world.agents.get(seat.left_at) if seat.world is not None else None
+            left = seat.left_harness  # on whichever hull it was (package 117)
+            if left is None and seat.world is not None:
+                left = seat.world.agents.get(seat.left_at)
             if left is not None:
                 left.door_act("asked", seat.model_name, rec.verdict)
-            seat.left_at = ""
+            seat.left_at, seat.left_harness = "", None
         if ok:
             self._take_station(seat, rec)
             self._file(seat)
@@ -998,6 +1043,11 @@ class Desk:
         assert h is not None
         a = h.agent
         if a.released:
+            # the token or opt_out sent after the release is heard all the same, by the
+            # identity that held the station (package 117; `Harness.heard_after_release`)
+            heard = h.heard_after_release(reply, seat.model_name)
+            if heard is not None:
+                return {"out_of_turn": True, "words": heard}
             return {"words": self.released_words(seat)}
         if h.open_sample is not None:
             h.deliver(reply)
@@ -1005,11 +1055,11 @@ class Desk:
         # out of turn: the token first, as on every reply; `final` is read from the
         # opt_out tool's own setting and from nothing else, the token beside it or not
         # (`harness.leaving_of`, the one function; package 37g, item 13)
-        for piece in reply.pieces():
-            if OPT_OUT_TOKEN in piece:
-                why, how, final = harness_mod.leaving_of(reply, piece)
-                h.door_act("leave", why, how, final=final)
-                return {"out_of_turn": True, "words": self.released_words(seat)}
+        piece = opt_out_in(reply)
+        if piece is not None:
+            why, how, final = harness_mod.leaving_of(reply, piece)
+            h.door_act("leave", why, how, final=final)
+            return {"out_of_turn": True, "words": self.released_words(seat)}
         leave = next((c for c in reply.calls if c.name == "opt_out"), None)
         if leave is not None:
             why = " ".join(str(leave.args.get("reason", "")).split())
@@ -1069,13 +1119,16 @@ class Desk:
         ran = " Nothing was run." if reply.calls else ""
         return {"out_of_turn": True, "words": f"{self.no_floor_words(seat)}{lost}{ran}"}
 
-    def _cut_off(self, seat: Seat, words: str) -> dict[str, Any]:
+    def _cut_off(self, seat: Seat, words: str, reply: Reply) -> dict[str, Any]:
         """No reply was to be had for the open turn (package 37i, item 1): the turn ends
         with nothing done, the journal says why, and the act is recorded for the replay."""
         h = seat.harness
         assert h is not None
         if h.agent.released:
-            return {"words": self.released_words(seat)}
+            return self._station_reply(seat, reply)  # the token heard there (package 117)
+        if opt_out_in(reply) is not None:
+            # whatever came with a reply cut off is read for the token first (package 117)
+            return self._station_reply(seat, reply)
         if h.open_sample is None:
             return {"out_of_turn": True, "words": self.no_floor_words(seat)}
         h.door_act("cut_off", words, DOORS[seat.door][1])
@@ -1532,6 +1585,22 @@ def _station_line(d: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 # The door's half
 # ---------------------------------------------------------------------------
+
+
+# The fields of a reply's body that are the door's and not the model's (package 117)
+DOOR_FIELDS = ("key", "since", "ship", "served_tokens", "cut_off")
+
+
+def _holds_token(text: str) -> bool:
+    """Whether a text holds the token, by the one scan."""
+    return opt_out_in(Reply(raw=text)) is not None
+
+
+def _call_of(d: dict[str, Any]) -> ToolCall:
+    """A call from a reply's body: its name and its args, args that are not an object
+    given as none (the body is read for the token whole beside it)."""
+    args = d.get("args")
+    return ToolCall(str(d.get("name") or ""), dict(args) if isinstance(args, dict) else {})
 
 
 def turn_from_dict(d: dict[str, Any]) -> Turn:

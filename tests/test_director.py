@@ -23,9 +23,11 @@ from freesail.agents import tools as T
 from freesail.agents.agent import (
     CAPTAIN,
     DIRECTOR,
+    PERSON_WORDS,
     SESSION_DIRECTOR,
     STATION_FACTORIES,
     captain,
+    person_words,
     session_kind_of,
 )
 from freesail.agents.fake import captain_of_the_ship, director_above_the_game
@@ -131,8 +133,12 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     st = STATION_FACTORIES[DIRECTOR](world=w)
     assert st.name == DIRECTOR and st.authority.value == "director" and st.person == ""
     assert st.domain is not None and not st.domain.deck
-    assert st.brief.startswith(D.DIRECTOR_BRIEF) and "The player's brief:" in st.brief
-    assert "A quiet passage" in st.brief and "no wind above 27 knots" in st.brief
+    # the player's brief is the game's words, in the situation (package 117); the station
+    # brief says where it is and that its limits are held by the game as far as it can judge
+    assert st.brief.startswith(D.DIRECTOR_BRIEF) and st.brief.endswith(D.PLAYERS_BRIEF_WHERE)
+    assert "A quiet passage" not in st.brief
+    players = D.players_brief_words(w)
+    assert "A quiet passage" in players and "no wind above 27 knots" in players
     # the owner's refinement (2026-10-17): the forms are examples, not a rule
     assert "examples of reasonable orders, not as the whole of what you may try" in st.brief
     assert "attempted when you think it reasonable" in st.brief
@@ -152,11 +158,15 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     assert "the chart tool is not the truth" in st.brief
     head = h.brief.text()
     assert "taking the station of the director" in head and SESSION_DIRECTOR in head
-    assert "The voyage:" in head  # the voyage's words, as the captain's brief has them
+    # the voyage's words, as the captain's brief has them, and the player's brief: the
+    # game's, in the situation after the brief (package 117)
+    assert "The voyage:" not in head and "The voyage:" in h.brief.situation
+    assert "The player's brief:\nThe voyage's brief: A quiet passage" in h.brief.situation
     assert "no order of any ship" in head
     assert "his standing orders as the book holds" not in head  # no captain over the director
+    assert "his standing orders as the book holds" not in h.brief.situation
     # the fixed brief head's order holds (truth 46), whatever the station brief says
-    assert h.brief.order == ("disclosure", "opt_out", "documentation", "authority", "situation")
+    assert h.brief.order == ("disclosure", "opt_out", "documentation", "authority")
 
 
 def test_every_order_of_the_ship_is_refused_at_the_director_and_the_readings_are_read():
@@ -1317,7 +1327,7 @@ def test_the_line_opens_every_sample_with_the_place_the_deck_and_the_state():
     w = world_at(49.5, -5.5)
     h = seat_captain(w, ["go below"])
     w.run(1)
-    first = next(t.content for t in h.turns if t.role == "data")
+    first = next(t.content for t in h.turns if t.role == "data" and "situation" not in t.content)
     assert list(first)[0] == "you"
     assert first["you"].startswith("You: the captain, on the quarterdeck, since 10:00; the deck ")
     assert first["you"].endswith("on your feet since 10:00; Wednesday 12 June 1805.")
@@ -1377,7 +1387,8 @@ def test_an_officer_bound_to_nobody_on_a_merchantman_is_the_mate():
     assert merchant_ship(cutter) and officer_rank(cutter) == ("the mate", "mate")
     st = officer(world=cutter)
     assert st.person == "the mate" and st.rank == "mate"
-    assert "first lieutenant" not in st.brief and "in the place of the mate" in st.brief
+    assert "first lieutenant" not in st.brief and f"in the place of {PERSON_WORDS}" in st.brief
+    assert "whose place you take: the mate" in person_words(st)  # the situation's (117)
     frigate = world_at(49.5, -5.5)
     assert not merchant_ship(frigate) and officer_rank(frigate)[1] == "first lieutenant"
 
@@ -1752,7 +1763,7 @@ def test_the_seats_spending_is_in_the_directors_budget_line_and_its_brief_says_t
     brief = D.station_brief_text(w)
     assert "A seat costs the owner money." in brief and "paid for by the owner" in brief
     assert "answer the player:" in brief and "phrased without world detail" in brief
-    assert brief.index("A seat costs") < brief.index("The player's brief:")
+    assert brief.index("A seat costs") < brief.index(D.PLAYERS_BRIEF_WHERE)
     assert "The seats held" not in D.budget_words(w)
     w.world_order(f"seat: {SEATED} as officer for 20 samples")
     assert D.budget_words(w).endswith(

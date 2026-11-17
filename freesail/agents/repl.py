@@ -86,7 +86,7 @@ from freesail.agents.agent import (
     station_name,
 )
 from freesail.agents.fake import Transcript
-from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn, opt_out_in
 from freesail.api import readings as R
 from freesail.core import replay as replay_mod
 from freesail.core.world import Scenario, World
@@ -150,6 +150,8 @@ def render_turn(turn: Turn) -> str:
         ]
         return "== Your reply ==\n" + ("\n".join(lines) or "(nothing)")
     d = turn.content
+    if "situation" in d:  # the brief's own data turn (package 117)
+        return "== The situation at the seating (data from the game) ==\n" + str(d["situation"])
     words = harness_mod.conversation_text(d)
     if words is not None:
         return f"== From the developer ({d.get('reason', '')}) ==\n{words}"
@@ -493,7 +495,9 @@ def run_interactive(
             # the answer is kept beside the leaving, whatever it was: a no is held to,
             # and the question is not put again at each start
             asked = consent.check(args.model_name, Path(args.records))
-            left = world.agents.get(again.left_at) if world is not None else None
+            left = again.left_harness or (
+                world.agents.get(again.left_at) if world is not None else None
+            )
             if left is not None:
                 left.door_act("asked", identity, asked.verdict if asked is not None else "")
         if record is None:
@@ -633,6 +637,14 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
         text = Path(args.owner_reply).read_text(encoding="utf-8").strip()
         owner_replies.append(text)
         conv.owner_says(text)
+    elif (
+        conv.outcome is None
+        and args.reply
+        and conv.leave_out_of_turn(parse_reply(Path(args.reply).read_text(encoding="utf-8")))
+    ):
+        # a reply out of turn is read for the token before it is refused (package 117):
+        # it ends the conversation as left, the reply kept in the record
+        pass
     elif args.load and (args.reply or args.owner_reply):
         whose = (
             "the owner's (--owner-reply)"
@@ -687,6 +699,7 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
     if not args.save or not args.sample:
         raise SystemExit("Turn mode needs --save STATE.json and --sample NEXT.txt.")
     before, record = "", None
+    heard_after: str | None = None
     paused_since: float | None = None
     if args.model_name:
         code, before, record = _consent_turn(args)
@@ -720,6 +733,17 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
             raise SystemExit(f"The save has no {args.station}.")
         h.save_fn = _save_fn(args.save)
         paused_since = (data.get("repl") or {}).get("paused_since")
+        piece = opt_out_in(new_reply) if new_reply is not None else None
+        if piece is not None and not h.agent.released:
+            # the reply was not taken by an open sample (none was open at the save's end,
+            # or the station was paused): the token is read all the same and ends its part,
+            # a door's act recorded for the replay, as at the agent API (package 117)
+            why, how, final = harness_mod.leaving_of(new_reply, piece)
+            h.door_act("leave", why, how, final=final)
+        elif new_reply is not None and h.agent.released:
+            # the token or opt_out sent after the release, by the identity that held the
+            # station, is heard all the same (package 117; `Harness.heard_after_release`)
+            heard_after = h.heard_after_release(new_reply, args.model_name or "")
         if h.agent.released and new_reply is None:
             # a released station taken again by the game's one rule (package 37g): at
             # once when no question is owed; where one is, in words, for the interactive
@@ -775,6 +799,8 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
         text = f"{before}\n\n{text}"
     if h.agent.released:
         text += f"\n\n== The station is released: {h.agent.released_reason}. =="
+        if args.load and heard_after:
+            text += f"\n\n== {heard_after} =="
     elif h.agent.paused:
         text += "\n\n" + PAUSED_HERE.format(station=h.station.name, reason=h.agent.pause_reason)
     elif h.open_sample is None:

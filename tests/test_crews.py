@@ -269,7 +269,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
         crew = b.crew
         h = crew.agents["captain"]
         assert "captain" not in w.agents and h.world is crew
-        brief = h.brief.text()
+        brief = h.brief.situation  # the voyage's words: data (package 117)
         assert "X at full detail" in brief or "at full detail" in brief
         assert crew.captain.seated and not crew.captain.commands
         # the station's first sample says the shape
@@ -460,7 +460,7 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
             "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "X"}
         ).json()
         assert a["phase"] == "station"
-        brief = b.crew.agents["captain"].brief.text()
+        brief = b.crew.agents["captain"].brief.situation  # the voyage: data (package 117)
         assert f"The intent the scenario gives the ship: {goal}. It is a free intent" in brief
         assert "the rules-based captain will not follow it" in brief
         http.post(

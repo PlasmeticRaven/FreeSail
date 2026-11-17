@@ -593,7 +593,10 @@ def run_door(
     with driver.lock:
         h = world.agents.get("captain")
         if h is not None and not h.agent.released:
-            world.submit("stand down the captain")
+            # the reason is the race's end, not the captain's order (package 117; the
+            # consent brief: a station held for a race is stood down, with the reason,
+            # when the race is over); a door's act, recorded for the replay
+            h.door_act("stand_down", "the race is over", "the race")
     thread.join(timeout=30.0)
     return world, judge, identity, int(got.get("code", 0))
 
