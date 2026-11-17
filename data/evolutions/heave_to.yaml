@@ -67,7 +67,7 @@ timing:
   abaft_s: 120            # for this long
   keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
 on_start: {log: "Hands to the after braces; heave to."}
-on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, helm a-lee{drifting}.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, {helm}{drifting}.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

@@ -1893,7 +1893,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # (set, take in, furl, reef, shake out and trim its sheet; 98 before them), and its settee
     # four (set, take in, furl and dip; 104 before them)
     # ... and package 115's relieving tackles (relieving_tackles.yaml; 108 before it)
-    assert "109 evolutions; the list about" in contents
+    # ... and package 116's wheel repaired (repair_wheel.yaml, card 5; 109 before it)
+    assert "110 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)
