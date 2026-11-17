@@ -2418,9 +2418,7 @@ class Brief:
         if station.has_authority:
             if station.person:
                 authority += f" You are in the place of {PERSON_WORDS}"
-                authority += (
-                    f", whose rank, {rank}, your standing orders carry." if rank else "."
-                )
+                authority += f", whose rank, {rank}, your standing orders carry." if rank else "."
             if deck:
                 authority += f" {deck}"
             if general:
