@@ -5331,7 +5331,9 @@ def test_truth_85_a_game_saved_with_three_seated_loads_from_its_checkpoint_with_
     for name, note in ((CAPTAIN, "The captain's own note."), (OFFICER, "The officer's own note.")):
         h = back.agents[name]
         h.take_over(Fake([reply("", call("read_journal", kind="notes"))]))
-        assert "The station's journal:" in h.brief.text()
+        # package 117: the journal is the game's words, in the situation sent as data
+        assert "The station's journal:" in h.brief.situation
+        assert "The station's journal:" not in h.brief.text()
         read = tools_mod.call(back, name, "read_journal", {"kind": "notes"})
         assert any(e["text"] == note for e in read["entries"]), name
     read = tools_mod.read_journal(back, MASTER, kind="notes")
@@ -14703,7 +14705,9 @@ def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_th
             tools.tool_names(),
             ship=words,
         )
-        assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
+        # package 117: the situation is no longer a head item; it is the first data turn,
+        # opening with its head of the code's words and then the ship herself
+        assert brief.situation.startswith(f"{agent.SITUATION_HEAD}\n\n{words}")
 
 
 def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
