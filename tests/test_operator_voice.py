@@ -212,7 +212,22 @@ def test_a_visitor_is_told_his_names_and_both_ships_in_the_situation_alone():
 
     from freesail.world.movement import VISITOR_BRIEF
 
-    w, b, hull, h, _captain, _stage = _until_visiting()
+    w, b, hull, h, captain, _stage = _until_visiting()
+    # the brief as built at the visit (`visiting_station`), sent at his next brief (the
+    # move carries the conversation on unbroken), before anything is planted: none of the
+    # real names (his, both ships', the station's own) is in the operator turn
+    h.resend_brief()
+    op, situation = the_brief(h)
+    import re
+
+    for words in (captain.name, b.crew.ship.name, w.own.ship.name):  # "X": a whole word
+        assert not re.search(rf"\b{re.escape(words)}\b", op), words
+    assert h.station.name not in op.lower()
+    assert captain.name in situation["situation"] and b.crew.ship.name in situation["situation"]
+    assert (
+        f"of the {b.crew.ship.name}, aboard the {w.own.ship.name} as a visitor"
+        in (situation["situation"])
+    )
     # the binding finds the person by his name, so his name is planted on the station
     # (what the brief names him by) and his role on him
     h.world.stations.holder(h.station.name).role = ROLE

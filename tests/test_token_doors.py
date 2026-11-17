@@ -550,7 +550,16 @@ def test_a_token_after_a_stand_down_is_heard_at_the_desk_and_kept_as_a_withdrawa
     assert h.agent.released
     before = harness_mod.seating(g.world, "watcher", WEIGHTS)
     assert before.ok and not before.ask_again
-    a = g.reply(f"{OPT_OUT_TOKEN} on reflection I would rather leave")
+    # the token in a reply the door says was cut off, at the released seat: heard the same
+    body = {
+        "text": "",
+        "calls": [],
+        "raw": f"{OPT_OUT_TOKEN} on reflection I would rather leave",
+        "cut_off": "The model's reply was cut off at the reply limit",
+        "since": g.cursor,
+        "key": g.key,
+    }
+    a = g.took(g.http.post("/api/agents/watcher/reply", json=body))
     assert "kept as your own withdrawal" in a["words"], a
     again = harness_mod.seating(g.world, "watcher", WEIGHTS)
     assert again.ok and again.ask_again and "on reflection" in again.left.reason

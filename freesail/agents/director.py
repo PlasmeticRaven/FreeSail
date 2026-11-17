@@ -344,7 +344,8 @@ class DirectorBrief:
                 f"not a rule): {said}."
             )
         lines.append(
-            f"The limits, which the channel enforces whatever you ask: {self.limits_words()}."
+            "The limits, which the channel holds as far as it can judge them, and which are "
+            f"yours to keep beyond that: {self.limits_words()}."
         )
         lines.append(
             f"Your clock: sampled every {self.cadence} and on the notable and urgent lines. "
