@@ -622,6 +622,8 @@ SHIP_WORK_WORDS = {
     "plug_shot_hole": ("plug the shot holes", "plugging the shot holes"),  # file
     # package 115 D's, joined at the merge: named by its verb's own words
     "relieving_tackles": ("rig the relieving tackles", "rigging the relieving tackles"),
+    # package 116's: named by its verb's own words, as the tackles are
+    "repair_wheel": ("repair the wheel", "repairing the wheel"),
     "rig_preventers": ("rig preventers", "rigging preventers"),
     "scud": ("scud", "scudding"),
     "secure_guns": ("secure the guns", "securing the guns"),  # file
@@ -1070,6 +1072,18 @@ STANDS = {
         "to trim.",
         "trims it",
     ),
+    # package 116: the wheel may be repaired while the tackles lie held, so the tackles state what
+    # must still be true. Old (package 115 D's, among `NOTHING_STANDS`): "the helm is lost until
+    # these tackles are rove and by nothing else; held, the wheel is still shot away".
+    ("relieving_tackles", "the wheel repaired"): (
+        "74",
+        None,
+        lambda w, s: w.ship.extra.__setitem__("helm_lost", "the wheel shot away"),
+        lambda w: w.ship.extra.pop("helm_lost"),
+        "Could not rig the relieving tackles: the wheel is repaired; the relieving tackles are "
+        "not wanted.",
+        "reeves tackles that are not wanted",
+    ),
 }
 # The scripts a post can hold whose beginning nothing in the world makes false while they lie held:
 # their `Script.standing` is the base's None, and why.
@@ -1081,8 +1095,7 @@ NOTHING_STANDS = {
     "plug_shot_hole": "its own going plugs the holes and spends the plugs, holding the carpenter; "
     "holes the world adds are more work, not less",
     # package 115 D's, joined at the merge
-    "relieving_tackles": "the helm is lost until these tackles are rove and by nothing else; "
-    "held, the wheel is still shot away",
+    "repair_wheel": "the wheel is made good by this work alone; held, it is still shot away",
     "secure_guns": "its own going secures the guns; none is cast loose but by work at quarters",
     "send_boat": "it reads a port and a boat, which nothing takes away; it holds the boat",
     "serve_small_arms": "the arms are served out by this work alone, which holds them",
@@ -1137,7 +1150,9 @@ def test_every_script_a_post_can_hold_states_what_must_still_be_true_or_why_noth
     scripts: the reader's four (the veer, backing the anchor, the kedge, catting and fishing), the
     three given before (the letting go, the cutting away; the fish wants hands aloft, so no post
     holds it), and the sweep's own five (the signal, its hoist hauled down by the locker, and the
-    four trims, their sail and sheet said as preconditions, read as they begin alone)."""
+    four trims, their sail and sheet said as preconditions, read as they begin alone). Package 116
+    adds the relieving tackles to those that state it (the wheel repaired while they lie held;
+    before, named with a reason) and the wheel's repair to those named with a reason."""
     from freesail.evolutions.scripts import Script
 
     can = _scripts_a_post_can_hold()
@@ -1221,6 +1236,8 @@ def _effect(world, eid: str, sid: str | None):
         return sorted(s.id for s in ship.spars.values() if s.wrecked)
     if eid == "make_signal":
         return [(h.key, h.breaks_out) for h in _locker(world).made]
+    if eid == "relieving_tackles":
+        return sorted(k for k in ship.extra if k.startswith("helm_"))
     sail = ship.sails[sid]
     return [(ln.id, ln.state, round(ln.hauled, 4)) for ln in ship.sheets_of(sail)]
 

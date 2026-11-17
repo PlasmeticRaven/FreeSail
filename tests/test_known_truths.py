@@ -19666,7 +19666,9 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
     names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 61 mechanical (the code's own years and the one finding only a whole world
+    other: 60 mechanical (61 until package 116 moved the cruiser's prize keys under
+    `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the code's own
+    years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
@@ -19680,7 +19682,7 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     assert not A.unlisted(audit, known)
     cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
     assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 61
+    assert len(audit.keys(A.MECHANICAL)) == 60  # 61 before package 116 (the cruiser's keys)
     assert len(audit.keys(A.REFERENCE)) == 38
     for foe in ("france", "spain", "batavian-republic"):
         pair = "+".join(sorted(("britain", foe)))
@@ -20412,10 +20414,12 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
     seventeen minutes): the order given at the prompt on the minute the wheel goes, and the
     loss is cleared within the quarter hour, the rudder following the helm's order.
 
-    What the helm does with the wheel shot away and before the tackles are rove is not here:
-    nothing reads the tackles (`helm_by_tackles`), and she steers meanwhile exactly as before
-    (the lead's reading of part D at 60af48e, item 6; the question put to the owner, in the
-    notes). Its words are true (the same reading): given twice, said once; the hands' work
+    What the helm does with the wheel shot away and before the tackles are rove, and by the
+    tackles, is package 116's (truths 7-632 and 7-633; old, to that package: nothing read
+    the tackles, `helm_by_tackles`, and she steered by them exactly as by the wheel; new: by
+    them the helmsman's rate is half the wheel's, and the rudder's difference below is met
+    at that rate, 0.28 radians at this seed against the bound of 0.2). Its words are true
+    (the same reading): given twice, said once; the hands' work
     named as the log names it; `belay the relieving tackles` belays it and says how she is
     left; and the wheel, once shot away, is not shot away again with the tackles rove."""
     w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
@@ -20461,10 +20465,10 @@ def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_
     assert not again, [x.text for x in again]
 
 
-# the merchant brig's case waits on package 75's people (the lead's ruling of 2026-11-14 on
-# package 115 D4 (d)): her opening 'let go the best bower' waits for twelve forecastle hands
-# her company of sixteen never spares, on the trunk and on that branch alike
-_OPENING_UNTIL_75 = {"merchant-brig.yaml"}
+# the merchant brig's case, left out of this truth until package 116 (old: `_OPENING_UNTIL_75
+# = {"merchant-brig.yaml"}`, her opening 'let go the best bower' waiting for twelve forecastle
+# hands her larboard watch of three never spared): the anchor's file now calls all hands where
+# the watch is too few (card 5), and she is held to the truth with every other
 _SAYS_AT_ANCHOR = re.compile(r"\bat anchor\b|\bthe usual anchorage\b|\blies at\b|\briding\b", re.I)
 _SAYS_NOT = re.compile(r"\bunmoored\b|\bno anchor down\b", re.I)
 
@@ -20474,8 +20478,8 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
     the usual anchorage" (its file's words) under way with no anchor down, so that 'send the
     boat ashore' and 'buy' were refused at the first minute. The cause: a scenario's opening
     state at anchor is made by an opening order, and this file had none (the deeper cause,
-    for the notes: a state made by an order that can wait or fail; the merchant brig's waits
-    for hands for ever, left for package 75's people). Mended: the dispatches let go as the
+    for the notes: a state made by an order that can wait or fail; the merchant brig's waited
+    for hands for ever, mended in package 116, truth 7-630). Mended: the dispatches let go as the
     merchant scenarios in the same road do. Every scenario started as the harbour starts it:
     one whose opening words (the header and the position line) say she lies at anchor, and
     not that she is unmoored or under way, is riding at anchor in her port at two minutes;
@@ -20515,10 +20519,6 @@ def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor(
             under_way += 1
             continue
         if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
-            continue
-        if name in _OPENING_UNTIL_75:
-            # the merchant brig's opening waits for hands (package 75's people): nothing is
-            # asserted of her here, neither her anchor nor her place nor her name
             continue
         w = _harbour_game(path)
         if getattr(w, "ship", None) is None or not hasattr(w.ship, "dyn"):
@@ -20629,6 +20629,351 @@ def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds
 # socket or a real request to it, from a foreign page, with no mark, or as the game's own
 # page; a checkpoint or a save made by hand on the disk and loaded as a player loads it.
 # ---------------------------------------------------------------------------
+
+
+# -- package 116 (card 5 of docs/dev/ScopeCards-BeforeTheGate.md): the four small mends --------
+
+
+def test_truth_7_630_the_merchant_brig_lets_go_her_anchor_by_all_hands_and_weighs():
+    """Card 5, the first mend. The harbour's merchant brig began with her opening order
+    waiting for ever: `let go the anchor` wants a dozen (its file's judgement), no more than
+    the eleven her company can give; work begins at half its want; and her ten seamen are
+    watched seven and three (ruling 11's own words), the larboard three and her master making
+    four at five in the morning: "Not hands enough on deck to let go the anchor; there are
+    but four to spare", and nothing ever called the rest. Mended at the anchor's file, by the
+    form the settee's files and the boat's have (`too_few: all hands`): a watch too few to
+    begin it calls all hands for it, piped down when she is brought up. Her muster stands.
+
+    As the harbour starts her: all hands are called to let go, she rides at anchor in
+    Falmouth within two minutes and the larboard watch has the deck again; she weighs, and
+    `let go the anchor` brings her up a second time. The cutter in the same road lets go
+    with her watch as before, no hands called."""
+    w = _harbour_game("data/scenarios/merchant-brig.yaml")
+    crew = w.ship.extra["crew"]
+    runner = w.ship.extra["evolutions"]
+    from freesail.crew.bill import Watch
+
+    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [7, 3]
+    w.run(120)
+    assert w.dealings.anchored and w.dealings.in_port().name == "Falmouth"
+    called = [e.text for e in w.log if e.kind == "crew.all_hands"]
+    assert called == ["All hands! (to let go the anchor)"], called
+    assert [e for e in w.log if e.kind == "crew.piped_down"], "all hands were never piped down"
+    assert not crew.all_hands_called
+    assert not [e for e in w.log if e.kind == "evolution.waiting"]
+    e = _said(w, "weigh anchor")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(60):
+        w.run(60)
+        if not w.dealings.anchored:
+            break
+    assert not w.dealings.anchored, "she never weighed"
+    first = len([x for x in w.log if x.kind == "ship.anchored"])
+    e = _said(w, "let go the anchor")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(30):  # the anchor she weighed is catted first, some seven minutes
+        w.run(30)
+        if len([x for x in w.log if x.kind == "ship.anchored"]) > first:
+            break
+    assert len([x for x in w.log if x.kind == "ship.anchored"]) == first + 1
+    assert w.dealings.anchored
+
+    c = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    c.run(120)
+    assert c.dealings.anchored
+    assert not [x for x in c.log if x.kind == "crew.all_hands"]
+
+
+def test_truth_7_631_strike_the_colours_strikes_her_colours_with_the_fighting_book_loaded():
+    """Card 5, the second mend. The fighting book carries a standing order named "the
+    colours" (data/standing_orders/fighting.orders), and the book's reading of a bare
+    sentence (`standing.grammar.bare_book_sentence`: `strike`, `show`, `belay`, `avast`,
+    `resume` before the whole name of a standing order, without quotes) ran before the
+    order's own: a captain who said `strike the colours` to an enemy was answered "Standing
+    order 'the colours' struck from the book." and fought on. One rule now, and no special
+    case: words without quotes that are a whole order of the vocabulary are that order; in
+    quotes, or with the words 'standing order', the sentence is the book's.
+
+    The first action as the harbour starts it, the fighting book loaded: `strike the
+    colours` strikes her colours and the standing order stays in the book; `strike colours`
+    and `strike her colours` (two synonyms of the vocabulary's data) the same; `show the
+    colours` is the colours' own order (the vocabulary's `hoist the colours`) and `show "the
+    colours"` shows the standing order; `belay the colours` is no order of the vocabulary and
+    stays the book's; `strike "the colours"` and `strike standing order "the colours"` strike
+    the standing order still."""
+
+    def game():
+        g = _harbour_game("data/scenarios/first-action.yaml")
+        assert "the colours" in g.ship.extra["standing"].book.names
+        return g
+
+    for words in (
+        "strike the colours",
+        "Strike the colours.",
+        "strike colours",
+        "strike her colours",
+    ):
+        w = game()
+        e = _said(w, words)
+        assert e.kind == "action.struck", (words, e.kind, e.text)
+        assert "struck" in w.ship.extra, words
+        assert "the colours" in w.ship.extra["standing"].book.names, words
+    for words in ('strike "the colours"', 'strike standing order "the colours"'):
+        w = game()
+        e = _said(w, words)
+        assert e.kind == "standing.struck", (words, e.kind, e.text)
+        assert "the colours" not in w.ship.extra["standing"].book.names, words
+        assert "struck" not in w.ship.extra, words
+    w = game()
+    e = _said(w, "show the colours")
+    assert e.kind.startswith("colours."), (e.kind, e.text)
+    e = _said(w, 'show "the colours"')
+    assert e.kind == "query.standing_orders" and 'Standing order "the colours"' in e.text
+    e = _said(w, "belay the colours")
+    assert e.kind == "standing.belayed", (e.kind, e.text)
+
+
+def _wheel_lost_at_seed_6():
+    """The first action at seed 6 as the harbour starts it, run to the shot that takes her
+    wheel (truth 7-626's own passage)."""
+    w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
+    for _ in range(90):
+        w.run(30)
+        if w.ship.extra.get("helm_lost"):
+            break
+    assert w.ship.extra.get("helm_lost"), "the wheel was not lost at seed 6 this time"
+    return w
+
+
+def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_rove():
+    """Card 5, the third mend, its first half. With the wheel shot away the rudder was held
+    where the shot left it (`physics.hull.steer`) and nothing else knew: `steer north-west`
+    was logged "Helm ordered", a tack began and missed stays. Now a helm order (a course,
+    full and by, the conning words) and a manoeuvre that drives the helm are refused in the
+    world's words, which say why and name the two orders that mend it; a standing order's
+    helm action meets the same refusal by the same road. The sail orders stand, and `heave
+    to` stands (tried with the helm dead, she comes to by her sails), its line saying that
+    the helm does not answer. With the tackles rove every one is taken again.
+
+    The first action at seed 6, the player at the prompt on the minute the wheel goes."""
+    from freesail.evolutions.scripts import HELM_LOST_WORDS
+
+    assert "'rig the relieving tackles'" in HELM_LOST_WORDS
+    assert "'repair the wheel'" in HELM_LOST_WORDS
+    w = _wheel_lost_at_seed_6()
+    held = float(w.ship.dyn.rudder)
+    refused = (
+        "steer north-west",
+        "full and by",
+        "steady",
+        "meet her",
+        "right the helm",
+        "helm a-lee",
+        "helm a-weather",
+        "tack",
+        "wear ship",
+        "shape a course for Falmouth",
+    )
+    for order in refused:
+        e = _said(w, order)
+        assert e.kind == "order.rejected" and e.text.endswith(HELM_LOST_WORDS), (order, e.text)
+    e = _said(w, 'standing order "by the wind": every 1 minute then steer north-west')
+    assert e.kind != "order.rejected", e.text
+    at = w.clock.tick
+    w.run(130)
+    fired = [x for x in w.log if x.tick > at and x.kind == "order.rejected"]
+    assert fired and all(x.text.endswith(HELM_LOST_WORDS) for x in fired), [x.text for x in fired]
+    assert not [x for x in w.log if x.tick > at and x.kind == "helm.order"]
+    assert _said(w, 'strike standing order "by the wind"').kind == "standing.struck"
+    assert abs(float(w.ship.dyn.rudder) - held) < 1e-9, "the rudder moved with the wheel gone"
+    e = _said(w, "trim the sheets")
+    assert e.kind != "order.rejected", e.text
+    e = _said(w, "heave to")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    said = [x.text for x in w.log if x.kind == "evolution.step" and x.tick >= e.tick]
+    assert any("the helm not answering, the wheel shot away" in s for s in said), said
+    assert not any("helm a-lee" in s for s in said), said
+
+
+def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it_is_repaired():
+    """Card 5, the third mend, its second half. The relieving tackles rove, she answered
+    exactly as by the wheel: nothing read them. Now the helmsman's rate by the tackles is a
+    share of the wheel's (`helm_rate_share` of data/evolutions/relieving_tackles.yaml, a
+    half: that it is slower is Luce's, the figure a JUDGEMENT said as one in the file's
+    `source:`), and `repair the wheel` is a repair evolution of its own (repair_wheel.yaml,
+    half an hour, JUDGEMENT): at its end she steers by the wheel at the wheel's rate and the
+    tackles are cast off. No equation of the hull is touched: the rate is the helm's.
+
+    The first action at seed 6. The rudder's travel in five seconds towards an order hard
+    over, read twice: by the tackles, half the wheel's; the wheel repaired,
+    the wheel's own (her file's five degrees a second). `repair the wheel` given twice is
+    said once; with the wheel whole it is refused in words; the wheel made good, the
+    relieving tackles are no longer wanted."""
+    import yaml
+
+    spec = yaml.safe_load(open("data/evolutions/relieving_tackles.yaml", encoding="utf-8"))
+    assert spec["timing"]["helm_rate_share"] == 0.5
+    assert "JUDGEMENT" in spec["source"] and "Luce 1884" in spec["source"]
+    mend = yaml.safe_load(open("data/evolutions/repair_wheel.yaml", encoding="utf-8"))
+    assert "JUDGEMENT" in mend["source"] and "Luce 1884" in mend["source"]
+    w = _wheel_lost_at_seed_6()
+    ship = w.ship
+    rate = math.radians(float(ship.hull.spec.rudder.rate_deg_s))
+
+    def travel() -> float:
+        """Radians the rudder goes in five seconds from where it lies towards hard over
+        the other way, by the helm's own order (five, that the stop is not reached)."""
+        was = float(ship.dyn.rudder)
+        order = (
+            "helm a-lee"
+            if was * (1.0 if ship.dyn.tack == "starboard" else -1.0) <= 0
+            else ("helm a-weather")
+        )
+        e = _said(w, order)
+        assert e.kind == "helm.order", e.text
+        w.run(5)
+        return abs(float(ship.dyn.rudder) - was)
+
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(40):
+        w.run(30)
+        if not ship.extra.get("helm_lost"):
+            break
+    assert ship.extra.get("helm_by_tackles") and ship.extra.get("helm_rate_share") == 0.5
+    relieved = [x.text for x in w.log if x.kind == "helm.relieved"]
+    assert relieved and relieved[-1].endswith("more slowly than by the wheel."), relieved
+    assert _said(w, "right the helm").kind == "helm.order"
+    w.run(30)
+    by_tackles = travel()
+    assert by_tackles == pytest.approx(0.5 * rate * 5, rel=0.02), (by_tackles, rate)
+
+    e = _said(w, "repair the wheel")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    twice = _said(w, "repair the wheel")
+    assert twice.text.endswith("The hands are repairing the wheel already."), twice.text
+    for _ in range(200):
+        w.run(30)
+        if not ship.extra.get("helm_by_tackles"):
+            break
+    done = [x.text for x in w.log if x.kind == "helm.repaired"]
+    assert done == [
+        "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; "
+        "the relieving tackles are cast off."
+    ], done
+    assert not ship.extra.get("helm_lost") and not ship.extra.get("helm_by_tackles")
+    assert "helm_rate_share" not in ship.extra
+    assert _said(w, "right the helm").kind == "helm.order"
+    w.run(30)
+    by_wheel = travel()
+    assert by_wheel == pytest.approx(rate * 5, rel=0.02), (by_wheel, rate)
+    assert by_tackles == pytest.approx(0.5 * by_wheel, rel=0.03)
+    whole = _said(w, "repair the wheel")
+    assert whole.kind == "order.rejected" and "the wheel is whole" in whole.text, whole.text
+    none = _said(w, "rig the relieving tackles")
+    assert none.kind == "order.rejected" and "no need of the relieving tackles" in none.text
+
+
+def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_would():
+    """Card 5, the third mend, the rules captain. Before: he asked for the tackles from
+    inside his repairs' own rules, so that he never rigged them lying to for weather, in
+    distress, with the wind at his shortening figure (thirty knots) and above, nor within
+    ten minutes of another repair's order (package 115 D's finding: his own rule, not the
+    evolution's, which has no wind limit); and he went on giving the helm its orders with
+    the rudder held. Now the tackles come before everything, whatever the weather; while
+    the wheel is lost and they are not rove he gives no helm order and begins no helm
+    manoeuvre; and the wheel's repair is his damage work in its turn, out of action.
+
+    The first action at seed 6 left to him: within a minute of the shot he orders the
+    tackles; no helm order of his is logged, taken or refused, until they are rove; he
+    steers again by them; and the action over he orders the wheel repaired. And the gale
+    trial of the station (`trial-station-gale`, an hour in, the wind over thirty knots),
+    her wheel lost as the hit leaves it (no shot is to be had in a gale: the hit's own
+    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too."""
+    w = _wheel_lost_at_seed_6()
+    lost = w.clock.tick
+    for _ in range(40):
+        w.run(30)
+        if not w.ship.extra.get("helm_lost"):
+            break
+    rove = [x.tick for x in w.log if x.kind == "helm.relieved"]
+    assert rove, "the captain never had the tackles rove"
+    his = [x for x in w.log if lost <= x.tick <= rove[0] and str(x.actor).startswith("captain")]
+    asked = [x for x in his if "rigging the relieving tackles" in x.text]
+    assert len(asked) == 1 and asked[0].tick - lost <= 60, [(x.tick - lost, x.text) for x in his]
+    helm = [x for x in his if x.kind == "helm.order" or "steering" in x.text]
+    assert not helm, [x.text for x in helm]
+    assert not [x for x in his if x.kind == "order.rejected"], [x.text for x in his]
+    w.run(3600)
+    after = [x for x in w.log if x.tick > rove[0] and str(x.actor).startswith("captain")]
+    assert [x for x in after if x.kind == "helm.order"], "he never steered by the tackles"
+    assert [x for x in after if "repairing the wheel" in x.text], [x.text for x in after][-8:]
+
+    from freesail import units as U
+    from tests.test_captain_trials import trial
+
+    g = trial("trial-station-gale", hours=1)
+    assert U.ms_to_knots(g.wind.speed) >= 30.0, U.ms_to_knots(g.wind.speed)
+    g.ship.extra["helm_lost"] = "the wheel shot away"
+    at = g.clock.tick
+    for _ in range(80):
+        g.run(30)
+        if not g.ship.extra.get("helm_lost"):
+            break
+    his = [x for x in g.log if x.tick >= at and str(x.actor).startswith("captain")]
+    assert [x for x in his if "rigging the relieving tackles" in x.text], [x.text for x in his]
+    assert g.ship.extra.get("helm_by_tackles") and not g.ship.extra.get("helm_lost")
+
+
+def test_truth_7_635_the_cruisers_prize_doctrine_is_under_thresholds_and_is_read():
+    """Card 5, the fourth mend. Thirteen keys of the cruiser's doctrine, the prize's
+    (package 74), were written under `stations:` in data/captains/cruiser.yaml, where
+    nothing read them as doctrine: `Doctrine.threshold` gave the code's defaults, and the
+    world's business took thirteen keys for thirteen nations of no war (the range audit's
+    finding `v-nation-unknown:cruiser.stations`, in its known list). Moved under
+    `thresholds:`; the revenue cutter's book, which is the cruiser's (tests/test_subtypes),
+    carries the same thirteen with the cruiser's values (the lead's leave of 2026-11-16).
+    Each of the seven that code reads has the value the code's default had, so that no
+    cruiser sails differently: the mend is that her doctrine is now hers to change.
+
+    Six of the thirteen are read by no code in any role (`mans_prizes`, `divide_prisoners`,
+    `prisoners_most`, `burns_when`, `worth_least`, `fit_least`): doctrine written and not
+    yet read, listed for the owner in docs/dev/TuningNotes.md and not built here."""
+    import yaml
+
+    from freesail.world import captains as C
+
+    keys = {
+        "mans_prizes",
+        "prize_crew_share",
+        "prize_crew_least",
+        "prize_master_from",
+        "divide_prisoners",
+        "prisoners_most",
+        "burns_when",
+        "worth_least",
+        "fit_least",
+        "prize_goal",
+        "prize_company",
+        "parole_accepted",
+        "prisoners_landed",
+    }
+    raw = yaml.safe_load(open("data/captains/cruiser.yaml", encoding="utf-8"))
+    assert set(raw["stations"]) == {"britain", "france", "spain", "batavian-republic"}
+    assert keys <= set(raw["thresholds"])
+    cruiser, revenue = C.load_doctrine("cruiser"), C.load_doctrine("revenue")
+    for doctrine in (cruiser, revenue):
+        assert keys <= set(doctrine.thresholds)
+    assert {k: revenue.thresholds[k] for k in keys} == {k: cruiser.thresholds[k] for k in keys}
+    assert cruiser.threshold("prize_crew_share", None) == 0.1
+    assert cruiser.threshold("prize_crew_least", None) == 6
+    assert cruiser.threshold("prize_goal", None) == "the nearest friendly port"
+    assert str(cruiser.threshold("prize_company", "")).startswith("in company")
+    assert cruiser.threshold("parole_accepted", None) is True
+    assert cruiser.threshold("prisoners_landed", None) == "the first friendly port"
+    assert "lieutenant" in str(cruiser.threshold("prize_master_from", ""))
 
 
 def _foreign_socket(url: str, **kw):

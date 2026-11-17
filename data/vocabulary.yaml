@@ -1539,7 +1539,7 @@ verbs:
     object: gunnery
     level: 1
   strike the colours:
-    synonyms: [strike our colours, strike the ensign, strike to her, surrender, we strike]
+    synonyms: [strike our colours, strike colours, strike her colours, strike the ensign, strike to her, surrender, we strike]
     object: gunnery
     level: 1
   # Package 73 (spec M7 §13, §14; docs/design/Design-WaterAndHealth.md): the water, the
@@ -1604,6 +1604,13 @@ verbs:
     synonyms: [rig relieving tackles, reeve the relieving tackles, reeve relieving tackles,
                hook on the relieving tackles, man the relieving tackles, steer with the relieving tackles,
                steer by the relieving tackles, rig the tiller tackles, hook the tackles to the tiller]
+    object: damage
+    level: 1
+  # package 116 (card 5): the wheel made good and new wheel-ropes rove, after which she
+  # steers by the wheel again and the relieving tackles are cast off
+  repair the wheel:
+    synonyms: [repair wheel, mend the wheel, repair the helm, reeve new wheel ropes,
+               reeve the wheel ropes, reeve new tiller ropes, ship a new wheel]
     object: damage
     level: 1
   sling the yards:
@@ -2427,6 +2434,7 @@ more_work_nouns:
   log: heave the log
   # package 115 D4 (e): `belay the relieving tackles`, the work by its own name
   relieving tackles: rig the relieving tackles
+  wheel: repair the wheel
 
 # ---------------------------------------------------------------------------
 # What undoes what (package 37g, item 5; the review of gate 5c's playtests, 5.4 and 10.5):
