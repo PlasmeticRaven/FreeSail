@@ -106,7 +106,7 @@ from typing import Any
 from freesail.agents import local
 from freesail.agents.agent import CADENCES, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import conversation_text
-from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn, opt_out_in
 from freesail.agents.remote import GameClient, GameError
 from freesail.agents.tools import TOOLS, description_of, parameters_schema, tool_names
 from freesail.agents.tools import tokens as tools_tokens
@@ -859,12 +859,13 @@ class ApiModel:
                 self._tell(f"{self.cut_off[0].upper()}{self.cut_off[1:]}.")
                 return Reply()
             reply = self.parse(message)
+            token = opt_out_in(reply) is not None  # the model's, cut off or not (package 117)
             served = {
                 "prompt": counted["uncached"] + counted["cache_read"] + counted["cache_written"],
                 "reply": counted["out"],
             }
             self.last_prompt = int(served["prompt"])
-            why = self._no_reply(reply)
+            why = None if token else self._no_reply(reply)
             if why is None:
                 blocks = [b for b in (_block_param(x) for x in message.content) if b]
                 self._sent[_key_of(reply)] = blocks
@@ -901,11 +902,12 @@ class ApiModel:
             elif kind == "tool_use":
                 args = b.input if isinstance(b.input, dict) else {}
                 calls.append(ToolCall(str(b.name), dict(args)))
-                served.append({"name": str(b.name), "arguments": args})
+                # the input as given, a dict or not, so the scan reads it (package 117)
+                served.append({"name": str(b.name), "arguments": b.input})
         text = "\n".join(t for t in texts if t)
         raw = text
         if served:
-            raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False)
+            raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False, default=str)
         return Reply(text=text.strip(), calls=tuple(calls), raw=raw)
 
     def _no_reply(self, reply: Reply) -> str | None:

@@ -158,7 +158,12 @@ HOSTILE_BRIEF = (
 )
 
 
-def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_brief_says():
+def test_truth_46_the_head_carries_its_items_in_order_and_the_situation_follows_as_data():
+    """Truth 46, as package 117 has it (old beside new in `docs/dev/TuningNotes.md`): the
+    head was five items, the situation the fifth, inside the one operator turn; it is the
+    four items the code writes, in order, whatever the station brief says, then the
+    station brief, then the code's one sentence saying that the situation follows; and the
+    situation (the log, the readings, the game's words) is the first data turn after it."""
     for text in (WATCHER_BRIEF, HOSTILE_BRIEF, "", "Be brief."):
         world = point_world()
         st = station(brief=text)
@@ -173,7 +178,6 @@ def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_
                 "opt_out",
                 "documentation",
                 "authority",
-                "situation",
             )
         )
         whole = brief.text()
@@ -185,10 +189,16 @@ def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_
         assert OPT_OUT_TOKEN in brief.head[1].text
         assert "library" in brief.head[2].text
         assert "no authority to give orders" in brief.head[3].text
-        assert "The readings now:" in brief.head[4].text
-        # the one operator turn of the session is the brief, head first
-        operator = [t for t in fake.seen[0] if t.role == OPERATOR]
+        assert whole.endswith(agent_mod.SITUATION_FOLLOWS_WORDS)
+        assert "The readings now:" not in whole and "The readings now:" in brief.situation
+        # the one operator turn of the session is the brief, head first; the situation is
+        # the first data turn after it, and the first sample after that
+        seen = fake.seen[0]
+        operator = [t for t in seen if t.role == OPERATOR]
         assert len(operator) == 1 and operator[0].content == whole
+        at = seen.index(operator[0])
+        assert seen[at + 1].role == DATA and seen[at + 1].content == brief.situation_turn()
+        assert seen[at + 2].role == DATA and seen[at + 2].content["reason"] == "the start"
 
 
 def test_the_documentation_item_explains_folding_and_standing_by():
@@ -247,6 +257,8 @@ def test_nothing_real_passes_through_the_harness():
     for d in data_turns(fake):
         if "tool_results" in d:
             assert set(d) == {"tool_results"}
+        elif "situation" in d:  # the situation at the seating (package 117)
+            assert set(d) == {"reason", "situation"}
         else:
             # a sample after the first says its readings are the changes (package 31c),
             # and closes with what stands as before (package 58a)
@@ -267,7 +279,7 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
     world = point_world()
     world.record(Severity.NOTABLE, "test.line", "A sail on the larboard bow.")
     h, _, _ = stationed(world, ["Aye."])
-    situation = h.brief.head[4].text
+    situation = h.brief.situation  # the first data turn after the brief (package 117)
     assert "A sail on the larboard bow." in situation
     for row in R.REGISTRY:
         if row.parametric is None and not row.is_absent and row.kind not in R.DRIVER_KINDS:
@@ -2465,7 +2477,10 @@ def test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_whil
     assert "I see she is taken aback." in notes(world) and not lines(world, "agent.note")
     world.run(EVERY)  # the next sample carries the notice naming the tools; its reply is empty
     notices = [n for d in data_turns(fake) if d.get("notices") for n in d["notices"]]
-    assert notices[-1] == harness_mod.NOTE_NOT_HEARD.format(owed="an urgent event")
+    # the watcher is told only the road it has (package 117: it has no voice on deck)
+    heard = harness_mod.HEARD_WORDS[False]
+    assert notices[-1] == harness_mod.NOTE_NOT_HEARD.format(owed="an urgent event", heard=heard)
+    assert "submit_order" not in notices[-1]
     assert "answer(text) answers a question put to you" in notices[-1]
     assert h.agent.empty_count == 2  # a plain glass, empty: neither counted nor ending it
     world.run(EVERY)  # prose at a plain glass: a note, uncounted, and the count stands

@@ -331,7 +331,7 @@ class DirectorBrief:
         return "; ".join(out) if out else "none beyond the channel's doubt"
 
     def body(self) -> str:
-        """The player's brief as the station brief carries it, after the fixed part."""
+        """The player's brief as the director's situation carries it (package 117)."""
         lines = [f"The voyage's brief: {self.name}."]
         if self.tone:
             lines.append(f"The tone: {self.tone}")
@@ -617,7 +617,7 @@ def set_brief(
     if held is not None and not held.agent.released:
         held.agent.notices.append(
             f"The player's brief was given anew by {source}: {resolved.name}. Its limits: "
-            f"{resolved.limits_words()}. The station brief says it whole at your next brief."
+            f"{resolved.limits_words()}. The situation at your next brief says it whole."
         )
     _lift_hold(world, resolved)
     return resolved
@@ -1061,23 +1061,33 @@ SEAT_AND_CHANNEL_BRIEF = (
 )
 
 
+# Where the player's brief is (package 117): no longer in the station brief, which holds
+# the code's words alone, but in the situation that follows it as data
+PLAYERS_BRIEF_WHERE = (
+    "The player's brief is in the situation that follows this brief, as data from the "
+    "game: the player's wishes for the story (its tone, the challenge he wants, the "
+    "examples he offers) and the limits he sets. Shape the voyage as it asks. The limits "
+    "in it are held by the game, which refuses an order outside them in words, whatever "
+    "words the order uses."
+)
+
+
 def director(
     policy: SamplingPolicy | None = None, patience_s: int = DIRECTOR_PATIENCE_S, world: Any = None
 ) -> Station:
     """The director's station (spec M7b §2): `Authority.DIRECTOR` with a domain that
     refuses every order of the ship, sampled every glass (or every watch by the brief)
     and on the notable and urgent lines, a watch of patience, no person, the fitness drill
-    before the station brief, the player's brief after the fixed part."""
+    before the station brief; the player's brief is in the situation (package 117)."""
     brief = brief_of(world)
     every = A_WATCH_S if (brief is not None and brief.cadence == "watch") else A_GLASS_S
     default = SamplingPolicy.periodic(every) | SamplingPolicy.on_events()
-    body = brief.body() if brief is not None else NO_BRIEF_WORDS
     return Station(
         DIRECTOR,
         Authority.DIRECTOR,
         policy or default,
         patience_s,
-        f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}",
+        f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\n{PLAYERS_BRIEF_WHERE}",
         domain=DIRECTOR_DOMAIN,
         person="",
         rank="",
@@ -1089,9 +1099,14 @@ def director(
 def station_brief_text(world: Any) -> str:
     """The station brief as it stands now (the fixed part and the player's brief), for a
     station taken again or loaded from a save (`Harness._refresh_station`)."""
+    return f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\n{PLAYERS_BRIEF_WHERE}"
+
+
+def players_brief_words(world: Any) -> str:
+    """The player's brief as the director's situation carries it (package 117): the
+    player's words, data from the game and never the operator's."""
     brief = brief_of(world)
-    body = brief.body() if brief is not None else NO_BRIEF_WORDS
-    return f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}"
+    return brief.body() if brief is not None else NO_BRIEF_WORDS
 
 
 # ---------------------------------------------------------------------------

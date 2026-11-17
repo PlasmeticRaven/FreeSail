@@ -150,6 +150,8 @@ def render_turn(turn: Turn) -> str:
         ]
         return "== Your reply ==\n" + ("\n".join(lines) or "(nothing)")
     d = turn.content
+    if "situation" in d:  # the brief's own data turn (package 117)
+        return "== The situation at the seating (data from the game) ==\n" + str(d["situation"])
     words = harness_mod.conversation_text(d)
     if words is not None:
         return f"== From the developer ({d.get('reason', '')}) ==\n{words}"
@@ -493,7 +495,9 @@ def run_interactive(
             # the answer is kept beside the leaving, whatever it was: a no is held to,
             # and the question is not put again at each start
             asked = consent.check(args.model_name, Path(args.records))
-            left = world.agents.get(again.left_at) if world is not None else None
+            left = again.left_harness or (
+                world.agents.get(again.left_at) if world is not None else None
+            )
             if left is not None:
                 left.door_act("asked", identity, asked.verdict if asked is not None else "")
         if record is None:

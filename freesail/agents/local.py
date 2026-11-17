@@ -141,7 +141,7 @@ from freesail.agents.harness import (
     HANDOVER_RESERVE_TOKENS,
     conversation_text,
 )
-from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn, opt_out_in
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.tools import (
     CHARS_PER_TOKEN,
@@ -752,6 +752,10 @@ class LocalModel:
                 answer_the_ids()
                 words = conversation_text(d)
                 if words is not None:
+                    if "situation" in d:
+                        # the situation at the seating, the brief's own data turn, is never
+                        # left out (package 117)
+                        pinned.add(len(out))
                     out.append({"role": "user", "content": words})
                 else:
                     if "readings" in d:
@@ -798,7 +802,8 @@ class LocalModel:
         cost = [self.scaled(m) for m in measures]
         tools_cost = self.scaled(tools_measure)
         room = ctx - self.max_reply - tools_cost
-        # the brief, and the handover note folded in after it, are never left out
+        # the brief, the situation after it and the handover note folded in after them
+        # are never left out
         lead = 0
         if messages[0]["role"] == "system":
             lead = 1
@@ -872,7 +877,8 @@ class LocalModel:
         """A response message as a `Reply`: the content as text; each tool call with its
         arguments (a JSON string, or an object where a server sends one; an argument
         string that is not JSON gives no arguments, and the tool says what it needs);
-        `raw` the content and then the calls as served, so the scan sees every word."""
+        `raw` the content as sent (a call written in it included, whole) and then the
+        calls as served, every field of each, so the scan sees every word."""
         content = message.get("content") or ""
         if isinstance(content, list):  # content parts, a model's reasoning parts left out
             content = "".join(
@@ -881,6 +887,10 @@ class LocalModel:
                 if isinstance(p, dict) and str(p.get("type", "text")) not in REASONING_PARTS
             )
         content = str(content)
+        # the content as the server sent it, before any written call is cut out of it:
+        # raw keeps it whole, so that a word in any field of a written call is read by the
+        # token scan (package 117; the cold review's 05-4)
+        sent = content
         calls: list[ToolCall] = []
         served: list[dict[str, Any]] = []
         if not message.get("tool_calls"):
@@ -888,7 +898,6 @@ class LocalModel:
             content, written = calls_in_text(content)
             for name, args in written:
                 calls.append(ToolCall(name, args))
-                served.append({"name": name, "arguments": json.dumps(args, ensure_ascii=False)})
         for tc in message.get("tool_calls") or []:
             fn = tc.get("function") or {}
             name = str(fn.get("name", ""))
@@ -904,9 +913,9 @@ class LocalModel:
                     args = {}
             calls.append(ToolCall(name, dict(args)))
             served.append({"name": name, "arguments": raw_args})
-        raw = content
+        raw = sent
         if served:
-            raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False)
+            raw += ("\n" if raw else "") + json.dumps(served, ensure_ascii=False, default=str)
         return Reply(text=content.strip(), calls=tuple(calls), raw=raw)
 
     def _failure(self, words: str, final: bool = False) -> None:
@@ -1008,7 +1017,8 @@ class LocalModel:
             self._take_count(counts)
             self.exchanges.append(message)
             reply = self.parse(message)
-            why = self._no_reply(reply, message, finish)
+            # a reply that holds the token is the model's, cut off or not (package 117)
+            why = None if opt_out_in(reply) is not None else self._no_reply(reply, message, finish)
             if why is None:
                 if self.served:
                     reply = dataclasses.replace(reply, served_tokens=dict(self.served))
@@ -1638,7 +1648,7 @@ def run(
                     # no reply to be had for the turn (package 37i, item 1): the game ends
                     # it with nothing done and the journal says why; no empty reply is
                     # passed on as the model's
-                    a = took(game.reply(Reply(), cut_off=model.cut_off))
+                    a = took(game.reply(Reply(raw=r.raw if r else None), cut_off=model.cut_off))
                     continue
                 a = took(game.reply(r))
                 continue

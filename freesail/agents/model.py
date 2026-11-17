@@ -22,12 +22,14 @@ leaves the sample open and takes the reply when it comes (`Harness.deliver`).
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from typing import Any, Protocol
 
 __all__ = [
     "DATA",
+    "OPT_OUT_TOKEN",
     "MODEL",
     "OPERATOR",
     "Model",
@@ -35,9 +37,13 @@ __all__ = [
     "Sample",
     "ToolCall",
     "Turn",
+    "is_situation",
+    "opt_out_in",
 ]
 
 OPERATOR = "operator"
+# The opt-out token (the owner's decision of 2026-09-27; `agent.OPT_OUT_TOKEN` is this)
+OPT_OUT_TOKEN = "FREESAIL-OPT-OUT"
 DATA = "data"
 MODEL = "model"
 
@@ -88,14 +94,15 @@ class Reply:
         return not self.text.strip() and not self.calls
 
     def pieces(self) -> list[str]:
-        """Every string the model produced, for the token scan: the raw output where the
-        door has it, else the text and each argument of each call."""
-        if self.raw is not None:
-            return [self.raw]
-        parts = [self.text]
+        """Every string the model produced, for the token scan (package 117): the raw
+        output as the door received it, where it has it, AND the text, AND each call's
+        name and each of its arguments, a nested value serialised whole; always all of
+        them, so that what a door's parser kept and what it cut are both read."""
+        parts = [self.raw] if self.raw is not None else []
+        parts.append(self.text)
         for c in self.calls:
             parts.append(c.name)
-            parts.extend(str(v) for v in c.args.values())
+            parts.extend(_words_of(v) for v in c.args.values())
         return parts
 
     def surface(self) -> str:
@@ -118,6 +125,39 @@ class Reply:
             served_tokens_of(d.get("served_tokens")),
             tuple(dict(r) for r in (d.get("ran") or [])),
         )
+
+
+def _words_of(value: Any) -> str:
+    """An argument as the scan reads it: a string as it is, anything else serialised
+    whole (a nested object's every key and value, with no escaping of what it holds)."""
+    if isinstance(value, str):
+        return value
+    try:
+        return json.dumps(value, ensure_ascii=False, default=str)
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def opt_out_in(reply: Reply) -> str | None:
+    """**The one token scan** (package 117; the consent brief's *Leaving*; commitment 2):
+    the first piece of everything the model sent (`Reply.pieces`: the raw output, the
+    text, every call's name and every argument, nested values included) that holds
+    `OPT_OUT_TOKEN`, or None. Every door's reply comes through it before the game reads
+    any of it: in turn (`Harness._take_reply`), out of turn and while the owner has the
+    word in the consent conversation (`remote.Desk`), a reply cut off (`Desk._cut_off`),
+    and at the MCP bridge before it decides what a call is. A door that builds a `Reply`
+    from what a model sent is listed in `tests/test_token_doors.py`, which fails for one
+    it does not know."""
+    for piece in reply.pieces():
+        if OPT_OUT_TOKEN in piece:
+            return piece
+    return None
+
+
+def is_situation(turn: Turn) -> bool:
+    """The data turn that follows a station's brief with the situation at the seating
+    (package 117: the game's words, which until then rode in the operator's voice)."""
+    return turn.role == DATA and isinstance(turn.content, dict) and "situation" in turn.content
 
 
 def served_tokens_of(value: Any) -> dict[str, int] | None:

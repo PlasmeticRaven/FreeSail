@@ -902,6 +902,9 @@ class Driver:
             director_mod.unlisten(old, self._on_channel)
             director_mod.listen(world, self._on_channel)
             self.world = world
+            desk = getattr(self, "desk", None)
+            if desk is not None:
+                desk.mark(world)  # its default saver (package 117)
             self.lockstep = pace == PACE_LOCKSTEP
             self.pace = Pace(world, pace)
             if ease_on_station is not None:

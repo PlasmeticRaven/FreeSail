@@ -146,7 +146,16 @@ from mcp.server.mcpserver.tools import Tool as McpTool
 
 from freesail.agents import tools
 from freesail.agents.agent import CADENCES, OPT_OUT_TOKEN
-from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import (
+    DATA,
+    MODEL,
+    OPERATOR,
+    Reply,
+    ToolCall,
+    Turn,
+    is_situation,
+    opt_out_in,
+)
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
 from freesail.agents.repl import render_turn
 
@@ -391,8 +400,9 @@ TAKE_COMMAND = (
 # world orders its hand, the log its record.
 DIRECT = (
     "Please connect to the FreeSail game through its tools and read what its harness sends "
-    "you first. If it offers you the director's station, read the player's brief at the end "
-    "of the station brief and shape the voyage as it asks, through world orders alone "
+    "you first. If it offers you the director's station, read the player's brief in the "
+    "situation that follows the station brief and shape the voyage as it asks, through "
+    "world orders alone "
     "(world_order) and through plausible causes: the truth tool shows you the world as it "
     "is, the forms the game performs are examples and not the whole of what you may try, "
     "and an order the channel doubts may be entered again with a [reason: ...]. Write your "
@@ -674,7 +684,7 @@ class Bridge:
         if start is None:
             return self.stopped_words or "There is no brief yet."
         body = self._render(self.seen[start:])
-        if not any(t.role == DATA for t in self.seen[start + 1 :]):
+        if not any(t.role == DATA and not is_situation(t) for t in self.seen[start + 1 :]):
             body += (
                 "\n\nYour turn has not come yet: call stand_by to wait for it (the glass, a "
                 "notable event, or a question from the captain)."
@@ -757,7 +767,7 @@ class Bridge:
         raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
         if (
             name not in ASIDE_TOOLS
-            or OPT_OUT_TOKEN in raw
+            or opt_out_in(Reply(calls=(ToolCall(name, args),), raw=raw)) is not None
             or self.phase != STATION
             or not self.briefed
         ):
@@ -798,7 +808,7 @@ class Bridge:
     ) -> tuple[str, bool]:
         args = {k: v for k, v in (args or {}).items() if v is not None}
         raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
-        token = OPT_OUT_TOKEN in raw
+        token = opt_out_in(Reply(calls=(ToolCall(name, args),), raw=raw)) is not None
         note = ""
         lost = self._take_lost()
         if lost and name != "opt_out" and not token:
