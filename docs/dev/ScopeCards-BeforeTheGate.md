@@ -47,7 +47,7 @@ One thing at a time. The four small mends named on 15 November (the wheel shot a
 
 What I propose: **the design covers both layers, and the build before the gate is the upper one only**, the page and the scenario's keys as the game already reads them. The lower layer is designed, left unbuilt, and decided after the gate, when the owner has played. If the inventory shows something the page cannot offer without the lower layer, the design names it and the owner chooses.
 
-## Card 2. The consent revision
+## Card 2. The consent revision (approved by the owner on 2026-11-15; LAUNCHED 2026-11-17 as package 117, on package 116's merge)
 
 | Field | |
 |---|---|
@@ -162,3 +162,5 @@ The shape of this part was ruled and approved by the owner on 14 November ("I th
 | **Comes after** | Package 115 C merged. |
 | **Comes before** | The consent revision (card 2), which stays last before the gate. |
 | **Who** | One builder of the Fable tier in a session of its own; every reported hash read by a reader of the Opus tier; the fast tier whole run by the builder with a limit of hours; the whole suite on the cloud once on the reported hash; a few passes if the work needs them. |
+
+**Card 5 as it ran (2026-11-17).** Merged at 8dd5f3df by the reported hash 5b9c369f, in one pass; the record is in `docs/dev/M7-WorkPackages.md`, "Package 116 (the four small mends), as merged". Two things in this card were the lead's and wrong, and are corrected there: `port your helm` is not an order of the game (try the wheel with `steer ...`, `helm a-lee`, `bear up` or `tack`); and the audit's known list is kept by hand and checked by its tool, not generated. The ground report, run and not guessed, showed before anything was built that the prize doctrine moves no passage: the values the code reads are the ones it already fell back to, and six of the thirteen keys have no reader. Left for the owner: the brig's watches of seven and three; those six keys.

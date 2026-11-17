@@ -36,6 +36,7 @@ from freesail.agents.agent import (
     OFFICER_DOMAIN,
     OPT_OUT_TOKEN,
     OPTED_OUT,
+    PERSON_WORDS,
     STOOD_DOWN,
     TOKEN_NAMED_WORDS,
     Authority,
@@ -45,7 +46,7 @@ from freesail.agents.agent import (
     watcher,
 )
 from freesail.agents.fake import officer_of_the_watch
-from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.model import DATA, OPERATOR, is_situation
 from freesail.agents.tools import TOOLS, parameters_schema, truthy
 from freesail.api import readings as R
 from freesail.api.session import make_world, ship_factory
@@ -126,8 +127,10 @@ def data_turns(fake: Fake) -> list[dict[str, Any]]:
     seen: list[dict[str, Any]] = []
     for turns in fake.seen:
         for t in turns:
-            if t.role == DATA and not any(t.content is s for s in seen):
-                seen.append(t.content)
+            # the situation at the seating is the brief's own data turn, not a sample (117)
+            if t.role == DATA and "situation" not in t.content:
+                if not any(t.content is s for s in seen):
+                    seen.append(t.content)
     return seen
 
 
@@ -155,7 +158,9 @@ def test_the_officer_takes_the_place_of_the_first_lieutenant_or_the_mate():
     st = station(world)
     assert st.name == OFFICER and st.person == name and st.rank == rank and st.drill
     assert st.authority is Authority.OFFICER_2 and st.domain is OFFICER_DOMAIN
-    assert st.brief.startswith(f"You are the officer of the watch, in the place of {name}")
+    # the station brief names him by the code's words, his name is the situation's (117)
+    assert st.brief.startswith(f"You are the officer of the watch, in the place of {PERSON_WORDS}")
+    assert name not in st.brief
     for ship, role in (("topsail-schooner", "mate"), ("cutter", "mate"), ("brig", "lieutenant")):
         w = make_world(7, str(ROOT / "data/ships" / f"{ship}.yaml"), Scenario())
         n, r = officer_rank(w)
@@ -166,30 +171,33 @@ def test_the_officer_takes_the_place_of_the_first_lieutenant_or_the_mate():
     assert loaded == st
 
 
-def test_the_officers_brief_head_carries_the_five_items_the_domain_and_the_night_orders():
-    """Items 1, 5 and 7: the head's five items in order (truth 46); the authority item
-    states the domain in words, the person, whose the deck is and the captain's night
-    orders (the book as it stands); the opt-out item carries the two sentences asked for
-    in the consent record of 2026-09-29; the station brief comes after the head."""
+def test_the_officers_brief_head_carries_the_four_items_the_domain_and_the_night_orders():
+    """Items 1, 5 and 7: the head's items in order (truth 46, four since package 117); the
+    authority item states the domain in words, the rank, and whose the deck is, and names
+    the person by the code's words; the opt-out item carries the two sentences asked for
+    in the consent record of 2026-09-29; the station brief comes after the head. The
+    person's name and the captain's night orders (the book as it stands) are the game's,
+    and are in the situation, the first data turn after the brief (package 117)."""
     world = frigate_world()
     world.submit('standing order "night routine": at sunset then take in the royals')
     world.submit('standing order "glass": when the glass is falling fast then shorten sail')
     h, fake, _ = seated(world, ["Aye, sir."], deck=False)
     brief = h.brief
-    assert brief.order == ("disclosure", "opt_out", "documentation", "authority", "situation")
+    assert brief.order == ("disclosure", "opt_out", "documentation", "authority")
     assert "the station of the officer of the watch" in brief.head[0].text
     assert TOKEN_NAMED_WORDS in brief.head[1].text
     authority = brief.head[3].text
     assert authority.startswith(OFFICER_DOMAIN.words)
-    assert "You are in the place of Mr Pearce, whose rank, first lieutenant" in authority
+    assert f"You are in the place of {PERSON_WORDS}, whose rank, first lieutenant" in authority
     assert "The deck is the captain's now." in authority
-    assert "The captain's night orders" in authority
-    assert '"night routine" (the captain): at sunset then take in the royals' in authority
-    assert '"glass" (the captain)' in authority
+    assert "The captain's night orders" in authority and "are in the situation" in authority
+    situation = brief.situation
+    assert "whose place you take: Mr Pearce" in situation and "Mr Pearce" not in brief.text()
+    assert '"night routine" (the captain): at sunset then take in the royals' in situation
+    assert '"glass" (the captain)' in situation and "night routine" not in brief.text()
     assert brief.text().index(h.station.brief) > brief.text().index(authority)
     # the strangers, the port, the dangers and the people are the registry's rows, and so
-    # in the situation item as every reading is (parity is structural)
-    situation = brief.head[4].text
+    # in the situation as every reading is (parity is structural)
     for row in ("strangers", "port", "dangers", "people", "officer_of_the_watch"):
         assert f"  {row}: " in situation, row
     # the one operator turn is the brief
@@ -941,15 +949,18 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # with package 98's `the flags` and the flags of command, together on the merged tree:
     # 13,433 at the seat before either (the trunk at c54a053), 13,474 with 98 alone, 13,475
     # with step 5 alone, 13,516 with both, over the fraction of 22,500 (13,500): five
-    # hundred more, 23,000
-    h.budget_tokens = 23000
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 23000
+    # hundred more, 23,000; package 117: the situation the first data turn after the brief,
+    # with its head line and the brief's closing sentence (13,646 at the seat on the trunk at
+    # 90581e79, 13,832 with it, over the fraction of 23,000 (13,800)): five hundred more,
+    # 23,500
+    h.budget_tokens = 23500
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 23500
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 23,000 tokens this door gives you" in ask  # 22,500 before 74 and 98 met
+    assert "of the 23,500 tokens this door gives you" in ask  # 23,000 before 117
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"
@@ -959,10 +970,12 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     assert h.revision == before + 1 and h.agent.has_deck
     roles = [t.role for t in h.turns]
     assert roles[0] == OPERATOR and roles.count(OPERATOR) == 1
-    folded = h.turns[1].content
+    # the situation at the seating is kept with the brief (package 117), the note after it
+    assert is_situation(h.turns[1])
+    folded = h.turns[2].content
     assert folded["handover"] == NOTE and folded["folded"] == harness_mod.HANDOVER_FOLDED
     assert "true_wind_speed" in folded["readings"]  # every reading as it stood
-    assert len(h.turns) <= 2 + harness_mod.HANDOVER_KEEP_TURNS + 3
+    assert len(h.turns) <= 3 + harness_mod.HANDOVER_KEEP_TURNS + 3
     # the next request's conversation holds the note and not the earlier readings reads
     world.run(EVERY)
     last = fake.seen[-1]
@@ -2311,7 +2324,7 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
     tools_call(world, "stand_down", note="The relief wants the royals watched.")
     assert h.agent.released
     h.reseat(Fake([""], loop=True))
-    again = h.brief.text()
+    again = h.brief.situation  # the game's words, the first data turn (package 117)
     assert "The last handover note in this station's journal" in again
     assert "The relief wants the royals watched." in again
     # the ways of stopping that are not a withdrawal: each station's brief says its own,

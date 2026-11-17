@@ -5331,7 +5331,9 @@ def test_truth_85_a_game_saved_with_three_seated_loads_from_its_checkpoint_with_
     for name, note in ((CAPTAIN, "The captain's own note."), (OFFICER, "The officer's own note.")):
         h = back.agents[name]
         h.take_over(Fake([reply("", call("read_journal", kind="notes"))]))
-        assert "The station's journal:" in h.brief.text()
+        # package 117: the journal is the game's words, in the situation sent as data
+        assert "The station's journal:" in h.brief.situation
+        assert "The station's journal:" not in h.brief.text()
         read = tools_mod.call(back, name, "read_journal", {"kind": "notes"})
         assert any(e["text"] == note for e in read["entries"]), name
     read = tools_mod.read_journal(back, MASTER, kind="notes")
@@ -7529,7 +7531,11 @@ def _captain_standing_by_a_glass(stranger_at: str, destination: str):
 def _samples(h) -> list[dict]:
     from freesail.agents.model import DATA
 
-    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+    return [
+        t.content
+        for t in h.turns
+        if t.role == DATA and "tool_results" not in t.content and "situation" not in t.content
+    ]  # the situation at the seating is the brief's own data turn, not a sample (package 117)
 
 
 def test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new():
@@ -14699,7 +14705,9 @@ def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_th
             tools.tool_names(),
             ship=words,
         )
-        assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
+        # package 117: the situation is no longer a head item; it is the first data turn,
+        # opening with its head of the code's words and then the ship herself
+        assert brief.situation.startswith(f"{agent.SITUATION_HEAD}\n\n{words}")
 
 
 def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
