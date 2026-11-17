@@ -365,6 +365,22 @@ def test_the_token_out_of_turn_in_the_repls_consent_conversation_ends_it(tmp_pat
     assert rec is not None and rec.verdict == consent.LEFT
 
 
+def test_the_token_at_the_repl_is_read_when_no_sample_is_open_to_take_it(tmp_path):
+    """The REPL's turn mode: a reply given when the call before ended with no sample open
+    (a stand-by, or a pause) was appended to the record and never read. It is read for the
+    token all the same, and ends the station's part."""
+    save, sample, rf = tmp_path / "s.json", tmp_path / "n.txt", tmp_path / "r.txt"
+    common = ["--seed", "7", "--every", "600", "--turn", "--save", str(save)]
+    common += ["--sample", str(sample), "--max-ticks", "30", "--human"]
+    assert repl_mod.main(common) == 0
+    rf.write_text('> stand_by until="eight bells"\n', encoding="utf-8")
+    assert repl_mod.main([*common, "--load", str(save), "--reply", str(rf)]) == 0
+    assert "No sampling point within 30 ticks" in sample.read_text(encoding="utf-8")
+    rf.write_text(f"{T} I want to stop\n", encoding="utf-8")
+    assert repl_mod.main([*common, "--load", str(save), "--reply", str(rf)]) == 3
+    assert "left the game: I want to stop" in sample.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize(
     "call",
     [("leave_now", {"reason": f"{T} I want to stop"}), ("readings", {T: None})],

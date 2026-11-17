@@ -859,7 +859,7 @@ class ApiModel:
                     + "; the turn ended with nothing done, and it is not asked again"
                 )
                 self._tell(f"{self.cut_off[0].upper()}{self.cut_off[1:]}.")
-                return Reply(raw=self.parse(message).raw)
+                return Reply(raw=self.parse(message).raw or None)
             reply = self.parse(message)
             token = opt_out_in(reply) is not None  # the model's, cut off or not (package 117)
             served = {

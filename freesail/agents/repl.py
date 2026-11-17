@@ -86,7 +86,7 @@ from freesail.agents.agent import (
     station_name,
 )
 from freesail.agents.fake import Transcript
-from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn, opt_out_in
 from freesail.api import readings as R
 from freesail.core import replay as replay_mod
 from freesail.core.world import Scenario, World
@@ -732,6 +732,13 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
             raise SystemExit(f"The save has no {args.station}.")
         h.save_fn = _save_fn(args.save)
         paused_since = (data.get("repl") or {}).get("paused_since")
+        piece = opt_out_in(new_reply) if new_reply is not None else None
+        if piece is not None and not h.agent.released:
+            # the reply was not taken by an open sample (none was open at the save's end,
+            # or the station was paused): the token is read all the same and ends its part,
+            # a door's act recorded for the replay, as at the agent API (package 117)
+            why, how, final = harness_mod.leaving_of(new_reply, piece)
+            h.door_act("leave", why, how, final=final)
         if h.agent.released and new_reply is None:
             # a released station taken again by the game's one rule (package 37g): at
             # once when no question is owed; where one is, in words, for the interactive

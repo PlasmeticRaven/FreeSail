@@ -17,6 +17,8 @@ No model is asked anything: the stations are held by the scripted fake.
 
 from __future__ import annotations
 
+import dataclasses
+
 from test_captain import frigate_world, order, seated
 
 from freesail.agents import Fake, Harness, SamplingPolicy, watcher
@@ -199,7 +201,13 @@ def test_a_voices_station_is_named_by_its_kind_in_the_head():
         domain=PASSENGER_DOMAIN,
         person="Mr Pentreath",
     )
+    from freesail.world.seats import VOICE_BRIEF
+
+    voice = dataclasses.replace(voice, brief=VOICE_BRIEF.format(person="x", where="y"))
     assert station_title_words(voice) == "the voice of a person"
+    # a passenger's station bound under another name is a passenger's, not a voice's
+    supercargo = dataclasses.replace(voice, name="supercargo", brief="You are a passenger, x")
+    assert station_title_words(supercargo) == "a passenger"
     assert station_title_words(watcher()) == "the watcher"
 
 

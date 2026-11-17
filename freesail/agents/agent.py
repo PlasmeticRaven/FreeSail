@@ -2529,7 +2529,9 @@ def station_title_words(station: Station) -> str:
         return station.title
     if station.domain == VISITOR_DOMAIN:
         return "a visitor aboard another ship"
-    return "the voice of a person"
+    if station.brief.startswith("You are the voice of "):  # `seats.VOICE_BRIEF`
+        return "the voice of a person"
+    return "a passenger"
 
 
 def person_words(station: Station, where: str = "") -> str:
