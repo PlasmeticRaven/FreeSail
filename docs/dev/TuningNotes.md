@@ -38020,3 +38020,19 @@ Run whole with the keys moved, both tiers, a trace on every read: cruisers read 
 | truth 7-590, the audit's mechanical findings | 61 | 60 (`v-nation-unknown:cruiser.stations` no longer made) |
 
 **Doctrine written and not yet read, for the owner.** Six of the thirteen are read by no code in any captain's role: `mans_prizes`, `divide_prisoners`, `prisoners_most`, `burns_when`, `worth_least`, `fit_least`. A doctrine that says a privateer never burns a prize, or that a merchantman mans none, changes nothing today. No reader was built for them here.
+
+### Found by the whole fast tier and the readers (2026-11-16 and 17)
+
+The registers that name every work, and two things the independent readers found. Each old beside new.
+
+| where | old | new | why |
+|---|---|---|---|
+| `tests/test_agents.py`, the works the catalogue counts | 109 evolutions | 110 | the wheel's repair is one more |
+| `tests/test_range_audit.py`, the known list's findings that are the data's | 29 | 28 | `v-nation-unknown:cruiser.stations` is no longer made, and its entry was taken out of `tools/range/audit-known.yaml` by hand at the lead's word (the list is kept by hand); the tool reads after: none lacking, none stale, none over its ceiling |
+| truth 7-627, the scenarios whose opening orders are excused | the merchant brig excused (her anchor's order waited) | nobody excused | her anchor is let go; the pin is the stronger |
+| `tests/test_settee.py`, the files that call all hands where the watch is too few | the settee's four and `send_boat` | those and `let_go_anchor` | mend 1, the lead's ruling |
+| `tests/test_held_work.py`, the works' words (`SHIP_WORK_WORDS`) | no `repair_wheel` | "repair the wheel", "repairing the wheel", by its verb's own words as the tackles are | the new work |
+| `tests/test_held_work.py`, held work and the world moved | the relieving tackles among those nothing makes false while held ("the helm is lost until these tackles are rove and by nothing else") | the tackles state it (`RelievingTacklesScript.standing`) and are tried: held, the wheel repaired, taken up, refused, "Could not rig the relieving tackles: the wheel is repaired; the relieving tackles are not wanted."; the wheel's repair among those nothing makes false | the wheel can now be repaired while the tackles lie held (the second reader's finding: they would have been rove for five minutes before being found not wanted) |
+| `freesail/core/checkpoint_names.py`, by its tool's long census | 329 names, `agents.director.Form` among them | 329: `evolutions.repair_scripts.RepairWheelScript` came, `agents.director.Form` went | truth 7-606's walk of kin asked for the new script; `Form` is in no checkpoint and is no longer a name of the director's module (the note of package 115, part C above, which says the entry still resolves, is not so at this tree: `Form` lives in `freesail/world/orders.py` alone) |
+
+The first reader's finding, mended before these: tackles whose reeving ends after the wheel is repaired (neither held) end "The wheel is repaired; the relieving tackles are not wanted." and leave her steering by the wheel. The head comments of the two helm files, which the library's catalogue serves, say nothing of the build.
