@@ -47,7 +47,7 @@ One thing at a time. The four small mends named on 15 November (the wheel shot a
 
 What I propose: **the design covers both layers, and the build before the gate is the upper one only**, the page and the scenario's keys as the game already reads them. The lower layer is designed, left unbuilt, and decided after the gate, when the owner has played. If the inventory shows something the page cannot offer without the lower layer, the design names it and the owner chooses.
 
-## Card 2. The consent revision
+## Card 2. The consent revision (approved by the owner on 2026-11-15; LAUNCHED 2026-11-17 as package 117, on package 116's merge)
 
 | Field | |
 |---|---|
