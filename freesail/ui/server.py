@@ -1085,6 +1085,9 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
     from freesail.agents.remote import Desk, DeskError
 
     desk = Desk(lock, world, **desk_options)
+    # the World handed to the routes has the desk's default saver at once (package 117): a
+    # station seated in the game's own process that leaves before any request is saved
+    desk.mark(world())
     router = APIRouter()
 
     def call(fn: Callable[..., Any], *args: Any) -> JSONResponse:

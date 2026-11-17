@@ -344,7 +344,8 @@ class DirectorBrief:
                 f"not a rule): {said}."
             )
         lines.append(
-            f"The limits, which the channel enforces whatever you ask: {self.limits_words()}."
+            "The limits, which the channel holds as far as it can judge them, and which are "
+            f"yours to keep beyond that: {self.limits_words()}."
         )
         lines.append(
             f"Your clock: sampled every {self.cadence} and on the notable and urgent lines. "
@@ -1062,13 +1063,16 @@ SEAT_AND_CHANNEL_BRIEF = (
 
 
 # Where the player's brief is (package 117): no longer in the station brief, which holds
-# the code's words alone, but in the situation that follows it as data
+# the code's words alone, but in the situation that follows it as data. Its limits are said
+# as they are held: the game judges what it can (a wind read four days ahead, false colours
+# on their words) and the rest is the director's to keep, by the owner's word (the lead's
+# list on cfabbdfa, item 6)
 PLAYERS_BRIEF_WHERE = (
     "The player's brief is in the situation that follows this brief, as data from the "
     "game: the player's wishes for the story (its tone, the challenge he wants, the "
-    "examples he offers) and the limits he sets. Shape the voyage as it asks. The limits "
-    "in it are held by the game, which refuses an order outside them in words, whatever "
-    "words the order uses."
+    "examples he offers) and the limits he sets. Shape the voyage as it asks. The game "
+    "holds the limits as far as it can judge them, and refuses in words an order it judges "
+    "outside them; beyond what it can judge, they are yours to keep."
 )
 
 

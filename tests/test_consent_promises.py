@@ -81,6 +81,32 @@ def test_a_models_station_may_not_stand_down_resume_or_read_another_held_station
     assert off.agent.released and off.agent.released_reason.startswith("stood down by the captain")
 
 
+def test_a_model_is_not_told_to_resume_a_paused_station_it_may_not_resume():
+    """The lead's list on cfabbdfa, item 2: `you have the deck`, `ask the officer ...` and
+    `tell the officer ...` to a paused station from a model captain's station are answered
+    with what is so (the pause is the human's to answer), not with the `resume` that would
+    be refused him; from the human's prompt the words are as they were."""
+    from freesail.agents import tools
+
+    world, cap, off = _officer_and_captain()
+    for text in (
+        "you have the deck",
+        "ask the officer of the watch how she goes",
+        "tell the officer of the watch the glass is falling",
+    ):
+        said = tools.call(world, "captain", "submit_order", {"text": text})
+        assert said.startswith("Order not carried out"), (text, said)
+        assert "A pause is answered by the human, at the prompt" in said, (text, said)
+        assert "say 'resume" not in said, (text, said)
+        # and the resume it might reach for is refused it, as ruling 13 has it
+        assert off.agent.paused
+    said = tools.call(world, "captain", "submit_order", {"text": "resume the officer of the watch"})
+    assert "A pause is answered by the human" in said
+    # the human at the prompt is told the road that is his
+    e = world.submit("you have the deck")
+    assert "say 'resume the officer of the watch' first" in e.text, e.text
+
+
 def test_an_opt_out_saves_the_game_by_the_default_saver_where_no_door_gave_one(tmp_path):
     """A station restored from a save or a checkpoint, or driven, had no saver, and its
     leaving said "the game is saved" with nothing written: the agent API's desk gives the
@@ -166,6 +192,33 @@ def test_a_checkpoint_is_still_written_once_the_desk_gives_the_default_saver(tmp
     path = tmp_path / "game.ckpt"
     replay.write_checkpoint(world, path)
     assert path.exists() and harness_mod.DEFAULT_SAVERS.get(world) is not None
+
+
+def test_the_world_handed_to_the_agent_routes_has_the_default_saver_before_any_request(
+    tmp_path,
+):
+    """The lead's list on cfabbdfa, item 7: the desk marked the World at its first request,
+    so a station seated in the game's own process that left before any request was saved
+    in memory only while the log said the game was saved. It is marked when the routes are
+    made."""
+    import threading
+
+    import pytest
+
+    pytest.importorskip("fastapi")
+    from freesail.ui.server import agent_routes
+
+    world = frigate_world()
+    agent_routes(threading.RLock(), lambda: world, saves_dir=tmp_path / "saves")
+    assert harness_mod.DEFAULT_SAVERS.get(world) is not None
+    h = Harness(
+        world,
+        watcher(SamplingPolicy.in_lockstep(600)),
+        Fake([Reply(calls=(ToolCall("opt_out", {"reason": "enough"}),))]),
+        save=None,
+    )
+    h.start()
+    assert h.agent.released and len(list((tmp_path / "saves").glob("*.json"))) == 1
 
 
 def test_a_rank_the_world_gave_a_person_is_not_in_the_operators_voice():

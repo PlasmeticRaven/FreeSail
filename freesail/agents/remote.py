@@ -1043,6 +1043,11 @@ class Desk:
         assert h is not None
         a = h.agent
         if a.released:
+            # the token or opt_out sent after the release is heard all the same, by the
+            # identity that held the station (package 117; `Harness.heard_after_release`)
+            heard = h.heard_after_release(reply, seat.model_name)
+            if heard is not None:
+                return {"out_of_turn": True, "words": heard}
             return {"words": self.released_words(seat)}
         if h.open_sample is not None:
             h.deliver(reply)
@@ -1120,7 +1125,7 @@ class Desk:
         h = seat.harness
         assert h is not None
         if h.agent.released:
-            return {"words": self.released_words(seat)}
+            return self._station_reply(seat, reply)  # the token heard there (package 117)
         if opt_out_in(reply) is not None:
             # whatever came with a reply cut off is read for the token first (package 117)
             return self._station_reply(seat, reply)

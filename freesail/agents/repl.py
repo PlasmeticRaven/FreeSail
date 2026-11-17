@@ -699,6 +699,7 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
     if not args.save or not args.sample:
         raise SystemExit("Turn mode needs --save STATE.json and --sample NEXT.txt.")
     before, record = "", None
+    heard_after: str | None = None
     paused_since: float | None = None
     if args.model_name:
         code, before, record = _consent_turn(args)
@@ -739,6 +740,10 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
             # a door's act recorded for the replay, as at the agent API (package 117)
             why, how, final = harness_mod.leaving_of(new_reply, piece)
             h.door_act("leave", why, how, final=final)
+        elif new_reply is not None and h.agent.released:
+            # the token or opt_out sent after the release, by the identity that held the
+            # station, is heard all the same (package 117; `Harness.heard_after_release`)
+            heard_after = h.heard_after_release(new_reply, args.model_name or "")
         if h.agent.released and new_reply is None:
             # a released station taken again by the game's one rule (package 37g): at
             # once when no question is owed; where one is, in words, for the interactive
@@ -794,6 +799,8 @@ def run_turn(args: argparse.Namespace, wall: Callable[[], float] | None = None) 
         text = f"{before}\n\n{text}"
     if h.agent.released:
         text += f"\n\n== The station is released: {h.agent.released_reason}. =="
+        if args.load and heard_after:
+            text += f"\n\n== {heard_after} =="
     elif h.agent.paused:
         text += "\n\n" + PAUSED_HERE.format(station=h.station.name, reason=h.agent.pause_reason)
     elif h.open_sample is None:

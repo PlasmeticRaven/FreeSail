@@ -1244,7 +1244,9 @@ def _deck(
             who = ""  # the station named by its number or its person: he is the one meant
         return (
             "agent.deck",
-            agent.give_deck(by="the captain", name=who),
+            agent.give_deck(
+                by="the captain", name=who, by_a_model=_a_model_speaks(_station_speaking(ship))
+            ),
             {"station": target, "deck": "given", "name": who},
         )
     if verb == "i have the deck":

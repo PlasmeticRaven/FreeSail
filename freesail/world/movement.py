@@ -1023,29 +1023,50 @@ def visiting_station(hull: Any, person: Any, policy: Any = None, home_station: A
     if stations.holder(name) is not person:
         stations.bind(name, person, kind=VOICE_KIND, quiet=True, actor=VOICE_ACTOR)
     station = voice_station(hull, name, policy)
-    home = hull_of(hull.world, getattr(person, "home", ""))
-    role = str(getattr(person, "role", "") or "a person")
-    brief = VISITOR_BRIEF.format(
-        person=person.name,
-        role=role,
-        home=hull_name(home) if home is not None else "your own ship",
-        hull=hull_name(hull),
-    )
+    from freesail.agents.agent import PERSON_WORDS
+
+    # the brief in the code's words alone (package 117): the person, his role and both
+    # ships' names are the game's, and go in the situation (`visitor_where`)
+    brief = VISITOR_BRIEF.format(person=PERSON_WORDS)
     return dataclasses.replace(station, brief=brief, domain=VISITOR_DOMAIN)
 
 
+def visitor_where(hull: Any, station: Any) -> str:
+    """Where a visitor is and whose he is, for the situation's first line (package 117):
+    "the lieutenant of the Raven, aboard the Amazon as a visitor"; "" for a station that is
+    no visitor's. Read from the world at each brief, so the names are those of the moment."""
+    from freesail.agents.agent import VISITOR_DOMAIN
+
+    if getattr(station, "domain", None) != VISITOR_DOMAIN:
+        return ""
+    try:
+        person = hull.stations.holder(station.name)
+    except Exception:  # noqa: BLE001  (a hull with no stations binds nobody)
+        person = None
+    if person is None:
+        return ""
+    world = getattr(hull, "world", hull)
+    home = hull_of(world, getattr(person, "home", ""))
+    role = str(getattr(person, "role", "") or "a person")
+    of = hull_name(home) if home is not None else "his own ship"
+    return f"{role} of the {of}, aboard the {hull_name(hull)} as a visitor"
+
+
 # A visitor's brief (package 82): what a model whose person is aboard another ship has and
-# has not there, in the consent brief's voice; the station's kind is the passenger's.
+# has not there, in the consent brief's voice; the station's kind is the passenger's. Since
+# package 117 in the code's words alone: "your own ship" and "the ship you are aboard" where
+# it named both, the person by `agent.PERSON_WORDS`, the names in the situation.
 VISITOR_BRIEF = (
-    "You are {person}, {role} of the {home}, aboard the {hull} as a visitor: your station has "
-    "gone with you from your own ship, and here you have a passenger's reach and no more. You "
-    "read every reading and every query of the {hull} ('where am I' says where you stand), "
+    "You are {person}, aboard another ship as a visitor: your station has gone with you "
+    "from your own ship, and here you have a passenger's reach and no more. You read every "
+    "reading and every query of the ship you are aboard ('where am I' says where you stand), "
     "speak and ask by the deck's conversation, give and take what lies before you, keep your "
-    "journal, stand by until an event or a bell, and leave. You give no order of her deck, and "
-    "none of the {home}'s from here: hail her, make a signal or send a letter. Your own station "
-    "on the {home} stands bound to you meanwhile; 'come aboard' sends the {hull}'s boat to take "
-    "you home where the {home} lies within a boat's pull, and your station is yours again with "
-    "its whole surface when you are aboard her. There is no deck at this station.\n\n"
+    "journal, stand by until an event or a bell, and leave. You give no order of her deck, "
+    "and none of your own ship's from here: hail her, make a signal or send a letter. Your "
+    "own station on your own ship stands bound to you meanwhile; 'come aboard' sends the boat "
+    "of the ship you are aboard to take you home where your own ship lies within a boat's "
+    "pull, and your station is yours again with its whole surface when you are aboard her. "
+    "There is no deck at this station.\n\n"
     "Two ways to stop, which are not one another:\n"
     "- Stand down: stand_down(note). The game is saved, your note is journaled, and the "
     "station is released.\n"
