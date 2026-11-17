@@ -7529,7 +7529,11 @@ def _captain_standing_by_a_glass(stranger_at: str, destination: str):
 def _samples(h) -> list[dict]:
     from freesail.agents.model import DATA
 
-    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+    return [
+        t.content
+        for t in h.turns
+        if t.role == DATA and "tool_results" not in t.content and "situation" not in t.content
+    ]  # the situation at the seating is the brief's own data turn, not a sample (package 117)
 
 
 def test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new():

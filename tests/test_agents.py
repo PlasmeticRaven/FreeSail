@@ -142,8 +142,10 @@ def data_turns(fake: Fake) -> list[dict[str, Any]]:
     seen: list[dict[str, Any]] = []
     for turns in fake.seen:
         for t in turns:
-            if t.role == DATA and not any(t.content is s for s in seen):
-                seen.append(t.content)
+            # the situation at the seating is the brief's own data turn, not a sample (117)
+            if t.role == DATA and "situation" not in t.content:
+                if not any(t.content is s for s in seen):
+                    seen.append(t.content)
     return seen
 
 
@@ -1828,7 +1830,8 @@ def test_authority_words_and_the_brief_builder_stand_alone():
     assert all(a.may_submit_orders for a in Authority if a is not Authority.NONE)
     assert Authority.NONE.words("watcher").startswith("The watcher has no authority")
     b = Brief.build(station(), "a test", ["a line"], {"speed": "5 knots"}, ("read_log",))
-    assert b.order == HEAD_ORDER and "  speed: 5 knots" in b.head[4].text
+    assert b.order == HEAD_ORDER and "  speed: 5 knots" in b.situation  # the data (117)
+    assert "  speed: 5 knots" not in b.text()
     assert agent_mod.Station.load(station().save()) == station()
 
 
