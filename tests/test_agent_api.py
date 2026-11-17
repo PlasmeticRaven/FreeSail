@@ -25,7 +25,7 @@ from fastapi import FastAPI  # noqa: E402
 from own_page import DoorClient  # noqa: E402
 
 from freesail.agents import OPT_OUT_TOKEN, consent  # noqa: E402
-from freesail.agents.agent import A_GLASS_S  # noqa: E402
+from freesail.agents.agent import A_GLASS_S, SITUATION_REASON  # noqa: E402
 from freesail.agents.remote import POLL_RECHECK_S, TURNS_WAIT_MAX_S, RemoteModel  # noqa: E402
 from freesail.api.session import make_world, ship_factory  # noqa: E402
 from freesail.core import replay  # noqa: E402
@@ -153,7 +153,12 @@ def test_a_whole_session_through_the_routes(tmp_path):
     yes_on_record(g.records)
     a = g.took(g.station(door_note="A test door."))
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["operator", "data"] and reasons(a) == ["the start"]
+    # the brief, then the situation at the seating, the first data (package 117)
+    assert roles(a) == ["operator", "data", "data"] and reasons(a) == [
+        SITUATION_REASON,
+        "the start",
+    ]
+    assert "situation" in a["turns"][1]["content"]
     brief = a["turns"][0]["content"]
     assert brief.startswith("This is a message from the harness of FreeSail")
     assert "A test door. Consent for these weights is on record" in brief
@@ -735,7 +740,11 @@ def test_a_station_the_game_mans_itself_is_refused_and_a_loaded_games_is_taken_o
     assert g.station(model_name="someone-else").status_code == 409
     a = g.took(g.station())
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["operator", "data"] and reasons(a) == ["the glass"]
+    # the brief, the situation (package 117), then the open turn
+    assert roles(a) == ["operator", "data", "data"] and reasons(a) == [
+        SITUATION_REASON,
+        "the glass",
+    ]
     assert a["turns"][0]["content"].startswith("This is a message from the harness")
     g.reply("Still here.")
     assert "Still here." in g.notes()

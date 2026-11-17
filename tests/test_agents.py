@@ -67,7 +67,7 @@ from freesail.agents.agent import (
     SESSION_PLAY,
     WATCHER_BRIEF,
 )
-from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.model import DATA, OPERATOR, is_situation
 from freesail.agents.remote import RemoteModel
 from freesail.api import queries
 from freesail.api import readings as R
@@ -1255,7 +1255,9 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     world.run(EVERY)  # the interval comes round: folded, not a second sample
     world.submit("ask the watcher how she goes")
     assert world.clock.tick == EVERY and h.agent.samples == 1
-    since_reply = h.turns[1:]  # the brief, then no model turn yet
+    # the brief and its situation (package 117), then no model turn yet
+    assert is_situation(h.turns[1])
+    since_reply = h.turns[2:]
     assert all(t.role == DATA for t in since_reply)
     folded = [t.content for t in since_reply if t.content.get("folded")]
     assert since_reply[0].content["reason"] == "the start" and len(folded) >= 2
@@ -2703,7 +2705,8 @@ def test_samples_bundled_into_an_open_turn_share_one_copy_of_what_is_common():
     h = late(world)
     world.submit("make plain sail")
     world.run(3 * EVERY)
-    turns = [t for t in h.turns if t.role == DATA]
+    # the samples: every data turn but the brief's situation (package 117)
+    turns = [t for t in h.turns if t.role == DATA and not is_situation(t)]
     folds = [t.content for t in turns if t.content.get("folded")]
     assert len(folds) >= 3
     picture: dict[str, Any] = {}
@@ -2739,11 +2742,22 @@ def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_readin
     # The spare is measured and not a number, so that a reading added to the registry
     # (package 41's `stations` and `lookout`) does not outgrow it.
     whole_cost = len(json.dumps(tools.readings_words(world), ensure_ascii=False)) // 4
-    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + whole_cost + 200 + probe.max_reply + tools_cost
+    # the brief and the situation after it are never left out (package 117): both counted
+    ctx = (
+        costs[0]
+        + costs[1]
+        + sum(costs[len(costs) // 2 :])
+        + whole_cost
+        + 200
+        + probe.max_reply
+        + tools_cost
+    )
     model = LocalModel("http://127.0.0.1:9", ctx_size=ctx)
     msgs = model.messages(h.turns)
     assert model.dropped_turns > 0
-    kept = [json.loads(m["content"]) for m in msgs if m["role"] == "user"]
+    # the situation is a user message of words, kept first; the samples after it
+    assert full[1] == msgs[1] and "situation" in h.turns[1].content
+    kept = [json.loads(m["content"]) for m in msgs[2:] if m["role"] == "user"]
     first = kept[0]
     assert first["readings_are"] == READINGS_WHOLE
     samples = [t.content for t in h.turns if t.role == DATA and "readings" in t.content]
