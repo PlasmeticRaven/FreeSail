@@ -1,0 +1,675 @@
+# Design: the *Purísima Concepción* class three-decker of the Spanish navy (package 90, second draft)
+
+The second draft (2026-11-18) of the design for package 90's fifth hull, the Spanish navy's
+*Purísima Concepción* class, the game's first ship of three gun decks. By the plan's method
+(`Plan-ShipsWorkflow.md` §2, Phase 3) it answers the critic's reading of the first draft item by
+item ("How this draft answers the critic", below the decisions) and takes the settlements of
+package 90's plan (`docs/design/Plan-Package90.md` §4, its step names in §6: A9 is hers). It is for
+the lead and, through the lead's scope card, the owner. **Nothing here is
+built**, and nothing may be until a scope card for the build is agreed with the owner
+(`docs/dev/ScopeCards-BeforeTheGate.md`, "How a package runs, as amended on 2026-11-16"; the
+lead's note of 2026-11-18, nudge 15).
+
+**What binds, in order:**
+1. The lead's note of 2026-11-18, 00:50 UTC (row 90's last paragraph in `docs/dev/M7-WorkPackages.md`):
+   the preliminaries only; documents alone; the build from a scope card agreed with the owner.
+2. Row 90 and the notes to the ships session of 2026-10-29 and 2026-11-06 (18:00 and later): the
+   first three-decker, "three gun decks, a first rate's complement and her stations, the great
+   ship's handling"; the 1797 fit of 112 for St Vincent and the 1803 fit of 116 for the war's
+   scenarios; Winfield's metres for the game's constants; the book's pairs of libras and pounds as it
+   gives them.
+3. `docs/design/Build-Ships.md` (cited **Build**): §5.0's principles and ladder; §6's postscript,
+   package 81's checklist for ports and guns; §8, fits and roles; §13.2's list of what a ship's
+   design settles (the 74's, the nearest kin).
+4. Her research note, `docs/design/Research-PurisimaConcepcion-2026-11.md` (cited **Res**), and
+   `docs/design/VesselReferences-2026-11-Spanish.md` §4 (cited **VR-Sp**, Winfield via the lead).
+5. The 74's design, `docs/design/Design-Ship-Bellerophon.md` (cited **Bel-D**): her bill by deck
+   (§6.4, B7.b as built), her numbering by deck (§5.2, B7.d as built), her made-out words (§8 and
+   the lead's ruling 17 of 2026-11-12), her lateen mizen and yards under the bowsprit (§4).
+6. `docs/design/Design-ShipsEngineExtensions.md` (cited **Ext**): §3 (B3.1, the lateen cut at the
+   mast) and the schooner's-mast rule (B3.4, `Ship.on_schooner_mast`), which she meets only to be
+   classed a ship.
+7. The engine's note for package 90, `docs/design/Design-Package90-Engine.md` (cited **Eng**):
+   its §6 on three gun decks and the obús, read beside this draft's own probes.
+8. Package 116 (the wheel shot away, `repair the wheel`, the cruiser's doctrine read from
+   `thresholds:`) and package 96 (`client/harbour-shelves.yaml`, a sentence a scenario).
+
+**Marks** as Res's: *read*, *read (OCR)*, *read on screen*, *catalogue*, *via Winfield*,
+*measured*, *observed*, *judgement* (in capitals, **JUDGEMENT**, where a figure of hers rests on it
+alone). The rungs are the lead's: **A** the original plans, **B** a historian's particular, **C**
+judgement; **rule** for a named period rule applied to her own particulars (§5.0's R). "Plainly:"
+marks a departure from a ruling, a precedent or a source, with its reason. "Observed here" means a
+run of this draft's scratch scripts (Res §7; `scratchpad/p90/concepcion/`, the session's scratch,
+not filed), each with `py`, the pkg-90 tree first on `sys.path`, `freesail.__file__` asserted
+under it; no tracked file of the tree was changed (Python's git-ignored bytecode caches aside) and
+no git write made.
+
+**One sentence.** One module writes one file of the rebuilt hull for both her fits: her lines her
+sister's at Greenwich checked on her own plan at Madrid, her three tiers of sixteen ports on the
+74's machinery for decks (which already takes a middle deck), Winfield's two establishments to the
+libra, a company of 839 split so that every gun is manned, her rig by Steel's rule until a Spanish
+one is read, and her own words, rank and polar so that she is made out, feared and sailed as a
+first rate.
+
+---
+
+## Decisions proposed
+
+| # | Decision | Why, in short |
+|---|---|---|
+| 1 | One module `tools/ships/concepcion.py`, `build(out_dir)` writing `data/ships/three-decker.yaml` (her name *Purísima Concepción*); her people `data/people/three-decker.yaml` | The 74's form (Bel-D decision 1): a file by her type, a name by her ship |
+| 2 | **One hull, as rebuilt (1786 to 1793), for both fits**; the as-built hull of 94 is no fit | Both her fits are after the rebuild (VR-Sp §4); the game's era is 1792 to 1820 (`Plan-ShipsWorkflow.md` §0) |
+| 3 | **Her lines from ZAZ0101** (her sister *San Josef* as fitted at Plymouth, 1:48, 1801: body, sheer, half-breadth), rung A (§5.0's S, a sister's lines) **once it is read at step 1** (not viewed yet: Res §0.3); until then **PB-039** (her own plan as built, 1779, read on screen) scaled to her rebuilt length stands as her stand-in, S†, and checks ZAZ0101 after | The rebuilt form is the one she sailed; PB-039 is before the rebuild (Res §2.3, §2.4); a source on file but unread is no rung (§5.0 principle 3) |
+| 4 | Hull blocks: length 61.30 m (Winfield, rebuilt), extreme breadth 16.54 m (James, the *San Josef*), draught and displacement measured at her water; interim 7.5 m and 4,200 t, **JUDGEMENT**; Winfield's 5,167 t recorded beside | §2 |
+| 5 | **Three tiers of sixteen ports a side** (lower, middle, upper), the lower's sixteenth pair empty in Spanish service; the quarterdeck's and forecastle's ports as ZAZ0103 and ZAZ0100 show them | Res §2.4 (PB-039's 15, 16, 16 as built); VR-Sp §4 (the sixteenth pair cut in 1791) |
+| 6 | **Guns numbered by deck** (`numbering: by deck`), each deck from No. 1 forward, the 74's B7.d | Built and measured on her scratch file (observed here); the period numbered each deck (Bel-D §5.2) |
+| 7 | **Two fits**: "concepcion 1797" (112, the default) and "concepcion 1809" (116, the 1803 alteration) | VR-Sp §4; each sums to Winfield's broadside in libras exactly (observed here) |
+| 8 | **The obús carried as a carronade** of its calibre, its words and note saying obús | The engine refuses an `obus` kind and takes a 48-pounder carronade (Eng §6.3); a new kind is engine work beyond her file (§5.4) |
+| 9 | **A gun's `pounder` as her navy named it** (`pounder: 36`), Winfield's pairs of libras and pounds in the note as the book gives them, never a ratio re-derived from them: **the owner's (Dec 9)**, this the pick; the other way, the English weight in the file with the words from a separate key, set beside it in §5.3 | The lead's rule (VR-Sp "Units": take the pairs as given); the plan's §4 row 8. **Plainly:** the first draft filed each calibre by Winfield's broadside ratio, which re-derives the book's ratio per calibre |
+| 10 | Company 839: posts 18, idlers 60, **her soldiers 100, the bill keeping 60 as small arms**, seamen 661: every gun of one side manned at the beat (observed here). **Interim** until Winfield's dotación by kind (Dec Part D, G3) is read | VR-Sp §4 (839, not broken down); the marines never serve a long gun in the engine (Bel-D §6.3), so about 160 soldiers, the 74's share (JUDGEMENT), leave four crews unmanned (observed here; §6) |
+| 11 | Masts by Steel's rule on her own particulars (the main mast half her lower deck and extreme breadth), the rest by the 74's proportions scaled 1.15, **rule and JUDGEMENT**, until a Spanish rule or PB-078 is read | Res §5 |
+| 12 | The mizen course on a lateen yard cut at the mast (B3.1) in both fits; the spritsail and sprit topsail yards as the 74's; **no driver** | The 74's machinery; no Spanish source either way (Res §5); the driver is the owner's British choice (Bel-D §4.6) |
+| 13 | Her words: description `three-decker`; at the rig's distance the tops make out **"a three-decker"**; the glass **"a three-decker, sixteen ports a tier"**; how she is rigged, "a ship" | Package 75's made-out rule, the lead's ruling 17 (Bel-D §8) |
+| 14 | **Size rank 5**, a class above the 74's 4, `LINE_OF_BATTLE_RANK` unchanged | The owner's (§17 item 1) |
+| 15 | Roles: `kings-ship` and `commodore` (a flagship); her nation the scenario's; a British fit "as the san josef 1801" booked, not drawn | Build §8.2; Bel-D §8 |
+| 16 | Her polar given her own length and canvas so that she sails between the 74 and the frigate (observed here: 8.01 kn abeam in 15 kn against 7.87 and 8.19); her tack slowed to no quicker than the 74's by her rudder and her helm's lead | Res §6 (Brenton, James); §9 |
+| 17 | Truths 7-NNN-a to e (§14), numbered by the lead at the scope card | Build §15's form |
+| 18 | Her first scenario: Cape St Vincent, 14 February 1797, on the Actions shelf, a sentence (§11): **booked** for a card of its own after the nations' dated wars, not in the build's card (the plan's §4 row 15); she is offered from the harbour for a bare start | Package 96; Res §8 |
+
+---
+
+## How this draft answers the critic
+
+| Finding | What the first draft said | This draft |
+|---|---|---|
+| F2 (blocker): a personal path | the scratch folder written out in full, with the account's name | **Held.** `scratchpad/p90/concepcion/`, the session's scratch, not filed, as the other notes write it (the marks; Res §0) |
+| F9: rungs before reading | ZAZ0101 "A (S)" though not viewed | **Held.** S once ZAZ0101 is read at step 1; PB-039, read on screen, her stand-in (S†) until then (decision 3, §3.2) |
+| F11: the soldiers' other way | "file the soldiers as Winfield gives them" | **Held.** Winfield gives the 839 unbroken; the other way is about 160 soldiers by the 74's share (JUDGEMENT) with the engine's rule changed. The pick of 100 is interim until G3's dotación is read (decision 10, §6.1, §17 question 3) |
+| F17: which length | "not said in VR-Sp"; filed as the length on the gun deck | **Held.** VR-Sp labels it "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as the gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the eslora on the gun deck, JUDGEMENT; C1 stays asked (§2) |
+| F23: the pace | "three crewed at the first thousand and two after", 0.96 | **Held.** Her p5c.py ran a world of its own (three of the file added as patrolling vessels off the Lizard), not truth 7-196's; in truth 7-196's own world the engine note measured three three-decker probes at 72 to 75 against three 74s' 79 to 81, all three crewed throughout (Eng §7): about 0.92 (§9) |
+| The plan's settlements | the pounder by Winfield's ratio per calibre; a first scenario | the nominal pounder as the pick, the owner's (decision 9, §5.3; Plan §4 row 8); no scenario in the card (decision 18; Plan §4 row 15); A9 hers (Plan §6) |
+
+---
+
+## 0. The gate, the order, and what waits
+
+**No build until the owner's scope card.** The order inside package 90 is the plan's (§9.1): on
+the ship-rigged road the *Diana* first and she second, beside the lateen road; A9 (three decks) is
+her own step, built by her builder. Her build would want, in
+this order and each on its own word:
+
+| Piece | Whose | Before her file? |
+|---|---|---|
+| The owner's answers to §17 | the owner | yes |
+| Winfield's passages (Res §11) | the owner's books | the hull blocks and the bill wait on items 1 and 2; nothing else does |
+| PB-039 held in the tree (CC BY 4.0), and the choice of her hull: her sister's ZAZ0101 as rebuilt, or PB-039 as built (Dec 10; the sheets themselves read under the standing Greenwich rule) | the owner | her hull's lines (§3.2) wait on it |
+| Her words and rank in `world/ships.py` and `world/captains.py` (§8) | her builder, the lead allotting `world/` | with her file |
+| "The second deck", "the third deck" in `orders/gunnery.py` (§5.5) | the gunnery's owner, or her builder on the lead's allotment | no: words only |
+| The obús as a kind of its own | a later gunnery package | no: carried as a carronade meanwhile |
+| A Spanish names list (`data/crew/names.yaml` has English, American and French) | her builder or the *Diana*'s | with her people file |
+
+Nothing of her moves another ship's file, truth or pin (§15).
+
+---
+
+## 1. The module and the generator
+
+### 1.1 Files
+
+- `tools/ships/concepcion.py` (new): `build(out_dir)`; imports `gen_ships` as `g`, `period`,
+  `mizen_yard`, `spritsail_yards`; nothing from `bellerophon.py` (Bel-D decision 3: an import
+  would tie her bytes to another ship's module).
+- `data/ships/three-decker.yaml` (generated).
+- `data/people/three-decker.yaml` (hand-written data, as the 74's).
+- `tests/test_concepcion.py` (new).
+- Rows in `freesail/world/ships.py` and `freesail/world/captains.py` (§8), and the words of §5.5.
+
+### 1.2 What she reuses, read only
+
+The 74's machinery throughout: `g.broadside_pair(..., deck=<word>, round_to=0.01)` and the re-keying
+of ids by deck after it (`gun.middle.3.starboard`: Bel-D §5.2, B7.d as built); `numbering: by
+deck`; `g.hull_profile` with `decks_m`, `ports_m` and `port_size_m` for each of her six decks
+(`schema.DECK_WORDS` already holds `middle`: `freesail/ship/schema.py:339`); `mizen_yard.py` (the
+course cut at the mast); `spritsail_yards.py`; `g.fit_magazine`; `g.exercise_allowance(n,
+decks=3)` (the Regulations' "a ship of two or three decks": Eng §6.2).
+
+### 1.3 What is new in her module
+
+Her own lists (no shared constant changes): her decks (`GUN_DECKS` as the 74's module keeps its
+own, `tools/ships/bellerophon.py:2499`, Eng §6.2); her calibres in libras and their English pounds
+(§5.3); her patterns' weights and crews (§5.3); her company's split (§6).
+
+---
+
+## 2. The hull blocks
+
+| Key | Figure | Source, rung |
+|---|---|---|
+| `length_waterline_m` | **61.30** | Winfield's rebuilt length (via Winfield, p. 407; B), filed by the 74's convention of the length on the gun deck (Bel-D §2.1). VR-Sp labels Winfield's figure "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as her gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the *eslora* on the gun deck (JUDGEMENT), the owner's passage C1 asked. **Plainly:** the book's pies give 61.43 m (220 pies 6 pulgadas × 0.2786); its metres are taken by the lead's rule, the owner's re-reading of p. 407 settling the digit (Res §2.1). James's 59.21 m for the *San Josef* (Res §2.2) is the check; ZAZ0101's scale measures it (task 1) |
+| `beam_m` | **16.54** | James's extreme breadth of the *San Josef* (vol. 2 p. 59, read (OCR); B). **Plainly:** not Winfield's 16.25 m, the book's *manga* being read as inside the plank (Res §2.2, JUDGEMENT); the file's beam is the extreme, as the 74's 46 ft 9 in is. If the owner's passage says the *manga* is extreme, 16.25 |
+| `draught_m` | **7.5**, to K, **JUDGEMENT** | Not found (Res §2.6). The 74's draught to K over her depth in hold (6.46 m on 19 ft 9 in: 1.07) on James's 7.44 m gives 8.0; on a Spanish ship built to carry her lower battery higher (James vol. 1 pp. 29 to 30) less (judgement). Measured on ZAZ0101 at her water (task 2) |
+| `displacement_kg` | **4,200,000**, **JUDGEMENT** | Her length, breadth and draught at the 74's block (Res §2.5). Measured off ZAZ0101's sections at her water (task 3); Winfield's 5,167 t in the note and in truth 7-NNN-a's record. The scratch file at 5,167 t heels 0.5° less close-hauled and tacks the same (observed here) |
+| `gm_m` | **1.5**, **JUDGEMENT** | The 74's 1.36 m (*Bombay Castle*, Bel-D §2.1) raised for a broad ship (James vol. 1 pp. 29 to 30: Spain built her ships broader than any other nation's, for safety); tuned within a band against the 74's heel |
+| `deck_height_m` | her **upper deck** at midships, about 5.2 m, measured | D18 (Bel-D §2.3): the deck of the waist, the third; read for the wind on deck, her windage and the lookout's eye (`physics/sails.py:349`, `world/lookout.py:223`) |
+| `hull_speed_kn` | **13.1**, **JUDGEMENT** | The 74's 12.0 by the square root of the lengths (61.30 / 51.2); tuned within §9's band |
+| `clr_x_m`, `rudder` | tuned (§9) | Her rudder from ZAZ0101's sheer (task 4); her helm's lead tuned for the 74's helm close-hauled and a tack no quicker than the 74's |
+
+---
+
+## 3. The hull profile and her shape (Build §5.0 to §5.3, §5.7)
+
+### 3.1 The form
+
+The 74's: `rail_m`, `breadth_m`, `keel_m`, `stem_m`, `stern_m`, `wales_m` (the main wale and, as the
+74's `channel_wales_m`, a wale between each tier), `section_m`, `decks_m` (six), `ports_m` (six),
+`port_size_m` (six), `head_m`, `breadth_line_m`, `sections_m`, `form` (a square stern, its
+galleries and lights by tier, a figure at the head), and `marks` for every line.
+
+### 3.2 Her lines, by source
+
+| Line | Source | Rung (§5.0) | Note |
+|---|---|---|---|
+| The body plan, sections and half-breadths | ZAZ0101 (1:48, 1801) | A (S, a sister's) once read at step 1; until then PB-039 scaled, S† | the *San Josef* as rebuilt and fitted; her sister's after the same rebuild (VR-Sp §4) |
+| The sheer, the rail and its steps, the wales | ZAZ0101 (sheer), ZAZ0100 (colour plan, 1799) | A (S) once read; PB-039 scaled, S†, until then | ZAZ0100 for the eye of her upper works as the British found them |
+| The stem, the head, the figure | ZAZ0101 ("figurehead"), PB-039 | A (S) once read; PB-039 meanwhile; the figure's form in words | PB-039's head a beakhead with rails and a figure (Res §2.4) |
+| The stern, the counter, the galleries and lights | ZAZ0101 ("sternboard with decoration detail", "quarter decoration"), PB-039 | A (S) once read; PB-039 meanwhile | PB-039: two closed tiers of quarter galleries and a third of lights above (Res §2.4); the admiral's cabins on the *toldilla* (PB_0050, via Winfield p. 409) |
+| The decks | ZAZ0102 (middle, gun and orlop, 1:96), ZAZ0103 (quarterdeck, forecastle, upper, 1:96), ZAZ0101 (inboard) | A (S) once read; T until then, to read: ZAZ0102, ZAZ0103 | |
+| The ports, their sills and sizes | ZAZ0101 and ZAZ0100 (rebuilt, 16 a tier); PB-039 (as built: 15, 16, 16, read on screen) | A (S) once read; PB-039's tiers, S†, meanwhile | §3.3 |
+| The keel and the body under the water | ZAZ0101 | A (S) once read; PB-039 scaled, S†, meanwhile | kept as data (§5.0 principle 11) |
+| Anything a sheet does not reach | the default rule (Build §5.3) | C, `judged` | its note names the hull it must differ from, the 74 |
+
+**Plainly:** until the Greenwich sheets are read and measured at step 1 (and the owner chooses her
+hull from them: Dec 10, question 2), her lines stand on PB-039 alone, her own hull before the rebuild: lengthened by her rebuilt length
+over her built length (61.30 / 59.55, 1.029: §5.0 principle 7's stand-in scaling, `stand-in`), her
+sections by the breadths (16.25 / 16.16), the sills from PB-039's own tiers. That is the fallback,
+not the plan.
+
+### 3.3 The ports and their sills
+
+- **The lower deck: sixteen ports a side** as rebuilt (the sixteenth pair cut in 1791: VR-Sp §4),
+  their centres and sills measured on ZAZ0101 (task 5). PB-039 gives the as-built fifteen at 12¾
+  pies (3.56 m) centre to centre over 49.8 m (Res §2.4); the rebuild's added length is about one
+  more room and space (judgement). Which pair is the sixteenth is not known (Res §10): **JUDGEMENT**
+  the aftmost, so that her armed pairs are the lower deck's Nos. 1 to 15 and No. 16 an empty port
+  (in the British fit armed); if the drawings show the new pair forward, the numbering keeps its gap
+  wherever it falls (Bel-D §5.2: "a fit that leaves a place empty leaves a gap").
+- **The middle and upper decks: sixteen a side**, the middle staggered between the lower and the
+  upper, the upper over the lower and one more aft (PB-039, Res §2.4).
+- **The quarterdeck and forecastle**: six and three a side for the 1797 fit's 12 and 6 eight-
+  pounders (VR-Sp §4); places from ZAZ0103 (task 6). The 1809 fit's quarterdeck takes four
+  eight-pounders and six obuses, its forecastle four and two: the same ports, the obuses on the
+  ports nearest the ends (**JUDGEMENT**; the 74's 1812 rule, long guns in the wake of the shrouds,
+  carronades elsewhere, Bel-D §5.1).
+- **The poop's six obuses of 24** (1809): three places a side over the rail, as the 74's poop
+  carronades (Bel-D §5.1), from ZAZ0103's poop if drawn.
+- **The lower sills above her water**: not known (Res §2.6). Her water is set as the 74's was (Bel-D
+  §2.2: the line where a reported clearance stands, else the drawn load line) by task 2, and the
+  sills follow from the drawing.
+
+### 3.4 Port sizes
+
+Measured by deck on ZAZ0101 (task 5). Interim, the 74's: lower 1.04 × 0.83 m, middle and upper the
+74's upper 0.84 × 0.80, the upper works 0.79 × 0.71 (**JUDGEMENT**); the Spanish 36-pounder's port
+is likely larger than the British 32's (judgement), so the lower's is measured first.
+
+### 3.5 Her measuring tasks (the Greenwich sheets read under the standing rule; the owner's choice of hull, Dec 10)
+
+1. ZAZ0101's scale, and her length between the perpendiculars and on the lower deck (against
+   Winfield's 61.30 and James's 59.21).
+2. Her load line on ZAZ0101 (the drawn waterlines) and PB-039's two dashed lines identified; her
+   water and draught to K.
+3. Her displacement at her water by the sections (the 74's method, `Research-74-2026-10.md` §3.2.5).
+4. Her rudder (area, span) and her lateral plane.
+5. Every port's centre, sill and size on three tiers; the sixteenth lower pair's place.
+6. The quarterdeck's, forecastle's and poop's ports and places on ZAZ0103 and ZAZ0100.
+7. The decks' heights at the middle line (six decks), and her upper deck at midships for
+   `deck_height_m`.
+8. The stern: the counter, the galleries' tiers and the lights' bands (`galleries_m`, `lights_m`).
+9. The masts' places at the partners (ZAZ0101's inboard; ZAZ0102's and ZAZ0103's decks).
+10. PB-039 against ZAZ0101: the rebuild's change in length and in the stern, for her note.
+
+---
+
+## 4. The rig
+
+**No Spanish source for her masts, yards or sails was read** (Res §5). Her rig is therefore Steel's
+rule for the main mast on her own particulars and the 74's file's proportions scaled to it, every
+figure marked; PB-078 (a 112's canvas, Romero Landa 1791) and any Spanish rule replace them when
+read (§17 item 4).
+
+### 4.1 The masts
+
+| Mast | Length | Source |
+|---|---|---|
+| Main lower mast | **124 ft 3 in (37.87 m)** | Steel 1794 vol. I p. 39 (read (OCR)): half the lower deck and the extreme breadth, on James's 194 ft 3 in and 54 ft 3 in; **rule**, British. On Winfield's 61.30 m and James's breadth, 127 ft 2 in; the gun deck's length taken as Steel's "lower deck" (Res §5) |
+| Fore lower mast, mizen lower mast, the topmasts, topgallant and royal masts | the 74's (*Dragon*'s list, Bel-D §4.1) × **1.150** (124.25 / 108) | **JUDGEMENT** until Steel's p. 39 fractions are read on the page image, which then rule |
+| Mast places, heels and rakes | measured (task 9) | A |
+
+Each lower mast is stepped on the keel and stands through **three** decks; Steel's diameters are
+"taken at the partners; which are at the middle deck in three-decked ships" (p. 49, read (OCR)).
+
+### 4.2 Mast by mast: each spar and sail, and its class
+
+As the 74's file (Bel-D §4), every length × 1.150 and every area × 1.32 (**JUDGEMENT**), the
+heights from her own decks. The class is the engine's (`physics/sails.py`'s `SAIL_CLASSES`).
+
+| Mast | Spars | Sails (class) |
+|---|---|---|
+| **Fore** | lower mast, topmast, topgallant mast, royal mast; fore yard, fore topsail yard, fore topgallant yard, fore royal yard; the lower, topmast and topgallant studding-sail booms a side | fore course (square), fore topsail (square), fore topgallant (square), fore royal (square, flying); fore staysail and fore topmast staysail (jibheaded); the lower, topmast and topgallant studding sails a side (studding); the fore storm staysail (jibheaded, in the sail room); the fore save-alls (studding, in the sail room) |
+| **Main** | lower mast, topmast, topgallant mast, royal mast; main yard, main topsail yard, main topgallant yard, main royal yard; the topmast and topgallant studding-sail booms a side | main course (square), main topsail (square), main topgallant (square), main royal (square, flying); main staysail, main topmast staysail, middle staysail, main topgallant staysail (jibheaded); the topmast and topgallant studding sails a side (studding) |
+| **Mizen** | lower mast, topmast, topgallant mast, royal mast; the mizen yard (`lateen_yard`), the crossjack yard (a dry yard for the topsail's sheets), mizen topsail yard, mizen topgallant yard, mizen royal yard | **mizen course (lateen, cut at the mast)**, mizen topsail (square), mizen topgallant (square), mizen royal (square, flying); mizen staysail and mizen topmast staysail (jibheaded); the mizen storm staysail and the storm mizen (jibheaded, in the sail room) |
+| **Bowsprit** | bowsprit, jib boom, spritsail yard, sprit-topsail yard | jib (jibheaded); spritsail (square), sprit topsail (square), out of "plain sail" (D8 (b), Ext §4) |
+
+- **The mizen course on its lateen yard** (B3.1, Ext §3): worn not tacked (the whole lateen's rule
+  of package 75 reaches only a whole lateen; hers is cut at the mast and lies against it as the 74's
+  does), hauled aft at helm's a-lee and brailed up hove to, observed on the scratch file as on the
+  74 (Res §7). **Plainly:** whether a Spanish three-decker carried a lateen yard or a gaff in 1797
+  and in 1809 was not found; the lateen is the 74's of 1794 and the machinery's (§17 item 4).
+- **No driver.** The 74's driver boomsail is Steel's British sail, chosen by the owner for the
+  British 74 (Bel-D §4.6); nothing gives it to a Spanish ship (judgement).
+- **The schooner's-mast rule (B3.4)** leaves her a ship: every mast with yards carries a lower
+  yard (her mizen's crossjack as the 74's), no after mast is a schooner's (observed here:
+  `on_schooner_mast` false for all eight after yards). Its two classing limits (a lower square-sail
+  yard on a schooner's main; a pole main with its topsail yard on the lower mast) do not reach her.
+- **Groups and aliases**: the 74's, by name (`plain sail` the same eleven: courses, topsails,
+  topgallants, the fore topmast staysail, the jib and the mizen course).
+
+### 4.3 What the rig must still be given
+
+The fore and mizen fractions from Steel's page; the yards by Steel's p. 40 proportions on her own
+masts (the 74's file cites them); the sails cut by Steel's table IV, its largest column scaled
+(judgement), checked against PB-078's sums when read; the ratings by her own areas; her brace
+limits the 74's (no source for a first rate's: `Research-74-2026-10.md` §7.4's open item).
+
+---
+
+## 5. The guns (package 81's checklist, Build §6's postscript)
+
+### 5.1 The fits
+
+| Fit | Lower (36) | Middle (24) | Upper | Quarterdeck | Forecastle | Poop | Pieces | Broadside |
+|---|---|---|---|---|---|---|---|---|
+| **"concepcion 1797"** (default) | 30 | 32 | 32 × 12 | 12 × 8 | 6 × 8 | — | **112** | **1,188 libras (1,282 lb)** |
+| **"concepcion 1809"** | 30 | 32 | 32 × 18 | 4 × 8, 6 × 48-pdr obús | 4 × 8, 2 × 48-pdr obús | 6 × 24-pdr obús | **116** | **1,508 libras (1,627 lb)** |
+
+Source: Winfield p. 407 (via Winfield; VR-Sp §4). Each fit's half by calibre sums to the book's
+broadside in libras exactly (observed here). **Plainly:** James's *San Josef* at her capture had 18s
+on the second deck (vol. 2 p. 51); Winfield's 24s are taken, the book's own sum the check (Res §3.2).
+Her default is the 1797 fit: the 1809 fit is a year's (her recommissioning, 1809 to her loss in
+1810), the 1797 the class's long establishment (1793 to 1803) and St Vincent's.
+
+**A third fit, booked:** "as the san josef 1801", the British first rate of 114 (ZAZ0101's "114-gun
+First Rate"), with her sixteenth lower pair armed and James's 850 men (vol. 6 p. 407); for a
+British scenario of 1801 to 1813, when the owner's passage of Winfield's British volume is read
+(Res §11 item 4). Not drawn in this draft.
+
+### 5.2 Places, numbers and the deck (checklist items 1 to 4)
+
+- **Numbered by deck from forward**, each deck from No. 1 (B7.d as built): lower 1 to 15 armed
+  (16 the empty sixteenth, §3.3), middle 1 to 16, upper 1 to 16, quarterdeck 1 to 6, forecastle 1 to
+  3, poop 1 to 3. Ids `gun.<deck>.<n>.<side>`. A place keeps its number in both fits.
+- **The deck word on every gun**: `lower`, `middle`, `upper`, `quarterdeck`, `forecastle`,
+  `roundhouse` (the poop: `parts.DECK_SAID`, "the poop").
+- **Checklist item 1**: `hull.profile` with `rail_m`, `breadth_m` and `decks_m` for all six decks.
+- **Item 2**: `ports_m.<deck>`, a triple at every gun's own `x_m` (within 0.01 m), the sill her
+  sheet's, the half-breadth her side's at the sill; the poop's places 2 in under the rail
+  (`OVER_THE_RAIL_M`).
+- **Item 3**: `port_size_m` for each of the six (§3.4).
+- **Item 4**: every gun's `kind`, `pounder`, `place`, `side`, `x_m`, `weight_cwt` and `deck`.
+- **Item 5**: `tools/check_viewer_guns.py data/ships/three-decker.yaml` clean, and the test. On the
+  scratch file it is clean for both fits (observed here: 106 and 6, 104 and 12; Res §7).
+
+### 5.3 The calibre, the weight and the crew
+
+| Piece (libras) | `pounder`, by Dec 9's pick | The other way's English figure (Dec 9 (b)) | Weight | Crew | Source |
+|---|---|---|---|---|---|
+| Long 36 | 36 | 38.85 | interim 66.8 cwt | 14 | the other way's figure the libra by Winfield's broadside pairs (1,308 / 1,212 = 1.079; Res §3.3), **JUDGEMENT**, until the book gives the English weight by calibre; the weight the English 32's 55 cwt scaled by the shot (judgement); the crew between Falconer's 13 for a 32 and 15 for a 42 (judgement) |
+| Long 24 | 24 | 25.90 | interim 49.5 cwt | 11 | Adye's 24 of 9 ft 6 in (judgement on the pattern); Falconer's 24 |
+| Long 18 (1809) | 18 | 19.43 | interim 42.0 cwt | 9 | Adye's 18 of 9 ft 6 in; Falconer's 18 |
+| Long 12 (1797) | 12 | 12.95 | interim 34.0 cwt | 7 | Adye's 12 of 9 ft 6 in; Falconer's 12 |
+| Long 8 | 8 | 8.63 | interim 24.5 cwt | 6 | Adye's 9 of 7 ft 6 in (the nearest); Falconer's 9 |
+| Obús 48 (1809) | 48, as a carronade | 51.80 | interim 22.25 cwt | 4 | the English 42-pounder carronade's weight (Adye p. 72), the nearest; Douglas's carronade crew |
+| Obús 24 (1809) | 24, as a carronade | 25.90 | interim 13.0 cwt | 4 | Adye's 24-pounder carronade |
+
+- **The `pounder` rule** (the owner's, Dec 9; this draft's pick, the plan's §4 row 8): each gun
+  filed by its calibre as her navy named it (`pounder: 36`), its note saying so ("a 36-pounder of
+  the Spanish navy, 36 libras"), and the fit's note giving Winfield's broadside pair as the book
+  gives it (1,188 libras, 1,282 lb; 1,508 libras, 1,627 lb), never a ratio drawn from it. Her
+  broadside then reads a little light in the game's English pounds, and her notes say so.
+  **Plainly:** the first draft filed each calibre by Winfield's broadside ratio (the third column),
+  which re-derives the book's ratio per calibre, the thing the lead's rule asks not to be done; it is
+  kept here only as the other way's figures, for the owner's eye, marked JUDGEMENT.
+- **The weights** are the checklist's drawn lengths too (the pattern of nearest weight in Adye's
+  tables, `check_viewer_guns` listing a weight more than a tenth off its pattern's). On the scratch
+  file a long 36 of 65 cwt drew no such note (observed here), Adye having no 36; what length the
+  viewer gives a Spanish 36 is to be read in `freesail/api/viewer_guns.py` before her file.
+- **The crews** (one side's pairs): 552 men in 1797, 582 in 1809 (observed here).
+- **Charges and the magazine**: Table No. 29 (SW-1) has no Spanish calibre; each charge a third of
+  the shot's weight for the long guns and a twelfth for the obuses (**JUDGEMENT**, the period's
+  common proportions, until Spanish figures are read); `g.fit_magazine` with the King's rounds;
+  `exercise_allowance(n, decks=3)`.
+
+### 5.4 The obús
+
+Carried as a carronade of its calibre (decision 8), so that it loads, fights and is drawn by the
+existing paths: its words "a 48-pounder obús", its note the reason. **Plainly:** a howitzer threw a
+shell as well as a shot, and the engine has no shell; the 1809 fit's obuses fire round and grape
+as a carronade does. The obús as its own kind (shell, its range) is a gunnery package's,
+with the *Diana*'s 1817 obuses (Eng §6.3).
+
+### 5.5 Orders and words by deck (observed here, Res §7)
+
+The 74's B7.b and B7.d work on three decks today: "fire the starboard middle deck" (16 guns), "fire
+No. 3 gun of the middle deck", "the middle deck's No. 16", "the gun deck" (the lower), a bare "fire
+No. 3" refused naming her decks. Two things are hers to settle:
+- **"The second deck" and "the third deck"** are James's own words for the middle and upper decks of
+  the Spanish prizes (vol. 2 p. 51) and Falconer's "the second or middle deck" (DECKS): proposed as
+  words for `middle` and `upper` on a ship of three gun decks (words only; on a two-decker "the
+  second deck" would name the upper, judgement, and is left unbuilt there).
+- **"The main deck"** names the upper deck today (Cumby's word on a 74, Bel-D §6.4 item 5). On a
+  three-decker the word is ambiguous in the period; **proposed**: on a ship of three gun decks it is
+  refused in words naming her three gun decks, as a bare number is (judgement; §17 item 5).
+
+---
+
+## 6. The company, her watches, the quarter bill by deck and the people file
+
+### 6.1 The company, 839
+
+Winfield's 839 (VR-Sp §4; B). James's 917 at her sister's capture and the 850 of British service
+in the note (Res §4). Not broken down in any source read, so the split is **JUDGEMENT**, set by what
+the engine needs to man her guns:
+
+| Part | Number | Basis |
+|---|---|---|
+| Posts | 18 | the 74's 16 with two more lieutenants, seven in all (judgement; Falconer's first rate has six; a Spanish flagship's second in command, the *segundo comandante*, among them) |
+| Soldiers (`marines` station) | **100**, interim | **JUDGEMENT**, interim until Winfield's dotación by kind is read (Dec Part D, G3): the 74's 111 of 590 is 19%, and about 160 of 839 by that share (JUDGEMENT; no source breaks down her 839) left four of her crews unmanned (observed here), because the engine's marines never serve a long gun (Bel-D §6.3, as built). At 100, every crew of both fits is manned (observed here: 56 and 58 crews, the trimmers 105 and 103) |
+| Idlers | 60 | the 74's 44 scaled (carpenter's crew 15, sailmaker's 5, cooper 2, armourer 4, cook 3, steward 4, servants 19, surgeon's mates 3, clerks 3, master-at-arms's party 2) |
+| Seamen | 661 | the rest, in the 74's six stations by her shares |
+
+**Plainly:** the Spanish practice of putting soldiers at the guns (judgement on general knowledge,
+no source read) is met here by counting fewer of her people as marines, not by changing the engine's
+rule; Winfield's breakdown (Res §11 item 2) replaces the split.
+
+### 6.2 Her watches
+
+Two, starboard and larboard, as every King's ship of the game (judgement; no Spanish source read).
+**Package 75's ruling 11** (a merchantman's master and mate counted as hands of their own watch
+where the watch is too few) does not reach her: she is a King's ship. Her watches are each over
+three hundred, so no evolution of the game wants all hands for want of a watch (package 116's `too_few:
+all hands` on `let_go_anchor` never bites).
+
+### 6.3 The quarter bill (against the default fit) and the bill by deck
+
+- **The bill**: trimmers by station as the 74's scaled to her seamen; the helm **4** (two wheels'
+  men on a first rate, judgement); the powder 42; small arms 60; boarders 140; the bill's `marines`
+  **60** (the small-arms party on the poop and quarterdeck). Observed here: in the 1797 fit, with no carronade, all 100 soldiers stand in their division (the engine's marines serve no long gun); in 1809 the obuses take 28 of them and 72 stand.
+- **The beat by deck** (B7.b, observed here): "The lower deck: 15 gun crews ... The middle deck: 16
+  gun crews ... The upper deck: 16 gun crews ... The quarterdeck: six gun crews ... The forecastle:
+  three gun crews ...", the poop's in 1809.
+- **Robbing by deck** (B7.b item 4): the lower deck's crews behind shut ports first, then "the other
+  decks" from the end that bears least, the lower deck's last (observed here). **Proposed, for the
+  lead** (it reaches `crew/quarters.py`, the 74's code): on a ship of three gun decks, the upper
+  deck's crews before the middle deck's (the lighter metal first, as the 74's reason for the lower
+  deck's last: judgement), and a middle deck's crews behind shut ports with the lower's (at 30° on
+  the scratch sills the middle deck's ports shut and its crews are not counted shut: observed here).
+  Neither moves the 74 or the 64 (keyed on a `middle` deck).
+
+### 6.4 The officers by deck (her people file)
+
+After the 74's (Bel-D §6.5), by the 1795 deck plan's cabins (the admiral's on the *toldilla*, the
+captain's and lieutenants' on the *alcázar*: PB_0050 via Winfield p. 409): the captain, the captain's second
+and the master on the quarterdeck; two lieutenants a gun deck, the senior at the after guns and the
+junior at the foremost; the forecastle under the boatswain; the poop's small arms under an officer
+of the soldiers. In her people file's briefs; no engine key.
+
+### 6.5 The flag
+
+A flagship through most of her service (Córdova's, Lángara's, Mazarredo's, Morales de los Ríos's:
+VR-Sp §4). The flag and its party are the scenario's `people:`, not her file's (Bel-D §6.6).
+
+### 6.6 The people file
+
+`data/people/three-decker.yaml`, hand-written: her posts' people in Spanish names (a Spanish list in
+`data/crew/names.yaml` first, shared with the *Diana*), her officers' briefs by deck (§6.4). Her
+`crew.names` key names the list.
+
+---
+
+## 7. Ground tackle, boats, pumps, hold and stores
+
+All **JUDGEMENT** on the 74's file scaled to a first rate until Spanish figures are read: Steel's
+anchor and cable table's 100-gun row where the OCR gives it (`period.STEEL_ANCHORS` holds the 64's
+and the 74's; hers appended); the 74's six boats with a second launch (judgement); four chain pumps
+and two hand pumps (the 74's); water and provisions scaled to 839 for 120 days (the 74's days).
+Ibargüen's plans of 1785 (Res §0.2) show the Spanish navy's wheel and its machinery: her wheel is
+the game's wheel, and package 116's `relieving_tackles` and `repair_wheel` stand for her as filed
+(observed here: the tackles in 380 s, the wheel repaired in 2,279 s, the 74's 385 and 2,310 s). **For
+the lead:** six hands at a first rate's tiller by the tackles is the frigate's judgement; a first
+rate's heavier tiller may want eight (judgement); her file could carry a timing of its own as the
+74's carries `lie_a_try`'s.
+
+---
+
+## 8. Far description, vessel type, size rank and her words
+
+### 8.1 What is made out, and when (package 75's made-out rule)
+
+- **At the rig's distance** (`RIG_MADE_OUT_NM`, 4 nm): the tops make out **"a three-decker"**. A
+  ship of the line is made out as such there by her size and her tiers (the lead's ruling 17 of
+  2026-11-12); a three-decker's three tiers and her height are what the logs of the period record at
+  first sight of a fleet ("another First-rate", Nelson's narrative, Nicolas vol. 2 p. 341)
+  (judgement on the distance, as the 74's).
+- **How she is rigged**: "a ship" (`RIGGED_AS["a three-decker"] = "a ship"`), so that her hail, her
+  sails aback lying to, and every reader of rigging read her as a ship.
+- **The glass** (`MADE_OUT_NM` × `GLASS_FACTOR`): **"a three-decker, sixteen ports a tier"** (her
+  three tiers of sixteen as rebuilt). Her colours at `COLOURS_MADE_OUT_NM` (2 nm), as every ship's.
+- **Not** "a first rate" in what is made out: a rate is a navy's book, not a sight (judgement); "a
+  first rate" names her description in a scenario's words.
+
+### 8.2 Her rows (in `freesail/world/ships.py` and `world/captains.py`, her window)
+
+- `DESCRIPTIONS["three-decker"] = {"file": "data/ships/three-decker.yaml", "rig": "a three-decker",
+  "what": "a three-decker, sixteen ports a tier"}`, and the file's own `ship.descriptions` with her
+  fit and roles (`kings-ship`, `commodore`).
+- `_DESCRIPTION_WORDS`: "a three-decker", "three-decker", "a first rate", "a first-rate", "a
+  hundred-and-twelve", "a 112", "a ship of the line of three decks" to `three-decker`. "A ship of the
+  line" stays the 74's.
+- `SIZE_RANK["three-decker"]` and `_SIZE_WORDS`: ("three-decker", 5) before ("ship of the line", 4).
+  Today "a three-decker" ranks nothing and is "a sail" (observed here).
+- `RIGGED_AS["a three-decker"] = "a ship"`.
+
+### 8.3 Her rank and what it does (observed in the code, `world/captains.py`)
+
+- A lone frigate (rank 3) hauls off from her as from a 74 (`LINE_OF_BATTLE_RANK` 4, `_overmatched`).
+- A cruiser or privateer (`stranger_hostile_nm` 6) hauls off from any bigger class: from a 74 and
+  from her alike at rank 5.
+- A King's 74 (rank 4, `stranger_hostile_nm` 0) does not haul off from her: the King's ship's book
+  hauls off from no ship of her own class or under and leaves bigger ones to her judgement. Whether
+  a lone 74 should avoid a three-decker is the owner's (§17 item 1).
+
+---
+
+## 9. How the engine sails her today, and what it must be given (observed here)
+
+The scratch file (Res §7): the 74's rig scaled 1.06, 59.2 m, 4,200 t. And the design's rig
+(`v_design.yaml`): the 74's rig scaled **1.15** by Steel's rule, 61.3 m, hull speed 13.1.
+
+| Measure | 74 | Scratch (1.06) | Design rig (1.15) | Frigate-36 | What she must be given |
+|---|---|---|---|---|---|
+| Static polar, 15 kn abeam | 7.87 kn | 7.50 | **8.01** | 8.19 | the design rig puts her between the 74 and the frigate, as Brenton and James have her (Res §6); band in 7-NNN-d |
+| Close-hauled 67.5° off, 15 kn | 4.92 kn, 3.6° | 4.75 kn, 2.7° | 4.92 kn, 3.4° | | her GM tuned so that she heels no more than the 74 (a broad ship) |
+| The tack, truth 10's form (290, 292.5, 295°) | 237, 243, 258 s | 181, 184, 188 | 182, 230, 189 | 343, 447, 370 | **quicker than the 74's**: neither her company (590 the same as 839) nor her displacement (5,167 t the same) slows it; the 74's rudder adds 15 s. Her rudder from ZAZ0101 and her helm's lead tuned to a tack no quicker than the 74's, inside Luce's five to ten minutes (the lead's (1) of 2026-11-07) |
+| The wear | 499 s | 498 | | 513 | as the 74's (truth 11's band) |
+| Hove to | ≤ 1.18 kn, 56.5 to 63.4° | ≤ 1.39 kn, 55 to 64° | | | as the 74's |
+| Classing | a ship | a ship | | | nothing |
+| Pace, alone (truth 51's form) | 408, 387 | 386, 371 | | | 0.95 of the 74's; the alone clause is no truth since the lead removed 7-196's |
+| Pace, three crewed (truth 7-196's world, Eng §7) | 79, 81 | 72, 75 (the engine note's three-decker probe) | | | about 0.92 of three 74s, over the floor of 60; the lead measures on the build machine. Her own p5c.py (68 against 71, 0.96) ran a world of its own, three of the file added as patrolling vessels off the Lizard, one of which stood off after the first thousand: recorded, not the truth's measure |
+| Checkpoint at quarters | 168 KB gz (637 KB raw) | 174 KB (688 KB) | | | under 2 MB |
+
+**The tack.** A first rate staying faster than a 74 contradicts every period expectation of a great
+ship (judgement: no source on her own time in stays was found). The cause in the engine is her
+rudder and her helm's lead scaled with her, not her mass: the yaw's inertia scales with her
+displacement and length (`physics/hull.py`, `yaw_inertia`) but the tack is governed by the
+evolution's phases and the swing's damping (observed: 4,200 and 5,167 t tack within a second of each
+other). Her builder tunes `clr_x_m` and the rudder to the band of 7-NNN-d, and says if no setting
+holds both the helm and the tack (as the 74's builder did).
+
+---
+
+## 10. The lee ports
+
+The rule (package 70; Build §7) reads her sills by deck from her profile; it shuts her lower ports
+first and her middle deck's at a greater heel (observed here on the scratch file's 74 sills: 11
+lower at 12.5°, all 15 at 18°, the middle deck's first eight at 30°). Her own sills wait on task 2
+and 5. James's general word that foreign-built ships carried their lower battery "higher from the
+water" (vol. 1 p. 29) is the period's expectation; a truth on her shut heel waits on her measured
+sill.
+
+---
+
+## 11. Where she sails
+
+| Scenario | Fit | The chart | The shelf's sentence (package 96, `client/harbour-shelves.yaml`, Actions) |
+|---|---|---|---|
+| **Cape St Vincent, 14 February 1797** (the first) | 1797 | `atlantic-east`, the `portugal` block's Cape St Vincent | "The Spanish three-decker *Purísima Concepción*, flagship of the second in command, off Cape St Vincent on 14 February 1797 with Jervis's fifteen sail of the line in sight." |
+| Cádiz Bay, 7 March 1810 | 1809 | Cádiz and its bay | "The *Purísima Concepción* at anchor in Cádiz Bay as the storm of 7 March 1810 comes on, the French on the shore to leeward." |
+| Brest, 1799 to 1802; Toulon, 1793 | 1797 | `biscay-north`; Toulon | booked |
+
+- **The nations.** `data/nations.yaml`'s wars are one year's picture (Britain at war with Spain from
+  12 December 1804): right in kind for 1797, wrong for 1810, when Spain was Britain's ally; the
+  Cádiz scenario wants the table's dated wars or a scenario's own stance (for the lead; not hers).
+- **Her signals**: Spain's own book (Mazarredo's, package 76).
+- **The other side at St Vincent**: the game's 74 under British colours and the frigate; no British
+  first rate exists (the *Victory*), so a scenario of the fleets would be a later package's.
+- **The wheel at St Vincent**: the *Captain*'s wheel was shot away before Nelson boarded (Nicolas
+  vol. 2 p. 341): the scenario's British 74 meets package 116's evolution in its own history.
+
+---
+
+## 12. Fits and roles
+
+- **Her trade**: none; a King's ship of the Spanish navy (her file carries no nation; the scenario's).
+- **Roles**: `kings-ship` (a ship of the line on her own) and `commodore` (a flagship leading a
+  squadron), as the 74's, read from `data/captains/` by the first (`brains.INTENT_RULED_ROWS`,
+  Build §8). The regency's cruiser's doctrine (package 116's road, `thresholds:`) is not hers.
+- **Fits**: §5.1; the British "as the san josef 1801" booked.
+
+---
+
+## 13. What the viewer must draw
+
+From her profile alone, by the rules the viewer already has (Eng §11: three tiers are drawn as two
+are; `galleries_m` takes any number of tiers):
+- **Three tiers of ports**, sixteen a side, the lower's sixteenth shut and empty in her Spanish fits;
+  the lids; the guns in them by package 81's rule.
+- **Her height**: three gun decks under a quarterdeck and forecastle with an open waist and its
+  gangways, and the poop; her rail's steps at each.
+- **The stern**: square, two closed tiers of quarter galleries and a third of lights above, the
+  stern's lights in tiers (PB-039; ZAZ0101's sternboard).
+- **The head**: a beakhead with its rails and a figure (PB-039; ZAZ0101's figurehead).
+- **The channels** above the upper tier, their chain plates down across it (PB-039).
+- **The mizen's lateen yard** and its course cut at the mast (the 74's drawing, Ext §6.1); the
+  spritsail yards (Ext §6.2).
+- **The words for a port** in `client/projection.js` (Eng §6.2: "upper-deck port" and the bare word
+  for any other): "a middle-deck port" for hers, by the log's "-deck" form (words only).
+- **Paint and carving** in words where ZAZ0100's colours are read (the British paint of 1799, not the
+  Spanish), else nothing invented (§5.0 principle 9).
+
+---
+
+## 14. Truths proposed (numbered by the lead at the scope card)
+
+| Truth | What it holds | Form |
+|---|---|---|
+| **7-NNN-a, her particulars hold their sources** | her length and breadth Winfield's and James's within the rounding; three gun decks with 16 ports a side each; her two fits 112 and 116 pieces whose halves sum to 1,188 and 1,508 libras; 839 men | the 74's 7-194 form |
+| **7-NNN-b, three gun decks at quarters** | the beat says the lower, middle and upper decks' crews in order; every crew of the default fit manned; "fire the starboard middle deck" names sixteen guns; a bare number refused naming her decks | B7.b and B7.d on three decks |
+| **7-NNN-c, her lower ports shut at the heel her sources give** | after tasks 2 and 5 | the 74's 7-195 form |
+| **7-NNN-d, she sails as a fast first rate** | her best speed in 15 kn at least the 74's and no more than the frigate's; her tack from truth 10's three headings no quicker than the 74's and inside 600 s; she wears and lies to as the 74 | Brenton via Winfield; James vol. 6 pp. 3 to 4; Luce |
+| **7-NNN-e, three of her crewed hold the floor** | the frigate off the Lizard with three of her crewed over `CREWED_FLOOR_TICKS_S` | the 74's 7-196, marked pace |
+
+---
+
+## 15. Pins her work could move
+
+None of another ship's by her file. Her rows in `world/ships.py` and `world/captains.py` add words
+and a rank; no existing description's words change ("a ship of the line" stays the 74's). The words
+"second deck" and "third deck" add orders where there were none. The robbing order proposed in
+§6.3 is keyed on a `middle` deck, which no file but hers has. The checks of every new attribute as a
+plain class default, and every existing file byte for byte, as Build §14.2.
+
+---
+
+## 16. Risks, ranked
+
+1. **Her lines unread.** Until ZAZ0101 to ZAZ0103 are read at step 1 (and if the owner chooses
+   PB-039 alone, Dec 10), her hull is PB-039's stand-in (§3.2), her sills and water judged, and truth
+   7-NNN-c waits.
+2. **Her tack and her helm.** The engine's tack does not slow with size (§9); if no rudder and lead
+   hold both the 74's helm and a tack no quicker than the 74's, the band is the lead's to set.
+3. **Her company's split** is set by the engine's rule that marines serve no long gun; Winfield's
+   breakdown may say she carried more soldiers than her bill can use.
+4. **The Spanish pound and the guns' weights** stand on one ratio until a passage gives them by
+   calibre; every gun's figure moves together when it does.
+5. **The displacement** (4,200 against 5,167 t) moves her heel, her way and her pace a little; her
+   handling and tack not (observed).
+
+---
+
+## 17. Open for the owner (few and plain; my pick first)
+
+1. **Her rank.** (a) **A class above the 74 (rank 5)**: a lone frigate and every cruiser keep away
+   from her as from a 74, and a lone King's 74 does not avoid her of itself (my pick; a 74's captain
+   meeting a three-decker alone is a judgement the game leaves to that captain). (b) The 74's rank, 4: every
+   ship of the line one class.
+2. **Her sources.** (a) **Hold PB-039** (her own plan, CC BY 4.0, credited as the *Diana*'s) in
+   `docs/references/images/`, **and draw her hull from her sister's lines as rebuilt, ZAZ0101 to
+   ZAZ0103**, measured on Greenwich's site under the standing rule (read and cited by number, never
+   copied, as *Minorca*'s are for the xebec) (my pick); (b) PB-039 alone, her hull scaled from her as
+   built. (Viewing the sheets needs no permission; the choice is which hull is hers, and so it is
+   the owner's: Dec 10 question 2.)
+3. **Her soldiers at the guns.** (a) **Count about a hundred of her 839 as soldiers and the rest as
+   seamen, so that every gun is manned** (my pick, interim until Winfield's dotación by kind, G3, is
+   read); (b) about 160 soldiers by the 74's share (JUDGEMENT: Winfield gives the 839 unbroken), with
+   the engine's rule changed so that her marines serve long guns on her bill (a change to the 74's
+   rule, for her alone).
+4. **Her rig.** (a) **Steel's rule and the 74's proportions scaled, a lateen mizen and no driver,
+   until a Spanish source is read** (my pick); (b) wait for a Spanish rule before her file.
+5. **"The main deck" on a three-decker.** (a) **Refused in words naming her three gun decks, with
+   "the second deck" and "the third deck" added** (my pick); (b) "the main deck" the upper deck, as
+   on the 74.
+
+Picture for the questions (side by side, words): her profile as PB-039 draws it (three tiers of 15,
+16 and 16, a beakhead, two tiers of quarter galleries) beside the 74's file as drawn today (two tiers
+of fourteen): for question 1, what the tops see at four miles.
+
+---
+
+## 18. For the lead
+
+1. **The images README** says J1945 is "as taken in 1797"; Greenwich dates it 1799 (ZAZ0100, the
+   fitting at Plymouth). The lines are ZAZ0101 (J1950) (Res §2.3).
+2. **Winfield's two figures** that disagree with the foot (the keel, the rebuilt length; Res §2.1),
+   for the owner's re-reading with the passages of Res §11.
+3. **The robbing order on three decks** (§6.3), keyed on a `middle` deck: the 74's code, which the
+   plan gives her builder as A9 (Plan §6, §7.1).
+4. **The relieving tackles' hands on a first rate** (§7).
+5. **The nations table's one year** for a scenario of 1810 (§11).
+6. **A Spanish names list**, shared with the *Diana* (§6.6): the plan's N1, from the *Diana*'s
+   builder.
+
+---
+
+## 19. Found on the way
+
+- **PB-039 at full resolution** (12,932 × 4,574 px) on the Biblioteca Virtual de Defensa, CC BY 4.0,
+  with four sister-type sheets of the 112s (PB-049, PB-078, PB-344, PB-060) and Ibargüen's wheel
+  of 1785, all from the Archivo Histórico de la Armada (Res §0.2): the same library and licence as
+  the *Diana*'s PB-021; the other hulls' documents may find their own plans there.
+- **The marines' rule** (they serve carronades and never long guns: Bel-D §6.3 as built) is what
+  leaves a ship with a large body of soldiers unable to man her guns; any later ship with soldiers
+  at the guns (a Spanish or French ship of the line) meets it too.
+- **The tack does not slow with displacement** in the engine (§9): a later great ship meets the
+  same, and a truth for "a first rate stays slowly" would need it said.
+- **"A ship of the line of three decks"** ranks 4 through "ship of the line" today, and names no
+  description (observed here).
