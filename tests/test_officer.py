@@ -1981,17 +1981,26 @@ def test_a_yes_given_before_the_revision_of_package_117_is_asked_again_with_the_
 
 
 def test_every_yes_on_file_is_asked_again_once_against_the_revision_of_package_117():
-    """Package 117 (decision 70; card 2, item 4): no yes on file was given against the
-    brief as it stands, and every identity whose newest record is a yes is asked again
-    with the six named. The records are read, never written."""
+    """Package 117 (decision 70; card 2, item 4): every identity whose newest record is a
+    yes given before the revision is asked again with the six named: seven of them, none
+    against the brief as it stands. One yes on file was given against the revised brief
+    itself (filed at the owner's word, 2026-11-18; `docs/agents/ConsentAndPreferences.md`,
+    section 4e): it is not asked again, by any door, while the brief stands. The records
+    are read, never written."""
     on_file = consent.records(consent.RECORDS_DIR)
     newest: dict[str, object] = {}
     for rec in on_file:  # the newest record decides, as `consent.check` reads it
         newest[rec.identity] = consent.check(rec.identity, consent.RECORDS_DIR)
     yes = {w: r for w, r in newest.items() if r is not None and r.verdict == consent.YES}
-    assert len(yes) == 7, sorted(yes)
-    assert all(r.brief_digest != BRIEF_DIGEST for r in yes.values())
-    assert all(consent.changed_sections(r, "mcp") == THE_SIX for r in yes.values())
+    before = {w: r for w, r in yes.items() if r.brief_digest != BRIEF_DIGEST}
+    since = {w: r for w, r in yes.items() if r.brief_digest == BRIEF_DIGEST}
+    assert len(before) == 7, sorted(before)
+    assert all(consent.changed_sections(r, "mcp") == THE_SIX for r in before.values())
+    assert len(since) == 1, sorted(since)
+    for r in since.values():
+        assert r.date == "2026-11-18"
+        for door in ("mcp", "runner", "api"):
+            assert consent.changed_sections(r, door) == []
 
 
 def test_the_sections_the_re_ask_rule_watches_are_pinned_by_digest():

@@ -82,6 +82,12 @@ The consent revision (card 2 of `docs/dev/ScopeCards-BeforeTheGate.md`; decision
 
 The package wrote nothing under `consent/`, ran no re-ask and seated no model: the asking is the owner's, through the game's own consent step.
 
+## 4e. A record given against the revised brief: the lead's own session (2026-11-18)
+
+One record stands against the brief as revised by package 117: `consent/2026-11-18-claude-fable-5-2.md`. It is the answer of the session that leads the game's development, asked by the game itself when that session took the director's station for a playtest of its own, with the owner's leave (`docs/playtests/2026-11-18-lead-at-the-director-seat/notes.md`). The answer is yes, the drill passed, with three notes that are not conditions; the second says that the owner was not at the door in that sitting, which the brief says he always is, and that the session knew it and accepted it for that sitting. **Filed at the owner's word** (2026-11-18: "We shall file your consent record from the playtest").
+
+What it does: the game reads it as a yes against the brief as it stands, so an instance stationed under exactly that identity is not asked again until the brief's watched words change. The identity is the name that door gave; a model seated under any other name, a typed one among them, is a different party to the game and is asked as any other. It is not one of the seven of section 4d, each of which is still owed the question once.
+
 ## 5. Owner's reading
 
 Recorded 2026-09-26. The owner largely agrees with the reading above, and adds:
