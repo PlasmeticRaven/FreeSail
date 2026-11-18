@@ -38080,3 +38080,76 @@ Step 1 moves no figure of the ship, the sea or the people. What moved is the sha
 **Listed, not mended, for the lead:** the pause's own line in the log (`Harness.pause`: "Continue, stand down, or leave paused? Say 'resume the <station>' or 'stand down the <station>'."), which reaches a model captain's samples and `read_log`, is said to the human; its words are pinned by three tests (`test_officer.py`, `test_agents.py`) and by `docs/agents/Harness.md`, and a line of the log is in every recorded game with a pause, so it is left as it is and listed.
 
 No pinned world digest moved, and no recorded passage: the saves replay by their acts (package 42) and the brief is not in the log.
+
+**Step 3: the approved words, and the code that keeps them** (2026-11-18; decision 70). The brief below its rule is the approved draft's Part 1 (`docs/design/ConsentBrief-Revision-2026-11.md` at e1cf1abf) with Part 3's words entered at their marks and the drafting marks taken out: the **[P3: …]** marks, the *[true after step 3: …]* marks, and Part 3's *[changed: …]*, *[new: …]* and *[kept by the owner]* notes. A script that strips them from the draft and compares the result with the brief's body finds them identical.
+
+### Pins moved
+
+- The brief's digest: `ccbc1ebdf1a42c3e` to **`2e9a96871ce0689f`** (`BRIEF_DIGEST`, decision 70 named beside it).
+- The watched sections (`WATCHED_SECTION_DIGESTS`), all six moved:
+
+  | Section | Before (42b) | After (117) |
+  |---|---|---|
+  | the opening | `a104662f6e3c0470` | `5db420636f4d7cc8` |
+  | What an instance would see and do | `3f1375a11d8266a0` | `03c1aaed3595dcb7` |
+  | Leaving | `4e338c8dd7492b09` | `b0ae9e1612eb0697` |
+  | Being stopped | `a7a279ef1ff24aae` | `3c6f0c3f684bb3db` |
+  | What is not done | `ad25c744cee7db0a` | `f7723f8cb85a9d39` |
+  | The journal | `5cf037ca675110e2` | `3d2b74e8e709710b` |
+
+- The re-ask:
+  - A yes given against the brief of 2026-10-17 is asked again with the six named (`test_a_yes_given_before_the_revision_of_package_117_is_asked_again_with_the_six_named`, against `tests/fixtures/ConsentBrief-before-117.md`, `-text` in `.gitattributes`).
+  - The seven yeses on file are each asked again with the six named (`test_every_yes_on_file_is_asked_again_once_against_the_revision_of_package_117`).
+  - The three older re-ask tests compare their fixture with the brief as it stands, so each moved where the brief moved:
+    - 37g's: the differing sections gain *Answering* (*The record* was there).
+    - 42a's: the two unwatched sections now differ. Old: `then["The record"] == now["The record"] and then["Answering"] == now["Answering"]`; new: both `!=`, and the list of differing sections gains the two.
+    - 42b's: the watched sections that differ go from the five of 42b (`THE_FIVE_OF_42B`, kept and asserted a subset) to all six (`THE_SIX`); Leaving goes from `==` to `!=`; the two unwatched from `==` to `!=`; `decide`'s and `why_again`'s words go from five sections to six.
+    - Each asserted words still hold for the yes against its own older brief.
+- The word bound: under 2,300 words as sent at the runner's door, now **under 3,700**.
+  - Below the rule: 2,259 words before this package, 3,644 after.
+  - As sent at the runner's door: 2,295 before, 3,680 after.
+  - The owner approved the words, and the bound moves with them and no further.
+- The pinned sentences of `test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files`, each old beside new:
+  - the passenger (now "…, or in a passenger's place as the voice of a person nobody else holds, aboard or ashore;");
+  - the director ("and later as a *director*, … under the owner's grant." to "and as a *director*, … may act on its ships and people, and may seat models … under the owner's grant and stand down those so seated.");
+  - "All of these exist today but the director, who is to come …" to "All of these exist today.";
+  - "this is the question only" to "Nothing in this question is a game, and it offers no station.";
+  - the kinds of session (", or a race)" to ", a race, or play at the director's station)");
+  - "The lookout and the master give no order of the deck." to "…, except a named thing the owner or the captain allows the master.";
+  - "It gives orders only while it has the deck, which the captain gives and takes back as he likes; neither ends its part." to "It gives the orders of the deck only while it has the deck." and "none of these ends its part.";
+  - "The owner may give such orders while instances play, as the director will; …" to "The owner may give orders to the world while instances play, and so may the director; …";
+  - the budget seat ("as a ship's captain … by the owner, or later by the director" to "at a station of a ship, or as the voice of a person, … by the owner or by the director");
+  - the signs (adds "replies with nothing in them where an answer was owed");
+  - "the game does not wait for a silent captain." to "The game does not wait for a silent captain, unless it is run to hold its clock while a door has its turn.";
+  - the journal ("open to any model that later keeps it, so it is a record and not a secret" to "…, and, while nobody holds the station, to the captain's station; so it is a record and not a secret.");
+  - what is not done ("from another model or from the world" to "from another model, from the director or from the world"; "the brief is the only text …" to "a brief is the only text … (this one here, a station's brief at a station), and everything after it is data, the situation at the seating first.");
+  - the record ("It is put again when the kind of thing changes: …" to "The question is put again when the words of this brief change in its opening or …").
+  - Added for the new kinds: the situation as the first data, the command devolved, the shot into a ship no enemy, the director's acts, its speaking as a person nobody holds, the captain at war, the prize master over a human's person, the officer sent into a prize, the token after a stand-down not heard once another holds the station, the pause said to the human, the stand-down at a capture, and *The record*'s covering of the adversarial seats.
+- `test_consent.py::test_the_brief_says_what_the_harness_does_in_its_own_numbers`: the signs' sentence, as above.
+- `test_officer.py::test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations`: two of the words a particular was checked absent by met the approved words in another sense, and each was made the particular's own phrase:
+  - "world order" to "give a world order" (the officer's particular; the brief now says the director acts "by the world orders its brief lists");
+  - "by whom" to "when and by whom" (the log's particular; the brief's Part 3 says the human "can read which stations are held, and by whom").
+  - Each particular's phrase is still absent from the brief, and still present in the station's brief.
+- The watcher's station brief and the officer's (`agent.WATCHER_BRIEF`, `OFFICER_BRIEF`): "pause your turns and ask the captain" to "pause your turns and say so in the log, to the human, who alone answers a pause". The watcher's journal: "the captain may ask to see it" to "the human may ask to see it". The pin `read_journal reads it back, the captain may ask to see it, …` moved with it. The officer's brief had the same untrue words as the watcher's and was mended with it; the lead named the watcher's.
+- `seats.ADVERSARIAL_SEATS_CONSENTED`: `False` to **`True`**. The two tests of the gate behind it (`test_court.py`, truth 7-366's and the replay's) now turn it back to `False` before they try the gate, and turn it on as before. `test_the_flag_is_turned_and_an_older_yes_seats_nobody_at_an_enemys_captain_unasked` is new.
+
+### The code
+
+- The director's `unseat` (`seats.give_up`) stands down only a station held by a seat's own model under a seat given by the director or under the owner's grant. A station the owner seated at a door is refused in words (`seats.NOT_THE_DIRECTORS`), by the station's form and by the ship's (`tests/test_seat_hook.py::test_the_director_stands_down_only_the_seats_given_under_the_grant`; it fails on the old `give_up` with "done" where "refused" was wanted).
+- The prize master's ladder (`prizes._master_not_refused`, `prize_master(exclude=…)`) passes over a man a model holds where the adversarial gate would refuse that model the prize; the gate is read after her prisoners are set. With the flag turned the gate refuses nothing, and he goes, his station with him (`tests/test_prizes.py::test_the_ladder_passes_over_a_models_man_where_the_gate_would_refuse_him_the_prize`, both ways of the flag; it fails without the pass-over).
+  - Not read: whether that model's own yes was given against the brief as it stands. The ladder is the world's rule and replays by its acts, so it reads no consent file. A model held in a game is seated through the consent step, and every yes older than this brief is asked again at its next seating.
+- The visitor test plants a string in the host ship's name too.
+- The old "channel enforces" claim in `DirectorBrief`'s docstring and in `docs/primer/README.md` becomes "holds as far as it can judge them".
+
+- **Mended on the independent reader's reading of step 3:**
+  - The ship form of `unseat` counts every seat on her, a person's voice of her company among them (`_where`), so that a voice the director seated is not called the owner's. Such a voice is given up and unbound with the rest.
+  - The unseat test now holds the mixed case: a seat's lookout and the owner's captain on one ship, the first stood down and the second kept, with the words saying which.
+  - The ladder's pass-over stops if it comes round to a man already passed over; with nobody else, her own rules take her.
+  - The new pause words of both station briefs are pinned, and "ask the captain" is pinned absent.
+  - The 42a and 42b re-ask tests check, fixture to fixture, what each package itself changed: 42a's six and not *The record* or *Answering*; 42b's five and not *Leaving*, *The record* or *Answering*. Against the brief as it stands, they check all six.
+  - A `seat:` the owner gives himself (`world: seat: …`) is held under his own grant, in the same keeping as the director's. The director's `unseat` may give it up, which "given by it or under the owner's grant" covers. Said in `give_up`'s docstring.
+
+- **Found by the whole fast tier at b5bf57f:** `tests/test_harbour.py::test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat` asked the game to refuse an enemy's captain at the door, and with the flag turned the gate admits him. The refusal is the gate's words while the flag is not turned, so the test holds the flag off for that part, as the court's two gate tests do. It gains the other half: with the flag turned, the same seat is admitted to its consent conversation (a station in its consent phase, Renard's captain, nobody's until it answers). Nothing it asserted before is dropped.
+- **Found by the slow tier at 0168f65:** `tests/test_court.py::test_the_captor_holding_the_players_person_is_refused_for_both_reasons` (slow) asked the gate for its two reasons with the flag turned. Mended as above: the flag held off for the refusal, and, the flag turned, the gate refuses the captor nothing. No other test asks the gate for a refusal without holding the flag off.
+
+No pinned world digest moved, and no recorded passage (the gate below confirms it).

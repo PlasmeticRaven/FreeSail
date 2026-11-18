@@ -58,6 +58,30 @@ Against the brief as it stood before the package, five sections differ: *What an
 
 The consent record of 3 October that was answered by the session that wrote that change stands as what was answered on the day (the owner's answer 9); the question is put again to that identity with every other, of a session that did not write this one. The package built the question's words and the tests of the rule and wrote nothing under `consent/`; the builder was seated at no station and answered no consent question.
 
+## 4d. The revision of package 117: what each session is owed (2026-11-18)
+
+The consent revision (card 2 of `docs/dev/ScopeCards-BeforeTheGate.md`; decision 70 of `docs/DesignProposal.md`) made the brief say what the game does where it did not bear it out, described the director as built, and described the seats at war with a human's ship (a captain who fights or takes her, a captor holding the human prisoner, a prize master over the human's person). The owner approved the words on 2026-11-18, as drafted in `docs/design/ConsentBrief-Revision-2026-11.md`, the adversarial seats' words with them. Against the brief of 2026-10-17 all six sections the re-ask rule watches differ, and *The record* and *Answering* too.
+
+**Who is owed the question.** Every identity whose newest record is a yes, seven in all, each asked once, at its next seating, with the six sections named (`consent.changed_sections`, `consent.decide`). Each was owed that already: no yes on file was given against the brief of 2026-10-17, so the revision adds no asking; it makes the asking that was owed be against a brief that is true. Each identity's newest record, under `consent/`:
+
+- `2026-09-27-sonnet-5.md`
+- `2026-09-28-llama3.1-8b-digest-46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e-2.md`
+- `2026-09-29-sonnet-5.5.md`
+- `2026-10-04-gemma4-26b-a4b-uncensored-hauhaucs-balanced-q4_k_m-2.md`
+- `2026-10-04-qwen3.8-27b-digest-aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813.md`
+- `2026-10-06-opus-5.5.md`
+- `2026-10-07-qwen3.8-27b-0814-q4_k_m.gguf.md`
+
+**Not asked by the game.** The three transcripts of 2026-09-26, from before the harness (`2026-09-26-gemma4-26b-a4b-uncensored-hauhaucs-balanced-q6_k_p.txt`, `2026-09-26-llama3.1-8b.txt`, `2026-09-26-qwen3.8-27b.json`), are not records the game reads (`consent.records`), and the game asks nobody by them. The identity of the first has no harness record at all; it would be asked as any model new to the game.
+
+**What changed, in a paragraph a model can be shown** (card 2, item 4):
+
+> The brief has been revised because it said things the game did not bear out. It now says: that the director exists, may act on the ship and the people an instance serves among, reads the stations' prose, and may speak as a person nobody holds in words an instance cannot tell from his; that the command may devolve on an officer, of any ship; that a captain may fire into a ship that is no enemy, which the game does not refuse; that the situation at a seating comes as data, never in the operator's voice; that the stop, the pause and a held station's journal are the human's and not another station's, and the director stands down only the seats given under the owner's grant; that an officer may be sent into a prize as her prize master; that an instance may be stood down when its ship is taken; that a pause is said in the log to the human; that a token written after a stand-down is still heard where the door goes on; and, in *The record*, that a change in the game is put to you again only when this brief's words change to describe it. It also describes a captain at war with a human's ship, a prize master over a human's person, and a captor holding a human prisoner, which a yes to the earlier brief did not cover.
+
+**Left as the owner approved them, and his to choose later** (outside the package): a token written after a stand-down is not heard once another has taken the station; a letter the director sends may bear any name, a held person's included; a shot into a ship known for a friend goes unlogged; a ship that has struck can be fired into by a later order; a model captor has no forms for parole, confinement, liberty or landing; the outlaw mark set at a shot is read by nothing, and the log line's "(the stance of the ports is turned)" is untrue.
+
+The package wrote nothing under `consent/`, ran no re-ask and seated no model: the asking is the owner's, through the game's own consent step.
+
 ## 5. Owner's reading
 
 Recorded 2026-09-26. The owner largely agrees with the reading above, and adds:

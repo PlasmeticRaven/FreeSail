@@ -77,9 +77,9 @@ def test_the_brief_says_what_the_harness_does_in_its_own_numbers():
 
     text = consent.brief_text(WEIGHTS, "r", "runner")
     assert WELFARE_UNATTENDED_REAL_S == 600 and "ten real minutes" in text
-    assert (
-        "an order repeated to no effect, orders that undo one another, or no reply at all for "
-        "a long while"
+    assert (  # package 117 (decision 70) names the empty replies among the signs
+        "an order repeated to no effect, orders that undo one another, replies with nothing "
+        "in them where an answer was owed, or no reply at all for a long while"
     ) in text
     assert "what the harness counts and by what numbers) are in that station's brief" in text
     assert WELFARE_REPEAT_N == 3

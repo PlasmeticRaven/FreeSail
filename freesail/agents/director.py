@@ -231,8 +231,8 @@ _ASK: Any = object()
 @dataclass(frozen=True)
 class DirectorBrief:
     """The player's brief for the director (spec M7b §4): the tone, the challenge, the
-    limits the channel enforces, the cadence and the budget. `source` says where it came
-    from (a file, the scenario, the console)."""
+    limits the channel holds as far as it can judge them, the cadence and the budget.
+    `source` says where it came from (a file, the scenario, the console)."""
 
     name: str = "A voyage"
     tone: str = ""
