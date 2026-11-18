@@ -47,7 +47,7 @@ One thing at a time. The four small mends named on 15 November (the wheel shot a
 
 What I propose: **the design covers both layers, and the build before the gate is the upper one only**, the page and the scenario's keys as the game already reads them. The lower layer is designed, left unbuilt, and decided after the gate, when the owner has played. If the inventory shows something the page cannot offer without the lower layer, the design names it and the owner chooses.
 
-## Card 2. The consent revision (approved by the owner on 2026-11-15; LAUNCHED 2026-11-17 as package 117, on package 116's merge)
+## Card 2. The consent revision (approved by the owner on 2026-11-15; LAUNCHED 2026-11-17 as package 117, on package 116's merge; MERGED WHOLE 2026-11-18)
 
 | Field | |
 |---|---|
@@ -67,6 +67,8 @@ What I propose: **the design covers both layers, and the build before the gate i
 
 1. **The adversarial seats.** Package 74 drafted a further revision (`docs/design/ConsentRevision-AdversarialSeats.md`): the words that would let a model be asked to captain a ship that fights a human's. Until it is approved the game refuses that seat. It can ride in this one revision, so that no model is asked twice, or stay out. If the gate is to have a model commanding an enemy, it has to be in. I would put it in: the asking is the same asking, and leaving it out means a second round later.
 2. **The director's limits** (package 115, part C: approved by the owner on 14 November, not begun). The brief speaks of the director, and part C changes what the director may do. If part C is to be built at all before the next revision, it should be built before this one, or the brief is revised twice. I would run part C as a small card of its own between the harbour's build and this revision. If the owner would rather keep the list before the gate to the two he named, the revision goes ahead without it and says of the director only what is true today.
+
+**Card 2 as it ran (2026-11-18).** Merged whole at 7ac35e13 (step 1, the code, at 63e4503c by the reported hash 43c1016c; steps 2 and 3, the words approved and applied, by the reported hash b648f9b1); the records are in `docs/dev/M7-WorkPackages.md`, "Package 117 (the consent revision)", step 1 and steps 2 and 3. Both of the card's choices went as proposed: the adversarial seats' words ride in this one revision, and the director's limits were built first (card 4). The owner approved the words as drafted ("I've read through the consent brief revision and I'm happy with it"), and with them the brief's length, which the lead had first misstated to him: 2,259 words below its rule before, 3,644 after ("No problem with the length"). The card's size was about a week with the owner's asking; the building took two days, and the asking is still to come. **What is the owner's now:** each of the seven models with a yes on file is asked again once, by the game itself at its next seating; `docs/agents/ConsentAndPreferences.md`, section 4d, lists them by record file and holds the paragraph of what changed. How he tries it, as the card says: the revised brief put to one model in a fresh session; the token written inside a tool call stands a model down; a standing order worded as an operator's instruction reaches an officer as data.
 
 ## Card 3. Package 96b: the harbour, built (proposed 2026-11-15 from the design the owner answered; APPROVED by him the same day: "Card 3 is approved, go ahead.")
 
