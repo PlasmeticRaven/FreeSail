@@ -1,5 +1,18 @@
 # Design: the tartane, a Provençal coaster under a great lateen and a square topsail (package 90, third draft)
 
+**Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
+owner decided that the strain of a lateen taken aback is built: "A lateen taken aback should
+increase the strain on the mast, as a backed square sail does, so that on the worse tack and not
+dipped, the sail may strain the mast and, in high enough wind, risk damage." This revision carries
+what that changes here:
+- decision 14, §0 item 2 and §5.4's heading: A1d one of her steps, not an option;
+- §5.4 item 2: a lateen left drawn over at "let go and haul"; her going about measured again with
+  the rule (Eng §2.2b), moved by 2 to 6 m in 15 knots;
+- §5.4 item 5: the bow watch's word, the great lateen aback against its mast;
+- §5.4 item 11: her great lateen held aback against its mast and lying on the bad hand, and what
+  each costs her yard and her mast, with the figures for the lead's ruling;
+- T-9 in A1d's form; §16.2.
+
 **Revised 2026-11-18 on the lead's note of 11:35 UTC (nudge 18).** The lead ruled the engine's
 figures for her going about (the plan's §13.1; the engine note, "How this revision answers the
 lead"), each JUDGEMENT, and set the strain of a lateen taken aback (A1d) apart as an option for the
@@ -119,7 +132,7 @@ today.
 | 11 | **The head**: the éperon (10½ pieds, 3.41 m, **to be re-read on the page image before it is a constant**: the printed ratio, 0.151, gives 9½ pieds, Tar §2.1) with the berthelot over it; **one great jib** to the berthelot's end, by judgement; a storm jib in the sail room | Lescallier pp. 393, 401; Forfait p. 125; Steel; Röding. Decision 11 leaves the headsails' count to judgement; the images README's reading of two is recorded (§17) |
 | 12 | **The bouffette**, a smaller lateen bent to the great yard in the great lateen's place in a blow, as the lugger's taille-vent is | Lescallier pp. 394-395; Forfait p. 129. Question 6's note |
 | 13 | **Tacked and worn as other vessels are** (the owner's answer to question 3): `tack ship` and `wear ship` each an evolution of her own; each lateen's yard shifted round its mast in stays (once her head is through the wind) or in the wear (at "wind aft"), peaked up and its car passed round, never lowered, by the order's clause or her practice ("shift" in both by default); or left, the lateen drawing as a lug against its mast on the bad hand until `shift the mainsail`; `put her about`, and a course ordered across the wind's eye, wear her over 22 knots | The owner (Dec 3, Part F); no source says a lateen vessel could not tack (GA §4); the yard changed "pour virer de bord", either way (Lescallier p. 378); the board on the mast named and sailed (Stratico, O'Scanlan: GA §3.3); the strong wind, Forfait p. 119. Question 2, answered |
-| 14 | The engine work this needs is the plan's **A1a to A1c** (the whole lateen's side, its going about with the yard's change a part, the rules captain; shared with the polacre's and the xebec's lateens; **A1d**, taken aback, the owner's option since nudge 18), with **A3** (a tiller's words), **A4** (the boat in tow), **A5 and A6** (her topsail on a pole main) and later **A8** (the lateen in a gale), each designed in package 90's plan (§6 there) before her file (§5.4) | Every whole lateen of the package needs A1; nothing of it is in the engine today (observed, §5.1); her pole main's topsail is a course today (§5.1a) |
+| 14 | The engine work this needs is the plan's **A1a to A1c** (the whole lateen's side, its going about with the yard's change a part, the rules captain; shared with the polacre's and the xebec's lateens), and **A1d** (taken aback and on the bad hand, built by the owner's decision of 2026-11-18), with **A3** (a tiller's words), **A4** (the boat in tow), **A5 and A6** (her topsail on a pole main) and later **A8** (the lateen in a gale), each designed in package 90's plan (§6 there) before her file (§5.4) | Every whole lateen of the package needs A1; nothing of it is in the engine today (observed, §5.1); her pole main's topsail is a course today (§5.1a) |
 | 15 | Company **ten** in trade (master and mate posts, six seamen, a boy, a cook), JUDGEMENT until sourced; her great sail's work an all-hands call | Ruling 11; package 116's `too_few: all hands`; the bilander's ruling (Tar §6) |
 | 16 | The trader **unarmed**; the coastguard **Chapman's eight 4-pounders and four swivels**, until Winfield's Spanish rows replace them | Chapman Pl. LVIII No. 16 (read there); Winfield to ask |
 | 17 | Roles: the trader `merchant`, a `fishing tartane` description `fisherman` (the trawl, its grounds to source: booked, the plan's card); the coastguard, description key `guarda-costa tartane`, role `revenue`, the revenue cutter's book read from `thresholds:` | Build §8; package 116's road; Tar §5 |
@@ -156,8 +169,8 @@ proposes for her (for the plan to weigh against the other four hulls):
    at a readable size and measured outside the repository (as Gwyn's bilander was:
    `owner-notes/<ship>/`); Winfield's passages (Tar §10) read by the owner; Lescallier's Pl. XXII
    fig. 5 and Forfait's figs. 9 and 35 seen.
-2. **The engine's steps A1a to A6** (§5.4; the plan's §6 and §9.1): A1a to A1c the whole lateen
-   (A1d if the owner takes it),
+2. **The engine's steps A1a to A6** (§5.4; the plan's §6 and §9.1): A1a to A1d the whole lateen
+   (A1d, the strain aback and on the bad hand, built by the owner's decision of 2026-11-18),
    tested on a rig in memory (the lead's `tartane_probe()` with the step's key) before any file
    carries it, every committed file byte for byte; A3 and A4; and **A5 and A6**, since her topsail
    stands on a pole main (§5.1a).
@@ -387,7 +400,7 @@ cannot bite; what it does reach is the engine's reading of her topsail as a cour
   her pole main today (§5.1a).
 - **The schooner's-mast rule's limits**: §5.2; not hers.
 
-### 5.4 What the engine must be given (the plan's A1a to A1c, A3 to A6 and A8; A1d optional)
+### 5.4 What the engine must be given (the plan's A1a to A1d, A3 to A6 and A8)
 
 Each item is a behaviour, said here and designed in package 90's plan (its §6, which names the step
 each belongs to); none is built now. The
@@ -416,7 +429,9 @@ what she needs of it.
      of it by O'Scanlan's CIMAR, recorded. The inventory and Lescallier's dinga pass the sheet
      forward of the mast, which does not settle the car's side (GA §3.3).
    - **Or left**, by the order's clause or her practice (item 3). Her practice by default shifts in
-     both (the owner's "preferred").
+     both (the owner's "preferred"). Left, the great lateen's sheet is drawn over to the new lee at "let go
+     and haul" (in the wear, at "wind aft"), and it fills on the bad hand against its mast; until
+     then, her head through the wind, it lies aback against its mast (A1d, item 11; Eng §2.4.3a).
    - **The machinery** (ruled): the settee's model with the yard peaked, not lowered, by a new
      `LateenChange` beside `SetteeChange`, with each yard's party and seconds and the main first
      where the hands are too few; built only when a yard is to be changed; the order by itself
@@ -441,6 +456,12 @@ what she needs of it.
      board shorter than **about an hour** (63½ minutes with her eight; the third draft's three
      quarters of an hour, at the settee's seconds), and shifting it pays on a longer one. That is
      the inventory's long boards on the bad hand avoided, given by the game's own numbers.
+
+     **Measured again with A1d** (Eng §2.2b, nudge 19, the harness drawing a left lateen over at
+     "let go and haul"): tacked with the yards left 152 s and 337 m (A1a alone 149 s and 334 m in
+     the same harness), tacked and shifted 297 s and 524 m (295 s and 518 m), worn and shifted
+     476 s and 799 m (797 m), worn and left 691 m (688): 2 to 6 m more in 15 knots. In 25 knots,
+     137 s and 531 m left (522), 247 s and 706 m shifted (693): 9 and 13 m.
 3. **How each choice is ordered** (A1b, A1c).
    - **One going about**: `tack ship` and `wear ship` with "and shift the lateens" or "and leave the
      lateens" ("the mainsail" or "the mizen" by name).
@@ -482,8 +503,9 @@ what she needs of it.
      is the yard's change, and **the sail room's new mainsail keeps its "for"**: `shift the
      mainsail for a new one` (or `for a spare`, or `for the bouffette`) (ruled; Eng §2.3 item 3a);
    - the watch says when a gybe has left her great lateen on the mast, and when a shift of wind
-     round ahead through the bow has (the stern watch hears no shift through the bow today: Eng
-     §2.3 item 1).
+     round ahead through the bow has left it aback against its mast (A1d: "The wind has come round
+     ahead to the larboard bow: the mainsail is aback against the mast; shift it when you will.";
+     the stern watch hears no shift through the bow today: Eng §2.3 item 1).
 6. **The gale and the lateen** (A8). "Shorten sail" takes in the great lateen before it would carry
    away (Forfait p. 120: the yard breaks in the first squall if she holds the wind in a storm), the
    tréou set if she runs, and offers the bouffette in its place (`bend the bouffette`), as the
@@ -507,20 +529,44 @@ what she needs of it.
    so that her topsail is a topsail to the heave-to, lie a-try, the take-in words and the trim; and
    the pole's quick handing and the topmast evolutions refused in words, by A6's key, which her main
    carries. Both before her file.
-11. **Taken aback in a breeze** (A1d; Forfait pp. 119-120; Fincham p. 59): **the owner's option**
-    (revised on nudge 18). In the engine a lateen is never aback: with the wind on its wrong face
-    it collapses and flogs, so her head in the wind's eye costs her probe its way and no spar in
-    15 to 35 knots (Eng §2.2a, re-run: her lateens backed for no tick; her great yard at a
-    twentieth of its rating near the wind in 35 knots). The third draft's factor on the load would
-    have multiplied almost nothing.
-    - **If the owner takes it**, a new rule of force: her great lateen pressed back against its
-      mast on the good hand stands aback as a plate and loads its yard and mast; `take in the
-      mainsail` waits till she pays off; a factor on the load only if measured to be wanted, on her
-      own rating. One and a half to two days, and her going about is measured again after it
-      (Eng §2.4.3).
-    - **If not** (the pick): she says the danger, the rules captain and every order that chooses
-      wear her over 22 knots, an ordered tack is obeyed and warned, and her head in the wind's eye
-      costs her her way and nothing carries away.
+11. **Taken aback, and on the bad hand, in a breeze** (A1d; Forfait pp. 119-120; Fincham p. 59;
+    Stratico, BISDOSSO): **built, by the owner's decision of 2026-11-18** (nudge 19), in their
+    words: "A lateen taken aback should increase the strain on the mast, as a backed square sail
+    does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough
+    wind, risk damage." Today in the engine a lateen is never aback: with the wind on its wrong face
+    it collapses and flogs, so her head in the wind's eye costs her probe its way and no spar (Eng
+    §2.2a). With A1d (Eng §2.4.3, a new rule of force in `physics/sails.py`; each figure JUDGEMENT
+    for the lead's ruling, measured on her probe and its fellows rated by the generator's rule, Eng
+    §2.2b):
+    - **Aback.** Once the wind has come round ahead onto the side her great lateen lies on (her head
+      through the wind before it is drawn over or shifted, a shift of wind, the helm carrying her
+      head through), the cloth is pressed back on its mast and stands aback; it pushes her astern,
+      and its pull on its yard and on her mainmast is multiplied by `LATEEN_ABACK_LOAD` (about 2½).
+      Her great yard then strains from about **28 knots** and may carry away from about **35**; her
+      mainmast, which carries her topsail too and is rated for it, from about 38 and 46, so the
+      yard goes first (Forfait p. 120's weak yard). Her mizen's mast, carrying only its lateen,
+      strains with its yard. Luffed, short of the wind's eye, the sail shakes as now and is not
+      pressed.
+    - **On the bad hand**, lying against its mast, the great lateen's pull on its yard and mast is
+      multiplied by `LATEEN_BAD_HAND_LOAD` (about 2, on its two-thirds): it strains from about
+      **45 knots** and may carry away from about **55**. Her great lateen is in before 30 knots
+      (T-6), so a long board on the bad hand strains nothing she carries it in.
+    - **The damage is the engine's own**: the strain model's wear over the rating, its warnings, its
+      chance of carrying away over one and a half times it, `_wreck_spar` with what hangs from the
+      spar. No new kind.
+    - **In stays** her great lateen is aback only from her head through the wind to "let go and
+      haul", when it is drawn over or its change begun (Eng §2.4.3a): in 22 knots her great yard
+      stood at 0.55 of its rating, in 28.6 at 0.95 and in 31.9, a squall's top on a 22-knot wind,
+      at 1.12, never at risk. Her rules captain wears her over 22 knots and leaves her yards only
+      under 12, where on the bad hand the yard bears a tenth of its rating for as long as the
+      board lasts: **a captain who follows the book is not dismasted by it.**
+    - **Left undrawn**, the rule holds her aback: her probe's great lateen aback after a tack in
+      25 knots held her head up and she fell back on the old tack (Eng §2.2b). So the evolution
+      draws it over (item 2).
+    - **`take in the mainsail`**, begun while it is aback in a wind over 22 knots, waits: "The
+      mainsail is aback against the mast; it will not come in till she pays off." (Forfait p. 119).
+    - Two and a half days of the engine track, merged alone after A1c and before her file (Eng
+      §2.4.3); her going about measured again after it (item 2 has it in process).
 
 **Pins it could move** (§14): none of a committed file by item 1's key; the probe's tests
 (`tests/test_schooner_mast.py`, `tests/test_rig_classing.py`) read the probe as filed, which carries
@@ -716,7 +762,7 @@ Numbered at the build. Each with its source and a band to be settled by measure 
 | T-6 | In a gale the great lateen comes in before 30 knots and she lies to under the mizen and the storm jib | Forfait p. 120; Lescallier pp. 394-395 | the gale of B3.4's reviews |
 | T-7 | A watch of hers calls all hands for her great sail, and her master and mate haul only where ruling 11 says | ruling 11; package 116 | her requests by night and by day |
 | T-8 | Before the wind the tréou set adds way, and the great lateen is taken in for it | Lescallier p. 401; Falconer | the run at 180° off, with and without |
-| T-9 | **In a strong breeze, by the owner's choice of A1d** (nudge 18). **Without A1d**: over 22 knots she is worn and not put in stays by every road that chooses, the danger said; an ordered tack is obeyed and warned; her head in the wind's eye costs her her way and nothing carries away. **With A1d**: taken aback in a strong wind her great yard strains and may carry away, before the mast, and the sail will not come in till she pays off; in a moderate one she only loses her way | Forfait pp. 119-120; Fincham p. 59 | without: `put her about` and a course across the wind in 15 and 25 knots, the choice and its words; her head put in the wind's eye in 15 and 34 knots, her way and no spar. With: her head in the wind's eye in 15, 28 and 34 knots, the yard's load over its rating, what carries away, the take-in's words; band JUDGEMENT (Eng §2.4.3) |
+| T-9 | **Taken aback in a strong wind, and on the bad hand** (A1d, built by the owner's decision of 2026-11-18): taken aback (the wind come round onto her great lateen's side) her great yard strains in a strong wind and may carry away in a stronger, before her mast, and the sail will not come in till she pays off; in a moderate wind she only loses her way; luffed, short of the wind's eye, nothing is pressed; her own tack in 22 knots strains nothing, and over 22 knots every road that chooses wears her, the danger said; on the bad hand in 12 knots for half an hour nothing strains | Forfait pp. 119-120; Fincham p. 59; Stratico, BISDOSSO; the owner's decision | the wind shifted onto her other bow in 15, 28 and 35 knots: her great yard's and mainmast's loads over their ratings (JUDGEMENT: under 0.5, about 1, about 1.4 for the yard; Eng §2.2b), what the strain model warns and what carries away, the take-in's words; `tack ship` in 22 knots, no part over its rating; `put her about` in 25 knots, worn and the reason said; a board of 1,800 s on the bad hand in 12 knots, no part over a fifth of its rating; band JUDGEMENT, on her file (Eng §2.4.3) |
 
 ---
 
@@ -790,8 +836,11 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
   evolution for the shift alone (Plan §4 row 3, §13.1 item 1). **Ruled 2026-11-18 (nudge 18)**,
   with its figures: the bad hand the lug's two-thirds; 8.7 s a metre of yard and one able hand
   for 2½ m, at least four; the car abaft the mast; the rules captain's 12 knots and half hour read
-  with defaults, the 22 knots a constant of the order's. The strain aback is the owner's option
-  (A1d: §5.4 item 11). Still asked: the change's time by itself (the lugger's 14.6 s a metre, the
+  with defaults, the 22 knots a constant of the order's. The strain aback and on the bad hand is
+  built, by the owner's decision of 2026-11-18 (A1d: §5.4 item 11); asked of the lead, each
+  JUDGEMENT: `LATEEN_ABACK_LOAD` about 2½ (her great yard aback from about 28 and 35 knots),
+  `LATEEN_BAD_HAND_LOAD` about 2 (from about 45 and 55), the rule's reading and the draw at "let go
+  and haul" (Eng §2.4.3). Still asked: the change's time by itself (the lugger's 14.6 s a metre, the
   lean, or the settee's 11¼: Eng §2.4.4).
 - **A5's reading of a topsail over a whole lateen** if the tréou's yard is left out (§5.1a):
   ruled the lean, the lateen yard the level below.

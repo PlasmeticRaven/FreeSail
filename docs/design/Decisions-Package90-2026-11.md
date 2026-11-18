@@ -1,5 +1,14 @@
 # Decisions: package 90, the Spanish and Mediterranean ships (the owner's round, November 2026)
 
+**Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
+one choice that came back to the owner with the scope card, the strain of a lateen taken aback, is
+decided: **built**. Their words, verbatim: "A lateen taken aback should increase the strain on the
+mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain
+the mast and, in high enough wind, risk damage." This revision records it in question 3 ("Decided
+by you") and in Part F, re-writes question 3's "In play" line on being taken aback and what it asks
+of the engine, and gives the figures that come with it, each judgement for the lead's ruling.
+Nothing else in the sheet changes, and nothing more is asked of the owner in it.
+
 **Revised 2026-11-18 on the lead's note of 11:35 UTC (nudge 18).** The lead ruled the figures
 question 3 left to them (the plan's §13.1), each as JUDGEMENT, and found that one of them, the
 strain of a lateen taken aback, rests on a premise the engine does not hold: in the game a lateen
@@ -14,7 +23,8 @@ go about, with a shape of their own (their words in Part F, verbatim; the lead's
 picked. It re-drafts question 3 on their shape, with what the period sources say
 (`Research-LateenGoingAbout-2026-11.md`, **GA**), what it means in play and how each choice is
 ordered. Nothing more is asked of them in it. The rulings it leaves are the lead's (the plan's
-§13.1), **given on 2026-11-18 (nudge 18)**; one comes back as a choice (question 3).
+§13.1), **given on 2026-11-18 (nudge 18)**; one came back as a choice (question 3), **decided by
+the owner the same day: built (nudge 19)**.
 
 The second draft (2026-11-18) was revised the same day on the critic's reading, with the designs'
 second drafts: question 3's evidence (Willaumez's tacking polacre is a square-rigged one), question
@@ -189,16 +199,21 @@ and the time to shift a yard are judgement.
   did: they kept their boards on the bad hand short.
 - **Taken aback in a breeze.** In the game today a lateen is never pressed aback: with the wind on
   the wrong side it collapses and flaps, so her head in the wind's eye costs her way and nothing
-  else, in 15 to 35 knots (measured). The earlier draft's figure of a yard straining from about
-  28 knots rested on its being aback, and is withdrawn. Whether to give the game that danger is the
-  choice below.
+  else, in 15 to 35 knots (measured). **You decided that the game gives it the danger** (below):
+  with it built, a lateen whose head goes through the wind, or which a shift of wind takes aback,
+  is pressed against its mast and strains its yard and mast in a strong wind; and one left on the
+  bad hand strains them in a gale. In your own going about it costs a few metres (measured on the
+  stand-in ships in 15 and 25 knots: no more than 13 metres more lost), since the hands let the sail
+  draw on the new side, or begin to shift it, as soon as her head is round.
 - **The xebec carries no head sail.** After a tack she eases her mizen to bring her head off;
   without that her stand-in lies stalled across the wind.
 
-**What it asks of the engine:** a larger addition than the second draft's, as you said: three
-steps in place of one (Eng §14, A1a to A1c), about five more working days of the engine track
-than the second draft's (the plan's §11 and §14; three in the earlier draft of this sheet, before
-the lead's reading found the yard's change woven into eleven places of the bilander's).
+**What it asks of the engine:** a larger addition than the second draft's, as you said: four
+steps in place of one (Eng §14, A1a to A1d), about seven and a half more working days of the engine
+track than the second draft's, five of them for going about and two and a half for the strain aback
+you decided (the plan's §11 and §14; three in the earlier draft of this sheet, before the lead's
+reading found the yard's change woven into eleven places of the bilander's). The build is about
+half a week longer for it: three and a half to four and a half weeks.
 
 **The lead's rulings (2026-11-18, nudge 18; the plan's §13.1)**, each judgement:
 - the bad hand's loss: the lugger's, a third of the sail's area;
@@ -209,18 +224,35 @@ the lead's reading found the yard's change woven into eleven places of the bilan
   half an hour on the bad hand before shifting;
 - the orders' words, as written above.
 
-**One choice comes back to you, with the scope card: the strain of a lateen taken aback** (the
-lead puts it to you; Eng §2.4.3).
-- **(a) Not built in this package (my pick).** The game says the danger: in a strong breeze, over
-  22 knots, every order that chooses for you (`put her about`, a course across the wind, the
-  captain's own) wears her and says why, and your own `tack ship` is obeyed with a warning. If her
-  head is in the wind's eye in a breeze she loses her way and her ground, and no spar is lost for
-  it.
-- **(b) Built.** A new rule in the game's physics: a lateen taken aback is pressed against its mast
-  and loads its yard and mast, so that in a strong wind the yard may strain and carry away, and the
-  sail will not come in till she pays off (Forfait p. 119). About a day and a half to two days
-  more, and it changes how every lateen vessel goes about, so all of them are measured again
-  after it.
+**Decided by you, 2026-11-18: the strain of a lateen taken aback is built** (the choice the lead
+put to you with the scope card; your answer through the lead's note of 22:35 UTC, nudge 19). Your
+words: "A lateen taken aback should increase the strain on the mast, as a backed square sail does,
+so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind,
+risk damage." It was put to you as (a) not built (the pick) or (b) built; you chose built, and asked
+for two things: a lateen taken aback loads its mast as a backed square sail does; and a lateen on
+the worse tack and not dipped, left lying against its mast, may strain the mast too, and in wind
+enough risk damage.
+
+**What is built, in plain words** (Eng §2.4.3; each figure judgement, for the lead's ruling):
+- A lateen whose head goes through the wind, or which a shift of wind takes on its other side, is
+  pressed back against its mast: it stands aback and pushes her astern, and its pull bears on its
+  yard and its mast, more than when it draws. It is not pressed while she only luffs; the sail then
+  shakes, as now.
+- **Aback**, the great yard begins to strain from about **28 knots** and may carry away from about
+  **35**. A mast that carries only its lateen goes with its yard; the tartane's mainmast, which
+  carries her topsail too, from about 38.
+- **On the bad hand**, lying against its mast, the yard strains from about **45 knots** and may
+  carry away from about **55**.
+- The damage is the game's own: a spar strained "working under the press of sail", one about to go
+  "bending like a whip", and one carried away with its sail, as any spar now. Nothing new.
+- The sail aback will not come in till she pays off (Forfait p. 119).
+- **Your captain is never dismasted by their own book.** They wear her over 22 knots and tack her
+  under it; in stays a lateen is aback only for the seconds until the hands let it draw on the new
+  side or begin to shift it, and the yards measured in that tack stood at about half their limit in
+  22 knots, and just over it only in the top of a squall (32 knots), never near the risk. They lie
+  on the bad hand only under 12 knots, where the yards bear a tenth of their limit for as long as the
+  board lasts.
+- Your own `tack ship` in a gale, or a sail left aback by a shift, is where the danger is.
 
 **What it replaces:** the second draft's pick, "decided by her main sail". In it a lateen main was
 worn only and `tack ship` was answered in her words, with the polacre alone tacking.
@@ -614,6 +646,11 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
 
 ## Part F. The answers (recorded verbatim when given)
 
+**The owner, 2026-11-18** (through the lead's note of 22:35 UTC, nudge 19), on the strain of a
+lateen taken aback, in full: "A lateen taken aback should increase the strain on the mast, as a
+backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and,
+in high enough wind, risk damage."
+
 **The owner, 2026-11-18** (through the lead's note of 04:30 UTC, nudge 17), in full: "For the
 ship session questions, I agree with the proposals, except for going about with a lateen main
 vessel. Is the judgement to only wear backed up by period sources? If not, and tacking was
@@ -637,3 +674,4 @@ addition, but we can include it in the planning."
 | 10 | The sources | "I agree with the proposals" (as picked) | 2026-11-18 |
 | D | Winfield's passages sent (by number) | None yet. The passages are theirs to look up; the lead has reminded them (nudge 17) | — |
 | E | Anything in Part E changed | No word given against it, so it stands as recommended, as this sheet's rule has it | 2026-11-18 |
+| A1d | The strain of a lateen taken aback (put with the scope card, nudge 18) | "A lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk damage." (built: question 3, "Decided by you") | 2026-11-18 |

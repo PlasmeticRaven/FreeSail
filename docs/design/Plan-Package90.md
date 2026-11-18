@@ -1,5 +1,29 @@
 # Plan: package 90, the Spanish and Mediterranean ships (the preliminaries' plan)
 
+**Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
+owner decided that the strain of a lateen taken aback is built: "A lateen taken aback should
+increase the strain on the mast, as a backed square sail does, so that on the worse tack and not
+dipped, the sail may strain the mast and, in high enough wind, risk damage." (The lead's
+recommendation and this plan's pick were the other way; the decision is the owner's, and settled.)
+This revision writes A1d into the plan as a step that is built, not an option:
+- the steps (§6: A1d's row, a new rule of force in `physics/sails.py`, what it reads and its strain
+  to the mast as well as the yard by the engine's existing strain and carrying-away), stage 0L
+  (§5.2), the file owners (§7.1), the hulls (§8), the order (§9.1: A1d after A1c, **merged
+  alone**), the guard set, truths and pins (§10), the risks (§12) and the lead's rulings (§13.1:
+  A1d's figures now asked of the lead);
+- the cost (§11: one merge more, about a quarter of an hour) and the calendar: **A1d two and a half
+  days** (two to three; Eng §2.4.3), **inside the engine track, now about fifteen and a half working
+  days** (fourteen and a half to sixteen and a half), and **three and a half to four and a half
+  weeks** of calendar (was three to four, with A1d's one and a half to two days and half a week
+  apart as an option);
+- the draft scope card (§14): its purpose, builds, does-not-build, may-change, expected-to-move,
+  how the owner tries it, size and comes-after.
+
+The measures behind it are the engine note's new §2.2b (run in the session's scratch, `p90/n19/`):
+the polacre probe's 407 s of nudge 18 is a failed tack under that process rule, not a long one; with
+the rule as now designed and the tack drawing a left lateen over at "let go and haul", the probes'
+going about moves by −9 to +13 m.
+
 **Revised 2026-11-18 on the lead's note of 11:35 UTC (nudge 18).** The engine note was read
 independently and mostly confirmed; the lead ruled §13.1 and sent one list back of six (Eng, "How
 this revision answers the lead"). This revision writes the rulings into §13.1, each as JUDGEMENT,
@@ -52,6 +76,10 @@ practice in place of `wears_only()`), §7.1 (the engine track's new files), §8.
      tests, anything the suite reads.
    - **And the lead's note of 11:35 UTC the same day, nudge 18**: the rulings on §13.1 and the
      list of six, documents alone; one commit and a message; then stop.
+   - **And the lead's note of 22:35 UTC the same day, nudge 19**: the owner's decision that A1d is
+     built, verbatim, written into the plan, the engine note and the draft card as a step that is
+     built; the bad hand's strain in the same terms; what the rule moves; the estimates; documents
+     alone. The build is still not before the milestone 7 gate.
    - The stopping point: the session's report on the preliminaries.
    - Items 8 and 37 of the list of 79. Item 8 is settled in the polacre's design, Pol-D §5. Item
      37 is reported in the engine note, Eng §1.
@@ -126,8 +154,9 @@ Every `file:line` is at 68e769ef, where the package's branch was cut from the tr
   - item 37 (A0);
   - the whole lateen tacked and worn, its yard changed round its mast or left, on the owner's
     answer to Dec 3 and the lead's rulings (A1a to A1c), and in a gale with its row tuned (A8);
-    the strain of a lateen held aback (A1d) **an option for the owner**, with its own size, since
-    the engine has no lateen aback today (Eng §2.4.3);
+    **the strain of a lateen held aback, and of one on the bad hand (A1d), built by the owner's
+    decision of 2026-11-18**: a new rule of force in the physics, its load on the yard and the mast
+    by the engine's own strain and carrying-away (Eng §2.4.3);
   - the words of a rig with no yards (A2);
   - a tiller's words (A3);
   - the boat in tow (A4);
@@ -175,8 +204,9 @@ Every `file:line` is at 68e769ef, where the package's branch was cut from the tr
 
   The owner is also asked to source Winfield's passages, listed by title and class (Dec, Part D).
 - **The cost on the owner's machine** is one fast tier, which is stage 0's base, plus short checks
-  at each merge: about three and a half to five and a half hours over the whole package (§11),
-  unchanged by nudge 18 within its range (one merge more, A2's alone).
+  at each merge: about three and three-quarters to five and three-quarters hours over the whole
+  package (§11; nudge 18: one merge more, A2's alone; nudge 19: one more, A1d's, a quarter of an
+  hour).
   The builders' suites and the lead's whole suites run in the cloud.
 - **The card** (§14) covers the whole build, with five stopping points at which the owner can try
   what has landed.
@@ -249,6 +279,14 @@ It includes:
 **The answers:** recorded in Dec's Part F (2026-11-18). Winfield's passages (Dec, Part D) are
 the owner's to look up; none has come yet. Part E stands as recommended, no word having been given
 against it.
+
+**A1d, decided by the owner on 2026-11-18** (put to them with the card as card A of
+`docs/dev/ScopeCards-AfterTheGate.md`; the lead's note of 22:35 UTC, nudge 19), verbatim: "A
+lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on
+the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk
+damage." **Built.** It asks two things: a lateen taken aback loads its mast as a backed square sail does;
+and a lateen on the worse tack and not dipped, left on the bad hand against its mast, may strain the
+mast too, and in wind enough risk damage (Dec 3 and Part F; Eng §2.4.3).
 
 ---
 
@@ -509,9 +547,10 @@ B3.3 in the same way).
 - **The runtime:** `Sail.lug_side` kept for a dipping lateen, a plain class default. The ship's
   practice for the yard, `ship.extra["lateen_practice"]`, is read with its default ("shift" in stays
   and in wearing) and set by nothing. The change evolution's data file is laid with its `applies`
-  empty. Nothing of A1d's option is laid: it is the owner's to take, and stage 0L is the same either
-  way. **Plainly:** the second version's `Ship.wears_only()` is not laid; the owner's answer to Dec
-  3 has every lateen rig tack (A1a to A1c, §6; A1d the owner's option).
+  empty. A1d lays nothing inert at 0L: its rule, its two constants and the drawn sheet's side are
+  behaviour, built at A1d (built by the owner's decision, nudge 19). **Plainly:** the second
+  version's `Ship.wears_only()` is not laid; the owner's answer to Dec 3 has every lateen rig tack
+  (A1a to A1d, §6).
 - **Guards** in `tests/test_probes_90.py`: no committed file carries the key; each probe with the
   key loads and classes as without it; the refusals for a lateen cut at the mast and for a lug are
   unchanged.
@@ -544,7 +583,7 @@ Each step is merged alone and measured, old beside new.
 | **A1a** | The whole lateen's side and the bad hand: `dipping` on a whole lateen, `lug_side` and `against_the_mast` (**the lug's two-thirds**, ruled, JUDGEMENT; measured 4 to 17 per cent of her speed close-hauled on the probes, Eng §2.2a); **the side found once by `set_lateen`'s nought-second step for a whole lateen alone, kept aloft by `take_in_lateen` and `furl_lateen`** (the 64's and the 74's mizzen course and driver untouched; Eng §2.3 item 1); `shift the mainsail` by itself (`change` and `dip` its words for a whole lateen), refused on the good hand, held in a manoeuvre, its evolution `change_lateen` (peaked, never lowered; its seconds and hands by the yard's length, JUDGEMENT: Eng §2.4.4, its rate by itself not ruled); **the routing**: `verbs.evolution_key`'s new key `whole_lateen`, the sail room's replacement kept by its "for" (`shift the mainsail for a new one`), marked by `_take_canvas_words`, and `dip` refused for a lateen not whole in today's words (Eng §2.3 item 3a); the watch's line for a lateen left on the mast after a gybe and **after a shift round ahead through the bow**, which the stern watch does not hear today (at its cause, a dipping lug's too); `set_lateen`, `take_in_lateen`, `furl_lateen` and `reef_lateen` sized by the ship's data or `too_few: all hands`; the lateen mizen kept set hove to; the heave-to refused, **for a rig with a whole lateen set** and neither head sail nor braced yard, in the xebec's words (the five boats keep today's) | `dipping` on a whole lateen | Nothing of the eighteen files (none carries a whole lateen; the 64's and the 74's mizen courses are `cut_at_mast`; `shift the mizen` on them run as today, Eng §2.3 item 3a). The library's count of evolutions by `change_lateen` (`tests/test_agents.py`); the vocabulary's order lists by `shift` and `dip` for a whole lateen. `tests/test_lateen.py`'s pins of the set, take-in and furl, and `tests/test_evolutions.py:1102`'s refusal, as they are. The probes' tests are unchanged as filed. The bow's line for the lugger's lugs, at its cause (no pin expected; to grep) | the three lateen hulls' files on the branch | engine track | Tar-D §5.4 items 1, 5, 7; Pol-D A1 (its E3); Xeb-D A1 (its E1, E3); Eng §2.3 items 1, 3, 3a, 5, 8, §14 |
 | **A1b** | Going about with the yard's change a part (the owner's answer to Dec 3), at **every place the settee's change is woven in that the lateen's must mirror** (Eng §2.3a: eleven of eighteen; the tack, the wear at its own point, the fill away, the hove-to watch's forced round, the box-haul and wear short round, box her off, the holds and the runner's rule): **`LateenChange`**, a plain class beside `SetteeChange`, each yard's seconds at **8.7 a metre** and its party at **one able hand for 2½ m, at least four** (ruled), the yards together with hands for all and **one after another, the main first**, with too few, **built only when a lateen is to be changed** (or truth 7-606 moves); the yard peaked and not lowered, **the car abaft the mast** (ruled), in stays once her head is through the wind, **in the wear at "wind aft"** (its own point: the settee's is lowered at "up helm"); which yards, by the order's clause after the order ("and shift the lateens", "and leave the lateens") or the ship's practice ("shift" in both by default; set by `leave the lateens in stays` and its kin, **the verb first and no comma**; shown in the readings); the clause and the occasion new modifier kinds in `orders/grammar.py`, their words loaded by `orders/vocabulary.py`, and the practice's verb named in the primer; a lateen left on the bad hand until shifted; the change's seconds in its own file (`tack.yaml`'s and `wear.yaml`'s timings untouched); her words name the lateens; the aftermost lateen hauled aft at helm's a-lee and eased as she pays off where she has no head sail; a foremost lateen before a square main eased with the head sheets and drawn at "let go and haul"; **a tack's end waiting for her to pay off, on a rig with a whole lateen set alone** (ruled). **Three and a half days** (was one and a half) | `dipping` on a whole lateen | Nothing of the eighteen files; **the settee's and the lugger's guard sets as they stand after A2** (A2, merged alone first, moves the lugger's two transcripts in `tests/test_settee.py`; the third version's "as they are" corrected). The vocabulary's order lists (the clause, the practice's verb and occasion). The primer's going-about chapter naming the practice's new verb and its reading, so that `tests/test_grammar_book.py`'s two primer tests pass again. No checkpoint name (`lateen_practice` is a plain dict of strings; `LateenChange` built only when needed: Eng §2.3). `tests/test_catalogue.py` and truth 7-606 unmoved by construction; every other rig's tack's end as it is | the three lateen hulls' files on the branch | engine track | Tar-D §5.4 items 2-4; Pol-D §5.3; Xeb-D §5 A1; Eng §2.3 items 2-5, §2.3a, §14 |
 | **A1c** | The rules captain and `put her about`: package 45's choice wears where a whole lateen is set and the mean true wind is over **`LATEEN_TACK_KN`, 22 kn, a module constant of `orders/navigation.py` beside `WEAR_WIND_KN`'s 30** (neither `put_about_choice` nor `judge_course` reads a captain's book, so it serves every voice: the player's, a model's, the director's and the rules captain's), said, and so does the course's judgement for a course across the wind's eye (`judge_course`, the road of `steer`, `shape a course` and the captains' hourly leg), each tacking her regardless where there is no room to wear (ruled); an ordered `tack ship` over 22 kn obeyed and warned, words only; `tack ship` never turned into a wear; the captain's practice from the book, **read with defaults and written in no committed book** (ruled): the practice set by the wind (`leave the lateens in stays` as the wind falls under `lateen_leave_kn`, 12 kn; `shift the lateens in stays` as it rises over it), so that every tack by any road reads it; the yards shifted after a board of `bad_hand_s` (1,800 s) on the bad hand, and after the wind has crossed the stern or come round through the bow, as a lug is dipped (JUDGEMENT on every figure; Forfait p. 119; Stratico BISDOSSO; the 2018 inventory) | a whole lateen set | Nothing of the eighteen files (none sets one). **No committed book's count**: the two keys read by `Doctrine.threshold(key, default)`, in the corsair's new book alone if anywhere; a key in a committed book would move `tests/test_subtypes.py:463-490` (the indiaman's thresholds the merchant's key for key; the revenue cutter's the cruiser's but `man_of_war_nm`). The captain's trials and `tests/test_captains.py` as a lens | the tartane's merge | engine track | Eng §2.3 item 6, §14 |
-| **A1d** | **The owner's option** (nudge 18: not ruled; built only if the owner takes it): a new rule of force in the physics, a whole lateen on the good hand with the wind on its lee face held aback against its mast as a plate (`physics/sails.py`, `_read_rig`'s `held` and `_plate_force`), where today it collapses and flogs and is never aback (Eng §2.1, §2.2a); its load on its yard and mast by the strain model as it is, a factor only if measured to be wanted, set on each hull's rating; `take in` begun on a lateen aback over 22 kn waiting till she pays off (Forfait p. 119); the bad hand's load folded in. **One and a half to two days.** Without it the danger is said in her words and the guide's, every road that chooses wears her over 22 kn, and her lateens collapse aback with no spar lost (Eng §2.4.3) | a whole lateen with `dipping` | Nothing of the eighteen files. **Every lateen hull's going about**, measured again after it (made in process, the polacre probe's tack in 15 kn went from 164 s and 249 m to 407 s and 725 m: Eng §2.2a); A1b's figures and the hulls' truths of it (Tar-D T-3, T-9; Xeb-D X4; Pol-D P5). `tests/test_strain.py` as it is | the tartane's merge, if taken | engine track | Eng §2.4.3, §14 |
+| **A1d** | **Built, by the owner's decision of 2026-11-18** (nudge 19; their words in §0): **a whole lateen held aback against its mast, and one on the bad hand, a new rule of force in the physics** (`physics/sails.py`). It reads the whole lateen (class `lateen`, no `cut_at_mast`, A1a's `dipping` and `lug_side`), the side (its cloth kept on its yard's side by the mast while the wind comes round ahead, not laid on the deck's lee as a single sheet is today; carried over to leeward abaft the beam; drawn over by hands, a whole lateen's sheet keeping the side it is drawn to in `evolutions/trim.py`'s `set_sheet_angle`) and the wind's face at its own height: with the wind come round ahead onto the side its cloth lies on it is held (`_read_rig`) and stands as a plate aback (`_plate_force` as it is), "Main lateen taken aback." after 10 s; in the luffing band it shakes as today. **Its strain goes to the mast as well as the yard**: in `_apply_loads` its pull on each spar of its chain (its yard, then its mast) multiplied by `LATEEN_ABACK_LOAD` held aback and by `LATEEN_BAD_HAND_LOAD` against its mast on the bad hand; the cloth and lines the plain pull; the wear over 1.0, the chance over 1.5, the certain failure at nought and `_wreck_spar` with its dependents `physics/strain.py`'s as they are, **no new kind of damage** (a backed square sail's road, Eng §2.4.3). **The figures, JUDGEMENT for the lead (§13.1)**: aback, a great yard strains from about 28 kn and may carry away from about 35 (the factor about 2½); on the bad hand from about 45 and 55 (about 2, on the two-thirds' pull); a mast with its yard where it carries only its lateen, from about 38 kn aback where it carries more; the rules captain never at risk in their own handling (under 22 kn in stays the yards at 0.55 to 0.60 of their ratings, 1.12 to 1.21 in a squall's top; on the bad hand under 12 kn at 0.07 to 0.10: Eng §2.4.3, §2.2b). **The evolution's part, at A1b's places**: a left lateen drawn over at "let go and haul" and "wind aft", a changed one's change begun there; a foremost one kept aback hung in stays; the bow watch's "aback against the mast"; `take in` begun on a lateen aback over 22 kn waiting till it fills or is drawn (Forfait p. 119; Eng §2.4.3a). **Two and a half days** (two to three) | a whole lateen with `dipping` | Nothing of the eighteen files. `tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are. **The probes' going about by −9 to +13 m** in 15 and 25 kn, measured in process with the evolution's part, so that A1b's figures stand within about two per cent (Eng §2.2b; nudge 18's 164 s to 407 s on the polacre a failed tack under that process rule, not this rule's); A1b's figures and the hulls' truths of going about and the strain (Tar-D T-3, T-9; Xeb-D X4; Pol-D P5) measured after it, old beside new | the tartane's merge | engine track, **merged alone** after A1c | Eng §2.4.3, §2.4.3a, §2.2b, §14 |
 | **A2** | The words of a rig with no yards, **at the cause** (widened on nudge 18): the wear's "brace in the after yards" said only where she has after yards; "braced" said only where she has a braced yard, in the tack's end, the wear's end and the wear's wind-aft line ("hauled out and braced up"), for every rig. **Merged alone, before A1a** | the rig as filed | **The lugger's two pinned transcripts** (`tests/test_settee.py:1418-1456`): the tack's line at 180 s and the wear's at 1, 36 and 171 s, words only, every tick the same (run as they are in scratch; the new words by reading, Eng §2.3 item 9); the lugger's case of `tests/test_evolutions.py:1169-1171`; **the cutter's and the smack's wear's first line only** (run; no test pins it) | before A1a | engine track | Eng §2.3 item 9; Xeb-D E10 |
 | **A3** | The helm's kind: on `helm: tiller`, the hit says the tiller or its ropes are shot away; the relieving tackles hook to the tiller as now; `repair the wheel` is answered as the tiller's repair (a spare tiller shipped, or new tiller ropes rove), its time and hands by judgement. For every tiller-steered hull | `helm: tiller` | The six files whose notes say tiller, regenerated with the key: the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig (read: `data/ships/*.yaml`). Their "no figure moved" records name the key. Their words where a helm is shot away. Truth 7-626 is the first action's, at seed 6: to be measured, and expected not to move if her ship steers by a wheel | the tartane's file | engine track | Tar-D §5.4 item 9; Eng §10 |
 | **A4** | The boat in tow: a towed boat manned from alongside, not hoisted out; words. Its drag is left out as small beside the hull's at her speeds (JUDGEMENT, measured against the trawl's form) | a boat's `towed` | nothing (no file tows a boat) | the tartane's file | engine track | Tar-D §5.4 item 8; Eng §3 |
@@ -562,7 +601,6 @@ Each step is merged alone and measured, old beside new.
 | **N3** | A `spanish` marines kit in `data/marines.yaml` (decision 64; the *África*'s 38 soldiers): musket and drill from a source, or the basic kit's, said so | the fit's marines | none | the xebec's King's fit | the *Diana*'s builder | Xeb-D E8 |
 
 **What this plan does not give the engine** (booked, each in §14's "Does not build"):
-- a lateen held aback against its mast (A1d), unless the owner takes it (nudge 18; Eng §2.4.3);
 - the obús as a kind of its own;
 - a lying-to under lateens alone;
 - the xebec's square sails for running;
@@ -583,7 +621,7 @@ files, and before the tartane, the package's first pole main (the critic's F3).
 | Owner | Owns (edits only these) |
 |---|---|
 | **The stage-0 agent** (here) | Every file of §5.1 and §5.2, at its commit. `freesail/ship/schema.py` for the whole package: a later need goes back to a stage-0 commit, as in package 75 |
-| **The engine track** (one cloud session, one builder at a time) | **Code:** `tools/gen_ships.py` after stage 0 (A0 only); `freesail/ship/parts.py` and `ship/graph.py`; `physics/sails.py` and `physics/integrate.py`; `evolutions/scripts.py`, `runner.py`, `trim.py` and `action_scripts.py`; `orders/verbs.py`, `orders/storm.py`, `orders/boat.py` and a new `orders/sweeps.py`; `combat/hits.py` (A3); `world/boats.py` and `world/movement.py` (A7, only so that the boat predicates stay a boat's); `world/ships.py`'s far-body pace, l. 840-870 (A7, `VESSEL_MIN_SPEED_KN` and its readers); **third draft:** `orders/navigation.py`'s `put_about_choice` and `LATEEN_TACK_KN`, `judge_course`'s eye branch and `watch_the_stern` with the bow's line (A1a, A1c); `orders/grammar.py`'s going-about modifiers and `_take_canvas_words`'s mark of "for" (A1a, A1b) and `orders/vocabulary.py`'s table for them (A1b); `world/captains.py`'s going about, `_across_the_stern` and the bow's event, for a whole lateen (and a dipping lug's at the cause: A1a, A1c); `api/readings.py`'s row for the ship's practice (A1b); **only if the owner takes A1d**: `physics/sails.py`'s rule of a lateen held aback, and `physics/strain.py` if a factor is taken |
+| **The engine track** (one cloud session, one builder at a time) | **Code:** `tools/gen_ships.py` after stage 0 (A0 only); `freesail/ship/parts.py` and `ship/graph.py`; `physics/sails.py` and `physics/integrate.py`; `evolutions/scripts.py`, `runner.py`, `trim.py` and `action_scripts.py`; `orders/verbs.py`, `orders/storm.py`, `orders/boat.py` and a new `orders/sweeps.py`; `combat/hits.py` (A3); `world/boats.py` and `world/movement.py` (A7, only so that the boat predicates stay a boat's); `world/ships.py`'s far-body pace, l. 840-870 (A7, `VESSEL_MIN_SPEED_KN` and its readers); **third draft:** `orders/navigation.py`'s `put_about_choice` and `LATEEN_TACK_KN`, `judge_course`'s eye branch and `watch_the_stern` with the bow's line (A1a, A1c); `orders/grammar.py`'s going-about modifiers and `_take_canvas_words`'s mark of "for" (A1a, A1b) and `orders/vocabulary.py`'s table for them (A1b); `world/captains.py`'s going about, `_across_the_stern` and the bow's event, for a whole lateen (and a dipping lug's at the cause: A1a, A1c); `api/readings.py`'s row for the ship's practice (A1b); **for A1d** (built, nudge 19): `physics/sails.py`'s rule of a lateen held aback and its two factors in `_apply_loads`, and `evolutions/trim.py`'s `set_sheet_angle` keeping a whole lateen's drawn side; `physics/strain.py` is not touched |
 | | **Docs:** the primer's going-about chapter, `docs/primer/05-going-about.md`, at A1b, naming the practice's new verb and its reading; and at A7 a passage naming the sweeps' orders, in the chapter the builder names. `tests/test_grammar_book.py` asks every verb and reading to be named in the primer (the sweeps' gap older than the third draft) |
 | | **Data:** `data/evolutions/` (the new files and those the steps name); `data/vocabulary.yaml`; the lateen row of `data/sail_classes.yaml` (A8); no committed book of `data/captains/` (A1c's two keys read with defaults, ruled; the corsair's new book, N2's, may carry them) |
 | | **Generated:** the committed files that A0 and A3 move, regenerated by the tool |
@@ -683,7 +721,7 @@ The pictures stay outside the repository.
 
 | Hull | Comparator | Her particular work in the report |
 |---|---|---|
-| Tartane | the cutter | her tack and her wear, each with her yards shifted and with them left, the time and the ground lost beside the cutter's; the bad hand and `shift the mainsail`; `put her about` in a strong breeze, worn and the reason said; her head in the wind's eye in a breeze (with A1d, if the owner takes it, her yard's strain aback); hove to; the tréou running; the gale's bouffette; the boat in tow |
+| Tartane | the cutter | her tack and her wear, each with her yards shifted and with them left, the time and the ground lost beside the cutter's; the bad hand and `shift the mainsail`; `put her about` in a strong breeze, worn and the reason said; her head through the wind in a breeze and a shift that takes her aback, with A1d her great yard's and mast's strain (and on the bad hand), the take-in's wait; hove to; the tréou running; the gale's bouffette; the boat in tow |
 | Polacre | the merchant brig | the topsail and topgallant lowered "en paquet"; her tack and her wear with both lateens changed and with them left; hove to with her mizen set |
 | Xebec | the brig | her tack and her wear with the three changes, and her mizen eased as she pays off; `out sweeps` in a calm, and the men taken from the guns; the small lateens shifted in a gale; before the wind against the brig |
 | *Diana* | the frigate-36 | her captain's case (10 to 11 kn, 2 to 3 points free); her heel against the frigate's; the lee port at 21.8°; her four fits |
@@ -709,9 +747,10 @@ The pictures stay outside the repository.
 
   For the record: A0 moves nothing of hers, since she carries no studding sail and her lateen peak
   is 1.25, the engine's 1.246. V1 to V3 are for her report, not her file.
-- **Her truths:** nine (Tar-D §13, T-1 to T-9; T-9, taken aback in a breeze, the third draft's,
-  in one of two forms by the owner's choice of A1d: the yard strained aback if it is built, else
-  the wear over 22 kn and the danger said, nothing carried away).
+- **Her truths:** nine (Tar-D §13, T-1 to T-9; T-9, taken aback in a breeze, in A1d's form, built
+  by the owner's decision: her great yard strained aback from about 28 kn and at risk from about 35,
+  before her mast; her own tack in 22 kn straining nothing; the wear over 22 kn and the danger
+  said).
 - **Her pins:** none of a committed file. The probe's tests read the probe as filed.
 
 ### 8.2 The polacre (Pol, Pol-D)
@@ -732,8 +771,7 @@ The pictures stay outside the repository.
   - **Brass guns' weights** for the navy's fit, from a source to be read.
 - **Her files wait on:**
   - Winfield's rows;
-  - A1a to A1c (and A1d if the owner takes it), A5 and A6 (all on the branch before the
-    tartane's file);
+  - A1a to A1d, A5 and A6 (all on the branch before the tartane's file);
   - N2 for her corsair fit.
 
   V1 and V2 are for her report.
@@ -753,7 +791,7 @@ The pictures stay outside the repository.
   - **Her regency's fit** on N2, under `Design-SlaveryAndSuppression.md` §8. Her file is open to the
     player under Spain's flag, as the rule asks.
 - **Her file waits on:**
-  - A1a to A1c (and A1d if taken), and A7;
+  - A1a to A1d, and A7;
   - A8 before her merge, since her "worst of all before the wind" truth fails on the untuned row
     today;
   - N2 and N3;
@@ -827,11 +865,11 @@ The pictures stay outside the repository.
 | N1-N3 | the *Diana*'s builder | the shared data, each merged alone | S0 | the first Spanish people file; the corsair fits | the audit's counts (N2) |
 | ***Diana*** | her builder | her file | A0, N1 | stopping point 1 | none of another file's |
 | **Stopping point 1** | the owner | the first new ship, and item 37's boom ratings | | | |
-| 0L | stage-0 agent, here | §5.2 | the lead's approval of A1's design (A1a to A1c, ruled 2026-11-18; A1d the owner's) | A1a, and the lateen hulls' files | none (proven) |
+| 0L | stage-0 agent, here | §5.2 | the lead's approval of A1's design (A1a to A1c, ruled 2026-11-18; A1d decided built by the owner, 2026-11-18, its figures the lead's) | A1a, and the lateen hulls' files | none (proven) |
 | A2 | engine track | the words of a rig with no yards, at the cause; **merged alone** | 0L | A1a | the lugger's two transcripts and her wind-aft case; the cutter's and the smack's wear's first line (words) |
 | A1a, A1b | engine track | the whole lateen's side, its routing and its going about, the yard's change a part | A2 | the tartane's file on the branch | the library's and the vocabulary's counts |
 | A1c | engine track | the rules captain and `put her about` | A1b (N2's `world/captains.py` merged first) | the tartane's merge | none (no committed book gains a key) |
-| A1d, if the owner takes it | engine track | a lateen held aback: the new rule of force | A1c | the tartane's merge | the probes' going about re-measured (no committed pin) |
+| A1d | engine track | a lateen held aback against its mast and one on the bad hand: the new rule of force, **merged alone** | A1c | the tartane's merge | none committed; the probes' going about re-measured |
 | A3, A4 | engine track | the helm; the boat in tow | A1b (the same files) | the tartane's file | A3's six files |
 | A5, A6 | engine track | the yard's level; the pole | A3, A4 | the tartane's file (her topsail on a pole main) | the smack's |
 | V1 to V3 | viewer | the lateen, the pole and the towed boat drawn | A1, A4, A6 | the tartane's report | the smack's picture (V2) |
@@ -840,10 +878,10 @@ The pictures stay outside the repository.
 | A9, ***Concepción*** | her builder | three decks, and her file | A0, N1, her passages, Dec 10 | stopping point 3 | V4's words |
 | V4 | viewer | the middle deck's port words | A9 | her report | the 74's and the 64's port word |
 | **Stopping point 3** | the owner | the first three-decker | | | |
-| **Polacre** | her builder | her two files | A1a to A1c (A1d if taken), A5, A6, N2; Winfield's rows | stopping point 4 | none |
+| **Polacre** | her builder | her two files | A1a to A1d, A5, A6, N2; Winfield's rows | stopping point 4 | none |
 | **Stopping point 4** | the owner | the square main among lateens | | | |
 | A7 | engine track | sweeps | A6 | the xebec's sweeps | the counts |
-| **Xebec** | her builder | her two files | A1a to A1c (A1d if taken), A7, N2, N3 | A8 | the file counts |
+| **Xebec** | her builder | her two files | A1a to A1d, A7, N2, N3 | A8 | the file counts |
 | A8 | engine track | the gale; the lateen row tuned | the tartane and the xebec on the branch, and the polacre if she has landed (§4 row 7) | the xebec's merge | the lateen hulls' own figures |
 | **Stopping point 5** | the owner | the whole package | | | |
 | Phase 5 | integrator | §3 | every merge | the lead's close | — |
@@ -925,28 +963,29 @@ a test that builds the state by hand let faults through there).
 - the byte test, two-way, and the golden classing table;
 - `tests/test_schooner_mast.py` and `tests/test_probes_90.py`;
 - `tools/check_viewer_guns.py`'s test;
-- **at each of A2, A1a to A1c (A1d if taken), A5 and A6:**
+- **at each of A2, A1a to A1d, A5 and A6:**
   - the lugger's guard set: `tests/test_lug.py`, truth 7b-111, `tests/test_captains.py`'s lug
     cases, the lug cases of `tests/test_view_geometry.py`;
   - the settee's, `tests/test_settee.py`. **At A2** its two lugger transcripts move by their four
     lines, and `tests/test_evolutions.py`'s lugger case by one, words only (Eng §2.3 item 9): A2 is
     merged alone so that they move once, old beside new, and the set then holds unmoved through
-    A1a to A1c (and A1d);
+    A1a to A1d;
   - the going-about set: `test_gale.py`, `test_rig_geometry.py`, `test_staying.py`,
     `test_lying_to.py`, `test_evolutions.py`, `test_captain_trials.py`, `test_catalogue.py`;
   - a trace of the lugger's and the frigate's tack, wear and heave-to at seed 7, before and after
     (a lens, not a test);
   - **at A1b and A7 also**: `tests/test_grammar_book.py`, for the new orders, the clause's parse
     and the primer's naming of them;
-  - **at A1c also** (and A1d if taken): `tests/test_captains.py` whole,
+  - **at A1c and A1d also**: `tests/test_captains.py` whole,
     `tests/test_captain_rules.py`, `tests/test_standing.py` and `tests/test_subtypes.py`, since
     they reach the rules captain's going about, the practice's order as a standing order and the
-    books; `tests/test_strain.py` at A1d alone;
+    books; `tests/test_strain.py` and `tests/test_lateen.py` whole at A1d;
   - **at A1b also**: truth 7-606 (the checkpoint's census and its kin), since `LateenChange` is a
     new class of `evolutions/scripts.py`;
-  - **at A1a to A1c** (and A1d if taken): the probes' own going about re-measured, old beside
-    new, by Eng §2.2a's measure (the tack and the wear, the yard shifted and left, the time and
-    the ground lost).
+  - **at A1a to A1d**: the probes' own going about re-measured, old beside new, by Eng §2.2a's
+    measure (the tack and the wear, the yard shifted and left, the time and the ground lost); at
+    A1d also Eng §2.2b's (the shift aback and the bad hand on the probes rated by the generator's
+    rule, the factors' winds).
 
 **The review lenses** on each builder's branch (`Build-Ships.md` §17):
 1. sources and fidelity;
@@ -962,8 +1001,7 @@ a test that builds the state by hand let faults through there).
 ### 10.3 The truths
 
 Thirty-five are proposed:
-- tartane 9 (T-9, taken aback in a breeze, is the third draft's, its form the owner's choice of
-  A1d);
+- tartane 9 (T-9, taken aback in a breeze, in A1d's form: built by the owner's decision);
 - polacre 6;
 - xebec 9;
 - *Diana* 6;
@@ -987,7 +1025,7 @@ and passed by a reader other than the one who moved it.
 | A2 | `tests/test_settee.py`'s `LUGGER_TACK` (the line at 180 s) and `LUGGER_WEAR` (the lines at 1, 36 and 171 s); `tests/test_evolutions.py:1169-1171`, the lugger's wind-aft line; the cutter's and the smack's wear's first line wherever a recorded passage holds it (no test pins it) | words only, every tick the same, old beside new (Eng §2.3 item 9) |
 | A1a, A1b | `tests/test_agents.py`'s count of evolutions (`change_lateen`); the vocabulary's order lists (`shift` and `dip` for a whole lateen, the clause, the practice's verb and occasion); `tests/test_grammar_book.py`'s `test_every_verb_of_the_vocabulary_is_named_in_the_primer` and `test_every_reading_of_the_registry_is_named_in_the_primer`; the bow's line for the lugger's lugs, at its cause, if any passage holds such a shift (none expected) | counts; the lists regenerated by their tools; the two primer tests passing again once chapter 5 names the new verb and reading |
 | A1c | none: the 22 kn a module constant, the 12 kn and 1,800 s read with defaults and written in no committed book (ruled); `tests/test_subtypes.py:463-490` would move if a committed book gained a key | — |
-| A1d, if taken | none committed (keyed on a whole lateen with `dipping`); the probes' going about and A1b's figures re-measured | measured old beside new |
+| A1d | none committed (keyed on a whole lateen with `dipping`; `tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are); the probes' going about (−9 to +13 m in process, Eng §2.2b) and A1b's figures re-measured | measured old beside new |
 | A3 | six files regenerated with `helm: tiller`; their records of no figure moved; their words where a helm is shot away; truth 7-626 measured | a key line; words |
 | A5, A6 | the smack's heave-to and lie a-try with her topsail set; her topsail's take-in | behaviour where her topsail is set; no pinned passage expected |
 | A7 | `tests/test_agents.py`'s count of evolutions; the vocabulary's order lists; the checkpoint's names list; `tests/test_grammar_book.py`'s primer test of the verbs | counts; the list regenerated by its tool; the primer test passing again once the sweeps' orders are named |
@@ -1010,10 +1048,10 @@ The fast tier takes about 51 minutes here at eight workers, and the slow tier ab
 | Phase 2 and Phase 3 (critics, second drafts, measuring, the owner's round) | nothing | — |
 | S0 | the fast tier whole once, with `--junitxml`: **the base** for every later step; the stage-0 guards; the byte test | about 55 minutes |
 | 0L | `tests/test_probes_90.py`, and the tests of the schema and the lateen; the base is S0's junit | about 10 minutes |
-| Each merge of a cloud branch (about nineteen: A0; N1, N2 and N3; the *Diana*; A2 alone; A1a-A1b; A1c (with A1d if the owner takes it); A3-A4; A5-A6; V1 to V3; `lateen.py`; the tartane; A9 with the *Concepción*; V4; the polacre; A7; the xebec; A8) | the byte test, the golden classing table, §10.2's guard set for that step's files, and lint. **No tier:** the cloud's fast-tier junit is compared here against the base | 5 to 15 minutes each, A1c's about half an hour (the captains' tests whole; the strain's too if A1d is taken): about two and a half to four and a half hours over the package (nudge 18: one merge more, A2's, inside the range) |
+| Each merge of a cloud branch (about twenty: A0; N1, N2 and N3; the *Diana*; A2 alone; A1a-A1b; A1c; A1d alone; A3-A4; A5-A6; V1 to V3; `lateen.py`; the tartane; A9 with the *Concepción*; V4; the polacre; A7; the xebec; A8) | the byte test, the golden classing table, §10.2's guard set for that step's files, and lint. **No tier:** the cloud's fast-tier junit is compared here against the base | 5 to 15 minutes each, A1c's about half an hour (the captains' tests whole) and A1d's about a quarter (the strain's and the lateen's tests whole): about two and three-quarters to four and three-quarters hours over the package (nudge 18: one merge more, A2's, inside the range; nudge 19: one more, A1d's alone, a quarter of an hour) |
 | The three-decker's crewed pace | truth 7-196's world with three of her crewed, once, to record a figure (the floor is the build machine's) | about 2 minutes |
 | The testing reports' pictures | the viewer in the built-in pane; no suite | minutes each |
-| **Total** | **about three and a half to five and a half hours of the owner's machine over the package**, one at a time, and never beside another suite (third draft: half an hour more than the second version's three to five, for A1c's captains' tests; nudge 18: unchanged, A2's own merge and A1d's, if taken, inside the range) | |
+| **Total** | **about three and three-quarters to five and three-quarters hours of the owner's machine over the package**, one at a time, and never beside another suite (third draft: half an hour more than the second version's three to five, for A1c's captains' tests; nudge 18: unchanged, A2's own merge inside the range; nudge 19: a quarter of an hour more, for A1d's merge alone) | |
 
 **In the cloud**, not on the owner's machine:
 - each builder's fast tier whole on its final tree, about an hour, plus the slow tier of its
@@ -1046,9 +1084,9 @@ generator's existing method.
 ## 12. Risks, ranked
 
 1. **A1 is new behaviour on every whole lateen of the package and is the largest step**, larger
-   since the owner's answer to Dec 3: three steps in place of one (A1a to A1c), and a fourth, A1d,
-   if the owner takes it, reaching the tack, the wear, the rules captain and, with A1d, the
-   physics. A1b alone is woven into eleven places of the settee's change (Eng §2.3a), three and a
+   since the owner's answer to Dec 3: four steps in place of one (A1a to A1c, and A1d, built by the
+   owner's decision of 2026-11-18), reaching the tack, the wear, the rules captain and, with A1d,
+   the physics. A1b alone is woven into eleven places of the settee's change (Eng §2.3a), three and a
    half days by the estimate.
    - *Mitigation:*
      - designed once in the engine note (its third draft, §2.3, §2.4, §14), approved by the lead
@@ -1056,16 +1094,19 @@ generator's existing method.
      - keyed on `dipping` on a whole lateen, or on a whole lateen set, which no committed file
        carries;
      - the lugger's and the settee's guard sets (moved once by A2, merged alone first, then
-       holding), the captains' tests at A1c, the strain's at A1d if taken, truth 7-606 at A1b,
-       and the trace (§10.2);
-     - A1d, a new rule of force, kept out of the card unless the owner takes it, with its size
-       and what it moves set beside it (Eng §2.4.3);
+       holding), the captains' tests at A1c, the strain's and the lateen's at A1d, truth 7-606 at
+       A1b, and the trace (§10.2);
+     - A1d, a new rule of force, merged alone and read by a reader of the other tier; measured in
+       process before the build (Eng §2.2b: the probes' going about moved −9 to +13 m with the
+       evolution's draw; held aback on the new board if the draw were missed, which its tests pin);
      - the probes tested with the key before any file carries it, their going about re-measured
        by Eng §2.2a's measure.
 2. **Every figure of the lateen's going about is judgement**: the bad hand's loss, the change's
-   seconds and hands, the captain's three winds, the strain aback. No source gives one (GA §5).
+   seconds and hands, the captain's three winds, the strain aback and on the bad hand (A1d's two
+   factors and their winds). No source gives one (GA §5).
    - *Mitigation:* each is named in Eng §2.4 with its reason, the lead ruled them on 2026-11-18
-     (§13.1), and each
+     (§13.1; A1d's asked of them on nudge 19, checked against the rules captain's own winds so that
+     a captain who follows the book is not dismasted by it, Eng §2.4.3), and each
      hull's truths measure them on her own file. The probes already show the trade the owner's
      shape implies (Eng §2.2a: the yard left pays on a short board, the change on a long one),
      so a figure that loses it is seen.
@@ -1140,12 +1181,25 @@ Each ruling is JUDGEMENT, as the documents have it: no source gives these figure
      (`judge_course`), with the tack regardless where there is no room to wear. **Ruled**;
    - **a tack's end waiting for her to pay off** (Eng §13 item 8): **keyed on a whole lateen only**,
      so that no other rig's pin moves. **Ruled**;
-   - **the strain aback and on the bad hand: not ruled.** Its premise does not hold in the engine
-     (a whole lateen is never aback: Eng §2.1, §2.2a). **A1d is re-drafted as an option for the
-     owner** (Eng §2.4.3), which the lead puts to them with the card: a new rule of force for a
-     lateen held aback against its mast, one and a half to two days, reaching every lateen hull's
-     going about; or nothing built, the danger said and every road that chooses wearing her over
-     22 kn, with no spar lost for it. The pick: not built in this card.
+   - **the strain aback and on the bad hand: not ruled on nudge 18**, its premise not holding in
+     the engine (a whole lateen is never aback: Eng §2.1, §2.2a); put to the owner as an option.
+     **Decided by the owner on 2026-11-18 (nudge 19): built** (their words in §0). **Asked of the
+     lead now, each JUDGEMENT** (Eng §2.4.3, §2.4.3a, §2.2b):
+     - the rule's reading: a whole lateen held aback only once the wind has come round ahead onto
+       the side its cloth lies on (its cloth kept on its yard's side by the mast), shaking as today
+       in the luffing band, carried over to leeward abaft the beam;
+     - `LATEEN_ABACK_LOAD` **about 2½**: aback, a great yard strains from about 28 kn and may carry
+       away from about 35 (in stays about 30 and 36); the third draft's 3.9 was set on a drawing load
+       the engine never put on a lateen aback;
+     - `LATEEN_BAD_HAND_LOAD` **about 2**, on the two-thirds' pull: the bad hand strains from about
+       45 kn and may carry away from about 55; the third draft's 1.5 forgot the two-thirds (at 1.5
+       it strains only from about 53);
+     - the mast left to the ratings: with its yard where it carries only its lateen, from about
+       38 kn aback where it carries more (the tartane's main);
+     - the evolution's draw of a left lateen at "let go and haul" and "wind aft", and its words;
+     - checked against the rules captain's book: in their own tack under 22 kn the yards at 0.55 to
+       0.60 of their ratings, 1.12 to 1.21 in a squall's top (31.9 kn), never at risk; on the bad
+       hand under 12 kn for 1,800 s at 0.07 to 0.10, nothing worn.
    - **Asked, from the ruling's reason** (not ruled): the change's time **by itself**
      (`change_lateen`, standing on her course). The third draft took the settee's dip, 11¼ s a
      metre; the lugger's own by itself is `dip_lug`'s 150 s for her 10.3 m, 14.6 s a metre. The
@@ -1210,22 +1264,22 @@ The three this package does mend, A2, A3 and A5, are in §2 item 5.
 
 | Field | |
 |---|---|
-| **Purpose** | The game gains its five Spanish and Mediterranean ships, from the smallest up: the tartane, the polacre, the xebec, the corvette *Diana* and the *Purísima Concepción* three-decker. Each is sailable from the harbour in her fits and roles, built from her sources by the ladder of evidence, and handled as the period handled her: a lateen tacked and worn, its yard changed round its mast or left on the bad hand (the owner's answer to Dec 3), and worn, not put in stays, in a strong breeze, the danger said; a pole mast's sails lowered from the deck; a xebec at her sweeps; three gun decks at quarters. No existing ship sails otherwise, except where this card names it: item 37's boom ratings; three older faults mended at their cause (the words of a rig with no yards among them, which reach the lugger's, the cutter's and the smack's going about); and what reaches existing ships by the new keys: the smack's topsail lowered onto the yard below and drawn so, the 74's and the 64's port word, and the watch's line for a lugger's lugs left on their masts by a shift of wind through the bow |
+| **Purpose** | The game gains its five Spanish and Mediterranean ships, from the smallest up: the tartane, the polacre, the xebec, the corvette *Diana* and the *Purísima Concepción* three-decker. Each is sailable from the harbour in her fits and roles, built from her sources by the ladder of evidence, and handled as the period handled her: a lateen tacked and worn, its yard changed round its mast or left on the bad hand (the owner's answer to Dec 3), and worn, not put in stays, in a strong breeze, the danger said; a lateen taken aback, or lying against its mast on the bad hand, straining its yard and its mast in a strong wind and at risk in a stronger one (the owner's decision of A1d); a pole mast's sails lowered from the deck; a xebec at her sweeps; three gun decks at quarters. No existing ship sails otherwise, except where this card names it: item 37's boom ratings; three older faults mended at their cause (the words of a rig with no yards among them, which reach the lugger's, the cutter's and the smack's going about); and what reaches existing ships by the new keys: the smack's topsail lowered onto the yard below and drawn so, the 74's and the 64's port word, and the watch's line for a lugger's lugs left on their masts by a shift of wind through the bow |
 | **Builds** | **(1) Stage 0 and 0L**, behaviour-free (plan §5). |
-| | **(2) The engine's steps A0 to A9** (§6): item 37 by the owner's road; the whole lateen tacked and worn, its yard's change a part done or left by the order's words or the ship's practice, the rules captain's choice, and the danger of a strong breeze said and worn clear of (A1a to A1c); **and, only if the owner takes it, A1d: a lateen held aback against its mast as a new rule of force in the physics, its yard and mast loaded, one and a half to two days more** (Eng §2.4.3); the words of a rig with no yards; a tiller's words; the boat in tow; a yard's level and the pole mast; sweeps; the lateen in a gale, with its row tuned; three decks. |
+| | **(2) The engine's steps A0 to A9** (§6): item 37 by the owner's road; the whole lateen tacked and worn, its yard's change a part done or left by the order's words or the ship's practice, the rules captain's choice, and the danger of a strong breeze said and worn clear of (A1a to A1c); **and A1d, built by the owner's decision: a lateen held aback against its mast, and one on the bad hand, as a new rule of force in the physics, its yard and its mast loaded by the engine's own strain and carrying-away** (Eng §2.4.3); the words of a rig with no yards; a tiller's words; the boat in tow; a yard's level and the pole mast; sweeps; the lateen in a gale, with its row tuned; three decks. |
 | | **(3) The viewer's V1 to V4.** |
 | | **(4) The shared data N1 to N3:** Spanish names; the regency's cruiser as a role with its doctrine; a Spanish marines kit. |
 | | **(5) The five hulls in eight ship files:** the tartane and the coastguard tartane; the polacre and the polacre of war; the xebec and the merchant xebec; `corvette-20`; `three-decker`. Each with her people files, tests, truths and testing report. |
-| **Does not build** | A lateen held aback as a new rule of force (A1d), unless the owner takes it. Any scenario or shelf line. The fisherman's description, which wants a fishing-grounds file. The chambequín, or the xebec of 30. The xebec's square sails for running, or her lying to under lateens. A polacre with a square mizen topsail. The obús as a kind of its own. A British *San Josef* fit. A seat for a player at a regency's cruiser. The nations' dated wars. The sweep ports drawn. The Danish draught. Anything else of package 77 or of the list of 79 |
-| **May change** | **Only these:** stage 0's and 0L's files; `tools/gen_ships.py` (`SHIP_MODULES`, and item 37); the five new modules, `tools/ships/lateen.py` and `period.py`'s constants; the eight new ship files and their people files; existing ship files only by regeneration, under A0 and A3; the engine's files named in plan §7.1, `world/ships.py`'s far-body pace among them, and for A1a to A1c `orders/navigation.py`'s going-about choice (with `LATEEN_TACK_KN`), course judgement and the watch's stern and bow, `orders/grammar.py`'s going-about modifiers and its mark of "for", `orders/vocabulary.py`'s table for them, `orders/verbs.py`'s `evolution_key`, `world/captains.py`'s going about and its watch's events for a whole lateen (and a dipping lug's at the cause) and `api/readings.py`'s row for the practice; **for A1d, only if the owner takes it**, `physics/sails.py`'s rule of a lateen held aback and `physics/strain.py` if a factor is taken; the rows of `world/ships.py` and `world/captains.py`, and `ROLES`; `data/evolutions/`, `data/vocabulary.yaml`, the lateen row of `data/sail_classes.yaml`, `data/captains/corsair.yaml` (A1c's two keys there alone, if anywhere: no committed book gains one), `data/crew/names.yaml` and `data/marines.yaml`; `client/projection.js`, `shipview.js` and `style.css`; the tests of these; the primer's going-about chapter at A1b, and a passage naming the sweeps' orders at A7, for the grammar book's tests; at the close, the notes, the specification as built and the primer's vessel pages. |
+| **Does not build** | Any scenario or shelf line. The fisherman's description, which wants a fishing-grounds file. The chambequín, or the xebec of 30. The xebec's square sails for running, or her lying to under lateens. A polacre with a square mizen topsail. The obús as a kind of its own. A British *San Josef* fit. A seat for a player at a regency's cruiser. The nations' dated wars. The sweep ports drawn. The Danish draught. Anything else of package 77 or of the list of 79 |
+| **May change** | **Only these:** stage 0's and 0L's files; `tools/gen_ships.py` (`SHIP_MODULES`, and item 37); the five new modules, `tools/ships/lateen.py` and `period.py`'s constants; the eight new ship files and their people files; existing ship files only by regeneration, under A0 and A3; the engine's files named in plan §7.1, `world/ships.py`'s far-body pace among them, and for A1a to A1c `orders/navigation.py`'s going-about choice (with `LATEEN_TACK_KN`), course judgement and the watch's stern and bow, `orders/grammar.py`'s going-about modifiers and its mark of "for", `orders/vocabulary.py`'s table for them, `orders/verbs.py`'s `evolution_key`, `world/captains.py`'s going about and its watch's events for a whole lateen (and a dipping lug's at the cause) and `api/readings.py`'s row for the practice; **for A1d**, `physics/sails.py`'s rule of a lateen held aback and its two factors, and `evolutions/trim.py`'s `set_sheet_angle` for a whole lateen's drawn side (`physics/strain.py` untouched); the rows of `world/ships.py` and `world/captains.py`, and `ROLES`; `data/evolutions/`, `data/vocabulary.yaml`, the lateen row of `data/sail_classes.yaml`, `data/captains/corsair.yaml` (A1c's two keys there alone, if anywhere: no committed book gains one), `data/crew/names.yaml` and `data/marines.yaml`; `client/projection.js`, `shipview.js` and `style.css`; the tests of these; the primer's going-about chapter at A1b, and a passage naming the sweeps' orders at A7, for the grammar book's tests; at the close, the notes, the specification as built and the primer's vessel pages. |
 | | **A step that needs any other file stops**, and the builder says so before touching it |
-| **Expected to move** | Item 37's: truth 35's last clause, `test_studding`'s frigate case, five records naming the booms, and seven byte pins by regeneration. A tiller's key in six files, and their words where a helm is shot away. The words of a rig with no yards (A2, merged alone): the lugger's two pinned transcripts in `tests/test_settee.py`, by the tack's last line and the wear's first, wind-aft and last lines, and her wind-aft case in `tests/test_evolutions.py`, every tick the same; the cutter's and the smack's wear's first line, pinned by no test. The smack's topsail handled as a topsail (A5), lowered onto the yard below and furled from it (A6), and drawn so (V2). The 74's and the 64's "a lower port" in the viewer's words, "a lower-deck port" (V4). The counts that grow by a file, a role or an evolution, the lateen's change and its orders among them (plan §10.4); the primer named for the new orders and the practice's reading, the grammar book's two tests passing again. The watch's line for a lugger's lugs after a shift of wind through the bow, at its cause (no pinned passage expected). No captain's book's count (the lateen keys read with defaults). If the owner takes A1d: the lateen probes' going about re-measured, no committed pin. |
+| **Expected to move** | Item 37's: truth 35's last clause, `test_studding`'s frigate case, five records naming the booms, and seven byte pins by regeneration. A tiller's key in six files, and their words where a helm is shot away. The words of a rig with no yards (A2, merged alone): the lugger's two pinned transcripts in `tests/test_settee.py`, by the tack's last line and the wear's first, wind-aft and last lines, and her wind-aft case in `tests/test_evolutions.py`, every tick the same; the cutter's and the smack's wear's first line, pinned by no test. The smack's topsail handled as a topsail (A5), lowered onto the yard below and furled from it (A6), and drawn so (V2). The 74's and the 64's "a lower port" in the viewer's words, "a lower-deck port" (V4). The counts that grow by a file, a role or an evolution, the lateen's change and its orders among them (plan §10.4); the primer named for the new orders and the practice's reading, the grammar book's two tests passing again. The watch's line for a lugger's lugs after a shift of wind through the bow, at its cause (no pinned passage expected). No captain's book's count (the lateen keys read with defaults). A1d: no committed pin; the lateen probes' going about re-measured (−9 to +13 m in process, Eng §2.2b). |
 | | Each is measured old beside new and passed by a reader other than the one who moved it. **Anything else that moves is a stop, not a ruling** |
 | **First step, before any code** | A ground report: (a) the trunk merged in, and the grep that no text of the game holds the new rank words; (b) for item 37, the tiller's key, the words and the smack, what moves, run and not guessed, with a count; (c) the tiller-steered files read from their sources. **More than about twenty pinned results moving brings it back to the owner before anything is built** |
-| **How the owner tries it** | At five stopping points, from the harbour, each new ship from a bare start: (1) the *Diana* on a reach in a strong breeze, leaning as the frigate does; (2) the tartane: `tack ship`, her great yard shifted round the mast in stays; then `tack ship and leave the lateens`, a board on the bad hand, and `shift the mainsail`; then `leave the lateens in stays` and `tack ship`; then `wear ship`; `put her about` in a strong breeze, worn and the reason said; `shift the mainsail for a new one` from the sail room; (3) the three-decker: `beat to quarters` reports three decks, then `fire the starboard middle deck`; (4) the polacre: `take in the main topsail` lowers it onto the lower yard; (5) the xebec: `out sweeps` in a calm. |
+| **How the owner tries it** | At five stopping points, from the harbour, each new ship from a bare start: (1) the *Diana* on a reach in a strong breeze, leaning as the frigate does; (2) the tartane: `tack ship`, her great yard shifted round the mast in stays; then `tack ship and leave the lateens`, a board on the bad hand, and `shift the mainsail`; then `leave the lateens in stays` and `tack ship`; then `wear ship`; `put her about` in a strong breeze, worn and the reason said; `tack ship` in a strong breeze, obeyed and warned, her great lateen aback against its mast from her head through the wind to "let go and haul", and in a gale, the great lateen kept set, her great yard "working under the press of sail" as she goes about; `shift the mainsail for a new one` from the sail room; (3) the three-decker: `beat to quarters` reports three decks, then `fire the starboard middle deck`; (4) the polacre: `take in the main topsail` lowers it onto the lower yard; (5) the xebec: `out sweeps` in a calm. |
 | | With each hull's testing report: figures beside her comparator, and pictures in five views |
-| **Size** | **Three to four weeks of calendar** at this week's pace (was two and a half to three and a half), set by the readings and the trying, not by the tests. **The engine track is about thirteen working days of steps** (twelve and a half to thirteen and a half): eight in the second version, and for the owner's answer to Dec 3 and the lead's rulings **A1b's change three and a half** (woven into eleven places of the settee's change: Eng §2.3a; the third draft's one and a half), **A1c's rules captain one**, and **half a day for A1a's edges** (the side found once, the routing with "for", the bow's watch, the heave-to's key). **A1d, the owner's option, one and a half to two days more if taken**: fourteen and a half to fifteen days of the engine track, about half a week more of calendar. Each hull is two to three days, in parallel (JUDGEMENT, from package 75's record). About three and a half to five and a half hours of the owner's machine (plan §11) |
-| **Comes after** | The owner's gate of milestone 7, unless the owner says otherwise (Dec 1); the owner's answers (Dec 1 to 10, given 2026-11-18); the second drafts and these third drafts read by the lead, and A1's design ruled (A1a to A1c, 2026-11-18, nudge 18); the owner's choice of A1d; for the polacre's files alone, Winfield's polacras |
+| **Size** | **Three and a half to four and a half weeks of calendar** at this week's pace (was three to four, with A1d apart as an option), set by the readings and the trying, not by the tests. **The engine track is about fifteen and a half working days of steps** (fourteen and a half to sixteen and a half): eight in the second version, and for the owner's answer to Dec 3 and the lead's rulings **A1b's change three and a half** (woven into eleven places of the settee's change: Eng §2.3a; the third draft's one and a half), **A1c's rules captain one**, **half a day for A1a's edges** (the side found once, the routing with "for", the bow's watch, the heave-to's key), and for the owner's decision of A1d **A1d two and a half** (two to three: the rule, its two factors, the cloth's side kept and the evolution's draw at A1b's places, the take-in's wait and the words, its tests, the probes re-measured and the factors set, a reader of the other tier: Eng §2.4.3; nudge 18's guess was one and a half to two, before the rule was found to need the cloth's side kept). Each hull is two to three days, in parallel (JUDGEMENT, from package 75's record). About three and three-quarters to five and three-quarters hours of the owner's machine (plan §11) |
+| **Comes after** | The owner's gate of milestone 7, unless the owner says otherwise (Dec 1); the owner's answers (Dec 1 to 10, given 2026-11-18); the second drafts and these third drafts read by the lead, and A1's design ruled (A1a to A1c, 2026-11-18, nudge 18); the owner's decision of A1d (2026-11-18, nudge 19: built) and the lead's ruling of its figures (§13.1); for the polacre's files alone, Winfield's polacras |
 | **Comes before** | Package 90's scenarios (a card of their own, after the nations' dated wars); any later ship of the session |
 | **Who** | **This session, here:** stage 0 and 0L (built by one agent, checked by another), the measuring, the merges and their checks, the reports. |
 | | **Cloud sessions:** the engine track, the viewer and one per hull, at most four at once, each on its own branch. Each runs the fast tier whole within its container's limit of hours. |
@@ -1233,8 +1287,8 @@ The three this package does mend, A2, A3 and A5, are in §2 item 5.
 
 **The choices in this card that are the owner's:** Dec 1 to 10, answered on 2026-11-18 (nine as
 picked, the third in the owner's own shape). Winfield's passages, which the owner sources (Dec,
-Part D). **And A1d** (nudge 18), which the lead puts to them with the card: (a) not built here, the
-danger of a strong breeze said in her words and the guide's and worn clear of by every road that
-chooses, a lateen aback losing her way and no spar (the pick); or (b) built, a new rule of force
-for a lateen held aback against its mast, one and a half to two days, reaching every lateen hull's
-going about (Eng §2.4.3).
+Part D). **And A1d**, which the lead put to them with the card (nudge 18) and which they decided on
+2026-11-18 (nudge 19): **built**, in their words, "A lateen taken aback should increase the strain
+on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may
+strain the mast and, in high enough wind, risk damage." Its figures are the lead's to rule (§13.1;
+Eng §2.4.3).
