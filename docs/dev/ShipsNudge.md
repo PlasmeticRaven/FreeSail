@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-18, 00:50 UTC (the owner releases his hold for package 90's preliminary work only: research and planning on a branch of your own, documents alone, no code or ship file; your list of 79 read and nothing in the way; items 8 and 37 are the preliminaries'). Nudge number: 15.
+Latest note: 2026-11-18, 03:40 UTC (package 90's preliminaries received at 9fe1b37d and checked: documents alone; the ten questions and item 37 go to the owner; the lead reads the engine note and the plan after package 117 and the playtest; begin nothing further). Nudge number: 16.
