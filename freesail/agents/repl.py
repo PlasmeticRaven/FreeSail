@@ -108,9 +108,9 @@ REPL_RUNTIME = "the REPL door of FreeSail's harness (text at a terminal, one rep
 EXIT_OWNER = 4  # the consent conversation waits for the owner's reply
 EXIT_NO_CONSENT = 5  # no yes on record: the run stops
 LOADED_ASKS_FIRST = (
-    "{lead} Call this door with --turn and without --load, with a --save and a --sample of "
-    "their own (not this game's), for {what}; once it is answered yes, call again with --load "
-    "to take the {station} in this game."
+    "{lead} Call this door with --turn{again} and without --load, with a --save and a "
+    "--sample of their own (not this game's), for {what}; once it is {done}, call again with "
+    "--load to take the {station} in this game."
 )
 
 REPLY_SYNTAX = (
@@ -600,13 +600,17 @@ def _consent_turn(args: argparse.Namespace) -> tuple[int | None, str, consent.Re
             if not kind and record is not None and record.proceeds:
                 return None, "", record
             if kind:
-                what = "the drill" if kind == consent.DRILL_KIND else "the consent question"
-                if consent.check(identity, records_dir) is None:
+                drill = kind == consent.DRILL_KIND
+                if consent.check(identity, records_dir) is None and not args.ask_again:
                     lead = consent.gate(None, identity)[1]
                 else:
                     lead = f"{identity} is not seated in this loaded game: {words}."
                 words = LOADED_ASKS_FIRST.format(
-                    lead=lead, what=what, station=station_name(args.station)
+                    lead=lead,
+                    again=" --ask-again" if args.ask_again else "",
+                    what="the drill" if drill else "the consent question",
+                    done="passed" if drill else "answered yes",
+                    station=station_name(args.station),
                 )
             _write_sample(args, f"== {words} ==")
             return EXIT_NO_CONSENT, "", None

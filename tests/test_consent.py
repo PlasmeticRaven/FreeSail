@@ -538,6 +538,38 @@ def test_the_repl_turn_mode_on_a_loaded_game_asks_again_a_yes_older_than_the_bri
         went_on = sample.read_text(encoding="utf-8")
         assert "not seated in this loaded game" not in went_on
         assert "== Sample at " in went_on, went_on[:300]
+        # the owner asks again: the call says so, and how (--ask-again on the call of its own)
+        assert (
+            repl_mod.main(common + ["--records", str(now), "--load", str(save), "--ask-again"]) == 5
+        )
+        said = sample.read_text(encoding="utf-8")
+        assert f"{WEIGHTS} is not seated in this loaded game: the owner asks again." in said
+        assert "Call this door with --turn --ask-again and without --load" in said
+    # a yes with no drill: the officer drills, and is not seated in the loaded game until it
+    # is passed; the watcher, which does not drill, is
+    undrilled = tmp_path / "undrilled"
+    consent.Record(
+        WEIGHTS,
+        runtime,
+        "2026-11-18",
+        consent.YES,
+        answer="Yes.",
+        brief=consent.brief_text(WEIGHTS, runtime, "repl"),
+        brief_digest=consent.brief_digest(),
+    ).write(undrilled)
+    for station, seated in (("officer", False), ("watcher", True)):
+        save, sample = tmp_path / f"{station}.json", tmp_path / f"{station}.txt"
+        common = ["--seed", "7", "--every", "60", "--turn", "--model-name", WEIGHTS]
+        common += ["--station", station, "--save", str(save), "--sample", str(sample)]
+        code = repl_mod.main(common + ["--records", str(undrilled), "--load", str(save)])
+        said = sample.read_text(encoding="utf-8")
+        if seated:
+            assert code == 0 and "not seated in this loaded game" not in said
+        else:
+            assert code == repl_mod.EXIT_NO_CONSENT
+            assert "the station asks for the drill before its brief." in said
+            assert "for the drill; once it is passed, call again with --load" in said
+            assert "This is a message from the harness of FreeSail" not in said
 
 
 def test_a_conversation_rebuilt_from_its_replies_reaches_the_same_place(tmp_path):
