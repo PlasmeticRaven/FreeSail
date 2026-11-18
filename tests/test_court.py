@@ -264,13 +264,18 @@ def test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_w
 
 
 @pytest.mark.slow
-def test_the_captor_holding_the_players_person_is_refused_for_both_reasons():
+def test_the_captor_holding_the_players_person_is_refused_for_both_reasons(monkeypatch):
+    """Package 117 turned the flag (decision 70): the gate behind it is tried with it turned
+    back, and the flag turned, it refuses the captor nothing."""
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False)
     w, enemy = _struck_to_a_crewed_frigate()
     why = P.adversarial_seat_why(w, enemy.vessel, "captain")
     assert why is not None and "holds Captain Bowen her prisoner" in why
     # his own ship, a prize, flies her captor's colours now: the enemy's reason is read of a
     # hull a human holds, and the prisoner's reason is the one that stands
     assert "an enemy of" not in why and "seats no model as the captain of the Medusa" in why
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", True)
+    assert P.adversarial_seat_why(w, enemy.vessel, "captain") is None
 
 
 # ---------------------------------------------------------------------------
