@@ -221,7 +221,9 @@ def test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_w
     """The design's §6 (truth 7-366): a `seat:` at the captain of a hull at war with the
     player's is refused with the brief's reason before any consent record is read; her
     lookout's station is admitted (a lookout fires into nobody); the flag turned, the seat is
-    admitted; the captor holding the player's person is refused for both reasons."""
+    admitted; the captor holding the player's person is refused for both reasons. Package
+    117 turned the flag (decision 70): the gate behind it is tried with it turned back."""
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False)
     w = granted(directed(), tmp_path)
     put(
         w,
@@ -481,9 +483,12 @@ def test_a_seat_the_journal_holds_is_held_again_in_a_replay_and_refused_before_t
     captain held in play (the flag turned, or a save from before the rule) is held again in
     a replay with the flag as it stands, to the same digest; and in play the refusal comes
     before any consent record is read (a model with no record is refused for the brief's
-    reason, not for its record)."""
+    reason, not for its record). Package 117 turned the flag (decision 70): the gate
+    behind it is tried with it turned back."""
     from freesail.api.session import ship_factory
     from freesail.core import replay
+
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False)
 
     w = granted(directed(), tmp_path)
     e = w.world_order(
@@ -508,3 +513,70 @@ def test_a_seat_the_journal_holds_is_held_again_in_a_replay_and_refused_before_t
     assert copy.log.digest() == w.log.digest()
     assert list(WO.director_seats(copy)) == list(WO.director_seats(w))
     assert len(WO.director_seats(copy)) == 1
+
+
+def test_the_flag_is_turned_and_an_older_yes_seats_nobody_at_an_enemys_captain_unasked(tmp_path):
+    """Package 117 (decision 70): the brief revised with the adversarial seats' words and
+    approved, the flag is turned. A model whose yes was given against the brief of
+    2026-10-17 (before the revision) comes to the door of the captain of a ship at war with
+    the player's and is asked the question again, with the six sections named, before any
+    station is given; a yes given against the brief as it stands is seated there."""
+    pytest.importorskip("fastapi")
+    from own_page import DoorClient
+
+    from freesail.agents import consent
+    from freesail.ui.server import Driver, create_app
+    from tests.test_officer import BRIEF_BEFORE_117
+
+    assert seats.ADVERSARIAL_SEATS_CONSENTED is True
+    runtime = "a test runtime"
+    for given, brief_path, phase in (
+        ("2026-10-17", BRIEF_BEFORE_117, "consent"),
+        ("2026-11-18", consent.BRIEF_PATH, "station"),
+    ):
+        root = tmp_path / given
+        root.mkdir()
+        w = directed()
+        put(
+            w,
+            "brig-sloop",
+            "france",
+            "49 32 N 5 31 W",
+            "bound for Brest",
+            "bound for Brest",
+            name="Renard",
+        )
+        w.run(60)
+        renard = w.vessels.find("Renard")
+        assert P.adversarial_seat_why(w, renard, "captain") is None  # the flag turned
+        records = root / "consent"
+        records.mkdir()
+        consent.Record(
+            SEATED,
+            runtime,
+            given,
+            consent.YES,
+            answer="Yes.",
+            drill="passed",
+            brief=consent.brief_text(SEATED, runtime, "mcp", path=brief_path),
+            brief_digest=consent.brief_digest(brief_path),
+        ).write(records)
+        app = create_app(
+            Driver(w, compression=60.0),
+            game="a test",
+            consent_records=records,
+            saves_dir=root / "saves",
+        )
+        with DoorClient(app) as http:
+            a = http.post(
+                "/api/agents/captain",
+                json={"model_name": SEATED, "door": "mcp", "ship": "Renard"},
+            ).json()
+        assert a["phase"] == phase, (given, a.get("words"))
+        if phase == "consent":
+            assert "the consent brief has changed since their record (2026-10-17)" in a["words"]
+            assert "Leaving" in a["words"] and "The journal" in a["words"]
+            crew = renard.crew
+            assert crew is None or "captain" not in crew.agents
+        else:
+            assert a["station"] == "captain"

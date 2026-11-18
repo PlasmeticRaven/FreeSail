@@ -1596,7 +1596,8 @@ def test_a_yes_given_before_the_briefs_revision_is_asked_again_and_the_question_
     the sections that changed and no other: *The record* changed too, and is not one the
     rule watches. Package 37g changed four; since package 42a's revision for milestone 6
     the opening and *What is not done* differ too, so the six are named (package 42a's own
-    test is the next one); since package 117's revision (decision 70) *Answering* too. A record made after is not asked. The officer's drill is run again
+    test is the next one); since package 117's revision (decision 70) *Answering* too. A
+    record made after is not asked. The officer's drill is run again
     with the question when the brief has changed (the new record holds its own), where
     after an opt-out a drill passed on record is carried. No record file is edited: the
     test makes its own in a temporary folder."""
@@ -1910,7 +1911,6 @@ def test_a_yes_given_before_the_revision_for_6c_is_asked_again_with_the_five_nam
     assert consent.read_brief(old.path) == before  # the old record stands as written
 
 
-
 def test_a_yes_given_before_the_revision_of_package_117_is_asked_again_with_the_six_named(
     tmp_path,
 ):
@@ -1983,6 +1983,7 @@ def test_every_yes_on_file_is_asked_again_once_against_the_revision_of_package_1
     assert all(r.brief_digest != BRIEF_DIGEST for r in yes.values())
     assert all(consent.changed_sections(r, "mcp") == THE_SIX for r in yes.values())
 
+
 def test_the_sections_the_re_ask_rule_watches_are_pinned_by_digest():
     """Package 42a, item 2 (decision 41; spec M6 §15, "Brought forward"): the revision for
     milestone 6 describes in kind everything 6b and 6c add that the rule watches, so that
@@ -2045,7 +2046,8 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
     package 42b (decision 48) and once by package 117 (decision 70; its new kinds pinned
     too: the director as built, the command devolved, the shot into a ship no enemy, the
     seats at war with a human's ship, the prize master, the token after a stand-down, the
-    pause said to the human, the stand-down at a capture): it keeps the kind of thing a model is asked to agree to and
+    pause said to the human, the stand-down at a capture): it keeps the kind of thing a
+    model is asked to agree to and
     the commitments, and leaves a station's particulars to that station's brief. A few
     sentences of each section are pinned here, among them one for each kind the revisions
     describe (the captain's station and the player's seat, package 40's draft; the lookout
@@ -2081,8 +2083,8 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
             "as a *captain*, who commands a ship, the player's or another in the same world, "
             "with every power a human player has at the prompt, by direct orders and by "
             "standing orders of his own",
-            "as a *passenger*, who is aboard with no duty, or in a passenger's place as the voice of "
-            "a person nobody else holds, aboard or ashore;",
+            "as a *passenger*, who is aboard with no duty, or in a passenger's place as the "
+            "voice of a person nobody else holds, aboard or ashore;",
             "and as a *director*, who sees the whole world, shapes events, may act on its ships "
             "and people, and may seat models at the stations of its ships under the owner's "
             "grant and stand down those so seated.",
@@ -2098,8 +2100,8 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
         "What an instance would see and do": (
             "A station's brief, which opens by saying that this is a game, that the reader is "
             "a language model taking a station in it, which station, and which kind of session",
-            "(a test of a feature, play with a human captain, play for its own sake, a race, or play "
-            "at the director's station)",
+            "(a test of a feature, play with a human captain, play for its own sake, a race, or "
+            "play at the director's station)",
             "Then, as the first data from the game, the situation at the seating.",
             "and, where the door carries them, pictures of the chart and of the ship;",
             "A picture stays in its conversation until the instance puts it back with a note of "
@@ -2466,8 +2468,9 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
         assert text.count("its consent is asked again, with the reason you gave") == 1
     assert officers.count("Give the deck back and stay: hand_over(note)") == 1
     assert "hand_over(note)" not in watchers.split("The station brief:")[1]
-    # the journal: read back, shown to the captain, open to a later holder
-    assert "read_journal reads it back, the captain may ask to see it, and a model that later" in (
+    # the journal: read back, shown to the human, open to a later holder (package 117: was
+    # "the captain may ask to see it", which a model's captain is refused while it is held)
+    assert "read_journal reads it back, the human may ask to see it, and a model that later" in (
         watchers
     )
     assert "whoever holds it after you may read yours" in officers

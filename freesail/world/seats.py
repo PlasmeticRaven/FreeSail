@@ -71,9 +71,12 @@ VOICE = "voice"
 # Package 74 (item 6; the design's §6): the consent brief names no role in which a model
 # fires into a human's ship or takes him prisoner, so a seat at the captain's station of a
 # hull adversarial to a human is refused in words until the brief is revised and the
-# question put again (`docs/design/ConsentRevision-AdversarialSeats.md` drafts the text;
-# package 55 carries the revision). One flag, which the revision's package turns.
-ADVERSARIAL_SEATS_CONSENTED = False
+# question put again (`docs/design/ConsentRevision-AdversarialSeats.md` drafted the text).
+# One flag, which the revision's package turns: package 117 turned it (decision 70), the
+# brief revised with the adversarial seats' words in it and approved by the owner on
+# 2026-11-18. A yes given against an older brief still seats nobody there: every older
+# yes is asked again at its next seating, by the re-ask rule (`consent.decide`).
+ADVERSARIAL_SEATS_CONSENTED = True
 # The kind of station a person's voice is (the passenger's: no order of any ship's).
 VOICE_KIND = "passenger"
 # The actor of a voice's binding lines: the director's, so that they are for the record
@@ -529,11 +532,26 @@ def _duration_words(seconds: int) -> str:
     return "a minute" if m == 1 else f"{m} minutes"
 
 
+# The words a station the owner seated is refused with, at the director's `unseat`
+# (package 117; decision 70): the station is not the director's to stand down.
+NOT_THE_DIRECTORS = (
+    " The station held {what} was seated by the owner and not under a seat of the "
+    "director's: it is not the director's to stand down, and keeps its station."
+)
+
+
 def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     """`unseat: <ship>[, <note>]` (package 43: the seat on her and every station held on
     her stood down), or `unseat: <the station or the person as the seat named it>`: the
     seat given up, the station released with the director's note, the seat given back to
-    the budget; a voice's binding undone."""
+    the budget; a voice's binding undone.
+
+    Package 117 (decision 70; the consent brief: the director "may seat models ... under
+    the owner's grant and stand down those so seated"): only a station held by the seat's
+    own model, under a seat given by the director or under the owner's grant, is stood down.
+    A station the owner seated at a door, with no seat, is not the director's to stand
+    down, and is refused in words (`NOT_THE_DIRECTORS`); the player's prompt is never a
+    seat."""
     m = _UNSEAT.match(" ".join(str(body).split()))
     if m is None:
         raise _error(SEAT_FORM)
@@ -542,18 +560,33 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     seats = _seats(world)
     vessel = world.vessels.find(who) if getattr(world, "vessels", None) else None
     if vessel is not None:
-        held = seats.pop(vessel.id, None)
-        for key in [k for k in seats if k.startswith(f"{vessel.id}/")]:
-            held = seats.pop(key, None) or held
+        given = {
+            k: seat for k, seat in seats.items() if k == vessel.id or k.startswith(f"{vessel.id}/")
+        }
         crew = getattr(vessel, "crew", None)
+        held_by_owner = [
+            h
+            for h in (list(crew.agents.values()) if crew is not None else [])
+            if not h.agent.released
+            and not any(
+                holder_of_seat(world, k, seat) is h and h.model_name == seat.get("model")
+                for k, seat in given.items()
+            )
+        ]
+        if not given:
+            raise _error(
+                f"The director holds no seat on {vessel.name}."
+                + (NOT_THE_DIRECTORS.format(what=f"on {vessel.name}") if held_by_owner else "")
+            )
         stood = ""
-        if crew is not None:
-            for h in list(crew.agents.values()):
-                if not h.agent.released:
-                    h.stand_down(note, by="the director")
-                    stood = f"; {h.model_name or 'the station'} stood down"
-        if held is None and not stood:
-            raise _error(f"The director holds no seat on {vessel.name}.")
+        for k, seat in given.items():
+            seats.pop(k, None)
+            h = holder_of_seat(world, k, seat)
+            if h is not None and not h.agent.released and h.model_name == seat.get("model"):
+                h.stand_down(note, by="the director")
+                stood = f"; {h.model_name or 'the station'} stood down"
+        if held_by_owner:
+            stood += NOT_THE_DIRECTORS.format(what=f"on {vessel.name}")
         _log(world, f"The seat on {vessel.name} given up ({note}).")
         return f"the director's seat on {vessel.name} given up ({note}){stood}", {
             "ship": vessel.id,
@@ -569,11 +602,15 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     seat = seats.pop(key, None)
     h = holder_of_seat(world, key, seat or {"station": target["station"], "ship": ""})
     stood = ""
-    if h is not None and not h.agent.released and (seat is None or h.model_name == seat["model"]):
+    if seat is None:
+        held = h is not None and not h.agent.released
+        raise _error(
+            f"The director holds no seat at {target['what']}."
+            + (NOT_THE_DIRECTORS.format(what="there") if held else "")
+        )
+    if h is not None and not h.agent.released and h.model_name == seat["model"]:
         h.stand_down(note, by="the director")
         stood = f"; {h.model_name or 'the station'} stood down"
-    if seat is None and not stood:
-        raise _error(f"The director holds no seat at {target['what']}.")
     if target.get("person"):
         _unbind_voice(world, target["station"], f"the director's seat given up ({note})")
     _log(world, f"The seat at {target['what']} given up ({note}).")
