@@ -399,10 +399,12 @@ def _master_not_refused(
     passed: list[Any] = []
     while master is not None and harness_of(world, master) is not None:
         why = adversarial_seat_why(world, prize, "prize master")
-        if why is None:
-            break
+        if why is None or any(master is p for p in passed):
+            break  # no refusal; or the ladder came round to a man already passed over
         passed.append(master)
         master = prize_master(captor_hull, doctrine, party, exclude=tuple(passed))
+    if master is not None and any(master is p for p in passed):
+        return None  # nobody of the ladder but the men passed over: her own rules take her
     return master
 
 

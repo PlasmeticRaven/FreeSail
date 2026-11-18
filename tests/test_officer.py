@@ -1772,6 +1772,11 @@ def test_a_yes_given_before_the_revision_for_milestone_6_is_asked_again_with_the
         "Answering",
     ]
     assert then["The record"] != now["The record"] and then["Answering"] != now["Answering"]
+    # what package 42a itself changed, fixture to fixture: the six, and not the other two
+    after_42a = consent.sections(consent.brief_text(WEIGHTS, runtime, "mcp", path=BRIEF_BEFORE_42B))
+    assert [n for n in consent.RE_ASK_SECTIONS if then[n] != after_42a[n]] == THE_SIX
+    assert then["The record"] == after_42a["The record"]
+    assert then["Answering"] == after_42a["Answering"]
     consent.Record(
         WEIGHTS,
         runtime,
@@ -1863,6 +1868,11 @@ def test_a_yes_given_before_the_revision_for_6c_is_asked_again_with_the_five_nam
     assert set(THE_FIVE_OF_42B) < set(changed) and changed == THE_SIX
     assert then["Leaving"] != now["Leaving"]
     assert then["The record"] != now["The record"] and then["Answering"] != now["Answering"]
+    # what package 42b itself changed, fixture to fixture: the five, and not the other three
+    after_42b = consent.sections(consent.brief_text(WEIGHTS, runtime, "api", path=BRIEF_BEFORE_117))
+    assert [n for n in consent.RE_ASK_SECTIONS if then[n] != after_42b[n]] == THE_FIVE_OF_42B
+    for same in ("Leaving", "The record", "Answering"):
+        assert then[same] == after_42b[same], same
     consent.Record(
         WEIGHTS,
         runtime,
@@ -2473,6 +2483,13 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
     assert "read_journal reads it back, the human may ask to see it, and a model that later" in (
         watchers
     )
+    # the pause: said in the log to the human, who alone answers it (package 117; was "pause
+    # your turns and ask the captain", which a model's captain may not answer)
+    for text in (officers, watchers):
+        assert "pause your turns and say so in the log, to the human, who alone answers a " in (
+            " ".join(text.split())
+        )
+        assert "ask the captain" not in text
     assert "whoever holds it after you may read yours" in officers
     # each thing once: the officer's station brief no longer says the domain, the grant or
     # the way out of danger again after the head's authority item

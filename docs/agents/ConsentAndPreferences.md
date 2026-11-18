@@ -62,7 +62,7 @@ The consent record of 3 October that was answered by the session that wrote that
 
 The consent revision (card 2 of `docs/dev/ScopeCards-BeforeTheGate.md`; decision 70 of `docs/DesignProposal.md`) made the brief say what the game does where it did not bear it out, described the director as built, and described the seats at war with a human's ship (a captain who fights or takes her, a captor holding the human prisoner, a prize master over the human's person). The owner approved the words on 2026-11-18, as drafted in `docs/design/ConsentBrief-Revision-2026-11.md`, the adversarial seats' words with them. Against the brief of 2026-10-17 all six sections the re-ask rule watches differ, and *The record* and *Answering* too.
 
-**Who is owed the question.** Every identity whose newest record is a yes, seven in all, each asked once, at its next seating, with the six sections named (`consent.changed_sections`, `consent.decide`). Each was owed that already: no yes on file was given against the brief of 2026-10-17, so the revision adds no asking; it makes the asking that was owed be against a brief that is true. Their records, newest first by identity, under `consent/`:
+**Who is owed the question.** Every identity whose newest record is a yes, seven in all, each asked once, at its next seating, with the six sections named (`consent.changed_sections`, `consent.decide`). Each was owed that already: no yes on file was given against the brief of 2026-10-17, so the revision adds no asking; it makes the asking that was owed be against a brief that is true. Each identity's newest record, under `consent/`:
 
 - `2026-09-27-sonnet-5.md`
 - `2026-09-28-llama3.1-8b-digest-46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e-2.md`

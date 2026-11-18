@@ -551,7 +551,8 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     own model, under a seat given by the director or under the owner's grant, is stood down.
     A station the owner seated at a door, with no seat, is not the director's to stand
     down, and is refused in words (`NOT_THE_DIRECTORS`); the player's prompt is never a
-    seat."""
+    seat. A `seat:` the owner gives himself (`world: seat: ...`) is held under his own grant,
+    in the same keeping as the director's, and may be given up by the director's `unseat`."""
     m = _UNSEAT.match(" ".join(str(body).split()))
     if m is None:
         raise _error(SEAT_FORM)
@@ -560,9 +561,8 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     seats = _seats(world)
     vessel = world.vessels.find(who) if getattr(world, "vessels", None) else None
     if vessel is not None:
-        given = {
-            k: seat for k, seat in seats.items() if k == vessel.id or k.startswith(f"{vessel.id}/")
-        }
+        # every seat on her: her stations' and a person's voice of her company (`_where`)
+        given = {k: seat for k, seat in seats.items() if _where(k, seat)[0] == str(vessel.id)}
         crew = getattr(vessel, "crew", None)
         held_by_owner = [
             h
@@ -585,6 +585,8 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             if h is not None and not h.agent.released and h.model_name == seat.get("model"):
                 h.stand_down(note, by="the director")
                 stood = f"; {h.model_name or 'the station'} stood down"
+            if k.startswith(f"{VOICE}/"):
+                _unbind_voice(world, _where(k, seat)[1], f"the director's seat given up ({note})")
         if held_by_owner:
             stood += NOT_THE_DIRECTORS.format(what=f"on {vessel.name}")
         _log(world, f"The seat on {vessel.name} given up ({note}).")

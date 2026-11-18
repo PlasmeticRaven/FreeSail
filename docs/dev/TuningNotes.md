@@ -38141,4 +38141,12 @@ No pinned world digest moved, and no recorded passage: the saves replay by their
 - The visitor test plants a string in the host ship's name too.
 - The old "channel enforces" claim in `DirectorBrief`'s docstring and in `docs/primer/README.md` becomes "holds as far as it can judge them".
 
-No pinned world digest moved, and no recorded passage.
+- **Mended on the independent reader's reading of step 3:**
+  - The ship form of `unseat` counts every seat on her, a person's voice of her company among them (`_where`), so that a voice the director seated is not called the owner's. Such a voice is given up and unbound with the rest.
+  - The unseat test now holds the mixed case: a seat's lookout and the owner's captain on one ship, the first stood down and the second kept, with the words saying which.
+  - The ladder's pass-over stops if it comes round to a man already passed over; with nobody else, her own rules take her.
+  - The new pause words of both station briefs are pinned, and "ask the captain" is pinned absent.
+  - The 42a and 42b re-ask tests check, fixture to fixture, what each package itself changed: 42a's six and not *The record* or *Answering*; 42b's five and not *Leaving*, *The record* or *Answering*. Against the brief as it stands, they check all six.
+  - A `seat:` the owner gives himself (`world: seat: …`) is held under his own grant, in the same keeping as the director's. The director's `unseat` may give it up, which "given by it or under the owner's grant" covers. Said in `give_up`'s docstring.
+
+No pinned world digest moved, and no recorded passage (the gate below confirms it).

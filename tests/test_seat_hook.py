@@ -180,13 +180,14 @@ def test_the_director_stands_down_only_the_seats_given_under_the_grant(tmp_path)
     the owner's grant and stand down those so seated"). A station the owner seated at a
     door, with no seat of the director's, is refused to `unseat:` in the world's words,
     by the station's form and by the ship's, and keeps its holder; a seat the director
-    held under the grant is given up and its holder stood down, as before."""
+    held under the grant is given up and its holder stood down, as before; on a ship where
+    both are held, `unseat: <ship>` stands down the seat's and keeps the owner's."""
     pytest.importorskip("fastapi")
     from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
-    w = granted_world(tmp_path)
+    w = granted_world(tmp_path, seats=2, in_voyage=3)
     w.run(61)
     x = w.vessels.find("X")
     assert x.crew is not None and x.crew.shape == "full"
@@ -214,6 +215,21 @@ def test_the_director_stands_down_only_the_seats_given_under_the_grant(tmp_path)
             assert e.data["result"] == "refused"
             assert "it is not the director's to stand down, and keeps its station" in e.text
             assert not theirs.agent.released and not ours.agent.released
+            # a seat under the grant on the same ship as the owner's: the seat's holder stood
+            # down, the owner's captain kept, and the words say which
+            e = w.world_order(f"seat: {WEIGHTS} as lookout of X for 3 samples")
+            assert e.data["result"] == "done", e.text
+    with DoorClient(app) as http:
+        lk = http.post(
+            "/api/agents/lookout", json={"model_name": WEIGHTS, "door": "mcp", "ship": "X"}
+        ).json()
+        assert lk["phase"] == "station", lk
+        with driver.lock:
+            lookout = x.crew.agents["lookout"]
+            e = w.world_order("unseat: X, the lookout is done")
+            assert e.data["result"] == "done" and "stood down" in e.text, e.text
+            assert "was seated by the owner and not under a seat of the director's" in e.text
+            assert lookout.agent.released and not theirs.agent.released
             # a seat under the grant, on another ship: given up, its holder stood down
             e = w.world_order(f"seat: {WEIGHTS} as captain of Nancy for 3 samples")
             assert e.data["result"] == "done", e.text
