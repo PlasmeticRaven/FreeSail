@@ -480,6 +480,98 @@ def test_the_repl_turn_mode_runs_consent_a_turn_a_call_and_waits_for_the_owner(t
     assert "No consent is on record for made-up-other" in sample.read_text(encoding="utf-8")
 
 
+def test_the_repl_turn_mode_on_a_loaded_game_asks_again_a_yes_older_than_the_brief(tmp_path):
+    """Package 117, step 3 (the lead's reader): a game loaded in turn mode, with no consent
+    conversation in its save, keeps the rule the doors share (`consent.decide`). A model
+    whose only yes is against the brief before the revision is not seated in the loaded
+    game, at the watcher or at the officer of the watch: the call says why, in the six
+    sections' words, and how the question is put (a call of its own, the game loaded after);
+    no station brief is sent, and the game's save is left as it was. A yes against the brief
+    as it stands takes the station in the same loaded game."""
+    fixture = Path(__file__).parent / "fixtures" / "ConsentBrief-before-117.md"
+    runtime = repl_mod.REPL_RUNTIME
+
+    def a_yes(folder: Path, old: bool) -> Path:
+        brief = consent.brief_text(WEIGHTS, runtime, "repl", **({"path": fixture} if old else {}))
+        consent.Record(
+            WEIGHTS,
+            runtime,
+            "2026-10-17" if old else "2026-11-18",
+            consent.YES,
+            answer="Yes.",
+            drill="passed",
+            brief=brief,
+            brief_digest=consent.brief_digest(fixture) if old else consent.brief_digest(),
+        ).write(folder)
+        return folder
+
+    now, then = a_yes(tmp_path / "now", False), a_yes(tmp_path / "then", True)
+    for station, called in (("watcher", "watcher"), ("officer", "officer of the watch")):
+        save, sample = tmp_path / f"{station}.json", tmp_path / f"{station}.txt"
+        common = ["--seed", "7", "--every", "60", "--turn", "--model-name", WEIGHTS]
+        common += ["--station", station, "--save", str(save), "--sample", str(sample)]
+        # the game begins under a yes against the brief as it stands
+        assert repl_mod.main(common + ["--records", str(now)]) == 0
+        assert "This is a message from the harness of FreeSail" in sample.read_text(
+            encoding="utf-8"
+        )
+        game = save.read_bytes()
+        # loaded with only the older yes on file: nobody is seated, and nothing is sent
+        code = repl_mod.main(common + ["--records", str(then), "--load", str(save)])
+        assert code == repl_mod.EXIT_NO_CONSENT, station
+        said = sample.read_text(encoding="utf-8")
+        assert (
+            f"{WEIGHTS} is not seated in this loaded game: the consent brief has changed " in said
+        )
+        assert (
+            "since their record (2026-10-17) in the opening, What an instance would see and do, "
+            "Leaving, Being stopped, What is not done, The journal, which bear on what the "
+            "model was told, so the question is put again." in said
+        )
+        assert "for the consent question; once it is answered yes, call again with --load" in said
+        assert f"to take the {called} in this game." in said
+        assert "This is a message from the harness of FreeSail" not in said
+        assert "This is a message from the developer of a game" not in said
+        assert save.read_bytes() == game  # the game is not written over
+        # the same loaded game, a yes against the brief as it stands on file: the station
+        assert repl_mod.main(common + ["--records", str(now), "--load", str(save)]) == 0
+        went_on = sample.read_text(encoding="utf-8")
+        assert "not seated in this loaded game" not in went_on
+        assert "== Sample at " in went_on, went_on[:300]
+        # the owner asks again: the call says so, and how (--ask-again on the call of its own)
+        assert (
+            repl_mod.main(common + ["--records", str(now), "--load", str(save), "--ask-again"]) == 5
+        )
+        said = sample.read_text(encoding="utf-8")
+        assert f"{WEIGHTS} is not seated in this loaded game: the owner asks again." in said
+        assert "Call this door with --turn --ask-again and without --load" in said
+    # a yes with no drill: the officer drills, and is not seated in the loaded game until it
+    # is passed; the watcher, which does not drill, is
+    undrilled = tmp_path / "undrilled"
+    consent.Record(
+        WEIGHTS,
+        runtime,
+        "2026-11-18",
+        consent.YES,
+        answer="Yes.",
+        brief=consent.brief_text(WEIGHTS, runtime, "repl"),
+        brief_digest=consent.brief_digest(),
+    ).write(undrilled)
+    for station, seated in (("officer", False), ("watcher", True)):
+        save, sample = tmp_path / f"{station}.json", tmp_path / f"{station}.txt"
+        common = ["--seed", "7", "--every", "60", "--turn", "--model-name", WEIGHTS]
+        common += ["--station", station, "--save", str(save), "--sample", str(sample)]
+        code = repl_mod.main(common + ["--records", str(undrilled), "--load", str(save)])
+        said = sample.read_text(encoding="utf-8")
+        if seated:
+            assert code == 0 and "not seated in this loaded game" not in said
+        else:
+            assert code == repl_mod.EXIT_NO_CONSENT
+            assert "the station asks for the drill before its brief." in said
+            assert "for the drill; once it is passed, call again with --load" in said
+            assert "This is a message from the harness of FreeSail" not in said
+
+
 def test_a_conversation_rebuilt_from_its_replies_reaches_the_same_place(tmp_path):
     """Turn mode rests on this: the conversation is a function of the replies and the
     owner's words, so a later call rebuilds it exactly."""
