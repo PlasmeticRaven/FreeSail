@@ -1,5 +1,7 @@
 # Scope cards: what runs before the gate (for the owner's agreement)
 
+**The cards end here (2026-11-18).** The owner: "Do you think that it might be better to drop the card system before it overcomplicates things? A sufficient package brief, as performed before, and categorized with our running package system, is probably sufficient rather than adding two filing layers." The lead agrees. From package 118 on there is no separate card: a package is proposed to the owner in a few lines (what it is for, what it builds and does not, how he tries it, its size), his word is recorded in the package's row of `docs/dev/M7-WorkPackages.md`, the builder's brief is the scope and carries the same things, and the as-merged record closes it. This file stays as the history of the cards that ran.
+
 Written by the lead on 2026-11-15, after the owner's word of that morning: "the only thing I would run before a gate would be the package 96, as the harbour has become enough out of date, and wants access to the full current set of features enough that before I can jump in to a gate or proper testing, the harbour should be brought up to date, and further design of it both for an experienced user and for a newcomer considered. As well, a consent revision package (55(?) or a fresh one)."
 
 **Agreed by the owner, 2026-11-15:** "The order, card 1, and card 2 are approved. Adversarial seating should be included in the consent wording, and the director's limits may be included after a card between the harbour's build and revision." So:

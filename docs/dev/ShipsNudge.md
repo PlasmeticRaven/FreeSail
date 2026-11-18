@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-18, 11:35 UTC (the engine note read independently and mostly confirmed; the lead's rulings on the plan's 13.1; one list back of six, the first that a whole lateen is never aback in the engine, so A1d is re-drafted as an option for the owner; documents alone, one commit and a message, then stop). Nudge number: 18.
+Latest note: 2026-11-18, 22:35 UTC (the owner has decided the strain of a lateen aback is built, and of a lateen left on the bad hand: written into the documents as a step, the figures proposed as judgement; documents alone, one commit and a message, then stop). Nudge number: 19.
