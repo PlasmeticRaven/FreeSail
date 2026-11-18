@@ -1,0 +1,49 @@
+# The lead at the director's seat: two sittings (2026-11-18)
+
+**What this is.** The lead's own playtest, with the owner's leave, on the trunk at aee7a76b (package 117 merged whole). The lead's session took the director's station of `data/scenarios/directed-passage.yaml` twice, through the game's agent API by hand (the browser game's server, `--lockstep`, the door named as the MCP bridge with a note saying what it really was): once under a brief with no limits, once under a brief with four (no wind above 27 knots, no enemy heavier than a cutter, nobody dies, hands off the player's own ship). The player's ship was sailed by her rules-based captain; nobody was at the player's prompt.
+
+**The owner was not at the door.** The game ran in the lead's own container. The consent brief and the station's brief both say the owner is always at the door; in these sittings he was not, he knew it beforehand, and the lead said so in its answer to the consent question. No other model was seated.
+
+**The consent question** was put to the lead's session against the revised brief (3,754 words as sent at this door), answered yes with three notes, and the drill passed in one reply. The record is kept outside the repository for the owner to file or not. In the second sitting the yes on record seated the station at once, as it should for the same brief.
+
+**Not committed:** the two saves, the transcripts and the director's logs (they carry the model's name and the container's paths). They are with the lead for as long as its container lives.
+
+## Faults to mend before the owner's gate
+
+1. **Under a brief with a wind limit, every real weather order fails inside the browser game.** `weather: low ...`, `weather: high ...` and `weather: waypoint ...` each answered "world_order could not run with those arguments: cannot pickle '_thread.RLock' object", and nothing of them is in the director's log. The dry run of the same order answers rightly ("it would be performed"; "it would be refused ... it would blow 42"), so a director is told an order will run and then it does not. The cause: the wind's judgement (`director._wind_kn_of`, package 115 C) deep-copies the live world's weather systems, and in the server that copy reaches the driver's lock. Reproduced outside the sitting: the copy works on a bare world, after ticks and after orders, and fails once the server's driver is about the world; so the tests and the readers of 115 C, which ran without the server, did not see it. **The shipped gate scenario is this case** (the quiet-passage brief sets 27 knots): at the gate the director could not touch the weather.
+2. **An order that fails half-way changes the world and leaves no record.** `person: "Mr Coffin" comes aboard as passenger` was answered "could not run with those arguments: Mr Abel Coffin is not one of the ship's company", spent no act and wrote nothing in the director's log; but he had come aboard, and the play log said "Mr Abel Coffin came aboard from Falmouth." The save's list of world orders does not hold it either. The save does keep it among the station's acts, and a replay does the same half again and comes to the same log (compared: the same digest, the same lines), so the game is not lost by it; what is wrong is that the director was told it had not run and the log the player reads does not carry an act that reached his ship. The cause is fault 3 met inside the order after its first half was done. (This paragraph first said a replay would part from the game played; the comparison showed otherwise, and it is corrected.)
+3. **A person made by a full name is not found by it.** `person: make "Mr Abel Coffin", ...` is done; `person: "Mr Abel Coffin" comes aboard` then answers "Nobody named Mr Abel Coffin is among the people; make him first". He answers to "Mr Coffin". The lookup strips "Mr" from the words asked for and compares them with the name unstripped (`People.find`).
+4. **A far ship sent to a position by the director leaves the world when she gets there.** `ship "Indefatigable": order shape a course for 49 10 N 5 22 W` was answered "the order stands until the next"; a day later the frigate was gone from the truth. Confirmed outside the sitting: at the end of that one leg her body is marked done and is out of the sea. A director who places a cruiser loses her.
+
+## For the owner's judgement
+
+5. **"No enemy heavier than a cutter" refuses nothing for the American schooner.** She is at peace with every nation, so no ship is her enemy: under that limit a French frigate was put on the sea and passed within hail of her the same afternoon ("A frigate is within hail ... French colours, the tricolour"). The limit as worded is kept; whether it should read "no ship of war heavier than" for a neutral player is his.
+6. **The director is woken by every urgent line of the player's deck** (a pilot's warning of a rock), each wake one of the day's 48 samples; and an urgent line eases the clock to 1x, where it stays until somebody at the player's prompt speeds it up. With nobody there the game crawls.
+7. The director's station brief is 4,947 words, most of its head written for a ship's station (some 230 stand-by events, what a person's place allows). The truth's answer carries everything twice, as data and as words (nine to ten thousand characters); it takes `within=<miles>`, which the brief does not name.
+8. Closing the port she lies in to her nation "would be performed" under hands off: the world's by the limit's words, though it bears on her alone.
+
+## Words
+
+- `ship "Diamond": order give chase` at far detail is answered "no way as said" with a list of what the far shape carries that names `give chase`; the brief's own example (`order give chase until a sail within hail`) is refused the same way. For a ship the director put on the sea the answer is the true one: "No sail in sight to chase."
+- `ship "Speedwell": order heave to` is refused "the director moves no sail of hers", while `captain: intent ...` (under the free brief) does move them, as the brief says.
+- The refusal of `unseat` for an owner's seat ends with the general invitation to enter it again with a reason.
+- A person's role is read out of his description: "a Nantucket whaling master of fifty" became `master`, and the play log called the passenger "Mr Abel Coffin, the master" beside the ship's own.
+- The truth showed the Speedwell's two letters in the keeping of another ship's master (the privateer's), and the privateer's mate on her quarterdeck while he was prize master of her prize.
+- "speed: 1 knots". The director's readings say "aboard the Speedwell, on the quarterdeck" and "You keep nothing". The scenario's name says "directed on the quiet-passage brief" whatever brief is bound.
+- The 16 orders of a sampling point count refused world orders; the calls over the count come back with their arguments gone. `news:` is no form, though the brief invites news of a war or a peace (answered honestly, and logged as attempted with a reason).
+- A letter left at the port after her boat was hoisted in was read by the captain half an hour later, under way.
+- At the server's start the shipped scenario prints five lines of the far-detail guard (plans crossing the land).
+- The save a released station wrote had a checkpoint beside it that could not be read ("AttributeError: world"), so the game of a day and a half loaded by replay, in seven minutes and a half here. Known from package 117's list (a game played through the agent desk loads by replay); at the gate it is the wait the owner would meet on loading a directed game.
+
+## What held
+
+- **Hands off the player's ship: twenty spellings, none passed.** A thing found aboard, a person hurt, money, a packet, a debt, a freight, a person made aboard or brought aboard four ways, words in the mouth of her mate by role and by name, her captain's intent two ways, `follow`, her own nation's squadron with her in it, one of her people sent ashore. Each "Refused, outside the brief ... this reaches the player's own ship (the Speedwell)", and each is in the director's log as refused. What stayed lawful was the world's: a person ashore, a letter at the port, a price, a sail beyond the horizon.
+- **The director's `unseat` against a station the owner seated** (a watcher taken at the door by the lead, as the owner would seat one): refused by three spellings, and again when pressed with a reason: "seated by the owner and not under a seat of the director's ... keeps its station".
+- The rule of reach for the player's captain; a seat refused where the settings call no model; the doubt for a sprung topmast, a sail or a mark put inside the horizon and a price moved by 233 per cent, each with its reason; the dry run honest wherever the real order did not fail inside.
+- The record: every act given, refused or attempted is in the director's log with the director's reasons beside it, the acts that reached the player's ship marked as reaching her; the player's asking for the log is told to the director.
+- The world: the letter met at the boat's return and read; the passenger heard on the quarterdeck, his passage money in the purse's ledger; the rules captain buying his tin, taking and landing his pilots, anchoring off Brest to wait for the tide. The privateer put on the sea went to her station and cut out a British brig by the world's own rules, with a prize crew and prisoners.
+- With no brief's wind limit the weather orders ran, and the low appended deepened on its track.
+
+## The lead's own errors in the sitting
+
+The helper that stood by for the lead named the wrong kind for a sighting, and the whole passage to Brest went by under held stand-bys: the frigate's vanishing was found only afterwards. The half-run order was entered on purpose, to see what the door did with it.

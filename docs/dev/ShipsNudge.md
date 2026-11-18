@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-18, 04:30 UTC (the owner agrees nine of package 90's ten questions as picked and re-opens the third: a lateen-main vessel tacks and wears as others do, the yard's change preferred and not necessary; look for the period's word on tacking under a lateen and re-plan step A1; documents alone). Nudge number: 17.
+Latest note: 2026-11-18, 22:35 UTC (the owner has decided the strain of a lateen aback is built, and of a lateen left on the bad hand: written into the documents as a step, the figures proposed as judgement; documents alone, one commit and a message, then stop). Nudge number: 19.

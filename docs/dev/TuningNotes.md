@@ -38159,3 +38159,10 @@ No pinned world digest moved, and no recorded passage: the saves replay by their
 - `OFFICER_BRIEF`: "yours again, as you held it, when he resumes you" to "… when the human resumes you": a model's `resume` is refused (`stations._refuse_to_a_model`), and the pause is the human's to answer. The moved-out particular "when he resumes" to "when the human resumes", still absent from the consent brief. `docs/agents/README.md`'s "a paused one when he resumes him" mended with it.
 
 No pinned world digest moved, and no recorded passage (the gate below confirms it).
+
+**A record filed against the revised brief (2026-11-18, the owner's word: "We shall file your consent record from the playtest").** The lead's own session was asked the consent question by the game when it took the director's station for a playtest, answered yes, and passed the drill; the record is `docs/agents/consent/2026-11-18-…` (the newest file there), and `docs/agents/ConsentAndPreferences.md`, section 4e, says what it is. One pin moves with it, in `tests/test_officer.py::test_every_yes_on_file_is_asked_again_once_against_the_revision_of_package_117`:
+- Old: every yes on file, seven, none against the brief as it stands; each asked again with the six named.
+- New: the yeses given before the revision, **seven**, none against the brief as it stands, each asked again with the six named (the same seven, the same assertion); and the yeses given against the brief as it stands, **one**, dated 2026-11-18, for which no watched section differs at any door (`mcp`, `runner`, `api`), so it is not asked again while the brief stands.
+- The reason: the test said no yes on file was given against the revised brief, which stopped being so when one was filed. Nothing of the re-ask rule changed; the count of records owed the question is the same seven.
+- Moved by the lead; passed by an independent reader (the record of the filing in `docs/dev/M7-WorkPackages.md` names the reading).
+
