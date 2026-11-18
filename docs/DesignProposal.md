@@ -1018,6 +1018,28 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     (d) **Peace needs a purpose in play,** to be designed, not only dated. (e) The data
     work is planned as milestone 7c, after the review, from the range's audit.
 
+70. **The consent brief revised to what the game does; the seats at war with a human's ship
+    described.** Owner, 2026-11-18, having read package 117's draft whole
+    (`docs/design/ConsentBrief-Revision-2026-11.md`, at e1cf1abf): "I've read through the
+    consent brief revision and I'm happy with it." With his ruling of 2026-11-15
+    ("Adversarial seating should be included in the consent wording"), the approval covers
+    the draft's Part 1 and its Part 3 as drafted. So: (a) the brief below its rule is Part 1
+    with Part 3's words entered at its marks, the drafting marks taken out and no other word
+    changed; (b) all six watched sections move, and every identity with a yes on record is
+    asked again once, at its next seating (each was owed it already: no yes on file was
+    given against the brief of 2026-10-17); (c) `seats.ADVERSARIAL_SEATS_CONSENTED` is
+    turned, and a yes given against an older brief seats nobody at those seats until the
+    question is put again; (d) the code is made to keep two sentences, by the lead's
+    rulings: the director's `unseat` stands down only a seat given by the director or under
+    the owner's grant, and the prize master's ladder passes over a person a model holds
+    where the adversarial gate would refuse that seat; (e) two clauses stand as approved
+    and are not built away: a token written after a stand-down is not heard once another
+    has taken the station, and a letter the director sends may bear any name. What the
+    draft found and left to him (a shot into a recognised friend unlogged; a struck ship
+    fired into by a later order; no forms for a model captor; `outlaw` read by nothing; a
+    letter in a held person's name; the earlier holder's token when a relief holds the
+    seat) is his to choose, outside the package.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

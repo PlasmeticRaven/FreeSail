@@ -468,3 +468,65 @@ def test_a_checkpoint_taken_with_a_prize_in_company_comes_back_whole(tmp_path):
     assert master is not None and master.name == P.record_of(b)["master"] and master.home == b.id
     assert copy.readings.words("prize") == w.readings.words("prize")
     assert cb.signals.colours.over == "france" and cb.nation == "britain"
+
+
+def _a_model_at_the_ladders_head():
+    """A French frigate, the Renard, alongside a British brig struck to her, the player's
+    Amazon British: a model (the scripted fake) holds the station of the man her ladder
+    sends into a prize (package 117)."""
+    from freesail.agents.agent import SamplingPolicy, officer
+    from freesail.agents.fake import Fake
+    from freesail.agents.harness import Harness
+    from freesail.agents.model import Reply
+    from freesail.world.crews import station_world
+    from tests.test_mends_75 import _at
+
+    w = world_at(49.5, -5.5)
+    here = destination(w.position, 180.0, 2.0 * units.NAUTICAL_MILE)
+    brig = put(w, "merchant brig", "britain", _at(here), "bound for Falmouth", "bound for Falmouth")
+    there = destination(here, 90.0, 0.2 * units.NAUTICAL_MILE)
+    fr = put(
+        w, "frigate", "france", _at(there), "bound for Brest", "bound for Brest", name="Renard"
+    )
+    _v, crew = station_world(w, fr.id)
+    station_world(w, brig.id)  # both hulls made, so that the prize master goes aboard her
+    head = P.prize_master(crew, P._doctrine(fr))
+    assert head is not None
+    crew.stations.bind("officer of the watch", head, quiet=True)
+    h = Harness(
+        crew,
+        officer(SamplingPolicy.in_lockstep(300, "notable", "urgent"), world=crew),
+        Fake([lambda last, turns: Reply(text="Aye.")], loop=True),
+    )
+    h.model_name = "a made-up model"
+    h.start()
+    brig.struck = True
+    return w, fr, brig, crew, head, h
+
+
+def test_the_ladder_passes_over_a_models_man_where_the_gate_would_refuse_him_the_prize(
+    monkeypatch,
+):
+    """Package 117 (decision 70; the consent brief: "An officer may be sent into a prize his
+    ship takes as her prize master, his station going with him"). Where the adversarial
+    gate would refuse the prize's command to the model that holds the man the ladder sends
+    (her, now French, an enemy of the player's Amazon), the ladder passes over him: the
+    next of it takes her, and the model's station stays at home. With the flag turned (a
+    yes against the brief that describes the seat), the gate refuses nothing, and he goes,
+    his station with him."""
+    from freesail.world import seats
+    from freesail.world.movement import harness_of
+
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", False)
+    w, fr, brig, crew, head, h = _a_model_at_the_ladders_head()
+    rec = P.possess(w, fr, brig, by="a test", said=False)
+    assert rec["master"] and rec["master"] != head.name
+    assert h.world is crew and h.station.name == "officer of the watch"
+    assert P.adversarial_seat_why(w, brig, "prize master")  # the seat it would have been
+    assert harness_of(w, head) is not None and str(head.hull) == str(crew.id)
+
+    monkeypatch.setattr(seats, "ADVERSARIAL_SEATS_CONSENTED", True)
+    w, fr, brig, crew, head, h = _a_model_at_the_ladders_head()
+    rec = P.possess(w, fr, brig, by="a test", said=False)
+    assert rec["master"] == head.name
+    assert h.world is P._hull(brig) and h.station.name == "captain"
