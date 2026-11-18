@@ -38149,4 +38149,6 @@ No pinned world digest moved, and no recorded passage: the saves replay by their
   - The 42a and 42b re-ask tests check, fixture to fixture, what each package itself changed: 42a's six and not *The record* or *Answering*; 42b's five and not *Leaving*, *The record* or *Answering*. Against the brief as it stands, they check all six.
   - A `seat:` the owner gives himself (`world: seat: …`) is held under his own grant, in the same keeping as the director's. The director's `unseat` may give it up, which "given by it or under the owner's grant" covers. Said in `give_up`'s docstring.
 
+- **Found by the whole fast tier at b5bf57f:** `tests/test_harbour.py::test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat` asked the game to refuse an enemy's captain at the door, and with the flag turned the gate admits him. The refusal is the gate's words while the flag is not turned, so the test holds the flag off for that part, as the court's two gate tests do. It gains the other half: with the flag turned, the same seat is admitted to its consent conversation (a station in its consent phase, Renard's captain, nobody's until it answers). Nothing it asserted before is dropped.
+
 No pinned world digest moved, and no recorded passage (the gate below confirms it).
