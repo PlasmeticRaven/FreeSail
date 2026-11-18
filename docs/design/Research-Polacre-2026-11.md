@@ -1,5 +1,14 @@
 # Research note: the polacre, a Mediterranean three-master under lateens and a square pole main (November 2026)
 
+**Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
+`Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
+- §4, going about;
+- §10's row on going about;
+- §12's question 3.
+
+It now reads with the period's word on tacking under a lateen, gathered since in
+`Research-LateenGoingAbout-2026-11.md` (**GA**). Nothing else is changed.
+
 Package 90's preliminary research for its second hull (the lead's note of 2026-11-18, 00:50 UTC,
 nudge 15, `docs/dev/M7-WorkPackages.md`: research and planning only, documents alone; no code, no
 ship file, no generator change). The polacre is the owner's (2026-11-06): **a lateen on a
@@ -298,8 +307,10 @@ navy's eight of 1780 to 1818 may be any of these, which only Winfield's rows can
 
 ## 4. Going about
 
-The brief's words for package 90's lateens: "worn, not tacked; the yard dipped round the mast"
-(`M7-WorkPackages.md` row 90). What the sources say of the polacre and of lateen yards:
+The brief's words for package 90's lateens were "worn, not tacked; the yard dipped round the mast"
+(`M7-WorkPackages.md` row 90). The owner's answer to question 3 (2026-11-18) replaces them: a
+lateen vessel tacks and wears as others do, the change of the yard preferred and not necessary.
+What the sources say of the polacre and of lateen yards:
 
 | Source | What it says | Access |
 |---|---|---|
@@ -316,8 +327,13 @@ The brief's words for package 90's lateens: "worn, not tacked; the yard dipped r
   changed round the mast, by the period's word *muder* (the yard peaked up and its heel passed
   abaft the mast), whether she tacks or wears. Whether the fore lateen is changed in stays, after
   the head is through the wind, or she is worn to spare the labour of it, no source read says for
-  a polacre. The brief's "worn, not tacked" is read here as the lateen rigs' preference where the
-  yard is large (the xebec's, the tartane's); for the polacre the owner decides (§12, question 3).
+  a polacre. **Third draft:** nor for any lateen vessel (GA §3.4). The board with the yard left on
+  the mast is named in four dictionaries (Romme, Stratico, Willaumez, O'Scanlan: GA §2.2), and two
+  have the new board held so. A ship's whole lateen mizen, which hers resembles, was changed at
+  every going about, in stays as in the wear (Röding II col. 578; Boteler's "shift the mizen":
+  GA §3.1). The owner's answer to question 3 (2026-11-18) gives her shape: she tacks and wears
+  as a brig, her lateens changed in either or left, the change preferred and not necessary
+  (JUDGEMENT, the owner's; her design's §5.3, measured in `Design-Package90-Engine.md` §2.2a).
 - **Against the mast.** A lateen not changed lies on the weather side of its mast on one tack,
   the sail pressed on the mast, which is why it is changed (Willaumez MUDER; read there).
 
@@ -456,7 +472,7 @@ date and namesake are vetted on its own page.
 | The pole's height | Lescallier p. 372: less tall than the three-piece; Forfait p. 132: the eyes at the three-piece heights | Forfait's rule for the eyes, the pole's head shortened by Lescallier's advice (JUDGEMENT); the design's §4.1 |
 | The footropes | Steel: none but on the lower yards; Falconer: none on any yard | Steel's (the men stand on the lower yard to furl the topsail, Falconer's own account, which needs a footrope there) (JUDGEMENT) |
 | The mizen | Lescallier, Steel, Röding: the mizen sometimes not one piece; Forfait: never a pole in the square-sailed vessels | A lateen mizen needs no topmast; a pole (JUDGEMENT) |
-| Going about | The brief: "worn, not tacked; the yard dipped round the mast"; Willaumez: a square-rigged polacre tacking (no lateens; the plate not viewed); Lescallier, Fincham: the lateen yard changed round the mast to go about | The owner's question 3; the lateen polacre's tack JUDGEMENT |
+| Going about | The brief: "worn, not tacked; the yard dipped round the mast"; Willaumez: a square-rigged polacre tacking (no lateens; the plate not viewed); Lescallier, Fincham: the lateen yard changed round the mast to go about; Stratico, O'Scanlan: the yard left and the new board held (GA) | The owner's answer to question 3 (2026-11-18): tacked and worn as a brig, her lateens changed or left (JUDGEMENT, the owner's) |
 | The *Bella Aurora* | James's Spanish polacre of 1799 and Roux's Greek polacre of 1801 | Two ships of one name (JUDGEMENT) |
 
 ## 11. What is open, and whom to ask
@@ -499,11 +515,11 @@ date and namesake are vetted on its own page.
    size taken from a Spanish polacra of Winfield's rows once you send them** (my pick: Falconer's
    "extremely different" from the xebec, and the trade's vessel of burthen). (b) The xebec-like
    hull O'Scanlan gives in 1831, from the xebec's own draught, scaled.
-3. **Going about.** (a) **She tacks and wears as a brig of her size, her main's yards swung as a
-   brig's; her two lateen yards changed round their masts in both (peaked up and the heel passed
-   abaft, the period's *muder*), costing time and hands** (my pick, JUDGEMENT: no source read says a
-   polacre could not tack; Willaumez's tacking polacre is a square-rigged one). (b) The brief's "worn, not tacked": she wears
-   only, a "tack ship" refused in words.
+3. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own shape, which
+   takes the pick and widens it: she tacks and wears as a brig of her size, her main's yards swung
+   as a brig's; her two lateen yards changed round their masts in either (peaked up and the car
+   passed round, the period's *muder*), costing time and hands, or left on the bad hand until
+   shifted. The brief's "worn, not tacked", the other way, is dropped.
 4. **Her fits and roles, in this order:** (a) **unarmed trader (the default); armed trader (six
    long 6-pounders, James's of 1808); the Spanish navy's (San José's fourteen brass guns, her 49
    and 22 soldiers); and the regency's cruiser as a role on an armed fit (the Tripolitan's fourteen

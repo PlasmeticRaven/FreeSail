@@ -313,7 +313,8 @@ is brig-rigged, so the corvette's spar table in Babron is not hers (read).
 ### 3.3 Her handling, and the package's rig rules
 
 - **No lateen**: her mizen carries a gaff driver and a crossjack; package 75's B3.1 (the lateen
-  worn, not tacked, the yard dipped round) does not reach her.
+  worn, not tacked, the yard dipped round; replaced in package 90 by the owner's answer to Dec 3)
+  does not reach her.
 - **The schooner's-mast rule** (B3.4, `Ship.on_schooner_mast`; Design-ShipsEngineExtensions.md):
   an after mast with yards and no yard on its lower mast handles as a fore-and-after's. Her mizen
   carries the crossjack on its lower mast, so **all three masts class square** (observed on the

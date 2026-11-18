@@ -1,12 +1,20 @@
 # Decisions: package 90, the Spanish and Mediterranean ships (the owner's round, November 2026)
 
-**Status (2026-11-18): open.** For the lead to put to the owner with the scope card
-(`docs/design/Plan-Package90.md` §14). Revised the same day on the critic's reading, with the
-designs' second drafts: question 3's evidence (Willaumez's tacking polacre is a square-rigged
-one), question 4 (her main's rake asked in place of her headsails, which are judgement; her size
-in plain words), question 5 (no length of a 30 is known), questions 7 and 10 (the *Diana*'s 1809
-drawing; the three-decker's hull), question 8 (the soldiers' other way), Part D's units, and Part
-E (the polacre in two files).
+**Status (2026-11-18): answered. Third draft, 2026-11-18, on the owner's answer to question 3.**
+The owner agreed nine of the ten questions as picked and re-opened the third, how the lateen ships
+go about, with a shape of their own (their words in Part F, verbatim; the lead's note of 2026-11-18,
+04:30 UTC, nudge 17). This draft records their answers in Part F and marks the nine settled as
+picked. It re-drafts question 3 on their shape, with what the period sources say
+(`Research-LateenGoingAbout-2026-11.md`, **GA**), what it means in play and how each choice is
+ordered. Nothing more is asked of them in it. The rulings it leaves are the lead's (the plan's
+§13.1).
+
+The second draft (2026-11-18) was revised the same day on the critic's reading, with the designs'
+second drafts: question 3's evidence (Willaumez's tacking polacre is a square-rigged one), question
+4 (her main's rake asked in place of her headsails, which are judgement; her size in plain words),
+question 5 (no length of a 30 is known), questions 7 and 10 (the *Diana*'s 1809 drawing; the
+three-decker's hull), question 8 (the soldiers' other way), Part D's units, and Part E (the
+polacre in two files).
 
 This sheet holds:
 - **ten questions.** Each gives the pick first and what it means in play, with a pointer to the
@@ -24,6 +32,8 @@ the lead are in the plan's §13, not here. Nothing is built until the scope card
 **The documents cited:**
 - **Eng**: `Design-Package90-Engine.md`.
 - **Tar**, **Pol**, **Xeb**, **Dia**, **Con**: the research notes, `Research-*-2026-11.md`.
+- **GA**: `Research-LateenGoingAbout-2026-11.md`, the period's word on going about under a
+  lateen (2026-11-18).
 - **Tar-D** and the rest: the designs, `Design-Ship-*.md`.
 - **VR-Sp**: `VesselReferences-2026-11-Spanish.md`.
 
@@ -32,6 +42,8 @@ the lead are in the plan's §13, not here. Nothing is built until the scope card
 ## Part A. The package
 
 ### 1. When the build begins, and in what order
+
+**Settled 2026-11-18, as picked:** "I agree with the proposals" (the owner; Part F).
 
 The rule since 15 November is that the gate of milestone 7 comes before any new building, unless
 you say otherwise.
@@ -58,6 +70,8 @@ stopping points.
 the smallest build).
 
 ### 2. Item 37: the shipbuilding script's copy of how hard a sail pulls
+
+**Settled 2026-11-18, as picked, (a):** "I agree with the proposals" (the owner; Part F).
 
 **The fault, in plain words.** The game rates each studding-sail boom for the wind it should stand.
 The shipbuilding script keeps its own copy of how hard each kind of sail pulls. Its figure for a
@@ -92,36 +106,106 @@ them now, and a test keeps the two together.
 
 ### 3. How the lateen ships go about
 
-Today all three lateen probes tack with nothing done to their lateens, in 89, 164 and 101 seconds.
-The period says that could not be done.
+**Answered by the owner, 2026-11-18, in a shape of their own** (Part F, verbatim): "Is the
+judgement to only wear backed up by period sources? If not, and tacking was sometimes done, as I
+know it is done on more modern lateen vessels, it might at least be included as an ordered
+evolution, or, we might implement lateen main vessels as we do others, tacking and wearing
+normally with their evolutions. We may also consider that lateen vessels may or may not dip the
+lateen when tacking, it being preferred but not necessary. This is a larger engine addition, but
+we can include it in the planning."
 
-**My pick: decided by her main sail.**
+**What the period sources say** (GA, read for your question):
+- **None read says a lateen vessel could not tack, or never did.** The one "never" is of an Indian
+  boat, the Bombay dinga (Lescallier pp. 463-464).
+- **The yard was changed "pour virer de bord"**, which is going about either way (Lescallier
+  p. 378). Every period word for changing a lateen's yard is tied to going about either way
+  (Lescallier p. 378; Willaumez, MUDER; O'Scanlan, CIMAR). The same words for a fore-and-aft sail
+  mean its gybe (Röding, GIEPEN; Romme, TRELUCHER).
+- **The board sailed with the yard left on the mast has a name in four dictionaries**, and two of
+  them describe going about and holding the new board so (Stratico 1813; O'Scanlan 1831).
+- **A lateen taken aback in a strong wind could cost the mast** (Forfait p. 119).
+- **"Worn, not tacked" came from the package's brief**, not from a source.
 
-| | The tartane and the xebec (a lateen main) | The polacre (a square main) |
+So your own knowledge of lateen vessels tacking stands as the judgement, said as one, and the
+design follows it.
+
+**What is built, on your shape:**
+- **A vessel with a lateen main tacks and wears as other vessels do.** Each is an ordered evolution
+  with her own words, hands and time.
+- **Changing the yard round the mast is a part of either, which may be done or left.**
+  - Done: in stays once her head is through the wind, or in the wear once the wind is aft. The
+    yard is peaked up and passed round the mast, never lowered.
+  - Left: she sails the new board on the bad hand, the sail against the mast and drawing less,
+    until she is ordered to shift it.
+- **The polacre** tacks and wears as a brig does with her square main. Her two lateens are changed
+  or left in the same way.
+
+**How each choice is ordered:**
+- **For one going about**, in the order's own words: `tack ship and shift the lateens`, or `tack
+  ship and leave the lateens`; the same with `wear ship`.
+- **By default**, by her practice: shifted in stays and in wearing (your "preferred"). It is
+  changed for the cruise by an order of its own, for example "in stays, leave the lateens". A
+  standing order can set it too as the wind crosses a figure: one for when the wind falls under
+  12 knots, and a second for when it rises over 12 again. A standing order acts at the crossing,
+  not all the while the wind stays under it.
+- **By itself**: `shift the mainsail` puts right a lateen left on the mast. It is refused in words
+  when the sail is already to leeward.
+- **The game's own captain** keeps the ship's practice, with three judgements of their own:
+  - in a strong breeze, over 22 knots, `put her about` wears her, and so does an order to steer
+    or shape a course across the wind, since a lateen taken aback in a strong wind could cost the
+    mast;
+  - in fine weather, under 12 knots, they leave the yards in stays, and shift them once a board on
+    the bad hand has run half an hour or the wind freshens;
+  - they shift a lateen left on the mast after a gybe, as they dip a lugger's lugs.
+
+  Your own `tack ship` is always a tack.
+
+**In play.** Measured on the engine's stand-in tartane in 15 knots, the first quarter of an hour.
+The bad hand's loss and the time to shift a yard are judgement.
+
+| The stand-in tartane | Done in | Ground lost to windward |
 |---|---|---|
-| `tack ship` | Answered in her words, and nothing is done: "She does not stay under her lateen; wear her." | She tacks as a brig of her size (judgement: no source read says she could not) |
-| Going about | She wears. With the wind aft, each lateen is changed round its mast: its yard peaked up and its heel passed abaft the mast, never lowered | In the tack and in the wear, her two lateens are changed round their masts as the square yards swing |
-| A shift of wind | A lateen left on the wrong side lies against its mast and draws less, until `shift the mainsail` | The same, for her fore and mizen lateens |
+| Tacked, the yard left | about 2½ minutes | 330 m, then about 5 per cent of her speed on the bad hand |
+| Tacked, the yard shifted in stays | 3 to 4 minutes | 430 to 530 m |
+| Worn, the yard shifted | 8 minutes | 630 to 730 m |
+| Worn, the yard left | 8 minutes | 715 m, then the bad hand as above |
 
-**The other ways:**
-- (b) All three wear only, the polacre too. These are the brief's words for every lateen.
-- (c) `tack ship` is turned into a wear, and the log says so.
+- **So leaving the yard pays on a short board, and shifting it pays on a long one.** On the
+  stand-in tartane the turn comes after about three quarters of an hour. That is what the late
+  Provençal record says lateen sailors did: they kept their boards on the bad hand short.
+- **Taken aback in a breeze** (JUDGEMENT, not measured: the design's target for her own great
+  yard, Eng §2.4.3), it would begin to strain at about 28 knots and might carry away from about
+  34. On the stand-in today a lateen taken aback only loses her way, in 15 to 35 knots.
+- **The xebec carries no head sail.** After a tack she eases her mizen to bring her head off;
+  without that her stand-in lies stalled across the wind.
+
+**What it asks of the engine:** a larger addition than the second draft's, as you said: four
+steps in place of one (Eng §14, A1a to A1d), about three more working days of the engine track
+(the plan's §11 and §14).
+
+**Nothing more is asked of you here.** The lead rules the figures (the plan's §13.1):
+- the bad hand's loss;
+- the seconds and hands to shift a yard;
+- which side of the mast the yard's heel passes;
+- the winds of the captain's judgements;
+- the strain when taken aback.
+
+**What it replaces:** the second draft's pick, "decided by her main sail". In it a lateen main was
+worn only and `tack ship` was answered in her words, with the polacre alone tacking.
 
 *Evidence:*
-- Lescallier 1791 p. 378: the yard is changed round the mast.
-- Forfait 1788 p. 119: a lateen taken aback costs the mast.
-- A heritage inventory of 2018 on late small lateen boats wearing (secondary; for a tartane of
-  1800, judgement: Tar §4.2).
-- No source read says the polacre could not tack. Willaumez's text describes a square-rigged
-  polacre, with no lateens, tacking, and the plate was not viewed (Pol §4), so the lateen
-  polacre's tack, her lateens changed, is judgement.
-- Xeb §3.4; Eng §2.2.
+- GA §2 to §5;
+- Eng §2.2a (the measures), §2.3 (the design), §2.4 (the costs and risks), §14;
+- each hull's going about in her design: Tar-D §5.4, Xeb-D §5, Pol-D §5.3.
 
 ---
 
 ## Part B. The hulls
 
 ### 4. The tartane: her size, her main's rake, her tréou
+
+**Settled 2026-11-18, as picked:** the *Humble*, her main raked 3° forward, the tréou carried. "I
+agree with the proposals" (the owner; Part F).
 
 ![The Roux-school watercolour of a tartane under sail, held in the tree](../references/images/tartane-roux-school-watercolour.webp)
 
@@ -155,6 +239,9 @@ eye may overrule the judgement). Before a gale she sets her square sail.
 
 ### 5. The xebec: which size, and the chambequín
 
+**Settled 2026-11-18, as picked:** the small class on *Minorca*'s hull; the 30 and the chambequín
+booked. "I agree with the proposals" (the owner; Part F).
+
 Winfield gives two sizes: 14 to 22 guns with 4-pounders, and 30 to 32 guns with 8-pounders.
 
 **My pick:**
@@ -180,6 +267,8 @@ since she would class as a ship. But no figure of her spars was found, so she wa
 
 ### 6. The xebec's sweeps
 
+**Settled 2026-11-18, as picked:** now, as a fit. "I agree with the proposals" (the owner; Part F).
+
 **My pick: now, as a fit.**
 - Sixteen sweeps of three men each, carried by the King's, the regency's and the privateer's
   fits.
@@ -201,6 +290,9 @@ her own sweeps falls behind her.
 - Eng §5: today a ship given a boat's oars becomes a boat, with no bells.
 
 ### 7. The *Diana*'s guns when she was taken
+
+**Settled 2026-11-18, as picked:** the owner's three fits kept, and "Danish 1807" added. "I agree
+with the proposals" (the owner; Part F).
 
 ![The Spanish navy's plan of the corvette Diana, 1809 to 1810, held in the tree](../references/images/corvette-diana-1809-plano-bvmdefensa.jpg)
 
@@ -230,6 +322,9 @@ default.
 *Evidence:* Dia §4 and §8; Dia-D §17.1, question 1.
 
 ### 8. The three-decker: her fits, her soldiers, her rank
+
+**Settled 2026-11-18, as picked:** one rebuilt hull for both fits; about 100 of her 839 as soldiers,
+for now; size rank 5. "I agree with the proposals" (the owner; Part F).
 
 **My pick:**
 - **One hull, as rebuilt (1786 to 1793), for both fits:**
@@ -266,6 +361,9 @@ of fourteen.
 
 ### 9. How a Spanish or Danish gun's pounds are written
 
+**Settled 2026-11-18, as picked:** as her own navy named it. "I agree with the proposals" (the
+owner; Part F).
+
 A Spanish pound is not an English pound, and the sources disagree on the difference:
 - James adds a seventy-second: 1.014.
 - Winfield gives the broadsides in libras with the book's pounds beside them, and those come to 1.079.
@@ -283,6 +381,9 @@ cost of a new key in the engine.
 *Evidence:* VR-Sp, "Units"; Con §3.3; Dia-D §17.1, question 2; Eng §6.3.
 
 ### 10. Four questions on the sources
+
+**Settled 2026-11-18, as picked:** yes, yes, yes once vetted, and not now. "I agree with the
+proposals" (the owner; Part F).
 
 **My pick:**
 1. **Yes: hold PB-039**, the *Concepción*'s own plan of 1779, in `docs/references/images/` with
@@ -481,17 +582,26 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
 
 ## Part F. The answers (recorded verbatim when given)
 
+**The owner, 2026-11-18** (through the lead's note of 04:30 UTC, nudge 17), in full: "For the
+ship session questions, I agree with the proposals, except for going about with a lateen main
+vessel. Is the judgement to only wear backed up by period sources? If not, and tacking was
+sometimes done, as I know it is done on more modern lateen vessels, it might at least be included
+as an ordered evolution, or, we might implement lateen main vessels as we do others, tacking and
+wearing normally with their evolutions. We may also consider that lateen vessels may or may not
+dip the lateen when tacking, it being preferred but not necessary. This is a larger engine
+addition, but we can include it in the planning."
+
 | # | Question | The owner's answer, verbatim | Date |
 |---|---|---|---|
-| 1 | When the build begins, and its order | | |
-| 2 | Item 37 | | |
-| 3 | How the lateen ships go about | | |
-| 4 | The tartane | | |
-| 5 | The xebec's size, and the chambequín | | |
-| 6 | The xebec's sweeps | | |
-| 7 | The *Diana*'s guns | | |
-| 8 | The three-decker | | |
-| 9 | A foreign gun's pounds | | |
-| 10 | The sources | | |
-| D | Winfield's passages sent (by number) | | |
-| E | Anything in Part E changed | | |
+| 1 | When the build begins, and its order | "I agree with the proposals" (as picked: after the gate, then two roads) | 2026-11-18 |
+| 2 | Item 37 | "I agree with the proposals" (as picked: (a), the cause mended) | 2026-11-18 |
+| 3 | How the lateen ships go about | "... except for going about with a lateen main vessel. Is the judgement to only wear backed up by period sources? If not, and tacking was sometimes done, as I know it is done on more modern lateen vessels, it might at least be included as an ordered evolution, or, we might implement lateen main vessels as we do others, tacking and wearing normally with their evolutions. We may also consider that lateen vessels may or may not dip the lateen when tacking, it being preferred but not necessary. This is a larger engine addition, but we can include it in the planning." (the design on their shape: §3 above) | 2026-11-18 |
+| 4 | The tartane | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 5 | The xebec's size, and the chambequín | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 6 | The xebec's sweeps | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 7 | The *Diana*'s guns | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 8 | The three-decker | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 9 | A foreign gun's pounds | "I agree with the proposals" (as picked) | 2026-11-18 |
+| 10 | The sources | "I agree with the proposals" (as picked) | 2026-11-18 |
+| D | Winfield's passages sent (by number) | None yet. The passages are theirs to look up; the lead has reminded them (nudge 17) | — |
+| E | Anything in Part E changed | No word given against it, so it stands as recommended, as this sheet's rule has it | 2026-11-18 |

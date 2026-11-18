@@ -1,4 +1,19 @@
-# Design note: the engine for package 90 (November 2026; second draft)
+# Design note: the engine for package 90 (November 2026; third draft)
+
+**Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
+`Decisions-Package90-2026-11.md` §3 and Part F; the lead's note of 2026-11-18, 04:30 UTC, nudge
+17, items 2 to 4). The owner agreed nine of the ten questions as picked and answered the third
+with a shape of their own: a vessel with a lateen main tacks and wears as other vessels do, each an
+ordered evolution, and the change of the yard round the mast is "preferred but not necessary".
+No source read says a lateen vessel could not tack (`Research-LateenGoingAbout-2026-11.md`,
+cited **GA**, §3.4 and §4), so their knowledge stands as the judgement, said as one. This draft
+changes §2 (its title; §2.1's last two paragraphs; a new §2.2a of measures run for it; §2.3
+re-drafted on their shape; a new §2.4, what going about costs and risks under a lateen), the "In
+brief" row of the lateens, §12's list, §13 (items 8 and 9, new) and §14 (A1 re-planned as A1a to
+A1d; the A0 row's "under the owner's (a), agreed"), and adds "How the third draft answers the
+owner" below the critic's table. Everything else is the second draft's.
+The measures of §2.2a were run in the session's scratch (`p90/goabout/redraft/`), on the tree at
+9fe1b37d, with no tracked file changed.
 
 Package 90's preliminary work, the engine's part (the lead's note of 2026-11-18 at 00:50 UTC,
 nudge 15; `docs/dev/M7-WorkPackages.md`, row 90). It does two things. It reports item 37 of the
@@ -54,7 +69,7 @@ their outputs are kept with the session's scratch, not in the repository.
 | Need | What the engine does today (measured unless marked) | What the build wants |
 |---|---|---|
 | Item 37, `PEAK_COEFF["studding"]` | 1.25 where the engine's curve peaks at 1.4396 at 35°; read by the rating pass alone, for the studding-sail booms and the ringtail booms. Made the engine's: **74 figures in 9 of the 18 files move**, every one a studding-sail boom's or a ringtail boom's `rating_kn`, up 15 per cent; nothing else in any file | The generator reading the engine's curves (§1.5). In both tiers on the moved files: truth 35's last clause and `test_studding`'s frigate brought up to six points move (no boom carries away), five records of "no figure moved" name the booms, seven byte pins hold again by the regeneration; truth 9 and truth 14 hold. For the owner, before any new file is generated |
-| Whole lateens worn and dipped (B3.1) | No dip: the schema refuses `dipping` on any sail but a lug. The tartane, the polacre and the xebec probes **tack** in 89, 164 and 101 s, the lateens swung over as gaff sails with no word, drawing alike on both tacks (5.07 and 5.02 kN, the polacre's fore lateen); a wear says nothing of them | The plan's A1 (§14): `dipping` allowed on a whole lateen for its side and its loss against the mast; a new `change_lateen` evolution on the settee's model; "worn, not tacked" where the main is a whole lateen; the lateen mizen worked as a ship's mizen and kept set hove to; the words (§2) |
+| Whole lateens tacked and worn, the yard changed or left (the owner's answer to question 3) | No dip: the schema refuses `dipping` on any sail but a lug. The tartane, the polacre and the xebec probes **tack** in 89, 164 and 101 s, the lateens swung over as gaff sails with no word, drawing alike on both tacks (5.07 and 5.02 kN, the polacre's fore lateen); a wear says nothing of them. In 15 kn a tack loses them 205 to 249 m to windward and a wear 519 to 602 (§2.2a); a lateen taken aback costs only her way | The plan's A1a to A1d (§14): `dipping` allowed on a whole lateen for its side and its loss on the bad hand; the tack and the wear each with the yard's change as a part, done or left by the order's words or the ship's practice ("shift" by default); `shift the mainsail` alone; the rules captain's choice; the lateen taken aback in a breeze loading its yard and mast; the lateen mizen worked as a ship's mizen and kept set hove to; the words (§2) |
 | A square topsail over a lateen (the tartane) | Classed as the cutter is, by B3.4's rule as the lead read it: her main her one mast with yards, the topsail her head yard, no after yards, not square-rigged; hove to with it aback **on the probe, whose topsail stands on the cutter's topmast**; on her design's pole main (the yard on the lower mast's head) the topsail is a course today and is hauled up hove to (Tar-D §5.1a) | Nothing new for the classing; A5 and A6 for her topsail on a pole main (§14); her *tréou* for her document; her boat in tow, which no boat's entry can say today (§3) |
 | The pole mast (the polacre) | No such thing in the engine: every square sail is furled aloft by topmen; her main topsail yard put on the lower mast classes as the probe does | The pole known to the square sails' take-in and furl, the topmast evolutions and the viewer, read from the parts as filed (the polacre's design's reading); item 8 settled in her document (§4) |
 | Sweeps | A ship's file may carry a boat's `oars:`, and is then a boat to the game (no bells, "a boat under oars, with no rig to draw"); `give way` mans every oar at once from nobody (the probe's 121 men untouched), no evolution, no time; 20 oars at a boat's figures move the xebec probe 1.6 kn in a calm | Sweeps of a ship's own, apart from a boat's oars; as a fit; an evolution drawing the men from the company; men to a sweep; the guns' crews against the oars (§5) |
@@ -74,6 +89,18 @@ their outputs are kept with the session's scratch, not in the repository.
 | F25: "nothing in the tree written" | §0 | **Held.** Reworded: no tracked file changed; Python's git-ignored bytecode caches were written by the probes (§0) |
 | F22 (with the plan): the far body's pace | §5 named no file for it | `world/ships.py`'s far pace (`VESSEL_MIN_SPEED_KN`, l. 98, read at l. 849 and 865) is A7's (§14; Plan §7.1) |
 | The plan's settlements | the dip's key or the settee's machinery, "the lead's choice"; the Spanish pound "the English pounds" | the plan's proposal for A1 (§2.3 item 1, §14); the Spanish pound the owner's, the pick the nominal pounder (§6.3; Plan §4 row 8, Dec 9) |
+
+## How the third draft answers the owner (question 3, 2026-11-18)
+
+| The second draft | What the sources and the owner say | This draft |
+|---|---|---|
+| "Worn, not tacked" where the main is a whole lateen (§2.3 item 3); `Ship.wears_only()` | The rule came from the brief, not a source (GA §4); the owner: she tacks and wears "normally with their evolutions" | **Dropped.** Every lateen rig tacks and wears; `wears_only()` is not laid (§2.3, §14) |
+| `tack ship` answered "She does not stay under her lateen; wear her." and nothing done | No source says so (GA §6) | **Dropped.** `tack ship` tacks; `put her about` and the course's judgement wear her only over `lateen_tack_kn` (§2.3 item 6) |
+| The yard changed only in the wear, at "wind aft" | "it being preferred but not necessary"; the yard changed "pour virer de bord", either way (Lescallier p. 378; GA, the words) | **A part of either**, done in stays or in the wear by the order's clause or the ship's practice ("shift" by default), or left (§2.3 items 2-3) |
+| A lateen left on the wrong side lies against its mast (A1 (1)) | the board on the mast named in four dictionaries and sailed (Stratico, O'Scanlan, Romme, Willaumez: GA §3.3) | **Kept**, and measured: 4 to 17 per cent of her speed close-hauled (§2.2a) |
+| The heel passed abaft the mast | Willaumez abaft; O'Scanlan's CIMAR forward (GA §3.3) | **Not agreed**: the viewer's only; the lead's (§2.3 item 2) |
+| Nothing on the costs | Forfait p. 119 (taken aback in a strong wind); no figure of way, wind, loss, hands or time (GA §5) | **§2.4**: the game's figures, each JUDGEMENT, measured where they can be (§2.2a); a lateen aback in a breeze strains her yard (A1d); the rules captain's practice (A1c) |
+| The bare xebec's tack (her probe stalls 39° off) | the mizen added to bring lateen vessels to the wind (Lescallier pp. 393-394) | **Her mizen eased as she pays off** where she has no head sail: measured, 192 m lost against 1,064 (§2.2a, §2.3 item 5) |
 
 ---
 
@@ -295,7 +322,13 @@ both files would be generated again after it.
 
 ---
 
-## 2. The lateens: worn, not tacked, the yard dipped round the mast (B3.1)
+## 2. The lateens: tacked and worn, the yard changed round the mast or left (the owner's answer to question 3)
+
+**Plainly:** the second draft's title was the brief's, B3.1's "worn, not tacked, the yard dipped
+round the mast". The owner's answer of 2026-11-18 replaces it (the decisions sheet's question 3 and
+Part F, their words verbatim). §2.1 and §2.2 are the second draft's reading and measures, §2.1 with
+the machinery the change would take as its model; §2.2a is new, run for this draft; §2.3 is
+re-drafted on their shape; §2.4 is new.
 
 ### 2.1 What the engine has
 
@@ -312,6 +345,39 @@ refuses `dipping` on any sail but a lug ("only a lug is dipped"); `dipping_lugs`
 and is False for any sail without `dipping`. The settee came into the dip by the `settee` key
 (B3.3, Ext §5.4); the 64's and the 74's mizen course, a lateen cut at the mast (`cut_at_mast`),
 is not dipped and goes about as a ship's mizen, its curve the gaff's.
+
+**The machinery a change of the yard would take as its model** (read, for this draft). The engine
+already changes two yard-sails in going about. The lugger's dipping lugs are lowered at helm's
+a-lee, dipped as her head passes the wind and hoisted on the new lee (`LugDip`, `scripts.py:486`;
+the manoeuvre's `dip_s`, 90 s by the crew's factor). The bilander's settee is kept drawing in
+stays as a ship's mizen and changed last, once the head yards are swung: lowered on deck, passed
+round abaft the mast and hoisted on the new lee, and she is not tacked till it is up
+(`SetteeChange`, `scripts.py:394`; `SETTEE_DIP_S`, 120 s for a yard of 15 to 17 m, held out of
+`tack.yaml` so that `tests/test_catalogue.py`'s pin of the tack's timings does not move). In the
+wear the settee is lowered as she bears up and hoisted once the wind is past the stern. Each has
+its order by itself: `dip_lug.yaml`, 150 s; `dip_settee.yaml`, 180 s, six able hands,
+`too_few: all hands`.
+
+**The rules round going about, every rig's** (read):
+- **The stays rule** (`tack.yaml`): she is put in stays only with two knots through the water
+  ("She has not way enough on her to stay"). Her way is gone under a quarter of her speed at
+  helm's a-lee, or under a length a minute. Hung 180 s from then, or fallen back two points on the
+  old side, she has missed stays: her yards are squared and the helm put up, and she falls off on
+  the old tack.
+- **`put her about`** chooses the tack or the wear by package 45's rule
+  (`orders/navigation.py:1132`, `put_about_choice`). It wears with no head sail set, the topsails
+  close-reefed, the wind over 30 kn, or after missing stays within the hour. It tacks regardless
+  with the land to leeward within two miles. The rules captain gives the order
+  (`world/captains.py:3403`).
+- **The helm's judgement** for a course across the wake (`navigation.py` l. 565-600) wears a
+  vessel with square sail set and gybes a fore-and-after by the helm; a lateen rig gybes, as the
+  lugger does.
+- **The stern watch** says when a gybe or a shift has left a dipping lug against its mast
+  (`navigation.watch_the_stern`), and the rules captain dips it (`Captain._across_the_stern`).
+- **A sail taken aback** is said ("Taken aback: the sails pressed against the masts and she lost
+  her way.", `physics/hull.py`, `ABACK_SECONDS`). Its cloth wears at three times the rate
+  (`physics/strain.py`). Its load on its yard and mast is the load it has, judged against their
+  ratings as any load is.
 
 ### 2.2 What it does with whole lateens today (measured)
 
@@ -360,71 +426,457 @@ What this shows:
    empty), so a lateen mizen is kept as a fore-and-after's mizen hove to: item 8's first half, for
    the polacre's document.
 
-### 2.3 What the build wants
+### 2.2a Going about today, and with the yard's change modelled (measured, 2026-11-18)
 
-By the package's brief, B3.1's handling: worn, not tacked; the yard dipped round the mast (the
-Levant's *muder*, Lescallier 1791 p. 378 and Willaumez p. 406 as `Research-Bilander-2026-10.md`
-§1.5 reads them: the yard topped up toward the mast's line, its heel passed abaft the mast, the
-tack shifted to the new weather side, "so that on the other tack the sail is not pressed on the
-mast"). The engine's parts of it, in the order I would build them:
+**The harness** is §0's. Seed 7, a steady northerly, no gusts, the starboard tack 67.5° off,
+plain sail, settled 1,800 s; the settee brig settled 2,400 s braced sharp up, as
+`tests/test_settee.py`'s `_world`. Then the order and 900 s run, in 15 kn unless said.
 
-1. **The dip for a lateen.** `dipping: true` allowed on the `lateen` class (`schema.py:2363`), the
-   dip's machinery read from `dipping` and not from `cls == "lug"` (the places of §2.1 and the
-   lug-keyed readers the settee's step listed, Ext §5.4, each read again for a lateen), with the
-   lateen's own words and time: the yard not lowered to the deck as a lug's is, but peaked and
-   passed round, the *muder*'s minutes the hull documents' JUDGEMENT from the sources. The settee's
-   step (B3.3) is the precedent for the cost: one key, every path read for it, no committed file
-   moving. The polacre's design (`Design-Ship-Polacre.md` §5) names the settee's own change
-   machinery for the same act, nearer in its handling of a yard slung on a mast that carries other
-   yards; the dip's key is the smaller change to the schema. One of the two is built once for the
-   three hulls: the lead's choice. **The plan proposes both halves** (its §4 row 3): the dip's key
-   for the side and the loss against the mast, and a new `change_lateen` evolution whose scripts
-   take the settee's change as their model, for the act itself (§14, A1).
-2. **The loss against the mast.** `against_the_mast` reading `dipping` would give a dipping
-   lateen left on its weather side the lug's loss (it draws with two thirds of its cloth,
-   `LUG_AGAINST_MAST_AREA`, `sails.py:126-135`, itself a judgement); whether a lateen's figure is
-   the lug's is the hull documents' (judgement:
-   Fincham p. 59, "more liable to be taken aback than the common lug", `VesselReferences-2026-10.md`
-   §3.1).
-3. **Worn, not tacked.** A rule of the rig, not of a file: a ship whose working canvas includes a
-   dipping lateen goes about by wearing. Today the choice between a tack and a wear is package 45's
-   (`data/vocabulary.yaml` l. 238-243: `put her about` wears when her sail is short or after she has
-   missed stays, the log saying why); the lateen rig is one more reason to wear, said. What `tack
-   ship` itself answers on such a rig is the owner's (§12, question 2).
-4. **The wear's lateens.** In the wear the lateens dipped as she runs off, as the lugger's lugs are
-   lowered and dipped in hers today ("Lowered the foresail and the mainsail to dip them" at 36 s,
-   "Dipped ...; hoisted on the starboard side, to leeward of the masts" at 149 s, observed), the
-   lateen's way and words.
-5. **Heaving to, and the lateen mizen as a ship's mizen.** The period's way of lying to under
-   lateens is the hulls' research (the *cape*); the engine's heave-to today forereaches them at
-   three knots (§2.2, 5). **The lateen mizen is worked as a ship's mizen and is not read by the
-   driver rule** (the plan's §4 row 4, on the polacre's measure): a whole lateen on the aftermost
-   mast with a mast before it is hauled aft as she comes to in the wear (and at helm's a-lee where
-   a square main tacks), eased at "up helm", and **kept set hove to**; `after_gaff_sails` never
-   takes a whole lateen, and a guard over every file holds it. Taken in hove to, the polacre probe
-   falls off past the beam and does not heave to at all (`Design-Ship-Polacre.md` §5.2), so the
-   driver rule must not reach it. A hull that forereaches past truth 12's band is mended by her
-   own file's lever (the tartane's great lateen's trim; the polacre's fore lateen's sheet),
-   measured on her file. **Plainly:** the first draft had the mizen read by the driver's paths and
-   "handled hove to by the driver rule"; the measure rules that out. One step (A1) serves the
-   three hulls.
-6. **The shift alone.** An order for a lateen left on the bad hand by a shift of wind, as `dip the
-   foresail` is for a lug (the tartane's design, §5.4 item 5, `shift the mainsail`); refused in
-   words on the good hand. Its word wants care: `shift` is already the sail room's ("shift the
-   mainsail for the small mainsail", `Research-Xebec-2026-11.md` §9 item 7).
-7. **The lateens' evolutions sized to the hull.** B3.1's `set_lateen`, `take_in_lateen`,
-   `furl_lateen` and `reef_lateen` were sized for the 64's mizen course (Ext §3.6); a small
-   company's great lateen calls all hands where the watch is too few (`too_few: all hands`,
-   package 116's and the settee's road), so nothing waits for ever.
-8. **The words.** "Brace in the after yards" left out where she has no after yards (the three
-   probes, and the lugger, the cutter and the smack as filed), and the tack's "Tacked; braced up on
-   the larboard tack" where she has no yard at all (the xebec): words only, moving those files'
-   wear lines; the lead's to place, with the evolutions' owner or here.
+**Lost to windward** is the cost of going about in metres. It is the ground she would have made
+to windward in 900 s holding her board at her settled speed, less what she made.
 
-**What it moves:** nothing of the eighteen files, none of which carries a whole lateen (the 64's
-and the 74's mizen course is `cut_at_mast` and stays a ship's mizen): keyed on a dipping lateen,
-the change is the settee's kind, byte for byte for the rest (judgement, to be measured at the
-build as B3.3 was).
+**The rigs:**
+- the three probes of §2.2;
+- the xebec note's own probe with no head sail (`Research-Xebec-2026-11.md` §9; "bare" below);
+- the cutter, the lugger and the brig as filed;
+- the settee's test rig (`tests/rig_fixtures.py`'s `brig_with_settee_doc`), the engine's one yard
+  changed in stays today.
+
+**The variants**, made in the process only, nothing in the tree changed (the scripts in the
+session's scratch, `p90/goabout/redraft/`):
+- **left**: each whole lateen is given a side after load. `dipping` is set on the `Sail` object
+  and `lug_side` is its lee side before the order. The schema refuses the key, so no file carries
+  it. She comes out of the tack or the wear on the bad hand at the lug's two-thirds.
+- **changed in stays**: as left, and each whole lateen draws nothing (`in the gear`) from the
+  moment her head is through the wind, for a stated time. It is then set on the new lee with its
+  sheet drawn for the close-hauled wind: the settee's act, done by the script.
+- **changed in the wear**: the same, from the moment the wind is within 30° of the stern.
+
+The times are the lugger's 90 s, the settee's 120 s, and the hulls' own by §2.4.4's rule, rounded:
+the tartane's 24.4-m yard 180 s, the xebec's 30-m main 225 s, the polacre's 19-m fore 140 s. They
+are JUDGEMENT; no source gives one. The change was modelled on every whole lateen of the probe at
+once, for the probe's own (shorter) yards.
+
+**The tack** (her settled speed beside the rig; then when it was done, her least way, and when she
+was back at nine tenths of her speed; the ground lost to windward; for the changes, at 90 s / 120
+s / the hull's seconds):
+
+| Rig | Today | Yard left | Changed in stays |
+|---|---|---|---|
+| Tartane probe (6.21 kn) | 89 s; 1.52 kn at 44 s; 107 s; **227 m** | 157 s; **326 m** | **428 / 463 / 529 m** |
+| Polacre probe (4.65 kn) | 164 s; 0.12 kn at 92 s; 261 s; **249 m** | 165 s; **275 m** | **291 / 296 / 306 m** |
+| Xebec probe, head sails (5.14 kn) | 101 s; 1.64 kn at 84 s; 201 s; **205 m** | 101 s; **309 m** | **370 / 443 / 554 m** |
+| Xebec, bare (5.02 kn) | 347 s; out at 39° off and 1.1 kn, never back; **1,064 m** | **988 m** | **1,107 / 1,123 m** (90 / 120 s) |
+| Cutter (6.12 kn) | 106 s; **184 m** | | |
+| Lugger, her lugs dipped (7.55 kn) | 180 s; **467 m** | | |
+| Settee brig (4.36 kn) | 318 s, the settee changed in stays (down at 155 s, up at 314 s); **327 m** | | |
+| Brig (4.88 kn) | 454 s; **552 m** | | |
+
+**The wear** (the same; the changes at the same seconds):
+
+| Rig | Today | Yard left | Changed in the wear |
+|---|---|---|---|
+| Tartane probe | 487 s; **551 m** | **715 m** | **628 / 658 / 726 m** |
+| Polacre probe | 464 s; **602 m** | **647 m** | **599 / 617 / 649 m** |
+| Xebec probe, head sails | 254 s; **519 m** | **610 m** | **548 / 575 / 653 m** |
+| Xebec, bare | 150 s; **412 m** | **533 m** | **455 / 489 m** (90 / 120 s) |
+| Cutter | 458 s; **439 m** | | |
+| Lugger, dipped | 171 s; **612 m** | | |
+| Settee brig | 478 s, the settee changed (hoisted at 152 s); **590 m** | | |
+| Brig | 474 s; **725 m** | | |
+
+**On the bad hand.** Close-hauled 67.5° off, 900 s after, at the lug's two-thirds:
+- the tartane probe 6.17 → 5.83 kn, 5½ per cent less;
+- the polacre 4.84 → 4.64, 4 per cent;
+- the xebec 5.12 → 4.59, 10½ per cent;
+- the bare xebec 5.03 → 4.17, 17 per cent, all three lateens on the mast.
+
+The changed variants come out a few per cent under today's speed (the tartane 6.0 kn against
+6.17). The scratch change draws the sheet by rule and does not trim it: an artefact of the probe,
+not of the change.
+
+**In other winds** (the tack, today; and with the lateens changed in stays at 120 s, "ch."; lost
+to windward):
+
+| Wind | Tartane | Polacre | Xebec | Bare xebec | Cutter | Brig |
+|---|---|---|---|---|---|---|
+| 6 kn | 114 s, 94 m; ch. 179 m | refused: 1.88 kn of way, under the two knots | 227 s, 112 m; ch. 130 m | 401 s, out at 47° off, 143 m | 180 s, 76 m | refused: 1.97 kn |
+| 10 kn | 83 s, 152 m; ch. 322 m | 206 s, 159 m; ch. 178 m | 143 s, 147 m; ch. 277 m | 366 s, out at 39° off, 572 m | 117 s, 124 m | 410 s, 217 m |
+| 22 kn | 89 s, 341 m; ch. 653 m | 284 s, 592 m; ch. 617 m | 75 s, 286 m; ch. 597 m | 336 s, out at 42° off, 1,614 m | 106 s, 289 m | 179 s, 490 m |
+| 28 kn | 98 s, 430 m; ch. 723 m | 184 s, 540 m; ch. 605 m | 65 s, 358 m; ch. 707 m | 333 s, out at 36° off, 1,980 m | 109 s, 390 m | 200 s, 733 m |
+
+**Paying off with no head sail** (the bare xebec, 15 kn, in the process only). Her mizen lateen
+was let draw nothing from the moment her head was through the wind until she lay within 10° of
+67.5° off, then set again. She tacked in 297 s and made 5.0 kn at 600 s, losing **192 m**. Today
+she takes 347 s, lies at 39° off at 1.1 kn and loses 1,064 m. Holding her fore lateen aback for
+30 s after the wind made no difference.
+
+**Taken aback.** Each probe was settled close-hauled, then given "steer north" and run 240 s. The
+table gives the greatest load on each great yard, its mast and its cloth over its rating
+(the probes' own ratings, scratch figures), close-hauled and then aback:
+
+| Rig | 15 kn | 25 kn | 35 kn |
+|---|---|---|---|
+| Tartane probe, main yard / mast / cloth | 0.15 / 0.05 / 0.06, the same aback | 0.35 / 0.12 / 0.14, the same | 0.58 / 0.21 → 0.22 / 0.24 |
+| Polacre probe, fore | 0.09 / 0.05 / 0.05, the same | 0.24 / 0.13 / 0.13, the same | 0.45 → 0.44 / 0.23 / 0.23 |
+| Xebec probe, main | 0.12 → 0.13 / 0.01 → 0.02 / 0.05 | 0.30 / 0.04 / 0.13, the same | 0.57 → 0.68 / 0.07 → 0.09 / 0.24 → 0.28 |
+
+In every run "Taken aback: the sails pressed against the masts and she lost her way." came within
+18 to 31 s, and nothing strained or carried away.
+
+**What this shows:**
+1. **The tack is the cheaper today** for every lateen probe with head sails, and their lateens
+   cost nothing either way. The tartane probe loses 227 m in a tack and 551 in a wear. The
+   period's general rule holds for them as for any vessel (Falconer, VEERING; Röding, WENDEN).
+   The bare xebec is the other way: 412 m worn against 1,064 tacked (item 5).
+2. **The owner's shape has its trade in the game**, with the lug's two-thirds and the settee's
+   seconds. On the tartane probe, in the first quarter-hour:
+   - a tack with the yard left loses 326 m;
+   - a tack with it changed in stays 428 to 529 m;
+   - a wear with it changed 628 to 726 m;
+   - a wear with it left 715 m.
+
+   The bad hand goes on costing as the board goes on: the tartane 0.34 kn, about 240 m to
+   windward an hour. So leaving the yard pays on a short board and the change pays on a long one.
+   Taking today's good-hand speed for the changed yard, the crossover comes about three quarters
+   of an hour after the order on the tartane probe, about 35 minutes on the xebec's and about 25
+   on the polacre's. That is arithmetic on the tables, JUDGEMENT on the two figures it rests on.
+   It is the 2018 inventory's practice (long boards on the bad hand avoided), given by the game's
+   own numbers and not tuned to it.
+3. **The same seconds of change cost two to four times as much in stays as in the wear.** On the
+   tartane probe 120 s cost 236 m in stays and 108 m in the wear; on the xebec's, 238 and 56. In
+   stays she loses way while the sail is out of drawing; in the wear she is running. So the change
+   needs no second figure for stays to be dearer there (§2.4.4).
+4. **The polacre's square main carries her through her tack**, and her lateens' change costs
+   little: 291 to 306 m against 249. Her probe stops dead in stays today (0.12 kn at 92 s) and
+   is refused in 6 kn.
+5. **The bare xebec cannot pay off from her tack.** She lies 36° to 47° off at about a knot for ten
+   minutes in every wind from 6 to 28 kn, and is called "Tacked" by the steady timeout. Easing her
+   mizen lateen as she pays off cures it: 192 m against 1,064. With no head sail, the after lateen
+   must be worked to bring her off, as a ship's spanker is eased (§2.3 item 5).
+6. **A lateen taken aback costs her way and nothing else.** Forfait's danger is not in the engine.
+7. **No probe missed stays from 6 to 28 kn.** The engine's two-knot floor refused the polacre and
+   the brig in 6 kn.
+
+### 2.3 What the build wants (re-drafted on the owner's shape)
+
+**Plainly:** the second draft built the brief's "worn, not tacked". `tack ship` was answered on a
+lateen main in her words with nothing done (`Ship.wears_only()`), and the yard was changed only in
+the wear. The owner's answer of 2026-11-18 replaces both. What follows is their shape:
+- she tacks and wears as other vessels do, each an ordered evolution with her own words, hands
+  and time;
+- changing the yard round the mast is a part of either, which may be done or left;
+- done, it is done in stays or in the wear, as her practice is by default;
+- left, she sails the new board on the bad hand, the sail against the mast and drawing less, until
+  she is ordered to shift it.
+
+The engine's parts, in the order I would build them (§14, A1a to A1d):
+
+1. **The side, and the bad hand's drawing** (A1a).
+   - `dipping: true` is allowed on the `lateen` class with no `cut_at_mast` (`schema.py:2363`).
+     The side's machinery reads it from `dipping`, not from `cls == "lug"`, wherever the lateen
+     needs it. The lug-keyed readers of Ext §5.4 are each read again: `dipping_lugs`,
+     `lugger_lugs` and `_lugs_all` stay the lug's.
+   - `Sail.lug_side` is kept for it, set on the lee side when the sail is set, as a dipping lug's
+     is.
+   - `against_the_mast` reads it as it is. A lateen on the weather side of its mast draws with
+     `LUG_AGAINST_MAST_AREA`'s two-thirds (JUDGEMENT, the lug's: Stratico's two bellies, one each
+     side of the mast, read as a third lost; GA §5.5). Measured above: 4 to 17 per cent of her
+     speed. A lateen's own figure, if one is wanted, is set once at A8's tuning.
+   - The stern watch and the rules captain's `_across_the_stern` read whole lateens with a side as
+     they read dipping lugs. A gybe by the helm or a shift of wind that leaves a lateen on the bad
+     hand is said once ("The mainsail lies on the mast."), and the rules captain shifts it (A1c).
+2. **The change, a part of the tack and of the wear** (A1b).
+   - **In stays**: once her head is through the wind (after "let go and haul" where she has head
+     yards, as the settee is changed last), each lateen to be changed draws nothing while it is
+     changed:
+     - its parrel eased and its weather runners cast off;
+     - its yard peaked up by its halyard and ourses;
+     - its car passed round the mast and the tack shifted to the new weather side;
+     - the runners set up, the parrel hauled taut and the sheet drawn on the new lee.
+
+     The sources are Lescallier pp. 378-379, Willaumez MUDER and O'Scanlan CIMAR (GA §3.3). The
+     yard is **never lowered**: the lug and the settee are lowered, the lateen is peaked
+     (Willaumez; the 2018 inventory).
+   - **Which side of the mast the car passes is not agreed**: abaft by Willaumez's MUDER, forward
+     by O'Scanlan's CIMAR. The 2018 inventory and Lescallier's dinga pass the sheet forward of the
+     mast, which does not settle the car's side (GA §3.3). It changes the drawing, not the time.
+     The lead rules. My lean is abaft, the French Levant's word and the second draft's.
+   - **In the wear**: once the wind is aft, the same, the sail flying before the wind (the
+     inventory).
+   - She is tacked or worn when the change is done, as she is not tacked till a settee is up
+     (`TackScript._lugs_down`).
+   - **The machinery** is the settee's `SetteeChange` with the yard peaked and not lowered: a new
+     `LateenChange` beside it, or `SetteeChange` taking a flag (the builder's; the lead rules).
+     The order by itself is a new evolution, `change_lateen`, its scripts on the settee's model
+     (the plan's §4 row 3, as before).
+3. **How each choice is ordered** (A1b).
+   - **The order's own words, for one going about.** `tack ship`, `wear ship` and `put her
+     about` take a clause:
+     - "and shift the lateens" or "and leave the lateens";
+     - "shift the mainsail" or "leave the mizen" names one;
+     - "change" is a synonym of "shift", and "on the mast" of "leave".
+
+     The period's English for the change is "change" or "shift the mizen" (Steel 1794 II, CHANGE
+     THE MIZEN; Röding's English for DURCHKAIEN; earlier, Mainwaring c. 1620). No English word for
+     leaving it was read (*aller à bido*, *a bisdosso*, *llevar la vela sobre el palo*: GA §2.2),
+     so the words are plain. The log says which: "Ready about ...; the lateens to be shifted in
+     stays." or "...; the lateens left on the mast."
+
+     The clause is a new kind of modifier. `orders/grammar.py` reads modifiers by kinds written in
+     code (`_parse_modifiers`), and today it answers `tack ship and leave the lateens` with "'tack
+     ship' was understood, but not 'and leave the lateens'" (observed in scratch, on the lugger as
+     filed). So A1b adds the kind there, its words a table in `data/vocabulary.yaml` loaded by
+     `orders/vocabulary.py`.
+   - **The ship's practice, the default.** It is held on the ship as two settings, in stays and in
+     wearing, each "shift" or "leave" (`ship.extra["lateen_practice"]`, a plain dict saved with
+     her). **"Shift" in both by default**: the owner's "preferred".
+     - It is set for the cruise by an order of its own: "in stays, leave the lateens", "in stays,
+       shift the lateens", "in wearing, shift the lateens", and "in going about, ..." for both.
+     - It is answered "Her practice: the lateens left on the mast in stays, shifted in wearing."
+     - It is shown in the readings, so that a model at the conn knows what `tack ship` will do.
+     - Its orders are a new verb: "in stays, leave the lateens" is refused today ("'in stays' is
+       not an order this ship understands", observed in scratch). The verb and the practice's
+       reading are named in the primer's going-about chapter (`docs/primer/05-going-about.md`),
+       since `tests/test_grammar_book.py` asks every verb of the vocabulary and every reading of
+       the registry to be named in the primer.
+     - No file key. A hull whose sources give her a practice of her own would take one then
+       (JUDGEMENT).
+   - **A standing order.** The practice's order is an ordinary order, so the standing dialect takes
+     it unchanged. A `when` fires at each coming to hold (`freesail/standing/grammar.py`), so a
+     practice set by the wind is a pair:
+     - `standing order "fine weather boards": when the true wind is under 12 knots then in stays,
+       leave the lateens`;
+     - `standing order "fresh weather boards": when the true wind exceeds 12 knots then in stays,
+       shift the lateens`.
+
+     The practice is set as the wind crosses the figure, not held while it stays under it. The
+     captains' books already write their standing orders from their thresholds
+     (`data/captains/commodore.yaml` l. 156).
+   - **The shift alone.** `shift the mainsail`, `shift the mizen` and `shift the lateens`, with
+     `change` and `dip` as synonyms for a lateen, serve for a lateen left on the bad hand by a
+     going about with the yard left, a gybe by the helm or a shift of wind.
+     - Refused in words on the good hand: "The mainsail lies to leeward of its mast already."
+     - Held while a manoeuvre is in hand, as `settees_held` holds a settee.
+     - Kept apart from the sail room's "shift ... for ..." (`Research-Xebec-2026-11.md` §9 item 7).
+   - **Every voice gives the same orders**: the player's, a model's at a station, the director's
+     and the rules captain's.
+4. **Her own words, hands and time** (A1b).
+   - **Words.** The tack's and the wear's lines name the lateens, with A2's words for a rig with no
+     braced yard:
+     - "Ready about. Helm's a-lee; ease off the head sheets; haul aft the mizen sheet."
+     - "Shift the mainsail: ease the parrel, cast off the runners, peak up the yard and pass the car
+       round."
+     - "Shifted the mainsail; it stands to leeward of the mast."
+     - "Tacked; full and by on the larboard tack, the mainsail on the mast." where it was left.
+   - **Hands.** All hands, as the tack and the wear call them today (observed for the probes); the
+     change's own by the yard (§2.4.4).
+   - **Time.** The tack's or the wear's own, and the change's seconds by the yard's length
+     (§2.4.4), in the change's own file. So `tack.yaml`'s and `wear.yaml`'s timings, which
+     `tests/test_catalogue.py` pins whole, do not move.
+5. **The lateen mizen and the fore lateen** in stays and in the wear (A1b; the plan's §4 row 4, on
+   the polacre's measure, kept).
+   - **A whole lateen on the aftermost mast**, with a mast before it:
+     - hauled aft at helm's a-lee (the polacre probe 157 s against 164: Pol-D §5.3);
+     - **eased as she pays off on the new board where she has no head sail set**. This is new,
+       measured on the bare xebec in §2.2a (192 m lost against 1,064); JUDGEMENT on the act, the
+       spanker's "ease off" carried to it;
+     - eased at "up helm" in the wear and hauled aft as she comes to.
+   - **A whole lateen on the foremost mast**, before a square main (the polacre): eased with the
+     head sheets at helm's a-lee and drawn at "let go and haul" (Pol-D §5.3 item 1).
+   - **Hove to** (the second draft's item 5, unchanged) the mizen is kept set, and
+     `after_gaff_sails` never takes a whole lateen, a guard over every file holding it. Taken in
+     hove to, the polacre probe falls off past the beam and does not heave to at all
+     (`Design-Ship-Polacre.md` §5.2), so the driver rule must not reach it. The engine's heave-to
+     forereaches the probes at about three knots today (§2.2, 5); the period's way of lying to
+     under lateens (the *cape*) is the hulls' research. A hull that forereaches past truth 12's
+     band is mended by her own file's lever (the tartane's great lateen's trim; the polacre's fore
+     lateen's sheet), measured on her file.
+6. **The rules captain and `put her about`** (A1c).
+   - **Package 45's choice gains one reason to wear**: a whole lateen set and the wind over the
+     book's `lateen_tack_kn`. It is said: "the wind 24 knots: a lateen is not put in stays in a
+     strong wind" (Forfait p. 119; JUDGEMENT on the figure, 22 kn, Beaufort's strong breeze).
+   - **The tack regardless** with the land to leeward stands, at Forfait's risk (A1d).
+   - **The course's judgement takes the same reason.** A course across the wind's eye is put
+     about through `judge_course` (`orders/navigation.py`, its eye branch), not through
+     `put_about_choice`, and today it tacks any vessel with way to stay at any wind. `steer`,
+     `shape a course` and the captains' hourly "shape a course for {mark}"
+     (`data/captains/commodore.yaml` l. 151) all come to it. So its eye branch wears a vessel with
+     a whole lateen set over `lateen_tack_kn`, in the same words, and tacks her regardless where
+     there is no room to wear (`no_room_to_wear`), as `put_about_choice` does with the land to
+     leeward (JUDGEMENT: the officer's choice of how to come to a course, not an order to tack).
+   - **`tack ship` is never turned into a wear.** The player's, the model's and the director's tack
+     is a tack.
+   - **The rules captain keeps the ship's practice as filed** ("shift" in both), with three
+     judgements of their own from their book:
+     - in stays they leave the yards while the wind is under `lateen_leave_kn` (Stratico's "con
+       tempo bello"; JUDGEMENT, 12 kn);
+     - they shift them when a board on the bad hand has run `bad_hand_s` (JUDGEMENT, 30 minutes:
+       the order of §2.2a's crossover, the inventory's long boards avoided) or when the wind rises
+       over `lateen_leave_kn`;
+     - after the wind has come across the stern, they shift a lateen left on the mast as they dip a
+       lug.
+   - **The keys** sit under `thresholds:` with their sources (package 116's road), read with these
+     defaults where a book lacks them. Whether every book carries them, or only the corsair's and
+     the books the lateen hulls sail under, is the lead's (§14).
+7. **Taken aback, and the bad hand in a breeze** (A1d): §2.4.3.
+8. **The lateens' own evolutions** (A1a, unchanged). `set_lateen`, `take_in_lateen`,
+   `furl_lateen` and `reef_lateen` are sized by the ship's data or `too_few: all hands` (the
+   second draft's item 7). The heave-to is refused for a rig with neither head sail nor braced
+   yard, in the xebec's words (its A1 (7)).
+9. **The words** (A2, unchanged): "brace in the after yards" left out where she has no after
+   yards, and "braced up on the ... tack" where she has no braced yard.
+
+**What it moves:** nothing of the eighteen files. None carries a whole lateen; the 64's and the
+74's mizen courses are `cut_at_mast` and stay a ship's mizen. Every part is keyed on a whole
+lateen with `dipping` (A1a, A1b, A1d) or on a whole lateen set (A1c's reason and judgements).
+What moves by count:
+- the library's evolutions, by `change_lateen` (`tests/test_agents.py`);
+- the vocabulary's order lists: the clause, the practice's orders, `shift` for a lateen;
+- the primer's going-about chapter, which names the practice's new verb and its reading, so that
+  `tests/test_grammar_book.py`'s two primer tests pass again (item 3);
+- if the lead puts the three keys in every captain's book, those books' threshold counts wherever
+  a test counts them (to grep at the build).
+
+**No checkpoint name moves.** `lateen_practice` is a plain dict of strings, as `COURSE_PENDING`
+is, and the checkpoint's list (`freesail/core/checkpoint_names.py`, `ADMITTED`) holds the classes
+and functions a pickle's loading calls, not the keys of `ship.extra`. A `LateenChange`, if the
+builder makes a class of it, would become a name only when one of the game's own checkpoints held
+one in the middle of a change. No scenario of this card sails a lateen hull, so the census meets
+none.
+
+All of it is judgement, to be measured at the build as B3.3 was.
+
+### 2.4 What going about costs and risks under a lateen (the lead's item 3)
+
+From GA §5 where the sources speak; JUDGEMENT where they do not; the game's figures measured on
+the probes where they can be (§2.2a).
+
+#### 2.4.1 Her way and the wind she needs to stay
+
+- **The sources** give no figure for a lateen vessel (GA §5.1). A lateen lies at five points, a
+  square-rigger at six (Lescallier p. 380; Steel I p. 237). The mizen was added to lateen vessels
+  to bring them to the wind (Lescallier pp. 393-394). In general a ship misses stays for want of
+  way (Steel II p. 316), and in a violent wind and sea she wears (Falconer, VEERING; Röding,
+  WENDEN).
+- **The game** keeps the stays rule as it is for every rig: two knots to be put in stays; her way
+  gone at a quarter of her speed or a length a minute; 180 s hung. There is no figure of the
+  lateen's own (JUDGEMENT: none is sourced, and the tartane and xebec probes stay from 6 to
+  28 kn, the polacre's from 10, refused for want of way in 6: §2.2a). Two things are her own:
+  - her mizen eased as she pays off where she has no head sail (§2.3 item 5);
+  - `put her about`, and the course's judgement, wearing her over `lateen_tack_kn` (§2.3 item 6).
+- **Whether a hull tacks slower or less surely than her probe** is her file's to measure against
+  her truth. The tartane probe tacks faster than the cutter today (89 s against 106). GA §5.1's
+  judgement that the tartane is slower in stays than the xebec is not the probes'; her truth's band
+  is set on her file.
+
+#### 2.4.2 Missing stays
+
+- **The sources** speak in general only (Steel II, MISS STAYS; Stratico, RICUSARE DI VIRARE, then
+  worn; GA §5.2).
+- **The game** keeps the rule as it is. The yard's change is begun only once her head is through
+  the wind (§2.3 item 2), so a miss costs a lateen what it costs any vessel: the yard was never
+  moved and lies on the good hand for the old board. That is the settee's own case, pinned in
+  `tests/test_settee.py`: a miss before she is through leaves `settee_change` None. After a miss
+  `put her about` wears her within the hour (package 45).
+- **Hanging head to wind in a breeze**, her lateens are aback: §2.4.3.
+
+#### 2.4.3 Taken aback in a breeze: the sail, the yard and the mast
+
+- **The sources:**
+  - in a strong wind, lateens taken aback ("coëffées", making "chapelle") cost the masts or the
+    vessel, the canvas wrapping the mast so that the yard cannot be lowered (Forfait p. 119);
+  - the long weak yard is broken by the first squall in a storm (p. 120);
+  - the lateen is more liable to it than a lug (Fincham p. 59);
+  - the yard left on the mast is dangerous but in fine weather (Stratico, BISDOSSO);
+  - which goes first, and at what wind, none says (GA §5.3).
+- **Today** a lateen aback costs only her way (§2.2a).
+- **What the game does then** (A1d; JUDGEMENT throughout, the figures the lead's to rule and the
+  hulls' to measure):
+  - **The yard and the mast.** A whole lateen aback, by the sail's own aback reading for the
+    hull's `ABACK_SECONDS`, puts its force on its spar chain multiplied by `LATEEN_ABACK_LOAD`: the
+    yard bent across the mast at its parrel. The strain model does the rest, as for any spar: wear
+    above 1.0, the chance of carrying away above 1.5, certain at nought.
+    - The factor is set so that a great yard rated by the generator's rule for her lower spars
+      (the 55-kn design wind) begins to strain aback at about 28 knots and may carry away from
+      about 34. By the arithmetic that is about 3.9. The engine's load on a spar goes as the
+      wind's square, and the generator rates a lower yard at the sustained load the engine puts on
+      it in 55 kn (`tools/gen_ships.py`, the static peak times `SUSTAINED_FRACTION`, 0.85). So the
+      load reaches the rating at 55/√3.9, about 28 kn, and 1.5 times it at about 34. The probes'
+      aback loads equal their drawing loads (§2.2a), so the factor bears on the sustained load.
+      The winds are the target, not the factor: if her module rates the yard at another design
+      wind, the factor is set again for it.
+    - **The yard goes first** (Forfait p. 120's weak yard), since the mast carries its rating for
+      all its sails. The mast follows only in a gale, or once the yard is sprung. Each hull's file
+      is measured for it; if her mast goes first, the lead rules.
+    - Under about 28 knots the factor changes nothing on a yard so rated. The probes' scratch
+      ratings are not the generator's: their yards stood at 0.24 to 0.35 of them in 25 kn today,
+      and at 3.9 the stand-in tartane's main yard would strain from about 21 kn. That is why the
+      factor is set on each hull's own rating.
+  - **The sail.** `take in the mainsail`, begun while it is aback in a wind over `lateen_tack_kn`,
+    waits: "The mainsail is aback and wrapped round the mast; it will not come in till she pays
+    off." (Forfait p. 119). It goes on when she pays off. The cloth wears at the aback rate it has
+    today; nothing blows out that would not by the cloth's own rating.
+  - **The bad hand in a breeze.** The yard left on the mast bears on it. `LATEEN_BAD_HAND_LOAD` is
+    put on the same chain, smaller: about 1.5, so that a long board on the bad hand strains the yard
+    only in a strong gale, about 45 kn by the same arithmetic (55 × √(1/1.5)). It answers
+    Stratico's "otherwise it would be dangerous" and the inventory's "roughly used" (B). The other
+    way is none: the bad hand's cost its drawing alone. My lean is the factor, small.
+  - **Where it bites**: a lateen hanging in stays in a breeze, taken aback by a shift on a wind, or
+    her head brought too near the wind. Over 22 kn `put her about` wears her, and so does the
+    course's judgement for a course across the wind's eye (`judge_course`, §2.3 item 6). So only an
+    ordered tack, a lee shore or a squall puts her at it.
+
+#### 2.4.4 The hands and the time to change a yard of her length, in stays and in the wear
+
+- **The sources:**
+  - the xebec's labour is that of three square-rigged ships (Falconer, XEBEC);
+  - the change of a ship's whole mizen was "eine beschwerliche Arbeit" (Röding I col. 494);
+  - the column shrouds are cast off for it (Lescallier p. 378), and the yards worked round by the
+    parrels (Fincham p. 60);
+  - it is not for one man (the 2018 inventory, B);
+  - no count of hands and no seconds (GA §5.4).
+- **JUDGEMENT, for the lead.**
+  - **Time.** The settee's 120 s for a yard of 16 m in a manoeuvre gives **7½ seconds a metre of
+    yard**, by the crew's factor.
+    - The same in stays and in the wear: the lean. §2.2a shows the same seconds cost two to four
+      times the ground in stays, which is the period's reason to leave the yard there (Stratico),
+      without a second figure. The other way is half as long again in stays.
+    - At that rate on the hulls' own yards, with the hands they want: the tartane's 24.4-m main
+      183 s and 15.3-m mizen 115 s; the xebec's 30.0-m main 225 s, 27.0-m fore 202 s and 13.5-m
+      mizen 101 s; the polacre's fore of about 19 m 140 s and mizen of about 9½ m 70 s.
+    - By itself (`change_lateen`, standing on her course): the settee's dip's 180 s for 16 m, so
+      11¼ seconds a metre, the sail drawing nothing while it is shifted.
+  - **Hands.** One able hand for each 2½ metres of yard, at least four (the settee's six for
+    16 m), from the hands the tack or the wear has called; `too_few: all hands`.
+    - The tartane's main ten, her mizen six. She can put at most eight to her main: her six
+      seamen, the boy and the cook. Her master and mate are at the conn, since by ruling 11 a post
+      is never taken for all-hands work (`crew/hands.py`). So her main's change goes by the
+      party's numbers term, 10/8 of 183 s, about 230 s.
+    - The xebec's main twelve, fore eleven, mizen five.
+    - The polacre's fore eight, mizen four.
+
+    With hands for all, her yards are changed together (the xebec's 28 of her 75 seamen; the
+    polacre's twelve of the trader's fourteen hands). With too few, one after another, the main
+    first (the trader xebec's eighteen; the tartane's eight).
+
+#### 2.4.5 The polacre's square main with her lateens
+
+- **The sources:** the main "ever keeps the rigging of the polacre" (Steel I p. 236); nothing on
+  how her lateens are worked going about (GA §5.6).
+- **The game:**
+  - she tacks and wears as a brig of her size with her main, `TackScript` as it is: "mainsail
+    haul" for her main yards, then "let go and haul";
+  - her fore lateen is eased with the head sheets at helm's a-lee and drawn at "let go and haul";
+    her mizen is hauled aft at helm's a-lee (§2.3 item 5);
+  - both are changed after "let go and haul" by her practice, or left, by two parties together
+    (the forecastlemen at the fore, the afterguard at the mizen); in the wear, at "wind aft".
+- **Measured** (§2.2a):
+  - her tack: 164 s and 249 m today; 180 to 181 s and 291 to 306 m with both changed (90 to
+    140 s); 165 s and 275 m with both left, and 4 per cent off on the bad hand;
+  - her wear: 464 s and 602 m today; 599 to 649 m changed (90 to 140 s).
+- **Her probe stops dead in stays** (0.12 kn at 92 s) and is refused in 6 kn. Her helm and her
+  lever are her file's to measure (Pol-D §5).
 
 ---
 
@@ -776,11 +1228,16 @@ the owner as its questions 2 (item 37), 3 (going about), 6 (the sweeps) and 8 (t
    holding them together; truth 35's last clause and the frigate's six-points test re-measured old
    beside new, and the five records of no figure moved naming the booms; or (b) 1.25 kept as a
    stated JUDGEMENT; or (c) the studding curve lowered. Before any new file is generated.
-2. **`tack ship` on a lateen rig.** (a) Answered in her words and nothing done, naming the wear
-   (the tartane's design has "She does not stay under her lateen; wear her.", its decision 13),
-   with `put her about` choosing the wear and saying why; or (b) taken as a wear and said so. Which
-   rigs it reaches (a whole lateen on the main, as the tartane's design has it, or any whole lateen
-   bent) is the same decision's, the polacre's square main being the case that tells them apart.
+2. **Going about on a lateen rig: answered by the owner, 2026-11-18** (the decisions sheet's
+   question 3 and Part F). They re-opened the second draft's pick ("`tack ship` answered in her
+   words and nothing done, naming the wear"; or "taken as a wear") and gave their own shape: a
+   vessel with a lateen main tacks and wears as others do, each an ordered evolution, and the
+   change of the yard round the mast is preferred and not necessary. It is designed in §2.3 and
+   §2.4 and built as A1a to A1d (§14). No rig of the package is kept from the tack.
+
+(Questions 2, 6 and 8 of the decisions sheet, which carry items 1, 3 and 4 here, were agreed by
+the owner on 2026-11-18 as picked; items 5 and 6 stood in its Part E and are taken as
+recommended, no word having been given against them.)
 3. **The sweeps' men.** (a) Drawn from her company by an evolution, so many to a sweep by the
    sources, and not at the guns while they pull; or (b) the boat's model as it is.
 4. **A first rate's rank** in the captains' judgement: (a) a rank of her own above the 74s', or (b)
@@ -821,6 +1278,13 @@ the owner as its questions 2 (item 37), 3 (going about), 6 (the sweeps) and 8 (t
    docstring records for 13 November; and `tools/pace.py seventy-four` times a fight, not that
    world (§7).
 7. A ship file with `oars:` is taken for a ship's boat by every boat predicate (§5).
+8. **Third draft.** A rig with no head sail and her centre of effort aft (the xebec's own probe)
+   is called "Tacked" by the steady timeout while she lies 36° to 47° off the wind at about a knot,
+   in every wind from 6 to 28 kn (§2.2a): the tack ends without her having paid off. A1b's mizen
+   eased as she pays off answers it for a lateen rig; whether the tack's end should wait for her to
+   pay off, for any rig, is the lead's.
+9. **Third draft.** A lateen taken aback costs her way and nothing else: her yard's and her mast's
+   loads aback are no more than drawing (§2.2a). Forfait's danger is A1d's.
 
 ---
 
@@ -832,16 +1296,32 @@ the whole lateen's interfaces (the plan's §5.2). Each step is keyed on what no 
 carries except where its last column says what moves, each is merged alone and measured old beside
 new, and the files each may change are the plan's §7.1.
 
+**Third draft: A1 re-planned on the owner's answer to question 3** (§2.3, §2.4). The second
+draft's A1 was one step built to "worn, not tacked". It is now four, built and merged in order on
+the engine track before the tartane's file:
+- **A1a**: the side and the bad hand;
+- **A1b**: going about with the yard's change a part, and how it is ordered;
+- **A1c**: the rules captain;
+- **A1d**: taken aback and the bad hand in a breeze.
+
+The owner has said it is "a larger engine addition" and accepts it in the planning. What it adds
+to the cost and the card is the plan's (§11, §14). Each is keyed so that no committed file moves.
+Gone from the second draft: `Ship.wears_only()`, `tack ship` answered in words and nothing done,
+and the yard changed only at "wind aft".
+
 | Step | The design | Key | What it moves (measured at the ground report) | Here |
 |---|---|---|---|---|
-| **A0** | Item 37: the generator's `PEAK_COEFF` read from the engine's curves (`data/sail_classes.yaml`), rounded to two places as now; a test holding the two together; the sprit class gaining the engine's 1.20. Only under the owner's (a) | the generator | 74 `rating_kn` figures in 9 files (the studding-sail and ringtail booms, about 15 per cent up); truth 35's last clause and `test_studding`'s frigate at six points re-stated; five "no figure moved" records naming the booms; seven byte pins passing again by the regeneration; truths 9 and 14 hold | §1.3-§1.5 |
-| **A1** | **The whole lateen going about.** (1) Its side: `dipping` allowed on a whole lateen (class `lateen`, no `cut_at_mast`); `Sail.lug_side` kept for it; `against_the_mast` reads it, the loss the lug's two-thirds of the cloth (JUDGEMENT, the hulls' to measure). (2) The change: a new evolution `change_lateen`, the yard peaked up beside the mast by its halyard and ourses, its heel passed abaft the mast, the tack hooked on the new weather side and the sheet hauled aft to leeward, **never lowered**, its scripts on the settee's `SetteeChange` (B3.3), its hands by `too_few: all hands`, its time JUDGEMENT. (3) Going about, keyed on the main sail: `Ship.wears_only()` (a whole lateen as her main) answers `tack ship` in her words ("She does not stay under her lateen; wear her.") and does nothing; `put her about` chooses the wear and says why (package 45's road); the captains' books and the director meet the same; the wear changes each whole lateen at "wind aft". A square main (the polacre) tacks as a brig's, her aftermost whole lateen hauled aft at helm's a-lee (measured on her probe: 157 s against 164 s), the foremost eased with the head sheets and drawn at "let go and haul", both changed after. (4) The lateen mizen: hauled aft as she comes to, eased at "up helm", kept set hove to; `after_gaff_sails` never takes a whole lateen. (5) `shift the mainsail` and `shift the mizen` (`dip` its synonym for a lateen) for a lateen left on the bad hand, refused in words on the good, kept apart from the sail room's "shift ... for ...". (6) `set_lateen`, `take_in_lateen`, `furl_lateen` and `reef_lateen` sized by the ship's data or `too_few: all hands`. (7) The heave-to refused, for a rig with neither head sail nor braced yard, in the xebec's words ("She will not lie to under her lateens: there is no sail to bring her to."), her lying to booked | `dipping` on a whole lateen; `wears_only()` | nothing of the eighteen files (none carries a whole lateen; the 64's and the 74's mizen courses are `cut_at_mast`); the probes' tests as filed | §2.3 items 1-7 |
-| **A2** | The words of a rig with no yards, the cause's mend for every rig: the wear's "brace in the after yards" said only where she has after yards; the tack's "braced up on the ... tack" only where she has a braced yard | the rig as filed | the wear's first line and the tack's last line in the lugger's, the cutter's and the smack's recorded passages: words only | §2.3 item 8; §13 item 1 |
+| **A0** | Item 37: the generator's `PEAK_COEFF` read from the engine's curves (`data/sail_classes.yaml`), rounded to two places as now; a test holding the two together; the sprit class gaining the engine's 1.20. Under the owner's (a), agreed on 2026-11-18 | the generator | 74 `rating_kn` figures in 9 files (the studding-sail and ringtail booms, about 15 per cent up); truth 35's last clause and `test_studding`'s frigate at six points re-stated; five "no figure moved" records naming the booms; seven byte pins passing again by the regeneration; truths 9 and 14 hold | §1.3-§1.5 |
+| **A1a** | **The whole lateen's side and the bad hand.** `dipping` allowed on a whole lateen (class `lateen`, no `cut_at_mast`); `Sail.lug_side` kept for it, set on the lee side when it is set; `against_the_mast` reads it, the loss the lug's two-thirds (JUDGEMENT; measured on the probes, 4 to 17 per cent of her speed close-hauled: §2.2a). `shift the mainsail` (`shift the mizen`, `shift the lateens`; `change` and `dip` its synonyms for a lateen) by itself: refused on the good hand, held while a manoeuvre is in hand, kept apart from the sail room's "shift ... for ...", its evolution `change_lateen` (peaked, never lowered; 11¼ s a metre of yard; one able hand for each 2½ m of yard, at least four; `too_few: all hands`). The stern watch's line for a lateen left on the mast. `set_lateen`, `take_in_lateen`, `furl_lateen` and `reef_lateen` sized by the ship's data or `too_few: all hands`. The lateen mizen kept set hove to, `after_gaff_sails` never taking a whole lateen. The heave-to refused for a rig with neither head sail nor braced yard, in the xebec's words ("She will not lie to under her lateens: there is no sail to bring her to."), her lying to booked | `dipping` on a whole lateen | nothing of the eighteen files (none carries a whole lateen; the 64's and the 74's mizen courses are `cut_at_mast`); the library's count of evolutions by `change_lateen` (`tests/test_agents.py`); the vocabulary's lists by `shift` for a lateen; the probes' tests as filed | §2.3 items 1, 3 (the shift alone), 5 (hove to), 8 |
+| **A1b** | **Going about with the yard's change a part, and how it is ordered.** The tack and the wear, and their kin that may change a settee (the box-haul, the fill away), take the change as the settee's `SetteeChange` does, the yard peaked and not lowered (a `LateenChange`, or a flag on it: the builder's): in stays once her head is through the wind (after "let go and haul" where she has head yards), in the wear once the wind is aft; she is tacked or worn when it is done. Which yards are changed: by the order's clause ("and shift the lateens", "and leave the lateens", one named, "on the mast"), else by the ship's practice (`ship.extra["lateen_practice"]`: in stays and in wearing, each "shift" or "leave", **"shift" in both by default**), set by its own orders ("in stays, leave the lateens", "in wearing, shift the lateens", "in going about, ...") and shown in the readings; a standing order sets it as any order. A lateen left lies on the bad hand (A1a) and the log says so. The change's seconds 7½ a metre of yard by the crew's factor, the same in stays and in the wear (the lean; the other way half as long again in stays), in its own file, `tack.yaml`'s and `wear.yaml`'s timings untouched; its hands as A1a's, the yards changed together with hands for all, else the main first. The car passed abaft the mast (Willaumez) or forward (O'Scanlan): the lead's. Her words name the lateens (§2.3 item 4). The clause a new modifier kind in `orders/grammar.py` (`_parse_modifiers`), its words a table loaded by `orders/vocabulary.py`; the practice's orders a new verb, named with its reading in the primer's going-about chapter (`docs/primer/05-going-about.md`) for `tests/test_grammar_book.py`. The aftermost whole lateen hauled aft at helm's a-lee and **eased as she pays off where she has no head sail set** (measured: the bare xebec 192 m against 1,064), eased at "up helm" and hauled aft as she comes to in the wear; a foremost whole lateen before a square main eased with the head sheets at helm's a-lee and drawn at "let go and haul" (the polacre) | `dipping` on a whole lateen | nothing of the eighteen files: the settee's and the lugger's paths as they are, with their guard sets (`tests/test_settee.py`, `tests/test_lug.py`, truth 7b-111); the vocabulary's order lists (the clause, the practice's orders); the primer's going-about chapter naming the new verb and reading, `tests/test_grammar_book.py`'s two primer tests passing again; no checkpoint name (`lateen_practice` a plain dict of strings); `tests/test_catalogue.py` unmoved by construction | §2.3 items 2-5; §2.4.4, §2.4.5 |
+| **A1c** | **The rules captain and `put her about`.** `put_about_choice` (`orders/navigation.py:1132`) wears where a whole lateen is set and the wind is over `lateen_tack_kn` (22 kn, Forfait p. 119; JUDGEMENT on the figure), said ("a lateen is not put in stays in a strong wind"), the tack regardless with the land to leeward kept; the course's judgement (`judge_course`'s eye branch, the road of `steer`, `shape a course` and the captains' hourly leg) wears her in the same wind and words, and tacks her regardless where there is no room to wear; `tack ship` is never turned into a wear. The rules captain keeps the ship's practice, and from their book: in stays they leave the yards under `lateen_leave_kn` (12 kn, Stratico's fine weather) and shift them above it, or when a board on the bad hand has run `bad_hand_s` (1,800 s: the 2018 inventory, and §2.2a's crossover); in wearing they shift them; a lateen left on the mast after the wind has crossed the stern they shift, as they dip a lug (`Captain._across_the_stern`). The three keys under `thresholds:` with their sources, read with these defaults where a book lacks them | a whole lateen set | nothing of the eighteen files (none sets one); the captains' books' threshold counts if the keys go into every book (the lead's), to grep at the build; the captain's trials and `tests/test_captains.py` as a lens | §2.3 item 6 |
+| **A1d** | **Taken aback, and the bad hand in a breeze.** A whole lateen aback (its own aback reading, `ABACK_SECONDS`) loads its spar chain by `LATEEN_ABACK_LOAD`: about 3.9 on the engine's sustained load, so that a great yard rated at the lower spars' 55 kn strains aback from about 28 kn and may carry away from about 34; the yard first, the mast in a gale or once the yard is sprung, measured on each file. A lateen on the bad hand by `LATEEN_BAD_HAND_LOAD`, about 1.5, so that the yard strains only in a strong gale, about 45 kn (or none: the other way). `take in` begun on a lateen aback over `lateen_tack_kn` waits till she pays off, in its words (Forfait p. 119). The strain model, its wear and its chance as they are | a whole lateen with `dipping` | nothing of the eighteen files; `tests/test_strain.py` as it is; the hulls' gale and aback truths (Tar-D T-6 and T-9) | §2.4.3 |
+| **A2** | The words of a rig with no yards, the cause's mend for every rig: the wear's "brace in the after yards" said only where she has after yards; the tack's "braced up on the ... tack" only where she has a braced yard | the rig as filed | the wear's first line and the tack's last line in the lugger's, the cutter's and the smack's recorded passages: words only | §2.3 item 9; §13 item 1 |
 | **A3** | The helm's kind, for every tiller-steered hull: `helm: wheel` or `tiller` (default `wheel`); on a tiller the hit says the tiller or its ropes are shot away, the relieving tackles hook to the tiller as now, and `repair the wheel` is answered as the tiller's repair (a spare tiller shipped, or new tiller ropes rove), its time and hands JUDGEMENT for the lead | `helm: tiller` | the six files whose notes say tiller (the cutter, the lugger, the smack, the two schooners, the hermaphrodite brig), regenerated with the key; their words where a helm is shot away; truth 7-626 measured | §10 |
 | **A4** | The boat in tow: a boat's `towed: true`, manned from alongside and not hoisted out; its words; its drag left out as small beside the hull's at her speeds (JUDGEMENT, measured against the trawl's form) | a boat's `towed` | nothing (no file tows a boat) | §3 |
 | **A5** | A yard's level read from its place: `Ship.yard_level(yard)`, the rank by height of a braced yard among the braced yards on its own lower mast (0 the course), the yards under the bowsprit apart, read once a ship from the parts and held beside her as B3.4's memo is; read at the twelve places that read the parent's class today (`Design-Ship-Polacre.md` §5.1). A square yard over a whole lateen on the same mast with no braced yard below it (the tartane if her tréou is left out) counts the lateen yard as the level below (JUDGEMENT; the lead rules: Tar-D §5.1a). **Before the tartane's file**, the package's first pole main | the parts as filed | the smack: her topsail a topsail, not a course, in the heave-to, lie a-try and the take-in words with it set (no pinned passage sets it); a guard over every file's yard levels, old beside new, equal but for the smack | §4; Pol-D §5.1 |
 | **A6** | The pole mast's quick handing ("amener en paquet"): the upper square sails of a pole lowered together onto the yard below, furled and reefed from it, the men on the yard below (Falconer; Steel p. 236); the topmast evolutions refused in words; times JUDGEMENT for the lead | a lower mast carrying braced yards above its lowest, with no topmast (the smack's, the tartane's and the polacre's mains) | the smack's topsail taken in and furled so (measured) | §4; Pol-D §5.1 |
-| **A7** | Sweeps of a ship's own, never `oars:`: the `sweeps:` section (number, men each, a man's thrust and power, the tiring), package 82's law in the ship's substep, its state in `ship.extra["sweeps"]`; `out sweeps`, `in sweeps`, `give way`, `easy all`, `lie on your sweeps` where the hull has sweeps; an evolution manning `number × men_each` from the watch or all hands, the men taken from the sails and the guns while they pull; **the far body's pace in a calm** (`world/ships.py`'s `VESSEL_MIN_SPEED_KN`, l. 98, read at l. 849 and 865); the boat predicates kept a boat's | `sweeps:` | the library's count of evolutions; the vocabulary's order lists; the checkpoint's names list | §5 |
+| **A7** | Sweeps of a ship's own, never `oars:`: the `sweeps:` section (number, men each, a man's thrust and power, the tiring), package 82's law in the ship's substep, its state in `ship.extra["sweeps"]`; `out sweeps`, `in sweeps`, `give way`, `easy all`, `lie on your sweeps` where the hull has sweeps; an evolution manning `number × men_each` from the watch or all hands, the men taken from the sails and the guns while they pull; **the far body's pace in a calm** (`world/ships.py`'s `VESSEL_MIN_SPEED_KN`, l. 98, read at l. 849 and 865); the boat predicates kept a boat's | `sweeps:` | the library's count of evolutions; the vocabulary's order lists; the checkpoint's names list; the primer naming the sweeps' orders, for `tests/test_grammar_book.py` (an older gap, found at the third draft) | §5 |
 | **A8** | The lateen in a gale: the reduction shifts storm canvas set `in_place_of` a whole lateen (the xebec's small lateens, the tartane's bouffette) at the topsails' second reef (Luce p. 476's level), in place of reefing; a whole lateen in no "courses" group. **The lateen row tuned** once, before the xebec's merge, on the truths of the lateen hulls on the branch then (the polacre's re-measured old beside new when she lands); the lead's leftover 4 of 2026-11-07 (the second reef queued on a course already being reefed) if the lead gives it here | storm canvas `in_place_of` a whole lateen; the lateen row, which no committed sail reads | nothing committed; the lateen hulls' own figures; `PEAK_COEFF["lateen"]` follows the row by A0 (a) | Tar-D §5.4 item 6; Xeb-D §5 |
 | **A9** | Three decks: `_shut_crews` and `_rob_order` for a middle deck (`crew/quarters.py:418-435`, `:668-687`), the upper deck's crews robbed before the middle's; "the second deck" and "the third deck" in `orders/gunnery.py`; "the main deck" refused on a three-decker in words naming her decks; her words and rank are her rows (stage 0 and her builder) | a `middle` deck | nothing (no file has one) | §6.2-§6.3; Con-D §5.5, §6.3 |
 | **V1** | The whole lateen drawn: three corners on its yard slung at a third on the mast's raked line, on its lee side; peaked up its mast while it is changed; against its mast on the bad hand (`client/projection.js:815-816`, `904`, `1506`, `1537`) | as A1 | every committed file's picture unchanged | §11 |

@@ -1,4 +1,20 @@
-# Design: the polacre, a Mediterranean trader under lateens and a square pole main (package 90, second draft)
+# Design: the polacre, a Mediterranean trader under lateens and a square pole main (package 90, third draft)
+
+**Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
+`Decisions-Package90-2026-11.md` §3 and Part F; the lead's note of 2026-11-18, 04:30 UTC, nudge
+17). The owner agreed the sheet's other nine questions as picked, so this design's questions 1, 2
+and 4 stand as picked (§17.1). On going about they gave their own shape: a lateen vessel tacks and
+wears as others do, each an ordered evolution, and changing the yard round the mast is "preferred
+but not necessary". This draft re-drafts her going about, and nothing else:
+- the one sentence, decision 9 and §0;
+- §5.3's "What the engine must be given";
+- §12's A1 row and §13's lateen;
+- truth P5;
+- §15 to §17.
+
+It takes the engine note's third draft (`Design-Package90-Engine.md` §2.2a, §2.3, §2.4.5, §14:
+A1a to A1d) and the period's word on tacking under a lateen (`Research-LateenGoingAbout-2026-11.md`,
+**GA**).
 
 **Status: the second draft (2026-11-18)** of her design document, in the form of
 `Design-Ship-Bilander.md` and `Design-Ship-Bellerophon.md` (`Plan-ShipsWorkflow.md` §2, Phase 3).
@@ -57,8 +73,9 @@ raked forward, a course, topsail and topgallant on the pole main handed by lower
 lateen on the mizen, the jibs on a long bowsprit of one piece; the trader unarmed by default,
 with an armed trader's fit, and on the same hull the polacre of war, the Spanish navy's, with the
 regency's cruiser as a role; built only after the plan's A5 (a yard's level read from its place on
-the mast and not from its spar's class), A6 (the pole mast's quick handing), A1 (the whole lateen
-worked in stays and changed round its mast) and V1 (the whole lateen drawn), which package 90's
+the mast and not from its spar's class), A6 (the pole mast's quick handing), A1a to A1d (the whole
+lateen worked in stays and in the wear, changed round its mast or left) and V1 (the whole lateen
+drawn), which package 90's
 tartane and xebec share (the tartane A5 and A6 too, her topsail standing on her pole main's
 head).
 
@@ -76,7 +93,7 @@ head).
 | 6 | **Engine step A5: a yard's level read from its order on its lower mast, not from its spar's class**, one predicate read at the twelve places that read it now | observed: a pole main's topsail is a course to the heave-to, the lie a-try, the take-in words and the trim (§5.1) |
 | 7 | **Engine step A6: the pole mast's quick handing**, "amener en paquet": the upper square sails of a pole mast lowered together onto the lower yard, quicker than clewing up each on its cap; furled from the yard below | Lescallier p. 371; Röding; Falconer; Steel p. 236; O'Scanlan p. 482 (Pol §2.3) |
 | 8 | **Her lateen mizen is kept set hove to, and the heave-to's driver rule does not reach it** | observed: kept, she lies 58.5° off at 1.65 kn by truth 12's measure (1.49 kn of headway), just over its 1.6 kn, so her file's lever is to be measured (§5.2); taken in, she falls off past the beam and the heave-to fails (§5.2) |
-| 9 | **Engine step A1: a whole lateen worked in stays** (the mizen hauled out at helm's a-lee as a ship's mizen; the fore eased off as a head sail) **and changed round its mast** (the period's *muder*: the yard peaked up and its heel passed abaft the mast), with a lateen left unchanged lying against its mast | observed: nothing works a whole lateen in stays today (§5.3); Lescallier p. 378, Fincham p. 60, Willaumez MUDER (Pol §4) |
+| 9 | **Engine steps A1a to A1d: a whole lateen worked in stays and in the wear** (the mizen hauled out at helm's a-lee as a ship's mizen; the fore eased off as a head sail and drawn at "let go and haul") **and changed round its mast or left** (the period's *muder*: the yard peaked up and its car passed round the mast, abaft or forward by the lead's ruling), by the order's clause or her practice ("shift" in both by default); a lateen left lying against its mast on the bad hand until shifted. She tacks and wears as a brig of her size (the owner's answer to question 3) | observed: nothing works a whole lateen in stays today (§5.3); Lescallier p. 378, Fincham p. 60, Willaumez MUDER (Pol §4); the owner (Dec 3, Part F); GA §3.3 |
 | 10 | **B3.4's limits do not bite her**, nor the chebec's or the chambequín's: her main is her foremost mast with braced yards, pole or not; a square mizen topsail (question 1 (b)) would be filed on the pole mizen and class her square-rigged, never on a mizzen topmast | observed (§5.4) |
 | 11 | Fits: in the trader's file **`unarmed`** (default) and **`armed trader`** six long 6-pounders; in the polacre of war's **`spanish navy 1800`** (default) San Josef's fourteen brass guns and **`corsair`** fourteen small guns. Roles `merchant`, `privateer` (on the armed trader), `kings-ship` and `cruiser` (on the navy's), and a new **`corsair`** role for the regency's cruiser with a doctrine book of its own (`data/captains/corsair.yaml`, read from `thresholds:` as package 116 made the cruiser's: question 4) | James (Pol §6); the roles the files use today are nine, none a corsair's (observed); question 4 |
 | 12 | Company **sixteen** in the trader's file: master and mate (posts, working officers by ruling 11), boatswain, carpenter, cook, nine seamen, two boys; **seventy-one** in the polacre of war's (the *San Josef*'s 49 seamen and 22 soldiers), the corsair's 80 filed at 71 and recorded as a departure, as the xebec's regency fit's 150 is (Xeb-D §8.1); `names: spanish` (a new list, the plan's N1) | the trader's JUDGEMENT within twelve to twenty (Pol §5.3); James vol. 3 pp. 33, 160 (Pol §6); §7 |
@@ -108,16 +125,15 @@ head).
   owner after the session's report.
 - **Her files wait on four engine steps**, each its own small step with its own measure (§12):
   **A5** the yards' level (before the tartane's file, the package's first pole main, the smack
-  measured first: §15);
-  **A6** the pole mast's quick handing (after A5); **A1** the whole lateen in stays and its change
-  (shared with the tartane and the xebec; after the owner's answer to question 3); **V1** the
-  whole lateen drawn (the viewer's, with A1). Without A5 her main topsail is a course to six of
-  the engine's paths (§5.1); without A1 her lateens tack for nothing and never lie against their
-  masts (§5.3).
+  measured first: §15); **A6** the pole mast's quick handing (after A5); **A1a to A1d** the whole
+  lateen in stays and in the wear and its change, done or left (shared with the tartane and the
+  xebec; the owner's answer to question 3 given on 2026-11-18); **V1** the whole lateen drawn (the
+  viewer's, with A1a). Without A5 her main topsail is a course to six of the engine's paths (§5.1);
+  without A1a and A1b her lateens tack for nothing and never lie against their masts (§5.3).
 - **Her size waits on Winfield's rows** (Pol §11 items 1, 2 and 6). Until then the figures of §2
   are JUDGEMENT and her files are not written.
 - **Order within package 90** (the plan's §9.1, which keeps the lead's view): the tartane first,
-  the smallest and the reference vessel, after A1 to A6; the polacre second, after the tartane's
+  the smallest and the reference vessel, after A1a to A6; the polacre second, after the tartane's
   file; the xebec third, going ahead of her if her Winfield rows have not come when A6 lands.
 
 ---
@@ -453,7 +469,8 @@ hauled aft would). So the mizen worked as a ship's mizen helps her round a littl
 II p. 316, "haul the mizen out while you put the helm a-lee", read there: Ext §2), and the fore is
 to be eased as the head sheets are.
 
-**What the engine must be given (A1, decision 9)** (for the owner's question 3 and the lead):
+**What the engine must be given (A1a to A1d, decision 9)** (on the owner's answer to question 3,
+for the lead):
 1. **In stays**: a whole lateen on the aftermost lower mast abaft the masts with yards is hauled out
    at helm's a-lee (a `boom_sails` reading for it: Steel II p. 316; "brace the bowline quite to
    leeward", Bourdé p. 87 and Steel II p. 316, read there); a whole lateen on the foremost mast,
@@ -462,8 +479,12 @@ to be eased as the head sheets are.
    lines say "head sheets".
 2. **The change round the mast** (*trelucher, muder l'antenne*, Lescallier p. 378; Fincham p. 60;
    Willaumez MUDER): after "let go and haul" (or, wearing, once the wind is aft), each lateen's
-   runners cast off, its yard peaked up the mast, its heel passed round abaft the mast, the tack
-   hooked on the new weather side and the sheet hauled aft to leeward. On the settee's machinery
+   runners cast off, its yard peaked up the mast, its heel passed round the mast (abaft by
+   Willaumez, forward by O'Scanlan's CIMAR: GA §3.3, the lead's), the tack hooked on the new
+   weather side and the sheet hauled aft to leeward; **or left**, by the order's clause ("and
+   leave the lateens") or her practice. The fore by the forecastlemen and the mizen by the
+   afterguard, together (JUDGEMENT; Eng §2.4.4: her fore's 19-m yard about 140 s and eight hands,
+   her mizen's 9½-m about 70 s and four). On the settee's machinery
    (`SetteeChange`, `scripts.py:394`) with the yard **peaked, not lowered** (Bil §1.5's way (b));
    the hands by the settee's road, `too_few: all hands` where her watch is short (package 75's
    ruling of 2026-11-10). Times JUDGEMENT, to be measured against the settee's.
@@ -471,19 +492,33 @@ to be eased as the head sheets are.
    yard is on the weather side of its mast (a `yard_side` beside `lug_side`), at the lug's area
    factor, so that the change has a reason in the physics (Willaumez MUDER: the sail pressed on
    the mast).
-4. **"Worn, not tacked"** (the brief): if the owner rules question 3 (b), "tack ship" is refused in
-   her words and every going about is a wear with the lateens changed when the wind is aft. If
-   (a), she tacks as above.
+4. **Going about** (the owner's answer to question 3, 2026-11-18): she tacks and wears as a brig of
+   her size, her two lateens changed in either by her practice ("shift" in both by default) or left
+   by the order's clause, as above. `put her about` wears her over 22 knots, and so does a course
+   ordered across the wind's eye, as for any vessel with a whole lateen set (Eng §2.3 item 6).
+   **Plainly:** the second draft's other way, "worn, not tacked", came from the brief and not from
+   a source (GA §4), and is dropped.
 
-The package's engine note (`Design-Package90-Engine.md` §2.3) builds the change as a dip, with
-`dipping: true` allowed on the lateen class and the yard peaked and passed round, not lowered: the
-same act as item 2 here, by the lug's key where this draft names the settee's machinery. One of
-the two is built once for the tartane, the polacre and the xebec; the engine note's key is the
-smaller change to the schema, the settee's machinery the nearer in its handling of a yard slung on
-a mast that carries other yards (the bilander's main). **The plan settles the proposal** (Plan §4
-row 3): `dipping` allowed on a whole lateen for its side and its loss against the mast, and a new
-`change_lateen` evolution, peaked up and passed round, never lowered, its scripts on the settee's
-B3.3 model. The lead rules it at A1's design.
+   **Measured** on her probe, 15 knots, the first quarter-hour (Eng §2.2a):
+   - her tack: 164 s and 249 m lost to windward today; 180 to 181 s and 291 to 306 m with both
+     lateens changed (90 to 140 s); 165 s and 275 m with both left, and 4 per cent off her speed
+     on the bad hand after;
+   - her wear: 464 s and 602 m today; 599 to 649 m changed (90 to 140 s).
+
+   Her square main carries her through her tack, so her lateens' change costs her little. Leaving
+   them pays on a board shorter than about 25 minutes (Eng §2.2a). Her probe stops dead in stays
+   (0.12 kn at 92 s) and is refused in 6 knots, for her helm and lever to answer on her file.
+
+The package's engine note (`Design-Package90-Engine.md` §2.3, its third draft) builds the change
+with `dipping: true` allowed on the lateen class for the side, and in the tack and the wear on the
+settee's `SetteeChange`, the yard peaked and passed round, not lowered. So the second draft's two
+readings meet: the lug's key for the side, the smaller change to the schema, and the settee's
+machinery for the act, the nearer in its handling of a yard slung on a mast that carries other
+yards (the bilander's main). **The plan settles the proposal** (Plan §4 row 3): `dipping` allowed
+on a whole lateen for its side and its loss against the mast; the change in the tack and the wear
+on the settee's machinery; and a new `change_lateen` evolution for the change by itself, peaked up
+and passed round, never lowered, its scripts on the settee's B3.3 model. The lead rules it at A1's
+design.
 
 ### 5.4 (d) The schooner's-mast rule's two limits, for the file that first carries a pole main
 
@@ -720,7 +755,7 @@ with oil, the wind ahead." (JUDGEMENT; the scenario's own package writes it).
 |---|---|---|---|
 | **A5**, the yards' level | `Ship.yard_level(yard)` read at the twelve places of §5.1 | `ship/graph.py`, `evolutions/scripts.py`, `evolutions/trim.py`, `orders/verbs.py`, `physics/sails.py` | a guard over every file of `data/ships/`: every yard's level old beside new, equal but for the smack's topsail; the golden classing table unmoved; the smack's heave-to and lie a-try measured old beside new with her topsail set |
 | **A6**, the pole mast's handing | a pole mast's upper sails lowered "en paquet" onto the lower yard; the furl and reef from the yard below | the take-in and furl evolutions' data and scripts | no committed file has a pole mast with two yards above its lowest but the smack (whose two yards are a square sail and a topsail: she would gain the quick handing of her topsail; measured) |
-| **A1**, the whole lateen in stays | §5.3's items 1 to 3; item 4 on the owner's word | `evolutions/scripts.py` (the tack, the wear, a lateen change on the settee's machinery), `physics/sails.py` (`against_the_mast`), new evolution data | no committed file has a whole lateen (the 64's and the 74's mizen courses are `cut_at_mast`: read); the tartane's file is the first to meet it |
+| **A1a to A1d**, the whole lateen in stays and in the wear | §5.3's items 1 to 4 (item 4 on the owner's answer to question 3) | `evolutions/scripts.py` (the tack, the wear, a lateen change on the settee's machinery), `physics/sails.py` (`against_the_mast`), new evolution data; for the rules captain and the strain, `orders/navigation.py`, `world/captains.py` and `physics/strain.py` (Eng §14) | no committed file has a whole lateen (the 64's and the 74's mizen courses are `cut_at_mast`: read); the tartane's file is the first to meet it |
 | **V1**, the whole lateen drawn | §13 | `client/projection.js` | the drawn pictures of every committed file unchanged |
 | Her rows | §9's registries | `world/captains.py`, `world/lookout.py`, `world/ships.py` | no text of the game says "polacre" now |
 | Her names | `spanish` in `data/crew/names.yaml` | data | the three lists unchanged |
@@ -728,7 +763,7 @@ with oil, the wind ahead." (JUDGEMENT; the scenario's own package writes it).
 
 **The allotment** (the plan's §6 and §9.1): A5 is general (any pole mast) and small, and A6 is
 any pole mast's; both come before the tartane's file, whose topsail stands on her pole main's head
-(the critic's F3). A1 and V1 are the lateen class's, built on the engine track before the
+(the critic's F3). A1a to A1d and V1 are the lateen class's, built on the engine track before the
 tartane's file, the first whole lateen.
 
 ---
@@ -746,7 +781,7 @@ tartane's file, the first whole lateen.
   that builds a whole lateen draws it as its own" (l. 815-816). Wanted: a three-cornered sail from
   the yard's lower end to its peak with the clew aft, its yard slung at a third on its mast's raked
   line, on its lee side; drawn peaked up its mast while it is changed; against its mast when not
-  changed (A1 item 3).
+  changed (A1a; §5.3 item 3).
 - **The square sails lowered "en paquet"**: the topsail and topgallant yards drawn down on the
   lower yard while their sails are lowered (A6).
 - **The long bowsprit of one piece**, its jibs; the beak; her ports and guns by package 81's rule
@@ -773,8 +808,10 @@ tartane's file, the first whole lateen.
   makes her fall off (observed: the heave-to fails at 600 s).
 - **P4, "amener en paquet"**: her main topsail and topgallant handed together onto the lower yard
   in less time than the merchant brig takes in both (Lescallier p. 371): after A6.
-- **P5, going about costs her the lateens' change**: her tack (or wear, by question 3) against the
-  merchant brig's, the change's time and hands said in the log (Lescallier p. 378): after A1.
+- **P5, going about costs her the lateens' change**: her tack and her wear, with her lateens
+  changed and with them left, against the merchant brig's; the change's time and hands said in
+  the log; left, each lies on the bad hand and draws less (Lescallier p. 378; the owner's answer to
+  question 3): after A1a to A1d.
 - **P6, a pole mast lost is a whole mast lost** (Lescallier p. 372): her main carried away takes
   every yard with it, and no topmast is to be fidded (by reading `strain.py`; to be run at her
   build).
@@ -787,7 +824,8 @@ tartane's file, the first whole lateen.
   hauled up as a course); every other file's levels equal (to be proved). The smack's pinned
   passages do not set her topsail in plain sail (her plain sail is the mainsail, foresail and jib:
   observed), so none is expected to move.
-- **A1**: no committed file (no whole lateen); the tartane's and the xebec's own.
+- **A1a to A1d**: no committed file (no whole lateen); the tartane's and the xebec's own; the
+  library's and the vocabulary's counts (the plan's §10.4).
 - **Her rows**: none (no text says "polacre").
 
 ---
@@ -799,8 +837,9 @@ tartane's file, the first whole lateen.
 2. **The lateen curve is untuned**, so her windward work is the class curve's (§5.5). *Mitigation:*
    tuned once at A8 on the lateen hulls on the branch at the time, against Lescallier's five points
    (the plan's §4 row 7); P2 here, re-measured old beside new when she lands.
-3. **A1 is the largest engine step** (the lateen's change on the settee's machinery, peaked not
-   lowered; the physics of a lateen against its mast). *Mitigation:* built once for the three
+3. **A1a to A1d are the largest engine work** (the lateen's change on the settee's machinery,
+   peaked not lowered, in stays and in the wear; the physics of a lateen against its mast; the rules
+   captain's choice; the strain aback). *Mitigation:* built once for the three
    lateen hulls; the bilander's settee change is its model and its tests the guard.
 4. **A pole mast's strain**: it decays at a lower mast's half ratio though it carries the upper
    sails (`strain.py:247`). *Mitigation:* measured on her file at the build; the owner's word if it
@@ -826,11 +865,10 @@ tartane's file, the first whole lateen.
 2. **Her hull and size.** (a) **A Mediterranean merchant hull of about 200 tons with a beak, its
    size from a Spanish polacra in Winfield once you send the rows** (my pick). (b) The xebec-like
    hull of O'Scanlan's 1831 polacra, from the xebec's draught.
-3. **Going about.** (a) **She tacks and wears as a brig of her size, her two lateen yards changed
-   round their masts in both** (my pick, JUDGEMENT: no source read says she could not, and her
-   square main tacks as a brig's; Willaumez's text describes a square-rigged polacre, with no
-   lateens, tacking, and the plate was not viewed). (b) The brief's "worn, not tacked": she wears
-   only.
+3. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own shape,
+   which takes the pick and widens it: she tacks and wears as a brig of her size, her two lateen
+   yards changed round their masts in either, or left on the bad hand until shifted, the change
+   "preferred but not necessary". The other way, (b) the brief's "worn, not tacked", is dropped.
 4. **Her fits and roles.** (a) **Two files of one hull: the trader's, unarmed (the default) and
    the armed trader, sixteen men; the polacre of war's, the Spanish navy's (San Josef's fourteen
    brass guns and her 71) and the regency's cruiser as a role on the corsair's fourteen small guns,
@@ -852,8 +890,9 @@ sheer). (Pol §11.)
    heave-to measured old beside new with her topsail set (§5.1, §15); and the second file's name,
    `polacre-of-war.yaml`, with the plan's other file names (Plan §13.1 item 5).
 2. A6's times (no period figure found): the builder's proposal, the lead's ruling.
-3. A1's design (the plan's proposal, §5.3 above); and whether a lateen left unchanged lies
-   against its mast (A1 item 3) at the lug's area factor.
+3. A1's design (A1a to A1d: the plan's proposal, §5.3 above); whether a lateen left unchanged
+   lies against its mast (§5.3 item 3) at the lug's area factor (measured: 4 per cent of her
+   probe's speed, Eng §2.2a); the side the car passes; her two parties' seconds and hands.
 4. Her ports: pierced for the corsair's seven a side on one hull for every fit (§6.2 item 2), or
    the trader's hull plain and the armed fits' ports her fits' own.
 5. Brass guns' weights for the navy's fit (§6.1): a source to read before her file.

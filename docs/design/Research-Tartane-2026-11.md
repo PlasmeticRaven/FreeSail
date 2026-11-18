@@ -1,5 +1,16 @@
 # Research note: the Mediterranean tartane, her lateen and her square topsail (November 2026)
 
+**Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
+`Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
+- the "In short" line on it;
+- §4.2, going about;
+- truth candidate 2;
+- §9's row on tacking;
+- §11's question 2.
+
+It now reads with the period's word on tacking under a lateen, gathered since in
+`Research-LateenGoingAbout-2026-11.md` (**GA**). Nothing else is changed.
+
 Package 90's preliminary research for its first and smallest hull (the lead's note of
 2026-11-18, 00:50 UTC, nudge 15, `docs/dev/M7-WorkPackages.md`: research and planning only,
 documents alone). The tartane is decision 11's third reference vessel (`docs/DesignProposal.md`
@@ -72,15 +83,23 @@ memory, unverified).
 - **The Spanish navy kept seven tartanas**, mostly bought or chartered from French builders; they
   served now and then as coastguard and look-out vessels; the rig is Monleón's (Winfield pp. 1249
   to 1252, the lead's words). Their names, sizes, guns and men are the passages to ask for.
-- **The handling is the lateen's, and the tartane is worn, not tacked.** The period texts give the
-  yard changed from side to side in going about by easing the column shrouds (Lescallier p. 378,
-  *trelucher* or *muder l'antenne*), and warn that a lateen taken aback is the loss of the mast or
-  the vessel (Forfait p. 119). The modern record of Provençal practice (a 2018 heritage inventory
-  citing Vence 1897, small craft) has the lateen boat wear when the weather allows, the yard brought
-  up beside the mast and yard and sail passed round to the other side, and avoid long boards on the
-  wrong hand, where the sail lies pressed against the mast. This agrees with the lead's "worn, not
-  tacked; the yard dipped round the mast"; that a 100-tonneau tartane of 1800 did the same is
-  judgement.
+- **The handling is the lateen's: she goes about either way, her yard changed round the mast or
+  left.**
+  - **The period texts** give the yard changed from side to side "pour virer de bord", going about
+    either way, by easing the column shrouds (Lescallier p. 378, *trelucher* or *muder
+    l'antenne*). They warn that a lateen taken aback in a strong wind is the loss of the mast or
+    the vessel (Forfait p. 119). They name the board sailed with the yard left on the mast
+    (Stratico 1813, whose figure for it is a tartane; O'Scanlan 1831: GA §2.2).
+  - **The modern record** of Provençal practice (a 2018 heritage inventory citing Vence 1897, small
+    craft) has the lateen boat change her yard by a wear "when the weather allows", the yard
+    brought up beside the mast and yard and sail passed round to the other side. It has her avoid
+    long boards on the wrong hand, where the sail lies pressed against the mast. It does not say
+    she could not tack.
+  - **No source read says a lateen vessel could not tack** (GA §4). The owner's answer to question
+    3 (2026-11-18) has her tack and wear as other vessels do, the yard's change preferred and not
+    necessary: their knowledge, said as JUDGEMENT. **Plainly:** the first two drafts' "worn, not
+    tacked" was the brief's, read here as agreeing with the inventory; the inventory does not
+    say it.
 - **The engine today, run on the lead's `tartane_probe`:** she classes as the cutter; she *tacks*
   in 89 s with nothing done to either lateen (no dip, no side, no cost); she wears in 487 s with the
   yards never shifted; hove to she lies 54° off at 3.1 knots with both lateens drawing; `dip the
@@ -370,14 +389,14 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   craft's lateens unbent in a bad sea and a forced wind and two square sails of half the area set
   in their place (read, OCR).
 
-### 4.2 Going about: worn, not tacked
+### 4.2 Going about: tacked and worn, the yard changed or left (third draft)
 
 - **The yard changed.** Lescallier p. 378 (read, OCR): the column shrouds are cast off "when the
   sail is to be changed to the other side in going about", called *trelucher* or *muder l'antenne*.
   "Virer de bord" covers tacking and wearing both; which is meant is not said. Röding vol. I col. 655
   (read, OCR): *changer, muder, trelucher* are the French of a fore-and-aft sail gybing; the
   Spanish *tomar por la pena*, "to take it by the peak".
-- **The danger of tacking.** Forfait p. 119 (read, OCR): when lateen sails are taken aback
+- **The danger of being taken aback.** Forfait p. 119 (read, OCR): when lateen sails are taken aback
   ("coiffées", "font chapelle") in a strong wind the mast or the vessel is lost, the canvas wrapping
   the mast so that the yard cannot be lowered; and (p. 120) the yard, very long and weak, would
   infallibly be broken by the first squall if she had to hold the wind in a storm to claw off a lee
@@ -393,15 +412,35 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   forward of the mast; the sail set on the new side, the parrel hauled taut, she luffs up on the
   good hand. Running on the bad hand the sail may shift of itself (*la trélouche*); better to shift it
   first. The search's summary of the same source, that tartanes could not stay and so wore, is the
-  search tool's gloss and is not counted.
+  search tool's gloss and is not counted. The sheet itself never says a lateen boat cannot tack;
+  its "when the weather allows" implies times she did not wear to change the yard (GA §2.4, §3.2).
+- **The yard left, and the tack** (third draft; GA §2.2, §3.1):
+  - Stratico 1813 (BISDOSSO) has a lateen vessel close-hauled go about "prontamente" with the yard
+    left on the mast, so as not to have to change it. Only in a vessel of one sail and in fine
+    weather, "altrimenti, sarebbe pericoloso". Its figure is a tartane.
+  - O'Scanlan 1831 (VELA) has lateen vessels hold the new board without changing the yard.
+  - Romme 1792 and Willaumez 1831 name that board, *à bidot*, *bido*.
+  - James has two settees and an armed xebec "tacked" in British officers' accounts (B).
 - **Wearing in general**: Forfait p. 127 on the galley before the wind, her two lateens goose-winged
   (*en ciseaux*; the Levant's *oreilles de lièvre*, Lescallier p. 395), half the area of other rigs
   on the same course (read, OCR).
-- **What is known** (rung A): the yard is shifted at going about; a lateen taken aback is a grave
-  danger; she lies better on one hand than the other. **What is reported** (rung B, late, small
-  craft): she wore, and the yard was stood up beside the mast and passed round while she ran off.
-  **What is judgement**: that a 100-tonneau tartane of 1800 did the same with her 24-metre yard,
-  with more hands and the ourses and halyard instead of a man's arms.
+- **What is known** (rung A):
+  - the yard is shifted at going about, either way;
+  - the yard may be left and the new board sailed on the mast, a prompt going about in fine weather;
+  - a lateen taken aback in a strong wind is a grave danger;
+  - she lies better on one hand than the other.
+- **What is reported** (rung B, late, small craft): when the weather allowed she changed her yard
+  by a wear, the yard stood up beside the mast and passed round while she ran off, and she kept
+  her boards on the bad hand short.
+- **What is judgement:**
+  - that a 100-tonneau tartane of 1800 changed her 24-metre yard in the same way, with more hands
+    and the ourses and halyard instead of a man's arms;
+  - by the owner's answer to question 3, that she tacked and wore as other vessels did, her yard
+    changed in stays or in the wear, or left.
+
+  How her design builds it, and what each choice costs her in the game, is
+  `Design-Ship-Tartane.md` §5.4 items 2 to 5 and 11 (measured on her probe:
+  `Design-Package90-Engine.md` §2.2a).
 
 ### 4.3 How tartanes sailed
 
@@ -422,8 +461,11 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
 **Truth candidates** (handling rules, for her design's §13):
 1. Close-hauled she lies about a point nearer the wind than a brig, at about five points (Lescallier
    p. 380; Steel I p. 237).
-2. She does not stay under her lateen: going about, she wears and shifts her yards (Lescallier
-   p. 378; Forfait p. 119; PCI 2018).
+2. She tacks and wears; going about, her yards are shifted round their masts in stays or in the
+   wear, or left on the bad hand (Lescallier p. 378, the change "pour virer de bord"; Stratico,
+   BISDOSSO, and O'Scanlan, VELA, the yard left; the owner's answer to question 3). **Plainly:**
+   the second draft's "she does not stay under her lateen" is said by none of the three sources it
+   cited (GA §6), and is dropped.
 3. On the bad hand her lateen, pressed against the mast, draws less than on the good (PCI 2018; the
    lug's rule in the game, a third off).
 4. Before the wind with the tréou set she runs better than under the lateen alone, and the lateen
@@ -518,7 +560,7 @@ braced sharp up, trimmed every two minutes, settled 2,400 s), the cutter as file
 | The headsails | Lescallier, Steel, Röding: one. Forfait's ocean rig: two or three. The README and the Spanish note: two in the watercolour; this note: one seen | By judgement, as decision 11 leaves it: one great jib (Tar-D decision 11); the README's two recorded |
 | Bowsprit or beak | Steel, Falconer: a bowsprit. Lescallier, Forfait: none, an éperon with a berthelot | The berthelot over an éperon (rung A from two French constructors and riggers; the English words loose) |
 | The mast's rake | Decision 11: "one raking mast". No text gives the main's rake; the watercolour's main near upright, its mizen raked aft | The owner's: their word beside their picture (§11 question 3; Tar-D §16.1 question 3) |
-| Tacking | Lescallier: the yard changed "pour virer de bord" (either way). Forfait: lateens taken aback are mortal. PCI 2018: worn, the yard passed round | Worn, not tacked (the lead's; §4.2) |
+| Tacking | Lescallier: the yard changed "pour virer de bord" (either way). Forfait: lateens taken aback in a strong wind are mortal. PCI 2018: the yard changed by a wear when the weather allows. Stratico, O'Scanlan: the new board held with the yard left (GA) | Tacked and worn, the yard changed or left: the owner's answer to question 3 (2026-11-18); no source says she could not tack (§4.2) |
 | The engine's probe and her | The probe's yard 16 m, the *Humble*'s 24.4 m; the probe's lateen 120 m² on a 106-t cutter's hull | The probe classes her and was never meant to sail her; her design takes the *Humble* |
 | Chapman's proportions and Forfait's | 3.54 breadths against 2.88 and 3.09 | War against trade (JUDGEMENT); the lines scaled by principle 7 |
 | Project files to correct (for the lead; this note writes nothing else) | `docs/references/images/README.md`: "two headsails" is one reading, not settled (above); `VesselReferences-2026-10.md` §0 lists Lescallier's tartane at pp. 394 to 401, the article itself is pp. 400 to 401; its §3.1 "the rule the brief names ... was not found" is now answered by §4.2 here for the lateen (the tack's yard changed) | — |
@@ -563,11 +605,11 @@ tackle; her boat's size (the watercolour's boat, for the eye only).
    masts and yards from Forfait's Table II without the topgallant, Chapman's lines scaled to her.
    Or the *Espiègle*'s 75 tonneaux with a mizen added (Forfait says a tartane of her size has none),
    or Chapman's war tartane at her own scale.
-2. **Going about.** *The pick*: worn, not tacked, as the lead gives it: `tack ship` answered in words
-   ("she does not stay under her lateen; wear her"), and the wear shifting each lateen to the new
-   lee side, the yard stood up by the mast and its car passed round, never lowered (*muder*). Or
-   tacked, the lateens left on the bad hand against the mast until she is worn or the sail is
-   shifted by its own order.
+2. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own shape: she
+   tacks and wears as other vessels do, her yards shifted round their masts in stays or in the wear
+   (the yard stood up by the mast and its car passed round, never lowered: *muder*), or left on
+   the bad hand until shifted; the change preferred and not necessary. The pick ("worn, not
+   tacked") came from the brief and is dropped.
 3. **Her main's rake.** *The pick*: 3° forward, provisional, so that "raking" holds and the
    watercolour's near-upright main still looks right; or upright; or raked further. (The headsails
    are judgement by decision 11 itself: one great jib to the berthelot's end, Lescallier, Steel,

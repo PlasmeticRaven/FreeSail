@@ -1,5 +1,14 @@
 # Research note: the xebec for package 90 (November 2026)
 
+**Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
+`Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
+- what binds, on the lateen's handling;
+- §3.4, going about;
+- §10's row on going about.
+
+It now reads with the period's word on tacking under a lateen, gathered since in
+`Research-LateenGoingAbout-2026-11.md` (**GA**). Nothing else is changed.
+
 Package 90's preliminary work (the lead's note of 2026-11-18, 00:50 UTC, nudge 15: research and
 planning only, documents alone). This is the research note for the third of the package's five
 hulls, **the xebec**: a lateen on all three masts, her sweeps a fit, the 14 and the 30 the two
@@ -14,7 +23,9 @@ B3.4's rule (§9 item 9; F15), and the units of Forfait's and Willaumez's figure
 
 **What binds, and is not reopened here.** Build-Ships.md §5.0's principles and its ladder of
 evidence; the lateen handling package 75's B3.1 gives as the brief reads it (worn, not tacked; the
-yard dipped round the mast); B3.4's schooner's-mast rule and its two classing limits
+yard dipped round the mast), **replaced for this package by the owner's answer to question 3**
+(2026-11-18: tacked and worn as other vessels are, the yard's change preferred and not
+necessary; §3.4); B3.4's schooner's-mast rule and its two classing limits
 (`Design-ShipsEngineExtensions.md`; the lead's ruling of 2026-11-06); the regency's cruisers as a
 role with their doctrine on package 116's road (a captain's doctrine read from `thresholds:`); the
 harbour's shelves (package 96); the wheel shot away and `repair the wheel` (package 116); package
@@ -330,7 +341,7 @@ Every figure here is to be read on the page image before it is a game constant (
   penne raised by lowering the heel with its ourses lifts part of the sail into the air that moves
   aloft (Forfait p. 120) (read (OCR)).
 
-### 3.4 Going about (A, with the brief's rule)
+### 3.4 Going about (A, and the owner's answer to question 3)
 
 - **What the sources say**: the column shrouds are cast off "lorsqu'on veut changer la voile de
   côté pour virer de bord; ce qu'on appelle trelucher, ou muder l'antenne" (Lescallier p. 378);
@@ -340,9 +351,23 @@ Every figure here is to be read on the page image before it is a game constant (
   stands the Levant's lateen yard up in the mast's axis to pass the heel abaft
   (`Research-Bilander-2026-10.md` §1.5, way (b)) (read (OCR)). *Virer de bord* is going about either
   way, tacking or wearing; none of these says which the xebec did.
-- **The brief's rule** for the package: the lateen worn, not tacked; the yard dipped round the
-  mast. No text read here says a xebec tacked; none says she never did. The rule is taken as
-  given; its truth says what the sources say and no more (Design §15).
+- **The brief's rule, replaced.** The package's brief had the lateen worn, not tacked, the yard
+  dipped round the mast. No text read here says a xebec tacked; none says she never did. The rule
+  came from the brief, not a source (GA §4).
+- **What has been read since** (third draft; GA §2.2, §2.3, §3.1):
+  - Stratico 1813 (BISDOSSO): a lateen vessel close-hauled goes about promptly with the yard left
+    on the mast, only in a vessel of one sail and in fine weather.
+  - O'Scanlan 1831 (VELA): lateen vessels hold the new board with the yard unchanged.
+  - James V p. 253 (1811, B): an armed French xebec, the *Guêpe*, "tacked" with a brig. Her rig is
+    not stated, and the officer's letter was not read.
+  - Steel I p. 237: the mizen "lately added, to keep them better to the wind".
+  - Falconer, XEBEC: her crew's labour "at least" that of three square-rigged ships.
+- **The owner's answer** (2026-11-18): she tacks and wears as other vessels do, each an ordered
+  evolution, the change of the yard round the mast preferred and not necessary: the owner's
+  knowledge, said as JUDGEMENT. How her design builds it (her mizen eased as she pays off, since
+  she carries no head sail; her three yards changed together or in turn) is
+  `Design-Ship-Xebec.md` decision 8 and §5, measured on her probe in
+  `Design-Package90-Engine.md` §2.2a.
 - **On one side.** A lateen whose yard is not changed lies against its mast on one board (the
   settee's way (c), `Research-Bilander-2026-10.md` §1.5); Fincham p. 59 has the lateen "more liable
   to be taken aback than the common lug" by the wind.
@@ -557,7 +582,7 @@ JUDGEMENT). It is a probe of the engine's paths, not of her speed.
 |---|---|---|
 | Her proportions | length over breadth 3.2 (*Minorca*), 3.75 to 3.9 (Willaumez, Forfait), 5.2 (Chapman); Falconer's "great breadth" against Röding's "lang und schmal" | *Minorca*'s for the small class, the only plan at hand (judgement); Chapman's plate to be read |
 | Square sails: when | before the wind (Falconer, Fincham, Steel, Forfait); in too strong a wind as well (Lescallier p. 398, Röding, Fincham p. 59) | both: the square sails for running, the small lateens in a gale by the wind (judgement) |
-| Going about | the yard changed round the mast "pour virer de bord" (Lescallier; Steel; Fincham), which says neither tacking nor wearing; the brief's rule, worn not tacked | the brief's rule (it binds), its truth limited to what the sources say |
+| Going about | the yard changed round the mast "pour virer de bord" (Lescallier; Steel; Fincham), which says neither tacking nor wearing; the yard left and the new board held (Stratico; O'Scanlan: GA); an armed xebec "tacked" (James V p. 253, B); the brief's rule, worn not tacked | tacked and worn, the yard changed or left: the owner's answer to question 3 (2026-11-18); the brief's rule replaced (§3.4) |
 | The *Gamo*'s guns | the Regulation's 30: 8-pounders (Winfield); James: twenty-two long 12s | a fit by date, not the Regulation's (judgement); Winfield's entry for her asked for |
 | The *África*'s swivels | the Regulation's twenty 2-pounder pedreros; James: four brass 4-pounder swivels | two fits: the Regulation's (1752) and hers (1799) |
 | Fincham's xebec | given as a second source in `VesselReferences-2026-10.md` §3.3 | the author's own footnote makes it Forfait's table; the 0.96 L mixes units; Forfait's figures stand |

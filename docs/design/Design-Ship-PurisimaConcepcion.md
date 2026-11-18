@@ -260,11 +260,12 @@ heights from her own decks. The class is the engine's (`physics/sails.py`'s `SAI
 | **Mizen** | lower mast, topmast, topgallant mast, royal mast; the mizen yard (`lateen_yard`), the crossjack yard (a dry yard for the topsail's sheets), mizen topsail yard, mizen topgallant yard, mizen royal yard | **mizen course (lateen, cut at the mast)**, mizen topsail (square), mizen topgallant (square), mizen royal (square, flying); mizen staysail and mizen topmast staysail (jibheaded); the mizen storm staysail and the storm mizen (jibheaded, in the sail room) |
 | **Bowsprit** | bowsprit, jib boom, spritsail yard, sprit-topsail yard | jib (jibheaded); spritsail (square), sprit topsail (square), out of "plain sail" (D8 (b), Ext §4) |
 
-- **The mizen course on its lateen yard** (B3.1, Ext §3): worn not tacked (the whole lateen's rule
-  of package 75 reaches only a whole lateen; hers is cut at the mast and lies against it as the 74's
-  does), hauled aft at helm's a-lee and brailed up hove to, observed on the scratch file as on the
-  74 (Res §7). **Plainly:** whether a Spanish three-decker carried a lateen yard or a gaff in 1797
-  and in 1809 was not found; the lateen is the 74's of 1794 and the machinery's (§17 item 4).
+- **The mizen course on its lateen yard** (B3.1, Ext §3): B3.1's whole-lateen handling, replaced in
+  package 90 by the owner's answer to Dec 3, reaches only a whole lateen; hers is cut at the mast and
+  lies against it as the 74's does. It is hauled aft at helm's a-lee and brailed up hove to,
+  observed on the scratch file as on the 74 (Res §7). **Plainly:** whether a Spanish three-decker
+  carried a lateen yard or a gaff in 1797 and in 1809 was not found; the lateen is the 74's of 1794
+  and the machinery's (§17 item 4).
 - **No driver.** The 74's driver boomsail is Steel's British sail, chosen by the owner for the
   British 74 (Bel-D §4.6); nothing gives it to a Spanish ship (judgement).
 - **The schooner's-mast rule (B3.4)** leaves her a ship: every mast with yards carries a lower
