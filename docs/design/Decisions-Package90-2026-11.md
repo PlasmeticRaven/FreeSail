@@ -1,5 +1,12 @@
 # Decisions: package 90, the Spanish and Mediterranean ships (the owner's round, November 2026)
 
+**Revised 2026-11-18 on the lead's note of 11:35 UTC (nudge 18).** The lead ruled the figures
+question 3 left to them (the plan's §13.1), each as JUDGEMENT, and found that one of them, the
+strain of a lateen taken aback, rests on a premise the engine does not hold: in the game a lateen
+is never aback. That one comes back to the owner as a choice, which the lead puts with the scope
+card (question 3, "One choice comes back to you"). The in-play figures of question 3 are measured
+again at the ruled time to shift a yard. Nothing else in the sheet changes.
+
 **Status (2026-11-18): answered. Third draft, 2026-11-18, on the owner's answer to question 3.**
 The owner agreed nine of the ten questions as picked and re-opened the third, how the lateen ships
 go about, with a shape of their own (their words in Part F, verbatim; the lead's note of 2026-11-18,
@@ -7,7 +14,7 @@ go about, with a shape of their own (their words in Part F, verbatim; the lead's
 picked. It re-drafts question 3 on their shape, with what the period sources say
 (`Research-LateenGoingAbout-2026-11.md`, **GA**), what it means in play and how each choice is
 ordered. Nothing more is asked of them in it. The rulings it leaves are the lead's (the plan's
-§13.1).
+§13.1), **given on 2026-11-18 (nudge 18)**; one comes back as a choice (question 3).
 
 The second draft (2026-11-18) was revised the same day on the critic's reading, with the designs'
 second drafts: question 3's evidence (Willaumez's tacking polacre is a square-rigged one), question
@@ -144,51 +151,76 @@ design follows it.
 - **For one going about**, in the order's own words: `tack ship and shift the lateens`, or `tack
   ship and leave the lateens`; the same with `wear ship`.
 - **By default**, by her practice: shifted in stays and in wearing (your "preferred"). It is
-  changed for the cruise by an order of its own, for example "in stays, leave the lateens". A
+  changed for the cruise by an order of its own, for example `leave the lateens in stays`. A
   standing order can set it too as the wind crosses a figure: one for when the wind falls under
   12 knots, and a second for when it rises over 12 again. A standing order acts at the crossing,
-  not all the while the wind stays under it.
+  not all the while the wind stays under it. (The order is said with the verb first, `leave the
+  lateens in stays`, since an order that begins "in stays," is read as a hail: the lead's
+  ruling.)
 - **By itself**: `shift the mainsail` puts right a lateen left on the mast. It is refused in words
-  when the sail is already to leeward.
+  when the sail is already to leeward. To bend a new mainsail from the sail room instead, the
+  order keeps its "for": `shift the mainsail for a new one` (the lead's ruling).
 - **The game's own captain** keeps the ship's practice, with three judgements of their own:
   - in a strong breeze, over 22 knots, `put her about` wears her, and so does an order to steer
     or shape a course across the wind, since a lateen taken aback in a strong wind could cost the
     mast;
   - in fine weather, under 12 knots, they leave the yards in stays, and shift them once a board on
     the bad hand has run half an hour or the wind freshens;
-  - they shift a lateen left on the mast after a gybe, as they dip a lugger's lugs.
+  - they shift a lateen left on the mast after a gybe, or after a shift of wind round ahead, as
+    they dip a lugger's lugs.
 
   Your own `tack ship` is always a tack.
 
-**In play.** Measured on the engine's stand-in tartane in 15 knots, the first quarter of an hour.
-The bad hand's loss and the time to shift a yard are judgement.
+**In play.** Measured on the engine's stand-in tartane in 15 knots, the first quarter of an hour,
+with her own yards' times at the lead's ruled rate (8.7 seconds a metre of yard, her trader's
+eight hands: the great yard in about 4½ minutes, then the mizen in about 2). The bad hand's loss
+and the time to shift a yard are judgement.
 
 | The stand-in tartane | Done in | Ground lost to windward |
 |---|---|---|
 | Tacked, the yard left | about 2½ minutes | 330 m, then about 5 per cent of her speed on the bad hand |
-| Tacked, the yard shifted in stays | 3 to 4 minutes | 430 to 530 m |
-| Worn, the yard shifted | 8 minutes | 630 to 730 m |
+| Tacked, the yards shifted in stays | about 7 minutes, the great yard and then the mizen (4 with hands for both at once) | 520 m (535 with hands for both) |
+| Worn, the yards shifted | 8 minutes | 800 m (730 with hands for both) |
 | Worn, the yard left | 8 minutes | 715 m, then the bad hand as above |
 
 - **So leaving the yard pays on a short board, and shifting it pays on a long one.** On the
-  stand-in tartane the turn comes after about three quarters of an hour. That is what the late
-  Provençal record says lateen sailors did: they kept their boards on the bad hand short.
-- **Taken aback in a breeze** (JUDGEMENT, not measured: the design's target for her own great
-  yard, Eng §2.4.3), it would begin to strain at about 28 knots and might carry away from about
-  34. On the stand-in today a lateen taken aback only loses her way, in 15 to 35 knots.
+  stand-in tartane the turn comes after about an hour (it was three quarters of an hour at the
+  quicker time of the earlier draft). That is what the late Provençal record says lateen sailors
+  did: they kept their boards on the bad hand short.
+- **Taken aback in a breeze.** In the game today a lateen is never pressed aback: with the wind on
+  the wrong side it collapses and flaps, so her head in the wind's eye costs her way and nothing
+  else, in 15 to 35 knots (measured). The earlier draft's figure of a yard straining from about
+  28 knots rested on its being aback, and is withdrawn. Whether to give the game that danger is the
+  choice below.
 - **The xebec carries no head sail.** After a tack she eases her mizen to bring her head off;
   without that her stand-in lies stalled across the wind.
 
-**What it asks of the engine:** a larger addition than the second draft's, as you said: four
-steps in place of one (Eng §14, A1a to A1d), about three more working days of the engine track
-(the plan's §11 and §14).
+**What it asks of the engine:** a larger addition than the second draft's, as you said: three
+steps in place of one (Eng §14, A1a to A1c), about five more working days of the engine track
+than the second draft's (the plan's §11 and §14; three in the earlier draft of this sheet, before
+the lead's reading found the yard's change woven into eleven places of the bilander's).
 
-**Nothing more is asked of you here.** The lead rules the figures (the plan's §13.1):
-- the bad hand's loss;
-- the seconds and hands to shift a yard;
-- which side of the mast the yard's heel passes;
-- the winds of the captain's judgements;
-- the strain when taken aback.
+**The lead's rulings (2026-11-18, nudge 18; the plan's §13.1)**, each judgement:
+- the bad hand's loss: the lugger's, a third of the sail's area;
+- the time to shift a yard: the lugger's own rate, 8.7 seconds a metre of yard; one able hand for
+  every 2½ metres, at least four;
+- the yard's heel passes abaft the mast (Willaumez; O'Scanlan's forward recorded);
+- the captain's winds: 22 knots to wear in place of a tack, 12 knots to leave the yards in stays,
+  half an hour on the bad hand before shifting;
+- the orders' words, as written above.
+
+**One choice comes back to you, with the scope card: the strain of a lateen taken aback** (the
+lead puts it to you; Eng §2.4.3).
+- **(a) Not built in this package (my pick).** The game says the danger: in a strong breeze, over
+  22 knots, every order that chooses for you (`put her about`, a course across the wind, the
+  captain's own) wears her and says why, and your own `tack ship` is obeyed with a warning. If her
+  head is in the wind's eye in a breeze she loses her way and her ground, and no spar is lost for
+  it.
+- **(b) Built.** A new rule in the game's physics: a lateen taken aback is pressed against its mast
+  and loads its yard and mast, so that in a strong wind the yard may strain and carry away, and the
+  sail will not come in till she pays off (Forfait p. 119). About a day and a half to two days
+  more, and it changes how every lateen vessel goes about, so all of them are measured again
+  after it.
 
 **What it replaces:** the second draft's pick, "decided by her main sail". In it a lateen main was
 worn only and `tack ship` was answered in her words, with the polacre alone tacking.

@@ -1,5 +1,13 @@
 # Design: the xebec, the Spanish navy's and the regency's cruiser under three lateens (package 90, third draft)
 
+**Revised 2026-11-18 on the lead's note of 11:35 UTC (nudge 18).** The lead ruled the engine's
+figures for the lateens' going about (the plan's §13.1), each JUDGEMENT, and set the strain of a
+lateen taken aback (A1d) apart as an option for the owner, since in the engine a lateen is never
+aback. This revision carries what that changes here: §5's table rows 3 and 4 and its A1 items
+(her yards' times at the lugger's rate, 8.7 s a metre: 261, 235 and 117 s; the costs measured again
+at them; the practice's words; her heave-to's refusal keyed on a whole lateen; her wear's finding),
+decision 8, §1's extension rows, §17 item 1 and §18.3 item 1.
+
 **Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
 `Decisions-Package90-2026-11.md` §3 and Part F; the lead's note of 2026-11-18, 04:30 UTC, nudge
 17). The owner agreed the sheet's other nine questions as picked, so this design's questions 1 and
@@ -85,7 +93,7 @@ option of her fits by a key of the ship's own; the King's xebec of the 1752 Regu
 | 5 | **A whole lateen on each mast**, class `lateen` with no key (Ext §3.7), four corners with a short luff, on a `lateen_yard` slung at a third; the fore mast raked forward; the fore and main block masts with no tops; the mizen with a small top and a bare topmast | Lescallier pp. 377 to 380, 398 to 399; Steel 1794 I p. 237; Forfait pp. 128 to 129; the brief |
 | 6 | **No bowsprit and no headsail**; a boomkin on the beak for the bowlines and the fore tack | Steel; Röding; Forfait p. 128. **Plainly:** today she then cannot heave to (§5, item 5) |
 | 7 | **A second suit of small lateens**, unbent, each `in_place_of` its lateen (package 75's bending rule), in "storm canvas"; no reef band on the large lateens; the square sails for running booked | Falconer, Fincham, Steel; she changes sails rather than reefing (Xeb §3.5); the rule runs today (Xeb §9 item 7) |
-| 8 | **She tacks and wears as other vessels do** (the owner's answer to question 3, 2026-11-18). Each yard is changed round its mast, the column shrouds shifted, in stays once her head is through the wind or in the wear at the wind aft, by the order's clause or her practice ("shift" in both by default); or it is left, the lateen on the bad hand until shifted. Her mizen lateen is eased as she pays off from a tack, since she carries no head sail. The change is the plan's A1a to A1d, designed once for the three lateen hulls | The owner (Dec 3, Part F); "pour virer de bord", either way (Lescallier p. 378; Steel; Fincham p. 60); no text read says a xebec tacked or that she never did (Xeb §3.4), and James's armed xebec of 1811 "tacked" (B; GA §2.3); the mizen "to keep them better to the wind" (Steel I p. 237). Question 2, answered |
+| 8 | **She tacks and wears as other vessels do** (the owner's answer to question 3, 2026-11-18). Each yard is changed round its mast, the column shrouds shifted, in stays once her head is through the wind or in the wear at the wind aft, by the order's clause or her practice ("shift" in both by default); or it is left, the lateen on the bad hand until shifted. Her mizen lateen is eased as she pays off from a tack, since she carries no head sail. The change is the plan's A1a to A1c (A1d, taken aback, the owner's option since nudge 18), designed once for the three lateen hulls | The owner (Dec 3, Part F); "pour virer de bord", either way (Lescallier p. 378; Steel; Fincham p. 60); no text read says a xebec tacked or that she never did (Xeb §3.4), and James's armed xebec of 1811 "tacked" (B; GA §2.3); the mizen "to keep them better to the wind" (Steel I p. 237). Question 2, answered |
 | 9 | **Her sweeps an option of the fit** (the brief), each fit saying whether she carries them and how many; their law's figures a key of the ship's own, `sweeps:`, never package 82's `oars:` (which makes a hull a boat: Xeb §9 item 8); package 82's oar law reused; her own orders, her own hands, sail and sweep together allowed | the brief; Xeb §4; the engine note §5; the owner's question (§18, 3) |
 | 10 | Fits: **"regulation 1752"** the default (14 × 4-pdr, 20 pedreros); **"africa 1799"**; **"regency 1815"** (18 guns); **"privateer"**; the trader's file **"unarmed"** with an armed merchant fit | Xeb §§2.1, 2.3, 5 |
 | 11 | Roles: the King's xebec `kings-ship`, `cruiser`, `commodore`; the regency's `corsair`, a new captain's file on package 116's road; the privateer `privateer`; the trader `merchant` | §9; `Design-SlaveryAndSuppression.md` §8 |
@@ -117,7 +125,7 @@ extensions, and is the first ship to need the second:
 
 | Extension | Whose document designs it | What the xebec takes from it |
 |---|---|---|
-| **The whole lateen's going about** (the plan's A1a to A1d; §5): `dipping` widened from the lug to the lateen, `against_the_mast` for a lateen not changed, the tack and the wear each with the yard's change a part, done or left, the rules captain's choice, and the lateen taken aback in a breeze | the package's engine note (§2.3, §2.4) and the tartane's (the reference vessel; Ext §3.7 left it to "her package") | the change on three masts at once, in stays or in the wear, or left; her mizen eased as she pays off from a tack |
+| **The whole lateen's going about** (the plan's A1a to A1c; §5): `dipping` widened from the lug to the lateen, `against_the_mast` for a lateen not changed, the tack and the wear each with the yard's change a part, done or left, and the rules captain's choice; the lateen taken aback in a breeze (A1d) the owner's option (nudge 18) | the package's engine note (§2.3, §2.4) and the tartane's (the reference vessel; Ext §3.7 left it to "her package") | the change on three masts at once, in stays or in the wear, or left; her mizen eased as she pays off from a tack |
 | **The sweeps** (A7) | the engine note's §5 for the engine's part; **this document**, §6, for her figures, her fits' sweeps and her hands | everything; the brigs could take it later (James's *Pasley*, *Wizard*, *Halcyon*) and no file is given it now |
 
 **Plainly:** the xebec cannot be merged before the tartane's lateen extension. Without it she tacks
@@ -151,7 +159,8 @@ answered on 2026-11-18: 1, 3 to 5 as picked, 2 in the owner's own shape.
   `furl_lateen`, `reef_lateen`, `trim_lateen_sheet`: Ext §3.6, all of which serve a whole lateen by
   its `curve_class`, Ext §3.7), the bending rule's `in_place_of` (package 75), package 70's
   armament, the quarter bill and the magazine, package 82's oar law (`physics/oars.py`).
-- **New in the engine** (each a step of the plan's §6): A1a to A1d, A2, A7 and A8, and the shared
+- **New in the engine** (each a step of the plan's §6): A1a to A1c (A1d if the owner takes it), A2,
+  A7 and A8, and the shared
   data N1 to N3 (§5).
 
 ### 1.3 The checks raised before her file is written
@@ -305,8 +314,8 @@ courses too). Aliases: "foresail", "mainsail", "mizen", "the small foresail" and
 | 1. Close-hauled | a point nearer than the brig: closest 40° against 50°, best to windward 50° against 60° | five points against six (Lescallier p. 380; Steel) | nothing: a truth (§15, X2) |
 | 2. Before the wind | 0.83 of her best at 180°, the brig 0.72 | "the worst of all" before the wind and in a rough sea (Forfait p. 129; Fincham p. 59) | **A8**: the lateen row tuned or a running loss for a whole lateen, measured; the truth X3 fails today |
 | 3. Going about | tacks in 346 s at 15 knots, the lateens flipping sides with no work, and comes out 39° off at 1.1 knots, never back (1,064 m lost to windward in the quarter-hour); wears in 150 to 167 s (412 m); the words "braced up" and "brace in the after yards" with no yard | the yard changed round the mast "pour virer de bord", either way, the shrouds shifted (Lescallier p. 378); no text read says a xebec tacked or never did (§3.4 of Xeb); the owner: tacked and worn, the change preferred and not necessary | **A1b**: the tack and the wear, each with her yards' change a part, done or left; her mizen eased as she pays off from a tack (measured: 297 s and 192 m lost); **A1c**: `put her about` wearing her over 22 knots; **A2**: the words of the tack and the wear for a rig with no yards (the B3.4b kind of word bug), for every rig |
-| 4. A lateen on the wrong side | never against the mast (`against_the_mast` is the dipping lug's alone, `physics/sails.py:673`) | lies against the mast unless changed; "more liable to be taken aback" (Fincham p. 59) | **A1a**: `against_the_mast` for a lateen not changed (her probe 17 per cent slower with all three on the mast: Eng §2.2a); **A1d**: a lateen taken aback in a breeze strains its yard |
-| 5. Heave to | refused: "No head sail is set to haul to windward, nor a topsail to lay aback" | not found | her lying to booked until a source is found (§18.3; Plan §4 row 13); the refusal in her own words with A1 |
+| 4. A lateen on the wrong side | never against the mast (`against_the_mast` is the dipping lug's alone, `physics/sails.py:673`) | lies against the mast unless changed; "more liable to be taken aback" (Fincham p. 59) | **A1a**: `against_the_mast` for a lateen not changed, at the lug's two-thirds (ruled; her probe 17 per cent slower with all three on the mast: Eng §2.2a); **A1d**, a lateen taken aback in a breeze straining its yard, is **the owner's option** (nudge 18): in the engine a lateen is never aback, it collapses and flogs (Eng §2.4.3) |
+| 5. Heave to | refused: "No head sail is set to haul to windward, nor a topsail to lay aback" | not found | her lying to booked until a source is found (§18.3; Plan §4 row 13); the refusal in her own words with A1a, keyed on a whole lateen set, since the five boats are refused today in the same words as she is (run: Eng §2.3 item 1) |
 | 6. Reef | refused for a lateen with no band | "un ris placé obliquement" (Lescallier p. 379), but she changes sails | none: her small lateens (decision 7) |
 | 7. Change of suit | `in_place_of` loads; `bend` refused with the engine's own remedy "shift the mainsail for the small mainsail" | the large lateens for small in a gale | the gale's reduction routed to the shift for her (**A8**, in `orders/storm.py`, which the plan gives the engine track: Plan §7.1) |
 | 8. Sweeps | none: "out sweeps" is not an order; package 82's `oars:` would make her a boat (no bells, the boat's tick, `is_boat_hull`) | §6 | **A7**: §6 |
@@ -319,15 +328,19 @@ except A2, which is a cause's mend for every rig:**
 - **A1a and A1b (her E1). The yard's change** (the engine note's §2.3 and the plan design it; this
   one asks three things of it). (a) The schema's lug-only `dipping` (`ship/schema.py:2363`) widened
   to the lateen; (b) the dip's side state (`Sail.lug_side`) and `against_the_mast` read for a
-  dipping lateen, its loss `LUG_AGAINST_MAST_AREA` or a lateen's own figure; (c) in stays once her
-  head is through the wind, and in the wear at the step "Wind aft", each dipping lateen's yard
-  passed round its mast to the new lee side, or left by the order's clause or her practice, its
-  column shrouds shifted in the words. The hands and seconds are the engine note's (no period
-  figure; JUDGEMENT, Eng §2.4.4): her main's 30.0-m yard 225 s and twelve hands, her fore's 27.0-m
-  202 s and eleven, her mizen's 13.5-m 101 s and five. In the King's file the three are changed
-  together by three parties, 28 of her 75 seamen. In the trader (eighteen) they go in turn, main,
-  fore, mizen (JUDGEMENT on the order). The lugger's `dipping_lugs` and every lug-keyed path stay
-  the lug's (Ext §5.4's list is the checklist).
+  dipping lateen, its loss `LUG_AGAINST_MAST_AREA`'s two-thirds (ruled, until A8's tuning); (c) in
+  stays once her head is through the wind, and in the wear at the step "Wind aft", each dipping
+  lateen's yard passed round its mast to the new lee side, or left by the order's clause or her
+  practice, its column shrouds shifted in the words. The hands and seconds are the engine note's,
+  **ruled by the lead on 2026-11-18** (no period figure; JUDGEMENT, Eng §2.4.4): the lugger's rate,
+  8.7 seconds a metre of yard, one able hand for 2½ m, at least four. **Her main's 30.0-m yard 261 s
+  and twelve hands, her fore's 27.0-m 235 s and eleven, her mizen's 13.5-m 117 s and five** (the
+  third draft's 225, 202 and 101 s at 7½). In the King's file the three are changed together by
+  three parties, 28 of her 75 seamen, done in 261 s. In the trader (eighteen) they go in turn, main,
+  fore, mizen (JUDGEMENT on the order), 613 s in all, each waiting its turn drawing on the bad hand.
+  The car passes abaft the mast (ruled: Willaumez). `LateenChange` carries the parties and the order
+  (Eng §2.3). The lugger's `dipping_lugs` and every lug-keyed path stay the lug's (Ext §5.4's list
+  is the checklist).
 - **A1b and A1c (her E2). Tacked and worn** (the owner's answer to question 3). No file key and no
   predicate: `tack ship` tacks her and `wear ship` wears her, as for any vessel.
   - **After a tack her mizen lateen is eased as she pays off.** She carries no head sail, and
@@ -337,13 +350,23 @@ except A2, which is a cause's mend for every rig:**
     to the wind (Lescallier pp. 393-394; Steel I p. 237); easing it to bring her head off is
     JUDGEMENT, the spanker's "ease off" carried to it.
   - **`put her about`** wears her over 22 knots, and so does a course ordered across the wind's
-    eye (Forfait p. 119; Eng §2.3 item 6).
-  - **The rules captain** leaves her yards in stays in fine weather and shifts them after half an
-    hour on the bad hand, as the engine note gives it (§2.3 item 6).
+    eye (Forfait p. 119; ruled; Eng §2.3 item 6): the 22 knots a constant of the order's, read
+    for every voice.
+  - **The rules captain** leaves her yards in stays in fine weather, by her practice set as the
+    wind falls under 12 knots (`leave the lateens in stays`, the verb first), and shifts them after
+    half an hour on the bad hand, as the engine note gives it (§2.3 item 6), their figures read
+    with defaults (ruled).
   - **The cost in the game** on her probe with the brig's head sails, 15 knots, the first
-    quarter-hour (Eng §2.2a). Today a tack loses 205 m and a wear 519. With her yards handled:
-    tacked with them left, 309 m; tacked and changed in stays, 370 to 554 m; worn and changed,
-    548 to 653 m.
+    quarter-hour (Eng §2.2a, run again at 5b987acd with her own seconds). Today a tack loses 205 m
+    and a wear 519. With her yards handled: tacked with them left, 309 m; tacked and changed in
+    stays, 370 and 443 m at the lugger's and the settee's seconds, **500 m at the King's own
+    (464 m with the trader's eighteen in turn)**; worn and changed, 548 and 575 m, **641 m at the
+    King's own (680 m the trader's)**. Leaving them pays on a board shorter than about **45
+    minutes** (40 the trader's; the third draft's 35, at the settee's seconds).
+  - **Her wear with no head sail** (the bare probe, Eng §13 item 12): with her three yards out of
+    drawing for the King's seconds she came to stalled 41° off at 1.1 knots (1,311 m lost). Her
+    mizen eased as she comes to in the wear, as it is eased as she pays off from a tack, is for her
+    file to measure.
 
   **Plainly:** the second draft's `Ship.wears_only()`, and `tack ship` answered "She goes about by
   wearing; ... 'Wear ship.'", are dropped by the owner's answer; the first draft's `goes_about:
@@ -643,7 +666,8 @@ gives a xebec's.
 
 ## 17. Risks, ranked
 
-1. **A1a to A1d are shared with the tartane and the polacre** and must be designed once (the
+1. **A1a to A1c (and A1d, if the owner takes it) are shared with the tartane and the polacre** and
+   must be designed once (the
    engine note's §2.3, §2.4 and §14, the plan's §6); a second form for the xebec would split the
    lateen's handling. *Mitigation*: her document takes the shared design whole and asks only the
    three things of §5, A1a and A1b, and her mizen eased as she pays off.
@@ -701,10 +725,11 @@ Winfield et al., *Spanish Warships in the Age of Sail, 1700–1860*, the owner's
 
 ### 18.3 For the lead
 
-1. **A1's design** (A1a to A1d): the plan's proposal (Plan §4 row 3, §13.1 item 1); the xebec's
-   takes it, asking §5's three things and her mizen eased as she pays off. With it, its figures:
-   the change's seconds and hands for her three yards, together or in turn, and the bad hand's
-   loss (Eng §2.4).
+1. **A1's design** (A1a to A1c): the plan's proposal (Plan §4 row 3, §13.1 item 1); the xebec's
+   takes it, asking §5's three things and her mizen eased as she pays off. **Ruled 2026-11-18 (nudge
+   18)**, with its figures: the change's seconds and hands for her three yards at 8.7 s a metre and
+   one able hand for 2½ m, together or in turn; the bad hand the lug's two-thirds; the car abaft the
+   mast. The strain aback (A1d) is the owner's option.
 2. **A7, the sweeps**: settled by the plan as a step of package 90's engine track (the owner's
    Dec 6); the brigs' sweeps later by the same key.
 3. **Her lying to** for a rig with neither head sail nor yard: booked until a source; refused in
