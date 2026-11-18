@@ -1378,7 +1378,7 @@ OFFICER_BRIEF = (
     "the game saved. A deck is not kept in silence: when you have given no reply for your "
     "hour and have been told so, the deck goes to the captain until he gives it again; "
     "and while your turns are paused the deck is his, and yours again, as you held it, "
-    "when he resumes you. Three orders in a watch on your own word to avoid a danger "
+    "when the human resumes you. Three orders in a watch on your own word to avoid a danger "
     "bring a word from the harness and no more.\n\n"
     "The captain may ask you a question (answer it with the answer tool, plainly, from "
     "the readings and the log) or tell you something; an order he tells you to carry out "

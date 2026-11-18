@@ -2403,14 +2403,16 @@ def test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_the_stations():
             "a paused officer has the deck again when resumed, a silent one when it is given",
             # "resumes" alone until package 42a: the captain's paragraph of the revision for
             # milestone 6, approved as drafted, says the owner "resumes" a paused captain,
-            # which is the kind of thing; the officer's particular is the captain resuming him
-            ("when he resumes", "resumes you", "gives it again"),
+            # which is the kind of thing; the officer's particular is the human resuming him
+            # (package 117: "when he resumes" until then, untrue under a model captain, whose
+            # `resume` is refused: the pause is the human's to answer)
+            ("when the human resumes", "resumes you", "gives it again"),
             {
                 "officer": (
                     "when you have given no reply for your hour and have been told so, the "
                     "deck goes to the captain until he gives it again",
                     "while your turns are paused the deck is his, and yours again, as you held "
-                    "it, when he resumes you",
+                    "it, when the human resumes you",
                 )
             },
         ),

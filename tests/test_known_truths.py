@@ -16755,7 +16755,7 @@ def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
     test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned(
         tmp_path, monkeypatch
     )
-    test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+    test_the_captor_holding_the_players_person_is_refused_for_both_reasons(monkeypatch)
 
 
 def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
