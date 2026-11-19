@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-19, 11:05 UTC (HOLD YOUR NEXT MESSAGE TO THE LEAD UNTIL 19:05 UTC TODAY, the owner's word: the lead's usage is at its weekly limit until the reset at 19:00 UTC, 2 PM US Eastern; keep working; package 118 is merged, merge the trunk in; the polacre's mizen topsail carried). Nudge number: 21.
+Latest note: 2026-11-19, 20:15 UTC (YOUR GROUND REPORT IS READ: STAGE 0 HAS MY WORD; the bad hand's factor is 2.5, your pick; A3's words as drafted; A2's wider reach inside A2; the hermaphrodite brig's tiller kept by judgement; the owner's two answers recorded as you relay them). Nudge number: 22.
