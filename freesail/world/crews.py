@@ -1228,6 +1228,28 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
             v.plan = [("lie_to", math.inf)]
         return "ship.hove_to", "Hove to (the far body lies to, drifting a knot to leeward).", {}
     if low in ("fill away", "fill", "get her way on"):
+        if v.plan and v.plan[0][0] == "lie_to" and not v.saved_plan:
+            # lying to where nothing was saved to fill away on (package 118: at the end of a
+            # course the director gave, an empty plan put her out of the world within the
+            # hour): her own goal's voyage again where she has one, laid from where she
+            # lies; refused in words where she has none, and she lies to as she was
+            goal = str(getattr(v, "goal", "") or "")
+            if not goal:
+                raise OrderError(
+                    f"{v.name} has no course to fill away on: she lies to as she was until a "
+                    "course is shaped for her ('shape a course for <a place>')"
+                )
+            from freesail.world.ships import _goal_plan
+
+            try:
+                plan, cycle, _kept = _goal_plan(crew.parent, goal, v.position)
+            except ValueError as e:
+                raise OrderError(f"{v.name} cannot fill away on her voyage: {e}") from None
+            v.plan, v.cycle = plan, cycle
+            v.ordered_mark = None
+            v.lying_to_s = 0.0
+            v.tack = 0.0
+            return "ship.filled_away", f"Filled away, on her own voyage again ({goal}).", {}
         if v.plan and v.plan[0][0] == "lie_to":
             v.plan = list(v.saved_plan or [])
             v.saved_plan = None
