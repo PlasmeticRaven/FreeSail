@@ -38224,3 +38224,44 @@ The third is the order of the table itself and no rank of any description. The o
 - **The probes** (`tests/rig_fixtures.py`): `xebec_probe()` and `three_decker_probe()`, as the engine's note built them (§0): each document equal, key for key, to the note's scratch rig. Their classing, with the lead's two, is pinned in `tests/test_probes_90.py` as measured at this head: the xebec has no mast with yards; the three-decker classes as the 74.
 
 Moved by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).
+
+
+## Package 90, A0: item 37, the studding-sail booms rated as the rule intended (2026-11-19)
+
+The owner's choice (a) of question 2 (`docs/design/Decisions-Package90-2026-11.md`; the engine's note, `docs/design/Design-Package90-Engine.md` §1.5): the mend at the cause. The generator's `PEAK_COEFF` is read from the engine's own curves (`freesail.physics.sails.SAIL_CLASSES`: the greatest |(C_L, C_D)| over each class's tabulated points, rounded to two places, as the table always was), where it was a hand copy that package 10 left at 1.25 for the studding class when it raised that curve's peak to 1.35 (1.44 at its best angle) for truth 14. `tests/test_peak_coeff.py` holds the two together, with the generator's air, knot and shear against the engine's.
+
+| Class | square | studding | gaff | jibheaded | lug | lateen | sprit |
+|---|---|---|---|---|---|---|---|
+| Old | 1.23 | **1.25** | 1.29 | 1.32 | 1.29 | 1.25 | (none: a KeyError at the rating pass) |
+| New | 1.23 | **1.44** | 1.29 | 1.32 | 1.29 | 1.25 | **1.20** |
+
+**The files, regenerated** (`py tools/gen_ships.py data/ships`): nine change and nine are byte for byte. In the nine, **74 figures move, every one a `rating_kn`** of a studding-sail boom (70) or a ringtail boom (4), each up by about a seventh, with the booms' 37 "Rating: ... in 18 kn -> N kN." comments where a file has them (the brig's, the merchant brig's, the frigate's and the two schooners'). No other line moves, and the figures are the ground report's (`docs/design/GroundReport-Package90-2026-11.md` §2.1), file for file.
+
+| File | Booms, old -> new kN (each a pair unless named) |
+|---|---|
+| frigate-36 | fore lower 4.2 -> 4.9, fore topmast 5.6 -> 6.4, fore topgallant 1.8 -> 2.1, main topmast 7.0 -> 8.1, main topgallant 2.3 -> 2.6; ringtail 4.0 -> 4.6 |
+| razee-44 | 6.0 -> 6.9, 7.9 -> 9.0, 2.7 -> 3.2, 9.4 -> 10.9, 3.4 -> 3.9; ringtail 3.7 -> 4.2 |
+| sixty-four | 6.1 -> 7.0, 8.0 -> 9.2, 2.8 -> 3.2, 9.5 -> 11.0, 3.4 -> 4.0 |
+| seventy-four | 8.4 -> 9.7, 10.9 -> 12.5, 3.9 -> 4.5, 15.0 -> 17.3, 4.9 -> 5.7 |
+| brig, merchant-brig | 2.1 -> 2.4, 2.9 -> 3.3, 1.1 -> 1.2, 3.1 -> 3.6, 1.1 -> 1.3 |
+| hermaphrodite-brig | 3.4 -> 3.9, 3.5 -> 4.0, 1.3 -> 1.5 |
+| privateer-schooner, topsail-schooner | fore topmast 2.2 -> 2.6; ringtail 3.9 -> 4.5 |
+
+### Pins moved, old beside new (the reason of each: the booms rated as the rule intended, the owner's choice (a))
+
+- **Truth 35's last clause** (`tests/test_known_truths.py`, `test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_on_a_gust`, slow).
+  - Old: in 32 knots every boom whips on the first second of the blow and one carries away on the second, before the routine can fire: the main topmast studding-sail boom (larboard), the booms at 2.38 of their rating.
+  - New: in 32 knots nothing carries away in the whole run, the booms at 2.11 of their rating at most: the routine is in time. The routine's firing, its three orders on the one tick at 120 s, its count (once, then twice) and its timing are pinned as they were.
+  - Added, the strain's road kept: from the same start a blow of 36 knots held 121 s carries a studding-sail boom away before the routine's two minutes, and nothing but booms (measured: the fore lower boom, starboard, on the 2nd second, three more by 102 s; in 34 and 35 knots nothing goes; in 37 the mizzen royal yard goes first). Which boom and its second are the strain stream's draw and are not pinned. It costs the run about 4 s (the start and the blow, measured alone: 4.3 s).
+- **The frigate brought up to six points** (`tests/test_studding.py`, `test_brought_up_to_six_points_they_shake_strain_and_carry_away[frigate]`, slow).
+  - Old: set at nine points in 13 knots, brought up to six and kept so half an hour: booms go at 374, 1,134 and 1,635 s.
+  - New: the frigate in 14 knots: booms go at 978 and 1,355 s (measured). In 13 knots none goes in the half hour (the booms at 1.63 of their rating at most; kept on, the first goes at 6,615 s, its condition worn to nought: the ground report); in 15 knots the first goes at 99 s. The test's story is kept (they shake, strain and carry away in the half hour), and the fixture carries a wind for each ship. `test_studding_sails_draw_at_nine_points[frigate]` holds in 14 knots. The schooner's case is as it was: 13 knots, the strict expected failure of her setup in irons.
+- **The five records of no figure moved**, each naming its booms' ratings old beside new as the table above, item 37 the reason, in the form each uses for a ruled move (package 75's SW-4), the ratings put back only there:
+  - `tests/test_hull_frigate.py::test_no_figure_the_physics_or_the_gunnery_reads_moved`: eleven;
+  - `tests/test_hull_brig.py::test_no_figure_the_physics_or_the_gunnery_reads_moved[data/ships/brig.yaml]` and `[data/ships/merchant-brig.yaml]`: ten each;
+  - `tests/test_hull_schooner.py::test_no_figure_the_physics_reads_moved[data/ships/topsail-schooner.yaml]` and `[data/ships/privateer-schooner.yaml]`: three each.
+- **The seven byte pins** pass again by the regeneration, with no edit: truth 7-185, `test_ship_particulars`'s generator test, `test_profile`'s hook test, `test_neufchatel`'s writer test, and the generators' report tests of `test_bellerophon`, `test_indefatigable` and `test_hull_schooner`.
+
+**Held:** truths 9 and 14 (both tests of each), the *Neufchatel*'s truth 9, the rest of `test_studding`, `test_lateen` (its rating pass at the gaff's peak), `test_profile` (its lateen rating), `test_strain`, `test_canvas`, `test_sails` and `test_catalogue` whole. Nothing else moved.
+
+Moved by the stage-0 builder; to be passed by an independent reader.

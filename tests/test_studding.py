@@ -205,14 +205,21 @@ _SCHOONER_IN_IRONS = pytest.mark.xfail(
 )
 
 
+# Each ship with the wind she is brought up in. The frigate's is 14 knots since package 90's
+# item 37 (the owner's choice (a) of its question 2: her studding-sail booms rated as the rule
+# intended, a seventh stronger): in 13 knots none goes in the half hour (the first at 6,615 s,
+# its condition worn to nought), in 14 the first at 978 s (measured; old: 13 knots, the first at
+# 374 s; docs/dev/TuningNotes.md, "Package 90, A0"). The schooner's stays 13, her case as it was.
 @pytest.fixture(
     scope="module",
-    params=[SHIPS[0], pytest.param(SHIPS[1], marks=_SCHOONER_IN_IRONS)],
+    params=[(SHIPS[0], 14.0), pytest.param((SHIPS[1], 13.0), marks=_SCHOONER_IN_IRONS)],
     ids=["frigate", "schooner"],
 )
 def brought_up(request):
-    """Set at nine points in 13 knots, then brought up to six and kept so half an hour."""
-    world = weather_studding_sails_at_nine_points(request.param, 13.0)
+    """Set at nine points (the frigate in 14 knots, the schooner in 13), then brought up to six
+    and kept so half an hour."""
+    path, knots = request.param
+    world = weather_studding_sails_at_nine_points(path, knots)
     at_nine = {s.id: (s.is_set, s.shivering, s.thrust_kn) for s in stuns(world.ship)}
     start = world.clock.tick
     world.submit(f"steer {360.0 - SIX_POINTS}")

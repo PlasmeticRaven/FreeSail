@@ -1590,7 +1590,10 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     forenoon. A gust to 32 knots that lasts two minutes less a second and falls away does
     not fire it; 32 knots held two minutes does, once, and the wind staying over thirty
     does not fire it again; under thirty for a second less than the dwell (300 s) and up
-    again does not; under thirty for the dwell and up again for two minutes does."""
+    again does not; under thirty for the dwell and up again for two minutes does. In 32 knots
+    the routine is in time and nothing carries away; from the same start a blow of 36 knots
+    held carries a studding-sail boom away before the routine's two minutes, and nothing but
+    booms (package 90, item 37: the booms rated as the rule intended)."""
     world = running_under_all_sail(datetime(1805, 6, 1, 10, 0))
     world.submit(SHORTEN_SAIL)
     name = "shorten sail for weather"
@@ -1623,13 +1626,28 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     blow(world, 32.0)
     run(world, 121)
     assert rule.fired == 2
-    # the routine's two minutes are long for studding sails before the wind in 32 knots:
-    # every boom whips on the first second of the blow and one carries away on the
-    # second, before the routine can fire (docs/dev/TuningNotes.md, milestone 4a); since
-    # package 57 (Steel's staysails in all sail) the main topmast boom goes first, where the
-    # fore topgallant boom went before
-    lost = events(world, "spar.carried_away")
-    assert lost and lost[0].subject == "main.topmast.studdingsail_boom.larboard"
+    # the routine's two minutes were long for studding sails before the wind in 32 knots:
+    # every boom whipped on the first second of the blow and one carried away on the second,
+    # before the routine could fire (docs/dev/TuningNotes.md, milestone 4a); from package 57
+    # (Steel's staysails in all sail) the main topmast boom went first, where the fore
+    # topgallant boom went before. Since package 90's item 37 (the owner's choice (a) of its
+    # question 2: the generator's studding peak read from the engine's curves, 1.44 for the
+    # 1.25 it kept since package 10) the booms are rated as the rule intended, a seventh
+    # stronger: in 32 knots they whip, at 2.11 of their rating at most, and none carries away
+    # in the whole run, the routine in time (old: the main topmast boom, larboard, on the 2nd
+    # second of the first blow; TuningNotes, "Package 90, A0")
+    assert events(world, "spar.carried_away") == [], "the routine in time: nothing carries away"
+    # the strain's road, kept: from the same start a blow of 36 knots held carries a boom away
+    # before the routine's two minutes, and nothing but booms; which boom and when is the
+    # strain stream's draw (measured: the fore lower boom, starboard, on the 2nd second and
+    # three more by 102 s; in 37 knots the mizzen royal yard goes first)
+    world = running_under_all_sail(datetime(1805, 6, 1, 10, 0))
+    world.submit(SHORTEN_SAIL)
+    t0 = world.clock.tick
+    blow(world, 36.0)
+    run(world, 121)
+    lost = events(world, "spar.carried_away", t0)
+    assert lost and lost[0].tick - t0 < 120, "a boom goes before the routine's two minutes"
     assert all("studdingsail_boom" in (e.subject or "") for e in lost), "booms, nothing else"
 
 
