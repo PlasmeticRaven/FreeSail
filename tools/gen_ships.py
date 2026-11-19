@@ -10395,8 +10395,20 @@ def boat_cutter_23(out_dir="data/ships"):
 # every helper as `g.<name>`; it is imported only below, after `gen_ships` is made this running
 # script, so that its Builders, DesignLoads and helpers are these, one copy (a Builder of one
 # copy with a DesignLoad of another fails at `dump`: measured, Design-Ship-Indefatigable.md
-# §1.2).
-SHIP_MODULES = ("indefatigable", "neufchatel", "bilander", "bellerophon")
+# §1.2). Package 90 (docs/design/Plan-Package90.md §5.1 item 1) names its five after the four,
+# the same way, smallest first: the tartane, the polacre, the xebec, the Diana and the Purísima
+# Concepción.
+SHIP_MODULES = (
+    "indefatigable",
+    "neufchatel",
+    "bilander",
+    "bellerophon",
+    "tartane",
+    "polacre",
+    "xebec",
+    "diana",
+    "concepcion",
+)
 
 
 if __name__ == "__main__":

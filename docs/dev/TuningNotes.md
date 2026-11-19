@@ -38198,3 +38198,29 @@ What a player no longer learns, because his deck could not see it:
 No new road of news is built: a letter, a hail and a port's talk carry what they carried.
 
 Moved by the builder; each of the four passed by an independent reader (named in the build report).
+
+
+## Package 90, stage 0: the inert hooks for the Spanish and Mediterranean ships (2026-11-19)
+
+`docs/design/Plan-Package90.md` §5.1 items 1 to 10, one commit, behaviour-free. No figure of the physics, the gunnery or the world moved: every ship file is written by the generator byte for byte as committed, and no committed file carries `sweeps:`, a towed boat, a hull's `helm` or a whole lateen with `dipping` (`tests/test_probes_90.py`, read off each file). The new size words rank no description of the game: every description ranks as before, by the figures measured before them and by the word table with them taken out (the same file).
+
+### Pins moved, old beside new
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_profile.py`'s `MODULE_FILES` | the four rows of package 75's modules | the four, then five rows each `[]`: `ships.tartane`, `ships.polacre`, `ships.xebec`, `ships.diana`, `ships.concepcion` | §5.1 item 1: `SHIP_MODULES` names the five stubs after the four, each writing nothing (the bilander's precedent) |
+| `tests/test_profile.py`'s hook test | `test_the_hook_runs_the_four_ships_modules_after_the_eight_each_writing_its_own`, its docstring naming four modules | `test_the_hook_runs_the_nine_ships_modules_after_the_eight_each_writing_its_own`, its docstring naming the nine | the same; every assertion of the test as it was |
+| `tests/test_profile.py`'s `test_the_size_words_rank_the_new_ships_the_razees_first` | `_SIZE_WORDS[:7]` is "razee", "sixty-four", "seventy-four", "ship of the line", "two-decker", "bilander", "frigate" | `_SIZE_WORDS[:9]` is "razee", "sixty-four", "seventy-four", "three-decker", "first rate", "ship of the line", "two-decker", "bilander", "frigate" | §5.1 item 6: the three-decker's and the first rate's words go before "ship of the line" ("a first rate, a ship of the line" ranks 5, not 4), so the table's first seven words change. **Not named by the plan's list of pins (§5.3, §10.4): for the lead.** The razee's word is still first, and every rank the test reads holds |
+
+The third is the order of the table itself and no rank of any description. The other way, the two words placed after "ship of the line", keeps the old pin and makes "a first rate, a ship of the line" a 74's class: it is not built, since the plan places them before it.
+
+### What the new keys and words are, and who reads them
+
+- **The schema** (`freesail/ship/schema.py`): a top-level `sweeps:` (`SweepsSpec`: `number`, `men_each`, `thrust_n`, `power_w`, `tiring_h`), refused on a hull with `oars:` and on a boat's rig; a fit's `sweeps` (a whole number of one or more), refused where the file has no `sweeps:` section; a boat's `towed`, true or false, false by default (refused at the load before: no test pinned that refusal, grepped); the hull's `helm`, `wheel` or `tiller`, `wheel` by default. Each spec leaves the key out of its pickle while it holds its default. Read by nothing else yet: A7 (the sweeps), A4 (the towed boat), A3 (the tiller).
+- **The ranks** (`world/captains.py`): `SIZE_RANK` gains the tartane 1, the polacre 2, the xebec 2, the corvette 2 and the three-decker 5 (the owner's answer to question 8); `_SIZE_WORDS` gains the three-decker's and the first rate's words at 5 before "ship of the line", and the corvette's, the ship-sloop's (both spellings), the xebec's, the polacre's and the tartane's before "a ship" and "brig". Rank 5 is only compared, never an index: a lone 74 takes the three-decker for a superior force (`LINE_OF_BATTLE_RANK` 4 read as at least it), and she is never under the rank-4 haul-off herself.
+- **The men of war** (`world/regimes.py`, `world/squadrons.py` twice), `brains.role_of_vessel` (King's ships) and the hail's words (`orders/signals.py`) take the corvette, the three-decker and the xebec.
+- **Known word changes, no pin:** a director's brief limit or a world order's enemy in these words is now ranked where it was refused as no class (a brief "no enemy heavier than a corvette" ranks 2; "a first rate" is still no description, so a world order putting one on the sea is still refused for that); "hail the xebec" names a sail where it was the lookout's hail. No committed brief, scenario or text of the game holds the words.
+- **The generator:** `SHIP_MODULES` names the five stubs (`tools/ships/tartane.py`, `polacre.py`, `xebec.py`, `diana.py`, `concepcion.py`) and `tools/ships/lateen.py` is a docstring; `tools/ships/period.py` gains `PIE_DE_BURGOS_M`, 0.278635 m, the book's own figure (Winfield et al. 2023, pp. 41-46; the tree's 0.2786 m of package 39d is the same to four places, and the two comments that carry it, in `data/tides/establishments.yaml` and `data/charts/features/strait.yaml`, are left), and `PIED_DU_ROI_M`, 0.3248 m.
+- **The probes** (`tests/rig_fixtures.py`): `xebec_probe()` and `three_decker_probe()`, as the engine's note built them (§0): each document equal, key for key, to the note's scratch rig. Their classing, with the lead's two, is pinned in `tests/test_probes_90.py` as measured at this head: the xebec has no mast with yards; the three-decker classes as the 74.
+
+Moved by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).

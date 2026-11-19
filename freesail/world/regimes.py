@@ -192,9 +192,19 @@ def _story(vessel: Any, tick: int, words: str) -> None:
 # offing as for a cruiser)
 _MAN_OF_WAR_ROLES = frozenset({"kings-ship", "cruiser", "commodore", "revenue"})
 # the descriptions of the men of war (package 75 adds the new ships' rows, keyed before
-# their files come: docs/design/Build-Ships.md §3.1 item 25)
+# their files come: docs/design/Build-Ships.md §3.1 item 25; package 90 its three, the same
+# way: docs/design/Plan-Package90.md §5.1 item 7)
 _MAN_OF_WAR_DESCRIPTIONS = frozenset(
-    {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}
+    {
+        "frigate",
+        "brig-sloop",
+        "sixty-four",
+        "razee",
+        "seventy-four",
+        "corvette",
+        "three-decker",
+        "xebec",
+    }
 )
 
 
