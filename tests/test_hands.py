@@ -1253,8 +1253,14 @@ def test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_t
     wholes = [runner._watch_whole(crew, w) for w in (Watch.STARBOARD, Watch.LARBOARD)]
     assert wholes == [5, 5]
     jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
-    by_jib = taken(w, jib)
-    assert len(by_jib) == 6 and by_jib[-1] == "master", by_jib
+    assert taken(w, jib) == [
+        "fore_top ordinary",
+        "forecastle able",
+        "fore_top able",
+        "main_top able",
+        "afterguard landsman",
+        "master",
+    ]
     assert jib.assignment.outcome == hands.ENOUGH and jib.assignment.wanted == 6
     w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
     jib = asked(w, "take_in_jibheaded", "jib", "set")
@@ -1264,8 +1270,15 @@ def test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_t
 
     w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
     jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
-    by_jib = taken(w, jib)
-    assert len(by_jib) == 6 and by_jib[-1] == "mate" and jib.assignment.outcome == hands.ENOUGH
+    assert taken(w, jib) == [
+        "forecastle ordinary",
+        "forecastle able",
+        "fore_top able",
+        "main_top able",
+        "main_top able",
+        "mate",
+    ]
+    assert jib.assignment.outcome == hands.ENOUGH
     hands.release(crew, jib.inst_id)
     brace = asked(w, "brace", None)
     by_brace = taken(w, brace)
