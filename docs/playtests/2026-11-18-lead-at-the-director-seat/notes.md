@@ -4,7 +4,7 @@
 
 **The owner was not at the door.** The game ran in the lead's own container. The consent brief and the station's brief both say the owner is always at the door; in these sittings he was not, he knew it beforehand, and the lead said so in its answer to the consent question. No other model was seated.
 
-**The consent question** was put to the lead's session against the revised brief (3,754 words as sent at this door), answered yes with three notes, and the drill passed in one reply. The record is kept outside the repository for the owner to file or not. In the second sitting the yes on record seated the station at once, as it should for the same brief.
+**The consent question** was put to the lead's session against the revised brief (3,754 words as sent at this door), answered yes with three notes, and the drill passed in one reply. The record was kept outside the repository for the owner to file or not; he has since had it filed (`docs/agents/ConsentAndPreferences.md`, section 4e). In the second sitting the yes on record seated the station at once, as it should for the same brief.
 
 **Not committed:** the two saves, the transcripts and the director's logs (they carry the model's name and the container's paths). They are with the lead for as long as its container lives.
 
