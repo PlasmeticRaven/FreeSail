@@ -1,8 +1,17 @@
 # Gate M7: the owner plays the trunk
 
-**Verdict:** Pending. **A draft of 2026-11-18.** It waits on the owner's word about card 6 (`docs/dev/ScopeCards-BeforeTheGate.md`): item 6 below and the first known issue change with it.
+**Verdict:** Pending. **Its shape was settled by the owner on 2026-11-19** (below). The build `m7` is to be cut once package 118 (the director's mends) has merged and the tree is otherwise clean; until it is, this page is a draft and play is play, not the gate.
 
 **What this gate is** (the continuation proposal, step A): the owner plays the trunk as it stands, from the opening page, through a passage, a fight and a port. Milestone 7 is closed where it stands at this gate, and what it still owes is carried forward as a short list.
+
+## The gate's shape, as the owner settled it (2026-11-19)
+
+1. **The gate is played on the build with package 118 merged** ("Agreed, the gate on 118 merged"). The brig's watches (119) and the ships (90) are not waited for.
+2. **What is played for a verdict:** the steps of the walk below, once each, in any order, over as many sittings as he likes; anything else he plays counts as well ("Agreed").
+3. **Models are seated for the gate** ("Models will be seated for the gate, using the standard consent procedure. The consent brief is asked automatically on every new version anyway."). So each model seated is asked the consent question by the game at its first seating, against the brief as revised by package 117; the walk has steps for them (7 to 9).
+4. **The verdict,** in his words on the playtest form, is one of three ("Agreed"): *closed* (milestone 7 is closed where it stands); *closed, with a list* (closed, and what he names is mended first in the next milestone); *not yet* (what he names is mended and the failed steps played again).
+5. **A proper cut is made** ("A proper cut for the gate should be made, once 118 is merged and the tree deemed otherwise clean"): the build named `m7`, the branch `gates/m7`, the tag `gate-m7` and the release, as gates 4 to 6 were cut. "Clean" is the lead's to show: lint clean, and the whole suite green in the cloud on the cut tree itself.
+6. **On *closed*** the lead writes "the game as built" (one page) and the list carried forward, the first input to the next milestone's shape ("Agreed").
 
 **Start:** `py -m freesail`. The harbour opens in the browser; the clock is held until you say `go`.
 
@@ -23,7 +32,11 @@
 3. **A fight.** *Actions*: the first action. `clear for action`, `cast loose the guns`, the private signal, `engage her to starboard`; fight her yourself to the end; `strike the colours` if it comes to that.
 4. **A wheel shot away**, if the fight gives you one: `steer` refused in words, the tackles, the repair.
 5. **Save, close the browser, and take the game up again** from the harbour.
-6. **With a director** (*With a director*: the directed passage), yourself at the director's station or a model after its asking again. *Not before card 6 is settled: today the director cannot order the weather under that scenario's brief.*
+6. **With a director** (*With a director*: the directed passage), yourself at the director's station: a letter left at the port, a sail put beyond the horizon, the weather ordered within the brief's 27 knots and refused beyond it, a person made ashore and brought aboard, a ship sent to a position. *Not before package 118 has merged: until then the director cannot order the weather under that scenario's brief.*
+
+7. **A model on your own ship.** From the harbour's *stations* tab, a watcher or an officer of the watch seated on the ship of step 2 or 3, for a watch. *The game puts the consent question to the model first (allow a few minutes: the brief is 3,600 words and an officer has a drill after it); a yes, and the station follows. Its notes and its orders are lines of your log under its station's name; `stand down the officer of the watch` takes the station back.*
+8. **A model at the director's station** on the directed passage, in place of yourself in step 6. *Ask for `the director's log` afterwards: every act and its reason; what reached your own ship marked as reaching her; what the brief refused.*
+9. **A model commanding the other ship in a fight** (the first action, the privateer's captain seated): the seat at war with a human's ship, which a yes to the revised brief now covers and an older yes does not. *The game asks first, as for any seat. If you strike to her you are her prisoner at your own prompt, and nothing between you is hidden from you as the owner.*
 
 Write down every surprise, fault or not, on the form in `docs/playtests/README.md`.
 

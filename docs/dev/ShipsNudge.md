@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-18, 22:35 UTC (the owner has decided the strain of a lateen aback is built, and of a lateen left on the bad hand: written into the documents as a step, the figures proposed as judgement; documents alone, one commit and a message, then stop). Nudge number: 19.
+Latest note: 2026-11-19, 07:00 UTC (THE OWNER HAS RELEASED PACKAGE 90 TO BUILD NOW, before the gate; your plan's card at 509f9959 is the scope; the ground report first, with a backed square topsail's winds beside the bad hand's; each hash for the trunk reported to the lead; the polacre's files wait for Winfield). Nudge number: 20.
