@@ -374,9 +374,11 @@ def test_a_boat_may_be_towed_and_is_on_deck_by_default():
     assert boats[0].towed is True and not any(b.towed for b in boats[1:])
     _with(doc, ("boats", 0, "towed"), False)
     assert spec_from_dict(doc, "towed.yaml").boats[0].towed is False
+    _with(doc, ("boats", 0, "towed"), None)  # null is the key left out, as `helm` and `sweeps`
+    assert spec_from_dict(doc, "towed.yaml").boats[0].towed is False
 
 
-@pytest.mark.parametrize("given", ["yes", 1, None])
+@pytest.mark.parametrize("given", ["yes", 1, 0.0])
 def test_a_boats_towed_is_true_or_false(given):
     doc = _doc()
     _with(doc, ("boats", 0, "towed"), given)

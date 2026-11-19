@@ -1711,7 +1711,9 @@ def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
             raise ShipFileError(
                 f"{source}: {where} is of kind '{kind}'; say one of {', '.join(BOAT_KINDS)}."
             )
-        towed = b.get("towed", False)  # package 90, stage 0
+        # package 90, stage 0: a null `towed` reads as the key left out (on deck), as the
+        # hull's null `helm` reads as the wheel and a fit's null `sweeps` as none
+        towed = False if b.get("towed") is None else b["towed"]
         if not isinstance(towed, bool):
             raise ShipFileError(
                 f"{source}: {where} has towed = {towed!r}; say true (towed astern) or false "
