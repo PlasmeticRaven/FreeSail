@@ -2540,8 +2540,11 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
 # wanted every fit hand aboard (574, 477, 113 and 118); at B7.c before its review it drew on every
 # hand idle at quarters (196, 181, 61 and 76, the helm, the powder, the carpenter's crew and the
 # surgeon's mates among them) and lent 72, 39, none and none.
+# package 119 (the muster's rule 3: the odd hands of odd stations to the watches in turn): the
+# seventy-four's watches 265 and 265, her party one watch (old `(268, 150, 118)`, her starboard
+# watch of 268; docs/dev/TuningNotes.md, "Package 119")
 TACK_AT_QUARTERS = {
-    SEVENTY_FOUR: (268, 150, 118),
+    SEVENTY_FOUR: (265, 150, 115),
     SIXTY_FOUR: (218, 137, 81),
     "data/ships/brig.yaml": (48, 42, 6),
     "data/ships/hermaphrodite-brig.yaml": (55, 65, 0),

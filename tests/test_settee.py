@@ -242,7 +242,8 @@ def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
     committed ship files only the bilander carries a settee. The fixture's settee brig, a brig's
     company, keeps watches of 48 hands (38 who go aloft), never too few for six. Package 116
     (the lead's word of 2026-11-16) adds the letting go of the anchor, for every ship: the
-    merchant brig's larboard watch of three could not let it go."""
+    merchant brig's larboard watch of three could not let it go (her watches five and five since
+    package 119, a watch made short calling all hands for it: truth 7-703)."""
     from pathlib import Path
 
     calling = {eid for eid, evo in EVOLUTIONS.items() if "too_few" in evo.crew}

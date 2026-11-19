@@ -22214,7 +22214,8 @@ post the rule put in a pool and took (a scratch pytest plugin wrapping `Runner._
 `hands.request`, the tree untouched):
 
 - **Their watches as mustered at seed 7.** The merchant brig's are seven and three (each of her
-  stations odd, the odd hand to the starboard by the muster's rule), the smack's three and two,
+  stations odd, the odd hand to the starboard by the muster's rule; **since package 119 five and
+  five**, the odd hands going to the watches in turn: "Package 119" below), the smack's three and two,
   the topsail schooner's seventeen and sixteen. The schooner's are over the want of every request
   that is a watch's work on deck by her files (twelve at the most, a topsail set from the gear),
   by night and by day, so her post is never counted for it (pinned:
@@ -22291,7 +22292,10 @@ post the rule put in a pool and took (a scratch pytest plugin wrapping `Runner._
   put in a pool.
 - **The merchant brig's watches** are seven and three as mustered (each of her stations odd, the
   odd hand to the starboard), so her master works with the larboard's three at nearly every
-  request: her own lines of who hauls, no test or truth of hers moved.
+  request: her own lines of who hauls, no test or truth of hers moved. (**Package 119:** five and
+  five since, her master and her mate each with a watch of five, under the want of most work on
+  deck as before; the three tests of ruling 11 that stood on seven and three re-made, old beside
+  new under "Package 119".)
 
 ### Ruling 8 on ruling 11: the bilander's nine (the second commit)
 
@@ -22673,7 +22677,8 @@ seed 7 on the owner's machine (Windows 11).
   hands by their files), each watch by night and by day, the watch alone, no post.
 - **Where else, not mended, for the lead:** the merchant brig's larboard watch of three (her clamp
   eleven) and the smack's of two (six) cannot heave to or fill away by night alone, on the trunk and
-  here alike; the lead's (c) was the bilander's.
+  here alike; the lead's (c) was the bilander's. (Package 119: her watches five and five, neither
+  can heave to by night alone, the starboard's seven having done so: "Package 119" below.)
 
 #### (C4): the schooner's master and mate are counted for the work that wants twenty
 
@@ -38166,3 +38171,46 @@ No pinned world digest moved, and no recorded passage (the gate below confirms i
 - The reason: the test said no yes on file was given against the revised brief, which stopped being so when one was filed. Nothing of the re-ask rule changed; the count of records owed the question is the same seven.
 - Moved by the lead; passed by an independent reader (the record of the filing in `docs/dev/M7-WorkPackages.md` names the reading).
 
+
+## Package 119: the merchant brig's watches five and five (2026-11-19)
+
+**The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.
+
+**The cause.** The muster (`freesail/crew/muster.py`, its rule 3) watched each station's hands alternately, starboard first, so that an odd station's last hand went to the starboard watch, and every odd station's did. The merchant brig's four seaman stations are all odd (forecastle 3, fore top 3, main top 3, the afterguard's boy 1): her ten were watched seven and three, and on her watch of three every job wanting nine or more hands waited.
+
+**The mend.** Each station's hands are watched as before; the odd last hands of successive odd stations, in the stations' order and the marines among them after the seamen's, go to the watches in turn, the first to the starboard. Nothing else of the muster moves: the books, each hand's name, rating, station and skills, and the stream's draws (the rule draws nothing). No ship file is touched. How a job counts its hands is unchanged.
+
+**Every ship file's watches as mustered** (seaman stations and marines, starboard and larboard; the same at every seed). Old beside new, the three that move:
+
+| ship | old | new | odd stations |
+|---|---|---|---|
+| merchant brig | 7, 3 | 5, 5 | forecastle, fore top, main top, afterguard |
+| razee (44) | 146, 142 | 144, 144 | forecastle, fore top, main top, waisters |
+| seventy-four | 268, 262 | 265, 265 | forecastle, fore top, main top, afterguard, waisters, marines |
+
+The other fifteen as they were, each hand of each: equal where no station is odd (the bilander's 3 and 3, the brig's 48 and 48, the frigate's 111 and 111, the hermaphrodite brig's 55 and 55, the cutter's 12 and 12, the five boats'), one apart where one station is (the lugger's 13 and 12, the privateer and the topsail schooner 17 and 16, the sixty-four's 218 and 217, the smack's 3 and 2), which no rule mends. The hands whose watch moved: the merchant brig's fore top's odd hand and her boy, the razee's fore top's and waisters' odd hands, the seventy-four's fore top's, afterguard's and marines' (truth 7-701).
+
+**What the merchant brig gets** (by night off the Lizard, `tests/test_hands.py`'s trader at seed 7; each watch with its post, counted as ruling 11 counts it). Old beside new:
+
+| work (want; her company's clamp) | starboard old | larboard old | either watch new |
+|---|---|---|---|
+| a topsail or the foresail from the gear (12; 11) | 8 of 11, short | waits, "but four to spare" | 6 of 11, short |
+| the braces (8) | 8, enough | 4 of 8, short | 6 of 8, short |
+| a topsail furled (12; 10, aloft) | 7 of 10, short | waits, "but three to spare" | 5 of 10, short |
+| tack, wear (all hands' work) | 9 | 6 | 7 |
+| heave to (12; 11, a manoeuvre: no post) | 7 of 11, short | waits, "but three to spare" | waits, "but five to spare" |
+| let go the anchor (12; 11) | 8 of 11, short | 4: all hands called (package 116) | 6 of 11, short; no hands called |
+
+**One thing she loses, for the owner's eye:** the starboard watch's seven could heave to by night alone, and neither watch of five can (five, under half the eleven, and a manoeuvre takes no post). The larboard's three could not before either. Work of the whole company waits for all hands by either watch alike (pinned: truth 7-704). Not mended: how a job counts its hands is out of the package.
+
+**Every pin moved or re-made, old beside new.**
+
+1. **Truth 7-630** (`tests/test_known_truths.py`), renamed from `..._lets_go_her_anchor_by_all_hands_and_weighs` to `..._lets_go_her_anchor_by_her_watch_and_weighs`. Old: her watches' whole `[7, 3]`; as the harbour starts her, all hands called once, "All hands! (to let go the anchor)", piped down. New: `[5, 5]`; she lets go by the larboard watch, no hands called, the one line "Only six hands to let go the anchor; there are no more on deck."; nothing waiting. Kept as it was: riding at anchor in Falmouth within two minutes, all hands not up, weighing, `let go the anchor` bringing her up again, the cutter by her watch with no hands called. The reason: at five and five the larboard five and the master are half the want, so the truth's all-hands half cannot be told on her as she starts. A substantive change, at the lead's word; the all-hands half is told by truth 7-703 instead.
+2. **`test_hands.py::test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_the_works_want`** (ruling 11). Old: `[7, 3]`; by night the larboard's jib from the gear (want six) by its three and the master, four, short; the starboard's seven set it with six hands, enough, the mate not counted; the braces (eight) by the seven and the mate; four of the starboard's seven made busy, the jib from the gear begun short by the three idle, the mate not taken. New: `[5, 5]`; the larboard's jib from the gear by its five and the master, six, enough; the jib taken in (want four) by the larboard's four, the master not counted; the starboard's jib from the gear by its five and the mate, six, enough; the braces by the five and the mate, six of eight, short; the jib taken in by the starboard's four, the mate not counted; two of the starboard's five made busy (the whole still five), the jib taken in short by the three idle, the mate not taken. The reason: at five and five the jib from the gear is over the whole of either watch, so the case of a whole not under the want, and the busy watch's, cannot be told by it; the jib taken in tells them. Each half still turns on what the test's name says.
+3. **`test_hands.py::test_a_post_is_counted_where_the_watch_is_small_on_board_and_not_where_it_is_away_working`**. Old: the boat holding three of the starboard's seven; the jib from the gear (six); the whole seven hoisting out (the mate not counted) and four pulling away (the mate counted). New: three of the starboard's five; the jib taken in (four); the whole five hoisting out (not counted) and two pulling away (counted). The reason as in 2: with the jib from the gear the whole is under the want both ways and the case stops turning.
+4. **`test_bellerophon.py::test_a_tack_at_quarters_takes_one_watch_the_guns_giving_only_the_rest`**, both priorities: `TACK_AT_QUARTERS[SEVENTY_FOUR]` old `(268, 150, 118)`, new `(265, 150, 115)`. Her party is one watch, the larger (old her starboard's 268, new either's 265), and the hands lent from the guns beyond her 150 trimmers three fewer. It still tells its story; a re-pin.
+5. **Words only, the assertions as they were:** `test_hands.py::test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_at_quarters` (her fore topsail furled by the larboard's five, old three); `test_settee.py::test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few` (history kept, the new state added); `freesail/crew/model.py`'s comment on `WATCHES`; the words on rulings 8 and 11 above, where they state seven and three as present.
+
+**New truths, 7-700 to 7-704.** 7-700: every ship file's two watches equal or one apart at two seeds, and each station's share; the three files' new splits. 7-701: the eighteen musters otherwise as they were: the hands on the books, the last one's name and the stream's next draw at seed 7 measured on the old rule; each hand's watch the old rule's but the odd hands named above; the merchant brig's two moved hands by name, and the three files' skills summed. 7-702: the brig's fore topsail, main topsail and foresail from the gear begun short by either watch by night, six of eleven, its post among them. 7-703: the harbour's brig, anchored by her watch and weighed, two of her larboard watch on the sick list (`Health.make_sick`) and the whole three: `let go the anchor` calls all hands once, she is brought up in Falmouth's road within two minutes and piped down, nothing waiting. Hands away in the boat do not make the watch too few: they are at other work, and the anchor waits for them (`Runner._calls_for_itself`), measured in the ground report's probe. 7-704: her two watches alike by night, the table above, heaving to waiting on either.
+
+**Not moved,** run with the new rule before the build (the ground report): no recorded passage in either tier, and nothing of the razee's.
