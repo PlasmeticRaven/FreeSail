@@ -402,7 +402,10 @@ def test_a_merchantman_brought_to_by_a_privateer_with_no_cover_strikes_and_joins
     assert prey.brain is not None and prey.brain.intent.destination == "brest"
     assert any("struck" in words for _, words in prey.story)
     assert any("taken by the Vengeur" in words for _, words in prey.story)
-    assert any(e.kind == "squadron.cut_out" for e in w.log)
+    # the cut out is on the far record (above) and in her story; seventeen miles off his
+    # ship, out of his sight, it is no line of his log (package 118: what far ships do
+    # reaches him only as his deck could see it)
+    assert not any(e.kind == "squadron.cut_out" for e in w.log)
 
 
 def test_the_cut_out_is_withheld_while_a_man_of_war_of_hers_is_within_the_cover_distance():
@@ -553,7 +556,9 @@ def test_the_frigate_in_ordinary_slips_out_when_the_blockaders_are_gone_from_the
     assert hulk.brain is not None and hulk.regime == ""
     assert hulk.brain.intent_words == "cruise off the Lizard within 20 miles"
     assert any("slipped out" in words for _, words in hulk.story)
-    assert any(e.kind == "regime.sortie" for e in w.log)
+    # the sortie is in her story; a hundred miles off his ship it is no line of his log
+    # (package 118)
+    assert not any(e.kind == "regime.sortie" for e in w.log)
 
 
 def test_a_ship_is_laid_up_in_ordinary_and_commissioned_by_the_directors_forms():

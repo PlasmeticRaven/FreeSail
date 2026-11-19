@@ -9208,8 +9208,11 @@ def test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_
     w.run(21600)
     assert any(t == 37920 and "restored" in words for t, words in sq.history), sq.history
     assert naiad.brain.intent_words == "blockade Brest"
-    sortie = [e for e in w.log if e.kind == "regime.sortie"]
-    assert [e.tick for e in sortie] == [43200], sortie
+    # the Hortense out at 43200, by her own story (package 118: out of the sight of the
+    # Ushant station the sortie is no line of the player's log, and his log is not read)
+    sortie = [t for t, words in hortense.story if "slipped out" in words]
+    assert sortie == [43200], hortense.story
+    assert not any(e.kind == "regime.sortie" for e in w.log)
     assert hortense.regime == "" and hortense.brain is not None
     assert hortense.intent_words == "cruise off the Lizard within 20 miles"
     assert w.captain.state == "keeping station"
@@ -22544,3 +22547,396 @@ def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_i
         10,
         3,
     ), count
+
+
+# -- package 118: the director's mends, and the far ships' lines (truths 7-650 to 7-659) -------
+# Card 6 of docs/dev/ScopeCards-BeforeTheGate.md (the owner's, 2026-11-18): the lead's play at
+# the director's seat found four faults that the tests, which ran without the server, did not
+# see; the owner added a fifth from the lead's play at the player's door. Each test here comes
+# in by the game's own doors: the server's loader and its `Driver`, the console's `Console`.
+
+DIRECTED = "data/scenarios/directed-passage.yaml"
+
+
+def _directed_under(door: str = "driver"):
+    """The directed passage as the browser game starts it (`prepare_game`), the player at
+    the director's seat, with the server's `Driver` or the console's `Console` about the
+    world (each subscribes to its log and holds a lock), or neither."""
+    import io
+
+    from freesail.ui.console import Console
+    from freesail.ui.server import Driver, prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", DIRECTED, "--seat", "director"])
+    w = prepare_game(args, say=lambda _line: None)
+    if door == "driver":
+        Driver(w)
+    elif door == "console":
+        Console(w, out=io.StringIO())
+    return w
+
+
+@pytest.mark.parametrize("door", ["driver", "console"])
+def test_truth_7_650_weather_is_ordered_under_a_wind_limit_in_the_game_as_played(door):
+    """Item 1 (the lead's sitting of 2026-11-18, fault 1): under the quiet passage's 27 knots,
+    with the server's driver about the world, every real `weather:` order failed inside
+    ("cannot pickle '_thread.RLock' object") while its dry run said it would be performed: the
+    wind's judgement deep-copied the weather, whose coast hooks are the World's own methods,
+    and the copy took the World and the driver's lock with it. Now the copy is the weather's
+    alone. Through the driver and through the console: a mild low is done, as its dry run
+    says, and a low deep enough for a gale is refused in words, by the figure it would blow."""
+    from freesail.agents import director as D
+
+    w = _directed_under(door)
+    assert D.brief_of(w).limits["wind_max_kn"] == 27
+    mild = 'weather: low "the low" radius 450 km at 1805-06-13T10:00 -500 300 1004'
+    assert "it would be performed" in D.dry_run(w, mild)
+    said = D.direct(w, mild)
+    assert said.startswith("Done: low 'the low' appended to the weather"), said
+    deep = 'weather: low "the deep" radius 450 km at 1805-06-13T10:00 -300 200 985'
+    said = D.direct(w, deep)
+    assert said.startswith("Refused, outside the brief: the brief allows no wind above 27"), said
+    assert "it would blow" in said
+    # the wind's judgement on the world itself, with the driver about it (the door judges
+    # on a copy, which has no driver; the judgement must hold where it is asked of the world)
+    from freesail.world import orders as WO
+
+    why = D.brief_of(w).limit_of(w, WO.parse(deep))
+    assert why is not None and "it would blow" in why, why
+    kinds = [e.kind for e in D.log_of(w).entries]
+    assert kinds.count("director.order") == 1 and kinds.count("director.refused") == 1
+
+
+@pytest.mark.slow
+def test_truth_7_651_every_forms_example_is_answered_alike_with_a_driver_or_a_console_about():
+    """Item 1, the test that would have caught it: every example of every form of world
+    order, on the forms' near sea under the quiet passage's limits, judged, dry run and
+    entered at the director's door with nothing about the world, with the server's driver
+    about it, and with the console's: nothing raises, and every answer is the same word for
+    word whichever door is about the world."""
+    import io
+
+    from freesail.agents import director as D
+    from freesail.ui.console import Console
+    from freesail.ui.server import Driver
+    from freesail.world import orders as WO
+    from tests.test_director import _forms_worlds
+
+    answers = {}
+    for door in ("bare", "driver", "console"):
+        w = _forms_worlds()[2]()  # the near sea, made afresh for each door
+        D.set_brief(w, "quiet-passage", quiet=True)
+        if door == "driver":
+            Driver(w)
+        elif door == "console":
+            Console(w, out=io.StringIO())
+        said = []
+        for f in D.WORLD_ORDER_FORMS:
+            for x in f.examples:
+                said.append(str(WO.judged(w, WO.parse(x)) is not None))
+                said.append(D.dry_run(w, x))
+                D.budget_of(w).acts = 0
+                said.append(D.direct(w, x))
+        answers[door] = said
+    assert not any("could not run" in s or "pickle" in s for s in answers["driver"])
+    assert answers["driver"] == answers["bare"]
+    assert answers["console"] == answers["bare"]
+
+
+def test_truth_7_652_an_order_that_fails_inside_leaves_the_world_as_it_was_and_is_recorded(
+    monkeypatch,
+):
+    """Item 2 (fault 2): `person: "Mr Coffin" comes aboard as passenger` brought him aboard,
+    wrote "Mr Abel Coffin came aboard from Falmouth.", and then the station's binding raised:
+    the director was told it did not run, spent no act and had no entry, the play log carried
+    the half, and the save made after it did not replay. Now every world order is tried first
+    on a copy of the world. One that fails inside (the binding made to raise here as it raised
+    then, the name now being found, item 3) is answered "failed" in words with the world as
+    it was: he is still ashore, no line of his coming, the director's log says it failed, no
+    act is spent, `world_orders` holds it. And one the channel refuses after it had begun (a
+    squadron of a name already borne, whose members had left their sets before the refusal)
+    leaves the sets as they were."""
+    from freesail.agents import director as D
+    from tests.test_director import _forms_worlds
+
+    w = _directed_under("driver")
+    said = D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    assert said.startswith("Done:"), said
+    lines = len(list(w.log))
+
+    bind = type(w.stations).bind
+
+    def raises(self, name, person=None, *a, **kw):
+        if "Coffin" in str(getattr(person, "name", person) or ""):
+            raise ValueError(
+                "Mr Abel Coffin is not one of the ship's company; nobody by that name."
+            )
+        return bind(self, name, person, *a, **kw)
+
+    monkeypatch.setattr(type(w.stations), "bind", raises)
+    said = D.direct(w, 'person: "Mr Abel Coffin" comes aboard as passenger')
+    monkeypatch.undo()
+    assert said.startswith("Failed: the order was tried and failed inside"), said
+    assert "nothing of it was done" in said
+    coffin = w.people.find("Mr Abel Coffin")
+    assert coffin is not None and not coffin.aboard
+    new = list(w.log)[lines:]
+    assert not any("came aboard" in e.text for e in new)
+    assert [e.data.get("result") for e in new if e.kind == "world.order"] == ["failed"]
+    assert w.world_orders[-1]["result"] == "failed"
+    last = D.log_of(w).entries[-1]
+    assert last.kind == "director.failed" and "Mr Abel Coffin" in last.text
+    assert D.budget_of(w).acts == 1  # the making alone
+
+    near = _forms_worlds()[2]()
+    sq = near.squadrons.find("the Channel squadron")
+    members, commander = list(sq.members), sq.commander
+    e = near.world_order(
+        'squadron: "the Channel squadron" of Britain under the Nimble with the Medusa, bound '
+        "for Falmouth",
+        "the test",
+    )
+    assert e.data["result"] == "refused"
+    sq = near.squadrons.find("the Channel squadron")
+    assert (list(sq.members), sq.commander) == (members, commander)
+
+
+def test_truth_7_653_the_passenger_comes_aboard_by_his_own_name_and_the_save_replays():
+    """Items 2 and 3 together, as the owner tries them: the passenger made ashore at
+    Falmouth comes aboard as passenger by the name he was made by; the director's log says
+    so, one act each; and the save made after it replays to the same log."""
+    from freesail.agents import director as D
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w = _directed_under("driver")
+    assert D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth').startswith(
+        "Done:"
+    )
+    said = D.direct(w, 'person: "Mr Abel Coffin" comes aboard as passenger')
+    assert said.startswith("Done:"), said
+    assert w.people.find("Mr Abel Coffin").aboard
+    assert any(e.text == "Mr Abel Coffin came aboard from Falmouth." for e in w.log)
+    assert [e.kind for e in D.log_of(w).entries].count("director.order") == 2
+    assert D.budget_of(w).acts == 2
+    w.run(120)
+    data = w.save()
+    assert data["world_order_door"] == 2 and data["world_order_door_from"] == 0
+    again = replay.replay(data, ship_factory)
+    assert again.log.digest() == w.log.digest()
+
+
+def test_truth_7_654_a_save_from_before_the_door_replays_the_order_that_raised_as_played(
+    monkeypatch,
+):
+    """Item 2, the saves made before it: under the door as it was, an order that failed
+    inside raised out of it with its first half done and nothing recorded, and the save made
+    after it raised again on replay (the input road and the acts road) and did not load. A
+    save without the door's mark (`world_order_door`) is replayed by the door it was played
+    under, and the replay goes past the order that raised as the play went on: the half done
+    again, the same log. Made here by the old door itself, the mark then taken out."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w = _directed_under("none")
+    w.world_order('person: make "Mr Abel Coffin", a passenger, ashore at Falmouth', "the owner")
+    w.world_order_door_from = 10**9  # the door before package 118, for this game
+
+    bind = type(w.stations).bind
+
+    def raises(self, name, person=None, *a, **kw):
+        if "Coffin" in str(getattr(person, "name", person) or ""):
+            raise ValueError("nobody by that name")
+        return bind(self, name, person, *a, **kw)
+
+    monkeypatch.setattr(type(w.stations), "bind", raises)
+    with pytest.raises(ValueError):
+        w.world_order('person: "Mr Abel Coffin" comes aboard as passenger', "the owner")
+    w.run(60)
+    data = w.save()
+    data.pop("world_order_door")
+    data.pop("world_order_door_from")
+    assert not any('Coffin" comes aboard' in o["order"] for o in data["world_orders"])
+    again = replay.replay(data, ship_factory)
+    monkeypatch.undo()
+    assert again.log.digest() == w.log.digest()
+    assert again.people.find("Mr Abel Coffin").aboard  # the half, done again as in play
+    assert again.world_order_door_from == data["end_tick"] + 1
+
+
+def test_truth_7_655_a_person_is_found_by_the_name_he_was_made_by_and_not_made_twice():
+    """Item 3 (fault 3): `People.find` stripped 'Mr' from the words asked and compared them
+    with the name unstripped, so "Mr Abel Coffin" answered to "Mr Coffin" alone, and a
+    second `make` of his name was done. Now his whole name finds him with 'Mr', without it
+    and with 'Mister', as his surname did; a second making of the name is refused; and a
+    surname alone borne by a hand of another hull's company refuses no new person."""
+    from freesail.agents import director as D
+
+    w = _directed_under("driver")
+    D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    coffin = w.people.find("Mr Coffin")
+    assert coffin is not None
+    for words in ("Mr Abel Coffin", "Abel Coffin", "mister abel coffin", "Coffin"):
+        assert w.people.find(words) is coffin, words
+        assert w.people.find_anywhere(words) is coffin, words
+    said = D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    assert "is among the people already" in said, said
+    said = D.direct(w, 'person: make "Abel Coffin", a passenger, ashore at Falmouth')
+    assert "is among the people already" in said, said
+    others = [
+        p
+        for p in w.registry.persons()
+        if p.home and p.home != w.own.id and getattr(p, "surname", "")
+    ]
+    if others:
+        surname = others[0].surname
+        said = D.direct(w, f'person: make "Mr Jedediah {surname}", a passenger, ashore at Falmouth')
+        assert said.startswith("Done:"), said
+
+
+def test_truth_7_656_a_far_ship_sent_to_a_position_lies_to_there_until_her_next_order():
+    """Item 4 (fault 4): `ship "<name>": order shape a course for <a position>` was answered
+    "the order stands until the next", and at the position she was marked done and was out of
+    the sea. Now at the end of a course the director gave (to a position, or a course steered
+    for its sixty miles) she lies to there until her next order: the Medusa put on the sea and
+    sent six miles, and still in the world, hove to, a watch after she came there."""
+    from freesail.agents import director as D
+    from freesail.world.geo import bearing_and_distance
+
+    w = _directed_under("driver")
+    D.direct(w, 'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth')
+    medusa = w.vessels.find("Medusa")
+    said = D.direct(w, 'ship "Medusa": order shape a course for 49 50 N 4 40 W')
+    assert "the order stands until the next" in said, said
+    w.run(6 * 3600)
+    assert medusa in w.vessels.vessels and not medusa.done
+    assert medusa.plan and medusa.plan[0][0] == "lie_to"
+    from freesail.world.geo import Position
+
+    mark = Position(lat_deg=49 + 50 / 60, lon_deg=-(4 + 40 / 60))
+    assert bearing_and_distance(medusa.position, mark)[1] / units.NAUTICAL_MILE < 6.0
+    said = D.direct(w, 'ship "Medusa": order steer south')
+    assert "the order stands until the next" in said, said
+    w.run(12 * 3600)
+    assert medusa in w.vessels.vessels and medusa.plan[0][0] == "lie_to"
+
+
+def _cut_out_at(miles: float):
+    """A British merchant brig cut out by a French privateer `miles` south of an English
+    schooner of the player's (no man of war of hers near, so the cut out is done)."""
+    from freesail.world import prizes as P
+    from freesail.world.geo import destination
+    from tests.test_brains import put, world_at
+
+    w = world_at(49.5, -5.5, ship="data/ships/topsail-schooner.yaml")
+    w.crewed_settings = {"cap": 0}
+    w.run(60)
+    far = destination(w.position, 180.0, miles * units.NAUTICAL_MILE)
+    prey = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "bound for the Start",
+        name="Nancy",
+    )
+    prey.sailing_factor = 0.85
+    p = destination(far, 270.0, 1.2 * units.NAUTICAL_MILE)
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="shown",
+        name="Vengeur",
+    )
+    pv.sailing_factor = 1.0
+    for _ in range(150):
+        w.run(60)
+        if P.is_prize(prey):
+            break
+    return w, prey, pv
+
+
+def test_truth_7_657_a_far_capture_is_a_line_of_his_log_only_when_his_deck_could_see_it():
+    """Item 5 (the owner's words of 2026-11-18): a far ship's capture, a hundred and twenty
+    miles off, was a notable line of the player's log. Now such a line is written into his
+    log only when the ships it names are in his lookout's sight and made out (their colours,
+    for a ship struck and taken): the same cut out a mile off is his line, and twelve miles
+    off, a sail on the horizon, it is not; the far record and her story hold it either way."""
+    from freesail.world import prizes as P
+
+    near, prey, _ = _cut_out_at(1.0)
+    assert P.is_prize(prey)
+    assert [e.text for e in near.log if e.kind == "squadron.cut_out"] == [
+        "Nancy is cut out: brought to by Vengeur with no help near, she strikes and is sent in "
+        "under a prize crew."
+    ]
+    far, prey, pv = _cut_out_at(12.0)
+    assert P.is_prize(prey) and P.record_of(prey)["how"] == "cut out"
+    assert far.lookout.made_out(prey.id) in (None, 0)
+    assert not any(e.kind == "squadron.cut_out" for e in far.log)
+    assert any("taken by the Vengeur" in words for _, words in prey.story)
+
+
+def test_truth_7_658_his_own_sets_ship_lost_or_parted_is_his_and_anothers_only_in_sight():
+    """Item 5, the lead's ruling: a ship lost to the set or parted from it is a line of his
+    log wherever she is when the set is his own (the convoy or squadron his ship commands or
+    sails in: her absence is what his lookout sees), and of another set's only when she is
+    in his sight and made out; a line that names his own ship is always his."""
+    from freesail.core.events import Severity
+    from freesail.world import squadrons as Q
+    from freesail.world.ships import PLAYER_ID, _seen_from_her_deck
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5)
+    w.run(60)
+    own = Q.Squadron(
+        id="his-convoy", name="his convoy", nation="britain", members=[PLAYER_ID, "x1"]
+    )
+    other = Q.Squadron(
+        id="their-convoy",
+        name="their convoy",
+        nation="britain",
+        commander="x2",
+        members=["x2", "x3"],
+    )
+    w.squadrons.add(own)
+    w.squadrons.add(other)
+
+    def line(kind, data):
+        return (Severity.NOTABLE, kind, "words", data)
+
+    for kind in ("squadron.lost", "squadron.parted"):
+        assert _seen_from_her_deck(w, line(kind, {"id": "x1", "squadron": "his-convoy"}))
+        assert not _seen_from_her_deck(w, line(kind, {"id": "x3", "squadron": "their-convoy"}))
+    assert not _seen_from_her_deck(
+        w, line("squadron.straggler", {"id": "x1", "squadron": "his-convoy"})
+    )
+    assert _seen_from_her_deck(w, line("prize.taken", {"captor": "x2", "prize": PLAYER_ID}))
+    assert _seen_from_her_deck(w, line("sail.spoke", {}))  # a line of no far kind is as it was
+
+
+def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
+    """Item 2, the record: the acts applier counted an act of the day's budget for every
+    world order of the director it gave again, a refused one too, where the door counts only
+    an order done, so a replay by the acts could be held by a budget the play was not. Now a
+    refused or failed order given again is counted as nothing, and a done one as one."""
+    from freesail.agents import director as D
+    from freesail.core import acts
+
+    w = _directed_under("none")
+    before = D.budget_of(w).acts
+    acts._world_order(w, "director", {"text": "weather: nothing at all", "source": D.SOURCE})
+    acts._world_order(
+        w, "director", {"text": 'person: "Mr Nobody" goes ashore', "source": D.SOURCE}
+    )
+    assert D.budget_of(w).acts == before
+    acts._world_order(
+        w,
+        "director",
+        {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
+    )
+    assert D.budget_of(w).acts == before + 1

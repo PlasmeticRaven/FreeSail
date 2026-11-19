@@ -917,6 +917,29 @@ def chart_names(manifest: dict[str, Any]) -> list[str]:
     return list(manifest.get("charts") or {}) + list(manifest.get("regions") or {})
 
 
+# The manifest as `chart_holding` reads it (package 118): read once for each state of the
+# file, keyed on its path, its time of modification and its size, so that a manifest
+# regenerated or a test's own is never served stale. A World read from a checkpoint asks
+# `chart_holding` for each of its hulls, and the file read again each time was nearly the
+# whole cost of a copy of the world (three quarters of a second a hull). Only this reader
+# shares it, and it only reads; `load_manifest` gives every other caller its own.
+_MANIFESTS: dict[tuple[str, int, int], dict[str, Any]] = {}
+
+
+def _manifest_read(root: Path) -> dict[str, Any]:
+    path = root / "manifest.yaml"
+    try:
+        st = path.stat()
+    except OSError:
+        return load_manifest(root)  # its own words for a missing manifest
+    key = (str(path.resolve()), st.st_mtime_ns, st.st_size)
+    doc = _MANIFESTS.get(key)
+    if doc is None:
+        doc = load_manifest(root)
+        _MANIFESTS[key] = doc
+    return doc
+
+
 def chart_holding(region: str, root: Path = CHARTS_DIR) -> str:
     """The name of the chart in play for a scenario that names a region (package 45, the
     owner's question 3 of gate m6a: the chart shows one region where the game should show
@@ -925,7 +948,7 @@ def chart_holding(region: str, root: Path = CHARTS_DIR) -> str:
     region's own name where no chart holds it (a chart of that one region, as package 38
     had it), and a chart's own name as given. A scenario that wants one region alone says
     `chart: <region>` outright, which only a test should."""
-    manifest = load_manifest(root)
+    manifest = _manifest_read(root)
     if region in (manifest.get("charts") or {}):
         return region
     for name, spec in (manifest.get("charts") or {}).items():

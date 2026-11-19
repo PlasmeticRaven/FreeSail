@@ -1836,3 +1836,28 @@ def test_the_players_word_and_the_directors_answer_by_every_road_and_none_in_the
     copy = replay.replay(json.loads(json.dumps(w.save())), ship_factory)
     assert copy.log.digest() == w.log.digest()
     assert [x["text"] for x in D.channel_lines(copy)][:2] == answers[:2]
+
+
+def test_an_order_through_the_first_hulls_hand_runs_on_her_on_the_copy_and_the_world():
+    """Package 118, item 2 (the reader of 2026-11-19): the director's tools hold his first
+    hull's handle, and the copy an order is tried on and judged on had no current hull of
+    its own and read its followed one. With another hull followed, an order given through
+    the first hull's handle is tried, judged and performed on her, the copy as the world."""
+    from tests.test_crews import hove_to_world
+    from tests.test_crews import put as put_crewed
+
+    w = hove_to_world()
+    frigate = w.players
+    b = put_crewed(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    D.direct(w, f'follow "{b.name}"', by="t")
+    said = D.direct(w, "aboard: the boat gone adrift [reason: test]", by="t")
+    assert said.startswith("Done:"), said
+    assert w.own.dealings.boat.lost and not frigate.dealings.boat.lost
+    D.budget_of(w).acts = 0
+    said = D.direct(frigate, "aboard: the boat gone adrift [reason: test]", by="t")
+    assert said.startswith("Done:"), said
+    assert frigate.dealings.boat.lost
+    assert "the boat is lost already" in D.dry_run(frigate, "aboard: the boat gone adrift")

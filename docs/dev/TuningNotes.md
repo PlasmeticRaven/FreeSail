@@ -38166,3 +38166,35 @@ No pinned world digest moved, and no recorded passage (the gate below confirms i
 - The reason: the test said no yes on file was given against the revised brief, which stopped being so when one was filed. Nothing of the re-ask rule changed; the count of records owed the question is the same seven.
 - Moved by the lead; passed by an independent reader (the record of the filing in `docs/dev/M7-WorkPackages.md` names the reading).
 
+
+## Package 118: the director's mends, and the far ships' lines (2026-11-19)
+
+Card 6 of `docs/dev/ScopeCards-BeforeTheGate.md`. No figure of the physics, the weather or the sea moved. The wind's judgement gives the same figure to the last digit (a copy of the weather alone, its coast hooks shared, where it was a copy of the whole World). Four tests moved, all by item 5, the owner's words of 2026-11-18: "constrained to show in the log only if visible to the player and within range that it could be discerned ... it may be hidden entirely unless speaking of the players vessel". Each of the four read the player's own log for a line about ships out of his lookout's sight. Each now reads the far record or the ship's story for the same fact, and asserts that the line is not in his log.
+
+- `tests/test_squadrons.py::test_a_merchantman_brought_to_by_a_privateer_with_no_cover_strikes_and_joins_his_company`
+  - Old: a `squadron.cut_out` line in his log.
+  - New: no such line. The cut out is on the far record (`how: cut out`, the captor, already asserted) and in her story ("taken by the Vengeur").
+  - The reason: the cut out is seventeen miles off his ship.
+- `tests/test_squadrons.py::test_the_frigate_in_ordinary_slips_out_when_the_blockaders_are_gone_from_the_offing`
+  - Old: a `regime.sortie` line in his log.
+  - New: no such line. The sortie is in her story ("slipped out", already asserted).
+  - The reason: it is a hundred miles off his ship.
+- `tests/test_prizes.py::test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_retakes_her` (slow)
+  - Old: one `squadron.cut_out` line in his log, "sent in under a prize crew"; one `prize.retaken` line, "retaken by Sprightly coming up".
+  - New: neither line. The far record holds both: no company, so sent in; `retaken: ("retaken", "Sprightly coming up")`. Both stories hold the retaking.
+  - The reason: neither ship is in his sight.
+- `tests/test_known_truths.py::test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_after_the_gale` (slow)
+  - Old: the sortie's tick read from his log, `[43200]`.
+  - New: the same tick, `[43200]`, read from the Hortense's own story; and no `regime.sortie` line in his log.
+  - The reason: the Ushant station does not see Brest's road.
+
+The rule, for the record. A far ship's possession taken, a cut out, a retaking and a sortie are written into his log when every ship they name is in his lookout's sight with her colours made out (level 2). A straggler, or a ship regaining her station, is written when she is in sight with her rig and course made out (level 1). A ship lost to her set or parted from it is written wherever she is when the set is his own, and otherwise only in sight at level 1. A line naming his own ship is always written. The rule is `ships._FAR_LINES_SEEN_AT`, and the sight is the lookout's own (`Lookout.made_out`). In the fast tier at level 2 for every kind, 33 lines left the logs of 17 tests that pass unchanged, and no pinned digest moved.
+
+What a player no longer learns, because his deck could not see it:
+- A far capture, cut out or retaking out of his sight. The merchant cutter's first morning loses three: the Palinure and the Hirondelle a hundred and twenty miles off, the Swift twenty.
+- The blockade's sortie off Brest. The frigate on the Ushant station is not told the Hortense is out unless she sees her.
+- Another convoy's or squadron's straggler or ship regaining her station out of his sight, and another set's ship lost or parted out of his sight.
+
+No new road of news is built: a letter, a hail and a port's talk carry what they carried.
+
+Moved by the builder; each of the four passed by an independent reader (named in the build report).
