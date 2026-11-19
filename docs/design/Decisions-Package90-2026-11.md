@@ -807,6 +807,12 @@ to fill in some things from other research or judgement".
 - **The tiller step's seven files the card does not name** (A3: the ground report's §6 and §8 item
   3): "Widen the card"
 
+**The owner, 2026-11-19**, on the primer's passage item 37 makes untrue (chapter 3, "How close they
+may be carried": the frigate in 13 knots losing two booms in three minutes, where with the booms
+rated as intended none goes in the half hour), put as "Widen it for this one passage?", verbatim:
+"Widen it (Recommended)", the scene re-recorded from a run at 15 knots and the sentence restated
+from measurement, in stage 0's hash.
+
 **The owner, 2026-11-18** (through the lead's note of 22:35 UTC, nudge 19), on the strain of a
 lateen taken aback, in full: "A lateen taken aback should increase the strain on the mast, as a
 backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and,
@@ -839,5 +845,6 @@ addition, but we can include it in the planning."
 | P-V | *Virgen del Carmen*'s row: the third figure her beam or her depth | "Quite honestly, I do not know." (recorded as unknown: VR-Sp §12; no file reads her row) | 2026-11-19 |
 | GR | The ground report's count over twenty | "Go ahead" (built: the card's "Expected to move" names the moves, A6 drafted without its own two faults: Plan §14) | 2026-11-19 |
 | A3 | The tiller step's seven files the card does not name | "Widen the card" (named in the card's "May change": Plan §14, §6, §7.1) | 2026-11-19 |
+| A0-p | The primer's chapter 3 passage item 37 makes untrue (the frigate's booms in 13 knots) | "Widen it (Recommended)" (re-recorded at 15 knots from a run, with its size pins: Plan §14; TuningNotes, "Package 90, A0") | 2026-11-19 |
 | E | Anything in Part E changed | No word given against it, so it stands as recommended, as this sheet's rule has it | 2026-11-18 |
 | A1d | The strain of a lateen taken aback (put with the scope card, nudge 18) | "A lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk damage." (built: question 3, "Decided by you") | 2026-11-18 |

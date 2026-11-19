@@ -202,24 +202,25 @@ rig out the weather fore topmast studdingsail
 
 ### How close they may be carried
 
-Luce: the weather topmast and topgallant studding sails may be set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam" (Luce 1866, ch. XXIII; Luce 1884, ch. XXIII). The game refuses none of it. The wind does: forward of its angle a studding sail's lift falls away over a point and it shakes in its gear, the snatching comes on its boom, and kept so the boom carries away. The frigate in 13 knots of wind with her five weather studding sails drawing at nine points, brought up to six:
+Luce: the weather topmast and topgallant studding sails may be set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam" (Luce 1866, ch. XXIII; Luce 1884, ch. XXIII). The game refuses none of it. The wind does: forward of its angle a studding sail's lift falls away over a point and it shakes in its gear, the snatching comes on its boom, and kept so the boom carries away. The frigate in 15 knots of wind with her five weather studding sails drawing at nine points, brought up to six and her sails trimmed each minute:
 
 ```
-  Morning watch (04:38)  Order: steer 292.
-* Morning watch (04:38)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
-* Morning watch (04:38)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
-* Morning watch (04:39)  Starboard fore topmast studdingsail shaking in its gear; she is too near the wind to carry it.
+  Morning watch (04:35)  Order: steer 292.
+* Morning watch (04:35)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
+* Morning watch (04:35)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
+* Morning watch (04:35)  Starboard fore topgallant studdingsail shaking in its gear; she is too near the wind to carry it.
   ...
-* Morning watch (04:39)  Starboard fore topmast studdingsail boom whipping as the starboard fore topmast studdingsail flogs; she is too near the wind for it.
-! Morning watch (04:40)  Starboard main topmast studdingsail boom carried away; the starboard main topmast studdingsail hanging to leeward.
-! Morning watch (04:41)  Starboard fore topmast studdingsail boom carried away; the starboard fore topmast studdingsail hanging to leeward.
-  Morning watch (04:43)  Order: steer 259.
-  Morning watch (04:44)  Starboard fore topgallant studdingsail drawing again.
-  Morning watch (04:44)  Starboard main topgallant studdingsail drawing again.
-  Morning watch (04:44)  Starboard fore lower studdingsail drawing again.
+* Morning watch (04:35)  Starboard fore topgallant studdingsail boom whipping as the starboard fore topgallant studdingsail flogs; she is too near the wind for it.
+  ...
+! Morning watch (04:37)  Starboard fore topgallant studdingsail boom carried away; the starboard fore topgallant studdingsail hanging to leeward.
+! Morning watch (04:38)  Starboard fore lower studdingsail boom carried away; the starboard fore lower studdingsail hanging to leeward.
+! Morning watch (04:39)  Starboard main topmast studdingsail boom carried away; the starboard main topmast studdingsail hanging to leeward.
+  Morning watch (04:39)  Order: steer 259.
+  Morning watch (04:39)  Starboard fore topmast studdingsail drawing again.
+  Morning watch (04:39)  Starboard main topgallant studdingsail drawing again.
 ```
 
-Two booms gone in three minutes; borne away to nine points again, the three still aloft draw. In 12 knots every boom whips and none goes in ten minutes; in 15 they go within minutes. A studding sail shaking in its gear also wears three times as fast as one drawing (below). Going about takes them in and the booms in before anything else (chapter 5).
+Three booms gone in four minutes; borne away to nine points again, the two still aloft draw. In 12 knots every boom whips and none goes in ten minutes, and in 13 none goes in half an hour; in 14 the first goes after a quarter of an hour, and in 15 within two minutes. A studding sail shaking in its gear also wears three times as fast as one drawing (below). Going about takes them in and the booms in before anything else (chapter 5).
 
 ## The ringtail, the save-alls and the water sail
 

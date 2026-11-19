@@ -1635,11 +1635,11 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     # topgallant boom went before. Since package 90's item 37 (the owner's choice (a) of its
     # question 2: the generator's studding peak read from the engine's curves, 1.44 for the
     # 1.25 it kept since package 10) the booms are rated as the rule intended, a seventh
-    # stronger: in 32 knots they whip, at 2.11 of their rating at most, and none carries away
+    # stronger: in 32 knots they whip, at about 2.1 of their rating at most, and none carries away
     # in the whole run, the routine in time (old: the main topmast boom, larboard, on the 2nd
     # second of the first blow; TuningNotes, "Package 90, A0"). Like the old clause it holds
     # by the strain stream's draw at the seed: over 1.5 of its rating a spar may carry away,
-    # and the booms reach 2.10 and the main and mizzen royal yards 1.90 and 1.92 (measured)
+    # and the booms reach about 2.1 and the main and mizzen royal yards 1.90 and 1.92 (measured)
     assert events(world, "spar.carried_away") == [], "the routine in time: nothing carries away"
     # the strain's road, kept: from the same start a blow of 36 knots held carries a boom away
     # before the routine's two minutes, a boom the first spar to go; which boom and when is
