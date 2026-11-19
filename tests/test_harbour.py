@@ -1017,14 +1017,24 @@ def test_the_scenarios_plan_of_its_stations_and_the_other_captains_are_in_the_st
     assert game["chosen"]["plan"] == {} and game["captains"] == []
 
 
-def test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat(port, client):
+def test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_seat(
+    port, client, monkeypatch
+):
     """Package 96b, step 9, mended (the independent reader's findings): the page's state
     passes on each seat's phase and its ship. A seat in its consent conversation is not a
     station held, and a seat stopped (a consent declined, a door stopped before an answer)
     is nobody's; another ship's captain asked for is said with her name, not on the
     player's own captain's row. And a row the page offers changes nothing of what the game
     admits: a model asked for as the captain of an enemy of the player's ship is refused
-    by the game in its own words, before any station is made."""
+    by the game in its own words, before any station is made.
+
+    Package 117 turned `seats.ADVERSARIAL_SEATS_CONSENTED`: the refusal is the gate's while
+    the flag is not turned, and is held so here; at the end, the flag turned, the same seat
+    is admitted to its consent conversation (a station in its consent phase, nobody's
+    until it answers)."""
+    from freesail.world import seats as seat_rules
+
+    monkeypatch.setattr(seat_rules, "ADVERSARIAL_SEATS_CONSENTED", False)
     client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
     assert client.get("/api/harbour/state").json()["game"]["captains"] == ["Renard"]
     seat = {"model_name": "made-up-b", "door": "api", "ship": "Renard"}
@@ -1053,6 +1063,11 @@ def test_only_a_seated_station_is_held_and_the_game_refuses_a_hostile_captains_s
         ("officer of the watch", "", "made-up-a", "stopped"),
         ("captain", "Raven", "made-up-b", "stopped"),
     ]
+    monkeypatch.setattr(seat_rules, "ADVERSARIAL_SEATS_CONSENTED", True)
+    client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
+    r = client.post("/api/agents/captain", json=seat)
+    assert r.status_code == 200, r.text
+    assert seats() == [("captain", "Renard", "made-up-b", "consent")]
 
 
 # ---------------------------------------------------------------------------
