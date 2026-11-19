@@ -176,6 +176,10 @@ KINDS: dict[str, str] = {
     "director.unperformed": (
         "an order the game has no way to perform as said, answered so and not performed"
     ),
+    "director.failed": (
+        "an order tried and failed inside, nothing of it done and no act spent, with the "
+        "error in words (package 118)"
+    ),
     "director.follow": (
         "the drivers' centre moved to a ship by the director's word: the player's prompt "
         "moved with it (packages 82 and 115)"
@@ -478,7 +482,21 @@ def _wind_kn_of(world: Any, j: Any) -> float | None:
     systems = getattr(world, "systems", None)
     if append is None or systems is None:
         return None
-    trial, as_it_stood = copy.deepcopy(systems), copy.deepcopy(systems)
+
+    # a copy that is the weather's alone (package 118, item 1): the two coast hooks are
+    # bound methods of the World, and deep-copied they took the whole World with them, and
+    # under the server's driver the driver's lock, which cannot be copied (every weather
+    # order under a wind limit failed in the browser game); the hooks only read the chart,
+    # so the copies share them, as the checkpoint leaves them out
+    def weather_alone() -> Any:
+        memo: dict[int, Any] = {}
+        for hook in ("coast", "coast_trend"):
+            h = getattr(systems, hook, None)
+            if h is not None:
+                memo[id(h)] = h
+        return copy.deepcopy(systems, memo)
+
+    trial, as_it_stood = weather_alone(), weather_alone()
     try:
         system = append(trial)
     except ValueError:
@@ -1683,7 +1701,9 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     brief = brief_of(world)
     acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     bare, reason = world_orders.split_reason(text)
-    stage, why, order, judgement, free = _read(world, text, b.acts, acts_allowed)
+    stage, why, order, judgement, free = _read(
+        world, text, b.acts, acts_allowed, on=_judged_on(world)
+    )
     if stage == NO_FORM:
         # no form the game has (the owner's refinement of 2026-10-17): answered honestly,
         # never as "not allowed"; entered again with a reason, logged as attempted
@@ -1783,6 +1803,22 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         e = world._apply_world_order(order.text, SOURCE)  # the input is this door's own
     result = str(e.data.get("result") or "")
     done = e.text.removeprefix(f"World order ({SOURCE}): ").rstrip(".")
+    if result == "failed":
+        # failed inside (package 118): nothing of it was done, no act is spent, and the log
+        # says so; the words are the plain truth of it, never that the game cannot do it
+        from freesail.core.world import FAILED_WORDS
+
+        why = done.removeprefix(FAILED_WORDS).rstrip(".")
+        log.append(
+            director_hull(world),
+            f"Failed, nothing of it done: {order.text} ({why})",
+            kind="director.failed",
+            by=by,
+        )
+        return (
+            f"Failed: the order was tried and failed inside, and nothing of it was done "
+            f"({why}). No act is spent. The world is as it was."
+        )
     if result != "done":
         why = done.removeprefix("not carried out: ")
         return _no_way(world, order.text, order.reason, why, by)
@@ -1813,6 +1849,21 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         f"order. ({cost}{left} {'act' if left == 1 else 'acts'} of the day's {acts_allowed} "
         f"left.){tail}"
     )
+
+
+def _judged_on(world: Any) -> Callable[[], Any]:
+    """The world a director's order is judged on at the door (package 118): a copy of it,
+    made once the order has come as far as its judgement, so that a hull a judgement makes
+    on the way is made on the copy and the world itself is not touched by the judging; the
+    world itself where it cannot be copied (as before)."""
+
+    def on() -> Any:
+        from freesail.core.replay import trial_copy
+
+        copy = trial_copy(world)
+        return world if copy is None else copy
+
+    return on
 
 
 DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"

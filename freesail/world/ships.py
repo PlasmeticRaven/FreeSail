@@ -667,6 +667,11 @@ class Vessel:
     # crewed promotion. A vessel in a checkpoint from before loads on passage.
     state: str = "on passage"
     saved_plan: list[tuple[Any, ...]] | None = None
+    # the mark of a course the director gave her (package 118: `shape a course for <a
+    # position>`, `steer <a point>`): at its end, with nothing after it, she lies to there
+    # until her next order, as the answer to the order says, and is not put out of the
+    # world; None for every other leg (her own voyage ends as it did)
+    ordered_mark: Any = None
     # the plan's last mark reached under a held station (package 84, step 4): she lies to
     # there, and her World says so once (`CrewedWorld.far_tick`)
     mark_reached: str = ""
@@ -1098,6 +1103,13 @@ class Vessel:
             # until whoever sent her gives her a plan (the pilot's cutter, `ports.py`)
             self.plan = [("lie_to", math.inf)]
             return
+        if kind == "to" and not self.plan and self.ordered_mark is not None:
+            if len(leg) > 1 and leg[1] == self.ordered_mark:
+                # the end of a course the director gave (package 118): she lies to there
+                # until her next order, as she was told, and is not put out of the world
+                self.plan = [("lie_to", math.inf)]
+                self.ordered_mark = None
+                return
         if kind == "home" or (kind == "to" and not self.plan):
             if self.station_held():
                 # a crewed hull whose captain's station is held (package 84, step 4; the
@@ -1779,6 +1791,67 @@ def land_crossing(world: Any, start: Position, plan: list[tuple[Any, ...]]) -> s
 # ---------------------------------------------------------------------------
 
 
+# What far ships do is not a line of the player's log unless his deck could see it
+# (package 118; the owner's words of 2026-11-18: "constrained to show in the log only if
+# visible to the player and within range that it could be discerned ... it may be hidden
+# entirely unless speaking of the players vessel"). Each kind of the far minute's lines
+# here, with the level his lookout must have made out every ship it names (`Lookout.
+# made_out`): a possession taken, a cut out, a retaking and a sortie are colours struck
+# and hoisted, read from her colours (2); a ship out of her station or regaining it, from
+# her rig and course (1). A ship lost to her set or parted from it is his own set's
+# business wherever she is (her absence is what his lookout sees, and a commodore's
+# standing orders hang on it), and another set's only in sight. A line that names his own
+# ship is always his. What is not written into his log is kept whole in the far records,
+# the director's truth and each hull's own story; it reaches him only as news does (a
+# letter, a hail, the port's talk).
+_FAR_LINES_SEEN_AT: dict[str, int] = {
+    "prize.taken": 2,
+    "prize.retaken": 2,
+    "squadron.cut_out": 2,
+    "regime.sortie": 2,
+    "squadron.straggler": 1,
+    "squadron.in_station": 1,
+    "squadron.lost": 1,
+    "squadron.parted": 1,
+}
+_HIS_OWN_SETS_LINES = frozenset({"squadron.lost", "squadron.parted"})
+_SHIPS_NAMED = ("captor", "prize", "id")
+
+
+def _seen_from_her_deck(world: Any, line: tuple[Any, ...]) -> bool:
+    """Whether a line of the far minute is one of the player's log (package 118)."""
+    kind = str(line[1]) if len(line) > 1 else ""
+    level = _FAR_LINES_SEEN_AT.get(kind)
+    if level is None:
+        return True
+    data = (line[3] if len(line) > 3 else None) or {}
+    named = [str(data[k]) for k in _SHIPS_NAMED if data.get(k)]
+    own = {PLAYER_ID}
+    for attr in ("own", "players"):
+        hull = getattr(world, attr, None)
+        if getattr(hull, "id", None):
+            own.add(str(hull.id))
+    if any(n in own for n in named):
+        return True
+    if kind in _HIS_OWN_SETS_LINES:
+        sets = getattr(world, "squadrons", None)
+        sq = next(
+            (s for s in getattr(sets, "sets", []) if s.id == str(data.get("squadron") or "")),
+            None,
+        )
+        if sq is not None and (str(sq.commander) in own or own & {str(m) for m in sq.members}):
+            return True
+    lookout = getattr(world, "lookout", None)
+    made_out = getattr(lookout, "made_out", None)
+    if made_out is None or not named:
+        return False
+    for n in named:
+        seen = made_out(n)
+        if seen is None or seen < level:
+            return False
+    return True
+
+
 class Vessels:
     """The vessels of one World, ticked once a game minute (`World.tick`; a near-detail
     vessel every second), and what the lookout can see of them."""
@@ -1915,7 +1988,7 @@ class Vessels:
             switch(world)
             enforce_budgets(world)
         self.vessels = [v for v in self.vessels if not v.done]
-        return lines
+        return [ln for ln in lines if _seen_from_her_deck(world, ln)]
 
     def tick_crews(self, world: Any) -> None:
         """Every second: each crewed vessel's own World ticked (her physics, her book,

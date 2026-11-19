@@ -167,6 +167,13 @@ def replay(
     # the world orders' outcomes in play, which a seat's consent is read from in a replay
     # rather than from the records on this machine (package 67: a seat held under records
     # kept elsewhere, `--consent-records`, was refused in the replay and the log diverged)
+    # the door the world orders were played under (package 118): a save without the mark
+    # was played under the door before it, which this replay keeps for its every tick, and
+    # so does a game that goes on from it, for those ticks
+    if "world_order_door" in data:
+        world.world_order_door_from = int(data.get("world_order_door_from") or 0)
+    else:
+        world.world_order_door_from = int(data["end_tick"]) + 1
     world.replayed_orders = {
         (int(o.get("tick") or 0), " ".join(str(o.get("order") or "").split())): str(
             o.get("result") or ""
@@ -226,7 +233,11 @@ def replay(
             and (within is None or station_acts[j].get("station") == within[1])
         ):
             act = station_acts[j]
-            acts_mod.give(world, act, driven_station)
+            try:
+                acts_mod.give(world, act, driven_station)
+            except Exception:
+                if not _raised_in_play(world, act):
+                    raise
             if world.station_acts is not None:
                 world.station_acts.append(dict(act))  # the record, kept for a save of it
             j += 1
@@ -246,7 +257,11 @@ def replay(
                 # a station stood down by its unbinding: its acts inside the input come
                 # where they came, before the binding's own line (package 42)
                 give_acts(within=(i + 1, str(inputs[i]["binding"]["name"])))
-            _give(world, inputs[i])
+            try:
+                _give(world, inputs[i])
+            except Exception:
+                if not _raised_in_play(world, inputs[i]):
+                    raise
             i += 1
             # a station seated after this input, whatever it was (package 37d: a driver's
             # line and a refused order are inputs and no orders), is seated here
@@ -278,6 +293,16 @@ def replay(
                 ]
                 h.take_up_after_replay(kept)
     return world
+
+
+def _raised_in_play(world: Any, entry: dict[str, Any]) -> bool:
+    """Whether an input or an act that raised in this replay is a world order that raised
+    in play under the door before package 118 (a save without its mark): its first half
+    done and nothing recorded, as the replay has it now, and the replay goes on past it as
+    the play went on. Anything else that raises is the replay's own fault, raised."""
+    if world.clock.tick >= int(getattr(world, "world_order_door_from", 0) or 0):
+        return False
+    return any(k in entry for k in ("world_order", "director_order"))
 
 
 def driven_station(world: Any, seated: dict[str, Any]) -> Any:
@@ -499,6 +524,22 @@ def checkpoint_bytes(world: World) -> bytes:
     buf = io.BytesIO()
     _Pickler(buf, protocol=pickle.HIGHEST_PROTOCOL).dump(world)
     return buf.getvalue()
+
+
+def trial_copy(world: Any) -> Any:
+    """A copy of the world to try an order on and let go (package 118: the door of the
+    world orders; the dry run's copy, `agents.director._copy`): the checkpoint's own
+    pickling, read back and rebound, marked `dry_run` so that a form that writes a file
+    writes none on it. None where the world cannot be copied."""
+    from freesail.world.hulls import world_of
+
+    try:
+        copy = _Unpickler(io.BytesIO(checkpoint_bytes(world_of(world)))).load()
+        _rebind(copy)
+    except Exception:  # noqa: BLE001  (a world that cannot be copied: the caller says so)
+        return None
+    copy.__dict__["dry_run"] = True
+    return copy
 
 
 def write_checkpoint(world: World, path: str | Path) -> Path:

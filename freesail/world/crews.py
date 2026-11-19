@@ -1201,6 +1201,7 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
             raise OrderError(f"The chart knows no place named {m.group('place')!r}.")
         v.saved_plan = None
         v.plan = [("to", found[0], found[1])]
+        v.ordered_mark = found[0]  # she lies to there at its end (package 118)
         v.tack = 0.0
         if brain is not None:
             brain.planned = True
@@ -1218,6 +1219,7 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
         far = destination(v.position, units.rad_to_deg(rad) % 360.0, 60.0 * units.NAUTICAL_MILE)
         v.saved_plan = None
         v.plan = [("to", far, f"a course {units.point_name(rad)}")]
+        v.ordered_mark = far  # she lies to at its sixty miles' end (package 118)
         v.tack = 0.0
         return "helm.set", f"Helm ordered: steer {units.point_name(rad)} (the plan's course).", {}
     if low in ("heave to", "lie to", "bring her to"):

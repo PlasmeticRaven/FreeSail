@@ -500,6 +500,15 @@ def _in_commission_words(world: Any, vessel: Any) -> str | None:
     )
 
 
+def _figure(text: Any) -> float:
+    """A figure of an order read as a number, or the order refused in words (package 118:
+    '4..5' or '-3.0.0' passed the pattern and raised out of the judgement and the door)."""
+    try:
+        return float(text)
+    except (TypeError, ValueError):
+        raise WorldOrderError(f"'{text}' is no figure the order can read") from None
+
+
 def judged(world: Any, order: WorldOrder) -> Judged | None:
     """**What the order is** (package 115, part C): its form of the one table, whom it
     reaches and its harm, read by the handler that would perform it up to the point
@@ -522,6 +531,8 @@ def judged_or_why(world: Any, order: WorldOrder) -> tuple[Judged | None, str]:
         return e.judgement, ""
     except WorldOrderError as e:
         return None, str(e).rstrip(".")
+    except Exception as e:  # noqa: BLE001  (package 118: an error in the reading, in words)
+        return None, (str(e).rstrip(".") or type(e).__name__)
     finally:
         _STATE.judging = was
     raise RuntimeError(  # a handler that named no form performed the order while judging
@@ -950,14 +961,14 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             # the same appending, for a limit to try on a copy of the systems
             append=lambda trial, name=name, at=at, m=m: (
                 trial.append_waypoint(
-                    name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
+                    name, at, _figure(m.group("x")), _figure(m.group("y")), _figure(m.group("hpa"))
                 ),
                 trial.find(name),
             )[1],
         )
         try:
             reached = systems.append_waypoint(
-                name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
+                name, at, _figure(m.group("x")), _figure(m.group("y")), _figure(m.group("hpa"))
             )
         except ValueError as e:
             raise WorldOrderError(str(e)) from None
@@ -976,18 +987,21 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         d: dict[str, Any] = {
             "name": name,
             "kind": m.group("kind").lower(),
-            "radius_km": float(m.group("r") or 500.0),
+            "radius_km": _figure(m.group("r") or 500.0),
             "track": [
                 {
                     "at": at.isoformat(),
-                    "x_km": float(m.group("x")),
-                    "y_km": float(m.group("y")),
-                    "hpa": float(m.group("hpa")),
+                    "x_km": _figure(m.group("x")),
+                    "y_km": _figure(m.group("y")),
+                    "hpa": _figure(m.group("hpa")),
                 }
             ],
         }
         if m.group("warm"):
-            d["fronts"] = {"warm_deg": float(m.group("warm")), "cold_deg": float(m.group("cold"))}
+            d["fronts"] = {
+                "warm_deg": _figure(m.group("warm")),
+                "cold_deg": _figure(m.group("cold")),
+            }
         _touch(
             world,
             f"weather.{d['kind']}",
@@ -2127,7 +2141,7 @@ def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if good is None:
         raise WorldOrderError(f"{port.name} deals in no '{pm.group('good')}'.")
     _touch(world, "port", stance="price of")
-    good.price = float(pm.group("pounds"))
+    good.price = _figure(pm.group("pounds"))
     return f"the price of {good.good} at {port.name} set at £{good.price:g} a ton", {
         "port": port.id,
         "good": good.good,
@@ -2298,6 +2312,20 @@ def _ship_words_of(phrase: str) -> str:
     return phrase
 
 
+def _name_borne(world: Any, name: str) -> bool:
+    """Whether a name is borne already, for the refusal of a second person made by it
+    (package 118): one the World's own people answer to (`People.find`, by his name or his
+    surname, as before), or the whole name, with or without 'Mr', borne by anybody of the
+    world. Never a surname alone borne by a hand of another hull's company."""
+    if world.people.find(name) is not None:
+        return True
+    from freesail.world.people import bears_the_name
+
+    registry = getattr(world, "registry", None)
+    everyone = registry.persons() if registry is not None else []
+    return any(bears_the_name(p, name) for p in everyone)
+
+
 def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]:
     """`person: make "<name>", <the words>`: a person with an outline from the words, among
     the world's people from now on (spec M7b §8; package 52)."""
@@ -2309,7 +2337,7 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         raise WorldOrderError(
             "A person made from words wants a name: 'person: make \"Mr Fox\", ...'."
         )
-    if world.people.find(name) is not None:
+    if _name_borne(world, name):
         raise WorldOrderError(f"{name} is among the people already.")
     ports = getattr(world, "dealings", None)
     places = Places()
@@ -2459,8 +2487,10 @@ def _person_anywhere(world: Any, name: str) -> Any:
     everyone = registry.persons() if registry is not None else []
     # the name whole first; the surname only when one person of the world bears it (the
     # lead's review of step 9: two Mr Popes on two hulls)
+    from freesail.world.people import bears_the_name
+
     for p in everyone:
-        if str(p.name).lower() == key:
+        if bears_the_name(p, key):  # whole, with or without 'Mr' (package 118)
             return p
     surname = key.removeprefix("mr ").removeprefix("mister ")
     by_surname = [p for p in everyone if str(getattr(p, "surname", "")).lower() == surname]
@@ -2714,9 +2744,9 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         )
     role = m.group("role").strip().lower()
     name = m.group("name").strip()
-    skill = float(m.group("skill") or 0.7)
+    skill = _figure(m.group("skill") or 0.7)
     pid = re.sub(r"[^a-z0-9]+", "_", f"{role} {name}".lower()).strip("_")
-    if world.people.find(name) is not None:
+    if _name_borne(world, name):
         raise WorldOrderError(f"{name} is among the people already.")
     _touch(world, "person.named", hull=world if m.group("aboard") else None)
     if m.group("aboard"):
@@ -3491,7 +3521,7 @@ def read_sum(words: str) -> float | None:
     m = _STERLING.match(text)
     if m is not None:
         shillings, pence = int(m.group("s") or 0), int(m.group("d") or 0)
-        total += float(m.group("l")) + shillings / 20.0 + pence / 240.0
+        total += _figure(m.group("l")) + shillings / 20.0 + pence / 240.0
         text, said = text[m.end() :].strip(), True
     tokens = [t for t in text.replace("-", " ").split() if t not in ("and", "sterling")]
     i = 0
@@ -4966,14 +4996,14 @@ def _glass_rising(world: Any) -> bool:
 
 
 def _doubt_high(world: Any, m: re.Match[str], table: Any, systems: Any) -> str | None:
-    hpa = float(m.group("hpa"))
+    hpa = _figure(m.group("hpa"))
     if table is not None and hpa > _high_ceiling(table):
         return (
             f"a high of {hpa:g} hPa is above the season's ceiling for these waters "
             f"({_high_ceiling(table):g} hPa in {table.name})"
         )
     if systems is not None:
-        x, y = float(m.group("x")), float(m.group("y"))
+        x, y = _figure(m.group("x")), _figure(m.group("y"))
         near = math.hypot(x - world.ship_x_km, y - world.ship_y_km)
         background = float(systems.background_hpa)
         if near <= LOW_NEAR_KM and hpa - background >= LOW_DEEP_HPA and not _glass_rising(world):
@@ -4992,14 +5022,14 @@ def _doubt_weather(world: Any, body: str) -> str | None:
     if m is not None and m.group("kind").lower() == "high":
         return _doubt_high(world, m, table, systems)
     if m is not None and m.group("kind").lower() == "low":
-        hpa = float(m.group("hpa"))
+        hpa = _figure(m.group("hpa"))
         if table is not None and hpa < table.central_hpa[2]:
             return (
                 f"a low of {hpa:g} hPa is deeper than the season's floor for these waters "
                 f"({table.central_hpa[2]:g} hPa in {table.name})"
             )
         if systems is not None:
-            x, y = float(m.group("x")), float(m.group("y"))
+            x, y = _figure(m.group("x")), _figure(m.group("y"))
             near = math.hypot(x - world.ship_x_km, y - world.ship_y_km)
             background = float(systems.background_hpa)
             if near <= LOW_NEAR_KM and background - hpa >= LOW_DEEP_HPA and _glass_steady(world):
@@ -5028,21 +5058,21 @@ def _doubt_weather(world: Any, body: str) -> str | None:
         hours = (at - from_at).total_seconds() / 3600.0
         if hours <= 0:
             return None
-        km = math.hypot(float(m.group("x")) - from_x, float(m.group("y")) - from_y)
+        km = math.hypot(_figure(m.group("x")) - from_x, _figure(m.group("y")) - from_y)
         fastest = table.speed_kn[1] * 1.852 * 1.5  # the season's fastest low, with a half over
         if km / hours > fastest:
             return (
                 f"the waypoint moves {system.name} at {km / hours:.0f} km an hour, faster than "
                 f"the season's lows move ({table.speed_kn[1]:g} knots at the most in {table.name})"
             )
-        if system.kind == "low" and float(m.group("hpa")) < table.central_hpa[2]:
+        if system.kind == "low" and _figure(m.group("hpa")) < table.central_hpa[2]:
             return (
-                f"the waypoint deepens {system.name} to {float(m.group('hpa')):g} hPa, below "
+                f"the waypoint deepens {system.name} to {_figure(m.group('hpa')):g} hPa, below "
                 f"the season's floor ({table.central_hpa[2]:g} hPa in {table.name})"
             )
-        if system.kind == "high" and float(m.group("hpa")) > _high_ceiling(table):
+        if system.kind == "high" and _figure(m.group("hpa")) > _high_ceiling(table):
             return (
-                f"the waypoint builds {system.name} to {float(m.group('hpa')):g} hPa, above "
+                f"the waypoint builds {system.name} to {_figure(m.group('hpa')):g} hPa, above "
                 f"the season's ceiling ({_high_ceiling(table):g} hPa in {table.name})"
             )
     return None
@@ -5167,7 +5197,7 @@ def _doubt_port(world: Any, body: str) -> str | None:
     good = port.market.find(pm.group("good"))
     if good is None or not good.price:
         return None
-    swing = abs(float(pm.group("pounds")) - float(good.price)) / float(good.price)
+    swing = abs(_figure(pm.group("pounds")) - float(good.price)) / float(good.price)
     if swing > PRICE_SWING:
         return (
             f"the price of {good.good} at {port.name} moved by {swing:.0%} in a word, where a "
