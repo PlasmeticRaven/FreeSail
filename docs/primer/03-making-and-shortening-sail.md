@@ -208,6 +208,7 @@ Luce: the weather topmast and topgallant studding sails may be set "with the win
   Morning watch (04:35)  Order: steer 292.
 * Morning watch (04:35)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
 * Morning watch (04:35)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
+  ...
 * Morning watch (04:35)  Starboard fore topgallant studdingsail shaking in its gear; she is too near the wind to carry it.
   ...
 * Morning watch (04:35)  Starboard fore topgallant studdingsail boom whipping as the starboard fore topgallant studdingsail flogs; she is too near the wind for it.

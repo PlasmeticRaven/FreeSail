@@ -811,7 +811,7 @@ to fill in some things from other research or judgement".
 may be carried": the frigate in 13 knots losing two booms in three minutes, where with the booms
 rated as intended none goes in the half hour), put as "Widen it for this one passage?", verbatim:
 "Widen it (Recommended)", the scene re-recorded from a run at 15 knots and the sentence restated
-from measurement, in stage 0's hash.
+from measurement, in A0, which goes to the lead in stage 0's reported hash.
 
 **The owner, 2026-11-18** (through the lead's note of 22:35 UTC, nudge 19), on the strain of a
 lateen taken aback, in full: "A lateen taken aback should increase the strain on the mast, as a
