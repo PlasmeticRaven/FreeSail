@@ -1,8 +1,21 @@
 # Gate M7: the owner plays the trunk
 
-**Verdict:** Pending. **A draft of 2026-11-18.** It waits on the owner's word about card 6 (`docs/dev/ScopeCards-BeforeTheGate.md`): item 6 below and the first known issue change with it.
+**Verdict:** Pending. **A draft, worked up on 2026-11-19 at the owner's word; its shape is his to settle (the six questions below).** It is played on the trunk once package 118 (the director's mends) has merged: until then step 6 cannot be played as written, and the first known issue stands.
 
 **What this gate is** (the continuation proposal, step A): the owner plays the trunk as it stands, from the opening page, through a passage, a fight and a port. Milestone 7 is closed where it stands at this gate, and what it still owes is carried forward as a short list.
+
+## The gate's shape: six things for the owner to settle
+
+Each with what the lead would choose, so that a yes is enough where he agrees.
+
+| # | The question | The lead's choice |
+|---|---|---|
+| 1 | **Which trunk is the gate played on?** | The trunk with package 118 merged, named by its commit in this page when it is. The brig's watches (119) and the ships (90) are not waited for. Play before that is play, and welcome; it is not the gate. |
+| 2 | **What must be played for a verdict?** | The six steps of the walk below, once each, in any order and at his own pace over as many sittings as he likes; anything else he plays counts as well. |
+| 3 | **Is a model at a station part of this gate?** | No. Step 6 is played by him at the director's station (`--seat director`), which needs no model. A model at a station comes after the asking again, which is his own act and has its own time; the seats at war with a human's ship are tried then, not here. |
+| 4 | **What is the verdict's form?** | One of three, in his words on the playtest form: *closed* (milestone 7 is closed where it stands); *closed, with a list* (closed, and the things he names are mended first in the next milestone); *not yet* (the things he names are mended and the walk's failed steps played again). |
+| 5 | **Is a build cut for it,** as gates 4 to 6 were (a branch `gates/m7`, a tag `gate-m7`, a zip)? | A tag `gate-m7` on the commit he played, and nothing more: no branch and no zip, since he plays from the trunk. The tag is made on his word, when the verdict is in. |
+| 6 | **What happens to what milestone 7 still owes?** | On *closed*, the lead writes two pages: "the game as built" (one page, in place of the records as the way to know where the game stands) and the list carried forward (the known issues below and the packages booked and not built), which becomes the first input to the next milestone's shape. |
 
 **Start:** `py -m freesail`. The harbour opens in the browser; the clock is held until you say `go`.
 
@@ -23,7 +36,7 @@
 3. **A fight.** *Actions*: the first action. `clear for action`, `cast loose the guns`, the private signal, `engage her to starboard`; fight her yourself to the end; `strike the colours` if it comes to that.
 4. **A wheel shot away**, if the fight gives you one: `steer` refused in words, the tackles, the repair.
 5. **Save, close the browser, and take the game up again** from the harbour.
-6. **With a director** (*With a director*: the directed passage), yourself at the director's station or a model after its asking again. *Not before card 6 is settled: today the director cannot order the weather under that scenario's brief.*
+6. **With a director** (*With a director*: the directed passage), yourself at the director's station: a letter left at the port, a sail put beyond the horizon, the weather ordered within the brief's 27 knots and refused beyond it, a person made ashore and brought aboard, a ship sent to a position. *Not before package 118 has merged: until then the director cannot order the weather under that scenario's brief.*
 
 Write down every surprise, fault or not, on the form in `docs/playtests/README.md`.
 
