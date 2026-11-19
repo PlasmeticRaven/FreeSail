@@ -2314,16 +2314,33 @@ def _ship_words_of(phrase: str) -> str:
 
 def _name_borne(world: Any, name: str) -> bool:
     """Whether a name is borne already, for the refusal of a second person made by it
-    (package 118): one the World's own people answer to (`People.find`, by his name or his
-    surname, as before), or the whole name, with or without 'Mr', borne by anybody of the
-    world. Never a surname alone borne by a hand of another hull's company."""
+    (package 118, as the lead drew the line on 2026-11-19): one the World's own people
+    answer to (`People.find`, by his name or his surname, as before); or the whole name,
+    with or without 'Mr', borne by a person made or named by a world order, or by anybody
+    ashore. Never by the company of another hull (a director cannot know them, and two men
+    of one name in two ships is the world as it is)."""
     if world.people.find(name) is not None:
         return True
+    from freesail.world.hulls import world_of
     from freesail.world.people import bears_the_name
 
-    registry = getattr(world, "registry", None)
+    root = world_of(world)
+    key = " ".join(str(name).lower().split()).removeprefix("mr ").removeprefix("mister ")
+    if key in (root.__dict__.get("names_by_orders") or ()):
+        return True
+    registry = getattr(root, "registry", None)
     everyone = registry.persons() if registry is not None else []
-    return any(bears_the_name(p, name) for p in everyone)
+    return any(bears_the_name(p, name) and not getattr(p, "aboard", True) for p in everyone)
+
+
+def _named_by_an_order(world: Any, name: str) -> None:
+    """The whole name of a person a world order made or named, kept on the World for the
+    refusal of a second making (`_name_borne`), whatever hull he is of."""
+    from freesail.world.hulls import world_of
+
+    root = world_of(world)
+    key = " ".join(str(name).lower().split()).removeprefix("mr ").removeprefix("mister ")
+    root.__dict__["names_by_orders"] = tuple(root.__dict__.get("names_by_orders") or ()) + (key,)
 
 
 def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]:
@@ -2453,6 +2470,7 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         ashore_at=ashore_at,
     )
     world.people.add(person)
+    _named_by_an_order(world, name)
     where = place_words(place) if aboard else f"ashore at {port.name}"
     if ashore_at:
         from freesail.world.movement import ashore_place_words
@@ -2756,6 +2774,7 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                 f"'{place}' is no place aboard; the places are {', '.join(PLACES)}."
             )
         world.people.add(Person(pid, name, role, skill, place=place))
+        _named_by_an_order(world, name)
         return f"{name}, {role}, aboard {PLACES[place].name}", {
             "id": pid,
             "role": role,
@@ -2766,6 +2785,7 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if port is None:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     world.people.add(Person(pid, name, role, skill, place="shore", aboard=False, port=port.id))
+    _named_by_an_order(world, name)
     return f"{name}, {role}, ashore at {port.name}", {"id": pid, "role": role, "port": port.id}
 
 

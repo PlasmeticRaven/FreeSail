@@ -1760,6 +1760,15 @@ class World:
             return self._world_order_record(
                 text, source, channel, f"not carried out: {str(e).rstrip('.')}", {}, "refused"
             )
+        if channel == "court":
+            # the world's own rule before the order (the lead's list of 2026-11-19): a court
+            # whose accused is dead or gone is dissolved at the next minute or at the next
+            # form that names the court, the form refused after it; that is the court's own
+            # doing and not the order's, so it is done here, on the world itself, and does not
+            # hang on the order being done on the copy
+            from freesail.world.court import dissolve_if_gone
+
+            dissolve_if_gone(self)
         if not self.__dict__.get("dry_run"):
             from freesail.core.replay import trial_copy
 

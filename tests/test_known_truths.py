@@ -22608,7 +22608,9 @@ def test_truth_7_650_weather_is_ordered_under_a_wind_limit_in_the_game_as_played
 
 
 @pytest.mark.slow
-def test_truth_7_651_every_forms_example_is_answered_alike_with_a_driver_or_a_console_about():
+def test_truth_7_651_every_forms_example_is_answered_alike_with_a_driver_or_a_console_about(
+    tmp_path,
+):
     """Item 1, the test that would have caught it: every example of every form of world
     order, on the forms' near sea under the quiet passage's limits, judged, dry run and
     entered at the director's door with nothing about the world, with the server's driver
@@ -22625,6 +22627,9 @@ def test_truth_7_651_every_forms_example_is_answered_alike_with_a_driver_or_a_co
     answers = {}
     for door in ("bare", "driver", "console"):
         w = _forms_worlds()[2]()  # the near sea, made afresh for each door
+        # a new command's scenario file (`court: ... new command`) written in a place of
+        # the test's own, one for each door, never in the working tree
+        w.__dict__["saves_dir"] = str(tmp_path / door)
         D.set_brief(w, "quiet-passage", quiet=True)
         if door == "driver":
             Driver(w)
@@ -22783,15 +22788,27 @@ def test_truth_7_655_a_person_is_found_by_the_name_he_was_made_by_and_not_made_t
     assert "is among the people already" in said, said
     said = D.direct(w, 'person: make "Abel Coffin", a passenger, ashore at Falmouth')
     assert "is among the people already" in said, said
-    others = [
-        p
-        for p in w.registry.persons()
-        if p.home and p.home != w.own.id and getattr(p, "surname", "")
-    ]
-    if others:
-        surname = others[0].surname
-        said = D.direct(w, f'person: make "Mr Jedediah {surname}", a passenger, ashore at Falmouth')
-        assert said.startswith("Done:"), said
+    # the companies of other hulls (the lead's line of 2026-11-19): a director cannot know
+    # them, and two men of one name in two ships is the world as it is; a person a world
+    # order made, of whatever hull, and anybody ashore, are known
+    from tests.test_world_orders import _frigate_with_the_brig_x
+
+    w2, b, hull = _frigate_with_the_brig_x()
+    hers = [p for p in hull.people.all if str(p.name).startswith("Mr ")]
+    assert hers, [p.name for p in hull.people.all]
+    for p in hers[:3]:
+        e = w2.world_order(f'person: make "{p.name}", a passenger, ashore at Falmouth', "t")
+        assert e.data["result"] == "done", e.text
+    e = w2.world_order('person: make "Mr Pope", a passenger of fifty, ashore at Falmouth', "t")
+    assert e.data["result"] == "done", e.text
+    e = w2.world_order(
+        'person: make "Mr Gill", a merchant of forty, aboard the X, in the cabin', "t"
+    )
+    assert e.data["result"] == "done", e.text
+    e = w2.world_order('person: make "Mr Gill", a passenger, ashore at Falmouth', "t")
+    assert e.data["result"] == "refused" and "among the people already" in e.text, e.text
+    e = w2.world_order('person: make "Mr Pope", a passenger, ashore at Falmouth', "t")
+    assert e.data["result"] == "refused" and "among the people already" in e.text, e.text
 
 
 def test_truth_7_656_a_far_ship_sent_to_a_position_lies_to_there_until_her_next_order():
@@ -22818,6 +22835,29 @@ def test_truth_7_656_a_far_ship_sent_to_a_position_lies_to_there_until_her_next_
     said = D.direct(w, 'ship "Medusa": order steer south')
     assert "the order stands until the next" in said, said
     w.run(12 * 3600)
+    assert medusa in w.vessels.vessels and medusa.plan[0][0] == "lie_to"
+    # `fill away` there, the next order her answer names (the lead's list of 2026-11-19: she
+    # had no saved plan, was given an empty one and was out of the world within three
+    # hours): her own goal's voyage again, and where she has no goal, refused in words and
+    # lying to as she was
+    indefatigable = w.vessels.find("Indefatigable")
+    goal = indefatigable.goal
+    D.direct(w, 'ship "Indefatigable": order shape a course for 50 15 N 4 15 W')
+    for _ in range(48):
+        w.run(1800)
+        if indefatigable.plan and indefatigable.plan[0][0] == "lie_to":
+            break
+    assert indefatigable.plan[0][0] == "lie_to" and indefatigable in w.vessels.vessels
+    said = D.direct(w, 'ship "Indefatigable": order fill away')
+    assert f"on her own voyage again ({goal})" in said, said
+    w.run(3 * 3600)
+    assert indefatigable in w.vessels.vessels and indefatigable.plan
+    assert indefatigable.plan[0][0] != "lie_to"
+    medusa.goal = ""  # a ship with no voyage of her own
+    D.budget_of(w).acts = 0
+    said = D.direct(w, 'ship "Medusa": order fill away')
+    assert "has no course to fill away on: she lies to as she was" in said, said
+    w.run(3 * 3600)
     assert medusa in w.vessels.vessels and medusa.plan[0][0] == "lie_to"
 
 
