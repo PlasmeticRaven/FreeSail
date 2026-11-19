@@ -1806,8 +1806,20 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     if result == "failed":
         # failed inside (package 118): nothing of it was done, no act is spent, and the log
         # says so; the words are the plain truth of it, never that the game cannot do it
-        from freesail.core.world import FAILED_WORDS
+        from freesail.core.world import FAILED_PART_WORDS, FAILED_WORDS
 
+        if done.startswith(FAILED_PART_WORDS):
+            why = done.removeprefix(FAILED_PART_WORDS).rstrip(".")
+            log.append(
+                director_hull(world),
+                f"Failed part-way, what it had done stands: {order.text} ({why})",
+                kind="director.failed",
+                by=by,
+            )
+            return (
+                f"Failed: the order failed part-way on the world itself ({why}); what it "
+                "had done by then stands, and the play log carries it. No act is spent."
+            )
         why = done.removeprefix(FAILED_WORDS).rstrip(".")
         log.append(
             director_hull(world),
@@ -1991,6 +2003,16 @@ def dry_run(world: Any, text: str) -> str:
     if would.startswith("not carried out: "):
         why = would.removeprefix("not carried out: ")
         return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why}."
+    from freesail.core.world import FAILED_WORDS
+
+    if would.startswith(FAILED_WORDS):
+        # it fails inside on the copy (package 118): entered, it fails the same way, and
+        # nothing of it is done
+        why = would.removeprefix(FAILED_WORDS)
+        return (
+            f"{DRY_RUN_HEAD} it would fail inside, and nothing of it would be done: {why}. "
+            "No act would be spent."
+        )
     cost = "an answer, counted against nothing" if free else "one of the day's acts"
     left = acts_allowed - acts_used
     return (
@@ -2010,18 +2032,15 @@ def _copy(world: Any) -> Any:
     director's tools hold his hull (package 97), and a pickle rooted at a hull made the
     hull before its World, whose rebinding then failed, so that every dry run said 'would
     be performed' in play (package 109)."""
-    import io
-
     from freesail.core import replay
-    from freesail.world.hulls import world_of
 
     try:
-        copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world_of(world)))).load()
-        replay._rebind(copy)
+        # the copy's same hull for a hull's handle, so that the order runs on the copy
+        # under the hull it runs under on the world (package 118); `dry_run` set on it, so
+        # that a form that writes a file writes none on the copy (74)
+        return replay.trial_copy(world, raising=True)
     except Exception as e:  # noqa: BLE001  (a world that cannot be copied: said so)
         return f"{NOT_TRIED}the world could not be copied to try it ({type(e).__name__})"
-    copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
-    return copy
 
 
 def _would_do(copy: Any, text: str) -> str:

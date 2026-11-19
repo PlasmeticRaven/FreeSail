@@ -1770,6 +1770,11 @@ class World:
                     # refused or failed on the copy: the world itself is not touched
                     return self._world_order_record(text, source, channel, words, {}, result)
         words, data, result = _performed(self, order)
+        if result == "failed" and not self.__dict__.get("dry_run"):
+            # failed on the world itself, after the copy did it or where none could be made:
+            # what it had done by then stands, and the record says so (the reader of
+            # 2026-11-19: never "nothing of it was done" where something may have been)
+            words = FAILED_PART_WORDS + words.removeprefix(FAILED_WORDS)
         return self._world_order_record(text, source, channel, words, data, result)
 
     def _world_order_record(
@@ -3034,3 +3039,5 @@ def _performed(world: Any, order: Any) -> tuple[str, dict[str, Any], str]:
 
 # The words of a world order that failed inside (package 118): nothing of it is done.
 FAILED_WORDS = "failed, and nothing of it was done: "
+# ... and of one that failed on the world itself, part-way: what it had done stands.
+FAILED_PART_WORDS = "failed part-way, and what it had done by then stands: "

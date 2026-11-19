@@ -1104,7 +1104,7 @@ class Vessel:
             self.plan = [("lie_to", math.inf)]
             return
         if kind == "to" and not self.plan and self.ordered_mark is not None:
-            if len(leg) > 1 and leg[1] == self.ordered_mark:
+            if len(leg) > 1 and leg[1] == self.ordered_mark and not self.station_held():
                 # the end of a course the director gave (package 118): she lies to there
                 # until her next order, as she was told, and is not put out of the world
                 self.plan = [("lie_to", math.inf)]
@@ -1831,7 +1831,9 @@ def _seen_from_her_deck(world: Any, line: tuple[Any, ...]) -> bool:
         hull = getattr(world, attr, None)
         if getattr(hull, "id", None):
             own.add(str(hull.id))
-    if any(n in own for n in named):
+    if any(n in own for n in named) or str(data.get("was") or "") in own:
+        # a line that names his own ship, or speaks of a prize of hers retaken (`was`, her
+        # captor that was): his, wherever it happens
         return True
     if kind in _HIS_OWN_SETS_LINES:
         sets = getattr(world, "squadrons", None)

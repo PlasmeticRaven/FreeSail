@@ -526,19 +526,29 @@ def checkpoint_bytes(world: World) -> bytes:
     return buf.getvalue()
 
 
-def trial_copy(world: Any) -> Any:
+def trial_copy(world: Any, raising: bool = False) -> Any:
     """A copy of the world to try an order on and let go (package 118: the door of the
     world orders; the dry run's copy, `agents.director._copy`): the checkpoint's own
     pickling, read back and rebound, marked `dry_run` so that a form that writes a file
     writes none on it. None where the world cannot be copied."""
     from freesail.world.hulls import world_of
 
+    live = world_of(world)
+    # the hull the order runs under (the reader of 2026-11-19): the handle's own where the
+    # handle is a hull, the World's current hull otherwise; the copy has no stack of its
+    # own and would read its followed hull, so the copy's same hull is handed back
+    current = world if world is not live else live.own
     try:
-        copy = _Unpickler(io.BytesIO(checkpoint_bytes(world_of(world)))).load()
+        copy = _Unpickler(io.BytesIO(checkpoint_bytes(live))).load()
         _rebind(copy)
     except Exception:  # noqa: BLE001  (a world that cannot be copied: the caller says so)
+        if raising:
+            raise
         return None
     copy.__dict__["dry_run"] = True
+    hull = (copy.__dict__.get("hulls") or {}).get(getattr(current, "id", None))
+    if hull is not None and hull is not copy.own:
+        return hull
     return copy
 
 
@@ -898,6 +908,11 @@ def load_report(
     elif cp.exists():
         try:
             header, world = read_checkpoint(cp)
+            if "world_order_door" not in data:
+                # the door its save was played under (package 118): a game loaded from a
+                # checkpoint of a save without the mark keeps it for the ticks played, as
+                # one loaded by replay does, so that its next save replays them alike
+                world.world_order_door_from = int(data["end_tick"]) + 1
         except Exception as e:  # noqa: BLE001  (an import error, a class reshaped, a bad file)
             header, world = {}, None
             said = " ".join(str(e).split()) or "no words"

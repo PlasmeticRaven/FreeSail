@@ -22597,6 +22597,12 @@ def test_truth_7_650_weather_is_ordered_under_a_wind_limit_in_the_game_as_played
     said = D.direct(w, deep)
     assert said.startswith("Refused, outside the brief: the brief allows no wind above 27"), said
     assert "it would blow" in said
+    # the wind's judgement on the world itself, with the driver about it (the door judges
+    # on a copy, which has no driver; the judgement must hold where it is asked of the world)
+    from freesail.world import orders as WO
+
+    why = D.brief_of(w).limit_of(w, WO.parse(deep))
+    assert why is not None and "it would blow" in why, why
     kinds = [e.kind for e in D.log_of(w).entries]
     assert kinds.count("director.order") == 1 and kinds.count("director.refused") == 1
 

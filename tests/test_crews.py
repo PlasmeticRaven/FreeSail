@@ -1077,3 +1077,19 @@ def test_the_pace_rules_open_samples_name_every_hulls_station_once():
     w.follow("X")
     names = [name for name, _h, _w in all_agents(w)]
     assert sorted(names) == ["captain", f"captain of {w.players.ship.name}"]
+
+
+def test_a_held_stations_own_course_ends_with_the_plans_last_mark_said_as_before():
+    """Package 118, item 4, kept to the director's course (the reader of 2026-11-19): a
+    station holding a far hull steers her by the far shape's own road, and at the end of her
+    course she lies to with the plan's last mark said to the station (`plan.ended`), as
+    before; the director's course's own ending does not take that line from her."""
+    w = hove_to_world()
+    v, crew = _held_far_cutter(w, "49 40 N 5 40 W")
+    e = crew.submit("steer north", actor="the captain")
+    assert e.kind == "helm.set", e.text
+    n = len(list(crew.log))
+    w.run(12 * 3600)
+    assert v.plan[:1] == [("lie_to", float("inf"))] and not v.done and v.station_held()
+    ended = [x.text for x in list(crew.log)[n:] if x.kind == "plan.ended"]
+    assert len(ended) == 1 and ended[0].startswith("The plan's last mark reached"), ended
