@@ -1690,7 +1690,8 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
                 "prize.retaken",
                 f"The {v.name}, prize to {rec.get('captor_name', 'her captor')}, is retaken by "
                 "her prisoners rising.",
-                {"prize": v.id},
+                # her captor's id, so that his own prize retaken is his line (package 118)
+                {"prize": v.id, "was": str(rec.get("captor") or "")},
             )
         )
     return lines

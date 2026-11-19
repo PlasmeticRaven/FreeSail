@@ -1040,6 +1040,50 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     letter in a held person's name; the earlier holder's token when a relief holds the
     seat) is his to choose, outside the package.
 
+71. **The player's own Python is struck.** Owner, 2026-11-19, on the survey of the proposal
+    against the game: "We can strike the direct Python integration, having built this much,
+    and seeing what the game is now, it's a natural language game, not a coding one, and
+    that's OK. It still plays just as much to the strengths and preferences of models, and
+    for me. Coding to sail was what drove me to brainstorm the idea, but now, I see that
+    really, the Orders language is that done right." So: the control ladder ends at the
+    orders and the standing orders; level 3 of §2.2, the script interface of §4.2 and §4.3
+    and the sandbox of §4.5 are not to be built, and the sections say so when the proposal
+    is revised. The library that stands in the code for it is not a promise to a player.
+
+72. **A player can make a new ship, by hand or with a model's help: the intent kept, the
+    wording open.** Owner, 2026-11-19, on §3.3's "ships are data files, not code": "I think
+    it's still going to be important for the game to allow players, either manually, or at
+    least with LLM assistance, to create new ships for the game. A more open consideration
+    is deserved on this one. How can we hit the intent, despite the original wording?" The
+    ship files are written by the generator today and are not edited by hand. What is to be
+    designed: a ship described in a sheet a person or a model can write, made into her file
+    by the generator and proved by the game before she is sailed. Not designed yet; it has
+    no package.
+
+73. **Peace has its purpose in the man, not in a mode.** Owner, 2026-11-19, on decision
+    69(d): "In peacetime, a player is for what a man of the sea would be for in peacetime.
+    If of a peaceful trade like cargo or fishing, the loop remains clear, and if of a
+    wartime profession, they must find the way to live."
+
+74. **Every calling of the sea is a path.** Owner, 2026-11-19: "Trade, fishing,
+    privateering, piracy, and the navy should all generally be paths that can be taken both
+    naturally in gameplay and, by extension, in the eventual career system. A general
+    principle to consider here might be that, where possible, the world should function,
+    and the player in it, rather than the player playing in the world that is formed around
+    them." The principle stands beside the pillars: **the world functions, and the player
+    is in it.** It bears on decision 58's career (a merchant, a fisherman, a privateer and
+    a pirate may begin one, as a naval officer may) and on decision 68's closed corsair's
+    station, which is to be looked at again under it.
+
+75. **The order of the milestones after 7.** Owner, 2026-11-19, of the three shapes the
+    survey offered (A, the ship and her people; B, the world that moves and the career; C,
+    the player's first hours): "I think A, B, then C, or A, C, then B, are the preferable
+    orders for me for the next milestones." So the next milestone's centre is the ship and
+    her people; which of the other two follows is settled when it closes. And the same day:
+    "the structural half (AKA the cheaper test suite) of C could run besides A or B, as you
+    say, and should." So the work on the suite, and on the boundary between the simulation and
+    what drives or shows it, runs beside the next milestone and does not wait for C.
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
