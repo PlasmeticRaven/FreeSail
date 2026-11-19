@@ -411,8 +411,9 @@ def test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_re
     assert prey.intent_words == "carry the prize to Brest"
     assert prey.brain.doctrine.role == "prize-master"
     assert prey.signals.colours.over == "britain"
-    cut = _events(w.log, "squadron.cut_out")
-    assert len(cut) == 1 and "sent in under a prize crew" in cut[0].text
+    # sent in under a prize crew, by the far record (above: no company); out of his sight,
+    # the cut out is no line of his log (package 118)
+    assert not _events(w.log, "squadron.cut_out")
     for _ in range(60):
         w.run(60)
     assert _nm(pv, prey) > P.COVER_NM and prey.speed_kn > 3.0  # parted, under way for Brest
@@ -437,8 +438,9 @@ def test_the_cut_out_prize_parts_for_brest_under_her_prize_crew_and_a_cruiser_re
     assert prey.intent_words == "bound for the Start" and prey.brain.doctrine.role == "merchant"
     assert prey.signals.colours.state == "shown" and prey.signals.colours.over == ""
     assert not prey.struck and prey.brain.state != "struck"
-    retaken = _events(w.log, "prize.retaken")
-    assert len(retaken) == 1 and "retaken by Sprightly coming up" in retaken[0].text
+    # retaken by the Sprightly coming up, by the far record (above) and the stories (below);
+    # out of his sight, the retaking is no line of his log (package 118)
+    assert not _events(w.log, "prize.retaken")
     assert any("retaken (Sprightly coming up)" in words for _, words in prey.story)
     assert any("the Nancy retaken" in words for _, words in pv.story)
     assert cutter.brain.state in ("chasing", "cruising", "on passage", None)
