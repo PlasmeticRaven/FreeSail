@@ -22806,8 +22806,10 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
         assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
         assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
         # the two roads, in the world: the player's order and a standing order
-        for given in ("heave to", 'standing order "lie to": when the true wind exceeds 10 knots '
-                      "then heave to"):
+        for given in (
+            "heave to",
+            'standing order "lie to": when the true wind exceeds 10 knots then heave to',
+        ):
             w, crew, _runner = trader_at(BRIG, 2, watch)
             for sid in w.ship.groups["plain sail"]:
                 w.ship.sails[sid].state = SailState.SET
