@@ -444,11 +444,15 @@ def _world_order(world: Any, station: str, payload: Any) -> None:
     channel with its source, as the tool did (its line is the driver's, written by the
     carrying out; the director's log's entries are the station's notes, given apart)."""
     d = payload or {}
-    world._apply_world_order(str(d.get("text") or ""), str(d.get("source") or "the director"))
+    e = world._apply_world_order(str(d.get("text") or ""), str(d.get("source") or "the director"))
     from freesail.agents import director as director_mod
 
-    if d.get("source") == director_mod.SOURCE:
-        director_mod.budget_of(world).acts += 1  # the day's count, as the tool counted it
+    done = str((getattr(e, "data", None) or {}).get("result") or "") == "done"
+    if d.get("source") == director_mod.SOURCE and done:
+        # the day's count, as the door counted it: only an order done spends an act
+        # (package 118: a refused one was counted here and not in play, and a replay could
+        # be held by a budget the play was not)
+        director_mod.budget_of(world).acts += 1
 
 
 # Appliers for acts of other kinds (`record`), by kind: `fn(world, station, payload)`.

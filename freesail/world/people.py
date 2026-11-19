@@ -1175,7 +1175,7 @@ class People:
         # 'master' is a role before it is a surname; a surname after 'mr'
         key = key.removeprefix("mr ").removeprefix("mister ")
         for p in self.people:
-            if _words(p.surname) == key or _words(p.name) == key:
+            if _words(p.surname) == key or key in _bare_names(p):
                 return p
         # a role the table does not name ('the cook', 'the supercargo', a person made from
         # words by his role; package 52), after every name, so that nothing found before
@@ -1199,7 +1199,7 @@ class People:
         bare = key.removeprefix("mr ").removeprefix("mister ")
         others = [p for p in self.registry.persons() if p.home != self.hull_id]
         for p in others:
-            if _words(p.surname) == bare or _words(p.name) == bare or _words(p.name) == key:
+            if _words(p.surname) == bare or bare in _bare_names(p):
                 return p
         role = ROLE_WORDS.get(key, key)
         for p in others:
@@ -1218,7 +1218,7 @@ class People:
         for p in self.registry.aboard(self.hull_id):
             if p.home == self.hull_id:
                 continue
-            if _words(p.name) == key or _words(p.name) == bare or _words(p.surname) == bare:
+            if bare in _bare_names(p) or _words(p.surname) == bare:
                 return p
         return None
 
@@ -1846,6 +1846,22 @@ def _to_words(place: str) -> str:
     if place in ("quarterdeck", "deck"):
         return "aft"
     return f"to {PLACES[place].name}"
+
+
+def _bare_names(p: Any) -> tuple[str, str]:
+    """A person's name in the lookup's words, whole and without its 'Mr' (package 118: a
+    person made as "Mr Abel Coffin" answered to "Mr Coffin" and not to his own name, the
+    words asked being stripped of their 'Mr' and his name not). The words asked are
+    stripped too, so "Mr Abel Coffin", "Abel Coffin" and "Mister Abel Coffin" all find him."""
+    whole = _words(p.name)
+    return whole, whole.removeprefix("mr ").removeprefix("mister ")
+
+
+def bears_the_name(person: Any, words: str) -> bool:
+    """Whether a person bears these words as his whole name, with or without 'Mr' (the
+    refusal of a name already borne, package 118); never by his surname alone."""
+    key = _words(words).removeprefix("mr ").removeprefix("mister ")
+    return bool(key) and key in _bare_names(person)
 
 
 def _words(text: str) -> str:
