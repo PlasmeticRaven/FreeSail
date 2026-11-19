@@ -22774,11 +22774,15 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
     the braces six of eight, short; a topsail furled five of ten (aloft: no post), short; a tack
     and a wear, all hands' work by their files, seven whichever watch has the deck (old nine
     with the starboard's, six with the larboard's). Heaving to (twelve, her eleven; a
-    manoeuvre, so no post) waits on either watch, "there are but five to spare": the larboard's
-    three could not heave to by night before either, and the starboard's seven could (seven of
-    eleven); work of the whole company waits for all hands to be called, by either watch alike.
-    How a job counts its hands is unchanged."""
+    manoeuvre, so no post) is more than either watch of five can begin, and calls all hands
+    (the owner's word of 2026-11-19: `too_few: all hands` in its file): ordered by the player
+    or by a standing order, on either watch, all hands are called once for it, she is hove to,
+    and the hands are piped down with the same watch on deck. Old (b422d05, before the key):
+    it waited on either watch, "Not hands enough on deck to heave to; there are but five to
+    spare."; before package 119 the larboard's three waited and the starboard's seven hove to
+    short (seven of eleven). How a job counts its hands is unchanged."""
     from freesail.crew.bill import Watch
+    from freesail.ship.parts import SailState
     from tests.test_hands import BRIG, asked, trader_at
 
     cases = (
@@ -22799,9 +22803,40 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
             assert (got.got, got.wanted, got.outcome) == want, (watch, eid, sid)
         w, crew, runner = trader_at(BRIG, 2, watch)
         inst = asked(w, "heave_to", None)
-        assert not runner._take_hands(w.ship, inst, crew)
-        said = "Not hands enough on deck to heave to; there are but five to spare."
-        assert inst.wait_line == said, (watch, inst.wait_line)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        # the two roads, in the world: the player's order and a standing order
+        for given in ("heave to", 'standing order "lie to": when the true wind exceeds 10 knots '
+                      "then heave to"):
+            w, crew, _runner = trader_at(BRIG, 2, watch)
+            for sid in w.ship.groups["plain sail"]:
+                w.ship.sails[sid].state = SailState.SET
+            w.ship.dyn.heading = units.deg_to_rad(215.0)  # by the wind, the starboard tack
+            w.ship.dyn.speed = units.knots_to_ms(5.0)
+            w.submit("steer 215")
+            w.run(400)
+            t0 = w.clock.tick
+            w.submit(given)
+            w.run(600)
+            ev = [e for e in w.log if e.tick >= t0]
+            road = (watch, given)
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'lie to': heaving to."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to heave to)"
+            ], road
+            assert [e.kind for e in ev if e.kind == "crew.all_hands_up"] == ["crew.all_hands_up"]
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            hove = [e.tick for e in ev if e.kind == "ship.hove_to"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(hove) == 1 and "hove_to" in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= hove[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
 
 
 # -- package 118: the director's mends, and the far ships' lines (truths 7-650 to 7-659) -------
