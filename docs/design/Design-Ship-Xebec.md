@@ -1,5 +1,24 @@
 # Design: the xebec, the Spanish navy's and the regency's cruiser under three lateens (package 90, third draft)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The xebecs after 1750 (Winfield et al. 2023, pp. 1141-1158), the complements of 1788 (p.
+1446 and following) and the místicos (pp. 1195-1201) came, set down in
+`VesselReferences-2026-11-Spanish.md` §11, §13 and §15. They give her **comparators**, not her
+figures: nothing of her file moves, since the owner settled the small class on *Minorca*'s hull
+(Dec 5). This revision carries:
+- **the Spanish small class beside *Minorca*** (§2.1, §2.2): the rows of 14 to 22 guns are 3.8 to
+  5.0 beams long, *Minorca* 3.2, broader for her length than any of them (computed);
+  ***Nuestra Señora de África* (ii)**, all lateen, 18 guns, 23.85 × 6.34 m, 127 men; *Gitano*, a 14
+  of 27.43 × 6.71 m;
+- **a Spanish plan of the small class to seek**: *Gitano*'s draught (Museo Naval, PB_album_06_05),
+  the plan §3.1 waits for (§3.1, §17 risk 2, §18.3);
+- **the 30's length known**: the *Gamo*, 38.92 m of eslora by 9.38 m, 435 t (§18.1);
+- **the chambequines' dates**, no masting (decision 15);
+- **the 1788 complements** of a xebec of 18 and of a lateen xebec of 16 to 20 beside her 113, and
+  her commander's rank by them (§8.1, §8.3);
+- **what is not in the passages**, her sweeps, steering and lying to: judgement stands, by the
+  owner's word (§6, §12, §18.2).
+
 **Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
 owner decided that the strain of a lateen taken aback is built: "A lateen taken aback should
 increase the strain on the mast, as a backed square sail does, so that on the worse tack and not
@@ -108,7 +127,7 @@ option of her fits by a key of the ship's own; the King's xebec of the 1752 Regu
 | 12 | Company **113** in the King's file (*África*'s 75 seamen and 38 soldiers), **18** in the trader's (JUDGEMENT); the regency's 150 and the privateer's 59 recorded as departures until the ship's configuration gives a number | Xeb §6; the coasting cutter's road |
 | 13 | Steered by **a wheel** (JUDGEMENT, the brig-sloop's of her size), so that package 116's wheel and its repair stand unchanged; Winfield asked, and a tiller, if the book shows one, takes the engine note's helm key (its §10) | §12 |
 | 14 | Description key `xebec`, rig word **"a xebec"**, size rank 2 (the brig's class); the glass "a xebec of war, nine ports a side"; the trader "a xebec, deep laden" | §10; the made-out rule |
-| 15 | The chambequín **booked** as a third file of the same module, after the xebec sails | A rig change is a file, not a fit; square rig on all three is a ship's classing, cheap in the engine and dear in research (no spar figure found: Xeb §3.6) |
+| 15 | The chambequín **booked** as a third file of the same module, after the xebec sails | A rig change is a file, not a fit; square rig on all three is a ship's classing, cheap in the engine and dear in research (no spar figure found: Xeb §3.6). **2026-11-19:** the entries date them (*Aventurero* 1765, *Andaluz* (ii) 1778, *Caimán* and Barceló's *San Antonio* rigged so, the ship-rigged *Murciano* class 1779) and give no spar figure (VR-Sp §13): still booked |
 
 ---
 
@@ -200,13 +219,46 @@ said in its note.
 **Plainly:** the Spanish xebec of 14 may have been smaller than *Minorca*; the file is the small class
 at *Minorca*'s size, its 18 ports carrying the 14's guns in fourteen of them, until Winfield's entries
 give a Spanish hull (§18.2, item 1). Her figures move then by principle 12, her behaviour pinned
-only where measured.
+only where measured. **2026-11-19:** the entries came (VR-Sp §13). The Spanish 14s and 18s were
+**shorter or no longer, and narrower**: *Gitano* (14 guns) 27.43 × 6.71 m, *Nuestra Señora de
+África* (ii) (18 guns, all lateen) 23.85 × 6.34 m, *Caballo Blanco* (14) 27.58 × 6.90 m, against
+*Minorca*'s 29.49 × 9.30 m. They give no plan the tree can read yet, so **her figures do not move**
+(the owner's Dec 5: *Minorca*'s hull); *Gitano*'s draught, if found and read, is the Spanish hull
+principle 12 waits for (§3.1). Her beam and her stability are where *Minorca* is furthest from the
+Spanish rows (§2.2).
 
 ### 2.2 Her comparators
 
 The brig-sloop (26.8 m on the water, 8.6 m broad, 3.5 m draught, 413 t; `data/ships/brig.yaml`) is
 the nearest committed hull, and the one her truths set her against (§15): about the same length, a
 little broader, a little shallower, a fifth lighter.
+
+**The Spanish xebecs, added 2026-11-19** (Winfield et al. 2023, pp. 1141-1158; the book's metres;
+the beams' ratio computed; VR-Sp §13 has the rows whole). Comparators, not her figures:
+
+| Xebec | Guns | Eslora × manga (m) | Beams long | Depth in hold (m) | Men | Note |
+|---|---|---|---|---|---|---|
+| ***Minorca*** (hers, RMG ZAZ4270) | 18 | 29.49 × 9.30 (English feet, on the lower deck, extreme) | **3.2** | 3.05 | — | a British design built at Mahón |
+| *Gitano* (1753) | 14 | 27.43 × 6.71 (English feet as designed) | 4.1 | 3.10 | — | **her draught reproduced, PB_album_06_05** |
+| *Nuestra Señora de África* (ii) (1775) | 18 | 23.85 × 6.34 | 3.8 | 2.41 | **127** | **all lateen sails**; 14 × 4 mounted |
+| *Caballo Blanco* (an Algerian prize, 1768) | 14/24 | 27.58 × 6.90 | 4.0 | 2.83 | — | 155 t |
+| *Gavilán* (1749) | 20 | 33.32 × 7.59 | 4.4 | 2.69 | — | 232 t |
+| *Garzota* (1753) | 22 | 38.87 × 7.85 | 5.0 | 2.65 | — | 267 t |
+| *Diligente* (1808-1823) | 12 | 21.73 × 6.69 | 3.25 | 3.06 | 69 | 125 t |
+| ***Gamo*** (1770; the *Speedy*'s prize, 1801) | 30/32 | 38.92 × 9.38 | 4.15 | 3.53 | — | 435 t; the 30 |
+| *Mallorquín* class (1786) | 26/28 | 36.08 × 10.03 | 3.6 | 3.90 | 251 | lateen-rigged |
+
+- **Her beam is the outlier** (computed): *Minorca* is broader for her length than any Spanish row of
+  14 to 22 guns built from 1749 to 1779 (3.8 to 5.0 beams long), as broad as the *Gamo* of 30; only
+  the later small *Diligente* (3.25) and *Muralla* (8 guns, 2.95) come near her. Her GM of about 1.0
+  m (§2.1, from Falconer's "great breadth") is set on her breadth; a Spanish hull would want it
+  measured again (JUDGEMENT).
+- **Her depth in hold** (3.05 m) is inside the Spanish small class's 2.1 to 3.2 m; the book's rule
+  of a depth about half the beam does not hold for xebecs, whose depths run from three-tenths of
+  their beam to under a half (computed).
+- ***África* (ii)** is the Spanish lateen small class itself: all lateen, 18 guns with fourteen
+  4-pounders mounted, 127 men, launched at Ceuta in 1775, her fate not known. Whether she is
+  James's *África* of 1799 (her fit "africa 1799", §7.1) her entry does not say.
 
 ## 3. The hull profile and her shape (Build §5.0 to §5.3, §5.7)
 
@@ -223,6 +275,14 @@ little broader, a little shallower, a fifth lighter.
 **Plainly:** *Minorca* was designed for building at Port Mahon for the Royal Navy, not for Spain. She
 is the plan of the type nearest the small class that is at hand (her 18 guns are the Regulation's
 xebec of 18); a Spanish plan from Winfield's reproductions replaces her by principle 12.
+**2026-11-19:** Winfield reproduces three (VR-Sp §13): **the draught of *Gitano*, a 14-gun xebec
+of 1753 by Jorge Juan (Museo Naval, Madrid, PB_album_06_05)**, the small class's 14 itself; the
+*Cazador* class's plan (the Marqués de la Victoria's album, plate 17; 20-gun xebecs of 1750); and
+*Aventurero*'s (a 30). None is held or read. **To seek at her step 1**: *Gitano*'s draught where
+the Museo Naval's albums are served (the Biblioteca Virtual de Defensa serves the navy's plans
+under CC BY 4.0, as PB-039 and the *Diana*'s are). If it is found and read, it is the Spanish plan
+this paragraph waits for; since the owner chose *Minorca*'s hull (Dec 5), the change goes to the
+lead, and through them to the owner, with the comparators of §2.2 (JUDGEMENT on the road).
 
 ### 3.2 What the drawing must show her to be
 
@@ -410,7 +470,9 @@ best speed, a league and a half in the first hour and half to three quarters of 
 a few more, then nothing (Forfait p. 126); a xebec "having more sweeps and more men" out-pulling a
 brig at hers (James III p. 149).
 
-**Her figures** (JUDGEMENT throughout, until Winfield's entries give her *remos*):
+**Her figures** (JUDGEMENT throughout, until Winfield's entries give her *remos*). **2026-11-19:**
+the xebecs' entries give no oars (VR-Sp §13); the only oars in the passages are the místico
+*Cerbero*'s 28 on a hull of 14½ m (VR-Sp §11). Judgement stands, by the owner's word:
 
 | | Figure | Reason |
 |---|---|---|
@@ -504,6 +566,16 @@ and the sweeps (§6).
 | the privateer's fit | 113 filed; **59** her own, a departure | | James V p. 128 (B) |
 | `merchant-xebec.yaml`, the trader | **18** (JUDGEMENT) | the master (*patrón*) and the mate, 14 seamen, a boy, a cook | between the merchant rule's five a hundred tons (about 12 on her tonnage) and Falconer's "labour of three square-rigged ships" |
 
+**Beside her, 2026-11-19** (comparators; her 113 does not move, being *África*'s own by James):
+- **The regulation of 1788** (Winfield et al. 2023, p. 1446 and following; VR-Sp §15), for peace:
+  a **xebec with lateen sails of 16 to 20 guns, 142** (the book's Total 134 without its four
+  commissioned and four major officers), of whom **26 soldiers** (20 infantry, 6
+  infantry-artillery); a xebec of 18 guns, 199 by the printed Total (189 by its columns, which do
+  not add to it), of whom 55 soldiers. Her 113 with 38 soldiers lies under both: a ship's own
+  muster against the establishment (JUDGEMENT).
+- ***Nuestra Señora de África* (ii)**, all lateen, 18 guns: **127** (VR-Sp §13).
+- The regency's 150 and the privateer's 59 stay departures recorded, as before.
+
 ### 8.2 Her watches
 
 - **The King's**: the 75 seamen in two watches (the generator's muster); the soldiers their own
@@ -524,6 +596,11 @@ and the sweeps (§6).
 `data/people/xebec.yaml` with `names: spanish` (N1): her commander a *teniente de navío* (James's
 "Captain Josef Subjado" of the *África*; the rank judgement until Winfield gives it), an *alférez*,
 the pilot, the boatswain (*contramaestre*), the gunner (*condestable*), the carpenter, the surgeon.
+**2026-11-19:** the regulation of 1788 (p. 1446 and following; VR-Sp §15) gives a xebec with lateen
+sails of 16 to 20 guns a *teniente de fragata* and three alféreces (two *de navío*, one *de
+fragata*), and a xebec of 18 a *teniente de navío* over a *teniente de fragata*: her commander **a
+*teniente de fragata*** (was *teniente de navío*, judgement), the lateen row the nearest to her,
+with an *alférez de navío* as her second; the posts spoken in the game's English (VR-Sp §8).
 The regency's cruiser's people are not named but her rais, and the rais by a source (Foss's "Rais",
 1798), or not at all (`Design-SlaveryAndSuppression.md`'s rule of plain words). The trader's
 *patrón* and mate, `names: spanish`.
@@ -622,7 +699,9 @@ relieving tackles` steers her at half the wheel's rate, `repair the wheel` is th
 four. If Winfield's plans show a tiller, she takes the helm key the engine note proposes for every
 tiller-steered hull (§10 there: the cutter's own file says she steers by a tiller, and is told her
 wheel is shot away): "the tiller shot away", the relieving tackles hooked to the tiller as now, the
-repair a spare tiller shipped; nothing else of hers moves.
+repair a spare tiller shipped; nothing else of hers moves. **2026-11-19:** the entries sent say
+nothing of her steering, and the plans they reproduce are not read: the wheel stands, JUDGEMENT, by
+the owner's word, until *Gitano*'s draught is read (§3.1).
 
 ## 13. The harbour's shelves (package 96), and her scenarios
 
@@ -680,7 +759,9 @@ gives a xebec's.
    lateen's handling. *Mitigation*: her document takes the shared design whole and asks only the
    three things of §5, A1a and A1b, and her mizen eased as she pays off.
 2. **Her hull is a stand-in** (*Minorca*, a British design); a Spanish plan may move her figures.
-   *Mitigation*: principle 12; only measured pins move.
+   *Mitigation*: principle 12; only measured pins move. **2026-11-19:** the Spanish rows show
+   *Minorca* broader for her length than any Spanish xebec of her class (§2.2); *Gitano*'s draught
+   is the Spanish plan to seek (§3.1).
 3. **The sweeps touch the hands**: men at the sweeps are men not at the sails or the guns, and the
    runner's pools and the quarter bill must say so without moving any existing ship's hands.
    *Mitigation*: keyed on `sweeps:`, which no file carries.
@@ -703,7 +784,9 @@ gives a xebec's.
    and 319 men, the famous fight with the *Speedy*; no length of a 30 is known (the *Gamo*'s is not
    given), and Winfield's entries are asked (§18.2 item 2). (A sketch: the small one is the brig's
    length with three long yards over her; the large one is longer and heavier, by how much the book
-   will say. The 20-gun xebecs of 38 to 39 m are of the small class, Xeb §2.2.)
+   will say. The 20-gun xebecs of 38 to 39 m are of the small class, Xeb §2.2.) *Answered
+   2026-11-18 as picked. 2026-11-19:* the book now says: the *Gamo*, 38.92 m of eslora by 9.38 m,
+   435 t, a third longer than *Minorca* (VR-Sp §13).
 2. **How does she go about?** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own
    shape: she tacks and wears as other vessels do, her yards changed round their masts in stays or
    in the wear, or left; the change "preferred but not necessary". **Plainly:** the pick, `tack
@@ -731,6 +814,12 @@ Winfield et al., *Spanish Warships in the Age of Sail, 1700–1860*, the owner's
 4. Anything on a jabeque's **steering**, her **lying to**, and the **packet-boat of 18** the Regulation
    sets beside the xebec of 18.
 
+**Marked 2026-11-19** (the decisions sheet's Part D; VR-Sp §13): item 1 **partly supplied** (the
+rows, *África* (ii) and *Gitano*'s draught; *Vives*, seamen and soldiers apart, and her oars not
+found); item 2 **supplied** but for her men (the *Gamo*); item 3 **partly supplied** (the dates;
+no masting); item 4 **not found**. By the owner's word, what was not found is filled from other
+research or judgement.
+
 ### 18.3 For the lead
 
 1. **A1's design** (A1a to A1c): the plan's proposal (Plan §4 row 3, §13.1 item 1); the xebec's
@@ -749,6 +838,10 @@ Winfield et al., *Spanish Warships in the Age of Sail, 1700–1860*, the owner's
    the three.
 5. **A season key** for the regency's cruisers (May to November) read by the business: none reads one.
 6. **The sweep ports** in the viewer (§11 item 5): a key or a rule, the viewer's next owner's.
+6a. **2026-11-19: *Gitano*'s draught** (§3.1): whether to seek it at her step 1, and if it is read,
+   whether her hull moves from *Minorca*'s to it (the owner's choice of hull, Dec 5, put back to
+   them with the comparators of §2.2). The pick: seek it; the hull's change put to the owner only
+   once it is read.
 7. **Item 37**: her lines and spars are rated by the generator's own copy of the sail-force law,
    `PEAK_COEFF["lateen"] = 1.25` (`tools/gen_ships.py:140`); nothing of hers asks it changed, and her
    file is generated after the owner settles it (Dec 2; the plan's A0).

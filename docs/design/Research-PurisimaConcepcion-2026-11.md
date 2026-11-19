@@ -1,5 +1,16 @@
 # Research note: the *Purísima Concepción* class three-decker (package 90, November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The units (Winfield et al. 2023, pp. 41-46), the complements of 1 January 1788 (p. 1446 and
+the two pages following) and of the Regulation of 16 October 1803, and the ordinance of 1803's guns
+by deck came, set down in `VesselReferences-2026-11-Spanish.md` §7, §15 and §16. **Her company by
+kind is the regulations'** (a 112: 877 in 1788, of whom 225 soldiers; 1,015 in 1803, of whom 275);
+**the libra is 0.4608 kg**, one ratio for every calibre; **the ordinance's 112 carries 118 pieces**,
+and its own note gives her 18-pounders in her third battery. The class's pages (pp. 406-410) were
+not sent again: the keel's and the rebuilt length's digits, her draught, sills, trials and the
+sixteenth pair's place stay open, to be measured (ZAZ0101) or judged, by the owner's word. The
+units, §3.3, §3.5, §4, §10 and §11 are brought into line; nothing else is changed.
+
 The research for the fifth and largest hull of package 90, the Spanish navy's *Purísima
 Concepción* class of three-deckers, the game's first ship of three gun decks. It is the note her
 design document (`Design-Ship-PurisimaConcepcion.md`, second draft of 2026-11-18) works from, in the form of
@@ -38,7 +49,10 @@ metres from Winfield's metres where the book gives them. James, Falconer and Ste
 of 0.3048 m. A Spanish gun's calibre is in *libras*; Winfield gives each broadside in libras with
 the book's English pounds beside, and the lead's rule is to take the book's pairs as it gives them (VR-Sp,
 "Units"). Tons: *arqueo* (Spanish measure) and *bm* (English builder's measure) are different
-things and are never compared as one.
+things and are never compared as one. **2026-11-19** (Winfield et al. 2023, pp. 41-46): the pie is
+278.635 mm; the libra 0.4608 kg; a row's length is the *eslora*, on the lowest planked deck over
+both overhangs; the *puntal* the depth in hold, about half the *manga*; the *tonelada de arqueo* a
+capacity of about 1.42 m³ (VR-Sp §7).
 
 **The scratch.** Every probe is under `scratchpad/p90/concepcion/` in the session's scratch ("the
 scratch", not filed), run with `py` from the scripts' own folder, the pkg-90 tree first on `sys.path`
@@ -345,6 +359,12 @@ The engine reads a gun's `pounder` as its shot's weight in English pounds (the e
 They differ by 6.4%. The lead's rule binds: the file takes Winfield's pounds, by calibre if the book gives
 them (a passage to ask for, §11), else by the book's broadside's pair (judgement: each calibre at the
 broadside's ratio), each gun's calibre in libras in its note.
+- **The book's own libra, read 2026-11-19** (Winfield et al. 2023, pp. 41-46): **0.4608 kg**, 1.5873
+  per cent heavier than the English pound (1.0159), one ratio for every calibre; a gun the book calls
+  a "32pdr" fires 32 libras. It agrees with James's 1.014 to within a fifth of a per cent, and not
+  with the book's own broadside pairs (1.079), which stay as the book gives them. The owner settled
+  the file's way (Dec 9: as her navy named it); the other way's English figures are now the libra's
+  (a 36, 36.57 lb: Con-D §5.3).
 
 ### 3.4 The obús
 
@@ -360,6 +380,15 @@ obús (§11).
 No weight of a Spanish 36, 24, 18, 12 or 8 was found; the English patterns (`tools/ships/period.py`,
 Adye 1804) have no 36. Falconer's QUARTERS (`period.FALCONER_CREW`) has no 36 either: 15 men for a
 42 and 13 for a 32. Both are to be asked for (§11); until then judgement (the design's §5).
+**2026-11-19:** not in Winfield's passages. By the owner's word they come from other research (the
+period's Spanish artillery treatises, for example) or judgement.
+
+**The ordinance of 1803, read 2026-11-19** (Winfield et al. 2023, the table of the ordinance; VR-Sp
+§16): a three-decker of 112 carries 30 × 36, 32 × 24 and 32 × 12 in her batteries, 4 × 8 and 8 ×
+48-pdr obuses on the quarterdeck, 4 × 8 and 2 × 48-pdr obuses on the forecastle, 6 × 24-pdr obuses
+on the poop: 118, the poop's six outside the nominal 112. Its note: *Concepción* carried 18-pounders
+in her third battery. Beside §3.1's 1803 alteration (116), two 48-pounder obuses more on the
+quarterdeck; her own record stays her fit.
 
 ---
 
@@ -378,6 +407,28 @@ unknown, and so is whether a flagship's figure includes an admiral's staff. Jame
 warrants includes everyone aboard on the day, her admiral's people among them (judgement). James
 vol. 2 p. 59 says the Spanish government sent its fleet to sea "so badly manned" (read (OCR)),
 which a scenario of 1797 may carry in its people, not her file (judgement).
+
+**Read 2026-11-19: a 112's company by kind** (Winfield et al. 2023, p. 1446 and the two pages
+following; the table of the Regulation of 16 October 1803; rung B; VR-Sp §15). The book's columns:
+commissioned officers; major officers (pursers, chaplains, surgeons, pilots); sea officers
+(boatswains, guardians, caulkers, carpenters, cooks, divers, armourers, lamp men, sailing masters,
+quartermasters); infantry; infantry-artillery (the artillery's infantry corps); artillery; seamen;
+landsmen; boys. Its "Total" leaves out the commissioned and the major officers.
+
+| A 112 | Commissioned | Major | Sea | Infantry | Inf.-art. | Artillery | Seamen | Landsmen | Boys | Total | All (computed) | Soldiers |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1788 | 19 | 10 | 23 | 168 | 57 | 130 | 200 | 230 | 40 | 848 | 877 | 225 |
+| 1803 | 19 | 14 | 37 | 200 | 75 | 190 | 240 | 200 | 40 | 982 | 1,015 | 275 |
+
+- The commissioned officers: a brigadier, a capitán de navío, a capitán de fragata, four tenientes
+  de navío, four tenientes de fragata, four alféreces de navío and four de fragata.
+- The 1788 complements were for peace; in war, as many men again as guns in the main batteries,
+  half infantry and half landsmen, and more surgeons (907 or 971 for a 112 by the reading: VR-Sp
+  §15).
+- **Against her own figures:** her 839 lies 4 per cent under 1788's 877 and within nine of its
+  Total of 848; James's 917 at her sister's capture lies nearest the war increase's lower reading
+  (907). What her 839 counts her entry does not say (judgement).
+- The design files the regulations' company and soldiers (Con-D §6.1).
 
 **Watches.** No Spanish source on her watches was read. The game's King's ships keep two watches,
 starboard and larboard; the design takes the same for her (judgement). **Ruling 11** (package
@@ -507,8 +558,10 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
 - **Her lower sills above her water**, and her draught: not read anywhere (§2.6). The lee ports'
   truth waits on them.
 - **Her displacement** at her sailing water (§2.5).
-- **The 839 by kind** (officers, seamen, marine infantry, the navy's gunners, boys).
-- **Her guns' weights, lengths and crews** by Spanish practice; the obús's.
+- **The 839 by kind** (officers, seamen, marine infantry, the navy's gunners, boys). *Met
+  2026-11-19 by the regulations of 1788 and 1803 (§4).*
+- **Her guns' weights, lengths and crews** by Spanish practice; the obús's. *Not in the passages of
+  2026-11-19: other research or judgement.*
 - **Her masts and yards** by any Spanish rule; Steel's p. 39 fractions and p. 49 column on the page
   images; PB-078's sails.
 - **The mizen**: a lateen yard or a gaff in 1797 and in 1809.
@@ -552,6 +605,14 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
 4. ***British Warships in the Age of Sail 1793–1817*, the first rates, the prize *San Josef*
    (1797)**: her British dimensions, armament (the 114 of 1801), complement and any sailing
    remark (the owner's volume; its entries already serve package 75).
+
+**Marked 2026-11-19** (the decisions sheet's Part D): item 1 **not found** (the class's pages not
+sent), but for which length the "length" is (the eslora, by the units: §0) and the 839 by kind (by
+the regulations instead: §4); item 2 **partly supplied** (the measurements, arqueo and the libra;
+the dotación of a 112 by kind; not the guns' weights, the obús or a masting rule); item 3 **not
+found** as a class (a 112's crew by item 2's regulations); item 4 **not found**. By the owner's word,
+what was not found is filled from other research (ZAZ0101 to ZAZ0103 at her step 1; the period's
+Spanish artillery treatises for the weights) or judgement.
 
 **The lead**: the images README's "as taken in 1797" against Greenwich's 1799 (§2.3); the words
 "second deck" and "third deck" for the gunnery's owner (§7).

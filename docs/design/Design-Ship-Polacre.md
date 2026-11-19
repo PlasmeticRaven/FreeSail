@@ -1,5 +1,26 @@
 # Design: the polacre, a Mediterranean trader under lateens and a square pole main (package 90, third draft)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The polacras' entries came (Winfield et al. 2023, pp. 1083-1086; set down in
+`VesselReferences-2026-11-Spanish.md` §12), with the owner's own reading of Monleón's print, and the
+owner answered whether she should carry the small loose-footed mizen topsail that reading shows:
+"Carry it". This revision carries what that settles here, each figure old beside new:
+- **her size, from *Angel de la Guarda*** (1818), the one whole row: 25.08 m of eslora, 22.15 m of
+  keel, 7.52 m of beam, 3.34 m of depth in hold, 71 men, 2 × 12 and 8 × 8 bronze; her 71 the
+  polacre of war's 71 (decisions 4 and 12, §0, §2.1, §16 risk 1, §17.1 question 2);
+- **her mizen topsail carried**: a small loose-footed square topsail over her lateen mizen, on her
+  pole mizen with no lower yard, by the tartane's road (A5's ruled reading, A6's key): decisions 2
+  and 10, §4.4a (new), §4.6, §5.4, §12, §13, §17.1 question 1;
+- **the owner's reading of the print**, a check for the eye: three headsails, the main and the mizen
+  raked aft, the mizen about the fore's height, its lateen sheeted to a short boom over the
+  transom, a lively sheer with a step at a raised quarterdeck, no gunports, a reasonably short
+  bowsprit (§3.1, §4.1, §4.4, §4.5);
+- her commanders' ranks from the entries (§7.2); the *San José* not among them (§6.1); what is not
+  in the passages, the brass guns' weights, from other research or JUDGEMENT (§17.2).
+
+*Virgen del Carmen*'s row (22.15, 19.20 × 4.20 m) is not used: whether its third figure is her
+beam or her depth is unknown (the owner, 2026-11-19: "Quite honestly, I do not know.").
+
 **Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
 owner decided that the strain of a lateen taken aback is built: "A lateen taken aback should
 increase the strain on the mast, as a backed square sail does, so that on the worse tack and not
@@ -84,10 +105,12 @@ for this draft, `scratchpad/p90/second/speeds.py`). **JUDGEMENT**: this draft's 
 **A** (the period's own plan, rule or text), **B** (a historian's particular), **C** (judgement);
 for the hull's lines §5.0's **S**, **S†**, **R**, **T**.
 
-**One sentence.** One module writes two files of one class: a Mediterranean trader of about 200 tons
-(JUDGEMENT until Winfield's rows come), three pole masts with no tops, a great lateen on the fore
-raked forward, a course, topsail and topgallant on the pole main handed by lowering their yards, a
-lateen on the mizen, the jibs on a long bowsprit of one piece; the trader unarmed by default,
+**One sentence.** One module writes two files of one class: a Mediterranean trader on the Spanish
+navy's polacra *Angel de la Guarda* (25.08 m of eslora by 7.52 m; Winfield et al. 2023, pp.
+1083-1086; was about 200 tons by JUDGEMENT until Winfield's rows came), three pole masts with no
+tops, a great lateen on the fore raked forward, a course, topsail and topgallant on the pole main
+handed by lowering their yards, a lateen on the mizen with a small loose-footed topsail over it
+(the owner's "Carry it", 2026-11-19), three jibs on a bowsprit of one piece; the trader unarmed by default,
 with an armed trader's fit, and on the same hull the polacre of war, the Spanish navy's, with the
 regency's cruiser as a role; built only after the plan's A5 (a yard's level read from its place on
 the mast and not from its spar's class), A6 (the pole mast's quick handing), A1a to A1c (the whole
@@ -104,17 +127,17 @@ head).
 | # | Proposal | Why, in short |
 |---|---|---|
 | 1 | One module `tools/ships/polacre.py`, `build(out_dir)` writing `data/ships/polacre.yaml` (the trader) and `data/ships/polacre-of-war.yaml` (the navy's and the regency's: one class in two roles, the file's name the lead's); the whole lateen's cut in a shared pure module `tools/ships/lateen.py` (the tartane's and the xebec's too) | the per-ship modules' rule (`Plan-ShipsWorkflow.md` §3); a company belongs to a file, not to a fit (the lead's ruling (5) of 2026-11-07; `Build-Ships.md` §5.0 principle 10), and her fits' companies are 16, 71 and 80; one cut for package 90's three lateen hulls |
-| 2 | **The rig is Monleón's** (the owner's plan): lateen fore on a pole foremast raked forward; square pole main with course, topsail and topgallant; lateen mizen on a pole; jibs on a long bowsprit of one piece | the owner, 2026-11-06; Falconer's "generally"; Steel's second polacre-settee (Pol §1); question 1 |
+| 2 | **The rig is Monleón's** (the owner's plan): lateen fore on a pole foremast raked forward; square pole main with course, topsail and topgallant; lateen mizen on a pole; jibs on a long bowsprit of one piece. **Revised 2026-11-19** on the owner's own reading of the print: the main and the mizen raked aft, the mizen about the fore's height; **a small loose-footed square topsail over the lateen mizen, carried** ("Carry it"); the mizen lateen sheeted to a short boom over the transom; **three headsails** (was two, JUDGEMENT) on a **reasonably short** bowsprit (was "long") | the owner, 2026-11-06 and 2026-11-19 (VR-Sp §12); Falconer's "generally"; Steel's first and second polacre-settees (Pol §1); question 1 |
 | 3 | **The hull a Mediterranean merchantman's of burthen, with a beak**, not the xebec's | Falconer 1780 XEBEC, PROW; Lescallier p. 370 "un Navire Marchand ordinaire"; Pol §5.1; question 2 |
-| 4 | **Her size from Winfield's Spanish rows when the owner sends them**; until then about 200 tons by the old measure, LWL about 25 m, beam about 7.3 m, draught about 3.3 m, all JUDGEMENT | no polacre's dimensions found (Pol §5.2); §2 |
+| 4 | **Her size from Winfield's Spanish rows when the owner sends them**; until then about 200 tons by the old measure, LWL about 25 m, beam about 7.3 m, draught about 3.3 m, all JUDGEMENT. **Settled 2026-11-19: *Angel de la Guarda*'s row**, 25.08 m eslora, 22.15 m keel, **7.52 m beam** (was 7.3), 3.34 m depth in hold; the waterline about 24.9 m (was 24.5) and the draught about 3.3 m by JUDGEMENT on them | Winfield et al. 2023, pp. 1083-1086 (VR-Sp §12); §2 |
 | 5 | **Pole masts filed as the smack files her one stick**: a `mast` with every yard on it and no topmast, topgallant or royal mast; no new key | the generator's precedent (`data/ships/smack.yaml` l. 129-166, read); Pol §2 |
 | 6 | **Engine step A5: a yard's level read from its order on its lower mast, not from its spar's class**, one predicate read at the twelve places that read it now | observed: a pole main's topsail is a course to the heave-to, the lie a-try, the take-in words and the trim (§5.1) |
 | 7 | **Engine step A6: the pole mast's quick handing**, "amener en paquet": the upper square sails of a pole mast lowered together onto the lower yard, quicker than clewing up each on its cap; furled from the yard below | Lescallier p. 371; Röding; Falconer; Steel p. 236; O'Scanlan p. 482 (Pol §2.3) |
 | 8 | **Her lateen mizen is kept set hove to, and the heave-to's driver rule does not reach it** | observed: kept, she lies 58.5° off at 1.65 kn by truth 12's measure (1.49 kn of headway), just over its 1.6 kn, so her file's lever is to be measured (§5.2); taken in, she falls off past the beam and the heave-to fails (§5.2) |
 | 9 | **Engine steps A1a to A1d (A1d built by the owner's decision of 2026-11-18): a whole lateen worked in stays and in the wear** (the mizen hauled out at helm's a-lee as a ship's mizen; the fore eased off as a head sail and drawn at "let go and haul") **and changed round its mast or left** (the period's *muder*: the yard peaked up and its car passed round the mast, abaft it by the lead's ruling of 2026-11-18, Willaumez's MUDER; O'Scanlan's forward recorded), by the order's clause or her practice ("shift" in both by default); a lateen left lying against its mast on the bad hand until shifted. She tacks and wears as a brig of her size (the owner's answer to question 3) | observed: nothing works a whole lateen in stays today (§5.3); Lescallier p. 378, Fincham p. 60, Willaumez MUDER (Pol §4); the owner (Dec 3, Part F); GA §3.3 |
-| 10 | **B3.4's limits do not bite her**, nor the chebec's or the chambequín's: her main is her foremost mast with braced yards, pole or not; a square mizen topsail (question 1 (b)) would be filed on the pole mizen and class her square-rigged, never on a mizzen topmast | observed (§5.4) |
+| 10 | **B3.4's limits do not bite her**, nor the chebec's or the chambequín's: her main is her foremost mast with braced yards, pole or not; a square mizen topsail (question 1 (b)) would be filed on the pole mizen and class her square-rigged, never on a mizzen topmast. **Since 2026-11-19 it is carried** (the owner's "Carry it"): filed on the pole mizen, loose-footed with no yard below it, read a topsail by A5's ruled reading (the lateen yard the level below, as the tartane's topsail is); she classes **square-rigged, two masts with yards**, the mizen topsail yard her after yard | observed (§5.4); the owner (VR-Sp §12) |
 | 11 | Fits: in the trader's file **`unarmed`** (default) and **`armed trader`** six long 6-pounders; in the polacre of war's **`spanish navy 1800`** (default) San Josef's fourteen brass guns and **`corsair`** fourteen small guns. Roles `merchant`, `privateer` (on the armed trader), `kings-ship` and `cruiser` (on the navy's), and a new **`corsair`** role for the regency's cruiser with a doctrine book of its own (`data/captains/corsair.yaml`, read from `thresholds:` as package 116 made the cruiser's: question 4) | James (Pol §6); the roles the files use today are nine, none a corsair's (observed); question 4 |
-| 12 | Company **sixteen** in the trader's file: master and mate (posts, working officers by ruling 11), boatswain, carpenter, cook, nine seamen, two boys; **seventy-one** in the polacre of war's (the *San Josef*'s 49 seamen and 22 soldiers), the corsair's 80 filed at 71 and recorded as a departure, as the xebec's regency fit's 150 is (Xeb-D §8.1); `names: spanish` (a new list, the plan's N1) | the trader's JUDGEMENT within twelve to twenty (Pol §5.3); James vol. 3 pp. 33, 160 (Pol §6); §7 |
+| 12 | Company **sixteen** in the trader's file: master and mate (posts, working officers by ruling 11), boatswain, carpenter, cook, nine seamen, two boys; **seventy-one** in the polacre of war's (the *San Josef*'s 49 seamen and 22 soldiers; **and *Angel de la Guarda*'s own 71**, Winfield et al. 2023, pp. 1083-1086, whose hull she is), the corsair's 80 filed at 71 and recorded as a departure, as the xebec's regency fit's 150 is (Xeb-D §8.1); `names: spanish` (a new list, the plan's N1) | the trader's JUDGEMENT within twelve to twenty (Pol §5.3); James vol. 3 pp. 33, 160 (Pol §6); §7 |
 | 13 | Description key `polacre`, rig word **"a polacre"**, size rank 2; the registries gain her words | the made-out rule; §9 |
 | 14 | **Engine step V1 (the viewer): a whole lateen drawn as itself**, three corners on its yard, on its lee side, peaked up the mast while it is changed | `client/projection.js` l. 815, 904, 1506, 1537 (read): no whole lateen is drawn as one today; §13 |
 | 15 | Truths proposed P1 to P6 (§14); her scenario a shelf line on 79c's water (§11), booked for a card of its own (the plan's §4 row 15) | the plan's form |
@@ -151,7 +174,10 @@ head).
   engine's paths (§5.1); without A1a and A1b her lateens tack for nothing and never lie against
   their masts (§5.3).
 - **Her size waits on Winfield's rows** (Pol §11 items 1, 2 and 6). Until then the figures of §2
-  are JUDGEMENT and her files are not written.
+  are JUDGEMENT and her files are not written. **The rows came on 2026-11-19**: she is sized on
+  *Angel de la Guarda* (§2.1), and **her files no longer wait on Winfield**. What the passages do
+  not give (the brass guns' weights, the handling of her masts) is filled from other research or
+  judgement, by the owner's word.
 - **Order within package 90** (the plan's §9.1, which keeps the lead's view): the tartane first,
   the smallest and the reference vessel, after A1a to A6; the polacre second, after the tartane's
   file; the xebec third, going ahead of her if her Winfield rows have not come when A6 lands.
@@ -193,20 +219,31 @@ James's English pounds of shot as given. Each figure carries its rung in its not
 
 ## 2. The hull blocks
 
-### 2.1 The figures (all JUDGEMENT until a source; the second draft replaces them)
+### 2.1 The figures (revised 2026-11-19: *Angel de la Guarda*'s row)
 
-| Key | Working figure | Rung | Basis |
+**Her row** (Winfield et al. 2023, pp. 1083-1086; VR-Sp §12; rung B): the Spanish navy's polacra
+*Angel de la Guarda*, 10 guns, reported only in 1818: **eslora 25.08 m, quilla 22.15 m, manga 7.52
+m, puntal 3.34 m** (90 pies, 79 pies 6 pulgadas, 27 pies and 12 pies by the book's metres); 71
+men; 2 × 12-pdr and 8 × 8-pdr, bronze. The book's metres are taken, as the Spanish note's head
+rules. She is the one whole row of the eight; *Virgen del Carmen*'s three figures are not used, the
+third being unknown as beam or depth (the owner: "Quite honestly, I do not know.").
+
+| Key | Figure (old → new) | Rung | Basis |
 |---|---|---|---|
-| Tons burthen | about 200 (170 to 220) | C | `VesselReferences-2026-10.md` §3.4's "about 200 tons" (judgement there); the polacre-ships of James carry ten to sixteen guns (Pol §6) |
-| `length_waterline_m` | about 24.5 | C | the tons by the old measure on a length of 3.4 beams (a merchant's proportion, JUDGEMENT). The keel for tonnage is the length less three-fifths of the breadth, as *Minorca*'s own figures show (96 ft 9 in less 18 ft 3 in is 78 ft 6 in: Pol §5.1), and the tons are that keel by the breadth by half the breadth over 94: about 81 ft on deck by 23¾ ft broad gives 200 tons (24.7 × 7.24 m), 86 by 24 ft about 219, 88 by 25 ft about 243. **Plainly:** the first draft's "172" and "190" misapplied the rule |
-| `beam_m` | about 7.3 | C | as above |
-| `draught_m` | about 3.3 | C | a laden trader of her size (the bilander's 3.51 m at 130 tons, read there, is a deep-laden British coaster's, from Lloyd's: JUDGEMENT on carrying less to her) |
-| Displacement | LWL × B × T × Cb 0.52 × 1025 | C | the brig file's method; Cb a merchant's, JUDGEMENT |
-| `deck_height_m` | about 1.4 | C | the brig's method |
+| Eslora (on her lowest deck, over the overhangs) | — → **25.08 m** | B | her row; the eslora's definition, Winfield et al. 2023, pp. 41-46 (VR-Sp §7) |
+| Quilla (the straight keel) | — → **22.15 m** | B | her row |
+| Puntal (depth in hold) | — → **3.34 m** | B | her row; 0.44 of her beam (computed), near the book's "about half" |
+| Tons burthen | about 200 (170 to 220), JUDGEMENT → **about 218** by the old English measure on her figures (computed: 82.3 ft less three-fifths of 24.7 ft, by 24.7, by 12.3, over 94), within the old band; Winfield gives her no tons | C, computed | the old measure as the first draft's row applied it (the keel for tonnage the length less three-fifths of the breadth, as *Minorca*'s figures show: Pol §5.1); the generator's helpers want an English burthen, as the *Diana*'s design has it (Dia-D §2) |
+| `length_waterline_m` | about 24.5, JUDGEMENT → **about 24.9, JUDGEMENT** | C | her eslora is on her lowest deck over its overhangs, so her waterline is a little shorter: on the *Diana*'s plan the drawn waterline falls 0.4 per cent short of her eslora (34.40 against 34.55 m: Dia-D §2), taken here; set on her drawn profile at the build |
+| `beam_m` | about 7.3, JUDGEMENT → **7.52** | B | her manga (whether over the plank is not said: VR-Sp §7) |
+| `draught_m` | about 3.3 | C | a laden trader of her size (the bilander's 3.51 m at 130 tons, read there, is a deep-laden British coaster's, from Lloyd's: JUDGEMENT on carrying less to her). **Unchanged, now checked** against her puntal of 3.34 m: a laden coaster's draught near her depth in hold (JUDGEMENT); Winfield gives no draught |
+| Displacement | LWL × B × T × Cb 0.52 × 1025 | C | the brig file's method; Cb a merchant's, JUDGEMENT. About 315 t on the old figures → **about 329 t** on the new (computed) |
+| `deck_height_m` | about 1.4 | C | the brig's method; unchanged |
 
-**Plainly:** no figure above is sourced. The owner's passages (Pol §11 items 1, 2, 6) are asked
-for; a Spanish polacra's row, or HMS *Calpe*'s if she was the *San José*, replaces them, its metres
-taken as Winfield gives them.
+**Plainly:** until 2026-11-19 no figure above was sourced. Her size now is *Angel de la Guarda*'s, a
+Spanish navy polacra of 1818 inside the game's years, and her company of 71 (§7.2) is that ship's
+own as well as the *San Josef*'s. Her waterline and draught stay JUDGEMENT on her row, measured on
+her drawn hull at the build (`Build-Ships.md` §5.0 principle 8).
 
 ### 2.2 Her datum
 
@@ -230,7 +267,13 @@ The upper deck, as the merchant brig's (D18 (a) of package 75).
   platform), JUDGEMENT on its length; **a merchantman's fuller floor** than the xebec's (Falconer
   XEBEC: the xebec's hull "extremely different"; Steel's PINKS "not sharp in the bottom, as they
   are vessels of burthen"); **a low sheer** with a short raised quarterdeck (JUDGEMENT, to be
-  checked against the owner's description of Monleón's print, Pol §11 item 5).
+  checked against the owner's description of Monleón's print, Pol §11 item 5). **Revised
+  2026-11-19 on that description** (the owner: "The hull has reasonably aggressive sheer, a clear
+  step in the rail for the raised quarterdeck area, no gunports, and reasonably short bowsprit."):
+  **a lively sheer** (was low), with a clear step in the rail at a raised quarterdeck; no ports on
+  the trader's side as the print shows her (the lead's ruling of one hull pierced for every fit
+  stands, the trader's ports shut and empty: §6.2). The description is a check for the eye, never a
+  source of points: the sheer's figures stay JUDGEMENT, set so that it holds.
 
 ### 3.2 What the drawing must show her to be
 
@@ -254,9 +297,9 @@ None sourced; recorded in words only where the owner's description or a vetted p
 | Spar | Filed as | Figures (JUDGEMENT unless said) | Source |
 |---|---|---|---|
 | `fore.mast` | `mast`, one stick, **raked forward** (`rake_deg` about −8) | shorter than the main (about 0.75 of its height above the deck), short and thick as a lateen mast is | Monleón (the lead's words); Lescallier p. 376 ("gros & courts"); Fincham p. 59; the rake JUDGEMENT, to check on the print |
-| `main.mast` | `mast`, one stick carrying the course, topsail and topgallant yards; **no topmast, topgallant or royal mast** | the heel-to-head length by Forfait's rule: the eyes of the rigging at the heights a three-piece main of her size would give them (p. 132), shortened at the pole's head by Lescallier's advice (p. 372); checked against the Levant's rule of four and a fraction breadths (p. 133, the fraction to read) | Forfait pp. 131-133; Lescallier pp. 370-372 (Pol §2.5, §10) |
-| `mizzen.mast` | `mast`, one stick, a lateen mast | about 0.6 of the main's height (Fincham's xebec, read there) | Pol §3.3 |
-| `bowsprit` | `bowsprit`, **one piece, no jib-boom**, long | about 0.6 of the main's length outboard (JUDGEMENT) | Lescallier p. 370 ("bout de beaupré aussi d'une seule pièce"); Steel p. 236; Monleón "a long bowsprit" (the lead's words) |
+| `main.mast` | `mast`, one stick carrying the course, topsail and topgallant yards; **no topmast, topgallant or royal mast**; **raked aft** (2026-11-19, the owner's reading of the print; the angle JUDGEMENT, a few degrees) | the heel-to-head length by Forfait's rule: the eyes of the rigging at the heights a three-piece main of her size would give them (p. 132), shortened at the pole's head by Lescallier's advice (p. 372); checked against the Levant's rule of four and a fraction breadths (p. 133, the fraction to read) | Forfait pp. 131-133; Lescallier pp. 370-372 (Pol §2.5, §10); the owner's reading (VR-Sp §12) |
+| `mizzen.mast` | `mast`, one stick, a lateen mast, carrying the lateen yard and, above it, the small mizen topsail's yard (§4.4a); **raked aft** (2026-11-19; the angle JUDGEMENT, as the tartane's mizen's) | about 0.6 of the main's height (Fincham's xebec, read there) → **about the fore's height, 0.75 of the main's** (2026-11-19, JUDGEMENT set so that the owner's reading, "about the same height as the foremast", holds for the eye) | Pol §3.3; the owner's reading (VR-Sp §12) |
+| `bowsprit` | `bowsprit`, **one piece, no jib-boom**, long → **reasonably short** (the owner's reading, 2026-11-19) | about 0.6 of the main's length outboard (JUDGEMENT) → **about 0.45** (JUDGEMENT, set so that the owner's reading holds for the eye; it must still take three headsails' tacks: §4.5) | Lescallier p. 370 ("bout de beaupré aussi d'une seule pièce"); Steel p. 236; Monleón "a long bowsprit" (the lead's words), corrected by the owner's own reading: "reasonably short bowsprit" |
 
 - **The diameters** (for the ratings' notes): the main at the deck 1/60 to 1/62 of its length, the
   fore 1/68 (Forfait p. 133); the yards a twentieth (lower) and a fifteenth (upper) thinner than
@@ -309,14 +352,47 @@ None sourced; recorded in words only where the owner's description or a vetted p
   main lateen, so the fore's is taken as the measure.
 - Its lines as the fore's. In "plain sail", "all sail", "fore-and-aft sails", "lateens"; alias
   "mizen".
+- **Its sheet to a short boom over the transom** (2026-11-19, the owner's reading: "lateen sheeted
+  to a short boom atop the transom"): an outrigger as the tartane's mizen has (Tar-D §4.2), its
+  length JUDGEMENT by the lugger's in proportion to her mizen yard.
 - **Kept set hove to** (§5.2): never a driver.
+
+### 4.4a The mizen topsail (`mizzen.topsail` on `mizzen.topsail.yard`; added 2026-11-19)
+
+**Carried, by the owner's word** ("Carry it", 2026-11-19), asked whether she should carry the small
+loose-footed topsail their reading of Monleón's print shows over her lateen mizen. It was question 1
+(b)'s, Steel's first polacre-settee's (a square mizen topsail over a lateen mizen: Pol §1), and the
+card's "Does not build" until now.
+
+| Part | Id; class | Figures (JUDGEMENT unless said) | Source |
+|---|---|---|---|
+| The mizen topsail yard | `mizzen.topsail.yard`; `yard`, **`on: mizzen.mast`** (no topmast: a pole mizen) | hoisted on the mizen's head, above the lateen yard's sling; its length about the main topgallant yard's ("small") | the owner's reading; the length JUDGEMENT |
+| **The mizen topsail** | `mizzen.topsail`; `square` | **loose-footed**: cut between its yard and the mizen's hounds, its sheets to the deck, **no yard below it** (as the tartane's topsail: Tar-D §4.1) | the owner's reading (VR-Sp §12); Steel's first polacre-settee (Pol §1) |
+
+- **Read as a topsail, by the tartane's road**: with no braced yard below it on its mast, A5's
+  ruled reading counts the lateen yard as the level below (Plan §13.1 item 2), so it is a topsail
+  to the heave-to, the lie a-try, the take-in words and the trim, never a course; A6's quick
+  handing reaches it by the same key as the tartane's topsail (a pole with a yard above its
+  lowest). Without A5 it would be a course to the engine, as her main topsail would (§5.1).
+- **In "plain sail"** (the print shows it set with the main topsail and topgallant: JUDGEMENT on
+  plain sail), "all sail", "square sails", "topsails"; a new group "mizen yards" for its yard.
+- **Braced with the main's yards at "mainsail haul"** in stays, and squared in the wear as an after
+  yard (JUDGEMENT: a ship's way, §5.4); A2's words say "brace in the after yards" for her, since she
+  now has one.
+- **Her classing moves**: two masts with yards, square-rigged, the mizen topsail yard her after
+  yard, no driver and nothing on a schooner's mast (§5.4's fourth row, observed on the classing
+  variant). Her heave-to, tack and wear (§5.2, §5.3) were measured without it, and are **measured
+  again on her file**, old beside new: a small sail, so little is expected to move (JUDGEMENT).
 
 ### 4.5 Headsails, staysails, storm canvas
 
 - **Jibs on the long bowsprit**: a fore staysail and a jib, on stays from the fore masthead
   (JUDGEMENT: Monleón shows "the jibs"; the count to the owner's eye). **Plainly:** Lescallier p.
   376 gives lateen masts no stays; how a polacre's jib stays clear the fore lateen's yard when it is
-  changed is not in any source read (§17, for the lead).
+  changed is not in any source read (§17, for the lead). **Revised 2026-11-19: three headsails**,
+  by the owner's eye ("Three headsails"): a fore staysail, a jib and an outer jib (JUDGEMENT on
+  their names and cut) on the bowsprit, now reasonably short (§4.1). The question of their stays
+  against the fore lateen's yard is the more pressing for it (§17.2 item 7).
 - **A main staysail** on the main stay, her lying-to staysail (JUDGEMENT: the heave-to's and lie
   a-try's staysail; none sourced).
 - **Storm canvas**: a storm fore staysail; small lateens for bad weather are the xebec's (Fincham
@@ -328,7 +404,10 @@ None sourced; recorded in words only where the owner's description or a vetted p
 sails", "lateens" (new), "fore-and-aft sails", "headsails", "plain sail" (fore lateen, main course,
 main topsail, jib, mizen lateen), "all sail", "lying-to staysails", "storm canvas"; "main yards",
 "lower yards", "topsail yards", "yards". Aliases: "mainsail" the main course, "foresail" the fore
-lateen, "mizen" the mizen lateen.
+lateen, "mizen" the mizen lateen. **Revised 2026-11-19:** "topsails" the main topsail and the mizen
+topsail; "plain sail" adds the mizen topsail (of the headsails the jib, as before; the fore
+staysail and the outer jib in "all sail": JUDGEMENT); "headsails" the three; "mizen yards" the mizen topsail yard, and it in
+"topsail yards" and "yards"; alias "mizen topsail".
 
 ---
 
@@ -605,7 +684,9 @@ bite), and the polacre the first with a pole main among square yards and lateens
   is the period's (Forfait p. 130's xebec after mast carries its square sail over the lateen; the
   mizen topsail is handled with the main's yards at "mainsail haul", a ship's way: JUDGEMENT), so
   her file would carry it on the pole mizen, and a guard pins that no file of hers has a mizzen
-  topmast.
+  topmast. **Since 2026-11-19 she carries it** (the owner's "Carry it", on their reading of
+  Monleón's print: §4.4a), on the pole mizen, so **the table's fourth row is hers**: square-rigged,
+  two masts with yards, no driver, nothing on a schooner's mast. The limits still do not bite her.
 - **Neither limit reaches the xebec's other rigs either** (stated here once, for the package; the
   xebec's documents agree, Xeb §9 item 9, Xeb-D §4.3): Forfait's Spanish chebec (a square main of
   course and topsail between a lateen fore and a lateen mizen) has her main as her foremost mast with
@@ -649,8 +730,18 @@ sprit scaled to match (untested rigs)"). Lescallier's five points against six (p
 - **The calibres** are James's English words for Spanish and Barbary guns; Winfield's rows give
   libras beside pounds for the navy's (take Winfield's pairs as given: the Spanish note's head). The
   navy's fit's calibres are to be read against Winfield's row for her if she is the *San José*.
+  **2026-11-19:** no *San José* is among the eight polacras sent (VR-Sp §12), so the *San Josef*'s
+  fit stays James's, each gun filed as her navy named it (Dec 9), a libra being 0.4608 kg (VR-Sp
+  §7).
+- **Her own guns, recorded** (2026-11-19): *Angel de la Guarda*, whose hull she is, carried 2 ×
+  12-pdr and 8 × 8-pdr, bronze, in 1818 (Winfield et al. 2023, pp. 1083-1086), ten guns that her
+  hull's seven ports a side take at five a side. **For the lead:** a fit of them, `spanish navy
+  1818`, beside the *San Josef*'s 1800 (the default by Part E), or her note alone. The pick: the fit,
+  since her hull is hers and 1818 is inside the game's years (JUDGEMENT).
 - **Brass**: the *San Josef*'s guns are all brass. The weight table is Adye's (package 81's item 4);
   brass guns' weights for these calibres are to be read before her file (§17, for the lead).
+  **2026-11-19:** not in Winfield's passages; from other research (the period's Spanish artillery
+  treatises, for example) or JUDGEMENT, by the owner's word.
 
 ### 6.2 Package 81's checklist, item by item
 
@@ -717,6 +808,12 @@ navy's fit; the corsair's as the privateer's book gives a privateer (JUDGEMENT).
   (James vol. 3 p. 33), the file's company,
   her officers JUDGEMENT (a lieutenant commanding and a second, a pilot; the Spanish navy's ranks
   for a small vessel to be read in Winfield's row); the marines file's Spanish row for the 22.
+  **2026-11-19:** the 71 is also *Angel de la Guarda*'s own (Winfield et al. 2023, pp. 1083-1086),
+  her company on two sources. The polacras' commanders, where the entries name them, were
+  alféreces de fragata (*Virgen del Carmen*, 1808; *Concepción*, 1818) and a teniente de navío
+  (*Cupido*, 1814) (VR-Sp §12; the ranks, VR-Sp §8): her commander **an alférez de fragata** (was a
+  lieutenant), a second and a pilot (JUDGEMENT on the second and the pilot), in her people file's
+  briefs, the posts spoken in the game's English.
 - **The corsair's**: filed at the file's 71, her own 80 (James vol. 3 p. 160) a departure in the
   note, as the xebec's regency fit's 150 is filed at the King's 113 (Xeb-D §8.1). **Package 110's
   rulings bind** (the owner,
@@ -814,7 +911,9 @@ with oil, the wind ahead." (JUDGEMENT; the scenario's own package writes it).
 **The allotment** (the plan's §6 and §9.1): A5 is general (any pole mast) and small, and A6 is any
 pole mast's; both come before the tartane's file, whose topsail stands on her pole main's head (the
 critic's F3). A1a to A1d and V1 are the lateen class's, built on the
-engine track before the tartane's file, the first whole lateen.
+engine track before the tartane's file, the first whole lateen. **2026-11-19:** her carried mizen
+topsail (§4.4a) asks nothing more of the engine: A5's ruled reading makes it a topsail over its
+lateen, and A6's key reaches it, as both do the tartane's topsail on her main.
 
 ---
 
@@ -835,7 +934,10 @@ engine track before the tartane's file, the first whole lateen.
 - **The square sails lowered "en paquet"**: the topsail and topgallant yards drawn down on the
   lower yard while their sails are lowered (A6).
 - **The long bowsprit of one piece**, its jibs; the beak; her ports and guns by package 81's rule
-  (§6.2), nothing drawn by hand.
+  (§6.2), nothing drawn by hand. **2026-11-19:** the bowsprit reasonably short, with three jibs;
+  the main and the mizen raked aft; **the small mizen topsail loose-footed over the mizen lateen**,
+  no yard below it, as the tartane's topsail is drawn (Tar-D §10); the mizen lateen's sheet to its short boom over the
+  transom (§4.1, §4.4, §4.4a).
 - Pictures for the owner's testing report: abeam under plain sail; from ahead (the fore's rake and
   lateen); hove to; with the main's upper sails lowered.
 
@@ -885,7 +987,9 @@ engine track before the tartane's file, the first whole lateen.
 ## 16. Risks, ranked
 
 1. **Her size and hull rest on judgement** until the owner's Winfield passages come (Pol §11).
-   *Mitigation:* no file until then; the figures of §2 are a probe's, not a ship's.
+   *Mitigation:* no file until then; the figures of §2 are a probe's, not a ship's. **Met
+   2026-11-19**: her size is *Angel de la Guarda*'s (§2.1); her lines stay T, a type judgement, no
+   polacre's plan having been found, and her waterline and draught JUDGEMENT on her row.
 2. **The lateen curve is untuned**, so her windward work is the class curve's (§5.5). *Mitigation:*
    tuned once at A8 on the lateen hulls on the branch at the time, against Lescallier's five points
    (the plan's §4 row 7); P2 here, re-measured old beside new when she lands.
@@ -918,10 +1022,15 @@ engine track before the tartane's file, the first whole lateen.
 1. **Her rig.** (a) **Monleón's, as you chose: lateen fore raked forward, square pole main with
    course, topsail and topgallant, lateen mizen, jibs on a long bowsprit** (my pick). (b) Steel's
    first polacre-settee, a square mizen topsail over the lateen mizen. (c) The Provençal polacre,
-   square on three pole masts, as a later fit.
+   square on three pole masts, as a later fit. *Answered 2026-11-18 as picked, and widened
+   2026-11-19 by the owner's own reading of Monleón's print*, which shows (b)'s small loose-footed
+   mizen topsail on (a)'s rig; asked whether she should carry it, the owner answered "Carry it"
+   (Dec Part F). So her rig is (a) with (b)'s mizen topsail, three headsails and a reasonably short
+   bowsprit (decision 2, §4).
 2. **Her hull and size.** (a) **A Mediterranean merchant hull of about 200 tons with a beak, its
    size from a Spanish polacra in Winfield once you send the rows** (my pick). (b) The xebec-like
-   hull of O'Scanlan's 1831 polacra, from the xebec's draught.
+   hull of O'Scanlan's 1831 polacra, from the xebec's draught. *Answered 2026-11-18 as picked; the
+   rows came 2026-11-19*, and her size is *Angel de la Guarda*'s (§2.1).
 3. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own shape,
    which takes the pick and widens it: she tacks and wears as a brig of her size, her two lateen
    yards changed round their masts in either, or left on the bad hand until shifted, the change
@@ -941,6 +1050,12 @@ the polacre-sloop of 1801 (was she the *San José*? memory, unverified), and **H
 polacre, 1799. And, in the owner's own words, the hull in Monleón's print (stern, head, ports,
 sheer). (Pol §11.)
 
+**Marked 2026-11-19** (Dec Part D): the eight polacras **supplied** (*Angel de la Guarda* her size;
+*Virgen del Carmen*'s row recorded as unknown); the *San José* **not found** among them; the
+caption **not found**, the owner's own reading of the hull **supplied** (a lively sheer, a step at
+a raised quarterdeck, no gunports, a reasonably short bowsprit; the stern and head not described);
+the bergantín-polacra and polacra-goleta, *Calpe* and *Fortune* **not found**.
+
 ### 17.2 For the lead
 
 1. A5 as its own small step before the tartane's file, the package's first pole main, the smack's
@@ -955,7 +1070,9 @@ sheer). (Pol §11.)
 4. Her ports: pierced for the corsair's seven a side on one hull for every fit (§6.2 item 2), or
    the trader's hull plain and the armed fits' ports her fits' own. **Ruled the lean** (nudge 18):
    one hull pierced for every fit.
-5. Brass guns' weights for the navy's fit (§6.1): a source to read before her file.
+5. Brass guns' weights for the navy's fit (§6.1): a source to read before her file. Not in
+   Winfield's passages (2026-11-19): from other research, for example the period's Spanish
+   artillery treatises, or JUDGEMENT. And a fit of *Angel de la Guarda*'s own ten guns (§6.1).
 6. A `spanish` names list (§7.3): its source, shared by package 90's hulls.
 7. The jibs' stays against the fore lateen's yard (§4.5): a ruling on the rigging. No lean was
    given and none was ruled on nudge 18: open, for her step 1's reading of a source.

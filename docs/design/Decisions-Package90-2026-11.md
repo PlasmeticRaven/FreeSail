@@ -1,5 +1,19 @@
 # Decisions: package 90, the Spanish and Mediterranean ships (the owner's round, November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The owner sent the passages of Part D they found, with their readings of Monleón's tartane
+and polacre prints, and said, verbatim: "I went through Winfield for some of the requested
+passages, I was not able to find everything requested, so you shall have to fill in some things
+from other research or judgement". This revision:
+- marks Part D item by item **supplied**, **partly supplied** or **not found**, with where each
+  fact now stands (VR-Sp §7 to §17) and what fills a gap (other research, or judgement, by the
+  owner's word);
+- records in Part F the owner's four answers of 2026-11-19, verbatim: the polacre's mizen topsail
+  ("Carry it"), *Virgen del Carmen*'s row ("Quite honestly, I do not know."), the ground report's
+  count over twenty ("Go ahead") and the tiller step's seven files ("Widen the card");
+- adds a dated line under questions 4, 5, 8 and 9 and in Part E's polacre where a passage bears
+  on what was settled. Nothing settled is re-opened.
+
 **Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
 one choice that came back to the owner with the scope card, the strain of a lateen taken aback, is
 decided: **built**. Their words, verbatim: "A lateen taken aback should increase the strain on the
@@ -271,6 +285,11 @@ worn only and `tack ship` was answered in her words, with the polacre alone tack
 **Settled 2026-11-18, as picked:** the *Humble*, her main raked 3° forward, the tréou carried. "I
 agree with the proposals" (the owner; Part F).
 
+*2026-11-19:* the owner's reading of Monleón's print and the other tartane prints they have seen
+gives her **one headsail** and **a loose-footed square topsail with no lower yard** (Part D, T2;
+VR-Sp §9). The one jib stands, now on their reading; the tréou stays carried, its yard sent up with
+it and not crossed in plain sail (Tar-D decision 9).
+
 ![The Roux-school watercolour of a tartane under sail, held in the tree](../references/images/tartane-roux-school-watercolour.webp)
 
 *Your watercolour, held in the tree: the reference for her rig.*
@@ -305,6 +324,10 @@ eye may overrule the judgement). Before a gale she sets her square sail.
 
 **Settled 2026-11-18, as picked:** the small class on *Minorca*'s hull; the 30 and the chambequín
 booked. "I agree with the proposals" (the owner; Part F).
+
+*2026-11-19:* the *Gamo*'s length is now known, 38.92 m of eslora by 9.38 m (Part D, X2); the
+Spanish rows of the small class are narrower for their length than *Minorca*, and *Gitano*'s
+draught is a Spanish plan of the 14 (Part D, X1; VR-Sp §13; Xeb-D §2.2). Nothing settled moves.
 
 Winfield gives two sizes: 14 to 22 guns with 4-pounders, and 30 to 32 guns with 8-pounders.
 
@@ -390,6 +413,13 @@ default.
 **Settled 2026-11-18, as picked:** one rebuilt hull for both fits; about 100 of her 839 as soldiers,
 for now; size rank 5. "I agree with the proposals" (the owner; Part F).
 
+*2026-11-19:* Winfield's breakdown (G3) is read, so the interim "about 100" gives way as the pick
+said it would: her company by the regulation of 1788 for the 1797 fit (877, of whom 225 soldiers,
+168 infantry and 57 infantry-artillery) and by that of 1803 for the 1809 fit (1,015, of whom 275;
+a company being the file's, the 1809 figure is recorded as a departure, as the polacre's corsair's
+is); her own 839 in the note (Part D, G3; VR-Sp §15; Con-D §6.1). Whether her soldiers then leave
+crews empty under the engine's rule is measured at her build and goes to the lead if they do.
+
 **My pick:**
 - **One hull, as rebuilt (1786 to 1793), for both fits:**
   - 1797, 112 guns, the default (Cape St Vincent);
@@ -427,6 +457,11 @@ of fourteen.
 
 **Settled 2026-11-18, as picked:** as her own navy named it. "I agree with the proposals" (the
 owner; Part F).
+
+*2026-11-19:* the book gives the libra as 0.4608 kg, 1.59 per cent heavier than the English pound,
+one ratio for every calibre (Part D, G2; VR-Sp §7). By it a Spanish broadside reads light by about
+1.6 per cent, not the "1½ to 8" below; the book's broadside pairs (1.079) do not follow its own
+libra and stay as given. The way settled does not change.
 
 A Spanish pound is not an English pound, and the sources disagree on the difference:
 - James adds a seventy-second: 1.014.
@@ -484,9 +519,23 @@ it, her hull is scaled from her plan as first built.
 The facts go into the tree by page, in the lead's words (as VR-Sp does), and never the text.
 **Waited on** marks a passage a ship's file waits for. The others would improve her file.
 
+**Marked 2026-11-19, item by item**, on the passages the owner sent that day: **supplied**,
+**partly supplied** or **not found**. The owner, verbatim: "I went through Winfield for some of the
+requested passages, I was not able to find everything requested, so you shall have to fill in some
+things from other research or judgement". So **nothing waits on Winfield any longer**: what was not
+found is filled from other research or by judgement, each marked so in the design it reaches. The
+facts sent are set down by page in VR-Sp §7 to §17, cited "Winfield et al. 2023, p. N".
+
 **The book's front matter (for every Spanish hull)**
 - **G1.** Measurement: the eslora, manga and puntal as measured; arqueo against displacement; which
   length the rows' "length" is.
+
+  → **Supplied** (pp. 41-46; VR-Sp §7). The four figures of a row are eslora, quilla × manga ×
+  puntal: the eslora on the lowest planked deck over both overhangs (the rows' "length", neither the
+  length overall nor the British gun deck's), the quilla the straight keel, the manga the greatest
+  beam at mid-length, the puntal the depth of hold, about half the manga. The tonelada de arqueo is
+  capacity, about 1.42 m³; a displacement is marked "(disp.)". The pie de Burgos is 278.635 mm.
+  Whether the manga is inside or outside the plank is not said.
 - **G2.** Ordnance:
   - the libra against the English pound, calibre by calibre;
   - the iron guns' weights by calibre;
@@ -494,11 +543,28 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - the obús: its weights, charge, crew and when it came in (the 48-, 24- and 3-pounder).
 
   **Waited on** by the three-decker's pounds by calibre.
+
+  → **Partly supplied** (pp. 41-46; VR-Sp §7, §16). **The libra: 0.4608 kg**, 1.59 per cent heavier
+  than the English pound, one ratio for every calibre, and a "32pdr" fires 32 libras: the
+  three-decker's pounds by calibre no longer wait (Con-D §5.3). The ordinance of 1803 places the 48-
+  and 24-pounder obuses by deck (VR-Sp §16). **Not found:** the iron guns' weights, the carronades',
+  and the obús's weights, charge, crew and date: to come from other research (the period's Spanish
+  artillery treatises, for example) or judgement.
 - **G3.** Manning: the dotación of a 112 and of a corvette of 20, by kind (officers, warrant
   officers, the brigades' gunners, seamen, boys, soldiers). **Waited on** by the three-decker's
   bill.
+
+  → **Supplied** (p. 1446 and the two pages following, and the table of the Regulation of 16
+  October 1803; VR-Sp §15). A 112 by kind in 1788 (877 in all, the book's Total of 848 leaving out
+  the commissioned and major officers) and in 1803 (1,015); a corvette of 18 to 22 guns in 1788
+  (138); the xebecs' too. The soldiers are the infantry and the infantry-artillery. The 1788
+  complements are for peace, with a war increase; the 1803 table has no corvette. The three-decker's
+  bill no longer waits (Con-D §6.1), nor the *Diana*'s split (Dia-D §6.1).
 - **G4.** Any masting or rigging rule (a reglamento de arboladura), and whether the mizen was on a
   lateen yard or a gaff in 1797 and 1809.
+
+  → **Not found.** Her rig stays Steel's rule and the 74's proportions, a lateen mizen, by judgement
+  (Part E).
 
 **The tartane** (pp. 1249 to 1252, held in the lead's words)
 - **T1.** The tartanas, pp. 1249 to 1252, in full:
@@ -510,10 +576,25 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - men;
   - the coastguard's stations and duties;
   - fates.
+
+  → **Partly supplied** (pp. 1252-1253; VR-Sp §9). Seven by name (*San Cayetano*, chartered in
+  1741; *San Nicolás* and *Santo Espíritu*, bought from France after 1762, *Misericordia* perhaps
+  the third; *Dolores* and *Todos los Santos*, bought 1778; *Las Ánimas*, a tartana armed as a gunboat,
+  lost in the Bay of Roses in 1795), with how they came and their fates. **Not found:** particulars,
+  tons, guns, men, the builders' names and the stations. The tartane's company and the coastguard's
+  guns and men stay judgement (Tar-D §6, §7).
 - **T2.** Monleón's print of a tartana at rest, p. 1249: its caption and the Museo Naval's number;
   whether a lower square yard stands under the topsail; how many headsails.
+
+  → **Partly supplied** (the owner's reading, 2026-11-19; VR-Sp §9). **One headsail; a loose-footed
+  square topsail with no lower yard**, in this print and the others the owner has seen. **Not
+  found:** the caption and the museum's number (the print's reproduction too poor to send).
 - **T3.** Any section on the navy's small coastguard craft of the same service (the guardacostas,
   and the lateen místicos and faluchos), by title and class: their companies and duties.
+
+  → **Partly supplied** (pp. 168-169 and 1195-1201; VR-Sp §10, §11). The coastguard's work and whose
+  it was (the Treasury's, but the navy's from 1802 to April 1805); the místicos with their
+  dimensions, companies (23 to 72) and guns. **Not found:** the faluchos.
 
 **The polacre** (pp. 1083 to 1084)
 - **P1.** The polacras of about 1780 to 1818, pp. 1083 to 1084 and any that follow. For each of the
@@ -524,15 +605,37 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - any account of how her masts and yards were handled.
 
   **Waited on: her size.**
+
+  → **Supplied** (pp. 1083-1086; VR-Sp §12), but for the handling of the masts and yards, not
+  found. The eight entries, with what each gives. **Her size: *Angel de la Guarda*** (1818), 25.08,
+  22.15 × 7.52 × 3.34 m, 71 men, 2 × 12 and 8 × 8 bronze, the one whole row (Pol-D §2). *Virgen
+  del Carmen*'s row gives three figures, 22.15, 19.20 × 4.20 m, and whether the third is her beam
+  or her depth is **recorded as unknown**: the owner, 2026-11-19, "Quite honestly, I do not know."
+  (Part F).
 - **P2.** Whether a polacra *San José* is among them (the ship taken at Fuengirola on 28 October
   1800, James vol. 3 p. 33), and her row.
+
+  → **Not found:** no *San José* among the eight entries sent. The polacre of war's *San Josef*
+  fit stays James's.
 - **P3.** The caption of Monleón's polacre print, p. 1084, with its date and the Museo Naval's
   number. And in your own words, the hull it shows: her stern, her head, her ports, her sheer.
+
+  → **Partly supplied** (the owner's reading, 2026-11-19, quoted whole in VR-Sp §12). Three
+  headsails; the fore lateen on a foremast raked forward; the main and the mizen raked aft, the
+  mizen about the fore's height with **a small loose-footed topsail** over its lateen, the lateen
+  sheeted to a short boom over the transom; a lively sheer, a step in the rail for a raised
+  quarterdeck, no gunports, a reasonably short bowsprit. Asked whether she should carry the mizen
+  topsail, the owner answered "Carry it" (Part F). **Not found:** the caption, its date and the
+  museum's number.
 - **P4.** Any bergantín-polacra or polacra-goleta entries.
+
+  → **Not found.**
 - ***British Warships 1793 to 1817*:**
   - **PB1.** HMS *Calpe* (14), the polacre-sloop of 1801, and whether she was the *San José*
     (memory, unverified).
   - **PB2.** HMS *Fortune* (10), polacre, 1799: dimensions and tons.
+
+  → **Not found** (not sent). Neither is needed now that *Angel de la Guarda* sizes her.
 
 **The xebec** (pp. 1134 to 1136)
 - **X1.** The jabeques of 14 to 22 guns: the ship entries after pp. 1134 to 1136, at least one
@@ -544,11 +647,31 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - her sweeps (remos), and the men to each;
   - her builder and yard;
   - any plan reproduced, with its archive number.
+
+  → **Partly supplied** (pp. 1141-1158; VR-Sp §13). The xebecs from 1749 on, with dimensions,
+  tons, guns by date, builders and yards, and men for some; ***Nuestra Señora de África* (ii)** of
+  1775, 18 guns, all lateen, 23.85 × 6.34 m, 127 men (whether she is James's *África* of 1799 is not
+  said); ***Gitano*** of 1753, 14 guns, 27.43 × 6.71 m in English feet as designed, **her draught
+  reproduced (Museo Naval, PB_album_06_05)**; the *Cazador* class's plan (the Marqués de la
+  Victoria's album, plate 17). **Not found:** *Vives*, seamen and soldiers apart, the sweeps (remos)
+  and the men to each. The sweeps stay judgement (Xeb-D §6).
 - **X2.** The jabeques of 30 to 32 guns, the *Gamo* (taken 6 May 1801) first: the same.
+
+  → **Supplied**, but for her men (VR-Sp §13). **The *Gamo*: 38.92, 32.00 × 9.38 × 3.53 m, 435 t;
+  24 × 8, 6 × 3 and 12 pedreros**; launched at Mallorca in 1770. Others of the 30 beside her. The
+  1788 complement of a xebec of 30 to 32 guns is 293 (VR-Sp §15).
 - **X3.** The chambequines (*Volante*, *Andaluz* (ii), and any others): their masting and their
   dates.
+
+  → **Partly supplied** (VR-Sp §13). The dates: *Aventurero* converted 1765, *Andaluz* (ii) 1778,
+  both for Buenos Aires; *Caimán* (1770) and Barceló's *San Antonio* (1772) rigged as chambequines;
+  the *Murciano* class (1779) ship-rigged. **Not found:** any masting figure, and *Volante*'s
+  conversion. The chambequín stays booked.
 - **X4.** Anything on a jabeque's steering (wheel or tiller), her lying to, and her going about
   under the lateens. And the packet-boat of 18 that the Regulation sets beside the xebec of 18.
+
+  → **Not found.** Her wheel, her lying to refused in words, and her going about stay as designed,
+  by judgement (Xeb-D §5, §12).
 
 **The *Diana*** (p. 930)
 - **D1.** Her whole entry, p. 930:
@@ -557,9 +680,19 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - the source for "20 × 24-pdr carronades as captured";
   - the rule behind "335 t";
   - her rig, masting and steering, if given.
+
+  → **Supplied, and holding nothing new** (p. 930; VR-Sp §17). The owner: "this is the entirety of
+  it". It has only what VR-Sp §5 had; **none of the four asks is in it**. By G1, her 335 t is
+  toneladas de arqueo, a capacity, not a weight (Dia-D §2).
 - **D2.** The introduction to the corvettes' chapter (about pp. 900 to 930): how corvettes of 20
   were rigged and armed after 1800.
+
+  → **Partly supplied** (pp. 904-906; VR-Sp §14). How they were armed (6- and 4-pounders and short
+  guns of the carronade kind, many rearmed with 8s; after 1800 8-pounder ships called corbetas) and
+  how the book draws its line at twenty guns. **Not found:** how a corvette of 20 was rigged.
 - **D3.** Any other ship of France's allies seized in Spanish ports in 1808 and 1809.
+
+  → **Not found.**
 
 **The *Purísima Concepción*** (pp. 406 to 410)
 - **C1.** The class, pp. 406 to 410, re-read for:
@@ -577,10 +710,21 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - the captions of PB_0050 and J1945.
 
   **Waited on: her hull blocks.**
+
+  → **Not found** (the class's pages not sent), but for two asks met elsewhere: **which length**,
+  by G1 (the eslora, on the lowest planked deck; VR-Sp §4 relabelled), and **the 839 by kind**,
+  by G3's regulations in its place (Con-D §6.1). The ordinance of 1803 confirms her 18-pounders in
+  her third battery (VR-Sp §16). The keel's and the rebuilt length's digits stay as printed, the
+  game taking the book's metres by the lead's rule; her draught, sills and rudder are measured on
+  ZAZ0101 at her step 1, or judged. **Her hull blocks no longer wait on Winfield.**
 - **C2.** The *Santa Ana* class (the 112s of 1784 on): their crew, and any masting figure.
+
+  → **Not found** as a class; a 112's crew by G3.
 - ***British Warships 1793 to 1817*:**
   - **CB1.** The prize first rate *San Josef* (1797): her British dimensions, the 114 of 1801, her
     850 men, and any sailing remark.
+
+  → **Not found** (not sent). The British fit stays booked.
 
 ---
 
@@ -590,7 +734,9 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
   - Monleón's rig, as you chose it: a lateen fore raked forward; a square pole main with course,
     topsail and topgallant; a lateen mizen; jibs on a long bowsprit.
   - A Mediterranean merchant hull of about 200 tons with a beak. Her size comes from Winfield's rows
-    (P1) when they arrive.
+    (P1) when they arrive. *2026-11-19:* they have; she is sized on *Angel de la Guarda* (25.08 m of
+    eslora by 7.52 m), and by the owner's word she carries a small loose-footed mizen topsail over
+    her lateen mizen, as Monleón's print shows it (Part D, P1 and P3; Part F).
   - Two files of one hull, since a ship's company belongs to her file and not to a fit: the
     trader's, sixteen men, unarmed by default or an armed trader with six long 6-pounders; and the
     polacre of war's, the Spanish navy's (the *San José*'s fourteen brass guns and 71 men) and the
@@ -646,6 +792,21 @@ The facts go into the tree by page, in the lead's words (as VR-Sp does), and nev
 
 ## Part F. The answers (recorded verbatim when given)
 
+**The owner, 2026-11-19**, sending Winfield's passages (Part D), in full: "I went through Winfield
+for some of the requested passages, I was not able to find everything requested, so you shall have
+to fill in some things from other research or judgement".
+
+**The owner, 2026-11-19**, on four questions put to them that day, verbatim:
+- **The polacre's mizen topsail** (whether she should carry the small loose-footed mizen topsail
+  their own reading of Monleón's print shows over her lateen mizen): "Carry it"
+- ***Virgen del Carmen*'s row** (whether its third figure, 15 ft 1 in, is her beam or her depth):
+  "Quite honestly, I do not know."
+- **The ground report's count** (25 pinned results moving, 27 with two digests and 23 with A6
+  drafted without its own two faults, over the card's "about twenty",
+  `GroundReport-Package90-2026-11.md` §8 item 1): "Go ahead"
+- **The tiller step's seven files the card does not name** (A3: the ground report's §6 and §8 item
+  3): "Widen the card"
+
 **The owner, 2026-11-18** (through the lead's note of 22:35 UTC, nudge 19), on the strain of a
 lateen taken aback, in full: "A lateen taken aback should increase the strain on the mast, as a
 backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and,
@@ -673,5 +834,10 @@ addition, but we can include it in the planning."
 | 9 | A foreign gun's pounds | "I agree with the proposals" (as picked) | 2026-11-18 |
 | 10 | The sources | "I agree with the proposals" (as picked) | 2026-11-18 |
 | D | Winfield's passages sent (by number) | None yet. The passages are theirs to look up; the lead has reminded them (nudge 17) | — |
+| D | Winfield's passages sent (by number) | Sent, with the owner's readings of the tartane and polacre prints: "I went through Winfield for some of the requested passages, I was not able to find everything requested, so you shall have to fill in some things from other research or judgement" (supplied G1, G3, P1, X2 but for her men, D1; partly G2, T1, T2, T3, P3, X1, X3, D2; not found G4, P2, P4, PB1, PB2, X4, D3, C1 but for two asks met by G1 and G3, C2, CB1: Part D) | 2026-11-19 |
+| P-m | The polacre's mizen topsail (her loose-footed topsail over the lateen mizen, on their reading of the print) | "Carry it" (carried, by the tartane's road: Pol-D decisions 2 and 10) | 2026-11-19 |
+| P-V | *Virgen del Carmen*'s row: the third figure her beam or her depth | "Quite honestly, I do not know." (recorded as unknown: VR-Sp §12; no file reads her row) | 2026-11-19 |
+| GR | The ground report's count over twenty | "Go ahead" (built: the card's "Expected to move" names the moves, A6 drafted without its own two faults: Plan §14) | 2026-11-19 |
+| A3 | The tiller step's seven files the card does not name | "Widen the card" (named in the card's "May change": Plan §14, §6, §7.1) | 2026-11-19 |
 | E | Anything in Part E changed | No word given against it, so it stands as recommended, as this sheet's rule has it | 2026-11-18 |
 | A1d | The strain of a lateen taken aback (put with the scope card, nudge 18) | "A lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk damage." (built: question 3, "Decided by you") | 2026-11-18 |

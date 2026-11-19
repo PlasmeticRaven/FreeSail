@@ -1,5 +1,27 @@
 # Design: the *Purísima Concepción* class three-decker of the Spanish navy (package 90, second draft)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The units (Winfield et al. 2023, pp. 41-46), the complements of 1788 (p. 1446 and the two
+pages following) and of the Regulation of 16 October 1803, and the ordinance of 1803's guns by deck
+came, set down in `VesselReferences-2026-11-Spanish.md` §7, §15 and §16. The class's own pages
+(C1) were not sent; by the owner's word, what they would have given is filled from other research
+or judgement. This revision carries, each figure old beside new:
+- **her company by the regulations** (decision 10, §6.1, §6.3, §14, §17 question 3): for the 1797
+  fit the 1788 regulation's **877** (was her own 839, kept in the note), of whom **225 soldiers, 168
+  infantry and 57 infantry-artillery** (was about 100, interim JUDGEMENT); for the 1809 fit the 1803
+  regulation's **1,015**, of whom **275**, recorded as a departure since a company is the file's;
+  whether the engine's rule then leaves crews empty, measured at her build and for the lead;
+- **her guns by deck by her own record** (pp. 406-410), **the ordinance of 1803's 118 noted** beside
+  her 116 (two more 48-pounder obuses on the quarterdeck), and its note that she carried 18-pounders
+  in her third battery (§5.1);
+- **her calibres by the book's libra** (0.4608 kg, one ratio, 1.0159, for every calibre): the other
+  way's English figures move from the broadside pairs' ratio to it, a 36 from 38.85 to 36.57 lb, and
+  the 36's interim weight from 66.8 to 62.9 cwt (decision 9, §5.3); **the guns' weights by calibre
+  are still to come** from other research (the period's Spanish artillery treatises, for example)
+  or JUDGEMENT;
+- **her length's label**: the eslora, on the lowest planked deck over both overhangs (§2); the
+  figure does not move.
+
 The second draft (2026-11-18) of the design for package 90's fifth hull, the Spanish navy's
 *Purísima Concepción* class, the game's first ship of three gun decks. By the plan's method
 (`Plan-ShipsWorkflow.md` §2, Phase 3) it answers the critic's reading of the first draft item by
@@ -47,8 +69,9 @@ no git write made.
 **One sentence.** One module writes one file of the rebuilt hull for both her fits: her lines her
 sister's at Greenwich checked on her own plan at Madrid, her three tiers of sixteen ports on the
 74's machinery for decks (which already takes a middle deck), Winfield's two establishments to the
-libra, a company of 839 split so that every gun is manned, her rig by Steel's rule until a Spanish
-one is read, and her own words, rank and polar so that she is made out, feared and sailed as a
+libra, a company of 839 split so that every gun is manned (since 2026-11-19, her company by the
+regulations of 1788 and 1803, her soldiers their infantry and infantry-artillery), her rig by
+Steel's rule until a Spanish one is read, and her own words, rank and polar so that she is made out, feared and sailed as a
 first rate.
 
 ---
@@ -65,8 +88,8 @@ first rate.
 | 6 | **Guns numbered by deck** (`numbering: by deck`), each deck from No. 1 forward, the 74's B7.d | Built and measured on her scratch file (observed here); the period numbered each deck (Bel-D §5.2) |
 | 7 | **Two fits**: "concepcion 1797" (112, the default) and "concepcion 1809" (116, the 1803 alteration) | VR-Sp §4; each sums to Winfield's broadside in libras exactly (observed here) |
 | 8 | **The obús carried as a carronade** of its calibre, its words and note saying obús | The engine refuses an `obus` kind and takes a 48-pounder carronade (Eng §6.3); a new kind is engine work beyond her file (§5.4) |
-| 9 | **A gun's `pounder` as her navy named it** (`pounder: 36`), Winfield's pairs of libras and pounds in the note as the book gives them, never a ratio re-derived from them: **the owner's (Dec 9)**, this the pick; the other way, the English weight in the file with the words from a separate key, set beside it in §5.3 | The lead's rule (VR-Sp "Units": take the pairs as given); the plan's §4 row 8. **Plainly:** the first draft filed each calibre by Winfield's broadside ratio, which re-derives the book's ratio per calibre |
-| 10 | Company 839: posts 18, idlers 60, **her soldiers 100, the bill keeping 60 as small arms**, seamen 661: every gun of one side manned at the beat (observed here). **Interim** until Winfield's dotación by kind (Dec Part D, G3) is read | VR-Sp §4 (839, not broken down); the marines never serve a long gun in the engine (Bel-D §6.3), so about 160 soldiers, the 74's share (JUDGEMENT), leave four crews unmanned (observed here; §6) |
+| 9 | **A gun's `pounder` as her navy named it** (`pounder: 36`), Winfield's pairs of libras and pounds in the note as the book gives them, never a ratio re-derived from them: **the owner's (Dec 9)**, this the pick; the other way, the English weight in the file with the words from a separate key, set beside it in §5.3. **2026-11-19:** the book's libra, 0.4608 kg (pp. 41-46), gives the other way's figures, one ratio for every calibre (§5.3); the pick, settled, is unchanged | The lead's rule (VR-Sp "Units": take the pairs as given); the plan's §4 row 8. **Plainly:** the first draft filed each calibre by Winfield's broadside ratio, which re-derives the book's ratio per calibre |
+| 10 | Company 839: posts 18, idlers 60, **her soldiers 100, the bill keeping 60 as small arms**, seamen 661: every gun of one side manned at the beat (observed here). **Interim** until Winfield's dotación by kind (Dec Part D, G3) is read. **Revised 2026-11-19, G3 read: her company by the regulations**, the file's the 1797 default's by that of 1788, **877** (was 839), of whom **225 soldiers** (168 infantry, 57 infantry-artillery; was 100); the 1809 fit's by that of 1803, **1,015** of whom **275**, a departure recorded in its note (a company being the file's), or a second file if the lead prefers; the rest split onto the game's stations at her build (JUDGEMENT). Her crews under the engine's rule are measured then, and go to the lead if any stands empty (§6.1) | Winfield et al. 2023, p. 1446 and the table of the Regulation of 16 October 1803 (VR-Sp §15); VR-Sp §4 (her own 839, not broken down); the marines never serve a long gun in the engine (Bel-D §6.3), so about 160 soldiers, the 74's share (JUDGEMENT), leave four crews unmanned (observed here; §6) |
 | 11 | Masts by Steel's rule on her own particulars (the main mast half her lower deck and extreme breadth), the rest by the 74's proportions scaled 1.15, **rule and JUDGEMENT**, until a Spanish rule or PB-078 is read | Res §5 |
 | 12 | The mizen course on a lateen yard cut at the mast (B3.1) in both fits; the spritsail and sprit topsail yards as the 74's; **no driver** | The 74's machinery; no Spanish source either way (Res §5); the driver is the owner's British choice (Bel-D §4.6) |
 | 13 | Her words: description `three-decker`; at the rig's distance the tops make out **"a three-decker"**; the glass **"a three-decker, sixteen ports a tier"**; how she is rigged, "a ship" | Package 75's made-out rule, the lead's ruling 17 (Bel-D §8) |
@@ -101,7 +124,7 @@ this order and each on its own word:
 | Piece | Whose | Before her file? |
 |---|---|---|
 | The owner's answers to §17 | the owner | yes |
-| Winfield's passages (Res §11) | the owner's books | the hull blocks and the bill wait on items 1 and 2; nothing else does |
+| Winfield's passages (Res §11) | the owner's books | the hull blocks and the bill wait on items 1 and 2; nothing else does. **Received 2026-11-19, in part:** the bill by the regulations (§6.1) and the libra (§5.3); the class's pages (item 1) not sent, so her draught, sills and rudder are measured on ZAZ0101 or judged, and the keel's and the rebuilt length's digits stand as printed. **Nothing waits on Winfield now** |
 | PB-039 held in the tree (CC BY 4.0), and the choice of her hull: her sister's ZAZ0101 as rebuilt, or PB-039 as built (Dec 10; the sheets themselves read under the standing Greenwich rule) | the owner | her hull's lines (§3.2) wait on it |
 | Her words and rank in `world/ships.py` and `world/captains.py` (§8) | her builder, the lead allotting `world/` | with her file |
 | "The second deck", "the third deck" in `orders/gunnery.py` (§5.5) | the gunnery's owner, or her builder on the lead's allotment | no: words only |
@@ -145,8 +168,8 @@ own, `tools/ships/bellerophon.py:2499`, Eng §6.2); her calibres in libras and t
 
 | Key | Figure | Source, rung |
 |---|---|---|
-| `length_waterline_m` | **61.30** | Winfield's rebuilt length (via Winfield, p. 407; B), filed by the 74's convention of the length on the gun deck (Bel-D §2.1). VR-Sp labels Winfield's figure "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as her gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the *eslora* on the gun deck (JUDGEMENT), the owner's passage C1 asked. **Plainly:** the book's pies give 61.43 m (220 pies 6 pulgadas × 0.2786); its metres are taken by the lead's rule, the owner's re-reading of p. 407 settling the digit (Res §2.1). James's 59.21 m for the *San Josef* (Res §2.2) is the check; ZAZ0101's scale measures it (task 1) |
-| `beam_m` | **16.54** | James's extreme breadth of the *San Josef* (vol. 2 p. 59, read (OCR); B). **Plainly:** not Winfield's 16.25 m, the book's *manga* being read as inside the plank (Res §2.2, JUDGEMENT); the file's beam is the extreme, as the 74's 46 ft 9 in is. If the owner's passage says the *manga* is extreme, 16.25 |
+| `length_waterline_m` | **61.30** | Winfield's rebuilt length (via Winfield, p. 407; B), filed by the 74's convention of the length on the gun deck (Bel-D §2.1). VR-Sp labels Winfield's figure "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as her gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the *eslora* on the gun deck (JUDGEMENT), the owner's passage C1 asked. **2026-11-19:** the book defines its length (Winfield et al. 2023, pp. 41-46; VR-Sp §7): the *eslora*, on the lowest planked deck over both overhangs, neither the length overall nor the British gun deck's between the rabbets; for her the lower gun deck (JUDGEMENT); VR-Sp §4 relabelled. The figure filed does not move. **Plainly:** the book's pies give 61.43 m (220 pies 6 pulgadas × 0.2786); its metres are taken by the lead's rule, the owner's re-reading of p. 407 settling the digit (Res §2.1). James's 59.21 m for the *San Josef* (Res §2.2) is the check; ZAZ0101's scale measures it (task 1) |
+| `beam_m` | **16.54** | James's extreme breadth of the *San Josef* (vol. 2 p. 59, read (OCR); B). **Plainly:** not Winfield's 16.25 m, the book's *manga* being read as inside the plank (Res §2.2, JUDGEMENT); the file's beam is the extreme, as the 74's 46 ft 9 in is. If the owner's passage says the *manga* is extreme, 16.25. **2026-11-19:** the book's *manga* is the greatest beam at mid-length, the plank not said (pp. 41-46): the condition is not met in so many words, and 16.54 stands (JUDGEMENT) |
 | `draught_m` | **7.5**, to K, **JUDGEMENT** | Not found (Res §2.6). The 74's draught to K over her depth in hold (6.46 m on 19 ft 9 in: 1.07) on James's 7.44 m gives 8.0; on a Spanish ship built to carry her lower battery higher (James vol. 1 pp. 29 to 30) less (judgement). Measured on ZAZ0101 at her water (task 2) |
 | `displacement_kg` | **4,200,000**, **JUDGEMENT** | Her length, breadth and draught at the 74's block (Res §2.5). Measured off ZAZ0101's sections at her water (task 3); Winfield's 5,167 t in the note and in truth 7-NNN-a's record. The scratch file at 5,167 t heels 0.5° less close-hauled and tacks the same (observed here) |
 | `gm_m` | **1.5**, **JUDGEMENT** | The 74's 1.36 m (*Bombay Castle*, Bel-D §2.1) raised for a broad ship (James vol. 1 pp. 29 to 30: Spain built her ships broader than any other nation's, for safety); tuned within a band against the 74's heel |
@@ -299,6 +322,15 @@ on the second deck (vol. 2 p. 51); Winfield's 24s are taken, the book's own sum 
 Her default is the 1797 fit: the 1809 fit is a year's (her recommissioning, 1809 to her loss in
 1810), the 1797 the class's long establishment (1793 to 1803) and St Vincent's.
 
+**The ordinance of 1803, noted (2026-11-19;** Winfield et al. 2023, the table of the ordinance of
+1803; VR-Sp §16). Its three-decker of 112 carries 30 × 36, 32 × 24 and 32 × 12 in her three
+batteries; 4 × 8 and **8** × 48-pdr obuses on the quarterdeck; 4 × 8 and 2 × 48-pdr obuses on the
+forecastle; 6 × 24-pdr obuses on the poop: **118 pieces**, the poop's obuses outside the nominal 112.
+Its own note says she carried **18-pounders in her third battery**, as her 1809 fit has them. **Her
+1809 fit stays her own record** (pp. 406-410), **116 pieces**, two 48-pounder obuses fewer on the
+quarterdeck than the ordinance's 118; the ordinance is in the fit's note, not a fit. By its count
+she was nominally 110 (computed).
+
 **A third fit, booked:** "as the san josef 1801", the British first rate of 114 (ZAZ0101's "114-gun
 First Rate"), with her sixteenth lower pair armed and James's 850 men (vol. 6 p. 407); for a
 British scenario of 1801 to 1813, when the owner's passage of Winfield's British volume is read
@@ -322,21 +354,26 @@ British scenario of 1801 to 1813, when the owner's passage of Winfield's British
 
 ### 5.3 The calibre, the weight and the crew
 
-| Piece (libras) | `pounder`, by Dec 9's pick | The other way's English figure (Dec 9 (b)) | Weight | Crew | Source |
+| Piece (libras) | `pounder`, by Dec 9's pick | The other way's English figure (Dec 9 (b)): old → **new, 2026-11-19** | Weight | Crew | Source |
 |---|---|---|---|---|---|
-| Long 36 | 36 | 38.85 | interim 66.8 cwt | 14 | the other way's figure the libra by Winfield's broadside pairs (1,308 / 1,212 = 1.079; Res §3.3), **JUDGEMENT**, until the book gives the English weight by calibre; the weight the English 32's 55 cwt scaled by the shot (judgement); the crew between Falconer's 13 for a 32 and 15 for a 42 (judgement) |
-| Long 24 | 24 | 25.90 | interim 49.5 cwt | 11 | Adye's 24 of 9 ft 6 in (judgement on the pattern); Falconer's 24 |
-| Long 18 (1809) | 18 | 19.43 | interim 42.0 cwt | 9 | Adye's 18 of 9 ft 6 in; Falconer's 18 |
-| Long 12 (1797) | 12 | 12.95 | interim 34.0 cwt | 7 | Adye's 12 of 9 ft 6 in; Falconer's 12 |
-| Long 8 | 8 | 8.63 | interim 24.5 cwt | 6 | Adye's 9 of 7 ft 6 in (the nearest); Falconer's 9 |
-| Obús 48 (1809) | 48, as a carronade | 51.80 | interim 22.25 cwt | 4 | the English 42-pounder carronade's weight (Adye p. 72), the nearest; Douglas's carronade crew |
-| Obús 24 (1809) | 24, as a carronade | 25.90 | interim 13.0 cwt | 4 | Adye's 24-pounder carronade |
+| Long 36 | 36 | 38.85 → **36.57** | interim 66.8 → **62.9** cwt | 14 | the other way's figure the libra by Winfield's broadside pairs (1,308 / 1,212 = 1.079; Res §3.3), **JUDGEMENT**, until the book gives the English weight by calibre. **2026-11-19:** the book gives the libra itself, 0.4608 kg, 1.0159 English pounds (Winfield et al. 2023, pp. 41-46): one ratio for every calibre, the pairs' 1.079 kept as the book gives them and not used. The weight the English 32's 55 cwt scaled by the shot (judgement), now by 36.57 / 32; still interim, **the Spanish 36's weight to come from other research** (the period's Spanish artillery treatises, for example) **or JUDGEMENT**; the crew between Falconer's 13 for a 32 and 15 for a 42 (judgement) |
+| Long 24 | 24 | 25.90 → **24.38** | interim 49.5 cwt | 11 | Adye's 24 of 9 ft 6 in (judgement on the pattern); Falconer's 24 |
+| Long 18 (1809) | 18 | 19.43 → **18.29** | interim 42.0 cwt | 9 | Adye's 18 of 9 ft 6 in; Falconer's 18 |
+| Long 12 (1797) | 12 | 12.95 → **12.19** | interim 34.0 cwt | 7 | Adye's 12 of 9 ft 6 in; Falconer's 12 |
+| Long 8 | 8 | 8.63 → **8.13** | interim 24.5 cwt | 6 | Adye's 9 of 7 ft 6 in (the nearest); Falconer's 9 |
+| Obús 48 (1809) | 48, as a carronade | 51.80 → **48.76** | interim 22.25 cwt | 4 | the English 42-pounder carronade's weight (Adye p. 72), the nearest; Douglas's carronade crew |
+| Obús 24 (1809) | 24, as a carronade | 25.90 → **24.38** | interim 13.0 cwt | 4 | Adye's 24-pounder carronade |
+
+**2026-11-19:** the weights by calibre are not in Winfield's passages (Dec Part D, G2). Every weight
+above stays interim, a British pattern's or a scaled one's, until a Spanish source gives it (other
+research: the period's Spanish artillery treatises, for example), or is ruled JUDGEMENT at her build.
 
 - **The `pounder` rule** (the owner's, Dec 9; this draft's pick, the plan's §4 row 8): each gun
   filed by its calibre as her navy named it (`pounder: 36`), its note saying so ("a 36-pounder of
   the Spanish navy, 36 libras"), and the fit's note giving Winfield's broadside pair as the book
   gives it (1,188 libras, 1,282 lb; 1,508 libras, 1,627 lb), never a ratio drawn from it. Her
-  broadside then reads a little light in the game's English pounds, and her notes say so.
+  broadside then reads a little light in the game's English pounds, and her notes say so: by about
+  1.6 per cent, by the book's libra (2026-11-19).
   **Plainly:** the first draft filed each calibre by Winfield's broadside ratio (the third column),
   which re-derives the book's ratio per calibre, the thing the lead's rule asks not to be done; it is
   kept here only as the other way's figures, for the owner's eye, marked JUDGEMENT.
@@ -375,7 +412,9 @@ No. 3" refused naming her decks. Two things are hers to settle:
 
 ## 6. The company, her watches, the quarter bill by deck and the people file
 
-### 6.1 The company, 839
+### 6.1 The company: 839 in the second draft, by the regulations since 2026-11-19
+
+*The second draft's split, kept for the record; the regulations below replace it.*
 
 Winfield's 839 (VR-Sp §4; B). James's 917 at her sister's capture and the 850 of British service
 in the note (Res §4). Not broken down in any source read, so the split is **JUDGEMENT**, set by what
@@ -392,6 +431,61 @@ the engine needs to man her guns:
 no source read) is met here by counting fewer of her people as marines, not by changing the engine's
 rule; Winfield's breakdown (Res §11 item 2) replaces the split.
 
+**Revised 2026-11-19: her company by the regulations** (Winfield et al. 2023, p. 1446 and the two
+pages following, for 1 January 1788; the table of the Regulation of 16 October 1803; rung B; VR-Sp
+§15). A 112 by kind ("All" computed: the book's Total leaves out the commissioned and the major
+officers):
+
+| Kind | 1788, the 1797 fit | 1803, the 1809 fit |
+|---|---|---|
+| Commissioned officers | 19: a brigadier (her captain), a capitán de navío (her second), a capitán de fragata, 4 tenientes de navío, 4 tenientes de fragata, 4 alféreces de navío, 4 alféreces de fragata | 19, the same |
+| Major officers (purser, chaplain, surgeons, pilots) | 10 | 14 |
+| Sea officers (boatswains, guardians, caulkers, carpenters, cooks, divers, armourers, lamp men, sailing masters, quartermasters) | 23 | 37 |
+| **Infantry** | **168** | **200** |
+| **Infantry-artillery** | **57** | **75** |
+| Artillery | 130 | 190 |
+| Seamen | 200 | 240 |
+| Landsmen | 230 | 200 |
+| Boys | 40 | 40 |
+| The book's Total | 848 | 982 |
+| **All** | **877** | **1,015** |
+| **Her soldiers** (infantry and infantry-artillery) | **225** | **275** |
+
+**What is filed**, old beside new:
+- **The company: 839 → 877**, the file's, the 1797 default's by the 1788 regulation (its
+  establishment for peace, as printed). Her own 839 (pp. 406-410, unbroken) goes in the note: 4 per
+  cent under, and within nine of the book's Total of 848 without the officers (whether her 839 is
+  counted on that basis her entry does not say). Truth 7-NNN-a records both (§14).
+- **The soldiers: about 100 (interim JUDGEMENT) → 225**, her infantry and infantry-artillery, the
+  `marines` station.
+- **The 1809 fit: 1,015, of whom 275 soldiers**, by the 1803 regulation, **recorded as a departure in
+  the fit's note**, a company being the file's and not a fit's (the lead's ruling (5) of 2026-11-07),
+  as the polacre's corsair's 80 at 71 and the xebec's regency's 150 at 113 are. **For the lead:** or a
+  second file of the same hull for the 1809 fit, `three-decker-1809.yaml`, with its own company
+  (the polacre's road). The pick: the departure (JUDGEMENT: one hull, one file, as Dec 8 settled).
+- **The war increase is not filed.** The 1788 complements were for peace; in war a ship gained as
+  many men as guns in her main batteries, half infantry and half landsmen, and more surgeons. For
+  her, 907 if her main batteries are her lower deck's 30 guns, 971 if they are her three gun decks'
+  94, the book calling a gun deck a "battery" in the ordinance of 1803 (computed); James's 917 for
+  her sister at her capture (Res §4) lies nearest the first. Which reading, and whether St Vincent's
+  fit takes it, is the lead's (JUDGEMENT on the road: the printed establishment filed meanwhile).
+- **The split onto the game's stations** at her build (JUDGEMENT, the 74's form, the regulation's
+  kinds its check): her posts from the commissioned officers and the chiefs of the major and sea
+  officers; her idlers from the rest of them (the carpenters, caulkers, armourers, cooks, lamp men,
+  the surgeons' and the purser's people); her seamen from the artillery, the seamen, the landsmen and
+  the boys, in the 74's six stations by her shares.
+
+**What it does in the engine, to be measured.** Her soldiers stand in the `marines` station, and the
+engine's marines serve carronades and never a long gun (Bel-D §6.3, as built). The second draft's
+own run left four crews of the 1797 fit empty at 160 soldiers of 839, leaving 679 others (observed
+here); at 225 of 877 the others are 652 (computed), fewer still, so **crews are likely to stand
+empty** in both fits (in 1809 the obuses, carronades to the engine, take 28 of the soldiers).
+Measured on her file at her build, by deck, both fits. **If crews stand empty, it goes to the lead at
+its cause** (the owner's rule of 14 November): the engine's rule that soldiers serve no long gun,
+which any Spanish or French ship of the line meets (§19), and Dec 8's other way, her soldiers at the
+long guns: at least her infantry-artillery, the artillery's own soldiers, or all of them, for her
+alone or for every ship that carries them. Not built in this card without the lead's word.
+
 ### 6.2 Her watches
 
 Two, starboard and larboard, as every King's ship of the game (judgement; no Spanish source read).
@@ -404,7 +498,7 @@ all hands` on `let_go_anchor` never bites).
 
 - **The bill**: trimmers by station as the 74's scaled to her seamen; the helm **4** (two wheels'
   men on a first rate, judgement); the powder 42; small arms 60; boarders 140; the bill's `marines`
-  **60** (the small-arms party on the poop and quarterdeck). Observed here: in the 1797 fit, with no carronade, all 100 soldiers stand in their division (the engine's marines serve no long gun); in 1809 the obuses take 28 of them and 72 stand.
+  **60** (the small-arms party on the poop and quarterdeck). Observed here: in the 1797 fit, with no carronade, all 100 soldiers stand in their division (the engine's marines serve no long gun); in 1809 the obuses take 28 of them and 72 stand. **2026-11-19:** with the regulation's 225 soldiers (§6.1), all 225 stand in their division in 1797, the small arms among them, and 197 in 1809, the obuses taking 28 (computed on the same rule); the bill's other stations shrink with the 652 others, measured at her build.
 - **The beat by deck** (B7.b, observed here): "The lower deck: 15 gun crews ... The middle deck: 16
   gun crews ... The upper deck: 16 gun crews ... The quarterdeck: six gun crews ... The forecastle:
   three gun crews ...", the poop's in 1809.
@@ -442,7 +536,8 @@ VR-Sp §4). The flag and its party are the scenario's `people:`, not her file's 
 All **JUDGEMENT** on the 74's file scaled to a first rate until Spanish figures are read: Steel's
 anchor and cable table's 100-gun row where the OCR gives it (`period.STEEL_ANCHORS` holds the 64's
 and the 74's; hers appended); the 74's six boats with a second launch (judgement); four chain pumps
-and two hand pumps (the 74's); water and provisions scaled to 839 for 120 days (the 74's days).
+and two hand pumps (the 74's); water and provisions scaled to 839 for 120 days (the 74's days); to
+her 877 since 2026-11-19 (§6.1).
 Ibargüen's plans of 1785 (Res §0.2) show the Spanish navy's wheel and its machinery: her wheel is
 the game's wheel, and package 116's `relieving_tackles` and `repair_wheel` stand for her as filed
 (observed here: the tackles in 380 s, the wheel repaired in 2,279 s, the 74's 385 and 2,310 s). **For
@@ -583,8 +678,8 @@ are; `galleries_m` takes any number of tiers):
 
 | Truth | What it holds | Form |
 |---|---|---|
-| **7-NNN-a, her particulars hold their sources** | her length and breadth Winfield's and James's within the rounding; three gun decks with 16 ports a side each; her two fits 112 and 116 pieces whose halves sum to 1,188 and 1,508 libras; 839 men | the 74's 7-194 form |
-| **7-NNN-b, three gun decks at quarters** | the beat says the lower, middle and upper decks' crews in order; every crew of the default fit manned; "fire the starboard middle deck" names sixteen guns; a bare number refused naming her decks | B7.b and B7.d on three decks |
+| **7-NNN-a, her particulars hold their sources** | her length and breadth Winfield's and James's within the rounding; three gun decks with 16 ports a side each; her two fits 112 and 116 pieces whose halves sum to 1,188 and 1,508 libras; 839 men. **2026-11-19:** 877 men by the 1788 regulation, of whom 225 soldiers; the 1809 fit's note giving the 1803 regulation's 1,015 and 275, and her own 839 | the 74's 7-194 form |
+| **7-NNN-b, three gun decks at quarters** | the beat says the lower, middle and upper decks' crews in order; every crew of the default fit manned (2026-11-19: with the regulation's soldiers, as measured; if crews stand empty, the clause waits on the lead's word, §6.1); "fire the starboard middle deck" names sixteen guns; a bare number refused naming her decks | B7.b and B7.d on three decks |
 | **7-NNN-c, her lower ports shut at the heel her sources give** | after tasks 2 and 5 | the 74's 7-195 form |
 | **7-NNN-d, she sails as a fast first rate** | her best speed in 15 kn at least the 74's and no more than the frigate's; her tack from truth 10's three headings no quicker than the 74's and inside 600 s; she wears and lies to as the 74 | Brenton via Winfield; James vol. 6 pp. 3 to 4; Luce |
 | **7-NNN-e, three of her crewed hold the floor** | the frigate off the Lizard with three of her crewed over `CREWED_FLOOR_TICKS_S` | the 74's 7-196, marked pace |
@@ -609,9 +704,13 @@ plain class default, and every existing file byte for byte, as Build §14.2.
 2. **Her tack and her helm.** The engine's tack does not slow with size (§9); if no rudder and lead
    hold both the 74's helm and a tack no quicker than the 74's, the band is the lead's to set.
 3. **Her company's split** is set by the engine's rule that marines serve no long gun; Winfield's
-   breakdown may say she carried more soldiers than her bill can use.
+   breakdown may say she carried more soldiers than her bill can use. **2026-11-19: it does** (225
+   in 1797, 275 in 1809: §6.1); measured at her build, and the lead's at its cause if crews stand
+   empty.
 4. **The Spanish pound and the guns' weights** stand on one ratio until a passage gives them by
-   calibre; every gun's figure moves together when it does.
+   calibre; every gun's figure moves together when it does. **2026-11-19:** the libra is the book's
+   (one ratio, 1.0159); the weights by calibre are not in the passages, and stay interim until other
+   research gives them or they are ruled JUDGEMENT.
 5. **The displacement** (4,200 against 5,167 t) moves her heel, her way and her pace a little; her
    handling and tack not (observed).
 
@@ -633,7 +732,9 @@ plain class default, and every existing file byte for byte, as Build §14.2.
    seamen, so that every gun is manned** (my pick, interim until Winfield's dotación by kind, G3, is
    read); (b) about 160 soldiers by the 74's share (JUDGEMENT: Winfield gives the 839 unbroken), with
    the engine's rule changed so that her marines serve long guns on her bill (a change to the 74's
-   rule, for her alone).
+   rule, for her alone). *Answered 2026-11-18 as picked (a), interim; G3 read 2026-11-19:* her
+   soldiers are the regulations' (225 and 275, §6.1). If they leave crews empty, (b)'s change comes
+   back to the lead at its cause, with her build's measure.
 4. **Her rig.** (a) **Steel's rule and the 74's proportions scaled, a lateen mizen and no driver,
    until a Spanish source is read** (my pick); (b) wait for a Spanish rule before her file.
 5. **"The main deck" on a three-decker.** (a) **Refused in words naming her three gun decks, with
@@ -651,7 +752,13 @@ of fourteen): for question 1, what the tops see at four miles.
 1. **The images README** says J1945 is "as taken in 1797"; Greenwich dates it 1799 (ZAZ0100, the
    fitting at Plymouth). The lines are ZAZ0101 (J1950) (Res §2.3).
 2. **Winfield's two figures** that disagree with the foot (the keel, the rebuilt length; Res §2.1),
-   for the owner's re-reading with the passages of Res §11.
+   for the owner's re-reading with the passages of Res §11. *2026-11-19:* the class's pages were not
+   sent; at the book's own pie (278.635 mm) the keel's 190 pies 10 pulgadas are 53.17 m and the
+   rebuilt 220 pies 6 pulgadas 61.44 m (computed), against the printed 53.12 and 61.30. The printed
+   metres stand by the lead's rule; the difference is recorded, not resolved.
+2a. **2026-11-19: her soldiers at the long guns** if her build finds crews empty with the
+   regulations' 225 and 275 (§6.1): the engine's marines' rule at its cause, or her infantry-artillery
+   alone at the guns. And whether the 1809 fit's company is a departure recorded or a second file.
 3. **The robbing order on three decks** (§6.3), keyed on a `middle` deck: the 74's code, which the
    plan gives her builder as A9 (Plan §6, §7.1).
 4. **The relieving tackles' hands on a first rate** (§7).

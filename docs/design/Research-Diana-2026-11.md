@@ -1,5 +1,14 @@
 # Research note: the corvette *Diana*, the Danish light frigate of 1804 kept by Spain (November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The owner sent her whole entry, p. 930 ("this is the entirety of it", their words), with the
+units (pp. 41-46), the corvettes' chapter (pp. 904-906) and the complements of 1788 (p. 1446 and
+following), set down in `VesselReferences-2026-11-Spanish.md` §7, §14, §15 and §17. **The entry
+holds only what was already set down**: her figures, her 167 and her three fits, built 1804, seized
+at Cartagena when war was declared, last heard of in 1832; no service line, no source for "as
+captured", no rule for the 335 t, nothing of her rig. The units (the libra, the pie), §4's pounds,
+§5's company, §8's tonnage row and §11 are brought into line; nothing else is changed.
+
 Package 90's preliminary work (the lead's note of 2026-11-18, nudge 15, `docs/dev/M7-WorkPackages.md`):
 research and planning only, no code, no ship file. This is the note the design for her
 (`docs/design/Design-Ship-Diana.md`, second draft of 2026-11-18) works from, in the form of
@@ -32,7 +41,11 @@ gives one, as the lead ruled; a measured figure of this note is converted at **0
 two differ by 0.01%). A pulgada is a twelfth of a pie (0.02322 m). The **libra castellana** is
 0.4601 kg and the **tonelada** of the plan's table is 2,000 libras (proved by the table's own carry,
 §2.3), 920.2 kg (the libra memory). The **Danish pund** of her guns is about 0.50 kg (memory,
-unverified). An English foot is 0.3048 m. Nothing in this note reads a Spanish foot as an English
+unverified). **2026-11-19** (Winfield et al. 2023, pp. 41-46): the book's pie is 278.635 mm, the
+figure taken above; **its libra is 0.4608 kg** (memory's 0.4601 replaced), so the tonelada of
+2,000 libras is 921.6 kg (computed; the book's own "about 1,150 kg" for a ton of weight does not
+agree with its 2,000 libras, and is not used); her **335 t are toneladas de arqueo**, a capacity of
+about 1.42 m³ each, not a weight. An English foot is 0.3048 m. Nothing in this note reads a Spanish foot as an English
 one.
 
 **In short.**
@@ -333,7 +346,8 @@ is brig-rigged, so the corvette's spar table in Babron is not hers (read).
 | 1809-1810, first rearmed | **20 × 30-pdr carronades** | Winfield p. 930; the plan's title, "del porte de 20 carronadas de á 30" | Ten a side in the ten broadside ports (§2.7) |
 | 31 October 1817 | 12 × 12-pdr, 8 × 30-pdr carronades, 4 × 3-pdr obuses | Winfield p. 930 | 24 pieces for 22 ports: two pieces over the rail or in the bow ports (judgement) |
 
-- **The pounds.** A Spanish 30-pounder fires 30 libras (13.8 kg, 30.4 English lb); a Danish
+- **The pounds.** A Spanish 30-pounder fires 30 libras (13.8 kg, 30.4 English lb; at the book's
+  libra, 13.82 kg and 30.48 lb, 2026-11-19); a Danish
   30-pund carronade about 15 kg (33 lb, memory on the pund); Winfield gives Spanish broadsides in
   libras with English pounds beside them at a ratio of 1.079 (`VesselReferences-2026-11-Spanish.md`
   §4: 1,212 libras as 1,308 lb; the lead: take Winfield's pairs and do not re-derive). The game's guns
@@ -356,7 +370,12 @@ is brig-rigged, so the corvette's spar table in Babron is not hers (read).
 
 The Spanish company's make-up (officers, warrant officers, gunners of the brigades, seamen, ship's
 boys, soldiers) is in no source read; the Spanish navy's establishment for a corvette is the passage
-to ask for (§11). **She is a man-of-war in every fit**: package 75's ruling 11 (a merchantman's
+to ask for (§11). **2026-11-19:** read. The regulation of 1 January 1788 (Winfield et al. 2023, p.
+1446 and following; rung B; VR-Sp §15), the first to name corvettes (pp. 904-906), gives a corvette
+of 18 to 22 guns in peace 138: a teniente de navío commanding (her plan's José de Julián was one), a
+teniente de fragata and three alféreces, 5 major officers, 11 sea officers, 40 infantry, 10
+infantry-artillery, 21 artillery, 20 seamen, 20 landsmen, 6 boys. Her 167 is 29 more; her design
+takes the regulation's 50 soldiers into her 167 (Dia-D §6.1). **She is a man-of-war in every fit**: package 75's ruling 11 (a merchantman's
 master and mate counted a hand of their own watch where the watch is too small) does not reach her.
 
 ## 6. How she sailed
@@ -418,7 +437,7 @@ company 167 on the frigate's stations scaled, the frigate's guns moved to her le
 |---|---|---|
 | Her guns when taken, September 1809 | Winfield p. 930: 20 × 24-pdr carronades. Roos p. 94 (her papers) and the 1809 drawing's caption: 4 × 8-pdr long guns and 16 × 30-pdr carronades, Danish | Two sources of her own time against one historian's summary; the owner ruled Winfield's three fits on 2026-11-06 before this was found. Owner's question 1 (Design §17) |
 | Her company | Winfield 167 (Spanish); Danish establishment 120, 161 aboard in 1807 | Not in conflict: different services. 161 and 167 are within 4% |
-| Her tonnage | Winfield 335 t; the plan's displacement 540 t 691 lb (497 t) | Different measures (§2.3); ask Winfield's rule (§11) |
+| Her tonnage | Winfield 335 t; the plan's displacement 540 t 691 lb (497 t) | Different measures (§2.3); ask Winfield's rule (§11). **2026-11-19:** the 335 t are toneladas de arqueo, capacity (pp. 41-46); the rule is not given; at the book's libra the displacement is 498 t |
 | Her rate | Winfield and the plan: a corvette; Roos and the 1809 caption: a frigate, "a light frigate" | A Danish light frigate rated by Spain a corvette by her guns and size; both true |
 | Her sailing date | Roos p. 87: command hoisted 6 July, weighed 17 July 1807; Wikipedia: left on 7 July | Roos |
 | Her main yard by rule | Luce 19.76 m, Falconer 19.87 m, Chapman 17.97 m | Luce (the generator's chain), Chapman the check; Steel to read |
@@ -473,3 +492,10 @@ Felip; Seaforth 2023), the owner's edition:
    libra against the English pound in Winfield's practice.
 4. **Any other ship seized in 1808-1809 from France's allies in Spanish ports**, if the book lists
    them beside her, for her companions in a scenario of 1809-1810.
+
+**Marked 2026-11-19** (the decisions sheet's Part D): item 1 **supplied** and holding nothing new
+(p. 930: no service line, no source for "as captured", no rule for the 335 t, whose meaning comes
+from the units instead); item 2 **partly supplied** (pp. 904-906 and the 1788 establishment; how a
+corvette was rigged after 1800 not found); item 3 **partly supplied** (the libra, pp. 41-46; the
+carronade's and the obús's weights and shot not found); item 4 **not found**. By the owner's word,
+what was not found is filled from other research or judgement.

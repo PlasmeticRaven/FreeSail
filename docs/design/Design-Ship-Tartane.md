@@ -1,5 +1,23 @@
 # Design: the tartane, a Provençal coaster under a great lateen and a square topsail (package 90, third draft)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The tartanas' entries (Winfield et al. 2023, pp. 1252-1253), the coastguard (pp. 168-169)
+and the místicos (pp. 1195-1201) came, set down in `VesselReferences-2026-11-Spanish.md` §9 to §11,
+with the owner's own reading of Monleón's tartane print and the others they have seen: "it, and
+other prints of Tartanes I have seen, show one headsail, and a loose-footed (no lower yard) square
+topsail." This revision carries what that settles here:
+- **one headsail**: decision 11's one jib, by judgement, now on the owner's reading (decision 11,
+  §4.3, §16.1, §17);
+- **the topsail loose-footed, with no lower yard**: the tréou's yard is not crossed in plain sail
+  but sent up with the tréou (decisions 8 and 9, §4.1, §5.1a, §10, §16.1 question 4, §16.2); A5's
+  ruled reading then makes her topsail a topsail;
+- **the entries give no particulars, guns or men**, so her trader's ten and the coastguard's
+  Chapman eight 4-pounders and 34 men stay JUDGEMENT, by the owner's word ("you shall have to fill
+  in some things from other research or judgement"); the 34 now inside the Spanish místicos' 23 to
+  72 (decision 16, §6.1, §6.3, §7, §15);
+- **the coastguard's work and whose it was** (the Treasury's, the navy's from 1802 to April 1805):
+  the revenue cutter's book stands, no doctrine of her own (§8).
+
 **Revised 2026-11-18 on the owner's decision of A1d (the lead's note of 22:35 UTC, nudge 19).** The
 owner decided that the strain of a lateen taken aback is built: "A lateen taken aback should
 increase the strain on the mast, as a backed square sail does, so that on the worse tack and not
@@ -90,7 +108,8 @@ generator, no scenario, no test (the lead's note of 2026-11-18, nudge 15).
    Package 96 (`client/harbour-shelves.yaml`, a sentence a scenario).
 8. Pictures for the eye only: the Roux-school watercolour held
    (`docs/references/images/tartane-roux-school-watercolour.webp`); Monleón's print (Winfield
-   p. 1249), cited, not seen.
+   p. 1249), cited, not seen; the owner's own reading of it and of the other tartane prints they
+   have seen (2026-11-19, VR-Sp §9), in their words.
 
 **Marks.** As her note's: *read (page image)*, *read (OCR)*, *read there*, *the lead's words*,
 *secondary*, *seen*, *observed* (printed by this package's scratch probes,
@@ -106,8 +125,10 @@ first use; Forfait's pied du roi is 0.3248 m.
 **One sentence.** One module writes her: Forfait's *Humble*, a tartane of 100 tonneaux with a
 topsail and a mizen (62¾ by 20⅓ pieds, 20.38 by 6.61 m; Forfait 1788 Table II, read on the page
 image), drawn on Chapman's French tartane of 1768 scaled to her; a whole lateen on a 24.4-metre
-yard on her main with a square topsail on its head, a small lateen on a mizen raked aft and sheeted
-to an outrigger, one great jib on the berthelot, a square tréou for running; unarmed, a trader of
+yard on her main with a square topsail on its head, loose-footed with no yard below it in plain sail
+(the owner's reading of the prints, 2026-11-19), a small lateen on a mizen raked aft and sheeted
+to an outrigger, one great jib on the berthelot (one headsail, the same reading), a square tréou for
+running, its yard sent up with it; unarmed, a trader of
 ten with a fisherman's fit, and a coastguard of the same hull in a second file with Chapman's eight
 4-pounders; tacked and worn as other vessels are, her yards shifted round their masts in stays or
 in the wear by her practice, or left on the bad hand until shifted, which the engine cannot do
@@ -126,15 +147,15 @@ today.
 | 5 | Draught 2.50 m, displacement about 155 t, GM about 0.8 m, all JUDGEMENT to be measured on the scaled body at step 1 | No trading tartane's draught found (Tar §2.3): Chapman's draught to breadth, 0.379, on her breadth |
 | 6 | **The main**: a mast *à calcet* of 59 pieds (19.17 m) heel to head, 26 pieds (8.45 m) of head, stepped 10 pieds 5 pouces (3.38 m) before the middle; column shrouds (`haubans à colonne`) | Forfait Table II; Lescallier pp. 376-378 |
 | 7 | **The great lateen**, class `lateen`, whole (no `cut_at_mast`), on a `lateen_yard` of 75 pieds (24.36 m) slung at a third; cut by Forfait's rule (p. 121) | Forfait Table II and p. 121; Lescallier p. 379; Ext §3.7 |
-| 8 | **The topsail**, square, on a yard of 32 pieds (10.39 m) hoisted on the main's head; **no topgallant**. Her main is a pole (no topmast), so the topsail is a course to the engine today and wants A5 and A6 before her file (§5.1a) | Forfait's *Humble*; Röding; Winfield's Monleón shows none above the topsail, and the watercolour, for the eye, none. Question 4's note |
-| 9 | **The tréou**, square, on a yard of 41 pieds (13.32 m) crossed as the cutter's square sail is, set before the wind and in too much wind, out of plain sail | Lescallier p. 401; Steel; Falconer; Forfait's *Espiègle* and square-sail column. Question 4 |
+| 8 | **The topsail**, square, on a yard of 32 pieds (10.39 m) hoisted on the main's head; **no topgallant**. Her main is a pole (no topmast), so the topsail is a course to the engine today and wants A5 and A6 before her file (§5.1a). **Loose-footed, no yard below it** (2026-11-19, the owner's reading of the prints: "a loose-footed (no lower yard) square topsail"), as this decision's sheets to the deck already had it; A5's ruled reading makes it a topsail | Forfait's *Humble*; Röding; Winfield's Monleón shows none above the topsail, and the watercolour, for the eye, none; the owner's reading (VR-Sp §9). Question 4's note |
+| 9 | **The tréou**, square, on a yard of 41 pieds (13.32 m) crossed as the cutter's square sail is, set before the wind and in too much wind, out of plain sail. **Revised 2026-11-19:** its yard **not crossed in plain sail** but sent up with the tréou and struck with it, the period's way of setting it flying, so that in plain sail no yard stands under the topsail (the owner's reading of the prints). How her file carries a yard not crossed (with its sail in the sail room, sent up by its evolution) is her builder's at step 2, the lead's if it asks more of the engine (JUDGEMENT) | Lescallier p. 401; Steel; Falconer; Forfait's *Espiègle* and square-sail column; the owner's reading (VR-Sp §9). Question 4 |
 | 10 | **The mizen**: 30 pieds (9.75 m), head 6 (1.95 m), 15 pieds 2 pouces (4.93 m) abaft the middle, raked aft (JUDGEMENT on the angle); its lateen on a yard of 47 pieds (15.27 m), sheeted to an outrigger over the stern | Forfait Table II; Forfait p. 128 (the lateen xebec's after mast "panché vers l'arrière", the nearest text), the angle to be read on Chapman's plate at step 1; Lescallier p. 393 (the mizen to bring her to the wind); the outrigger's length by the lugger's (Forfait Table VII). The watercolour a check for the eye only |
-| 11 | **The head**: the éperon (10½ pieds, 3.41 m, **to be re-read on the page image before it is a constant**: the printed ratio, 0.151, gives 9½ pieds, Tar §2.1) with the berthelot over it; **one great jib** to the berthelot's end, by judgement; a storm jib in the sail room | Lescallier pp. 393, 401; Forfait p. 125; Steel; Röding. Decision 11 leaves the headsails' count to judgement; the images README's reading of two is recorded (§17) |
+| 11 | **The head**: the éperon (10½ pieds, 3.41 m, **to be re-read on the page image before it is a constant**: the printed ratio, 0.151, gives 9½ pieds, Tar §2.1) with the berthelot over it; **one great jib** to the berthelot's end, by judgement; a storm jib in the sail room. **2026-11-19: one headsail, on the owner's reading** of Monleón's print and the other tartane prints they have seen ("show one headsail"), so the count no longer rests on judgement alone | Lescallier pp. 393, 401; Forfait p. 125; Steel; Röding; the owner's reading (VR-Sp §9). Decision 11 leaves the headsails' count to judgement; the images README's reading of two is recorded (§17) |
 | 12 | **The bouffette**, a smaller lateen bent to the great yard in the great lateen's place in a blow, as the lugger's taille-vent is | Lescallier pp. 394-395; Forfait p. 129. Question 6's note |
 | 13 | **Tacked and worn as other vessels are** (the owner's answer to question 3): `tack ship` and `wear ship` each an evolution of her own; each lateen's yard shifted round its mast in stays (once her head is through the wind) or in the wear (at "wind aft"), peaked up and its car passed round, never lowered, by the order's clause or her practice ("shift" in both by default); or left, the lateen drawing as a lug against its mast on the bad hand until `shift the mainsail`; `put her about`, and a course ordered across the wind's eye, wear her over 22 knots | The owner (Dec 3, Part F); no source says a lateen vessel could not tack (GA §4); the yard changed "pour virer de bord", either way (Lescallier p. 378); the board on the mast named and sailed (Stratico, O'Scanlan: GA §3.3); the strong wind, Forfait p. 119. Question 2, answered |
 | 14 | The engine work this needs is the plan's **A1a to A1c** (the whole lateen's side, its going about with the yard's change a part, the rules captain; shared with the polacre's and the xebec's lateens), and **A1d** (taken aback and on the bad hand, built by the owner's decision of 2026-11-18), with **A3** (a tiller's words), **A4** (the boat in tow), **A5 and A6** (her topsail on a pole main) and later **A8** (the lateen in a gale), each designed in package 90's plan (§6 there) before her file (§5.4) | Every whole lateen of the package needs A1; nothing of it is in the engine today (observed, §5.1); her pole main's topsail is a course today (§5.1a) |
 | 15 | Company **ten** in trade (master and mate posts, six seamen, a boy, a cook), JUDGEMENT until sourced; her great sail's work an all-hands call | Ruling 11; package 116's `too_few: all hands`; the bilander's ruling (Tar §6) |
-| 16 | The trader **unarmed**; the coastguard **Chapman's eight 4-pounders and four swivels**, until Winfield's Spanish rows replace them | Chapman Pl. LVIII No. 16 (read there); Winfield to ask |
+| 16 | The trader **unarmed**; the coastguard **Chapman's eight 4-pounders and four swivels**, until Winfield's Spanish rows replace them. **2026-11-19:** the tartanas' entries give no guns (pp. 1252-1253), so Chapman's stand, by the owner's word on what is not found | Chapman Pl. LVIII No. 16 (read there); Winfield et al. 2023, pp. 1252-1253 (VR-Sp §9) |
 | 17 | Roles: the trader `merchant`, a `fishing tartane` description `fisherman` (the trawl, its grounds to source: booked, the plan's card); the coastguard, description key `guarda-costa tartane`, role `revenue`, the revenue cutter's book read from `thresholds:` | Build §8; package 116's road; Tar §5 |
 | 18 | Rig word **"a tartane"**, size rank 1; no nation in the file (the scenario's, as the *Neufchatel*'s) | The made-out rule; D16's bilander precedent; the type named on sight |
 | 19 | **Her boat towed astern** on passage by default | Decision 11 ("the boat in tow"); the watercolour. Question 6 |
@@ -261,8 +282,8 @@ measured on Chapman's sheer at step 1.
 | Its gear | lines | the halyard (jeers) a `halyard`; the two ourses, *à proue* and *à poupe*, two `guy`s at the car (the bilander's mapping of the ourses, Bil §1.2); the brace (*oste*) and the vang (*van*) at the penne, `vang`s; one parrel | Lescallier p. 379, A; the forward ourse to the berthelot's end (p. 393) |
 | **The great lateen** | `main.lateen`; `lateen`, whole | head 72¾ pieds (23.63 m: the yard less its ends); the clew where it falls on the deck at the mast's foot with the yard peaked as she carries it (Forfait p. 121, R), the car tacked at the stem; one sheet aft to leeward, one tack; **about 100 to 140 m²** before the cut (JUDGEMENT); one oblique reef band (Lescallier p. 379) | A, R |
 | The topsail yard | `main.topsail.yard`; `yard`, **`on: main.mast`** (no topmast: a pole main) | 32 pieds (10.39 m), 6¼ pouces; hoisted on the main's head, about 15.5 m above the deck; braced as the cutter's topsail yard | Forfait, A; the brace limit the cutter's, JUDGEMENT. The engine reads it as a course today (§5.1a): A5 |
-| **The topsail** | `main.topsail`; `square` | cut between its yard and the hounds by the cutter's topsail rule, its sheets to the deck (no lower yard set) | Forfait's *Humble* crosses no lower yard; Röding; Winfield's Monleón "for stability" |
-| The tréou's yard | `main.treou.yard`; `yard` | 41 pieds (13.32 m), 8½ pouces; crossed as the cutter's `square_sail.yard` is ("the type set this sail flying, the yard sent up with it"; the file crosses it) | Forfait's *Espiègle* and square-sail column, A; the cutter's precedent |
+| **The topsail** | `main.topsail`; `square` | cut between its yard and the hounds by the cutter's topsail rule, its sheets to the deck (no lower yard set); **loose-footed**, borne out by the owner's reading of the prints (2026-11-19) | Forfait's *Humble* crosses no lower yard; Röding; Winfield's Monleón "for stability"; the owner's reading (VR-Sp §9) |
+| The tréou's yard | `main.treou.yard`; `yard` | 41 pieds (13.32 m), 8½ pouces; crossed as the cutter's `square_sail.yard` is ("the type set this sail flying, the yard sent up with it"; the file crosses it). **Revised 2026-11-19: not crossed in plain sail**; sent up with the tréou and struck with it (decision 9), since the prints show no yard under the topsail | Forfait's *Espiègle* and square-sail column, A; the cutter's precedent, departed from on the owner's reading |
 | **The tréou** | `main.treou`; `square` | from its yard to near the deck; in "square sails" and "all sail", **never plain sail**; set before the wind and in too much wind | Lescallier pp. 395, 401; Steel; Falconer TREOU and SQUARE-SAIL, A |
 | The bouffette | `main.bouffette`; `lateen`, whole, in the sail room | a smaller lateen bent to the great yard in the great lateen's place; its area JUDGEMENT (two-thirds) | Lescallier pp. 394-395 (the galley's); the lugger's taille-vent precedent |
 
@@ -271,7 +292,9 @@ measured on Chapman's sheer at step 1.
 - **With the tréou's yard crossed on the main's lower mast she is still one mast with yards**
   (observed: a lower square yard added to the probe, the main's two yards her head yards, not
   square-rigged, nothing on a schooner's mast). B3.4's two limits are an after mast's and do not
-  reach her (§5.2).
+  reach her (§5.2). **2026-11-19:** in plain sail it is not crossed (decision 9): her topsail yard
+  is then her one braced yard, her head yard, and she is still one mast with yards; with the tréou
+  set, as observed above.
 
 ### 4.2 The mizen
 
@@ -295,7 +318,7 @@ measured on Chapman's sheer at step 1.
 | Part | Id; class | Figures | Source |
 |---|---|---|---|
 | The éperon with the berthelot | `bowsprit`; `bowsprit`, fixed, near the horizontal | 10½ pieds (3.41 m) beyond the stem; its steeve a few degrees (JUDGEMENT) | Forfait, A; Lescallier p. 393 |
-| **The jib** | `jib`; `jibheaded` | from the berthelot's end to the main's hounds; area by the files' rule on her stay | Lescallier p. 401; Steel; Röding, A. One, by judgement (decision 11) |
+| **The jib** | `jib`; `jibheaded` | from the berthelot's end to the main's hounds; area by the files' rule on her stay | Lescallier p. 401; Steel; Röding, A. One, by judgement (decision 11), and since 2026-11-19 on the owner's reading of the prints (VR-Sp §9) |
 | The storm jib | `storm_jib`; `jibheaded`, in the sail room | the cutter's pattern | JUDGEMENT |
 
 ### 4.4 Groups and aliases
@@ -369,6 +392,10 @@ crossed below it (question 4's pick), the predicate's "rank by height on the low
 topsail level 1, a topsail; **without the tréou's yard it would be the lowest braced yard and still
 a course**, so if the tréou is left out A5 must read a square sail over a whole lateen on the same
 mast as a topsail (the lateen yard counted as the level below it): ruled so by the lead (nudge 18).
+**2026-11-19: that is now her plain sail.** By the owner's reading of the prints no yard stands
+under her topsail until the tréou is set (decision 9), so the ruled reading is what makes her
+topsail a topsail; with the tréou's yard sent up, the rank by height does it as before. A5's
+predicate must give the same answer both ways (§15 risk 5).
 
 ### 5.2 The schooner's mast and its two limits (observed)
 
@@ -596,7 +623,9 @@ key and their words where a helm is shot away; A5 and A6 the smack's topsail han
   all hands, the officers at the conn; the change of her great yard in either wants ten and gets
   the eight she can put to it, her master and mate at the conn (§5.4 item 2).
 - **The sources wanted**: a trading tartane's company in the prize papers' catalogue and Winfield's
-  rows (Tar §10). Ten stays JUDGEMENT until then, within a range of eight to twelve.
+  rows (Tar §10). Ten stays JUDGEMENT until then, within a range of eight to twelve. **2026-11-19:**
+  Winfield's tartanas give no men (pp. 1252-1253; VR-Sp §9); ten stays JUDGEMENT, by the owner's
+  word, the prize papers still the route.
 
 ### 6.2 The fisherman
 
@@ -609,7 +638,10 @@ ten, the net worked by all hands.
 **Provisional thirty-four**: three a gun for the eight 4-pounders (Falconer's crew for a small gun,
 the bilander's 3-pounders' rule, D31 (c)), the trader's ten for the sail, posts a master (her
 commander) and a mate; JUDGEMENT until Winfield's men are read. The people file the cutter's form
-for a King's small craft.
+for a King's small craft. **2026-11-19:** the tartanas' entries give no men, so thirty-four stays
+JUDGEMENT, by the owner's word; it now has a Spanish check: the navy's místicos, lateen coastguard
+craft of 14½ to 17½ m, carried 23 to 72 men for one to twelve guns (Winfield et al. 2023, pp.
+1195-1201; VR-Sp §11), *Terrible*'s 31 to 48 for six 8-pounders the nearest.
 
 ### 6.4 The people files
 
@@ -625,7 +657,7 @@ scenario's.
 | Fit | Guns | Source |
 |---|---|---|
 | The trader, `unarmed` (default) | none | JUDGEMENT; the bilander's and the merchant brig's pattern |
-| The coastguard, `long guns` (default of the second file) | **eight 4-pounders, four a side, and four swivels** | Chapman Pl. LVIII No. 16 (read there): a French war tartane's; to be replaced by Winfield's Spanish rows when read |
+| The coastguard, `long guns` (default of the second file) | **eight 4-pounders, four a side, and four swivels** | Chapman Pl. LVIII No. 16 (read there): a French war tartane's; to be replaced by Winfield's Spanish rows when read. **2026-11-19:** the rows give no guns (VR-Sp §9; *Las Ánimas*, a tartana armed as a gunboat and lost in 1795, without figures), so Chapman's stand; the místicos' 4- to 12-pounders and obuses the Spanish check (VR-Sp §11) |
 
 **The checklist** (`Build-Ships.md` §6, postscript), for the coastguard's file:
 1. `hull.profile` with `rail_m`, `breadth_m` and `decks_m` (her one deck), from the scaled plate;
@@ -656,7 +688,11 @@ cutter's form for eight guns; "sail before guns" for the trader.
   look-out vessels (Winfield, the lead's words). The revenue cutter's book is the nearest (the
   search not modelled there either). A doctrine of her own (`coastguard.yaml`) only if Winfield's
   passages give a duty the revenue's book lacks; the look-out's report to a squadron is package
-  72's road. JUDGEMENT.
+  72's road. JUDGEMENT. **2026-11-19:** the coastguard's chapter (Winfield et al. 2023, pp. 168-169;
+  VR-Sp §10) gives its work as contraband, the defence of merchant ships and the coast, survey and
+  rescue: the revenue book holds the first three, and the game reads no book for survey or rescue,
+  so **no doctrine of her own** (the condition is not met). The service was the Treasury's, the
+  navy's from 1802 to April 1805; her "King's" stands (§9).
 - **The fisherman's gear and grounds.** The Provençal tartane towed a trawl (memory, unverified;
   Duhamel du Monceau to read); the smack's `trawl` gear the nearest; a grounds file for the Gulf of
   Lion on 79c's water (none exists, read here), its fish and seasons sourced or judged as
@@ -711,7 +747,9 @@ rig word; within `COLOURS_MADE_OUT_NM` (2; 3) her colours; within `MADE_OUT_NM` 
    the lowering.
 3. **The square topsail on the main's head**, the main drawn as a pole with no doubling (V2), with
    its sheets to the deck; the tréou's yard crossed
-   below it, bare until the tréou is set.
+   below it, bare until the tréou is set. **Revised 2026-11-19:** loose-footed, **no yard drawn
+   below it in plain sail** (the owner's reading of the prints); the tréou's yard drawn only while
+   the tréou is set.
 4. **The mizen raked aft** with its lateen and the outrigger over the stern its sheet leads to.
 5. **The beak and the berthelot**, nearly level, the jib's tack at its end.
 6. **The boat in tow** on its painter astern, veered as the speed and the sea ask (JUDGEMENT).
@@ -785,7 +823,8 @@ Numbered at the build. Each with its source and a band to be settled by measure 
 2. **Chapman's plate unreadable or unlike a trader**: her lines then stand at T, a type judgement
    (a broad Mediterranean coaster's body), said so.
 3. **Her company and guns are judgement** until the passages come: the coastguard's thirty-four
-   especially.
+   especially. **2026-11-19:** the passages came and hold none of them; they stay judgement by the
+   owner's word, the coastguard's now inside the místicos' range (§6.3).
 4. **The lateen row is untuned** (`docs/dev/TuningNotes.md` l. 127): her close-hauled advantage is
    the row's today (the probe's 2.92 knots at 40° against the cutter's 1.96); T-2 is where it is
    tested, and A8 tunes it once on the lateen hulls on the branch at the time (Plan §4 row 7), her
@@ -815,9 +854,12 @@ Numbered at the build. Each with its source and a band to be settled by measure 
    your watercolour's near-upright main still looks right. Or upright, as the watercolour shows it;
    or raked further, as your word might mean. No text gives a tartane's main a rake. (The headsails
    are left to judgement by decision 11 itself: one great jib, as Lescallier, Steel and Röding give
-   her; the images README's reading of two is recorded, §17.)
+   her; the images README's reading of two is recorded, §17.) *2026-11-19:* one headsail, now on
+   your own reading of the prints.
 4. **The tréou.** *The pick*: carried, a square sail on a yard crossed below the topsail, set before
-   the wind and in too much wind, never in plain sail. Or left out.
+   the wind and in too much wind, never in plain sail. Or left out. *2026-11-19:* carried, as
+   answered; by your reading of the prints (no lower yard under the topsail) its yard is sent up
+   with it and not crossed in plain sail (decision 9).
 5. **The coastguard.** *The pick*: a second file of the same hull, with Chapman's eight 4-pounders
    and a company of about thirty-four, one class in two roles as the brig and the merchant brig are.
    Or one file whose coastguard fit adds guns to the trader's ten.
@@ -843,7 +885,10 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
   and haul" (Eng §2.4.3). Still asked: the change's time by itself (the lugger's 14.6 s a metre, the
   lean, or the settee's 11¼: Eng §2.4.4).
 - **A5's reading of a topsail over a whole lateen** if the tréou's yard is left out (§5.1a):
-  ruled the lean, the lateen yard the level below.
+  ruled the lean, the lateen yard the level below. *2026-11-19:* now her plain sail, the tréou's
+  yard not crossed until the tréou is set (decision 9). **For the lead:** how her file carries a
+  yard sent up with its sail (the sail room, or a yard struck by an evolution), if her builder finds
+  the generator cannot say it.
 - **The tiller's words** (§5.4 item 9): settled by the plan as A3 for every tiller-steered hull,
   their figures JUDGEMENT for the lead (Plan §13.1 item 3).
 - **The company per fit**: settled by the plan (§4 row 12), one class in two files.
@@ -857,7 +902,8 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
 
 - **The images README's "two headsails"** is one reading of the watercolour; this draft's reading
   sees one (Tar §9), and the count is judgement by decision 11 (one jib). The README is not changed
-  here (Plan §13.2).
+  here (Plan §13.2). *2026-11-19:* the owner's reading of Monleón's print and the other tartane
+  prints they have seen gives one (VR-Sp §9).
 - **`VesselReferences-2026-10.md` §0** gives Lescallier's tartane at pp. 394 to 401; the article is
   pp. 400 to 401 (the range is the lateen craft's chapter). §3.1's "the rule ... was not found"
   (the lateen's tack shifted round the mast) is answered for the lateen by Tar §4.2.

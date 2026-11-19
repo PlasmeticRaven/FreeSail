@@ -1,5 +1,14 @@
 # Research note: the Mediterranean tartane, her lateen and her square topsail (November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The tartanas' entries (Winfield et al. 2023, pp. 1252-1253), the coastguard (pp. 168-169)
+and the místicos (pp. 1195-1201) came, set down in `VesselReferences-2026-11-Spanish.md` §9 to
+§11, with the owner's reading of Monleón's tartane print and the others they have seen: "it, and
+other prints of Tartanes I have seen, show one headsail, and a loose-footed (no lower yard) square
+topsail." The entries name seven tartanas with their acquisitions and fates, and give no
+particulars, guns or men. "In short", §5 to §7, §9's headsail row and §10 are brought into line;
+nothing else is changed.
+
 **Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
 `Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
 - the "In short" line on it;
@@ -53,7 +62,7 @@ rung", principle 3): T, to read; Forfait's and Lescallier's rules are R; the res
 **Units.** Forfait's and Lescallier's *pied* is the pied du roi, 0.3248 m (1.066 English feet; the
 tree's `VesselReferences-2026-10.md` §0), of 12 *pouces* (2.707 cm) of 12 *lignes* (2.256 mm); a
 square pied is 0.1055 m². Chapman's Swedish foot is 0.2969 m. Winfield's Spanish feet are **pies de
-Burgos**, 0.2786 m, and the game takes Winfield's own metres (the Spanish note's head). Every figure below
+Burgos**, 0.2786 m (the book's own figure 278.635 mm, Winfield et al. 2023, pp. 41-46), and the game takes Winfield's own metres (the Spanish note's head). Every figure below
 is given in its source's units first and in metres after, the metres this note's arithmetic. A
 French *tonneau* of burden is a capacity measure, not a displacement; the figures are kept as the
 sources give them (that a tonneau de mer is 42 cubic pieds, about 1.44 m³, or 2,000 livres, is
@@ -83,6 +92,10 @@ memory, unverified).
 - **The Spanish navy kept seven tartanas**, mostly bought or chartered from French builders; they
   served now and then as coastguard and look-out vessels; the rig is Monleón's (Winfield pp. 1249
   to 1252, the lead's words). Their names, sizes, guns and men are the passages to ask for.
+  **2026-11-19:** the entries (pp. 1252-1253) give seven names, how each came and her fate (among
+  them *Las Ánimas*, a tartana armed as a gunboat and lost in the Bay of Roses in 1795), and no sizes,
+  guns or men. The owner's reading of the prints gives **one headsail and a loose-footed square
+  topsail with no lower yard** (VR-Sp §9).
 - **The handling is the lateen's: she goes about either way, her yard changed round the mast or
   left.**
   - **The period texts** give the yard changed from side to side "pour virer de bord", going about
@@ -487,7 +500,13 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   Biscay's). **The second fit**, its gear and grounds to source.
 - **The Spanish navy's coastguard** (rung B, Winfield): tartanas bought or chartered, used now and
   then for coastguard and reconnaissance. The game's nearest doctrine is the revenue cutter's
-  (`data/captains/revenue.yaml`: the cruiser's book, every sail spoken). **A role.**
+  (`data/captains/revenue.yaml`: the cruiser's book, every sail spoken). **A role.** **2026-11-19**
+  (Winfield et al. 2023, pp. 168-169; VR-Sp §10): the coastguard was a service of the Ministry of
+  the Treasury, its vessels kept in the navy's arsenals and often commanded by navy officers, many
+  of them bought merchantmen armed with what guns were to hand; transferred to the navy in 1802 and
+  back to the Treasury in April 1805. Its work: contraband, the defence of merchant ships and the
+  coast, survey and rescue. The revenue book fits; no doctrine of her own is wanted (Tar-D §8). The
+  entries' reconnaissance tartanas (1741, 1762) are the navy's own.
 - **The fighting tartane** (rung A): Chapman's "for war", eight 4-pounders and four swivels, of
   France. **Not asked**, recorded.
 
@@ -502,6 +521,10 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   a boy and a cook), more for the fisherman's net; a coastguard with guns several times that. The
   great lateen and its 24-metre yard want more hands than any watch of such a company: the
   bilander's settee case, which the lead ruled with an all-hands call (§5 of her design).
+- **2026-11-19:** Winfield's tartanas give no men (pp. 1252-1253), so the judgement stands, by the
+  owner's word. The nearest Spanish figures are the navy's místicos, three-masted lateen craft of
+  14½ to 17½ m used by the coastguard, with 23 to 72 men for one to twelve guns (pp. 1195-1201;
+  VR-Sp §11): the coastguard tartane's 34 (Tar-D §6.3) lies inside them.
 
 ## 7. Her guns
 
@@ -511,7 +534,9 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   4-pounder threw about 4.3 English pounds; unverified).
 - **The Spanish coastguard tartanas**: not given in the lead's words; Winfield's rows to ask for.
   The Spanish pound (libra castellana) differs from the English, and Winfield's pairs are taken as
-  given (the Spanish note's head).
+  given (the Spanish note's head). **2026-11-19:** the entries give no guns (*Las Ánimas*, 1795, an
+  tartana armed as a gunboat, has none given); Chapman's eight 4-pounders stand. The libra is 0.4608
+  kg (Winfield et al. 2023, pp. 41-46).
 - **Ports**: the plate's to read; none is seen in the watercolour, whose tartane is a trader (seen).
 
 ## 8. What the engine does today (observed)
@@ -557,7 +582,7 @@ braced sharp up, trimmed every two minutes, settled 2,400 s), the cutter as file
 |---|---|---|
 | One mast or two | Lescallier, Steel, Falconer: one. Röding: one, and two-masted ones too. Forfait: one (*simple*) and, above 19-20 by 60 pieds, a mizen. Winfield, Monleón, the watercolour: a small mizen | Both were real; the owner's is the two-masted (JUDGEMENT) |
 | The topsail | Lescallier, Steel, Falconer: none named. Röding: usually. Forfait: the tartane simple's mark. Winfield (Monleón): "for stability". The watercolour: yes | The owner's settled rig (2026-11-06) |
-| The headsails | Lescallier, Steel, Röding: one. Forfait's ocean rig: two or three. The README and the Spanish note: two in the watercolour; this note: one seen | By judgement, as decision 11 leaves it: one great jib (Tar-D decision 11); the README's two recorded |
+| The headsails | Lescallier, Steel, Röding: one. Forfait's ocean rig: two or three. The README and the Spanish note: two in the watercolour; this note: one seen. The owner's reading of Monleón's print and other tartane prints (2026-11-19): one | By judgement, as decision 11 leaves it: one great jib (Tar-D decision 11); the README's two recorded; borne out by the owner's reading |
 | Bowsprit or beak | Steel, Falconer: a bowsprit. Lescallier, Forfait: none, an éperon with a berthelot | The berthelot over an éperon (rung A from two French constructors and riggers; the English words loose) |
 | The mast's rake | Decision 11: "one raking mast". No text gives the main's rake; the watercolour's main near upright, its mizen raked aft | The owner's: their word beside their picture (§11 question 3; Tar-D §16.1 question 3) |
 | Tacking | Lescallier: the yard changed "pour virer de bord" (either way). Forfait: lateens taken aback in a strong wind are mortal. PCI 2018: the yard changed by a wear when the weather allows. Stratico, O'Scanlan: the new board held with the yard left (GA) | Tacked and worn, the yard changed or left: the owner's answer to question 3 (2026-11-18); no source says she could not tack (§4.2) |
@@ -580,6 +605,13 @@ braced sharp up, trimmed every two minutes, settled 2,400 s), the cutter as file
 3. **Any Winfield section on the navy's small coastguard craft** of the same service (the
    *guardacostas*, and the lateen *místicos*, *faluchos* or *jabeques* used in the same duty), by
    title and class, for the coastguard role's doctrine and complement.
+
+**Marked 2026-11-19** (the decisions sheet's Part D): item 1 **partly supplied** (pp. 1252-1253:
+the names, acquisitions and fates; no particulars, guns, men, builders or stations); item 2
+**partly supplied** (the owner's reading: one headsail, a loose-footed topsail with no lower yard;
+the caption and number not found); item 3 **partly supplied** (the coastguard, pp. 168-169; the
+místicos, pp. 1195-1201; the faluchos not found). By the owner's word, what was not found is
+filled from other research (the prize papers, item 9) or judgement.
 
 **For the build's step 1 (public domain, outside the tree):**
 

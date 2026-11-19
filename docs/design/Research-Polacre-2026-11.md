@@ -1,5 +1,15 @@
 # Research note: the polacre, a Mediterranean three-master under lateens and a square pole main (November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The eight polacras' entries (Winfield et al. 2023, pp. 1083-1086) and the owner's own
+reading of Monleón's print are set down in `VesselReferences-2026-11-Spanish.md` §12 and summed up
+here in §7 and §5.2: **her size is *Angel de la Guarda*'s** (25.08, 22.15 × 7.52 × 3.34 m, 71 men,
+2 × 12 and 8 × 8 bronze, 1818), **no *San José* is among the eight**, *Virgen del Carmen*'s row is
+recorded as unknown (the owner: "Quite honestly, I do not know."), and the owner, asked whether
+she should carry the small loose-footed mizen topsail their reading of the print shows, answered
+"Carry it". The units (the pie 278.635 mm), §5.2, §7, §9, §11 and §12 are brought into line;
+nothing else is changed.
+
 **Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
 `Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
 - §4, going about;
@@ -48,8 +58,9 @@ every quoted work is public domain by age.
 
 **Units.** Lescallier's and Forfait's *pied* is the pied du roi, 0.3248 m (1.066 English feet;
 `VesselReferences-2026-10.md` §0). Winfield's feet for Spanish rows are **pies de Burgos**,
-0.2786 m, and the game takes Winfield's own metres (the Spanish note's head); no Spanish polacra's
-dimensions are in the tree yet (§7). James's guns are English pounds of shot. A point of the
+0.2786 m (the book's own figure 278.635 mm, Winfield et al. 2023, pp. 41-46), and the game takes
+Winfield's own metres (the Spanish note's head); no Spanish polacra's dimensions are in the tree yet
+(§7). **2026-11-19:** they are (§7): *Angel de la Guarda*'s. James's guns are English pounds of shot. A point of the
 compass is 11° 15'.
 
 **In short.**
@@ -87,6 +98,8 @@ compass is 11° 15'.
   "extremely different" from the polacre's (1780); O'Scanlan (1831) that the polacra's is "very
   like" the jabeque's; Forfait that polacres derive from xebecs but rank now as square-rigged
   vessels of burthen. Her size rests on judgement until the owner's Winfield passages come.
+  **2026-11-19:** they came; the Spanish navy's polacra *Angel de la Guarda* (1818) gives her size,
+  25.08 m of eslora by 7.52 m (§5.2, §7). Still no polacre's lines.
 - **James gives eight armed polacres of the war with their guns and men** (§6), among them the
   Spanish navy's polacre-ship *San Josef* (1800: fourteen brass guns, a crew of 49 and 22
   soldiers), a Spanish privateer (1801: ten guns pierced for twenty, 94 men), a laden Spanish
@@ -373,6 +386,14 @@ What the sources say of the polacre and of lateen yards:
   Winfield's British volume gives her dimensions in English feet (§11).
 - Forfait's Levant rule (§2.5) would give her main pole mast from her breadth once the fraction is
   read.
+- **Read 2026-11-19 (Winfield et al. 2023, pp. 1083-1086; rung B; VR-Sp §12):** the Spanish navy's
+  polacra ***Angel de la Guarda***, 10 guns, 1818: eslora 25.08 m, keel 22.15 m, beam 7.52 m,
+  depth in hold 3.34 m; 71 men; 2 × 12-pdr and 8 × 8-pdr, bronze. About 218 tons by the old
+  English measure on her figures (computed), inside the 200-ton judgement's band. Of the other
+  seven, only *Virgen del Carmen* has dimensions, three figures (22.15, 19.20 × 4.20 m) whose third
+  cannot be told for beam or depth (recorded as unknown: the owner, "Quite honestly, I do not
+  know."), and *Concepción* her depth alone (3.34 m). Her depth is 0.44 of her beam (computed),
+  near Winfield's rule of about a half (pp. 41-46).
 
 ### 5.3 Her trade and her people
 
@@ -426,6 +447,24 @@ What the sources say of the polacre and of lateen yards:
   a pole mainmast (course, topsail, topgallant), a lateen mizen, the jibs on a long bowsprit.
 - **Units:** a Spanish row's feet are pies de Burgos (0.2786 m); the game takes Winfield's metres.
 
+**Added 2026-11-19: the eight entries, pp. 1083-1086** (rung B, read from the owner's copy; set
+down whole in VR-Sp §12): *San Pedro* (sold 1783); *Dichosa* (bought at Algiers 1791, broken up
+1793); *Virgen del Carmen* (8 guns, a prize of 1808, 63 to 84 men, 6- and 8-pounders and two
+16-pounder carronades, to the posts 1819, broken up at Havana 1820; her row's third figure
+unknown); *Cupido* (Jamaica 1814); *Minerva* (14 guns, 100 men) and *Industria* (12 guns, 80 men),
+both at Cumaná 1816; *Concepción* (12/16 guns, 51 men, 8-pounders and 3-pounder obuses,
+1817-1818; her depth 3.34 m); ***Angel de la Guarda*** (above, §5.2). The commanders named were
+alféreces de fragata and a teniente de navío. **Not in them:** a *San José*, any bergantín-polacra
+or polacra-goleta, any account of the masts' handling.
+
+**The owner's reading of Monleón's print** (2026-11-19; quoted whole in VR-Sp §12): three
+headsails; the fore lateen on a foremast raked forward; the main raked aft, course clewed up,
+topsail and topgallant set; the mizen raked aft, about the fore's height, with a small loose-footed
+topsail over a lateen sheeted to a short boom over the transom; a lively sheer, a step in the rail
+at a raised quarterdeck, no gunports, a reasonably short bowsprit. It corrects the lead's "long
+bowsprit" above, and shows Steel's first polacre-settee's mizen topsail on the owner's rig. Asked,
+the owner said she should carry it: "Carry it".
+
 ## 8. What the engine does today (observed; the design document's §5 has the runs)
 
 On the lead's `polacre_probe()` (`tests/rig_fixtures.py`: the brig with lateens on her fore and on
@@ -456,7 +495,7 @@ date and namesake are vetted on its own page.
 
 | Picture | Artist, date | Standing | Namesake |
 |---|---|---|---|
-| Monleón's polacre under sail, Winfield p. 1084 | Rafael Monleón y Torres (1843-1900), Museo Naval, Madrid (the lead's words) | public domain by age; the book's photograph not held; the museum's catalogue number not found | — |
+| Monleón's polacre under sail, Winfield p. 1084 | Rafael Monleón y Torres (1843-1900), Museo Naval, Madrid (the lead's words) | public domain by age; the book's photograph not held; the museum's catalogue number not found (not in the passages sent 2026-11-19); the owner's own reading of it recorded (§7; VR-Sp §12) | — |
 | *Bella Aurora, a Greek polacre off Marseille* | Antoine Roux (1765-1835), watercolour, 1801 (Commons `File:Antoine Roux-557346.jpg`, catalogue) | PD-old-100 on Commons; **its source is a reproduction seller's page** and its medium is in doubt (the page calls it an oil); not to be held without a museum's source | **Not the James *Bella Aurora*** of 1799 as far as can be told: that one Spanish, Genoa to Barcelona; Roux's Greek, two years later; the name was common (JUDGEMENT) |
 | The polacre *San Nicolo* at anchor off Pomègue, a study | Antoine Roux; worked up by Roux's son François as a large aquatint (Musée de la Marine, Paris) (Commons `File:Polacre San Nicolo-Antoine Roux-p17.jpg`, catalogue) | PD-Art, PD-old-100 on Commons; taken from a 1991 book's plate | an Ottoman-Greek trader; not the Spanish *San Josef* of 1800 |
 | Lescallier Pl. XIX fig. 1, "Polacre, bâtiment de la Méditerranée" | the plates of 1791 | public domain; not viewed (the square polacre) | — |
@@ -493,6 +532,12 @@ date and namesake are vetted on its own page.
   6. **HMS *Calpe* (14), the polacre-sloop of 1801**, and whether she was the Spanish *San José*
      taken in 1800 (memory, unverified); and **HMS *Fortune* (10), polacre, 1799**: their entries
      with dimensions and tons.
+- **Marked 2026-11-19** (the decisions sheet's Part D): item 1 **supplied** (the eight; her size
+  *Angel de la Guarda*'s); item 2 **not found** (no *San José*); item 3 **not found** (the caption
+  and number); item 4 **not found**; item 5 **supplied** in part by the owner's reading (her sheer,
+  her quarterdeck's step, no ports, a short bowsprit; her stern and head not described); item 6
+  **not found**, and no longer needed for her size. By the owner's word, what was not found is
+  filled from other research or judgement.
 - **The page images to read (the session's, at the build):** Forfait pp. 129-133 (the Levant
   rule's fractions; the aviso's sums) and the book's fig. 37 (the Spanish xebec's rig, from which Forfait
   derives the polacre's); Lescallier Pl. XIX fig. 1; Willaumez pl. C fig. 13; Röding Fig. 240; the
@@ -510,11 +555,13 @@ date and namesake are vetted on its own page.
    main with course, topsail and topgallant; a lateen mizen; jibs on a long bowsprit** (my pick:
    yours, and Falconer's "generally"). (b) Steel's first polacre-settee: the same with a square
    mizen topsail over a lateen mizen. (c) The Provençal polacre square on all three pole masts, a
-   ship's handling, as a later fit of the same hull.
+   ship's handling, as a later fit of the same hull. *2026-11-19:* (a) with (b)'s mizen topsail, by
+   the owner's reading of the print and their answer, "Carry it" (§7).
 2. **Her hull and size.** (a) **A Mediterranean merchant hull of about 200 tons with a beak, its
    size taken from a Spanish polacra of Winfield's rows once you send them** (my pick: Falconer's
    "extremely different" from the xebec, and the trade's vessel of burthen). (b) The xebec-like
-   hull O'Scanlan gives in 1831, from the xebec's own draught, scaled.
+   hull O'Scanlan gives in 1831, from the xebec's own draught, scaled. *2026-11-19:* (a), sized on
+   *Angel de la Guarda* (§5.2).
 3. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3, Part F), in their own shape, which
    takes the pick and widens it: she tacks and wears as a brig of her size, her main's yards swung
    as a brig's; her two lateen yards changed round their masts in either (peaked up and the car

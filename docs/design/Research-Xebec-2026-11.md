@@ -1,5 +1,14 @@
 # Research note: the xebec for package 90 (November 2026)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The xebecs after 1750 (Winfield et al. 2023, pp. 1141-1158) and the complements of 1788 (p.
+1446 and the two pages following) came, set down in `VesselReferences-2026-11-Spanish.md` §13 and
+§15. They add the Spanish hulls with figures (§2.2), the *Gamo*'s length, *Nuestra Señora de
+África* (ii) all lateen, *Gitano*'s draught reproduced (PB_album_06_05), the chambequines' dates
+(§3.6) and the establishments beside the companies (§6). They do not give her oars, her steering,
+her lying to, seamen and soldiers apart, or *Vives*: those stay open (§11), filled from other
+research or judgement by the owner's word. Nothing else is changed.
+
 **Third draft, 2026-11-18, on the owner's answer to question 3** (the decisions sheet,
 `Decisions-Package90-2026-11.md` §3 and Part F). Only her handling is re-drafted:
 - what binds, on the lateen's handling;
@@ -52,8 +61,10 @@ spelling; none runs past a line or two.
 **Units.** Each figure in its source's own unit and in metres: the English foot 0.3048 m; the
 Swedish foot (Chapman) 0.2969 m; the *pied du roi* (Forfait, Willaumez, Lescallier) 0.3248 m, its
 square 0.1055 m²; the French sea league (*lieue marine*, twenty to the degree) three nautical
-miles; the *pie de Burgos* 0.2786 m, though for any Spanish row this note takes Winfield's own
-metres and never converts the book's feet (`VesselReferences-2026-11-Spanish.md`, Units).
+miles; the *pie de Burgos* 0.2786 m (the book's own figure 278.635 mm, Winfield et al. 2023, pp.
+41-46), though for any Spanish row this note takes Winfield's own metres and never converts the
+book's feet (`VesselReferences-2026-11-Spanish.md`, Units). One xebec row is in English feet,
+*Gitano*'s, marked so by the book (VR-Sp §13).
 
 **In short.**
 
@@ -231,6 +242,10 @@ count of guns but not her weight of metal (Winfield pp. 1134 to 1136, B).
 | The *Caméléon* of 20 guns, Forfait's Table IV | A (table) | 118 *pieds* (38.33 m) | 30 *pieds* (9.74 m; the OCR's "•3°", confirmed by Fincham's 32.0 English ft) | not given | 20 guns | read (OCR) |
 | Willaumez's chebec of 20 guns | A (text) | 120 *pieds* of keel (38.98 m) | 32 *pieds* (10.39 m) | 10 *pieds* deep (3.25 m) | 20 guns; a sweep port between each gun | read (OCR, by a fetching tool) |
 | *Gamo*, Spanish, 32 guns, 1801 | B | not given (James: "lofty") | | | 22 × 12-pdr, 8 × 8-pdr, 2 carronades | read (OCR) |
+| ***Gamo***, the same ship, as built at Mallorca, 1770 (added 2026-11-19) | B | **38.92 m** of eslora, 32.00 m of keel | 9.38 m | 3.53 m in the hold; 435 t | 24 × 8-pdr, 6 × 3-pdr, 12 pedreros (her fit at building; James's of 1801 above) | Winfield et al. 2023, pp. 1141-1158 |
+| *Gitano*, Spanish, 14 guns, 1753 (added 2026-11-19) | B | 27.43 m (90 ft, **English feet as designed**) | 6.71 m | 3.10 m | 14 × 4-pdr, 20 × 2-pdr pedreros; oars not given | the same; **her draught reproduced, Museo Naval PB_album_06_05** |
+| *Nuestra Señora de África* (ii), Spanish, 18 guns, Ceuta 1775, **all lateen** (added 2026-11-19) | B | 23.85 m of eslora, 19.02 m of keel | 6.34 m | 2.41 m; 102 t | 14 × 4-pdr, 4 × 2-pdr pedreros; 127 men | the same |
+| The other Spanish xebecs (added 2026-11-19) | B | 14 to 22 guns, 1749 to 1779: 23.85 to 38.87 m of eslora; 30 to 32 guns: 33.99 to 41.47 m | 6.32 to 7.89 m; 8.31 to 10.17 m | 2.1 to 3.2 m; 3.3 to 4.3 m | by entry | the same; VR-Sp §13 has the rows |
 
 **The proportions spread widely.** Length over breadth: *Minorca* 3.2 (her deck over her extreme
 breadth), Forfait 3.9, Willaumez 3.75 on the keel, Chapman 5.2. Falconer's "great breadth" and
@@ -241,6 +256,13 @@ and the 20-gun French and Algerian xebecs' 38 to 39 m (the *Caméléon*, Willaum
 inside Winfield's 14 to 22 guns. **No length of a 30 is known** (the *Gamo*'s is not given):
 Winfield's entries for the 30 to 32 guns are asked (§11). **Plainly:** the note's first version set
 *Minorca* against the 20-gun hulls as small against large; they are both the small class.
+
+**2026-11-19, the Spanish rows** (computed on Winfield's metres): the small class's Spanish hulls of
+1749 to 1779 run 23.85 to 38.87 m of eslora and are 3.8 to 5.0 beams long, narrower than
+*Minorca*'s 3.2 and the *Caméléon*'s 3.9; only the later small *Diligente* (12 guns, 1808; 3.25) and
+*Muralla* (8 guns, 1795; 2.95) are as beamy. **The 30's length is known now**: the *Gamo*, 38.92 m
+of eslora by 9.38 m (4.15 beams), so the 30 is about the 20-gun xebecs' length on a broader beam.
+Chapman's Algerian (5.2) is no longer the outlier among the narrow ones: *Garzota*, 22 guns, is 5.0.
 
 ### 2.3 The ships in the record, 1798 to 1815 (B)
 
@@ -407,7 +429,12 @@ change is a sending down and swaying up of yards, not a reef.
 - **The chambequín** (Winfield p. 1135, B): a xebec hull entirely square-rigged on light masting;
   faster than frigates and lateen xebecs in the waters between the Mediterranean and the Atlantic,
   and with a smaller crew; *Volante* and *Andaluz* (ii) converted in 1765 for Buenos Aires, for
-  seamen without lateen experience. No spar figures were found.
+  seamen without lateen experience. No spar figures were found. **2026-11-19** (the entries,
+  Winfield et al. 2023, pp. 1141-1158, B): *Aventurero* converted in 1765 and *Andaluz* (ii) in
+  1778, both for Buenos Aires; *Caimán* (Havana, 1770, for Cartagena de Indias's coastguard) and
+  Barceló's *San Antonio* (taken into the navy 1772) rigged as chambequines; the *Murciano* class
+  (1779) ship-rigged, after *Atrevido* enlarged. The entries give *Volante* no conversion, and no
+  spar figure (VR-Sp §13).
 
 ### 3.7 How she sailed (A, B)
 
@@ -477,6 +504,8 @@ asked for (§11).
 | | 300 to 450 (16 to 24 guns, the 1770s) | "two-thirds of whom are generally soldiers" | Falconer (A) |
 | The privateer | 59 (*César*, 4 guns); 54 (*Espérance*, 10 guns, 150 tons) | | James V p. 128; III p. 267 (B) |
 | The trader | not found | | §11; the game's rule for merchantmen, about five men a hundred tons (`tools/gen_ships.py`, the merchant brig), and Falconer's labour of three square-riggers, pull in opposite directions (judgement) |
+| The King's, the small class (added 2026-11-19) | 127 (*Nuestra Señora de África* (ii), 18 guns, all lateen, 1775) | not given apart | Winfield et al. 2023, pp. 1141-1158 (B) |
+| The establishment of 1788, for peace (added 2026-11-19) | 142 (a xebec with lateen sails, 16 to 20 guns); 199 (a xebec of 18); 293 (30 to 32) | soldiers (infantry and infantry-artillery) 26, 55 and 75 | Winfield et al. 2023, p. 1446 and following (B; VR-Sp §15; the 18's printed Total does not add) |
 
 ## 7. The regency's cruiser
 
@@ -605,6 +634,12 @@ JUDGEMENT). It is a probe of the engine's paths, not of her speed.
    and their dates.
 4. Anything of the book's on **how a jabeque was steered** (wheel or tiller), **how she lay to**, and the
    **packet-boat of 18** that the Regulation sets beside the xebec of 18.
+
+**Marked 2026-11-19** (the decisions sheet's Part D): item 1 **partly supplied** (the rows, *África*
+(ii), *Gitano*'s draught and the *Cazador* class's plan; *Vives*, seamen and soldiers apart, and her
+oars not found); item 2 **supplied** but for her men; item 3 **partly supplied** (dates, no masting);
+item 4 **not found**. A new route: *Gitano*'s draught, Museo Naval PB_album_06_05, to seek where the
+Museo Naval's albums are served (Xeb-D §3.1).
 
 **To read, public domain, not reached this time**: Forfait's Table IV on the page image (IA
 `bub_gb_AQUHAAAAQAAJ`, p. 136) and the book's figs. 37 and 38; Lescallier's tome II Pl. XXI fig. 3 and

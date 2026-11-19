@@ -1,5 +1,24 @@
 # Design: the corvette *Diana*, a Danish light frigate of 1804 in the Spanish navy (package 90, second draft)
 
+**Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
+day.** The owner sent her whole entry (Winfield et al. 2023, p. 930; "this is the entirety of it",
+their words), the units (pp. 41-46), the corvettes' chapter (pp. 904-906) and the complements of 1788
+(p. 1446 and following), set down in `VesselReferences-2026-11-Spanish.md` §7, §14, §15 and §17.
+**Her entry holds only what VR-Sp §5 already had**: no service line, no source for "as captured",
+no rule for her 335 t, nothing of her rig; her fits, her 167 and her figures stand. What the other
+passages settle here, old beside new:
+- **her 335 t is toneladas de arqueo**, a capacity of about 476 m³ (computed), not a weight (§2's
+  tons);
+- **the libra is 0.4608 kg** by the book, where §1.3 took 0.4601 from memory: her displacement from
+  her plan's table moves from 497,200 to **498,000 kg** (computed, 0.16 per cent; §1.3, §2, decision
+  3);
+- **her soldiers by the 1788 regulation** for a corvette of 18 to 22 guns, **50** (40 infantry and 10
+  infantry-artillery) where §6.1 had 25 by the frigate's share, JUDGEMENT; her other stations scaled
+  to the rest (§6.1, §6.2, §6.4); her commander a teniente de navío, as the regulation and her plan
+  both have it;
+- what still waits (§0, §17): the source of "as captured", her rig's rule, Steel's 20-gun column, the
+  Danish draught: other research or judgement, by the owner's word.
+
 **Second draft (2026-11-18).** The design for the fourth hull of package 90 (the lead's order: the
 tartane, the polacre, the xebec, the *Diana*, the *Purísima Concepción* class). By
 `Plan-ShipsWorkflow.md`'s method it answers the critic's reading of the first draft ("How this
@@ -43,7 +62,7 @@ caches aside), *judgement*, marked
 `marks` they are §5.0's words, `sourced` (A), `rule` and `judged` (C).
 
 **One sentence.** One module writes one file: the Spanish navy's own plan of her at its own scale
-(34.55 by 9.06 m, 497 t, drawing 3.57 m), a flush-decked light frigate of eleven ports a side with
+(34.55 by 9.06 m, 497 t, 498 t at the book's libra since 2026-11-19, drawing 3.57 m), a flush-decked light frigate of eleven ports a side with
 her masts where the plan steps them, ship-rigged by the generator's frigate chain on her own
 particulars, carrying twenty carronades of 30 by default and her other fits by date, her company
 of 167, made out "a ship" by the tops and "a corvette" by the glass; the engine sails her today
@@ -57,13 +76,13 @@ with nothing new but her rows, once her stiffness is given her.
 |---|---|---|
 | 1 | One module `tools/ships/diana.py`, `build(out_dir)` writing **`data/ships/corvette-20.yaml`**, `ship.name` *Diana*; added to `SHIP_MODULES` (`tools/gen_ships.py:10399`) | The package 75 pattern (one module a ship); the file named by type and guns as `frigate-36` and `razee-44` are |
 | 2 | Her particulars as data in the plan's own units (pies, pulgadas, toneladas and libras, and the plan's pixels at 11.40 a pie), converted once in a frozen `Particulars` | Every figure reads as its source gives it (the *Bellerophon*'s §1.4) |
-| 3 | **Her hull is the plan's, rung A, `sourced`**: LWL 34.40 m, beam 9.06 m (Winfield), draught **3.57 m** to the keel's lower edge at the plan's arrowed line, displacement **497,200 kg** (the table's 540 t 691 lb), deck 1.40 m | Dia §2.3-§2.5 |
+| 3 | **Her hull is the plan's, rung A, `sourced`**: LWL 34.40 m, beam 9.06 m (Winfield), draught **3.57 m** to the keel's lower edge at the plan's arrowed line, displacement **497,200 kg** (the table's 540 t 691 lb), deck 1.40 m. **2026-11-19:** displacement **498,000 kg**, the table's libras at the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46) in place of memory's 0.4601 | Dia §2.3-§2.5; VR-Sp §7 |
 | 4 | **GM 1.5 m, JUDGEMENT**, tuned to her captain's "stiff" (Dia §6) | The frigate's ratio (1.0 m) heels her 1.7 times the frigate (observed, §9); 1.5 brings her within 15% of it |
 | 5 | Her profile wholly from the plan: rail, half-breadths by station, keel, stem, stern, wales, section, the gun deck and its eleven port triples, the port size [0.87, 0.66]; `form.stern: square`, `form.head: knee` | Dia §2.5-§2.7; Build §5.1; package 81's checklist |
 | 6 | Masts at the plan's places and rakes (A); **every spar by Luce's chain on her particulars** (the generator's frigate rule), Falconer's yard rule and Chapman's the checks, Steel's 20-gun column read at step 1 as the third (C) | No spar of hers survives; the rule the game already uses for its frigate (Dia §3.2) |
 | 7 | Her sails the frigate's set by the same chain: courses, topsails, topgallants and royals on fore and main, topsail, topgallant and royal on the mizen over a dry crossjack, the driver, three headsails, the staysails between the masts, studding sails | The 1809 drawing (eye, Dia §3.1); the frigate's file the pattern |
 | 8 | **Four fits proposed**, three of them the owner's: `danish 1807` (16 × 30-pdr carronades, 4 × 8-pdr long guns; **the owner's to accept**), `as captured 1809` (20 × 24-pdr carronades), **`carronadas de a 30 1810`** (20 × 30-pdr carronades, **the default**, the plan's own), `1817` (12 × 12-pdr, 8 × 30-pdr carronades, 4 × 3-pdr obuses) | Winfield p. 930; Roos pp. 94, 101; owner's question 1 |
-| 9 | Company **167** (Winfield), on the frigate's shares of stations scaled, 10 posts; two watches; **ruling 11 does not reach her** | Dia §5; she is a man-of-war in every fit |
+| 9 | Company **167** (Winfield), on the frigate's shares of stations scaled, 10 posts; two watches; **ruling 11 does not reach her**. **2026-11-19:** her soldiers **50** (was 25), by the 1788 regulation for a corvette of 18 to 22 guns, the rest on the frigate's shares | Dia §5; she is a man-of-war in every fit; Winfield et al. 2023, p. 1446 and following (VR-Sp §15) |
 | 10 | Description key **`corvette`**: the tops make out **"a ship"**, the glass **"a corvette, flush-decked, eleven ports a side"**; `SIZE_RANK` 2; roles `kings-ship`, `cruiser` | The made-out rule (§8) |
 | 11 | People file `data/people/corvette-20.yaml`, her people's names Spanish (**the owner's**: Spain's `names` is `english` today) | §6.3 |
 | 12 | No engine change for her rig; her stage 0 the rows a new man-of-war's description needs (§12) | Observed: she sails, tacks, wears and heaves to as the frigate does (§9) |
@@ -95,7 +114,10 @@ The critic's findings that touch her, and the plan's settlements:
 - **What waits on the lead** (§17.2): the made-out rank at the rig's distance, her file's name,
   the stage-0 rows, item 37 (the generator's studding law) settled before her file is generated.
 - **What waits on sources**: Winfield's passages (Dia §11); Steel's 20-gun column on the page image;
-  the Danish draught, if the owner wants it sought.
+  the Danish draught, if the owner wants it sought. **2026-11-19:** Winfield's passages came; her
+  entry holds nothing new, and nothing of her waits on the book now. What it does not give (the
+  source of "as captured", her rig) stays as designed, by the owner's word: other research or
+  judgement.
 - **Her place in the package's build.** She asks nothing new of the engine (§9), so her build is the
   smallest of the five and the natural one on which to settle the package's shared rules first: the
   foreign pounder, the Spanish names, the nations' dated wars (§11), each of which the xebec and the
@@ -141,7 +163,11 @@ imported from another ship's module; the duplication is reported.
   pixel figures of Dia §2, with `PX_PER_PIE = 11.40` and the origin x 826.5, y 311); `TABLE` (the
   table: 124 pies, 32 pies 6 pulgadas, 16 pies; 540 t 691 lb and its two bodies); `WINFIELD` (the
   book's metres, men and fits); `ROOS` (the Danish guns, men and Meyer's speed); `PIE_M = 0.278635`,
-  `LIBRA_KG = 0.4601`, `TONELADA_LIBRAS = 2000`.
+  `LIBRA_KG = 0.4601`, `TONELADA_LIBRAS = 2000`. **2026-11-19:** `PIE_M` is the book's own pie
+  (278.635 mm, Winfield et al. 2023, pp. 41-46), and **`LIBRA_KG = 0.4608`**, the book's libra (was
+  0.4601, memory); `TONELADA_LIBRAS = 2000` stands, proved by the table's carry (Dia §2.3), where
+  the book's "about 1,150 kg" ton of weight does not equal its own 2,000 libras (921.6 kg, computed:
+  VR-Sp §7).
 - **The frame.** x in metres forward of the middle of her load waterline (image x 826.5: the
   post's after face at x 123 and the stem's fore face at x 1530 on the line); z above the line
   (image y 311). A spar's `height_m` and a sail's `corners_m` above her datum, the gun deck at
@@ -162,7 +188,7 @@ imported from another ship's module; the duplication is reported.
 | `length_waterline_m` | **34.40** | The plan, the post's after face to the stem's fore face at the arrowed line, 1,407 px (Dia §2.4, measured). A. The rabbets 33.56 m in the note |
 | `beam_m` | **9.06** | Winfield's metres for the table's 32 pies 6 pulgadas, extreme (the body plan's frame, measured 32½ pies). A and B |
 | `draught_m` | **3.57** | The arrowed line 11.45 pies above the rabbet, the keel 1.36 pies under it: 12.8 pies to the keel's lower edge, even keel (Dia §2.4). A for the drawing, **JUDGEMENT** on the arrow's meaning, checked by the table's displacement (Cb 0.48, Cp 0.72) |
-| `displacement_kg` | **497,200** | The table's 540 t 691 lb at 2,000 libras of 0.4601 kg (Dia §2.3). A. The frigate's rule (Cb 0.55) would make her 627 t, 26% more: not taken |
+| `displacement_kg` | **497,200** → **498,000** (2026-11-19) | The table's 540 t 691 lb at 2,000 libras of 0.4601 kg (Dia §2.3). A. The frigate's rule (Cb 0.55) would make her 627 t, 26% more: not taken. **Revised:** at the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46), 1,080,691 libras are 497,980 kg (computed), 0.16 per cent more; the drawn displacement is set against it as before |
 | `gm_m` | **1.5** | **JUDGEMENT**: Meyer's "stiff" (Roos p. 94) against the frigate's heel in the same wind (§9). The frigate's 1.3 m scaled by the breadth gives 1.0, which heels her 19° abeam in 22 knots under plain sail |
 | `clr_x_m` | **2.5** to start | The frigate's lead (3.0 m on 41.8) scaled by the length; tuned for Meyer's "steers splendidly" (truth D, §14) |
 | `lateral_area_m2` | 104.4 | LWL × draught × 0.85, the generator's rule; the plan's profile under the line measured beside it (§3.6 task 2) |
@@ -177,7 +203,11 @@ an English burthen, its tables being English. By the builder's old measure on he
 pies, 113.4 English ft) and breadth (29.7 ft), (113.4 − 3/5 × 29.7) × 29.7 × 14.86 / 94 = **449
 tons** (arithmetic; the frigate's 933 is matched by the same rule on her own figures within 1%).
 *Pick:* 449 for the helpers, Winfield's 335 beside it in her note with its rule once Winfield's
-passage gives it.
+passage gives it. **2026-11-19:** the book's units say what the 335 t is, not its rule: **toneladas
+de arqueo**, a measure of capacity of about 1.42 m³ each, as the English ton burthen is (Winfield et
+al. 2023, pp. 41-46; VR-Sp §7), so about 476 m³ (computed). The measuring (arqueamiento) is not
+given; her whole entry (p. 930) gives nothing more. The pick stands: 449 for the helpers, her 335
+toneladas de arqueo in her note as such.
 
 ---
 
@@ -374,15 +404,29 @@ so **one company of 167 serves every fit** (a fit cannot change the muster; JUDG
 establishment of 120 and the 161 in her note. **How the 167 are made up is JUDGEMENT** until
 Winfield's establishment for a corvette is read (Dia §11 item 2): the frigate's shares scaled.
 
+**Revised 2026-11-19: the establishment is read.** The regulation of 1 January 1788 (Winfield et al.
+2023, p. 1446 and following; VR-Sp §15), the first to name corvettes (pp. 904-906), gives a
+corvette of 18 to 22 guns in peace **138**: a teniente de navío commanding, a teniente de fragata
+and three alféreces; 5 major officers (purser, chaplain, surgeon, pilots); 11 sea officers; **40
+infantry and 10 infantry-artillery**; 21 artillery; 20 seamen, 20 landsmen and 6 boys. Her own 167
+is 29 more (computed); it stays her company, as her entry gives it. **Her soldiers are the
+regulation's 50** (was 25 by the frigate's share, JUDGEMENT), the count sourced and its place in
+her 167 JUDGEMENT; the other seven stations take the remaining 107 on their old shares (computed,
+rounded by the largest remainders):
+
 | Posts (10) | captain, first lieutenant, second lieutenant, master, boatswain, gunner, carpenter, purser, surgeon, sailmaker |
 |---|---|
-| Stations (157) | forecastle 17, fore top 15, main top 19, mizzen top 9, afterguard 31, waisters 22, marines 25, idlers 19 |
+| Stations (157) | forecastle 17, fore top 15, main top 19, mizzen top 9, afterguard 31, waisters 22, marines 25, idlers 19 → **2026-11-19:** forecastle 14, fore top 12, main top 15, mizzen top 7, afterguard 25, waisters 18, **marines 50**, idlers 16 |
 | Ratings | the frigate's shares (0.3 able, 0.4 ordinary, 0.3 landsmen) |
-| Idlers by trade | the frigate's shares scaled to 19 |
+| Idlers by trade | the frigate's shares scaled to 19 (16 since 2026-11-19) |
 
 - **Marines**: Spain's soldiers embarked, the nation's kit (`data/nations.yaml`, Spain `marines:
   {kit: basic}`); 25 by the frigate's share (JUDGEMENT). The Danes carried a petty officer and ten
-  soldiers (Roos p. 94): in the note.
+  soldiers (Roos p. 94): in the note. **2026-11-19: 50**, the 1788 regulation's infantry and
+  infantry-artillery for her rate (the Spanish kit, N3, if it lands first). In the engine marines
+  serve carronades and no long gun (Bel-D §6.3), so in her carronade fits they man guns; in the
+  1817 fit, with twelve long 12-pounders, her builder measures whether every crew is manned, and
+  says so if not (as the three-decker's: Con-D §6.1).
 - **The posts' words are the game's English**, as for every ship (the *teniente de navío* who
   commanded her is "the captain").
 
@@ -395,7 +439,9 @@ rule; every fit
 of hers is a man-of-war's, so it does not reach her, and no merchant fit is proposed (no source
 puts her in trade). Her builder runs every evolution's want against her watches (about 56 a watch)
 and lists those that call all hands (the anchor's twelve forecastle hands against her watch's eight
-or nine, as package 116's road for a small company has it).
+or nine, as package 116's road for a small company has it). **2026-11-19:** with 50 marines, about
+45 a watch and seven of the forecastle (computed), so more of her work calls all hands; her builder
+lists it.
 
 ### 6.3 The people file and her name
 
@@ -409,7 +455,8 @@ them, her file names none.
 ### 6.4 Package 116
 
 Her company meets package 116's evolutions: `rig the relieving tackles` wants six of the afterguard
-and waisters (she has 31 and 22), `repair the wheel` four able hands of the idlers and afterguard.
+and waisters (she has 31 and 22; 25 and 18 since 2026-11-19), `repair the wheel` four able hands of
+the idlers and afterguard.
 She steers by a wheel (JUDGEMENT: a frigate-built ship of 1804; the plan's inboard works aft are
 not read for it, §3.6 task 7).
 
@@ -645,13 +692,14 @@ harbour's list of files. No test today names "corvette" (searched: none), so no 
    drawing of her signed "Thomsen pinx 1809" (perhaps her officer of that name) say the Danes armed
    her with sixteen 30-pounder carronades and four long 8-pounders. *Pick:* keep Winfield's three as you ruled and **add a fourth fit, "Danish 1807"**,
    from her papers, for a scenario under Danish colours; and ask Winfield's p. 930 for the source of
-   the book's "as captured" (Dia §11). *What you would see:* in an 1807 scenario off Cartagena she shows a
+   the book's "as captured" (Dia §11). *2026-11-19:* the whole entry gives no source (VR-Sp §17);
+   your four fits stand as answered. *What you would see:* in an 1807 scenario off Cartagena she shows a
    long gun at each end of her battery on either side and carronades between; in 1809 and after, as
    Winfield has her.
 2. **How a Spanish or Danish gun's pounds are written.** A Spanish "30-pounder" fires 30 Spanish
    pounds (about 30½ English); a Danish one about 33 English. *Pick:* write the gun as its own navy
    named it (a 30-pounder), with the English weight in its note; the game's range and weight of
-   broadside then read it a little light (by 1.5% for Spain). The other way writes the English
+   broadside then read it a little light (by 1.5% for Spain; 1.6% by the book's libra, 2026-11-19). The other way writes the English
    weight (30.4, 33) and the words say "30-pounder" from a separate word key. *What you would see:*
    "the 30-pounder carronades" in her log and on her deck, as her people said it.
 3. **Her stiffness.** Her captain called her stiff. With the frigate's proportion she would heel half
