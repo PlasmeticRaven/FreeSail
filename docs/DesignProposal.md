@@ -1079,7 +1079,10 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     survey offered (A, the ship and her people; B, the world that moves and the career; C,
     the player's first hours): "I think A, B, then C, or A, C, then B, are the preferable
     orders for me for the next milestones." So the next milestone's centre is the ship and
-    her people; which of the other two follows is settled when it closes.
+    her people; which of the other two follows is settled when it closes. And the same day:
+    "the structural half (AKA the cheaper test suite) of C could run besides A or B, as you
+    say, and should." So the work on the suite, and on the boundary between the simulation and
+    what drives or shows it, runs beside the next milestone and does not wait for C.
 
 ### Still open
 
