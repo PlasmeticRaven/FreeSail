@@ -203,9 +203,11 @@ def test_other_malformed_crew_sections(frigate_data):
 
 def test_the_name_lists():
     data = yaml.safe_load(NAMES_PATH.read_text(encoding="utf-8"))
-    assert set(data) == {"english", "american", "french"}  # the French: package 43b's lugger
+    # the French: package 43b's lugger; the Spanish: package 90, N1 (old: the three lists)
+    assert set(data) == {"english", "american", "french", "spanish"}
     for which, lists in data.items():
-        # the French list is a chasse-marée's of thirty men, not a frigate's company
+        # the French list is a chasse-marée's of thirty men, not a frigate's company; the
+        # Spanish list is a three-decker's as well, and holds to a frigate's floor at least
         least = (30, 40) if which == "french" else (60, 200)
         assert len(lists["given"]) >= least[0] and len(lists["surnames"]) >= least[1]
         for names in lists.values():
@@ -218,6 +220,24 @@ def test_given_names_are_abbreviated_as_a_muster_book_would(frigate_crew):
     assert not any(n.split()[0] in GIVEN_ABBREVIATIONS for n in names)
     assert any(n.startswith(("Wm. ", "Jno. ", "Thos. ")) for n in names)
     assert len(set(names)) == len(names)
+
+
+def test_a_company_is_drawn_from_the_spanish_list_in_full():
+    """Package 90, N1: a ship file whose crew says `names: spanish` (none is committed yet; the
+    74's, the largest company of the committed files, told so) musters her whole company from
+    the Spanish list, each man a given name and a surname of it, every name a man's own, and
+    each written in full: the muster's abbreviations are an English muster book's."""
+    data = yaml.safe_load(NAMES_PATH.read_text(encoding="utf-8"))["spanish"]
+    spec = copy.deepcopy(load_ship(ROOT / "data" / "ships" / "seventy-four.yaml").spec.crew)
+    spec.names = "spanish"
+    crew = muster(spec, Rng(7).stream("muster"))
+    assert len(crew.sailors) == spec.complement
+    names = [s.name for s in crew.sailors]
+    assert len(set(names)) == len(names)
+    for name in names:
+        given, surname = name.split(" ", 1)
+        assert given in data["given"] and surname in data["surnames"], name
+    assert not set(data["given"]) & set(GIVEN_ABBREVIATIONS)
 
 
 def test_an_unknown_name_list_is_refused():
