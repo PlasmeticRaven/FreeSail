@@ -236,9 +236,13 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
     nations = getattr(world, "nations", None)
     if nations is None:
         return False
+    from freesail.world.ships import PLAYER_ID
+
     for o in world.vessels.vessels:
         if getattr(o, "done", False) or not nations.at_war(str(o.nation), nation):
             continue
+        if o.id == PLAYER_ID:
+            continue  # her own shadow: by her service below, not by her hull's word (pkg 121)
         brain = getattr(o, "brain", None)
         role = getattr(brain, "role", "") if brain is not None else ""
         if (

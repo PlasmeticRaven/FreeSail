@@ -1648,6 +1648,8 @@ def _covered(world: Any, prey: Any) -> bool:
     for o in world.vessels.vessels:
         if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
             continue
+        if o.id == PLAYER_ID:
+            continue  # her own shadow: by her service below, not by her hull's word (pkg 121)
         brain = getattr(o, "brain", None)
         role = getattr(brain, "role", "") if brain is not None else ""
         if (
