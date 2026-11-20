@@ -187,6 +187,26 @@ def test_the_hit_chance_falls_with_the_square_of_the_range_to_nought_at_musket_s
     )
 
 
+def test_the_spanish_kit_is_the_basic_kits_figures_soldiers_and_no_nation_names_it_yet():
+    """Package 90, N3: the Spanish kit carries every field the basic kit carries, and its
+    musket, its arms and its figures are the basic kit's (no page in the tree gives the Spanish
+    musket or its rate); its men are soldiers, and its share aloft is under the line at which a
+    rules captain whose book says `kit` sends them into the tops (the ordinances of 1748 post
+    their officer on the poop). No nation's row names it yet, so Spain's ships keep the basic
+    kit and nothing fights otherwise."""
+    from freesail.world.nations import load_marines, load_nations
+
+    kits = load_marines()["kits"]
+    spanish, basic = kits["spanish"], kits["basic"]
+    assert set(spanish) == set(basic)
+    same = ("musket", "sergeant", "officer", "volley_s", "hit_at_50_yd", "tops_factor", "boarding")
+    assert {k: spanish[k] for k in same} == {k: basic[k] for k in same}
+    assert spanish["soldiers"] is True and spanish["tops_share"] == basic["tops_share"] < 0.3
+    n = load_nations()
+    assert all(n.marines_kit_of(nation)["id"] != "spanish" for nation in n.nations)
+    assert n.marines_kit_of("spain")["id"] == "basic"
+
+
 # -- the marines --------------------------------------------------------------------------------
 
 
