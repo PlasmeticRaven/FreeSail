@@ -690,6 +690,11 @@ REFUSED_AS_BEFORE = [
         ONLY_A_LUG.format("mizzen.course", "lateen"),
     ),
     (
+        "a whole lateen whose cut_at_mast is said null",  # an older key: a null refused, as before
+        lambda: _keyed(tartane_probe_doc(), "main.lateen", dipping=True, cut_at_mast=None),
+        ONLY_A_LUG.format("main.lateen", "lateen"),
+    ),
+    (
         "a whole lateen said to be cut at the mast",
         lambda: _keyed(tartane_probe_doc(), "main.lateen", dipping=True, cut_at_mast=True),
         ONLY_A_LUG.format("main.lateen", "lateen"),

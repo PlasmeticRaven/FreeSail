@@ -38311,7 +38311,7 @@ Moved by the stage-0 builder. Read by an independent checker, who passed the gen
 | `dipping: true` and `sheeted_to` on a whole lateen | "... only a lug is dipped." | "sail '...' is a lateen sail; only a lug topsail is sheeted to another sail." (the same) |
 | `dipping: true` and `flying: true` on a whole lateen | "... only a lug is dipped." | loads, as `flying: true` does on a whole lateen without dipping (an older looseness, `flying` taken on any class: found on the way, not built) |
 
-The other 24 of the 37 cases measured (`refusals.py` in the session's scratch, run at both) give the same words at both.
+The other 24 of the 37 cases measured (`refusals.py` in the session's scratch, run at both) give the same words at both. **The class, not the three examples** (the checker's reading, run): at the base every fault that the sail's parse or the validation reaches after the dipping check was hidden, on a dipping whole lateen, behind "only a lug is dipped."; now each is said in its own key's words, as on a lateen without dipping (run: `area_m2` left out, "sail 'main.lateen' is missing 'area_m2'."; a bad `canvas_no`, the canvas sentence). Loader words on files no one has; no pin.
 
 ### The grep proofs
 

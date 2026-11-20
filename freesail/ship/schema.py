@@ -139,9 +139,9 @@ and one pickled before it, is pickled as before it.
 Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3 item
 1) allows `dipping: true` on a whole lateen, a sail of class `lateen` that is not `cut_at_mast`
 (the tartane's, the polacre's and the xebec's), so that its yard keeps the side of the mast it
-hangs on as a dipping lug's does. A lateen cut at the mast (the 64's and the 74's mizen course)
-is refused it, as is every class but the lug, in the words they were refused in before. No file
-carries it, and nothing acts on it for a lateen until the engine's step A1a.
+hangs on as a dipping lug's does. A lateen cut at the mast (the 64's and the 74's mizen course
+and driver) is refused it, as is every class but the lug, in the words they were refused in
+before. No file carries it, and nothing acts on it for a lateen until the engine's step A1a.
 """
 
 from __future__ import annotations
@@ -2505,8 +2505,9 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
     if not isinstance(dipping, bool):
         raise ShipFileError(f"{source}: {where} has dipping = {dipping!r}; say true or false.")
     # a lug is dipped, and since package 90's stage 0L a whole lateen: a lateen whose
-    # `cut_at_mast` is left out or said false (one said otherwise, true or not a bool, is
-    # refused here first, as before, and its own key's words follow once dipping is mended)
+    # `cut_at_mast` is left out or said false (one said otherwise, true, null or not a bool,
+    # is refused here first, as before; one not a bool meets its own key's words once the
+    # dipping is mended)
     whole_lateen = cls == "lateen" and s.get("cut_at_mast", False) is False
     if dipping and cls != "lug" and not whole_lateen:
         raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is dipped.")
