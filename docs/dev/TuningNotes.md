@@ -38198,3 +38198,9 @@ What a player no longer learns, because his deck could not see it:
 No new road of news is built: a letter, a hail and a port's talk carry what they carried.
 
 Moved by the builder; each of the four passed by an independent reader (named in the build report).
+
+## Package 120: a word put in a mouth reaches the player (2026-11-20)
+
+The owner's fault: the director's `say as <person>: "..."` lines were written in the log and given to the stations held within earshot, and never shown the player at the prompt on the same quarterdeck. Every writer of a word's hearers (`heard_by`: `world.orders._say_as`, `orders.free`, `orders.stations` say and hail) names the stations held (a model's harness, the player's seat); the player at the prompt holds none, and the play log's reading (`knowledge.hears`) took the list as the whole of who heard. A model's own `say` on deck was hidden from him the same way. Mended in the reading: where the player's station is held by nobody, he hears such a word by the rule each writer holds a station to, where his person stands (`knowledge._heard_where_said`); where his seat or a model holds it, the list is the answer as before. No line's data changes.
+
+Pins moved: none. No `heard_by` assertion, count of shown lines or recorded digest moved. New truths 7-705 to 7-709 in `tests/test_mends_120.py`.
