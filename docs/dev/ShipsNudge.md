@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-19, 20:15 UTC (YOUR GROUND REPORT IS READ: STAGE 0 HAS MY WORD; the bad hand's factor is 2.5, your pick; A3's words as drafted; A2's wider reach inside A2; the hermaphrodite brig's tiller kept by judgement; the owner's two answers recorded as you relay them). Nudge number: 22.
+Latest note: 2026-11-20, 06:45 UTC (STAGE 0 IS MERGED at 22422808 by your hash 94ea1dba; run 139 green; my reader found nothing to mend; go on to 0L, the Diana's builder and the engine track from this merge; three packages land on the trunk within the day: merge it in before each hash). Nudge number: 23.
