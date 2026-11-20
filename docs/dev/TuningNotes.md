@@ -38822,3 +38822,15 @@ Every other primer line holding these words is the frigate's or the brig's, and 
 The guard set of the plan's §10.2 at A2 (the byte test and the golden classing table, `tests/test_schooner_mast.py`, `tests/test_probes_90.py`, `tests/test_check_viewer_guns.py`; the lugger's and the settee's sets; the going-about set) and the fast and slow tiers whole, on this commit beside the base d8857629: their counts and the comparison test by test are the session's, in `docs/design/Report-Package90-Engine.md`, A2.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, stage 0's guards as one table (the stage-0 builder, at A3's merge, 2026-11-20)
+
+The lead's nudge 31: stage 0's guard that no committed file carried any of its four keys failed by A3, rightly, on the six tiller files. **The cause** was general. Each "carried by no file" guard of stage 0 (a ship's or a fit's `sweeps`, a boat's `towed`, the hull's `helm`, `dipping` on a whole lateen) has to be retired, file by file, by the step that writes its key. **Mended at that level:** one table in `tests/test_probes_90.py`, `KEY_CARRIERS`, of each key and exactly the files that carry it. The test holds the committed files to it both ways: a file in a key's row carries the key and is read so, and no file outside it does (checked: the brig given a helm fails, and the cutter without hers fails). A second test holds the table to the four keys and to committed files. Each step that writes a key moves its row here, old beside new.
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_probes_90.py::test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole_lateen[*]` (18 cases) | no file carries any of the four keys; every hull `helm == "wheel"` | renamed `test_each_stage_0_key_is_carried_by_exactly_the_files_of_its_row[*]`: each file carries exactly the keys of the rows that name it, read off the file and as loaded | A3 writes `helm: tiller` into six files |
+| `KEY_CARRIERS["helm"]` | (none) | the cutter, the hermaphrodite brig, the lugger, the privateer schooner, the smack and the topsail schooner (`TILLER_FILES`) | A3 |
+| `KEY_CARRIERS["sweeps"]`, `["towed"]`, `["dipping"]` | (none) | none, as before | their steps (A7; A4; the lateen hulls' files) move them |
+
+Added: `test_the_table_of_carriers_names_committed_files_and_the_four_keys`. A guard is a pin, so it is passed by the lead's reader at the gate.
