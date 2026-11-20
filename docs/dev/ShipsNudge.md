@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 07:35 UTC (THE DIANA'S LOAD LINE RULED: the arrowed line as drawn, with its drag; her plank's thickness from a source or as a stated range, never chosen by the band; the table most likely reckoned on a level line at the after draught, recorded as the reason the comparison is not like for like; her profile's area by the method the other draughted hulls use). Nudge number: 24.
+Latest note: 2026-11-20, 10:45 UTC (N2, THE CORSAIR, IS NOT WIDENED BY ME: it reaches roles, service, colours, the prize court and the seats, which is the world's and the owner's; I have put it to him with my advice that it be a package of its own and the corsair fits wait; the two small needs, the names' nation row and Spain's kit, are allowed as you pick them; report N1 and N3's hash when your fast tier is whole on it). Nudge number: 25.
