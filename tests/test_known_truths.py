@@ -23536,3 +23536,67 @@ def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps
             service, ship="data/ships/brig.yaml", position={"lat_deg": 49.6, "lon_deg": -5.6}
         )
         assert w.vessels.player_shadow(w).description == look, service
+
+
+def test_truth_7_715_a_kings_ship_by_papers_or_wardroom_wears_her_pendant_and_the_others_not():
+    """Package 121's follow-up: she wears her flags by her service, her papers first. The naval
+    cruise's frigate, her captain with no role: with no papers (a King's ship by her wardroom)
+    or a King's papers she flies the red pendant at the main truck, at `the flags` and to
+    another ship's lookout ("she wears a pendant at the main: a man-of-war"); under a
+    privateer's or a merchant's papers her ensign alone. A merchant brig's file (no wardroom)
+    under a King's papers wears the pendant; under none, a privateer's or a merchant's, her
+    ensign alone, as before. OLD: every one of them her ensign alone (`world_role` read her
+    captain's role and the private signals, and a role-less King's ship wore the
+    merchantman's)."""
+    from freesail.world import flags as F
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    man_of_war = "she wears a pendant at the main: a man-of-war"
+    for ship, pendant, kings in (
+        (None, "the red pendant at the main truck", (None, "kings")),
+        ("data/ships/merchant-brig.yaml", "the long pendant at the main truck", ("kings",)),
+    ):
+        for service in (None, "kings", "privateer", "merchant"):
+            w = _papered(service, ship=ship, position=at)
+            assert w.captain.role == "", (ship, service)
+            w.run(60)
+            said = w.submit("the flags").text
+            seen = F.vessel_flies_words(w, w.vessels.player_shadow(w))
+            if service in kings:
+                assert said.endswith(f" at the peak; {pendant}."), (ship, service, said)
+                assert seen == man_of_war, (ship, service, seen)
+            else:
+                assert said.startswith("The flags: ") and said.endswith(" at the peak."), (
+                    ship,
+                    service,
+                    said,
+                )
+                assert "pendant" not in said and seen == "", (ship, service, said, seen)
+
+
+def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
+    """Package 121's follow-up: a ship whose captain's role answered her flags before flies
+    what she flew: with no papers every role wears its own, and under papers of the role's own
+    service (a commodore under a King's papers, a packet or a revenue cutter under a
+    merchant's) so does she; a prize-master keeps his under any papers. Only papers of another
+    service than her role's change her flags (her papers first)."""
+    from freesail.world import flags as F
+    from freesail.world.service import ROLE_SERVICE, SERVICE_ROLE
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    for role, service in ROLE_SERVICE.items():
+        plain = _papered(None, position=at)
+        plain.captain.role = role
+        assert F.world_role(plain) == role, role
+        plain.run(60)
+        flown = plain.submit("the flags").text
+        own = _papered(service, position=at)
+        own.captain.role = role
+        assert F.world_role(own) == role, (role, service)
+        own.run(60)
+        assert own.submit("the flags").text == flown, (role, service)
+        for other in ("kings", "privateer", "merchant"):
+            w = _papered(other, position=at)
+            w.captain.role = role
+            kept = role == "prize-master" or ROLE_SERVICE[role] == other
+            assert F.world_role(w) == (role if kept else SERVICE_ROLE[other]), (role, other)
