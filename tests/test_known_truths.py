@@ -22780,7 +22780,14 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
     and the hands are piped down with the same watch on deck. Old (b422d05, before the key):
     it waited on either watch, "Not hands enough on deck to heave to; there are but five to
     spare."; before package 119 the larboard's three waited and the starboard's seven hove to
-    short (seven of eleven). How a job counts its hands is unchanged."""
+    short (seven of eleven). Filling away, its pair (twelve, her eleven: the lead's ruling inside
+    the owner's word, `too_few: all hands` in its file), the same: hove to, she fills away by all
+    hands, called once for it, and is piped down again with the same watch on deck, under way;
+    by the player's orders, and by two standing orders (to lie to when the wind exceeds ten
+    knots, to fill away when it is below eight, the wind then falling to six). Old (5e56509,
+    before the key): on either watch she was hove to and could not fill away, "Not hands enough
+    on deck to fill away; there are but five to spare.", and lay hove to. How a job counts its
+    hands is unchanged."""
     from freesail.crew.bill import Watch
     from freesail.ship.parts import SailState
     from tests.test_hands import BRIG, asked, trader_at
@@ -22805,7 +22812,12 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
         inst = asked(w, "heave_to", None)
         assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
         assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
-        # the two roads, in the world: the player's order and a standing order
+        w, crew, runner = trader_at(BRIG, 2, watch)
+        w.ship.extra["hove_to"] = {"tack": "starboard", "backed": ["main"]}
+        inst = asked(w, "fill_away", None)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        # the two roads, in the world: the player's orders and standing orders
         for given in (
             "heave to",
             'standing order "lie to": when the true wind exceeds 10 knots then heave to',
@@ -22839,6 +22851,34 @@ def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
             ], road
             assert piped[0].tick >= hove[0], road
             assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            # and filled away again, by all hands, and under way
+            t1 = w.clock.tick
+            if given == "heave to":
+                w.submit("fill away")
+            else:
+                w.submit(
+                    'standing order "fill": when the true wind is below 8 knots then fill away'
+                )
+                w.wind.speed = w.wind.base_speed = units.knots_to_ms(6.0)  # the wind falls
+            w.run(900)
+            ev = [e for e in w.log if e.tick >= t1]
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'fill': filling away."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to fill away)"
+            ], road
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            filled = [e.tick for e in ev if e.kind == "ship.filled_away"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(filled) == 1 and "hove_to" not in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= filled[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            assert units.ms_to_knots(w.ship.dyn.speed) > (3.0 if given == "heave to" else 1.5), road
 
 
 # -- package 118: the director's mends, and the far ships' lines (truths 7-650 to 7-659) -------

@@ -245,7 +245,9 @@ def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
     merchant brig's larboard watch of three could not let it go (her watches five and five since
     package 119, a watch made short calling all hands for it: truth 7-703). Package 119 (the
     owner's word of 2026-11-19) adds heaving to, for every ship: the merchant brig's watch of five
-    by night cannot heave to alone, either watch, and calls all hands for it (truth 7-704)."""
+    by night cannot heave to alone, either watch, and calls all hands for it (truth 7-704); and
+    filling away, its pair (the lead's ruling inside the same word): hove to by all hands, she
+    could not fill away by either watch of five and lay hove to (truth 7-704)."""
     from pathlib import Path
 
     calling = {eid for eid, evo in EVOLUTIONS.items() if "too_few" in evo.crew}
@@ -253,12 +255,14 @@ def test_only_the_settees_files_call_all_hands_where_the_watch_is_too_few():
     # anchor calls all hands too, for the brig's larboard watch of three. Old:
     # `calling == set(SETTEE_FILES) | {"send_boat"}`. Package 119 (the brig's watch of five)
     # adds heaving to. Old: `calling == set(SETTEE_FILES) | {"send_boat", "let_go_anchor"}`.
-    assert calling == set(SETTEE_FILES) | {"send_boat", "let_go_anchor", "heave_to"}
+    # And filling away, its pair. Old: `... | {"send_boat", "let_go_anchor", "heave_to"}`.
+    assert calling == set(SETTEE_FILES) | {"send_boat", "let_go_anchor", "heave_to", "fill_away"}
     for eid in SETTEE_FILES:
         assert not hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).until_manned, eid
     assert hands.CrewRequest.from_mapping(EVOLUTIONS["send_boat"].crew).until_manned
     assert not hands.CrewRequest.from_mapping(EVOLUTIONS["let_go_anchor"].crew).until_manned
     assert not hands.CrewRequest.from_mapping(EVOLUTIONS["heave_to"].crew).until_manned
+    assert not hands.CrewRequest.from_mapping(EVOLUTIONS["fill_away"].crew).until_manned
     for eid in calling:
         assert hands.CrewRequest.from_mapping(EVOLUTIONS[eid].crew).calls_all_hands, eid
     with_settee = set()
