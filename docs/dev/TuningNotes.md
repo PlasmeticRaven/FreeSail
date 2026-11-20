@@ -38590,3 +38590,60 @@ What turns it is the count of ordinary seamen in her starboard fore top. Single 
 **Not moved:** no other recorded passage in either tier, and nothing of the razee's.
 
 **Read.** Every pin above moved by the package's builder and passed by an independent reader, told to check that no assertion was weakened. The reader mustered all eighteen files at two seeds under the old rule and the new and compared every hand's every field. They broke ruling 11 three ways (posts never counted, always counted, the boat's hands counted on board): each re-made `test_hands` case failed where its name says it turns. Truths 7-630 and 7-700 to 7-704 each failed with the old rule restored, and 7-703 failed with `too_few: all hands` taken out of `data/evolutions/let_go_anchor.yaml`. One finding, mended before the hash was reported: the jib from the gear's hands, an exact list in the old test, had been pinned only by their count and the last name; both watches' lists are exact again.
+
+## Package 90, the Diana: her file, her tuning and the pins she moves (2026-11-20)
+
+Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D). Her file, `data/ships/corvette-20.yaml`, is new, written by `tools/ships/diana.py` through the generator; every other ship file comes out byte for byte. Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `under_plain_sail`, `close_hauled_on_starboard`, `until`, `wear`, `hove_to`), on her file with each figure changed in a scratch copy.
+
+**Her two tuned figures, old beside new** (Dia-D §2 gives both as judgement to be tuned: GM by her captain's "stiff" against the frigate-36, decision 4 and truth C; `clr_x_m` by his "steers splendidly", truth D):
+
+| figure | old (her design's) | new | why |
+|---|---|---|---|
+| `gm_m` | 1.5 | **1.6** | at 1.5, on her measured hull and her rig, she heeled 1.17 times the frigate close-hauled and 1.20 abeam in 22 kn under plain sail (8.59 against 7.34 degrees, 13.60 against 11.30), over truth C's 1.15, where her design's probe (no profile, the frigate's rig scaled) had 1.12 and 1.14; at 1.6, 1.10 and 1.13 (8.05 and 12.77) |
+| `clr_x_m` | 2.5 | **2.6** | at 2.5 her weather helm close-hauled in 15 kn was 0.57 degrees (0.45 at GM 1.5), the foot of truth D's 0.5 to 3; at 2.6, 0.91 close-hauled and 1.85 abeam, beside the frigate's 1.31 and 1.99; at 2.75 she fell aback once lying to; at 2.9 she missed stays from 295 |
+
+**The sweep, at GM 1.6** (her rudder as measured, 3.0 m2 at 3 deg/s; each cell tacked from 290, 292.5 and 295 degrees in seconds, then the weather helm close-hauled and abeam in 15 kn):
+
+| `clr_x_m` | tacks (s) | helm (deg) |
+|---|---|---|
+| 2.5 | 206, 217, 226 | 0.57, 1.68 |
+| 2.6 | 200, 211, 218 | 0.91, 1.85 |
+| 2.75 | 190, 206, 213 | 2.40, 2.09 |
+| 2.9 | 185, 200, missed stays | 3.29, 2.33 |
+| 3.0 | 183, 197, 200 | 2.25, 2.48 |
+| 3.5 | 178, missed stays, none in 900 s | 3.52, 3.25 |
+
+**Her going about: truth E's band is not reached by her helm or her rudder** (Plan §8.4: "to be tuned by her helm and rudder"). Truth 10's 285 to 600 s is Luce's five to ten minutes for a frigate. The frigate-36 shoots through stays with way on and then spends most of her 340 to 450 s griping up on the new tack with too little way for her helm; she hangs in stays, is boxed off by her head yards, and settles on the new tack at once. More weather helm takes her round sooner (above). Her rudder, at GM 1.6 and `clr_x_m` 2.5, tacks from the three headings in:
+
+| rudder | tacks (s) |
+|---|---|
+| 3.0 m2, 3 deg/s (measured; the frigate's rate) | 206, 217, 226 |
+| 3.0 m2, 2 deg/s | 217, 230, 231 |
+| 3.0 m2, 1.5 deg/s | 233, 239, 243 |
+| 3.0 m2, 1 deg/s | 251, 263, 259 |
+| 2.5 m2 | 232, 237, 238 |
+| 2.0 m2 | 244, 237, 214 |
+| 3.3 m2 (the measuring's upper bound) | 168, 206, 219 |
+| 3.84 m2 (the frigate's scaled, her design's probe) | 164, 172, 205 |
+| 4.5 m2 | 298, 164, 180 |
+| 5.5 m2 | 284, 303, 161 |
+
+No figure within her sources brings all three into 285 to 600 s; a knife-edge, the one figure moving one heading's tack longer and another's shorter. Her rudder is kept as measured and her truth E (7-664) drafted with her own band, three to ten minutes (180 to 600 s: JUDGEMENT, for the lead), on her measured 200, 211 and 218 s; she wears in 492 s, within truth 11's band. Each of her three tacks loses ground (16, 29 and 41 m), where truth 10 has the frigate's three gain together: recorded, not asserted.
+
+**Her other figures, measured on the file as committed** (for her testing report): her polar's best 4.59, 7.98 and 11.15 kn in 8, 15 and 25 kn (the frigate-36's 4.62, 8.19 and 11.63); Meyer's case, the wind 112 to 124 degrees off in 24 to 27 kn under plain sail (her book's below 30 kn), 10.26 to 11.26 kn (truth B's 9.5 to 11.5); hove to from 5 kn close-hauled in 128 s, lying 56 to 57 degrees off at 1.1 kn, never aback (the frigate's 220 s, 58 to 62 degrees, 1.4 kn), filled away in 59 s and close-hauled at three knots in 163 s (the frigate's 59 and 161).
+
+**Plain sail from furled, explained** (Dia-D §9 left it to her builder): her watch sets it in 12.8 minutes and all hands in 16.4 (the frigate's 16.4 and 5.6). With all hands up her eight square sails are begun at once, each wanting twelve hands aloft: 96 against her 91 seamen (her fifty soldiers and her idlers go aloft to none), so the last, the mizzen topgallant, begins with seven of twelve, short-handed, and is set at 1,074 s, every other sail by 665 s. A numbered job begun short is not topped up when other jobs' hands come free (`crew/hands.py`, `top_up` serves all-hands work alone); her watch, too few for all at once, takes the sails in turn, each with its hands. The engine's rule, found and not mended (not a file of hers): for the lead.
+
+**Every evolution's want against her watches** (Dia-D §6.2): her watches are 71 and 70 (46 and 45 seamen, 25 soldiers each; package 119's rule for the odd hands); asked of either watch alone through the muster's request, the 83 numbered evolutions are manned whole and the 27 others are all hands' work by their files; none calls all hands for too few and none waits. The request takes any idle hand on deck, its stations ranked first, so her design's "the anchor's twelve forecastle hands against her watch's seven" is made up from the watch's other hands (`tests/test_diana.py`).
+
+**The pins her file moves** (Plan-Package90.md §10.4, "each hull: the guards that count ship files"; the card's "the counts that grow by a file"), each old beside new, found by running every test file that ranges over `data/ships` on her tree:
+
+| test | old | new | why |
+|---|---|---|---|
+| `tests/test_profile.py`, `MODULE_FILES["ships.diana"]` (the hook test) | `[]`, a stub | `["corvette-20.yaml"]` | her module writes her file and no other |
+| `tests/test_probes_90.py::test_the_five_modules_follow_the_four_and_each_stub_writes_nothing` | the five stubs each a docstring and a `build` writing nothing | the four still stubs so; `FILLED = ("diana",)` held by the hook test above | her builder filled her stub |
+| `tests/test_schooner_mast.py::test_the_guard_reads_eighteen_files_...` | `len(SHIP_FILES) == 18`, the name saying eighteen | `== 19`, renamed `..._reads_nineteen_files_...` | her file the nineteenth; the rule names none of her parts (her mizen crosses its dry crossjack) |
+| `tests/test_lee_ports.py`, `LOWEST_LEE_PORT` (truth 7-190's rows) | nine rows | ten: `(DIANA, "carronadas de a 30 1810", "upper", 18.50, 4)` | her default fit carries guns in ports; her lowest, the midship port, shuts at 18.50 degrees, ports 5, 7 and 4 within the next degree (truth 7-665) |
+| `tests/test_known_truths.py::test_truth_7_190_covers_every_armed_file` | `len(armed) == 9` | `== 10` | the same row; the parametrized truth gains her line, passing; its docstring names her figure and count |
+
+Nothing else of those files moved: `tests/test_harbour.py`, `test_subtypes.py`, `test_people.py`, `test_wardroom.py`, `test_hull_form.py`, `test_check_viewer_guns.py`, `test_ship_particulars.py`, `test_catalogue.py` and the rest of the sixteen pass with her file as they stand (917 tests, 3 failing before these moves).
