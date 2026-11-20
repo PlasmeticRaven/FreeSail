@@ -1084,6 +1084,30 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     say, and should." So the work on the suite, and on the boundary between the simulation and
     what drives or shows it, runs beside the next milestone and does not wait for C.
 
+76. **The corsair's station is open by consent; a slave ship's master is the rules' alone.**
+    Owner, 2026-11-20, looking again at decision 68's closed station under decision 74:
+    "we've built a consent system centered around directness, honesty, and free choice, and
+    we might allow a model or player to choose to play as a corsair, understanding the
+    implications, the model being briefed in the consent, and the player understanding by
+    primer and by being informed, either at scenario start, or by the world, of the
+    implications of taking a corsair role. I don't intend to play as a corsair, but it
+    doesn't entirely make sense to me to make them rules-only." And, the line and the way
+    of building it: "Agreed on drawing the line at a slave ship's master, a corsair, open
+    and honest without glorification of the reality is acceptable, and may be built
+    alongside a robust rules-based system so that a model never need be seated for the
+    system to function. We can build this as a package rather than a widening of 90, so you
+    have direct oversight, as it's a general system. It can be placed in the career
+    milestone, the polacre's and xebec's corsair fits held for it." So: a model or a player
+    may hold a corsair's station by a free choice made knowing what the station is and may
+    do (the model by the consent brief, where it is its own question; the player by the
+    primer and by being told at the scenario's start or by the world); the game tells it
+    plainly and does not glorify it; the rules' own corsair is built whole, so that the
+    world's corsairs sail with nobody seated; and no player and no model is ever seated as
+    the master of a slave ship. The work is a package of its own under the lead, in the
+    milestone of the world that moves and the career (decision 75's B); the consent
+    documents change only by the owner's own process
+    (`docs/design/Design-SlaveryAndSuppression.md`, section 8).
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
