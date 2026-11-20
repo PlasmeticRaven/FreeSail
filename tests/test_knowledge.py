@@ -62,7 +62,11 @@ def seated(w, script, make=captain, every=600, loop=False, **kw) -> Harness:
 
 
 def samples(h: Harness) -> list[dict[str, Any]]:
-    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+    return [
+        t.content
+        for t in h.turns
+        if t.role == DATA and "tool_results" not in t.content and "situation" not in t.content
+    ]  # the situation at the seating is the brief's own data turn, not a sample (package 117)
 
 
 def results(h: Harness, name: str) -> list[Any]:
@@ -576,7 +580,8 @@ def test_a_replys_prose_is_a_note_heard_by_nobody_and_a_say_is_heard():
     )
     assert "I think not." in [e.text for e in _prose_notes(cap)]
     notices = [n for s in samples(cap) if s.get("notices") for n in s["notices"]]
-    assert harness_mod.NOTE_NOT_HEARD.format(owed="a question") in notices
+    heard = harness_mod.HEARD_WORDS[True]  # the captain may say it in the world
+    assert harness_mod.NOTE_NOT_HEARD.format(owed="a question", heard=heard) in notices
     said = [e for e in w.log if e.kind == "agent.said"]
     assert said and said[0].text.endswith("Shorten sail, Mr Pearce.")
     assert cap.agent.empty_count == 0 and cap.agent.empty_noted == 0

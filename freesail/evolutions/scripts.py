@@ -378,6 +378,28 @@ def settees_held(ship: Ship) -> set[str]:
     return {sl.id for sl in settees(ship)}
 
 
+# Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3
+# item 3): the ship's practice for a whole lateen's yard in going about, kept on her as a plain
+# dict of strings (`ship.extra["lateen_practice"]`, saved with her, as `COURSE_PENDING` is), for
+# each occasion, in stays and in wearing, "shift" (the yard changed round its mast) or "leave"
+# (left on the bad hand). "Shift" in both by default: the owner's "preferred" (question 3,
+# 2026-11-18). Set by nothing yet; its orders (`leave the lateens in stays` and their kin), the
+# tack's and the wear's reading of it and its row in the readings are the engine's step A1b.
+LATEEN_PRACTICE = "lateen_practice"
+LATEEN_PRACTICE_DEFAULT = (("stays", "shift"), ("wearing", "shift"))
+
+
+def lateen_practice(ship: Ship) -> dict[str, str]:
+    """The ship's practice for her whole lateens' yards in going about, by occasion ("stays",
+    "wearing"): what `ship.extra["lateen_practice"]` keeps for each, else the default, "shift"
+    in both (package 90's stage 0L). A fresh dict each time, so that changing it changes nothing
+    kept. Nothing acts on it until the engine's step A1b."""
+    kept = (getattr(ship, "extra", None) or {}).get(LATEEN_PRACTICE)
+    if not isinstance(kept, dict):
+        kept = {}
+    return {occasion: kept.get(occasion, default) for occasion, default in LATEEN_PRACTICE_DEFAULT}
+
+
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
 # the new lee in stays, and in wearing once the wind is past the stern.
 SETTEE_DIPPED_WORDS = "Dipped the {sail}; hoisted on the {side} side, to leeward of {mast}."
@@ -2196,6 +2218,28 @@ LYING_TO_STERNWAY = 0.15
 LYING_TO_WAY_SMOOTH_S = 60.0
 # The manoeuvres that have the helm and the yards while they are in hand: the watch's
 # tending stands off for them (a ship being filled away is not held to her old tack).
+# Package 116 (card 5; the lead's word of 2026-11-16): the wheel shot away. The helm does
+# not answer until the relieving tackles are rove or the wheel is repaired
+# (`ship.extra["helm_lost"]`, `combat.hits`; the rudder held where it was,
+# `physics.hull.steer`): a helm order and a manoeuvre that drives the helm are refused in
+# these words, by the order's own road (`orders.verbs`) and the runner's
+# (`Runner._failing_condition`), so that the player, a standing order and the game's own
+# captain meet the one refusal. Heave to is not among them: tried with the helm dead, the
+# brig came to by her sails alone (the main topsail to the mast, the head sheets aft), later
+# and with more way on, and its lines say that the helm does not answer.
+HELM_LOST_WORDS = (
+    "The wheel is shot away and the helm does not answer: rig the relieving tackles "
+    "('rig the relieving tackles') to steer her from below, or repair the wheel "
+    "('repair the wheel')."
+)
+HELM_LOST_ASIDE = "the helm not answering, the wheel shot away"
+
+
+def helm_lost(ship: Any) -> bool:
+    """The wheel shot away and no relieving tackles rove (`combat.hits`)."""
+    return bool((getattr(ship, "extra", None) or {}).get("helm_lost"))
+
+
 HELM_MANOEUVRES = frozenset(
     {
         "heave_to",
@@ -2963,7 +3007,7 @@ class HeaveToScript(Script):
                 words.append(f"{names_of_sails(self.ship, [self.headsail])} sheet to windward")
             if self.yards:
                 words.append(f"braced the {self._backed_name()} aback")
-            text = "; ".join(words) + "; helm a-lee."
+            text = "; ".join(words) + f"; {self._helm_words()}."
             self.note(text[0].upper() + text[1:])
         else:
             # "regulate by easing off, or hauling aft, the spanker and jib sheets" (Luce
@@ -2975,7 +3019,7 @@ class HeaveToScript(Script):
             up = "; braced up the other yards" if braced_up else ""
             self.note(
                 f"Braced the {self._backed_name()} aback{up}; hauled aft the "
-                "head sheets; helm a-lee."
+                f"head sheets; {self._helm_words()}."
             )
         # The other fore-and-aft sails that stay drawing (the staysails abaft the fore
         # mast, a schooner's foresail, a fore-and-after's jib): a sheet eased for a wind
@@ -3084,10 +3128,27 @@ class HeaveToScript(Script):
 
             held = part_name(self.ship, self.headsail.id)
             lying = f"under her fore-and-aft canvas, {held} sheet to windward"
-            return {"backed": held, "lying": lying, "hove_tack": tack, "drifting": drifting}
+            return {
+                "backed": held,
+                "lying": lying,
+                "hove_tack": tack,
+                "drifting": drifting,
+                "helm": self._helm_words(),
+            }
         backed = self._backed_name()
         lying = f"{backed} to the mast"
-        return {"backed": backed, "lying": lying, "hove_tack": tack, "drifting": drifting}
+        return {
+            "backed": backed,
+            "lying": lying,
+            "hove_tack": tack,
+            "drifting": drifting,
+            "helm": self._helm_words(),
+        }
+
+    def _helm_words(self) -> str:
+        """`helm a-lee`, or that it does not answer with the wheel shot away (package 116:
+        she is brought to by her sails alone)."""
+        return HELM_LOST_ASIDE if helm_lost(self.ship) else "helm a-lee"
 
     def data(self) -> dict[str, Any]:
         d = super().data()

@@ -734,6 +734,16 @@ class Lookout:
 
     # -- her name, once the deck has it (package 95) -------------------------------------
 
+    def made_out(self, vessel_id: str) -> int | None:
+        """How far another sail is made out now by this lookout's last look (0 a sail, 1 her
+        rig and course, 2 her colours, 3 what she is), or None when she is not in sight
+        (package 118: a far ship's doing is a line of this ship's log only when the deck
+        could see it; the same reckoning `Vessels.spoke` reads)."""
+        fid = f"sail:{vessel_id}"
+        if fid not in (self._sails_seen or {}):
+            return None
+        return int((self._sail_said or {}).get(fid, 0))
+
     def _identify(self, world: Any, seen: dict[str, str]) -> None:
         """The deck learns a sail's name, and the lookout keeps it while she is in sight:
         by a hail (her answer to ours, or her own hail of us, in her words: her own name,

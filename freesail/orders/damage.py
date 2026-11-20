@@ -60,6 +60,7 @@ DAMAGE_VERBS: tuple[str, ...] = (
     "fish",
     "rig a jury mast",
     "rig the relieving tackles",
+    "repair the wheel",
     "cut away the mast",
     "bury the dead",
 )
@@ -209,6 +210,16 @@ def execute(ship: Any, order: Order) -> Result:
             # at 60af48e, item 6)
             raise OrderError("The hands are rigging the relieving tackles already.")
         return _start(ship, "relieving_tackles", "ship", {}, verb)
+    if verb == "repair the wheel":
+        # the wheel made good and new wheel-ropes rove (package 116, card 5): with the
+        # relieving tackles rove or without them
+        runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+        if any(
+            getattr(i.evo, "id", "") == "repair_wheel"
+            for i in getattr(runner, "instances", None) or []
+        ):
+            raise OrderError("The hands are repairing the wheel already.")
+        return _start(ship, "repair_wheel", "ship", {}, verb)
     if verb == "cut away the mast":
         from freesail.orders.resolve import resolve as resolve_noun_
 

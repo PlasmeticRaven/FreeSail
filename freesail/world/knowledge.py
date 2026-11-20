@@ -1100,7 +1100,12 @@ def hears(world: Any, senses: Senses, e: Any, station: str = "captain") -> bool:
     if station in (data.get("heard_by") or ()):
         return True
     if "heard_by" in data:
-        return False  # its hearers are named, and he is not among them
+        if _station_listed(world, station):
+            return False  # its hearers are named, and he is not among them
+        # the hearers named are the stations held (a model's, the player's seat): the player
+        # at the prompt holds none, and is heard by the same rule as they are, where his
+        # person stands (package 120: the director's `say as` lines were never shown him)
+        return _heard_where_said(world, kind, data, senses.spot)
     from freesail.world.hearing import own_hull, within_hearing
 
     hull = str(data.get("said_from") or own_hull(world))
@@ -1112,6 +1117,76 @@ def hears(world: Any, senses: Senses, e: Any, station: str = "captain") -> bool:
     else:
         return bool(senses.spot) and senses.spot[0] == "ashore"  # a word said ashore
     return within_hearing(said, senses.spot)
+
+
+def _station_listed(world: Any, station: str) -> bool:
+    """Whether a word's named hearers (`heard_by`) can name this station: the stations held
+    are what every writer of the list walks (`hearing.stations_everywhere`, `_stations_held`:
+    a model's harness, the player's seat), and the player at the prompt, seated nowhere and
+    his station held by no model, is none of them (package 120)."""
+    if _seat(world) is not None:
+        return True
+    from freesail.agents.harness import _stations_held
+
+    try:
+        held = _stations_held(world)
+    except Exception:  # noqa: BLE001  (a world with no stations)
+        return False
+    return any(str(h.station.name) == station for h in held)
+
+
+def _person_named(world: Any, name: str) -> Any:
+    """The person of the one registry by his name, or None (a voice of the ship's own)."""
+    people = getattr(world, "people", None)
+    if people is None or not name:
+        return None
+    try:
+        everyone = list(getattr(people, "everyone", None) or people.all)
+    except Exception:  # noqa: BLE001  (a world with no muster)
+        return None
+    return next((p for p in everyone if str(getattr(p, "name", "")) == name), None)
+
+
+def _heard_where_said(world: Any, kind: str, data: dict[str, Any], spot: Any) -> bool:
+    """Whether a word whose hearers were named among the stations held was said within
+    hearing of `spot` (the player's person at the prompt), by the rule each writer of the
+    list holds a station to (package 120): a station's `say` or hail by its place
+    (`orders.stations`), a person's words put in his mouth by his place aboard, the
+    masthead's reaching the deck (`world.orders._say_as`), and ashore by where he stands
+    (`hearing.within_hearing`)."""
+    from freesail.world.hearing import own_hull, spot_of, station_spot, within_hearing
+
+    if not spot:
+        return False
+    hull = str(data.get("said_from") or own_hull(world))
+    place = str(data.get("place") or "")
+    if kind == "agent.spoke":
+        if data.get("hail"):
+            # a hail carries over her own deck, and no further
+            return spot[0] == "aboard" and spot[1] == hull and spot[2] in ("quarterdeck", "deck")
+        if place in PLACES and PLACES[place].aboard:
+            return within_hearing(("aboard", hull, place), spot)
+        from freesail.world.movement import hull_of
+
+        there = hull_of(_root(world), hull) if data.get("said_from") else None
+        try:
+            said = station_spot(there or world, str(data.get("station") or ""))
+        except Exception:  # noqa: BLE001  (a station of a hull not made)
+            return False
+        return within_hearing(said, spot)
+    person = _person_named(world, str(data.get("person") or ""))
+    if place in PLACES and PLACES[place].aboard:
+        if person is not None and getattr(person, "aboard", True):
+            hull = str(spot_of(world, person)[1] or hull)
+        if spot[0] != "aboard" or spot[1] != hull:
+            return False
+        near = earshot("quarterdeck" if place == "deck" else place) | earshot(place)
+        if place == "masthead":
+            near = near | earshot("quarterdeck")  # the masthead's hail reaches the deck
+        return spot[2] in near
+    if person is None:
+        return False
+    return within_hearing(spot_of(world, person), spot)
 
 
 def rows_elsewhere(senses: Senses) -> list[Any]:

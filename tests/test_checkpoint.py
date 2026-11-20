@@ -468,7 +468,9 @@ def test_a_station_left_in_a_playtest_save_is_taken_again_by_the_one_rule(name, 
     assert "the deck handed over" in stationed
     # the brief of the station taken again is this build's, with the last note in it
     brief = h.brief.text()
-    assert "stand_down" in brief and "The last handover note in this station's journal" in brief
+    assert "stand_down" in brief
+    # the last note is the game's words, in the situation after the brief (package 117)
+    assert "The last handover note in this station's journal" in h.brief.situation
     world.run(A_GLASS)
     again = replay_mod.save_to_file(world, tmp_path / "on.json")
     copy, report = replay_mod.load_report(again, ship_factory)

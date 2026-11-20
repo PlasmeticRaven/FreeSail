@@ -334,7 +334,12 @@ def party_leader(hull: Any, boarders: list[Sailor]) -> Any:
     return standing(hull, among=boarders)
 
 
-def prize_master(captor_hull: Any, doctrine: Any = None, party: list[Sailor] | None = None) -> Any:
+def prize_master(
+    captor_hull: Any,
+    doctrine: Any = None,
+    party: list[Sailor] | None = None,
+    exclude: tuple[Any, ...] = (),
+) -> Any:
     """The prize master by the captor's doctrine (`prize_master_from`: the roles he sends,
     in order; the first lieutenant kept with his ship unless the file names him), the ladder
     otherwise; from the party on her deck first where there is one."""
@@ -354,21 +359,53 @@ def prize_master(captor_hull: Any, doctrine: Any = None, party: list[Sailor] | N
     except Exception:  # noqa: BLE001
         captain = None
     ids = {s.id for s in party} if party else None
+    excluded = {id(x) for x in exclude}
     for role in roles:
         if role == "petty officer":
-            found = standing(captor_hull, among=party if party else None)
+            found = standing(captor_hull, among=party if party else None, exclude=exclude)
             if found is not None and found.role == PETTY_OFFICER_ROLE:
                 return found
             continue
         for p in people.by_role(role):
             if p is captain or getattr(p, "dead", False) or not getattr(p, "aboard", True):
                 continue
+            if id(p) in excluded:
+                continue
             if getattr(p, "sick", False) or getattr(p, "confined_to", ""):
                 continue
             if ids is not None and p.sailor_id not in ids and party:
                 continue
             return p
-    return standing(captor_hull, among=party if party else None)
+    return standing(captor_hull, among=party if party else None, exclude=exclude)
+
+
+def _master_not_refused(
+    world: Any,
+    prize: Any,
+    master: Any,
+    captor_hull: Any,
+    doctrine: Any = None,
+    party: list[Sailor] | None = None,
+) -> Any:
+    """The prize master, passing over a person a model holds where the adversarial gate
+    would refuse that model the prize's command (package 117, decision 70; the consent
+    brief: "An officer may be sent into a prize his ship takes as her prize master, his
+    station going with him"): the next of the ladder takes her, or nobody and her own
+    rules. With the flag turned (`seats.ADVERSARIAL_SEATS_CONSENTED`) the gate refuses
+    nothing, and he goes. The gate is read after her prisoners are set, so a prize that
+    holds a human's person is read as one."""
+    from freesail.world.movement import harness_of
+
+    passed: list[Any] = []
+    while master is not None and harness_of(world, master) is not None:
+        why = adversarial_seat_why(world, prize, "prize master")
+        if why is None or any(master is p for p in passed):
+            break  # no refusal; or the ladder came round to a man already passed over
+        passed.append(master)
+        master = prize_master(captor_hull, doctrine, party, exclude=tuple(passed))
+    if master is not None and any(master is p for p in passed):
+        return None  # nobody of the ladder but the men passed over: her own rules take her
+    return master
 
 
 # -- the prize crew's size ------------------------------------------------------------------
@@ -722,8 +759,14 @@ def possess(
         record["prisoners"] = (
             prisoners_of(prize_hull.ship).count if prisoners_of(prize_hull.ship) else 0
         )
-        if master is None:
-            master = prize_master(captor_hull, doctrine, party)
+        master = _master_not_refused(
+            world,
+            prize,
+            master if master is not None else prize_master(captor_hull, doctrine, party),
+            captor_hull,
+            doctrine,
+            party,
+        )
         if master is not None:
             _put_master(world, master, captor_hull, prize_hull, record)
     elif captor_hull is not None:
@@ -734,8 +777,14 @@ def possess(
         kept = captor_hull.ship.extra.setdefault("prize_crews", {})
         kept[str(prize.id)] = list(men)
         record["crew"] = len(men)
-        if master is None:
-            master = prize_master(captor_hull, doctrine, party)
+        master = _master_not_refused(
+            world,
+            prize,
+            master if master is not None else prize_master(captor_hull, doctrine, party),
+            captor_hull,
+            doctrine,
+            party,
+        )
         if master is not None:
             record["master"] = master.name
             record["master_id"] = master.id
@@ -1641,7 +1690,8 @@ def far_minute(world: Any) -> list[tuple[Any, ...]]:
                 "prize.retaken",
                 f"The {v.name}, prize to {rec.get('captor_name', 'her captor')}, is retaken by "
                 "her prisoners rising.",
-                {"prize": v.id},
+                # her captor's id, so that his own prize retaken is his line (package 118)
+                {"prize": v.id, "was": str(rec.get("captor") or "")},
             )
         )
     return lines

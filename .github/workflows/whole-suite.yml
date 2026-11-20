@@ -71,7 +71,10 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install -e ".[dev,server]"
       - name: The slow tier, this shard, without the pace tests
-        run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
+        # --durations: the forty slowest tests of the shard are printed at its end, so that a
+        # shard that has grown says which tests grew (the owner's leave, 2026-11-15, after runs
+        # 123 and 124 took an hour and a half where the three before took seventy minutes)
+        run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider --durations=40 --durations-min=20
 
   browser:
     # The browser plans (the lead, 2026-11-13). The runners have Playwright the package and

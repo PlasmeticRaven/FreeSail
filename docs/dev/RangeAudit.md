@@ -253,6 +253,8 @@ The full sweep makes **105 findings: 67 mechanical and 38 that rest on the refer
 | a judgement to be read against a source | 0 | 38 |
 | all | 67 | 38 |
 
+Since package 116 (card 5) mended `v-nation-unknown:cruiser.stations`: **104 findings, 66 mechanical**, 28 of them the data's; the tables of this section are as the audit first ran.
+
 **By check** (the full sweep):
 
 | Check | Findings | What they are |
@@ -575,7 +577,8 @@ Found for others and not mended (each is in the known list or said here):
   The business reads each key of `stations:` as a nation with stations (none is at war,
   so none is drawn), and the cruiser's own prize doctrine is read by its defaults. Found
   when the vessels' check was made to stand on the tables; it is the list's
-  `v-nation-unknown:cruiser.stations`.
+  `v-nation-unknown:cruiser.stations`. **Mended in package 116** (card 5): the keys moved
+  under `thresholds:`, the finding no longer made and its entry taken out of the list.
 
 - **The build's fingerprint and an audit's list.** `core.world.fingerprint_of` hashes
   every file under `data/` but the tiles. This audit's two files were first laid under

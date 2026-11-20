@@ -26,7 +26,14 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # Pinned to ubuntu-24.04 as the whole suite is (the lead, 2026-11-20): the floating image
+    # is 26.04, whose libm differs in the last place, and nine recorded passages pinned on
+    # 24.04 move by a line or a minute there (docs/dev/TuningNotes.md, "the nine passages
+    # that moved in the cloud (2026-11-05)"). The first release run of gate m7 failed on
+    # exactly those nine for this.
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONUTF8: "1"
     steps:
       - uses: actions/checkout@v4
       - name: Work out the gate name
