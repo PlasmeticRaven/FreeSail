@@ -1,5 +1,19 @@
 # Research note: the corvette *Diana*, the Danish light frigate of 1804 kept by Spain (November 2026)
 
+**Corrected 2026-11-20 by her measuring** (`docs/design/ships-design/pages-diana.md`, **Pages**).
+Her plan was measured again on the Biblioteca Virtual de Defensa's larger image (16,868 × 5,949 px,
+96.1 px a pie), and the lead ruled on it the same day (nudge 24). Only what the measuring corrects
+is corrected here. Each correction is set after the reading it corrects, which stands as it was
+found (the marks are never upgraded):
+- the level line this note took at the small image's y 311 (§2.4, §2.5);
+- the scale's image (§2.2) and the stations' spacing (§2.1);
+- the keel, its drag and the false keel (§2.4);
+- the profile's points, the forward rail and the head (§2.5);
+- the midship section (§2.6);
+- the ports' sills, size and lee angle (§2.7);
+- the masts' places and the hourglass fitting (§2.8);
+- the larger image and Steel's column, both now read (§0, §3.2, §8, §9).
+
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The owner sent her whole entry, p. 930 ("this is the entirety of it", their words), with the
 units (pp. 41-46), the corvettes' chapter (pp. 904-906) and the complements of 1788 (p. 1446 and
@@ -87,6 +101,20 @@ one.
   metacentric height scaled by her breadth (1.0 m) she heels 1.7 times the frigate** (19° on a beam
   reach in 22 knots), which Meyer's "stiff" refutes; 1.5 to 1.8 m brings her to the frigate's heel.
 
+**Corrected 2026-11-20** (Pages §0, §4-§5; measured on the larger image unless marked):
+- **The scale**: 96.1 px a pie on the larger image; the tree's file's 11.40 is the same sheet at
+  1/8.43.
+- **The line is not level**: it is inclined to the keel by 0.46°, deeper aft, so the sheet draws her
+  trimmed by the stern, with a drag of 0.27 m. It stands 3.26 m above the rabbet at midships.
+- **The draught**: 3.63 m to the keel's lower edge at the middle (3.76 aft, 3.49 forward), and 3.78
+  m to a false keel drawn under it (3.91, 3.65).
+- **Ruled her load line as drawn** (the lead, 2026-11-20). Her drawn displacement to it is 466 to
+  474 t with 3 to 4 pulgadas of plank (JUDGEMENT), against the table's 498 t. The table was most
+  likely reckoned on the after draught carried level (judgement, Pages §4.4).
+- **At midships**: her deck 1.33 m above the water, her sills 1.72 m, her waist rail 2.62 m.
+- **The ports and the masts**: the ten broadside ports stand 2.86 m apart; her masts at x +12.50,
+  −2.29 and −11.38 m (computed in the corrected frame).
+
 ## 0. The sources
 
 **Held in the repository:**
@@ -99,7 +127,7 @@ one.
 | Chapman 1781 | F. H. af Chapman, *Traité de la construction des vaisseaux*, 1781 (`chapman/...-ocr.txt`) | **C** (a named rule); public domain | Ch. VIII §30 (pp. 98-100, OCR l. 11601-11724, read (OCR)): the main yard of a frigate-built merchant ship 0.52 of the length from stem to post; the mizen's centre 0.181 of the length from the post; the mast rakes and the bowsprit's steeve |
 | Falconer 1780 | *An Universal Dictionary of the Marine*, art. YARD (`falconer/...-ocr.txt`) | **C**; public domain | The main yard 0.575 of the gun-deck length for ships below 44 guns (the generator's module docstring, `tools/gen_ships.py` l. 45-48, read) |
 | Luce 1866 | S. B. Luce, *Seamanship*, ch. VII (`luce/...-ocr.txt`) as the generator applies it (`tools/gen_ships.py` l. 49-63 and `frigate()` l. 2235-2280, read) | **C** (a named rule; later than the period, the generator's chain for the frigate) | Every spar in proportion to the main mast, (LWL + extreme breadth) / 2 |
-| Steel 1794 | *The Elements and Practice of Rigging and Seamanship*, vol. I, "Dimensions of Masts and Yards in the Royal Navy" (pp. 49-50), the "20 Guns" column (`steel/...-vol1-ocr.txt` l. 5208-5240 and 5245 onward) | **unread**: the OCR of the table is not legible; no rung until the page image is read | A British 20-gun ship's masts and yards, the check on Luce for her rig (the builder's step 1, §9) |
+| Steel 1794 | *The Elements and Practice of Rigging and Seamanship*, vol. I, "Dimensions of Masts and Yards in the Royal Navy" (pp. 49-50), the "20 Guns" column (`steel/...-vol1-ocr.txt` l. 5208-5240 and 5245 onward) | **unread**: the OCR of the table is not legible; no rung until the page image is read. **2026-11-20: read** on the page image, p. 50, "20 GUNS. 429 Tons." (Pages §7); **C**, a check | A British 20-gun ship's masts and yards, the check on Luce for her rig (the builder's step 1, §9) |
 
 **Read online, not held:**
 
@@ -125,7 +153,9 @@ of points, holding no rung; reproduced in Roos 1957, read on its page images; no
   former Orlogsmuseet's collection: memory). Whom to ask: §9.
 - **navalhistory.dk**, the Danish naval history site's ship pages (503 on 2026-11-17).
 - **A larger image of the plan**: the record serves its pages through a viewer (two image groups,
-  350668 and 350671); the tree's 2000-px file is the only one read.
+  350668 and 350671); the tree's 2000-px file is the only one read. **2026-11-20: reached and
+  read.** Group 350671 serves a one-page PDF holding a JPEG of 16,868 × 5,949 px; group 350668
+  serves a thumbnail only. Kept outside the tree (Pages §1.1).
 - **Spanish sources of her service** (O'Scanlan 1831 for the words; the Museo Naval; the archive's
   other records of her): not searched beyond one query.
 
@@ -154,7 +184,8 @@ left half, the fore body on the right, the diagonals in red), the half-breadth p
 a scale bar and the table at the lower right (read). The stations are numbered on the keel: aft 11
 to 1, three midship frames "m", fore 1 to 11, every 51.1 px (4.49 pies, 1.25 m; measured). The masts
 are drawn as stumps that end under the title; the bowsprit is drawn short; no sail, yard or rigging
-but the chains and deadeyes is drawn (read).
+but the chains and deadeyes is drawn (read). **Corrected 2026-11-20:** the stations lie every 433.0 px
+on the larger image, **4.506 pies (1.255 m)**; 4.49 was the small image's rounding (Pages §5.1).
 
 ### 2.2 The scale (measured)
 
@@ -167,6 +198,12 @@ but the chains and deadeyes is drawn (read).
 **Taken: 11.40 px a pie**, 0.02444 m a pixel, ±0.5% between the three. A point is read to ±2 px
 (±5 cm) where the line is clear, ±5 px where it is crowded (the stern, the forefoot). The sheet is
 1:46 if the catalogue's 107 cm is the image's width (judgement; no scale is written on the sheet).
+**Corrected 2026-11-20:** 11.40 px a pie is the tree's file's. On the larger image (Pages §3.1):
+- the scale bar's 33 division lines fit at **96.08 px a pie** (rms 2.7 px);
+- the body plan's frame is 32.47 pies against the manga's 32½;
+- taken: **96.1 px a pie**, 0.29 cm a pixel, ±2 px on a clear line.
+
+The tree's file is the same sheet at 1/8.43.
 
 ### 2.3 The table against Winfield (read; measured where marked)
 
@@ -203,6 +240,22 @@ half-breadth plan's middle line, judgement). **Her draught is 3.57 m (12.8 pies,
 even keel**: the keel is level on the sheet (y 440 to 442 from x 160 to 1460, measured), so the
 drawing floats her without drag.
 
+**Corrected 2026-11-20** (Pages §3.3, §4.1, §4.2, measured on the larger image):
+- **The line is not level.** It is straight and inclined to the keel by 0.00807 (0.46°), deeper
+  aft, and the three other waterlines are parallel to it. So the sheet draws her trimmed by the
+  stern, with a drag of 0.27 m over her length. The body plan draws each waterline higher on its
+  after half than its fore half, by the same drag. On the small image the line stands at y 301.8 at
+  the stern, 308.8 at midships and 312.8 at the bow, where this note read it level at y 311; the
+  photographed sheet is slightly bowed besides.
+- **Above the rabbet at the midship station** the line stands 11.71 pies, **3.26 m** (was 3.19).
+- **The keel's lower edge** is 1.28 pies (0.36 m) under the rabbet. The line at y 462 is not the
+  half-breadth plan's middle line: it is **a false keel's lower edge, K**, 0.51 m under the rabbet
+  (judgement, by the body plan's keel section, which has the same depths). The rudder's heel and
+  the gripe's foot end on it.
+- **Her draught**: to the keel's lower edge 3.76 m at the post's after face, 3.63 m at the middle and
+  3.49 m at the stem's fore face; to K 3.91, 3.78 and 3.65 m. **Ruled her load line as drawn**, with
+  its drag (the lead, 2026-11-20).
+
 **The check against the table.** The midship section was traced on the body plan's fore half
 (measured; the half-breadths in §2.6): its area under the line is 251 square pies, its midship
 coefficient 0.67, a sharp rising floor with about 21° of deadrise. The table's 497.2 t is 484.6 m³
@@ -216,8 +269,23 @@ usual figure, and only the drawn volume itself, the sections integrated to the l
 them. That is the builder's first measuring task (Design §3.6 task 2), as Research-74's §3.5 did for
 the 74.
 
+**Corrected 2026-11-20: the drawn volume, integrated** (Pages §4.3-§4.5, measured, computed):
+- **At the arrowed line as drawn**: 424.5 m³ moulded, 435.6 t; 441.7 t with the keel, post, stem and
+  gripe; 465.6 to 473.6 t with 3 to 4 pulgadas of plank. Against the table's 498.0 t (at the book's
+  libra) that is −11.3%, −6.5% and −4.9%.
+- **Its coefficients**: block 0.43 and prismatic 0.63 (computed), not 0.48 and 0.72. The midship
+  section's area to the line is 259.7 square pies, 20.16 m², its coefficient 0.68 (not 251 and 0.67).
+- **So the arrow's line and the table do not agree at the drawn line.** The after draught carried
+  level gives the table's figures: 499 t, with the bodies 1.10 to 1 against the table's 1.089
+  (computed). The table was most likely reckoned so (the lead's ruling, 2026-11-20; JUDGEMENT on the
+  reckoning, which no word on the sheet gives).
+- **The plank** was sought in her class's timber regulations and not found. It is taken as 3 to 4
+  pulgadas, JUDGEMENT.
+
 **Her waterline**: 1,407 px from the post's after face (x 123) to the stem's fore face (x 1530) at
-the line, **34.39 m**; 1,373 px between the rabbets, 33.56 m (measured).
+the line, **34.39 m**; 1,373 px between the rabbets, 33.56 m (measured). **Corrected 2026-11-20:**
+11,886.8 px on the larger image between the same faces on the line, **34.47 m** (Pages §4.1); between
+the rabbets not re-measured.
 
 ### 2.5 The profile (measured; x forward of the middle of the waterline, image x 826.5; z above the line, image y 311)
 
@@ -236,6 +304,31 @@ the line, **34.39 m**; 1,373 px between the rabbets, 33.56 m (measured).
 | Hawse holes | Two, (16.70, 2.35) and (16.90, 2.35) | |
 | The rudder | About 0.68 m from the post at the line to 1.0 m at the heel: about 3.0 m² under the line | ±0.3 m² |
 
+**Corrected 2026-11-20** (Pages §5, §6.2, §8; measured on the larger image in the frame of the line
+as drawn, z square to it).
+- **Every z of this table moves by the datum**: −0.26 m at x −18, −0.22 at −15, −0.16 at −10, −0.11
+  at −5, −0.06 at 0, −0.02 at +5, +0.02 at +10, +0.04 at +15, +0.05 at +18; x moves 1 to 3 cm
+  forward (computed). The new points are Pages §6.2's.
+- **The waist rail**: 2.62 m at midships, (−18.82, 3.52) at its after end. Forward of x +13.5 this
+  table followed a head rail's band, not the bulwark rail, which sweeps up to 3.39 m at +16 and
+  3.59 m at +17.3 (the bow's crowding on the small image). The hammock rail: 3.17 m at midships,
+  3.99 at the stern, 4.10 at the bow.
+- **The deck**: 1.33 m at midships, traced along its length; the deck at side is the upper red line
+  of three (JUDGEMENT, Pages §5.2).
+- **The main wale**: a band of three strakes. Its lower edge lies 0.02 m above the line at midships
+  (on it within 2 cm), 1.06 m at x +17 and 0.66 m at −16; its upper edge 0.88, 1.90 and 1.38 m.
+- **The keel**: not level. The rabbet runs −3.40 to −3.15 m and the keel's lower edge −3.75 to −3.51
+  m, with a false keel's lower edge under it at −3.91 to −3.66 m (§2.4's correction).
+- **The stern post**: its after face at (−17.23, 0.00), raked 10.5° to the line's square (not 9.4°);
+  its head (−17.84, 2.94). The counter has a knuckle at (−18.57, 3.20) under an upright upper
+  stern, and the taffrail's top is at (−18.63, 4.03) (identifications judgement, Pages §5.5).
+- **The stem**: its fore face at (17.23, 0.00), its head (17.30, 5.09). The forefoot leaves the keel
+  at x +13.84, not about +15.2.
+- **The head**: the knee runs forward over the body plan's frame to a scroll at about x +20.6, z 3.2
+  to 3.6. "About x +18.7" is where the frame begins on the sheet.
+- **The hawse holes**: (16.72, 2.40), (16.92, 2.40), re-referenced (computed).
+- **The rudder**: 3.0 m² under the line (unchanged); its heel on K.
+
 ### 2.6 The midship section (measured on the body plan's fore half; z above the line, half-breadth outside the plank)
 
 | z (m) | −3.20 | −3.11 | −2.96 | −2.81 | −2.67 | −2.37 | −2.08 | −1.79 | −1.49 | −1.20 | −0.91 | −0.61 | −0.32 | 0.0 | +2.6 |
@@ -243,7 +336,12 @@ the line, **34.39 m**; 1,373 px between the rabbets, 33.56 m (measured).
 
 The greatest half-breadth 4.53 m (the manga's half) lies just above the line; the side is nearly
 upright from there to the rail, with a few centimetres of tumblehome (measured, ±5 cm). The body
-plan's after sections are deeply hollow at the garboard (read).
+plan's after sections are deeply hollow at the garboard (read). **Corrected 2026-11-20** (Pages
+§5.1, §6.2, §6.4):
+- the midship station traced again on the larger image, 21 points, its z 0.07 m lower in the frame
+  of the line as drawn: from (−3.26, 0.09) by (0.00, 4.53) to (2.62, 4.42), 0.11 m of tumblehome;
+- whether its half-breadths are moulded or outside the plank is not on the sheet (JUDGEMENT), where
+  this heading took them as outside it.
 
 ### 2.7 The ports (measured; image ports' bottoms traced; z of the sill above the line)
 
@@ -266,6 +364,19 @@ plan's after sections are deeply hollow at the garboard (read).
   memory, unverified for her), not as scuttles for the berth deck, which lies below the gun deck
   (read). The Danish draught would settle it.
 
+**Corrected 2026-11-20** (Pages §5.7, measured on the larger image):
+- **The sills** above the line as drawn: 2.11, 1.93, 1.82, 1.75, 1.72, 1.72, 1.75, 1.82, 1.91, 2.06
+  and 2.38 m. **The x's**: −13.49, −10.69, −7.81, −4.93, −2.06, +0.80, +3.65, +6.42, +9.37, +12.27,
+  +15.96.
+- **The size**: 0.83 by 0.66 m, the ten broadside ports 2.86 m apart.
+- **The lee port**: the midship sill stands **1.72 m** over a half-breadth of 4.46 m, so the lee port
+  **dips at 21.1°** (computed; accepted by the lead, 2026-11-20). The ends' ports dip later: port 2
+  at 27.1°, port 10 at 28.9°, port 1 at 33.5°.
+- **Above the deck** (the upper red line taken as the deck at side): 0.38 to 0.50 m at ports 1 to 10
+  (computed). These are not low for a carronade: Steel's carronade ports stand 11 in above the
+  plank (Pages §5.2).
+- **The sweep ports** were not re-measured.
+
 ### 2.8 The masts, the bowsprit and the deck (measured)
 
 | | At the deck, x (m) | Rake aft | Heel (z m) | Checks |
@@ -283,6 +394,17 @@ plan's after sections are deeply hollow at the garboard (read).
 - **Inboard**: hatchways in red along the deck; pillars with step-cleats under the main hatch; the
   masts stepped on the keelson; an hourglass-shaped fitting rising above the rail at x +7.05, read
   as the galley's funnel or the capstan (JUDGEMENT).
+
+**Corrected 2026-11-20** (Pages §5.8, §6.2):
+- **The hourglass fitting** is a ship's bell in red, hung in a red frame on a post from the deck, at
+  x +7.14 m. Its mouth stands about 2.5 m and the frame's top about 3.3 m above the line (read,
+  measured). It is read as the ship's bell in its belfry (judgement), not the galley's funnel or the
+  capstan.
+- **The masts in the frame of the line as drawn** (computed, not re-measured):
+  - the fore at the deck at +12.50, its heel at z −1.66;
+  - the main at −2.29, its heel at −2.18;
+  - the mizen at −11.38, its heel at −1.87.
+- **Their rakes** gain 0.5° aft in that frame, and the bowsprit's steeve 0.5°.
 
 ### 2.9 What the plan does not give
 
@@ -310,7 +432,7 @@ ft; extreme breadth 9.06 m, 29.7 ft; the gun deck 124 pies, 113.4 English ft):
 | Luce 1866 ch. VII, the generator's chain for the frigate: the main mast (heel to head) = (LWL + breadth) / 2 = 71.3 ft (21.73 m); the main yard 10/11 of it | **19.76 m** | `tools/gen_ships.py` `frigate()`, read; every spar of hers is then the frigate's times **0.8132** |
 | Falconer 1780, YARD: 0.575 of the gun-deck length below 44 guns | 19.87 m | The generator's docstring, read |
 | Chapman 1781 §30: 0.52 of the length stem to post for frigate-built merchant ships | 17.97 m | read (OCR); the main topsail yard by the same rule 0.79 of it, 14.20 m |
-| Steel 1794's 20-gun column | to read | the page image (§0) |
+| Steel 1794's 20-gun column | to read. **2026-11-20:** 63 ft 0 in, **19.20 m** | the page image (§0). **2026-11-20:** read, vol. I p. 50 (Pages §7) |
 
 Luce and Falconer agree within 0.6%; Chapman, a Scandinavian builder's rule for merchant
 frigates, is 9% shorter (judgement: a Danish naval light frigate is likelier to be lofty than a
@@ -440,7 +562,7 @@ company 167 on the frigate's stations scaled, the frigate's guns moved to her le
 | Her tonnage | Winfield 335 t; the plan's displacement 540 t 691 lb (497 t) | Different measures (§2.3); ask Winfield's rule (§11). **2026-11-19:** the 335 t are toneladas de arqueo, capacity (pp. 41-46); the rule is not given; at the book's libra the displacement is 498 t |
 | Her rate | Winfield and the plan: a corvette; Roos and the 1809 caption: a frigate, "a light frigate" | A Danish light frigate rated by Spain a corvette by her guns and size; both true |
 | Her sailing date | Roos p. 87: command hoisted 6 July, weighed 17 July 1807; Wikipedia: left on 7 July | Roos |
-| Her main yard by rule | Luce 19.76 m, Falconer 19.87 m, Chapman 17.97 m | Luce (the generator's chain), Chapman the check; Steel to read |
+| Her main yard by rule | Luce 19.76 m, Falconer 19.87 m, Chapman 17.97 m | Luce (the generator's chain), Chapman the check; Steel to read. **2026-11-20:** Steel 19.20 m (read, Pages §7), between Luce and Chapman, nearer Luce |
 | The pie | Winfield's metres 0.27863-0.27877 m; the tree's 0.2786 m; the vara de Burgos's third 0.278635 m | Winfield's metres for the book's figures; 0.278635 m for the measured ones |
 
 ## 9. What is open, and whom to ask
@@ -451,7 +573,11 @@ company 167 on the frigate's stations scaled, the frigate's guns moved to her le
   yearbook printed Roos; nothing of the request needs any personal detail.
 - **The plan's own words not read**: the sheet may carry small lettering in the body plan's
   margins (the diagonals' numbers 1 to 5 were read; nothing else) that a larger image would show.
-- **Steel 1794's 20-gun column** on the page image (the builder's step 1).
+  **2026-11-20: read on the larger image.** Nothing more is written on the sheet than the stations,
+  the diagonals' numbers (2 to 5 numbered) and the table. The table's libras are confirmed on the
+  glyphs, and "5" beside the arrow's head is a diagonal's number (Pages §1.2, §2).
+- **Steel 1794's 20-gun column** on the page image (the builder's step 1). **2026-11-20: read**
+  (Pages §7).
 - **The Spanish company's make-up and watches**, the Spanish carronade's and obús's weights and
   shot, and the meaning of Winfield's 335 tons: Winfield's passages (§11).
 - **The 1809 drawing for the tree**: the original (Frederiksborg, inv. no. 3561) is public domain
