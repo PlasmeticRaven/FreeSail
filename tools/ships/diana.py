@@ -265,14 +265,18 @@ DRAUGHT_M = 3.78  # the mean to K (ruling 1; the lead's note of 09:40, item (1))
 DRAUGHT_AFT_M, DRAUGHT_FORE_M = 3.91, 3.65
 DATUM_M = 1.33  # the deck at side at the middle (ruling 5)
 LATERAL_AREA_M2 = 122.2  # the post's after face, K, the knee's fore edge, no rudder (ruling 4)
-GM_M = 1.65  # JUDGEMENT (Dia-D decision 4), tuned: the design's 1.5 (docs/dev/TuningNotes.md)
+GM_M = 1.75  # JUDGEMENT (Dia-D decision 4), tuned: the design's 1.5 (docs/dev/TuningNotes.md)
 CLR_X_M = 2.8  # tuned for her helm: 2.5 to start (docs/dev/TuningNotes.md)
 HULL_SPEED_KN = 11.8
 RUDDER = {"area_m2": 3.0, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 3.9}
 
-# The drawn displacement to her line beside the table's (Pages §4.3, §4.5, computed), tonnes:
-# moulded; with the keel, post, stem and gripe; and outside 3 and 4 pulgadas of plank (JUDGEMENT).
+# The drawn displacement to her line (Pages §4.3, §4.5, computed), tonnes: moulded; with the keel,
+# post, stem and gripe; and outside 3 and 4 pulgadas of plank (JUDGEMENT). Her file's mass is the
+# body as drawn outside the plank at the line as drawn, one figure of that range (the lead's
+# ruling of 2026-11-20, nudge 30): the middle, at 3.5 pulgadas (JUDGEMENT), 469.6 t, filed to the
+# tonne; the table's 498.0 t beside it in her note.
 DRAWN_T = {"moulded": 435.6, "with the keel": 441.7, "3 pulgadas": 465.6, "4 pulgadas": 473.6}
+PLANK_PULGADAS = 3.5
 
 # ---------------------------------------------------------------------------
 # Her masts (Dia-D §4.1; Pages §6.2, re-referenced, computed)
@@ -331,6 +335,7 @@ class Particulars:
     beam_m: float
     depth_m: float
     displacement_kg: float
+    table_kg: float
     main_len_ft: float
     scale: float
     masts: dict
@@ -412,7 +417,9 @@ def particulars():
     check_winfield()
     check_masts()
     check_ports()
-    displacement = round(libras(*TABLE["total"]) * LIBRA_KG, -3)
+    table_kg = round(libras(*TABLE["total"]) * LIBRA_KG, -3)
+    lo, hi = DRAWN_T["3 pulgadas"], DRAWN_T["4 pulgadas"]
+    displacement = round((lo + (hi - lo) * (PLANK_PULGADAS - 3.0)) * 1000.0, -3)
     lwl_ft, beam_ft = LWL_M / FT, BEAM_M / FT
     main_len = (lwl_ft + beam_ft) / 2.0
     hull, notes = hull_block(displacement)
@@ -423,6 +430,7 @@ def particulars():
         beam_m=MANGA_PIES * PIE_M,
         depth_m=PUNTAL_PIES * PIE_M,
         displacement_kg=displacement,
+        table_kg=table_kg,
         main_len_ft=main_len,
         scale=main_len / FRIGATE_MAIN_LEN_FT,
         masts=MASTS,
@@ -462,14 +470,17 @@ HULL_NOTES = {
     "hulls drawn from their draughts file theirs (D29 (b); the lead's note of 2026-11-20, 09:40): "
     "3.91 m at the post's after face and 3.65 m at the stem's fore face. To the keel's lower edge "
     "3.63 m (3.76, 3.49). The engine has no trim: she floats level at the mean.",
-    "displacement_kg": "The plan's table, 540 toneladas 691 libras at 2,000 libras the tonelada "
-    "and the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46): 497,980 kg (computed), "
-    "the table's, kept by the lead's rulings 2 and 3 of 2026-11-20. Drawn to her line (measured, "
-    "computed, Pages §4.3): 435.6 t moulded, 441.7 t with the keel, post, stem and gripe (-11.3%), "
-    "465.6 to 473.6 t outside a plank of 3 to 4 pulgadas (-6.5% to -4.9%), the plank JUDGEMENT, no "
-    "source found (Pages §4.5). The miss is recorded and explained, not closed: the table was most "
-    "likely reckoned on a level line at the after draught (499 t, its bodies 1.10 to 1 against "
-    "the table's 1.089; ruling 3, JUDGEMENT), not at the line she is drawn floating at.",
+    "displacement_kg": "Her body as drawn, outside the plank, at her line as drawn (the lead's "
+    "ruling of 2026-11-20, nudge 30, for every hull drawn from her plan): every other figure of "
+    "her file, her draught, her breadth at the water, her lateral area, is reckoned to that line. "
+    "Drawn to it (measured, computed, Pages §4.3): 435.6 t moulded, 441.7 t with the keel, post, "
+    "stem and gripe, 465.6 to 473.6 t outside a plank of 3 to 4 pulgadas, the plank JUDGEMENT, no "
+    "source found (Pages §4.5); the middle of that range taken, at 3.5 pulgadas (JUDGEMENT). "
+    "Beside it, the plan's table: 540 toneladas 691 libras at 2,000 libras the tonelada and the "
+    "book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46), 498.0 t (computed), most likely "
+    "reckoned on a level line at her after draught (499 t, its bodies 1.10 to 1 against the "
+    "table's 1.089: the lead's ruling 3, JUDGEMENT), not at the line she is drawn floating at; "
+    "filed until nudge 30.",
     "gm_m": "JUDGEMENT: her captain's 'stiff' (Meyer's report, Roos 1957 p. 94: Dia §6), set so "
     "that under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 (Dia-D "
     "§9, decision 4; truth C), the frigate's 1.3 m scaled by her breadth heeling her half again "

@@ -110,6 +110,7 @@ her.PORTS[5][1] = 1.72
 out["notes"] = {k: her.HULL_NOTES[k] for k in ("gm_m", "clr_x_m")}
 p = her.particulars()
 out["displacement"] = p.displacement_kg
+out["table_kg"] = p.table_kg
 out["length"] = round(p.length_m, 3)
 out["beam"] = round(p.beam_m, 3)
 out["depth"] = round(p.depth_m, 3)
@@ -145,8 +146,9 @@ def _probe(code, *args):
 def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_path):
     """`build()` raises the checks of Dia-D §1.3 before her file is written and prints the
     generator's report (the lead's notes of 2026-10-29, item 2): her hull as drawn, 448 t against
-    the filed 498 t (-10%, recorded and not moved: her table reckoned on a level line at the after
-    draught, the lead's ruling 3), drawn 3.26 m deep at the greatest section to the rabbet against
+    the filed 470 t (-5%, recorded and not moved: the filed figure her measuring's body outside 3.5
+    pulgadas of plank, the lead's ruling of nudge 30; 498 t, the table's, before it), drawn 3.26 m
+    deep at the greatest section to the rabbet against
     her draught of 3.78 m to K; ports 1 to 10 within 0.05 m of the drawn side at their sills (her
     body plan's readings at the sills being among her sections) and the bow port's half-breadth,
     JUDGEMENT, 0.24 m outside it, reported; her plain sail and her rope's scale; Luce's chain on her
@@ -155,7 +157,7 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     said = _probe(REPORT_PROBE, str(tmp_path)).stderr
     assert (ROOT / HER).read_bytes() == (tmp_path / Path(HER).name).read_bytes()
     drawn = "corvette-20: the hull as drawn (freesail/ship/form.py):"
-    assert f"{drawn} drawn displacement 448 t against the filed 498 t (-10%)." in said
+    assert f"{drawn} drawn displacement 448 t against the filed 470 t (-5%)." in said
     assert f"{drawn} drawn 3.26 m deep at the greatest section (x 1.26)" in said
     assert (
         "off the half-breadth by +0.00, -0.02, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, "
@@ -518,16 +520,19 @@ def test_her_rank_is_a_frigates_at_the_rigs_distance_and_the_brig_sloops_made_ou
 def test_truth_7_660_her_particulars_hold_her_sources(doc):
     """Package 90, her builder (Dia-D §14, truth A), drafted in `tests/test_diana.py`. Her plan's
     table, 124 by 32 1/2 by 16 pies, is 34.55 by 9.06 by 4.46 m at the book's pie, and its 540
-    toneladas 691 libras 498.0 t at its libra; she floats at 3.78 m, the mean to K on the arrowed
-    line as drawn, 3.91 m aft and 3.65 m forward (the lead's ruling 1); her lateral area the
+    toneladas 691 libras 498.0 t at its libra, recorded beside her mass; she floats at 3.78 m, the
+    mean to K on the arrowed line as drawn, 3.91 m aft and 3.65 m forward (the lead's ruling 1),
+    her mass the body drawn to that line outside the plank, 465.6 to 473.6 t at 3 to 4 pulgadas,
+    the middle filed, 470 t (the lead's ruling of nudge 30; Pages §4.3); her lateral area the
     measured 122.2 m2 (ruling 4); her waterline 34.47 m; eleven ports a side at the plan's sills
-    (Pages §5.7); her four fits by date. Her module's particulars give the metres and the mass
-    from the table's own units, and her file the rulings' figures."""
+    (Pages §5.7); her four fits by date. Her module's particulars give the metres and the table's
+    mass from the table's own units, and her file the rulings' figures."""
     got = json.loads(_probe(MODULE_PROBE).stdout)
     assert [round(got[k], 2) for k in ("length", "beam", "depth")] == [34.55, 9.06, 4.46]
-    assert got["displacement"] == round((540 * 2000 + 691) * LIBRA_KG, -3) == 498000.0
+    assert got["table_kg"] == round((540 * 2000 + 691) * LIBRA_KG, -3) == 498000.0
+    assert got["displacement"] == round((465.6 + 473.6) / 2.0, 0) * 1000.0 == 470000.0
     hull = doc["hull"]
-    assert hull["displacement_kg"] == 498000.0
+    assert hull["displacement_kg"] == 470000.0
     assert hull["draught_m"] == 3.78 and hull["length_waterline_m"] == 34.47
     assert hull["beam_m"] == 9.06 and hull["lateral_area_m2"] == 122.2
     (x0, z0), (x1, z1) = hull["profile"]["keel_m"]
@@ -541,7 +546,7 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
     of 1807, Meyer: 10 to 11 knots with the wind two or three points abaft the beam in a fresh
     breeze (Roos 1957 p. 94: Dia §6). With the wind 112 to 124 degrees off in 24 to 27 knots, under
     the sail her book carries in that wind (a King's ship's: plain sail below `shorten_sail_kn`,
-    30), she makes 9.5 to 11.5 knots: measured 10.28 to 11.28."""
+    30), she makes 9.5 to 11.5 knots: measured 10.28 to 11.29."""
     from tests.test_known_truths import knots, under_plain_sail
 
     for wind_kn, off in ((24.0, 124.0), (25.0, 118.0), (27.0, 112.0)):
@@ -552,7 +557,7 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
 def test_truth_7_662_she_is_stiff_as_her_captain_said():
     """Package 90, her builder (Dia-D §14, truth C), drafted in `tests/test_diana.py`. Close-hauled
     and abeam under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 does
-    (measured at her GM of 1.65: 8.12 against 7.34 degrees close-hauled, 1.11; 12.62 against
+    (measured at her GM of 1.75: 8.10 against 7.34 degrees close-hauled, 1.10; 12.61 against
     11.30 abeam, 1.12), and her midship lee port stays open (it shuts at 18.5 degrees: truth
     7-665)."""
     from tests.test_known_truths import reading, under_plain_sail
@@ -567,7 +572,7 @@ def test_truth_7_662_she_is_stiff_as_her_captain_said():
 def test_truth_7_663_she_steers_well():
     """Package 90, her builder (Dia-D §14, truth D), drafted in `tests/test_diana.py`. Meyer's
     "steers splendidly": close-hauled in 15 knots she carries 0.5 to 3 degrees of weather helm,
-    abeam 1 to 3 (measured at her `clr_x_m` of 2.8: 0.80 and 2.02, the frigate-36's 1.31 and
+    abeam 1 to 3 (measured at her `clr_x_m` of 2.8: 0.82 and 2.02, the frigate-36's 1.31 and
     1.99)."""
     from tests.test_known_truths import reading, under_plain_sail
 
@@ -580,8 +585,8 @@ def test_truth_7_663_she_steers_well():
 def test_truth_7_664_she_goes_about_as_a_small_ship_does():
     """Package 90, her builder (Dia-D §14, truth E), drafted in `tests/test_diana.py`. She tacks
     from 290, 292.5 and 295 degrees and wears, as truths 10 and 11 put the frigate about: tacked in
-    197, 212 and 218 s (measured), each through stays in about a minute and a half and settled on
-    the new tack at once, losing 15, 31 and 42 m; she wears in 492 s (truth 11's 360 to 720). Her
+    206, 215 and 216 s (measured), each through stays in about two minutes and settled on the new
+    tack at once, losing 28, 42 and 46 m; she wears in 492 s (truth 11's 360 to 720). Her
     tack's band is her own, three to ten minutes (JUDGEMENT, for the lead): truth 10's floor, 285
     s, is Luce's five minutes for a frigate of 42 m, which spends most of hers griping up on the new
     tack with too little way for her helm; her design asked her helm and rudder tuned to it (Plan
