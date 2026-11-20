@@ -1168,13 +1168,16 @@ def _speakers(world: Any, data: dict[str, Any]) -> list[Any]:
         if aboard:
             return at[0] == "aboard" and at[2] == ("quarterdeck" if place == "deck" else place)
         if place == "shore":
+            port_of = (getattr(ports, "ports", None) or {}) if ports is not None else {}
             if at[0] in ("boat", "cutter"):
-                # a man in a boat off his port is said 'ashore at <port>' (`_say_as`)
-                at = ("ashore", str(getattr(p, "port", "") or ""), "")
+                # a man in a boat off his port is said 'ashore at <port>' (`_say_as`): his
+                # by that port's name, and no other's
+                port = port_of.get(str(getattr(p, "port", "") or ""))
+                name = str(getattr(port, "name", "") or "")
+                return bool(name) and where.startswith("ashore at ") and name in where
             if at[0] != "ashore":
                 return False
-            port = (getattr(ports, "ports", None) or {}).get(at[1]) if ports is not None else None
-            name = str(getattr(port, "name", "") or "")
+            name = str(getattr(port_of.get(at[1]), "name", "") or "")
             return not where.startswith("ashore at ") or not name or name in where
         return at[0] == place  # in a boat
 

@@ -185,6 +185,11 @@ def test_truth_7_709_ashore_by_his_place_aboard_another_ship_by_his_hull_and_no_
     master.where, master.ashore_at = "boat", ""
     pearce.role, pearce.ashore_at = master.role, "market"
     assert not d.hears(e) and not con.hears(e)
+    # ...and the master back beside the player at the market, the namesake of his trade in
+    # the boat with no port: the boat is no port's, and the master's word is the player's
+    master.where, master.ashore_at = "shore", "market"
+    pearce.where, pearce.port, pearce.ashore_at = "boat", "", ""
+    assert d.hears(e) and con.hears(e)
     pearce.role = "first lieutenant"
     # a model holding the captain's station: the list is his, and it names him or not
     for p in (cap, master):
