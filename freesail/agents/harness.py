@@ -171,7 +171,6 @@ from freesail.agents.agent import (
     MASTER,
     MASTER_BRIEF,
     OFFICER,
-    OFFICER_BRIEF,
     OPT_OUT_TOKEN,
     OPTED_OUT,
     ORDERS_PER_TURN,
@@ -1255,7 +1254,9 @@ class Harness:
             brief = VISITOR_BRIEF.format(person=PERSON_WORDS)
         elif (st.name == OFFICER or kind == OFFICER) and st.domain is not None:
             # the person by the code's words, the names in the situation (package 117)
-            brief = OFFICER_BRIEF.format(person=PERSON_WORDS)
+            from freesail.agents.agent import officer_brief
+
+            brief = officer_brief(self.world)  # the Regulations only where they bind her
         elif kind == PASSENGER and st.domain is not None and st.domain != VISITOR_DOMAIN:
             from freesail.world.seats import VOICE_BRIEF, voice_where
 
@@ -2431,10 +2432,17 @@ class Harness:
         if told:
             return
         a.report_duty_told = True
+        from freesail.world.service import under_the_regulations
+
+        # the Regulations named only where they bind her (package 121)
+        given = (
+            "the Regulations give you his strange sails and his shifts of wind to report"
+            if under_the_regulations(self.world)
+            else "his strange sails and his shifts of wind are yours to report"
+        )
         a.notices.append(
-            "The captain is below; the Regulations give you his strange sails and his "
-            "shifts of wind to report: 'say to the captain ...', or 'call the captain: "
-            "<why>' when the ship is in danger or by night, which wakes him."
+            f"The captain is below; {given}: 'say to the captain ...', or 'call the "
+            "captain: <why>' when the ship is in danger or by night, which wakes him."
         )
 
     def _commander_notice(self) -> None:

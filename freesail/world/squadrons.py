@@ -1648,6 +1648,8 @@ def _covered(world: Any, prey: Any) -> bool:
     for o in world.vessels.vessels:
         if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
             continue
+        if o.id == PLAYER_ID:
+            continue  # her own shadow: by her service below, not by her hull's word (pkg 121)
         brain = getattr(o, "brain", None)
         role = getattr(brain, "role", "") if brain is not None else ""
         if (
@@ -1661,9 +1663,12 @@ def _covered(world: Any, prey: Any) -> bool:
     ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
-        from freesail.world.captains import _is_kings_ship
+        from freesail.world.service import KINGS, service_of
 
-        if R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM) and _is_kings_ship(world):
+        # the King's ships protect the trade; a privateer by her papers was not in that
+        # business (`service_of`; package 121)
+        covering = service_of(world) == KINGS
+        if covering and R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM):
             return True
     return False
 
