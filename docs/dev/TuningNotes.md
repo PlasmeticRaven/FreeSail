@@ -38329,4 +38329,22 @@ Each from this worktree's root, one at a time, its junit kept in the session's s
 
 The fast and slow tiers whole are the session's, on the commit.
 
-Built by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).
+Built by the stage-0 builder; passed by an independent checker (the plan's §5.3), whose mends are in 43962916.
+
+## Package 90, N1: the Spanish names list (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6, row N1: a `spanish` list in `data/crew/names.yaml`, for the people of the package's Spanish ships by their files' `names: spanish` (`docs/design/Design-Ship-Diana.md` §17.1 question 6; the owner's Part E, "a Spanish names list for her people"). No committed ship file names the list, so nothing sails, fights or is mustered otherwise; Spain's row in `data/nations.yaml` keeps `names: english` (the recruits of a Spanish port are drawn from it, as before).
+
+**The source** (stated at the list's head): the Instituto Nacional de Estadística's tables as served on 2026-11-20, "Frecuencias de apellidos" (the annual population census at 1 January 2025) for the 244 surnames, its first 250 by rank less two of a modern immigration and four of more than one word; and "Nombres más frecuentes por fecha de nacimiento" (the Padrón continuo at 1 January 2022), the men born before 1930, the nation's fifty and each province of birth's twenty, for the 68 given names, one name to a man, the Catalan forms in their Castilian, less nine names taken for later fashions. A modern table for a list of the period is JUDGEMENT, said there.
+
+### Pins moved, old beside new
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_crew_model.py::test_the_name_lists` | the lists are `english`, `american` and `french` | the lists are `english`, `american`, `french` and `spanish`; the Spanish held to the frigate's floor (60 given names, 200 surnames: it has 68 and 244), unique and trimmed as the others | the new list. Not named by the plan's §6 or §10.4 for N1 ("none"), which missed that this test pins the set of lists |
+
+**Added:** `tests/test_crew_model.py::test_a_company_is_drawn_from_the_spanish_list_in_full`: the seventy-four's crew section, told `names: spanish`, musters her whole company from the list, every man's name his own, each written in full.
+
+**Found, outside N1's files, for the coordinating session:** `freesail/world/nations.py`'s `NAMES_TO_NATION` gives the nation a ship belongs to by her list where the scenario gives none (`Dealings.ship_nation`), and has no `spanish` row, so a ship drawn from the Spanish list with no nation given would be taken for Britain's (the table's default). Nothing reads the list yet, so nothing is wrong today; the row is wanted before the first file that names the list. Not mended here (the stop rule).
+
+Moved by the *Diana*'s builder; to be passed by a reader other than the one who moved it.
