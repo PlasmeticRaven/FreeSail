@@ -155,8 +155,9 @@ nations:
     signals: {root: spain, system: well-built}
     # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
     # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
-    # the share aloft); the detachment itself is the ship file's
-    marines: {kit: basic}
+    # the share aloft); the detachment itself is the ship file's. Package 90 (N3, the lead's
+    # follow-up of nudge 25): the Spanish navy's own kit, its figures the basic kit's
+    marines: {kit: spanish}
     # package 72 (spec M7 §22): the Spanish keep port with the French
     naval:
       keeps_the_sea: false

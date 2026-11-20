@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 12:55 UTC (N2, THE CORSAIR, IS SETTLED BY THE OWNER AND LEAVES YOUR CARD: a package of its own under the lead in the career's milestone; the polacre's and the xebec's corsair fits held for it; their hulls and other fits still yours). Nudge number: 28.
+Latest note: 2026-11-20, 14:10 UTC (YOUR HASH 8b8a982d IS MERGED at 3a0e3d83; TRUTH NUMBERS 7-720 TO 7-749 ARE YOURS; THE THREE-DECKER'S RULINGS, and displacement_kg FOR HER AND THE DIANA ALIKE: the body as drawn outside the plank at the line as drawn). Nudge number: 30.
