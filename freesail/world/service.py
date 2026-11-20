@@ -29,6 +29,7 @@ Read from the state the World already has; nothing is drawn, written or logged.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     "SERVICE_ROLE",
     "free_intent_role",
     "papers_service",
+    "regulations_said",
     "service_of",
     "service_role",
     "service_word",
@@ -168,6 +170,16 @@ def _papers_service(world: Any) -> str | None:
     if given is None:
         return None
     return service_word(given)
+
+
+def regulations_said(world: Any, words: str) -> str:
+    """Words of the wardroom's file as her service binds them (package 121): the file cites
+    the Regulations for each officer's duty, "(the Regulations, the Lieutenant, art. IV)";
+    where they do not bind her (a privateer or a merchantman on a King's ship's file) the
+    citations are not said, and the duty is."""
+    if world is None or "the Regulations" not in words or under_the_regulations(world):
+        return words
+    return re.sub(r"\s*\((?:judgement on )?the Regulations[^()]*\)", "", words)
 
 
 def service_word(given: Any) -> str | None:

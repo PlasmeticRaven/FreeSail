@@ -38528,3 +38528,76 @@ What turns it is the count of ordinary seamen in her starboard fore top. Single 
 **Not moved:** no other recorded passage in either tier, and nothing of the razee's.
 
 **Read.** Every pin above moved by the package's builder and passed by an independent reader, told to check that no assertion was weakened. The reader mustered all eighteen files at two seeds under the old rule and the new and compared every hand's every field. They broke ruling 11 three ways (posts never counted, always counted, the boat's hands counted on board): each re-made `test_hands` case failed where its name says it turns. Truths 7-630 and 7-700 to 7-704 each failed with the old rule restored, and 7-703 failed with `too_few: all hands` taken out of `data/evolutions/let_go_anchor.yaml`. One finding, mended before the hash was reported: the jib from the gear's hands, an exact list in the old test, had been pinned only by their count and the last name; both watches' lists are exact again.
+
+## Package 121: her service is her papers' (2026-11-20)
+
+**The fault (the owner's).** A frigate given `papers: {service: privateer}` in the harbour's maker still read "a King's ship" to the officer and the director: `readings.ship_words` judged her service by her captain's role or her wardroom (`service._is_kings_ship`), never by `service.service_of`, which reads her papers first. THE RULE (the lead's ruling): her papers answer first wherever the game asks or says what service she is of; her captain's role answers where they say nothing; a prize-master stays by his role.
+
+**The table as built.**
+
+| site | before | now |
+|---|---|---|
+| `readings.ship_words` | her role, else her wardroom | `service_of`: the prize-master by his role; the role's own merchant word (packet, fisherman, revenue, Indiaman) only where she is a merchantman; "the convoy's escort" only for a King's commodore; "H.M." only for a King's ship |
+| `regimes._enemy_men_of_war_near` (the blockade) | the player's ship by her hull's word and her role | `service_of == KINGS` alone; her own shadow is not counted by its description in the loop (it had been, as "frigate") |
+| `squadrons._covered` (the cover of the trade) | likewise | `service_of == KINGS` alone; her shadow likewise left to her service |
+| `ships.player_shadow`, the brig-sloop's look | her wardroom | a merchantman by `service_of` is the "merchant brig"; a privateer keeps the brig-sloop's armed look (ruling ii) |
+| `captains.role_for`, a free intent (home, a passage, free) | her wardroom, else a merchantman | `service.free_intent_role`: her papers alone, else her wardroom, else a merchantman (the captain is not asked: he is being made) |
+| `hail.hail_order`, the hail she makes | her captain's role, else "kings-ship" | `service.service_role`: her captain's role, else her service's |
+| `hail.answer_by_table`, the answer her own ship gives | her captain's role, else a merchantman's | her captain's role, else her service's |
+| `hail._heave_to`, whom a neutral obeys | a King's ship's role, or the player's ship whatever her service | her papers first: a King's ship or a privateer is obeyed, a merchantman by her papers is run from; papers silent, as before with the privateer's role added (a letter of marque carried the right to bring to and examine) |
+| `agent.officer`, the officer's brief | "what the Regulations gave the lieutenant to report" on every ship | `agent.officer_brief`: said only `under_the_regulations`; else "what the officer of the watch reports to him" |
+| `harness`, the captain-below notice | "the Regulations give you his strange sails..." | said only `under_the_regulations`; else "his strange sails and his shifts of wind are yours to report" |
+| the wardroom's outlines (`agent.station_outline`, `people.wardroom_lines`, `people.where_is`) | the file's citations "(the Regulations, the Lieutenant, art. IV)" on every ship | `service.regulations_said`: the citations not said where the Regulations do not bind her; the duty is |
+| `scenarios.load`, `papers: {service: ...}` | a word the game did not know passed by in silence, her wardroom answering | refused in words ("... is no service; say kings, privateer or merchant"); every shipped scenario and test file loads |
+| `client/harbour.html`, "Her service" | the label alone | a line saying what the service changes and that her people stay the chosen ship's |
+| `orders/prompt._sentence`, "The ship: The ship:" | the heading doubled where the reading heads itself | headed once |
+
+**Item 7's sweep: every sentence telling a station the Regulations bind her or that she is in His Majesty's service.**
+
+| where | the words | now |
+|---|---|---|
+| `agents/agent.py`, `OFFICER_BRIEF` | "Report to the captain what the Regulations gave the lieutenant to report" | said only where they bind her (above) |
+| `agents/harness.py`, the captain below | "the Regulations give you his strange sails and his shifts of wind to report" | said only where they bind her (above) |
+| `data/people/*.yaml` (frigate-36, razee-44, sixty-four, seventy-four, brig), the outlines' citations | "(the Regulations, the Master, art. I to XXIX)" and the like, to every station handed the wardroom | not said where they do not bind her (above); the file's words not changed |
+| `combat/marks.py`, the exercise allowance | "... by the Regulations, the Gunner, Art. XXI" | already `under_the_regulations` alone (no allowance otherwise) |
+| `world/ordnance.py`, the purchase of necessity | "a captain is charged not to purchase stores without an absolute necessity (the Regulations)" | already `under_the_regulations` alone (`bound`) |
+| `world/ordnance.py`, the roads and the galley fire | "(the Regulations, the Gunner, Art. VI)", "Art. V" | already the Ordnance's issue alone, which is a King's ship's |
+| `world/places.py`, the sail room and the sick berth | "(judgement on the Regulations' sailmaker ...)" | left: a place's description citing its source, telling no station she is bound |
+| `data/captains/kings-ship.yaml`, `cruiser.yaml`, `commodore.yaml`, `data/signals/britain/*` | the King's ship's book and table | already by those roles alone |
+| `data/captains/revenue.yaml`, `data/evolutions/*`, `data/ports/*`, `data/director/aboard.yaml`, `data/nations.yaml`, `data/business.yaml`, `data/crew/ration.yaml` | `source:` fields and comments | sources, not served as sentences |
+| `world/court.py` | "is dismissed His Majesty's service for the loss of the {ship}" | a finding (below), not mended |
+| `data/ports/plymouth.yaml`, `portsmouth.yaml`, the yard's notes | "by demand on the yard (the Regulations of 1806 ...)" | with the King's yard's demand, a finding (below) |
+
+**What moved.** One pin, and the reason is the mend:
+
+| test | old | new |
+|---|---|---|
+| `tests/test_captive.py::test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_his_prompt_with_him` (and truth 7-355, which plays it) | `w.submit("the ship").text.startswith("The ship: The ship: Medusa")` | `... .startswith("The ship: Medusa")`: the heading once (item 10) |
+
+Two failures of the first fast run were the build's, mended before the hash and not pins: `test_harbour.py::test_the_keys_the_proof_takes_for_the_loaders_are_the_keys_the_loader_reads` read `papers_raw["service"]` in the loader as a key of the file (the loader now reads the word once into `given_service`); and `test_subtypes.py::test_a_revenue_cutter_answers_a_hail_as_the_customs_cruiser_and_heaves_to_for_a_kings_ship`, where the first build ran a neutral from the player's role-less cutter (no papers, no wardroom) as from a merchantman; the ruling's words are "not a merchantman by papers", and with papers silent the player's ship is obeyed as before. `test_replay.py`'s fingerprint test failed once because the tree changed under it during the run, and passes. No recorded passage moved.
+
+**The truths.** Each goes by the scenario door (`write_scenario`, `load_scenario`, `make_scenario_world`, as the harbour's maker writes) and the player's or the stations' roads (`w.submit`, `tools.submit_order`, `agent.officer`), and each was shown to fail with its mend out:
+
+| truth | pins | its mend out |
+|---|---|---|
+| 7-710 | the ship's words at the prompt, the officer's door and the director's: "a King's ship", "a privateer", "a merchantman" of Britain by the papers; headed once; the shipped merchant ship "a merchantman of the United States" | `readings.py` restored: "a King's ship" under a privateer's papers; `prompt.py` restored: "The ship: The ship:" |
+| 7-711 | a French frigate in Plymouth Sound counts as an enemy man of war near for the blockade, and a British merchant brig is covered, under none or a King's papers only | `regimes.py` restored: counted for the privateer; `squadrons.py` restored: covered by the privateer |
+| 7-712 | a free intent ("bound for Falmouth") gives kings-ship, kings-ship, privateer, merchant for none, kings, privateer, merchant | `captains.py` restored: kings-ship for the privateer |
+| 7-713 | her hail; a Danish brig hailed to heave to obeys a King's ship and a privateer and makes sail from a merchantman by papers; her own ship's answer is the privateer's, or "His Majesty's" with none | `hail.py` restored: the merchantman's answer for the King's ship with none |
+| 7-714 | the officer's brief and the wardroom's outlines cite the Regulations only for the King's ship; the brig's look is the brig-sloop for none and the privateer, the merchant brig for the merchantman | the brief's condition out: the Regulations' words to the privateer; `regulations_said` out: the captain's outline cites them to the privateer; `ships.py` restored: the brig-sloop for the merchantman |
+
+**`captains.py`.** Two lines and the import, against the ruling's one: the free-intent branch's condition kept and its return made `free_intent_role(world)` (one line), and its comment (the second); the import `from freesail.world.service import free_intent_role` at the top.
+
+**Measured, not built: `flags.world_role` by her service.** FLAGS_MEASURED
+
+**Findings (not built).**
+- `signals.table_of` gives no table to a King's ship, by her papers or her wardroom, whose captain has no role (ruling iii).
+- `flags.world_role` reads her captain's role and the papers' private signals alone: the plain role-less King's frigate wears the merchant's colours (measured above). And `flags.ROLE_OF_CAPTAIN` gives the revenue cutter a pendant while `service.ROLE_SERVICE` names her a merchantman.
+- The King's yard's demand (`dealings.py`, about :2340 to :2450, and the yards' notes in `data/ports/plymouth.yaml` and `portsmouth.yaml`) supplies on the captain's demand with no service asked: a privateer or a merchantman draws on the King's yard.
+- The court martial (`court.py`) asks no service: "dismissed His Majesty's service" is said of a privateer's or a merchantman's captain.
+- `MAN_OF_WAR_WORDS` judges by the hull's description; `reckoning._ship_of_war` by her marines; `data/crew/ration.yaml`'s navy table by the ship file. Each left.
+- The captain's brief names "the King's ships' table": it describes the order, and is left.
+
+**The wardroom's package (ruling iv), half a page.** Her people are her ship file's: `data/people/<stem>.yaml` is bound by the ship file's stem, so a privateer or a merchantman on the frigate's file keeps a post-captain, three sea officers holding the King's commission, a master and warrant officers by the Navy Board's establishment, a lieutenant and the Royal Marines, and a history of "H.M." ships. The harbour page says so now. A privateer's or a merchantman's own wardroom needs: (1) ship files of their own, made by `tools/gen_ships.py` from the King's ship's hull (a privateer frigate or brig: the hull and rig the same, the complement, the guns and the stores her owners' — no marines; a letter-of-marque merchantman lighter in guns and men), so the stem differs and the people file binds; (2) `data/people/<new stem>.yaml`: for a privateer a captain by courtesy who is the owners' commander, lieutenants and prize-masters by the owners' articles, a master, a surgeon and a gunner of the owners' hiring, no marines and no purser of the Victualling Board, and outlines citing the articles of agreement and the letter of marque instead of the Regulations; for a merchantman a master, a mate or two, a carpenter and a boatswain, the outlines citing the articles and the custom of the trade; (3) the harbour offering them: the ship list by her file, and the service line naming the file that fits her papers (and saying, as now, that she keeps the people of the file chosen otherwise). The readers this package mended read her service already, so nothing here need change with the new files; the wardroom file's citations would stop needing `regulations_said`.
+
+**Read.** READER_LINE

@@ -23509,9 +23509,11 @@ def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps
     """No station of a ship the Regulations do not bind is told they do: the officer of the
     watch of the frigate under a privateer's or a merchant's papers is told to report to the
     captain 'what the officer of the watch reports to him', and with none 'what the Regulations
-    gave the lieutenant to report'. And another ship's lookout sees the brig under a merchant's
+    gave the lieutenant to report'; the wardroom's outlines, her people's duties from the
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout sees the brig under a merchant's
     papers as the merchant brig, and under a privateer's as the brig-sloop she looks (armed,
-    full of men). OLD: the Regulations' words under all three papers; the brig under either
+    full of men). OLD: the Regulations' words under all three papers, in the brief and in the
+    outlines; the brig under either
     papers the brig-sloop."""
     from freesail.agents import agent
 
@@ -23521,6 +23523,13 @@ def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps
         assert (agent.REGULATIONS_REPORT in brief) is bound, service
         assert (agent.PLAIN_REPORT in brief) is not bound, service
         assert "Regulations" not in brief or bound, service
+        # her people stay the frigate's file's: their duties said, the Regulations cited
+        # only where they bind her
+        captain = agent.station_outline(w, agent.CAPTAIN)
+        assert "her people and her orders are his" in captain, (service, captain)
+        assert ("the Regulations" in captain) is bound, (service, captain)
+        lines = " ".join(w.people.wardroom_lines())
+        assert ("the Regulations" in lines) is bound, service
     looks = {None: "brig-sloop", "privateer": "brig-sloop", "merchant": "merchant brig"}
     for service, look in looks.items():
         w = _papered(

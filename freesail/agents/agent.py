@@ -1517,9 +1517,12 @@ def station_outline(world: Any, station: str) -> str:
     if found is None:
         return ""
     try:
-        return str(found.outline_words())
+        words = str(found.outline_words())
     except Exception:
         return ""
+    from freesail.world.service import regulations_said
+
+    return regulations_said(world, words)
 
 
 def officer(
