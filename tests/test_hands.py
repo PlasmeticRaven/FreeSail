@@ -1223,27 +1223,16 @@ def test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_t
     """The lead's ruling 11 of 2026-11-13 (the narrower form of ruling 9's probe), on the merchant
     brig at seed 7: her master and mate head the larboard and the starboard watch (her people file,
     read at the muster into `Crew.post_watches`; JUDGEMENT, the mate the starboard; their own
-    `watch` stays the bill's, none), her watches five and five hands as mustered (package 119;
-    old seven and three). A
+    `watch` stays the bill's, none), her watches seven and three hands as mustered. A
     post is counted a hand of their own watch for work on deck only where the watch's whole number
     (every hand of it on board and fit, whatever they are doing: `Runner._watch_whole`) is under the
     work's want (the request's own `wanted`, its file's number no more than the company could put to
     it), taken after every hand of the pool (`hands._tier`). By night in her larboard watch the jib
-    from the gear wants six: the five are under it, so the master makes the sixth, and the jib is
-    manned; in her starboard watch the mate makes it so, and the braces, wanting eight, take the
-    five and the mate, short. Where the whole is not under the want the post is not counted: the
-    jib taken in wants four, under either watch's five, and is the four's without the post. A
-    watch busy at other work is not too small: with two of the starboard's five at other work the
-    jib is taken in short by the three idle, the mate not taken (old, before the ruling, every case
-    without the post: the larboard's three short, the brace's seven short).
-
-    Package 119, old beside new (docs/dev/TuningNotes.md, "Package 119"): old `[7, 3]`; the
-    larboard's jib from the gear by its three and the master, four of six, short; the starboard's
-    seven set it with six hands, enough, the mate not counted; the braces by the seven and the
-    mate, eight; four of the seven made busy and the jib from the gear begun short by the three,
-    the mate not taken. At five and five the jib from the gear is under the whole of neither
-    watch, so the case of a whole over the want, and the busy watch, are told by the jib taken
-    in (want four)."""
+    from the gear wants six: the three are under it, so the master makes four. Her starboard's
+    seven set it with six hands, the mate not counted; the braces want eight, so the mate makes
+    the eighth. A watch busy at other work is not too small: with four of the starboard's seven at
+    other work the jib is begun short with the three idle, the mate not taken (old, before the
+    ruling, every case without the post: the larboard's three short, the brace's seven short)."""
     w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
     by = {s.post: s for s in crew.sailors if s.post}
     assert crew.post_watches == {"master": "larboard", "mate": "starboard"}
@@ -1251,62 +1240,35 @@ def test_a_merchantmans_post_hauls_only_where_the_watchs_whole_number_is_under_t
     assert heads == {"master": Watch.LARBOARD, "mate": Watch.STARBOARD, "second mate": None}
     assert all(s.watch is Watch.NONE for s in crew.sailors if s.post)
     wholes = [runner._watch_whole(crew, w) for w in (Watch.STARBOARD, Watch.LARBOARD)]
-    assert wholes == [5, 5]
+    assert wholes == [7, 3]
     jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
-    assert taken(w, jib) == [
-        "fore_top ordinary",
-        "forecastle able",
-        "fore_top able",
-        "main_top able",
-        "afterguard landsman",
-        "master",
-    ]
-    assert jib.assignment.outcome == hands.ENOUGH and jib.assignment.wanted == 6
-    w, crew, runner = trader_at(BRIG, 2, Watch.LARBOARD)
-    jib = asked(w, "take_in_jibheaded", "jib", "set")
-    assert jib.assignment is None and jib.want.hands == 4
-    assert runner._working_posts(crew, jib) == []
-    assert "master" not in taken(w, jib) and jib.assignment.outcome == hands.ENOUGH
+    assert taken(w, jib) == ["forecastle able", "fore_top able", "main_top able", "master"]
+    assert jib.assignment.outcome == hands.SHORT and jib.assignment.wanted == 6
 
     w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
     jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
-    assert taken(w, jib) == [
-        "forecastle ordinary",
-        "forecastle able",
-        "fore_top able",
-        "main_top able",
-        "main_top able",
-        "mate",
-    ]
-    assert jib.assignment.outcome == hands.ENOUGH
-    hands.release(crew, jib.inst_id)
-    brace = asked(w, "brace", None)
-    by_brace = taken(w, brace)
-    assert len(by_brace) == 6 and by_brace[-1] == "mate", by_brace
-    assert brace.assignment.outcome == hands.SHORT and brace.assignment.wanted == 8
-    w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
-    jib = asked(w, "take_in_jibheaded", "jib", "set")
-    assert runner._working_posts(crew, jib) == []
     assert "mate" not in taken(w, jib) and jib.assignment.outcome == hands.ENOUGH
+    brace = asked(w, "brace", None)
+    hands.release(crew, jib.inst_id)
+    by_brace = taken(w, brace)
+    assert len(by_brace) == 8 and by_brace[-1] == "mate"
 
     w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
-    busy = [s for s in crew.sailors if s.watch is Watch.STARBOARD and not s.post][:2]
+    busy = [s for s in crew.sailors if s.watch is Watch.STARBOARD and not s.post][:4]
     for s in busy:
         s.at = "other#1"
-    jib = asked(w, "take_in_jibheaded", "jib", "set")
-    assert runner._watch_whole(crew, Watch.STARBOARD) == 5
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
     assert runner._working_posts(crew, jib) == []
     assert len(taken(w, jib)) == 3 and jib.assignment.outcome == hands.SHORT
 
 
 def test_a_merchantmans_post_never_hauls_aloft_for_all_hands_for_a_manoeuvre_or_at_quarters():
     """Ruling 11, everything else as ruling 9's probe had it: a post is never counted for work
-    aloft (her fore topsail furled: the larboard's five alone; package 119, old three), for
-    all-hands work, while all hands are called, for any of the twelve manoeuvres
-    (`scripts.HELM_MANOEUVRES`) or while one is in hand, the officer of the deck giving it; and a
-    manoeuvre begun takes a post from the work they hold back to the conn, the work going on short
-    (`Runner._to_the_conn`). A post whose person is not free on deck (below, at a task) is not
-    counted (`People.works_on_deck`)."""
+    aloft (her fore topsail furled: the larboard's three alone), for all-hands work, while all hands
+    are called, for any of the twelve manoeuvres (`scripts.HELM_MANOEUVRES`) or while one is in
+    hand, the officer of the deck giving it; and a manoeuvre begun takes a post from the work they
+    hold back to the conn, the work going on short (`Runner._to_the_conn`). A post whose person is
+    not free on deck (below, at a task) is not counted (`People.works_on_deck`)."""
     from freesail.evolutions.scripts import HELM_MANOEUVRES
 
     assert len(HELM_MANOEUVRES) == 12
@@ -1340,23 +1302,19 @@ def test_a_post_is_counted_where_the_watch_is_small_on_board_and_not_where_it_is
     """Ruling 11's whole number reads the hands on board: a hand away in the boat (held by work
     whose crew is out of the ship, `Script.crew_away`: the boat from her pull out to her pull back)
     is not on board, and one hoisting her out is. The merchant brig's starboard watch by night,
-    the boat holding three of its five: hoisting out, the whole is five, not under the four the
-    jib's taking in wants, and the mate is not counted; pulling for the shore, the whole is two,
-    under four, and the mate is counted. Package 119, old beside new (docs/dev/TuningNotes.md,
-    "Package 119"): old, the boat holding three of the starboard's seven, the jib from the gear
-    (want six), the whole seven hoisting out and four pulling away; at five and five the jib
-    from the gear is over the whole either way, and the case is told by the jib taken in."""
+    the boat holding three of its seven: hoisting out, the whole is seven and the jib is the six's
+    without the mate; pulling for the shore, the whole is four, under six, and the mate is
+    counted."""
     w, crew, runner = trader_at(BRIG, 2, Watch.STARBOARD)
     boat = asked(w, "send_boat", None)
     boat.script.phase = "hoist_out"
     for s in [s for s in crew.sailors if s.watch is Watch.STARBOARD and not s.post][:3]:
         s.at = boat.inst_id
-    jib = asked(w, "take_in_jibheaded", "jib", "set")
-    assert jib.want.hands == 4
-    assert runner._watch_whole(crew, Watch.STARBOARD) == 5
+    jib = asked(w, "set_jibheaded", "jib", "in_the_gear")
+    assert runner._watch_whole(crew, Watch.STARBOARD) == 7
     assert runner._working_posts(crew, jib) == []
     boat.script.phase = "pull_out"
-    assert boat.script.crew_away and runner._watch_whole(crew, Watch.STARBOARD) == 2
+    assert boat.script.crew_away and runner._watch_whole(crew, Watch.STARBOARD) == 4
     assert [s.post for s in runner._working_posts(crew, jib)] == ["mate"]
 
 

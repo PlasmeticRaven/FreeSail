@@ -62,8 +62,7 @@ SEAMAN_STATIONS = (
 # The seamen's ratings, best first, as the ship file shares them.
 SEAMAN_RATINGS = (Rating.ABLE, Rating.ORDINARY, Rating.LANDSMAN)
 
-# The two watches, starboard first: the odd hands of odd stations go to them in turn
-# (muster.py, rule 3; package 119, before which every odd hand went to the starboard).
+# The two watches, starboard first: the odd hand of a station goes to the starboard watch.
 WATCHES = (Watch.STARBOARD, Watch.LARBOARD)
 
 # Skill of a fresh sailor of each rating, (deck, aloft), spec M3 §2.1. The ordinary seaman
