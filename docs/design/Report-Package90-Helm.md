@@ -3,7 +3,81 @@
 The builder's report for step A3, built in a session of its own beside the engine track (the
 lead's nudge 27). It is also the nudge to the coordinating session.
 
-## In brief
+## The second pass: stop 2 built (the lead's nudge 31, 2026-11-20)
+
+The lead allowed both stops. Stop 2 was the builder's to build; stop 1 is the coordinating
+session's, at A3's merge. This section is the nudge for the second pass. The first pass's
+sections follow it as they were reported, with marks where this pass supersedes them.
+
+- **The commit: `5426600a0f0efa8d6dd108afd0ff2e44a5a47b40`** ("Package 90, A3: the captain's
+  mend order from the one table"), on this step's own branch after the first pass's report
+  (58b89c96). Four files:
+  - `freesail/world/captains.py`;
+  - `tests/test_known_truths.py`;
+  - `tests/test_helm_kind.py`;
+  - `docs/dev/TuningNotes.md`.
+- **`freesail/world/captains.py`, as the first pass's §7 drafts it.** In `Captain._repairs`,
+  `from freesail.evolutions.scripts import helm_words` beside the function's own import, and the
+  order `wanted.append((helm_words(ship)["mend"], "steering by the relieving tackles"))`. There
+  is no branch on the hull's kind.
+  - With the reason's line (`_helm_first`), that is three lines of A3's in the file and no
+    more: `git diff 8b8a982d -- freesail/world/captains.py` shows one line added and two
+    changed, all outside the going-about rows.
+  - Package 121's lines elsewhere in the file are not chased.
+- **What it says now.** On a tiller hull: "By the captain, taking possession: shipping the spare
+  tiller (steering by the relieving tackles)." On a wheel ship: "... repairing the wheel (...)",
+  as before.
+- **Pin moved, old beside new** (TuningNotes, "Package 90, A3"): truth 7-634's last clause, the
+  captain's line after the action, from "repairing the wheel" to "shipping the spare tiller".
+  Words only; every other clause is as it was.
+  - The first pass's 7-634, run on this tree, fails by that clause alone.
+  - With 7-632 and 7-633, the step now moves the three truths the ground report named (its rows
+    23 to 25).
+- **Measured, old beside new** (the probe again, the base beside this commit).
+  - The first action at seed 6, left to the captain: 255 lines; every tick, kind and actor the
+    same; 9 texts moved, where the first pass had 8. The one more is his line at tick 4,620.
+  - The other eight runs are as the first pass measured them.
+  - Across all nine runs, no line on a tiller hull names a wheel, but for the player's own
+    `repair the wheel` echoed as typed.
+- **`tests/test_helm_kind.py`** gains `test_the_captains_mend_order_is_her_helms`, on either
+  helm: the tackles rove and nothing else to mend, his repairs give the table's order, said in
+  her helm's words, and the work begun is the mend. On the first pass's code its tiller case
+  fails (it said "repairing the wheel") and its wheel case passes. The file now has 35 cases.
+
+**The tests of this pass** (on 5426600a, its own worktree; `python -m pytest -n 4 -p
+no:cacheprovider -o addopts="--dist loadgroup"`):
+
+| Set | Result |
+|---|---|
+| the four helm truths, 7-626, 7-632, 7-633, 7-634 (`--slow`) | 4 passed |
+| the first pass's truth 7-634 on this tree | 1 failed, by its last clause (the move) |
+| `tests/test_helm_kind.py` | 35 passed |
+| the captain's files, `--slow`: `test_captain.py`, `test_captain_rules.py`, `test_captains.py`, `test_captain_trials.py` | 51 passed (their whole count) |
+| **the fast tier whole**, in the suite's six shards, compared test by test with the base (8b8a982d) | 8,515: 8,508 passed, 6 failed, 1 xfailed. The same differences as the first pass and no other: stop 1's six (passed -> failed); the eight f5be9110 records (skipped at the shallow base -> passed); `tests/test_helm_kind.py`'s 35 (new, passed) |
+| the slow tier of the test files touched, `--slow -m "slow and not pace"`: `test_known_truths.py`, the four hull files, `test_helm_kind.py` | 205: 197 passed, 8 xfailed (the suite's own marks, as the first pass), 0 failed; 38 min 37 s |
+
+**Stop 1** (`tests/test_probes_90.py`, six cases) is left alone, on the lead's word: the
+coordinating session makes stage 0's guards one table at A3's merge. Its six cases are still the
+only failures of the fast tier.
+
+**The package's branch** has moved to 00382c4e since the first pass: A2 merged alone. By
+condition 1 its merge into this work is the coordinating session's, so it is not merged here. A
+dry run, to save that session a surprise, was made with nothing committed to any branch: `git
+merge-tree` of the package's branch and 5426600a, and a local throwaway worktree of the result.
+- The merge has **no conflict**: A2's `scripts.py` and `test_known_truths.py` merge cleanly with
+  A3's.
+- On the merged tree the generator writes every committed ship file byte for byte (A2 moves no
+  ship file).
+- `tests/test_helm_kind.py`, A2's `tests/test_rig_words.py` and the four hull files: 172 passed.
+- The four helm truths: 4 passed.
+- Its fast tier was not run: that is the coordinating session's, on its own merge.
+
+**Left as the first pass reports it**, apart from these two changes:
+- the captain's unlogged refusal of his own helm order would now be a fourth and a fifth line of
+  `captains.py`;
+- the mend order is no longer among the places left (§5).
+
+## In brief (the first pass, 8d218fb8)
 
 - **The step's commit: `8d218fb85d84d0e968dcd76c47067b5c24a4f24b`** on this step's own branch,
   cut from 8b8a982d. One commit, 25 files. This report is a second commit, pushed after it.
@@ -26,7 +100,8 @@ lead's nudge 27). It is also the nudge to the coordinating session.
 - **Pins moved, as the brief names them:** the eight records of the six files, and truths 7-632
   and 7-633, words only. Truth 7-626 holds, as expected. **Truth 7-634 holds too**, because of
   stop 2.
-- **Two stops, not built, for the lead:**
+- **Two stops, not built, for the lead** (both allowed at nudge 31: stop 2 built in the
+  second pass above; stop 1 the coordinating session's):
   1. **`tests/test_probes_90.py`**: stage 0's guard "no committed file carries ... a hull's
      `helm`" fails on the six files, six cases. The brief does not name it, so it is not moved.
      It is the one test of the fast tier and the guard set that fails by this step.
@@ -204,12 +279,12 @@ Every "wheel" in `freesail/`, `data/` (bar the ship files), `client/` and `docs/
 - the captain's reason.
 
 **Left, each for a reason:**
-1. **`world/captains.py`, the mend order**: stop 2.
+1. **`world/captains.py`, the mend order**: stop 2 (built in the second pass).
 2. **`world/captains.py`, the refusal of his own helm order** while the tackles are not rove
    (`give`: `text=HELM_LOST_WORDS`, `"not_given": "the wheel shot away"`). It is the wheel's on
    every hull. The event goes back to his judgement and is never logged: truth 7-634 asserts
    nothing of his is refused in the log, and his callers read only its `kind`. So no one reads
-   its words. It would be a third and a fourth line of that file.
+   its words. It would be a fourth and a fifth line of that file (the second pass).
 3. **The comments in `world/captains.py`** about the wheel (ll. 4667, 4677, 4960, 4981).
    Comments, and outside the two lines.
 4. **The primer.** Chapter 25's table (`docs/primer/25-water-wounds-and-the-fight-on-deck.md`,
@@ -271,7 +346,8 @@ the six cases `[cutter]`, `[lugger]`, `[smack]`, `[topsail-schooner]`, `[private
   `A3_TILLER_FILES` would be the six stems, and its docstring would say so. Its name
   ("..._a_helm_...") would be kept.
 
-**Stop 2: the captain's mend order** (`freesail/world/captains.py`, `Captain._repairs`).
+**Stop 2: the captain's mend order** (`freesail/world/captains.py`, `Captain._repairs`). Built
+in the second pass, as drafted here (the top of this report).
 - **Why it needs a third line:** the order must be the table's (`helm_words(ship)["mend"]`), and
   `_repairs` has no road to the table without an import.
   - The local import block there names three functions of `repair_scripts`.
