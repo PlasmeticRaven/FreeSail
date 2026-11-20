@@ -378,6 +378,85 @@ def settees_held(ship: Ship) -> set[str]:
     return {sl.id for sl in settees(ship)}
 
 
+def is_whole_lateen(sail: Sail) -> bool:
+    """A whole lateen with a side to keep (package 90, A1a; docs/design/Design-Package90-Engine.md
+    §2.3 item 1): a sail of class `lateen` carrying `dipping`, which the schema allows only on a
+    lateen not cut at the mast. Its yard is slung on one side of its mast, as a dipping lug's is
+    (`Sail.lug_side`), and on the weather side it draws with the lug's two-thirds
+    (`physics.sails.against_the_mast`). The 64's and the 74's mizzen course and driver, lateens
+    cut at the mast, are never one, and go about as a ship's mizen."""
+    return sail.cls == "lateen" and bool(sail.dipping) and not sail.cut_at_mast
+
+
+def whole_lateens(ship: Ship) -> list[Sail]:
+    """The whole lateens set (`is_whole_lateen`), by the ship's order: what a manoeuvre may shift
+    round its mast, the stern and bow watches read against its mast, and a heave-to finds no
+    braced yard nor head sail beside (package 90, A1a)."""
+    return [
+        sl for sl in ship.sails.values() if is_whole_lateen(sl) and sl.is_set and ship.sheets_of(sl)
+    ]
+
+
+def lateens_held(ship: Ship) -> set[str]:
+    """The whole lateens set, by id: held from the order by a manoeuvre that may shift one round
+    its mast, as `settees_held` holds a settee, so that its shift by itself (`change_lateen`) and
+    its other work wait for the manoeuvre (package 90, A1a; Design-Package90-Engine.md §2.3a, row
+    2). A ship with none holds nothing more."""
+    return {sl.id for sl in whole_lateens(ship)}
+
+
+# A whole lateen's yard shifted round its mast by itself (`change_lateen`; package 90, A1a): its
+# seconds a metre of yard, before the weather and the hands. The lugger's dip by itself
+# (`dip_lug.yaml`: 30, 60 and 60 s) for her 10.3-m main lug yard (`data/ships/lugger.yaml`), taken
+# as a rate: JUDGEMENT, the lean put to the lead and not ruled (Design-Package90-Engine.md
+# §2.4.4); in a manoeuvre the lead's 8.7 s a metre (A1b).
+LATEEN_SHIFT_ALONE_S_PER_M = 14.6
+# Its party: one able hand for each 2½ m of yard, and never fewer than four (the lead's ruling of
+# 2026-11-18, nudge 18; JUDGEMENT): the settee's six for 16 m.
+LATEEN_YARD_M_A_HAND = 2.5
+LATEEN_LEAST_PARTY = 4
+
+
+def lateen_yard_m(ship: Ship, sail: Sail) -> float:
+    """The length of a lateen's yard, metres (0 with none)."""
+    yard = ship.yard_of(sail)
+    return float(yard.length_m) if yard is not None else 0.0
+
+
+def hands_to_give(ship: Ship) -> int | None:
+    """The hands her company can put to a lateen's change: every hand fit to work on deck but
+    the posts at the conn, never taken for all-hands work (the lead's ruling 11 of 2026-11-13);
+    None for a ship with no company (a test's stub)."""
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if crew is None:
+        return None
+    from freesail.crew import hands  # local import: the crew's own rule
+    from freesail.crew.model import Station
+
+    return sum(
+        1 for s in crew.sailors if hands.can_work(s, False) and s.station is not Station.QUARTERDECK
+    )
+
+
+def party_term(ship: Ship, party: int) -> float:
+    """The party's numbers term for a lateen's change (`crew.hands.crew_factor`'s: wanted over
+    got, never faster for more): the party over the hands her company can give, at least 1. The
+    change is all hands' work, whose own term is the whole deck's (`crew_factor`), so the party's
+    is taken here (package 90, A1a: the tartane's main, ten wanted of her eight, 10/8 of its
+    seconds, Design-Package90-Engine.md §2.4.4)."""
+    have = hands_to_give(ship)
+    if have is None:
+        return 1.0
+    return max(1.0, party / max(have, 1))
+
+
+def lateen_party(ship: Ship, sail: Sail) -> int:
+    """The able hands to shift a whole lateen's yard round its mast: one for each
+    `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY` (package 90; the lead's
+    ruling)."""
+    return max(LATEEN_LEAST_PARTY, math.ceil(lateen_yard_m(ship, sail) / LATEEN_YARD_M_A_HAND))
+
+
 # Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3
 # item 3): the ship's practice for a whole lateen's yard in going about, kept on her as a plain
 # dict of strings (`ship.extra["lateen_practice"]`, saved with her, as `COURSE_PENDING` is), for
@@ -1052,8 +1131,9 @@ class Script:
         one round its mast, and kept as `order_settees`: the runner does not keep a manoeuvre that
         belays the step-list work in hand waiting behind an order of a settee's given before it
         on these alone (`Runner._settees_only`; package 75, the lead's ruling (3)(iii) of
-        2026-11-10, and its review)."""
-        held = settees_held(self.ship)
+        2026-11-10, and its review). And the whole lateens set, which the same manoeuvres may
+        shift round their masts, held and kept so alike (`lateens_held`; package 90, A1a)."""
+        held = settees_held(self.ship) | lateens_held(self.ship)
         self.order_settees = frozenset(held)
         return held
 
@@ -2236,6 +2316,12 @@ class WearScript(Script):
 # easing off, or hauling aft, the spanker and jib sheets".
 HOVE_TO_DRIVER_APPARENT = 6 * POINT
 
+# A rig of whole lateens with no head sail set and no braced yard will not lie to (package 90,
+# A1a; Design-Package90-Engine.md §2.3 item 1; the xebec's design, her A1 (7)): the heave-to's
+# refusal in her words, keyed on a whole lateen set, so that the five boats and a schooner are
+# refused as before. Her lying to under her lateens (the cape) is the hulls' research, not built.
+LATEENS_WILL_NOT_LIE_TO = "She will not lie to under her lateens: there is no sail to bring her to."
+
 # Hove to, a settee (package 75; docs/design/Design-ShipsEngineExtensions.md §5.7): kept with
 # its sheet eased to the driver's trim where her backed yards are on her aftermost mast, by the
 # engine's driver rule, which the lead's ruling on Ext §14 item 3 holds for it "unless the
@@ -2915,6 +3001,13 @@ class HeaveToScript(Script):
         square_set = standing_sail_on(self.ship, self.yards) is not None
         if self.fore_and_after():
             if not square_set and innermost_head_sail(self.ship, standing=True) is None:
+                head, after = head_and_after_yards(self.ship)
+                if whole_lateens(self.ship) and not has_braced_yards(head, after):
+                    # a rig of whole lateens, no head sail set and no braced yard: nothing to
+                    # bring her to, and her lying to under her lateens is not built (package 90,
+                    # A1a; the xebec's words, her A1 (7)); a boat's and a schooner's refusal as
+                    # it was
+                    return LATEENS_WILL_NOT_LIE_TO
                 return "No head sail is set to haul to windward, nor a topsail to lay aback."
             if not square_set:
                 self.yards = []
@@ -9416,8 +9509,105 @@ class FishingGearScript(Script):
         return {"gear": name, "Gear": _cap(name), "catch": self.catch_words}
 
 
+class ChangeLateenScript(Script):
+    """A whole lateen's yard shifted round its mast by itself, standing on her course (package
+    90, A1a; `data/evolutions/change_lateen.yaml`; Design-Package90-Engine.md §2.3 items 2 and
+    3): the parrel eased and the weather runners cast off, the yard peaked up by its halyard and
+    its car passed round abaft the mast (the lead's ruling), the tack shifted to the new weather
+    side and the runners set up again, the sheet drawn on the new lee. The yard is never lowered,
+    as a lug's and a settee's are. The sail draws nothing while it is shifted (in its gear), and
+    is set again on the lee side of the wind as the deck reads it when the work is done
+    (`Sail.lug_side`), its single sheet to leeward. Its seconds are its yard's length at
+    `LATEEN_SHIFT_ALONE_S_PER_M`, by the weather and the hands (the runner's factor), and its
+    party one able hand for each `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY`:
+    all hands are called for it, and the party's numbers term over the hands her company can give
+    is taken here (`party_term`), so that no post holds it and a small company has the hands at
+    any hour. Belayed, it is left in its gear where its yard
+    hangs, and the line says so (`left_words`). Its file's preconditions refuse a lateen cut at
+    the mast, blown out, unbent or not set, and one to leeward of its mast already."""
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.sail_id: str | None = (
+            params.get("sail") if isinstance(params.get("sail"), str) else None
+        )
+        self.side: str | None = None
+        self.left_s = 0.0
+
+    def _sail(self) -> Sail | None:
+        return self.ship.sails.get(self.sail_id) if self.sail_id else None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the sail and its yard and mast standing (read as it is taken up
+        again after a belay; its file's preconditions read them as it begins)."""
+        sail = self._sail() or _subject_sail(self.ship, self.params, words)
+        if sail is None:
+            return None
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        name = part_name(self.ship, sail.id)
+        if sail.wrecked:
+            return f"the {name} is wrecked"
+        if any(sp.wrecked for sp in self.ship.spar_chain(sail)):
+            return f"the {name}'s yard or mast is wrecked"
+        return None
+
+    def holds(self) -> set[str]:
+        return {self.sail_id} if self.sail_id else set()
+
+    def begin(self, words: dict[str, Any]) -> None:
+        sail = _subject_sail(self.ship, self.params, words)
+        self.sail_id = sail.id if sail is not None else None
+        if sail is None:
+            self.fail("there is no such lateen")
+            return
+        # the new lee, the side opposite the wind as the deck reads it: where the yard goes
+        self.side = "larboard" if self.ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+        seconds = lateen_yard_m(self.ship, sail) * self.timing_value(
+            "shift_s_per_m", LATEEN_SHIFT_ALONE_S_PER_M
+        )
+        # its party's numbers term (all hands are called, the party the yard's): a company too
+        # small for the party takes the longer, never the shorter for more hands
+        self.left_s = max(seconds, 0.0) * party_term(self.ship, lateen_party(self.ship, sail))
+        sail.state = SailState.IN_THE_GEAR  # peaked up and passed round: drawing nothing
+        self.phase = "shift"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        sail = self._sail()
+        if sail is None or self.side is None:
+            return
+        self.left_s -= dt / max(factor, 1e-6)
+        if self.left_s > 0.0:
+            return
+        sail.state = SailState.SET
+        sail.lug_side = self.side
+        draw_sheets(self.ship, [sail], None, None)
+        for ln in self.ship.sheets_of(sail):
+            ln.held_side = None  # its single sheet lies to leeward of the wind
+        self.finish()
+
+    def remaining_s(self) -> float:
+        return max(0.0, self.left_s)
+
+    def left_words(self) -> str | None:
+        """'the mainsail in its gear, its yard not yet shifted round the mast': belayed, the
+        sail is left drawing nothing where its yard hangs."""
+        sail = self._sail()
+        if sail is None or self.status != "running" or self.side is None:
+            return None
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        name = part_name(self.ship, sail.id)
+        return f"the {name} in its gear, its yard not yet shifted round the mast"
+
+    def words(self) -> dict[str, Any]:
+        return {"side": self.side or ""}
+
+
 SCRIPTS: dict[str, type[Script]] = {
     "tack": TackScript,
+    "change_lateen": ChangeLateenScript,  # package 90, A1a
     "trim_sheet": TrimSheetScript,
     "wear": WearScript,
     "heave_to": HeaveToScript,

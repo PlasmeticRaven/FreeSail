@@ -380,6 +380,11 @@ def _steer_for_a_place(verb: str, verb_phrase: str, words: list[str]) -> str | N
 # ---------------------------------------------------------------------------
 
 CANVAS_VERBS = ("bend", "shift")
+# Package 90, A1a: the mark that "for" was said after a canvas verb, whatever followed it ("for a
+# new one" leaves no modifier of its own): `shift the mainsail for a new one` is the sail room's
+# on a hull with a whole lateen, whose `shift the mainsail` shifts its yard round its mast
+# (`verbs.evolution_key`; Design-Package90-Engine.md §2.3 item 3a). Read by the routing alone.
+SAIL_ROOM_MARK = "sail_room"
 
 
 def _canvas_number(words: list[str], i: int) -> int | None:
@@ -401,6 +406,7 @@ def _take_canvas_words(words: list[str]) -> tuple[list[str], dict[str, Any]]:
     mods: dict[str, Any] = {}
     out = list(words)
     if "for" in out:
+        mods[SAIL_ROOM_MARK] = True  # package 90, A1a: "for" said, the sail room's
         i = out.index("for")
         after = strip_article(out[i + 1 :])
         if after[:1] in (["a"], ["an"]):

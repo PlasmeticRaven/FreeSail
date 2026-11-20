@@ -1963,6 +1963,7 @@ evolutions:
   dip:
     lug: dip_lug
     settee: dip_settee  # package 75: the settee's yard lowered and passed round
+    whole_lateen: change_lateen  # package 90, A1a: a whole lateen's yard peaked and passed round
   brace: brace
   square: brace
   back: brace
@@ -1997,6 +1998,9 @@ evolutions:
     studding: shift_sail
     lug: shift_sail  # package 43b: the lugger's lugs and the taille-vent
     lateen: shift_sail  # package 75
+    # package 90, A1a: a whole lateen (a lateen with `dipping`) shifted round its mast; said
+    # "for" a sail (`shift the mainsail for a new one`) it is the sail room's, by its class
+    whole_lateen: change_lateen
     spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
   cut away: clear_wreck
   send down: clear_wreck
