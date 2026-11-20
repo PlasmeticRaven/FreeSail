@@ -55,7 +55,7 @@ from freesail.evolutions import trim as yard_trim
 from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, LineState, Sail, SailState, Spar, sync_catharpins
-from freesail.ship.schema import YARD_LIKE_CLASSES
+from freesail.ship.schema import HELM_WHEEL, YARD_LIKE_CLASSES
 from freesail.ship.stub import OrderError
 
 if TYPE_CHECKING:
@@ -1379,6 +1379,14 @@ class Script:
 
     def holds(self) -> set[str]:
         return {self.ship.name}
+
+    def work(self) -> str | None:
+        """The work in words by this ship, where it is hers and not the file's alone: read first
+        by the one road for a work's name (`Runner._describe`), so that both its forms and every
+        line that names it follow. None, the file's words (`registry.Evolution.work`, else the
+        verb's): every script but the helm's mend, whose name is the helm's (`helm_words`;
+        package 90, A3)."""
+        return None
 
     def _hold_settees(self) -> set[str]:
         """The settees set (`settees_held`), held from the order by a manoeuvre that may change
@@ -2793,10 +2801,71 @@ HELM_LOST_WORDS = (
     "('repair the wheel')."
 )
 HELM_LOST_ASIDE = "the helm not answering, the wheel shot away"
+# Package 90, A3 (docs/design/Plan-Package90.md §6 A3; GroundReport-Package90-2026-11.md §2.2):
+# the helm's words by what she steers by (`HullSpec.helm`, one of `schema.HELM_KINDS`), the one
+# place every line where a helm is shot away, rigged round or mended reads them, so that a hull
+# steered by a tiller is not told her wheel is shot away and mended with new wheel-ropes. The
+# wheel's row is package 116's words exactly (`HELM_LOST_WORDS` and `HELM_LOST_ASIDE` the wheel's
+# still). The tiller's are the lead's ruling of the ground report's draft (nudge 22, "as drafted":
+# the tackles hooked to the stump of the tiller and manned on deck, the spare tiller shipped by the
+# carpenter's crew aft at the rudder head; JUDGEMENT, plan §13.1 item 3); the times and the hands
+# are the wheel's, the files' own. `lost` is the state the hit writes (`ship.extra["helm_lost"]`)
+# and the minute's words; `mend` the order that mends her and its work's name; `holds` what the
+# mend holds while the tackles hold the tiller, so that the two go on together on either helm.
+HELM_WORDS: dict[str, dict[str, str]] = {
+    HELM_WHEEL: {
+        "lost": "the wheel shot away",
+        "hit": "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
+        "'rig the relieving tackles'.",
+        "refusal": HELM_LOST_WORDS,
+        "aside": HELM_LOST_ASIDE,
+        "tackles_begin": "Rig the relieving tackles! Hands below to the tiller.",
+        "tackles_rove": "The relieving tackles are rove to the tiller and manned below: the helm "
+        "answers again, steered by the tackles, and more slowly than by the wheel.",
+        "mended": "the wheel is repaired",
+        "mend": "repair the wheel",
+        "mend_begin": "Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be "
+        "rove.",
+        "mend_done": "The wheel is repaired and new wheel-ropes rove: she steers by the wheel "
+        "again",
+        "whole": "the wheel is whole and she steers by it",
+        "not_mended": "the wheel not mended",
+        "holds": "the wheel",
+    },
+    "tiller": {
+        "lost": "the tiller shot away",
+        "hit": "The tiller is shot away; the helm is lost until the relieving tackles are rove: "
+        "'rig the relieving tackles'.",
+        "refusal": "The tiller is shot away and the helm does not answer: rig the relieving "
+        "tackles ('rig the relieving tackles') to steer her by them, or ship the spare tiller "
+        "('ship the spare tiller').",
+        "aside": "the helm not answering, the tiller shot away",
+        "tackles_begin": "Rig the relieving tackles! Hands aft to the tiller.",
+        "tackles_rove": "The relieving tackles are hooked to the stump of the tiller and manned on "
+        "deck: the helm answers again, steered by the tackles, and more slowly than by the "
+        "tiller.",
+        "mended": "the spare tiller is shipped",
+        "mend": "ship the spare tiller",
+        "mend_begin": "Ship the spare tiller! The carpenter's crew aft to the rudder head.",
+        "mend_done": "The spare tiller is shipped in the rudder head: she steers by the tiller "
+        "again",
+        "whole": "the tiller is whole and she steers by it",
+        "not_mended": "the spare tiller not shipped",
+        "holds": "the rudder head",
+    },
+}
+
+
+def helm_words(ship: Any) -> dict[str, str]:
+    """The helm's words for her (`HELM_WORDS`), by what her file says she steers by: the wheel's
+    where it says nothing, and for a ship with no hull spec (package 90, A3)."""
+    spec = getattr(getattr(ship, "hull", None), "spec", None)
+    return HELM_WORDS[getattr(spec, "helm", HELM_WHEEL)]
 
 
 def helm_lost(ship: Any) -> bool:
-    """The wheel shot away and no relieving tackles rove (`combat.hits`)."""
+    """The helm shot away, her wheel or her tiller, and no relieving tackles rove
+    (`combat.hits`)."""
     return bool((getattr(ship, "extra", None) or {}).get("helm_lost"))
 
 
@@ -3767,9 +3836,9 @@ class HeaveToScript(Script):
         }
 
     def _helm_words(self) -> str:
-        """`helm a-lee`, or that it does not answer with the wheel shot away (package 116:
-        she is brought to by her sails alone)."""
-        return HELM_LOST_ASIDE if helm_lost(self.ship) else "helm a-lee"
+        """`helm a-lee`, or that it does not answer with the helm shot away (package 116:
+        she is brought to by her sails alone), in the words of her helm (package 90, A3)."""
+        return helm_words(self.ship)["aside"] if helm_lost(self.ship) else "helm a-lee"
 
     def data(self) -> dict[str, Any]:
         d = super().data()

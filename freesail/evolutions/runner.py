@@ -100,12 +100,12 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
-    HELM_LOST_WORDS,
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
     _world_of,
     helm_lost,
+    helm_words,
     keep_full_and_by,
     keep_lying_to,
     lying_to_hands_off,
@@ -858,12 +858,13 @@ class Runner:
         going never does; the whole-change review of 80e703c7, sailing-2: a mast carried away
         while her cutting away lay held was cut away again)."""
         if not begun and inst.evo.id in HELM_MANOEUVRES - {"heave_to"} and helm_lost(ship):
-            # the wheel shot away and no relieving tackles rove (package 116, card 5): a
+            # the helm shot away and no relieving tackles rove (package 116, card 5): a
             # manoeuvre that drives the helm is refused as it would begin, whoever gave it
             # (the player, a standing order, the game's own captain); heave to stands, done
-            # by her sails. Before, a tack began and missed stays with the rudder held.
+            # by her sails. Before, a tack began and missed stays with the rudder held. In the
+            # words of her helm, the wheel or the tiller (package 90, A3)
             inst.done_already = False
-            return HELM_LOST_WORDS
+            return helm_words(ship)["refusal"]
         env = self._env(ship, inst)
         inst.done_already = False
         for cond in conditions:
@@ -2113,7 +2114,10 @@ class Runner:
         hands to veer cable", "All hands! (to lie a try)", "Not hands enough on deck to cut away
         mast the main mast"), and the tack and the wear had a rule of their own here."""
         evo = registry.get(inst.evo.id) or inst.evo
-        head = getattr(evo, "work", None) or evo.verb.replace("_", " ")
+        # the script's own name for its work by the ship first (`Script.work`: the helm's mend,
+        # named by her helm, package 90, A3), then the file's
+        own = inst.script.work() if inst.script is not None else None
+        head = own or getattr(evo, "work", None) or evo.verb.replace("_", " ")
         if isinstance(inst.subject, Ship):
             return head
         return f"{head} the {part_name(self.ship, inst.subject_id)}"

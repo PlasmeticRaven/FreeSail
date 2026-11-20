@@ -57,6 +57,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 4.0
     span_m: 3.58
+  # JUDGEMENT: she steers by a tiller on deck, as the privateer schooner, no source read for her helm. Against it, Chapelle 1930 p. 136: the slave brig Diligente of 1839, 100 ft between perpendiculars, whose plan he says does not show her helm but reads as probably a wheel. Her own draughts would settle it, read at her rudder head: RMG ZAZ6177 (her lines) and ZAZ6179 (her sail plan).
+  helm: tiller
   # Her side, decks and ports (Neuf-D §3; Build-Ships.md §5.1): x forward of the middle of her waterline between the rabbets, z above her sailing-trim line at each station, metres; measured on RMG ZAZ6177 (her lines, taken off at Deptford in 1815; 7.05 px/ft, +-0.3 ft) but where a line's note says judgement. Her ports and masts are Neuf's figures forward of the post at deck height, through the join to the after rabbet (tools/ships/neufchatel.py, POST_AT_DECK_FT).
   profile:
     # The top of her side, ZAZ6177 traced by column, the columns of the mast stumps and the deck fittings dropped (measured for the design, re-traced by the checker on both sheets of her lines: aft of her fore channels they agree; forward of them the re-trace stands higher, reported: docs/dev/TuningNotes.md). About 4 ft above the deck at side (Neuf §2.7). ZAZ6179, her sail plan, draws it about 7.8 ft above her water at the main and 8.4 at the fore (measured by the checker), against the lines' 7.5 and 8.1: the lines' figure stands.

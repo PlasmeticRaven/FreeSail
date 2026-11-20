@@ -5,10 +5,10 @@ game already has, by the cause the director's hand uses today (`aboard: the fore
 is found sprung` and a shot that springs it end in the same state): a line parted
 (`strain._part_line`, the sail coming down as it does now), a spar sprung or carried away
 (`strain._wreck_spar`, the wreck cleared as it is), a sail holed (`Sail.holed_m2`, its area
-cut), a gun dismounted (`Gun.dismounted`, a part out of the bill), a boat stove, the wheel
-or the tiller ropes shot away (`ship.extra["helm_lost"]`, the helm held where it was until
-73's repair), **a shot hole at or below the waterline written as state for 73's well to
-read** (`ship.extra["shot_holes"]`: the side, the place along the hull, the height against
+cut), a gun dismounted (`Gun.dismounted`, a part out of the bill), a boat stove, the helm
+shot away, her wheel or her tiller by her file (`ship.extra["helm_lost"]`, the helm held where
+it was until 73's repair), **a shot hole at or below the waterline written as state for 73's
+well to read** (`ship.extra["shot_holes"]`: the side, the place along the hull, the height against
 the waterline, the hole's size; no water flows from it here), and **men killed and
 wounded written to the muster** (`Sailor.fit` false, `Sailor.hurt`), which takes them off
 the bill; a named person hurt is a line of his own.
@@ -96,7 +96,7 @@ SPAR_SPRUNG = 40.0
 # Douglas; a 5-inch ball makes a 5-inch hole that splits to a cloth or two in the wind).
 HOLE_ROUND_M2 = 0.6
 HOLE_CHAIN_M2 = 1.5
-# The wheel or the tiller ropes shot away: this share of the hits on the after deck
+# The helm shot away, the wheel or the tiller: this share of the hits on the after deck
 # (judgement; the quarterdeck's helm was the first mark of a raking broadside).
 HELM_SHOT_SHARE = 0.06
 # A boat stove on the booms: this share of the hits on the midship deck of a ship with boats.
@@ -213,20 +213,18 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
         aft
         and rng.random() < HELM_SHOT_SHARE
         and not ship.extra.get("helm_lost")
-        # the wheel is shot away once: with the relieving tackles rove she steers from below
+        # the helm is shot away once: with the relieving tackles rove she steers by them
         # (the lead's reading of part D at 60af48e, item 6)
         and not ship.extra.get("helm_by_tackles")
     ):
-        ship.extra["helm_lost"] = "the wheel shot away"
-        ship.note(
-            "urgent",
-            "helm.shot_away",
-            "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
-            "'rig the relieving tackles'.",
-            None,
-            {"tick": tick},
-        )
-        keeper.minute.append(("helm", "the wheel shot away"))
+        # in the words of her helm, the wheel or the tiller (package 90, A3: one place,
+        # `scripts.helm_words`); the draws above are as they were
+        from freesail.evolutions.scripts import helm_words
+
+        words = helm_words(ship)
+        ship.extra["helm_lost"] = words["lost"]
+        ship.note("urgent", "helm.shot_away", words["hit"], None, {"tick": tick})
+        keeper.minute.append(("helm", words["lost"]))
         _casualties(ship, keeper, MEN_HURT_DECK * scale * grape, x_m, "deck", rng, tick)
         return seen
     boats = list(getattr(getattr(ship, "spec", None), "boats", []) or [])

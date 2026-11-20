@@ -1621,7 +1621,8 @@ verbs:
   # steers by the wheel again and the relieving tackles are cast off
   repair the wheel:
     synonyms: [repair wheel, mend the wheel, repair the helm, reeve new wheel ropes,
-               reeve the wheel ropes, reeve new tiller ropes, ship a new wheel]
+               reeve the wheel ropes, reeve new tiller ropes, ship a new wheel,
+               ship the spare tiller, ship a spare tiller, ship a new tiller, repair the tiller]
     object: damage
     level: 1
   sling the yards:

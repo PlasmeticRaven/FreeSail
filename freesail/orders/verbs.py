@@ -27,7 +27,7 @@ Three kinds of verb live here:
 - **Helm verbs** (`steer`, `come up`, `bear away`, `keep her full`) set the
   helm targets in `ship.dyn` for the helmsman in the physics to follow; the
   **conning words** (`steady`, `meet her`, `right the helm`, `helm a-lee`,
-  `helm a-weather`) speak to the wheel itself.
+  `helm a-weather`) speak to the helm itself, her wheel or her tiller.
 
 Each returns `(kind, log_text, data)` for the World to log, or raises
 `OrderError` with a sentence saying why the order was not carried out.
@@ -2434,10 +2434,11 @@ def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
     if scripts.helm_lost(ship):
-        # the wheel shot away and no relieving tackles rove (package 116, card 5): a course,
+        # the helm shot away and no relieving tackles rove (package 116, card 5): a course,
         # full and by and the conning words are refused in the world's words, which say why
-        # and what to order; before, each was logged as carried out and she did not answer
-        raise OrderError(scripts.HELM_LOST_WORDS)
+        # and what to order; before, each was logged as carried out and she did not answer.
+        # In the words of her helm, the wheel or the tiller (package 90, A3)
+        raise OrderError(scripts.helm_words(ship)["refusal"])
     if lying_to(ship) and (
         verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
     ):

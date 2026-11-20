@@ -53,6 +53,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 6.0
     span_m: 2.0
+  # She steers by a tiller on deck: by the rule only, as the cutter (Falconer 1780, HELM: a wheel save in small vessels, which need none; Lever 1827, the Rudder, fig. 373); no draught of hers is read for it. Judgement.
+  helm: tiller
   # Her lines, drawn only (Build-Ships.md §5; §5.7): Chapman 1768, Architectura Navalis Mercatoria, Pl. LIX No. 3, the English smack, of her type and not a vessel of hers (docs/design/ships-design/pages-chapman-pl59.md, 'the note' below), carried to her by §5.0 principle 7: every x by the ratio of the waterlines, hers to the plate's 11.46 m; every half-breadth and every height of the body by the ratio of the beams, hers to the plate's 4.06 m moulded. x forward of the plate's mid-perpendiculars along the keel and z above its top water line, taken as her load line (judgement, the note's §3), square to the keel, in the plate's own frame, not turned level with the water. Feet in these notes are Swedish feet of 0.2969 m (the note's Units and datums). No figure the physics or the guns read comes from these lines; where they differ from the file it is recorded, not moved.
   profile:
     # The top of the side, from the taffrail's sweep to the stem head (the note's §4.3, §4.5, §4.14), its last two points the rail's stop at the head's after edge and the head's top there. Its height is judged: principle 7 takes her side from her own source for the sills and she has none, so the rail's lowest by the beams' ratio, with the frames it stands on, and its rise by the waterlines'.
