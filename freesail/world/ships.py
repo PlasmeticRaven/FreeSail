@@ -287,6 +287,20 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a ship of the line",
         "what": "a seventy-four, a ship of the line, fourteen ports a tier",
     },
+    # package 90 (docs/design/Design-Ship-Tartane.md §8, §9): the Provençal tartane under her great
+    # lateen and square topsail, the trader; and the Spanish guarda-costa of the same hull in a
+    # file of her own (one class in two roles), made out armed and a King's by the glass. The
+    # tops make out a tartane at the rig's distance (her great lateen yard longer than her hull)
+    "tartane": {
+        "file": "data/ships/tartane.yaml",
+        "rig": "a tartane",
+        "what": "a tartane, a coaster under her great lateen, deep laden",
+    },
+    "guarda-costa tartane": {
+        "file": "data/ships/coastguard-tartane.yaml",
+        "rig": "a tartane",
+        "what": "a King's tartane, armed, a guarda-costa",
+    },
 }
 # Her rig's word (`DESCRIPTIONS`' `rig`, a vessel's `kind`) is what the tops make out of her at the
 # rig's distance, and for a two-decker that is her class, "a ship of the line" (the lead's ruling 17
@@ -382,6 +396,20 @@ _DESCRIPTION_WORDS = {
     "a line-of-battle ship": "seventy-four",
     "line-of-battle ship": "seventy-four",
     "a line of battle ship": "seventy-four",
+    # package 90 (Design-Ship-Tartane.md §9): her rig's word, Falconer's and Steel's spelling
+    # ("tartan") and the Spanish ("tartana"); the guarda-costa's, and James's "garda-costa"
+    "a tartane": "tartane",
+    "tartane": "tartane",
+    "a tartan": "tartane",
+    "tartan": "tartane",
+    "a tartana": "tartane",
+    "tartana": "tartane",
+    "a guarda-costa": "guarda-costa tartane",
+    "guarda-costa": "guarda-costa tartane",
+    "a garda-costa": "guarda-costa tartane",
+    "garda-costa": "guarda-costa tartane",
+    "a guarda-costa tartane": "guarda-costa tartane",
+    "guarda-costa tartane": "guarda-costa tartane",
 }
 
 

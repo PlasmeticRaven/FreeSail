@@ -52,6 +52,8 @@ PRIVATEER = "data/ships/privateer-schooner.yaml"
 CUTTER = "data/ships/cutter.yaml"
 LUGGER = "data/ships/lugger.yaml"
 SMACK = "data/ships/smack.yaml"
+TARTANE = "data/ships/tartane.yaml"  # package 90, the tartane's builder (Design-Ship-Tartane.md §8)
+COASTGUARD = "data/ships/coastguard-tartane.yaml"
 
 # Build-Ships.md §8.2, every row whose file exists, as (file, description): (fit, whether it is
 # her file's default, roles). The merchant brig sails merchant-brig.yaml by the lead's ruling of
@@ -69,6 +71,10 @@ TABLE = {
     (LUGGER, "lugger"): (UNARMED, True, ["fisherman", "merchant"]),
     (LUGGER, "privateer lugger"): ("gun lugger 1795", False, ["privateer"]),
     (SMACK, "smack"): (UNARMED, True, ["fisherman"]),
+    # package 90 (Design-Ship-Tartane.md §8): the tartane, one class in two files, each row her
+    # file's default; the trader carries no armament, so her default is `unarmed`
+    (TARTANE, "tartane"): (UNARMED, True, ["merchant"]),
+    (COASTGUARD, "guarda-costa tartane"): ("long guns", True, ["revenue"]),
 }
 # §8.3's two new roles, in `captains.ROLES` with their books since the world side (the first
 # pass let a description name them ahead of `ROLES`; that allowance is gone)

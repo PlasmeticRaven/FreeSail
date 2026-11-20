@@ -506,7 +506,7 @@ MODULE_FILES = {
     "ships.neufchatel": ["hermaphrodite-brig.yaml"],
     "ships.bilander": ["bilander.yaml"],
     "ships.bellerophon": ["seventy-four.yaml"],
-    "ships.tartane": [],
+    "ships.tartane": ["coastguard-tartane.yaml", "tartane.yaml"],
     "ships.polacre": [],
     "ships.xebec": [],
     "ships.diana": [],

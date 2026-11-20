@@ -1,6 +1,20 @@
-"""Package 90, the tartane: the whole lateen's shared cut, `tools/ships/lateen.py`
-(docs/design/Plan-Package90.md §7.1, §7.2: the tartane's builder fills it and merges it alone,
-before the polacre's and the xebec's rigs are written).
+"""Package 90, the tartane: the whole lateen's shared cut, `tools/ships/lateen.py`, and her two
+files, `data/ships/tartane.yaml` (the trader) and `data/ships/coastguard-tartane.yaml` (the
+guarda-costa of the same hull), written by `tools/ships/tartane.py` (docs/design/
+Design-Ship-Tartane.md, Tar-D; her measuring, docs/design/ships-design/pages-tartane.md, Pages;
+docs/design/Plan-Package90.md §7.1, §7.2, §8.1: the tartane's builder fills `lateen.py` and merges
+it alone, before the polacre's and the xebec's rigs are written).
+
+Her truths, 7-681 to 7-689 (Tar-D §13's T-1 to T-9), are drafted here under their numbers where
+they hold on the tree as it stands, each a state: 7-681 (T-1) and 7-688 (T-8). The others wait on
+the engine's steps not yet merged and stay drafted in her design's §13: 7-682 (T-2, a point nearer
+the wind than a square-rigger: A8 tunes the lateen row, and A1a gives her lateen its bad hand;
+measured today she lies 60 degrees off making 1.91 kn to windward where the merchant brig holds
+63.75 making 1.89, a third of a point), 7-683 (T-3, her tack and wear with her yards shifted or
+left: A1a to A1c, re-measured after A1d), 7-684 (T-4, the bad hand and `shift the mainsail`:
+A1a), 7-685 (T-5, hove to with her topsail a topsail: A5 and A6), 7-686 (T-6, the gale: A8, with
+A1a's lateen evolutions), 7-687 (T-7, her great sail's all-hands call: A1a) and 7-689 (T-9, taken
+aback: A1d, with A1c's wear over 22 knots).
 
 `lateen.py` is pure: it imports nothing of the generator or the game, has no `build` and is
 named by no `SHIP_MODULES` row. Its cut is a whole lateen's (docs/design/Design-Ship-Tartane.md
@@ -17,9 +31,17 @@ import ast
 import importlib.util
 import math
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
+
+from freesail.ship.loader import load_ship, load_spec
+from freesail.ship.parts import SailState
+from freesail.world import captains
+from freesail.world import ships as S
+from freesail.world.ships import polar_of
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -177,3 +199,288 @@ def test_the_checks_hold_a_true_cut_and_raise_each_fault_in_words(lateen):
     tackless = [ln for ln in written if ln[1] != "tack"]
     with pytest.raises(ValueError, match="the lateen has 0 tacks"):
         lateen.check(c, tackless, **kw)
+
+
+# ---------------------------------------------------------------------------
+# Her two files: the generator's report, the hull, the rig, her company, her guns, her rows
+# ---------------------------------------------------------------------------
+
+HER = "data/ships/tartane.yaml"
+GUARD = "data/ships/coastguard-tartane.yaml"
+PIED = 0.3248
+
+
+@pytest.fixture(scope="module")
+def built(tmp_path_factory):
+    """Her module run as the generator runs it (`gen_ships` the running script), into a scratch
+    folder: her files and her report."""
+    out = tmp_path_factory.mktemp("tartane")
+    probe = (
+        "import sys\n"
+        "sys.path.insert(0, 'tools')\n"
+        "import gen_ships\n"
+        "from ships import tartane\n"
+        "tartane.build(sys.argv[1])\n"
+    )
+    run = subprocess.run(
+        [sys.executable, "-c", probe, str(out)],
+        check=True,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return out, run.stderr
+
+
+def _report(stderr, words):
+    return [line for line in stderr.splitlines() if words in line]
+
+
+def test_her_module_writes_her_two_files_byte_for_byte_as_committed(built):
+    out, _ = built
+    assert sorted(p.name for p in out.iterdir()) == ["coastguard-tartane.yaml", "tartane.yaml"]
+    for name in ("tartane.yaml", "coastguard-tartane.yaml"):
+        assert (out / name).read_bytes() == (ROOT / "data" / "ships" / name).read_bytes(), name
+
+
+@pytest.mark.parametrize("path", [HER, GUARD])
+def test_her_files_load_with_no_warning_every_part_rated(path):
+    spec = load_spec(path)
+    assert spec.warnings == []
+    ship = load_ship(path)
+    assert all(sp.rating_kn > 0.0 for sp in spec.spars)
+    assert all(ln.rating_kn > 0.0 for ln in ship.lines.values())
+    p = polar_of(path)
+    assert all(v >= 0.0 for row in p.speeds_kn for v in row)
+
+
+@pytest.mark.parametrize("path", [HER, GUARD])
+def test_her_hull_is_her_drawn_body_on_h_outside_the_plank(path, built):
+    """Tar-D §2 with the lead's rulings of 2026-11-20 (nudges 29 and 30): every figure on H, the
+    line the sheet marks; her displacement the body as drawn outside the plank, Chapman's body to
+    H with its keel (135.2 t moulded: Pages §4.3) and a plank of 2½ pouces (JUDGEMENT), the range
+    2 to 3 pouces in her report."""
+    hull = load_spec(path).hull
+    assert (hull.length_waterline_m, hull.draught_m, hull.lateral_area_m2) == (18.47, 2.38, 40.9)
+    assert (hull.hull_speed_kn, hull.deck_height_m, hull.gm_m) == (10.4, 0.54, 0.8)
+    assert hull.beam_m == round(20 * PIED + PIED / 3, 2) == 6.6
+    assert hull.displacement_kg == 142200.0
+    _, stderr = built
+    stem = Path(path).stem
+    line = _report(stderr, f"{stem}: her body drawn to H")[0]
+    assert "135.2 t moulded" in line and "142.2 t outside the plank, filed" in line
+    assert "140.8 to 143.6 t on 2 to 3 pouces" in line
+    drawn = _report(stderr, f"{stem}: the hull as drawn (freesail/ship/form.py): drawn displ")[0]
+    assert "drawn displacement 143 t against the filed 142 t (+1%)" in drawn
+
+
+def test_her_profile_is_chapmans_plate_at_her_scale_with_the_plank():
+    """Tar-D §3 (Pages §6): every line of the plate at her scale on H, rung S† (stand-in), each
+    half-breadth the plate's moulded one and the plank; the war tartane's four ports a side only
+    in the coastguard's file, the trader no war tartane."""
+    plank = 2.5 / 12 * PIED
+    for path in (HER, GUARD):
+        prof = load_spec(path).hull.profile
+        assert prof.rail_m[0] == (-9.72, 3.3) and prof.rail_m[-1] == (10.38, 3.67)
+        assert prof.keel_m == ((-8.91, -2.43), (0.0, -2.38), (6.71, -2.32))
+        assert prof.stem_m[-1] == (10.58, 4.74) and prof.stern_m[3] == (-9.23, 0.0)
+        midship = [t for t in prof.breadth_m if t[0] == -0.23][0]
+        assert midship[1] == pytest.approx(3.27 + plank, abs=0.006)
+        marks = dict(prof.marks)
+        assert marks["rail_m"] == marks["breadth_m"] == "stand-in"
+        assert prof.form.stern.type == "round" and prof.form.head == "knee"
+    assert load_spec(HER).hull.profile.ports_m == ()
+    ports = dict(load_spec(GUARD).hull.profile.ports_m)["upper"]
+    assert [(x, s) for x, s, _ in ports] == [
+        (-4.66, 1.37),
+        (-1.94, 1.11),
+        (3.21, 1.18),
+        (5.93, 1.57),
+    ]
+    assert dict(load_spec(GUARD).hull.profile.port_size_m)["upper"] == (0.52, 0.54)
+
+
+def test_her_masts_and_yards_hold_forfaits_table_ii():
+    """Truth 7-681's figures (T-1): her masts, yards and places within rounding of Forfait 1788
+    Table II's Humble (read on the page image: Tar §2.1), the pied du roi 0.3248 m; the topgallant
+    the Humble carries left out (Tar-D §4.1)."""
+    spars = {s.id: s for s in load_spec(HER).spars}
+    assert spars["main.lateen_yard"].length_m == round(75 * PIED, 2)
+    assert spars["main.topsail.yard"].length_m == round(32 * PIED, 2)
+    assert spars["main.treou.yard"].length_m == round(41 * PIED, 2)
+    assert spars["mizzen.lateen_yard"].length_m == round(47 * PIED, 2)
+    assert spars["bowsprit"].length_m == round(10.5 * PIED, 2)
+    assert "main.topgallant.yard" not in spars and "main.topmast" not in spars
+
+
+def test_her_main_stands_upright_by_the_owners_rule_one_figure():
+    """Her main's rake, one figure in her module (the owner's rule of 2026-11-20: the better
+    sailing of upright and slightly forward, measured: docs/dev/TuningNotes.md, the tartane's
+    section): upright, as Chapman's Pl. LXII No. 16 draws a tartane's main; her mizen raked aft
+    10 degrees (JUDGEMENT on Forfait p. 128)."""
+    spars = {s.id: s for s in load_spec(HER).spars}
+    assert spars["main.mast"].rake_deg is None
+    assert spars["mizzen.mast"].rake_deg == 10.0
+    assert spars["main.mast"].x_m == 3.87  # Forfait's 10 pieds 5 pouces before the middle
+
+
+def test_her_great_lateen_is_cut_by_forfaits_rule_and_her_sail_is_his(built):
+    """Tar-D §4.1, §4.5 (Forfait p. 121): the great lateen's head the yard less its ends, its yard
+    slung a third from the car on the main's raked line at its hounds and peaked so that the car
+    is tacked at the stem, its clew on the deck at the mast's foot (her design's reading, R); the
+    mizen lateen 'semblable' (Forfait pp. 124-125), its clew at its own mast's foot, its peak inside
+    the outrigger's end; her plain sail checked against the Humble's 2,237½ square pieds less his
+    topgallant's 20 m² (JUDGEMENT), within ±15%: 216.1 m², +0.0%."""
+    spec = load_spec(HER)
+    sails = {s.id: s for s in spec.sails}
+    great = sails["main.lateen"]
+    assert great.cls == "lateen" and not great.cut_at_mast and not great.dipping
+    tack, throat, peak, clew = great.corners_m
+    assert math.dist(throat, peak) == pytest.approx((75 - 2.25) * PIED, abs=0.02)
+    assert clew == (3.87, 0.31)  # the deck at the main's foot, above the datum
+    assert tack[0] == throat[0] and throat[1] - tack[1] == pytest.approx(0.3)
+    _, stderr = built
+    assert _report(stderr, "tartane: the great yard peaked 34.4 degrees to tack its car")
+    assert _report(stderr, "tartane: her plain sail 216.1 m² against Forfait's 236.0 m²")
+    plain = sum(sails[s].area_m2 for s in load_ship(HER).groups["plain sail"])
+    assert plain == 216
+    assert (sails["main.lateen"].area_m2, sails["mizzen.lateen"].area_m2) == (79, 26)
+    assert (sails["main.topsail"].area_m2, sails["jib"].area_m2) == (77, 34)
+
+
+def test_her_groups_are_her_designs_and_name_no_courses():
+    """Tar-D §4.4: plain sail the two lateens, the topsail and the jib; all sail those and the
+    tréou; the lateens a group of their own; no "courses" (her lateen is no course)."""
+    ship = load_ship(HER)
+    g = ship.groups
+    assert set(g["plain sail"]) == {"main.lateen", "main.topsail", "mizzen.lateen", "jib"}
+    assert set(g["all sail"]) == set(g["plain sail"]) | {"main.treou"}
+    assert g["lateens"] == ["main.lateen", "mizzen.lateen"]
+    assert "courses" not in g
+    assert ship.aliases["mainsail"] == "main.lateen" and ship.aliases["mizen"] == "mizzen.lateen"
+    sails = {s.id: s for s in load_spec(HER).sails}
+    assert sails["main.treou"].flying and sails["main.treou"].cls == "square"
+    assert not sails["main.bouffette"].bent and sails["main.bouffette"].in_place_of == "main.lateen"
+
+
+def test_her_companies_ten_and_thirty_four_with_spanish_names():
+    """Tar-D §6: the trader's ten, the master and the mate each heading a watch (ruling 11), six
+    able seamen, the boy and the cook; the guarda-costa's thirty-four; both drawn from the spanish
+    list (package 90's N1), which reads her as Spain's."""
+    trader, guard = load_spec(HER).crew, load_spec(GUARD).crew
+    assert (trader.complement, guard.complement) == (10, 34)
+    assert trader.names == guard.names == "spanish"
+    assert [p.post for p in trader.posts] == [p.post for p in guard.posts] == ["master", "mate"]
+    trader_stations = sum(trader.stations.values())
+    guard_stations = sum(guard.stations.values())
+    assert (trader_stations, guard_stations) == (8, 32)
+
+
+def test_the_guarda_costas_guns_are_chapmans_in_the_war_tartanes_ports():
+    """Tar-D §7 (package 81's checklist): eight long 4-pounders, one in each of the war tartane's
+    four ports a side, each at its port's sill, and four swivels on the rail aft; drawn by the
+    viewer's one rule (`tools/check_viewer_guns.py` clean); the trader unarmed, no armament."""
+    from freesail.api import viewer_guns  # noqa: F401  (the check's own rule)
+
+    assert load_spec(HER).armament is None
+    arm = load_spec(GUARD).armament
+    assert arm.default == "long guns"
+    guns = arm.fits["long guns"].guns
+    longs = [g for g in guns if g.kind == "long"]
+    assert len(longs) == 8 and {g.pounder for g in longs} == {4.0}
+    ports = {x: sill for x, sill, _ in dict(load_spec(GUARD).hull.profile.ports_m)["upper"]}
+    assert all(ports[g.x_m] == g.height_m for g in longs)
+    assert len([g for g in guns if g.kind == "swivel"]) == 4
+    run = subprocess.run(
+        [sys.executable, "tools/check_viewer_guns.py", HER, GUARD],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert run.returncode == 0 and run.stdout.strip().endswith("clean"), run.stdout
+
+
+def test_her_descriptions_rows_and_words_rank_her_the_cutters_class():
+    """Tar-D §8, §9: 'a tartane' at four miles; the trader 'a tartane, a coaster under her great
+    lateen, deep laden', a merchant, unarmed; the guarda-costa 'a King's tartane, armed, a
+    guarda-costa', the revenue role, her long guns; each ranked the cutter's class by every
+    reading; her words, Falconer's and Steel's 'tartan', the Spanish 'tartana' and James's
+    'garda-costa'."""
+    for key, path, fit, roles in (
+        ("tartane", HER, "unarmed", ["merchant"]),
+        ("guarda-costa tartane", GUARD, "long guns", ["revenue"]),
+    ):
+        d = S.description(key)
+        assert (d["file"], d["rig"], d["fit"], d["roles"]) == (path, "a tartane", fit, roles)
+        readings = [
+            captains.SIZE_RANK.get(key),
+            captains.size_rank_of(key),
+            captains.size_of_words(d["rig"]),
+            captains.size_of_words(d["what"]),
+            captains.size_rank_of(d["what"]),
+            captains.size_of_file(d["file"]),
+        ]
+        assert readings == [1] * 6, key
+    assert "King's" in S.description("guarda-costa tartane")["what"]
+    for words, key in (
+        ("a tartan", "tartane"),
+        ("tartana", "tartane"),
+        ("a garda-costa", "guarda-costa tartane"),
+    ):
+        assert S.description_key(words) == key
+
+
+# ---------------------------------------------------------------------------
+# Her truths that hold on the tree as it stands: 7-681 (T-1) and 7-688 (T-8)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_681_her_particulars_hold_their_sources():
+    """T-1 (Tar-D §13): her particulars hold their sources. Her length and breadth Forfait's
+    Humble (62¾ by 20⅓ pieds; Table II, read on the page image), her masts and yards his within
+    rounding, their places his from the middle of her perpendiculars (x +0.49 in her frame: Pages
+    §6.4); her lines Chapman's Pl. LVII No. 16 at her scale, lengths by 1.100 and sections by 1.268
+    (Pages §3.4): her waterline 18.47 m and her draught 2.38 m on H, her drawn displacement within
+    Pages §4.3's ±6% of the filed."""
+    spec = load_spec(HER)
+    spars = {s.id: s for s in spec.spars}
+    assert round(62.75 * PIED, 2) == 20.38 and spec.hull.beam_m == round((20 + 1 / 3) * PIED, 2)
+    for sid, pieds in (
+        ("main.lateen_yard", 75),
+        ("main.topsail.yard", 32),
+        ("mizzen.lateen_yard", 47),
+        ("bowsprit", 10.5),
+    ):
+        assert spars[sid].length_m == pytest.approx(pieds * PIED, abs=0.005), sid
+    assert spars["main.mast"].x_m == pytest.approx(0.49 + (10 + 5 / 12) * PIED, abs=0.01)
+    assert spars["mizzen.mast"].x_m == pytest.approx(
+        0.49 - (15 + 2 / 12) * PIED - math.tan(math.radians(10.0)) * (0.54 - 0.93), abs=0.01
+    )
+    # the main: 59 pieds heel to head, its heel on a keelson over the keel's upper edge
+    main_head = -2.12 + 0.25 + 59 * PIED  # above the water, upright
+    assert spars["main.mast"].height_m == pytest.approx(main_head - 0.54, abs=0.01)
+    assert spec.hull.length_waterline_m == pytest.approx(56.55 * 0.2969 * 1.1003, abs=0.01)
+    assert spec.hull.draught_m == pytest.approx(6.317 * 0.2969 * 1.2682, abs=0.01)
+    drawn = 135.2 / 0.94, 135.2 / 1.06
+    assert drawn[1] * 1000 < spec.hull.displacement_kg < drawn[0] * 1000 * 1.06
+
+
+def test_truth_7_688_before_the_wind_the_treou_set_adds_way_the_great_lateen_taken_in_for_it():
+    """T-8 (Tar-D §13; Lescallier p. 401: the tréou set with the wind aft; Falconer 1780, TREOU):
+    running dead before 15 knots of wind, her great lateen taken in and her tréou set flying on
+    its yard, she runs faster than under plain sail. Measured on the tree as it stands (seed 7):
+    4.69 kn under plain sail; 4.35 with the great lateen taken in; 4.86 with the tréou set."""
+    from tests.test_known_truths import knots, make, run, settle
+
+    w = make(HER, 180.0, 15.0, 4.0)
+    settle(w, ["call all hands", "set plain sail", "square the yards"], sail_wait=1800, ticks=1200)
+    plain = knots(w)
+    assert w.ship.sails["main.treou"].state is SailState.FURLED
+    w.submit("take in the mainsail")
+    run(w, 600, trim_every=120)
+    lateen_in = knots(w)
+    assert w.ship.sails["main.lateen"].state is SailState.IN_THE_GEAR
+    w.submit("set the treou")
+    run(w, 900, trim_every=120)
+    assert w.ship.sails["main.treou"].state is SailState.SET
+    assert knots(w) > plain > lateen_in

@@ -81,6 +81,9 @@ from freesail.world import ships as S
 ROOT = Path(__file__).resolve().parents[1]
 SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
 NEW_MODULES = ("tartane", "polacre", "xebec", "diana", "concepcion")
+# The modules built since stage 0, each by her builder (the plan's §7.1): the tartane's writes
+# `tartane.yaml` and `coastguard-tartane.yaml` (tests/test_profile.py's `MODULE_FILES`).
+BUILT_MODULES = ("tartane",)
 PACKAGE_90_WORDS = (
     "three-decker",
     "first rate",
@@ -468,6 +471,11 @@ def test_the_five_modules_follow_the_four_and_each_stub_writes_nothing(tmp_path)
         path = ROOT / "tools" / "ships" / f"{name}.py"
         tree = ast.parse(path.read_text(encoding="utf-8"))
         assert ast.get_docstring(tree), name
+        if name in BUILT_MODULES:
+            # a built module writes her own files and no other (tests/test_profile.py's hook
+            # test holds them byte for byte with the generator as the running script)
+            assert "build" in {n.name for n in tree.body if isinstance(n, ast.FunctionDef)}
+            continue
         assert [type(n).__name__ for n in tree.body] == ["Expr", "FunctionDef"], name
         out = tmp_path / name
         out.mkdir()

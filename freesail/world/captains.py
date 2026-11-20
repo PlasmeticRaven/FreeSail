@@ -324,6 +324,9 @@ SIZE_RANK: dict[str, int] = {
     # the three-decker a class above the ships of the line, compared and never an index (the
     # owner's answer to question 8, 2026-11-18, Decisions-Package90-2026-11.md)
     "tartane": 1,
+    # her sub-type in a file of its own, the guarda-costa of the same hull, her file's class
+    # (package 90, the tartane's builder; Design-Ship-Tartane.md §8)
+    "guarda-costa tartane": 1,
     "polacre": 2,
     "xebec": 2,
     "corvette": 2,

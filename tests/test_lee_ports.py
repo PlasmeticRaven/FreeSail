@@ -49,6 +49,7 @@ SIXTY_FOUR = "data/ships/sixty-four.yaml"
 RAZEE = "data/ships/razee-44.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2
 SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7
+COASTGUARD = "data/ships/coastguard-tartane.yaml"  # package 90, the tartane's builder
 LAUNCH = "data/ships/boat-launch-31.yaml"
 # A real checkpoint of a cutter with her guns cast loose, written by the commit before package
 # 75's stage 0 (c5140483): her guns hold no deck and her hull no profile, her sills 1.5 m. A
@@ -1647,6 +1648,10 @@ LOWEST_LEE_PORT = (
     (SIXTY_FOUR, "ardent class 1784", "lower", 10.55, 6),
     (NEUFCHATEL, "as taken 1814", "upper", 18.18, 3),
     (SEVENTY_FOUR, "arrogant class 1795", "lower", 10.35, 6),  # package 75, B7 (10.38 at step 4)
+    # package 90, the tartane's builder: the guarda-costa's long 4-pounders in the war tartane's
+    # ports (Pages §5.7), her lowest lee port with a gun in it her No. 3 (x -1.94, sill 1.11 m),
+    # measured by the truth's helpers on her file (2026-11-20)
+    (COASTGUARD, "long guns", "upper", 14.53, 1),
 )
 # The razee's three decks with guns in them, as lines of the truth (§15, "Not truths, said";
 # Indf §3.4): her main battery the 64's lower deck raised by her rise, and the two above it.

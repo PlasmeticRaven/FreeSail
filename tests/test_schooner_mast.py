@@ -192,13 +192,16 @@ def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(pat
     assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_eighteen_files_her_three_parts_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the eighteen files of the tree (the *Neufchatel*'s the sixteenth,
+def test_the_guard_reads_twenty_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the twenty files of the tree (the *Neufchatel*'s the sixteenth,
     package 75, B2; the bilander's the seventeenth, B4, her main crossing her dry yard on its lower
-    mast, so that the rule names none of hers; the 74's the eighteenth, B7, a ship's three masts),
-    her three parts named, and the brig's main topsail, topgallant and royal yards, which a rule
-    without its lower-yard test would name. Old: seventeen files."""
-    assert len(SHIP_FILES) == 18
+    mast, so that the rule names none of hers; the 74's the eighteenth, B7, a ship's three masts;
+    package 90's tartane and coastguard tartane the nineteenth and twentieth, her main her one mast
+    with yards, its topsail and tréou yards on its lower mast, so that the rule names none of
+    hers, as the tartane's probe classes as the cutter), her three parts named, and the brig's
+    main topsail, topgallant and royal yards, which a rule without its lower-yard test would name.
+    Old: eighteen files (the name said eighteen); seventeen before them."""
+    assert len(SHIP_FILES) == 20
     assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
     bilander = load_ship(ROOT / "data" / "ships" / "bilander.yaml")
     assert bilander.spars["main.crossjack.yard"].parent == "main.mast"
@@ -779,7 +782,9 @@ def test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_g
     *Neufchatel*'s has no line of the after sail at any reef, her plain sail and her courses set
     (the schooners cross no course; the cutter's topsail has one reef band, so never a second;
     the smack's topsail yard is on her pole mast, no topsail of a topmast; the lugger's are set
-    flying; the boats have none). Hers reefs her fore course once from her topsails' first reef
+    flying; the boats have none; package 90's tartane and coastguard tartane cross no course, their
+    lateens in no "courses" group, Design-Ship-Tartane.md §4.4; old: the list without them). Hers
+    reefs her fore course once from her topsails' first reef
     on, and takes in nothing (`COURSE_REEFED_BY_THE_GALE`; her gale is her own tests'; her fore
     gaff sail taken in with it from B2b to B2c, when the owner's ruling for the lead moved it to
     lie a-try). The square-rigged files are `tests/test_gale.py`'s and the other files' as
@@ -805,11 +810,13 @@ def test_only_the_neufchatel_of_the_fore_and_afters_has_a_course_reefed_by_the_g
         "boat-launch-25",
         "boat-launch-31",
         "boat-yawl-16",
+        "coastguard-tartane",
         "cutter",
         "hermaphrodite-brig",
         "lugger",
         "privateer-schooner",
         "smack",
+        "tartane",
         "topsail-schooner",
     ]
 
