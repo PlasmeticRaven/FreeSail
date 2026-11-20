@@ -167,6 +167,17 @@ ACTOR_PREFIX = "captain's rule "
 JUDGE_EVERY_S = 60
 JUDGE_FIRST_S = 300
 
+# A whole lateen's practice and its board on the bad hand (package 90, A1c; the lead's ruling of
+# 2026-11-18, nudge 18; docs/design/Design-Package90-Engine.md §2.3 item 6). The rules captain
+# keeps the ship's practice ("shift" in both) and, by their book's `lateen_leave_kn` and
+# `bad_hand_s` read with these defaults (written in no committed book, so that no book's count
+# moves: `tests/test_subtypes.py`), leaves the yards in stays in fine weather (Stratico,
+# BISDOSSO: "con tempo bello"), sets the practice back as it freshens, and shifts a yard left on
+# the bad hand after a long board on it (the 2018 inventory's long boards; a little before the
+# probes' break-even, 34 to 67 minutes at the ruled rate). JUDGEMENT on every figure.
+LATEEN_LEAVE_KN = 12.0
+BAD_HAND_S = 1800
+
 # The states in which the rules-based captain keeps the deck himself over a seated officer
 # (package 41, spec M6 §11: he takes it back "for a judgement that needs the deck"): the
 # gale and the shelter, a stranger investigated, chased or evaded, distress, and the
@@ -3201,6 +3212,7 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
+            self._lateen_work(p)  # package 90, A1c: nothing on a hull with no whole lateen
         if ABACK_RECOVER and state in ABACK_RECOVER_STATES and self._aback_with_no_way(p, kinds):
             return  # boxing her off: the state's own work waits for her way
         if DANGER_AHEAD and state in DANGER_AHEAD_STATES and self._danger_ahead_by_chart(p):
@@ -3244,6 +3256,8 @@ class Captain(Judgement):
                 self._waiting_at_road = False
         if "sail.across_the_stern" in kinds and state not in ("hove to for weather", "in distress"):
             self._across_the_stern(events)
+        if "sail.across_the_bow" in kinds and state not in ("hove to for weather", "in distress"):
+            self._across_the_bow(events)  # package 90, A1c: its whole lateens
         if "ship.brought_up" in kinds:
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
@@ -3586,10 +3600,74 @@ class Captain(Judgement):
             sl = sails.get(sid)
             if sl is not None and sl.is_set:
                 self.give(f"dip the {self._sail_name(sid)}", why=why)
+        self._shift_lateens_left(data, why)  # package 90, A1c: as a lug is dipped
         if data.get("yards"):
             self.give("trim sails", why=why)
         elif data.get("booms"):
             self.give("trim the sheets", why=why)
+
+    def _shift_lateens_left(self, data: dict[str, Any], why: str) -> None:
+        """Each whole lateen the watch's line said lies on its mast, still set, shifted by its own
+        order (package 90, A1c), as a lug left against its mast is dipped; one shifted since is
+        refused as done."""
+        sails = getattr(self.world.ship, "sails", {}) or {}
+        for sid in data.get("lateens") or []:
+            sl = sails.get(sid)
+            if sl is not None and sl.is_set:
+                self.give(f"shift the {self._sail_name(sid)}", why=why)
+
+    def _across_the_bow(self, events: list[Any]) -> None:
+        """The wind come round ahead through her bow outside a manoeuvre (package 90, A1a's line,
+        `navigation.watch_the_stern`): the whole lateens it left on their masts shifted (A1c),
+        as after the wind across the stern. The lugger's lugs the line names are not his to dip
+        here: their answer is not of this card, and the lugger's runs stay as they were."""
+        crossed = [e for e in events if e.kind == "sail.across_the_bow"]
+        if crossed:
+            self._shift_lateens_left(crossed[-1].data or {}, "the wind round ahead through the bow")
+
+    def _lateen_work(self, p: Perception) -> None:
+        """A hull with a whole lateen (package 90, A1c; Design-Package90-Engine.md §2.3 item 6):
+        the ship's practice in stays set by the mean true wind, `leave the lateens in stays` as it
+        falls under `lateen_leave_kn` and `shift the lateens in stays` as it rises over it, each
+        once at the crossing, as a standing order would, so that every tack by any road reads it;
+        the yards left on the bad hand shifted, each by its own order, as the wind rises over it
+        or after a board of `bad_hand_s` on it, while no manoeuvre is in hand. Both figures from
+        his book, read with their defaults. A hull with none: nothing, and nothing kept."""
+        from freesail.evolutions import scripts
+
+        ship = self.world.ship
+        if not scripts.has_whole_lateen(ship):
+            return
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        leave_kn = float(th("lateen_leave_kn", LATEEN_LEAVE_KN))
+        b = self._business
+        light = p.wind_kn < leave_kn
+        was = b.get("lateen_light")
+        b["lateen_light"] = light
+        if was is None or was != light:
+            wanted = "leave" if light else "shift"
+            if scripts.lateen_practice(ship).get("stays") != wanted:
+                said = "under" if light else "over"
+                why = f"the wind {said} {leave_kn:g} knots"
+                self.give(f"{wanted} the lateens in stays", why=why)
+        left = scripts.lateens_on_their_masts(ship)
+        if not left or p.manoeuvre not in ("none", ""):
+            b.pop("bad_hand_since", None)
+            return
+        since = b.setdefault("bad_hand_since", p.tick)
+        risen = was is True and not light
+        board = p.tick - since >= float(th("bad_hand_s", BAD_HAND_S))
+        if not (risen or board):
+            return
+        b.pop("bad_hand_since", None)
+        why = (
+            f"the wind risen over {leave_kn:g} knots"
+            if risen
+            else f"{round((p.tick - since) / 60)} minutes on the bad hand"
+        )
+        for sl in left:
+            self.give(f"shift the {self._sail_name(sl.id)}", why=why)
 
     def _sail_if_none(self) -> None:
         """Plain sail made when she is under way with none set (package 43b), the topsails

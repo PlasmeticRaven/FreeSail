@@ -759,12 +759,19 @@ def lateen_plan_words(ship: Ship, plan: dict[str, list[str]], occasion: str) -> 
     return "; " + ", ".join(said)
 
 
+def lateens_on_their_masts(ship: Ship) -> list[Sail]:
+    """The whole lateens set whose yards hang on the weather side of their masts as the deck reads
+    the wind, on the bad hand (package 90): what a going about's last line names, and what the
+    rules captain shifts after a board on it (A1c)."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    return [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+
+
 def lateens_on_the_mast_words(ship: Ship) -> str:
     """', the mainsail on the mast' (', the lateens on their masts'): the whole lateens set that
     end a manoeuvre on the weather side of their masts, for its last line (package 90, A1b); ""
     with none, so that no other ship's line moves."""
-    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
-    on = [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+    on = lateens_on_their_masts(ship)
     if not on:
         return ""
     if len(on) == 1:
