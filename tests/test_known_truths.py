@@ -20669,31 +20669,39 @@ def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds
 # -- package 116 (card 5 of docs/dev/ScopeCards-BeforeTheGate.md): the four small mends --------
 
 
-def test_truth_7_630_the_merchant_brig_lets_go_her_anchor_by_all_hands_and_weighs():
+def test_truth_7_630_the_merchant_brig_lets_go_her_anchor_by_her_watch_and_weighs():
     """Card 5, the first mend. The harbour's merchant brig began with her opening order
     waiting for ever: `let go the anchor` wants a dozen (its file's judgement), no more than
-    the eleven her company can give; work begins at half its want; and her ten seamen are
+    the eleven her company can give; work begins at half its want; and her ten seamen were
     watched seven and three (ruling 11's own words), the larboard three and her master making
     four at five in the morning: "Not hands enough on deck to let go the anchor; there are
     but four to spare", and nothing ever called the rest. Mended at the anchor's file, by the
     form the settee's files and the boat's have (`too_few: all hands`): a watch too few to
-    begin it calls all hands for it, piped down when she is brought up. Her muster stands.
+    begin it calls all hands for it, piped down when she is brought up.
 
-    As the harbour starts her: all hands are called to let go, she rides at anchor in
-    Falmouth within two minutes and the larboard watch has the deck again; she weighs, and
-    `let go the anchor` brings her up a second time. The cutter in the same road lets go
-    with her watch as before, no hands called."""
+    Package 119 (the owner's word of 2026-11-19, the lead's of the same day): her ten are
+    mustered five and five (the muster's rule 3, the odd hands of odd stations to the
+    watches in turn), so that the larboard five and her master make six, half the want, and
+    she lets go by her watch: "Only six hands to let go the anchor", no hands called. (Old,
+    package 116: `[7, 3]`, all hands called once, "All hands! (to let go the anchor)", and
+    piped down. A watch too few still calls all hands for it: truth 7-703.)
+
+    As the harbour starts her: she rides at anchor in Falmouth within two minutes by the
+    larboard watch, nothing waiting and no hands called; she weighs, and `let go the anchor`
+    brings her up a second time. The cutter in the same road lets go with her watch as
+    before, no hands called."""
     w = _harbour_game("data/scenarios/merchant-brig.yaml")
     crew = w.ship.extra["crew"]
     runner = w.ship.extra["evolutions"]
     from freesail.crew.bill import Watch
 
-    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [7, 3]
+    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [5, 5]
     w.run(120)
     assert w.dealings.anchored and w.dealings.in_port().name == "Falmouth"
     called = [e.text for e in w.log if e.kind == "crew.all_hands"]
-    assert called == ["All hands! (to let go the anchor)"], called
-    assert [e for e in w.log if e.kind == "crew.piped_down"], "all hands were never piped down"
+    assert called == [], called
+    short = [e.text for e in w.log if e.kind == "evolution.short_handed"]
+    assert short == ["Only six hands to let go the anchor; there are no more on deck."], short
     assert not crew.all_hands_called
     assert not [e for e in w.log if e.kind == "evolution.waiting"]
     e = _said(w, "weigh anchor")
@@ -22571,6 +22579,330 @@ def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_i
         10,
         3,
     ), count
+
+
+# -- package 119 (the owner's word of 2026-11-19): the merchant brig's watches five and five ----
+# The muster's rule 3 (`freesail/crew/muster.py`): each station's hands watched alternately,
+# starboard first, as before; the odd hands of successive odd stations, the marines among them
+# after the seamen's, go to the watches in turn (old: every odd hand to the starboard). Truths
+# 7-700 to 7-704.
+
+# Each ship file mustered at seed 7 on the trunk before package 119 (at de62ed74, the old rule):
+# the hands on her books, the name of the last of them and the muster stream's next draw after
+# the muster. The rule draws nothing, so each is the same under the new.
+_MUSTERED_BEFORE_119 = {
+    "bilander.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-cutter-23.yaml": (7, "Dennis Thompson", 0.8584684590486795),
+    "boat-cutter-28.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-launch-25.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-launch-31.yaml": (11, "Robt. Nicholson", 0.4275923056694029),
+    "boat-yawl-16.yaml": (5, "Simon White", 0.22323896460701453),
+    "brig.yaml": (121, "Nichs. Webb", 0.9617865333626133),
+    "cutter.yaml": (30, "Llewellyn Gale", 0.15129838311640065),
+    "frigate-36.yaml": (264, "Dennis Gordon", 0.6678109415441436),
+    "hermaphrodite-brig.yaml": (130, "Abm. Henderson", 0.04378806669158586),
+    "lugger.yaml": (30, "Gilles Riou", 0.8639844696985152),
+    "merchant-brig.yaml": (16, "Richd. Evans", 0.34205580615985787),
+    "privateer-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
+    "razee-44.yaml": (330, "Martin Hodgson", 0.17463947466444973),
+    "seventy-four.yaml": (590, "Giles Stewart", 0.9241919469285972),
+    "sixty-four.yaml": (491, "Gilbert Pritchard", 0.7511335761053086),
+    "smack.yaml": (8, "Isaac Matthews", 0.5709136896467344),
+    "topsail-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
+}
+
+
+def _mustered(path, seed=7):
+    """The ship file's company as the muster makes it from its own stream at `seed`, and the
+    stream's next draw after it."""
+    import random
+
+    from freesail.crew import muster
+    from freesail.ship.loader import load_spec
+
+    stream = random.Random(seed)
+    crew = muster(load_spec(path).crew, stream)
+    return crew, stream.random()
+
+
+def _stations_watched(crew):
+    """{station: [watch of each hand, in the order of the books]} for the watched stations."""
+    from freesail.crew.model import Watch
+
+    out: dict = {}
+    for s in crew.sailors:
+        if s.watch is not Watch.NONE:
+            out.setdefault(s.station, []).append(s.watch)
+    return out
+
+
+def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
+    """Package 119, the rule's purpose (Luce: "giving to each watch an equal share of the
+    strength"): in every ship file, mustered at two seeds, the starboard and the larboard
+    watches are equal or one apart, and so is each station's share of them; the merchant brig's
+    ten are five and five (old seven and three), the razee's 288 are 144 and 144 (old 146 and
+    142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
+    were: no other one had more than one odd station."""
+    import glob
+
+    from freesail.crew.model import Watch
+
+    files = sorted(glob.glob("data/ships/*.yaml"))
+    assert [Path(p).name for p in files] == sorted(_MUSTERED_BEFORE_119)
+    split = {}
+    for path in files:
+        for seed in (7, 1805):
+            crew, _ = _mustered(path, seed)
+            st = sum(1 for s in crew.sailors if s.watch is Watch.STARBOARD)
+            lar = sum(1 for s in crew.sailors if s.watch is Watch.LARBOARD)
+            assert 0 <= st - lar <= 1, (path, seed, st, lar)
+            for station, watches in _stations_watched(crew).items():
+                gap = watches.count(Watch.STARBOARD) - watches.count(Watch.LARBOARD)
+                assert abs(gap) <= 1, (path, station, gap)
+            split[Path(path).name] = (st, lar)
+    assert split["merchant-brig.yaml"] == (5, 5)
+    assert split["razee-44.yaml"] == (144, 144)
+    assert split["seventy-four.yaml"] == (265, 265)
+    assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
+
+
+def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
+    """Package 119, the lead's word: each hand's watch, name and skills and the stream's draw
+    as before, for all eighteen files. At seed 7 each file's books hold as many hands as before,
+    the last of them by the same name, and the stream's next draw after the muster is the same
+    (`_MUSTERED_BEFORE_119`, measured on the old rule): the rule draws nothing and enters no
+    hand otherwise. Each hand's watch is the old rule's (alternately in its station, starboard
+    first) but for the odd last hands of the second, fourth, ... odd stations, which go to the
+    larboard: two of the merchant brig's (her fore top's and her afterguard's, the boy), two of
+    the razee's (fore top, waisters), three of the seventy-four's (fore top, afterguard, the
+    marines); none of any other file's."""
+    import glob
+
+    from freesail.crew.model import WATCHES
+
+    moved_by_file = {}
+    for path in sorted(glob.glob("data/ships/*.yaml")):
+        name = Path(path).name
+        crew, after = _mustered(path)
+        assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]
+        moved = []
+        odd = 0
+        for station, watches in _stations_watched(crew).items():
+            for i, watch in enumerate(watches):
+                old = WATCHES[i % 2]
+                if len(watches) % 2 and i == len(watches) - 1:
+                    assert watch is WATCHES[odd % 2], (name, station)
+                    odd += 1
+                    if watch is not old:
+                        moved.append(station.value)
+                else:
+                    assert watch is old, (name, station, i)
+        moved_by_file[name] = moved
+    assert {k: v for k, v in moved_by_file.items() if v} == {
+        "merchant-brig.yaml": ["fore_top", "afterguard"],
+        "razee-44.yaml": ["fore_top", "waisters"],
+        "seventy-four.yaml": ["fore_top", "afterguard", "marines"],
+    }
+    # the three files' moved hands by name and the company's skills, as on the old rule
+    crew, _ = _mustered("data/ships/merchant-brig.yaml")
+    by_id = {s.id: s for s in crew.sailors}
+    assert (by_id["s011"].name, by_id["s015"].name) == ("Benjn. Hammond", "Josiah Zimmerman")
+    for path, aloft, deck in (
+        ("data/ships/merchant-brig.yaml", 11.519, 11.819),
+        ("data/ships/razee-44.yaml", 150.054, 179.938),
+        ("data/ships/seventy-four.yaml", 259.365, 317.525),
+    ):
+        crew, _ = _mustered(path)
+        assert round(sum(s.skill_aloft for s in crew.sailors), 3) == aloft, path
+        assert round(sum(s.skill_deck for s in crew.sailors), 3) == deck, path
+
+
+def test_truth_7_702_the_merchant_brigs_fore_topsail_is_begun_short_by_either_watch():
+    """Package 119, the owner's complaint (package 116's "left for the owner"): on her watch of
+    three, `set the fore topsail` and every job wanting nine or more hands waited ("Not hands
+    enough on deck to set the fore topsail; there are but four to spare"). At five and five,
+    by night off the Lizard (tests/test_hands.py's trader at seed 7), the fore topsail, the
+    main topsail and the foresail from the gear (twelve wanted, her company's eleven) are each
+    begun short by either watch, its five hands and its post making six, half the eleven.
+    How a job counts its hands is unchanged: the post is counted as ruling 11 counts it."""
+    from freesail.crew.bill import Watch
+    from tests.test_hands import BRIG, asked, trader_at
+
+    for watch, post in ((Watch.STARBOARD, "mate"), (Watch.LARBOARD, "master")):
+        for sid in ("fore.topsail", "main.topsail", "fore.course"):
+            w, crew, runner = trader_at(BRIG, 2, watch)
+            inst = asked(w, "set_square", sid, "in_the_gear")
+            assert runner._take_hands(w.ship, inst, crew), (watch, sid, inst.wait_line)
+            got = inst.assignment
+            assert (got.got, got.wanted, got.outcome) == (6, 11, "short"), (watch, sid)
+            assert [s.post for s in got.hands if s.post] == [post], (watch, sid)
+
+
+def test_truth_7_703_a_merchant_brig_whose_watch_is_too_few_calls_all_hands_to_let_go():
+    """Package 119, the lead's word: package 116's `too_few: all hands` still told by a ship.
+    The harbour's merchant brig lets go by her watch at five and five (truth 7-630) and weighs;
+    two of her larboard watch go on the sick list (`Health.make_sick`, the state the director's
+    `aboard:` forms make), and her watch's whole is three. `let go the anchor` then calls all
+    hands, once, "All hands! (to let go the anchor)": the three and her master are under half
+    its want. She is brought up again in Falmouth's road within two minutes, all hands piped
+    down and the larboard watch on deck, nothing left waiting. (Hands away in the boat do not
+    make the watch too few: they are at other work, and the anchor waits for them, by the one
+    judge's rule, `Runner._calls_for_itself`.)"""
+    from freesail.crew.bill import Watch
+
+    w = _harbour_game("data/scenarios/merchant-brig.yaml")
+    crew = w.ship.extra["crew"]
+    runner = w.ship.extra["evolutions"]
+    w.run(120)
+    assert w.dealings.anchored
+    assert _said(w, "weigh anchor").kind != "order.rejected"
+    for _ in range(60):
+        w.run(60)
+        if not w.dealings.anchored:
+            break
+    assert not w.dealings.anchored, "she never weighed"
+    for _ in range(40):
+        if not runner.instances and not crew.all_hands_called:
+            break
+        w.run(30)
+    assert not runner.instances and not crew.all_hands_called
+    t0 = w.clock.tick
+    larboard = [s for s in crew.sailors if s.watch is Watch.LARBOARD and not s.post]
+    assert len(w.health.make_sick(larboard[:2], "a fever", int(t0))) == 2
+    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [5, 3]
+    e = _said(w, "let go the anchor")
+    assert e.kind != "order.rejected", e.text
+    first = len([x for x in w.log if x.kind == "ship.anchored"])
+    for _ in range(8):
+        w.run(15)
+        if len([x for x in w.log if x.kind == "ship.anchored"]) > first:
+            break
+    assert len([x for x in w.log if x.kind == "ship.anchored"]) == first + 1
+    assert w.dealings.anchored and w.dealings.in_port().name == "Falmouth"
+    assert w.clock.tick - t0 <= 120
+    called = [x.text for x in w.log if x.tick > t0 and x.kind == "crew.all_hands"]
+    assert called == ["All hands! (to let go the anchor)"], called
+    w.run(5)
+    piped = [x.text for x in w.log if x.tick > t0 and x.kind == "crew.piped_down"]
+    assert piped == ["Piped down; the larboard watch has the deck."], piped
+    assert not crew.all_hands_called
+    assert not [x for x in w.log if x.tick > t0 and x.kind == "evolution.waiting"]
+
+
+def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
+    """Package 119, what else the rule gives the merchant brig: her two watches are alike in
+    what they can do, by night off the Lizard (tests/test_hands.py's trader at seed 7), each of
+    five and its post. Each takes the same number for every work below, where at seven and
+    three the starboard took more and the larboard waited for the topsails, the foresail and
+    the furling of a topsail: a topsail or the foresail set from the gear six of eleven, short;
+    the braces six of eight, short; a topsail furled five of ten (aloft: no post), short; a tack
+    and a wear, all hands' work by their files, seven whichever watch has the deck (old nine
+    with the starboard's, six with the larboard's). Heaving to (twelve, her eleven; a
+    manoeuvre, so no post) is more than either watch of five can begin, and calls all hands
+    (the owner's word of 2026-11-19: `too_few: all hands` in its file): ordered by the player
+    or by a standing order, on either watch, all hands are called once for it, she is hove to,
+    and the hands are piped down with the same watch on deck. Old (b422d05, before the key):
+    it waited on either watch, "Not hands enough on deck to heave to; there are but five to
+    spare."; before package 119 the larboard's three waited and the starboard's seven hove to
+    short (seven of eleven). Filling away, its pair (twelve, her eleven: the lead's ruling inside
+    the owner's word, `too_few: all hands` in its file), the same: hove to, she fills away by all
+    hands, called once for it, and is piped down again with the same watch on deck, under way;
+    by the player's orders, and by two standing orders (to lie to when the wind exceeds ten
+    knots, to fill away when it is below eight, the wind then falling to six). Old (5e56509,
+    before the key): on either watch she was hove to and could not fill away, "Not hands enough
+    on deck to fill away; there are but five to spare.", and lay hove to. How a job counts its
+    hands is unchanged."""
+    from freesail.crew.bill import Watch
+    from freesail.ship.parts import SailState
+    from tests.test_hands import BRIG, asked, trader_at
+
+    cases = (
+        ("set_square", "fore.topsail", "in_the_gear", (6, 11, "short")),
+        ("set_square", "main.topsail", "in_the_gear", (6, 11, "short")),
+        ("set_square", "fore.course", "in_the_gear", (6, 11, "short")),
+        ("brace", None, None, (6, 8, "short")),
+        ("furl_square", "fore.topsail", "in_the_gear", (5, 10, "short")),
+        ("tack", None, None, (7, 7, "enough")),
+        ("wear", None, None, (7, 7, "enough")),
+    )
+    for watch in (Watch.STARBOARD, Watch.LARBOARD):
+        for eid, sid, state, want in cases:
+            w, crew, runner = trader_at(BRIG, 2, watch)
+            inst = asked(w, eid, sid, state)
+            assert runner._take_hands(w.ship, inst, crew), (watch, eid, inst.wait_line)
+            got = inst.assignment
+            assert (got.got, got.wanted, got.outcome) == want, (watch, eid, sid)
+        w, crew, runner = trader_at(BRIG, 2, watch)
+        inst = asked(w, "heave_to", None)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        w, crew, runner = trader_at(BRIG, 2, watch)
+        w.ship.extra["hove_to"] = {"tack": "starboard", "backed": ["main"]}
+        inst = asked(w, "fill_away", None)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        # the two roads, in the world: the player's orders and standing orders
+        for given in (
+            "heave to",
+            'standing order "lie to": when the true wind exceeds 10 knots then heave to',
+        ):
+            w, crew, _runner = trader_at(BRIG, 2, watch)
+            for sid in w.ship.groups["plain sail"]:
+                w.ship.sails[sid].state = SailState.SET
+            w.ship.dyn.heading = units.deg_to_rad(215.0)  # by the wind, the starboard tack
+            w.ship.dyn.speed = units.knots_to_ms(5.0)
+            w.submit("steer 215")
+            w.run(400)
+            t0 = w.clock.tick
+            w.submit(given)
+            w.run(600)
+            ev = [e for e in w.log if e.tick >= t0]
+            road = (watch, given)
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'lie to': heaving to."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to heave to)"
+            ], road
+            assert [e.kind for e in ev if e.kind == "crew.all_hands_up"] == ["crew.all_hands_up"]
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            hove = [e.tick for e in ev if e.kind == "ship.hove_to"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(hove) == 1 and "hove_to" in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= hove[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            # and filled away again, by all hands, and under way
+            t1 = w.clock.tick
+            if given == "heave to":
+                w.submit("fill away")
+            else:
+                w.submit(
+                    'standing order "fill": when the true wind is below 8 knots then fill away'
+                )
+                w.wind.speed = w.wind.base_speed = units.knots_to_ms(6.0)  # the wind falls
+            w.run(900)
+            ev = [e for e in w.log if e.tick >= t1]
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'fill': filling away."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to fill away)"
+            ], road
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            filled = [e.tick for e in ev if e.kind == "ship.filled_away"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(filled) == 1 and "hove_to" not in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= filled[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            assert units.ms_to_knots(w.ship.dyn.speed) > (3.0 if given == "heave to" else 1.5), road
 
 
 # -- package 118: the director's mends, and the far ships' lines (truths 7-650 to 7-659) -------
