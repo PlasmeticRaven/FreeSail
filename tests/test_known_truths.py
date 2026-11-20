@@ -22593,6 +22593,9 @@ def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_i
 # Each ship file mustered at seed 7 on the trunk before package 119 (at de62ed74, the old rule):
 # the hands on her books, the name of the last of them and the muster stream's next draw after
 # the muster. The rule draws nothing, so each is the same under the new.
+# Package 90's files, added after package 119, mustered by its rule alone: no muster before it
+# (truth 7-700 holds each to the rule's purpose; 7-701 reads the eighteen of the table below).
+_MUSTERED_SINCE_119 = ("coastguard-tartane.yaml", "tartane.yaml")
 _MUSTERED_BEFORE_119 = {
     "bilander.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
     "boat-cutter-23.yaml": (7, "Dennis Thompson", 0.8584684590486795),
@@ -22651,7 +22654,7 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     from freesail.crew.model import Watch
 
     files = sorted(glob.glob("data/ships/*.yaml"))
-    assert [Path(p).name for p in files] == sorted(_MUSTERED_BEFORE_119)
+    assert [Path(p).name for p in files] == sorted([*_MUSTERED_BEFORE_119, *_MUSTERED_SINCE_119])
     split = {}
     for path in files:
         for seed in (7, 1805):
@@ -22667,6 +22670,8 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     assert split["razee-44.yaml"] == (144, 144)
     assert split["seventy-four.yaml"] == (265, 265)
     assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
+    # package 90's files, mustered by the rule alone (`_MUSTERED_SINCE_119`)
+    assert split["tartane.yaml"] == (4, 3) and split["coastguard-tartane.yaml"] == (15, 14)
 
 
 def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
@@ -22684,7 +22689,12 @@ def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
     from freesail.crew.model import WATCHES
 
     moved_by_file = {}
-    for path in sorted(glob.glob("data/ships/*.yaml")):
+    # the eighteen files of package 119, by its table; a file added since has no muster before
+    # the rule to be as (`_MUSTERED_SINCE_119`: 7-700 holds it to the rule's purpose)
+    assert set(_MUSTERED_BEFORE_119) | set(_MUSTERED_SINCE_119) == {
+        Path(p).name for p in glob.glob("data/ships/*.yaml")
+    }
+    for path in sorted(f"data/ships/{name}" for name in _MUSTERED_BEFORE_119):
         name = Path(path).name
         crew, after = _mustered(path)
         assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]

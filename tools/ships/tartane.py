@@ -425,7 +425,9 @@ PROFILE_NOTES = {
     "profile.rail_m": "The top of the side, taffrail to stem head: aft, the rail from the "
     "taffrail; the waist bulwark from its upright after end at x -7.06 (two points a centimetre "
     "apart), its top 1.72 m above the water amidships, to the bow rail by the stem head (Pages "
-    "§5.2). A war tartane's bulwark, kept for the trader (JUDGEMENT: the plate is her lines).",
+    "§5.2). A war tartane's bulwark, kept for the trader (JUDGEMENT: the plate is her lines). A "
+    "point at each traced frame's station at the line's own height to the centimetre, each frame's "
+    "head cut there (Pages §5.1).",
     "profile.breadth_m": "By the plate's stations: the half-breadth at the water on H (the plan's "
     "load waterline carried down from H' by the sections' flare, Pages §4.3) and at the rail (the "
     "body plan's frames cut at the profile's rail; aft 2, aft 1, fore 7 and fore 8 interpolated "
@@ -497,23 +499,65 @@ class Particulars:
     drawn_range_t: tuple[float, float]
 
 
+MIDSHIP_X = -0.23  # the midship frame's station (Pages §6.2)
+# The frames' heads within this of the profile's rail are the rail (Pages §5.1: the body plan's
+# frames cut at the profile's rail; the two traced apart, their heights to the plate's rounding).
+ON_THE_RAIL_M = 0.03
+
+
+def rail_at_stations() -> list[list[float]]:
+    """The profile's rail with a point at each traced frame's station and the midship frame's, at
+    the rail's own height there to the centimetre, so that each frame's head stands on it: the rail
+    line itself moved by no more than its rounding."""
+    stations = [*SECTIONS_MOULDED, MIDSHIP_X]
+    added = [[x, cm(interp(RAIL_M, x))] for x in stations if not any(p[0] == x for p in RAIL_M)]
+    return sorted([list(p) for p in RAIL_M] + added, key=lambda p: (p[0], p[1]))
+
+
+def headed_at_the_rail(x: float, points) -> list[list[float]]:
+    """A traced frame's points (z, half-breadth) with its head on the profile's rail at its
+    station: a head within `ON_THE_RAIL_M` of it is the rail; one under it by more is carried
+    straight up to it. Aft 7 (x -7.04) is that one: it stands 0.05 ft forward of the waist
+    bulwark's upright after end (Pages §5.2), and its frame is cut at the lower rail, 2.38 m, where
+    the side's top there is the bulwark's, 2.60 m (JUDGEMENT: the bulwark's end on the frame's
+    head, its half-breadth the frame's)."""
+    rail = cm(interp(RAIL_M, x))
+    pts = [list(p) for p in points]
+    z, hb = pts[-1]
+    if abs(z - rail) <= ON_THE_RAIL_M:
+        pts[-1] = [rail, hb]
+    elif z < rail:
+        pts.append([rail, hb])
+    else:
+        raise ValueError(
+            f"the frame at x {x:g} stands {z - rail:.2f} m above her rail there; a frame's head "
+            "is cut at the profile's rail (Pages §5.1)."
+        )
+    return pts
+
+
 def hull_lines(armed: bool) -> dict:
-    """The profile's lines as `g.hull_profile` takes them, every half-breadth with the plank; the
-    ports and their size only for the armed file (the trader is no war tartane)."""
+    """The profile's lines as `g.hull_profile` takes them, every half-breadth with the plank, each
+    frame's head on the rail; the ports and their size only for the armed file (the trader is no
+    war tartane). At a traced frame's station the breadth's half-breadth at the rail is the frame's
+    head's, the one measure (Pages §5.1: the rail's half-breadth is the body plan's frame cut at
+    the profile's rail), where the two tables differ by their rounding."""
     half_siding = g.KEEL_SIDING_OF_BREADTH * BREADTH / 2.0
+    sections = {x: headed_at_the_rail(x, pts) for x, pts in SECTIONS_MOULDED.items()}
     lines = {
-        "rail": RAIL_M,
-        "breadth": [[x, outside(w), outside(r)] for x, w, r in BREADTH_MOULDED],
+        "rail": rail_at_stations(),
+        "breadth": [
+            [x, outside(w), outside(sections[x][-1][1] if x in sections else r)]
+            for x, w, r in BREADTH_MOULDED
+        ],
         "keel": KEEL_M,
         "stem": STEM_M,
         "stern": STERN_M,
         "wales": WALES_M,
-        "section": [[z, outside(hb)] for z, hb in SECTION_MOULDED],
+        "section": [[z, outside(hb)] for z, hb in headed_at_the_rail(MIDSHIP_X, SECTION_MOULDED)],
         "decks": {"upper": DECK_M},
         "head": HEAD_M,
-        "sections": [
-            [x, z, outside(hb)] for x in sorted(SECTIONS_MOULDED) for z, hb in SECTIONS_MOULDED[x]
-        ],
+        "sections": [[x, z, outside(hb)] for x in sorted(sections) for z, hb in sections[x]],
         "rabbet": [[x, z, half_siding] for x, z in RABBET_Z],
     }
     if armed:
@@ -1381,12 +1425,14 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
 
 def groups_and_aliases(b) -> None:
     """Her groups and aliases (Tar-D §4.4): no "courses", her lateen being no course (the gale's
-    reduction must not reef it as one)."""
+    reduction must not reef it as one). Her design's "lateens" group, for `shift the lateens` and
+    the practice's orders, waits on the step A1b that builds those orders: a one-word family of
+    sails is one the standing book's fitting knows (`standing.book.SAIL_FAMILIES`, truth 7-625:
+    "a new one is added on purpose"), which A1b adds with it."""
     b.group("plain sail", ["main.lateen", "main.topsail", "mizzen.lateen", "jib"])
     b.group("all sail", ["main.lateen", "main.topsail", "main.treou", "mizzen.lateen", "jib"])
     b.group("square sails", ["main.topsail", "main.treou"])
     b.group("fore-and-aft sails", ["main.lateen", "mizzen.lateen", "jib"])
-    b.group("lateens", ["main.lateen", "mizzen.lateen"])
     b.group("headsails", ["jib"])
     b.group("jibs", ["jib"])
     b.group("topsails", ["main.topsail"])

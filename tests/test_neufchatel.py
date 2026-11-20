@@ -1032,6 +1032,10 @@ ROLE_BY_INTENT = {
     # package 75, B7: the 74's row, filed since 75 with her roles, sails by her first, a King's
     # ship's (Design-Ship-Bellerophon.md §8.1), as the frigate's and the 64's rows do by theirs
     "seventy-four": ["kings-ship"] * 4 + _TAIL,
+    # package 90, the tartane's builder: her two rows, each a whole file's filed with its roles,
+    # sail by their first, a merchant's and the revenue's (Design-Ship-Tartane.md §8)
+    "tartane": ["merchant"] * 4 + _TAIL,
+    "guarda-costa tartane": ["revenue"] * 4 + _TAIL,
 }
 
 
@@ -1045,7 +1049,8 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
     captain takes his own file's first row's by the same rule (`brains.own_sub_type_role`), hers
     alone of the files until the bilander's landing (package 75, B4), whose row, filed since 75
     with its roles, sails by its first role as hers does: a merchant; and the 74's (B7), a King's
-    ship (old: the bilander's and hers alone)."""
+    ship (old: the bilander's and hers alone); and package 90's tartane, a merchant, and the
+    guarda-costa tartane, the revenue's (old: the three)."""
     for key, roles in ROLE_BY_INTENT.items():
         got = []
         for kind, prizes, convoy in INTENT_KINDS:
@@ -1060,8 +1065,10 @@ def test_her_row_sails_by_her_first_role_and_no_other_row_moves():
         own[path.name] = brains.own_sub_type_role(world)
     assert {k: v for k, v in own.items() if v} == {
         "bilander.yaml": "merchant",
+        "coastguard-tartane.yaml": "revenue",
         "hermaphrodite-brig.yaml": "privateer",
         "seventy-four.yaml": "kings-ship",
+        "tartane.yaml": "merchant",
     }
 
 

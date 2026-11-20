@@ -350,13 +350,14 @@ def test_her_great_lateen_is_cut_by_forfaits_rule_and_her_sail_is_his(built):
 
 def test_her_groups_are_her_designs_and_name_no_courses():
     """Tar-D §4.4: plain sail the two lateens, the topsail and the jib; all sail those and the
-    tréou; the lateens a group of their own; no "courses" (her lateen is no course)."""
+    tréou; no "courses" (her lateen is no course). Her design's "lateens" group waits on A1b,
+    which builds the orders that name it and adds the family to the standing book's (truth
+    7-625)."""
     ship = load_ship(HER)
     g = ship.groups
     assert set(g["plain sail"]) == {"main.lateen", "main.topsail", "mizzen.lateen", "jib"}
     assert set(g["all sail"]) == set(g["plain sail"]) | {"main.treou"}
-    assert g["lateens"] == ["main.lateen", "mizzen.lateen"]
-    assert "courses" not in g
+    assert "courses" not in g and "lateens" not in g
     assert ship.aliases["mainsail"] == "main.lateen" and ship.aliases["mizen"] == "mizzen.lateen"
     sails = {s.id: s for s in load_spec(HER).sails}
     assert sails["main.treou"].flying and sails["main.treou"].cls == "square"
