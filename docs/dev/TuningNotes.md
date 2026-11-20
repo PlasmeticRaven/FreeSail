@@ -38256,6 +38256,100 @@ By day six are on deck for it, half the eleven, and she fills away short by eith
 
 **Her own captain, live** (the rules captain, the trader at seed 7 off the Lizard by night, plain sail by the wind; a free intent given, then `bound for Falmouth`). With the key, on either watch: "By the captain, on passage: heaving to (a free intent, ...: no plan to sail by)." at 02:06:41; "All hands! (to heave to)"; "All hands on deck."; hove to at 02:09:02 and piped down; "By the captain, on passage: filling away (to make sail)." at 02:21:41; "All hands! (to fill away)"; filled away at 02:22:41, "braced full and steering SSW (202°)", piped down, "the starboard (larboard) watch has the deck"; a course shaped for Falmouth, and under way at 6.2 knots fifteen minutes on. At 5e56509 the same until the fill away: "Not hands enough on deck to fill away; there are but five to spare.", then "filling away (to make sail)" once a minute and she lay hove to. On the trunk the starboard watch of seven hove to and filled away short, the larboard's three could not heave to ("but three to spare"). **Found, not mended (it was so on the trunk):** the captain gives "filling away (to make sail)" twice on the one tick (`_fill_away_first` on entering the state and `_work`'s `filling` business), and the second, queued behind the first, fails when she has filled: "Could not fill away: She is not hove to." On the trunk's starboard watch the same two lines and the same failure. Left for the lead.
 
+**The sweep, so that this is the last of its kind** (the lead's word of 2026-11-20). Every evolution of `data/evolutions/` (110) ordered through `Runner.start` on the merchant brig, by night (02:00) and by day (10:00), each watch given the deck by the bill's override, on the trunk (ea6d364), at 5e56509 and with filling away's key; a fresh world for every case. At sea: the trader at seed 7 off the Lizard, plain sail set, braced sharp up and close-hauled on the starboard tack at five knots (set up by the starboard watch, then quiet). The anchor's work: the harbour's merchant brig brought up in Falmouth (`data/scenarios/merchant-brig.yaml`, her clock set to the hour). Each subject put in the state its order wants (a sail furled to be set, set to be taken in, reefed to be shaken out, unbent to be bent; a boom rigged out; a spar wrecked, sprung or its wreck cleared; a line parted; a seam working; the helm lost; the catharpins swiftered in; the topsails in and the topgallant masts or yards sent down, by their orders, before the work that follows them; quarters beaten; the anchor weighed, or left hanging at the hawse; moored). A cell is what the order does: whole; short, got/wanted; waits; **all hands** (called because the watch is too few, its file's key); all hands (file: all-hands work by its file). Night / day where they differ.
+
+| evolution | trunk starboard (7) | trunk larboard (3) | 5e56509, either watch (5) | with the key, either watch (5) |
+|---|---|---|---|---|
+| back_anchor | 8/11 / 9/11 | waits | 6/11 / 7/11 | 6/11 / 7/11 |
+| back_and_fill | whole | 3/6 / 4/6 | 5/6 / whole | 5/6 / whole |
+| batten_down | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| bend_sail | whole | 3/6 | 5/6 | 5/6 |
+| box_off | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| boxhaul | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| brace | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| cast_loose_guns | whole | whole | whole | whole |
+| cat_and_fish_anchor | 8/11 / 9/11 | waits | 6/11 / 7/11 | 6/11 / 7/11 |
+| clear_for_action | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| clear_wreck | whole | waits | 5/7 | 5/7 |
+| come_to_anchor | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| cross_topgallant_yards | whole | waits | 5/7 | 5/7 |
+| cut_away_mast | 8/10 / 9/10 | waits / 5/10 | 6/10 / 7/10 | 6/10 / 7/10 |
+| ease_catharpins | 7/8 | waits | 5/8 | 5/8 |
+| fid_topmasts | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| fill_away | 7/11 / 8/11 | waits | waits / 6/11 | **all hands** / 6/11 |
+| fish_spar | 7/8 | waits | 5/8 | 5/8 |
+| fother_sail | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| furl_all | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| furl_gaff | 7/8 | waits | 5/8 | 5/8 |
+| furl_jibheaded | whole | whole | whole | whole |
+| furl_square | 7/10 | waits | 5/10 | 5/10 |
+| get_under_way | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| goose_wing | whole | 4/6 / 5/6 | whole | whole |
+| haul_bowline | whole | whole | whole | whole |
+| heave_deep_sea_lead | 8/11 / 9/11 | waits | 6/11 / 7/11 | 6/11 / 7/11 |
+| heave_in | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| heave_lead | whole | whole | whole | whole |
+| heave_log | whole | whole | whole | whole |
+| heave_mark | whole | whole | whole | whole |
+| heave_short | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| heave_to | 7/11 / 8/11 | waits | **all hands** / 6/11 | **all hands** / 6/11 |
+| jury_mast | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| lay_out_kedge | 8/11 / 9/11 | waits | 6/11 / 7/11 | 6/11 / 7/11 |
+| let_go_anchor | 8/11 / 9/11 | **all hands** | 6/11 / 7/11 | 6/11 / 7/11 |
+| lie_a_try | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| loose_sails_to_dry | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| make_signal | whole | whole | whole | whole |
+| moor | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| plug_shot_hole | whole | whole | whole | whole |
+| reef_gaff | 8/10 / 9/10 | waits / 5/10 | 6/10 / 7/10 | 6/10 / 7/10 |
+| reef_square | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| reeve_line | whole | 3/6 | 5/6 | 5/6 |
+| relieving_tackles | whole | 4/6 / 5/6 | whole | whole |
+| repair_wheel | whole | whole | whole | whole |
+| rig_in_studdingsail_boom | whole | 3/4 | whole | whole |
+| rig_out_studdingsail_boom | whole | 3/4 | whole | whole |
+| rig_preventers | 7/10 | waits | 5/10 | 5/10 |
+| scud | whole | 3/6 / 4/6 | 5/6 / whole | 5/6 / whole |
+| secure_guns | whole | whole | whole | whole |
+| send_boat | 8/11 / 9/11 | waits | 6/11 / 7/11 | 6/11 / 7/11 |
+| send_down_topgallant_masts | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| send_down_topgallant_yards | whole | waits | 5/7 | 5/7 |
+| serve_small_arms | whole | 4/6 / 5/6 | whole | whole |
+| set_flying | whole | whole | whole | whole |
+| set_gaff | 8/10 / 9/10 | waits / 5/10 | 6/10 / 7/10 | 6/10 / 7/10 |
+| set_jibheaded | whole | 4/6 / 5/6 | whole | whole |
+| set_square | 7/10 | waits | 5/10 | 5/10 |
+| set_studding | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| set_up_rigging | 7/10 | waits | 5/10 | 5/10 |
+| shake_out_gaff | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| shake_out_square | 7/10 | waits | 5/10 | 5/10 |
+| shift_sail | whole | waits | 5/7 | 5/7 |
+| shift_spar | whole | waits | 5/7 | 5/7 |
+| strike_topmasts | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| sway_up_topgallant_masts | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| swifter_in_catharpins | 7/8 | waits | 5/8 | 5/8 |
+| tack | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| take_in_flying | whole | whole | whole | whole |
+| take_in_gaff | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| take_in_jibheaded | whole | whole | whole | whole |
+| take_in_square | 8/10 / 9/10 | waits / 5/10 | 6/10 / 7/10 | 6/10 / 7/10 |
+| take_in_studding | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| take_lunar | whole | whole | whole | whole |
+| trim_gaff_sheet | whole | 4/6 / 5/6 | whole | whole |
+| trim_jib_sheet | whole | whole | whole | whole |
+| unbend_sail | whole | 3/6 | 5/6 | 5/6 |
+| unmoor | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| veer_cable | whole | 4/8 / 5/8 | 6/8 / 7/8 | 6/8 / 7/8 |
+| wear | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| wear_short_round | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+| weigh_anchor | all hands (file) | all hands (file) | all hands (file) | all hands (file) |
+
+**Refused on every tree, for what she is, not for her hands** (27): the lug's, lateen's and settee's work (she carries none), the fishing gear's (she carries none), the running bowsprit's (hers is gammoned fast), and `grapple` (no enemy engaged; a numbered deck job of eight hands, the post counted, it would be as `batten_down`'s eight, 6/8 by night and 7/8 by day at five and five).
+
+**Every evolution the trunk's starboard watch began and neither watch of five begins at 5e56509: one.** `fill_away` by night (7 of 11 short on the trunk; waits on either watch at 5e56509). Its right mend is `too_few: all hands` (above): it is heaving to's own pair, the same hands at the same braces (the file's source, Luce 1866, ch. XXVI, 'To fill away, after lying to with the main topsail to the mast', follows 'To heave to'); that a merchantman of ten does it with all hands, as she hove to with them, is judgement, not the book's word. Nothing else: every other numbered job is begun by either watch of five, short where the trunk's seven began it whole or shorter, and the work the trunk's larboard three waited for (the topsails, the foresail, a topsail furled, the gaff's sail set and reefed, the yards sent down and crossed, a spar shifted or fished, the rigging set up, the boat, the anchor catted, the kedge, the deep-sea lead, the preventers, the catharpins) is begun short by either watch. Why only those two: a merchantman's post is counted a hand where the watch is under the work's want (ruling 11), but never for a manoeuvre (`HELM_MANOEUVRES`) nor aloft; of the numbered manoeuvres only heaving to and filling away want more than twice five of her eleven (`scud`, `back_and_fill` want six).
+
+**The razee and the seventy-four** (old 146 and 142, 268 and 262; new 144 and 144, 265 and 265), the same sweep at sea on the trunk and at 5e56509, 440 cases each: no outcome changes. Every numbered job is begun whole by either watch on both trees (the largest numbered want is twenty, far under a watch of 142), nothing waits and nothing calls all hands; no evolution's want lies between the old and the new figure of a watch. What moves is the count of the all-hands parties, by one or two (the razee's tack, wear, boxhaul and clearing for action 204 and 201 by night, new 202 and 202; the seventy-four's 370 and 366, new 368 and 368).
+
 **Every pin moved or re-made, old beside new.**
 
 1. **Truth 7-630** (`tests/test_known_truths.py`), renamed from `..._lets_go_her_anchor_by_all_hands_and_weighs` to `..._lets_go_her_anchor_by_her_watch_and_weighs`. Old: her watches' whole `[7, 3]`; as the harbour starts her, all hands called once, "All hands! (to let go the anchor)", piped down. New: `[5, 5]`; she lets go by the larboard watch, no hands called, the one line "Only six hands to let go the anchor; there are no more on deck."; nothing waiting. Kept as it was: riding at anchor in Falmouth within two minutes, all hands not up, weighing, `let go the anchor` bringing her up again, the cutter by her watch with no hands called. The reason: at five and five the larboard five and the master are half the want, so the truth's all-hands half cannot be told on her as she starts. A substantive change, at the lead's word; the all-hands half is told by truth 7-703 instead.
