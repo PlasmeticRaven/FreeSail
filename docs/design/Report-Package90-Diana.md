@@ -24,6 +24,15 @@ mine to edit:
 Each is set out in §5 with what it needs. Everything of hers that her row covers is built and
 pushed, with the guards that only count her file moved.
 
+**After the stop (§8).** The lead ruled on all three in nudge 32 and widened my row to the viewer's
+tests. Her rows are in its tables, two of them recorded departures for the lead (the viewer's, not
+mended). A foreign gun's charge is its kind's share, her audit entry is filed, and truth E's band is
+180 to 330 s. The package's branch is merged at 00382c4 (`72127c9`). Her final fast tier whole,
+against a base on that tree, differs from the base only by her own tests and her cases, all
+passing. A race in the harbour's start failed one browser test once; it passed on its rerun, and
+is recorded for the lead. The slow tier of her files, pace tests excepted, passes. **I stop at the owner's
+stopping point 1.**
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -379,3 +388,182 @@ For the owner: none new. Her design's §17.1 questions were answered on 2026-11-
   not a file or a message, and I did not change it. The messages carry no trailer.
 - **The stop**: I stop here, early, for the three things of §5, before the owner's stopping point
   1. Everything else of hers is pushed; this report is the last commit.
+
+## 8. After the stop: the lead's rulings of nudge 32
+
+The lead answered the three stops of §5 and the questions of §6 in nudge 32
+(`docs/dev/M7-WorkPackages.md` on the package's branch), widening my row to
+`tests/test_view_geometry.py`. What each ruling moved, old beside new, is in
+`docs/dev/TuningNotes.md`, "The Diana: the lead's rulings of nudge 32".
+
+### 8.1 The branch and its commits since §7
+
+- **Merged the package's branch at 00382c4** (package 90's A2, the words of a rig with no yards;
+  the tartane's step 1 and nudges 27 to 29), under my user's standing permission (§0), as the merge
+  commit `72127c9`. One file conflicted, `docs/dev/TuningNotes.md`, where both sides only added
+  sections. Both sides' sections are kept, the package's and then mine. No generated file
+  conflicted. No rebase, no force, no other branch touched.
+- **The base** for the final tier is the fast tier whole on the merged tree's package side, 00382c4,
+  in a worktree of its own (§8.4).
+- **Her figures after the merge**, measured again on the head, are as before it: her tacks 206, 215
+  and 216 s (ground lost 28, 42 and 46 m), her wear 492 s, her heel in 22 kn 8.10 and 12.61 deg,
+  hove to in 126 s lying 56 to 57 deg off at 1.1 kn, filled away in 59 s and settled in 156 s.
+
+| Commit | What | Files |
+|---|---|---|
+| `2cd5caa` | the rulings of nudge 32: her viewer rows and the two departures, the charges' rule, her audit entry and truth 7-590's count, truth E's band, the 1817 ports, no stern lights | `tools/ships/diana.py`, `data/ships/corvette-20.yaml`, `tests/test_view_geometry.py`, `tests/test_magazine.py`, `tests/test_diana.py`, `tests/test_known_truths.py`, `tools/range/audit-known.yaml`, `docs/dev/TuningNotes.md` |
+| `4dec517` | the ranges audit's two ceilings her file moves, and two histories in her people file mended without a year | `tools/range/audit-known.yaml`, `data/people/corvette-20.yaml`, `docs/dev/TuningNotes.md` |
+| `72127c9` | the merge of the package's branch at 00382c4 | the package's |
+| `acd85fa` | the known list's count of the data's entries, 28 to 29 | `tests/test_range_audit.py`, `docs/dev/TuningNotes.md` |
+| this section | the branch's head; and two figures of mine mended in TuningNotes (§8.2 items 1 and 4) | `docs/design/Report-Package90-Diana.md`, `docs/dev/TuningNotes.md` |
+
+### 8.2 What each ruling moved
+
+1. **The viewer's tables** (`tests/test_view_geometry.py`). Her rows, each read off the case's own
+   probe on her file:
+
+   | Table | Her row |
+   |---|---|
+   | `BOWSPRIT_DRAWN` | 2.014 m forward of B5.1's rule, drawn 32.13 deg steeved (her file's 21.5: item (b) below) |
+   | `TIERS_IN_THE_SIDE` | none drawn (item (a) below) |
+   | `CHORD_OFF_THE_SIDE_M` | 0.004 m, her main wale's |
+   | `LINES_ON_THE_RAIL` | the frigate-36's own set |
+   | `STEM_TACKED`, `STEM_TACK_Z_M` | her storm staysail; its tack at 5.11 m, 2 cm over her stem head's top |
+   | `BOOM_SAIL`, with `FRAME_MOVED_OLD_M`, `SHEET_END_X_M`, `BOOM_OVER_TAFFRAIL_M` | her spanker; 4.86 m; x -24.05 to -18.63; 0.20 m level, 0.58 m topped up |
+   | `NO_GALLERY_OR_LIGHT` (into `RIGHTLY_WITHOUT["gallery"]` and `["light"]`) | her file, with its reason |
+   | `ROUND_UP_UNREAD` (new) | her file, with its reason; the transom case's branch draws her foot straight across at the knuckle, with no tuck |
+
+   The two cases that held every square stern to `round_up_m` and `galleries_m` name her and her
+   reason and no other file. A square stern that merely forgets them still fails. I checked this
+   with a throwaway copy of the frigate-36's file with the two keys and their marks taken out, not
+   committed: the transom case fails on its new assertion ("a square stern files its round-up, or
+   is named with its reason in ROUND_UP_UNREAD"), the gallery case on its `galleries_m`, and the
+   closed-hull case on its gallery.
+
+   Her cases in that file number 58, all passing. My TuningNotes line said 59, a miscount of mine:
+   neither the file nor her ship file has moved since. This commit mends the line to 58.
+
+   Two of her rows are **recorded departures, for the lead**. Their cause is the viewer's
+   (`client/projection.js`), which is not in my row, so I did not mend them:
+   - **(a) No port band is drawn on her** (`BAND_UNDRAWN`, joined to `RIGHTLY_WITHOUT["band"]` as
+     the *Neufchatel*'s `WALE_UNREAD` is to the wale's). Her eleven ports a side are cut in her
+     side, but her one tier also holds the 1817 fit's place over the rail, whose middle stands 0.28 m
+     over it. The viewer reads a tier as cut in the side only when every triple in it is.
+   - **(b) Her stem head stands 1.50 m over her rail's fore end** (measured: 5.09 against 3.59 m),
+     where every other file's is within 0.14 m of its rail or under it. The viewer roots the
+     bowsprit and the fore stay at the lower of the two. So it draws her bowsprit 10.6 deg steeper
+     than her file and lands her fore stay 1.5 m under her stem head's top. And it raises her storm
+     staysail's tack 10.6% up the stay (`TACK_UP_HER_STAY`, every other file's under 4%), 0.53 m off
+     her side (her row of `TACK_OFF_HER_SIDE_M`, beside the *Neufchatel*'s 0.20).
+2. **A foreign gun's charge is its kind's share** (`parts.charge_lb`; no reader changed).
+   `tests/test_magazine.py` now holds every new ship's charge to `parts.charge_lb` for its kind and
+   calibre, and keeps the guard that every gun of the table gets the table's figure. Her guns outside
+   the table: the 30-pounder carronade (2 lb 8 oz), the Danish long 8 (2 lb 11 oz) and the obús of 3
+   (4 oz). Their calibres are as her navy named them. **Found, not mended: the pounds differ.** The
+   Spanish libra is 0.4608 kg, the English pound 0.4536, and a Danish 30-pounder fires about 33
+   English pounds. Every reader takes a `pounder` as English, so her charges, ranges and weight of
+   broadside read a Spanish gun 1.6% light and a Danish one about 9% light.
+3. **The ranges audit**: her entry in `tools/range/audit-known.yaml`
+   (`v-fit-ahead:corvette-20:carronadas de a 30 1810`, as the other hulls' default fits have), and
+   truth 7-590's mechanical count 60 to 61, the old beside the new. The audit's slow sweeps then
+   found three counts over their ceilings with her file:
+   - `u-ships`, 19 against 18. Every ship file is counted, since the schema has no year, and hers is
+     the nineteenth. The ceiling is raised by one, with its reason.
+   - `x-words:ship-words`, 18 against 17. Her `era_notes` date her building, her taking and her
+     service, as the other files' do. The ceiling is raised by one, with its reason.
+   - `x-words:people-words`, 12 against 10. Two histories in her people file named a year ("after
+     the peace of 1802", "at Toulon in 1793"). They were my outlines' words, not a source's, so I
+     **mended them at the cause**: they are rewritten without the year, and the ceiling stays 10.
+
+   And `tests/test_range_audit.py` counts the known list's entries by owner: the data's 28 to 29 with
+   her entry, the engine's 38 unmoved, old beside new in its comment. It failed in the final tier's
+   first run (§8.4) and is mended in `acd85fa`.
+4. **Truth E's band, 180 to 330 s** (it was her own 180 to 600). The floor is JUDGEMENT, a small ship
+   quick in stays; the ceiling is about half again her slowest tack, also JUDGEMENT. Her three tacks,
+   measured again after the merge, are 206, 215 and 216 s from 290, 292.5 and 295 deg, unchanged.
+   What was tried is §4: her weather helm (`clr_x_m` 2.5 to 3.5), her rudder's rate (3 down to 1
+   deg/s) and its area (2.0 to 5.5 m2). Her rudder is kept as measured, 3.0 m2 at 3 deg/s. The
+   ground each tack loses, 28, 42 and 46 m, is recorded, not asserted. My TuningNotes line for this
+   ruling said "her rudder from 2.0 to 4.5 m2", but the trials' own table there runs to 5.5. This
+   commit mends my line to the table, and to the rate's trials beside it.
+5. **Held as designed**: her rank at the rig's distance; truth F with both figures, the dip at 21.1
+   deg and L2's shut at 18.50; `keel_m` at K. **Her 1817 fit by the measuring note's numbering**:
+   the long 12s forward and amidships in ports 5 to 10, the 30-pounder carronades aft in ports 1 to 4
+   (JUDGEMENT, her note says so), and the obuses where they were. At quarters there are twelve crews
+   of 62, all manned: 20 soldiers at the guns and 30 kept in their division (21 and 29 before).
+   **Her stern lights: none filed**, as for the flush-decked brig, until the owner's sheets show them
+   (JUDGEMENT, her note says so). Her marks are `sourced` but `sections_m` and the ends' fullness.
+6. **The engine's faults found** (§6, items 6 to 8): nothing to do, by the ruling.
+
+### 8.3 Why other ships' rows moved for her file
+
+Each of these tests holds a table by file over every file of the tree. Each grew by her row, and no
+figure of another ship changed. I checked each table's other rows against the base, and every one is
+as it stood.
+- **The *Neufchatel*'s rows-by-intent** (`tests/test_neufchatel.py`,
+  `test_her_row_sails_by_her_first_role_and_no_other_row_moves`). This test holds every row of
+  `DESCRIPTIONS` (`freesail/world/ships.py`) to the kind each intent sails it as, and every file to
+  its own first role. Her row, `corvette`, is a new row of that table, so the test's two maps took
+  her line: `"corvette": ["kings-ship"] * 4 + _TAIL`, as the 74's, and her file
+  `"corvette-20.yaml": "kings-ship"`. No other row's value moved.
+- **Package 119's truths 7-700 and 7-701** (`tests/test_known_truths.py`). Truth 7-700 holds every
+  ship file's two watches equal or one apart, and 7-701 holds the eighteen musters as they were
+  before package 119's rule for the odd hands. Both read every file by glob, so her file joined
+  them. For 7-700 she is a row of `_MUSTERED_AFTER_119`, her watches 71 and 70, beside the eighteen
+  of `_MUSTERED_BEFORE_119`, which are unchanged. For 7-701, a muster made after the rule has no
+  muster before it to be held to, so the truth iterates the eighteen it was written for. Their
+  figures are as they stood.
+
+### 8.4 The tests on the head
+
+Run as in §5, from the worktree's root. Each fast tier whole ran as four pytest runs (`-n 4`, each
+with its own `--junitxml`), one after another in one command under the two-hour limit, and the four
+junit files were then read together.
+
+| Set | Tree | Result |
+|---|---|---|
+| **The base**: the fast tier whole | 00382c4 | **8,500 passed, 8 skipped, 1 xfailed** (8,509); no failure |
+| Her fast tier whole, first run | `72127c9` | shards 1 to 3: 6,502 passed, 7 skipped, 1 xfailed, **1 failed**: the known list's count of the data's entries, 28 against her 29 (§8.2 item 3), moved in `acd85fa`; shard 4 not run |
+| **Her final fast tier whole** | `acd85fa` | **8,607 passed, 8 skipped, 1 xfailed, 1 failed** (8,617): the harbour's stations table, below |
+| The harbour's test alone, five times | `acd85fa` | 5 passed |
+| Shard 2 whole again, alone | `acd85fa` | **3,422 passed**, the harbour's test among them |
+| **The final tier with shard 2's rerun** in place of its first | `acd85fa` | **8,608 passed, 8 skipped, 1 xfailed** (8,617); no failure |
+| **The slow tier of her files**, pace tests excepted (`--slow -m "slow and not pace"`) | `acd85fa` | **209 passed, 8 xfailed**, no failure (46 minutes): `tests/test_known_truths.py` 197 and its eight marked xfails, the base's eight (§5); `tests/test_range_audit.py`'s 11 sweeps; `tests/test_neufchatel.py`'s 1 |
+| The 13 pace tests of `tests/test_known_truths.py` | | **not run**: they want the machine to themselves, and the coordinator runs them |
+| The generator into scratch, and `cmp` of every committed ship file | `acd85fa` | 19 of 19 byte for byte |
+| `tools/check_viewer_guns.py` on her file | `acd85fa` | clean: "fit '1817': 24 guns: 22 port, 2 over the rail" |
+| `ruff check` and `ruff format --check` on her Python files | `acd85fa` | clean; no line the branch adds is over 100 characters |
+
+**The final tier beside the base, test by test** (`acd85fa` against 00382c4):
+- **only in her tree: 109**, all passed. 29 are her own tests (`tests/test_diana.py`). 79 are her
+  cases of the tests over every file, 58 of them in `tests/test_view_geometry.py`. The last is the
+  schooner-mast guard renamed "nineteen files" from "eighteen" by her file (133ccb3, TuningNotes).
+- **only in the base: 1**, that guard's old name.
+- **outcome changed: 1**, `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`,
+  passed on the base and failed in her final tier's shard 2. Its row for the officer's station read
+  `""` where the scenario's plan says `"a model"`. **It is a race in the harbour's start, not her
+  file's.** The start (`freesail/ui/harbour.py`, under the harbour's lock) sets the game started,
+  then reads and parses the scenario's plan of its stations (`self.plan(scenario)`), and only then
+  files the game with its plan. The game's state is read meanwhile under the driver's lock, not
+  the harbour's. So a state read in that gap shows the game started with no plan (`chosen` still
+  `{}`), and the page (`client/harbour.js`, the table's `plan[station]`) draws the table from it
+  with the plan's column empty until its next read. The test reads the table as soon as its first
+  row is drawn, and under four workers its read fell in the gap. Nothing on this branch touches
+  the harbour, its page or its test. The same test passed in the
+  first run's shard 2 at `72127c9`, and `acd85fa` changes only `tests/test_range_audit.py` and a
+  line of TuningNotes. It passed five times of five alone on the head, and again in shard 2 whole,
+  run again on its own. With that rerun in place of the shard's first run, **no outcome differs
+  from the base**. Not mine to mend: the start's plan, the stations table and its test are
+  package 96b's, step 9. Recorded for the lead.
+- **the skips and the xfail** are the base's, the same tests.
+
+### 8.5 Her open questions now
+
+For the lead:
+- the two viewer departures of §8.2 item 1, (a) and (b);
+- the pounds of §8.2 item 2;
+- the harbour test's race of §8.4.
+
+The rest of §6 is answered by nudge 32. For the owner: none new.
+
+**I stop here, at the owner's stopping point 1.** This section is the branch's last commit.
