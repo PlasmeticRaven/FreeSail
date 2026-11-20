@@ -48,6 +48,12 @@ def _shown(sent: list[dict], out: io.StringIO, words: str) -> tuple[bool, bool]:
     return pages, words in out.getvalue()
 
 
+def _before_the_speakers_side(e):
+    """The line as a save written before the speaker's side was held it (no `said_at`)."""
+    gone = (K.SAID_AT, K.SAID_PORT, K.SPEAKER_ID)
+    return dataclasses.replace(e, data={k: v for k, v in e.data.items() if k not in gone})
+
+
 def _say_as(w, who: str, words: str):
     w.world_order(f'say as {who}: "{words}"', "the director")
     return [e for e in w.log if e.kind == "person.spoke" and words in e.text][-1]
@@ -184,11 +190,14 @@ def test_truth_7_709_ashore_by_his_place_aboard_another_ship_by_his_hull_and_no_
     assert e.data["place"] == "shore" and e.data["where"].startswith("ashore at Falmouth")
     master.where, master.ashore_at = "boat", ""
     pearce.role, pearce.ashore_at = master.role, "market"
-    assert not d.hears(e) and not con.hears(e)
+    old = _before_the_speakers_side(e)  # a save's line: read by what it says of him
+    assert not d.hears(old) and not con.hears(old)
+    assert d.hears(e) and con.hears(e)  # the line says he spoke beside the player
     # ...and the master back beside the player at the market, the namesake of his trade in
     # the boat with no port: the boat is no port's, and the master's word is the player's
     master.where, master.ashore_at = "shore", "market"
     pearce.where, pearce.port, pearce.ashore_at = "boat", "", ""
+    assert d.hears(old) and con.hears(old)
     assert d.hears(e) and con.hears(e)
     pearce.role = "first lieutenant"
     # a model holding the captain's station: the list is his, and it names him or not
@@ -248,3 +257,172 @@ def test_truth_7_709_aboard_another_ship_by_her_hull_whatever_his_name():
     purser.where = "quarterdeck"  # the namesake on the frigate's quarterdeck: his trade
     w.world_order('say as Mr Cannon: "The anchor is a-peak, sir."', "the director")
     assert _shown(sent, out, "The anchor is a-peak") == (True, True)
+
+
+# -- the speaker's side read from the line (the lead's list of 2026-11-20 15:54) ----------
+
+
+def _read_back(d, w, words: str) -> tuple[bool, bool, bool]:
+    """Whether the words are shown when the log is read back later: the pages' log as the
+    driver serves it (`Driver.shown_log`), the console's `log N`, and the page's
+    `/api/log`."""
+    from own_page import DoorClient
+
+    from freesail.ui.server import create_app
+
+    shown = any(words in str(m.get("text", "")) for m in d.shown_log())
+    out = io.StringIO()
+    Console(w, out=out).handle_line("log 500")
+    with DoorClient(create_app(d)) as http:
+        api = any(words in str(m.get("text", "")) for m in http.get("/api/log?limit=5000").json())
+    return shown, words in out.getvalue(), api
+
+
+NOWHERE = (False, False, False)
+EVERYWHERE = (True, True, True)
+
+
+def test_truth_7_709_read_back_ashore_then_aboard_by_where_he_spoke():
+    """The lead's reproduction: the master speaks ashore at Falmouth, the player on the
+    quarterdeck; it is not shown him. The master comes back aboard to the quarterdeck, the
+    player never moving: read back, at the pages, the console and the page's log, the word
+    is still not shown. The converse: a word on the quarterdeck, shown, and the master then
+    goes ashore: still shown. The line holds where he stood as he spoke."""
+    w, d, con, out, sent = _played()
+    master = w.people.find("the master")
+    master.aboard, master.where, master.port, master.ashore_at = (
+        False,
+        "shore",
+        "falmouth",
+        "market",
+    )
+    e = _say_as(w, "the master", "Fish is dear today.")
+    assert e.data[K.SAID_AT] == ["ashore", "falmouth", "market"]
+    assert _shown(sent, out, "Fish is dear") == (False, False)
+    master.aboard, master.where, master.port, master.ashore_at = True, "quarterdeck", "", ""
+    assert _read_back(d, w, "Fish is dear") == NOWHERE
+    e = _say_as(w, "the master", "The glass is rising, sir.")
+    assert _shown(sent, out, "The glass is rising") == (True, True)
+    master.aboard, master.where, master.port, master.ashore_at = (
+        False,
+        "shore",
+        "falmouth",
+        "market",
+    )
+    assert _read_back(d, w, "The glass is rising") == EVERYWHERE
+
+
+def test_truth_7_709_read_back_ashore_at_another_place_then_at_his():
+    """Ashore, the master at the counting house and the player at the market: his word is
+    not shown; he walks to the market, the player standing: read back, still not. The
+    converse: a word beside the player at the market, shown; he walks back to the counting
+    house: still shown."""
+    w, d, con, out, sent = _played()
+    cap, master = w.people.captain, w.people.find("the master")
+    for p in (cap, master):
+        p.aboard, p.where, p.port = False, "shore", "falmouth"
+    cap.ashore_at, master.ashore_at = "market", "counting_house"
+    _say_as(w, "the master", "The agent is out, sir.")
+    assert _shown(sent, out, "The agent is out") == (False, False)
+    master.ashore_at = "market"
+    assert _read_back(d, w, "The agent is out") == NOWHERE
+    _say_as(w, "the master", "The agent is back, sir.")
+    assert _shown(sent, out, "The agent is back") == (True, True)
+    master.ashore_at = "counting_house"
+    assert _read_back(d, w, "The agent is back") == EVERYWHERE
+
+
+def test_truth_7_709_read_back_aboard_another_hull_then_brought_aboard_hers():
+    """The brig X's mate speaks on her quarterdeck, the player on the frigate's: not shown.
+    He is brought to the frigate's quarterdeck (`movement.put_aboard`), the player standing:
+    read back, still not (the hull is the line's, not where he stands now). The converse:
+    his word on the frigate's quarterdeck beside the player, shown; he goes back to the
+    brig: still shown."""
+    from freesail.world import movement
+    from tests.test_knowledge import _with_the_brig_x
+
+    w, _b, brig = _with_the_brig_x()
+    d = Driver(w)
+    cannon = brig.people.find("Mr Cannon")
+    assert K.players_senses(w).spot[1:] == (str(w.own.id), "quarterdeck")
+    e = _say_as(w, "Mr Cannon", "Fair wind for Falmouth.")
+    assert e.data[K.SAID_AT] == ["aboard", str(brig.own.id), "quarterdeck"]
+    assert not d.hears(e)
+    movement.put_aboard(w, cannon, w.players, place="quarterdeck")
+    assert _read_back(d, w, "Fair wind for Falmouth") == NOWHERE
+    _say_as(w, "Mr Cannon", "Your servant, sir.")
+    assert _read_back(d, w, "Your servant") == EVERYWHERE
+    movement.put_aboard(w, cannon, brig, place="quarterdeck")
+    assert _read_back(d, w, "Your servant") == EVERYWHERE
+
+
+def test_truth_7_709_read_back_a_namesake_of_his_trade_decides_nothing():
+    """The brig's Mr Cannon speaks on her quarterdeck and then goes below in her; a man of
+    the frigate's is named Mr Cannon, of the same trade, on the frigate's quarterdeck beside
+    the player: the brig's word is not shown him, read back. The converse: the frigate's Mr
+    Cannon speaks beside the player, shown; he goes below and the brig's Mr Cannon stands on
+    her quarterdeck: still shown."""
+    from tests.test_knowledge import _with_the_brig_x
+
+    w, _b, brig = _with_the_brig_x()
+    d = Driver(w)
+    cannon = brig.people.find("Mr Cannon")
+    _say_as(w, "Mr Cannon", "The brig is snug, sir.")
+    cannon.where = "cabin"
+    purser = next(p for p in w.people.everyone if p.role == "purser" and p.hull != brig.own.id)
+    purser.name, purser.role, purser.where = "Mr Cannon", cannon.role, "quarterdeck"
+    assert _read_back(d, w, "The brig is snug") == NOWHERE
+    cannon.where = "quarterdeck"
+    e = _say_as(w, "Mr Cannon", "The frigate is snug, sir.")
+    assert e.data[K.SAID_AT] == ["aboard", str(w.own.id), "quarterdeck"]
+    assert _read_back(d, w, "The frigate is snug") == EVERYWHERE
+    purser.where = "gunroom"
+    assert _read_back(d, w, "The frigate is snug") == EVERYWHERE
+
+
+def test_truth_7_708_the_mastheads_hail_is_her_hulls_and_no_others():
+    """The frigate's lookout hails from her masthead, the brig X hove to beside her: the
+    line says the hail was her hull's (`said_at`), and it is shown the player on her
+    quarterdeck, read back as live; a person standing on the brig's quarterdeck at the
+    same moment would not hear it, nor one in the frigate's gunroom, and one at her
+    masthead would."""
+    from tests.test_knowledge import _with_the_brig_x
+
+    w, _b, brig = _with_the_brig_x()
+    d = Driver(w)
+    e = _say_as(w, "the lookout", "Sail ho! Fine on the weather bow.")
+    frigate = str(w.own.id)
+    assert frigate != str(brig.own.id)
+    assert e.data[K.SAID_AT] == ["aboard", frigate, "masthead"]
+    assert d.hears(e)
+    assert _read_back(d, w, "Fine on the weather bow") == EVERYWHERE
+    here = K.players_senses(w)
+    for spot, heard in (
+        (("aboard", str(brig.own.id), "quarterdeck"), False),  # another hull's deck
+        (("aboard", frigate, "gunroom"), False),
+        (("aboard", frigate, "masthead"), True),
+        (("aboard", frigate, "quarterdeck"), True),
+    ):
+        assert K.hears(w, dataclasses.replace(here, spot=spot), e) is heard, spot
+
+
+def test_truth_7_709_a_line_without_the_speakers_side_is_read_as_before_hidden_on_doubt():
+    """A line of a save written before the speaker's side was (no `said_at`) is read by
+    what it says of him, his name, trade and place, as before: the master's word at the
+    market beside the player is shown; with a namesake of his trade at the counting house
+    of the same port (the line holds no place ashore), it is hidden on doubt. The line that
+    says where he stood is not in doubt: shown. The fall-back, pinned."""
+    w, d, con, out, sent = _played()
+    cap, master = w.people.captain, w.people.find("the master")
+    for p in (cap, master):
+        p.aboard, p.where, p.port, p.ashore_at = False, "shore", "falmouth", "market"
+    e = _say_as(w, "the master", "The agent is out, sir.")
+    assert _shown(sent, out, "The agent is out") == (True, True)
+    old = _before_the_speakers_side(e)
+    assert d.hears(old) and con.hears(old)  # read by his name: he is beside the player
+    pearce = w.people.find("Mr Pearce")
+    pearce.name, pearce.role = master.name, master.role
+    pearce.aboard, pearce.where, pearce.port = False, "shore", "falmouth"
+    pearce.ashore_at = "counting_house"
+    assert not d.hears(old) and not con.hears(old)  # two answer to it, one out of hearing
+    assert d.hears(e) and con.hears(e)
