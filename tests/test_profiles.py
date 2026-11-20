@@ -838,6 +838,14 @@ SAME_HULL_BY_INTENT = {
         "Alike for now, same reasoning as the brig, they are one class in two roles, so they would "
         "look alike except for where they specifically differ in details."
     ),
+    # package 90 (Design-Ship-Tartane.md decision 1, §16.1 question 5, answered as picked by the
+    # owner on 2026-11-18, Decisions-Package90-2026-11.md Part E): the coastguard a second file of
+    # the same hull, one class in two roles as the brig and the merchant brig are
+    frozenset(("tartane", "coastguard-tartane")): (
+        "A second file of the same hull, with Chapman's eight 4-pounders and a company of about "
+        "thirty-four, one class in two roles as the brig and the merchant brig are (her design's "
+        "question 5, the owner's answer as picked, 2026-11-18)."
+    ),
 }
 PAIR_BOX_PX = 100.0
 # Judgement, re-set after the owner's first sheet, old beside new (§5.6).

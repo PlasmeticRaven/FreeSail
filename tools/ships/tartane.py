@@ -1027,8 +1027,6 @@ def write(out_dir: str, p: Particulars, role: str) -> dict:
         quarter_bill(b, guns)
         rep["bill"] = at_the_guns(guns)
     hold_pumps_boat(b, role)
-    if role == TRADER:
-        b.hands(HANDS_NOTE, WATCH_MANOEUVRE_HANDS)
     b.descriptions([DESCRIPTION[role]])
     b.dump(os.path.join(out_dir, FILES[role]), header(role))
     rep["plain"] = sum(
@@ -1468,18 +1466,6 @@ STATION_WORDS = {
     "waisters": "Waisters, the guns' crews beyond the sail's hands",
     "idlers": "Idlers: the trades below",
 }
-# Her own number of hands for the two manoeuvres a watch is asked for by night without a call,
-# over their files' twelve (the bilander's, the lead's (C2) of 2026-11-14): six, her seamen of
-# both watches, so that either watch of three begins them, short (JUDGEMENT, the bilander's rule
-# for a company of her size).
-WATCH_MANOEUVRE_HANDS = {"heave_to": 6, "fill_away": 6}
-HANDS_NOTE = (
-    "Her own number of hands for an evolution, over its file's: heaving to and filling away, six, "
-    "her seamen of both watches, so that either watch of three begins them by night, short; the "
-    "files' twelve, clamped to what her company could ever give, is eight at her ten (her six "
-    "seamen, the boy and the cook), and a watch is under half of it (the bilander's rule, the "
-    "lead's (C2) of 2026-11-14; judgement)."
-)
 # Her burthen for the house's rules of tackle and hold (Tar-D §11): Forfait's 100 tonneaux taken
 # as tons (JUDGEMENT: the tonneau de mer of 2,000 livres is about the long ton).
 BURTHEN_TONS = float(HUMBLE["tonneaux"])
