@@ -4688,7 +4688,7 @@ class Captain(Judgement):
         asked = int(self._business.get("helm_tick", -(10**9)))
         if "relieving_tackles" not in in_hand and tick - asked >= 60:
             self._business["helm_tick"] = tick
-            self.give("rig the relieving tackles", why="the wheel shot away")
+            self.give("rig the relieving tackles", why=str(ship.extra["helm_lost"]))
         return True
 
     def _chase_order(self, p: Perception) -> str:

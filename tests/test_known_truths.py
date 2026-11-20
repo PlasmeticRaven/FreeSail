@@ -20776,6 +20776,14 @@ def test_truth_7_631_strike_the_colours_strikes_her_colours_with_the_fighting_bo
     assert e.kind == "standing.belayed", (e.kind, e.text)
 
 
+# Package 90, A3: the refusal in the words of a helm steered by a tiller, the first action's
+# cutter's (truth 7-632; `evolutions.scripts.HELM_WORDS`), beside the wheel's `HELM_LOST_WORDS`
+TILLER_LOST = (
+    "The tiller is shot away and the helm does not answer: rig the relieving tackles ('rig the "
+    "relieving tackles') to steer her by them, or ship the spare tiller ('ship the spare tiller')."
+)
+
+
 def _wheel_lost_at_seed_6():
     """The first action at seed 6 as the harbour starts it, run to the shot that takes her
     wheel (truth 7-626's own passage)."""
@@ -20798,12 +20806,19 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     to` stands (tried with the helm dead, she comes to by her sails), its line saying that
     the helm does not answer. With the tackles rove every one is taken again.
 
-    The first action at seed 6, the player at the prompt on the minute the wheel goes."""
+    The first action at seed 6, the player at the prompt on the minute the wheel goes.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick the same: the first action's ship is the cutter, who steers by a tiller, so her
+    refusals and her aside are the tiller's (`TILLER_LOST`, "the tiller shot away"), where they
+    were the wheel's (`HELM_LOST_WORDS`, "the wheel shot away"), which every ship steered by a
+    wheel keeps."""
     from freesail.evolutions.scripts import HELM_LOST_WORDS
 
     assert "'rig the relieving tackles'" in HELM_LOST_WORDS
     assert "'repair the wheel'" in HELM_LOST_WORDS
     w = _wheel_lost_at_seed_6()
+    assert w.ship.hull.spec.helm == "tiller"
     held = float(w.ship.dyn.rudder)
     refused = (
         "steer north-west",
@@ -20819,13 +20834,13 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     )
     for order in refused:
         e = _said(w, order)
-        assert e.kind == "order.rejected" and e.text.endswith(HELM_LOST_WORDS), (order, e.text)
+        assert e.kind == "order.rejected" and e.text.endswith(TILLER_LOST), (order, e.text)
     e = _said(w, 'standing order "by the wind": every 1 minute then steer north-west')
     assert e.kind != "order.rejected", e.text
     at = w.clock.tick
     w.run(130)
     fired = [x for x in w.log if x.tick > at and x.kind == "order.rejected"]
-    assert fired and all(x.text.endswith(HELM_LOST_WORDS) for x in fired), [x.text for x in fired]
+    assert fired and all(x.text.endswith(TILLER_LOST) for x in fired), [x.text for x in fired]
     assert not [x for x in w.log if x.tick > at and x.kind == "helm.order"]
     assert _said(w, 'strike standing order "by the wind"').kind == "standing.struck"
     assert abs(float(w.ship.dyn.rudder) - held) < 1e-9, "the rudder moved with the wheel gone"
@@ -20835,7 +20850,7 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     assert e.kind != "order.rejected", e.text
     w.run(5)
     said = [x.text for x in w.log if x.kind == "evolution.step" and x.tick >= e.tick]
-    assert any("the helm not answering, the wheel shot away" in s for s in said), said
+    assert any("the helm not answering, the tiller shot away" in s for s in said), said
     assert not any("helm a-lee" in s for s in said), said
 
 
@@ -20852,7 +20867,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     over, read twice: by the tackles, half the wheel's; the wheel repaired,
     the wheel's own (her file's five degrees a second). `repair the wheel` given twice is
     said once; with the wheel whole it is refused in words; the wheel made good, the
-    relieving tackles are no longer wanted."""
+    relieving tackles are no longer wanted.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick and every rate the same: the first action's cutter steers by a tiller, so her
+    tackles are hooked to its stump, "more slowly than by the tiller", and `repair the wheel` is
+    answered as the spare tiller shipped, given twice, done and with the tiller whole in the
+    tiller's words; the wheel's ("by the wheel", "repairing the wheel", "The wheel is repaired
+    and new wheel-ropes rove", "the wheel is whole") are every wheel ship's still."""
     import yaml
 
     spec = yaml.safe_load(open("data/evolutions/relieving_tackles.yaml", encoding="utf-8"))
@@ -20886,7 +20908,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
             break
     assert ship.extra.get("helm_by_tackles") and ship.extra.get("helm_rate_share") == 0.5
     relieved = [x.text for x in w.log if x.kind == "helm.relieved"]
-    assert relieved and relieved[-1].endswith("more slowly than by the wheel."), relieved
+    assert relieved and relieved[-1].endswith("more slowly than by the tiller."), relieved
     assert _said(w, "right the helm").kind == "helm.order"
     w.run(30)
     by_tackles = travel()
@@ -20896,14 +20918,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert e.kind != "order.rejected", e.text
     w.run(5)
     twice = _said(w, "repair the wheel")
-    assert twice.text.endswith("The hands are repairing the wheel already."), twice.text
+    assert twice.text.endswith("The hands are shipping the spare tiller already."), twice.text
     for _ in range(200):
         w.run(30)
         if not ship.extra.get("helm_by_tackles"):
             break
     done = [x.text for x in w.log if x.kind == "helm.repaired"]
     assert done == [
-        "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; "
+        "The spare tiller is shipped in the rudder head: she steers by the tiller again; "
         "the relieving tackles are cast off."
     ], done
     assert not ship.extra.get("helm_lost") and not ship.extra.get("helm_by_tackles")
@@ -20914,7 +20936,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert by_wheel == pytest.approx(rate * 5, rel=0.02), (by_wheel, rate)
     assert by_tackles == pytest.approx(0.5 * by_wheel, rel=0.03)
     whole = _said(w, "repair the wheel")
-    assert whole.kind == "order.rejected" and "the wheel is whole" in whole.text, whole.text
+    assert whole.kind == "order.rejected" and "the tiller is whole" in whole.text, whole.text
     none = _said(w, "rig the relieving tackles")
     assert none.kind == "order.rejected" and "no need of the relieving tackles" in none.text
 
