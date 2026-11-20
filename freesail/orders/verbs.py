@@ -3201,14 +3201,14 @@ def _lateen_practice(ship: Ship, order: Order) -> Result:
     lateens' yards in going about, kept on her (`scripts.set_lateen_practice`) and read by the
     next tack or wear, or by one in hand whose change has not begun. Answered with the practice
     whole: "Her practice: the lateens left on the mast in stays, shifted in wearing." """
-    _no_stray_modifiers(order, {LATEEN_OCCASION})
+    _no_stray_modifiers(order, {LATEEN_OCCASION, LATEENS})
     if not scripts.has_whole_lateen(ship):
         raise OrderError(
             "She carries no whole lateen; 'leave' is said of a lateen's yard in going about, "
             "left on the mast."
         )
     occasion = order.modifiers.get(LATEEN_OCCASION)
-    if order.object != LATEENS:
+    if not order.modifiers.get(LATEENS):
         name = f"the {order.object}" if order.object else "a sail"
         raise OrderError(
             f"The practice is the lateens' together, not {name}'s: 'leave the lateens in stays', "

@@ -38790,6 +38790,7 @@ No other pin moves (the tiers' compare in the report). New: A1b's part of `tests
 
 ### Recorded
 
+- Found at the step's end, before its tiers: `leave the lateens in stays` given in a standing order was refused as the book read it whole ("There is no such part as the the lateens in this ship": `orders.read_whole` seeks a sail order's object as a part, and "the lateens" is a group only of a hull's file that names it). Mended at its cause in the grammar: "the lateens" said of the practice is a mark (`the_lateens`), the order's object left empty, as the sail room's "for" is a mark. The standing order is entered and sets the practice at the glass ("By standing order 'lateens': leaving the lateens in wearing."; `test_a_standing_order_sets_the_practice_as_any_order`).
 - A checkpoint taken while a `LateenChange` is in hand is refused as it is loaded (`CheckpointRefused`), as one taken while a `SetteeChange` is in hand always was: neither is admitted by truth 7-606's census, which A1b leaves unmoved by construction. No scenario of the card sails a lateen hull; admitting it is the step that first does.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).

@@ -99,6 +99,7 @@ class Order:
       lateens      {sail id | "all": "shift" | "leave"} "tack ship and leave the lateens"
                    (package 90, A1b: on a hull with a whole lateen alone)
       occasion     "stays" | "wearing" | "both"     "leave the lateens in stays" (the same)
+      the_lateens  True                             "the lateens" said of their practice
     """
 
     text: str  # the normalised order
@@ -254,6 +255,7 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     side_word: str | None = None
     if verb == "trim":
         rest = _sheets_of_sails(ship, rest)
+    said_the_lateens = False
     lateen_verb = verb in LATEEN_CLAUSE_VERBS or verb in LATEEN_PRACTICE_VERBS
     lateens = lateen_verb and whole_lateen_hull(ship)
     after_lateens = _the_lateens_at(rest, vocab) if lateens else None
@@ -263,7 +265,7 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     ):
         # "leave the lateens in stays", "shift the lateens in going about" (package 90, A1b): the
         # practice, said of the lateens together whether or not her file names the group
-        obj, rest = LATEENS, after_lateens
+        said_the_lateens, rest = True, after_lateens
     elif spec.object in ("sail", "yards", "line", "wreck"):
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
         if verb == "trim" and obj is not None:
@@ -299,6 +301,8 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         )
     if _CLAUSE_SAID in mods:
         mods[LATEEN_CLAUSE] = _lateen_clause(ship, mods.pop(_CLAUSE_SAID))
+    if said_the_lateens:
+        mods[LATEENS] = True
     if side_from_mods is not None:
         if side_word is not None and side_from_mods != side_word:
             raise OrderError(
@@ -415,8 +419,10 @@ LATEEN_CLAUSE = "lateens"  # the clause read: {sail id, or "all": "shift" | "lea
 LATEEN_OCCASION = "occasion"  # the practice's occasion: "stays" | "wearing" | "both"
 LATEEN_CLAUSE_VERBS = ("tack ship", "wear ship")
 LATEEN_PRACTICE_VERBS = ("shift", "leave")
-# the lateens together, said of their practice whether or not her file names the group
-LATEENS = "the lateens"
+# the mark that "the lateens" was said of their practice, whether or not her file names the
+# group: the order's object is left empty, so that a standing order's reading of it whole
+# (`orders.read_whole`) seeks no part of that name
+LATEENS = "the_lateens"
 _CLAUSE_SAID = "_lateen_clause_said"  # the clause's words before they are resolved
 
 

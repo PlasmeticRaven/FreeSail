@@ -508,6 +508,25 @@ def test_the_practice_is_ordered_answered_read_and_kept_with_her(xebec):
     assert ready.endswith("; the lateens left on their masts.")
 
 
+def test_a_standing_order_sets_the_practice_as_any_order(xebec):
+    """The plan's A1b, "a standing order sets it as any order": entered, its order read whole as
+    the book reads it (`orders.read_whole`: "the lateens" is a mark of the practice and no part
+    sought by that name, which a hull's file without the group would refuse), and given at the
+    glass. Built first with "the lateens" as the order's object, the book refused it ("There is
+    no such part as the the lateens in this ship")."""
+    world = _from(xebec)
+    reply = world.submit('standing order "lateens": every glass then leave the lateens in wearing')
+    assert reply.kind == "standing.given", reply.text
+    n0 = len(world.log.all())
+    world.run(1900)
+    assert scripts.lateen_practice(world.ship) == {"stays": "shift", "wearing": "leave"}
+    said = [
+        e.text for e in _after(world, n0) if e.kind in ("order.accepted", "ship.lateen_practice")
+    ]
+    assert "By standing order 'lateens': leaving the lateens in wearing." in said
+    assert "Her practice: the lateens shifted in stays, left on the mast in wearing." in said
+
+
 def test_a_practice_set_in_stays_before_the_change_is_the_one_the_tack_reads(xebec):
     """Given while a tack is in hand and before its change has begun (Eng §2.3 item 3), the
     practice set is the one that tack reads: the plan is read again as the change would begin."""
