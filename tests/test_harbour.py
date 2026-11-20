@@ -422,11 +422,12 @@ def test_a_box_of_the_files_words_takes_no_anchor_no_alias_and_no_more_than_its_
     ).json()["fields"]
     bomb = "a: &a [x, x, x, x, x, x, x, x, x]\nb: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a]\n"
     bomb += "c: &c [*b, *b, *b, *b, *b, *b, *b, *b, *b]\nbrest: {news: *c}\n"
-    # The proof reads every ship's file once in a process for the fits it may name
-    # (`Harbour.fits`), each longer than the box may be. A proof with no box first, so that
-    # what the loader is given below is the box's words alone, whichever test this process
-    # ran before (found when the test ran first in its worker, the cloud's run 147).
-    assert client.post("/api/harbour/scenario/prove", json={"fields": fields}).status_code == 200
+    # A Harbour begins reading the ships' fits on a thread as it is built (`Harbour.fits`,
+    # every ship's file, each longer than a box may be), and a loader patched while that
+    # thread reads is given their texts. Wait for it first, so that what the loader is
+    # given below is the box's words alone, whichever test this process ran before (the
+    # test failed where it ran first in its worker: the cloud's run 147).
+    port.harbour.fits()
     loads: list[str] = []
     real = yaml_mod.safe_load
     monkeypatch.setattr(yaml_mod, "safe_load", lambda text: loads.append(str(text)) or real(text))
