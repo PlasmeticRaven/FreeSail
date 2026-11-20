@@ -475,3 +475,21 @@ Two figures of the drawing beside them, for the viewer's eye:
   - since f6f26f8a, only her two ship files have changed;
   - `load_ship` and `check_viewer_guns` are clean on both her files;
   - ruff is clean, LF only, and no Python line is over 100 characters.
+
+## 11. The lead's nudge 35: authorship and the Harbour
+
+**Authorship.** Step 1's commit, bfec7fa, keeps the author I set by hand (§1). It was not
+rewritten and nothing was forced. No later commit sets its author, and none will.
+
+**The Harbour.** My tests do not patch a loader or count loads, and none builds a Harbour:
+- `tests/test_tartane.py` runs the generator in a subprocess and imports her module by path;
+- its `load_ship` calls only read her two files;
+- my other edits to tests are rows in tables and lists.
+
+**The harbour and browser tests on a tree with her files.** None failed in any run:
+- the fast tier's 43 (`tests/test_harbour.py` and `tests/test_browser_probe.py`) passed in the
+  base and in each of my runs: on b4e814c, on ecf6180 and on b33adfd, and in the targeted run
+  of the file-iterating files;
+- the slow tier's 18 harbour, browser and Harbour-truth cases, collected by name from
+  `--slow -m slow`, were run on 675fd50 and then on the base f6f26f8a in a scratch worktree.
+  **18 passed on each.**
