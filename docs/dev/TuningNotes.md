@@ -38291,3 +38291,19 @@ Moved by the stage-0 builder. Read by an independent checker, who passed the gen
 **Found, outside N1's files, for the coordinating session:** `freesail/world/nations.py`'s `NAMES_TO_NATION` gives the nation a ship belongs to by her list where the scenario gives none (`Dealings.ship_nation`), and has no `spanish` row, so a ship drawn from the Spanish list with no nation given would be taken for Britain's (the table's default). Nothing reads the list yet, so nothing is wrong today; the row is wanted before the first file that names the list. Not mended here (the stop rule).
 
 Moved by the *Diana*'s builder; to be passed by a reader other than the one who moved it.
+
+
+## Package 90, N3: the Spanish marines' kit (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6, row N3 (decision 64; the xebec *África*'s 38 soldiers, `Design-Ship-Xebec.md` §5 and §8.1): a `spanish` kit in `data/marines.yaml`. **No pin moved, and nothing fights otherwise:** a ship's kit is her nation's (`Nations.marines_kit_of`), and Spain's row in `data/nations.yaml` names the basic kit, as it did; no nation names the new kit (held by the test below).
+
+**What it is, and from what:**
+- **The corps** (`name`, `soldiers: true`): the regulation of 1 January 1788 counts infantry and infantry-artillery in every ship's company (Winfield et al. 2023, p. 1446 and following, by `docs/design/VesselReferences-2026-11-Spanish.md` §15), and James calls the *África*'s 38 soldiers (James vol. II p. 365, by Xeb-D §8.1). The engine reads no `soldiers` key today (words).
+- **Aloft or on deck** (`tops_share` 0.2, `tops_factor` 1.0, the basic kit's): the ordinances of 1748 post the troops' officer on the poop in action (*Ordenanzas de Su Magestad para su Real Armada*, Madrid 1748, tratado I, título V, art. XXXIV, p. 76; `docs/references/signals/`), so the share stays under the 0.3 at which a rules captain whose book says `kit` sends them into the tops (`world/captains.py`), not the French habit's 0.4.
+- **The musket and the drill**: the same ordinances have the troops exercised at the musket and the great gun (tratado I, título III, art. XLV, p. 42) but give no rate; no page in the tree gives the Spanish musket. So the musket, the sergeant's and the officer's arms, `volley_s` 25, `hit_at_50_yd` 0.04 and `boarding` 1.2 are **the basic kit's, said** (JUDGEMENT).
+
+**Added:** `tests/test_fight.py::test_the_spanish_kit_is_the_basic_kits_figures_soldiers_and_no_nation_names_it_yet`.
+
+**For the coordinating session:** the plan's N3 row keys the kit on "the fit's marines", but no fit carries a kit and the schema has no such key (a fit's `marines` is the quarter bill's count, package 75's B1): the kit is reached only by a nation's row. For a Spanish ship to muster it, Spain's row in `data/nations.yaml` must name it (a file nobody touches after stage 0, plan §7.1), or a fit's kit key be built (`freesail/ship/schema.py`, stage 0's). Neither is done here.
+
+Moved by the *Diana*'s builder; to be passed by a reader other than the one who moved it.
