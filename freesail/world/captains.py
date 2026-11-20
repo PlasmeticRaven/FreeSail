@@ -4617,6 +4617,7 @@ class Captain(Judgement):
             parted_standing_lines,
             sprung_spars,
         )
+        from freesail.evolutions.scripts import helm_words
 
         world = self.world
         ship = world.ship
@@ -4666,7 +4667,7 @@ class Captain(Judgement):
         if ship.extra.get("helm_by_tackles") and "repair_wheel" not in in_hand and not in_action:
             # the wheel in its turn, after the leak and the rigging and out of action
             # (package 116, card 5): she steers by the tackles meanwhile, the slower
-            wanted.append(("repair the wheel", "steering by the relieving tackles"))
+            wanted.append((helm_words(ship)["mend"], "steering by the relieving tackles"))
         if not wanted:
             return
         self._business["repairs_tick"] = tick

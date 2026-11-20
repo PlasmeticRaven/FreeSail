@@ -38419,6 +38419,7 @@ Moved by the stage-0 builder (the coordinating session); to be passed by the lea
 | the mend belayed | `repair_scripts.py` `left_words` | "the wheel not mended, ..." | "the spare tiller not shipped, ..." |
 | the mend failing | `repair_wheel.yaml` `on_fail` "Could not {work}: {reason}." | "Could not repair the wheel: ..." | "Could not ship the spare tiller: ..." |
 | the captain's reason | `world/captains.py` `_helm_first`: the hit's own words, `ship.extra["helm_lost"]` | "(the wheel shot away)" | "(the tiller shot away)" |
+| the captain's mend order | `world/captains.py` `_repairs`: the table's `mend` (the lead's word of nudge 31) | "By the captain, taking possession: repairing the wheel (steering by the relieving tackles)." | "... shipping the spare tiller (...)" |
 
 The mend holds "the wheel" under a wheel and "the rudder head" under a tiller, and the tackles hold "the tiller" on both, so the two go on together on either helm as before. The tiller's words for the tackles not wanted, the mend belayed and the mend failing are not in the ground report's table. They are the builder's, by the same ruling (JUDGEMENT).
 
@@ -38446,12 +38447,11 @@ The mend holds "the wheel" under a wheel and "the rudder head" under a tiller, a
 | `tests/test_hull_schooner.py::test_no_figure_the_physics_reads_moved[data/ships/topsail-schooner.yaml]` and `[data/ships/privateer-schooner.yaml]` | the physics' view equals the file at f5be9110 but for SW-4's keys and item 37's three booms | the same, with the hull's `helm` absent there and `"tiller"` here, taken out |
 | `tests/test_known_truths.py::test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_rove` | the ten refusals and the standing order's end with `HELM_LOST_WORDS`; the heave-to's aside "the helm not answering, the wheel shot away" | each ends with the tiller's refusal (`TILLER_LOST`, beside the truth); the aside "the helm not answering, the tiller shot away"; the cutter's helm asserted the tiller; its two assertions on `HELM_LOST_WORDS` hold as they were |
 | `tests/test_known_truths.py::test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it_is_repaired` | "more slowly than by the wheel."; "The hands are repairing the wheel already."; "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; the relieving tackles are cast off."; "the wheel is whole" | "more slowly than by the tiller."; "The hands are shipping the spare tiller already."; "The spare tiller is shipped in the rudder head: she steers by the tiller again; the relieving tackles are cast off."; "the tiller is whole". The rates are as they were: by the tackles half the helm's own, and the whole of it once mended |
+| `tests/test_known_truths.py::test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_would` | the action over, a line of his says "repairing the wheel" | a line of his says "shipping the spare tiller": his mend order, the table's. Moved by the second commit, on the lead's word of nudge 31 (the ground report's row 25); every other clause as it was |
 
-The truths move in words only, every tick the same: **the first action's ship is the cutter** (`data/scenarios/first-action.yaml`), a tiller hull. Measured: the base's own test files run on this commit's tree fail exactly these ten (the eight records and the two truths), and pass at the base.
+The truths move in words only, every tick the same: **the first action's ship is the cutter** (`data/scenarios/first-action.yaml`), a tiller hull. Measured: the base's own test files run on the first commit's tree (8d218fb8) fail exactly ten, the eight records and truths 7-632 and 7-633. The previous truth 7-634 run on the second commit's tree fails, by its last clause alone. At the base all eleven pass.
 
-**Held, as expected:**
-- **truth 7-626**: its asserted words ("'rig the relieving tackles'", "The hands are rigging the relieving tackles already.", the belay's line) are the same on either helm.
-- **truth 7-634**: its "repairing the wheel" is the captain's mend order, which this commit leaves as it was (below). The ground report counted it as moved by that order alone.
+**Held, as expected:** truth 7-626: its asserted words ("'rig the relieving tackles'", "The hands are rigging the relieving tackles already.", the belay's line) are the same on either helm.
 
 ### Measured, old beside new (the probe, base 8b8a982d beside this commit)
 
@@ -38467,18 +38467,18 @@ Each of the six files, and the brig as the wheel's control, started from the har
 | hermaphrodite brig | 17 | 10 | 390 | 2,585 |
 | brig (the wheel) | 20 | 2 (the two new synonyms understood) | 390 | 2,585 |
 | first action, the prompt | 51 | 13 | 460 | 4,545 |
-| first action, the captain | 255 | 8 | the same at both | the captain's mend begun at tick 4,620 at both |
+| first action, the captain | 255 | 9 (8 at the first commit; the mend order at tick 4,620 at the second) | the same at both | the captain's mend begun at tick 4,620 at both |
 
-Each figure is the same old and new. In the first action the minute's line reads "Shot from a cutter: the tiller shot away."; the robbed gun's "Shipping the spare tiller at quarters: four hands taken from No. 3 gun; the guns go on short-handed."; and the waiting and short lines name "shipping the spare tiller" among the work in hand. On a tiller hull the one line of the game left in the wheel's words is the captain's mend order (below). The player's own `repair the wheel` is echoed as typed.
+Each figure is the same old and new. In the first action the minute's line reads "Shot from a cutter: the tiller shot away."; the robbed gun's "Shipping the spare tiller at quarters: four hands taken from No. 3 gun; the guns go on short-handed."; and the waiting and short lines name "shipping the spare tiller" among the work in hand. On a tiller hull no line of the game is left in the wheel's words; the player's own `repair the wheel` is echoed as typed.
 
-### Stops, not built (for the lead)
+### The two stops of the first commit, and the lead's word (nudge 31, 2026-11-20)
 
-1. **`tests/test_probes_90.py::test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole_lateen`, six cases** (the cutter, the lugger, the smack, the two schooners, the hermaphrodite brig). This is stage 0's guard that no committed file carries the key, written after the ground report was measured, so the ground report did not see it. It fails on the six, as A3's own key must make it. The brief does not name it, so it is not moved. The move it wants: its `helm` clause made the six files' `tiller` and the twelve files' absence of the key.
-2. **The captain's mend order** (`freesail/world/captains.py`, `_repairs`, "repair the wheel"). To give the tiller's order he needs the table's words, and those need an import into that function: a third line of the file. By the lead's condition 2 that is a stop. The line is left as it was, so on a tiller hull he says "By the captain, taking possession: repairing the wheel (steering by the relieving tackles)."; the work itself is named in the tiller's words. The one line it wants: `helm_words` added to `_repairs`' local import, and `(helm_words(ship)["mend"], "steering by the relieving tackles")`. With it, truth 7-634's last clause moves to "shipping the spare tiller" (the ground report's row 25).
+1. **`tests/test_probes_90.py::test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole_lateen`, six cases** (the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig). This is stage 0's guard that no committed file carries the key. It was written after the ground report was measured, so the ground report did not see it, and it fails on the six, as A3's own key must make it. **The coordinating session's, by the lead's word:** stage 0's guards become one table at A3's merge into the package's branch. Not touched here.
+2. **The captain's mend order** (`freesail/world/captains.py`, `_repairs`). It needed the table's words, and so an import into that function: a third line of the file, a stop by the lead's condition 2. **Built in the second commit, on the lead's word:** `helm_words` imported in `_repairs` and the order `(helm_words(ship)["mend"], "steering by the relieving tackles")`, with no branch on the hull's kind. With the reason's line, that is A3's three lines in the file and no more (`git diff 8b8a982d -- freesail/world/captains.py`). His order is now "ship the spare tiller" on a tiller hull and "repair the wheel" on a wheel ship, as before. Measured on the first action left to him: his line at tick 4,620 is the one line that moves, every tick the same (above). Its pin is truth 7-634 (above); `tests/test_helm_kind.py` holds it on either helm.
 
 ### Found by the same cause and left (files or lines the card does not give A3)
 
-- `freesail/world/captains.py`'s refusal of his own helm order while the tackles are not rove (`give`): `HELM_LOST_WORDS` and `"not_given": "the wheel shot away"` on every hull. That event is returned to his own judgement and never logged (truth 7-634: nothing of his is refused in the log), so no one reads its words. Mending it would be a third and a fourth line.
+- `freesail/world/captains.py`'s refusal of his own helm order while the tackles are not rove (`give`): `HELM_LOST_WORDS` and `"not_given": "the wheel shot away"` on every hull. That event is returned to his own judgement and never logged (truth 7-634: nothing of his is refused in the log), so no one reads its words. Mending it would be a fourth and a fifth line, beyond the three the lead allowed.
 - The primer's chapter 25 table (`docs/primer/25-water-wounds-and-the-fight-on-deck.md`, ll. 63-70) gives the wheel's words. Chapter 2 (l. 192) says that the conning words "speak to the wheel".
 - `freesail/ship/schema.py` (stage 0's): the helm "read by nothing yet" (ll. 134, 620) is no longer true.
 - The comments of the two evolution files above their start and fail lines, and `verb: repair_the_wheel`'s comment ("repairing the wheel"). Comments, outside the lines the card gives.
@@ -38496,7 +38496,7 @@ From the tree's root, with the full git history fetched (the shallow clone skips
 - **the six hulls' files, the new test and the sets named** (`--slow`): `test_hull_cutter`, `test_hull_lugger`, `test_hull_smack`, `test_hull_schooner`, `test_neufchatel`, `test_helm_kind`, `test_held_work`, `test_grammar_book` (the four synonyms in the library's grammar page, served from the vocabulary: no committed page), `test_fight`, `test_checkpoint`, the four boats' files, and `test_agents`, `test_catalogue` and `test_in_world` (the catalogue serves the two files' lines): 579 passed, 2 xfailed (the base's two);
 - **the eight records moved**, the base's own four hull files run on this tree: 8 failed (exactly the eight above), 100 passed.
 
-The fast tier whole, compared test by test with the base's, and the slow tier of the test files touched are in the build's report (`docs/design/Report-Package90-Helm.md`).
+The fast tier whole, compared test by test with the base's, the slow tier of the test files touched, and the second commit's tests (the four helm truths, `test_helm_kind`, the captain's files) are in the build's report (`docs/design/Report-Package90-Helm.md`).
 
 Built by the A3 builder in a session of its own, beside the engine track; to be read by an independent reader (the plan's §10.2 lens 8: whether the mend is the cause's or only the symptom's, and where else the cause was looked for).
 

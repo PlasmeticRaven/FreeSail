@@ -20956,7 +20956,12 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     steers again by them; and the action over he orders the wheel repaired. And the gale
     trial of the station (`trial-station-gale`, an hour in, the wind over thirty knots),
     her wheel lost as the hit leaves it (no shot is to be had in a gale: the hit's own
-    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too."""
+    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"; the lead's word
+    of nudge 31), words only, every tick the same: the first action's cutter steers by a tiller,
+    so his mend order is her helm's, "shipping the spare tiller", where it was "repairing the
+    wheel", which every ship steered by a wheel keeps."""
     w = _wheel_lost_at_seed_6()
     lost = w.clock.tick
     for _ in range(40):
@@ -20974,7 +20979,7 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     w.run(3600)
     after = [x for x in w.log if x.tick > rove[0] and str(x.actor).startswith("captain")]
     assert [x for x in after if x.kind == "helm.order"], "he never steered by the tackles"
-    assert [x for x in after if "repairing the wheel" in x.text], [x.text for x in after][-8:]
+    assert [x for x in after if "shipping the spare tiller" in x.text], [x.text for x in after][-8:]
 
     from freesail import units as U
     from tests.test_captain_trials import trial

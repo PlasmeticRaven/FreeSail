@@ -7,7 +7,8 @@ hull steered by a tiller was told her wheel is shot away and mended with new whe
 where it lives: the helm's words come from one place keyed on what her file says she steers by
 (`evolutions.scripts.HELM_WORDS`, read by `helm_words(ship)` off `HullSpec.helm`), and every line
 reads them there: the hit, the refusal, the heave-to's aside, the tackles' lines, the mend's lines,
-the order given twice, the work's name in the log and the captain's reason. Here:
+the order given twice, the work's name in the log, and the captain's reason and mend order.
+Here:
 - every helm the schema takes has its words, the same lines in each; the wheel's are package
   116's exactly, and the tiller's name no wheel;
 - the six tiller files (the cutter, the lugger, the smack, the two schooners and the hermaphrodite
@@ -16,15 +17,16 @@ the order given twice, the work's name in the log and the captain's reason. Here
 - on each of the six, and on two wheel ships, the helm shot away by the hit itself and mended, line
   by line in her helm's words and no other's, the tackles and the mend in their times as they were;
 - the lines no passage reaches in a short run: the tackles not wanted, the mend belayed and
-  failing, and the captain's reason, in either helm's words.
-
-Left, and said in the build's report: the captain's mend order (`world/captains.py`'s repairs,
-"repairing the wheel" on either helm; a third line of that file, a stop by the lead's condition).
+  failing, and the captain's reason, in either helm's words;
+- the captain's mend order, the table's (`world/captains.py`'s repairs; built on the lead's word
+  of nudge 31, the third line of that file the lead allowed): on a tiller hull he orders the
+  spare tiller shipped, and on a wheel ship the wheel repaired, as before.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -310,3 +312,27 @@ def test_the_lines_a_short_passage_does_not_reach_are_her_helms_words(helm):
     assert (rig.script.phase_s("reeve"), mend.script.phase_s("mend")) == (300.0, 1800.0)
     hands = {i.evo.id: runner._crew_line(ship, i.evo)["hands"] for i in (rig, mend)}
     assert hands == {"relieving_tackles": 6, "repair_wheel": 4}
+
+
+@pytest.mark.parametrize("helm", HELM_KINDS)
+def test_the_captains_mend_order_is_her_helms(helm):
+    """The tackles rove (their end as `RelievingTacklesScript` makes it) and nothing else to
+    mend, out of action: the rules captain's repairs give the helm's mend from the one table, said
+    in her helm's words ("By the captain, on passage: shipping the spare tiller (steering by the
+    relieving tackles)."), and the work begun is the mend, named so."""
+    path = ROOT / "data/ships" / ("cutter.yaml" if helm == "tiller" else "brig.yaml")
+    words = HELM_WORDS[helm]
+    w = make_world(7, str(path.relative_to(ROOT)), Scenario())
+    ship = w.ship
+    w.run(60)
+    _shot_away(w)
+    RelievingTacklesScript(ship, {}, {}).end_phase("reeve")
+    assert ship.extra["helm_by_tackles"] == words["lost"] and "helm_lost" not in ship.extra
+    n0 = len(w.log)
+    w.captain._repairs(SimpleNamespace(tick=w.clock.tick, wind_kn=10.0))
+    said = [x.text for x in w.log[n0:] if str(x.actor).startswith("captain")]
+    doing = gerund_words(words["mend"])
+    assert said == [f"By the captain, on passage: {doing} (steering by the relieving tackles)."]
+    runner = ship.extra["evolutions"]
+    (mend,) = [i for i in runner.instances if i.evo.id == "repair_wheel"]
+    assert runner.doing(mend) == doing
