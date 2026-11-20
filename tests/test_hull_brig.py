@@ -572,18 +572,48 @@ def _without_sw4_words(path, now, then):
             then["ship"]["descriptions"][key].pop(reworded)
 
 
+# Package 90, item 37 (step A0; the owner's choice (a) of its question 2, 2026-11-18;
+# docs/design/Design-Package90-Engine.md §1.5), old beside new: the generator's peak for the
+# studding class read from the engine's curves, 1.44 for 1.25, so her studding-sail booms are rated
+# as the rule intended. The ratings it writes, kN, each boom a pair, the same in both files (her
+# rig is the brig's; TuningNotes, "Package 90, A0").
+ITEM_37 = {
+    f"{boom}.studdingsail_boom.{side}": ratings
+    for boom, ratings in (
+        ("fore.lower", (2.1, 2.4)),
+        ("fore.topmast", (2.9, 3.3)),
+        ("fore.topgallant", (1.1, 1.2)),
+        ("main.topmast", (3.1, 3.6)),
+        ("main.topgallant", (1.1, 1.3)),
+    )
+    for side in ("starboard", "larboard")
+}
+
+
+def _without_item_37(now, then):
+    """Her booms' ratings as they stood, in place, after holding each to its move."""
+    spars_then = {s["id"]: s for s in then["spars"]}
+    spars_now = {s["id"]: s for s in now["spars"]}
+    moved = {sid: (spars_then[sid]["rating_kn"], spars_now[sid]["rating_kn"]) for sid in ITEM_37}
+    assert moved == ITEM_37
+    for sid in ITEM_37:
+        spars_now[sid]["rating_kn"] = spars_then[sid]["rating_kn"]
+
+
 @pytest.mark.parametrize("path", [BRIG, MERCHANT])
 def test_no_figure_the_physics_or_the_gunnery_reads_moved(path):
     """§5.0 principle 8, §5.6: her file against git, every key but the drawing's: the hull's
     figures, the spars, the sails, the lines, the guns' calibre, place, x and crew, her stores and
     her company, all as they stood. Only the profile, each gun's height and deck and the era note's
-    words differ."""
+    words differ, and the keys a ruled move names, old beside new (package 75's SW-4; package
+    90's item 37, her ten booms' ratings)."""
     before = _git_show(path)
     if before is None:
         pytest.skip(f"{BEFORE} is not in this checkout")
     now = yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
     then = yaml.safe_load(before)
     _without_sw4_words(path, now, then)
+    _without_item_37(now, then)
     assert _without_the_drawing(now) == _without_the_drawing(then)
     # and the hull's own keys are in their old order, the profile last (§5.1)
     assert list(now["hull"]) == [*then["hull"], "profile"]

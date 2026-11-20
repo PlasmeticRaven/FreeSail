@@ -318,24 +318,48 @@ SIZE_RANK: dict[str, int] = {
     "seventy-four": 4,
     "hermaphrodite brig": 2,
     "bilander": 1,
+    # package 90's ships (docs/design/Plan-Package90.md §5.1 item 6; their files and rows come
+    # with each ship): the tartane the cutter's class; the polacre and the xebec a brig's, by
+    # their size; the corvette, a ship-sloop, the brig-sloop's (Design-Ship-Diana.md §11); and
+    # the three-decker a class above the ships of the line, compared and never an index (the
+    # owner's answer to question 8, 2026-11-18, Decisions-Package90-2026-11.md)
+    "tartane": 1,
+    "polacre": 2,
+    "xebec": 2,
+    "corvette": 2,
+    "three-decker": 5,
 }
 # The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
 # rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
 # lower class hauls off from an enemy of this class made out within her doctrine's
 # `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
-# match for one ship of the line (p. 78).
+# match for one ship of the line (p. 78). The three-decker's 5 (package 90) is of the line too:
+# every reader compares a rank with this one as at least it.
 LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
-# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
+# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8).
+# Package 90 (docs/design/Plan-Package90.md §5.1 item 6): each of its words before any row that
+# matches inside it or inside the words that name her: the three-decker's and the first rate's
+# before "ship of the line" ("a first rate, a ship of the line" is of rank 5); the corvette's,
+# the ship-sloop's and the xebec's before "a ship" ("a ship-sloop" holds it); the polacre's
+# before "a ship" and "brig" ("a polacre-ship", "a polacre brig"); the tartane's with them
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("razee", 3),
     ("sixty-four", 4),
     ("seventy-four", 4),
+    ("three-decker", 5),
+    ("first rate", 5),
     ("ship of the line", 4),
     ("two-decker", 4),
     ("bilander", 1),
     ("frigate", 3),
+    ("corvette", 2),
+    ("ship-sloop", 2),
+    ("ship sloop", 2),
+    ("xebec", 2),
+    ("polacre", 2),
+    ("tartane", 1),
     ("a ship", 3),
     ("brig", 2),
     ("schooner", 1),
