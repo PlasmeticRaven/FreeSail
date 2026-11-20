@@ -104,3 +104,67 @@ french:
     Lemarchand, Lefebvre, Leroux, Lecoq, Delaunay, Duval, Marie, Lebas, Hébert, Gosselin,
     Surcouf, Porcher, Jégou, Briand, Gauthier, Allain, Bourdon, Collet, Fleury, Renaud,
   ]
+# spanish: a Spanish ship's company (package 90, N1; docs/design/Design-Ship-Diana.md §17.1
+#   question 6: the people of the corvette, the xebec, the three-decker and the tartane, by
+#   their files' `names: spanish`). Spain's row in data/nations.yaml keeps `names: english`.
+#   From Spain's statistics office, its tables as served on 2026-11-20: Instituto Nacional
+#   de Estadística, "Frecuencias de apellidos" (the surnames borne by 100 or more as a first
+#   surname; the annual population census at 1 January 2025) and "Nombres más frecuentes por
+#   fecha de nacimiento" (the Padrón continuo at 1 January 2022):
+#   - the surnames: the table's first 250 by rank, in its order, less the two of a modern
+#     immigration (Singh, Chen) and the four of more than one word (de la Fuente, de la
+#     Cruz, del Río, de la Torre): 244;
+#   - the given names: the men born before 1930, the nation's fifty and each province of
+#     birth's twenty (its sheets 1 and 3, those born abroad left out), in that order; one
+#     name to a man (José María and the other compounds left out); the Catalan forms in
+#     their Castilian (Josep, Joan, Jaume, Pere, Miquel, Jordi, Francesc, Joaquim, Lluís and
+#     Antoni as José, Juan, Jaime, Pedro, Miguel, Jorge, Francisco, Joaquín, Luis and
+#     Antonio); less Jesús, Javier alone, Alfredo, Daniel, David, Eduardo, Emilio, Julio and
+#     Ricardo: 68.
+#   JUDGEMENT throughout, the table being of today: the commonest Spanish surnames are
+#   patronymics settled long before 1800, so their rank now stands for the period's; the men
+#   born before 1930 are the table's nearest to the period, and the nine names left out are
+#   taken for the fashions of the century after (the table does not say so). The nation's
+#   table and not the coasts' alone, since a Spanish company held soldiers and landsmen
+#   besides its seamen (the regulation of 1788's columns: docs/design/VesselReferences-2026-
+#   11-Spanish.md §15). Written in the Academy's spelling (the table prints capitals with no
+#   accents), one surname to a man as the other lists have it (a Spanish record often gave
+#   two), and in full: the muster's abbreviations (freesail/crew/muster.py) are English and
+#   reach none of these.
+spanish:
+  given: [
+    José, Antonio, Manuel, Francisco, Juan, Pedro, Luis, Ángel, Miguel, Vicente,
+    Ramón, Rafael, Joaquín, Enrique, Fernando, Andrés, Félix, Julián, Tomás, Mariano,
+    Salvador, Santiago, Agustín, Domingo, Alfonso, Gregorio, Jaime, Carlos, Felipe, Pablo,
+    Eugenio, Lorenzo, Alejandro, Diego, Benito, Sebastián, Ignacio, Fermín, Victoriano, Pascual,
+    Gabriel, Cristóbal, Teodoro, Rufino, Víctor, Bartolomé, Guillermo, Bernardo, Mateo, Martín,
+    Jorge, Teófilo, Gerardo, Amador, Ginés, Celso, Camilo, Eladio, Avelino, Florentino,
+    Nicolás, Carmelo, Cándido, Esteban, Dionisio, Valentín, Emiliano, Eusebio,
+  ]
+  surnames: [
+    García, Rodríguez, González, Fernández, López, Martínez, Sánchez, Pérez, Gómez, Martín,
+    Jiménez, Hernández, Ruiz, Díaz, Moreno, Muñoz, Álvarez, Romero, Gutiérrez, Alonso,
+    Torres, Navarro, Domínguez, Ramírez, Ramos, Vázquez, Gil, Serrano, Morales, Molina,
+    Suárez, Castro, Blanco, Delgado, Ortega, Ortiz, Marín, Rubio, Medina, Núñez,
+    Castillo, Cortés, Sanz, Iglesias, Santos, Garrido, Guerrero, Lozano, Flores, Cruz,
+    Herrera, Cano, Méndez, Peña, León, Prieto, Cabrera, Márquez, Reyes, Gallego,
+    Campos, Vidal, Calvo, Vega, Fuentes, Aguilar, Vargas, Carrasco, Caballero, Nieto,
+    Díez, Rojas, Santana, Giménez, Benítez, Arias, Hidalgo, Montero, Santiago, Pascual,
+    Durán, Mora, Herrero, Lorenzo, Ibáñez, Ferrer, Carmona, Soto, Vicente, Rivera,
+    Silva, Román, Parra, Crespo, Mendoza, Velasco, Pastor, Bravo, Rivas, Moya,
+    Franco, Sáez, Gallardo, Ríos, Soler, Pardo, Esteban, Vera, Lara, Camacho,
+    Espinosa, Merino, Sierra, Izquierdo, Carrillo, Arroyo, Montes, Contreras, Luque, Casado,
+    Segura, Rey, Redondo, Galán, Heredia, Otero, Bernal, Salazar, Palacios, Pereira,
+    Robles, Soriano, Marcos, Guerra, Miranda, Acosta, Valero, Varela, Martí, Macías,
+    Guzmán, Vila, Expósito, Roldán, Calderón, Guillén, Bueno, Mateo, Aguilera, Benito,
+    Padilla, Rivero, Andrés, Villar, Escudero, Bermúdez, Salas, Escobar, Beltrán, Mateos,
+    Ávila, Casas, Aparicio, Hurtado, Gálvez, Estévez, Quintana, Trujillo, Rico, Pacheco,
+    Jurado, Conde, Aranda, Menéndez, Plaza, Abad, Villanueva, Montoya, Gracia, Rueda,
+    Manzano, Valencia, Costa, Maldonado, Santamaría, Paredes, Blázquez, Luna, Mesa, Roca,
+    Castaño, Alarcón, Zamora, Serra, Cuesta, Miguel, Tomás, Millán, Simón, Bautista,
+    Murillo, Ponce, Lázaro, Pons, Sancho, Ordóñez, Valverde, Amador, Ballesteros, Cordero,
+    Salvador, Valle, Blasco, Oliva, Bermejo, Barrera, Cuevas, Antón, Aguirre, Lorente,
+    Pozo, Cárdenas, Cuenca, Quintero, Arenas, Collado, Rodrigo, Pulido, Martos, Quesada,
+    Barroso, Sosa, Navas, Paz, Mas, Zapata, Juan, Galindo, Mena, Correa,
+    Vallejo, Bonilla, Villalba, Alba,
+  ]

@@ -36,8 +36,15 @@ NATIONS_PATH = Path(__file__).resolve().parents[2] / "data" / "nations.yaml"
 STANCES = ("open", "neutral", "closed", "hostile")
 
 # The names lists of data/crew/names.yaml and the nation a ship whose company is drawn
-# from each belongs to by default (the scenario may say otherwise).
-NAMES_TO_NATION = {"english": "britain", "american": "united-states", "french": "france"}
+# from each belongs to by default (the scenario may say otherwise). Every list has its row:
+# a list without one would read as Britain's (`nation_of_names`'s floor). The `spanish` list
+# is package 90's (N1; its row the lead's follow-up of nudge 25).
+NAMES_TO_NATION = {
+    "english": "britain",
+    "american": "united-states",
+    "french": "france",
+    "spanish": "spain",
+}
 
 
 # The habit of a nation the table does not know (a scenario's nation is always the
