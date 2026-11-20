@@ -48,7 +48,7 @@ FOLLOWED_BODY = "at her truth"
 # `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
 # before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
 # save (`core.replay.load`): the same fingerprint.
-BUILD_NAME = "m6c"
+BUILD_NAME = "m7"
 BUILD_RULES_DIGITS = 16
 UNSTAMPED_WORDS = "unstamped, before 37d"
 
@@ -1734,16 +1734,67 @@ class World:
         return self._apply_world_order(text, source, by)
 
     def _apply_world_order(self, text: str, source: str, by: str = "") -> Event:
+        """**A world order runs whole or not at all** (package 118, item 2): the one door
+        every world order goes through (the director's, the owner's live order, the
+        scenario's, an act given again). The order is tried first on a copy of the world
+        (the checkpoint's own pickling, `core.replay.trial_copy`), and performed on the
+        world itself only where the copy did it: one refused there is refused in its own
+        words, and one that failed inside (any error, not the channel's refusal) is
+        answered "failed" in words, the world as it was; either way it is in the record
+        (`world_orders`, the driver's line). Before it, an order that failed part-way left
+        its first half done and no record of it (a passenger brought aboard, then the
+        station's binding raised). A world that is itself a copy (the dry run's, the
+        trial's) performs the order directly. A save written before this door replays its
+        orders by the door it was played under (`world_order_door_from`)."""
+        if self.clock.tick < int(self.__dict__.get("world_order_door_from") or 0):
+            return self._apply_world_order_before_118(text, source, by)
         from freesail.world import orders as world_orders
 
-        order = world_orders.parse(text)
-        if by:
-            order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
+        channel = ""
         try:
-            words, data = world_orders.apply(self, order)
-            result = "done"
+            order = world_orders.parse(text)
+            channel = order.channel
+            if by:
+                order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
         except world_orders.WorldOrderError as e:
-            words, data, result = f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+            return self._world_order_record(
+                text, source, channel, f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+            )
+        if channel == "court":
+            # the world's own rule before the order (the lead's list of 2026-11-19): a court
+            # whose accused is dead or gone is dissolved at the next minute or at the next
+            # form that names the court, the form refused after it; that is the court's own
+            # doing and not the order's, so it is done here, on the world itself, and does not
+            # hang on the order being done on the copy
+            from freesail.world.court import dissolve_if_gone
+
+            dissolve_if_gone(self)
+        if not self.__dict__.get("dry_run"):
+            from freesail.core.replay import trial_copy
+
+            trial = trial_copy(self)
+            if trial is not None:
+                words, data, result = _performed(trial, order)
+                if result != "done":
+                    # refused or failed on the copy: the world itself is not touched
+                    return self._world_order_record(text, source, channel, words, {}, result)
+        words, data, result = _performed(self, order)
+        if result == "failed" and not self.__dict__.get("dry_run"):
+            # failed on the world itself, after the copy did it or where none could be made:
+            # what it had done by then stands, and the record says so (the reader of
+            # 2026-11-19: never "nothing of it was done" where something may have been)
+            words = FAILED_PART_WORDS + words.removeprefix(FAILED_WORDS)
+        return self._world_order_record(text, source, channel, words, data, result)
+
+    def _world_order_record(
+        self,
+        text: str,
+        source: str,
+        channel: str,
+        words: str,
+        data: dict[str, Any],
+        result: str,
+    ) -> Event:
         self.world_orders.append(
             {
                 "tick": self.clock.tick,
@@ -1758,9 +1809,28 @@ class World:
             "world.order",
             f"World order ({source}): {words}.",
             actor="driver",
-            data={"order": text, "source": str(source), "channel": order.channel, "result": result}
+            data={"order": text, "source": str(source), "channel": channel, "result": result}
             | data,
         )
+
+    def _apply_world_order_before_118(self, text: str, source: str, by: str = "") -> Event:
+        """The door as it was before package 118, for the orders of a save written under it
+        (a replay's): the order performed on the world itself, and an error that is not the
+        channel's refusal raised out of it with its first half done and nothing recorded,
+        as the play had it (the replay passes it by, `core.replay`)."""
+        from freesail.world import orders as world_orders
+
+        channel = ""
+        try:
+            order = world_orders.parse(text)
+            channel = order.channel
+            if by:
+                order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
+            words, data = world_orders.apply(self, order)
+            result = "done"
+        except world_orders.WorldOrderError as e:
+            words, data, result = f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+        return self._world_order_record(text, source, channel, words, data, result)
 
     def _tick_world_orders(self) -> None:
         """The scenario's world orders due at this tick, in their order (a function of
@@ -2665,6 +2735,11 @@ class World:
             # M5 §26, package 36); a replay applies the scenario's again from the scenario
             # and the harness's from `inputs`
             "world_orders": [dict(o) for o in self.world_orders],
+            # the door the world orders went through (package 118): 2, whole or not at all;
+            # a save without it was played under the door before, and a game loaded from
+            # one keeps that door for the ticks it was played under
+            "world_order_door": 2,
+            "world_order_door_from": int(self.__dict__.get("world_order_door_from") or 0),
             # the player's pencil on the chart (package 37n), for the chart alone; a replay
             # makes none of it, and the door that draws the chart takes it up from here
             "chart_marks": [dict(m) for m in self.chart_marks],
@@ -2953,3 +3028,25 @@ def _hundredths(change_in: float) -> str:
     else:
         amount = f"{n} hundredths"
     return f"{verb} {amount}"
+
+
+def _performed(world: Any, order: Any) -> tuple[str, dict[str, Any], str]:
+    """A world order performed on `world`: (its words, its data, its result), the result
+    "done", "refused" (the channel's refusal in its own words) or "failed" (an error inside
+    it, in words; package 118)."""
+    from freesail.world import orders as world_orders
+
+    try:
+        words, data = world_orders.apply(world, order)
+        return words, data, "done"
+    except world_orders.WorldOrderError as e:
+        return f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+    except Exception as e:  # noqa: BLE001  (any error inside an order: failed, in words)
+        why = str(e).rstrip(".") or type(e).__name__
+        return f"{FAILED_WORDS}{why}", {}, "failed"
+
+
+# The words of a world order that failed inside (package 118): nothing of it is done.
+FAILED_WORDS = "failed, and nothing of it was done: "
+# ... and of one that failed on the world itself, part-way: what it had done stands.
+FAILED_PART_WORDS = "failed part-way, and what it had done by then stands: "

@@ -62,7 +62,8 @@ SEAMAN_STATIONS = (
 # The seamen's ratings, best first, as the ship file shares them.
 SEAMAN_RATINGS = (Rating.ABLE, Rating.ORDINARY, Rating.LANDSMAN)
 
-# The two watches, starboard first: the odd hand of a station goes to the starboard watch.
+# The two watches, starboard first: the odd hands of odd stations go to them in turn
+# (muster.py, rule 3; package 119, before which every odd hand went to the starboard).
 WATCHES = (Watch.STARBOARD, Watch.LARBOARD)
 
 # Skill of a fresh sailor of each rating, (deck, aloft), spec M3 §2.1. The ordinary seaman
@@ -208,6 +209,11 @@ class Crew:
     # the dead struck from the books at their burial (package 73, spec M7 §16): counted
     # still against the company's temper and in the butcher's bill
     dead: list[Sailor] = field(default_factory=list)
+    # the highest number the books have given a man (package 115 D4, the cold review's 5.3
+    # item 13): the next recruit's is the one after, never the length of the list, which falls
+    # when a man is buried or sent away in a prize crew and so gave a new man the number of
+    # one still borne; 0 in a checkpoint from before, which reads the books instead
+    issued: int = 0
     by_station: dict[Station, list[Sailor]] = field(init=False, repr=False)
     by_watch: dict[Watch, list[Sailor]] = field(init=False, repr=False)
     by_id: dict[str, Sailor] = field(init=False, repr=False)
@@ -229,6 +235,16 @@ class Crew:
             self.by_id[s.id] = s
             if s.post:
                 self.posts[s.post] = s
+
+    def next_number(self) -> int:
+        """The number the next man entered is given after: the highest ever issued, read
+        from the books (the borne and the dead) where a checkpoint from before has none."""
+        seen = [self.issued]
+        for s in [*self.sailors, *self.dead]:
+            digits = s.id[1:] if s.id[:1] == "s" else ""
+            if digits.isdigit():
+                seen.append(int(digits))
+        return max(seen)
 
     @property
     def complement(self) -> int:

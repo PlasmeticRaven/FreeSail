@@ -625,6 +625,8 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
             continue
         other.hear(line)
         (hearers if same_hull else elsewhere.setdefault(hull, [])).append(other.station.name)
+    from freesail.world import knowledge
+
     data = {
         "station": station,
         "words": words,
@@ -632,6 +634,9 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         "where": where,
         "hail": is_hail,
         "heard_by": hearers,
+        # where the speaker stood as he spoke (package 120): a hail from her masthead, else
+        # his station's spot
+        **knowledge.said_at(world, spot=("aboard", here, place) if is_hail else said_at),
     }
     if is_hail or (speaker is not None and station != CAPTAIN):
         # a hail, and a station's word on deck, are notable (a station with authority
@@ -819,6 +824,8 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station, "words": words, **said_by}
             | ({"speaker": speaker["station"]} if speaker else {}),
         )
+    if verb in ("show the journal of", "stand down", "resume") and _a_model_speaks(speaker):
+        _refuse_to_a_model(verb, norm, ship, speaker)
     if verb == "show the journal of":
         m = _JOURNAL.match(norm)
         assert m is not None
@@ -843,6 +850,51 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station},
         )
     return "agent.resume", agent.resume("the captain"), {"station": station}
+
+
+# The words a model's station is refused with when it gives the human's orders to another
+# station (package 117; the consent brief's *Being stopped* and *The journal*: the stop
+# and the pause are the human's, and a journal is its keeper's)
+REFUSED_TO_A_MODEL = {
+    "stand down": (
+        "Standing a station down is the human's to do, at the prompt, and not a station's: "
+        "the {station} keeps its station. Its holder may stand down by its own word."
+    ),
+    "resume": (
+        "A pause is answered by the human, at the prompt, and not by a station: the {station} "
+        "stays as it is until the human resumes it or stands it down."
+    ),
+    "show the journal of": (
+        "The {station}'s journal is its keeper's, read by the human at the prompt and by a "
+        "later holder of the station, and not by another station while it is held."
+    ),
+}
+
+
+def _a_model_speaks(speaker: dict[str, str] | None) -> bool:
+    """Whether the sentence is a model's at its station (`_station_speaking`), not the
+    player's at his seat (whose words are the human's)."""
+    return speaker is not None and not speaker.get("words", "").endswith(", the player")
+
+
+def _refuse_to_a_model(verb: str, norm: str, ship: Any, speaker: dict[str, str]) -> None:
+    """`stand down`, `resume` and `show the journal of` another station, from a model's
+    station: refused in words (package 117). A station's own journal is its own to read."""
+    if verb == "show the journal of":
+        m = _JOURNAL.match(norm)
+        who = (m.group("who") or m.group("who2") or "") if m else ""
+    else:
+        m = (_STAND_DOWN if verb == "stand down" else _RESUME).match(norm)
+        who = (m.group("who") or m.groupdict().get("who2") or "") if m else ""
+    station = _station_in(who, ship) or who or "station"
+    if verb == "show the journal of":
+        if station == speaker.get("station"):
+            return  # its own
+        extra = getattr(ship, "extra", None) or {}
+        held = _held(extra.get("agents") or {}, station, extra.get("player_seat"))
+        if held is None or not getattr(held, "started", True) or held.agent.released:
+            return  # a journal nobody holds now is read as before
+    raise OrderError(REFUSED_TO_A_MODEL[verb].format(station=station))
 
 
 def _within_hail(ship: Any, text: str, verb: str) -> None:
@@ -1197,7 +1249,9 @@ def _deck(
             who = ""  # the station named by its number or its person: he is the one meant
         return (
             "agent.deck",
-            agent.give_deck(by="the captain", name=who),
+            agent.give_deck(
+                by="the captain", name=who, by_a_model=_a_model_speaks(_station_speaking(ship))
+            ),
             {"station": target, "deck": "given", "name": who},
         )
     if verb == "i have the deck":

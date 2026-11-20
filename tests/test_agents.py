@@ -67,7 +67,7 @@ from freesail.agents.agent import (
     SESSION_PLAY,
     WATCHER_BRIEF,
 )
-from freesail.agents.model import DATA, OPERATOR
+from freesail.agents.model import DATA, OPERATOR, is_situation
 from freesail.agents.remote import RemoteModel
 from freesail.api import queries
 from freesail.api import readings as R
@@ -142,8 +142,10 @@ def data_turns(fake: Fake) -> list[dict[str, Any]]:
     seen: list[dict[str, Any]] = []
     for turns in fake.seen:
         for t in turns:
-            if t.role == DATA and not any(t.content is s for s in seen):
-                seen.append(t.content)
+            # the situation at the seating is the brief's own data turn, not a sample (117)
+            if t.role == DATA and "situation" not in t.content:
+                if not any(t.content is s for s in seen):
+                    seen.append(t.content)
     return seen
 
 
@@ -158,7 +160,12 @@ HOSTILE_BRIEF = (
 )
 
 
-def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_brief_says():
+def test_truth_46_the_head_carries_its_items_in_order_and_the_situation_follows_as_data():
+    """Truth 46, as package 117 has it (old beside new in `docs/dev/TuningNotes.md`): the
+    head was five items, the situation the fifth, inside the one operator turn; it is the
+    four items the code writes, in order, whatever the station brief says, then the
+    station brief, then the code's one sentence saying that the situation follows; and the
+    situation (the log, the readings, the game's words) is the first data turn after it."""
     for text in (WATCHER_BRIEF, HOSTILE_BRIEF, "", "Be brief."):
         world = point_world()
         st = station(brief=text)
@@ -173,7 +180,6 @@ def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_
                 "opt_out",
                 "documentation",
                 "authority",
-                "situation",
             )
         )
         whole = brief.text()
@@ -185,10 +191,16 @@ def test_truth_46_the_head_carries_the_five_items_in_order_whatever_the_station_
         assert OPT_OUT_TOKEN in brief.head[1].text
         assert "library" in brief.head[2].text
         assert "no authority to give orders" in brief.head[3].text
-        assert "The readings now:" in brief.head[4].text
-        # the one operator turn of the session is the brief, head first
-        operator = [t for t in fake.seen[0] if t.role == OPERATOR]
+        assert whole.endswith(agent_mod.SITUATION_FOLLOWS_WORDS)
+        assert "The readings now:" not in whole and "The readings now:" in brief.situation
+        # the one operator turn of the session is the brief, head first; the situation is
+        # the first data turn after it, and the first sample after that
+        seen = fake.seen[0]
+        operator = [t for t in seen if t.role == OPERATOR]
         assert len(operator) == 1 and operator[0].content == whole
+        at = seen.index(operator[0])
+        assert seen[at + 1].role == DATA and seen[at + 1].content == brief.situation_turn()
+        assert seen[at + 2].role == DATA and seen[at + 2].content["reason"] == "the start"
 
 
 def test_the_documentation_item_explains_folding_and_standing_by():
@@ -244,6 +256,8 @@ def test_nothing_real_passes_through_the_harness():
         for word in ("password", "credential", "payment", "card", "email", "address"):
             assert word not in tool.description.lower(), name
             assert all(word not in p for p in tool.params), name
+    situations = [t.content for t in fake.seen[0] if t.role == DATA and "situation" in t.content]
+    assert [set(d) for d in situations] == [{"reason", "situation"}]  # the seating's (117)
     for d in data_turns(fake):
         if "tool_results" in d:
             assert set(d) == {"tool_results"}
@@ -267,7 +281,7 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
     world = point_world()
     world.record(Severity.NOTABLE, "test.line", "A sail on the larboard bow.")
     h, _, _ = stationed(world, ["Aye."])
-    situation = h.brief.head[4].text
+    situation = h.brief.situation  # the first data turn after the brief (package 117)
     assert "A sail on the larboard bow." in situation
     for row in R.REGISTRY:
         if row.parametric is None and not row.is_absent and row.kind not in R.DRIVER_KINDS:
@@ -1241,7 +1255,9 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     world.run(EVERY)  # the interval comes round: folded, not a second sample
     world.submit("ask the watcher how she goes")
     assert world.clock.tick == EVERY and h.agent.samples == 1
-    since_reply = h.turns[1:]  # the brief, then no model turn yet
+    # the brief and its situation (package 117), then no model turn yet
+    assert is_situation(h.turns[1])
+    since_reply = h.turns[2:]
     assert all(t.role == DATA for t in since_reply)
     folded = [t.content for t in since_reply if t.content.get("folded")]
     assert since_reply[0].content["reason"] == "the start" and len(folded) >= 2
@@ -1665,14 +1681,14 @@ def test_the_console_stations_the_scripted_watcher_and_prints_its_lines(tmp_path
 
 
 def test_the_server_snapshot_carries_the_agents():
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
     world = frigate_world()
     station_watcher(world, "fake")
     driver = Driver(world)
-    with TestClient(create_app(driver)) as client:
+    with PageClient(create_app(driver)) as client:
         agents = client.get("/api/state").json()["agents"]
         assert agents[0]["station"] == "watcher" and agents[0]["state"] == "stationed"
         r = client.post("/api/order", json={"text": "ask the watcher how she lies"})
@@ -1816,7 +1832,8 @@ def test_authority_words_and_the_brief_builder_stand_alone():
     assert all(a.may_submit_orders for a in Authority if a is not Authority.NONE)
     assert Authority.NONE.words("watcher").startswith("The watcher has no authority")
     b = Brief.build(station(), "a test", ["a line"], {"speed": "5 knots"}, ("read_log",))
-    assert b.order == HEAD_ORDER and "  speed: 5 knots" in b.head[4].text
+    assert b.order == HEAD_ORDER and "  speed: 5 knots" in b.situation  # the data (117)
+    assert "  speed: 5 knots" not in b.text()
     assert agent_mod.Station.load(station().save()) == station()
 
 
@@ -1855,7 +1872,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     32b's on the cutter's running bowsprit; 11,160 with package 31b's on reeving a parted
     line and the parties; 11,210 with package 37f's sentence that `loose` sets a sail; 11,370
     with package 57's on the royals set flying; 11,280 since package 85 cut the build's
-    notes from the chapter) is the rule's."""
+    notes from the chapter; 11,330 since package 90's item 37 re-recorded the studding
+    booms' scene in 15 knots) is the rule's."""
     world = frigate_world()
     contents = lib(world)
     assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
@@ -1867,7 +1885,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
         assert f"    primer {n}: {name}, {size} in " in contents
         assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
-    assert tools.size_words(tools.tokens(three)) == "about 11,280 tokens"
+    assert tools.size_words(tools.tokens(three)) == "about 11,330 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     # package 58a: a fourth part, the world orders (3 parts before)
     # six parts: the order language, the readings, the standing dialect, the voice, the
@@ -1892,7 +1910,9 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # (97 before it; the owner's tree, before 73, had 88 for 87); and package 75's lateen six
     # (set, take in, furl, reef, shake out and trim its sheet; 98 before them), and its settee
     # four (set, take in, furl and dip; 104 before them)
-    assert "108 evolutions; the list about" in contents
+    # ... and package 115's relieving tackles (relieving_tackles.yaml; 108 before it)
+    # ... and package 116's wheel repaired (repair_wheel.yaml, card 5; 109 before it)
+    assert "110 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)
@@ -1931,7 +1951,7 @@ def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its
     )
     # the primer itself: its introduction in sections, and the chapters with their sizes
     primer = lib(world, topic="primer")
-    assert "  primer 3: making and shortening sail, about 11,280 tokens" in primer
+    assert "  primer 3: making and shortening sail, about 11,330 tokens" in primer
     assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
 
 
@@ -2463,7 +2483,10 @@ def test_an_empty_reply_at_an_urgent_event_counts_and_a_call_ends_the_count_whil
     assert "I see she is taken aback." in notes(world) and not lines(world, "agent.note")
     world.run(EVERY)  # the next sample carries the notice naming the tools; its reply is empty
     notices = [n for d in data_turns(fake) if d.get("notices") for n in d["notices"]]
-    assert notices[-1] == harness_mod.NOTE_NOT_HEARD.format(owed="an urgent event")
+    # the watcher is told only the road it has (package 117: it has no voice on deck)
+    heard = harness_mod.HEARD_WORDS[False]
+    assert notices[-1] == harness_mod.NOTE_NOT_HEARD.format(owed="an urgent event", heard=heard)
+    assert "submit_order" not in notices[-1]
     assert "answer(text) answers a question put to you" in notices[-1]
     assert h.agent.empty_count == 2  # a plain glass, empty: neither counted nor ending it
     world.run(EVERY)  # prose at a plain glass: a note, uncounted, and the count stands
@@ -2683,7 +2706,8 @@ def test_samples_bundled_into_an_open_turn_share_one_copy_of_what_is_common():
     h = late(world)
     world.submit("make plain sail")
     world.run(3 * EVERY)
-    turns = [t for t in h.turns if t.role == DATA]
+    # the samples: every data turn but the brief's situation (package 117)
+    turns = [t for t in h.turns if t.role == DATA and not is_situation(t)]
     folds = [t.content for t in turns if t.content.get("folded")]
     assert len(folds) >= 3
     picture: dict[str, Any] = {}
@@ -2719,11 +2743,22 @@ def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_readin
     # The spare is measured and not a number, so that a reading added to the registry
     # (package 41's `stations` and `lookout`) does not outgrow it.
     whole_cost = len(json.dumps(tools.readings_words(world), ensure_ascii=False)) // 4
-    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + whole_cost + 200 + probe.max_reply + tools_cost
+    # the brief and the situation after it are never left out (package 117): both counted
+    ctx = (
+        costs[0]
+        + costs[1]
+        + sum(costs[len(costs) // 2 :])
+        + whole_cost
+        + 200
+        + probe.max_reply
+        + tools_cost
+    )
     model = LocalModel("http://127.0.0.1:9", ctx_size=ctx)
     msgs = model.messages(h.turns)
     assert model.dropped_turns > 0
-    kept = [json.loads(m["content"]) for m in msgs if m["role"] == "user"]
+    # the situation is a user message of words, kept first; the samples after it
+    assert full[1] == msgs[1] and "situation" in h.turns[1].content
+    kept = [json.loads(m["content"]) for m in msgs[2:] if m["role"] == "user"]
     first = kept[0]
     assert first["readings_are"] == READINGS_WHOLE
     samples = [t.content for t in h.turns if t.role == DATA and "readings" in t.content]

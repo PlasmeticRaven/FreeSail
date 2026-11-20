@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
+from own_page import PageClient
 
 from freesail.api import queries
 from freesail.api.session import make_world
@@ -95,7 +95,7 @@ def world(request) -> World:
 def client(world):
     driver = Driver(world)
     app = create_app(driver)
-    with TestClient(app) as c:
+    with PageClient(app) as c:
         yield c
 
 
@@ -310,7 +310,11 @@ def test_websocket_streams_events_and_snapshots(client):
                     break
         assert ticks[:3] == [1, 2, 3]  # every tick at 1x
 
-        ws.send_json({"type": "order", "text": "set the fore topsail"})
+        # the socket carries the game to the page and takes nothing from it (package 115,
+        # part A: its order receiver, which no page used, is gone): an order sent over it
+        # is not given; the page's orders come by its route, as the page sends them
+        ws.send_json({"type": "order", "text": "set the main topsail"})
+        client.post("/api/order", json={"text": "set the fore topsail"})
         seen = False
         for _ in range(6):
             m = ws.receive_json()
@@ -318,25 +322,29 @@ def test_websocket_streams_events_and_snapshots(client):
                 seen = True
                 break
         assert seen
+        client.post("/api/driver", json={"action": "tick", "value": 2})
+        log = client.get("/api/log").json()
+        assert not any("main topsail" in e["text"] for e in log)
 
 
 # -- saving from the browser session ---------------------------------------------------
 
 
 def test_save_from_the_order_box_and_the_driver(tmp_path):
-    """`save PATH` typed in the order box writes the same file the console's `save`
-    writes, says so in the log, and is not journaled (a replay must not re-save); the
-    driver action and the download route give the same save."""
+    """`save NAME` typed in the order box writes the same file the console's `save`
+    writes, in the saves place (package 115: a save over the server is named, and a path
+    out of the saves place is refused), says so in the log, and is not journaled (a replay
+    must not re-save); the driver action and the download route give the same save."""
     world = world_for(SHIPS[0])
     driver = Driver(world)
-    app = create_app(driver)
-    with TestClient(app) as client:
+    app = create_app(driver, saves_dir=tmp_path)
+    with PageClient(app) as client:
         client.post("/api/order", json={"text": "set the jib"})
         client.post("/api/driver", json={"action": "tick", "value": 5})
         journal_before = list(world.journal)
 
         target = tmp_path / "voyage.json"
-        r = client.post("/api/order", json={"text": f"save {target}"})
+        r = client.post("/api/order", json={"text": "save voyage"})
         assert r.status_code == 200
         assert r.json()["kind"] == "driver.saved"
         assert "tick 5" in r.json()["text"]
@@ -348,7 +356,7 @@ def test_save_from_the_order_box_and_the_driver(tmp_path):
         assert saved["journal"][-1][2] == "set the jib"
 
         second = tmp_path / "again.json"
-        r = client.post("/api/driver", json={"action": "save", "value": str(second)})
+        r = client.post("/api/driver", json={"action": "save", "value": "again.json"})
         assert r.status_code == 200
         assert json.loads(second.read_text())["journal"] == saved["journal"]
 
@@ -359,10 +367,9 @@ def test_save_from_the_order_box_and_the_driver(tmp_path):
 
         r = client.post("/api/order", json={"text": "save"})
         assert r.json()["kind"] == "driver.refused"
-        r = client.post(
-            "/api/order", json={"text": f"save {tmp_path / 'no' / 'such' / 'dir' / 'x.json'}"}
-        )
+        r = client.post("/api/order", json={"text": f"save {tmp_path.parent / 'x.json'}"})
         assert r.json()["kind"] == "driver.refused"
+        assert not (tmp_path.parent / "x.json").exists()
 
 
 # -- package 29: --load and --scenario on the server (spec M4 §19, §21) -----------------
@@ -394,7 +401,7 @@ def test_the_server_loads_a_save_and_goes_on(tmp_path):
     assert loaded.clock.tick == 180
     assert loaded.log.digest() == world.log.digest()
     driver = Driver(loaded)
-    with TestClient(create_app(driver)) as client:
+    with PageClient(create_app(driver)) as client:
         assert client.get("/api/state").json()["tick"] == 180
         client.post("/api/order", json={"text": "set the royals"})
         client.post("/api/driver", json={"action": "tick", "value": 30})
@@ -419,10 +426,12 @@ def test_a_save_on_the_server_replays_with_its_line(tmp_path):
     save replays it where it was, and a refusal too, so the digests agree after a save."""
     from freesail.api.session import ship_factory
     from freesail.core import replay
+    from freesail.ui.places import Places
 
     world = world_for(SHIPS[0])
     driver = Driver(world)
-    e = driver.save(str(tmp_path / "one.json"))
+    driver.places = Places(tmp_path)  # the server's saves place, the test's own
+    e = driver.save("one")
     assert e.kind == "driver.saved" and "the log's digest is" in e.text
     world.run(30)
     assert driver.submit("state of the tide").kind == "order.rejected"
@@ -592,7 +601,7 @@ def test_the_ship_papers_are_the_librarys_papers_topic_and_nothing_waits(client,
     assert page.splitlines()[1:] == by["the manifest"]["lines"]
     assert data["waiting"] == []
     point = Driver(World(seed=1))
-    with TestClient(create_app(point)) as c:
+    with PageClient(create_app(point)) as c:
         bare = c.get("/api/library/papers").json()
         assert bare["papers"] == [] and bare["words"] and bare["waiting"] == []
 
@@ -656,7 +665,7 @@ def test_ease_on_station_when_a_station_speaks_and_the_option_by_the_driver(tmp_
     (its turn opening, `sampled`, comes first). The instruments' option is the driver's
     action `ease_on_station`, and the state says it only when it is on."""
     driver = watched_driver()
-    with TestClient(create_app(driver)) as client:
+    with PageClient(create_app(driver)) as client:
         driver.running = True
         assert "ease_on_station" not in client.get("/api/state").json()["driver"]
         r = client.post("/api/driver", json={"action": "ease_on_station", "value": True})
@@ -692,7 +701,7 @@ def test_the_chart_block_is_unchanged_by_the_zoom():
     from freesail.ui.server import build_world
 
     world = build_world(server_args(scenario="data/scenarios/gate-5b-passage.yaml"))
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         chart = client.get("/api/chart").json()
     assert set(chart) == set(queries.chart_block(world))
     assert {"region", "title", "bounds", "coast", "features"} <= set(chart)
@@ -724,7 +733,7 @@ def test_the_marks_are_laid_listed_and_rubbed_out():
     the log, the journal, the inputs or the snapshot, and the game's digest does not move."""
     world = world_for(SHIPS[0])
     digest = world.log.digest()
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         with client.websocket_connect("/ws") as ws:
             assert ws.receive_json()["marks"] == []
             first = client.post("/api/marks", json=LINE).json()
@@ -780,7 +789,7 @@ def test_the_marks_are_saved_and_loaded_with_the_game(tmp_path, checkpoint):
     from freesail.ui.server import build_world
 
     world = world_for(SHIPS[0])
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         for mark in (LINE, RING, NOTE):
             client.post("/api/marks", json=mark)
         client.post("/api/driver", json={"action": "tick", "value": 30})
@@ -793,7 +802,7 @@ def test_the_marks_are_saved_and_loaded_with_the_game(tmp_path, checkpoint):
     assert loaded.loaded_from == ("checkpoint" if checkpoint else "replay")
     assert loaded.chart_marks == saved["chart_marks"]
     assert loaded.log.digest() == world.log.digest()
-    with TestClient(create_app(Driver(loaded))) as client:
+    with PageClient(create_app(Driver(loaded))) as client:
         assert client.post("/api/marks", json=LINE).json()["id"] == "m4"
 
 

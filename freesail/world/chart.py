@@ -564,7 +564,7 @@ class Tile:
 
     @classmethod
     def _load(cls, path: Path) -> Tile:
-        with np.load(path) as z:
+        with np.load(path, allow_pickle=False) as z:  # a tile is arrays, never a pickle
             elevation = z["elevation"]
             if "predictor" in z.files and int(z["predictor"]) == 2:
                 # the build's horizontal differencing undone: int16 wraps exactly
@@ -917,6 +917,29 @@ def chart_names(manifest: dict[str, Any]) -> list[str]:
     return list(manifest.get("charts") or {}) + list(manifest.get("regions") or {})
 
 
+# The manifest as `chart_holding` reads it (package 118): read once for each state of the
+# file, keyed on its path, its time of modification and its size, so that a manifest
+# regenerated or a test's own is never served stale. A World read from a checkpoint asks
+# `chart_holding` for each of its hulls, and the file read again each time was nearly the
+# whole cost of a copy of the world (three quarters of a second a hull). Only this reader
+# shares it, and it only reads; `load_manifest` gives every other caller its own.
+_MANIFESTS: dict[tuple[str, int, int], dict[str, Any]] = {}
+
+
+def _manifest_read(root: Path) -> dict[str, Any]:
+    path = root / "manifest.yaml"
+    try:
+        st = path.stat()
+    except OSError:
+        return load_manifest(root)  # its own words for a missing manifest
+    key = (str(path.resolve()), st.st_mtime_ns, st.st_size)
+    doc = _MANIFESTS.get(key)
+    if doc is None:
+        doc = load_manifest(root)
+        _MANIFESTS[key] = doc
+    return doc
+
+
 def chart_holding(region: str, root: Path = CHARTS_DIR) -> str:
     """The name of the chart in play for a scenario that names a region (package 45, the
     owner's question 3 of gate m6a: the chart shows one region where the game should show
@@ -925,7 +948,7 @@ def chart_holding(region: str, root: Path = CHARTS_DIR) -> str:
     region's own name where no chart holds it (a chart of that one region, as package 38
     had it), and a chart's own name as given. A scenario that wants one region alone says
     `chart: <region>` outright, which only a test should."""
-    manifest = load_manifest(root)
+    manifest = _manifest_read(root)
     if region in (manifest.get("charts") or {}):
         return region
     for name, spec in (manifest.get("charts") or {}).items():
@@ -948,6 +971,102 @@ def _present(entry: dict[str, Any] | None, root: Path) -> dict[str, Path]:
         if path.exists():
             out[str(t["name"])] = path
     return out
+
+
+def _crossings(x0: float, dx: float, every: float, off: float) -> set[float]:
+    """The fractions t in (0, 1) at which x0 + dx * t crosses a line (k + off) * every, k
+    whole (package 111's ruling 1: the places a line's surface may change its formula)."""
+    if dx == 0.0 or every <= 0.0:
+        return set()
+    lo, hi = min(x0, x0 + dx), max(x0, x0 + dx)
+    k0 = math.floor(lo / every - off)
+    k1 = math.ceil(hi / every - off)
+    out = set()
+    for kk in range(k0, k1 + 1):
+        t = ((kk + off) * every - x0) / dx
+        if 0.0 < t < 1.0:
+            out.add(t)
+    return out
+
+
+@dataclass
+class LinePiece:
+    """A piece of a line within which the chart's surface is one quadratic of the
+    distance along it, or a constant (`Chart._line_pieces`): fractions t0 to t1 of a chord
+    straight in degrees from (lat0, lon0) by (dlat, dlon), the chord beginning `along0`
+    metres along the line and `chord_m` long."""
+
+    chart: Any
+    lat0: float
+    lon0: float
+    dlat: float
+    dlon: float
+    t0: float
+    t1: float
+    along0: float
+    chord_m: float
+
+    def at(self, t: float) -> Position:
+        return Position(self.lat0 + self.dlat * t, _wrap(self.lon0 + self.dlon * t))
+
+    def depth(self, t: float) -> float | None:
+        e = self.chart.elevation_at(self.at(t))
+        return None if e is None else -e
+
+    def along_m(self, t: float) -> float:
+        return self.along0 + self.chord_m * t
+
+    def first_under(self, wants_m: float) -> float | None:
+        """The first fraction t within the piece where its depth is under `wants_m`, by the
+        quadratic through its ends and its middle (exact on a bilinear piece, and on a
+        constant one); None where it is nowhere under."""
+        tm = 0.5 * (self.t0 + self.t1)
+        d0, dm, d1 = self.depth(self.t0), self.depth(tm), self.depth(self.t1)
+        if d0 is not None and d0 < wants_m:
+            return self.t0
+        if d0 is None or dm is None or d1 is None:
+            for d, t in ((dm, tm), (d1, self.t1)):
+                if d is not None and d < wants_m:
+                    return t
+            return None
+        # d(u) = A u^2 + B u + C on u in [0, 1] across the piece, C = d0
+        big_a = 2.0 * (d0 - 2.0 * dm + d1)
+        big_b = d1 - d0 - big_a
+        c = d0 - wants_m
+        roots: list[float] = []
+        if abs(big_a) < 1e-12:
+            if abs(big_b) > 1e-12:
+                roots.append(-c / big_b)
+        else:
+            disc = big_b * big_b - 4.0 * big_a * c
+            if disc >= 0.0:
+                r = math.sqrt(disc)
+                roots += [(-big_b - r) / (2.0 * big_a), (-big_b + r) / (2.0 * big_a)]
+        for u in sorted(u for u in roots if 0.0 <= u <= 1.0):
+            # the first crossing downward: just beyond it the depth is under the draught
+            v = min(1.0, u + 1e-9)
+            if big_a * v * v + big_b * v + c < 0.0 or u >= 1.0:
+                return self.t0 + u * (self.t1 - self.t0)
+        return None
+
+    def readings(self) -> list[tuple[float, Position]]:
+        """The depths that hold the piece's least: its ends, its middle and, where the
+        quadratic through the three turns to a least within it, its turning point."""
+        tm = 0.5 * (self.t0 + self.t1)
+        d0, dm, d1 = self.depth(self.t0), self.depth(tm), self.depth(self.t1)
+        out = [
+            (d, self.at(t)) for d, t in ((d0, self.t0), (dm, tm), (d1, self.t1)) if d is not None
+        ]
+        if d0 is not None and dm is not None and d1 is not None:
+            curv = d0 - 2.0 * dm + d1
+            if curv > 1e-12:
+                u = 0.5 * (1.0 + (d0 - d1) / (2.0 * curv))
+                if 0.0 < u < 1.0:
+                    tv = self.t0 + u * (self.t1 - self.t0)
+                    dv = self.depth(tv)
+                    if dv is not None:
+                        out.append((dv, self.at(tv)))
+        return out
 
 
 class Chart:
@@ -1193,6 +1312,98 @@ class Chart:
         height above it: the shore, a drying rock); None where the chart has nothing."""
         e = self.elevation_at(pos)
         return None if e is None else -e
+
+    # -- depth along a line (package 111's ruling 1, the chart session's tracks step) -------
+
+    def least_depth_along(self, a: Position, b: Position) -> tuple[float, Position] | None:
+        """The least depth at the datum the chart gives along the great circle from `a` to
+        `b` (metres, negative where it dries), and the place of it: the TRUE least of the
+        chart's own surface along the line, with no step and no margin (the lead's ruling
+        of 2026-11-14, 11:00, on the reader's finding that a reading half a cell apart steps
+        over a lone head on a diagonal or off its centre; old: a first reading every half
+        cell of the finest level under the line and a second every 2 m under 8 m).
+
+        The lookup (`elevation_at`) is bilinear between cell centres, so along a straight
+        line within one square of four centres the depth is a quadratic, least at an end or
+        at its turning point. The line is cut at every place the surface may change its
+        formula (`_line_pieces`): each level's centre lines and cell edges where that level
+        has a tile, and each level's tile edges; on each piece the depth is read at its
+        ends and its middle, and at the quadratic's turning point where that is a least
+        within it. Where a corner is unknown the lookup falls back to the nearest cell, a
+        constant on the piece, which the same readings give. None where the chart knows
+        nothing along the line. The one reader of a line's least depth: the audit's track
+        check reads it."""
+        least: tuple[float, Position] | None = None
+        for piece in self._line_pieces(a, b):
+            for d, p in piece.readings():
+                if least is None or d < least[0]:
+                    least = (d, p)
+        return least
+
+    def first_under(
+        self, a: Position, b: Position, wants_m: float
+    ) -> tuple[float, float, Position] | None:
+        """The first place along the great circle from `a` to `b` where the chart's surface
+        gives less than `wants_m` of water at the datum, as (metres along from `a`, the depth
+        there, the place); None where it nowhere does. The same pieces as
+        `least_depth_along`, in order, each solved exactly: the quadratic through its ends
+        and its middle, and its first root below `wants_m` within the piece (the lead's
+        ruling of 2026-11-14, 11:05: the first place under a draught is the line's second
+        answer, built once, for the pilot's warning when the game's readers move to it)."""
+        for piece in self._line_pieces(a, b):
+            t = piece.first_under(wants_m)
+            if t is not None:
+                d = piece.depth(t)
+                return piece.along_m(t), float(wants_m if d is None else d), piece.at(t)
+        return None
+
+    # A long line is read in chords no longer than this, each straight in degrees between
+    # two points of the great circle: at 500 m the two differ by a few millimetres
+    LINE_CHORD_M = 500.0
+
+    def _line_pieces(self, a: Position, b: Position) -> list[LinePiece]:
+        """The pieces of the line from `a` to `b` within which the chart's surface is one
+        quadratic of the distance along (or one constant where the lookup falls back to a
+        cell), in order: the great circle cut into chords of at most `LINE_CHORD_M`, each
+        straight in degrees, cut again at every level's tile edges and, where that level
+        has a tile, at its cell edges and its centre lines."""
+        bearing, dist = bearing_and_distance(a, b)
+        n = max(1, int(math.ceil(dist / self.LINE_CHORD_M)))
+        ends = [destination(a, bearing, dist * i / n) for i in range(n + 1)]
+        out: list[LinePiece] = []
+        for k in range(n):
+            p, q = ends[k], ends[k + 1]
+            along0 = dist * k / n
+            chord = dist / n
+            lat0, lon0 = p.lat_deg, p.lon_deg
+            dlat = q.lat_deg - lat0
+            dlon = _wrap(q.lon_deg - lon0)
+            cuts = {0.0, 1.0}
+            for lv in self.levels:
+                span = lv.span_sec / 3600.0
+                edges = sorted(
+                    {0.0, 1.0}
+                    | _crossings(lat0 + 90.0, dlat, span, 0.0)
+                    | _crossings(lon0 + 180.0, dlon, span, 0.0)
+                )
+                cuts.update(edges)
+                cell = lv.cell_sec / 3600.0
+                for t0, t1 in zip(edges, edges[1:], strict=False):
+                    tm = 0.5 * (t0 + t1)
+                    if not lv.has(lat0 + dlat * tm, lon0 + dlon * tm):
+                        continue
+                    for off in (0.0, 0.5):
+                        for t in _crossings(lat0 + 90.0, dlat, cell, off) | _crossings(
+                            lon0 + 180.0, dlon, cell, off
+                        ):
+                            if t0 < t < t1:
+                                cuts.add(t)
+            ts = sorted(cuts)
+            for t0, t1 in zip(ts, ts[1:], strict=False):
+                if t1 - t0 <= 1e-12:
+                    continue
+                out.append(LinePiece(self, lat0, lon0, dlat, dlon, t0, t1, along0, chord))
+        return out
 
     def tile_min_depth(self, pos: Position) -> float | None:
         """The shoalest sounding of the finest tile under the point (NaN-free: None

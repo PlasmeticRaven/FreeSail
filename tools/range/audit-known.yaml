@@ -234,13 +234,6 @@ known:
   owner: a data fault for milestone 7c
   reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
-- key: v-nation-unknown:cruiser.stations
-  what: the table is keyed by names the nations' table has not, each of which the business reads as a nation
-  years: 1792-1825
-  basis: mechanical
-  owner: a data fault for milestone 7c
-  reason: 'data/captains/cruiser.yaml: package 74''s prize keys (`mans_prizes`, `prize_crew_share`, `burns_when` and ten more) stand under `stations:` where the other doctrines have them under `thresholds:`, so the business reads thirteen of them as nations with stations (none is at war, so none is drawn) and the cruiser''s own prize doctrine is read by its defaults. The keys moved under `thresholds:` clear it. Found when the vessels'' check was made to stand on the tables'
-  most: 13
 - key: f-colours:britain
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1800

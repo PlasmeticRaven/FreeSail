@@ -1,0 +1,162 @@
+# The harbour's shelves (package 96b, step 1; docs/design/Design-Harbour.md §3.2): which
+# shelf of the harbour's page each of the game's scenarios stands on, in what order, and
+# the one sentence the page says of it. Read by the harbour's page alone
+# (freesail/ui/harbour.py, `Harbour.shelves`); the game reads nothing here, and no scenario
+# file says its own shelf, so that sorting the list moves no scenario. It lies with the
+# page's files and not under data/: data/ is the game's data, which the range's audit
+# classes key by key and the rules' stamp of a save hashes file by file, and the page's
+# sorting is neither.
+#
+# A scenario is named by its file's name without `.yaml`. A scenario of data/scenarios/
+# that no shelf names stands on the page's last shelf, "Not yet sorted", so that a new
+# scenario is never hidden by being forgotten here. A shelf marked `hidden: true` is shown
+# only when the page's tick box asks for it: the scenarios kept for tests and gates.
+#
+# `first_game` (step 2; the design's §3.1 and §3.3) is the game the page's first panel
+# names for a newcomer: a scenario of a shelf below, and the lines said beside its button.
+# The lessons of that panel are the shelf `lessons`, in its order. A scenario's `seat` is
+# the station the first panel's button seats the player at (the lesson that is the
+# officer's own); the page's other lists leave the seat to the player.
+
+first_game:
+  file: first-passage
+  says:
+    - The frigate Amazon in open water, a north wind of fifteen knots; no land, no other sail, nothing to hit.
+    - About an hour and a quarter. You make sail, brace the yards, tack her and wear her.
+    - The primer's chapter 7 goes with it, line by line (docs/primer/07-a-first-passage.md in the game's folder).
+
+shelves:
+  - id: first
+    title: Begin here
+    says: The game to begin with.
+    scenarios:
+      - file: first-passage
+        says: The frigate in open water with a north wind; make sail, brace up, tack and wear, with the primer's chapter 7 beside you.
+
+  - id: lessons
+    title: Lessons
+    says: The primer's lessons, in the primer's order (chapter 18).
+    scenarios:
+      - file: lesson-landfall
+        says: The frigate standing in from sea at night; raise the Lizard and say where you are.
+      - file: lesson-reckoning
+        seat: officer
+        says: You are the officer of the watch off the Lizard; work the reckoning for yourself before noon.
+      - file: lesson-falmouth
+        says: Pilot water from Black Head to Falmouth road; cross bearings, a pilot, and an anchor let go in a tideway.
+      - file: lesson-lee-shore
+        says: A night standing off and on with a fresh southerly blowing on the coast.
+
+  - id: passages
+    title: Passages
+    says: A ship, a sea and a port to make; from the Channel outward.
+    scenarios:
+      - file: channel-east
+        says: The frigate from Torbay to Guernsey through the Race of Alderney.
+      - file: spithead
+        says: The frigate from the Downs down Channel to Spithead.
+      - file: naval-cruise
+        says: The frigate Amazon from Plymouth to her station off Ushant, with a chronometer in the captain's charge.
+      - file: falmouth-to-corunna
+        says: An American schooner from Falmouth round Ushant and across the Bay for Corunna, by your own courses.
+      - file: biscay-north
+        says: An American cutter from L'Orient down the coast and into the Bay of Quiberon.
+      - file: biscay-south
+        says: An American cutter from Vigo round Cape Finisterre to Corunna.
+      - file: portugal
+        says: An American schooner from Oporto down the coast and up the Tagus to Lisbon.
+      - file: strait
+        says: The frigate from off Cape Trafalgar through the Strait to Gibraltar.
+      - file: madeira
+        says: An American schooner from Funchal to Porto Santo and back.
+      - file: azores
+        says: The frigate six hundred miles from Funchal to Terceira, by the log and the noon sight.
+      - file: canaries
+        says: The frigate sent from Funchal to look into the road of Santa Cruz of Tenerife.
+      - file: morocco
+        says: A British merchant brig from Gibraltar down the coast of Morocco for Mogador.
+      - file: mahon
+        says: The frigate from Gibraltar along the coast of Spain to Port Mahon.
+      - file: tarragona
+        says: The frigate from Port Mahon to the road of Tarragona, in May 1809.
+      - file: agincourt-sound
+        says: The frigate from the Maddalena to look into Toulon and back.
+      - file: bona
+        says: The frigate from Port Mahon across to the Barbary shore at Bona.
+      - file: the-faro
+        says: The frigate from Valletta through the Faro of Messina to Palermo, in April 1808.
+
+  - id: trade
+    title: Trade
+    says: A merchantman, a purse and the ports; the voyage is your own.
+    scenarios:
+      - file: merchant-passage
+        says: An American schooner from Falmouth for Brest, with a cargo to buy at the quay.
+      - file: merchant-intent
+        says: The same passage with the game's own captain sailing her by his intent; take the ship from him when you like.
+      - file: merchant-cutter
+        says: An American cutter at anchor off Falmouth with £500; the trade and the course are yours.
+      - file: merchant-brig
+        says: An American brig at anchor off Falmouth with £1,000; the trade and the course are yours.
+      - file: merchant-schooner-plymouth
+        says: An American schooner at anchor in Plymouth Sound with £2,100; the trade and the course are yours.
+      - file: merchant-ship
+        says: A frigate-built merchant ship at anchor off Falmouth with £5,000; the trade and the course are yours.
+      - file: smack-falmouth
+        says: A Cornish smack out of Falmouth in the pilchard season.
+      - file: lugger-roscoff
+        says: A French lugger out of Roscoff, with the British cruisers about.
+
+  - id: actions
+    title: Actions and squadrons
+    says: Guns, a chase, a convoy, a blockade.
+    scenarios:
+      - file: first-action
+        says: A King's cutter off the Lizard and a French privateer cutter a mile and a half away.
+      - file: encounter
+        says: The frigate on the Lizard station, and a cutter under British colours that is not British.
+      - file: exercising-the-great-guns
+        says: A forenoon with nobody in sight, to exercise the frigate's company at the guns.
+      - file: leak
+        says: A King's cutter homeward for Falmouth with a seam working and the water gaining.
+      - file: convoy
+        says: A King's brig-sloop with four merchant brigs under her orders, bound up Channel.
+      - file: convoy-six
+        says: A King's brig-sloop, commodore of six merchant brigs in two columns, and a privateer.
+      - file: blockade
+        says: The frigate off Ushant, the inshore squadron off Brest, and a French frigate running home.
+
+  - id: director
+    title: With a director
+    says: A model above the game shapes the voyage; each wants a model's door started.
+    scenarios:
+      - file: directed-passage
+        says: The merchant passage for Brest with a director on the quiet-passage brief.
+      - file: dispatches-falmouth
+        says: A cutter from Falmouth for Plymouth, a sealed packet aboard, and a director on the dispatches brief.
+      - file: prize-home
+        says: The frigate bringing a French prize in to Falmouth, with a director above.
+      - file: captive
+        says: You have struck; a prisoner aboard the French frigate bound for Brest.
+      - file: the-channel-observed
+        says: No ship of your own; the western Channel watched from the director's station.
+
+  - id: tests
+    title: Kept for tests and gates
+    says: The gates' days and the acceptance walks; not games to begin with.
+    hidden: true
+    scenarios:
+      - file: gate-4c-day
+        says: The gate's day; a day under standing orders through a rising gale.
+      - file: gate-5a-day
+        says: The gate's day with the weather from systems alone.
+      - file: gate-5b-passage
+        says: The passage for gate 5b; Ushant to Falmouth by the reckoning and the noon sight.
+      - file: gate-5b-passage-schooner
+        says: The passage for gate 5b in the schooner.
+      - file: gate-5b-passage-thick
+        says: The passage for gate 5b in thick weather.
+      - file: squadron
+        says: A squadron in line ahead crossing the frigate's bows; the walk of ships promoted while in station.
+      - file: tender
+        says: The frigate at anchor in Torbay and her tender sent to Plymouth and home; the one-world acceptance walk.

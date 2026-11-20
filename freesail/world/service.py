@@ -29,6 +29,7 @@ Read from the state the World already has; nothing is drawn, written or logged.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 __all__ = [
@@ -38,7 +39,13 @@ __all__ = [
     "REGULATIONS_NATION",
     "ROLE_SERVICE",
     "SERVICES",
+    "SERVICE_ROLE",
+    "free_intent_role",
+    "papers_service",
+    "regulations_said",
     "service_of",
+    "service_role",
+    "service_word",
     "under_the_regulations",
 ]
 
@@ -73,6 +80,10 @@ ROLE_SERVICE: dict[str, str] = {
     "indiaman": MERCHANT,
     "revenue": MERCHANT,
 }
+
+# The captain's role each service stands for where a reader needs a role and her captain has
+# none (package 121: the hail's words, the answer when she is hailed, a free intent's role).
+SERVICE_ROLE: dict[str, str] = {KINGS: "kings-ship", PRIVATEER: "privateer", MERCHANT: "merchant"}
 
 # The words the papers may give for each, beside the service's own name.
 _PAPERS_WORDS: dict[str, str] = {
@@ -111,6 +122,34 @@ def service_of(world: Any) -> str:
     return MERCHANT
 
 
+def papers_service(world: Any) -> str | None:
+    """The service her scenario's papers give, alone (package 121): None where they give
+    none or a word this module does not know. For a reader that must not ask her captain,
+    as the captain's own default role at his making."""
+    return _papers_service(world)
+
+
+def free_intent_role(world: Any) -> str:
+    """The role of a captain whose intent names none (home, a passage, a free hand;
+    `captains.role_for`): her papers' service first (package 121: a privateer by her papers
+    on a passage sails by the privateer's book, not the King's ship's), else a King's ship
+    by her wardroom (package 86), else a merchantman."""
+    given = _papers_service(world)
+    if given is not None:
+        return SERVICE_ROLE[given]
+    from freesail.world.captains import _is_kings_ship
+
+    return "kings-ship" if _is_kings_ship(world) else "merchant"
+
+
+def service_role(world: Any) -> str:
+    """Her captain's role where he has one, else the role of her service (`service_of`,
+    `SERVICE_ROLE`): a privateer by her papers hails and answers as a privateer, and a
+    King's ship by her wardroom as a King's ship (package 121)."""
+    role = _role(world)
+    return role or SERVICE_ROLE[service_of(world)]
+
+
 def under_the_regulations(world: Any) -> bool:
     """Whether the Admiralty's Regulations bind her captain: a King's ship (`service_of`)
     of Britain's (`signals.own_nation`), who buys stores of the merchants only of
@@ -130,6 +169,23 @@ def _papers_service(world: Any) -> str | None:
     given = papers.get("service") if isinstance(papers, dict) else None
     if given is None:
         return None
+    return service_word(given)
+
+
+def regulations_said(world: Any, words: str) -> str:
+    """Words of the wardroom's file as her service binds them (package 121): the file cites
+    the Regulations for each officer's duty, "(the Regulations, the Lieutenant, art. IV)";
+    where they do not bind her (a privateer or a merchantman on a King's ship's file) the
+    citations are not said, and the duty is."""
+    if world is None or "the Regulations" not in words or under_the_regulations(world):
+        return words
+    return re.sub(r"\s*\((?:judgement on )?the Regulations[^()]*\)", "", words)
+
+
+def service_word(given: Any) -> str | None:
+    """The service a word of the papers names ("privateer", "letter of marque", "King's
+    ship", in any case), or None for a word that names none; the scenario door refuses
+    such a word (package 121)."""
     key = " ".join(str(given).lower().replace("’", "'").split())
     return _PAPERS_WORDS.get(key)
 

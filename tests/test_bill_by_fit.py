@@ -206,8 +206,9 @@ def test_a_real_checkpoint_from_before_the_trimmers_by_fit_loads_and_beats_as_be
     assert said.text == (
         "Beat to quarters! Quarters: 19 gun crews manned, the trimmers 79, the helm 2, the powder "
         "22, the marines 38. Not hands enough for every gun: the guns, Nos. 12 to 13 and 17 stand "
-        "unmanned."
-    )
+        "unmanned. The guns are secured: 'cast loose the guns' to serve them."
+    )  # package 115 D1, joined at the merge: the beat says the guns are secured; old, the line
+    # ended at "stand unmanned."
     assert (len(q.divisions[TRIMMERS]), len(q.divisions[MARINES])) == (79, 38)
     path = replay.write_checkpoint(w, tmp_path / "again.checkpoint")
     _, again = replay.read_checkpoint(path)

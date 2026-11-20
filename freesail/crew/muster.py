@@ -17,9 +17,14 @@ How the company is made up, all of it deterministic:
 3. Each station is entered on the books best rating first, and its hands are watched
    alternately starboard and larboard, so that each watch has an equal share of its
    strength (Luce: "giving to each watch an equal share of the strength and intelligence of
-   the crew"); an odd hand goes to the starboard watch.
-4. The marines are watched the same way; the idlers are entered by trade in the file's
-   order and keep no watch.
+   the crew"). A station of an odd number has one hand over, its last: the odd hands of
+   successive odd stations, in the stations' order, go to the watches in turn, the first to
+   the starboard watch, the next to the larboard, so that the two watches of the whole
+   company are equal or one apart (package 119: before it every odd hand went to the
+   starboard, and the merchant brig's ten, all four of her stations odd, were watched seven
+   and three).
+4. The marines are watched the same way, their odd hand taking its turn after the seamen's
+   stations; the idlers are entered by trade in the file's order and keep no watch.
 """
 
 from __future__ import annotations
@@ -178,6 +183,7 @@ def muster(
     for p in spec.posts:
         entries.append((Rating.OFFICER, Station.QUARTERDECK, Watch.NONE, p.post, None, p.name))
     by_rating = station_ratings(spec)
+    odd_turn = 0  # how many odd stations' odd hands are watched so far (rule 3)
     for station in Station:
         n = spec.stations.get(station.value, 0) if station is not Station.QUARTERDECK else 0
         if n == 0:
@@ -192,7 +198,11 @@ def muster(
         else:
             ratings = [r for r in SEAMAN_RATINGS for _ in range(by_rating[station][r])]
         for i, rating in enumerate(ratings):
-            entries.append((rating, station, WATCHES[i % 2], None, None, None))
+            watch = WATCHES[i % 2]
+            if len(ratings) % 2 and i == len(ratings) - 1:  # its odd hand, by turns (rule 3)
+                watch = WATCHES[odd_turn % 2]
+                odd_turn += 1
+            entries.append((rating, station, watch, None, None, None))
 
     used: set[str] = {e[5] for e in entries if e[5]}
     sailors: list[Sailor] = []
@@ -217,7 +227,7 @@ def muster(
                 trade=trade,
             )
         )
-    return Crew(ship_name=ship_name, sailors=sailors)
+    return Crew(ship_name=ship_name, sailors=sailors, issued=len(sailors))
 
 
 def _draw_name(

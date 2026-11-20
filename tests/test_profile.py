@@ -498,20 +498,29 @@ print(repr(seen))
 
 
 # The files each ships module writes, in the lead's order (Build-Ships.md §4.1): a stub writes
-# none, and a built module its own files only.
+# none, and a built module its own files only. Package 90's five follow package 75's four, each a
+# stub writing none until her builder gives her row its files (docs/design/Plan-Package90.md
+# §5.1 item 1; old: the four rows alone).
 MODULE_FILES = {
     "ships.indefatigable": ["razee-44.yaml", "sixty-four.yaml"],
     "ships.neufchatel": ["hermaphrodite-brig.yaml"],
     "ships.bilander": ["bilander.yaml"],
     "ships.bellerophon": ["seventy-four.yaml"],
+    "ships.tartane": [],
+    "ships.polacre": [],
+    "ships.xebec": [],
+    "ships.diana": [],
+    "ships.concepcion": [],
 }
 
 
-def test_the_hook_runs_the_four_ships_modules_after_the_eight_each_writing_its_own(tmp_path):
-    """Build-Ships.md §3.1 items 1, 2 and 28: the generator writes the eight files, then imports
-    each module in the lead's order (the Indefatigable, the Prince de Neufchatel,
-    the bilander, the 74) after `gen_ships` is made the running script; each build adds its
-    own files and no other (§4.1), a stub none."""
+def test_the_hook_runs_the_nine_ships_modules_after_the_eight_each_writing_its_own(tmp_path):
+    """Build-Ships.md §3.1 items 1, 2 and 28, and package 90's stage 0 (Plan-Package90.md §5.1
+    item 1): the generator writes the eight files, then imports the nine ships' modules in the
+    lead's order (package 75's four, the Indefatigable, the Prince de Neufchatel, the bilander
+    and the 74; then package 90's five, the tartane, the polacre, the xebec, the Diana and the
+    Concepción) after `gen_ships` is made the running script; each build adds its own files and
+    no other (§4.1), a stub none. (Old: the four modules; the name said four.)"""
     out = tmp_path / "ships"
     run = subprocess.run(
         [sys.executable, "-c", HOOK_PROBE, str(ROOT / "tools" / "gen_ships.py"), str(out)],
@@ -925,14 +934,20 @@ def test_a_crewed_captain_takes_his_vessels_role_from_her_far_brain(monkeypatch)
 
 
 def test_the_size_words_rank_the_new_ships_the_razees_first():
-    """Item 24 (Indf §8): the ranks, and the words matched in order, the razee's first."""
+    """Item 24 (Indf §8): the ranks, and the words matched in order, the razee's first. Package
+    90's stage 0 (Plan-Package90.md §5.1 item 6) puts the three-decker's and the first rate's
+    words before "ship of the line", so the first words are nine here (old: the first seven,
+    "razee" to "frigate" with neither of package 90's two; the rest of package 90's words are
+    tests/test_probes_90.py's)."""
     rank = captains.SIZE_RANK
     assert (rank["razee"], rank["sixty-four"], rank["seventy-four"]) == (3, 4, 4)
     assert (rank["hermaphrodite brig"], rank["bilander"]) == (2, 1)
-    assert [w for w, _ in captains._SIZE_WORDS[:7]] == [
+    assert [w for w, _ in captains._SIZE_WORDS[:9]] == [
         "razee",
         "sixty-four",
         "seventy-four",
+        "three-decker",
+        "first rate",
         "ship of the line",
         "two-decker",
         "bilander",

@@ -199,9 +199,11 @@ def test_the_request_carries_the_brief_the_samples_and_the_tools_and_nothing_els
     assert set(body) == {"messages", "stream", "tools", "seed", "temperature", "max_tokens"}
     assert body["max_tokens"] == L.REPLY_MAX_TOKENS  # the reply budget (package 28c)
     assert body["seed"] == 7 and body["temperature"] == 0.3 and body["stream"] is False
-    assert [msg["role"] for msg in body["messages"]] == ["system", "user"]
+    # the brief, the situation at the seating as words of data (package 117), the sample
+    assert [msg["role"] for msg in body["messages"]] == ["system", "user", "user"]
     assert body["messages"][0]["content"] == h.brief.text()
-    sample = json.loads(body["messages"][1]["content"])
+    assert body["messages"][1]["content"] == h.brief.situation
+    sample = json.loads(body["messages"][2]["content"])
     assert sample["reason"] == "the start" and "readings" in sample
     assert [t["function"]["name"] for t in body["tools"]] == list(tools.tool_names())
     for t in body["tools"]:
@@ -249,14 +251,22 @@ def test_a_tool_call_round_trip_through_the_harness():
     h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m)
     h.start()
     second = server.bodies[1]["messages"]
-    assert [msg["role"] for msg in second] == ["system", "user", "assistant", "tool", "tool"]
-    calls = second[2]["tool_calls"]
+    # the brief, the situation at the seating (package 117), the first sample, the reply
+    assert [msg["role"] for msg in second] == [
+        "system",
+        "user",
+        "user",
+        "assistant",
+        "tool",
+        "tool",
+    ]
+    calls = second[3]["tool_calls"]
     assert [c["function"]["name"] for c in calls] == ["readings", "submit_order"]
     assert (
-        second[3]["tool_call_id"] == calls[0]["id"] and second[4]["tool_call_id"] == calls[1]["id"]
+        second[4]["tool_call_id"] == calls[0]["id"] and second[5]["tool_call_id"] == calls[1]["id"]
     )
-    assert "true_wind_speed" in json.loads(second[3]["content"])
-    assert second[4]["content"] == "The watcher has no authority to give orders."
+    assert "true_wind_speed" in json.loads(second[4]["content"])
+    assert second[5]["content"] == "The watcher has no authority to give orders."
     assert "The wind is steady." in notes(world)
     assert "agent.refused" in [e.kind for e in world.log]
 
@@ -340,7 +350,7 @@ class Game:
     clock the test turns while the runner runs in a thread."""
 
     def __init__(self, tmp_path):
-        from fastapi.testclient import TestClient
+        from own_page import DoorClient
 
         from freesail.api.session import make_world
         from freesail.ui.server import Driver, create_app
@@ -358,7 +368,7 @@ class Game:
             consent_records=self.records,
             saves_dir=self.saves,
         )
-        self.http = TestClient(app)
+        self.http = DoorClient(app)
 
     @property
     def harness(self):
@@ -395,7 +405,7 @@ def run_runner(game: Game, server: Server, argv: list[str], inp: str = "") -> di
 
     def run() -> None:
         got["code"] = L.main(
-            ["--game", "http://testserver", *argv],
+            ["--game", "http://localhost:8000", *argv],
             inp=io.StringIO(inp),
             out=got["out"],
             transport=server.transport(),
@@ -521,7 +531,7 @@ def test_an_endpoint_failure_is_reported_in_words_and_the_station_released(tmp_p
 
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver"],
+        ["--game", "http://localhost:8000"],
         inp=io.StringIO(""),
         out=out,
         transport=httpx.MockTransport(handler),
@@ -619,7 +629,7 @@ def test_a_timed_out_request_leaves_the_turn_open_and_the_runner_asks_again(tmp_
 
     def run() -> None:
         got["code"] = L.main(
-            ["--game", "http://testserver", "--max-reply", "2048"],
+            ["--game", "http://localhost:8000", "--max-reply", "2048"],
             inp=io.StringIO(""),
             out=out,
             transport=httpx.MockTransport(handler),
@@ -654,7 +664,7 @@ def test_failures_in_a_row_stand_the_station_down_with_the_reason(tmp_path):
     server = llama([])
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver"],
+        ["--game", "http://localhost:8000"],
         inp=io.StringIO(""),
         out=out,
         transport=flaky(server, ["timeout", "500", "timeout"]),
@@ -696,7 +706,7 @@ def test_the_context_guard_refuses_a_small_context_with_what_it_measured(tmp_pat
     game = Game(tmp_path)
     out = io.StringIO()
     code = L.main(
-        ["--game", "http://testserver", "--endpoint", "http://127.0.0.1:11434"],
+        ["--game", "http://localhost:8000", "--endpoint", "http://127.0.0.1:11434"],
         inp=io.StringIO(""),
         out=out,
         transport=ollama({"ps": 4096}),
@@ -741,10 +751,12 @@ def test_a_stand_by_that_ended_the_turn_is_answered_in_the_messages():
     world.run(A_GLASS_S)
     msgs = server.bodies[1]["messages"]
     roles = [x["role"] for x in msgs]
-    assert roles == ["system", "user", "assistant", "tool", "user"]
-    assert msgs[3]["tool_call_id"] == msgs[2]["tool_calls"][0]["id"]
-    assert msgs[3]["content"].startswith("Standing by: this ended your turn")
-    assert "You stood by until a glass" in msgs[4]["content"]
+    # the situation at the seating, the first data after the brief (package 117), then
+    # the first sample
+    assert roles == ["system", "user", "user", "assistant", "tool", "user"]
+    assert msgs[4]["tool_call_id"] == msgs[3]["tool_calls"][0]["id"]
+    assert msgs[4]["content"].startswith("Standing by: this ended your turn")
+    assert "You stood by until a glass" in msgs[5]["content"]
 
 
 def test_the_picture_tools_at_the_local_runner_where_its_model_reads_an_image():
@@ -828,6 +840,7 @@ def test_a_shelved_book_is_its_line_in_the_runners_next_request(tmp_path):
     # the conversation is otherwise the same, turn for turn
     assert [m["role"] for m in last["messages"]] == [
         "system",
+        "user",  # the situation at the seating (package 117)
         "user",
         "assistant",
         "tool",
@@ -898,7 +911,7 @@ def test_no_officer_is_seated_without_a_context_size_and_the_guard_measures_his_
     code = L.main(
         [
             "--game",
-            "http://testserver",
+            "http://localhost:8000",
             "--endpoint",
             "http://127.0.0.1:11434",
             "--station",
@@ -1232,7 +1245,7 @@ def test_the_handover_reserve_is_tokens_or_a_share_and_the_larger_when_both(tmp_
         L.main(["--handover-reserve", "lots"], out=io.StringIO())
     # sent with the station request in tokens, kept on the harness and in the save
     game = Game(tmp_path)
-    client = GameClient("http://testserver", http=game.http)
+    client = GameClient("http://localhost:8000", http=game.http)
     consent.Record("made-up-weights", "r", "2026-09-26", consent.YES, answer="Yes.").write(
         game.records
     )

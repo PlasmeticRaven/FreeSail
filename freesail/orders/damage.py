@@ -59,6 +59,8 @@ DAMAGE_VERBS: tuple[str, ...] = (
     "reeve new lines",
     "fish",
     "rig a jury mast",
+    "rig the relieving tackles",
+    "repair the wheel",
     "cut away the mast",
     "bury the dead",
 )
@@ -197,6 +199,27 @@ def execute(ship: Any, order: Order) -> Result:
         return "evolution.started", " ".join(texts), data | {"spars": spars}
     if verb == "rig a jury mast":
         return _start(ship, "jury_mast", "ship", {"mast_words": words}, verb)
+    if verb == "rig the relieving tackles":
+        # the wheel or its ropes shot away (package 115 D4 (e)): the tackles to the tiller
+        runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+        if any(
+            getattr(i.evo, "id", "") == "relieving_tackles"
+            for i in getattr(runner, "instances", None) or []
+        ):
+            # given twice: said once, not "will follow" itself (the lead's reading of part D
+            # at 60af48e, item 6)
+            raise OrderError("The hands are rigging the relieving tackles already.")
+        return _start(ship, "relieving_tackles", "ship", {}, verb)
+    if verb == "repair the wheel":
+        # the wheel made good and new wheel-ropes rove (package 116, card 5): with the
+        # relieving tackles rove or without them
+        runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+        if any(
+            getattr(i.evo, "id", "") == "repair_wheel"
+            for i in getattr(runner, "instances", None) or []
+        ):
+            raise OrderError("The hands are repairing the wheel already.")
+        return _start(ship, "repair_wheel", "ship", {}, verb)
     if verb == "cut away the mast":
         from freesail.orders.resolve import resolve as resolve_noun_
 

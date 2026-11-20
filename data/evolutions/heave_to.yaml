@@ -67,7 +67,7 @@ timing:
   abaft_s: 120            # for this long
   keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
 on_start: {log: "Hands to the after braces; heave to."}
-on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, helm a-lee{drifting}.", kind: ship.hove_to, severity: notable}
+on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, {helm}{drifting}.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').
@@ -75,5 +75,9 @@ on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity
 # It is more than one watch of the schooner has at this rating (six ordinary, seven
 # able, two landsmen on deck at the least), so there the request is made up with
 # better hands and goes a little faster than milestone 2; the frigate's watch fills it.
-crew: {hands: 12, rating: ordinary, stations: [afterguard, marines]}
+# too_few (package 119, the owner's word of 2026-11-19): where the watch on deck is too
+# few to begin it, all hands are called for it and piped down after, as for the settee's
+# work and the anchor; the merchant brig's watches of five by night, and the smack's
+# larboard watch of two, waited before.
+crew: {hands: 12, rating: ordinary, stations: [afterguard, marines], too_few: all hands}
 source: "Luce 1866, ch. XXVI Emergencies, 'To heave to' (mizzen topsail aback), 'To heave to with the fore topsail to the mast'; Luce 1884, ch. XXXIV Handling Fore-and-Afters, 'To Heave to' (the staysail sheet to windward)"

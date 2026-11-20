@@ -87,8 +87,8 @@ from pathlib import Path
 from typing import Any
 
 from freesail.agents.agent import A_WATCH_S, Authority, Brief, SamplingPolicy, Station
-from freesail.agents.harness import Harness
-from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Turn
+from freesail.agents.harness import Harness, leaving_of
+from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Turn, opt_out_in
 
 __all__ = [
     "BRIEF_PATH",
@@ -1062,6 +1062,21 @@ class Conversation:
         """A reply from a door that answers late (the MCP server; the REPL's turn mode)."""
         self.harness.deliver(reply)
         self._settle()
+
+    def leave_out_of_turn(self, reply: Reply) -> bool:
+        """A reply that came while the conversation had no turn open for it (the owner has
+        the word): if it holds the token (the one scan, `model.opt_out_in`; package 117),
+        it ends the conversation as left, the reply kept in the record as it came; True
+        then. False, and nothing done, for a reply without it."""
+        piece = opt_out_in(reply)
+        if piece is None or self.outcome is not None:
+            return False
+        h = self.harness
+        h.turns.append(Turn(MODEL, reply))
+        reason, how, final = leaving_of(reply, piece)
+        h.leave(reason, how=how, final=final)
+        self._settle()
+        return True
 
     def _put(self, text: str, reason: str) -> None:
         self.model_words = ""

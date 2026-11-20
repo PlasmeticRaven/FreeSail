@@ -527,9 +527,14 @@ def run_door(
     desk = driver.desk
     desk.on_record_only = True  # the regatta runs no model without its consent on record
     desk.race = True  # and tells it the session is a race (package 42b)
-    http = TestClient(app)
+    # the game and its door in one process, on the machine itself (package 115: the
+    # server asks a door elsewhere for the mark, and the test client's default is no
+    # address of the machine's)
+    http = TestClient(app, base_url="http://localhost", client=("127.0.0.1", 50000))
     out = out or sys.stdout
-    argv = ["--game", "http://regatta", "--station", "captain", *door_argv]
+    # the door names the game at the machine's own address, as every door does (package 115:
+    # the server answers no other name)
+    argv = ["--game", "http://localhost", "--station", "captain", *door_argv]
     got: dict[str, Any] = {}
 
     def door() -> None:
@@ -588,7 +593,10 @@ def run_door(
     with driver.lock:
         h = world.agents.get("captain")
         if h is not None and not h.agent.released:
-            world.submit("stand down the captain")
+            # the reason is the race's end, not the captain's order (package 117; the
+            # consent brief: a station held for a race is stood down, with the reason,
+            # when the race is over); a door's act, recorded for the replay
+            h.door_act("stand_down", "the race is over", "the race")
     thread.join(timeout=30.0)
     return world, judge, identity, int(got.get("code", 0))
 

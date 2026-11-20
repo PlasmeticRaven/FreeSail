@@ -1274,11 +1274,13 @@ def test_truth_29_studding_sails_flog_and_strain_at_six_points_and_draw_at_nine(
     "with the wind one point free, or forming an angle of seven points with the keel", the
     lower "only ... with the wind abaft the beam". The frigate sets her five weather
     studding sails at nine points in 12 knots of wind and they draw; brought up to six
-    they shake in their gear and every boom whips (a strain line each, the booms at 1.4 to
-    1.5 of their rating); borne away to nine again after ten minutes they draw, and nothing
-    has gone. Twelve knots because it is the least wind in which every boom's strain shows
-    (package 23: in 10 knots one boom warns; in 13 two booms carry away within seven
-    minutes, which is the gate's scene, not the truth's)."""
+    they shake in their gear and every boom whips (a strain line each, the booms at 1.3 to
+    1.4 of their rating since package 90's item 37 rated them for the curve the sailing
+    uses, 1.5 to 1.6 before); borne away to nine again after ten minutes they draw, and
+    nothing has gone. Twelve knots because it is the least wind in which every boom's strain
+    showed (package 23: in 10 knots one boom warned; in 13 two booms carried away within
+    seven minutes, which was the gate's scene, not the truth's; since item 37 none goes in
+    13 knots in the half hour, and the gate's scene is held in 14, `tests/test_studding.py`)."""
     from test_studding import NINE_POINTS, weather_studding_sails_at_nine_points
 
     world = weather_studding_sails_at_nine_points(FRIGATE, 12.0)
@@ -1590,7 +1592,10 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     forenoon. A gust to 32 knots that lasts two minutes less a second and falls away does
     not fire it; 32 knots held two minutes does, once, and the wind staying over thirty
     does not fire it again; under thirty for a second less than the dwell (300 s) and up
-    again does not; under thirty for the dwell and up again for two minutes does."""
+    again does not; under thirty for the dwell and up again for two minutes does. In 32 knots
+    the routine is in time and nothing carries away; from the same start a blow of 36 knots
+    held carries a studding-sail boom away before the routine's two minutes, a boom the first
+    spar to go (package 90, item 37: the booms rated as the rule intended)."""
     world = running_under_all_sail(datetime(1805, 6, 1, 10, 0))
     world.submit(SHORTEN_SAIL)
     name = "shorten sail for weather"
@@ -1623,14 +1628,33 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     blow(world, 32.0)
     run(world, 121)
     assert rule.fired == 2
-    # the routine's two minutes are long for studding sails before the wind in 32 knots:
-    # every boom whips on the first second of the blow and one carries away on the
-    # second, before the routine can fire (docs/dev/TuningNotes.md, milestone 4a); since
-    # package 57 (Steel's staysails in all sail) the main topmast boom goes first, where the
-    # fore topgallant boom went before
-    lost = events(world, "spar.carried_away")
-    assert lost and lost[0].subject == "main.topmast.studdingsail_boom.larboard"
-    assert all("studdingsail_boom" in (e.subject or "") for e in lost), "booms, nothing else"
+    # the routine's two minutes were long for studding sails before the wind in 32 knots:
+    # every boom whipped on the first second of the blow and one carried away on the second,
+    # before the routine could fire (docs/dev/TuningNotes.md, milestone 4a); from package 57
+    # (Steel's staysails in all sail) the main topmast boom went first, where the fore
+    # topgallant boom went before. Since package 90's item 37 (the owner's choice (a) of its
+    # question 2: the generator's studding peak read from the engine's curves, 1.44 for the
+    # 1.25 it kept since package 10) the booms are rated as the rule intended, a seventh
+    # stronger: in 32 knots they whip, at about 2.1 of their rating at most, and none carries away
+    # in the whole run, the routine in time (old: the main topmast boom, larboard, on the 2nd
+    # second of the first blow; TuningNotes, "Package 90, A0"). Like the old clause it holds
+    # by the strain stream's draw at the seed: over 1.5 of its rating a spar may carry away,
+    # and the booms reach about 2.1 and the main and mizzen royal yards 1.90 and 1.92 (measured)
+    assert events(world, "spar.carried_away") == [], "the routine in time: nothing carries away"
+    # the strain's road, kept: from the same start a blow of 36 knots held carries a boom away
+    # before the routine's two minutes, a boom the first spar to go; which boom and when is
+    # the strain stream's draw (measured: the fore lower boom, starboard, on the 2nd second
+    # and three more booms by 102 s, nothing else; the booms at 2.79 of their rating against
+    # the royal yards' 2.51 and 2.54, so that "nothing but booms" would be a finer edge than
+    # the story needs; in 37 knots the mizzen royal yard goes first)
+    world = running_under_all_sail(datetime(1805, 6, 1, 10, 0))
+    world.submit(SHORTEN_SAIL)
+    t0 = world.clock.tick
+    blow(world, 36.0)
+    run(world, 121)
+    lost = events(world, "spar.carried_away", t0)
+    assert lost and lost[0].tick - t0 < 120, "a boom goes before the routine's two minutes"
+    assert "studdingsail_boom" in (lost[0].subject or ""), "a boom the first spar to go"
 
 
 # 36: keep her full
@@ -3034,6 +3058,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
 # tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
 # with the two "sound the well" lines at tick 0 the whole difference)
+# package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
+# the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
+# left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
 GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
@@ -3046,7 +3073,9 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # the identity on the merged tree) gives the old digest (TuningNotes, the ruled builds, (3))
 # (old beside new: 2b68e8b1f60e8496 at 58a; b9acdeac6354f3bf, the well; b7c16adc at 56)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
-GATE_5B_SCHOONER_DIGEST = "b5f35676ef8183d0"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
+GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4140,7 +4169,9 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the same, proved by bisection (the base head 93a15ee5 gives 1e7f8ab24b84e6f7; TuningNotes)
 # 75's words, passed by the lead by its lines (1e7f8ab24b84e6f7 on the trunk before); the trim's
 # words (1e7f8ab24b84e6f7 at SW-4)
-GATE_5C_CRUISE_DIGEST = "81b0b08a63bf068e"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
+GATE_5C_CRUISE_DIGEST = "bdd6ce8a97a33140"
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4267,7 +4298,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # the Goulet at 111661, when the Mingan is sighted a danger, her sails lift, the Mingan
 # closes, the land is ahead and the pilot warns (five calls, 111661 to 112801, one for a
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
-GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
+# before)
+GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4277,7 +4310,9 @@ GATE_5C_MERCHANT_LINES = 3103  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # package 65, step 3: the mate's two reports and five calls (6abbbff4d7fa1a57 at 58b)
 # 75's words, passed by the lead by its lines (40bcef34afd0cec4 before); package 98, step 5
 # (6436eb06a665f379 at 65)
-GATE_5C_MERCHANT_DIGEST = "ad35e60bf5d3737d"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
+GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
 
 
 def _people(world) -> list[dict]:
@@ -4926,7 +4961,9 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # package 65, step 3: the merchant passage's seven lines more (dfaa7ab3bdd70295 at step 2)
 # 75's words, passed by the lead by its lines (c0bf4b51621ad91f before); package 98, step 5
 # (7076e667c2bc41e3 at 65)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "2cc02c95ad794bc8"
+# with package 115 D's mends on top, passed by the lead by their lines on the joined tree
+# (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -5318,7 +5355,9 @@ def test_truth_85_a_game_saved_with_three_seated_loads_from_its_checkpoint_with_
     for name, note in ((CAPTAIN, "The captain's own note."), (OFFICER, "The officer's own note.")):
         h = back.agents[name]
         h.take_over(Fake([reply("", call("read_journal", kind="notes"))]))
-        assert "The station's journal:" in h.brief.text()
+        # package 117: the journal is the game's words, in the situation sent as data
+        assert "The station's journal:" in h.brief.situation
+        assert "The station's journal:" not in h.brief.text()
         read = tools_mod.call(back, name, "read_journal", {"kind": "notes"})
         assert any(e["text"] == note for e in read["entries"]), name
     read = tools_mod.read_journal(back, MASTER, kind="notes")
@@ -5462,7 +5501,11 @@ DIRECTED_DAY_ORDERS = [
     "intent: bound for Falmouth",
     'ship: a cutter "Lark" of Britain at 49 28 N 5 40 W, bound for Falmouth',
     'weather: low "the gale" radius 450 km at 1805-06-12T22:00 -800 800 965',
-    'weather: low "a soft low" radius 500 km at 1805-06-12T16:00 -700 500 1006',
+    # package 115 C: 1010 hPa, which the brief's 27 knots admit with the summer field
+    # standing (24.8 knots at its hardest, judged by the weather's own functions). It was
+    # 1006: 11 knots by its own bell, which was all the limit then read, and 28.5 with the
+    # field, over the brief (`docs/dev/TuningNotes.md`, package 115, part C)
+    'weather: low "a soft low" radius 500 km at 1805-06-12T16:00 -700 500 1010',
     "aboard: a cask found stove",
     "aboard: the fore topmast is found sprung",
     "news: war declared between Britain and Denmark",
@@ -6653,7 +6696,11 @@ def test_truth_7b_108_py_m_freesail_opens_the_harbour_and_shows_a_started_game_a
                     assert proc.poll() is None and time.monotonic() < deadline
                     time.sleep(0.2)
             assert first.status_code == 307 and first.headers["location"] == "/harbour"
-            assert "the harbour" in c.get("/harbour").text
+            harbour_page = c.get("/harbour").text
+            assert "the harbour" in harbour_page
+            # the game's own page from here on, its origin and its mark (package 115)
+            mark = re.search(r'name="freesail-page" content="([^"]+)"', harbour_page).group(1)
+            c.headers.update({"x-freesail-page": mark, "origin": url})
             r = c.post(
                 "/api/harbour/start",
                 json={
@@ -6705,7 +6752,7 @@ def test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads
     form and written again, the same bytes; and the hand-made file itself read into the
     form and written with nothing changed is itself."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.core.world import Scenario, World
     from freesail.ui.console import start_world
@@ -6717,7 +6764,7 @@ def test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads
     driver = Driver(World(seed=1805, scenario=Scenario()))
     app = create_app(driver, harbour=Harbour(driver, settings_path=settings))
     hand = HARBOUR_ROOT / "data" / "scenarios" / "smack-falmouth.yaml"
-    with TestClient(app) as c:
+    with PageClient(app) as c:
         got = c.get("/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"})
         fields = got.json()["fields"]
         made = c.post("/api/harbour/scenario", json={"fields": fields, "name": "smack"}).json()
@@ -6769,8 +6816,8 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
     the desktop client's file (likewise); a game started from the harbour and saved, its
     log and its save hold no word of it; nor does anything the harbour says."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
     from messages_api import fake_store
+    from own_page import PageClient
 
     from freesail import settings as S
     from freesail.agents.api import KEYRING_ACCOUNT, KEYRING_SERVICE
@@ -6799,9 +6846,11 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
             S.save_settings(s, path)
     assert path.read_text(encoding="utf-8") == kept
     driver = Driver(World(seed=1805, scenario=Scenario()))
-    app = create_app(driver, harbour=Harbour(driver, settings_path=path))
+    app = create_app(
+        driver, harbour=Harbour(driver, settings_path=path), saves_dir=tmp_path / "saves"
+    )
     said: list[str] = []
-    with TestClient(app) as c:
+    with PageClient(app) as c:
         said.append(c.get("/api/harbour/state").text)
         assert "is in the credential store" in said[-1]
         r = c.post(
@@ -6813,8 +6862,9 @@ def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches
         assert PLACEHOLDER_MODEL in Path(d["path"]).read_text(encoding="utf-8")
         assert not S.inside_repository(d["path"])
         c.post("/api/driver", json={"action": "tick", "value": 600})
-        save = tmp_path / "game.json"
-        c.post("/api/driver", json={"action": "save", "value": str(save)})
+        # a save over the server is named and lies in the saves place (package 115)
+        save = app.state.driver.places.saves / "game.json"
+        c.post("/api/driver", json={"action": "save", "value": "game"})
         said.append(c.get("/api/log", params={"limit": 5000}).text)
         said.append(c.get("/api/harbour/state").text)
         said.append(c.get("/api/save").text)
@@ -7505,7 +7555,11 @@ def _captain_standing_by_a_glass(stranger_at: str, destination: str):
 def _samples(h) -> list[dict]:
     from freesail.agents.model import DATA
 
-    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+    return [
+        t.content
+        for t in h.turns
+        if t.role == DATA and "tool_results" not in t.content and "situation" not in t.content
+    ]  # the situation at the seating is the brief's own data turn, not a sample (package 117)
 
 
 def test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new():
@@ -7700,7 +7754,7 @@ def test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_
         monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.null.Keyring")
         live = Live(port)
         try:
-            with httpx.Client(base_url=live.url, timeout=60) as c:
+            with httpx.Client(base_url=live.url, timeout=60, headers=live.page) as c:
                 c.post(
                     "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
                 )
@@ -8150,8 +8204,19 @@ def test_truth_7_134_two_cutters_at_pistol_shot_one_broadside_strikes_and_the_da
     ship (rule 1)."""
     w, v, enemy, battery = _two_cutters_at_pistol_shot()
     assert battery.target == v.id and battery.engaged == "starboard"
+    # package 115 D1 (the lead's hold ruling): the fire held now stays held, so the word is
+    # given when the engaged side is run out and primed (30 s after the engage, measured:
+    # every starboard gun loaded, run out and primed, none fired). OLD: the word at once,
+    # the engage having turned the hold into "as they bear", and the first minute's fire
+    # (two or more) was the guns' own as they bore; NEW: the broadside at the word, three
+    # shot, one struck her
+    assert not any(g.fired for g in w.ship.guns.values())
+    w.run(30)
+    side = [g for g in w.ship.guns.values() if g.side == "starboard" and g.serves]
+    assert all(battery.ready(g) for g in side) and not any(g.fired for g in side)
     said = w.submit("fire")
     assert said.kind == "guns.fire", said.text
+    assert "3 guns ready to go together" in said.text, said.text
     w.run(70)
     fired = [e for e in w.log if e.kind == "action.fired"]
     assert fired and fired[0].data["fired"] >= 2, [e.text for e in fired]
@@ -9167,8 +9232,11 @@ def test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_
     w.run(21600)
     assert any(t == 37920 and "restored" in words for t, words in sq.history), sq.history
     assert naiad.brain.intent_words == "blockade Brest"
-    sortie = [e for e in w.log if e.kind == "regime.sortie"]
-    assert [e.tick for e in sortie] == [43200], sortie
+    # the Hortense out at 43200, by her own story (package 118: out of the sight of the
+    # Ushant station the sortie is no line of the player's log, and his log is not read)
+    sortie = [t for t, words in hortense.story if "slipped out" in words]
+    assert sortie == [43200], hortense.story
+    assert not any(e.kind == "regime.sortie" for e in w.log)
     assert hortense.regime == "" and hortense.brain is not None
     assert hortense.intent_words == "cruise off the Lizard within 20 miles"
     assert w.captain.state == "keeping station"
@@ -10512,18 +10580,21 @@ def test_truth_7_180_the_boarders_are_repulsed_by_a_whole_company_awake_and_the_
     assert f.lost_attack > f.lost_defence > 0
 
 
-def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colours_come_down():
-    """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
-    their guns and the deck held by her marines, the helm, the trimmers and the
-    quarterdeck, the boarders with their arms served out carry it in a few rounds: her
-    colours come down 'carried by boarding' (the strike's own line, the far body struck for
-    the moment of it), and (package 74, step 2: the officer on the deck won takes possession
-    at once) she is a prize of ours alongside, her record saying how; the losses by name on
-    both bills, hers the prisoners'. The pin moved by 74: on the trunk she lay struck and no
-    prize; the fight's bands are as they were."""
+def test_truth_7_181a_a_frigates_deck_held_by_her_marines_at_her_own_temper_holds():
+    """Spec M7 §11a, the deck held; restated by the lead's ruling of 2026-11-14 on package 115
+    D1 (the owner told). OLD SENTENCE: "the boarders carry a deck held by the marines and the
+    colours come down". It passed because the French frigate, never fired on, was given the
+    default temper (0.70) by the boarding's asking where her own captain's doctrine gives
+    0.88 (`combat.morale.morale_of`, mended). NEW SENTENCE: at her own temper a frigate's
+    deck held by her marines, the helm, the trimmers and the quarterdeck HOLDS against a
+    boarding party of about her defenders' number: the boarders are repulsed, her temper
+    above theirs in every round, and they lose more men than she does. Round table at seed 7
+    (attacker men, temper | defender men, temper): old r1 98, .647 | 118, .700 ... r10 95,
+    .374 | 92, .291 carried (lost 43 and 55); new r1 100, .632 | 118, .877 ... r9 94, .291 |
+    99, .597 repulsed (lost 59 and 44). Asserted by direction, not by its figures. The deck
+    carried when her defenders are reduced is truth 7-181b."""
     from freesail.combat import boarding as B
     from freesail.combat import small_arms as SA
-    from freesail.world import prizes as P
     from tests.test_fight import _alongside
 
     w, v, enemy = _alongside(10.0, her_quarters=True)
@@ -10538,12 +10609,54 @@ def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colou
         if f is not None and f.over:
             break
     f = B.fight_of(w.ship)
-    assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
-    assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
-    assert events(w, "action.carried") and events(w, "prize.taken")
-    assert P.is_prize(v) and not v.struck and P.record_of(v)["how"] == "carried by boarding"
-    assert f.lost_defence > f.lost_attack > 0
-    assert "of them hurt" in enemy.readings.words("prisoners")
+    assert f.over == "repulsed", (f.over, f.round)
+    rounds = [e.data for e in events(w, "action.boarding")]
+    assert rounds and all(r["temper_defence"] > r["temper_attack"] for r in rounds), rounds
+    assert f.lost_attack > f.lost_defence > 0
+    assert not v.struck and not enemy.ship.extra.get("struck")
+
+
+def test_truth_7_181b_a_deck_is_carried_when_its_defenders_are_reduced_the_contests_sum():
+    """The deck carried, the second of 7-181's two sentences (the lead's ruling of 2026-11-14
+    on package 115 D1). A TEST OF THE CONTEST'S SUM, NOT OF A FIGHT: no road the game offers
+    today brings a frigate's boarders to a reduced French frigate (measured: her fit men put
+    on the sick list a tenth at a time by the world's own order, 264 to 161, and the boarders
+    still repulsed, their own temper falling under its line; our fire drives the two ships
+    out of the grapnel's throw and in forty minutes takes eleven of her men; the brigs the
+    far detail offers carry no marines and drift beyond the throw), so the rule is tried at
+    its own level: the men, their arms, the tempers and the cover in, the end out, by the
+    contest's own `_strength` and `_verdict`. A hundred boarders at temper 0.6 against her
+    marines and deck stations at her own 0.88: carried under 34 defenders, contested from 35
+    to 136, repulsed from 137; and carried at any number when her temper falls under her
+    line, repulsed when theirs does."""
+    from freesail.combat.boarding import CONTEST_ROUNDS, _strength, _verdict
+
+    def end(boarders, ta, defenders, td, line_a=0.3, line_d=0.3, round_no=3):
+        sa = _strength([(None, 1.0)] * boarders, ta, 1.0)
+        sd = _strength([(None, 1.0)] * defenders, td, 1.0)
+        return _verdict(boarders, sa, ta, line_a, defenders, sd, td, line_d, round_no)
+
+    table = [
+        # (boarders, their temper, defenders, her temper) -> the end
+        ((100, 0.6, 30, 0.88), "carried"),
+        ((100, 0.6, 32, 0.88), "carried"),
+        ((100, 0.6, 34, 0.88), "carried"),
+        ((100, 0.6, 35, 0.88), ""),
+        ((100, 0.6, 37, 0.88), ""),
+        ((100, 0.6, 40, 0.88), ""),
+        ((100, 0.6, 118, 0.88), ""),
+        ((100, 0.6, 135, 0.88), ""),
+        ((100, 0.6, 136, 0.88), ""),
+        ((100, 0.6, 137, 0.88), "repulsed"),
+        ((100, 0.6, 140, 0.88), "repulsed"),
+        ((100, 0.6, 118, 0.29), "carried"),  # her temper under her line
+        ((100, 0.29, 118, 0.88), "repulsed"),  # theirs under theirs
+        ((100, 0.6, 0, 0.88), "carried"),
+        ((0, 0.6, 118, 0.88), "repulsed"),
+    ]
+    for (b, ta, d, td), want in table:
+        assert end(b, ta, d, td) == want, ((b, ta, d, td), end(b, ta, d, td), want)
+    assert end(100, 0.6, 118, 0.88, round_no=CONTEST_ROUNDS) == "contested"
 
 
 def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():
@@ -14619,7 +14732,9 @@ def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_th
             tools.tool_names(),
             ship=words,
         )
-        assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
+        # package 117: the situation is no longer a head item; it is the first data turn,
+        # opening with its head of the code's words and then the ship herself
+        assert brief.situation.startswith(f"{agent.SITUATION_HEAD}\n\n{words}")
 
 
 def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
@@ -16667,7 +16782,7 @@ def test_truth_7_366_the_adversarial_seat_is_refused_in_words_behind_the_flag(
     test_the_adversarial_seat_is_refused_in_words_behind_the_flag_and_admitted_when_turned(
         tmp_path, monkeypatch
     )
-    test_the_captor_holding_the_players_person_is_refused_for_both_reasons()
+    test_the_captor_holding_the_players_person_is_refused_for_both_reasons(monkeypatch)
 
 
 def test_truth_7_367_the_readings_the_events_and_the_forms_perform_and_the_truth_shows_the_prizes():
@@ -18105,7 +18220,7 @@ def test_truth_7_564_where_the_weathers_boxes_and_the_regions_part():
 @pytest.mark.slow
 def test_truth_7_565_the_full_sweep_finds_the_known_list_and_nothing_else():
     """Package 111, the ratchet: the audit's full sweep over every region finds exactly the
-    findings `data/charts/audit-known.yaml` owns, each within its count's ceiling."""
+    findings `tools/audit_chart_known.yaml` owns, each within its count's ceiling."""
     A = _audit_tool()
     audit = A.run(A.FULL_STEP_DEG)
     known = A.load_known()
@@ -19586,7 +19701,9 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
     names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 61 mechanical (the code's own years and the one finding only a whole world
+    other: 60 mechanical (61 until package 116 moved the cruiser's prize keys under
+    `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the code's own
+    years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
@@ -19600,7 +19717,7 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     assert not A.unlisted(audit, known)
     cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
     assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 61
+    assert len(audit.keys(A.MECHANICAL)) == 60  # 61 before package 116 (the cruiser's keys)
     assert len(audit.keys(A.REFERENCE)) == 38
     for foe in ("france", "spain", "batavian-republic"):
         pair = "+".join(sorted(("britain", foe)))
@@ -19702,3 +19819,3720 @@ def test_truth_7_593_the_audits_keys_are_one_on_any_machine_and_its_files_no_par
     assert fingerprint_of(tmp_path) == before
     (tmp_path / "data" / "audit-known.yaml").write_text("known: [one]\n", encoding="utf-8")
     assert fingerprint_of(tmp_path) != before
+
+
+# -- package 115, part D: the newcomer's trips (truths 7-615 to 7-629) -----------------------
+# The cold review of 2026-11-14 (docs/reviews/ColdReview-M7.md 1.5, 5.3): each trip met at the
+# prompt, and each test here comes in by the player's door: the scenario started as the
+# harbour starts it (`ui.server.prepare_game`, the road the harbour's new game takes), the
+# rules captain and the books as the player finds them, and the orders typed as a newcomer
+# types them, each through `World.submit` as the console and the socket give them.
+
+
+def _harbour_game(scenario: str, *flags: str):
+    """A game started as the harbour starts it: the server's own command line and
+    `prepare_game`, every step in its order."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", scenario, *flags])
+    return prepare_game(args, say=lambda _line: None)
+
+
+def _said(world, order: str):
+    """An order typed at the prompt, and the line the game answered it with."""
+    return world.submit(order)
+
+
+def test_truth_7_615_a_bargain_with_the_boat_lost_takes_nothing_by_any_road_and_one_is_had():
+    """The cold review's 5.3 item 2 (code-03 R1, refute-03): with the boat cut adrift, `buy
+    three tons of coal` answered "Order not carried out" and the purse went £500 to £494,
+    and the two goods together to £248, the market moved and nothing came. The cause: the
+    three doors of the market (`trade`, `trade_together`, `trade_list`) each paid and moved
+    the market before the boat was sent, and the boat's refusal came after. Mended where it
+    lives: one bargaining function (`Dealings._bargain`) by which every door strikes, which
+    sends the boat first and pays only when she is away for the goods. The three roads by the
+    boat as one table, from the merchant cutter at anchor in Carrick Road with the list of
+    Falmouth aboard (her own file's opening): each refused with the boat lost, twice, the
+    purse, the market and the hold as they were; and each, with a boat, paid once and had."""
+    from freesail.world.places import pounds_words
+
+    roads = [
+        ("one", ["buy three tons of coal"], {"coal": 3.0}),
+        ("together", ["buy three tons of coal and two tons of tin"], {"coal": 3.0, "tin": 2.0}),
+        (
+            "the manifest",
+            [
+                'draft a book "cargo": buy 3 tons of coal; buy 2 tons of tin',
+                'give the book "cargo" to the boat',
+            ],
+            {"coal": 3.0, "tin": 2.0},
+        ),
+    ]
+    for road, orders, goods in roads:
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)  # the best bower down (her opening order) and she lies in Falmouth
+        assert w.dealings.in_port() is not None, road
+        market = w.dealings.in_port().market
+        purse, net, hold = w.purse.pounds, dict(market.net_sold), dict(w.hold.goods)
+        e = _said(w, "cut the boat adrift")
+        assert w.dealings.boat.lost, (road, e.text)
+        for _ in range(2):  # a newcomer told nothing will try again
+            for order in orders:
+                e = _said(w, order)
+            assert e.kind == "order.rejected", (road, e.text)
+            assert "The boat is lost: cut adrift" in e.text, (road, e.text)
+            assert "the boat lost" not in e.text, (road, e.text)  # said once, not twice
+            assert w.purse.pounds == purse, road
+            assert dict(market.net_sold) == net, road
+            assert dict(w.hold.goods) == hold, road
+        w.run(3600)
+        assert w.purse.pounds == purse and dict(w.hold.goods) == hold, road
+        # the same road with her boat: paid once, and the goods had when she is back
+        w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+        w.run(120)
+        purse = w.purse.pounds
+        for order in orders:
+            e = _said(w, order)
+        assert e.kind == "market.bargain", (road, e.text)
+        paid = purse - w.purse.pounds
+        assert paid > 0 and f"The purse: {pounds_words(w.purse.pounds)}" in e.text, road
+        for _ in range(180):
+            if not w.dealings.boat.away:
+                break
+            w.run(60)
+        assert not w.dealings.boat.away, road
+        for good, tons in goods.items():
+            assert w.hold.goods.get(good) == pytest.approx(tons), (road, good)
+        assert w.purse.pounds == pytest.approx(purse - paid), road
+
+
+def test_truth_7_616_a_sale_with_the_boat_lost_keeps_the_goods_in_the_hold_and_the_money_ashore():
+    """The sale's road of the same fault (refute-03: "on a sale the goods vanish and the
+    player is paid", by the code, not run): goods bought and had by the boat, the boat then
+    cut adrift, and `sell two tons of tin` is refused with the tin still in the hold and the
+    purse as it was."""
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    e = _said(w, "buy two tons of tin")
+    assert e.kind == "market.bargain", e.text
+    for _ in range(180):
+        if not w.dealings.boat.away:
+            break
+        w.run(60)
+    assert w.hold.goods.get("tin") == pytest.approx(2.0)
+    _said(w, "cut the boat adrift")
+    purse = w.purse.pounds
+    for order in ("sell two tons of tin", "sell one ton of tin and one ton of tin"):
+        e = _said(w, order)
+        assert e.kind == "order.rejected" and "The boat is lost" in e.text, e.text
+        assert w.hold.goods.get("tin") == pytest.approx(2.0)
+        assert w.purse.pounds == purse
+
+
+def test_truth_7_617_a_rule_held_back_by_no_stranger_says_so_once_and_it_is_so():
+    """The cold review's 5.3 item 4: in the first action, Mr Bowen's 'more of her' at a sail
+    made out answered "not carried out; a stranger in sight is no stranger in sight". The
+    cause: a clause's words for the log (`standing.rules.Clause.describe`) joined the
+    reading's name, "is" and the reading's own words, and this reading's words are a whole
+    sentence of absence. Mended there: words of absence ("no ...") are said alone. The
+    first action as the harbour starts it, run to that line: it reads "no stranger in sight",
+    and the lookout has indeed no stranger then (the cutter made out is known)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    line = None
+    for _ in range(20):
+        w.run(30)
+        held = [
+            e
+            for e in w.log
+            if "'more of her'" in e.text and "not carried out" in e.text and "stranger" in e.text
+        ]
+        if held:
+            line = held[0]
+            break
+    assert line is not None, "the rule was never held back in the first ten minutes"
+    assert line.text.endswith("not carried out; no stranger in sight."), line.text
+    assert "is no stranger" not in line.text
+    assert w.readings.words("stranger_in_sight") == "no stranger in sight"
+
+
+def test_truth_7_618_the_noon_hour_past_noon_is_the_afternoon_in_every_mouth():
+    """The cold review's 5.3 item 10: "High water at Ramhead about a quarter past twelve at
+    noon". The cause: `world.tide.time_words` gave the whole hour from noon to one "at
+    noon". Mended there (the one speller of a time of day in words; the reckoning's own
+    lines say the clock's figures): the time past noon is the afternoon's, noon itself
+    "noon". The schooner in Carrick Road as the harbour starts her, asking the tide as a
+    newcomer asks it; and every quarter of the day by the speller itself, so that no other
+    hour is said wrong."""
+    from freesail.world.tide import time_words
+
+    w = _harbour_game("data/scenarios/merchant-schooner-plymouth.yaml")
+    e = _said(w, "the tide by the almanac")
+    assert "a quarter past twelve in the afternoon" in e.text, e.text
+    assert "at noon" not in e.text
+    for q in range(96):
+        words = time_words(q / 4.0)
+        assert ("at noon" not in words) and (words == "noon") == (q == 48), (q, words)
+        if 48 < q < 68:
+            assert words.endswith("in the afternoon"), (q, words)
+
+
+def test_truth_7_619_a_mistyped_world_line_is_refused_in_words_and_the_game_goes_on(tmp_path):
+    """The cold review's 5.3 item 12: a mistyped `world:` line ended the console with a
+    traceback. The cause: `World._apply_world_order` read the line outside the refusal's
+    reach (only the carrying out was caught), after the line was journaled, so the console's
+    loop, the socket's and a replay of a save holding it all raised. Mended there: the
+    reading is inside it. The first action as the harbour starts it, at the console's own
+    door: each mistyped line is answered "not carried out" in the world's words, the console
+    plays on, and a save holding the lines replays to the same log."""
+    import io
+
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.ui.console import Console
+
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    out = io.StringIO()
+    con = Console(w, out=out)
+    for line in (
+        "world: wether: a gale from the west",
+        "world: weather a gale",
+        "world: : :",
+        "world: ship",
+    ):
+        con.handle_line(line)
+    con.handle_line("tick 60")
+    con.handle_line("state")
+    text = out.getvalue()
+    refused = [e for e in w.log if e.kind == "world.order" and e.data.get("result") == "refused"]
+    assert len(refused) == 4, [e.text for e in refused]
+    assert all(e.text.startswith("World order (") and "not carried out" in e.text for e in refused)
+    assert "Traceback" not in text and "Sherbourne: heading" in text
+    path = replay_mod.save_to_file(w, tmp_path / "mistyped.json", checkpoint=False)
+    copy = replay_mod.replay(replay_mod.load_file(path), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+
+
+def test_truth_7_620_a_misspelt_sail_is_offered_the_sail_on_every_readme_ship():
+    """The cold review's 5.3 item 11: on the README's frigate `set the fore topsial` was
+    answered "did you mean the fore topsail lift, the fore topsail halyard or the fore
+    topsail sheet?", and never the fore topsail. The cause: `orders.resolve.NounTable.add`
+    entered a part's raw id first ("fore.topsail", unsuggested) under the same key as its
+    plain words, so the plain words never went into the hints (22 of 38 sails on the frigate
+    were never offered as themselves). Mended there: the plain words are the hint for the
+    part they still name. On each ship of the README's first commands, started as the README
+    starts her, every sail misspelt in its own word at the prompt is offered as itself."""
+    import re
+
+    from freesail.orders.resolve import key
+    from freesail.ui.server import prepare_game, server_parser
+
+    readme = [
+        ("data/ships/frigate-36.yaml", "293"),
+        ("data/ships/topsail-schooner.yaml", "300"),
+        ("data/ships/cutter.yaml", "300"),
+        ("data/ships/brig.yaml", "295"),
+    ]
+    sides = {"starboard", "larboard"}
+    for ship_file, heading in readme:
+        args = server_parser().parse_args(
+            [ship_file, "--seed", "7", "--wind", "0,15", "--heading", heading]
+        )
+        w = prepare_game(args, say=lambda _line: None)
+        tried = 0
+        for sid in w.ship.sails:
+            words = key(sid).split()
+            own = [x for x in words if x not in sides]
+            plain = " ".join(own)
+            long = max(own, key=len)
+            if len(long) < 5:
+                continue
+            miss = " ".join(x if x != long else x[:-2] + x[-1] + x[-2] for x in words)
+            e = _said(w, f"set the {miss}")
+            hint = re.search(r"did you mean (.*?)\? \(", e.text)
+            if e.kind == "order.rejected" and hint:
+                tried += 1
+                offered = hint.group(1).replace(" or ", ", ").split(", ")
+                assert any(o.endswith(f"the {plain}") or o == f"the {key(sid)}" for o in offered), (
+                    ship_file,
+                    miss,
+                    e.text,
+                )
+        assert tried >= 5, (ship_file, tried)
+
+
+def test_truth_7_621_the_officer_does_not_send_the_same_thing_down_twice_within_the_hour():
+    """The cold review's 5.3 item 5 (play/console-4, 12:17 to 12:29): "the sail on the
+    larboard quarter lost sight of" sent down to the captain eight times in twelve minutes.
+    Measured: eight sails of the world's business, each lost from sight in the same words.
+    The cause: `world.reports.tick` sent every reportable line with no guard, where the calls
+    have one (`_called_lately`). Mended there (`_reported_lately`): words sent down within
+    the hour are not sent again until the captain has been on deck. The dispatches as the
+    harbour starts them, the reviewer's own orders: the reports still go down, and no words
+    go down twice in the hour with the captain below throughout."""
+    from freesail.world import reports
+
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    w.run(9000)
+    _said(w, "shape a course for Plymouth")
+    # below by his own order: since package 115 D4 (c) the day's work no longer
+    # takes the player's own person below, which is how the reviewer's captain came to be
+    # sent the eight reports; a captain below by his own choice is sent them still
+    _said(w, "go below")
+    w.run(7200 + 14400)
+    made = [e for e in w.log if e.kind == reports.REPORT_MADE]
+    assert made, "no report sent down in the passage"
+    # the same thing is not sent down twice in the hour: the same kind of line of the same
+    # sail or mark (`reports._subject`), the captain below throughout
+    told: dict[tuple[str, str], int] = {}
+    for e in w.log:
+        if e.kind == "captain.on_deck":
+            told.clear()
+        what = reports._what(e)
+        if what is None or not [m for m in made if m.tick == e.tick + reports.MESSENGER_S]:
+            continue
+        subject = reports._subject(e, what)
+        if subject in told and e.tick - told[subject] <= 3600:
+            again = [
+                m
+                for m in made
+                if m.tick == e.tick + reports.MESSENGER_S
+                and m.data["of"] == e.kind
+                and (m.data["text"] == what or m.data.get("n"))
+            ]
+            assert not again or any(
+                reports._subject(x, reports._what(x) or "") != subject
+                for x in w.log
+                if x.tick == e.tick and x.kind == e.kind and x is not e
+            ), (e.ship_time, e.text)
+        told.setdefault(subject, e.tick)
+
+    # and a different sail is a different report (the lead's reading of part D at 60af48e,
+    # item 2: four sails sighted "on the larboard bow" in an hour, the base sending four
+    # reports and the gathering by words one): below from the start, every sail the lookout
+    # hails by day is sent down, a minute's sails alike as the lookout says them
+    w = _harbour_game("data/scenarios/dispatches-falmouth.yaml")
+    _said(w, "go below")
+    w.run(9000)
+    hailed: dict[int, int] = {}
+    for e in w.log:
+        if e.kind == "lookout.sighting" and str(e.data.get("id", "")).startswith("sail:"):
+            hailed[e.tick] = hailed.get(e.tick, 0) + 1
+    assert len([n for n in hailed.values()]) >= 8, hailed
+    sent = {
+        e.tick - reports.MESSENGER_S: e
+        for e in w.log
+        if e.kind == reports.REPORT_MADE
+        and e.data["of"] == "lookout.sighting"
+        and "sail" in e.data["text"]
+    }
+    for tick, n in hailed.items():
+        assert tick in sent, (tick, n)
+        assert sent[tick].data.get("n", 1) == n, (tick, n, sent[tick].text)
+        if n > 1:
+            words = {2: "two", 3: "three", 4: "four"}[n]
+            assert f": {words} sail sighted" in sent[tick].text, sent[tick].text
+            assert "the same" not in sent[tick].text, sent[tick].text
+
+
+def test_truth_7_622_the_gun_deck_answers_true_of_the_guns_and_the_deck_is_said_to_be_yours():
+    """The cold review's 1.5 and 5.3 item 1 (play/console-2): the first action, the orders its
+    header lists less one, and the game answered "The guns are firing as they bear already"
+    with every gun lashed; nothing fired in an hour and nothing said why. The cause, read and
+    measured: the answers of the standing intentions spoke of the battery's intention as of
+    the guns; the beat did not say the guns were still secured; and the player's order made
+    Mr Bowen stand aside (decision 41) before he reached the state in which he casts loose,
+    unsaid. Casting loose stays its own word at the beat, as the period had it (Falconer 1780,
+    EXERCISE: "1st. Silence. 2d. Cast loose your guns."; the lead's ruling of 2026-11-14), and
+    engage casts loose (truth 7-628). Mended: each answer is made true of the guns
+    (`orders.gunnery._true_of_the_guns`), the beat and the aside say what is so and what to
+    order next. The beat, then the intentions a newcomer gives before he engages: every
+    answer while no gun is loose says they are secured and names the order, and it is so;
+    the aside says the deck is the player's and her guns secured."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+
+    def secured() -> bool:
+        return not any(g.cast_loose for g in w.ship.guns.values() if g.serves)
+
+    e = _said(w, "beat to quarters")
+    assert e.kind == "crew.quarters" and secured()
+    assert "The guns are secured: 'cast loose the guns' to serve them." in e.text, e.text
+    w.run(300)
+    answers = []
+    for order in (
+        "fire as they bear",
+        "load with round shot",
+        "aim at her rigging",
+        "cease firing",
+    ):
+        answers.append(_said(w, order))
+        w.run(30)
+    assert secured(), "the guns came loose with nobody's word"
+    for a in answers:
+        assert a.kind.startswith("guns."), a.text
+        assert "The guns are secured" in a.text and "'cast loose the guns'" in a.text, a.text
+        assert not a.text.startswith("The guns are firing"), a.text
+        assert "loaded and run out" not in a.text, a.text
+    aside = [x for x in w.log if x.kind == "captain.aside"]
+    assert aside and "the deck is yours, and her guns are secured" in aside[0].text, aside
+    # the lines the guns' own standing orders gave at the beat are true too
+    by_book = [x for x in w.log if x.kind in ("guns.aim", "guns.load") and x.tick <= 180]
+    assert by_book and all("The guns are secured" in x.text for x in by_book), by_book
+    assert w.readings.value("guns")["cast_loose"] is False
+
+    # every order that asks the guns to fire (the lead's reading of part D at 60af48e, item
+    # 3): after an action fought, the guns secured with three still loaded and the mark and
+    # side still engaged, the hands beat to quarters again; `fire` and its forms each say
+    # the word stands for the guns when they are cast loose, that three are loaded and none
+    # is run out, and name the order; and nothing fires on them
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    _said(w, "engage her to starboard")
+    w.run(3300)
+    assert [x for x in w.log if x.kind == "action.fired"], "no action fought"
+    _said(w, "secure the guns")
+    w.run(600)
+    _said(w, "beat to quarters")
+    w.run(30)
+    assert secured() and sum(1 for g in w.ship.guns.values() if g.loaded) == 3
+    battery = w.ship.extra["battery"]
+    assert battery.engaged == "starboard" and battery.target
+    orders = (
+        "fire",
+        "fire a gun to leeward",
+        "fire the starboard broadside",
+        "fire number one starboard gun",
+        "fire as they bear",
+        "fire by divisions",
+    )
+    for order in orders:
+        a = _said(w, order)
+        assert a.kind.startswith("guns."), (order, a.text)
+        assert "The guns are secured, three of them loaded: none is run out or fired" in a.text
+        assert a.text.endswith("say 'cast loose the guns'."), (order, a.text)
+        assert "no gun of it is loaded" not in a.text, (order, a.text)
+        assert "as soon as it is ready" not in a.text, (order, a.text)
+        assert "as soon as ready" not in a.text, (order, a.text)
+    last = w.clock.tick
+    w.run(600)
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > last]
+
+
+def test_truth_7_628_engage_casts_the_guns_loose_and_the_reviewers_own_orders_fight_her():
+    """The owner's word of 2026-11-14 on package 115 D1: "it is an explicit order for engaging,
+    so it stands to reason that the gun would be cast loose on it." `engage` given with the
+    guns secured begins casting them loose by the order 'cast loose the guns' and its
+    evolution (the one road the rules captain and the player take), and says so. The first
+    action as the harbour starts it and the reviewer's own three orders, `beat to quarters`,
+    `engage her to starboard`, `fire as they bear`, and no other order: the engage's answer
+    says the guns are being cast loose; they are cast loose within the evolution's time with
+    the crews coming to them, loaded and run out, and her own guns fire at the privateer
+    once she bears within their reach (measured: cast loose four minutes after the word,
+    the first broadside forty-two minutes after it, as the range closes)."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert "The guns are being cast loose; she engages to starboard when they are." in e.text
+    w.run(300)
+    f = _said(w, "fire as they bear")
+    assert "secured" not in f.text, f.text
+    loose = [x for x in w.log if x.kind == "guns.cast_loose" and x.tick > e.tick]
+    assert loose and loose[0].tick - e.tick <= 600, loose
+    fired = []
+    for _ in range(90):
+        w.run(60)
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
+        if fired:
+            break
+    assert fired, "the guns cast loose and nothing fired in an hour and a half"
+    assert any(g.fired for g in w.ship.guns.values())
+
+
+def test_truth_7_623_recruits_are_numbered_after_every_man_the_books_have_borne():
+    """The cold review's 5.3 item 13 (code-03 R2): recruits were given numbers another man
+    held (`s264` twice). The cause: `Dealings._muster_recruits` numbered from the length of
+    the list, which falls when a man is buried or sent away in a prize crew. Mended at the
+    books (`crew.model.Crew.issued`, `next_number`): numbers run on from the highest ever
+    given; a prize crew is numbered by her captor's books. The prize brought home as the
+    harbour starts her: her prize crew is out at 10:02 (256 men borne, numbers to s264), she
+    is in Falmouth by the evening by her captain's own plan, and four able seamen entered
+    come aboard with numbers no man borne, dead or away in a prize has."""
+    w = _harbour_game("data/scenarios/prize-home.yaml")
+    for _ in range(14 * 6):
+        w.run(600)
+        if w.dealings.in_port() is not None:
+            break
+    assert w.dealings.in_port() is not None, "she never came into port"
+    crew = w.ship.extra["crew"]
+    before = {s.id for s in crew.sailors}
+    assert len(before) < crew.next_number(), "nobody away: the case is not met"
+    # her purse is empty as she comes home: the owner's word at the console's own door puts
+    # the bounty in it (`world: aboard: ...`, the live world order)
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+
+    w.world_order(
+        "aboard: twenty pounds paid into the purse by the prize agent",
+        source=LIVE_WORLD_ORDER_SOURCE,
+    )
+    e = _said(w, "enter four able seamen")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(30 * 6):
+        w.run(600)
+        if len(crew.sailors) > len(before):
+            break
+    new = [s for s in crew.sailors if s.id not in before]
+    assert len(new) == 4, [s.id for s in new]
+    ids = [s.id for s in crew.sailors]
+    assert len(ids) == len(set(ids)), "two men borne under one number"
+    away = {s.id for s in crew.dead}
+    for rec in (w.ship.extra.get("prize_crews") or {}).values():
+        away |= {s.id for s in rec}
+    for hull in getattr(w, "hulls", {}).values():
+        other = (getattr(getattr(hull, "ship", None), "extra", None) or {}).get("crew")
+        if other is not None and other is not crew:
+            away |= {s.id for s in other.sailors}
+    assert not ({s.id for s in new} & away), "a recruit given a number a man away holds"
+
+
+def test_truth_7_624_a_boat_lost_on_her_errand_says_the_goods_went_with_her_paid_once():
+    """The lead's word of 2026-11-14 on package 115 D2: a bargain is paid once the boat is away
+    for the goods; what becomes of them if she is lost after? Measured at the prompt before
+    the mend: the boat stove while away for three tons of coal, £6 gone, nothing said of the
+    coal, and two hours later "The boat hoisted in" of a boat that was lost. The cause: the
+    boat's errand (`SendBoatScript`) ran on when its boat was gone, and nothing kept or said
+    what was in her. Mended there: the errand keeps what it carries, ends when its boat is
+    lost and says the goods are lost with her and paid for once; she is not hoisted in. The
+    merchant cutter at anchor as the harbour starts her, coal bought, the boat stove by the
+    owner's word at the console's door while she is away: the line says so, the purse is
+    what it was after the bargain, the hold empty, and another bargain is refused unpaid."""
+    from freesail.ui.console import LIVE_WORLD_ORDER_SOURCE
+
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    e = _said(w, "buy three tons of coal")
+    assert e.kind == "market.bargain", e.text
+    paid = w.purse.pounds
+    w.run(600)
+    assert w.dealings.boat.away
+    w.world_order("aboard: the boat stove", source=LIVE_WORLD_ORDER_SOURCE)
+    w.run(60)
+    said = [x for x in w.log if "errand is not done" in x.text]
+    assert said and "the 3 tons of coal bought are lost with her, £6 paid" in said[0].text, said
+    w.run(7200)
+    assert not [x for x in w.log if x.kind == "boat.in" and x.tick > e.tick], (
+        "a lost boat hoisted in"
+    )
+    assert w.purse.pounds == paid and not w.hold.goods.get("coal")
+    again = _said(w, "buy three tons of coal")
+    assert again.kind == "order.rejected" and "The boat is lost" in again.text
+    assert w.purse.pounds == paid
+
+    # the sale, one row more (the lead's reading of part D at 60af48e, item 4: "the money
+    # taken stands" had the market pay for tin it never had): a sale is had when the goods
+    # are landed; the boat stove while she pulls for the shore with the tin, he has neither
+    # tin nor money, and the market is as it was before the sale
+    w = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    w.run(120)
+    assert _said(w, "buy two tons of tin").kind == "market.bargain"
+    w.run(3 * 3600)
+    assert w.hold.goods.get("tin") == 2.0 and not w.dealings.boat.away
+    before = w.purse.pounds
+    sold = _said(w, "sell two tons of tin")
+    assert sold.kind == "market.bargain" and "the boat lands it" in sold.text, sold.text
+    port = w.dealings.ports[w.dealings.boat.port_id]
+    market_before_sale = port.market.net_sold.get("tin", 0.0) - 2.0
+    w.run(600)
+    assert w.dealings.boat.phase == "pulling for the shore"
+    w.world_order("aboard: the boat stove", source=LIVE_WORLD_ORDER_SOURCE)
+    w.run(60)
+    said = [x.text for x in w.log if "errand is not done" in x.text]
+    assert said and (
+        "the 2 tons of tin to be sold went down in her before they were landed: the sale is "
+        "void, and the £245 taken for them is paid back" in said[0]
+    ), said
+    assert w.purse.pounds == before and not w.hold.goods.get("tin")
+    assert port.market.net_sold.get("tin", 0.0) == market_before_sale
+
+
+def test_truth_7_625_the_starter_book_fits_every_rig_and_says_what_it_left_out():
+    """The cold review's 5.3 item 3 (play/console-2): the starter book refused three of its
+    seven rules on the first action's cutter ("There is no such part as the royals in this
+    ship"). Measured on every ship file: refused on the cutter, the smack, the lugger, the
+    bilander, both schooners and every boat; whole on the square rigs. The cause: the book
+    is written for a ship with royals and studdingsails, and a clause naming a family of
+    sails she has none of refused the whole rule. Mended where the book is read
+    (`standing.book.fit_to_rig`, by `ui.console.read_standing_orders`, the console's and the
+    server's and the scenarios' one reading; the lead's ruling of 2026-11-14: one book for any
+    rig): such a clause is left out, a rule with nothing left out whole, and her log says
+    what in her own words. On every ship file, the book read at the prompt as a newcomer
+    reads it, by `read the standing orders from` the starter book's path, the book held
+    empty before: nothing refused, every rule entered or said left out, and the line true
+    of her (each family it names, she has none of; each she has, it does not name)."""
+    import glob
+    import io
+
+    from freesail.standing.book import SAIL_FAMILIES
+    from freesail.ui.console import STARTER_BOOK, Console
+    from freesail.ui.server import prepare_game, server_parser
+
+    families_in_files = set()
+    for ship_file in sorted(glob.glob("data/ships/*.yaml")):
+        w = prepare_game(
+            server_parser().parse_args([ship_file, "--seed", "7"]), say=lambda _l: None
+        )
+        ship = w.ship
+        for name, members in ship.groups.items():
+            if (
+                " " not in name
+                and name.endswith("s")
+                and members
+                and all(m in ship.sails for m in members)
+            ):
+                families_in_files.add(name)
+        assert len(w.standing.book) == 0, ship_file
+        n0 = len(w.log)
+        Console(w, out=io.StringIO()).handle_line(f"read the standing orders from {STARTER_BOOK}")
+        new = w.log[n0:]
+        refused = [e.text for e in new if e.kind == "order.rejected"]
+        assert not refused, (ship_file, refused)
+        fitted = [e for e in new if e.kind == "book.fitted"]
+        lacks = {f for f in SAIL_FAMILIES if f not in ship.groups}
+        if fitted:
+            head = fitted[0].text.split(":", 1)[0]
+            for f in SAIL_FAMILIES:
+                assert (f in head) == (f in lacks and f in fitted[0].text), (ship_file, f, head)
+            for e in new:
+                if e.kind == "order.accepted":
+                    assert not any(f"the {f}" in e.text for f in lacks), (ship_file, e.text)
+        else:
+            assert not ({"royals", "studdingsails"} & lacks), ship_file
+        assert len(w.standing.book) >= 4, (ship_file, len(w.standing.book))
+        # no rule fitted down to taking in only what nothing in the book sets, which could
+        # only refuse at its every firing (the lead's reading of part D at 60af48e, item 6:
+        # the schooner's night routine, "Nothing done: ... already furled" at each sunset)
+        texts = [r.text for r in w.standing.book.rules]
+        for r in w.standing.book.rules:
+            acts = [a.strip() for a in r.text.split(" then ", 1)[-1].split(";")]
+            if not all(a.startswith("take in the ") for a in acts):
+                continue
+            fams = [a.removeprefix("take in the ").split(",")[0].strip() for a in acts]
+            sets = [t for t in texts if any(f"set the {f}" in t for f in fams)]
+            unfitted = [ln for ln in open(STARTER_BOOK, encoding="utf-8") if r.name in ln]
+            assert sets or any(r.text.split(" then ", 1)[-1] in ln for ln in unfitted), (
+                ship_file,
+                r.text,
+            )
+    # the families the fitting knows are the ship files' own: a new one is added on purpose
+    assert families_in_files <= SAIL_FAMILIES, families_in_files - SAIL_FAMILIES
+
+    # and the rules captain's own books are not refused for a rule the game fitted: the
+    # first action's cutter, the starter book loaded at her opening, its 'shorten sail for
+    # weather' fitted; the book 'keeping station' says only what it said before the fitting
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(1800)
+    clash = [e.text for e in w.log if "held already" in e.text and "keeping station" in e.text]
+    assert clash and not [t for t in clash if "'shorten sail for weather'" in t], clash
+
+
+def test_truth_7_626_the_wheel_shot_away_is_mended_by_the_relieving_tackles_and_she_answers():
+    """The cold review's 5.3 item 8: the wheel shot away for good. The hit said "the helm is
+    lost until the relieving tackles are rove", and nothing could rove them: no order, no
+    evolution, nothing in the rules captain's repairs (`combat.hits`, `physics.hull` holding
+    the rudder where it was). Mended (the lead's ruling of 2026-11-14: the game's own line
+    promises it): `rig the relieving tackles`, an evolution of the repairs' pattern whose end
+    clears the loss, the hit's line naming the order, and the rules captain's `_repairs`
+    giving it first. The first action at seed 6 as the harbour starts it (the wheel lost at
+    seventeen minutes): the order given at the prompt on the minute the wheel goes, and the
+    loss is cleared within the quarter hour, the rudder following the helm's order.
+
+    What the helm does with the wheel shot away and before the tackles are rove, and by the
+    tackles, is package 116's (truths 7-632 and 7-633; old, to that package: nothing read
+    the tackles, `helm_by_tackles`, and she steered by them exactly as by the wheel; new: by
+    them the helmsman's rate is half the wheel's, and the rudder's difference below is met
+    at that rate, 0.28 radians at this seed against the bound of 0.2). Its words are true
+    (the same reading): given twice, said once; the hands' work
+    named as the log names it; `belay the relieving tackles` belays it and says how she is
+    left; and the wheel, once shot away, is not shot away again with the tackles rove."""
+    w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
+    for _ in range(90):
+        w.run(30)
+        if w.ship.extra.get("helm_lost"):
+            break
+    assert w.ship.extra.get("helm_lost"), "the wheel was not lost at seed 6 this time"
+    line = [e for e in w.log if e.kind == "helm.shot_away"][-1]
+    assert "'rig the relieving tackles'" in line.text
+    held = float(w.ship.dyn.rudder)
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    twice = _said(w, "rig the relieving tackles")
+    assert twice.text.endswith("The hands are rigging the relieving tackles already."), twice.text
+    b = _said(w, "belay the relieving tackles")
+    assert b.kind == "work.belayed", b.text
+    assert b.text == (
+        "Belayed rigging the relieving tackles; the tackles not rove, the helm lost as the "
+        "shot left it."
+    ), b.text
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    short = [x.text for x in w.log if x.kind == "evolution.short_handed" and x.tick >= e.tick]
+    assert not [t for t in short if t.endswith("the rest are relieving tackles.")], short
+    for _ in range(30):
+        w.run(30)
+        if not w.ship.extra.get("helm_lost"):
+            break
+    assert not w.ship.extra.get("helm_lost"), "the tackles never rove"
+    assert [x for x in w.log if x.kind == "helm.relieved"], "nothing said the helm answers"
+    seen = []
+    for order in ("steer north-west", "steer east"):
+        said = _said(w, order)
+        assert said.kind != "order.rejected", said.text
+        w.run(30)
+        seen.append(float(w.ship.dyn.rudder))
+    assert abs(seen[0] - seen[1]) > 0.2, ("the rudder did not answer the helm", held, seen)
+    rove = [x.tick for x in w.log if x.kind == "helm.relieved"][0]
+    w.run(1800)
+    again = [x for x in w.log if x.kind == "helm.shot_away" and x.tick > rove]
+    assert not again, [x.text for x in again]
+
+
+# the merchant brig's case, left out of this truth until package 116 (old: `_OPENING_UNTIL_75
+# = {"merchant-brig.yaml"}`, her opening 'let go the best bower' waiting for twelve forecastle
+# hands her larboard watch of three never spared): the anchor's file now calls all hands where
+# the watch is too few (card 5), and she is held to the truth with every other
+_SAYS_AT_ANCHOR = re.compile(r"\bat anchor\b|\bthe usual anchorage\b|\blies at\b|\briding\b", re.I)
+_SAYS_NOT = re.compile(r"\bunmoored\b|\bno anchor down\b", re.I)
+
+
+def test_truth_7_627_every_scenario_that_says_she_lies_at_anchor_lies_at_anchor():
+    """The cold review's 5.3 item 7 (play/console-4): the dispatches began "in Carrick Road,
+    the usual anchorage" (its file's words) under way with no anchor down, so that 'send the
+    boat ashore' and 'buy' were refused at the first minute. The cause: a scenario's opening
+    state at anchor is made by an opening order, and this file had none (the deeper cause,
+    for the notes: a state made by an order that can wait or fail; the merchant brig's waited
+    for hands for ever, mended in package 116, truth 7-630). Mended: the dispatches let go as the
+    merchant scenarios in the same road do. Every scenario started as the harbour starts it:
+    one whose opening words (the header and the position line) say she lies at anchor, and
+    not that she is unmoored or under way, is riding at anchor in her port at two minutes;
+    in the place her position's words name, and named in her header by her own name (the
+    lead's reading of part D at 60af48e, item 7: the schooner of Plymouth's header and place
+    said Falmouth and Carrick Road, the merchant ship's and the merchant cutter's described
+    the schooner Speedwell; the three headers rewritten true)."""
+    import glob
+
+    import yaml
+
+    # the ships' own names, file by file: a header naming one must name her own (the lead's
+    # reading of part D at 60af48e, item 7: the merchant ship's header described the schooner
+    # Speedwell, and she is the Amazon)
+    ship_names = set()
+    for f in glob.glob("data/ships/*.yaml"):
+        spec = yaml.safe_load(open(f, encoding="utf-8")) or {}
+        n = str((spec.get("ship") or {}).get("name") or "")
+        if n and not n.startswith("the "):
+            ship_names.add(n)
+    tried = 0
+    under_way = 0
+    for path in sorted(glob.glob("data/scenarios/*.yaml")):
+        name = path.rsplit("/", 1)[-1]
+        raw = open(path, encoding="utf-8").read().splitlines()
+        place = " ".join(
+            ln.split("#", 1)[1] for ln in raw if ln.startswith("position:") and "#" in ln
+        )
+        words = " ".join([ln for ln in raw if ln.startswith("#")][:30] + [place])
+        if re.search(r"\bunder way\b", place):
+            # her place says she is under way (the dispatches, the lead's ruling (b) of
+            # 2026-11-14: an anchor at her opening sent her rules captain onto the Black Rock
+            # at 09:54, so she begins under way as before and her words say so)
+            w = _harbour_game(path)
+            w.run(120)
+            assert not w.dealings.anchored, (name, place)
+            under_way += 1
+            continue
+        if not _SAYS_AT_ANCHOR.search(words) or _SAYS_NOT.search(words):
+            continue
+        w = _harbour_game(path)
+        if getattr(w, "ship", None) is None or not hasattr(w.ship, "dyn"):
+            continue
+        w.run(120)
+        tried += 1
+        assert w.dealings.anchored and w.dealings.in_port() is not None, (name, words[:200])
+        # her place, where her position's words name it: the port she lies in, its road or
+        # its anchorage (the schooner of Plymouth's said Carrick Road, and she lies in the
+        # Sound)
+        port = w.dealings.in_port()
+        spots = [port.name] + [
+            str(getattr(getattr(port, r, None), "name", "") or "")
+            for r in ("anchorage", "outer_road", "mooring")
+        ]
+        assert any(x and x.lower() in place.lower() for x in spots), (name, place, spots)
+        # and her name, where the header names a ship of the files: her own, or a sail of
+        # the scenario's own list
+        header = " ".join(
+            ln for ln in raw[: next(i for i, ln in enumerate(raw) if not ln.startswith("#"))]
+        )
+        spec = yaml.safe_load("\n".join(raw)) or {}
+        others = {str(x.get("name") or "") for x in spec.get("ships") or []}
+        named = {n for n in ship_names if re.search(rf"\b{re.escape(n)}\b", header)}
+        assert named <= {w.ship.name} | others, (name, w.ship.name, named)
+    assert tried >= 8 and under_way >= 1, (tried, under_way)
+
+
+def test_truth_7_629_after_hold_your_fire_engage_takes_her_casts_loose_and_holds():
+    """The lead's ruling of 2026-11-14 on package 115 D1 (JUDGEMENT, put to the owner): the
+    later explicit order about firing stands. `_engage` turned a held battery to "as they
+    bear"; with the guns secured that did nothing, and with engage casting loose it fired on
+    a player who had just said hold. The first action as the harbour starts it: `beat to
+    quarters`, `hold your fire`, `engage her to starboard`: the engage takes her for the
+    mark, casts loose, and holds, saying so and naming the order that opens; nothing fires
+    in the next forty minutes; `fire as they bear` then opens. Without the hold, engage fights
+    as they bear (truth 7-628).
+
+    The hand that held is the hand that must loose (the lead's reading of part D at 60af48e,
+    item 1): the rules captain's own hold ("hold your fire (until she is within the book's
+    range)", at his every entry to engaging) does not bind the player's engage, which opens as
+    the base's did, the same shot at the same seconds; and no answer says "at your order" of
+    a hold he did not give, nor "engaging already" of a battery that is held. The engage on a
+    held battery with the guns secured says one thing of them: cast loose, and held."""
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    w.run(120)
+    _said(w, "beat to quarters")
+    _said(w, "hold your fire")
+    w.run(300)
+    e = _said(w, "engage her to starboard")
+    assert e.kind == "guns.engage", e.text
+    assert e.text.endswith(
+        "The guns are being cast loose, and held at your order when they are: "
+        "'fire as they bear' to open."
+    ), e.text
+    assert "engages to starboard when they are" not in e.text, e.text
+    assert e.text.count("held at your order") == 1, e.text
+    again = _said(w, "engage her to starboard")
+    assert "already" not in again.text and "her guns are held at your order" in again.text, (
+        again.text
+    )
+    battery = w.ship.extra["battery"]
+    assert battery.mode.value == "hold" and battery.target, (battery.mode, battery.target)
+    for _ in range(40):
+        w.run(60)
+    assert any(g.cast_loose for g in w.ship.guns.values()), "never cast loose"
+    assert not [x for x in w.log if x.kind == "action.fired" and x.tick > e.tick], "fired, held"
+    opened = _said(w, "fire as they bear")
+    assert opened.kind == "guns.mode", opened.text
+    fired = []
+    for _ in range(60):
+        w.run(60)
+        fired = [x for x in w.log if x.kind == "action.fired" and x.tick > opened.tick]
+        if fired:
+            break
+    assert fired, "opened and nothing fired in an hour"
+
+    # the rules captain's own hold, and the player's engage after it
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    _said(w, "beat to quarters")
+    w.run(520)
+    held = [x for x in w.log if x.text.startswith("By the captain, engaging: holding your fire")]
+    assert held, "the captain's book held no fire on engaging"
+    e = _said(w, "engage her to starboard")
+    assert e.text.startswith("Engage a cutter to starboard: the guns to fire as they bear."), e.text
+    assert "your order" not in e.text and "already" not in e.text, e.text
+    w.run(3600)
+    fired = [x.tick for x in w.log if x.kind == "action.fired" and x.tick > e.tick]
+    assert fired[:3] == [3720, 3780, 3840], fired[:3]  # the base's own, to the second
+    other = _said(w, "engage her to larboard")
+    assert "your order" not in other.text, other.text
+
+    # `cease firing` before the beat: its hint is the order that works from there, and its
+    # hold (meant: an explicit order about firing, standing until an order to fire) is said
+    # again at the beat, not found later in a silent battery
+    w = _harbour_game("data/scenarios/first-action.yaml")
+    c = _said(w, "cease firing")
+    assert c.text.endswith("say 'beat to quarters', then 'cast loose the guns'."), c.text
+    b = _said(w, "beat to quarters")
+    assert b.text.endswith("The guns are held at your order: 'fire as they bear' to open."), b.text
+    assert _said(w, "cast loose the guns").kind != "order.rejected"
+
+
+# ---------------------------------------------------------------------------
+# Package 115, parts A and B: what is unsafe (the cold review of milestone 7, 5.4, 5.7 and
+# 6.1). Truths 7-600 to 7-614. Every one comes in by the door the fault was met at: the
+# game's server run as the owner runs it (`py -m freesail`, its own process) and a real
+# socket or a real request to it, from a foreign page, with no mark, or as the game's own
+# page; a checkpoint or a save made by hand on the disk and loaded as a player loads it.
+# ---------------------------------------------------------------------------
+
+
+# -- package 116 (card 5 of docs/dev/ScopeCards-BeforeTheGate.md): the four small mends --------
+
+
+def test_truth_7_630_the_merchant_brig_lets_go_her_anchor_by_her_watch_and_weighs():
+    """Card 5, the first mend. The harbour's merchant brig began with her opening order
+    waiting for ever: `let go the anchor` wants a dozen (its file's judgement), no more than
+    the eleven her company can give; work begins at half its want; and her ten seamen were
+    watched seven and three (ruling 11's own words), the larboard three and her master making
+    four at five in the morning: "Not hands enough on deck to let go the anchor; there are
+    but four to spare", and nothing ever called the rest. Mended at the anchor's file, by the
+    form the settee's files and the boat's have (`too_few: all hands`): a watch too few to
+    begin it calls all hands for it, piped down when she is brought up.
+
+    Package 119 (the owner's word of 2026-11-19, the lead's of the same day): her ten are
+    mustered five and five (the muster's rule 3, the odd hands of odd stations to the
+    watches in turn), so that the larboard five and her master make six, half the want, and
+    she lets go by her watch: "Only six hands to let go the anchor", no hands called. (Old,
+    package 116: `[7, 3]`, all hands called once, "All hands! (to let go the anchor)", and
+    piped down. A watch too few still calls all hands for it: truth 7-703.)
+
+    As the harbour starts her: she rides at anchor in Falmouth within two minutes by the
+    larboard watch, nothing waiting and no hands called; she weighs, and `let go the anchor`
+    brings her up a second time. The cutter in the same road lets go with her watch as
+    before, no hands called."""
+    w = _harbour_game("data/scenarios/merchant-brig.yaml")
+    crew = w.ship.extra["crew"]
+    runner = w.ship.extra["evolutions"]
+    from freesail.crew.bill import Watch
+
+    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [5, 5]
+    w.run(120)
+    assert w.dealings.anchored and w.dealings.in_port().name == "Falmouth"
+    called = [e.text for e in w.log if e.kind == "crew.all_hands"]
+    assert called == [], called
+    short = [e.text for e in w.log if e.kind == "evolution.short_handed"]
+    assert short == ["Only six hands to let go the anchor; there are no more on deck."], short
+    assert not crew.all_hands_called
+    assert not [e for e in w.log if e.kind == "evolution.waiting"]
+    e = _said(w, "weigh anchor")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(60):
+        w.run(60)
+        if not w.dealings.anchored:
+            break
+    assert not w.dealings.anchored, "she never weighed"
+    first = len([x for x in w.log if x.kind == "ship.anchored"])
+    e = _said(w, "let go the anchor")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(30):  # the anchor she weighed is catted first, some seven minutes
+        w.run(30)
+        if len([x for x in w.log if x.kind == "ship.anchored"]) > first:
+            break
+    assert len([x for x in w.log if x.kind == "ship.anchored"]) == first + 1
+    assert w.dealings.anchored
+
+    c = _harbour_game("data/scenarios/merchant-cutter.yaml")
+    c.run(120)
+    assert c.dealings.anchored
+    assert not [x for x in c.log if x.kind == "crew.all_hands"]
+
+
+def test_truth_7_631_strike_the_colours_strikes_her_colours_with_the_fighting_book_loaded():
+    """Card 5, the second mend. The fighting book carries a standing order named "the
+    colours" (data/standing_orders/fighting.orders), and the book's reading of a bare
+    sentence (`standing.grammar.bare_book_sentence`: `strike`, `show`, `belay`, `avast`,
+    `resume` before the whole name of a standing order, without quotes) ran before the
+    order's own: a captain who said `strike the colours` to an enemy was answered "Standing
+    order 'the colours' struck from the book." and fought on. One rule now, and no special
+    case: words without quotes that are a whole order of the vocabulary are that order; in
+    quotes, or with the words 'standing order', the sentence is the book's.
+
+    The first action as the harbour starts it, the fighting book loaded: `strike the
+    colours` strikes her colours and the standing order stays in the book; `strike colours`
+    and `strike her colours` (two synonyms of the vocabulary's data) the same; `show the
+    colours` is the colours' own order (the vocabulary's `hoist the colours`) and `show "the
+    colours"` shows the standing order; `belay the colours` is no order of the vocabulary and
+    stays the book's; `strike "the colours"` and `strike standing order "the colours"` strike
+    the standing order still."""
+
+    def game():
+        g = _harbour_game("data/scenarios/first-action.yaml")
+        assert "the colours" in g.ship.extra["standing"].book.names
+        return g
+
+    for words in (
+        "strike the colours",
+        "Strike the colours.",
+        "strike colours",
+        "strike her colours",
+    ):
+        w = game()
+        e = _said(w, words)
+        assert e.kind == "action.struck", (words, e.kind, e.text)
+        assert "struck" in w.ship.extra, words
+        assert "the colours" in w.ship.extra["standing"].book.names, words
+    for words in ('strike "the colours"', 'strike standing order "the colours"'):
+        w = game()
+        e = _said(w, words)
+        assert e.kind == "standing.struck", (words, e.kind, e.text)
+        assert "the colours" not in w.ship.extra["standing"].book.names, words
+        assert "struck" not in w.ship.extra, words
+    w = game()
+    e = _said(w, "show the colours")
+    assert e.kind.startswith("colours."), (e.kind, e.text)
+    e = _said(w, 'show "the colours"')
+    assert e.kind == "query.standing_orders" and 'Standing order "the colours"' in e.text
+    e = _said(w, "belay the colours")
+    assert e.kind == "standing.belayed", (e.kind, e.text)
+
+
+def _wheel_lost_at_seed_6():
+    """The first action at seed 6 as the harbour starts it, run to the shot that takes her
+    wheel (truth 7-626's own passage)."""
+    w = _harbour_game("data/scenarios/first-action.yaml", "--seed", "6")
+    for _ in range(90):
+        w.run(30)
+        if w.ship.extra.get("helm_lost"):
+            break
+    assert w.ship.extra.get("helm_lost"), "the wheel was not lost at seed 6 this time"
+    return w
+
+
+def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_rove():
+    """Card 5, the third mend, its first half. With the wheel shot away the rudder was held
+    where the shot left it (`physics.hull.steer`) and nothing else knew: `steer north-west`
+    was logged "Helm ordered", a tack began and missed stays. Now a helm order (a course,
+    full and by, the conning words) and a manoeuvre that drives the helm are refused in the
+    world's words, which say why and name the two orders that mend it; a standing order's
+    helm action meets the same refusal by the same road. The sail orders stand, and `heave
+    to` stands (tried with the helm dead, she comes to by her sails), its line saying that
+    the helm does not answer. With the tackles rove every one is taken again.
+
+    The first action at seed 6, the player at the prompt on the minute the wheel goes."""
+    from freesail.evolutions.scripts import HELM_LOST_WORDS
+
+    assert "'rig the relieving tackles'" in HELM_LOST_WORDS
+    assert "'repair the wheel'" in HELM_LOST_WORDS
+    w = _wheel_lost_at_seed_6()
+    held = float(w.ship.dyn.rudder)
+    refused = (
+        "steer north-west",
+        "full and by",
+        "steady",
+        "meet her",
+        "right the helm",
+        "helm a-lee",
+        "helm a-weather",
+        "tack",
+        "wear ship",
+        "shape a course for Falmouth",
+    )
+    for order in refused:
+        e = _said(w, order)
+        assert e.kind == "order.rejected" and e.text.endswith(HELM_LOST_WORDS), (order, e.text)
+    e = _said(w, 'standing order "by the wind": every 1 minute then steer north-west')
+    assert e.kind != "order.rejected", e.text
+    at = w.clock.tick
+    w.run(130)
+    fired = [x for x in w.log if x.tick > at and x.kind == "order.rejected"]
+    assert fired and all(x.text.endswith(HELM_LOST_WORDS) for x in fired), [x.text for x in fired]
+    assert not [x for x in w.log if x.tick > at and x.kind == "helm.order"]
+    assert _said(w, 'strike standing order "by the wind"').kind == "standing.struck"
+    assert abs(float(w.ship.dyn.rudder) - held) < 1e-9, "the rudder moved with the wheel gone"
+    e = _said(w, "trim the sheets")
+    assert e.kind != "order.rejected", e.text
+    e = _said(w, "heave to")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    said = [x.text for x in w.log if x.kind == "evolution.step" and x.tick >= e.tick]
+    assert any("the helm not answering, the wheel shot away" in s for s in said), said
+    assert not any("helm a-lee" in s for s in said), said
+
+
+def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it_is_repaired():
+    """Card 5, the third mend, its second half. The relieving tackles rove, she answered
+    exactly as by the wheel: nothing read them. Now the helmsman's rate by the tackles is a
+    share of the wheel's (`helm_rate_share` of data/evolutions/relieving_tackles.yaml, a
+    half: that it is slower is Luce's, the figure a JUDGEMENT said as one in the file's
+    `source:`), and `repair the wheel` is a repair evolution of its own (repair_wheel.yaml,
+    half an hour, JUDGEMENT): at its end she steers by the wheel at the wheel's rate and the
+    tackles are cast off. No equation of the hull is touched: the rate is the helm's.
+
+    The first action at seed 6. The rudder's travel in five seconds towards an order hard
+    over, read twice: by the tackles, half the wheel's; the wheel repaired,
+    the wheel's own (her file's five degrees a second). `repair the wheel` given twice is
+    said once; with the wheel whole it is refused in words; the wheel made good, the
+    relieving tackles are no longer wanted."""
+    import yaml
+
+    spec = yaml.safe_load(open("data/evolutions/relieving_tackles.yaml", encoding="utf-8"))
+    assert spec["timing"]["helm_rate_share"] == 0.5
+    assert "JUDGEMENT" in spec["source"] and "Luce 1884" in spec["source"]
+    mend = yaml.safe_load(open("data/evolutions/repair_wheel.yaml", encoding="utf-8"))
+    assert "JUDGEMENT" in mend["source"] and "Luce 1884" in mend["source"]
+    w = _wheel_lost_at_seed_6()
+    ship = w.ship
+    rate = math.radians(float(ship.hull.spec.rudder.rate_deg_s))
+
+    def travel() -> float:
+        """Radians the rudder goes in five seconds from where it lies towards hard over
+        the other way, by the helm's own order (five, that the stop is not reached)."""
+        was = float(ship.dyn.rudder)
+        order = (
+            "helm a-lee"
+            if was * (1.0 if ship.dyn.tack == "starboard" else -1.0) <= 0
+            else ("helm a-weather")
+        )
+        e = _said(w, order)
+        assert e.kind == "helm.order", e.text
+        w.run(5)
+        return abs(float(ship.dyn.rudder) - was)
+
+    e = _said(w, "rig the relieving tackles")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(40):
+        w.run(30)
+        if not ship.extra.get("helm_lost"):
+            break
+    assert ship.extra.get("helm_by_tackles") and ship.extra.get("helm_rate_share") == 0.5
+    relieved = [x.text for x in w.log if x.kind == "helm.relieved"]
+    assert relieved and relieved[-1].endswith("more slowly than by the wheel."), relieved
+    assert _said(w, "right the helm").kind == "helm.order"
+    w.run(30)
+    by_tackles = travel()
+    assert by_tackles == pytest.approx(0.5 * rate * 5, rel=0.02), (by_tackles, rate)
+
+    e = _said(w, "repair the wheel")
+    assert e.kind != "order.rejected", e.text
+    w.run(5)
+    twice = _said(w, "repair the wheel")
+    assert twice.text.endswith("The hands are repairing the wheel already."), twice.text
+    for _ in range(200):
+        w.run(30)
+        if not ship.extra.get("helm_by_tackles"):
+            break
+    done = [x.text for x in w.log if x.kind == "helm.repaired"]
+    assert done == [
+        "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; "
+        "the relieving tackles are cast off."
+    ], done
+    assert not ship.extra.get("helm_lost") and not ship.extra.get("helm_by_tackles")
+    assert "helm_rate_share" not in ship.extra
+    assert _said(w, "right the helm").kind == "helm.order"
+    w.run(30)
+    by_wheel = travel()
+    assert by_wheel == pytest.approx(rate * 5, rel=0.02), (by_wheel, rate)
+    assert by_tackles == pytest.approx(0.5 * by_wheel, rel=0.03)
+    whole = _said(w, "repair the wheel")
+    assert whole.kind == "order.rejected" and "the wheel is whole" in whole.text, whole.text
+    none = _said(w, "rig the relieving tackles")
+    assert none.kind == "order.rejected" and "no need of the relieving tackles" in none.text
+
+
+def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_would():
+    """Card 5, the third mend, the rules captain. Before: he asked for the tackles from
+    inside his repairs' own rules, so that he never rigged them lying to for weather, in
+    distress, with the wind at his shortening figure (thirty knots) and above, nor within
+    ten minutes of another repair's order (package 115 D's finding: his own rule, not the
+    evolution's, which has no wind limit); and he went on giving the helm its orders with
+    the rudder held. Now the tackles come before everything, whatever the weather; while
+    the wheel is lost and they are not rove he gives no helm order and begins no helm
+    manoeuvre; and the wheel's repair is his damage work in its turn, out of action.
+
+    The first action at seed 6 left to him: within a minute of the shot he orders the
+    tackles; no helm order of his is logged, taken or refused, until they are rove; he
+    steers again by them; and the action over he orders the wheel repaired. And the gale
+    trial of the station (`trial-station-gale`, an hour in, the wind over thirty knots),
+    her wheel lost as the hit leaves it (no shot is to be had in a gale: the hit's own
+    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too."""
+    w = _wheel_lost_at_seed_6()
+    lost = w.clock.tick
+    for _ in range(40):
+        w.run(30)
+        if not w.ship.extra.get("helm_lost"):
+            break
+    rove = [x.tick for x in w.log if x.kind == "helm.relieved"]
+    assert rove, "the captain never had the tackles rove"
+    his = [x for x in w.log if lost <= x.tick <= rove[0] and str(x.actor).startswith("captain")]
+    asked = [x for x in his if "rigging the relieving tackles" in x.text]
+    assert len(asked) == 1 and asked[0].tick - lost <= 60, [(x.tick - lost, x.text) for x in his]
+    helm = [x for x in his if x.kind == "helm.order" or "steering" in x.text]
+    assert not helm, [x.text for x in helm]
+    assert not [x for x in his if x.kind == "order.rejected"], [x.text for x in his]
+    w.run(3600)
+    after = [x for x in w.log if x.tick > rove[0] and str(x.actor).startswith("captain")]
+    assert [x for x in after if x.kind == "helm.order"], "he never steered by the tackles"
+    assert [x for x in after if "repairing the wheel" in x.text], [x.text for x in after][-8:]
+
+    from freesail import units as U
+    from tests.test_captain_trials import trial
+
+    g = trial("trial-station-gale", hours=1)
+    assert U.ms_to_knots(g.wind.speed) >= 30.0, U.ms_to_knots(g.wind.speed)
+    g.ship.extra["helm_lost"] = "the wheel shot away"
+    at = g.clock.tick
+    for _ in range(80):
+        g.run(30)
+        if not g.ship.extra.get("helm_lost"):
+            break
+    his = [x for x in g.log if x.tick >= at and str(x.actor).startswith("captain")]
+    assert [x for x in his if "rigging the relieving tackles" in x.text], [x.text for x in his]
+    assert g.ship.extra.get("helm_by_tackles") and not g.ship.extra.get("helm_lost")
+
+
+def test_truth_7_635_the_cruisers_prize_doctrine_is_under_thresholds_and_is_read():
+    """Card 5, the fourth mend. Thirteen keys of the cruiser's doctrine, the prize's
+    (package 74), were written under `stations:` in data/captains/cruiser.yaml, where
+    nothing read them as doctrine: `Doctrine.threshold` gave the code's defaults, and the
+    world's business took thirteen keys for thirteen nations of no war (the range audit's
+    finding `v-nation-unknown:cruiser.stations`, in its known list). Moved under
+    `thresholds:`; the revenue cutter's book, which is the cruiser's (tests/test_subtypes),
+    carries the same thirteen with the cruiser's values (the lead's leave of 2026-11-16).
+    Each of the seven that code reads has the value the code's default had, so that no
+    cruiser sails differently: the mend is that her doctrine is now hers to change.
+
+    Six of the thirteen are read by no code in any role (`mans_prizes`, `divide_prisoners`,
+    `prisoners_most`, `burns_when`, `worth_least`, `fit_least`): doctrine written and not
+    yet read, listed for the owner in docs/dev/TuningNotes.md and not built here."""
+    import yaml
+
+    from freesail.world import captains as C
+
+    keys = {
+        "mans_prizes",
+        "prize_crew_share",
+        "prize_crew_least",
+        "prize_master_from",
+        "divide_prisoners",
+        "prisoners_most",
+        "burns_when",
+        "worth_least",
+        "fit_least",
+        "prize_goal",
+        "prize_company",
+        "parole_accepted",
+        "prisoners_landed",
+    }
+    raw = yaml.safe_load(open("data/captains/cruiser.yaml", encoding="utf-8"))
+    assert set(raw["stations"]) == {"britain", "france", "spain", "batavian-republic"}
+    assert keys <= set(raw["thresholds"])
+    cruiser, revenue = C.load_doctrine("cruiser"), C.load_doctrine("revenue")
+    for doctrine in (cruiser, revenue):
+        assert keys <= set(doctrine.thresholds)
+    assert {k: revenue.thresholds[k] for k in keys} == {k: cruiser.thresholds[k] for k in keys}
+    assert cruiser.threshold("prize_crew_share", None) == 0.1
+    assert cruiser.threshold("prize_crew_least", None) == 6
+    assert cruiser.threshold("prize_goal", None) == "the nearest friendly port"
+    assert str(cruiser.threshold("prize_company", "")).startswith("in company")
+    assert cruiser.threshold("parole_accepted", None) is True
+    assert cruiser.threshold("prisoners_landed", None) == "the first friendly port"
+    assert "lieutenant" in str(cruiser.threshold("prize_master_from", ""))
+
+
+def _foreign_socket(url: str, **kw):
+    """A socket opened on the game's server as a web page of another site opens one."""
+    import asyncio
+
+    import websockets
+
+    async def go():
+        async with websockets.connect(url, open_timeout=30, **kw) as ws:
+            return await asyncio.wait_for(ws.recv(), 30)
+
+    return asyncio.run(go())
+
+
+def test_truth_7_600_a_socket_from_another_page_or_without_the_mark_gets_nothing_and_moves_nothing(
+    tmp_path,
+):
+    """Package 115, part A, item 4 (the review's 5.7; `refute-05` finding 1): a web page of
+    another site opens the game's socket. Before, it was given the hello (the ship, the
+    snapshot, the log) and its orders were obeyed, a file read among them. Now a socket
+    from a foreign origin, one from the game's own origin without the game's mark, and one
+    carrying a wrong mark are each refused at the handshake (403), before the hello; the
+    game's log has not a line more for them. The game's own page, its origin and its mark,
+    is given the hello as before."""
+    pytest.importorskip("websockets")
+    from own_page import LiveGame
+    from websockets.exceptions import InvalidStatus
+
+    with LiveGame(tmp_path) as game:
+        before = game.log_texts()
+        ws = f"ws://{game.own}/ws"
+        tried = [
+            (ws + f"?page={game.mark}", {"origin": "http://evil.example"}),  # the mark stolen
+            (ws, {"origin": f"http://{game.own}"}),  # its own origin, no mark
+            (ws + "?page=not-the-mark", {"origin": f"http://{game.own}"}),
+            (ws, {}),  # no page at all
+        ]
+        for url, kw in tried:
+            with pytest.raises(InvalidStatus) as refused:
+                _foreign_socket(url, **kw)
+            assert refused.value.response.status_code == 403, url
+        # the Host asked of the socket too: a rebinding page's socket at its own name, its
+        # origin that name's and the stolen mark with it
+        evil = f"evil.example:{game.port}"
+        assert (
+            _raw_request(
+                game.port,
+                "GET",
+                f"/ws?page={game.mark}",
+                [f"Host: {evil}", f"Origin: http://{evil}", "Upgrade: websocket"]
+                + ["Connection: Upgrade", "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ=="]
+                + ["Sec-WebSocket-Version: 13"],
+            )
+            == 403
+        )
+        assert game.log_texts() == before
+        hello = json.loads(_foreign_socket(ws + f"?page={game.mark}", origin=f"http://{game.own}"))
+        assert hello["type"] == "hello" and "snapshot" in hello
+
+
+def test_truth_7_601_an_order_from_another_page_or_without_the_mark_is_refused_before_the_game(
+    tmp_path,
+):
+    """Package 115, part A, items 1 and 4: the routes that change anything are the game's
+    own page's. A POST of an order from a foreign origin, one with no mark (a program on the
+    machine, or a page whose request carries none), and one from a name that is not the
+    game's address (a page of another site made to resolve here: DNS rebinding) are each
+    refused in the game's words (403), and the game has not a line more: the order was not
+    given, the file it named not read. The same order from the game's own page is given.
+    The page itself is not served to the foreign name, so its mark cannot be read there."""
+    import httpx
+    from own_page import LiveGame
+
+    secret = tmp_path / "secret.txt"
+    secret.write_text("SECRET_TOKEN=abc123\n", encoding="utf-8")
+    order = {"text": f"read the standing orders from {secret}"}
+    with LiveGame(tmp_path) as game:
+        before = game.log_texts()
+        url = game.url + "/api/order"
+        refusals = [
+            httpx.post(url, json=order, headers={"origin": "http://evil.example"}, timeout=60),
+            httpx.post(
+                url,
+                json=order,
+                headers={"origin": "http://evil.example", "x-freesail-page": game.mark},
+                timeout=60,
+            ),
+            httpx.post(url, json=order, timeout=60),
+            httpx.post(
+                url,
+                json=order,
+                headers={"host": f"evil.example:{game.port}", "x-freesail-page": game.mark},
+                timeout=60,
+            ),
+            httpx.post(game.url + "/api/harbour/doors/1/stop", timeout=60),  # a body-less POST
+        ]
+        refusals.append(  # the page's cookie alone is no mark for an order
+            httpx.post(url, json=order, cookies={f"freesail-page-{game.port}": game.mark})
+        )
+        for r in refusals:
+            assert r.status_code == 403, r.text
+            assert "nothing was done" in r.json()["detail"] or "own address" in r.json()["detail"]
+            assert "SECRET" not in r.text
+        page = httpx.get(game.url + "/", headers={"host": f"evil.example:{game.port}"}, timeout=60)
+        assert page.status_code == 403 and game.mark not in page.text
+        after = game.log_texts()
+        assert after == before and not any("SECRET" in t for t in after)
+        with game.page() as c:
+            r = c.post("/api/order", json={"text": "hold"})
+        assert r.status_code == 200
+
+
+def test_truth_7_602_the_agents_doors_still_come_in_by_their_key_and_no_web_page_seats_one(
+    tmp_path,
+):
+    """Package 115, part A, the agents' doors: they have no page and carry no mark, and are
+    seated by the game's own rule with every later call carrying the seating's key (package
+    37g). A door on the machine (no origin, no mark, the game's address) is answered as
+    before; the same request from a web page of another site, or at a foreign name, is
+    refused before the game, so no page can seat a station."""
+    import httpx
+    from own_page import LiveGame
+
+    with LiveGame(tmp_path) as game:
+        door = httpx.get(game.url + "/api/agents", timeout=60)
+        assert door.status_code == 200 and "stations" in door.json()
+        foreign = httpx.post(
+            game.url + "/api/agents/captain",
+            json={"model_name": "a-page", "door": "api"},
+            headers={"origin": "http://evil.example"},
+            timeout=60,
+        )
+        assert foreign.status_code == 403
+        rebound = httpx.get(
+            game.url + "/api/agents", headers={"host": f"evil.example:{game.port}"}, timeout=60
+        )
+        assert rebound.status_code == 403
+        assert httpx.get(game.url + "/api/agents", timeout=60).json() == door.json()
+
+
+# The paths a player or a page might type, written as strings so that they mean the same on
+# Linux and on Windows: out by `..`, absolute, a Windows drive, a Windows share.
+_OUT_OF_THE_FOLDERS = (
+    "../outside",
+    "{tmp}/outside",
+    "C:\\Users\\someone\\outside",
+    "\\\\a-host\\a-share\\outside",
+)
+
+
+def test_truth_7_603_over_the_server_a_save_and_a_book_are_named_and_lie_in_the_games_folders(
+    tmp_path,
+):
+    """Package 115, part A, items 2 and 3 (`refute-05` finding 1): the order line over the
+    server, given by the game's own page. `save NAME` writes NAME.json and its checkpoint in
+    the saves place and the reply says where; a save by a path out of it (by `..`, absolute,
+    a Windows drive, a share) is refused in words that say where saves are kept, and nothing
+    is written. A book by such a path is refused before it is opened, so no line of it comes
+    back. The primer's own line, `read the standing orders from
+    data/standing_orders/starter.orders`, and the book by its name, are read as before."""
+    from own_page import LiveGame
+
+    secret = tmp_path / "outside.orders"
+    secret.write_text("SECRET_TOKEN=abc123\n", encoding="utf-8")
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+
+            def said(text: str) -> dict:
+                r = c.post("/api/order", json={"text": text})
+                assert r.status_code == 200, r.text
+                return r.json()
+
+            saved = said("save my-passage")
+            assert saved["kind"] == "driver.saved"
+            assert (game.saves / "my-passage.json").is_file()
+            assert (game.saves / "my-passage.checkpoint").is_file()
+            assert str(game.saves / "my-passage.json") in saved["text"]
+            before = sorted(p.name for p in tmp_path.rglob("*") if p.is_file())
+            for path in _OUT_OF_THE_FOLDERS:
+                given = path.format(tmp=tmp_path.as_posix())
+                refused = said(f"save {given}.json")
+                assert refused["kind"] == "driver.refused", given
+                assert "saved in the saves place" in refused["text"]
+                assert "save NAME" in refused["text"]
+                book = said(f"read the standing orders from {given}.orders")
+                assert book["kind"] == "driver.refused", given
+                assert "was not opened" in book["text"]
+            assert said(f"read the standing orders from {secret}")["kind"] == "driver.refused"
+            after = sorted(p.name for p in tmp_path.rglob("*") if p.is_file())
+            assert after == before
+            primer = said("read the standing orders from data/standing_orders/starter.orders")
+            assert primer["kind"] == "driver.standing_orders" and "Read 7" in primer["text"]
+            assert said("read the standing orders from fighting")["kind"] == (
+                "driver.standing_orders"
+            )
+        assert not any("SECRET" in t for t in game.log_texts())
+
+
+def test_truth_7_604_the_harbours_start_and_maker_open_files_in_the_games_folders_alone(tmp_path):
+    """Package 115, part A, item 2: the harbour's start and its scenario maker, from the
+    game's own page. A save in the saves place is taken up by its name; one outside the
+    saves place and the game's folder is refused in words that say the two ways it still
+    loads, and is not opened; so is a scenario, a ship's file or a book by a path out of the
+    folders, and a scenario the maker is to prove whose ship's file lies outside."""
+    from own_page import LiveGame
+
+    outside = tmp_path / "elsewhere"
+    outside.mkdir()
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+            assert c.post("/api/order", json={"text": "save kept"}).json()["kind"] == (
+                "driver.saved"
+            )
+            (outside / "stranger.json").write_bytes((game.saves / "kept.json").read_bytes())
+            started = c.post("/api/harbour/start", json={"load": "kept"})
+            assert started.status_code == 200, started.text
+            for choice in (
+                {"load": str(outside / "stranger.json")},
+                {"load": "..\\elsewhere\\stranger.json"},
+                {"scenario": str(outside / "s.yaml")},
+                {"scenario": "C:\\scenarios\\s.yaml"},
+                {"ship": "\\\\a-host\\share\\ship.yaml"},
+                {"scenario": "data/scenarios/lesson-falmouth.yaml", "standing_orders": "../x"},
+            ):
+                r = c.post("/api/harbour/start", json=choice)
+                assert r.status_code == 403, (choice, r.text)
+            words = c.post("/api/harbour/start", json={"load": str(outside / "stranger.json")})
+            assert "move it into the saves place" in words.json()["detail"]
+            assert "--load PATH" in words.json()["detail"]
+            fields = c.get(
+                "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+            ).json()["fields"]
+            (outside / "brief.yaml").write_text("name: outside\n", encoding="utf-8")
+            (outside / "book.orders").write_text("trim sails\n", encoding="utf-8")
+            r = c.post(
+                "/api/harbour/start",
+                json={
+                    "scenario": "data/scenarios/lesson-falmouth.yaml",
+                    "director_brief": str(outside / "brief.yaml"),
+                },
+            )
+            assert r.status_code == 403 and "was not opened" in r.json()["detail"]
+            for key, value in (
+                ("ship", str(outside / "ship.yaml")),
+                ("standing_orders", [str(outside / "book.orders")]),
+                ("director", {"brief": str(outside / "brief.yaml")}),
+            ):
+                f = json.loads(json.dumps(fields))
+                if key == "ship":
+                    f["ship"]["file"] = value
+                else:
+                    f[key] = value
+                proved = c.post("/api/harbour/scenario/prove", json={"fields": f})
+                assert proved.status_code == 403, (key, proved.text)
+                assert "was not opened" in proved.json()["detail"]
+
+
+def test_truth_7_609_another_device_opens_the_printed_address_and_not_the_machines_programs(
+    tmp_path,
+):
+    """Package 115, part A, items 1 and the lead's ruling 6: bound beyond the machine
+    (`--host 0.0.0.0`), the terminal prints the address another device opens, which carries
+    the game's mark. A request from another device's address without it is refused, the
+    page among them; with it the page is served and keeps the mark for its later loads. The
+    harbour's routes that write the settings, the desktop client's file or a shortcut, or
+    start a door, are refused to the other device, mark or no mark, and answered on the
+    machine itself. The requests come through the whole app with another device's address
+    as the client (the container that runs the suite has no second device)."""
+    from own_page import ON_THE_MACHINE, PageClient
+
+    from freesail.ui.server import Driver, create_app, elsewhere_words
+
+    world = World(seed=1805, scenario=Scenario())
+    app = create_app(Driver(world), hosts=("0.0.0.0",), saves_dir=tmp_path / "saves")
+    mark = app.state.guard.token
+    (line,) = elsewhere_words(app.state.guard, "0.0.0.0", 8000, "/harbour")
+    assert f"/harbour?page={mark}" in line and "From another device" in line
+    from fastapi.testclient import TestClient
+
+    device = ("192.0.2.7", 50000)
+    with TestClient(app, base_url="http://192.0.2.1:8000", client=device) as other:
+        assert other.get("/harbour").status_code == 403
+        assert other.get("/api/state").status_code == 403
+        page = other.get(f"/harbour?page={mark}")
+        assert page.status_code == 200 and mark in page.text
+        assert other.get("/api/harbour/state").status_code == 200  # the cookie kept it
+        own = {"x-freesail-page": mark, "origin": "http://192.0.2.1:8000"}
+        for route, body in (
+            ("/api/harbour/settings", {"settings": {}}),
+            ("/api/harbour/desktop", {"stations": ["captain"], "write": True}),
+            ("/api/harbour/shortcut", {"write": True}),
+            ("/api/harbour/doors", {"door": "local", "station": "captain"}),
+        ):
+            r = other.post(route, json=body, headers=own)
+            assert r.status_code == 403 and "machine the game runs on" in r.text, route
+        assert other.post("/api/order", json={"text": "hold"}, headers=own).status_code == 200
+    with PageClient(app, client=ON_THE_MACHINE) as here:
+        r = here.post("/api/harbour/shortcut", json={})
+        assert r.status_code == 200
+
+
+def _hand_made_checkpoint(module: bytes, name: bytes, args: tuple[str, ...] = ()) -> bytes:
+    """The review's hand-made checkpoint (`probes/checkpoint-allow-list.py`): a pickle that
+    names `module`.`name` and calls it with `args`, written as a pickle is, by hand."""
+    import pickle
+
+    out = pickle.PROTO + b"\x04"
+    for part in (module, name):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL + pickle.MARK
+    for a in args:
+        b = a.encode("utf-8")
+        out += pickle.BINUNICODE + len(b).to_bytes(4, "little") + b
+    return out + pickle.TUPLE + pickle.REDUCE + pickle.STOP
+
+
+def _getattr_checkpoint(module: bytes, name: bytes, attribute: bytes) -> bytes:
+    """A hand-made checkpoint that asks `getattr` of a name the list admits."""
+    import pickle
+
+    out = pickle.PROTO + b"\x04"
+    for part in (b"builtins", b"getattr"):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL
+    for part in (module, name):
+        out += pickle.SHORT_BINUNICODE + bytes([len(part)]) + part
+    out += pickle.STACK_GLOBAL + pickle.SHORT_BINUNICODE + bytes([len(attribute)]) + attribute
+    return out + pickle.TUPLE2 + pickle.REDUCE + pickle.STOP
+
+
+def test_truth_7_605_a_hand_made_checkpoint_beside_a_save_runs_nothing_and_the_save_is_replayed(
+    tmp_path,
+):
+    """Package 115, part B, items 1 and 2 (the review's 5.4): a save of the game's own, its
+    checkpoint replaced on the disk by a hand-made one under the save's own header, so that
+    it is taken for the save's, and the save taken up by `--load` as a player takes it up.
+    Before, the loader admitted any name in any module of the game, and `getattr`: the
+    reviewer's checkpoint called `os.getcwd` through `freesail.settings`. Now each road is
+    refused (a function of the operating system through a module of the game; a module the
+    list once admitted whole, numpy; `getattr` of an admitted class), nothing is run (the
+    folder the payload would make is not made), the load says the checkpoint could not be
+    read and why, and the save is replayed from its journal to the same log."""
+    import gzip
+
+    from freesail.core import replay
+    from freesail.ui.server import prepare_game, server_parser
+
+    save = tmp_path / "mine.json"
+    world = prepare_game(
+        server_parser().parse_args(["--scenario", "data/scenarios/lesson-falmouth.yaml"]),
+        say=lambda _l: None,
+    )
+    world.run(60)
+    replay.save_to_file(world, save)
+    cp = replay.checkpoint_path(save)
+    with gzip.open(cp, "rb") as f:
+        header = f.readline()
+    made = tmp_path / "made-by-the-checkpoint"
+    payloads = [
+        _hand_made_checkpoint(b"freesail.settings", b"os.mkdir", (str(made),)),
+        _hand_made_checkpoint(b"freesail.core.replay", b"pickle.loads", ("x",)),
+        _hand_made_checkpoint(b"numpy", b"load", (str(save),)),
+        _hand_made_checkpoint(b"os", b"mkdir", (str(made),)),
+        _getattr_checkpoint(b"collections", b"deque", b"__reduce__"),
+        _getattr_checkpoint(b"freesail.core.world", b"World", b"mro"),
+    ]
+    for payload in payloads:
+        with gzip.open(cp, "wb") as f:
+            f.write(header + payload)
+        loaded = prepare_game(server_parser().parse_args(["--load", str(save)]), say=lambda _l: 0)
+        report = loaded.load_report
+        assert report.how == "replay", report
+        assert replay.COULD_NOT_BE_READ in report.checkpoint
+        assert "may not hold" in report.checkpoint
+        assert not made.exists()
+        assert loaded.log.digest() == world.log.digest()
+
+
+def _census_cases():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import checkpoint_names as C
+
+    cases = [
+        pytest.param("fixture", p, 0, (), id=p.name)
+        for p in sorted(C.FIXTURES.glob("*.checkpoint"))
+    ]
+    cases += [pytest.param("scenario", p, C.RUN_S, (), id=p.name) for p in C.scenario_files()]
+    cases += [
+        pytest.param("scenario", C.SCENARIOS / n, run_s, orders, id=what)
+        for what, n, run_s, orders in C.WORLDS
+    ]
+    cases += [pytest.param("wardroom", None, 0, (), id="the-wardroom")]
+    cases += [pytest.param("practice", None, 0, (), id="a-practice-at-the-great-guns")]
+    cases += [pytest.param("boat", None, 0, (), id="a-boat-away-under-oars-and-sail")]
+    cases += [pytest.param("kin", None, 0, (), id="the-list-holds-its-kin")]
+    return cases
+
+
+@pytest.mark.parametrize(("kind", "path", "run_s", "orders"), _census_cases())
+def test_truth_7_606_every_checkpoint_of_the_games_own_holds_only_names_the_list_admits(
+    kind, path, run_s, orders
+):
+    """Package 115, part B, item 1: the loader's list is exact and made from what the
+    game's own checkpoints hold. Each checkpoint of the census (`tools/checkpoint_names.py`:
+    every scenario begun as the harbour begins it and run ten minutes, the kept saves, a
+    fight with the guns cast loose and fired, a port, the far world, the wardroom with its
+    stations seated) is read with every name
+    it calls recorded, and every name is one the list admits; a class new to a checkpoint
+    fails here until it is added to the list on purpose, by the tool. `getattr` is admitted
+    only for the bound methods the older checkpoints hold, each by its class and name."""
+    import checkpoint_names as C
+
+    from freesail.core.checkpoint_names import ADMITTED
+
+    if kind == "boat":
+        names = C.census_of_boat()
+    elif kind == "practice":
+        names = C.census_of_practice()
+    elif kind == "kin":
+        names = C.kin(set(ADMITTED))  # every class of the game kin to one the list admits
+    elif kind == "wardroom":
+        names = C.census_of_wardroom()
+    elif kind == "fixture":
+        names = C.names_of_file(path)
+    else:
+        names = C.census_of_scenario(path, run_s, orders)
+    lacking = sorted(names - ADMITTED - {("builtins", "getattr")})
+    where = path.name if path is not None else kind
+    assert not lacking, f"{where} holds names the list lacks: {lacking}"
+
+
+def test_truth_7_607_every_kept_save_loads_from_its_checkpoint_as_before():
+    """Package 115, part B, item 2: every kept save under `tests/fixtures/saves/` is taken
+    up from its checkpoint, as before the list was made exact (not passed over for a replay
+    because a name was refused), and the bare checkpoint without a save is read whole."""
+    from freesail.core import replay
+
+    saves = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "saves"
+    for save in sorted(saves.glob("*.json")):
+        world, report = replay.load_report(save, replay_anyway=True)
+        assert report.how == "checkpoint", (save.name, report.why)
+    for cp in sorted(saves.glob("*.checkpoint")):
+        if not cp.with_suffix(".json").exists():
+            header, world = replay.read_checkpoint(cp)
+            assert header["end_tick"] == world.clock.tick
+
+
+def test_truth_7_608_an_act_in_a_save_names_a_record_of_the_game_or_nothing_is_made(tmp_path):
+    """Package 115, part B, item 3 (where else): a save's acts (`core/acts.py`) name the
+    game's records by module and name, and the loader walked the name through whatever the
+    module imports, as the checkpoint did, and made what it found. A save of the game's own
+    with the scripted watcher at his station, marked as another build's (so that it is
+    replayed by its stations' acts, as an older save is), an act added to it by hand on the
+    disk whose line carries a walk out of the module
+    (`freesail.settings:os.environ`), a class imported from elsewhere
+    (`freesail.core.acts:dataclasses.Field`), a function, or a method of a record, and taken
+    up by `--load` as a player takes it up, is refused in words and nothing of it is made;
+    the same save without the act is replayed by its acts as before."""
+    from freesail.core import replay
+    from freesail.ui.server import prepare_game, server_parser
+
+    world = prepare_game(
+        server_parser().parse_args(
+            ["--scenario", "data/scenarios/lesson-falmouth.yaml", "--watcher", "fake"]
+        ),
+        say=lambda _l: None,
+    )
+    world.run(60)
+    save = tmp_path / "mine.json"
+    replay.save_to_file(world, save, checkpoint=False)
+    kept = json.loads(save.read_text(encoding="utf-8"))
+
+    def with_act(named: str) -> Path:
+        data = json.loads(json.dumps(kept))
+        data["build"] = {"name": "an-older-build", "rules": "0000000000000000"}
+        data["builds"] = [data["build"]]
+        line = {
+            "severity": "routine",
+            "kind": "director.note",
+            "text": "A line of a hand-made act.",
+            "actor": "director",
+            "data": {"what": {"__class__": named, "fields": {"words": "a bell"}}},
+        }
+        data.setdefault("station_acts", []).append(
+            {"tick": 30, "after_inputs": 0, "station": "watcher", "line": line}
+        )
+        path = tmp_path / "made.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        return path
+
+    for named in (
+        "freesail.settings:os.environ",
+        "freesail.core.acts:dataclasses.Field",
+        "freesail.core.acts:decode",
+        "freesail.agents.agent:StandBy.__init__",
+    ):
+        with pytest.raises(SystemExit, match="no record of the game"):
+            prepare_game(
+                server_parser().parse_args(["--load", str(with_act(named)), "--replay-anyway"]),
+                say=lambda _l: None,
+            )
+    # the same save without the hand-made act is replayed by its acts, the watcher seated
+    data = json.loads(json.dumps(kept))
+    data["build"] = {"name": "an-older-build", "rules": "0000000000000000"}
+    data["builds"] = [data["build"]]
+    plain = tmp_path / "plain.json"
+    plain.write_text(json.dumps(data), encoding="utf-8")
+    loaded = prepare_game(
+        server_parser().parse_args(["--load", str(plain), "--replay-anyway"]),
+        say=lambda _l: None,
+    )
+    assert "watcher" in loaded.agents and loaded.log.digest() == world.log.digest()
+
+
+def _outside_files(tmp_path):
+    """Files out of every folder of the game's, each holding a line that must never come
+    back: a brief, a book, a save, a scenario, a ship's file."""
+    out = tmp_path / "outside"
+    out.mkdir()
+    for leaf in ("secret.yaml", "secret.orders", "secret.json"):
+        (out / leaf).write_text("name: SENTINEL-OUTSIDE-115\n", encoding="utf-8")
+    return out
+
+
+def test_truth_7_610_every_name_a_browser_sends_is_a_name_and_finds_its_file_in_its_folder(
+    tmp_path,
+):
+    """Package 115, part A, the reader's finding 1: the director's starter briefs were found
+    by joining the player's words to their folder, so that `director: brief
+    /some/file.yaml` and `director: brief ../../some/file` read a file anywhere and said its
+    name. One rule now (`core.names`): a name is a name, and what it finds lies in its
+    folder. Every road by which a browser's words become a file is tried here, from the
+    game's own page (its mark and origin), with `..`, an absolute path and a separator of
+    either system, at files planted out of the folders: the order line's brief and book,
+    the harbour's start (brief, book, scenario, ship, save), the maker's ship, books and
+    brief, the harbour's scenario reader and chart, the library, the pictures, the marks,
+    the agents' stations. None gives back the planted line, none says it was taken; the
+    order line's and the harbour's refusals are in the game's words. A starter by its name,
+    a book by its name, and a save by its name are found as before."""
+    from own_page import LiveGame
+
+    out = _outside_files(tmp_path)
+    up = "../" * 12 + out.relative_to(out.anchor).as_posix()
+    tries = [
+        f"{out}/secret",
+        f"{out}/secret.yaml",
+        up + "/secret",
+        up + "/secret.yaml",
+        "..\\..\\..\\outside\\secret",
+        "C:\\outside\\secret.yaml",
+    ]
+    with LiveGame(
+        tmp_path, "--scenario", str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    ) as game:
+        with game.page() as c:
+            answers = []
+            for t in tries:
+                brief = c.post("/api/order", json={"text": f"director: brief {t}"}).json()
+                assert "was not taken" in brief["text"], (t, brief["text"])
+                answers.append(brief["text"])
+                book = c.post("/api/order", json={"text": f"read the standing orders from {t}"})
+                assert book.json()["kind"] == "driver.refused", t
+                answers.append(book.text)
+                for choice in (
+                    {"scenario": "data/scenarios/lesson-falmouth.yaml", "director_brief": t},
+                    {"scenario": "data/scenarios/lesson-falmouth.yaml", "standing_orders": t},
+                    {"scenario": t},
+                    {"ship": t},
+                    {"load": t},
+                ):
+                    r = c.post("/api/harbour/start", json=choice)
+                    assert r.status_code in (403, 400), (choice, r.text)
+                    answers.append(r.text)
+                fields = c.get(
+                    "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+                ).json()["fields"]
+                for key in ("ship", "standing_orders", "director"):
+                    f = json.loads(json.dumps(fields))
+                    if key == "ship":
+                        f["ship"]["file"] = t
+                    elif key == "standing_orders":
+                        f["standing_orders"] = [t]
+                    else:
+                        f["director"] = {"brief": t}
+                    r = c.post("/api/harbour/scenario/prove", json={"fields": f})
+                    assert r.status_code == 403, (key, t, r.text)
+                    answers.append(r.text)
+                for route, params in (
+                    ("/api/harbour/scenario", {"path": t}),
+                    ("/api/harbour/chart", {"region": t}),
+                    ("/api/library", {"topic": t}),
+                    ("/api/library", {"topic": "primer", "section": t}),
+                ):
+                    r = c.get(route, params=params)
+                    assert r.status_code in (200, 400, 403, 404), (route, t)
+                    answers.append(r.text)
+                for path in (f"/api/picture/{t}", f"/api/marks/{t}", f"/api/agents/{t}"):
+                    r = c.post(path) if "picture" in path else c.delete(path)
+                    answers.append(r.text)
+            assert not any("SENTINEL-OUTSIDE-115" in a for a in answers)
+            assert not any("brief is given" in a for a in answers)
+            # the names, as before
+            assert (
+                "brief is given"
+                in c.post("/api/order", json={"text": "director: brief quiet-passage"}).json()[
+                    "text"
+                ]
+            )
+            assert (
+                c.post("/api/order", json={"text": "read the standing orders from starter"}).json()[
+                    "kind"
+                ]
+                == "driver.standing_orders"
+            )
+            assert (
+                c.post("/api/order", json={"text": "save by-name"}).json()["kind"] == "driver.saved"
+            )
+            assert c.post("/api/harbour/start", json={"load": "by-name"}).status_code == 200
+
+
+def test_truth_7_611_the_maker_opens_the_file_it_checked_from_whatever_folder_it_was_started(
+    tmp_path,
+):
+    """Package 115, part A, the reader's finding 2: the scenario maker checked a book's path
+    from the game's folder and opened it from the server's working folder. The server run
+    from a scratch folder that holds its own `data/standing_orders/starter.orders`, its one
+    line an order no ship takes. First the maker is shown to read the books it is named: a
+    book of the player's own holding such a line is refused in the maker's words, the line
+    named. Then it proves a scenario whose book is the game's
+    `data/standing_orders/starter.orders`: the proof passes whole (her ship's file and the
+    book both found where they were checked; the game's book, fitted to her rig, holds no
+    order she refuses: part D's) and the planted line is nowhere in it, so the book read was
+    the game's. Before, the ship's file and the book were opened from the scratch folder:
+    the proof failed (no such ship file there), or read the planted book. The scenario's
+    text comes back in the player's own words."""
+    from own_page import LiveGame
+
+    planted = tmp_path / "data" / "standing_orders"
+    planted.mkdir(parents=True)
+    (planted / "starter.orders").write_text("SENTINEL-CWD-115 is no order\n", encoding="utf-8")
+    with LiveGame(tmp_path, module="freesail.ui.server") as game:
+        own = game.settings.parent / "scenarios"
+        own.mkdir(parents=True, exist_ok=True)
+        (own / "mine.orders").write_text("SENTINEL-READ-115 is no order\n", encoding="utf-8")
+        with game.page() as c:
+            fields = c.get(
+                "/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"}
+            ).json()["fields"]
+            fields["standing_orders"] = [str(own / "mine.orders")]
+            read = c.post("/api/harbour/scenario/prove", json={"fields": fields})
+            fields["standing_orders"] = ["data/standing_orders/starter.orders"]
+            r = c.post("/api/harbour/scenario/prove", json={"fields": fields})
+    assert read.status_code == 400 and "SENTINEL-READ-115" in read.text, read.text
+    assert r.status_code == 200, r.text
+    assert "SENTINEL-CWD-115" not in r.text
+    text = r.json()["text"]
+    assert "file: data/ships/smack.yaml" in text
+    assert "standing_orders: [data/standing_orders/starter.orders]" in text
+
+
+def _raw_request(port: int, method: str, path: str, headers: list[str], body: bytes = b"") -> int:
+    """A request written by hand on a socket, as no well-behaved client writes one (a
+    header twice, a Host of another name on a socket's opening): its status."""
+    import socket
+
+    head = [f"{method} {path} HTTP/1.1", *headers]
+    if body:
+        head += ["Content-Type: application/json", f"Content-Length: {len(body)}"]
+    if not any(h.lower().startswith("connection:") for h in headers):
+        head.append("Connection: close")
+    head += ["", ""]
+    with socket.create_connection(("127.0.0.1", port), timeout=60) as s:
+        s.sendall("\r\n".join(head).encode("latin-1") + body)
+        first = s.recv(64).decode("latin-1")
+    return int(first.split()[1])
+
+
+def _raw_post(port: int, path: str, headers: list[str], body: bytes) -> int:
+    return _raw_request(port, "POST", path, headers, body)
+
+
+def test_truth_7_612_the_guards_small_doors_shut(tmp_path):
+    """Package 115, part A, the reader's finding 3 and 4: the director's log revealed by
+    another page of the same machine with the cookie alone (an image's request, no origin)
+    is refused, and with the mark in the request is given; a request that carries its Host
+    or its Origin twice is refused; a mark of characters outside ASCII is refused, not an
+    error; and the machine itself seen as `::ffff:127.0.0.1` is the machine."""
+    import httpx
+    from own_page import LiveGame
+
+    from freesail.ui.guard import Guard, _loopback
+
+    assert _loopback("::ffff:127.0.0.1") and _loopback("127.0.0.1") and not _loopback("192.0.2.7")
+    with LiveGame(tmp_path) as game:
+        cookie = {f"freesail-page-{game.port}": game.mark}
+        r = httpx.get(game.url + "/api/director/log", cookies=cookie, timeout=60)
+        assert r.status_code == 403 and "entries" not in r.text
+        bare = httpx.get(game.url + "/api/director/log", timeout=60)  # no mark, no cookie
+        assert bare.status_code == 403 and "entries" not in bare.text
+        with game.page() as c:
+            assert c.get("/api/director/log").status_code == 200
+        body = b'{"text": "hold"}'
+        for doubled in (
+            [f"Host: {game.own}", f"Host: evil.example:{game.port}"],
+            [f"Host: {game.own}", f"Origin: http://{game.own}", "Origin: http://evil.example"],
+        ):
+            status = _raw_post(
+                game.port, "/api/order", doubled + [f"X-FreeSail-Page: {game.mark}"], body
+            )
+            assert status == 403, doubled
+        odd = httpx.post(
+            game.url + "/api/order",
+            params={"page": "\u00e9\u00e9"},
+            json={"text": "hold"},
+            timeout=60,
+        )
+        assert odd.status_code == 403
+    assert not Guard(token="x").mark_ok("\u00e9")
+
+
+def _link(link: Path, target: Path) -> bool:
+    """A symbolic link made as a stranger's save folder could hold one; False where this
+    system will not let this user make one (Windows without the right), and then no link
+    can lead out of a folder here either."""
+    import os
+
+    try:
+        os.symlink(target, link)
+    except (OSError, NotImplementedError):
+        return False
+    return True
+
+
+def test_truth_7_613_a_save_and_a_load_open_the_file_they_checked_and_no_link_leads_out(tmp_path):
+    """Package 115, part A, the second reader's findings 1, 6 and 7: the save checked its
+    path before it added `.json`, and the checkpoint beside it was never checked, so links
+    in the saves place led a save out of it, and the harbour's load took any file of the
+    game's folder. Through the order line and the harbour, from the game's own page: a save
+    named for a link to a file outside, for a dangling link, and a save whose checkpoint's
+    name is a link out are each refused and write nothing outside; a load named for a link
+    out is refused; the load of a file of the game's folder that is no save (`pyproject.toml`,
+    the server's own code) is refused before it is opened; a NUL in a name and a name too
+    long for the system are refused in words, at the order line and the harbour, never an
+    error of the server. Where the system lets no link be made, the links are not tried
+    (none can lead out here) and the rest is."""
+    from own_page import LiveGame
+
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    victim = outside / "victim.json"
+    victim.write_text("SENTINEL-VICTIM-115", encoding="utf-8")
+    lesson = str(HARBOUR_ROOT / "data/scenarios/lesson-falmouth.yaml")
+    with LiveGame(tmp_path, "--scenario", lesson) as game:
+        links = (
+            _link(game.saves / "linkvictim.json", victim)
+            and _link(game.saves / "dangling.json", outside / "made.json")
+            and _link(game.saves / "plain.checkpoint", outside / "plain.checkpoint")
+        )
+        with game.page() as c:
+
+            def said(text: str) -> dict:
+                r = c.post("/api/order", json={"text": text})
+                assert r.status_code == 200, r.text
+                return r.json()
+
+            if links:
+                for name in ("linkvictim", "dangling", "plain"):
+                    assert said(f"save {name}")["kind"] == "driver.refused", name
+                assert victim.read_text(encoding="utf-8") == "SENTINEL-VICTIM-115"
+                assert not (outside / "made.json").exists()
+                assert not (outside / "plain.checkpoint").exists()
+                r = c.post("/api/harbour/start", json={"load": "linkvictim"})
+                assert r.status_code == 403 and "SENTINEL" not in r.text
+            for given in (
+                "pyproject.toml",
+                "./pyproject.toml",  # a path to a file lying in the game's folder: no save
+                "freesail/ui/guard.py",
+                "data/ships/cutter.yaml",
+            ):
+                r = c.post("/api/harbour/start", json={"load": given})
+                assert r.status_code == 403, (given, r.text)
+                assert "a .json file" in r.json()["detail"]
+            for word in ("a\x00b", "x" * 5000):
+                assert said(f"save {word}")["kind"] == "driver.refused"
+                assert said(f"read the standing orders from {word}")["kind"] == "driver.refused"
+                for choice in ({"load": word}, {"scenario": word}, {"ship": word}):
+                    r = c.post("/api/harbour/start", json=choice)
+                    assert r.status_code in (400, 403), (choice, r.status_code)
+            assert said("save kept")["kind"] == "driver.saved"  # a plain name, as before
+
+
+def test_truth_7_614_a_door_from_another_device_comes_with_the_mark_and_on_the_machine_as_before(
+    tmp_path,
+):
+    """Package 115, part A, the second reader's finding 2: off the machine, the doors were
+    open to anyone who could reach the port (`--host 0.0.0.0`, a program on another address
+    seating the captain with no mark). From another device's address a door's seating is
+    refused without the mark, nothing asked of the game, and taken with it; on the machine
+    itself a door comes in with no mark as before. Through the whole app with another
+    device's address as its client (the container has no second device)."""
+    from fastapi.testclient import TestClient
+    from own_page import ON_THE_MACHINE
+
+    from freesail.ui.server import Driver, create_app
+
+    world = World(seed=1805, scenario=Scenario())
+    app = create_app(
+        Driver(world),
+        hosts=("0.0.0.0",),
+        saves_dir=tmp_path / "saves",
+        consent_records=tmp_path / "consent",
+    )
+    mark = app.state.guard.token
+    seat = {"model_name": "lan-program", "door": "api"}
+    with TestClient(app, base_url="http://192.0.2.1:8000", client=("192.0.2.7", 50000)) as other:
+        r = other.post("/api/agents/captain", json=seat)
+        assert r.status_code == 403 and "no station was touched" in r.text
+        assert other.get("/api/agents").status_code == 403
+        assert not any("lan-program" in e.text for e in world.log)
+        marked = other.post("/api/agents/captain", json=seat, headers={"x-freesail-page": mark})
+        assert marked.status_code != 403
+    with TestClient(app, base_url="http://localhost:8000", client=ON_THE_MACHINE) as here:
+        assert here.get("/api/agents").status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Package 96b: the harbour, built (docs/design/Design-Harbour.md §4; truths 7-402 to 7-419)
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_402_the_harbours_list_is_by_shelf_and_the_tests_scenarios_are_off_it(tmp_path):
+    """Package 96b, step 1 (docs/design/Design-Harbour.md §3.2; the cold review of
+    milestone 7, 1.5 and 5.3 item 14: forty-seven scenarios in alphabetical order, "The
+    gate's day" beside "The first action", the ship's boats among the ships). The harbour's
+    catalogue gives every scenario of the game a shelf the shelves' file names, none left
+    unsorted; the game to begin with first and the lessons after it, in the primer's
+    order; the gates' days and the acceptance walks on the one shelf marked to be shown
+    only when asked for; every other shelf shown; and no ship's boat among the ships a
+    bare game starts in. The shelves are read from a file of the page's own
+    (`client/harbour-shelves.yaml`), outside `data/` altogether, so that no scenario file
+    was changed to sort them and a re-sorting moves neither the range's audit nor the
+    rules' stamp of a save."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import GAME_SCENARIOS, SHELVES_FILE, Harbour
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    cat = harbour.catalogue()
+    assert GAME_SCENARIOS not in SHELVES_FILE.parents
+    assert HARBOUR_ROOT / "data" not in SHELVES_FILE.parents
+    shelves = {s["id"]: s for s in cat["shelves"]}
+    assert "unsorted" not in shelves and "yours" not in shelves
+    assert [s["id"] for s in cat["shelves"] if s["hidden"]] == ["tests"]
+    game = {Path(s["path"]).stem: s for s in cat["scenarios"]}
+    assert set(game) == {p.stem for p in GAME_SCENARIOS.glob("*.yaml")}
+    assert all(s["shelf"] in shelves and s["says"] for s in game.values())
+    assert [Path(s["path"]).stem for s in cat["scenarios"][:5]] == [
+        "first-passage",
+        "lesson-landfall",
+        "lesson-reckoning",
+        "lesson-falmouth",
+        "lesson-lee-shore",
+    ]
+    kept = {n for n, s in game.items() if s["shelf"] == "tests"}
+    assert {n for n in game if n.startswith("gate-")} <= kept
+    assert kept == {n for n in game if n.startswith("gate-")} | {"squadron", "tender"}
+    assert cat["ships"] and not [s for s in cat["ships"] if Path(s).stem.startswith("boat-")]
+
+
+def test_truth_7_403_the_harbour_opens_on_a_first_game_which_is_the_primers_chapter_7(tmp_path):
+    """Package 96b, step 2 (docs/design/Design-Harbour.md §3.1, §3.3; the cold review of
+    milestone 7, "a stranger cannot begin": the opening page a form with no first game, and
+    the primer's own first passage a bare ship with flags the page did not have). The
+    harbour's catalogue names one game to begin with, the scenario "A first passage", with
+    the lines said beside its button, and the four lessons after it; the page's own start
+    takes it up with nothing else chosen, the clock held at tick 0, the player the captain
+    at the prompt, the frigate lying as the chapter has her (head WNW, a north wind of
+    fifteen knots, nothing set), on a World of the chapter's seed."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    cat = harbour.catalogue()
+    first = cat["first_game"]
+    assert first["name"] == "A first passage" and first["says"]
+    assert Path(first["path"]).stem == Path(cat["scenarios"][0]["path"]).stem == "first-passage"
+    lessons = [s for s in cat["scenarios"] if s["shelf"] == "lessons"]
+    assert len(lessons) == 4 and [s["seat"] for s in lessons] == ["", "officer", "", ""]
+    started = harbour.start({"scenario": first["path"]})
+    try:
+        world = driver.world
+        assert world.seed == 7 and world.clock.tick == 0 and not driver.running
+        assert world.player_seat is None
+        assert started["game"]["title"] == "A first passage"
+        opening = next(e.text for e in world.log if e.kind == "world.start")
+        assert opening == (
+            "A first passage. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+        )
+        assert not [n for n, s in world.ship.sails.items() if getattr(s, "set_fraction", 0) > 0]
+    finally:
+        harbour.close()
+
+
+def test_truth_7_404_the_harbours_start_takes_the_ship_aboard_a_bare_ships_wind_and_a_save_by_name(
+    tmp_path,
+):
+    """Package 96b, step 3 (docs/design/Design-Harbour.md §1.1 rows 3, 7, 15 and 16, §2.2):
+    what only the command line could say is said from the page. The page's start puts the
+    player aboard another ship of the scenario from the first minute (the server's `--ship`:
+    his own left as she lies, the drivers following the other) and refuses in words a ship
+    that is not there; a bare ship takes her wind and her heading (`--wind`, `--heading`:
+    the primer's chapter 7 as its own command has it); the page's state lists the saves of
+    the saves place by name, and one is taken up by its name; and a scenario says its own
+    lines and the ships to be aboard before it is started."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    saves = tmp_path / "saves"
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=saves)
+    try:
+        said = harbour.read_scenario("data/scenarios/tender.yaml")
+        assert said["aboard"] == ["Raven"] and said["lines"][0].startswith("Scenario: The tender")
+        started = harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Raven"})
+        assert "Following the Raven." in started["lines"]
+        assert driver.world.followed_words == "Raven"
+        with pytest.raises(HarbourError, match="Nobody"):
+            harbour.start({"scenario": "data/scenarios/tender.yaml", "aboard": "Nobody"})
+        harbour.start(
+            {"ship": "data/ships/frigate-36.yaml", "seed": 7, "wind": "0,15", "heading": 293}
+        )
+        opening = next(e.text for e in driver.world.log if e.kind == "world.start")
+        assert opening == "Open water. Wind N, 15 knots, a moderate breeze. Heading WNW (293°)."
+        with pytest.raises(HarbourError, match="wind"):
+            harbour.start({"ship": "data/ships/frigate-36.yaml", "wind": "a gale"})
+        assert harbour.saves()["saves"] == []
+        driver.places = harbour.places  # as the app joins them: the saves place is the test's
+        assert driver.save("kept-404").kind == "driver.saved"
+        assert [s["name"] for s in harbour.saves()["saves"]] == ["kept-404"]
+        assert harbour.saves()["place"] == str(saves.resolve())
+        taken = harbour.start({"load": "kept-404"})
+        assert taken["game"]["chosen"]["load"] == "kept-404"
+    finally:
+        harbour.close()
+
+
+def test_truth_7_405_the_sheet_keeps_what_it_does_not_show_and_the_page_has_its_parts(tmp_path):
+    """Package 96b, step 4 (docs/design/Design-Harbour.md §2.3): the scenario maker's form
+    folded into parts, each a line when closed. The fold is the page's own and touches
+    nothing the maker writes: a scenario with keys the form has no field for (the blockade:
+    its squadron, its weather's system, another ship's intent and squadron) read by the
+    page's server and written again with nothing changed is the same file byte for byte;
+    and the page carries the nine parts in their order, each with its line, every field the
+    maker had still in it."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import CLIENT_DIR, GAME_SCENARIOS, Harbour
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/blockade.yaml")
+    assert read["fields"]["squadrons"] and read["fields"]["weather"]["systems"]
+    saved = harbour.save_scenario(read["fields"], "blockade", source=read["path"])
+    assert Path(saved["path"]).read_bytes() == (GAME_SCENARIOS / "blockade.yaml").read_bytes()
+    page = (CLIENT_DIR / "harbour.html").read_text(encoding="utf-8")
+    parts = re.findall(r'<fieldset data-part="([a-z]+)" class="folded">', page)
+    assert parts == [
+        "day",
+        "ship",
+        "start",
+        "papers",
+        "weather",
+        "ships",
+        "sea",
+        "orders",
+        "stations",
+    ]
+    assert [f'data-line="{p}"' in page for p in parts] == [True] * 9
+    for field in (
+        "name", "seed", "start", "nation", "ship.file", "ship.heading_deg", "ship.glass",
+        "ship.instrument", "cargo.purse_pounds", "intent", "region", "position", "weather",
+        "business", "crewed.cap", "crewed.range_nm", "ports", "ships", "world_orders",
+        "standing_orders", "orders", "director",
+    ):  # fmt: skip
+        assert f'data-field="{field}"' in page, field
+
+
+def test_truth_7_406_the_ships_card_is_filled_from_the_games_own_kinds_fits_and_roles(tmp_path):
+    """Package 96b, step 5 (docs/design/Design-Harbour.md §2.4): every ship is set up on
+    one card, whose blanks are the game's own words. The harbour's catalogue gives each
+    kind another ship may be her ship file, the fit she carries as that kind and the roles
+    her file gives her, and each ship file its fits and the one carried when none is said,
+    as `world.ships.description` and the file's `armament` have them; a scenario written
+    from them (the player's cutter named and under long guns, a revenue cutter, a French
+    privateer lugger under British colours, a role of her kind's) is proved by the maker as
+    the game loads it; and the proof says, without refusing, a fit a ship's kind has not
+    and a heading the game reads nowhere."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+    from freesail.world.ships import DESCRIPTIONS, description
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    cat = harbour.catalogue()
+    assert [k["id"] for k in cat["kinds"]] == list(DESCRIPTIONS)
+    for k in cat["kinds"]:
+        d = description(k["id"])
+        assert (k["file"], k["fit"], k["roles"]) == (
+            d["file"],
+            str(d.get("fit") or ""),
+            list(d.get("roles") or []),
+        )
+        assert k["file"] in cat["fits"]
+        assert not k["fit"] or k["fit"] == "unarmed" or k["fit"] in cat["fits"][k["file"]]["fits"]
+    fields = {
+        "name": "Two cutters",
+        "seed": 7,
+        "start": "1805-06-12T05:00",
+        "position": {"lat_deg": 50.1631, "lon_deg": -5.0345},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/cutter.yaml", "name": "Swift", "fit": "long guns"},
+        "papers": {"service": "kings"},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": "vigilant",
+                "description": "revenue cutter",
+                "name": "Vigilant",
+                "nation": "britain",
+                "position": "50 4.1 N 4 58.9 W",
+                "goal": "bound for Plymouth",
+                "role": "revenue",
+            },
+            {
+                "id": "furet",
+                "description": "privateer lugger",
+                "name": "Furet",
+                "nation": "france",
+                "position": "50 4.1 N 5 5.3 W",
+                "goal": "bound for Plymouth",
+                "colours": "britain",
+            },
+        ],
+    }
+    proved = harbour.prove(fields)
+    assert not [ln for ln in proved["lines"] if "To know" in ln]
+    assert any("revenue cutter Vigilant" in ln for ln in proved["lines"])
+    fields["ships"][0]["role"] = "privateer"  # no role of a revenue cutter's: the game's refusal
+    with pytest.raises(Exception, match="no role a revenue cutter takes"):
+        harbour.prove(fields)
+    fields["ships"][0]["role"] = "revenue"
+    fields["ships"][1]["fit"] = "long tom"  # the schooner's, not the lugger's
+    fields["ships"][1]["heading_deg"] = 270
+    said = [ln for ln in harbour.prove(fields)["lines"] if "To know" in ln]
+    assert len(said) == 2 and "long tom" in said[0] and "read by nothing" in said[1]
+
+
+def test_truth_7_407_a_squadron_is_made_from_the_sheet_by_the_games_own_kinds_and_formations(
+    tmp_path,
+):
+    """Package 96b, step 6 (docs/design/Design-Harbour.md §1.3 rows 108 and 109, §2.3: "a
+    scenario whose squadrons could not be set but by the file"). The harbour's catalogue
+    gives the squadron's card the game's own kinds and formations, the books a set sails
+    by and the words for the player's ship; a scenario with a convoy written as the card
+    writes it (its name, kind, formation, the player its commander, its members by id, in
+    the squadron's own entry and not on each ship) is proved by the maker and makes the
+    set in the game: a convoy in the order of sailing under the player's ship, the three
+    merchant brigs its members; and a formation that is none of the game's is refused in
+    the loader's words."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+    from freesail.world.squadrons import FORMATIONS, KINDS, PLAYER_ID
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    words = harbour.catalogue()["squadrons"]
+    assert words["kinds"] == list(KINDS) and words["formations"] == list(FORMATIONS)
+    assert words["player"] == PLAYER_ID and "convoy" in words["books"]
+    fields = {
+        "name": "A convoy of three",
+        "seed": 7,
+        "start": "1805-06-12T10:00",
+        "position": {"lat_deg": 49.85, "lon_deg": -5.2},
+        "region": "channel-west",
+        "nation": "britain",
+        "ship": {"file": "data/ships/brig.yaml", "heading_deg": 60},
+        "weather": {"climatology": True},
+        "ships": [
+            {
+                "id": name.lower(),
+                "description": "merchant brig",
+                "name": name,
+                "nation": "britain",
+                "position": f"49 5{n} N 5 1{n} W",
+                "goal": "in company with the ship within 3 cables",
+            }
+            for n, name in enumerate(("Nancy", "Hope", "Providence"))
+        ],
+        "squadrons": [
+            {
+                "name": "the Falmouth trade",
+                "kind": words["kinds"][1],
+                "formation": "order of sailing",
+                "commander": words["player"],
+                "members": ["nancy", "hope", "providence"],
+            }
+        ],
+    }
+    harbour.prove(fields)
+    saved = harbour.save_scenario(fields, "a-convoy")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        sets = list(driver.world.squadrons.sets)
+        assert len(sets) == 1
+        assert (sets[0].kind, sets[0].formation) == ("convoy", "order of sailing")
+        assert sets[0].commander == PLAYER_ID
+        assert set(sets[0].members) == {PLAYER_ID, "nancy", "hope", "providence"}
+        fields["squadrons"][0]["formation"] = "a wedge"
+        with pytest.raises(HarbourError, match="no formation"):
+            harbour.prove(fields)
+    finally:
+        harbour.close()
+
+
+def test_truth_7_408_the_papers_the_purse_and_the_people_are_set_from_the_sheet(tmp_path):
+    """Package 96b, step 7 (docs/design/Design-Harbour.md §1.3 rows 54 to 61 and 72 to 76;
+    the owner's points of 2026-10-18: he could not add a chronometer, and hoped to name the
+    people aboard). A scenario with the fields as the sheet's part writes them (a
+    chronometer with its maker and rate, the epitome, the private signals withheld, a
+    price list, goods in the hold, the master named and his skill said, a supercargo
+    beside the muster, a thing in the captain's keeping) is proved by the maker and is so
+    in the game: the chronometer aboard, the master of that name and skill, Mr Pentreath
+    among her people. The catalogue gives the page each ship's wardroom posts, so that the
+    sheet can say which roles are officers of her muster and which make a person more."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    cat = harbour.catalogue()
+    assert "master" in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    assert "supercargo" not in cat["posts"]["data/ships/topsail-schooner.yaml"]
+    fields = harbour.read_scenario("data/scenarios/merchant-passage.yaml")["fields"]
+    fields["papers"] = {
+        **fields["papers"],
+        "chronometer": {"maker": "Earnshaw", "rate_s_per_day": 1.8, "drift": 0},
+        "private_signals": False,
+        "price_lists": ["falmouth", "brest"],
+    }
+    fields["people"] = [
+        {"role": "master", "skill": 0.5, "name": "Mr Tregenza"},
+        {"role": "supercargo", "name": "Mr Pentreath"},
+    ]
+    fields["cargo"] = {**(fields.get("cargo") or {}), "goods": {"tin": 12}}
+    fields["things"] = ["a sealed packet, in the captain's keeping"]
+    proved = harbour.prove(fields, "data/scenarios/merchant-passage.yaml")
+    assert any("She carries a chronometer by Earnshaw" in ln for ln in proved["lines"])
+    saved = harbour.save_scenario(fields, "with-a-chronometer")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        world = driver.world
+        assert world.scenario.chronometer["rate_s_per_day"] == 1.8
+        assert world.scenario.papers["private_signals"] is False
+        master = world.people.by_role("master")[0]
+        assert (master.name, master.skill) == ("Mr Tregenza", 0.5)
+        assert "Mr Pentreath" in {p.name for p in world.people.everyone}
+        assert world.scenario.cargo["goods"] == {"tin": 12.0}
+    finally:
+        harbour.close()
+
+
+def test_truth_7_409_the_day_the_weather_and_the_ports_are_set_whole_and_the_unread_is_said(
+    tmp_path,
+):
+    """Package 96b, step 8 (docs/design/Design-Harbour.md §1.3 rows 40, 79 to 85 and 91,
+    §1.4 traps 1 to 3 and 6, §2.5). From the sheet: the world keeping to the course of
+    history, one fixed wind with its air, a current, a weather system and a port's state
+    (the two as the file's own words, read by the page's server into the fields), proved
+    as the game loads them and so in the game: the world follows history, the port is
+    closed to Britain, the system is the weather's. And the proof says, without refusing,
+    what the game reads nowhere: a key misspelt, the chart's year and the almanac, the
+    nations' block, a station given to "model"; and of a scenario of another year, that
+    its ports are that day's and its wars June 1805's."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=_harbour_settings(tmp_path), saves_dir=tmp_path / "s")
+    fields = {
+        "name": "The day whole",
+        "seed": 7,
+        "start": "1808-04-20T05:00",
+        "position": {"lat_deg": 50.1631, "lon_deg": -5.0345},
+        "region": "channel-west",
+        "nation": "britain",
+        "follows_history": True,
+        "ship": {"file": "data/ships/cutter.yaml", "heading_deg": 190},
+        "wind": {"from_deg": 270, "knots": 18, "air_mass": "unstable"},
+        "current": {"knots": 1.5, "toward_deg": 90},
+        "papers": {"chart": {"year": 1804}, "almanac": 1808},
+        "weather_bund": "seasonal",
+        "stations": {"captain": "model"},
+    }
+    blocks = {
+        "systems": "- name: the high\n  kind: high\n  radius_km: 800\n  track:\n"
+        "    - {at: 1808-04-20T05:00, x_km: 200, y_km: -300, hpa: 1026}\n"
+        "    - {at: 1808-04-21T05:00, x_km: 300, y_km: -300, hpa: 1024}\n",
+        "ports": "falmouth: {}\nbrest:\n  closed_to: [britain]\n",
+    }
+    whole = harbour.with_blocks(fields, blocks)
+    assert whole["weather"]["systems"][0]["track"][0]["at"] == "1808-04-20T05:00"
+    assert whole["ports"]["brest"] == {"closed_to": ["britain"]} and "ports" not in fields
+    lines = harbour.prove(whole)["lines"]
+    said = [ln.strip() for ln in lines if "To know" in ln]
+    assert len(said) == 4, said
+    assert "'weather_bund' is no key the game reads" in said[0]
+    assert "the chart's year and the almanac" in said[1]
+    assert "'model' and 'rules' (captain) seat nobody" in said[2]
+    assert "she begins in 1808" in said[3] and "June 1805" in said[3]
+    saved = harbour.save_scenario(whole, "the-day-whole")
+    try:
+        harbour.start({"scenario": saved["path"]})
+        world = driver.world
+        assert world.scenario.follows_history is True
+        assert world.scenario.current == {"knots": 1.5, "toward_deg": 90.0}
+        assert [s["name"] for s in world.scenario.systems] == ["the high"]
+        assert set(world.scenario.ports) == {"falmouth", "brest"}
+        assert world.scenario.ports["brest"]["closed_to"] == ["britain"]
+        with pytest.raises(HarbourError, match="could not be read"):
+            harbour.with_blocks(fields, {"systems": "- name: ["})
+        assert harbour.blocks_of(whole)["ports"].startswith("falmouth: {}")
+    finally:
+        harbour.close()
+
+
+def test_truth_7_410_one_settings_file_seats_several_models_and_the_page_reads_the_plan(tmp_path):
+    """Package 96b, step 9 (docs/design/Design-Harbour.md §1.2 rows 28 and 34, §1.4 trap 1,
+    §2.6; the owner's points of 2026-10-18: the stations and the seats three notions with
+    one word, and several models wanting several settings files). The one settings file
+    names every model the API door can call (its own and those beside it), and the page's
+    state names none of them (truth 7b-110 stands); a door's command line for a station
+    takes any one of them by name,
+    with that model's dialect and no seat's fold, and refuses in words a name the settings
+    do not have, and any model named for the local runner; the door's own model is used
+    when none is chosen, as before, and a director's seat's door is as it was. The
+    scenario's `stations:`, which the game reads for the player's seat alone, is the page's
+    plan for the game started, and the other ships with a captain of their own are named
+    for the table. No model is named here: the names are made up."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.harbour import Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    first, second, third = "placeholder-410-a", "placeholder-410-b", "placeholder-410-c"
+    settings = _harbour_settings(
+        tmp_path,
+        api={
+            "model": first,
+            "models": [second, {"name": third, "dialect": "openrouter"}],
+            "seat_budget_tokens": "80000",
+        },
+    )
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    harbour = Harbour(driver, settings_path=settings, saves_dir=tmp_path / "s")
+    try:
+        from freesail import settings as S
+
+        assert S.callable_models(harbour.settings()) == {
+            first: "anthropic",
+            second: "anthropic",
+            third: "openrouter",
+        }
+        # the page takes these from the settings' route; its state names none (7b-110)
+        said = json.dumps(harbour.state())
+        assert not [name for name in (first, second, third) if name in said]
+
+        def said(argv: list[str], flag: str) -> str:
+            return argv[argv.index(flag) + 1]
+
+        own = harbour.door_argv("api", "officer")
+        assert said(own, "--model") == first and "--budget-tokens" not in own
+        chosen = harbour.door_argv("api", "officer", model=third)
+        assert (said(chosen, "--model"), said(chosen, "--dialect")) == (third, "openrouter")
+        assert said(chosen, "--station") == "officer" and "--budget-tokens" not in chosen
+        aboard = harbour.door_argv("api", "captain", "Raven", model=second)
+        assert (said(aboard, "--model"), said(aboard, "--ship")) == (second, "Raven")
+        seat = harbour.door_argv("api", "captain", "Raven", seat_model=second)
+        assert said(seat, "--budget-tokens") == "80000"  # a director's seat's, as it was
+        with pytest.raises(HarbourError, match="call no model by that name"):
+            harbour.door_argv("api", "officer", model="a-model-nobody-named")
+        with pytest.raises(HarbourError, match="local runner serves the one model"):
+            harbour.door_argv("local", "officer", model=second)
+        with pytest.raises(HarbourError, match="Start a game first"):
+            harbour.start_door("api", "officer", model=second)
+        # the plan and the captains
+        own_place = settings.parent / "scenarios"
+        own_place.mkdir(parents=True, exist_ok=True)
+        planned = own_place / "planned.yaml"
+        planned.write_text(
+            (HARBOUR_ROOT / "data" / "scenarios" / "tender.yaml").read_text(encoding="utf-8")
+            + "\nstations:\n  officer: model\n  lookout: player\n",
+            encoding="utf-8",
+        )
+        harbour.start({"scenario": str(planned)})
+        game = harbour.state()["game"]
+        assert game["chosen"]["plan"] == {"officer": "model", "lookout": "player"}
+        assert game["captains"] == ["Raven"]
+        assert "lookout" in game["seat"]  # the game's own reading: the player's seat
+        assert driver.world.agents == {} or all(
+            a.agent.released or "lookout" in k for k, a in driver.world.agents.items()
+        )  # "model" seats nobody by itself: the page offers the door
+    finally:
+        harbour.close()
+
+
+def test_truth_7_411_every_setting_of_the_harbour_is_explained_where_it_is_set():
+    """Package 96b, step 10 (docs/design/Design-Harbour.md §2.7; the owner's word of
+    2026-10-18 on the page as merged: "the settings tab does not say what the flags are or
+    what each does"). Every control written in the harbour's page (the new game's, the
+    sheet's, the stations' and the settings') has one sentence in a player's words, kept
+    in one file of the page's own and put under the control; the only controls without one
+    are those whose own label is the sentence. The words for the things the owner named:
+    the crewed ships, the pace, the seed, the sea's traffic and a seated model's memory
+    are said plainly."""
+    import json
+
+    client = HARBOUR_ROOT / "client"
+    page = (client / "harbour.html").read_text(encoding="utf-8")
+    text = (client / "harbour-words.js").read_text(encoding="utf-8")
+    start = text.index("window.freesailHarbourWords = ") + len("window.freesailHarbourWords = ")
+    words = json.loads(text[start : text.rindex(";")])
+    controls = []
+    for attrs in re.findall(r"<(?:input|select|textarea)\b([^>]*)>", page):
+        ident = re.search(r'\bid="([^"]+)"', attrs)
+        data = re.search(r'data-(field|set|brief|chron)="([^"]+)"', attrs)
+        controls.append(
+            f"#{ident.group(1)}" if ident else f'[data-{data.group(1)}="{data.group(2)}"]'
+        )
+    unsaid = set(controls) - set(words)
+    assert unsaid == {"#m-chron-on", "#m-systems", "#m-ports-state", "#m-brief-from"}
+    assert set(words) <= set(controls)
+    assert "sailed man by man" in words["#s-crewed-cap"]
+    assert "real time while a model at a station is answering" in words["#s-pace"]
+    assert "same weather" in words["#s-seed"] and "traders" in words["#s-business"].lower()
+    assert "folded into a summary" in words['[data-set="doors.api.seat_budget_tokens"]']
+    assert "applyWords" in (client / "harbour.js").read_text(encoding="utf-8")
+
+
+def test_truth_7_412_a_box_of_the_files_words_cannot_hold_the_server_and_keeps_the_ports(tmp_path):
+    """Package 96b, the final list (the whole-page reader's findings on step 8's boxes).
+    The words of a box take no anchor and no alias and no more than their length: a text of
+    nested aliases, which loaded as gigabytes, is refused in words by its tokens before
+    anything is loaded, in a moment; plain words pass as before. And a scenario whose ports
+    are a list shows them in the ports' box as the mapping they mean, so that a port's
+    state said there keeps every other port in play."""
+    pytest.importorskip("fastapi")
+    import time
+
+    from freesail.ui.harbour import BLOCK_MAX_CHARS, Harbour, HarbourError
+    from freesail.ui.server import Driver
+
+    harbour = Harbour(
+        Driver(World(seed=1805, scenario=Scenario())),
+        settings_path=_harbour_settings(tmp_path),
+        saves_dir=tmp_path / "saves",
+    )
+    read = harbour.read_scenario("data/scenarios/merchant-passage.yaml")
+    fields = read["fields"]
+    assert isinstance(fields["ports"], list)
+    assert read["blocks"]["ports"] == "".join(f"{p}: {{}}\n" for p in fields["ports"])
+    bomb = "a: &a [x, x, x, x, x, x, x, x, x]\n"
+    for prev, name in zip("abcdefg", "bcdefgh", strict=True):
+        bomb += f"{name}: &{name} [" + ", ".join([f"*{prev}"] * 9) + "]\n"
+    bomb += "brest: {news: *h}\n"
+    assert len(bomb) < 600
+    started = time.monotonic()
+    for block in ("ports", "systems"):
+        with pytest.raises(HarbourError, match="an anchor or an alias"):
+            harbour.with_blocks(fields, {block: bomb})
+    with pytest.raises(HarbourError, match="at most"):
+        harbour.with_blocks(fields, {"ports": "x: 1\n" * (BLOCK_MAX_CHARS // 5 + 1)})
+    assert time.monotonic() - started < 2.0
+    closed = read["blocks"]["ports"].replace("brest: {}", "brest: {closed_to: [united-states]}")
+    whole = harbour.with_blocks(fields, {"ports": closed})
+    assert list(whole["ports"]) == fields["ports"]
+    assert whole["ports"]["brest"] == {"closed_to": ["united-states"]}
+    lines = harbour.prove(whole, read["path"])["lines"]
+    assert f"The ports: {', '.join(fields['ports'])}." in lines
+
+
+# ---------------------------------------------------------------------------
+# Package 115, part C: the director's limits (truths 7-462 to 7-469; the cold review of
+# 2026-11-14, decision 14; the owner's ruling of 2026-11-14). Each comes in by the
+# director's own door, the `world_order` tool of a director seated at the station.
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7_462_the_director_is_free_by_default_the_players_own_ship_included():
+    """Under a brief that sets no limit the director's order reaches the player's own ship
+    and is done: her rules captain given an intent by the captain's channel and by her own
+    name, two acts spent, nothing refused."""
+    from freesail.agents import director as D
+    from tests.test_director import log_kinds
+    from tests.test_director_limits import FREE, at_the_door
+
+    w, door = at_the_door(FREE)
+    assert w.captain.intent is None
+    assert door("captain: intent bound for Plymouth").startswith("Done:")
+    assert w.captain.intent is not None and "Plymouth" in w.captain.intent.words
+    assert door('ship "Amazon": intent bound for Falmouth').startswith("Done:")
+    assert D.budget_of(w).acts == 2 and "director.refused" not in log_kinds(w)
+
+
+def test_truth_7_463_hands_off_the_players_ship_holds_by_every_spelling():
+    """A brief that sets hands-off refuses the same act by each of its spellings, in words
+    that name the limit: no act spent, her captain given no intent, four refusals logged."""
+    from freesail.agents import director as D
+    from tests.test_director import log_kinds
+    from tests.test_director_limits import HANDS_OFF, at_the_door
+
+    w, door = at_the_door(HANDS_OFF)
+    spellings = (
+        "captain: intent bound for Plymouth",
+        "captain: bound for Plymouth",
+        'ship "Amazon": intent bound for Plymouth',
+        'ship "Amazon": bound for Plymouth',
+    )
+    for text in spellings:
+        said = door(text)
+        assert said.startswith("Refused, outside the brief:"), (text, said)
+        assert "hands off the player's own ship" in said
+    assert w.captain.intent is None and D.budget_of(w).acts == 0
+    assert log_kinds(w).count("director.refused") == len(spellings)
+    assert not any(b for b in D.starter_briefs() if D.resolve_brief(b).limits.get(D.HANDS_OFF))
+
+
+def test_truth_7_464_nobody_dies_has_something_to_refuse_and_every_starter_sets_it():
+    """The aboard table marks four things deadly (the grave wound; the boat stove, swamped
+    or adrift while anyone is in her), and each of the six starter briefs refuses the grave
+    wound of the player's own captain by the spelling that walked round it: nobody is hurt."""
+    from freesail.agents import director as D
+    from freesail.world import orders as WO
+    from tests.test_director_limits import at_the_door, captain_of
+
+    deadly = {t["id"]: t.get("deadly_when") for t in WO.aboard_table() if t["harm"] == "deadly"}
+    assert deadly == {
+        "person_badly_hurt": None,
+        "boat_stove": "manned",
+        "boat_swamped": "manned",
+        "boat_adrift": "manned",
+    }
+    starters = D.starter_briefs()
+    assert len(starters) == 6
+    for name in starters:
+        assert D.resolve_brief(name).limits.get("nobody_dies") is True, name
+    w, door = at_the_door("quiet-passage")
+    said = door(f"aboard the Amazon: {captain_of(w).name} is badly hurt [reason: the story]")
+    assert said.startswith("Refused, outside the brief:") and "nobody dies" in said
+    assert not [s for s in w.ship.extra["crew"].sailors if s.hurt]
+
+
+def test_truth_7_465_a_weight_the_limit_cannot_rank_is_refused_not_passed():
+    """Under "no enemy heavier than a cutter" a seventy-four by the words the ranking did
+    not know is refused as heavier; under a limit whose own word names no class, no enemy
+    passes at all; no ship is put on the sea by either."""
+    from tests.test_director_limits import at_the_door
+
+    w, door = at_the_door("quiet-passage")
+    ships = len(w.vessels.active())
+    for desc in ("a line-of-battle ship", "a 74"):
+        said = door(f'ship: {desc} "Brave" of France at 48 30 N 6 30 W, bound for Brest')
+        assert said.startswith("Refused, outside the brief:") and "is heavier" in said, desc
+    assert len(w.vessels.active()) == ships
+    w, door = at_the_door({"name": "Odd", "tone": "x", "limits": {"enemy_heaviest": "galleon"}})
+    said = door('ship: a cutter "Furet" of France at 48 30 N 6 30 W, bound for Brest')
+    assert said.startswith("Refused, outside the brief:") and "refused, not passed" in said
+    assert w.vessels.find("Furet") is None
+
+
+def test_truth_7_466_the_directors_log_says_whom_each_act_reached():
+    """Three acts through the door, two of which reach the player's own ship: the director's
+    log as the player reads it holds all three, and two of them say whom they reached."""
+    from freesail.agents import director as D
+    from tests.test_director_limits import FREE, at_the_door, entered
+
+    w, door = at_the_door(FREE)
+    assert door("captain: intent bound for Plymouth").startswith("Done:")
+    assert entered(door, "aboard the Amazon: a cask found stove").startswith("Done:")
+    brig = 'ship: a merchant brig "Nancy" of Britain at 49 00 N 6 20 W, bound for Falmouth'
+    assert entered(door, brig).startswith("Done:")
+    lines = [x for x in D.reveal(w, "the player") if "(order)" in x or "(reentered)" in x]
+    assert len(lines) == 3
+    reached = [x for x in lines if "it reached the player's own ship (the Amazon)" in x]
+    assert len(reached) == 2 and not any('"Nancy"' in x for x in reached)
+
+
+def test_truth_7_467_the_owners_orders_are_outside_the_brief():
+    """The owner's world order is judged by the one table for what it is and by no brief:
+    under hands-off the same order the director is refused is done for the owner."""
+    from freesail.world import orders as WO
+    from tests.test_director_limits import HANDS_OFF, at_the_door
+
+    w, door = at_the_door(HANDS_OFF)
+    order = "captain: intent bound for Plymouth"
+    assert door(order).startswith("Refused, outside the brief:") and w.captain.intent is None
+    judged = WO.judged(w, WO.parse(order))
+    assert judged.form.key == "captain" and judged.reaches == {WO.PLAYERS_SHIP}
+    e = w.world_order(order, source="the owner")
+    assert e.data["result"] == "done" and w.captain.intent is not None
+
+
+def test_truth_7_468_a_ship_in_commission_is_not_laid_up_and_the_door_answers_in_words():
+    """The player's own ship laid up in ordinary through the director's door is answered in
+    the game's words (she is in commission), where it raised an error; her regime stands."""
+    from tests.test_director_limits import FREE, at_the_door
+
+    w, door = at_the_door(FREE)
+    said = door('ship "Amazon": in ordinary at Falmouth')
+    assert said.startswith("The game has no way to do this as said: Amazon is in commission")
+    assert w.vessels.own.regime != "in ordinary" and w.ship.name == "Amazon"
+
+
+def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_is_marked():
+    """One table of the world-order forms, kept by the channel and read by the director:
+    43 forms, each with a reach of the five and a harm; twenty-seven of them can reach the
+    player's own ship, ten his person, three his prompt."""
+    from freesail.agents import director as D
+    from freesail.world import orders as WO
+
+    forms = WO.WORLD_ORDER_FORMS
+    assert D.WORLD_ORDER_FORMS is forms and len({f.key for f in forms}) == len(forms)
+    assert all(f.reach and set(f.reach) <= set(WO.REACHES) for f in forms)
+    assert [f.key for f in forms if f.harm == WO.HARM_BY_THE_THING] == ["aboard.found"]
+    count = {r: sum(1 for f in forms if r in f.reach) for r in WO.REACHES}
+    assert len(forms) == 43, len(forms)
+    assert (count[WO.PLAYERS_SHIP], count[WO.PLAYERS_PERSON], count[WO.PLAYERS_PROMPT]) == (
+        27,
+        10,
+        3,
+    ), count
+
+
+# -- package 119 (the owner's word of 2026-11-19): the merchant brig's watches five and five ----
+# The muster's rule 3 (`freesail/crew/muster.py`): each station's hands watched alternately,
+# starboard first, as before; the odd hands of successive odd stations, the marines among them
+# after the seamen's, go to the watches in turn (old: every odd hand to the starboard). Truths
+# 7-700 to 7-704.
+
+# Each ship file mustered at seed 7 on the trunk before package 119 (at de62ed74, the old rule):
+# the hands on her books, the name of the last of them and the muster stream's next draw after
+# the muster. The rule draws nothing, so each is the same under the new.
+_MUSTERED_BEFORE_119 = {
+    "bilander.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-cutter-23.yaml": (7, "Dennis Thompson", 0.8584684590486795),
+    "boat-cutter-28.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-launch-25.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
+    "boat-launch-31.yaml": (11, "Robt. Nicholson", 0.4275923056694029),
+    "boat-yawl-16.yaml": (5, "Simon White", 0.22323896460701453),
+    "brig.yaml": (121, "Nichs. Webb", 0.9617865333626133),
+    "cutter.yaml": (30, "Llewellyn Gale", 0.15129838311640065),
+    "frigate-36.yaml": (264, "Dennis Gordon", 0.6678109415441436),
+    "hermaphrodite-brig.yaml": (130, "Abm. Henderson", 0.04378806669158586),
+    "lugger.yaml": (30, "Gilles Riou", 0.8639844696985152),
+    "merchant-brig.yaml": (16, "Richd. Evans", 0.34205580615985787),
+    "privateer-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
+    "razee-44.yaml": (330, "Martin Hodgson", 0.17463947466444973),
+    "seventy-four.yaml": (590, "Giles Stewart", 0.9241919469285972),
+    "sixty-four.yaml": (491, "Gilbert Pritchard", 0.7511335761053086),
+    "smack.yaml": (8, "Isaac Matthews", 0.5709136896467344),
+    "topsail-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
+}
+
+
+def _mustered(path, seed=7):
+    """The ship file's company as the muster makes it from its own stream at `seed`, and the
+    stream's next draw after it."""
+    import random
+
+    from freesail.crew import muster
+    from freesail.ship.loader import load_spec
+
+    stream = random.Random(seed)
+    crew = muster(load_spec(path).crew, stream)
+    return crew, stream.random()
+
+
+def _stations_watched(crew):
+    """{station: [watch of each hand, in the order of the books]} for the watched stations."""
+    from freesail.crew.model import Watch
+
+    out: dict = {}
+    for s in crew.sailors:
+        if s.watch is not Watch.NONE:
+            out.setdefault(s.station, []).append(s.watch)
+    return out
+
+
+def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
+    """Package 119, the rule's purpose (Luce: "giving to each watch an equal share of the
+    strength"): in every ship file, mustered at two seeds, the starboard and the larboard
+    watches are equal or one apart, and so is each station's share of them; the merchant brig's
+    ten are five and five (old seven and three), the razee's 288 are 144 and 144 (old 146 and
+    142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
+    were: no other one had more than one odd station."""
+    import glob
+
+    from freesail.crew.model import Watch
+
+    files = sorted(glob.glob("data/ships/*.yaml"))
+    assert [Path(p).name for p in files] == sorted(_MUSTERED_BEFORE_119)
+    split = {}
+    for path in files:
+        for seed in (7, 1805):
+            crew, _ = _mustered(path, seed)
+            st = sum(1 for s in crew.sailors if s.watch is Watch.STARBOARD)
+            lar = sum(1 for s in crew.sailors if s.watch is Watch.LARBOARD)
+            assert 0 <= st - lar <= 1, (path, seed, st, lar)
+            for station, watches in _stations_watched(crew).items():
+                gap = watches.count(Watch.STARBOARD) - watches.count(Watch.LARBOARD)
+                assert abs(gap) <= 1, (path, station, gap)
+            split[Path(path).name] = (st, lar)
+    assert split["merchant-brig.yaml"] == (5, 5)
+    assert split["razee-44.yaml"] == (144, 144)
+    assert split["seventy-four.yaml"] == (265, 265)
+    assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
+
+
+def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
+    """Package 119, the lead's word: each hand's watch, name and skills and the stream's draw
+    as before, for all eighteen files. At seed 7 each file's books hold as many hands as before,
+    the last of them by the same name, and the stream's next draw after the muster is the same
+    (`_MUSTERED_BEFORE_119`, measured on the old rule): the rule draws nothing and enters no
+    hand otherwise. Each hand's watch is the old rule's (alternately in its station, starboard
+    first) but for the odd last hands of the second, fourth, ... odd stations, which go to the
+    larboard: two of the merchant brig's (her fore top's and her afterguard's, the boy), two of
+    the razee's (fore top, waisters), three of the seventy-four's (fore top, afterguard, the
+    marines); none of any other file's."""
+    import glob
+
+    from freesail.crew.model import WATCHES
+
+    moved_by_file = {}
+    for path in sorted(glob.glob("data/ships/*.yaml")):
+        name = Path(path).name
+        crew, after = _mustered(path)
+        assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]
+        moved = []
+        odd = 0
+        for station, watches in _stations_watched(crew).items():
+            for i, watch in enumerate(watches):
+                old = WATCHES[i % 2]
+                if len(watches) % 2 and i == len(watches) - 1:
+                    assert watch is WATCHES[odd % 2], (name, station)
+                    odd += 1
+                    if watch is not old:
+                        moved.append(station.value)
+                else:
+                    assert watch is old, (name, station, i)
+        moved_by_file[name] = moved
+    assert {k: v for k, v in moved_by_file.items() if v} == {
+        "merchant-brig.yaml": ["fore_top", "afterguard"],
+        "razee-44.yaml": ["fore_top", "waisters"],
+        "seventy-four.yaml": ["fore_top", "afterguard", "marines"],
+    }
+    # the three files' moved hands by name and the company's skills, as on the old rule
+    crew, _ = _mustered("data/ships/merchant-brig.yaml")
+    by_id = {s.id: s for s in crew.sailors}
+    assert (by_id["s011"].name, by_id["s015"].name) == ("Benjn. Hammond", "Josiah Zimmerman")
+    for path, aloft, deck in (
+        ("data/ships/merchant-brig.yaml", 11.519, 11.819),
+        ("data/ships/razee-44.yaml", 150.054, 179.938),
+        ("data/ships/seventy-four.yaml", 259.365, 317.525),
+    ):
+        crew, _ = _mustered(path)
+        assert round(sum(s.skill_aloft for s in crew.sailors), 3) == aloft, path
+        assert round(sum(s.skill_deck for s in crew.sailors), 3) == deck, path
+
+
+def test_truth_7_702_the_merchant_brigs_fore_topsail_is_begun_short_by_either_watch():
+    """Package 119, the owner's complaint (package 116's "left for the owner"): on her watch of
+    three, `set the fore topsail` and every job wanting nine or more hands waited ("Not hands
+    enough on deck to set the fore topsail; there are but four to spare"). At five and five,
+    by night off the Lizard (tests/test_hands.py's trader at seed 7), the fore topsail, the
+    main topsail and the foresail from the gear (twelve wanted, her company's eleven) are each
+    begun short by either watch, its five hands and its post making six, half the eleven.
+    How a job counts its hands is unchanged: the post is counted as ruling 11 counts it."""
+    from freesail.crew.bill import Watch
+    from tests.test_hands import BRIG, asked, trader_at
+
+    for watch, post in ((Watch.STARBOARD, "mate"), (Watch.LARBOARD, "master")):
+        for sid in ("fore.topsail", "main.topsail", "fore.course"):
+            w, crew, runner = trader_at(BRIG, 2, watch)
+            inst = asked(w, "set_square", sid, "in_the_gear")
+            assert runner._take_hands(w.ship, inst, crew), (watch, sid, inst.wait_line)
+            got = inst.assignment
+            assert (got.got, got.wanted, got.outcome) == (6, 11, "short"), (watch, sid)
+            assert [s.post for s in got.hands if s.post] == [post], (watch, sid)
+
+
+def test_truth_7_703_a_merchant_brig_whose_watch_is_too_few_calls_all_hands_to_let_go():
+    """Package 119, the lead's word: package 116's `too_few: all hands` still told by a ship.
+    The harbour's merchant brig lets go by her watch at five and five (truth 7-630) and weighs;
+    two of her larboard watch go on the sick list (`Health.make_sick`, the state the director's
+    `aboard:` forms make), and her watch's whole is three. `let go the anchor` then calls all
+    hands, once, "All hands! (to let go the anchor)": the three and her master are under half
+    its want. She is brought up again in Falmouth's road within two minutes, all hands piped
+    down and the larboard watch on deck, nothing left waiting. (Hands away in the boat do not
+    make the watch too few: they are at other work, and the anchor waits for them, by the one
+    judge's rule, `Runner._calls_for_itself`.)"""
+    from freesail.crew.bill import Watch
+
+    w = _harbour_game("data/scenarios/merchant-brig.yaml")
+    crew = w.ship.extra["crew"]
+    runner = w.ship.extra["evolutions"]
+    w.run(120)
+    assert w.dealings.anchored
+    assert _said(w, "weigh anchor").kind != "order.rejected"
+    for _ in range(60):
+        w.run(60)
+        if not w.dealings.anchored:
+            break
+    assert not w.dealings.anchored, "she never weighed"
+    for _ in range(40):
+        if not runner.instances and not crew.all_hands_called:
+            break
+        w.run(30)
+    assert not runner.instances and not crew.all_hands_called
+    t0 = w.clock.tick
+    larboard = [s for s in crew.sailors if s.watch is Watch.LARBOARD and not s.post]
+    assert len(w.health.make_sick(larboard[:2], "a fever", int(t0))) == 2
+    assert [runner._watch_whole(crew, x) for x in (Watch.STARBOARD, Watch.LARBOARD)] == [5, 3]
+    e = _said(w, "let go the anchor")
+    assert e.kind != "order.rejected", e.text
+    first = len([x for x in w.log if x.kind == "ship.anchored"])
+    for _ in range(8):
+        w.run(15)
+        if len([x for x in w.log if x.kind == "ship.anchored"]) > first:
+            break
+    assert len([x for x in w.log if x.kind == "ship.anchored"]) == first + 1
+    assert w.dealings.anchored and w.dealings.in_port().name == "Falmouth"
+    assert w.clock.tick - t0 <= 120
+    called = [x.text for x in w.log if x.tick > t0 and x.kind == "crew.all_hands"]
+    assert called == ["All hands! (to let go the anchor)"], called
+    w.run(5)
+    piped = [x.text for x in w.log if x.tick > t0 and x.kind == "crew.piped_down"]
+    assert piped == ["Piped down; the larboard watch has the deck."], piped
+    assert not crew.all_hands_called
+    assert not [x for x in w.log if x.tick > t0 and x.kind == "evolution.waiting"]
+
+
+def test_truth_7_704_what_her_two_watches_of_five_give_by_night_alike():
+    """Package 119, what else the rule gives the merchant brig: her two watches are alike in
+    what they can do, by night off the Lizard (tests/test_hands.py's trader at seed 7), each of
+    five and its post. Each takes the same number for every work below, where at seven and
+    three the starboard took more and the larboard waited for the topsails, the foresail and
+    the furling of a topsail: a topsail or the foresail set from the gear six of eleven, short;
+    the braces six of eight, short; a topsail furled five of ten (aloft: no post), short; a tack
+    and a wear, all hands' work by their files, seven whichever watch has the deck (old nine
+    with the starboard's, six with the larboard's). Heaving to (twelve, her eleven; a
+    manoeuvre, so no post) is more than either watch of five can begin, and calls all hands
+    (the owner's word of 2026-11-19: `too_few: all hands` in its file): ordered by the player
+    or by a standing order, on either watch, all hands are called once for it, she is hove to,
+    and the hands are piped down with the same watch on deck. Old (b422d05, before the key):
+    it waited on either watch, "Not hands enough on deck to heave to; there are but five to
+    spare."; before package 119 the larboard's three waited and the starboard's seven hove to
+    short (seven of eleven). Filling away, its pair (twelve, her eleven: the lead's ruling inside
+    the owner's word, `too_few: all hands` in its file), the same: hove to, she fills away by all
+    hands, called once for it, and is piped down again with the same watch on deck, under way;
+    by the player's orders, and by two standing orders (to lie to when the wind exceeds ten
+    knots, to fill away when it is below eight, the wind then falling to six). Old (5e56509,
+    before the key): on either watch she was hove to and could not fill away, "Not hands enough
+    on deck to fill away; there are but five to spare.", and lay hove to. How a job counts its
+    hands is unchanged."""
+    from freesail.crew.bill import Watch
+    from freesail.ship.parts import SailState
+    from tests.test_hands import BRIG, asked, trader_at
+
+    cases = (
+        ("set_square", "fore.topsail", "in_the_gear", (6, 11, "short")),
+        ("set_square", "main.topsail", "in_the_gear", (6, 11, "short")),
+        ("set_square", "fore.course", "in_the_gear", (6, 11, "short")),
+        ("brace", None, None, (6, 8, "short")),
+        ("furl_square", "fore.topsail", "in_the_gear", (5, 10, "short")),
+        ("tack", None, None, (7, 7, "enough")),
+        ("wear", None, None, (7, 7, "enough")),
+    )
+    for watch in (Watch.STARBOARD, Watch.LARBOARD):
+        for eid, sid, state, want in cases:
+            w, crew, runner = trader_at(BRIG, 2, watch)
+            inst = asked(w, eid, sid, state)
+            assert runner._take_hands(w.ship, inst, crew), (watch, eid, inst.wait_line)
+            got = inst.assignment
+            assert (got.got, got.wanted, got.outcome) == want, (watch, eid, sid)
+        w, crew, runner = trader_at(BRIG, 2, watch)
+        inst = asked(w, "heave_to", None)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        w, crew, runner = trader_at(BRIG, 2, watch)
+        w.ship.extra["hove_to"] = {"tack": "starboard", "backed": ["main"]}
+        inst = asked(w, "fill_away", None)
+        assert runner._take_hands(w.ship, inst, crew), (watch, inst.wait_line)
+        assert inst.all_hands and inst.wait_line == "", (watch, inst.wait_line)
+        # the two roads, in the world: the player's orders and standing orders
+        for given in (
+            "heave to",
+            'standing order "lie to": when the true wind exceeds 10 knots then heave to',
+        ):
+            w, crew, _runner = trader_at(BRIG, 2, watch)
+            for sid in w.ship.groups["plain sail"]:
+                w.ship.sails[sid].state = SailState.SET
+            w.ship.dyn.heading = units.deg_to_rad(215.0)  # by the wind, the starboard tack
+            w.ship.dyn.speed = units.knots_to_ms(5.0)
+            w.submit("steer 215")
+            w.run(400)
+            t0 = w.clock.tick
+            w.submit(given)
+            w.run(600)
+            ev = [e for e in w.log if e.tick >= t0]
+            road = (watch, given)
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'lie to': heaving to."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to heave to)"
+            ], road
+            assert [e.kind for e in ev if e.kind == "crew.all_hands_up"] == ["crew.all_hands_up"]
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            hove = [e.tick for e in ev if e.kind == "ship.hove_to"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(hove) == 1 and "hove_to" in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= hove[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            # and filled away again, by all hands, and under way
+            t1 = w.clock.tick
+            if given == "heave to":
+                w.submit("fill away")
+            else:
+                w.submit(
+                    'standing order "fill": when the true wind is below 8 knots then fill away'
+                )
+                w.wind.speed = w.wind.base_speed = units.knots_to_ms(6.0)  # the wind falls
+            w.run(900)
+            ev = [e for e in w.log if e.tick >= t1]
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'fill': filling away."
+                ], road
+            assert [e.text for e in ev if e.kind == "crew.all_hands"] == [
+                "All hands! (to fill away)"
+            ], road
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            filled = [e.tick for e in ev if e.kind == "ship.filled_away"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(filled) == 1 and "hove_to" not in w.ship.extra, road
+            assert [e.text for e in piped] == [
+                f"Piped down; the {watch.value} watch has the deck."
+            ], road
+            assert piped[0].tick >= filled[0], road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            assert units.ms_to_knots(w.ship.dyn.speed) > (3.0 if given == "heave to" else 1.5), road
+
+
+# -- package 118: the director's mends, and the far ships' lines (truths 7-650 to 7-659) -------
+# Card 6 of docs/dev/ScopeCards-BeforeTheGate.md (the owner's, 2026-11-18): the lead's play at
+# the director's seat found four faults that the tests, which ran without the server, did not
+# see; the owner added a fifth from the lead's play at the player's door. Each test here comes
+# in by the game's own doors: the server's loader and its `Driver`, the console's `Console`.
+
+DIRECTED = "data/scenarios/directed-passage.yaml"
+
+
+def _directed_under(door: str = "driver"):
+    """The directed passage as the browser game starts it (`prepare_game`), the player at
+    the director's seat, with the server's `Driver` or the console's `Console` about the
+    world (each subscribes to its log and holds a lock), or neither."""
+    import io
+
+    from freesail.ui.console import Console
+    from freesail.ui.server import Driver, prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", DIRECTED, "--seat", "director"])
+    w = prepare_game(args, say=lambda _line: None)
+    if door == "driver":
+        Driver(w)
+    elif door == "console":
+        Console(w, out=io.StringIO())
+    return w
+
+
+@pytest.mark.parametrize("door", ["driver", "console"])
+def test_truth_7_650_weather_is_ordered_under_a_wind_limit_in_the_game_as_played(door):
+    """Item 1 (the lead's sitting of 2026-11-18, fault 1): under the quiet passage's 27 knots,
+    with the server's driver about the world, every real `weather:` order failed inside
+    ("cannot pickle '_thread.RLock' object") while its dry run said it would be performed: the
+    wind's judgement deep-copied the weather, whose coast hooks are the World's own methods,
+    and the copy took the World and the driver's lock with it. Now the copy is the weather's
+    alone. Through the driver and through the console: a mild low is done, as its dry run
+    says, and a low deep enough for a gale is refused in words, by the figure it would blow."""
+    from freesail.agents import director as D
+
+    w = _directed_under(door)
+    assert D.brief_of(w).limits["wind_max_kn"] == 27
+    mild = 'weather: low "the low" radius 450 km at 1805-06-13T10:00 -500 300 1004'
+    assert "it would be performed" in D.dry_run(w, mild)
+    said = D.direct(w, mild)
+    assert said.startswith("Done: low 'the low' appended to the weather"), said
+    deep = 'weather: low "the deep" radius 450 km at 1805-06-13T10:00 -300 200 985'
+    said = D.direct(w, deep)
+    assert said.startswith("Refused, outside the brief: the brief allows no wind above 27"), said
+    assert "it would blow" in said
+    # the wind's judgement on the world itself, with the driver about it (the door judges
+    # on a copy, which has no driver; the judgement must hold where it is asked of the world)
+    from freesail.world import orders as WO
+
+    why = D.brief_of(w).limit_of(w, WO.parse(deep))
+    assert why is not None and "it would blow" in why, why
+    kinds = [e.kind for e in D.log_of(w).entries]
+    assert kinds.count("director.order") == 1 and kinds.count("director.refused") == 1
+
+
+@pytest.mark.slow
+def test_truth_7_651_every_forms_example_is_answered_alike_with_a_driver_or_a_console_about(
+    tmp_path,
+):
+    """Item 1, the test that would have caught it: every example of every form of world
+    order, on the forms' near sea under the quiet passage's limits, judged, dry run and
+    entered at the director's door with nothing about the world, with the server's driver
+    about it, and with the console's: nothing raises, and every answer is the same word for
+    word whichever door is about the world."""
+    import io
+
+    from freesail.agents import director as D
+    from freesail.ui.console import Console
+    from freesail.ui.server import Driver
+    from freesail.world import orders as WO
+    from tests.test_director import _forms_worlds
+
+    answers = {}
+    for door in ("bare", "driver", "console"):
+        w = _forms_worlds()[2]()  # the near sea, made afresh for each door
+        # a new command's scenario file (`court: ... new command`) written in a place of
+        # the test's own, one for each door, never in the working tree
+        w.__dict__["saves_dir"] = str(tmp_path / door)
+        D.set_brief(w, "quiet-passage", quiet=True)
+        if door == "driver":
+            Driver(w)
+        elif door == "console":
+            Console(w, out=io.StringIO())
+        said = []
+        for f in D.WORLD_ORDER_FORMS:
+            for x in f.examples:
+                said.append(str(WO.judged(w, WO.parse(x)) is not None))
+                said.append(D.dry_run(w, x))
+                D.budget_of(w).acts = 0
+                said.append(D.direct(w, x))
+        answers[door] = said
+    assert not any("could not run" in s or "pickle" in s for s in answers["driver"])
+    assert answers["driver"] == answers["bare"]
+    assert answers["console"] == answers["bare"]
+
+
+def test_truth_7_652_an_order_that_fails_inside_leaves_the_world_as_it_was_and_is_recorded(
+    monkeypatch,
+):
+    """Item 2 (fault 2): `person: "Mr Coffin" comes aboard as passenger` brought him aboard,
+    wrote "Mr Abel Coffin came aboard from Falmouth.", and then the station's binding raised:
+    the director was told it did not run, spent no act and had no entry, the play log carried
+    the half, and the save made after it did not replay. Now every world order is tried first
+    on a copy of the world. One that fails inside (the binding made to raise here as it raised
+    then, the name now being found, item 3) is answered "failed" in words with the world as
+    it was: he is still ashore, no line of his coming, the director's log says it failed, no
+    act is spent, `world_orders` holds it. And one the channel refuses after it had begun (a
+    squadron of a name already borne, whose members had left their sets before the refusal)
+    leaves the sets as they were."""
+    from freesail.agents import director as D
+    from tests.test_director import _forms_worlds
+
+    w = _directed_under("driver")
+    said = D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    assert said.startswith("Done:"), said
+    lines = len(list(w.log))
+
+    bind = type(w.stations).bind
+
+    def raises(self, name, person=None, *a, **kw):
+        if "Coffin" in str(getattr(person, "name", person) or ""):
+            raise ValueError(
+                "Mr Abel Coffin is not one of the ship's company; nobody by that name."
+            )
+        return bind(self, name, person, *a, **kw)
+
+    monkeypatch.setattr(type(w.stations), "bind", raises)
+    said = D.direct(w, 'person: "Mr Abel Coffin" comes aboard as passenger')
+    monkeypatch.undo()
+    assert said.startswith("Failed: the order was tried and failed inside"), said
+    assert "nothing of it was done" in said
+    coffin = w.people.find("Mr Abel Coffin")
+    assert coffin is not None and not coffin.aboard
+    new = list(w.log)[lines:]
+    assert not any("came aboard" in e.text for e in new)
+    assert [e.data.get("result") for e in new if e.kind == "world.order"] == ["failed"]
+    assert w.world_orders[-1]["result"] == "failed"
+    last = D.log_of(w).entries[-1]
+    assert last.kind == "director.failed" and "Mr Abel Coffin" in last.text
+    assert D.budget_of(w).acts == 1  # the making alone
+
+    near = _forms_worlds()[2]()
+    sq = near.squadrons.find("the Channel squadron")
+    members, commander = list(sq.members), sq.commander
+    e = near.world_order(
+        'squadron: "the Channel squadron" of Britain under the Nimble with the Medusa, bound '
+        "for Falmouth",
+        "the test",
+    )
+    assert e.data["result"] == "refused"
+    sq = near.squadrons.find("the Channel squadron")
+    assert (list(sq.members), sq.commander) == (members, commander)
+
+
+def test_truth_7_653_the_passenger_comes_aboard_by_his_own_name_and_the_save_replays():
+    """Items 2 and 3 together, as the owner tries them: the passenger made ashore at
+    Falmouth comes aboard as passenger by the name he was made by; the director's log says
+    so, one act each; and the save made after it replays to the same log."""
+    from freesail.agents import director as D
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w = _directed_under("driver")
+    assert D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth').startswith(
+        "Done:"
+    )
+    said = D.direct(w, 'person: "Mr Abel Coffin" comes aboard as passenger')
+    assert said.startswith("Done:"), said
+    assert w.people.find("Mr Abel Coffin").aboard
+    assert any(e.text == "Mr Abel Coffin came aboard from Falmouth." for e in w.log)
+    assert [e.kind for e in D.log_of(w).entries].count("director.order") == 2
+    assert D.budget_of(w).acts == 2
+    w.run(120)
+    data = w.save()
+    assert data["world_order_door"] == 2 and data["world_order_door_from"] == 0
+    again = replay.replay(data, ship_factory)
+    assert again.log.digest() == w.log.digest()
+
+
+def test_truth_7_654_a_save_from_before_the_door_replays_the_order_that_raised_as_played(
+    monkeypatch,
+):
+    """Item 2, the saves made before it: under the door as it was, an order that failed
+    inside raised out of it with its first half done and nothing recorded, and the save made
+    after it raised again on replay (the input road and the acts road) and did not load. A
+    save without the door's mark (`world_order_door`) is replayed by the door it was played
+    under, and the replay goes past the order that raised as the play went on: the half done
+    again, the same log. Made here by the old door itself, the mark then taken out."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w = _directed_under("none")
+    w.world_order('person: make "Mr Abel Coffin", a passenger, ashore at Falmouth', "the owner")
+    w.world_order_door_from = 10**9  # the door before package 118, for this game
+
+    bind = type(w.stations).bind
+
+    def raises(self, name, person=None, *a, **kw):
+        if "Coffin" in str(getattr(person, "name", person) or ""):
+            raise ValueError("nobody by that name")
+        return bind(self, name, person, *a, **kw)
+
+    monkeypatch.setattr(type(w.stations), "bind", raises)
+    with pytest.raises(ValueError):
+        w.world_order('person: "Mr Abel Coffin" comes aboard as passenger', "the owner")
+    w.run(60)
+    data = w.save()
+    data.pop("world_order_door")
+    data.pop("world_order_door_from")
+    assert not any('Coffin" comes aboard' in o["order"] for o in data["world_orders"])
+    again = replay.replay(data, ship_factory)
+    monkeypatch.undo()
+    assert again.log.digest() == w.log.digest()
+    assert again.people.find("Mr Abel Coffin").aboard  # the half, done again as in play
+    assert again.world_order_door_from == data["end_tick"] + 1
+
+
+def test_truth_7_655_a_person_is_found_by_the_name_he_was_made_by_and_not_made_twice():
+    """Item 3 (fault 3): `People.find` stripped 'Mr' from the words asked and compared them
+    with the name unstripped, so "Mr Abel Coffin" answered to "Mr Coffin" alone, and a
+    second `make` of his name was done. Now his whole name finds him with 'Mr', without it
+    and with 'Mister', as his surname did; a second making of the name is refused; and a
+    surname alone borne by a hand of another hull's company refuses no new person."""
+    from freesail.agents import director as D
+
+    w = _directed_under("driver")
+    D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    coffin = w.people.find("Mr Coffin")
+    assert coffin is not None
+    for words in ("Mr Abel Coffin", "Abel Coffin", "mister abel coffin", "Coffin"):
+        assert w.people.find(words) is coffin, words
+        assert w.people.find_anywhere(words) is coffin, words
+    said = D.direct(w, 'person: make "Mr Abel Coffin", a passenger, ashore at Falmouth')
+    assert "is among the people already" in said, said
+    said = D.direct(w, 'person: make "Abel Coffin", a passenger, ashore at Falmouth')
+    assert "is among the people already" in said, said
+    # the companies of other hulls (the lead's line of 2026-11-19): a director cannot know
+    # them, and two men of one name in two ships is the world as it is; a person a world
+    # order made, of whatever hull, and anybody ashore, are known
+    from tests.test_world_orders import _frigate_with_the_brig_x
+
+    w2, b, hull = _frigate_with_the_brig_x()
+    hers = [p for p in hull.people.all if str(p.name).startswith("Mr ")]
+    assert hers, [p.name for p in hull.people.all]
+    for p in hers[:3]:
+        e = w2.world_order(f'person: make "{p.name}", a passenger, ashore at Falmouth', "t")
+        assert e.data["result"] == "done", e.text
+    e = w2.world_order('person: make "Mr Pope", a passenger of fifty, ashore at Falmouth', "t")
+    assert e.data["result"] == "done", e.text
+    e = w2.world_order(
+        'person: make "Mr Gill", a merchant of forty, aboard the X, in the cabin', "t"
+    )
+    assert e.data["result"] == "done", e.text
+    e = w2.world_order('person: make "Mr Gill", a passenger, ashore at Falmouth', "t")
+    assert e.data["result"] == "refused" and "among the people already" in e.text, e.text
+    e = w2.world_order('person: make "Mr Pope", a passenger, ashore at Falmouth', "t")
+    assert e.data["result"] == "refused" and "among the people already" in e.text, e.text
+
+
+def test_truth_7_656_a_far_ship_sent_to_a_position_lies_to_there_until_her_next_order():
+    """Item 4 (fault 4): `ship "<name>": order shape a course for <a position>` was answered
+    "the order stands until the next", and at the position she was marked done and was out of
+    the sea. Now at the end of a course the director gave (to a position, or a course steered
+    for its sixty miles) she lies to there until her next order: the Medusa put on the sea and
+    sent six miles, and still in the world, hove to, a watch after she came there."""
+    from freesail.agents import director as D
+    from freesail.world.geo import bearing_and_distance
+
+    w = _directed_under("driver")
+    D.direct(w, 'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth')
+    medusa = w.vessels.find("Medusa")
+    said = D.direct(w, 'ship "Medusa": order shape a course for 49 50 N 4 40 W')
+    assert "the order stands until the next" in said, said
+    w.run(6 * 3600)
+    assert medusa in w.vessels.vessels and not medusa.done
+    assert medusa.plan and medusa.plan[0][0] == "lie_to"
+    from freesail.world.geo import Position
+
+    mark = Position(lat_deg=49 + 50 / 60, lon_deg=-(4 + 40 / 60))
+    assert bearing_and_distance(medusa.position, mark)[1] / units.NAUTICAL_MILE < 6.0
+    said = D.direct(w, 'ship "Medusa": order steer south')
+    assert "the order stands until the next" in said, said
+    w.run(12 * 3600)
+    assert medusa in w.vessels.vessels and medusa.plan[0][0] == "lie_to"
+    # `fill away` there, the next order her answer names (the lead's list of 2026-11-19: she
+    # had no saved plan, was given an empty one and was out of the world within three
+    # hours): her own goal's voyage again, and where she has no goal, refused in words and
+    # lying to as she was
+    indefatigable = w.vessels.find("Indefatigable")
+    goal = indefatigable.goal
+    D.direct(w, 'ship "Indefatigable": order shape a course for 50 15 N 4 15 W')
+    for _ in range(48):
+        w.run(1800)
+        if indefatigable.plan and indefatigable.plan[0][0] == "lie_to":
+            break
+    assert indefatigable.plan[0][0] == "lie_to" and indefatigable in w.vessels.vessels
+    said = D.direct(w, 'ship "Indefatigable": order fill away')
+    assert f"on her own voyage again ({goal})" in said, said
+    w.run(3 * 3600)
+    assert indefatigable in w.vessels.vessels and indefatigable.plan
+    assert indefatigable.plan[0][0] != "lie_to"
+    medusa.goal = ""  # a ship with no voyage of her own
+    D.budget_of(w).acts = 0
+    said = D.direct(w, 'ship "Medusa": order fill away')
+    assert "has no course to fill away on: she lies to as she was" in said, said
+    w.run(3 * 3600)
+    assert medusa in w.vessels.vessels and medusa.plan[0][0] == "lie_to"
+
+
+def _cut_out_at(miles: float):
+    """A British merchant brig cut out by a French privateer `miles` south of an English
+    schooner of the player's (no man of war of hers near, so the cut out is done)."""
+    from freesail.world import prizes as P
+    from freesail.world.geo import destination
+    from tests.test_brains import put, world_at
+
+    w = world_at(49.5, -5.5, ship="data/ships/topsail-schooner.yaml")
+    w.crewed_settings = {"cap": 0}
+    w.run(60)
+    far = destination(w.position, 180.0, miles * units.NAUTICAL_MILE)
+    prey = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "bound for the Start",
+        name="Nancy",
+    )
+    prey.sailing_factor = 0.85
+    p = destination(far, 270.0, 1.2 * units.NAUTICAL_MILE)
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="shown",
+        name="Vengeur",
+    )
+    pv.sailing_factor = 1.0
+    for _ in range(150):
+        w.run(60)
+        if P.is_prize(prey):
+            break
+    return w, prey, pv
+
+
+def test_truth_7_657_a_far_capture_is_a_line_of_his_log_only_when_his_deck_could_see_it():
+    """Item 5 (the owner's words of 2026-11-18): a far ship's capture, a hundred and twenty
+    miles off, was a notable line of the player's log. Now such a line is written into his
+    log only when the ships it names are in his lookout's sight and made out (their colours,
+    for a ship struck and taken): the same cut out a mile off is his line, and twelve miles
+    off, a sail on the horizon, it is not; the far record and her story hold it either way."""
+    from freesail.world import prizes as P
+
+    near, prey, _ = _cut_out_at(1.0)
+    assert P.is_prize(prey)
+    assert [e.text for e in near.log if e.kind == "squadron.cut_out"] == [
+        "Nancy is cut out: brought to by Vengeur with no help near, she strikes and is sent in "
+        "under a prize crew."
+    ]
+    far, prey, pv = _cut_out_at(12.0)
+    assert P.is_prize(prey) and P.record_of(prey)["how"] == "cut out"
+    assert far.lookout.made_out(prey.id) in (None, 0)
+    assert not any(e.kind == "squadron.cut_out" for e in far.log)
+    assert any("taken by the Vengeur" in words for _, words in prey.story)
+
+
+def test_truth_7_658_his_own_sets_ship_lost_or_parted_is_his_and_anothers_only_in_sight():
+    """Item 5, the lead's ruling: a ship lost to the set or parted from it is a line of his
+    log wherever she is when the set is his own (the convoy or squadron his ship commands or
+    sails in: her absence is what his lookout sees), and of another set's only when she is
+    in his sight and made out; a line that names his own ship is always his."""
+    from freesail.core.events import Severity
+    from freesail.world import squadrons as Q
+    from freesail.world.ships import PLAYER_ID, _seen_from_her_deck
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5)
+    w.run(60)
+    own = Q.Squadron(
+        id="his-convoy", name="his convoy", nation="britain", members=[PLAYER_ID, "x1"]
+    )
+    other = Q.Squadron(
+        id="their-convoy",
+        name="their convoy",
+        nation="britain",
+        commander="x2",
+        members=["x2", "x3"],
+    )
+    w.squadrons.add(own)
+    w.squadrons.add(other)
+
+    def line(kind, data):
+        return (Severity.NOTABLE, kind, "words", data)
+
+    for kind in ("squadron.lost", "squadron.parted"):
+        assert _seen_from_her_deck(w, line(kind, {"id": "x1", "squadron": "his-convoy"}))
+        assert not _seen_from_her_deck(w, line(kind, {"id": "x3", "squadron": "their-convoy"}))
+    assert not _seen_from_her_deck(
+        w, line("squadron.straggler", {"id": "x1", "squadron": "his-convoy"})
+    )
+    assert _seen_from_her_deck(w, line("prize.taken", {"captor": "x2", "prize": PLAYER_ID}))
+    assert _seen_from_her_deck(w, line("sail.spoke", {}))  # a line of no far kind is as it was
+
+
+def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
+    """Item 2, the record: the acts applier counted an act of the day's budget for every
+    world order of the director it gave again, a refused one too, where the door counts only
+    an order done, so a replay by the acts could be held by a budget the play was not. Now a
+    refused or failed order given again is counted as nothing, and a done one as one."""
+    from freesail.agents import director as D
+    from freesail.core import acts
+
+    w = _directed_under("none")
+    before = D.budget_of(w).acts
+    acts._world_order(w, "director", {"text": "weather: nothing at all", "source": D.SOURCE})
+    acts._world_order(
+        w, "director", {"text": 'person: "Mr Nobody" goes ashore', "source": D.SOURCE}
+    )
+    assert D.budget_of(w).acts == before
+    acts._world_order(
+        w,
+        "director",
+        {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
+    )
+    assert D.budget_of(w).acts == before + 1
+
+
+# -- package 121 (the owner's word of 2026-11-20): her service is her papers' -----------------
+# A frigate under a privateer's papers (`papers: {service: privateer}`, the harbour's "Her
+# service") read "a King's ship" to the officer of the watch and to the director: the reading
+# and the readers beside it asked her captain's role or her wardroom, never her papers. Each
+# reader now asks `service.service_of` (her papers first, then her captain's role, then her
+# wardroom); a prize-master is said by his role. Truths 7-710 to 7-714, each through the
+# scenario door.
+
+
+_ROOT_121 = Path(__file__).resolve().parents[1]
+
+
+def _papered(service=None, *, ship=None, position=None, intent=None, nation=None, **papers):
+    """The naval cruise's frigate (data/scenarios/naval-cruise.yaml) through the scenario door,
+    as the harbour's maker writes it: her papers' service given, or none; another ship file,
+    another position, an intent where named."""
+    import copy
+    import tempfile
+
+    from freesail.world.scenarios import (
+        load_scenario,
+        make_scenario_world,
+        read_scenario_text,
+        write_scenario,
+    )
+
+    text, raw = read_scenario_text(_ROOT_121 / "data" / "scenarios" / "naval-cruise.yaml")
+    raw = copy.deepcopy(raw)
+    raw["papers"] = dict(raw.get("papers") or {}, **papers)
+    if service is not None:
+        raw["papers"]["service"] = service
+    if ship is not None:
+        raw["ship"] = dict(raw["ship"], file=ship)
+    if position is not None:
+        raw["position"] = position
+        for key in ("ships", "world_orders", "orders", "standing_orders"):
+            raw.pop(key, None)
+    if intent is not None:
+        raw["intent"] = intent
+    if nation is not None:
+        raw["nation"] = nation
+    path = Path(tempfile.mkdtemp()) / "papered.yaml"
+    write_scenario(raw, path, text)
+    return make_scenario_world(load_scenario(path), seed=7)
+
+
+def _put_on_sea(w, description, name, nation, where, intent):
+    from freesail.world import ships as S
+
+    w.vessels.serial += 1
+    spec = {
+        "description": description,
+        "name": name,
+        "nation": nation,
+        "position": where.to_dict(),
+        "goal": intent,
+        "intent": intent,
+    }
+    return w.vessels.add(S.vessel_from_spec(w, spec, w.vessels.serial))
+
+
+def test_truth_7_710_her_papers_name_her_service_to_every_station_and_the_director():
+    """The owner's frigate under a privateer's papers is told as a privateer, under a merchant's
+    as a merchantman, and with none as the King's ship her wardroom makes her: at the player's
+    prompt ('the ship'), at the officer's door and at the director's alike, said once (the
+    answer had been headed twice, "The ship: The ship:"). The shipped merchant ship on the
+    frigate's file (data/scenarios/merchant-ship.yaml) is a merchantman of the United States.
+    OLD: all three "a King's ship of Britain"; the merchant ship "a ship of the American
+    navy"."""
+    from freesail.agents import tools
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    head = "The ship: Amazon, "
+    said = {
+        None: "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a King's ship of "
+        "Britain.",
+        "privateer": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a privateer "
+        "of Britain.",
+        "merchant": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a merchantman "
+        "of Britain.",
+    }
+    for service, words in said.items():
+        w = _papered(service)
+        prompt = w.submit("the ship").text
+        assert prompt.startswith(head + words), (service, prompt[:160])
+        assert "The ship: The ship:" not in prompt
+        for station in ("officer", "director"):
+            door = tools.submit_order(w, station, "the ship")
+            assert (head + words) in door and "The ship: The ship:" not in door, (station, door)
+        if service is not None:
+            assert "King's ship" not in prompt and "navy" not in prompt
+    m = make_scenario_world(
+        load_scenario(_ROOT_121 / "data" / "scenarios" / "merchant-ship.yaml"), 7
+    )
+    assert "; a merchantman of the United States." in m.submit("the ship").text
+
+
+def test_truth_7_711_a_blockade_and_the_cover_of_the_trade_are_a_king_s_ships_alone():
+    """A blockade is a public force's, and the King's ships protect the trade: the frigate under
+    French colours in Plymouth Sound, France at war with Britain, is an enemy man of war in the
+    port's offing (which keeps a squadron in ordinary there from slipping out) only as a King's
+    ship, by her wardroom (no papers) or her papers; under a privateer's or a merchant's papers
+    she is none, and a British merchant brig half a mile off her at sea is covered only by the
+    King's ship. OLD: her wardroom answered, and all four blockaded and covered."""
+    from freesail.world import regimes as REG
+    from freesail.world import squadrons as Q
+    from freesail.world.geo import destination
+
+    for service, kings in (
+        (None, True),
+        ("kings", True),
+        ("privateer", False),
+        ("merchant", False),
+    ):
+        w = _papered(service, nation="france")
+        plymouth = w.dealings.ports["plymouth"]
+        assert REG._enemy_men_of_war_near(w, plymouth, "britain", 10.0) is kings, service
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+        nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+        assert Q._covered(w, nancy) is kings, service
+
+
+def test_truth_7_712_a_free_intent_takes_her_papers_role_before_her_wardrooms():
+    """Her captain given a passage and no role sails by her papers' service: a privateer's book
+    under a privateer's papers, a merchant's under a merchant's, the King's ship's with none
+    (her wardroom, package 86). OLD: the King's ship's book under all three."""
+    roles = {None: "kings-ship", "kings": "kings-ship", "privateer": "privateer"}
+    roles["merchant"] = "merchant"
+    for service, role in roles.items():
+        w = _papered(service, intent="bound for Falmouth")
+        assert w.captain.role == role, (service, w.captain.role)
+
+
+def test_truth_7_713_she_hails_answers_and_is_obeyed_as_her_papers_say():
+    """The hail by her service: with no words, a merchantman by her papers hails 'What ship is
+    that, and whither bound?' and the rest 'What ship is that?'; hailed herself, her captain
+    with no role, she answers as her service (a privateer 'The privateer Amazon of ...'; old, as
+    a merchantman by default); and a neutral merchantman told to heave to obeys a King's ship
+    or a privateer (her letter of marque carried the right to bring to and examine in war), and
+    makes sail from a merchantman by her papers. OLD: the King's ship's hail under all; the
+    neutral obeyed her whatever her service."""
+    from freesail.world import hail as H
+    from freesail.world.geo import destination
+
+    for service, hail, obeys in (
+        (None, "What ship is that?", True),
+        ("privateer", "What ship is that?", True),
+        ("merchant", "What ship is that, and whither bound?", False),
+    ):
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        near = destination(w.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+        dane = _put_on_sea(w, "merchant brig", "Fortuna", "denmark", near, "bound for 49 0 N 8 0 W")
+        assert dane.nation == "denmark"
+        hailed = w.submit("hail the Fortuna").text
+        assert f"by the trumpet: '{hail}'" in hailed, (service, hailed)
+        demand = w.submit("say to the Fortuna: heave to").text
+        assert ("Aye aye: heaving to." in demand) is obeys, (service, demand)
+        assert ("She makes no answer but sail." in demand) is not obeys, (service, demand)
+        shadow = w.vessels.player_shadow(w)
+        own = H.answer_by_table(w, shadow, "What ship is that?", other_world=w)
+        if service == "privateer":
+            assert own.startswith("The privateer Amazon of "), own
+        elif service is None:
+            assert "His Majesty's" in own and "on the King's service" not in own, own
+
+
+def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps_her_look():
+    """No station of a ship the Regulations do not bind is told they do: the officer of the
+    watch of the frigate under a privateer's or a merchant's papers is told to report to the
+    captain 'what the officer of the watch reports to him', and with none 'what the Regulations
+    gave the lieutenant to report'; the wardroom's outlines, her people's duties from the
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout
+    sees the brig under a merchant's papers as the merchant brig, and under a privateer's as
+    the brig-sloop she looks (armed, full of men). OLD: the Regulations' words under all
+    three papers, in the brief and in the outlines; the brig under either papers the
+    brig-sloop."""
+    from freesail.agents import agent
+
+    for service, bound in ((None, True), ("privateer", False), ("merchant", False)):
+        w = _papered(service)
+        brief = agent.officer(world=w).brief
+        assert (agent.REGULATIONS_REPORT in brief) is bound, service
+        assert (agent.PLAIN_REPORT in brief) is not bound, service
+        assert "Regulations" not in brief or bound, service
+        # her people stay the frigate's file's: their duties said, the Regulations cited
+        # only where they bind her
+        captain = agent.station_outline(w, agent.CAPTAIN)
+        assert "her people and her orders are his" in captain, (service, captain)
+        assert ("the Regulations" in captain) is bound, (service, captain)
+        lines = " ".join(w.people.wardroom_lines())
+        assert ("the Regulations" in lines) is bound, service
+    looks = {None: "brig-sloop", "privateer": "brig-sloop", "merchant": "merchant brig"}
+    for service, look in looks.items():
+        w = _papered(
+            service, ship="data/ships/brig.yaml", position={"lat_deg": 49.6, "lon_deg": -5.6}
+        )
+        assert w.vessels.player_shadow(w).description == look, service

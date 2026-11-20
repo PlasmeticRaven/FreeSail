@@ -74,6 +74,7 @@ from freesail.world.geo import (
     format_position,
     parse_position,
 )
+from freesail.world.service import free_intent_role
 
 __all__ = [
     "ACTOR_PREFIX",
@@ -318,24 +319,48 @@ SIZE_RANK: dict[str, int] = {
     "seventy-four": 4,
     "hermaphrodite brig": 2,
     "bilander": 1,
+    # package 90's ships (docs/design/Plan-Package90.md §5.1 item 6; their files and rows come
+    # with each ship): the tartane the cutter's class; the polacre and the xebec a brig's, by
+    # their size; the corvette, a ship-sloop, the brig-sloop's (Design-Ship-Diana.md §11); and
+    # the three-decker a class above the ships of the line, compared and never an index (the
+    # owner's answer to question 8, 2026-11-18, Decisions-Package90-2026-11.md)
+    "tartane": 1,
+    "polacre": 2,
+    "xebec": 2,
+    "corvette": 2,
+    "three-decker": 5,
 }
 # The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
 # rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
 # lower class hauls off from an enemy of this class made out within her doctrine's
 # `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
-# match for one ship of the line (p. 78).
+# match for one ship of the line (p. 78). The three-decker's 5 (package 90) is of the line too:
+# every reader compares a rank with this one as at least it.
 LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
-# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
+# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8).
+# Package 90 (docs/design/Plan-Package90.md §5.1 item 6): each of its words before any row that
+# matches inside it or inside the words that name her: the three-decker's and the first rate's
+# before "ship of the line" ("a first rate, a ship of the line" is of rank 5); the corvette's,
+# the ship-sloop's and the xebec's before "a ship" ("a ship-sloop" holds it); the polacre's
+# before "a ship" and "brig" ("a polacre-ship", "a polacre brig"); the tartane's with them
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("razee", 3),
     ("sixty-four", 4),
     ("seventy-four", 4),
+    ("three-decker", 5),
+    ("first rate", 5),
     ("ship of the line", 4),
     ("two-decker", 4),
     ("bilander", 1),
     ("frigate", 3),
+    ("corvette", 2),
+    ("ship-sloop", 2),
+    ("ship sloop", 2),
+    ("xebec", 2),
+    ("polacre", 2),
+    ("tartane", 1),
     ("a ship", 3),
     ("brig", 2),
     ("schooner", 1),
@@ -1053,8 +1078,8 @@ def role_for(world: Any, intent: Intent | None, given: str = "", sub_type_role: 
         return "packet"
     if intent is not None and intent.convoy:
         return "commodore"  # package 71: the convoy's escort, by the intent's words
-    if intent is not None and intent.kind in ("home", "passage", FREE) and _is_kings_ship(world):
-        return "kings-ship"  # a free intent's too (package 86): her service's role
+    if intent is not None and intent.kind in ("home", "passage", FREE):
+        return free_intent_role(world)  # her papers', else her wardroom's (packages 86, 121)
     return "merchant"
 
 
@@ -2629,10 +2654,18 @@ class Captain(Judgement):
         self._leave(state)
         self.state = None
         words = f" and his book '{state}' struck"
+        # the deck the player's from now, and what of it he must see to himself (the cold
+        # review of 2026-11-14, 1.5; package 115 D1: the guns left lashed through an action
+        # because the captain who would have cast them loose had stood aside unseen)
+        deck = "the deck is yours"
+        ship = getattr(self.world, "ship", None)
+        guns = [g for g in (getattr(ship, "guns", None) or {}).values() if g.serves]
+        if guns and not any(g.cast_loose for g in guns) and self._enemy_in_sight():
+            deck += ", and her guns are secured"
         self.world.record(
             Severity.NOTABLE,
             "captain.aside",
-            f"{self.name} stands aside at your order ({text!r}){words}; "
+            f"{self.name} stands aside at your order ({text!r}){words}; {deck}; "
             "'captain: carry on' gives her back to him.",
             actor=actor_for(state),
             data={"order": text, "state": state, "intent": self.intent_words},
@@ -2658,6 +2691,20 @@ class Captain(Judgement):
             actor=actor_for(state),
             data={"order": f"take command: {to}", "state": state, "intent": self.intent_words},
         )
+
+    def _enemy_in_sight(self) -> bool:
+        """A sail in sight of a nation at war with hers, by the lookout (for the aside's
+        words: the guns' state is said where there is a fight to be had)."""
+        world = self.world
+        lookout = getattr(world, "lookout", None)
+        ship = getattr(world, "ship", None)
+        nations = getattr(world, "nations", None)
+        ports = getattr(world, "dealings", None)
+        own = getattr(ports, "ship_nation", None)
+        if lookout is None or ship is None or nations is None or not own:
+            return False
+        items = (lookout.strangers(world, float(ship.heading)) or {}).get("items") or []
+        return any(i.get("nation") and nations.at_war(str(i["nation"]), str(own)) for i in items)
 
     def carry_on(self) -> str:
         """`captain: carry on`: the captain commands again from where she is, his plan
@@ -4575,6 +4622,8 @@ class Captain(Judgement):
         world = self.world
         ship = world.ship
         tick = p.tick
+        if self._helm_first(ship, tick):
+            return
         if tick - int(self._business.get("repairs_tick", -(10**9))) < 600:
             return
         # the rigging is mended when the weather serves (the carpenter's and the boatswain's
@@ -4615,11 +4664,33 @@ class Captain(Judgement):
 
                             wanted.append((f"fish the {_name(ship, spar.id)}", "a sprung spar"))
                             break
+        if ship.extra.get("helm_by_tackles") and "repair_wheel" not in in_hand and not in_action:
+            # the wheel in its turn, after the leak and the rigging and out of action
+            # (package 116, card 5): she steers by the tackles meanwhile, the slower
+            wanted.append(("repair the wheel", "steering by the relieving tackles"))
         if not wanted:
             return
         self._business["repairs_tick"] = tick
         text, why = wanted[0]
         self.give(text, why=why)
+
+    def _helm_first(self, ship: Any, tick: int) -> bool:
+        """The wheel shot away: the relieving tackles before everything, whatever the
+        weather and whatever other repair was last given (package 115 D4 (e): a ship that
+        cannot steer cannot fight or claw off; package 116, card 5: before, this stood
+        behind the repairs' own rules, so that he never rigged them lying to for weather, in
+        distress, with the wind at the shortening figure and above, where a ship with no
+        helm needs them most, nor within ten minutes of another repair's order). True
+        while the helm is lost: no other repair is given until the tackles are rove."""
+        if not ship.extra.get("helm_lost"):
+            return False
+        runner = ship.extra.get("evolutions")
+        in_hand = {inst.evo.id for inst in getattr(runner, "instances", [])} if runner else set()
+        asked = int(self._business.get("helm_tick", -(10**9)))
+        if "relieving_tackles" not in in_hand and tick - asked >= 60:
+            self._business["helm_tick"] = tick
+            self.give("rig the relieving tackles", why="the wheel shot away")
+        return True
 
     def _chase_order(self, p: Perception) -> str:
         """'chase the cutter': the chase named by HIS stranger's rig when the lookout has
@@ -4886,9 +4957,54 @@ class Captain(Judgement):
         world = self.world
         state = self.state or "on passage"
         ship = world.ship
+        if _waits_for_the_helm(ship, text):
+            # the wheel shot away and the tackles not yet rove (package 116, card 5): he
+            # gives no helm order and begins no helm manoeuvre; the order is not given, and
+            # his own work reads it as refused and tries again at its next judgement
+            from freesail.core.events import Event
+            from freesail.evolutions.scripts import HELM_LOST_WORDS
+
+            return Event(
+                tick=world.clock.tick,
+                ship_time=world.clock.ship_time,
+                severity=Severity.ROUTINE,
+                kind="order.rejected",
+                text=HELM_LOST_WORDS,
+                actor=actor_for(state),
+                data={"order": text, "not_given": "the wheel shot away"},
+            )
         done = said_as_done(ship, text) if hasattr(ship, "parts") else text
         said = f"By the captain, {state}: {done}" + (f" ({why})" if why else "")
         return world.submit(text, actor=actor_for(state), said=said)
+
+
+# The orders of his that drive the helm, by how they begin (package 116, card 5): not given
+# while the wheel is shot away and the relieving tackles not rove (`Captain.give`). The sail,
+# the guns, the damage, the lead and `heave to` (done by her sails) are given as before; an
+# order of another kind that would reach the helm meets the order's own refusal
+# (`orders.verbs._helm`, `Runner._failing_condition`).
+_HELM_ORDERS = (
+    "steer ",
+    "shape a course ",
+    "put her about",
+    "box her off",
+    "fill away",
+    "come to an anchor",
+    "get under way",
+    "lie a-try",
+    "give chase",
+    "chase ",
+    "make her out",
+    "keep your station",
+    "lay her aboard",
+    "let the pilot take her in",
+)
+
+
+def _waits_for_the_helm(ship: Any, text: str) -> bool:
+    if not (getattr(ship, "extra", None) or {}).get("helm_lost"):
+        return False
+    return " ".join(text.lower().split()).startswith(_HELM_ORDERS)
 
 
 # ---------------------------------------------------------------------------

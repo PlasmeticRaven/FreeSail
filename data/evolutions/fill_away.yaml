@@ -42,5 +42,9 @@ on_fail: {log: "Could not fill away: {reason}.", kind: evolution.failed, severit
 # It is more than one watch of the schooner has at this rating (six ordinary, seven
 # able, two landsmen on deck at the least), so there the request is made up with
 # better hands and goes a little faster than milestone 2; the frigate's watch fills it.
-crew: {hands: 12, rating: ordinary, stations: [afterguard, marines]}
+# too_few (package 119, heaving to's pair, by the owner's word of 2026-11-19 as the lead
+# rules it): where the watch on deck is too few to begin it, all hands are called for it
+# and piped down after, as for heaving to; the merchant brig hove to by night by all hands
+# and the smack's larboard watch of two waited to fill away before, and lay hove to.
+crew: {hands: 12, rating: ordinary, stations: [afterguard, marines], too_few: all hands}
 source: "Luce 1866, ch. XXVI Emergencies, 'To fill away, after lying to with the main topsail to the mast'"

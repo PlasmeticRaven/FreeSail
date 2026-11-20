@@ -1031,7 +1031,13 @@ def test_her_helm_as_tuned_holds_truths_6_and_17():
     points to ten, +0.16, +0.39 and +0.79 at seven points, the beam and ten points (the 64's +0.17,
     +0.43 and +0.76); at six points, her own close-hauled course, 0.97 deg of lee helm (the 64's
     0.95), banded as the 64's. The Bellona's "weatherly helm" (Lavery 1985 p. 9, Table 2) is not
-    reached close-hauled without her griping aback getting under way: for the owner's eye."""
+    reached close-hauled without her griping aback getting under way: for the owner's eye.
+    Package 119 (the owner's word of 2026-11-19): the second wind is 15.5 knots, old 16; the
+    16-knot pass sat on an edge, one ordinary seaman in her starboard fore top (moved, she is
+    aback in 16 knots at the old muster too), and from rest, plain sail, braced sharp up she is
+    taken aback from about 16 to 16.5 knots under either muster, which is left to her author.
+    At 15.5 knots: 58.9 deg, settled in 456 s at the old muster; 57.5 deg, 474 s at five and
+    five's (docs/dev/TuningNotes.md, package 119). The same bounds as at 16."""
     from tests.test_known_truths import reading, run, under_plain_sail
 
     world = under_plain_sail(SEVENTY_FOUR, 270.0)
@@ -1051,7 +1057,7 @@ def test_her_helm_as_tuned_holds_truths_6_and_17():
         assert 0.1 <= helm <= 1.0, (off, helm)
     helm = reading(under_plain_sail(SEVENTY_FOUR, 67.5))["weather_helm"]
     assert -1.5 <= helm <= 0.0, helm  # six points: lee helm, as the 64's
-    for wind_kn in (15.0, 16.0):
+    for wind_kn in (15.0, 15.5):  # package 119; old (15.0, 16.0): 16 kn sat on an edge
         aback, min_off, sternway, settled_at, kn = _truth_17_form(SEVENTY_FOUR, wind_kn)
         assert aback == [], wind_kn
         assert min_off > 45.0 and sternway < 0.5, (wind_kn, min_off, sternway)
@@ -2093,6 +2099,8 @@ BEAT_LINE = {
 MARINES_KEPT = {"data/ships/razee-44.yaml": 14, SIXTY_FOUR: 84}
 # The 64's deck lines, new beside her old beat, which had none (B7.b item 2, keyed on two gun
 # decks: the lead's answer (2))
+# the beat's last words while no gun is cast loose (package 115 D1)
+GUNS_SECURED = "The guns are secured: 'cast loose the guns' to serve them."
 SIXTY_FOURS_DECK_LINES = [
     "The lower deck: 13 gun crews, 143 men.",
     "The upper deck: 13 gun crews, 117 men.",
@@ -2181,8 +2189,10 @@ def test_her_beat_says_her_decks_and_the_64s_with_her():
     _w, said, q = _beaten(SIXTY_FOUR)
     assert q.describe()[0] == f"Quarters: {BEAT_LINE[SIXTY_FOUR]}."
     assert q.describe()[1:5] == SIXTY_FOURS_DECK_LINES
+    # package 115 D1 (re-pinned by the lead's word): the beat says the guns are secured
+    # (old: the line ended with the deck lines)
     assert said.text == "Beat to quarters! " + " ".join(
-        [f"Quarters: {BEAT_LINE[SIXTY_FOUR]}.", *SIXTY_FOURS_DECK_LINES]
+        [f"Quarters: {BEAT_LINE[SIXTY_FOUR]}.", *SIXTY_FOURS_DECK_LINES, GUNS_SECURED]
     )
 
 
@@ -2197,7 +2207,8 @@ def test_nothing_of_a_one_gun_deck_file_moves_at_the_beat(path):
     from freesail.crew.quarters import MARINES
 
     _w, said, q = _beaten(path)
-    assert said.text == f"Beat to quarters! Quarters: {BEAT_LINE[path]}."
+    # package 115 D1 (re-pinned by the lead's word): old, the line ended at the bill
+    assert said.text == f"Beat to quarters! Quarters: {BEAT_LINE[path]}. {GUNS_SECURED}"
     assert q.describe()[0] == f"Quarters: {BEAT_LINE[path]}."
     assert not any(line.startswith("The ") and " deck: " in line for line in q.describe())
     assert all(gc.deck is None and "deck" not in gc.__getstate__() for gc in q.crews.values())
@@ -2502,9 +2513,13 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
     assert len(shut) == 8
     said = w.submit("fire the starboard lower deck")
     assert said.kind == "guns.fire", said.text
+    # package 115 D, the lead's reading at 60af48e, item 3 (`fire` true of the guns): the
+    # beat leaves her guns secured, and the answer says so. OLD "... each as soon as it is
+    # ready, six guns; eight are behind ports the sea has shut."
     assert said.text == (
-        "The starboard lower-deck guns to fire each as soon as it is ready, six guns; eight are "
-        "behind ports the sea has shut."
+        "The starboard lower-deck guns to fire each as soon as it is cast loose and ready, six "
+        "guns; eight are behind ports the sea has shut. The guns are secured: none is loaded, "
+        "run out or fired until they are cast loose; say 'cast loose the guns'."
     )
     assert len(b.single) == 6 and not set(b.single) & shut
     b.single.clear()
@@ -2531,8 +2546,11 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
 # wanted every fit hand aboard (574, 477, 113 and 118); at B7.c before its review it drew on every
 # hand idle at quarters (196, 181, 61 and 76, the helm, the powder, the carpenter's crew and the
 # surgeon's mates among them) and lent 72, 39, none and none.
+# package 119 (the muster's rule 3: the odd hands of odd stations to the watches in turn): the
+# seventy-four's watches 265 and 265, her party one watch (old `(268, 150, 118)`, her starboard
+# watch of 268; docs/dev/TuningNotes.md, "Package 119")
 TACK_AT_QUARTERS = {
-    SEVENTY_FOUR: (268, 150, 118),
+    SEVENTY_FOUR: (265, 150, 115),
     SIXTY_FOUR: (218, 137, 81),
     "data/ships/brig.yaml": (48, 42, 6),
     "data/ships/hermaphrodite-brig.yaml": (55, 65, 0),

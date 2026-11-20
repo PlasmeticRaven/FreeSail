@@ -1,0 +1,25 @@
+# FreeSail: a first passage (package 96b, step 2; docs/design/Design-Harbour.md §3.3). The
+# game the harbour's page names for a newcomer to begin with: the primer's chapter 7
+# (docs/primer/07-a-first-passage.md), "The frigate Amazon, morning watch", as a scenario,
+# so that it can be started from the page. The frigate lies with her head west-north-west
+# at four in the morning, a north wind of fifteen knots six points on her starboard bow,
+# nothing set and no way on her; no land, no other sail, no port, no book of standing
+# orders: an hour and a quarter of making sail, bracing up, tacking and wearing, typed
+# along with the chapter, whose logs are from this seed and this wind.
+#     py -m freesail.ui.console --scenario data/scenarios/first-passage.yaml
+# is the chapter's own command,
+#     py -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 293
+# and gives the chapter's log line for line (tests/test_harbour.py holds the two together).
+#
+# On the endless plane, as the chapter's bare ship is: no position and no chart, so that
+# nothing but the ship and the wind is in the lesson. The wind is the one fixed wind
+# (`wind:`), not pinned by the hour and not the month's weather.
+
+name: A first passage
+seed: 7
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 293
+wind:
+  from_deg: 0
+  knots: 15

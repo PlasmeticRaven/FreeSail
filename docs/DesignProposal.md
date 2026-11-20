@@ -1018,6 +1018,96 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     (d) **Peace needs a purpose in play,** to be designed, not only dated. (e) The data
     work is planned as milestone 7c, after the review, from the range's audit.
 
+70. **The consent brief revised to what the game does; the seats at war with a human's ship
+    described.** Owner, 2026-11-18, having read package 117's draft whole
+    (`docs/design/ConsentBrief-Revision-2026-11.md`, at e1cf1abf): "I've read through the
+    consent brief revision and I'm happy with it." With his ruling of 2026-11-15
+    ("Adversarial seating should be included in the consent wording"), the approval covers
+    the draft's Part 1 and its Part 3 as drafted. So: (a) the brief below its rule is Part 1
+    with Part 3's words entered at its marks, the drafting marks taken out and no other word
+    changed; (b) all six watched sections move, and every identity with a yes on record is
+    asked again once, at its next seating (each was owed it already: no yes on file was
+    given against the brief of 2026-10-17); (c) `seats.ADVERSARIAL_SEATS_CONSENTED` is
+    turned, and a yes given against an older brief seats nobody at those seats until the
+    question is put again; (d) the code is made to keep two sentences, by the lead's
+    rulings: the director's `unseat` stands down only a seat given by the director or under
+    the owner's grant, and the prize master's ladder passes over a person a model holds
+    where the adversarial gate would refuse that seat; (e) two clauses stand as approved
+    and are not built away: a token written after a stand-down is not heard once another
+    has taken the station, and a letter the director sends may bear any name. What the
+    draft found and left to him (a shot into a recognised friend unlogged; a struck ship
+    fired into by a later order; no forms for a model captor; `outlaw` read by nothing; a
+    letter in a held person's name; the earlier holder's token when a relief holds the
+    seat) is his to choose, outside the package.
+
+71. **The player's own Python is struck.** Owner, 2026-11-19, on the survey of the proposal
+    against the game: "We can strike the direct Python integration, having built this much,
+    and seeing what the game is now, it's a natural language game, not a coding one, and
+    that's OK. It still plays just as much to the strengths and preferences of models, and
+    for me. Coding to sail was what drove me to brainstorm the idea, but now, I see that
+    really, the Orders language is that done right." So: the control ladder ends at the
+    orders and the standing orders; level 3 of §2.2, the script interface of §4.2 and §4.3
+    and the sandbox of §4.5 are not to be built, and the sections say so when the proposal
+    is revised. The library that stands in the code for it is not a promise to a player.
+
+72. **A player can make a new ship, by hand or with a model's help: the intent kept, the
+    wording open.** Owner, 2026-11-19, on §3.3's "ships are data files, not code": "I think
+    it's still going to be important for the game to allow players, either manually, or at
+    least with LLM assistance, to create new ships for the game. A more open consideration
+    is deserved on this one. How can we hit the intent, despite the original wording?" The
+    ship files are written by the generator today and are not edited by hand. What is to be
+    designed: a ship described in a sheet a person or a model can write, made into her file
+    by the generator and proved by the game before she is sailed. Not designed yet; it has
+    no package.
+
+73. **Peace has its purpose in the man, not in a mode.** Owner, 2026-11-19, on decision
+    69(d): "In peacetime, a player is for what a man of the sea would be for in peacetime.
+    If of a peaceful trade like cargo or fishing, the loop remains clear, and if of a
+    wartime profession, they must find the way to live."
+
+74. **Every calling of the sea is a path.** Owner, 2026-11-19: "Trade, fishing,
+    privateering, piracy, and the navy should all generally be paths that can be taken both
+    naturally in gameplay and, by extension, in the eventual career system. A general
+    principle to consider here might be that, where possible, the world should function,
+    and the player in it, rather than the player playing in the world that is formed around
+    them." The principle stands beside the pillars: **the world functions, and the player
+    is in it.** It bears on decision 58's career (a merchant, a fisherman, a privateer and
+    a pirate may begin one, as a naval officer may) and on decision 68's closed corsair's
+    station, which is to be looked at again under it.
+
+75. **The order of the milestones after 7.** Owner, 2026-11-19, of the three shapes the
+    survey offered (A, the ship and her people; B, the world that moves and the career; C,
+    the player's first hours): "I think A, B, then C, or A, C, then B, are the preferable
+    orders for me for the next milestones." So the next milestone's centre is the ship and
+    her people; which of the other two follows is settled when it closes. And the same day:
+    "the structural half (AKA the cheaper test suite) of C could run besides A or B, as you
+    say, and should." So the work on the suite, and on the boundary between the simulation and
+    what drives or shows it, runs beside the next milestone and does not wait for C.
+
+76. **The corsair's station is open by consent; a slave ship's master is the rules' alone.**
+    Owner, 2026-11-20, looking again at decision 68's closed station under decision 74:
+    "we've built a consent system centered around directness, honesty, and free choice, and
+    we might allow a model or player to choose to play as a corsair, understanding the
+    implications, the model being briefed in the consent, and the player understanding by
+    primer and by being informed, either at scenario start, or by the world, of the
+    implications of taking a corsair role. I don't intend to play as a corsair, but it
+    doesn't entirely make sense to me to make them rules-only." And, the line and the way
+    of building it: "Agreed on drawing the line at a slave ship's master, a corsair, open
+    and honest without glorification of the reality is acceptable, and may be built
+    alongside a robust rules-based system so that a model never need be seated for the
+    system to function. We can build this as a package rather than a widening of 90, so you
+    have direct oversight, as it's a general system. It can be placed in the career
+    milestone, the polacre's and xebec's corsair fits held for it." So: a model or a player
+    may hold a corsair's station by a free choice made knowing what the station is and may
+    do (the model by the consent brief, where it is its own question; the player by the
+    primer and by being told at the scenario's start or by the world); the game tells it
+    plainly and does not glorify it; the rules' own corsair is built whole, so that the
+    world's corsairs sail with nobody seated; and no player and no model is ever seated as
+    the master of a slave ship. The work is a package of its own under the lead, in the
+    milestone of the world that moves and the career (decision 75's B); the consent
+    documents change only by the owner's own process
+    (`docs/design/Design-SlaveryAndSuppression.md`, section 8).
+
 ### Still open
 
 At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

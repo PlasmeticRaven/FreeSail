@@ -24,8 +24,11 @@ checkpoint and a world replayed to the same tick carry on to the same digest for
 watch. The state is Python's pickle of the object graph with the hooks that do not
 pickle left out (the ship's stepper and order handler, the chart's shared tiles, the
 log's subscribers, an agent's live door) and put back at the load; it is read through
-an unpickler that admits the game's own classes and the standard library's plain
-types and nothing else, so a checkpoint from elsewhere cannot run code here.
+an unpickler that admits an exact list of the classes and functions the game's own
+checkpoints hold (`core/checkpoint_names.py`) and nothing else, so that loading a
+checkpoint from elsewhere calls nothing but the game's own constructors of its state
+(package 115, part B: before it the list admitted whole modules, and a hand-made
+checkpoint could call a function of the operating system).
 
 **The build's stamp and the load's rule** (package 37d; the review of gate 5c's
 playtests, sections 6 and 9). A save and its checkpoint's header say which build wrote
@@ -164,6 +167,13 @@ def replay(
     # the world orders' outcomes in play, which a seat's consent is read from in a replay
     # rather than from the records on this machine (package 67: a seat held under records
     # kept elsewhere, `--consent-records`, was refused in the replay and the log diverged)
+    # the door the world orders were played under (package 118): a save without the mark
+    # was played under the door before it, which this replay keeps for its every tick, and
+    # so does a game that goes on from it, for those ticks
+    if "world_order_door" in data:
+        world.world_order_door_from = int(data.get("world_order_door_from") or 0)
+    else:
+        world.world_order_door_from = int(data["end_tick"]) + 1
     world.replayed_orders = {
         (int(o.get("tick") or 0), " ".join(str(o.get("order") or "").split())): str(
             o.get("result") or ""
@@ -223,7 +233,11 @@ def replay(
             and (within is None or station_acts[j].get("station") == within[1])
         ):
             act = station_acts[j]
-            acts_mod.give(world, act, driven_station)
+            try:
+                acts_mod.give(world, act, driven_station)
+            except Exception:
+                if not _raised_in_play(world, act):
+                    raise
             if world.station_acts is not None:
                 world.station_acts.append(dict(act))  # the record, kept for a save of it
             j += 1
@@ -243,7 +257,11 @@ def replay(
                 # a station stood down by its unbinding: its acts inside the input come
                 # where they came, before the binding's own line (package 42)
                 give_acts(within=(i + 1, str(inputs[i]["binding"]["name"])))
-            _give(world, inputs[i])
+            try:
+                _give(world, inputs[i])
+            except Exception:
+                if not _raised_in_play(world, inputs[i]):
+                    raise
             i += 1
             # a station seated after this input, whatever it was (package 37d: a driver's
             # line and a refused order are inputs and no orders), is seated here
@@ -275,6 +293,16 @@ def replay(
                 ]
                 h.take_up_after_replay(kept)
     return world
+
+
+def _raised_in_play(world: Any, entry: dict[str, Any]) -> bool:
+    """Whether an input or an act that raised in this replay is a world order that raised
+    in play under the door before package 118 (a save without its mark): its first half
+    done and nothing recorded, as the replay has it now, and the replay goes on past it as
+    the play went on. Anything else that raises is the replay's own fault, raised."""
+    if world.clock.tick >= int(getattr(world, "world_order_door_from", 0) or 0):
+        return False
+    return any(k in entry for k in ("world_order", "director_order"))
 
 
 def driven_station(world: Any, seated: dict[str, Any]) -> Any:
@@ -445,58 +473,48 @@ def _new(cls: type) -> Any:
     return cls.__new__(cls)
 
 
-# What a checkpoint may name: the game's own classes and the standard library's plain
-# types that its state is made of. Anything else is refused, so a checkpoint from
-# elsewhere cannot run code here.
-_ALLOWED_MODULES = ("freesail.",)
-_ALLOWED_EXACT = {
-    ("freesail.core.replay", "_new"),
-    ("copyreg", "_reconstructor"),
-    ("builtins", "set"),
-    ("builtins", "frozenset"),
-    ("builtins", "list"),
-    ("builtins", "dict"),
-    ("builtins", "tuple"),
-    ("builtins", "object"),
-    ("builtins", "bytearray"),
-    ("builtins", "bytes"),
-    ("builtins", "str"),
-    ("builtins", "int"),
-    ("builtins", "float"),
-    ("builtins", "bool"),
-    ("builtins", "complex"),
-    ("builtins", "range"),
-    ("builtins", "slice"),
-    ("builtins", "getattr"),
-    ("random", "Random"),
-    ("_random", "Random"),
-    ("collections", "OrderedDict"),
-    ("collections", "deque"),
-    ("collections", "defaultdict"),
-    ("datetime", "datetime"),
-    ("datetime", "date"),
-    ("datetime", "timedelta"),
-    ("datetime", "time"),
-    ("datetime", "timezone"),
-    ("pathlib", "PosixPath"),
-    ("pathlib", "WindowsPath"),
-    ("pathlib", "PurePosixPath"),
-    ("pathlib", "PureWindowsPath"),
-    ("enum", "EnumType"),
-    ("enum", "EnumMeta"),
-}
-_ALLOWED_PREFIXES = ("numpy",)
+# What a checkpoint may name (package 115, part B; the cold review's 5.4): an exact list of
+# the classes and functions the game's own checkpoints hold (`core/checkpoint_names.py`,
+# written from the census of `tools/checkpoint_names.py` and held to it by
+# `tests/test_checkpoint_names.py`), and nothing else: no module admitted by its name, so
+# nothing a module of the game has itself imported, and no dotted name walked from one.
+# The cause it mends: the loader admitted any name in any module beginning `freesail.`
+# and `numpy`, and `builtins.getattr`, and so whatever those modules import (a hand-made
+# checkpoint that named `os.getcwd` through `freesail.settings` was loaded and called it).
+#
+# `getattr` is admitted for one thing alone: the bound methods the game's own older
+# checkpoints hold (a World's coast hooks, before they were left out), each by its class
+# and its method's name exactly (`BOUND_METHODS`); any other use is refused.
+from freesail.core.checkpoint_names import ADMITTED  # noqa: E402
+
+BOUND_METHODS: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("freesail.core.world.World", "_coast_of_plane"),
+        ("freesail.core.world.World", "_coast_trend_of_plane"),
+    }
+)
+
+
+class CheckpointRefused(pickle.UnpicklingError):
+    """A checkpoint that holds what the game's own checkpoints never hold."""
+
+
+def _bound_method(obj: Any, name: str) -> Any:
+    cls = type(obj)
+    if (f"{cls.__module__}.{cls.__qualname__}", name) not in BOUND_METHODS:
+        raise CheckpointRefused(
+            f"the checkpoint asks for {cls.__qualname__}.{name}, which a checkpoint may not hold"
+        )
+    return getattr(obj, name)
 
 
 class _Unpickler(pickle.Unpickler):
     def find_class(self, module: str, name: str) -> Any:
-        if (
-            (module, name) in _ALLOWED_EXACT
-            or module.startswith(_ALLOWED_MODULES)
-            or module.startswith(_ALLOWED_PREFIXES)
-        ):
+        if (module, name) == ("builtins", "getattr"):
+            return _bound_method
+        if (module, name) in ADMITTED:
             return super().find_class(module, name)
-        raise pickle.UnpicklingError(
+        raise CheckpointRefused(
             f"the checkpoint names {module}.{name}, which a checkpoint may not hold"
         )
 
@@ -506,6 +524,32 @@ def checkpoint_bytes(world: World) -> bytes:
     buf = io.BytesIO()
     _Pickler(buf, protocol=pickle.HIGHEST_PROTOCOL).dump(world)
     return buf.getvalue()
+
+
+def trial_copy(world: Any, raising: bool = False) -> Any:
+    """A copy of the world to try an order on and let go (package 118: the door of the
+    world orders; the dry run's copy, `agents.director._copy`): the checkpoint's own
+    pickling, read back and rebound, marked `dry_run` so that a form that writes a file
+    writes none on it. None where the world cannot be copied."""
+    from freesail.world.hulls import world_of
+
+    live = world_of(world)
+    # the hull the order runs under (the reader of 2026-11-19): the handle's own where the
+    # handle is a hull, the World's current hull otherwise; the copy has no stack of its
+    # own and would read its followed hull, so the copy's same hull is handed back
+    current = world if world is not live else live.own
+    try:
+        copy = _Unpickler(io.BytesIO(checkpoint_bytes(live))).load()
+        _rebind(copy)
+    except Exception:  # noqa: BLE001  (a world that cannot be copied: the caller says so)
+        if raising:
+            raise
+        return None
+    copy.__dict__["dry_run"] = True
+    hull = (copy.__dict__.get("hulls") or {}).get(getattr(current, "id", None))
+    if hull is not None and hull is not copy.own:
+        return hull
+    return copy
 
 
 def write_checkpoint(world: World, path: str | Path) -> Path:
@@ -864,6 +908,11 @@ def load_report(
     elif cp.exists():
         try:
             header, world = read_checkpoint(cp)
+            if "world_order_door" not in data:
+                # the door its save was played under (package 118): a game loaded from a
+                # checkpoint of a save without the mark keeps it for the ticks played, as
+                # one loaded by replay does, so that its next save replays them alike
+                world.world_order_door_from = int(data["end_tick"]) + 1
         except Exception as e:  # noqa: BLE001  (an import error, a class reshaped, a bad file)
             header, world = {}, None
             said = " ".join(str(e).split()) or "no words"

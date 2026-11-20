@@ -550,6 +550,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         raise ScenarioError(
             f"{where}, papers: a mapping (chart, epitome, almanac, chronometer, price_lists)."
         )
+    given_service = papers_raw.get("service")
+    if given_service is not None:
+        # her service by her papers (package 121): a word the game does not know is refused
+        # here, where it had been passed by and her wardroom answered in its place
+        from freesail.world.service import service_word
+
+        if service_word(given_service) is None:
+            raise ScenarioError(
+                f"{where}, papers: service '{given_service}' is no service; say kings "
+                "(a King's ship), privateer (a letter of marque) or merchant (a merchantman)."
+            )
     # the master's epitome for the tide (spec M5 §16, package 34): the ship's line or the
     # file's; a table of data/tides/establishments.yaml (norie, moore); none, the ship's
     # kind chooses (a ship of war Norie's, a merchantman Moore's)

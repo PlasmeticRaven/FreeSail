@@ -22,10 +22,10 @@ pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
 from fastapi import FastAPI  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
+from own_page import DoorClient  # noqa: E402
 
 from freesail.agents import OPT_OUT_TOKEN, consent  # noqa: E402
-from freesail.agents.agent import A_GLASS_S  # noqa: E402
+from freesail.agents.agent import A_GLASS_S, SITUATION_REASON  # noqa: E402
 from freesail.agents.remote import POLL_RECHECK_S, TURNS_WAIT_MAX_S, RemoteModel  # noqa: E402
 from freesail.api.session import make_world, ship_factory  # noqa: E402
 from freesail.core import replay  # noqa: E402
@@ -59,7 +59,7 @@ class Game:
             saves_dir=tmp_path / "saves",
             say=self.said.append,
         )
-        self.http = TestClient(self.app)
+        self.http = DoorClient(self.app)
         self.desk = self.driver.desk
         self.cursor = 0
         self.key = ""  # the seating's key, kept from the stationing as a door keeps it
@@ -153,7 +153,12 @@ def test_a_whole_session_through_the_routes(tmp_path):
     yes_on_record(g.records)
     a = g.took(g.station(door_note="A test door."))
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["operator", "data"] and reasons(a) == ["the start"]
+    # the brief, then the situation at the seating, the first data (package 117)
+    assert roles(a) == ["operator", "data", "data"] and reasons(a) == [
+        SITUATION_REASON,
+        "the start",
+    ]
+    assert "situation" in a["turns"][1]["content"]
     brief = a["turns"][0]["content"]
     assert brief.startswith("This is a message from the harness of FreeSail")
     assert "A test door. Consent for these weights is on record" in brief
@@ -257,8 +262,10 @@ def test_the_consent_gate_runs_in_the_game_through_the_routes(tmp_path):
     a = g.reply("Only that I look forward to it.")
     # the model's one reply closes the record; the yes goes on to the station at once
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["model", "operator", "data"]
+    # the brief, then the situation at the seating, the first data (package 117)
+    assert roles(a) == ["model", "operator", "data", "data"]
     assert a["turns"][1]["content"].startswith("This is a message from the harness of FreeSail")
+    assert "situation" in a["turns"][2]["content"]
     rec = consent.check(WEIGHTS, g.records)
     assert rec is not None and rec.verdict == consent.YES
     assert rec.runtime == (
@@ -313,8 +320,8 @@ def test_a_manned_station_is_refused_to_another_model_and_attached_by_the_same(t
     # with a new key; the door before it is refused, and the log says the door changed
     again = g.took(g.station())
     assert again["attached"] and again["since"] == first["next"]
-    assert roles(again) == ["operator", "data"]
-    assert again["turns"][1]["content"]["reason"] == "the start"  # the open turn, again
+    assert roles(again) == ["operator", "data", "data"]  # the situation, then the turn (117)
+    assert again["turns"][2]["content"]["reason"] == "the start"  # the open turn, again
     assert g.key and g.key != old_key
     stale = g.http.get("/api/agents/watcher/turns", params={"since": 0, "key": old_key})
     assert stale.status_code == 409 and "carries another seating's key" in stale.text
@@ -395,10 +402,18 @@ def test_a_released_station_is_taken_by_another_model_with_its_own_consent(tmp_p
         f"{WEIGHTS}: the second seating; it had stood down by the watcher: its own word."
     )
     brief = next(t["content"] for t in a["turns"] if t["role"] == "operator")
-    assert f"The last handover note in this station's journal, written by {WEIGHTS} at " in brief
-    assert "Stood the first watch; the royals want watching." in brief
-    assert "The station's journal: " in brief and "read_journal reads it back" in brief
     assert brief.index("This is a message from the harness") == 0  # the disclosure first
+    # another model's note is the game's words: in the situation after the brief, never in
+    # the operator's voice (package 117)
+    told = next(
+        t["content"]["situation"]
+        for t in a["turns"]
+        if t["role"] == "data" and "situation" in t["content"]
+    )
+    assert "Stood the first watch; the royals want watching." not in brief
+    assert f"The last handover note in this station's journal, written by {WEIGHTS} at " in told
+    assert "Stood the first watch; the royals want watching." in told
+    assert "The station's journal: " in told and "read_journal reads it back" in told
     # the relief reads the journal of the holder before it, and the entries say whose
     a = g.reply("", ("read_journal", {"kind": "notes"}))
     entries = results(a)[0]["entries"]
@@ -477,9 +492,9 @@ def test_the_cursor_makes_a_poll_idempotent(tmp_path):
     read = {"since": 0, "key": g.key}
     a1 = g.http.get("/api/agents/watcher/turns", params=read).json()
     a2 = g.http.get("/api/agents/watcher/turns", params=read).json()
-    assert a1 == a2 and roles(a1) == ["operator", "data"] and a1["next"] == 2
-    assert g.http.get("/api/agents/watcher/turns", params=read | {"since": 1}).json()["turns"] == [
-        a1["turns"][1]
+    assert a1 == a2 and roles(a1) == ["operator", "data", "data"] and a1["next"] == 3
+    assert g.http.get("/api/agents/watcher/turns", params=read | {"since": 2}).json()["turns"] == [
+        a1["turns"][2]
     ]
 
 
@@ -676,7 +691,7 @@ def test_the_console_hosts_the_same_routes_and_prints_the_station_in_state(tmp_p
     con.desk = router.desk
     app = FastAPI()
     app.include_router(router)
-    http = TestClient(app)
+    http = DoorClient(app)
     yes_on_record(tmp_path / "consent")
     r = http.post("/api/agents/watcher", json={"model_name": WEIGHTS, "door": "runner"})
     assert r.status_code == 200 and r.json()["phase"] == "station"
@@ -725,7 +740,11 @@ def test_a_station_the_game_mans_itself_is_refused_and_a_loaded_games_is_taken_o
     assert g.station(model_name="someone-else").status_code == 409
     a = g.took(g.station())
     assert a["phase"] == "station" and a["floor"] == "model"
-    assert roles(a) == ["operator", "data"] and reasons(a) == ["the glass"]
+    # the brief, the situation (package 117), then the open turn
+    assert roles(a) == ["operator", "data", "data"] and reasons(a) == [
+        SITUATION_REASON,
+        "the glass",
+    ]
     assert a["turns"][0]["content"].startswith("This is a message from the harness")
     g.reply("Still here.")
     assert "Still here." in g.notes()
@@ -917,7 +936,15 @@ def test_the_voice_of_a_person_nobody_holds_speaks_where_he_is_and_say_as_him_is
     assert "mr pentreath" in g.world.stations.names()
     a = _door(g, "Mr Pentreath", WEIGHTS)
     brief = next(t["content"] for t in a["turns"] if t["role"] == "operator")
-    assert "You are the voice of Mr Pentreath, aboard" in brief
+    # his name and where he is are the game's, in the situation (package 117)
+    assert "You are the voice of the person the situation names" in brief
+    assert "Mr Pentreath" not in brief
+    told = next(
+        t["content"]["situation"]
+        for t in a["turns"]
+        if t["role"] == "data" and "situation" in t["content"]
+    )
+    assert "whose place you take: Mr Pentreath, aboard." in told
     h = g.world.agents["mr pentreath"]
     assert h.station.person == "Mr Pentreath"
     # his prose is his note (decision 60); he speaks where he is with `say`

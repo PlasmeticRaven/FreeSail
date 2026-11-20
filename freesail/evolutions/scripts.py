@@ -378,6 +378,28 @@ def settees_held(ship: Ship) -> set[str]:
     return {sl.id for sl in settees(ship)}
 
 
+# Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3
+# item 3): the ship's practice for a whole lateen's yard in going about, kept on her as a plain
+# dict of strings (`ship.extra["lateen_practice"]`, saved with her, as `COURSE_PENDING` is), for
+# each occasion, in stays and in wearing, "shift" (the yard changed round its mast) or "leave"
+# (left on the bad hand). "Shift" in both by default: the owner's "preferred" (question 3,
+# 2026-11-18). Set by nothing yet; its orders (`leave the lateens in stays` and their kin), the
+# tack's and the wear's reading of it and its row in the readings are the engine's step A1b.
+LATEEN_PRACTICE = "lateen_practice"
+LATEEN_PRACTICE_DEFAULT = (("stays", "shift"), ("wearing", "shift"))
+
+
+def lateen_practice(ship: Ship) -> dict[str, str]:
+    """The ship's practice for her whole lateens' yards in going about, by occasion ("stays",
+    "wearing"): what `ship.extra["lateen_practice"]` keeps for each, else the default, "shift"
+    in both (package 90's stage 0L). A fresh dict each time, so that changing it changes nothing
+    kept. Nothing acts on it until the engine's step A1b."""
+    kept = (getattr(ship, "extra", None) or {}).get(LATEEN_PRACTICE)
+    if not isinstance(kept, dict):
+        kept = {}
+    return {occasion: kept.get(occasion, default) for occasion, default in LATEEN_PRACTICE_DEFAULT}
+
+
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
 # the new lee in stays, and in wearing once the wind is past the stern.
 SETTEE_DIPPED_WORDS = "Dipped the {sail}; hoisted on the {side} side, to leeward of {mast}."
@@ -1858,13 +1880,18 @@ class TackScript(Script):
         braced up on the larboard tack": B3.4)."""
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        heading = self.new_course
         if self.timed_out:
             new = self.ship.dyn.tack
+            # and the heading she lies on, read from her, not the course she was put about
+            # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
+            # up on the starboard tack, heading SSE (158°)" with her head at NE)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
         return {
             "old_tack": old,
             "new_tack": new,
-            "new_course": units.format_heading(self.new_course),
+            "new_course": units.format_heading(heading),
         } | steer.words("braced up", self.paid_off)
 
     def data(self) -> dict[str, Any]:
@@ -2191,6 +2218,28 @@ LYING_TO_STERNWAY = 0.15
 LYING_TO_WAY_SMOOTH_S = 60.0
 # The manoeuvres that have the helm and the yards while they are in hand: the watch's
 # tending stands off for them (a ship being filled away is not held to her old tack).
+# Package 116 (card 5; the lead's word of 2026-11-16): the wheel shot away. The helm does
+# not answer until the relieving tackles are rove or the wheel is repaired
+# (`ship.extra["helm_lost"]`, `combat.hits`; the rudder held where it was,
+# `physics.hull.steer`): a helm order and a manoeuvre that drives the helm are refused in
+# these words, by the order's own road (`orders.verbs`) and the runner's
+# (`Runner._failing_condition`), so that the player, a standing order and the game's own
+# captain meet the one refusal. Heave to is not among them: tried with the helm dead, the
+# brig came to by her sails alone (the main topsail to the mast, the head sheets aft), later
+# and with more way on, and its lines say that the helm does not answer.
+HELM_LOST_WORDS = (
+    "The wheel is shot away and the helm does not answer: rig the relieving tackles "
+    "('rig the relieving tackles') to steer her from below, or repair the wheel "
+    "('repair the wheel')."
+)
+HELM_LOST_ASIDE = "the helm not answering, the wheel shot away"
+
+
+def helm_lost(ship: Any) -> bool:
+    """The wheel shot away and no relieving tackles rove (`combat.hits`)."""
+    return bool((getattr(ship, "extra", None) or {}).get("helm_lost"))
+
+
 HELM_MANOEUVRES = frozenset(
     {
         "heave_to",
@@ -2958,7 +3007,7 @@ class HeaveToScript(Script):
                 words.append(f"{names_of_sails(self.ship, [self.headsail])} sheet to windward")
             if self.yards:
                 words.append(f"braced the {self._backed_name()} aback")
-            text = "; ".join(words) + "; helm a-lee."
+            text = "; ".join(words) + f"; {self._helm_words()}."
             self.note(text[0].upper() + text[1:])
         else:
             # "regulate by easing off, or hauling aft, the spanker and jib sheets" (Luce
@@ -2970,7 +3019,7 @@ class HeaveToScript(Script):
             up = "; braced up the other yards" if braced_up else ""
             self.note(
                 f"Braced the {self._backed_name()} aback{up}; hauled aft the "
-                "head sheets; helm a-lee."
+                f"head sheets; {self._helm_words()}."
             )
         # The other fore-and-aft sails that stay drawing (the staysails abaft the fore
         # mast, a schooner's foresail, a fore-and-after's jib): a sheet eased for a wind
@@ -3079,10 +3128,27 @@ class HeaveToScript(Script):
 
             held = part_name(self.ship, self.headsail.id)
             lying = f"under her fore-and-aft canvas, {held} sheet to windward"
-            return {"backed": held, "lying": lying, "hove_tack": tack, "drifting": drifting}
+            return {
+                "backed": held,
+                "lying": lying,
+                "hove_tack": tack,
+                "drifting": drifting,
+                "helm": self._helm_words(),
+            }
         backed = self._backed_name()
         lying = f"{backed} to the mast"
-        return {"backed": backed, "lying": lying, "hove_tack": tack, "drifting": drifting}
+        return {
+            "backed": backed,
+            "lying": lying,
+            "hove_tack": tack,
+            "drifting": drifting,
+            "helm": self._helm_words(),
+        }
+
+    def _helm_words(self) -> str:
+        """`helm a-lee`, or that it does not answer with the wheel shot away (package 116:
+        she is brought to by her sails alone)."""
+        return HELM_LOST_ASIDE if helm_lost(self.ship) else "helm a-lee"
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -9101,6 +9167,14 @@ class SendBoatScript(Script):
             if item.get("kind") in ("purchase", "sale")
         )
         self.ashore_s = float(BOAT_ASHORE_S.get(errand, 1800)) + tons * LIGHTER_S_PER_TON
+        # what she carries on the errand, kept by the errand itself: the boat's state is made
+        # afresh when she is lost (`world.boats.lose_boat`), and the goods with it
+        self.carried = [
+            dict(item)
+            for item in self.ports.boat.carrying
+            if item.get("kind") in ("purchase", "sale")
+        ]
+        self.port_id = self.ports.boat.port_id  # the market of her errand, kept with them
         return None
 
     def begin(self, words: dict[str, Any]) -> None:
@@ -9114,6 +9188,17 @@ class SendBoatScript(Script):
             self.ship.note(severity.value, kind, text, self.ship.name, data)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        if self.ports is not None and getattr(self.ports.boat, "lost", None):
+            # the boat lost on her errand (stove, swamped, gone adrift): the errand ends there,
+            # and what was bought or sold in her is said lost with her, paid once and never
+            # again (the lead's word of 2026-11-14 on package 115 D2); she is not hoisted in
+            # a sale is had when the goods are landed: lost before she reached the quay, it
+            # is void (the lead's reading of part D at 60af48e, item 4)
+            landed = self.phase in ("ashore", "pull_back", "hoist_in")
+            carried = list(getattr(self, "carried", []) or [])
+            port_id = getattr(self, "port_id", None)
+            self.fail(self.ports.lost_on_errand(carried, landed=landed, port_id=port_id))
+            return
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":

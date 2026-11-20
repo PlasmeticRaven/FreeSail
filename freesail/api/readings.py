@@ -2455,15 +2455,24 @@ def ship_words(world: Any) -> str:
             nation = nation_id.replace("-", " ")
     captain = getattr(world, "captain", None)
     role = str(getattr(captain, "role", "") or "")
-    from freesail.world.captains import _is_kings_ship
+    # her service by her papers first, then her captain's role, then her wardroom
+    # (`service.service_of`; package 121, the owner's word of 2026-11-20: a frigate under a
+    # privateer's papers read "a King's ship" to the officer and the director); a prize under
+    # her prize crew is said by the role (a prize is not her captor's King's ship)
+    from freesail.world.service import KINGS, MERCHANT, PRIVATEER, service_of
 
-    kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
-    escort = ", the convoy's escort" if role == "commodore" else ""
+    service_is = "" if role == "prize-master" else service_of(world)
+    kings = service_is == KINGS
+    if service_is == PRIVATEER:
+        role = "privateer"
+    elif service_is == MERCHANT and role not in ("packet", "fisherman", "revenue", "indiaman"):
+        role = "merchant"
+    escort = ", the convoy's escort" if kings and role == "commodore" else ""
     # package 75, SW-4's words step: a revenue cutter is the Customs' cruiser, armed and of the
     # Crown and not the Navy's, as Sherbourne served the Board of Customs against the smugglers
     # from 1763 to 1779 (docs/design/VesselCandidates.md; the kit's manual); an Indiaman a
     # merchantman that is armed, named by her book's word (data/captains/indiaman.yaml)
-    duty = ", in the service of the Customs" if role == "revenue" else ""
+    duty = ", in the service of the Customs" if role == "revenue" and not kings else ""
     if kings:
         # a navy by its nation's adjective (package 75, B2b, the lead's ruling of 2026-11-07):
         # "a ship of the French navy", where the name read "the France navy" and "the the
