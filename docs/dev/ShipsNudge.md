@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 12:55 UTC (N2, THE CORSAIR, IS SETTLED BY THE OWNER AND LEAVES YOUR CARD: a package of its own under the lead in the career's milestone; the polacre's and the xebec's corsair fits held for it; their hulls and other fits still yours). Nudge number: 28.
+Latest note: 2026-11-20, 13:35 UTC (THE TARTANE'S THREE RULINGS: her load line H as the sheet marks, H' recorded; deck_height_m the measured 0.54 m; the beak 10 1/2 pieds; the plate's number corrected everywhere). Nudge number: 29.
