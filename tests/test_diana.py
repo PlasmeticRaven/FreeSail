@@ -40,7 +40,6 @@ from freesail.world.nations import load_nations
 ROOT = Path(__file__).resolve().parents[1]
 HER = "data/ships/corvette-20.yaml"
 FRIGATE = "data/ships/frigate-36.yaml"
-PIE_M = 0.278635  # the pie de Burgos (Winfield et al. 2023, pp. 41-46)
 LIBRA_KG = 0.4608  # the libra castellana, the book's own
 FITS = ("danish 1807", "as captured 1809", "carronadas de a 30 1810", "1817")
 DEFAULT_FIT = "carronadas de a 30 1810"
@@ -96,6 +95,19 @@ try:
 except ValueError as e:
     out["winfield wrong"] = str(e)
 her.WINFIELD["beam_m"] = 9.06
+her.MASTS["main"]["heel"] = 1.40
+try:
+    her.check_masts()
+except ValueError as e:
+    out["masts wrong"] = str(e)
+her.MASTS["main"]["heel"] = -2.18
+her.PORTS[5][1] = 2.70
+try:
+    her.check_ports()
+except ValueError as e:
+    out["ports wrong"] = str(e)
+her.PORTS[5][1] = 1.72
+out["notes"] = {k: her.HULL_NOTES[k] for k in ("gm_m", "clr_x_m")}
 p = her.particulars()
 out["displacement"] = p.displacement_kg
 out["length"] = round(p.length_m, 3)
@@ -138,8 +150,8 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     her draught of 3.78 m to K; ports 1 to 10 within 0.05 m of the drawn side at their sills (her
     body plan's readings at the sills being among her sections) and the bow port's half-breadth,
     JUDGEMENT, 0.24 m outside it, reported; her plain sail and her rope's scale; Luce's chain on her
-    particulars; each fit's pieces and broadside; the quarter bill's trimmers; and her idlers by
-    trade. Her file comes out as it stands."""
+    particulars; each fit's pieces, broadside, men at the guns of a side and weight of guns; the
+    quarter bill's trimmers; and her idlers by trade. Her file comes out as it stands."""
     said = _probe(REPORT_PROBE, str(tmp_path)).stderr
     assert (ROOT / HER).read_bytes() == (tmp_path / Path(HER).name).read_bytes()
     drawn = "corvette-20: the hull as drawn (freesail/ship/form.py):"
@@ -155,21 +167,39 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
         in said
     )
     assert "corvette-20: the main mast 71.4 ft heel to head (21.77 m)" in said
+    for fit, pieces, lb, men, tonnes in (
+        ("danish 1807", 20, 256, 44, 18.6),
+        ("as captured 1809", 20, 240, 40, 13.2),
+        ("carronadas de a 30 1810", 20, 300, 40, 17.4),
+        ("1817", 24, 198, 62, 28.3),
+    ):
+        assert (
+            f"corvette-20: the fit '{fit}', {pieces} pieces, a broadside of {lb} lb, {men} at the "
+            f"guns of a side, {tonnes} t of guns." in said
+        )
     assert (
-        "corvette-20: the fit 'carronadas de a 30 1810', 20 pieces, a broadside of 300 lb" in said
+        "corvette-20: the quarter bill's trimmers 29 (forecastle 5, fore_top 7, main_top 8, "
+        "mizzen_top 4, afterguard 5), 13 small-arms men and 38 boarders." in said
     )
-    assert "corvette-20: the fit '1817', 24 pieces, a broadside of 198 lb" in said
+    assert (
+        "corvette-20: her idlers by trade, carpenter's crew 3, sailmaker's crew 2, cooper 1, "
+        "armourer 0, cook 1, steward 2, servant 4, surgeon's mate 1, clerk 0, master-at-arms's "
+        "party 2." in said
+    )
 
 
 def test_her_table_holds_its_arithmetic_and_her_checks_raise_in_words():
     """Dia-D §1.3: the table's two bodies sum to its total and differ by its difference; Winfield's
     metres within 0.01 m of the table's pies at the book's pie; every mast's heel between K and the
     deck over it; her midship lee port at 21.1 deg and every sill on her side. Each raised in words
-    when its figure is put wrong (never an `assert`, which `python -O` strips)."""
+    when a figure of it is put wrong (never an `assert`, which `python -O` strips): a body's libras,
+    Winfield's breadth, the main mast's heel above her deck, the midship port's sill."""
     got = json.loads(_probe(MODULE_PROBE).stdout)
     assert [got[k] for k in ("table", "winfield", "masts", "ports")] == ["held"] * 4
     assert "do not sum to its total" in got["table wrong"]
     assert "not within 0.01 m of Winfield's 9.1" in got["winfield wrong"]
+    assert "her main mast's heel stands at z 1.4 m, not between K under it" in got["masts wrong"]
+    assert "her midship lee port dips at" in got["ports wrong"]
     # Luce's chain on her measured waterline and Winfield's breadth (Dia-D §4.1, 2026-11-20): the
     # main (113.1 + 29.7) / 2 = 71.4 ft, every spar the frigate-36's times 0.8145; the masts beside
     # Steel's 20-gun column, 72, 64 and 61 ft (Pages §7), the main yard 19.79 m beside his 19.20
@@ -180,8 +210,9 @@ def test_her_table_holds_its_arithmetic_and_her_checks_raise_in_words():
 
 
 def test_her_notes_carry_no_figure_a_rule_computes():
-    """The lead's notes of 2026-10-29, item 2: no rating's figure, no bowline's size, in her notes;
-    what each rule read stays."""
+    """The lead's notes of 2026-10-29, item 2: no rating's figure and no bowline's size in her
+    notes, what each rule read staying; and her two tuned figures' notes give their reasons and
+    point to their record without the measured heels and helms, which would go stale there."""
     said = [
         line.strip()
         for line in (ROOT / HER).read_text(encoding="utf-8").splitlines()
@@ -190,12 +221,16 @@ def test_her_notes_carry_no_figure_a_rule_computes():
     assert not [line for line in said if re.search(r" -> [0-9.]+ kN", line)]
     assert not [line for line in said if re.search(r"than the sheet, [0-9.]+ in", line)]
     assert [line for line in said if "Rating: fore.course" in line]
+    for key, note in json.loads(_probe(MODULE_PROBE).stdout)["notes"].items():
+        assert "docs/dev/TuningNotes.md" in note and " deg" not in note, key
 
 
 def test_her_file_loads_and_rates_and_her_masts_are_classed_square(spec):
     """Her file loads as the game loads it, with no warning, every spar and line rated; her three
-    masts classed square (B3.4's rule: her mizen carries its crossjack, Dia-D §4.3)."""
+    masts classed square, B3.4's rule naming no part of hers on a schooner's mast (her mizen
+    crosses its dry crossjack, Dia-D §4.3), and no mizen course."""
     ship = load_ship(HER)
+    assert not [pid for pid in ship.parts if ship.on_schooner_mast(pid)]
     assert spec.warnings == []
     assert all(sp.rating_kn > 0.0 for sp in spec.spars)
     assert all(ln.rating_kn > 0.0 for ln in ship.lines.values())
@@ -300,6 +335,7 @@ def test_the_builders_checklist_draws_every_gun_of_hers():
     assert done.returncode == 0, done.stdout + done.stderr
     assert done.stdout.rstrip().endswith("clean")
     assert "fit '1817': 24 guns: 22 port, 2 over the rail" in done.stdout
+    assert done.stdout.count("empty ports a side: upper 1") == 3
 
 
 @pytest.mark.parametrize("fit", FITS)
@@ -342,10 +378,15 @@ def test_her_company_is_167_with_fifty_soldiers_and_spanish_names(doc):
     assert sum(crew["stations"].values()) + len(crew["posts"]) == 167
 
 
-def test_her_soldiers_are_spains_kit():
-    """Her fifty muster with Spain's kit, the soldiers of the navy's infantry and artillery
-    (data/marines.yaml `spanish`, N3; Spain's row naming it since the lead's follow-up)."""
-    kit = load_nations().marines_kit_of("spain")
+def test_her_soldiers_are_spains_kit(doc):
+    """Her names list reads as Spain's where a scenario names no nation (`NAMES_TO_NATION`, truth
+    7-680), and Spain's kit is the soldiers of the navy's infantry and artillery (data/marines.yaml
+    `spanish`, N3; Spain's row naming it since the lead's follow-up): her fifty are Spain's."""
+    from freesail.world.nations import NAMES_TO_NATION
+
+    nation = NAMES_TO_NATION[doc["crew"]["names"]]
+    kit = load_nations().marines_kit_of(nation)
+    assert nation == "spain" and doc["crew"]["stations"]["marines"] == 50
     assert (kit["id"], kit["name"]) == ("spanish", "the Spanish navy's infantry and artillery")
 
 
@@ -480,12 +521,12 @@ def test_truth_7_660_her_particulars_hold_her_sources(doc):
     toneladas 691 libras 498.0 t at its libra; she floats at 3.78 m, the mean to K on the arrowed
     line as drawn, 3.91 m aft and 3.65 m forward (the lead's ruling 1); her lateral area the
     measured 122.2 m2 (ruling 4); her waterline 34.47 m; eleven ports a side at the plan's sills
-    (Pages §5.7); her four fits by date."""
+    (Pages §5.7); her four fits by date. Her module's particulars give the metres and the mass
+    from the table's own units, and her file the rulings' figures."""
+    got = json.loads(_probe(MODULE_PROBE).stdout)
+    assert [round(got[k], 2) for k in ("length", "beam", "depth")] == [34.55, 9.06, 4.46]
+    assert got["displacement"] == round((540 * 2000 + 691) * LIBRA_KG, -3) == 498000.0
     hull = doc["hull"]
-    assert round(124 * PIE_M, 2) == 34.55
-    assert round(32.5 * PIE_M, 2) == 9.06
-    assert round(16 * PIE_M, 2) == 4.46
-    assert round((540 * 2000 + 691) * LIBRA_KG / 1000.0, 1) == 498.0
     assert hull["displacement_kg"] == 498000.0
     assert hull["draught_m"] == 3.78 and hull["length_waterline_m"] == 34.47
     assert hull["beam_m"] == 9.06 and hull["lateral_area_m2"] == 122.2
@@ -500,7 +541,7 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
     of 1807, Meyer: 10 to 11 knots with the wind two or three points abaft the beam in a fresh
     breeze (Roos 1957 p. 94: Dia §6). With the wind 112 to 124 degrees off in 24 to 27 knots, under
     the sail her book carries in that wind (a King's ship's: plain sail below `shorten_sail_kn`,
-    30), she makes 9.5 to 11.5 knots: measured 10.26 to 11.26."""
+    30), she makes 9.5 to 11.5 knots: measured 10.28 to 11.28."""
     from tests.test_known_truths import knots, under_plain_sail
 
     for wind_kn, off in ((24.0, 124.0), (25.0, 118.0), (27.0, 112.0)):
@@ -511,8 +552,9 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
 def test_truth_7_662_she_is_stiff_as_her_captain_said():
     """Package 90, her builder (Dia-D §14, truth C), drafted in `tests/test_diana.py`. Close-hauled
     and abeam under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 does
-    (measured at her GM of 1.6: 8.05 against 7.34 degrees close-hauled, 1.10; 12.77 against 11.30
-    abeam, 1.13), and her midship lee port stays open (it shuts at 18.5 degrees: truth 7-665)."""
+    (measured at her GM of 1.65: 8.12 against 7.34 degrees close-hauled, 1.11; 12.62 against
+    11.30 abeam, 1.12), and her midship lee port stays open (it shuts at 18.5 degrees: truth
+    7-665)."""
     from tests.test_known_truths import reading, under_plain_sail
 
     for off in (66.0, 90.0):
@@ -525,7 +567,7 @@ def test_truth_7_662_she_is_stiff_as_her_captain_said():
 def test_truth_7_663_she_steers_well():
     """Package 90, her builder (Dia-D §14, truth D), drafted in `tests/test_diana.py`. Meyer's
     "steers splendidly": close-hauled in 15 knots she carries 0.5 to 3 degrees of weather helm,
-    abeam 1 to 3 (measured at her `clr_x_m` of 2.6: 0.91 and 1.85, the frigate-36's 1.31 and
+    abeam 1 to 3 (measured at her `clr_x_m` of 2.8: 0.80 and 2.02, the frigate-36's 1.31 and
     1.99)."""
     from tests.test_known_truths import reading, under_plain_sail
 
@@ -538,13 +580,13 @@ def test_truth_7_663_she_steers_well():
 def test_truth_7_664_she_goes_about_as_a_small_ship_does():
     """Package 90, her builder (Dia-D §14, truth E), drafted in `tests/test_diana.py`. She tacks
     from 290, 292.5 and 295 degrees and wears, as truths 10 and 11 put the frigate about: tacked in
-    200, 211 and 218 s (measured), each through stays in about a minute and a half and settled on
-    the new tack at once, losing 16, 29 and 41 m; she wears in 492 s (truth 11's 360 to 720). Her
+    197, 212 and 218 s (measured), each through stays in about a minute and a half and settled on
+    the new tack at once, losing 15, 31 and 42 m; she wears in 492 s (truth 11's 360 to 720). Her
     tack's band is her own, three to ten minutes (JUDGEMENT, for the lead): truth 10's floor, 285
     s, is Luce's five minutes for a frigate of 42 m, which spends most of hers griping up on the new
     tack with too little way for her helm; her design asked her helm and rudder tuned to it (Plan
-    §8.4), and no figure of either within her sources brings her there (her measured rudder of 3.0
-    m2 at 1 deg/s tacks in 251 to 263 s; docs/dev/TuningNotes.md, 'Package 90, the Diana')."""
+    §8.4), and no figure of either within her sources brings her there (the sweeps in
+    docs/dev/TuningNotes.md, 'Package 90, the Diana')."""
     from tests.test_known_truths import close_hauled_on_starboard, until, wear
 
     for heading in (290.0, 292.5, 295.0):
@@ -565,14 +607,18 @@ def test_truth_7_665_her_midship_lee_port():
     port's sill, 1.72 m over a half-breadth of 4.46 m (Pages §5.7), comes to the water at 21.1
     degrees of heel (atan, the lead's ruling 6), and by §7.1's rule (L2: a foot short of the water)
     her lowest lee port, that one, shuts at 18.50 degrees: open half a degree below and, a degree
-    above, shut with ports 5, 7 and 4 (18.67, 19.08 and 19.45 by the rule's arithmetic); the
-    ends' ports later, the bow port never on the heel alone."""
+    above, shut with ports 5, 7 and 4 (18.67, 19.08 and 19.45 by the rule's arithmetic). Her
+    design's truth F put the shut at 21.1 deg by L2's rule; the two are not one measure, and both
+    are held here (docs/dev/TuningNotes.md, 'Package 90, the Diana')."""
     from tests import test_lee_ports as L
 
-    assert math.degrees(math.atan2(1.72, 4.46)) == pytest.approx(21.1, abs=0.05)
+    triples = {round(t[0], 2): t for t in load_spec(HER).hull.profile.ports_m[0][1]}
+    _x, sill, half = triples[0.80]
+    assert math.degrees(math.atan2(sill, half)) == pytest.approx(21.1, abs=0.05)
     w = L._in_a_sea(HER)
     gid, heel = L._lowest_lee(w, "upper")
     assert heel == pytest.approx(18.50, abs=0.05)
     assert w.ship.guns[gid].x_m == 0.80
     assert L._open_then_shut(w, "upper", 18.50, 0.0, 0) == (0, 4)
-    assert L.shut_heel(1.75, 4.34) == pytest.approx(19.45, abs=0.01)
+    for x, figure in ((-2.06, 18.67), (3.65, 19.08), (-4.93, 19.45)):
+        assert L.shut_heel(*triples[x][1:]) == pytest.approx(figure, abs=0.01), x

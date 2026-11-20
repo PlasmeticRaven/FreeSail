@@ -39,10 +39,10 @@ hull:
   draught_m: 3.78
   # The plan's table, 540 toneladas 691 libras at 2,000 libras the tonelada and the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46): 497,980 kg (computed), the table's, kept by the lead's rulings 2 and 3 of 2026-11-20. Drawn to her line (measured, computed, Pages §4.3): 435.6 t moulded, 441.7 t with the keel, post, stem and gripe (-11.3%), 465.6 to 473.6 t outside a plank of 3 to 4 pulgadas (-6.5% to -4.9%), the plank JUDGEMENT, no source found (Pages §4.5). The miss is recorded and explained, not closed: the table was most likely reckoned on a level line at the after draught (499 t, its bodies 1.10 to 1 against the table's 1.089; ruling 3, JUDGEMENT), not at the line she is drawn floating at.
   displacement_kg: 498000.0
-  # JUDGEMENT: her captain's 'stiff' (Meyer's report, Roos 1957 p. 94: Dia §6), set so that under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 (Dia-D §9, decision 4; truth C). The frigate's 1.3 m scaled by her breadth gives 1.0, which heels her 1.7 times the frigate; the design's 1.5, on her measured hull and her rig, 1.17 times close-hauled and 1.20 abeam; 1.6, 1.10 and 1.13 (measured: docs/dev/TuningNotes.md, 'Package 90, the Diana').
-  gm_m: 1.6
-  # Tuned for her captain's 'steers splendidly' (Meyer, Roos 1957 p. 94) by her helm's truth (Dia-D §14, truth D): the frigate's lead, 3.0 m on 41.8, scaled by her length to start, 2.5 m (Dia-D §2), which gave her 0.6 deg of weather helm close-hauled in 15 knots, the band's foot; 2.6 gives 0.9 close-hauled and 1.9 abeam beside the frigate's 1.3 and 2.0, and she lies to without falling aback, which at 2.75 she did once (measured, old beside new: docs/dev/TuningNotes.md, 'Package 90, the Diana'). Her going about is not tuned by it: more weather helm takes her round sooner, and from 2.9 she misses stays from 295 deg.
-  clr_x_m: 2.6
+  # JUDGEMENT: her captain's 'stiff' (Meyer's report, Roos 1957 p. 94: Dia §6), set so that under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 (Dia-D §9, decision 4; truth C), the frigate's 1.3 m scaled by her breadth heeling her half again as much; tuned from the design's 1.5, measured old beside new in docs/dev/TuningNotes.md, 'Package 90, the Diana', and held by her tests.
+  gm_m: 1.65
+  # Tuned for her captain's 'steers splendidly' (Meyer, Roos 1957 p. 94) by her helm's truth (Dia-D §14, truth D), from the frigate's lead scaled by her length (Dia-D §2), so that she carries weather helm within the truth's band, near the frigate-36's, and lies to without falling aback; measured old beside new in docs/dev/TuningNotes.md, 'Package 90, the Diana', and held by her tests. Her going about is not tuned by it: more weather helm takes her round sooner, and further forward she misses stays.
+  clr_x_m: 2.8
   # Measured by the method of the hulls drawn from their draughts (the lead's ruling 4 of 2026-11-20; D29 (b)): the post's after face, K and the knee's fore edge, the rudder left out (Pages §5.6), as the 64's, the razee's, the 74's and the Neufchatel's. Beside it: 120.0 m2 to the keel's lower edge and the stem's fore face, 125.2 m2 with the rudder, and 104.4 m2 by the generator's 0.85 rule on her first particulars.
   lateral_area_m2: 122.2
   # The frigate-36's 13.0 by the root of her length over the frigate's, sqrt(34.47 / 41.8): 11.8 (computed); Meyer's 10 to 11 knots with the wind two or three points abaft the beam in a fresh breeze (Roos 1957 p. 94) the check (truth B).
@@ -149,25 +149,25 @@ hull:
       form.stern.lights_m: judged
       form.head: sourced
 spars:
-# fore lower mast by Luce: 9/10 of the main, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column and Babron's corvette the checks (Pages §7). Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 55 kn.
+# fore lower mast by Luce: 9/10 of the main, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column (Pages §7) and Babron's corvette (Dia-D §4.1) the checks. Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 55 kn.
 - id: fore.mast
   class: mast
   x_m: 12.5
   rake_deg: 0.5
   height_m: 16.6
-  rating_kn: 290.2
+  rating_kn: 296.4
 # fore topmast (Luce: 3/5 of the main mast, 9/10 of it), its hoist above the lower cap the length less the lower mast head. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 40 kn.
 - id: fore.topmast
   class: topmast
   steps_on: fore.mast
   height_m: 8.5
-  rating_kn: 120.5
+  rating_kn: 123.7
 # fore topgallant mast: half the topmast (Luce), above the topmast cap. Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant, fore.royal, flying_jib in 25 kn.
 - id: fore.topgallant_mast
   class: topgallant_mast
   steps_on: fore.topmast
   height_m: 3.9
-  rating_kn: 14.8
+  rating_kn: 15.2
 # fore royal mast: 2/3 of the topgallant mast (Luce), above its head; Steel's 20-gun column sets the royals on the topgallant masts' poles (Pages §7). Provisional (truth 9), see gen_ships.py. Rating: fore.royal in 20 kn.
 - id: fore.royal_mast
   class: royal_mast
@@ -206,7 +206,7 @@ spars:
   height_m: 31.6
   brace_limit_deg: 68
   rating_kn: 2.0
-# main lower mast by Luce 1866 ch. VII: (LWL + breadth) / 2, heel to head, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column and Babron's corvette the checks (Pages §7). Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn.
+# main lower mast by Luce 1866 ch. VII: (LWL + breadth) / 2, heel to head, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column (Pages §7) and Babron's corvette (Dia-D §4.1) the checks. Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn.
 - id: main.mast
   class: mast
   x_m: -2.29
@@ -263,7 +263,7 @@ spars:
   height_m: 35.0
   brace_limit_deg: 70
   rating_kn: 2.6
-# mizzen lower mast by Luce: 13/15 of the main's height above the deck, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column and Babron's corvette the checks (Pages §7). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, mizzen.staysail, mizzen.topmast_staysail, mizzen.topgallant_staysail in 55 kn.
+# mizzen lower mast by Luce: 13/15 of the main's height above the deck, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column (Pages §7) and Babron's corvette (Dia-D §4.1) the checks. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, mizzen.staysail, mizzen.topmast_staysail, mizzen.topgallant_staysail in 55 kn.
 - id: mizzen.mast
   class: mast
   x_m: -11.38
@@ -341,21 +341,21 @@ spars:
   x_m: 17.31
   length_m: 9.1
   height_m: 7.1
-  rating_kn: 99.1
+  rating_kn: 105.2
 # jib-boom, 6/7 of the bowsprit, 7/12 of it outboard along the steeve (Luce); Steel's 31 ft 0 in its check (Pages §7). Provisional (truth 9), see gen_ships.py. Rating: the sails named in the script in 30 kn (the engine's graph loads nothing on it).
 - id: jib_boom
   class: jib_boom
   'on': bowsprit
   length_m: 6.8
   height_m: 9.6
-  rating_kn: 21.7
+  rating_kn: 23.1
 # flying jib-boom, 2/3 of the jib-boom's outboard part (judgement). Provisional (truth 9), see gen_ships.py. Rating: the sails named in the script in 22 kn (the engine's graph loads nothing on it).
 - id: flying_jib_boom
   class: flying_jib_boom
   'on': jib_boom
   length_m: 4.5
   height_m: 11.2
-  rating_kn: 4.2
+  rating_kn: 4.4
 # fore lower studding-sail boom, half the yard it is rigged on (Luce); rated for its sail in the studding sails' design wind. Provisional (truth 9), see gen_ships.py. Rating: fore.lower.studdingsail.starboard in 18 kn.
 - id: fore.lower.studdingsail_boom.starboard
   class: studdingsail_boom
@@ -586,7 +586,7 @@ sails:
   stay: fore.topmast.stay
   area_m2: 50
   x_m: 19.8
-  centre_height_m: 8.0
+  centre_height_m: 10.2
   canvas_no: 6
   cloth_rating_kn: 11.4
 # jib: the frigate-36's, its area, its place from the bowsprit's root and its height scaled by her chain (Dia-D §4.2; the frigate's judgement from the stay's run). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Jib' ('the foremost sail of a ship'): No. 6 or 7; Kipping 1847 (1898 printing), Sails and Sailmaking, 'Outer jib', on the stay from the jib-boom end to the fore topmast, as this one: No. 6. Luce 1884 ch. X p. 171 (Tables.md §1) gives No. 2, the jib of 1884 being the working headsail); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
@@ -595,7 +595,7 @@ sails:
   stay: jib.stay
   area_m2: 86
   x_m: 25.5
-  centre_height_m: 9.6
+  centre_height_m: 12.7
   canvas_no: 6
   cloth_rating_kn: 19.7
 # flying jib: the frigate-36's, its area, its place from the bowsprit's root and its height scaled by her chain (Dia-D §4.2; the frigate's judgement from the stay's run). Canvas No. 7 (judgement: Steel's jib range (No. 6 or 7) at its lighter end, the flying jib setting outside and above the jib; Luce 1884 ch. X p. 171 (Tables.md §1) makes his three numbers lighter than the jib); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
@@ -604,7 +604,7 @@ sails:
   stay: flying_jib.stay
   area_m2: 46
   x_m: 30.3
-  centre_height_m: 11.3
+  centre_height_m: 15.2
   canvas_no: 7
   cloth_rating_kn: 9.8
 # main staysail, a triangle, square on the foot (Steel 1794 vol. I, Sail-making): its tack at the stay over the boats on the booms (a fifth of the main mast's height above the deck, judgement), its peak before the main top. 'This sail is seldom used in large vessels' (Steel), and lying to under it is 'a mean between the two others' (Steel 1794 vol. II, 'Lying-to under the main staysail'). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
@@ -2433,7 +2433,7 @@ crew:
   # Her people's names Spanish: the spanish list in data/crew/names.yaml (package 90, N1), which reads as Spain's where a scenario gives her no nation.
   names: spanish
   stations:
-    # Hands per station, both watches together: the frigate-36's shares of her seamen's stations scaled to the 107 left beside her fifty soldiers and ten posts, by the largest remainders (computed; JUDGEMENT until her establishment's shares are read, Dia-D §6.1). Forecastlemen: the head, anchors and headsails.
+    # Hands per station, both watches together: her design's table (Dia-D §6.1), the 107 left beside her fifty soldiers and ten posts shared on her first draft's seven stations (the frigate-36's shares scaled to her company) by the largest remainders, the main top's and the idlers' tie given to the idlers (computed in the design; JUDGEMENT until her establishment's shares are read). Forecastlemen: the head, anchors and headsails.
     forecastle: 14
     # Fore topmen.
     fore_top: 12
@@ -2575,7 +2575,7 @@ crew:
     table: navy
     # Water drawn a man a day for his drink, his grog and the coppers: a gallon, the figure her water above is reckoned at (judgement).
     water_gallons: 1
-  # The named people beyond the posts (package 35, spec M5 §22): each drawn from his station at muster, the counts above unchanged (data/people/corvette-20.yaml).
+  # The named people beyond the posts (package 35, spec M5 §22): each drawn from their station at muster, the counts above unchanged (data/people/corvette-20.yaml).
   people:
   # A pilot's mate, an able seaman of the forecastle, the master's mate's role in the game's English (judgement).
   - role: master's mate
@@ -3568,7 +3568,7 @@ armament:
         crew: 4
         weight_cwt: 17.125
         deck: upper
-      # The 1817 fit's twelve long 12-pounders in ports 1 to 6 (JUDGEMENT on the ports), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to the pair (Falconer, QUARTERS: D31 (c)). Twelve long 12s weigh about 28 t on her deck against the carronades' 17, higher in her; her GM is one for every fit (Dia-D §5.3).
+      # The 1817 fit's twelve long 12-pounders in ports 1 to 6 (JUDGEMENT on the ports), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to the pair (Falconer, QUARTERS: D31 (c)). The long guns weigh more on her deck than the carronades of her other fits, and higher in her; her GM is one for every fit (Dia-D §5.3).
       - id: gun.6.starboard
         kind: long
         pounder: 12

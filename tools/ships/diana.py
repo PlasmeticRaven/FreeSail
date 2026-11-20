@@ -32,7 +32,8 @@ the generator's `frigate()` is copied here with her figures in place of its cons
 seventy-four's module copied it (nothing is imported from another ship's module; the
 duplication reported, Dia-D §1.2). Where the frigate's function carries a figure of its own hull
 (a headsail's area and place, the spanker's), it is the frigate's scaled by her chain, its
-length by `SCALE` and its area by its square, as her design's probe did (Dia-D §9).
+length by her chain's ratio (`Particulars.scale`) and its area by its square, as her design's
+probe did (Dia-D §9).
 
 **Her notes (the lead's notes of 2026-10-29, item 2).** The file's notes carry sources,
 departures and judgements. A figure a rule computes from the file's own keys (a rating, a
@@ -264,8 +265,8 @@ DRAUGHT_M = 3.78  # the mean to K (ruling 1; the lead's note of 09:40, item (1))
 DRAUGHT_AFT_M, DRAUGHT_FORE_M = 3.91, 3.65
 DATUM_M = 1.33  # the deck at side at the middle (ruling 5)
 LATERAL_AREA_M2 = 122.2  # the post's after face, K, the knee's fore edge, no rudder (ruling 4)
-GM_M = 1.6  # JUDGEMENT (Dia-D decision 4), tuned: 1.5 before (docs/dev/TuningNotes.md)
-CLR_X_M = 2.6  # tuned for her helm: 2.5 to start (docs/dev/TuningNotes.md)
+GM_M = 1.65  # JUDGEMENT (Dia-D decision 4), tuned: the design's 1.5 (docs/dev/TuningNotes.md)
+CLR_X_M = 2.8  # tuned for her helm: 2.5 to start (docs/dev/TuningNotes.md)
 HULL_SPEED_KN = 11.8
 RUDDER = {"area_m2": 3.0, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 3.9}
 
@@ -288,7 +289,8 @@ MASTS = {
 BOWSPRIT_STEEVE_DEG = 21.5  # to the line (the plan's 21 deg, +0.5 in the line's frame)
 
 # The frigate-36's main mast by the same chain, (137 + 38.33) / 2 ft (`gen_ships.frigate`), which
-# her chain is set against: her spars are the frigate's times SCALE, her sails' areas its square.
+# her chain is set against: her spars are the frigate's times `Particulars.scale`, her sails' areas
+# its square.
 FRIGATE_MAIN_LEN_FT = (round(0.957 * 143.2) + 38.33) / 2.0
 FRIGATE_DECK_M = g.FRIGATE_DECK_M
 FRIGATE_PLAIN_SAIL_M2 = 1584.0  # the frigate-36's plain sail, against which her rope is scaled
@@ -296,13 +298,16 @@ FRIGATE_PLAIN_SAIL_M2 = 1584.0  # the frigate-36's plain sail, against which her
 # The frigate's figures of its own hull, scaled to hers (`frigate()`; Dia-D §9's probe): the
 # spanker (167 m2 with its centre 9.8 m above the frigate's water, 5.0 m abaft its mizen), and
 # the three headsails, (id, stay, m2, x forward of its bowsprit's root at x 21.0, centre above its
-# water).
+# water, the spar its tack is on and that spar's end above the frigate's datum, `height_m`): each
+# headsail's centre stands 2.2, 2.2 and 3.2 m above its tack's spar end in the frigate, and hers
+# that height scaled above her own spar's end, on her plan's steeve (the lead's reader of her
+# first hash: the frigate's heights above its deck had put her centres at or below her tacks).
 FRIGATE_SPANKER = (167.0, 9.8, 5.0)
 FRIGATE_BOWSPRIT_X = 21.0
 FRIGATE_HEADS = [
-    ("fore.topmast_staysail", "fore.topmast.stay", 75.0, 24.0, 10.0),
-    ("jib", "jib.stay", 130.0, 31.0, 12.0),
-    ("flying_jib", "flying_jib.stay", 70.0, 37.0, 14.0),
+    ("fore.topmast_staysail", "fore.topmast.stay", 75.0, 24.0, 10.0, "bowsprit", 6.0),
+    ("jib", "jib.stay", 130.0, 31.0, 12.0, "jib_boom", 8.0),
+    ("flying_jib", "flying_jib.stay", 70.0, 37.0, 14.0, "flying_jib_boom", 9.0),
 ]
 # The spanker's boom over her taffrail: its height above her datum, the frigate's 2.4 m raised
 # to clear her taffrail's top (4.03 m above her water) by 0.2 m (JUDGEMENT).
@@ -467,17 +472,15 @@ HULL_NOTES = {
     "the table's 1.089; ruling 3, JUDGEMENT), not at the line she is drawn floating at.",
     "gm_m": "JUDGEMENT: her captain's 'stiff' (Meyer's report, Roos 1957 p. 94: Dia §6), set so "
     "that under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 (Dia-D "
-    "§9, decision 4; truth C). The frigate's 1.3 m scaled by her breadth gives 1.0, which heels "
-    "her 1.7 times the frigate; the design's 1.5, on her measured hull and her rig, 1.17 times "
-    "close-hauled and 1.20 abeam; 1.6, 1.10 and 1.13 (measured: docs/dev/TuningNotes.md, "
-    "'Package 90, the Diana').",
+    "§9, decision 4; truth C), the frigate's 1.3 m scaled by her breadth heeling her half again "
+    "as much; tuned from the design's 1.5, measured old beside new in docs/dev/TuningNotes.md, "
+    "'Package 90, the Diana', and held by her tests.",
     "clr_x_m": "Tuned for her captain's 'steers splendidly' (Meyer, Roos 1957 p. 94) by her helm's "
-    "truth (Dia-D §14, truth D): the frigate's lead, 3.0 m on 41.8, scaled by her length to start, "
-    "2.5 m (Dia-D §2), which gave her 0.6 deg of weather helm close-hauled in 15 knots, the band's "
-    "foot; 2.6 gives 0.9 close-hauled and 1.9 abeam beside the frigate's 1.3 and 2.0, and she "
-    "lies to without falling aback, which at 2.75 she did once (measured, old beside new: "
-    "docs/dev/TuningNotes.md, 'Package 90, the Diana'). Her going about is not tuned by it: more "
-    "weather helm takes her round sooner, and from 2.9 she misses stays from 295 deg.",
+    "truth (Dia-D §14, truth D), from the frigate's lead scaled by her length (Dia-D §2), so that "
+    "she carries weather helm within the truth's band, near the frigate-36's, and lies to without "
+    "falling aback; measured old beside new in docs/dev/TuningNotes.md, 'Package 90, the Diana', "
+    "and held by her tests. Her going about is not tuned by it: more weather helm takes her round "
+    "sooner, and further forward she misses stays.",
     "lateral_area_m2": "Measured by the method of the hulls drawn from their draughts (the lead's "
     "ruling 4 of 2026-11-20; D29 (b)): the post's after face, K and the knee's fore edge, the "
     "rudder left out (Pages §5.6), as the 64's, the razee's, the 74's and the Neufchatel's. Beside "
@@ -813,18 +816,39 @@ def spanker_figures(p):
     return a, c, x
 
 
+def head_spar_ends(p):
+    """Her bowsprit's, jib-boom's and flying jib-boom's outboard lengths in feet and their ends'
+    heights above her water: the bowsprit 5/8 of the main mast, a third of it inboard; the
+    jib-boom 6/7 of the bowsprit, 7/12 of it outboard (Luce); the flying jib-boom 2/3 of the
+    jib-boom's outboard part (judgement); rooted on her stem head and steeved as her plan has it."""
+    bowsprit_out = 5.0 / 8.0 * p.main_len_ft * 2.0 / 3.0
+    jib_boom_out = 6.0 / 7.0 * 5.0 / 8.0 * p.main_len_ft * 7.0 / 12.0
+    flying_out = 2.0 / 3.0 * jib_boom_out
+    rise = math.sin(math.radians(BOWSPRIT_STEEVE_DEG))
+    root_z = STEM_HEAD[1]
+    lengths = {"bowsprit": bowsprit_out, "jib_boom": jib_boom_out, "flying_jib_boom": flying_out}
+    ends, out = {}, 0.0
+    for spar, length in lengths.items():
+        out += length
+        ends[spar] = root_z + g.ft(out) * rise
+    return lengths, ends
+
+
 def head_figures(p):
     """The three headsails, (id, stay, area, x, centre above her water): the frigate's scaled by
-    her chain from its bowsprit's root to hers, the stem head."""
+    her chain, its area by the square, its place from its bowsprit's root to hers, the stem head,
+    and its centre's height above the end of the spar its tack is on to hers."""
+    _lengths, ends = head_spar_ends(p)
     out = []
-    for sid, stay, area, x, h in FRIGATE_HEADS:
+    for sid, stay, area, x, h, spar, spar_h in FRIGATE_HEADS:
+        above_tack = h - (FRIGATE_DECK_M + spar_h)
         out.append(
             (
                 sid,
                 stay,
                 round(area * p.scale * p.scale),
                 round(STEM_HEAD[0] + (x - FRIGATE_BOWSPRIT_X) * p.scale, 1),
-                round(DATUM_M + (h - FRIGATE_DECK_M) * p.scale, 1),
+                round(ends[spar] + above_tack * p.scale, 1),
             )
         )
     return out
@@ -888,7 +912,7 @@ def rig(b, p, geom, rope_scale):
             "standing on its heel at the plan's step: its place at the deck and its rake the "
             "plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in "
             "place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's "
-            f"20-gun column and Babron's corvette the checks (Pages §7).{prov}",
+            f"20-gun column (Pages §7) and Babron's corvette (Dia-D §4.1) the checks.{prov}",
         )
         top = b.spar(
             f"{name}.topmast",
@@ -1069,18 +1093,12 @@ def rig(b, p, geom, rope_scale):
     # 7/12 of it outboard (Luce); flying jib-boom 2/3 of the jib-boom's outboard part
     # (judgement). length_m is the outboard part, x_m the bowsprit's root at the stem head and
     # height_m each spar's end above her datum along the plan's steeve (as the 74's).
-    bowsprit_ft = 5.0 / 8.0 * main_len
-    bowsprit_out = bowsprit_ft * 2.0 / 3.0
-    jib_boom_ft = 6.0 / 7.0 * bowsprit_ft
-    jib_boom_out = jib_boom_ft * 7.0 / 12.0
-    flying_out = 2.0 / 3.0 * jib_boom_out
-    rise = math.sin(math.radians(BOWSPRIT_STEEVE_DEG))
-    root_x, root_z = STEM_HEAD
-    ends = {
-        "bowsprit": root_z + g.ft(bowsprit_out) * rise - DATUM_M,
-        "jib_boom": root_z + g.ft(bowsprit_out + jib_boom_out) * rise - DATUM_M,
-        "flying_jib_boom": root_z + g.ft(bowsprit_out + jib_boom_out + flying_out) * rise - DATUM_M,
-    }
+    lengths, above_water = head_spar_ends(p)
+    bowsprit_out, jib_boom_out, flying_out = (
+        lengths[s] for s in ("bowsprit", "jib_boom", "flying_jib_boom")
+    )
+    root_x = STEM_HEAD[0]
+    ends = {spar: z - DATUM_M for spar, z in above_water.items()}
     heads = head_figures(p)
     head_loads = {sid: (area, h, "jibheaded") for sid, _st, area, _x, h in heads}
     bowsprit = b.spar(
@@ -1731,8 +1749,8 @@ def her_fits():
         of_1817[10][0],
         "The 1817 fit's twelve long 12-pounders in ports 1 to 6 "
         "(JUDGEMENT on the ports), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to "
-        "the pair (Falconer, QUARTERS: D31 (c)). Twelve long 12s weigh about 28 t on her "
-        "deck against the carronades' 17, higher in her; her GM is one for every fit "
+        "the pair (Falconer, QUARTERS: D31 (c)). The long guns weigh more on her deck than "
+        "the carronades of her other fits, and higher in her; her GM is one for every fit "
         "(Dia-D §5.3).",
     )
     return [
@@ -1821,6 +1839,7 @@ def armament(b, fits):
             len(guns),
             broadside_lb(guns),
             sum(gun["crew"] for gun, _ in guns if gun["side"] == g.SIDES[0]),
+            sum(gun["weight_cwt"] for gun, _ in guns) * g.CWT_KG / 1000.0,
         )
         for name, _s, guns, _n in fits
     }
@@ -1907,10 +1926,12 @@ def company(b):
             (
                 ("stations", "forecastle"),
                 STATIONS["forecastle"],
-                "Hands per station, both watches together: the frigate-36's shares of her seamen's "
-                "stations scaled to the 107 left beside her fifty soldiers and ten posts, by the "
-                "largest remainders (computed; JUDGEMENT until her establishment's shares are "
-                "read, Dia-D §6.1). Forecastlemen: the head, anchors and headsails.",
+                "Hands per station, both watches together: her design's table (Dia-D §6.1), the "
+                "107 left beside her fifty soldiers and ten posts shared on her first draft's "
+                "seven stations (the frigate-36's shares scaled to her company) by the largest "
+                "remainders, the main top's and the idlers' tie given to the idlers (computed in "
+                "the design; JUDGEMENT until her establishment's shares are read). Forecastlemen: "
+                "the head, anchors and headsails.",
             ),
             (("stations", "fore_top"), STATIONS["fore_top"], "Fore topmen."),
             (("stations", "main_top"), STATIONS["main_top"], "Main topmen, the largest top."),
@@ -1984,8 +2005,8 @@ def company(b):
         ]
     )
     b.people(
-        "The named people beyond the posts (package 35, spec M5 §22): each drawn from his station "
-        "at muster, the counts above unchanged (data/people/corvette-20.yaml).",
+        "The named people beyond the posts (package 35, spec M5 §22): each drawn from their "
+        "station at muster, the counts above unchanged (data/people/corvette-20.yaml).",
         DRAWN,
     )
     b.spare_spars(
@@ -2269,10 +2290,10 @@ def her_report() -> str:
                 f"{gm['yard']:.1f} ft ({gm['yard'] * FT:.2f} m)."
             )
     if "fits" in REPORT:
-        for name, (pieces, lb, crew) in REPORT["fits"].items():
+        for name, (pieces, lb, crew, tonnes) in REPORT["fits"].items():
             out.append(
                 f"corvette-20: the fit '{name}', {pieces} pieces, a broadside of {lb} lb, "
-                f"{crew} at the guns of a side."
+                f"{crew} at the guns of a side, {tonnes:.1f} t of guns."
             )
     if "bill" in REPORT:
         trimmers, small_arms, boarders = REPORT["bill"]

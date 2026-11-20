@@ -38599,10 +38599,10 @@ Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D).
 
 | figure | old (her design's) | new | why |
 |---|---|---|---|
-| `gm_m` | 1.5 | **1.6** | at 1.5, on her measured hull and her rig, she heeled 1.17 times the frigate close-hauled and 1.20 abeam in 22 kn under plain sail (8.59 against 7.34 degrees, 13.60 against 11.30), over truth C's 1.15, where her design's probe (no profile, the frigate's rig scaled) had 1.12 and 1.14; at 1.6, 1.10 and 1.13 (8.05 and 12.77) |
-| `clr_x_m` | 2.5 | **2.6** | at 2.5 her weather helm close-hauled in 15 kn was 0.57 degrees (0.45 at GM 1.5), the foot of truth D's 0.5 to 3; at 2.6, 0.91 close-hauled and 1.85 abeam, beside the frigate's 1.31 and 1.99; at 2.75 she fell aback once lying to; at 2.9 she missed stays from 295 |
+| `gm_m` | 1.5 | **1.65** (1.6 at 133ccb3) | at 1.5, on her measured hull and her rig, she heeled 1.17 times the frigate close-hauled and 1.20 abeam in 22 kn under plain sail (8.59 against 7.34 degrees, 13.60 against 11.30), over truth C's 1.15, where her design's probe (no profile, the frigate's rig scaled) had 1.12 and 1.14; at 1.6, 1.10 and 1.13 with her headsails as first cut, and 1.14 and 1.15 once they were raised to her own tacks (below); at 1.65, 1.11 and 1.12 (8.12 and 12.62) |
+| `clr_x_m` | 2.5 | **2.8** (2.6 at 133ccb3) | at 2.5 her weather helm close-hauled in 15 kn was 0.57 degrees (0.45 at GM 1.5), the foot of truth D's 0.5 to 3; 2.6 gave 0.91 and 1.85 abeam with her headsails as first cut, and 0.24 and 1.70 once they were raised, their centre of effort higher forward; at 2.8, 0.80 close-hauled and 2.02 abeam beside the frigate's 1.31 and 1.99; at 3.0 she fell aback once lying to and filled away in 152 s |
 
-**The sweep, at GM 1.6** (her rudder as measured, 3.0 m2 at 3 deg/s; each cell tacked from 290, 292.5 and 295 degrees in seconds, then the weather helm close-hauled and abeam in 15 kn):
+**The sweep, at GM 1.6, her headsails as first cut (133ccb3)** (her rudder as measured, 3.0 m2 at 3 deg/s; each cell tacked from 290, 292.5 and 295 degrees in seconds, then the weather helm close-hauled and abeam in 15 kn):
 
 | `clr_x_m` | tacks (s) | helm (deg) |
 |---|---|---|
@@ -38613,7 +38613,19 @@ Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D).
 | 3.0 | 183, 197, 200 | 2.25, 2.48 |
 | 3.5 | 178, missed stays, none in 900 s | 3.52, 3.25 |
 
-**Her going about: truth E's band is not reached by her helm or her rudder** (Plan §8.4: "to be tuned by her helm and rudder"). Truth 10's 285 to 600 s is Luce's five to ten minutes for a frigate. The frigate-36 shoots through stays with way on and then spends most of her 340 to 450 s griping up on the new tack with too little way for her helm; she hangs in stays, is boxed off by her head yards, and settles on the new tack at once. More weather helm takes her round sooner (above). Her rudder, at GM 1.6 and `clr_x_m` 2.5, tacks from the three headings in:
+**The headsails' mend (the review lenses on 50afd35, lens 2: sailing).** Her bowsprit is rooted on her stem head (5.09 m above her water) and steeved 21.5 degrees, which puts the ends of her bowsprit, jib-boom and flying jib-boom 8.43, 10.93 and 12.53 m above her water; her headsails' centres had been the frigate-36's heights scaled from the frigate's deck, 8.0, 9.6 and 11.3 m, each at or below the spar end its tack is on, a triangle no stay could set. The cause was the head re-rooted on her plan while the sails stayed on the probe's scaling from the deck. Mended at the cause: each centre stands above its tack's spar end by the frigate-36's own height there (2.2, 2.2 and 3.2 m above its bowsprit's, jib-boom's and flying jib-boom's ends) scaled by her chain: **10.2, 12.7 and 15.2 m** (old 8.0, 9.6 and 11.3); their areas and places unchanged. Her plain-sail heeling moment rises and her weather helm falls with it, so her two figures were set again (above). Re-swept at GM 1.65:
+
+| `clr_x_m` | tacks (s) | helm (deg) | hove to, filled away |
+|---|---|---|---|
+| 2.6 | 209, 221, 231 | 0.22, 1.70 | 137 s, 60 deg, never aback; 59 s |
+| 2.7 | 203, 218, 220 | 0.37, 1.86 | 133 s, never aback; 59 s |
+| **2.8** | 197, 212, 218 | 0.80, 2.02 | 130 s, 56 to 58 deg, never aback; 59 s, settled 160 s |
+| 2.9 | 192, 207, 213 | 1.14, 2.18 | 127 s, never aback; 59 s |
+| 3.0 | 189, 200, 206 | 1.47, 2.34 | 125 s, aback once; 152 s |
+
+At GM 1.6, 1.65 and 1.7 with `clr_x_m` 2.6 her heel in 22 kn was 8.36, 8.11 and 7.87 degrees close-hauled and 13.00, 12.62 and 12.26 abeam. 2.8 taken: within truth D with a margin either side, and short of the figure at which she falls aback lying to.
+
+**Her going about: truth E's band is not reached by her helm or her rudder** (Plan §8.4: "to be tuned by her helm and rudder"). Truth 10's 285 to 600 s is Luce's five to ten minutes for a frigate. The frigate-36 shoots through stays with way on and then spends most of her 340 to 450 s griping up on the new tack with too little way for her helm; she hangs in stays, is boxed off by her head yards, and settles on the new tack at once. More weather helm takes her round sooner (above). Her rudder, at GM 1.6 and `clr_x_m` 2.5 with her headsails as first cut, tacks from the three headings in:
 
 | rudder | tacks (s) |
 |---|---|
@@ -38628,9 +38640,11 @@ Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D).
 | 4.5 m2 | 298, 164, 180 |
 | 5.5 m2 | 284, 303, 161 |
 
-No figure within her sources brings all three into 285 to 600 s; a knife-edge, the one figure moving one heading's tack longer and another's shorter. Her rudder is kept as measured and her truth E (7-664) drafted with her own band, three to ten minutes (180 to 600 s: JUDGEMENT, for the lead), on her measured 200, 211 and 218 s; she wears in 492 s, within truth 11's band. Each of her three tacks loses ground (16, 29 and 41 m), where truth 10 has the frigate's three gain together: recorded, not asserted.
+No figure within her sources brings all three into 285 to 600 s; a knife-edge, the one figure moving one heading's tack longer and another's shorter. Her rudder is kept as measured and her truth E (7-664) drafted with her own band, three to ten minutes (180 to 600 s: JUDGEMENT, for the lead), on her measured 197, 212 and 218 s as committed (200, 211 and 218 at 133ccb3); she wears in 492 s, within truth 11's band. Each of her three tacks loses ground (15, 31 and 42 m), where truth 10 has the frigate's three gain together: recorded, not asserted.
 
-**Her other figures, measured on the file as committed** (for her testing report): her polar's best 4.59, 7.98 and 11.15 kn in 8, 15 and 25 kn (the frigate-36's 4.62, 8.19 and 11.63); Meyer's case, the wind 112 to 124 degrees off in 24 to 27 kn under plain sail (her book's below 30 kn), 10.26 to 11.26 kn (truth B's 9.5 to 11.5); hove to from 5 kn close-hauled in 128 s, lying 56 to 57 degrees off at 1.1 kn, never aback (the frigate's 220 s, 58 to 62 degrees, 1.4 kn), filled away in 59 s and close-hauled at three knots in 163 s (the frigate's 59 and 161).
+**Her other figures, measured on the file as committed** (for her testing report): her polar's best 4.61, 8.01 and 11.18 kn in 8, 15 and 25 kn (the frigate-36's 4.62, 8.19 and 11.63; 4.59, 7.98 and 11.15 at 133ccb3); Meyer's case, the wind 112 to 124 degrees off in 24 to 27 kn under plain sail (her book's below 30 kn), 10.28 to 11.28 kn (truth B's 9.5 to 11.5); hove to from 5 kn close-hauled in 130 s, lying 56 to 58 degrees off at 1.1 kn, never aback (the frigate's 220 s, 58 to 62 degrees, 1.4 kn), filled away in 59 s and close-hauled at three knots in 160 s (the frigate's 59 and 161).
+
+**Her truth F, old beside new** (Dia-D §14). Her design: "the midship lee port shuts at 21.1 deg ± 0.5 (L2's rule on her triple)". 21.1 degrees is the heel at which that port's sill, 1.72 m over 4.46 m, comes to the water (atan; the lead's ruling 6). L2's rule (`tests/test_lee_ports.py` `shut_heel`, `combat/shot.py` `PORT_SHUT_M`) shuts a lee port a foot short of the water, at 18.50 degrees for her. Truth 7-665 holds both: the dip at 21.1 and the shut at 18.50, with ports 5, 7 and 4 (18.67, 19.08, 19.45) shut a degree above it. For the lead: which the truth's figure is to be.
 
 **Plain sail from furled, explained** (Dia-D §9 left it to her builder): her watch sets it in 12.8 minutes and all hands in 16.4 (the frigate's 16.4 and 5.6). With all hands up her eight square sails are begun at once, each wanting twelve hands aloft: 96 against her 91 seamen (her fifty soldiers and her idlers go aloft to none), so the last, the mizzen topgallant, begins with seven of twelve, short-handed, and is set at 1,074 s, every other sail by 665 s. A numbered job begun short is not topped up when other jobs' hands come free (`crew/hands.py`, `top_up` serves all-hands work alone); her watch, too few for all at once, takes the sails in turn, each with its hands. The engine's rule, found and not mended (not a file of hers): for the lead.
 
@@ -38647,3 +38661,9 @@ No figure within her sources brings all three into 285 to 600 s; a knife-edge, t
 | `tests/test_known_truths.py::test_truth_7_190_covers_every_armed_file` | `len(armed) == 9` | `== 10` | the same row; the parametrized truth gains her line, passing; its docstring names her figure and count |
 
 Nothing else of those files moved: `tests/test_harbour.py`, `test_subtypes.py`, `test_people.py`, `test_wardroom.py`, `test_hull_form.py`, `test_check_viewer_guns.py`, `test_ship_particulars.py`, `test_catalogue.py` and the rest of the sixteen pass with her file as they stand (917 tests, 3 failing before these moves).
+
+**Found on the way, for the lead, not mended (none is a file of hers):**
+- **The drawn top of the side and a stem head over the rail's end** (`freesail/ship/form.py`, `_top_at` and `check`): her stem head, read by eye at (17.30, 5.09), stands directly over the rail's last point (17.30, 3.59), and the drawing then gives that x two tops and refuses the rail's point. She files the head a centimetre forward, 17.31, within its reading (+-0.05 m); the cause is the drawing's, which draws the side's top straight to the stem head beyond the rail's last point.
+- **The staysails between the masts keep the frigate's stays** (`gen_ships.between_the_masts`, its fixed sizes: the main staysail stay 9 in, the mizen's 6, the mizen topmast stay 4.5 and the rest), where her other stays and lines are the frigate-36's by her rope's scale (0.816): those lines rate about half again as strong as hers would by it (her main staysail stay 125.5 kN, the frigate-36's the same). The brig-sloop's file takes the same helper, unscaled, for the staysails between her two masts. Left as the shared helper has them.
+- **Her measured ports' gap check passes by construction**: each of ports 1 to 10's body-plan readings at the sill is one of her `sections_m` points, so the drawn side passes through it; the check holds the drawing to the readings and not the readings to an independent line. Her `sections_m` is marked `judged` for the water's half-breadths carried there between stations, where her design marked every line but the lights `sourced`.
+- **A numbered job begun short is not topped up** when other hands come free (above, plain sail by all hands): the engine's rule, which her company of 91 seamen meets when all hands set her eight square sails at once.
