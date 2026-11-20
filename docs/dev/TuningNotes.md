@@ -38699,4 +38699,9 @@ Two failures of the first fast run were the build's, mended before the hash and 
 
 **The lead's question.** Would `regulations_said` still be needed for a FOREIGN King's ship, once a privateer and a merchantman have their own people files? Yes, on the trunk today. `under_the_regulations` is a King's ship of Britain alone. A French or an American national ship on a British file (the frigate's, the brig's) keeps a wardroom whose outlines cite the British Regulations. Until the foreign navies have people files of their own, citing their own ordinances or none, the citations are left unsaid only by `regulations_said`.
 
-**Read.** FOLLOWUP_READER
+**Read.** The follow-up's truths and the additions were passed by an independent reader, who was told to check that nothing was weakened and that each truth fails with its mend out. It found:
+- no assertion in `tests/` weakened, deleted or skipped: the only lines removed were three docstring lines, rewritten wider;
+- every truth pins words, values or states, not digests;
+- each fails by an assertion, never an ImportError, with its mend out: the old `world_role` (7-715, 7-716), the same-service clause (7-716, at the cruiser), `kings_force` without the prize-master (7-711), the door's refusal (7-710), and the captain-below condition (7-714).
+
+It also found the same-service rule sound. With papers silent, every role is returned as before. Every role in `captains.ROLES` is a key of `ROLE_SERVICE`. Crewed worlds carry no papers. Its two notes, left as they are: a role outside `ROLE_SERVICE` would give way to the papers (there is none today); and a revenue cutter under a merchant's papers keeps her pendant, as before.
