@@ -830,3 +830,39 @@ def test_no_world_gives_a_ship_a_lateen_practice(tmp_path):
         world.run(120)
         assert scripts.LATEEN_PRACTICE not in world.ship.extra, ship_path.name
         assert scripts.lateen_practice(world.ship) == {"stays": "shift", "wearing": "shift"}
+
+
+# -- the Spanish list's nation and Spain's kit (the lead's follow-ups of nudge 25) ---------------
+
+
+def test_every_names_list_has_its_nation():
+    """The cause of the follow-up, held at its level: every list of `data/crew/names.yaml` has
+    its nation in `NAMES_TO_NATION`, so that no list reads as Britain's by the table's floor
+    alone, and every nation the table names is a nation of `data/nations.yaml`."""
+    from freesail.world.nations import NAMES_TO_NATION, load_nations
+
+    lists = yaml.safe_load((ROOT / "data" / "crew" / "names.yaml").read_text(encoding="utf-8"))
+    assert set(NAMES_TO_NATION) == {k for k, v in lists.items() if isinstance(v, dict)}
+    nations = load_nations()
+    assert all(nation in nations.nations for nation in NAMES_TO_NATION.values())
+
+
+def test_truth_7_680_a_ship_drawn_from_the_spanish_list_with_no_nation_given_is_spains(tmp_path):
+    """Package 90 (the lead's nudge 25): a ship whose company is drawn from the Spanish list,
+    her scenario giving no nation, reads as Spain's: her nation by her list, her marines Spain's
+    kit, and her people Spanish names. Before the list had its row she read as Britain's, with
+    the Royal Marines' kit."""
+    from freesail.combat import small_arms
+
+    names = yaml.safe_load((ROOT / "data" / "crew" / "names.yaml").read_text(encoding="utf-8"))
+    doc = _doc("frigate-36")
+    doc["crew"]["names"] = "spanish"
+    world = make_world(7, write_ship(doc, tmp_path, "frigate-36-spanish"), Scenario())
+    assert world.scenario.nation is None
+    assert world.dealings.ship_nation == "spain"
+    marines = small_arms.describe(world, world.ship)
+    assert marines["kit"] == "spanish"
+    assert "(the Spanish navy's infantry and artillery; " in marines["words"]
+    for sailor in world.ship.extra["crew"].sailors:
+        given, surname = sailor.name.split(" ", 1)
+        assert given in names["spanish"]["given"] and surname in names["spanish"]["surnames"]
