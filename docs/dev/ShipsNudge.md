@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 18:40 UTC (THE CONCEPCION'S deck_height_m IS 5.99 m; A2 IS HELD FOR THE PRIMER: its brace lines move in A2's own hash; one list from my reader within the hour). Nudge number: 33.
+Latest note: 2026-11-20, 19:25 UTC (A2: MY READER FINDS IT WORDS ONLY; THE ONE LIST: the primer's four lines; the two tests under five seconds; "the braces" on a one-masted vessel; the brace words by the square sails set on the rigs without after yards; three small points). Nudge number: 34.
