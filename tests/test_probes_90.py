@@ -19,12 +19,22 @@ are read only where a description names them. Here:
   each before any row that matches inside the words that name her;
 - the men-of-war sets, `role_of_vessel` and the hail's words take the corvette, the
   three-decker and the xebec.
+
+Stage 0L (the plan's §5.2), the whole lateen's interfaces, laid as inert:
+- each probe with a whole lateen (the tartane, the polacre, the xebec) loads with `dipping` on
+  its whole lateens and classes as it does without it, the key changing nothing else of her;
+- the refusals that touch `dipping`, for a lateen cut at the mast, for every class refused
+  before, and for a lug, word for word as measured at stage 0's head (94ea1dba);
+- `Sail.lug_side` kept for a dipping lateen by the plain class default, no new class;
+- the ship's practice for the yard, `ship.extra["lateen_practice"]`, read with its default and
+  set by nothing.
 """
 
 from __future__ import annotations
 
 import ast
 import copy
+import dataclasses
 import importlib.util
 import pickle
 from functools import cache
@@ -35,8 +45,11 @@ import pytest
 import yaml
 from rig_fixtures import (
     THREE_DECKER_COMPLEMENT,
+    brig_with_settee_doc,
     polacre_probe,
+    polacre_probe_doc,
     tartane_probe,
+    tartane_probe_doc,
     three_decker_probe,
     three_decker_probe_doc,
     write_ship,
@@ -44,13 +57,15 @@ from rig_fixtures import (
     xebec_probe_doc,
 )
 
+from freesail.api.session import make_world
+from freesail.core.world import Scenario
 from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
 from freesail.orders import signals
-from freesail.physics.sails import _square_rigged
+from freesail.physics.sails import _square_rigged, against_the_mast
 from freesail.ship.graph import Ship
-from freesail.ship.loader import load_ship, spec_from_dict
-from freesail.ship.parts import SailState
+from freesail.ship.loader import load_ship, ship_from_dict, spec_from_dict
+from freesail.ship.parts import Sail, SailState
 from freesail.ship.schema import (
     BOAT_KEYS,
     FIT_KEYS,
@@ -228,6 +243,7 @@ def test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole
     whole = [s for s in doc["sails"] if s["class"] == "lateen" and not s.get("cut_at_mast")]
     assert [s["id"] for s in whole if "dipping" in s] == []
     ship = load_ship(path)
+    assert [s.id for s in ship.sails.values() if _whole(s) and s.dipping] == []  # stage 0L
     assert ship.spec.sweeps is None and ship.spec.hull.helm == "wheel"
     assert not any(b.towed for b in ship.spec.boats)
     if ship.spec.armament is not None:
@@ -588,3 +604,224 @@ def test_the_men_of_war_and_the_hail_take_the_corvette_the_three_decker_and_the_
         ), key
         assert signals._names_a_sail(None, f"the {key}"), key
         assert signals._names_a_sail(None, f"a {key}", by_rig=True), key
+
+
+# -- stage 0L: the whole lateen's interfaces, laid inert (the plan's §5.2) -------------------
+
+# The probes with a whole lateen (class lateen, not cut at the mast); the three-decker's mizen
+# course, the 74's, is a lateen cut at the mast and keeps its refusal (below).
+WHOLE_LATEEN_PROBES = {
+    "tartane": (tartane_probe_doc, ["main.lateen", "mizzen.lateen"]),
+    "polacre": (polacre_probe_doc, ["fore.lateen", "mizzen.lateen"]),
+    "xebec": (xebec_probe_doc, ["fore.lateen", "mizzen.lateen", "main.lateen"]),
+}
+
+
+def _whole(sail) -> bool:
+    """A whole lateen, on a sail or its spec: class lateen and not cut at the mast."""
+    return sail.cls == "lateen" and not sail.cut_at_mast
+
+
+def _dipping(doc: dict) -> dict:
+    """The document with `dipping: true` on each of its whole lateens."""
+    for s in doc["sails"]:
+        if s["class"] == "lateen" and not s.get("cut_at_mast"):
+            s["dipping"] = True
+    return doc
+
+
+@pytest.mark.parametrize("name", list(WHOLE_LATEEN_PROBES))
+def test_each_probe_with_a_whole_lateen_loads_with_dipping_and_classes_as_without_it(name):
+    """Given the key on every whole lateen, the probe loads with no warning, and it changes
+    nothing of her but the key itself: her classing through the golden table's gates is the
+    probe's as measured at stage 0, and her sails, spars, lines and groups are as without it,
+    each lateen's side not yet found (None), so that it draws as it did."""
+    build, whole = WHOLE_LATEEN_PROBES[name]
+    plain = ship_from_dict(build(), f"tests/rig_fixtures.py:{name}")
+    keyed = ship_from_dict(_dipping(build()), f"tests/rig_fixtures.py:{name}")
+    assert keyed.spec.warnings == []
+    assert [s.id for s in keyed.spec.sails if _whole(s)] == whole
+    assert [s.id for s in keyed.spec.sails if s.dipping] == whole
+    assert [s.id for s in keyed.sails.values() if s.dipping] == whole
+    assert not any(s.dipping for s in plain.spec.sails if _whole(s))
+    unkeyed = [dataclasses.replace(s, dipping=False) for s in keyed.spec.sails]
+    assert unkeyed == plain.spec.sails
+    assert keyed.spec.spars == plain.spec.spars and keyed.spec.lines == plain.spec.lines
+    assert keyed.groups == plain.groups and keyed.aliases == plain.aliases
+    for sid in whole:
+        sail = keyed.sails[sid]
+        assert type(sail) is Sail and sail.lug_side is None, sid
+        assert not against_the_mast(sail, 1.0) and not against_the_mast(sail, -1.0), sid
+    assert _classing(keyed) == _classing(plain) == CLASSING[name][1]
+
+
+# Every refusal that touches `dipping`, word for word as stage 0's head (94ea1dba) gave it, run
+# before the narrowing: a lateen cut at the mast keeps the sentence every class but the lug is
+# refused in, and so does one whose `cut_at_mast` is said otherwise than true or false (the
+# dipping refused first, as before); a lug's own refusals stand.
+def _committed(name: str, sid: str, **keys) -> dict:
+    """A committed file's document with `keys` set on the sail `sid`, a key given None taken
+    out of it."""
+    doc = _doc(name)
+    sail = next(s for s in doc["sails"] if s["id"] == sid)
+    for key, value in keys.items():
+        if value is None:
+            sail.pop(key, None)
+        else:
+            sail[key] = value
+    return doc
+
+
+def _keyed(doc: dict, sid: str, **keys) -> dict:
+    next(s for s in doc["sails"] if s["id"] == sid).update(keys)
+    return doc
+
+
+ONLY_A_LUG = "bad.yaml: sail '{}' is a {} sail; only a lug is dipped."
+REFUSED_AS_BEFORE = [
+    (
+        "a lateen cut at the mast",
+        lambda: _committed("seventy-four", "mizzen.course", dipping=True),
+        ONLY_A_LUG.format("mizzen.course", "lateen"),
+    ),
+    (
+        "a lateen cut at the mast said 1",
+        lambda: _committed("seventy-four", "mizzen.course", dipping=True, cut_at_mast=1),
+        ONLY_A_LUG.format("mizzen.course", "lateen"),
+    ),
+    (
+        "a whole lateen said to be cut at the mast",
+        lambda: _keyed(tartane_probe_doc(), "main.lateen", dipping=True, cut_at_mast=True),
+        ONLY_A_LUG.format("main.lateen", "lateen"),
+    ),
+    (
+        "a square sail",
+        lambda: _committed("brig", "fore.course", dipping=True),
+        ONLY_A_LUG.format("fore.course", "square"),
+    ),
+    (
+        "a gaff sail",
+        lambda: _committed("brig", "main.spanker", dipping=True),
+        ONLY_A_LUG.format("main.spanker", "gaff"),
+    ),
+    (
+        "a jib-headed sail",
+        lambda: _committed("brig", "jib", dipping=True),
+        ONLY_A_LUG.format("jib", "jibheaded"),
+    ),
+    (
+        "a studding sail",
+        lambda: _committed("brig", "fore.lower.studdingsail.starboard", dipping=True),
+        ONLY_A_LUG.format("fore.lower.studdingsail.starboard", "studding"),
+    ),
+    (
+        "a sprit sail",
+        lambda: _committed("brig", "fore.course", dipping=True, **{"class": "sprit"}),
+        ONLY_A_LUG.format("fore.course", "sprit"),
+    ),
+    (
+        "a dipping lug's key not a bool",
+        lambda: _committed("lugger", "fore.lug", dipping="yes"),
+        "bad.yaml: sail 'fore.lug' has dipping = 'yes'; say true or false.",
+    ),
+    (
+        "a standing lug's key not a bool",
+        lambda: _committed("lugger", "mizen.lug", dipping=1),
+        "bad.yaml: sail 'mizen.lug' has dipping = 1; say true or false.",
+    ),
+    (
+        "a lug cut at the mast",
+        lambda: _committed("lugger", "fore.lug", cut_at_mast=True),
+        "bad.yaml: sail 'fore.lug' is a lug sail; only a lateen is cut at the mast.",
+    ),
+    (
+        "a settee not dipping",
+        lambda: _keyed(brig_with_settee_doc(), "main.settee", dipping=False),
+        "bad.yaml: sail 'main.settee' is a settee and is not dipping; a settee is a dipping lug "
+        "(say dipping: true).",
+    ),
+    (
+        "a whole lateen's key not a bool",
+        lambda: _keyed(tartane_probe_doc(), "main.lateen", dipping="yes"),
+        "bad.yaml: sail 'main.lateen' has dipping = 'yes'; say true or false.",
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "build, message",
+    [case[1:] for case in REFUSED_AS_BEFORE],
+    ids=[case[0] for case in REFUSED_AS_BEFORE],
+)
+def test_the_refusals_for_a_lateen_cut_at_the_mast_and_for_a_lug_are_unchanged(build, message):
+    with pytest.raises(ShipFileError) as e:
+        spec_from_dict(build(), "bad.yaml")
+    assert str(e.value) == message
+
+
+@pytest.mark.parametrize(
+    "keys, message",
+    [
+        ({"settee": True}, "is a lateen sail; only a lug is a settee."),
+        (
+            {"sheeted_to": "mizzen.lateen"},
+            "is a lateen sail; only a lug topsail is sheeted to another sail.",
+        ),
+    ],
+    ids=["a settee", "sheeted to another sail"],
+)
+def test_a_dipping_whole_lateen_is_no_lug_its_keys_refused_as_without_dipping(keys, message):
+    """A lug's own keys on a whole lateen are refused in the words a lateen without `dipping`
+    is refused in (at stage 0's head the dipping's sentence came first)."""
+    for dipping in (False, True):
+        doc = _keyed(tartane_probe_doc(), "main.lateen", **keys)
+        if dipping:
+            _keyed(doc, "main.lateen", dipping=True)
+        with pytest.raises(ShipFileError) as e:
+            spec_from_dict(doc, "bad.yaml")
+        assert str(e.value) == f"bad.yaml: sail 'main.lateen' {message}", dipping
+
+
+def test_a_dipping_whole_lateen_keeps_its_side_as_a_dipping_lug_does_by_the_plain_default():
+    """`Sail.lug_side` is the plain class default, a field of `Sail` and no class of its own;
+    on a dipping whole lateen it starts unfound, is kept once given, and is pickled with the
+    sail as a lug's is. The key adds nothing to the sail's pickled state but itself."""
+    assert {f.name: f.default for f in dataclasses.fields(Sail)}["lug_side"] is None
+    keyed = ship_from_dict(_dipping(tartane_probe_doc()), "tests/rig_fixtures.py:tartane")
+    plain = ship_from_dict(tartane_probe_doc(), "tests/rig_fixtures.py:tartane")
+    sail = keyed.sails["main.lateen"]
+    state, before = sail.__getstate__(), plain.sails["main.lateen"].__getstate__()
+    assert set(state) == set(before)
+    assert {k for k in state if state[k] != before[k]} == {"dipping"}
+    sail.lug_side = "larboard"
+    again = pickle.loads(pickle.dumps(sail))
+    assert type(again) is Sail and again.dipping and again.lug_side == "larboard"
+    lug = load_ship(ROOT / "data" / "ships" / "lugger.yaml").sails["fore.lug"]
+    assert type(lug) is type(sail) and lug.dipping and lug.lug_side is None
+
+
+def test_the_ships_lateen_practice_is_read_with_its_default():
+    """`ship.extra["lateen_practice"]`, in stays and in wearing, "shift" in both by default (the
+    owner's "preferred"); a kept occasion is read over its default, and the reading is a fresh
+    dict, so that changing it changes nothing kept."""
+    assert scripts.LATEEN_PRACTICE == "lateen_practice"
+    ship = ship_from_dict(_dipping(xebec_probe_doc()), "tests/rig_fixtures.py:xebec")
+    assert scripts.LATEEN_PRACTICE not in ship.extra
+    assert scripts.lateen_practice(ship) == {"stays": "shift", "wearing": "shift"}
+    ship.extra[scripts.LATEEN_PRACTICE] = {"stays": "leave"}
+    got = scripts.lateen_practice(ship)
+    assert got == {"stays": "leave", "wearing": "shift"}
+    got["wearing"] = "leave"
+    assert ship.extra[scripts.LATEEN_PRACTICE] == {"stays": "leave"}
+    assert scripts.lateen_practice(ship) == {"stays": "leave", "wearing": "shift"}
+
+
+def test_no_world_gives_a_ship_a_lateen_practice(tmp_path):
+    """Set by nothing: neither the xebec probe with the key, nor the lugger as filed, is given
+    a practice by her world's making or two minutes of its sailing."""
+    path = write_ship(_dipping(xebec_probe_doc()), tmp_path, "xebec")
+    for ship_path in (path, ROOT / "data" / "ships" / "lugger.yaml"):
+        world = make_world(7, ship_path, Scenario())
+        world.run(120)
+        assert scripts.LATEEN_PRACTICE not in world.ship.extra, ship_path.name
+        assert scripts.lateen_practice(world.ship) == {"stays": "shift", "wearing": "shift"}

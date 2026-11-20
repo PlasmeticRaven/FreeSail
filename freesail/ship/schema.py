@@ -135,6 +135,13 @@ ship's builder writes it and an engine step reads it:
   yet.
 Each is left out of its spec's pickle while it holds its default, so that a spec without it,
 and one pickled before it, is pickled as before it.
+
+Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3 item
+1) allows `dipping: true` on a whole lateen, a sail of class `lateen` that is not `cut_at_mast`
+(the tartane's, the polacre's and the xebec's), so that its yard keeps the side of the mast it
+hangs on as a dipping lug's does. A lateen cut at the mast (the 64's and the 74's mizen course)
+is refused it, as is every class but the lug, in the words they were refused in before. No file
+carries it, and nothing acts on it for a lateen until the engine's step A1a.
 """
 
 from __future__ import annotations
@@ -689,7 +696,10 @@ class SailSpec:
     # its yard slung at a third of its length on one side of the mast and its tack shifted
     # in going about (Forfait 1788 pp. 5 to 6; Steel 1794 vol. I, LUGGER), which must be
     # dipped round the mast to the new lee side; a standing lug (a mizen, the taille-vent
-    # tacked at the foot of the mast) is not dipped.
+    # tacked at the foot of the mast) is not dipped. Package 90's stage 0L: a whole lateen
+    # (class lateen, not `cut_at_mast`) may carry it too, its yard changed round its mast in
+    # going about or left on the bad hand (Design-Package90-Engine.md §2.3), acted on by nothing
+    # for a lateen until the engine's step A1a.
     dipping: bool = False
     # Package 57 (the owner's note of 2026-10-17 on the lug topsail; Steel 1794 vol. I p. 214,
     # ROYALS "Are set flying"): a sail set flying, its yard swayed up from the deck with the
@@ -2494,7 +2504,11 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
     dipping = s.get("dipping", False)
     if not isinstance(dipping, bool):
         raise ShipFileError(f"{source}: {where} has dipping = {dipping!r}; say true or false.")
-    if dipping and cls != "lug":
+    # a lug is dipped, and since package 90's stage 0L a whole lateen: a lateen whose
+    # `cut_at_mast` is left out or said false (one said otherwise, true or not a bool, is
+    # refused here first, as before, and its own key's words follow once dipping is mended)
+    whole_lateen = cls == "lateen" and s.get("cut_at_mast", False) is False
+    if dipping and cls != "lug" and not whole_lateen:
         raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is dipped.")
     flying = s.get("flying", False)
     if not isinstance(flying, bool):
