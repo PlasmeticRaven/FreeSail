@@ -1166,10 +1166,7 @@ def _as_loaded(path):
             "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up.",
         ),
         (_dismasted_trial_b, "Wind aft. Shifted over the sheets; hauled out and braced up."),
-        (
-            _as_loaded("data/ships/lugger.yaml"),
-            "Wind aft. Shifted over the sheets; hauled out and braced up.",
-        ),
+        (_as_loaded("data/ships/lugger.yaml"), "Wind aft. Shifted over the sheets."),
     ],
     ids=["the frigate", "trial B with her fore yards shot away", "the lugger"],
 )
@@ -1180,8 +1177,11 @@ def test_with_no_head_yards_the_wear_squares_none(build, said):
     to. With no head yards (trial B with her fore yards shot away, her main topsail yard her one
     after yard; the lugger, whose lug yards are no braced yards) the line says nothing of
     squaring them. Old beside new: "Wind aft. Squared the head yards; shifted over the sheets;
-    hauled out and braced up." whatever she had; the frigate's line as it was. In the stub world
-    as the wears above."""
+    hauled out and braced up." whatever she had; the frigate's line as it was. And with no braced
+    yard at all (the lugger) none is braced up (package 90's A2, the words of a rig with no yards
+    at their cause): her line was "Wind aft. Shifted over the sheets; hauled out and braced up."
+    until it; trial B, her main topsail yard braced, keeps it. In the stub world as the wears
+    above."""
     from freesail.evolutions import scripts
 
     ship = build()
