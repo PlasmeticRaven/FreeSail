@@ -404,6 +404,15 @@ def test_truth_7_708_the_mastheads_hail_is_her_hulls_and_no_others():
         (("aboard", frigate, "quarterdeck"), True),
     ):
         assert K.hears(w, dataclasses.replace(here, spot=spot), e) is heard, spot
+    # ...and still so with the brig followed (the player gone aboard her): the hull is the
+    # line's, not the hull the world now follows
+    from freesail.world import movement
+    from freesail.world.hearing import own_hull
+
+    movement.put_aboard(w, w.people.captain, brig, place="quarterdeck")
+    assert own_hull(w) == str(brig.own.id)
+    assert not K.hears(w, dataclasses.replace(here, spot=("aboard", own_hull(w), "quarterdeck")), e)
+    assert K.hears(w, dataclasses.replace(here, spot=("aboard", frigate, "quarterdeck")), e)
 
 
 def test_truth_7_709_a_line_without_the_speakers_side_is_read_as_before_hidden_on_doubt():
