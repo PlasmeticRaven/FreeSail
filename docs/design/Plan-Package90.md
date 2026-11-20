@@ -942,7 +942,7 @@ The pictures stay outside the repository.
 | **Stopping point 1** | the owner | the first new ship, and item 37's boom ratings | | | |
 | 0L | stage-0 agent, here | §5.2 | the lead's approval of A1's design (A1a to A1c, ruled 2026-11-18; A1d decided built by the owner, 2026-11-18, its figures the lead's) | A1a, and the lateen hulls' files | none (proven) |
 | A2 | engine track | the words of a rig with no yards, at the cause; **merged alone** | 0L | A1a | the lugger's two transcripts and her wind-aft case; the cutter's and the smack's wear's first line (words) |
-| A1a, A1b | engine track | the whole lateen's side, its routing and its going about, the yard's change a part | A2 | the tartane's file on the branch | the library's and the vocabulary's counts |
+| A1a, A1b | engine track | the whole lateen's side, its routing and its going about, the yard's change a part | A2 | the tartane's file on the branch | the library's and the vocabulary's counts; `test_held_work`'s two sweeps if `change_lateen` has a class of its own (measured at 0L) |
 | A1c | engine track | the rules captain and `put her about` | A1b (N2's `world/captains.py` merged first) | the tartane's merge | none (no committed book gains a key) |
 | A1d | engine track | a lateen held aback against its mast and one on the bad hand: the new rule of force, **merged alone** | A1c | the tartane's merge | none committed; the probes' going about re-measured |
 | A3, A4 | engine track | the helm; the boat in tow | A1b (the same files) | the tartane's file | A3's six files |
