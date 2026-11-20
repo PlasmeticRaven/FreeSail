@@ -1,0 +1,205 @@
+# Report: package 90, the engine track
+
+The engine track's builder reports here, one section per step, the file pushed last after each
+step's commit (and pushed also when a step stops early, with why). Branch
+`…/pkg-90-engine`, cut from package 90's stage 0L merged with the trunk, d8857629.
+
+## Step A2: the words of a rig with no yards, mended at their cause (2026-11-20)
+
+**Commit:** **00f0604bca22318016eaca7d92374edbf2dcbcb1** on `…/pkg-90-engine` (parent d8857629). One commit, to be merged alone
+before A1a.
+
+**Files (8, each in the engine track's §7.1 row or a pin §10.4 names for A2):**
+- `freesail/evolutions/scripts.py`: the mend (two readers, `has_braced_yards` and `braces_manned`,
+  and the lines that read them);
+- `data/evolutions/tack.yaml`, `heave_to.yaml`, `fill_away.yaml`, `scud.yaml`: their fixed lines
+  given a word from the script (`{fell_off}`, `{braces}`, `{braced_full}`);
+- `tests/test_rig_words.py`: new (a name §7.1 gives the engine track);
+- the moved pins: `tests/test_settee.py`, `tests/test_evolutions.py`,
+  `tests/test_rig_geometry.py`, `tests/test_captain_trials.py`, `tests/test_known_truths.py`;
+- `docs/dev/TuningNotes.md`: "Package 90, A2", every move old beside new with its reason.
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class is
+added (two functions), so truth 7-606 and the checkpoint's list are not touched. LF only; ruff
+clean; no line over 100 characters. Nothing under `docs/agents/consent/`; the primer not edited.
+
+### The cause, and the mend
+
+The going-about evolutions and their kin named braced yards and braces without reading whether
+she has them. A lugger's and a boat's lug yards are no braced yards, and the cutter, the smack and
+the two schooners have head yards alone. **Mended where the words are made, for every rig:** a line
+that names a braced yard or its braces is said only where she has one, read from the yards the
+evolution itself swings (`head_and_after_yards`; `working_yards` for the scud and the anchor), so a
+ship whose yards are shot away is not told to brace them either. The new words are JUDGEMENT:
+"full and by" (or "trimmed" before a course's clause) for "braced up"/"braced sharp up"; "head
+braces" or "sheets" for "after braces"; "Right the helm." for "Braced the yards full."; the braced
+or squared clause dropped elsewhere. The table of every line, old beside new, with the rigs it
+moves on, is in `docs/dev/TuningNotes.md`, "Package 90, A2".
+
+**The lines mended (16, in 10 evolutions):** the tack's end, its luff up for a course and its
+fallen-off line after a miss; the wear's up-helm line (both branches), its wind-aft line and its
+end; the heave-to's and the fill-away's first lines; the fill-away's falling-off line and its end;
+the box-haul's, wear short round's and box her off's wind-aft line; the scud's two first lines;
+the come-to-anchor's brought-up line; and get under way's two topsail-yard phrases on a boat at her
+grapnel.
+
+### The proof that every tick is the same
+
+The session's scratch harness (`a2/harness.py`, `a2/compare.py`): all eighteen files from four
+starts (the lugger transcripts' settle, seed 7, 15 kn; off the wind; the same settle in 5 kn; the
+anchor's road in Carrick Road; and off Falmouth in three fathoms and a half, where a boat lies to
+her grapnel), each order run from a copy of the settled world: tack, wear, heave to and fill away
+(by the wind and for a course), box haul, wear short round, box her off, scud, back and fill, lie
+a-try, a course across the eye and across the stern, a tack in 5 kn, come to an anchor and get
+under way. For each run every event (tick, kind, text) and a 10-second trace of heading, speed and
+position, at the base and on the mended tree.
+
+**270 runs: in every one the ticks, the event kinds, the orders' answers and the trace are
+identical. 88 lines move, in 51 runs, all words, all on the ten rigs the table names (the lugger
+18, the cutter 9, each schooner 9, the smack 8, each boat 7); not one line moves on the eight rigs
+with after yards.** The ground report's 18 lines in 11 runs are among them, line for line. The two
+digests' passages (below) agree: every tick and kind the same, only those words.
+
+### Each moved test, old beside new, with its reason (the reason of all: the words of a rig with no yards, at their cause)
+
+| Test | Old | New |
+|---|---|---|
+| `tests/test_settee.py::test_the_luggers_tack_and_wear_are_as_they_were[tack ship-lines0]` | 180 s: "Tacked; braced up on the larboard tack, heading ENE (68°)." | "Tacked; full and by on the larboard tack, heading ENE (68°)." |
+| the same, `[wear ship-lines1]` | 1 s: "Stand by to wear ship. Up helm; brace in the after yards."; 36 s: "Wind aft. Shifted over the sheets; hauled out and braced up. Lowered the foresail and the mainsail to dip them."; 171 s: "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)." | "Stand by to wear ship. Up helm."; "Wind aft. Shifted over the sheets. Lowered the foresail and the mainsail to dip them."; "Wore ship; full and by on the larboard tack, heading ENE (68°)." |
+| `tests/test_evolutions.py::test_with_no_head_yards_the_wear_squares_none[the lugger]` | "Wind aft. Shifted over the sheets; hauled out and braced up." | "Wind aft. Shifted over the sheets." |
+| `tests/test_rig_geometry.py::test_going_about_lets_the_bowlines_go_and_steadies_them_out_again[wear-schooner]` | "Stand by to wear ship. Up helm; clear away the bowlines; brace in the after yards." | "Stand by to wear ship. Up helm; clear away the bowlines." |
+| `tests/test_captain_trials.py::test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_wind` (slow): `TRIAL_TRADE_STRANGER_DIGEST` | 48c8948f87088a76 | 323b8966ceab6857: seven lines' words of 1,594, the schooner's "Hands to the head braces; heave to." (11094, 34488, 66601), "Fill away; man the head braces." (12493, 35890, 67820) and "Stand by to wear ship. Up helm." (34201); the states as pinned |
+| `tests/test_known_truths.py::test_truth_77_...` (slow): `GATE_5C_MERCHANT_DIGEST` | 16272dee77120779 | 8259996fb122428e: five lines' words of 3,096, the same words (17461, 18301, 89192, 90359, 90475); the cruise's digest holds |
+
+**Four digests more, moved by the wider reach** (found by the slow tier whole; each passes at the
+base; every tick and kind the same, line for line, traced at both): the schooner's "Hands to the
+head braces; heave to." and "Fill away; man the head braces.", and in two of them her wear's first
+line, "Stand by to wear ship. Up helm.":
+
+| Test (slow) | Constant | Old | New | Lines moved |
+|---|---|---|---|---|
+| `tests/test_known_truths.py::test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours` | `GATE_5B_SCHOONER_DIGEST` | be166d89d06a1992 | 0fef1c52128ce9b2 | 3 of 766 (28741, 30178, 56925) |
+| `tests/test_known_truths.py::test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants` | `GATE_6A_INTENT_DIGEST` | 5d3cbbc5f4d33b84 | 7239b1a1ed45736f | 11 of 2,079 (ten heave-to and fill-away lines; the wear's at 88141) |
+| `tests/test_known_truths.py::test_truth_78_...` | `GATE_6A_FAKE_CAPTAIN_DIGEST` | f47f7bc0daabc950 | 50529f09d4de955e | 5 of 3,108 (the merchant passage's five) |
+| `tests/test_captain_trials.py::test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits` | `TRIAL_TRADE_THICK_DIGEST` | 506bf46eaa6d66fe | f2f52d500f050950 | 2 of 426 (3901, 5323) |
+
+**These four are not among the pins the card names.** I moved them as "what the wider reach moves"
+(nudge 22's own category), because they move by the head-braces words alone (and the card's own
+"both schooners' wear's first line"); but they are my reading, and a reader may hold them a stop.
+See "Unsure" item 2.
+
+Nothing else moved: no fast test, and no slow test but these six digests (below).
+
+**Not moved, as the card asked:** the primer. Its lines A2 makes untrue, old beside new from the
+harness's run of the topsail schooner (seed 7, 15 kn), for A1b's edit of chapter 5 and for the lead
+on chapter 7, which no step names:
+- `docs/primer/05-going-about.md:357`, the schooner's wear: "Stand by to wear ship. Up helm; brace
+  in the after yards." -> "Stand by to wear ship. Up helm." (Its line 359 stands: true of her; it
+  lacks "shifted over the sheets" already, older than A2.)
+- `docs/primer/07-a-first-passage.md:339`, the *Speedwell* hove to: "Hands to the after braces;
+  heave to." -> "Hands to the head braces; heave to." (her own line before it: "braced the fore
+  topsail aback").
+- `docs/primer/07-a-first-passage.md:349`, her fill away: "Fill away; man the after braces." ->
+  "Fill away; man the head braces."
+
+Every other primer line holding these words is the frigate's or the brig's, and stands.
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is d8857629**, a worktree beside the mended
+tree; nothing was merged into the branch (see below).
+
+| Run | Base (d8857629) | Mended tree |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,471: 8,462 passed, 8 skipped, 1 xfailed, 0 failed (1 h 34 min, the box loaded by the measures) | 8,500: 8,491 passed, 8 skipped, 1 xfailed, 0 failed (1 h 18 min). **Test by test: every one of the base's 8,471 the same outcome; 29 new, all `tests/test_rig_words.py`, passed** |
+| **Fast tier whole again, after the mend of the four digests** (the session's rule: the mended tests, then the fast tier with its junit) | as above | 8,500: 8,491 passed, 8 skipped, 1 xfailed, 0 failed (1 h 26 min), on the committed tree. **Test by test: every one of the base's 8,471 the same outcome; the same 29 new passed** |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | the five below re-run: 5 passed | 568: 552 passed, 11 xfailed, 5 failed (1 h 31 min): the four digests above, and the browser round-trip (`tests/test_harbour.py::test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip`, "assert 'schooner' in ''": the page read before it was written, under the tier's load; **it passes alone on this tree**, 53 s, and at the base) |
+| **The six moved digest tests**, after their pins moved | the two named pass at the base with the old digests (measured) | 6 passed (17 min) |
+
+**The guard set of §10.2 at A2**, tallied from the fast tier's junits, base beside mended, every
+case the same outcome: the byte test and the golden classing table (`tests/test_ship_particulars.py`,
+`tests/test_rig_classing.py`, truth 7-185) 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 86; `tests/test_check_viewer_guns.py` 21; the lugger's set (`tests/test_lug.py`,
+truth 7b-111, `tests/test_captains.py`'s and `tests/test_view_geometry.py`'s lug cases) 58; the
+settee's, `tests/test_settee.py`, 75; the going-about set (`test_gale`, `test_rig_geometry`,
+`test_staying`, `test_lying_to`, `test_evolutions`, `test_captain_trials`, `test_catalogue`) 261; all
+passed, at both. Their slow cases are in the slow tier whole above (their only failure
+`trade_thick`'s digest, moved and passing since). The lens of a trace of the lugger's and the
+frigate's tack, wear and heave-to at seed 7 before and after is the harness's (identical).
+
+**The slow tier of the files touched** is inside the slow tier whole: `test_settee`,
+`test_evolutions`, `test_rig_geometry` and `test_rig_words` (no slow case) all passed;
+`test_captain_trials` and `test_known_truths` failed only the four digests, passing since.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 files byte for byte with
+`data/ships/`; no new ship file, so no `load_ship` or viewer-guns check of one.
+
+**The package branch moved while A2 ran** (`…/pkg-90` at 8b8a982: package 119, the
+merchant brig's watches, and N1 to N3). A2 needed nothing of it, so **nothing was merged into this
+branch**; the base of every comparison here is d8857629. Checked for the merge: A2's diff applied
+on 8b8a982 in a scratch worktree, the only conflict `docs/dev/TuningNotes.md` (both append at its
+end; resolved there by keeping both sections whole, A2's after package 119's). There,
+`test_rig_words`, `test_settee`, `test_evolutions`, `test_rig_geometry`, `test_lying_to` and
+`test_hands` passed (333), and the six moved digest tests passed (6): package 119's `too_few` on
+the heave-to and the fill-away, in the same two evolution files, sits on other lines and moves
+none of A2's figures.
+
+### Where else the cause was looked for
+
+By the cause, not the examples: every string of `freesail/` naming a brace, a braced yard, the
+after or head yards or squaring (parsed, all modules), and every base line of the harness's 270
+runs on a rig with no braced yard naming a brace, a yard or squaring, and on a rig with head yards
+alone naming after yards or after braces. Every such line is mended or found true of every rig that
+reaches it:
+- **mended**: the lines of the table (the ground report's four, the card's wider reach, and found
+  beyond it: the tack's luff up and its fallen-off line, the scud's two lines, the come-to-anchor's
+  "square the yards", the cutter's and the schooners' heave-to and fill-away "after braces", and the
+  boats' get-under-way "The topsail yard abox." and "brace round the topsail yard");
+- **left, keyed already** (earlier mends of the same cause): "Mainsail haul" on after yards, "Let
+  go and haul" and "the head yards aback to box her off" on head yards, the urgent missed-stays
+  line's "square the yards", the wear's "Squared the head yards";
+- **left, true where reached**: "Haul taut the lifts and weather braces. Steady out the bowlines."
+  (only with a bowline steadied out; a bowline is a square sail's, and no yardless file carries one);
+  the box-haul family's other lines and back and fill and lie a-try (each refused without the yards
+  it works); the heave-to's "Braced the ... aback" (on the yards laid aback); get under way's ship's
+  road (two masts with yards); `_brace_up_for_the_helm` (a square sail set);
+- **outside the engine track's files**, read and found keyed: `physics/integrate.py`'s "the yards
+  are not trimmed" (a square sail set), `orders/navigation.py`'s across-the-stern line (yards
+  aback), `orders/verbs.py`'s brace order (refused, "This ship has no yards to brace.");
+  `world/captains.py` holds none of the words. **No file outside the row was needed.**
+
+### Unsure, and for the lead
+
+1. **The two digests' premise.** The card has them "in tests already failing at the base ... their
+   outcome does not change". At this base, d8857629, both **pass** (their digests are their pins;
+   the ground report's 5067945e failed both). So A2 must move them or turn them red. They are named
+   in §10.4's A2 row, so I moved them, old beside new with every line traced; if the lead would
+   rather they were ruled first, it is these two constants alone.
+2. **The wider reach on rigs with head yards alone.** "Hands to the after braces" and "man the after
+   braces" on the cutter, the smack and the two schooners: no example of the card's names them; I
+   took them as the same cause ("after" braces where she has no after yards), and the schooners'
+   own primer log shows it ("braced the fore topsail aback", then "Hands to the after braces"). They
+   move four digests the card does not name (gate 5b's, gate 6a's intent's, truth 78's and
+   `trade_thick`'s), and add six lines to the two it does. "head braces" is JUDGEMENT; the engine
+   already calls these yards her head yards ("Squared the head yards", "Brace abox the head
+   yards!"). **Were it ruled no part of the cause,** it is `braces_manned`'s middle branch alone:
+   gate 5b's and `trade_thick`'s digests go back to their old figures, and the other four move
+   still, by the wear's first line, which the card names.
+3. **The words chosen** (all JUDGEMENT): "full and by" and "trimmed" (the ground report's
+   candidate's); "sheets" for a yardless rig's heave-to and fill-away (Luce's fore-and-after heaves
+   to by her sheets); "Right the helm." where a yarded ship "Braced the yards full."
+4. **Found on the way, not built** (another cause, which no step names): a boat's anchor work is
+   said in a ship's words (the messenger, the bars and the capstan, sail-loosers aloft, a topsail and
+   a jib she has not, "Hook the cat", "under the jib"), and the lugger and the boats brought up are
+   told to "brail up the spanker". Only the two yard phrases of that road are A2's, and they are
+   mended.
+5. **Two new tests near the slow tier's line.** Under the measures' load,
+   `test_the_lugger_brought_up_squares_no_yards` and `test_a_ship_with_after_yards_says_them_as_before`
+   took 5 to 8 s (the conftest's line is 5 s); `tests/conftest.py`'s slow list is not in my row, so
+   neither is marked slow. Measured alone on the quiet box: 6.05 s (of it about 4 s the Channel's chart,
+   loaded once a process: 2.2 s with it loaded) and 5.47 s. Left in the fast tier rather than
+   trimmed and the tier run a third time; if the lead wants them in `SLOW_TESTS`, that is
+   `tests/conftest.py`'s line.
+
+Stopped after A2, as briefed: waiting for the coordinating session's message before A1a.
