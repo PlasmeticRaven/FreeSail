@@ -38333,7 +38333,69 @@ Each from this worktree's root, one at a time, its junit kept in the session's s
 
 The fast and slow tiers whole are the session's, on the commit.
 
-Built by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).
+Built by the stage-0 builder; passed by an independent checker (the plan's §5.3), whose mends are in 43962916.
+
+## Package 90, N1: the Spanish names list (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6, row N1: a `spanish` list in `data/crew/names.yaml`, for the people of the package's Spanish ships by their files' `names: spanish` (`docs/design/Design-Ship-Diana.md` §17.1 question 6; the owner's Part E, "a Spanish names list for her people"). No committed ship file names the list, so nothing sails, fights or is mustered otherwise; Spain's row in `data/nations.yaml` keeps `names: english` (the recruits of a Spanish port are drawn from it, as before).
+
+**The source** (stated at the list's head): the Instituto Nacional de Estadística's tables as served on 2026-11-20, "Frecuencias de apellidos" (the annual population census at 1 January 2025) for the 244 surnames, its first 250 by rank less two of a modern immigration and four of more than one word; and "Nombres más frecuentes por fecha de nacimiento" (the Padrón continuo at 1 January 2022), the men born before 1930, the nation's fifty and each province of birth's twenty, for the 68 given names, one name to a man, the Catalan forms in their Castilian, less nine names taken for later fashions. A modern table for a list of the period is JUDGEMENT, said there.
+
+### Pins moved, old beside new
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_crew_model.py::test_the_name_lists` | the lists are `english`, `american` and `french` | the lists are `english`, `american`, `french` and `spanish`; the Spanish held to the frigate's floor (60 given names, 200 surnames: it has 68 and 244), unique and trimmed as the others | the new list. Not named by the plan's §6 or §10.4 for N1 ("none"), which missed that this test pins the set of lists |
+
+**Added:** `tests/test_crew_model.py::test_a_company_is_drawn_from_the_spanish_list_in_full`: the seventy-four's crew section, told `names: spanish`, musters her whole company from the list, every man's name his own, each written in full.
+
+**Found, outside N1's files, for the coordinating session:** `freesail/world/nations.py`'s `NAMES_TO_NATION` gives the nation a ship belongs to by her list where the scenario gives none (`Dealings.ship_nation`), and has no `spanish` row, so a ship drawn from the Spanish list with no nation given would be taken for Britain's (the table's default). Nothing reads the list yet, so nothing is wrong today; the row is wanted before the first file that names the list. Not mended here (the stop rule).
+
+Moved by the *Diana*'s builder; to be passed by a reader other than the one who moved it.
+
+
+## Package 90, N3: the Spanish marines' kit (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6, row N3 (decision 64; the xebec *África*'s 38 soldiers, `Design-Ship-Xebec.md` §5 and §8.1): a `spanish` kit in `data/marines.yaml`. **No pin moved, and nothing fights otherwise:** a ship's kit is her nation's (`Nations.marines_kit_of`), and Spain's row in `data/nations.yaml` names the basic kit, as it did; no nation names the new kit (held by the test below).
+
+**What it is, and from what:**
+- **The corps** (`name`, `soldiers: true`): the regulation of 1 January 1788 counts infantry and infantry-artillery in every ship's company (Winfield et al. 2023, p. 1446 and following, by `docs/design/VesselReferences-2026-11-Spanish.md` §15), and James calls the *África*'s 38 soldiers (James vol. II p. 365, by Xeb-D §8.1). The engine reads no `soldiers` key today (words).
+- **Aloft or on deck** (`tops_share` 0.2, `tops_factor` 1.0, the basic kit's): the ordinances of 1748 post the troops' officer on the poop in action (*Ordenanzas de Su Magestad para su Real Armada*, Madrid 1748, tratado I, título V, art. XXXIV, p. 76; `docs/references/signals/`), so the share stays under the 0.3 at which a rules captain whose book says `kit` sends them into the tops (`world/captains.py`), not the French habit's 0.4.
+- **The musket and the drill**: the same ordinances have the troops exercised at the musket and the great gun (tratado I, título III, art. XLV, p. 42) but give no rate; no page in the tree gives the Spanish musket. So the musket, the sergeant's and the officer's arms, `volley_s` 25, `hit_at_50_yd` 0.04 and `boarding` 1.2 are **the basic kit's, said** (JUDGEMENT).
+
+**Added:** `tests/test_fight.py::test_the_spanish_kit_is_the_basic_kits_figures_soldiers_and_no_nation_names_it_yet`.
+
+**For the coordinating session:** the plan's N3 row keys the kit on "the fit's marines", but no fit carries a kit and the schema has no such key (a fit's `marines` is the quarter bill's count, package 75's B1): the kit is reached only by a nation's row. For a Spanish ship to muster it, Spain's row in `data/nations.yaml` must name it (a file nobody touches after stage 0, plan §7.1), or a fit's kit key be built (`freesail/ship/schema.py`, stage 0's). Neither is done here.
+
+Moved by the *Diana*'s builder; to be passed by a reader other than the one who moved it.
+
+## Package 90, the two follow-ups of N1 and N3: the Spanish list's nation and Spain's kit (2026-11-20)
+
+The lead's nudge 25 allowed both as the stage-0 builder's follow-ups, before the *Diana*'s file.
+
+**The Spanish list's nation** (`freesail/world/nations.py`, `NAMES_TO_NATION`): the row `"spanish": "spain"`. **The cause:** a list without a row reads as Britain's by `nation_of_names`'s floor, and the *Diana*'s builder found that N1's list had none. **At its level:** `tests/test_probes_90.py::test_every_names_list_has_its_nation` holds every list of `data/crew/names.yaml` to a row, and every row to a nation of the table. **Truth 7-680** (`test_truth_7_680_a_ship_drawn_from_the_spanish_list_with_no_nation_given_is_spains`, drafted in the stage-0 file, the package's number): a ship whose company is drawn from the Spanish list, with no nation given, reads as Spain's, with Spain's marines and Spanish names. Before the row she read as Britain's, with the Royal Marines' kit (measured, below). No committed file names the list, so nothing in play moves.
+
+**Spain's kit** (`data/nations.yaml`, Spain's row): `marines: {kit: spanish}`, where it was `basic`. N3's kit, whose figures are the basic kit's, now reaches her ships. **Measured** old (cb8c445b, in a scratch worktree) beside new, by the marines' reading (`combat/small_arms.describe`) of the frigate-36, the brig and the seventy-four. With the nation Spain given, only words move, every count the same:
+
+| Served | Old | New |
+|---|---|---|
+| the reading's words | "40 fit of 40 (the marines; a musket of the common bore with its bayonet): ..." | "40 fit of 40 (the Spanish navy's infantry and artillery; a musket of the common bore with its bayonet): ..." |
+| the reading's `kit` | `basic` | `spanish` |
+
+Every reader of a kit takes its figures alone (`combat/boarding.py`'s boarding and hit, `combat/small_arms.py`'s hit, share aloft, tops factor and volley, `orders/fight.py`'s volley and share, `world/captains.py`'s share aloft at 0.3). All of these figures are the basic kit's, so no fight moves. The kit's `soldiers` key is read by nothing.
+
+With no nation given and her company drawn from the Spanish list, a ship moved from Britain's (the Royal Marines; the Sea Service musket) to Spain's. That is the names row's truth, above, and no committed file has such a company.
+
+### Pins moved, old beside new
+
+| Pin | Old | New | Reason |
+|---|---|---|---|
+| `tests/test_fight.py::test_the_hit_chance_falls_with_the_square_of_the_range_to_nought_at_musket_shot` (package 73) | Spain's kit `basic`, as the example of "the basic kit else" | Spain's kit `spanish`; Portugal's and a nation with no row `basic`, as the basic kit's example | Spain's row names her kit; the clause's point, that a nation naming none takes the basic kit, is kept on Portugal's row |
+| `tests/test_fight.py::test_the_spanish_kit_is_the_basic_kits_figures_soldiers_and_no_nation_names_it_yet` (N3) | renamed; no nation names the kit, and Spain's is `basic` | `..._soldiers_and_spains_row_names_it`: Spain's row and no other nation's names it | the follow-up itself; the figures' clauses as they were |
+
+Added: `tests/test_probes_90.py`'s guard and truth 7-680, above.
+
+Moved by the stage-0 builder (the coordinating session); to be passed by the lead's reader.
 
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 

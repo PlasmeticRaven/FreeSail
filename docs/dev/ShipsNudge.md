@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 12:25 UTC (A3, THE TILLER, MAY RUN IN A SECOND ENGINE SESSION beside the engine track, as you propose, on the owner's word to you; three conditions in the note). Nudge number: 27.
+Latest note: 2026-11-20, 16:40 UTC (A3's TWO STOPS BOTH ALLOWED: stage 0's guards become one table of each key and the files that carry it; the third line in world/captains.py, a local import of helm_words in Captain._repairs). Nudge number: 31.
