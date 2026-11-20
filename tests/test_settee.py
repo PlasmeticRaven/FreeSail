@@ -1414,7 +1414,12 @@ def test_an_order_of_the_settee_waits_for_the_fill_away_that_dips_it(tmp_path):
 # same: the wear's at 36 s, "Wind aft. Squared the head yards; shifted over the sheets; ..."
 # until B3.4b, where with no head yards (her lug yards are no braced yards) it says nothing of
 # squaring them (the lead's ruling (3) of 2026-11-07; Luce 1884 p. 424, the head yards laid
-# square with the wind aft).
+# square with the wind aft). Four more moved at package 90's A2, words only, every tick the same
+# (the words of a rig with no yards, at their cause: her lug yards are no braced yards, and she
+# has no after yards; docs/dev/TuningNotes.md, "Package 90, A2"): the tack's at 180 s, "Tacked;
+# braced up on the larboard tack, ..."; the wear's at 1 s, "Stand by to wear ship. Up helm; brace
+# in the after yards."; at 36 s, "Wind aft. Shifted over the sheets; hauled out and braced up.
+# Lowered ..."; and at 171 s, "Wore ship; braced sharp up on the larboard tack, ...".
 LUGGER_TACK = [
     (0, "Order: tack ship."),
     (1, "All hands! (to tack ship)"),
@@ -1432,18 +1437,17 @@ LUGGER_TACK = [
         "Dipped the foresail and the mainsail; hoisted on the starboard side, to leeward of the "
         "masts.",
     ),
-    (180, "Tacked; braced up on the larboard tack, heading ENE (68°)."),
+    (180, "Tacked; full and by on the larboard tack, heading ENE (68°)."),
     (180, "Piped down; the starboard watch has the deck."),
 ]
 LUGGER_WEAR = [
     (0, "Order: wear ship."),
     (1, "All hands! (to wear ship)"),
-    (1, "Stand by to wear ship. Up helm; brace in the after yards."),
+    (1, "Stand by to wear ship. Up helm."),
     (1, "Stations for wearing ship."),
     (
         36,
-        "Wind aft. Shifted over the sheets; hauled out and braced up. Lowered the foresail and "
-        "the mainsail to dip them.",
+        "Wind aft. Shifted over the sheets. Lowered the foresail and the mainsail to dip them.",
     ),
     (90, "All hands on deck."),
     (
@@ -1451,7 +1455,7 @@ LUGGER_WEAR = [
         "Dipped the foresail and the mainsail; hoisted on the starboard side, to leeward of the "
         "masts.",
     ),
-    (171, "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)."),
+    (171, "Wore ship; full and by on the larboard tack, heading ENE (68°)."),
     (171, "Piped down; the starboard watch has the deck."),
 ]
 
@@ -1460,7 +1464,7 @@ LUGGER_WEAR = [
 def test_the_luggers_tack_and_wear_are_as_they_were(order, lines):
     """Ext §10.1, the trace: the lugger's dip and lowering take her lugs alone (`lugger_lugs`),
     her lines and ticks as before the settee step (the wear's wind-aft line's words since moved
-    by B3.4b, above)."""
+    by B3.4b, and four lines' words by package 90's A2, above)."""
     scenario = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,

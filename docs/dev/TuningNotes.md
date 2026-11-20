@@ -38330,3 +38330,132 @@ Each from this worktree's root, one at a time, its junit kept in the session's s
 The fast and slow tiers whole are the session's, on the commit.
 
 Built by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).
+
+
+## Package 90, A2: the words of a rig with no yards, mended at their cause (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6's A2, widened by the lead's nudge 22 (2026-11-19: "A2's wider reach: inside A2, at the cause, each line old beside new"); one commit, merged alone before A1a. **Words only**: every tick, every event's kind and every trace of heading, speed and position the same over all eighteen files' going about and its kin (measured below); no ship file moves (`py tools/gen_ships.py <scratch>`: 18 of 18 byte for byte), and no class is added to any module (two functions), so the checkpoint's list and truth 7-606 hold as they were.
+
+**The cause.** The going-about evolutions and their kin named braced yards and their braces without reading whether she has them. A lugger's and a boat's lug yards are no braced yards (`Spar.is_yard`, package 43b), and the cutter, the smack and the two schooners have head yards and no after yards (`head_and_after_yards`); yet the lugger worn was told "Up helm; brace in the after yards", "hauled out and braced up" and "Wore ship; braced sharp up", tacked "Tacked; braced up", hove to she manned "the after braces", filled away she "Braced the yards full" and was "braced full", scudding she stood by "the braces", and brought up she squared "the yards"; the cutter, the smack and the schooners were told to brace in, and braced up, after yards they have not, and manned after braces to heave to.
+
+**The mend**, where the words are made (`freesail/evolutions/scripts.py`, and the four evolution files whose lines are fixed text: `tack.yaml`, `heave_to.yaml`, `fill_away.yaml`, `scud.yaml`), for every rig: a line that names a braced yard or its braces is said only where she has one, read from the yards the evolution itself swings (`head_and_after_yards`, its working yards; `working_yards` for the scud and the anchor, which swing all of them), so that a ship whose yards are all shot away is not told to brace them either. Two readers, beside `head_and_after_yards`:
+- `has_braced_yards(head, after)`: whether she has a braced yard to be said braced, braced up or squared;
+- `braces_manned(ship)`: the braces a heave-to or a fill-away mans: "after braces" where she has after yards, as before; "head braces" where her braced yards are her head yards alone; "sheets" where she has none, who heaves to and fills away the fore-and-after's way, by her sheets (Luce 1884, ch. XXXIV, 'To Heave to').
+
+Each line, old beside new (the new words JUDGEMENT; "none" is a rig with no braced yard, the lugger and the five boats; "head" a rig with head yards alone, the cutter, the smack and the two schooners):
+
+| Evolution, line | Old | New | Rigs |
+|---|---|---|---|
+| tack, its end (`TackScript.words`, `CourseToSteer.words`) | "Tacked; braced up on the larboard tack, heading ENE (68°)." | "Tacked; full and by on the larboard tack, ..."; with a course's clause "trimmed" ("Tacked; trimmed on the starboard tack, heading WNW (290°), the course ordered.", "..., full and by."), so that "full and by" is not said twice; paid off to it "trimmed for the course ordered" | none |
+| tack, luffed up for a course (`_go_about`) | "Luff up and brace up: she is brought by the wind to go about." | "Luff up: she is brought by the wind to go about." | none |
+| tack, fallen off from a miss (`tack.yaml`'s `on_fail`, `{fell_off}`) | "Squared the yards; she fell off on the starboard tack, to try again or to wear." | "She fell off on the starboard tack, to try again or to wear." | none |
+| wear, up helm, both branches (`_up_helm`) | "Stand by to wear ship. Up helm; brace in the after yards." | "Stand by to wear ship. Up helm." (and "...; clear away the bowlines.") | none, head |
+| wear, wind aft | "Wind aft. Shifted over the sheets; hauled out and braced up." | "Wind aft. Shifted over the sheets." | none |
+| wear, its end (`WearScript.words`) | "Wore ship; braced sharp up on the larboard tack, ..." ("braced for the course ordered" worn for one) | as the tack's end | none |
+| heave to (`heave_to.yaml`'s `on_start`, `{braces}`) | "Hands to the after braces; heave to." | "Hands to the head braces; heave to."; "Hands to the sheets; heave to." | head; none |
+| fill away (`fill_away.yaml`'s `on_start`, `{braces}`) | "Fill away; man the after braces." | "Fill away; man the head braces."; "Fill away; man the sheets." | head; none |
+| fill away, fallen off | "Braced the yards full." ("Fallen off; braced the yards full.") | "Right the helm." ("Fallen off; right the helm."): the helm is righted for her course there, which is what that moment is for her | none |
+| fill away, its end (`{braced_full}`) | "Filled away on the starboard tack; braced full and steering WNW (292°)." | "Filled away on the starboard tack; steering WNW (292°)." | none |
+| box-haul, wear short round, and box her off gone round by the stern: wind aft (`BoxHaulScript`) | "Wind aft; braced up the after yards; shifted over the sheets. Haul out the mainsail!" | "Wind aft; shifted over the sheets. Haul out the mainsail!" | head (each is refused without head yards: "She has no head yards to brace abox.") |
+| scud, up helm | "Up helm; brace in the yards as she goes off." | "Up helm." | none |
+| scud (`scud.yaml`'s `on_start`, `{braces}`) | "Up helm; stand by the braces. Bear up and scud." | "Up helm. Bear up and scud." | none |
+| come to anchor, brought up | "Brought up. Stations for furling sail; square the yards." | "Brought up. Stations for furling sail." | none (the lugger; a boat at her grapnel) |
+| get under way, the anchor aweigh, the fore-and-after's road (`GetUnderWayScript`) | "Let go the downhauls, hoist away the jib, its sheet to windward! The topsail yard abox. Helm a-lee for the stern-board." | "Let go the downhauls, hoist away the jib, its sheet to windward! Helm a-lee for the stern-board." | none (a boat at her grapnel; the lugger has her own road) |
+| get under way, cast | "She has paid off; right the helm, draw the jib, haul aft the main sheet, brace round the topsail yard." | "She has paid off; right the helm, draw the jib, haul aft the main sheet." | the same |
+
+The eight rigs with after yards (the bilander, the brig, the merchant brig, the frigate, the razee, the 74, the 64 and the hermaphrodite brig, whose main topsail and topgallant yards are after yards) say every line as they did.
+
+**Looked for by the cause, and left** (each true of every rig that reaches it):
+- the tack's own keyed lines, mends of this cause in earlier packages: "Mainsail haul" and "Main-topsail haul" on after yards (package 32e), "Let go and haul" and "the head yards aback to box her off" on head yards, "square the yards" in the urgent missed-stays line on any yard; the wear's "Squared the head yards" on head yards (package 75, B3.4b);
+- "Haul taut the lifts and weather braces. Steady out the bowlines." (the tack's and the wear's): said only when a bowline is steadied out; a bowline is a square sail's, and no file with no braced yard carries one (the lugger and the five boats: none, grepped);
+- the box-haul's, wear short round's and box her off's other lines ("Ready about. Helm's a-lee; checked the lee head braces.", "Brace abox the head yards!", "Square away the after yards!" already on after yards, "Let go and haul! Brace up for the ... tack.", and their ends "braced sharp up"): each evolution is refused without head yards;
+- back and fill ("Man the main braces"), lie a-try ("Braced the ... sharp up") and the heave-to's own lines ("Braced the ... aback", "braced up the other yards"): refused without the yards they work ("She has no square yards to back and fill.", "She has no topsail to lie a-try under."), or keyed on the yards laid aback;
+- get under way: the lugger has her own road and words since package 68; the ship's road ("Brace up the after yards for the ... tack, the head yards abox", "brace round the head yards") is taken only by a ship with yards on two masts or more, which has both;
+- the watch's brace-up for the helm (`_brace_up_for_the_helm`): only with a square sail set;
+- outside the engine track's files, read and found keyed: `physics/integrate.py`'s "the yards are not trimmed for this course" (only with a square sail set), `orders/navigation.py`'s across-the-stern line (on the yards aback), `orders/verbs.py`'s brace order (refused, "This ship has no yards to brace."); `world/captains.py` says none of these words (grepped).
+
+### Measured: words only, old beside new
+
+**The harness** (the session's scratch, `a2/harness.py`, `a2/compare.py`; the base d8857629 in a worktree beside the mended tree). Every one of the eighteen files, from five starts, each settled once and each order run from a copy of the settled world (the checkpoint's own pickling, as `core.replay.trial_copy` takes it; the lugger's tack and wear so are her pinned transcripts line for line and tick for tick):
+- the lugger transcripts' settle (`tests/test_settee.py`: seed 7, 15 kn from 0°, her head 292.5°, plain sail braced sharp up on the starboard tack, trimmed every two minutes after five, 2,400 s): `tack ship`; `wear ship`; `heave to` then `fill away`; `heave to` then `fill away and steer 250`; `box haul`; `wear short round`; `box her off`; `scud`; `back and fill`; `lie a-try`; each 600 s an order;
+- off the wind (`tests/test_ships.py`'s `_under_way` turned to this wind: steady on 105° under plain sail, trimmed, 1,500 s): `steer 290` (across the eye) and `steer 250` (across the stern), 1,200 s each;
+- the same settle in 5 kn: `tack ship`, 900 s;
+- the anchor's road (`tests/test_anchor.py`'s `brought_up`: Carrick Road, 12 kn from 225°, her head 335°, 240 s under plain sail): `come to an anchor`, 2,400 s, then `get under way`, 1,500 s;
+- off Falmouth in three fathoms and a half (50.152° N, 5.040° W: 8 kn from 225°, her head 335°, `set plain sail` and `set the lug`, 60 s), where a boat lies to her grapnel (in the Road, fourteen fathoms, the grapnel's twenty fathoms of cable will not hold her): the same two orders.
+
+For each run: every event after the order (its tick, kind and text) and a trace every 10 s of her heading, speed and position. **270 runs; in all of them the ticks, the event kinds, the orders' answers and the trace are identical, old beside new. 88 lines move, in 51 runs, every one a line of the table above, and on the ten rigs it names (the lugger 18, the cutter 9, each schooner 9, the smack 8, each boat 7); nothing moves on the eight with after yards.**
+
+| Line moved (old -> new) | Runs |
+|---|---|
+| "Stand by to wear ship. Up helm; brace in the after yards." -> "... Up helm." | 13: the five boats', the lugger's, the cutter's, the smack's and the two schooners' wears, and the cutter's and the two schooners' wears for a course across the stern |
+| "Wind aft; braced up the after yards; shifted over the sheets. Haul out the mainsail!" -> "Wind aft; shifted over the sheets. Haul out the mainsail!" | 12: the cutter's, the smack's and the two schooners' box-haul, wear short round and box her off |
+| "Hands to the after braces; heave to." -> "Hands to the head braces; heave to." | 8: the cutter's, the smack's and the two schooners' heave-to, twice each |
+| "Fill away; man the after braces." -> "Fill away; man the head braces." | 8: the same, their fill-away |
+| "Up helm; brace in the yards as she goes off." -> "Up helm." | 6: the five boats' and the lugger's scud |
+| "Up helm; stand by the braces. Bear up and scud." -> "Up helm. Bear up and scud." | 6: the same |
+| "Wind aft. Shifted over the sheets; hauled out and braced up." -> "Wind aft. Shifted over the sheets." | 5: the five boats' wears (30 to 43 s) |
+| "Tacked; braced up on the larboard tack, heading ENE (68°)." -> "Tacked; full and by on the larboard tack, ..." | 2: the lugger's tack in 15 and in 5 kn |
+| "Hands to the after braces; heave to." -> "Hands to the sheets; heave to." | 2: the lugger's |
+| "Fill away; man the after braces." -> "Fill away; man the sheets." | 2: the lugger's |
+| "Braced the yards full." -> "Right the helm." | 2: the lugger's |
+| "Wind aft. Shifted over the sheets; hauled out and braced up. Lowered the foresail and the mainsail to dip them." -> "Wind aft. Shifted over the sheets. Lowered ..." | 1: the lugger's wear |
+| "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)." -> "Wore ship; full and by on the larboard tack, ..." | 1: the lugger's |
+| "Filled away on the starboard tack; braced full and steering WNW (292°)." -> "...; steering WNW (292°)." | 1: the lugger's |
+| "Filled away on the starboard tack; braced full and steering WSW (250°), the course ordered." -> "...; steering WSW (250°), the course ordered." | 1: the lugger's |
+| "Tacked; braced up on the starboard tack, heading WNW (290°), the course ordered." -> "Tacked; trimmed on the starboard tack, ..." | 1: the lugger's tack for a course across the eye |
+| "Brought up. Stations for furling sail; square the yards." -> "Brought up. Stations for furling sail." | 7: the lugger's in the Road and off Falmouth, and the five boats' off Falmouth |
+| "Let go the downhauls, hoist away the jib, its sheet to windward! The topsail yard abox. Helm a-lee for the stern-board." -> "... its sheet to windward! Helm a-lee for the stern-board." | 5: the five boats' off Falmouth |
+| "She has paid off; right the helm, draw the jib, haul aft the main sheet, brace round the topsail yard." -> "... haul aft the main sheet." | 5: the same |
+
+The ground report's eighteen lines in eleven runs (its §2.3) are among these, line for line; the rest are the wider reach's. **Not reached by any order of a player's** on a rig with no braced yard, in these runs or the probes beside them: the luff up for a course (a lugger is by the wind, by her own luff, for every course she is put about for, or is gybed by the helm) and the fallen-off line of a missed stay (she tacked in 4 kn, and in 3 kn has not way to stay). Both are mended at the cause all the same, and taken by the runner's door in the new tests, as `tests/test_evolutions.py` takes them on the frigate.
+
+### Pins moved, old beside new (the reason of each: the words of a rig with no yards, at their cause; words only, every tick the same)
+
+- **The lugger's two transcripts** (`tests/test_settee.py`, `LUGGER_TACK` and `LUGGER_WEAR`, `test_the_luggers_tack_and_wear_are_as_they_were[tack ship-lines0]` and `[wear ship-lines1]`), four lines, every tick and every other line as they were (the comment above them names the four):
+  - the tack's at 180 s: "Tacked; braced up on the larboard tack, heading ENE (68°)." -> "Tacked; full and by on the larboard tack, heading ENE (68°).";
+  - the wear's at 1 s: "Stand by to wear ship. Up helm; brace in the after yards." -> "Stand by to wear ship. Up helm.";
+  - at 36 s: "Wind aft. Shifted over the sheets; hauled out and braced up. Lowered the foresail and the mainsail to dip them." -> "Wind aft. Shifted over the sheets. Lowered the foresail and the mainsail to dip them.";
+  - at 171 s: "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)." -> "Wore ship; full and by on the larboard tack, heading ENE (68°).".
+- **The lugger's wind-aft case** (`tests/test_evolutions.py`, `test_with_no_head_yards_the_wear_squares_none[the lugger]`): "Wind aft. Shifted over the sheets; hauled out and braced up." -> "Wind aft. Shifted over the sheets."; the frigate's and trial B's (her main topsail yard braced) as they were; the docstring says so.
+- **The wear-schooner case** (`tests/test_rig_geometry.py`, `test_going_about_lets_the_bowlines_go_and_steadies_them_out_again[wear-schooner]`; the ground report's row 11): "Stand by to wear ship. Up helm; clear away the bowlines; brace in the after yards." -> "Stand by to wear ship. Up helm; clear away the bowlines." (the test's own comment says the schooner has no after yards); the frigate's as it was.
+- **The two digests** (the ground report's §2.3; the card's "two digests in tests already failing at the base"). **At this base they pass**: d8857629 gives `trade_stranger`'s 48c8948f87088a76 and truth 77's merchant 16272dee77120779, each its pin, the states as pinned (measured in the session's scratch, `a2/digests.py`, at the base and the mended tree; the ground report's base, 5067945e, gave 028b011b3d6b2ccb and f9851749c0d55427 and failed both). So A2 moves their pins, which the card had only to record: each the merchant schooner's passage, whose yards are head yards alone; every tick and every kind the same, line for line:
+  - `TRIAL_TRADE_STRANGER_DIGEST` (`tests/test_captain_trials.py`, `test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_wind`): 48c8948f87088a76 -> 323b8966ceab6857, seven lines' words of 1,594: "Hands to the after braces; heave to." -> "Hands to the head braces; heave to." at 11094, 34488 and 66601; "Fill away; man the after braces." -> "Fill away; man the head braces." at 12493, 35890 and 67820; "Stand by to wear ship. Up helm; brace in the after yards." -> "Stand by to wear ship. Up helm." at 34201;
+  - `GATE_5C_MERCHANT_DIGEST` (`tests/test_known_truths.py`, truth 77, `test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_named_and_aside`): 16272dee77120779 -> 8259996fb122428e, five lines' words of 3,096: the heave-to's at 17461 and 89192, the fill-away's at 18301 and 90359, the wear's first line at 90475, the same words;
+  - the cruise's digest, the frigate's (`GATE_5C_CRUISE_DIGEST`, bdd6ce8a97a33140), holds.
+- **Four digests more, by the wider reach** (found by the slow tier whole; each passes at the base, and every tick and every kind is the same, line for line, measured at both in the session's scratch, `a2/digests2.py`): the schooner, whose yards are head yards alone, manning her head braces to heave to and fill away ("Hands to the after braces; heave to." -> "Hands to the head braces; heave to.", "Fill away; man the after braces." -> "Fill away; man the head braces."), and in two of them her wear's first line ("... Up helm; brace in the after yards." -> "... Up helm."):
+  - `GATE_5B_SCHOONER_DIGEST` (`tests/test_known_truths.py`, `test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours`): be166d89d06a1992 -> 0fef1c52128ce9b2, three lines' words of 766 (28741, 30178, 56925);
+  - `GATE_6A_INTENT_DIGEST` (`test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants`): 5d3cbbc5f4d33b84 -> 7239b1a1ed45736f, eleven lines' words of 2,079 (the heave-to's and fill-away's at 19081, 19921, 30721, 32090, 64861, 66054, 83341, 84524, 97741 and 99087; the wear's at 88141);
+  - `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78, `test_truth_78_the_fake_captain_commands_the_merchant_passage_by_its_book_and_six_orders`): f47f7bc0daabc950 -> 50529f09d4de955e, the merchant passage's five lines as above, of 3,108;
+  - `TRIAL_TRADE_THICK_DIGEST` (`tests/test_captain_trials.py`, `test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits`): 506bf46eaa6d66fe -> f2f52d500f050950, two lines' words of 426 (3901, 5323).
+
+  **Not among the pins the card names**: they move by the wider reach's "head braces" (nudge 22's "anywhere else the same cause speaks": "after braces" said of a rig with no after yards), and the intent's and truth 78's by the wear's first line as well, which the card names in kind ("both schooners' wear's first line"). For the lead: were "head braces" ruled no part of the cause, it is `braces_manned`'s middle branch alone, and with it gate 5b's and `trade_thick`'s digests go back to their old figures; the other four move by the wear's first line too.
+- **Nothing else moved**: the fast tier whole and the slow tier whole (but the pace tests), compared test by test with the base, move nothing but what this list names (the counts in `docs/design/Report-Package90-Engine.md`, A2).
+
+### The new tests (`tests/test_rig_words.py`)
+
+Each by the door the behaviour is met at (a ship file as the game loads it, an order as a player gives it), but for the two lines no player's order reaches, which go by the runner's:
+- the key over the eighteen files as filed, each file's braces named (six "sheets", four "head braces", eight "after braces"; named, not globbed, so that a file added later is no move of it);
+- the lugger: hove to and filled away, line for line and tick for tick; filled away for a course; scudding, line for line; put about across the eye and ended trimmed, full and by; no line of her tack, her wear, her heave-to or her fill-away naming a brace or a yard; brought up in Carrick Road without squaring yards;
+- the cutter: her wear's first line without after yards, her head yards squared and braced up as before, her heave-to's and fill-away's head braces; her box-haul's wind-aft line; no line naming after yards or after braces;
+- the brig: her after yards and after braces as before;
+- by the runner's door: the lugger luffed up for a course, "Luff up: ...", and fallen off from a miss, "She fell off on the starboard tack, ...", the urgent line squaring none.
+
+### The primer (not edited: the card names chapter 5 for A1b, and no step names chapter 7)
+
+Lines A2's words make untrue, old beside new from the harness's runs (the topsail schooner, seed 7, 15 kn):
+- `docs/primer/05-going-about.md:357`, the schooner's wear: "Stand by to wear ship. Up helm; brace in the after yards." -> "Stand by to wear ship. Up helm." (Its line at 359, "Wind aft. Squared the head yards; hauled out and braced up.", is true of her and stands; it lacks "shifted over the sheets" already, as the ground report found: older than A2.)
+- `docs/primer/07-a-first-passage.md:339`, the *Speedwell* hove to: "Hands to the after braces; heave to." -> "Hands to the head braces; heave to." (her own line before it says "braced the fore topsail aback");
+- `docs/primer/07-a-first-passage.md:349`, her fill away: "Fill away; man the after braces." -> "Fill away; man the head braces."
+
+Every other primer line holding these words is the frigate's or the brig's, and stands (grepped: chapters 4, 5, 7, 9, 13 and 18).
+
+### Found on the way, not built
+
+- The lugger brought up is told "Veered to seventy-nine fathoms; brail up the spanker." of her standing lug mizen (`driver_words`): a sail's name, not a yard's or a brace's; another cause, which no step names.
+- **A boat's anchor work is said in a ship's words** (`ComeToAnchorScript`, `GetUnderWayScript`'s fore-and-after's road), found by the shoal's runs: brought up to her grapnel the launch is told "Let go the topsail sheets; clew up; haul down the jib." and "brail up the spanker"; getting under way, "Pass the messenger, ship the bars; send the ready-men aloft", "Pawl the capstan", "Lay aloft, sail-loosers! Man the topsail sheets and halliards", "Hoist away the topsail and the mainsail", "hoist away the jib", "Hook the cat" and "Under way on the starboard tack, under the jib", of a boat with one standing lug, no jib, no capstan and no one aloft. Only its two yard phrases are A2's cause, and they are mended above; the rest names sails and gear, not yards: another cause, older than this package, which no step names. For the lead.
+
+### Tests run
+
+The guard set of the plan's §10.2 at A2 (the byte test and the golden classing table, `tests/test_schooner_mast.py`, `tests/test_probes_90.py`, `tests/test_check_viewer_guns.py`; the lugger's and the settee's sets; the going-about set) and the fast and slow tiers whole, on this commit beside the base d8857629: their counts and the comparison test by test are the session's, in `docs/design/Report-Package90-Engine.md`, A2.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
