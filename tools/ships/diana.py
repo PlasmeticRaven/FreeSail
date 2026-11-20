@@ -231,11 +231,11 @@ KNUCKLE_Z = 3.20
 # The transom's half-breadth at the taffrail and at the knuckle: the body plan's aftermost upright
 # line, 7.0 and 7.13 pies (Pages §5.5; JUDGEMENT, the stern's reading not closing).
 TRANSOM_HB = [1.95, 1.99]
-# Her stern lights, none drawn (Dia-D §3.1): a band across the transom above the knuckle, in a
-# small ship "the great cabin windows only" between the counters and the taffarel (Steel 1805
-# p. 240, OCR l. 15376-15382); the count and the spread the frigate-36's five within 2.6 m of
-# her 3.2-m transom brought to her 1.95 m (JUDGEMENT).
-LIGHTS = [3.25, 3.85, 4, 1.50]
+# Her stern lights: none filed (JUDGEMENT; the lead's ruling of nudge 32). None is drawn on her plan
+# (Dia-D §3.1), and a band over her knuckle would stand partly above her bulwark rail with no
+# cabin under a quarterdeck behind it, she being flush-decked; the flush-decked brig files none.
+# Until the owner's sheets show them. (Old, her first five commits: a judged band of four,
+# [3.25, 3.85, 4, 1.50], by Steel 1805 p. 240's "the great cabin windows only".)
 
 # The main wale, [x, lower edge, upper edge] (Pages §5.3, traced).
 WALES = [
@@ -514,7 +514,7 @@ HULL_NOTES = {
 }
 
 # Each line's rung (Build-Ships.md §5.0 principles 3 and 4): her own plan for every line (Dia-D
-# §3.4), the judgements in it named in each line's note; the lights judged (Dia-D §3.2).
+# §3.4), the judgements in it named in each line's note; no stern lights filed (nudge 32).
 MARKS = {
     "rail_m": "sourced",
     "breadth_m": "sourced",
@@ -533,7 +533,6 @@ MARKS = {
     "form.stern": "sourced",
     "form.stern.knuckle_z_m": "sourced",
     "form.stern.transom_hb_m": "sourced",
-    "form.stern.lights_m": "judged",
     "form.head": "sourced",
 }
 
@@ -595,9 +594,11 @@ PROFILE_NOTES = {
     "rabbet's half-siding of 0.33 pie from the body plan's keel section (measured, Pages §4.3); "
     "then up the stem's rabbet, read in Pages §5.4, not filed.",
     "profile.form": "Her stern square on the body plan's aftermost upright line, its knuckle the "
-    "sheer's (Pages §5.5: JUDGEMENT, the reading not closing); her lights a band over the "
-    "knuckle, judged (Steel 1805 p. 240; no light drawn); her head a scroll on the knee, no "
-    "figure (read: the lead's ruling 6). The ends beyond the end stations by the default rule.",
+    "sheer's (Pages §5.5: JUDGEMENT, the reading not closing), with no round-up read, no quarter "
+    "gallery and no stern lights filed: none is drawn on her plan, and a band over her knuckle "
+    "would stand partly above her bulwark rail, she being flush-decked, as the brig files none "
+    "(JUDGEMENT, until the owner's sheets show them); her head a scroll on the knee, no figure "
+    "(read: the lead's ruling 6). The ends beyond the end stations by the default rule.",
 }
 
 
@@ -643,7 +644,6 @@ def profile_into(p):
             "type": "square",
             "knuckle_z_m": KNUCKLE_Z,
             "transom_hb_m": list(TRANSOM_HB),
-            "lights_m": [list(LIGHTS)],
         },
         "head": "scroll",
     }
@@ -1710,6 +1710,15 @@ def fit(spec):
     return guns
 
 
+def noted(guns, kind_pounder, note):
+    """The note set on the foremost gun of the kind and calibre in a fit's (mapping, note) list."""
+    for i, (gun, _n) in enumerate(guns):
+        if (gun["kind"], gun["pounder"]) == kind_pounder:
+            guns[i] = (gun, note)
+            return
+    raise ValueError(f"the fit has no {kind_pounder[1]}-pounder {kind_pounder[0]} to note.")
+
+
 def her_fits():
     """Her four fits (Dia-D §5.1), as (name, source, guns, note), in the file's order, the
     dates'."""
@@ -1744,31 +1753,38 @@ def her_fits():
     )
     plan = fit([(port, "carronade", 30, None) for port in range(1, 11)])
     plan[0] = (plan[0][0], carronade_30)
+    # her 1817 fit by the measuring note's port numbers, port 1 aftmost (Pages §5.7): the long 12s
+    # forward and amidships, in ports 5 to 10, and the carronades in the after ports, 1 to 4, where
+    # a ship with a quarterdeck carried hers (JUDGEMENT either way, her design's word; the lead's
+    # ruling of nudge 32)
     of_1817 = fit(
         [(11, "carronade", 3, None), ("rail", "carronade", 3, None)]
-        + [(port, "carronade", 30, None) for port in range(7, 11)]
-        + [(port, "long", 12, None) for port in range(1, 7)]
+        + [(port, "carronade", 30, None) for port in range(1, 5)]
+        + [(port, "long", 12, None) for port in range(5, 11)]
     )
-    of_1817[0] = (
-        of_1817[0][0],
-        "The 1817 fit's four 3-pounder obuses (Winfield et al. 2023, p. "
-        "930), carried as carronades (Plan-Package90.md §0, Part E): two in the bow "
-        "ports and two over the rail by the mizen, between ports 1 and 2 (JUDGEMENT, "
-        "both places); about 3 cwt and two men to the pair (JUDGEMENT).",
+    noted(
+        of_1817,
+        ("carronade", 3),
+        "The 1817 fit's four 3-pounder obuses (Winfield et al. 2023, p. 930), carried as "
+        "carronades (Plan-Package90.md §0, Part E): two in the bow ports and two over the rail by "
+        "the mizen, between ports 1 and 2 (JUDGEMENT, both places); about 3 cwt and two men to the "
+        "pair (JUDGEMENT).",
     )
-    of_1817[2] = (
-        of_1817[2][0],
-        "The 1817 fit's eight 30-pounder carronades in ports 7 to 10 "
-        "(JUDGEMENT on the ports), the 32-pounder's pattern (Adye 1804 p. 72); four men "
-        "to the pair (Douglas). " + POUNDS_NOTE,
+    noted(
+        of_1817,
+        ("long", 12),
+        "The 1817 fit's twelve long 12-pounders forward and amidships, in ports 5 to 10 by the "
+        "measuring note's numbering, port 1 aftmost (JUDGEMENT on the ports: the lead's ruling of "
+        "nudge 32), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to the pair (Falconer, "
+        "QUARTERS: D31 (c)). The long guns weigh more on her deck than the carronades of her other "
+        "fits, and higher in her; her GM is one for every fit (Dia-D §5.3).",
     )
-    of_1817[10] = (
-        of_1817[10][0],
-        "The 1817 fit's twelve long 12-pounders in ports 1 to 6 "
-        "(JUDGEMENT on the ports), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to "
-        "the pair (Falconer, QUARTERS: D31 (c)). The long guns weigh more on her deck than "
-        "the carronades of her other fits, and higher in her; her GM is one for every fit "
-        "(Dia-D §5.3).",
+    noted(
+        of_1817,
+        ("carronade", 30),
+        "The 1817 fit's eight 30-pounder carronades in the after ports, 1 to 4 (JUDGEMENT on the "
+        "ports), the 32-pounder's pattern (Adye 1804 p. 72); four men to the pair (Douglas). "
+        + POUNDS_NOTE,
     )
     return [
         (

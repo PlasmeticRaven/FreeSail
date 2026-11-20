@@ -19703,9 +19703,10 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
     names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 60 mechanical (61 until package 116 moved the cruiser's prize keys under
-    `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the code's own
-    years and the one finding only a whole world
+    other: 61 mechanical (60 before the Diana's file, package 90, whose default fit of 1810 is
+    `v-fit-ahead:corvette-20` as the other hulls' are; 61 until package 116 moved the cruiser's
+    prize keys under `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the
+    code's own years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
@@ -19719,7 +19720,8 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     assert not A.unlisted(audit, known)
     cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
     assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 60  # 61 before package 116 (the cruiser's keys)
+    # 60 before the Diana's file (package 90); 61 before package 116 (the cruiser's keys)
+    assert len(audit.keys(A.MECHANICAL)) == 61
     assert len(audit.keys(A.REFERENCE)) == 38
     for foe in ("france", "spain", "batavian-republic"):
         pair = "+".join(sorted(("britain", foe)))

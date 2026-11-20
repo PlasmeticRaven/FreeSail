@@ -234,6 +234,13 @@ known:
   owner: a data fault for milestone 7c
   reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
+- key: v-fit-ahead:corvette-20:carronadas de a 30 1810
+  what: a corvette sails the fit 'carronadas de a 30 1810' on days before 1810 (a scenario may name her)
+  years: 1792-1809
+  basis: mechanical
+  owner: a data fault for milestone 7c
+  reason: the description's default fit is of a later year than the day (package 90, the Diana; her file's earlier fits, of 1807 and 1809, are a scenario's to name). An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
+  most: 1
 - key: f-colours:britain
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1800

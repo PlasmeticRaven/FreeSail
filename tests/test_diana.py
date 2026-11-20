@@ -248,11 +248,13 @@ def test_her_file_loads_and_rates_and_her_masts_are_classed_square(spec):
 
 def test_every_line_of_her_shape_carries_its_rung(doc):
     """Her own plan for every line (Dia-D §3.4), the judgements in each named in its note; her
-    lights judged (Dia-D §3.2), and her sections judged where the water at a port's station is
-    carried between two stations (the line's weakest point, Build-Ships.md §5.0 principle 4)."""
+    sections judged where the water at a port's station is carried between two stations (the
+    line's weakest point, Build-Ships.md §5.0 principle 4), and the ends' fullness the default
+    rule's. No stern lights filed (the lead's ruling of nudge 32; old: a judged band)."""
     marks = doc["hull"]["profile"]["marks"]
     judged = {k for k, v in marks.items() if v == "judged"}
-    assert judged == {"sections_m", "form.fullness", "form.stern.lights_m"}
+    assert judged == {"sections_m", "form.fullness"}
+    assert "form.stern.lights_m" not in marks
     assert set(marks.values()) == {"sourced", "judged"}
 
 
@@ -274,7 +276,6 @@ def test_her_profile_is_her_plans_points_and_her_form_a_square_stern_and_a_scrol
         "type": "square",
         "knuckle_z_m": 3.2,
         "transom_hb_m": [1.95, 1.99],
-        "lights_m": [[3.25, 3.85, 4, 1.5]],
     }
     assert p["form"]["head"] == "scroll"
     assert doc["hull"]["deck_height_m"] == 1.33
@@ -415,7 +416,7 @@ QUARTERS = {
     "danish 1807": (10, 44, 18),
     "as captured 1809": (10, 40, 10),
     "carronadas de a 30 1810": (10, 40, 10),
-    "1817": (12, 62, 29),
+    "1817": (12, 62, 30),
 }
 
 
@@ -425,7 +426,8 @@ def test_at_quarters_every_crew_of_every_fit_is_manned(fit):
     12-pounders among them. `Quarters.beat` at seed 7 off Cartagena (crew/quarters.py): every
     numbered crew of every fit manned whole, her soldiers at the carronades (the engine's rule:
     marines serve carronades and no long gun) and the rest of them kept in their division; the
-    1817 fit's twelve crews want 62, 21 of them soldiers at its carronades and obuses."""
+    1817 fit's twelve crews want 62, 20 of them soldiers at its carronades and obuses (21 before
+    its long guns went forward, nudge 32)."""
     from freesail.crew.quarters import quarters_of
     from tests.test_brains import world_at
 
@@ -587,11 +589,14 @@ def test_truth_7_664_she_goes_about_as_a_small_ship_does():
     from 290, 292.5 and 295 degrees and wears, as truths 10 and 11 put the frigate about: tacked in
     206, 215 and 216 s (measured), each through stays in about two minutes and settled on the new
     tack at once, losing 28, 42 and 46 m; she wears in 492 s (truth 11's 360 to 720). Her
-    tack's band is her own, three to ten minutes (JUDGEMENT, for the lead): truth 10's floor, 285
-    s, is Luce's five minutes for a frigate of 42 m, which spends most of hers griping up on the new
-    tack with too little way for her helm; her design asked her helm and rudder tuned to it (Plan
-    §8.4), and no figure of either within her sources brings her there (the sweeps in
-    docs/dev/TuningNotes.md, 'Package 90, the Diana')."""
+    tack's band is her own, 180 to 330 s (the lead's ruling of nudge 32): the floor JUDGEMENT, a
+    small ship quick in stays; the ceiling about half again her slowest tack as measured,
+    JUDGEMENT, so that the truth catches her going about as slowly as the frigate. Truth 10's
+    285 to 600 s is Luce's five to ten minutes for a frigate of 42 m, which spends most of hers
+    griping up on the new tack with too little way for her helm; her design asked her helm and
+    rudder tuned to it (Plan §8.4), and no figure of either within her sources brings her there,
+    her rudder kept as measured (the sweeps in docs/dev/TuningNotes.md, 'Package 90, the
+    Diana'). The ground each tack loses is recorded, not asserted."""
     from tests.test_known_truths import close_hauled_on_starboard, until, wear
 
     for heading in (290.0, 292.5, 295.0):
@@ -599,7 +604,7 @@ def test_truth_7_664_she_goes_about_as_a_small_ship_does():
         world.submit("tack ship")
         done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
         assert [e.kind for e in done] == ["ship.tacked"], heading
-        assert 180 <= seconds <= 600, (heading, seconds)
+        assert 180 <= seconds <= 330, (heading, seconds)
         assert world.ship.dyn.tack == "larboard"
     world = close_hauled_on_starboard(HER)
     seconds, _ = wear(world)

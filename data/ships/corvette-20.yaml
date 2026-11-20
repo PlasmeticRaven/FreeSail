@@ -119,14 +119,13 @@ hull:
                  [15.63, -2.44, 0.09], [15.63, -1.62, 0.21], [15.63, -0.81, 0.64]]
     # The rabbet line, ruled straight on the sheet (Pages §3.3, §4.1), with the rabbet's half-siding of 0.33 pie from the body plan's keel section (measured, Pages §4.3); then up the stem's rabbet, read in Pages §5.4, not filed.
     rabbet_m: [[-16.55, -3.4, 0.09], [13.45, -3.15, 0.09]]
-    # Her stern square on the body plan's aftermost upright line, its knuckle the sheer's (Pages §5.5: JUDGEMENT, the reading not closing); her lights a band over the knuckle, judged (Steel 1805 p. 240; no light drawn); her head a scroll on the knee, no figure (read: the lead's ruling 6). The ends beyond the end stations by the default rule.
+    # Her stern square on the body plan's aftermost upright line, its knuckle the sheer's (Pages §5.5: JUDGEMENT, the reading not closing), with no round-up read, no quarter gallery and no stern lights filed: none is drawn on her plan, and a band over her knuckle would stand partly above her bulwark rail, she being flush-decked, as the brig files none (JUDGEMENT, until the owner's sheets show them); her head a scroll on the knee, no figure (read: the lead's ruling 6). The ends beyond the end stations by the default rule.
     form:
       fullness: [1.0, 1.0]
       stern:
         type: square
         knuckle_z_m: 3.2
         transom_hb_m: [1.95, 1.99]
-        lights_m: [[3.25, 3.85, 4, 1.5]]
       head: scroll
     marks:
       rail_m: sourced
@@ -146,7 +145,6 @@ hull:
       form.stern: sourced
       form.stern.knuckle_z_m: sourced
       form.stern.transom_hb_m: sourced
-      form.stern.lights_m: judged
       form.head: sourced
 spars:
 # fore lower mast by Luce: 9/10 of the main, on her own particulars (Dia-D §4.1), standing on its heel at the plan's step: its place at the deck and its rake the plan's (measured, Pages §6.2, re-referenced to the line), its heel the plan's in place of the frigate's 14 ft from the step to the deck; Steel 1794 vol. I p. 50's 20-gun column (Pages §7) and Babron's corvette (Dia-D §4.1) the checks. Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.topmast_staysail, jib, flying_jib in 55 kn.
@@ -3479,96 +3477,95 @@ armament:
         crew: 2
         weight_cwt: 3.0
         deck: upper
-      # The 1817 fit's eight 30-pounder carronades in ports 7 to 10 (JUDGEMENT on the ports), the 32-pounder's pattern (Adye 1804 p. 72); four men to the pair (Douglas). Each gun's pounds as her navy named it (the owner's decision 9, Plan-Package90.md §0): a Spanish 30-pounder fires 30 Spanish pounds, about 30 1/2 English at the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46), a Danish 30-pounder about 33 English (Dia-D §17.1 question 2), the game's range and weight of broadside reading them a little light.
+      # The 1817 fit's twelve long 12-pounders forward and amidships, in ports 5 to 10 by the measuring note's numbering, port 1 aftmost (JUDGEMENT on the ports: the lead's ruling of nudge 32), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to the pair (Falconer, QUARTERS: D31 (c)). The long guns weigh more on her deck than the carronades of her other fits, and higher in her; her GM is one for every fit (Dia-D §5.3).
       - id: gun.2.starboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 2
         side: starboard
         x_m: 12.27
         height_m: 2.06
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.2.larboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 2
         side: larboard
         x_m: 12.27
         height_m: 2.06
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.3.starboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 3
         side: starboard
         x_m: 9.37
         height_m: 1.91
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.3.larboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 3
         side: larboard
         x_m: 9.37
         height_m: 1.91
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.4.starboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 4
         side: starboard
         x_m: 6.42
         height_m: 1.82
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.4.larboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 4
         side: larboard
         x_m: 6.42
         height_m: 1.82
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.5.starboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 5
         side: starboard
         x_m: 3.65
         height_m: 1.75
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
       - id: gun.5.larboard
-        kind: carronade
-        pounder: 30
+        kind: long
+        pounder: 12
         place: broadside
         number: 5
         side: larboard
         x_m: 3.65
         height_m: 1.75
-        crew: 4
-        weight_cwt: 17.125
+        crew: 7
+        weight_cwt: 34.0
         deck: upper
-      # The 1817 fit's twelve long 12-pounders in ports 1 to 6 (JUDGEMENT on the ports), Adye's 12 of 9 ft 6 in, 34 cwt (p. 155); seven men to the pair (Falconer, QUARTERS: D31 (c)). The long guns weigh more on her deck than the carronades of her other fits, and higher in her; her GM is one for every fit (Dia-D §5.3).
       - id: gun.6.starboard
         kind: long
         pounder: 12
@@ -3613,71 +3610,72 @@ armament:
         crew: 7
         weight_cwt: 34.0
         deck: upper
+      # The 1817 fit's eight 30-pounder carronades in the after ports, 1 to 4 (JUDGEMENT on the ports), the 32-pounder's pattern (Adye 1804 p. 72); four men to the pair (Douglas). Each gun's pounds as her navy named it (the owner's decision 9, Plan-Package90.md §0): a Spanish 30-pounder fires 30 Spanish pounds, about 30 1/2 English at the book's libra of 0.4608 kg (Winfield et al. 2023, pp. 41-46), a Danish 30-pounder about 33 English (Dia-D §17.1 question 2), the game's range and weight of broadside reading them a little light.
       - id: gun.8.starboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 8
         side: starboard
         x_m: -4.93
         height_m: 1.75
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.8.larboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 8
         side: larboard
         x_m: -4.93
         height_m: 1.75
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.9.starboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 9
         side: starboard
         x_m: -7.81
         height_m: 1.82
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.9.larboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 9
         side: larboard
         x_m: -7.81
         height_m: 1.82
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.10.starboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 10
         side: starboard
         x_m: -10.69
         height_m: 1.93
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.10.larboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 10
         side: larboard
         x_m: -10.69
         height_m: 1.93
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.11.starboard
         kind: carronade
@@ -3702,26 +3700,26 @@ armament:
         weight_cwt: 3.0
         deck: upper
       - id: gun.12.starboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 12
         side: starboard
         x_m: -13.49
         height_m: 2.11
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       - id: gun.12.larboard
-        kind: long
-        pounder: 12
+        kind: carronade
+        pounder: 30
         place: broadside
         number: 12
         side: larboard
         x_m: -13.49
         height_m: 2.11
-        crew: 7
-        weight_cwt: 34.0
+        crew: 4
+        weight_cwt: 17.125
         deck: upper
       # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
@@ -3746,11 +3744,11 @@ armament:
           round: 240
           grape: 24
           chain: 24
-        30:
-          round: 480
-          grape: 48
-          chain: 48
         12:
           round: 720
           grape: 72
           chain: 72
+        30:
+          round: 480
+          grape: 48
+          chain: 48
