@@ -695,34 +695,60 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
 
 
 # Package 90, A2: the words of a rig with no yards, mended at their cause. A line that names a
-# braced yard, or its braces, is said only where she has one, read from the yards the evolution
-# swings (`head_and_after_yards`), for every rig: a lugger's and a boat's lug yards are no braced
-# yards (`Spar.is_yard`), and the cutter, the smack and the two schooners have head yards and no
-# after yards. Before it a lugger worn was told to brace in her after yards and was braced up,
-# hove to she manned the after braces, and the cutter box-hauled braced up after yards she has
-# not, whatever the rig. The words put in their place are JUDGEMENT; no tick, no event's kind and
-# no figure moves (docs/dev/TuningNotes.md, "Package 90, A2").
+# braced yard, or its braces, is said only where she works them, read from the yards the
+# evolution swings (`head_and_after_yards`), for every rig: a lugger's and a boat's lug yards are
+# no braced yards (`Spar.is_yard`), and the cutter, the smack and the two schooners have head
+# yards and no after yards. Before it a lugger worn was told to brace in her after yards and was
+# braced up, hove to she manned the after braces, and the cutter box-hauled braced up after
+# yards she has not, whatever the rig. A2's second pass (the lead's nudge 34): on a rig without
+# after yards the words follow the square sails set, not the yards crossed (the smack under her
+# mainsail, fore staysail and jib was told to man her head braces and lay hove to by her sheets),
+# and a one-masted vessel's braces are no head braces. The words put in their place are
+# JUDGEMENT; no tick, no event's kind and no figure moves (docs/dev/TuningNotes.md, "Package 90,
+# A2").
 
 
-def has_braced_yards(head: list[Spar], after: list[Spar]) -> bool:
-    """Whether she has a braced yard among the head and after yards an evolution swings: a line
-    that says she was braced, braced up or squared is said only then (package 90, A2)."""
-    return bool(head or after)
+def square_set_on(ship: Ship, yards: list[Spar]) -> bool:
+    """Whether a square sail is set on one of these yards (package 90, A2's second pass)."""
+    for y in yards:
+        sail = ship.sail_of(y)
+        if sail is not None and sail.cls == "square" and sail.is_set:
+            return True
+    return False
+
+
+def braces_worked(ship: Ship, head: list[Spar], after: list[Spar]) -> bool:
+    """Whether her braces are worked, among the head and after yards an evolution swings: a line
+    that names her braces, or says her yards braced, braced up, squared or aback, is said only
+    then (package 90, A2). Always where she has after yards (the eight rigs with them say every
+    line as before, whatever they have set); where her braced yards are her head yards alone
+    (the cutter, the smack, the two schooners), only while a square sail is set on one of them
+    (A2's second pass: with none set she is handled by her sheets, as a lugger is, and has the
+    lugger's words); never with no braced yard (a lugger, a boat). Read at the line's moment."""
+    return bool(after) or square_set_on(ship, head)
+
+
+def one_masted(ship: Ship) -> bool:
+    """A vessel of one mast (the cutter, the smack, a boat), whose yards are no head yards: her
+    braces are "the braces" (package 90, A2's second pass)."""
+    return sum(1 for sp in ship.spars.values() if sp.cls == "mast") < 2
 
 
 def braces_manned(ship: Ship) -> str:
     """The braces a heave-to or a fill-away mans, by her rig (package 90, A2): her after braces
-    where she has after yards, as before; her head braces where her braced yards are her head
-    yards alone (the cutter, the smack, a topsail schooner: "after braces" she has not); and
-    her sheets where she has no braced yard (a lugger, a boat), who heaves to and fills away
-    the fore-and-after's way, by her sheets (Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat
-    aft the main sheet ... and haul the staysail sheet to windward"). The word is JUDGEMENT."""
+    where she has after yards, as before; where her braced yards are her head yards alone and a
+    square sail is set on one (`braces_worked`), her head braces (a topsail schooner: "after
+    braces" she has not), or her braces on a vessel of one mast (the cutter, the smack: A2's
+    second pass, "head braces" in A2); and her sheets where she works no braces (a lugger, a
+    boat, and the cutter or the smack with no square sail set), who heaves to and fills away the
+    fore-and-after's way, by her sheets (Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat aft the
+    main sheet ... and haul the staysail sheet to windward"). The word is JUDGEMENT."""
     head, after = head_and_after_yards(ship)
     if after:
         return "after braces"
-    if head:
-        return "head braces"
-    return "sheets"
+    if not braces_worked(ship, head, after):
+        return "sheets"
+    return "braces" if one_masted(ship) else "head braces"
 
 
 def after_square_yards(ship: Ship) -> list[Spar]:
@@ -1192,7 +1218,7 @@ class CourseToSteer:
 
     def words(self, braced: str, paid_off: bool) -> dict[str, str]:
         """The completion line's words: how she was braced, and the course's clause. `braced`
-        is "" for a rig with no braced yard (package 90, A2: `has_braced_yards`), which is not
+        is "" where she works no braces (package 90, A2: `braces_worked`), and she is not
         said to be braced: she ends "full and by", or "trimmed" where the course's clause
         follows, so that "full and by" is not said twice ("trimmed for the course ordered" where
         she paid off to it). The words are JUDGEMENT."""
@@ -1480,8 +1506,9 @@ class TackScript(Script):
         dyn.steady = False
         self.by_wind_drawn = False
         self.phase = "by_the_wind"
-        # braced up only where she has a braced yard (package 90, A2)
-        luff = "Luff up and brace up" if has_braced_yards(self.head, self.after) else "Luff up"
+        # braced up only where she works her braces (package 90, A2: `braces_worked`)
+        worked = braces_worked(self.ship, self.head, self.after)
+        luff = "Luff up and brace up" if worked else "Luff up"
         self.note(f"{luff}: she is brought by the wind to go about.", "helm.order")
 
     def _by_the_wind(self, dt: float, wind: Wind, factor: float) -> None:
@@ -1667,7 +1694,11 @@ class TackScript(Script):
                 new_lee = self.old_side(weather=True)
                 self._draw_on_new_tack(new_lee, wind)
                 draw = " Draw jib; trim aft the head sheets." if self.heads else ""
-                if self.head:
+                # her head yards hauled in words only where she works her braces; with no
+                # square sail set and head sheets to draw she has the lugger's line (package
+                # 90, A2's second pass: "Let go and haul." whatever she had set before it)
+                hauled = braces_worked(self.ship, self.head, self.after) or not draw
+                if self.head and hauled:
                     # the fore tack kept fast at the haul is risen now, by its name, while its
                     # course still draws (package 75, B3.4b; `_haul_words`)
                     rise = self.fore_rise and self._courses_drawing()[0]
@@ -1818,7 +1849,9 @@ class TackScript(Script):
         # stern, it pushes the stern to leeward and her head up to the wind
         sheets_to(self.ship, self.booms, self.old_side(weather=True), None)
         words = ["Her way is gone; she hangs in stays. Helm kept a-lee"]
-        if self.head:
+        # her head yards aback in words only where she works her braces (package 90, A2's
+        # second pass: said of every head yard crossed before it, a square sail set or none)
+        if self.head and braces_worked(self.ship, self.head, self.after):
             words.append("the head yards aback to box her off")
         if self.heads:
             words.append("the head sheets held to windward")
@@ -1860,7 +1893,9 @@ class TackScript(Script):
         dyn.target_heading = self.old_heading
         dyn.steady = False
         orders = ["Up helm"]
-        if yards:
+        # the yards squared in words only where she works her braces (package 90, A2's second
+        # pass: "square the yards" of every yard crossed before it)
+        if yards and braces_worked(self.ship, self.head, self.after):
             orders.append("square the yards")
         if self.heads:
             orders.append("flatten in the head sheets")
@@ -1926,9 +1961,10 @@ class TackScript(Script):
             # up on the starboard tack, heading SSE (158°)" with her head at NE)
             heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
-        # package 90, A2: "braced up" and "squared the yards" only where she has a braced yard
-        # ("Tacked; braced up on the larboard tack" of the lugger before it)
-        braced = has_braced_yards(self.head, self.after)
+        # package 90, A2: "braced up" and "squared the yards" only where she works her braces
+        # ("Tacked; braced up on the larboard tack" of the lugger before it; and of the cutter
+        # with no square sail set before A2's second pass: `braces_worked`)
+        braced = braces_worked(self.ship, self.head, self.after)
         return {
             "old_tack": old,
             "new_tack": new,
@@ -2113,11 +2149,12 @@ class WearScript(Script):
                 # and the words say nothing of them (package 75, the lead's ruling (3) of
                 # 2026-11-07, B3.4b; "Squared the head yards" before it, whatever she had); and
                 # with no braced yard at all (a lugger, a boat) none is braced up (package 90,
-                # A2: "hauled out and braced up" before it, whatever she had)
-                squared = "Squared the head yards; shifted" if self.head else "Shifted"
-                braced = (
-                    "; hauled out and braced up" if has_braced_yards(self.head, self.after) else ""
-                )
+                # A2: "hauled out and braced up" before it, whatever she had); and where she
+                # works no braces (head yards alone and no square sail set, A2's second pass:
+                # `braces_worked`) she is worn by her sheets and has the lugger's words
+                worked = braces_worked(self.ship, self.head, self.after)
+                squared = "Squared the head yards; shifted" if self.head and worked else "Shifted"
+                braced = "; hauled out and braced up" if worked else ""
                 self.note(f"Wind aft. {squared} over the sheets{braced}." + dipped)
         if self.dip is not None:
             self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
@@ -2209,8 +2246,8 @@ class WearScript(Script):
         new = "larboard" if self.sign > 0 else "starboard"
         steer = self.steer if self.steer is not None else CourseToSteer({})
         braced = "braced" if self.for_the_course else "braced sharp up"
-        if not has_braced_yards(self.head, self.after):
-            braced = ""  # no braced yard to brace (package 90, A2: `CourseToSteer.words`)
+        if not braces_worked(self.ship, self.head, self.after):
+            braced = ""  # no braces worked (package 90, A2: `CourseToSteer.words`)
         return {
             "old_tack": old,
             "new_tack": new,
@@ -3474,12 +3511,12 @@ class FillAwayScript(Script):
                 aback = _yards_aback_for(self.ship, self.sign)
                 what = sail_name_on(self.ship, aback) if aback else "yards"
                 head, after = head_and_after_yards(self.ship)
-                # with no braced yard (a lugger, a boat) nothing is braced full: the helm is
-                # righted for her course, which is what this moment is for her (package 90, A2:
-                # "Braced the yards full." before it, whatever the rig; the words JUDGEMENT)
-                full = (
-                    f"braced the {what} full" if has_braced_yards(head, after) else "right the helm"
-                )
+                # with no braces worked (a lugger, a boat; the cutter or the smack with no square
+                # sail set, A2's second pass) nothing is braced full: the helm is righted for her
+                # course, which is what this moment is for her (package 90, A2: "Braced the yards
+                # full." before it, whatever the rig; the words JUDGEMENT)
+                worked = braces_worked(self.ship, head, after)
+                full = f"braced the {what} full" if worked else "right the helm"
                 if falling_s > 1.0:
                     self.note(f"Fallen off; {full}.")
                 else:
@@ -3602,14 +3639,14 @@ class FillAwayScript(Script):
         else:
             course_words = f"steering {course}"
         # package 90, A2: braced full, and the braces manned, by her rig (`braces_manned`);
-        # with no braced yard she is not said to be braced ("braced full and" before it)
+        # with no braces worked she is not said to be braced ("braced full and" before it)
         head, after = head_and_after_yards(self.ship)
         return {
             "new_course": course,
             "filled_tack": _tack_name(self.sign),
             "course_words": course_words,
             "braces": braces_manned(self.ship),
-            "braced_full": "braced full and " if has_braced_yards(head, after) else "",
+            "braced_full": "braced full and " if braces_worked(self.ship, head, after) else "",
         }
 
     def data(self) -> dict[str, Any]:
@@ -6018,9 +6055,18 @@ class ScudScript(Script):
         dyn.steady = False
         self.phase = "bear_up"
         brailed = f"; brailed up {names_of_sails(self.ship, self.drivers)}" if self.drivers else ""
-        # the yards braced in only where she has a braced yard (package 90, A2)
-        brace_in = "; brace in the yards as she goes off" if working_yards(self.ship) else ""
+        # the yards braced in only where she works her braces (package 90, A2: `_braces_worked`)
+        brace_in = "; brace in the yards as she goes off" if self._braces_worked() else ""
         self.note(f"Up helm{brailed}{brace_in}.", "helm.order")
+
+    def _braces_worked(self) -> bool:
+        """Whether her braces are worked as she bears up, by the one reader the other evolutions
+        read (`braces_worked`, package 90, A2's second pass; `working_yards` here in A2). The
+        scud swings every working yard (`tick`); `head_and_after_yards` splits them all between
+        head and after, but for a yard under the bowsprit on a ship with no mast's yard left, which
+        is in neither list and was said braced in A2: no yard of the eighteen files as filed."""
+        head, after = head_and_after_yards(self.ship)
+        return braces_worked(self.ship, head, after)
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
@@ -6042,9 +6088,11 @@ class ScudScript(Script):
 
     def words(self) -> dict[str, Any]:
         side = "starboard" if self.sign > 0 else "larboard"
-        # the braces stood by only where she has a braced yard (package 90, A2)
-        braces = "; stand by the braces" if working_yards(self.ship) else ""
-        return {"course": units.format_heading(self.course), "quarter": side, "braces": braces}
+        # the braces stood by only where she works them (package 90, A2); and where she works
+        # none, the up-helm said once, by the line before this one ("Up helm." and at once "Up
+        # helm. Bear up and scud." in A2: A2's second pass)
+        up_helm = "Up helm; stand by the braces. " if self._braces_worked() else ""
+        return {"course": units.format_heading(self.course), "quarter": side, "up_helm": up_helm}
 
 
 class BackAndFillScript(Script):
@@ -7447,7 +7495,12 @@ class ComeToAnchorScript(_AnchorScript):
                 )
                 self.anchor.brought_up = True  # the evolution's own line says so
                 # the yards squared only where she has a braced yard (package 90, A2: the
-                # lugger was told to square hers before it)
+                # lugger was told to square hers before it). Read from the yards crossed, not the
+                # square sails set (A2's second pass, `braces_worked`, read under sail): this is
+                # the furl's line, which squares every yard and furls every sail not furled, and
+                # every square sail is clewed up by now ("Let go the topsail sheets; clew up"),
+                # so that a reading of the sails set would drop it from every rig of head yards
+                # alone, a topsail schooner's whose topsail is in its gear to be furled among them
                 square = "; square the yards" if yards else ""
                 self.note(f"Brought up. Stations for furling sail{square}.")
             return
@@ -8511,9 +8564,11 @@ class GetUnderWayScript(_AnchorScript):
                     )
                     return
                 # her topsail yard laid abox only where she has one: a boat at her grapnel has no
-                # braced yard (package 90, A2: "The topsail yard abox." whatever she had)
+                # braced yard (package 90, A2: "The topsail yard abox." whatever she had); and
+                # only where she works her braces (A2's second pass: `braces_worked`)
                 abox = ""
-                if self.fore_and_aft and head_and_after_yards(ship)[0]:
+                cast_head, cast_after = head_and_after_yards(ship)
+                if self.fore_and_aft and cast_head and braces_worked(ship, cast_head, cast_after):
                     abox = " The topsail yard abox."
                 self.note(
                     "Let go the downhauls, hoist away the jib, its sheet to windward!"
@@ -8632,8 +8687,10 @@ class GetUnderWayScript(_AnchorScript):
                     self.phase = "under_way"
                     self.phase_t = 0.0
                     driver = driver_words(ship, [sl for sl in drivers if sl.is_set])
-                    # the topsail yard braced round only where she has one (package 90, A2)
-                    brace = ", brace round the topsail yard" if head else ""
+                    # the topsail yard braced round only where she has one (package 90, A2), and
+                    # works her braces (A2's second pass: `braces_worked`)
+                    worked = head and braces_worked(ship, head, after)
+                    brace = ", brace round the topsail yard" if worked else ""
                     self.note(
                         f"{how}; right the helm, draw the jib, haul aft the main sheet{brace}."
                         if self.fore_and_aft

@@ -5,11 +5,16 @@ sharp up", "Hands to the after braces" and "square the yards" whatever the rig, 
 whose lug yards are no braced yards (`Spar.is_yard`), was told to brace in her after yards and
 was braced up, and the cutter, the smack and the two schooners, whose yards are head yards alone,
 braced up after yards they have not. A line that names a braced yard or its braces is now said
-only where she has one, read from the yards the evolution swings (`scripts.head_and_after_yards`,
-`scripts.has_braced_yards`, `scripts.braces_manned`), for every rig. The words put in their place
-are JUDGEMENT. Words only: every tick, every event's kind and every trace of heading, speed and
-position the same, old beside new over all eighteen files (docs/dev/TuningNotes.md, "Package 90,
-A2").
+only where she works them, read from the yards the evolution swings (`scripts.head_and_after_yards`,
+`scripts.braces_worked`, `scripts.braces_manned`), for every rig. A2's second pass (the lead's
+nudge 34): on a rig without after yards the words follow the square sails set, not the yards
+crossed, so that with none set she has the lugger's words, her sheets' (the smack under her
+mainsail, fore staysail and jib was told to man her head braces and lay hove to by her sheets);
+a vessel of one mast mans "the braces", not head braces; and the scud says its up-helm once. The
+eight rigs with after yards say every line as before, whatever they have set. The words put in
+their place are JUDGEMENT. Words only: every tick, every event's kind and every trace of heading,
+speed and position the same, old beside new over all eighteen files (docs/dev/TuningNotes.md,
+"Package 90, A2").
 
 Each test enters by the door the behaviour is met at: a ship file loaded as the game loads it,
 and an order given as a player gives it, from the lugger transcripts' settle
@@ -39,17 +44,27 @@ from freesail.core.world import Scenario
 from freesail.evolutions import Runner, scripts
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship
+from freesail.ship.parts import SailState
 
 LUGGER = "data/ships/lugger.yaml"
 CUTTER = "data/ships/cutter.yaml"
+SMACK = "data/ships/smack.yaml"
 BRIG = "data/ships/brig.yaml"
+# The anchor's two roads on the region's own chart (a scenario's `chart:` naming the region
+# alone, `world.chart.chart_holding`, as only a test should): the same water, depths and holding
+# as the whole chart that holds it, read in two seconds where the whole chart takes four more
+# (A2's second pass: the lead's five-second line; `region: channel-west` before it)
+ROAD_CHART = "channel-west"
 
-# The eighteen files committed at A2, each with the braces her going about mans, as filed: the
-# five boats and the lugger have no braced yard; the cutter, the smack and the two schooners have
-# head yards alone; the rest have after yards too (the hermaphrodite brig's main topsail and
-# topgallant yards on her schooner's main among them). Named, not globbed, so that a file added
+# The eighteen files committed at A2, each with the braces her going about mans with every square
+# sail on her braced yards set: the five boats and the lugger have no braced yard, and man their
+# sheets; the cutter and the smack, of one mast, their braces ("head braces" before A2's second
+# pass); the two schooners, whose yards are on the fore, their head braces; the rest have after
+# yards too, and man their after braces (the hermaphrodite brig's main topsail and topgallant
+# yards on her schooner's main among them). As filed, no sail set, the ten without after yards
+# man their sheets and the eight their after braces. Named, not globbed, so that a file added
 # later is no move of this guard.
-BRACES_AS_FILED = {
+BRACES_SQUARE_SET = {
     "bilander": "after braces",
     "boat-cutter-23": "sheets",
     "boat-cutter-28": "sheets",
@@ -57,7 +72,7 @@ BRACES_AS_FILED = {
     "boat-launch-31": "sheets",
     "boat-yawl-16": "sheets",
     "brig": "after braces",
-    "cutter": "head braces",
+    "cutter": "braces",
     "frigate-36": "after braces",
     "hermaphrodite-brig": "after braces",
     "lugger": "sheets",
@@ -66,20 +81,29 @@ BRACES_AS_FILED = {
     "razee-44": "after braces",
     "seventy-four": "after braces",
     "sixty-four": "after braces",
-    "smack": "head braces",
+    "smack": "braces",
     "topsail-schooner": "head braces",
 }
 
 
-@pytest.mark.parametrize(("name", "braces"), sorted(BRACES_AS_FILED.items()))
+@pytest.mark.parametrize(("name", "braces"), sorted(BRACES_SQUARE_SET.items()))
 def test_every_file_is_read_for_the_braces_it_has(name, braces):
-    """The key, read off every committed file as loaded: the yards the evolutions swing, and so
-    the braces their words name, and whether she has a braced yard to be said braced at all."""
+    """The key, read off every committed file as loaded (no sail set) and with every square sail
+    on her braced yards set: the yards the evolutions swing, and so the braces their words name,
+    and whether her braces are worked at all (`braces_worked`). Old (A2): the key as filed
+    alone, "head braces" for the cutter, the smack and the two schooners whatever was set."""
     ship = load_ship(f"data/ships/{name}.yaml")
     head, after = scripts.head_and_after_yards(ship)
-    assert scripts.braces_manned(ship) == braces
-    assert scripts.has_braced_yards(head, after) == (braces != "sheets")
     assert bool(after) == (braces == "after braces")
+    assert scripts.braces_manned(ship) == ("after braces" if after else "sheets")
+    assert scripts.braces_worked(ship, head, after) == bool(after)
+    for y in head + after:
+        sail = ship.sail_of(y)
+        if sail is not None and sail.cls == "square":
+            sail.state = SailState.SET
+    assert scripts.braces_manned(ship) == braces
+    assert scripts.braces_worked(ship, head, after) == (braces != "sheets")
+    assert scripts.one_masted(ship) == (braces == "braces" or name.startswith("boat-"))
 
 
 # ---------------------------------------------------------------------------
@@ -87,8 +111,10 @@ def test_every_file_is_read_for_the_braces_it_has(name, braces):
 # ---------------------------------------------------------------------------
 
 
-def _settle(path: str) -> bytes:
-    """The lugger transcripts' settle (`tests/test_settee.py`), as a checkpoint to sail from."""
+def _settle(path: str, seconds: int = 2400) -> bytes:
+    """The lugger transcripts' settle (`tests/test_settee.py`), as a checkpoint to sail from;
+    the brig's half as long (A2's second pass: the lead's five-second line), her words read
+    there whole, every one as at 2,400 s."""
     scenario = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -100,7 +126,7 @@ def _settle(path: str) -> bytes:
     world = make_world(7, path, scenario)
     world.submit("set plain sail")
     world.submit("brace sharp up on the starboard tack")
-    for i in range(2400):
+    for i in range(seconds):
         if i % 120 == 0 and i > 300:
             world.submit("trim sails")
         world.tick()
@@ -140,6 +166,17 @@ def cutter() -> bytes:
     return _settle(CUTTER)
 
 
+@pytest.fixture(scope="module")
+def smack() -> bytes:
+    """The smack under plain sail, her mainsail, fore staysail and jib: no square sail set."""
+    return _settle(SMACK)
+
+
+@pytest.fixture(scope="module")
+def brig() -> bytes:
+    return _settle(BRIG, 1200)
+
+
 def test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_line(lugger):
     """Old: "Hands to the after braces; heave to.", "Fill away; man the after braces.", "Braced
     the yards full." and "Filled away on the starboard tack; braced full and steering WNW
@@ -175,12 +212,13 @@ def test_the_lugger_filled_away_for_a_course_is_trimmed_not_braced(lugger):
 
 def test_the_lugger_scudding_stands_by_no_braces(lugger):
     """Old: "Up helm; brace in the yards as she goes off." and "Up helm; stand by the braces.
-    Bear up and scud."; scudding at 48 s as before."""
+    Bear up and scud."; and the up-helm said once (A2's second pass: "Up helm." and at once "Up
+    helm. Bear up and scud." in A2); scudding at 48 s as before."""
     got = _lines(_from(lugger), [("scud", 60)])
     assert got == [
         (0, "Order: scud."),
         (1, "Up helm."),
-        (1, "Up helm. Bear up and scud."),
+        (1, "Bear up and scud."),
         (48, "Scudding before it, the wind on the starboard quarter, steering S by W (195°)."),
     ]
 
@@ -200,10 +238,13 @@ def test_the_lugger_put_about_for_a_course_is_trimmed_for_it(lugger):
     assert not [line for _, line in got + worn if BRACES.search(line)]
 
 
-def test_the_cutter_wears_without_after_yards_and_hove_to_mans_her_head_braces(cutter):
-    """The cutter has head yards and no after yards. Old: "Stand by to wear ship. Up helm; brace
-    in the after yards.", "Hands to the after braces; heave to." and "Fill away; man the after
-    braces."; her head yards squared and braced up as before, every tick the same."""
+def test_the_cutter_wears_without_after_yards_and_hove_to_mans_her_braces(cutter):
+    """The cutter has head yards and no after yards, on her one mast, her topsail set. Old:
+    "Stand by to wear ship. Up helm; brace in the after yards.", "Hands to the after braces;
+    heave to." and "Fill away; man the after braces."; and "Hands to the head braces; heave to."
+    and "Fill away; man the head braces." in A2 (A2's second pass: a vessel of one mast has no
+    head braces; the test was `..._mans_her_head_braces`); her head yards squared and braced up
+    as before, every tick the same."""
     worn = _lines(_from(cutter), [("wear ship", 600)])
     assert (1, "Stand by to wear ship. Up helm.") in worn
     aft = [line for _, line in worn if line.startswith("Wind aft")]
@@ -214,13 +255,44 @@ def test_the_cutter_wears_without_after_yards_and_hove_to_mans_her_head_braces(c
         "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)."
     ]
     hove = _lines(_from(cutter), [("heave to", 600), ("fill away", 120)])
-    assert (1, "Hands to the head braces; heave to.") in hove
-    assert any(line == "Fill away; man the head braces." for _, line in hove)
+    assert (1, "Hands to the braces; heave to.") in hove
+    assert any(line == "Fill away; man the braces." for _, line in hove)
     assert any(
         line.startswith("Filled away on the starboard tack; braced full and ") for _, line in hove
     )
     for line in [x for _, x in worn + hove]:
         assert "after yards" not in line and "after braces" not in line, line
+        assert "head braces" not in line, line
+
+
+def test_the_cutter_with_her_square_sails_in_lies_to_her_sheets(cutter):
+    """A2's second pass: her topsail taken in, no square sail set, she is hove to, filled away
+    and worn by her sheets and has the lugger's words. Old (A2): "Hands to the head braces;
+    heave to.", "Fill away; man the head braces.", "Fallen off; braced the yards full.",
+    "Filled away on the starboard tack; braced full and steering WNW (292°).", "Wind aft. Squared
+    the head yards; shifted over the sheets; hauled out and braced up." and "Wore ship; braced
+    sharp up on the larboard tack, heading ENE (68°)."; every tick as it was."""
+    taken_in = [("take in the square sails", 300)]
+    hove = _lines(_from(cutter), [*taken_in, ("heave to", 600), ("fill away", 60)])
+    assert [(t, line) for t, line in hove if t >= 300] == [
+        (300, "Order: heave to."),
+        (301, "Hauled flat aft the mainsail sheet; the foresail sheet to windward; helm a-lee."),
+        (301, "Hands to the sheets; heave to."),
+        (
+            447,
+            "Hove to on the starboard tack, under her fore-and-aft canvas, foresail sheet to "
+            "windward, helm a-lee.",
+        ),
+        (900, "Order: fill away."),
+        (901, "Hauled aft the head sheets; kept the helm a-lee to let her fall off."),
+        (901, "Fill away; man the sheets."),
+        (916, "Fallen off; right the helm."),
+        (917, "Filled away on the starboard tack; steering WNW (292°)."),
+    ]
+    worn = _lines(_from(cutter), [*taken_in, ("wear ship", 600)])
+    assert (301, "Stand by to wear ship. Up helm.") in worn
+    assert (338, "Wind aft. Shifted over the sheets.") in worn
+    assert (759, "Wore ship; full and by on the larboard tack, heading ENE (68°).") in worn
 
 
 def test_the_cutter_box_hauled_braces_up_no_after_yards(cutter):
@@ -233,12 +305,68 @@ def test_the_cutter_box_hauled_braces_up_no_after_yards(cutter):
     assert not [line for line in said if "after yards" in line]
 
 
-def test_a_ship_with_after_yards_says_them_as_before():
-    """The brig: her wear's first line and her heave-to's and fill-away's braces as they were."""
-    settled = _settle(BRIG)
-    worn = _lines(_from(settled), [("wear ship", 60)])
+def test_the_cutter_boxed_off_round_by_the_stern_braces_up_no_after_yards(cutter):
+    """Box her off (A2's second pass: the case the lead asked for), gone round by the stern from
+    the settle, as a box-haul ends. Old: "Wind aft; braced up the after yards; shifted over the
+    sheets. Haul out the mainsail!"; her head yards braced abox as they were, every tick the
+    same."""
+    got = _lines(_from(cutter), [("box her off", 600)])
+    assert (1, "Up mainsail! Brace abox the head yards!") in got
+    assert (58, "Wind aft; shifted over the sheets. Haul out the mainsail!") in got
+    assert (99, "Boxed her off; braced sharp up on the starboard tack, full and by.") in got
+    assert not [line for _, line in got if "after yards" in line]
+
+
+def test_the_smack_under_her_fore_and_aft_canvas_lies_to_her_sheets(smack):
+    """A2's second pass, the lead's case: the smack under her mainsail, fore staysail and jib, no
+    square sail set, hove to and filled away by her sheets. Old (A2): "Hands to the head braces;
+    heave to.", "Fill away; man the head braces.", "Fallen off; braced the yards full." and
+    "Filled away on the starboard tack; braced full and steering WNW (292°)."; every tick as it
+    was."""
+    got = _lines(_from(smack), [("heave to", 600), ("fill away", 60)])
+    assert got == [
+        (0, "Order: heave to."),
+        (1, "Only three hands to heave to; there are no more on deck."),
+        (1, "Hauled flat aft the mainsail sheet; the foresail sheet to windward; helm a-lee."),
+        (1, "Hands to the sheets; heave to."),
+        (
+            163,
+            "Hove to on the starboard tack, under her fore-and-aft canvas, foresail sheet to "
+            "windward, helm a-lee.",
+        ),
+        (600, "Order: fill away."),
+        (601, "Only three hands to fill away; there are no more on deck."),
+        (601, "Hauled aft the head sheets; kept the helm a-lee to let her fall off."),
+        (601, "Fill away; man the sheets."),
+        (610, "Fallen off; right the helm."),
+        (611, "Filled away on the starboard tack; steering WNW (292°)."),
+    ]
+
+
+def test_the_smack_under_her_fore_and_aft_canvas_wears_and_scuds_by_her_sheets(smack):
+    """Old (A2): "Wind aft. Squared the head yards; shifted over the sheets; hauled out and
+    braced up.", "Wore ship; braced sharp up on the larboard tack, heading ENE (68°).", "Up helm;
+    brace in the yards as she goes off." and "Up helm; stand by the braces. Bear up and scud.";
+    every tick as it was, and no line naming a brace or a yard."""
+    worn = _lines(_from(smack), [("wear ship", 600)])
+    assert (1, "Stand by to wear ship. Up helm.") in worn
+    assert (34, "Wind aft. Shifted over the sheets.") in worn
+    assert (456, "Wore ship; full and by on the larboard tack, heading ENE (68°).") in worn
+    scud = _lines(_from(smack), [("scud", 60)])
+    assert [(t, line) for t, line in scud if not line.startswith("Only")] == [
+        (0, "Order: scud."),
+        (1, "Up helm."),
+        (1, "Bear up and scud."),
+    ]
+    assert not [line for _, line in worn + scud if BRACES.search(line)]
+
+
+def test_a_ship_with_after_yards_says_them_as_before(brig):
+    """The brig: her wear's first line and her heave-to's and fill-away's braces as they were
+    (A2's second pass: the settle a module's, half as long, for the five-second line)."""
+    worn = _lines(_from(brig), [("wear ship", 60)])
     assert any(line.endswith("; brace in the after yards.") for _, line in worn)
-    hove = _lines(_from(settled), [("heave to", 600), ("fill away", 120)])
+    hove = _lines(_from(brig), [("heave to", 600), ("fill away", 120)])
     said = [line for _, line in hove]
     assert "Hands to the after braces; heave to." in said
     assert "Fill away; man the after braces." in said
@@ -247,10 +375,25 @@ def test_a_ship_with_after_yards_says_them_as_before():
     )
 
 
+def test_a_ship_with_after_yards_and_her_square_sails_in_says_them_as_before(brig):
+    """A2's second pass: the eight rigs with after yards say every line as before, whatever they
+    have set; the brig with her square sails in, worn and scudding."""
+    taken_in = [("take in the square sails", 300)]
+    worn = _lines(_from(brig), [*taken_in, ("wear ship", 120)])
+    said = [line for _, line in worn]
+    assert "Stand by to wear ship. Up helm; brail up the spanker; brace in the after yards." in said
+    assert (
+        "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up."
+    ) in said
+    scud = [line for _, line in _lines(_from(brig), [*taken_in, ("scud", 10)])]
+    assert "Up helm; brailed up the spanker; brace in the yards as she goes off." in scud
+    assert "Up helm; stand by the braces. Bear up and scud." in scud
+
+
 def test_the_lugger_brought_up_squares_no_yards():
     """The anchor's road (`tests/test_anchor.py`: Carrick Road, 12 knots from the south-west,
-    her head 335). Old: "Brought up. Stations for furling sail; square the yards."; the
-    frigate's line as it was (`tests/test_anchor.py`)."""
+    her head 335), on the region's own chart (`ROAD_CHART`). Old: "Brought up. Stations for
+    furling sail; square the yards."; the frigate's line as it was (`tests/test_anchor.py`)."""
     scenario = Scenario(
         start_time=datetime(1805, 6, 10, 10, 0),
         wind_from_deg=225.0,
@@ -260,7 +403,7 @@ def test_the_lugger_brought_up_squares_no_yards():
         ship_heading_deg=335.0,
         ship_speed_kn=3.0,
         position={"lat_deg": 50.160, "lon_deg": -5.034},
-        region="channel-west",
+        chart=ROAD_CHART,
     )
     world = make_world(7, LUGGER, scenario)
     world.submit("set plain sail")
@@ -275,7 +418,9 @@ def test_a_boat_at_her_grapnel_squares_and_lays_abox_no_yard():
     square the yards.", "... its sheet to windward! The topsail yard abox. Helm a-lee for the
     stern-board." and "She has paid off; right the helm, draw the jib, haul aft the main sheet,
     brace round the topsail yard."; every tick as it was. The rest of that road's words are a
-    ship's (the bars, the sail-loosers, a jib she has not): another cause, not this step's."""
+    ship's (the bars, the sail-loosers, a jib she has not): another cause, not this step's. On
+    the region's own chart (`ROAD_CHART`), and got under way once the come-to-anchor is done
+    (her brought-up line at 978 s; at 2,400 s before A2's second pass, the same lines)."""
     scenario = Scenario(
         start_time=datetime(1805, 6, 10, 10, 0),
         wind_from_deg=225.0,
@@ -285,12 +430,12 @@ def test_a_boat_at_her_grapnel_squares_and_lays_abox_no_yard():
         ship_heading_deg=335.0,
         ship_speed_kn=2.0,
         position={"lat_deg": 50.152, "lon_deg": -5.040},
-        region="channel-west",
+        chart=ROAD_CHART,
     )
     world = make_world(7, "data/ships/boat-launch-31.yaml", scenario)
     world.submit("set the lug")
     world.run(60)
-    got = _lines(world, [("come to an anchor", 2400), ("get under way", 1100)])
+    got = _lines(world, [("come to an anchor", 1200), ("get under way", 1100)])
     said = [line for _, line in got]
     assert "Brought up. Stations for furling sail." in said
     assert (
@@ -348,8 +493,8 @@ def _run(runner, ship, wind, stepper) -> list:
     return notes
 
 
-def _on_starboard(off_deg: float):
-    ship = load_ship(LUGGER)
+def _on_starboard(off_deg: float, path: str = LUGGER):
+    ship = load_ship(path)
     wind = _wind()
     ship.dyn.heading = units.wrap_2pi(wind.direction_from - units.deg_to_rad(off_deg))
     ship.dyn.speed = units.knots_to_ms(5.0)
@@ -379,3 +524,31 @@ def test_the_lugger_missing_stays_squares_no_yards():
     assert len(missed) == 1 and "square the yards" not in missed[0][2]
     assert notes[-1][1] == "ship.fell_off"
     assert notes[-1][2] == "She fell off on the starboard tack, to try again or to wear."
+
+
+@pytest.mark.parametrize(
+    ("topsail", "squared", "fell_off"),
+    [
+        (SailState.FURLED, False, "She fell off on the starboard tack, to try again or to wear."),
+        (
+            SailState.SET,
+            True,
+            "Squared the yards; she fell off on the starboard tack, to try again or to wear.",
+        ),
+    ],
+    ids=["no square sail set", "her topsail set"],
+)
+def test_the_cutter_missing_stays_squares_her_yards_only_with_a_square_sail_set(
+    topsail, squared, fell_off
+):
+    """A2's second pass, by the runner's door (the lugger's miss above): the cutter's head yards
+    squared in words, in the urgent line and the fallen-off line, only with a square sail set.
+    Old (A2): "square the yards" and "Squared the yards; she fell off ..." whatever she had set;
+    with her topsail set as before."""
+    ship, runner, wind = _on_starboard(55.0, CUTTER)
+    ship.sails["topsail"].state = topsail
+    runner.start(ship, "tack", "ship")
+    notes = _run(runner, ship, wind, _turner(0.4, dies_in_s=60))
+    missed = [n for n in notes if n[1] == "ship.missed_stays"]
+    assert len(missed) == 1 and ("square the yards" in missed[0][2]) == squared
+    assert notes[-1][1] == "ship.fell_off" and notes[-1][2] == fell_off

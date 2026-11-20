@@ -731,7 +731,12 @@ def test_tack_succeeds_when_the_ship_turns(path):
     assert text == "All hands about ship."
     ticks, notes = run(runner, ship, wind, turner(0.4))
     assert kinds(notes)[-1] == "ship.tacked"
-    assert "braced up on the larboard tack" in texts(notes)[-1]
+    # package 90, A2's second pass: the schooner as loaded has no square sail set, and on a rig
+    # of head yards alone the brace words follow the square sails set (`scripts.braces_worked`):
+    # she ends "full and by" as a lugger does ("braced up on the larboard tack" before it); the
+    # frigate's words as they were
+    braced = "braced up" if path == FRIGATE else "full and by"
+    assert f"{braced} on the larboard tack" in texts(notes)[-1]
     words = texts(notes)
     if path == FRIGATE:
         # her courses furled as she is loaded, so no course is set: "Main-topsail haul." (Luce
@@ -1848,8 +1853,11 @@ def test_a_tack_for_a_course_off_the_wind_pays_off_to_it_and_steers_it(path):
     assert runner.start(ship, "tack", "ship", {"course_deg": course}) == "All hands about ship."
     _, notes = run(runner, ship, wind, turner(0.4))
     assert kinds(notes)[-1] == "ship.tacked", texts(notes)
+    # package 90, A2's second pass: the schooner as loaded, no square sail set, "trimmed" as a
+    # lugger is ("Tacked; braced up for the course ordered ..." before it); the frigate's as it was
+    braced = "braced up" if path == FRIGATE else "trimmed"
     assert texts(notes)[-1] == (
-        "Tacked; braced up for the course ordered on the larboard tack, heading S by W (190°)."
+        f"Tacked; {braced} for the course ordered on the larboard tack, heading S by W (190°)."
     )
     assert ship.dyn.helm_mode is HelmMode.HEADING
     assert ship.dyn.target_heading == pytest.approx(math.radians(course))
@@ -1897,8 +1905,11 @@ def test_a_wear_for_a_course_comes_to_it_with_the_yards_trimmed_for_it(path):
     runner.start(ship, "wear", "ship", {"course_deg": course})
     _, notes = run(runner, ship, wind, turner(0.5))
     assert kinds(notes)[-1] == "ship.wore", texts(notes)
+    # package 90, A2's second pass: the schooner as loaded, no square sail set, "trimmed" as a
+    # lugger is ("Wore ship; braced for the course ordered ..." before it); the frigate's as it was
+    braced = "braced" if path == FRIGATE else "trimmed"
     assert texts(notes)[-1] == (
-        "Wore ship; braced for the course ordered on the larboard tack, heading S by W (190°)."
+        f"Wore ship; {braced} for the course ordered on the larboard tack, heading S by W (190°)."
     )
     assert ship.dyn.helm_mode is HelmMode.HEADING
     assert ship.dyn.target_heading == pytest.approx(math.radians(course))
