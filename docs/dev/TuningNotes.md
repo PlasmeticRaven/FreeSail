@@ -38397,6 +38397,109 @@ Added: `tests/test_probes_90.py`'s guard and truth 7-680, above.
 
 Moved by the stage-0 builder (the coordinating session); to be passed by the lead's reader.
 
+## Package 90, A3: the helm's kind, a tiller's words (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6, row A3, built beside the engine track on the lead's word of 2026-11-20 (nudge 27), the card's file list as the owner widened it ("Widen the card", 2026-11-19), the words as the lead ruled the ground report's draft (nudge 22, "as drafted"; plan §13.1 item 3, JUDGEMENT). **The cause:** every line where a helm is shot away, rigged round or mended was written in the wheel's words, whatever the hull steered by, so a hull steered by a tiller was told her wheel was shot away and was mended with new wheel-ropes (`GroundReport-Package90-2026-11.md` §2.2). **The mend, where it lives:** the helm's words come from one table keyed on what her file says she steers by (`freesail/evolutions/scripts.py`, `HELM_WORDS` and `helm_words(ship)`, read off `HullSpec.helm`, which stage 0 laid inert). Every line reads them there, with no branch per message. The wheel's row is package 116's words exactly, and `HELM_LOST_WORDS` and `HELM_LOST_ASIDE` are the wheel's still. **No tick, kind or figure moves:** the times and the hands are the files', the same on either helm, and the hit's draws are as they were.
+
+### What reads the table
+
+| Line | Where | Wheel (package 116's, kept) | Tiller (new) |
+|---|---|---|---|
+| the hit, its state and the minute's words | `combat/hits.py` `_deck_hit` | "The wheel is shot away; the helm is lost until the relieving tackles are rove: 'rig the relieving tackles'."; `helm_lost` "the wheel shot away" | "The tiller is shot away; ..." (the rest the same); "the tiller shot away" |
+| the refusal, by the order's road and the runner's | `orders/verbs.py` `_helm`; `evolutions/runner.py` `_failing_condition` | "The wheel is shot away and the helm does not answer: rig the relieving tackles ('rig the relieving tackles') to steer her from below, or repair the wheel ('repair the wheel')." | "The tiller is shot away and the helm does not answer: rig the relieving tackles ('rig the relieving tackles') to steer her by them, or ship the spare tiller ('ship the spare tiller')." |
+| the heave-to's aside | `scripts.py` `_helm_words` | "the helm not answering, the wheel shot away" | "the helm not answering, the tiller shot away" |
+| the tackles begun | `relieving_tackles.yaml` `on_start` "{begin}" | "Rig the relieving tackles! Hands below to the tiller." | "Rig the relieving tackles! Hands aft to the tiller." |
+| the tackles rove | `repair_scripts.py` | "The relieving tackles are rove to the tiller and manned below: the helm answers again, steered by the tackles, and more slowly than by the wheel." | "The relieving tackles are hooked to the stump of the tiller and manned on deck: the helm answers again, steered by the tackles, and more slowly than by the tiller." |
+| the tackles not wanted (reason and line) | `repair_scripts.py` | "the wheel is repaired; the relieving tackles are not wanted" | "the spare tiller is shipped; the relieving tackles are not wanted" |
+| the mend begun | `repair_wheel.yaml` `on_start` "{begin}" | "Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be rove." | "Ship the spare tiller! The carpenter's crew aft to the rudder head." |
+| the mend's name, both forms (the robbed gun at quarters, the work the rest are at, the belay, the readings) | `runner.py` `_describe` reads `Script.work` first; `RepairWheelScript.work` | "repair the wheel", "repairing the wheel" | "ship the spare tiller", "shipping the spare tiller" |
+| given twice | `orders/damage.py`, by `Runner.doing` | "The hands are repairing the wheel already." | "The hands are shipping the spare tiller already." |
+| the mend done | `repair_scripts.py` | "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; the relieving tackles are cast off." | "The spare tiller is shipped in the rudder head: she steers by the tiller again; the relieving tackles are cast off." |
+| the helm whole | `repair_scripts.py` `check` | "the wheel is whole and she steers by it" | "the tiller is whole and she steers by it" |
+| the mend belayed | `repair_scripts.py` `left_words` | "the wheel not mended, ..." | "the spare tiller not shipped, ..." |
+| the mend failing | `repair_wheel.yaml` `on_fail` "Could not {work}: {reason}." | "Could not repair the wheel: ..." | "Could not ship the spare tiller: ..." |
+| the captain's reason | `world/captains.py` `_helm_first`: the hit's own words, `ship.extra["helm_lost"]` | "(the wheel shot away)" | "(the tiller shot away)" |
+| the captain's mend order | `world/captains.py` `_repairs`: the table's `mend` (the lead's word of nudge 31) | "By the captain, taking possession: repairing the wheel (steering by the relieving tackles)." | "... shipping the spare tiller (...)" |
+
+The mend holds "the wheel" under a wheel and "the rudder head" under a tiller, and the tackles hold "the tiller" on both, so the two go on together on either helm as before. The tiller's words for the tackles not wanted, the mend belayed and the mend failing are not in the ground report's table. They are the builder's, by the same ruling (JUDGEMENT).
+
+**Understood:** `ship the spare tiller`, `ship a spare tiller`, `ship a new tiller` and `repair the tiller`, the four synonyms of `repair the wheel` (`data/vocabulary.yaml`). Each was "not an order this ship understands" before. On a wheel ship each is answered as the wheel's mend (unpinned; the ground report's §6).
+
+### The six files, by the generator
+
+`python tools/gen_ships.py data/ships`: six files change and twelve are byte for byte. Each of the six gains two lines under `hull:`, after `rudder` and before `profile`: a sourced note and `helm: tiller` (the ground report's §3).
+- **The cutter** and **the smack** (hull dicts of `tools/gen_ships.py`): the rule only (Falconer 1780, HELM; Lever 1827, the Rudder, fig. 373). Judgement.
+- **The lugger** (`tools/gen_ships.py`): the type (Holdsworth 1874 p. 104 and pp. 196-197; the fitting on her rudder head on ZAZ6306 read and not identified). Judgement.
+- **The topsail schooner** and **the privateer schooner** (one hull dict): direct, Chapelle 1930 p. 83, H.M. schooner *Musquidobit*, late *Lynx* (fig. 17).
+- **The hermaphrodite brig** (`tools/ships/neufchatel.py`): **JUDGEMENT, kept as filed** (nudge 22). No source has been read for her helm, and against it stands Chapelle 1930 p. 136 on the *Diligente*. Her own draughts would settle it: RMG ZAZ6177 (her lines) and ZAZ6179 (her sail plan).
+- **The bilander stays on the wheel**, the key's default: no source either way (the ground report's §3).
+
+### Pins moved, old beside new (the reason of each: the six files carry `helm: tiller`, A3's ruled key)
+
+| Pin | Old | New |
+|---|---|---|
+| `tests/test_hull_cutter.py::test_the_hull_figures_stand_as_filed` | her hull but its profile is `HULL_AS_FILED` | the same, with the hull's `helm` held to `"tiller"` and taken out first (`HELM_A3`) |
+| `tests/test_hull_cutter.py::test_a_diff_of_her_physics_keys_against_git_shows_none` | her hull but its profile equals the file at f5be9110; the existing keys in order, then the profile | the same, with `helm` absent there and `"tiller"` here, taken out; the existing keys in order, then `helm` and `profile` |
+| `tests/test_hull_lugger.py::test_no_hull_figure_the_physics_reads_moved` | her hull but its profile is `HULL_AS_FILED`; the profile last | the same, with `helm` held to `"tiller"` and taken out; the profile last still |
+| `tests/test_hull_lugger.py::test_a_diff_of_her_files_physics_keys_against_git_shows_none` | her hull but its profile equals the file at f5be9110 | the same, with `helm` absent there and `"tiller"` here, taken out |
+| `tests/test_hull_smack.py::test_no_figure_the_physics_reads_has_moved_by_the_pins` | her hull but its lines is `PHYSICS_KEYS`, in its order | the same, with `helm` last of those keys, held to `"tiller"` and taken out |
+| `tests/test_hull_smack.py::test_her_file_but_for_her_lines_is_what_it_was_against_git` | the file at f5be9110 but for SW-4's keys and her lines, as data and as text | the same, with `helm` absent there and `"tiller"` here, and its two lines (`HELM_A3_LINES`, the note and the key, just before her lines) found once and taken out of the text |
+| `tests/test_hull_schooner.py::test_no_figure_the_physics_reads_moved[data/ships/topsail-schooner.yaml]` and `[data/ships/privateer-schooner.yaml]` | the physics' view equals the file at f5be9110 but for SW-4's keys and item 37's three booms | the same, with the hull's `helm` absent there and `"tiller"` here, taken out |
+| `tests/test_known_truths.py::test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_rove` | the ten refusals and the standing order's end with `HELM_LOST_WORDS`; the heave-to's aside "the helm not answering, the wheel shot away" | each ends with the tiller's refusal (`TILLER_LOST`, beside the truth); the aside "the helm not answering, the tiller shot away"; the cutter's helm asserted the tiller; its two assertions on `HELM_LOST_WORDS` hold as they were |
+| `tests/test_known_truths.py::test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it_is_repaired` | "more slowly than by the wheel."; "The hands are repairing the wheel already."; "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; the relieving tackles are cast off."; "the wheel is whole" | "more slowly than by the tiller."; "The hands are shipping the spare tiller already."; "The spare tiller is shipped in the rudder head: she steers by the tiller again; the relieving tackles are cast off."; "the tiller is whole". The rates are as they were: by the tackles half the helm's own, and the whole of it once mended |
+| `tests/test_known_truths.py::test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_would` | the action over, a line of his says "repairing the wheel" | a line of his says "shipping the spare tiller": his mend order, the table's. Moved by the second commit, on the lead's word of nudge 31 (the ground report's row 25); every other clause as it was |
+
+The truths move in words only, every tick the same: **the first action's ship is the cutter** (`data/scenarios/first-action.yaml`), a tiller hull. Measured: the base's own test files run on the first commit's tree (8d218fb8) fail exactly ten, the eight records and truths 7-632 and 7-633. The previous truth 7-634 run on the second commit's tree fails, by its last clause alone. At the base all eleven pass.
+
+**Held, as expected:** truth 7-626: its asserted words ("'rig the relieving tackles'", "The hands are rigging the relieving tackles already.", the belay's line) are the same on either helm.
+
+### Measured, old beside new (the probe, base 8b8a982d beside this commit)
+
+Each of the six files, and the brig as the wheel's control, started from the harbour at seed 7. At 60 s her helm was shot away by `combat.hits._deck_hit` itself, its draw forced and nobody hurt. Then the orders: `steer north`, `rig the relieving tackles`, run until rove, `repair the wheel` twice, run until mended, and with the helm whole `repair the wheel`, `repair the tiller` and `ship the spare tiller`. The first action at seed 6 was run twice: once with the player at the prompt (the refusals, the heave-to, the tackles given twice, the mend given twice and done), and once left to the captain for two hours. **Every line's tick, kind and actor is the same in all nine runs; only words move.**
+
+| Run | Lines | Texts moved | Rove (s after the shot, sampled) | Mended (s, sampled) |
+|---|---|---|---|---|
+| cutter | 21 | 10 | 330 | 2,555 |
+| lugger | 22 | 10 | 330 | 2,525 |
+| smack | 20 | 10 | 420 | 2,555 |
+| topsail schooner | 19 | 10 | 390 | 2,615 |
+| privateer schooner | 19 | 10 | 390 | 2,615 |
+| hermaphrodite brig | 17 | 10 | 390 | 2,585 |
+| brig (the wheel) | 20 | 2 (the two new synonyms understood) | 390 | 2,585 |
+| first action, the prompt | 51 | 13 | 460 | 4,545 |
+| first action, the captain | 255 | 9 (8 at the first commit; the mend order at tick 4,620 at the second) | the same at both | the captain's mend begun at tick 4,620 at both |
+
+Each figure is the same old and new. In the first action the minute's line reads "Shot from a cutter: the tiller shot away."; the robbed gun's "Shipping the spare tiller at quarters: four hands taken from No. 3 gun; the guns go on short-handed."; and the waiting and short lines name "shipping the spare tiller" among the work in hand. On a tiller hull no line of the game is left in the wheel's words; the player's own `repair the wheel` is echoed as typed.
+
+### The two stops of the first commit, and the lead's word (nudge 31, 2026-11-20)
+
+1. **`tests/test_probes_90.py::test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole_lateen`, six cases** (the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig). This is stage 0's guard that no committed file carries the key. It was written after the ground report was measured, so the ground report did not see it, and it fails on the six, as A3's own key must make it. **The coordinating session's, by the lead's word:** stage 0's guards become one table at A3's merge into the package's branch. Not touched here.
+2. **The captain's mend order** (`freesail/world/captains.py`, `_repairs`). It needed the table's words, and so an import into that function: a third line of the file, a stop by the lead's condition 2. **Built in the second commit, on the lead's word:** `helm_words` imported in `_repairs` and the order `(helm_words(ship)["mend"], "steering by the relieving tackles")`, with no branch on the hull's kind. With the reason's line, that is A3's three lines in the file and no more (`git diff 8b8a982d -- freesail/world/captains.py`). His order is now "ship the spare tiller" on a tiller hull and "repair the wheel" on a wheel ship, as before. Measured on the first action left to him: his line at tick 4,620 is the one line that moves, every tick the same (above). Its pin is truth 7-634 (above); `tests/test_helm_kind.py` holds it on either helm.
+
+### Found by the same cause and left (files or lines the card does not give A3)
+
+- `freesail/world/captains.py`'s refusal of his own helm order while the tackles are not rove (`give`): `HELM_LOST_WORDS` and `"not_given": "the wheel shot away"` on every hull. That event is returned to his own judgement and never logged (truth 7-634: nothing of his is refused in the log), so no one reads its words. Mending it would be a fourth and a fifth line, beyond the three the lead allowed.
+- The primer's chapter 25 table (`docs/primer/25-water-wounds-and-the-fight-on-deck.md`, ll. 63-70) gives the wheel's words. Chapter 2 (l. 192) says that the conning words "speak to the wheel".
+- `freesail/ship/schema.py` (stage 0's): the helm "read by nothing yet" (ll. 134, 620) is no longer true.
+- The comments of the two evolution files above their start and fail lines, and `verb: repair_the_wheel`'s comment ("repairing the wheel"). Comments, outside the lines the card gives.
+- `belay the tiller` is refused ("There is no such part as the tiller in this ship."): `more_work_nouns` has `wheel` alone. On either helm the mend is belayed by `belay the wheel`, and on a tiller hull also by its name, `belay shipping the spare tiller` or `belay ship the spare tiller`. Condition 3 keeps the vocabulary's change to the four synonyms.
+- `freesail/physics/hull.py` and `physics/integrate.py` name the man at the wheel in comments; the helmsman's model is the same for both helms.
+- A game saved before this step, on one of the six, reads the wheel until a new start: her pickled spec has no `helm`.
+
+No class is added (the table is a dict, `Script.work` a method), so the checkpoint's list is not touched.
+
+### Tests run (`python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, `--slow` where named)
+
+From the tree's root, with the full git history fetched (the shallow clone skips the five records that read f5be9110, at the base and here alike; with it they run, and all 108 cases of the four hull files pass at both):
+- **the guard set** (`--slow`): truth 7-185 (the byte test, two-way), `tests/test_rig_classing.py` (the golden table), `test_schooner_mast.py`, `test_probes_90.py` and `test_check_viewer_guns.py`: 249 passed, 6 failed, the six of stop 1 above and no other;
+- **the four helm truths** (`--slow`), 7-626, 7-632, 7-633 and 7-634: 4 passed; the base's own four on this tree: 7-626 and 7-634 pass, 7-632 and 7-633 fail, the two moved;
+- **the six hulls' files, the new test and the sets named** (`--slow`): `test_hull_cutter`, `test_hull_lugger`, `test_hull_smack`, `test_hull_schooner`, `test_neufchatel`, `test_helm_kind`, `test_held_work`, `test_grammar_book` (the four synonyms in the library's grammar page, served from the vocabulary: no committed page), `test_fight`, `test_checkpoint`, the four boats' files, and `test_agents`, `test_catalogue` and `test_in_world` (the catalogue serves the two files' lines): 579 passed, 2 xfailed (the base's two);
+- **the eight records moved**, the base's own four hull files run on this tree: 8 failed (exactly the eight above), 100 passed.
+
+The fast tier whole, compared test by test with the base's, the slow tier of the test files touched, and the second commit's tests (the four helm truths, `test_helm_kind`, the captain's files) are in the build's report (`docs/design/Report-Package90-Helm.md`).
+
+Built by the A3 builder in a session of its own, beside the engine track; to be read by an independent reader (the plan's §10.2 lens 8: whether the mend is the cause's or only the symptom's, and where else the cause was looked for).
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.

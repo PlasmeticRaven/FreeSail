@@ -63,6 +63,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 5.0
     span_m: 2.5
+  # She steers by a tiller on deck: the type's (Holdsworth 1874 p. 104, the Yarmouth luggers' mizen stepped to one side for the tiller's play; pp. 196-197, the Cornish luggers' mizen stepped forward, out of its way); the fitting on her rudder head drawn on ZAZ6306 is read and not identified. Judgement.
+  helm: tiller
   # Her lines (Build-Ships.md §5; docs/design/ships-design/pages-zaz6306.md, the note): x forward of the middle of ZAZ6306's two perpendiculars, z above its green line, taken as the file's waterline and recorded beside it, not moved; metres, plank on. Above the water her own sheet (S), but for the curve of the side up to her main breadth (T, the note's §6.2); under it Le Coureur on ZAZ6170, her type (judgement; S†, the note's §13), lengths by 0.868, sections by 0.9135, her own 2 in of plank. A departure from §5.0 principle 7's last sentence: her line is drawn at her sheet's length, not the file's, so that her own rail, plan and stem stand (the note's §13.4). No port: her sheet draws none, and her three guns are taken to fire over the rail (judgement, the note's §6.4).
   profile:
     # The top of her side from the taffrail to the stem head, with its two steps at 15.07 and 43.04 ft from the after perpendicular (measured on ZAZ6306, ±0.05 ft: the note's §5.2; each step given 0.01 m apart).
