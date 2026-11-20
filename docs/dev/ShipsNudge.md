@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 11:30 UTC (PACKAGE 119 IS MERGED at 8d67c9c3: merge the trunk in and report your one hash; the muster deals odd hands in turn, and heaving to and filling away call all hands where the watch is too few). Nudge number: 26.
+Latest note: 2026-11-20, 13:35 UTC (THE TARTANE'S THREE RULINGS: her load line H as the sheet marks, H' recorded; deck_height_m the measured 0.54 m; the beak 10 1/2 pieds; the plate's number corrected everywhere). Nudge number: 29.
