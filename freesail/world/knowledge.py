@@ -1149,31 +1149,40 @@ def _people_named(world: Any, name: str) -> list[Any]:
 
 
 def _speakers(world: Any, data: dict[str, Any]) -> list[Any]:
-    """The persons a word's line can be of, by what the line says of where it was said:
-    its speaker's name, and his place aboard (`place`) or the port he was ashore at (its
-    name in `where`, "ashore at Falmouth"). The line holds neither his hull nor his place
-    ashore, so more than one can answer to it."""
+    """The persons a word's line can be of, by what the line says of him: his name; where
+    more than one bears it, his trade (`role`, which a word put in a mouth writes), then his
+    place aboard (`place`) or the port he was ashore at (its name in `where`, "ashore at
+    Falmouth"), each taken only where it leaves somebody. The line holds neither his hull
+    nor his place ashore, so more than one can still answer to it."""
     from freesail.world.hearing import spot_of
 
+    out = _people_named(world, str(data.get("person") or ""))
+    role = str(data.get("role") or "")
     place = str(data.get("place") or "")
     where = str(data.get("where") or "")
     aboard = place in PLACES and PLACES[place].aboard
-    out = []
-    for p in _people_named(world, str(data.get("person") or "")):
+    ports = getattr(_root(world), "ports", None)
+
+    def at_the_line(p: Any) -> bool:
         at = spot_of(world, p)
         if aboard:
-            if at[0] == "aboard" and at[2] == ("quarterdeck" if place == "deck" else place):
-                out.append(p)
-        elif place == "shore":
+            return at[0] == "aboard" and at[2] == ("quarterdeck" if place == "deck" else place)
+        if place == "shore":
             if at[0] != "ashore":
-                continue
-            ports = getattr(_root(world), "ports", None)
+                return False
             port = (getattr(ports, "ports", None) or {}).get(at[1]) if ports is not None else None
             name = str(getattr(port, "name", "") or "")
-            if not where.startswith("ashore at ") or (name and name in where):
-                out.append(p)
-        elif at[0] == place:
-            out.append(p)  # in a boat
+            return not where.startswith("ashore at ") or not name or name in where
+        return at[0] == place  # in a boat
+
+    for keep in (
+        lambda p: str(getattr(p, "role", "") or "") == role,
+        at_the_line,
+    ):
+        if len(out) > 1 and (role or keep is at_the_line):
+            narrowed = [p for p in out if keep(p)]
+            if narrowed:
+                out = narrowed
     return out
 
 
@@ -1214,10 +1223,11 @@ def _heard_where_said(world: Any, kind: str, data: dict[str, Any], spot: Any) ->
         if place in PLACES and PLACES[place].aboard:
             return within_hearing(("aboard", hull, place), spot)  # a voice of her own
         return False
-    # the speaker by what the line says of where it was said; where more than one person
-    # answers to it (a namesake at the same place of another hull, or at the same port
-    # ashore), the word is shown only where every one of them would be heard, so that a
-    # namesake never shows a word he could not hear
+    # the speaker by what the line says of him (`_speakers`): his name, his trade, his
+    # place; where more than one person still answers to it (a namesake of the same trade
+    # at the same place of another hull, or at the same port ashore), the word is shown
+    # only where every one of them would be heard, so that a namesake never shows a word
+    # he could not hear
     speakers = _speakers(world, data)
     if not speakers:
         return False

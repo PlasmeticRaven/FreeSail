@@ -65,6 +65,9 @@ def test_truth_7_705_a_word_put_in_a_mouth_on_the_quarterdeck_is_shown_the_playe
     assert "person.spoke" in [m["event"]["kind"] for m in sent]
     assert _shown(sent, out, LAUNCH) == (True, True)
     assert d.hears(e) and con.hears(e)
+    w.people.find("the master").where = "cabin"  # he goes below after: the line stands
+    assert d.hears(e) and con.hears(e)
+    w.people.find("the master").where = "quarterdeck"
     w.people.captain.where = "cabin"
     e = _say_as(w, "the master", "The cutter is alongside, sir.")
     assert e.data["heard_by"] == [] and e.data["place"] == "quarterdeck"
@@ -171,6 +174,11 @@ def test_truth_7_709_ashore_by_his_place_aboard_another_ship_by_his_hull_and_no_
     e = _say_as(w, "the master", "The agent is gone again, sir.")
     assert e.text.startswith(master.name)
     assert _shown(sent, out, "The agent is gone again") == (False, False)
+    # ...and the master beside the player at the market, the namesake at the counting
+    # house: his word is shown (the line's trade tells the two apart)
+    master.ashore_at, pearce.ashore_at = "market", "counting_house"
+    _say_as(w, "the master", "The boat waits at the steps, sir.")
+    assert _shown(sent, out, "The boat waits at the steps") == (True, True)
     # a model holding the captain's station: the list is his, and it names him or not
     for p in (cap, master):
         p.aboard, p.where, p.port, p.ashore_at = True, "quarterdeck", "", ""
@@ -225,3 +233,6 @@ def test_truth_7_709_aboard_another_ship_by_her_hull_whatever_his_name():
     assert purser.where == "gunroom"
     w.world_order('say as Mr Cannon: "The pilot is aboard, sir."', "the director")
     assert _shown(sent, out, "The pilot is aboard") == (True, True)
+    purser.where = "quarterdeck"  # the namesake on the frigate's quarterdeck: his trade
+    w.world_order('say as Mr Cannon: "The anchor is a-peak, sir."', "the director")
+    assert _shown(sent, out, "The anchor is a-peak") == (True, True)
