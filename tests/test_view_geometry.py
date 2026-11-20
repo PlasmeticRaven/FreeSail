@@ -160,6 +160,10 @@ SMACK = "data/ships/smack.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2: the Prince de Neufchatel
 BILANDER = "data/ships/bilander.yaml"  # package 75, B4: the bilander
 SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7: the Bellerophon
+# package 90, the tartane (her builder): the trader and the guarda-costa, one hull in two files
+TARTANE = "data/ships/tartane.yaml"
+COASTGUARD_TARTANE = "data/ships/coastguard-tartane.yaml"
+TARTANES = (TARTANE, COASTGUARD_TARTANE)
 # The files whose driver is Steel's boomsail on a lateen cut at the mast, her boom named by the cut
 # (Ext §17): the 64's since her stage B, and the 74's (package 75, B7)
 LATEEN_DRIVEN = {SIXTY_FOUR, SEVENTY_FOUR}
@@ -1186,10 +1190,11 @@ def test_the_sides_top_runs_through_every_rail_point_and_the_head_rule(tmp_path,
 
 @needs_node
 @pytest.mark.parametrize(
-    ("path", "builder"), [d for d in DRAWN_BY if d[0] not in (LUGGER, BILANDER)]
+    ("path", "builder"), [d for d in DRAWN_BY if d[0] not in (LUGGER, BILANDER, *TARTANES)]
 )
 def test_the_transom_runs_from_the_knuckle_to_the_taffrail(tmp_path, path, builder):
-    """Every stern with a transom; the lugger's and the bilander's are round (`RIGHTLY_WITHOUT`)."""
+    """Every stern with a transom; the lugger's, the bilander's and the tartane's are round
+    (`RIGHTLY_WITHOUT`)."""
     hull = hull_of(path, builder)
     profile = hull["profile"]
     got = run_js(
@@ -1315,6 +1320,10 @@ BOWSPRIT_DRAWN = {
     NEUFCHATEL: (0.555, 19.50),
     BILANDER: (1.270, 28.99),
     SEVENTY_FOUR: (1.235, 31.76),
+    # package 90, the tartane: her éperon, level, rooted at her rail at the stem (`LEVEL_ROOT_M`),
+    # measured on her files (2026-11-20)
+    TARTANE: (0.902, 0.0),
+    COASTGUARD_TARTANE: (0.902, 0.0),
 }
 # The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
 # the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
@@ -1328,6 +1337,13 @@ LEVEL_ROOT_M = {
     CUTTER: (2.44, 2.81, 2.42),
     LUGGER: (2.83, 2.83, 2.79),
     SMACK: (2.22, 2.60, 2.37),
+    # package 90, the tartane (measured on her files, 2026-11-20): her éperon's end 2.85 m above her
+    # water, under the top of her bow rail at the stem, 3.67, where the rule roots it; the sheet's
+    # height her beak's middle line, level at 2.85 m on Chapman's plate (pages-tartane.md §5.4).
+    # Her beak stands under her bow rail, not over it, so that the rule's root is 0.82 m above her
+    # sheet's: recorded, for the viewer (her report)
+    TARTANE: (3.67, 3.67, 2.85),
+    COASTGUARD_TARTANE: (3.67, 3.67, 2.85),
 }
 
 
@@ -1634,15 +1650,21 @@ WALE_UNREAD = {NEUFCHATEL}
 # scrollwork, not a gallery (Bil-D §3.2, "Carving and paint in words"), so that she files
 # `lights_m` and no `galleries_m`. Her round stern, as the lugger's, has no transom.
 LIT_WITH_NO_GALLERY = {BILANDER}
+# The tartane (package 90): Chapman's Pl. LVII No. 16, her lines, draws a sharp stern, the planking
+# closing on a raked post with no transom, no counter, no gallery and no light (pages-tartane.md
+# §5.5, read), so that her files file a round stern with no `lights_m` and no `galleries_m`, as the
+# lugger's; the trader, no war tartane, files no ports, so no band (the guarda-costa's four a side
+# make hers)
+SHARP_STERNED = set(TARTANES)
 # a ship's boat (package 82: her drawing by rule) has no gallery, no stern light, no head
 # and no ports, a square transom and a rubbing strake for her wale
 RIGHTLY_WITHOUT = {
-    "gallery": NO_GALLERY_OR_LIGHT | LIT_WITH_NO_GALLERY | set(BOATS),
-    "light": NO_GALLERY_OR_LIGHT | set(BOATS),
+    "gallery": NO_GALLERY_OR_LIGHT | LIT_WITH_NO_GALLERY | SHARP_STERNED | set(BOATS),
+    "light": NO_GALLERY_OR_LIGHT | SHARP_STERNED | set(BOATS),
     "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
-    "transom": {LUGGER, BILANDER},
+    "transom": {LUGGER, BILANDER} | SHARP_STERNED,
     "wale": {SCHOONER, PRIVATEER} | WALE_UNREAD,
-    "band": {LUGGER, SMACK} | set(BOATS),
+    "band": {LUGGER, SMACK, TARTANE} | set(BOATS),
 }
 # The *Neufchatel*'s stem meets her water at her rabbet's x, 16.35 m, where her `breadth_m` gives
 # the stem's siding at the water, 0.14 m (Neuf-D §3.2), so that her last station stands on her
@@ -2543,6 +2565,10 @@ TIERS_IN_THE_SIDE = {
     NEUFCHATEL: {"upper"},
     BILANDER: {"upper"},
     SEVENTY_FOUR: {"lower", "upper", "quarterdeck"},
+    # package 90 (measured on her files, 2026-11-20): the trader files no ports; the guarda-costa's
+    # four a side are cut in her waist bulwark, each port's middle under her rail
+    TARTANE: set(),
+    COASTGUARD_TARTANE: {"upper"},
 }
 
 
@@ -2588,6 +2614,10 @@ CHORD_OFF_THE_SIDE_M = {
     NEUFCHATEL: 0.001,
     BILANDER: 0.103,
     SEVENTY_FOUR: 0.089,
+    # package 90, the tartane, her wale and (the guarda-costa's) her port band: measured on her
+    # files (2026-11-20)
+    TARTANE: 0.032,
+    COASTGUARD_TARTANE: 0.032,
 }
 BANDS = """
     const H = P.formHull(d.hull);
@@ -3775,7 +3805,9 @@ def test_the_frame_holds_the_yards_under_the_bowsprit_across_states(tmp_path, fa
 
 
 @needs_node
-@pytest.mark.parametrize("path", [p for p in PROFILED if p not in (CUTTER, LUGGER, SMACK)])
+@pytest.mark.parametrize(
+    "path", [p for p in PROFILED if p not in (CUTTER, LUGGER, SMACK, *TARTANES)]
+)
 def test_on_a_hull_drawn_from_her_profile_the_yards_hang_from_the_bowsprit_as_it_stands(
     tmp_path, path
 ):
@@ -3785,7 +3817,8 @@ def test_on_a_hull_drawn_from_her_profile_the_yards_hang_from_the_bowsprit_as_it
     jib-boom as they stand (`with_sprit_yards`) hang exactly as far under the drawn spars as
     they were cut, at their own stations; the spritsail's foot a metre above the water, the
     sprit topsail's clews at the spritsail yard's arms, the braces up to her fore top: every file
-    with a jib-boom (the cutter, the lugger and the smack carry none)."""
+    with a jib-boom (the cutter, the lugger and the smack carry none, nor the tartane, whose éperon
+    carries the berthelot alone: Design-Ship-Tartane.md §4.3)."""
     graph = with_sprit_yards(path)
     got = run_js(tmp_path, {"graph": graph}, SPRIT_FIGURES)
     deck = graph["hull"]["deck_height_m"]
@@ -4464,8 +4497,9 @@ BOOM_SAIL = {
 }
 # The files with no boom, so no gaff sail on one: the lugger's lugs, and the bilander's settee on
 # her main and her square sails and staysails (package 75, B4), each sheeted to the rail, a block
-# or the yard below
-NO_BOOM = {LUGGER, BILANDER}
+# or the yard below; and the tartane's two whole lateens, her square sails and her jib (package
+# 90), none on a boom (Design-Ship-Tartane.md §4)
+NO_BOOM = {LUGGER, BILANDER, *TARTANES}
 # Across those states the frame itself is one on every file but the smack's: the top of it there
 # is her gaff's peak as that stands sheeted, 0.09 m higher at 85 degrees heeled 0.3 rad. A gaff's,
 # and no boom's, and as before her lines: recorded.
@@ -5965,6 +5999,14 @@ LINES_ON_THE_RAIL[BILANDER] = both_sides(
 )
 # a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
 LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
+# package 90, the tartane (measured on her files, 2026-11-20): her jib's sheets and her two whole
+# lateens' one sheet each; her topsail's sheets to the tréou's yard's arms
+LINES_ON_THE_RAIL.update(
+    {
+        tartane: both_sides("jib.sheet") | {"main.lateen.sheet", "mizzen.lateen.sheet"}
+        for tartane in TARTANES
+    }
+)
 # The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
 # the razee's are cut from their files' corners, their tacks on the bowsprit's collar.
 STEM_TACKED = {
@@ -5981,6 +6023,10 @@ STEM_TACKED = {
     NEUFCHATEL: {"fore.staysail", "fore.storm_staysail"},  # her storm jib on the jib stay
     BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
     SEVENTY_FOUR: set(),  # cut from her file's corners, as the 64's (package 75, B7)
+    # package 90, the tartane: her jib and her storm jib cut from her file's corners, their tacks at
+    # the berthelot's end (Design-Ship-Tartane.md §4.3), as the 64's
+    TARTANE: set(),
+    COASTGUARD_TARTANE: set(),
 }
 # A recorded departure (package 75, B2, for the lead): how far a head sail's tack on a stay to the
 # stem stands off the top of her side, where it is more than 5 cm. The *Neufchatel*'s stem head,

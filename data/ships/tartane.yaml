@@ -233,15 +233,16 @@ sails:
   corners_m: [[10.38, 3.56], [10.38, 3.86], [-5.55, 14.75], [5.07, 0.96]]
   bent: false
   in_place_of: main.lateen
-# the storm jib, two-thirds of the jib (Steel 1794 p. 190, the sloop's), the cutter's pattern (JUDGEMENT, Tar-D §4.3); in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
+# the storm jib, two-thirds of the jib (Steel 1794 p. 190, the sloop's), the cutter's pattern (JUDGEMENT, Tar-D §4.3), cut alike on the jib's stay about its tack at the berthelot's end; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_jib
   class: jibheaded
   stay: jib.stay
   area_m2: 23
-  x_m: 8.09
-  centre_height_m: 3.8
+  x_m: 9.17
+  centre_height_m: 4.0
   canvas_no: 1
   cloth_rating_kn: 21.1
+  corners_m: [[13.99, 2.31], [6.97, 6.47], [6.56, 1.59]]
   bent: false
   in_place_of: jib
 lines:

@@ -893,6 +893,12 @@ def jib_cut(m: dict[str, Mast]) -> dict:
     cx = tack[0] - foot
     clew = (cx, deck_at(cx) + JIB_CLEW_ABOVE_DECK)
     centre = ((tack[0] + head[0] + clew[0]) / 3.0, (tack[1] + head[1] + clew[1]) / 3.0)
+    # the storm jib on the same stay and tack, cut alike about its tack to two-thirds the area
+    k = math.sqrt(STORM_JIB_SHARE)
+    storm = [
+        tack,
+        *((tack[0] + k * (p[0] - tack[0]), tack[1] + k * (p[1] - tack[1])) for p in (head, clew)),
+    ]
     return {
         "corners": [tack, head, clew],
         "area": area,
@@ -902,6 +908,8 @@ def jib_cut(m: dict[str, Mast]) -> dict:
         "foot": foot,
         "leech": leech,
         "storm": STORM_JIB_SHARE * area,
+        "storm_corners": storm,
+        "storm_centre": (sum(p[0] for p in storm) / 3.0, sum(p[1] for p in storm) / 3.0),
     }
 
 
@@ -1393,15 +1401,16 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         "jibheaded",
         stay="jib.stay",
         area_m2=storm,
-        x_m=cm(jib["centre"][0]),
-        centre_height_m=round(jib["centre"][1] * 0.9, 1),
+        x_m=cm(jib["storm_centre"][0]),
+        centre_height_m=round(jib["storm_centre"][1], 1),
         canvas_no=CANVAS["storm jib"][0],
         cloth_rating_kn=g.storm_cloth(storm),
+        corners_m=written(jib["storm_corners"]),
         bent=False,
         in_place_of="jib",
         note="the storm jib, two-thirds of the jib (Steel 1794 p. 190, the sloop's), the "
-        "cutter's pattern (JUDGEMENT, Tar-D §4.3); in the sail room."
-        + g.canvas_note(CANVAS["storm jib"], storm=True),
+        "cutter's pattern (JUDGEMENT, Tar-D §4.3), cut alike on the jib's stay about its tack at "
+        "the berthelot's end; in the sail room." + g.canvas_note(CANVAS["storm jib"], storm=True),
     )
     # -- their lines ---------------------------------------------------------------------
     lateen_lines(b, "main")

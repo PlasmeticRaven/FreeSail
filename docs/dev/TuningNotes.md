@@ -38669,3 +38669,33 @@ Her drawn displacement (143 t against the filed 142), her ports' gaps and every 
 - the stern painted from abaft, which wants a transom or a light: a round stern with no lights has neither.
 
 They are listed by case in her report for the coordinating session. The viewer's V1 draws the whole lateen (her design's §10), and its rows for her files are its own to measure.
+
+### The viewer's cases on her files (the coordinating session's widening, the lead's nudge 32, item 1)
+
+`tests/test_view_geometry.py` was widened to her builder for her rows: "as every hull's builder must at her file". Of its 44 cases that failed on her two files at ecf6180, 28 now pass and 16 remain.
+
+**Her rows, each measured by the file's own probes on her files** (`SPARS_DRAWN`, `FACES_SEEN`, `BANDS`, `LINE_ENDS`, run through the test module's helpers):
+
+| Table | Her row | Note |
+|---|---|---|
+| `BOWSPRIT_DRAWN` | (0.902, 0.0) each | her éperon drawn level from her rail at the stem |
+| `LEVEL_ROOT_M` | (3.67, 3.67, 2.85) each | the root drawn at her bow rail's top at the stem; the stem head's height by the rule, the same; the sheet's height her beak's middle line, level at 2.85 m on Chapman's plate (Pages §5.4). The case's check that the root stands within 0.15 m of the sheet's height fails by 0.82 m: her beak runs under her bow rail, not over it. Recorded, not tuned; for the viewer |
+| `TIERS_IN_THE_SIDE` | the trader none; the guarda-costa `{"upper"}` | the four ports a side cut in her waist bulwark, each port's middle under her rail |
+| `CHORD_OFF_THE_SIDE_M` | 0.032 each | her wale, and the guarda-costa's port band |
+| `LINES_ON_THE_RAIL` | each: the jib's two sheets, `main.lateen.sheet`, `mizzen.lateen.sheet` | the lines the viewer brings down to her rail; her topsail's sheets go to the tréou's yard's arms |
+| `STEM_TACKED` | `set()` each | her jib and her storm jib cut from her file's corners, their tacks at the berthelot's end, as the 64's head sails are |
+
+**Her parts she has none of, each a named row with its reason, as `RIGHTLY_WITHOUT` has them:**
+- `SHARP_STERNED`, her two files: Chapman's Pl. LVII No. 16 draws a sharp stern, the planking closing on a raked post with no transom, counter, gallery or light (Pages §5.5, read). Her files are in `RIGHTLY_WITHOUT`'s gallery, light and transom rows and kept from the transom's case, as the lugger's and the bilander's round sterns are. The trader alone is in its band row, since she files no ports.
+- `NO_BOOM`: her two files. Her whole lateens, her square sails and her jib are on no boom.
+- The yards under the bowsprit's case: her two files are kept from it beside the cutter, the lugger and the smack. Her éperon carries the berthelot and no jib-boom (her design's §4.3).
+
+**Shown, with a throwaway file never committed** (`data/ships/zz-forgetful.yaml`, a copy of hers, deleted after): a hull these rows do not name fails all 22 of the cases that failed on her files before them. That includes the stern's, the boom's and the jib-boom's cases. The rows pass her files by name and nothing that merely leaves a part out.
+
+**Mended in her own file, found by the stem-stay case:** her storm jib had no corners, so the viewer cut it on her jib's stay, which it lands on her stem head. Its tack then stood 0.53 m off her side, 8% up the stay. Her storm jib is two-thirds of her jib on the same stay with the same tack (Steel 1794 p. 190), so it now files its corners, cut alike about the jib's tack at the berthelot's end, its centre theirs. No other figure moved, and the eighteen files are byte for byte.
+
+**The 16 that remain, each for the viewer.** The first three groups want its drawing of a whole lateen with its cut (V1, her design's §10), which no committed file carried before:
+- **Her great lateen's one sheet** (12 cases: `test_each_line_that_comes_down_ends_on_her_drawn_rail` and `test_with_no_profile_the_lines_come_down_as_before`, four each, and `test_the_lines_come_down_on_the_rail_as_the_game_serves_her`, two). The viewer draws a whole lateen with its corners as a standing lug, and so leads its sheet to the rail a metre abaft the clew. The case's rule for a lateen is two metres, a lug's one. Which is a whole lateen's lead is V1's to draw.
+- **The fixed frame across states** (2 cases, `test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number`): dressed, her great yard's penne stands 0.15 m over the frame's top. The lugger's lugs, drawn by the same cut, stand over it too (`OVER_THE_FRAME`).
+- **Her head inside the frame across states** (2 cases, `test_the_head_and_the_galleries_stay_inside_the_fixed_frame_across_states`): furled, the viewer lays her yard and sail on deck as a lowered lug's, and so her bounds move from furled to set. A whole lateen's yard stays aloft when its sail is furled (her design's §5.4 item 7).
+- **Her beak's root** (2 cases, `test_a_level_bowsprit_is_rooted_at_the_rail_at_the_stem_beside_its_sheets_height`): the level spar's rule roots it at the rail, 0.82 m over her beak (above). This is not V1's, but the viewer's rule for a level spar, which a beak under the bow rail does not fit.
