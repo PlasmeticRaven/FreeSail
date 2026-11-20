@@ -290,6 +290,11 @@ class Sail(Part):
     # drawn for a polar). On the lee side it stands clear of the mast; on the weather side,
     # after a tack with no dip, it lies against the mast and draws badly
     # (`physics.sails.LUG_AGAINST_MAST_AREA`) until it is dipped (dip_lug.yaml).
+    # Package 90's stage 0L (docs/design/Plan-Package90.md §5.2): a whole lateen with
+    # `dipping` (class lateen, not cut at the mast) keeps its side here as a dipping lug does,
+    # the same plain default, saved with the sail as every sail's is. Nothing gives a lateen a
+    # side until the engine's step A1a (`set_lateen`'s finding of it), so until then it is
+    # None and the sail draws as it did without the key.
     dipping: bool = False
     lug_side: str | None = None
     # Package 57: a sail set flying (the lug topsails, the royals of 1794): furled, it is on
