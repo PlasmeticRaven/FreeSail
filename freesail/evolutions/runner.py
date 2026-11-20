@@ -101,6 +101,7 @@ from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
     HELM_MANOEUVRES,
+    LATEEN_ABACK_WAITS_WORDS,
     SCRIPTS,
     Script,
     _world_of,
@@ -108,6 +109,7 @@ from freesail.evolutions.scripts import (
     helm_words,
     keep_full_and_by,
     keep_lying_to,
+    lateen_take_in_waits,
     lying_to_hands_off,
 )
 from freesail.ship.graph import Ship
@@ -448,6 +450,13 @@ class Runner:
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
         if reason is not None:
             raise OrderError(reason)
+        if lateen_take_in_waits(ship, evo.verb, subject):
+            # a whole lateen aback in a strong wind will not come in till she pays off (package
+            # 90, A1d): the work waits, and begins when it fills or is drawn over
+            self.instances.append(inst)
+            words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
+            ship.note("notable", "evolution.waiting", words, sid)  # said once, at the order
+            return words
         self.instances.append(inst)
         if not self._begin(ship, inst):
             return inst.wait_line
@@ -1100,8 +1109,8 @@ class Runner:
                 )
                 for other in self.instances
             )
-            if busy:
-                continue
+            if busy or lateen_take_in_waits(ship, inst.evo.verb, inst.subject):
+                continue  # a whole lateen aback in a strong wind waits too (package 90, A1d)
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
                 if inst.done_already:

@@ -30,7 +30,9 @@ from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
 from freesail.evolutions import scripts
+from freesail.evolutions import trim as yard_trim
 from freesail.orders import navigation
+from freesail.physics import sails as P
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import SailState
 from freesail.world import captains as C
@@ -273,7 +275,9 @@ def test_the_stern_watch_says_a_lateen_left_on_its_mast_by_a_gybe(xebec):
 
 def test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through_the_bow(xebec):
     """A shift of wind through her bow outside a manoeuvre: one line, once, a point past dead
-    ahead (the stern watch heard only a gybe)."""
+    ahead (the stern watch heard only a gybe). Since A1d the lateens are held aback there, their
+    cloth on the side the wind has come round onto (Design-Package90-Engine.md §2.4.3a's words);
+    A1a's line said "lie on their masts", the cloth then blown over to the deck's lee."""
     world = _from(xebec)
     n0 = len(world.log.all())
     _shift_the_wind(world, -8.0)
@@ -281,7 +285,7 @@ def test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert [e.text for e in said] == [
         "The wind has come round ahead to the larboard bow: the foresail and the mizen and the "
-        "mainsail lie on their masts; shift them when you will."
+        "mainsail are aback against their masts; shift them when you will."
     ]
 
 
@@ -1037,3 +1041,172 @@ def test_the_rules_captains_lateen_keys_are_in_no_committed_book(path):
     text = Path(path).read_text(encoding="utf-8")
     assert "lateen_leave_kn" not in text and "bad_hand_s" not in text
     assert (C.LATEEN_LEAVE_KN, C.BAD_HAND_S) == (12.0, 1800)
+
+
+# ---------------------------------------------------------------------------
+# Taken aback, and the bad hand, in a breeze (A1d)
+# ---------------------------------------------------------------------------
+
+
+def _lateen_loads(world, sid: str) -> tuple[float, float, float]:
+    """A lateen's own pull (its cloth's load), and its yard's and its mast's loads, this tick."""
+    ship = world.ship
+    sail = ship.sails[sid]
+    return sail.load_kn, ship.yard_of(sail).load_kn, ship.mast_of(sail).load_kn
+
+
+def test_a_lateen_is_held_aback_by_a_shift_through_the_bow_and_strains_its_yard_two_and_a_half_fold(
+    xebec,
+):
+    """The rule of force (Eng §2.4.3): the wind come round ahead onto the side its cloth lies on,
+    its sheet's side is the weather side and it stands aback against its mast; its pull on its
+    yard is `LATEEN_ABACK_LOAD` (2.5) times its own, its cloth and lines the plain pull. The
+    mizen's mast carries only its lateen, so its load is the yard's."""
+    world = _from(xebec)
+    _shift_the_wind(world, -8.0)
+    world.run(30)
+    ship = world.ship
+    mizen = ship.sails["mizzen.lateen"]
+    assert yard_trim.read_sheet(ship, mizen).held_to_windward and mizen.backed
+    cloth, yard, mast = _lateen_loads(world, "mizzen.lateen")
+    assert cloth > 0.5
+    assert yard == pytest.approx(P.LATEEN_ABACK_LOAD * cloth, rel=1e-9)
+    assert mast == pytest.approx(yard, rel=1e-9)
+    assert P.LATEEN_ABACK_LOAD == 2.5 and P.LATEEN_BAD_HAND_LOAD == 2.5
+
+
+def test_in_the_luffing_band_a_lateen_shakes_and_is_not_held(xebec):
+    """With her head luffed inside its sheet's angle and the wind still on the far bow, a lateen
+    lifts and shakes, as before A1d, and is not held: it is pressed only once the wind has
+    crossed (Eng §2.4.3)."""
+    world = _from(xebec)
+    world.submit("steer 330")  # luffed to within a point and a half of the wind, not through it
+    world.run(60)
+    ship = world.ship
+    assert ship.dyn.apparent_wind_angle > 0.0  # the wind still on her starboard bow
+    for sid in XEBEC_LATEENS:
+        assert not yard_trim.read_sheet(ship, ship.sails[sid]).held_to_windward
+        cloth, yard, _mast = _lateen_loads(world, sid)
+        assert yard == pytest.approx(cloth, rel=1e-9)  # no factor: on the good hand, not held
+
+
+def test_through_the_stern_the_cloth_goes_over_against_its_mast_on_the_bad_hand(xebec):
+    """Abaft the beam the wind carries the cloth over to leeward against its mast, its sheet with
+    it, as a gybe does (Eng §2.4.3): the bad hand of A1a, not aback; its pull on its yard
+    `LATEEN_BAD_HAND_LOAD` times its own, at the lug's two-thirds of its cloth."""
+    world = _from(xebec)
+    world.submit("steer 135")  # across the wind by the stern: she gybes by the helm
+    world.run(240)
+    ship = world.ship
+    lee = "starboard" if ship.dyn.apparent_wind_angle < 0.0 else "larboard"
+    for sid in XEBEC_LATEENS:
+        sail = ship.sails[sid]
+        reading = yard_trim.read_sheet(ship, sail)
+        assert not reading.held_to_windward and not sail.backed
+        assert sail.lug_side != lee and P.against_the_mast(sail, reading.side)
+        (sheet,) = ship.sheets_of(sail)
+        assert sheet.held_side == lee
+        cloth, yard, _mast = _lateen_loads(world, sid)
+        assert yard == pytest.approx(P.LATEEN_BAD_HAND_LOAD * cloth, rel=1e-9)
+
+
+def test_a_whole_lateens_sheet_keeps_the_side_it_is_drawn_to_and_no_other_sail_does(xebec):
+    """`set_sheet_angle` keeps a whole lateen's drawn side, the lee included (Eng §2.4.3), so
+    that the wind come round ahead holds it there; a jib-headed sail's single sheet is held only
+    off the lee, as it always was. No sail of a committed file keeps its side."""
+    world = _from(xebec)
+    ship = world.ship
+    main = ship.sails["main.lateen"]
+    yard_trim.set_sheet_angle(ship, main, main.sheet_angle, None)
+    (sheet,) = ship.sheets_of(main)
+    assert sheet.held_side == "larboard"  # the lee, kept
+    jib = ship.sails["jib"]
+    yard_trim.set_sheet_angle(ship, jib, jib.sheet_angle, None)
+    assert all(ln.held_side is None for ln in ship.sheets_of(jib))
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        assert not any(yard_trim.keeps_its_side(sl) for sl in load_ship(path).sails.values()), path
+
+
+def test_at_let_go_and_haul_the_lateens_left_are_drawn_over_and_filled_on_the_bad_hand(xebec):
+    """The evolution's part (Eng §2.4.3a): through the wind her lateens lie aback against their
+    masts; at "let go and haul" each still set is drawn over to the new lee with the head
+    sheets, and those left fill on the bad hand, the line saying so; none is aback after."""
+    world = _from(xebec)
+    n0 = len(world.log.all())
+    world.submit("tack ship and leave the lateens")
+    world.run(300)
+    ship = world.ship
+    steps = [e.text for e in _after(world, n0) if e.kind == "evolution.step"]
+    assert "Draw jib; trim aft the head sheets; draw the lateens on their masts." in steps
+    assert ship.dyn.tack == "larboard"
+    for sid in XEBEC_LATEENS:
+        sail = ship.sails[sid]
+        reading = yard_trim.read_sheet(ship, sail)
+        assert not reading.held_to_windward and not sail.backed
+        assert P.against_the_mast(sail, reading.side)
+
+
+def test_with_the_wind_aft_the_lateens_left_go_over_against_their_masts_and_none_is_aback(xebec):
+    """In the wear, at "wind aft", each lateen left goes over against its mast with the other
+    sheets, and the line says so; a wear never holds one aback (Eng §2.4.3a)."""
+    world = _from(xebec)
+    n0 = len(world.log.all())
+    world.submit("wear ship and leave the lateens")
+    backed = 0
+    for _ in range(600):
+        world.tick()
+        backed += any(world.ship.sails[sid].backed for sid in XEBEC_LATEENS)
+    lines = [e.text for e in _after(world, n0) if e.kind == "evolution.step"]
+    assert any(
+        x.startswith("Wind aft. Shifted over the sheets; the lateens over against their masts")
+        for x in lines
+    ), lines
+    assert backed == 0 and world.ship.dyn.tack == "larboard"
+
+
+def test_a_take_in_waits_while_the_lateen_is_aback_in_a_strong_wind(xebec_in_a_breeze):
+    """`take in the mainsail` begun while it is aback over `LATEEN_TACK_KN` waits, said once in
+    Forfait's words, and goes on when it fills (Eng §2.4.3): she pays off, her head falls away
+    till the wind is abaft the beam, and the cloth goes over; brailed up then, in its gear.
+    Measured, seed 7, 25 kn: aback at the order, filled and begun 35 s after it."""
+    world = _from(xebec_in_a_breeze)
+    _shift_the_wind(world, -8.0)
+    world.run(30)
+    ship = world.ship
+    main = ship.sails["main.lateen"]
+    assert scripts.lateen_aback(ship, main)
+    n0 = len(world.log.all())
+    assert world.submit("take in the mainsail").kind == "order.accepted"
+    world.run(3)
+    (inst,) = [i for i in ship.extra["evolutions"].instances if i.evo.id == "take_in_lateen"]
+    assert inst.waiting and main.is_set
+    waited = [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    assert waited == [
+        "The mainsail is aback against the mast; it will not come in till she pays off."
+    ]
+    for _ in range(300):
+        world.tick()
+        if not inst.waiting:
+            break
+    assert not inst.waiting and not scripts.lateen_aback(ship, main)
+    world.run(200)
+    assert main.state is SailState.IN_THE_GEAR
+    assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == waited
+
+
+def test_hung_in_stays_the_aftermost_lateen_is_eased_and_not_hauled_over(xebec):
+    """Hung in stays (`_hang`), a whole lateen on her aftermost mast cannot be hauled over its
+    mast to windward as a boom is: its sheet is eased on the old lee till "let go and haul",
+    and the line says so (Eng §2.4.3a)."""
+    world = _from(xebec)
+    world.submit("tack ship")
+    (inst,) = [i for i in world.ship.extra["evolutions"].instances if i.evo.id == "tack"]
+    world.tick()
+    tack = inst.script
+    tack._hang()
+    ship = world.ship
+    mizen = ship.sails["mizzen.lateen"]
+    (sheet,) = ship.sheets_of(mizen)
+    assert sheet.held_side == tack.old_side(weather=False)
+    said = [n[2] for n in ship.notes if n[1] == "helm.order"][-1]
+    assert "the mizen sheet eased" in said and "mizen hauled over" not in said

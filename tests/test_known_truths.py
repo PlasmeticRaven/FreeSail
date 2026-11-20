@@ -23385,3 +23385,150 @@ def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
         {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
     )
     assert D.budget_of(w).acts == before + 1
+
+
+# ---------------------------------------------------------------------------
+# Package 90, A1d: a whole lateen aback, and on the bad hand, in a breeze (truths 7-670 to 7-672)
+# ---------------------------------------------------------------------------
+# The owner's decision of 2026-11-18: "A lateen taken aback should increase the strain on the
+# mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may
+# strain the mast and, in high enough wind, risk damage." The lead's figures, ruled (nudge 18 and
+# 22): aback a great yard strains from about 28 kn and may carry away from about 35; on the bad
+# hand from about 40 and 49; the rules captain's board under 12 kn under a fifth of the rating.
+# docs/design/Design-Package90-Engine.md §2.4.3 and §2.2b. On the probes of `tests/rig_fixtures.py`
+# with `dipping` on each whole lateen (no committed file carries one), their lateen yards and masts
+# rated by the generator's rule (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`:
+# a lower yard for its own sail, a lower mast for every sail on it), as the design measured them.
+# Seed 7, a steady northerly, the starboard tack 67.5 degrees off under plain sail trimmed,
+# settled 600 s. "Strains" is a load over the rating (`physics/strain.py`: wear over 1.0), "may
+# carry away" over one and a half times it (a chance at every substep over `CARRY_AWAY_RATIO`).
+
+
+def _a1d_probe(doc_fn, knots: float, tmp_path: Path):
+    """A lateen probe settled in `knots`, its lateen yards and masts rated by the generator's
+    rule; the World and those spars."""
+    from rig_fixtures import write_ship
+
+    from tools.gen_ships import DESIGN_WIND_KN, design_kn
+
+    doc = doc_fn()
+    for s in doc["sails"]:
+        if s.get("class") == "lateen" and not s.get("cut_at_mast"):
+            s["dipping"] = True
+    path = write_ship(doc, tmp_path, f"{doc_fn.__name__}-{knots:g}")
+    world = make_world(
+        7,
+        path,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=knots,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=292.5,
+            ship_speed_kn=5.0,
+        ),
+    )
+    ship = world.ship
+    spars = []
+    for sl in ship.sails.values():
+        if sl.cls != "lateen":
+            continue
+        yard, mast = ship.yard_of(sl), ship.mast_of(sl)
+        on_mast = [s for s in ship.sails.values() if ship.mast_of(s) is mast]
+        lower = DESIGN_WIND_KN["lower"]
+        yard.rating_kn = float(design_kn([(sl.area_m2, sl.centre_height_m, sl.curve_class)], lower))
+        mast.rating_kn = float(
+            design_kn([(s.area_m2, s.centre_height_m, s.curve_class) for s in on_mast], lower)
+        )
+        spars += [yard, mast]
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 0 and i > 240:
+            world.submit("trim sails")
+        world.tick()
+    return world, spars
+
+
+def _a1d_peaks(world, spars, seconds: int) -> tuple[dict[str, float], int]:
+    """Each spar's peak load over its rating, and the seconds a lateen stood aback."""
+    peak = {sp.id: 0.0 for sp in spars}
+    aback = 0
+    for _ in range(seconds):
+        world.tick()
+        for sp in spars:
+            peak[sp.id] = max(peak[sp.id], sp.load_kn / sp.rating_kn)
+        aback += any(sl.backed for sl in world.ship.sails.values() if sl.cls == "lateen")
+    return peak, aback
+
+
+def _a1d_on_the_bad_hand(world) -> None:
+    """Every lateen's yard on the weather side of its mast, its cloth drawn round to leeward."""
+    from freesail.evolutions import trim as yard_trim
+
+    ship = world.ship
+    for sl in ship.sails.values():
+        if sl.cls == "lateen":
+            sl.lug_side = "starboard"  # the starboard tack: the weather side
+            yard_trim.set_sheet_angle(ship, sl, sl.sheet_angle, "larboard")
+
+
+def test_truth_7_670_a_great_lateen_taken_aback_strains_from_about_28_kn_and_risks_it_from_35(
+    tmp_path,
+):
+    """The tartane probe's great lateen taken aback by a shift with her way on (the wind come 20
+    degrees on her other bow, 120 s, nobody shifting it): under its yard's rating in 26 kn,
+    strained in 31 and not at risk, over one and a half times it in 38 (measured: 0.94 in 28,
+    1.26 in 31, 1.46 in 34, 1.71 in 37); its mast, carrying her topsail and head sails too, rated
+    higher and under its rating in 31. Her mizen's mast carries only its lateen and strains with
+    its yard, by the owner's words."""
+    from rig_fixtures import tartane_probe_doc
+
+    peaks = {}
+    for knots in (26.0, 31.0, 38.0):
+        world, spars = _a1d_probe(tartane_probe_doc, knots, tmp_path)
+        wind = world.wind
+        wind.follow(units.wrap_2pi(wind.base_direction - math.radians(87.5)), wind.base_speed)
+        world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+        peaks[knots], aback = _a1d_peaks(world, spars, 120)
+        assert aback >= 10  # held aback, its cloth on the mast ("taken aback" after 10 s)
+    yard = [peaks[k]["main.lateen_yard"] for k in (26.0, 31.0, 38.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+    assert peaks[31.0]["main.mast"] < 1.0, peaks
+    for k in peaks:
+        assert peaks[k]["mizzen.mast"] == pytest.approx(peaks[k]["mizzen.lateen_yard"])
+
+
+def test_truth_7_671_a_lateen_on_the_bad_hand_strains_from_about_40_kn_and_risks_it_from_49(
+    tmp_path,
+):
+    """The polacre probe close-hauled with both lateens on the bad hand, each yard on the weather
+    side of its mast and its cloth drawn round to leeward (300 s): her fore lateen yard under its
+    rating in 38 kn, strained in 45 and not at risk, over one and a half times it in 52 (measured:
+    0.95 in 42, 1.37 in 46, 1.59 in 50), and never aback."""
+    from rig_fixtures import polacre_probe_doc
+
+    peaks = {}
+    for knots in (38.0, 45.0, 52.0):
+        world, spars = _a1d_probe(polacre_probe_doc, knots, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks[knots], aback = _a1d_peaks(world, spars, 300)
+        assert aback == 0
+    yard = [peaks[k]["fore.lateen_yard"] for k in (38.0, 45.0, 52.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+
+
+def test_truth_7_672_the_rules_captains_board_on_the_bad_hand_under_12_kn_is_under_a_fifth(
+    tmp_path,
+):
+    """The rules captain lies on the bad hand only by choice under 12 kn, for no more than a board
+    of 1,800 s (truth of A1c's keys): so lying, each lateen yard and mast of the tartane and the
+    polacre probes stays under a fifth of its rating (measured: 0.12 and 0.10 the tartane's, 0.08
+    and 0.10 the polacre's), and under its rating a part loses nothing."""
+    from rig_fixtures import polacre_probe_doc, tartane_probe_doc
+
+    for doc_fn in (tartane_probe_doc, polacre_probe_doc):
+        world, spars = _a1d_probe(doc_fn, 12.0, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks, aback = _a1d_peaks(world, spars, 1800)
+        assert max(peaks.values()) < 0.2 and aback == 0, (doc_fn.__name__, peaks)
+        assert all(sp.condition == 100.0 for sp in spars)  # no wear under the rating

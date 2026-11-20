@@ -134,6 +134,20 @@ RUNNING_AWA = units.deg_to_rad(150.0)  # "running": wind within 30° of dead ast
 # the cloth that the mast cuts across in the period's words, the luff in the mast's lee.
 LUG_AGAINST_MAST_AREA = 2.0 / 3.0
 
+# A whole lateen pressed on its mast (package 90, A1d; the owner's decision of 2026-11-18: "A
+# lateen taken aback should increase the strain on the mast, as a backed square sail does, so
+# that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind,
+# risk damage"; docs/design/Design-Package90-Engine.md §2.4.3, §2.2b). Its pull on each spar of
+# its chain, its yard then its mast and any spar beneath, is multiplied by these, its cloth and
+# its lines taking the plain pull: held aback, its cloth pressed on the mast and the yard bent
+# across it at its parrel (Forfait 1788 pp. 119-120); on the bad hand, against its mast at the
+# lug's two-thirds. The lead's figures, ruled (nudge 18 and 22), each JUDGEMENT: aback a great
+# yard strains from about 28 kn and may carry away from about 35; on the bad hand from about 40
+# and 49, the backed square topsail's own measured 40. `physics/strain.py` judges the load as
+# any spar's: no new kind of damage.
+LATEEN_ABACK_LOAD = 2.5
+LATEEN_BAD_HAND_LOAD = 2.5
+
 # The deck-level apparent wind is what a man on deck feels: deck plus head height.
 WIND_EYE_HEIGHT_M = 1.5
 
@@ -600,6 +614,8 @@ def _read_rig(ship: Ship) -> _Rig:
         elif sail.is_fore_and_aft:
             # the sheet holds the trim (package 32e): the sail lies where its sheets hold
             # it, and its angle reading is refreshed from them
+            if yard_trim.keeps_its_side(sail):
+                _carried_over_abaft_the_beam(ship, sail, lee)  # package 90, A1d
             reading = yard_trim.refresh_reading(ship, sail)
             side_sign = reading.side if reading.side is not None else lee
             held, flogging = reading.held_to_windward, reading.free
@@ -668,6 +684,36 @@ def _read_rig(ship: Ship) -> _Rig:
         windage_heights=heights,
         reach=_blanket_reach(ship),
     )
+
+
+def _carried_over_abaft_the_beam(ship: Ship, sail: Sail, lee: float) -> None:
+    """A whole lateen's cloth on the weather side of its mast with the wind abaft the beam is
+    carried over to leeward against the mast, its sheet with it, as a gybe carries a boom, and
+    its sheet keeps the new side (package 90, A1d; Design-Package90-Engine.md §2.4.3): the wind
+    come round ahead onto the side its cloth lies on holds it aback there; come round the stern
+    onto it, it blows it over."""
+    if abs(ship.dyn.apparent_wind_angle) <= math.pi / 2:
+        return
+    reading = yard_trim.read_sheet(ship, sail)
+    if reading.free or reading.side is None or reading.side == lee:
+        return
+    for ln in ship.sheets_of(sail):
+        if ln.side is None and ln.state is LineState.BELAYED:
+            ln.held_side = yard_trim.side_name(lee)
+
+
+def lateen_load_factor(sail: Sail, d: _Drawing | None) -> float:
+    """What a whole lateen's pull on its yard and mast is multiplied by (package 90, A1d):
+    `LATEEN_ABACK_LOAD` held aback (its sheet holding its cloth on the weather side, the wind
+    on its outer face), `LATEEN_BAD_HAND_LOAD` lying against its mast on the bad hand, else 1;
+    1 for every other sail."""
+    if d is None or not yard_trim.keeps_its_side(sail):
+        return 1.0
+    if d.held:
+        return LATEEN_ABACK_LOAD
+    if against_the_mast(sail, d.side_sign):
+        return LATEEN_BAD_HAND_LOAD
+    return 1.0
 
 
 def against_the_mast(sail: Sail, side_sign: float) -> bool:
@@ -1516,8 +1562,9 @@ def _apply_loads(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None = N
     """Put a sail's pull on its cloth, its spars and its running rigging."""
     sail.load_kn = force_kn
     path = _load_path(ship, sail)
+    on_spars = force_kn * lateen_load_factor(sail, d)  # package 90, A1d: the spars alone
     for spar in path.spars:
-        spar.load_kn += force_kn
+        spar.load_kn += on_spars
     if d is not None and d.side_sign != 0.0:
         # a fore-and-aft sail: its working sheet carries the pull, a sheet let fly nothing
         if d.working_sheet is not None:

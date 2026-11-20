@@ -424,6 +424,14 @@ class SheetReading:
     working: Line | None
 
 
+def keeps_its_side(sail: Sail) -> bool:
+    """A whole lateen (class `lateen`, `dipping`, not cut at the mast; package 90, A1d;
+    docs/design/Design-Package90-Engine.md §2.4.3): its one sheet, held to no side, holds its
+    cloth on its yard's side (`Sail.lug_side`), the mast standing between the cloth and the other
+    side, and a side its sheet is drawn to is kept, the lee included. No committed sail is one."""
+    return sail.cls == "lateen" and bool(sail.dipping) and not sail.cut_at_mast
+
+
 def lee_side_sign(ship: Ship) -> float:
     """The lee side as the deck reads the apparent wind: +1 starboard, -1 larboard."""
     return -1.0 if ship.dyn.apparent_wind_angle >= 0.0 else 1.0
@@ -473,6 +481,10 @@ def read_sheet(ship: Ship, sail: Sail) -> SheetReading:
     working = belayed[0]
     if working.held_side is not None and working.hauled > 0.0:
         side = 1.0 if working.held_side == "starboard" else -1.0
+    elif sail.lug_side is not None and working.hauled > 0.0 and keeps_its_side(sail):
+        # a whole lateen's cloth lies on its yard's side, as its mast keeps it (package 90, A1d):
+        # not blown over to the deck's lee as the wind comes round ahead, but held aback there
+        side = 1.0 if sail.lug_side == "starboard" else -1.0
     else:
         side = lee
     angle = geo.angle_from_hauled(working.hauled)
@@ -550,6 +562,10 @@ def set_sheet_angle(ship: Ship, sail: Sail, angle: float, side: str | None = Non
         lee = side_name(lee_side_sign(ship))
         weather = "larboard" if lee == "starboard" else "starboard"
         line.held_side = {None: None, "lee": None, "weather": weather, lee: None}.get(side, side)
+        if keeps_its_side(sail):
+            # a whole lateen keeps the side its sheet is drawn to, the lee included (package 90,
+            # A1d): when the wind comes round ahead onto it, it is held aback there
+            line.held_side = {None: lee, "lee": lee, "weather": weather}.get(side, side)
     else:
         for other in ship.sheets_of(sail):
             if other is not line and other.state is LineState.BELAYED:
