@@ -201,6 +201,7 @@ ADMITTED: frozenset[tuple[str, str]] = frozenset(
         ("freesail.ship.schema", "SparSpec"),
         ("freesail.ship.schema", "SpareSailSpec"),
         ("freesail.ship.schema", "StoresSpec"),
+        ("freesail.ship.schema", "SweepsSpec"),
         ("freesail.ship.stub", "PointShip"),
         ("freesail.standing.book", "Book"),
         ("freesail.standing.rules", "Clause"),

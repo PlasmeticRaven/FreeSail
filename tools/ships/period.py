@@ -161,3 +161,22 @@ LAVERY_74_CABLE_FATHOMS = 100.0
 # 455-460, the page images read row by row: Research-74-2026-10.md §4.3): the 590 column is the
 # 74's.
 REGULATIONS_COLUMNS[74] = 590
+
+# -- package 90's units (docs/design/Plan-Package90.md §5.1 item 2), for its Spanish and
+# Mediterranean hulls' modules.
+#
+# The pie de Burgos in metres, the book's own figure: 278.635 mm, half the codo real de Castilla,
+# the Spanish shipwrights' foot from the Royal Ordinance of 25 July 1750 (Winfield et al. 2023,
+# Spanish Warships in the Age of Sail, 1700-1860, pp. 41-46; set down by page in
+# docs/design/VesselReferences-2026-11-Spanish.md §7). The plan's "0.2786 m (the tree's value)",
+# held for Tofiño's tides since package 39d (docs/dev/TuningNotes.md), is the same figure to four
+# places: under a centimetre on the three-decker's 220 pies.
+PIE_DE_BURGOS_M = 0.278635
+# Forfait's pied, the pied du roi, in metres (1.066 English feet): Forfait 1788's tables are in
+# pieds, pouces and lignes (docs/design/VesselReferences-2026-10.md, "Units").
+PIED_DU_ROI_M = 0.3248
+# Winfield's metres are the game's figures for the book's rows. The book prints a Spanish row's
+# dimensions in pies with their metres beside, and a hull's constants are those metres as printed,
+# not its pies converted again (a row read in English feet is wrong by eight and a half per cent).
+# A figure measured on a Spanish plan, which gives pies alone, is converted once at
+# PIE_DE_BURGOS_M (VesselReferences-2026-11-Spanish.md, "Units" and §7).
