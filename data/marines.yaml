@@ -70,6 +70,23 @@ kits:
     soldiers: false
     boarding: 1.2
     source: "the common kit of the period's sea soldiers; judgement"
+  # package 90, N3 (docs/design/Plan-Package90.md §6; Design-Ship-Xebec.md §5, her E8): the
+  # soldiers of a Spanish ship, the xebec's King's fit's 38 among them. Read by no ship yet:
+  # a ship's kit is her nation's (`Nations.marines_kit_of`), and Spain's row in
+  # data/nations.yaml names the basic kit, as it did. The musket and the drill's figures are
+  # the basic kit's, no page in the tree giving the Spanish musket or its rate of fire.
+  spanish:
+    name: the Spanish navy's infantry and artillery
+    musket: "a musket of the common bore with its bayonet"
+    sergeant: "the pike"
+    officer: "the sword"
+    volley_s: 25
+    hit_at_50_yd: 0.04
+    tops_share: 0.2
+    tops_factor: 1.0
+    soldiers: true
+    boarding: 1.2
+    source: "the corps: the regulation of 1 January 1788's infantry and infantry-artillery in each rate's company, a corvette of 18 to 22 guns 40 and 10, a xebec with lateen sails 20 and 6 (Winfield et al. 2023, p. 1446 and following, by docs/design/VesselReferences-2026-11-Spanish.md §15); soldiers, as James has the xebec África's 38 (James vol. II p. 365, by Design-Ship-Xebec.md §8.1); the troops exercised at the musket and the great gun (Ordenanzas de Su Magestad para su Real Armada, Madrid 1748, tratado I, título III, art. XLV, p. 42) and, in action, their officer posted on the poop (tratado I, título V, art. XXXIV, p. 76), so the share aloft the basic kit's and not the French habit's; the musket, the sergeant's arm, the seconds between volleys, the hit and the boarding the basic kit's (judgement: no page in the tree gives them)"
 
 # The ship's company's small arms, served out to the boarders by the bill (spec M7 §11:
 # cutlasses, pikes, pistols, tomahawks; the Ordnance's allowance of small arms to a ship by
