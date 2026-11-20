@@ -475,10 +475,15 @@ def test_the_five_modules_follow_the_four_and_each_stub_writes_nothing(tmp_path)
         assert list(out.iterdir()) == [], name
 
 
-def test_the_lateens_cut_is_a_docstring_alone_until_the_tartanes_builder_fills_it():
+def test_the_lateens_cut_filled_by_the_tartanes_builder_has_no_build_and_no_modules_row():
+    """Stage 0 laid `lateen.py` as a docstring alone; the tartane's builder filled it (the plan's
+    §7.2), its cut held by `tests/test_tartane.py`. What stage 0 said of it stands: the hulls'
+    modules import it, it has no `build`, and `SHIP_MODULES` does not name it."""
     tree = ast.parse((ROOT / "tools" / "ships" / "lateen.py").read_text(encoding="utf-8"))
-    assert [type(n).__name__ for n in tree.body] == ["Expr"]
     assert "whole lateen's cut" in ast.get_docstring(tree)
+    names = {n.name for n in tree.body if isinstance(n, ast.FunctionDef)}
+    assert {"cut", "lines", "check"} <= names and "build" not in names
+    assert "lateen" not in _module(ROOT / "tools" / "gen_ships.py").SHIP_MODULES
 
 
 def test_period_gives_the_pie_de_burgos_and_the_pied_du_roi():
