@@ -592,13 +592,21 @@ def _heave_to(world: Any, vessel: Any, role: str, other_world: Any, hailer_world
     table = _table().get("heave_to") or {}
     nations = getattr(world, "nations", None)
     hailer_nation = _own_nation(hailer_world)
-    from freesail.world.service import KINGS, PRIVATEER, service_of
+    from freesail.world.service import KINGS, PRIVATEER, papers_service
 
     # a neutral heaves to for a King's ship or a privateer (her letter of marque carried the
-    # right to bring to and examine in war), not for a merchantman; the hailer's service by
-    # her papers, her role or her wardroom (package 121: the player's ship had counted as
-    # the navy's whatever her service)
-    hailer_navy = service_of(hailer_world) in (KINGS, PRIVATEER)
+    # right to bring to and examine in war), not for a merchantman by her papers (package
+    # 121); where her papers say nothing, her captain's role, and the player's own ship the
+    # navy's as before
+    papered = papers_service(hailer_world)
+    if papered is not None:
+        hailer_navy = papered in (KINGS, PRIVATEER)
+    else:
+        hailer_role = str(getattr(getattr(hailer_world, "captain", None), "role", "") or "")
+        hailer_navy = (
+            hailer_role in ("kings-ship", "cruiser", "commodore", "privateer")
+            or getattr(hailer_world, "parent", None) is None
+        )
     at_war = bool(nations is not None and nations.at_war(hailer_nation, str(vessel.nation)))
     if role in ("kings-ship", "cruiser", "commodore"):
         return str(table.get("declines") or "")

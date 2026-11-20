@@ -158,7 +158,7 @@ def test_the_player_struck_is_a_person_aboard_the_captor_his_station_down_and_hi
     assert out.kind == "order.rejected"
     assert "You are a prisoner aboard the Medusa; her deck is not yours" in out.text
     assert "say to the captain" in out.text
-    assert w.submit("the ship").text.startswith("The ship: The ship: Medusa")
+    assert w.submit("the ship").text.startswith("The ship: Medusa")
     assert w.submit("go to the boat").kind == "order.rejected"
     assert enemy.readings.words("prisoners").startswith("one prisoner of rank: Captain Bowen")
     # his own ship's deck from her prompt and from his ship's: a prize's
