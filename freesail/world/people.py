@@ -1498,14 +1498,21 @@ class People:
             "place": self.effective_place(p),
             "words": f"{p.name}, {self.state_words(p)}{self.keeping_words(p)}",
             "state": self.state_words(p),
-            "outline": p.outline_words(),
+            "outline": self._outline_said(p),
         }
 
     def wardroom_lines(self) -> list[str]:
         """The people with their outlines, one a line, the captain first (package 40):
         what a narrator draws on and what a model taking a station is handed."""
         self._build()
-        return [p.outline_words() for p in self.people]
+        return [self._outline_said(p) for p in self.people]
+
+    def _outline_said(self, p: Person) -> str:
+        """His outline as her service binds it: the wardroom file's citations of the
+        Regulations not said where they do not bind her (package 121)."""
+        from freesail.world.service import regulations_said
+
+        return regulations_said(self.world, p.outline_words())
 
     # -- occupying and moving ----------------------------------------------------------
 

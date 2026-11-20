@@ -23336,3 +23336,203 @@ def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
         {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
     )
     assert D.budget_of(w).acts == before + 1
+
+
+# -- package 121 (the owner's word of 2026-11-20): her service is her papers' -----------------
+# A frigate under a privateer's papers (`papers: {service: privateer}`, the harbour's "Her
+# service") read "a King's ship" to the officer of the watch and to the director: the reading
+# and the readers beside it asked her captain's role or her wardroom, never her papers. Each
+# reader now asks `service.service_of` (her papers first, then her captain's role, then her
+# wardroom); a prize-master is said by his role. Truths 7-710 to 7-714, each through the
+# scenario door.
+
+
+_ROOT_121 = Path(__file__).resolve().parents[1]
+
+
+def _papered(service=None, *, ship=None, position=None, intent=None, nation=None, **papers):
+    """The naval cruise's frigate (data/scenarios/naval-cruise.yaml) through the scenario door,
+    as the harbour's maker writes it: her papers' service given, or none; another ship file,
+    another position, an intent where named."""
+    import copy
+    import tempfile
+
+    from freesail.world.scenarios import (
+        load_scenario,
+        make_scenario_world,
+        read_scenario_text,
+        write_scenario,
+    )
+
+    text, raw = read_scenario_text(_ROOT_121 / "data" / "scenarios" / "naval-cruise.yaml")
+    raw = copy.deepcopy(raw)
+    raw["papers"] = dict(raw.get("papers") or {}, **papers)
+    if service is not None:
+        raw["papers"]["service"] = service
+    if ship is not None:
+        raw["ship"] = dict(raw["ship"], file=ship)
+    if position is not None:
+        raw["position"] = position
+        for key in ("ships", "world_orders", "orders", "standing_orders"):
+            raw.pop(key, None)
+    if intent is not None:
+        raw["intent"] = intent
+    if nation is not None:
+        raw["nation"] = nation
+    path = Path(tempfile.mkdtemp()) / "papered.yaml"
+    write_scenario(raw, path, text)
+    return make_scenario_world(load_scenario(path), seed=7)
+
+
+def _put_on_sea(w, description, name, nation, where, intent):
+    from freesail.world import ships as S
+
+    w.vessels.serial += 1
+    spec = {
+        "description": description,
+        "name": name,
+        "nation": nation,
+        "position": where.to_dict(),
+        "goal": intent,
+        "intent": intent,
+    }
+    return w.vessels.add(S.vessel_from_spec(w, spec, w.vessels.serial))
+
+
+def test_truth_7_710_her_papers_name_her_service_to_every_station_and_the_director():
+    """The owner's frigate under a privateer's papers is told as a privateer, under a merchant's
+    as a merchantman, and with none as the King's ship her wardroom makes her: at the player's
+    prompt ('the ship'), at the officer's door and at the director's alike, said once (the
+    answer had been headed twice, "The ship: The ship:"). The shipped merchant ship on the
+    frigate's file (data/scenarios/merchant-ship.yaml) is a merchantman of the United States.
+    OLD: all three "a King's ship of Britain"; the merchant ship "a ship of the American
+    navy"."""
+    from freesail.agents import tools
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    head = "The ship: Amazon, "
+    said = {
+        None: "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a King's ship of "
+        "Britain.",
+        "privateer": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a privateer "
+        "of Britain.",
+        "merchant": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a merchantman "
+        "of Britain.",
+    }
+    for service, words in said.items():
+        w = _papered(service)
+        prompt = w.submit("the ship").text
+        assert prompt.startswith(head + words), (service, prompt[:160])
+        assert "The ship: The ship:" not in prompt
+        for station in ("officer", "director"):
+            door = tools.submit_order(w, station, "the ship")
+            assert (head + words) in door and "The ship: The ship:" not in door, (station, door)
+        if service is not None:
+            assert "King's ship" not in prompt and "navy" not in prompt
+    m = make_scenario_world(
+        load_scenario(_ROOT_121 / "data" / "scenarios" / "merchant-ship.yaml"), 7
+    )
+    assert "; a merchantman of the United States." in m.submit("the ship").text
+
+
+def test_truth_7_711_a_blockade_and_the_cover_of_the_trade_are_a_king_s_ships_alone():
+    """A blockade is a public force's, and the King's ships protect the trade: the frigate under
+    French colours in Plymouth Sound, France at war with Britain, is an enemy man of war in the
+    port's offing (which keeps a squadron in ordinary there from slipping out) only as a King's
+    ship, by her wardroom (no papers) or her papers; under a privateer's or a merchant's papers
+    she is none, and a British merchant brig half a mile off her at sea is covered only by the
+    King's ship. OLD: her wardroom answered, and all four blockaded and covered."""
+    from freesail.world import regimes as REG
+    from freesail.world import squadrons as Q
+    from freesail.world.geo import destination
+
+    for service, kings in (
+        (None, True),
+        ("kings", True),
+        ("privateer", False),
+        ("merchant", False),
+    ):
+        w = _papered(service, nation="france")
+        plymouth = w.dealings.ports["plymouth"]
+        assert REG._enemy_men_of_war_near(w, plymouth, "britain", 10.0) is kings, service
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+        nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+        assert Q._covered(w, nancy) is kings, service
+
+
+def test_truth_7_712_a_free_intent_takes_her_papers_role_before_her_wardrooms():
+    """Her captain given a passage and no role sails by her papers' service: a privateer's book
+    under a privateer's papers, a merchant's under a merchant's, the King's ship's with none
+    (her wardroom, package 86). OLD: the King's ship's book under all three."""
+    roles = {None: "kings-ship", "kings": "kings-ship", "privateer": "privateer"}
+    roles["merchant"] = "merchant"
+    for service, role in roles.items():
+        w = _papered(service, intent="bound for Falmouth")
+        assert w.captain.role == role, (service, w.captain.role)
+
+
+def test_truth_7_713_she_hails_answers_and_is_obeyed_as_her_papers_say():
+    """The hail by her service: with no words, a merchantman by her papers hails 'What ship is
+    that, and whither bound?' and the rest 'What ship is that?'; hailed herself, her captain
+    with no role, she answers as her service (a privateer 'The privateer Amazon of ...'; old, as
+    a merchantman by default); and a neutral merchantman told to heave to obeys a King's ship
+    or a privateer (her letter of marque carried the right to bring to and examine in war), and
+    makes sail from a merchantman by her papers. OLD: the King's ship's hail under all; the
+    neutral obeyed her whatever her service."""
+    from freesail.world import hail as H
+    from freesail.world.geo import destination
+
+    for service, hail, obeys in (
+        (None, "What ship is that?", True),
+        ("privateer", "What ship is that?", True),
+        ("merchant", "What ship is that, and whither bound?", False),
+    ):
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        near = destination(w.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+        dane = _put_on_sea(w, "merchant brig", "Fortuna", "denmark", near, "bound for 49 0 N 8 0 W")
+        assert dane.nation == "denmark"
+        hailed = w.submit("hail the Fortuna").text
+        assert f"by the trumpet: '{hail}'" in hailed, (service, hailed)
+        demand = w.submit("say to the Fortuna: heave to").text
+        assert ("Aye aye: heaving to." in demand) is obeys, (service, demand)
+        assert ("She makes no answer but sail." in demand) is not obeys, (service, demand)
+        shadow = w.vessels.player_shadow(w)
+        own = H.answer_by_table(w, shadow, "What ship is that?", other_world=w)
+        if service == "privateer":
+            assert own.startswith("The privateer Amazon of "), own
+        elif service is None:
+            assert "His Majesty's" in own and "on the King's service" not in own, own
+
+
+def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps_her_look():
+    """No station of a ship the Regulations do not bind is told they do: the officer of the
+    watch of the frigate under a privateer's or a merchant's papers is told to report to the
+    captain 'what the officer of the watch reports to him', and with none 'what the Regulations
+    gave the lieutenant to report'; the wardroom's outlines, her people's duties from the
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout
+    sees the brig under a merchant's papers as the merchant brig, and under a privateer's as
+    the brig-sloop she looks (armed, full of men). OLD: the Regulations' words under all
+    three papers, in the brief and in the outlines; the brig under either papers the
+    brig-sloop."""
+    from freesail.agents import agent
+
+    for service, bound in ((None, True), ("privateer", False), ("merchant", False)):
+        w = _papered(service)
+        brief = agent.officer(world=w).brief
+        assert (agent.REGULATIONS_REPORT in brief) is bound, service
+        assert (agent.PLAIN_REPORT in brief) is not bound, service
+        assert "Regulations" not in brief or bound, service
+        # her people stay the frigate's file's: their duties said, the Regulations cited
+        # only where they bind her
+        captain = agent.station_outline(w, agent.CAPTAIN)
+        assert "her people and her orders are his" in captain, (service, captain)
+        assert ("the Regulations" in captain) is bound, (service, captain)
+        lines = " ".join(w.people.wardroom_lines())
+        assert ("the Regulations" in lines) is bound, service
+    looks = {None: "brig-sloop", "privateer": "brig-sloop", "merchant": "merchant brig"}
+    for service, look in looks.items():
+        w = _papered(
+            service, ship="data/ships/brig.yaml", position={"lat_deg": 49.6, "lon_deg": -5.6}
+        )
+        assert w.vessels.player_shadow(w).description == look, service
