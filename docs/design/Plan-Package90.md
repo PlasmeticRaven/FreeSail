@@ -768,7 +768,7 @@ The pictures stay outside the repository.
 | Tartane | the cutter | her tack and her wear, each with her yards shifted and with them left, the time and the ground lost beside the cutter's; the bad hand and `shift the mainsail`; `put her about` in a strong breeze, worn and the reason said; her head through the wind in a breeze and a shift that takes her aback, with A1d her great yard's and mast's strain (and on the bad hand), the take-in's wait; hove to; the tréou running; the gale's bouffette; the boat in tow |
 | Polacre | the merchant brig | the topsail and topgallant lowered "en paquet"; her tack and her wear with both lateens changed and with them left; hove to with her mizen set |
 | Xebec | the brig | her tack and her wear with the three changes, and her mizen eased as she pays off; `out sweeps` in a calm, and the men taken from the guns; the small lateens shifted in a gale; before the wind against the brig |
-| *Diana* | the frigate-36 | her captain's case (10 to 11 kn, 2 to 3 points free); her heel against the frigate's; the lee port at 21.8°; her four fits |
+| *Diana* | the frigate-36 | her captain's case (10 to 11 kn, 2 to 3 points free); her heel against the frigate's; the lee port at 21.1° (measured at step 1; 21.8° in the second draft); her four fits |
 | *Concepción* | the seventy-four | beat to quarters by three decks; the robbing; the lee ports by deck; her tack against the 74's; three of her crewed at the pace floor |
 
 ### 8.1 The tartane (Tar, Tar-D)
@@ -876,8 +876,12 @@ The pictures stay outside the repository.
   - **Her spars** by the frigate's rule (Luce's chain) on her particulars. Chapman and Steel's
     20-gun column are the checks.
   - **The load line, first.** The drawn displacement is integrated to the arrowed line and set
-    against the table's 497 t. If it misses by more than 5%, it goes to the lead before anything
-    else.
+    against the table's 497 t (498.0 t at the book's libra). If it misses by more than 5%, it goes
+    to the lead before anything else. **Done at step 1, 2026-11-20, and ruled by the lead (nudge
+    24):** the drawn line, inclined 0.46° (0.27 m of drag), is her load line; it misses the table
+    (−11.3% moulded with her keel, −6.5% to −4.9% outside a plank of 3 to 4 pulgadas, JUDGEMENT),
+    and the table was most likely reckoned on a level line at the after draught (499 t, a split of
+    1.10), so the miss is recorded and explained, not closed (`ships-design/pages-diana.md` §4).
   - **Her one fast tack**, 164 s from 295°, under truth 10's 285-s floor: to be tuned by her helm
     and rudder.
   - **The obús** of her 1817 fit, carried as a carronade.
