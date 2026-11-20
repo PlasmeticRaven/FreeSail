@@ -131,8 +131,10 @@ def hail_order(world: Any, who_words: str, words: str) -> tuple[str, str, dict[s
             f"She is beyond hail, {cables:.1f} cables off; within four cables she may be "
             "spoken by the trumpet."
         )
-    captain = getattr(world, "captain", None)
-    role = str(getattr(captain, "role", "") or "kings-ship")
+    from freesail.world.service import service_role
+
+    # her captain's role, else her service's (her papers first; package 121)
+    role = service_role(world)
     said = " ".join(str(words or "").split()).strip(" '\"") or standard_hail(role)
     tick = int(world.clock.tick)
     who = _words_for(world, vessel)
@@ -448,6 +450,12 @@ def answer_by_table(world: Any, vessel: Any, said: str, other_world: Any = None)
     role = str(getattr(brain, "role", "") or "")
     if other_world is not None:
         role = str(getattr(getattr(other_world, "captain", None), "role", "") or role)
+        if not role and getattr(other_world, "parent", None) is None:
+            # the player's own ship hailed, her captain with no role: she answers as her
+            # service (her papers first; package 121), not as a merchantman by default
+            from freesail.world.service import service_role
+
+            role = service_role(other_world)
     if not role:
         role = "merchant"
     from freesail.world.signals import colours_of
@@ -584,12 +592,13 @@ def _heave_to(world: Any, vessel: Any, role: str, other_world: Any, hailer_world
     table = _table().get("heave_to") or {}
     nations = getattr(world, "nations", None)
     hailer_nation = _own_nation(hailer_world)
-    hailer_captain = getattr(hailer_world, "captain", None)
-    hailer_role = str(getattr(hailer_captain, "role", "") or "")
-    hailer_navy = (
-        hailer_role in ("kings-ship", "cruiser", "commodore")
-        or getattr(hailer_world, "parent", None) is None
-    )
+    from freesail.world.service import KINGS, PRIVATEER, service_of
+
+    # a neutral heaves to for a King's ship or a privateer (her letter of marque carried the
+    # right to bring to and examine in war), not for a merchantman; the hailer's service by
+    # her papers, her role or her wardroom (package 121: the player's ship had counted as
+    # the navy's whatever her service)
+    hailer_navy = service_of(hailer_world) in (KINGS, PRIVATEER)
     at_war = bool(nations is not None and nations.at_war(hailer_nation, str(vessel.nation)))
     if role in ("kings-ship", "cruiser", "commodore"):
         return str(table.get("declines") or "")
