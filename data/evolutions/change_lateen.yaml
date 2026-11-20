@@ -51,4 +51,8 @@ on_complete: {log: "Shifted the {sail}; it stands to leeward of the mast.", kind
 on_fail: {log: "Could not shift the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: all hands, the forecastlemen and the afterguard first, able hands, as dip_settee's
 crew: {hands: all, rating: able, stations: [forecastle, afterguard, all hands]}
+# its seconds a metre of yard: by itself, the lugger's dip by itself (not ruled); and as a part of
+# going about, the lugger's own rate in a manoeuvre (ruled), which the tack, the wear and their kin
+# read here (`scripts.lateen_change_s_per_m`), their own files' timings untouched
+timing: {shift_s_per_m: 14.6, in_a_manoeuvre_s_per_m: 8.7}
 source: "Willaumez 1831, MUDER (the yard peaked, the car passed abaft the mast); Lescallier 1791 pp. 378-379; O'Scanlan 1831, CIMAR; dip_lug's time as a rate (judgement)"

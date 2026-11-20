@@ -46,8 +46,8 @@ from freesail.evolutions.runner import PartyTooSmall, part_name
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
+from freesail.orders.grammar import LATEEN_CLAUSE, LATEEN_OCCASION, LATEENS, Order
 from freesail.orders.grammar import SAIL_ROOM_MARK as _GRAMMAR_SAIL_ROOM_MARK
-from freesail.orders.grammar import Order
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary
 from freesail.physics.sails import BOWLINE_SLACK_ANGLE_DEG
 from freesail.ship.graph import Ship
@@ -128,6 +128,8 @@ def execute(
         # "clear away the larboard studdingsail boom": a spar or a sail is cleared away as
         # a wreck; a line is let go, as "clear away the bowlines" always was (package 30b)
         return _clear_wreck(ship, order, vocab)
+    if order.verb == "leave" or LATEEN_OCCASION in order.modifiers:
+        return _lateen_practice(ship, order)  # package 90, A1b
     if order.verb == "shift" and _names_spars(ship, order):
         return _shift_spar(ship, order, vocab)
     if order.verb == "draw":
@@ -3189,15 +3191,57 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
+# The occasions of the lateens' practice, as the grammar reads them ("in going about": both).
+_PRACTICE_OCCASIONS = {"stays": ("stays",), "wearing": ("wearing",), "both": ("stays", "wearing")}
+
+
+def _lateen_practice(ship: Ship, order: Order) -> Result:
+    """`leave the lateens in stays`, `shift the lateens in wearing`, "in going about" for both
+    (package 90, A1b; Design-Package90-Engine.md §2.3 item 3): the ship's practice for her whole
+    lateens' yards in going about, kept on her (`scripts.set_lateen_practice`) and read by the
+    next tack or wear, or by one in hand whose change has not begun. Answered with the practice
+    whole: "Her practice: the lateens left on the mast in stays, shifted in wearing." """
+    _no_stray_modifiers(order, {LATEEN_OCCASION})
+    if not scripts.has_whole_lateen(ship):
+        raise OrderError(
+            "She carries no whole lateen; 'leave' is said of a lateen's yard in going about, "
+            "left on the mast."
+        )
+    occasion = order.modifiers.get(LATEEN_OCCASION)
+    if order.object != LATEENS:
+        name = f"the {order.object}" if order.object else "a sail"
+        raise OrderError(
+            f"The practice is the lateens' together, not {name}'s: 'leave the lateens in stays', "
+            f"'shift the lateens in wearing'. To leave one in a single going about, say it after "
+            f"the order: 'tack ship and leave the mizen'."
+        )
+    if occasion is None:
+        raise OrderError(
+            "Leave the lateens when? Say 'leave the lateens in stays', 'in wearing' or 'in going "
+            "about'; or, for one going about, 'tack ship and leave the lateens'."
+        )
+    how = "leave" if order.verb == "leave" else "shift"
+    practice = scripts.set_lateen_practice(ship, how, _PRACTICE_OCCASIONS[occasion])
+    text = f"Her practice: {scripts.lateen_practice_words(ship, practice)}."
+    data = {"verb": order.verb, "level": 1, "lateen_practice": practice}
+    return "ship.lateen_practice", text, data
+
+
 def _ship_evolution(
     ship: Ship, order: Order, vocab: Vocabulary, course: dict[str, Any] | None = None
 ) -> Result:
     allowed = {"tack", "manner", "hands_from"}
     if order.verb == "fill away":
         allowed.add("heading")  # "fill away and steer SW by W" (package 37f)
+    if order.verb in ("tack ship", "wear ship"):
+        allowed.add(LATEEN_CLAUSE)  # "and leave the lateens" (package 90, A1b)
     _no_stray_modifiers(order, allowed)
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
+    if order.modifiers.get(LATEEN_CLAUSE):
+        # which whole lateens the going about shifts round their masts and which it leaves on
+        # them, over the ship's practice (`scripts.lateen_plan`): a plain dict of strings
+        params["lateens"] = dict(order.modifiers[LATEEN_CLAUSE])
     if order.verb == "fill away":
         if "heading" in order.modifiers:
             # she is filled on the tack she is on, and the helm then has the course

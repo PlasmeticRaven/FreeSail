@@ -1284,11 +1284,31 @@ def put_about_choice(ship: Any) -> tuple[str, str]:
     return "tack ship", "her sail is whole and the wind moderate"
 
 
-def put_about(ship: Any) -> Result:
-    """`put her about`: tacks or wears by `put_about_choice`, the choice and its reason
-    said before the manoeuvre's own line."""
-    from freesail import orders
+def _lateen_clause_after(ship: Any, rest: str) -> str:
+    """The words after `put her about` that are the whole lateens' clause ("and leave the
+    lateens"; package 90, A1b), on a hull with a whole lateen alone; "" otherwise, every other
+    word after the order passed over as it always was."""
+    from freesail.orders.grammar import whole_lateen_hull
+    from freesail.orders.vocabulary import key, load_vocabulary
 
+    said = key(rest)
+    leads = load_vocabulary().lateen_clause
+    if not said or not any(said == lead or said.startswith(lead + " ") for lead in leads):
+        return ""
+    return rest if whole_lateen_hull(ship) else ""
+
+
+def put_about(ship: Any, rest: str = "") -> Result:
+    """`put her about`: tacks or wears by `put_about_choice`, the choice and its reason
+    said before the manoeuvre's own line. The whole lateens' clause after it ("put her about
+    and leave the lateens") goes with the tack or the wear chosen, read before the choice is
+    said, so that a clause refused says nothing of the choice."""
+    from freesail import orders
+    from freesail.orders.grammar import parse
+
+    clause = _lateen_clause_after(ship, rest)
+    if clause:
+        parse(ship, f"tack ship {clause}")  # refused here, in the clause's words, if it is
     verb, why = put_about_choice(ship)
     choice = "wearing" if verb == "wear ship" else "tacking"
     # the choice said as a note of the ship's (the World drops an evolution order's own
@@ -1301,7 +1321,7 @@ def put_about(ship: Any) -> Result:
             f"Put about: {choice}, {why}.",
             data={"put_about": verb, "why": why},
         )
-    kind, text, data = orders.handle(ship, verb)
+    kind, text, data = orders.handle(ship, f"{verb} {clause}" if clause else verb)
     data = dict(data or {})
     data["put_about"] = verb
     data["why"] = why
@@ -1668,7 +1688,7 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = nav.allow_set(knots, toward)
         return "reckoning.set_allowance", _whose(ship, text), {"verb": verb, "level": 1} | data
     if verb == "put her about":
-        return put_about(ship)
+        return put_about(ship, rest)
     if verb == "shape a course for":
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")

@@ -335,6 +335,17 @@ verbs:
     synonyms: [dip the yard of]
     object: sail
     level: 1
+  leave:
+    # Package 90, A1b: the ship's practice for her whole lateens in going about, the verb first
+    # and the occasion after it with no comma: `leave the lateens in stays`, `... in wearing`,
+    # `... in going about` (both); `shift the lateens in stays` and its kin set it back. The
+    # yards left on the mast lie on the bad hand until shifted (Design-Package90-Engine.md §2.3
+    # item 3). Its words, and the clause after `tack ship` and `wear ship` ("and leave the
+    # lateens"), are read on a hull with a whole lateen alone (`lateen_clause`,
+    # `lateen_occasions` below).
+    synonyms: []
+    object: sail
+    level: 1
   # Spars aloft (Luce 1884, ch. XX, 'Sending up and down topgallant-masts';
   # ch. XXIX, 'Preparations for a Gale'). The whole order is the verb: every
   # mast of that kind the ship has.
@@ -2181,6 +2192,22 @@ sheet_to:
   to weather: weather
   to leeward: lee
   over to leeward: lee
+# Package 90, A1b (Design-Package90-Engine.md §2.3 item 3): read on a hull with a whole lateen
+# alone, every other hull's answers as they were. After `tack ship`, `wear ship` or `put her
+# about`, the clause that says which whole lateens the going about shifts round their masts and
+# which it leaves on them: "and shift the lateens", "and leave the mizen" ("change" is "shift";
+# Steel 1794 II, CHANGE THE MIZEN). After `leave` or `shift` said of the lateens, the occasion
+# their practice is for, in stays, in wearing, or both. "On the mast" after the lateens left is
+# the words' own and says nothing more.
+lateen_clause:
+  and shift: shift
+  and change: shift
+  and leave: leave
+lateen_occasions:
+  in stays: stays
+  in wearing: wearing
+  in going about: both
+lateen_on_the_mast: [on the mast, on their masts, on its mast]
 reef_close: [close, close reefed, close reef, close reefs, all reefs]
 tack_phrase: ["on the", "on", "to the"]   # "on the starboard tack", "to the starboard tack"
 point_directions:

@@ -67,6 +67,12 @@ class Vocabulary:
     # words after a sheet's name saying which side it is hauled on: "haul the jib sheet to
     # windward" -> "weather", "... to leeward" -> "lee" (package 32e)
     sheet_to: dict[str, str] = field(default_factory=dict)
+    # package 90, A1b: on a hull with a whole lateen alone, the clause after a going about
+    # ("and leave the lateens": lead -> "shift" | "leave"), the occasion of the lateens'
+    # practice ("in stays" -> "stays" | "wearing" | "both") and "on the mast" after them
+    lateen_clause: dict[str, str] = field(default_factory=dict)
+    lateen_occasions: dict[str, str] = field(default_factory=dict)
+    lateen_on_the_mast: tuple[str, ...] = ()
     # a reading asked at the prompt (package 33c): each query verb made of a registry
     # phrase -> that phrase as the registry has it ("the reckonings uncertainty" -> "the
     # reckoning's uncertainty"); `orders.prompt` answers them
@@ -256,6 +262,13 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
     vocab.sheet_to = {
         key(phrase): str(value) for phrase, value in (data.get("sheet_to") or {}).items()
     }
+    vocab.lateen_clause = {
+        key(phrase): str(value) for phrase, value in (data.get("lateen_clause") or {}).items()
+    }
+    vocab.lateen_occasions = {
+        key(phrase): str(value) for phrase, value in (data.get("lateen_occasions") or {}).items()
+    }
+    vocab.lateen_on_the_mast = _tuple(data.get("lateen_on_the_mast"))
     for cls, phrases in (data.get("take_in_words") or {}).items():
         vocab.take_in_words[str(cls)] = _tuple(phrases)
     vocab.hands_selectors = {

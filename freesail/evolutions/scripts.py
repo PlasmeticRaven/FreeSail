@@ -479,6 +479,39 @@ def lateen_practice(ship: Ship) -> dict[str, str]:
     return {occasion: kept.get(occasion, default) for occasion, default in LATEEN_PRACTICE_DEFAULT}
 
 
+def has_whole_lateen(ship: Ship) -> bool:
+    """Whether the hull carries a whole lateen, set or not (package 90, A1b): the hull whose
+    going-about orders take the clause ("and leave the lateens") and whose practice is ordered and
+    read. Every other hull's answers are as they were."""
+    return any(is_whole_lateen(sl) for sl in (getattr(ship, "sails", None) or {}).values())
+
+
+def set_lateen_practice(ship: Ship, how: str, occasions: tuple[str, ...]) -> dict[str, str]:
+    """The ship's practice set to `how` ("shift" or "leave") for each occasion named, the others
+    kept, and kept on her as a plain dict of strings (package 90, A1b); the practice now."""
+    practice = lateen_practice(ship)
+    for occasion in occasions:
+        practice[occasion] = how
+    ship.extra[LATEEN_PRACTICE] = dict(practice)
+    return practice
+
+
+def lateen_practice_words(ship: Ship, practice: dict[str, str] | None = None) -> str:
+    """The practice in words, as the reading gives it and the order answers it: 'the lateens left
+    on the mast in stays, shifted in wearing', 'the lateens shifted in stays and in wearing'; the
+    lateen by its name on a hull with one (package 90, A1b; Design-Package90-Engine.md §2.3
+    item 3)."""
+    practice = practice if practice is not None else lateen_practice(ship)
+    lats = [sl for sl in ship.sails.values() if is_whole_lateen(sl)]
+    them = names_of_sails(ship, lats) if len(lats) == 1 else "the lateens"
+    said = {"shift": "shifted", "leave": "left on the mast"}
+    stays = said.get(practice.get("stays", "shift"), "shifted")
+    wearing = said.get(practice.get("wearing", "shift"), "shifted")
+    if stays == wearing:
+        return f"{them} {stays} in stays and in wearing"
+    return f"{them} {stays} in stays, {wearing} in wearing"
+
+
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
 # the new lee in stays, and in wearing once the wind is past the stern.
 SETTEE_DIPPED_WORDS = "Dipped the {sail}; hoisted on the {side} side, to leeward of {mast}."
@@ -654,6 +687,227 @@ class LugDip:
             )
         self.done = True
         return True
+
+
+# A whole lateen's yard shifted round its mast in a manoeuvre (package 90, A1b): the lead's
+# ruling of 2026-11-18 (nudge 18), the lugger's own rate, her 90 s in a manoeuvre (`dip_s`) for
+# her 10.3-m main lug yard, 8.7 s a metre of yard; the same in stays and in the wear; JUDGEMENT.
+LATEEN_CHANGE_S_PER_M = 8.7
+
+
+def lateen_change_s_per_m() -> float:
+    """The change's seconds a metre of yard in a manoeuvre, from the change's own file
+    (data/evolutions/change_lateen.yaml, `timing: in_a_manoeuvre_s_per_m`;
+    Design-Package90-Engine.md §2.3 item 4), so that `tack.yaml`'s and `wear.yaml`'s timings,
+    which `tests/test_catalogue.py` pins whole, do not move; `LATEEN_CHANGE_S_PER_M` where it
+    gives none."""
+    from freesail.evolutions import registry  # local import: the registry reads the files
+
+    evo = registry.get("change_lateen")
+    timing = evo.timing if evo is not None else {}
+    return float(timing.get("in_a_manoeuvre_s_per_m", LATEEN_CHANGE_S_PER_M))
+
+
+# A rig of whole lateens has paid off from her tack when her head is this near full and by on
+# the new board (package 90, A1b; Design-Package90-Engine.md §2.3 item 5, §2.2a's measure of the
+# mizen eased; JUDGEMENT): the tack's steady timeout ends her tack only then, or a further
+# `stays_timeout_s` after it, the line then saying how she lies.
+LATEEN_PAID_OFF_DEG = 10.0
+
+
+def part_name_of(ship: Ship, part_id: str | Sail) -> str:
+    """A part's name for the log ('mizen'), the runner's (a local import, to avoid a cycle)."""
+    from freesail.evolutions.runner import part_name
+
+    return part_name(ship, part_id if isinstance(part_id, str) else part_id.id)
+
+
+def lateen_plan(ship: Ship, params: dict[str, Any], occasion: str) -> dict[str, list[str]]:
+    """Which whole lateens set a going about shifts round their masts and which it leaves on the
+    bad hand (package 90, A1b; Design-Package90-Engine.md §2.3 items 2-3): by the order's clause
+    (`params["lateens"]`: "shift" or "leave" for a sail by its id, or for them all under "all"),
+    else by the ship's practice for the occasion ("stays" or "wearing": `lateen_practice`,
+    "shift" in both by default). {"shift": [...], "leave": [...]}, by the ship's order."""
+    practice = lateen_practice(ship).get(occasion, "shift")
+    clause = params.get("lateens") if isinstance(params.get("lateens"), dict) else {}
+    plan: dict[str, list[str]] = {"shift": [], "leave": []}
+    for sl in whole_lateens(ship):
+        how = clause.get(sl.id, clause.get("all", practice))
+        plan["leave" if how == "leave" else "shift"].append(sl.id)
+    return plan
+
+
+def lateen_plan_words(ship: Ship, plan: dict[str, list[str]], occasion: str) -> str:
+    """'; the lateens to be shifted in stays', '; the lateens left on the mast', or each named
+    where some are shifted and some left; "" with none (package 90, A1b: the log says which)."""
+    shift, leave = plan.get("shift") or [], plan.get("leave") or []
+    if not shift and not leave:
+        return ""
+    when = "in stays" if occasion == "stays" else "with the wind aft"
+
+    def named(ids: list[str]) -> str:
+        if len(ids) > 1 and not (shift and leave):
+            return "the lateens"
+        return names_of_sails(ship, [ship.sails[i] for i in ids])
+
+    said = []
+    if shift:
+        said.append(f"{named(shift)} to be shifted {when}")
+    if leave:
+        one = len(leave) == 1 or (shift and len(leave) == 1)
+        said.append(f"{named(leave)} left on {'the mast' if one else 'their masts'}")
+    return "; " + ", ".join(said)
+
+
+def lateens_on_the_mast_words(ship: Ship) -> str:
+    """', the mainsail on the mast' (', the lateens on their masts'): the whole lateens set that
+    end a manoeuvre on the weather side of their masts, for its last line (package 90, A1b); ""
+    with none, so that no other ship's line moves."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    on = [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+    if not on:
+        return ""
+    if len(on) == 1:
+        return f", {names_of_sails(ship, on)} on the mast"
+    if len(on) == len(whole_lateens(ship)):
+        return ", the lateens on their masts"
+    return f", {names_of_sails(ship, on)} on their masts"
+
+
+def aft_lateen(ship: Ship) -> Sail | None:
+    """The whole lateen set on her aftermost mast, with a mast before it: the mizen worked as a
+    ship's mizen in going about, hauled aft at helm's a-lee, eased at "up helm" (package 90, A1b;
+    Design-Package90-Engine.md §2.3 item 5); None with none."""
+    lats = [sl for sl in whole_lateens(ship) if ship.mast_of(sl) is not None]
+    if not lats:
+        return None
+    sl = min(lats, key=lambda s: ship.mast_of(s).x_m)
+    mast = ship.mast_of(sl)
+    before = any(
+        sp.cls == "mast" and not sp.wrecked and sp.x_m > mast.x_m for sp in ship.spars.values()
+    )
+    return sl if before else None
+
+
+def fore_lateen_before_square(ship: Ship) -> Sail | None:
+    """A whole lateen set on her foremost mast where a mast abaft it carries braced yards (the
+    polacre's fore before her square main): eased with the head sheets at helm's a-lee and drawn
+    at "let go and haul" (package 90, A1b; Pol-D §5.3 item 1); None with none."""
+    lats = [sl for sl in whole_lateens(ship) if ship.mast_of(sl) is not None]
+    with_yards = _masts_with_yards(ship)
+    if not lats or not with_yards:
+        return None
+    sl = max(lats, key=lambda s: ship.mast_of(s).x_m)
+    mast = ship.mast_of(sl)
+    if any(m.x_m < mast.x_m for m in with_yards) and all(
+        sp.x_m <= mast.x_m for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked
+    ):
+        return sl
+    return None
+
+
+class LateenChange:
+    """Whole lateens shifted round their masts in a manoeuvre (package 90, A1b; the lead's ruling
+    of 2026-11-18; Design-Package90-Engine.md §2.3 item 2, §2.3a, §2.4.4): each yard peaked up and
+    its car passed round abaft its mast (ruled), never lowered, the sail drawing nothing while it
+    is shifted, then set on the new lee with its single sheet drawn. Each yard's seconds are its
+    length at `LATEEN_CHANGE_S_PER_M` by the manoeuvre's factor, and its party one able hand for
+    each `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY` (`lateen_party`), drawn from
+    the hands the manoeuvre has called (`hands_to_give`): together where they serve every yard,
+    the change done when the longest is; one after another, **the main first** (the longest yard
+    first), where they do not, each by its party's numbers term over them (`party_term`), a
+    lateen waiting its turn drawing where it lies. `SetteeChange` has one timer and counts no
+    hands. A plain class, built only when a lateen is to be shifted, so that no checkpoint of the
+    game's own holds one (truth 7-606's census). A lateen taken in or carried away meanwhile is
+    let be."""
+
+    def __init__(self, ship: Ship, ids: list[str], side: str):
+        self.ship = ship
+        sails = [ship.sails[i] for i in ids if i in ship.sails]
+        self.ids = [sl.id for sl in sorted(sails, key=lambda sl: -lateen_yard_m(ship, sl))]
+        self.side = side
+        self.left: dict[str, float] = {}
+        self.active: list[str] = []
+        self.queue: list[str] = []
+        self.done = not self.ids
+
+    def _name(self, ids: list[str]) -> str:
+        return names_of_sails(self.ship, [self.ship.sails[i] for i in ids])
+
+    def _words(self, ids: list[str]) -> str:
+        if len(ids) == 1:
+            return (
+                f"Shift {self._name(ids)}: ease the parrel, cast off the runners, peak up the "
+                "yard and pass the car round."
+            )
+        return (
+            f"Shift {self._name(ids)}: ease the parrels, cast off the runners, peak up the yards "
+            "and pass the cars round."
+        )
+
+    def begin(self, seconds_per_m: float = LATEEN_CHANGE_S_PER_M) -> str:
+        """Begin the change: together where the hands serve every yard, else the longest yard
+        first; returns the first line ("" with nothing to shift)."""
+        self.ids = [i for i in self.ids if self.ship.sails[i].is_set]
+        if not self.ids:
+            self.done = True
+            return ""
+        parties = {i: lateen_party(self.ship, self.ship.sails[i]) for i in self.ids}
+        have = hands_to_give(self.ship)
+        together = have is None or sum(parties.values()) <= have
+        for i in self.ids:
+            seconds = lateen_yard_m(self.ship, self.ship.sails[i]) * seconds_per_m
+            term = 1.0 if together else party_term(self.ship, parties[i])
+            self.left[i] = max(seconds * term, 0.0)
+        if together:
+            self.active, self.queue = list(self.ids), []
+        else:
+            self.active, self.queue = self.ids[:1], self.ids[1:]
+        for i in self.active:
+            self.ship.sails[i].state = SailState.IN_THE_GEAR
+        self.done = False
+        return self._words(self.active)
+
+    def left_s(self) -> float:
+        """The seconds still to come, before the weather and the hands."""
+        active = max((self.left.get(i, 0.0) for i in self.active), default=0.0)
+        return max(active, 0.0) + sum(self.left.get(i, 0.0) for i in self.queue)
+
+    def advance(self, dt: float, factor: float, awa: float | None = None) -> bool:
+        """The change's work; each yard done is set on its side with its sheet drawn for `awa`
+        (the deck's reading when None), and the next begun. Returns whether all are done."""
+        if self.done:
+            return True
+        for i in list(self.active):
+            sl = self.ship.sails[i]
+            if sl.wrecked or sl.state is not SailState.IN_THE_GEAR:
+                self.active.remove(i)  # taken in, set by hand, or carried away: let be
+                continue
+            self.left[i] -= dt / max(factor, 1e-6)
+            if self.left[i] > 0.0:
+                continue
+            self.active.remove(i)
+            sl.state = SailState.SET
+            sl.lug_side = self.side
+            draw_sheets(self.ship, [sl], None, awa)
+            for ln in self.ship.sheets_of(sl):
+                ln.held_side = None  # its single sheet lies to leeward of the wind
+            self.ship.note(
+                "routine",
+                "evolution.step",
+                f"Shifted {self._name([i])}; it stands to leeward of the mast.",
+                self.ship.name,
+            )
+        if not self.active and self.queue:
+            nxt = self.queue.pop(0)
+            sl = self.ship.sails[nxt]
+            if sl.is_set and not sl.wrecked:
+                sl.state = SailState.IN_THE_GEAR
+                self.active = [nxt]
+                self.ship.note("routine", "evolution.step", self._words([nxt]), self.ship.name)
+        if not self.active and not self.queue:
+            self.done = True
+        return self.done
 
 
 def innermost_head_sail(ship: Ship, standing: bool = False) -> Sail | None:
@@ -1404,6 +1658,14 @@ class TackScript(Script):
     # (`words`)
     fore_rise = False
     timed_out = False
+    # package 90, A1b: set on the script only where she has a whole lateen set, so that every
+    # other ship's tack pickles as it did: which lateens are shifted in stays and which left
+    # (`lateen_plan`), their change (`LateenChange`), the aftermost lateen eased as she pays off
+    # with no head sail set, and the end's words where it came before she had paid off
+    lateen_plan: dict[str, list[str]] | None = None
+    lateen_change: LateenChange | None = None
+    mizen_eased = False
+    not_paid_off = ""
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
@@ -1411,6 +1673,9 @@ class TackScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being changed, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held
 
     def give_course(self, course_deg: float, full_and_by: bool) -> None:
@@ -1606,6 +1871,18 @@ class TackScript(Script):
         # them if she hangs, eased off with them if she misses, and drawn on the new tack
         # with them, its yard on the old side until it is changed last (`SetteeChange`)
         self.booms += [sl for sl in settees(self.ship) if sl not in self.booms]
+        if whole_lateens(self.ship):
+            # package 90, A1b (Design-Package90-Engine.md §2.3 item 5): which lateens are shifted
+            # in stays and which left, by the order's clause or her practice; the aftermost one,
+            # with a mast before it, hauled aft as a ship's mizen is; a foremost one before a
+            # square main eased with the head sheets and drawn at "let go and haul"
+            self.lateen_plan = lateen_plan(self.ship, self.params, "stays")
+            aft = aft_lateen(self.ship)
+            if aft is not None and aft not in self.booms:
+                self.booms.append(aft)
+            fore = fore_lateen_before_square(self.ship)
+            if fore is not None and fore not in self.heads:
+                self.heads.append(fore)
         self.shifted = shifted_sails(self.ship)
         ease_off_sheets(self.ship, self.heads)
         sheets_to(self.ship, self.booms, None, None)
@@ -1628,12 +1905,17 @@ class TackScript(Script):
         lowered = self.dip.lower()
         if lowered:
             words += f"; {lowered}"
+        if self.lateen_plan is not None:
+            words += lateen_plan_words(self.ship, self.lateen_plan, "stays")  # package 90, A1b
         self.note(words + ".", "helm.order")
 
     def _lugs_down(self) -> bool:
         """The dipping lugs not yet hoisted again (package 43b), or a settee not yet changed
-        round and hoisted (package 75): she is not tacked till it is up."""
+        round and hoisted (package 75), or a whole lateen not yet shifted round its mast (package
+        90, A1b): she is not tacked till it is up."""
         if self.settee_change is not None and not self.settee_change.done:
+            return True
+        if self.lateen_change is not None and not self.lateen_change.done:
             return True
         return self.dip is not None and not self.dip.done
 
@@ -1660,6 +1942,9 @@ class TackScript(Script):
         if self.settee_change is not None:
             awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
             self.settee_change.advance(dt, factor, awa)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "missed":
             # the yards squared as a brace, with hands and time; then she has missed stays
             assert self.squaring is not None
@@ -1746,6 +2031,14 @@ class TackScript(Script):
                 # (package 32e); trimmed for the wind, three and a half knots.
                 new_lee = self.old_side(weather=True)
                 self._draw_on_new_tack(new_lee, wind)
+                aft = aft_lateen(self.ship) if self.lateen_plan is not None else None
+                if aft is not None and not head_sails(self.ship):
+                    # with no head sail set the aftermost lateen is eased as she pays off on the
+                    # new board, as a ship's spanker is, and drawn when she has (package 90, A1b;
+                    # measured on the bare xebec, Design-Package90-Engine.md §2.2a: 192 m lost
+                    # against 1,064; JUDGEMENT on the act)
+                    ease_off_sheets(self.ship, [aft])
+                    self.mizen_eased = True
                 draw = " Draw jib; trim aft the head sheets." if self.heads else ""
                 if self.head:
                     # the fore tack kept fast at the haul is risen now, by its name, while its
@@ -1798,15 +2091,33 @@ class TackScript(Script):
                         f"Dip the {change.names()}: lower the yard, pass it round abaft "
                         f"{change.masts()} and shift the tack to the weather bow."
                     )
+                self._shift_lateens(new_lee)  # package 90, A1b: changed last, as the settee
         elif self.phase == "steady":
             self.t_steady += dt
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.target_heading = self.new_course
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
             steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
+            paid_off = self._paid_off(wind, ch)
+            if self.mizen_eased and paid_off:
+                # she has paid off: the aftermost lateen drawn on the new board (package 90)
+                self.mizen_eased = False
+                aft = aft_lateen(self.ship)
+                if aft is not None:
+                    awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+                    draw_sheets(self.ship, [aft], self.old_side(weather=True), awa)
+            timeout = self.timing_value("steady_timeout_s", 120.0)
             if (
-                steady or (self.t_steady >= self.timing_value("steady_timeout_s", 120.0))
-            ) and not self._lugs_down():
+                not steady
+                and self.t_steady >= timeout
+                and self._lateen_rig()
+                and not paid_off
+                and self.t_steady < timeout + self.timing_value("stays_timeout_s", 180.0)
+            ):
+                return  # a lateen rig waits for her to pay off (package 90, A1b; ruled)
+            if (steady or (self.t_steady >= timeout)) and not self._lugs_down():
+                if not steady and self._lateen_rig() and not paid_off:
+                    self.not_paid_off = self._not_paid_off_words(wind)
                 if not steady:
                     # ended by the timeout, not steady on her course: the line names the tack
                     # she lies on, read from her (package 75, B3.4b; `words`)
@@ -1815,6 +2126,49 @@ class TackScript(Script):
                     self._to_the_course(wind)
                 else:
                     self.finish()
+
+    # -- the whole lateens (package 90, A1b) -----------------------------------------------
+
+    def _shift_lateens(self, new_lee: str) -> None:
+        """The lateens her plan shifts in stays begun, once her head is through the wind and her
+        head yards swung (changed last, as a settee is): each to be shifted that hangs off the
+        new lee (`LateenChange`); one on the new lee already, left on the weather side before the
+        tack, is to leeward of its mast now and is let be. The plan is read again here, so that a
+        practice set while she is in stays, before her change has begun, is the one this tack
+        reads (Design-Package90-Engine.md §2.3 item 3); the order's clause stands over it."""
+        if self.lateen_plan is None:
+            return
+        plan = self.lateen_plan = lateen_plan(self.ship, self.params, "stays")
+        ids = [i for i in plan.get("shift") or [] if self.ship.sails[i].lug_side != new_lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, new_lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
+
+    def _lateen_rig(self) -> bool:
+        """A rig of whole lateens: a whole lateen set and no square sail (package 90, A1b: the
+        lead's ruling, keyed on a whole lateen only, so that no other rig's end moves)."""
+        return bool(whole_lateens(self.ship)) and not any(
+            sl.cls == "square" and sl.is_set for sl in self.ship.sails.values()
+        )
+
+    def _paid_off(self, wind: Wind, ch: float) -> bool:
+        """Her head paid off to within `LATEEN_PAID_OFF_DEG` of full and by on the new board."""
+        rel = wind_rel(self.ship, wind)
+        return -self.sign * rel >= ch - units.deg_to_rad(LATEEN_PAID_OFF_DEG)
+
+    def _not_paid_off_words(self, wind: Wind) -> str:
+        """', but she has not paid off: she lies 39° off the wind with a knot of way' (package 90,
+        A1b; JUDGEMENT on the words), for a tack's end that came before she had."""
+        from freesail.crew.model import number_words  # local import: the words' home
+
+        off = abs(units.rad_to_deg(wind_rel(self.ship, wind)))
+        kn = round(units.ms_to_knots(max(self.ship.dyn.u, 0.0)))
+        way = "a knot" if kn == 1 else "no way" if kn == 0 else f"{number_words(kn)} knots"
+        return f", but she has not paid off: she lies {off:.0f}° off the wind with {way} of way"
 
     # -- the course she was put about for (package 37m) ---------------------------------
 
@@ -1965,10 +2319,26 @@ class TackScript(Script):
             return self.timing_value("settee_dip_s", SETTEE_DIP_S)
         return 0.0
 
+    def _lateens_to_change_s(self) -> float:
+        """The lateens' change still to come before she is tacked (package 90, A1b): the longest
+        yard's seconds by the ruled rate for those her plan shifts that hang off the new lee,
+        while the change is not begun; 0 with none (the estimate counts them together)."""
+        plan = self.lateen_plan
+        if plan is None or self.lateen_change is not None:
+            return 0.0
+        new_lee = self.old_side(weather=True)
+        rate = lateen_change_s_per_m()
+        yards = [
+            lateen_yard_m(self.ship, self.ship.sails[i])
+            for i in plan.get("shift") or []
+            if self.ship.sails[i].lug_side != new_lee
+        ]
+        return max(yards, default=0.0) * rate
+
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
         swings = self._after_swing_s() + brace_s  # the after yards', then the head yards'
-        settee_s = self._settee_to_change_s()
+        settee_s = self._settee_to_change_s() + self._lateens_to_change_s()
         if self.phase == "in_studding_sails" and self.studding is not None:
             return self.studding.remaining_s() + 60.0 + swings + 30.0 + settee_s
         if self.phase == "helm_down":
@@ -1986,6 +2356,9 @@ class TackScript(Script):
         change = self.settee_change
         if self.phase == "steady" and change is not None and not change.done:
             return max(30.0, change.left_s)  # a settee being changed (package 75)
+        lateens = self.lateen_change
+        if self.phase == "steady" and lateens is not None and not lateens.done:
+            return max(30.0, lateens.left_s())  # a whole lateen being shifted (package 90)
         return 30.0
 
     def words(self) -> dict[str, Any]:
@@ -2014,6 +2387,8 @@ class TackScript(Script):
             "new_tack": new,
             "new_course": units.format_heading(heading),
             "fell_off": "Squared the yards; she fell off" if braced else "She fell off",
+            # package 90, A1b: a whole lateen left on its mast, and an end before she paid off
+            "lateens_said": lateens_on_the_mast_words(self.ship) + self.not_paid_off,
         } | steer.words("braced up" if braced else "", self.paid_off)
 
     def data(self) -> dict[str, Any]:
@@ -2069,6 +2444,12 @@ class WearScript(Script):
     settee_change: SetteeChange | None = None  # package 75, the same
     for_the_course = False
     full_and_by = False
+    # package 90, A1b: set only where she has a whole lateen set (every other ship's wear pickles
+    # as it did): which are shifted with the wind aft and which left, their change, and the
+    # aftermost one eased at "up helm" to be hauled aft as she comes to
+    lateen_plan: dict[str, list[str]] | None = None
+    lateen_change: LateenChange | None = None
+    mizen_eased = False
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
@@ -2076,6 +2457,9 @@ class WearScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee lowered, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held | {s.id for s in after_gaff_sails(self.ship)}
 
     def give_course(self, course_deg: float, full_and_by: bool) -> None:
@@ -2125,6 +2509,19 @@ class WearScript(Script):
             change.change(
                 new_lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_WORE_WORDS
             )
+        if whole_lateens(self.ship):
+            # package 90, A1b (Design-Package90-Engine.md §2.3 items 2 and 5): which lateens are
+            # shifted with the wind aft and which left, by the order's clause or her practice in
+            # wearing; the aftermost, with a mast before it, eased as she bears up, as a ship's
+            # mizen is hauled up, and hauled aft again as she comes to; the lateens keep drawing
+            # as she bears up, their change begun only at "wind aft" (not the settee's "up helm")
+            self.lateen_plan = lateen_plan(self.ship, self.params, "wearing")
+            aft = aft_lateen(self.ship)
+            if aft is not None:
+                ease_off_sheets(self.ship, [aft])
+                self.mizen_eased = True
+                brail += f"; ease off the {part_name_of(self.ship, aft)} sheet"
+            brail += lateen_plan_words(self.ship, self.lateen_plan, "wearing")
         self.bowlined = bowlines_hauled(self.ship)
         # the after yards braced in only where she has after yards (package 90, A2: the lugger,
         # the boats, the cutter, the smack and the schooners were told to before it)
@@ -2199,6 +2596,7 @@ class WearScript(Script):
                     "; hauled out and braced up" if has_braced_yards(self.head, self.after) else ""
                 )
                 self.note(f"Wind aft. {squared} over the sheets{braced}." + dipped)
+                self._shift_lateens(new_lee)  # package 90, A1b: the lateens' change begun
         if self.dip is not None:
             self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
         if self.settee_change is not None:
@@ -2207,6 +2605,9 @@ class WearScript(Script):
             past = self.sign * rel < 0
             awa = full_and_by_apparent(self.ship, wind, self.way_before)
             self.settee_change.advance(dt, factor, awa, may_hoist=past)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.way_before)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "come_to":
             sharp_up = -self.sign  # braced sharp up for the new tack
             course_rel = 0.0
@@ -2237,6 +2638,13 @@ class WearScript(Script):
             if steady and self.brailed:
                 said = "On her course." if self.for_the_course else "By the wind."
                 self.note(said + self._haul_out())
+            if steady and self.mizen_eased:
+                # the aftermost lateen hauled aft as she comes to, by the wind (package 90, A1b)
+                self.mizen_eased = False
+                aft = aft_lateen(self.ship)
+                if aft is not None:
+                    awa = full_and_by_apparent(self.ship, wind, self.way_before)
+                    draw_sheets(self.ship, [aft], _lee_name(sharp_up), awa)
             if self.for_the_course:
                 # the yards follow the wind round as she comes to the course, and are
                 # trimmed to the course's own wind when she is steady on it ("When the wind
@@ -2267,6 +2675,8 @@ class WearScript(Script):
                     head_done = False
             lugs_up = self.dip is None or self.dip.done
             settee_up = self.settee_change is None or self.settee_change.done  # package 75
+            if self.lateen_change is not None and not self.lateen_change.done:
+                settee_up = False  # a whole lateen not yet shifted (package 90, A1b)
             if steady and after_done and head_done and lugs_up and settee_up:
                 if self.for_the_course:
                     # a settee hoisted again is trimmed for the course with them (package 75)
@@ -2279,6 +2689,22 @@ class WearScript(Script):
                 if steer is not None:
                     _end_on_course(self.ship, steer, self.new_course, self.full_and_by)
                 self.finish()
+
+    def _shift_lateens(self, new_lee: str) -> None:
+        """The lateens her plan shifts in wearing begun with the wind aft (package 90, A1b): each
+        that hangs off the new lee (`LateenChange`); one on it already is let be. The plan read
+        again here, as the tack's is, for a practice set since "up helm"."""
+        if self.lateen_plan is None:
+            return
+        plan = self.lateen_plan = lateen_plan(self.ship, self.params, "wearing")
+        ids = [i for i in plan.get("shift") or [] if self.ship.sails[i].lug_side != new_lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, new_lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
 
     def remaining_s(self) -> float:
         first = self.studding.remaining_s() if self.studding is not None else 0.0
@@ -2295,6 +2721,7 @@ class WearScript(Script):
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
+            "lateens_said": lateens_on_the_mast_words(self.ship),  # package 90, A1b
         } | steer.words(braced, self.for_the_course)
 
     def data(self) -> dict[str, Any]:
@@ -2760,6 +3187,15 @@ def _judge_lying_to(
         )
 
 
+def _lateens_against_their_masts(ship: Ship) -> list[Sail]:
+    """The whole lateens set whose yards hang on the weather side of their masts as the deck reads
+    the wind, the side `change_lateen`'s precondition reads (package 90, A1b): forced round lying
+    to, a lateen's yard stays where she hove to, as a settee's does."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    on = [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+    return sorted(on, key=lambda sl: -lateen_yard_m(ship, sl))  # the main first
+
+
 def _settees_against_their_masts(ship: Ship) -> list[Sail]:
     """The settees set whose yards hang on the weather side of their masts as the deck reads
     the wind, the side the dip order reads (`dip_settee`'s `against_the_mast`): forced round
@@ -2803,6 +3239,9 @@ def _hove_to_no_longer(
     dyn.steady = False
     data = {**data, "speed_kn": round(units.ms_to_knots(dyn.u), 1), "heading": dyn.heading}
     dip = _settees_against_their_masts(ship) if forced_round is not None else []
+    # package 90, A1b: a whole lateen left on its mast so is shifted by the watch, its own order
+    # (`change_lateen`: all hands called, its party the yard's), as the settee is dipped
+    shift = _lateens_against_their_masts(ship) if forced_round is not None else []
     notes = getattr(ship, "notes", None)
     at = len(notes) if isinstance(notes, list) else 0  # the line goes before the dip's own
     begun: list[Sail] = []
@@ -2837,7 +3276,47 @@ def _hove_to_no_longer(
         waiting.append(sl)
         if inst.waiting_for is None:
             after.append(("evolution.queued", line, sl.id))  # its turn behind other work
+    shifted: list[Sail] = []
+    shift_waiting: list[Sail] = []
+    for sl in shift:
+        try:
+            line = forced_round.start(ship, "change_lateen", sl.id)
+        except OrderError as e:
+            why = str(e).strip().rstrip(".")
+            why = why[:1].lower() + why[1:]
+            after.append(
+                ("evolution.failed", f"Could not shift {names_of_sails(ship, [sl])}: {why}.", sl.id)
+            )
+            continue
+        inst = next(
+            (
+                i
+                for i in reversed(forced_round.instances)
+                if i.evo.id == "change_lateen" and i.subject_id == sl.id
+            ),
+            None,
+        )
+        if inst is None:
+            continue
+        if not inst.waiting:
+            shifted.append(sl)
+            continue
+        shift_waiting.append(sl)
+        if inst.waiting_for is None:
+            after.append(("evolution.queued", line, sl.id))
     said = ""
+    if shifted:
+        mast = "its mast" if len(shifted) == 1 else "their masts"
+        said += (
+            f" The watch calls all hands to shift {names_of_sails(ship, shifted)}, lying on {mast}."
+        )
+        data["lateens_shifted"] = [sl.id for sl in shifted]
+    if shift_waiting:
+        one = len(shift_waiting) == 1
+        mast, be = ("its mast", "is") if one else ("their masts", "are")
+        names = names_of_sails(ship, shift_waiting)
+        said += f" {names[:1].upper() + names[1:]}, lying on {mast}, {be} to be shifted."
+        data["lateens_to_be_shifted"] = [sl.id for sl in shift_waiting]
     if begun:
         mast = "its mast" if len(begun) == 1 else "their masts"
         who = "The watch calls all hands to dip" if called else "The watch dips"
@@ -3371,6 +3850,9 @@ class FillAwayScript(Script):
     # B3.3b's review: true from the order to the first tick when a settee is set, the dip read
     # then by the wind (`_first_tick`); the field is gone again once read
     wind_to_read = False
+    # package 90, A1b: a whole lateen on her weather side, shifted first as she lies, as a
+    # settee is dipped (set on the script only when one is, the pickle otherwise as before)
+    lateen_change: LateenChange | None = None
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -3391,6 +3873,9 @@ class FillAwayScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being dipped, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held
 
     def check(self, words: dict[str, Any]) -> str | None:
@@ -3409,17 +3894,28 @@ class FillAwayScript(Script):
         lee = _lee_name(self.sign)
         change = SetteeChange(self.ship)
         change.ids = [i for i in change.ids if self.ship.sails[i].lug_side != lee]
-        if not change.ids:
+        # package 90, A1b: a whole lateen on that tack's weather side, shifted first as she lies
+        # (`LateenChange`, the tack's rate), as the settee is dipped; one on her lee is let be
+        lateens = [sl.id for sl in whole_lateens(self.ship) if sl.lug_side != lee]
+        if not change.ids and not lateens:
             return False
-        self.settee_change = change
+        if change.ids:
+            self.settee_change = change  # first, as before, so that its pickle is as it was
         self.lying = {"sign": self.sign}  # the tending's own record, on the tack she is on
         self.phase = "dip_settee"
         self.ship.dyn.steady = False
-        change.change(lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_DIPPED_WORDS)
-        self.note(
-            f"Dip the {change.names()}: lower the yard, pass it round abaft {change.masts()} "
-            "and shift the tack to the weather bow."
-        )
+        if change.ids:
+            change.change(lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_DIPPED_WORDS)
+            self.note(
+                f"Dip the {change.names()}: lower the yard, pass it round abaft "
+                f"{change.masts()} and shift the tack to the weather bow."
+            )
+        if lateens:
+            shift = LateenChange(self.ship, lateens, lee)
+            said = shift.begin(lateen_change_s_per_m())
+            if said:
+                self.lateen_change = shift
+                self.note(said)
         return True
 
     def _dip_tick(self, dt: float, wind: Wind, factor: float, rel: float) -> None:
@@ -3429,8 +3925,9 @@ class FillAwayScript(Script):
         tack's lee with its sheet drawn for the wind she will have full and by with the way she
         has, as the tack hoists it (`full_and_by_apparent`); then she is let fall off."""
         change = self.settee_change
+        lateens = self.lateen_change  # package 90, A1b: a whole lateen shifted as she lies
         lying = self.lying
-        assert change is not None and lying is not None
+        assert (change is not None or lateens is not None) and lying is not None
         if not self.signed and abs(rel) > 0.5 * POINT:
             # the tack she is on, by the wind itself, read once as `tick` reads it (the deck's
             # reading lags a ship that has just come round)
@@ -3440,16 +3937,22 @@ class FillAwayScript(Script):
                 self.sign = sign
                 lying.clear()
                 lying["sign"] = sign
-                change.side = _lee_name(sign)
+                if change is not None:
+                    change.side = _lee_name(sign)
+                if lateens is not None:
+                    lateens.side = _lee_name(sign)
         tend_lying_to(self.ship, lying, dt, wind, lying_to_timing())
         awa = full_and_by_apparent(self.ship, wind, self.ship.dyn.u)
-        if change.advance(dt, factor, awa):
+        done = change.advance(dt, factor, awa) if change is not None else True
+        if lateens is not None:
+            done = lateens.advance(dt, factor, awa) and done
+        if done:
             self.fall_t0 = self.t
             self._fall_off()
 
     def begin(self, words: dict[str, Any]) -> None:
         self.sign = 1.0 if self.ship.dyn.tack == "starboard" else -1.0
-        if settees(self.ship):
+        if settees(self.ship) or whole_lateens(self.ship):  # package 90, A1b: a lateen too
             # package 75, B3.3b's review: with a settee set, whether it is dipped first is read
             # at the first tick from the wind itself (`_first_tick`), not from the deck's
             # reading, which lags a ship just come round: by the deck's alone one on her lee was
@@ -3660,12 +4163,18 @@ class FillAwayScript(Script):
         fall_s = self.timing_value("fall_off_timeout_s", 180.0)
         if self.phase == "dip_settee" and self.settee_change is not None:
             return self.settee_change.left_s + fall_s + brace_s  # package 75, B3.3b
+        if self.phase == "dip_settee" and self.lateen_change is not None:
+            return self.lateen_change.left_s() + fall_s + brace_s  # package 90, A1b
         if self.wind_to_read:
             # a settee set, the first tick to come (package 75, B3.3b's review): its dip
             # counted if the deck has it on her weather side, as the wind will mostly agree
             lee = _lee_name(self.sign)
             dip = any(sl.lug_side != lee for sl in settees(self.ship))
             dip_s = self.timing_value("settee_dip_s", SETTEE_DIP_S) if dip else 0.0
+            rate = lateen_change_s_per_m()
+            yards = [lateen_yard_m(self.ship, sl) for sl in whole_lateens(self.ship)]
+            if any(sl.lug_side != lee for sl in whole_lateens(self.ship)):
+                dip_s = max(dip_s, max(yards, default=0.0) * rate)  # package 90, A1b
             return dip_s + fall_s + brace_s
         if self.phase == "fall_off":
             return max(0.0, fall_s - (self.t - self.fall_t0)) + brace_s
@@ -3679,6 +4188,14 @@ class FillAwayScript(Script):
         settee in its gear on deck, which the runner's words, naming the phase, did not say;
         None otherwise, for the runner's words."""
         change = self.settee_change
+        lateens = self.lateen_change
+        if self.phase == "dip_settee" and change is None and lateens is not None:
+            if lateens.done:
+                return None
+            return (  # package 90, A1b: a whole lateen being shifted as she lies
+                f"the helm and the yards left as they stand; {lateens._name(lateens.active)} in "
+                "its gear, not yet shifted round the mast"
+            )
         if self.phase != "dip_settee" or change is None or change.done:
             return None
         return (
@@ -5432,6 +5949,31 @@ class BoxHaulScript(Script):
     # for a ship with a settee
     settee_change: SetteeChange | None = None
     by_the_bow = False
+    # package 90, A1b: a whole lateen's change, set only when one is shifted (the pickle as before)
+    lateen_change: LateenChange | None = None
+
+    def _lateens_at_box(self) -> None:
+        """The lateens at the box (package 90, A1b): box-hauling and wearing short round shift
+        theirs as the wind comes aft (`_lateens_at_come_to`), so nothing here."""
+
+    def _lateens_at_come_to(self, lee: str) -> None:
+        """The wind aft and she comes to (package 90, A1b; Design-Package90-Engine.md §2.3a row 8):
+        the whole lateens her practice shifts in wearing that hang off her new lee are shifted
+        round their masts (`LateenChange`); a change begun at the box (box her off) is carried to
+        this lee."""
+        change = self.lateen_change
+        if change is not None and not change.done:
+            change.side = lee
+            return
+        plan = lateen_plan(self.ship, self.params, "wearing")
+        ids = [i for i in plan["shift"] if self.ship.sails[i].lug_side != lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
 
     def _settee_at_box(self) -> tuple[SetteeChange, str, str]:
         """The settees lowered at the box, the side each is to be hoisted on, and the line said
@@ -5458,6 +6000,9 @@ class BoxHaulScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # package 90, A1b
         return held
 
     def check(self, words: dict[str, Any]) -> str | None:
@@ -5501,6 +6046,7 @@ class BoxHaulScript(Script):
             lowered = change.lower()
             up = f"{lowered[0].upper()}{lowered[1:]}! {up}"
             change.change(side, self.timing_value("settee_dip_s", SETTEE_DIP_S), said)
+        self._lateens_at_box()  # package 90, A1b
         targets = [-self.sign * y.brace_limit for y in self.head] + [0.0 for _ in self.after]
         self.swing = YardSwing(self.head + self.after, targets, self.timing_value("brace_s", 45.0))
         if self.after:
@@ -5548,6 +6094,9 @@ class BoxHaulScript(Script):
             awa = full_and_by_apparent(self.ship, wind, self.way_before)
             hoist = self.phase == "come_to" and self.sign * rel < 0
             self.settee_change.advance(dt, factor, awa, may_hoist=hoist)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.way_before)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "box":
             assert self.swing is not None
             if self.swing.advance(dt, factor):
@@ -5572,6 +6121,8 @@ class BoxHaulScript(Script):
                 # off round by the stern were told so before it)
                 after = "braced up the after yards; " if self.after else ""
                 self.note(f"Wind aft; {after}shifted over the sheets.{words}")
+                # package 90, A1b: the lateens' change begun with the wind aft
+                self._lateens_at_come_to("starboard" if self.sign > 0 else "larboard")
         if self.phase == "come_to":
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.helm_mode = HelmMode.HEADING
@@ -5591,6 +6142,8 @@ class BoxHaulScript(Script):
                 follow_wind(self.head, rel, ch, max_step)
                 head_done = False
             settee_up = self.settee_change is None or self.settee_change.done  # package 75
+            if self.lateen_change is not None and not self.lateen_change.done:
+                settee_up = False  # a whole lateen not yet shifted (package 90, A1b)
             if steady and after_done and head_done and settee_up:
                 self.finish()
 
@@ -5685,6 +6238,20 @@ class BoxOffScript(BoxHaulScript):
             "and shift the tack to the weather bow."
         )
 
+    def _lateens_at_box(self) -> None:
+        """Only a whole lateen on the weather side of the tack she is boxed off on is shifted
+        (package 90, A1b; Design-Package90-Engine.md §2.3a row 9, the settee's silent case): begun
+        at the box, set on that tack's lee when its time is done, she boxed off when it is."""
+        lee = _lee_name(self.sign)
+        ids = [sl.id for sl in whole_lateens(self.ship) if sl.lug_side not in (None, lee)]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
+
     def begin(self, words: dict[str, Any]) -> None:
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
@@ -5710,7 +6277,10 @@ class BoxOffScript(BoxHaulScript):
         if change is not None:
             # a settee lowered at the box, hoisted on her lee once its time is done (package 75)
             change.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
-        if swung and (change is None or change.done):
+        lateens = self.lateen_change
+        if lateens is not None:  # a lateen shifted from the box (package 90, A1b)
+            lateens.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
+        if swung and (change is None or change.done) and (lateens is None or lateens.done):
             self.finish()
 
     def _haul(self, factor: float) -> None:
