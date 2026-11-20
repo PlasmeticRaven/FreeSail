@@ -465,13 +465,17 @@ class Squadron:
         role = str(getattr(getattr(body, "brain", None), "role", "") or "")
         if role in ("kings-ship", "cruiser", "commodore"):
             return True
-        # the men of war by their descriptions (package 75 adds the new ships' keys)
+        # the men of war by their descriptions (package 75 adds the new ships' keys, and package
+        # 90 its three: docs/design/Plan-Package90.md §5.1 item 7)
         return str(getattr(body, "description", "") or "") in (
             "frigate",
             "brig-sloop",
             "sixty-four",
             "razee",
             "seventy-four",
+            "corvette",
+            "three-decker",
+            "xebec",
         )
 
     def stations(self, world: Any) -> dict[str, Position]:
@@ -1572,9 +1576,19 @@ COVER_NM = 2.0
 # data/captains/indiaman.yaml), and this one set makes a captor of every role in it as well
 # as a cover, so her cover of a straggler of her nation is left out with the captor's part
 _ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore", "revenue"})
-# package 75 adds the new ships' descriptions, keyed before their files come
+# package 75 adds the new ships' descriptions, keyed before their files come, and package 90
+# its three the same way (docs/design/Plan-Package90.md §5.1 item 7)
 _MAN_OF_WAR_DESCRIPTIONS = frozenset(
-    {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}
+    {
+        "frigate",
+        "brig-sloop",
+        "sixty-four",
+        "razee",
+        "seventy-four",
+        "corvette",
+        "three-decker",
+        "xebec",
+    }
 )
 
 

@@ -370,7 +370,7 @@ spars:
   side: starboard
   length_m: 15.2
   height_m: 0.32
-  rating_kn: 6.0
+  rating_kn: 6.9
   rigged_out: false
 # Rating: fore.lower.studdingsail.larboard in 18 kn.
 - id: fore.lower.studdingsail_boom.larboard
@@ -379,7 +379,7 @@ spars:
   side: larboard
   length_m: 15.2
   height_m: 0.32
-  rating_kn: 6.0
+  rating_kn: 6.9
   rigged_out: false
 # fore topmast studding-sail boom 39 ft 9 in (Steel 1794 vol. I p. 49, the 64; p. 40: half the yard it is rigged on); rated for its sail in 18 kn. Rating: fore.topmast.studdingsail.starboard in 18 kn.
 - id: fore.topmast.studdingsail_boom.starboard
@@ -388,7 +388,7 @@ spars:
   side: starboard
   length_m: 12.1
   height_m: 14.52
-  rating_kn: 7.9
+  rating_kn: 9.0
   rigged_out: false
 # Rating: fore.topmast.studdingsail.larboard in 18 kn.
 - id: fore.topmast.studdingsail_boom.larboard
@@ -397,7 +397,7 @@ spars:
   side: larboard
   length_m: 12.1
   height_m: 14.52
-  rating_kn: 7.9
+  rating_kn: 9.0
   rigged_out: false
 # fore topgallant studding-sail boom 28 ft 9 in (Steel 1794 vol. I p. 49, the 64; p. 40: half the yard it is rigged on); rated for its sail in 18 kn. Rating: fore.topgallant.studdingsail.starboard in 18 kn.
 - id: fore.topgallant.studdingsail_boom.starboard
@@ -406,7 +406,7 @@ spars:
   side: starboard
   length_m: 8.8
   height_m: 29.52
-  rating_kn: 2.7
+  rating_kn: 3.2
   rigged_out: false
 # Rating: fore.topgallant.studdingsail.larboard in 18 kn.
 - id: fore.topgallant.studdingsail_boom.larboard
@@ -415,7 +415,7 @@ spars:
   side: larboard
   length_m: 8.8
   height_m: 29.52
-  rating_kn: 2.7
+  rating_kn: 3.2
   rigged_out: false
 # main topmast studding-sail boom 45 ft (Steel 1794 vol. I p. 49, the 64; p. 40: half the yard it is rigged on); rated for its sail in 18 kn. Rating: main.topmast.studdingsail.starboard in 18 kn.
 - id: main.topmast.studdingsail_boom.starboard
@@ -424,7 +424,7 @@ spars:
   side: starboard
   length_m: 13.7
   height_m: 16.52
-  rating_kn: 9.4
+  rating_kn: 10.9
   rigged_out: false
 # Rating: main.topmast.studdingsail.larboard in 18 kn.
 - id: main.topmast.studdingsail_boom.larboard
@@ -433,7 +433,7 @@ spars:
   side: larboard
   length_m: 13.7
   height_m: 16.52
-  rating_kn: 9.4
+  rating_kn: 10.9
   rigged_out: false
 # main topgallant studding-sail boom 32 ft 8 in (Steel 1794 vol. I p. 49, the 64; p. 40: half the yard it is rigged on); rated for its sail in 18 kn. Rating: main.topgallant.studdingsail.starboard in 18 kn.
 - id: main.topgallant.studdingsail_boom.starboard
@@ -442,7 +442,7 @@ spars:
   side: starboard
   length_m: 10.0
   height_m: 33.02
-  rating_kn: 3.4
+  rating_kn: 3.9
   rigged_out: false
 # Rating: main.topgallant.studdingsail.larboard in 18 kn.
 - id: main.topgallant.studdingsail_boom.larboard
@@ -451,7 +451,7 @@ spars:
   side: larboard
   length_m: 10.0
   height_m: 33.02
-  rating_kn: 3.4
+  rating_kn: 3.9
   rigged_out: false
 # ringtail boom, run out on the driver boom (Kipping's sliding gunter-boom; Steel 1794 vol. I, 'Ringtail-boom': 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (the frigate-36's, judgement); rated for its sail in 18 kn, as a studding sail boom. Rating: ringtail in 18 kn.
 - id: ringtail_boom
@@ -459,7 +459,7 @@ spars:
   'on': mizzen.boom
   length_m: 5.3
   height_m: 3.49
-  rating_kn: 3.7
+  rating_kn: 4.2
   rigged_out: false
 sails:
 # fore course: Steel's table IV, the 64: 36 cloths at the head, 34 at the foot, 12 yards deep, 22 1/2 in a cloth in the sail (Ind §5; ±10%, judgement); 2 reef bands (Steel). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): the working foresail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.

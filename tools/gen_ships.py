@@ -131,13 +131,24 @@ FT = 0.3048
 # working load one third of that. In kN per square inch of circumference:
 ROPE_KN_PER_SQ_IN = round(1044.9 * 4.44822 / 1000.0 / 3.0, 4)  # 1.5493
 
-# The engine's force coefficient at the peak of each class's curve (data/sail_classes.yaml,
-# |(C_L, C_D)| at the best angle). Package 10: if the curves change, change these and rerun.
-PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32, "lug": 1.29}
-# Package 75 (docs/design/Design-ShipsEngineExtensions.md §3.1): the lateen row's 1.15 and 0.48
-# at its best angle, 35 degrees, give 1.246 by the same rule. No file of the eight carries a
-# lateen sail; without the entry the rating pass would fail on the first that does.
-PEAK_COEFF["lateen"] = 1.25
+from freesail.physics.sails import SAIL_CLASSES  # noqa: E402  (the root put on the path above)
+
+
+def peak_coeff(cls) -> float:
+    """The engine's force coefficient at the peak of a class's curve: the greatest
+    |(C_L, C_D)| over its tabulated points (the curves are piecewise linear, and the norm,
+    convex along each piece, is greatest at a point), rounded to two places."""
+    return round(max(math.hypot(c_l, c_d) for c_l, c_d in zip(cls.lift, cls.drag, strict=True)), 2)
+
+
+# The engine's force coefficient at the peak of each class's curve, read from the engine's own
+# tables (freesail.physics.sails.SAIL_CLASSES, from data/sail_classes.yaml), so that the copy
+# cannot drift from the law (package 90, item 37: package 10 raised the studding peak to 1.35
+# for truth 14, 1.44 at its best angle, and left this table's 1.25; tests/test_peak_coeff.py
+# holds the two together). Rounded to two places, as the table always was: square 1.23,
+# studding 1.44, gaff 1.29, jibheaded 1.32, lug 1.29, lateen 1.25 (package 75's 1.246), sprit
+# 1.20 (its drag alone, at 90 degrees).
+PEAK_COEFF = {name: peak_coeff(cls) for name, cls in SAIL_CLASSES.items()}
 
 # Sustained load / static peak-coefficient load, measured with tools/measure_loads.py on the
 # frigate on a beam reach with the yards trimmed to the wind: 0.9 at 35 knots under all
@@ -10395,8 +10406,20 @@ def boat_cutter_23(out_dir="data/ships"):
 # every helper as `g.<name>`; it is imported only below, after `gen_ships` is made this running
 # script, so that its Builders, DesignLoads and helpers are these, one copy (a Builder of one
 # copy with a DesignLoad of another fails at `dump`: measured, Design-Ship-Indefatigable.md
-# §1.2).
-SHIP_MODULES = ("indefatigable", "neufchatel", "bilander", "bellerophon")
+# §1.2). Package 90 (docs/design/Plan-Package90.md §5.1 item 1) names its five after the four,
+# the same way, smallest first: the tartane, the polacre, the xebec, the Diana and the Purísima
+# Concepción.
+SHIP_MODULES = (
+    "indefatigable",
+    "neufchatel",
+    "bilander",
+    "bellerophon",
+    "tartane",
+    "polacre",
+    "xebec",
+    "diana",
+    "concepcion",
+)
 
 
 if __name__ == "__main__":
