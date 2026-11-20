@@ -9,12 +9,17 @@ by the owner's rule: it measured the better sailing of the two rakes. Her `displ
 as it stands and are written** (7-681 and 7-688). Seven wait on engine steps not yet merged. No
 other ship file moved: the eighteen are byte for byte.
 
-**The tests.** The final fast tier on my head (ecf6180), compared test by test with the base on
-f6f26f8a: **no test of the base changed its outcome**. Of the 166 new tests, 122 pass and **44
-fail**. All 44 are `tests/test_view_geometry.py`'s cases on her two files, and that file is the
-viewer's (the plan's §7.1). Each wants her measured row in one of its tables, or the viewer's
-drawing of a whole lateen (V1). Under the stop rule I have not edited it; the cases are listed in
-§9 for the coordinating session. The slow tier of her files passes.
+**The tests.** The final fast tier on my head (b33adfd), compared test by test with the base on
+f6f26f8a: **no test of the base changed its outcome**. Of the 152 new tests, 136 pass and **16
+fail**. All 16 are `tests/test_view_geometry.py`'s cases on her two files:
+- 14 want the viewer's drawing of a whole lateen (V1);
+- 2 want the viewer's rule for a level spar, which roots her beak at the rail.
+
+That file was the viewer's, and §9 lists its 44 cases as they stood on ecf6180, unedited under
+the stop rule. The coordinating session then widened it to me for her rows (the lead's nudge 32,
+item 1). §10 has her rows, her named rows with their reasons, and the 16 that remain. The slow
+tier of her files passes: 117 tests, among them four anchorage cases §9's run had left out
+(§10).
 
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
@@ -26,7 +31,8 @@ rebased or forced.
 |---|---|---|
 | 1, `lateen.py` alone | `bfec7fa3307162bc7fc23845b60cb6784ca903c9` | `tools/ships/lateen.py`; `tests/test_tartane.py` (its eight tests); `tests/test_probes_90.py` (the stub's pin restated); `docs/dev/TuningNotes.md` ("Package 90, the tartane", step 1) |
 | 2 to 4, her module and her files, and two mends found by the tests | `0dbd4fc933df9b37adac5fb8b8dbe2ab318d6dfa`; mends `b4e814c7e9bc99d285d6b57c7644f3fd820877b5` and `ecf61800db82ce5cc3bb3de31b61a3b69e185b5d` (§8, §9) | `tools/ships/tartane.py`; `data/ships/tartane.yaml` and `data/ships/coastguard-tartane.yaml` (generated); `data/people/tartane.yaml` and `data/people/coastguard-tartane.yaml`; `freesail/world/ships.py` (her two `DESCRIPTIONS` rows and her words); `freesail/world/captains.py` (the coastguard's `SIZE_RANK` row); `tests/test_tartane.py`; the moved pins (§8); `docs/dev/TuningNotes.md` (step 2 and the mends) |
-| this report | the commit that adds this file | `docs/design/Report-Package90-Tartane.md` |
+| her rows in the viewer's tables, and her storm jib's corners (§10) | `b33adfd69facb88dfc007b9e4cf37e61b32b0119` | `tests/test_view_geometry.py` (widened to me, §10); `tools/ships/tartane.py`; her two ship files (generated); `docs/dev/TuningNotes.md` |
+| this report | `e743467`, and §10 in the commit that adds it | `docs/design/Report-Package90-Tartane.md` |
 
 **Step 1's commit carries the owner's name as its author.** I set it by hand for that one commit.
 Every later commit is under the session's own default identity, as the other cloud builders'
@@ -336,7 +342,8 @@ failed.** Compared test by test (the two junit sets, by node id):
   and reads nothing of hers.
 
 **The slow tier of her files**: `--slow tests/test_tartane.py tests/test_probes_90.py`, 113
-passed in 5.9 s. Neither file has a test in the slow tier.
+passed in 5.9 s. Neither file has a test in the slow tier. (This run left out the four
+anchorage cases on her ship files in `tests/test_take_up_at_anchor.py`. §10 runs them.)
 
 **The targeted runs on the way** (no junit kept for the comparison):
 - the file-iterating files on 0dbd4fc: 1,562 passed and the base's xfail; 2 failed, both mended
@@ -351,8 +358,9 @@ passed in 5.9 s. Neither file has a test in the slow tier.
   12 guns, 8 in ports and 4 on the rail);
 - ruff clean, no Python line over 100, LF only (`git diff | tr -cd '\r' | wc -c` is 0).
 
-**The viewer's 44 cases on her files** (`tests/test_view_geometry.py`, the viewer's file: not
-edited, the stop rule), two of each but where four:
+**The viewer's 44 cases on her files, as they stood on ecf6180** (`tests/test_view_geometry.py`,
+the viewer's file: not edited then, under the stop rule; §10 has them after it was widened to
+me). Two of each, except where four:
 - **her row in a table of measured figures, or her file in a list of the files without a part**:
   - her round stern with no transom, no lights and no galleries, as the lugger's:
     `test_every_file_draws_a_closed_hull_with_no_nan` (`RIGHTLY_WITHOUT`'s gallery), `test_the_transom_runs_from_the_knuckle_to_the_taffrail`,
@@ -380,3 +388,90 @@ edited, the stop rule), two of each but where four:
     `test_the_head_and_the_galleries_stay_inside_the_fixed_frame_across_states`.
 
 
+## 10. The viewer's cases, after the widening (the coordinating session's message; the lead's nudge 32, item 1)
+
+`tests/test_view_geometry.py` was widened to me for her rows, "as every hull's builder must at
+her file". Commit b33adfd. Of the 44 cases that failed on her files:
+- **16 now pass**;
+- **12 are no longer run on her files**, because her named rows (below) say she rightly has
+  none of the part they test: her transom, her galleries and lights, her stern's layer, and the
+  yards under a jib-boom;
+- **16 remain**, each the viewer's.
+
+Two cases that passed before are also no longer run on her: those of
+`test_the_stern_stays_under_a_rig_figure_abaft_and_nearer`. They follow from the stern row by
+the file's own derivation. `STERN_LAYERED` takes a file with a transom or lights, and she has
+neither, as the lugger has neither.
+
+**(a) Her rows**, each measured by the file's own probes on her files:
+
+| Table | Her row |
+|---|---|
+| `BOWSPRIT_DRAWN` | (0.902, 0.0), each file |
+| `LEVEL_ROOT_M` | (3.67, 3.67, 2.85): the root drawn at her bow rail at the stem, the stem head by the rule, and her plate's beak level at 2.85 m (Pages §5.4) |
+| `TIERS_IN_THE_SIDE` | the trader none; the guarda-costa `{"upper"}` |
+| `CHORD_OFF_THE_SIDE_M` | 0.032, each file |
+| `LINES_ON_THE_RAIL` | the jib's two sheets and the two lateens' one sheet each |
+| `STEM_TACKED` | none: her jib and storm jib are cut from her file's corners, as the 64's are |
+
+**(b) The parts she has none of, as named rows with their reasons:**
+- `SHARP_STERNED`, her two files: Chapman's plate draws a sharp stern, the planking closing on a
+  raked post, with no transom, counter, gallery or light (Pages §5.5). Her files join
+  `RIGHTLY_WITHOUT`'s gallery, light and transom rows, and the transom's case keeps them out as
+  it keeps the lugger and the bilander. The trader alone joins its band row: she files no ports.
+- `NO_BOOM`: her two files (no part of hers is on a boom).
+- The yards under the bowsprit: her two files kept out beside the cutter, the lugger and the
+  smack. Her éperon carries the berthelot and no jib-boom (her design's §4.3).
+
+**The throwaway check.** I made a copy of her file under a name no row names
+(`data/ships/zz-forgetful.yaml`, never committed, and deleted after the run). Its run was
+`tests/test_view_geometry.py -k forgetful`: **22 failed and 31 passed**. Those 22 are the same 22 cases
+each of her files failed before her rows, the stern's, the boom's and the jib-boom's among them.
+Nothing passes for a hull that merely leaves a part out, and nothing was invented for her.
+
+**Found and mended in her own file:** her storm jib had no corners. The viewer therefore cut it
+on her jib's stay, which it lands on her stem head, and its tack stood 0.53 m off her side. It now
+files its corners, two-thirds of the jib cut alike about the jib's tack at the berthelot's end
+(Steel 1794 p. 190). This mend passes the four cases of
+`test_a_stay_to_the_stem_lands_on_the_stem_head_and_its_sails_foot_stands_over_the_rail`, which
+§9 had put under V1. They were mine, not the viewer's. Nothing else of her files moved, and the
+eighteen are byte for byte.
+
+**(c) The 16 that remain, and why** (exactly these; none edited, none loosened):
+
+| Case (each on both her files) | Cases | Why |
+|---|---|---|
+| `test_each_line_that_comes_down_ends_on_her_drawn_rail` (both tacks) | 4 | the whole lateen's sheet: drawn as a standing lug's, a metre abaft the clew, where the case's rule for a lateen is two. **V1** |
+| `test_with_no_profile_the_lines_come_down_as_before` (both tacks) | 4 | the same sheet, with no profile. **V1** |
+| `test_the_lines_come_down_on_the_rail_as_the_game_serves_her` | 2 | the same sheet, as served. **V1** |
+| `test_the_frame_is_unmoved_across_states_and_no_figure_lacks_a_number` | 2 | dressed, her great yard's penne stands 0.15 m over the fixed frame. The lugger's lugs, drawn by the same cut, are `OVER_THE_FRAME`; how the frame holds a whole lateen's yard is **V1**'s |
+| `test_the_head_and_the_galleries_stay_inside_the_fixed_frame_across_states` | 2 | furled, the viewer lays her yard and sail on deck as a lowered lug's, so her bounds move from furled to set. A whole lateen's yard stays aloft furled (her design's §5.4 item 7). **V1** |
+| `test_a_level_bowsprit_is_rooted_at_the_rail_at_the_stem_beside_its_sheets_height` | 2 | her beak runs level **under** her bow rail: the plate's 2.85 m against the rule's root, 3.67 m at the rail, 0.82 m over the case's 0.15. **Not V1**: the viewer's rule for a level spar, which roots every one at the rail at the stem. Her row records the figures; I did not touch the rule |
+
+Two figures of the drawing beside them, for the viewer's eye:
+- the stay her jib sets on is drawn to her stem head, while her jib is drawn from its corners,
+  its tack 3.41 m farther out at the berthelot's end;
+- her topsail's sheets are drawn to the tréou's yard's arms in plain sail, where her design has
+  no yard crossed under the topsail until the tréou is set (decision 9).
+
+**The tests, on b33adfd** (the same six chunks and command as §9's):
+- **The fast tier whole: 8,630 tests. 8,605 passed, 9 skipped and xfailed (the base's own),
+  and 16 failed.** Compared test by test with the base on f6f26f8a:
+  - **no test of the base changed its outcome**;
+  - the same 2 tests are the base's only (§9);
+  - 152 tests are new, and the 16 that fail are exactly the 16 of (c);
+  - no new test takes 5 s or more.
+- **Against the run on ecf6180:**
+  - 16 cases went from failed to passed;
+  - 14 left her parametrisation: the 12 above, and the 2 stern-layer cases that passed;
+  - nothing else changed.
+- **The slow tier of her files:** `--slow tests/test_tartane.py tests/test_probes_90.py` and
+  `test_take_up_at_anchor.py`'s `test_a_ship_taken_up_asleep_at_her_anchor_is_laid_at_it_on_every_hull`
+  on her two files, **117 passed**. **A correction to §9:** its slow-tier run left out those
+  four anchorage cases. They are the only slow cases on her ship files, found by collecting
+  `--slow -m slow` (587 tests) and searching the node ids. The other 113 are §9's.
+- **At this step's end:**
+  - `python tools/gen_ships.py <scratch>` gave all twenty files byte for byte as committed;
+  - since f6f26f8a, only her two ship files have changed;
+  - `load_ship` and `check_viewer_guns` are clean on both her files;
+  - ruff is clean, LF only, and no Python line is over 100 characters.
