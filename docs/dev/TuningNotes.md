@@ -38273,7 +38273,6 @@ Moved by the stage-0 builder. Read by an independent checker, who passed the gen
 - **The primer's chapter 3, "How close they may be carried"** (`docs/primer/03-making-and-shortening-sail.md`), widened by the owner. Old: the frigate in 13 knots brought up to six, two booms carried away at 04:40 and 04:41 ("Two booms gone in three minutes"), a transcript of an earlier engine (at the base, by the test's own orders, one boom goes at 374 s); "In 12 knots every boom whips and none goes in ten minutes; in 15 they go within minutes." New, re-recorded from a run on this tree (the test's scene, `weather_studding_sails_at_nine_points`, steered by whole degrees as a player orders it, the sails trimmed each minute; the trim and helm lines left out, and the other sails' shaking and whipping and her steadying as "..."): the frigate in 15 knots, three booms carried away at 04:37, 04:38 and 04:39 (104, 201 and 233 s), borne away to nine after four minutes with the two still aloft drawing again; "In 12 knots every boom whips and none goes in ten minutes, and in 13 none goes in half an hour; in 14 the first goes after a quarter of an hour, and in 15 within two minutes" (each measured: 12 knots, none in ten minutes; 13, none in the half hour; 14, the first at 978 s).
 - **The chapter's size**, with the passage: `tests/test_agents.py`'s `test_the_contents_says_what_each_topic_costs_measured_from_the_text_served` and `test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number`, "about 11,280 tokens" -> "about 11,330 tokens", a count, its history kept in the first's docstring.
 
-<<<<<<< HEAD
 
 ## Package 90, stage 0L: the whole lateen's interfaces, laid inert (2026-11-20)
 
@@ -38331,10 +38330,9 @@ Each from this worktree's root, one at a time, its junit kept in the session's s
 The fast and slow tiers whole are the session's, on the commit.
 
 Built by the stage-0 builder; to be passed by an independent reader (the plan's §5.3).
-=======
+
 ## Package 120: a word put in a mouth reaches the player (2026-11-20)
 
 The owner's fault: the director's `say as <person>: "..."` lines were written in the log and given to the stations held within earshot, and never shown the player at the prompt on the same quarterdeck. Every writer of a word's hearers (`heard_by`: `world.orders._say_as`, `orders.free`, `orders.stations` say and hail) names the stations held (a model's harness, the player's seat); the player at the prompt holds none, and the play log's reading (`knowledge.hears`) took the list as the whole of who heard. A model's own `say` on deck was hidden from him the same way. Mended in the reading: where the player's station is held by nobody, he hears such a word by the rule each writer holds a station to, where his person stands (`knowledge._heard_where_said`); where his seat or a model holds it, the list is the answer as before. No line's data changes.
 
 Pins moved: none. No `heard_by` assertion, count of shown lines or recorded digest moved. New truths 7-705 to 7-709 in `tests/test_mends_120.py`.
->>>>>>> 47399900f258866c574ff6f5eb376248920a9ea5
