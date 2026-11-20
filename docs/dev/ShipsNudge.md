@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 11:30 UTC (PACKAGE 119 IS MERGED at 8d67c9c3: merge the trunk in and report your one hash; the muster deals odd hands in turn, and heaving to and filling away call all hands where the watch is too few). Nudge number: 26.
+Latest note: 2026-11-20, 12:25 UTC (A3, THE TILLER, MAY RUN IN A SECOND ENGINE SESSION beside the engine track, as you propose, on the owner's word to you; three conditions in the note). Nudge number: 27.
