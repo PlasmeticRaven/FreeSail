@@ -83,7 +83,7 @@ wardroom:
     station: the rigging and the boats
     place: deck
     traits: [loud, knows every rope by its feel, hard on idlers]
-    history: "A topman of the Mediterranean squadron rated boatswain after the peace of 1802."
+    history: "A topman of the Mediterranean squadron, rated boatswain after the last peace."
     brief: >-
       The rigging, the cables, the anchors, the boats and the hands at their stations: they pipe
       the evolutions and see the gear overhauled.
@@ -179,7 +179,7 @@ wardroom:
     station: the soldiers
     place: deck
     traits: [a loud voice, the pike, twenty years' service]
-    history: "A private at Toulon in 1793; a sergeant since."
+    history: "A private of the navy's infantry in the last war; a sergeant since."
     brief: >-
       Posts the sentries, takes the drill and the muster of the soldiers and leads the file on a
       boarding.
