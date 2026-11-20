@@ -243,13 +243,14 @@ def test_the_cutter_wears_without_after_yards_and_hove_to_mans_her_braces(cutter
     "Stand by to wear ship. Up helm; brace in the after yards.", "Hands to the after braces;
     heave to." and "Fill away; man the after braces."; and "Hands to the head braces; heave to."
     and "Fill away; man the head braces." in A2 (A2's second pass: a vessel of one mast has no
-    head braces; the test was `..._mans_her_head_braces`); her head yards squared and braced up
-    as before, every tick the same."""
+    head braces; the test was `..._mans_her_head_braces`); her yards squared and braced up as
+    before, every tick the same, and "the yards", not "the head yards" (A2's second pass, its
+    point 3 at its cause: "Wind aft. Squared the head yards; ..." before it)."""
     worn = _lines(_from(cutter), [("wear ship", 600)])
     assert (1, "Stand by to wear ship. Up helm.") in worn
     aft = [line for _, line in worn if line.startswith("Wind aft")]
     assert aft == [
-        "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up."
+        "Wind aft. Squared the yards; shifted over the sheets; hauled out and braced up."
     ]
     assert [line for _, line in worn if line.startswith("Wore ship")] == [
         "Wore ship; braced sharp up on the larboard tack, heading ENE (68°)."
@@ -297,21 +298,27 @@ def test_the_cutter_with_her_square_sails_in_lies_to_her_sheets(cutter):
 
 def test_the_cutter_box_hauled_braces_up_no_after_yards(cutter):
     """Old: "Wind aft; braced up the after yards; shifted over the sheets. Haul out the
-    mainsail!"; "Brace abox the head yards!" as it was."""
+    mainsail!"; and her yards and braces said without "head", a vessel of one mast (A2's second
+    pass, its point 3 at its cause: "Ready about. Helm's a-lee; checked the lee head braces."
+    and "Brace abox the head yards!" before it), every tick the same."""
     got = _lines(_from(cutter), [("box haul", 600)])
     said = [line for _, line in got]
     assert "Wind aft; shifted over the sheets. Haul out the mainsail!" in said
-    assert any(line.endswith("Brace abox the head yards!") for line in said)
+    assert "Ready about. Helm's a-lee; checked the lee braces." in said
+    assert any(line.endswith("Brace abox the yards!") for line in said)
+    assert not [line for line in said if "head yards" in line or "head braces" in line]
     assert not [line for line in said if "after yards" in line]
 
 
 def test_the_cutter_boxed_off_round_by_the_stern_braces_up_no_after_yards(cutter):
     """Box her off (A2's second pass: the case the lead asked for), gone round by the stern from
     the settle, as a box-haul ends. Old: "Wind aft; braced up the after yards; shifted over the
-    sheets. Haul out the mainsail!"; her head yards braced abox as they were, every tick the
-    same."""
+    sheets. Haul out the mainsail!"; and "Up mainsail! Brace abox the head yards!" and "Box her
+    off! Stand by the head braces." before its point 3 at its cause, a vessel of one mast having
+    no head yards; every tick the same."""
     got = _lines(_from(cutter), [("box her off", 600)])
-    assert (1, "Up mainsail! Brace abox the head yards!") in got
+    assert (1, "Up mainsail! Brace abox the yards!") in got
+    assert (1, "Box her off! Stand by the braces.") in got
     assert (58, "Wind aft; shifted over the sheets. Haul out the mainsail!") in got
     assert (99, "Boxed her off; braced sharp up on the starboard tack, full and by.") in got
     assert not [line for _, line in got if "after yards" in line]
@@ -552,3 +559,43 @@ def test_the_cutter_missing_stays_squares_her_yards_only_with_a_square_sail_set(
     missed = [n for n in notes if n[1] == "ship.missed_stays"]
     assert len(missed) == 1 and ("square the yards" in missed[0][2]) == squared
     assert notes[-1][1] == "ship.fell_off" and notes[-1][2] == fell_off
+
+
+def _hanger(rate_deg_s: float, at_deg: float, dies_in_s: float):
+    """Physics that turns her until her head is `at_deg` off the wind, then lets her way die
+    over `dies_in_s` (`tests/test_evolutions.py`'s `hangs_in_stays`)."""
+    turn = _turner(rate_deg_s)
+    hung: dict = {}
+
+    def stepper(ship, dt, wind) -> None:
+        rel = units.relative_bearing(ship.dyn.heading, wind.direction_from)
+        if abs(rel) > units.deg_to_rad(at_deg):
+            turn(ship, dt, wind)
+        else:
+            speed0 = hung.setdefault("speed", ship.dyn.speed)
+            hung["t"] = hung.get("t", 0.0) + dt
+            ship.dyn.speed = max(0.0, speed0 * (1 - hung["t"] / dies_in_s))
+            _deck(ship, wind)
+
+    return stepper
+
+
+@pytest.mark.parametrize(
+    ("path", "topsail", "aback"),
+    [
+        (CUTTER, "topsail", "the yards aback to box her off"),
+        ("data/ships/topsail-schooner.yaml", "fore.topsail", "the head yards aback to box her off"),
+    ],
+    ids=["the cutter, of one mast", "the topsail schooner, of two"],
+)
+def test_hung_in_stays_a_one_master_lays_her_yards_aback_not_her_head_yards(path, topsail, aback):
+    """A2's second pass, by the runner's door (`tests/test_evolutions.py`'s hang): her topsail
+    set, hung in stays, the cutter's yards are laid aback in words as "the yards", a vessel of one
+    mast having no head yards; the schooner's as before. Old: "the head yards aback to box her
+    off" of both."""
+    ship, runner, wind = _on_starboard(45.0, path)
+    ship.sails[topsail].state = SailState.SET
+    runner.start(ship, "tack", "ship")
+    notes = _run(runner, ship, wind, _hanger(1.0, 8.0, 30.0))
+    hung = [n[2] for n in notes if n[2].startswith("Her way is gone; she hangs in stays.")]
+    assert hung == [f"Her way is gone; she hangs in stays. Helm kept a-lee; {aback}."]
