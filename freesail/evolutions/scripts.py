@@ -378,6 +378,28 @@ def settees_held(ship: Ship) -> set[str]:
     return {sl.id for sl in settees(ship)}
 
 
+# Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3
+# item 3): the ship's practice for a whole lateen's yard in going about, kept on her as a plain
+# dict of strings (`ship.extra["lateen_practice"]`, saved with her, as `COURSE_PENDING` is), for
+# each occasion, in stays and in wearing, "shift" (the yard changed round its mast) or "leave"
+# (left on the bad hand). "Shift" in both by default: the owner's "preferred" (question 3,
+# 2026-11-18). Set by nothing yet; its orders (`leave the lateens in stays` and their kin), the
+# tack's and the wear's reading of it and its row in the readings are the engine's step A1b.
+LATEEN_PRACTICE = "lateen_practice"
+LATEEN_PRACTICE_DEFAULT = (("stays", "shift"), ("wearing", "shift"))
+
+
+def lateen_practice(ship: Ship) -> dict[str, str]:
+    """The ship's practice for her whole lateens' yards in going about, by occasion ("stays",
+    "wearing"): what `ship.extra["lateen_practice"]` keeps for each, else the default, "shift"
+    in both (package 90's stage 0L). A fresh dict each time, so that changing it changes nothing
+    kept. Nothing acts on it until the engine's step A1b."""
+    kept = (getattr(ship, "extra", None) or {}).get(LATEEN_PRACTICE)
+    if not isinstance(kept, dict):
+        kept = {}
+    return {occasion: kept.get(occasion, default) for occasion, default in LATEEN_PRACTICE_DEFAULT}
+
+
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
 # the new lee in stays, and in wearing once the wind is past the stern.
 SETTEE_DIPPED_WORDS = "Dipped the {sail}; hoisted on the {side} side, to leeward of {mast}."
