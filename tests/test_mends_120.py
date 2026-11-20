@@ -177,8 +177,15 @@ def test_truth_7_709_ashore_by_his_place_aboard_another_ship_by_his_hull_and_no_
     # ...and the master beside the player at the market, the namesake at the counting
     # house: his word is shown (the line's trade tells the two apart)
     master.ashore_at, pearce.ashore_at = "market", "counting_house"
-    _say_as(w, "the master", "The boat waits at the steps, sir.")
+    e = _say_as(w, "the master", "The boat waits at the steps, sir.")
     assert _shown(sent, out, "The boat waits at the steps") == (True, True)
+    # a man in the boat off Falmouth is said 'ashore at Falmouth': with a namesake of his
+    # trade at the market beside the player, the boat's word is not the player's to hear
+    assert e.data["place"] == "shore" and e.data["where"].startswith("ashore at Falmouth")
+    master.where, master.ashore_at = "boat", ""
+    pearce.role, pearce.ashore_at = master.role, "market"
+    assert not d.hears(e) and not con.hears(e)
+    pearce.role = "first lieutenant"
     # a model holding the captain's station: the list is his, and it names him or not
     for p in (cap, master):
         p.aboard, p.where, p.port, p.ashore_at = True, "quarterdeck", "", ""

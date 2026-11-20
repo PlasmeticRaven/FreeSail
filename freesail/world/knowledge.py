@@ -1168,6 +1168,9 @@ def _speakers(world: Any, data: dict[str, Any]) -> list[Any]:
         if aboard:
             return at[0] == "aboard" and at[2] == ("quarterdeck" if place == "deck" else place)
         if place == "shore":
+            if at[0] in ("boat", "cutter"):
+                # a man in a boat off his port is said 'ashore at <port>' (`_say_as`)
+                at = ("ashore", str(getattr(p, "port", "") or ""), "")
             if at[0] != "ashore":
                 return False
             port = (getattr(ports, "ports", None) or {}).get(at[1]) if ports is not None else None
