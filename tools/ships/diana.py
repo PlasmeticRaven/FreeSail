@@ -144,9 +144,12 @@ WATERLINES = [
     [(-0.81, 0.64), (-1.62, 0.21), (-2.44, 0.09)],
 ]  # fmt: skip
 
-# The bulwark rail's upper edge, taffrail to stem head (Pages §5.2, §6.2; +-0.02 m).
+# The top of her side, taffrail to stem head (Build-Ships.md §5.1): the taffrail's top, the stern's
+# last point (Pages §5.5), then the bulwark rail's upper edge (Pages §5.2, §6.2; +-0.02 m). The
+# bulwark rail's after end, (-18.82, 3.52), stands 0.25 m abaft her upright upper stern at its
+# height, the stern's reading not closing (Pages §5.5): in her note, not a point of her side.
 RAIL = [
-    [-18.82, 3.52], [-18.0, 3.43], [-17.0, 3.33], [-16.0, 3.23], [-15.0, 3.13], [-14.36, 3.08],
+    [-18.63, 4.03], [-18.0, 3.43], [-17.0, 3.33], [-16.0, 3.23], [-15.0, 3.13], [-14.36, 3.08],
     [-13.10, 2.99], [-11.86, 2.91], [-10.60, 2.84], [-9.36, 2.79], [-8.11, 2.75], [-6.88, 2.71],
     [-5.63, 2.68], [-4.37, 2.66], [-3.12, 2.64], [-1.87, 2.63], [-0.62, 2.62], [0.63, 2.62],
     [1.89, 2.63], [3.13, 2.64], [4.36, 2.65], [5.61, 2.68], [6.87, 2.72], [8.12, 2.76],
@@ -539,9 +542,12 @@ PROFILE_NOTES = {
     "of her line, z above it and square to it, metres; every point measured on her own plan "
     "(BVD 1037832, PB-021, the larger image at 96.1 px a pie: Pages §6.2), the corrected frame "
     "taking out the sheet's bow and the level datum the first reading took (Pages §3.3, §4.1, §8).",
-    "profile.rail_m": "The bulwark rail's upper edge, from its after end to the stem head, traced "
-    "(Pages §5.2). The solid side is the rail (JUDGEMENT); the hammock rail above it, 3.17 m at "
-    "the middle to 3.99 m at the stern and 4.10 m at the bow, has no key.",
+    "profile.rail_m": "The top of her side from the taffrail's top, the stern's last point, then "
+    "the bulwark rail's upper edge to the stem head, traced (Pages §5.2, §5.5). The solid side is "
+    "the rail (JUDGEMENT); the bulwark rail's after end, (-18.82, 3.52), stands abaft her upright "
+    "upper stern at its height, the stern's reading not closing, and is not a point of it; the "
+    "hammock rail above it, 3.17 m at the middle to 3.99 m at the stern and 4.10 m at the bow, has "
+    "no key.",
     "profile.breadth_m": "The half-breadths at the line and at the rail at the plan's 25 stations, "
     "aft 11 to fore 11 every 4.506 pies (measured, Pages §5.1): the half-breadth plan's at the "
     "line, the body plan's sections at the rail's height. As drawn; whether moulded or outside "

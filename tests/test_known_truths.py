@@ -22612,6 +22612,11 @@ _MUSTERED_BEFORE_119 = {
     "smack.yaml": (8, "Isaac Matthews", 0.5709136896467344),
     "topsail-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
 }
+# The ship files made after package 119, which have no muster before the rule to be held to:
+# their watches at seed 7, starboard and larboard, held by truth 7-700 beside the eighteen. The
+# Diana's (package 90, her builder): 71 and 70, her odd main top, mizzen top and afterguard
+# watched by turns. Old: none.
+_MUSTERED_AFTER_119 = {"corvette-20.yaml": (71, 70)}
 
 
 def _mustered(path, seed=7):
@@ -22644,13 +22649,15 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     watches are equal or one apart, and so is each station's share of them; the merchant brig's
     ten are five and five (old seven and three), the razee's 288 are 144 and 144 (old 146 and
     142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
-    were: no other one had more than one odd station."""
+    were: no other one had more than one odd station. And every file made after the rule
+    (`_MUSTERED_AFTER_119`), the Diana's 141 seamen and soldiers 71 and 70 (package 90; old: the
+    eighteen files alone, every file of the tree)."""
     import glob
 
     from freesail.crew.model import Watch
 
     files = sorted(glob.glob("data/ships/*.yaml"))
-    assert [Path(p).name for p in files] == sorted(_MUSTERED_BEFORE_119)
+    assert [Path(p).name for p in files] == sorted({*_MUSTERED_BEFORE_119, *_MUSTERED_AFTER_119})
     split = {}
     for path in files:
         for seed in (7, 1805):
@@ -22664,6 +22671,7 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
             split[Path(path).name] = (st, lar)
     assert split["merchant-brig.yaml"] == (5, 5)
     assert split["razee-44.yaml"] == (144, 144)
+    assert {k: split[k] for k in _MUSTERED_AFTER_119} == _MUSTERED_AFTER_119
     assert split["seventy-four.yaml"] == (265, 265)
     assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
 
@@ -22677,14 +22685,14 @@ def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
     first) but for the odd last hands of the second, fourth, ... odd stations, which go to the
     larboard: two of the merchant brig's (her fore top's and her afterguard's, the boy), two of
     the razee's (fore top, waisters), three of the seventy-four's (fore top, afterguard, the
-    marines); none of any other file's."""
-    import glob
-
+    marines); none of any other file's. The eighteen are the files of before the rule
+    (`_MUSTERED_BEFORE_119`): a file made after it has no before, and truth 7-700 holds its
+    watches (the Diana's, package 90; old: every file of the tree, then the eighteen)."""
     from freesail.crew.model import WATCHES
 
     moved_by_file = {}
-    for path in sorted(glob.glob("data/ships/*.yaml")):
-        name = Path(path).name
+    for name in sorted(_MUSTERED_BEFORE_119):
+        path = f"data/ships/{name}"
         crew, after = _mustered(path)
         assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]
         moved = []
