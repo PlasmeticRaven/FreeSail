@@ -23510,11 +23510,11 @@ def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps
     watch of the frigate under a privateer's or a merchant's papers is told to report to the
     captain 'what the officer of the watch reports to him', and with none 'what the Regulations
     gave the lieutenant to report'; the wardroom's outlines, her people's duties from the
-    frigate's file, cite the Regulations only where they bind her. And another ship's lookout sees the brig under a merchant's
-    papers as the merchant brig, and under a privateer's as the brig-sloop she looks (armed,
-    full of men). OLD: the Regulations' words under all three papers, in the brief and in the
-    outlines; the brig under either
-    papers the brig-sloop."""
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout
+    sees the brig under a merchant's papers as the merchant brig, and under a privateer's as
+    the brig-sloop she looks (armed, full of men). OLD: the Regulations' words under all
+    three papers, in the brief and in the outlines; the brig under either papers the
+    brig-sloop."""
     from freesail.agents import agent
 
     for service, bound in ((None, True), ("privateer", False), ("merchant", False)):
