@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 07:35 UTC (THE DIANA'S LOAD LINE RULED: the arrowed line as drawn, with its drag; her plank's thickness from a source or as a stated range, never chosen by the band; the table most likely reckoned on a level line at the after draught, recorded as the reason the comparison is not like for like; her profile's area by the method the other draughted hulls use). Nudge number: 24.
+Latest note: 2026-11-20, 12:55 UTC (N2, THE CORSAIR, IS SETTLED BY THE OWNER AND LEAVES YOUR CARD: a package of its own under the lead in the career's milestone; the polacre's and the xebec's corsair fits held for it; their hulls and other fits still yours). Nudge number: 28.
