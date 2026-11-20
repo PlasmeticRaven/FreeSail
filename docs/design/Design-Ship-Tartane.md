@@ -31,8 +31,9 @@ beside new, each where it falls:
 - **the éperon** (ruling 3): **10½ pieds (3.41 m)**, the printed ratio 0.151 the misprint (JUDGEMENT),
   Forfait's leaf n179 and Chapman's 3.53 m the cross-check (decision 11, §4.3);
 - **the main's rake** (ruling 6): the owner's **3° forward** kept. Chapman's Pl. LXII draws it upright
-  (0.6° to 1.1° aft, ±0.5°), recorded beside it, and the owner has been asked whether to revisit it
-  (§4.1, §16.1);
+  (0.6° to 1.1° aft, ±0.5°), recorded beside it. **The owner's answer, 2026-11-20, verbatim:**
+  "Use the rake which provides the better sailing characteristic, upright, or slightly forward raked." So her builder measures her both ways, upright and 3° forward, and files the better
+  sailing, with the figures in her report (§4.1, §16.1);
 - **found and written in** (ruling 7): no raised after deck is drawn (§3); the war tartane's four
   ports a side, measured (§7); Pl. LXII's tartane two-masted, with no topsail, no mizen and no
   headsail (§4); the mizen's rake still JUDGEMENT (decision 10, §4.2);
@@ -934,8 +935,8 @@ Numbered at the build. Each with its source and a band to be settled by measure 
    her; the images README's reading of two is recorded, §17.) *2026-11-19:* one headsail, now on
    your own reading of the prints. *2026-11-20:* Chapman's only drawn rig of the type (Pl. LXII No. 16)
    stands the main **upright** (0.6° to 1.1° aft, ±0.5°), on a two-masted lateen with no topsail,
-   mizen or headsail (Pages §7). Your 3° forward is kept, as your answer, and you have been asked
-   whether to revisit it (the lead's ruling 6).
+   mizen or headsail (Pages §7). **Your answer, 2026-11-20:** "Use the rake which provides the better sailing characteristic, upright, or slightly forward raked." Her builder
+   measures both and files the better (the lead's ruling 6).
 4. **The tréou.** *The pick*: carried, a square sail on a yard crossed below the topsail, set before
    the wind and in too much wind, never in plain sail. Or left out. *2026-11-19:* carried, as
    answered; by your reading of the prints (no lower yard under the topsail) its yard is sent up

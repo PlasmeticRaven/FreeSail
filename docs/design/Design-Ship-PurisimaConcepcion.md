@@ -1,5 +1,60 @@
 # Design: the *Purísima Concepción* class three-decker of the Spanish navy (package 90, second draft)
 
+**Revised 2026-11-20 on her measuring, the owner's choice of her source and the lead's rulings of
+that day (14:10 UTC, nudge 30, item 4).** Her step 1 measured her own plan, PB-039, at the library's
+full size (12,932 × 4,574 px, 39.75 px a pie), and her sister's sheets at Greenwich, ZAZ0100 to
+ZAZ0103, at the 1,280 px the museum serves. The measuring is set down in
+`docs/design/ships-design/pages-concepcion.md` (**Pages**). The owner chose her source the same day:
+asked "Draw her hull from PB-039 instead?", in place of their Dec 10 choice of the *San Josef*'s sheets,
+they answered "Use PB-039 (Recommended)" (Dec Part F). The lead ruled on the measuring the same day.
+Old beside new, each where it falls:
+- **her source** (decisions 3 and 4, §0, §3.2, §16, §17 question 2): her lines from ZAZ0101 (rung S,
+  a sister's) with PB-039 scaled her stand-in (S†) meanwhile, become **PB-039, her own plan as built
+  (BVD record 1026905), unscaled: rung S, her own lines**. ZAZ0100 to ZAZ0103 stay as the comparison;
+  they settle her sixteenth lower pair, the aftmost (§3.3).
+- **her load line** (ruling 1; §2): a level line at 7.5 m to K (JUDGEMENT) becomes **the line as
+  traced** on PB-039, 8.02 m to K at the post's after face, 7.94 m at the middle and 7.65 m at the
+  stem's fore face, a drag of 0.37 m. The straight fit (8.17, 7.92 and 7.67 m, a drag of 0.50 m) is
+  recorded beside it, with the doubt about the photograph: the other waterlines leave their straight
+  fits aft unevenly (Pages §12.1). `draught_m`: 7.5 → **7.94**.
+- **`displacement_kg`** (ruling 2; decision 4, §2): 4,200,000 (JUDGEMENT on a level 7.5 m line, the
+  *Diana*'s cause) → **4,440,000**, about 4,440 t, the body as drawn, outside the plank, at the line as
+  drawn; the range 4,421 to 4,473 t, the plank's 3 to 4 pulgadas JUDGEMENT. Every other figure of
+  her file is reckoned to that line: her draught, her breadth at the water, her lateral area and her
+  KM (Pages §12.1). Winfield's 5,167 t is recorded beside it: read as toneladas of 2,000 libras, about
+  4,762 t, most likely reckoned level near her after draught (JUDGEMENT; the book's own mark on the
+  figure, the owner's p. 407, would settle it: Pages §12.5).
+- **her length** (ruling 3; decision 4, §2, §3.2): `length_waterline_m` 61.30 (Winfield's rebuilt
+  eslora) → **61.26**, PB-039's from the post's after face to the stem's fore face on her line (219.8
+  pies; 220.0 outside them at the lower deck). The lengthening of her lines by 1.029 is dropped: it
+  came from the research note's "about 214 pies", read short of the stem, and would count the rebuild
+  twice. Whether her eslora is between the rabbets (215.5 pies) or outside (220) stays open.
+  `hull_speed_kn` stays 13.1 (13.13 on 61.26 m against 13.13 on 61.30: computed).
+- **`deck_height_m`** (ruling 4; §2): "about 5.2 m" → **held for the lead**. 6.06 m was ruled on the
+  condition that it is the same deck by the same method as the 74's 3.16 m and the 64's 3.22 m (the
+  upper deck in the waist). It is the same deck by its place, but not the same method in one
+  particular: the 74's is the mean of the top and middle red lines her sheet draws for the deck, where
+  Pages took the upper of PB-039's pair. By the 74's method she stands 6.00 to 6.01 m (5.98 to 6.00
+  above the line as traced). Not filed (Pages §5.3).
+- **accepted as measured** (ruling 5):
+  - the ports (§3.3, §3.4): the lower 1.04 × 0.83 m (the 74's, interim) → **1.01 × 0.93 m**, its sills
+    (not known) → **1.89 to 2.48 m, 1.91 m amidships**; the middle and upper 0.84 × 0.80 m (interim) →
+    **0.91 × 0.76 m** and **0.80 × 0.67 m**; 15, 16 and 16 a side on PB-039 and 16, 16 and 16 on
+    ZAZ0100, the sixteenth lower pair's place (the aftmost, JUDGEMENT) → **the aftmost, read**;
+  - the lee port (§10): waiting on tasks 2 and 5 → **13.3°** at the midship port;
+  - the rudder (§2): "from ZAZ0101's sheer (task 4)" → **13.3 m², a span of 8.29 m**;
+  - the lateral plane (§2, a new row): **475.2 m²** to K and the knee, the rudder left out, by the
+    drawn hulls' method, D29 (b); about 473.5 m² reckoned to the line as traced (computed, Pages
+    §12.1);
+  - the decks (§3.2), the stern's lights on PB-039 (§13) and the masts' places (§4.1): measured
+    (Pages §5.3, §5.5, §5.7), the masts at **x −18.94, −3.47 and +23.37 m**.
+- **found besides** (Pages): PB-039 is a full body plan of eighteen sections with a half-breadth plan,
+  not a section only (§19); ZAZ0100 gives the quarterdeck six ports a side and the poop three, the
+  forecastle's not made out (decision 5, §3.3); her five truths' range, 7-735 to 7-739 (§14; Plan
+  §10.3).
+- **for the lead** (§18 items 7 to 10): `deck_height_m`; her `draught_m` at the middle of a bent line;
+  the length's convention by D29 (b), as the *Diana*'s; the breadth's factor of the old stand-in rule.
+
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The units (Winfield et al. 2023, pp. 41-46), the complements of 1788 (p. 1446 and the two
 pages following) and of the Regulation of 16 October 1803, and the ordinance of 1803's guns by deck
@@ -58,16 +113,18 @@ lead's note of 2026-11-18, nudge 15).
 
 **Marks** as Res's: *read*, *read (OCR)*, *read on screen*, *catalogue*, *via Winfield*,
 *measured*, *observed*, *judgement* (in capitals, **JUDGEMENT**, where a figure of hers rests on it
-alone). The rungs are the lead's: **A** the original plans, **B** a historian's particular, **C**
-judgement; **rule** for a named period rule applied to her own particulars (§5.0's R). "Plainly:"
-marks a departure from a ruling, a precedent or a source, with its reason. "Observed here" means a
-run of this draft's scratch scripts (Res §7; `scratchpad/p90/concepcion/`, the session's scratch,
-not filed), each with `py`, the pkg-90 tree first on `sys.path`, `freesail.__file__` asserted
-under it; no tracked file of the tree was changed (Python's git-ignored bytecode caches aside) and
-no git write made.
+alone). **2026-11-20:** *measured* also off PB-039 at the library's full size (39.75 px a pie) and
+the Greenwich sheets at 1,280 px (Pages, its marks). The rungs are the lead's: **A** the original
+plans, **B** a historian's particular, **C** judgement; **rule** for a named period rule applied to
+her own particulars (§5.0's R). "Plainly:" marks a departure from a ruling, a precedent or a
+source, with its reason. "Observed here" means a run of this draft's scratch scripts (Res §7;
+`scratchpad/p90/concepcion/`, the session's scratch, not filed), each with `py`, the pkg-90 tree
+first on `sys.path`, `freesail.__file__` asserted under it; no tracked file of the tree was changed
+(Python's git-ignored bytecode caches aside) and no git write made.
 
 **One sentence.** One module writes one file of the rebuilt hull for both her fits: her lines her
-sister's at Greenwich checked on her own plan at Madrid, her three tiers of sixteen ports on the
+sister's at Greenwich checked on her own plan at Madrid (since 2026-11-20, her lines her own plan's,
+PB-039, by the owner's choice, her sister's the comparison), her three tiers of sixteen ports on the
 74's machinery for decks (which already takes a middle deck), Winfield's two establishments to the
 libra, a company of 839 split so that every gun is manned (since 2026-11-19, her company by the
 regulations of 1788 and 1803, her soldiers their infantry and infantry-artillery), her rig by
@@ -82,9 +139,9 @@ first rate.
 |---|---|---|
 | 1 | One module `tools/ships/concepcion.py`, `build(out_dir)` writing `data/ships/three-decker.yaml` (her name *Purísima Concepción*); her people `data/people/three-decker.yaml` | The 74's form (Bel-D decision 1): a file by her type, a name by her ship |
 | 2 | **One hull, as rebuilt (1786 to 1793), for both fits**; the as-built hull of 94 is no fit | Both her fits are after the rebuild (VR-Sp §4); the game's era is 1792 to 1820 (`Plan-ShipsWorkflow.md` §0) |
-| 3 | **Her lines from ZAZ0101** (her sister *San Josef* as fitted at Plymouth, 1:48, 1801: body, sheer, half-breadth), rung A (§5.0's S, a sister's lines) **once it is read at step 1** (not viewed yet: Res §0.3); until then **PB-039** (her own plan as built, 1779, read on screen) scaled to her rebuilt length stands as her stand-in, S†, and checks ZAZ0101 after | The rebuilt form is the one she sailed; PB-039 is before the rebuild (Res §2.3, §2.4); a source on file but unread is no rung (§5.0 principle 3) |
-| 4 | Hull blocks: length 61.30 m (Winfield, rebuilt), extreme breadth 16.54 m (James, the *San Josef*), draught and displacement measured at her water; interim 7.5 m and 4,200 t, **JUDGEMENT**; Winfield's 5,167 t recorded beside | §2 |
-| 5 | **Three tiers of sixteen ports a side** (lower, middle, upper), the lower's sixteenth pair empty in Spanish service; the quarterdeck's and forecastle's ports as ZAZ0103 and ZAZ0100 show them | Res §2.4 (PB-039's 15, 16, 16 as built); VR-Sp §4 (the sixteenth pair cut in 1791) |
+| 3 | **Her lines from ZAZ0101** (her sister *San Josef* as fitted at Plymouth, 1:48, 1801: body, sheer, half-breadth), rung A (§5.0's S, a sister's lines) **once it is read at step 1** (not viewed yet: Res §0.3); until then **PB-039** (her own plan as built, 1779, read on screen) scaled to her rebuilt length stands as her stand-in, S†, and checks ZAZ0101 after | The rebuilt form is the one she sailed; PB-039 is before the rebuild (Res §2.3, §2.4); a source on file but unread is no rung (§5.0 principle 3). **2026-11-20, the owner's answer** ("Use PB-039 (Recommended)", to "Draw her hull from PB-039 instead?"): **her lines PB-039's, her own plan as built, unscaled, rung S**; ZAZ0101 read at 1,280 px only, the comparison (Pages §1.2, §11) |
+| 4 | Hull blocks: length 61.30 m (Winfield, rebuilt), extreme breadth 16.54 m (James, the *San Josef*), draught and displacement measured at her water; interim 7.5 m and 4,200 t, **JUDGEMENT**; Winfield's 5,167 t recorded beside. **2026-11-20 (the lead's rulings 1 to 3):** length 61.30 → **61.26 m** (PB-039); draught 7.5 → **7.94 m** to K at the middle of the line as traced; displacement 4,200 → **about 4,440 t** (4,421 to 4,473 t outside the plank); Winfield's 5,167 t beside it, about 4,762 t as toneladas of 2,000 libras | §2 |
+| 5 | **Three tiers of sixteen ports a side** (lower, middle, upper), the lower's sixteenth pair empty in Spanish service; the quarterdeck's and forecastle's ports as ZAZ0103 and ZAZ0100 show them. **2026-11-20:** ZAZ0100 draws 16, 16 and 16 a side, the sixteenth lower pair the aftmost; the quarterdeck 6 a side, the poop 3 small ones; no forecastle port made out at 1,280 px, and ZAZ0103's plans do not show the ports at that size (Pages §11.3) | Res §2.4 (PB-039's 15, 16, 16 as built); VR-Sp §4 (the sixteenth pair cut in 1791) |
 | 6 | **Guns numbered by deck** (`numbering: by deck`), each deck from No. 1 forward, the 74's B7.d | Built and measured on her scratch file (observed here); the period numbered each deck (Bel-D §5.2) |
 | 7 | **Two fits**: "concepcion 1797" (112, the default) and "concepcion 1809" (116, the 1803 alteration) | VR-Sp §4; each sums to Winfield's broadside in libras exactly (observed here) |
 | 8 | **The obús carried as a carronade** of its calibre, its words and note saying obús | The engine refuses an `obus` kind and takes a 48-pounder carronade (Eng §6.3); a new kind is engine work beyond her file (§5.4) |
@@ -124,8 +181,8 @@ this order and each on its own word:
 | Piece | Whose | Before her file? |
 |---|---|---|
 | The owner's answers to §17 | the owner | yes |
-| Winfield's passages (Res §11) | the owner's books | the hull blocks and the bill wait on items 1 and 2; nothing else does. **Received 2026-11-19, in part:** the bill by the regulations (§6.1) and the libra (§5.3); the class's pages (item 1) not sent, so her draught, sills and rudder are measured on ZAZ0101 or judged, and the keel's and the rebuilt length's digits stand as printed. **Nothing waits on Winfield now** |
-| PB-039 held in the tree (CC BY 4.0), and the choice of her hull: her sister's ZAZ0101 as rebuilt, or PB-039 as built (Dec 10; the sheets themselves read under the standing Greenwich rule) | the owner | her hull's lines (§3.2) wait on it |
+| Winfield's passages (Res §11) | the owner's books | the hull blocks and the bill wait on items 1 and 2; nothing else does. **Received 2026-11-19, in part:** the bill by the regulations (§6.1) and the libra (§5.3); the class's pages (item 1) not sent, so her draught, sills and rudder are measured on ZAZ0101 or judged, and the keel's and the rebuilt length's digits stand as printed. **Nothing waits on Winfield now**. **2026-11-20:** her draught, sills and rudder measured on PB-039 at step 1 (Pages); her length PB-039's 61.26 m by the lead's ruling 3, Winfield's printed 61.30 beside it |
+| PB-039 held in the tree (CC BY 4.0), and the choice of her hull: her sister's ZAZ0101 as rebuilt, or PB-039 as built (Dec 10; the sheets themselves read under the standing Greenwich rule) | the owner | her hull's lines (§3.2) wait on it. **Answered 2026-11-20:** PB-039, her own plan ("Use PB-039 (Recommended)"), the Greenwich sheets the comparison. Dec 10's first part, PB-039 held in the tree, stands as agreed and was not done at step 1 (her image is kept outside the tree: Pages §1.1) |
 | Her words and rank in `world/ships.py` and `world/captains.py` (§8) | her builder, the lead allotting `world/` | with her file |
 | "The second deck", "the third deck" in `orders/gunnery.py` (§5.5) | the gunnery's owner, or her builder on the lead's allotment | no: words only |
 | The obús as a kind of its own | a later gunnery package | no: carried as a carronade meanwhile |
@@ -168,14 +225,15 @@ own, `tools/ships/bellerophon.py:2499`, Eng §6.2); her calibres in libras and t
 
 | Key | Figure | Source, rung |
 |---|---|---|
-| `length_waterline_m` | **61.30** | Winfield's rebuilt length (via Winfield, p. 407; B), filed by the 74's convention of the length on the gun deck (Bel-D §2.1). VR-Sp labels Winfield's figure "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as her gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the *eslora* on the gun deck (JUDGEMENT), the owner's passage C1 asked. **2026-11-19:** the book defines its length (Winfield et al. 2023, pp. 41-46; VR-Sp §7): the *eslora*, on the lowest planked deck over both overhangs, neither the length overall nor the British gun deck's between the rabbets; for her the lower gun deck (JUDGEMENT); VR-Sp §4 relabelled. The figure filed does not move. **Plainly:** the book's pies give 61.43 m (220 pies 6 pulgadas × 0.2786); its metres are taken by the lead's rule, the owner's re-reading of p. 407 settling the digit (Res §2.1). James's 59.21 m for the *San Josef* (Res §2.2) is the check; ZAZ0101's scale measures it (task 1) |
-| `beam_m` | **16.54** | James's extreme breadth of the *San Josef* (vol. 2 p. 59, read (OCR); B). **Plainly:** not Winfield's 16.25 m, the book's *manga* being read as inside the plank (Res §2.2, JUDGEMENT); the file's beam is the extreme, as the 74's 46 ft 9 in is. If the owner's passage says the *manga* is extreme, 16.25. **2026-11-19:** the book's *manga* is the greatest beam at mid-length, the plank not said (pp. 41-46): the condition is not met in so many words, and 16.54 stands (JUDGEMENT) |
-| `draught_m` | **7.5**, to K, **JUDGEMENT** | Not found (Res §2.6). The 74's draught to K over her depth in hold (6.46 m on 19 ft 9 in: 1.07) on James's 7.44 m gives 8.0; on a Spanish ship built to carry her lower battery higher (James vol. 1 pp. 29 to 30) less (judgement). Measured on ZAZ0101 at her water (task 2) |
-| `displacement_kg` | **4,200,000**, **JUDGEMENT** | Her length, breadth and draught at the 74's block (Res §2.5). Measured off ZAZ0101's sections at her water (task 3); Winfield's 5,167 t in the note and in truth 7-NNN-a's record. The scratch file at 5,167 t heels 0.5° less close-hauled and tacks the same (observed here) |
+| `length_waterline_m` | **61.30** → **61.26** (2026-11-20) | Winfield's rebuilt length (via Winfield, p. 407; B), filed by the 74's convention of the length on the gun deck (Bel-D §2.1). VR-Sp labels Winfield's figure "Length overall"; the *Diana*'s plan, where Winfield's 124 pies measure as her gun deck from post to stem (Dia §2.2-§2.3), is the reason to read it as the *eslora* on the gun deck (JUDGEMENT), the owner's passage C1 asked. **2026-11-19:** the book defines its length (Winfield et al. 2023, pp. 41-46; VR-Sp §7): the *eslora*, on the lowest planked deck over both overhangs, neither the length overall nor the British gun deck's between the rabbets; for her the lower gun deck (JUDGEMENT); VR-Sp §4 relabelled. The figure filed does not move. **Plainly:** the book's pies give 61.43 m (220 pies 6 pulgadas × 0.2786); its metres are taken by the lead's rule, the owner's re-reading of p. 407 settling the digit (Res §2.1). James's 59.21 m for the *San Josef* (Res §2.2) is the check; ZAZ0101's scale measures it (task 1). **Revised, the lead's ruling 3: PB-039's 61.26 m**, from the post's after face (x 3,131 px) to the stem's fore face (x 11,870) on her line, 219.8 pies; 220.0 pies (61.30 m) outside them at the lower deck, 215.5 pies (60.06 m) between the rabbets there (Pages §5.1, measured). The lengthening of the lines by 1.029 is dropped (§3.2). Whether her eslora is between the rabbets or outside stays open; VR-Sp §7's definition (the lowest planked deck, both overhangs included) and the *Diana*'s plan read it outside, by which PB-039 draws about the rebuilt figure (220.0 pies against 220 pies 6 pulgadas: Pages §5.1): recorded, not settled. ZAZ0101 and ZAZ0100 draw the *San Josef* 59.71 m post to stem (Pages §11.2): the comparison. **Plainly:** D29 (b) files the drawn hulls' length rabbet to rabbet at the load line; hers, as the *Diana*'s, is post to stem by the ruling (§18 item 9). A, her own plan |
+| `beam_m` | **16.54** | James's extreme breadth of the *San Josef* (vol. 2 p. 59, read (OCR); B). **Plainly:** not Winfield's 16.25 m, the book's *manga* being read as inside the plank (Res §2.2, JUDGEMENT); the file's beam is the extreme, as the 74's 46 ft 9 in is. If the owner's passage says the *manga* is extreme, 16.25. **2026-11-19:** the book's *manga* is the greatest beam at mid-length, the plank not said (pp. 41-46): the condition is not met in so many words, and 16.54 stands (JUDGEMENT). **2026-11-20:** unchanged; beside it PB-039's moulded breadth at her line, 16.34 m amidships, its body plan's frame 58.25 pies (the as-built manga 58 pies 0), and ZAZ0101's 16.23 m (Pages §4.5, §6, §11.2) |
+| `draught_m` | **7.5**, to K, **JUDGEMENT** → **7.94** (2026-11-20) | Not found (Res §2.6). The 74's draught to K over her depth in hold (6.46 m on 19 ft 9 in: 1.07) on James's 7.44 m gives 8.0; on a Spanish ship built to carry her lower battery higher (James vol. 1 pp. 29 to 30) less (judgement). Measured on ZAZ0101 at her water (task 2). **Revised, the lead's ruling 1: her load line is the line as traced on PB-039**, 8.02 m to K at the post's after face, **7.94 m at the middle**, 7.65 m at the stem's fore face, a drag of 0.37 m (Pages §12.1, measured); the straight fit L0, the top of seven ruled waterlines inclined 0.47° to the keel, 8.17, 7.92 and 7.67 m (a drag of 0.50 m), recorded beside it, with the doubt about the photograph (the other waterlines leave their straight fits aft unevenly). To the keel's lower edge 7.65 m at the middle on the straight fit. The level 7.5 m was the *Diana*'s cause (Pages §4.4). K a false keel's lower edge (JUDGEMENT), as the drawn hulls file theirs (D29 (b)). The middle is taken, not the mean of the bent line's two ends, 7.84 m (JUDGEMENT; §18 item 8). ZAZ0101's waterlines are inclined 0.45° to its keel, its load line not identified at 1,280 px (Pages §11.2). A |
+| `displacement_kg` | **4,200,000**, **JUDGEMENT** → **4,440,000** (2026-11-20) | Her length, breadth and draught at the 74's block (Res §2.5). Measured off ZAZ0101's sections at her water (task 3); Winfield's 5,167 t in the note and in truth 7-NNN-a's record. The scratch file at 5,167 t heels 0.5° less close-hauled and tacks the same (observed here). **Revised, the lead's ruling 2: the body as drawn, outside the plank, at the line as drawn**: about 4,440 t, the range 4,421 to 4,473 t (the line as traced and the straight fit, each outside 3 to 4 pulgadas of plank), the plank's thickness **JUDGEMENT**, no scantling source being read for her (Pages §4.3, §4.5, §12.1; computed, ±2%). Moulded with the keel, 4,327 to 4,349 t. Every other figure of her file is reckoned to that line: her draught, her breadth at the water, her lateral area and her KM. **Beside it, in her source note:** Winfield's 5,167 t (p. 407), read as toneladas of 2,000 libras (921.6 kg, the *Diana*'s table's unit), is about **4,762 t**, most likely reckoned level near her after draught (JUDGEMENT); as metric tonnes it would need a line 0.8 to 0.9 m above her drawn one, in the wale's band, drawn nowhere on the sheet. The book's own mark on the figure, the owner's p. 407, would settle its unit (Pages §12). The old 4,200 t was her body at a judged level 7.5 m (Pages §4.4: 4,080 to 4,110 t there). A, her own plan |
 | `gm_m` | **1.5**, **JUDGEMENT** | The 74's 1.36 m (*Bombay Castle*, Bel-D §2.1) raised for a broad ship (James vol. 1 pp. 29 to 30: Spain built her ships broader than any other nation's, for safety); tuned within a band against the 74's heel |
-| `deck_height_m` | her **upper deck** at midships, about 5.2 m, measured | D18 (Bel-D §2.3): the deck of the waist, the third; read for the wind on deck, her windage and the lookout's eye (`physics/sails.py:349`, `world/lookout.py:223`) |
-| `hull_speed_kn` | **13.1**, **JUDGEMENT** | The 74's 12.0 by the square root of the lengths (61.30 / 51.2); tuned within §9's band |
-| `clr_x_m`, `rudder` | tuned (§9) | Her rudder from ZAZ0101's sheer (task 4); her helm's lead tuned for the 74's helm close-hauled and a tack no quicker than the 74's |
+| `deck_height_m` | her **upper deck** at midships, about 5.2 m, measured → **held for the lead** (2026-11-20) | D18 (Bel-D §2.3): the deck of the waist, the third; read for the wind on deck, her windage and the lookout's eye (`physics/sails.py:349`, `world/lookout.py:223`). **2026-11-20:** the 5.2 was the scratch file's (the 74's upper deck raised 2.05 m), not a reading. PB-039's upper deck at x 0, its upper red line, stands **6.06 m** above the straight fit (Pages §5.3, measured). **The lead's ruling 4**: 6.06 m on the condition that it is the same deck by the same method as the 74's 3.16 m and the 64's 3.22 m (the upper deck in the waist). **Checked (Pages §5.3): the same deck by its place** (the highest continuous deck, at the waist, at the middle line and at the middle, above her water by the same rule), **not the same method in one particular**: the 74's figure is the mean of the top and middle red lines her sheet draws for the deck (`tools/ships/bellerophon.py`:138-145, :775-778), where Pages took the upper of PB-039's pair; the 64's leaves the edge open by ±0.4 ft (`tools/ships/indefatigable.py`:147-153). By the 74's method she stands **6.00 to 6.01 m** (5.98 to 6.00 above the line as traced; 6.04 to 6.05 by Pages' line). **Not filed: for the lead** (§18 item 7) |
+| `hull_speed_kn` | **13.1**, **JUDGEMENT** | The 74's 12.0 by the square root of the lengths (61.30 / 51.2); tuned within §9's band. **2026-11-20:** unchanged on 61.26 m (13.13 either way: computed) |
+| `clr_x_m`, `rudder` | tuned (§9); the rudder **13.3 m², span 8.29 m** (2026-11-20) | Her rudder from ZAZ0101's sheer (task 4); her helm's lead tuned for the 74's helm close-hauled and a tack no quicker than the 74's. **Revised, the lead's ruling 5: PB-039's rudder, accepted as measured**: 13.3 m² below her line, a span of 8.29 m to its sole on K, 1.03 m broad at the line and 1.88 m at the heel, its centroid 4.68 m down (Pages §5.6, ±5%); ZAZ0101's not read at 1,280 px. Her angle and rate the 74's until tuned. A |
+| `lateral_area_m2` | not in this table → **475.2** (2026-11-20) | **The lead's ruling 5: by the drawn hulls' method, D29 (b)**: the post's after face, K and the knee's fore edge, the rudder left out, 475.2 m² to the straight fit, 0.98 of her length times her draught (Pages §5.6, measured); 455.3 m² to the keel's lower edge and the stem's fore face, 488.5 m² with the rudder, beside it. **Reckoned to the line as traced** (ruling 2's condition): **about 473.5 m²**, the strip between the two lines aft taken out (Pages §12.1, computed). A |
 
 ---
 
@@ -192,13 +250,13 @@ galleries and lights by tier, a figure at the head), and `marks` for every line.
 
 | Line | Source | Rung (§5.0) | Note |
 |---|---|---|---|
-| The body plan, sections and half-breadths | ZAZ0101 (1:48, 1801) | A (S, a sister's) once read at step 1; until then PB-039 scaled, S† | the *San Josef* as rebuilt and fitted; her sister's after the same rebuild (VR-Sp §4) |
-| The sheer, the rail and its steps, the wales | ZAZ0101 (sheer), ZAZ0100 (colour plan, 1799) | A (S) once read; PB-039 scaled, S†, until then | ZAZ0100 for the eye of her upper works as the British found them |
-| The stem, the head, the figure | ZAZ0101 ("figurehead"), PB-039 | A (S) once read; PB-039 meanwhile; the figure's form in words | PB-039's head a beakhead with rails and a figure (Res §2.4) |
-| The stern, the counter, the galleries and lights | ZAZ0101 ("sternboard with decoration detail", "quarter decoration"), PB-039 | A (S) once read; PB-039 meanwhile | PB-039: two closed tiers of quarter galleries and a third of lights above (Res §2.4); the admiral's cabins on the *toldilla* (PB_0050, via Winfield p. 409) |
-| The decks | ZAZ0102 (middle, gun and orlop, 1:96), ZAZ0103 (quarterdeck, forecastle, upper, 1:96), ZAZ0101 (inboard) | A (S) once read; T until then, to read: ZAZ0102, ZAZ0103 | |
-| The ports, their sills and sizes | ZAZ0101 and ZAZ0100 (rebuilt, 16 a tier); PB-039 (as built: 15, 16, 16, read on screen) | A (S) once read; PB-039's tiers, S†, meanwhile | §3.3 |
-| The keel and the body under the water | ZAZ0101 | A (S) once read; PB-039 scaled, S†, meanwhile | kept as data (§5.0 principle 11) |
+| The body plan, sections and half-breadths | ZAZ0101 (1:48, 1801) | A (S, a sister's) once read at step 1; until then PB-039 scaled, S†. **2026-11-20: PB-039's body plan (eighteen sections) and half-breadth plan, A (S, her own), unscaled** (Pages §4.3, §6) | the *San Josef* as rebuilt and fitted; her sister's after the same rebuild (VR-Sp §4). **2026-11-20:** ZAZ0101 the comparison, its sections not measurable at 1,280 px (Pages §11.2) |
+| The sheer, the rail and its steps, the wales | ZAZ0101 (sheer), ZAZ0100 (colour plan, 1799) | A (S) once read; PB-039 scaled, S†, until then. **2026-11-20: PB-039's sheer, A (S, her own)**; the wale measured amidships only (Pages §5.4) | ZAZ0100 for the eye of her upper works as the British found them |
+| The stem, the head, the figure | ZAZ0101 ("figurehead"), PB-039 | A (S) once read; PB-039 meanwhile; the figure's form in words. **2026-11-20: PB-039's stem and knee, measured** (Pages §5.1, §6) | PB-039's head a beakhead with rails and a figure (Res §2.4) |
+| The stern, the counter, the galleries and lights | ZAZ0101 ("sternboard with decoration detail", "quarter decoration"), PB-039 | A (S) once read; PB-039 meanwhile. **2026-11-20: PB-039's quarter and its lights, measured and accepted** (ruling 5; Pages §5.5); the stern board's measures not read | PB-039: two closed tiers of quarter galleries and a third of lights above (Res §2.4); the admiral's cabins on the *toldilla* (PB_0050, via Winfield p. 409) |
+| The decks | ZAZ0102 (middle, gun and orlop, 1:96), ZAZ0103 (quarterdeck, forecastle, upper, 1:96), ZAZ0101 (inboard) | A (S) once read; T until then, to read: ZAZ0102, ZAZ0103. **2026-11-20: PB-039's red lines, measured and accepted** (ruling 5; Pages §5.3); the Greenwich plans not readable for heights at 1,280 px | |
+| The ports, their sills and sizes | ZAZ0101 and ZAZ0100 (rebuilt, 16 a tier); PB-039 (as built: 15, 16, 16, read on screen) | A (S) once read; PB-039's tiers, S†, meanwhile. **2026-11-20: PB-039's, A (S, her own), measured and accepted**; the sixteenth lower pair placed by ZAZ0100 (ruling 5) | §3.3 |
+| The keel and the body under the water | ZAZ0101 | A (S) once read; PB-039 scaled, S†, meanwhile. **2026-11-20: PB-039's, A (S, her own)**, to the line as traced (Pages §12.1) | kept as data (§5.0 principle 11) |
 | Anything a sheet does not reach | the default rule (Build §5.3) | C, `judged` | its note names the hull it must differ from, the 74 |
 
 **Plainly:** until the Greenwich sheets are read and measured at step 1 (and the owner chooses her
@@ -206,6 +264,16 @@ hull from them: Dec 10, question 2), her lines stand on PB-039 alone, her own hu
 over her built length (61.30 / 59.55, 1.029: §5.0 principle 7's stand-in scaling, `stand-in`), her
 sections by the breadths (16.25 / 16.16), the sills from PB-039's own tiers. That is the fallback,
 not the plan.
+
+**Revised 2026-11-20 (the owner's choice; the lead's ruling 3).** PB-039 is her hull, and **the
+fallback's lengthening is dropped**: PB-039 already draws her 61.26 m from the post's after face to
+the stem's fore face on her line, not 59.55; the 1.029 rested on the research note's "about 214 pies",
+read 170 px short of the stem's fore face, and would make her about 63.0 m, counting the rebuild
+twice (Pages §5.1). Her lines are PB-039's as drawn, rung S, her own. **The breadth's factor**
+(16.25 / 16.16, 1.0056) is not named by the ruling: PB-039's body-plan frame measures 58.25 pies,
+between the as-built manga's 58 pies 0 and the rebuilt 16.25 m (58.32 pies), inside the scale's
+±0.4%, so the sheet cannot tell them apart. Taken as drawn, unscaled, as ruling 2's "the body as
+drawn" reads (JUDGEMENT; §18 item 10). ZAZ0100 to ZAZ0103 stay as the comparison (Pages §11).
 
 ### 3.3 The ports and their sills
 
@@ -216,10 +284,21 @@ not the plan.
   the aftmost, so that her armed pairs are the lower deck's Nos. 1 to 15 and No. 16 an empty port
   (in the British fit armed); if the drawings show the new pair forward, the numbering keeps its gap
   wherever it falls (Bel-D §5.2: "a fit that leaves a place empty leaves a gap").
+  **2026-11-20, measured and accepted (ruling 5):** on PB-039, **15 a side, 12.78 pies (3.56 m)
+  apart, from x −24.66 to +25.18** (49.84 m), the research note's figure standing; **the sixteenth pair
+  the aftmost, read on ZAZ0100**, where the lower tier's 16 ports stand each under one of the upper
+  tier's 16, the aftmost included, as on PB-039 the upper tier has one port more aft than the lower
+  (x −28.27). The JUDGEMENT becomes a reading; the numbering stands (lower Nos. 1 to 15 armed, No. 16
+  the empty aftmost) (Pages §5.2, §11.3).
 - **The middle and upper decks: sixteen a side**, the middle staggered between the lower and the
-  upper, the upper over the lower and one more aft (PB-039, Res §2.4).
+  upper, the upper over the lower and one more aft (PB-039, Res §2.4). **2026-11-20, measured:** the
+  middle from x −26.46 to +26.97, the upper from −28.27 to +25.18 (PB-039); on ZAZ0100, 16, 16 and 16,
+  the lower and upper port over port, 3.43 m apart, the middle staggered (Pages §5.2, §11.3).
 - **The quarterdeck and forecastle**: six and three a side for the 1797 fit's 12 and 6 eight-
-  pounders (VR-Sp §4); places from ZAZ0103 (task 6). The 1809 fit's quarterdeck takes four
+  pounders (VR-Sp §4); places from ZAZ0103 (task 6). **2026-11-20:** ZAZ0100 draws the quarterdeck's
+  six a side at x −18.8 to −7.3 (2.30 m apart), the poop's three small ones at x −25.4, −23.4 and
+  −21.4; no forecastle port could be made out at 1,280 px, and ZAZ0103's plans do not show the ports
+  at that size (Pages §11.3): the forecastle's places not read. The 1809 fit's quarterdeck takes four
   eight-pounders and six obuses, its forecastle four and two: the same ports, the obuses on the
   ports nearest the ends (**JUDGEMENT**; the 74's 1812 rule, long guns in the wake of the shrouds,
   carronades elsewhere, Bel-D §5.1).
@@ -227,13 +306,19 @@ not the plan.
   carronades (Bel-D §5.1), from ZAZ0103's poop if drawn.
 - **The lower sills above her water**: not known (Res §2.6). Her water is set as the 74's was (Bel-D
   §2.2: the line where a reported clearance stands, else the drawn load line) by task 2, and the
-  sills follow from the drawing.
+  sills follow from the drawing. **2026-11-20, measured and accepted (ruling 5):** above PB-039's line,
+  **1.91 m amidships** (the lowest 1.89 at x +3.78; 2.30 aft and 2.48 forward); the middle sills 4.29
+  to 4.93 m, the upper 6.29 to 6.81 m; every triple in Pages §5.2. Above the line as traced the after
+  sills stand a little higher (the aftmost lower about 0.11 m: Pages §12.1).
 
 ### 3.4 Port sizes
 
 Measured by deck on ZAZ0101 (task 5). Interim, the 74's: lower 1.04 × 0.83 m, middle and upper the
 74's upper 0.84 × 0.80, the upper works 0.79 × 0.71 (**JUDGEMENT**); the Spanish 36-pounder's port
 is likely larger than the British 32's (judgement), so the lower's is measured first.
+**2026-11-20, measured and accepted (ruling 5):** on PB-039, **lower 1.01 × 0.93 m, middle 0.91 ×
+0.76 m, upper 0.80 × 0.67 m** (±1 cm; Pages §5.2), in place of the 74's 1.04 × 0.83 and 0.84 × 0.80;
+the upper works' not measured.
 
 ### 3.5 Her measuring tasks (the Greenwich sheets read under the standing rule; the owner's choice of hull, Dec 10)
 
@@ -251,6 +336,12 @@ is likely larger than the British 32's (judgement), so the lower's is measured f
 9. The masts' places at the partners (ZAZ0101's inboard; ZAZ0102's and ZAZ0103's decks).
 10. PB-039 against ZAZ0101: the rebuild's change in length and in the stern, for her note.
 
+**2026-11-20, done at step 1** (Pages §7): on PB-039 at full size, 2 (its part), 3, 4, 5 and 7, and 8
+in part; on ZAZ0100 to ZAZ0103 at 1,280 px, 1, 9 and 10 (the length) coarsely, 5 and 6 counted, the
+sixteenth pair read. Not done: 3 by ZAZ0101's sections, ZAZ0101's load line (2), its rudder (4), decks
+(7) and stern measures (8), the forecastle's ports (6). With her hull PB-039's (the owner's choice),
+ZAZ0101's are the comparison's, not hers.
+
 ---
 
 ## 4. The rig
@@ -266,7 +357,7 @@ read (§17 item 4).
 |---|---|---|
 | Main lower mast | **124 ft 3 in (37.87 m)** | Steel 1794 vol. I p. 39 (read (OCR)): half the lower deck and the extreme breadth, on James's 194 ft 3 in and 54 ft 3 in; **rule**, British. On Winfield's 61.30 m and James's breadth, 127 ft 2 in; the gun deck's length taken as Steel's "lower deck" (Res §5) |
 | Fore lower mast, mizen lower mast, the topmasts, topgallant and royal masts | the 74's (*Dragon*'s list, Bel-D §4.1) × **1.150** (124.25 / 108) | **JUDGEMENT** until Steel's p. 39 fractions are read on the page image, which then rule |
-| Mast places, heels and rakes | measured (task 9) | A |
+| Mast places, heels and rakes | measured (task 9). **2026-11-20, measured and accepted (ruling 5):** PB-039's stumps above the rail, **mizen x −18.94, main −3.47, fore +23.37 m**, the main's step at −3.56; ZAZ0101's −19.07, −3.89 and +23.16 beside; the same spacing on ZAZ0102's middle deck (the partners) and ZAZ0103's decks, so upright within the reading; the rakes not read (Pages §5.7, §11.5) | A |
 
 Each lower mast is stepped on the keel and stands through **three** decks; Steel's diameters are
 "taken at the partners; which are at the middle deck in three-decked ships" (p. 49, read (OCR)).
@@ -622,6 +713,15 @@ and 5. James's general word that foreign-built ships carried their lower battery
 water" (vol. 1 p. 29) is the period's expectation; a truth on her shut heel waits on her measured
 sill.
 
+**2026-11-20, measured and accepted (ruling 5):** on her own plan **the midship lee port dips at
+13.3°** (the sill's z over its half-breadth, this rule's), the lowest (lower No. 9 at x +3.78) at
+13.3°, the aftmost at 18.7°, the foremost at 22.1° (Pages §5.2, computed). Against the 74's 1.57 m
+sill at a moulded half-breadth of 6.93 m (Research-74 §3.2.4; 7.04 m outside the plank in the 74's
+file), about 12.8° (12.6° on the file's: computed): her sill stands 0.34 m higher from the water, as
+James says of Spanish ships, but her greater breadth keeps the angle within a degree of the 74's
+(judgement). The midship ports stand forward of where the line as traced leaves the straight fit, so
+the 13.3° holds on either (Pages §12.1). Truth 7-NNN-c may now be drafted on it.
+
 ---
 
 ## 11. Where she sails
@@ -662,7 +762,10 @@ are; `galleries_m` takes any number of tiers):
 - **Her height**: three gun decks under a quarterdeck and forecastle with an open waist and its
   gangways, and the poop; her rail's steps at each.
 - **The stern**: square, two closed tiers of quarter galleries and a third of lights above, the
-  stern's lights in tiers (PB-039; ZAZ0101's sternboard).
+  stern's lights in tiers (PB-039; ZAZ0101's sternboard). **2026-11-20, measured on the quarter and
+  accepted (ruling 5):** the lights at z 4.80 to 5.92, 7.39 to 7.95 and 9.39 to 9.92 m; the lowest
+  gallery's drop to 2.45 m; the taffrail's top 11.84 m at x −33.2 (Pages §5.5); the stern board itself
+  (ZAZ0101) not read.
 - **The head**: a beakhead with its rails and a figure (PB-039; ZAZ0101's figurehead).
 - **The channels** above the upper tier, their chain plates down across it (PB-039).
 - **The mizen's lateen yard** and its course cut at the mast (the 74's drawing, Ext §6.1); the
@@ -676,11 +779,14 @@ are; `galleries_m` takes any number of tiers):
 
 ## 14. Truths proposed (numbered by the lead at the scope card)
 
+**2026-11-20:** her range is **7-735 to 7-739** (`Plan-Package90.md` §10.3, by the lead's nudge
+30); the letters stand until her builder numbers them.
+
 | Truth | What it holds | Form |
 |---|---|---|
-| **7-NNN-a, her particulars hold their sources** | her length and breadth Winfield's and James's within the rounding; three gun decks with 16 ports a side each; her two fits 112 and 116 pieces whose halves sum to 1,188 and 1,508 libras; 839 men. **2026-11-19:** 877 men by the 1788 regulation, of whom 225 soldiers; the 1809 fit's note giving the 1803 regulation's 1,015 and 275, and her own 839 | the 74's 7-194 form |
+| **7-NNN-a, her particulars hold their sources** | her length and breadth Winfield's and James's within the rounding; three gun decks with 16 ports a side each; her two fits 112 and 116 pieces whose halves sum to 1,188 and 1,508 libras; 839 men. **2026-11-19:** 877 men by the 1788 regulation, of whom 225 soldiers; the 1809 fit's note giving the 1803 regulation's 1,015 and 275, and her own 839. **2026-11-20:** her length PB-039's 61.26 m (Winfield's 61.30 beside it, within 0.1%), her displacement her drawn body's (about 4,440 t) with Winfield's 5,167 t in the record | the 74's 7-194 form |
 | **7-NNN-b, three gun decks at quarters** | the beat says the lower, middle and upper decks' crews in order; every crew of the default fit manned (2026-11-19: with the regulation's soldiers, as measured; if crews stand empty, the clause waits on the lead's word, §6.1); "fire the starboard middle deck" names sixteen guns; a bare number refused naming her decks | B7.b and B7.d on three decks |
-| **7-NNN-c, her lower ports shut at the heel her sources give** | after tasks 2 and 5 | the 74's 7-195 form |
+| **7-NNN-c, her lower ports shut at the heel her sources give** | after tasks 2 and 5. **2026-11-20:** measured, the midship lee port at 13.3° (§10) | the 74's 7-195 form |
 | **7-NNN-d, she sails as a fast first rate** | her best speed in 15 kn at least the 74's and no more than the frigate's; her tack from truth 10's three headings no quicker than the 74's and inside 600 s; she wears and lies to as the 74 | Brenton via Winfield; James vol. 6 pp. 3 to 4; Luce |
 | **7-NNN-e, three of her crewed hold the floor** | the frigate off the Lizard with three of her crewed over `CREWED_FLOOR_TICKS_S` | the 74's 7-196, marked pace |
 
@@ -700,7 +806,9 @@ plain class default, and every existing file byte for byte, as Build §14.2.
 
 1. **Her lines unread.** Until ZAZ0101 to ZAZ0103 are read at step 1 (and if the owner chooses
    PB-039 alone, Dec 10), her hull is PB-039's stand-in (§3.2), her sills and water judged, and truth
-   7-NNN-c waits.
+   7-NNN-c waits. **2026-11-20: met.** PB-039 measured at full size and chosen by the owner; her sills
+   and water measured; the Greenwich sheets read only at 1,280 px (no larger free image), her
+   comparison. What stays: whether the sheet or its photograph bends her waterlines aft (Pages §12.1).
 2. **Her tack and her helm.** The engine's tack does not slow with size (§9); if no rudder and lead
    hold both the 74's helm and a tack no quicker than the 74's, the band is the lead's to set.
 3. **Her company's split** is set by the engine's rule that marines serve no long gun; Winfield's
@@ -712,7 +820,8 @@ plain class default, and every existing file byte for byte, as Build §14.2.
    (one ratio, 1.0159); the weights by calibre are not in the passages, and stay interim until other
    research gives them or they are ruled JUDGEMENT.
 5. **The displacement** (4,200 against 5,167 t) moves her heel, her way and her pace a little; her
-   handling and tack not (observed).
+   handling and tack not (observed). **2026-11-20:** ruled, about 4,440 t, her drawn body; Winfield's
+   5,167 t, about 4,762 t as toneladas, recorded beside it (§2).
 
 ---
 
@@ -727,7 +836,10 @@ plain class default, and every existing file byte for byte, as Build §14.2.
    ZAZ0103**, measured on Greenwich's site under the standing rule (read and cited by number, never
    copied, as *Minorca*'s are for the xebec) (my pick); (b) PB-039 alone, her hull scaled from her as
    built. (Viewing the sheets needs no permission; the choice is which hull is hers, and so it is
-   the owner's: Dec 10 question 2.)
+   the owner's: Dec 10 question 2.) *Answered 2026-11-18 as picked (a); answered again 2026-11-20*,
+   put as "Draw her hull from PB-039 instead?": "Use PB-039 (Recommended)". Her hull is drawn from
+   PB-039, her own plan as built; the *San Josef*'s sheets stay as the comparison, and settle her
+   sixteenth lower pair, the aftmost (Dec Part F).
 3. **Her soldiers at the guns.** (a) **Count about a hundred of her 839 as soldiers and the rest as
    seamen, so that every gun is manned** (my pick, interim until Winfield's dotación by kind, G3, is
    read); (b) about 160 soldiers by the 74's share (JUDGEMENT: Winfield gives the 839 unbroken), with
@@ -765,12 +877,29 @@ of fourteen): for question 1, what the tops see at four miles.
 5. **The nations table's one year** for a scenario of 1810 (§11).
 6. **A Spanish names list**, shared with the *Diana* (§6.6): the plan's N1, from the *Diana*'s
    builder.
+7. **2026-11-20: `deck_height_m`** (ruling 4's condition, checked: §2; Pages §5.3). The same deck by
+   its place as the 74's and the 64's, not the same method in the line taken as the deck's surface:
+   6.06 m by Pages' line (the upper of PB-039's pair), 6.00 to 6.01 m by the 74's (the pair's mean);
+   5.98 to 6.05 m above the line as traced. Not filed until the lead's word.
+8. **2026-11-20: her `draught_m` on a bent line.** The line as traced is straight forward of about x
+   −5 m and nearly parallel to the keel aft of it, so its middle (7.94 m to K) and the mean of its two
+   ends (7.84 m) part by 0.10 m. The middle is taken, where the file's frame is set (JUDGEMENT; Pages
+   §4.2, §12.1). And the frame's heights follow the line as traced at their stations, up to 0.15 m at
+   the post's after face (Pages §12.1, JUDGEMENT on what ruling 2 asks).
+9. **2026-11-20: her length's convention**, as the *Diana*'s §17.2 item 8: D29 (b) files the drawn
+   hulls' length rabbet to rabbet at the load line; hers is PB-039's post to stem by ruling 3. Her
+   length between the rabbets on her line is not measured (60.06 m at the lower deck).
+10. **2026-11-20: the breadth's factor** of the old stand-in rule (16.25 / 16.16), not named by ruling
+   3: taken as drawn, unscaled (JUDGEMENT; §3.2).
 
 ---
 
 ## 19. Found on the way
 
-- **PB-039 at full resolution** (12,932 × 4,574 px) on the Biblioteca Virtual de Defensa, CC BY 4.0,
+- **PB-039 at full resolution** (12,932 × 4,574 px) on the Biblioteca Virtual de Defensa, CC BY 4.0
+  (**2026-11-20:** served as a one-page PDF by the record's second image group, 356204; the sheet holds
+  a full body plan of ten after and eight fore sections with five diagonals, and a half-breadth plan
+  under the sheer, not only a section: Pages §1.1, §1.3),
   with four sister-type sheets of the 112s (PB-049, PB-078, PB-344, PB-060) and Ibargüen's wheel
   of 1785, all from the Archivo Histórico de la Armada (Res §0.2): the same library and licence as
   the *Diana*'s PB-021; the other hulls' documents may find their own plans there.

@@ -299,7 +299,7 @@ answered in the owner's own shape**, the row below.
 | 7 | The *Diana*'s guns when taken | The owner's three fits kept, and a fourth, "Danish 1807", added from her own papers | Dia §4, §8; Dia-D §17.1 |
 | 8 | The three-decker | Two fits on one rebuilt hull, 1797 as the default; about 100 of her 839 as soldiers so that every gun is manned (interim, until Winfield's dotación is read); size rank 5. **2026-11-19:** the dotación read; her company by the regulations, 877 of whom 225 soldiers for the 1797 fit (1788) and 1,015 of whom 275 for the 1809 fit (1803, a departure in the note), her crews measured at her build | Con §3, §4; Con-D §6.1, §17; VR-Sp §15 |
 | 9 | A foreign gun's pounds | As her navy named it (`pounder: 36`), with Winfield's pairs in the note as the book gives them | VR-Sp "Units"; Con §3.3; Dia-D §17.1 |
-| 10 | The sources | Hold PB-039; the three-decker's hull from her sister's lines as rebuilt (ZAZ0101 to ZAZ0103, read under the standing Greenwich rule); hold the *Diana*'s 1809 drawing once a museum image with its terms is found and vetted; the Danish draught not sought now | Con §11; Dia §9 |
+| 10 | The sources | Hold PB-039; the three-decker's hull from her sister's lines as rebuilt (ZAZ0101 to ZAZ0103, read under the standing Greenwich rule); hold the *Diana*'s 1809 drawing once a museum image with its terms is found and vetted; the Danish draught not sought now. **2026-11-20:** the three-decker's hull answered again, "Use PB-039 (Recommended)": drawn from PB-039, her own plan, the *San Josef*'s sheets the comparison (§8.5) | Con §11; Dia §9 |
 
 **Taken as recommended unless the owner says otherwise:** Dec, Part E, a short list with pointers.
 It includes:
@@ -313,7 +313,10 @@ the owner's to look up; none has come yet. Part E stands as recommended, no word
 against it. **2026-11-19:** the passages came, marked item by item in Dec Part D, and the owner
 answered four more questions, verbatim in Dec Part F: the polacre's mizen topsail, "Carry it";
 *Virgen del Carmen*'s row, "Quite honestly, I do not know."; the ground report's count over twenty,
-"Go ahead"; the tiller step's seven files, "Widen the card".
+"Go ahead"; the tiller step's seven files, "Widen the card". **2026-11-20:** three more, verbatim in
+Dec Part F: the three-decker's source, "Use PB-039 (Recommended)"; the tartane's main's rake, "Use the
+rake which provides the better sailing characteristic, upright, or slightly forward raked."; the
+tartane's builder, "Start it (Recommended)".
 
 **A1d, decided by the owner on 2026-11-18** (put to them with the card as card A of
 `docs/dev/ScopeCards-AfterTheGate.md`; the lead's note of 22:35 UTC, nudge 19), verbatim: "A
@@ -335,7 +338,7 @@ mast too, and in wind enough risk damage (Dec 3 and Part F; Eng §2.4.3).
 | Polacre | Pol: Steel 1794's two polacre-settees; Forfait's rule for pole masts; O'Scanlan 1831; James's eight armed polacres, among them the Spanish navy's *San Josef* of 1800 | Pol-D: item 8 settled (§5); two files (the trader, and the polacre of war) | T: no polacre's lines found; her size waited on Winfield's rows, and since 2026-11-19 is *Angel de la Guarda*'s (25.08 m of eslora by 7.52 m: VR-Sp §12) | On a pole main the topsail and topgallant are "courses" to the engine at twelve places. Her lateen mizen hove to is kept drawing: 58.5° off at 1.65 kn by truth 12's own measure, 0.05 kn over its 1.6 (her headway 1.49 kn), her lever the fore lateen's trim. Taken in, she does not heave to at all | Monleón's caption (Winfield's polacras came 2026-11-19, with the owner's reading of the print) |
 | Xebec | Xeb: James gives *África* (1799), *Vives* (1806) and a 22-gun xebec at her sweeps (1801). Niles gives the regency's 18 (1815). Forfait's Table IV (the *Caméléon*) gives her spars | Xeb-D: two files (the King's xebec, and a trader); a new corsair book | S† once Greenwich's *Minorca* (ZAZ4270, 29.49 × 9.30 m) is read at step 1; R or T until then | A point nearer the wind than the brig, but better before the wind than the brig: the opposite of the sources. Tacks in 346 s with the lateens flipped free. A ship given boat's oars becomes a boat | Forfait's Table IV on the page image; *Minorca* measured; Chapman's xebec |
 | *Diana* | Dia: her held Spanish plan read to scale. Its table gives Winfield's row and her displacement, 497.2 t. Roos 1957 (rung B) gives her Danish arms and her captain's report | Dia-D: one file; four fits | S: her own plan, rung A | Sails, tacks, wears and heaves to as the frigate does, given GM 1.5. One tack, from 295°, is 164 s, under truth 10's band | Steel's 20-gun column; the Danish draught |
-| *Concepción* | Con: her own plan PB-039 (CC BY 4.0), three tiers of 15, 16 and 16 ports; her sister's lines at Greenwich (ZAZ0101); James's *San Josef* as taken | Con-D: one file; two fits | S once ZAZ0101 is read and measured; PB-039 (read on screen) her stand-in, S†, meanwhile | The engine takes a third deck almost everywhere (Eng §6). She tacks quicker than the 74 (181 to 188 s against 237 to 258 s). In truth 7-196's world three of her probe crewed run 72 to 75 ticks a second against three 74s' 79 to 81 (Eng §7) | Her masting, her gun weights, draught and sill; ZAZ0100 to ZAZ0103 not viewed (her company by kind came 2026-11-19, by the regulations of 1788 and 1803: VR-Sp §15) |
+| *Concepción* | Con: her own plan PB-039 (CC BY 4.0), three tiers of 15, 16 and 16 ports; her sister's lines at Greenwich (ZAZ0101); James's *San Josef* as taken | Con-D: one file; two fits | S once ZAZ0101 is read and measured; PB-039 (read on screen) her stand-in, S†, meanwhile. **2026-11-20:** PB-039 measured at full size and chosen by the owner: S, her own lines, unscaled; ZAZ0100 to ZAZ0103 read at 1,280 px, the comparison (`ships-design/pages-concepcion.md`) | The engine takes a third deck almost everywhere (Eng §6). She tacks quicker than the 74 (181 to 188 s against 237 to 258 s). In truth 7-196's world three of her probe crewed run 72 to 75 ticks a second against three 74s' 79 to 81 (Eng §7) | Her masting, her gun weights, draught and sill; ZAZ0100 to ZAZ0103 not viewed (her company by kind came 2026-11-19, by the regulations of 1788 and 1803: VR-Sp §15). Her draught and sills measured 2026-11-20; the sheets viewed at 1,280 px only |
 
 **The engine note**, Eng:
 - item 37 measured both ways, on both tiers, through a read redirect in scratch (§1);
@@ -369,7 +372,9 @@ mast too, and in wind enough risk damage (Dec 3 and Part F; Eng §2.4.3).
 - **Greenwich's free 1280-px images**, read and cited by object number and never copied:
   - *Minorca*, ZAZ4270;
   - ZAZ0100 to ZAZ0103, the *San Josef*, under the same rule; the owner chooses whether the
-    three-decker's hull is drawn from them (Dec 10).
+    three-decker's hull is drawn from them (Dec 10). **2026-11-20:** reached at 1,280 px, the only
+    size served free, and measured coarsely; the owner chose PB-039 for her hull, these sheets the
+    comparison (`ships-design/pages-concepcion.md` §1.2, §11).
 - **Winfield's passages**, sourced by the owner and asked by title and class (Dec, Part D).
   **Received 2026-11-19**, in part, and marked item by item there; set down by page in VR-Sp §7 to
   §17. What was not found is filled from other research or judgement, by the owner's word.
@@ -779,7 +784,9 @@ The pictures stay outside the repository.
   - **The main's rake.** "Raking" in decision 11; no text gives an angle; the watercolour's main is
     near upright. 3° forward is provisional. The owner's (Dec 4). **2026-11-20:** Chapman's Pl. LXII
     No. 16 draws a tartane's main upright (0.6° to 1.1° aft); the owner's 3° forward is kept, and the
-    owner has been asked whether to revisit it (the lead's ruling 6, nudge 29).
+    owner has been asked whether to revisit it (the lead's ruling 6, nudge 29). **Answered
+    2026-11-20** (Dec Part F): "Use the rake which provides the better sailing characteristic,
+    upright, or slightly forward raked." And her builder: "Start it (Recommended)".
   - **Her topsail on a pole main** (Tar-D §5.1a): A5 and A6 before her file, and A5's reading of
     her topsail if the tréou's yard is left out (the lead's).
   - **Her heave-to's lever** (§4 row 4), with the measure to be made on her file.
@@ -916,9 +923,38 @@ The pictures stay outside the repository.
 
 - **Her second draft must settle:**
   - **Dec 8**, Dec 9 (her decision 9 and its §5.3 table, if the owner takes the nominal pounder)
-    and Dec 10.
+    and Dec 10. **2026-11-20:** Dec 10's hull answered again, "Use PB-039 (Recommended)", put as
+    "Draw her hull from PB-039 instead?" in place of the *San Josef*'s sheets (Dec Part F).
   - **Her lines from ZAZ0101** if the owner chooses her sister's hull (Dec 10), or PB-039 as a
-    stand-in.
+    stand-in. **Done at step 1, 2026-11-20, and ruled by the lead (14:10 UTC, nudge 30, item 4)**
+    (`ships-design/pages-concepcion.md`):
+    - her hull is drawn from PB-039, her own plan as built (BVD record 1026905), rung S, unscaled;
+      the *San Josef*'s sheets (ZAZ0100 to ZAZ0103, served at 1,280 px only) stay as the comparison,
+      and settle her sixteenth lower pair, the aftmost;
+    - her load line is the line as traced, 8.02 m to K at the post's after face, 7.94 m at the
+      middle and 7.65 m at the stem's fore face (a drag of 0.37 m), the straight fit (8.17 m aft, a
+      drag of 0.50 m) recorded beside it, with the doubt about the photograph said; the two part by
+      22 t;
+    - `displacement_kg` is the body as drawn, outside the plank, at the line as drawn: about 4,440 t
+      (the range 4,421 to 4,473 t, the plank's 3 to 4 pulgadas JUDGEMENT), was 4,200 t, a judgement
+      on a level 7.5 m line, the *Diana*'s cause; her draught (7.94 m, was 7.5), her breadth at the
+      water, her lateral area and her KM are reckoned to that line; Winfield's 5,167 t is recorded
+      beside it, about 4,762 t as toneladas of 2,000 libras, most likely reckoned level near her
+      after draught (JUDGEMENT; the owner's p. 407 would settle it);
+    - her length is PB-039's 61.26 m (was Winfield's 61.30), the lengthening of her lines by 1.029
+      dropped; whether her eslora is between the rabbets or outside stays open;
+    - `deck_height_m` 6.06 m was ruled on the condition that it is the same deck by the same method
+      as the 74's 3.16 m and the 64's 3.22 m. Checked: the same deck by its place, not the same
+      method in the line taken as the deck (the 74's mean of its top and middle red lines, her
+      note's upper line); 6.00 to 6.01 m by the 74's method. **Held for the lead**, not filed;
+    - for the lead besides (Con-D §18 items 8 to 10): her `draught_m` at the middle of a bent line
+      (7.94 m, the mean of its ends 7.84); her length's convention by D29 (b), as the *Diana*'s; the
+      breadth's factor of the old stand-in rule, taken as drawn;
+    - accepted as measured: her ports (lower 1.01 × 0.93 m, its sills 1.89 to 2.48 m and 1.91 m
+      amidships; middle 0.91 × 0.76 m; upper 0.80 × 0.67 m; 15, 16 and 16 a side on PB-039, 16, 16
+      and 16 on ZAZ0100), the lee port at 13.3°, the rudder (13.3 m², a span of 8.29 m), the
+      lateral plane (475.2 m² to K and the knee, the rudder left out, D29 (b); about 473.5 m² to the
+      line as traced), the decks, the stern's lights and the masts' places.
   - **Her tack**, quicker than the 74's today. Her rudder and helm's lead are tuned to a tack no
     quicker than the 74's and inside Luce's five to ten minutes. If no setting holds both the helm
     and the tack, the band is the lead's.
@@ -938,12 +974,15 @@ The pictures stay outside the repository.
   - **no longer Winfield** (2026-11-19): G3 gave her bill and G2 the libra, so her pounds by calibre
     stand; C1 was not found, and what it would have given is measured on ZAZ0101 at her step 1 or
     judged (her draught, sills and rudder), the keel's and the rebuilt length's digits standing as
-    printed by the lead's rule;
+    printed by the lead's rule (**2026-11-20:** measured on PB-039, her length its own);
   - her guns' weights by calibre, not in the passages: from other research (the period's Spanish
     artillery treatises, for example) or JUDGEMENT, the interim figures of Con-D §5.3 meanwhile;
-  - Dec 10 for her lines (without it, her hull stands at PB-039's stand-in);
-  - N1.
-- **Her truths:** five (Con-D §14). The pace truth is measured on the build machine.
+  - Dec 10 for her lines (without it, her hull stands at PB-039's stand-in); **answered 2026-11-20:
+    PB-039**;
+  - N1;
+  - **2026-11-20:** the lead's word on `deck_height_m` (above).
+- **Her truths:** five (Con-D §14), **7-735 to 7-739** (§10.3). The pace truth is measured on the
+  build machine.
 - **Her pins:** none of another ship's file. A9 is keyed on a middle deck. V4's words move the 74's
   and the 64's port word.
 
@@ -970,7 +1009,7 @@ The pictures stay outside the repository.
 | V1 to V3 | viewer | the lateen, the pole and the towed boat drawn | A1, A4, A6 | the tartane's report | the smack's picture (V2) |
 | **Tartane** | her builder | `lateen.py` alone, then her two files | 0L for her files; A1a to A6 for her merge | the polacre's and the xebec's rigs (`lateen.py`) | none |
 | **Stopping point 2** | the owner | the first lateen ship | | | |
-| A9, ***Concepción*** | her builder | three decks, and her file | A0, N1, her passages (received 2026-11-19; what was not found measured or judged), Dec 10 | stopping point 3 | V4's words |
+| A9, ***Concepción*** | her builder | three decks, and her file | A0, N1, her passages (received 2026-11-19; what was not found measured or judged), Dec 10 (answered 2026-11-20: PB-039); the lead's word on her `deck_height_m` (§8.5) | stopping point 3 | V4's words |
 | V4 | viewer | the middle deck's port words | A9 | her report | the 74's and the 64's port word |
 | **Stopping point 3** | the owner | the first three-decker | | | |
 | **Polacre** | her builder | her two files | A1a to A1d, A5, A6 (Winfield's rows received 2026-11-19; N2 struck 2026-11-20, her corsair fit held for package 123) | stopping point 4 | none |
@@ -1109,6 +1148,22 @@ in the order of §9.1. The engine steps' own behaviour is pinned in their test f
 hulls' truths that state it ("she tacks and wears, her yards shifted round their masts or left";
 "she shifts to her small lateens";
 "under her sweeps in a calm"; "three gun decks at quarters").
+
+**2026-11-20: the numbers, and who holds them.** The lead gave 7-660 to 7-699 (2026-11-19, nudge
+20) and 7-720 to 7-749 (nudge 30), and asked that the table be kept here ("keep the table in your
+plan"). **7-700 to 7-719 are other packages' and are not to be used** (the lead's nudge 30).
+
+| Numbers | Holder |
+|---|---|
+| 7-660 to 7-669 | the *Diana* |
+| 7-670 to 7-679 | the engine track |
+| 7-680 | the stage-0 builder's truth 7-680 (the Spanish list's nation) |
+| 7-681 to 7-689 | the tartane |
+| 7-690 to 7-694 | A3 |
+| 7-720 to 7-725 | the polacre |
+| 7-726 to 7-734 | the xebec |
+| 7-735 to 7-739 | the *Concepción* |
+| 7-695 to 7-699, 7-740 to 7-749 | spare (the viewer and later needs) |
 
 ### 10.4 Pins expected to move, by step
 
