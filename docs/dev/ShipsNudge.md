@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-21, 04:40 UTC (A2's MENDED HASH 4207881a: WORDS ONLY AGAINST THE TRUNK, the ten right, the primer right; NOT MERGED on one short list: dismasted, the eight are told of the yards they have left, classed as built: a brig with her fore mast gone keeps "after braces"; one reader for the four; pinned). Nudge number: 37.
+Latest note: 2026-11-21, 05:10 UTC (THE TARTANE'S QUESTIONS 2 TO 10: the mizen's clew as taken; T-2 never tuned to; her watch by night measured now; the trader Saint-Pierre takes the french names; A5, A6 and A4 noted for the queue). Nudge number: 38.
