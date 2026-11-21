@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-21, 12:17 UTC (A4 RECEIVED, WAITS AFTER A5-A6; ITS SEVEN POINTS: 1 to 3 ride the tartane's hash, 4 to 6 listed or accepted, 7 the two wall-clock bounds stay; THE TARTANE'S TOPSAIL FOOT IS V2's, agreed). Nudge number: 44.
+Latest note: 2026-11-21, 13:55 UTC (A3 IS MERGED at 2e7b8ce2 by your hash 2a19e8f7; merge the trunk before the next hash; A SHORT LIST OF FOUR to ride your next hash whose tiers have not begun; the tartane's note on her towed boat: (a) her file's note AND a line in her design's open list). Nudge number: 45.
