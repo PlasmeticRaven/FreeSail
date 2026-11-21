@@ -463,6 +463,37 @@ def test_a_brig_dismasted_is_told_of_the_yards_she_has_left_as_built(brig, which
         ]
 
 
+def test_the_brig_with_her_main_gone_heaves_to_and_fills_away_line_for_line(brig):
+    """The lead's nudge 42: the brig with her main carried away by the game's own call, by the
+    player's door as `test_a_brig_dismasted_is_told_of_the_yards_she_has_left_as_built` has her
+    (her square sails in, 300 s, her main carried away, 1 s), hove to 600 s and filled away 120
+    s: every line, in its order and at its tick, so that a line dropped from the middle of either
+    evolution fails. Measured on this code, the same in every run (A2's second pass pinned these
+    lines so at its third commit, with the main wrecked by hand; from its fifth commit, through
+    the game's own call, only their presence)."""
+    world = _from(brig)
+    world.submit("take in the square sails")
+    world.run(300)
+    _carried_away(world.ship, "main")
+    world.run(1)
+    cut = replay.checkpoint_bytes(world)
+    assert _lines(_from(cut), [("heave to", 600), ("fill away", 120)]) == [
+        (0, "Order: heave to."),
+        (1, "The fore topmast staysail sheet to windward; helm a-lee."),
+        (1, "Hands to the head braces; heave to."),
+        (
+            600,
+            "Hove to on the starboard tack, under her fore-and-aft canvas, fore topmast staysail "
+            "sheet to windward, helm a-lee.",
+        ),
+        (600, "Order: fill away."),
+        (601, "Hauled aft the head sheets; kept the helm a-lee to let her fall off."),
+        (601, "Fill away; man the head braces."),
+        (601, "Braced the yards full."),
+        (602, "Filled away on the starboard tack; braced full and steering WNW (292°)."),
+    ]
+
+
 def test_the_smack_under_her_fore_and_aft_canvas_box_hauls_and_boxes_off_by_no_braces(smack):
     """A2's second pass, its third commit (the checker's finding 2): the box-haul family follows
     the square sails set as the tack and the wear do. The smack under plain sail, no square sail

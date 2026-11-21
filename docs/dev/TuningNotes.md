@@ -39047,6 +39047,10 @@ Whole, none moves on any of the eight.
 - **The lying-to's "Her after yards full, she gathers way"** (`keep_lying_to`) still reads the action's own split; not reached by the proof or by the checker's 12 forced-round probes.
 - **Found, not of this step** (the damage control's): the bilander with her main gone keeps "the mainsail", her main's settee, set though wrecked, and the trim order trims it ("Trimmed the mainsail sheet; the mainsail 85 degrees off the centreline.", and the watch's hands lines).
 
+### After the merge: the brig with her main gone pinned line for line (the lead's nudge 42, 2026-11-21)
+
+`test_the_brig_with_her_main_gone_heaves_to_and_fills_away_line_for_line`: the brig with her main carried away by the game's own call (`_carried_away`), by the player's door as the fifth commit's world test has her, hove to 600 s and filled away 120 s. **Old**: since the fifth commit, the presence of her heave-to's and fill-away's lines alone ("Hands to the head braces; heave to.", "Fill away; man the head braces."); at the third commit, with her main wrecked by hand, line for line and tick for tick. **New**: her nine lines, in their order and at their ticks, measured on the merged code (11c7e67e) and the same in every run (two runs in two processes, byte for byte): the order at 0 s; the fore topmast staysail sheet to windward and the head braces manned at 1 s; hove to and the fill-away ordered at 600 s; the head sheets hauled aft, the head braces manned and the yards braced full at 601 s; filled away at 602 s. With one line taken out of the middle in a scratch copy (`a2fix/mut7.py`: the fill-away's "Braced the yards full." not said), the new test fails (at index 7, the filled-away line where the braced-full line was) and the fifth commit's world test, which reads their presence alone, still passes.
+
 Built on the lead's list of nudge 34; to be passed by the lead's reader.
 
 ## Package 121: her service is her papers' (2026-11-20)
