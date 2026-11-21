@@ -19,6 +19,9 @@
 # Parameters: `toward_deg`, the bearing to lay it out on (none: ahead, up the stream
 # she rides to); `fathoms` of hawser (none: three quarters of the hawser, the rest for
 # the scope and the quarter port).
+#
+# A boat towed astern on her painter is hauled up alongside by it for the kedge and the hawser,
+# not hoisted out, and veered astern on it again when she is back, a minute each.
 id: lay_out_kedge
 verb: lay_out_kedge
 work: lay out the kedge
@@ -31,8 +34,10 @@ timing:
   sling_s: 300            # the kedge over the boat's stern and the hawser coiled in her (judgement)
   boat_pace_kn: 4.0       # a boat pulling, laden: judgement (ports.BOAT_PACE_KN)
   hoist_in_s: 300         # judgement
+  haul_alongside_s: 60    # a towed boat hauled up alongside by her painter (judgement: ports.BOAT_HAUL_ALONGSIDE_S)
+  veer_astern_s: 60       # a towed boat veered astern on her painter again (judgement: ports.BOAT_VEER_ASTERN_S)
   hawser_fraction: 0.75   # the part of the hawser laid out (judgement)
-on_start: {log: "Hoist out {boat}; the kedge and a hawser into her."}
+on_start: {log: "{boat_out}; the kedge and a hawser into her."}
 on_complete: {log: "The kedge laid out {fathoms} to the {point} by {boat}; the hawser taut to the capstan.", kind: ship.kedged, severity: notable}
 on_fail: {log: "Could not lay out the kedge: {reason}.", kind: evolution.failed, severity: notable}
 crew: {hands: 16, rating: ordinary, stations: [forecastle, waisters]}

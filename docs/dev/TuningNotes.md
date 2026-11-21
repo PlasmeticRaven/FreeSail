@@ -39044,3 +39044,55 @@ The smack, seed 7, 15 kn, her topsail set over plain sail and settled (times fro
 The ground report's rows 13 to 16 do not move: no `reef_pole` (13), and `tests/test_held_work.py`'s two sweeps (14, 15) and `tests/test_in_world.py`'s catalogue case (16) pass as they are. New: `tests/test_yard_level.py`, `tests/test_pole_mast.py`.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, A4: the boat in tow (2026-11-21)
+
+`docs/design/Plan-Package90.md` §6's A4, on `docs/design/Design-Package90-Engine.md` §3 ("her boat in tow") and the tartane's design (§5.4 item 8, §11: one boat, about 4.5 m, towed astern on passage), widened by the lead's ruling on the step's stop (nudge 36) to `world/boats.py`, `world/dealings.py` and `world/ports.py` for the towed boat alone, and to `physics/integrate.py` for her drag by the trawl's road. A boat's `towed` is stage 0's key (`schema.BoatSpec.towed`); no committed file carries it, so every changed line stands behind it and nothing of the eighteen files moves (measured below).
+
+### What it builds
+
+- **Her place and her words** (`world/boats.py`): a towed boat is hauled up alongside by her painter and manned at the gangway, not hoisted out, and back alongside she is veered astern on her painter again, not hoisted in: `man_boat` ("The boat hauled alongside and manned: her coxswain and 4 oarsmen in her, lying astern on her painter by ..."), `tow_with_boat` ("hauled alongside and manned for the tow"), `come_alongside` and `hoist_in` ("alongside and veered astern on her painter again"). Manned, she lies `TOWED_ASTERN_M` = 12 m dead astern, where a boat hoisted out is put 15 m off the lee quarter (JUDGEMENT: a short painter's length, two of her lengths and a little, so that she rides clear of the stern).
+- **The way rule** (`boats.way_on_her`, given the boat): a towed boat may be hauled alongside and manned with up to `HAUL_ALONGSIDE_WAY_MS` = 3 knots of way on the ship, against a hoisting out's 2 (JUDGEMENT: at more she sheers about and fills alongside; no period figure found); over it, "She has 3.4 knots of way on her; heave to or shorten sail before the boat is hauled alongside and manned."
+- **The hauling times** (`world/ports.py`): `BOAT_HAUL_ALONGSIDE_S` and `BOAT_VEER_ASTERN_S`, 60 s each, against the 300 s of `BOAT_HOIST_OUT_S` and `BOAT_HOIST_IN_S` (JUDGEMENT, no period time found: the painter hand over hand and the crew down into her, against the yard and stay tackles); `boat_out_s(boat)` and `boat_in_s(boat)` give either. Read by the sleeping hull's errand and the trip to another ship (`dealings.py`), and by the two errand scripts through their files' new `haul_alongside_s` and `veer_astern_s` (`send_boat.yaml`, `lay_out_kedge.yaml`), each stretched by the weather's factor as the hoisting is.
+- **The errands' words** (`dealings.py`, `scripts.py`, the two files): the boat's first phase "hauling alongside" and her last "alongside, veering astern" (`dealings.OUT_PHASES`; the keeper, `_boat_kept`, reads either first phase as never launched); "Away the boat's crew! Haul the boat up alongside.", "Haul the boat up alongside; the kedge and a hawser into her.", "The boat alongside from the shore and veered astern on her painter again.", "The boat veered astern on her painter again."; the files' log lines take `{boat_out}` and `{boat_back}`, which say "Hoist out the long-boat" and "hoisted in" of every boat on deck, as before. At home she is "the boat towing astern on her painter", not "at the booms" (`BoatState.words(towed)`).
+- **Her drag** (`physics/integrate.py`, beside the trawl's): while a boat is in tow, her own resistance at the ship's speed (`hull.resistance`, the boat's form from her own file, read and not changed) times `TOW_WAKE_FACTOR` = 0.6, on the way ahead alone (making sternway the painter is slack). JUDGEMENT on the factor: she rides a short painter astern in the ship's wake, water the ship drags along with her, so it meets her slower than the sea meets the ship; a wake fraction of about a quarter so near the stern (memory, unverified) gives (1 - 0.25) squared, about 0.6, for a drag that goes as the square of the speed. Never tuned to a band: a hull's truths say they are measured with her boat in tow, as she ordinarily sails. The key, `ship.extra["boat_in_tow"]` (her hulls, a tuple of `ship.parts.Hull`), is kept each tick by her dealings (`boats.keep_in_tow`) for a ship whose file tows a boat: there while the boat is in tow, gone while she is away (on an errand, manned, towing ahead) or lost, never given to a boat with no file of her own. Distinct from package 82's `tow`, which is the boat towing the ship.
+
+### Measured
+
+The tartane probe (`cutter.yaml` rigged as a tartane; her 15-ft boat on the 16-ft yawl's file), seed 7.
+
+At anchor in Carrick Road (the times from the order):
+
+| Work | Her boat on deck | Her boat in tow |
+|---|---|---|
+| `send the boat ashore`: out and away | 283 s (hoisted out) | 56 s (hauled alongside) |
+| back alongside to home | 290 s (hoisted in) | 58 s (veered astern) |
+| the whole errand | 5,040 s | 4,581 s |
+| `lay out a kedge to the NE` (her hands short): out | 412 s | 82 s |
+| back | 413 s | 83 s |
+| the kedge laid out and her boat home | 1,399 s | 739 s |
+
+Her way with her boat in tow (plain sail trimmed every two minutes after five, the mean of the last 600 s of 2,400; the wind from 0°):
+
+| Wind, her head | Boat on deck | Boat in tow | The boat's drag | The probe's own resistance |
+|---|---|---|---|---|
+| 8 kn, 270° (beam) | 4.34 kn | 4.25 kn | 122 N | 2,633 N |
+| 15 kn, 270° (beam) | 7.23 kn | 7.00 kn | 905 N | 8,855 N |
+| 25 kn, 270° (beam) | 9.52 kn | 9.14 kn | 3,737 N | 21,725 N |
+| 15 kn, 315° (close-hauled) | 3.71 kn | 3.66 kn | 79 N | 1,919 N |
+| 15 kn, 225° (broad) | 6.29 kn | 6.13 kn | 485 N | 6,169 N |
+
+So she loses 1 to 4 per cent of her way, the most on a fast reach, where the yawl is far past her own hull speed (5.4 kn) and the form's wave term rises steeply.
+
+**The eighteen files**: every committed file's boat work at A5-A6 (effbaed) and at A4, by a harness in the session's scratch (at anchor in Carrick Road, the boat words, `send the boat ashore` to its end and `lay out a kedge to the NE` to its end; at rest in a calm, `go to the boat`, `come alongside`; `tow her with the boat to the NE` and `the boat alongside`; `go to the boat` with 2.5 knots of way): every event of every hull, the trace each minute and the checkpoint's digest the same (the report).
+
+### Pins moved, old beside new
+
+None. New: `tests/test_boat_towed.py`.
+
+### Not built, for the lead
+
+- `world/movement.py`'s person in the boat at the ship's side (package 109, `_in_the_boat_at_the_side`) reads her first phase as "hoisting out" alone: a person in a towed boat while she is hauled alongside cannot belay her from the boat. The mend is one line there (`dealings.OUT_PHASES`); not in the step's files, so not edited.
+- `combat/hits.py`'s "stove on the booms by a shot" is said of any boat; a towed boat is not on the booms. Not in the step's files.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).

@@ -9825,12 +9825,49 @@ class UnmoorScript(_AnchorScript):
         return 1500.0 if self.phase in ("rig_capstan", "heave") else 400.0
 
 
+def _boat_out_s(script: Any) -> float:
+    """The seconds to get the errand's boat out: hoisted out by the yard and stay tackles
+    (`hoist_out_s`), or a boat towed astern hauled up alongside by her painter
+    (`haul_alongside_s`; package 90, A4)."""
+    from freesail.world.ports import BOAT_HAUL_ALONGSIDE_S
+
+    if script.towed:
+        return script.timing_value("haul_alongside_s", float(BOAT_HAUL_ALONGSIDE_S))
+    return script.timing_value("hoist_out_s", 300.0)
+
+
+def _boat_in_s(script: Any) -> float:
+    """The seconds to have the errand's boat back: hoisted in (`hoist_in_s`), or a towed boat
+    veered astern on her painter again (`veer_astern_s`; package 90, A4)."""
+    from freesail.world.ports import BOAT_VEER_ASTERN_S
+
+    if script.towed:
+        return script.timing_value("veer_astern_s", float(BOAT_VEER_ASTERN_S))
+    return script.timing_value("hoist_in_s", 300.0)
+
+
+def _boat_out_words(script: Any) -> str:
+    """The order that gets the errand's boat out: 'Hoist out the launch', or of a towed boat
+    'Haul the boat up alongside' (package 90, A4)."""
+    if script.towed:
+        return f"Haul {script.boat_name} up alongside"
+    return f"Hoist out {script.boat_name}"
+
+
+def _alongside_phase(script: Any) -> str:
+    """The boat's state back at the side: hoisting in, or a towed boat veering astern."""
+    return "alongside, veering astern" if script.towed else "alongside, hoisting in"
+
+
 class LayOutKedgeScript(_AnchorScript):
     """A kedge carried out by the boat and let go (data/evolutions/lay_out_kedge.yaml).
     Holds the ship and the boat (package 82, item 5: the boat's keeper reads the scripts
     that hold her, so that the kedge's boat is not denied while she is out)."""
 
     holds_subject = True
+    # a boat towed astern on her painter (package 90, A4; a boat's `towed`), set by `check`
+    # only for her: hauled up alongside and veered astern again, not hoisted out and in
+    towed = False
 
     # the phases with the boat's crew in her, away from the ship's side (hoisting out, slinging
     # the kedge and hoisting in are deck work): the review of the lead's ruling 11
@@ -9872,6 +9909,8 @@ class LayOutKedgeScript(_AnchorScript):
         if self.ports.boat.away:
             return f"{boat.name} is away"
         self.boat_name = boat.name
+        if getattr(boat, "towed", False):
+            self.towed = True
         if _water_depth(self.ship) is None:
             return "no bottom here to lay a kedge in"
         toward = self.params.get("toward_deg")
@@ -9935,7 +9974,7 @@ class LayOutKedgeScript(_AnchorScript):
                 boat_id=boat.id,
                 boat_name=boat.name,
                 errand="laying out the kedge",
-                phase="hoisting out",
+                phase="hauling alongside" if self.towed else "hoisting out",
                 since_tick=0,
             )
 
@@ -9947,7 +9986,7 @@ class LayOutKedgeScript(_AnchorScript):
         self.wind = wind
         ship = self.ship
         if self.phase == "hoist_out":
-            if self.phase_t >= self.timing_value("hoist_out_s", 300.0) * factor:
+            if self.phase_t >= _boat_out_s(self) * factor:
                 self.phase = "sling"
                 self.phase_t = 0.0
                 if self.ports is not None:
@@ -10009,10 +10048,10 @@ class LayOutKedgeScript(_AnchorScript):
                 self.phase = "hoist_in"
                 self.phase_t = 0.0
                 if self.ports is not None:
-                    self.ports.boat.phase = "alongside, hoisting in"
+                    self.ports.boat.phase = _alongside_phase(self)
             return
         if self.phase == "hoist_in":
-            if self.phase_t >= self.timing_value("hoist_in_s", 300.0) * factor:
+            if self.phase_t >= _boat_in_s(self) * factor:
                 if self.ports is not None:
                     from freesail.world.ports import BoatState
 
@@ -10026,6 +10065,7 @@ class LayOutKedgeScript(_AnchorScript):
         d.update(
             {
                 "boat": self.boat_name,
+                "boat_out": _boat_out_words(self),
                 "fathoms": _fathoms_words(units.m_to_fathoms(self.out_m)),
                 "point": units.point_name(self.toward),
             }
@@ -10042,6 +10082,9 @@ class SendBoatScript(Script):
     (`freesail.world.dealings.Dealings.boat_phase`). Holds the boat and not the ship."""
 
     holds_subject = False
+    # a boat towed astern on her painter (package 90, A4; a boat's `towed`), set by `check`
+    # only for her: hauled up alongside and veered astern again, not hoisted out and in
+    towed = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -10073,6 +10116,8 @@ class SendBoatScript(Script):
         if boat is None:
             return "she carries no boat"
         self.boat_name = boat.name
+        if getattr(boat, "towed", False):
+            self.towed = True
         from freesail.world.ports import BOAT_ASHORE_S, LIGHTER_S_PER_TON
 
         distance = self.ports.to_shore_m(port)
@@ -10121,7 +10166,7 @@ class SendBoatScript(Script):
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":
-            if self.phase_t >= self.timing_value("hoist_out_s", 300.0) * factor:
+            if self.phase_t >= _boat_out_s(self) * factor:
                 self.phase = "pull_out"
                 self.phase_t = 0.0
                 self._say("away")
@@ -10143,23 +10188,31 @@ class SendBoatScript(Script):
                 self.phase = "hoist_in"
                 self.phase_t = 0.0
                 if self.ports is not None:
-                    self.ports.boat.phase = "alongside, hoisting in"
+                    self.ports.boat.phase = _alongside_phase(self)
             return
         if self.phase == "hoist_in":
-            if self.phase_t >= self.timing_value("hoist_in_s", 300.0) * factor:
+            if self.phase_t >= _boat_in_s(self) * factor:
                 self._say("alongside")
                 self.finish()
 
     def words(self) -> dict[str, Any]:
-        return {"boat": self.boat_name, "boat_cap": _cap(self.boat_name)}
+        back = "veered astern on her painter again" if self.towed else "hoisted in"
+        return {
+            "boat": self.boat_name,
+            "boat_cap": _cap(self.boat_name),
+            "boat_out": _boat_out_words(self),
+            "boat_back": back,
+        }
 
     def remaining_s(self) -> float:
+        # the boat out and in again: 300 s each, or a towed boat's (package 90, A4)
+        out_s, in_s = (_boat_out_s(self), _boat_in_s(self)) if self.towed else (300.0, 300.0)
         left = {
-            "hoist_out": 2 * self.pull_s + self.ashore_s + 600.0,
-            "pull_out": self.pull_s + self.ashore_s + 300.0 + self.pull_s,
-            "ashore": self.ashore_s + self.pull_s + 300.0,
-            "pull_back": self.pull_s + 300.0,
-            "hoist_in": 300.0,
+            "hoist_out": 2 * self.pull_s + self.ashore_s + out_s + in_s,
+            "pull_out": self.pull_s + self.ashore_s + in_s + self.pull_s,
+            "ashore": self.ashore_s + self.pull_s + in_s,
+            "pull_back": self.pull_s + in_s,
+            "hoist_in": in_s,
         }
         return max(0.0, left.get(self.phase, 600.0) - self.phase_t)
 
