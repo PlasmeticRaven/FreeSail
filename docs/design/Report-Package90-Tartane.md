@@ -33,6 +33,12 @@ words now say so. Truth 7-695's counts hold, four and three. The fast tier whole
 changed no test of the base, and one test is new. Her wear from 292.5 degrees no longer comes
 round on the new bill: the knife's edge of §3, recorded.
 
+**The owner's note on her topsail, and the lead's nudge 42, point 5 (§14).** Her file already
+carries decision 9: the tréou is set flying, on deck with its yard in plain sail and at her
+start, swayed up when set and sent down when taken in, as measured. The askew foot is the
+viewer's: `squareCut` takes the tréou's yard on deck as the yard below. Its mend is one
+condition in `client/projection.js`, V2's, not mine; nothing in the tree moved.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -799,3 +805,93 @@ going about wholly, so this is recorded, not tuned. No test reads her wear: T-3 
   - every file is LF only;
   - no added Python line is over 100 characters;
   - no added line names a model or its maker.
+
+## 14. The owner's note on her topsail, and the lead's nudge 42, point 5
+
+The owner looked at her on b9ebd761 and saw her topsail's loose foot trimmed to the wind,
+askew of its yard. The lead's nudge 42, point 5, in the note at the end of
+`docs/dev/M7-WorkPackages.md` on the trunk at 11c7e67e, which I read whole: her design's
+decision 9 is the answer at the cause. In plain sail the tréou's yard is on deck with its sail,
+sent down as the game already sends a yard down, and goes aloft when the tréou is set. Do that
+in her file's plain sail and her start, if the engine's sent-down yard serves her set flying. If
+it does not, say what it lacks before building anything in the engine. The check for her final
+version is her loose foot square with its own yard.
+
+**In short: her file already does it, the engine serves it, and the askew foot is the viewer's.**
+Nothing in the tree is changed for this. The mend is one condition in `client/projection.js`,
+which is not mine, so I stopped there under the stop rule.
+
+### 14.1 Her file and the engine: decision 9 as built
+
+Her tréou has been `flying: true` since step 2 (0dbd4fc), and it is in neither her plain sail
+nor her start. The engine's sail set flying (package 57, the lug topsails and the royals of
+1794) is decision 9's way:
+- furled, it is on deck with its yard ("sent down");
+- `set` sways the yard up from the deck with the sail bent (`data/evolutions/set_flying.yaml`);
+- `take in` sends it down whole.
+
+Measured at seed 7, 12 kn, all hands, by the game's own orders:
+
+| Her state | The tréou | Its yard |
+|---|---|---|
+| her start | furled, sent down | on deck |
+| plain sail, by the wind and before it | furled, sent down | on deck |
+| `set the treou` | "Swayed up the square sail's yard from the deck with the sail bent." at +85 s; "Set the square sail, flying." at +129 s | aloft at the main's hounds, 8.85 m above her water |
+| `take in the treou` | "Took in the square sail; sent down on deck with its yard." at +86 s | on deck |
+
+**The cutter's way does not serve her.** That is the yard's own `sent_down`, as the topgallant
+yards are sent down:
+- no ship file can start a spar sent down (`SparSpec` has no such key);
+- the send-down and the sway-up go by a class of mast (`topgallant_mast`). Hers is a pole main
+  of class `mast`, so the class would take every yard on both her masts;
+- `set` refuses a sail whose yard is sent down, so the tréou would want a sway-up first. That is
+  not set flying.
+
+### 14.2 Where the foot goes askew: the viewer's `squareCut`
+
+`squareCut` hangs a square sail's clews at the arms of the yard below it, by the file's heights.
+It skips that yard only when the spar's own state is `sent_down`. A flying yard on deck is served
+`sound`, because its sail says it is down. The viewer reads that (`yardOnDeck`) and draws the yard
+on deck, fore and aft, 1.44 m above her water and 1.65 m to starboard (`sent_down_flying`).
+`squareCut` still takes it as the yard below. So her topsail's clews go to its arms, fore and aft,
+raised to the hoist's height.
+
+Her topsail's foot, measured with `buildSkeleton` from the game's snapshot, against her topsail
+yard in plan:
+
+| Her state | On the tree | On a scratch copy, the one condition added |
+|---|---|---|
+| her start; plain sail before the wind; the tréou taken in | **90 degrees askew**: the foot fore and aft from x -2.12 to 9.86 m, 8.85 m above her water, under a yard square at x 4.20 | square with its yard: 9.35 m broad, its clews 8.09 m above her water |
+| plain sail by the wind (her topsail yard braced 64 degrees) | **26 degrees askew**: the foot still fore and aft | square with its yard |
+| the tréou set | square: the clews at the tréou's yard's arms, 8.85 m | the same |
+
+**What it lacks:** one condition in `squareCut`. A yard on deck with its flying sail
+(`B.flyingDown`) should be read as no yard below. Her topsail then hangs from its own yard, 0.9
+of it broad and as deep as its area over that breadth, as every square sail with no yard below
+does. I measured that on a scratch copy of `client/projection.js` and did not commit it. It is
+V2's: "a loose-footed topsail along its own yard wherever the yard below carries no sail".
+
+**Only her two files are touched.** In every ship file, the one square sail over a flying yard
+is her topsail, over the tréou's yard, in `tartane.yaml` and `coastguard-tartane.yaml`. The
+royals and the lug topsails have no square sail over them, so no other ship's drawing moves.
+
+### 14.3 Found, recorded, not mine
+
+- **The engine braces a flying yard on deck with the rest.** Her tréou's yard was at 58 degrees
+  by the wind, and the frigate's main royal yard at 59. The snapshot serves it `sound` and braced,
+  as the owner's preview showed (42.2 degrees there). The viewer draws it on deck either way.
+- **The trim's words count it.** "Braced two yards to the wind" after the tréou is taken in counts
+  the yard on deck. Both are package 57's reading of a yard sent down with its sail, every ship's.
+
+### 14.4 What moved
+
+Nothing. No file of the tree changed for this section, so the §13 figures all stand:
+- truth 7-695's counts;
+- her figures;
+- the twenty ship files, byte for byte from the generator.
+
+13.3's fast tier whole on 3a5c96b is this tree's, since b9ebd76 changed only this report, so I
+ran no new tier. When V2's condition is on `…/pkg-90`, her final version's check is a view
+case: her topsail's foot square with its own yard at her start, in plain sail, and with the
+tréou set and taken in. I will write it then, in the viewer's file as widened to me for her rows
+(§10).
