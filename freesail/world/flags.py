@@ -520,18 +520,28 @@ FLAGS_SPOKEN = True
 
 
 def world_role(world: Any) -> str:
-    """The role this World's ship wears her flags by: her captain's (a rules captain's or the
-    far brain's that crews her), else a King's ship where she carries the private table by her
-    papers, else a merchantman's."""
+    """The role this World's ship wears her flags by: her papers' service first (package
+    121's follow-up; a prize-master keeps his own, and a role of the papers' service its
+    own), else her captain's (a rules captain's or the far brain's that crews her), else a
+    King's ship where she carries the private table by her papers, else her service's
+    (`service.service_of`: a King's ship by her wardroom, else a merchantman)."""
+    from freesail.world.service import ROLE_SERVICE, SERVICE_ROLE, papers_service, service_of
+
     captain = getattr(world, "captain", None)
     role = str(getattr(captain, "role", "") or "")
     if not role:
         vessel = getattr(world, "vessel", None)
         role = str(getattr(getattr(vessel, "brain", None), "role", "") or "")
+    papered = papers_service(world)
+    if papered is not None and role != "prize-master" and ROLE_SERVICE.get(role) != papered:
+        # her papers name another service than her captain's role (or she has none): she
+        # wears her papers'; a role of the papers' own service (a commodore under a King's
+        # papers, a packet under a merchant's) keeps its own flags
+        return SERVICE_ROLE[papered]
     if not role:
         papers = getattr(getattr(world, "scenario", None), "papers", None) or {}
         given = papers.get("private_signals") if isinstance(papers, dict) else None
-        role = "kings-ship" if given else "merchant"
+        role = "kings-ship" if given else SERVICE_ROLE[service_of(world)]
     return role
 
 

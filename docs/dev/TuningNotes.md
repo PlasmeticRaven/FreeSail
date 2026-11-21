@@ -38663,6 +38663,48 @@ Two failures of the first fast run were the build's, mended before the hash and 
 
 **Read.** The moved pin and the five truths passed by an independent reader, told to check that nothing was weakened and that each truth fails with its mend out: the new pin is no weaker (it fails on the doubled heading); no assertion of `tests/` was deleted, loosened or skipped; each truth pins words or values, not digests, and failed by an assertion with each of its nine mends out (`readings.py`, `prompt.py`, `regimes.py`, `squadrons.py`, `captains.py`, `hail.py`, `ships.py`, `regulations_said`, `officer_brief`). Its two notes, left: in 7-713 her own answer with no papers is pinned by "His Majesty's" alone, and by a merchant's papers not at all; the hail and the heave-to are pinned for all three.
 
+## Package 121, follow-up: she wears her flags by her service (2026-11-20)
+
+**The ruling.** The lead's, on the measurement above: build `flags.world_role` by her papers first, then the captain's role, then the papers' private signals, then `service_of`; with the reader's three additions in the same hash.
+
+**As built.**
+
+| site | before | now |
+|---|---|---|
+| `flags.world_role` | her captain's role (or her far brain's), else a King's ship by the papers' private signals, else a merchantman | her papers' service first, except that a prize-master keeps his own and a role of the papers' own service keeps its own (a commodore under a King's papers her broad pendant; a packet or a revenue cutter under a merchant's hers); else her captain's role; else the private signals; else her service (`service_of`: a King's ship by her wardroom, else a merchantman). The same-service rule is beyond the measured patch: without it a commodore or a cruiser under a King's papers would have lost her own flags (truth 7-716 fails with it out, at the cruiser) |
+| `service.kings_force`, read by `regimes._enemy_men_of_war_near` and `squadrons._covered` | `service_of == KINGS` | the same, and never a prize under her prize-master: a prize is not her captor's King's ship, as `readings.ship_words` says (the reader's addition 3; four lines and the two call sites, no pin moved) |
+| `docs/primer/23-colours-and-signals.md` | the colours by "her service and her captain's place"; the private signal "in a King's ship, a cruiser or a commodore's" | how her own ship wears them (her papers' `service:` first, her captain's place, her file's wardroom; a place of the papers' own service keeps its flags); the private signal in a ship whose captain's place is a King's ship's, a cruiser's or a commodore's, and none in a King's ship by her papers or wardroom alone (as the game does: `signals.table_of`, a finding, unchanged) |
+
+**What moved.** Nothing. The flag-reading files (every test file reading the flags, the pendants, the ensigns or the lookout's flag words, `test_known_truths.py` among them) at the follow-up's first commit: 2461 passed, 6 skipped, and one failure that was the builder's own edit made under the running workers (`test_truth_7_623_...`, an ImportError of `kings_force` from a `service.py` already loaded before it was added; it passes alone). The whole fast tier and the slow files on the reported hash, below.
+
+**The truths.**
+
+| truth | pins | its mend out |
+|---|---|---|
+| 7-715 | the naval cruise's frigate, her captain with no role: with no papers or a King's, `the flags` ends "at the peak; the red pendant at the main truck." and another ship's lookout says "she wears a pendant at the main: a man-of-war"; under a privateer's or a merchant's, her ensign alone and nothing said; a merchant brig's file under a King's papers "the long pendant at the main truck", and her ensign alone under the rest | the old `world_role`: no pendant for the role-less frigate |
+| 7-716 | every role of `service.ROLE_SERVICE`, papers silent: `world_role` is the role; under papers of the role's own service the same, and `the flags` word for word what she flew with papers silent; papers of another service give that service's role, but a prize-master keeps his | the old `world_role`: a King's ship's role under a privateer's papers kept; the same-service rule out: the cruiser under a King's papers made a plain King's ship |
+| 7-710 (added) | the scenario door refuses `papers: {service: a pirate}` with "papers: service 'a pirate' is no service; say kings ... privateer (a letter of marque) or merchant (a merchantman)" | the refusal out: did not raise |
+| 7-711 (added) | the frigate under French colours, her captain made prize-master: no enemy man of war in Plymouth's offing; and at sea she covers no British merchant brig | `kings_force` without the prize-master: she blockades; the cover's own check restored to `service_of == KINGS`: she covers |
+| 7-713 (added) | her own answer under a merchant's papers, whole: "The Amazon of Guernsey, from Guernsey, in ballast." | the answer's mend out fails 7-713 at the no-papers case; the merchant's own words are the same with the mend in or out (the merchantman answered as one before), so this pin holds them and proves no mend |
+| 7-714 (added) | the officer seated (the scripted fake), the deck his, the captain gone below: one notice, "The captain is below; the Regulations give you his strange sails ..." with no papers, "The captain is below; his strange sails and his shifts of wind are yours to report" under a privateer's and a merchant's | the harness's condition out: the Regulations' words to the privateer |
+
+**Accepted as built (the lead's words, so that the next reader does not take them for accidents).**
+- (a) Where her papers are silent, the blockade and the cover go by her captain's role, not by her hull's word. First-action's King's cutter now covers the trade. The hermaphrodite brig under her privateer captain no longer blockades.
+- (b) A neutral heaves to for a crewed ship whose captain's role is privateer, her papers silent.
+- (c) The officer's plain report sentence, the plain captain-below notice and the dropped citations reach every ship not under the Regulations. That means the paperless merchantmen (twenty shipped scenarios) and the foreign national ships, which had been told the British Regulations bound them.
+- (d) A role-less King's frigate hailed now answers "His Majesty's ship ..." where she had answered in a merchant's words. A role-less merchantman's own hail is "What ship is that, and whither bound?".
+
+**Not in the follow-up:** `signals.table_of`, the revenue cutter's pendant against `ROLE_SERVICE`, the King's yard, the court martial's words. They stay findings (above).
+
+**The lead's question.** Would `regulations_said` still be needed for a FOREIGN King's ship, once a privateer and a merchantman have their own people files? Yes, on the trunk today. `under_the_regulations` is a King's ship of Britain alone. A French or an American national ship on a British file (the frigate's, the brig's) keeps a wardroom whose outlines cite the British Regulations. Until the foreign navies have people files of their own, citing their own ordinances or none, the citations are left unsaid only by `regulations_said`.
+
+**Read.** The follow-up's truths and the additions were passed by an independent reader, who was told to check that nothing was weakened and that each truth fails with its mend out. It found:
+- no assertion in `tests/` weakened, deleted or skipped: the only lines removed were three docstring lines, rewritten wider;
+- every truth pins words, values or states, not digests;
+- each fails by an assertion, never an ImportError, with its mend out: the old `world_role` (7-715, 7-716), the same-service clause (7-716, at the cruiser), `kings_force` without the prize-master (7-711), the door's refusal (7-710), and the captain-below condition (7-714).
+
+It also found the same-service rule sound. With papers silent, every role is returned as before. Every role in `captains.ROLES` is a key of `ROLE_SERVICE`. Crewed worlds carry no papers. Its two notes, left as they are: a role outside `ROLE_SERVICE` would give way to the papers (there is none today); and a revenue cutter under a merchant's papers keeps her pendant, as before.
+
 ## Package 120: a word put in a mouth reaches the player (2026-11-20)
 
 The owner's fault: the director's `say as <person>: "..."` lines were written in the log and given to the stations held within earshot, and never shown the player at the prompt on the same quarterdeck. Every writer of a word's hearers (`heard_by`: `world.orders._say_as`, `orders.free`, `orders.stations` say and hail) names the stations held (a model's harness, the player's seat); the player at the prompt holds none, and the play log's reading (`knowledge.hears`) took the list as the whole of who heard. A model's own `say` on deck was hidden from him the same way. Mended in the reading: where the player's station is held by nobody, he hears such a word by the rule each writer holds a station to, where his person stands (`knowledge._heard_where_said`); where his seat or a model holds it, the list is the answer as before. No line's data changes.

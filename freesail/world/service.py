@@ -41,6 +41,7 @@ __all__ = [
     "SERVICES",
     "SERVICE_ROLE",
     "free_intent_role",
+    "kings_force",
     "papers_service",
     "regulations_said",
     "service_of",
@@ -180,6 +181,13 @@ def regulations_said(world: Any, words: str) -> str:
     if world is None or "the Regulations" not in words or under_the_regulations(world):
         return words
     return re.sub(r"\s*\((?:judgement on )?the Regulations[^()]*\)", "", words)
+
+
+def kings_force(world: Any) -> bool:
+    """Whether her ship is one of the King's ships of war, to blockade a port or cover the
+    trade: a King's ship by `service_of`, but never a prize under her prize-master (package
+    121's follow-up: a prize is not her captor's King's ship, as `readings.ship_words` says)."""
+    return service_of(world) == KINGS and _role(world) != "prize-master"
 
 
 def service_word(given: Any) -> str | None:
