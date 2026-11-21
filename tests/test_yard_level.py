@@ -96,11 +96,18 @@ def test_a_square_yard_over_a_whole_lateen_counts_the_lateen_yard_below_it(tmp_p
     assert again.yard_level("topsail.yard") == 0
 
 
-def _tartane_with_her_treou(tmp_path, treou_m: float | None) -> Path:
+def _tartane_with_her_treou(
+    tmp_path,
+    treou_m: float | None,
+    lateen_m: float = 10.0,
+    topsail_m: float = 15.6,
+    treou_first: bool = False,
+) -> Path:
     """The tartane probe (its rig, not her file: her file is not on this branch) with her pole
-    main as Tar-D §4.1 files it, no topmast and the topsail yard on the main's own head, her
-    great lateen's yard crossing the mast at 10 m; with the tréou's yard crossed on the main at
-    `treou_m` (the cutter's square sail and its gear, renamed), or not crossed (`None`)."""
+    main as Tar-D §4.1 files it, no topmast and the topsail yard on the main's own head at
+    `topsail_m`, her great lateen's yard crossing the mast at `lateen_m`; with the tréou's yard
+    crossed on the main at `treou_m` (the cutter's square sail and its gear, renamed), filed
+    after the great lateen's yard or, `treou_first`, before it; or not crossed (`None`)."""
     doc = tartane_probe_doc()
     gone = {"main.topmast", "main.topgallant_mast"}
     doc["spars"] = [s for s in doc["spars"] if s["id"] not in gone]
@@ -112,7 +119,9 @@ def _tartane_with_her_treou(tmp_path, treou_m: float | None) -> Path:
         doc["groups"].pop(name)
     for s in doc["spars"]:
         if s["id"] == "topsail.yard":
-            s["on"], s["height_m"] = "main.mast", 15.6
+            s["on"], s["height_m"] = "main.mast", topsail_m
+        if s["id"] == "main.lateen_yard":
+            s["height_m"] = lateen_m
     if treou_m is not None:
         cutter = yaml.safe_load(Path("data/ships/cutter.yaml").read_text(encoding="utf-8"))
         ours = {"square_sail", "square_sail.yard"}
@@ -126,16 +135,29 @@ def _tartane_with_her_treou(tmp_path, treou_m: float | None) -> Path:
                             for k, v in item.items()
                         }
                     )
-        for s in doc["spars"]:
-            if s["id"] == "main.treou.yard":
-                s["height_m"] = treou_m
+        treou = next(s for s in doc["spars"] if s["id"] == "main.treou.yard")
+        treou["height_m"] = treou_m
+        if treou_first:
+            doc["spars"].remove(treou)
+            at = next(i for i, s in enumerate(doc["spars"]) if s["id"] == "main.lateen_yard")
+            doc["spars"].insert(at, treou)
         doc["groups"]["square sails"].append("main.treou")
     return write_ship(doc, tmp_path, "tartane-treou")
 
 
-@pytest.mark.parametrize("treou_m", [None, 8.0, 13.0], ids=["not-crossed", "below", "above"])
+@pytest.mark.parametrize(
+    "treou_m, lateen_m, topsail_m, treou_first, treou_level",
+    [
+        (None, 10.0, 15.6, False, None),
+        (8.0, 10.0, 15.6, False, 0),
+        (13.0, 10.0, 15.6, False, 1),
+        (8.31, 8.31, 15.78, False, 0),
+        (8.31, 8.31, 15.78, True, 0),
+    ],
+    ids=["not-crossed", "below", "above", "her-files-tie", "her-files-tie-the-treou-filed-first"],
+)
 def test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or_not(
-    tmp_path, treou_m
+    tmp_path, treou_m, lateen_m, topsail_m, treou_first, treou_level
 ):
     """Her tréou is set flying (Tar-D decision 9, §5.1a, §15 risk 5): its yard sent up with it and
     struck with it, so in plain sail no yard stands under her topsail. Her topsail reads the same
@@ -143,8 +165,14 @@ def test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or
     the great lateen's yard below it (the ruled clause); with the tréou's yard crossed, by the
     braced yard below it. The tréou's own yard, the lowest braced yard: crossed below the great
     lateen's yard it is the course (0); crossed above it the same clause reads it 1, a topsail on
-    the pole as well, which is the lead's (the engine track's report, A5 and A6)."""
-    ship = load_ship(_tartane_with_her_treou(tmp_path, treou_m))
+    the pole as well, which is the lead's (the engine track's report, A5 and A6). At her file's
+    heights (`data/ships/tartane.yaml` on her branch: the great lateen's yard and the tréou's both
+    at the hounds, 8.31 m, the topsail's at 15.78 m) the two tie, and the clause counts a lateen
+    yard only strictly below (`Ship._find_yard_levels`): the tréou's yard is the course (0),
+    whichever of the two is filed first, the file's order breaking ties between braced yards
+    alone. What it does now, pinned; the clause is the lead's to rule."""
+    path = _tartane_with_her_treou(tmp_path, treou_m, lateen_m, topsail_m, treou_first)
+    ship = load_ship(path)
     assert ship.yard_level("topsail.yard") == 1
     assert ship.is_pole_mast("main.mast") and ship.on_pole("topsail")
     assert verbs._take_in_kind(ship, ship.sails["topsail"]) == "pole"
@@ -152,11 +180,13 @@ def test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or
         assert "main.treou.yard" not in ship.spars
         assert [sl.id for sl in scripts._topsails(ship)] == ["topsail"]
     else:
-        level = 0 if treou_m < ship.spars["main.lateen_yard"].height_m else 1
-        assert ship.yard_level("main.treou.yard") == level
-        topsails = ["topsail"] + (["main.treou"] if level else [])
+        order = [sp.id for sp in ship.spars.values()]
+        treou_at, lateen_at = order.index("main.treou.yard"), order.index("main.lateen_yard")
+        assert (treou_at < lateen_at) is treou_first  # as filed
+        assert ship.yard_level("main.treou.yard") == treou_level
+        topsails = ["topsail"] + (["main.treou"] if treou_level else [])
         assert [sl.id for sl in scripts._topsails(ship)] == topsails
-        courses = [] if level else ["main.treou"]
+        courses = [] if treou_level else ["main.treou"]
         assert [sl.id for sl in scripts.lowest_square_sails(ship)] == courses
 
 
