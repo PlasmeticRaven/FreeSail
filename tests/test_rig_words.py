@@ -42,7 +42,6 @@ from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner, scripts
-from freesail.orders.errors import OrderError
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import SailState
@@ -729,22 +728,3 @@ def test_a_rig_of_head_yards_alone_with_nothing_to_draw_meets_her_with_the_helm(
     said = [n[2] for n in _run(runner, ship, wind, _turner(0.4))]
     assert "Meet her with the helm." in said
     assert not [line for line in said if "Let go and haul" in line]
-
-
-@pytest.mark.parametrize(
-    ("path", "refusal"),
-    [
-        ("data/ships/boat-launch-31.yaml", "She has no yards to brace abox."),
-        (LUGGER, "She has no head yards to brace abox."),
-    ],
-    ids=["a boat, of one mast", "the lugger, of three"],
-)
-def test_the_box_hauls_refusal_says_no_head_yards_of_a_vessel_of_one_mast(path, refusal):
-    """A2's second pass, its third commit (the checker's point 3): an answer's words. The box-haul
-    family refused to a vessel with no braced yard; "head" not said of a vessel of one mast (old:
-    "She has no head yards to brace abox." to the boats); the lugger's as it was."""
-    ship, runner, _wind = _on_starboard(55.0, path)
-    for evolution in ("boxhaul", "wear_short_round", "box_off"):
-        with pytest.raises(OrderError) as refused:
-            runner.start(ship, evolution, "ship")
-        assert str(refused.value) == refusal

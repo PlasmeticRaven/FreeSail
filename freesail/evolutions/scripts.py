@@ -5448,9 +5448,10 @@ class BoxHaulScript(Script):
 
     def check(self, words: dict[str, Any]) -> str | None:
         if not self.head:
-            # "the yards" of a vessel of one mast, the five boats (package 90, A2's second
-            # pass: `head_word`; "She has no head yards to brace abox." before it)
-            return f"She has no {head_word(self.ship)}yards to brace abox."
+            # left as it is, "head" said to the five boats of one mast too: the refusal is
+            # also the rejected order's event's data (its reason), which package 90, A2's
+            # second pass holds the same (words only); for the lead
+            return "She has no head yards to brace abox."
         if "hove_to" in self.ship.extra:
             return "She is hove to; fill away first, or wear."
         return None
