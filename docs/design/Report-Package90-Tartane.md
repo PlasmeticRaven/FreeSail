@@ -307,6 +307,28 @@ both on `…/pkg-90`.
   is set. With her topsail furled, `heave to` is refused in the words "No head sail is set to haul
   to windward, nor a topsail to lay aback."; with it set, she heaves to.
 
+**Owed with her hash when A4 and her files are on `…/pkg-90`** (the lead's nudge 44, trunk
+dd09a54a, read whole; nothing built now). Hers is the first file that tows:
+1. `freesail/world/movement.py`, `_in_the_boat_at_the_side`: a person in a towed boat while she
+   is hauled alongside is "in the boat at the side", as one in a boat hoisting out is. The one
+   line, `boat.phase not in dealings.OUT_PHASES`, with a proof.
+2. `freesail/combat/hits.py`, "stove on the booms by a shot": said of a towed boat, it is words
+   only. She is stove where she tows, with no change to what is hit or how often. This comes after
+   A3 is on the trunk.
+3. The clearing for action (`freesail/evolutions/action_scripts.py`): no clearing time for boats
+   already astern, and the line does not say they were got out. A ship with a boat on the booms
+   keeps today's time and words, to the digest.
+4. Her file's known list: no order veers a towed boat long or hoists her in on passage (her
+   design's §11, "hoisted in, or veered long, in a blow"), with her drag past her hull speed.
+   Listed for the ship and her people's milestone.
+
+Items 1 to 3 are engine files outside my §7.1 row, so I will build them on the lead's nudge 44
+alone. **A question for then:** no ship file carries a known list today (none under
+`data/ships/` has one, and the schema has no such key). Item 4 wants its place named: her ship
+file's notes through `tools/ships/tartane.py`, or her design's list. Also noted there, and not
+mine: a towed boat with no file of her own puts no drag on the ship, and the generator may refuse
+`towed` on such a boat when her files come.
+
 ## 7. The pictures
 
 I took none: a cloud session has no browser. The coordinating session takes them by the plan's
