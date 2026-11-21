@@ -23,11 +23,7 @@ timing:
   steady_deg: 5           # within this of the course counts as steady
   scud_timeout_s: 600     # call her scudding after this long regardless
   scud_estimate_s: 180    # what the state snapshot shows as remaining at the start
-# {up_helm}: "Up helm; stand by the braces. ", or nothing where she works no braces, a lugger, a
-# boat, or the cutter or the smack with no square sail set, whose up-helm the line before this one
-# has said (package 90, A2: `ScudScript.words`; "Up helm. Bear up and scud." in A2, at once after
-# "Up helm.", until A2's second pass)
-on_start: {log: "{up_helm}Bear up and scud."}
+on_start: {log: "Up helm; stand by the braces. Bear up and scud."}
 on_complete: {log: "Scudding before it, the wind on the {quarter} quarter, steering {course}.", kind: ship.scudding, severity: notable}
 on_fail: {log: "Could not bear up: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the watch at the braces and the spanker brails: afterguard, marines and waisters

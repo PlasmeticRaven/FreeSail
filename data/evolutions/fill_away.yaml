@@ -33,11 +33,8 @@ timing:
   fall_off_timeout_s: 180  # brace full anyway after this long
   retrim_s: 20             # with a course to pay off to: the yards and sheets trimmed to the wind she has, so often (package 37f: judgement)
   pay_off_timeout_s: 240   # and trimmed for the course, and the evolution done, after this long though her head is not yet on it (judgement)
-# {braces} by her rig and her sails, as heave_to's; {braced_full} "braced full and ", or nothing
-# where she works no braces (`scripts.braces_worked`: a lugger, a boat, or a rig of head yards
-# alone with no square sail set; package 90, A2 and its second pass: `FillAwayScript.words`)
-on_start: {log: "Fill away; man the {braces}."}
-on_complete: {log: "Filled away on the {filled_tack} tack; {braced_full}{course_words}.", kind: ship.filled_away, severity: notable}
+on_start: {log: "Fill away; man the after braces."}
+on_complete: {log: "Filled away on the {filled_tack} tack; braced full and {course_words}.", kind: ship.filled_away, severity: notable}
 on_fail: {log: "Could not fill away: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): the after braces; the marines "divide at the gear of main and
 # mizzen top-sails" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', 'Idlers, Firemen, Marines').

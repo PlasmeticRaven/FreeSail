@@ -416,7 +416,7 @@ tables of each plate unless marked OCR.
 
 ### 3.1 The tartane
 
-- **Figures**: Chapman 1768 plate LVII No. 16, "A French tartane (Vessels of war)", **read**:
+- **Figures**: Chapman 1768 plate LVIII No. 16, "A French tartane (Vessels of war)", **read**:
   62¼ Swedish ft between perpendiculars (60.6 ft), breadth moulded 17 7/12 (17.1 ft),
   draught 6⅔ (6.5 ft); eight 4-pounders, four swivels; "used in the Mediterranean both to
   carry merchandise and as a fighting ship". Chapman's figure of the rigs includes a "Tartane with lateen
@@ -425,11 +425,6 @@ tables of each plate unless marked OCR.
   lateen yard 0.9 L, fore 0.88 of the main; main yard arms 0.0117 (weather) and 0.0234 (lee)
   of the yard; the fore mast raked forward. Steel 1794 p. 41, launches with settee-sails (read):
   main yard 3½ the breadth.
-  **2026-11-20:** the plate's number corrected from LVIII to LVII, here and for §3.9's Bermuda sloop
-  (No. 15), by the engraved number on the sheet and the Sjöhistoriska museet's record of it (Plansch
-  LVII, record 011024789749, which names Nos. 14 to 16; Pl. LVIII holds Nos. 17 and 18), as the
-  tartane's measuring read them (`ships-design/pages-tartane.md` §1.2). §3.3's xebec, No. 17, is on
-  LVIII and stands.
 - **Passages**: Lescallier 1791 pp. 400 to 401 (OCR, read): one mast *à calcet* with a lateen
   sail like a galley's, shrouds *à colonne*, a jib to the *berthelot*; Provence, sometimes to
   the ocean ports and America; "Les Tartanes peuvent aller, soit avec le vent arrière, soit
@@ -593,8 +588,7 @@ tables of each plate unless marked OCR.
   retenir un moment le petit foc ou trinquette pour laisser abattre"; before the wind the
   mainsail is lowered and a square *voile de fortune* set with a topsail above it. Falconer
   SLOOP (read).
-- **Figures**: Chapman plate LVII No. 15 (the number corrected 2026-11-20: §3.1), a Bermuda
-  sloop, **read**: 65½ × 21¾ Swedish ft
+- **Figures**: Chapman plate LVIII No. 15, a Bermuda sloop, **read**: 65½ × 21¾ Swedish ft
   (63.8 × 21.2 ft), draught 12⅔ (12.3 ft), displacement 4,751 cubic Swedish feet; ten
   4-pounders, twelve swivels. Steel p. 41 for the spars.
 - **Base vessel**: Chapman's Bermuda sloop.

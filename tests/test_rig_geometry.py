@@ -581,18 +581,17 @@ def test_going_about_lets_the_bowlines_go_and_steadies_them_out_again(which, evo
     # yards) is brailed up as the helm goes up; the schooner's mainsail is her driving
     # sail and stands.
     brail = "; brail up the spanker" if which == "frigate" else ""
-    # package 32e: a vessel with no after yards (the schooner) has no "mainsail haul"; nor, since
-    # package 90's A2 (the words of a rig with no yards, at their cause), is she told to brace in
-    # the after yards as she bears up: "Stand by to wear ship. Up helm; clear away the bowlines;
-    # brace in the after yards." until it, the frigate's line as it was
-    after = "; brace in the after yards" if which == "frigate" else ""
+    # package 32e: a vessel with no after yards (the schooner) has no "mainsail haul"
     let_go = {
         "tack": (
             "Rise tacks and sheets. Mainsail haul; let go the bowlines."
             if which == "frigate"
             else "Let go the bowlines."
         ),
-        "wear": f"Stand by to wear ship. Up helm; clear away the bowlines{brail}{after}.",
+        "wear": (
+            f"Stand by to wear ship. Up helm; clear away the bowlines{brail}; brace in the "
+            "after yards."
+        ),
     }[evolution]
     steady = "Haul taut the lifts and weather braces. Steady out the bowlines."
     assert let_go in words and steady in words

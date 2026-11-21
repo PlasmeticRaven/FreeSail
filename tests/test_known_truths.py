@@ -3075,12 +3075,7 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
-# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
-# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
-# (28741, 30178 and 56925: "Hands to the after braces; heave to." and "Fill away; man the after
-# braces." before); three lines' words, the 766 lines, every tick and every kind the same
-# (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
-GATE_5B_SCHOONER_DIGEST = "0fef1c52128ce9b2"
+GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4317,13 +4312,7 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # (6436eb06a665f379 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
-# package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose yards
-# are head yards alone, mans her head braces to heave to and fill away (17461, 18301, 89192 and
-# 90359: "Hands to the after braces; heave to.", "Fill away; man the after braces." before) and
-# is not told to brace in after yards she has not as she wears (90475: "Stand by to wear ship.
-# Up helm; brace in the after yards." before); five lines' words, the 3,096 lines, every tick
-# and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
-GATE_5C_MERCHANT_DIGEST = "8259996fb122428e"
+GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
 
 
 def _people(world) -> list[dict]:
@@ -4785,14 +4774,7 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # severity, and 58a's recurring lines are routine in this passage too
 # 75's words, passed by the lead by its lines (9d9efe6b21c17060 before); package 98, step 5
 # (8744d3e56cfc9508 at 65)
-# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
-# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
-# (19081, 19921, 30721, 32090, 64861, 66054, 83341, 84524, 97741 and 99087: "Hands to the after
-# braces; heave to." and "Fill away; man the after braces." before) and is not told to brace in
-# after yards she has not as she wears (88141: "... Up helm; brace in the after yards." before);
-# eleven lines' words, the 2,079 lines, every tick and every kind the same (5d3cbbc5f4d33b84
-# before; TuningNotes, "Package 90, A2")
-GATE_6A_INTENT_DIGEST = "7239b1a1ed45736f"
+GATE_6A_INTENT_DIGEST = "5d3cbbc5f4d33b84"
 
 
 @pytest.fixture(scope="module")
@@ -4981,11 +4963,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # (7076e667c2bc41e3 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
-# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
-# merchant passage's five lines as GATE_5C_MERCHANT_DIGEST's (17461, 18301, 89192, 90359 and
-# 90475), the 3,108 lines, every tick and every kind the same (f47f7bc0daabc950 before;
-# TuningNotes, "Package 90, A2")
-GATE_6A_FAKE_CAPTAIN_DIGEST = "50529f09d4de955e"
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

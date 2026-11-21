@@ -73,10 +73,7 @@ on_start: {log: "All hands about ship."}
 on_complete: {log: "Tacked; {braced} on the {new_tack} tack, heading {new_course}{course_words}.", kind: ship.tacked, severity: notable}
 # The urgent "Missed stays" line is the script's, at the moment she has (kind
 # ship.missed_stays); this line comes when the yards are square and she has fallen off.
-# {fell_off} is "Squared the yards; she fell off", or "She fell off" where she works no braces
-# (`scripts.braces_worked`: a lugger, a boat, or a rig of head yards alone with no square sail
-# set; package 90, A2 and its second pass: `TackScript.words`).
-on_fail: {log: "{fell_off} on the {old_tack} tack, to try again or to wear.", kind: ship.fell_off, severity: notable}
+on_fail: {log: "Squared the yards; she fell off on the {old_tack} tack, to try again or to wear.", kind: ship.fell_off, severity: notable}
 # A tack that waited its turn (behind a cast of the lead, a trim) and could not begin when
 # it came, being off the wind or without way, is said in its own words and not in a
 # missed stay's (package 37k; the review's G7: three "she fell off" lines of the Speedwell

@@ -375,15 +375,8 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # the build machine, 2026-11-07)
     # 75's words, passed by the lead by its lines (aa04702e062bc64b before); package 76, item 8
     # (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
-    "323b8966ceab6857"
+    "48c8948f87088a76"
     # 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
-    # package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose
-    # yards are head yards alone, mans her head braces to heave to and fill away (11094, 12493,
-    # 34488, 35890, 66601 and 67820: "Hands to the after braces; heave to." and "Fill away; man
-    # the after braces." before) and is not told to brace in after yards she has not as she wears
-    # (34201: "... Up helm; brace in the after yards." before); seven lines' words, the 1,594
-    # lines, every tick and every kind and the states the same (48c8948f87088a76 before;
-    # TuningNotes, "Package 90, A2")
 )
 
 
@@ -456,12 +449,7 @@ TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
 # package 68, riding: 3c2b220e06496db5 (ce964d9f346034de)
 # 75's words, passed by the lead by its lines (cfa538b19cb0d2fe before); package 58b
 # (3c2b220e06496db5 at 68)
-# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
-# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
-# (3901 and 5323: "Hands to the after braces; heave to." and "Fill away; man the after braces."
-# before); two lines' words, the 426 lines, every tick and every kind and the states the same
-# (506bf46eaa6d66fe before; TuningNotes, "Package 90, A2")
-TRIAL_TRADE_THICK_DIGEST = "f2f52d500f050950"
+TRIAL_TRADE_THICK_DIGEST = "506bf46eaa6d66fe"
 
 
 @pytest.fixture(scope="module")

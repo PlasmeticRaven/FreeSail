@@ -1,47 +1,5 @@
 # Design: the tartane, a Provençal coaster under a great lateen and a square topsail (package 90, third draft)
 
-**Revised 2026-11-20 on her measuring and the lead's rulings of that day (13:35 UTC, nudge 29).**
-Her step 1 measured Chapman's two plates of her type on the Sjöhistoriska museet's photographs
-(6,000 × 4,258 px: Pl. LVII, the hull, at 33.47 px a Swedish foot; Pl. LXII, the rigs, at 8.09) and
-re-read Forfait's Table II on its leaf n179. The measuring is set down in
-`docs/design/ships-design/pages-tartane.md` (**Pages**), and the lead ruled on it the same day. Old
-beside new, each where it falls:
-- **the plate's number** (ruling 5): Chapman's French tartane is **Pl. LVII No. 16**, not LVIII, by the
-  engraved number and the museum's record (Pages §1.2); corrected here in decisions 4 and 16, §0, §3
-  and §7, and in the research note, the plan and `VesselReferences-2026-10.md` §3.1;
-- **her lines** (decision 4, §3): read, rung **S†** (`stand-in`) where it was T; the factors **1.100**
-  in length and **1.268** in section (were 19.0 ÷ about 18.5, and 1.266), heights above the water by
-  principle 7;
-- **her load line** (ruling 1): **H, the line the sheet marks**, as the *Diana*'s, drawn 0.29° to the
-  keel. H′ (0.63°), which her body plan, her half-breadth plan and Chapman's stated after draught
-  follow, is recorded beside it. Her displacement, KM and lateral area are reckoned to H, the line her
-  draught is given on (§2);
-- **accepted as measured** (ruling 4), two causes mended at the cause (Pages §8):
-  - the draught, 2.50 m on Chapman's stated 6⅔ ft taken as level, becomes **2.38 m**, a mean on the
-    drawn line to the keel's lower edge (2.43 m aft, 2.32 m forward); the stated figure is his after
-    draught;
-  - the waterline, 19.0 m on Chapman's length between the perpendiculars taken for his waterline,
-    becomes **18.47 m**;
-  - what follows from them: the displacement, about 155 t, becomes **about 135 t**; **KM 3.15 m** on H (GM
-    0.8 m stays JUDGEMENT); a lateral area of **40.9 m²**; the hull speed, 10.6 knots, becomes **10.4**
-    (§2, decision 5, §16.1);
-- **`deck_height_m`** (ruling 2): about 0.9 m becomes **0.54 m**, the plate's dashed deck at side. Its
-  readers, the wind at the deck and on the hull and the lookout's eye, hold none a flooding edge or a
-  freeboard; the bulwark's top, 1.72 m, is in Pages by the plate; no new key (§2);
-- **the éperon** (ruling 3): **10½ pieds (3.41 m)**, the printed ratio 0.151 the misprint (JUDGEMENT),
-  Forfait's leaf n179 and Chapman's 3.53 m the cross-check (decision 11, §4.3);
-- **the main's rake** (ruling 6): the owner's **3° forward** kept. Chapman's Pl. LXII draws it upright
-  (0.6° to 1.1° aft, ±0.5°), recorded beside it, and the owner has been asked whether to revisit it
-  (§4.1, §16.1);
-- **found and written in** (ruling 7): no raised after deck is drawn (§3); the war tartane's four
-  ports a side, measured (§7); Pl. LXII's tartane two-masted, with no topsail, no mizen and no
-  headsail (§4); the mizen's rake still JUDGEMENT (decision 10, §4.2);
-- **measured besides** (Pages): her profile line by line (§3), the heights above the deck (§4, §4.1),
-  the éperon level (§4.3), the ports' size (§7);
-- **ruling 1's condition met** (§16.2): her waterplane, drawn by the plan on H′, is carried down to H
-  by the sections' flare, so her KM is H's, 3.15 m (3.16 m on H′, recorded), and her half-breadths at
-  the water are H's (Pages §4.3, §6.2).
-
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The tartanas' entries (Winfield et al. 2023, pp. 1252-1253), the coastguard (pp. 168-169)
 and the místicos (pp. 1195-1201) came, set down in `VesselReferences-2026-11-Spanish.md` §9 to §11,
@@ -162,9 +120,7 @@ the speed, `dyn.speed`, a little more: a figure by truth 12's measure is marked 
 this draft), **JUDGEMENT**. "Plainly:" marks a departure from a ruling or a source, with its reason.
 The hull's rungs are §5.0's (S, S†, R, T); the evidence's are the lead's (A the period's own, B a
 historian's particular, C judgement). Lengths in metres, each with its source's units beside it on
-first use; Forfait's pied du roi is 0.3248 m. **2026-11-20:** *measured*, off the Sjöhistoriska
-museet's photographs of Chapman's plates (Pages, its marks; Chapman's Swedish foot 0.2969 m), and
-Forfait's leaf n179 re-read on its image for the éperon.
+first use; Forfait's pied du roi is 0.3248 m.
 
 **One sentence.** One module writes her: Forfait's *Humble*, a tartane of 100 tonneaux with a
 topsail and a mizen (62¾ by 20⅓ pieds, 20.38 by 6.61 m; Forfait 1788 Table II, read on the page
@@ -187,19 +143,19 @@ today.
 | 1 | One module `tools/ships/tartane.py`, writing `data/ships/tartane.yaml` (the trader) and, by question 5's pick, `data/ships/coastguard-tartane.yaml` (one class in two roles) | `Build-Ships.md` §3.3's per-ship modules; principle 10 (the brig and the merchant brig) |
 | 2 | Her particulars as data in Forfait's units (pieds, pouces, lignes), converted once | The bilander's and the *Bellerophon*'s way: every figure reads as its source gives it |
 | 3 | **Her size is the *Humble*'s** (Forfait Table II col. 2): 62¾ by 20⅓ pieds, 20.38 by 6.61 m; 100 tonneaux | The owner's rig (topsail and mizen) is Forfait's rig for her size (p. 124: a mizen once the breadth passes 19-20 pieds and the length 60); rung A, a named vessel "known to sail well" (p. 122). Question 1 |
-| 4 | **Her lines are Chapman's Pl. LVII No. 16**, scaled to her: lengths by the waterlines' ratio, sections by the beams' (6.61 ÷ 5.22 = 1.27). **S† (`stand-in`) once the plate is read at step 1; T until then, to read: Chapman Pl. LVII No. 16** (the plate was not reached at a readable size: Tar §2.2). **2026-11-20:** read (Pages): **S† (`stand-in`)**. Lengths **×1.100** (her 20.38 m over the plate's measured 18.52 m between the perpendiculars, the same as her 18.47 m over his 16.79 m waterline), sections **×1.268** (6.61 m over the measured 5.21 m; 1.27 → 1.268), heights above the water by principle 7 (the side at midships by the sections' factor, the sheer's rise by the lengths') | §5.0 principles 3 and 7: the type's only lines; principle 3, a source on file but unread is no rung. **Plainly:** a war tartane's fine body widened by more than a quarter for a trader, the factor in the note |
-| 5 | Draught 2.50 m, displacement about 155 t, GM about 0.8 m, all JUDGEMENT to be measured on the scaled body at step 1. **2026-11-20, measured and accepted (the lead's ruling 4):** draught **2.38 m**, the mean to the keel's lower edge on the drawn line H (2.43 m at the post, 2.32 m at the stem); displacement **about 135 t** (±6%); **KM 3.15 m** (KB 1.48, BM 1.66); all reckoned to H (ruling 1; KM 3.16 m on the plan's H′ waterplane, recorded). GM 0.8 m stays JUDGEMENT (KG 2.35 m above the keel) | No trading tartane's draught found (Tar §2.3): Chapman's draught to breadth, 0.379, on her breadth. **2026-11-20:** Chapman's 6⅔ ft is his after draught, his load line drawn inclined to the keel (Pages §4.2, §4.3) |
+| 4 | **Her lines are Chapman's Pl. LVIII No. 16**, scaled to her: lengths by the waterlines' ratio, sections by the beams' (6.61 ÷ 5.22 = 1.27). **S† (`stand-in`) once the plate is read at step 1; T until then, to read: Chapman Pl. LVIII No. 16** (the plate was not reached at a readable size: Tar §2.2) | §5.0 principles 3 and 7: the type's only lines; principle 3, a source on file but unread is no rung. **Plainly:** a war tartane's fine body widened by more than a quarter for a trader, the factor in the note |
+| 5 | Draught 2.50 m, displacement about 155 t, GM about 0.8 m, all JUDGEMENT to be measured on the scaled body at step 1 | No trading tartane's draught found (Tar §2.3): Chapman's draught to breadth, 0.379, on her breadth |
 | 6 | **The main**: a mast *à calcet* of 59 pieds (19.17 m) heel to head, 26 pieds (8.45 m) of head, stepped 10 pieds 5 pouces (3.38 m) before the middle; column shrouds (`haubans à colonne`) | Forfait Table II; Lescallier pp. 376-378 |
 | 7 | **The great lateen**, class `lateen`, whole (no `cut_at_mast`), on a `lateen_yard` of 75 pieds (24.36 m) slung at a third; cut by Forfait's rule (p. 121) | Forfait Table II and p. 121; Lescallier p. 379; Ext §3.7 |
 | 8 | **The topsail**, square, on a yard of 32 pieds (10.39 m) hoisted on the main's head; **no topgallant**. Her main is a pole (no topmast), so the topsail is a course to the engine today and wants A5 and A6 before her file (§5.1a). **Loose-footed, no yard below it** (2026-11-19, the owner's reading of the prints: "a loose-footed (no lower yard) square topsail"), as this decision's sheets to the deck already had it; A5's ruled reading makes it a topsail | Forfait's *Humble*; Röding; Winfield's Monleón shows none above the topsail, and the watercolour, for the eye, none; the owner's reading (VR-Sp §9). Question 4's note |
 | 9 | **The tréou**, square, on a yard of 41 pieds (13.32 m) crossed as the cutter's square sail is, set before the wind and in too much wind, out of plain sail. **Revised 2026-11-19:** its yard **not crossed in plain sail** but sent up with the tréou and struck with it, the period's way of setting it flying, so that in plain sail no yard stands under the topsail (the owner's reading of the prints). How her file carries a yard not crossed (with its sail in the sail room, sent up by its evolution) is her builder's at step 2, the lead's if it asks more of the engine (JUDGEMENT) | Lescallier p. 401; Steel; Falconer; Forfait's *Espiègle* and square-sail column; the owner's reading (VR-Sp §9). Question 4 |
-| 10 | **The mizen**: 30 pieds (9.75 m), head 6 (1.95 m), 15 pieds 2 pouces (4.93 m) abaft the middle, raked aft (JUDGEMENT on the angle); its lateen on a yard of 47 pieds (15.27 m), sheeted to an outrigger over the stern. **2026-11-20:** no plate of Chapman's draws a tartane's mizen (Pl. LVII No. 16 draws no mast; Pl. LXII No. 16 is two-masted, with none: Pages §7), so the rake **stays JUDGEMENT**, 10° on Forfait p. 128 (the lead's ruling 7) | Forfait Table II; Forfait p. 128 (the lateen xebec's after mast "panché vers l'arrière", the nearest text), the angle to be read on Chapman's plate at step 1; Lescallier p. 393 (the mizen to bring her to the wind); the outrigger's length by the lugger's (Forfait Table VII). The watercolour a check for the eye only |
-| 11 | **The head**: the éperon (10½ pieds, 3.41 m, **to be re-read on the page image before it is a constant**: the printed ratio, 0.151, gives 9½ pieds, Tar §2.1) with the berthelot over it; **one great jib** to the berthelot's end, by judgement; a storm jib in the sail room. **2026-11-19: one headsail, on the owner's reading** of Monleón's print and the other tartane prints they have seen ("show one headsail"), so the count no longer rests on judgement alone. **2026-11-20, ruled (the lead's ruling 3):** the page image (leaf n179) prints both 10½ and 0.151; the éperon is **10½ pieds (3.41 m)**, the printed ratio taken as the misprint (JUDGEMENT); Chapman's beak, scaled, 3.53 m to the berthelot's point, the cross-check (Pages §1.3, §5.4) | Lescallier pp. 393, 401; Forfait p. 125; Steel; Röding; the owner's reading (VR-Sp §9). Decision 11 leaves the headsails' count to judgement; the images README's reading of two is recorded (§17) |
+| 10 | **The mizen**: 30 pieds (9.75 m), head 6 (1.95 m), 15 pieds 2 pouces (4.93 m) abaft the middle, raked aft (JUDGEMENT on the angle); its lateen on a yard of 47 pieds (15.27 m), sheeted to an outrigger over the stern | Forfait Table II; Forfait p. 128 (the lateen xebec's after mast "panché vers l'arrière", the nearest text), the angle to be read on Chapman's plate at step 1; Lescallier p. 393 (the mizen to bring her to the wind); the outrigger's length by the lugger's (Forfait Table VII). The watercolour a check for the eye only |
+| 11 | **The head**: the éperon (10½ pieds, 3.41 m, **to be re-read on the page image before it is a constant**: the printed ratio, 0.151, gives 9½ pieds, Tar §2.1) with the berthelot over it; **one great jib** to the berthelot's end, by judgement; a storm jib in the sail room. **2026-11-19: one headsail, on the owner's reading** of Monleón's print and the other tartane prints they have seen ("show one headsail"), so the count no longer rests on judgement alone | Lescallier pp. 393, 401; Forfait p. 125; Steel; Röding; the owner's reading (VR-Sp §9). Decision 11 leaves the headsails' count to judgement; the images README's reading of two is recorded (§17) |
 | 12 | **The bouffette**, a smaller lateen bent to the great yard in the great lateen's place in a blow, as the lugger's taille-vent is | Lescallier pp. 394-395; Forfait p. 129. Question 6's note |
 | 13 | **Tacked and worn as other vessels are** (the owner's answer to question 3): `tack ship` and `wear ship` each an evolution of her own; each lateen's yard shifted round its mast in stays (once her head is through the wind) or in the wear (at "wind aft"), peaked up and its car passed round, never lowered, by the order's clause or her practice ("shift" in both by default); or left, the lateen drawing as a lug against its mast on the bad hand until `shift the mainsail`; `put her about`, and a course ordered across the wind's eye, wear her over 22 knots | The owner (Dec 3, Part F); no source says a lateen vessel could not tack (GA §4); the yard changed "pour virer de bord", either way (Lescallier p. 378); the board on the mast named and sailed (Stratico, O'Scanlan: GA §3.3); the strong wind, Forfait p. 119. Question 2, answered |
 | 14 | The engine work this needs is the plan's **A1a to A1c** (the whole lateen's side, its going about with the yard's change a part, the rules captain; shared with the polacre's and the xebec's lateens), and **A1d** (taken aback and on the bad hand, built by the owner's decision of 2026-11-18), with **A3** (a tiller's words), **A4** (the boat in tow), **A5 and A6** (her topsail on a pole main) and later **A8** (the lateen in a gale), each designed in package 90's plan (§6 there) before her file (§5.4) | Every whole lateen of the package needs A1; nothing of it is in the engine today (observed, §5.1); her pole main's topsail is a course today (§5.1a) |
 | 15 | Company **ten** in trade (master and mate posts, six seamen, a boy, a cook), JUDGEMENT until sourced; her great sail's work an all-hands call | Ruling 11; package 116's `too_few: all hands`; the bilander's ruling (Tar §6) |
-| 16 | The trader **unarmed**; the coastguard **Chapman's eight 4-pounders and four swivels**, until Winfield's Spanish rows replace them. **2026-11-19:** the tartanas' entries give no guns (pp. 1252-1253), so Chapman's stand, by the owner's word on what is not found | Chapman Pl. LVII No. 16 (read there; **2026-11-20:** its four ports a side read on the plate, Pages §5.7); Winfield et al. 2023, pp. 1252-1253 (VR-Sp §9) |
+| 16 | The trader **unarmed**; the coastguard **Chapman's eight 4-pounders and four swivels**, until Winfield's Spanish rows replace them. **2026-11-19:** the tartanas' entries give no guns (pp. 1252-1253), so Chapman's stand, by the owner's word on what is not found | Chapman Pl. LVIII No. 16 (read there); Winfield et al. 2023, pp. 1252-1253 (VR-Sp §9) |
 | 17 | Roles: the trader `merchant`, a `fishing tartane` description `fisherman` (the trawl, its grounds to source: booked, the plan's card); the coastguard, description key `guarda-costa tartane`, role `revenue`, the revenue cutter's book read from `thresholds:` | Build §8; package 116's road; Tar §5 |
 | 18 | Rig word **"a tartane"**, size rank 1; no nation in the file (the scenario's, as the *Neufchatel*'s) | The made-out rule; D16's bilander precedent; the type named on sight |
 | 19 | **Her boat towed astern** on passage by default | Decision 11 ("the boat in tow"); the watercolour. Question 6 |
@@ -213,11 +169,11 @@ today.
 |---|---|---|
 | F3: her topsail on a pole main | the heave-to read from the probe, "topsail aback" | **Held.** Her file puts the topsail yard on the main's own head (§4.1), and there the engine makes it a course: re-run for this draft on the probe with the yard so filed, "Hauled up the courses", hove to "under her fore-and-aft canvas", 51.8° off at 3.29 kn by truth 12's measure at +600 s (§5.1a). A5 (and A6) become conditions of her file (§0, §5.4 item 10; the plan's §9.1); T-5 is read after A5 |
 | F7 (with Plan §4 row 4): her mizen hove to | the mizen "her driver", read by the driver's paths, "brailed hove to as the rule rules" | **Settled by the plan:** worked as a ship's mizen going about, kept set hove to; the driver rule never takes a whole lateen (§4.2, §5.3, §5.4 item 4). If she forereaches past truth 12's band, the lever is her great lateen's trim |
-| F9: rungs before reading | Chapman's plate "S†" | **Held.** T until the plate is read at step 1, then S† (decision 4, §3). **2026-11-20:** read; S† (Pages) |
-| F12: her size in plain words | "as long as the cutter's deck and a half" (and the decisions sheet's "exactly your rig") | **Held.** 20.38 m is about a quarter longer than the cutter's 54.5 ft (16.6 m) on deck and a third longer than her 15.2 m on the water (**2026-11-20:** a fifth longer, 18.47 against 15.2 m, on her measured waterline: §2); the *Humble* carries a topgallant, which is left out (§16.1) |
-| F13: figures from a picture | the mizen's rake and the outrigger "JUDGEMENT on the watercolour" | **Held.** The rake on Forfait p. 128 and Chapman's plate, the outrigger on the lugger's (decision 10, §4.2); the watercolour for the eye only. **2026-11-20:** no plate of Chapman's draws her mizen; the rake on Forfait p. 128 alone, JUDGEMENT (the lead's ruling 7) |
+| F9: rungs before reading | Chapman's plate "S†" | **Held.** T until the plate is read at step 1, then S† (decision 4, §3) |
+| F12: her size in plain words | "as long as the cutter's deck and a half" (and the decisions sheet's "exactly your rig") | **Held.** 20.38 m is about a quarter longer than the cutter's 54.5 ft (16.6 m) on deck and a third longer than her 15.2 m on the water; the *Humble* carries a topgallant, which is left out (§16.1) |
+| F13: figures from a picture | the mizen's rake and the outrigger "JUDGEMENT on the watercolour" | **Held.** The rake on Forfait p. 128 and Chapman's plate, the outrigger on the lugger's (decision 10, §4.2); the watercolour for the eye only |
 | F16: her words | "a King's tartane, armed, a coastguard" | **Held.** "a guarda-costa", the period English for the Spanish service's vessel (James's "garda-costa"); "coastguard" as a vessel's name belongs to the British service of the 1820s (§8, §9, §12) |
-| F20: the éperon | 10½ pieds taken as read | **Held.** The printed ratio gives 9½: re-read on the page image before it is a constant (decision 11; Tar §2.1). **2026-11-20:** re-read: the page prints both; 10½ pieds ruled the constant (the lead's ruling 3, JUDGEMENT) |
+| F20: the éperon | 10½ pieds taken as read | **Held.** The printed ratio gives 9½: re-read on the page image before it is a constant (decision 11; Tar §2.1) |
 | F24: whose question | the headsails to the owner, the main's rake to the lead | **Held.** The headsails by judgement (decision 11's own words), one jib; the main's rake to the owner, their word "raking" beside their watercolour's near-upright main (§16.1 question 3) |
 | The plan's settlements | numbered items of one step | the plan's step names (decision 14, §5.4); the coastguard a second file (Plan §4 row 12); no scenario in the card (§12) |
 
@@ -230,12 +186,10 @@ today.
 unless they say otherwise. This draft is input to that card. When it opens, the order this draft
 proposes for her (for the plan to weigh against the other four hulls):
 
-1. **Step 0, documents and measurement, outside the tree's code**: Chapman's Pl. LVII No. 16 read
+1. **Step 0, documents and measurement, outside the tree's code**: Chapman's Pl. LVIII No. 16 read
    at a readable size and measured outside the repository (as Gwyn's bilander was:
    `owner-notes/<ship>/`); Winfield's passages (Tar §10) read by the owner; Lescallier's Pl. XXII
-   fig. 5 and Forfait's figs. 9 and 35 seen. **2026-11-20:** Chapman's Pl. LVII No. 16 and Pl. LXII
-   No. 16 read on the museum's photographs and measured outside the repository (Pages); Forfait's
-   figs. 9 and 35 not reached, and Lescallier's Pl. XXII fig. 5 not sought (Pages §9).
+   fig. 5 and Forfait's figs. 9 and 35 seen.
 2. **The engine's steps A1a to A6** (§5.4; the plan's §6 and §9.1): A1a to A1d the whole lateen
    (A1d, the strain aback and on the bad hand, built by the owner's decision of 2026-11-18),
    tested on a rig in memory (the lead's `tartane_probe()` with the step's key) before any file
@@ -259,8 +213,7 @@ her. (On the plan's other road the *Diana* comes first: Plan §9.1.)
   in `freesail/world/ships.py` and `world/captains.py`; `tests/test_tartane.py`.
 - **The data**: a frozen `Particulars` in Forfait's units (Table II's column 2 whole, the
   *Espiègle*'s and the square-sail column's figures kept beside it as records), Chapman's plate's
-  measured points in Swedish feet, each converted once. **2026-11-20:** Pages §5 and §6, in Swedish
-  feet in the frame of her load line H, hers in metres beside them.
+  measured points in Swedish feet, each converted once.
 - **The checks** (each a `ValueError` with a sentence, as `settee.py`'s): the great lateen's sling
   a third along its yard within 0.1 m of the main's raked line; its peak inside the outrigger's end
   and its clew inside the taffrail; the sum of her sail within a stated band of Forfait's (§4.6);
@@ -278,73 +231,54 @@ her. (On the plan's other road the *Diana* comes first: Plan §9.1.)
 | Figure | Value | Source and rung |
 |---|---|---|
 | Length (Forfait's *longueur*) | 20.38 m (62¾ pieds) | Forfait Table II col. 2, read (page image), A. Which length (on deck or stem to sternpost) is not stated: to read in Forfait's ch. I |
-| Waterline length | **19.0 m, provisional** → **18.47 m** (2026-11-20) | JUDGEMENT; at step 1, Chapman's waterline over the plate's length between perpendiculars, applied to 20.38 m. **Measured, accepted (the lead's ruling 4):** Chapman's waterline on H, the post's after face to the stem's fore face, 56.55 ft (16.79 m), over his 62.39 ft between the perpendiculars (0.906), on her 20.38 m. The 19.0 m rested on his length between the perpendiculars (about 18.5 m) taken for his waterline: his stem rakes 4.6 ft forward of the water to its head and his post 1.5 ft aft (Pages §4.1, §8) |
+| Waterline length | **19.0 m, provisional** | JUDGEMENT; at step 1, Chapman's waterline over the plate's length between perpendiculars, applied to 20.38 m |
 | Breadth | 6.61 m (20⅓ pieds) | Forfait, A |
-| Draught | 2.50 m → **2.38 m** (2026-11-20) | JUDGEMENT: Chapman's 1.98 m on 5.22 m (0.379) on her breadth; the sections' factor of principle 7. **Measured, accepted (the lead's ruling 4):** the mean to the keel's lower edge at the middle of her waterline on H, the line the sheet marks (ruling 1); 2.43 m at the post, 2.32 m at the stem (drag 0.11 m). Chapman's stated 6⅔ ft fits his after draught on H′ (+0.5%; on H −3.0%): the 2.50 m was that after draught taken as level. On H′ she would draw 2.40 m mean, 2.52 and 2.28 (Pages §4.2) |
-| Displacement | about 155 t → **about 135 t** (2026-11-20) | JUDGEMENT: Cb 0.48 on the figures above; measured on the scaled body at step 1, the drawn and the filed within 15% or recorded (principle 8). **Measured, accepted (the lead's ruling 4):** drawn to H (ruling 1's condition), ±6%: 134.6 t moulded, 135.2 t with the keel; block 0.51, midship 0.83, waterplane 0.69 to the base line; 13% under the 155 t, by the shorter waterline and the shallower mean draught (Pages §4.3) |
-| GM | about 0.8 m | JUDGEMENT: a broad, shallow hull (Forfait p. 125, "their relative breadth always very great") under a high centre of effort (p. 123). **2026-11-20:** **KM 3.15 m** above the keel's lower edge, reckoned to H by ruling 1's condition (KB 1.48, BM 1.66; on the plan's load waterline, drawn on H′, BM 1.67 and KM 3.16, recorded; Pages §4.3). GM 0.8 m stays JUDGEMENT, putting KG 2.35 m above the keel |
-| Deck above the water | about 0.9 m → **0.54 m** (2026-11-20) | JUDGEMENT until Chapman's sheer is read (the cutter's 0.9). **Measured; `deck_height_m` by the lead's ruling 2:** the deck at side, the plate's dashed line, at the midship station (lowest 0.52 m), rising to 1.77 m aft and 1.45 m forward where the line ends. Its readers (the wind taken at the deck and on the hull, `physics/sails.py` and `physics/hull.py`; the lookout's eye, `world/lookout.py`) hold none a flooding edge or a freeboard, by the lead's reading. The waist bulwark's top, 1.72 m above her water, is in Pages by the plate (§5.2); no new key |
-| Hull speed | 10.6 knots to start → **10.4 knots** (2026-11-20) | the files' rule, 1.34 √(LWL in feet). **2026-11-20:** 1.34 √60.6 on her measured 18.47 m (computed; accepted, the lead's ruling 4) |
-| Lateral area | — → **40.9 m²** (2026-11-20) | **Measured, accepted (the lead's ruling 4):** the post's after face, the keel's lower edge and the stem's fore face under H, no rudder drawn (Pages §5.6). It fills 0.93 of her waterline times her mean draught, as the other drawn hulls do; the generator's 0.85 rule would give 37.4 m² |
+| Draught | 2.50 m | JUDGEMENT: Chapman's 1.98 m on 5.22 m (0.379) on her breadth; the sections' factor of principle 7 |
+| Displacement | about 155 t | JUDGEMENT: Cb 0.48 on the figures above; measured on the scaled body at step 1, the drawn and the filed within 15% or recorded (principle 8) |
+| GM | about 0.8 m | JUDGEMENT: a broad, shallow hull (Forfait p. 125, "their relative breadth always very great") under a high centre of effort (p. 123) |
+| Deck above the water | about 0.9 m | JUDGEMENT until Chapman's sheer is read (the cutter's 0.9) |
+| Hull speed | 10.6 knots to start | the files' rule, 1.34 √(LWL in feet) |
 | Burden | 100 tonneaux | Forfait, A; kept in the notes, no constant |
 
 **Plainly:** the lead's probe (`tests/rig_fixtures.py`) is the cutter's 15.2-m, 106-t hull; she is
 a third longer and half again as heavy (JUDGEMENT on the figures above). The probe classes her; it
-was never meant to sail her. **2026-11-20:** on the measured figures she is a fifth longer on the
-water (18.47 m) and about a quarter heavier (135 t).
+was never meant to sail her.
 
 ## 3. The hull profile and her shape (`Build-Ships.md` §5.0-§5.3)
 
 | Line | Source | Rung | Mark |
 |---|---|---|---|
-| Body under the water, sections, keel, rising line | Chapman Pl. LVII No. 16, scaled | S† once read at step 1; T until then, to read: the plate. **2026-11-20:** read, **S†** (Pages §5, §6): frames traced aft 3 to 8, ⊕, fore 1 to 6 and 9; the half-breadths at the water at every station from the plan | `stand-in` once read; `judged` until then. **2026-11-20:** `stand-in` |
-| Sheer, rail, stem, stern | the same plate | S† once read; T until then, to read: the plate. **2026-11-20:** read, **S†**: the rail and the waist bulwark, the planksheer band, the deck at side, the stem and the stem head, the post, measured (Pages §5.2, §5.4, §5.5) | as above |
-| The éperon and the berthelot | Forfait Table II (10½ pieds, to re-read), p. 125; Lescallier p. 393; the plate's beak to read | R for its length (Forfait's table); T for its shape until the plate is read. **2026-11-20:** R for its length, 10½ pieds by the lead's ruling 3; **S† for its shape**, the plate's beak, level, to an eye, with the berthelot laid on it (`head_m`; `form.head: knee`, JUDGEMENT on the word: Pages §5.4, §6.2) | `rule`; `judged`. **2026-11-20:** `rule`; `stand-in` |
-| Wales and paint | the plate where it shows them; the watercolour's dark hull and light strake for the eye | T. **2026-11-20:** the wale from the plate, a band 0.16 m deep straddling the load line amidships, **S†** (Pages §5.3); paint T | `judged`. **2026-11-20:** the wale `stand-in` |
+| Body under the water, sections, keel, rising line | Chapman Pl. LVIII No. 16, scaled | S† once read at step 1; T until then, to read: the plate | `stand-in` once read; `judged` until then |
+| Sheer, rail, stem, stern | the same plate | S† once read; T until then, to read: the plate | as above |
+| The éperon and the berthelot | Forfait Table II (10½ pieds, to re-read), p. 125; Lescallier p. 393; the plate's beak to read | R for its length (Forfait's table); T for its shape until the plate is read | `rule`; `judged` |
+| Wales and paint | the plate where it shows them; the watercolour's dark hull and light strake for the eye | T | `judged` |
 | Carving | Falconer's CAGOUILLE, the scroll at a tartane's prow: in words | — | principle 9 |
 
 - **The factors** (principle 7): lengths 19.0 ÷ Chapman's waterline (about 18.5 m, to read); the
   sections by 6.61 ÷ 5.22 = 1.266, so her floor, flare and tumblehome keep the plate's angles. The
-  depth so drawn is recorded beside her draught and never moved. **2026-11-20:** lengths 18.47 ÷
-  Chapman's waterline 16.79 m = **1.100**, the same as 20.38 ÷ his 18.52 m between the perpendiculars
-  (the "about 18.5 m" was that length, not his waterline: Pages §8); the sections 6.61 ÷ 5.21 m
-  (measured) = **1.268**; above the water, by principle 7, k(x) from 1.265 amidships to 1.145 at the
-  ends (Pages §3.4).
+  depth so drawn is recorded beside her draught and never moved.
 - **What the drawing must show her to be** (the watercolour, seen, no figure taken): a low, beamy
   hull with a strong sheer rising to the beak and the stern, a long beak with the berthelot almost
-  level beyond the stem, a raised after deck, no ports in the trader. **2026-11-20:** the plate draws
-  **no raised after deck** (the lead's ruling 7); the watercolour's is for the eye only. It draws a
-  deck low amidships (0.54 m) closed by a high waist bulwark from x −7.06 to +6.5 m, with a lower rail
-  aft of its upright after end to the taffrail; a sharp stern, the planking closing on a raked post; a
-  tall stem head standing about 1.1 m above the bow rail; the beak level beyond the stem to an eye, the
-  berthelot laid on it; the wale awash amidships (Pages §5.2 to §5.5). Whether the trader keeps the
-  war tartane's high bulwark is her builder's to propose (JUDGEMENT).
+  level beyond the stem, a raised after deck, no ports in the trader.
 - **The measuring tasks** (step 1): the plate's waterline, perpendiculars and breadth; the stations'
   sections; the sheer and the rail; the beak; the masts' places and rakes against Forfait's; the
   ports of the war tartane; the scale's check against the 1971 reprint's table (Chapman's 62¼
-  Swedish feet). **2026-11-20: done** (Pages), but the frames aft 1 and 2, fore 7, 8 and 10 (not
-  traced); the scale within 0.2% of the table's length.
+  Swedish feet).
 
 ## 4. The rig, mast by mast
 
 Each spar and sail with its class. Heights above the deck are this draft's JUDGEMENT on Forfait's
 lengths with the mast stepped about 2.8 m below the deck (the depth of hold not found), to be
-measured on Chapman's sheer at step 1. **2026-11-20:** measured on Chapman's sheer (Pages §6.4): at
-the main (x +3.87 m) the deck at side stands 0.85 m above her water and the keel's upper edge 2.12 m
-below it, **2.97 m between them**; at the mizen (x −4.44 m), 0.93 m and 3.10 m. On a keelson of 0.2
-to 0.25 m (JUDGEMENT; none is drawn) the heel stands about 2.75 m below the deck, so the 2.8 m
-stands. Chapman's Pl. LXII No. 16, his one drawn rig of the type, is another rig: two-masted, a main
-and a fore mast raked 23° forward, with no topsail, no mizen and no headsail (Pages §7; the lead's
-ruling 7). It checks the main's rake and its yard, not her rig.
+measured on Chapman's sheer at step 1.
 
 ### 4.1 The main mast
 
 | Part | Id; class | Figures | Source |
 |---|---|---|---|
-| Lower mast *à calcet* | `main.mast`; `mast` | 59 pieds heel to head (19.17 m), 22 pouces (0.60 m) at the deck, its head 26 pieds (8.45 m); the hounds about 8 m above the deck, the head about 16.4 m; stepped 3.38 m before the middle. **2026-11-20:** measured on Chapman's sheer, the hounds **7.7 to 8.0 m** and the head **16.2 to 16.4 m** above the deck at side (the heel on the keel's upper edge, or on a keelson of 0.25 m: Pages §6.4); Chapman's Pl. LXII stands its main at the middle of the length, on another rig (recorded, Pages §7) | Forfait Table II, A; heights JUDGEMENT; **2026-11-20:** the deck measured (Pages §6.4), the keelson JUDGEMENT |
-| Rake | — | **3° forward, provisional** | JUDGEMENT on decision 11's "one raking mast"; no text gives it; the owner's watercolour shows the main near upright (seen, for the eye only); the owner's question, §16.1 question 3. **2026-11-20, the lead's ruling 6:** 3° forward is **the owner's answer** (question 3, answered as picked on 2026-11-18) and is kept. Chapman's Pl. LXII No. 16 draws a tartane's main **upright** (0.6° to 1.1° aft, ±0.5°), on a two-masted lateen rig (Pages §7), recorded beside it; the owner has been asked whether to revisit it |
+| Lower mast *à calcet* | `main.mast`; `mast` | 59 pieds heel to head (19.17 m), 22 pouces (0.60 m) at the deck, its head 26 pieds (8.45 m); the hounds about 8 m above the deck, the head about 16.4 m; stepped 3.38 m before the middle | Forfait Table II, A; heights JUDGEMENT |
+| Rake | — | **3° forward, provisional** | JUDGEMENT on decision 11's "one raking mast"; no text gives it; the owner's watercolour shows the main near upright (seen, for the eye only); the owner's question, §16.1 question 3 |
 | Column shrouds | lines of class `shroud`, sided, each with its runner tackle | as the lugger's and the cutter's shrouds are filed, rated by their rule | Lescallier pp. 377-378, A |
-| The great lateen yard | `main.lateen_yard`; `lateen_yard` | 75 pieds (24.36 m), 9¼ pouces (0.25 m); slung at a third from the car (8.12 m before the mast); its ends 1½ pieds at the penne and about ¾ at the car | Forfait, A; Lescallier p. 379, A; **2026-11-20:** Chapman's Pl. LXII main yard 1.20 of its hull's length, Forfait's 1.195 (Pages §7) |
+| The great lateen yard | `main.lateen_yard`; `lateen_yard` | 75 pieds (24.36 m), 9¼ pouces (0.25 m); slung at a third from the car (8.12 m before the mast); its ends 1½ pieds at the penne and about ¾ at the car | Forfait, A; Lescallier p. 379, A |
 | Its gear | lines | the halyard (jeers) a `halyard`; the two ourses, *à proue* and *à poupe*, two `guy`s at the car (the bilander's mapping of the ourses, Bil §1.2); the brace (*oste*) and the vang (*van*) at the penne, `vang`s; one parrel | Lescallier p. 379, A; the forward ourse to the berthelot's end (p. 393) |
 | **The great lateen** | `main.lateen`; `lateen`, whole | head 72¾ pieds (23.63 m: the yard less its ends); the clew where it falls on the deck at the mast's foot with the yard peaked as she carries it (Forfait p. 121, R), the car tacked at the stem; one sheet aft to leeward, one tack; **about 100 to 140 m²** before the cut (JUDGEMENT); one oblique reef band (Lescallier p. 379) | A, R |
 | The topsail yard | `main.topsail.yard`; `yard`, **`on: main.mast`** (no topmast: a pole main) | 32 pieds (10.39 m), 6¼ pouces; hoisted on the main's head, about 15.5 m above the deck; braced as the cutter's topsail yard | Forfait, A; the brace limit the cutter's, JUDGEMENT. The engine reads it as a course today (§5.1a): A5 |
@@ -366,7 +300,7 @@ ruling 7). It checks the main's rake and its yard, not her rig.
 
 | Part | Id; class | Figures | Source |
 |---|---|---|---|
-| Mizen | `mizzen.mast`; `mast` | 30 pieds (9.75 m), 10 pouces (0.27 m), its head 6 pieds; stepped 4.93 m abaft the middle; **raked aft, 10° provisional** | Forfait Table II, A; the rake JUDGEMENT on Forfait p. 128 (the lateen xebec's after mast "panché vers l'arrière"), its angle to be read on Chapman's plate at step 1. **2026-11-20:** no plate of Chapman's draws a tartane's mizen (Pages §7): the rake **stays JUDGEMENT** on Forfait p. 128 (the lead's ruling 7) |
+| Mizen | `mizzen.mast`; `mast` | 30 pieds (9.75 m), 10 pouces (0.27 m), its head 6 pieds; stepped 4.93 m abaft the middle; **raked aft, 10° provisional** | Forfait Table II, A; the rake JUDGEMENT on Forfait p. 128 (the lateen xebec's after mast "panché vers l'arrière"), its angle to be read on Chapman's plate at step 1 |
 | Its lateen yard | `mizzen.lateen_yard`; `lateen_yard` | 47 pieds (15.27 m), 6 pouces; slung at a third | Forfait, A |
 | **The mizen lateen** | `mizzen.lateen`; `lateen`, whole | cut by Forfait's rule; its sheet to the outrigger; about 30 to 45 m² (JUDGEMENT) | A, R |
 | The outrigger | `mizzen.outrigger`; the lugger's class for hers | its length by the lugger's `bout-dehors de tapecul` (Forfait Table VII) in proportion to her mizen yard (JUDGEMENT on the carrying) | the lugger's file; Forfait Table VII |
@@ -383,7 +317,7 @@ ruling 7). It checks the main's rake and its yard, not her rig.
 
 | Part | Id; class | Figures | Source |
 |---|---|---|---|
-| The éperon with the berthelot | `bowsprit`; `bowsprit`, fixed, near the horizontal | 10½ pieds (3.41 m) beyond the stem; its steeve a few degrees (JUDGEMENT). **2026-11-20:** 10½ pieds (3.41 m) beyond the stem head, by the lead's ruling 3 (the printed ratio the misprint, JUDGEMENT; Chapman's beak, 3.53 m, the cross-check); **its steeve level on the plate** (the beak's middle line 8.35 ft above the water at both ends, the beak tapering to the eye), about 2.85 m above her water at the eye | Forfait, A; Lescallier p. 393; Pages §5.4 |
+| The éperon with the berthelot | `bowsprit`; `bowsprit`, fixed, near the horizontal | 10½ pieds (3.41 m) beyond the stem; its steeve a few degrees (JUDGEMENT) | Forfait, A; Lescallier p. 393 |
 | **The jib** | `jib`; `jibheaded` | from the berthelot's end to the main's hounds; area by the files' rule on her stay | Lescallier p. 401; Steel; Röding, A. One, by judgement (decision 11), and since 2026-11-19 on the owner's reading of the prints (VR-Sp §9) |
 | The storm jib | `storm_jib`; `jibheaded`, in the sail room | the cutter's pattern | JUDGEMENT |
 
@@ -723,25 +657,18 @@ scenario's.
 | Fit | Guns | Source |
 |---|---|---|
 | The trader, `unarmed` (default) | none | JUDGEMENT; the bilander's and the merchant brig's pattern |
-| The coastguard, `long guns` (default of the second file) | **eight 4-pounders, four a side, and four swivels** | Chapman Pl. LVII No. 16 (read there; **2026-11-20:** four ports a side read on the plate, Pages §5.7): a French war tartane's; to be replaced by Winfield's Spanish rows when read. **2026-11-19:** the rows give no guns (VR-Sp §9; *Las Ánimas*, a tartana armed as a gunboat and lost in 1795, without figures), so Chapman's stand; the místicos' 4- to 12-pounders and obuses the Spanish check (VR-Sp §11) |
+| The coastguard, `long guns` (default of the second file) | **eight 4-pounders, four a side, and four swivels** | Chapman Pl. LVIII No. 16 (read there): a French war tartane's; to be replaced by Winfield's Spanish rows when read. **2026-11-19:** the rows give no guns (VR-Sp §9; *Las Ánimas*, a tartana armed as a gunboat and lost in 1795, without figures), so Chapman's stand; the místicos' 4- to 12-pounders and obuses the Spanish check (VR-Sp §11) |
 
 **The checklist** (`Build-Ships.md` §6, postscript), for the coastguard's file:
-1. `hull.profile` with `rail_m`, `breadth_m` and `decks_m` (her one deck), from the scaled plate
-   (**2026-11-20:** Pages §6.2's points);
+1. `hull.profile` with `rail_m`, `breadth_m` and `decks_m` (her one deck), from the scaled plate;
 2. `ports_m.<deck>`: a triple [x, sill, half-breadth] at each gun's `x_m`, **the x's from Chapman's
    ports as read at step 1**, the sills her sheet's; a gun over the rail if the plate shows no ports
-   (`OVER_THE_RAIL_M`). **2026-11-20, measured** (accepted, the lead's ruling 7): the war tartane's
-   **four ports a side**, in two pairs with the waist clear between them: `ports_m.upper` [−4.66, 1.37,
-   2.89], [−1.94, 1.11, 3.14], [3.21, 1.18, 3.02], [5.93, 1.57, 2.39] (x, sill, hb at the sill; Pages
-   §5.7);
-3. `port_size_m.<deck>`: [width, depth], from the plate. **2026-11-20:** **[0.52, 0.54]** (Chapman's
-   1.61 by 1.45 ft, the width by the lengths' factor and the depth by the sections'; 0.61 by 0.54 m on
-   the sections' alone, the builder's choice: Pages §5.7);
+   (`OVER_THE_RAIL_M`);
+3. `port_size_m.<deck>`: [width, depth], from the plate;
 4. each gun's `kind` (long gun), `pounder` (4, in the nation's pound as Winfield gives it, or the
    French livre's as Chapman's; the game's English pounds beside it), `place`, `side`, `x_m`,
    `weight_cwt` (the nearest pattern in Adye's tables, listed if more than a tenth off), `deck`;
-   the four swivels on the rail, half-pounders, two a side aft (JUDGEMENT; none is drawn on the plate,
-   Pages §5.7);
+   the four swivels on the rail, half-pounders, two a side aft (JUDGEMENT);
 5. then `python tools/check_viewer_guns.py data/ships/coastguard-tartane.yaml` clean, and its test.
 
 The magazine a small cruiser's (the cutter's by her guns' number, JUDGEMENT); her quarter bill the
@@ -824,11 +751,9 @@ rig word; within `COLOURS_MADE_OUT_NM` (2; 3) her colours; within `MADE_OUT_NM` 
    below it in plain sail** (the owner's reading of the prints); the tréou's yard drawn only while
    the tréou is set.
 4. **The mizen raked aft** with its lateen and the outrigger over the stern its sheet leads to.
-5. **The beak and the berthelot**, nearly level, the jib's tack at its end. **2026-11-20:** level on the
-   plate, the tall stem head above it (Pages §5.4).
+5. **The beak and the berthelot**, nearly level, the jib's tack at its end.
 6. **The boat in tow** on its painter astern, veered as the speed and the sea ask (JUDGEMENT).
-7. **The hull from her profile** (§3), the scroll at the prow in words only. **2026-11-20:** with the
-   waist bulwark, the sharp stern and the wale awash amidships (Pages §5.2 to §5.5).
+7. **The hull from her profile** (§3), the scroll at the prow in words only.
 8. **The coastguard's guns** by package 81's rule from her file alone (§7); the trader none.
 
 The standard is the current ships' (the plan's §0); screenshots beside the watercolour for the
@@ -896,8 +821,7 @@ Numbered at the build. Each with its source and a band to be settled by measure 
 1. **The engine step is new behaviour on every whole lateen of the package** (the polacre's fore
    and mizen, the xebec's three): designed once in the plan, built once, its key the only road.
 2. **Chapman's plate unreadable or unlike a trader**: her lines then stand at T, a type judgement
-   (a broad Mediterranean coaster's body), said so. **2026-11-20:** read (S†, Pages); **unlike a trader
-   in its high waist bulwark and its ports**, which the trader may keep or not (JUDGEMENT; §3).
+   (a broad Mediterranean coaster's body), said so.
 3. **Her company and guns are judgement** until the passages come: the coastguard's thirty-four
    especially. **2026-11-19:** the passages came and hold none of them; they stay judgement by the
    owner's word, the coastguard's now inside the místicos' range (§6.3).
@@ -919,8 +843,7 @@ Numbered at the build. Each with its source and a band to be settled by measure 
    (Forfait's table), on Chapman's lines widened to her. Or the *Espiègle*, 75 tonneaux, 16.8 by 5.8
    m (a tartane simple, which by Forfait carries no mizen); or Chapman's war tartane, 18.5 by 5.2 m,
    at her own scale. *A sketch*: the *Humble* is a beamy coaster about a quarter longer than the
-   cutter on deck (a third longer on the water; **2026-11-20:** a fifth, 18.47 against 15.2 m, on her
-   measured waterline), her yard longer than her hull. She is your rig but
+   cutter on deck (a third longer on the water), her yard longer than her hull. She is your rig but
    for the *Humble*'s topgallant, which is left out.
 2. **Going about.** *Answered by the owner, 2026-11-18* (Dec 3 and Part F), in their own shape:
    she tacks and wears as other vessels do, her yards shifted round their masts in stays or in
@@ -932,10 +855,7 @@ Numbered at the build. Each with its source and a band to be settled by measure 
    or raked further, as your word might mean. No text gives a tartane's main a rake. (The headsails
    are left to judgement by decision 11 itself: one great jib, as Lescallier, Steel and Röding give
    her; the images README's reading of two is recorded, §17.) *2026-11-19:* one headsail, now on
-   your own reading of the prints. *2026-11-20:* Chapman's only drawn rig of the type (Pl. LXII No. 16)
-   stands the main **upright** (0.6° to 1.1° aft, ±0.5°), on a two-masted lateen with no topsail,
-   mizen or headsail (Pages §7). Your 3° forward is kept, as your answer, and you have been asked
-   whether to revisit it (the lead's ruling 6).
+   your own reading of the prints.
 4. **The tréou.** *The pick*: carried, a square sail on a yard crossed below the topsail, set before
    the wind and in too much wind, never in plain sail. Or left out. *2026-11-19:* carried, as
    answered; by your reading of the prints (no lower yard under the topsail) its yard is sent up
@@ -975,15 +895,6 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
 - **The file's name** `coastguard-tartane.yaml` and the description key `guarda-costa tartane`
   (Plan §13.1 item 5): ruled the lean.
 - **Item 37**: nothing of hers moves (§1).
-- **Step 1's rulings** (2026-11-20, 13:35 UTC, nudge 29), each written in where it falls: her load
-  line H, H′ recorded, her displacement, KM and lateral area reckoned to H (1); `deck_height_m` the
-  measured 0.54 m, no new key (2); the éperon 10½ pieds, JUDGEMENT (3); the draught, the waterline and
-  what follows, as measured (4); the plate's number, Pl. LVII (5); the main's rake the owner's, the
-  owner asked (6); the findings of 7. **Ruling 1's condition, met** (Pages §4.3): the plan's load
-  waterline is drawn on H′, so her waterplane is carried down to H by the sections' flare; its second
-  moment is 0.6% less, and her KM is H's, 3.15 m (3.16 m on H′, recorded). Her `breadth_m`
-  half-breadths at the water are H's likewise: narrower by 0.03 m a side at aft 6 and aft 7 and wider
-  by up to 0.02 m at fore 8 and fore 9 than the plan's line (computed by the sections' flare).
 
 ---
 
@@ -1001,11 +912,3 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
 - **The probe tacks** with no word for the lateens and in less time than the cutter (89 s against
   106 s): the engine's lateen is today a jib-like sail with no side. Recorded for the step, no
   fault of the probe, which was for classing.
-- **The plate's number** (2026-11-20, Pages §1.2, §8): `VesselReferences-2026-10.md` §3.1's plate
-  for the tartane (No. 16) and §3.9's for the Bermuda sloop (No. 15) are both Pl. LVII, by the
-  engraved number and the museum's record; the fault was carried into the research note, this design
-  and the plan. Corrected in all by the lead's ruling 5, with a dated line in §3.1 there; the xebec's
-  Pl. LVIII No. 17 is right.
-- **The xebec's 9⅔ ft** (Chapman's Pl. LVIII No. 17) is probably an after draught too, as hers was:
-  one line in `Design-Ship-Xebec.md` §2.1 where it is cited, to be measured at her own step 1 (the
-  lead's ruling 7).
