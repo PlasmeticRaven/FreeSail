@@ -1108,3 +1108,201 @@ the first item.
    A5's topsail to the mast. That is read from the code, not run. It is for the re-measure at
    the merge (the smack's table, every order, as in A5 and A6's sections).
 5. **A4** reads no yard and no brace. Its conflicts are A1d's.
+
+## Step A4 as ruled (nudge 36): the boat in tow, on A5 and A6 as ruled (2026-11-21)
+
+**Built under the lead's ruling on the step's stop (nudge 36):** A4 widened to `world/boats.py`,
+`world/dealings.py` and `world/ports.py` for the towed boat alone, and its drag carried by the
+trawl's road in `integrate.step`. **Merged first** (nudge 39): **`…/pkg-90-a56` at
+4ebd88a**, A5 and A6 as ruled, into `…/pkg-90-engine` by the merge commit **b13b8dc**, so that A4
+sits on them; from the package branch, nothing (A2's re-mend is on `…/pkg-90` at 7686aec1, with
+A3; the coordinating session merges each step's hash into it in its turn, and none is merged
+from it here until it asks). **The base** of every comparison is A5 and A6 as ruled,
+**e83f9e7** (the code of `…/pkg-90-a56`; the commit above it adds its report section alone).
+
+**Commits:** **99d164c** on `…/pkg-90-engine` (parent effbaed), A4 alone, one commit; then the
+merge **b13b8dc** (parents da88dae, the engine branch's tip, and 4ebd88a). The merge's
+conflicts, resolved: `tests/test_yard_level.py` as A5 and A6 as ruled have it (A4 does not touch
+it; the two branches carry the same tréou commits under two hashes, restated on `…-a56`);
+`docs/dev/TuningNotes.md`, both sides' sections whole, "Package 90, A5 and A6" as ruled and
+"Package 90, A4" as built; this report as `…-a56` has it, which holds the engine branch's sections
+whole. **The merge brings A4 alone onto A5 and A6 as ruled:** `git diff 4ebd88a b13b8dc` is
+`git diff effbaed 99d164c` line for line (nine files, 581 lines in and 40 out, the same lines).
+**On origin**, each a branch of its own: `…/pkg-90-a56` at 4ebd88a, its own name (pushed once the
+owner allowed the new branch, after the coordinating session's note that it was not there), and
+`…/pkg-90-engine` at b13b8dc, then the look-ahead at A2's re-mend (eafd309, the section above)
+and this section, each a report commit alone.
+
+**Files** (my row's, and the three the ruling widens it to):
+- `freesail/world/boats.py`: `way_on_her(ship_hull, boat)`'s towed branch, `HAUL_ALONGSIDE_WAY_MS`,
+  `TOWED_ASTERN_M`; `man_boat`'s place astern and words, `tow_with_boat`'s, `come_alongside`'s and
+  `hoist_in`'s words (`_launched`, `_back_aboard`, `_spec_of`); `keep_in_tow`, `_towed_hull`;
+- `freesail/world/dealings.py`: `OUT_PHASES`, `_out_phase`; the first phase of the errand,
+  `_boat_kept`'s reading of it, the two schedules' times (`boat_out_s`, `boat_in_s`), the two
+  "back" lines (`_back_aboard`, `_towed`), the boat's home words, and `keep_in_tow` each tick
+  (`_tows_a_boat`);
+- `freesail/world/ports.py`: `BOAT_HAUL_ALONGSIDE_S`, `BOAT_VEER_ASTERN_S`, `boat_out_s`,
+  `boat_in_s`; `BoatState.words(towed)`;
+- `freesail/physics/integrate.py`: `TOW_WAKE_FACTOR` and the drag beside the trawl's, in
+  `step`; the hull's equations read, not changed;
+- `freesail/evolutions/scripts.py`: `SendBoatScript`'s and `LayOutKedgeScript`'s `towed` (a class
+  default, set by `check` only for a towed boat), their times and words (`_boat_out_s`,
+  `_boat_in_s`, `_boat_out_words`, `_alongside_phase`);
+- `data/evolutions/send_boat.yaml`, `data/evolutions/lay_out_kedge.yaml`: the towed boat's
+  paragraph in the served notes, `haul_alongside_s` and `veer_astern_s`, and the log lines'
+  `{boat_out}` and `{boat_back}`;
+- `tests/test_boat_towed.py` (new); `docs/dev/TuningNotes.md`: "Package 90, A4".
+
+Every changed line stands behind `towed`: a boat's key (stage 0's), read as
+`getattr(boat, "towed", False)`, which no committed file carries. **No key is written into a
+committed file**, so stage 0's `KEY_CARRIERS["towed"]` stays empty and its row does not move. No
+ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class added
+(functions, constants, a module dictionary), so truth 7-606 and the checkpoint's list are not
+touched; the key's value is a tuple of `ship.parts.Hull`, a class the list admits already. LF;
+ruff check and format clean; no Python line over 100. Nothing under `docs/agents/consent/`.
+
+**A7's use of `world/boats.py` beside A4's**, so that the two do not cross: A7's is the boat
+predicates alone (`is_boat`, "her file has oars", and `_oars`), so that a hull with `sweeps:` stays
+a ship and not a boat. A4's is `way_on_her`, `man_boat`, `tow_with_boat`, `come_alongside`,
+`hoist_in` and the new `_launched`, `_back_aboard`, `_spec_of`, `keep_in_tow` and `_towed_hull`;
+it reads no predicate and changes none.
+
+### What was built
+
+TuningNotes has each piece with its words. **Her words**: hauled up alongside by her painter and
+manned at the gangway, not hoisted out; back alongside, veered astern on her painter again, not
+hoisted in; at home "towing astern on her painter", not "at the booms". **Her place**: manned, she
+lies 12 m dead astern on her painter, not 15 m off the lee quarter. **The way rule**: hauled
+alongside and manned with up to three knots of way, against a hoisting out's two. **The hauling
+times**: a minute each way against five. **Her drag**: while in tow, her own resistance at the
+ship's speed times 0.6, on the way ahead alone; gone while she is away or lost.
+
+**JUDGEMENT, each with its reason** (TuningNotes):
+1. **The way rule's figure**, 3 knots (`HAUL_ALONGSIDE_WAY_MS`): a boat hauled up alongside on her
+   painter may be boarded with a little way on, the ship eased; at more she sheers about and fills
+   alongside. No period figure found.
+2. **The hauling times**, 60 s each (`BOAT_HAUL_ALONGSIDE_S`, `BOAT_VEER_ASTERN_S`): the painter
+   hand over hand and the crew down into her, against the five minutes of the yard and stay
+   tackles. No period time found.
+3. **Her place astern**, 12 m (`TOWED_ASTERN_M`): a short painter's length, two of her lengths
+   and a little, so that she rides clear of the ship's stern.
+4. **The wake factor**, 0.6 (`TOW_WAKE_FACTOR`): she rides in the ship's wake, water the ship drags
+   along with her, so it meets her slower than the sea meets the ship; a wake fraction of about a
+   quarter so near the stern (memory, unverified) gives (1 - 0.25) squared, about 0.6, for a drag
+   that goes as the square of the speed. **Not tuned to any band.** For the hulls' truths later:
+   they say which state they are measured in, the boat in tow as she ordinarily sails.
+
+### Measured
+
+- **Not one event of the eighteen files' boats moves.** A harness in the session's scratch
+  (`a4/boatwork.py`) runs every committed file's boat work, each from a fresh world, seed 7: at
+  anchor in Carrick Road, the readings' boat words, `send the boat ashore` to its end and `lay out
+  a kedge to the NE` to its end; at rest in a calm off the Lizard, `go to the boat`, two minutes,
+  and `come alongside` (hoisting out, manning, hoisting in); `tow her with the boat to the NE`
+  twenty minutes and `the boat alongside`; and `go to the boat` with 2.5 knots of way on her (the
+  way rule). Each run keeps every event of every hull (tick, kind, text and data), every reply, a
+  trace each minute (her heading, way, position, the boat's words and `ship.extra`'s keys) and the
+  checkpoint's digest. At e83f9e7 and at the merge: **72 runs, every field the same, 1,070
+  events and 2,376 trace rows, every checkpoint digest the same; the two files byte for byte**, as
+  at effbaed and 99d164c when first built. (Run first from two worktrees, the digests differed and
+  nothing else: a checkpoint holds the build's own stamp, a hash of the source, and each port
+  file's path, the tree's own; run from one path with the stamp held the same, they agree.)
+- **The eighteen files' sailing**: A2's harness (the going about and its kin, 270 runs) at e83f9e7
+  and at the merge: **every tick, kind, trace and line the same** (the two files byte for byte),
+  as at effbaed and 99d164c.
+- **The tartane probe, her boat in tow** (seed 7; `tests/test_boat_towed.py` pins each): at anchor
+  in Carrick Road, `send the boat ashore` takes 4,581 s against 5,040 with her boat on deck (out in
+  56 s against 283, home in 58 s against 290); `lay out a kedge to the NE`, her hands short, 739 s
+  against 1,399 (out in 82 s against 412, home in 83 s against 413). Manned at rest she lies 12.0 m
+  dead astern. With 2.5 knots of way she is manned and the boat on deck is refused; with 3.4 knots
+  both are refused, each in its words. At the merge, re-measured: every time the same.
+- **Her drag** (plain sail trimmed every two minutes after five, the mean of the last 600 s of
+  2,400; the wind from 0°):
+
+  | Wind, her head | Boat on deck | Boat in tow | The boat's drag | The probe's own resistance |
+  |---|---|---|---|---|
+  | 8 kn, 270° (beam) | 4.34 kn | 4.25 kn | 122 N | 2,633 N |
+  | 15 kn, 270° (beam) | 7.23 kn | 7.00 kn | 905 N | 8,855 N |
+  | 25 kn, 270° (beam) | 9.52 kn | 9.14 kn | 3,737 N | 21,725 N |
+  | 15 kn, 315° (close-hauled) | 3.71 kn | 3.66 kn | 79 N | 1,919 N |
+  | 15 kn, 225° (broad) | 6.29 kn | 6.13 kn | 485 N | 6,169 N |
+
+  So she loses 1 to 4 per cent of her way, the most on a fast reach. A checkpoint of her with her
+  boat in tow sails on the same. Measured at 99d164c, and again at the merge: every figure the
+  same.
+
+### Moved, old beside new, with reason
+
+Nothing moves.
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is A5 and A6 as ruled, e83f9e7** (its two
+tiers' junits, run for that section), test by test. The first fast run and the slow run are of
+a scratch merge, b4c4cb7, whose tree is b13b8dc's but for this report (`git diff b4c4cb7 b13b8dc`:
+the report alone); the second fast run is of b13b8dc itself, with nothing else running.
+
+| Run | Base (e83f9e7) | A4 at the merge (b4c4cb7, b13b8dc) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml`, first run (b4c4cb7) | 8,700: 8,691 passed, 8 skipped, 1 xfailed, 0 failed (1 h 23 min) | 8,729: 8,719 passed, 8 skipped, 1 xfailed, **1 failed** (1 h 17 min). **Test by test: every one of the base's 8,700 the same outcome but one; 29 new, all passed** (`tests/test_boat_towed.py`). The one: `tests/test_replay.py::test_the_fingerprint_is_of_the_code_and_the_data_and_not_of_the_line_endings`, its wall-clock bound, `rules_fingerprint()` in 0.646 s against 0.5 s (0.118 s in the base's run). Run alone, it passed at both trees (0.23 to 0.31 s); `rules_fingerprint()` ten times at each, the median 0.110 s at both |
+| **Fast tier whole**, `--junitxml`, second run (b13b8dc, alone on the machine) | the same | 8,729: 8,719 passed, 8 skipped, 1 xfailed, **1 failed** (1 h 20 min). **Test by test: every one of the base's 8,700 the same outcome but one, and not the first run's one; the same 29 new, all passed.** The fingerprint's case passed (0.117 s). The one: `tests/test_known_truths.py::test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge`, a pace within a quarter (the tide's blend against the eleven gauges alone, the best of five), 0.0220 s against 0.0140 s, 1.57 against 1.25. Run alone ten times: **10 of 10 passed at b13b8dc, 9 of 10 at e83f9e7**, the base's own tree failing it once. Its measure five times over, alone: the ratio 0.92 to 1.83 at b13b8dc, 0.97 to 1.31 at e83f9e7 |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (b4c4cb7; the drag in `integrate.step`, so the tier whole) | 568: 557 passed, 11 xfailed, 0 failed (1 h 28 min) | 568: 557 passed, 11 xfailed, 0 failed (1 h 28 min). **Test by test: every one of the base's 568 the same outcome**, none new |
+
+**The two failures** are each a wall-clock bound, each failing in one run and passing in the
+other, each passing alone, on a machine of four cores with four workers. **A4 touches neither:**
+`git diff e83f9e7 b13b8dc` reaches no line of `freesail/world/tide.py`, `freesail/world/geo.py`,
+`tests/test_known_truths.py` or `tests/test_replay.py`, and the fingerprint reads the code and
+the data at the same pace at both trees. Neither case is loosened, skipped or marked; each is
+reported as it ran.
+
+**The guard set of §10.2**, tallied from each fast tier's junit, base beside new, every case the
+same outcome in both runs: the byte test and the golden classing table 96 passed;
+`tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py`
+21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth
+7-606 74; `tests/test_lateen_whole.py` 90; all passed at both.
+
+**The generator**, on b13b8dc: `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`. **`ruff check`** and **`ruff format --check`** on b13b8dc: clean (430 files).
+
+### Unsure, and for the lead
+
+1. **`world/movement.py`'s person in the boat at her side** (package 109,
+   `_in_the_boat_at_the_side`, l. 494) reads the errand's first phase as `"hoisting out"` alone,
+   so a person in a towed boat while she is hauled alongside (her first minute) is not "in the boat
+   at the side" and cannot belay her from it. The mend is one line there (`boat.phase not in
+   dealings.OUT_PHASES`). My row names `world/movement.py` for A7 alone, and the ruling widened A4
+   to three files that are not it, so by the stop rule it is not edited. No committed file meets
+   it.
+2. **`combat/hits.py`'s "stove on the booms by a shot"** is said of any boat; a towed boat is not
+   on the booms. My row names `combat/hits.py` for A3 alone; not edited. For the tartane's file:
+   whether a shot reaches her boat astern at all.
+3. **The clearing for action** (`action_scripts.py`) gives the boats their share of the clearing
+   time and says "The boats are out and towing astern; the ship is clear." of every ship; a ship
+   whose boats are all towed already needs no time for them. Left as it is (no row reading asked
+   for it, and no committed file tows).
+4. **Her drag at speed**: on a fast reach the yawl's file is far past its own hull speed (5.4 kn)
+   and the form's wave term rises steeply: 3,737 N at 9.1 kn, a sixth of the probe's own. The
+   factor is not tuned for it, as ruled. The tartane's design (§11) has her boat "hoisted in, or
+   veered long, in a blow": no order veers the painter long or hoists a towed boat in on passage;
+   for the tartane's builder, if her truths want it.
+5. **A boat with no file of her own** that is towed puts no drag on the ship (her resistance has no
+   form to be read from); no committed file and no probe has one.
+6. **The sleeping hull's errand** (`_send_boat_coarse`) takes the towed boat's times; no drag is
+   kept on a sleeping hull (its way is the plan's), and the key is kept each tick on every hull
+   whose file tows a boat, asleep or awake.
+7. **The fast tier's wall-clock bounds** (the fingerprint's 0.5 s, truth 7-284's quarter) each
+   failed once here under four workers on four cores and passed alone, the base's tree failing
+   7-284 alone once in ten. `tests/conftest.py` keeps such measures out of the tiers by the `pace`
+   mark; neither case carries it. Not mine to mark (my row does not name `tests/conftest.py`, and
+   no test is loosened); said for the lead, as `docs/dev/ContinuationProposal.md`'s "Timing tests
+   out of the ordinary tiers" says of others.
+
+**The look-ahead's item 1, ruled** (the lead's nudge 43, trunk d6159090): (a), A1a's meaning kept,
+`not (head or after)`, a question of what she carries and not of what is set. The coordinating
+session makes the one-line mend at A1a-A1b's merge into `…/pkg-90`; A1c and the later steps carry
+the line unchanged and merge onto it. When A1d, A5-A6 and A4 are resolved against it, by both
+rules, each hash's report says which lines were resolved by hand, and `ruff check` runs on each
+merged tree before its tiers.
+
+Stopped after A4 and the A5-A6 section, as briefed: waiting for the coordinating session's message.
