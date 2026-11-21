@@ -4618,6 +4618,7 @@ class Captain(Judgement):
             parted_standing_lines,
             sprung_spars,
         )
+        from freesail.evolutions.scripts import helm_words
 
         world = self.world
         ship = world.ship
@@ -4667,7 +4668,7 @@ class Captain(Judgement):
         if ship.extra.get("helm_by_tackles") and "repair_wheel" not in in_hand and not in_action:
             # the wheel in its turn, after the leak and the rigging and out of action
             # (package 116, card 5): she steers by the tackles meanwhile, the slower
-            wanted.append(("repair the wheel", "steering by the relieving tackles"))
+            wanted.append((helm_words(ship)["mend"], "steering by the relieving tackles"))
         if not wanted:
             return
         self._business["repairs_tick"] = tick
@@ -4689,7 +4690,7 @@ class Captain(Judgement):
         asked = int(self._business.get("helm_tick", -(10**9)))
         if "relieving_tackles" not in in_hand and tick - asked >= 60:
             self._business["helm_tick"] = tick
-            self.give("rig the relieving tackles", why="the wheel shot away")
+            self.give("rig the relieving tackles", why=str(ship.extra["helm_lost"]))
         return True
 
     def _chase_order(self, p: Perception) -> str:
