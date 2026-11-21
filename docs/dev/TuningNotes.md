@@ -38536,6 +38536,15 @@ Every answer's kind and the lines after it are the same but where a belay now be
 
 Nothing moves by this item: the starts were taken before, and the first two belays are item 2's. On the old code the test fails at `belay the tiller`.
 
+**4. Older wheel words a tiller hull still read.**
+- **The primer**, a clause each where she steers by a tiller, each run against the game (`tests/test_helm_kind.py::test_the_primer_says_of_a_tiller_what_the_game_does`):
+  - **chapter 25's table** gains a row, `ship the spare tiller`: "the same where she steers by a tiller: the tackles hooked to the stump of the tiller and manned on deck, and the spare tiller shipped in the rudder head, half an hour". These are her lines' words and the mend file's 1,800 s. The paragraph below it says "With the wheel (or the tiller) shot away ...", where it said "With the wheel shot away".
+  - **chapter 22**: "the wheel shot away (or the tiller, in a hull steered by one) loses you the helm", where it said "the wheel shot away loses you the helm". The hit is the tiller's on her.
+  - **chapter 2**: the conning words "speak to the wheel rather than to the course (to the tiller, in the same words, in the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig)". Run on the cutter beside the frigate, the ten words are each taken in the frigate's words; only her own heading differs where a word names it. The six named are the six files that carry the key.
+  - No forms table or orders block changes. The chapters' sizes are measured where they are served (only chapter 3's is pinned), and the primer's tests pass (below).
+- **`freesail/ship/schema.py`'s two comments** said the key is "read by nothing yet". They now say the six tiller files carry it and the helm's words read it. Comments only; no figure, pickle or refusal moves.
+- **`freesail/world/places.py`'s quarterdeck**, "where ... the wheel is", by her helm: **a stop, not built.** `Places` is built with the ship's name alone, by `core/world.py`, which nobody touches after stage 0. Both readers of the description (`the places` reading's `items` and `described`) are in `api/readings.py`, which the list does not give. Keying it on her helm in `places.py` alone cannot be done. It wants two lines of `api/readings.py`'s `_places`, the quarterdeck's description by the ship's helm, and a reader of it in `places.py`. Alternatively the description could say "the helm" on every ship, which moves every wheel ship's words; that is for the lead.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.
