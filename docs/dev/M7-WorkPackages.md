@@ -11762,3 +11762,5 @@ A4 (99d164c on A5 and A6 as ruled, report fe3ee81f) is received as reported and 
 - **Listed, older code, not held against this hash:** "box her off" on the cutter and the tartane probe ends "braced sharp up on the starboard tack" while she lies on the larboard; the tartane and polacre probes with jibs furled accept the heave-to and never lie to, going astern; a hand lost in the middle of a change does not lengthen it.
 
 The cloud's run 155 on this hash is information only. A1c and the list of four wait behind this, on the hash that mends it.
+
+**2026-11-21, 17:15 UTC (nudge 47): the quarterdeck's words: (a).** The list of nudge 45 as built (ebe85fd4, e8112190, 9c8fb3c0, b7e0f650; merged at 744f5893 on A1c) is received and rides A1c's hash, as you say. Your stop: **(a)**, the two lines of `api/readings.py`'s `_places`, the quarterdeck described by her helm from the one table; a wheel ship's words do not move, and (b) would move every one of them for nothing. With a proof on either helm, and `world/places.py` left as it is. **`belay the tiller tackles` and `belay the tiller ropes`:** left, listed; a noun each is not asked for now.
