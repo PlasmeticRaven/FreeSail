@@ -21,6 +21,12 @@ item 1). §10 has her rows, her named rows with their reasons, and the 16 that r
 tier of her files passes: 117 tests, among them four anchorage cases §9's run had left out
 (§10).
 
+**The lead's nudge 38 (§12).** The trader now takes the `french` list of names, and the
+guarda-costa keeps the `spanish` one. Truth **7-695**, her watch by night, is written. Her
+larboard watch's three call all hands for heaving to and filling away, and her starboard
+watch's four, exactly half, do not. The fast tier whole on 8998c08 changed no test of the base:
+four tests are new, one renamed pin is gone, and the same 16 viewer cases fail.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -32,6 +38,7 @@ rebased or forced.
 | 1, `lateen.py` alone | `bfec7fa3307162bc7fc23845b60cb6784ca903c9` | `tools/ships/lateen.py`; `tests/test_tartane.py` (its eight tests); `tests/test_probes_90.py` (the stub's pin restated); `docs/dev/TuningNotes.md` ("Package 90, the tartane", step 1) |
 | 2 to 4, her module and her files, and two mends found by the tests | `0dbd4fc933df9b37adac5fb8b8dbe2ab318d6dfa`; mends `b4e814c7e9bc99d285d6b57c7644f3fd820877b5` and `ecf61800db82ce5cc3bb3de31b61a3b69e185b5d` (§8, §9) | `tools/ships/tartane.py`; `data/ships/tartane.yaml` and `data/ships/coastguard-tartane.yaml` (generated); `data/people/tartane.yaml` and `data/people/coastguard-tartane.yaml`; `freesail/world/ships.py` (her two `DESCRIPTIONS` rows and her words); `freesail/world/captains.py` (the coastguard's `SIZE_RANK` row); `tests/test_tartane.py`; the moved pins (§8); `docs/dev/TuningNotes.md` (step 2 and the mends) |
 | her rows in the viewer's tables, and her storm jib's corners (§10) | `b33adfd69facb88dfc007b9e4cf37e61b32b0119` | `tests/test_view_geometry.py` (widened to me, §10); `tools/ships/tartane.py`; her two ship files (generated); `docs/dev/TuningNotes.md` |
+| the lead's nudge 38: her names, and truth 7-695 (§12) | `07aed62807521f61749c169e4df57b3fec6f7c73`; `8998c087f23f4cd2cf3b5e195c17962ec746684f` | `tools/ships/tartane.py`; `data/ships/tartane.yaml` (generated); `data/people/tartane.yaml` (its header); `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
 | this report | `e743467`, and §10 in the commit that adds it | `docs/design/Report-Package90-Tartane.md` |
 
 **Step 1's commit carries the owner's name as its author.** I set it by hand for that one commit.
@@ -194,6 +201,9 @@ decide. This is the owner's rule applied; her design's 3 degrees forward was its
 - **7-688 (T-8)**, before the wind the tréou set adds way, and the great lateen is taken in for
   it. Dead before 15 kn: 4.69 kn under plain sail, 4.35 with the great lateen in, and 4.86 with
   the tréou set flying.
+- **7-695** (the lead's nudge 38, question 4), her watch by night. A watch of hers too few on
+  deck calls all hands to heave to and fill away, by order and by a standing order, and is
+  piped down (§12.2).
 
 **Waiting, each left drafted in her design's §13:**
 
@@ -231,7 +241,7 @@ her files carry none of them yet.
    OCR.
 
    **Answered by the page (77ead1d0).** The coordinating session read Forfait p. 121 on its page
-   image, IA leaf n166 (`pages-tartane.md` §1.3 at 77ead1d0 on `claude/pkg-90`). The page puts the
+   image, IA leaf n166 (`pages-tartane.md` §1.3 at 77ead1d0 on `…/pkg-90`). The page puts the
    clew on the deck at the mast's foot with the yard fully peaked (figs. 35 to 38), and the car
    tacked at the stem (fig. 35). The design's reading, taken literally, is therefore the page's,
    and the cut stands as filed. The *Humble*'s own ends in Table II lie under the page's general
@@ -263,6 +273,12 @@ her files carry none of them yet.
    description of hers is written.
 9. **Words outside her files**, for A2: her wear's and heave-to's "after yards" and "after
    braces" (§3). They are mended on the package's branch, which I have not merged.
+
+**Questions 2 to 10 were ruled at the lead's nudge 38**, in the note at the end of
+`docs/dev/M7-WorkPackages.md` on the trunk at 8a78bd2a. Two were mine to build, and §12 has
+them: question 4, her watch by night (truth 7-695), and question 6, the trader's names from
+the `french` list. Question 7's longest test is now truth 7-695, at 12.4 s (§12.2). The rest
+are settled or noted there, and nothing of them is mine to change.
 
 ## 7. The pictures
 
@@ -501,3 +517,141 @@ rewritten and nothing was forced. No later commit sets its author, and none will
 - the slow tier's 18 harbour, browser and Harbour-truth cases, collected by name from
   `--slow -m slow`, were run on 675fd50 and then on the base f6f26f8a in a scratch worktree.
   **18 passed on each.**
+
+## 12. The lead's nudge 38: her watch by night and her names
+
+The lead ruled questions 2 to 10 at nudge 38, in the note at the end of
+`docs/dev/M7-WorkPackages.md` on the trunk at 8a78bd2a, which I read whole. Two were for me to
+build: question 4, her watch by night, and question 6, her names. The rest are settled or noted
+there, and nothing of them is mine to change. I merged nothing; the tree is mine as it was.
+
+| What | Commit | Files |
+|---|---|---|
+| Question 6, her names | `07aed62807521f61749c169e4df57b3fec6f7c73` | `tools/ships/tartane.py`; `data/ships/tartane.yaml` (generated); `data/people/tartane.yaml` (its header); `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
+| Question 4, truth 7-695 | `8998c087f23f4cd2cf3b5e195c17962ec746684f` | `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
+| this section | the commit that adds it | `docs/design/Report-Package90-Tartane.md` |
+
+Each commit's author is as the cloud gives it, and neither has a trailer.
+
+### 12.1 Question 6: the trader's names from the `french` list
+
+The trader *Saint-Pierre* now takes the `french` list, her design's default (§6.4), and the
+guarda-costa *San Pedro* keeps the `spanish`. Her module gives each role its list, and the
+generator (`python tools/gen_ships.py`) wrote the files. `data/ships/tartane.yaml` moves in two
+lines, its names line and that line's note. The other nineteen files are byte for byte (`cmp`),
+the guarda-costa's among them.
+
+**Passing on 07aed62:** truth 7-680, the names' guard (`test_every_names_list_has_its_nation`)
+and her own tests, 27 passed together. A new case holds the ruling's purpose. With no nation
+given, the trader reads as France's and the guarda-costa as Spain's, and every sailor's names
+come from their file's list.
+
+**Two things found, recorded, and not mine to change:**
+- The muster writes every list's given names with an English muster book's short forms
+  (`freesail/crew/muster.py`, `GIVEN_ABBREVIATIONS`). So the `french` list's Charles becomes
+  "Chas.": her first muster at seed 7 has a Chas. Lecoq. The lugger's French list meets the same.
+  My case compares names as the muster writes them, through its own `abbreviate`.
+- The `french` list's names are of Brittany and Normandy (Kerjean, Kervella, Gosselin): the
+  lugger's list, not Provence's.
+
+### 12.2 Question 4: her watch by night, truth 7-695
+
+**The number.** 7-681 to 7-689 are T-1 to T-9's, each written or waiting, so none is free. The
+truth takes **7-695 from the spare** (the plan's table on `…/pkg-90`: 7-695 to 7-699). No
+branch of package 90 and not the trunk uses it.
+
+**Measured** as truth 7-704 measures the merchant brig: the trader off the Lizard at 02:00, seed
+7, a westerly of 14 kn. Her bill draws four able seamen to the starboard watch, and two and the
+boy to the larboard. Her design's §6.1 gives "watches of three seamen (four with the boy)", so
+the counts on deck are its counts. Heaving to and filling away want twelve by their files,
+clamped to the eight her company can give: the seven of the watches and the cook. A watch under
+half of that calls all hands (`too_few: all hands`, package 119).
+
+| Her `hands:` | The starboard's four | The larboard's three |
+|---|---|---|
+| none, as filed | begins each itself, short, 4 of 8, and no one is called: hove to in 103 s (104 by the standing order), filled away in 181 (182) | **all hands called** once for each: hove to in 76 s (77) and piped down; filled away in 181 (182), the watch below up at 90, and piped down |
+| the bilander's six (0dbd4fc; taken out at b4e814c), measured on this tree | begins each itself, short, and no one is called: hove to in 82 s (83), filled away in 181 (182) | begins each itself, short, and no one is called: hove to in 112 s (113), filled away in 181 (182) |
+
+Nothing waits and nothing fails either way. **The six are not put back:** they would have no one
+call all hands, which the truth asks for. **Her own is none,** the file's twelve under package
+119, as she stood. The pin in `tests/test_mends_75.py` that holds the section to the bilander is
+untouched, since nothing of hers needs it moved.
+
+**Truth 7-695** holds both watches as measured, on 8998c08:
+- the larboard's three: by order and by a standing order (to lie to over ten knots, then to fill
+  away under eight, the wind falling to six), all hands are called once for each, she is hove to
+  and filled away, and the hands are piped down with the larboard watch on deck;
+- the starboard's four: half of eight, so not too few. The watch begins each itself, short, four
+  of eight, and nobody is called or piped down.
+
+It takes 12.4 s, over the slow tier's threshold of 5 s, as 7-703 (15.8 s) and 7-704 (15.7 s)
+do. `tests/conftest.py`'s `SLOW_TESTS` is not mine, so it runs in the fast tier beside them.
+
+**For the lead: the starboard's four.** The ruling has all hands called for "a watch of hers". On
+her larboard watch they are; on her starboard they are not, because four is half her clamped
+eight and the engine calls all hands only under half (`hands.too_few_on_deck`). No figure a ship
+file gives can change it, because her company's clamp holds the want at eight. Whether a watch
+at exactly half should call all hands for a manoeuvre is the engine's rule, not hers.
+
+**Recorded, not asserted: filled away, she is not under way.** By the player's order, the wind
+at 14 kn, she lies 20 to 45 degrees off the wind after "Filled away ... steering SSW (202°)".
+She wanders between 226 and 250 degrees at 0.8 to 1.3 kn for the thirty minutes traced. By the
+standing order, the wind fallen to six, she makes 0.38 kn at 900 s. The merchant brig in the same
+world steadies on 202.5 at 4.17 kn within 300 s.
+- **The cause:** her heave-to hauls up her topsail as a course ("Hauled up the courses.", read on
+  this tree), and filling away does not set it again. Left under her two lateens and her jib,
+  she cannot bear away. The same happens with all hands up first, and with `steer 202` given
+  again.
+- **With `set the main topsail`** after filling away, she steadies on 202 to 203 degrees at
+  3.77 kn by 800 s after the order.
+
+It is the engine's reading of her topsail, which A5 changes, so her truth asserts no speed.
+7-704's last clause ("and under way") waits on A5 for her.
+
+**One more found:** my complement words say "six able seamen in two watches of three". The bill
+draws four able seamen to the starboard and two with the boy to the larboard. At seed 7 it deals
+each station's hands alternately from the starboard: her forecastle's three, and her
+afterguard's four with the boy among them. The counts on deck are her design's either way, and
+the truth reads them, so I have not moved her stations. Recorded for the lead.
+
+### 12.3 What moved, old beside new
+
+- **Her trader's file**, `data/ships/tartane.yaml`: `names: spanish` becomes `names: french`, with
+  its note. Nothing else of the twenty files moved.
+- **The names pin** in `tests/test_tartane.py`:
+  `test_her_companies_ten_and_thirty_four_with_spanish_names` becomes
+  `test_her_companies_ten_and_thirty_four_the_trader_french_the_guarda_costa_spanish`. Old
+  (71dd278): both `spanish`. New: `("french", "spanish")`.
+- **New:** `test_each_of_her_files_reads_as_its_lists_nation_with_no_nation_given` (two cases),
+  and truth 7-695.
+- **Her people file's header** names the `french` list.
+- **TuningNotes**, her section: the nudge 38 measurements above. I also corrected a count of mine
+  there: the great lateen's sheet accounts for 10 of the viewer's 16 remaining cases, not 12.
+
+### 12.4 The tests, on 8998c08
+
+- **The fast tier whole** ran in the same six chunks as §9 and §10. I compared it test by test
+  with the run on b33adfd, the base on the same tree: between b33adfd and 71dd278 only this
+  report changed, and I merged nothing.
+  - **8,633 tests: 8,608 passed, 16 failed, 9 skipped and xfailed.** On b33adfd: 8,630 tests,
+    8,605 passed, the same 16 failed and the same 9 skipped and xfailed.
+  - **No test of the base changed its outcome.** The only differences:
+    - the old names pin is gone (it passed on b33adfd);
+    - four tests are new, all passing: the renamed pin, the two nation cases and truth 7-695.
+  - **The 16 that fail are §10's 16 viewer cases**, the same node ids in both runs.
+- **The harbour and browser tests (nudge 35):** none failed.
+  - The fast tier's 43 passed in both runs.
+  - The slow tier's 18, the list §11 ran, passed on 8998c08.
+- **The slow tier of her files:**
+  - `--slow tests/test_tartane.py tests/test_probes_90.py`: **116 passed**, §9's 113 and the
+    three new tests;
+  - her four anchorage cases (§10) passed, so **120 in all**.
+- **At this step's end:**
+  - `python tools/gen_ships.py <scratch>` gave all twenty files byte for byte as committed;
+  - ruff is clean;
+  - every file is LF only;
+  - no added Python line is over 100 characters;
+  - no added line names a model or its maker.
+
+**A correction to §6.** Its answer to question 1, as committed at 71dd278, wrote the package's
+branch in full. It now reads `…/pkg-90`, as §1 writes it, so that no line names a model's maker.
