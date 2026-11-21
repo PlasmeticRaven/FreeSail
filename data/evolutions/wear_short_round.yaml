@@ -21,7 +21,8 @@ timing:
   box_timeout_s: 900
   box_estimate_s: 360
 on_start: {log: "Hard up! Stand by to wear short round."}
-on_complete: {log: "Wore short round; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.wore, severity: notable}
+# {braced}: as boxhaul.yaml's (package 90, A2's second pass: `BoxHaulScript.words`)
+on_complete: {log: "Wore short round; {braced} on the {new_tack} tack, heading {new_course}.", kind: ship.wore, severity: notable}
 on_fail: {log: "Could not wear her short round: {reason}.", kind: evolution.failed, severity: notable}
 # crew: all hands, as for box-hauling (Luce 1884, ch. XXIV, 'Box-hauling', 'To Wear Short
 # Round').
