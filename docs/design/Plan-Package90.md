@@ -1159,11 +1159,12 @@ plan"). **7-700 to 7-719 are other packages' and are not to be used** (the lead'
 | 7-670 to 7-679 | the engine track |
 | 7-680 | the stage-0 builder's truth 7-680 (the Spanish list's nation) |
 | 7-681 to 7-689 | the tartane |
+| 7-695 | the tartane: her watch by night (the lead's nudge 38, question 4; taken from the spare, her nine being T-1 to T-9's) |
 | 7-690 to 7-694 | A3 |
 | 7-720 to 7-725 | the polacre |
 | 7-726 to 7-734 | the xebec |
 | 7-735 to 7-739 | the *Concepción* |
-| 7-695 to 7-699, 7-740 to 7-749 | spare (the viewer and later needs) |
+| 7-696 to 7-699, 7-740 to 7-749 | spare (the viewer and later needs) |
 
 ### 10.4 Pins expected to move, by step
 
