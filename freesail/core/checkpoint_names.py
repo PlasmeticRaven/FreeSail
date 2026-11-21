@@ -99,6 +99,7 @@ ADMITTED: frozenset[tuple[str, str]] = frozenset(
         ("freesail.evolutions.scripts", "BoxHaulScript"),
         ("freesail.evolutions.scripts", "BoxOffScript"),
         ("freesail.evolutions.scripts", "CatAndFishScript"),
+        ("freesail.evolutions.scripts", "ChangeLateenScript"),
         ("freesail.evolutions.scripts", "ClearWreckScript"),
         ("freesail.evolutions.scripts", "ComeToAnchorScript"),
         ("freesail.evolutions.scripts", "CourseToSteer"),

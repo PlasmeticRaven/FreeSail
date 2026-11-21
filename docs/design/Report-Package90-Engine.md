@@ -203,3 +203,166 @@ reaches it:
    `tests/conftest.py`'s line.
 
 Stopped after A2, as briefed: waiting for the coordinating session's message before A1a.
+
+## Steps A1a and A1b: the whole lateen's side, its routing and its going about with the yard's change (2026-11-20)
+
+**Merged first:** `origin/…/pkg-90` at **00382c4** (A2's merge), into this branch by
+fast-forward, before A1a; nothing merged since. Every comparison here is against a worktree of
+00382c4.
+
+**Commits** on `…/pkg-90-engine`, three, one merge (plan §6, §9.1: "A1a-A1b"):
+- **ea1045e** A1a: the side, the shift by itself (`change_lateen`), its routing, the stern and
+  bow watches, the heave-to refused;
+- **4e6df32** A1b: `LateenChange` woven into the going about, the clause, the practice and its
+  reading, the primer, and truth 7-606's list written again for A1a's script;
+- **1b0f12c** A1b, a mend found before the tiers: the practice given in a standing order.
+
+**Files** (each in the engine track's §7.1 row, or named by the card or the coordinating
+session):
+- `freesail/evolutions/scripts.py`, `runner.py`; `freesail/orders/verbs.py`, `grammar.py`,
+  `vocabulary.py`, `navigation.py`; `freesail/api/readings.py` (the practice's row);
+- `data/evolutions/change_lateen.yaml` (new), `set_lateen.yaml`, `tack.yaml`, `wear.yaml`
+  (their last lines' `{lateens_said}`; no timing moved); `data/vocabulary.yaml`;
+- `docs/primer/05-going-about.md` (the new section, and A2's line at :357, "Up helm.", from a
+  run); `docs/dev/TuningNotes.md` ("Package 90, A1a", "Package 90, A1b");
+- `freesail/core/checkpoint_names.py`, **written by its tool** (`python tools/checkpoint_names.py
+  --write --jobs 4`, the brief's checkpoint rule), the diff one name (below);
+- `tests/test_lateen_whole.py` (new), `tests/test_agents.py` (A1a's count).
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). LF; ruff
+check and format clean; no line over 100. Nothing under `docs/agents/consent/`. Chapter 7's lines
+(:339, :349) untouched. No truth added: none of 7-670 to 7-679 is used (every behaviour is pinned
+in `tests/test_lateen_whole.py`, at the door it is met at, on the probes, since no committed file
+carries a whole lateen).
+
+### What was built
+
+TuningNotes has each piece with its reason and its words; in short:
+- **A1a.** The side found once at the set (`set_lateen`'s nought-second step) and kept brailed
+  and furled; the lug's two-thirds on the bad hand; `shift`, `change` and `dip` of a whole lateen
+  routed to `change_lateen` (peaked, the car abaft, 14.6 s a metre by itself, one able hand for
+  2½ m and at least four, all hands), "for" keeping the sail room's; the whole lateens held by
+  every manoeuvre that holds a settee; the stern watch and the new bow watch (a lugger's lugs at
+  the same cause); the heave-to refused in the xebec's words.
+- **A1b.** `LateenChange`, a plain class, built only when a lateen is to be shifted: 8.7 s a
+  metre (read from `change_lateen.yaml`'s own `timing`, the tack's and the wear's untouched),
+  together where her hands serve every party, else one after another, the main first. Woven in at
+  the holds, the tack (through the wind), the wear (wind aft), the fill away, the hove-to watch's
+  forced round, the box-haul, the wear short round and box her off; she is tacked or worn when it
+  is done; the mizen hauled and eased; a lateen rig's tack waits to pay off. Which yards: the
+  clause (`tack ship and leave the mizen`), else the practice (`leave the lateens in stays` and
+  its kin, a new verb `leave` and the occasion), answered and read (`the lateen practice`); the
+  plan read again as the change begins.
+
+### The probes, old beside new
+
+The three probes of `tests/rig_fixtures.py` with `dipping` on each whole lateen (`a1/goabout.py`
+in the session's scratch: seed 7, 15 kn steady from the north, the starboard tack 67.5° off, plain
+sail trimmed, settled 1,800 s, then the order and 900 s; "lost" is the ground she would have made
+to windward in 900 s at her settled rate, less what she made). Base 00382c4; A1a the yards left
+(A1a's commit, ea1045e); A1b the yards changed by the default practice, at the probes' own yards.
+
+| Probe | Tack: base -> A1a -> A1b | Wear: base -> A1a -> A1b | After, kn |
+|---|---|---|---|
+| Tartane | 89 s, 29 m -> 157 s, 128 m -> **262 s, 193 m** | 487 s, 353 m -> 480 s, 517 m -> **480 s, 490 m** | 6.17 -> 5.83 -> 6.05 |
+| Polacre | 164 s, 102 m -> 165 s, 128 m -> **292 s, 154 m** | 464 s, 455 m -> 462 s, 500 m -> **461 s, 472 m** | 4.84 -> 4.65 -> 4.76 |
+| Xebec | 100 s, 51 m -> 100 s, 156 m -> **344 s, 318 m** | 255 s, 367 m -> 294 s, 459 m -> **308 s, 460 m** | 5.14 -> 4.60 -> 5.00 |
+
+A1a's differences from the base are Eng §2.2a's "yard left" to the metre (+99, +27, +105 in
+stays). A1b's (+164, +53, +266 in stays; +137, +18, +93 in the wear) are under §2.2a's at the
+hulls' own seconds (+294, +69, +295; +250, +77, +122): the probes' yards are shorter (the tartane
+probe's main 16.0 m), the change begins after "let go and haul" and not as her head passes the
+wind, and each yard's sheet is drawn as it is set. The xebec's tack ends at the tack's own 300-s
+timeout: with all three yards in their gear she pays off well past full and by (127° off at the
+most) and comes back up slowly. The bare xebec (head sails furled) waits 31 s past it for her head
+to pay off, the ruling's case.
+
+**The eighteen files**: A2's harness (`a2/harness_v2.py`: each file settled 2,400 s, then her
+tack, wear, heave-to and fill-away, box-haul and the rest, every event and a trace every 10 s) at
+00382c4 and at A1b: **270 runs, every tick, kind, trace and line the same**.
+
+### Moved, old beside new, with reason
+
+1. `tests/test_agents.py::test_the_contents_says_what_each_topic_costs_measured_from_the_text_served`
+   (A1a): "110 evolutions" -> "111 evolutions", `change_lateen.yaml`, the card's.
+2. `freesail/core/checkpoint_names.py` (A1b's commit, for A1a's class): truth 7-606's `kin` case
+   failed, `('freesail.evolutions.scripts', 'ChangeLateenScript')` lacking. Every script class is
+   kin to the scripts the list admits, and A1a's `change_lateen` has its own. The list written
+   again by its tool (`python tools/checkpoint_names.py --write --jobs 4`, 11 min), **the diff
+   that one name**, as the brief's checkpoint rule asks. **A1a's commit alone (ea1045e) fails
+   truth 7-606**; the merge, one, carries both. The plan held 7-606 unmoved by construction at
+   A1b: true of `LateenChange` (no name, built only when needed), not of A1a's script.
+3. `tests/test_lateen_whole.py`, A1a's own: four tests put the yards on the bad hand with a plain
+   `tack ship`, which did nothing to them before A1b; given `tack ship and leave the lateens`
+   (the first renamed for it). Same merge, same file.
+4. `docs/primer/05-going-about.md:357`: "Stand by to wear ship. Up helm; brace in the after
+   yards." -> "... Up helm." (A2's, from a run: the topsail schooner worn under plain sail, seed 7,
+   12 kn, at 00382c4 and at A1b alike). The next line, "Wind aft. Squared the head yards; hauled
+   out and braced up.", runs today as "... shifted over the sheets; hauled out and braced up." at
+   the base too (B3.4b's words, before A2): not in my brief, so not edited.
+
+No other pin moves (the tiers below).
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is 00382c4**, a worktree of the merged hash.
+
+| Run | Base (00382c4) | A1a-A1b (1b0f12c) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,509: 8,500 passed, 8 skipped, 1 xfailed, 0 failed (1 h 45 min, the box loaded by the measures) | 8,572: 8,563 passed, 8 skipped, 1 xfailed, 0 failed (1 h 15 min). **Test by test: every one of the base's 8,509 the same outcome; 63 new, all `tests/test_lateen_whole.py`, passed** |
+| **The touched files' slow cases**, `--slow -m slow` (`tests/test_agents.py`, `tests/test_lateen_whole.py`, which has none) | | 15 passed |
+| **The guard files whole with their slow cases**, `--slow`: `test_settee`, `test_catalogue`, `test_held_work`, `test_agents`, `test_readings`, `test_lateen`, `test_lug`, `test_evolutions`, `test_orders`, `test_grammar_book`, `test_staying`, `test_lying_to`, truths 7-606 and 7b-111 | | on the tree before the list and the mend: 1,313 passed, 2 xfailed, **1 failed, truth 7-606's `kin`** (A1a's script, above); then truth 7-606 whole and `test_lateen_whole` after the list: 127 passed. The mend after touches the practice's words alone |
+
+**The guard set of §10.2 at A1a-A1b**, tallied from the two fast tiers' junits, base beside new,
+every case the same outcome: the byte test and the golden classing table
+(`tests/test_ship_particulars.py`, `tests/test_rig_classing.py`, truth 7-185) 96 passed;
+`tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 88; `tests/test_check_viewer_guns.py` 21;
+the lugger's set (`tests/test_lug.py`, truth 7b-111, `tests/test_captains.py`'s and
+`tests/test_view_geometry.py`'s lug cases) 58; the settee's, `tests/test_settee.py`, 75; the
+going-about set (`test_gale`, `test_rig_geometry`, `test_staying`, `test_lying_to`,
+`test_evolutions`, `test_captain_trials`, `test_catalogue`) 261; A1b's own, `test_grammar_book` and
+truth 7-606, 74; all passed at both. **The settee's and the lugger's guard sets held unmoved**, and
+`tests/test_catalogue.py` with them. The probes' going about re-measured above; the eighteen files'
+by the harness, every run the same.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`. **The checkpoint's list:** written by its tool, one name (above).
+
+### Unsure, and for the lead
+
+1. **The rate by itself** (`change_lateen`, `shift the mainsail` with no manoeuvre): 14.6 s a
+   metre, the lugger's `dip_lug` by itself, the lean put to the lead and **not ruled**; now in
+   `change_lateen.yaml`'s `timing` beside the ruled 8.7 in a manoeuvre ("the change's own file",
+   Eng §2.3 item 4, read literally: `tests/test_catalogue.py` pins milestone 2's timings alone).
+2. **`hands: all` with no party named** on `change_lateen`, the party and its numbers term the
+   script's: the numbered party with `too_few`, a named party, or `requires`, each moved a guard
+   pin (TuningNotes, A1a). The lateen's own evolutions are not given `too_few` for the same
+   reason.
+3. **A checkpoint while a `LateenChange` is in hand is refused** on loading
+   (`CheckpointRefused`), as one while a `SetteeChange` is in hand always was: neither is
+   admitted. By the plan's construction (no name added at A1b). A lateen hull's first scenario
+   would need it admitted.
+4. **"The lateens" by itself** (`shift the lateens` with no occasion) rests on the hull's file
+   naming the group (Eng §2.3 item 3a); the probes have none, and answer "There is no such part as
+   the lateens". The practice and the clause read "the lateens" whatever the file.
+5. **The practice is the lateens' together**: one per occasion, as the plan's dict has it; a
+   practice for one yard is refused in words, and one going about names one by the clause.
+6. **The readings row is in every station's readings**, "no whole lateen aboard" on any other
+   hull (the row's words for its None). Its one phrase, "the lateen practice", was chosen because
+   "the practice of the lateens" became the cutter's nearest hint for "and leave the lateens" in
+   place of "the lanterns".
+7. **The new verb `leave` is every hull's**: a line beginning "leave" other than "leave the
+   pumps" was "not an order this ship understands" and is now answered by the verb ("She carries
+   no whole lateen; ..." or "no such part"). The clause and the occasion are read on a lateen hull
+   alone.
+8. **The words** (JUDGEMENT): the change's ("Shift ...: ease the parrel(s), cast off the runners,
+   peak up the yard(s) and pass the car(s) round.", "Shifted the mizen; it stands to leeward of
+   the mast."), the plan's ("the lateens to be shifted in stays", "... left on their masts"), the
+   end's (", the mizen on the mast", ", but she has not paid off: ..."), the practice's ("Her
+   practice: ...") and the refusals'. `LATEEN_PAID_OFF_DEG` (10°) is JUDGEMENT.
+9. **Found and mended before the tiers**: a standing order of the practice was refused as the
+   book read it whole (`orders.read_whole` seeks the object as a part); "the lateens" is now a
+   mark, the object empty (third commit, 1b0f12c).
+
+Stopped after A1a and A1b, as briefed: waiting for the coordinating session's message.

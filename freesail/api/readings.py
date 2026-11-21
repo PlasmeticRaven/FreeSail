@@ -1744,6 +1744,41 @@ REGISTRY.add(
     )
 )
 
+# The ship's practice for her whole lateens in going about (package 90, A1b;
+# Design-Package90-Engine.md §2.3 item 3), so that a model at the conn knows what `tack ship`
+# will do with the yards: in stays and in wearing, each shifted round the mast or left on it
+# (`scripts.lateen_practice`, "shifted" in both by default), set by `leave the lateens in stays`
+# and its kin. A hull with no whole lateen has none: the row's words say so.
+NO_LATEEN_WORDS = "no whole lateen aboard"
+
+
+def _no_lateen_words(_world: Any) -> str:
+    return NO_LATEEN_WORDS
+
+
+def _lateen_practice(world: Any, _: str | None) -> dict[str, Any] | None:
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = world.ship
+    if not scripts.has_whole_lateen(ship):
+        return None
+    practice = scripts.lateen_practice(ship)
+    return {"words": scripts.lateen_practice_words(ship, practice), **practice}
+
+
+REGISTRY.add(
+    Reading(
+        "lateen_practice",
+        ("the lateen practice",),
+        "query",
+        "",
+        _lateen_practice,
+        description="the ship's practice for her whole lateens in going about: each yard "
+        "shifted round its mast or left on it, in stays and in wearing",
+        none_words=_no_lateen_words,
+    )
+)
+
 
 # ---------------------------------------------------------------------------
 # Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the
