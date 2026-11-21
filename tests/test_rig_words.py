@@ -42,6 +42,7 @@ from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner, scripts
+from freesail.physics import strain
 from freesail.physics.wind import Wind, WindParams
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import SailState
@@ -96,13 +97,13 @@ def test_every_file_is_read_for_the_braces_it_has(name, braces):
     head, after = scripts.head_and_after_yards(ship)
     assert bool(after) == (braces == "after braces")
     assert scripts.braces_manned(ship) == ("after braces" if after else "sheets")
-    assert scripts.braces_worked(ship, head, after) == bool(after)
+    assert scripts.braces_worked(ship) == bool(after)
     for y in head + after:
         sail = ship.sail_of(y)
         if sail is not None and sail.cls == "square":
             sail.state = SailState.SET
     assert scripts.braces_manned(ship) == braces
-    assert scripts.braces_worked(ship, head, after) == (braces != "sheets")
+    assert scripts.braces_worked(ship) == (braces != "sheets")
     assert scripts.one_masted(ship) == (braces == "braces" or name.startswith("boat-"))
 
 
@@ -397,53 +398,61 @@ def test_a_ship_with_after_yards_and_her_square_sails_in_says_them_as_before(bri
     assert "Up helm; stand by the braces. Bear up and scud." in scud
 
 
-def _shot_away(ship, which: str) -> None:
-    """A mast shot away with everything on it (the checker's harness): her foremost lower mast,
-    the one abaft it, or all of them, her bowsprit standing."""
+def _carried_away(ship, which: str) -> None:
+    """Her foremost lower mast, the one abaft it, or all of them, carried away with everything on
+    them by the game's own dismasting call (`physics.strain._wreck_spar`, as a shot carries one
+    away: the lead's reader's way), her bowsprit standing."""
     masts = sorted([sp for sp in ship.spars.values() if sp.cls == "mast"], key=lambda m: -m.x_m)
     for mast in masts if which == "all" else [masts[0] if which == "fore" else masts[1]]:
-        mast.wrecked = True
-        for part in ship.dependents(mast):
-            part.wrecked = True
+        strain._wreck_spar(ship, strain.strain_state(ship), mast, 0.0, how="shot away")
 
 
-@pytest.mark.parametrize("which", ["main", "fore"])
-def test_a_brig_dismasted_with_her_square_sails_in_says_her_words_as_before(brig, which):
-    """A2's second pass, its third commit (the checker's finding 1): a rig built with after yards
-    keeps A2's words when she has lost a mast, whatever she has set (`after_yards_as_built`).
-    The brig, her square sails in and her main (or her fore) shot away, by the player's door:
-    her heave-to's, fill-away's, wear's and scud's lines as at 5c5e04be, line for line and tick
-    for tick (measured there). Before it, read from the yards she had left, she was given the
-    lugger's: "Hands to the sheets; heave to.", "Right the helm.", "Wind aft. Shifted over the
-    sheets." and "Up helm." and "Bear up and scud."."""
+@pytest.mark.parametrize("which", ["main", "fore", "all"])
+def test_a_brig_dismasted_is_told_of_the_yards_she_has_left_as_built(brig, which):
+    """A2's second pass, its fifth commit (the lead's nudge 37): she is told of the yards she has
+    left, each classed head or after as she was built (`yards_told`). The brig, her square sails
+    in and her main, her fore or both carried away, by the player's door, every line beside the
+    trunk's (measured there, the trunk at ba876cc1):
+    - her main gone, her fore yards are head yards alone: "Hands to the head braces; heave to.",
+      "Fill away; man the head braces." and "Stand by to wear ship. Up helm." (the trunk's "after
+      braces" and "...; brace in the after yards.", A2's mend);
+    - her fore gone, her main yards are after yards still: "Stand by to wear ship. Up helm; brace
+      in the after yards." as the trunk has it (A2's fourth commit, the yards classed by what was
+      left, called them head yards, and her braces "head braces": the one wrong line);
+    - both gone, no braced yard left: "Stand by to wear ship. Up helm.", "Wind aft. Shifted over
+      the sheets." and the scud's "Up helm." and "Bear up and scud." (the trunk's brace-in, its
+      "hauled out and braced up" and "Up helm; brace in the yards as she goes off." and "Up helm;
+      stand by the braces. Bear up and scud.")."""
     world = _from(brig)
     world.submit("take in the square sails")
     world.run(300)
-    _shot_away(world.ship, which)
+    _carried_away(world.ship, which)
+    world.run(1)
     cut = replay.checkpoint_bytes(world)
-    if which == "main":
-        assert _lines(_from(cut), [("heave to", 600), ("fill away", 120)]) == [
-            (0, "Order: heave to."),
-            (1, "The fore topmast staysail sheet to windward; helm a-lee."),
-            (1, "Hands to the head braces; heave to."),
-            (
-                600,
-                "Hove to on the starboard tack, under her fore-and-aft canvas, fore topmast "
-                "staysail sheet to windward, helm a-lee.",
-            ),
-            (600, "Order: fill away."),
-            (601, "Hauled aft the head sheets; kept the helm a-lee to let her fall off."),
-            (601, "Fill away; man the head braces."),
-            (601, "Braced the yards full."),
-            (602, "Filled away on the starboard tack; braced full and steering WNW (292°)."),
-        ]
+    hove = [line for _, line in _lines(_from(cut), [("heave to", 600), ("fill away", 120)])]
+    worn = [line for _, line in _lines(_from(cut), [("wear ship", 600)])]
+    scud = [line for _, line in _lines(_from(cut), [("scud", 60)])]
     aft = "Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up."
-    assert aft in [line for _, line in _lines(_from(cut), [("wear ship", 600)])]
-    assert _lines(_from(cut), [("scud", 60)]) == [
-        (0, "Order: scud."),
-        (1, "Up helm; brace in the yards as she goes off."),
-        (1, "Up helm; stand by the braces. Bear up and scud."),
-    ]
+    if which == "main":
+        assert "Hands to the head braces; heave to." in hove
+        assert "Fill away; man the head braces." in hove
+        assert "Stand by to wear ship. Up helm." in worn and aft in worn
+    elif which == "fore":
+        assert not [line for line in hove if line.startswith("Hands to the")]  # refused
+        assert "Stand by to wear ship. Up helm; brace in the after yards." in worn and aft in worn
+    else:
+        assert "Stand by to wear ship. Up helm." in worn
+        assert "Wind aft. Shifted over the sheets." in worn
+    for line in hove + worn:
+        assert "after braces" not in line or which == "fore", line
+    if which == "all":
+        assert scud == ["Order: scud.", "Up helm.", "Bear up and scud."]
+    else:
+        assert scud == [
+            "Order: scud.",
+            "Up helm; brace in the yards as she goes off.",
+            "Up helm; stand by the braces. Bear up and scud.",
+        ]
 
 
 def test_the_smack_under_her_fore_and_aft_canvas_box_hauls_and_boxes_off_by_no_braces(smack):
@@ -672,50 +681,64 @@ def test_hung_in_stays_a_one_master_lays_her_yards_aback_not_her_head_yards(path
     assert hung == [f"Her way is gone; she hangs in stays. Helm kept a-lee; {aback}."]
 
 
-@pytest.mark.parametrize(
-    ("name", "which"),
-    [
-        ("brig", "main"),
-        ("brig", "fore"),
-        ("hermaphrodite-brig", "main"),
-        ("hermaphrodite-brig", "fore"),
-        ("bilander", "main"),
-        ("bilander", "fore"),
-        ("seventy-four", "all"),
-        ("sixty-four", "all"),
-        ("razee-44", "all"),
-        ("brig", "all"),
-    ],
-)
-def test_a_rig_built_with_after_yards_is_read_as_built_whatever_she_has_lost(name, which):
-    """A2's second pass, its third commit (the checker's finding 1), at the reader: a rig built
-    with after yards (`after_yards_as_built`, every braced yard as filed) is read by A2's own
-    readers when a mast is shot away, her square sails in (as loaded): her braces worked while
-    she has a braced yard left, A2's `has_braced_yards`; her braces manned A2's way; and the scud
-    braces in every working yard, the yards under the bowsprit of the 74, the 64 and the razee
-    with every mast gone among them (A2's `working_yards`). Before it, read from the yards she
-    had left, the brig with her main gone was given the lugger's sheets, and the 74 with her masts
-    gone was told nothing of the spritsail yards the scud still braces in."""
-    ship = load_ship(f"data/ships/{name}.yaml")
-    _shot_away(ship, which)
-    head, after = scripts.head_and_after_yards(ship)
-    assert scripts.after_yards_as_built(ship)
-    assert scripts.braces_worked(ship, head, after) == bool(head or after)
-    a2 = "after braces" if after else "head braces" if head else "sheets"
-    assert scripts.braces_manned(ship) == a2
-    braced_in = bool(scripts.working_yards(ship))
-    assert scripts.ScudScript(ship, {}, {})._braces_worked() == braced_in
-    runner = Runner(ship)
+# The dismasted cases (the lead's nudge 37), each told of the yards she has left, classed head or
+# after as she was built: (file, the mast or masts carried away, the braces her heave-to and
+# fill-away man, the wear's up-helm line, whether the scud braces her yards in). Beside each, the
+# trunk's words: "after braces", "...; brace in the after yards." and the scud's braces, whatever
+# she had left.
+UP_HELM = "Stand by to wear ship. Up helm."
+UP_HELM_BRACE_IN = "Stand by to wear ship. Up helm; brace in the after yards."
+DISMASTED = [
+    ("brig", "main", "head braces", UP_HELM, True),
+    ("brig", "fore", "after braces", UP_HELM_BRACE_IN, True),
+    ("brig", "all", "sheets", UP_HELM, False),
+    ("merchant-brig", "main", "head braces", UP_HELM, True),
+    ("hermaphrodite-brig", "main", "head braces", UP_HELM, True),
+    ("hermaphrodite-brig", "fore", "after braces", UP_HELM_BRACE_IN, True),
+    ("bilander", "main", "head braces", UP_HELM, True),
+    ("bilander", "fore", "after braces", UP_HELM_BRACE_IN, True),
+    ("frigate-36", "main", "after braces", UP_HELM_BRACE_IN, True),
+    ("frigate-36", "fore", "after braces", UP_HELM_BRACE_IN, True),
+    ("seventy-four", "all", "sheets", UP_HELM, False),
+    ("sixty-four", "all", "sheets", UP_HELM, False),
+    ("razee-44", "all", "sheets", UP_HELM, False),
+]
+
+
+@pytest.mark.parametrize(("name", "which", "braces", "up_helm", "braced_in"), DISMASTED)
+def test_a_dismasted_rig_is_told_of_the_yards_she_has_left_as_built(
+    name, which, braces, up_helm, braced_in
+):
+    """A2's second pass, its fifth commit (the lead's nudge 37), by the runner's door, the masts
+    carried away by the game's own call: one reader, `yards_told`, of the yards she has left,
+    each classed head or after as she was built, read by the braces she mans, the wear's up-helm
+    line, the box-haul's wind-aft line and the scud. Her main gone, she has head yards alone and
+    mans her head braces; her fore gone, after yards alone, and her after braces, as the trunk
+    has it (A2's fourth commit gave the brig, the hermaphrodite brig and the bilander "head
+    braces" there, and no brace-in: classed by what was left); every mast gone, she is told of no
+    yard, the yards under the bowsprit alone being no yards of going about, and the scud says its
+    up-helm once (the 74, the 64 and the razee were told to brace in their spritsail yards by the
+    scud while the wear braced none). The frigate keeps every word, a mast gone or not."""
+    path = f"data/ships/{name}.yaml"
+    ship, runner, _w = _on_starboard(55.0, path)
+    _carried_away(ship, which)
+    ship.drain_notes()
+    runner.start(ship, "wear", "ship")
+    assert [n[2] for n in ship.drain_notes()][0] == up_helm
+    ship, runner, _w = _on_starboard(55.0, path)
+    _carried_away(ship, which)
+    ship.drain_notes()
     said = runner.start(ship, "scud", "ship")
-    notes = [n[2] for n in ship.drain_notes()]
+    first = [n[2] for n in ship.drain_notes()][0]
     if braced_in:
+        assert first == "Up helm; brace in the yards as she goes off."
         assert said == "Up helm; stand by the braces. Bear up and scud."
-        assert "Up helm; brace in the yards as she goes off." in notes
     else:
-        # no braced yard left (the brig with every mast gone): A2's "Up helm." twice, the
-        # bare repeat kept on a rig built with after yards, whose lines do not move
-        assert said == "Up helm. Bear up and scud."
-        assert "Up helm." in notes
+        assert (first, said) == ("Up helm.", "Bear up and scud.")
+    # the readers, after the words (so that with the rule out the words fail first)
+    assert scripts.braces_manned(ship) == braces
+    assert scripts.after_yards_as_built(ship)
+    assert bool(scripts.yards_told(ship)[1]) == (up_helm == UP_HELM_BRACE_IN)
 
 
 def test_a_rig_of_head_yards_alone_with_nothing_to_draw_meets_her_with_the_helm():
