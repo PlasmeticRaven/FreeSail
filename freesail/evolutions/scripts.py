@@ -755,11 +755,15 @@ def yards_told(ship: Ship) -> tuple[list[Spar], list[Spar]]:
     brig with her main gone has head yards alone and with her fore gone after yards alone; and
     none where she has no braced yard left, or only the yards under her bowsprit, which alone
     are no yards of going about (the 74 with every mast gone). The one reader of her braces in
-    words: `braces_worked`, `braces_manned`, the wear's up-helm line, the box-haul's wind-aft
-    line, and through `braces_worked` the scud and every other line of the going-about
-    evolutions (package 90, A2's second pass, its fifth commit; the lead's nudge 37: "she is
-    told of the yards she has left, each classed head or after as she was built"; the
-    evolutions' swings read `head_and_after_yards` still, unchanged)."""
+    words: every line that names her yards or braces head or after reads its class here, through
+    `class_word`, of the yards the evolution's action swings at that phase (`told_of`, which
+    reads them here too); `braces_worked` and `braces_manned` read it, and through
+    `braces_worked` the scud and every other line of the going-about evolutions (package 90,
+    A2's second pass, its fifth commit; the lead's nudge 37: "she is told of the yards she has
+    left, each classed head or after as she was built"; its sixth commit, the lead's nudge 40:
+    "the word follows the deed"). The evolutions' swings read `head_and_after_yards` still,
+    unchanged: a brig with her fore gone is handled with her main yards as her head yards, and
+    told of them as her after yards."""
     left = working_yards(ship)
     if all(ship.under_bowsprit(y) for y in left):
         return [], []
@@ -787,14 +791,38 @@ def one_masted(ship: Ship) -> bool:
     return sum(1 for sp in ship.spars.values() if sp.cls == "mast") < 2
 
 
-def head_word(ship: Ship) -> str:
-    """The word "head " before "yards" or "braces" in a line, said of a vessel of two masts or
-    more, whose yards on her foremost mast with yards are her head yards; nothing for a vessel
-    of one mast (`one_masted`), whose yards are "the yards" and her braces "the braces"
-    (package 90, A2's second pass, its point 3 at its cause: "the head yards" and "the head
-    braces" were said of the cutter and the smack in the wear, the tack, the box-haul and box
-    her off)."""
-    return "" if one_masted(ship) else "head "
+def told_of(ship: Ship, yards: list[Spar]) -> list[Spar]:
+    """Of the yards an evolution's action swings at a phase, or holds unswung (its head or its
+    after list, `head_and_after_yards`), those a line of that phase tells of: the ones her words
+    tell of (`yards_told`), none where they are only the yards under her bowsprit. A line that
+    names a bracing of them is said only where there are some, so that the word follows the
+    deed: a brig with her fore gone, whose after list is empty, is not told to brace in her
+    after yards as she bears up to wear, for the action braces none in then (package 90, A2's
+    second pass, its sixth commit; the lead's nudge 40: "A line says a brace is hauled only
+    where the evolution hauls it then")."""
+    head, after = yards_told(ship)
+    told = [y for y in yards if y in head or y in after]
+    if all(ship.under_bowsprit(y) for y in told):
+        return []
+    return told
+
+
+def class_word(ship: Ship, yards: list[Spar]) -> str:
+    """The word before "yards" or "braces" in a line that names these yards (`told_of`): "after "
+    where they are after yards as she was built (`yards_told`), else "head "; and nothing on a
+    vessel of one mast (`one_masted`), whose yards are "the yards" and her braces "the braces".
+    The yards under her bowsprit go with the yards they are swung with and are not read. So a
+    line names the yards the action swings by their class as built, whatever list the action
+    holds them in: the main yards of a brig with her fore gone, swung in her head yards' place,
+    are her after yards in every line of one evolution (package 90, A2's second pass, its sixth
+    commit; the lead's nudge 40: "named by their as-built class"; `head_word` before it, of the
+    masts alone, its point 3 at its cause: "the head yards" and "the head braces" said of the
+    cutter and the smack)."""
+    if one_masted(ship):
+        return ""
+    _head, after = yards_told(ship)
+    named = [y for y in yards if not ship.under_bowsprit(y)]
+    return "after " if named and all(y in after for y in named) else "head "
 
 
 def braces_manned(ship: Ship) -> str:
@@ -813,7 +841,7 @@ def braces_manned(ship: Ship) -> str:
         return "after braces"
     if not braces_worked(ship):
         return "sheets"
-    return f"{head_word(ship)}braces"
+    return f"{class_word(ship, head)}braces"
 
 
 def after_square_yards(ship: Ship) -> list[Spar]:
@@ -1918,11 +1946,14 @@ class TackScript(Script):
         # stern, it pushes the stern to leeward and her head up to the wind
         sheets_to(self.ship, self.booms, self.old_side(weather=True), None)
         words = ["Her way is gone; she hangs in stays. Helm kept a-lee"]
-        # her head yards aback in words only where she works her braces (package 90, A2's
-        # second pass: said of every head yard crossed before it, a square sail set or none), and
-        # "the yards" on a vessel of one mast (`head_word`: "the head yards" before it)
-        if self.head and braces_worked(self.ship):
-            words.append(f"the {head_word(self.ship)}yards aback to box her off")
+        # her head yards, held unswung by the action, aback in words only where she works her
+        # braces (package 90, A2's second pass: said of every head yard crossed before it, a
+        # square sail set or none), named by their class as built (`class_word`: "the yards" on
+        # a vessel of one mast, "the head yards" before it; a brig's main yards with her fore
+        # gone, which the tack holds as her head yards, her after yards: its sixth commit)
+        held = told_of(self.ship, self.head)
+        if held and braces_worked(self.ship):
+            words.append(f"the {class_word(self.ship, held)}yards aback to box her off")
         if self.heads:
             words.append("the head sheets held to windward")
         if self.booms:
@@ -2152,11 +2183,19 @@ class WearScript(Script):
                 new_lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_WORE_WORDS
             )
         self.bowlined = bowlines_hauled(self.ship)
-        # the after yards braced in only where she has after yards left, classed as she was
-        # built (`yards_told`; package 90, A2: the lugger, the boats, the cutter, the smack and
-        # the schooners were told to before it; its fifth commit, nudge 37: a brig with her
-        # fore gone has her main's still, and with her main gone none)
-        brace_in = "; brace in the after yards" if yards_told(self.ship)[1] else ""
+        # the after yards braced in as she falls off, said only where the action braces some in
+        # now (`told_of` its after list; the head yards follow once the wind is abaft the beam,
+        # unsaid) and she works her braces, named by their class as built (`class_word`; package
+        # 90, A2: the lugger, the boats, the cutter, the smack and the schooners were told to
+        # before it; A2's second pass, its sixth commit, the lead's nudge 40, "the word follows
+        # the deed": a brig with her fore gone, her main yards in the action's head list, has
+        # none braced in now, nor one with her main gone)
+        braced_in = told_of(self.ship, self.after)
+        brace_in = (
+            f"; brace in the {class_word(self.ship, braced_in)}yards"
+            if braced_in and braces_worked(self.ship)
+            else ""
+        )
         if let_go_bowlines(self.ship):
             self.note(
                 f"Stand by to wear ship. Up helm; clear away the bowlines{brail}{brace_in}.",
@@ -2223,11 +2262,15 @@ class WearScript(Script):
                 # with no braced yard at all (a lugger, a boat) none is braced up (package 90,
                 # A2: "hauled out and braced up" before it, whatever she had); and where she
                 # works no braces (head yards alone and no square sail set, A2's second pass:
-                # `braces_worked`) she is worn by her sheets and has the lugger's words; her yards
-                # "the yards" on a vessel of one mast (`head_word`: "the head yards" before it)
+                # `braces_worked`) she is worn by her sheets and has the lugger's words; the yards
+                # squared, the action's head list, named by their class as built (`class_word`:
+                # "the yards" on a vessel of one mast, "the head yards" before it; a brig's main
+                # yards with her fore gone, her after yards, squared here as they followed the
+                # wind abaft the beam: A2's second pass, its sixth commit, the lead's nudge 40)
                 worked = braces_worked(self.ship)
-                yards = f"{head_word(self.ship)}yards"
-                squared = f"Squared the {yards}; shifted" if self.head and worked else "Shifted"
+                swung = told_of(self.ship, self.head)
+                yards = f"{class_word(self.ship, swung)}yards"
+                squared = f"Squared the {yards}; shifted" if swung and worked else "Shifted"
                 braced = "; hauled out and braced up" if worked else ""
                 self.note(f"Wind aft. {squared} over the sheets{braced}." + dipped)
         if self.dip is not None:
@@ -5496,13 +5539,16 @@ class BoxHaulScript(Script):
         if self.timing_value("luff_first", 1.0) > 0:
             dyn.target_rudder = self.sign * helm
             self.phase = "luff"
-            # her braces "the braces" on a vessel of one mast (package 90, A2's second pass:
-            # `head_word`, "the lee head braces" before it), and checked only where she works
+            # the braces of the yards to be braced abox, the action's head list, named by their
+            # class as built (`class_word`: "the braces" on a vessel of one mast, package 90,
+            # A2's second pass, "the lee head braces" before it; a brig's main braces with her
+            # fore gone, her after braces: its sixth commit), and checked only where she works
             # them (`braces_worked`: a rig of head yards alone with no square sail set, the
             # smack under her plain sail, is given the helm's words alone)
+            abox = told_of(self.ship, self.head)
             checked = (
-                f"; checked the lee {head_word(self.ship)}braces"
-                if braces_worked(self.ship)
+                f"; checked the lee {class_word(self.ship, abox)}braces"
+                if abox and braces_worked(self.ship)
                 else ""
             )
             self.note(f"Ready about. Helm's a-lee{checked}.", "helm.order")
@@ -5532,13 +5578,16 @@ class BoxHaulScript(Script):
             change.change(side, self.timing_value("settee_dip_s", SETTEE_DIP_S), said)
         targets = [-self.sign * y.brace_limit for y in self.head] + [0.0 for _ in self.after]
         self.swing = YardSwing(self.head + self.after, targets, self.timing_value("brace_s", 45.0))
-        # her yards "the yards" on a vessel of one mast (package 90, A2's second pass:
-        # `head_word`, "Brace abox the head yards!" before it); with after yards she has two
-        # masts and more, and the words are as they were
-        yards = f"{head_word(self.ship)}yards"
-        if self.after:
-            text = f"Square away the after yards! Brace abox the {yards}!"
-        elif braces_worked(self.ship):
+        # the yards squared and the yards braced abox, the action's after and head lists, each
+        # named by its class as built (`class_word`: "the yards" on a vessel of one mast,
+        # package 90, A2's second pass, "Brace abox the head yards!" before it; a brig with her
+        # fore gone braces her main yards abox, her after yards: its sixth commit)
+        squared, abox = told_of(self.ship, self.after), told_of(self.ship, self.head)
+        yards = f"{class_word(self.ship, abox)}yards"
+        if squared:
+            after = f"{class_word(self.ship, squared)}yards"
+            text = f"Square away the {after}! Brace abox the {yards}!"
+        elif abox and braces_worked(self.ship):
             text = f"Brace abox the {yards}!"
         else:
             # no square sail set to box her head off with (a rig of head yards alone): her
@@ -5607,11 +5656,15 @@ class BoxHaulScript(Script):
                 shift_sheets_over(
                     self.ship, "starboard" if self.sign > 0 else "larboard", wind, self.way_before
                 )
-                # the after yards braced up only where she has after yards left, classed as she
-                # was built (`yards_told`; package 90, A2: the cutter, the smack and the
-                # schooners box-hauled, worn short round or boxed off round by the stern were
-                # told so before it)
-                after = "braced up the after yards; " if yards_told(self.ship)[1] else ""
+                # the after yards braced up as she comes to, said only where the action braces
+                # some up now (`told_of` its after list; the head yards follow the wind, unsaid),
+                # named by their class as built (`class_word`; package 90, A2: the cutter, the
+                # smack and the schooners box-hauled, worn short round or boxed off round by the
+                # stern were told so before it; A2's second pass, its sixth commit, the lead's
+                # nudge 40: a brig with her fore gone, her main yards in the action's head list,
+                # has none braced up now, nor one with her main gone)
+                up = told_of(self.ship, self.after)
+                after = f"braced up the {class_word(self.ship, up)}yards; " if up else ""
                 self.note(f"Wind aft; {after}shifted over the sheets.{words}")
         if self.phase == "come_to":
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
@@ -5789,15 +5842,19 @@ class BoxOffScript(BoxHaulScript):
         return max(0.0, self.timing_value("box_estimate_s", 240.0) - self.t)
 
     def words(self) -> dict[str, Any]:
-        # the first line's braces, "the braces" on a vessel of one mast (package 90, A2's
-        # second pass: `head_word`; "the head braces" whatever her masts before it), stood by
-        # only where she works them, and the end line's "braced sharp up", or "trimmed" before
-        # its "full and by" where she works none (the checker's finding 2)
+        # the first line's braces, of the yards to be braced abox (the action's head list),
+        # named by their class as built (`class_word`: "the braces" on a vessel of one mast,
+        # package 90, A2's second pass, "the head braces" whatever her masts before it; a brig's
+        # main braces with her fore gone, her after braces: its sixth commit), stood by only
+        # where she works them, and the end line's "braced sharp up", or "trimmed" before its
+        # "full and by" where she works none (the checker's finding 2)
         worked = braces_worked(self.ship)
+        abox = told_of(self.ship, self.head)
+        stand_by = f" Stand by the {class_word(self.ship, abox)}braces." if abox and worked else ""
         return {
             "tack": _tack_name(self.sign),
             "new_tack": _tack_name(self.sign),
-            "stand_by": f" Stand by the {head_word(self.ship)}braces." if worked else "",
+            "stand_by": stand_by,
             "braced": "braced sharp up" if worked else "trimmed",
         }
 
@@ -8603,9 +8660,15 @@ class GetUnderWayScript(_AnchorScript):
                     )
                 else:
                     self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 60.0))
+                    # her after and head lists braced up and abox, each named by its class as
+                    # built (`class_word`; package 90, A2's second pass, its sixth commit: a ship
+                    # with her fore gone lays her main yards abox, after yards); with two masts
+                    # of yards she has both lists
+                    up = class_word(ship, told_of(ship, after))
+                    abox = class_word(ship, told_of(ship, head))
                     self.note(
-                        f"Let fall! Sheet home! Hoist away the topsails! Brace up the after "
-                        f"yards for the {self.tack} tack, the head yards abox. Man the bars; "
+                        f"Let fall! Sheet home! Hoist away the topsails! Brace up the {up}"
+                        f"yards for the {self.tack} tack, the {abox}yards abox. Man the bars; "
                         "heave round!"
                     )
             return
@@ -8802,10 +8865,13 @@ class GetUnderWayScript(_AnchorScript):
                     # works her braces (A2's second pass: `braces_worked`)
                     worked = head and braces_worked(ship)
                     brace = ", brace round the topsail yard" if worked else ""
+                    # the head list braced round, named by its class as built (`class_word`; A2's
+                    # second pass, its sixth commit: a ship with her fore gone, her main yards)
+                    rounded = class_word(ship, told_of(ship, head))
                     self.note(
                         f"{how}; right the helm, draw the jib, haul aft the main sheet{brace}."
                         if self.fore_and_aft
-                        else f"{how}; right the helm, brace round the head yards, set {driver}."
+                        else f"{how}; right the helm, brace round the {rounded}yards, set {driver}."
                     )
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):

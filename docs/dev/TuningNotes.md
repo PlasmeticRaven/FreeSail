@@ -38887,7 +38887,7 @@ Beside them in the proof, as the rule gives them: the bilander her main gone 18 
 - `test_a_dismasted_rig_is_told_of_the_yards_she_has_left_as_built`, thirteen cases (`DISMASTED`: the brig's three; the merchant brig's main; the hermaphrodite brig's and the bilander's main and fore; the frigate's main and fore; the 74's, the 64's and the razee's every mast), by the runner's door: the wear's up-helm line, the scud's two first lines, then the braces manned and the reader;
 - in place of the third commit's two (`test_a_rig_built_with_after_yards_is_read_as_built_whatever_she_has_lost`, hand-wrecked and asserting the yards classed by what was left, and `test_a_brig_dismasted_with_her_square_sails_in_says_her_words_as_before`).
 
-Each fails on its words with the rule out (measured, the sixteen run on the trunk's code and on 4207881a's): the main-gone and every-mast cases on the trunk's (its "after braces", its brace-in, its scud's braces); the fore-gone and every-mast cases on 4207881a's ("head braces" and no brace-in, classed by what was left; its repeat kept on the eight; the spritsail yards braced in); the frigate's two, which do not move, pin that they do not (they fail on neither's words, only on the reader, which neither has).
+Each fails on its words with the rule out (measured, the sixteen run on the trunk's code and on 4207881a's): the main-gone and every-mast cases on the trunk's (its "after braces", its brace-in, its scud's braces); the brig's and the bilander's fore-gone cases and the every-mast cases on 4207881a's ("head braces" and no brace-in, classed by what was left; its repeat kept on the eight; the spritsail yards braced in); the frigate's two, which do not move, pin that they do not, and so does the hermaphrodite brig's fore-gone case, which 4207881a already gave the rule's words ("after braces" and the brace-in: her main a schooner's mast, its yards her after yards in the evolutions' own split too): these three fail on neither's words, only on the reader, which neither has. (Corrected in the sixth commit, below: this paragraph had the hermaphrodite brig's fore-gone case failing on 4207881a's words.)
 
 **Measured against the trunk** (`a2fix/proof5.py`, `a2fix/proof5_compare.py`; the trunk, ba876cc1, in a scratch worktree beside this tree, removed after): the eighteen files whole and dismasted (every rig of two masts or three her fore, her main and every mast carried away, each of one mast her mast, at the settle's 2,000th second, the 1,300th off the wind: 58 cases), from four starts (the settle in 15 kn; the same with her square sails taken in at 600 s; the settle in 5 kn; off the wind on 105°), eight runs each (tack; wear; heave to and fill away; heave to and fill away for 250°; box haul; wear short round; box her off; scud): **232 settles and 1,856 runs. Every field but the text is the same in every one: each event's tick, kind, severity, actor, subject and data; every order's answer, its words too; the track; the end state, every sail's state and every spar's brace angle, wreck and sending down. Whole, not a line moves on the eight. Dismasted, the eight move in 135 runs, 199 lines, every one the rule's (the table).** All told 906 lines move in 452 runs (the lugger 140, the two schooners 116 each, the smack 114, the cutter 81, the bilander 39, the hermaphrodite brig 38, the brig 37, the merchant brig 33, each boat 28, the frigate, the razee, the 74 and the 64 13 each), by damage: whole 385, her fore gone 39, her main gone 221, every mast 261.
 
@@ -38899,6 +38899,147 @@ Each fails on its words with the rule out (measured, the sixteen run on the trun
 - come to an anchor's "square the yards" (on `working_yards`: the 74 with every mast gone squares her spritsail yards for the furl).
 
 **Left as they are**, as the lead accepts them: the boats' refusal ("She has no head yards to brace abox.", its `data["reason"]`); the two anchor tests' times; and, older than A2 and listed for a primer pass, the primer's 05:03 refusal and its cutter's tack log (chapter 5, lines 333 to 340).
+
+### Second pass, sixth commit: the word follows the deed, the yards named as built (the checker's read of 58872332; the lead's nudge 40, 2026-11-21)
+
+The checker read 58872332 and held it: the fifth commit classed as built only the four lines it put on `yards_told`, and left the evolutions' other head and after words on their own split (`head_and_after_yards`), so that within one evolution the same yards were named two ways. The brig with her fore gone, box-hauled: "checked the lee head braces" and "Brace abox the head yards!" of her main yards, then "Wind aft; braced up the after yards" of the same yards; worn: "brace in the after yards" of them, then "Squared the head yards". The question put to the lead at the same time (the brig with her fore gone told "Up helm; brace in the after yards." while nothing is braced in then) was answered at nudge 40: **the word follows the deed.** "A line says a brace is hauled only where the evolution hauls it then", the bracing said where it is done, in her after yards' name; as a rule, not a case.
+
+**The cause**: once she has lost her foremost mast with yards, two things part: the yards the action swings at each phase (its head and after lists, `head_and_after_yards`, read from the foremost mast left with yards) and the class of those yards as she was built. The fifth commit gated four lines on the class as built, whatever the action swung then, and the rest named the action's lists "head" and "after".
+
+**The rule, for every line that names her yards or braces head or after**: it names the yards the evolution's action swings at that phase, or holds unswung there, as the action reads them (its head or its after list); it is said only where there are some, read with `told_of` (of those yards, the ones she is told of, `yards_told`; none where they are only the yards under her bowsprit); and it names them by their class as built, with `class_word` ("after " where they are after yards as she was built, else "head ", and nothing on a vessel of one mast; it takes `head_word`'s place, which read the masts alone). `yards_told` is the one reader of the class in words, and `told_of`, `class_word`, `braces_worked` and `braces_manned` all read it. The actions are untouched: no tick, kind, datum or angle moves.
+
+**The lines now reading the one class** (`freesail/evolutions/scripts.py`), each with the list it names:
+- The tack hung in stays (`TackScript._hang`): "the head yards aback to box her off" names the head list, which the tack holds unswung.
+- The wear at up-helm (`WearScript._up_helm`): "; brace in the after yards" names the after list, which the action braces in as she falls off. With no after list nothing is said. The head list follows only once the wind is abaft the beam, unsaid, as before.
+- The wear with the wind aft (`WearScript.tick`): "Squared the head yards; shifted" names the head list.
+- The box-haul's luff (`BoxHaulScript.begin`): "checked the lee head braces" names the head list, to be braced abox.
+- The box (`BoxHaulScript._box`, for box-hauling, wearing short round and box her off): "Square away the after yards! Brace abox the head yards!" names the after and the head lists.
+- The box-haul's wind aft (`BoxHaulScript.tick`): "braced up the after yards; " names the after list, braced sharp up as she comes to. With no after list nothing is said: the head list follows the wind, unsaid, as before.
+- Box her off's first line (`BoxOffScript.words`, `{stand_by}`): " Stand by the head braces." names the head list.
+- Getting under way, the ship's road (`GetUnderWayScript.tick`): "Brace up the after yards for the ... tack, the head yards abox." and "brace round the head yards" name the after and the head lists.
+- `braces_manned`'s "head braces", or "braces" on a vessel of one mast (the heave-to's and the fill-away's `{braces}`), now reads `class_word`, with no word changed.
+
+Whole, each list is her yards of that class as built, so no line moves on the eight (the proof below).
+
+**Left as the trunk has them**, as the lead rules:
+- the orders named for a mast ("Mainsail haul.", "Main-topsail haul.", "Rise tacks and sheets.", "Rise fore tack and sheet.", "Let go and haul.");
+- come to an anchor's "square the yards";
+- the boats' refusal, "She has no head yards to brace abox.", and its `data["reason"]`.
+
+**Said with the mast they name gone** (measured on the head, `a2fix/table6.py`):
+- the tack's "Main-topsail haul.", by the frigate with her main gone (1 run, in 15 kn: her after list is the mizzen's yards, whose course is not set);
+- getting under way by the fore-and-after's road, with her main gone and her driver named the mainsail:
+  - "Hoist away the topsail and the mainsail, the main boom steadied over to larboard." (28 runs);
+  - "haul aft the main sheet" (28);
+  - "Under way ... under the topsail and the mainsail and the jib" (the frigate and the razee, their fore and main gone, 2);
+- the lugger's "set the mizen", with her mizzen gone (2).
+
+Not reached by the proof, read in the code:
+- back and fill's "Man the main braces; back and fill.", whatever mast it backs;
+- the lying-to's forced round, "Her after yards full, she gathers way" (`keep_lying_to`), which names after yards whatever yards are full: with her main gone, hove to on her fore, they are her fore yards.
+
+**The deed, measured** (`a2fix/deed6.py`, on the proof's head run). Each line that names a bracing is checked every second against the yards that swung more than 2 degrees. The yards a line is about are read as the action reads them after the settle. The stretch it speaks of runs:
+- from the line to the evolution's next line, as a rule;
+- over two such stretches for a stand-by or a check;
+- over the whole evolution for the braces a heave-to or a fill-away mans;
+- over the stretch before the line for "Squared".
+
+A line passes when three things hold: those yards are some, the class it names is theirs as built, and one of them swings in its stretch (for the yards held aback in stays, none swings). Dismasted, 1,698 lines are checked and 28 fail; whole, 559 are checked and 5 fail.
+
+Of the failures:
+- **Box her off a second time** (the frigate with her mizzen gone off the wind, and the merchant brig with her main gone in 5 kn; 2 runs, 4 lines): the helm boxes her off again with her head yards abox from the first time, so none swings. The yards are where the line says.
+- **The bilander with her main gone, worn in 5 kn** (1 line): her watch was short-handed and the wear waited, so the wind was aft a second after up-helm. "Squared the head yards" has a stretch one second long, and her fore yards follow after.
+- **The hermaphrodite brig with her fore gone, off the wind** (1 line): "hauled out and braced up" falls one second before her next line.
+- **The fill-away's braces** (22 dismasted lines, 5 whole). "Fill away; man the after braces." is said where no after yard is braced full:
+  - the four three-masters with their main gone, hove to by the fore (16): the heave-to backs the mast with the most sail standing, and the fill-away braces it full;
+  - whole, the hermaphrodite brig, hove to by her fore topsail the fore-and-after's way (5).
+
+  And "Fill away; man the head braces." is said with nothing braced, where she was hove to by her sheets (the brig and the hermaphrodite brig with the main gone and their square sails in, the three-masters with main and mizzen gone: 6). These are the trunk's "after braces" (the head braces are A2's), from `braces_manned` as the lead accepts it at nudge 40; left, for the lead.
+
+Every other line passes. From the line to the first of its yards to swing, the median is:
+- the wear's brace-in, 8 s;
+- the box's square-away 2 s, its brace abox 1 s;
+- the box-haul's braced-up, 3 s;
+- box her off's stand-by, 1 s;
+- getting under way's three, 2 s;
+- the scud's brace-in, 6 s;
+- the heave-to's hands to the braces, 1 s.
+
+**The wear's action with her fore gone, measured, for the record and for the damage control's package** (nudge 40, its point 3; not changed). The wear's action reads her lists from the foremost mast left with yards, so a brig with her fore gone is handled with her main yards as her head yards and no after list. The after list is braced in as she falls off and the head list follows only once the wind is abaft the beam, so nothing is braced in at up-helm.
+
+The brig by the player's door, as `test_a_brig_dismasted_is_told_of_the_yards_she_has_left_as_built` has her (settled by the wind 1,200 s, her square sails taken in, 300 s, her fore carried away; `a2fix/wearfore.py`):
+
+| Time from "wear ship" | Wind on her bow | Main yard (from square) | What the action does |
+|---|---|---|---|
+| 1 s, up helm | 67.1° | 62.0° (sharp up, starboard) | nothing braced in |
+| 36 s | 89.8° | 62.0° | still unswung |
+| 41 s | 94.7° | 60.9° | first swing: the wind is abaft the beam and the head list follows it, at the wear's brace rate (0.35°/s by the crew's factor, about 0.28°/s here) |
+| 96 s | 143.7° | 45.7° | following the wind in |
+| 132 s, "Wind aft" | 165.1° | 35.8° | the line says "Squared the after yards"; the main yard is not yet square |
+| 256 s | 51.8° on the larboard bow | 0.4° | square, while she comes to |
+| 481 s | 49.4° | −62.0° (sharp up, larboard) | at its limit |
+
+She lies 49° from the wind at 1.6 kn and is never steady on her new course, so the wear runs on to its timeout (900 s).
+
+With her square sails set (the same settle, her fore carried away at once; `wearfore.py <tree> set`):
+- the main yard stays at 62.0° from up-helm (the wind 67.3°) until the wind is abeam, between 26 s (88.6°) and 31 s (95.6°);
+- it is about 45° from square with the wind aft (90 s, 166°);
+- it is sharp up on the new tack at 481 s;
+- she is not steady by 900 s.
+
+The trunk's action is the same, tick for tick (the proof).
+
+**The truths** (`tests/test_rig_words.py`). In each, the masts are carried away by the game's own dismasting call; `_carried_away` now takes any set of masts by place ("fore+main", say).
+- `test_a_dismasted_ship_names_the_yards_the_action_swings_by_their_class_as_built`: nine cases at the runner's door. The brig whole, with her main gone and with her fore gone; the frigate whole and with her main, her fore, her fore and main, her fore and mizzen, and her main and mizzen gone. Each is worn, box-hauled, boxed off and hung in stays. The case asserts her up-helm line, her "Squared the ... yards", her checked and stood-by braces, her box line, the box-haul's wind-aft line and her yards aback in stays. The box-haul's wind-aft truth that the checker asked for is the brig with her main gone: "Wind aft; shifted over the sheets." With the rule out it fails. With the line said always, the checker's mutation, it fails there. With the line on the after yards left as built (58872332's rule) it fails on the brig with her fore gone. Named "after" on the action's after list, the checker's other mutation, it is the rule, and passes.
+- `test_the_brig_with_her_fore_gone_wears_bracing_in_nothing_until_her_main_yards_follow`: the lead's truth at nudge 40, at the runner's door. Her up-helm line is "Stand by to wear ship. Up helm.". Her main yard does not move from up-helm until the wind is abaft the beam (measured: it first swings with the wind 90.6 degrees on her bow), and then it does. With the wind aft she is told "Wind aft. Squared the after yards; shifted over the sheets; hauled out and braced up.", and no line names her head yards or a brace-in.
+- `test_the_frigate_with_her_fore_gone_gets_under_way_naming_her_main_yards_after_yards` (marked slow, 8 s): the frigate brought up in the outer road, her fore carried away, then got under way. Her lines are "Brace up the after yards for the starboard tack, the after yards abox." and "...; right the helm, brace round the after yards, set the spanker.".
+- Changed to the rule:
+  - `test_a_brig_dismasted_is_told_of_the_yards_she_has_left_as_built[fore]`: with her fore gone, "Stand by to wear ship. Up helm." and "Wind aft. Squared the after yards; ...";
+  - `DISMASTED`: the brig's and the bilander's fore-gone rows have no brace-in, since their main yards are in the action's head list; its reader check is the action's after list, `told_of`. The comment and the docstring are made true of the hermaphrodite brig: 4207881a gave her fore-gone case the rule's words, and it fails there, as the frigate's do, only on the missing reader.
+
+Each fails with its rule out (`a2fix/mut6.py` and `a2fix/mut6.sh`, on a scratch tree of this commit; as committed, the 27 truths so run all pass):
+- the box-haul's wind-aft line said always (the checker's mutation): 5 fail (the brig with her main gone and with her fore gone; the frigate with her fore and main, her fore and mizzen, and her main and mizzen gone);
+- that line on the after yards left as built (58872332's rule): 3 fail (the brig with her fore gone; the frigate with her fore and main, and her fore and mizzen gone);
+- that line on the action's after list (the checker's other mutation): none fails, for that is the rule now;
+- the wear's brace-in on the after yards left as built (58872332's rule): 7 fail (the nudge 40 truth; the brig's world test with her fore gone; `DISMASTED`'s brig and bilander fore rows; three of the nine);
+- every class word "head " (`head_word`'s rule, which read the masts alone): 13 fail, the slow truth among them.
+
+**Measured against the trunk** (`a2fix/proof6.py`, `a2fix/proof5_compare.py`). The trunk was taken at e7aa4eec, in a scratch worktree beside this tree, removed after. Its code is the merge base's, 89081946: from there to the trunk only `docs/` moves.
+
+The cases are the eighteen files, whole and dismasted, every set of masts carried away by the game's own call:
+- a vessel of one mast loses her mast;
+- one of two masts loses her fore, her main, or both;
+- one of three masts loses her fore, her main or her mizzen alone, her main and mizzen, her fore and main, her fore and mizzen, or all three.
+
+That makes 78 cases. Each loses her masts at the settle's 2,000th second (the 1,300th off the wind, the 600th at anchor). There are five starts: the fifth commit's four, eight runs each, and, new, brought up in the outer road on the channel-west chart in 10 kn and then got under way. **That is 390 settles and 2,574 runs, and every field but the text is the same in every one**: each event's tick, kind, severity, actor, subject and data; every order's answer, its words too; the track; the end state, with every sail and every spar's brace angle, wreck and sending down. **Whole, not a line moves on the eight. Dismasted, the eight move in 434 runs, 750 lines, every one the rule's (the table).**
+
+All told, 1,621 lines move in 817 runs:
+- by ship: the lugger 290, the frigate 142, the 74 138, the razee 133, the 64 130, the two schooners 120 each, the smack 118, the cutter 83, the brig 78, the bilander 46, the hermaphrodite brig 42, the merchant brig 41, each boat 28;
+- by damage: whole 387 (the ten without after yards, A2's), every mast 287, the main 221, the fore 202, fore and main 173, fore and mizzen 152, main and mizzen 143, the mizzen 56 (the lugger's alone).
+
+**The dismasted cases of the eight, the trunk beside this commit** (`a2fix/table6.py`). The counts are the runs a line moves in; cases at sea run 32 times each (four starts by eight evolutions), and at anchor once.
+
+| Case | The trunk | This commit | Runs moved |
+|---|---|---|---|
+| The brig, her main gone: her fore yards, head yards alone | "Hands to the after braces; heave to." (8), "Fill away; man the after braces." (2); "Stand by to wear ship. Up helm; brace in the after yards." (4); "Wind aft; braced up the after yards; shifted over the sheets." (box-hauled, worn short round, boxed off, 9) | "... the head braces ..."; "Stand by to wear ship. Up helm."; "Wind aft; shifted over the sheets." | 21 (as at the fifth commit) |
+| The brig, her fore gone: her main yards, after yards alone as built, in the action's head list | "Ready about. Helm's a-lee; checked the lee head braces." (4); "Up spanker! Brace abox the head yards!" (12); "Box her off! Stand by the head braces." (4); "Wind aft; braced up the after yards; shifted over the sheets. Haul out the spanker!" (7); "Stand by to wear ship. Up helm; brace in the after yards." (3); "Wind aft. Squared the head yards; ..." (1) | "... the lee after braces."; "Up spanker! Brace abox the after yards!"; "Box her off! Stand by the after braces."; "Wind aft; shifted over the sheets. Haul out the spanker!"; "Stand by to wear ship. Up helm."; "Wind aft. Squared the after yards; ..." | 15 (0 at the fifth commit) |
+| The brig, both gone: no braced yard left | the fifth commit's (the wear's brace-in, its "hauled out and braced up", the scud's two); at anchor, "The topsail yard abox." and ", brace round the topsail yard" | as at the fifth commit; at anchor, neither (no braced yard: A2's rule) | 8 |
+| The merchant brig | main: as the brig's; fore: as the brig's, in 5 kn alone (her watch at other work in the other starts); all: as the brig's | the same | 17; 4; 9 |
+| The hermaphrodite brig | main: the fifth commit's (20); fore: at anchor, "The topsail yard abox." and "brace round the topsail yard" (her main a schooner's mast, the action's head list empty); all: as the brig's | main as before; fore: neither said (nothing laid abox); all as the brig's | 20; 1; 9 |
+| The bilander | main: as the brig's; fore: as the brig's, in 5 kn alone, "Lower the mainsail! Brace abox the head yards!" among them; all: as the brig's, and "Wore ship; braced sharp up ..." | the same: "... the after yards!", "... full and by ..." | 18; 3; 9 |
+| The frigate, the razee, the 74 and the 64, their main gone, or their mizzen | every line | the same (the fore yards are the head list, the yards abaft the after list) | 0 each |
+| The same, their fore gone: both lists after yards as built | "checked the lee head braces"; "... Square away the after yards! Brace abox the head yards!"; "Stand by the head braces."; "Squared the head yards"; at anchor "Brace up the after yards for the starboard tack, the head yards abox." and "brace round the head yards, set the spanker" | "... after braces"; "Square away the after yards! Brace abox the after yards!"; "Stand by the after braces."; "Squared the after yards"; "..., the after yards abox." and "brace round the after yards, set ..." | 15; 16; 17; 17 |
+| The same, their fore and main gone, or their fore and mizzen: one list, after yards as built | as the brig's with her fore gone | as the brig's with her fore gone | 16, 17; 15, 16; 17, 17; 16, 16 |
+| The same, their main and mizzen gone: one list, head yards as built | as the brig's with her main gone | as the brig's with her main gone | 20; 19; 17; 17 |
+| The same, every mast gone | as the brig's both gone | as the brig's both gone | 8 each |
+
+Whole, none moves on any of the eight.
+
+**For the lead** (measured, not changed):
+- **Two lists of one class.** A three-master with her fore gone has both lists after yards as built, and the rule's words name them alike: "Square away the after yards! Brace abox the after yards!" and "Brace up the after yards for the starboard tack, the after yards abox." (JUDGEMENT; the frigate, the razee, the 74 and the 64). A mast's name would part them, but the orders named for a mast are the trunk's.
+- **The fill-away's braces** (the deed above). Following the deed there would name the class of the yards the heave-to laid aback, and that would move the hermaphrodite brig's line whole.
+- **Whole too, the trunk's words.** "Wind aft. Squared the head yards" is said while the head yards are still coming in: whole, the yards it names are a median 41.8 degrees from square at the line (8.9 to 50.8, 33 lines), and dismasted 29.7 (93 lines). The box-haul's "checked the lee head braces" is said at the luff, which swings nothing; its yards first swing a median 90 s after, at the box.
+- **Found, not of this step** (the damage control's): the bilander with her main gone keeps "the mainsail", her main's settee, set though wrecked, and the trim order trims it ("Trimmed the mainsail sheet; the mainsail 85 degrees off the centreline.", and the watch's hands lines).
 
 Built on the lead's list of nudge 34; to be passed by the lead's reader.
 

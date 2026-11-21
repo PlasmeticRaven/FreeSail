@@ -30,11 +30,13 @@ timing:
   steady_deg: 5
   box_timeout_s: 900
   box_estimate_s: 240
-# {stand_by}: " Stand by the head braces.", " Stand by the braces." on a vessel of one mast (the
-# cutter's and the smack's), or nothing where she works no braces; {braced}: "braced sharp up",
-# or "trimmed" where she works none (package 90, A2's second pass: `scripts.head_word` and
-# `scripts.braces_worked`, `BoxOffScript.words`; "Stand by the head braces." and "braced sharp
-# up" whatever her rig and her sails before it)
+# {stand_by}: the braces of the yards to be braced abox (the action's head list), named by their
+# class as built: " Stand by the head braces.", " Stand by the after braces." where they are
+# after yards (a brig with her fore gone, her main's), " Stand by the braces." on a vessel of one
+# mast (the cutter's and the smack's), or nothing where she works no braces; {braced}: "braced
+# sharp up", or "trimmed" where she works none (package 90, A2's second pass: `scripts.told_of`,
+# `scripts.class_word` and `scripts.braces_worked`, `BoxOffScript.words`; "Stand by the head
+# braces." and "braced sharp up" whatever her rig, her masts and her sails before it)
 on_start: {log: "Box her off!{stand_by}"}
 on_complete: {log: "Boxed her off; {braced} on the {tack} tack, full and by.", kind: ship.boxed_off, severity: notable}
 on_fail: {log: "Could not box her off: {reason}.", kind: evolution.failed, severity: notable}
