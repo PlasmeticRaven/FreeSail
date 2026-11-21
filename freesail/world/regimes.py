@@ -257,11 +257,12 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
     ports = getattr(world, "dealings", None)
     own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
     if pos is not None and own and nations.at_war(own, nation):
-        from freesail.world.service import KINGS, service_of
+        from freesail.world.service import kings_force
 
         # a blockade is a public force's: a King's ship by her papers, her role or her
-        # wardroom (`service_of`; package 121), never a privateer or a merchantman by papers
-        if service_of(world) == KINGS and _in_the_offing(world, port, pos, within_nm):
+        # wardroom (`service_of`; package 121), never a privateer or a merchantman by papers,
+        # nor a prize under her prize-master
+        if kings_force(world) and _in_the_offing(world, port, pos, within_nm):
             return True
     return False
 
