@@ -381,6 +381,34 @@ def test_her_companies_ten_and_thirty_four_the_trader_french_the_guarda_costa_sp
     assert (trader_stations, guard_stations) == (8, 32)
 
 
+def test_her_trader_is_watched_three_able_seamen_a_side_the_boy_to_the_starboard():
+    """The lead's nudge 41, point 3: her complement's words say what her bill draws, for a player
+    reads the muster. Her design's §6.1 has six able seamen, three a watch, in watches of three
+    seamen, four with the boy. Her stations four and three: the muster watches the forecastle's
+    four two a side and the afterguard's two able seamen one a side, its odd hand, the boy, to the
+    starboard (freesail/crew/muster.py, rule 3); and her file's words say so. Old (8998c08): the
+    forecastle three and the afterguard four, watched four able seamen to the starboard and two
+    with the boy to the larboard, under words of "two watches of three"."""
+    import random
+
+    from freesail.crew.model import Rating, Watch
+    from freesail.crew.muster import muster
+
+    spec = load_spec(HER).crew
+    stations = {st: n for st, n in spec.stations.items() if n}
+    assert stations == {"forecastle": 4, "afterguard": 3, "idlers": 1}
+    crew = muster(spec, random.Random(7))
+    able = [
+        len([s for s in crew.sailors if s.watch is watch and s.rating is Rating.ABLE])
+        for watch in (Watch.STARBOARD, Watch.LARBOARD)
+    ]
+    assert able == [3, 3]
+    boys = [(s.station.value, s.watch) for s in crew.sailors if s.rating is Rating.ORDINARY]
+    assert boys == [("afterguard", Watch.STARBOARD)]
+    words = (ROOT / HER).read_text(encoding="utf-8")
+    assert "six able seamen in two watches of three, a boy in the starboard watch, and a" in words
+
+
 @pytest.mark.parametrize(
     ("path", "nation", "names"), [(HER, "france", "french"), (GUARD, "spain", "spanish")]
 )
@@ -524,8 +552,10 @@ def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_calle
     7-689 are T-1 to T-9's, each written or waiting. The trader off the Lizard by night
     (tests/test_hands.py's trader at seed 7, 02:00). Her ten: the master and the mate head the
     larboard and the starboard watch; six able seamen and the boy are in the watches; the cook is
-    an idler. The bill draws four able seamen to the starboard, and two and the boy to the
-    larboard (her design's §6.1: watches of three seamen, four with the boy).
+    an idler. With her stations four and three (the lead's nudge 41, point 3), the bill draws three
+    able seamen and the boy to the starboard, and three able seamen to the larboard: her design's
+    §6.1, watches of three seamen, four with the boy. (Filed three and four before, it drew four
+    able seamen to the starboard, and two and the boy to the larboard: the same counts.)
 
     Heaving to and filling away want twelve by their files; the company's clamp gives her eight,
     and as manoeuvres they take no post. Each calls all hands where the watch on deck is under

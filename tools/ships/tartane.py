@@ -1491,10 +1491,16 @@ def groups_and_aliases(b) -> None:
 # boy (mousse), ordinary, and a cook. The coastguard, thirty-four (§6.3; JUDGEMENT, inside the
 # Spanish místicos' 23 to 72, Winfield et al. 2023 pp. 1195-1201): the trader's ten for the sail
 # and three a gun for Chapman's eight 4-pounders, her master (her commander) and a mate as posts.
+# The trader's stations four and three (JUDGEMENT; the lead's nudge 41, point 3): the muster
+# watches each station's hands alternately, the odd hands of odd stations by turns, the first to
+# the starboard (freesail/crew/muster.py, rule 3). So her forecastle's four able seamen go two a
+# watch, and her afterguard's two able seamen one a watch, its odd hand, the boy, to the
+# starboard: three able seamen a watch, as Tar-D §6.1 has them. Filed three and four before, she
+# was watched four able seamen to the starboard and two with the boy to the larboard.
 COMPANY = {
     TRADER: {
         "complement": 10,
-        "stations": {"forecastle": 3, "afterguard": 4, "idlers": 1},
+        "stations": {"forecastle": 4, "afterguard": 3, "idlers": 1},
         "ratings": {"able": 0.86, "ordinary": 0.14, "landsman": 0.0},
         "idlers": {"cook": 1},
         "water_tons": 3,
@@ -1533,6 +1539,15 @@ STATION_WORDS = {
     "waisters": "Waisters, the guns' crews beyond the sail's hands",
     "idlers": "Idlers: the trades below",
 }
+# What the muster makes of the trader's stations, said beside them (the lead's nudge 41, point 3):
+# a player reads the muster, and her words say what her bill draws.
+STATION_BILL_WORDS = {
+    TRADER: {
+        "afterguard": " The muster watches the forecastle's four two a side and the afterguard's "
+        "two able seamen one a side, its odd hand, the boy, to the starboard: three able seamen a "
+        "watch (Tar-D §6.1).",
+    },
+}
 # Her burthen for the house's rules of tackle and hold (Tar-D §11): Forfait's 100 tonneaux taken
 # as tons (JUDGEMENT: the tonneau de mer of 2,000 livres is about the long ton).
 BURTHEN_TONS = float(HUMBLE["tonneaux"])
@@ -1552,7 +1567,8 @@ def company(b, role: str) -> None:
         )
     complement_words = {
         TRADER: "Ten (Tar-D decision 15, §6.1): the master (patron) and the mate (second), six "
-        "able seamen in two watches of three, a boy and a cook. JUDGEMENT within eight to twelve: "
+        "able seamen in two watches of three, a boy in the starboard watch, and a cook. JUDGEMENT "
+        "within eight to twelve: "
         "Winfield's tartanas give no men (Winfield et al. 2023 pp. 1252-1253; VR-Sp §9), the prize "
         "papers the route; ten by the owner's word on what is not found.",
         COASTGUARD: "Thirty-four (Tar-D §6.3): three a gun for Chapman's eight 4-pounders "
@@ -1566,7 +1582,7 @@ def company(b, role: str) -> None:
         (("names",), NAMES_LIST[role], NAMES_LIST_WORDS[role]),
     ]
     for st, n in c["stations"].items():
-        words = STATION_WORDS[st] + f": {n}."
+        words = STATION_WORDS[st] + f": {n}." + STATION_BILL_WORDS.get(role, {}).get(st, "")
         entries.append((("stations", st), n, words))
     entries += [
         (

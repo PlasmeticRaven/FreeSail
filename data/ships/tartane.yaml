@@ -620,15 +620,15 @@ ground_tackle:
     cable_in: 5.5
     cable_kn: 46.9
 crew:
-  # Ten (Tar-D decision 15, §6.1): the master (patron) and the mate (second), six able seamen in two watches of three, a boy and a cook. JUDGEMENT within eight to twelve: Winfield's tartanas give no men (Winfield et al. 2023 pp. 1252-1253; VR-Sp §9), the prize papers the route; ten by the owner's word on what is not found.
+  # Ten (Tar-D decision 15, §6.1): the master (patron) and the mate (second), six able seamen in two watches of three, a boy in the starboard watch, and a cook. JUDGEMENT within eight to twelve: Winfield's tartanas give no men (Winfield et al. 2023 pp. 1252-1253; VR-Sp §9), the prize papers the route; ten by the owner's word on what is not found.
   complement: 10
   # Her people's names from the french list in data/crew/names.yaml (Tar-D §6.4, the lead's nudge 38), which reads her as France's where a scenario gives no nation (world/nations.py); a scenario names her nation and her people as it will.
   names: french
   stations:
-    # Hands per station, both watches together (Tar-D §6; JUDGEMENT): she has no tops, and her hands work aloft from the deck stations, as the cutter's. Forecastlemen, for the jib, the anchors and the great lateen's car and ourses: 3.
-    forecastle: 3
-    # Afterguard, at the lateens' sheets, the mizen and the helm: 4.
-    afterguard: 4
+    # Hands per station, both watches together (Tar-D §6; JUDGEMENT): she has no tops, and her hands work aloft from the deck stations, as the cutter's. Forecastlemen, for the jib, the anchors and the great lateen's car and ourses: 4.
+    forecastle: 4
+    # Afterguard, at the lateens' sheets, the mizen and the helm: 3. The muster watches the forecastle's four two a side and the afterguard's two able seamen one a side, its odd hand, the boy, to the starboard: three able seamen a watch (Tar-D §6.1).
+    afterguard: 3
     # Idlers: the trades below: 1.
     idlers: 1
   ratings:
