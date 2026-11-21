@@ -210,7 +210,7 @@ said in its note.
 | Depth in the hold | 10 ft 0 in, 3.05 m | A, the same | stand-in |
 | Burthen | 388 40/94 tons (the Navy's rule, checked: 78.5 × 30.5 × 15.25 / 94 = 388.4) | A, the same | — |
 | `length_waterline_m` | **28.5 m** to start; measured at step 1 | C, JUDGEMENT (the beak and the stern platform overhang her water: Falconer) | judged until measured |
-| `draught_m` | **3.0 m** to start; measured at step 1 | C, JUDGEMENT ("shallow draught", Winfield; Chapman's 9⅔ Swedish ft on a hull a third longer) | judged until measured |
+| `draught_m` | **3.0 m** to start; measured at step 1 | C, JUDGEMENT ("shallow draught", Winfield; Chapman's 9⅔ Swedish ft on a hull a third longer). **2026-11-20:** that 9⅔ ft is probably an after draught too, as the tartane's 6⅔ ft proved on her plate (`ships-design/pages-tartane.md` §4.2, §8); to be measured on Pl. LVIII No. 17 at her own step 1 (the lead's ruling, nudge 29) | judged until measured |
 | `displacement_kg` | about **330 t** (Cb 0.42 on the figures above) | C, JUDGEMENT by the brig file's methods ("a narrow floor", Falconer) | judged |
 | `gm_m` | about **1.0 m** ("a great breadth ... without danger of overturning", Falconer) | C, JUDGEMENT | judged |
 | `deck_height_m` | about **1.2 m** ("usually very low-built", Falconer) | C, measured at step 1 | judged until measured |

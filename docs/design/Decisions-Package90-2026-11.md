@@ -306,7 +306,7 @@ it and not crossed in plain sail (Tar-D decision 9).
   before the wind, or when it blows too hard for the lateen, and never in plain sail.
 
 **In play:** a beamy coaster about a quarter longer than the cutter on deck (a third longer on the
-water), whose lateen yard (24 m) is longer than her hull. She has one big jib: your decision 11
+water, as first drafted; **2026-11-20:** a fifth longer, by her measured waterline of 18.47 m), whose lateen yard (24 m) is longer than her hull. She has one big jib: your decision 11
 leaves her headsails to judgement, and Lescallier, Steel and Röding give her one (the images
 README and the lead's Spanish note read two in your watercolour; that reading is recorded, and your
 eye may overrule the judgement). Before a gale she sets her square sail.
