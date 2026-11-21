@@ -467,3 +467,118 @@ the same outcome: the byte test and the golden classing table (`tests/test_ship_
    while a manoeuvre ("hove to") is in hand: the hove-to watch's forced round (A1b) shifts them.
 
 Stopped after A1c, as briefed: waiting for the coordinating session's message.
+
+## Step A1d: a whole lateen aback, and on the bad hand, in a breeze (2026-11-20)
+
+**Merged first:** nothing new. The package branch's A2 mended hash had not landed when A1d was
+built (the coordinating session's word: merge it when it is said to have landed); the branch
+stands on 686557d (the package branch at 033f42b7) and A1c. The base of every comparison here is
+A1c, **0c98ff8** (a worktree; `be2c90f` above it adds the report alone).
+
+**Commit:** **8dce637** on `…/pkg-90-engine` (parent be2c90f), one commit, merged alone.
+
+**Files** (each in the engine track's §7.1 row for A1d, or A1b's places):
+- `freesail/physics/sails.py`: `LATEEN_ABACK_LOAD`, `LATEEN_BAD_HAND_LOAD` beside
+  `LUG_AGAINST_MAST_AREA`; `_carried_over_abaft_the_beam` in `_read_rig`; `lateen_load_factor` in
+  `_apply_loads`, on the spars alone;
+- `freesail/evolutions/trim.py`: `keeps_its_side`; `read_sheet`'s cloth on its yard's side;
+  `set_sheet_angle` keeping a whole lateen's drawn side, the lee included;
+- `freesail/evolutions/scripts.py` (A1b's places): the draw at "let go and haul"
+  (`TackScript._draw_lateens_over`), the hang's eased mizen, the wear's "wind aft"
+  (`WearScript._lateens_over`), `ease_off_sheets`' side, the take-in's test
+  (`lateen_aback`, `lateen_take_in_waits`) and their words;
+- `freesail/evolutions/runner.py`: the take-in's wait, at the start and in `_start_waiting`;
+- `freesail/orders/navigation.py`: the bow watch's words for a lateen held aback;
+- `tests/test_lateen_whole.py`: A1d's part, and A1a's bow line moved;
+  `tests/test_known_truths.py`: truths 7-670, 7-671 and 7-672;
+- `docs/dev/TuningNotes.md`: "Package 90, A1d".
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class added
+(functions and constants only), so truth 7-606 and the checkpoint's list are not touched.
+`physics/strain.py` is not touched. LF; ruff check and format clean; no Python line over 100.
+Nothing under `docs/agents/consent/`.
+
+### What was built
+
+TuningNotes has each piece with its words. **The rule**: a whole lateen's cloth lies on its
+yard's side, kept by its mast, and its sheet keeps the side it is drawn to; the wind come round
+ahead onto that side holds it aback against its mast (the plate `_plate_force` makes, unchanged);
+in the luffing band it shakes as before; with the wind abaft the beam on it the cloth goes over to
+leeward, the bad hand. **The strain**: its pull on its yard and its mast (and any spar beneath)
+times 2.5 held aback and 2.5 on the bad hand, its cloth and lines the plain pull; the strain model
+as it is. **The evolution's part**: every lateen drawn over to the new lee at "let go and haul"
+and at "wind aft", those left said; the aftermost eased in stays and in the wear as A1b eases it;
+the bow's line "aback against the mast"; a take-in of a lateen aback over 22 kn waits till it
+fills or is drawn over.
+
+### Measured
+
+- **The bands** (truths 7-670 to 7-672; the probes' lateen yards and masts rated by the
+  generator's rule, the design's figures to the decimal): taken aback by a shift, the tartane's
+  great yard 0.94 of its rating in 28 kn, 1.26 in 31, 1.46 in 34, 1.71 in 37, so it **strains from
+  about 29 kn and may carry away from about 34½** (the polacre's fore yard 30 and 36½); her main
+  mast, carrying more, from about 40. On the bad hand the polacre's fore yard 0.95 in 42 kn, 1.37
+  in 46, 1.59 in 50: **from about 42½ and 48½**. The rules captain's board on the bad hand in 12
+  kn for 1,800 s: the yards at 0.08 to 0.12 of their ratings, **under a fifth**, no condition lost.
+  The lead's figures (28 and 35; 40 and 49) stand.
+- **The probes' going about** in 15 and 25 kn, old (A1c) beside new: **−34 to +18 m**. The tack
+  and the wear with the yards changed (A1b's figures) within 2 per cent but for the polacre's
+  25-kn tack, +17.5 m, 5 per cent: her fore lateen stands aback 28 s across the main yard's swing,
+  paying her head off, as the design means it to. With the lateens left the wear loses 5 to 20 m
+  the less (its left lateens now drawn for the wind she comes to at "wind aft") and the polacre's
+  25-kn tack 34 m the less (the design's own case, 76 m). The table is TuningNotes'. No "taken
+  aback" line is said in any run.
+- **The eighteen files**: A2's harness at 0c98ff8 and at 8dce637: **270 runs, every tick, kind,
+  trace and line the same** (the two files byte for byte).
+
+### Moved, old beside new, with reason
+
+1. `tests/test_lateen_whole.py::test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through_the_bow`
+   (A1a's own): "... the foresail and the mizen and the mainsail lie on their masts; shift them
+   when you will." -> "... are aback against their masts; shift them when you will.", the
+   design's words (§2.4.3a) for the lateens A1d holds aback there.
+
+`tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are.
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is A1c, 0c98ff8** (its fast tier's junit, run
+for A1c's report on the same code as `be2c90f`).
+
+| Run | Base (0c98ff8) | A1d (8dce637) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,627: 8,618 passed, 8 skipped, 1 xfailed, 0 failed (1 h 15 min) | 8,638: 8,629 passed, 8 skipped, 1 xfailed, 0 failed (1 h 16 min). **Test by test: every one of the base's 8,627 the same outcome; 11 new, all passed** (eight of `tests/test_lateen_whole.py`, truths 7-670 to 7-672) |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (a new rule of force in `physics/sails.py`, so the tier whole and not the touched files' alone) | | 568: 557 passed, 11 xfailed, 0 failed (1 h 26 min). The same 568 cases as A2's slow tier (`a2`'s run on its own tree) and the same eleven xfailed; A2's five failures there (its four digests, moved since, and the browser's flake) pass |
+| **The guard and physics files with their slow cases**, `--slow`: `test_strain`, `test_lateen`, `test_settee`, `test_lug`, `test_sails`, `test_trim_order`, `test_evolutions`, `test_staying`, `test_lying_to`, `test_gale`, `test_rig_geometry`, `test_catalogue`, `test_captains`, `test_captain_trials`, `test_rig_words`, `test_held_work`, truth 7b-111 | | 590 passed, 1 xfailed (16 min), on the tree as committed |
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, base beside new, every case
+the same outcome: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py`
+74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed at both.
+`tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`.
+
+### Unsure, and for the lead
+
+1. **The change in stays begins where A1b put it**, at the head yards' swing's end, "changed
+   last, as the settee"; the design's §2.4.3a has it begin at "let go and haul". So that no lateen
+   stands aback through the swing, every lateen still set is drawn over at "let go and haul" and
+   the one to be changed fills on the bad hand until its change begins. On the probes the swing
+   is short or none; on a hull with long head yards it is the swing's seconds on the bad hand.
+2. **The aftermost lateen in the wear** is eased at "up helm" and hauled aft only as she comes to
+   steady (A1b); at "wind aft" A1d takes it over to the new lee still eased. Drawn there at once,
+   as the first draft did, the wear with the lateens left lost 53 to 132 m less than A1c: a change
+   of A1b's act, not the rule's, so not built.
+3. **The tartane probe on the bad hand from 34 kn**, and in a 12-kn wind's top gust of 15.6 kn,
+   luffs and is taken aback by her own lateens, so her figures there are aback's; the bad hand's
+   band is the polacre's. Her own file measures her (Tar-D T-9).
+4. **The take-in's wait** is the runner's (no step of an evolution file can wait, and
+   `registry.py` is not in my row): a take-in of a whole lateen held aback over 22 kn waits at its
+   start and when its turn comes; its words are said once, at the order.
+5. **Truths 7-670 to 7-672** take about 3 s each (the probes tick at about a millisecond), so they
+   stand in the fast tier.
+
+Stopped after A1d, as briefed: waiting for the coordinating session's message.
