@@ -826,7 +826,7 @@ on this tree in the session's scratch, not committed, reads the same: `main.treo
 lead's to rule, not changed.
 The case pins each row's levels, courses and topsails and her topsail's pole (five rows with the
 tie's two below, passed; 56 passed with `tests/test_pole_mast.py`, `--slow`); the tréou's own pole, the last column, is the scratch
-measure's (`treou/probe.py`). Once both are on `claude/pkg-90`, the coordinating session checks the
+measure's (`treou/probe.py`). Once both are on `…/pkg-90`, the coordinating session checks the
 same on her file.
 
 **For the lead** (the third row; not built, the clause being ruled): the tréou's yard is the
@@ -852,3 +852,201 @@ then being her great lateen's (measured on the probe, `treou/takein.py` in the s
    it (`tests/test_yard_level.py`).
 3. **The pole's times** are JUDGEMENT (no period time found): the brig's clew-up less its settling
    on the cap for the take-in, the square sail's furl less the climb for the furl.
+
+## Steps A5 and A6 as ruled (nudge 39): the tréou her course, the pole's words at the hounds, the cast under her plain sail (2026-11-21)
+
+**Their own hash, for the gate** (the lead's ruling 4): branch **`…/pkg-90-a56`**, cut from
+**effbaed** (A5 and A6 as first built), A4 not in it. Its code is **e83f9e7**; the commit above it
+adds this section alone. Brought across from `…/pkg-90-engine` by cherry-pick, in order:
+58b28ab (this report's A5 and A6 section) as ca9d96b, 109ee87 (the tréou case) as e37fd53,
+ca72113 (the section for the lead's reader) as 4aac105, c6018aa (the tie pinned) as ea24aa1,
+da88dae (its report) as fcfc97a; then e83f9e7, the three rulings built. **Merged first:**
+nothing new (A2's mended hash has not been said to have landed). **The base** of every
+comparison is A1d, **8dce637**, as for A5 and A6's first section; where said, effbaed.
+
+**Files** (each in the engine track's §7.1 row):
+- `freesail/ship/graph.py`: the clause narrowed in `_find_yard_levels`; `_square_foot_m`;
+- `freesail/evolutions/scripts.py`: `_plain_sail_topsails`, read at the cast's two places
+  (`GetUnderWayScript._begin_loose` and its `loose` phase); `pole_words` and its two tables,
+  `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`;
+- `freesail/evolutions/runner.py`: the pole's words filled for `take_in_pole` and `furl_pole`;
+- `data/evolutions/take_in_pole.yaml`, `data/evolutions/furl_pole.yaml`: their log lines' words in
+  braces (`{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}`, `{pole_furled_on}`), and a
+  sentence of the served notes for the hounds;
+- `tests/test_yard_level.py` (the tréou case restated, the clause's narrowing, the pole's words
+  by her case); `tests/test_pole_mast.py` (the smack's cast); `docs/dev/TuningNotes.md`, "Package
+  90, A5 and A6" restated as ruled.
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class added
+(functions, constants and a function inside one), so truth 7-606 and the checkpoint's list are not
+touched. No key written into a committed file: stage 0's `KEY_CARRIERS` does not move. LF; ruff
+check and format clean; no Python line over 100. Nothing under `docs/agents/consent/`.
+
+### The three rulings, built
+
+1. **The tréou is her course, wherever its yard crosses.** The clause is narrowed as ruled: a
+   square sail is a topsail by the lateen's yard below it only where it is set over the lateen,
+   its foot clear above the lateen's yard, and not where its foot comes down past that yard toward
+   the deck. The foot is read from the cut as her file gives it, its head on its yard and its
+   centre (`centre_height_m`) midway between head and foot: twice the centre less the yard's
+   height (`graph._square_foot_m`). The yard below the square yard, and its sail a whole lateen on
+   the same mast, are as before. A bare yard, with no sail to be set over the lateen, is not
+   raised by it. **JUDGEMENT** on the foot: exact for a sail cut square; for a topsail cut wider
+   at its foot its centre lies lower than midway, so the foot is read lower than it is and the
+   clause errs toward the course. On her file the margin is 1.11 m: her topsail's foot 9.42 m,
+   the great lateen's yard 8.31 m.
+2. **The pole's words where the yard below is not a square yard.** `take_in_pole` and
+   `furl_pole` take their words from the yard below (`scripts.pole_words`). Where a braced yard
+   is crossed below the pole sail on its mast, the words are as before (the smack's, unchanged):
+   "Lowered the topsail down onto the yard below and clewed it up there.", "Took in the topsail;
+   lowered on the yard below, hanging in the gear.", "Lay out on the yard below and furl the
+   topsail.", "Furled the topsail on the yard below.". Where none is, the pole's own: "Lowered the
+   topsail down to the hounds and clewed it up there.", "Took in the topsail; lowered to the
+   hounds, hanging in the gear.", "Lay aloft to the hounds and furl the topsail.", "Furled the
+   topsail on its own yard, lowered to the hounds.". A yard whose sail is set flying and furled is
+   not crossed: package 57's flying sail is sent down on deck with its yard, as her file's tréou
+   is (`flying: true`) in her plain sail. So her topsail takes the hounds' words in her plain
+   sail, and the yard below's words with her tréou set. The served notes say both. The times as
+   before: **JUDGEMENT**, 60 s to lower and clew up and a 120-s furl (no period time found).
+3. **Getting under way makes her plain sail.** The cast looses and sets the topsails of her plain
+   sail alone (`scripts._plain_sail_topsails`), ruled by the plain sail and not by the vessel. A
+   file with no plain sail group would have every topsail, as before; every committed file has
+   one. Of the eighteen files the smack's topsail alone is not of her plain sail: every other
+   file's topsails are (measured, each file's `_topsails` against its `plain sail`).
+
+### Measured
+
+- **A2's harness** (the going about and its kin, 270 runs; `a2/harness_v2.py` in the session's
+  scratch) at 8dce637 and at e83f9e7: **269 the same in every tick, kind, trace and line.** The
+  one that moves is the smack's `lie_a_try`, in its refusal's words alone: "She has no topsail to
+  lie a-try under." -> "The topsail is not set; set it to lie a-try under it.". Her trace is the
+  same. So **the cutter, every ship and the other files do not move by a line or a tick**:
+  `cutter`'s fifteen runs, `seventy-four`'s, `frigate-36`'s and every other file's, all the same.
+  Against A5 and A6 as first built (effbaed), the two that move back are the smack's `anchor` and
+  `shoal_anchor`.
+- **The smack's two anchor runs against the trunk** (f264f89, its harness run in a scratch
+  worktree for the smack and the cutter): `anchor` and `shoal_anchor` the same as the trunk's,
+  line for line and tick for tick, for both. She casts under her mainsail and her jib, her
+  topsail furled throughout ("Under way on the starboard tack, under the mainsail and the jib;
+  ...", +3,434 s in `shoal_anchor`). The two hulls' other runs that differ from the trunk differ
+  in the same lines at A1d, the base: A2's going-about words ("Hands to the after braces; heave
+  to." where the trunk has "head braces", the after yards' clauses), every tick and trace the
+  same.
+- **Every order of the smack's table** (`a5/play.py`, the first section's measure, at 8dce637,
+  effbaed and e83f9e7). Everything listed there stands, being her topsail read as a topsail when
+  the player has set it, but the cast:
+
+  | Order, her topsail set over plain sail | At e83f9e7, as ruled |
+  |---|---|
+  | `heave to` | as first built: "...; braced the topsail aback; helm a-lee."; "Hove to on the starboard tack, topsail to the mast, helm a-lee." at +202 s; 50.5° off at 2.87 kn at +600 s (A1d: "Hauled up the courses.", under her fore-and-aft canvas, 47.3° off at 2.61 kn) |
+  | `lie a-try` | as first built: lying a-try under the topsail and the foresail at +348 s in 15 kn and at +808 s in 30 kn (A1d: refused, "She has no topsail to lie a-try under.") |
+  | `back and fill` | as first built: "Backed the topsail; her way checked." and "Filled the topsail; she forereaches." (A1d: "Hauled up the topsail." and "Backed the square sail ...") |
+  | `take in the topsail`, `clew up the topsail` | as first built, the pole's way, in the yard below's words: 88 s from the start line (A1d: clewed up as a course, 154 s). **JUDGEMENT** |
+  | `lower the topsail` | as first built: obeyed (A1d: refused, "A course is hauled up, not lowered; ...") |
+  | `haul up the topsail` | as first built: refused, "A topsail or light sail on a pole mast is lowered, not hauled up; say 'lower the topsail' or 'take in the topsail'." (A1d: obeyed) |
+  | `furl the topsail` | as first built, from the yard below: 300 s from the start line (A1d: "Lay aloft and furl the topsail.", 350 s). **JUDGEMENT** |
+  | `take in all sail` | as first built: the topsail as take in; the jib, last, at +350 s (A1d: +412 s) |
+  | `strike the topmasts` (and `send down the topgallant masts`, `fid the topmast`) | as first built: "... her masts are the main mast (a pole, the mast and topmast in one stick)." (A1d: "... her masts are the main mast.") |
+  | **`get under way`** (Carrick Road, her topsail furled by `come to an anchor`) | **as A1d, line for line and tick for tick**: the topsail furled through the cast (first built: loosed and set, she paid off 2 s sooner and lay at +1,500 s 136.2° at 3.78 kn against 125.3° at 4.19 kn) |
+  | `tack ship`, `wear ship`, `box haul`, `scud`, `shorten sail`, `set the topsail`, `trim sails`, `square the yards`, `brace sharp up on the larboard tack`, `come to an anchor` | as A1d, line for line and tick for tick |
+
+  With her topsail never set, a player meets two changes: `lie a-try`'s refusal in other words,
+  and the topmasts' orders naming the pole.
+- **`lie a-try` on the trunk's cutter** (f264f89; `a56m/try.py`, settled as the harness's at-sea
+  start, seed 7, the wind from 0°, her head 292.5°, plain sail braced sharp up on the starboard
+  tack and trimmed, 2,400 s). Her plain sail sets her topsail. She is brought to: "All hands!
+  Shorten sail and bring her to under the topsail.", then "Lying a-try under the topsail and the
+  foresail, helm a-lee." at +296 s in 15 kn (36.5° off at 1.30 kn at +1,800 s) and at +420 s in
+  30 kn (41.6° off at 1.72 kn). With her topsail furled first she is refused: "The topsail is not
+  set; set it, close-reefed, to lie a-try under it.". **The smack follows the cutter, no
+  further.** Her topsail set, the same order brings her to in the same words: lying a-try at
+  +298 s in 15 kn (43.1° off at 0.97 kn) and at +546 s in 30 kn (49.4° off at 3.68 kn). Her
+  topsail not set, as in her plain sail, she is refused in the cutter's words less "close-reefed"
+  ("The topsail is not set; set it to lie a-try under it."), her topsail having no reef bands.
+  The head's cutter is the trunk's in every line, tick and figure here. Whether a one-masted
+  vessel lies a-try under a square topsail at all is the lead's look at the heavy-weather book,
+  not settled here.
+- **The tréou** (`tests/test_yard_level.py`, the tartane probe with her pole main; her own file is
+  not on this branch). Each sail's cut moves with its yard (the cutter's cut), or her file's cut
+  is given (her topsail's centre 12.6 m, its foot 9.42 m; her tréou's centre 5.8 m, its foot
+  3.29 m):
+
+  | The tréou's yard | Her topsail's level | The tréou's level | The courses; the topsails |
+  |---|---|---|---|
+  | not filed, at the probe's heights (the great lateen's yard 10 m, the topsail's 15.6 m, its foot 12.0 m) | 1, set over the lateen | none | none; the topsail |
+  | not filed, at her file's heights and cut (8.31 m; 15.78 m, foot 9.42 m) | 1, set over the lateen | none | none; the topsail |
+  | crossed at 8 m, below the great lateen's yard | 1 | **0, the course** | the tréou; the topsail |
+  | crossed at **13 m**, above it (its foot 7.4 m) | 1 | **0, the course** (first ruled: 1) | the tréou; the topsail |
+  | crossed at **8.31 m, with the great lateen's yard (the tie)**, her file's heights and cuts, filed after it as her file has it | 1 | **0, the course** | the tréou; the topsail |
+  | the same, the tréou's yard filed before the great lateen's | 1 | **0, the course** | the tréou; the topsail |
+
+  **The answer hangs on the sail's cut, not on the two yards' heights**: the clause compares the
+  sail's foot with the lateen's yard, and the file's order breaks ties between braced yards
+  alone. Beside it, the narrowing itself on the probe's topsail, its yard at 15.5 m with no
+  braced yard below: cut down to near the deck (its foot 1.0 m), the course; its foot at the
+  great lateen's yard's own height (10.0 m), the course, not clear above it; its foot at
+  10.25 m, a topsail. The heights are exact in binary, so the tie is a tie. Her own file, read
+  on this tree in the session's scratch and not committed: `main.topsail.yard` 1,
+  `main.treou.yard` 0, the courses the tréou, her main a pole.
+- **The pole's words, her case** (`tests/test_yard_level.py`, the probe at her file's heights and
+  cuts, seed 7, 15 kn, plain sail set, then `take in the topsail` and `furl the topsail`). With no
+  tréou's yard filed, and with her tréou set flying and furled as her file has it, the hounds'
+  words. With the tréou's yard crossed (the cutter's square sail, not set flying), the yard
+  below's. The smack's words are the yard below's, as `tests/test_pole_mast.py` pins them.
+
+### Moved, old beside new, with reason
+
+1. `tests/test_yard_level.py::test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or_not[above]`:
+   the tréou's yard crossed at 13 m, its level **1 -> 0** (ruling 1). Its topsails were the
+   topsail and the tréou, and are now the topsail alone; its courses were none, and are now the
+   tréou. The case's probe moves each sail's cut with its yard (`_cut_moved`). Before, the sails'
+   centres stayed where the cutter files them as their yards moved: the topsail's centre stood
+   19.5 m high over its yard at 15.6 m.
+2. The same case's two tie rows (c6018aa), **0 -> 0**, now by the cut and not by the clause
+   counting a lateen yard strictly below. They now take her file's cuts.
+3. `tests/test_yard_level.py::test_a_square_yard_over_a_whole_lateen_counts_the_lateen_yard_below_it`:
+   its probe's topsail cut moved with its yard (its foot 12.0 m); every assertion as it was.
+
+New: `tests/test_yard_level.py`'s `her-file-not-crossed` row,
+`test_a_square_sail_whose_foot_comes_below_the_lateens_yard_is_the_course` and
+`test_the_tartanes_topsail_on_her_pole_comes_down_to_the_hounds_where_no_yard_is_below` (three
+rows); `tests/test_pole_mast.py::test_the_smack_gets_under_way_under_her_plain_sail_her_topsail_left_furled`.
+No other pin moves (the tiers).
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is A1d, 8dce637** (its two tiers' junits, run
+for A1d's report), test by test.
+
+| Run | Base (8dce637) | A5-A6 as ruled (e83f9e7) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,638: 8,629 passed, 8 skipped, 1 xfailed, 0 failed (1 h 16 min) | 8,700: 8,691 passed, 8 skipped, 1 xfailed, 0 failed (1 h 23 min). **Test by test: every one of the base's 8,638 the same outcome; 62 new, all passed** (28 of `tests/test_pole_mast.py`, 34 of `tests/test_yard_level.py`); the moved pins' cases passed. Against effbaed's fast tier: every one of its 8,689 the same outcome, 11 new |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (the level read in `physics/sails.py` and the trim's, and the cast, so the tier whole) | 568: 557 passed, 11 xfailed, 0 failed (1 h 26 min) | 568: 557 passed, 11 xfailed, 0 failed (1 h 28 min). **Test by test: every one of the base's 568 the same outcome**, none new |
+| **The lens with its slow cases**, `--slow`, `-n 3`: A5 and A6's lens (their first section) and `test_anchor`, `test_neufchatel`, `test_ships` | | 1,833 passed, 2 xfailed (10 min), on the tree as committed |
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, base beside new, every case
+the same outcome: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py`
+74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
+`tests/test_lateen_whole.py` 90; all passed at both.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`.
+
+### Unsure, and for the lead
+
+1. **The foot read from the centre** (JUDGEMENT, above): a builder who files a square sail's
+   centre by its area, for a topsail cut wider below, gives a foot lower than its cut's. The
+   clause then reads it the course sooner. Her file's margin is 1.11 m. The polacre's mizen
+   topsail, over her lateen mizen, is the other sail the clause is for. Her file is not on this
+   branch: the polacre's builder reads its foot against her mizen's lateen yard.
+2. **The pole's words read the yard below as it is, crossed or sent down**, at the line's own
+   tick. The level of each yard is read from the parts as filed, so the tréou's level and her
+   topsail's do not hang on whether the tréou is set (ruling 1).
+3. **The earlier sections' words on the cast** (A5 and A6's "Measured" item 2, "Unsure" item 1,
+   and the lead's reader's item 1 and its `get under way` row) describe A5 and A6 as first built,
+   effbaed. They stand as the record of that hash. This section supersedes them for the gate.
+
+Stopped after A5 and A6 as ruled, as briefed: A4's section follows on `…/pkg-90-engine`, on this
+tree merged.

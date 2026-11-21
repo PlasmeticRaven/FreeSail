@@ -43,6 +43,13 @@ _YARD_LEVELS: weakref.WeakKeyDictionary[Ship, dict[str, int]] = weakref.WeakKeyD
 YARD_LEVEL_SPARS = ("mast", "topmast", "topgallant_mast", "royal_mast")
 
 
+def _square_foot_m(yard: Spar, sail: Sail) -> float:
+    """A square sail's foot as her file cuts it, at the heights her file gives: its head on its
+    yard and its centre (`centre_height_m`, the centre of its cut) midway between head and foot,
+    so the foot is the centre's height less its depth below the yard (package 90, nudge 39)."""
+    return 2.0 * sail.centre_height_m - yard.height_m
+
+
 class Ship:
     def __init__(self, spec: ShipSpec, fit: str | None = None):
         self.spec = spec
@@ -269,9 +276,12 @@ class Ship:
         so that on a pole mast, the mast and topmast in one stick, the topsail yard crossing the
         mast's own head over the lower yard is a topsail and not a course (the smack's, the
         polacre's main). A square yard on a lower mast with no braced yard below it and a whole
-        lateen's yard below it there counts that yard as its level below (JUDGEMENT, the lead's
-        lean ruled, Plan §13.1 item 2: the tartane's topsail over her great lateen, the
-        polacre's mizen topsail over her lateen mizen). On every file with one yard to a spar
+        lateen's yard below it there counts that yard as its level below where its sail is set
+        over the lateen, the sail's foot clear above the lateen's yard (JUDGEMENT, the lead's lean
+        ruled, Plan §13.1 item 2, and narrowed so, nudge 39: the tartane's topsail over her great
+        lateen, the polacre's mizen topsail over her lateen mizen); a square sail whose foot comes
+        down below the lateen's yard is the course, wherever its yard crosses (the tartane's
+        tréou). On every file with one yard to a spar
         it is the spar's level, as it always was. Found once a ship and held (`_YARD_LEVELS`);
         any other spar's level is its parent's, or 0."""
         sp = yard if isinstance(yard, Spar) else self._spar(yard)
@@ -341,15 +351,21 @@ class Ship:
             )
             level += below
             if level == 0:
-                # a square yard over a whole lateen and no braced yard below it on its mast
+                # a square sail set over a whole lateen, its foot clear above the lateen's yard,
+                # and no braced yard below it on its mast; not one whose foot comes down below
+                # that yard to the deck (the tartane's tréou, her course: nudge 39, ruling 1)
+                square = self.sail_of(sp)
+                foot = _square_foot_m(sp, square) if square is not None else None
                 for lat in self.spars.values():
                     sail = self.sail_of(lat) if lat.cls == "lateen_yard" else None
                     if (
-                        sail is not None
+                        foot is not None
+                        and sail is not None
                         and sail.cls == "lateen"
                         and not sail.cut_at_mast
                         and root_of(lat) is root
                         and lat.height_m < sp.height_m
+                        and foot > lat.height_m
                     ):
                         level = 1
                         break
