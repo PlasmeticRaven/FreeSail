@@ -38511,6 +38511,24 @@ The lead's reader passed A3 with a list (nudge 45). Each item rode as its own co
 
 The brig's four answers are as they were ("... is repairing the wheel."). Every answer's kind, the lines after it and the work in hand are the same. No pin moves. Pinned: `tests/test_helm_kind.py::test_a_mend_not_in_hand_is_named_as_her_helm_names_it`, on either helm; on the old code its tiller case fails.
 
+**2. `belay the tiller` and `belay the spare tiller` belay the mend** (`data/vocabulary.yaml`, `more_work_nouns`: `tiller` and `spare tiller`, each to `repair the wheel`, beside `wheel`). They belay the mend on either helm. With no mend in hand they name it as item 1 does.
+
+| Order | Ship, work in hand | Old | New |
+|---|---|---|---|
+| `belay the tiller` | cutter, tackles and mend | "There is no such part as the tiller in this ship." (the mend goes on) | "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the shot left it." |
+| `belay the spare tiller` | cutter, tackles and mend | "There is no such part as the spare tiller in this ship; did you mean the square sail?" | the same as `belay the tiller` |
+| either | cutter, tackles alone | the same refusals | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: rigging the relieving tackles." |
+| either | brig, tackles and mend | "There is no such part as the tiller (the spare tiller) in this ship." | "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it." (item 3) |
+| either | brig, tackles alone | the same refusals | "Nothing in hand or waiting is repairing the wheel. ..." |
+
+**Moved beside it, refusal to refusal (measured, no pin):** `belay the tiller tackles` and `belay the tiller ropes`, the work nouns' reach.
+- Old: "There is no such part as the tiller tackles (the tiller ropes) in this ship", with "did you mean the topsail reef tackle?" on the cutter.
+- New: "Nothing in hand or waiting answers to 'the tiller tackles' ('the tiller ropes'): name the work as the log does, its kind ('the reef') or its sail. The work in hand: ...".
+- Neither belays anything, before or after.
+- The vocabulary has `rig the tiller tackles` and `reeve new tiller ropes` as synonyms of the two works. A noun for each, so that each belays its work, is listed for the lead and not built: the list asks for the tiller and the spare tiller, and `belay the wheel ropes` is refused as these now are.
+
+Every answer's kind and the lines after it are the same but where a belay now belays; there the mend is belayed as `belay the wheel` belays it. No pin moves. Pinned: `tests/test_helm_kind.py::test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`; on the old code it fails.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.

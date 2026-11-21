@@ -373,3 +373,21 @@ def test_a_mend_not_in_hand_is_named_as_her_helm_names_it(helm):
             "tackles."
         ), (order, e.text)
         assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
+
+
+def test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend():
+    """Nudge 45, item 2. On a tiller hull `belay the tiller` and `belay the spare tiller` belay
+    the mend in hand, as `belay the wheel` does (the vocabulary's work nouns, beside `wheel`), and
+    the rest of the work in hand goes on. Old: "There is no such part as the tiller in this ship"
+    and "... as the spare tiller in this ship; did you mean the square sail?", the mend going on."""
+    for order in ("belay the tiller", "belay the spare tiller", "belay the wheel"):
+        w = _tackles_in_hand(ROOT / "data/ships/cutter.yaml")
+        assert w.submit("repair the wheel").kind != "order.rejected"
+        w.run(2)
+        e = w.submit(order)
+        assert e.kind == "work.belayed", (order, e.text)
+        assert e.text == (
+            "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the "
+            "shot left it."
+        ), (order, e.text)
+        assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
