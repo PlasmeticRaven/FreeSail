@@ -74,6 +74,7 @@ from freesail.world.geo import (
     format_position,
     parse_position,
 )
+from freesail.world.service import free_intent_role
 
 __all__ = [
     "ACTOR_PREFIX",
@@ -1077,8 +1078,8 @@ def role_for(world: Any, intent: Intent | None, given: str = "", sub_type_role: 
         return "packet"
     if intent is not None and intent.convoy:
         return "commodore"  # package 71: the convoy's escort, by the intent's words
-    if intent is not None and intent.kind in ("home", "passage", FREE) and _is_kings_ship(world):
-        return "kings-ship"  # a free intent's too (package 86): her service's role
+    if intent is not None and intent.kind in ("home", "passage", FREE):
+        return free_intent_role(world)  # her papers', else her wardroom's (packages 86, 121)
     return "merchant"
 
 
