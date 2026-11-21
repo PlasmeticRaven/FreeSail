@@ -46,7 +46,8 @@ from freesail.evolutions.runner import PartyTooSmall, part_name
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
-from freesail.orders.grammar import Order
+from freesail.orders.grammar import LATEEN_CLAUSE, LATEEN_OCCASION, LATEENS, Order
+from freesail.orders.grammar import SAIL_ROOM_MARK as _GRAMMAR_SAIL_ROOM_MARK
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary
 from freesail.physics.sails import BOWLINE_SLACK_ANGLE_DEG
 from freesail.ship.graph import Ship
@@ -127,6 +128,8 @@ def execute(
         # "clear away the larboard studdingsail boom": a spar or a sail is cleared away as
         # a wreck; a line is let go, as "clear away the bowlines" always was (package 30b)
         return _clear_wreck(ship, order, vocab)
+    if order.verb == "leave" or LATEEN_OCCASION in order.modifiers:
+        return _lateen_practice(ship, order)  # package 90, A1b
     if order.verb == "shift" and _names_spars(ship, order):
         return _shift_spar(ship, order, vocab)
     if order.verb == "draw":
@@ -196,6 +199,10 @@ BOOM_FOUL_BRACE_DEG = 45.0
 SAIL_SCRIPT_VERBS = ("bend", "unbend", "shift")
 # The grammar's words for which sail the sail room gives (spec 3b §6.3), passed to the script.
 CANVAS_PARAMS = ("canvas_no", "heavy", "for")
+# The grammar's mark that "for" was said after a canvas verb (package 90, A1a: `shift the
+# mainsail for a new one` is the sail room's on a hull with a whole lateen, whose `shift the
+# mainsail` shifts its yard round the mast). Read by the routing alone, never passed to a script.
+SAIL_ROOM_MARK = _GRAMMAR_SAIL_ROOM_MARK
 # The helm verbs with no heading or points after them: the conning words.
 HELM_VERBS = (
     "keep her full",
@@ -315,6 +322,7 @@ def _sail_evolution(
     allowed.add("hands_from")
     if verb in SAIL_SCRIPT_VERBS:
         allowed |= set(CANVAS_PARAMS)  # which sail from the sail room (spec 3b §6.3)
+        allowed.add(SAIL_ROOM_MARK)  # "for" said (package 90, A1a)
     _no_stray_modifiers(order, allowed)
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
@@ -327,6 +335,8 @@ def _sail_evolution(
         handed = {c: take_in[c] for c in FURLED_AS_TAKEN_IN if c in take_in}
         mapping = {**handed, **mapping}
     params = _sail_params(order)
+    # "for" a sail said (the grammar's mark): the sail room's, never a whole lateen's shift
+    sail_room = bool(order.modifiers.get(SAIL_ROOM_MARK))
 
     sails: list[Sail] = []
     for pid in res.ids:
@@ -365,7 +375,7 @@ def _sail_evolution(
     extra, call = _hands_params(
         ship,
         order,
-        [mapping[evolution_key(sail, mapping)] for sail in to_start],
+        [mapping[evolution_key(sail, mapping, sail_room)] for sail in to_start],
         _group_label(verb, res.name, group) if len(to_start) > 1 else None,
     )
     params.update(extra)
@@ -375,7 +385,7 @@ def _sail_evolution(
             failed.append(reason)
             failed_ids.append(sail.id)
             continue
-        evo = mapping[evolution_key(sail, mapping)]
+        evo = mapping[evolution_key(sail, mapping, sail_room)]
         p = dict(params)
         if verb in SAIL_SCRIPT_VERBS:
             p["sail"] = sail.id
@@ -417,16 +427,25 @@ def _sail_evolution(
 FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug", "flying")
 
 
-def evolution_key(sail: Sail, mapping: dict[str, Any]) -> str:
+def evolution_key(sail: Sail, mapping: dict[str, Any], sail_room: bool = False) -> str:
     """The key a sail verb's evolution is found by: 'settee' for a settee where the verb has
     an evolution of its own for it (set, take in, furl, dip: package 75,
     docs/design/Design-ShipsEngineExtensions.md §5.2), 'flying' for a sail set flying where
     the verb has one for it (set, take in: package 57), else the sail's class. So a settee is
     reefed, its reef shaken out, its sheet trimmed, and it is bent, unbent and shifted as the
     lug it is (D42(a), D45(a)); and `furl`, whose mapping takes a lug in, finds its own row
-    first (furled aloft on its yard)."""
+    first (furled aloft on its yard).
+
+    Package 90, A1a (Design-Package90-Engine.md §2.3 item 3a; the lead's ruling of 2026-11-18):
+    'whole_lateen' for a whole lateen (a lateen with `dipping`, `scripts.is_whole_lateen`) where
+    the verb has that row, `shift` and `dip`, which shift its yard round its mast
+    (`change_lateen`); unless the order said "for" a sail (`sail_room`, the grammar's mark:
+    `shift the mainsail for a new one`), which replaces it from the sail room by its class as
+    before. Every other lateen, the 64's and the 74's mizzen course among them, by its class."""
     if sail.settee and "settee" in mapping:
         return "settee"
+    if not sail_room and "whole_lateen" in mapping and scripts.is_whole_lateen(sail):
+        return "whole_lateen"
     return "flying" if sail.flying and "flying" in mapping else sail.cls
 
 
@@ -470,7 +489,7 @@ def _sail_check(
         if sail.cls != "gaff":
             return f"{name} is a {sail.cls} sail; it has no peak to drop"
         return vocab.refusals["scandalise"].format(name=name[4:]).rstrip(".")
-    if evolution_key(sail, mapping) not in mapping:
+    if evolution_key(sail, mapping, bool(order.modifiers.get(SAIL_ROOM_MARK))) not in mapping:
         template = vocab.refusals.get(verb, "'{verb}' has no meaning for a {class} sail")
         return template.format(name=name[4:], **{"class": sail.cls, "verb": verb}).rstrip(".")
     if verb == "set" and sail.state is SailState.SET:
@@ -3106,7 +3125,7 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     """'Shift the <spar>' ('... for a spare'): a spar carried away, its wreck cleared,
     replaced by a spare of its class from the booms (shift_spar.yaml). With none aboard,
     or with the wreck still hanging, the runner's check refuses it in words."""
-    _no_stray_modifiers(order, {"manner", "hands_from"} | set(CANVAS_PARAMS))
+    _no_stray_modifiers(order, {"manner", "hands_from", SAIL_ROOM_MARK} | set(CANVAS_PARAMS))
     if "canvas_no" in order.modifiers or "heavy" in order.modifiers:
         raise OrderError("A spar has no canvas; say 'shift the <spar>', or '... for a spare'.")
     if "for" in order.modifiers:
@@ -3173,15 +3192,57 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
+# The occasions of the lateens' practice, as the grammar reads them ("in going about": both).
+_PRACTICE_OCCASIONS = {"stays": ("stays",), "wearing": ("wearing",), "both": ("stays", "wearing")}
+
+
+def _lateen_practice(ship: Ship, order: Order) -> Result:
+    """`leave the lateens in stays`, `shift the lateens in wearing`, "in going about" for both
+    (package 90, A1b; Design-Package90-Engine.md §2.3 item 3): the ship's practice for her whole
+    lateens' yards in going about, kept on her (`scripts.set_lateen_practice`) and read by the
+    next tack or wear, or by one in hand whose change has not begun. Answered with the practice
+    whole: "Her practice: the lateens left on the mast in stays, shifted in wearing." """
+    _no_stray_modifiers(order, {LATEEN_OCCASION, LATEENS})
+    if not scripts.has_whole_lateen(ship):
+        raise OrderError(
+            "She carries no whole lateen; 'leave' is said of a lateen's yard in going about, "
+            "left on the mast."
+        )
+    occasion = order.modifiers.get(LATEEN_OCCASION)
+    if not order.modifiers.get(LATEENS):
+        name = f"the {order.object}" if order.object else "a sail"
+        raise OrderError(
+            f"The practice is the lateens' together, not {name}'s: 'leave the lateens in stays', "
+            f"'shift the lateens in wearing'. To leave one in a single going about, say it after "
+            f"the order: 'tack ship and leave the mizen'."
+        )
+    if occasion is None:
+        raise OrderError(
+            "Leave the lateens when? Say 'leave the lateens in stays', 'in wearing' or 'in going "
+            "about'; or, for one going about, 'tack ship and leave the lateens'."
+        )
+    how = "leave" if order.verb == "leave" else "shift"
+    practice = scripts.set_lateen_practice(ship, how, _PRACTICE_OCCASIONS[occasion])
+    text = f"Her practice: {scripts.lateen_practice_words(ship, practice)}."
+    data = {"verb": order.verb, "level": 1, "lateen_practice": practice}
+    return "ship.lateen_practice", text, data
+
+
 def _ship_evolution(
     ship: Ship, order: Order, vocab: Vocabulary, course: dict[str, Any] | None = None
 ) -> Result:
     allowed = {"tack", "manner", "hands_from"}
     if order.verb == "fill away":
         allowed.add("heading")  # "fill away and steer SW by W" (package 37f)
+    if order.verb in ("tack ship", "wear ship"):
+        allowed.add(LATEEN_CLAUSE)  # "and leave the lateens" (package 90, A1b)
     _no_stray_modifiers(order, allowed)
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
+    if order.modifiers.get(LATEEN_CLAUSE):
+        # which whole lateens the going about shifts round their masts and which it leaves on
+        # them, over the ship's practice (`scripts.lateen_plan`): a plain dict of strings
+        params["lateens"] = dict(order.modifiers[LATEEN_CLAUSE])
     if order.verb == "fill away":
         if "heading" in order.modifiers:
             # she is filled on the tack she is on, and the helm then has the course

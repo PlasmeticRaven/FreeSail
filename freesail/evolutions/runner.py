@@ -223,6 +223,16 @@ def part_name(ship: Ship, part_id: str) -> str:
     return " ".join(words)
 
 
+def _whole_lateen_on_the_mast(ship: Ship, sail: Sail) -> bool:
+    """A whole lateen (a lateen with `dipping`, not cut at the mast) whose yard hangs on the
+    weather side of its mast as the deck reads the wind (package 90, A1a): the runner's
+    `against_the_mast` for it alone."""
+    if sail.cls != "lateen" or not sail.dipping or sail.cut_at_mast or sail.lug_side is None:
+        return False
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    return sail.lug_side != lee
+
+
 class _SafeDict(dict):
     def __missing__(self, key: str) -> str:
         return "{" + key + "}"
@@ -2005,6 +2015,11 @@ class Runner:
             ctx["reefs"] = subject.reefs
             ctx["reef_bands"] = subject.reef_bands
             ctx["parted"] = self._parted_gear(ship, subject)
+            # a whole lateen set on the weather side of its mast (package 90, A1a: its yard keeps
+            # the side it hangs on), for `set_lateen`'s line; nothing for any other sail
+            ctx["on_the_mast"] = (
+                "; it lies on the mast" if _whole_lateen_on_the_mast(ship, subject) else ""
+            )
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
         if inst.evo.id == "get_under_way":
