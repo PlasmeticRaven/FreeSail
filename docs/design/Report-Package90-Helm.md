@@ -555,3 +555,65 @@ over `freesail`, `tools` and `tests`, and `test_helm_kind` with A1c's `test_late
 - No generated file is touched: no ship file moves, and the checkpoint's list is unmoved (no class
   added; `Script.work_of` is a method).
 - Pushed only to this step's own branch.
+
+## The quarterdeck, by the lead's ruling (a) of nudge 47 (2026-11-21)
+
+The lead ruled the list's one stop (nudge 47, trunk 88ceeb54): **(a)**. The branch was first
+fast-forwarded to the package's branch at **744f5893** (the list of nudge 45 merged on A1c), and
+the one commit is built on it.
+
+- **The commit: `cf754540`** ("Package 90, A3's list (nudge 47): the quarterdeck described by her
+  helm"). Four files:
+  - `freesail/api/readings.py`;
+  - `freesail/evolutions/scripts.py`;
+  - `tests/test_helm_kind.py`;
+  - `docs/dev/TuningNotes.md`, its line under A3's "The list of nudge 45", item 4.
+- **`api/readings.py`'s `_places`.** The quarterdeck is described by her helm in the reading's two
+  forms, the `items` and the lines `described` (`"the wheel is"` read as her helm's noun's). The
+  diff, besides its comment, is:
+  - the import of `helm_words`;
+  - the noun read once;
+  - the two lines, the `items` and the `described`, the first wrapped by the formatter.
+- **`world/places.py`** is left as it is.
+- **From the one table.** It had no plain noun for her helm, so it gains one: `HELM_WORDS`' `helm`,
+  "the wheel" or "the tiller". That is a line in each row of `evolutions/scripts.py`, and two
+  more lines of its comment. It is read by `_places` alone, and nothing else moves by it. The table's pinned
+  rows in `tests/test_helm_kind.py` gain it.
+- **What moved, old beside new** (measured on fresh worlds at seed 7, old 744f5893 beside new):
+
+| Ship | The quarterdeck in `items` and `described` |
+|---|---|
+| the cutter, the lugger (the six tiller files) | "... where the captain and the officer of the watch keep the deck and the wheel is (Falconer 1780, QUARTER-DECK)" -> "... keep the deck and the tiller is (...)" |
+| the brig, the frigate, the bilander (wheel ships) | byte for byte as it was |
+
+  On all five the reading's `words` and every other place are as they were. No pin moves.
+- **The proof:** `test_the_places_reading_says_where_her_helm_is`, on the cutter, the brig and the
+  frigate. It checks the quarterdeck by `items` and by `described`, every other place, and the
+  `words`. Its words are held literally, so a wheel ship's case passes on the old code as it
+  should. On the old code (744f5893, its own worktree) the cutter's case fails and the brig's and
+  the frigate's pass. Here all three pass.
+- **Left, not asked:** `belay the tiller tackles` and `belay the tiller ropes`, as the lead lists
+  them.
+
+**The tests** (`python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, the fast
+tier in the suite's six shards, each tree in its own worktree, the two runs one after the other):
+
+| Set | Base, 744f5893 | Head, cf754540 |
+|---|---|---|
+| **the fast tier whole** | 8,689: 8,688 passed, 1 xfailed | 8,692: 8,691 passed, 1 xfailed |
+| `tests/test_helm_kind.py` | | 43 passed |
+| the reading's other readers: `test_places`, `test_letters`, `test_people`, with `test_helm_kind` | | 94 passed |
+| the new test on the old code (744f5893, its own worktree) | the cutter's case failed; the brig's and the frigate's passed | 3 passed |
+
+**Test by test** (names without the xdist group label): **the head is the base's 8,689, each with
+the same outcome, and the new test's three cases, each passed**
+(`test_the_places_reading_says_where_her_helm_is[cutter]`, `[brig]`, `[frigate-36]`). Nothing
+else differs, and no timing test tripped. The base is my own whole run on 744f5893, not a delta.
+
+**Rules as before:**
+- each commit's author is as the cloud gives it;
+- no model or vendor name and no trailer;
+- LF endings; ruff clean;
+- TuningNotes' sections whole;
+- no generated file touched;
+- pushed only to this step's own branch.
