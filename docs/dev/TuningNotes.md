@@ -38995,3 +38995,52 @@ So A1d moves the probes' going about by −34 to +18 m, A1b's tack and wear with
 `tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are (run). New: A1d's part of `tests/test_lateen_whole.py`; truths 7-670 to 7-672 in `tests/test_known_truths.py`.
 
 Built by the engine track's builder; to be passed by an independent reader of the other tier (a new rule of force: the plan's §10.4).
+
+## Package 90, A5 and A6: a yard's level from its order on its mast, and the pole mast's quick handing (2026-11-21)
+
+`docs/design/Plan-Package90.md` §6's A5 and A6 (one merge, §9.1), on `docs/design/Design-Ship-Polacre.md` §5.1 (decisions 6 and 7), the tartane's §5.1a, the lead's ruling of the lateen yard below (§13.1 item 2) and nudge 22 (A6 drafted without `reef_pole`, its descriptions in the game's own words). The ground report's §2.4 and §2.5 rows 12 to 16 measured the first draft.
+
+### A5: what it builds
+
+- **`Ship.yard_level(yard)`** (`ship/graph.py`): a braced yard's level on its lower mast, 0 the course, 1 the topsail, 2 the topgallant, 3 the royal, -1 under the bowsprit: the level of the spar it hangs on (`YARD_LEVEL_SPARS`) and one more for each braced yard on the same spar below it by height, so a topsail yard crossing a pole mast's head over the lower yard is a topsail. A square yard on a lower mast with no braced yard below it and a whole lateen's yard below it there counts the lateen yard as its level below (JUDGEMENT, the lead's lean ruled: the tartane's topsail over her great lateen, the polacre's mizen topsail over her lateen mizen). Found once a ship and held beside her (`_YARD_LEVELS`, a weak dictionary as the schooner's yards' is), never pickled: a checkpoint is the same bytes whether it has been read or not.
+- **Read at the twelve places** in place of the parent spar's class: `scripts.lowest_square_sails` (and through it the heave-to's courses, lie a-try, the box-haul's after courses, back and fill, coming to anchor, `standing_sail_on`), `light_sails_forward_of`, `_topsails_on`, `_is_upper_square`, `_topsails`; `trim._level` (and through it `stagger`, `by_level`, `eased_lowest`, `heavy_weather_trim`); `verbs._take_in_kind`, `verbs._level_rank`; `physics.sails._yard_level` (the helm's mark), `studding_level`.
+- A pure rank by height among a mast's braced yards, the plan's first wording, was measured and not built: it makes the topsail schooner's, the privateer schooner's and the hermaphrodite's topsails courses (no lower yard on those masts), three committed files moved. The rule built keeps them as they are.
+- **Mended at its cause beside it** (the ground report's fault): lie a-try's refusal says "close-reefed" only of a topsail with reef bands ("The topsail is not set; set it to lie a-try under it." the smack's; the brig's as before).
+
+### A5: measured
+
+- **The guard over every file's yard levels** (`tests/test_yard_level.py`), old beside new: every braced yard of the eighteen files at the level its spar's class gave it, but the smack's `topsail.yard`, 0 -> 1.
+- **The smack hove to with her topsail set** (seed 7, 15 kn, her head 292.5°, the topsail set over plain sail, settled 900 s): before, "Hauled up the courses." and "Hove to on the starboard tack, under her fore-and-aft canvas, foresail sheet to windward, helm a-lee.", 47.3° off at 2.61 kn at +900 s; now "...; braced the topsail aback; helm a-lee." and "Hove to on the starboard tack, topsail to the mast, helm a-lee.", 50.5° off at 2.87 kn (inside truth 12's 45° to 65°).
+- **The smack's lie a-try with it set** (30 kn): before, "Could not bring her to: She has no topsail to lie a-try under."; now "Lying a-try under the topsail and the foresail, helm a-lee.", 49.3° off at 3.64 kn by +1,800 s.
+- Her plain sail sets no topsail, so no pinned passage of hers meets these (the tiers in the report).
+
+### A6: what it builds
+
+- **The pole** (`Ship.is_pole_mast`, `Ship.on_pole`): a lower mast with a braced yard above its lowest on the mast itself and no topmast standing on it, read from the parts as filed with no key. Of the committed files the smack's main alone, her topsail alone on it (guarded).
+- **Its upper sails' handing**, routed by `verbs.evolution_key`'s new `pole` (given the ship) for `take in` and `furl`:
+  - `take_in_pole.yaml`: the halyards let go together, the yard lowered onto the yard below and the sail clewed up there, one 60-s step with no settling on a cap ("Let go the topsail halyards; hands to the clewlines and buntlines.", "Lowered the topsail down onto the yard below and clewed it up there.", "Took in the topsail; lowered on the yard below, hanging in the gear."). JUDGEMENT on the time: the brig's clew-up, the settling's 45 s left out (no period time found).
+  - `furl_pole.yaml`: lowered so first if set, then furled from the yard below, the men not climbing to the yard aloft ("Lay out on the yard below and furl the topsail.", "Furled the topsail on the yard below."), the furl 120 s (JUDGEMENT: the square sail's 150 s less 30 s for the climb).
+  - `take_in_words`' `pole: [lower, clew up]`: "lower the topsail" a pole sail's word; "haul up", a course's, refused in its own words ("A topsail or light sail on a pole mast is lowered, not hauled up; say 'lower the topsail' or 'take in the topsail'.", the first draft's "A pole sail is lowered" mended).
+- **The topmast evolutions refused in words naming the pole** (`scripts.mast_inventory`): "She has no topmasts to strike; her masts are the main mast (a pole, the mast and topmast in one stick)."
+- **Not built, as ruled**: `reef_pole` (the smack's topsail has no reef bands and no committed file reaches one; the catalogue's all-hands rule would want it named). The two new files' served notes are the ship's work and its sources alone, their build notes below the blank line that ends what the library serves.
+
+### A6: measured
+
+The smack, seed 7, 15 kn, her topsail set over plain sail and settled (times from each evolution's own start line):
+
+| Order | Before | After |
+|---|---|---|
+| take in the topsail | clewed up at +88 s, in the gear at +154 s | lowered and clewed up, in the gear at +88 s |
+| clew up the topsail | as take in | as take in |
+| lower the topsail | refused ("A course is hauled up, not lowered ...") | obeyed, as take in |
+| haul up the topsail | obeyed, as a course | refused, in the pole's words |
+| furl the topsail, set | "Lay aloft and furl the topsail."; furled at +350 s | "Lay out on the yard below and furl the topsail."; furled at +300 s |
+| strike the topmasts | refused, "her masts are the main mast" | refused, "... the main mast (a pole, the mast and topmast in one stick)" |
+
+### Pins moved, old beside new
+
+- `tests/test_agents.py::test_the_contents_says_what_each_topic_costs_measured_from_the_text_served`: "111 evolutions" -> "113 evolutions" (`take_in_pole.yaml`, `furl_pole.yaml`; the ground report's row 12, 110 -> 112 there before A1a's `change_lateen`).
+
+The ground report's rows 13 to 16 do not move: no `reef_pole` (13), and `tests/test_held_work.py`'s two sweeps (14, 15) and `tests/test_in_world.py`'s catalogue case (16) pass as they are. New: `tests/test_yard_level.py`, `tests/test_pole_mast.py`.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).

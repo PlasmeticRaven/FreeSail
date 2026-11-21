@@ -1260,11 +1260,11 @@ def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
             out.append(sl)
             continue
         yard = ship.yard_of(sl)
-        above = ship.parent_of(yard) if yard is not None else None
         mast = ship.mast_of(sl)
+        # a topgallant or a royal by its level on its mast (`Ship.yard_level`; package 90, A5)
         if (
-            above is not None
-            and above.cls in ("topgallant_mast", "royal_mast")
+            yard is not None
+            and ship.yard_level(yard) >= 2
             and mast is not None
             and mast.x_m > x_backed
         ):
@@ -1292,12 +1292,12 @@ def driver_words(ship: Ship, drivers: list) -> str:
 
 
 def lowest_square_sails(ship: Ship) -> list:
-    """The courses: square sails on yards that hang directly on a lower mast."""
+    """The courses: square sails on their lower masts' lowest yards (`Ship.yard_level` 0; package
+    90, A5: a topsail yard crossing a pole mast's head is a topsail, not a course)."""
     out = []
     for y in working_yards(ship):
-        parent = ship.parent_of(y)
         sl = ship.sail_of(y)
-        if parent is not None and parent.cls == "mast" and sl is not None and sl.cls == "square":
+        if ship.yard_level(y) == 0 and sl is not None and sl.cls == "square":
             out.append(sl)
     return out
 
@@ -4488,9 +4488,13 @@ def mast_inventory(ship: Ship) -> str:
             d for d in ship.dependents(lower) if isinstance(d, Spar) and d.cls in MAST_CLASSES
         ]
         names = [part_name(ship, m.id) for m in _in_ship_order(ship, chain)]
-        groups.append(
-            "the " + (names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
+        group = "the " + (
+            names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
         )
+        if ship.is_pole_mast(lower):
+            # package 90, A6: no topmast to strike, send down or fid on a pole
+            group += " (a pole, the mast and topmast in one stick)"
+        groups.append(group)
     if not groups:
         return "she has no masts"
     return "her masts are " + (
@@ -6596,12 +6600,12 @@ def _brace_up_for_the_helm(ship: Ship, runner: Any, memo: dict[str, Any]) -> Non
 
 
 def _topsails_on(ship: Ship, yards: list[Spar]) -> list:
-    """The topsails among a mast's yards: square sails on yards that hang on a topmast."""
+    """The topsails among a mast's yards: square sails on yards of the topsail's level
+    (`Ship.yard_level` 1; package 90, A5)."""
     out = []
     for y in yards:
         sl = ship.sail_of(y)
-        parent = ship.parent_of(y)
-        if sl is not None and sl.cls == "square" and parent is not None and parent.cls == "topmast":
+        if sl is not None and sl.cls == "square" and ship.yard_level(y) == 1:
             out.append(sl)
     return out
 
@@ -6692,9 +6696,12 @@ class LieATryScript(Script):
         if "hove_to" in self.ship.extra:
             return "She is lying to already."
         if not any(s.is_set for s in self.topsails):
+            # close-reefed where it has the bands to be (package 90, A5: the smack's topsail,
+            # a topsail by its level now, has none)
+            reefed = ", close-reefed," if any(s.reef_bands > 0 for s in self.topsails) else ""
             return (
-                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it, "
-                f"close-reefed, to lie a-try under it."
+                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it{reefed} "
+                f"to lie a-try under it."
             )
         return None
 
@@ -8315,12 +8322,12 @@ class ComeToAnchorScript(_AnchorScript):
 
 
 def _is_upper_square(ship: Ship, sail: Any) -> bool:
-    """A square sail above the topsails: on a topgallant or royal yard."""
+    """A square sail above the topsails: on a topgallant or royal yard, by its level
+    (`Ship.yard_level`; package 90, A5)."""
     if sail.cls != "square":
         return False
     yard = ship.yard_of(sail)
-    parent = ship.parent_of(yard) if yard is not None else None
-    return parent is not None and parent.cls in ("topgallant_mast", "royal_mast")
+    return yard is not None and ship.yard_level(yard) >= 2
 
 
 class LetGoAnchorScript(_AnchorScript):
@@ -8918,14 +8925,14 @@ def _world_of(ship: Ship) -> Any:
 
 
 def _topsails(ship: Ship) -> list[Sail]:
-    """The topsails: the square sails whose yard crosses a topmast."""
+    """The topsails: the square sails whose yard is of the topsail's level (`Ship.yard_level` 1;
+    package 90, A5: a topmast's, or a pole mast's head over its lower yard)."""
     out = []
     for sl in ship.sails.values():
         if sl.cls != "square" or sl.wrecked:
             continue
         yard = ship.yard_of(sl)
-        parent = ship.parent_of(yard) if yard is not None else None
-        if parent is not None and parent.cls == "topmast":
+        if yard is not None and ship.yard_level(yard) == 1:
             out.append(sl)
     return out
 

@@ -1956,10 +1956,12 @@ evolutions:
     sprit: take_in_sprit
     flying: take_in_flying  # package 57: lowered and sent down whole
     settee: take_in_settee  # package 75: clewed up aloft, the yard standing
+    pole: take_in_pole  # package 90, A6: lowered onto the yard below and clewed up there
   furl:
     square: furl_square
     lateen: furl_lateen  # package 75: furled on its yard aloft (Falconer 1780, YARD)
     settee: furl_settee  # package 75: furled on its yard aloft, as a lateen yard's sail
+    pole: furl_pole  # package 90, A6: furled from the yard below
   reef:
     square: reef_square
     gaff: reef_gaff
@@ -2092,6 +2094,9 @@ take_in_words:
   # voiles quarrées" (Lescallier 1791 p. 390), its yard standing; it is lowered only to dip
   settee: [clew up, haul up]
   sprit: [lower]
+  # package 90, A6: a topsail or light sail on a pole mast, its halyards let go and lowered onto
+  # the yard below ("amener en paquet", Lescallier 1791 p. 371), then clewed up there
+  pole: [lower, clew up]
 
 # ---------------------------------------------------------------------------
 # Brace modes: the target brace angle for each word (spec §8.2). `limit`

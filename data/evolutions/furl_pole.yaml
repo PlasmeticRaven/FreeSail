@@ -1,0 +1,36 @@
+# Furl a topsail or a light sail on a pole mast, the mast and topmast in one stick. A sail still
+# set is first lowered down onto the yard below, its halyards let go, and clewed up there; then the
+# topmen lay out on the yard below, not on its own yard aloft, pass the gaskets and furl it, as a
+# pole topsail is furled from the lower yard (Falconer 1780, POLACRE; Steel 1794 vol. I p. 236).
+
+# Build notes (not served by the library's catalogue):
+# Package 90, A6: docs/design/Design-Ship-Polacre.md §5.1, decision 7; the ground report's §2.4.
+# Routed by `verbs.evolution_key`'s `pole` (`Ship.on_pole`). Its times JUDGEMENT (no period time
+# found): the lowering as take_in_pole's 60 s, and the furl furl_square's 150 s less 30 s for the
+# climb to the yard aloft that the men on the yard below do not make.
+id: furl_pole
+verb: furl
+applies_to: {class: square}
+preconditions:
+  - {check: sail.state != furled, reason: "The {sail} is furled already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; there is no sail on the yard to furl."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: lower_and_clew_up
+    duration_s: 60
+    if: sail.state in [set, sheeted, loosed, goose_winged]
+    sets: {sail.state: in_the_gear}
+    log: "Lowered the {sail} down onto the yard below and clewed it up there."
+  - do: furl
+    duration_s: 120
+    aloft: true
+    sets: {sail.state: furled}
+on_start: {log: "Lay out on the yard below and furl the {sail}."}
+on_complete: {log: "Furled the {sail} on the yard below.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: as furl_square's, the topmen who furl the topsail and light sails of their own mast
+# (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship')
+crew: {hands: 12, rating: ordinary, stations: [topmen, forecastle, afterguard]}
+source: "Falconer 1780, POLACRE; Steel 1794 vol. I p. 236 (furled from the yard below); furl_square's furl for its time (judgement)"

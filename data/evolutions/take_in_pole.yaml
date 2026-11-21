@@ -1,0 +1,30 @@
+# Take in a topsail or a light sail on a pole mast, the mast and topmast in one stick: its
+# halyards are let go together and its yard comes down onto the yard below ("amener en paquet",
+# Lescallier 1791 p. 371), and the sail is clewed up there, the hands at the clewlines and
+# buntlines on deck. There is no cap to settle the yard on; it lies on the yard below until it is
+# hoisted again to set the sail. Furling it is a separate evolution (furl_pole).
+
+# Build notes (not served by the library's catalogue):
+# Package 90, A6: docs/design/Design-Ship-Polacre.md §5.1, decision 7; the ground report's §2.4.
+# Routed by `verbs.evolution_key`'s `pole`, for a square sail above a pole mast's lower yard
+# (`Ship.on_pole`). Its time JUDGEMENT (no period time found): the brig's clew-up of
+# take_in_square (60 s) with no settling of the yard on the cap (its 45 s second step).
+id: take_in_pole
+verb: take_in
+applies_to: {class: square}
+preconditions:
+  - {check: "sail.state in [set, sheeted, loosed, goose_winged]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: lower_and_clew_up
+    duration_s: 60
+    sets: {sail.state: in_the_gear}
+    log: "Lowered the {sail} down onto the yard below and clewed it up there."
+on_start: {log: "Let go the {sail} halyards; hands to the clewlines and buntlines."}
+on_complete: {log: "Took in the {sail}; lowered on the yard below, hanging in the gear.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: as take_in_square's, the topmen at the clewlines with the afterguard and waisters at the
+# sheets and halyards (Luce 1884, ch. XVIII Organization, 'Station Billet')
+crew: {hands: 10, rating: ordinary, stations: [topmen, afterguard, waisters]}
+source: "Lescallier 1791 p. 371 (amener en paquet); Röding 1794; take_in_square's clew-up for its time (judgement)"
