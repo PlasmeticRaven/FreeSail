@@ -38499,6 +38499,18 @@ The fast tier whole, compared test by test with the base's, the slow tier of the
 
 Built by the A3 builder in a session of its own, beside the engine track; to be read by an independent reader (the plan's §10.2 lens 8: whether the mend is the cause's or only the symptom's, and where else the cause was looked for).
 
+### The list of nudge 45, after A3's merge (2026-11-21)
+
+The lead's reader passed A3 with a list (nudge 45). Each item rode as its own commit on this step's branch, fast-forwarded to `claude/pkg-90` at 0d5d2c56 (A3, A1a and A1b). None moves a tick. Each item was measured old (0d5d2c56) beside new, every order on a fresh world (`probe_belay.py`, kept in the session's scratch).
+
+**1. A mend not in hand named as her helm names it** (`freesail/orders/work.py`; `Script.work_of` in `freesail/evolutions/scripts.py` and `repair_scripts.py`). **The cause:** a belay's refusal named a work not in hand by the vocabulary's verb (`_gerund_words(verb)`), while the runner names it, once begun, by its script (`Script.work`). **Mended:** the script's own name is read before an instance exists (`Script.work_of(ship)`, a class method that `work` now calls), and the belay names a work not in hand by it (`_work_words`), in both of its readings (by the order and by the kind of work). Only the helm's mend has a name of its own, so on every other work the words are the verb's, as before.
+
+| On the cutter, the tackles in hand, no mend | Old | New |
+|---|---|---|
+| `belay shipping the spare tiller`, `belay ship the spare tiller`, `belay the wheel`, `belay repairing the wheel` | "Nothing in hand or waiting is repairing the wheel. The work in hand: rigging the relieving tackles." | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: ..." |
+
+The brig's four answers are as they were ("... is repairing the wheel."). Every answer's kind, the lines after it and the work in hand are the same. No pin moves. Pinned: `tests/test_helm_kind.py::test_a_mend_not_in_hand_is_named_as_her_helm_names_it`, on either helm; on the old code its tiller case fails.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.

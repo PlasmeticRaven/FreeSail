@@ -336,3 +336,40 @@ def test_the_captains_mend_order_is_her_helms(helm):
     runner = ship.extra["evolutions"]
     (mend,) = [i for i in runner.instances if i.evo.id == "repair_wheel"]
     assert runner.doing(mend) == doing
+
+
+# -- the list of nudge 45: the belay by the helm's words -------------------------------------
+
+
+def _tackles_in_hand(path: Path):
+    """From the harbour at seed 7, her helm shot away at a minute and the relieving tackles
+    ordered and in hand: no mend in hand or waiting."""
+    w = make_world(7, str(path.relative_to(ROOT)), Scenario())
+    w.run(60)
+    _shot_away(w)
+    w.run(1)
+    assert w.submit("rig the relieving tackles").kind != "order.rejected"
+    w.run(2)
+    runner = w.ship.extra["evolutions"]
+    assert [i.evo.id for i in runner.instances] == ["relieving_tackles"]
+    return w
+
+
+@pytest.mark.parametrize("helm", HELM_KINDS)
+def test_a_mend_not_in_hand_is_named_as_her_helm_names_it(helm):
+    """Nudge 45, item 1. With the tackles in hand and no mend, a belay of the mend by any of its
+    words is refused, naming the mend not in hand as the log would name it once begun, by her
+    helm (`Script.work_of`, the one table). Old: on a tiller hull "Nothing in hand or waiting is
+    repairing the wheel.", the vocabulary's verb, whatever words she was given."""
+    path = ROOT / "data/ships" / ("cutter.yaml" if helm == "tiller" else "brig.yaml")
+    doing = gerund_words(HELM_WORDS[helm]["mend"])
+    for order in ("belay shipping the spare tiller", "belay ship the spare tiller",
+                  "belay the wheel", "belay repairing the wheel"):  # fmt: skip
+        w = _tackles_in_hand(path)
+        e = w.submit(order)
+        assert e.kind == "order.rejected", (order, e.text)
+        assert e.text.endswith(
+            f"Nothing in hand or waiting is {doing}. The work in hand: rigging the relieving "
+            "tackles."
+        ), (order, e.text)
+        assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
