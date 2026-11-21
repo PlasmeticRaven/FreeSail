@@ -61,6 +61,7 @@ TILLER_FILES = {
 
 # Package 116's words for the wheel, each as its lines gave it before this step: kept exactly
 WHEEL_116 = {
+    "helm": "the wheel",  # her helm's noun, as a place's words name it (nudge 47)
     "lost": "the wheel shot away",
     "hit": "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
     "'rig the relieving tackles'.",
@@ -82,6 +83,7 @@ WHEEL_116 = {
 }
 # The tiller's, the lead's ruling of the ground report's draft (nudge 22, "as drafted"), JUDGEMENT
 TILLER_A3 = {
+    "helm": "the tiller",
     "lost": "the tiller shot away",
     "hit": "The tiller is shot away; the helm is lost until the relieving tackles are rove: "
     "'rig the relieving tackles'.",
@@ -470,3 +472,29 @@ def test_the_primer_says_of_a_tiller_what_the_game_does():
     heading = {"steady", "steady as she goes", "meet her"}
     assert all(a == b for o, (a, b) in said.items() if o not in heading), said
     assert all(a.split(" N")[0] == b.split(" N")[0] for o, (a, b) in said.items()), said
+
+
+@pytest.mark.parametrize("stem", ["cutter", "brig", "frigate-36"])
+def test_the_places_reading_says_where_her_helm_is(stem):
+    """Nudge 47 ((a)): `the places` reading describes the quarterdeck by her helm, from the one
+    table, in both its forms, the items and the lines described. On the cutter "... keep the deck
+    and the tiller is"; on the brig and the frigate the place's own words, byte for byte, as
+    `world/places.py` gives them and as they were; every other place as it is. Old: "the wheel
+    is" on every ship."""
+    from freesail.world.places import PLACES
+
+    w = make_world(7, f"data/ships/{stem}.yaml", Scenario())
+    reading = w.readings["places"]
+    filed = PLACES["quarterdeck"].description
+    assert filed.endswith("keep the deck and the wheel is (Falconer 1780, QUARTER-DECK)")
+    tiller = _helm_of(ROOT / "data/ships" / f"{stem}.yaml") == "tiller"
+    # the words held literally, so that a wheel ship's case passes on the old code as well
+    want = filed.replace("the wheel is", "the tiller is") if tiller else filed
+    assert reading["items"]["quarterdeck"]["description"] == want
+    assert f"The quarterdeck: {want}." in reading["described"]
+    if tiller:
+        assert "the wheel" not in " ".join(reading["described"])
+        assert want.endswith("keep the deck and the tiller is (Falconer 1780, QUARTER-DECK)")
+    others = {p.id: p.description for p in PLACES.values() if p.id != "quarterdeck"}
+    assert {k: v["description"] for k, v in reading["items"].items() if k in others} == others
+    assert reading["words"] == ", ".join(p.name for p in PLACES.values())

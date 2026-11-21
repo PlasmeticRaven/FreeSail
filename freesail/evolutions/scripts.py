@@ -2978,11 +2978,14 @@ HELM_LOST_ASIDE = "the helm not answering, the wheel shot away"
 # still). The tiller's are the lead's ruling of the ground report's draft (nudge 22, "as drafted":
 # the tackles hooked to the stump of the tiller and manned on deck, the spare tiller shipped by the
 # carpenter's crew aft at the rudder head; JUDGEMENT, plan §13.1 item 3); the times and the hands
-# are the wheel's, the files' own. `lost` is the state the hit writes (`ship.extra["helm_lost"]`)
+# are the wheel's, the files' own. `helm` is what she steers by, as a place's words name it (the
+# quarterdeck "where ... the wheel is", `api.readings`' `the places`; nudge 47). `lost` is the
+# state the hit writes (`ship.extra["helm_lost"]`)
 # and the minute's words; `mend` the order that mends her and its work's name; `holds` what the
 # mend holds while the tackles hold the tiller, so that the two go on together on either helm.
 HELM_WORDS: dict[str, dict[str, str]] = {
     HELM_WHEEL: {
+        "helm": "the wheel",
         "lost": "the wheel shot away",
         "hit": "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
         "'rig the relieving tackles'.",
@@ -3002,6 +3005,7 @@ HELM_WORDS: dict[str, dict[str, str]] = {
         "holds": "the wheel",
     },
     "tiller": {
+        "helm": "the tiller",
         "lost": "the tiller shot away",
         "hit": "The tiller is shot away; the helm is lost until the relieving tackles are rove: "
         "'rig the relieving tackles'.",
