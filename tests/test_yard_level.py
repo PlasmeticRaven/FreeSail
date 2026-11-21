@@ -17,6 +17,7 @@ import math
 from pathlib import Path
 
 import pytest
+import yaml
 from rig_fixtures import polacre_probe_doc, tartane_probe_doc, write_ship
 
 from freesail import units
@@ -93,6 +94,70 @@ def test_a_square_yard_over_a_whole_lateen_counts_the_lateen_yard_below_it(tmp_p
     again = load_ship(write_ship(doc, tmp_path, "pole-tartane-2"))
     again.sails["main.lateen"].cls = "gaff"  # no whole lateen below it now
     assert again.yard_level("topsail.yard") == 0
+
+
+def _tartane_with_her_treou(tmp_path, treou_m: float | None) -> Path:
+    """The tartane probe (its rig, not her file: her file is not on this branch) with her pole
+    main as Tar-D §4.1 files it, no topmast and the topsail yard on the main's own head, her
+    great lateen's yard crossing the mast at 10 m; with the tréou's yard crossed on the main at
+    `treou_m` (the cutter's square sail and its gear, renamed), or not crossed (`None`)."""
+    doc = tartane_probe_doc()
+    gone = {"main.topmast", "main.topgallant_mast"}
+    doc["spars"] = [s for s in doc["spars"] if s["id"] not in gone]
+    doc["lines"] = [ln for ln in doc["lines"] if ln.get("of") not in gone or ln["id"] == "jib.stay"]
+    for ln in doc["lines"]:
+        if ln["id"] == "jib.stay":
+            ln["of"] = "main.mast"
+    for name in ("topmasts", "topgallant masts"):
+        doc["groups"].pop(name)
+    for s in doc["spars"]:
+        if s["id"] == "topsail.yard":
+            s["on"], s["height_m"] = "main.mast", 15.6
+    if treou_m is not None:
+        cutter = yaml.safe_load(Path("data/ships/cutter.yaml").read_text(encoding="utf-8"))
+        ours = {"square_sail", "square_sail.yard"}
+        for part in ("spars", "sails", "lines"):
+            for item in cutter[part]:
+                if item["id"] in ours or item.get("of") in ours:
+                    named = ("id", "of", "yard")
+                    doc[part].append(
+                        {
+                            k: v.replace("square_sail", "main.treou") if k in named else v
+                            for k, v in item.items()
+                        }
+                    )
+        for s in doc["spars"]:
+            if s["id"] == "main.treou.yard":
+                s["height_m"] = treou_m
+        doc["groups"]["square sails"].append("main.treou")
+    return write_ship(doc, tmp_path, "tartane-treou")
+
+
+@pytest.mark.parametrize("treou_m", [None, 8.0, 13.0], ids=["not-crossed", "below", "above"])
+def test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or_not(
+    tmp_path, treou_m
+):
+    """Her tréou is set flying (Tar-D decision 9, §5.1a, §15 risk 5): its yard sent up with it and
+    struck with it, so in plain sail no yard stands under her topsail. Her topsail reads the same
+    both ways, a topsail (1) on the pole and handed by the pole's way: with no yard below it, by
+    the great lateen's yard below it (the ruled clause); with the tréou's yard crossed, by the
+    braced yard below it. The tréou's own yard, the lowest braced yard: crossed below the great
+    lateen's yard it is the course (0); crossed above it the same clause reads it 1, a topsail on
+    the pole as well, which is the lead's (the engine track's report, A5 and A6)."""
+    ship = load_ship(_tartane_with_her_treou(tmp_path, treou_m))
+    assert ship.yard_level("topsail.yard") == 1
+    assert ship.is_pole_mast("main.mast") and ship.on_pole("topsail")
+    assert verbs._take_in_kind(ship, ship.sails["topsail"]) == "pole"
+    if treou_m is None:
+        assert "main.treou.yard" not in ship.spars
+        assert [sl.id for sl in scripts._topsails(ship)] == ["topsail"]
+    else:
+        level = 0 if treou_m < ship.spars["main.lateen_yard"].height_m else 1
+        assert ship.yard_level("main.treou.yard") == level
+        topsails = ["topsail"] + (["main.treou"] if level else [])
+        assert [sl.id for sl in scripts._topsails(ship)] == topsails
+        courses = [] if level else ["main.treou"]
+        assert [sl.id for sl in scripts.lowest_square_sails(ship)] == courses
 
 
 def test_the_yards_under_the_bowsprit_stand_apart(tmp_path):
