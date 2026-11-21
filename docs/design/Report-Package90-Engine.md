@@ -1306,3 +1306,31 @@ rules, each hash's report says which lines were resolved by hand, and `ruff chec
 merged tree before its tiers.
 
 Stopped after A4 and the A5-A6 section, as briefed: waiting for the coordinating session's message.
+
+## For the coordinating session: held on nudge 46's item 6, a file outside my row (2026-11-21)
+
+**Where nudge 46 stands.** `…/pkg-90-a1ab` is cut locally from 0d5d2c56; nothing is pushed to it
+yet. Items 1 to 5, 7 and 8 are built there, uncommitted, and the lugger's bow watch is declared in
+TuningNotes, old beside new. Each item has a proof in `tests/test_lateen_whole.py`, and each proof
+fails when its mend is undone (thirteen mutations, each failing its pins). The base tiers on
+0d5d2c56 are running.
+
+**Held on item 6.** The lead asks that "no whole lateen aboard" be served only where she carries
+a whole lateen, and kept out of the samples. A station's sample is drawn in
+`freesail/agents/harness.py`'s `_sample_readings`: `agents/tools.readings_words` less
+`api/action_readings.py`'s `idle_rows`. My §7.1 row names only `api/readings.py`'s practice row,
+and no field of a `Reading` (`where`, `absent`, `none_words`, `per_asker`) keeps a row out of a
+sample. By the stop rule I have not edited either file.
+
+**The smallest mend:** `idle_lateen_rows(world)` in `api/readings.py`, naming the practice's row
+where she carries no whole lateen, and read by `idle_rows` in `api/action_readings.py`. That is two
+lines there, as `idle_practice_rows` is read now, with a test that the row is in no sample of the
+eighteen and is in the xebec probe's. The readings tool itself keeps every row:
+`tests/test_grammar_book.py` asks every reading to be named in the primer, and the tool's own tests
+read every registry row. That is the rule of the readings that wants every row on every ship.
+
+**The question:** may I edit `api/action_readings.py` for those two lines? Until I hear, item 6
+stays stopped and the hash is built without it.
+
+**And the new branch:** pushing `…/pkg-90-a1ab` may need the owner's allowance, as `…-a56` did; I
+will ask the owner when the hash is ready.
