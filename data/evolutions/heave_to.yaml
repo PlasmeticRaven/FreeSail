@@ -66,9 +66,11 @@ timing:
   abaft_points: 9         # fallen off: her head this far from the wind (a point abaft the beam)
   abaft_s: 120            # for this long
   keep_hands: 4           # the hands the tending costs the watch: the spanker and head sheets
-# {braces}: "after braces" where she has after yards, "head braces" where her braced yards are
-# her head yards alone, "sheets" where she has no braced yard, a lugger or a boat (package 90, A2:
-# `scripts.braces_manned`; "after braces" whatever the rig before it).
+# {braces} (package 90, A2 and its second pass: `scripts.braces_manned`; "after braces" whatever
+# the rig before A2): "after braces" where she has after yards; on a rig of head yards alone with
+# a square sail set (`scripts.braces_worked`), "head braces", or "braces" on a vessel of one mast
+# (`scripts.head_word`); "sheets" where she works no braces, a lugger, a boat, or a rig of head
+# yards alone with no square sail set.
 on_start: {log: "Hands to the {braces}; heave to."}
 on_complete: {log: "Hove to on the {hove_tack} tack, {lying}, {helm}{drifting}.", kind: ship.hove_to, severity: notable}
 on_fail: {log: "Could not heave to: {reason}.", kind: evolution.failed, severity: notable}

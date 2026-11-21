@@ -744,8 +744,10 @@ def test_tack_succeeds_when_the_ship_turns(path):
         # haul." before it
         assert words.index("Main-topsail haul.") < words.index("Let go and haul.")
     else:
-        # a vessel with no after yards has no "mainsail haul" (package 32e)
-        assert "Let go and haul." in words
+        # a vessel with no after yards has no "mainsail haul" (package 32e); and as loaded, no
+        # square sail and no head sail set, her head yards are hauled bare and the line is the
+        # helm's (package 90, A2's second pass, its third commit: "Let go and haul." before it)
+        assert "Meet her with the helm." in words
         assert not any("Mainsail haul" in w or "Main-topsail haul" in w for w in words)
     # The stub's turn rate sets the time; a frigate should take five to ten minutes.
     assert 240 <= ticks <= 600
