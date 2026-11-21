@@ -1050,3 +1050,61 @@ settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
 
 Stopped after A5 and A6 as ruled, as briefed: A4's section follows on `…/pkg-90-engine`, on this
 tree merged.
+
+## Looking ahead at A2's re-mend: how each step reads A2's new readers, not merged (2026-11-21)
+
+Read for the coordinating session's plan (A2's re-mend on `…/pkg-90` at 7686aec1, with A3), with
+`git merge-tree` of each hash against `origin/…/pkg-90` at 7686aec1 and `ruff check` of the
+merged `scripts.py`. **Nothing merged and nothing built.** Written now, ahead of A4's section, for
+the first item.
+
+1. **A1a-A1b (71ae1aae) and A1c (be2c90fd): a name the merge leaves undefined, with no conflict
+   to show it.** `HeaveToScript.check` (A1a, ea1045e) refuses a rig of whole lateens with no head
+   sail set and no braced yard by `not has_braced_yards(head, after)`. A2's second pass removes
+   `has_braced_yards` (its uses there read `braces_worked`). Git merges the line clean (A1a-A1b's
+   conflict is TuningNotes' alone, A1c's none), and the merged file fails `ruff check`:
+   `freesail/evolutions/scripts.py:3707:53: F821 Undefined name has_braced_yards` (3714 at A1c).
+   Run on a scratch copy of that merge, the xebec's `heave to` with no head sail set fails with
+   `NameError: name 'has_braced_yards' is not defined`
+   (`tests/test_lateen_whole.py::test_a_rig_of_lateens_with_no_head_sail_set_will_not_lie_to`,
+   1 failed).
+   The same line stands at A1d, A5-A6 and A4 (3823). **The mend, at A1a-A1b's merge:** the line
+   asks whether she has a braced yard at all (A1a's words: "no braced yard"), and names no brace,
+   so I would keep its meaning, `not (head or after)`, which is what `has_braced_yards`
+   returned. A2's `braces_worked` there differs only for a rig of whole lateens built with head
+   yards alone and no square sail set on them: the tartane's file, her topsail furled. That rig
+   would be refused "She will not lie to under her lateens: there is no sail to bring her to."
+   With the meaning kept she is told "No head sail is set to haul to windward, nor a topsail to
+   lay aback.", and she can set it and lay it aback. The xebec probe (no braced yard) and every
+   committed file read the same either way. Which of the two is the lead's call.
+2. **A1d (e2d6b926): the two conflicts in `scripts.py`.** They are the same, byte for byte, at
+   A5-A6 (4ebd88a2) and A4 (b13b8dce): those two add no conflict of their own.
+   - **The tack's haul** (`TackScript`, from `mainsail_haul` to `let_go_and_haul`): A1d adds
+     the lateens drawn over to `draw` (`lateens_drawn_words`). A2 says "Let go and haul." only
+     where she works her braces (`hauled = braces_worked(self.ship)`), else `draw` alone, else
+     "Meet her with the helm.". By both rules: A1d's three lines, then A2's test. A rig of whole
+     lateens that works no braces says its lateens drawn (after the jib's words where she has a
+     head sail) in A2's `elif draw` line. One that works her braces says "Let go and haul." with
+     them.
+   - **The wear's "Wind aft."** (`WearScript`): A2 names the yards squared by `told_of` and
+     `class_word`, and says "hauled out and braced up" by `braces_worked`. A1d puts the lateens
+     shifted over (`_lateens_over`) between the sheets and the braces, with A1b's
+     `_shift_lateens(new_lee)` after the line. By both rules: A2's four readers, A1d's `over` in
+     the line, A1b's call after it. A1d's side's `has_braced_yards` goes, for A2's `worked`.
+   - **`tests/test_known_truths.py`**: both sides append at the file's end, package 121's 7-710
+     to 7-716 and A1d's 7-670 to 7-672 with their three helpers (`_a1d_probe`, `_a1d_peaks`,
+     `_a1d_on_the_bad_hand`). Both are kept whole; they share no name.
+3. **A1b's and A1c's other lines** (the lateens' shift and their watch, the box-off's
+   interruption "the helm and the yards left as they stand; ...", worded as the settee's line
+   beside it, which A2 leaves as it is) name no brace and read none of A2's readers.
+4. **A5-A6 as ruled**: they read A2's readers without crossing them. `yard_level` reads a yard's
+   place on its mast. A2's `_split_as_built` reads head or after by the mast as she was built.
+   Each changes nothing the other reads. The smack is of one mast (`one_masted`) and her topsail
+   is a head yard, so by A2 she works her braces only while it is set (`square_set_on`). The cast
+   under her plain sail (ruling 3) leaves it furled, so A2's cast lines ("The topsail yard
+   abox.", ", brace round the topsail yard") are not said of her, as on `…/pkg-90` now: the two
+   rules agree there. With her topsail set by the player she works her braces by A2, and her
+   topsail is a topsail by A5: hove to, she has A2's "the braces" (`braces_manned`, one mast) and
+   A5's topsail to the mast. That is read from the code, not run. It is for the re-measure at
+   the merge (the smack's table, every order, as in A5 and A6's sections).
+5. **A4** reads no yard and no brace. Its conflicts are A1d's.
