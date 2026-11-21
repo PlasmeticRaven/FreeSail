@@ -639,3 +639,118 @@ speed. JUDGEMENT either way; the boat towed in the wake of a ship rides lighter 
 committed file tows a boat.
 
 Going on to A5 and A6 meanwhile, as briefed; they touch none of these files.
+
+## Steps A5 and A6: a yard's level from its order on its mast, and the pole mast's quick handing (2026-11-21)
+
+**Merged first:** nothing new (the package branch's A2 mended hash has not been said to have
+landed). **The base** of every comparison is A1d, **8dce637** (`e2d6b92` and `a7f8298` above it add
+reports alone).
+
+**Commit:** **effbaed** on `…/pkg-90-engine` (parent a7f8298), one commit for the two, as the plan's
+§9.1 merges them.
+
+**Files** (each in the engine track's §7.1 row):
+- `freesail/ship/graph.py`: `Ship.yard_level`, `YARD_LEVEL_SPARS`, `_find_yard_levels` and its
+  memo `_YARD_LEVELS` (a weak dictionary, never pickled); `Ship.is_pole_mast`, `Ship.on_pole`;
+- `freesail/evolutions/scripts.py`: the level read at `lowest_square_sails`,
+  `light_sails_forward_of`, `_topsails_on`, `_is_upper_square`, `_topsails`; lie a-try's refusal
+  ("close-reefed" only of a topsail with reef bands); `mast_inventory` naming the pole;
+- `freesail/evolutions/trim.py`: `_level` (and through it `stagger`, `by_level`, `eased_lowest`,
+  `heavy_weather_trim`);
+- `freesail/orders/verbs.py`: `_take_in_kind`, `_level_rank`, `evolution_key(..., ship)`'s
+  `pole`, the pole sail's refusal of "haul up";
+- `freesail/physics/sails.py`: `_yard_level` (the helm's mark) and `studding_level`, by
+  `yard_level`;
+- `data/vocabulary.yaml`: `take in` and `furl`'s `pole`, `take_in_words`' `pole: [lower, clew up]`;
+  `data/evolutions/take_in_pole.yaml`, `data/evolutions/furl_pole.yaml` (new);
+- `tests/test_yard_level.py`, `tests/test_pole_mast.py` (new); `tests/test_agents.py` (the pin
+  below); `docs/dev/TuningNotes.md`: "Package 90, A5 and A6".
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class added
+(methods, functions, constants and a module dictionary), so truth 7-606 and the checkpoint's list
+are not touched; a test shows a checkpoint the same bytes whether the levels have been read or
+not. No key written into a committed file: stage 0's `KEY_CARRIERS` does not move. LF; ruff check
+and format clean; no Python line over 100. Nothing under `docs/agents/consent/`.
+
+### What was built
+
+TuningNotes has each piece with its words. **A5**: a braced yard's level is the level of the spar
+it hangs on and one more for each braced yard on the same spar below it by height; a square yard
+on a lower mast with no braced yard below it and a whole lateen's yard below it counts the
+lateen's (the lead's lean, ruled); read at the twelve places in place of the parent spar's class.
+A pure rank by height (the plan's first wording) was measured and not built: it made three
+committed files' topsails courses. **A6**: the pole, read from the parts as filed with no key: a
+lower mast with a braced yard above its lowest on the mast itself and no topmast; its upper square
+sails taken in by the halyards let go, lowered onto the yard below and clewed up there
+(`take_in_pole`, 60 s), and furled from the yard below (`furl_pole`, the lowering and a 120-s
+furl), "lower" its word and "haul up" refused in its own words; the topmast evolutions refused in
+words naming the pole. **Not built, as ruled:** `reef_pole`. The two new files' served notes are
+the ship's work and its sources alone (a test says so).
+
+### Measured
+
+- **The guard over every file's yard levels** (`tests/test_yard_level.py`), old beside new: every
+  braced yard of the eighteen files at the level its spar's class gave it, but the smack's
+  `topsail.yard`, 0 -> 1. Of the committed files the smack's main alone is a pole, her topsail
+  alone on it (`tests/test_pole_mast.py`).
+- **The smack** (seed 7, her head 292.5°, the topsail set over plain sail and settled 900 s):
+  hove to in 15 kn, her topsail now laid to the mast as a fore-and-after's ("Hove to on the
+  starboard tack, topsail to the mast, helm a-lee."), 50.5° off at 2.87 kn by +900 s, where before
+  it was hauled up as a course and she lay 47.3° off at 2.61 kn; in 30 kn she lies a-try under the
+  topsail and the foresail, 49.3° off at 3.64 kn by +1,800 s, where before she was refused ("She has
+  no topsail to lie a-try under."). Her topsail taken in 88 s from the order's start line, against
+  154 s; furled 300 s against 350. The table is TuningNotes'.
+- **The eighteen files**: A2's harness at 8dce637 and at effbaed, **270 runs: 267 the same in
+  every tick, kind, trace and line; the smack's three move**, none of them pinned:
+  1. `lie_a_try` (her plain sail, the topsail not set): the refusal's words, "She has no topsail to
+     lie a-try under." -> "The topsail is not set; set it to lie a-try under it." (A5: she has a
+     topsail now; the lie a-try's refusal mended at its cause for a topsail with no reef bands).
+  2. `anchor` and `shoal_anchor` (come to anchor in Carrick Road, then weigh and cast): every line
+     the same words; her cast's "She has paid off ..." 2 s earlier (3,603 s against 3,605; 3,115
+     against 3,117), the trace parting from +3,170 s in the one and +2,740 s in the other as she
+     makes sail to cast, and at the run's end, +3,900 s, she lies 34 to 39 m from where she lay
+     before, the lookout's and the helm's lines after it at moved ticks. The cause: getting under
+     way, the trim's stagger now braces her topsail as a topsail (level 1) from her course below,
+     where it was braced as a course.
+
+### Moved, old beside new, with reason
+
+1. `tests/test_agents.py::test_the_contents_says_what_each_topic_costs_measured_from_the_text_served`:
+   "111 evolutions" -> "113 evolutions": `take_in_pole.yaml` and `furl_pole.yaml` (the ground
+   report's row 12, measured 110 -> 112 before A1a's `change_lateen`).
+
+**The ground report's rows 13 to 16 do not move**: no `reef_pole` (13), and
+`tests/test_held_work.py`'s two sweeps (14, 15) and `tests/test_in_world.py`'s catalogue case (16)
+pass as they are (in the lens below and the fast tier).
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is A1d, 8dce637** (its two tiers' junits, run
+for A1d's report).
+
+| Run | Base (8dce637) | A5-A6 (effbaed) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,638: 8,629 passed, 8 skipped, 1 xfailed, 0 failed (1 h 16 min) | 8,689: 8,680 passed, 8 skipped, 1 xfailed, 0 failed (1 h 27 min). **Test by test: every one of the base's 8,638 the same outcome; 51 new, all passed** (27 of `tests/test_pole_mast.py`, 24 of `tests/test_yard_level.py`); the moved pin's case passed at both |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (a level read in `physics/sails.py` and the trim's, so the tier whole) | 568: 557 passed, 11 xfailed, 0 failed (1 h 26 min) | 568: 557 passed, 11 xfailed, 0 failed (1 h 25 min). **Test by test: every one of the base's 568 the same outcome**, none new |
+| **The lens with its slow cases**, `--slow`, `-n 3`: `test_yard_level`, `test_pole_mast`, `test_lateen_whole`, `test_settee`, `test_lug`, `test_evolutions`, `test_staying`, `test_lying_to`, `test_gale`, `test_rig_geometry`, `test_catalogue`, `test_captain_trials`, `test_held_work`, `test_agents`, `test_in_world`, `test_rig_classing`, `test_schooner_mast`, `test_fishing`, `test_sails`, `test_trim_order`, `test_orders`, truth 7b-111 | | 1,703 passed, 2 xfailed (11 min), on the tree as committed |
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, base beside new, every case
+the same outcome: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py`
+74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
+`tests/test_lateen_whole.py` 90; all passed at both.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`.
+
+### Unsure, and for the lead
+
+1. **The smack's cast, 2 s earlier**, and her place 34 to 39 m off at the harness's end: no truth
+   or pin of hers reads it (the tiers), and it is the rule's own reach (her topsail a topsail).
+   Said here rather than left to be found.
+2. **The lateen-below clause** (the lead's lean) reaches no committed file: the tartane's topsail
+   over her great lateen and the polacre's mizen topsail meet it with their files; the probes show
+   it (`tests/test_yard_level.py`).
+3. **The pole's times** are JUDGEMENT (no period time found): the brig's clew-up less its settling
+   on the cap for the take-in, the square sail's furl less the climb for the furl.
