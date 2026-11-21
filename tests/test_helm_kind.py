@@ -391,3 +391,33 @@ def test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend():
             "shot left it."
         ), (order, e.text)
         assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
+
+
+def test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend():
+    """Nudge 45, item 3: the tiller's words on a wheel ship are accepted, and she answers in her
+    own. On the brig, the tackles in hand: each of the tiller's four words starts the wheel's
+    mend, begun in the wheel's words; each of the tiller's belays belays it, in the wheel's words;
+    and with the wheel whole each is refused as the wheel's (the passage above)."""
+    words = HELM_WORDS["wheel"]
+    brig = ROOT / "data/ships/brig.yaml"
+    for order in ("ship the spare tiller", "ship a spare tiller", "ship a new tiller",
+                  "repair the tiller"):  # fmt: skip
+        w = _tackles_in_hand(brig)
+        n = len(w.log)
+        e = w.submit(order)
+        assert e.kind == "order.accepted", (order, e.text)
+        w.run(2)
+        begun = [x.text for x in w.log[n:] if x.kind == "evolution.started"]
+        assert begun == [words["mend_begin"]], (order, begun)
+        (mend,) = [i for i in w.ship.extra["evolutions"].instances if i.evo.id == "repair_wheel"]
+        assert w.ship.extra["evolutions"].doing(mend) == "repairing the wheel"
+    for order in ("belay the tiller", "belay the spare tiller", "belay shipping the spare tiller",
+                  "belay ship the spare tiller"):  # fmt: skip
+        w = _tackles_in_hand(brig)
+        assert w.submit("ship the spare tiller").kind != "order.rejected"
+        w.run(2)
+        e = w.submit(order)
+        assert e.kind == "work.belayed", (order, e.text)
+        assert e.text == (
+            "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it."
+        ), (order, e.text)

@@ -38529,6 +38529,13 @@ The brig's four answers are as they were ("... is repairing the wheel."). Every 
 
 Every answer's kind and the lines after it are the same but where a belay now belays; there the mend is belayed as `belay the wheel` belays it. No pin moves. Pinned: `tests/test_helm_kind.py::test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`; on the old code it fails.
 
+**3. The tiller's words on a wheel ship, accepted and pinned** (`tests/test_helm_kind.py::test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend`). On the brig, with the tackles in hand:
+- each of `ship the spare tiller`, `ship a spare tiller`, `ship a new tiller` and `repair the tiller` starts the wheel's mend, begun in the wheel's words ("Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be rove.") and named "repairing the wheel";
+- each of `belay the tiller`, `belay the spare tiller`, `belay shipping the spare tiller` and `belay ship the spare tiller` belays it: "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it.";
+- the "whole" refusal stands pinned beside them (`test_a_helm_shot_away_and_mended_is_said_in_her_helms_words_alone[brig]`).
+
+Nothing moves by this item: the starts were taken before, and the first two belays are item 2's. On the old code the test fails at `belay the tiller`.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.
