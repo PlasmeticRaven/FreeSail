@@ -336,3 +336,137 @@ def test_the_captains_mend_order_is_her_helms(helm):
     runner = ship.extra["evolutions"]
     (mend,) = [i for i in runner.instances if i.evo.id == "repair_wheel"]
     assert runner.doing(mend) == doing
+
+
+# -- the list of nudge 45: the belay by the helm's words -------------------------------------
+
+
+def _tackles_in_hand(path: Path):
+    """From the harbour at seed 7, her helm shot away at a minute and the relieving tackles
+    ordered and in hand: no mend in hand or waiting."""
+    w = make_world(7, str(path.relative_to(ROOT)), Scenario())
+    w.run(60)
+    _shot_away(w)
+    w.run(1)
+    assert w.submit("rig the relieving tackles").kind != "order.rejected"
+    w.run(2)
+    runner = w.ship.extra["evolutions"]
+    assert [i.evo.id for i in runner.instances] == ["relieving_tackles"]
+    return w
+
+
+@pytest.mark.parametrize("helm", HELM_KINDS)
+def test_a_mend_not_in_hand_is_named_as_her_helm_names_it(helm):
+    """Nudge 45, item 1. With the tackles in hand and no mend, a belay of the mend by any of its
+    words is refused, naming the mend not in hand as the log would name it once begun, by her
+    helm (`Script.work_of`, the one table). Old: on a tiller hull "Nothing in hand or waiting is
+    repairing the wheel.", the vocabulary's verb, whatever words she was given."""
+    path = ROOT / "data/ships" / ("cutter.yaml" if helm == "tiller" else "brig.yaml")
+    doing = gerund_words(HELM_WORDS[helm]["mend"])
+    for order in ("belay shipping the spare tiller", "belay ship the spare tiller",
+                  "belay the wheel", "belay repairing the wheel"):  # fmt: skip
+        w = _tackles_in_hand(path)
+        e = w.submit(order)
+        assert e.kind == "order.rejected", (order, e.text)
+        assert e.text.endswith(
+            f"Nothing in hand or waiting is {doing}. The work in hand: rigging the relieving "
+            "tackles."
+        ), (order, e.text)
+        assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
+
+
+def test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend():
+    """Nudge 45, item 2. On a tiller hull `belay the tiller` and `belay the spare tiller` belay
+    the mend in hand, as `belay the wheel` does (the vocabulary's work nouns, beside `wheel`), and
+    the rest of the work in hand goes on. Old: "There is no such part as the tiller in this ship"
+    and "... as the spare tiller in this ship; did you mean the square sail?", the mend going on."""
+    for order in ("belay the tiller", "belay the spare tiller", "belay the wheel"):
+        w = _tackles_in_hand(ROOT / "data/ships/cutter.yaml")
+        assert w.submit("repair the wheel").kind != "order.rejected"
+        w.run(2)
+        e = w.submit(order)
+        assert e.kind == "work.belayed", (order, e.text)
+        assert e.text == (
+            "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the "
+            "shot left it."
+        ), (order, e.text)
+        assert [i.evo.id for i in w.ship.extra["evolutions"].instances] == ["relieving_tackles"]
+
+
+def test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend():
+    """Nudge 45, item 3: the tiller's words on a wheel ship are accepted, and she answers in her
+    own. On the brig, the tackles in hand: each of the tiller's four words starts the wheel's
+    mend, begun in the wheel's words; each of the tiller's belays belays it, in the wheel's words;
+    and with the wheel whole each is refused as the wheel's (the passage above)."""
+    words = HELM_WORDS["wheel"]
+    brig = ROOT / "data/ships/brig.yaml"
+    for order in ("ship the spare tiller", "ship a spare tiller", "ship a new tiller",
+                  "repair the tiller"):  # fmt: skip
+        w = _tackles_in_hand(brig)
+        n = len(w.log)
+        e = w.submit(order)
+        assert e.kind == "order.accepted", (order, e.text)
+        w.run(2)
+        begun = [x.text for x in w.log[n:] if x.kind == "evolution.started"]
+        assert begun == [words["mend_begin"]], (order, begun)
+        (mend,) = [i for i in w.ship.extra["evolutions"].instances if i.evo.id == "repair_wheel"]
+        assert w.ship.extra["evolutions"].doing(mend) == "repairing the wheel"
+    for order in ("belay the tiller", "belay the spare tiller", "belay shipping the spare tiller",
+                  "belay ship the spare tiller"):  # fmt: skip
+        w = _tackles_in_hand(brig)
+        assert w.submit("ship the spare tiller").kind != "order.rejected"
+        w.run(2)
+        e = w.submit(order)
+        assert e.kind == "work.belayed", (order, e.text)
+        assert e.text == (
+            "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it."
+        ), (order, e.text)
+
+
+CONNING = ("steady", "steady as she goes", "meet her", "right the helm", "hard a-lee",
+           "helm's a-lee", "hard up", "helm a-weather", "up helm", "down helm")  # fmt: skip
+
+
+def test_the_primer_says_of_a_tiller_what_the_game_does():
+    """Nudge 45, item 4: chapters 25, 22 and 2 of the primer each give the hulls steered by a
+    tiller a clause, and each says what the game does, run: chapter 25's row and its tackles
+    and mend in the tiller's lines (the passage above runs them) and in the mend's half hour of
+    its file; chapter 22's hit, the tiller's; chapter 2's conning words, taken on a tiller hull
+    in the frigate's words (chapter 2's block is the frigate's), the six it names the six."""
+    primer = ROOT / "docs" / "primer"
+
+    def flat(name: str) -> str:
+        return " ".join((primer / name).read_text(encoding="utf-8").split())
+
+    words = HELM_WORDS["tiller"]
+    ch25 = flat("25-water-wounds-and-the-fight-on-deck.md")
+    assert "ship the spare tiller the same where she steers by a tiller:" in ch25
+    assert "the tackles hooked to the stump of the tiller and manned on deck" in ch25
+    assert "hooked to the stump of the tiller and manned on deck" in words["tackles_rove"]
+    assert "the spare tiller shipped in the rudder head, half an hour" in ch25
+    assert words["mend_done"].startswith("The spare tiller is shipped in the rudder head")
+    mend = yaml.safe_load((ROOT / "data/evolutions/repair_wheel.yaml").read_text(encoding="utf-8"))
+    assert mend["timing"]["mend_s"] == 1800
+    assert "With the wheel (or the tiller) shot away and no tackles rove she has no helm" in ch25
+    ch22 = flat("22-an-action.md")
+    hit = "the wheel shot away (or the tiller, in a hull steered by one) loses you the helm"
+    assert hit in ch22
+    assert words["hit"].startswith("The tiller is shot away; the helm is lost until the relieving")
+    ch2 = flat("02-the-wind-and-the-points-of-sail.md")
+    six = "the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig"
+    assert f"(to the tiller, in the same words, in {six})" in ch2
+    assert TILLER_FILES == {"cutter", "lugger", "smack", "topsail-schooner",
+                            "privateer-schooner", "hermaphrodite-brig"}  # fmt: skip
+    said: dict[str, list[str]] = {}
+    for stem in ("frigate-36", "cutter"):
+        w = make_world(7, f"data/ships/{stem}.yaml", Scenario())
+        w.run(30)
+        for order in CONNING:
+            e = w.submit(order)
+            assert e.kind == "helm.order" and e.text.startswith(f"Helm ordered: {order};"), e.text
+            # the words but her heading's and the rudder's side, which are her own
+            said.setdefault(order, []).append(e.text.split(";", 1)[1].split(" (")[0])
+            w.run(3)
+    heading = {"steady", "steady as she goes", "meet her"}
+    assert all(a == b for o, (a, b) in said.items() if o not in heading), said
+    assert all(a.split(" N")[0] == b.split(" N")[0] for o, (a, b) in said.items()), said

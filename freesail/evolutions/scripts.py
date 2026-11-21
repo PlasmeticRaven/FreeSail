@@ -1512,6 +1512,14 @@ class Script:
         line that names it follow. None, the file's words (`registry.Evolution.work`, else the
         verb's): every script but the helm's mend, whose name is the helm's (`helm_words`;
         package 90, A3)."""
+        return self.work_of(self.ship)
+
+    @classmethod
+    def work_of(cls, ship: Ship) -> str | None:
+        """`work` for a ship before the work is begun, with no instance of it: what a line names
+        a work by that is not in hand (`orders.work`'s belay, "Nothing in hand or waiting is
+        shipping the spare tiller"), so that it names it as the runner will once it is begun
+        (package 90, A3, nudge 45)."""
         return None
 
     def _hold_settees(self) -> set[str]:

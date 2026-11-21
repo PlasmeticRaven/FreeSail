@@ -986,8 +986,9 @@ class RepairWheelScript(PhasedScript):
     def holds(self) -> set[str]:
         return {helm_words(self.ship)["holds"]}
 
-    def work(self) -> str | None:
-        return helm_words(self.ship)["mend"]
+    @classmethod
+    def work_of(cls, ship: Ship) -> str | None:
+        return helm_words(ship)["mend"]
 
     def check(self, words: dict[str, Any]) -> str | None:
         extra = self.ship.extra

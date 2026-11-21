@@ -38499,6 +38499,52 @@ The fast tier whole, compared test by test with the base's, the slow tier of the
 
 Built by the A3 builder in a session of its own, beside the engine track; to be read by an independent reader (the plan's §10.2 lens 8: whether the mend is the cause's or only the symptom's, and where else the cause was looked for).
 
+### The list of nudge 45, after A3's merge (2026-11-21)
+
+The lead's reader passed A3 with a list (nudge 45). Each item rode as its own commit on this step's branch, fast-forwarded to `claude/pkg-90` at 0d5d2c56 (A3, A1a and A1b). None moves a tick. Each item was measured old (0d5d2c56) beside new, every order on a fresh world (`probe_belay.py`, kept in the session's scratch).
+
+**1. A mend not in hand named as her helm names it** (`freesail/orders/work.py`; `Script.work_of` in `freesail/evolutions/scripts.py` and `repair_scripts.py`). **The cause:** a belay's refusal named a work not in hand by the vocabulary's verb (`_gerund_words(verb)`), while the runner names it, once begun, by its script (`Script.work`). **Mended:** the script's own name is read before an instance exists (`Script.work_of(ship)`, a class method that `work` now calls), and the belay names a work not in hand by it (`_work_words`), in both of its readings (by the order and by the kind of work). Only the helm's mend has a name of its own, so on every other work the words are the verb's, as before.
+
+| On the cutter, the tackles in hand, no mend | Old | New |
+|---|---|---|
+| `belay shipping the spare tiller`, `belay ship the spare tiller`, `belay the wheel`, `belay repairing the wheel` | "Nothing in hand or waiting is repairing the wheel. The work in hand: rigging the relieving tackles." | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: ..." |
+
+The brig's four answers are as they were ("... is repairing the wheel."). Every answer's kind, the lines after it and the work in hand are the same. No pin moves. Pinned: `tests/test_helm_kind.py::test_a_mend_not_in_hand_is_named_as_her_helm_names_it`, on either helm; on the old code its tiller case fails.
+
+**2. `belay the tiller` and `belay the spare tiller` belay the mend** (`data/vocabulary.yaml`, `more_work_nouns`: `tiller` and `spare tiller`, each to `repair the wheel`, beside `wheel`). They belay the mend on either helm. With no mend in hand they name it as item 1 does.
+
+| Order | Ship, work in hand | Old | New |
+|---|---|---|---|
+| `belay the tiller` | cutter, tackles and mend | "There is no such part as the tiller in this ship." (the mend goes on) | "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the shot left it." |
+| `belay the spare tiller` | cutter, tackles and mend | "There is no such part as the spare tiller in this ship; did you mean the square sail?" | the same as `belay the tiller` |
+| either | cutter, tackles alone | the same refusals | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: rigging the relieving tackles." |
+| either | brig, tackles and mend | "There is no such part as the tiller (the spare tiller) in this ship." | "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it." (item 3) |
+| either | brig, tackles alone | the same refusals | "Nothing in hand or waiting is repairing the wheel. ..." |
+
+**Moved beside it, refusal to refusal (measured, no pin):** `belay the tiller tackles` and `belay the tiller ropes`, the work nouns' reach.
+- Old: "There is no such part as the tiller tackles (the tiller ropes) in this ship", with "did you mean the topsail reef tackle?" on the cutter.
+- New: "Nothing in hand or waiting answers to 'the tiller tackles' ('the tiller ropes'): name the work as the log does, its kind ('the reef') or its sail. The work in hand: ...".
+- Neither belays anything, before or after.
+- The vocabulary has `rig the tiller tackles` and `reeve new tiller ropes` as synonyms of the two works. A noun for each, so that each belays its work, is listed for the lead and not built: the list asks for the tiller and the spare tiller, and `belay the wheel ropes` is refused as these now are.
+
+Every answer's kind and the lines after it are the same but where a belay now belays; there the mend is belayed as `belay the wheel` belays it. No pin moves. Pinned: `tests/test_helm_kind.py::test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`; on the old code it fails.
+
+**3. The tiller's words on a wheel ship, accepted and pinned** (`tests/test_helm_kind.py::test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend`). On the brig, with the tackles in hand:
+- each of `ship the spare tiller`, `ship a spare tiller`, `ship a new tiller` and `repair the tiller` starts the wheel's mend, begun in the wheel's words ("Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be rove.") and named "repairing the wheel";
+- each of `belay the tiller`, `belay the spare tiller`, `belay shipping the spare tiller` and `belay ship the spare tiller` belays it: "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it.";
+- the "whole" refusal stands pinned beside them (`test_a_helm_shot_away_and_mended_is_said_in_her_helms_words_alone[brig]`).
+
+Nothing moves by this item: the starts were taken before, and the first two belays are item 2's. On the old code the test fails at `belay the tiller`.
+
+**4. Older wheel words a tiller hull still read.**
+- **The primer**, a clause each where she steers by a tiller, each run against the game (`tests/test_helm_kind.py::test_the_primer_says_of_a_tiller_what_the_game_does`):
+  - **chapter 25's table** gains a row, `ship the spare tiller`: "the same where she steers by a tiller: the tackles hooked to the stump of the tiller and manned on deck, and the spare tiller shipped in the rudder head, half an hour". These are her lines' words and the mend file's 1,800 s. The paragraph below it says "With the wheel (or the tiller) shot away ...", where it said "With the wheel shot away".
+  - **chapter 22**: "the wheel shot away (or the tiller, in a hull steered by one) loses you the helm", where it said "the wheel shot away loses you the helm". The hit is the tiller's on her.
+  - **chapter 2**: the conning words "speak to the wheel rather than to the course (to the tiller, in the same words, in the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig)". Run on the cutter beside the frigate, the ten words are each taken in the frigate's words; only her own heading differs where a word names it. The six named are the six files that carry the key.
+  - No forms table or orders block changes. The chapters' sizes are measured where they are served (only chapter 3's is pinned), and the primer's tests pass (below).
+- **`freesail/ship/schema.py`'s two comments** said the key is "read by nothing yet". They now say the six tiller files carry it and the helm's words read it. Comments only; no figure, pickle or refusal moves.
+- **`freesail/world/places.py`'s quarterdeck**, "where ... the wheel is", by her helm: **a stop, not built.** `Places` is built with the ship's name alone, by `core/world.py`, which nobody touches after stage 0. Both readers of the description (`the places` reading's `items` and `described`) are in `api/readings.py`, which the list does not give. Keying it on her helm in `places.py` alone cannot be done. It wants two lines of `api/readings.py`'s `_places`, the quarterdeck's description by the ship's helm, and a reader of it in `places.py`. Alternatively the description could say "the helm" on every ship, which moves every wheel ship's words; that is for the lead.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.
