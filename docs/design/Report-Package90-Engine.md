@@ -582,3 +582,60 @@ settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; al
    stand in the fast tier.
 
 Stopped after A1d, as briefed: waiting for the coordinating session's message.
+
+## Step A4: the boat in tow, stopped by the stop rule (2026-11-21)
+
+**Stopped before building; nothing committed for it.** The branch stands at e2d6b92, A1d's report.
+A4 needs three files that my §7.1 row and the card do not name for it, so by the brief's stop rule
+it stops here, and none of them is edited.
+
+**What A4 needs, and why** (read: every road by which a boat leaves and comes back to her ship):
+1. **`freesail/world/boats.py`**, which my row names for A7 alone ("only so that the boat
+   predicates stay a boat's"). The boat manned as a hull is hoisted out here and nowhere else:
+   `man_boat` ("hoisted out and manned: her coxswain and N oarsmen in her, lying off the lee
+   quarter", placed off the lee quarter, refused under way by `way_on_her`, "heave to or come to
+   an anchor before the boat is hoisted out"), `tow_with_boat` ("hoisted out and manned for the
+   tow"), and `hoist_in` and `come_alongside` ("alongside and hoisted in"). A towed boat is
+   hauled up alongside from astern and manned, and veered astern again after, so each of these
+   wants the boat's `towed` read: its words, its place (astern on her painter, not off the lee
+   quarter), and whether the way rule, which guards a hoisting out, applies (JUDGEMENT: hauled
+   alongside she can be manned with a little way on).
+2. **`freesail/world/dealings.py`**, not named in my row. The boat's state on an errand says
+   "hoisting out" (`phase="hoisting out"`, l. 2760) and the errand's schedule counts the hoisting
+   out and in (`BOAT_HOIST_OUT_S`, `BOAT_HOIST_IN_S`, l. 2785-2786 and 3383-3384, the boat's
+   other roads to the quay and to another ship); its words are the errand's (`boat_phase`).
+3. **`freesail/world/ports.py`**, not named. The two times themselves (`BOAT_HOIST_OUT_S`,
+   `BOAT_HOIST_IN_S`, 300 s each, l. 308-309).
+
+In my row, and ready to take the same reading once the three are given: the errands' scripts
+(`evolutions/scripts.py`: `SendBoatScript`'s and `LayOutKedgeScript`'s "hoist_out" and "hoist_in"
+phases, 300 s each, and `send_boat.yaml`'s "Away {boat}'s crew! Hoist out {boat}." and "{boat_cap}
+hoisted in."), and the clearing for action's "boats hoisted out to tow astern"
+(`evolutions/action_scripts.py`, l. 103-134). Built in those alone, `send the boat ashore` would
+say "hauled alongside" while `man the boat` still said "hoisted out" of a boat already in the
+water: a mend at two places of one cause, not at the cause.
+
+**Measured, for the drag** (A4's JUDGEMENT "left out as small beside the hull's, measured against
+the trawl's form"), run in scratch with nothing changed: the engine's own resistance
+(`physics/hull.resistance`, the form the trawl's drag rides beside in `integrate.step`) of the
+16-ft yawl (`data/ships/boat-yawl-16.yaml`, the nearest committed boat to the tartane's 4.5 m)
+beside the tartane probe's hull, upright:
+
+| Her way | The yawl | The tartane probe | The boat's share | The trawl, for scale (`TRAWL_DRAG` u²) |
+|---|---|---|---|---|
+| 2 kn | 33 N | 561 N | 6 per cent | 1,270 N |
+| 4 kn | 168 N | 2,308 N | 7 per cent | 5,081 N |
+| 6 kn | 734 N | 5,836 N | 13 per cent | 11,433 N |
+| 8 kn | 3,009 N | 13,453 N | 22 per cent | 20,325 N |
+
+So the boat's drag is small at a towing pace and in light airs, but at the tartane's sailing
+speeds (6 to 8 kn, the A1b probe's 6 kn close-hauled and 8.5 kn in 25 kn) it is an eighth to a
+fifth of her hull's by the engine's form, well past the boat's own hull speed. **For the lead**:
+whether it is left out, as the plan has it, or carried as a drag like the trawl's (veered long in
+a blow, or hoisted in, by the tartane's design §11), the figure being the boat's resistance at her
+speed. JUDGEMENT either way; the boat towed in the wake of a ship rides lighter than the bare form.
+
+**Pins:** none moved; nothing built. **Stage 0's table** (`KEY_CARRIERS["towed"]`) stays empty: no
+committed file tows a boat.
+
+Going on to A5 and A6 meanwhile, as briefed; they touch none of these files.
