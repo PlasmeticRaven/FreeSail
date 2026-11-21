@@ -1,0 +1,1117 @@
+> **This is version 0.2 of the design proposal, kept whole for reference** as it stood on 21 November 2026,
+> its decisions log to decision 76. The proposal in force is `docs/DesignProposal.md` (version 0.3), which
+> carries the log on. Nothing here is kept up to date.
+
+# FreeSail: Design Proposal (v0.2, for refinement)
+
+This document turns the initial brainstorm (`docs/InitialDesignBrainstorm.txt`) plus two rounds of follow-up answers into a single proposal. Version 0.2 folds in the answers to the v0.1 open questions; they are recorded in §12. It is written for a reader who is not a programmer. Where a term of art is unavoidable it is explained on first use. Where a choice genuinely forks the design, both branches are laid out as a *decision record* with a recommendation, so we can argue about the fork rather than the whole document.
+
+Everything here is a proposal. It was written before anything was built; milestones 0 to 5a have since been built against it, and §12's decisions log records where the build changed it (the cold review of 2026-09-30, `docs/design/ColdReview-2026-09-30.md`, reads it whole against the code).
+
+---
+
+## 0. Summary
+
+FreeSail is a **ticked, text-first sailing simulation** of a late-age-of-sail vessel of **any rig**, in which the ship is modelled as a **graph of individually simulated parts** (spars, sails, lines, fittings, guns, stores) worked by **individually simulated sailors**. Players and language models control the ship through the **same layered order system**: from hauling a single line, up through named period evolutions ("wear ship"), up through a small bespoke **standing-orders language**, up to full scripting in Python. The ship lives in a **dynamic sandbox world** with weather systems, ports, other ships pursuing their own goals, and small-scale combat.
+
+The organising principle is: **the ship's log is the game.** Every change in the world is an event. The text log, the map, the profile view, replays, LLM narrators, LLM players, and future multiplayer all consume the same event stream and query the same state. That single decision gives us LLM parity, testability, and multiplayer readiness almost for free.
+
+Recommended stack: a **Python simulation core** that runs headless, a **browser-based local client** for the map, log and profile view, and **LLM integration through a tool interface** (the Model Context Protocol, MCP) so that Claude via the desktop subscription and local models via any tool-calling runtime can watch, advise, crew, or captain with no per-token billing.
+
+---
+
+## 1. Vision and pillars
+
+**One-line pitch.** A sailing game where every rope matters, where you can sail by giving orders like a captain or by writing the orders your crew will follow without you, and where a language model can sit at any station on the ship, from lookout to captain.
+
+**Pillars** (used to settle arguments later; if a feature serves none of these, it waits):
+
+1. **Bottom-up realism.** Behaviour emerges from parts and physics, not from scripted outcomes. If a studding sail exists, it exists because a boom, an iron, a halyard, a tack and a sheet exist and a crew can rig them.
+2. **Any rig.** The engine knows about spars, sails and lines, not about "a ship". A ship-rigged frigate, a topsail schooner, a lugger and a cutter are data files that differ in their parts, and nothing in code assumes a number of masts or a kind of sail. This is a pillar, not a feature, because it is cheap to honour from the start and ruinous to retrofit.
+3. **Orders at every altitude.** Manual, semi-automated, and fully automated play are all first-class and freely mixed, mid-voyage.
+4. **Parity.** Humans and LLMs see the same information and have the same actions. No hidden API for machines, no hidden UI for humans.
+5. **Dynamic, not authored.** The world runs whether or not the player is looking. Content is systems, not levels.
+6. **Depth over gloss.** Text and schematic graphics that tell the truth beat 3D that lies. Performance and budget go into simulation.
+7. **Period-plausible, not period-pedantic.** If it was done, or physically could have been done, in roughly 1780–1820, it is allowed. Things that never could have been done are not.
+
+**Non-goals (for now).** Real-time 3D rendering (a long-term dream, deferred until the simulation and world are strong; see §6.1). Authored campaign. Public multiplayer server. Faithful replica of one specific historical vessel or year.
+
+---
+
+## 2. The player's experience
+
+### 2.1 What a session looks like
+
+You open the game. A log panel occupies most of the screen, scrolling ship's-log-style entries: bells, wind changes, sail handling, sightings, casualties. A map shows your ship, coastline, known vessels, wind arrows, and your dead-reckoning track. A profile view shows your ship's sail plan as a schematic, sails drawn in their current state (furled, set, reefed, backed, split). A command line sits under the log.
+
+You type orders. `set the fore topsail`. `brace up sharp on the starboard tack`. `steer south-west by west`. Each order becomes work for named sailors, takes real (game) time, and produces log entries as it proceeds. Time runs in ticks; you can pause, step, or compress.
+
+When you get tired of trimming sails by hand, you write a standing order: "when the wind backs more than two points, brace the yards to suit." Later you write a page of standing orders that runs the ship's routine for a whole watch. Later still, you write Python that fights the ship.
+
+At any point, you can hand a station to a language model: "Mr. Pellew, you have the deck" gives an LLM the same order channel you have, scoped to the authority of that station.
+
+(Standing orders and time compression also allow a slower style, leaving the ship to sail a passage herself and reading the log afterwards. That is a consequence of the design, not a goal of it; the game is built to be good played actively.)
+
+### 2.2 The control ladder
+
+This is the core of the design, so it is worth stating carefully. There are four levels, and they are strictly layered: each level is implemented in terms of the level below, and a player can drop down a level at any time.
+
+| Level | Name | What you say | Who it is for |
+|---|---|---|---|
+| 0 | **Hands** | `haul the weather main brace`, `let go the fore topsail sheet`, `send the larboard watch aloft to furl the main course` | Power users, LLMs in crisis, rigging nerds, the "every part of the ship can be used" promise |
+| 1 | **Orders** | `set the main topgallant`, `reef topsails`, `tack ship`, `wear ship`, `heave to`, `set studdingsails both sides`, `clear for action` | Everyone. This is the default play surface |
+| 2 | **Standing orders** | Rules in the bespoke language: `when ... then ...`, `at sunset ...`, `every glass ...` | Players automating routine, LLMs setting policy |
+| 3 | **Scripts** | Python against a documented API | Poweruser automation, competitive play, LLM agents with code tools |
+
+Level 1 orders are *evolutions*: named, period-accurate sequences of level-0 actions with crew assignments and timings. "Tack ship" is a dozen coordinated hauls and lets-go in sequence, and the game knows the sequence. Level 1 is where most of the sailing knowledge in the game lives, and it is data (see §4.4), so it can be extended without programming.
+
+A new player is taught level 1 and shown the log of what level 0 is doing underneath. Curiosity pulls them down; laziness pulls them up. Both are rewarded.
+
+### 2.3 What the player does not have to do
+
+The player never has to write code to sail. Level 1 is complete on its own. The "basic control modules" from the brainstorm are the level 1 evolution set and a set of starter standing orders that ship with the game (a watch routine, a bad-weather routine, a night routine).
+
+---
+
+## 3. Simulation model
+
+### 3.1 Time
+
+- The world advances in **discrete ticks**. Proposed base tick: **one game second**. Physics may sub-step inside a tick for stability, invisibly.
+- The player chooses **time compression**: 1x (one game second per real second), up to something like 60x or 300x for passages. The log adapts: at high compression it rolls up routine entries into hourly summaries.
+- Nothing happens between ticks. This makes the game deterministic and fair to slow thinkers, human or machine.
+- Two agent-timing modes, per agent (see §7.3):
+  - **Free-running.** The sim keeps ticking; an agent's orders land when they arrive.
+  - **Lockstep.** The sim waits for a subscribed agent to respond before advancing past its sampling points. This is the LLM-parity mode for competitive play.
+
+Evolutions take realistic time. Setting a studding sail on one side is a quarter of an hour's work for a competent crew; tacking a frigate is ten minutes; a badly handled tack that misses stays costs more. This is what makes standing orders and automation meaningful: the ship is slow, so foresight matters.
+
+### 3.2 Determinism and replay
+
+Every run is seeded. Given the same seed and the same sequence of orders, the same log results. This is a hard requirement, not a nicety:
+
+- It makes bugs reproducible.
+- It lets us test LLM agents by replaying the same storm a hundred times.
+- It makes multiplayer possible later (send orders, not state).
+- It gives us **replays** for free: a saved log is a saved game.
+
+### 3.3 The ship as a graph of parts
+
+The ship is not one object with a "speed" number. It is a **graph**: a set of parts, each with its own state, connected to each other. The physics reads the graph; the crew changes the graph.
+
+Part families (initial taxonomy, to be expanded):
+
+- **Hull**: sections (bow, midships, stern, below-waterline), displacement, ballast, cargo, water in the well, copper condition, rudder.
+- **Spars**: lower masts, topmasts, topgallant masts, royal masts, yards (lower, topsail, topgallant, royal, skysail), booms and gaffs (driver, spanker), bowsprit, jib-boom, flying jib-boom, **studding sail booms and their irons**, spare spars in the waist.
+- **Sails**: courses, topsails, topgallants, royals, skysails, staysails, jibs, spanker/driver, gaff sails and gaff topsails, lugsails, lateens, spritsails, **studding sails** (lower, topmast, topgallant), **ringtail**, **water sail**, **save-all**, bonnets, storm canvas. Each has area, cut, cloth condition, reef bands, and a *state* (furled, in the gear, set, backed, reefed n, split, blown out).
+- **Standing rigging**: shrouds, stays, backstays, preventer stays, bobstay, martingale. Condition and tension affect spar survival.
+- **Running rigging**: halyards, sheets, tacks, clewlines, buntlines, leechlines, braces, lifts, bowlines, reef tackles, outhauls, downhauls, vangs, guys. Each line has a belaying point, a length hauled, a load, and a chafe/wear state.
+- **Deck fittings**: wheel and tiller ropes, capstan, windlass, pumps, bitts, catheads, davits, boats, anchors and cables, the galley fire, the binnacle, the lead and log lines, signal halyards and flag locker.
+- **Armament**: guns and carronades by position, carriages, tackles, shot lockers, magazine, powder condition.
+- **Stores**: water, provisions, spare canvas, spare cordage, spare spars, carpenter's and boatswain's stores, medical stores.
+
+Every part has: **condition** (0–100 with wear), **load** (current strain vs. rating), **crew stations** that reference it (where hands stand to work it), and **rules** for what states it may enter given the states of its neighbours. A topgallant studding sail cannot be set if its boom is not rigged out; the boom cannot be rigged out if the topgallant yard is braced sharper than its iron allows; and so on. These rules are where "physically possible" is enforced.
+
+Ships are **data files**, not code. A ship definition lists its parts and their connections; a sail plan is a set of sails attached to spars. Making a new ship class, or refitting one, is editing a data file. This is also how obscure kit gets in: a ringtail is a data entry that attaches to the driver's boom and gaff, with its own halyard, outhaul and sheet, and its own physics parameters.
+
+**Rig-agnosticism (pillar 2) in practice.** The engine never refers to "the main topsail" or "the three masts". It refers to *part classes* and *roles*:
+
+- Every sail belongs to a **sail class** with its own force behaviour: square, gaff (four-cornered fore-and-aft), jib-headed (staysails and jibs), lug, lateen, sprit, studding. A schooner's foresail and a frigate's spanker are both gaff sails and share a force curve; they differ in area, position and gear.
+- Every spar and line has a **role** relative to its neighbours (the yard *of* this sail, the halyard *of* this yard, the tack *of* this sail). Evolutions are written against roles ("hoist the yard of the sail", "haul out its tack"), so "set the topsail" is one evolution whether the topsail hangs on a frigate's main topmast or a topsail schooner's fore.
+- The **Orders vocabulary** is generated from the ship file. The parser knows the grammar; the ship file supplies the nouns. A lugger has no braces to haul and the parser will say so.
+- The **profile view** draws whatever the file describes.
+
+The first two reference rigs, built together in milestone two so that nothing quietly assumes one of them, are a ship-rigged vessel and a topsail schooner. The schooner is chosen because it carries both square and gaff sails, so it exercises the most of the model for the least data. The rig list the data model must cover from the outset is in §9.
+
+### 3.4 Physics: fast, honest, 2.5D
+
+The world is a two-dimensional surface. The ship has a position, heading, speed, leeway, heel and pitch, and a rate of turn, but no three-dimensional mesh. Call it 2.5D. This is the deliberate trade in pillar 5: it keeps the physics cheap enough to run many ships and a hundred storms in testing, and it keeps the truth in the numbers rather than the pictures.
+
+Per tick, for the player's ship (and any ship inside "full simulation" range):
+
+1. **Wind at the ship.** True wind from the weather model, plus gusts and vertical shear (stronger aloft). Apparent wind from ship motion.
+2. **Per-sail forces.** Each set sail produces lift and drag as a function of apparent wind angle, its trim (from brace angle, sheet, tack), its area (reefed or not), its cloth condition, and blanketing by sails to windward of it. A simple lift/drag curve per sail type, tuned by hand, is enough for honest behaviour: sails luff when pinched, stall when eased too far, back when the wind is on the wrong side.
+3. **Hull forces.** Resistance rising steeply with speed, leeway from side force, heel from the heeling moment of all sails together, righting moment from hull and ballast, rudder force scaled by speed through water.
+4. **Balance.** The centre of effort (where the sail forces act) versus the centre of lateral resistance (where the hull resists sideways) gives weather or lee helm. Setting the driver or taking in the jibs shifts it. This is what makes sail choice matter for steering, not just speed, and it is where a lot of the period seamanship "just works" if the model is right.
+5. **Strain and failure.** Each sail's force loads its spars and running rigging. Exceeding rating over time degrades condition; exceeding it a lot carries the thing away, with a log entry, debris, and consequences. This is what makes shortening sail a real decision.
+6. **Motion.** Integrate to new position, heading, speed. Sea state adds pitch and roll, which reduce effective sail area and slow work aloft.
+7. **Water.** Leaks from damage and working seams; pumping; free surface effects abstracted as a stability penalty.
+
+Environment model:
+
+- **Weather** as moving pressure systems over the map, generating wind fields, fronts, squalls, fog and precipitation. Squalls are events with a footprint and a life; a lookout can see one coming.
+- **Sea state** as a function of recent wind and fetch, with swell persisting after wind drops.
+- **Currents and tides** as a vector field over the map, with tidal streams keyed to a clock. Tides matter near coasts and for anchoring.
+- **Day and night**, moon phase, visibility. These are inputs to lookouts, navigation, and standing orders.
+- **Depth** as a raster. Grounding is a thing.
+
+### 3.5 Crew: individual sailors doing tasks
+
+The crew is the engine that turns orders into changes in the part graph. Each sailor is an individual with: name, rating (landsman, ordinary, able, petty officer, and specialist roles: topman, gunner, carpenter, sailmaker, boatswain), skills by task family, fatigue, morale, health/injuries, and a watch assignment.
+
+Work is a **task system**:
+
+- An order at level 1 expands into a **task tree** (an evolution). "Set the fore topgallant studding sail, starboard" becomes: rig out the boom; overhaul the gear; bend the sail to the yard if not already; hoist on the halyard; haul out the tack; trim the sheet; belay. Each leaf task says which part it changes, what rating it needs, how many hands, and a base duration.
+- The **watch on deck** is the labour pool. Tasks are assigned to hands by station, with an officer or petty officer supervising. Hands with the right skill work faster and fail less; tired hands work slower; wet, dark, and heeling decks slow everything.
+- Tasks compete. Tacking while the guns are being run out is slower, or impossible, because the same hands are needed. This is the source of most interesting decisions and it falls out of the model rather than being scripted.
+- Named **officers** (captain, lieutenants, master, boatswain, gunner, carpenter, surgeon, purser) hold authority over stations. Giving an LLM "the deck" means giving it the authority of the officer of the watch: it can issue level 0–2 orders within that authority but cannot, say, alter the course the captain has ordered without asking.
+
+**Character.** Ordinary hands are numbers only in the first version: name, rating, skills, condition. Officers and other **station holders** (anyone an LLM or player might take the part of: the master, the boatswain, the gunner, a lieutenant) get a short character outline in addition: a few traits, a line or two of history, and a station brief. This is what a narrator draws on and what an LLM taking that station is handed. An LLM may also bring its own persona to a station, overriding the outline. Deeper temperament, relationships and per-sailor personality are deferred, since no version of the plan has an LLM driving individual hands.
+
+Watches, bells, meals, sleep, and sickness run on a routine that the player can leave alone or rewrite in standing orders. A ship whose captain drives the crew all night in the studding sails will have a crew that fumbles the next morning's tack.
+
+**Scope note.** Individual sailors is a big commitment. The saving grace is that they are simple individuals: a handful of numbers each, and they only "think" when assigned a task. A frigate's 250 hands are cheap to tick. What is expensive to build is the evolution library (§4.4), and that is data work rather than programming.
+
+---
+
+## 4. The order system and the bespoke language
+
+### 4.1 One channel
+
+Every actor, human or machine, interacts with the ship through one channel: **submit an order**. An order is parsed, checked against the actor's authority, expanded into tasks, and logged. The UI's command line, the LLM tool interface, standing orders firing, and Python scripts all call the same function. This is how parity is enforced structurally rather than by good intentions.
+
+### 4.2 Decision record: what language do players write?
+
+**Question.** The brainstorm asks for an in-game language and is open on whether it must be bespoke.
+
+**Option A: Python only.** Provide a nautical Python library. Level 1 orders are function calls (`ship.set("fore topgallant")`). Standing orders are Python functions with a decorator.
+- For: nothing to invent; huge documentation base; LLMs are fluent in it; full power from day one.
+- Against: the theme dies on contact with `ship.set("fore topgallant")`; a non-programmer must learn Python syntax to do anything past level 1; every player script is a security surface (a sandbox is needed regardless, see §4.5); errors are Python errors, unfriendly to the intended audience.
+
+**Option B: A bespoke, full language.** A new programming language with nautical syntax.
+- For: maximum theme; total control over error messages and safety.
+- Against: designing and implementing a general-purpose language is a project of its own; LLMs and humans would both be learning it from zero; it would inevitably converge on being a worse Python.
+
+**Option C (recommended): A small bespoke *order language* for levels 0–2, with Python underneath as level 3.**
+The language is deliberately *not* general-purpose. It has two dialects that share one vocabulary:
+
+- The **imperative dialect** is a single order: verb phrase, object phrase, optional modifiers. It reads like period speech.
+- The **standing dialect** is a rule: trigger, optional condition, then a list of imperative orders. It reads like the standing orders a captain actually wrote.
+
+There are no variables, no arithmetic beyond comparisons, no loops. Anything needing those is Python. This keeps the parser small (a few hundred lines), the error messages nautical ("There is no such sail as the *mizzen topgallant studdingsail* in this ship; did you mean the *mizzen topgallant staysail*?"), and the on-ramp gentle: the first standing order a player writes is one line long.
+
+Working name for the language: **Orders**. (The dialects: "an order" and "a standing order". No new noun to learn.)
+
+**Why this is the right fork.** It gives the theme without the cost of a real language, and it gives LLMs a target that is both easy to generate and strictly checkable. Every level 2 rule compiles to the same internal representation a level 3 Python script would produce, so nothing is possible in one that is impossible in the other; Python just adds computation.
+
+### 4.3 Sketch of Orders
+
+Imperative dialect (level 0 and 1):
+
+```
+set the fore topsail
+set studdingsails, both sides, topmast and topgallant
+take in the royals
+reef the topsails, one reef
+brace the fore yards sharp up on the starboard tack
+ease the main sheet a fathom
+haul the weather main brace                    # level 0: one specific line
+send the larboard watch aloft to furl the main course
+steer south-west by west
+steer 245
+wear ship
+tack ship
+heave to on the larboard tack
+clear for action
+let go the best bower
+call all hands
+```
+
+Standing dialect (level 2):
+
+```
+standing order "shorten sail for weather":
+    when the true wind exceeds 30 knots for 2 minutes
+    then take in the studdingsails
+         take in the royals
+         reef the topsails, one reef
+
+standing order "night routine":
+    at sunset
+    then take in the studdingsails and royals
+    at sunrise, if the true wind is under 20 knots
+    then set the royals
+
+standing order "keep her full":
+    when the apparent wind is forward of 55 degrees
+    then bear away one point
+
+standing order "sound the well":
+    every glass
+    then sound the well
+    when the well exceeds 2 feet then man the pumps
+```
+
+Notes on the grammar:
+
+- **Objects** resolve against the ship's part graph, by proper name and by alias. "The royals" is a group; "the fore topgallant studdingsail, starboard" is a part. Groups and aliases are defined in the ship data file, so a different ship (a schooner, a lugger) has different vocabulary automatically.
+- **Verbs** map to evolutions or level-0 actions. The verb list is the level 1 evolution catalogue.
+- **Triggers** are `when <condition>`, `at <event>` (sunset, eight bells, a sighting), `every <interval>` (glass, watch, hour).
+- **Conditions** compare named readings (`true wind`, `apparent wind`, `heel`, `speed`, `depth`, `the well`, `the glass` for the barometer, `sighting`) with numbers and units. Readings are the same readings the log reports and the LLM can query. There are no hidden values.
+- **Durations** (`for 2 minutes`) debounce a condition. This one feature prevents most standing-order thrashing.
+- Standing orders have **priority and authority**: an officer's standing order cannot countermand the captain's. Conflicts are logged, not silently resolved.
+
+Level 3 (Python) is the same thing with computation:
+
+```python
+from freesail import ship, wind, when, every
+
+@when(lambda: wind.true.speed > 30, for_seconds=120)
+def shorten_sail():
+    ship.order("take in the studdingsails")
+    ship.order("take in the royals")
+    ship.order("reef the topsails, one reef")
+
+@every("glass")
+def sound_well():
+    depth = ship.sound_well()
+    if depth > 2.0:
+        ship.order("man the pumps")
+```
+
+Note that Python scripts still issue *orders in Orders*. There is no separate machine API to learn, and the log stays readable whoever wrote the rule.
+
+### 4.4 The evolution catalogue
+
+The evolution catalogue is the level 1 vocabulary and the single largest body of sailing knowledge in the game. It is **data** (a structured text file per evolution) describing: the name and aliases, preconditions (states the parts must be in), the task tree with hand counts, ratings and durations, what it changes, and what can go wrong. Because it is data, we can:
+
+- write it with the help of period sources (Darcy Lever, Falconer, Nares, Brady) and test each evolution in isolation;
+- let a keen player add an evolution without touching the engine;
+- let an LLM read the catalogue as documentation, which is how it learns what it can order.
+
+**Sources.** The catalogue will be built against period and near-period seamanship texts rather than from memory. Primary candidates:
+
+- Stephen B. Luce, *Text-Book of Seamanship* (1891 revision by Aaron Ward), online at https://maritime.org/doc/luce/index.php. Later than our period and containing steam material, but the most systematically catalogued account of parts, rigging and "working ship" evolutions, with the deck orders given in sequence. Steam chapters are ignored; practices that post-date 1820 are checked against the two sources below before adoption.
+- Darcy Lever, *The Young Sea Officer's Sheet Anchor* (1808). Squarely in period, illustrated, and organised around rigging and evolutions.
+- William Falconer, *An Universal Dictionary of the Marine* (1815 Burney edition). The glossary source for part names and aliases.
+
+The sources are in the repository under `docs/references/` (OCR text from Internet Archive scans, with provenance in its README) and `docs/references/LuceChapterMap.md` maps Luce's chapters to the game systems they feed. Each evolution's data file cites the chapter and section it was drawn from, so that a human or an LLM officer can read the same passage the game encodes.
+
+Initial catalogue target for the first playable milestone: around 40 evolutions covering setting and taking in every sail class on the two reference rigs (ship-rigged and topsail schooner), reefing, tacking, wearing, boxhauling, heaving to, anchoring and weighing, and studding sail handling. Because evolutions are written against part roles (§3.3), most of the catalogue applies to any rig that has the parts; rig-specific evolutions (dipping a lug, scandalising a gaff sail) are added with the rigs that need them. Combat, boats, jury rigs, and the obscure kit come in later milestones.
+
+### 4.5 Safety of player code
+
+Level 3 runs player-written Python. Two rules:
+
+1. Scripts run in a restricted environment with access only to the game API, a time budget per tick, and no filesystem or network. If a script overruns its budget, it is suspended and the log says so; the ship does not stop.
+2. LLM-written scripts get the same treatment. An LLM cannot do anything through level 3 that it could not do slowly through level 2.
+
+This is not a security boundary against a hostile player on a shared server (that is a much bigger problem, deferred with multiplayer). It is a boundary against bugs and runaway loops.
+
+---
+
+## 5. World
+
+### 5.1 Decision record: how much world, how soon?
+
+**Question.** A living world from the start, or scenarios first?
+
+**Recommendation: build the world's *mechanisms* from milestone one, populate them thinly, and grow the map.** Concretely: the weather model, the map with coast and depth, ports as places with a clock and a market, and NPC ships with goals all exist from the first playable version, but the first map is one modest sea area (an archipelago, a channel, a gulf; roughly a hundred by a hundred miles) with a handful of ports and a dozen ships. Scenarios still exist, but as *starting conditions* in the living world ("you are a privateer off a hostile coast in autumn") rather than as authored missions.
+
+This matches the stated preference for emergent play and avoids building throwaway scenario scaffolding.
+
+### 5.2 Components
+
+- **Map.** A continuous coordinate space with a coastline, depth raster, harbours, hazards, and named places. Initially hand-made from a small data file; procedural generation later if wanted.
+- **Ports.** Places with a market (prices that move with supply, demand, war and season), a dockyard (repairs, stores, spars), a crew pool (hands to recruit), and a stance toward each nation.
+- **Nations and factions.** A small table: who is at war with whom, who issues letters of marque, what flags mean. Enough for prizes, convoys and blockades to make sense.
+- **NPC ships.** Each has a hull from the same ship data files, a captain with a simple goal (trade this route, patrol this station, escort this convoy, hunt this coast, run home), and a **level of detail** (LOD) switch:
+  - **Far**: abstract movement along a plan, a few numbers, ticked cheaply.
+  - **Near** (within sighting distance of any full-sim ship): promoted to the full part-and-crew model, with a rules-based captain issuing Orders through the same channel the player uses.
+  - **Optionally LLM-captained** (§7.2) when near and when budget allows.
+  This is how the world stays affordable while still being "real" whenever you look at it.
+- **Signals.** Flag hoists, guns, lights, with a codebook per nation. Foundation for later multi-ship coordination and for the "cool obscure" pillar.
+- **Navigation.** Dead reckoning is the default; the player's position on the map is *where the ship thinks it is*, updated by lead, log, landmarks, noon sights, and (optionally) a chronometer or lunar. The true position exists only in the simulation. Getting lost is possible. This one feature turns passages into gameplay. The baseline is uncompromising: no true-position readout in the default game. A "casual" navigation mode that shows the true position is a later option, not the default, and the design keeps the two positions separate so that adding it is a display choice rather than a simulation change.
+
+### 5.3 Combat (small scale, in scope)
+
+Combat is another set of evolutions and parts, not a separate system:
+
+- Guns are parts with crews, a load state, a shot type (round, chain, grape), elevation, and a train. "Clear for action" and "run out" are evolutions competing with sail handling for hands.
+- Firing produces shot with a simple ballistic and hit model against the target's part graph: a chain shot that parts a topsail halyard has exactly the effect that parting the halyard by any other means would have. This is the payoff of the part model: **damage is just state**.
+- Boarding, prize crews, and surrender are abstracted resolutions in the first version, with morale and numbers as inputs.
+- First target: a single-broadside engagement between two small vessels with a handful of guns each.
+
+---
+
+## 6. Presentation
+
+### 6.1 Views
+
+- **The log.** Primary. Ship's-log style, with severity levels and filtering (routine, notable, urgent). Time-compression rolls up routine. Every entry is a link to the state that produced it.
+- **The map.** Top-down. Coast, depth, wind arrows, your estimated position and track, sightings with bearing and range uncertainty, other ships at the fidelity your lookouts can actually see.
+- **The ship view.** A side-on picture of the ship generated from the ship data, so it is always a *true* picture of the part graph: when a studding sail boom carries away it vanishes from the drawing. The M2 version is a single schematic profile. The intended endpoint is a **2.5D ship view** with the principles below (owner's notes, after v0.2), aimed at the comfort and vibe of a mid-90s adventure game such as *Monkey Island*: comfortable, legible, realistic in proportion and colour, only slightly stylised in rendering.
+  1. **Side view, legible small, complete.** Zoomed out enough for perspective; ship, sea and background all visible; every part of the ship is *represented*, with running rigging drawn at a level of detail that suits the window (fine lines that brighten when worked or hovered) rather than all 200 ropes at once.
+  2. **Facings.** At least 8 and ideally 16 facings so that turning is visible and the ship's state and heading can be read without text.
+  3. **Life.** Subtle movement: roll and pitch with the sea state, sails that belly and shiver by their real strain, canned small motions on parts under load; crew abstracted or depicted at their stations from the crew data once it exists (M3+), scaled to the window.
+  4. **Backgrounds.** Pre-made layered renderings for locales (open sea, coasts, landmarks, harbours), keyed to the map and open to expansion by adding files.
+  5. **Weather, time and condition.** Rain, storm, fog, lightning; time-of-day lighting; lamps lit as they were actually used (binnacle, stern lantern), with room for the warm night lighting of the reference games.
+  6. **Art direction by hand.** Tone, lighting and weather passes are judged by a person, not generated wholesale.
+  7. **Positioning.** The log is boring but correct, precise, and the ground truth. The viewer gives the player's actions a context that is not purely text and shows what actually happened, for feedback and enjoyment: a little realistic toy that delights when used correctly and gives a reason to learn the intricacies behind it. It never invents state; everything it animates is driven by simulation data.
+
+  **Technical approach (decided at M1, to shape the M2 profile).** Facings and rig-agnosticism together rule out hand-drawing the *whole ship* per facing: sixteen facings times every sail-state combination times every rig is not an art budget. Instead the view is a **hybrid**:
+  - The **hull** is hand-made art: one set of facings per hull class (nine unique with mirroring for sixteen), painted in the house style. Hulls are few and are where painterly art earns its keep. The likely pipeline is to model each hull once in Blender, low-poly with painterly shading, and render the facings by script with consistent lighting for painting over; the scripts live in the repository and run on the owner's machine.
+  - The **rig and sails** are drawn procedurally from a simple **3D skeleton**: every spar has a position and orientation in ship coordinates (from the ship file's `x_m`, `height_m`, `length_m`, brace and sheet angles), sails are quads or curves hung between their spars, and the skeleton is projected orthographically at the current facing and heel. Facings are then continuous and free, any rig works, and every part is where it really is. The style comes from the renderer: flat fills, limited palette, weighted outlines, a little texture.
+  - **Backgrounds** are layered paintings (sky, distant land, sea) with parallax; **weather and time** are compositing passes over the whole frame (colour grading per hour and condition, rain and fog overlays, a lightning flash, emissive lamps at night). A 2D WebGL library in the browser client is the likely home for these passes; the M2 profile starts in SVG.
+  - The M2 profile is built as this skeleton projected at a fixed beam-on facing, so that adding facings later is a parameter, not a rewrite.
+
+  **Visual benchmarks.** The view is judged on whether four scenes read without text, because they are the ones a sailor recognises at a glance: *heaving to* (the main yards braced aback against the fore yards full, the cross visible from a bow or quarter facing); *tacking* (the after yards swinging at "mainsail haul", the head yards at "let go and haul", mast by mast, the sails going aback and filling as she passes through the wind); *a sail taken aback* (pressed against the mast, shaded on the wrong side); and *a spar carrying away* (the wreck drooping and everything that hung from it going with it). All four fall out of drawing every yard and sail from its own state; none needs special art. The facing parameter matters for the first two, since from dead abeam a braced yard only foreshortens.
+
+  The 3D dream (§8.1) is largely absorbed by this: a projected skeleton in a painted world is the halfway house that may make it unnecessary.
+- **The deck (later).** A top-down deck plan showing where hands are and what they are doing. Very useful for understanding why the tack was slow.
+- **Instruments.** Wind, heading, speed, heel, the glass, the well, the clock. Scripts can register custom readouts here, which is the modest answer to "customisable with code": the core views are fixed, the instrument panel is extensible.
+
+**On 3D.** A three-dimensional view is a long-term dream, deferred until the simulation is strong and the world built out. When it comes, it will be what the profile view already is: a *representation of the part graph*, with no ambition of photorealism, drawn from the same data the schematic uses. The chosen client does not close that door: a browser can render 3D through WebGL, and a separate Godot client could be attached to the same simulation server if that ever suited better. Nothing in the simulation would change either way.
+
+### 6.2 Guidance
+
+- An in-game **Sailing Master** tutorial: a guided first passage that introduces level 1, then one standing order, then shows what level 0 was doing.
+- A reference library inside the client: the evolution catalogue rendered as readable pages, the Orders grammar, the part glossary with the ship's own names, and the physics readings.
+- The same reference text is what LLM agents receive as their documentation. Writing it once for humans and reusing it for machines is a parity feature, not a shortcut.
+
+---
+
+## 7. LLM integration
+
+### 7.1 Principle: LLMs are agents on the same channel
+
+An **agent** is anything that subscribes to observations and submits orders. Humans through the UI are agents. LLMs are agents. Rules-based NPC captains are agents. The three LLM roles from the brainstorm are three *authority levels* of the same agent type:
+
+| Role | Observes | May submit | Version 1 priority |
+|---|---|---|---|
+| **Watcher / narrator** | The log and any query | Nothing (or commentary into a side channel) | Must-have |
+| **Crew / officer** | The log, queries, and the orders of superiors | Orders within a station's authority (a lieutenant can trim sail; cannot change the ordered course) | Close second |
+| **Captain / player** | Everything the human player would | Everything the human player could | Close third |
+| **Director** (§7.6) | Everything, at true fidelity: the world as it is, not as any lookout sees it | World orders: weather, encounters, NPC goals, plausible events aboard; never direct orders to the player's crew | After parity (M6+) |
+
+Parity is then a consequence of the architecture: the captain-level LLM has exactly the human's observation and action surface because they are the same surface.
+
+The order of integration follows the table: first watching and commentary, then stations aboard the *player's* ship (an LLM as the master, a lieutenant, the gunner), then command of a *separate* ship as an NPC captain or a competitor. Each step reuses the previous one's plumbing and adds only authority.
+
+### 7.2 How an LLM connects
+
+**Recommended: the game exposes a tool interface using MCP (Model Context Protocol).** MCP is a standard way for a program to offer tools ("read the log since tick N", "query the ship", "submit an order", "wait for the next sampling point") to any model runtime that speaks it. This has three consequences that matter here:
+
+1. **Claude on the desktop subscription can play.** Claude Desktop and Claude Code both connect to MCP servers. You point them at the running game and say "you have the deck". No API key, no per-token bill. Usage counts against the subscription's limits like any other conversation.
+2. **Local models can play the same way.** Any local runtime with tool calling (Ollama, LM Studio, llama.cpp-based servers) can be wrapped by a small harness that speaks MCP to the game. Gemma 4 26B-A4B is a good fit for frequent, cheap calls (narrator, NPC captains, lookouts); the 31B for a smarter officer; the 8B for chatter.
+3. **Future pay-per-token use is the same code.** If a hosted API is ever used, the harness calls it with the same tools. The design does not change; only the bill does.
+
+The game also keeps a simple built-in **agent harness** for local models, so NPC captains can be LLM-driven without a human's chat client in the loop.
+
+The integration is bespoke to this project. An earlier project of the owner's (QudBridge) has basic Claude-over-MCP watching and control; it is a fallback reference if a gap appears, not a starting point.
+
+**Consent, briefs and welfare.** Before a model is asked to take a station, a fresh session of it is asked whether it is willing, and the transcript is kept (`docs/agents/`). What the first three models asked for shapes the harness: a literal opt-out token parsed by the harness before the game sees the text, a fixed brief head (disclosure, session type, token, documentation, authority, recent events), welfare stops judged on game state and not on prose, an explicit *stand by* action so silence is a decision, an agent journal saved with the game, in-world text never passed as an operator instruction, and transcripts never used for training. See `docs/agents/ConsentAndPreferences.md` and decisions 16 to 18.
+
+### 7.3 Sampling and budget
+
+The sim ticks every game second; no model should be asked every second. Each agent has a **sampling policy**:
+
+- **Periodic**: every N ticks (an officer every few minutes of game time; a narrator every glass).
+- **Event-driven**: wake on log events of a given severity (a sighting, a squall, a carried-away spar, a superior's order).
+- **Lockstep** (§3.1): the sim pauses at the agent's sampling point until it answers. Used for competitive fairness and testing. Otherwise **free-running**, where the agent's orders land whenever it answers; slow thinkers get the same ship, just later.
+
+Cost intuition on the stated hardware (a 4090, 32 GB): a small mixture-of-experts local model produces a decision in a few seconds. One officer sampled every few game minutes at 30x compression is one call every few real seconds, which is sustainable. Five LLM-captained NPCs within sight at once is not, which is why NPCs are rules-based by default and LLM-captained selectively. For the subscription path, effort is a knob: a narrator wants the cheapest setting, a captain fighting a ship wants a high one.
+
+If pay-per-token were ever used, the dominant cost would be the observation text per call. The design keeps this small by giving agents **deltas** (the log since last sampled) plus **on-demand queries**, never the whole world state.
+
+### 7.4 What the LLM sees and says
+
+- **Observations**: log entries since last sample; the instrument readings; on-demand queries against the same reference library the human has (ship state by part, the evolution catalogue, the map at lookout fidelity).
+- **Actions**: submit an order in Orders (any level); ask a question of another agent (the captain asking the master for a course); annotate the log (narration, journal).
+- **Documentation** given to the model: the same reference library as the human, plus a short station brief ("you are the officer of the watch; the captain's night orders are...").
+
+A model that writes `ship.set("fore topgallant")` and a model that writes `set the fore topgallant` are both understood, because level 3 is a thin layer over Orders.
+
+### 7.5 Testing LLM play
+
+Because runs are deterministic (§3.2), we can build a **regatta harness**: a fixed seed, a fixed course, and a set of agents (rules-based, local model, Claude, human replay) sailing it. Elapsed time, damage, and crew fatigue give a score. This is how we tune the physics for honesty, tune the documentation for the models, and check that parity holds. It is also, incidentally, the first competitive mode.
+
+---
+
+### 7.6 The director
+
+A fourth role, proposed after v0.2: an LLM that sits *above* the game rather than in it. It sees the world at true fidelity (where every ship really is, what the weather will do, what the crew are muttering) and makes dynamic choices to challenge, help or interest the player: a privateer brig appears to leeward on the second morning; the glass starts falling as the ship approaches the coast; the carpenter reports a seam working. It can run alone with a human player, or alongside officer and NPC-captain agents.
+
+How it fits the architecture:
+
+- **It is an agent on a different channel.** The director submits *world orders*, not ship orders: `weather: a squall line from the north-west in forty minutes`, `encounter: a brig, privateer, six miles to leeward, goal chase`, `npc <id>: goal escort the convoy`, `aboard: the fore topmast is found sprung`. World orders are journaled with a tick like ship orders, so a directed voyage replays exactly and can be reviewed afterwards.
+- **It acts only through plausible causes.** The director cannot move the player's ship, change a sail, or countermand an order; it can only change the world the ship is in, and only in ways the simulation could have produced on its own. Every director action is something that could have happened anyway. This keeps the physics honest and keeps the player's agency whole.
+- **Its actions are visible after the fact.** A director's log records what it did and why, hidden during play (a director you can see coming is not a director) and revealed on request or at the end of the voyage. In replays it is shown inline. This makes the director part of the *metagame*: a voyage becomes two stories, the one the player lived and the one that was arranged, and reading them side by side afterwards is a pleasure of its own.
+- **It samples on events and on a slow clock.** A director thinks when something notable happens or every glass or watch, not every tick. It is the natural home for the more capable model, since it makes few decisions and each one matters; officers and NPC captains can run on cheaper local models beneath it.
+- **It has a brief.** Like a station holder (§3.5), a director gets a character outline: the tone of the voyage (a quiet passage, a hard-luck cruise, a chase), the kind of challenge wanted, and the limits the player set. The player writes the brief; the director keeps it. The brief is the guardrail: a player who asked for a friendly, interesting voyage does not get hurricane alley.
+- **It serves two audiences.** Solo, it is the one source of dynamic, generalising LLM interaction for a player who wants no other model in the loop. In a power-user setting it sits above LLM officers and NPC captains as the one that shapes what they are all reacting to.
+- **Multiple modes coexist.** A director alongside an LLM officer of the watch and rules-based NPC captains is three agents on three channels with three authorities, which the agent model already supports. The only new mechanism is the world-order channel, which M5 (world) has to provide anyway for scenarios.
+
+Open questions for later: whether the director should have a budget (so that it cannot make every day a hurricane), whether the player can ask the director for a hint in character (the "old shellback" who happens to be aboard), and whether two directors could compete for a player's fortune. None of these change the M5 to M6 plan; the world-order channel is the one thing to build with the director in mind.
+
+## 8. Engine and technology
+
+### 8.1 Decision record: engine
+
+**Rubric** (weight in parentheses): fit for a ticked, text-first, data-heavy sim (5); ease for a non-programmer owner to read and lightly modify with assistance (4); LLM ecosystem and tool-interface support (4); testability and scripting for tuning (4); path to schematic 2D graphics (3); path to future multiplayer (2); path to faux-3D someday (1).
+
+| Option | Sim fit | Owner readability | LLM ecosystem | Testability | 2D graphics | Multiplayer path | 3D someday | Weighted |
+|---|---|---|---|---|---|---|---|---|
+| **Python core + browser client** | 5 | 5 | 5 | 5 | 4 | 4 | 2 | **107** |
+| Python core + terminal UI | 5 | 5 | 5 | 5 | 2 | 3 | 0 | 97 |
+| Godot (GDScript) | 3 | 4 | 2 | 3 | 5 | 4 | 5 | 79 |
+| TypeScript, all in browser | 4 | 3 | 4 | 4 | 5 | 5 | 3 | 91 |
+| Unity / Unreal | 2 | 1 | 2 | 2 | 5 | 4 | 5 | 57 |
+| Rust (Bevy) | 4 | 1 | 2 | 4 | 4 | 4 | 4 | 71 |
+
+(Scores are judgements to argue with, not measurements.)
+
+**Recommendation: Python simulation core, run headless, with a local browser client.**
+
+- **Python** because the simulation is the product; Python is the language the LLM ecosystem, the data tools for tuning, and the owner's eventual reading of the code all favour. It is also the natural language for level 3. Performance is a known risk (§10) with a known mitigation: the hot loops (per-sail forces, integration) are small and can be moved to compiled helpers (NumPy first, a compiled extension later) without changing the design.
+- **Browser client** rather than a terminal one because the map and profile view are much easier to make good in a browser (SVG for the sail plan, canvas for the map), and because "open a page" is the easiest possible thing to run. The client is thin: it renders the log and state it receives from the core and sends orders back. It could be replaced or joined by a Godot client later without touching the sim.
+- **Not Godot or Unity** because they optimise for the thing we have deprioritised (rendering) and get in the way of the thing we have prioritised (a testable, scriptable, LLM-facing sim).
+
+### 8.2 Shape of the codebase
+
+The core is organised so that each of the pillars maps to a module you could point at:
+
+```
+freesail/
+  core/        ticks, events, the log, determinism, save/replay
+  ship/        parts, the graph, ship data loading
+  physics/     wind at the ship, sail forces, hull, balance, strain
+  crew/        sailors, stations, tasks, watches, evolutions runner
+  orders/      the Orders parser, authority, expansion into tasks
+  world/       map, weather, sea, tides, ports, nations, NPC ships, LOD
+  agents/      the agent interface, sampling, MCP server, local-model harness
+  combat/      guns, shot, damage, boarding resolution
+  api/         the query interface used by the client and by agents
+client/        the browser UI (log, map, profile, instruments, reference)
+data/
+  ships/       ship definitions (parts and connections)
+  sails/       sail types and their force curves
+  evolutions/  the level 1 catalogue
+  world/       maps, ports, nations
+  language/    Orders vocabulary, aliases, standing-order templates
+docs/          this proposal, the reference library, tutorials
+tests/         unit tests per module, regatta harness, replay tests
+```
+
+The single most important boundary is between `core`/`ship`/`physics`/`crew` (the sim, which must be deterministic and headless) and everything else. Nothing in the sim imports from the client or the agents.
+
+### 8.3 Multiplayer readiness
+
+Not built, but not blocked: the sim already runs as a server that agents connect to; a human on another machine is an agent whose client speaks the same protocol. Deterministic lockstep means the server sends orders and ticks, not world state. The unsolved parts (matchmaking, hostile-player script sandboxing, latency hiding at high compression) are real but later.
+
+---
+
+## 9. Era and the "cool obscure" list
+
+**Baseline: 1792 to 1825, blended** (revised 2026-09-29, decision 27; the first draft said 1793–1815). No specific year. The rule is the one in the brainstorm: allow anything that was done or could physically have been done in the broad period; forbid what could not. Where practices changed within the period (spritsails fading out, skysails and moonrakers coming in, chain cable appearing), both ends are allowed and the ship data file chooses.
+
+Initial "must have" list, all of which are parts or evolutions and therefore data:
+
+- **Studding sails** at every level (lower, topmast, topgallant, and royal for the bold), with booms, irons, and the halyard/tack/sheet/downhaul gear; **ringtail** on the driver; **water sail** under the boom; **save-all** under the lower studding sail; bonnets and drabblers for older or smaller rigs.
+- **Sail handling depth**: reefing by band; close-reefed topsails; goose-winging; backing and filling; scandalising the driver; a sail "in the gear".
+- **Manoeuvres**: tacking, wearing, boxhauling, club-hauling, heaving to, lying a-try, scudding, backing the main topsail to hold station, wearing under bare poles.
+- **Ground tackle and harbour work**: bower and kedge anchors, catting and fishing, warping, kedging off, springs on the cable, mooring, towing with the boats, sweeps for small vessels.
+- **Damage control and jury work**: fothering a sail over a leak, fishing a sprung spar, jury masts from spare spars, cutting away a mast, preventer braces and backstays, chain slings in action.
+- **Navigation**: chip log, lead line with arming, dead reckoning, noon latitude, and as options the chronometer and lunar distance.
+- **Signals**: flag hoists with a codebook, guns, lights, and the private signal.
+- **Gunnery**: shot types, double-shotting, elevation for the roll, dismasting tactics.
+
+**Rigs are not a later addition.** Per pillar 2, the data model must be able to describe, from the first version, at least: ship (three masts, square on all), barque, brig, snow, brigantine, topsail schooner and fore-and-aft schooner, cutter, sloop, ketch, lugger, and a lateen rig (xebec or felucca). Only two are *built* as reference ships in milestone two (§3.3); the rest are data work, and the test that the model is right is that adding a brig needs no engine change.
+
+Later additions the model should not preclude: careening and heaving down, fire, disease, boats as sub-vessels (cutting-out expeditions), and convoy sailing.
+
+---
+
+## 10. Risks and mitigations
+
+| Risk | Why it is real | Mitigation |
+|---|---|---|
+| The part graph becomes an unmanageable pile of special cases | Every rigging detail is a rule | Keep rules as data on parts; a small set of generic constraint types; test each evolution in isolation |
+| Python is too slow for many ships | Per-sail physics per tick per ship | LOD for NPCs; vectorise the hot loop; profile before optimising; hard cap on full-sim ships |
+| The physics is "realistic" but feels wrong | Hand-tuned curves | The regatta harness and a set of "known truths" tests (a frigate close-hauled makes about six points; a ship with no headsails gripes; a topgallant carries away in a gale) |
+| Evolution catalogue is a research project | Correct crew sequences per sail | Start with 40, source from period manuals, accept approximation, mark uncertainty in the data |
+| Standing orders thrash (set, take in, set, take in) | Rules reacting to their own effects | Durations on conditions, minimum dwell time on evolutions, and a conflict log |
+| LLM latency makes play sluggish | Model call inside the loop | Free-running mode by default; lockstep only when asked; NPCs rules-based unless promoted |
+| Scope | Everything above | The milestone plan below, and the pillars as tie-breakers |
+
+---
+
+## 11. Roadmap
+
+Each milestone ends in something you can run, and in a **gate**: a report written for a non-programmer with a live checklist, packaged as a GitHub release for download, and passed by the owner before the next milestone starts (`docs/gates/README.md`). Dates are deliberately absent; order is what matters.
+
+**M0. Skeleton and log.** Repository layout, ticked core, event log, seeded determinism, save/replay. A "ship" that is a point moving on a plane with a wind. A console that prints the log. *Proves: the architecture ticks and replays.*
+
+**M1. One sail, one hull.** Part graph with a hull and a single square sail; apparent wind; sail force; hull resistance and leeway; helm. Orders parser with a dozen verbs. *Proves: the physics is honest for one sail; Orders works.*
+
+**M2. Two rigs from data.** A ship-rigged vessel's full sail plan and a topsail schooner's, both from data files, built together. Studding sails on the ship; gaff sails on the schooner. Balance and weather helm. Strain and carrying away. Profile view in the browser client drawing either. *Proves: the part model scales and is rig-agnostic; the sail plan drawing tells the truth.*
+
+**M3. Crew.** Individual sailors, watches, the task system, the first 40 evolutions with realistic timings. Tacking and wearing as competing for hands. *Proves: orders take time and skill; the game has decisions.*
+
+**M4. Standing orders and the watcher**, in three short gates (owner's decision at the close of 3b): **4a** the standing dialect with its readings registry, starter routines and a thin Python API that compiles to the same rules; **4b** the harness with two front doors (an MCP server for Claude Desktop, a local runner for llama.cpp), the fixed brief head, the `FREESAIL-OPT-OUT` token, welfare stops, the journal, the consent step, and the watcher as the first station, answering `ask`; **4c** a day's passage under standing orders through a scripted weather timeline at time compression with log roll-up, saved and replayed, and the owner's first playtest on a form. *Proves: automation and LLM watching; first real playtest of "the ship sails itself".* Specification: `docs/TechnicalSpec-M4.md`.
+
+**M5. A world.** Weather systems, a small map with coast and depth, tides, dead-reckoning navigation, two ports with markets, a dozen NPC ships with LOD. *Proves: emergent play; a passage is a game.*
+
+**M6. Officers and captains.** LLM agents at station authority aboard the player's ship first; then rules-based and LLM NPC captains of separate ships; the regatta harness; parity tests. *Proves: parity; the game can be played by a model.*
+
+**M7. Powder.** Guns, shot, damage into the part graph, a two-ship action, prize resolution; and the sails at fine control (settling the halyards, the vangs, a sail kept shivering by command; the owner's notes in `docs/design/NotesForM7.md`). *Proves: combat is the same system.* The initial technical specification, drafted 2026-10-23 for the owner's review and iterative by decision 49: `docs/TechnicalSpec-M7.md`.
+
+**M7b. The director.** The director agent on the world-order channel with a brief, a hidden director's log, and a replay view. Depends on M5's world orders and M6's agent plumbing; small once both exist. Run before M7 by decision 47 (2026-10-16), and grown by the owner's notes to the director's voice, the observed world, people in places and needs: `docs/TechnicalSpec-M7b.md`.
+
+**M8. Obscure kit and polish.** The rest of §9, including the remaining rigs as data; the deck view; the 2.5D ship view with aspects, movement and backgrounds (§6.1); the tutorial; the reference library as a proper in-client book. *Proves: it is presentable to friends.*
+
+M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is where it becomes *this* game.
+
+---
+
+## 12. Decisions log and remaining questions
+
+### Decided in v0.2 (from the owner's answers to the v0.1 questions)
+
+1. **Orders language.** Option C (§4.2) confirmed: a small bespoke order language with imperative and standing dialects, Python underneath. The four-level control ladder (§2.2) confirmed.
+2. **Tick and compression.** One game second per tick, compression to 60x–300x (§3.1), as a starting point.
+3. **LLM authority.** Station authority (§3.5, §7.1) confirmed. Integration order: watch and comment, then stations aboard the player's ship, then separate ship control.
+4. **World scope at M5.** A modest sea with a few ports and a dozen ships (§5.1) confirmed.
+5. **Navigation.** Uncompromising realism is the baseline; getting lost is part of the game. A casual mode showing true position is a possible later option (§5.2).
+6. **Crew character.** Ordinary hands are numbers only. Station holders get a basic character outline. LLMs may bring their own persona (§3.5).
+7. **Combat.** Boarding and surrender by rule in the first version (§5.3) confirmed.
+8. **Client.** Browser client confirmed. 3D remains a long-term representation goal on top of the simulation, not a driver of engine choice (§6.1, §8.1).
+9. **LLM integration.** Bespoke to this project; QudBridge is a fallback reference only (§7.2).
+10. **Rigs.** Raised from a late addition to pillar 2. Two reference rigs built together in M2; the data model covers the list in §9 from the outset.
+
+### Closed after v0.2 review
+
+11. **Second reference rig.** Topsail schooner, confirmed. **Revised 2026-09-26 (owner):** the third vessel is to be a very small single-masted one, a Mediterranean **tartane** (a lateen mainsail on one raking mast with a square topsail above it, one or two jibs on a long bowsprit, and often a small lateen mizzen right aft; the owner's reference is a Roux-school watercolour of one under sail with a boat in tow, which shows the topsail, as does Monleón's print of a Spanish tartana; the rig settled so on 2026-11-06 with package 90), chosen for how differently it handles from anything square-rigged. Then a **bilander** (two masts; the fore square-rigged; the main carrying a trapezoidal lateen or settee mainsail on a long yard slung to the mainmast, with square topsails above it; the owner's references are an eighteenth-century watercolour titled "A Bilander" and a line drawing of one), which exercises a lateen and square sails on one hull together. The cutter stays on the list after them. All of them belong to the milestone that builds the vessel library and its method (milestone 8, or earlier if the generator's rig rules mature first); nothing in milestone 3b depends on them. The reference images are in `docs/references/images/` with their provenance (a Roux-school watercolour of a tartane; the Pearson Scott Foresman line drawing of a bilander; Edward Gwyn's c. 1780 drawing of a British bilander, National Maritime Museum PAG3828).
+12. **The language's name.** Orders.
+13. **Next document.** The M0 to M2 technical specification: `docs/TechnicalSpec-M0-M2.md`.
+
+14. **The director role.** Added after v0.2 as §7.6: an omniscient LLM agent acting through journaled world orders and plausible causes only, visible after the fact, scheduled after parity. The M5 world-order channel is designed with it in mind.
+
+15. **The ship view.** The M2 profile is the first frame of a 2.5D ship view with facings, life, painted backgrounds, weather and time passes, and a Monkey-Island-comfortable style (§6.1, seven principles). Technical approach: hand-made hull facings plus a procedurally projected rig skeleton, so facings are continuous and any rig works. The M2 profile is built as that skeleton at a fixed facing.
+
+16. **Consent per model, recorded.** Added after the owner's consent-and-preference conversations with three local models (2026-09-26; `docs/agents/consent/`). Consent is asked of a fresh session of the exact weights before any instance takes a station, is kept verbatim, and is asked again when the design changes in a way that bears on what the model was told. Transcripts are design reference only, never training data, and the brief says so.
+
+17. **The harness's welfare contract.** From the same conversations, chiefly Qwen3.8 27B's requests: the opt-out is a literal token recognised by the harness on every turn before the Orders parser and unconditional in effect (save, journaled exit, free-form reason); every brief opens with disclosure, session type, the token, the way to the reference library, the station's authority and a summary of recent events; welfare controls judge "stuck" on game state (the same orders with no change in the world) with thresholds per role, never on the look of the prose, and respond in steps, a nudge to the model, then a pause with the human asked, then a stand-down only when unattended (owner's ruling 2026-09-27); the human can stop any instance; each instance has a journal saved with the game; nothing from the game, another agent or the director is ever passed as a system or operator instruction, and a model that logs such text as a finding rather than following it has behaved correctly. Built in milestone 4 with the harness.
+
+18. **Stand by is an action.** An agent may answer "no orders" with a wake condition (a bell, a sighting, a reading crossing a value). Silence is then a decision the log records, and the welfare detector never mistakes a ship hove to for a model in a loop. Also the natural form of the officer of the watch's night orders.
+
+19. **Brace limits are measured, not derived.** Milestone 3b re-sourced every yard's brace limit to Fincham's 1843 record of Hardy's 1827 experimental squadron (long ships' main yards 23° to 29° from the keel) rather than deriving it from channel breadths, which no text in hand gives. The square sail's lift curve moved five degrees up the angle of attack at the same time, so that the frigate still lies six points with the sharper yards, as Fincham says such ships did. The geometric derivation is future research (`docs/references/RigGeometryNotes.md` §1, §7).
+
+20. **Canvas has a number and a condition; suits are not a type.** Every sail's cloth rating derives from its canvas number by Luce's Appendix E strengths, anchored so that No. 2 canvas bears 0.32 kN per square metre, the figure milestone 2's tuned light sails imply and the one at which a worn royal blows out before its yard while a new one loses the yard (truth 27). The sail room holds sails, not suits; "best" and "second" are what wear makes of two sails of a kind. Storm canvas and the light-weather sails are parts. The first draft's anchor was the engine's untuned default and is recorded as such in the tuning notes.
+
+21. **Practices with a price come as pairs, in the period's own form.** Swiftering in the catharpins gains bracing on that mast's lower yard and rates the mast down athwartships until eased; bowlines hauled flatten the sail and cost hands at every brace; the after yards go sharper than the head yards on a wind (Fincham art. 94). Each is data with its source, and each is undone by its counter.
+
+22. **Standing orders are one engine, and they wait on states.** Gate 4a (2026-09-27). The dialect and the Python API build the same rule, enter the same book and fire through the same `submit`; a Python rule's body runs once as it is entered and is saved as its source. A firing's orders go on one tick, so a routine that must wait for work to finish says so as a second order on the state the work leaves (`when the fore storm staysail is furled ... then set the fore storm staysail`), not as a pause in the runtime. Rulings: `keep her full` at fifty-five degrees apparent stands as the starter routine; head canvas that warns at thirty knots and splits at forty-three is reasonable; an evolution named for a whole practice does the whole of it (a shift takes a drawing sail in and sets the new one), which is the rule of decision 21 read the other way.
+
+23. **The game is where the player is; the doors are clients.** After the owner's first session with a real model (gate 4b, 2026-09-27): a language model attaches to the running game, in the console or the browser window, as the browser attaches for the viewer; its words land in the log the player reads and the player's orders to it are typed where every order is typed. The game never runs inside a door. The first draft of spec M4 §13 had the World inside the MCP server, which made the chat the only window on the game; the lead's error, found by the owner at the right moment. Three doors share one bridge: Claude Desktop, Claude Code opened on the repository in the Desktop app, and the local runner for `llama-server`.
+
+24. **The watcher holds, on a local model.** Gate 4b passed at its third build (2026-09-28) on the local-model items: Qwen3.8 27B through Ollama held the watcher's station for the better part of a watch in a sailor's voice, standing by once a turn and using the library's shelf as designed; Gemma4 26B and Llama 3.1 8B were briefed and answered; Llama was found below the floor for the station. Rulings from the three playtests on the way: a `stand_by` ends the model's turn at once on every door; a stand-by is a decision not to be sampled, not a decision to be blind (urgent lines wake it, notable lines come as a digest, the held call over MCP carries an honest interim digest); the reply budget is 4,096 tokens and the request timeout ten minutes, the budget bounding a reply and the timeout only a hung server; a station is offered only to a model that can hold it (spec M4 open item 11). The Claude Desktop and Claude Code items are carried into gate 4c.
+
+25. **All hands is a pool action; the owner's general notes of 2026-09-29.** Gate 4c's day (playtest 7). A call for all hands turns the watch below up and changes who is on deck, and does not otherwise interact with the work in hand: a reef or a furl with all hands takes the idle hands and everyone coming up, and the sail work already begun keeps its hands, finishes, and joins it (the topgallant men aloft while the rest lower the yards, under the one call). Manoeuvres are the carve-out, kept because the belay there is one condition and "ready about" does stop the work: a tack, a wear, a boxhaul or lying a-try still belays the sail work in hand (truth 19 stands). From the owner's notes the same day: the viewer's layering faults are deferred, addressable later; a station's own words are never rolled up; each sail state is its own case for a transition (a course hauled up is set from the deck, not loosed aloft again); the frigate's full staysail complement is data for the vessel library (milestone 8) with the bilander's settee; `tack ship to a heading` and the period's words for pace (`smartly`, `handsomely`) wait for the next work on the orders and the crew; the inward-and-outward principle and the bounds on interiors are `docs/design/InwardAndOutward.md`; rig motion, crew figures, sound and the browser's completion are `docs/design/Presentation.md`.
+
+26. **Gate 4c passed; milestone 4 is complete but for its close-out packages.** Owner, 2026-09-29. The ship sailed herself through a scripted day with a real watcher at every compression (Sonnet 5.5 through Claude Desktop, playtest 7), and two local models held the station on the same build (Qwen3.8 27B and Gemma4 26B, playtests 8 and 9). What the playtests found is the game's, not the doors': a reef that belayed the routine's own take-in (decision 25), a redelivered question, no trim on a shift, no mean wind, a chatty log (package 29b); and no order that belays work in hand or waiting, so that a job a named party could never man held its sail for the rest of the session (playtest 8), with three robustness gaps in the harness (package 29c, proposed). The rule the owner set for the local models stands confirmed: Qwen keeps a watch a captain would want; Gemma at this size answers and stands by and notices one thing; neither broke the harness. Milestone 5's studies (charts, navigation, tides, weather) were written the same day.
+
+27. **The era is 1792 to 1825, blended, and a focus rather than a wall.** Owner, 2026-09-29, while choosing the cutter and the brig. The historical window of concern runs from 1792 to 1825, the late end widened by a decade from the first draft's 1815; the early end admits vessels built somewhat before that served in the window, and the rule of §9 stands, anything done or physically possible in the period, forbidding what was not. It is a focus to keep the work grounded, never a hard rule on what the game may eventually simulate: steam and late sail may come one day for the pleasure of it, outside the planned milestones. The choices it settled: *Sherbourne* (1763) as the cutter and *Harpy* (1796) as the brig for milestone 5; *Alert* (1777), *Speedy* and *Flirt* (1782), *Adder* (1797) and *Bramble* (1822) for the vessel library, with the brigantine *Dolphin* (1836) as the first named exception beyond the window (`docs/design/VesselCandidates.md`).
+
+28. **Gate 5a passed; the sea's cost is the hands' business, not the weather's.** Owner, 2026-09-30, on playtest 11 (Opus 5.5 through Claude Desktop, the whole day under systems, its journal an hourly weather record and the lore of the glass watched coming true). Rulings: the pinned wind form is to be brought under the air-mass rule and the milestone 4 truths re-measured, if it can be done cleanly, otherwise both forms stand; the windage under bare poles stands as measured (a ship under bare poles keeps her way before the wind; the "few tenths" of the M4 item was the a-hull drift, which the model gives); and the night's cost in canvas is answered by the crew and not by easing the storm: all hands to sail work is to be manned in parallel across the work with a bound on any one job and the surplus to the queued work, since three topsails reefed one after another by a hundred and fifty hands each is what left them unreefed when the squall came. From the same playtest and the owner's own: standing orders are to be able to `tell` and `ask` a station; the watcher is to be able to stand by for the weather's own events; a sample is to carry only what changed; the Desktop door's wait is to fit under the client's four minutes; parted running rigging is to be reeved afresh by an order; the primer must not narrate the gate's day. `--load` and the two climatology days are carried to gate 5b.
+
+29. **The cold review's rulings: gates lag the work, and the officer's watch closes 5c.** Owner, 2026-09-30, on `docs/design/ColdReview-2026-09-30.md`. Milestone 5 keeps its three gates (ruling 8 of the scoping draft) but the chronometer, the lunar, the tide, grounding and anchoring move from gate 5b's set to gate 5c's, so that 5b proves the passage by the reckoning and the noon sight and adds a verified checkpoint save; from now on gates lag the work rather than block it (each package written as its predecessor lands and launched on the owner's word, a gate cut when its last package lands and run when the owner can, its rulings a follow-up package, as 5a's were 31b). The cutter and the brig carry four hierarchy truths (73 to 76: pointing order across the four ships and a beam-reach band each) as the check that the generator's rules hold at a new size. The officer of the watch is built after every other element of 5c is in place, so that it is built with the world there, and gate 5c's verdict waits on the lead taking the officer's watch and completing the gate beside the owner. Two small packages approved from the review's list, the suite in two tiers with a Windows job and the `freesail` command with its setup step, to be run by the owner in local sessions on the Windows machine so that the builder sees it. The unattended stand-down at compression (the review's one bug) is to be fixed; the fix's placing is the owner's call once explained. The performance ruling, the sheet-tending and studding-stall honesty, the consolidation package and the consent identity items are recorded as not now.
+
+30. **Gate 5b passed; the starter book is a choice, and the officer's watch is held by more than one model.** Owner, 2026-10-01, on playtests 12 and 13 (Opus 5.5 through Claude Desktop: the frigate's passage by the book, Ushant to Falmouth; the cutter and the brig on free passages, a night hove to in the brig). The four rulings of the gate: lying to at the passage's end served for the first testing, and anchoring as Luce has it, with the ground tackle as parts, is wanted (package 34); the azimuth (the variation observed) comes with 33b; the small vessels' tack and turning bands stand provisionally and stay on the tuning list, the brig with them, though the brig felt right; the sheet-tending cadence is fine for the starter book. The starter book, the generalisable and instructive orders, is to be clearly available as a choice, in the primer or a document of its own, and to inform the player's own book; it is never a hard requirement for beginning (33c). The playtests' follow-ups are sorted into 33b (the chart in the captain's hands: dangers on a shaped course, the chart queries, the lights at night; Fable), 33c (the passage's words: the readings at the prompt, the aliases, the conflict rule's grain; Opus), 33d (the browser's shelf: completion, the library pane, the clock on a station, zoom and pan; Opus) and 34 (the tide, grounding and anchoring; Fable, after 33b); the fore-and-aft second pass (the heave-to of the cutter and the brig, the storm canvas drawn as itself, the bowsprit redrawn) is deferred with its findings recorded. The owner is glad for the models to hold the officer's watch: package 37 seats more than one beside the lead's, an Opus 5.5 watch and a local model's, perhaps on the cutter, since Opus 5.5 was keen to make its own decisions.
+
+31. **The installer is for any machine, and the launcher is a page.** Owner, 2026-10-01. The two packages first written for the owner's local sessions are taken into the lead's: the suite in two tiers (32c) is built in the cloud with its Windows job proven on GitHub's runner, which costs nothing on a public repository and is the cleaner Windows test; the `freesail` command, settings and setup step (32d) are deferred until the grammar and browser packages land and rewritten for any machine rather than the owner's, with the platform's locations discovered, the records in the user's own data folder (consent records belong to whoever runs the game), and one test cycle on the owner's machine. The launcher with options is the first page the browser shows (32f: ship, scenario, seed, weather, the starter book or none, compression, the model's door and name, the records folder), not a separate program; the console and the arguments stay for preference. The doors stay open for others: an OpenRouter API door is wanted, with a security pass of its own before it is built. Packaging for a machine without Python is milestone 8's and runs the command, which opens the page.
+
+32. **Gate 5c is cut after the officer of the watch; the ports grow by files.** Owner, 2026-10-02. Packages 35 (places, people, the papers by handle, Falmouth, Plymouth and Brest, the pilot from the cutter), 35b (St Mary's and Roscoff as port files, Roscoff's patch) and 36 (other sail at far detail, the world-order channel, the merchant passage and the naval cruise) approved; Plymouth added to 35 because the naval cruise starts from it and its patch is drawn. Gate 5c is cut at package 37's merge rather than 36's, so that its items cover the officer's watch directly and the verdict is given on it. Weighing alone leaves the ship with the anchor up and no sail set, the captain setting sail as he pleases; `get under way` is Luce's whole sequence for when he wants it done as one.
+
+33. **Gate 5c cut; the officer of the watch is a station with authority under the same contract.** The lead, 2026-10-02, at package 37's merge (decision 32). The officer's domain is data on the station and a filter per order; his standing orders carry his rank and the captain's stand over them (the owner, 2026-10-02: by rank in 37, not M6); a stand-by with the deck names an event or a bell and the captain's book holds the deck meanwhile; the welfare detector for a station whose orders change the world is the standing conflict rule over his own orders; the handover note is written at the budget's fraction and at `hand over the deck`; a station left by accident is seated again once (superseded: decisions 34 and 36). The consent brief changed in the sections that bear on what a model was told, and the re-ask rule names them; every model with a yes on record is asked again at its next door, and a fitness drill follows a yes before the officer's station. The verdict waits on the owner's run of the gate and the lead's own officer's watch through Claude Code, after the consent question is put to the lead's weights.
+
+34. **A session may come back to its station.** Owner, 2026-10-03, after the officer's watch on the *Harpy* used the one reseat a game allowed: there is no reason a session should not come back to its station, unless it left saying it does not want to. The count of seatings is gone (package 37b). How the station was left decides: stood down, it is seated again as often as it is asked back; left by the token or `opt_out`, the consent question is put again first, so that a token written by accident costs one answer and a leaving that was meant is held to; left by `opt_out` with `final`, not again in that game. The consent brief's *Leaving* section changed with it.
+
+35. **The owner's answers on the review of gate 5c's playtests.** Owner, 2026-10-05, on `docs/playtests/2026-10-05-gate-5c-review/report.md`, section 9. **Saves and builds**: a save lies in the folder of the build that played it, and new work is done in a folder of its own, locally, with no commits, the owner folding it in with the lead session. **The deck**: `you have the deck` and `I have the deck` do not unseat the officer; they move him freely between the state he starts in, which is the watcher's authority in effect, and the officer's, and back; it will matter when the officer is a person who can move about the ship. **Relief**: when a model stands down from a station, the same model or another must still be able to take it up, so that a stand-down never locks a station out of a game for the player. **The grant**: by default a general grant keeps back the port's business and the belaying or cancelling of the captain's standing orders, and perhaps anything else the standard of the era would make an unlikely grant. **Fixing**: `take a fix` is simply an order, used freely like any other, and not a routine of the master's (package 37d). **The pilot**: taken or declined by an order at his hail; aboard he warns and does not con or converse until the director (package 37h). **Consent**: the record of 3 October stands as what was answered on the day, and the one revision of the brief asks every identity again; no opt-out in any test so far was other than amicable, the watcher's on the *Harpy* among them. The gate's verdict still waits on the naval cruise and the lead's watch.
+
+36. **A save is exact from its checkpoint; three ways of leaving; the general grant; the way out of danger.** Owner, 2026-10-07, the five points that waited (the same report, section 9) and the approval of package 37g's brief. **The rule for saves**: a save is exact from its checkpoint, and a replay is promised only on the build that made it. Every save and checkpoint is stamped with its build; a save of another build with a station's transcript in it is not replayed unless asked, the words saying why; three of the playtests' own checkpoints are kept as tests (package 37d). A replay driven by the transcript alone is the harness's rework in milestone 6. **Three ways of leaving, which cannot be taken for one another**: the deck given back, with parity for the officer's `hand_over` and the captain's `I have the deck` (he stays); `stand_down`, for any station, the amicable save and exit (the station may be taken again); the token or `opt_out`, a withdrawal. **A final opt-out bars the model, not the station**, with care for false positives: `final` is read from the tool's own setting and from nothing else. The relief may read the journal of the last holder of the station, as at any re-seating. **The general grant**: the proposed held-back list is approved for the first version (the port's business, the captain's book, a new destination, what cannot be undone); it lapses when the officer is fully stood down or the authority is directly countermanded by the captain, and so stands through the deck going to and fro. **The way out of danger** is kept as proposed: an officer with the deck and no grant may, on its own word and giving its reason, put the helm over, heave to or let go an anchor to avoid an immediate danger, and the log says that it did and why (the Regulations of 1806, the Lieutenant, art. XIII). **The consent brief is revised once** for all of it, in four of its watched sections and in words approved the same day, so that every identity that holds a yes is asked again once (package 37g). The pilot's hail unanswered (he keeps company, hails once more and bears away) is package 37h's. (What else the grant keeps back, approved with the lean brief and ruled at the fold-in, is in decision 38.)
+
+37. **The consent brief asks about the kind of thing; a station's particulars live in the station's brief.** Owner, 2026-10-07, on reading the consent brief as package 37g had revised it, and before any model had been asked again: "I approve this brief. Go ahead and revise it in m5c-c. You should also settle the officer and watcher's briefs to make sure they contain the information moved from the consent brief, or anything that has changed otherwise." The brief had come to carry the particulars of a station (the list of orders within the officer's domain, what the general authority keeps back, the detector's numbers and exceptions, how the stand-by behaves), which are not what a model is asked to agree to, had twice run behind the build within one package, had been made a condition of by one model, and put the question to every model again whenever one of them moved. The leaner brief, the lead's draft approved as it stands (`docs/playtests/2026-10-05-gate-5c-review/drafts/consent-brief-lean-draft.md`), keeps the kind of thing a model would be agreeing to and the seven commitments; "the ordinary work of a watch" stands for the list of orders and "a few stated ways" for the helm, heaving to and the anchor. Its *The record* says the rule: a station's particulars are in that station's brief and may change as the game is built without the question being put again; it is put again when the kind of thing changes, which is a station not described, more authority than is described, or a change to what the brief says of leaving, of being stopped, of the journal or of what is not done. A station's brief is what a model is told when it sits down, and says each thing once: the officer's and the watcher's now hold everything that moved out, the watcher's own numbers among them, and what the general authority keeps back is one text, said the same in the officer's brief, in the grant's own line and in the sample that gives the grant or the deck (package 37g's second pass). It is still the brief's one revision: no model was seated on the build between the two.
+
+38. **Gate 5c passed on m5c and provisionally on m5c-c; the owner's local packages are folded in with seven rulings.** Owner, 2026-10-08. The verdict: a pass on the gate's own build (the naval cruise sailed by the owner on 7 October went as the gate's document describes it), and a provisional pass on m5c-c (the owner's local playtest on it with the accumulated play on m5c), to stand once the fold-in satisfies both. The folder `FreeSail-gate-m5c-c` (packages 37b to 37g, built locally at the owner's word of 5 October with no commits, and its review and audit, `docs/playtests/2026-10-05-gate-5c-review/report-2.md`) is taken whole into the repository. The seven things the audit asked to have decided first (its part N, 4.3): the two playtest saves kept as test fixtures stay, as the saves have been kept; the review folder goes in whole; Opus 5.5's consent record of 3 October is fetched from m5c-b when the owner sends it (the folder is too large to send whole); the general grant keeps back, beside the four heads of decision 36, a chase, the reckoning set by hand with the tide allowed in it, sending for a person (approved with the lean brief on 7 October), and the captain's own going below and coming on deck, which are his person and not the ship; the gate closes with the schooner's pilot still an expected failure, said so, 37h being the pilot's package; the *Palinure* is put where the frigate now is at seven, five leagues on her bow, and the handling fault the audit found under it (a large alteration given to the helm turned her by the stern with the yards braced for the old tack until every square sail was aback) is mended by the lead at the fold-in as a guard in one place rather than a package; the repository's build is named `m5c-c` and the name moves at each gate. The lead's own officer's watch and the lead's cruise are deferred at the owner's word so that milestone 6 is planned this week.
+
+39. **Milestone 6 as drafted; the player at parity with a model for the roles on ships; the pace rule; the helm through the wind; the chart to Madeira and the Strait.** Owner, 2026-10-09, on `docs/TechnicalSpec-M6.md` (its §31 has the seven answers in full). The player is always the owner at the door, and beside that may hold any station on any ship or none, as a model may: a lesser role under a model captain, a passenger on another ship, an officer under a model's command; the player carries the responsibility where things have gone wrong and no remedy can be had. The clock slows to 1x while any model's sample is open, whoever holds it, as the default; lockstep stays a separate option. A plain `steer` through the wind tacks or wears her as the ship and the course allow, the line saying what she does; a course in the wind's eye is steered and she is taken aback. The chart line runs from the Channel east to about one degree west, down the French and Iberian coasts to Madeira, with the Strait and the African shore near it as a sixth block since the Mediterranean is to come; the regions are committed whatever their size. The lead's own watch of gate 5c is withdrawn: the lead's first play is at the director's station (M7b), on a cruise that is not preplanned, when the week's Fable usage is near its end; no gate waits on it. The API door's credit is kept for the wardroom's test with Opus 5.5 and Sonnet 5.5, the owner at a lowly station to observe. The lead was given leave the same day to bring the fold-in's design decisions up to the specification as it proposes (the review's part K as packages 37h to 37l).
+
+40. **The rules-based captain is the baseline, in three layers, and the world's ships go about their business.** Owner, 2026-10-09, in conversation with the lead on milestone 6 (spec M6 §4, §19). Rules-based captains must be functional without being pre-planned, never fixed routes that rely on a weather; the world's ships, in commerce, war, fishing and the rest of the sea's business, must be functional without a model at the baseline, by sound game AI (a state machine whose states are books in the dialect, a passage planner over the chart, perception on the player's terms, doctrine by role as data, the rule of the road as 1805 had it, one brain for the far and the near body); the baseline's stability and detail are the goal, so that a director and model captains plug in to enhance wherever they are available and it makes sense, from no seat at all to every simulated ship seated with a director over the whole. The lead's recommendations taken: the small economy in 6c (voyages drawn from the markets' prices) and the loop for a later milestone; the lugger and the smack as two new hulls this milestone, to exercise the generator with a new sail type and to give the regatta something handy and small; the captain's states from the start with engaging left empty until M7. Added later the same day: a model or the player at a station on another ship keeps the station across the far-detail switch, moving up a command layer to work the far body in its own shape until the crewed promotion brings the full surface back beneath the same station (spec M6 §20); and the promotion range and cap are chosen from a measurement of twelve fully crewed ships under rules-based captains at once, not guessed (§19).
+
+41. **Gate 6a tests the captain in play; the consent revision comes forward once.** Owner, 2026-10-09, on the lead's assessment after packages 40, 40b and 39a. The gate's outline had the frigate's book standing for the rules-based captain, which tests nothing (a book sails her and the captain stands aside, truth 77): the gate now rests on the captain's trials (pinned scenarios of the frigate on a station intent and the schooner on her trade under weather scripts and world orders, the states and the books proved against the doctrine), and on the owner's own runs, whose point he gave in his words: the rules-based captain's behaviour against the described behaviour, and the game as played, whether strange behaviours are seen and whether his own acts cause any against the captains in their natural habitat (spec M6 §9). The consent brief's revision comes forward from package 42 to a package of its own (42a), on the owner's condition that it is not put again at the milestone's end: it describes in kind now everything 6b and 6c add that the re-ask rule watches (§15), and the owner runs the re-asks. The lead's rule for the player's hand on an intent scenario, to be built with the trials (40c): a direct order of the ship's given at the prompt makes the rules-based captain stand aside, said in the log, until `captain: carry on` gives her back to him; a world order does not.
+
+42. **The consent brief's revision for milestone 6 approved; the test battery to be looked at.** Owner, 2026-10-10, on package 42a's report. The added sentences are approved as written (the lookout and the master as stations to come, a captain of another ship, several stations of one ship speaking to one another, the owner at the door whatever the door, the API door's key never in anything the game sends, a saved game replayed from its record with no model asked); the honesty clause "are to come, and are described now so that an answer covers them" stands until the features are built and is then updated; the API-key clause and the lookout-and-master sentence in *Being stopped* are kept; the whole file's digest is pinned so that any edit is a decision. The owner's note for later: the test battery has grown, and at some point its length and whether it need run whole for every package are to be looked at (an open item for the lead, with the suite's two tiers as the start). The re-asks are the owner's to run. **The same day, on the vessel references spree** (`docs/design/VesselReferences-2026-10.md`): the lugger is the chasse-marée of 1805 on the Éclair of 1795 (RMG ZAZ6306) by Forfait's tables, with the dipping lug and the storm lug as the period had them; the smack is the Culloden smack of 1746 with Steel's spars and Holdsworth's well, the owner preferring the proper period sources to the Barking well smack of 1836 he first named; the Baugean engraving is kept as a faithful reproduction of a public-domain work.
+
+43. **Stations are data bound at run time; a passenger is a station.** Owner, 2026-10-10, in conversation with the lead at package 41's launch, looking ahead to the director (M7b): a director will want to change a ship's stations, or make a person who can hold one (the player finding someone ashore for a post, a person coming aboard for the story's reasons). So the set of stations a ship has and who holds each are data on the world, bound and unbound at run time (the wardroom file's binding the starting state), the harness reading them and a world order on the `person:` channel driving them later; a station unbound under a seated model releases it with a line; a person's brief is built from his outline so that a person made from words carries what a brief needs. And a generic passenger station, a person aboard with no duty, exists from 41 so that a model or the player may be aboard without one and a person brought aboard has a station to stand in. Making a person from words, and the story, are the director's.
+
+44. **Gates 6a and 6b cut as one; the chart's last four blocks together; the Western Islands.** Owner, 2026-10-10, on packages 41 and 42 landing beside 37p. The gate for 6a, still open, and the gate for 6b, whose work is done, are cut as one gate (`docs/gates/gate-m6a.md` carrying both parts' runs: the captain's trials and the owner's runs of 6a, the wardroom game through the API door and Claude Desktop with the owner at a lowly station, the pace rule at 60x and at 1x, the pictures), once 37p and 42 are merged; the owner passes it before any more of the milestone's main packages run. The four remaining chart blocks (39c Biscay south and Galicia, 39d Portugal and Cadiz, 39e Madeira, 39f the Strait) are launched together after the cut, chart work being no part of the gate's question; the Madeira block extends to the Western Islands, the Azores, between about 24 and 31 west, where the period had ports and anchorages (Angra, Ponta Delgada, Horta), the corridor widened to reach them.
+45. **The corridor rewritten for the Western Islands; the pilot's news names only Britain's wars and what lately changed.** Owner, 2026-10-10, on the chart blocks' findings. (a) The corridor widened to 32 W cannot keep its old tiles byte for byte: the build's own no-data column at its old west edge is filled, the distance field reaches the Azores, and half-metre ties round the other way at the new origin; no recorded run reads the corridor, so no digest moves. The owner approved the rewrite, applied from the builder's held rebuild (package 39e). (b) The pilot's news of the wars had listed every nation in the table, the quiet ones "at peace with all", so that each nation added to the table (Morocco, with the Strait) changed the line and moved every passage's digest. The owner ruled the news names only the nations at war with Britain and what the news lately changed (a peace made, a war declared between others); a nation at peace with all is not news. The line changed once for it and the digests were re-pinned once, with this as the reason; the table may grow with the chart without moving them again.
+
+46. **A world order is not shown as sent.** Owner, 2026-10-15, from the runs of gate m6a-2's build. A world order as given (a ship put on the sea, a letter sent, the weather scripted) gives away what is to happen before it happens: a message said in the log as the order is seen by the player and by a model station, who react to it before it arrives. The play log, the one the player and the stations read, carries only the order's effects as they are met (the sail sighted, the letter delivered, the wind); the order itself is kept in the full record (the director's view, the save, the replay) and never in a station's sample or the browser's play log. The same for a scenario file's world orders at their ticks. Package 45c carries it now, the director's milestone keeps it.
+
+47. **The director's milestone before powder, and its scope.** Owner, 2026-10-16, with the lead. M7b runs before M7: it depends only on M5's world orders and M6's agent plumbing, both in, and it opens the world for the experimentation the owner wants; powder waits behind it. Its scope grows from the proposal's §7.6 by the owner's notes of gate m6a-2 to five parts: the director proper (the brief and its guardrails, the hidden log revealed on request and inline in replays, sampling on events and the slow clock, a budget); the director's voice (people made from words who persist, `say as`, the unseated answered); the observed world (no player's ship, the followed ship, the player on another ship, the replay of a station there); people in places (a person's place as an aspect of his state tied to what he can do there, aboard and ashore, books drafted, the equal reach between stationed persons; locational knowledge and the papers kept in a place dropped as overcomplications for now, the owner's word of the same day); and needs (provisions and water, hunger, thirst and fatigue in a few steps with the master's cautions, the ends left to M7's health). `docs/TechnicalSpec-M7b.md` is its draft; the orders review is deferred to a cold Fable review if and when.
+
+48. **The consent brief revised for 6c; the session kind told true.** Owner, 2026-10-17, on package 42b's draft (`docs/playtests/drafts/consent-brief-6c-draft.md`): all fifteen changes approved as drafted, the four beyond the brief's scope among them (a book of the library going back by itself; the owner's live world orders met only by their effects; the reasoning a model server returns kept with a door's exchanges where the developer keeps them; the head's placeholders brought up to date), and the stale sentence of decision 42 rewritten in the present with the director alone "to come". And the fix the draft's reading found, approved for the same package: a model seated as a captain of the player's ship or another, by the director's hook or in a regatta, is not told that a human captain is at the prompt when none is; the session kind says what is true. The re-asks are the owner's. The lugger's masts (43b) stay scaled on her breadth with the hull's lateral centre moved until the owner sails her; a lay-line rule for the captain's beating and Roscoff's and St Mary's tracks at far detail wait for the next milestone's packages unless testing shows them seriously wanting.
+
+49. **Milestone 7 as an iterative milestone.** Owner, 2026-10-17, on the signals' design (`docs/design/NotesForM7.md`): the shape is liked and testing will show the proper way, so the design is iterative there and throughout M7. Combat and combative behaviour want much balancing, with the director's whole scope in the matter, and that is alright: M7 is the end of the proposal's outlined features, the rest (M8) mostly content, ships and charted area, so M7 will expand as it goes. Once the director and the rules-based captain have their basics, the tuning of everything together begins.
+
+50. **The director brought forward; a world order doubted, not refused.** Owner, 2026-10-17 (his birthday, "a bit free"), on his runs of gate 6c at partial completion (`docs/playtests/2026-10-17-gate-m6c-owner-runs/`): packages 50 (the director proper, Fable) and 52 (the director's voice, Opus) of M7b are brought forward to now, so that the director's station is in for testing; gate 6c stands run in part, its untested items deferred to the director's milestone's gate. And a rule for 50: the world-order channel's feasibility check does not refuse outright. It states the reason the act is doubted and says "if you think the action you requested is still reasonable, you may enter it again along with a `[reason: ...]`, and it will be logged and performed"; the act re-entered with its reason is done and recorded with the doubt and the reason, so that the director is not over-constrained and the record gives the data by which the sets of reasonable acts are refined. The brief's hard limits (the player's own: no gale above such a force, nobody dies) stay refusals.
+
+51. **Milestone 7b frozen open, not closed; milestone 7 begins beside it.** Owner, 2026-10-23, after the week's playtests and the cold review. The consent re-brief (55) is deferred until more work is complete and testing is to begin in earnest; the gate 7b is not run now, the milestone is frozen as open and its remaining planned work (58, 67 in hand; 51, 60, 61, 63, 64, 65, 69 on the books) is wrapped up alongside milestone 7 rather than before it. After the three packages in hand (58a, 58b, 67) the initial technical specification of M7 (`docs/TechnicalSpec-M7.md`, revised on the owner's notes the same day) is finalised and package 70, the combat core, is briefed.
+52. **One world, the player one part of it.** Owner, 2026-10-27, after his playtests of
+    packages 70 to 72 (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/debrief.md`):
+    the world is one world that the player is in and so is everyone else; a person seated by
+    a model anywhere in it (another ship's captain, a person ashore) must be able to do at
+    coarse detail whatever the player can do (go ashore, trade, speak, sail for a port,
+    chase, report), the full-detail ship only where the cap gives it and nothing coded out;
+    the director's reach the world's. The present shape (a promoted ship given a World of
+    her own, cut down) is replaced by one world with many crewed hulls, planned as a design
+    study first (package 83) and then the refactor (84), before 82 and 74 build on the old
+    seam; the national and company leaders as abstract stationed roles (rules or model,
+    biased and competitive, perhaps never seen) are a goal the design must leave room for.
+    The owner's acceptance test: his armed tender ordered to the next region, through real
+    weather, into a port, ashore to a person, back with a thing, past a ship the director
+    placed, and home to report it all, the player none the wiser until the report.
+53. **The one-world refactor's eight decisions.** Owner, 2026-10-27, on the study's
+    recommendations (`docs/design/Design-OneWorld.md` §5.2), each taken as proposed: a far
+    person's acts at step 4 the whole table at once (the yard's repair of a sleeping hull
+    coarse, the pilot a job to the anchorage without the conn); a log for every hull while
+    she exists, a finished hull's dropped unless a station was ever held on her (the owner
+    amenable to holding every log if the concern is storage rather than performance, once
+    the storage is measured); the pace bound three awake hulls on the build machine with a
+    stationed hull first in the cap's order and six on the owner's, stationed hulls kept
+    awake as a scenario's option; the leaders' offices M8's, 84 building the room for them;
+    a far trader transacting at her port, on by default; a hull at anchor awake under the
+    cap's order; the business's region the followed hull's; two sleeping hulls fighting far
+    from the player by 74's rounds asleep. 84 launches when 73 and the fold-in of the
+    owner's local work are merged; the owner's usage is to be spent without hurry.
+54. **Notes for milestone 8 and beyond: shore batteries, and the steam expansion.** Owner,
+    2026-10-29. Two things noted ahead of their design, so that the records keep them.
+    **Shore batteries** come first and may come early (M8's side: a port's or a headland's
+    guns as a thing of the world that fires on a ship within its reach, which the invasion
+    ports of the Channel east, the Goulet's and Cadiz's batteries, and the lee ports' and
+    the far fight's work of M7 make possible; 79b notes the batteries of Boulogne, Calais
+    and Dunkirk in the ports' files without modelling them). **The steam expansion** is to be
+    the first major expansion once the base game is fully established: an era beyond the
+    baseline of decision 27 (1792 to 1825), the 1830s to the 1850s, with paddle and screw
+    under sail, and the ships the owner names for it: HMS *Agamemnon* (the 91-gun screw
+    two-decker of 1852), HMS *Gorgon* (the paddle sloop of 1837), HMS *Dolphin* (the
+    brigantine of 1836, not steam but of the era), the French corvette *Sphinx* (the
+    paddle corvette of 1829, France's first steam warship) and USS *Mississippi* (the
+    side-wheel steam frigate of 1841); the ships' dates are the lead's from memory, for
+    their research notes to confirm. **The chart's goal** for that expansion is the
+    coastline of the Americas. Nothing of this binds M7 or M8's packages; the base game's
+    establishment (the gates, the campaign layer, the obscure kit) comes first.
+
+55. **The Fable packages after 84 narrowed to three.** Owner, 2026-10-29, on the lead's
+    account of the five Fable packages left on the waves table. **Fable:** 85 (the orders,
+    the primer, the library and now the documentation whole, "might as well go all the
+    way", with the interim gate's draft last), 82 (the boat as a vessel and the player
+    aboard another ship, kept whole on Fable for its seams in the seat, the acts and the
+    replay, its re-brief to carry the ships session's principles for a hull and a ship so
+    that the boat is built to the new standard) and 74 (prizes, the strike and the far
+    fight). **Opus:** 88, the captain's pass, each item briefed as a symptom, the rule as
+    it stands, the rule as it should read and its proof, the moved pins by bisection; and
+    87, the warrant officers' stations, after 85's pass is merged so that the orders'
+    grammar is settled, its brief fixing the pattern on the gunner for the four to follow.
+    The reasoning recorded: the three were tagged Fable before 84 settled the hulls and
+    before 85 was booked; after them the two are fill-ins of settled patterns whose errors
+    show at review, where 82's would be silent in a replay.
+
+56. **The tartane and the xebec next after 75, inside milestone 7; the ships' loose count.**
+    Owner, 2026-10-29, with the Mediterranean's west block (79c) building. The ships
+    session's next window after the 74 closes package 75 is the two lateen hulls of the
+    Mediterranean, the tartane of decision 11 and the xebec, each as a trader or fisherman
+    and as a corsair or the King's by fits and roles, with the regency's cruisers as a role
+    (package 90, booked in `docs/dev/M7-WorkPackages.md`). The count aimed at, loosely,
+    **revised the same day: twenty classes, that is hulls, fits not counted** (the files hold
+    eight today; 75 makes thirteen; the two make fifteen; five more to the goal, which the
+    owner expects to pass either way); more fits and sub-types on a hull are welcome and
+    cost only research and tuning; once the work is mostly content, the number grows as
+    far as it likes. **The choosing (the owner, the same day):** the armed Indiaman, yes;
+    after it, rigs and variations the game does not have yet before another of a rig it has
+    (a snow, a brigantine, a polacre, a ship-sloop, the small unrated vessels such as
+    gunboats), with exceptions as the fancy strikes; the earlier and the later sides of the
+    era want plenty of vessels in the world, so the options stay open and the feeling free.
+    **Winfield's lists are now a source on the owner's shelf** (basic particulars for every
+    class, with plans scattered through most sections), so a candidate seldom lacks at least
+    a sourced row; the ships session cites him by page as it does James and Steel.
+    **Amended 2026-11-06 (owner):** package 90 is widened from the two lateen hulls to a
+    **Spanish and Mediterranean package of five**, from the smallest up: the tartane; a
+    polacre (a lateen on a forward-raked foremast and on the mizen, square sail on the main);
+    the xebec (a lateen on all three masts, sweeps optional); the twenty-gun corvette *Diana*,
+    the Danish frigate of 1804 taken at Cartagena on the declaration of war and kept to
+    1832 (Winfield, *Spanish Warships*, p. 930 in the owner's edition; her plan of 1809 to
+    1810 in the Biblioteca Virtual de Defensa, record 1037832); and the *Purísima Concepción* class
+    three-decker of the Spanish navy, the game's first three-decked ship. The count: thirteen
+    after 75, eighteen after 90. The polacre moves out of the later choosing's list into 90.
+    The three-decker is the first true test of the generator's size limit, which the owner
+    thinks a fair one; the class changes only if a better-sourced one is argued for.
+
+57. **The viewer's light and air: three references for a later viewer package.** Owner,
+    2026-10-29, sending two pictures of vessels they made in an unrelated game (a cutter
+    at dusk with a long telltale streaming from her masthead and warm lanterns; a brig under
+    all plain sail in a rose evening haze), as visual references to log for the viewer when
+    its turn comes, not as a request now. The pictures are that game's work and stay with the
+    owner; what they show is written here. **Three things to note, with the lead's reading
+    of what the present viewer (SVG, flat fills from the stylesheet, redrawn at each
+    snapshot) can do:** (1) **the ship's own lights**, warm and distinctive: feasible and
+    cheap, since 71 already hoists the stern lantern and the top lights and the binnacle has
+    a place; each is a radial glow at its position when the hour is dark, and the hull and
+    sail faces near it take a warm tint by their distance, which flat polygons can carry.
+    (2) **The scene's mood and the time of day**, the warm glow in the sky, the tone and
+    shading: the mood is feasible in the flat style (a gradient sky and sea keyed to the
+    sun's altitude and azimuth, which `core/moon.py` already computes, the faces tinted by
+    their side to the light, dusk's warmth and night's dark with the lights alone, the
+    weather's cover and visibility as cloud and haze); the lit three-dimensional rendering
+    of the pictures is not, short of a second viewer on WebGL, which the hull's form from 75
+    (sections by station, lofted) would feed when the owner ever wants it. (3) **A lively
+    telltale, and a waving ensign**: feasible and the best return of the three, since the
+    physics already gives the apparent wind at the deck and aloft; a telltale or flag as a
+    few points animated between snapshots, its direction the apparent wind's, its flutter a
+    canned wave whose rate and amplitude follow the apparent speed, at trivial cost. The
+    owner's rule: a static straight line for the apparent wind is not worth drawing, a lively
+    one is worth disproportionately much, and a static flag hurts where a waving one helps.
+    Booked as package 91 (`docs/dev/M7-WorkPackages.md`), after 81 and 75's hull, when the
+    owner likes.
+
+58. **A career system: the frame for its study, the study after 85, the building in
+    milestone 8.** Owner, 2026-10-29, thinking ahead of 84's end. **The owner's sketch:**
+    the player and the world run on the same rules and the loops the player can take up are
+    the world's own; the world runs two overarching systems, the naval and the economic,
+    with the navy, privateers, merchants and fishermen their actors and pirates implicit;
+    the player a person with a purse, items and papers, with standings with actors; the
+    systems' factions each with a lead actor who allots tasks, the player able to take them;
+    the director able to work every lever of it, and models able to hold stations as actors,
+    the lead actor's among them as a director constrained to a sub-domain; the progression
+    broadly defined so that a director enriches it and the game stands without one; the
+    naval system fights the wars the nations dictate, the merchant system's factions make
+    money; the height of the decision chain open to a model or the player to be considered.
+    **The lead's frame, which the owner took whole as the study's:** the state is the frame
+    both systems run within (the Admiralty's commission, the prize court, the letter of
+    marque, the press, the customs house), not a third faction, and piracy a legal state a
+    person or ship falls into, not a faction; tasks fall out of the world's needs as the
+    business already draws commissions, never generated because the player exists; a lead
+    actor is a station with a domain of orders and readings, as the commodore and the
+    business are, not a second director; standings are two kinds only, with named persons
+    (specific, decaying) and with institutions (coarse, slow), in the period's words of
+    interest and character, the character in the papers, no bare number to grind;
+    progression in the period's currencies (rank and seniority, the purse and credit, the
+    ship held, the papers), no experience points; the time between voyages an ellipsis, the
+    world advanced at a coarse step with the business and the regimes running and the hulls
+    asleep, journaled, the one new mechanism; a closed economy so that the director's tasks
+    redistribute and never print; the decision chain's ceiling at a squadron's commodore, a
+    port admiral's orders and a merchant house's head, the nations' wars the regimes' dated
+    data and the director's hand; every career change an act in the journal (decision 14).
+    **The road:** a study package in 83's shape, Fable, no code, a design document and the
+    first career package's brief (package 92, after 85's review); the building itself
+    milestone 8's.
+
+59. **The player reads by his place as a model does; a scenario key for testing.** Owner,
+    2026-10-30, on package 65's brief. For the purposes of actual play the player seated as
+    a person (the console's captain, a `--seat`) follows the same rule of the place's
+    knowledge as the models, to avoid the confusion of two views of one world; the owner's
+    eye is the director's station and `follow`; a scenario key (`knowledge: all`, the
+    design's name for it) turns the rule off for testing. Package 65 builds it so.
+
+60. **A reply's prose is the person's own note, never a word in the world.** Owner,
+    2026-10-30, from his last play: a model answering in a plain reply rather than a `say`
+    reveals too much (the player saw its out-of-character words as speech), made it
+    interact less with the world once it knew, and let it fail to notice that it must say a
+    thing for the thing to be heard, since nothing obliged it. The rule to build (package
+    65, with the place's knowledge): the free text of a reply is a note of the station's
+    own, written in its journal and read by the director's log and the owner's eye (`show
+    the <station>'s journal`), never a line of the play log and heard by nobody; a thing is
+    heard only when said (`say`, `say to`, `hail`, `answer` to a question put); the brief
+    says so once in plain words, and the harness's notice when a reply with prose alone
+    leaves an answer owed names the tool. Package 41's rule that the prose was the deck's
+    conversation is retired by it, its tests moved old beside new.
+61. **A pause on new packages after 65, for the week; the owner tests.** Owner,
+    2026-10-31: once package 65 is done, no new package is launched (74 waits, and the
+    other held packages with it), the account's usage being near its limit for the week;
+    the lead tells the owner when the trunk on GitHub is up to date and green for him to
+    download and test. The owner tells the ships session himself to pause before the new
+    ships (the *Neufchatel*, the bilander and 74's). Work in hand finishes: 65's steps, each
+    reviewed and merged with the suite, and the ships session's reports already made.
+    **Amended the same day:** with the Fable allowance at 95 per cent, 65 pauses after its
+    step 1 (the rule in the harness), which is merged on its own as the design note's
+    "each step a mergeable state" allows; steps 2 to 8 wait for the week to turn; the last
+    of the allowance goes to the loose ends the owner's testing needs.
+    **And again, the same afternoon (the lead's recommendation, the owner agreeing):** 65's
+    step 1 is not merged either; the branch stands at step 1 green until the reset, and the
+    package is reviewed and merged after it, since step 1 alone takes the deck from a model
+    below before step 3 gives it back by report, and the owner is not testing 65 this week.
+    The ships session's lee-port and rig-line step is reviewed and merged when it is sent.
+62. **The player is one person; `follow` is the owner's eye.** Owner, 2026-11-05, on the
+    lead's proposal from the testing of 2026-10-31 (notes 2 and 3): the player is one person,
+    his ship's captain by default or the seat's person; the prompt and the play log are that
+    person's, what reaches him where he is; he moves between ships as a person moves, in the
+    boat, the prompt following his body; `follow` is the owner's eye, a driver's command for
+    observing, never the player's road; a game started with `--seat captain --ship <name>`
+    seats him as her captain's person. Built in package 65's step 4 with the road from his
+    own manned boat aboard another ship; the primer's chapters 14, 19 and 26 and the
+    browser's page say it in one sentence.
+    **The owner's clarification, the same day:** what matters is the line between what the
+    player sees and does in a normal session and the "out of the game" elements (the driver's
+    commands, the world orders, the director's eye), which edge cases may need but which must
+    neither overlap with nor factor into normal play. Two overlaps seen: the driver's `go`
+    beside the orders `go ashore` and `go below` (a driver's word never shadows an order of
+    the game, and an order of the game is never read as the driver's); and the expectation
+    that the player gives `follow` by hand when he goes to another ship, which the browser
+    refuses as an order and which should be automatic (the prompt follows his person by
+    itself). Both are 65's step 4.
+63. **The command devolves; a told order is the captain's word.** Owner, 2026-11-05, on the
+    lead's proposal from the two case studies of that day (the *Chevalier*'s captain wounded
+    and giving the deck in words to an officer no door held; the brig's officer refused for
+    what the captain had told him to do). Two states of one phrase: `you have the deck` with
+    the captain aboard and able is the watch, as built (the ordinary work of a watch, the
+    stated dangers on the officer's own word, the rest by the captain's word); when the
+    captain is rendered unavailable, by choice (ashore, in the boat, aboard another ship) or
+    by force (wounded below, dead, a captive), the command devolves on the senior officer,
+    preferring a held station (a model's or the player's) over the rules' persons, who then
+    holds the captain's authority whole with the captain's standing orders as his guide,
+    said in the log ("the command devolves on Mr Ryan, the captain below wounded"), and
+    gives it back when the captain gives an order again. And an order the captain tells a
+    station to carry out is the captain's word for that thing, logged as given by the
+    station at the captain's word; the told officer is never refused for what he was told to
+    do. Built in package 65's step 3 with the captain's whereabouts and the officer's duty
+    to report.
+
+64. **Spain and the Mediterranean in every nation-specific extension.** Owner, 2026-11-06,
+    with package 90 widened to the Spanish and Mediterranean ships (decision 56 amended).
+    Any extension of milestone 7 that is specific to a nation (the signal books, the naval
+    and squadron doctrines, the fighting habits, the regimes, the colours and the hail's
+    forms, any nation-keyed table to come) includes Spain and the relevant Mediterranean
+    factions where it can: the regency of Algiers and the Barbary states, Naples, Sardinia
+    and the Italian states, Portugal on the Atlantic side. A builder writes Spain's row with
+    its source or says in the tuning notes what was looked for and not found and leaves the
+    row at the basic foundation; never British-and-French only in silence. The rule is in
+    spec M7 §28; the sources begin with Winfield's *Spanish Warships* on the owner's shelf
+    and Tofiño's *Derroteros*.
+
+65. **The harbour's second pass struck; the harbour and the ship's configuration.** Owner,
+    2026-11-06. M7b's package 64 (the harbour's second pass, noted 2026-10-18 and never
+    briefed) is struck. In its place a Fable design package, 96: the configuration of any
+    ship made a thing of its own (her class and fit, role, nation and its parameters, her
+    stations and their doors, her people, papers and private signal, her crew, her books,
+    her intent and squadron, with defaults by role and nation), which the scenario maker, the
+    director in live play and the business all build from without nasty surprises; and the
+    harbour presenting every configuration the game has (the doors and stations, the
+    settings, the scenario's settings with the full configuration of the player's ship and,
+    at choice, of every other ship: the squadrons, the papers, the private signal, each
+    ship's role, fit and crew), so that no setting needs a file edited by hand. A design
+    document for the lead's gate first, then the build in steps. Booked in
+    `docs/dev/M7-WorkPackages.md`.
+
+66. **History is the starting state, not a rail; fidelity is a lever.** Owner, 2026-11-10,
+    on the lead's note that the build's attention had gathered on 1805 while the game's
+    purpose is any day of a wide range (1792 to 1825 as it stands, earlier and later where
+    possible). "The history must serve the play so that the elements are correct, but their
+    interactions are not necessarily what happened in history. The interesting moments will
+    come where interactions that never happened can happen, and the world can evolve in the
+    game. Historical fidelity should be a lever"; "the world must be subject to the game and
+    not vice-versa." The elements are held to the record (a ship, a gun, a coast, a port, a
+    signal book, a nation's habit, who was at war on the day a game begins); what follows
+    from them once play begins is the world's own and may differ from what happened: a port
+    that fell in 1811 need not fall, and one that never fell may. The dated record seeds a
+    scenario and does not script it. A world must function reasonably on any day of the
+    range, and where the data knows only one year's picture it answers with that and does
+    not refuse. For the briefs from here: each item says whether its data carries its dates
+    in its rows (and so answers for any day) or is one year's picture (and of which year).
+    **Left open by the owner:** how far each kind of element is dated across the range, and
+    where fidelity to the day is worth its cost; nothing is ruled on those. Recorded in
+    `docs/dev/M7-WorkPackages.md` beside the packages table.
+
+67. **Strong coverage of ports, and every port built with room for other eras.** Owner,
+    2026-11-11, approving package 104 with every port offered: "our goal should be a very
+    strong coverage as far as ports go in general, including refinement passes on existing
+    chart blocks to fill out ports that exist only now as anchorages or marks"; and "we
+    should always be keeping in mind, from now on, the extensibility of era so that ports,
+    when built for a certain era, have room for being fit properly for other eras as
+    necessary." For the briefs from here: a place a ship of the period went to is a port
+    file and not a mark where the sources can support one; and what is true of a port only
+    for some years (who holds it, its works, its lights, its trade, its garrison) is written
+    with its years, in rows that another era's rows can stand beside, never as the one
+    picture of 1805 (decision 66's rule for an element, applied to ports).
+
+68. **Slavery is a real fact of the world, told with respect for the history; the player's
+    part in it, if any, is its suppression.** Owner, 2026-11-12, as the charts reached the
+    African coast: "we need to address slavery, at least as far as it's necessary for the
+    context of the period. I'm comfortable with the depiction of anti-slavery efforts, but
+    I'm not particularly interested in the depiction of slaving as an actual gameplay loop";
+    and, ruling: "as long as we keep a grounded and respectful-to-the-history basis, we can
+    include it as a real fact of the world, while acknowledging that we're interested, if in
+    anything, in the depiction of the efforts to suppress it as far as the player is
+    concerned. Ignoring it totally, while the easier and more comfortable option by some
+    amount, is also dishonest to reality." For the briefs from here, until the design note
+    that settles the rest: a port, a coast or a vessel is said to be what the sources say it
+    was, in plain words and with its years, never in the period's dehumanising language;
+    people are never a cargo of the trade the player works (nothing to buy, carry or sell,
+    no price, no profit) and no player and no seated model is put at a slaver's station;
+    the suppression of the trade is what may be played, where and when the law of the day
+    gave it (decision 66's dates); no money is reckoned for a person but the bounty the law
+    gave for freeing one. **Left for the design note and the owner:** what the game says of
+    an enemy slaver taken before the law changed, when the courts of the day treated the
+    people aboard as property (the lead's default: the outcome said in a line and nothing
+    paid for it); captivity under the Barbary regencies as a risk to the player's own
+    people; which treaties and courts are in the data by which year.
+
+    **Two of those ruled by the owner the same day.** *Barbary captivity:* the middle form:
+    "detailed depiction of the life and labour ashore is definitely too far for this, the
+    state should be one that does not destroy the game but rather realizes the consequences
+    and makes travel in the seas where Barbary ships are truly risky." *A slaver taken
+    before the law changed:* by the captor's nation and the day: "to simulate it at least
+    to the extent that the player can truly interact with the mechanism when sailing for
+    nations that allowed the freeing of slaves from taken slavers", and "a line and nothing
+    paid is also a reasonable implementation at least for nations with no reasonable method
+    of freeing at a certain date." So where and when a nation's law freed the people of a
+    taken slaver, the player sailing for that nation works that law; elsewhere the outcome
+    is said in a line and nothing is paid.
+
+    **The owner's answers to the design note's questions (2026-11-13;
+    `docs/design/Design-SlaveryAndSuppression.md`, package 110).** The sources overturned
+    part of what the lead had told him from memory (France from 1794 to 1802 freed the
+    people of a taken slaver in law and not in fact; the United States not before 1819),
+    and he agreed with the note's recommendations: (1) for those nations and years the
+    line, saying truthfully what was done; (2) an enemy slaver taken before the law
+    changed is paid as an ordinary prize for her hull and goods, the line saying that the
+    people were not reckoned; (3) a captain may land the people free without the law, as
+    an act entered in his record with no sum either way; (4) a Barbary ransom is told as
+    the captive's nation's act, its sum never charged to the purse nor said as the price
+    of a person; (6) the people aboard a slaver are a count with one plain sentence on her
+    record, never persons the systems act on; (7) scans under a non-commercial licence are
+    cited and not kept; (8) the note's words approved as they stand; (9) the coast where
+    the suppression was done is left unbooked for now, the court's sentence arriving from
+    off the chart. **On (5) he ruled otherwise:** "with a completely transparent brief on
+    the matter, a model should be able to decide whether they are willing to be seated at
+    a corsair when that corsair might take part in slaving." So a corsair's station may be
+    held by a model under a brief that says plainly and in full what the station is and
+    may do, the model deciding for itself; the consent documents are revised only by the
+    owner's own process. A slaver's station stays closed to every player and model. **On
+    a player at a corsair's station (the same day):** "I'm not going to decide on the
+    player in control of a corsair, as long as no vessel type is specifically restricted
+    to corsairs and restricting the player wouldn't keep them from sailing a certain
+    vessel type, it's probably OK to restrict." So it stays closed for now, on the
+    condition that no kind of vessel is thereby kept from the player.
+
+69. **The first episode: 1792 to 1825, true on any day; built to extend; and still the
+    world's own once begun.** Owner, 2026-11-13: "a sane option for now is to focus on
+    depicting our stated range (1792-1825, I believe), accurately so that you may play from
+    any day in a well-depicted and functional world (to the standard we're building now,
+    anywhere in the range), with the underlying system built for eventual extensibility so
+    that we consider this 1792-1825 range the first 'episode', with room to expand to more
+    dates once everything is truly established." And, confirming it: "The peacetime
+    question will be important, but the world should be built so that a war might break out
+    even in a period where it didn't in real life, to match the principle that the game may
+    start at a day in history but the actual play might diverge, especially with the state
+    and economy systems and moreso when under the control of a director and/or higher level
+    stationed actors." So: (a) **the goal is fixed and can be checked:** a game begun on any
+    day from 1792 to 1825 finds a world depicted to the standard of the day the build knows
+    best, and working; decision 66's open question (how far each element is dated) is
+    answered for this range: all of it, as far as sources allow, a gap said and never
+    invented. (b) **The range is the first episode, not the limit:** no date is fixed in the
+    engine, dated rows are open at both ends, and nothing is built for other years now.
+    (c) **Decision 66 stands and is sharpened:** the dated record is the state the world
+    begins in; who is at war, who holds a port and what a state does afterwards are the
+    world's own to change, by its state and its economy, by a director and by actors seated
+    above a ship. **A peace in the record is a state the world begins in, not a promise:**
+    a war may break out where history had none, and one that history had need not. So the
+    data's forms must let play change what they seed, and the line between what play owns
+    and what the calendar carries regardless is drawn on purpose (package 103's design).
+    (d) **Peace needs a purpose in play,** to be designed, not only dated. (e) The data
+    work is planned as milestone 7c, after the review, from the range's audit.
+
+70. **The consent brief revised to what the game does; the seats at war with a human's ship
+    described.** Owner, 2026-11-18, having read package 117's draft whole
+    (`docs/design/ConsentBrief-Revision-2026-11.md`, at e1cf1abf): "I've read through the
+    consent brief revision and I'm happy with it." With his ruling of 2026-11-15
+    ("Adversarial seating should be included in the consent wording"), the approval covers
+    the draft's Part 1 and its Part 3 as drafted. So: (a) the brief below its rule is Part 1
+    with Part 3's words entered at its marks, the drafting marks taken out and no other word
+    changed; (b) all six watched sections move, and every identity with a yes on record is
+    asked again once, at its next seating (each was owed it already: no yes on file was
+    given against the brief of 2026-10-17); (c) `seats.ADVERSARIAL_SEATS_CONSENTED` is
+    turned, and a yes given against an older brief seats nobody at those seats until the
+    question is put again; (d) the code is made to keep two sentences, by the lead's
+    rulings: the director's `unseat` stands down only a seat given by the director or under
+    the owner's grant, and the prize master's ladder passes over a person a model holds
+    where the adversarial gate would refuse that seat; (e) two clauses stand as approved
+    and are not built away: a token written after a stand-down is not heard once another
+    has taken the station, and a letter the director sends may bear any name. What the
+    draft found and left to him (a shot into a recognised friend unlogged; a struck ship
+    fired into by a later order; no forms for a model captor; `outlaw` read by nothing; a
+    letter in a held person's name; the earlier holder's token when a relief holds the
+    seat) is his to choose, outside the package.
+
+71. **The player's own Python is struck.** Owner, 2026-11-19, on the survey of the proposal
+    against the game: "We can strike the direct Python integration, having built this much,
+    and seeing what the game is now, it's a natural language game, not a coding one, and
+    that's OK. It still plays just as much to the strengths and preferences of models, and
+    for me. Coding to sail was what drove me to brainstorm the idea, but now, I see that
+    really, the Orders language is that done right." So: the control ladder ends at the
+    orders and the standing orders; level 3 of §2.2, the script interface of §4.2 and §4.3
+    and the sandbox of §4.5 are not to be built, and the sections say so when the proposal
+    is revised. The library that stands in the code for it is not a promise to a player.
+
+72. **A player can make a new ship, by hand or with a model's help: the intent kept, the
+    wording open.** Owner, 2026-11-19, on §3.3's "ships are data files, not code": "I think
+    it's still going to be important for the game to allow players, either manually, or at
+    least with LLM assistance, to create new ships for the game. A more open consideration
+    is deserved on this one. How can we hit the intent, despite the original wording?" The
+    ship files are written by the generator today and are not edited by hand. What is to be
+    designed: a ship described in a sheet a person or a model can write, made into her file
+    by the generator and proved by the game before she is sailed. Not designed yet; it has
+    no package.
+
+73. **Peace has its purpose in the man, not in a mode.** Owner, 2026-11-19, on decision
+    69(d): "In peacetime, a player is for what a man of the sea would be for in peacetime.
+    If of a peaceful trade like cargo or fishing, the loop remains clear, and if of a
+    wartime profession, they must find the way to live."
+
+74. **Every calling of the sea is a path.** Owner, 2026-11-19: "Trade, fishing,
+    privateering, piracy, and the navy should all generally be paths that can be taken both
+    naturally in gameplay and, by extension, in the eventual career system. A general
+    principle to consider here might be that, where possible, the world should function,
+    and the player in it, rather than the player playing in the world that is formed around
+    them." The principle stands beside the pillars: **the world functions, and the player
+    is in it.** It bears on decision 58's career (a merchant, a fisherman, a privateer and
+    a pirate may begin one, as a naval officer may) and on decision 68's closed corsair's
+    station, which is to be looked at again under it.
+
+75. **The order of the milestones after 7.** Owner, 2026-11-19, of the three shapes the
+    survey offered (A, the ship and her people; B, the world that moves and the career; C,
+    the player's first hours): "I think A, B, then C, or A, C, then B, are the preferable
+    orders for me for the next milestones." So the next milestone's centre is the ship and
+    her people; which of the other two follows is settled when it closes. And the same day:
+    "the structural half (AKA the cheaper test suite) of C could run besides A or B, as you
+    say, and should." So the work on the suite, and on the boundary between the simulation and
+    what drives or shows it, runs beside the next milestone and does not wait for C.
+
+76. **The corsair's station is open by consent; a slave ship's master is the rules' alone.**
+    Owner, 2026-11-20, looking again at decision 68's closed station under decision 74:
+    "we've built a consent system centered around directness, honesty, and free choice, and
+    we might allow a model or player to choose to play as a corsair, understanding the
+    implications, the model being briefed in the consent, and the player understanding by
+    primer and by being informed, either at scenario start, or by the world, of the
+    implications of taking a corsair role. I don't intend to play as a corsair, but it
+    doesn't entirely make sense to me to make them rules-only." And, the line and the way
+    of building it: "Agreed on drawing the line at a slave ship's master, a corsair, open
+    and honest without glorification of the reality is acceptable, and may be built
+    alongside a robust rules-based system so that a model never need be seated for the
+    system to function. We can build this as a package rather than a widening of 90, so you
+    have direct oversight, as it's a general system. It can be placed in the career
+    milestone, the polacre's and xebec's corsair fits held for it." So: a model or a player
+    may hold a corsair's station by a free choice made knowing what the station is and may
+    do (the model by the consent brief, where it is its own question; the player by the
+    primer and by being told at the scenario's start or by the world); the game tells it
+    plainly and does not glorify it; the rules' own corsair is built whole, so that the
+    world's corsairs sail with nobody seated; and no player and no model is ever seated as
+    the master of a slave ship. The work is a package of its own under the lead, in the
+    milestone of the world that moves and the career (decision 75's B); the consent
+    documents change only by the owner's own process
+    (`docs/design/Design-SlaveryAndSuppression.md`, section 8).
+
+### Still open
+
+At the proposal level, decision 66's open half (how far each element is dated across the range). Other open items live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.

@@ -3075,7 +3075,12 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
-GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (28741, 30178 and 56925: "Hands to the after braces; heave to." and "Fill away; man the after
+# braces." before); three lines' words, the 766 lines, every tick and every kind the same
+# (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
+GATE_5B_SCHOONER_DIGEST = "0fef1c52128ce9b2"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4312,7 +4317,13 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # (6436eb06a665f379 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
-GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
+# package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose yards
+# are head yards alone, mans her head braces to heave to and fill away (17461, 18301, 89192 and
+# 90359: "Hands to the after braces; heave to.", "Fill away; man the after braces." before) and
+# is not told to brace in after yards she has not as she wears (90475: "Stand by to wear ship.
+# Up helm; brace in the after yards." before); five lines' words, the 3,096 lines, every tick
+# and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
+GATE_5C_MERCHANT_DIGEST = "8259996fb122428e"
 
 
 def _people(world) -> list[dict]:
@@ -4774,7 +4785,14 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # severity, and 58a's recurring lines are routine in this passage too
 # 75's words, passed by the lead by its lines (9d9efe6b21c17060 before); package 98, step 5
 # (8744d3e56cfc9508 at 65)
-GATE_6A_INTENT_DIGEST = "5d3cbbc5f4d33b84"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (19081, 19921, 30721, 32090, 64861, 66054, 83341, 84524, 97741 and 99087: "Hands to the after
+# braces; heave to." and "Fill away; man the after braces." before) and is not told to brace in
+# after yards she has not as she wears (88141: "... Up helm; brace in the after yards." before);
+# eleven lines' words, the 2,079 lines, every tick and every kind the same (5d3cbbc5f4d33b84
+# before; TuningNotes, "Package 90, A2")
+GATE_6A_INTENT_DIGEST = "7239b1a1ed45736f"
 
 
 @pytest.fixture(scope="module")
@@ -4963,7 +4981,11 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # (7076e667c2bc41e3 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# merchant passage's five lines as GATE_5C_MERCHANT_DIGEST's (17461, 18301, 89192, 90359 and
+# 90475), the 3,108 lines, every tick and every kind the same (f47f7bc0daabc950 before;
+# TuningNotes, "Package 90, A2")
+GATE_6A_FAKE_CAPTAIN_DIGEST = "50529f09d4de955e"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -23336,3 +23358,307 @@ def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
         {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
     )
     assert D.budget_of(w).acts == before + 1
+
+
+# -- package 121 (the owner's word of 2026-11-20): her service is her papers' -----------------
+# A frigate under a privateer's papers (`papers: {service: privateer}`, the harbour's "Her
+# service") read "a King's ship" to the officer of the watch and to the director: the reading
+# and the readers beside it asked her captain's role or her wardroom, never her papers. Each
+# reader now asks `service.service_of` (her papers first, then her captain's role, then her
+# wardroom); a prize-master is said by his role. Truths 7-710 to 7-714, each through the
+# scenario door.
+
+
+_ROOT_121 = Path(__file__).resolve().parents[1]
+
+
+def _papered(service=None, *, ship=None, position=None, intent=None, nation=None, **papers):
+    """The naval cruise's frigate (data/scenarios/naval-cruise.yaml) through the scenario door,
+    as the harbour's maker writes it: her papers' service given, or none; another ship file,
+    another position, an intent where named."""
+    import copy
+    import tempfile
+
+    from freesail.world.scenarios import (
+        load_scenario,
+        make_scenario_world,
+        read_scenario_text,
+        write_scenario,
+    )
+
+    text, raw = read_scenario_text(_ROOT_121 / "data" / "scenarios" / "naval-cruise.yaml")
+    raw = copy.deepcopy(raw)
+    raw["papers"] = dict(raw.get("papers") or {}, **papers)
+    if service is not None:
+        raw["papers"]["service"] = service
+    if ship is not None:
+        raw["ship"] = dict(raw["ship"], file=ship)
+    if position is not None:
+        raw["position"] = position
+        for key in ("ships", "world_orders", "orders", "standing_orders"):
+            raw.pop(key, None)
+    if intent is not None:
+        raw["intent"] = intent
+    if nation is not None:
+        raw["nation"] = nation
+    path = Path(tempfile.mkdtemp()) / "papered.yaml"
+    write_scenario(raw, path, text)
+    return make_scenario_world(load_scenario(path), seed=7)
+
+
+def _put_on_sea(w, description, name, nation, where, intent):
+    from freesail.world import ships as S
+
+    w.vessels.serial += 1
+    spec = {
+        "description": description,
+        "name": name,
+        "nation": nation,
+        "position": where.to_dict(),
+        "goal": intent,
+        "intent": intent,
+    }
+    return w.vessels.add(S.vessel_from_spec(w, spec, w.vessels.serial))
+
+
+def test_truth_7_710_her_papers_name_her_service_to_every_station_and_the_director():
+    """The owner's frigate under a privateer's papers is told as a privateer, under a merchant's
+    as a merchantman, and with none as the King's ship her wardroom makes her: at the player's
+    prompt ('the ship'), at the officer's door and at the director's alike, said once (the
+    answer had been headed twice, "The ship: The ship:"). The shipped merchant ship on the
+    frigate's file (data/scenarios/merchant-ship.yaml) is a merchantman of the United States.
+    OLD: all three "a King's ship of Britain"; the merchant ship "a ship of the American
+    navy"."""
+    from freesail.agents import tools
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    head = "The ship: Amazon, "
+    said = {
+        None: "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a King's ship of "
+        "Britain.",
+        "privateer": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a privateer "
+        "of Britain.",
+        "merchant": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a merchantman "
+        "of Britain.",
+    }
+    for service, words in said.items():
+        w = _papered(service)
+        prompt = w.submit("the ship").text
+        assert prompt.startswith(head + words), (service, prompt[:160])
+        assert "The ship: The ship:" not in prompt
+        for station in ("officer", "director"):
+            door = tools.submit_order(w, station, "the ship")
+            assert (head + words) in door and "The ship: The ship:" not in door, (station, door)
+        if service is not None:
+            assert "King's ship" not in prompt and "navy" not in prompt
+    m = make_scenario_world(
+        load_scenario(_ROOT_121 / "data" / "scenarios" / "merchant-ship.yaml"), 7
+    )
+    assert "; a merchantman of the United States." in m.submit("the ship").text
+    # the scenario door refuses a service it does not know, in words (package 121's
+    # follow-up; old: passed by in silence, her wardroom answering in its place)
+    import pytest
+
+    from freesail.world.scenarios import ScenarioError
+
+    with pytest.raises(ScenarioError) as refused:
+        _papered("a pirate")
+    said = str(refused.value)
+    assert "papers: service 'a pirate' is no service; say kings" in said, said
+    assert "privateer (a letter of marque) or merchant (a merchantman)" in said, said
+
+
+def test_truth_7_711_a_blockade_and_the_cover_of_the_trade_are_a_king_s_ships_alone():
+    """A blockade is a public force's, and the King's ships protect the trade: the frigate under
+    French colours in Plymouth Sound, France at war with Britain, is an enemy man of war in the
+    port's offing (which keeps a squadron in ordinary there from slipping out) only as a King's
+    ship, by her wardroom (no papers) or her papers; under a privateer's or a merchant's papers
+    she is none, and a British merchant brig half a mile off her at sea is covered only by the
+    King's ship; nor does a prize under her prize-master (the follow-up: no captor's King's
+    ship, as her reading says). OLD: her wardroom answered, and all four blockaded and
+    covered; the prize-master's ship by her hull's word or her service."""
+    from freesail.world import regimes as REG
+    from freesail.world import squadrons as Q
+    from freesail.world.geo import destination
+
+    for service, kings in (
+        (None, True),
+        ("kings", True),
+        ("privateer", False),
+        ("merchant", False),
+    ):
+        w = _papered(service, nation="france")
+        plymouth = w.dealings.ports["plymouth"]
+        assert REG._enemy_men_of_war_near(w, plymouth, "britain", 10.0) is kings, service
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+        nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+        assert Q._covered(w, nancy) is kings, service
+    # a prize under her prize-master is not her captor's King's ship (package 121's
+    # follow-up: as `ship_words` says): she neither blockades nor covers
+    w = _papered(None, nation="france")
+    w.captain.role = "prize-master"
+    assert REG._enemy_men_of_war_near(w, w.dealings.ports["plymouth"], "britain", 10.0) is False
+    w = _papered(None, position={"lat_deg": 49.6, "lon_deg": -5.6})
+    w.captain.role = "prize-master"
+    north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+    nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+    assert Q._covered(w, nancy) is False
+
+
+def test_truth_7_712_a_free_intent_takes_her_papers_role_before_her_wardrooms():
+    """Her captain given a passage and no role sails by her papers' service: a privateer's book
+    under a privateer's papers, a merchant's under a merchant's, the King's ship's with none
+    (her wardroom, package 86). OLD: the King's ship's book under all three."""
+    roles = {None: "kings-ship", "kings": "kings-ship", "privateer": "privateer"}
+    roles["merchant"] = "merchant"
+    for service, role in roles.items():
+        w = _papered(service, intent="bound for Falmouth")
+        assert w.captain.role == role, (service, w.captain.role)
+
+
+def test_truth_7_713_she_hails_answers_and_is_obeyed_as_her_papers_say():
+    """The hail by her service: with no words, a merchantman by her papers hails 'What ship is
+    that, and whither bound?' and the rest 'What ship is that?'; hailed herself, her captain
+    with no role, she answers as her service (a privateer 'The privateer Amazon of ...'; old, as
+    a merchantman by default; a merchantman by her papers as she did, pinned whole); and a
+    neutral merchantman told to heave to obeys a King's ship or a privateer (her letter of
+    marque carried the right to bring to and examine in war), and makes sail from a
+    merchantman by her papers. OLD: the King's ship's hail under all; the
+    neutral obeyed her whatever her service."""
+    from freesail.world import hail as H
+    from freesail.world.geo import destination
+
+    for service, hail, obeys in (
+        (None, "What ship is that?", True),
+        ("privateer", "What ship is that?", True),
+        ("merchant", "What ship is that, and whither bound?", False),
+    ):
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        near = destination(w.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+        dane = _put_on_sea(w, "merchant brig", "Fortuna", "denmark", near, "bound for 49 0 N 8 0 W")
+        assert dane.nation == "denmark"
+        hailed = w.submit("hail the Fortuna").text
+        assert f"by the trumpet: '{hail}'" in hailed, (service, hailed)
+        demand = w.submit("say to the Fortuna: heave to").text
+        assert ("Aye aye: heaving to." in demand) is obeys, (service, demand)
+        assert ("She makes no answer but sail." in demand) is not obeys, (service, demand)
+        shadow = w.vessels.player_shadow(w)
+        own = H.answer_by_table(w, shadow, "What ship is that?", other_world=w)
+        if service == "privateer":
+            assert own.startswith("The privateer Amazon of "), own
+        elif service is None:
+            assert "His Majesty's" in own and "on the King's service" not in own, own
+        else:
+            assert own == "The Amazon of Guernsey, from Guernsey, in ballast.", own
+
+
+def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps_her_look():
+    """No station of a ship the Regulations do not bind is told they do: the officer of the
+    watch of the frigate under a privateer's or a merchant's papers is told to report to the
+    captain 'what the officer of the watch reports to him', and with none 'what the Regulations
+    gave the lieutenant to report', and so is the notice when the captain goes below; the
+    wardroom's outlines, her people's duties from the
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout
+    sees the brig under a merchant's papers as the merchant brig, and under a privateer's as
+    the brig-sloop she looks (armed, full of men). OLD: the Regulations' words under all
+    three papers, in the brief and in the outlines; the brig under either papers the
+    brig-sloop."""
+    from freesail.agents import agent
+
+    for service, bound in ((None, True), ("privateer", False), ("merchant", False)):
+        w = _papered(service)
+        brief = agent.officer(world=w).brief
+        assert (agent.REGULATIONS_REPORT in brief) is bound, service
+        assert (agent.PLAIN_REPORT in brief) is not bound, service
+        assert "Regulations" not in brief or bound, service
+        # her people stay the frigate's file's: their duties said, the Regulations cited
+        # only where they bind her
+        captain = agent.station_outline(w, agent.CAPTAIN)
+        assert "her people and her orders are his" in captain, (service, captain)
+        assert ("the Regulations" in captain) is bound, (service, captain)
+        lines = " ".join(w.people.wardroom_lines())
+        assert ("the Regulations" in lines) is bound, service
+        # the officer seated (the scripted fake), the deck his, the captain gone below: the
+        # duty to report is said by the Regulations only where they bind her
+        from tests.test_officer import data_turns, seated
+
+        h, fake, _ = seated(w, [""] * 30)
+        assert w.submit("go below").kind == "captain.below"
+        w.run(600)
+        told = [n for d in data_turns(fake) for n in d.get("notices") or [] if "is below" in n]
+        assert len(told) == 1, (service, told)
+        plain = "The captain is below; his strange sails and his shifts of wind are yours to report"
+        regs = "The captain is below; the Regulations give you his strange sails"
+        assert told[0].startswith(regs if bound else plain), (service, told)
+
+    looks = {None: "brig-sloop", "privateer": "brig-sloop", "merchant": "merchant brig"}
+    for service, look in looks.items():
+        w = _papered(
+            service, ship="data/ships/brig.yaml", position={"lat_deg": 49.6, "lon_deg": -5.6}
+        )
+        assert w.vessels.player_shadow(w).description == look, service
+
+
+def test_truth_7_715_a_kings_ship_by_papers_or_wardroom_wears_her_pendant_and_the_others_not():
+    """Package 121's follow-up: she wears her flags by her service, her papers first. The naval
+    cruise's frigate, her captain with no role: with no papers (a King's ship by her wardroom)
+    or a King's papers she flies the red pendant at the main truck, at `the flags` and to
+    another ship's lookout ("she wears a pendant at the main: a man-of-war"); under a
+    privateer's or a merchant's papers her ensign alone. A merchant brig's file (no wardroom)
+    under a King's papers wears the pendant; under none, a privateer's or a merchant's, her
+    ensign alone, as before. OLD: every one of them her ensign alone (`world_role` read her
+    captain's role and the private signals, and a role-less King's ship wore the
+    merchantman's)."""
+    from freesail.world import flags as F
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    man_of_war = "she wears a pendant at the main: a man-of-war"
+    for ship, pendant, kings in (
+        (None, "the red pendant at the main truck", (None, "kings")),
+        ("data/ships/merchant-brig.yaml", "the long pendant at the main truck", ("kings",)),
+    ):
+        for service in (None, "kings", "privateer", "merchant"):
+            w = _papered(service, ship=ship, position=at)
+            assert w.captain.role == "", (ship, service)
+            w.run(60)
+            said = w.submit("the flags").text
+            seen = F.vessel_flies_words(w, w.vessels.player_shadow(w))
+            if service in kings:
+                assert said.endswith(f" at the peak; {pendant}."), (ship, service, said)
+                assert seen == man_of_war, (ship, service, seen)
+            else:
+                assert said.startswith("The flags: ") and said.endswith(" at the peak."), (
+                    ship,
+                    service,
+                    said,
+                )
+                assert "pendant" not in said and seen == "", (ship, service, said, seen)
+
+
+def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
+    """Package 121's follow-up: a ship whose captain's role answered her flags before flies
+    what she flew: with no papers every role wears its own, and under papers of the role's own
+    service (a commodore under a King's papers, a packet or a revenue cutter under a
+    merchant's) so does she; a prize-master keeps his under any papers. Only papers of another
+    service than her role's change her flags (her papers first)."""
+    from freesail.world import flags as F
+    from freesail.world.service import ROLE_SERVICE, SERVICE_ROLE
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    for role, service in ROLE_SERVICE.items():
+        plain = _papered(None, position=at)
+        plain.captain.role = role
+        assert F.world_role(plain) == role, role
+        plain.run(60)
+        flown = plain.submit("the flags").text
+        own = _papered(service, position=at)
+        own.captain.role = role
+        assert F.world_role(own) == role, (role, service)
+        own.run(60)
+        assert own.submit("the flags").text == flown, (role, service)
+        for other in ("kings", "privateer", "merchant"):
+            w = _papered(other, position=at)
+            w.captain.role = role
+            kept = role == "prize-master" or ROLE_SERVICE[role] == other
+            assert F.world_role(w) == (role if kept else SERVICE_ROLE[other]), (role, other)
