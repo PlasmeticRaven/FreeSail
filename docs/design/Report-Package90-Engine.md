@@ -705,13 +705,16 @@ the ship's work and its sources alone (a test says so).
   1. `lie_a_try` (her plain sail, the topsail not set): the refusal's words, "She has no topsail to
      lie a-try under." -> "The topsail is not set; set it to lie a-try under it." (A5: she has a
      topsail now; the lie a-try's refusal mended at its cause for a topsail with no reef bands).
-  2. `anchor` and `shoal_anchor` (come to anchor in Carrick Road, then weigh and cast): every line
-     the same words; her cast's "She has paid off ..." 2 s earlier (3,603 s against 3,605; 3,115
-     against 3,117), the trace parting from +3,170 s in the one and +2,740 s in the other as she
-     makes sail to cast, and at the run's end, +3,900 s, she lies 34 to 39 m from where she lay
-     before, the lookout's and the helm's lines after it at moved ticks. The cause: getting under
-     way, the trim's stagger now braces her topsail as a topsail (level 1) from her course below,
-     where it was braced as a course.
+  2. `anchor` and `shoal_anchor` (come to an anchor, then get under way): getting under way now
+     looses and sets her topsail before she casts, where it stayed furled; her cast's "She has
+     paid off ..." 2 s earlier (3,603 s against 3,605; 3,115 against 3,117), the trace parting
+     from +3,170 s in the one and +2,740 s in the other, and at the run's end, +3,900 s, she lies
+     51 m and 63 m from where she lay before; in `shoal_anchor` her under-way line names the
+     topsail. The cause: the cast looses and sets every topsail (`scripts._topsails`, one of the
+     twelve places), and hers is one now. Each run, old beside new, is in the section for the
+     lead's reader below. *Corrected (nudge 38)*: this item as first pushed (58b28ab) said "every
+     line the same words", "34 to 39 m" (the two components of her end place's move in the one
+     run, not its distance) and a cause in the trim's stagger; measured again, as here.
 
 ### Moved, old beside new, with reason
 
@@ -744,11 +747,90 @@ settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
 **The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
 `data/ships/`.
 
+### For the lead's reader at the gate (nudge 38)
+
+**1. What "only the smack moves: her topsail becomes level 1, on a pole" changes in play.** Her
+topsail's yard crosses her main's own head, the main's lowest braced yard there, so the engine
+read it as a course; it is now a topsail, on a pole main. Her plain sail sets no topsail, so a
+player who never sets it meets the change in three places: `get under way` looses and sets her
+topsail with the mainsail and the jib before she casts, and she stands out under it ("Under way on
+the starboard tack, under the topsail and the mainsail and the jib; ...", where it was "under the
+mainsail and the jib"); `lie a-try` with it furled is refused in other words ("The topsail is not
+set; set it to lie a-try under it.", where it was "She has no topsail to lie a-try under."); and
+`strike the topmasts` (and `send down the topgallant masts`, `fid the topmast`) names her main a
+pole ("... her masts are the main mast (a pole, the mast and topmast in one stick)."). With it set
+(`set the topsail`), measured from one settled world, each order from a copy of it (seed 7, 15 kn
+from 0°, her head 292.5° at 5 kn, plain sail and then the topsail set, trimmed every two minutes
+after five, 1,320 s, as `tests/test_pole_mast.py`'s `_smack`; `a5/play.py` in the session's
+scratch, at 8dce637 and at effbaed), times from the order:
+
+| Order | Before (A1d) | Now (A5 and A6) |
+|---|---|---|
+| `heave to` | "Hauled up the courses."; "Hove to on the starboard tack, under her fore-and-aft canvas, foresail sheet to windward, helm a-lee." at +214 s; at +600 s 47.3° off at 2.61 kn, the topsail hanging in the gear | no course hauled up; "...; braced the topsail aback; helm a-lee."; "Hove to on the starboard tack, topsail to the mast, helm a-lee." at +202 s; at +600 s 50.5° off at 2.87 kn, the topsail set and to the mast |
+| `lie a-try` | refused: "Could not bring her to: She has no topsail to lie a-try under." | "All hands! Shorten sail and bring her to under the topsail."; the jib taken in; "Lying a-try under the topsail and the foresail, helm a-lee." at +348 s; at +600 s 43.3° off at 1.06 kn. In 30 kn: lying a-try at +808 s, 49.3° off at 3.64 kn by +1,800 s, where it was refused at +386 s |
+| `back and fill` | "Hauled up the topsail."; "Backed the square sail; her way checked." and "Filled the square sail; she forereaches." at +50, +223, +401 and +574 s; at +600 s her head 297.3° at 4.14 kn | the topsail kept: "Backed the topsail; her way checked." and "Filled the topsail; she forereaches." at +50, +224, +400 and +573 s; at +600 s her head 229.0° at 3.27 kn |
+| `take in the topsail`, `clew up the topsail` | "Hands to the topsail clewlines and buntlines."; "Clewed up the topsail." at +138 s; "Took in the topsail; hanging in the gear." at +204 s: **154 s** from the start line at +50 s (her watch at the sheets first) | "Let go the topsail halyards; hands to the clewlines and buntlines."; "Lowered the topsail down onto the yard below and clewed it up there." and "Took in the topsail; lowered on the yard below, hanging in the gear." at +138 s: **88 s** |
+| `lower the topsail` | refused: "A course is hauled up, not lowered; say 'haul up the topsail' or 'take in the topsail'." | obeyed, as take in |
+| `haul up the topsail` | obeyed, as take in | refused: "A topsail or light sail on a pole mast is lowered, not hauled up; say 'lower the topsail' or 'take in the topsail'." |
+| `furl the topsail` | "Lay aloft and furl the topsail."; "Clewed up the topsail." at +150 s; "Furled the topsail." at +400 s: **350 s** from the start line | "Lay out on the yard below and furl the topsail."; "Lowered the topsail down onto the yard below and clewed it up there." at +150 s; "Furled the topsail on the yard below." at +350 s: **300 s** |
+| `take in all sail` | the topsail's lines and time as take in; the jib, last, hauled down at +412 s | the topsail's as take in now; the jib at +350 s |
+| `get under way` (in Carrick Road, 12 kn from 225°, the topsail furled by `come to an anchor`) | the topsail furled through it | the topsail loosed and set with the mainsail; "She has paid off ..." 2 s sooner; at +1,500 s her head 136.2° at 3.78 kn against 125.3° at 4.19 kn |
+
+The same line for line and tick for tick: `tack ship`, `wear ship`, `box haul`, `scud`, `shorten
+sail`, `set the topsail`, `trim sails`, `square the yards`, `brace sharp up on the larboard tack`,
+and `come to an anchor` with the topsail set.
+
+**2. The three harness runs that move.** A2's harness (`a2/harness_v2.py` in the session's
+scratch): each start settled once and each run from a copy of it (the checkpoint's own pickling),
+every event and a trace every 10 s; A1d (8dce637) beside A5 and A6 (effbaed).
+
+| Run | Seed and start | What moves | What parts, old beside new |
+|---|---|---|---|
+| `lie_a_try` | seed 7; at sea, 15 kn from 0°, her head 292.5° at 5 kn, plain sail braced sharp up on the starboard tack and trimmed every two minutes after five, 2,400 s; then `lie a-try`, 600 s | **a word** | the refusal alone: "Order not carried out ('lie a-try'): She has no topsail to lie a-try under." -> "Order not carried out ('lie a-try'): The topsail is not set; set it to lie a-try under it."; every tick and trace row the same |
+| `anchor` | seed 7; Carrick Road (50.160° N, 5.034° W), 10:00 on 10 June 1805, 12 kn from 225°, her head 335° at 3 kn, plain sail set, 240 s; then `come to an anchor`, 2,400 s, and `get under way`, 1,500 s | **how she sails**, and the ticks with it | the same to +3,165 s, where getting under way looses her topsail (furled throughout before; set at +3,444 s); the trace parts from +3,170 s; "She has paid off; right the helm, draw the jib, haul aft the main sheet, brace round the topsail yard." at +3,603 s against +3,605; the helm's "Steady, full and by, the wind 68° on the starboard bow." at +3,706 s against "... 73° ..." at +3,815; the lookout's sighting of the pilot's cutter and his glass on her at +3,780 s against +3,720, the same words; his "made out" line on her, at +3,900 s before, past the run's end now. At +3,900 s her head 136.2° at 3.78 kn against 125.3° at 4.19 kn, 51 m apart (53 m at the most) |
+| `shoal_anchor` | seed 7; off Falmouth in three fathoms and a half (50.152° N, 5.040° W), the same hour, 8 kn from 225°, her head 335° at 2 kn, plain sail and `set the lug`, 60 s; then `come to an anchor`, 2,400 s, and `get under way`, 1,500 s | **a word, the ticks and how she sails** | the same to +2,740 s, where her topsail is loosed (set at +3,000 s) and the trace parts; "She has paid off ..." at +3,115 s against +3,117; the helm's "... the wind 69° ..." at +3,212 s against "... 71° ..." at +3,527; "Under way on the starboard tack, under the topsail and the mainsail and the jib; the best bower catted and fished; full and by." at +3,437 s against "..., under the mainsail and the jib; ..." at +3,434; the pilot's cutter, which closes a ship in her cruising ground (`world/ships.py`), read "under way on the larboard tack, with the wind on the quarter" at +3,300 s where she was "running before it" (so read at +3,600 now); "St Anthony's Head ... closing" at +3,840 s against +3,900. At +3,900 s her head 135.0° at 2.54 kn against 127.6° at 2.88 kn, 63 m apart (110 m at the most) |
+
+The cause in the two anchor runs, measured (`a5/cast.py`): at A1d her topsail stays furled through
+both casts; at A5 and A6 it is loosed at +3,165 s and +2,740 s, where the traces part.
+
+**3. The tartane's tréou** (Tar-D §5.1a and §15 risk 5; the lead's question 5). **A new case on the
+tartane probe, not her file**, which is not on this branch:
+`tests/test_yard_level.py::test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or_not`
+(commit **109ee87**, above A4). The probe is `rig_fixtures.tartane_probe_doc()` with her pole main
+as Tar-D §4.1 files it: no topmast, the topsail yard on the main's own head at 15.6 m, the jib's
+stay to the lower mast. Her great lateen's yard crosses at 10 m, and the tréou's yard (the
+cutter's square sail and its gear, renamed `main.treou`) is crossed on the main or not, three ways:
+
+| The tréou's yard | Her topsail's level | The tréou's yard's level | The courses; the topsails | The pole |
+|---|---|---|---|---|
+| not crossed (her plain sail, decision 9) | **1**, by the great lateen's yard below it (the ruled clause) | none crossed | none; the topsail | the main a pole; the topsail on it, taken in and furled by the pole's way |
+| crossed at 8 m, below the great lateen's yard | **1**, by the braced yard below it | 0, the course | the tréou; the topsail | the same; the tréou a course |
+| crossed at 13 m, above the great lateen's yard | **1** | **1** | none; the topsail and the tréou | the same, and the tréou on it as well |
+
+So **her topsail reads the same whether the tréou's yard is crossed or not**, at either height.
+The case pins each row's levels, courses and topsails and her topsail's pole (passed; 54 passed
+with `tests/test_pole_mast.py`, `--slow`); the tréou's own pole, the last column, is the scratch
+measure's (`treou/probe.py`). Once both are on `claude/pkg-90`, the coordinating session checks the
+same on her file.
+
+**For the lead** (the third row; not built, the clause being ruled): the tréou's yard is the
+main's lowest braced yard, so crossed above the great lateen's yard's crossing it takes the ruled
+clause too and is read a topsail beside her topsail: taken in by the pole's way and not hauled up
+as a course, and no course in her heave-to. Tar-D gives no height for either crossing. Two readings:
+her file crosses the tréou's yard below the great lateen's yard's crossing, and the rule reads it
+the course as it stands; or the clause is narrowed to a square sail set over the lateen and not one
+set below it (the tréou's foot reaches near the deck, the topsail's does not). And **for her
+builder**: with no tréou's yard crossed, her topsail's pole words say "Lowered the topsail down onto
+the yard below and clewed it up there." and "Furled the topsail on the yard below.", the yard below
+then being her great lateen's (measured on the probe, `treou/takein.py` in the session's scratch).
+
 ### Unsure, and for the lead
 
-1. **The smack's cast, 2 s earlier**, and her place 34 to 39 m off at the harness's end: no truth
-   or pin of hers reads it (the tiers), and it is the rule's own reach (her topsail a topsail).
-   Said here rather than left to be found.
+1. **The smack's getting under way under her topsail**, her cast 2 s earlier and her place 51 m
+   and 63 m off at the harness's end: no truth or pin of hers reads it (the tiers), and it is the
+   rule's own reach (her topsail a topsail, and the cast loosing every topsail). Said here rather
+   than left to be found; whether a smack casts under her topsail, as a cutter does, is the
+   lead's.
 2. **The lateen-below clause** (the lead's lean) reaches no committed file: the tartane's topsail
    over her great lateen and the polacre's mizen topsail meet it with their files; the probes show
    it (`tests/test_yard_level.py`).
