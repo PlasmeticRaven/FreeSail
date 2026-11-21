@@ -6,7 +6,8 @@ docs/design/Plan-Package90.md §7.1, §7.2, §8.1: the tartane's builder fills `
 it alone, before the polacre's and the xebec's rigs are written).
 
 Her truths, 7-681 to 7-689 (Tar-D §13's T-1 to T-9), are drafted here under their numbers where
-they hold on the tree as it stands, each a state: 7-681 (T-1) and 7-688 (T-8). The others wait on
+they hold on the tree as it stands, each a state: 7-681 (T-1) and 7-688 (T-8); and 7-695, from the
+spare, her watch by night (the lead's nudge 38, question 4). The others wait on
 the engine's steps not yet merged and stay drafted in her design's §13: 7-682 (T-2, a point nearer
 the wind than a square-rigger: A8 tunes the lateen row, and A1a gives her lateen its bad hand;
 measured today she lies 60 degrees off making 1.91 kn to windward where the merchant brig holds
@@ -458,7 +459,7 @@ def test_her_descriptions_rows_and_words_rank_her_the_cutters_class():
 
 
 # ---------------------------------------------------------------------------
-# Her truths that hold on the tree as it stands: 7-681 (T-1) and 7-688 (T-8)
+# Her truths that hold on the tree as it stands: 7-681 (T-1), 7-688 (T-8) and 7-695
 # ---------------------------------------------------------------------------
 
 
@@ -511,3 +512,116 @@ def test_truth_7_688_before_the_wind_the_treou_set_adds_way_the_great_lateen_tak
     run(w, 900, trim_every=120)
     assert w.ship.sails["main.treou"].state is SailState.SET
     assert knots(w) > plain > lateen_in
+
+
+LIE_TO = 'standing order "lie to": when the true wind exceeds 10 knots then heave to'
+FILL = 'standing order "fill": when the true wind is below 8 knots then fill away'
+
+
+def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_called_if_too_few():
+    """The lead's nudge 38, question 4: her watch by night, measured now that package 119 is
+    merged, as truth 7-704 is the merchant brig's. The number is 7-695, from the spare: 7-681 to
+    7-689 are T-1 to T-9's, each written or waiting. The trader off the Lizard by night
+    (tests/test_hands.py's trader at seed 7, 02:00). Her ten: the master and the mate head the
+    larboard and the starboard watch; six able seamen and the boy are in the watches; the cook is
+    an idler. The bill draws four able seamen to the starboard, and two and the boy to the
+    larboard (her design's §6.1: watches of three seamen, four with the boy).
+
+    Heaving to and filling away want twelve by their files; the company's clamp gives her eight,
+    and as manoeuvres they take no post. Each calls all hands where the watch on deck is under
+    half of that (`too_few: all hands`, package 119):
+    - the larboard's three are too few. By the player's order and by a standing order (to lie
+      to over ten knots; to fill away under eight, the wind falling to six), all hands are called
+      once for each. She is hove to (in 76 s, before the watch below is up, so "All hands on
+      deck." is not said) and filled away (in 181 s, the watch below up at 90 s), and the hands
+      are piped down with the larboard watch on deck;
+    - the starboard's four are half of eight, not too few. The watch begins each itself, short,
+      four of eight, and nobody is called or piped down.
+    Nothing waits and nothing fails on either watch.
+
+    Her file gives no `hands:` of her own. The bilander's six (0dbd4fc, taken out at b4e814c),
+    measured on this tree, make either watch begin both short and call no one: they are not put
+    back. Recorded, not asserted: filled away, she lies 20 to 45 degrees off the wind at about a
+    knot, her topsail left in the gear, since her heave-to hauls it up as a course and filling
+    away does not set it again (A5: her topsail a topsail). Set again, it steadies her on her
+    course at 3.8 kn."""
+    from freesail import units
+    from freesail.crew.bill import Watch
+    from tests.test_hands import asked, trader_at
+
+    assert not (load_spec(HER).hands or {})
+    for watch, on_deck in ((Watch.STARBOARD, 4), (Watch.LARBOARD, 3)):
+        too_few = watch is Watch.LARBOARD
+        for eid in ("heave_to", "fill_away"):
+            w, crew, runner = trader_at(HER, 2, watch)
+            assert len([s for s in crew.sailors if s.watch is watch]) == on_deck
+            if eid == "fill_away":
+                w.ship.extra["hove_to"] = {"tack": "starboard", "backed": ["main"]}
+            inst = asked(w, eid, None)
+            assert runner._take_hands(w.ship, inst, crew), (watch, eid, inst.wait_line)
+            assert inst.wait_line == "" and inst.all_hands is too_few, (watch, eid)
+            if not too_few:
+                got = inst.assignment
+                assert (got.got, got.wanted, got.outcome) == (4, 8, "short"), (watch, eid)
+        # the two roads, in the world: the player's orders and standing orders
+        for given in ("heave to", LIE_TO):
+            road = (watch, given)
+            w, crew, _runner = trader_at(HER, 2, watch)
+            for sid in w.ship.groups["plain sail"]:
+                w.ship.sails[sid].state = SailState.SET
+            w.ship.dyn.heading = units.deg_to_rad(215.0)
+            w.ship.dyn.speed = units.knots_to_ms(5.0)
+            w.submit("steer 215")
+            w.run(400)
+            t0 = w.clock.tick
+            w.submit(given)
+            w.run(600)
+            ev = [e for e in w.log if e.tick >= t0]
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'lie to': heaving to."
+                ], road
+            called = [e.text for e in ev if e.kind == "crew.all_hands"]
+            assert called == (["All hands! (to heave to)"] if too_few else []), road
+            assert not [e for e in ev if e.kind == "crew.all_hands_up"], road
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            hove = [e.tick for e in ev if e.kind == "ship.hove_to"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(hove) == 1 and "hove_to" in w.ship.extra, road
+            if too_few:
+                assert [e.text for e in piped] == [
+                    f"Piped down; the {watch.value} watch has the deck."
+                ], road
+                assert piped[0].tick >= hove[0], road
+            else:
+                assert not piped, road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+            # and filled away again
+            t1 = w.clock.tick
+            if given == "heave to":
+                w.submit("fill away")
+            else:
+                w.submit(FILL)
+                w.wind.speed = w.wind.base_speed = units.knots_to_ms(6.0)  # the wind falls
+            w.run(900)
+            ev = [e for e in w.log if e.tick >= t1]
+            if given != "heave to":
+                assert [e.text for e in ev if e.text.startswith("By standing order")] == [
+                    "By standing order 'fill': filling away."
+                ], road
+            called = [e.text for e in ev if e.kind == "crew.all_hands"]
+            assert called == (["All hands! (to fill away)"] if too_few else []), road
+            up = [e.kind for e in ev if e.kind == "crew.all_hands_up"]
+            assert up == (["crew.all_hands_up"] if too_few else []), road
+            assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
+            filled = [e.tick for e in ev if e.kind == "ship.filled_away"]
+            piped = [e for e in ev if e.kind == "crew.piped_down"]
+            assert len(filled) == 1 and "hove_to" not in w.ship.extra, road
+            if too_few:
+                assert [e.text for e in piped] == [
+                    f"Piped down; the {watch.value} watch has the deck."
+                ], road
+                assert piped[0].tick >= filled[0], road
+            else:
+                assert not piped, road
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road

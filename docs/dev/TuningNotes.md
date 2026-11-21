@@ -38700,7 +38700,40 @@ They are listed by case in her report for the coordinating session. The viewer's
 - **Her head inside the frame across states** (2 cases, `test_the_head_and_the_galleries_stay_inside_the_fixed_frame_across_states`): furled, the viewer lays her yard and sail on deck as a lowered lug's, and so her bounds move from furled to set. A whole lateen's yard stays aloft when its sail is furled (her design's §5.4 item 7).
 - **Her beak's root** (2 cases, `test_a_level_bowsprit_is_rooted_at_the_rail_at_the_stem_beside_its_sheets_height`): the level spar's rule roots it at the rail, 0.82 m over her beak (above). This is not V1's, but the viewer's rule for a level spar, which a beak under the bow rail does not fit.
 
-### The lead's nudge 38: her names (question 6)
+### The lead's nudge 38: her watch by night (question 4) and her names (question 6)
+
+**Her watch by night, measured now that package 119 is merged** (truth 7-695, from the spare: 7-681
+to 7-689 are T-1 to T-9's). The trader off the Lizard at 02:00, seed 7 (tests/test_hands.py's
+trader), west 14 kn. Her bill draws four able seamen to the starboard watch, and two and the boy
+to the larboard. Her design's §6.1 has watches of three seamen, four with the boy: the counts on
+deck are its counts. Heaving to and filling away want twelve by their files, clamped to her
+company's eight (the seven of the watches and the cook). A watch under half of that calls all
+hands (`too_few: all hands`, package 119).
+
+| Her `hands:` | The starboard's four | The larboard's three |
+|---|---|---|
+| none, as filed (the file's twelve, her eight) | begins each itself, short, 4 of 8, no call: hove to in 103 s (104 by the standing order), filled away in 181 (182) | all hands called once for each: hove to in 76 s (77), piped down then; filled away in 181 (182), all hands up at 90, piped down then |
+| the bilander's six (0dbd4fc; out at b4e814c), measured on this tree | begins each itself, short, no call: hove to in 82 s (83), filled away in 181 (182) | begins each itself, short, no call: hove to in 112 s (113), filled away in 181 (182) |
+
+Nothing waits or fails either way. The six make no one call all hands, which the lead's truth
+asks for, so they are not put back. As filed, the larboard's three call all hands and are piped
+down; the starboard's four, at half, begin both short and call no one. No figure a ship file gives
+can put a watch of four under half: her company's clamp holds the want at eight. Truth 7-695
+holds both watches as measured. It takes 12.4 s, over the slow tier's threshold, as 7-703 (15.8 s)
+and 7-704 (15.7 s) do; `tests/conftest.py`'s `SLOW_TESTS` is not mine, so it runs in the fast tier
+with them.
+
+**Recorded, not asserted: filled away, she is not under way.** By the player's order, the wind at 14
+kn, she lies 20 to 45 degrees off the wind after "Filled away ... steering SSW (202°)", wandering
+226 to 250 degrees at 0.8 to 1.3 kn for the thirty minutes traced. By the standing order, the wind
+fallen to six, she makes 0.38 kn at 900 s. The merchant brig in the same world, by the player's
+order, steadies on 202.5 at 4.17 kn within 300 s. The cause: her heave-to hauls up her topsail as a
+course ("Hauled up the courses.", her topsail a course on her pole main until A5), and filling away
+does not set it again. She is left under her two lateens and her jib, and cannot bear away. With
+`set the main topsail` after filling away, she steadies on 202 to 203 degrees at 3.77 kn by 800 s
+after the order (3.57 at 600). The same with all hands up first, and with `steer 202` given again:
+about a knot, wandering. It is the engine's reading of her topsail, which A5 changes, so her truth
+asserts no speed; 7-704's last clause waits on A5 for her.
 
 **Her names** (question 6): the trader *Saint-Pierre* takes the `french` list (her design's §6.4)
 and the guarda-costa *San Pedro* keeps the `spanish`. The pin moved, old beside new:
