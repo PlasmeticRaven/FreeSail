@@ -229,6 +229,14 @@ her files carry none of them yet.
 
    Is the reading right, or does p. 121 read otherwise on its page? I cannot read it: the note is
    OCR.
+
+   **Answered by the page (77ead1d0).** The coordinating session read Forfait p. 121 on its page
+   image, IA leaf n166 (`pages-tartane.md` §1.3 at 77ead1d0 on `claude/pkg-90`). The page puts the
+   clew on the deck at the mast's foot with the yard fully peaked (figs. 35 to 38), and the car
+   tacked at the stem (fig. 35). The design's reading, taken literally, is therefore the page's,
+   and the cut stands as filed. The *Humble*'s own ends in Table II lie under the page's general
+   band, and her row stands. Leaf n179 gives her surface as 2,237½ square pieds, 236.1 m² at the
+   pied du roi, Forfait's total as §2 has it. Nothing of hers changes.
 2. **The mizen's clew at its own mast's foot**, its sheet led to the outrigger 10 m aft. That is
    the rule taken alike; the watercolour shows the clew out at the outrigger (for the eye only).
    With its clew at the outrigger's end at the taffrail's height the mizen would be 55.5 m².
@@ -245,7 +253,7 @@ her files carry none of them yet.
 7. **Her slow tests**: `tests/conftest.py` sets the tier and is not mine. None of her tests
    needs a `SLOW_TESTS` entry: the longest, truth 7-688, takes 2.5 s (§9).
 10. **For the viewer (the stop rule): the 44 cases of `tests/test_view_geometry.py` on her
-    files.** That file is the viewer's (the plan's §7.1), and I have not edited it. None is a
+    files.** (The file has since been widened to me for her rows, and 16 cases remain: §10.) That file is the viewer's (the plan's §7.1), and I have not edited it. None is a
     fault of her files that is mine to mend. Each wants either her row in one of its measured
     tables, or the viewer's reading of a whole lateen with its cut, which no file carried before
     (V1: her design's §10). The cases are listed in §9. Her files are sound to the generator, the
