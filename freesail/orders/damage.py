@@ -200,7 +200,8 @@ def execute(ship: Any, order: Order) -> Result:
     if verb == "rig a jury mast":
         return _start(ship, "jury_mast", "ship", {"mast_words": words}, verb)
     if verb == "rig the relieving tackles":
-        # the wheel or its ropes shot away (package 115 D4 (e)): the tackles to the tiller
+        # the helm shot away, the wheel or its ropes (package 115 D4 (e)) or the tiller
+        # (package 90, A3): the tackles to the tiller
         runner = (getattr(ship, "extra", None) or {}).get("evolutions")
         if any(
             getattr(i.evo, "id", "") == "relieving_tackles"
@@ -212,13 +213,13 @@ def execute(ship: Any, order: Order) -> Result:
         return _start(ship, "relieving_tackles", "ship", {}, verb)
     if verb == "repair the wheel":
         # the wheel made good and new wheel-ropes rove (package 116, card 5): with the
-        # relieving tackles rove or without them
+        # relieving tackles rove or without them; on a hull steered by a tiller the spare tiller
+        # shipped, the work named by her helm (package 90, A3: `RepairWheelScript.work`)
         runner = (getattr(ship, "extra", None) or {}).get("evolutions")
-        if any(
-            getattr(i.evo, "id", "") == "repair_wheel"
-            for i in getattr(runner, "instances", None) or []
-        ):
-            raise OrderError("The hands are repairing the wheel already.")
+        for i in getattr(runner, "instances", None) or []:
+            if getattr(i.evo, "id", "") == "repair_wheel":
+                # given twice: said once, the work by its name in hand (`Runner.doing`)
+                raise OrderError(f"The hands are {runner.doing(i)} already.")
         return _start(ship, "repair_wheel", "ship", {}, verb)
     if verb == "cut away the mast":
         from freesail.orders.resolve import resolve as resolve_noun_
