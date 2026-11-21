@@ -38956,7 +38956,7 @@ Of the failures:
 
   And "Fill away; man the head braces." is said with nothing braced, where she was hove to by her sheets (the brig and the hermaphrodite brig with the main gone and their square sails in, the three-masters with main and mizzen gone: 6). These are the trunk's "after braces" (the head braces are A2's), from `braces_manned` as the lead accepts it at nudge 40; left, for the lead.
 
-Every other line passes. From the line to the first of its yards to swing, the median is:
+Every other line of the proof's runs passes. From the line to the first of its yards to swing, the median is:
 - the wear's brace-in, 8 s;
 - the box's square-away 2 s, its brace abox 1 s;
 - the box-haul's braced-up, 3 s;
@@ -38964,6 +38964,8 @@ Every other line passes. From the line to the first of its yards to swing, the m
 - getting under way's three, 2 s;
 - the scud's brace-in, 6 s;
 - the heave-to's hands to the braces, 1 s.
+
+*Corrected after the checker's read of 33cfcdfd* (`a2check3/`, 510 runs a tree on three starts, an anchored start among them, the wind from 250 at 8 kn): the proof's road start (225, 10 kn) never cast the wrong way, so one line of getting under way was not met there and does not pass. **"She would not cast on the starboard tack: she has paid off on the larboard; right the helm, brace round the head yards, set the spanker."** At that line her head list stays where it is, already right for the tack she has paid off on, and her after list is braced round, its first yard swinging 2 s after: the brig whole (t 1,026; the fore yard held at -60.0, the main yard swinging from 62.0), the frigate with her main gone (t 1,167; the fore yard held at -62.0, the crossjack yard swinging from 60.0); also the bilander, the merchant brig and the 74 whole, and the frigate with her mizzen gone and the 64 with her main gone. The trunk prints the same; to follow the deed it would move a line whole. Left, for the lead (below).
 
 **The wear's action with her fore gone, measured, for the record and for the damage control's package** (nudge 40, its point 3; not changed). The wear's action reads her lists from the foremost mast left with yards, so a brig with her fore gone is handled with her main yards as her head yards and no after list. The after list is braced in as she falls off and the head list follows only once the wind is abaft the beam, so nothing is braced in at up-helm.
 
@@ -39039,6 +39041,10 @@ Whole, none moves on any of the eight.
 - **Two lists of one class.** A three-master with her fore gone has both lists after yards as built, and the rule's words name them alike: "Square away the after yards! Brace abox the after yards!" and "Brace up the after yards for the starboard tack, the after yards abox." (JUDGEMENT; the frigate, the razee, the 74 and the 64). A mast's name would part them, but the orders named for a mast are the trunk's.
 - **The fill-away's braces** (the deed above). Following the deed there would name the class of the yards the heave-to laid aback, and that would move the hermaphrodite brig's line whole.
 - **Whole too, the trunk's words.** "Wind aft. Squared the head yards" is said while the head yards are still coming in: whole, the yards it names are a median 41.8 degrees from square at the line (8.9 to 50.8, 33 lines), and dismasted 29.7 (93 lines). The box-haul's "checked the lee head braces" is said at the luff, which swings nothing; its yards first swing a median 90 s after, at the box.
+- **The cast the other way** (the correction above): "brace round the head yards" where her after list is braced round and her head list held; the trunk's words, whole and dismasted.
+- **The trim order's reply, outside the evolutions** (the checker's read of 33cfcdfd): after "trim sails", the frigate, the razee and the 74 with the fore gone are told "Braced eight yards to the wind, 47 degrees on the starboard bow, the head yards four degrees sharper; ..." of her main yards, after yards as built (3 lines a ship in the checker's settles). The words are `orders/verbs.py`'s, through `evolutions/trim.py`'s `difference_words`, on the action's own split; the trunk's. Whether rule 1 reaches the orders is the lead's.
+- **The brig with her fore gone, worn off the wind** (16 kn): told "Stand by to wear ship. Up helm.", her main yards (the action's head list) begin bracing in 8 s after, as a whole brig's after yards do at her brace-in (median 8 s), and the bracing is first said at "Wind aft. Squared the after yards", 24 s later. By the wind they do not move in 500 s, and the plain "Up helm." is the deed there. The brace-in reads the action's after list, which she has not got; whether it should also be said of a head list braced in at that phase is the lead's.
+- **The lying-to's "Her after yards full, she gathers way"** (`keep_lying_to`) still reads the action's own split; not reached by the proof or by the checker's 12 forced-round probes.
 - **Found, not of this step** (the damage control's): the bilander with her main gone keeps "the mainsail", her main's settee, set though wrecked, and the trim order trims it ("Trimmed the mainsail sheet; the mainsail 85 degrees off the centreline.", and the watch's hands lines).
 
 Built on the lead's list of nudge 34; to be passed by the lead's reader.
