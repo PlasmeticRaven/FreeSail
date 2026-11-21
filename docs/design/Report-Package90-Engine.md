@@ -366,3 +366,104 @@ by the harness, every run the same.
    mark, the object empty (third commit, 1b0f12c).
 
 Stopped after A1a and A1b, as briefed: waiting for the coordinating session's message.
+
+## Step A1c: the rules captain and `put her about` with a whole lateen (2026-11-20)
+
+**Merged first:** `origin/…/pkg-90` at **033f42b7** (A3 merged, and stage 0's guards as one
+table), into this branch by a merge commit, **686557d**, its message reworded before it was
+pushed so that it names no branch. The one conflict, `docs/dev/TuningNotes.md`, both appending
+at its end: kept both whole, the package branch's stage-0 section first and A1a's and A1b's after
+it. Every comparison here is against a worktree of 686557d.
+
+**Commit:** **0c98ff8** on `…/pkg-90-engine` (parent 686557d), one commit, merged alone.
+
+**Files** (each in the engine track's §7.1 row for A1c):
+- `freesail/orders/navigation.py`: `LATEEN_TACK_KN` and its words beside `WEAR_WIND_KN`; the
+  readings' mean true wind as one reader (`mean_true_wind_kn`, `lateen_strong_wind_kn`);
+  `put_about_choice`'s reason; `judge_course`'s eye branch;
+- `freesail/orders/verbs.py`: the ordered tack's warning (`_warn_lateen_in_stays`);
+- `freesail/world/captains.py`: `LATEEN_LEAVE_KN`, `BAD_HAND_S`; `Captain._lateen_work` in
+  `_work`; `_across_the_stern`'s lateens and the bow's event (`_across_the_bow`,
+  `_shift_lateens_left`). Not near A3's lines in `Captain._repairs`, nor package 121's l. 1080;
+- `freesail/evolutions/scripts.py`: `lateens_on_their_masts`, read by the going about's last line
+  as before and by the captain;
+- `tests/test_lateen_whole.py`: A1c's part; `docs/dev/TuningNotes.md`: "Package 90, A1c".
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class
+added, so truth 7-606 and the checkpoint's list are not touched (truth 7-606 in the fast tier
+below). LF; ruff check and format clean; no Python line over 100. Nothing under
+`docs/agents/consent/`. No book written: neither key is in any file of `data/captains/` (a test
+says so of each). No truth added: none of 7-670 to 7-679 used.
+
+### What was built
+
+TuningNotes has each piece with its words; in short:
+- **`put her about`** wears a vessel with a whole lateen set over 22 kn (the readings' mean true
+  wind, as the gale's 30 kn is read), for every voice: "Put about: wearing, the wind 25 knots: a
+  lateen is not put in stays in a strong wind." The tack regardless with the land to leeward, or
+  no room to wear, stands before it.
+- **The course's judgement** (`steer`, `shape a course`, the captains' hourly leg) wears her for a
+  course across the wind's eye in the same wind and words, and tacks her regardless where there
+  is no room to wear, saying so.
+- **An ordered `tack ship`** there is obeyed, warned once in words (a note, `ship.tack_warned`:
+  "The wind 25 knots: a lateen is not put in stays in a strong wind; she is put in stays as
+  ordered."), never turned into a wear.
+- **The rules captain**: the practice in stays by the wind at 12 kn, once at each crossing; a
+  yard left on the bad hand shifted as the wind rises over 12 kn or after a board of 1,800 s;
+  each lateen the stern's or the bow's line names shifted, as a lug is dipped. Nothing on a hull
+  with no whole lateen, and nothing kept in his business there.
+
+### Measured
+
+- The xebec probe in 25 kn (seed 7, the starboard tack 67.5° off, plain sail trimmed, settled
+  900 s): `put her about` wears her, the reason said; `tack ship` tacks her, warned; `steer 45`
+  wears her for the larboard tack, full and by. In 18 kn all three tack her as before.
+- The tartane probe under the rules captain (seed 7, 14 kn and 9 kn from 260°, her head 90°, a
+  passage to the eastward): his first course carries the wind across her stern, the deck says the
+  mainsail lies on the mast, and his next order is "shifting the mainsail (the wind across the
+  stern)"; in 9 kn his first judgement leaves the lateens in stays.
+- **The eighteen files**: A2's harness at 686557d and at 0c98ff8: **270 runs, every tick, kind, trace and line the same** (the two files byte for byte).
+
+### Moved, old beside new, with reason
+
+Nothing moves (the tiers below).
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is 686557d**, a worktree of the merge.
+
+| Run | Base (686557d) | A1c (0c98ff8) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,608: 8,599 passed, 8 skipped, 1 xfailed, 0 failed (1 h 29 min, the box loaded by the measures) | 8,627: 8,618 passed, 8 skipped, 1 xfailed, 0 failed (1 h 15 min). **Test by test: every one of the base's 8,608 the same outcome; 19 new, all `tests/test_lateen_whole.py`, passed** |
+| **The lens with its slow cases**, `--slow`: `test_captains`, `test_captain_trials`, `test_captain_rules`, `test_subtypes`, `test_held_hulls`, `test_rig_words`, `test_ships`, `test_signals`, `test_settee`, `test_lug`, `test_orders`, `test_brains` | | 1,029 passed (16 min), on the tree as committed |
+| **The touched files' slow cases**, `--slow -m slow` (`test_lateen_whole`, which has none, `test_captains`, `test_captain_trials`, `test_captain_rules`) | | 5 passed |
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, base beside new, every case
+the same outcome: the byte test and the golden classing table (`tests/test_ship_particulars.py`,
+`tests/test_rig_classing.py`, truth 7-185) 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89 (stage 0's table, from the merge); `tests/test_check_viewer_guns.py`
+21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth
+7-606 74; all passed at both. `tests/test_subtypes.py`'s pairs of books pass (no key written).
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`.
+
+### Unsure, and for the lead
+
+1. **The bow's lugs.** A1a's bow line names the lugger's dipping lugs too; the captain's answer
+   to it is built for whole lateens alone. Dipping the lugger's lugs on it would move her
+   captained runs, which no row of the card names. The deck says them, as before.
+2. **The warning's place and words** (JUDGEMENT): a note of the ship's, after the tack's first
+   line, kind `ship.tack_warned`; not given for a tack of the course's judgement, whose own words
+   say why, nor for `put her about`'s tack regardless, whose note says why too (that tack is
+   warned: it goes by `tack ship`).
+3. **The captain's figures** (JUDGEMENT, ruled as defaults): his practice set at the first
+   judgement where the practice differs from the wind's (a crossing from no reading), then once
+   at each crossing; the board's timer runs while a yard is on the bad hand with no manoeuvre in
+   hand, and starts again after any; his why's words ("the wind under 12 knots", "30 minutes on
+   the bad hand", "the wind round ahead through the bow").
+4. **Hove to for weather** the captain still sets the practice by the wind, but gives no shift
+   while a manoeuvre ("hove to") is in hand: the hove-to watch's forced round (A1b) shifts them.
+
+Stopped after A1c, as briefed: waiting for the coordinating session's message.

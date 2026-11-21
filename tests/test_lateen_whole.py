@@ -30,8 +30,10 @@ from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
 from freesail.evolutions import scripts
+from freesail.orders import navigation
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import SailState
+from freesail.world import captains as C
 
 XEBEC_LATEENS = ("fore.lateen", "main.lateen", "mizzen.lateen")
 
@@ -819,3 +821,219 @@ def test_the_reading_and_the_verb_are_named_in_the_going_about_chapter():
     `tests/test_grammar_book.py`'s two primer tests (Eng §2.3 item 3)."""
     chapter = Path("docs/primer/05-going-about.md").read_text(encoding="utf-8")
     assert "`leave the lateens in stays`" in chapter and "`the lateen practice`" in chapter
+
+
+# ---------------------------------------------------------------------------
+# The rules captain and `put her about` (A1c)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def xebec_in_a_breeze(xebec_file) -> bytes:
+    """The xebec probe settled as the rest, in a strong breeze of 25 kn."""
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=25.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, xebec_file, scenario)
+    world.submit("set plain sail")
+    for i in range(900):
+        if i % 120 == 0 and i > 300:
+            world.submit("trim sails")
+        world.tick()
+    return replay.checkpoint_bytes(world)
+
+
+def test_over_22_knots_put_her_about_wears_a_lateen_and_says_why(xebec_in_a_breeze, xebec):
+    """Package 45's choice gains one reason to wear (Eng §2.3 item 6; the lead's ruling): a whole
+    lateen set and the mean true wind over `LATEEN_TACK_KN`, a module constant beside
+    `WEAR_WIND_KN`, read for every voice; said in Forfait's reason. In 15 kn she tacks."""
+    assert navigation.LATEEN_TACK_KN == 22.0 < navigation.WEAR_WIND_KN
+    world = _from(xebec_in_a_breeze)
+    assert navigation.put_about_choice(world.ship) == (
+        "wear ship",
+        "the wind 25 knots: a lateen is not put in stays in a strong wind",
+    )
+    n0 = len(world.log.all())
+    assert world.submit("put her about").kind == "order.accepted"
+    world.run(2)
+    (said,) = [e.text for e in _after(world, n0) if e.kind == "ship.put_about"]
+    assert (
+        said
+        == "Put about: wearing, the wind 25 knots: a lateen is not put in stays in a strong wind."
+    )
+    assert [i.evo.id for i in world.ship.extra["evolutions"].instances] == ["wear"]
+    assert navigation.put_about_choice(_from(xebec).ship)[0] == "tack ship"
+
+
+def test_an_ordered_tack_over_22_knots_is_obeyed_and_warned_once(xebec_in_a_breeze, xebec):
+    """`tack ship` is never turned into a wear: obeyed, and warned once in words, a note of the
+    ship's (the lead's ruling). In 15 kn, or with no whole lateen set, no warning."""
+    world = _from(xebec_in_a_breeze)
+    n0 = len(world.log.all())
+    assert world.submit("tack ship").kind == "order.accepted"
+    world.run(120)
+    assert [i.evo.id for i in world.ship.extra["evolutions"].instances] == ["tack"]
+    warned = [e for e in _after(world, n0) if e.kind == "ship.tack_warned"]
+    assert [e.text for e in warned] == [
+        "The wind 25 knots: a lateen is not put in stays in a strong wind; she is put in stays as "
+        "ordered."
+    ]
+    calm = _from(xebec)
+    n1 = len(calm.log.all())
+    calm.submit("tack ship")
+    calm.run(2)
+    assert not [e for e in _after(calm, n1) if e.kind == "ship.tack_warned"]
+
+
+@pytest.mark.parametrize("order", ["steer 45", "steer north-east"])
+def test_the_courses_judgement_wears_a_lateen_over_22_knots_across_the_eye(
+    xebec_in_a_breeze, order
+):
+    """A course across the wind's eye comes to `judge_course`'s eye branch (the road of `steer`,
+    `shape a course` and the captains' hourly leg): over 22 kn with a whole lateen set she is worn
+    for it, in the choice's words (ruled)."""
+    world = _from(xebec_in_a_breeze)
+    reply = world.submit(order)
+    assert "the wind 25 knots: a lateen is not put in stays in a strong wind, and she is worn " in (
+        reply.text
+    ), reply.text
+    world.run(2)
+    assert [i.evo.id for i in world.ship.extra["evolutions"].instances] == ["wear"]
+
+
+def test_with_no_room_to_wear_the_courses_judgement_tacks_a_lateen_regardless(
+    xebec_in_a_breeze, monkeypatch
+):
+    """Where there is no room to wear (`no_room_to_wear`), the course's judgement tacks her
+    regardless, as `put_about_choice` does with the land to leeward (ruled), and says why."""
+    world = _from(xebec_in_a_breeze)
+    monkeypatch.setattr(navigation, "no_room_to_wear", lambda _s: "the land a mile under her lee")
+    course = math.radians(45.0)
+    judged = navigation.judge_course(world.ship, course, helm_order=False)
+    assert judged.branch == "tack"
+    assert judged.words.endswith(
+        "lies too near the wind to be laid; the wind 25 knots, but there is no room to wear with "
+        "the land a mile under her lee: she is put about and kept full and by on the larboard tack"
+    ), judged.words
+
+
+def _recording(world):
+    """The rules captain of `world`, his orders recorded and not given."""
+    cap = world.captain
+    given: list[tuple[str, str]] = []
+
+    def give(text: str, why: str = ""):
+        given.append((text, why))
+        return type("E", (), {"kind": "order.accepted", "data": {}})()
+
+    cap.give = give
+    return cap, given
+
+
+def test_the_rules_captain_sets_the_practice_by_the_wind_once_at_each_crossing(xebec):
+    """From his book with its defaults (`lateen_leave_kn`, 12 kn): `leave the lateens in stays` as
+    the mean true wind falls under it and `shift the lateens in stays` as it rises over it, each
+    once at the crossing and only where the practice differs, so that every tack by any road reads
+    it; nothing on a hull with no whole lateen, and nothing kept there."""
+    world = _from(xebec)
+    cap, given = _recording(world)
+    p = C.Perception.read(world)
+    p.wind_kn = 15.0
+    cap._lateen_work(p)
+    assert given == []  # the practice "shift" already: nothing at the first reading
+    p.wind_kn = 9.0
+    cap._lateen_work(p)
+    assert given == [("leave the lateens in stays", "the wind under 12 knots")]
+    cap._lateen_work(p)
+    assert len(given) == 1  # once, at the crossing
+    scripts.set_lateen_practice(world.ship, "leave", ("stays",))
+    p.wind_kn = 16.0
+    cap._lateen_work(p)
+    assert given[1] == ("shift the lateens in stays", "the wind over 12 knots")
+    cutter = _from(_settle("data/ships/cutter.yaml"))
+    other, said = _recording(cutter)
+    q = C.Perception.read(cutter)
+    q.wind_kn = 9.0
+    other._lateen_work(q)
+    assert said == [] and not {"lateen_light", "bad_hand_since"} & set(other._business)
+
+
+def test_the_rules_captain_shifts_a_yard_after_a_board_on_the_bad_hand(xebec):
+    """A board of `bad_hand_s` (1,800 s, his book's default) with yards left on the bad hand and
+    no manoeuvre in hand: each shifted by its own order, its why the board's minutes; and at once
+    as the wind rises over `lateen_leave_kn`."""
+    world = _from(xebec)
+    world.submit("tack ship and leave the lateens")
+    world.run(600)
+    assert scripts.lateens_on_their_masts(world.ship)
+    saved = replay.checkpoint_bytes(world)
+    cap, given = _recording(world)
+    p = C.Perception.read(world)
+    assert p.manoeuvre == "none"
+    p.wind_kn = 15.0
+    cap._lateen_work(p)
+    p.tick += 1799
+    cap._lateen_work(p)
+    assert given == []
+    p.tick += 1
+    cap._lateen_work(p)
+    assert sorted(given) == sorted(
+        (f"shift the {name}", "30 minutes on the bad hand")
+        for name in ("mainsail", "foresail", "mizen")
+    )
+    risen, said = _recording(_from(saved))
+    q = C.Perception.read(risen.world)
+    q.wind_kn = 9.0
+    risen._lateen_work(q)
+    q.wind_kn = 14.0
+    risen._lateen_work(q)
+    assert ("shift the mainsail", "the wind risen over 12 knots") in said
+
+
+def test_the_rules_captain_shifts_a_lateen_the_bow_or_the_stern_left_on_its_mast(xebec):
+    """After the wind has crossed the stern, or come round ahead through the bow (A1a's lines),
+    he shifts each lateen the line named, as he dips a lug; the lugger's lugs the bow names are
+    not his to dip here."""
+    world = _from(xebec)
+    n0 = len(world.log.all())
+    _shift_the_wind(world, -8.0)
+    world.run(240)
+    events = _after(world, n0)
+    assert [e.kind for e in events].count("sail.across_the_bow") == 1
+    cap, given = _recording(world)
+    cap._across_the_bow(events)
+    assert given == [
+        (f"shift the {name}", "the wind round ahead through the bow")
+        for name in ("foresail", "mizen", "mainsail")
+    ]
+    stern = _from(xebec)
+    n1 = len(stern.log.all())
+    stern.submit("steer 135")
+    stern.run(240)
+    crossed = _after(stern, n1)
+    cap, given = _recording(stern)
+    cap._across_the_stern(crossed)
+    assert [t for t, _ in given][:3] == [
+        f"shift the {n}" for n in ("foresail", "mizen", "mainsail")
+    ]
+    lugger = _from(_settle("data/ships/lugger.yaml"))
+    n2 = len(lugger.log.all())
+    _shift_the_wind(lugger, -8.0)
+    lugger.run(240)
+    cap, given = _recording(lugger)
+    cap._across_the_bow(_after(lugger, n2))
+    assert given == []
+
+
+@pytest.mark.parametrize("path", sorted(str(p) for p in Path("data/captains").glob("*.yaml")))
+def test_the_rules_captains_lateen_keys_are_in_no_committed_book(path):
+    """`lateen_leave_kn` and `bad_hand_s` are read with their defaults and written in no committed
+    book (ruled): a key in one would move `tests/test_subtypes.py`'s pairs of books."""
+    text = Path(path).read_text(encoding="utf-8")
+    assert "lateen_leave_kn" not in text and "bad_hand_s" not in text
+    assert (C.LATEEN_LEAVE_KN, C.BAD_HAND_S) == (12.0, 1800)
