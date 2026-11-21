@@ -11,6 +11,7 @@ sail is built: the smack's topsail has no reef bands and no committed file reach
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,7 @@ from freesail.evolutions.registry import load_directory
 from freesail.orders import verbs
 from freesail.orders.vocabulary import load_vocabulary
 from freesail.ship.loader import load_ship
+from freesail.ship.parts import SailState
 
 SHIP_FILES = sorted(Path("data/ships").glob("*.yaml"))
 
@@ -165,3 +167,50 @@ def test_the_two_evolutions_are_described_to_the_player_in_the_games_own_words()
         for word in ("package", "Package", "A6", "Design", "docs/", "JUDGEMENT"):
             assert word not in text, (eid, word)
     assert "reef_pole" not in evolutions
+
+
+def _brought_up_off_falmouth():
+    """The harness's `shoal_anchor` start: off Falmouth in three fathoms and a half, 8 kn from
+    225°, her head 335° at 2 kn, plain sail set, 60 s; then come to an anchor, 2,400 s."""
+    world = make_world(
+        7,
+        "data/ships/smack.yaml",
+        Scenario(
+            wind_from_deg=225.0,
+            wind_speed_kn=8.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=335.0,
+            ship_speed_kn=2.0,
+            start_time=datetime(1805, 6, 10, 10, 0),
+            position={"lat_deg": 50.152, "lon_deg": -5.040},
+            region="channel-west",
+        ),
+    )
+    world.submit("set plain sail")
+    world.run(60)
+    world.submit("come to an anchor")
+    world.run(2400)
+    return world
+
+
+def test_the_smack_gets_under_way_under_her_plain_sail_her_topsail_left_furled():
+    """Nudge 39, ruling 3: getting under way makes her plain sail, so a topsail not of it is not
+    loosed by the cast (`scripts._plain_sail_topsails`: by the plain sail, not by the vessel).
+    The smack's topsail is set over her plain sail only at the player's word: through the cast it
+    stays furled and she stands out under her mainsail and her jib, as at A1d. A5 and A6 as first
+    built loosed it at +340 s of the order and set it at +600 s ("under the topsail and the
+    mainsail and the jib"); every committed file's other topsails are of its plain sail."""
+    world = _brought_up_off_falmouth()
+    n0 = len(world.log.all())
+    world.submit("get under way")
+    seen = set()
+    for _ in range(1500):
+        world.tick()
+        seen.add(world.ship.sails["topsail"].state)
+    assert seen == {SailState.FURLED}
+    under = [e.text for e in world.log.all()[n0:] if e.kind == "ship.under_way"]
+    assert under == [
+        "Under way on the starboard tack, under the mainsail and the jib; the best bower catted "
+        "and fished; full and by."
+    ]

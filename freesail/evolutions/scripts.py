@@ -8937,6 +8937,16 @@ def _topsails(ship: Ship) -> list[Sail]:
     return out
 
 
+def _plain_sail_topsails(ship: Ship) -> list[Sail]:
+    """The topsails she gets under way under (package 90, nudge 39 ruling 3): getting under way
+    makes her plain sail, so a topsail not of her plain sail (the smack's, set over it only at the
+    player's word) is not loosed by the cast; ruled by the plain sail, not by the vessel. A file
+    with no plain sail group, every topsail, as before."""
+    plain = ship.groups.get("plain sail")
+    tops = _topsails(ship)
+    return tops if plain is None else [sl for sl in tops if sl.id in plain]
+
+
 def _boom_mainsails(ship: Ship) -> list[Sail]:
     """A fore-and-after's gaff sails on a boom (the mainsail she gets under way under),
     set or not; nothing on a ship with yards on two masts (her spanker is set last). Yards
@@ -9026,6 +9036,50 @@ def _standing_lugs_all(ship: Ship) -> list[Sail]:
 # The first words of getting under way (`data/evolutions/get_under_way.yaml`'s on_start):
 # a ship's, and a lugger's, who has a windlass and no sail-loosers to send aloft (package
 # 68; the cold review of 2026-10-22, R-45).
+# A pole sail's words by the yard below it (package 90, nudge 39 ruling 2): lowered onto a braced
+# yard crossed below it on the mast, or, where none is (the tartane's topsail over her great
+# lateen), to the hounds, and furled there on its own yard.
+POLE_WORDS_ON_THE_YARD_BELOW = {
+    "pole_lowered": "down onto the yard below",
+    "pole_hanging": "lowered on the yard below",
+    "pole_furl_from": "Lay out on the yard below",
+    "pole_furled_on": "on the yard below",
+}
+POLE_WORDS_AT_THE_HOUNDS = {
+    "pole_lowered": "down to the hounds",
+    "pole_hanging": "lowered to the hounds",
+    "pole_furl_from": "Lay aloft to the hounds",
+    "pole_furled_on": "on its own yard, lowered to the hounds",
+}
+
+
+def pole_words(ship: Ship, sail: Sail) -> dict[str, str]:
+    """The words of `take_in_pole` and `furl_pole` for this sail: the yard below's where a braced
+    yard is crossed below its yard on the same mast, the hounds' where none is. A yard whose sail
+    is set flying and furled is not crossed: it is sent down on deck with its sail (package 57;
+    the tartane's tréou in her plain sail), as a wrecked yard is not there to lower onto."""
+    yard = ship.yard_of(sail)
+    if yard is None:
+        return dict(POLE_WORDS_AT_THE_HOUNDS)
+    order = list(ship.spars)
+    at = (yard.height_m, order.index(yard.id))
+
+    def crossed(y: Spar) -> bool:
+        on_it = ship.sail_of(y)
+        sent_down = on_it is not None and on_it.flying and on_it.state is SailState.FURLED
+        return not y.wrecked and not sent_down
+
+    below = [
+        y
+        for y in ship.spars.values()
+        if y.cls == "yard"
+        and y.parent == yard.parent
+        and (y.height_m, order.index(y.id)) < at
+        and crossed(y)
+    ]
+    return dict(POLE_WORDS_ON_THE_YARD_BELOW if below else POLE_WORDS_AT_THE_HOUNDS)
+
+
 UNDER_WAY_START_WORDS = (
     "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to "
     "get the sails ready for loosing."
@@ -9178,7 +9232,7 @@ class GetUnderWayScript(_AnchorScript):
                 "halliards manned on deck."
             )
             return
-        tops = _topsails(ship)
+        tops = _plain_sail_topsails(ship)
         mains = _boom_mainsails(ship)
         # a settee furled on its yard aloft is loosed with them, to be set after the cast
         # (package 75; Ext §5.8: `set_settee` looses it aloft first; B3.3's review)
@@ -9240,7 +9294,7 @@ class GetUnderWayScript(_AnchorScript):
             return
         if self.phase == "loose":
             if self.phase_t >= self.timing_value("loose_s", 240.0) * factor:
-                tops = _topsails(ship)
+                tops = _plain_sail_topsails(ship)
                 for sl in tops:
                     if sl.state in (SailState.LOOSED, SailState.FURLED, SailState.IN_THE_GEAR):
                         sl.state = SailState.SET
