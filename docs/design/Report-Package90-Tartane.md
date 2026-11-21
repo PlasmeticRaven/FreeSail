@@ -27,6 +27,12 @@ larboard watch's three call all hands for heaving to and filling away, and her s
 watch's four, exactly half, do not. The fast tier whole on 8998c08 changed no test of the base:
 four tests are new, one renamed pin is gone, and the same 16 viewer cases fail.
 
+**The lead's nudge 41 (§13).** Her bill is mended to her design: four at the forecastle and three
+in the afterguard, so each watch has three able seamen, and the boy goes to the starboard. Her
+words now say so. Truth 7-695's counts hold, four and three. The fast tier whole on 3a5c96b
+changed no test of the base, and one test is new. Her wear from 292.5 degrees no longer comes
+round on the new bill: the knife's edge of §3, recorded.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -39,6 +45,7 @@ rebased or forced.
 | 2 to 4, her module and her files, and two mends found by the tests | `0dbd4fc933df9b37adac5fb8b8dbe2ab318d6dfa`; mends `b4e814c7e9bc99d285d6b57c7644f3fd820877b5` and `ecf61800db82ce5cc3bb3de31b61a3b69e185b5d` (§8, §9) | `tools/ships/tartane.py`; `data/ships/tartane.yaml` and `data/ships/coastguard-tartane.yaml` (generated); `data/people/tartane.yaml` and `data/people/coastguard-tartane.yaml`; `freesail/world/ships.py` (her two `DESCRIPTIONS` rows and her words); `freesail/world/captains.py` (the coastguard's `SIZE_RANK` row); `tests/test_tartane.py`; the moved pins (§8); `docs/dev/TuningNotes.md` (step 2 and the mends) |
 | her rows in the viewer's tables, and her storm jib's corners (§10) | `b33adfd69facb88dfc007b9e4cf37e61b32b0119` | `tests/test_view_geometry.py` (widened to me, §10); `tools/ships/tartane.py`; her two ship files (generated); `docs/dev/TuningNotes.md` |
 | the lead's nudge 38: her names, and truth 7-695 (§12) | `07aed62807521f61749c169e4df57b3fec6f7c73`; `8998c087f23f4cd2cf3b5e195c17962ec746684f` | `tools/ships/tartane.py`; `data/ships/tartane.yaml` (generated); `data/people/tartane.yaml` (its header); `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
+| the lead's nudge 41: her bill mended to her design (§13) | `3a5c96bbf952358403bdef2dea57f1327ae688e1` | `tools/ships/tartane.py`; `data/ships/tartane.yaml` (generated); `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
 | this report | `e743467`, and §10 in the commit that adds it | `docs/design/Report-Package90-Tartane.md` |
 
 **Step 1's commit carries the owner's name as its author.** I set it by hand for that one commit.
@@ -169,6 +176,8 @@ degrees):
 `clr_x_m`. At `clr_x_m` 0.0 she tacked from 292.5 in 298 s, gaining 488 m; at +2.0, in 393 s,
 gaining 126 m. The going-about truth for the frigate says the same of the model. A1a to A1d
 change her going about wholly, so these are a record of the tree as it stands, not her handling.
+(The lead's nudge 41 mended her bill: §13.2 gives the figures that moved, her wear from 292.5
+among them.)
 
 ## 4. Her main's rake, by the owner's rule
 
@@ -203,7 +212,7 @@ decide. This is the owner's rule applied; her design's 3 degrees forward was its
   the tréou set flying.
 - **7-695** (the lead's nudge 38, question 4), her watch by night. A watch of hers too few on
   deck calls all hands to heave to and fill away, by order and by a standing order, and is
-  piped down (§12.2).
+  piped down (§12.2). Its counts held when her bill was mended at the lead's nudge 41 (§13.2).
 
 **Waiting, each left drafted in her design's §13:**
 
@@ -279,6 +288,11 @@ her files carry none of them yet.
 them: question 4, her watch by night (truth 7-695), and question 6, the trader's names from
 the `french` list. Question 7's longest test is now truth 7-695, at 12.4 s (§12.2). The rest
 are settled or noted there, and nothing of them is mine to change.
+
+**The lead answered §12 at nudge 41**, in the same note on the trunk at bb66331a. Point 3 was
+mine, her complement's words against her bill, and §13 has it. Point 1 leaves the starboard's
+four as the engine has it. Point 2, 7-695's "and under way", is owed when A5 and her files are
+both on `…/pkg-90`.
 
 ## 7. The pictures
 
@@ -612,7 +626,9 @@ It is the engine's reading of her topsail, which A5 changes, so her truth assert
 draws four able seamen to the starboard and two with the boy to the larboard. At seed 7 it deals
 each station's hands alternately from the starboard: her forecastle's three, and her
 afterguard's four with the boy among them. The counts on deck are her design's either way, and
-the truth reads them, so I have not moved her stations. Recorded for the lead.
+the truth reads them, so I have not moved her stations. Recorded for the lead. (The lead's
+nudge 41 had it mended, and §13 has the mend. The watches are the muster's rule 3, not the
+seed's: every seed deals them so.)
 
 ### 12.3 What moved, old beside new
 
@@ -655,3 +671,131 @@ the truth reads them, so I have not moved her stations. Recorded for the lead.
 
 **A correction to §6.** Its answer to question 1, as committed at 71dd278, wrote the package's
 branch in full. It now reads `…/pkg-90`, as §1 writes it, so that no line names a model's maker.
+
+## 13. The lead's nudge 41: her bill mended to her design
+
+The lead answered §12 at nudge 41, in the note at the end of `docs/dev/M7-WorkPackages.md` on the
+trunk at bb66331a, which I read whole. One point was mine to build, point 3: her complement's
+words must say what her bill draws, for a player reads the muster.
+- **Point 1**, the starboard's four: it stays as the engine has it, one rule for every ship.
+- **Point 2**, filled away and not under way: it is owed later. When A5 and her files are together
+  on `…/pkg-90`, truth 7-695 takes 7-704's "and under way" clause, measured, and this report gives
+  the figure.
+- **Recorded by the lead, not mine:** the muster's short forms on French names, and the Breton
+  and Norman `french` list.
+
+The note also asks for the trunk to be merged before the next hash. That merge is the coordinating
+session's, into `…/pkg-90`, and my brief lets me merge only that branch; its message says I need
+not have it for this. I merged nothing, so the tree is mine as it was.
+
+| What | Commit | Files |
+|---|---|---|
+| Point 3, her bill mended to her design | `3a5c96bbf952358403bdef2dea57f1327ae688e1` | `tools/ships/tartane.py`; `data/ships/tartane.yaml` (generated); `tests/test_tartane.py`; `docs/dev/TuningNotes.md` |
+| this section | the commit that adds it | `docs/design/Report-Package90-Tartane.md` |
+
+Its author is as the cloud gives it, and it has no trailer.
+
+### 13.1 Which, and why: the bill mended to her design
+
+- **The design is what is meant.** Her design's §6.1 says it twice: six seamen, "able ..., three
+  a watch", and "her watches of three seamen (four with the boy) and an officer". My complement's
+  words said the same. The bill did not, because of my stations.
+- **The cause was my stations, not the words.** The design gives no split of her seamen and the
+  boy between the forecastle and the afterguard; three and four were my judgement. The muster
+  watches each station's hands alternately, and the odd hands of odd stations go by turns, the
+  first to the starboard (`freesail/crew/muster.py`, rule 3). So the forecastle's three went
+  starboard, larboard, starboard. The afterguard's four, the boy last, went starboard, larboard,
+  starboard, larboard. The starboard had four able seamen and the larboard two with the boy.
+- **The mend: her stations four and three.** The forecastle's four go two a watch. The
+  afterguard's two able seamen go one a watch, and its odd hand, the boy, goes to the starboard.
+  Each watch has three able seamen, and the starboard has the boy as well.
+- **Why four forward and not two:** two at the forecastle and five aft would give the same
+  watches, by number. Her forecastle's words carry the most gear: the jib, the anchors, and the
+  great lateen's car and both ourses, the car tacked at the stem. The afterguard keeps the
+  sheets, the mizen and the helm. That is JUDGEMENT.
+- **The words** now name the boy's watch: "six able seamen in two watches of three, a boy in the
+  starboard watch, and a cook". The afterguard's line says how the muster watches them.
+- **The generator** wrote the file. `data/ships/tartane.yaml` moves in its complement's note and
+  its two stations with their notes. The other nineteen files are byte for byte (`cmp`), the
+  guarda-costa's among them.
+
+### 13.2 What moved, old beside new
+
+**Her bill** (old on 8998c08). Each number keeps its name and its skills, which the muster draws
+in the books' order. Only s006 to s009 change station or watch.
+
+| | Old: forecastle 3, afterguard 4 | New: forecastle 4, afterguard 3 |
+|---|---|---|
+| The starboard watch | s003, s005 (forecastle), s006, s008 (afterguard): four able | s003, s005 (forecastle), s007 (afterguard), able, and s009, the boy |
+| The larboard watch | s004 (forecastle), s007 (afterguard), able, and s009, the boy | s004, s006 (forecastle), s008 (afterguard): three able |
+| Her complement's words | "six able seamen in two watches of three, a boy and a cook" | "six able seamen in two watches of three, a boy in the starboard watch, and a cook" |
+
+**Truth 7-695: its counts held.** The starboard has four on deck and the larboard three, as
+before, so its assertions stand unchanged. Only its docstring is restated, for the watches'
+new make-up. Its figures (the standing order's in brackets):
+
+| | Old | New |
+|---|---|---|
+| The starboard's four, short, no call: hove to; filled away | 103 s (104); 181 (182) | 110 s (111); 181 (182) |
+| The larboard's three, all hands called: hove to; filled away, all hands up | 76 s (77); 181 (182), up at 90 (91) | the same |
+| With the bilander's six, no call on either: the starboard hove to; the larboard | 82 s (83); 112 (113) | 87 s (88); 103 (104) |
+
+The calls do not move. The larboard calls all hands for each and is piped down, and the
+starboard calls no one. With the six neither does, so the six stay out. The starboard heaves to
+7 s slower, the boy in place of an able seaman.
+
+**A new test:** `test_her_trader_is_watched_three_able_seamen_a_side_the_boy_to_the_starboard`.
+It holds her stations at four and three, three able seamen a watch, the boy in the afterguard
+and the starboard watch, and her file's words saying so.
+
+**Her other figures**, in §3's harness, each old one measured again on 8998c08 (they are §3's as
+reported):
+- her polar, truth 7-688's 4.69, 4.35 and 4.86 kn, and her speeds 67.5 and 90 degrees off (4.65
+  and 5.80 kn): unchanged. Her helm 67.5 degrees off moves from +0.25 to +0.27 degrees;
+- `heave to` from 292.5: hove to in 145 s, now 144; 49.9 degrees off at 0.80 kn at +300 s, now
+  49.8 at 0.79; 48.8 at 0.82 at +600 s, now 48.5 at 0.80;
+- `tack ship` from 290, 292.5 and 295: 165, 393 and 394 s, now 156, 393 and 394. To windward in
+  fifteen minutes: 621, 126 and 50 m, now 625, 130 and 32;
+- `wear ship` from the same: 585, 734 and 486 s, now 571, **not worn**, and 482. To windward:
+  -21, -149 and 63 m, now -7, -591 and 68;
+- the topsail set again after filling away, the larboard by night: 3.57 kn at 600 s, now 3.63;
+  3.77 at 800 s, unchanged.
+
+**For the lead: her wear from 292.5 degrees.** On the new bill she no longer comes round from
+292.5. "Could not wear: she would not come round." comes at 901 s, and she is left 43 degrees off
+at 0.7 kn, her helm hunting. Traced, the two wears run alike to a tenth of a degree for 180 s and
+part after 500 s. The bill tips her over §3's knife's edge, as the headings between show:
+
+| From | 291.25 | 292 | 292.5 | 293 | 293.75 |
+|---|---|---|---|---|---|
+| Old | 640 s | 647 | 734 | 715 | not worn (901) |
+| New | 598 s | 643 | not worn (901) | not worn (901) | 474 |
+
+Each bill has a heading in that quarter point from which she will not wear. A1a to A1d change her
+going about wholly, so this is recorded, not tuned. No test reads her wear: T-3 waits on them.
+
+### 13.3 The tests, on 3a5c96b
+
+- **The fast tier whole** ran in the same six chunks as §12.4. I compared it test by test with
+  §12.4's run on 8998c08, the base on the same tree: between 8998c08 and bdd2227 only this
+  report changed, and I merged nothing.
+  - **8,634 tests: 8,609 passed, 16 failed, 9 skipped and xfailed.** On 8998c08: 8,633 tests,
+    8,608 passed, the same 16 failed and the same 9 skipped and xfailed.
+  - **No test of the base changed its outcome.** The only difference is the new test of §13.2,
+    which passes. Truth 7-695 passes with its counts held, and truth 7-700, each ship file's two
+    watches and each station's share equal or one apart, passes on her new stations.
+  - **The 16 that fail are §10's 16 viewer cases**, the same node ids in both runs.
+- **The harbour and browser tests (nudge 35):** none failed.
+  - The fast tier's 43 (`tests/test_harbour.py` and `tests/test_browser_probe.py`) passed in
+    both runs.
+  - The slow tier's 18, the list §11 ran, passed on 3a5c96b.
+- **The slow tier of her files:**
+  - `--slow tests/test_tartane.py tests/test_probes_90.py`: **117 passed**, §12.4's 116 and the
+    new test;
+  - her four anchorage cases (§10) passed, so **121 in all**.
+- **At this step's end:**
+  - `python tools/gen_ships.py <scratch>` gave all twenty files byte for byte as committed;
+  - ruff is clean;
+  - every file is LF only;
+  - no added Python line is over 100 characters;
+  - no added line names a model or its maker.
