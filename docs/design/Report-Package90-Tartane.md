@@ -314,7 +314,8 @@ dd09a54a, read whole; nothing built now). Hers is the first file that tows:
    line, `boat.phase not in dealings.OUT_PHASES`, with a proof.
 2. `freesail/combat/hits.py`, "stove on the booms by a shot": said of a towed boat, it is words
    only. She is stove where she tows, with no change to what is hit or how often. This comes after
-   A3 is on the trunk.
+   A3 is on the trunk, and A3 is merged there now (2e7b8ce2; the lead's nudge 45), so it is clear
+   to build with her hash.
 3. The clearing for action (`freesail/evolutions/action_scripts.py`): no clearing time for boats
    already astern, and the line does not say they were got out. A ship with a boat on the booms
    keeps today's time and words, to the digest.
@@ -323,11 +324,16 @@ dd09a54a, read whole; nothing built now). Hers is the first file that tows:
    Listed for the ship and her people's milestone.
 
 Items 1 to 3 are engine files outside my §7.1 row, so I will build them on the lead's nudge 44
-alone. **A question for then:** no ship file carries a known list today (none under
-`data/ships/` has one, and the schema has no such key). Item 4 wants its place named: her ship
-file's notes through `tools/ships/tartane.py`, or her design's list. Also noted there, and not
-mine: a towed boat with no file of her own puts no drag on the ship, and the generator may refuse
-`towed` on such a boat when her files come.
+alone. **Item 4's place, answered by the lead's nudge 45** (trunk 6038f23a, read whole). No ship
+file carries a known list, so it goes in two places:
+- her ship file's note on her boat, written through `tools/ships/tartane.py` and the generator.
+  It says that no order veers the boat long or hoists her in on passage, and gives her drag past
+  her hull speed;
+- one line in her design's open list (`docs/design/Design-Ship-Tartane.md`) pointing at that note.
+
+Both are owed with her hash, beside the other towing items. Also noted there, and not mine: a
+towed boat with no file of her own puts no drag on the ship, and the generator may refuse `towed`
+on such a boat when her files come.
 
 ## 7. The pictures
 
