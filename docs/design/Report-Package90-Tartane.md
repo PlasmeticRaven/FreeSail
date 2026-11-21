@@ -300,6 +300,13 @@ mine, her complement's words against her bill, and §13 has it. Point 1 leaves t
 four as the engine has it. Point 2, 7-695's "and under way", is owed when A5 and her files are
 both on `…/pkg-90`.
 
+**Owed together, when A1a and A5 and her files are on `…/pkg-90`** (nothing built now):
+- truth 7-695's "and under way" clause (the lead's nudge 41, point 2);
+- the lead's nudge 43 (trunk d6159090), pinned with her case. On a rig of whole lateens the
+  heave-to's check asks whether she has a yard to bring her to, by what she carries, not by what
+  is set. With her topsail furled, `heave to` is refused in the words "No head sail is set to haul
+  to windward, nor a topsail to lay aback."; with it set, she heaves to.
+
 ## 7. The pictures
 
 I took none: a cloud session has no browser. The coordinating session takes them by the plan's
