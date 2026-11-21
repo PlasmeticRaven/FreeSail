@@ -799,17 +799,33 @@ tartane probe, not her file**, which is not on this branch:
 (commit **109ee87**, above A4). The probe is `rig_fixtures.tartane_probe_doc()` with her pole main
 as Tar-D §4.1 files it: no topmast, the topsail yard on the main's own head at 15.6 m, the jib's
 stay to the lower mast. Her great lateen's yard crosses at 10 m, and the tréou's yard (the
-cutter's square sail and its gear, renamed `main.treou`) is crossed on the main or not, three ways:
+cutter's square sail and its gear, renamed `main.treou`) is crossed on the main or not:
 
 | The tréou's yard | Her topsail's level | The tréou's yard's level | The courses; the topsails | The pole |
 |---|---|---|---|---|
 | not crossed (her plain sail, decision 9) | **1**, by the great lateen's yard below it (the ruled clause) | none crossed | none; the topsail | the main a pole; the topsail on it, taken in and furled by the pole's way |
 | crossed at 8 m, below the great lateen's yard | **1**, by the braced yard below it | 0, the course | the tréou; the topsail | the same; the tréou a course |
 | crossed at 13 m, above the great lateen's yard | **1** | **1** | none; the topsail and the tréou | the same, and the tréou on it as well |
+| **at her file's heights** (nudge 38's second case): crossed at 8.31 m, **the same height as the great lateen's yard**, the topsail's yard at 15.78 m; filed after the lateen's yard, as her file has it, or before it | **1** | **0**, the course, in either order | the tréou; the topsail | the same; the tréou a course |
 
 So **her topsail reads the same whether the tréou's yard is crossed or not**, at either height.
-The case pins each row's levels, courses and topsails and her topsail's pole (passed; 54 passed
-with `tests/test_pole_mast.py`, `--slow`); the tréou's own pole, the last column, is the scratch
+
+**The tie, as `Ship._find_yard_levels` reads it.** Her file (her branch's `data/ships/tartane.yaml`)
+crosses the great lateen's yard and the tréou's both at the main's hounds, 8.31 m, and the topsail's
+yard at 15.78 m. The clause counts a lateen yard **only strictly below** a square yard
+(`lat.height_m < sp.height_m`). At the tie the great lateen's yard is not below the tréou's, so
+the tréou's yard is the main's lowest braced yard with no lateen yard below it: **level 0, the
+course**. Her topsail is 1 by the braced yard below it. **The order of the spars in the file
+cannot change it.** The file's order breaks a tie between two braced yards on one spar alone
+(`(height, order)` in the count below), and the lateen clause compares heights alone. Pinned
+both ways (commit **c6018aa**, the case's rows `her-files-tie` and
+`her-files-tie-the-treou-filed-first`). Measured on the probe: 0 at 8.30 m and at 8.31 m, **1 at
+8.32 m**, either order, so a centimetre above the great lateen's yard decides. Her own file loaded
+on this tree in the session's scratch, not committed, reads the same: `main.treou.yard` 0,
+`main.topsail.yard` 1, her main a pole, the courses the tréou. Pinned as it is; the clause is the
+lead's to rule, not changed.
+The case pins each row's levels, courses and topsails and her topsail's pole (five rows with the
+tie's two below, passed; 56 passed with `tests/test_pole_mast.py`, `--slow`); the tréou's own pole, the last column, is the scratch
 measure's (`treou/probe.py`). Once both are on `claude/pkg-90`, the coordinating session checks the
 same on her file.
 
