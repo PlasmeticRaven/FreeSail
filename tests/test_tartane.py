@@ -36,6 +36,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 from freesail.ship.loader import load_ship, load_spec
 from freesail.ship.parts import SailState
@@ -364,17 +365,42 @@ def test_her_groups_are_her_designs_and_name_no_courses():
     assert not sails["main.bouffette"].bent and sails["main.bouffette"].in_place_of == "main.lateen"
 
 
-def test_her_companies_ten_and_thirty_four_with_spanish_names():
+def test_her_companies_ten_and_thirty_four_the_trader_french_the_guarda_costa_spanish():
     """Tar-D §6: the trader's ten, the master and the mate each heading a watch (ruling 11), six
-    able seamen, the boy and the cook; the guarda-costa's thirty-four; both drawn from the spanish
-    list (package 90's N1), which reads her as Spain's."""
+    able seamen, the boy and the cook; the guarda-costa's thirty-four. The trader's names are
+    from the french list (her design's §6.4, the lead's nudge 38), which reads her as France's,
+    and the guarda-costa's from the spanish (package 90's N1), which reads her as Spain's. Old
+    (71dd278): both spanish."""
     trader, guard = load_spec(HER).crew, load_spec(GUARD).crew
     assert (trader.complement, guard.complement) == (10, 34)
-    assert trader.names == guard.names == "spanish"
+    assert (trader.names, guard.names) == ("french", "spanish")
     assert [p.post for p in trader.posts] == [p.post for p in guard.posts] == ["master", "mate"]
     trader_stations = sum(trader.stations.values())
     guard_stations = sum(guard.stations.values())
     assert (trader_stations, guard_stations) == (8, 32)
+
+
+@pytest.mark.parametrize(
+    ("path", "nation", "names"), [(HER, "france", "french"), (GUARD, "spain", "spanish")]
+)
+def test_each_of_her_files_reads_as_its_lists_nation_with_no_nation_given(path, nation, names):
+    """The lead's nudge 38, question 6, by truth 7-680's measure: her scenario giving no nation,
+    the trader reads as France's and her people carry French names, and the guarda-costa as
+    Spain's with Spanish names. A Frenchman's people do not read as Spain's. Each given name as
+    the muster writes it (`muster.abbreviate`, a muster book's short forms, which turn the french
+    list's Charles into "Chas."). Old (71dd278): the trader read as Spain's, her people Spanish."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from freesail.crew.muster import abbreviate
+
+    lists = yaml.safe_load((ROOT / "data" / "crew" / "names.yaml").read_text(encoding="utf-8"))
+    given_written = {abbreviate(g) for g in lists[names]["given"]}
+    world = make_world(7, path, Scenario())
+    assert world.scenario.nation is None
+    assert world.dealings.ship_nation == nation
+    for sailor in world.ship.extra["crew"].sailors:
+        given, surname = sailor.name.split(" ", 1)
+        assert given in given_written and surname in lists[names]["surnames"], sailor.name
 
 
 def test_the_guarda_costas_guns_are_chapmans_in_the_war_tartanes_ports():

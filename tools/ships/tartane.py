@@ -1513,6 +1513,18 @@ COMPANY = {
         "shot_plugs": 8,
     },
 }
+# Her people's names by role (the lead's nudge 38, question 6): the Provençal trader the french
+# list, her design's default (Tar-D §6.4), the guarda-costa the spanish (package 90's N1). A list
+# is its nation's (truth 7-680; world/nations.py), so a Frenchman's people do not read as Spain's.
+NAMES_LIST = {TRADER: "french", COASTGUARD: "spanish"}
+NAMES_LIST_WORDS = {
+    TRADER: "Her people's names from the french list in data/crew/names.yaml (Tar-D §6.4, the "
+    "lead's nudge 38), which reads her as France's where a scenario gives no nation "
+    "(world/nations.py); a scenario names her nation and her people as it will.",
+    COASTGUARD: "Her people's names from the spanish list in data/crew/names.yaml (N1), which "
+    "reads her as Spain's where a scenario gives no nation (world/nations.py); a scenario names "
+    "her nation and her people as it will.",
+}
 STATION_WORDS = {
     "forecastle": "Hands per station, both watches together (Tar-D §6; JUDGEMENT): she has no "
     "tops, and her hands work aloft from the deck stations, as the cutter's. Forecastlemen, for "
@@ -1551,13 +1563,7 @@ def company(b, role: str) -> None:
     }[role]
     entries = [
         (("complement",), c["complement"], complement_words),
-        (
-            ("names",),
-            "spanish",
-            "Her people's names from the spanish list in data/crew/names.yaml (N1), which reads "
-            "her as Spain's where a scenario gives no nation (world/nations.py); a scenario names "
-            "her nation and her people as it will.",
-        ),
+        (("names",), NAMES_LIST[role], NAMES_LIST_WORDS[role]),
     ]
     for st, n in c["stations"].items():
         words = STATION_WORDS[st] + f": {n}."
