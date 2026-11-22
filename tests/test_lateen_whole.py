@@ -2397,3 +2397,285 @@ def test_the_course_ordered_is_read_against_the_course_not_full_and_by(xebec, pa
     script._to_the_course(world.wind)
     assert script.status == "done"
     assert script.not_paid_off.startswith(lies) and bool(script.not_paid_off) is bool(lies)
+
+
+# ---------------------------------------------------------------------------
+# The five that ride A1d's hash (the lead's nudge 51)
+# ---------------------------------------------------------------------------
+
+
+def _filled_and_ground(world, again: bool) -> tuple[int, float, list]:
+    """Hove to, her fore lateen on her weather side: `fill away`, and with `again` belayed a
+    second into its change and given again. The seconds from the first order to "Filled away",
+    the ground made to windward (the wind from the north) by the same clock half an hour after
+    it, and the lines."""
+    ship = world.ship
+    world.submit("heave to")
+    world.run(400)
+    ship.sails["fore.lateen"].lug_side = "starboard"  # her weather side
+    t0, y0, n0 = world.clock.tick, float(ship.dyn.y), len(world.log.all())
+    assert world.submit("fill away").kind == "order.accepted"
+    belayed = not again
+    while world.clock.tick - t0 < 1800:
+        world.tick()
+        if not belayed and ship.sails["fore.lateen"].state is SailState.IN_THE_GEAR:
+            world.tick()  # a second into the change
+            assert world.submit("belay that").kind == "work.belayed"
+            assert world.submit("fill away").kind == "order.accepted"
+            belayed = True
+    events = _after(world, n0)
+    filled = [e.tick - t0 for e in events if e.kind == "ship.filled_away"]
+    return filled[0], float(ship.dyn.y) - y0, events
+
+
+@pytest.mark.parametrize("probe", ["polacre", "xebec"])
+def test_a_fill_away_belayed_and_given_again_waits_behind_the_work_handed_on_and_gains_nothing(
+    polacre, xebec, probe
+):
+    """Nudge 51, item 1, pinned by time and by ground: no manoeuvre begins while a lateen of hers
+    is in its gear in work a belay handed on, which holds the ship as the manoeuvre did; it waits
+    behind that work and says so, and begins when the yard is set. Measured, seed 7: on the
+    polacre "Filled away" at 265 s against the plain order's 254, and 26 m less to windward in half
+    an hour; on the xebec 198 s against 196, half a metre less. Before, the second began at once:
+    at 49 s and 544 m further on the polacre, at 14 s and 55 m on the xebec."""
+    settled = {"polacre": polacre, "xebec": xebec}[probe]
+    plain_t, plain_y, _ = _filled_and_ground(_from(settled), False)
+    again_t, again_y, events = _filled_and_ground(_from(settled), True)
+    assert again_t >= plain_t, (plain_t, again_t)
+    assert again_y <= plain_y, (plain_y, again_y)
+    lines = [(e.kind, e.text) for e in events]
+    waits = "'Fill away' will follow 'shift the foresail', which the hands are still at."
+    assert ("evolution.waiting", waits) in lines, lines
+    set_line = "Shifted the foresail; it stands to leeward of the mast."
+    shifted = lines.index(("sail.dipped", set_line))
+    begun = [i for i, (k, x) in enumerate(lines) if k == "evolution.started" and "Fill away" in x]
+    assert len(begun) == 2 and begun[1] >= shifted
+
+
+def _sheets_as_set(world, order: str, ids, belay: bool) -> dict[str, float]:
+    """Each of `ids`'s sheet as the yard is set on its new side; with `belay`, the order belayed
+    as the change begins and the yards set by the work handed on."""
+    ship = world.ship
+    old = {i: ship.sails[i].lug_side for i in ids}
+    assert world.submit(order).kind == "order.accepted"
+    out: dict[str, float] = {}
+    belayed = not belay
+    for _ in range(1500):
+        world.tick()
+        if not belayed and any(ship.sails[i].state is SailState.IN_THE_GEAR for i in ids):
+            assert world.submit("belay that").kind == "work.belayed"
+            belayed = True
+        for i in ids:
+            sl = ship.sails[i]
+            if i not in out and sl.state is SailState.SET and sl.lug_side != old[i]:
+                out[i] = ship.sheets_of(sl)[0].hauled
+        if len(out) == len(ids):
+            return out
+    raise AssertionError(f"{order}: not set on the new hand in 1,500 s")
+
+
+@pytest.mark.parametrize(
+    "probe, order",
+    [
+        ("xebec", "tack ship"),
+        ("xebec", "wear ship"),
+        ("tartane", "tack ship"),
+        ("polacre", "tack ship"),
+        ("polacre", "box haul"),
+        ("polacre", "fill away"),
+    ],
+)
+def test_each_yard_handed_on_is_set_with_its_sheet_as_the_manoeuvre_sets_it(
+    xebec, polacre, tartane, probe, order
+):
+    """Nudge 51, item 1, the cause of the ground: the work a belay hands on draws each yard's
+    sheet for the wind the manoeuvre draws it for (`Script.lateen_way`, close-hauled on the way it
+    reckons with), so that a belay leaves no sail trimmed otherwise. Before, the deck's reading as
+    it was set: the xebec's tack belayed had her three lateens' sheets at 0.0, 0.0 and 0.11
+    against 0.81, 0.80 and 0.83, and lost 1,539 m to windward in half an hour against the plain
+    tack (now 0.8 m)."""
+    settled = {"xebec": xebec, "polacre": polacre, "tartane": tartane}[probe]
+    ids = TIMED[probe]
+    found = []
+    for belay in (False, True):
+        world = _from(settled)
+        these = ids
+        if order == "fill away":
+            world.submit("heave to")
+            world.run(400)
+            world.ship.sails["fore.lateen"].lug_side = "starboard"
+            these = ("fore.lateen",)
+        found.append(_sheets_as_set(world, order, these, belay))
+    plain, belayed = found
+    assert belayed == pytest.approx(plain, abs=1e-9), (plain, belayed)
+
+
+def test_pipe_down_after_the_watchs_work_is_belayed_says_who_has_it(polacre, xebec):
+    """Nudge 51, item 2: the work a belay hands on has the manoeuvre's request, and `pipe down`
+    reads the work's own (`orders/crew.py`, `all_hands_work`), not its file's `hands: all`. A fill
+    away by twelve of the starboard watch, belayed: "Nobody is turned up; the starboard watch has
+    the deck.", the yard shifted by them in its time (before, "All hands are still at work
+    (shifting the foresail); pipe down when it is done.", no hand called). A tack by all hands,
+    belayed: refused as before, truly."""
+    world = _from(polacre)
+    ship = world.ship
+    world.submit("heave to")
+    world.run(400)
+    ship.sails["fore.lateen"].lug_side = "starboard"
+    _belayed_mid_change(world, "fill away", ("fore.lateen",))
+    reply = world.submit("pipe down")
+    assert (reply.kind, reply.text) == (
+        "crew.order",
+        "Nobody is turned up; the starboard watch has the deck.",
+    ), reply.text
+    world.run(400)
+    fore = ship.sails["fore.lateen"]
+    assert fore.state is SailState.SET and fore.lug_side == "larboard" and not _in_hand(world)
+    tacked = _from(xebec)
+    _belayed_mid_change(tacked, "tack ship", XEBEC_LATEENS)
+    reply = tacked.submit("pipe down")
+    assert reply.kind == "order.rejected" and reply.text.endswith(
+        "All hands are still at work (shifting the mainsail and the foresail and the mizen); "
+        "pipe down when it is done."
+    ), reply.text
+
+
+def test_where_she_has_not_paid_off_to_the_course_the_line_gives_her_head(polacre):
+    """Nudge 51, item 3: a tack for a course, come round and paying off to it, ended on its last
+    trim lying 44 degrees off the wind with sternway: the line names her head, not the course
+    (before, "heading E by N (79°), but she has not paid off to it: she lies 44° off the wind",
+    the course for her heading; twelve of the lead's 832 probe runs)."""
+    world = _from(polacre)
+    ship = world.ship
+    assert world.submit("steer east by north").kind == "helm.order"
+    runner = ship.extra["evolutions"]
+    (inst,) = [i for i in runner.instances if i.evo.id == "tack"]
+    script = inst.script
+    for _ in range(900):
+        world.tick()
+        if script.phase == "pay_off":
+            break
+    assert script.phase == "pay_off"
+    new_sign = -script.sign
+    wind_from = world.wind.direction_from
+    ship.dyn.heading = units.wrap_2pi(wind_from - new_sign * math.radians(44.0))
+    ship.dyn.u = -0.6  # a knot of sternway
+    script.last_trim, script.paying = True, None
+    script._pay_off(1.0, world.wind, 1.0)
+    assert script.status == "done"
+    assert script.not_paid_off == (
+        ", but she has not paid off to it: she lies 44° off the wind with a knot of sternway"
+    )
+    said = script.words()["new_course"]
+    assert said == units.format_heading(ship.dyn.heading) != units.format_heading(script.new_course)
+
+
+def test_a_tack_that_falls_back_on_her_old_tack_has_missed_stays(polacre):
+    """Nudge 51, item 4: the polacre probe, her foresail taken in, tacks, her mizen is shifted in
+    stays, and she falls back on her old tack: she has not come round and has missed stays, told
+    so in the game's own words, her mizen said where it lies as she misses. Before, "Tacked;
+    braced up on the starboard tack, heading SW by S (217°), the mizen on the mast, but she has
+    not paid off: she lies 143° off the wind with no way on her." Read where the tack ends, so
+    that a tack fallen back that comes round before it is a tack, as it was (the polacre at 20
+    knots)."""
+    world = _from(polacre)
+    world.submit("take in the foresail")
+    world.run(270)
+    n0 = len(world.log.all())
+    assert world.submit("tack ship").kind == "order.accepted"
+    runner = world.ship.extra["evolutions"]
+    for _ in range(900):
+        world.tick()
+        if not [i for i in runner.instances if i.evo.id == "tack"]:
+            break
+    lines = [(e.kind, e.text) for e in _after(world, n0)]
+    assert "ship.tacked" not in [k for k, _ in lines]
+    assert (
+        "ship.missed_stays",
+        "Missed stays: she fell off on the old tack, the mizen on the mast. Up helm; square the "
+        "yards; flatten in the head sheets; ease off the mizen sheet.",
+    ) in lines, lines
+    assert (
+        "ship.fell_off",
+        "Squared the yards; she fell off on the starboard tack, to try again or to wear.",
+    ) in lines, lines
+
+
+def test_a_tack_fallen_back_that_comes_round_before_its_end_is_a_tack(polacre):
+    """Nudge 51, item 4, read where the tack ends: the polacre probe at 20 knots, her head through
+    the wind, falls back to 84 degrees on her old side with two knots of sternway and is round on
+    the new tack by the end, "Tacked; ... heading ENE (68°).", as before. Read as she fell back,
+    she was called missed (and eight of the polacre's 25 tacks with her)."""
+    world = _from(polacre)
+    wind = world.wind
+    wind.follow(wind.base_direction, units.knots_to_ms(20.0))
+    world.scenario.wind_speed_kn = 20.0
+    world.run(120)
+    n0 = len(world.log.all())
+    assert world.submit("tack ship").kind == "order.accepted"
+    runner = world.ship.extra["evolutions"]
+    (inst,) = [i for i in runner.instances if i.evo.id == "tack"]
+    script = inst.script
+    fell_back = 0.0
+    for _ in range(900):
+        world.tick()
+        if script.through:
+            fell_back = max(fell_back, script.sign * scripts.wind_rel(world.ship, wind))
+        if inst not in runner.instances:
+            break
+    assert fell_back > 2 * units.POINT  # back on her old side after her head was through
+    kinds = [e.kind for e in _after(world, n0)]
+    assert "ship.missed_stays" not in kinds and kinds.count("ship.tacked") == 1
+    (tacked,) = [e.text for e in _after(world, n0) if e.kind == "ship.tacked"]
+    assert tacked == "Tacked; braced up on the larboard tack, heading ENE (68°).", tacked
+
+
+def _his_work(world, state: str = "on passage"):
+    """The rules captain of `world` in `state`, his orders recorded and not given."""
+    cap, given = _recording(world)
+    cap.state = state
+    return cap, given
+
+
+def test_the_rules_captains_own_work_sets_the_practice_and_shifts_the_yards_on_the_bad_hand(xebec):
+    """Nudge 51, item 5, through his own road (`_work`, which calls the lateens' work): the
+    practice set as the wind falls under his book's 12 knots, and after a board of 30 minutes on
+    the bad hand each yard shifted by its own order. Before, the tests called `_lateen_work`
+    itself, and `_work` made to call it no longer passed every test."""
+    world = _from(xebec)
+    cap, given = _his_work(world)
+    p = C.Perception.read(world)
+    p.wind_kn = 15.0
+    cap._work(p, [])
+    assert given == []
+    p.wind_kn = 9.0
+    cap._work(p, [])
+    assert ("leave the lateens in stays", "the wind under 12 knots") in given
+    board = _from(xebec)
+    board.submit("tack ship and leave the lateens")
+    board.run(600)
+    assert scripts.lateens_on_their_masts(board.ship)
+    cap, given = _his_work(board, "beating")
+    q = C.Perception.read(board)
+    q.wind_kn = 15.0
+    cap._work(q, [])
+    q.tick += 1800
+    cap._work(q, [])
+    shifts = sorted(t for t, why in given if why == "30 minutes on the bad hand")
+    assert shifts == ["shift the foresail", "shift the mainsail", "shift the mizen"], given
+
+
+def test_the_rules_captains_own_work_shifts_the_lateens_the_bow_left_on_their_masts(xebec):
+    """Nudge 51, item 5, through his own road (`_work`, which reads the bow's line): the wind come
+    round ahead through her bow, each whole lateen the line named shifted by its own order. Before,
+    the tests called `_across_the_bow` itself."""
+    world = _from(xebec)
+    n0 = len(world.log.all())
+    _shift_the_wind(world, -8.0)
+    world.run(240)
+    events = _after(world, n0)
+    assert [e.kind for e in events].count("sail.across_the_bow") == 1
+    cap, given = _his_work(world)
+    cap._work(C.Perception.read(world), events)
+    bow = [t for t, why in given if why == "the wind round ahead through the bow"]
+    assert bow == ["shift the foresail", "shift the mizen", "shift the mainsail"], given

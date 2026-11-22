@@ -100,6 +100,7 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
+    HANDED_ON,
     HELM_MANOEUVRES,
     LATEEN_ABACK_WAITS_WORDS,
     SCRIPTS,
@@ -441,11 +442,19 @@ class Runner:
             # The subject is busy: the newcomer waits its turn. Its preconditions
             # are checked when it begins, since the earlier work may satisfy them.
             self.instances.append(inst)
-            first = blockers[0]
-            return (
+            handed = [b for b in blockers if b.params.get(HANDED_ON)]
+            first = (handed or blockers)[0]
+            words = (
                 f"'{self._describe(inst).capitalize()}' will follow "
                 f"'{self._describe(first)}', which the hands are still at."
             )
+            if handed:
+                # behind the yards a belay handed on (they hold the ship as the manoeuvre
+                # did): said here, at the order, since a whole-ship order's line is the
+                # runner's started line and this one would go unsaid (the lead's nudge 51,
+                # item 1: "it waits behind that work, and says so")
+                ship.note("notable", "evolution.waiting", words, sid)
+            return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
         if reason is not None:

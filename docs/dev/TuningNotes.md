@@ -39629,3 +39629,34 @@ On `…/pkg-90-a1c`, cut from `…/pkg-90` at b3c68af4 (A1c and A3's lists on th
 - The readings tool's full list carrying the practice's row on every ship: allowed.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the five that ride A1d's hash: the manoeuvre behind the work handed on, who has the work, her head, missed stays and the captain's road (the lead's nudge 51, 2026-11-22)
+
+On `…/pkg-90-a1d`, cut from A1d's hash e2d6b926 with `…/pkg-90` merged in at ee66c4a8 and again at a13fb0fe (the lines resolved by hand in the engine report's section). Each of the five has a proof in `tests/test_lateen_whole.py` ("The five that ride A1d's hash"), and each proof fails with its mend undone. Measured on the probes settled as the tests settle them (seed 7, 15 kn from the north, the starboard tack); "old" is cde50e7, A1d on A1c's hash before the five.
+
+### The mends
+
+1. **No manoeuvre begins while a lateen of hers is in its gear in work handed on** (`ChangeLateenScript.holds`: the work holds the ship, as the manoeuvre it stands for did). A manoeuvre ordered then waits behind it, and `Runner.start` says so at the order, "'Fill away' will follow 'shift the foresail', which the hands are still at." (a whole-ship order's line is the runner's started line, and this one would go unsaid). Every other work that holds the ship (sending down or swaying up the topgallant masts, loosing sails to dry, furling all, the anchor's work, laying out the kedge) waits behind it too, as it waited behind the manoeuvre. **And each yard handed on has its sheet drawn as the manoeuvre would draw it**: close-hauled on the way the manoeuvre reckons with (`Script.lateen_way`, handed on as `way`: the tack's at "helm's a-lee", the wear's and the box-haul's before the helm, the fill away's her way as she has it). Before, it was drawn for the deck's reading as it was set. A save from before, whose work names no way, keeps the deck's reading.
+   - The polacre, hove to, `fill away`, `belay that` a second into the change, `fill away` again: old, "Filled away" at 49 s against the plain order's 254, and 543.6 m further to windward in half an hour; new, 265 s, and 26.1 m less.
+   - The xebec, the same: old 14 s against 196 and 55.0 m further; new 198 s, and 0.5 m less.
+   - Each yard handed on, belayed as the change begins, is now set with its sheet as the plain manoeuvre sets it, in all six of nudge 48's cases. Old, the xebec's tack had her lateens' sheets at 0.0, 0.0 and 0.11 against 0.81, 0.80 and 0.83, and the polacre's fill away at 0.997 against 0.58. The ground in half an hour, belayed against plain, old then new: the xebec's tack −1,538.9 and −0.8 m; the tartane's −108.2 and −0.8; the polacre's −88.8 and 0.0; her box-haul −95.1 and −35.9; the xebec's wear −832.3 and −1.4.
+   - The time until her lateens draw on the new side is nudge 48's, to the second, in each case, but for the xebec's wear belayed, 260 s against 259 (plain 258).
+2. **Who has the work, at `pipe down`** (`orders/crew.py`, `all_hands_work`): the work's own request where it has one, its file's crew line only where it has none (no company, a save from before). With a crew a request is always made from the file's line, an all-hands line staying all hands whatever selector is given, so no other work's answer moves. The work handed on carries the manoeuvre's request.
+   - A fill away by twelve of the starboard watch, belayed: old "All hands are still at work (shifting the foresail); pipe down when it is done."; new "Nobody is turned up; the starboard watch has the deck.", the yard shifted by them in its time.
+   - A tack by all hands, belayed: refused as before.
+3. **Her head where she has not paid off to the course** (`TackScript.words`): wherever the line says she lies otherwise (`not_paid_off`, said only on a hull with a whole lateen), the heading in it is her head. No probe end in play reaches it (`n51/r3.py`: the three probes over eight courses each, 48 ends), and the helm alone pays her off when her head sails are taken from her. It is pinned at the tack's own door: a tack for E by N ended on its last trim lying 44° off the wind with a knot of sternway. Old "heading E by N (79°), but she has not paid off to it: she lies 44° off the wind ..."; new her head, NE (44°).
+4. **Missed stays, not "Tacked"** (`TackScript.tick`, at the end; `_miss_stays`): on a hull with a whole lateen, a tack that ends with the wind on her old side by more than two points, as the hung tack's miss reads it, has missed stays, "she fell off on the old tack". She is told so in the game's own words, and the urgent line says her lateens where they lie as she misses (`lateens_on_the_mast_words`, "" for every other ship). Read where the tack ends: a tack fallen back that comes round before its end is a tack, as it was.
+   - The polacre, her foresail taken in, tacked, her mizen shifted in stays: old "Tacked; braced up on the starboard tack, heading SW by S (217°), the mizen on the mast, but she has not paid off: she lies 143° off the wind with no way on her."; new "Missed stays: she fell off on the old tack, the mizen on the mast. Up helm; square the yards; flatten in the head sheets; ease off the mizen sheet." and "Squared the yards; she fell off on the starboard tack, to try again or to wear.".
+   - Over the polacre's 25 tacks of `n51/r4.py` (five winds, five sail plans) that end alone moves. Read as she falls back, at the moment, eight tacks at 20 and 24 knots that come round by their end were called missed.
+5. **The captain's wiring, through his own road**: two tests drive his work (`_work`) itself, a sailing state set and his orders recorded. In one, the practice is set as the wind falls under 12 knots and each yard is shifted after a board of 30 minutes on the bad hand. In the other, each lateen the bow's line named is shifted. With either call taken out of `_work`, its test fails.
+
+### Ruled
+
+- Unsure 1 and 2 of A1c's hash (`belay that` twice finds the newest order first; the long belay line of the work handed on): allowed as built.
+- Listed, not asked: the places' "the tiller is" credited to Falconer's QUARTER-DECK, worded when that file is next touched; "full and by" at 66° with sternway by the angle's rule, the trunk's.
+
+### Not built, for the lead
+
+- A whole-ship order made to wait is said by no line, on any ship: `_ship_evolution` (`orders/verbs.py`) returns the runner's "will follow" line as `evolution.started`, whose text the world drops. Mended at its cause it moves today's ships' lines: a stop.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
