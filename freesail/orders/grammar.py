@@ -275,6 +275,10 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         # practice, said of the lateens together whether or not her file names the group
         said_the_lateens, rest = True, after_lateens
     elif spec.object in ("sail", "yards", "line", "wreck"):
+        if lateens and verb in LATEEN_PRACTICE_VERBS:
+            _no_sail_before_the_occasion(
+                ship, verb, [*rest, *(w for seg in segments[1:] for w in seg)], vocab
+            )
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
         if verb == "trim" and obj is not None:
             # "trim the spanker sheet", "tend the jib sheets" (package 33c; playtest 12):
@@ -498,6 +502,27 @@ def _the_practice_said(
     if _says_an_occasion([*rest, *(w for seg in segments[1:] for w in seg)], vocab):
         return True
     return _names_a_whole_lateen(ship, rest)
+
+
+def _no_sail_before_the_occasion(
+    ship: Ship, verb: str, words: list[str], vocab: Vocabulary
+) -> None:
+    """`leave in stays`, `leave port in stays`, `shift in wearing` on a hull with a whole lateen:
+    an occasion of the practice said with no sail of hers before it is asked of in the practice's
+    own words, which name nothing she has not (the lead's nudge 48, item 4: "There is no such part
+    as the in stays in this ship; did you mean the main staysail ..." before). Words with a sail
+    of hers named before the occasion, or with no occasion, are let by as they were."""
+    at = next((i for i in range(len(words)) if _longest_at(words, i, vocab.lateen_occasions)), None)
+    if at is None:
+        return
+    before = strip_article([w for w in words[:at] if w != ","])
+    if before and compound_span(noun_table(ship), before) is not None:
+        return
+    occasion = _longest_at(words, at, vocab.lateen_occasions)
+    raise OrderError(
+        f"{verb.capitalize()} what {occasion}? Her practice is said of the lateens together: "
+        f"'{verb} the lateens {occasion}'."
+    )
 
 
 def _the_lateens_at(words: list[str], vocab: Vocabulary) -> list[str] | None:
