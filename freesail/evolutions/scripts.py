@@ -423,6 +423,13 @@ def lateens_held(ship: Ship) -> set[str]:
     return {sl.id for sl in whole_lateens(ship)}
 
 
+# The work a belay hands on (package 90; the lead's nudge 48, item 1): a `change_lateen` whose
+# params carry, by sail id, the seconds still to come of each yard whose change was begun in a
+# manoeuvre belayed, worked at no lighter a rate than the manoeuvre's own (`Script.handed_on`);
+# begun by the runner without the preconditions of its beginning, the yards being in their gear
+# already (`Runner._hand_on`), and without its first line, the belay's line saying it is in hand.
+HANDED_ON = "handed_on"
+
 # A whole lateen's yard shifted round its mast by itself (`change_lateen`; package 90, A1a): its
 # seconds a metre of yard, before the weather and the hands. The lugger's dip by itself
 # (`dip_lug.yaml`: 30, 60 and 60 s) for her 10.3-m main lug yard (`data/ships/lugger.yaml`), taken
@@ -468,20 +475,42 @@ def party_term(ship: Ship, party: int) -> float:
     return max(1.0, party / max(have, 1))
 
 
+def _how_it_went(ship: Ship, spar_id: str) -> str:
+    """'shot away' or 'carried away': how a spar went, read from the strain's own line for it
+    (`physics.strain._wreck_spar`'s `how`, which the spar does not keep), the ship's notes not yet
+    drained first and then the log's last lines; 'carried away' where no line says."""
+    notes = list(getattr(ship, "notes", None) or [])
+    for _sev, kind, _text, subject, data in reversed(notes):
+        if kind == "spar.carried_away" and subject == spar_id:
+            return str((data or {}).get("how") or "carried away")
+    world = _world_of(ship)
+    log = getattr(world, "log", None)
+    entries = log.all()[-400:] if log is not None else []
+    for e in reversed(entries):
+        if e.kind == "spar.carried_away" and getattr(e, "subject", None) == spar_id:
+            return str((e.data or {}).get("how") or "carried away")
+    return "carried away"
+
+
 def lateen_shift_befallen(ship: Ship, sail: Sail) -> str | None:
     """What has befallen a whole lateen while its yard is being shifted round its mast, in words
-    for the line that ends its shift, else None (package 90; the lead's nudge 46, item 1): blown
-    out of its bolt-ropes, its yard or mast carried away, or the halyard that peaks the yard
-    parted, the yard come down and the sail hanging in its gear. The shift by itself
-    (`ChangeLateenScript`) and the change in a manoeuvre (`LateenChange`) read it each tick and
-    leave the sail as the casualty left it; before, each set it on the new side drawing."""
+    for the line that ends its shift, else None (package 90; the lead's nudges 46 and 48): blown
+    out of its bolt-ropes; its yard or mast carried away or shot away, named where it went (the
+    mast where the mast went, though its yard is wrecked with it); the halyard that peaks the yard
+    parted, the yard come down and the sail hanging in its gear; or its sheet or tack parted, the
+    sail hanging in its gear, which is not set with a sheet or a tack parted (as no sail is). The
+    shift by itself (`ChangeLateenScript`) and the change in a manoeuvre (`LateenChange`) read it
+    each tick and leave the sail as the casualty left it; before, each set it on the new side
+    drawing."""
     from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
     if sail.state is SailState.BLOWN_OUT:
         return "it blew out of the bolt-ropes while it was being shifted"
-    gone = next((sp for sp in ship.spar_chain(sail) if sp.wrecked or sp.sent_down), None)
-    if gone is not None:
-        return f"the {part_name(ship, gone.id)} was carried away while it was being shifted"
+    gone = [sp for sp in ship.spar_chain(sail) if sp.wrecked or sp.sent_down]
+    if gone:
+        spar = gone[-1]  # the deepest spar gone: the mast where the mast went
+        how = _how_it_went(ship, spar.id)
+        return f"the {part_name(ship, spar.id)} was {how} while it was being shifted"
     if sail.wrecked:
         return "it was carried away while it was being shifted"
     halyard = ship.halyard_of(sail)
@@ -490,6 +519,12 @@ def lateen_shift_befallen(ship: Ship, sail: Sail) -> str | None:
             f"the {part_name(ship, halyard.id)} parted while it was being shifted; the yard came "
             "down and the sail hangs in its gear"
         )
+    for ln in ship.lines_of(sail):
+        if ln.cls in ("sheet", "tack") and ln.state is LineState.PARTED:
+            return (
+                f"the {part_name(ship, ln.id)} parted while it was being shifted; the sail hangs "
+                f"in its gear, not set, till its {ln.cls} is rove afresh"
+            )
     return None
 
 
@@ -790,20 +825,25 @@ def lateen_plan_words(
     where some are shifted and some left; "" with none (package 90, A1b: the log says which).
     "The lateens" only of every whole lateen she carries: two of her three are named (the lead's
     nudge 46, item 7). A lateen the order's clause names that is not set (`params["lateens"]`)
-    is said, "the mizen, ordered left, is not set", where before the clause was dropped without
-    a word."""
+    is said, "the mizen is not set and is let be", where before the clause was dropped without
+    a word; so where she has none set at all (`plan` empty)."""
     shift, leave = plan.get("shift") or [], plan.get("leave") or []
     clause = (params or {}).get("lateens")
     clause = clause if isinstance(clause, dict) else {}
     planned = set(shift) | set(leave)
+    carried = {sl.id for sl in ship.sails.values() if is_whole_lateen(sl)}
     unset = {
         how: [i for i, h in clause.items() if h == how and i in ship.sails and i not in planned]
         for how in ("shift", "leave")
     }
+    if "all" in clause:
+        # "the lateens" said: each she carries that is not set and not named by itself
+        named_ids = set(unset["shift"]) | set(unset["leave"]) | set(clause)
+        rest = [i for i in ship.sails if i in carried and i not in planned and i not in named_ids]
+        unset[clause["all"] if clause["all"] in unset else "shift"] += rest
     if not shift and not leave and not unset["shift"] and not unset["leave"]:
         return ""
     when = "in stays" if occasion == "stays" else "with the wind aft"
-    carried = {sl.id for sl in ship.sails.values() if is_whole_lateen(sl)}
 
     def named(ids: list[str]) -> str:
         if len(ids) > 1 and set(ids) == carried:
@@ -816,11 +856,11 @@ def lateen_plan_words(
     if leave:
         said.append(f"{named(leave)} left on {'the mast' if len(leave) == 1 else 'their masts'}")
     out = "; " + ", ".join(said) if said else ""
-    for how, word in (("leave", "left"), ("shift", "shifted")):
-        ids = unset[how]
-        if ids:
-            be = "is" if len(ids) == 1 else "are"
-            out += f"; {named(ids)}, ordered {word}, {be} not set"
+    ids = unset["leave"] + unset["shift"]
+    if ids:
+        # the lead's nudge 48, item 5: in a seaman's words, whatever the clause said of it
+        be = "is" if len(ids) == 1 else "are"
+        out += f"; {named(ids)} {be} not set and {be} let be"
     return out
 
 
@@ -895,6 +935,8 @@ class LateenChange:
         self.active: list[str] = []
         self.queue: list[str] = []
         self.done = not self.ids
+        self.factor = 1.0  # the manoeuvre's last factor: no yard handed on works lighter
+        self.handed: dict[str, float] = {}  # belayed: the yards handed on, their seconds
 
     def _name(self, ids: list[str]) -> str:
         return names_of_sails(self.ship, [self.ship.sails[i] for i in ids])
@@ -943,6 +985,7 @@ class LateenChange:
         (the deck's reading when None), and the next begun. Returns whether all are done."""
         if self.done:
             return True
+        self.factor = max(factor, 1.0)
         for i in list(self.active):
             sl = self.ship.sails[i]
             befallen = lateen_shift_befallen(self.ship, sl)
@@ -1004,11 +1047,11 @@ class LateenChange:
 
     def belay_words(self) -> str:
         """How a belay of the manoeuvre leaves the change, in words for its line (package 90; the
-        lead's nudge 46, item 2): 'the mainsail, its change begun, shifted round to the larboard
-        side; the foresail and the mizen left on their masts, not yet shifted'; "" with nothing in
-        hand. Hands do not walk away from a yard peaked half round its mast: a yard whose change
-        is begun is finished to the side it was going (`belay`), and a yard not yet begun is left
-        on its mast."""
+        lead's nudges 46 and 48): 'the mainsail, its change begun, still being shifted round to the
+        larboard side; the foresail and the mizen left on their masts, not yet shifted'; "" with
+        nothing in hand. Hands do not walk away from a yard peaked half round its mast: a yard
+        whose change is begun is finished in its time, the work handed on (`belay`), and a yard
+        not yet begun is left on its mast."""
         if self.done:
             return ""
         begun, waiting = self._begun(), self._waiting()
@@ -1016,26 +1059,25 @@ class LateenChange:
         if begun:
             its = "its" if len(begun) == 1 else "their"
             said.append(
-                f"{self._name(begun)}, {its} change begun, shifted round to the {self.side} side"
+                f"{self._name(begun)}, {its} change begun, still being shifted round to the "
+                f"{self.side} side"
             )
         if waiting:
             mast = "its mast" if len(waiting) == 1 else "their masts"
             said.append(f"{self._name(waiting)} left on {mast}, not yet shifted")
         return "; ".join(said)
 
-    def belay(self, awa: float | None = None) -> None:
-        """The manoeuvre belayed: each yard whose change is begun finished at once to the side it
-        was going, set with its sheet drawn for `awa` (the deck's reading when None); each waiting
-        its turn left set where it hangs; the change done (`belay_words` says which)."""
+    def belay(self) -> None:
+        """The manoeuvre belayed (the lead's nudge 48, item 1: a yard begun is finished in its
+        time): each yard whose change is begun is kept in its gear and handed on
+        (`handed`: its seconds still to come, before the weather and the hands), for the runner
+        to carry on as work in hand at no lighter a rate (`Script.handed_on`, `Runner._hand_on`);
+        each waiting its turn is
+        left set where it hangs; the change done (`belay_words` says which). Before, the yards
+        begun were set on the new side at the belay, in one tick."""
         if self.done:
             return
-        for i in self._begun():
-            sl = self.ship.sails[i]
-            sl.state = SailState.SET
-            sl.lug_side = self.side
-            draw_sheets(self.ship, [sl], None, awa)
-            for ln in self.ship.sheets_of(sl):
-                ln.held_side = None  # its single sheet lies to leeward of the wind
+        self.handed = {i: max(self.left.get(i, 0.0), 0.0) for i in self._begun()}
         self.active, self.queue = [], []
         self.done = True
 
@@ -1711,6 +1753,26 @@ class Script:
         if lateens is not None:
             lateens.belay()
 
+    def handed_on(self, factor: float = 1.0) -> list[tuple[str, str, dict[str, Any]]]:
+        """The work a belay of this script hands on, read by the runner once it is removed
+        (`Runner._hand_on`): the whole lateens whose change was begun when the manoeuvre was
+        belayed, carried on as one shift by itself in hand (`change_lateen`, its subject the
+        longest yard), each for the seconds it had left, and never less than the manoeuvre would
+        have taken: worked at no lighter a rate than the manoeuvre's own at the belay (`factor`,
+        the runner's for it, or the change's last where that is the heavier), so that its time
+        is never under those seconds at that rate (package 90; the lead's nudge 48, item 1). []
+        for any other work."""
+        lateens = getattr(self, "lateen_change", None)
+        handed = getattr(lateens, "handed", None) if lateens is not None else None
+        if not handed:
+            return []
+        rate = max(factor, getattr(lateens, "factor", 1.0), 1.0)
+        ids = sorted(handed, key=lambda i: -lateen_yard_m(self.ship, self.ship.sails[i]))
+        params: dict[str, Any] = {"sail": ids[0], "side": lateens.side, "rate": rate}
+        params[HANDED_ON] = {i: handed[i] for i in ids}
+        lateens.handed = {}
+        return [("change_lateen", ids[0], params)]
+
     def changes_left_words(self) -> str:
         """How a belay leaves the yards the manoeuvre changes round their masts, in words for
         the runner's line after "the helm and the yards left as they stand" (package 90, the
@@ -1727,6 +1789,13 @@ class Script:
         settee = getattr(self, "settee_change", None)
         if settee is not None and settee.lowered and not settee.done and settee._sails():
             said.append(f"the {settee.names()} lowered on deck, not yet dipped")
+        # the lugger's dipping lugs lowered and not yet hoisted on the new side: named, words
+        # alone (the lead's nudge 48, ruled on the second pass's unsure 4: the same cause)
+        dip = getattr(self, "dip", None)
+        if isinstance(dip, LugDip) and dip.lowered and not dip.done:
+            down = [sl for sl in dip._lugs() if sl.state is SailState.IN_THE_GEAR]
+            if down:
+                said.append(f"{names_of_sails(self.ship, down)} lowered, not yet dipped")
         return "; ".join(said)
 
     def note(self, text: str, kind: str = "evolution.step") -> None:
@@ -1983,6 +2052,15 @@ class TackScript(Script):
     def _boom_words(self) -> str:
         return names_of_sails(self.ship, self.booms) if self.booms else ""
 
+    def _jibs(self) -> list[Sail]:
+        """The head sails among the sheets eased at helm's a-lee: not the polacre's fore lateen,
+        which is eased with them (package 90, A1b) but is no jib (nudge 48)."""
+        return [sl for sl in self.heads if sl.cls == "jibheaded"]
+
+    def _boom_names(self, sails: list[Sail]) -> str:
+        """'foresail': sails by name, the article dropped, for a sheet's words."""
+        return names_of_sails(self.ship, sails).replace("the ", "", 1)
+
     def _after_swing_s(self) -> float:
         """The after swing's time at "mainsail haul", before the weather and the hands: the
         short after swing, ``light_after_swing_s``, when every after yard is on a schooner's
@@ -2169,8 +2247,12 @@ class TackScript(Script):
         ease_off_sheets(self.ship, self.heads)
         sheets_to(self.ship, self.booms, None, None)
         words = "Ready about. Helm's a-lee"
-        if self.heads:
+        if self._jibs():
             words += "; ease off the head sheets"
+        elif self.heads:
+            # the polacre's fore lateen alone, her jibs furled: named, not "the head sheets"
+            # (package 90, the lead's nudge 48, item 5; the lateens' road, never today's ships)
+            words += f"; ease off the {self._boom_names(self.heads)} sheet"
         if self.booms:
             words += f"; haul aft the {self._boom_words().replace('the ', '')} sheet"
             if any(sl.cut_at_mast for sl in self.booms):
@@ -2191,6 +2273,9 @@ class TackScript(Script):
             words += lateen_plan_words(
                 self.ship, self.lateen_plan, "stays", self.params
             )  # package 90, A1b
+        elif isinstance(self.params.get("lateens"), dict) and has_whole_lateen(self.ship):
+            # every whole lateen taken in: the clause's lateens said, not set (nudge 48)
+            words += lateen_plan_words(self.ship, {}, "stays", self.params)
         self.note(words + ".", "helm.order")
 
     def _lugs_down(self) -> bool:
@@ -2323,7 +2408,10 @@ class TackScript(Script):
                     # against 1,064; JUDGEMENT on the act)
                     ease_off_sheets(self.ship, [aft])
                     self.mizen_eased = True
-                draw = " Draw jib; trim aft the head sheets." if self.heads else ""
+                draw = " Draw jib; trim aft the head sheets." if self._jibs() else ""
+                if self.heads and not draw:
+                    # the fore lateen alone drawn on the new board (package 90, nudge 48)
+                    draw = f" Draw the {self._boom_names(self.heads)}; trim aft its sheet."
                 # her head yards hauled in words only where she works her braces; with no
                 # square sail set and head sheets to draw she has the lugger's line; with none
                 # to draw either, the helm's word, the helm given her new course now (package
@@ -2408,8 +2496,11 @@ class TackScript(Script):
             ):
                 return  # a lateen rig waits for her to pay off (package 90, A1b; ruled)
             if (steady or (self.t_steady >= timeout)) and not self._lugs_down():
-                if not steady and self._lateen_rig() and not paid_off:
-                    self.not_paid_off = self._not_paid_off_words(wind)
+                if not (self.steer is not None and self.steer.given):
+                    # the end's line says how she lies, on a hull with a whole lateen (nudge 48)
+                    lies = self._how_she_lies_words(wind, ch)
+                    if lies:
+                        self.not_paid_off = lies
                 if not steady:
                     # ended by the timeout, not steady on her course: the line names the tack
                     # she lies on, read from her (package 75, B3.4b; `words`)
@@ -2452,11 +2543,29 @@ class TackScript(Script):
         rel = wind_rel(self.ship, wind)
         return -self.sign * rel >= ch - units.deg_to_rad(LATEEN_PAID_OFF_DEG)
 
-    def _not_paid_off_words(self, wind: Wind) -> str:
+    def _how_she_lies_words(self, wind: Wind, ch: float) -> str:
+        """The end's words on a hull that carries a whole lateen, set or not (the lead's nudge 48,
+        item 5: the end's line says what she is): ', but she has not paid off: ...' where her
+        head is short of full and by on the new board by more than `LATEEN_PAID_OFF_DEG`, and ',
+        but she has fallen off: ...' where it is past it by more; "" within it, and on every other
+        hull, whose end is as it was. Before, only a rig of whole lateens alone was read, and the
+        polacre probe with her jibs furled ended "braced up" forty degrees off with sternway."""
+        if not has_whole_lateen(self.ship):
+            return ""
+        rel = -self.sign * wind_rel(self.ship, wind)
+        margin = units.deg_to_rad(LATEEN_PAID_OFF_DEG)
+        if rel < ch - margin:
+            return self._not_paid_off_words(wind)
+        if rel > ch + margin:
+            return self._not_paid_off_words(wind, "but she has fallen off")
+        return ""
+
+    def _not_paid_off_words(self, wind: Wind, how: str = "but she has not paid off") -> str:
         """', but she has not paid off: she lies 39° off the wind with a knot of way' (package 90,
-        A1b; JUDGEMENT on the words), for a tack's end that came before she had: 'with a knot of
-        sternway' going astern, 'with no way on her' under half a knot either way (the lead's
-        nudge 46, item 7: "with no way of way" was said of her going astern)."""
+        A1b; JUDGEMENT on the words), for a tack's end that came before she had (or, `how`, after
+        she fell off past full and by): 'with a knot of sternway' going astern, 'with no way on
+        her' under half a knot either way (the lead's nudge 46, item 7: "with no way of way" was
+        said of her going astern)."""
         from freesail.crew.model import number_words  # local import: the words' home
 
         off = abs(units.rad_to_deg(wind_rel(self.ship, wind)))
@@ -2469,7 +2578,7 @@ class TackScript(Script):
             way = f"{knots} of sternway"
         else:
             way = f"{knots} of way"
-        return f", but she has not paid off: she lies {off:.0f}° off the wind with {way}"
+        return f", {how}: she lies {off:.0f}° off the wind with {way}"
 
     # -- the course she was put about for (package 37m) ---------------------------------
 
@@ -2837,6 +2946,9 @@ class WearScript(Script):
                 self.mizen_eased = True
                 brail += f"; ease off the {part_name_of(self.ship, aft)} sheet"
             brail += lateen_plan_words(self.ship, self.lateen_plan, "wearing", self.params)
+        elif isinstance(self.params.get("lateens"), dict) and has_whole_lateen(self.ship):
+            # every whole lateen taken in: the clause's lateens said, not set (nudge 48)
+            brail += lateen_plan_words(self.ship, {}, "wearing", self.params)
         self.bowlined = bowlines_hauled(self.ship)
         # the after yards braced in as she falls off, said only where the action braces some in
         # now (`told_of` its after list; the head yards follow once the wind is abaft the beam,
@@ -10567,6 +10679,13 @@ class ChangeLateenScript(Script):
     hangs, and the line says so (`left_words`). Its file's preconditions refuse a lateen cut at
     the mast, blown out, unbent or not set, and one to leeward of its mast already."""
 
+    # class defaults (a checkpoint from before the lead's nudge 48): the yards a belay of a
+    # manoeuvre handed on, by sail id, their seconds still to come before the weather and the
+    # hands (`HANDED_ON`), worked at no lighter a rate than the manoeuvre's (`params["rate"]`),
+    # and the yard the last line names
+    handed: dict[str, float] | None = None
+    said_id: str | None = None
+
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
         self.sail_id: str | None = (
@@ -10594,9 +10713,24 @@ class ChangeLateenScript(Script):
         return None
 
     def holds(self) -> set[str]:
-        return {self.sail_id} if self.sail_id else set()
+        held = {self.sail_id} if self.sail_id else set()
+        # read by the runner as the work is made, before it begins: the yards handed on by the
+        # params, then by what is left of them
+        handed = self.handed if self.handed is not None else self.params.get(HANDED_ON)
+        if isinstance(handed, dict):
+            held |= set(handed)
+        return held
 
     def begin(self, words: dict[str, Any]) -> None:
+        handed = self.params.get(HANDED_ON)
+        if isinstance(handed, dict) and handed:
+            # handed on by a manoeuvre belayed (the lead's nudge 48, item 1): the yards are in
+            # their gear already, each with the seconds it had left, going round to the side the
+            # manoeuvre took them
+            self.handed = {i: float(v) for i, v in handed.items() if i in self.ship.sails}
+            self.side = str(self.params.get("side") or "") or None
+            self.phase = "shift"
+            return
         sail = _subject_sail(self.ship, self.params, words)
         self.sail_id = sail.id if sail is not None else None
         if sail is None:
@@ -10613,36 +10747,101 @@ class ChangeLateenScript(Script):
         sail.state = SailState.IN_THE_GEAR  # peaked up and passed round: drawing nothing
         self.phase = "shift"
 
-    def tick(self, dt: float, wind: Wind, factor: float) -> None:
-        self.t += dt
-        sail = self._sail()
-        if sail is None or self.side is None:
-            return
-        befallen = lateen_shift_befallen(self.ship, sail)
-        if befallen is not None:
-            # blown out, its yard or mast carried away, or its halyard parted while it was being
-            # shifted: the work ends in its own words, the sail as the casualty left it (the
-            # lead's nudge 46, item 1: before, it ended "Shifted the mainsail" set and drawing)
-            self.fail(befallen)
-            return
-        self.left_s -= dt / max(factor, 1e-6)
-        if self.left_s > 0.0:
-            return
+    def _set_on_its_side(self, sail: Sail) -> None:
         sail.state = SailState.SET
         sail.lug_side = self.side
         draw_sheets(self.ship, [sail], None, None)
         for ln in self.ship.sheets_of(sail):
             ln.held_side = None  # its single sheet lies to leeward of the wind
+
+    def _lies(self, sail: Sail) -> str:
+        """'it stands to leeward of the mast', or, set on the weather side (a yard handed on goes
+        round to the side the manoeuvre took it), 'it lies on the mast, to windward'."""
+        lee = "larboard" if self.ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+        if sail.lug_side == lee:
+            return "it stands to leeward of the mast"
+        return "it lies on the mast, to windward"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        if self.handed is not None:
+            self._tick_handed(dt, factor)
+            return
+        sail = self._sail()
+        if sail is None or self.side is None:
+            return
+        befallen = lateen_shift_befallen(self.ship, sail)
+        if befallen is not None:
+            # blown out, its yard or mast carried away, its halyard, sheet or tack parted while
+            # it was being shifted: the work ends in its own words, the sail as the casualty left
+            # it (the lead's nudges 46 and 48: before, it ended "Shifted the mainsail" set)
+            self.fail(befallen)
+            return
+        self.left_s -= dt / max(factor, 1e-6)
+        if self.left_s > 0.0:
+            return
+        self._set_on_its_side(sail)
         self.finish()
 
+    def _tick_handed(self, dt: float, factor: float) -> None:
+        """The yards a belay handed on: each set on its side when its seconds are done, worked at
+        no lighter a rate than the manoeuvre's at the belay, so never sooner than it would have
+        been, and said; each that something befalls let be and said; the work done with the
+        last."""
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        assert self.handed is not None
+        for i in list(self.handed):
+            sail = self.ship.sails[i]
+            befallen = lateen_shift_befallen(self.ship, sail)
+            if befallen is None:
+                # never lighter than the manoeuvre's rate at the belay
+                rate = max(factor, float(self.params.get("rate") or 1.0), 1e-6)
+                self.handed[i] -= dt / rate
+                if self.handed[i] > 0.0:
+                    continue
+                self._set_on_its_side(sail)
+            del self.handed[i]
+            self.said_id = i
+            if not self.handed:
+                if befallen is not None:
+                    self.fail(befallen)
+                else:
+                    self.finish()
+                return
+            name = part_name(self.ship, i)
+            if befallen is not None:
+                text = f"Could not shift the {name}: {befallen}."
+                self.ship.note("notable", "evolution.failed", text, self.ship.name)
+            else:
+                text = f"Shifted the {name}; {self._lies(sail)}."
+                self.ship.note("notable", "sail.dipped", text, self.ship.name)
+
     def remaining_s(self) -> float:
+        if self.handed:
+            rate = float(self.params.get("rate") or 1.0)
+            return max(0.0, max(self.handed.values()) * rate)
         return max(0.0, self.left_s)
 
     def left_words(self) -> str | None:
         """'the mainsail in its gear, its yard not yet shifted round the mast': belayed, the
-        sail is left drawing nothing where its yard hangs."""
+        sail is left drawing nothing where its yard hangs; so the yards a belay handed on, belayed
+        in their turn (the lead's nudge 48: allowed as built, there being no gain in it)."""
+        if self.status != "running" or self.side is None:
+            return None
+        if self.handed:
+            sails = [self.ship.sails[i] for i in self.handed]
+            if len(sails) == 1:
+                return (
+                    f"{names_of_sails(self.ship, sails)} in its gear, its yard not yet shifted "
+                    "round the mast"
+                )
+            return (
+                f"{names_of_sails(self.ship, sails)} in their gear, their yards not yet shifted "
+                "round their masts"
+            )
         sail = self._sail()
-        if sail is None or self.status != "running" or self.side is None:
+        if sail is None:
             return None
         from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
@@ -10650,7 +10849,15 @@ class ChangeLateenScript(Script):
         return f"the {name} in its gear, its yard not yet shifted round the mast"
 
     def words(self) -> dict[str, Any]:
-        return {"side": self.side or ""}
+        out: dict[str, Any] = {"side": self.side or ""}
+        said = self.ship.sails.get(self.said_id) if self.said_id else self._sail()
+        if said is not None:
+            out["it_stands"] = self._lies(said)
+        if self.said_id:
+            from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+            out["sail"] = part_name(self.ship, self.said_id)
+        return out
 
 
 SCRIPTS: dict[str, type[Script]] = {
