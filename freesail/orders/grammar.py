@@ -164,7 +164,15 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         raise OrderError("No order given.")
     words = segments[0]
 
-    verb_phrase, verb = _match_verb(words, vocab)
+    lateen_hull = whole_lateen_hull(ship)
+    hidden = () if lateen_hull else LATEEN_ONLY_VERBS
+    verb_phrase, verb = _match_verb(words, vocab, hidden)
+    if verb in LATEEN_ONLY_VERBS and not _the_practice_said(
+        ship, words[len(verb_phrase.split()) :], segments, vocab
+    ):
+        # `leave` is an order only in the practice's forms (package 90, A1b; the lead's nudge 46,
+        # item 4): "leave port", "leave the ship" or a bare "leave" is answered as it always was
+        raise _unknown_verb(words, vocab, LATEEN_ONLY_VERBS)
     if vocab.verbs[verb].object == "port" and words[:2] == ["take", "in"]:
         # 'take in the water sail' is the sail and not the water (package 37l; game 10,
         # where it was answered "the port's business"): the port's 'take in the water'
@@ -257,7 +265,7 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         rest = _sheets_of_sails(ship, rest)
     said_the_lateens = False
     lateen_verb = verb in LATEEN_CLAUSE_VERBS or verb in LATEEN_PRACTICE_VERBS
-    lateens = lateen_verb and whole_lateen_hull(ship)
+    lateens = lateen_verb and lateen_hull
     after_lateens = _the_lateens_at(rest, vocab) if lateens else None
     if after_lateens is not None and (
         verb == "leave"
@@ -267,6 +275,10 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         # practice, said of the lateens together whether or not her file names the group
         said_the_lateens, rest = True, after_lateens
     elif spec.object in ("sail", "yards", "line", "wreck"):
+        if lateens and verb in LATEEN_PRACTICE_VERBS:
+            _no_sail_before_the_occasion(
+                ship, verb, [*rest, *(w for seg in segments[1:] for w in seg)], vocab
+            )
         obj, side_word, rest = _match_object(ship, rest, vocab, verb, spec)
         if verb == "trim" and obj is not None:
             # "trim the spanker sheet", "tend the jib sheets" (package 33c; playtest 12):
@@ -319,6 +331,13 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         verb = "reef"  # "take in one reef in the topsails" is a reef, not a taking in
     if hands_from is not None:
         mods["hands_from"] = hands_from
+    if canvas.get(SAIL_ROOM_MARK) and not (
+        verb == "shift" and lateen_hull and _names_a_whole_lateen(ship, obj)
+    ):
+        # the mark tells a shift round the mast from a shift for a new sail, and only of a whole
+        # lateen: of any other sail "for a new one" says nothing more, as before, so that the
+        # standing orders' rule of contraries reads it as it did (the lead's nudge 46, item 5)
+        canvas.pop(SAIL_ROOM_MARK)
     mods.update(canvas)
     return Order(
         text=norm.replace(" , ", ", "),
@@ -432,6 +451,78 @@ def whole_lateen_hull(ship: Ship) -> bool:
     from freesail.evolutions import scripts  # local import, as `orders.verbs` reads it
 
     return scripts.has_whole_lateen(ship)
+
+
+# The verbs that are orders on a hull with a whole lateen alone, and there only in the practice's
+# forms (`_the_practice_said`): on any other hull, and in any other form, the words are answered
+# as they always were, "'leave port' is not an order this ship understands", and never hinted
+# (the lead's nudge 46, item 4: "leave port" was answered "There is no such part as the  in
+# this ship.", an empty name, on every ship).
+LATEEN_ONLY_VERBS = ("leave",)
+
+
+def _unknown_verb(
+    words: list[str], vocab: Vocabulary, hidden: tuple[str, ...] = ()
+) -> errors.UnknownVerbError:
+    """The answer to words that begin with no verb of hers, `hidden` neither matched nor hinted."""
+    synonyms = [s for v, spec in vocab.verbs.items() if v not in hidden for s in spec.synonyms]
+    verbs = [v for v in vocab.verb_names if v not in hidden]
+    return errors.unknown_verb(" ".join(words), verbs, synonyms)
+
+
+def _names_a_whole_lateen(ship: Ship, words: list[str] | str | None) -> bool:
+    """Whether the words begin with a part of hers that is a whole lateen ("the mizen", "the
+    mainsail and the mizen"), as the noun table reads them."""
+    from freesail.evolutions import scripts
+
+    ws = strip_article(words.split() if isinstance(words, str) else list(words or []))
+    table = noun_table(ship)
+    span = compound_span(table, ws) if ws else None
+    if span is None:
+        return False
+    sails = getattr(ship, "sails", None) or {}
+    for phrase in span[1]:
+        noun = table.lookup(phrase)
+        ids = noun.ids if noun is not None else ()
+        if any(i in sails and scripts.is_whole_lateen(sails[i]) for i in ids):
+            return True
+    return False
+
+
+def _the_practice_said(
+    ship: Ship, rest: list[str], segments: list[list[str]], vocab: Vocabulary
+) -> bool:
+    """Whether the words after `leave` are the practice's forms, on a hull with a whole lateen:
+    "the lateens" after it, an occasion among them ("in stays"), or one of her whole lateens
+    named ("leave the mizen", answered in the practice's words)."""
+    if not whole_lateen_hull(ship):
+        return False
+    if _the_lateens_at(rest, vocab) is not None:
+        return True
+    if _says_an_occasion([*rest, *(w for seg in segments[1:] for w in seg)], vocab):
+        return True
+    return _names_a_whole_lateen(ship, rest)
+
+
+def _no_sail_before_the_occasion(
+    ship: Ship, verb: str, words: list[str], vocab: Vocabulary
+) -> None:
+    """`leave in stays`, `leave port in stays`, `shift in wearing` on a hull with a whole lateen:
+    an occasion of the practice said with no sail of hers before it is asked of in the practice's
+    own words, which name nothing she has not (the lead's nudge 48, item 4: "There is no such part
+    as the in stays in this ship; did you mean the main staysail ..." before). Words with a sail
+    of hers named before the occasion, or with no occasion, are let by as they were."""
+    at = next((i for i in range(len(words)) if _longest_at(words, i, vocab.lateen_occasions)), None)
+    if at is None:
+        return
+    before = strip_article([w for w in words[:at] if w != ","])
+    if before and compound_span(noun_table(ship), before) is not None:
+        return
+    occasion = _longest_at(words, at, vocab.lateen_occasions)
+    raise OrderError(
+        f"{verb.capitalize()} what {occasion}? Her practice is said of the lateens together: "
+        f"'{verb} the lateens {occasion}'."
+    )
 
 
 def _the_lateens_at(words: list[str], vocab: Vocabulary) -> list[str] | None:
@@ -600,17 +691,21 @@ def _said(key: str, value: Any) -> str:
     return str(value)
 
 
-def _match_verb(words: list[str], vocab: Vocabulary) -> tuple[str, str]:
-    """The longest verb phrase at the start of the words, and its canonical verb."""
+def _match_verb(
+    words: list[str], vocab: Vocabulary, hidden: tuple[str, ...] = ()
+) -> tuple[str, str]:
+    """The longest verb phrase at the start of the words, and its canonical verb; a verb in
+    `hidden` (`LATEEN_ONLY_VERBS` on a hull with no whole lateen) is neither matched nor hinted."""
     keyed = [w.replace("'", "") for w in words]  # "helm's a-lee" is the phrase "helms a lee"
     for phrase in vocab.verb_phrases:
+        if vocab.phrase_to_verb[phrase] in hidden:
+            continue
         pw = phrase.split()
         if keyed[: len(pw)] == pw:
             return phrase, vocab.phrase_to_verb[phrase]
     # package 73: a synonym nearer in spelling than any verb is hinted first ("man the
     # boats" is "man the boat", not "man the pumps")
-    synonyms = [s for spec in vocab.verbs.values() for s in spec.synonyms]
-    raise errors.unknown_verb(" ".join(words), vocab.verb_names, synonyms)
+    raise _unknown_verb(words, vocab, hidden)
 
 
 # ---------------------------------------------------------------------------

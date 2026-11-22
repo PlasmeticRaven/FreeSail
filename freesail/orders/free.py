@@ -45,6 +45,7 @@ from typing import Any
 from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
 from freesail.orders.prompt import world_of
+from freesail.world import knowledge
 
 __all__ = ["AS_SAID", "FREE_KIND", "PAST", "Several", "execute", "hand_line", "not_found"]
 
@@ -192,6 +193,7 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
         "moved": moved,
         "heard_by": [h.station.name for h in heard],
         "notable": True,
+        **knowledge.said_at(world, person),  # his side as he spoke (package 120)
     }
     if thing is not None:
         data["thing"] = thing.id
@@ -264,6 +266,7 @@ def spoken(world: Any, person: Any, words: str) -> tuple[str, str, dict[str, Any
         "heard_by": [h.station.name for h in heard],
         "notable": True,
         "spoken_as": True,
+        **knowledge.said_at(world, person),  # his side as he spoke (package 120)
     }
     if thing is not None:
         data["thing"] = thing.id

@@ -356,7 +356,7 @@ The later word for wearing a fore-and-aft vessel is *gybe*, and the parser takes
   Morning watch (04:20)  Order: wear ship.
   Morning watch (04:20)  Stand by to wear ship. Up helm.
   Morning watch (04:20)  Stations for wearing ship.
-  Morning watch (04:21)  Wind aft. Squared the head yards; hauled out and braced up.
+  Morning watch (04:21)  Wind aft. Squared the head yards; shifted over the sheets; hauled out and braced up.
 * Morning watch (04:22)  Fore topgallant taken aback.
 * Morning watch (04:22)  Fore topsail taken aback.
   Morning watch (04:25)  Fore topsail filled again.

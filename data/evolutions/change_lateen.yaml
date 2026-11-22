@@ -47,7 +47,7 @@ preconditions:
   - {check: not sail.wrecked, reason: "The {sail} is wrecked."}
   - {check: not wrecked(spar_chain(sail)), reason: "The {sail}'s yard or mast is wrecked."}
 on_start: {log: "Shift the {sail}: ease the parrel, cast off the runners, peak up the yard and pass the car round."}
-on_complete: {log: "Shifted the {sail}; it stands to leeward of the mast.", kind: sail.dipped, severity: notable}
+on_complete: {log: "Shifted the {sail}; {it_stands}.", kind: sail.dipped, severity: notable}
 on_fail: {log: "Could not shift the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: all hands, the forecastlemen and the afterguard first, able hands, as dip_settee's
 crew: {hands: all, rating: able, stations: [forecastle, afterguard, all hands]}

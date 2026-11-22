@@ -3015,6 +3015,17 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     for h in heard:
         h.hear(line)
     names = [h.station.name for h in heard]
+    from freesail.world import knowledge
+
+    if voice:
+        # a voice of the ship's own speaks aboard the ship whose log this is (package 120:
+        # her hull written, so that the masthead's hail is never heard aboard another)
+        here = str(world.own.id)
+        spoken = knowledge.said_at(
+            world, spot=("aboard", here, "quarterdeck" if place == "deck" else place)
+        )
+    else:
+        spoken = knowledge.said_at(world, person)
     world.record(
         Severity.NOTABLE,
         PERSON_SPOKE_KIND,
@@ -3026,6 +3037,7 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             "where": where,
             "words": words,
             "heard_by": names,
+            **spoken,
         },
     )
     person_journal(world, person).append(world, f"Said, {where}: {words}", kind=SAID_KIND)
