@@ -2136,3 +2136,80 @@ cloud's base above is the comparison.
    work's one name, but long.
 
 **Next:** `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.
+
+## A1c's hash merged into the engine track (nudge 49, 2026-11-22)
+
+**The merge:** **b3c2dee** on `…/pkg-90-engine`, parents **68d74c1** (the engine branch's tip)
+and **ee66c4a** (`…/pkg-90-a1c`'s tip: A1c's hash with the five, 2f3285c, and its tiers). It
+brings 23 commits onto the engine: the five and their tiers, and `…/pkg-90` as cut at b3c68af4
+(its merges of A1c, A3 and A3's two lists, and of the three A1a-A1b passes, and the trunk to
+7a1bd65e). The code and data take seven files, 146 lines in and 40 out. The tests take two,
+`tests/test_helm_kind.py` (A3's lists) and `tests/test_lateen_whole.py`, 515 in. Git finds two
+merge bases, 7173281 and be2c90f. The engine took the third pass from `…/pkg-90-a1ab`, and
+`…/pkg-90` took it again at 5e42ed2f.
+
+**Which lines were resolved by hand** (four files conflicted; every other file merged clean,
+`freesail/evolutions/scripts.py` among them):
+1. **`freesail/evolutions/runner.py`, `_start_waiting`**, by both rules:
+   - Kept from the engine: A1d's `if busy or lateen_take_in_waits(ship, inst.evo.verb,
+     inst.subject):` and its `continue  # a whole lateen aback in a strong wind waits too
+     (package 90, A1d)`.
+   - Dropped from the engine: the third pass's three lines, `# work a belay handed on is begun
+     already: its beginning's conditions are not read`, `conditions = [] if
+     inst.params.get(HANDED_ON) else inst.evo.preconditions` and `reason =
+     self._failing_condition(ship, inst, conditions + inst.evo.requires)`. Nudge 49's item 3
+     takes them out.
+   - Taken from A1c's hash: `reason = self._failing_condition(ship, inst,
+     inst.evo.preconditions + inst.evo.requires)`, as on the trunk before the third pass.
+   - Dropped from A1c's hash: its plain `if busy:` and `continue`.
+
+   So the take-in waits as A1d had it, and the work handed on, never waiting, reads its
+   conditions as any work. `HANDED_ON`'s import went out clean, and no use of it is left in the
+   file.
+2. **`tests/test_lateen_whole.py`**, three hunks:
+   - The import block: the engine's three lines, `from freesail.evolutions import trim as
+     yard_trim`, `from freesail.orders import navigation` and `from freesail.physics import
+     sails as P`. A1c's hash had `navigation` alone, so none of its lines is lost.
+   - The engine's A1d section (169 lines, from its heading "Taken aback, and the bad hand, in a
+     breeze (A1d)"), set against nothing: kept whole.
+   - The five's section (353 lines, "The five that ride A1c's hash"), set against nothing: kept
+     whole, at the file's end.
+
+   The file is the engine's 191 cases and the five's 22: 213.
+3. **`docs/dev/TuningNotes.md`**, three hunks, each side's sections whole:
+   - A1c's hash has the lead's nudge-43 paragraph, "**At its merge into `claude/pkg-90`, by hand
+     (the lead's nudge 43).** ...", at the end of A1b's section, before A1c's. The engine has
+     nothing there. Taken: the paragraph and its blank line, in A1b's section, where the lead
+     wrote it.
+   - The engine's A1d, A5-A6 and A4 sections (171 lines), set against nothing: kept whole, but
+     for their last two lines. Those are a blank and a second copy of that same paragraph, word
+     for word, after A4's "Not built, for the lead". Left out, so the paragraph stands once.
+   - The five's section (34 lines), set against nothing: kept whole.
+
+   173 sections. Against 68d74c1 the file loses those two lines alone. Against ee66c4a it loses
+   none.
+4. **This report**, two hunks, both sides' sections whole:
+   - The engine's eight sections from A1d to "held on nudge 46's item 6" (867 lines), set against
+     nothing: kept.
+   - The engine's last two (the third pass's merge and its tiers, 86 lines), set against A1c's
+     hash's section with its tiers (201 lines): the engine's first, a blank, then A1c's hash's.
+
+   17 sections before this one.
+
+**Checked on the merged tree, before the tiers:**
+- No conflict marker is left anywhere. `ruff check` and `ruff format --check` are clean, 431
+  files.
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+- The code, tests and data are byte for byte those of a dry run of the same merge, made in the
+  session's scratch from 2f3285c. ee66c4a changes this report alone.
+- The lens, `-n 4`, on b3c2dee: 2,476 passed, 1 skipped, 1 xfailed, 0 failed (7 min 37 s);
+  `test_lateen_whole`'s 213 among them, all passed. It ran over the 32 files of A1c's hash's
+  lens, and `test_tow`, `test_boat_towed`, `test_yard_level`, `test_pole_mast` and
+  `test_rig_words`.
+
+**The tiers** run whole on the commit that adds this section, which touches this report alone.
+Each case will be set beside its outcome at b764b06 (the engine's last tiers) and at 2f3285c (A1c's
+hash). They follow in a section of their own.
+
+**For the coordinating session:** nudge 50 received. `…/pkg-90-a1d` is cut and merged next, its
+tiers held until A1c's verdict, and its section follows on that branch.
