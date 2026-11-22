@@ -1780,6 +1780,19 @@ REGISTRY.add(
 )
 
 
+def idle_lateen_rows(world: Any) -> set[str]:
+    """The practice's row, left out of a sample where she carries no whole lateen (package 90;
+    the lead's nudge 46, item 6: "no whole lateen aboard" was in every station's sample on all
+    eighteen ships, a seat paying for it on every reading and learning nothing). Read by
+    `action_readings.idle_rows`, as the practice and resupply's own rows are. The readings tool
+    keeps it on every ship: every reading is named in the primer (`tests/test_grammar_book.py`)
+    and the tool's own tests read every registry row."""
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = getattr(world, "ship", None)
+    return set() if ship is not None and scripts.has_whole_lateen(ship) else {"lateen_practice"}
+
+
 # ---------------------------------------------------------------------------
 # Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the
 # captain's hands (spec M5 §14, §15; decision 30). Each row reads the account and never
