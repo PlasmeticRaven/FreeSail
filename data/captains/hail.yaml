@@ -150,9 +150,10 @@ answers:
     days out: "{days} days from {port}."
     heave to: "{heave_to}"
 
-# the demand to heave to, answered by stance: a King's ship of a nation she is not at war
-# with is obeyed by a merchantman, a packet and a fisherman; an enemy's is run from; a
-# privateer makes sail from any; a King's ship declines
+# the demand to heave to, answered by stance: a King's ship or a privateer of a nation she is
+# not at war with is obeyed by a merchantman, a packet and a fisherman (package 121: a letter
+# of marque carried the right to bring to and examine in war); a merchantman's, or an
+# enemy's, is run from; a privateer makes sail from any; a King's ship declines
 heave_to:
   obeys: "Aye aye: heaving to."
   runs: "She makes no answer but sail."

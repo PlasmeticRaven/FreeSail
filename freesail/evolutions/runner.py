@@ -620,7 +620,9 @@ class Runner:
         if isinstance(subject, Ship):
             phase = inst.script.phase.replace("_", " ") if inst.script is not None else ""
             at = f" at {phase}" if phase and phase not in ("ready", "done") else ""
-            return f"the helm and the yards left as they stand{at}"
+            # the yards a manoeuvre changes round their masts, named (package 90, nudge 46)
+            also = inst.script.changes_left_words() if inst.script is not None else ""
+            return f"the helm and the yards left as they stand{at}{'; ' + also if also else ''}"
         name = part_name(ship, inst.subject_id)
         if isinstance(subject, Sail):
             return f"the {name} left {_SAIL_LEFT.get(subject.state, subject.describe_state())}"

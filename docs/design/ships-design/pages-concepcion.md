@@ -39,7 +39,7 @@ her line, her displacement, her length and her deck.**
   *San Josef*'s lines by 1.029 is dropped: it came from the research note's "about 214 pies", read
   short of the stem, and would count the rebuild twice. Whether her eslora is 215.5 pies between the
   rabbets or 220 outside stays open (§5.1).
-- **`deck_height_m` (ruling 4): 6.06 m on one condition**, that it is the same deck by the same
+- **`deck_height_m`: **ruled 5.99 m** (the lead's nudge 33, 2026-11-20): by the seventy-four's method, the mean of the lines her sheet draws for that deck, above her line as traced; this note's upper line's 6.06 m recorded beside it.** First ruled (ruling 4) as 6.06 m on one condition, that it is the same deck by the same
   method as the seventy-four's 3.16 m and the sixty-four's 3.22 m (the upper deck in the waist).
   **Checked (§5.3): the same deck, by its place** (the highest continuous deck, at the waist, at the
   middle line and at the middle, above her water by the same rule), **but not the same method in one
@@ -144,8 +144,8 @@ stay above the straight fit, as they were measured; §12.1 sets down what the li
 - **Decks** (§5.3), the upper red line of each at x 0: orlop −0.90, lower **1.53**, middle **3.90**,
   upper **6.06** (the design's `deck_height_m` "about 5.2"), the waist's gangway 7.63; the quarterdeck
   8.11 at x −17.5, the forecastle 8.10 at +23.8, the poop 10.33 at −22.8. The decks accepted (ruling
-  5); **`deck_height_m` held for the lead** by ruling 4's condition: 6.06 m by this note's line, 6.00
-  to 6.01 m by the 74's method, the mean of the pair (§5.3).
+  5); **`deck_height_m` 5.99 m**, ruled (nudge 33) by ruling 4's condition: 6.06 m by this note's line,
+  6.00 to 6.01 m by the 74's method, the mean of the pair, and 5.99 above her traced line (§5.3).
 - **Rudder** (§5.6): **13.3 m²** below L0, span 8.29 m to its sole, 1.03 m broad at L0 and 1.88 m at
   the heel, its centroid 4.68 m below L0. **Lateral plane** to K and the knee, no rudder: **475.2 m²**
   (0.98 of length times draught); 455.3 m² to the keel's lower edge and the stem's fore face. Both
@@ -643,7 +643,7 @@ hull, as ruled (2026-11-20; the line as traced, §12.1):
   displacement_kg 4,440,000 (about 4,440 t; the range 4,421 to 4,473 t outside the plank; ruling 2)
   lateral_area_m2 about 473.5 (the same method, to the line as traced; computed)
   rudder: area 13.3, span 8.29 (ruling 5)
-  deck_height_m held for the lead: 6.06 by this note's line, 6.00 to 6.01 by the 74's method (§5.3)
+  deck_height_m 5.99 (ruled, nudge 33: the 74's method above her traced line; 6.06 by this note's line) (§5.3)
 breadth_m (x, hb at L0) at the stations:
   [-28.63, 2.75], [-26.43, 5.57], [-23.29, 6.83], [-19.84, 7.33], [-16.33, 7.65], [-12.84, 7.84],
   [-9.38, 7.99], [-6.00, 8.11], [-2.49, 8.17], [0.99, 8.17], [4.48, 8.06], [8.00, 8.06],

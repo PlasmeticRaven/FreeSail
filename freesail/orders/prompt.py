@@ -59,7 +59,10 @@ def _view(ship: Any) -> tuple[Any, R.ReadingsView]:
 
 
 def _sentence(head: str, words: str) -> str:
-    text = f"{head[:1].upper()}{head[1:]}: {words}"
+    # words that already open with the head are not headed again (package 121: 'the ship'
+    # answered "The ship: The ship: Amazon, ...")
+    headed = words.lower().startswith(f"{head.lower()}:")
+    text = words if headed else f"{head[:1].upper()}{head[1:]}: {words}"
     return text if text.endswith((".", "!", "?")) else text + "."
 
 
