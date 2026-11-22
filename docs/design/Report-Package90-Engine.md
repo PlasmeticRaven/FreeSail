@@ -745,8 +745,27 @@ stands to leeward.
 
 ### The test sets run, with counts, and the base comparison
 
-The fast and the slow tier whole run on this commit now. Their results follow in the next
-commit, which touches this report alone.
+**The tiered hash is 1458b0e**, the third pass's commit itself. The commit after it, which
+writes these results, touches this report alone.
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch, on 1458b0e's own worktree. Compared test by test with
+the two junits of the second pass's section: **the base, 0d5d2c56**, and **the second pass,
+75abacd** (2e1e19b's tree), by the test's id with the xdist group's `@...` stripped.
+
+| Run | 1458b0e | Against the base (0d5d2c56) | Against the second pass (75abacd) |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,766: 8,757 passed, 8 skipped, 1 xfailed, 0 failed (58 min 40 s) | **Every one of the base's 8,665 the same outcome but the pin the second pass renamed** (its new name passed); **102 new, all passed**, every one in `tests/test_lateen_whole.py` | **Every one of the 8,722 the same outcome**, none gone; **44 new, all passed**, every one in `tests/test_lateen_whole.py` |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (the runner, the readings' samples and the grammar touched, so the tier whole) | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min) | **Every one of the 569 the same outcome**, none new | **Every one of the 569 the same outcome**, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+both: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 63 at the base, 120 at the second pass, 164 now, all passed.
+
+**On 1458b0e's tree:** `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte with
+`data/ships/`; **`ruff check`** and **`ruff format --check`**, clean.
 
 ### Unsure, and for the lead
 
@@ -757,4 +776,4 @@ commit, which touches this report alone.
    plain fields. A save while the manoeuvre's change is in hand is refused, as the second pass had
    it.
 
-**Next:** the tiers, then `…/pkg-90-a1ab` merged again into `…/pkg-90-engine`, as before.
+**Next:** `…/pkg-90-a1ab` merged again into `…/pkg-90-engine`, as before.
