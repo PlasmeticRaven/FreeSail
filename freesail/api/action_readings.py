@@ -60,10 +60,12 @@ ACTION_ROWS: tuple[str, ...] = (
 def idle_rows(world: Any) -> set[str]:
     """The rows to leave out of a sample now: the action's and the squadron's
     (`_idle_action_rows`), and the practice's on every path (practice and resupply, between
-    packages 72 and 73: `practice_readings.idle_practice_rows`)."""
+    packages 72 and 73: `practice_readings.idle_practice_rows`); and the lateens' practice where
+    she carries no whole lateen (package 90, nudge 46: `readings.idle_lateen_rows`)."""
     from freesail.api.practice_readings import idle_practice_rows
+    from freesail.api.readings import idle_lateen_rows
 
-    return _idle_action_rows(world) | idle_practice_rows(world)
+    return _idle_action_rows(world) | idle_practice_rows(world) | idle_lateen_rows(world)
 
 
 def _idle_action_rows(world: Any) -> set[str]:
