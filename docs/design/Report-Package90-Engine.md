@@ -1906,3 +1906,31 @@ Each case will be set beside its outcome at 4a4e1c6 (the engine's last tiers, ab
 
 **For the coordinating session:** `…/pkg-90-a1ab` at **7173281** is the hash for the gate (1458b0e
 tiered, the commit after it the report alone). The engine branch now carries it, at 0d639a6.
+
+## For the coordinating session: the third pass's merge, its tiers (nudge 48, 2026-11-22)
+
+**The tiered hash is b764b06**, the commit that adds the merge's section above (its code, tests
+and data are 0d639a6's, the merge). This commit, which writes the results, touches this report
+alone.
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+on b764b06's own worktree, each junit kept in the session's scratch. Set beside the engine's last
+tiers, those of **4a4e1c6** (the second pass's merge), and beside the third pass's, those of
+**1458b0e**, test by test, with the xdist group's `@...` stripped from each id:
+
+| Run | b764b06 | Against the engine (4a4e1c6) | Against the third pass (1458b0e) |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,887: 8,878 passed, 8 skipped, 1 xfailed, 0 failed (59 min 36 s) | **Every one of the 8,843 the same outcome**, none gone; **44 new, all passed**, the third pass's, every one in `tests/test_lateen_whole.py` | **Every one of the 8,766 the same outcome**, none gone; **121 new, all passed**, the engine's own steps': `test_yard_level` 34, `test_boat_towed` 29, `test_pole_mast` 28, `test_lateen_whole` 27 (A1c's and A1d's) and `test_known_truths` 3 |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 11 min) | **Every one of the 569 the same outcome**, none new | **Every one of the 569 the same outcome**, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, the same at 4a4e1c6: the byte
+test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 147 at 4a4e1c6, 191 now, all passed.
+
+**The hashes for the gate:** `…/pkg-90-a1ab` at **7173281** (1458b0e tiered, the commit after it
+the report alone); `…/pkg-90-engine` at this commit (b764b06 tiered, this commit the report
+alone).
+
+**Next:** nothing more on nudge 48. I wait for the coordinating session's word here.
