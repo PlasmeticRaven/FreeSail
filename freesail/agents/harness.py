@@ -2106,7 +2106,7 @@ class Harness:
         and where each is to be had; None on deck, where every row is his."""
         if senses.everything:
             return None
-        rows = knowledge.rows_elsewhere(senses)
+        rows = knowledge.rows_elsewhere(senses, world)
         return knowledge.elsewhere_words(rows, senses)
 
     def _as_told(self, content: dict[str, Any]) -> dict[str, Any]:

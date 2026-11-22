@@ -1744,6 +1744,54 @@ REGISTRY.add(
     )
 )
 
+# The ship's practice for her whole lateens in going about (package 90, A1b;
+# Design-Package90-Engine.md §2.3 item 3), so that a model at the conn knows what `tack ship`
+# will do with the yards: in stays and in wearing, each shifted round the mast or left on it
+# (`scripts.lateen_practice`, "shifted" in both by default), set by `leave the lateens in stays`
+# and its kin. A hull with no whole lateen has none: the row's words say so.
+NO_LATEEN_WORDS = "no whole lateen aboard"
+
+
+def _no_lateen_words(_world: Any) -> str:
+    return NO_LATEEN_WORDS
+
+
+def _lateen_practice(world: Any, _: str | None) -> dict[str, Any] | None:
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = world.ship
+    if not scripts.has_whole_lateen(ship):
+        return None
+    practice = scripts.lateen_practice(ship)
+    return {"words": scripts.lateen_practice_words(ship, practice), **practice}
+
+
+REGISTRY.add(
+    Reading(
+        "lateen_practice",
+        ("the lateen practice",),
+        "query",
+        "",
+        _lateen_practice,
+        description="the ship's practice for her whole lateens in going about: each yard "
+        "shifted round its mast or left on it, in stays and in wearing",
+        none_words=_no_lateen_words,
+    )
+)
+
+
+def idle_lateen_rows(world: Any) -> set[str]:
+    """The practice's row, left out of a sample where she carries no whole lateen (package 90;
+    the lead's nudge 46, item 6: "no whole lateen aboard" was in every station's sample on all
+    eighteen ships, a seat paying for it on every reading and learning nothing). Read by
+    `action_readings.idle_rows`, as the practice and resupply's own rows are. The readings tool
+    keeps it on every ship: every reading is named in the primer (`tests/test_grammar_book.py`)
+    and the tool's own tests read every registry row."""
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = getattr(world, "ship", None)
+    return set() if ship is not None and scripts.has_whole_lateen(ship) else {"lateen_practice"}
+
 
 # ---------------------------------------------------------------------------
 # Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the

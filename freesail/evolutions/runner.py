@@ -100,6 +100,7 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
+    HANDED_ON,
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
@@ -221,6 +222,16 @@ def part_name(ship: Ship, part_id: str) -> str:
     if len(words) > 1 and words[-1] in _SIDES:
         words = [words[-1], *words[:-1]]
     return " ".join(words)
+
+
+def _whole_lateen_on_the_mast(ship: Ship, sail: Sail) -> bool:
+    """A whole lateen (a lateen with `dipping`, not cut at the mast) whose yard hangs on the
+    weather side of its mast as the deck reads the wind (package 90, A1a): the runner's
+    `against_the_mast` for it alone."""
+    if sail.cls != "lateen" or not sail.dipping or sail.cut_at_mast or sail.lug_side is None:
+        return False
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    return sail.lug_side != lee
 
 
 class _SafeDict(dict):
@@ -579,15 +590,48 @@ class Runner:
             if isinstance(inst.subject, Sail):
                 entry["state"] = inst.subject.state.value
                 entry["reefs"] = inst.subject.reefs
+            handed: list[tuple[str, str, dict[str, Any]]] = []
             if inst.script is not None and not inst.waiting:
                 inst.script.belayed()  # package 37k: the capstan's pawl let go
+                # package 90: the lateens' change in hand, at no lighter a rate than the
+                # manoeuvre's own at the belay
+                aloft = getattr(inst.script, "aloft", False)
+                handed = inst.script.handed_on(self._last_factor * self._crew_factor(inst, aloft))
             self._remove(ship, inst)
+            for evolution_id, subject_id, params in handed:
+                self._hand_on(ship, evolution_id, subject_id, params)
             key = inst.params.get("log_group")
             if key:
                 self._group_done(ship, inst, key)  # the braces of a trim already done
             self._after_all_hands(ship, inst)
             out.append(entry)
         return out
+
+    def _hand_on(
+        self, ship: Ship, evolution_id: str, subject_id: str, params: dict[str, Any]
+    ) -> None:
+        """Work a belay hands on (`Script.handed_on`; package 90, the lead's nudge 48, item 1: a
+        whole lateen's change begun when a manoeuvre is belayed is finished in its time): begun
+        at once on the hands the belay leaves up, as work in hand, without the preconditions of
+        its beginning (its yards are in their gear already) and without its first line (the
+        belay's line says it is in hand). Waiting for hands, it begins when they come, its
+        preconditions unread as now (`_start_waiting`)."""
+        evo = registry.get(evolution_id)
+        if evo is None or evo.script is None or evo.script not in SCRIPTS:
+            return
+        subject, sid = self._resolve_subject(ship, subject_id)
+        merged = dict(evo.params)
+        merged.update(params)
+        inst = Instance(evo=evo, subject=subject, subject_id=sid, params=merged)
+        self._counter += 1
+        inst.order = self._counter
+        inst.given = self._giving
+        inst.script = SCRIPTS[evo.script](ship, merged, self._timing(ship, evo))
+        inst.holds = self._holds(ship, inst)
+        if self._crew(ship) is not None:
+            inst.want = hands.CrewRequest.from_mapping(self._crew_line(ship, evo))
+        self.instances.append(inst)
+        self._begin(ship, inst)
 
     def _left_words(self, ship: Ship, inst: Instance) -> str:
         """How a piece of work is left when it is belayed, in words for the log."""
@@ -601,7 +645,9 @@ class Runner:
         if isinstance(subject, Ship):
             phase = inst.script.phase.replace("_", " ") if inst.script is not None else ""
             at = f" at {phase}" if phase and phase not in ("ready", "done") else ""
-            return f"the helm and the yards left as they stand{at}"
+            # the yards a manoeuvre changes round their masts, named (package 90, nudge 46)
+            also = inst.script.changes_left_words() if inst.script is not None else ""
+            return f"the helm and the yards left as they stand{at}{'; ' + also if also else ''}"
         name = part_name(ship, inst.subject_id)
         if isinstance(subject, Sail):
             return f"the {name} left {_SAIL_LEFT.get(subject.state, subject.describe_state())}"
@@ -933,7 +979,8 @@ class Runner:
         inst.step_index = -1
         if inst.script is not None:
             inst.script.begin(self._format_context(inst))
-            self._note(ship, inst, inst.evo.on_start)
+            if not inst.params.get(HANDED_ON):  # handed on by a belay, whose line says it
+                self._note(ship, inst, inst.evo.on_start)
             return True
         if not inst.params.get("log_group"):  # the order's own line said it for the group
             self._note(ship, inst, inst.evo.on_start)
@@ -1092,7 +1139,9 @@ class Runner:
             )
             if busy:
                 continue
-            reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
+            # work a belay handed on is begun already: its beginning's conditions are not read
+            conditions = [] if inst.params.get(HANDED_ON) else inst.evo.preconditions
+            reason = self._failing_condition(ship, inst, conditions + inst.evo.requires)
             if reason is not None:
                 if inst.done_already:
                     self._done_already(ship, inst, reason)
@@ -2005,6 +2054,11 @@ class Runner:
             ctx["reefs"] = subject.reefs
             ctx["reef_bands"] = subject.reef_bands
             ctx["parted"] = self._parted_gear(ship, subject)
+            # a whole lateen set on the weather side of its mast (package 90, A1a: its yard keeps
+            # the side it hangs on), for `set_lateen`'s line; nothing for any other sail
+            ctx["on_the_mast"] = (
+                "; it lies on the mast" if _whole_lateen_on_the_mast(ship, subject) else ""
+            )
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
         if inst.evo.id == "get_under_way":
