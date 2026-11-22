@@ -878,3 +878,173 @@ settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; al
    it.
 
 **Next:** `…/pkg-90-a1ab` merged again into `…/pkg-90-engine`, as before.
+
+## A1c's hash (nudge 49): the five that ride it, the work handed on in its place and on its hands, and the end where a course was given (2026-11-22)
+
+**Merged first:** nothing. `…/pkg-90-a1c` is cut from `…/pkg-90` at **b3c68af4**: A1c and A3's
+lists on the third pass, the trunk at 7a1bd65e merged in, and 7173281 (the third pass's tiers)
+with them. No merge is made on it, so **no line is resolved by hand**. Every changed line is this
+pass's own, in the files below. **The base** of the tiers' comparison is b3c68af4, its two tiers
+run here on its own worktree. "Old" in the words below is b3c68af4.
+
+**Commits:** this pass is one commit, which carries this section with its code. **The fast and
+the slow tier run on that exact commit**, whose hash is the one sent. Their results follow in a
+commit after it that touches this report alone. It is said plainly here.
+
+**Files** (my row's; none widened):
+- `freesail/evolutions/runner.py`:
+  - `_hand_on`: the manoeuvre's place (`order`, `given`) and its hands (`assignment`, its hands'
+    `at`, `want`, `all_hands`, `held_up`), the work begun at once;
+  - the belay's hand-on before the manoeuvre is removed;
+  - `_begin` and `_start_waiting`: the third pass's two skips for work handed on taken out, each
+    line as on the trunk before it;
+  - `_describe`: the parts a script names (`Script.parts_named`);
+  - `HANDED_ON` no longer imported.
+- `freesail/evolutions/scripts.py`:
+  - `Script.parts_named`, and `ChangeLateenScript.parts_named` (the yards handed on);
+  - `TackScript._how_she_lies_words(wind, aim, to_it)`, read in `_to_the_course` and at
+    `_pay_off`'s end, and `words` leaving out the course's clause where she lies otherwise.
+- `tests/test_lateen_whole.py`: "The five that ride A1c's hash", 22 cases; no pin of before moved.
+- `docs/dev/TuningNotes.md`: "Package 90, the five that ride A1c's hash".
+
+**Form:**
+- No class and no field is added: a method on `Script`, one on `ChangeLateenScript`, and a
+  parameter. So truth 7-606 and the checkpoint's list are not touched, and a save from before
+  loads.
+- No key is written into a committed file, and no ship file moves (`python tools/gen_ships.py
+  <scratch>`: 18 of 18 byte for byte).
+- LF; `ruff check` and `ruff format --check` clean; no Python line over 100. Nothing under
+  `docs/agents/consent/`.
+
+### The five, each with its proof
+
+Each proof is in `tests/test_lateen_whole.py`. Each fails when its mend is undone: the session's
+scratch `n49/mutate49.py`, ten mutations, each failing its pins.
+
+1. **An order waiting behind a manoeuvre waits behind the work handed on.** The work keeps the
+   manoeuvre's place in the order of work. Measured on the xebec probe, seed 7, the order given
+   mid-change in a tack and then "belay tacking ship":
+   - "take in the mainsail": old, "The mainsail is in the gear; there is nothing to take in." the
+     next tick, the take in dropped and all three lateens set; new, it waits and "Took in the
+     mainsail; brailed up to its yard." follows the last shift, as after a plain tack.
+   - "take in all sail": old, the three lateens' take in dropped alike; new, the five sails taken
+     in after the shift.
+   - "shift the mainsail": old, "Could not shift the mainsail: The mainsail is in the gear; ...";
+     new, "The mainsail lies to leeward of its mast already.", as after a plain tack.
+
+   Proof: `test_an_order_waiting_behind_a_belayed_manoeuvre_waits_behind_the_work_handed_on`,
+   the three orders (a later number given back, the three fail).
+2. **The end's line where a course was given** is held to her state as the plain order's is, on
+   any hull that carries a whole lateen. "Full and by" is read against her close-hauled angle,
+   "the course ordered" against the course, and "trimmed for the course ordered" against the
+   course she paid off to, each within 10°. Where she lies otherwise the course's clause is not
+   said, and the line says how she lies. Measured, seed 7 (`n49/r2.py`), old and new:
+   - the polacre probe, her jibs furled, `steer north-east`: old "Tacked; braced up on the
+     larboard tack, heading NE (49°), full and by."; new "..., heading NE (49°), but she has not
+     paid off: she lies 49° off the wind with no way on her.";
+   - the same, `steer east-north-east`: old "..., the course ordered.", 19° short of it; new as
+     above;
+   - the same, `steer east`: old "Tacked; braced up for the course ordered on the larboard tack,
+     heading NE (49°)." with 0.9 kn of sternway; new "..., but she has not paid off to it: she
+     lies 49° off the wind with a knot of sternway.";
+   - the xebec probe, her mizen furled, `steer north-east` and `steer east-north-east`: old
+     "Tacked; trimmed on the larboard tack, heading E (94°), full and by." and "..., the course
+     ordered."; new "..., but she has fallen off: she lies 94° off the wind with three knots of
+     way.";
+   - the same, `steer east`, on her course: "Tacked; trimmed for the course ordered on the
+     larboard tack, heading E (93°).", old and new.
+
+   Proofs: `test_the_tacks_end_where_a_course_was_given_says_how_she_lies` (the five above),
+   `test_the_tacks_end_on_the_course_ordered_is_said_as_before`, and
+   `test_the_course_ordered_is_read_against_the_course_not_full_and_by`. The last is at the
+   tack's own door. No end in play lies between the two measures of a course steered as she
+   lies (within half a point of close-hauled), and the mutation "read against full and by"
+   passed every test in play. Her head 12° past full and by is 7° past a course 5° free of it,
+   and is on it.
+3. **Three rules no test held, each pinned:**
+   - **A casualty in the work handed on:** `test_a_casualty_in_the_work_handed_on_ends_it_in_true_words`
+     (the mainsail, the last yard, blown out, its jeers, sheet or tack parted, its yard carried
+     away: the work ends in the file's words, the others finished) and
+     `test_a_casualty_to_a_yard_not_the_last_is_said_and_the_rest_are_finished` (the mizen blown
+     out, said, the foresail and the mainsail finished).
+   - **The side's words where a yard ends to windward,** with the ruling:
+     `test_a_wear_belayed_with_the_wind_aft_finishes_its_yards_and_says_where_they_lie`. Brought
+     back to her old tack (`steer west-north-west`), each yard is finished to the side it was going,
+     now the weather side: "Shifted the mainsail; it lies on the mast, to windward.". Left to go
+     on, each stands to leeward.
+   - **The work handed on made to wait: the branch is taken out.** With item 4 the work takes
+     the manoeuvre's hands and begins at once, so nothing reaches it. `_start_waiting`'s skip of
+     its preconditions and `_begin`'s skip of its first line are gone, each line as on the trunk
+     before the third pass. On the trunk at 55b9658e, too, the work asked for all hands just after
+     the belay had let the manoeuvre's go, and an all-hands request is too few only with no idle
+     hand in its pool. The pin (item 4's test): it is never waiting, in the manoeuvre's place, on
+     the very hands the manoeuvre had. Given its own request again, the pin fails.
+4. **The work handed on takes the hands the manoeuvre had,** with its request and its call, and
+   is named of every yard it still shifts ("shifting the mainsail and the foresail and the
+   mizen").
+   - On the polacre probe's fill away from hove to, her fore lateen to windward, belayed
+     mid-change: old, "All hands! (to shift the foresail)" at the belay, and 70 hands; new, the
+     fill away's twelve and no call, the foresail set at the same tick, 1489.
+   - On the xebec's tack: the tack's 92 hands, all hands, piped down as the last yard is set.
+     "take in the jib" given then waits with "...; the watch is shifting the mainsail and the
+     foresail and the mizen.".
+   - The six probes' times from the order until the lateens draw on the new side, plain and
+     belayed (`n46/r48b.py`), are the third pass's, each to the second, old and new: the xebec's
+     tack 248 and 248, the tartane's 262 and 263, the polacre's 292 and 292, her box-haul 435 and
+     436, the xebec's wear 258 and 259, the polacre's fill away 187 and 190.
+
+   Proof: `test_the_work_handed_on_takes_the_manoeuvres_hands_and_is_named_of_its_yards`, the
+   tack and the fill away. Given its own request, or named of one yard, it fails.
+5. **Read, not reached: `_try_resume` fails held work without handing on.** It is not reached by
+   a manoeuvre with a change in hand, and so is left as it stands.
+   - Work is held only by a manoeuvre's belay of the step-list work in hand (scripted work is not
+     held: `_call_all_hands`) and by a post's leaving work they hold (`_post_off`).
+   - No post is counted a hand of a manoeuvre, nor of any work while one is in hand
+     (`_working_posts`). Every manoeuvre that makes a lateen change is a helm manoeuvre: the tack,
+     the wear, the fill away, the box-haul and boxing her off.
+   - A save is refused while a manoeuvre's change is in hand (the second pass's pin,
+     `test_the_change_is_built_only_when_a_lateen_is_to_be_shifted`), so none comes back held.
+
+   Proof: `test_no_post_is_counted_for_a_manoeuvre_so_none_with_a_change_is_held`. The polacre's
+   master heads the watch on deck, and the watch is counted too few. The master is counted for a
+   numbered take in, but not for the fill away nor while it is in hand. Gone below mid-change, the
+   fill away goes on, never held, and its yard is shifted. With the manoeuvre rule undone in
+   `_working_posts`, it fails.
+
+### Ruled, nothing to build
+
+- **The lugger's lugs at the belay**, the third declared line: its extent as measured by the
+  lead's reader is written into TuningNotes. It is 180 of 1,420 belays (the tack 68, putting her
+  about 68, the wear 44), at steady 92, come to 44, helm down 32 and mainsail haul 12.
+- A wear belayed with the wind aft and brought back to her old tack, its yards finished to
+  windward and said: allowed as built, pinned under item 3.
+- The second pass's unsure 2 (saves): allowed as built. The readings tool's full list: allowed.
+
+### Measured: today's ships
+
+- **A2's harness** (270 runs) and **the wind-shift runs** (`n46/windshift.py`, 108) on this tree,
+  beside b3c68af4's: running beside this commit; their result follows in the next commit, which touches
+  this report alone.
+- Every changed road is read only on a hull that carries a whole lateen, or only by the work a
+  belay hands on, which only a whole lateen's change makes.
+
+### The test sets run, with counts, and the base comparison
+
+The fast and the slow tier whole run on this commit now, and on b3c68af4 for the base. Their
+results follow in the next commit, which touches this report alone.
+
+**The lens of the touched files** (32 files, `-n 2`) runs beside the tiers; its count follows
+with theirs. Before the commit, `tests/test_lateen_whole.py` whole: 205 passed.
+
+### Unsure, and for the lead
+
+1. **"belay that" just after a manoeuvre is belayed** now finds what was given after it, before
+   the work handed on, because the work keeps the manoeuvre's place. With nothing given after,
+   it finds the work handed on, as before.
+2. **The belay of the work handed on** names every yard it still shifts, so its line says them
+   twice. On the xebec, 120 s after the tack is belayed with the mizen shifted: "Belayed shifting
+   the mainsail and the foresail; the mainsail and the foresail in their gear, their yards not yet
+   shifted round their masts." (old, "Belayed shifting the mainsail; ..."). It is true, and the
+   work's one name, but long.
+
+**Next:** the tiers, then `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.

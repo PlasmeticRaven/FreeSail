@@ -1686,6 +1686,13 @@ class Script:
         package 90, A3)."""
         return self.work_of(self.ship)
 
+    def parts_named(self) -> str | None:
+        """The parts the work is named of, where they are more than its subject: "the mainsail
+        and the foresail and the mizen", read by the one road for a work's name
+        (`Runner._describe`) after its verb. None, the subject alone: every script but the shift
+        a belay handed on (`ChangeLateenScript`; package 90, the lead's nudge 49, item 4)."""
+        return None
+
     @classmethod
     def work_of(cls, ship: Ship) -> str | None:
         """`work` for a ship before the work is begun, with no instance of it: what a line names
@@ -2558,21 +2565,28 @@ class TackScript(Script):
         rel = wind_rel(self.ship, wind)
         return -self.sign * rel >= ch - units.deg_to_rad(LATEEN_PAID_OFF_DEG)
 
-    def _how_she_lies_words(self, wind: Wind, ch: float) -> str:
+    def _how_she_lies_words(self, wind: Wind, aim: float, to_it: bool = False) -> str:
         """The end's words on a hull that carries a whole lateen, set or not (the lead's nudge 48,
         item 5: the end's line says what she is): ', but she has not paid off: ...' where her
-        head is short of full and by on the new board by more than `LATEEN_PAID_OFF_DEG`, and ',
-        but she has fallen off: ...' where it is past it by more; "" within it, and on every other
-        hull, whose end is as it was. Before, only a rig of whole lateens alone was read, and the
-        polacre probe with her jibs furled ended "braced up" forty degrees off with sternway."""
+        head is short of `aim` (her angle off the wind the line claims: full and by on the new
+        board, or the course ordered) by more than `LATEEN_PAID_OFF_DEG`, and ', but she has
+        fallen off: ...' where it is past it by more; "" within it, and on every other hull, whose
+        end is as it was. `to_it`, after "trimmed for the course ordered": '... not paid off to
+        it', '... fallen off past it'. Before, only a rig of whole lateens alone was read, and the
+        polacre probe with her jibs furled ended "braced up" forty degrees off with sternway; and
+        before the lead's nudge 49, item 2, an end with a course given was not read at all."""
         if not has_whole_lateen(self.ship):
             return ""
         rel = -self.sign * wind_rel(self.ship, wind)
         margin = units.deg_to_rad(LATEEN_PAID_OFF_DEG)
-        if rel < ch - margin:
-            return self._not_paid_off_words(wind)
-        if rel > ch + margin:
-            return self._not_paid_off_words(wind, "but she has fallen off")
+        if rel < aim - margin:
+            return self._not_paid_off_words(
+                wind, "but she has not paid off to it" if to_it else "but she has not paid off"
+            )
+        if rel > aim + margin:
+            return self._not_paid_off_words(
+                wind, "but she has fallen off past it" if to_it else "but she has fallen off"
+            )
         return ""
 
     def _not_paid_off_words(self, wind: Wind, how: str = "but she has not paid off") -> str:
@@ -2610,6 +2624,13 @@ class TackScript(Script):
         ch = close_hauled_true_angle(self.ship)
         if full_and_by or self.steer.off(wind.direction_from, new_sign) <= ch + 0.5 * POINT:
             _end_on_course(self.ship, self.steer, heading, full_and_by)
+            # the end's line held to her state on a hull with a whole lateen, as the plain
+            # order's is (the lead's nudge 49, item 2): "full and by" read against her
+            # close-hauled angle, "the course ordered" against the course
+            aim = ch if full_and_by else self.steer.off(wind.direction_from, new_sign)
+            lies = self._how_she_lies_words(wind, aim)
+            if lies:
+                self.not_paid_off = lies
             self.finish()
             return
         dyn = self.ship.dyn
@@ -2633,12 +2654,17 @@ class TackScript(Script):
         self.retrim_in -= dt
         if self.paying is not None and self.paying.advance(dt, factor):
             self.paying = None
+        on_course = new_sign * units.wrap_pi(wind.direction_from - self.new_course)
         if self.last_trim:
             if self.paying is None:
+                # trimmed for the course ordered: on a hull with a whole lateen the line says
+                # where she lies if she is not on it (the lead's nudge 49, item 2)
+                lies = self._how_she_lies_words(wind, on_course, to_it=True)
+                if lies:
+                    self.not_paid_off = lies
                 self.finish()
             return
         ch = close_hauled_true_angle(ship)
-        on_course = new_sign * units.wrap_pi(wind.direction_from - self.new_course)
         now = new_sign * wind_rel(ship, wind)
         there = now >= on_course - 0.5 * POINT
         late = self.pay_t >= self.timing_value("pay_off_timeout_s", 240.0)
@@ -2821,6 +2847,10 @@ class TackScript(Script):
             # not "full and by" of a ship that has not paid off (the lead's nudge 46, item 7):
             # she is through the wind on the new tack, and the line says how she lies
             said["braced"] = "through the wind"
+        if self.not_paid_off and steer.course is not None:
+            # nor ", full and by" nor ", the course ordered" after a course given, where she
+            # lies otherwise (the lead's nudge 49, item 2): the line says how she lies
+            said["course_words"] = ""
         return {
             "old_tack": old,
             "new_tack": new,
@@ -10730,6 +10760,16 @@ class ChangeLateenScript(Script):
         if any(sp.wrecked for sp in self.ship.spar_chain(sail)):
             return f"the {name}'s yard or mast is wrecked"
         return None
+
+    def parts_named(self) -> str | None:
+        """The yards a belay handed on and still in hand, named all, so that the work is "shifting
+        the mainsail and the foresail and the mizen" wherever it is named: the work the hands
+        are at, the belay of it, the call (the lead's nudge 49, item 4: before, "the watch is
+        shifting the mainsail" was said of three yards). None for the shift by itself."""
+        handed = self.handed if self.handed is not None else self.params.get(HANDED_ON)
+        if not isinstance(handed, dict) or not handed:
+            return None
+        return names_of_sails(self.ship, [self.ship.sails[i] for i in handed])
 
     def holds(self) -> set[str]:
         held = {self.sail_id} if self.sail_id else set()
