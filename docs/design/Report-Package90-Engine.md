@@ -589,3 +589,172 @@ and TuningNotes (each both sides' sections appended, kept whole). Each will be r
 rules and named line by line in that merge's section, with `ruff check` before its tiers.
 
 Stopped after the second pass, as briefed: the merge into the engine follows.
+
+## Steps A1a and A1b's third pass (nudge 48): the yard finished in its time, and the end that says what she is (2026-11-22)
+
+**Merged first:** nothing. On `…/pkg-90-a1ab` above **2e1e19b**, with no merge, as the
+coordinating session asked. **The base** of the tiers' comparison is 0d5d2c56, as for the second
+pass (its two tiers' junits), and 2e1e19b's tiers (75abacd's tree) are set beside it. "Old" in
+the words below is the second pass unless said.
+
+**Commits:** this pass is one commit, which carries this section with its code. **The fast and
+the slow tier run on that exact commit**, whose hash is the one sent. Their results follow in a
+commit after it that touches this report alone, as the lead's reminder allows when it is said
+plainly. It is said plainly here.
+
+**Which lines were resolved or changed by hand:** no merge is made in this pass, so no line is
+resolved by hand. Every changed line is this pass's own, in the files below.
+
+**Files** (my row's, and three widened):
+- `freesail/evolutions/scripts.py`:
+  - `_how_it_went` and `lateen_shift_befallen` (the mast named, "shot away", a sheet or a tack
+    parted);
+  - `LateenChange`'s `factor`, `handed`, `belay_words` and `belay`;
+  - `Script.handed_on`, and `changes_left_words` with the lugger's lugs;
+  - `HANDED_ON`;
+  - `ChangeLateenScript`'s handed-on work (`handed`, `said_id`, `holds`, `begin`, `_tick_handed`,
+    `_set_on_its_side`, `_lies`, `remaining_s`, `left_words`, `words`);
+  - `lateen_plan_words` (the clause's lateens not set, "the lateens"), and the clause said with
+    every lateen taken in, in the tack and the wear;
+  - `TackScript._how_she_lies_words`, `_not_paid_off_words`'s `how`, `_jibs` and `_boom_names`,
+    and the tack's head-sheet words;
+- `freesail/evolutions/runner.py`: `_hand_on`; the belay's hand-on; `_begin` with no first line
+  for work handed on; `_start_waiting` reading no beginning's conditions for it;
+- `freesail/orders/grammar.py`: `_no_sail_before_the_occasion`;
+- `data/evolutions/change_lateen.yaml`: its last line, `{it_stands}`;
+- **`freesail/world/knowledge.py`'s `rows_elsewhere(senses, world=None)`, and its two callers,
+  `freesail/agents/harness.py`'s `_readings_elsewhere` and `freesail/api/queries.py`'s
+  `knowledge_block`, one argument each: the three widened by nudge 48's item 3** (allowed by the
+  coordinating session, its answer to e1b5671's question);
+- `tests/test_lateen_whole.py` ("The third pass", and the second pass's tests where the rule
+  moved); `docs/dev/TuningNotes.md`: "Package 90, A1a and A1b's third pass".
+
+**Form:**
+- No class is added (methods, functions and a constant), so truth 7-606 and the checkpoint's
+  list are not touched.
+- The new fields are plain dicts and floats, with class defaults on `ChangeLateenScript`, so a
+  save from before loads.
+- No key is written into a committed file, and no ship file moves (`python tools/gen_ships.py
+  <scratch>`: 18 of 18 byte for byte).
+- LF; `ruff check` and `ruff format --check` clean; no Python line over 100. Nothing under
+  `docs/agents/consent/`.
+
+### The six items, each with its proof
+
+Each proof is in `tests/test_lateen_whole.py`. Each fails when its mend is undone: the session's
+scratch `n46/mutate48.py`, sixteen mutations, each failing its pins, among them the lead's two
+survivors ("no way of way", the two-thirds made 0.9). The second pass's thirteen
+(`n46/mutate.py`), run again on this tree, each still fail theirs.
+
+1. **A yard begun is finished in its time.**
+   - At the belay the manoeuvre ends as before. Each yard whose change is begun goes on as work in
+     hand: one `change_lateen`, its subject the longest yard.
+   - The runner begins it without the preconditions of its beginning, the yards being in their
+     gear, and without its first line.
+   - It is worked for the seconds each yard had left, at no lighter a rate than the manoeuvre's own
+     at the belay (the runner's factor for it then). Each yard is said when it is set.
+   - The yards waiting are left on their masts and said, as before.
+   - The belay's line: "...; the mainsail and the foresail and the mizen, their change begun, still
+     being shifted round to the starboard side."
+   - Belayed in its turn, the work handed on is a shift by itself, "... in their gear, their yards
+     not yet shifted round their masts" (allowed as built).
+
+   Measured, seed 7, the seconds from the order until every lateen draws on its new side, plain
+   beside belayed as the change begins: the xebec's tack 248 beside 248 (the second pass, 44); the
+   tartane's 262 beside 263 (80); the polacre's 292 beside 292 (105); her box-haul 435 beside 436
+   (246); the xebec's wear 258 beside 259 (55); the polacre's fill away 187 beside 190 (1). At
+   0d5d2c56 none of the six belayed drew in 2,400 s. **Pinned:** a belayed going about is never
+   sooner on the new hand than the plain one, on all six; and again with the handed-on work's own
+   hands made to work at half the manoeuvre's factor, which only the rate holds.
+
+   A floor in seconds was built beside the rate first. The mutations showed it to be the rate's
+   twin: undoing either alone, the other held. It is gone, and the rate alone keeps the time.
+2. **A sheet or a tack parted mid-shift:** "Could not shift the mainsail: the main lateen sheet
+   parted while it was being shifted; the sail hangs in its gear, not set, till its sheet is rove
+   afresh." (the tack's alike), by itself and in stays. Before, it ended "Shifted ..." set and
+   drawing fully. Proofs: the casualty tests, two cases each more.
+3. **The rows not to be had**, counted where they are hers. On the eighteen, from six places, at
+   both doors (the stations' line and the player's `knowledge_block`), 2a19e8f beside the mended
+   tree: all 216 lines the same, byte for byte. At 0d5d2c56, 180 had read "19 more" for "18
+   more". On the xebec probe the row is still counted. Proofs: one test for each of the eighteen,
+   and the probe's.
+4. **`leave` on a lateen hull:** "leave in stays" and "leave port in stays" are answered "Leave
+   what in stays? Her practice is said of the lateens together: 'leave the lateens in stays'."
+   ("Shift what in wearing? ..." alike). Before, "There is no such part as the in stays in this
+   ship; did you mean the main staysail ...".
+5. **The words:**
+   - With every lateen taken in, the clause is said ("...; the mizen is not set and is let be.";
+     "the lateens are not set and are let be"), in the tack and the wear.
+   - "ordered shifted, is not set" is now "is not set and is let be".
+   - **The end's line says what she is**, on any hull with a whole lateen:
+     - the polacre with her jibs furled: "Tacked; braced up on the larboard tack, heading NE
+       (46°), but she has not paid off: she lies 46° off the wind with a knot of sternway.";
+     - the tartane with hers furled, the same at 39°;
+     - the xebec with her mizen furled: "Tacked; through the wind on the larboard tack, heading
+       E (95°), but she has fallen off: she lies 95° off the wind with three knots of way." (it
+       was "full and by").
+   - **The mast named where it went**, "carried away" or "shot away" as the strain's own line has
+     it.
+   - **"Draw jib" with the jibs furled is the lateens' road** and is mended, not listed: the
+     polacre's fore lateen was counted among the head sheets (A1b). It is now "ease off the
+     foresail sheet" and "Draw the foresail; trim aft its sheet."; on today's ships the head sheets
+     are the set jibs alone, as at the trunk.
+6. **Two pins:** "with no way on her", at the words' own door; and the two-thirds against
+   `2.0 / 3.0` itself.
+
+### Ruled, declared
+
+- **The bilander's belay line:** its true extent, by the lead's reader, is all sixty runs with the
+  settee lowered at the belay (the tack, putting her about, the wear, the wear short round, the
+  box-haul, boxing her off), each differing by that suffix alone.
+- **The lugger's lugs at the same belay**, the third move on a committed ship, declared:
+  - old, "Belayed tacking ship; the helm and the yards left as they stand at helm down.";
+  - new, "...; the foresail and the mainsail lowered, not yet dipped." (the wear alike, at "come
+    to");
+  - words alone: her lugs are in their gear ten minutes on at both.
+- **"lateen practice" typed on a ship with none** answers "The lateen practice: no whole lateen
+  aboard.", declared: 36 answers in the reader's sweep, the only one on the eighteen that differs.
+- **Unsure 3** (two lines for one casualty in stays): allowed.
+- **The lugger's bow watch**, by the reader: 72 of 672 wind-shift runs, hers alone, the line 3 s
+  after the shift, her trace identical.
+
+### Measured: today's ships
+
+- **A2's harness** (270 runs) on this tree: byte for byte as at 0d5d2c56.
+- **The wind-shift runs** (`n46/windshift.py`, 108): byte for byte as at 0d5d2c56.
+- **The lens of the touched files**, `-n 2`: 1,906 passed, 1 skipped, 1 xfailed. It ran over
+  `test_lateen_whole`, `test_settee`, `test_bilander`, `test_lug`, `test_hull_lugger`,
+  `test_standing`, `test_orders`, `test_held_work`, `test_evolutions`, `test_catalogue`,
+  `test_probes_90`, `test_grammar_book`, `test_practice_orders`, `test_mends_75`, `test_lateen`,
+  `test_agents`, `test_practice`, `test_knowledge`, `test_agent_api`, `test_readings` and
+  `test_checkpoint`.
+
+### Moved, old beside new, with reason
+
+The second pass's own pins, where the rule moved:
+1. Its three belay tests: from "..., their change begun, shifted round to the starboard side.",
+   every yard set at the belay, to "..., still being shifted round ...", the yards set and said in
+   their time.
+2. `test_the_clause_names_a_lateen_not_set_and_the_lateens_are_all_she_carries`: "the mizen,
+   ordered left, is not set." to "the mizen is not set and is let be.".
+3. `test_a_whole_lateen_on_the_bad_hand_draws_two_thirds_of_its_cloth`: from the constant to
+   `2.0 / 3.0`.
+
+`change_lateen.yaml`'s last line reads "Shifted the {sail}; {it_stands}.", the same words where it
+stands to leeward.
+
+### The test sets run, with counts, and the base comparison
+
+The fast and the slow tier whole run on this commit now. Their results follow in the next
+commit, which touches this report alone.
+
+### Unsure, and for the lead
+
+1. **The work handed on calls all hands** ("All hands! (to shift the foresail)") where the
+   manoeuvre had the watch (the fill away): it is the shift by itself's own file (`hands: all`),
+   and its rate is never lighter than the manoeuvre's.
+2. **A save taken while the work handed on is in hand** loads: the work is a `change_lateen` with
+   plain fields. A save while the manoeuvre's change is in hand is refused, as the second pass had
+   it.
+
+**Next:** the tiers, then `…/pkg-90-a1ab` merged again into `…/pkg-90-engine`, as before.
