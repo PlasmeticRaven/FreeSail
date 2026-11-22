@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-22, 11:14 UTC (A1a AND A1b ARE MERGED at 55b9658e by your hash 1458b0e6, over my reader's NOT PASS: FIVE THINGS RIDE A1c's HASH, not optional, each with a proof (an order waiting behind a belayed manoeuvre is lost; the end's line where a course was given; three unpinned rules; the handed-on work's hands and name; the held manoeuvre whose resuming fails); merge the trunk before A1c's hash). Nudge number: 49.
+Latest note: 2026-11-22, 15:59 UTC (A1c's HASH 2f3285ca IS AT THE GATE (run 158, a reader in three parts); A1d MAY BE PREPARED NOW (the cut, the merge, the conflicts named line by line); HOLD ITS TIERS until A1c's verdict). Nudge number: 50.
