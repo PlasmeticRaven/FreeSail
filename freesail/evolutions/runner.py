@@ -100,7 +100,6 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
-    HANDED_ON,
     HELM_MANOEUVRES,
     SCRIPTS,
     Script,
@@ -597,9 +596,9 @@ class Runner:
                 # manoeuvre's own at the belay
                 aloft = getattr(inst.script, "aloft", False)
                 handed = inst.script.handed_on(self._last_factor * self._crew_factor(inst, aloft))
-            self._remove(ship, inst)
             for evolution_id, subject_id, params in handed:
-                self._hand_on(ship, evolution_id, subject_id, params)
+                self._hand_on(ship, inst, evolution_id, subject_id, params)
+            self._remove(ship, inst)
             key = inst.params.get("log_group")
             if key:
                 self._group_done(ship, inst, key)  # the braces of a trim already done
@@ -608,14 +607,26 @@ class Runner:
         return out
 
     def _hand_on(
-        self, ship: Ship, evolution_id: str, subject_id: str, params: dict[str, Any]
+        self,
+        ship: Ship,
+        manoeuvre: Instance,
+        evolution_id: str,
+        subject_id: str,
+        params: dict[str, Any],
     ) -> None:
         """Work a belay hands on (`Script.handed_on`; package 90, the lead's nudge 48, item 1: a
         whole lateen's change begun when a manoeuvre is belayed is finished in its time): begun
-        at once on the hands the belay leaves up, as work in hand, without the preconditions of
-        its beginning (its yards are in their gear already) and without its first line (the
-        belay's line says it is in hand). Waiting for hands, it begins when they come, its
-        preconditions unread as now (`_start_waiting`)."""
+        at once, as work in hand, without the preconditions of its beginning (its yards are in
+        their gear already) and without its first line (the belay's line says it is in hand).
+        Called before the manoeuvre is removed, it takes the manoeuvre's place in the order of work
+        (`Instance.order`, `given`), so that what waited behind the manoeuvre waits behind it (the
+        lead's nudge 49, item 1: given a later number, "take in the mainsail" waiting its turn
+        began at once against a yard in its gear, "there is nothing to take in", and was
+        dropped); and the hands the manoeuvre had, its request and its call (`assignment`,
+        `want`, `all_hands`, `held_up`), so that the watch that was shifting the yards finishes
+        them and all hands up for the manoeuvre stay up for them and are piped down when they are
+        done (item 4: before, a fill-away belayed called "All hands! (to shift the mainsail)"
+        for work the watch was doing). So it never waits for hands nor its turn."""
         evo = registry.get(evolution_id)
         if evo is None or evo.script is None or evo.script not in SCRIPTS:
             return
@@ -623,15 +634,25 @@ class Runner:
         merged = dict(evo.params)
         merged.update(params)
         inst = Instance(evo=evo, subject=subject, subject_id=sid, params=merged)
-        self._counter += 1
-        inst.order = self._counter
-        inst.given = self._giving
+        inst.order = manoeuvre.order
+        inst.given = manoeuvre.given
         inst.script = SCRIPTS[evo.script](ship, merged, self._timing(ship, evo))
         inst.holds = self._holds(ship, inst)
-        if self._crew(ship) is not None:
-            inst.want = hands.CrewRequest.from_mapping(self._crew_line(ship, evo))
+        inst.want = manoeuvre.want
+        inst.all_hands = manoeuvre.all_hands
+        inst.held_up = manoeuvre.held_up
+        got = manoeuvre.assignment
+        if got is not None:
+            got.inst_id = inst.inst_id
+            for s in got.hands:
+                s.at = inst.inst_id
+            inst.assignment = got
+            manoeuvre.assignment = None  # the manoeuvre's removal lets none of them go
+        inst.waiting = False
+        inst.waiting_for = None
+        inst.step_index = -1
         self.instances.append(inst)
-        self._begin(ship, inst)
+        inst.script.begin(self._format_context(inst))
 
     def _left_words(self, ship: Ship, inst: Instance) -> str:
         """How a piece of work is left when it is belayed, in words for the log."""
@@ -979,8 +1000,7 @@ class Runner:
         inst.step_index = -1
         if inst.script is not None:
             inst.script.begin(self._format_context(inst))
-            if not inst.params.get(HANDED_ON):  # handed on by a belay, whose line says it
-                self._note(ship, inst, inst.evo.on_start)
+            self._note(ship, inst, inst.evo.on_start)
             return True
         if not inst.params.get("log_group"):  # the order's own line said it for the group
             self._note(ship, inst, inst.evo.on_start)
@@ -1139,9 +1159,7 @@ class Runner:
             )
             if busy:
                 continue
-            # work a belay handed on is begun already: its beginning's conditions are not read
-            conditions = [] if inst.params.get(HANDED_ON) else inst.evo.preconditions
-            reason = self._failing_condition(ship, inst, conditions + inst.evo.requires)
+            reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
                 if inst.done_already:
                     self._done_already(ship, inst, reason)
@@ -2159,7 +2177,10 @@ class Runner:
         head = own or getattr(evo, "work", None) or evo.verb.replace("_", " ")
         if isinstance(inst.subject, Ship):
             return head
-        return f"{head} the {part_name(self.ship, inst.subject_id)}"
+        # the parts a script works, where they are more than its subject: the yards a belay
+        # handed on (`Script.parts_named`; package 90, the lead's nudge 49, item 4)
+        parts = inst.script.parts_named() if inst.script is not None else None
+        return f"{head} {parts or 'the ' + part_name(self.ship, inst.subject_id)}"
 
     def _remaining_s(self, inst: Instance) -> float:
         if inst.script is not None:

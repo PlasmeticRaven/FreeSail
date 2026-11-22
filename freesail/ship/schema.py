@@ -131,8 +131,10 @@ ship's builder writes it and an engine step reads it:
   where the file has no `sweeps:` section;
 - a boat's `towed` (`BoatSpec.towed`): true, the boat towed astern, not stowed on deck; false by
   default (it was refused at the load before, as a key a boat does not take);
-- the hull's `helm` (`HullSpec.helm`): `wheel` or `tiller`, `wheel` by default, read by nothing
-  yet.
+- the hull's `helm` (`HullSpec.helm`): `wheel` or `tiller`, `wheel` by default. Since package
+  90's A3 the six files steered by a tiller carry it, and the helm's words read it
+  (`evolutions.scripts.helm_words`): what is shot away, rigged round and mended, and how each
+  is said.
 Each is left out of its spec's pickle while it holds its default, so that a spec without it,
 and one pickled before it, is pickled as before it.
 
@@ -617,7 +619,7 @@ class HullSpec:
     # until the shared work writes theirs), drawn and gunned as before.
     profile: HullProfile | None = None
     # Package 90, stage 0: what she steers by, one of `HELM_KINDS`; a file that says nothing
-    # steers by a wheel. Read by nothing yet (the tiller's words are step A3's).
+    # steers by a wheel. Read by the helm's words since A3 (`evolutions.scripts.helm_words`).
     helm: str = HELM_WHEEL
 
     def __getstate__(self) -> dict[str, Any]:

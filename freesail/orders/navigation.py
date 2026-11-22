@@ -575,6 +575,29 @@ def judge_course(
         )
         return Judgement("full_and_by", course, words, full_and_by=True, tack=own)
     if crossing == "eye":
+        strong = lateen_strong_wind_kn(ship)  # package 90, A1c: a lateen in a strong wind
+        if strong is not None and speed >= units.knots_to_ms(stay_kn):
+            room = no_room_to_wear(ship)
+            if room:
+                # tacked regardless where there is no room to wear (ruled), as `put_about_choice`
+                # tacks her with the land to leeward
+                way = "she is put about for it" if laid else "she is put about"
+                return Judgement(
+                    "tack",
+                    target,
+                    f"{what}; the wind {strong:.0f} knots, but there is no room to wear with "
+                    f"{room}: {way}{tail}",
+                    full_and_by,
+                    said_tack,
+                )
+            way = "worn round for it" if laid else "worn round"
+            return Judgement(
+                "wear",
+                target,
+                f"{what}; the wind {strong:.0f} knots{LATEEN_STAYS_WORDS}, and she is {way}{tail}",
+                full_and_by,
+                said_tack,
+            )
         if speed >= units.knots_to_ms(stay_kn):
             way = "she is put about for it" if laid else "she is put about"
             return Judgement("tack", target, f"{what}; {way}{tail}", full_and_by, said_tack)
@@ -1120,6 +1143,42 @@ WEAR_WIND_KN = 30.0
 TACK_REGARDLESS_NM = 2.0
 MISSED_STAYS_WITHIN_S = 3600
 CLOSE_REEF = 3
+# Package 90, A1c (the lead's ruling of 2026-11-18, nudge 18; docs/design/Design-Package90-
+# Engine.md §2.3 item 6): a whole lateen is not put in stays in a strong wind (Forfait 1788
+# p. 119: taken aback, her lateens cost the masts or the yards). Over this mean true wind, with
+# a whole lateen set, `put her about` and the course's judgement wear her, and tack her regardless
+# where there is no room to wear; an ordered `tack ship` is obeyed and warned. A module constant
+# beside `WEAR_WIND_KN`, since neither reads a captain's book: so it serves every voice, the
+# player's, a model's, the director's and the rules captain's. JUDGEMENT on the figure:
+# Beaufort's strong breeze.
+LATEEN_TACK_KN = 22.0
+LATEEN_STAYS_WORDS = ": a lateen is not put in stays in a strong wind"
+
+
+def mean_true_wind_kn(ship: Any) -> float | None:
+    """The readings' mean true wind in knots (the true wind where it has no mean): the wind
+    `put_about_choice` reads its strong wind against, and the course's judgement and the tack's
+    warning with it (package 90, A1c). None with no readings."""
+    from freesail.orders.prompt import world_of
+
+    readings = getattr(world_of(ship), "readings", None)
+    if readings is None:
+        return None
+    w = readings.value("mean_true_wind_speed")
+    if w is None:
+        w = readings.value("true_wind_speed")
+    return units.ms_to_knots(float(w)) if w is not None else None
+
+
+def lateen_strong_wind_kn(ship: Any) -> float | None:
+    """The mean true wind in knots where a whole lateen is set and it is over `LATEEN_TACK_KN`
+    (package 90, A1c), else None: every other ship's choice as it was."""
+    from freesail.evolutions.scripts import whole_lateens
+
+    if not whole_lateens(ship):
+        return None
+    kn = mean_true_wind_kn(ship)
+    return kn if kn is not None and kn > LATEEN_TACK_KN else None
 
 
 # The room a wear takes (package 88, item 2; 57's station gale: the frigate beating for her
@@ -1270,8 +1329,11 @@ def put_about_choice(ship: Any) -> tuple[str, str]:
         if w is None:
             w = readings.value("true_wind_speed")
         wind_kn = units.ms_to_knots(float(w)) if w is not None else None
+    lateen = lateen_strong_wind_kn(ship) is not None  # package 90, A1c
     if wind_kn is not None and wind_kn > WEAR_WIND_KN:
-        reasons.append(f"the wind {wind_kn:.0f} knots")
+        reasons.append(f"the wind {wind_kn:.0f} knots{LATEEN_STAYS_WORDS if lateen else ''}")
+    elif lateen and wind_kn is not None:
+        reasons.append(f"the wind {wind_kn:.0f} knots{LATEEN_STAYS_WORDS}")
     log = getattr(world, "log", None)
     tick = world.clock.tick
     if log is not None:
