@@ -1557,3 +1557,69 @@ and TuningNotes (each both sides' sections appended, kept whole). Each will be r
 rules and named line by line in that merge's section, with `ruff check` before its tiers.
 
 Stopped after the second pass, as briefed: the merge into the engine follows.
+
+## The second pass merged into the engine track, under A1c, A1d, A5-A6 and A4 (nudge 46, 2026-11-22)
+
+**The merge:** **4a4e1c6** on `…/pkg-90-engine`, parents **db715d8** (the engine branch's tip)
+and **2e1e19b** (`…/pkg-90-a1ab`'s tip, the hash above). It brings onto the engine's steps both
+the second pass and what lay under it at 0d5d2c56: A2's re-mend and A3, and the package's other
+commits since the engine last took it: 71 commits in all, the second pass's three among them. The
+code and data take 29 files, 1,066 lines in and 173 out; the tests take seven files, 1,845 in and
+67 out. Git finds two merge bases, 033f42b7 and 71ae1aae, a criss-cross (each branch has merged a
+commit of the other's), and merges against the two together.
+
+**Which lines were resolved by hand** (five files conflicted; every other file merged clean):
+1. **`freesail/evolutions/scripts.py`, the tack's haul** (`TackScript`, at "let go and haul"),
+   by both rules, as the look-ahead set out. Kept from the engine: A1d's three lines,
+   `if left:`, `on = lateens_drawn_words(self.ship, left)` and `draw = ...`. Dropped from the
+   engine: its `if self.head:`. Taken from the package: A2's five-line comment,
+   `hauled = braces_worked(self.ship)` and `if self.head and hauled:`. So a rig of whole
+   lateens that works no braces says its lateens drawn over in A2's `elif draw` line.
+2. **`freesail/evolutions/scripts.py`, the wear's "Wind aft."** (`WearScript`), by both rules.
+   Taken from the package: A2's comment and its readers, `worked = braces_worked(self.ship)`,
+   `swung = told_of(...)`, `yards = ...`, `squared = ...` and `braced = ...`. Dropped from the
+   engine: its `squared = ...` and its `braced = ...`, the one that read `has_braced_yards`.
+   Kept from the engine, and written in by hand: A1d's
+   `over = self._lateens_over(new_lee, wind)  # package 90, A1d`, and the line
+   `self.note(f"Wind aft. {squared} over the sheets{over}{braced}." + dipped)`, which is A2's
+   line with A1d's `{over}` in it. A1b's `self._shift_lateens(new_lee)` after it merged as it
+   stood. No `has_braced_yards` is left in the tree; 0d5d2c56's hand-resolved
+   `not (head or after)` came over clean.
+3. **`tests/test_lateen_whole.py`**: the engine's file whole (A1a to A1d, 48 tests), with the
+   second pass's own diff from 0d5d2c56 applied to it: the two pins moved, `NOT_HERS`, and its
+   section appended after A1d's. The import block is united: the engine's, with
+   `brig_with_settee_doc`, `tartane_probe_doc`, `LUG_AGAINST_MAST_AREA`, `against_the_mast`,
+   `compute_sail_forces`, `LineState` and `contrary`. No name is shared: 65 tests, the engine's 48
+   and the second pass's 17.
+4. **`tests/test_known_truths.py`**: both appended sections kept whole, A1d's 7-670 to 7-672
+   with their three helpers first, then the package's (package 121's 7-710 and on); they share no
+   name.
+5. **`docs/dev/TuningNotes.md`**: both sides' sections whole. The package's sections that the
+   engine lacked come in whole: 465 lines, A2's re-mend among them. The engine's sections from A1c
+   to A4 (190 lines) are followed by the second pass's (34). Three lines of A2's own first-pass
+   section are as A2's re-mend rewrote them on the package (7686aec1). Git merged those without
+   a conflict, and no line of the engine's own sections is lost.
+6. **This report**: the engine's whole. Every line of the package's copy, A2's and A1a-A1b's
+   sections, is in it already. The second pass's section is appended, as above.
+
+**Checked on the merged tree:**
+- No conflict marker is left anywhere. `ruff check` and `ruff format --check` are clean: 431
+  files, run before the tiers.
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+- The code, tests and data are byte for byte those of a dry run of the same merge, made in the
+  session's scratch from 75abacd. The commits after 75abacd change TuningNotes and the report
+  alone.
+- On that dry run, with `-n 2`:
+  - `test_lateen_whole`: 147 passed;
+  - the lens of `test_rig_words`, `test_probes_90`, `test_settee`, `test_lug`, `test_yard_level`,
+    `test_pole_mast`, `test_boat_towed`, `test_helm_kind`, `test_held_work`, `test_catalogue`,
+    `test_captains` and `test_bilander`: 553 passed;
+  - both sides' new truths (7-67x, 7-68x, 7-69x, 7-71x): 10 passed.
+
+**The tiers of 4a4e1c6** are running (fast, then slow, from 03:36 UTC). Each case will be set
+beside its outcome on the engine at db715d8 (A4's merge, b13b8dc's code, whose tiers were run for
+A4's section), with the cases that A2's re-mend, A3 and the package bring named by their file.
+They follow in a section of their own when done.
+
+**For the coordinating session:** `…/pkg-90-a1ab` at **2e1e19b** is the hash for the gate (its
+section above); the engine branch now carries it, at 4a4e1c6.
