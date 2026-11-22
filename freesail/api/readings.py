@@ -2659,16 +2659,23 @@ def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
 def _places(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the places`: the names in the words (every sample carries them, so the static
     descriptions ride in `items`, where the prompt's answer and the pane find them)."""
+    from freesail.evolutions.scripts import helm_words
     from freesail.world import things as TH
     from freesail.world.places import PLACES
 
     places = getattr(world, "places", None)
     if places is None:
         return None
+    # the quarterdeck "where ... the wheel is", by her helm, from the one table (package 90,
+    # A3; the lead's nudge 47): "the tiller is" where she steers by one, a wheel ship's as it was
+    by_helm = f"{helm_words(getattr(world, 'ship', None))['helm']} is"
     out = {
         "words": ", ".join(p.name for p in PLACES.values()),
-        "items": {p.id: {"name": p.name, "description": p.description} for p in PLACES.values()},
-        "described": places.describe(),
+        "items": {
+            p.id: {"name": p.name, "description": p.description.replace("the wheel is", by_helm)}
+            for p in PLACES.values()
+        },
+        "described": [d.replace("the wheel is", by_helm) for d in places.describe()],
     }
     lying = TH.lying_aboard(world)
     if lying:

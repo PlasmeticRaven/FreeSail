@@ -399,3 +399,221 @@ in the second pass, as drafted here (the top of this report).
 - No test is skipped, xfailed or loosened. Each moved pin is old beside new, its new figure held
   exactly.
 - Pushed only to this step's own branch; no force, no rebase, no merge.
+
+## The list of nudge 45 (2026-11-21)
+
+The lead's reader passed A3 with a list (nudge 45; the trunk at 6038f23a, the note at the end of
+`docs/dev/M7-WorkPackages.md`). Each item is its own commit, to ride the next package hash. None
+moves a tick.
+
+**The branch.** Fast-forwarded to the package's branch at **0d5d2c56** (A3, A1a and A1b), which held
+fba02fff, so there was no merge commit. The four items are built on it, and the base run below is
+on that same tree.
+
+| Item | Commit | Files |
+|---|---|---|
+| 1. A mend not in hand named as her helm names it | `ebe85fd4` | `freesail/orders/work.py`, `freesail/evolutions/scripts.py`, `freesail/evolutions/repair_scripts.py`, `tests/test_helm_kind.py`, `docs/dev/TuningNotes.md` |
+| 2. `belay the tiller` and `belay the spare tiller` belay the mend | `e8112190` | `data/vocabulary.yaml`, `tests/test_helm_kind.py`, `docs/dev/TuningNotes.md` |
+| 3. The tiller's words on a wheel ship, pinned | `9c8fb3c0` | `tests/test_helm_kind.py`, `docs/dev/TuningNotes.md` |
+| 4. The primer, the schema's comments (the quarterdeck a stop) | `b7e0f650` | `docs/primer/02-...`, `22-...`, `25-...`, `freesail/ship/schema.py`, `tests/test_helm_kind.py`, `docs/dev/TuningNotes.md` |
+
+The record, old beside new, is TuningNotes, "Package 90, A3", its subsection "The list of nudge
+45". **The proof of each:** a probe of every belay order on the cutter (a tiller) and the brig (a
+wheel), the tackles in hand and the mend in hand, each order on a fresh world at seed 7, old
+(0d5d2c56) beside new (`probe_belay.py`, in the session's scratch). Each item's new test fails on
+the old code: all four run together in a separate worktree at 0d5d2c56, 4 failed (item 1's wheel
+case passes there, as it should).
+
+### 1. A mend not in hand, named as her helm names it
+
+**The cause:** a belay's refusal named a work not in hand by the vocabulary's verb, while the
+runner names it, once begun, by its script.
+
+**The mend at that cause:** the script's own name is readable before the work exists
+(`Script.work_of(ship)`, a class method that `Script.work` calls). `orders/work.py` names a work
+not in hand by it (`_work_words`), in both of its readings: by the order and by the kind of work.
+Only the helm's mend has a name of its own, so every other work is named as before.
+
+| The cutter, the tackles in hand, no mend | Old | New |
+|---|---|---|
+| `belay shipping the spare tiller`, `belay ship the spare tiller`, `belay the wheel`, `belay repairing the wheel` | "Nothing in hand or waiting is repairing the wheel. The work in hand: rigging the relieving tackles." | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: rigging the relieving tackles." |
+
+- On the brig, the same four answer as before ("... is repairing the wheel.").
+- Every answer's kind, the lines after it and the work in hand are the same.
+- No pin moves.
+- Pinned: `test_a_mend_not_in_hand_is_named_as_her_helm_names_it`, on either helm. On the old code
+  its tiller case fails and its wheel case passes. (Its first check ran in the base's tiering
+  worktree for a few seconds, under a name pytest does not collect, and was removed at once. It was
+  run again in the separate worktree with the other three.)
+
+### 2. `belay the tiller` and `belay the spare tiller`
+
+`more_work_nouns` gains `tiller` and `spare tiller`, each to the mend's verb, beside `wheel`.
+
+| Order | Ship, in hand | Old | New |
+|---|---|---|---|
+| `belay the tiller` | cutter, tackles and mend | "There is no such part as the tiller in this ship." | "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the shot left it." |
+| `belay the spare tiller` | cutter, tackles and mend | "... as the spare tiller in this ship; did you mean the square sail?" | the same |
+| either | cutter, tackles alone | the refusals above | "Nothing in hand or waiting is shipping the spare tiller. ..." |
+| either | brig, tackles and mend | "There is no such part as ..." | "Belayed repairing the wheel; the wheel not mended, ..." |
+| either | brig, tackles alone | the refusals above | "Nothing in hand or waiting is repairing the wheel. ..." |
+
+- **Beside it, refusal to refusal (measured, no pin):** `belay the tiller tackles` and `belay the
+  tiller ropes`.
+  - Old: "There is no such part as the tiller tackles (ropes) in this ship", with "did you mean the
+    topsail reef tackle?" on the cutter.
+  - New: "Nothing in hand or waiting answers to 'the tiller tackles' ('the tiller ropes'): name the
+    work as the log does, ...".
+  - Neither belays anything, old or new. The vocabulary has `rig the tiller tackles` and `reeve new
+    tiller ropes` as synonyms of the two works. **A noun for each, so that each belays its work, is
+    listed for the lead, not built:** the list names the tiller and the spare tiller alone, and
+    `belay the wheel ropes` is refused as these now are.
+- Pinned: `test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`. It fails on the
+  old code.
+
+### 3. The tiller's words on a wheel ship
+
+Pinned on the brig with the tackles in hand
+(`test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend`):
+- `ship the spare tiller`, `ship a spare tiller`, `ship a new tiller` and `repair the tiller` each
+  start the wheel's mend, begun in the wheel's words and named "repairing the wheel";
+- `belay the tiller`, `belay the spare tiller`, `belay shipping the spare tiller` and `belay ship
+  the spare tiller` each belay it, in the wheel's words;
+- the "whole" refusal is pinned beside them already.
+
+Nothing moves by this item: the starts were taken before, and two of the belays are item 2's. On
+the old code the test fails at `belay the tiller`.
+
+### 4. Older wheel words a tiller hull still read
+
+- **The primer**, a clause each, each run against the game
+  (`test_the_primer_says_of_a_tiller_what_the_game_does`):
+  - **Chapter 25:** a row, `ship the spare tiller`: "the same where she steers by a tiller: the
+    tackles hooked to the stump of the tiller and manned on deck, and the spare tiller shipped in
+    the rudder head, half an hour". Below it, "With the wheel (or the tiller) shot away ...".
+  - **Chapter 22:** "the wheel shot away (or the tiller, in a hull steered by one) loses you the
+    helm".
+  - **Chapter 2:** the conning words "speak to the wheel rather than to the course (to the tiller,
+    in the same words, in the cutter, the lugger, the smack, the two schooners and the
+    hermaphrodite brig)". Run on the cutter beside the frigate, the ten are taken in the frigate's
+    words, but for her own heading where a word names it.
+  - No forms table or orders block changes. The chapters' sizes are measured where they are served
+    (only chapter 3's is pinned). The primer's, the grammar book's, the in-world, the agents' and
+    the loader's tests pass, 1,486 with the helm tests.
+- **`freesail/ship/schema.py`**: its two comments that the key is "read by nothing yet" now say
+  that the six tiller files carry it and the helm's words read it. Comments only.
+- **`freesail/world/places.py`'s quarterdeck, by her helm: a stop, not built.**
+  - `Places` is made with the ship's name alone, by `core/world.py`, which nobody touches after
+    stage 0.
+  - The description's two readers (`the places` reading's `items` and `described`) are in
+    `api/readings.py`, which the list does not give.
+  - So in `places.py` alone it cannot be keyed on her helm. It wants two lines of
+    `api/readings.py`'s `_places`, the quarterdeck's description by the ship's helm, read through
+    `places.py`.
+  - The other road is "the helm" on every ship, which moves every wheel ship's words. For the lead.
+
+**Listed, not asked, and left:** the five boats' files, and the hermaphrodite brig's helm.
+
+### The tests, on b7e0f650 against the base on the same tree (0d5d2c56)
+
+All on b7e0f650 in its own worktree, and the base on 0d5d2c56 in its own: `python -m pytest -n 4
+-p no:cacheprovider -o addopts="--dist loadgroup"`, the fast tier in the suite's six shards
+(`FREESAIL_SHARD=i/6`, i 0 to 5, one after another; the two runs never shared the cores).
+
+| Set | Base, 0d5d2c56 | Head, b7e0f650 |
+|---|---|---|
+| **the fast tier whole** | 8,665: 8,664 passed, 1 xfailed | 8,670: 8,669 passed, 1 xfailed |
+| the four helm truths, 7-626 and 7-632 to 7-634 (`--slow`) | | 4 passed |
+| `test_held_work`, `test_hands`, `test_helm_kind`, `test_primer` (`--slow`) | | 1,263 passed |
+| the primer's and the vocabulary's readers (`test_primer`, `test_grammar_book`, `test_in_world`, `test_agents`, `test_probes_90`, `test_ship_loader`, `test_helm_kind`), at item 4 | | 1,486 passed, 1 xfailed |
+| the vocabulary's (`test_grammar_book`, `test_orders`, `test_helm_kind`, `--slow`), at item 2 | | 773 passed |
+| the list's four new tests on the old code (a worktree at 0d5d2c56) | 4 failed (item 1's wheel case passes) | 5 passed |
+
+**Test by test** (names without the xdist group label): **the head is the base's 8,665, each with
+the same outcome, and five new tests, each passed**:
+- `test_a_mend_not_in_hand_is_named_as_her_helm_names_it[tiller]` and `[wheel]`;
+- `test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`;
+- `test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend`;
+- `test_the_primer_says_of_a_tiller_what_the_game_does`.
+
+Nothing else differs. No timing test tripped in either run.
+
+**The package's branch has moved since**, to 248569c5 (A1c merged). By your word its merge with
+these four commits, and the tiers there, are yours. A dry run, with nothing committed to any
+branch: `git merge-tree` of 248569c5 and b7e0f650 has **no conflict** (A1c's `scripts.py` and
+`TuningNotes.md` merge cleanly with the list's). On a throwaway worktree of the result, ruff is clean
+over `freesail`, `tools` and `tests`, and `test_helm_kind` with A1c's `test_lateen_whole` pass
+(122).
+
+### Rules
+
+- Each commit's author is as the cloud gives it.
+- No model or vendor name and no trailer in any commit.
+- LF endings; ruff clean.
+- TuningNotes' sections are kept whole: the new subsection sits at the end of A3's, before package
+  119's.
+- No generated file is touched: no ship file moves, and the checkpoint's list is unmoved (no class
+  added; `Script.work_of` is a method).
+- Pushed only to this step's own branch.
+
+## The quarterdeck, by the lead's ruling (a) of nudge 47 (2026-11-21)
+
+The lead ruled the list's one stop (nudge 47, trunk 88ceeb54): **(a)**. The branch was first
+fast-forwarded to the package's branch at **744f5893** (the list of nudge 45 merged on A1c), and
+the one commit is built on it.
+
+- **The commit: `cf754540`** ("Package 90, A3's list (nudge 47): the quarterdeck described by her
+  helm"). Four files:
+  - `freesail/api/readings.py`;
+  - `freesail/evolutions/scripts.py`;
+  - `tests/test_helm_kind.py`;
+  - `docs/dev/TuningNotes.md`, its line under A3's "The list of nudge 45", item 4.
+- **`api/readings.py`'s `_places`.** The quarterdeck is described by her helm in the reading's two
+  forms, the `items` and the lines `described` (`"the wheel is"` read as her helm's noun's). The
+  diff, besides its comment, is:
+  - the import of `helm_words`;
+  - the noun read once;
+  - the two lines, the `items` and the `described`, the first wrapped by the formatter.
+- **`world/places.py`** is left as it is.
+- **From the one table.** It had no plain noun for her helm, so it gains one: `HELM_WORDS`' `helm`,
+  "the wheel" or "the tiller". That is a line in each row of `evolutions/scripts.py`, and two
+  more lines of its comment. It is read by `_places` alone, and nothing else moves by it. The table's pinned
+  rows in `tests/test_helm_kind.py` gain it.
+- **What moved, old beside new** (measured on fresh worlds at seed 7, old 744f5893 beside new):
+
+| Ship | The quarterdeck in `items` and `described` |
+|---|---|
+| the cutter, the lugger (the six tiller files) | "... where the captain and the officer of the watch keep the deck and the wheel is (Falconer 1780, QUARTER-DECK)" -> "... keep the deck and the tiller is (...)" |
+| the brig, the frigate, the bilander (wheel ships) | byte for byte as it was |
+
+  On all five the reading's `words` and every other place are as they were. No pin moves.
+- **The proof:** `test_the_places_reading_says_where_her_helm_is`, on the cutter, the brig and the
+  frigate. It checks the quarterdeck by `items` and by `described`, every other place, and the
+  `words`. Its words are held literally, so a wheel ship's case passes on the old code as it
+  should. On the old code (744f5893, its own worktree) the cutter's case fails and the brig's and
+  the frigate's pass. Here all three pass.
+- **Left, not asked:** `belay the tiller tackles` and `belay the tiller ropes`, as the lead lists
+  them.
+
+**The tests** (`python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, the fast
+tier in the suite's six shards, each tree in its own worktree, the two runs one after the other):
+
+| Set | Base, 744f5893 | Head, cf754540 |
+|---|---|---|
+| **the fast tier whole** | 8,689: 8,688 passed, 1 xfailed | 8,692: 8,691 passed, 1 xfailed |
+| `tests/test_helm_kind.py` | | 43 passed |
+| the reading's other readers: `test_places`, `test_letters`, `test_people`, with `test_helm_kind` | | 94 passed |
+| the new test on the old code (744f5893, its own worktree) | the cutter's case failed; the brig's and the frigate's passed | 3 passed |
+
+**Test by test** (names without the xdist group label): **the head is the base's 8,689, each with
+the same outcome, and the new test's three cases, each passed**
+(`test_the_places_reading_says_where_her_helm_is[cutter]`, `[brig]`, `[frigate-36]`). Nothing
+else differs, and no timing test tripped. The base is my own whole run on 744f5893, not a delta.
+
+**Rules as before:**
+- each commit's author is as the cloud gives it;
+- no model or vendor name and no trailer;
+- LF endings; ruff clean;
+- TuningNotes' sections whole;
+- no generated file touched;
+- pushed only to this step's own branch.

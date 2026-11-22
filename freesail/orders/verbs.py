@@ -3192,6 +3192,27 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
+def _warn_lateen_in_stays(ship: Ship) -> None:
+    """An ordered `tack ship` with a whole lateen set in a strong wind (over
+    `navigation.LATEEN_TACK_KN`, the mean true wind `put her about` reads): obeyed, never turned
+    into a wear, and warned once, in words only (package 90, A1c; the lead's ruling; Forfait 1788
+    p. 119). A note of the ship's, after the manoeuvre's first line, as `put her about` says its
+    choice in a note; `put her about` and the course's judgement wear her there, or say why they
+    tack."""
+    from freesail.orders import navigation
+
+    kn = navigation.lateen_strong_wind_kn(ship)
+    note = getattr(ship, "note", None)
+    if kn is None or not callable(note):
+        return
+    note(
+        "notable",
+        "ship.tack_warned",
+        f"The wind {kn:.0f} knots{navigation.LATEEN_STAYS_WORDS}; she is put in stays as ordered.",
+        data={"wind_kn": round(kn, 1), "lateen_tack_kn": navigation.LATEEN_TACK_KN},
+    )
+
+
 # The occasions of the lateens' practice, as the grammar reads them ("in going about": both).
 _PRACTICE_OCCASIONS = {"stays": ("stays",), "wearing": ("wearing",), "both": ("stays", "wearing")}
 
@@ -3306,6 +3327,8 @@ def _ship_evolution(
         raise
     _settle_call(ship, call, True)
     _drop_course_pending(ship)  # a manoeuvre ordered gives up a course held for want of way
+    if evo == "tack" and not course:
+        _warn_lateen_in_stays(ship)  # package 90, A1c
     if order.verb_phrase.split()[0] in ("gybe", "jibe"):
         # The later word for wearing a fore-and-aft vessel: the boom comes
         # over as the wind crosses the stern. The period word is wear.
