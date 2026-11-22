@@ -1847,3 +1847,62 @@ settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; al
    it.
 
 **Next:** `…/pkg-90-a1ab` merged again into `…/pkg-90-engine`, as before.
+
+## The third pass merged into the engine track (nudge 48, 2026-11-22)
+
+**The merge:** **0d639a6** on `…/pkg-90-engine`, parents **e1b5671** (the engine branch's tip)
+and **7173281** (`…/pkg-90-a1ab`'s tip: the third pass, 1458b0e, and its report's tiers). It
+brings two commits onto the engine. The code and data take seven files, 335 lines in and 61 out.
+The tests take one file, `tests/test_lateen_whole.py`, 417 in and 22 out. Git finds one merge
+base, 2e1e19b: the engine took the second pass at 4a4e1c6, and this is the same merge again.
+
+**Which lines were resolved by hand** (four files conflicted; every other file merged clean):
+1. **`freesail/evolutions/runner.py`, `_start_waiting`**, by both rules. Kept from the engine:
+   A1d's `if busy or lateen_take_in_waits(ship, inst.evo.verb, inst.subject):` and its
+   `continue  # a whole lateen aback in a strong wind waits too (package 90, A1d)`. Dropped from
+   the engine: its `reason = self._failing_condition(ship, inst, inst.evo.preconditions +
+   inst.evo.requires)`. Taken from the third pass: its comment `# work a belay handed on is begun
+   already: its beginning's conditions are not read`, `conditions = [] if
+   inst.params.get(HANDED_ON) else inst.evo.preconditions` and `reason =
+   self._failing_condition(ship, inst, conditions + inst.evo.requires)`. Dropped from the third
+   pass: its plain `if busy:` and `continue`. So the work handed on skips its preconditions, and
+   the take-in waits as A1d had it.
+2. **`freesail/evolutions/scripts.py`, the tack's haul** (`TackScript`, at "let go and haul"), by
+   both rules. Taken from the third pass: `draw = " Draw jib; trim aft the head sheets." if
+   self._jibs() else ""`, then `if self.heads and not draw:`, its comment `# the fore lateen alone
+   drawn on the new board (package 90, nudge 48)` and `draw = f" Draw the
+   {self._boom_names(self.heads)}; trim aft its sheet."`. Dropped from the engine: its
+   `draw = ... if self.heads else ""`. Kept from the engine, after them: A1d's `if left:`,
+   `on = lateens_drawn_words(self.ship, left)` and `draw = f"{draw[:-1]}; {on}." if draw else
+   ...`. So the fore lateen's own line comes first, and A1d's lateens drawn over are joined to it.
+3. **`tests/test_lateen_whole.py`, the import block**: the engine's four lines, from
+   `from freesail.evolutions import trim as yard_trim` to the `freesail.physics.sails` line, with
+   `LUG_AGAINST_MAST_AREA` dropped from that line as the third pass dropped it. Its one use, the
+   two-thirds pin, is against `2.0 / 3.0` now (item 6), and ruff would flag the name unused. The
+   rest of the file merged clean: the engine's 147 cases and the third pass's 44, 191.
+4. **This report**: both sides' sections whole, the engine's first (the second pass's merge and
+   the question on item 3), then the third pass's section with its tiers.
+
+`docs/dev/TuningNotes.md` merged clean: the engine's 171 sections whole, and the third pass's
+appended after the second pass's, 172. No line of either side's is lost.
+
+**Checked on the merged tree:**
+- No conflict marker is left anywhere. `ruff check` and `ruff format --check` are clean: 431
+  files, run before the tiers.
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+- The code, tests and data are byte for byte those of a dry run of the same merge, made in the
+  session's scratch from 1458b0e. 7173281 changes this report alone.
+- The lens, `-n 4`, on the merged tree (0d639a6): 2,068 passed, 1 skipped, 1 xfailed, 0 failed;
+  `test_lateen_whole`'s 191 among them, all passed. It ran over `test_lateen_whole`,
+  `test_settee`, `test_bilander`, `test_lug`, `test_hull_lugger`, `test_standing`, `test_orders`,
+  `test_held_work`, `test_evolutions`, `test_catalogue`, `test_probes_90`, `test_grammar_book`,
+  `test_practice_orders`, `test_mends_75`, `test_lateen`, `test_agents`, `test_practice`,
+  `test_knowledge`, `test_agent_api`, `test_readings`, `test_checkpoint`, `test_tow`,
+  `test_yard_level`, `test_pole_mast` and `test_rig_words`.
+
+**The tiers** run whole on the commit that adds this section, which touches this report alone.
+Each case will be set beside its outcome at 4a4e1c6 (the engine's last tiers, above) and at
+1458b0e (the third pass's). They follow in a section of their own when done.
+
+**For the coordinating session:** `…/pkg-90-a1ab` at **7173281** is the hash for the gate (1458b0e
+tiered, the commit after it the report alone). The engine branch now carries it, at 0d639a6.
