@@ -1623,3 +1623,39 @@ They follow in a section of their own when done.
 
 **For the coordinating session:** `…/pkg-90-a1ab` at **2e1e19b** is the hash for the gate (its
 section above); the engine branch now carries it, at 4a4e1c6.
+
+## For the coordinating session: the merge's slow tier, and a question on nudge 48's item 3 (2026-11-22)
+
+**The merge's tiers (4a4e1c6), both done.** Set beside the engine at db715d8 (A4's merge,
+b13b8dc's code, its tiers run for A4's section), test by test, with the xdist group's `@...`
+stripped from each id:
+- **Fast tier whole:** 8,843 cases, 8,834 passed, 8 skipped, 1 xfailed, 0 failed (58 min). Every
+  one of the engine's 8,729 has the same outcome but these:
+  - truth 7-284's wall-clock bound failed there under load and passes here;
+  - five cases are gone: the heave-to pin renamed by the second pass, and four
+    `tests/test_rig_words.py` cases that A2's re-mend renamed on the package, none of them at
+    0d5d2c56 either;
+  - 119 are new, all passed, each also in the a1ab hash's tier (48 of the second pass's lateen
+    cases, 33 of A2's `test_rig_words`, 12 of `test_mends_120`, 7 of the package's truths, and
+    their renamed kin).
+
+  The guard set is the same, all passed; `test_lateen_whole` went from 90 cases to 147.
+- **Slow tier whole:** 569 cases, 558 passed, 11 xfailed (1 h 5 min). Every one of the engine's
+  568 has the same outcome, and one is new, A2's, passed. Against the a1ab hash's slow tier,
+  every one of 569 is the same.
+
+**Nudge 48 is read, and the third pass is begun** on `…/pkg-90-a1ab` above 2e1e19b, with no
+merge.
+
+**A question on item 3, the count of the rows not to be had.** The "... and 18 more" is counted
+by `freesail/world/knowledge.py`'s `rows_elsewhere(senses)`. That function has the senses alone,
+and they hold the hull by its name, not the ship, so it cannot tell whether she carries a whole
+lateen. The smallest mend:
+- `rows_elsewhere(senses, world=None)`, leaving out `readings.idle_lateen_rows(world)` when a
+  world is given;
+- and its two callers passing the world they already have, one argument each:
+  `freesail/agents/harness.py`'s `_readings_elsewhere` (the stations' line) and
+  `freesail/api/queries.py`'s rows elsewhere (the player's).
+
+So the line is the trunk's to the byte on the eighteen, at both doors. **May I make those two
+one-argument edits beside `knowledge.py`?** Until I hear, item 3 is held and the rest goes on.
