@@ -1022,19 +1022,51 @@ scratch `n49/mutate49.py`, ten mutations, each failing its pins.
 
 ### Measured: today's ships
 
-- **A2's harness** (270 runs) and **the wind-shift runs** (`n46/windshift.py`, 108) on this tree,
-  beside b3c68af4's: running beside this commit; their result follows in the next commit, which touches
-  this report alone.
+- **A2's harness** (270 runs) on this tree: byte for byte as at b3c68af4.
+- **The wind-shift runs** (`n46/windshift.py`, 108): byte for byte as at b3c68af4.
 - Every changed road is read only on a hull that carries a whole lateen, or only by the work a
   belay hands on, which only a whole lateen's change makes.
 
 ### The test sets run, with counts, and the base comparison
 
-The fast and the slow tier whole run on this commit now, and on b3c68af4 for the base. Their
-results follow in the next commit, which touches this report alone.
+**The tiered hash is 2f3285c**, this pass's commit itself. The commit after it, which writes these
+results, touches this report alone.
 
-**The lens of the touched files** (32 files, `-n 2`) runs beside the tiers; its count follows
-with theirs. Before the commit, `tests/test_lateen_whole.py` whole: 205 passed.
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base, b3c68af4**, ran here the same way on its own
+worktree, and 2f3285c on its own. Compared test by test by the test's id, with the xdist group's
+`@...` stripped.
+
+| Run | b3c68af4 (the base) | 2f3285c | Against the base |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,793: 8,784 passed, 8 skipped, 1 xfailed, 0 failed (1 h 22 min, the lens and the harness running beside it) | 8,815: 8,806 passed, 8 skipped, 1 xfailed, 0 failed (58 min 39 s) | **Every one of the base's 8,793 the same outcome**, none gone; **22 new, all passed**, every one in `tests/test_lateen_whole.py` |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (the runner, the scripts and the words touched, so the tier whole) | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min) | 569: 558 passed, 11 xfailed, 0 failed (1 h 8 min) | **Every one of the 569 the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+the base: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 183 at the base, 205 now, all passed.
+
+**The lens of the touched files**, `-n 2`, run on the working tree beside the commit: 2,305 passed,
+1 skipped, 1 xfailed, 0 failed (18 min); the fast tier above holds each of its files on the exact
+hash. It ran over `test_lateen_whole`, `test_settee`, `test_bilander`, `test_lug`,
+`test_hull_lugger`, `test_standing`, `test_orders`, `test_held_work`, `test_evolutions`,
+`test_catalogue`, `test_probes_90`, `test_grammar_book`, `test_practice_orders`, `test_mends_75`,
+`test_lateen`, `test_agents`, `test_practice`, `test_knowledge`, `test_agent_api`, `test_readings`,
+`test_checkpoint`, `test_hands`, `test_captains`, `test_crews`, `test_helm_kind`, `test_lying_to`,
+`test_tackle_orders`, `test_found_on_the_way_85`, `test_mends_109`, `test_held_hulls`, `test_driver`
+and `test_replay`.
+
+**The coordinating session's tiers on 5e42ed2f**, quoted only as a cross-check. 5e42ed2f is
+b3c68af4's first parent, and differs from it only in `docs/dev/M7-WorkPackages.md` and
+`docs/dev/ShipsNudge.md`. Its fast tier: 8,793 (8,779 passed, 13 skipped, 1 xfailed, 0 failed), the
+same count of cases as the base here. Its slow tier: 534 passed, 14 skipped, 11 xfailed, 10 failed,
+the ten known to fail on that machine. Its pace tier: 11 passed, 4 under truth 51's floor. The
+cloud's base above is the comparison.
+
+**On 2f3285c's tree:** `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte with
+`data/ships/`; **`ruff check`** and **`ruff format --check`**, clean.
 
 ### Unsure, and for the lead
 
@@ -1047,4 +1079,4 @@ with theirs. Before the commit, `tests/test_lateen_whole.py` whole: 205 passed.
    shifted round their masts." (old, "Belayed shifting the mainsail; ..."). It is true, and the
    work's one name, but long.
 
-**Next:** the tiers, then `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.
+**Next:** `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.
