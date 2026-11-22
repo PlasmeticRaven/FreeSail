@@ -38499,6 +38499,53 @@ The fast tier whole, compared test by test with the base's, the slow tier of the
 
 Built by the A3 builder in a session of its own, beside the engine track; to be read by an independent reader (the plan's §10.2 lens 8: whether the mend is the cause's or only the symptom's, and where else the cause was looked for).
 
+### The list of nudge 45, after A3's merge (2026-11-21)
+
+The lead's reader passed A3 with a list (nudge 45). Each item rode as its own commit on this step's branch, fast-forwarded to `claude/pkg-90` at 0d5d2c56 (A3, A1a and A1b). None moves a tick. Each item was measured old (0d5d2c56) beside new, every order on a fresh world (`probe_belay.py`, kept in the session's scratch).
+
+**1. A mend not in hand named as her helm names it** (`freesail/orders/work.py`; `Script.work_of` in `freesail/evolutions/scripts.py` and `repair_scripts.py`). **The cause:** a belay's refusal named a work not in hand by the vocabulary's verb (`_gerund_words(verb)`), while the runner names it, once begun, by its script (`Script.work`). **Mended:** the script's own name is read before an instance exists (`Script.work_of(ship)`, a class method that `work` now calls), and the belay names a work not in hand by it (`_work_words`), in both of its readings (by the order and by the kind of work). Only the helm's mend has a name of its own, so on every other work the words are the verb's, as before.
+
+| On the cutter, the tackles in hand, no mend | Old | New |
+|---|---|---|
+| `belay shipping the spare tiller`, `belay ship the spare tiller`, `belay the wheel`, `belay repairing the wheel` | "Nothing in hand or waiting is repairing the wheel. The work in hand: rigging the relieving tackles." | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: ..." |
+
+The brig's four answers are as they were ("... is repairing the wheel."). Every answer's kind, the lines after it and the work in hand are the same. No pin moves. Pinned: `tests/test_helm_kind.py::test_a_mend_not_in_hand_is_named_as_her_helm_names_it`, on either helm; on the old code its tiller case fails.
+
+**2. `belay the tiller` and `belay the spare tiller` belay the mend** (`data/vocabulary.yaml`, `more_work_nouns`: `tiller` and `spare tiller`, each to `repair the wheel`, beside `wheel`). They belay the mend on either helm. With no mend in hand they name it as item 1 does.
+
+| Order | Ship, work in hand | Old | New |
+|---|---|---|---|
+| `belay the tiller` | cutter, tackles and mend | "There is no such part as the tiller in this ship." (the mend goes on) | "Belayed shipping the spare tiller; the spare tiller not shipped, the helm lost as the shot left it." |
+| `belay the spare tiller` | cutter, tackles and mend | "There is no such part as the spare tiller in this ship; did you mean the square sail?" | the same as `belay the tiller` |
+| either | cutter, tackles alone | the same refusals | "Nothing in hand or waiting is shipping the spare tiller. The work in hand: rigging the relieving tackles." |
+| either | brig, tackles and mend | "There is no such part as the tiller (the spare tiller) in this ship." | "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it." (item 3) |
+| either | brig, tackles alone | the same refusals | "Nothing in hand or waiting is repairing the wheel. ..." |
+
+**Moved beside it, refusal to refusal (measured, no pin):** `belay the tiller tackles` and `belay the tiller ropes`, the work nouns' reach.
+- Old: "There is no such part as the tiller tackles (the tiller ropes) in this ship", with "did you mean the topsail reef tackle?" on the cutter.
+- New: "Nothing in hand or waiting answers to 'the tiller tackles' ('the tiller ropes'): name the work as the log does, its kind ('the reef') or its sail. The work in hand: ...".
+- Neither belays anything, before or after.
+- The vocabulary has `rig the tiller tackles` and `reeve new tiller ropes` as synonyms of the two works. A noun for each, so that each belays its work, is listed for the lead and not built: the list asks for the tiller and the spare tiller, and `belay the wheel ropes` is refused as these now are.
+
+Every answer's kind and the lines after it are the same but where a belay now belays; there the mend is belayed as `belay the wheel` belays it. No pin moves. Pinned: `tests/test_helm_kind.py::test_on_a_tiller_hull_the_tiller_and_the_spare_tiller_belay_the_mend`; on the old code it fails.
+
+**3. The tiller's words on a wheel ship, accepted and pinned** (`tests/test_helm_kind.py::test_on_a_wheel_ship_the_tillers_words_start_and_belay_her_wheels_mend`). On the brig, with the tackles in hand:
+- each of `ship the spare tiller`, `ship a spare tiller`, `ship a new tiller` and `repair the tiller` starts the wheel's mend, begun in the wheel's words ("Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be rove.") and named "repairing the wheel";
+- each of `belay the tiller`, `belay the spare tiller`, `belay shipping the spare tiller` and `belay ship the spare tiller` belays it: "Belayed repairing the wheel; the wheel not mended, the helm lost as the shot left it.";
+- the "whole" refusal stands pinned beside them (`test_a_helm_shot_away_and_mended_is_said_in_her_helms_words_alone[brig]`).
+
+Nothing moves by this item: the starts were taken before, and the first two belays are item 2's. On the old code the test fails at `belay the tiller`.
+
+**4. Older wheel words a tiller hull still read.**
+- **The primer**, a clause each where she steers by a tiller, each run against the game (`tests/test_helm_kind.py::test_the_primer_says_of_a_tiller_what_the_game_does`):
+  - **chapter 25's table** gains a row, `ship the spare tiller`: "the same where she steers by a tiller: the tackles hooked to the stump of the tiller and manned on deck, and the spare tiller shipped in the rudder head, half an hour". These are her lines' words and the mend file's 1,800 s. The paragraph below it says "With the wheel (or the tiller) shot away ...", where it said "With the wheel shot away".
+  - **chapter 22**: "the wheel shot away (or the tiller, in a hull steered by one) loses you the helm", where it said "the wheel shot away loses you the helm". The hit is the tiller's on her.
+  - **chapter 2**: the conning words "speak to the wheel rather than to the course (to the tiller, in the same words, in the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig)". Run on the cutter beside the frigate, the ten words are each taken in the frigate's words; only her own heading differs where a word names it. The six named are the six files that carry the key.
+  - No forms table or orders block changes. The chapters' sizes are measured where they are served (only chapter 3's is pinned), and the primer's tests pass (below).
+- **`freesail/ship/schema.py`'s two comments** said the key is "read by nothing yet". They now say the six tiller files carry it and the helm's words read it. Comments only; no figure, pickle or refusal moves.
+- **`freesail/world/places.py`'s quarterdeck**, "where ... the wheel is", by her helm: **a stop, not built.** `Places` is built with the ship's name alone, by `core/world.py`, which nobody touches after stage 0. Both readers of the description (`the places` reading's `items` and `described`) are in `api/readings.py`, which the list does not give. Keying it on her helm in `places.py` alone cannot be done. It wants two lines of `api/readings.py`'s `_places`, the quarterdeck's description by the ship's helm, and a reader of it in `places.py`. Alternatively the description could say "the helm" on every ship, which moves every wheel ship's words; that is for the lead.
+  - **Built on the lead's ruling (a), nudge 47.** In `api/readings.py`'s `_places`, the quarterdeck is described by her helm in both of the reading's forms, the `items` and the lines `described`. The noun is taken from the one table, which gains it (`HELM_WORDS`' `helm`, "the wheel" or "the tiller"). `world/places.py` is left as it is. Old, on the six tiller files: "... where the captain and the officer of the watch keep the deck and the wheel is (Falconer 1780, QUARTER-DECK)". New: "... keep the deck and the tiller is (...)". Measured on the cutter, the lugger, the brig, the frigate and the bilander: only the tiller hulls' quarterdeck moves, by that word; the wheel ships' reading is byte for byte; the `words` and every other place are as they were. No pin moves. Pinned: `tests/test_helm_kind.py::test_the_places_reading_says_where_her_helm_is`, on the cutter, the brig and the frigate. On the old code (744f5893) its cutter case fails and the wheel ships' pass.
+
 ## Package 119: the merchant brig's watches five and five (2026-11-19)
 
 **The owner's word** (2026-11-19): "we might fix the merchant brig's watches to 5 and 5." **The lead's word** on the ground report the same day: the muster's own rule mended, in its narrowest form, and every ship it moves moved with her.
@@ -39379,6 +39426,8 @@ No other pin moves (the tiers' compare in the report). New: A1b's part of `tests
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
 
+**At its merge into `claude/pkg-90`, by hand (the lead's nudge 43).** A2's second pass removed `has_braced_yards`, and git merged A1a's line in `HeaveToScript.check` clean, leaving the name undefined (`ruff check`: F821; the xebec's `heave to` with no head sail set raising `NameError`; found by the engine's look-ahead). The line reads `not (head or after)`, A1a's meaning kept: "no braced yard" is what she carries, not what is set, so the tartane with her topsail furled is told "No head sail is set to haul to windward, nor a topsail to lay aback." and may set it and lay it aback. Every committed file and the xebec probe read the same either way; her case is pinned with her files. TuningNotes kept both sides' sections whole (stage 0's guards table, then A1a and A1b).
+
 ## Package 90, A1c: the rules captain and `put her about` with a whole lateen (2026-11-20)
 
 `docs/design/Plan-Package90.md` §6's A1c, on the lead's rulings of 2026-11-18 (§13.1: `LATEEN_TACK_KN` 22 kn a module constant of `orders/navigation.py`; `lateen_leave_kn` 12 kn and `bad_hand_s` 1,800 s read with defaults and written in no committed book; the tack regardless where there is no room to wear; an ordered `tack ship` over 22 kn obeyed and warned, in words only) and `docs/design/Design-Package90-Engine.md` §2.3 item 6. N2 struck (nudge 28): no corsair book, so the two keys are in no book at all. Keyed on a whole lateen set: **nothing of the eighteen files moves** (none sets one).
@@ -39570,8 +39619,6 @@ None. New: `tests/test_boat_towed.py`.
 - `world/movement.py`'s person in the boat at the ship's side (package 109, `_in_the_boat_at_the_side`) reads her first phase as "hoisting out" alone: a person in a towed boat while she is hauled alongside cannot belay her from the boat. The mend is one line there (`dealings.OUT_PHASES`); not in the step's files, so not edited.
 - `combat/hits.py`'s "stove on the booms by a shot" is said of any boat; a towed boat is not on the booms. Not in the step's files.
 
-**At its merge into `claude/pkg-90`, by hand (the lead's nudge 43).** A2's second pass removed `has_braced_yards`, and git merged A1a's line in `HeaveToScript.check` clean, leaving the name undefined (`ruff check`: F821; the xebec's `heave to` with no head sail set raising `NameError`; found by the engine's look-ahead). The line reads `not (head or after)`, A1a's meaning kept: "no braced yard" is what she carries, not what is set, so the tartane with her topsail furled is told "No head sail is set to haul to windward, nor a topsail to lay aback." and may set it and lay it aback. Every committed file and the xebec probe read the same either way; her case is pinned with her files. TuningNotes kept both sides' sections whole (stage 0's guards table, then A1a and A1b).
-
 ## Package 90, A1a and A1b's second pass: what befalls the yard, the belay, and the words (the lead's nudge 46, 2026-11-21)
 
 On `…/pkg-90-a1ab`, cut from the package's A1a-A1b merge, 0d5d2c56 (A2 and A3 under it, no A1c). Each of the lead's eight items mended with a proof in `tests/test_lateen_whole.py` ("The second pass"), and each proof shown to fail when its mend is undone (the session's scratch, `n46/mutate.py`: fourteen mutations, each failing its pins). Old is 0d5d2c56 unless said.
@@ -39650,5 +39697,39 @@ On `…/pkg-90-a1ab` above 2e1e19b, with no merge. Each of the lead's six items 
 - `test_the_clause_names_a_lateen_not_set_and_the_lateens_are_all_she_carries`: old "the mizen, ordered left, is not set."; new "the mizen is not set and is let be.".
 - `test_a_whole_lateen_on_the_bad_hand_draws_two_thirds_of_its_cloth`: old against `LUG_AGAINST_MAST_AREA`; new against `2.0 / 3.0`.
 - `change_lateen.yaml`'s last line: "Shifted the {sail}; {it_stands}.", the same words where it stands to leeward ("it lies on the mast, to windward" where a yard handed on went to a side the wind has left).
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the five that ride A1c's hash: the work handed on in its place and on its hands, and the end where a course was given (the lead's nudge 49, 2026-11-22)
+
+On `…/pkg-90-a1c`, cut from `…/pkg-90` at b3c68af4 (A1c and A3's lists on the third pass, the trunk at 7a1bd65e merged in), with no merge. Each of the five has a proof in `tests/test_lateen_whole.py` ("The five that ride A1c's hash"). Each proof fails when its mend is undone: the session's scratch `n49/mutate49.py`, ten mutations, each failing its pins. Old is b3c68af4 unless said. No pin of before moved.
+
+### The mends
+
+1. **The work handed on keeps the manoeuvre's place in the order of work** (`Runner._hand_on`: `Instance.order` and `given`, the manoeuvre's). Before, it took a new and later number, and an order waiting behind the manoeuvre no longer waited for it. Measured on the xebec probe, seed 7, the order given mid-change in a tack and then "belay tacking ship":
+   - "take in the mainsail": old, "The mainsail is in the gear; there is nothing to take in." the next tick, the take in dropped, and all three lateens set; new, it waits, and "Took in the mainsail; brailed up to its yard." once the mainsail is shifted, as after a plain tack.
+   - "take in all sail": old, the three lateens' take in dropped alike; new, the five sails taken in after the shift.
+   - "shift the mainsail": old, "Could not shift the mainsail: The mainsail is in the gear; only a lateen that is set is shifted round its mast. ..."; new, it waits, and "The mainsail lies to leeward of its mast already.", as after a plain tack.
+2. **The end's line where a course was given** (`TackScript._to_the_course`, `_pay_off`, `words`; `_how_she_lies_words(wind, aim, to_it)`): held to her state as the plain order's line is, on any hull that carries a whole lateen. "Full and by" is read against her close-hauled angle, "the course ordered" against the course, and "trimmed for the course ordered" against the course she paid off to, each within 10°. Where she lies otherwise, the course's clause is not said and the line says how she lies. Measured, seed 7 (`n49/r2.py`), old and new:
+   - The polacre probe with her jibs furled, `steer north-east` (and north-north-east): old "Tacked; braced up on the larboard tack, heading NE (49°), full and by."; new "..., heading NE (49°), but she has not paid off: she lies 49° off the wind with no way on her."
+   - The same, `steer east-north-east`: old "..., heading NE (49°), the course ordered.", nineteen degrees short of it; new as above.
+   - The same, `steer east`: old "Tacked; braced up for the course ordered on the larboard tack, heading NE (49°)." with 0.9 kn of sternway; new "..., heading NE (49°), but she has not paid off to it: she lies 49° off the wind with a knot of sternway."
+   - The xebec probe with her mizen furled, `steer north-east` and `steer east-north-east`: old "Tacked; trimmed on the larboard tack, heading E (94°), full and by." and "..., the course ordered."; new "..., heading E (94°), but she has fallen off: she lies 94° off the wind with three knots of way."
+   - The same, `steer east`, on her course: "Tacked; trimmed for the course ordered on the larboard tack, heading E (93°).", old and new.
+
+   No end in play lies between the two measures of a course steered as she lies (within half a point of close-hauled), so that rule is held by a test at the tack's own door: her head 12° past full and by, 7° past a course 5° free of it, is on it.
+3. **Three rules no test held, each pinned:**
+   - a casualty in the work handed on (blown out, its jeers, sheet or tack parted, its yard carried away): to the mainsail, the last yard, it ends the work in the file's words; to the mizen, the first, it is said of the mizen and the rest are finished;
+   - the side's words where a yard ends to windward, with the ruling: a wear belayed with the wind aft and brought back to her old tack (`steer west-north-west`) has each yard finished to the side it was going, now the weather side, and said "it lies on the mast, to windward."; left to go on, each stands to leeward;
+   - **the work handed on made to wait** is taken out: with item 4 it takes the manoeuvre's hands and begins at once, so nothing reaches the branch. Gone are `_start_waiting`'s skip of its preconditions and `_begin`'s skip of its first line, both as on the trunk before the third pass. On the trunk at 55b9658e, too, the work asked for all hands just after the belay had let the manoeuvre's go, and an all-hands request is too few only with no idle hand in its pool. The pin: it is never waiting, in its place, on the very hands the manoeuvre had.
+4. **The work handed on takes the hands the manoeuvre had** (`Runner._hand_on`: the manoeuvre's `assignment`, its hands' `at`, `want`, `all_hands` and `held_up`, taken before the manoeuvre is removed). The watch that was shifting the fill away's yard finishes it, with no call. All hands up for the tack stay up and are piped down as the last yard is set. It is named of every yard it still shifts (`Script.parts_named`, read by `Runner._describe`): "shifting the mainsail and the foresail and the mizen". Measured on the polacre probe's fill away from hove to, her fore lateen to windward, belayed mid-change: old, "All hands! (to shift the foresail)" at the belay and 70 hands; new, the fill away's twelve and no call, the foresail set at the same tick (1489). On the xebec's tack, the tack's 92 hands, all hands. The six probes' times from the order until the lateens draw on the new side, plain and belayed, are the third pass's, each to the second, old and new (`n46/r48b.py`: the xebec's tack 248 and 248, the polacre's fill away 187 and 190).
+5. **Read, not reached: `_try_resume` fails held work without handing on.** It is not reached by a manoeuvre with a change in hand. Work is held only by a manoeuvre's belay of the step-list work in hand (scripted work is not held) and by a post's leaving work they hold (`_post_off`). No post is counted a hand of a manoeuvre, nor of any work while one is in hand (`_working_posts`). And a save is refused while a manoeuvre's change is in hand, so none comes back held. Pinned on the polacre with her master heading the watch on deck and the watch counted too few: the master is counted for a numbered take in, but not for the fill away nor while it is in hand. Gone below mid-change, the fill away goes on, never held, and its yard is shifted. Undoing `_working_posts`' manoeuvre rule fails the pin.
+
+### Ruled
+
+- **The lugger's lugs at the belay**, allowed, the third declared line: its extent as measured by the lead's reader is wider than the third pass's notes said. It is 180 of 1,420 belays, the tack 68, putting her about 68 and the wear 44. By phase: at steady 92, come to 44, helm down 32 and mainsail haul 12.
+- A wear belayed with the wind aft and brought back to her old tack, its yards finished to windward and said: allowed as built (pinned, item 3).
+- The second pass's unsure 2 (a save in the work handed on loads; one in the manoeuvre's own change is refused): allowed as built.
+- The readings tool's full list carrying the practice's row on every ship: allowed.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
