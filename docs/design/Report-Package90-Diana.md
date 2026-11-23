@@ -45,6 +45,12 @@ fails five committed ships. **Her spanker cut on her own spars is stopped, as th
 with it, no `clr_x_m` holds truths D and E together, so her file keeps the larger sail until the
 lead rules which truth to restate.
 
+**The owner's (a) (§11).** Her spanker is now the one her spars carry, 95 m2 at 9.7 m, and
+`clr_x_m` is 2.65, chosen by a wide table of her tacks across 8 to 25 kn. Truth D is restated as
+measured: close-hauled her helm is within half a degree of amidships (-0.33 deg), and abeam she
+carries 1.54 deg of weather helm. Her other truths hold, each with its figure, and her picture
+does not move. For the lead: she misses stays in 20 and 25 kn with either sail.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -931,3 +937,130 @@ lead: §10.1, which truth to restate, or whether the larger sail stays. Her tier
 verdict, and for the spanker's ruling if it moves her file. Then I tier the exact hash I send, the
 fast tier whole beside a base on the merged tree and the slow tier of her files, pace tests
 excepted. For the owner: the spanker's restatement, if the lead puts it to them.
+
+## 11. Her spanker as her spars carry it: the owner's (a) (2026-11-23)
+
+The owner's word, in Decisions Part F, row D-s2 (on the package's branch at a6f7bc95): "My
+apologies, I answered the lead but wasn't aware you had an open question here with a different
+(a). Let's go with (a), as told to the lead." It supersedes row D-s ("Steel's boom, then
+measure"), and the lead's nudge 64 withdraws nudge 63. So, by the lead's nudges 61 and 62:
+- the spanker her spars carry, with her tacks kept;
+- `clr_x_m` chosen by the wide table;
+- truth D restated as measured.
+
+Old beside new, with the whole table, in `docs/dev/TuningNotes.md`, "The Diana: her spanker as her
+spars carry it". The work is in `36b4a3e`.
+
+### 11.1 Her boom's ground, as it is
+
+- **Her boom**, 10.9 m, is half her main mast by Luce's chain: **a rule, not a source**.
+- **Steel's 20-gun ship of 429 tons**, her near comparator, lists a driver boom of 45 ft 6 in
+  (13.9 m; Steel 1794 vol. I p. 50: Pages §7), 28% longer. It is known and not used, by the
+  owner's word.
+- **Her gaff**, 8.7 m, is Luce's 4/5 of the boom, the length of Steel's mizen yard (28 ft 6 in).
+
+Both notes in her file now say so. Before D-s2 arrived, I had measured Steel's boom at one seed:
+her rule cuts 114 m2 at 9.6 m on it. That figure is recorded and not used.
+
+### 11.2 The spanker, and what it moved
+
+- **Old:** the frigate-36's 167 m2 scaled by her chain, 111 m2 at 7.8 m above her water, x -16.1.
+- **New: 95 m2 at 9.7 m, x -16.6**, cut on her boom and gaff by her note's rule (`spanker_figures`
+  working from `spanker_spars`; §10.1 gives the method).
+- Through the generator, her plain sail goes from 1,054 to 1,038 m2 and her rope's scale from 0.816
+  to 0.810. The spanker's cloth rating and 56 ratings move with them.
+- Her spars and the eighteen are unmoved.
+
+### 11.3 The wide table, and the figure
+
+Her tacks from 290, 292.5 and 295 deg, in 8, 12, 15, 20 and 25 kn, at seeds 1 to 8, with her helm
+close-hauled and abeam at each wind and seed. **The eight seeds agree to the tick in every cell.**
+The truths' scenario has no gusts and no wind shifts, so a seed reaches nothing her going about
+reads, and the spread is across the winds and headings.
+
+| `clr_x_m` | Stayed, of 120 | 15 kn | Helm close-hauled, 8 to 25 kn |
+|---|---|---|---|
+| 2.600 | 56 | all three, 235 to 241 s | -0.63 to -0.31 deg |
+| 2.625 | 56 | all three, 233 to 240 | -0.55 to -0.22 |
+| **2.650** | **56** | **all three, 232 to 238** | **-0.47 to -0.14** |
+| 2.675 | 56 | all three, 231 to 237 | -0.39 to -0.05 |
+| 2.700 | 48 | **missed stays from 295** | -0.32 to +0.03 |
+| 2.725 | 56 | all three, 228 to 231 | -0.24 to +0.12 |
+| 2.750 | 56 | all three, 226 to 229 | -0.16 to +0.11 |
+| the sail as it was filed, 111 m2 at 2.8 | 56 | all three, 206 to 216 | +0.69 to +1.13 |
+
+In every row:
+- **12 kn:** she stays from all three headings.
+- **8 kn:** she stays only from 290.
+- **20 and 25 kn:** she does not stay at all.
+
+Each tack not made is a missed stay, said 59 to 107 s after the order.
+
+- **What the larger sail bought:** weather helm close-hauled, inside the old band, and tacks in
+  15 kn quicker by 22 to 26 s. It bought no tack the smaller sail does not make, in any wind
+  measured.
+- **The figure, 2.65 (JUDGEMENT).**
+  - From 2.6 to 2.675 she stays in every cell this band has, and at seed 7 her tacks held down to
+    2.0. At 2.7 she misses from 295 in 15 kn. 2.725 and 2.75 are a narrow island between that miss
+    and the one at 2.8.
+  - In the broad band, 2.65 is the lowest figure at which her close-hauled helm is within half a
+    degree of amidships at every wind measured. That is 0.05 short of the miss at 2.7.
+  - At 2.625 her close-hauled helm in 8 kn is -0.55 deg, outside the half degree.
+
+**For the lead: she misses stays in 20 and 25 kn under plain sail from all three headings, with
+either sail.** The frigate-36 stays from 292.5 in both, in 232 and 248 s. Truth E tests 15 kn
+alone, so no truth caught it. It is in her file as it was before this change, and is not the sail's
+doing.
+
+### 11.4 Truth D restated, and her other truths
+
+**Truth D (7-663), restated as measured:**
+- **Old:** close-hauled in 15 kn, 0.5 to 3 deg of weather helm, and abeam 1 to 3, Meyer's "steers
+  splendidly". She met it at 0.82 and 2.02.
+- **New: close-hauled, her helm within half a degree of amidships; abeam, 1 to 3 deg of weather
+  helm.** She meets it at **-0.33 and 1.54**.
+- The reason is in the test's docstring and TuningNotes: with the 95 m2 her spars carry, no
+  `clr_x_m` gives her that weather helm close-hauled and her tacks too, and the owner chose the sail
+  and her tacks.
+
+Her other truths, measured again at seed 7 by the truths' helpers. The old figures are with the
+frigate's spanker scaled.
+
+| Truth | Band | Old | New |
+|---|---|---|---|
+| B (7-661), Meyer's speed | 9.5 to 11.5 kn | 10.28 to 11.29 | 10.30 to 11.26 |
+| C (7-662), heel in 22 kn against the frigate-36's | 1.15 times at most | 8.10, 12.61 deg (1.10, 1.12) | 8.17, 12.63 deg (1.11, 1.12) |
+| E (7-664), each tack | 180 to 330 s | 206, 215, 216 s; ground lost 28, 42, 46 m | 232, 235, 238 s; 34, 44, 56 m |
+| the wear, truth 11's | 360 to 720 s | 492 s | 492 s |
+| F (7-665) and 7-660 | as filed | as filed | unmoved |
+| hove to; filled away and settled | | 126 s at 56 to 57 deg, 1.12 kn; 59, 156 s | 133 s at 59.8 to 60.1 deg, 1.16 kn; 59, 140 s |
+| truth 9, measured and not asserted | | 20 kn: nothing; 35 kn: her main royal yard, fore and mizzen royal masts and fore topgallant yard, 44 warnings | 20 kn: nothing; 35 kn: her three royal masts and the fore topgallant yard, each urgent, 50 warnings |
+
+### 11.5 Her viewer's picture
+
+**It does not move.** The viewer draws a gaff sail with a boom between its spars' ends
+(`client/projection.js`), reading neither its area nor its centre, and her boom and gaff are
+unchanged. Her 66 cases of the viewer's tests pass with her rows as they stood: the boom's frame,
+the sheet's end, and the boom over her taffrail. What the owner looks at live is what they saw.
+
+### 11.6 The checks on the head
+
+| Check | Tree | Result |
+|---|---|---|
+| `ruff check .` and `ruff format --check .` | `36b4a3e` | clean, 432 files; no line the branch adds is over 100 characters |
+| The generator into scratch, and `cmp` of every committed ship file | `36b4a3e` | 19 of 19 byte for byte |
+| The eighteen | `36b4a3e` | `git diff 329648e9 36b4a3e -- data/ships` names her file alone |
+| `tools/check_viewer_guns.py` on her file | `36b4a3e` | clean |
+| Her own tests, `tests/test_diana.py` | `36b4a3e` | 29 passed |
+| The 42 targeted files of §9.3 | `36b4a3e` | **3,846 passed, 5 skipped, 1 xfailed**; no failure, no harbour or browser test among any |
+
+### 11.7 Now
+
+Her hash for the lead's queue is the commit that adds this section, the branch's head. Her gate
+list is §9.5's with §10.5's two changes, the second now settled: truth D restated, on the spanker
+her spars carry. Her tiers wait for the engine's one A4 commit on the package's branch, as the
+coordinator holds them. Then I merge the package's branch once more, and tier the exact hash I
+send: the fast tier whole beside a base on the merged tree, and the slow tier of her files with
+the pace tests excepted.
+
+For the lead: her missed stays in 20 and 25 kn (§11.3). For the owner: none new.
