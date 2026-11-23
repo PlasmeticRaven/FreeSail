@@ -1418,21 +1418,69 @@ mend is undone: the session's scratch `n51/mutate51.py`, fourteen mutations, eac
 
 ### Measured: today's ships
 
-- **A2's harness** (270 runs) and **the wind-shift runs** (`n46/windshift.py`, 108) on this tree,
-  beside a13fb0f's (the base) and cde50e7's (old): running beside this commit. Their result follows
-  in the next commit, which touches this report alone.
+- **A2's harness** (270 runs) on this tree: byte for byte as at a13fb0f (the base) and as at
+  cde50e7 (old).
+- **The wind-shift runs** (`n46/windshift.py`, 108): byte for byte as at a13fb0f and at cde50e7.
 - Every changed road is read only on a hull that carries a whole lateen, or only by the work a
   belay hands on, which only a whole lateen's change makes, but one: `all_hands_work`, which reads
   for every other work the same flag as before (item 2).
 
 ### The test sets run, with counts, and the base comparison
 
-The fast and the slow tier whole run on this commit now, and the base's on a13fb0f beside it.
-Their results follow in the next commit, which touches this report alone.
+**The tiered hash is 71febde**, this pass's commit itself. The commit after it, which writes these
+results, touches this report alone.
 
-**The lens of the touched files** (52 files, `-n 2`, the list in the session's scratch
-`n51/lens_files.txt`) runs beside the tiers; its count follows with theirs. Before the commit,
-`tests/test_lateen_whole.py` whole: 227 passed.
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base, a13fb0f**, ran here the same way on its own
+worktree, and 71febde on its own, after it. Compared test by test by the test's id, with the xdist
+group's `@...` stripped.
+
+| Run | a13fb0f (the base) | 71febde | Against the base |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,815: 8,806 passed, 8 skipped, 1 xfailed, 0 failed (1 h 37 min, the lens and the harness running beside it) | 8,840: 8,830 passed, 8 skipped, 1 xfailed, **1 failed** (57 min) | **Every one of the base's 8,815 the same outcome but one**, none gone; **25 new, all passed**: 22 in `tests/test_lateen_whole.py` (A1d's own 8 and the five's 14) and A1d's truths 7-670 to 7-672 in `tests/test_known_truths.py`. **The one**: `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, passed at the base, failed here: a race in the harbour's start, the base's code, below |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (a rule of force and the runner touched, so the tier whole) | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min) | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min) | **Every one of the 569 the same outcome**, none gone, none new |
+
+**The one failure, read to its cause; not this hash's.** The stations table's first row for the
+officer read `''` where the scenario gives the station to a model (`'a model'`). In
+`freesail/ui/harbour.py` the game's start sets `self.started = True` under the harbour's lock, and
+then reads and parses the scenario file for its plan (`self.plan(scenario)`) while it builds
+`self.game`. `game_state` reads both under the driver's lock, not the harbour's. So a page's poll
+that falls between them sees a game started with no plan, and the table is drawn without it;
+under the tier's load the test read that first drawing. None of the files the test runs is
+touched: `freesail/ui/`, `client/` and `tests/test_harbour.py` are a13fb0f's byte for byte.
+- In the session's scratch, the window widened (a sleep of 1.5 s at `plan`'s head): the test
+  fails twice in two, with the tier's very assertion. With the plan read before the lock and
+  `self.started` set after `self.game`, the sleep still in place: passes twice in two. Restored.
+- The test alone on 71febde: three passes in three; on a13fb0f: three in three.
+  `tests/test_harbour.py` whole on 71febde: 42 passed (2 min 31 s).
+- In the twelve fast tiers' junits kept in this session's scratch, this is its one failure.
+
+Not mended: `freesail/ui/harbour.py` is in no row of mine. It is for the lead, below.
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, every case the same outcome
+at both: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 205 at the base, 227 now (A1d's own 8 and the five's 14), all
+passed.
+
+**The lens of the touched files**, `-n 2`, on the working tree as committed (only this report and
+the notes changed after it began): 3,603 passed, 1 skipped, 1 xfailed, 0 failed (1 h 5 min); the
+fast tier above holds each of its files on the exact hash. Its 52 files (the session's scratch,
+`n51/lens_files.txt`): `test_agent_api`, `test_agents`, `test_bellerophon`, `test_bilander`,
+`test_captain`, `test_captain_rules`, `test_captain_trials`, `test_captains`, `test_catalogue`,
+`test_checkpoint`, `test_company_moved`, `test_crew_orders`, `test_crews`, `test_damage_control`,
+`test_driver`, `test_evolutions`, `test_found_on_the_way_85`, `test_gale`, `test_grammar_book`,
+`test_hands`, `test_held_hulls`, `test_held_work`, `test_helm_kind`, `test_hull_lugger`,
+`test_indefatigable`, `test_knowledge`, `test_known_truths`, `test_lateen`, `test_lateen_whole`,
+`test_lug`, `test_lying_to`, `test_mends_109`, `test_mends_75`, `test_neufchatel`, `test_officer`,
+`test_orders`, `test_practice`, `test_practice_orders`, `test_probes_90`, `test_readings`,
+`test_replay`, `test_rig_geometry`, `test_rig_words`, `test_sails`, `test_schooner_mast`,
+`test_settee`, `test_ships`, `test_standing`, `test_staying`, `test_strain`, `test_studding` and
+`test_tackle_orders`.
+
+**On 71febde's tree:** `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte with
+`data/ships/`; **`ruff check`** and **`ruff format --check`**, clean.
 
 ### For the lead
 
@@ -1447,5 +1495,14 @@ Their results follow in the next commit, which touches this report alone.
 2. **A tack missed on a hull with no whole lateen** is read as before: package 75's B3.4b names
    the tack she lies on ("Tacked; braced up on the starboard tack ..." of a ship fallen back), and
    no other ship's end moves.
+3. **A race in the harbour's start** (`freesail/ui/harbour.py`, `start` and `game_state`; in no
+   row of mine). `self.started` is set before `self.game` is built, and the scenario's plan is
+   read between the two, while `game_state` reads both under the driver's lock and not the
+   harbour's. A page's poll that falls between them draws the stations table with no plan. It
+   failed `test_harbour`'s stations test once, in the fast tier on 71febde (above, with its proof).
+   The mend, tried in scratch only: read the plan before the lock, and set `self.started` after
+   `self.game`. As the lead's nudge 32 asked, said: a harbour test of the base failing once on a
+   tree with my files.
 
-**Next:** the tiers, then `…/pkg-90-a1d` merged into `…/pkg-90-engine`, as before, and A5-A6.
+**Next:** `…/pkg-90-a1d` merged into `…/pkg-90-engine`, as before; then A5 and A6 as their own
+hash, on the lead's word.
