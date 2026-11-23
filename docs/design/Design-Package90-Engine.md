@@ -1557,7 +1557,13 @@ words):**
   peak up the yard and pass the car round." where it is changed.
 - **Hung in stays** (`_hang`): a foremost lateen is left aback with the head sails to pay her head
   off ("Her head is through the wind; the head sails and the fore lateen aback pay her off."); an
-  aftermost one's sheet is eased till "let go and haul".
+  aftermost one is **hauled to windward with the booms** till "let go and haul", as the mizen
+  course and the settee are. *Corrected 2026-11-23 (the lead's nudge 55; the lateen hulls' list,
+  item 5):* this draft and A1d had it eased. That was A1d's own judgement, that a whole lateen
+  cannot be hauled over its mast as a boom is, and no source gave it. Measured over 1,536 probe
+  tacks, the 22 that hang in stays (all the polacre's) all missed stays with it eased and all came
+  round with it hauled, the yard well under its rating either way. So the ease cost her stays for
+  nothing, and it is put back (the engine's report, "The lateen hulls' list (nudge 53)", item 5).
 - **In the wear**, at "wind aft", each lateen to be left goes over against its mast with the other
   sheets ("Wind aft. Shifted over the sheets; the mainsail over against the mast."), each to be
   changed begins its change; a wear never holds one aback.
