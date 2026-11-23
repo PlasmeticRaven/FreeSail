@@ -11999,3 +11999,8 @@ And the tartane's own, as before: A4's points 1 to 3, her boat's note, truth 7-6
 - **One question before any of it is filed: are her boom and gaff from a source, or scaled?** If their lengths are a judgement, say so and what a boom of her date and class measured: a spanker of 111 m² may be the truth and the boom the fault. If they are sourced, (a) stands as above. Either way the viewer follows her spars.
 
 Her tiers wait for the spanker settled and for A4's one commit (nudge 60), then on the exact hash.
+
+**2026-11-23, 21:59 UTC (nudge 62): the Diana's spanker: the owner's word is (a).** Given to the lead directly, in his words: "Agreed, let's go with (a)." So: the sail her spars carry (95.0 m² at 9.71 m by her note's rule), her tacks kept, truth D restated as measured, old beside new with the reason in the tuning notes, passed at my gate.
+- **First, the one question of nudge 61, answered in her report: are her boom and gaff from a source or scaled?** If sourced, or scaled on a ground you can name, file (a). Only if a source contradicts their lengths, stop and say before filing: that would be a different fault and I would take it to him again.
+- **The figure by the wider table,** as nudge 61 asks: between 2.6 and 2.75, her tacks from the three headings across 8, 12, 15, 20 and 25 knots and at least eight seeds, the figure chosen where she stays most surely with her helm inside half a degree; the same table once for the sail as it was filed, for the record of what the larger sail bought.
+- Then her other truths measured again, each with its figure, and her tiers on the exact hash once A4's one commit is on `claude/pkg-90`.
