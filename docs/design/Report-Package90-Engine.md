@@ -2432,3 +2432,43 @@ The pinned files on it, `tests/test_yard_level.py` and `tests/test_pole_mast.py`
 **The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 3d4a468: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 227; all passed.
 
 **For the coordinating session:** the pins' commit is **6dcfe40** on `…/pkg-90-a56`, pushed and tiered; the commit after it touches this report alone. It is merged into `…/pkg-90-a4` at 0e66d03 (A4's hash ee1b856, its section there), and A4's fast and slow tiers run on ee1b856 now.
+
+## A4's hash at nudge 57: the trunk merged through `…/pkg-90` at 7405febf, the lines resolved by hand; the tiers on ee1b856 stopped, restarted on this hash (2026-11-23)
+
+**The merge:** **40a532e** on `…/pkg-90-a4`, parents **ee1b856** (A4's hash at nudge 56) and **7405febf** (`…/pkg-90`'s tip: b6c7b5b2 with the trunk at 9c95644b merged in, A5 and A6 merged there at 214e70db by 6dcfe408), as the lead asks before A4's hash. Two merge bases, 6dcfe40 and d83a9b26; the merge took 6dcfe40. Over ee1b856 it brings three docs and no other file:
+- `docs/dev/M7-WorkPackages.md` (53 lines in, 1 out) and `docs/dev/ShipsNudge.md` (1 in, 1 out), as the trunk has them;
+- this report's section "The pins' fast tier (nudge 56)" (07e5411's, 14 lines).
+
+No code, data, test or tool moves: `freesail/`, `data/`, `tests/` and `tools/` are ee1b856's trees. And 7405febf's are d83a9b26's and the trunk 9c95644b's, the same trees, so the trunk's code is the old side of every measure below, as it was at nudge 55.
+
+**Which lines were resolved by hand:** this report, one hunk.
+- Git set this branch's "A4's hash at nudge 56" (32 lines) against `…/pkg-90`'s "The pins' fast tier (nudge 56)" (14 lines).
+- Resolved by section, each whole: this branch's first, then the pins' tier.
+- **One line added by hand:** a blank line before the pins' tier's heading.
+- Against either side the file loses no line.
+
+**Checked on the merged tree:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return in the merge's diff;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers on ee1b856, stopped.** They began at 14:25, after the pins' fast tier, and were stopped at 16:06 when nudge 57 came: the hash sent is the hash tiered. Kept as measured, not as the hash's record:
+- **The fast tier finished:** 8,981, of which 8,971 passed, 8 skipped, 1 xfailed and **1 failed** (1 h 34 min 51 s).
+  - Against 6dcfe40, every other case had the same outcome, and none was gone but the one renamed at nudge 53 (`..._eased_and_not_hauled_over` -> `..._hauled_to_windward_with_the_booms`, in the lateen hulls' list above).
+  - There were 59 new cases, all passed: `tests/test_boat_towed.py` 29, `tests/test_lateen_whole.py` 29 and `tests/test_pole_mast.py` 1.
+- **The one failed:** `tests/test_known_truths.py::test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge`, package 89's measure of the tide's pace. A fresh cell's work with the blocks must stay within a quarter of the eleven gauges' alone, the best of five timed runs each. It gave 0.0226 s against 0.0116. It passed at 3d4a468 and at 6dcfe40.
+  - The modules it loads are `freesail/world/tide.py`, `geo.py`, `units.py` and `core/moon.py`. None of them moves between 6dcfe40 and ee1b856, nor does the data they read.
+  - Run alone six times on each hash, alternating, while the slow tier held the machine: it **failed once on ee1b856** (0.0145 against 0.0116) and **three times on 6dcfe40** (0.0200 against 0.0125, 0.0149 against 0.0119, and 0.0174 against 0.0118).
+  - It is a measure of time on a loaded machine. The machine has run 1.77 times slower since its restart at 12:35 (the pins' tier, above). The test is not touched.
+- **The slow tier** was stopped six minutes in; no result is kept.
+
+**The tiers on this hash** (40a532e), running from 16:08 on a worktree of their own, one after the other:
+1. the fast tier whole, test by test against 3d4a468, 6dcfe40 and ee1b856;
+2. the slow tier whole, against 3d4a468 (6dcfe40's slow tier is 3d4a468's, the same code);
+3. the eighteen in gales on this hash, against the trunk's code (d83a9b26's run at nudge 55) and against beeb4149's;
+4. truth 7-284 alone on the idle machine, ten times on this hash and ten on 6dcfe40, alternating.
+
+The results follow in a section of their own, with the seven of the lateen hulls' list read item by item. The commits after 40a532e touch this report alone.
+
+**For the coordinating session:** A4's hash is **40a532e** on `…/pkg-90-a4`, pushed, its tiers running.
