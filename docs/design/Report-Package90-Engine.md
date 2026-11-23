@@ -2053,6 +2053,10 @@ trunk as it will stand**, `…/pkg-90` at 32c9448; **new is b40ffa3**. Times fro
 | `furl the topsail` | "Lay aloft and furl the topsail."; "Clewed up the topsail." at +150 s; "Furled the topsail." at +400 s: 350 s | "Lay out on the yard below and furl the topsail."; "Lowered the topsail down onto the yard below and clewed it up there." at +150 s; "Furled the topsail on the yard below." at +350 s: 300 s. **JUDGEMENT**, as ruled |
 | `take in all sail` | the topsail as take in; the jib, last, hauled down at +412 s | the topsail as take in now; the jib at +350 s |
 | `strike the topmasts` (and `send down the topgallant masts`, `fid the topmast`) | "She has no topmasts to strike; her masts are the main mast." | "... her masts are the main mast (a pole, the mast and topmast in one stick)." |
+| **Every refusal that lists her masts** (`mast_inventory`; written out at the lead's nudge 56, ruled allowed): 62 phrases of the vocabulary, each given to her at sea. The twenty catharpin orders (`swifter in`, `ease`, `cast off` and `catharpin in`, eight of the fore mast and twelve of the mizzen); crossing the topgallant and royal yards (7) and sending them down (6); sending down or striking the topgallant masts (9) and swaying them up or fidding them (9); fidding or swaying up the topmasts (6) and striking or housing them (5) | "She has no fore mast; her masts are the main mast.", "She has no topgallant and royal yards to cross; her masts are the main mast." and their kin | every one the same but the note: "... her masts are the main mast (a pole, the mast and topmast in one stick)." |
+| `heave to` in 30 kn, held 1,800 s (nudge 56, ruled allowed) | "Could not heave to: she would not lie to on the starboard tack; the helm amidships." at +986 s; 59.4° off at 7.48 kn at +1,200 s | "Could not heave to: she would not lie to on the starboard tack, the wind on the starboard bow; the topsail left aback and the helm amidships." at +986 s; "Jib taken aback." at +1,178 s; she pays off before the wind with it aback, 149.7° off at 6.02 kn at +1,200 s |
+| `heave to`, then `tack ship` at +600 s with the topsail to the mast (nudge 56, ruled allowed) | tacked at +116 s of the order (+120 s after 300 s hove to) | "Missed stays: she hung in stays and would not come round. ..." at +541 s of the order (the same after 300 s and 900 s hove to). The cutter hove to with her topsail to the mast refuses that tack on both sides: "She has not way enough on her to stay: 2.0 kn through the water." |
+| `back and fill`, held 1,800 s (nudge 56, ruled allowed) | "Backed and filled; lying to with the square sail to the mast." at +836 s; "She has filled and gathers way, the wind on the starboard bow: hove to no longer." at +948 s | "Backed and filled; lying to with the topsail to the mast." at +833 s; "She has fallen off, the wind on the starboard quarter, abaft the beam, and the helm and the sheets will not bring her to: hove to no longer." at +1,125 s |
 | `get under way` (Carrick Road, her topsail furled by `come to an anchor`) | | **the trunk's, line for line and tick for tick**: her topsail furled through the cast; at +1,500 s her head 125.3° at 4.19 kn |
 | `tack ship`, `wear ship`, `box haul`, `scud`, `shorten sail`, `set the topsail`, `trim sails`, `square the yards`, `brace sharp up on the larboard tack`, `come to an anchor` | | the trunk's, line for line and tick for tick |
 
@@ -2085,3 +2089,123 @@ tick, kind, trace and line. The runs' files are kept in the scratch (`n52/`).
 **For the coordinating session:** A5 and A6's hash is **b40ffa3** on `…/pkg-90-a56`, pushed, its
 tiers held. The engine track's merge of A1d's hash (64efd89) is tiered meanwhile on its own
 branch, as before.
+
+## A5 and A6's hash tiered (nudges 53 and 54): `…/pkg-90` merged at efc5d779 and at 40561a76, the tiers on 3d4a468 (2026-11-23)
+
+**The first merge (nudge 53):** **50bb169** on `…/pkg-90-a56`, parents **695331e** (A5 and A6's
+hash, b40ffa3, and its section above) and **efc5d779** (`…/pkg-90`'s tip: 32c9448 with the trunk at
+e3026cdb merged in, A1d merged there at 793adc04 by 71febde6), as nudge 53 and the coordinating
+session ask. It brings four commits, the trunk's 71b89f8, 793adc0 and e3026cd and `…/pkg-90`'s
+efc5d77, and two files, both docs: `docs/dev/M7-WorkPackages.md` (41 lines in, 1 out) and
+`docs/dev/ShipsNudge.md` (1 in, 1 out), as the trunk has them. It merged clean: **no line resolved
+by hand.** Its code, data, tests and tools are b40ffa3's byte for byte; and efc5d779's are 32c9448's
+and 71febde's (`freesail/`, `data/`, `tests/` and `tools/` the same trees), so the base's tiers are
+71febde's.
+
+**Checked on the merged tree:** no conflict marker; `ruff check` and `ruff format --check` clean;
+no carriage return in the merge's diff; `python tools/gen_ships.py <scratch>`, 18 of 18 byte for
+byte.
+
+**The second merge (nudge 54):** **3d4a468** on `…/pkg-90-a56`, parents **50bb169** and
+**40561a76** (`…/pkg-90`'s tip: efc5d779 with the trunk at 8f9a4b45 merged in, the harbour's start
+race mended there by the lead at ecfacf09), as the lead asks before the next hash is sent. It brings
+three commits, the trunk's ecfacf0 and 8f9a4b4 and `…/pkg-90`'s 40561a7, and four files:
+`freesail/ui/harbour.py` (13 lines in, 6 out), `tests/test_harbour.py` (72 in), and two docs,
+`docs/dev/M7-WorkPackages.md` and `docs/dev/ShipsNudge.md`, as the trunk has them. It merged clean:
+**no line resolved by hand.** Its code over 40561a76 is A5 and A6's own lines, the twelve files of
+the section above, line for line as over efc5d779. Checked as the first: no conflict marker; ruff
+clean; no carriage return; the generator 18 of 18 byte for byte.
+
+**The tiered hash is 3d4a468**; the commit after it, which writes these results, touches this
+report alone. The tiers of 50bb169, run before nudge 54 came, are kept below as measured: that
+hash is not to be sent, but its run is the record of A5 and A6 beside efc5d779.
+
+**The tiers of 50bb169** (nudge 53's merge; begun before nudge 54, and finished). All from the
+tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a
+worktree of its own, each junit kept in the session's scratch, compared test by test by the
+test's id (the xdist group's `@...` stripped) beside `…/pkg-90` at efc5d779: its tiers are those
+of 71febde, the same code tree (in `…/pkg-90-a1d`'s section).
+
+| Run | 50bb169 | Against efc5d779 (71febde's tiers) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,902: 8,892 passed, 8 skipped, 1 xfailed, 1 failed (58 min 45 s) | efc5d779's 8,840 (8,830 passed, 8 skipped, 1 xfailed, 1 failed): **every one the same outcome**, none gone; **62 new, all passed**, A5 and A6's own: `tests/test_yard_level.py` 34 and `tests/test_pole_mast.py` 28. **The one failed, at both:** `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, with the same message at both ("At index 3 diff: '' != 'a model'": the planned door's cell empty), the harbour's race in its start (the lead's to mend, nudge 52), `freesail/ui/` and `client/` the same at both. Run alone on 50bb169 three times, in its own worktree: passed three times |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 9 min 17 s) | efc5d779's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+efc5d779: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
+`tests/test_lateen_whole.py` 227; all passed.
+
+### The smack, and the three harness runs, against efc5d779
+
+Run again on 50bb169 and on efc5d779 (each from its own worktree; `a5/play.py` and `a2/harness.py`
+in the session's scratch, as in the section above):
+- **The smack's table:** each side's run is byte for byte nudge 52's (32c9448's and b40ffa3's), so
+  the table above stands as it is, old (efc5d779) beside new (50bb169), line for line and figure
+  for figure.
+- **The harness whole:** 270 runs, **269 the same in every tick, kind, trace and line**. The one:
+  the smack's `lie_a_try`, in its refusal's words alone ("Order not carried out ('lie a-try'): She
+  has no topsail to lie a-try under." -> "Order not carried out ('lie a-try'): The topsail is not
+  set; set it to lie a-try under it."), her trace the same, 60 rows. Her `anchor` (34 events, 390
+  trace rows) and `shoal_anchor` (33 events, 390 rows) the same, line for line and tick for tick.
+  Each side's file is byte for byte its run for nudge 52 (new) and for nudge 51 (old: 71febde's).
+
+### The tiers of 3d4a468 (nudge 54), test by test
+
+Run as the first, on a worktree of its own, then `…/pkg-90` at 40561a76 tiered whole on another
+(none of its tiers was to hand, and the harbour's file is reached through `freesail/ui/server.py`
+by every page's test), each case set beside its outcome there and at 50bb169.
+
+| Run | 3d4a468 | Against 40561a76 | Against 50bb169 |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,903: 8,894 passed, 8 skipped, 1 xfailed, 0 failed (54 min 27 s) | 40561a76's 8,841 (8,832 passed, 8 skipped, 1 xfailed, 0 failed; 59 min 42 s): **every one the same outcome**, none gone; **62 new, all passed**, A5 and A6's own: `tests/test_yard_level.py` 34 and `tests/test_pole_mast.py` 28. The harbour's browser test and the trunk's new one passed at both | 50bb169's 8,902 (8,892 passed, 8 skipped, 1 xfailed, 1 failed): **every one the same outcome but one**, none gone; **1 new, passed**, the trunk's: `tests/test_harbour.py::test_a_page_that_asks_while_a_game_starts_finds_one_whole_game`. **The one:** `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, failed at 50bb169, passed here: the harbour's start, as mended on the trunk at ecfacf09 |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 5 min 51 s) | 40561a76's 569 (558 passed, 11 xfailed, 0 failed; 1 h 12 min 1 s): **every one the same outcome**, none gone, none new | 50bb169's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+40561a76 and at 50bb169: the byte test and the golden classing table 96 passed;
+`tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py`
+21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth
+7-606 74; `tests/test_lateen_whole.py` 227; all passed.
+
+**The smack's table and the three harness runs** are not run again: nudge 54's merge brings no
+file they read (the harbour's two and two docs alone), and they are measured above against
+efc5d779, whose code is 40561a76's but for `freesail/ui/harbour.py`. The coordinating session
+allows it.
+
+**For the coordinating session:** A5 and A6's hash is **3d4a468** on `…/pkg-90-a56`, pushed and
+tiered; the commit after it touches this report alone. The lateen hulls' list rides A4's hash, as
+the lead confirms: five of its seven are built on `…/pkg-90-lateen` (b3cd1eb, cut from 50bb169;
+its section there), items 1 and 3's strain line stopped on `physics/strain.py` (the row's "not
+touched", the mend proposed), item 7 asked. That branch takes the trunk before A4's hash is
+reported, as nudge 54 asks, and its tiers run on that hash. **Next:** A4, on the lead's word.
+
+## A5 and A6 held for two pins (nudge 56): the yard levels in a table and the smack's `lie a-try`, tests alone; what moves on her written out (2026-11-23)
+
+**The commit:** on `…/pkg-90-a56` at 2447e57 (A5 and A6's hash 3d4a468 and its tiers), as the lead asks: one commit of tests alone, with this report and the notes. It touches no code, data or tools, only `tests/test_yard_level.py` and these two records. There is no merge, so no line was resolved by hand.
+
+**Pin 1: every committed yard's level in a table.** `COMMITTED_YARD_LEVELS` in `tests/test_yard_level.py` lists the eighteen files' 91 braced yards, each at its level as the files stand. Files with no braced yard (the five boats and the lugger) have empty rows. It is held both ways, as stage 0's `KEY_CARRIERS` is:
+- `test_the_table_of_yard_levels_has_a_row_for_every_committed_file_and_no_other`: a row for every file and no other, 91 yards.
+- `test_each_committed_files_yards_are_the_yards_of_its_row_at_their_levels`, file by file: a yard in the file and not in its row fails, a row's yard the file does not have fails, and a level moved fails.
+
+Measured, as the lead asks, with a change to a ship's file where both sides move together: the cutter's topgallant mast filed as a royal mast. The guard working the old formula again passes it, and the table fails it. (Her topgallant yard filed on the topmast is caught by both.)
+
+**Pin 2: the smack's `lie a-try`** (ruling 3: she follows the cutter, no further). `test_the_smacks_lie_a_try_is_refused_furled_in_her_topsails_words_and_set_she_lies_a_try`:
+- with her topsail furled, "Order not carried out ('lie a-try'): The topsail is not set; set it to lie a-try under it." at the order;
+- with it set, "Lying a-try under the topsail and the foresail, helm a-lee." at +348 s, the table's figure.
+
+Both start from `_smack_with_her_topsail` with 300 s more, the trims done. On the settle alone the order waits behind the trims: furled, it is refused at +65 s in the same words; set, she lies a-try at +648 s. The trunk's words put back in `LieATryScript.check` ("set it, close-reefed, to lie a-try under it.") fail it. The file holds 54 cases, all passed.
+
+**What moves on her, written into the table** (the section "A5 and A6 as their own hash (nudge 52)", "The smack, old beside new", and the notes' A6 table). Each was measured, old `…/pkg-90` at 40561a76, whose code is the trunk's, against 3d4a468:
+- **Every refusal that lists her masts** (`mast_inventory`). Every phrase of the vocabulary, 1,949, was given to her at sea: 62 answers list her masts, on both sides, and every one differs by the pole's note alone. Of the 62:
+  - 20 are the catharpin orders, 8 of the fore mast and 12 of the mizzen;
+  - 7 cross the topgallant and royal yards, and 6 send them down;
+  - 9 send down or strike the topgallant masts, and 9 sway them up or fid them;
+  - 6 fid or sway up the topmasts, and 5 strike or house them.
+- **Heaving to in 30 kn, held 1,800 s.** It fails at +986 s on both sides. Now: "...; the topsail left aback and the helm amidships." She pays off before the wind with it aback, 149.7° off at 6.02 kn at +1,200 s, where the trunk's smack lay 59.4° off at 7.48 kn.
+- **A tack ordered from hove to,** 600 s after `heave to`, the topsail to the mast. She misses stays at +541 s of the order (the same after 300 s and 900 s hove to), where the trunk's tacked at +116 s. The cutter, hove to so, refuses it on both sides: "She has not way enough on her to stay: 2.0 kn through the water."
+- **Backing and filling, held 1,800 s.** She falls off to the quarter, "hove to no longer", at +1,125 s, where the trunk's filled at +948 s. The lead's reader gave +1,237 and +1,061 s: 112 and 113 s later, from a settle of their own.
+
+**The tiers:** the fast tier whole runs on this commit's hash, test by test against 3d4a468's. The slow tier is the same code, since this commit adds tests and records alone, and is not run again. The results follow in a section of their own.
+
+**For the coordinating session:** the pins' commit is this section's, on `…/pkg-90-a56`, pushed, its fast tier running. Next, A4's: the pole's marks glossed in the catalogue, this commit merged into `…/pkg-90-a4`, and A4's tiers on that exact hash.
