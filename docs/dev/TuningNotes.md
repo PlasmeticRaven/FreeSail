@@ -39839,3 +39839,9 @@ The probes stay as stage 0 wrote them (`tests/rig_fixtures.py`). Truths 7-670, 7
 A hull's own file carries the generator's ratings; her builder measures her own yards against A1d's bands at her gate.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, with A4's hash: the pole evolutions' marks glossed where they are served (the lead's nudge 56, 2026-11-23)
+
+The catalogue (`agents/tools.py`, `_evolution_text`) glosses `{sail}` alone. `take_in_pole` and `furl_pole` (A6) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`, which `scripts.pole_words` fills by the yard below. Each file's served notes now end with a paragraph that glosses them in the words the game fills them with, the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" ...; where no square yard is crossed below it, with "down to the hounds" ...". No line of code; what she does and says does not move. `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`, so a word changed in one place and not the other fails it; it fails with the gloss undone.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
