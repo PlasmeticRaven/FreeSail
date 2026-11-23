@@ -2535,3 +2535,63 @@ Each item's proofs are in `tests/test_lateen_whole.py`, and every one passed in 
    - The three truths: 3 passed.
 
 **For the coordinating session:** A4's hash is **40a532e** on `…/pkg-90-a4`, pushed and tiered whole: the fast tier and the slow, 0 failed. The commits after it touch this report alone. Every warning line and tick of the eighteen in gales is the trunk's, and the seven are read above. **Next:** the Diana, then the tartane, whose gate begins with the lateen hulls' list, on the lead's word.
+
+## A4's one commit (nudge 60): the boat entries' marks glossed where they are served, pinned against the game's words; what is served, old beside new (2026-11-23)
+
+**The commit:** on `…/pkg-90-a4` at 329648e (A4's hash 40a532e and its two report commits), as the lead asks, and nothing else in it: two entries' served notes, one test, and this section. No line of code moves, and nothing she does or says. There is no merge, so no line was resolved by hand.
+
+**The gloss.** `send_boat` and `lay_out_kedge` serve `{boat_out}`, and `send_boat` also `{boat_back}`, where the trunk's served the words. Each entry's served notes now end with a line as the two pole entries carry, in the words the game fills them with:
+- `send_boat`: "In its words the game fills {boat_out} with "Hoist out {boat}" and {boat_back} with "hoisted in"; for a boat towed astern, with "Haul {boat} up alongside" and "veered astern on her painter again"."
+- `lay_out_kedge`: "In its words the game fills {boat_out} with "Hoist out {boat}"; for a boat towed astern, with "Haul {boat} up alongside"." It serves `{boat_out}` alone; its line when done names the boat by `{boat}`, as on the trunk.
+
+**Where the game takes the words:** `freesail/evolutions/scripts.py`, `_boat_out_words` for both entries' `{boat_out}`, and `SendBoatScript.words` for `{boat_back}`. These are the words `world/boats.py` and `world/dealings.py` (`_back_aboard`) give the boat's own lines. `{boat}` and `{boat_cap}`, the boat's name, were served on the trunk and are as they were.
+
+**The pin:** `tests/test_boat_towed.py`, `test_the_boats_evolutions_marks_are_glossed_in_the_words_the_game_fills_them_with`, one case for each entry.
+- Every mark of the entry's logged lines but the boat's name is glossed, of a boat on deck and of one towed astern.
+- On the tartane probe, with her boat on deck and with it towed, at anchor in Carrick Road, the order is given, and the running script's own words are the gloss's.
+- The line logged at the start is the entry's, filled with them.
+
+It was tried against six faults, and each fails it:
+- the gloss's "hoisted in" changed;
+- the kedge's towed words in the gloss changed;
+- the gloss taken out of `send_boat`;
+- the game's "Haul {boat} up alongside" changed (both cases fail);
+- the game's "veered astern on her painter again" changed;
+- the kedge's start line put back to the trunk's "Hoist out {boat}".
+
+The catalogue's readers (`test_agents`, `test_in_world`, `test_held_work`, `test_evolutions`), with `test_boat_towed`, `test_pole_mast` and `test_ports`: 441 passed, 1 xfailed.
+
+**What is served, old beside new: every entry of the catalogue.** The trunk at 27e97e4 (its code 9c95644b's) beside this commit, each of the 113 entries' served text (`agents/tools._evolution_text`) compared whole: **109 the same, word for word. Four differ**, all of A4's hash:
+
+| Entry | The trunk serves | This hash serves |
+|---|---|---|
+| `take_in_pole` (A6's) | `{pole_lowered}` and `{pole_hanging}`, not glossed | the same, and the gloss line (4e7ebe1, nudge 56): "...fills {pole_lowered} with "down onto the yard below" and {pole_hanging} with "lowered on the yard below"; where no square yard is crossed below it, with "down to the hounds" and "lowered to the hounds"." |
+| `furl_pole` (A6's) | `{pole_lowered}`, `{pole_furl_from}` and `{pole_furled_on}`, not glossed | the same, and the gloss line (4e7ebe1), the yard below's three and the hounds' three |
+| `send_boat` | at the start "Away {boat}'s crew! Hoist out {boat}."; when done "{boat_cap} hoisted in."; timing `hoist_out_s` 300, `hoist_in_s` 300, `boat_pace_kn` 4 | at the start "Away {boat}'s crew! {boat_out}."; when done "{boat_cap} {boat_back}."; the towed boat's paragraph; timing with `haul_alongside_s` 60 and `veer_astern_s` 60 beside the rest; and the gloss line (this commit) |
+| `lay_out_kedge` | at the start "Hoist out {boat}; the kedge and a hawser into her."; timing `hoist_out_s`, `sling_s`, `boat_pace_kn`, `hoist_in_s`, `hawser_fraction` | at the start "{boat_out}; the kedge and a hawser into her."; the towed boat's paragraph; timing with `haul_alongside_s` 60 and `veer_astern_s` 60; and the gloss line (this commit) |
+
+On every committed ship no boat is towed, so the game fills `{boat_out}` with "Hoist out {boat}" and `{boat_back}` with "hoisted in". Her logged lines are the trunk's word for word, as the lead's reader found in 130 runs of the boats' work. The gloss tells a seat so where it is served.
+
+**Checked on this commit:**
+- `ruff check` and `ruff format --check` clean;
+- no line over 100 characters;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte (no ship file touched).
+
+**The tiers:** the fast tier whole runs on this commit's hash, test by test against 40a532e's. The results follow in a section of their own; the commit after this one touches the report alone.
+
+**For the coordinating session:** A4's one commit is this section's, on `…/pkg-90-a4`, pushed, its fast tier running. Next, the lateen hulls' list as it stands (nudge 60's eight), on `…/pkg-90-lateen` once A4 is on `…/pkg-90`.
+
+## A4's one commit tiered (nudge 60): 0040fda's fast tier whole, test by test against 40a532e (2026-11-23)
+
+**The tiered hash is 0040fda**, the one commit in the section above. The commit after it, which writes these results, touches this report alone. Run as before: from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a worktree of its own, with the junit kept in the session's scratch and compared test by test by the test's id (the xdist group's `@...` stripped).
+
+| Run | 0040fda | Against 40a532e |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,983: 8,974 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 13 min 35 s) | 40a532e's 8,981 (8,972 passed, 8 skipped, 1 xfailed): **every one the same outcome**, none gone; **2 new, both passed**, the pin's two cases in `tests/test_boat_towed.py` (`send_boat` and `lay_out_kedge`). The 8 skipped and the 1 xfailed are the same cases at both |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 40a532e: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 255; all passed.
+
+The slow tier is not asked for this commit and was not run. It is 40a532e's code with two entries' comments and one test added, and 40a532e's slow tier stands (569: 558 passed, 11 xfailed, 0 failed).
+
+**For the coordinating session:** A4's one commit is **0040fda** on `…/pkg-90-a4`, pushed, and its fast tier is whole with 0 failed. The commit after it touches this report alone. **Next:** the lateen hulls' list as it stands (nudge 60's eight), on `…/pkg-90-lateen` once A4 is on `…/pkg-90`.
