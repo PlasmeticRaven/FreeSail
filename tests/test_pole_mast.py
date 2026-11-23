@@ -169,6 +169,27 @@ def test_the_two_evolutions_are_described_to_the_player_in_the_games_own_words()
     assert "reef_pole" not in evolutions
 
 
+def test_the_pole_evolutions_marks_are_glossed_where_they_are_served():
+    """The lead's nudge 56: the catalogue glosses {sail}; the pole's two serve marks of their own
+    ({pole_lowered} and the rest), which their served notes gloss in the words the game fills
+    them with (`scripts.pole_words`), the yard below's and the hounds'. A word changed in the one
+    place and not the other fails here."""
+    import re
+
+    from freesail.evolutions.scripts import POLE_WORDS_AT_THE_HOUNDS, POLE_WORDS_ON_THE_YARD_BELOW
+
+    evolutions = load_directory()
+    for eid in ("take_in_pole", "furl_pole"):
+        text = tools._evolution_text(evolutions[eid])
+        marks = set(re.findall(r"\{(pole_[a-z_]+)\}", text))
+        assert marks and marks <= set(POLE_WORDS_ON_THE_YARD_BELOW), (eid, marks)
+        notes = text.split("\n\n")[1:3]
+        gloss = " ".join(notes)
+        for mark in marks:
+            assert f'{{{mark}}} with "{POLE_WORDS_ON_THE_YARD_BELOW[mark]}"' in gloss, (eid, mark)
+            assert f'"{POLE_WORDS_AT_THE_HOUNDS[mark]}"' in gloss, (eid, mark)
+
+
 def _brought_up_off_falmouth():
     """The harness's `shoal_anchor` start: off Falmouth in three fathoms and a half, 8 kn from
     225°, her head 335° at 2 kn, plain sail set, 60 s; then come to an anchor, 2,400 s."""

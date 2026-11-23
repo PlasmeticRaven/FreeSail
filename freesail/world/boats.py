@@ -74,6 +74,14 @@ HOIST_OUT_WAY_MS = 2.0 * 0.514444
 # Hoisted out, she lies this far off the ship's lee quarter (metres; judgement: a boat's
 # length clear of the side).
 HOIST_OUT_OFF_M = 15.0
+# A boat towed astern on her painter (package 90, A4; a boat's `towed`, which no committed file
+# carries): hauled up alongside by the painter and manned at the gangway, she may be boarded with
+# a little way on, the ship eased (JUDGEMENT: at more she sheers about and fills alongside; no
+# period figure found), so the bound is three knots against a hoisting out's two; and manned she
+# lies astern on the painter, its scope (JUDGEMENT: a short painter's length, two of her lengths
+# and a little, so that she rides clear of the ship's stern).
+HAUL_ALONGSIDE_WAY_MS = 3.0 * 0.514444
+TOWED_ASTERN_M = 12.0
 # Within this of a port's shore (metres), the boat is at the quay (a cable: the shore's spot
 # is a point of the chart, and the boat takes the ground or lies off the steps; judgement).
 QUAY_M = 200.0
@@ -140,17 +148,35 @@ def boat_named(ship_hull: Any, words: str = "") -> Any:
 # ---------------------------------------------------------------------------
 
 
-def way_on_her(ship_hull: Any) -> str:
+def way_on_her(ship_hull: Any, boat: Any = None) -> str:
     """The words refusing a boat hoisted out while she has way on her (more than
     `HOIST_OUT_WAY_MS` through the water), or "" where she may hoist one out. Shared by
-    `man_boat` and package 60's transfer."""
+    `man_boat` and package 60's transfer. A towed boat (package 90, A4) is hauled alongside
+    and manned, not hoisted out, up to `HAUL_ALONGSIDE_WAY_MS`."""
     way = abs(float(getattr(getattr(ship_hull.ship, "dyn", None), "u", 0.0) or 0.0))
+    if getattr(boat, "towed", False):
+        if way > HAUL_ALONGSIDE_WAY_MS:
+            return (
+                f"She has {units.ms_to_knots(way):.1f} knots of way on her; heave to or shorten "
+                "sail before the boat is hauled alongside and manned."
+            )
+        return ""
     if way > HOIST_OUT_WAY_MS:
         return (
             f"She has {units.ms_to_knots(way):.1f} knots of way on her; heave to or come to an "
             "anchor before the boat is hoisted out."
         )
     return ""
+
+
+def _launched(boat: Any) -> str:
+    """'hoisted out', or 'hauled alongside' of a boat towed astern (package 90, A4)."""
+    return "hauled alongside" if getattr(boat, "towed", False) else "hoisted out"
+
+
+def _back_aboard(boat: Any) -> str:
+    """'hoisted in', or 'veered astern on her painter again' of a towed boat (package 90, A4)."""
+    return "veered astern on her painter again" if getattr(boat, "towed", False) else "hoisted in"
 
 
 def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple[Any, str]:
@@ -186,12 +212,14 @@ def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple
             f"{_cap(spec.name)} has no file of her own to be a vessel by: her errands are the "
             "script's ('send the boat ashore', 'send the boat to the <ship>')."
         )
-    refused = way_on_her(ship_hull)
+    refused = way_on_her(ship_hull, spec)
     if refused:
         raise OrderError(refused)
     pos = getattr(ship_hull, "position", None)
     if pos is None:
-        raise OrderError("The boat is hoisted out on the sphere alone; this world has no chart.")
+        raise OrderError(
+            f"The boat is {_launched(spec)} on the sphere alone; this world has no chart."
+        )
     # hoisted out and lying off the lee quarter
     wind = getattr(ship_hull, "wind", None)
     lee = (float(getattr(wind, "direction_from", 0.0)) + math.pi) if wind is not None else 0.0
@@ -199,6 +227,10 @@ def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple
     aft = heading + math.pi
     dx = HOIST_OUT_OFF_M * (0.7 * math.sin(lee) + 0.7 * math.sin(aft))
     dy = HOIST_OUT_OFF_M * (0.7 * math.cos(lee) + 0.7 * math.cos(aft))
+    if getattr(spec, "towed", False):
+        # package 90, A4: manned from alongside, she lies astern on her painter, not off the
+        # lee quarter where a boat hoisted out is put
+        dx, dy = TOWED_ASTERN_M * math.sin(aft), TOWED_ASTERN_M * math.cos(aft)
     where = pos.advanced(dx, dy)
     ship_name = str(getattr(ship_hull.ship, "name", "") or "the ship")
     name = f"the {ship_name}'s {spec.name.removeprefix('the ')}"
@@ -236,9 +268,10 @@ def man_boat(world: Any, ship_hull: Any, words: str = "", by: str = "") -> tuple
     )
     oars = _oars(hull)
     n = int(oars.number) if oars is not None else int(spec.oars)
+    lying = "astern on her painter" if getattr(spec, "towed", False) else "off the lee quarter"
     text = (
-        f"{_cap(spec.name)} hoisted out and manned: her coxswain and {n} oarsmen in her, "
-        f"lying off the lee quarter{' by ' + by if by else ''}."
+        f"{_cap(spec.name)} {_launched(spec)} and manned: her coxswain and {n} oarsmen in her, "
+        f"lying {lying}{' by ' + by if by else ''}."
     )
     ship_hull.record(
         Severity.NOTABLE,
@@ -410,7 +443,7 @@ def tow_with_boat(world: Any, ship_hull: Any, rest: str = "") -> str:
     _tow_station(hull, ship_hull, bearing)
     n = int(oars.number)
     text = (
-        f"{_cap(spec.name)} hoisted out and manned for the tow, the hawser's bight to her "
+        f"{_cap(spec.name)} {_launched(spec)} and manned for the tow, the hawser's bight to her "
         f"stern-sheets; she pulls {said} with {n} oars, and the ship's head will follow her."
     )
     ship_hull.record(
@@ -723,7 +756,7 @@ def come_alongside(world: Any, hull: Any, words: str = "") -> str:
     then = (
         f"alongside, {_boarders_words(world, hull)} aboard her"
         if other is not None
-        else "alongside, she is hoisted in"
+        else f"alongside, she is {_back_aboard(_spec_of(ship_hull, hull))}"
     )
     if _lug_set(hull):
         # under the lug: the coxswain steers for her, the lug taken in as she is hoisted
@@ -875,8 +908,8 @@ def hoist_in(world: Any, hull: Any) -> str:
     ship_hull.record(
         Severity.NOTABLE,
         "boat.hoisted_in",
-        f"{_cap(name)} alongside and hoisted in{who}; her people aboard, {folded} lines of her "
-        "log entered.",
+        f"{_cap(name)} alongside and {_back_aboard(spec)}{who}; her people aboard, {folded} lines "
+        "of her log entered.",
         data={"boat": boat_id, "folded": folded, "homes": sorted(home_ids)},
     )
     if was_followed:
@@ -892,7 +925,51 @@ def hoist_in(world: Any, hull: Any) -> str:
         vessel.done = True
     release_done(world)
     dealings.boat = BoatState(boat_name=spec.name if spec is not None else dealings.boat.boat_name)
-    return f"{_cap(name)} hoisted in; her people aboard."
+    return f"{_cap(name)} {_back_aboard(spec)}; her people aboard."
+
+
+# The hulls of boats towed astern, by the boat's file, read once a file for the tow's drag
+# (package 90, A4); held here and never pickled
+_TOWED_HULLS: dict[str, Any] = {}
+
+
+def keep_in_tow(ship: Any, state: Any) -> None:
+    """The boats towed astern on their painters (package 90, A4; a boat's `towed`), their hulls
+    kept as `ship.extra["boat_in_tow"]` while each is in tow, for her drag on the ship's way
+    (`physics.integrate.step`, the trawl's road): not the boat away (on an errand, manned as a
+    hull, towing ahead) or lost (`state`, the ship's `BoatState`), nor one with no file of her
+    own to be a hull by. The key is gone when none is in tow; a ship whose file tows no boat is
+    never given it. Kept every tick by her dealings."""
+    boats = getattr(getattr(ship, "spec", None), "boats", None) or []
+    towed = [b for b in boats if getattr(b, "towed", False)]
+    extra = getattr(ship, "extra", None)
+    if not towed or not isinstance(extra, dict):
+        return
+    gone = str(state.boat_id) if (state.away or state.lost) else None
+    hulls = tuple(h for b in towed if b.id != gone and (h := _towed_hull(b)) is not None)
+    if hulls:
+        extra["boat_in_tow"] = hulls
+    else:
+        extra.pop("boat_in_tow", None)
+
+
+def _towed_hull(boat: Any) -> Any:
+    """A towed boat's hull from her own file (`ship.parts.Hull`), or None with no file."""
+    path = str(getattr(boat, "file", "") or "")
+    if not path:
+        return None
+    if path not in _TOWED_HULLS:
+        from freesail.ship.loader import load_ship
+
+        _TOWED_HULLS[path] = load_ship(path).hull
+    return _TOWED_HULLS[path]
+
+
+def _spec_of(ship_hull: Any, hull: Any) -> Any:
+    """The boat's entry in her ship's file, for the boat manned as this hull; None if none."""
+    boat_id = str(hull.__dict__.get("boat_id") or ship_hull.dealings.boat.boat_id)
+    boats = getattr(ship_hull.ship.spec, "boats", None) or []
+    return next((b for b in boats if b.id == boat_id), None)
 
 
 # ---------------------------------------------------------------------------

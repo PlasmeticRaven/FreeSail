@@ -2180,6 +2180,181 @@ its section there), items 1 and 3's strain line stopped on `physics/strain.py` (
 touched", the mend proposed), item 7 asked. That branch takes the trunk before A4's hash is
 reported, as nudge 54 asks, and its tiers run on that hash. **Next:** A4, on the lead's word.
 
+## The lateen hulls' list (nudge 53): five built on their own branch, two for the lead (2026-11-23)
+
+**The branch:** `…/pkg-90-lateen`, a branch of its own, as the coordinating session asked (its
+name is mine; it was given none). Cut from **50bb169**, A5 and A6's hash, since the lead's "with
+the engine's next hash" reads, to the coordinating session, as the hash after A5 and A6's (the
+lead to confirm). Its code: **f0914df** (items 2, 3's bow line, 4 and 6) and **1767018** (item 5),
+four files: `freesail/evolutions/runner.py`, `freesail/evolutions/scripts.py`,
+`freesail/orders/navigation.py` and `tests/test_lateen_whole.py`, all in the plan's §7.1 row.
+
+**Each item, old (50bb169) beside new**, the measures in `docs/dev/TuningNotes.md` ("Package 90, the
+lateen hulls' list"):
+1. **The dire warning missed: not built, a stop.** `physics/strain.py`'s rule; the row says
+   "`physics/strain.py` is not touched". The mend proposed at its cause is in the notes.
+2. **The take-in's wait: built.** Said at the order whatever work is before it, and when its turn
+   comes if its lateen came aback meanwhile; once.
+3. **The warnings that point the wrong way: the bow's line built**, "...; let fly its sheet, shift
+   it or box her off" (JUDGEMENT on the words; why not "bear away", in the notes). **"If sail is
+   not shortened" is `physics/strain.py`'s: a stop**, with item 1.
+4. **Clearing for action: built.** It begins at once beside the work handed on, short ("Only 102
+   hands to clear for action; the rest are shifting the foresail and the mizen."), the yards
+   keeping their parties; `let go the anchor` there is answered as on the trunk. A manoeuvre still
+   waits behind the yards.
+5. **The aftermost lateen in stays: put back.** The reasoning for A1d's ease was its own judgement
+   (that a whole lateen cannot be hauled over its mast as a boom is), with no source. Measured over
+   1,536 probe tacks, the 22 that hang in stays, all the polacre's, all miss eased and all come
+   round hauled, the yard well under its rating either way: it cost her stays for nothing.
+   Hauled to windward again, and said as the mizen course and the settee are, with no boom.
+   `docs/design/Design-Package90-Engine.md` §2.4.3a still says "eased": the design is not this
+   row's to edit, and the notes and the code's comment say why it moved.
+6. **Said twice: both built**, the polacre's foresail at "let go and haul" and the bow's two
+   "when you will".
+7. **Ratings: asked.** The probe files are stage 0's (`tests/rig_fixtures.py`); a hull's own file
+   is the generator's and carries its ratings, and her gate is her builder's. What is the engine's
+   part?
+
+**The proofs** (`tests/test_lateen_whole.py`, "The lateen hulls' list (the lead's nudge 53)"):
+eight new cases and two pins moved, each failing with its mend undone (run so, the code put back to
+50bb169's or to A1d's ease, the tests as they are now):
+- new: the take-in at the order, and when its turn comes; clearing for action; the anchor; the
+  foresail named once; the bow's two lines; the polacre's hung tacks, seeds 24 in 12 kn and 36 in
+  20 kn, coming round;
+- moved, old beside new: the bow watch's line ("shift them when you will" -> "let fly their
+  sheets, shift them or box her off"); the hang's (`..._eased_and_not_hauled_over` ->
+  `..._hauled_to_windward_with_the_booms`, "the mizen sheet eased" -> "the mizen hauled over to
+  windward").
+
+**Checked on 1767018:** `ruff check` and `ruff format --check` clean; no carriage return in the
+branch's diff; `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte (no ship file
+touched); `tests/test_lateen_whole.py`, `test_probes_90.py`, `test_lateen.py` and
+`test_rig_words.py`, 431 passed (the fast tier's set; `test_lateen_whole` 235 of them); and the
+harness whole (A2's, every ship, 270 runs, `a2/harness.py` in the session's scratch) **byte for byte
+50bb169's**: no committed ship's line, tick or trace moves.
+
+**Not run:** the tiers of this branch, held until the lead says where these ride, A5 and A6's
+taking the machine first.
+
+## A4's hash (nudge 55): A4 brought onto `…/pkg-90` at d83a9b26 with the lateen hulls' list, items 1 and 3's strain line; the tiers held (2026-11-23)
+
+**The branch:** `…/pkg-90-a4`, cut from **99d164c** (A4 alone on effbaed), as the lead's nudge 55 asks.
+
+**The first merge:** **b288bb4**, parents 99d164c and **d83a9b26**. d83a9b26 is `…/pkg-90`'s tip: A5 and A6's hash 3d4a468 and its tiers (2447e57), on A1d, A1c, A1a-A1b, A2, A3 and the trunk at 8f9a4b45, with the design's §2.4.3a corrected to the build by the coordinating session. One merge base, effbaed.
+
+Over d83a9b26 the merge adds A4's own lines and no other: nine files, 581 lines in and 40 out, each file's lines those of 99d164c over effbaed, line for line. They are `data/evolutions/lay_out_kedge.yaml`, `data/evolutions/send_boat.yaml`, `freesail/evolutions/scripts.py`, `freesail/physics/integrate.py`, `freesail/world/boats.py`, `freesail/world/dealings.py`, `freesail/world/ports.py`, `tests/test_boat_towed.py` and A4's section of `docs/dev/TuningNotes.md`. `scripts.py` merged clean.
+
+**Which lines were resolved by hand** (one file conflicted): `docs/dev/TuningNotes.md`, one hunk.
+- Git set A4's section ("Package 90, A4: the boat in tow", 49 lines, the end of 99d164c's file) against `…/pkg-90`'s four sections after A5 and A6's: the second pass (35 lines), the third pass (46), the five that ride A1c's hash (34) and the five that ride A1d's (30).
+- Resolved by section: A4's section whole after A5 and A6's, where it stood (as on `…/pkg-90-engine`), then the four whole, in their order.
+- **One line added by hand:** a blank line after A4's section, which closed its file and now stands before the second pass's heading.
+- Against d83a9b26 the file loses no line. Against 99d164c it loses only the lines that the trunk and `…/pkg-90` changed in sections both sides had: A5 and A6's, as ruled, and the trunk's edits to A0, A3, A2 and A1b.
+
+**The second merge:** **2853b46**, parents b288bb4 and **b3cd1eb** (`…/pkg-90-lateen`: the five of the lateen hulls' list, its notes and its section in this report, cut from 50bb169). One merge base, 50bb169. Over b288bb4 it adds that branch's own lines and no other, line for line: `freesail/evolutions/runner.py`, `freesail/evolutions/scripts.py`, `freesail/orders/navigation.py`, `tests/test_lateen_whole.py` and its notes' section. `scripts.py` and the notes merged clean.
+
+**Which lines were resolved by hand:** this report, one hunk.
+- Git set "A5 and A6's hash tiered (nudges 53 and 54)" (89 lines, `…/pkg-90`'s) against "The lateen hulls' list (nudge 53)" (55 lines, `…/pkg-90-lateen`'s).
+- Resolved: each whole, the first then the second.
+- **One line added by hand:** a blank line before the second's heading.
+- Against either side the file loses no line.
+
+**Checked on each merged tree:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return in the merge's diff;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+The lens on 2853b46 passed, 394 tests: `test_lateen_whole`, `test_boat_towed`, `test_yard_level`, `test_pole_mast`, `test_strain`, `test_gale` and `test_tow`.
+
+### Items 1 and 3: the strain's line, within the widening
+
+**2df9bcc**, on the lead's widening: the warning's words and what the ten minutes' rate is counted against. No figure of load, strain or damage moves, and nothing of the rule moves on a ship with no whole lateen. Untouched:
+- `LATEEN_ABACK_LOAD` and `LATEEN_BAD_HAND_LOAD`;
+- every ratio, the wear, the chance and the certain failure;
+- `WARNING_INTERVAL_S`;
+- the plain words.
+
+The change has three parts:
+- **The cause is marked where A1d's factor is applied.** `physics/sails.py`, `lateen_pressed`, says what presses a whole lateen on its mast: aback, or the bad hand. `lateen_load_factor` reads its factor from it, the same figures. `_apply_loads` marks each spar of the lateen's chain under `strain.LATEEN_PRESSED`, beside its load, and `_reset_loads` clears the mark with the loads each substep. `physics/sails.py` is A1d's file. This is a mark, no figure; the notes I proposed at b3cd1eb put it there.
+- **The rate is counted against the part and its cause.** In `physics/strain.py`, `_warn` keys a pressed part as `"<cause>:<part>"`, as the anchor keys its cable `"cable:<id>"`. A lateen coming aback or onto the bad hand is warned for as it comes, whatever was said before. Within a cause it is still one warning a part in ten minutes, and that warning stamps the part's own key too.
+- **The words name the cause and the relief** (`_pressed_words`; JUDGEMENT on the words, in the anchor's form, the reliefs the lead's):
+  - aback: "the mainsail aback against the mast: let fly its sheet, shift it or box her off";
+  - on the bad hand: "the mainsail lying on the mast; she will carry it away: let fly its sheet or shift it", with no "box her off", since paying off leaves the yard on the bad hand.
+
+The proofs are in `tests/test_lateen_whole.py`, "The strain's line", and each of the first two fails with the mend undone:
+- **Item 1:** the xebec probe generator-rated in 57 kn, put on the bad hand. Each yard is warned "bending like a whip" at once, with its cause and relief, before any of them carries away.
+- **Item 3:** the xebec in 25 kn, aback. "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.", once in ten minutes.
+- **The guard:** all eighteen files, plain sail struck by 50 kn. No part is ever marked, and every warning key is a part or a cable.
+
+The file holds 255 cases.
+
+| Item 1, the xebec probe in 57 kn, the lateens put on the bad hand at 600 s | Old (d83a9b26) | New (2df9bcc) |
+|---|---|---|
+| On the good hand | the mizzen mast and yard, the fore yard and the main yard "working under the press of sail." at 252, 442 and 451 s | the same |
+| On the bad hand, before a loss | nothing | at 601 s, each "bending like a whip(s), the ... lying on the mast; she will carry it (them) away: let fly its sheet or shift it." (1.63 to 1.88) |
+| The losses | the mizzen lateen yard at 756 s, the fore at 805 and the main at 1,156; the main's "bending like a whip; she will carry it away if sail is not shortened." at 1,051 | the same three at the same seconds; no other line |
+
+**For the lead: within a cause, the older rule still stands.** A yard first warned "working" in its cause that rises past one and a half within the ten minutes is warned "bending like a whip" only when they are out, as any spar of a committed ship is in a rising wind. Measured: the xebec generator-rated on the bad hand in 52 kn, the main yard at 1.31 at +1 s and "bending like a whip" at +601, nothing lost between. In the bands nothing carried away unwarned, aback in 33, 35 and 37 kn or on the bad hand in 45, 49 and 52. Counting the rate against the dire step too, for pressed parts alone, would be inside the widening's words. It is not built, since the lead named the cause as the mend.
+
+### The eighteen in gales, old beside new
+
+Every committed ship file was run through 35 and 50 kn gusting (`n55/gales.py` in the session's scratch). Each is settled once:
+- seed 7, 15 kn from the north with the scenario's gusts and shifts (0.3 and 0.3);
+- her head 292.5 degrees at 5 kn;
+- `set plain sail` and `brace sharp up on the starboard tack`, trimmed every two minutes after five, 900 s.
+
+Each of ten runs is made from a copy of that world. The gale strikes (the mean raised at a stroke), the order is given, and the run lasts 900 s:
+- `trim sails` close-hauled;
+- `steer 270`, a reach;
+- `steer 180`, running;
+- `tack ship`;
+- `wear ship`;
+- `heave to`;
+- caught aback, the wind eight points through her bow;
+- `shorten sail`;
+- `take in all sail`;
+- `scud`.
+
+Each run records:
+- every event, with its second, kind, severity, subject, text and data;
+- every part's load, condition, state and wreck each five seconds;
+- her heading, speed and place each ten seconds.
+
+**Old is `…/pkg-90` at d83a9b26** (the trunk as it will stand with A5 and A6); **new is 2df9bcc**, whose code is this hash's.
+
+| | Old beside new |
+|---|---|
+| Runs | **360, the same in every event, tick, part sample and trace**; the two files byte for byte |
+| Events | 6,101, every strain warning line and its tick among them |
+| Strain warnings | 1,766 |
+| Sails blown out | 417 |
+| Spars carried away | 49 |
+| Lines parted | 4 |
+| Part samples | 64,800 |
+
+**The harness catches a warning moved:** with `WARNING_INTERVAL_S` cut from 600 to 540 in a scratch tree, the cutter's, the brig's, the frigate's and the lugger's 80 runs gave 53 runs and 254 event rows different.
+
+**Against the trunk itself**, beeb4149 (A5 and A6 staged at the gate, not yet on it), the same 360 runs are byte for byte the same file. The smack's topsail, A5 and A6's one mover, is not of her plain sail and is never set in these runs.
+
+### Item 7: which truths re-rate the probes' yards, and why
+
+Truths 7-670, 7-671 and 7-672 (`tests/test_known_truths.py`, `_a1d_probe`) re-rate the probes' lateen yards and masts by the generator's rule before they measure: a lower yard for its own sail, a lower mast for every sail on it (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`). This hash's item 1 proof does the same (`_rated_by_the_generator`).
+
+**Why:** the bands the lead ruled are figures for spars rated as every committed hull's are, by the generator: aback from about 28 and 35 kn, the bad hand from about 40 and 49. The probes were filed by hand at stage 0, for other ends. Filed against the generator's rule:
+- below it: the tartane probe's great yard (44.1 kN against 59.5), the xebec's main yard (56.0 against 77.3), and the polacre's and the xebec's fore yards (56.0 against 61.1). So as filed the tartane's great yard strains aback from about 23 kn and risks it from about 29, as the lead's reader found.
+- about it: the tartane's mizzen yard, 11.0 against 11.2.
+- above it: the polacre's and the xebec's mizzen yards (56.0 against 21.7) and every lateen mast, the generator's rating 0.27 to 0.63 of the filed.
+
+The probes stay as stage 0 wrote them. A hull's own file carries the generator's ratings, and her builder measures her own yards against A1d's bands at her gate.
+
+### The five, read with this hash
+
+As built on `…/pkg-90-lateen` and set out in its section above: items 2, 3's bow line, 4, 5 (put back) and 6. They come through both merges line for line, and their proofs pass on this hash. Items 1 and 3's strain line are above, and item 7 is said.
+
+**The tiers are held until A5 and A6's verdict.** If A5 and A6 pass as they stand, the fast and the slow tier whole run on this hash, the commit that adds this section. Its code is 2df9bcc's; it adds this section and the notes' alone. If the verdict comes back with a list, its mend comes onto `…/pkg-90` first, is merged in here, and the mended hash is tiered.
+
+**For the coordinating session:** A4's hash is this section's commit on `…/pkg-90-a4`, pushed, its tiers held. A4's own part is inert (no committed file tows a boat), and the eighteen's warnings in gales are the trunk's, as set out above.
+
 ## A5 and A6 held for two pins (nudge 56): the yard levels in a table and the smack's `lie a-try`, tests alone; what moves on her written out (2026-11-23)
 
 **The commit:** on `…/pkg-90-a56` at 2447e57 (A5 and A6's hash 3d4a468 and its tiers), as the lead asks: one commit of tests alone, with this report and the notes. It touches no code, data or tools, only `tests/test_yard_level.py` and these two records. There is no merge, so no line was resolved by hand.
@@ -2209,3 +2384,51 @@ Both start from `_smack_with_her_topsail` with 300 s more, the trims done. On th
 **The tiers:** the fast tier whole runs on this commit's hash, test by test against 3d4a468's. The slow tier is the same code, since this commit adds tests and records alone, and is not run again. The results follow in a section of their own.
 
 **For the coordinating session:** the pins' commit is this section's, on `…/pkg-90-a56`, pushed, its fast tier running. Next, A4's: the pole's marks glossed in the catalogue, this commit merged into `…/pkg-90-a4`, and A4's tiers on that exact hash.
+
+## A4's hash at nudge 56: A5 and A6's pins merged, the pole's marks glossed; the tiers on this hash (2026-11-23)
+
+**The lead's choice: A4 is left as built.** Within one cause the ten minutes' rule stands for a lateen's parts, as for every spar of every ship. Whether the dire step should be counted apart goes to the owner with the other older things. Nothing of the strain's line changes.
+
+**The pole's marks, glossed** (**4e7ebe1**). The catalogue glosses `{sail}` alone, and `take_in_pole` and `furl_pole` (A6's) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`.
+- Each file's served notes now end with a paragraph that glosses them in the words the game fills them with (`scripts.pole_words`), the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" and {pole_hanging} with "lowered on the yard below"; where no square yard is crossed below it, with "down to the hounds" and "lowered to the hounds"." (`take_in_pole`; `furl_pole` the like for its three).
+- The gloss is in the files' comments alone, A6's own files. No line of code moves, and nothing she does or says.
+- `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`. It fails with the gloss undone.
+- The catalogue's readers (`test_agents`, `test_in_world`, `test_held_work`, `test_evolutions`): 331 passed, 1 xfailed.
+
+**The merge:** **0e66d03**, parents 4e7ebe1 and **6dcfe40** (`…/pkg-90-a56`'s two pins on 2447e57, as the lead asks). One merge base, 2447e57. Over 4e7ebe1 it adds the pins' lines and no other, line for line:
+- `tests/test_yard_level.py`;
+- `docs/dev/TuningNotes.md`: the A6 table's rows and the pins' paragraph, in A5 and A6's section;
+- this report's table rows (the section "A5 and A6 as their own hash (nudge 52)").
+
+**Which lines were resolved by hand:** this report, one hunk.
+- Git set this branch's two sections ("The lateen hulls' list (nudge 53)", 56 lines; "A4's hash (nudge 55)", 118) against `…/pkg-90-a56`'s "A5 and A6 held for two pins (nudge 56)" (29 lines).
+- Resolved: each whole, this branch's first.
+- **One line added by hand:** a blank line before the pins' heading.
+- Against either side the file loses no line.
+
+**Checked on the merged tree:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+The pinned files on it, `tests/test_yard_level.py` and `tests/test_pole_mast.py`: 83 passed.
+
+**The tiers:** the fast and the slow tier whole run on this hash, the commit that adds this section, test by test against 3d4a468's (A5 and A6's hash, the code A4 stands on) and against the pins' 6dcfe40. As the lead says, they need not wait for the merge of A5 and A6. The results follow in a section of their own.
+
+**For the coordinating session:** A4's hash is now this section's commit on `…/pkg-90-a4`, pushed; its tiers run after the pins' fast tier, so that the two do not share the machine.
+
+## The pins' fast tier (nudge 56): 6dcfe40 test by test against 3d4a468 (2026-11-23)
+
+**The tiered hash is 6dcfe40**, the pins' commit in the section above. The commit after it, which writes these results, touches this report alone. Run as before: from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a worktree of its own, with the junit kept in the session's scratch and compared test by test by the test's id (the xdist group's `@...` stripped).
+
+| Run | 6dcfe40 | Against 3d4a468 |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,923: 8,914 passed, 8 skipped, 1 xfailed, 0 failed (1 h 36 min 8 s) | 3d4a468's 8,903 (8,894 passed, 8 skipped, 1 xfailed, 0 failed; 54 min 27 s): **every one the same outcome**, none gone, the 8 skipped and the 1 xfailed the same cases at both. **20 new, all passed**, the pins' own, all in `tests/test_yard_level.py` (34 cases to 54): the table's row test 1, its file-by-file test 18 (one for each committed file), the smack's `lie a-try` 1 |
+| **Slow tier** | not run again | The same code: this commit adds `tests/test_yard_level.py`'s cases, none marked slow, and two records alone. 3d4a468's slow tier stands as measured above (569: 558 passed, 11 xfailed, 0 failed) |
+
+**The time:** the 20 new cases took 7.6 s between them. The 8,903 cases at both took 1.77 times as long summed (12,881 s at 3d4a468, 22,774 s here), and every group of cases over 20 s at 3d4a468 ran 1.16 to 3.34 times as long (median 1.74). The slowing is the machine's across the run, not this commit's: the session's machine restarted at 12:35 UTC, before this run began at 12:48.
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 3d4a468: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 227; all passed.
+
+**For the coordinating session:** the pins' commit is **6dcfe40** on `…/pkg-90-a56`, pushed and tiered; the commit after it touches this report alone. It is merged into `…/pkg-90-a4` at 0e66d03 (A4's hash ee1b856, its section there), and A4's fast and slow tiers run on ee1b856 now.
