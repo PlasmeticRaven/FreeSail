@@ -2489,6 +2489,10 @@ class TackScript(Script):
                 if self.heads and not draw:
                     # the fore lateen alone drawn on the new board (package 90, nudge 48)
                     draw = f" Draw the {self._boom_names(self.heads)}; trim aft its sheet."
+                # a lateen drawn with the head sheets is named there alone (the lead's nudge 53,
+                # item 6: "Draw the foresail; trim aft its sheet; draw the lateens on their
+                # masts" named the polacre's foresail twice)
+                left = [sl for sl in left if sl not in self.heads]
                 if left:
                     on = lateens_drawn_words(self.ship, left)
                     draw = f"{draw[:-1]}; {on}." if draw else f" {on[0].upper()}{on[1:]}."
