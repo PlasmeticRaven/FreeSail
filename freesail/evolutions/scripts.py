@@ -1551,11 +1551,11 @@ def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
             out.append(sl)
             continue
         yard = ship.yard_of(sl)
-        above = ship.parent_of(yard) if yard is not None else None
         mast = ship.mast_of(sl)
+        # a topgallant or a royal by its level on its mast (`Ship.yard_level`; package 90, A5)
         if (
-            above is not None
-            and above.cls in ("topgallant_mast", "royal_mast")
+            yard is not None
+            and ship.yard_level(yard) >= 2
             and mast is not None
             and mast.x_m > x_backed
         ):
@@ -1583,12 +1583,12 @@ def driver_words(ship: Ship, drivers: list) -> str:
 
 
 def lowest_square_sails(ship: Ship) -> list:
-    """The courses: square sails on yards that hang directly on a lower mast."""
+    """The courses: square sails on their lower masts' lowest yards (`Ship.yard_level` 0; package
+    90, A5: a topsail yard crossing a pole mast's head is a topsail, not a course)."""
     out = []
     for y in working_yards(ship):
-        parent = ship.parent_of(y)
         sl = ship.sail_of(y)
-        if parent is not None and parent.cls == "mast" and sl is not None and sl.cls == "square":
+        if ship.yard_level(y) == 0 and sl is not None and sl.cls == "square":
             out.append(sl)
     return out
 
@@ -5000,9 +5000,13 @@ def mast_inventory(ship: Ship) -> str:
             d for d in ship.dependents(lower) if isinstance(d, Spar) and d.cls in MAST_CLASSES
         ]
         names = [part_name(ship, m.id) for m in _in_ship_order(ship, chain)]
-        groups.append(
-            "the " + (names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
+        group = "the " + (
+            names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
         )
+        if ship.is_pole_mast(lower):
+            # package 90, A6: no topmast to strike, send down or fid on a pole
+            group += " (a pole, the mast and topmast in one stick)"
+        groups.append(group)
     if not groups:
         return "she has no masts"
     return "her masts are " + (
@@ -7171,12 +7175,12 @@ def _brace_up_for_the_helm(ship: Ship, runner: Any, memo: dict[str, Any]) -> Non
 
 
 def _topsails_on(ship: Ship, yards: list[Spar]) -> list:
-    """The topsails among a mast's yards: square sails on yards that hang on a topmast."""
+    """The topsails among a mast's yards: square sails on yards of the topsail's level
+    (`Ship.yard_level` 1; package 90, A5)."""
     out = []
     for y in yards:
         sl = ship.sail_of(y)
-        parent = ship.parent_of(y)
-        if sl is not None and sl.cls == "square" and parent is not None and parent.cls == "topmast":
+        if sl is not None and sl.cls == "square" and ship.yard_level(y) == 1:
             out.append(sl)
     return out
 
@@ -7267,9 +7271,12 @@ class LieATryScript(Script):
         if "hove_to" in self.ship.extra:
             return "She is lying to already."
         if not any(s.is_set for s in self.topsails):
+            # close-reefed where it has the bands to be (package 90, A5: the smack's topsail,
+            # a topsail by its level now, has none)
+            reefed = ", close-reefed," if any(s.reef_bands > 0 for s in self.topsails) else ""
             return (
-                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it, "
-                f"close-reefed, to lie a-try under it."
+                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it{reefed} "
+                f"to lie a-try under it."
             )
         return None
 
@@ -8898,12 +8905,12 @@ class ComeToAnchorScript(_AnchorScript):
 
 
 def _is_upper_square(ship: Ship, sail: Any) -> bool:
-    """A square sail above the topsails: on a topgallant or royal yard."""
+    """A square sail above the topsails: on a topgallant or royal yard, by its level
+    (`Ship.yard_level`; package 90, A5)."""
     if sail.cls != "square":
         return False
     yard = ship.yard_of(sail)
-    parent = ship.parent_of(yard) if yard is not None else None
-    return parent is not None and parent.cls in ("topgallant_mast", "royal_mast")
+    return yard is not None and ship.yard_level(yard) >= 2
 
 
 class LetGoAnchorScript(_AnchorScript):
@@ -9501,16 +9508,26 @@ def _world_of(ship: Ship) -> Any:
 
 
 def _topsails(ship: Ship) -> list[Sail]:
-    """The topsails: the square sails whose yard crosses a topmast."""
+    """The topsails: the square sails whose yard is of the topsail's level (`Ship.yard_level` 1;
+    package 90, A5: a topmast's, or a pole mast's head over its lower yard)."""
     out = []
     for sl in ship.sails.values():
         if sl.cls != "square" or sl.wrecked:
             continue
         yard = ship.yard_of(sl)
-        parent = ship.parent_of(yard) if yard is not None else None
-        if parent is not None and parent.cls == "topmast":
+        if yard is not None and ship.yard_level(yard) == 1:
             out.append(sl)
     return out
+
+
+def _plain_sail_topsails(ship: Ship) -> list[Sail]:
+    """The topsails she gets under way under (package 90, nudge 39 ruling 3): getting under way
+    makes her plain sail, so a topsail not of her plain sail (the smack's, set over it only at the
+    player's word) is not loosed by the cast; ruled by the plain sail, not by the vessel. A file
+    with no plain sail group, every topsail, as before."""
+    plain = ship.groups.get("plain sail")
+    tops = _topsails(ship)
+    return tops if plain is None else [sl for sl in tops if sl.id in plain]
 
 
 def _boom_mainsails(ship: Ship) -> list[Sail]:
@@ -9602,6 +9619,50 @@ def _standing_lugs_all(ship: Ship) -> list[Sail]:
 # The first words of getting under way (`data/evolutions/get_under_way.yaml`'s on_start):
 # a ship's, and a lugger's, who has a windlass and no sail-loosers to send aloft (package
 # 68; the cold review of 2026-10-22, R-45).
+# A pole sail's words by the yard below it (package 90, nudge 39 ruling 2): lowered onto a braced
+# yard crossed below it on the mast, or, where none is (the tartane's topsail over her great
+# lateen), to the hounds, and furled there on its own yard.
+POLE_WORDS_ON_THE_YARD_BELOW = {
+    "pole_lowered": "down onto the yard below",
+    "pole_hanging": "lowered on the yard below",
+    "pole_furl_from": "Lay out on the yard below",
+    "pole_furled_on": "on the yard below",
+}
+POLE_WORDS_AT_THE_HOUNDS = {
+    "pole_lowered": "down to the hounds",
+    "pole_hanging": "lowered to the hounds",
+    "pole_furl_from": "Lay aloft to the hounds",
+    "pole_furled_on": "on its own yard, lowered to the hounds",
+}
+
+
+def pole_words(ship: Ship, sail: Sail) -> dict[str, str]:
+    """The words of `take_in_pole` and `furl_pole` for this sail: the yard below's where a braced
+    yard is crossed below its yard on the same mast, the hounds' where none is. A yard whose sail
+    is set flying and furled is not crossed: it is sent down on deck with its sail (package 57;
+    the tartane's tréou in her plain sail), as a wrecked yard is not there to lower onto."""
+    yard = ship.yard_of(sail)
+    if yard is None:
+        return dict(POLE_WORDS_AT_THE_HOUNDS)
+    order = list(ship.spars)
+    at = (yard.height_m, order.index(yard.id))
+
+    def crossed(y: Spar) -> bool:
+        on_it = ship.sail_of(y)
+        sent_down = on_it is not None and on_it.flying and on_it.state is SailState.FURLED
+        return not y.wrecked and not sent_down
+
+    below = [
+        y
+        for y in ship.spars.values()
+        if y.cls == "yard"
+        and y.parent == yard.parent
+        and (y.height_m, order.index(y.id)) < at
+        and crossed(y)
+    ]
+    return dict(POLE_WORDS_ON_THE_YARD_BELOW if below else POLE_WORDS_AT_THE_HOUNDS)
+
+
 UNDER_WAY_START_WORDS = (
     "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to "
     "get the sails ready for loosing."
@@ -9754,7 +9815,7 @@ class GetUnderWayScript(_AnchorScript):
                 "halliards manned on deck."
             )
             return
-        tops = _topsails(ship)
+        tops = _plain_sail_topsails(ship)
         mains = _boom_mainsails(ship)
         # a settee furled on its yard aloft is loosed with them, to be set after the cast
         # (package 75; Ext §5.8: `set_settee` looses it aloft first; B3.3's review)
@@ -9816,7 +9877,7 @@ class GetUnderWayScript(_AnchorScript):
             return
         if self.phase == "loose":
             if self.phase_t >= self.timing_value("loose_s", 240.0) * factor:
-                tops = _topsails(ship)
+                tops = _plain_sail_topsails(ship)
                 for sl in tops:
                     if sl.state in (SailState.LOOSED, SailState.FURLED, SailState.IN_THE_GEAR):
                         sl.state = SailState.SET
