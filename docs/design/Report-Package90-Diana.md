@@ -57,6 +57,13 @@ first, as the lead suspected: she is the lightest ship of war for her tonnage, a
 every heading, with truth D in its first band. Her strong-wind misses also want her rig against her
 inertia. Both are the lead's to rule.
 
+**Hers, or every square-rigger's (§13, nudge 66): measured, nothing filed.** In a breeze under plain
+sail the misses are hers alone. The tack script calls "mainsail haul" a point off the wind for every
+ship, and that moment is what turns her back. Hauled with the wind ahead, as Luce also allows, or a
+point past, she stays in 20 and 25 kn from every heading, and the frigate-36 stays either way. Her
+8-knot misses are shared with the 64, the 74 and the razee. Her rudder is traced from her plan. The
+choice is the lead's and the owner's.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1240,3 +1247,148 @@ the lead:
    swings quicker than that rule gives her, the rule is the engine's, for the lead.
 
 Her tiers wait for the lead's ruling here, and for the engine's one A4 commit.
+
+## 13. Hers, or every square-rigger's? The count, the haul, her rudder (2026-11-23)
+
+The lead's nudge 66 (the trunk at 531f8896):
+- her displacement is not re-ruled and stays as filed;
+- Steel's spars are not taken;
+- one table more, by probes only, and nothing tuned toward any outcome.
+
+**Nothing is filed.** Her file is as at 8ce21bd, and her tiers wait. Every figure here comes from a
+probe through the engine as it stands, at seed 7 (the seeds agree to the tick, §11.3), her tacks
+from 290, 292.5 and 295 deg as the truths' helpers settle her. Where the probe calls "mainsail
+haul" at another moment, it rewrites that one condition of the tack script in its own process (§13.2).
+No file is changed.
+
+### 13.1 Every committed square-rigged ship: the count that stays
+
+**Under plain sail** (the game's own "set plain sail"), in 8, 12, 15, 20 and 25 kn. **S** is
+stayed, with its seconds; **m** is missed stays; **·** is no end in 900 s.
+
+| Ship | 8 kn | 12 kn | 15 kn | 20 kn | 25 kn | Stayed, of 15 |
+|---|---|---|---|---|---|---|
+| **the Diana** | S m m | S S S | S S S | **m m m** | **m m m** | **7** |
+| the frigate-36 | S S S | S S S | S S S | S S S | S S S | 15 |
+| the razee | S m m | S S S | S S S | S S S | S S S | 13 |
+| the 74 | m m m | S S S | S S S | S S S | S S S | 12 |
+| the 64 | S m m | S S S | S S S | S S S | S S S | 13 |
+| the brig | S S S | S S S | S S S | S S S | S S S | 15 |
+| the hermaphrodite brig | S S S | S S S | S S S | S S S | S S S | 15 |
+| the merchant brig | · · · | · · · | · · · | · · · | · · · | 0 |
+| the bilander | · · · | · · · | · · · | · · · | · · · | 0 |
+
+**Under the sail the game's own shortening leaves each, in 20 and 25 kn.** The order given was
+**"shorten sail"**, after plain sail was set and braced up, with 600 s more, trimmed every 120 s,
+before "tack ship". By the vocabulary's list it takes in the studding sails, the square sail, the
+royals, the flying jib and the topgallants, and any head sail loaded to its rating.
+
+| Ship | Left set | 20 kn | 25 kn | Stayed, of 6 |
+|---|---|---|---|---|
+| **the Diana** | 901 m2: the courses, the three topsails, the fore topmast staysail, the jib and the spanker | S235 S234 S235 | S275 **m** S260 | **5** |
+| the frigate-36 | 1,291 to 1,375 m2, the same sails | S268 S260 S259 | S475 S223 S241 | 6 |
+| the razee | 1,521 to 1,665 m2 | S395 S376 S368 | S483 S485 S486 | 6 |
+| the 74 | 1,771 to 1,941 m2 | S229 S186 S255 | S254 S285 S202 | 6 |
+| the 64 | 1,425 to 1,569 m2 | S225 S244 S254 | S246 S278 S207 | 6 |
+| the brig | 675 m2 | · S456 S203 | S477 S519 S441 | 5 |
+| the hermaphrodite brig | 901 m2 | S145 S150 S149 | S162 S160 S159 | 6 |
+| the merchant brig | 188 m2: her two courses | · · · | · · · | 0 |
+| the bilander | 196 m2: her fore course, fore topsail and main settee | · · · | · · · | 0 |
+
+- **In a breeze under plain sail, the misses are hers alone** among the ships that tack at all.
+  Every ship of war but she stays in 20 and 25 kn.
+- **In 8 kn they are not hers alone.** The 74 misses from all three headings, and the razee and the
+  64 from 292.5 and 295, as she does.
+- **Under the sail the game's shortening leaves, she stays in 20 kn from all three headings, and in
+  25 from two.** Her one miss, from 292.5 in 25 kn, came with the shortening not finished: her
+  mizzen topgallant still set, 931 m2 against the 901 of her other five.
+- **For the lead, not mine:** the merchant brig and the bilander never tack within 900 s, under
+  plain sail or shortened, with the little their books set (188 and 196 m2). The brig's 20-kn tack
+  from 292.5 came through and swung back to her old tack, and was still called tacked (§12.2).
+
+### 13.2 Where "mainsail haul" is called, and what a later haul does
+
+**The rule, for every ship** (`TackScript.tick`): "mainsail haul" is called when `abs(rel) <=
+POINT or self.through`. That is her head within a point (11.25 deg) of the wind, or through it.
+The after yards are then swung over `brace_s` (`_after_swing_s`). The script's own note cites Luce
+1884 p. 417 for the after yards hauled "with the wind ahead or a point on the bow", and the script
+takes the point on the bow.
+
+**At what angle and swing it is called**, in the ticks of §12.2 and here:
+
+| | Wind | Called at | Off the wind | Way | Swing |
+|---|---|---|---|---|---|
+| **the Diana** | 20 kn | 48 s | 9.9 deg | 1.86 kn | **0.72 deg/s** |
+| the Diana | 15 kn | 60 s | 10.4 deg | 1.57 kn | 0.58 deg/s |
+| the frigate-36 | 20 kn | 42 s | 9.9 deg | 3.30 kn | **1.18 deg/s** |
+| the brig | 20 kn | 30 s | 8.5 deg | 3.14 kn | 1.83 deg/s |
+
+**What a later haul does**, probes only. The one condition is rewritten in the probe's process:
+- "ahead": within half a degree of the wind, or through it, Luce's other reading;
+- "past": a point through the wind.
+
+| | Haul | 8 kn | 12 kn | 15 kn | 20 kn | 25 kn | Stayed, of 15 |
+|---|---|---|---|---|---|---|---|
+| **the Diana** | as the script has it | S m m | S S S | S S S | m m m | m m m | **7** |
+| **the Diana** | with the wind ahead | S m m | S S S | S S S | **S S S** | **S S S** | **13** |
+| **the Diana** | a point past | S m m | S S S | S S S | **S S S** | **S S S** | **13** |
+| the frigate-36 | as the script has it | S S S | S S S | S S S | S S S | S S S | 15 |
+| the frigate-36 | with the wind ahead | S S S | S S S | S S S | S S S | S S S | 15 |
+| the frigate-36 | a point past | S S S | S S S | S S S | S S S | S S S | 15 |
+
+Her times with the later haul:
+
+| Haul | 15 kn | 20 kn | 25 kn |
+|---|---|---|---|
+| with the wind ahead | 208, 313, 341 s | 228 to 232 s | 220 to 273 s |
+| a point past | 292 to 303 s | 219, 220, 220 s | 226 to 275 s |
+
+With the wind ahead, one 15 kn tack of 341 s is over truth E's 330 ceiling. The frigate's tacks
+slow with the later haul (25 kn: 244 to 485 s with the wind ahead, 496 to 502 a point past), and
+every one is made.
+
+**What her after yards do, hauled later** (20 kn from 292.5):
+- **As called** (§12.2): at 9.9 deg off the hauled after yards, then the square sails aback, give
+  -197 to -272 kN m. Her swing stops in 4 s, and she falls back and misses.
+- **With the wind ahead:** she hangs at 57 s, way gone, but her after yards are still unhauled.
+  Her square sails aback before the wind help her round (+33 kN m at 56 s), and nothing of the size
+  the hauled yards gave opposes her (the sails' total then -5 kN m). Her swing carries her to the
+  wind, and she crosses at about 62 s with 0.6 kn. The haul is called at 63 s, her head at the wind;
+  she is through at 64 s, and the head yards aback box her off. Tacked in 229 s.
+- **A point past:** the same, the haul called at 76 s, 13 deg through. Tacked in 219 s.
+
+**So in a breeze it is the script's one moment that turns her back.** Hauled at a point on the bow,
+the swung after yards take what swing a light, fine ship has left. Hauled with the wind ahead, as
+Luce allows, she stays in 20 and 25 kn from every heading. The frigate-36 stays either way. By the
+lead's words, that is the engine's and every ship's, and a package for the owner and a gate of
+today's ships, not a thing to be tuned into her file. Her 8-kn misses are another thing, shared
+with the 64, the 74 and the razee, and the later haul does not touch them.
+
+### 13.3 Her rudder
+
+- **Its ground: traced from her plan.** The blade under the line is 3.0 m2 (measured, Pages §5.5:
+  its after edge at the line at (-17.88, 0.01), its heel at (-17.47, -3.90)). Its stop and rate are
+  the frigate-36's.
+- **What the lateral plane's re-measure did to the ratio:**
+  - 104.4 m2 by the generator's rule, length times draught times 0.85, on her first particulars:
+    3.0 / 104.4 = **0.0287**;
+  - re-measured off her plan by the lead's ruling 4, to the false keel and the gripe, the rudder
+    left out as for the 64, the razee and the 74: 3.0 / 122.2 = **0.0245**;
+  - with the rudder in, 125.2 m2: 0.0240.
+
+  The measured ships of the line carry 0.029 to 0.030; the frigate-36 and the brig 0.0375.
+- Her rudder is not what turns her back. In the luff it is hard over, 35 deg, and its moment goes
+  with the square of her way (§12.2). The later haul alone gives her the breeze, on the same rudder.
+
+### 13.4 The engine's one inertia
+
+Read, not changed: every ship's yaw inertia is her mass times the square of a quarter of her length,
+and half as much again for the water swung with her (`hull.yaw_inertia`). Noted for the lead, as in
+§12.6.
+
+### 13.5 Now
+
+Nothing filed. For the lead's ruling: she joins as her plan makes her and as the engine sails her,
+slack in stays in a breeze and said so in her truths, with the haul's one moment booked as the
+engine's package; or she waits for that package. Her tiers wait for the ruling, and for the
+engine's one A4 commit.
