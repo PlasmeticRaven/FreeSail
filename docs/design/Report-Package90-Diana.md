@@ -33,6 +33,12 @@ passing. A race in the harbour's start failed one browser test once; it passed o
 is recorded for the lead. The slow tier of her files, pace tests excepted, passes. **I stop at the owner's
 stopping point 1.**
 
+**On the package's branch (§9, nudge 58).** Her branch takes the package's at 329648e9 (merge
+`defc026`), one file resolved by hand, TuningNotes, at its end. Her rows are in the package's new
+tables, and the review lenses were read on her merged hash: nothing blocks her gate, four word
+mends are made, and four records are for the lead, her spanker first. Her tiers wait for A4's
+verdict, as the lead holds them.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -65,7 +71,7 @@ in its §11 for the scenarios' package. `tests/test_harbour.py` passes with her 
 
 | Clause | In her file | Band or check | Source |
 |---|---|---|---|
-| Length on the line | 34.47 m | the post's after face to the stem's fore face on the line, 124 pies x 0.99; the table's 124 pies is 34.55 m (her module's check) | the plan, measured (Pages §4.1); Winfield et al. 2023, p. 930 |
+| Length on the line | 34.47 m | the post's after face to the stem's fore face on the line, 123.7 pies, 0.998 of the table's 124 (124 pies x 0.99 before, a wrong ratio: §9.4); the table's 124 pies is 34.55 m (her module's check) | the plan, measured (Pages §4.1); Winfield et al. 2023, p. 930 |
 | Breadth | 9.06 m | 32 pies 6 pulgadas at the book's pie, within 0.01 m (her check) | Winfield p. 930; the table |
 | Depth in hold | not a key | 16 pies, 4.46 m, within 0.01 m (her check) | the table |
 | Draught | 3.78 m | the mean to K, 3.91 m aft and 3.65 m forward; to the keel's lower edge 3.63 m (her note) | the lead's ruling 1 and note of 09:40, item (1); Pages §4.2 |
@@ -567,3 +573,228 @@ For the lead:
 The rest of §6 is answered by nudge 32. For the owner: none new.
 
 **I stop here, at the owner's stopping point 1.** This section is the branch's last commit.
+
+## 9. Her hash brought onto the package's branch at 329648e9 (nudge 58, 2026-11-23)
+
+The lead's nudge 58 (the trunk at ec28f4cd, `docs/dev/M7-WorkPackages.md`): "**The Diana:** yes,
+bring her hash onto `…/pkg-90` now and name what is resolved by hand; **hold her tiers until
+A4's verdict.**" So this section merges the package's branch into hers, gives her a row in each
+new table over every file, runs the checks and the review lenses with their fixer, and sets out
+her gate. **Her fast and slow tiers whole are not run**, as the lead holds them. They run on the
+hash sent when A4's verdict comes, after a further merge of the package's branch if that verdict
+brings a mend. Commands here run with `python`, since this container has no `py` launcher.
+
+### 9.1 The merge, and every line resolved by hand
+
+- **Merged the package's branch at 329648e9** (A2's re-mend, A3 the helm, A1a to A1d the whole
+  lateen, A5 and A6 the yard's level and the pole, A4 the boat in tow, and the trunk at 9c95644b)
+  into hers at 0305040, under my user's standing permission (§0), as the merge commit `defc026`.
+  It is 169 commits on the package's side, over 115 files. No rebase, no force, no other branch
+  touched.
+- **Resolved by hand: one file, `docs/dev/TuningNotes.md`, at its end and nowhere else.** Both
+  sides had added sections after the text they share, 00382c4's:
+  - the package's side, from "### Second pass: the lead's list of nudge 34 (2026-11-20)" to "##
+    Package 90, with A4's hash: the pole evolutions' marks glossed where they are served (the
+    lead's nudge 56, 2026-11-23)" and its last line, 980 lines;
+  - hers, from "## Package 90, the Diana: her file, her tuning and the pins she moves
+    (2026-11-20)" to the end of "### The Diana: the lead's rulings of nudge 32", 139 lines.
+
+  Both are kept whole, the package's first and then hers, as at the merge of 00382c4. Checked: the
+  resolved file is 329648e9's text exactly, followed by her sections exactly, and no marker is
+  left. The package's other changes inside the shared text merged without conflict.
+- **Merged by git, and read after it**: `freesail/world/ships.py`, `tests/test_known_truths.py` and
+  `tests/test_probes_90.py`. Against 329648e9, each differs by her lines alone: her description row
+  and her rank words; truth 7-190's tenth file, truth 7-590's count, and package 119's
+  `_MUSTERED_AFTER_119`; and stage 0's `FILLED`.
+- **The generator on the merged tree**, into scratch: **19 of 19 files byte for byte** with the
+  committed ones. Her file is written as committed, so nothing was regenerated, and the eighteen
+  others are the package's own.
+
+### 9.2 Her rows in the package's tables over every file
+
+In `ff5bfc0`. Each row is read off her file as committed by the test's own reader. Each table's
+other rows are as the package has them, and no other ship's figure moved. Old beside new in
+`docs/dev/TuningNotes.md`, "The Diana on the package's branch at 329648e9".
+
+| Table | Old | New | Read off her file |
+|---|---|---|---|
+| `COMMITTED_YARD_LEVELS` (`tests/test_yard_level.py`), held both ways | no row; 91 yards | her row; 103 yards | `ship.yard_level` of her twelve yards, the frigate-36's at the same levels (each mast's lower yard 0, its topsail, topgallant and royal 1 to 3; the mizen's crossjack 0); the old formula by its spar agrees |
+| `BRACES_SQUARE_SET` (`tests/test_rig_words.py`) | eighteen rows, eight with after braces | nineteen, nine: hers `"after braces"` | four head yards on the fore and eight after yards; her after braces manned and worked as filed and with every square sail set; not one-masted |
+| her evolutions against her watches (`tests/test_diana.py`, her own) | 110: 83 numbered, 27 all hands' work | 113: 85 and 28 | the package's `take_in_pole` and `furl_pole` (A5 and A6) numbered and manned whole by either watch, `change_lateen` (A1a) all hands' work by its file; every other evolution's answer as before, compared one by one against her branch at 0305040 |
+| stage 0's `KEY_CARRIERS` (`tests/test_probes_90.py`), held both ways | no row | no row | she carries none of the four keys: no `helm` in her hull (so the wheel by default), no sweeps, no boat towed, no whole lateen; its case on her file passes |
+
+The package's other cases over every file pass on her file as committed:
+- `tests/test_helm_kind.py`: the wheel, with no `helm` key;
+- `tests/test_pole_mast.py`: no pole;
+- `tests/test_boat_towed.py`: no boat in tow;
+- `tests/test_lateen_whole.py`: five cases, no whole lateen.
+
+Before her rows, the run of §9.3 failed three tests, the two yard-level cases on her file and her
+evolutions' count. No other test failed.
+
+### 9.3 The checks on the merged tree
+
+| Check | Tree | Result |
+|---|---|---|
+| `ruff check .` and `ruff format --check .` | `ff5bfc0` and `2fba3b3` | clean, 432 files; no line the branch adds is over 100 characters |
+| The generator into scratch, and `cmp` of every committed ship file | `defc026`, `ff5bfc0` and `2fba3b3` | 19 of 19 byte for byte |
+| `tools/check_viewer_guns.py` on her file | `ff5bfc0` and `2fba3b3` | clean: "fit '1817': 24 guns: 22 port, 2 over the rail" |
+| The package's changed test files, the guards over `data/ships` and the files with her cases: 42 files, the fast cases (not the tier whole) | `defc026` | 3,842 passed, 5 skipped, 1 xfailed, **3 failed**: her rows wanted (§9.2) |
+| The three edited test files whole, and her 13 cases of the package's tables | `ff5bfc0` | 153 passed; 13 passed |
+| The same 42 files, after the lenses' mends | `2fba3b3` | **3,846 passed, 5 skipped, 1 xfailed**; no failure (her row of `BRACES_SQUARE_SET` the one test more) |
+| Her tack, wear, heel and heave-to at seed 7, by the truths' helpers, on both trees | `0305040` and `ff5bfc0` | the same to the second and the hundredth: tacks 206, 215 and 216 s (ground lost 28, 42 and 46 m); wear 492 s; heel in 22 kn 8.10 and 12.61 deg; weather helm in 15 kn 0.82 and 2.02 deg; hove to in 126 s at 56.3 to 57.4 deg off and 1.12 kn, never aback; filled away in 59 s and settled in 156 s |
+| The review lenses (Plan §10.2, `Build-Ships.md` §17), read by a reviewer who is not her builder | `ff5bfc0` | nothing blocks her gate; four word mends made in `2fba3b3`, four records for the lead (§9.4) |
+
+No harbour or browser test failed on the merged tree, in either run (nudge 35's ask).
+
+### 9.4 The review lenses, and the fixer's mends
+
+The eight lenses were read on `ff5bfc0` by a reviewer who is not her builder, through her files,
+her rows, her notes and the lead's rulings, with targeted tests and probes of their own. **Nothing
+blocks her gate.** Lenses 3 (the generator), 6 (the engine's keys: she sails as she did under the
+helm, the yard's level, the pole, the boat in tow, the whole lateen and the sweeps) and 7 (names,
+pace and checkpoints) found nothing. Old beside new in `docs/dev/TuningNotes.md`, "The Diana's
+review lenses at ff5bfc0, and the fixer's mends".
+
+**Mended in `2fba3b3`, words only.** Her file was regenerated by the generator and moved by its
+notes alone; her figures and the eighteen are unmoved.
+1. **Her length's ratio** (lens 1). Her note and §2.1 above said "124 pies x 0.99", a wrong ratio:
+   124 x 0.99 pies is 34.21 m. Her 11,886.8 px at 96.1 a pie is **123.7 pies, 0.998 of the table's
+   124**. The filed 34.47 m is her measuring note's, and unmoved. The same words stand in her
+   measuring note (`docs/design/ships-design/pages-diana.md:216`), which is step 1's and not in my
+   row, so it is recorded here and not edited.
+2. **What her design puts in her note** (lens 1; lens 6, the `sweeps` key). Dia-D §3.3 and §13
+   say her hawse holes, chains and deadeyes, sweep ports and paint are "said in her note"; only
+   the hammock rail was. They are now in her profile's note: the hawse holes at (16.72, 2.40) and
+   (16.92, 2.40); the chains' deadeyes at the rail; the small square openings read as sweep ports
+   (JUDGEMENT), with no sweeps filed, since no source says she rowed; her paint by the 1809
+   drawing.
+3. **Her rank's wording** (lens 1). Three lines still said her rank at the rig's distance is "the
+   lead's to rule": her description's note, `freesail/world/ships.py`'s comment and her test's
+   docstring. They now say it is held as designed by nudge 32.
+4. **Three persons named where "his" stood** (the rule): Adye, Steel and Meyer, in her module, her
+   test and her TuningNotes.
+
+**Recorded, for the lead:**
+1. **Her spanker is the frigate-36's scaled, not cut on her own spars** (lenses 2 and 8). It is
+   the cause her headsails were mended for in `e561b0d`, and the spanker was not looked at then.
+   - Its area and centre are the frigate's scaled from the deck, 111 m2 at 7.8 m above her water.
+     Her boom was raised to 2.9 m to clear her taffrail, and the figures were not cut again.
+   - Cut by her note's rule on her own boom and gaff, it would be 95 m2 with its centroid at
+     9.7 m (the reviewer's reckoning). The frigate's own filed figure is 106% of its cut, with its
+     centre 1.75 m under its centroid.
+   - **I sailed a variant** at the frigate's ratios, 101 m2 at 8.3 m, at seed 7 by the truths'
+     helpers. Her weather helm close-hauled in 15 kn goes from 0.82 to **0.00** deg, under truth
+     D's 0.5. Her tacks from 290, 292.5 and 295 deg go from 206, 215 and 216 s to **223 s and two
+     missed stays**, outside truth E. Her heel, wear and heave-to barely move.
+   - So the mend would fail truths D and E and want `clr_x_m` tuned again. I have not made it at
+     her gate. It is the lead's to rule: hold the spanker as filed (JUDGEMENT, the frigate's
+     scaled, as her note says), or cut it on her spars and tune her helm again.
+2. **Her bow port stands 0.24 m outside her drawn side at its sill** (lenses 4 and 5). Its
+   half-breadth, 2.1 m (JUDGEMENT +-0.2), is beyond the judgement's own band. The generator reports
+   it ("-0.24 m; more than 0.05 m at x 15.96, reported and never moved"), and her test holds it.
+   The viewer draws the 1817 fit's two bow obuses there, outboard of her planking
+   (`freesail/api/viewer_guns.py`, the muzzle at the triple's half-breadth), and
+   `check_viewer_guns` checks only that the side is there. It was said in no report before this.
+3. **Truth 9 on her file, measured, not asserted** (lens 2). The truth's cases are the
+   frigate-36's and the schooner's. On her file, in 20 kn under plain sail for 20 minutes, nothing
+   carries away, no line parts and no strain warning is raised. In 35 kn under all sail, her main
+   royal yard, her fore and mizzen royal masts and her fore topgallant yard carry away, each
+   urgent, with 44 strain warnings. The reviewer's probe, run again by me.
+4. **Two audit ceilings moved beyond nudge 32's wording** (`4dec517`: `u-ships` 18 to 19,
+   `x-words:ship-words` 17 to 18, §8.2 item 3). Each is old beside new with its reason, as every
+   file's era notes carry their years, but the ruling named only her entry and truth 7-590's
+   count.
+
+### 9.5 Her gate, in the lead's words
+
+- **Her files by the generator, byte for byte.** `tools/ships/diana.py` writes
+  `data/ships/corvette-20.yaml` as committed, on the merged tree (§9.3). Her figures last changed
+  in `2cd5caa`, by the nudge 32 rulings (§8.2); the merge left her file as it was, and the lenses'
+  mends moved its notes alone (§9.4).
+- **The eighteen unmoved.** The other eighteen files are 329648e9's exactly (`git diff 329648e9
+  ff5bfc0 -- data/ships` names her file alone), and the generator writes each byte for byte.
+- **The guards' tables with her rows.** Each grows by her row alone, no other ship's figure moved,
+  and each moved count has its old figure beside it:
+  - `tests/test_view_geometry.py`: her rows of nudge 32 and the two departures (§8.2 item 1);
+  - `tests/test_known_truths.py`: truth 7-190's tenth file, truth 7-590's count 61, and package
+    119's truths 7-700 and 7-701 (§8.3);
+  - `tests/test_neufchatel.py`'s rows by intent (§8.3); `tests/test_magazine.py` (§8.2 item 2);
+  - `tests/test_lee_ports.py`'s row, 18.50 deg with four ports;
+  - `tests/test_schooner_mast.py`'s nineteen files; `tests/test_profile.py`'s and
+    `tests/test_probes_90.py`'s filled module;
+  - `tests/test_range_audit.py`'s count of the data's entries, and the known list's ceilings
+    (§8.2 item 3);
+  - and the package's new tables (§9.2).
+- **Her truths as bands** (`tests/test_diana.py`), each passing on the merged tree:
+
+  | Truth | Holds | Band | Hers |
+  |---|---|---|---|
+  | 7-660 | her particulars hold their sources | the table's measures within 0.01 m; her mass the drawn body's middle, 470,000 kg; the table's 498,000 kg beside it | as filed |
+  | 7-661 | Meyer's speed, wind abaft the beam in a fresh breeze | 9.5 to 11.5 kn (truth B) | 10.28 to 11.29 |
+  | 7-662 | stiff, as her captain said | heel in 22 kn within 1.15 times the frigate-36's, and under 18.5 deg (truth C) | 1.10 and 1.12 times |
+  | 7-663 | she steers well | weather helm in 15 kn 0.5 to 3 deg close-hauled, 1 to 3 abeam (truth D) | 0.82, 2.02 |
+  | 7-664 | she goes about as a small ship does | each tack 180 to 330 s (truth E, nudge 32); the wear 360 to 720 s (truth 11) | 206, 215, 216; 492 |
+  | 7-665 | her midship lee port | its sill dips at 21.1 deg (+-0.05) and L2 shuts it at 18.50 (+-0.05), both held | 21.1; 18.50 |
+- **The lead's rulings, each shown** (nudge 30's mass; the rest nudge 32's):
+  - her drawn displacement: 470,000 kg, her body drawn outside the plank to her line; the
+    generator's drawing 448 t beside it (-5%), recorded (§2.5);
+  - the viewer's rows: §8.2 item 1, with the two departures for the viewer's step;
+  - the charges: a foreign gun's its kind's share, `tests/test_magazine.py` (§8.2 item 2);
+  - her ports of 1817: the long 12s in ports 5 to 10, the carronades in 1 to 4 (§8.2 item 5);
+  - no stern lights filed (§8.2 item 5).
+
+### 9.6 Her figures: measured, Winfield's by page, or judgement
+
+Each figure's own note in her file says which it is; §2.1 gives each clause with its source, and
+§2.6 every judgement. In short:
+- **Measured off her plan** (her measuring note, "Pages", by section):
+  - her length on the line, 34.47 m (§4.1); her draught, 3.78 m to K (§4.2);
+  - her body's displacement outside the plank, 465.6 to 473.6 t (§4.3 to §4.5);
+  - her profile's points: the rabbet, the stem, the post and the knuckle (§3.1, §4.1, §5.1);
+  - her deck at side, 1.33 m (§5.2); her stem head, 5.09 m (§5.4); her rudder, 3.0 m2 on a span
+    of 3.90 m (§5.5); her lateral plane, 122.2 m2 (§5.6);
+  - her eleven ports a side, their sills and half-breadths (§5.7); K (§6.2);
+  - her masts' places and rakes, off the plan.
+- **Winfield et al. 2023, by page:**
+  - p. 930, her entry: the table's eslora of 124 pies, her breadth of 32 pies 6 pulgadas (9.06 m),
+    her depth in hold of 16 pies, the table's 540 toneladas 691 libras, her 335 toneladas de arqueo,
+    her company of 167, her fits by their dates, and the 1817 fit's long 12s, carronades and obuses;
+  - pp. 41 to 46: the pie de Burgos and the libra castellana, 0.4608 kg;
+  - p. 1446 and following: the regulation of 1788's fifty soldiers.
+- **From other sources, by page:**
+  - Luce 1866 ch. VII, her masts and yards on her particulars, against Steel's 20-gun column;
+  - Roos 1957 p. 94, Meyer's words, for her speed, stiffness and steering;
+  - Falconer and Douglas, her guns' crews;
+  - Steel 1805 p. 240, once for her lights, now none filed.
+- **Computed by rule:**
+  - her hull speed, 11.8 kn, the frigate's by the root of the lengths;
+  - her masthead, 29.0 m, and her plain sail, 1,054 m2;
+  - her ground tackle, by Luce's rule on 449 tons burthen; her hold, 45 tons;
+  - the table's 498.0 t, at the book's libra.
+- **JUDGEMENT** (42 notes in her module say so):
+  - her GM, 1.75 m, and `clr_x_m`, 2.8 m, each tuned to her captain's word (truths C and D);
+  - the plank, 3 to 4 pulgadas, so her mass the middle of the range;
+  - K as a false keel, the upper red line as her deck at side, the stern's reading, the bow port's
+    half-breadth;
+  - her company's shares beside her soldiers, one company for every fit;
+  - the obús's weight and crew, the long 8's weight, the 1817 ports and the obuses' places;
+  - her boats; her burthen of 449 tons for the English helpers;
+  - her headsails, spanker, rope, staysails and stores scaled from the frigate-36;
+  - her idlers by trade; `sections_m`'s carried half-breadths (marked `judged`);
+  - her stem head a centimetre forward; `keel_m` at K; her bow port's half-breadth (§9.4);
+  - the small openings between her ports read as sweep ports;
+  - no stern lights, until the owner's sheets show them;
+  - truth E's band: the floor a small ship's quickness in stays, the ceiling half again her slowest
+    tack.
+
+### 9.7 Now
+
+Her hash for the lead's queue is the commit that adds this section, the branch's head. Her tiers
+wait for A4's verdict. When it comes, I merge the package's branch again if the verdict brings a
+mend. Then I tier the exact hash I send: the fast tier whole beside a base on the merged tree, and
+the slow tier of her files with the pace tests excepted.
+
+For the lead: her spanker (§9.4, record 1), the one that would move her figures; her bow port
+(record 2); the audit's two ceilings (record 4). For the coordinator: her measuring note's "124
+pies × 0.99" (§9.4, mend 1), which is not in my row. For the owner: none new.
