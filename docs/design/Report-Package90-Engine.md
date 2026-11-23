@@ -2053,6 +2053,10 @@ trunk as it will stand**, `…/pkg-90` at 32c9448; **new is b40ffa3**. Times fro
 | `furl the topsail` | "Lay aloft and furl the topsail."; "Clewed up the topsail." at +150 s; "Furled the topsail." at +400 s: 350 s | "Lay out on the yard below and furl the topsail."; "Lowered the topsail down onto the yard below and clewed it up there." at +150 s; "Furled the topsail on the yard below." at +350 s: 300 s. **JUDGEMENT**, as ruled |
 | `take in all sail` | the topsail as take in; the jib, last, hauled down at +412 s | the topsail as take in now; the jib at +350 s |
 | `strike the topmasts` (and `send down the topgallant masts`, `fid the topmast`) | "She has no topmasts to strike; her masts are the main mast." | "... her masts are the main mast (a pole, the mast and topmast in one stick)." |
+| **Every refusal that lists her masts** (`mast_inventory`; written out at the lead's nudge 56, ruled allowed): 62 phrases of the vocabulary, each given to her at sea. The twenty catharpin orders (`swifter in`, `ease`, `cast off` and `catharpin in`, eight of the fore mast and twelve of the mizzen); crossing the topgallant and royal yards (7) and sending them down (6); sending down or striking the topgallant masts (9) and swaying them up or fidding them (9); fidding or swaying up the topmasts (6) and striking or housing them (5) | "She has no fore mast; her masts are the main mast.", "She has no topgallant and royal yards to cross; her masts are the main mast." and their kin | every one the same but the note: "... her masts are the main mast (a pole, the mast and topmast in one stick)." |
+| `heave to` in 30 kn, held 1,800 s (nudge 56, ruled allowed) | "Could not heave to: she would not lie to on the starboard tack; the helm amidships." at +986 s; 59.4° off at 7.48 kn at +1,200 s | "Could not heave to: she would not lie to on the starboard tack, the wind on the starboard bow; the topsail left aback and the helm amidships." at +986 s; "Jib taken aback." at +1,178 s; she pays off before the wind with it aback, 149.7° off at 6.02 kn at +1,200 s |
+| `heave to`, then `tack ship` at +600 s with the topsail to the mast (nudge 56, ruled allowed) | tacked at +116 s of the order (+120 s after 300 s hove to) | "Missed stays: she hung in stays and would not come round. ..." at +541 s of the order (the same after 300 s and 900 s hove to). The cutter hove to with her topsail to the mast refuses that tack on both sides: "She has not way enough on her to stay: 2.0 kn through the water." |
+| `back and fill`, held 1,800 s (nudge 56, ruled allowed) | "Backed and filled; lying to with the square sail to the mast." at +836 s; "She has filled and gathers way, the wind on the starboard bow: hove to no longer." at +948 s | "Backed and filled; lying to with the topsail to the mast." at +833 s; "She has fallen off, the wind on the starboard quarter, abaft the beam, and the helm and the sheets will not bring her to: hove to no longer." at +1,125 s |
 | `get under way` (Carrick Road, her topsail furled by `come to an anchor`) | | **the trunk's, line for line and tick for tick**: her topsail furled through the cast; at +1,500 s her head 125.3° at 4.19 kn |
 | `tack ship`, `wear ship`, `box haul`, `scud`, `shorten sail`, `set the topsail`, `trim sails`, `square the yards`, `brace sharp up on the larboard tack`, `come to an anchor` | | the trunk's, line for line and tick for tick |
 
@@ -2350,3 +2354,33 @@ As built on `…/pkg-90-lateen` and set out in its section above: items 2, 3's b
 **The tiers are held until A5 and A6's verdict.** If A5 and A6 pass as they stand, the fast and the slow tier whole run on this hash, the commit that adds this section. Its code is 2df9bcc's; it adds this section and the notes' alone. If the verdict comes back with a list, its mend comes onto `…/pkg-90` first, is merged in here, and the mended hash is tiered.
 
 **For the coordinating session:** A4's hash is this section's commit on `…/pkg-90-a4`, pushed, its tiers held. A4's own part is inert (no committed file tows a boat), and the eighteen's warnings in gales are the trunk's, as set out above.
+
+## A5 and A6 held for two pins (nudge 56): the yard levels in a table and the smack's `lie a-try`, tests alone; what moves on her written out (2026-11-23)
+
+**The commit:** on `…/pkg-90-a56` at 2447e57 (A5 and A6's hash 3d4a468 and its tiers), as the lead asks: one commit of tests alone, with this report and the notes. It touches no code, data or tools, only `tests/test_yard_level.py` and these two records. There is no merge, so no line was resolved by hand.
+
+**Pin 1: every committed yard's level in a table.** `COMMITTED_YARD_LEVELS` in `tests/test_yard_level.py` lists the eighteen files' 91 braced yards, each at its level as the files stand. Files with no braced yard (the five boats and the lugger) have empty rows. It is held both ways, as stage 0's `KEY_CARRIERS` is:
+- `test_the_table_of_yard_levels_has_a_row_for_every_committed_file_and_no_other`: a row for every file and no other, 91 yards.
+- `test_each_committed_files_yards_are_the_yards_of_its_row_at_their_levels`, file by file: a yard in the file and not in its row fails, a row's yard the file does not have fails, and a level moved fails.
+
+Measured, as the lead asks, with a change to a ship's file where both sides move together: the cutter's topgallant mast filed as a royal mast. The guard working the old formula again passes it, and the table fails it. (Her topgallant yard filed on the topmast is caught by both.)
+
+**Pin 2: the smack's `lie a-try`** (ruling 3: she follows the cutter, no further). `test_the_smacks_lie_a_try_is_refused_furled_in_her_topsails_words_and_set_she_lies_a_try`:
+- with her topsail furled, "Order not carried out ('lie a-try'): The topsail is not set; set it to lie a-try under it." at the order;
+- with it set, "Lying a-try under the topsail and the foresail, helm a-lee." at +348 s, the table's figure.
+
+Both start from `_smack_with_her_topsail` with 300 s more, the trims done. On the settle alone the order waits behind the trims: furled, it is refused at +65 s in the same words; set, she lies a-try at +648 s. The trunk's words put back in `LieATryScript.check` ("set it, close-reefed, to lie a-try under it.") fail it. The file holds 54 cases, all passed.
+
+**What moves on her, written into the table** (the section "A5 and A6 as their own hash (nudge 52)", "The smack, old beside new", and the notes' A6 table). Each was measured, old `…/pkg-90` at 40561a76, whose code is the trunk's, against 3d4a468:
+- **Every refusal that lists her masts** (`mast_inventory`). Every phrase of the vocabulary, 1,949, was given to her at sea: 62 answers list her masts, on both sides, and every one differs by the pole's note alone. Of the 62:
+  - 20 are the catharpin orders, 8 of the fore mast and 12 of the mizzen;
+  - 7 cross the topgallant and royal yards, and 6 send them down;
+  - 9 send down or strike the topgallant masts, and 9 sway them up or fid them;
+  - 6 fid or sway up the topmasts, and 5 strike or house them.
+- **Heaving to in 30 kn, held 1,800 s.** It fails at +986 s on both sides. Now: "...; the topsail left aback and the helm amidships." She pays off before the wind with it aback, 149.7° off at 6.02 kn at +1,200 s, where the trunk's smack lay 59.4° off at 7.48 kn.
+- **A tack ordered from hove to,** 600 s after `heave to`, the topsail to the mast. She misses stays at +541 s of the order (the same after 300 s and 900 s hove to), where the trunk's tacked at +116 s. The cutter, hove to so, refuses it on both sides: "She has not way enough on her to stay: 2.0 kn through the water."
+- **Backing and filling, held 1,800 s.** She falls off to the quarter, "hove to no longer", at +1,125 s, where the trunk's filled at +948 s. The lead's reader gave +1,237 and +1,061 s: 112 and 113 s later, from a settle of their own.
+
+**The tiers:** the fast tier whole runs on this commit's hash, test by test against 3d4a468's. The slow tier is the same code, since this commit adds tests and records alone, and is not run again. The results follow in a section of their own.
+
+**For the coordinating session:** the pins' commit is this section's, on `…/pkg-90-a56`, pushed, its fast tier running. Next, A4's: the pole's marks glossed in the catalogue, this commit merged into `…/pkg-90-a4`, and A4's tiers on that exact hash.

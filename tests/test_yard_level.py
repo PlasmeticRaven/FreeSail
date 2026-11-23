@@ -27,6 +27,7 @@ from freesail.core.world import Scenario
 from freesail.evolutions import scripts
 from freesail.orders import verbs
 from freesail.ship.loader import load_ship
+from freesail.ship.parts import SailState
 
 SHIP_FILES = sorted(Path("data/ships").glob("*.yaml"))
 SPAR_LEVELS = ("mast", "topmast", "topgallant_mast", "royal_mast")
@@ -52,6 +53,137 @@ def test_every_files_yard_levels_are_as_they_were_but_the_smacks_topsail(path):
         if sp.cls == "yard" and _by_its_spar(ship, sp) != ship.yard_level(sp)
     }
     assert moved == ({"topsail.yard": (0, 1)} if path.stem == "smack" else {})
+
+
+# Every committed file's braced yards and their levels as the files stand (the lead's nudge 56):
+# a table, as stage 0's `KEY_CARRIERS` is (`tests/test_probes_90.py`), held both ways. The guard
+# above works the old formula again and so catches a change to the code; this catches a change
+# to a file, where the formula and the level would move together. A step that adds, takes away
+# or moves a committed yard moves its row here, old beside new in docs/dev/TuningNotes.md.
+COMMITTED_YARD_LEVELS: dict[str, dict[str, int]] = {
+    "bilander": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "main.crossjack.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "spritsail.yard": -1,
+    },
+    "boat-cutter-23": {},
+    "boat-cutter-28": {},
+    "boat-launch-25": {},
+    "boat-launch-31": {},
+    "boat-yawl-16": {},
+    "brig": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+    },
+    "cutter": {"square_sail.yard": 0, "topsail.yard": 1, "topgallant.yard": 2},
+    "frigate-36": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+        "mizzen.topsail.yard": 1,
+        "mizzen.topgallant.yard": 2,
+        "mizzen.royal.yard": 3,
+        "mizzen.crossjack.yard": 0,
+    },
+    "hermaphrodite-brig": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+    },
+    "lugger": {},
+    "merchant-brig": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+    },
+    "privateer-schooner": {"fore.topsail.yard": 1, "fore.topgallant.yard": 2},
+    "razee-44": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+        "mizzen.topsail.yard": 1,
+        "mizzen.topgallant.yard": 2,
+        "mizzen.royal.yard": 3,
+        "mizzen.crossjack.yard": 0,
+        "spritsail.yard": -1,
+    },
+    "seventy-four": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+        "mizzen.topsail.yard": 1,
+        "mizzen.topgallant.yard": 2,
+        "mizzen.royal.yard": 3,
+        "mizzen.crossjack.yard": 0,
+        "spritsail.yard": -1,
+        "sprit_topsail.yard": -1,
+    },
+    "sixty-four": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+        "mizzen.topsail.yard": 1,
+        "mizzen.topgallant.yard": 2,
+        "mizzen.royal.yard": 3,
+        "mizzen.crossjack.yard": 0,
+        "spritsail.yard": -1,
+        "sprit_topsail.yard": -1,
+    },
+    "smack": {"square_sail.yard": 0, "topsail.yard": 1},
+    "topsail-schooner": {"fore.topsail.yard": 1, "fore.topgallant.yard": 2},
+}
+
+
+def test_the_table_of_yard_levels_has_a_row_for_every_committed_file_and_no_other():
+    assert set(COMMITTED_YARD_LEVELS) == {p.stem for p in SHIP_FILES}
+    assert sum(len(row) for row in COMMITTED_YARD_LEVELS.values()) == 91
+
+
+@pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
+def test_each_committed_files_yards_are_the_yards_of_its_row_at_their_levels(path):
+    """A yard in a file and not in its row fails, a row's yard the file does not have fails, and
+    a yard at another level fails."""
+    ship = load_ship(path)
+    levels = {sp.id: ship.yard_level(sp) for sp in ship.spars.values() if sp.cls == "yard"}
+    assert levels == COMMITTED_YARD_LEVELS[path.stem]
 
 
 def _pole_polacre(tmp_path) -> Path:
@@ -328,7 +460,7 @@ def test_the_levels_are_held_beside_her_and_never_pickled():
     assert replay.checkpoint_bytes(world) == before
 
 
-def _smack_with_her_topsail(knots: float):
+def _smack_with_her_topsail(knots: float, topsail: bool = True):
     world = make_world(
         7,
         "data/ships/smack.yaml",
@@ -343,7 +475,8 @@ def _smack_with_her_topsail(knots: float):
     )
     world.submit("set plain sail")
     world.run(120)
-    world.submit("set the topsail")
+    if topsail:
+        world.submit("set the topsail")
     for i in range(900):
         if i % 120 == 0 and i > 300:
             world.submit("trim sails")
@@ -378,3 +511,29 @@ def test_the_smack_lies_a_try_under_her_topsail_where_before_she_was_refused():
     lines = [(e.kind, e.text) for e in world.log.all()[n0:]]
     assert not [x for k, x in lines if k == "evolution.failed"], lines
     assert ("ship.hove_to", "Lying a-try under the topsail and the foresail, helm a-lee.") in lines
+
+
+def test_the_smacks_lie_a_try_is_refused_furled_in_her_topsails_words_and_set_she_lies_a_try():
+    """Nudge 39, ruling 3, held (the lead's nudge 56): at `lie a-try` the smack follows the cutter,
+    no further. Her topsail furled under her plain sail, she is refused in the words of a topsail
+    not set, with no "close-reefed" (it has no reef band); before A5, "She has no topsail to lie
+    a-try under.". Set, she lies a-try under it. Each from the settle with 300 s more, the trims
+    done (as the report's table of the smack): measured, seed 7, 15 kn, lying a-try at +348 s."""
+    furled = _smack_with_her_topsail(15.0, topsail=False)
+    furled.run(300)
+    assert furled.ship.sails["topsail"].state is SailState.FURLED
+    answer = furled.submit("lie a-try")
+    assert (answer.kind, answer.text) == (
+        "order.rejected",
+        "Order not carried out ('lie a-try'): The topsail is not set; set it to lie a-try under "
+        "it.",
+    )
+    world = _smack_with_her_topsail(15.0)
+    world.run(300)
+    n0 = len(world.log.all())
+    assert world.submit("lie a-try").kind == "order.accepted"
+    world.run(600)
+    lines = [(e.kind, e.text) for e in world.log.all()[n0:]]
+    assert not [x for k, x in lines if k in ("evolution.failed", "order.rejected")], lines
+    assert ("ship.hove_to", "Lying a-try under the topsail and the foresail, helm a-lee.") in lines
+    assert world.ship.sails["topsail"].is_set
