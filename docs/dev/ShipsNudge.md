@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 22:02 UTC (NUDGE 63 SUPERSEDED: THE DIANA IS (a), the owner's word twice: the sail her spars carry, tacks kept, D restated, the figure by nudge 61's table; Steel's boom recorded, known and not used). Nudge number: 64.
+Latest note: 2026-11-23, 22:54 UTC (THE DIANA MISSES STAYS IN A BREEZE: MENDED BEFORE HER GATE, THE CAUSE FOUND FIRST, beside the frigate-36 tick by tick; my first suspect her drawn 448 t against her canvas; if the mend gives room, D goes back to its first band; truth E across five winds; her tiers wait). Nudge number: 65.
