@@ -2384,3 +2384,36 @@ Both start from `_smack_with_her_topsail` with 300 s more, the trims done. On th
 **The tiers:** the fast tier whole runs on this commit's hash, test by test against 3d4a468's. The slow tier is the same code, since this commit adds tests and records alone, and is not run again. The results follow in a section of their own.
 
 **For the coordinating session:** the pins' commit is this section's, on `…/pkg-90-a56`, pushed, its fast tier running. Next, A4's: the pole's marks glossed in the catalogue, this commit merged into `…/pkg-90-a4`, and A4's tiers on that exact hash.
+
+## A4's hash at nudge 56: A5 and A6's pins merged, the pole's marks glossed; the tiers on this hash (2026-11-23)
+
+**The lead's choice: A4 is left as built.** Within one cause the ten minutes' rule stands for a lateen's parts, as for every spar of every ship. Whether the dire step should be counted apart goes to the owner with the other older things. Nothing of the strain's line changes.
+
+**The pole's marks, glossed** (**4e7ebe1**). The catalogue glosses `{sail}` alone, and `take_in_pole` and `furl_pole` (A6's) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`.
+- Each file's served notes now end with a paragraph that glosses them in the words the game fills them with (`scripts.pole_words`), the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" and {pole_hanging} with "lowered on the yard below"; where no square yard is crossed below it, with "down to the hounds" and "lowered to the hounds"." (`take_in_pole`; `furl_pole` the like for its three).
+- The gloss is in the files' comments alone, A6's own files. No line of code moves, and nothing she does or says.
+- `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`. It fails with the gloss undone.
+- The catalogue's readers (`test_agents`, `test_in_world`, `test_held_work`, `test_evolutions`): 331 passed, 1 xfailed.
+
+**The merge:** **0e66d03**, parents 4e7ebe1 and **6dcfe40** (`…/pkg-90-a56`'s two pins on 2447e57, as the lead asks). One merge base, 2447e57. Over 4e7ebe1 it adds the pins' lines and no other, line for line:
+- `tests/test_yard_level.py`;
+- `docs/dev/TuningNotes.md`: the A6 table's rows and the pins' paragraph, in A5 and A6's section;
+- this report's table rows (the section "A5 and A6 as their own hash (nudge 52)").
+
+**Which lines were resolved by hand:** this report, one hunk.
+- Git set this branch's two sections ("The lateen hulls' list (nudge 53)", 56 lines; "A4's hash (nudge 55)", 118) against `…/pkg-90-a56`'s "A5 and A6 held for two pins (nudge 56)" (29 lines).
+- Resolved: each whole, this branch's first.
+- **One line added by hand:** a blank line before the pins' heading.
+- Against either side the file loses no line.
+
+**Checked on the merged tree:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+The pinned files on it, `tests/test_yard_level.py` and `tests/test_pole_mast.py`: 83 passed.
+
+**The tiers:** the fast and the slow tier whole run on this hash, the commit that adds this section, test by test against 3d4a468's (A5 and A6's hash, the code A4 stands on) and against the pins' 6dcfe40. As the lead says, they need not wait for the merge of A5 and A6. The results follow in a section of their own.
+
+**For the coordinating session:** A4's hash is now this section's commit on `…/pkg-90-a4`, pushed; its tiers run after the pins' fast tier, so that the two do not share the machine.
