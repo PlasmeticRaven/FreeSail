@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 05:02 UTC (THE HARBOUR's START RACE IS MENDED ON THE TRUNK at ecfacf09: merge the trunk before your next hash; THE SEVEN RIDE A4's HASH, your reading agreed). Nudge number: 54.
+Latest note: 2026-11-23, 16:03 UTC (A5 AND A6 ARE MERGED at 214e70db by your hash 6dcfe408; merge the trunk before A4's hash). Nudge number: 57.
