@@ -289,7 +289,8 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
     },
     # package 90 (docs/design/Design-Ship-Diana.md §8): the corvette Diana, the Danish light
     # frigate of 1804 in the Spanish navy to 1832. The tops make out a ship at her rig's distance,
-    # a frigate's class until made out (JUDGEMENT, the lead's to rule: her design's §17.2 item 1);
+    # a frigate's class until made out (JUDGEMENT, held as designed by the lead's nudge 32: her
+    # design's §17.2 item 1);
     # the glass her one tier of eleven ports in a flush side, the brig-sloop's class
     "corvette": {
         "file": "data/ships/corvette-20.yaml",

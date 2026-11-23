@@ -204,7 +204,8 @@ def test_her_table_holds_its_arithmetic_and_her_checks_raise_in_words():
     assert "her midship lee port dips at" in got["ports wrong"]
     # Luce's chain on her measured waterline and Winfield's breadth (Dia-D §4.1, 2026-11-20): the
     # main (113.1 + 29.7) / 2 = 71.4 ft, every spar the frigate-36's times 0.8145; the masts beside
-    # Steel's 20-gun column, 72, 64 and 61 ft (Pages §7), the main yard 19.79 m beside his 19.20
+    # Steel's 20-gun column, 72, 64 and 61 ft (Pages §7), the main yard 19.79 m beside Steel's
+    # 19.20
     assert got["main_len_ft"] == pytest.approx(71.41, abs=0.01)
     assert got["scale"] == pytest.approx(0.8145, abs=0.0001)
     assert got["masts_ft"] == {"fore": 64.3, "main": 71.4, "mizzen": 62.8}
@@ -508,8 +509,9 @@ def test_her_description_in_her_file_and_through_the_index(doc):
 
 
 def test_her_rank_is_a_frigates_at_the_rigs_distance_and_the_brig_sloops_made_out():
-    """Dia-D §8.2: "a ship" at the rig's distance ranks her 3, a frigate's class (the lead's to
-    rule, Dia-D §17.2 item 1); made out, "a corvette", 2, the brig-sloop's; her file's size 2."""
+    """Dia-D §8.2: "a ship" at the rig's distance ranks her 3, a frigate's class (held as designed
+    by the lead's nudge 32, Dia-D §17.2 item 1); made out, "a corvette", 2, the brig-sloop's; her
+    file's size 2."""
     assert captains.size_of_words("a ship") == 3
     assert captains.size_of_words("a corvette, flush-decked, eleven ports a side") == 2
     assert captains.SIZE_RANK["corvette"] == 2

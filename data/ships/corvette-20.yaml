@@ -22,16 +22,16 @@ ship:
       note: 'The Spanish navy''s corvette of 1809 to 1817, the Danish light frigate Diana of 1804 (Winfield
         et al. 2023, p. 930; Roos 1957 p. 94): what the glass makes out, one tier of eleven ports in a
         flush side and three masts square-rigged on a small hull; the tops make her out a ship (Dia-D
-        §8, the made-out rule; the lead''s to rule on her rank at the rig''s distance, Dia-D §17.2 item
-        1). Her default fit serves a far ship of her; her roles a King''s ship''s, and a cruiser''s against
-        an enemy''s trade or privateers on a coast, her prize doctrine read from data/captains/cruiser.yaml
-        (Dia-D §8.1).'
+        §8, the made-out rule; her rank at the rig''s distance held as designed by the lead''s nudge 32,
+        Dia-D §17.2 item 1). Her default fit serves a far ship of her; her roles a King''s ship''s, and
+        a cruiser''s against an enemy''s trade or privateers on a coast, her prize doctrine read from
+        data/captains/cruiser.yaml (Dia-D §8.1).'
       fit: carronadas de a 30 1810
       roles:
       - kings-ship
       - cruiser
 hull:
-  # The post's after face to the stem's fore face on her line, 11,886.8 px at 96.1 a pie on the plan's larger image (measured, Pages §4.1): 124 pies x 0.99. The table's eslora of 124 pies is 34.55 m at the book's pie (Winfield et al. 2023, pp. 41-46 and p. 930), the gun deck from post to stem (Dia §2.2-§2.3); 34.83 m to the knee's fore edge (computed); between the rabbets about 33.6 m, not re-measured (Dia-D §17.2 item 8).
+  # The post's after face to the stem's fore face on her line, 11,886.8 px at 96.1 a pie on the plan's larger image (measured, Pages §4.1): 123.7 pies, 0.998 of the table's 124. The table's eslora of 124 pies is 34.55 m at the book's pie (Winfield et al. 2023, pp. 41-46 and p. 930), the gun deck from post to stem (Dia §2.2-§2.3); 34.83 m to the knee's fore edge (computed); between the rabbets about 33.6 m, not re-measured (Dia-D §17.2 item 8).
   length_waterline_m: 34.47
   # Winfield's metres for the table's manga of 32 pies 6 pulgadas, extreme (Winfield et al. 2023, p. 930); the body plan's frame 32.47 pies (measured, Pages §3.1), its sections 4.53 m a side at the line amidships (Pages §5.1).
   beam_m: 9.06
@@ -55,7 +55,7 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 3.0
     span_m: 3.9
-  # Her side, deck and ports (Dia-D §3; Build-Ships.md §5.1): x forward of the middle of her line, z above it and square to it, metres; every point measured on her own plan (BVD 1037832, PB-021, the larger image at 96.1 px a pie: Pages §6.2), the corrected frame taking out the sheet's bow and the level datum the first reading took (Pages §3.3, §4.1, §8).
+  # Her side, deck and ports (Dia-D §3; Build-Ships.md §5.1): x forward of the middle of her line, z above it and square to it, metres; every point measured on her own plan (BVD 1037832, PB-021, the larger image at 96.1 px a pie: Pages §6.2), the corrected frame taking out the sheet's bow and the level datum the first reading took (Pages §3.3, §4.1, §8). Not drawn and with no key, so said here (Dia-D §3.3, §13): her hawse holes, at (16.72, 2.40) and (16.92, 2.40), re-referenced for the datum (computed, Pages §6.2); the chains' deadeyes at the rail, the viewer drawing her shrouds to it; the small square openings between her ports, read as sweep ports (JUDGEMENT), with no sweeps filed, since no source says she rowed; and her paint by the 1809 drawing, a light band along the ports and dark lids (eye).
   profile:
     # The top of her side from the taffrail's top, the stern's last point, then the bulwark rail's upper edge to the stem head, traced (Pages §5.2, §5.5). The solid side is the rail (JUDGEMENT); the bulwark rail's after end, (-18.82, 3.52), stands abaft her upright upper stern at its height, the stern's reading not closing, and is not a point of it; the hammock rail above it, 3.17 m at the middle to 3.99 m at the stern and 4.10 m at the bow, has no key.
     rail_m: [[-18.63, 4.03], [-18.0, 3.43], [-17.0, 3.33], [-16.0, 3.23], [-15.0, 3.13], [-14.36, 3.08], [-13.1, 2.99], [-11.86, 2.91], [-10.6, 2.84], [-9.36, 2.79], [-8.11, 2.75], [-6.88, 2.71], [-5.63, 2.68], [-4.37, 2.66], [-3.12, 2.64], [-1.87, 2.63], [-0.62, 2.62], [0.63, 2.62], [1.89, 2.63], [3.13, 2.64], [4.36, 2.65], [5.61, 2.68], [6.87, 2.72], [8.12, 2.76], [9.37, 2.81], [10.62, 2.89], [11.87, 2.97], [13.12, 3.06], [14.38, 3.19], [15.63, 3.34], [16.0, 3.39], [17.0, 3.54], [17.3, 3.59]]

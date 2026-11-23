@@ -460,7 +460,8 @@ def hull_block(displacement):
 
 HULL_NOTES = {
     "length_waterline_m": "The post's after face to the stem's fore face on her line, 11,886.8 px "
-    "at 96.1 a pie on the plan's larger image (measured, Pages §4.1): 124 pies x 0.99. The table's "
+    "at 96.1 a pie on the plan's larger image (measured, Pages §4.1): 123.7 pies, 0.998 of the "
+    "table's 124. The table's "
     "eslora of 124 pies is 34.55 m at the book's pie (Winfield et al. 2023, pp. 41-46 and p. 930), "
     "the gun deck from post to stem (Dia §2.2-§2.3); 34.83 m to the knee's fore edge (computed); "
     "between the rabbets about 33.6 m, not re-measured (Dia-D §17.2 item 8).",
@@ -540,7 +541,12 @@ PROFILE_NOTES = {
     "profile": "Her side, deck and ports (Dia-D §3; Build-Ships.md §5.1): x forward of the middle "
     "of her line, z above it and square to it, metres; every point measured on her own plan "
     "(BVD 1037832, PB-021, the larger image at 96.1 px a pie: Pages §6.2), the corrected frame "
-    "taking out the sheet's bow and the level datum the first reading took (Pages §3.3, §4.1, §8).",
+    "taking out the sheet's bow and the level datum the first reading took (Pages §3.3, §4.1, §8). "
+    "Not drawn and with no key, so said here (Dia-D §3.3, §13): her hawse holes, at (16.72, 2.40) "
+    "and (16.92, 2.40), re-referenced for the datum (computed, Pages §6.2); the chains' deadeyes "
+    "at the rail, the viewer drawing her shrouds to it; the small square openings between her "
+    "ports, read as sweep ports (JUDGEMENT), with no sweeps filed, since no source says she "
+    "rowed; and her paint by the 1809 drawing, a light band along the ports and dark lids (eye).",
     "profile.rail_m": "The top of her side from the taffrail's top, the stern's last point, then "
     "the bulwark rail's upper edge to the stem head, traced (Pages §5.2, §5.5). The solid side is "
     "the rail (JUDGEMENT); the bulwark rail's after end, (-18.82, 3.52), stands abaft her upright "
@@ -1636,9 +1642,9 @@ FIT_1817 = "1817"
 DEFAULT_FIT = FIT_1810
 FIT_PIECES = {FIT_1807: 20, FIT_1809: 20, FIT_1810: 20, FIT_1817: 24}
 # The guns' weights, cwt (Dia-D §5.2 item 4): no source gives hers. The 30-pounder carronade
-# Adye's 32-pounder pattern and the 24-pounder his 24 (Adye 1804 p. 72: `period`); the long 12
-# Adye's of 9 ft 6 in (p. 155: `period`); the long 8 about 23, drawn on the long 9's pattern, and
-# the obús about 3 (JUDGEMENT, both).
+# Adye's 32-pounder pattern and the 24-pounder Adye's 24 (Adye 1804 p. 72: `period`); the long
+# 12 Adye's of 9 ft 6 in (p. 155: `period`); the long 8 about 23, drawn on the long 9's pattern,
+# and the obús about 3 (JUDGEMENT, both).
 CWT = {
     ("carronade", 30): period.ADYE_CARRONADE_CWT[32],
     ("carronade", 24): period.ADYE_CARRONADE_CWT[24],
@@ -2238,10 +2244,10 @@ DESCRIPTION = (
     "The Spanish navy's corvette of 1809 to 1817, the Danish light frigate Diana of 1804 (Winfield "
     "et al. 2023, p. 930; Roos 1957 p. 94): what the glass makes out, one tier of eleven ports in "
     "a flush side and three masts square-rigged on a small hull; the tops make her out a ship "
-    "(Dia-D §8, the made-out rule; the lead's to rule on her rank at the rig's distance, Dia-D "
-    "§17.2 item 1). Her default fit serves a far ship of her; her roles a King's ship's, and a "
-    "cruiser's against an enemy's trade or privateers on a coast, her prize doctrine read from "
-    "data/captains/cruiser.yaml (Dia-D §8.1).",
+    "(Dia-D §8, the made-out rule; her rank at the rig's distance held as designed by the lead's "
+    "nudge 32, Dia-D §17.2 item 1). Her default fit serves a far ship of her; her roles a King's "
+    "ship's, and a cruiser's against an enemy's trade or privateers on a coast, her prize doctrine "
+    "read from data/captains/cruiser.yaml (Dia-D §8.1).",
     DEFAULT_FIT,
     ["kings-ship", "cruiser"],
 )
