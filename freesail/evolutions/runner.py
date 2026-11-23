@@ -110,6 +110,7 @@ from freesail.evolutions.scripts import (
     helm_words,
     keep_full_and_by,
     keep_lying_to,
+    lateen_party,
     lateen_take_in_waits,
     lying_to_hands_off,
 )
@@ -279,6 +280,10 @@ class Instance:
     wait_line: str = ""  # the line it said when it first had to wait for hands
     given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
     held_by: str | None = None
+    # a take-in of a whole lateen aback in a strong wind has said that it waits for her to pay
+    # off (package 90, A1d), at the order or when the work before it is done (the lead's nudge
+    # 53, item 2)
+    lateen_wait_said: bool = False
 
     def __setstate__(self, state: dict[str, Any]) -> None:
         """An instance read from a checkpoint. One taken on the trunk while all hands came up
@@ -434,7 +439,7 @@ class Runner:
         blockers = [
             other
             for other in self.instances
-            if other.holds & inst.holds
+            if self._in_the_way(ship, inst, other)
             and other is not inst
             and not self._settees_only(ship, inst, other)
         ]
@@ -454,6 +459,14 @@ class Runner:
                 # runner's started line and this one would go unsaid (the lead's nudge 51,
                 # item 1: "it waits behind that work, and says so")
                 ship.note("notable", "evolution.waiting", words, sid)
+            if lateen_take_in_waits(ship, evo.verb, subject):
+                # a whole lateen aback in a strong wind will not come in till she pays off,
+                # whatever work is before it: said at the order, as with none (the lead's nudge
+                # 53, item 2: behind `trim sails` the player read only the order, and waited
+                # 69 s)
+                words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
+                ship.note("notable", "evolution.waiting", words, sid)
+                inst.lateen_wait_said = True
             return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
@@ -465,6 +478,7 @@ class Runner:
             self.instances.append(inst)
             words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
             ship.note("notable", "evolution.waiting", words, sid)  # said once, at the order
+            inst.lateen_wait_said = True
             return words
         self.instances.append(inst)
         if not self._begin(ship, inst):
@@ -983,6 +997,23 @@ class Runner:
                     held.add(ship.name)
         return held
 
+    @staticmethod
+    def _in_the_way(ship: Ship, work: Instance, other: Instance) -> bool:
+        """Whether two pieces of work hold a part in common, so that the later waits for the
+        earlier. The yards a belayed manoeuvre handed on hold the ship as it held her, so that no
+        manoeuvre begins while a lateen of hers is in its gear (`ChangeLateenScript.holds`, the
+        lead's nudge 51, item 1); work that is no manoeuvre and shares nothing with them but the
+        ship does not wait for them, and begins as it would with the manoeuvre belayed and nothing
+        handed on, for hands as ever (the lead's nudge 53, item 4: clearing for action waited
+        186 s behind them on the polacre probe, where the trunk began it at once, short-handed;
+        it needs no lateen)."""
+        shared = other.holds & work.holds
+        if shared == {ship.name}:
+            for a, b in ((other, work), (work, other)):
+                if a.params.get(HANDED_ON) and b.evo.id not in HELM_MANOEUVRES:
+                    return False
+        return bool(shared)
+
     def _settees_only(self, ship: Ship, manoeuvre: Instance, work: Instance) -> bool:
         """Whether a manoeuvre that belays the step-list work in hand (``belays: true``, with a
         crew: decision 25, `_call_all_hands`) shares with this step-list work nothing but the
@@ -1164,7 +1195,7 @@ class Runner:
             # on its settees alone (`_settees_only`): the work waits for the manoeuvre
             busy = any(
                 other is not inst
-                and other.holds & inst.holds
+                and self._in_the_way(ship, inst, other)
                 and (
                     (other.order < inst.order and not self._settees_only(ship, inst, other))
                     or (
@@ -1175,8 +1206,18 @@ class Runner:
                 )
                 for other in self.instances
             )
-            if busy or lateen_take_in_waits(ship, inst.evo.verb, inst.subject):
-                continue  # a whole lateen aback in a strong wind waits too (package 90, A1d)
+            if busy:
+                continue
+            if lateen_take_in_waits(ship, inst.evo.verb, inst.subject):
+                # a whole lateen aback in a strong wind waits too (package 90, A1d), and says so
+                # once, as at an order with no work before it: behind other work, the line at
+                # the order was that work's, and the wait after it went unsaid (the lead's nudge
+                # 53, item 2: 69 s with no word, `take in the mainsail` behind `trim sails`)
+                if not inst.lateen_wait_said:
+                    inst.lateen_wait_said = True
+                    words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, inst.subject_id))
+                    ship.note("notable", "evolution.waiting", words, inst.subject_id)
+                continue
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
                 if inst.done_already:
@@ -1566,9 +1607,39 @@ class Runner:
             if i.all_hands and not i.waiting and not i.paused and i is not but
         ]
 
+    def _yards_spare_their_hands(self, ship: Ship, inst: Instance) -> None:
+        """All-hands work that is no manoeuvre, begun while the yards a belayed manoeuvre handed
+        on hold every hand it had (`_hand_on`): that work keeps its yards' parties
+        (`scripts.lateen_party`, the hands its seconds reckon with, `party_term`) and lets the
+        rest go, so that the new work begins at once with the hands to be had, short where the
+        yards keep some, as it began on the trunk with the manoeuvre belayed and nothing handed
+        on (the lead's nudge 53, item 4: clearing for action waited 186 s on the polacre probe
+        for hands the yards held). A manoeuvre waits behind the yards as before (`_in_the_way`),
+        and work by numbers waits for hands as ever."""
+        if inst.evo.id in HELM_MANOEUVRES:
+            return
+        for work in self.instances:
+            handed = work.params.get(HANDED_ON)
+            got = work.assignment
+            if work is inst or not handed or got is None or not got.all_hands:
+                continue
+            yards = getattr(work.script, "handed", None) or handed
+            keep = sum(lateen_party(ship, ship.sails[i]) for i in yards if i in ship.sails)
+            if len(got.hands) <= keep:
+                continue
+            for s in got.hands[keep:]:
+                s.at = None
+            del got.hands[keep:]
+            got.wanted = got.party = keep
+            got.outcome = hands.ENOUGH
+            if work.want is not None:
+                work.want = replace(work.want, party=keep)
+
     def _take_hands(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Ask for the instance's hands (spec M3 §3.1, §3.2). True if it may begin."""
         want = self._want(inst)
+        if want.all_hands:
+            self._yards_spare_their_hands(ship, inst)
         # hands come free (earlier work done, the watch below coming up) join the all-hands
         # work already going before anything new may have them: a second all-hands evolution
         # waits for the first, as two always have (spec M3 §3.4)
