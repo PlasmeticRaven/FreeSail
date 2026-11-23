@@ -1207,10 +1207,11 @@ def test_a_take_in_waits_while_the_lateen_is_aback_in_a_strong_wind(xebec_in_a_b
     assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == waited
 
 
-def test_hung_in_stays_the_aftermost_lateen_is_eased_and_not_hauled_over(xebec):
-    """Hung in stays (`_hang`), a whole lateen on her aftermost mast cannot be hauled over its
-    mast to windward as a boom is: its sheet is eased on the old lee till "let go and haul",
-    and the line says so (Eng §2.4.3a)."""
+def test_hung_in_stays_the_aftermost_lateen_is_hauled_to_windward_with_the_booms(xebec):
+    """Hung in stays (`_hang`), a whole lateen on her aftermost mast is hauled to windward as a
+    boom is, held aback against its mast at the stern, and the line names no boom (the lead's nudge
+    53, item 5: A1d's ease on the old lee put back, measured). Before, "...; the mizen sheet
+    eased."."""
     world = _from(xebec)
     world.submit("tack ship")
     (inst,) = [i for i in world.ship.extra["evolutions"].instances if i.evo.id == "tack"]
@@ -1220,9 +1221,49 @@ def test_hung_in_stays_the_aftermost_lateen_is_eased_and_not_hauled_over(xebec):
     ship = world.ship
     mizen = ship.sails["mizzen.lateen"]
     (sheet,) = ship.sheets_of(mizen)
-    assert sheet.held_side == tack.old_side(weather=False)
+    assert sheet.held_side == tack.old_side(weather=True)
     said = [n[2] for n in ship.notes if n[1] == "helm.order"][-1]
-    assert "the mizen sheet eased" in said and "mizen hauled over" not in said
+    assert "the mizen hauled over to windward" in said, said
+    assert "sheet eased" not in said and "boom" not in said, said
+
+
+def _polacre_tack(seed: int, knots: float, tmp_path) -> tuple[list[str], float]:
+    """The polacre probe settled close-hauled (her head 292.5, the wind's gusts and shifts as the
+    scenario's defaults), tacked: the hang's, the tack's and the miss's lines, and her ground to
+    windward in 900 s."""
+    path = write_ship(_dipping(polacre_probe_doc()), tmp_path, f"pol-{seed}")
+    scenario = Scenario(
+        wind_from_deg=0.0, wind_speed_kn=knots, ship_heading_deg=292.5, ship_speed_kn=5.0
+    )
+    world = make_world(seed, path, scenario)
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 0 and i > 240:
+            world.submit("trim sails")
+        world.tick()
+    n0 = len(world.log.all())
+    y0 = world.ship.dyn.y
+    world.submit("tack ship")
+    world.run(900)
+    kinds = ("helm.order", "ship.tacked", "ship.missed_stays")
+    return [e.text for e in _after(world, n0) if e.kind in kinds], world.ship.dyn.y - y0
+
+
+@pytest.mark.parametrize("seed, knots", [(24, 12.0), (36, 20.0)])
+def test_the_polacre_hung_in_stays_comes_round_with_her_mizen_hauled_to_windward(
+    seed, knots, tmp_path
+):
+    """Nudge 53, item 5, at the door it was found at: of the three probes' 1,536 tacks measured
+    (12 to 25 kn, close-hauled, a point free and a beam reach, 64 seeds a set), 22 hung in stays,
+    all the polacre's; with her mizen eased on the old lee (A1d) each missed stays and fell off on
+    the old tack, with it hauled to windward each comes round, her mizen's yard at 0.03 to 0.17 of
+    its rating either way. Measured in 900 s: seed 24 in 12 kn, 205 m to windward against 421 m
+    to leeward eased; seed 36 in 20 kn, 496 m against 790 m to leeward."""
+    said, ground = _polacre_tack(seed, knots, tmp_path)
+    assert any("she hangs in stays" in x for x in said), said
+    assert any(x.startswith("Tacked; braced up on the larboard tack") for x in said), said
+    assert not any(x.startswith("Missed stays") for x in said), said
+    assert ground > 0.0, ground
 
 
 # ---------------------------------------------------------------------------

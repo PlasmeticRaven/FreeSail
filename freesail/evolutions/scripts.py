@@ -2790,13 +2790,14 @@ class TackScript(Script):
         sheets_to(self.ship, self.heads, self.old_side(weather=False), None)
         # the spanker's (or the main's) boom hauled well over to windward: aback at the
         # stern, it pushes the stern to leeward and her head up to the wind; an aftermost whole
-        # lateen, which cannot be hauled over its mast, is eased on the old lee till "let go
-        # and haul" (package 90, A1d; Design-Package90-Engine.md §2.4.3a)
-        aft = aft_lateen(self.ship) if self.lateen_plan is not None else None
-        booms = [sl for sl in self.booms if sl is not aft]
-        sheets_to(self.ship, booms, self.old_side(weather=True), None)
-        if aft is not None and aft in self.booms:
-            ease_off_sheets(self.ship, [aft], self.old_side(weather=False))
+        # lateen hauled to windward with them, held aback against its mast (A1b's place). A1d
+        # eased it on the old lee instead, reasoning that it cannot be hauled over its mast as a
+        # boom is (JUDGEMENT, no source); measured, the ease cost her stays and bought nothing,
+        # so it is put back (the lead's nudge 53, item 5): of 1,536 probe tacks (the three
+        # probes, 12 to 25 kn, 64 seeds a set) 22 hung, all the polacre's, and all 22 missed
+        # eased and came round hauled, her mizen's yard at 0.03 to 0.17 of its rating either
+        # way (docs/dev/TuningNotes.md, "the lateen hulls' list")
+        sheets_to(self.ship, self.booms, self.old_side(weather=True), None)
         words = ["Her way is gone; she hangs in stays. Helm kept a-lee"]
         # her head yards, held unswung by the action, aback in words only where she works her
         # braces (package 90, A2's second pass: said of every head yard crossed before it, a
@@ -2808,15 +2809,15 @@ class TackScript(Script):
             words.append(f"the {class_word(self.ship, held)}yards aback to box her off")
         if self.heads:
             words.append("the head sheets held to windward")
-        if aft is not None and aft in self.booms:
-            words.append(f"{names_of_sails(self.ship, [aft])} sheet eased")
-        if booms:
+        if self.booms:
+            booms = self.booms
             names = names_of_sails(self.ship, booms).replace("the ", "")
-            # the mizen course cut at the mast has no boom, nor has a settee: its sheet hauls
-            # the sail itself over (package 75); with a boom, or for a lugger's standing lug,
-            # the words are as they were
+            # the mizen course cut at the mast has no boom, nor has a settee or a whole lateen:
+            # its sheet hauls the sail itself over (package 75; package 90, nudge 53, item 5);
+            # with a boom, or for a lugger's standing lug, the words are as they were
             boomless = all(
-                (sl.cut_at_mast or sl.settee) and self.ship.spar_of_role(sl, "boom") is None
+                (sl.cut_at_mast or sl.settee or is_whole_lateen(sl))
+                and self.ship.spar_of_role(sl, "boom") is None
                 for sl in booms
             )
             words.append(
