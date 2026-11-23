@@ -2417,3 +2417,18 @@ The pinned files on it, `tests/test_yard_level.py` and `tests/test_pole_mast.py`
 **The tiers:** the fast and the slow tier whole run on this hash, the commit that adds this section, test by test against 3d4a468's (A5 and A6's hash, the code A4 stands on) and against the pins' 6dcfe40. As the lead says, they need not wait for the merge of A5 and A6. The results follow in a section of their own.
 
 **For the coordinating session:** A4's hash is now this section's commit on `…/pkg-90-a4`, pushed; its tiers run after the pins' fast tier, so that the two do not share the machine.
+
+## The pins' fast tier (nudge 56): 6dcfe40 test by test against 3d4a468 (2026-11-23)
+
+**The tiered hash is 6dcfe40**, the pins' commit in the section above. The commit after it, which writes these results, touches this report alone. Run as before: from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a worktree of its own, with the junit kept in the session's scratch and compared test by test by the test's id (the xdist group's `@...` stripped).
+
+| Run | 6dcfe40 | Against 3d4a468 |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,923: 8,914 passed, 8 skipped, 1 xfailed, 0 failed (1 h 36 min 8 s) | 3d4a468's 8,903 (8,894 passed, 8 skipped, 1 xfailed, 0 failed; 54 min 27 s): **every one the same outcome**, none gone, the 8 skipped and the 1 xfailed the same cases at both. **20 new, all passed**, the pins' own, all in `tests/test_yard_level.py` (34 cases to 54): the table's row test 1, its file-by-file test 18 (one for each committed file), the smack's `lie a-try` 1 |
+| **Slow tier** | not run again | The same code: this commit adds `tests/test_yard_level.py`'s cases, none marked slow, and two records alone. 3d4a468's slow tier stands as measured above (569: 558 passed, 11 xfailed, 0 failed) |
+
+**The time:** the 20 new cases took 7.6 s between them. The 8,903 cases at both took 1.77 times as long summed (12,881 s at 3d4a468, 22,774 s here), and every group of cases over 20 s at 3d4a468 ran 1.16 to 3.34 times as long (median 1.74). The slowing is the machine's across the run, not this commit's: the session's machine restarted at 12:35 UTC, before this run began at 12:48.
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 3d4a468: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 227; all passed.
+
+**For the coordinating session:** the pins' commit is **6dcfe40** on `…/pkg-90-a56`, pushed and tiered; the commit after it touches this report alone. It is merged into `…/pkg-90-a4` at 0e66d03 (A4's hash ee1b856, its section there), and A4's fast and slow tiers run on ee1b856 now.
