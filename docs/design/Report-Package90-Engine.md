@@ -2524,3 +2524,66 @@ fast tier above holds each of its files on the exact hash. Its 52 files (the ses
 
 **Next:** `…/pkg-90-a1d` merged into `…/pkg-90-engine`, as before; then A5 and A6 as their own
 hash, on the lead's word.
+
+## A1d's hash merged into the engine track (nudge 51, 2026-11-23)
+
+**The merge:** **64efd89** on `…/pkg-90-engine`, parents **95a58e9** (the engine branch's tip)
+and **32c9448** (`…/pkg-90-a1d`'s tip: A1d's hash with the five, 71febde, and its tiers). It
+brings eight commits onto the engine. Four are `…/pkg-90-a1d`'s: its two merges of `…/pkg-90`
+(4fcd224 at ee66c4a8, cde50e7 at a13fb0fe), the five (71febde) and their tiers (32c9448). Four are
+`…/pkg-90`'s since ee66c4a8: the lead's nudge 50 (3a59376), the trunk's merge of A1c (85266ea6),
+its record (25ccf84) and `…/pkg-90`'s merge of the trunk (a13fb0fe). A1d's own code was on the
+engine already (e2d6b92), and the trunk's four carry no code. So the code takes three files, the
+five's: `freesail/evolutions/runner.py`, `freesail/evolutions/scripts.py` and
+`freesail/orders/crew.py`, 87 lines in and 10 out. The tests take one, `tests/test_lateen_whole.py`,
+282 in. The docs take the trunk's `docs/dev/M7-WorkPackages.md` and `docs/dev/ShipsNudge.md`, as
+the trunk has them. Git finds two merge bases, ee66c4a and e2d6b92.
+
+**Which lines were resolved by hand** (three files conflicted; every other file merged clean, the
+five's three code files among them):
+1. **`tests/test_lateen_whole.py`**, one hunk: the five's section (282 lines, from its heading
+   "The five that ride A1d's hash (the lead's nudge 51)"), set against nothing: kept whole, at the
+   file's end. The file is then `…/pkg-90-a1d`'s byte for byte: the engine's 213 cases and the
+   five's 14, 227.
+2. **`docs/dev/TuningNotes.md`**, two hunks, each side's sections whole:
+   - The engine's A5-A6 and A4 sections (104 lines, from "## Package 90, A5 and A6: a yard's level
+     from its order on its mast" to A4's "Not built, for the lead"), set against nothing: kept
+     whole, where they stood.
+   - The five's section (31 lines, "Package 90, the five that ride A1d's hash"), set against
+     nothing: kept whole, at the file's end.
+
+   174 sections. Against 95a58e9 the file loses no line; against 32c9448 none.
+3. **This report**, two hunks, both sides' sections whole:
+   - The engine's seven sections from "Step A4: the boat in tow" to "held on nudge 46's item 6"
+     (752 lines), set against nothing: kept.
+   - The engine's last section (A1c's hash merged, nudge 49; 76 lines), set against
+     `…/pkg-90-a1d`'s two (A1d on A1c's hash, and A1d's hash with the five and its tiers; 310
+     lines): the engine's first, then `…/pkg-90-a1d`'s. **One line added by hand:** a blank line
+     between them, as each side's hunk began at its heading, the blank before it standing outside
+     the hunk.
+
+   20 sections before this one. Against 95a58e9 the file loses no line; against 32c9448 none.
+
+**Checked on the merged tree, before the tiers:**
+- No conflict marker is left anywhere. `ruff check` and `ruff format --check` are clean, 431
+  files. No carriage return in the merge's diff.
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+- The code, tests and data are byte for byte those of a dry run of the same merge, made in the
+  session's scratch from 71febde. 32c9448 changes `…/pkg-90-a1d`'s report alone.
+- The lens, `-n 4`, on 64efd89: 3,699 passed, 1 skipped, 1 xfailed, 0 failed (31 min 37 s);
+  `test_lateen_whole`'s 227 among them, all passed. It ran over the 52 files of A1d's hash's lens, and
+  `test_tow`, `test_boat_towed`, `test_yard_level` and `test_pole_mast`.
+
+**The tiers** run whole on the commit that adds this section, which touches this report alone.
+Each case will be set beside its outcome at b764b06 (the engine's last tiers) and at 71febde
+(A1d's hash). They follow in a section of their own.
+
+**The engine's tiers on 95a58e9 (nudge 49's merge) did not finish.** A restart of the session's
+machine stopped them at 14% of the fast tier, and they were not run again: 95a58e9 is under this
+merge, whose tiers are measured against both b764b06 and 71febde. The record has no tiers of
+95a58e9 itself.
+
+**For the coordinating session:** nudge 52 received. A5 and A6's own hash is **b40ffa3** on
+`…/pkg-90-a56` (its section there, 695331e, names the lines resolved by hand and sets the smack
+beside the trunk), its tiers held until A1d's verdict. If that verdict comes while this merge's
+tiers run, A5 and A6's take the machine first, and this section's results say where these stopped.
