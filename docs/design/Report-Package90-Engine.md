@@ -2085,3 +2085,59 @@ tick, kind, trace and line. The runs' files are kept in the scratch (`n52/`).
 **For the coordinating session:** A5 and A6's hash is **b40ffa3** on `…/pkg-90-a56`, pushed, its
 tiers held. The engine track's merge of A1d's hash (64efd89) is tiered meanwhile on its own
 branch, as before.
+
+## The lateen hulls' list (nudge 53): five built on their own branch, two for the lead (2026-11-23)
+
+**The branch:** `…/pkg-90-lateen`, a branch of its own, as the coordinating session asked (its
+name is mine; it was given none). Cut from **50bb169**, A5 and A6's hash, since the lead's "with
+the engine's next hash" reads, to the coordinating session, as the hash after A5 and A6's (the
+lead to confirm). Its code: **f0914df** (items 2, 3's bow line, 4 and 6) and **1767018** (item 5),
+four files: `freesail/evolutions/runner.py`, `freesail/evolutions/scripts.py`,
+`freesail/orders/navigation.py` and `tests/test_lateen_whole.py`, all in the plan's §7.1 row.
+
+**Each item, old (50bb169) beside new**, the measures in `docs/dev/TuningNotes.md` ("Package 90, the
+lateen hulls' list"):
+1. **The dire warning missed: not built, a stop.** `physics/strain.py`'s rule; the row says
+   "`physics/strain.py` is not touched". The mend proposed at its cause is in the notes.
+2. **The take-in's wait: built.** Said at the order whatever work is before it, and when its turn
+   comes if its lateen came aback meanwhile; once.
+3. **The warnings that point the wrong way: the bow's line built**, "...; let fly its sheet, shift
+   it or box her off" (JUDGEMENT on the words; why not "bear away", in the notes). **"If sail is
+   not shortened" is `physics/strain.py`'s: a stop**, with item 1.
+4. **Clearing for action: built.** It begins at once beside the work handed on, short ("Only 102
+   hands to clear for action; the rest are shifting the foresail and the mizen."), the yards
+   keeping their parties; `let go the anchor` there is answered as on the trunk. A manoeuvre still
+   waits behind the yards.
+5. **The aftermost lateen in stays: put back.** The reasoning for A1d's ease was its own judgement
+   (that a whole lateen cannot be hauled over its mast as a boom is), with no source. Measured over
+   1,536 probe tacks, the 22 that hang in stays, all the polacre's, all miss eased and all come
+   round hauled, the yard well under its rating either way: it cost her stays for nothing.
+   Hauled to windward again, and said as the mizen course and the settee are, with no boom.
+   `docs/design/Design-Package90-Engine.md` §2.4.3a still says "eased": the design is not this
+   row's to edit, and the notes and the code's comment say why it moved.
+6. **Said twice: both built**, the polacre's foresail at "let go and haul" and the bow's two
+   "when you will".
+7. **Ratings: asked.** The probe files are stage 0's (`tests/rig_fixtures.py`); a hull's own file
+   is the generator's and carries its ratings, and her gate is her builder's. What is the engine's
+   part?
+
+**The proofs** (`tests/test_lateen_whole.py`, "The lateen hulls' list (the lead's nudge 53)"):
+eight new cases and two pins moved, each failing with its mend undone (run so, the code put back to
+50bb169's or to A1d's ease, the tests as they are now):
+- new: the take-in at the order, and when its turn comes; clearing for action; the anchor; the
+  foresail named once; the bow's two lines; the polacre's hung tacks, seeds 24 in 12 kn and 36 in
+  20 kn, coming round;
+- moved, old beside new: the bow watch's line ("shift them when you will" -> "let fly their
+  sheets, shift them or box her off"); the hang's (`..._eased_and_not_hauled_over` ->
+  `..._hauled_to_windward_with_the_booms`, "the mizen sheet eased" -> "the mizen hauled over to
+  windward").
+
+**Checked on 1767018:** `ruff check` and `ruff format --check` clean; no carriage return in the
+branch's diff; `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte (no ship file
+touched); `tests/test_lateen_whole.py`, `test_probes_90.py`, `test_lateen.py` and
+`test_rig_words.py`, 431 passed (the fast tier's set; `test_lateen_whole` 235 of them); and the
+harness whole (A2's, every ship, 270 runs, `a2/harness.py` in the session's scratch) **byte for byte
+50bb169's**: no committed ship's line, tick or trace moves.
+
+**Not run:** the tiers of this branch, held until the lead says where these ride, A5 and A6's
+taking the machine first.
