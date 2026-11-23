@@ -1974,3 +1974,114 @@ fast tier above holds each of its files on the exact hash. Its 52 files (the ses
 
 **Next:** `…/pkg-90-a1d` merged into `…/pkg-90-engine`, as before; then A5 and A6 as their own
 hash, on the lead's word.
+
+## A5 and A6 as their own hash (nudge 52): `…/pkg-90` merged at 32c9448, the lines resolved by hand (2026-11-23)
+
+**The merge:** **b40ffa3** on `…/pkg-90-a56`, parents **4ebd88a** (A5 and A6 as ruled, nudge 39,
+on A1a-A1b as first built, no A4) and **32c9448** (`…/pkg-90`'s tip: A1d's hash and its tiers, on
+A1c, the three A1a-A1b passes, A3's lists, A2 and the trunk), as the lead's nudge 52 asks. It
+brings 104 commits; one merge base, e2d6b92. Over 4ebd88a the code, data and tests take 47 files,
+4,650 lines in and 299 out, all the trunk's.
+
+**What the merge adds over `…/pkg-90`** (non-docs, against 32c9448): A5 and A6's own lines and no
+other, twelve files, 922 lines in and 50 out. Each file's added and removed lines are those of A5
+and A6's own commits (e2d6b92 to 4ebd88a), line for line: `data/evolutions/furl_pole.yaml`,
+`data/evolutions/take_in_pole.yaml`, `data/vocabulary.yaml`, `freesail/evolutions/runner.py`,
+`freesail/evolutions/scripts.py`, `freesail/evolutions/trim.py`, `freesail/orders/verbs.py`,
+`freesail/physics/sails.py`, `freesail/ship/graph.py`, `tests/test_agents.py`,
+`tests/test_pole_mast.py` and `tests/test_yard_level.py`. The code merged clean, `runner.py`,
+`scripts.py` and `vocabulary.yaml` among it. And the merged tree is the engine branch's
+(`…/pkg-90-engine` at 64efd89, the same trunk with A5 and A6 and A4) less A4's own commit, 99d164c,
+line for line in each of its eight files: no line of A4 here, and no other.
+
+**Which lines were resolved by hand** (two files conflicted, both docs):
+1. **This report.** Git matched the two sides' like sub-headings ("### The test sets run, with
+   counts, and the base comparison", the guard set's lines) across different sections, and split
+   them into three hunks, each side's sections interleaved. Resolved by section, against the
+   merge base e2d6b92:
+   - The four sections both sides have (A2, A1a and A1b, A1c and A1d, as first built): the same
+     on each side, kept.
+   - This branch's three, whole, in their order after A1d's: "Step A4: the boat in tow, stopped
+     by the stop rule" (57 lines), "Steps A5 and A6" (213) and "Steps A5 and A6 as ruled (nudge
+     39)" (197).
+   - `…/pkg-90`'s five, whole, in their order after them: the second pass (223 lines), the third
+     pass (188), A1c's hash (202), A1d on A1c's hash (82) and A1d's hash (228).
+   - **One line added by hand:** a blank line between the last line of "Steps A5 and A6 as
+     ruled" and the second pass's heading, which stood next to no section of this branch's.
+
+   12 sections before this one. Against 4ebd88a the file loses no line; against 32c9448 none.
+2. **`docs/dev/TuningNotes.md`**, one hunk. Git set this branch's A5 and A6 section, less its last
+   two lines, against `…/pkg-90`'s four newest sections, matching the section's closing "Built by
+   the engine track's builder; ..." with the same line closing A1d's five. Resolved by section:
+   - "Package 90, A5 and A6: a yard's level from its order on its mast, and the pole mast's quick
+     handing" (53 lines), whole, after A1d's section, where it stood.
+   - Then `…/pkg-90`'s four, whole, in their order: the second pass (35 lines), the third pass
+     (46), the five that ride A1c's hash (34) and the five that ride A1d's (30).
+   - **One line added by hand:** a blank line before the second pass's heading.
+   - Every other section as git merged it, clean: the trunk's edits to four sections of before
+     (A0, A3, A2 and A1b, four lines out and their lines in), and its packages 120, 121 and
+     121's follow-up, in their places.
+
+   173 sections. Against 4ebd88a the file loses only the trunk's own four lines; against
+   32c9448 none. Set beside git's own resolution of the hunk (ours, then theirs), the file
+   differs only in A5 and A6's two closing lines kept with their section, and the blank.
+
+**Checked on the merged tree:** no conflict marker is left anywhere; `ruff check` and `ruff
+format --check` are clean, 430 files; no carriage return in the merge's diff; `python
+tools/gen_ships.py <scratch>`, 18 of 18 byte for byte.
+
+**The tiers are held until A1d's verdict**, as the lead asks. If A1d passes as it stands, the fast
+and the slow tier whole run on b40ffa3, the merge's exact hash; the commits after it touch this
+report alone. If it comes back with a list, its mend comes onto `…/pkg-90` first, it is merged in
+here, and the mended hash is tiered.
+
+### The smack, old beside new, against the trunk as it will stand
+
+Measured as at nudge 39, each order from one settled world (`a5/play.py` in the session's
+scratch: seed 7, 15 kn from 0°, her head 292.5° at 5 kn, plain sail and then the topsail set,
+trimmed every two minutes after five, 1,320 s; in Carrick Road, 12 kn from 225°). **Old is the
+trunk as it will stand**, `…/pkg-90` at 32c9448; **new is b40ffa3**. Times from the order.
+
+| Order, her topsail set over plain sail | The trunk (32c9448) | A5 and A6 (b40ffa3) |
+|---|---|---|
+| `heave to` | "Hauled up the courses."; "Hauled flat aft the mainsail sheet; the foresail sheet to windward; helm a-lee."; "Hands to the sheets; heave to."; "Hove to on the starboard tack, under her fore-and-aft canvas, foresail sheet to windward, helm a-lee." at +214 s; at +600 s 47.3° off at 2.61 kn, the topsail hanging in the gear | no course hauled up; "...; braced the topsail aback; helm a-lee."; "Hands to the braces; heave to."; "Hove to on the starboard tack, topsail to the mast, helm a-lee." at +202 s; at +600 s 50.5° off at 2.87 kn, the topsail set and to the mast. In 30 kn the same two lines, at +386 s |
+| `lie a-try` | refused: "Could not bring her to: She has no topsail to lie a-try under." (in 30 kn at +386 s) | "All hands! Shorten sail and bring her to under the topsail."; the jib taken in; "Lying a-try under the topsail and the foresail, helm a-lee." at +348 s; at +600 s 43.3° off at 1.06 kn. In 30 kn: lying a-try at +808 s, 49.3° off at 3.64 kn by +1,800 s |
+| `back and fill` | "Hauled up the topsail."; "Backed the square sail; her way checked." and "Filled the square sail; she forereaches." at +50, +223, +401 and +574 s; at +600 s her head 297.3° at 4.14 kn | the topsail kept: "Backed the topsail; her way checked." and "Filled the topsail; she forereaches." at +50, +224, +400 and +573 s; at +600 s her head 229.0° at 3.27 kn |
+| `take in the topsail`, `clew up the topsail` | "Hands to the topsail clewlines and buntlines."; "Clewed up the topsail." at +138 s; "Took in the topsail; hanging in the gear." at +204 s: 154 s from the start line | "Let go the topsail halyards; hands to the clewlines and buntlines."; "Lowered the topsail down onto the yard below and clewed it up there." and "Took in the topsail; lowered on the yard below, hanging in the gear." at +138 s: 88 s. **JUDGEMENT**, as ruled |
+| `lower the topsail` | refused: "A course is hauled up, not lowered; say 'haul up the topsail' or 'take in the topsail'." | obeyed, as take in |
+| `haul up the topsail` | obeyed, as take in | refused: "A topsail or light sail on a pole mast is lowered, not hauled up; say 'lower the topsail' or 'take in the topsail'." |
+| `furl the topsail` | "Lay aloft and furl the topsail."; "Clewed up the topsail." at +150 s; "Furled the topsail." at +400 s: 350 s | "Lay out on the yard below and furl the topsail."; "Lowered the topsail down onto the yard below and clewed it up there." at +150 s; "Furled the topsail on the yard below." at +350 s: 300 s. **JUDGEMENT**, as ruled |
+| `take in all sail` | the topsail as take in; the jib, last, hauled down at +412 s | the topsail as take in now; the jib at +350 s |
+| `strike the topmasts` (and `send down the topgallant masts`, `fid the topmast`) | "She has no topmasts to strike; her masts are the main mast." | "... her masts are the main mast (a pole, the mast and topmast in one stick)." |
+| `get under way` (Carrick Road, her topsail furled by `come to an anchor`) | | **the trunk's, line for line and tick for tick**: her topsail furled through the cast; at +1,500 s her head 125.3° at 4.19 kn |
+| `tack ship`, `wear ship`, `box haul`, `scud`, `shorten sail`, `set the topsail`, `trim sails`, `square the yards`, `brace sharp up on the larboard tack`, `come to an anchor` | | the trunk's, line for line and tick for tick |
+
+**Set beside nudge 39's table** (A1d, 8dce637, beside A5 and A6 as ruled, e83f9e7; its two runs
+kept in the scratch), A5 and A6's change to each order is the same, line for line and figure for
+figure, **but one line, in both `heave to` runs: its start.** Then, at A1d and as ruled alike,
+"Hands to the head braces; heave to.". Since then the trunk's words of a rig with no yards (A2's
+re-mend) say "Hands to the sheets; heave to." of her read with no braced yard to back, and with
+A5 and A6, her topsail read as a topsail and braced aback in the line before, "Hands to the
+braces; heave to.": the trunk's cutter's line in the same harness, word for word. The rest moves
+with the trunk alike on both sides (the box-haul's, the wear's and the get-under-way's words).
+
+With her topsail never set, a player meets two changes: `lie a-try`'s refusal in other words, and
+the topmasts' orders naming the pole.
+
+**The three harness runs**, and the harness whole (A2's, `a2/harness.py` in the session's scratch:
+each start settled once and each run from a copy of it, every event and a trace every 10 s), on
+b40ffa3 beside the trunk's (its run on 71febde's tree for nudge 51, whose code is 32c9448's, file
+for file): **270 runs, 269 the same in every tick, kind, trace and line.**
+
+| Run | Seed and start | b40ffa3 against the trunk |
+|---|---|---|
+| `lie_a_try` | seed 7; at sea, 15 kn from 0°, her head 292.5° at 5 kn, plain sail braced sharp up on the starboard tack and trimmed every two minutes after five, 2,400 s; then `lie a-try`, 600 s | **a word**: the refusal alone, "Order not carried out ('lie a-try'): She has no topsail to lie a-try under." -> "Order not carried out ('lie a-try'): The topsail is not set; set it to lie a-try under it."; her trace the same, 60 rows |
+| `anchor` | seed 7; Carrick Road, 10:00 on 10 June 1805, 12 kn from 225°, her head 335° at 3 kn, plain sail, 240 s; then `come to an anchor`, 2,400 s, and `get under way`, 1,500 s | **the same**, line for line and tick for tick: 34 events, 390 trace rows |
+| `shoal_anchor` | seed 7; off Falmouth in three fathoms and a half, the same hour, 8 kn from 225°, her head 335° at 2 kn, plain sail and `set the lug`, 60 s; then `come to an anchor`, 2,400 s, and `get under way`, 1,500 s | **the same**, line for line and tick for tick: 33 events, 390 trace rows; "Under way on the starboard tack, under the mainsail and the jib; the best bower catted and fished; full and by." at +3,434 s |
+
+The smack's twelve other runs, the cutter's fifteen and every other file's: the same in every
+tick, kind, trace and line. The runs' files are kept in the scratch (`n52/`).
+
+**For the coordinating session:** A5 and A6's hash is **b40ffa3** on `…/pkg-90-a56`, pushed, its
+tiers held. The engine track's merge of A1d's hash (64efd89) is tiered meanwhile on its own
+branch, as before.
