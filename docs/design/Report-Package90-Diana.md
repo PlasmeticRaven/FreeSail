@@ -39,6 +39,12 @@ tables, and the review lenses were read on her merged hash: nothing blocks her g
 mends are made, and four records are for the lead, her spanker first. Her tiers wait for A4's
 verdict, as the lead holds them.
 
+**Nudge 59 (§10).** Her bow port's half-breadth is now her drawn side's, 1.86 m, so the 1817
+fit's bow obuses stand in her side; `check_viewer_guns` is left as it is, since the outboard rule
+fails five committed ships. **Her spanker cut on her own spars is stopped, as the ruling says:**
+with it, no `clr_x_m` holds truths D and E together, so her file keeps the larger sail until the
+lead rules which truth to restate.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -798,3 +804,130 @@ the slow tier of her files with the pace tests excepted.
 For the lead: her spanker (§9.4, record 1), the one that would move her figures; her bow port
 (record 2); the audit's two ceilings (record 4). For the coordinator: her measuring note's "124
 pies × 0.99" (§9.4, mend 1), which is not in my row. For the owner: none new.
+
+## 10. The lead's rulings of nudge 59 on her four records (2026-11-23)
+
+The lead's nudge 59 (the trunk at a8913da6, `docs/dev/M7-WorkPackages.md`) ruled the four records
+of §9.4 before her tiers. A4's verdict is not in, so her tiers stay held. Old beside new, with
+every figure, in `docs/dev/TuningNotes.md`, "The Diana: the lead's rulings of nudge 59 on her four
+records". The work is in `79ed403`.
+
+### 10.1 Her spanker cut on her own spars: stopped, as the ruling says
+
+"If she will not hold both D's and E's bands with the spanker she can carry, stop and say what she
+does." She will not, so I stopped. **Her file keeps the spanker as it stood, 111 m2 at 7.8 m**,
+and nothing of the cut is filed.
+
+**The cut**, by her note's rule worked afresh on her spars as filed:
+- the boom 10.9 m at 2.9 m above her deck, the gaff 8.7 m with its jaws at 11.8 m, her deck 1.33 m
+  above her water, as the physics reads a spar's height;
+- the foot 0.9 of the boom, the head 0.9 of the gaff peaked 40 deg, the luff the hoist from boom to
+  jaws;
+- so **95.0 m2, its centroid 9.71 m above her water**, and 4.35 m abaft the mast, which is the
+  note's own "0.4 of the boom" (4.36 m). The rule closes on itself, and the reviewer's figure
+  stands. Filed it would be 95 m2 at 9.7 m, its x -16.6 (old -16.1).
+- Taken with the mizen's 6-deg rake, which the rule does not name, it is 92.7 m2 at 9.65 m.
+  Recorded, not used.
+
+In her module it is `spanker_figures` working those four corners (tack, clew, peak, throat) from
+`spanker_spars`, the boom and gaff her rig files, in place of the frigate's figure scaled. Through
+the generator it would move:
+- the spanker's area, centre and x, and its cloth's rating, 35.5 to 30.4 kn;
+- her plain sail, 1,054 to 1,038 m2, and so her rope's scale, 0.816 to 0.810;
+- 56 ratings, through her rope's scale and her spars' design wind.
+
+The eighteen would not move.
+
+**What she does with it**, at seed 7 by the truths' helpers, GM 1.75 and her rudder as measured,
+`clr_x_m` tuned from 2.0 to 4.2. The whole scan is in TuningNotes.
+
+| `clr_x_m` | Weather helm in 15 kn, close-hauled and abeam | Tacks from 290, 292.5 and 295 deg | Truth D | Truth E |
+|---|---|---|---|---|
+| 2.6 | -0.48, 1.46 deg | 235, 238, 241 s | no: lee helm | yes |
+| 2.75 | -0.10, 1.70 | 226, 229, 229 | no: lee helm | yes |
+| 2.8, as filed | 0.12, 1.78 | 223, 226, missed stays | no | no |
+| 2.94 | 0.56, 2.01 | 213, missed stays, missed stays | yes | no |
+| 3.0 to 3.6 | 0.73 to 2.54, 2.11 to 3.02 | missed stays from two headings, then all three | yes | no |
+
+- **Close-hauled, she carries lee helm until `clr_x_m` about 2.93.** Truth D asks 0.5 to 3 deg of
+  weather helm.
+- **From there she misses stays from 292.5 and 295 deg**, each miss said 79 to 91 s after the
+  order. Truth E asks all three tacks in 180 to 330 s.
+- No figure holds both bands. Where E holds (2.75 and below, but for a miss from 295 at 2.7), D
+  fails.
+- Her heel in 22 kn stays 8.16 and 12.63 deg throughout, inside truth C's band. Her wear stays
+  492 s, inside truth 11's. She heaves to in 135 s at 2.6 and in 123 s at 2.94.
+
+**So the lead's choice is which truth to restate as measured**, or whether to keep the larger
+sail. Restating D means lee helm close-hauled with the cut sail, -0.10 deg at 2.75, with her three
+tacks inside E. Restating E means two of three tacks missed from 2.94 up, with her helm inside D.
+
+**Her viewer's picture would not move with the cut.** The viewer draws a gaff sail with a boom
+between its spars' ends (`client/projection.js`, a gaff sail with no `corners_m`), not from its
+area or centre, and her boom and gaff are unchanged. What the owner saw ("she looks right to me")
+is the sail her spars draw, and the cut leaves it as it is.
+
+### 10.2 Her bow port on her drawn side: filed
+
+- **Old: 2.1 m, JUDGEMENT +-0.2, 0.24 m outside her drawn side at its sill. New: 1.86 m, her drawn
+  side's at its sill** (x 15.96, sill 2.38). It is read with `freesail/ship/form.py`'s
+  `half_breadth_at` on her drawn lines, the generator's own hull: 1.861 m, computed.
+- Her drawn hull is unmoved by it (448 t, 3.26 m deep), since the bow port is not among the
+  sections the hull is drawn from.
+- The generator now holds all eleven ports within 0.05 m of her drawn side. Before, it held ten
+  and reported the bow port.
+- The 1817 fit's two bow obuses stand in her side, 0.24 m inboard of where they were drawn.
+- Her file moved by that triple and its note alone. Her test's ports and the generator's report
+  line it holds moved with it, old beside new.
+
+**`check_viewer_guns` is left as it is.** I ran the rule over every committed file first: a gun in
+a port or over the rail whose half-breadth stands more than 0.05 m (the generator's
+`PORT_GAP_M`) outside the drawn side at its sill. It fails five committed ships, so by the ruling
+it is not added. Each ship's most outboard:
+
+| Ship | Most outboard | Where |
+|---|---|---|
+| the brig | +0.051 m | her Diligence fit's guns 2 |
+| the hermaphrodite brig | +0.153 m | her 1814 fit's bow chasers, and six ports more |
+| the razee | +0.350 m | her bow chasers of 1796; her ports 3 to 7 +0.05 to +0.18 |
+| the 74 | +0.180 m | her quarterdeck's ports 2 to 7, and her lower and upper ports 14 |
+| the 64 | +0.097 m | her lower ports 4 to 7 and upper 3 to 6 |
+
+The other eight armed files pass it, and so does hers, at +0.015 m (her place over the rail).
+
+### 10.3 Truth 9, and the two audit ceilings
+
+- **Truth 9 on her file** is noted by the lead as measured, as a ship of her force should be
+  (§9.4, record 3). Nothing changes.
+- **The two audit ceilings**, `u-ships` 18 to 19 and `x-words:ship-words` 17 to 18, are allowed by
+  the lead, old beside new with their reasons as filed in `4dec517`. Nothing changes.
+
+### 10.4 The checks on the head
+
+| Check | Tree | Result |
+|---|---|---|
+| `ruff check .` and `ruff format --check .` | `79ed403` | clean, 432 files; no line the branch adds is over 100 characters |
+| The generator into scratch, and `cmp` of every committed ship file | `79ed403` | 19 of 19 byte for byte |
+| The eighteen | `79ed403` | `git diff 329648e9 79ed403 -- data/ships` names her file alone |
+| `tools/check_viewer_guns.py` on her file | `79ed403` | clean |
+| Her tests, the viewer's, the guns', the lee ports' and the magazine's | `79ed403` | 1,523 passed |
+| Truths 7-190, 7-665, 7-700 and 7-701, and her cases of the known truths | `79ed403` | 17 passed |
+| The 42 targeted files of §9.3 | `79ed403` | **3,846 passed, 5 skipped, 1 xfailed**; no failure, no harbour or browser test among any |
+
+### 10.5 Her gate list now
+
+As §9.5 sets it out, with two changes:
+- her bow port's half-breadth leaves §9.6's judgements and is computed off her drawn lines;
+- her truths D and E stand on the spanker as filed, 111 m2 at 7.8 m, until the lead rules on
+  §10.1.
+
+The rest is as it stands: her files by the generator, the eighteen unmoved, the guards' tables
+with her rows, her truths as bands, and the rulings of nudges 30 and 32 each shown.
+
+### 10.6 Now
+
+Her hash for the lead's queue is the commit that adds this section, the branch's head. For the
+lead: §10.1, which truth to restate, or whether the larger sail stays. Her tiers wait for A4's
+verdict, and for the spanker's ruling if it moves her file. Then I tier the exact hash I send, the
+fast tier whole beside a base on the merged tree and the slow tier of her files, pace tests
+excepted. For the owner: the spanker's restatement, if the lead puts it to them.
