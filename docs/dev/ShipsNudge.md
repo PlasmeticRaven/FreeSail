@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 21:15 UTC (THE DIANA's FOUR: 1 HER SPANKER CUT ON HER OWN SPARS and her helm tuned to it, old beside new; stop and say if she will not hold D and E; 2 HER BOW PORT on her drawn side, measured from her lines; 3 noted; 4 the two ceilings allowed; her tiers still held until A4's verdict). Nudge number: 59.
+Latest note: 2026-11-23, 21:56 UTC (A4's VERDICT: today's eighteen unmoved in all they do; HELD FOR ONE SMALL COMMIT: gloss the marks boat_out and boat_back in send_boat and lay_out_kedge and declare the two entries; THE DIANA's TIERS MAY START once that commit is on claude/pkg-90; the lateen hulls' list of eight as it stands, its own step after). Nudge number: 60.
