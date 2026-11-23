@@ -39,6 +39,7 @@ from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
 from freesail.orders import navigation
 from freesail.physics import sails as P
+from freesail.physics import strain
 from freesail.physics.sails import against_the_mast, compute_sail_forces
 from freesail.ship.loader import load_ship
 from freesail.ship.parts import LineState, SailState
@@ -2886,3 +2887,143 @@ def test_the_bows_line_names_what_eases_a_lateen_aback_and_says_when_you_will_on
         "mast; let fly its sheet, shift it or box her off; and the mizen lies on the mast; shift "
         "it when you will."
     )
+
+
+# ---------------------------------------------------------------------------
+# The strain's line: items 1 and 3 of the list (the lead's nudge 55, `physics/strain.py` widened)
+# ---------------------------------------------------------------------------
+
+
+def _rated_by_the_generator(ship) -> None:
+    """Her whole lateens' yards and masts rated by the generator's rule, as truths 7-670 to 7-672
+    rate the probes (a lower yard for its own sail, a lower mast for every sail on it): a hull's
+    own file carries these (item 7)."""
+    from tools.gen_ships import DESIGN_WIND_KN, design_kn
+
+    lower = DESIGN_WIND_KN["lower"]
+    for sl in ship.sails.values():
+        if sl.cls != "lateen":
+            continue
+        yard, mast = ship.yard_of(sl), ship.mast_of(sl)
+        on_mast = [s for s in ship.sails.values() if ship.mast_of(s) is mast]
+        yard.rating_kn = float(design_kn([(sl.area_m2, sl.centre_height_m, sl.curve_class)], lower))
+        mast.rating_kn = float(
+            design_kn([(s.area_m2, s.centre_height_m, s.curve_class) for s in on_mast], lower)
+        )
+
+
+@pytest.fixture(scope="module")
+def xebec_in_a_gale(xebec_file) -> bytes:
+    """The xebec probe rated by the generator, plain sail in a steady 57 kn on the starboard
+    tack, trimmed, 600 s: her lateen yards warned on the good hand, as the lead's reader had her."""
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=57.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, xebec_file, scenario)
+    _rated_by_the_generator(world.ship)
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 0 and i > 240:
+            world.submit("trim sails")
+        world.tick()
+    return replay.checkpoint_bytes(world)
+
+
+def _warned(events, part_id: str) -> list:
+    return [
+        e
+        for e in events
+        if e.kind == "strain.warning" and part_id in (e.data.get("parts") or [e.subject])
+    ]
+
+
+def test_a_lateen_come_onto_the_bad_hand_in_a_gale_is_warned_for_at_once_before_it_goes(
+    xebec_in_a_gale,
+):
+    """Nudge 53, item 1: a whole lateen coming onto the bad hand is a new cause of strain and is
+    warned for as it comes, whatever was said before (`physics/strain.py`, `LATEEN_PRESSED`: the
+    ten minutes' rate counted against the part and its cause). The xebec in 57 kn: her lateen
+    yards warned "working under the press of sail." on the good hand inside the ten minutes, then
+    put on the bad hand, each yard warned at once "bending like a whip" with its cause and what
+    eases it, before any of them carries away. Measured, seed 7: warned at +1 s; the mizen's yard
+    carried away at +156 s and the foresail's at +205, as before. Before, no "bending like a
+    whip" before either went: the one warning a part in ten minutes had been said."""
+    world = _from(xebec_in_a_gale)
+    ship = world.ship
+    yards = {sid: ship.yard_of(ship.sails[sid]).id for sid in XEBEC_LATEENS}
+    names = {"fore.lateen": "foresail", "main.lateen": "mainsail", "mizzen.lateen": "mizen"}
+    for yid in yards.values():
+        (said,) = _warned(world.log.all(), yid)  # on the good hand, the plain words
+        assert said.text.endswith("working under the press of sail.")
+        assert world.clock.tick - said.tick < strain.WARNING_INTERVAL_S
+    n0 = len(world.log.all())
+    for sl in ship.sails.values():
+        if sl.cls == "lateen":
+            sl.lug_side = "starboard"  # the yard on the weather side of its mast
+            yard_trim.set_sheet_angle(ship, sl, sl.sheet_angle, "larboard")
+    world.run(300)
+    after = _after(world, n0)
+    gone = {e.subject: e.tick for e in after if e.kind == "spar.carried_away"}
+    assert yards["mizzen.lateen"] in gone and yards["fore.lateen"] in gone, gone
+    for sid, yid in yards.items():
+        said = _warned(after, yid)
+        assert said, sid
+        assert said[0].tick < gone.get(yid, math.inf)
+        assert said[0].data["ratio"] > strain.CARRY_AWAY_RATIO
+        assert f"the {names[sid]} lying on the mast;" in said[0].text
+        assert said[0].text.endswith("let fly its sheet or shift it."), said[0].text
+        assert "if sail is not shortened" not in said[0].text
+
+
+def test_a_lateen_held_aback_is_warned_for_with_its_cause_and_what_eases_it(xebec_in_a_breeze):
+    """Nudge 53, item 3: "... if sail is not shortened" pointed the wrong way of a lateen whose
+    taking in the game holds while it is aback; the line names the cause and the three reliefs
+    (its sheet let fly, the yard shifted, the ship boxed off), as the bow's line does. The xebec in
+    25 kn, the wind eight points through her bow: her main lateen yard at 1.11 of its rating,
+    "Main lateen yard working under the press of sail, the mainsail aback against the mast: let
+    fly its sheet, shift it or box her off.", once in the ten minutes."""
+    world = _from(xebec_in_a_breeze)
+    ship = world.ship
+    n0 = len(world.log.all())
+    _shift_the_wind(world, -8.0)
+    world.run(5)
+    pressed = ship.extra[strain.LATEEN_PRESSED]
+    assert pressed["main.lateen_yard"] == ("aback", "main.lateen")
+    assert pressed["main.mast"] == ("aback", "main.lateen")
+    (said,) = _warned(_after(world, n0), "main.lateen_yard")
+    assert said.text == (
+        "Main lateen yard working under the press of sail, the mainsail aback against the mast: "
+        "let fly its sheet, shift it or box her off."
+    )
+    world.run(590)
+    assert len(_warned(_after(world, n0), "main.lateen_yard")) == 1
+
+
+@pytest.mark.parametrize("path", sorted(str(p) for p in Path("data/ships").glob("*.yaml")))
+def test_no_part_of_a_committed_ship_is_pressed_by_a_lateen_and_her_warnings_keep_their_rule(path):
+    """No committed sail is a whole lateen: plain sail set in 15 kn and a gale of 50 kn striking
+    her (gusting, as a scenario's wind), no part of any committed file is marked pressed
+    (`strain.LATEEN_PRESSED`), and every warning she gives is counted against the part alone (or
+    the anchor's cable, as before), one a part in ten minutes, in the words it had. Eleven of the
+    eighteen give warnings in it (the 74's 46 parts); the eighteen in gales, old beside new, are
+    the report's (`docs/design/Report-Package90-Engine.md`, nudge 55)."""
+    world = make_world(
+        7,
+        path,
+        Scenario(wind_from_deg=0.0, wind_speed_kn=15.0, ship_heading_deg=292.5, ship_speed_kn=5.0),
+    )
+    world.submit("set plain sail")
+    world.run(300)
+    wind = world.wind
+    wind.follow(wind.base_direction, units.knots_to_ms(50.0))
+    world.scenario.wind_speed_kn = 50.0
+    for _ in range(180):
+        world.tick()
+        assert strain.LATEEN_PRESSED not in world.ship.extra
+    st = strain.strain_state(world.ship)
+    assert all(k in world.ship.parts or k.startswith("cable:") for k in st.last_warning_s)

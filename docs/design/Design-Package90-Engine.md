@@ -1436,7 +1436,19 @@ Both are module constants of `physics/sails.py` beside `LUG_AGAINST_MAST_AREA`. 
 lines take the plain pull as now. Nothing in `physics/strain.py` changes: the ratio, the wear over
 1.0, the warning, the chance over 1.5, the certain failure at nought and `_wreck_spar` with its
 dependents are the engine's as they are. **No new kind of damage**: a yard or a mast carried away
-as any spar is, its sail and gear with it.
+as any spar is, its sail and gear with it. *Widened 2026-11-23 (the lead's nudge 55; the lateen
+hulls' list, items 1 and 3):* `physics/strain.py` changes in its warning alone, never a figure of
+load, strain or damage. `_apply_loads` marks each spar of the chain with what presses it, aback or
+the bad hand (`lateen_pressed`, under `strain.LATEEN_PRESSED`, for each substep as its load), and
+`_warn` counts the ten minutes' rate against the part and its cause, so a lateen coming aback or
+onto the bad hand is warned for as it comes, whatever was said before, in words that say why and
+what eases it: "Main lateen yard bending like a whip, the mainsail lying on the mast; she will
+carry it away: let fly its sheet or shift it." (aback, "..., the mainsail aback against the mast:
+let fly its sheet, shift it or box her off."). Before, the one warning a part in ten minutes let a
+yard warned on the good hand carry away on the bad hand unwarned (the xebec probe in 57 kn), and
+"if sail is not shortened" pointed the wrong way of a lateen whose taking in the game holds while
+it is aback. No committed sail is a whole lateen, so their warnings keep the rule as it was (the
+eighteen in gales, old beside new, in the engine's report).
 - **Why a factor at all** (measured, §2.2b). "As a backed square sail does", the plate's force on
   the chain and no more, a lateen taken aback with her way on (the wind shifted onto her other bow)
   carries on its yard 0.12 to 0.15 of the generator's rating in 15 kn, 0.25 to 0.29 in 22, 0.39 to
