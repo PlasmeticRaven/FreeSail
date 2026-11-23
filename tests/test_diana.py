@@ -43,11 +43,13 @@ FRIGATE = "data/ships/frigate-36.yaml"
 LIBRA_KG = 0.4608  # the libra castellana, the book's own
 FITS = ("danish 1807", "as captured 1809", "carronadas de a 30 1810", "1817")
 DEFAULT_FIT = "carronadas de a 30 1810"
-# Pages §5.7: her eleven ports a side, aft to forward, [x, sill, half-breadth at the sill]
+# Pages §5.7: her eleven ports a side, aft to forward, [x, sill, half-breadth at the sill]; the
+# bow port's half-breadth her drawn side's at its sill (the lead's nudge 59; 2.1 before, by
+# JUDGEMENT, 0.24 m outside her drawn side)
 PORTS = [
     [-13.49, 2.11, 3.19], [-10.69, 1.93, 3.77], [-7.81, 1.82, 4.14], [-4.93, 1.75, 4.34],
     [-2.06, 1.72, 4.42], [0.80, 1.72, 4.46], [3.65, 1.75, 4.42], [6.42, 1.82, 4.33],
-    [9.37, 1.91, 4.14], [12.27, 2.06, 3.74], [15.96, 2.38, 2.1],
+    [9.37, 1.91, 4.14], [12.27, 2.06, 3.74], [15.96, 2.38, 1.86],
 ]  # fmt: skip
 
 
@@ -149,9 +151,10 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     the filed 470 t (-5%, recorded and not moved: the filed figure her measuring's body outside 3.5
     pulgadas of plank, the lead's ruling of nudge 30; 498 t, the table's, before it), drawn 3.26 m
     deep at the greatest section to the rabbet against
-    her draught of 3.78 m to K; ports 1 to 10 within 0.05 m of the drawn side at their sills (her
-    body plan's readings at the sills being among her sections) and the bow port's half-breadth,
-    JUDGEMENT, 0.24 m outside it, reported; her plain sail and her rope's scale; Luce's chain on her
+    her draught of 3.78 m to K; her eleven ports within 0.05 m of the drawn side at their sills
+    (ports 1 to 10 her body plan's readings at the sills, among her sections; the bow port's
+    half-breadth read off the drawn side, the lead's nudge 59: old, JUDGEMENT, 0.24 m outside it,
+    reported and not held); her plain sail and her rope's scale; Luce's chain on her
     particulars; each fit's pieces, broadside, men at the guns of a side and weight of guns; the
     quarter bill's trimmers; and her idlers by trade. Her file comes out as it stands."""
     said = _probe(REPORT_PROBE, str(tmp_path)).stderr
@@ -161,8 +164,7 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
     assert f"{drawn} drawn 3.26 m deep at the greatest section (x 1.26)" in said
     assert (
         "off the half-breadth by +0.00, -0.02, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, "
-        "+0.00, +0.00, -0.24 m; more than 0.05 m at x 15.96, reported and never moved to the "
-        "drawing; the 10 measured each within 0.05 m." in said
+        "+0.00, +0.00, +0.00 m; the 11 measured each within 0.05 m." in said
     )
     assert (
         "corvette-20: plain sail 1054 m2 against the frigate-36's 1584; her rope's scale 0.816."

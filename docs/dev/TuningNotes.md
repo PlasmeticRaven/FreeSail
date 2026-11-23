@@ -40023,3 +40023,34 @@ The eight lenses (Plan-Package90.md §10.2, Build-Ships.md §17) read on her mer
 - **Her bow port stands 0.24 m outside her drawn side at its sill** (lenses 4 and 5): its half-breadth, 2.1 m (JUDGEMENT +-0.2), beyond the judgement's own band. The generator reports it ("-0.24 m; more than 0.05 m at x 15.96, reported and never moved") and her test holds it (`tests/test_diana.py`); the viewer draws the 1817 fit's two bow obuses there, outboard of her planking (`freesail/api/viewer_guns.py`, the muzzle at the triple's half-breadth); `check_viewer_guns` checks only that the side is there.
 - **Truth 9 on her file, measured, not asserted** (lens 2; the truth's cases are the frigate-36's and the schooner's): in 20 kn under plain sail for 20 minutes nothing carries away, no line parts and no strain warning is raised; in 35 kn under all sail her main royal yard, her fore and mizzen royal masts and her fore topgallant yard carry away, each urgent, with 44 strain warnings.
 - **Two audit ceilings moved beyond nudge 32's wording** (4dec517: `u-ships` 18 to 19, `x-words:ship-words` 17 to 18), each old beside new with its reason, as every file's era notes carry their years: the ruling named only her entry and truth 7-590's count.
+
+### The Diana: the lead's rulings of nudge 59 on her four records (2026-11-23)
+
+**1. Her spanker cut on her own spars: STOPPED, as the ruling says, for she will not hold truths D and E together with it.** Not filed; her file keeps the spanker as it stood (111 m2 at 7.8 m), for the lead's word.
+- **The cut**, by her note's rule worked afresh on her spars as filed: the boom 10.9 m at 2.9 m above the deck, the gaff 8.7 m with its jaws at 11.8 m, both heights above her deck of 1.33 m as the physics reads them; foot 0.9 of the boom, head 0.9 of the gaff peaked 40 degrees, luff the hoist from boom to jaws. **95.0 m2, its centroid 9.71 m above her water**, and 4.35 m abaft the mast, the note's own "0.4 of the boom" (4.36), so the rule closes on itself; filed it would be 95 m2 at 9.7 m, x -16.6 (old -16.1). With the mizen's 6-degree rake taken into the cut, which the rule does not name: 92.7 m2 at 9.65 m (recorded, not used).
+- **What it moves in her file, by the generator:** the spanker's area, centre and x, its cloth's rating 35.5 to 30.4 kn, her plain sail 1,054 to 1,038 m2 and so her rope's scale 0.816 to 0.810, and 56 ratings through it and her spars' design wind; the eighteen unmoved.
+- **Her helm tuned against it** (`clr_x_m`, GM 1.75 and her rudder as measured, seed 7, the truths' helpers; truth D: weather helm in 15 kn 0.5 to 3 deg close-hauled and 1 to 3 abeam; truth E: each of three tacks 180 to 330 s):
+
+| `clr_x_m` | helm close-hauled, abeam (deg) | tacks from 290, 292.5, 295 (s) | D | E |
+|---|---|---|---|---|
+| 2.0 | -2.44, 0.44 | 263, 266, 263 | no | yes |
+| 2.4 | -1.19, 1.12 | 245, 248, 247 | no | yes |
+| 2.6 | -0.48, 1.46 | 235, 238, 241 | no | yes |
+| 2.7 | -0.18, 1.62 | 229, 232, missed stays | no | no |
+| 2.75 | -0.10, 1.70 | 226, 229, 229 | no | yes |
+| 2.8 (as filed) | 0.12, 1.78 | 223, 226, missed stays | no | no |
+| 2.9 | 0.42, 1.95 | 215, missed stays, missed stays | no | no |
+| 2.94 | 0.56, 2.01 | 213, missed stays, missed stays | yes | no |
+| 3.0 | 0.73, 2.11 | 210, missed stays, missed stays | yes | no |
+| 3.2 to 3.6 | 1.14 to 2.54, 2.41 to 3.02 | missed stays from all three | yes | no |
+| 3.8 to 4.2 | 3.50 to 4.22, 3.31 to 3.89 | missed from two; from 295 not round in 900 s | no | no |
+
+  So **with the spanker she can carry, her helm close-hauled is lee helm until `clr_x_m` about 2.93, and from there she misses stays from 292.5 and 295 degrees**: no figure holds both bands. Each miss is said 79 to 91 s after the order. Her heel in 22 kn stays 8.16 and 12.63 deg throughout (truth C's band held), her wear 492 s at 2.6 and 2.94 (truth 11's), hove to in 135 and 123 s. The cut is kept as a patch, to be filed when the lead rules how the truth is restated.
+- **Her viewer's picture would not move with it:** the viewer draws a gaff sail with a boom between its spars' ends (`client/projection.js`, the gaff sail with no `corners_m`), not from its area or centre, and her boom and gaff are unchanged. What the owner saw ("she looks right to me") is the sail as her spars draw it.
+
+**2. Her bow port on her drawn side: filed.** Old: its half-breadth 2.1 m, JUDGEMENT +-0.2, 0.24 m outside her drawn side at its sill. New: **1.86 m, her drawn side's at its sill** (x 15.96, sill 2.38: `freesail/ship/form.py`'s `half_breadth_at` on her drawn lines, 1.861; computed). Her drawn hull is unmoved by it (448 t, 3.26 m deep: the bow port is not among the sections it is drawn from), and the generator now holds all eleven ports within 0.05 m of the drawn side (old: the ten, the bow port reported). The 1817 fit's two bow obuses stand in her side, 0.24 m inboard of where they were drawn. Her file moved by that triple and its note alone; the eighteen unmoved. Her test's ports and her report's line moved with it, old beside new.
+- **`check_viewer_guns` is left as it is**: the rule "a gun in a port or over the rail whose half-breadth stands more than 0.05 m (the generator's `PORT_GAP_M`) outside the drawn side at its sill", run over every committed file, fails five committed ships, so by the ruling it is not added. Their most outboard: the brig +0.051 m (the Diligence fit's guns 2); the hermaphrodite brig +0.153 m (her 1814 fit's bow chasers; seven ports over); the razee +0.350 m (her bow chasers of 1796; ports 3 to 7 +0.05 to +0.18); the 74 +0.180 m (her quarterdeck's ports 2 to 7 and her lower and upper ports 14); the 64 +0.097 m (her lower ports 4 to 7 and upper 3 to 6). None of the others: the bilander, the cutter, the frigate-36, the lugger, the merchant brig, the privateer schooner, the smack, the topsail schooner, and her own at +0.015 m (her place over the rail).
+
+**3. Truth 9 on her file:** noted by the lead as measured, as a ship of her force should be (above, the lenses' record).
+
+**4. The two audit ceilings** (`u-ships` 18 to 19, `x-words:ship-words` 17 to 18): allowed by the lead, old beside new with their reasons as filed in 4dec517.

@@ -174,12 +174,14 @@ DECK = [
 
 # Her eleven ports a side, aft to forward, [x of the port's centre, sill, half-breadth at the
 # sill] (Pages §5.7: the sheet's own centres; the sills +-0.01 m, the half-breadths +-0.03 m
-# read on the body plan, +-0.05 at ports 1 and 10; the bow port's half-breadth JUDGEMENT,
-# +-0.2 m). Numbered here as Pages numbers them, port 1 aftmost and port 11 the bow port.
+# read on the body plan, +-0.05 at ports 1 and 10). The bow port's half-breadth is her drawn
+# side's at its sill, 1.861 m (computed, `freesail/ship/form.py`'s `half_breadth_at` on her drawn
+# lines; the lead's nudge 59). Old: 2.1, JUDGEMENT +-0.2 m, 0.24 m outside her drawn side.
+# Numbered here as Pages numbers them, port 1 aftmost and port 11 the bow port.
 PORTS = [
     [-13.49, 2.11, 3.19], [-10.69, 1.93, 3.77], [-7.81, 1.82, 4.14], [-4.93, 1.75, 4.34],
     [-2.06, 1.72, 4.42], [0.80, 1.72, 4.46], [3.65, 1.75, 4.42], [6.42, 1.82, 4.33],
-    [9.37, 1.91, 4.14], [12.27, 2.06, 3.74], [15.96, 2.38, 2.1],
+    [9.37, 1.91, 4.14], [12.27, 2.06, 3.74], [15.96, 2.38, 1.86],
 ]  # fmt: skip
 BOW_PORT = 11
 PORT_SIZE = [0.83, 0.66]  # measured: 286.5 by 229 px, the median of the clean ports
@@ -581,8 +583,9 @@ PROFILE_NOTES = {
     "inboard works crowding it there.",
     "profile.ports_m.upper": "Her eleven ports a side, the sheet's own centres, each sill and the "
     "half-breadth at it read on the body plan between the stations either side (measured, Pages "
-    "§5.7): ports 1 (aftmost) to 10 her broadside's, 11 the bow port, whose half-breadth is "
-    "JUDGEMENT (+-0.2 m); and a place over the rail between ports 1 and 2, a sill 2 in under the "
+    "§5.7): ports 1 (aftmost) to 10 her broadside's, 11 the bow port, whose half-breadth is her "
+    "drawn side's at its sill (computed from her drawn lines; 2.1 by JUDGEMENT before, 0.24 m "
+    "outside her side); and a place over the rail between ports 1 and 2, a sill 2 in under the "
     "rail, for the 1817 fit's after obuses (Dia-D §5.2 item 2: JUDGEMENT on the place).",
     "profile.port_size_m.upper": "0.83 by 0.66 m, 286.5 by 229 px, the median of the clean ports "
     "(measured, Pages §5.7): the plan's ports alike.",
@@ -610,9 +613,9 @@ PROFILE_NOTES = {
 
 def profile_into(p):
     """Her profile and shape keys added to `p.hull` through `g.hull_profile` and `g.hull_form`,
-    their notes to `p.hull_notes`; ports 1 to 10's triples measured at their sills (Pages §5.7),
-    so a gap over 0.05 m to the drawn side raises for them, and the bow port's and the place
-    over the rail are reported."""
+    their notes to `p.hull_notes`; ports 1 to 10's triples measured at their sills (Pages §5.7)
+    and the bow port's read off her drawn side, so a gap over 0.05 m to the drawn side raises for
+    each of the eleven; the place over the rail is reported."""
     ports = [list(t) for t in PORTS]
     rail_z = interp(RAIL, OVER_THE_RAIL_X)
     rail_hb = interp([(x, hr) for x, _hw, hr in BREADTH], OVER_THE_RAIL_X)
@@ -653,7 +656,7 @@ def profile_into(p):
         },
         "head": "scroll",
     }
-    measured = tuple(("upper", x) for x, _s, _h in PORTS[: BOW_PORT - 1])
+    measured = tuple(("upper", x) for x, _s, _h in PORTS)
     drawn = REPORT.setdefault("hull", [])
     drawn.clear()
     REPORT["gaps"] = g.hull_form(p.hull, form=form, marks=MARKS, measured=measured, report=drawn)
