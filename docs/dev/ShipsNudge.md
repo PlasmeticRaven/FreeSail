@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 21:59 UTC (THE DIANA's SPANKER: THE OWNER's WORD IS (a), given to the lead directly: the sail her spars carry, her tacks kept, truth D restated as measured; first answer whether her boom and gaff are sourced; the figure by the wider table of nudge 61; then her truths and her tiers). Nudge number: 62.
+Latest note: 2026-11-23, 22:00 UTC (THE DIANA's BOOM: the owner's two answers are one: STEEL's BOOM, the spanker cut on it, measured as nudge 61 asks, filed if she holds D and E, ELSE (a) with D restated; the boom's ground named as a comparator in her file). Nudge number: 63.
