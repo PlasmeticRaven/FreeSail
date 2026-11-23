@@ -39450,6 +39450,71 @@ None (the tiers' compare in the report). New: A1c's part of `tests/test_lateen_w
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
 
+## Package 90, A1d: a whole lateen aback, and on the bad hand, in a breeze (2026-11-20)
+
+`docs/design/Plan-Package90.md` §6's A1d, built by the owner's decision of 2026-11-18 ("A lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk damage."), on the lead's figures, ruled (nudge 18 and 22): `LATEEN_ABACK_LOAD` 2.5, a great yard straining from about 28 kn aback and at risk from about 35; `LATEEN_BAD_HAND_LOAD` 2.5, from about 40 and 49 (the backed square topsail's own 40, the 35-kn guess withdrawn); a mast that carries only its lateen straining with its yard. `docs/design/Design-Package90-Engine.md` §2.4.3, §2.4.3a, §2.2b. Keyed on a whole lateen with `dipping`: **nothing of the eighteen files moves** (none carries one).
+
+### What it builds
+
+- **The side kept by the mast** (`evolutions/trim.py`, `keeps_its_side`): a whole lateen's one sheet, held to no side, holds its cloth on its yard's side (`Sail.lug_side`), not on the deck's lee; `set_sheet_angle` keeps the side its sheet is drawn to, the lee included, for a whole lateen alone (every other single sheet is held only off the lee, as before).
+- **Held aback** (`physics/sails.py`): with the wind come round ahead onto the side its cloth lies on, its sheet's side is the weather side and `_read_rig` takes it as held, a plate aback pressed on its mast, `_plate_force` unchanged ("Main lateen taken aback." after 10 s). In the luffing band, the wind still on the far bow, it shakes as before and is not held.
+- **Carried over abaft the beam** (`_carried_over_abaft_the_beam`): with the wind abaft the beam on the side its cloth lies on, the cloth goes over to leeward against its mast, its sheet with it, as a gybe carries a boom: the bad hand, not aback.
+- **The two factors** (`lateen_load_factor`, in `_apply_loads`): its pull on each spar of its chain, its yard then its mast and any spar beneath, times `LATEEN_ABACK_LOAD` held aback and `LATEEN_BAD_HAND_LOAD` against its mast on the bad hand; its cloth and its lines the plain pull. `physics/strain.py` is not touched: the wear over 1.0, the chance over 1.5, the failure at nought and `_wreck_spar` are any spar's. No new kind of damage.
+- **The evolution's part** (`evolutions/scripts.py`), at A1b's places:
+  - at "let go and haul" every whole lateen still set is drawn over to the new lee with the head sheets (`TackScript._draw_lateens_over`): those to be changed fill on the bad hand till their change begins at the swing's end, as A1b has it; those left fill on the bad hand and the line says so ("Let go and haul. Draw jib; trim aft the head sheets; draw the lateens on their masts.", "Draw the mainsail on the mast." with no head sheets); the aftermost, eased as she pays off with no head sail, eased on the new lee (`ease_off_sheets` takes a side, the deck's reading lagging);
+  - hung in stays, the aftermost lateen's sheet eased on the old lee, not hauled over its mast as a boom is ("...; the mizen sheet eased."); a foremost one before a square main stays aback with the head sheets, as A1b has it;
+  - in the wear, at "wind aft", every whole lateen still set goes over to the new lee with the other sheets, the aftermost still eased as A1b eased it at "up helm" (`WearScript._lateens_over`), and the line names those left ("Wind aft. Shifted over the sheets; the lateens over against their masts.");
+  - **the bow watch's line** says a lateen held aback ("The wind has come round ahead to the larboard bow: the foresail and the mizen and the mainsail are aback against their masts; shift them when you will."), A1a's "lie on their masts" for one drawn round to leeward;
+  - **`take in` waits** (`evolutions/runner.py`, `scripts.lateen_take_in_waits`): begun on a whole lateen held aback while the mean true wind is over `LATEEN_TACK_KN`, the work waits, said once ("The mainsail is aback against the mast; it will not come in till she pays off.", Forfait p. 119), and begins when it fills or is drawn over (measured: the xebec probe in 25 kn pays off and fills 35 s after the order, and is brailed up).
+
+### Measured: the bands (truths 7-670 to 7-672)
+
+The tartane and polacre probes, their lateen yards and masts rated by the generator's rule (`design_kn` in 55 kn: the tartane's main yard 59.5 kN and mast 122.8, her mizen's 11.2 each; the polacre's fore 61.1 and 139.4, mizen 21.7: the design's figures to the decimal), seed 7, settled 600 s. Peak load over rating:
+
+| Taken aback by a shift (20° on her other bow, 120 s) | 22 kn | 25 | 28 | 31 | 34 | 37 | 40 |
+|---|---|---|---|---|---|---|---|
+| Tartane main yard | 0.67 | 0.83 | 0.94 | 1.26 | 1.46 | 1.71 | 1.95 |
+| Tartane main mast | 0.35 | 0.43 | 0.49 | 0.65 | 0.76 | 0.88 | 1.01 |
+| Polacre fore yard | 0.61 | 0.72 | 0.92 | 1.13 | 1.33 | 1.54 | 1.73 |
+| Mizens (yard = mast) | 0.61-0.67 | 0.72-0.81 | 0.92-0.94 | 1.10-1.13 | 1.27-1.34 | 1.49-1.55 | 1.72-1.73 |
+
+So a great yard aback strains from about 29 kn and may carry away from about 34½ (the polacre's 30 and 36½); the tartane's main mast, carrying her topsail and head sails too, from about 40.
+
+| On the bad hand, close-hauled (300 s) | 34 kn | 38 | 42 | 46 | 50 | 54 |
+|---|---|---|---|---|---|---|
+| Polacre fore yard | 0.60 | 0.74 | 0.95 | 1.37 | 1.59 | 1.65 |
+| Polacre mizen (yard = mast) | 0.66 | 0.82 | 1.04 | 1.38 | 1.46 | 1.59 |
+
+So on the bad hand a great yard strains from about 42½ kn and may carry away from about 48½. The tartane probe in these winds luffs and is taken aback by her own lateens (72 to 118 s of 300), so her figures there are aback's, not the bad hand's (as §2.2b found of the xebec probe); she is not in the truth's band.
+
+**The rules captain's board** on the bad hand in 12 kn for 1,800 s: the tartane's yards 0.12 and 0.10 of their ratings, the polacre's 0.08 and 0.10 (§2.2b's 0.07 to 0.10 at the earlier draft's factor of 2); no part loses condition. In 15.6 kn, a 12-kn wind's top gust, the polacre's 0.14 and 0.16; the tartane probe luffs and is aback most of the board there (0.26 on her mizen).
+
+### Measured: the probes' going about, old beside new
+
+`a1d/goabout2.py` in the session's scratch (seed 7, the starboard tack 67.5° off, plain sail trimmed, settled 1,800 s, the order and 900 s; "lost" to windward against her settled rate). Old is A1c, 0c98ff8; new A1d. Time to the order's end and ground lost:
+
+| 15 kn | Tack | Tack, the lateens left | Wear | Wear, the lateens left |
+|---|---|---|---|---|
+| Tartane | 262 s, 193.0 -> 188.5 m (−4.5) | 156 -> 149 s, 130.9 -> 136.0 m (+5.1) | 480 s, 489.6 m, the same | 479 s, 568.9 -> 549.2 m (−19.7) |
+| Polacre | 292 s, 154.2 -> 154.5 m | 167 -> 168 s, 139.0 -> 139.3 m | 461 s, 472.3 m, the same | 471 -> 468 s, 561.4 -> 556.0 m (−5.4) |
+| Xebec | 344 s, 317.5 -> 318.4 m | 97 s, 156.0 -> 153.7 m | 308 s, 459.6 m, the same | 340 -> 323 s, 500.6 -> 487.1 m (−13.5) |
+
+| 25 kn | Tack | Tack, the lateens left | Wear | Wear, the lateens left |
+|---|---|---|---|---|
+| Tartane | 318 s, 217.9 -> 215.8 m | 137 -> 134 s, 173.3 -> 179.5 m (+6.2) | 591 s, 733.2 m, the same | 593 -> 592 s, 784.3 -> 772.1 m (−12.2) |
+| Polacre | 329 -> 327 s, 351.2 -> 368.7 m (+17.5) | 234 -> 223 s, 375.3 -> 341.3 m (−34.0) | 547 s, 801.2 m, the same | 545 s, 932.6 -> 912.7 m (−19.9) |
+| Xebec | 331 s, 482.7 -> 482.5 m | 67 s, 191.5 -> 193.0 m | 300 s, 613.8 m, the same | 268 -> 255 s, 563.7 -> 554.3 m (−9.4) |
+
+So A1d moves the probes' going about by −34 to +18 m, A1b's tack and wear with the yards changed by −4.5 to +17.5 m and within 2 per cent but for the polacre's 25-kn tack (5 per cent: her fore lateen, eased with the head sheets, stands aback 28 s from her head through the wind to "let go and haul" across the main yard's swing, as the design means it to, paying her head off). With the lateens left, the wear loses 5 to 20 m the less, its left lateens drawn for the wind she comes to at "wind aft" where A1b left them at their old trim; the polacre's 25-kn tack with them left 34 m the less (the design's own case, §2.2b, 76 m). No lateen is aback in any wear; in the tacks only the polacre's in 25 kn (28 s in all, in spells under `_record_backed`'s 10-s dwell), and no "taken aback" line is said in any run.
+
+### Pins moved, old beside new
+
+- `tests/test_lateen_whole.py::test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through_the_bow` (A1a's own): "... the foresail and the mizen and the mainsail lie on their masts; shift them when you will." -> "... are aback against their masts; shift them when you will.", the design's words (§2.4.3a) for the lateens A1d holds aback there.
+
+`tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are (run). New: A1d's part of `tests/test_lateen_whole.py`; truths 7-670 to 7-672 in `tests/test_known_truths.py`.
+
+Built by the engine track's builder; to be passed by an independent reader of the other tier (a new rule of force: the plan's §10.4).
+
 ## Package 90, A1a and A1b's second pass: what befalls the yard, the belay, and the words (the lead's nudge 46, 2026-11-21)
 
 On `…/pkg-90-a1ab`, cut from the package's A1a-A1b merge, 0d5d2c56 (A2 and A3 under it, no A1c). Each of the lead's eight items mended with a proof in `tests/test_lateen_whole.py` ("The second pass"), and each proof shown to fail when its mend is undone (the session's scratch, `n46/mutate.py`: fourteen mutations, each failing its pins). Old is 0d5d2c56 unless said.
@@ -39562,5 +39627,36 @@ On `…/pkg-90-a1c`, cut from `…/pkg-90` at b3c68af4 (A1c and A3's lists on th
 - A wear belayed with the wind aft and brought back to her old tack, its yards finished to windward and said: allowed as built (pinned, item 3).
 - The second pass's unsure 2 (a save in the work handed on loads; one in the manoeuvre's own change is refused): allowed as built.
 - The readings tool's full list carrying the practice's row on every ship: allowed.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the five that ride A1d's hash: the manoeuvre behind the work handed on, who has the work, her head, missed stays and the captain's road (the lead's nudge 51, 2026-11-22)
+
+On `…/pkg-90-a1d`, cut from A1d's hash e2d6b926 with `…/pkg-90` merged in at ee66c4a8 and again at a13fb0fe (the lines resolved by hand in the engine report's section). Each of the five has a proof in `tests/test_lateen_whole.py` ("The five that ride A1d's hash"), and each proof fails with its mend undone. Measured on the probes settled as the tests settle them (seed 7, 15 kn from the north, the starboard tack); "old" is cde50e7, A1d on A1c's hash before the five.
+
+### The mends
+
+1. **No manoeuvre begins while a lateen of hers is in its gear in work handed on** (`ChangeLateenScript.holds`: the work holds the ship, as the manoeuvre it stands for did). A manoeuvre ordered then waits behind it, and `Runner.start` says so at the order, "'Fill away' will follow 'shift the foresail', which the hands are still at." (a whole-ship order's line is the runner's started line, and this one would go unsaid). Every other work that holds the ship (sending down or swaying up the topgallant masts, loosing sails to dry, furling all, the anchor's work, laying out the kedge) waits behind it too, as it waited behind the manoeuvre. **And each yard handed on has its sheet drawn as the manoeuvre would draw it**: close-hauled on the way the manoeuvre reckons with (`Script.lateen_way`, handed on as `way`: the tack's at "helm's a-lee", the wear's and the box-haul's before the helm, the fill away's her way as she has it). Before, it was drawn for the deck's reading as it was set. A save from before, whose work names no way, keeps the deck's reading.
+   - The polacre, hove to, `fill away`, `belay that` a second into the change, `fill away` again: old, "Filled away" at 49 s against the plain order's 254, and 543.6 m further to windward in half an hour; new, 265 s, and 26.1 m less.
+   - The xebec, the same: old 14 s against 196 and 55.0 m further; new 198 s, and 0.5 m less.
+   - Each yard handed on, belayed as the change begins, is now set with its sheet as the plain manoeuvre sets it, in all six of nudge 48's cases. Old, the xebec's tack had her lateens' sheets at 0.0, 0.0 and 0.11 against 0.81, 0.80 and 0.83, and the polacre's fill away at 0.997 against 0.58. The ground in half an hour, belayed against plain, old then new: the xebec's tack −1,538.9 and −0.8 m; the tartane's −108.2 and −0.8; the polacre's −88.8 and 0.0; her box-haul −95.1 and −35.9; the xebec's wear −832.3 and −1.4.
+   - The time until her lateens draw on the new side is nudge 48's, to the second, in each case, but for the xebec's wear belayed, 260 s against 259 (plain 258).
+2. **Who has the work, at `pipe down`** (`orders/crew.py`, `all_hands_work`): the work's own request where it has one, its file's crew line only where it has none (no company, a save from before). With a crew a request is always made from the file's line, an all-hands line staying all hands whatever selector is given, so no other work's answer moves. The work handed on carries the manoeuvre's request.
+   - A fill away by twelve of the starboard watch, belayed: old "All hands are still at work (shifting the foresail); pipe down when it is done."; new "Nobody is turned up; the starboard watch has the deck.", the yard shifted by them in its time.
+   - A tack by all hands, belayed: refused as before.
+3. **Her head where she has not paid off to the course** (`TackScript.words`): wherever the line says she lies otherwise (`not_paid_off`, said only on a hull with a whole lateen), the heading in it is her head. No probe end in play reaches it (`n51/r3.py`: the three probes over eight courses each, 48 ends), and the helm alone pays her off when her head sails are taken from her. It is pinned at the tack's own door: a tack for E by N ended on its last trim lying 44° off the wind with a knot of sternway. Old "heading E by N (79°), but she has not paid off to it: she lies 44° off the wind ..."; new her head, NE (44°).
+4. **Missed stays, not "Tacked"** (`TackScript.tick`, at the end; `_miss_stays`): on a hull with a whole lateen, a tack that ends with the wind on her old side by more than two points, as the hung tack's miss reads it, has missed stays, "she fell off on the old tack". She is told so in the game's own words, and the urgent line says her lateens where they lie as she misses (`lateens_on_the_mast_words`, "" for every other ship). Read where the tack ends: a tack fallen back that comes round before its end is a tack, as it was.
+   - The polacre, her foresail taken in, tacked, her mizen shifted in stays: old "Tacked; braced up on the starboard tack, heading SW by S (217°), the mizen on the mast, but she has not paid off: she lies 143° off the wind with no way on her."; new "Missed stays: she fell off on the old tack, the mizen on the mast. Up helm; square the yards; flatten in the head sheets; ease off the mizen sheet." and "Squared the yards; she fell off on the starboard tack, to try again or to wear.".
+   - Over the polacre's 25 tacks of `n51/r4.py` (five winds, five sail plans) that end alone moves. Read as she falls back, at the moment, eight tacks at 20 and 24 knots that come round by their end were called missed.
+5. **The captain's wiring, through his own road**: two tests drive his work (`_work`) itself, a sailing state set and his orders recorded. In one, the practice is set as the wind falls under 12 knots and each yard is shifted after a board of 30 minutes on the bad hand. In the other, each lateen the bow's line named is shifted. With either call taken out of `_work`, its test fails.
+
+### Ruled
+
+- Unsure 1 and 2 of A1c's hash (`belay that` twice finds the newest order first; the long belay line of the work handed on): allowed as built.
+- Listed, not asked: the places' "the tiller is" credited to Falconer's QUARTER-DECK, worded when that file is next touched; "full and by" at 66° with sternway by the angle's rule, the trunk's.
+
+### Not built, for the lead
+
+- A whole-ship order made to wait is said by no line, on any ship: `_ship_evolution` (`orders/verbs.py`) returns the runner's "will follow" line as `evolution.started`, whose text the world drops. Mended at its cause it moves today's ships' lines: a stop.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).

@@ -100,7 +100,9 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
+    HANDED_ON,
     HELM_MANOEUVRES,
+    LATEEN_ABACK_WAITS_WORDS,
     SCRIPTS,
     Script,
     _world_of,
@@ -108,6 +110,7 @@ from freesail.evolutions.scripts import (
     helm_words,
     keep_full_and_by,
     keep_lying_to,
+    lateen_take_in_waits,
     lying_to_hands_off,
 )
 from freesail.ship.graph import Ship
@@ -439,15 +442,30 @@ class Runner:
             # The subject is busy: the newcomer waits its turn. Its preconditions
             # are checked when it begins, since the earlier work may satisfy them.
             self.instances.append(inst)
-            first = blockers[0]
-            return (
+            handed = [b for b in blockers if b.params.get(HANDED_ON)]
+            first = (handed or blockers)[0]
+            words = (
                 f"'{self._describe(inst).capitalize()}' will follow "
                 f"'{self._describe(first)}', which the hands are still at."
             )
+            if handed:
+                # behind the yards a belay handed on (they hold the ship as the manoeuvre
+                # did): said here, at the order, since a whole-ship order's line is the
+                # runner's started line and this one would go unsaid (the lead's nudge 51,
+                # item 1: "it waits behind that work, and says so")
+                ship.note("notable", "evolution.waiting", words, sid)
+            return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
         if reason is not None:
             raise OrderError(reason)
+        if lateen_take_in_waits(ship, evo.verb, subject):
+            # a whole lateen aback in a strong wind will not come in till she pays off (package
+            # 90, A1d): the work waits, and begins when it fills or is drawn over
+            self.instances.append(inst)
+            words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
+            ship.note("notable", "evolution.waiting", words, sid)  # said once, at the order
+            return words
         self.instances.append(inst)
         if not self._begin(ship, inst):
             return inst.wait_line
@@ -1157,8 +1175,8 @@ class Runner:
                 )
                 for other in self.instances
             )
-            if busy:
-                continue
+            if busy or lateen_take_in_waits(ship, inst.evo.verb, inst.subject):
+                continue  # a whole lateen aback in a strong wind waits too (package 90, A1d)
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
                 if inst.done_already:
