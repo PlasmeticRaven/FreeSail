@@ -2587,3 +2587,32 @@ merge, whose tiers are measured against both b764b06 and 71febde. The record has
 `…/pkg-90-a56` (its section there, 695331e, names the lines resolved by hand and sets the smack
 beside the trunk), its tiers held until A1d's verdict. If that verdict comes while this merge's
 tiers run, A5 and A6's take the machine first, and this section's results say where these stopped.
+
+## A1d's hash merged into the engine track: the tiers on df84c25 (nudge 51, 2026-11-23)
+
+**The tiered hash is df84c25**, the commit that adds the merge's section above; it differs from the
+merge, 64efd89, in this report alone. The commit after it, which writes these results, touches this
+report alone.
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+on a worktree of its own, each junit kept in the session's scratch. Compared test by test by the
+test's id, with the xdist group's `@...` stripped, beside **b764b06** (the engine's last tiers, the
+third pass merged) and **71febde** (A1d's hash with the five, its tiers in `…/pkg-90-a1d`'s
+section).
+
+| Run | df84c25 | Against b764b06 | Against 71febde |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,931: 8,922 passed, 8 skipped, 1 xfailed, 0 failed (58 min 35 s) | b764b06's 8,887 (8,878 passed, 8 skipped, 1 xfailed): **every one the same outcome**, none gone; **44 new, all passed**: 36 in `tests/test_lateen_whole.py` (A1c's five's 22 and A1d's five's 14) and 8 in `tests/test_helm_kind.py` (A3's lists) | 71febde's 8,840: **every one the same outcome but one**, none gone; **91 new, all passed**, the engine's own: `tests/test_yard_level.py` 34, `tests/test_boat_towed.py` 29 and `tests/test_pole_mast.py` 28. **The one**: `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, failed at 71febde, passed here: the harbour's race, the lead's to mend (nudge 52), the code the same at both |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min 52 s) | b764b06's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new | 71febde's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+b764b06: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 191 at b764b06, 227 now, all passed.
+
+**95a58e9** (nudge 49's merge), whose own tiers a restart of the machine stopped, is under this
+hash: these tiers stand for it, as the merge's section says.
+
+**Next:** A5 and A6's tiers on b40ffa3 at A1d's verdict, as the lead's nudge 52 asks; the engine
+track holds.
