@@ -2231,3 +2231,122 @@ harness whole (A2's, every ship, 270 runs, `a2/harness.py` in the session's scra
 
 **Not run:** the tiers of this branch, held until the lead says where these ride, A5 and A6's
 taking the machine first.
+
+## A4's hash (nudge 55): A4 brought onto `…/pkg-90` at d83a9b26 with the lateen hulls' list, items 1 and 3's strain line; the tiers held (2026-11-23)
+
+**The branch:** `…/pkg-90-a4`, cut from **99d164c** (A4 alone on effbaed), as the lead's nudge 55 asks.
+
+**The first merge:** **b288bb4**, parents 99d164c and **d83a9b26**. d83a9b26 is `…/pkg-90`'s tip: A5 and A6's hash 3d4a468 and its tiers (2447e57), on A1d, A1c, A1a-A1b, A2, A3 and the trunk at 8f9a4b45, with the design's §2.4.3a corrected to the build by the coordinating session. One merge base, effbaed.
+
+Over d83a9b26 the merge adds A4's own lines and no other: nine files, 581 lines in and 40 out, each file's lines those of 99d164c over effbaed, line for line. They are `data/evolutions/lay_out_kedge.yaml`, `data/evolutions/send_boat.yaml`, `freesail/evolutions/scripts.py`, `freesail/physics/integrate.py`, `freesail/world/boats.py`, `freesail/world/dealings.py`, `freesail/world/ports.py`, `tests/test_boat_towed.py` and A4's section of `docs/dev/TuningNotes.md`. `scripts.py` merged clean.
+
+**Which lines were resolved by hand** (one file conflicted): `docs/dev/TuningNotes.md`, one hunk.
+- Git set A4's section ("Package 90, A4: the boat in tow", 49 lines, the end of 99d164c's file) against `…/pkg-90`'s four sections after A5 and A6's: the second pass (35 lines), the third pass (46), the five that ride A1c's hash (34) and the five that ride A1d's (30).
+- Resolved by section: A4's section whole after A5 and A6's, where it stood (as on `…/pkg-90-engine`), then the four whole, in their order.
+- **One line added by hand:** a blank line after A4's section, which closed its file and now stands before the second pass's heading.
+- Against d83a9b26 the file loses no line. Against 99d164c it loses only the lines that the trunk and `…/pkg-90` changed in sections both sides had: A5 and A6's, as ruled, and the trunk's edits to A0, A3, A2 and A1b.
+
+**The second merge:** **2853b46**, parents b288bb4 and **b3cd1eb** (`…/pkg-90-lateen`: the five of the lateen hulls' list, its notes and its section in this report, cut from 50bb169). One merge base, 50bb169. Over b288bb4 it adds that branch's own lines and no other, line for line: `freesail/evolutions/runner.py`, `freesail/evolutions/scripts.py`, `freesail/orders/navigation.py`, `tests/test_lateen_whole.py` and its notes' section. `scripts.py` and the notes merged clean.
+
+**Which lines were resolved by hand:** this report, one hunk.
+- Git set "A5 and A6's hash tiered (nudges 53 and 54)" (89 lines, `…/pkg-90`'s) against "The lateen hulls' list (nudge 53)" (55 lines, `…/pkg-90-lateen`'s).
+- Resolved: each whole, the first then the second.
+- **One line added by hand:** a blank line before the second's heading.
+- Against either side the file loses no line.
+
+**Checked on each merged tree:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return in the merge's diff;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+The lens on 2853b46 passed, 394 tests: `test_lateen_whole`, `test_boat_towed`, `test_yard_level`, `test_pole_mast`, `test_strain`, `test_gale` and `test_tow`.
+
+### Items 1 and 3: the strain's line, within the widening
+
+**2df9bcc**, on the lead's widening: the warning's words and what the ten minutes' rate is counted against. No figure of load, strain or damage moves, and nothing of the rule moves on a ship with no whole lateen. Untouched:
+- `LATEEN_ABACK_LOAD` and `LATEEN_BAD_HAND_LOAD`;
+- every ratio, the wear, the chance and the certain failure;
+- `WARNING_INTERVAL_S`;
+- the plain words.
+
+The change has three parts:
+- **The cause is marked where A1d's factor is applied.** `physics/sails.py`, `lateen_pressed`, says what presses a whole lateen on its mast: aback, or the bad hand. `lateen_load_factor` reads its factor from it, the same figures. `_apply_loads` marks each spar of the lateen's chain under `strain.LATEEN_PRESSED`, beside its load, and `_reset_loads` clears the mark with the loads each substep. `physics/sails.py` is A1d's file. This is a mark, no figure; the notes I proposed at b3cd1eb put it there.
+- **The rate is counted against the part and its cause.** In `physics/strain.py`, `_warn` keys a pressed part as `"<cause>:<part>"`, as the anchor keys its cable `"cable:<id>"`. A lateen coming aback or onto the bad hand is warned for as it comes, whatever was said before. Within a cause it is still one warning a part in ten minutes, and that warning stamps the part's own key too.
+- **The words name the cause and the relief** (`_pressed_words`; JUDGEMENT on the words, in the anchor's form, the reliefs the lead's):
+  - aback: "the mainsail aback against the mast: let fly its sheet, shift it or box her off";
+  - on the bad hand: "the mainsail lying on the mast; she will carry it away: let fly its sheet or shift it", with no "box her off", since paying off leaves the yard on the bad hand.
+
+The proofs are in `tests/test_lateen_whole.py`, "The strain's line", and each of the first two fails with the mend undone:
+- **Item 1:** the xebec probe generator-rated in 57 kn, put on the bad hand. Each yard is warned "bending like a whip" at once, with its cause and relief, before any of them carries away.
+- **Item 3:** the xebec in 25 kn, aback. "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.", once in ten minutes.
+- **The guard:** all eighteen files, plain sail struck by 50 kn. No part is ever marked, and every warning key is a part or a cable.
+
+The file holds 255 cases.
+
+| Item 1, the xebec probe in 57 kn, the lateens put on the bad hand at 600 s | Old (d83a9b26) | New (2df9bcc) |
+|---|---|---|
+| On the good hand | the mizzen mast and yard, the fore yard and the main yard "working under the press of sail." at 252, 442 and 451 s | the same |
+| On the bad hand, before a loss | nothing | at 601 s, each "bending like a whip(s), the ... lying on the mast; she will carry it (them) away: let fly its sheet or shift it." (1.63 to 1.88) |
+| The losses | the mizzen lateen yard at 756 s, the fore at 805 and the main at 1,156; the main's "bending like a whip; she will carry it away if sail is not shortened." at 1,051 | the same three at the same seconds; no other line |
+
+**For the lead: within a cause, the older rule still stands.** A yard first warned "working" in its cause that rises past one and a half within the ten minutes is warned "bending like a whip" only when they are out, as any spar of a committed ship is in a rising wind. Measured: the xebec generator-rated on the bad hand in 52 kn, the main yard at 1.31 at +1 s and "bending like a whip" at +601, nothing lost between. In the bands nothing carried away unwarned, aback in 33, 35 and 37 kn or on the bad hand in 45, 49 and 52. Counting the rate against the dire step too, for pressed parts alone, would be inside the widening's words. It is not built, since the lead named the cause as the mend.
+
+### The eighteen in gales, old beside new
+
+Every committed ship file was run through 35 and 50 kn gusting (`n55/gales.py` in the session's scratch). Each is settled once:
+- seed 7, 15 kn from the north with the scenario's gusts and shifts (0.3 and 0.3);
+- her head 292.5 degrees at 5 kn;
+- `set plain sail` and `brace sharp up on the starboard tack`, trimmed every two minutes after five, 900 s.
+
+Each of ten runs is made from a copy of that world. The gale strikes (the mean raised at a stroke), the order is given, and the run lasts 900 s:
+- `trim sails` close-hauled;
+- `steer 270`, a reach;
+- `steer 180`, running;
+- `tack ship`;
+- `wear ship`;
+- `heave to`;
+- caught aback, the wind eight points through her bow;
+- `shorten sail`;
+- `take in all sail`;
+- `scud`.
+
+Each run records:
+- every event, with its second, kind, severity, subject, text and data;
+- every part's load, condition, state and wreck each five seconds;
+- her heading, speed and place each ten seconds.
+
+**Old is `…/pkg-90` at d83a9b26** (the trunk as it will stand with A5 and A6); **new is 2df9bcc**, whose code is this hash's.
+
+| | Old beside new |
+|---|---|
+| Runs | **360, the same in every event, tick, part sample and trace**; the two files byte for byte |
+| Events | 6,101, every strain warning line and its tick among them |
+| Strain warnings | 1,766 |
+| Sails blown out | 417 |
+| Spars carried away | 49 |
+| Lines parted | 4 |
+| Part samples | 64,800 |
+
+**The harness catches a warning moved:** with `WARNING_INTERVAL_S` cut from 600 to 540 in a scratch tree, the cutter's, the brig's, the frigate's and the lugger's 80 runs gave 53 runs and 254 event rows different.
+
+**Against the trunk itself**, beeb4149 (A5 and A6 staged at the gate, not yet on it), the same 360 runs are byte for byte the same file. The smack's topsail, A5 and A6's one mover, is not of her plain sail and is never set in these runs.
+
+### Item 7: which truths re-rate the probes' yards, and why
+
+Truths 7-670, 7-671 and 7-672 (`tests/test_known_truths.py`, `_a1d_probe`) re-rate the probes' lateen yards and masts by the generator's rule before they measure: a lower yard for its own sail, a lower mast for every sail on it (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`). This hash's item 1 proof does the same (`_rated_by_the_generator`).
+
+**Why:** the bands the lead ruled are figures for spars rated as every committed hull's are, by the generator: aback from about 28 and 35 kn, the bad hand from about 40 and 49. The probes were filed by hand at stage 0, for other ends. Filed against the generator's rule:
+- below it: the tartane probe's great yard (44.1 kN against 59.5), the xebec's main yard (56.0 against 77.3), and the polacre's and the xebec's fore yards (56.0 against 61.1). So as filed the tartane's great yard strains aback from about 23 kn and risks it from about 29, as the lead's reader found.
+- about it: the tartane's mizzen yard, 11.0 against 11.2.
+- above it: the polacre's and the xebec's mizzen yards (56.0 against 21.7) and every lateen mast, the generator's rating 0.27 to 0.63 of the filed.
+
+The probes stay as stage 0 wrote them. A hull's own file carries the generator's ratings, and her builder measures her own yards against A1d's bands at her gate.
+
+### The five, read with this hash
+
+As built on `…/pkg-90-lateen` and set out in its section above: items 2, 3's bow line, 4, 5 (put back) and 6. They come through both merges line for line, and their proofs pass on this hash. Items 1 and 3's strain line are above, and item 7 is said.
+
+**The tiers are held until A5 and A6's verdict.** If A5 and A6 pass as they stand, the fast and the slow tier whole run on this hash, the commit that adds this section. Its code is 2df9bcc's; it adds this section and the notes' alone. If the verdict comes back with a list, its mend comes onto `…/pkg-90` first, is merged in here, and the mended hash is tiered.
+
+**For the coordinating session:** A4's hash is this section's commit on `…/pkg-90-a4`, pushed, its tiers held. A4's own part is inert (no committed file tows a boat), and the eighteen's warnings in gales are the trunk's, as set out above.

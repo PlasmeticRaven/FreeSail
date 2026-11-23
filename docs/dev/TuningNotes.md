@@ -39797,3 +39797,45 @@ On `…/pkg-90-lateen`, cut from A5 and A6's hash 50bb169. Five of the list's se
 - **Item 7, the probes' ratings**: the probe files are `tests/rig_fixtures.py`'s, stage 0's. A lateen hull's own file is the generator's and carries its ratings; her gate's measure of her own yards against the bands is her builder's (`tests/test_tartane.py` and the rest). Asked: what the engine's part is.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the lateen hulls' list: the strain's line, items 1 and 3 (the lead's nudge 55, 2026-11-23)
+
+On `…/pkg-90-a4`, A4's hash with the list. The lead widened the row narrowly for these two items: `physics/strain.py` for the warning's words and what the ten minutes' rate is counted against, and no figure of load, strain or damage. Proofs in `tests/test_lateen_whole.py` ("The strain's line"), each failing with its mend undone. "Old" is `…/pkg-90` at d83a9b26.
+
+### The mend
+
+- **The cause, marked where it is made** (`physics/sails.py`): `lateen_pressed(sail, d)` says what presses a whole lateen on its mast, "aback" (held aback by its sheet) or "bad hand" (against its mast on the bad hand). A1d's `lateen_load_factor` now reads its factor from it, the same figures. `_apply_loads` marks each spar of the lateen's chain with the cause under `strain.LATEEN_PRESSED` in `ship.extra`, beside its load. `_reset_loads` clears the mark with the loads each substep, so it always says what pressed this substep's load.
+- **The rate counted against the part and its cause** (`physics/strain.py`, `_warn`): a pressed part's warning is keyed `"<cause>:<part>"` in `StrainState.last_warning_s`, as the anchor's cable is keyed `"cable:<id>"`. So a lateen coming aback or onto the bad hand is warned for as it comes, whatever was said before (item 1). Within a cause it is one warning a part in ten minutes, as ever, and a warning in a cause stamps the part's own key too, so its plain strain is not said again inside the ten minutes.
+- **The words** (`_pressed_words`; JUDGEMENT on the words, in the anchor's form, the reliefs the lead's) name the cause and what eases it, in place of "if sail is not shortened" (item 3):
+  - aback, "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.";
+  - over 1.5 on the bad hand, "Main lateen yard bending like a whip, the mainsail lying on the mast; she will carry it away: let fly its sheet or shift it.";
+  - grouped as before, "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; ...".
+  The bad hand's reliefs leave out "box her off": paying off leaves the yard where it is.
+- No committed sail is a whole lateen (`trim.keeps_its_side`), so no part of a committed ship is ever marked. Their warnings take the old road line for line: the key is the part, the words are the old ones.
+
+### Measured
+
+- **Item 1, the xebec probe in 57 kn** (`n55/item1.py` in the session's scratch: seed 7, her lateens' yards and masts rated by the generator as truths 7-670 to 7-672 rate them, plain sail trimmed, steady wind, the lateens put on the bad hand at 600 s):
+  - Old: "working under the press of sail." for the mizzen mast and yard at 252 s, the fore yard at 442 and the main at 451. Then nothing until the mizzen yard carried away at 756 s and the fore yard at 805; the main yard "bending like a whip; she will carry it away if sail is not shortened." at 1,051, and carried away at 1,156.
+  - New: at 601 s, the mizzen mast and yard at 1.88, the fore yard at 1.63 and the main at 1.68, each "bending like a whip(s), the ... lying on the mast; she will carry it (them) away: let fly its sheet or shift it.". The losses fall at 756, 805 and 1,156 s as before: no load and no draw moved.
+- **Item 3, the xebec in 25 kn, the wind eight points through her bow** (the probe's own ratings, as the lead's reader had her):
+  - old, at +1 s, "Main lateen yard working under the press of sail." (1.11);
+  - new, the same tick and ratio, "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.";
+  - once in the ten minutes.
+- **The bands, generator-rated, the xebec:**
+  - aback in 33, 35 and 37 kn: every lateen yard warned at +1 s, in 37 kn "bending like a whip" (1.61 to 1.62);
+  - on the bad hand in 45, 49 and 52 kn: every lateen yard warned at +1 s. In 52 kn the mizzen mast carried away at +154 s after its dire warning at +1.
+  - Nothing carried away unwarned in any of them.
+- **What the rule still does, said for the lead:** within one cause the older rule stands. A yard first warned "working" in its cause that rises past 1.5 inside the ten minutes is warned "bending like a whip" only when they are out, as any spar of a committed ship is in a rising wind. In 52 kn on the bad hand the main yard was warned at 1.31 at +1 s and "bending like a whip" at +601, nothing lost between. Counting the rate against the dire step too, for pressed parts alone, would be inside the widening's words; it is not built, because the lead named the cause as the mend.
+- **The eighteen in gales, old beside new** (the engine's report, nudge 55): 360 runs, the same in every event, tick, part sample and trace.
+
+### Item 7, the ratings (the lead's reading agreed)
+
+The probes stay as stage 0 wrote them (`tests/rig_fixtures.py`). Truths 7-670, 7-671 and 7-672 (`tests/test_known_truths.py`, `_a1d_probe`) re-rate the probes' lateen yards and masts by the generator's rule before they measure: a lower yard for its own sail, a lower mast for every sail on it (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`). The proofs above (`_rated_by_the_generator`) do the same. Why: the lead's bands (aback from about 28 and 35 kn, the bad hand from about 40 and 49) are figures for spars rated as every committed hull's are, by the generator, and the probes were filed by hand for other ends. Filed against the generator's rule:
+- the tartane probe's great yard 44.1 kN against 59.5, and the xebec's main yard 56.0 against 77.3: below it, so as filed the tartane's great yard strains aback from about 23 kn and risks it from about 29 (the lead's reader);
+- the polacre's and the xebec's fore yards 56.0 against 61.1, below it; the tartane's mizzen yard 11.0 against 11.2, about it;
+- the polacre's and the xebec's mizzen yards 56.0 against 21.7, and every lateen mast, above it: the generator's rating 0.27 to 0.63 of the filed.
+
+A hull's own file carries the generator's ratings; her builder measures her own yards against A1d's bands at her gate.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
