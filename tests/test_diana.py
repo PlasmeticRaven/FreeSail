@@ -166,8 +166,9 @@ def test_the_generator_writes_her_file_as_committed_and_reports_its_checks(tmp_p
         "off the half-breadth by +0.00, -0.02, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, +0.00, "
         "+0.00, +0.00, +0.00 m; the 11 measured each within 0.05 m." in said
     )
+    # her spanker as her spars carry it (the owner's decision D-s2): old 1054 m2 and 0.816
     assert (
-        "corvette-20: plain sail 1054 m2 against the frigate-36's 1584; her rope's scale 0.816."
+        "corvette-20: plain sail 1038 m2 against the frigate-36's 1584; her rope's scale 0.810."
         in said
     )
     assert "corvette-20: the main mast 71.4 ft heel to head (21.77 m)" in said
@@ -554,7 +555,8 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
     of 1807, Meyer: 10 to 11 knots with the wind two or three points abaft the beam in a fresh
     breeze (Roos 1957 p. 94: Dia §6). With the wind 112 to 124 degrees off in 24 to 27 knots, under
     the sail her book carries in that wind (a King's ship's: plain sail below `shorten_sail_kn`,
-    30), she makes 9.5 to 11.5 knots: measured 10.28 to 11.29."""
+    30), she makes 9.5 to 11.5 knots: measured 10.30 to 11.26 (10.28 to 11.29 with the frigate's
+    spanker scaled, before the owner's decision D-s2)."""
     from tests.test_known_truths import knots, under_plain_sail
 
     for wind_kn, off in ((24.0, 124.0), (25.0, 118.0), (27.0, 112.0)):
@@ -565,8 +567,9 @@ def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze
 def test_truth_7_662_she_is_stiff_as_her_captain_said():
     """Package 90, her builder (Dia-D §14, truth C), drafted in `tests/test_diana.py`. Close-hauled
     and abeam under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 does
-    (measured at her GM of 1.75: 8.10 against 7.34 degrees close-hauled, 1.10; 12.61 against
-    11.30 abeam, 1.12), and her midship lee port stays open (it shuts at 18.5 degrees: truth
+    (measured at her GM of 1.75: 8.17 against 7.34 degrees close-hauled, 1.11; 12.63 against
+    11.30 abeam, 1.12; 8.10 and 12.61 with the frigate's spanker scaled, before the owner's
+    decision D-s2), and her midship lee port stays open (it shuts at 18.5 degrees: truth
     7-665)."""
     from tests.test_known_truths import reading, under_plain_sail
 
@@ -578,26 +581,32 @@ def test_truth_7_662_she_is_stiff_as_her_captain_said():
 
 
 def test_truth_7_663_she_steers_well():
-    """Package 90, her builder (Dia-D §14, truth D), drafted in `tests/test_diana.py`. Meyer's
-    "steers splendidly": close-hauled in 15 knots she carries 0.5 to 3 degrees of weather helm,
-    abeam 1 to 3 (measured at her `clr_x_m` of 2.8: 0.82 and 2.02, the frigate-36's 1.31 and
-    1.99)."""
+    """Package 90, her builder (Dia-D §14, truth D), drafted in `tests/test_diana.py`, restated as
+    measured (the owner's decision D-s2; the lead's nudges 61 and 62). In 15 knots her helm
+    close-hauled is within half a degree of amidships, and with the wind abeam she carries 1 to 3
+    degrees of weather helm (measured at her `clr_x_m` of 2.65: -0.33 and 1.54; the frigate-36's
+    1.31 and 1.99). Old: Meyer's "steers splendidly" read as 0.5 to 3 degrees of weather helm
+    close-hauled, met at 0.82 and 2.02 with the frigate's spanker scaled (111 m2, `clr_x_m` 2.8).
+    Why: the spanker her spars carry by her note's rule is 95 m2, and with it no `clr_x_m` gives
+    her that weather helm close-hauled and her tacks too (her report's §10.1); the owner chose the
+    sail and her tacks."""
     from tests.test_known_truths import reading, under_plain_sail
 
     close = reading(under_plain_sail(HER, 360.0 - 66.0, 15.0))["weather_helm"]
     abeam = reading(under_plain_sail(HER, 360.0 - 90.0, 15.0))["weather_helm"]
-    assert 0.5 <= close <= 3.0, close
+    assert abs(close) <= 0.5, close  # old: 0.5 <= close <= 3.0
     assert 1.0 <= abeam <= 3.0, abeam
 
 
 def test_truth_7_664_she_goes_about_as_a_small_ship_does():
     """Package 90, her builder (Dia-D §14, truth E), drafted in `tests/test_diana.py`. She tacks
     from 290, 292.5 and 295 degrees and wears, as truths 10 and 11 put the frigate about: tacked in
-    206, 215 and 216 s (measured), each through stays in about two minutes and settled on the new
-    tack at once, losing 28, 42 and 46 m; she wears in 492 s (truth 11's 360 to 720). Her
+    232, 235 and 238 s, losing 34, 44 and 56 m (measured with the spanker her spars carry, at her
+    `clr_x_m` of 2.65; 206, 215 and 216 s and 28, 42 and 46 m with the frigate's scaled, before the
+    owner's decision D-s2); she wears in 492 s (truth 11's 360 to 720). Her
     tack's band is her own, 180 to 330 s (the lead's ruling of nudge 32): the floor JUDGEMENT, a
-    small ship quick in stays; the ceiling about half again her slowest tack as measured,
-    JUDGEMENT, so that the truth catches her going about as slowly as the frigate. Truth 10's
+    small ship quick in stays; the ceiling about half again her slowest tack as measured then (216
+    s), JUDGEMENT, so that the truth catches her going about as slowly as the frigate. Truth 10's
     285 to 600 s is Luce's five to ten minutes for a frigate of 42 m, which spends most of hers
     griping up on the new tack with too little way for her helm; her design asked her helm and
     rudder tuned to it (Plan §8.4), and no figure of either within her sources brings her there,

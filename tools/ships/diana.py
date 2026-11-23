@@ -271,7 +271,9 @@ DRAUGHT_AFT_M, DRAUGHT_FORE_M = 3.91, 3.65
 DATUM_M = 1.33  # the deck at side at the middle (ruling 5)
 LATERAL_AREA_M2 = 122.2  # the post's after face, K, the knee's fore edge, no rudder (ruling 4)
 GM_M = 1.75  # JUDGEMENT (Dia-D decision 4), tuned: the design's 1.5 (docs/dev/TuningNotes.md)
-CLR_X_M = 2.8  # tuned for her helm: 2.5 to start (docs/dev/TuningNotes.md)
+# tuned for her helm (docs/dev/TuningNotes.md): 2.5 to start, 2.8 with the frigate's spanker
+# scaled; 2.65 with the spanker her spars carry, by the wide table (the lead's nudge 62)
+CLR_X_M = 2.65
 HULL_SPEED_KN = 11.8
 RUDDER = {"area_m2": 3.0, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 3.9}
 
@@ -311,7 +313,6 @@ FRIGATE_PLAIN_SAIL_M2 = 1584.0  # the frigate-36's plain sail, against which her
 # headsail's centre stands 2.2, 2.2 and 3.2 m above its tack's spar end in the frigate, and hers
 # that height scaled above her own spar's end, on her plan's steeve (the lead's reader of her
 # first hash: the frigate's heights above its deck had put her centres at or below her tacks).
-FRIGATE_SPANKER = (167.0, 9.8, 5.0)
 FRIGATE_BOWSPRIT_X = 21.0
 FRIGATE_HEADS = [
     ("fore.topmast_staysail", "fore.topmast.stay", 75.0, 24.0, 10.0, "bowsprit", 6.0),
@@ -492,12 +493,13 @@ HULL_NOTES = {
     "§9, decision 4; truth C), the frigate's 1.3 m scaled by her breadth heeling her half again "
     "as much; tuned from the design's 1.5, measured old beside new in docs/dev/TuningNotes.md, "
     "'Package 90, the Diana', and held by her tests.",
-    "clr_x_m": "Tuned for her captain's 'steers splendidly' (Meyer, Roos 1957 p. 94) by her helm's "
-    "truth (Dia-D §14, truth D), from the frigate's lead scaled by her length (Dia-D §2), so that "
-    "she carries weather helm within the truth's band, near the frigate-36's, and lies to without "
-    "falling aback; measured old beside new in docs/dev/TuningNotes.md, 'Package 90, the Diana', "
-    "and held by her tests. Her going about is not tuned by it: more weather helm takes her round "
-    "sooner, and further forward she misses stays.",
+    "clr_x_m": "JUDGEMENT, tuned with the spanker her spars carry (the owner's decision D-s2; the "
+    "lead's nudges 61 and 62): chosen by her tacks from three headings in light to strong winds "
+    "and her helm at each, where she stays most surely with her helm close-hauled near amidships, "
+    "truth D restated as measured (Dia-D §14); old beside new in docs/dev/TuningNotes.md, 'The "
+    "Diana: her spanker as her spars carry it'. 2.8 before, with the frigate's spanker scaled, "
+    "for her captain's 'steers splendidly' (Meyer, Roos 1957 p. 94). With more of it she misses "
+    "stays; with less, her helm close-hauled goes to lee helm.",
     "lateral_area_m2": "Measured by the method of the hulls drawn from their draughts (the lead's "
     "ruling 4 of 2026-11-20; D29 (b)): the post's after face, K and the knee's fore edge, the "
     "rudder left out (Pages §5.6), as the 64's, the razee's, the 74's and the Neufchatel's. Beside "
@@ -832,13 +834,47 @@ def square_areas(geom):
     return areas
 
 
-def spanker_figures(p):
-    """The spanker's area, centre above her water and x: the frigate's scaled by her chain."""
-    area, centre, abaft = FRIGATE_SPANKER
+# The spanker cut by her note's rule on her own boom and gaff (the owner's decision D-s2, the
+# lead's nudges 59 and 62): the foot 0.9 of the boom along it, the head 0.9 of the gaff peaked 40
+# degrees, the luff the hoist from the boom to the jaws; its area and its centroid the four
+# corners', its centre 0.4 of the boom abaft the mast. Old: the frigate-36's 167 m2 at 9.8 m and
+# 5.0 m abaft, scaled by her chain from the deck, 111 m2 at 7.8 m, which her spars did not carry.
+SPANKER_FOOT = 0.9
+SPANKER_HEAD = 0.9
+SPANKER_PEAK_DEG = 40.0
+SPANKER_ABAFT = 0.4
+
+
+def spanker_spars(p, geom):
+    """Her spanker boom's and gaff's lengths and heights above the deck (m), as her rig files them:
+    the boom half the main mast at `BOOM_HEIGHT_M`, the gaff 4/5 of the boom at its jaws (Luce)."""
+    boom_ft = 0.5 * p.main_len_ft
+    gz = geom["mizzen"]
+    return g.ft(boom_ft), BOOM_HEIGHT_M, g.ft(0.8 * boom_ft), g.ft(gz["above"] - gz["head"] - 3.0)
+
+
+def spanker_figures(p, geom):
+    """The spanker's area, centre above her water and x, cut on her own spars by her note's rule:
+    the four corners tack, clew, peak and throat, with the mast's line as the luff; the centre's
+    height above her water her deck's and the centroid's, and its x on the raked mast."""
+    boom_m, boom_h, gaff_m, jaws_h = spanker_spars(p, geom)
+    peak = math.radians(SPANKER_PEAK_DEG)
+    head = SPANKER_HEAD * gaff_m
+    corners = [
+        (0.0, boom_h),
+        (SPANKER_FOOT * boom_m, boom_h),
+        (head * math.cos(peak), jaws_h + head * math.sin(peak)),
+        (0.0, jaws_h),
+    ]
+    twice, moment = 0.0, 0.0
+    for (x0, z0), (x1, z1) in zip(corners, corners[1:] + corners[:1], strict=True):
+        cross = x0 * z1 - x1 * z0
+        twice += cross
+        moment += (z0 + z1) * cross
+    a = round(twice / 2.0)
+    c = round(DATUM_M + moment / (3.0 * twice), 1)
     m = MASTS["mizzen"]
-    a = round(area * p.scale * p.scale)
-    c = round(DATUM_M + (centre - FRIGATE_DECK_M) * p.scale, 1)
-    x = g.raked_x(m["x"] - abaft * p.scale, m["rake"], c, deck_m=m["deck"])
+    x = g.raked_x(m["x"] - SPANKER_ABAFT * boom_m, m["rake"], c, deck_m=m["deck"])
     return a, c, x
 
 
@@ -891,7 +927,7 @@ def plain_sail_m2(p, geom):
         if level in areas[name]
     )
     heads = sum(a for sid, _s, a, _x, _h in head_figures(p) if sid != "flying_jib")
-    return square + heads + spanker_figures(p)[0]
+    return square + heads + spanker_figures(p, geom)[0]
 
 
 def rig(b, p, geom, rope_scale):
@@ -900,7 +936,7 @@ def rig(b, p, geom, rope_scale):
     square sails and yards by level, the headsails and the spanker."""
     main_len = p.main_len_ft
     areas = square_areas(geom)
-    sp_area, sp_centre, sp_x = spanker_figures(p)
+    sp_area, sp_centre, sp_x = spanker_figures(p, geom)
     prov = " Provisional (truth 9), see gen_ships.py."
     yards_by_level = {level: [] for level in LEVELS}
     sails_by_level = {level: [] for level in LEVELS}
@@ -1074,8 +1110,8 @@ def rig(b, p, geom, rope_scale):
         length_m=g.ft(gaff_ft),
         height_m=g.ft(gz["above"] - gz["head"] - 3.0),
         rating_kn=g.design_kn([(sp_area, sp_centre, "gaff")], g.DESIGN_WIND_KN["gaff"]),
-        note="spanker gaff, 4/5 of the boom (Luce); Steel's 20-gun mizen yard of 28 ft 6 in its "
-        "length's check (Pages §7).",
+        note="spanker gaff, 4/5 of the boom (Luce's chain, a rule), the length of Steel's 20-gun "
+        "mizen yard, 28 ft 6 in (Steel 1794 vol. I p. 50: Pages §7).",
     )
     boom = b.spar(
         "mizzen.boom",
@@ -1085,9 +1121,11 @@ def rig(b, p, geom, rope_scale):
         height_m=BOOM_HEIGHT_M,
         horse_m=round(0.5 * BEAM_M, 1),
         rating_kn=g.design_kn([(sp_area, sp_centre, "gaff")], g.DESIGN_WIND_KN["gaff"]),
-        note="spanker boom, half the main mast (Luce; Steel's 20-gun driver boom of 45 ft 6 in is "
-        "longer, Pages §7), its height the frigate-36's raised to clear her taffrail's top by "
-        "0.2 m (judgement); horse_m " + g.HORSE_NOTE,
+        note="spanker boom, half the main mast (Luce's chain, a rule, not a source). Steel's "
+        "20-gun ship of 429 tons, her near comparator, lists a driver boom of 45 ft 6 in (13.9 m; "
+        "Steel 1794 vol. I p. 50: Pages §7), known and not used, by the owner's decision D-s2. Its "
+        "height the frigate-36's raised to clear her taffrail's top by 0.2 m (judgement); horse_m "
+        + g.HORSE_NOTE,
     )
     spanker = b.sail(
         "mizzen.spanker",
@@ -1101,9 +1139,11 @@ def rig(b, p, geom, rope_scale):
         centre_height_m=sp_centre,
         canvas_no=g.FRIGATE_CANVAS["mizzen.spanker"][0],
         cloth_rating_kn=g.cloth(sp_area, g.FRIGATE_CANVAS["mizzen.spanker"][0]),
-        note="spanker (driver), the frigate-36's scaled by her chain (Dia-D §4.2): foot 0.9 of the "
-        "boom, head 0.9 of the gaff, hoist from boom to jaws, gaff peaked 40 degrees; centre 0.4 "
-        "of the boom abaft the mast." + g.canvas_note(g.FRIGATE_CANVAS["mizzen.spanker"]),
+        note="spanker (driver), cut on her own boom and gaff (the owner's decision D-s2; Dia-D "
+        "§4.2's rule): foot 0.9 of the boom, head 0.9 of the gaff, hoist from boom to jaws, gaff "
+        "peaked 40 degrees; its area and centre the cut's, the centre 0.4 of the boom abaft the "
+        "mast (computed; the frigate-36's 167 m2 scaled by her chain, 111 m2 at 7.8 m, before)."
+        + g.canvas_note(g.FRIGATE_CANVAS["mizzen.spanker"]),
     )
 
     def r(size, parts=1):

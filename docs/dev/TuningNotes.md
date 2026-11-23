@@ -40054,3 +40054,40 @@ The eight lenses (Plan-Package90.md §10.2, Build-Ships.md §17) read on her mer
 **3. Truth 9 on her file:** noted by the lead as measured, as a ship of her force should be (above, the lenses' record).
 
 **4. The two audit ceilings** (`u-ships` 18 to 19, `x-words:ship-words` 17 to 18): allowed by the lead, old beside new with their reasons as filed in 4dec517.
+
+### The Diana: her spanker as her spars carry it (the owner's decision D-s2; the lead's nudges 61 to 64, 2026-11-23)
+
+The owner's word, Decisions Part F, row D-s2: "Let's go with (a), as told to the lead." It supersedes row D-s ("Steel's boom, then measure"), and the lead's nudge 64 withdraws nudge 63. So: the spanker her spars carry, cut on them by her note's rule; her tacks kept; truth D restated as measured; `clr_x_m` chosen by the wide table.
+
+**Her boom's and gaff's ground, as it is.** Her boom, 10.9 m, is half her main mast by Luce's chain: a rule, not a source. Steel's 20-gun ship of 429 tons, her near comparator (Steel 1794 vol. I p. 50: Pages §7), lists a driver boom of 45 ft 6 in (13.9 m), 28% longer: known, and not used, by the owner's word. Her gaff, 8.7 m, is Luce's 4/5 of the boom and the length of Steel's mizen yard, 28 ft 6 in. Both notes say so. (Measured before D-s2 came, at one seed and not used: on Steel's boom her rule cuts 114 m2 at 9.6 m, x -17.8.)
+
+**The spanker, old beside new.** Old: the frigate-36's 167 m2 at 9.8 m scaled by her chain, 111 m2 at 7.8 m above her water, x -16.1. New: **95 m2 at 9.7 m, x -16.6**, cut on her boom and gaff by her note's rule (`spanker_figures` and `spanker_spars`: the method in the nudge 59 section above). Through the generator: the spanker's cloth rating 35.5 to 30.4 kn, her plain sail 1,054 to 1,038 m2, her rope's scale 0.816 to 0.810, and 56 ratings with it; her spars unmoved, and the eighteen unmoved.
+
+**The wide table** (the lead's nudges 61 and 62). Her tacks from 290, 292.5 and 295 degrees in 8, 12, 15, 20 and 25 kn at seeds 1 to 8, each settled as the truths' helpers settle her, and her helm close-hauled (66 degrees) and abeam (90) at each wind and seed. **The eight seeds give the same result to the tick in every cell**: the truths' scenario has no gusts and no shifts of wind, so a seed reaches nothing her going about reads. The spread is across the winds and headings.
+
+| `clr_x_m` | stayed of 120 | 8 kn | 12 kn | 15 kn | 20, 25 kn | helm close-hauled, 8 to 25 kn | abeam, 8 to 25 kn |
+|---|---|---|---|---|---|---|---|
+| 2.600 | 56 | from 290 alone, 338 s | all three, 184 to 187 s | all three, 235 to 241 s | none | -0.63 to -0.31 | 1.27 to 2.30 |
+| 2.625 | 56 | 290 alone, 343 s | all three, 184 to 187 | all three, 233 to 240 | none | -0.55 to -0.22 | 1.30 to 2.35 |
+| **2.650** | **56** | **290 alone, 351 s** | **all three, 184 to 187** | **all three, 232 to 238** | **none** | **-0.47 to -0.14** | **1.34 to 2.41** |
+| 2.675 | 56 | 290 alone, 355 s | all three, 183 to 187 | all three, 231 to 237 | none | -0.39 to -0.05 | 1.38 to 2.46 |
+| 2.700 | 48 | 290 alone, 355 s | all three, 183 to 187 | 290 and 292.5; **missed stays from 295** | none | -0.32 to +0.03 | 1.41 to 2.51 |
+| 2.725 | 56 | 290 alone, 359 s | all three, 183 to 187 | all three, 228 to 231 | none | -0.24 to +0.12 | 1.45 to 2.57 |
+| 2.750 | 56 | 290 alone, 362 s | all three, 183 to 187 | all three, 226 to 229 | none | -0.16 to +0.11 | 1.48 to 2.62 |
+| **the sail as it was filed**, 111 m2 at 2.8 | 56 | 290 alone, 393 s | all three, 186 to 303 | all three, 206 to 216 | none | +0.69 to +1.13 | 1.77 to 2.99 |
+
+Every tack not made is a missed stay, said 59 to 107 s after the order: from 292.5 and 295 in 8 kn, and from all three in 20 and 25 kn, **with either sail**. The frigate-36 from 292.5 in 20 and 25 kn stays, in 232 and 248 s. So the larger sail bought her weather helm close-hauled (+0.7 to +1.1 degrees, inside the old band) and quicker tacks in 15 kn (by 22 to 26 s); it bought her no tack the smaller sail does not make, in any wind measured. Her missing stays in 20 and 25 kn under plain sail is her file's, not the sail's: for the lead.
+
+**The figure, 2.65 (JUDGEMENT).** From 2.6 to 2.675 she stays in every cell the band has (and below 2.6 her tacks held at seed 7 down to 2.0, the nudge 59 scan); at 2.7 she misses from 295 in 15 kn; 2.725 and 2.75 are a narrow island between that miss and the one at 2.8. In the broad band, 2.65 is the lowest figure whose helm close-hauled is within half a degree of amidships at every wind measured (-0.47 to -0.14), 0.05 short of the miss at 2.7; at 2.625 it is -0.55 in 8 kn. Old: 2.8, with the frigate's spanker scaled.
+
+**Truth D restated as measured** (truth 7-663, `tests/test_diana.py`). Old: close-hauled in 15 kn 0.5 to 3 degrees of weather helm and abeam 1 to 3, Meyer's "steers splendidly" (0.82 and 2.02 at 2.8, with the frigate's spanker). New: **close-hauled her helm within half a degree of amidships, abeam 1 to 3 degrees of weather helm: -0.33 and 1.54 at 2.65.** Why: the spanker her spars carry is 95 m2, and with it no `clr_x_m` gives her that weather helm close-hauled and her tacks too (the nudge 59 section above); the owner chose the sail and her tacks, the lead recommending it (nudge 61: "a tenth of a degree of lee helm close-hauled is a helm amidships to anyone steering her").
+
+**Her other truths, measured again** (seed 7, the truths' helpers; old with the frigate's spanker scaled):
+- truth B (7-661), Meyer's speed, 9.5 to 11.5 kn: 10.30 to 11.26 (10.28 to 11.29);
+- truth C (7-662), heel in 22 kn within 1.15 times the frigate-36's: 8.17 and 12.63 degrees, 1.11 and 1.12 (8.10 and 12.61, 1.10 and 1.12);
+- truth E (7-664), each tack 180 to 330 s: 232, 235 and 238 s, losing 34, 44 and 56 m (206, 215 and 216 s; 28, 42 and 46 m); the wear 492 s (492), truth 11's 360 to 720;
+- truth F (7-665) and truth 7-660: unmoved (her ports and particulars);
+- hove to in 133 s, lying 59.8 to 60.1 degrees off at 1.16 kn, never aback; filled away in 59 s and settled in 140 s (126 s, 56.3 to 57.4 degrees, 1.12 kn; 59 and 156 s);
+- truth 9, measured and not asserted: nothing carries away in 20 kn under plain sail, no line parts, no warning; in 35 kn under all sail her main, mizzen and fore royal masts and her fore topgallant yard carry away, each urgent, with 50 strain warnings (her main royal yard, fore and mizzen royal masts and fore topgallant yard, 44 warnings).
+
+**Her viewer's picture does not move.** The viewer draws a gaff sail with a boom between its spars' ends (`client/projection.js`), reading neither its area nor its centre, and her boom and gaff are unchanged. Her rows in `tests/test_view_geometry.py` (the boom's frame, the sheet's end and the boom over the taffrail) hold as they stood.
