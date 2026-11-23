@@ -236,9 +236,13 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
     nations = getattr(world, "nations", None)
     if nations is None:
         return False
+    from freesail.world.ships import PLAYER_ID
+
     for o in world.vessels.vessels:
         if getattr(o, "done", False) or not nations.at_war(str(o.nation), nation):
             continue
+        if o.id == PLAYER_ID:
+            continue  # her own shadow: by her service below, not by her hull's word (pkg 121)
         brain = getattr(o, "brain", None)
         role = getattr(brain, "role", "") if brain is not None else ""
         if (
@@ -253,9 +257,12 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
     ports = getattr(world, "dealings", None)
     own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
     if pos is not None and own and nations.at_war(own, nation):
-        from freesail.world.captains import _is_kings_ship
+        from freesail.world.service import kings_force
 
-        if _is_kings_ship(world) and _in_the_offing(world, port, pos, within_nm):
+        # a blockade is a public force's: a King's ship by her papers, her role or her
+        # wardroom (`service_of`; package 121), never a privateer or a merchantman by papers,
+        # nor a prize under her prize-master
+        if kings_force(world) and _in_the_offing(world, port, pos, within_nm):
             return True
     return False
 

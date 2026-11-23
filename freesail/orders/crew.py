@@ -278,7 +278,12 @@ def all_hands_work(ship: Ship) -> str | None:
     all-hands work for itself because its watch was too few (`Runner._made_all_hands`, the lead's
     ruling (1) of 2026-11-10), which this read from the file's crew line alone, so that "pipe
     down" was taken while all hands were at a take in called for itself (the whole-change review
-    of 80e703c7, sailing-6: the plan read where the work's own state should be)."""
+    of 80e703c7, sailing-6: the plan read where the work's own state should be). The file's crew
+    line is read only for work that has no request of its own (a ship with no company, a save from
+    before it): work a belay hands on takes the manoeuvre's request, and a fill away done by the
+    watch and belayed left "All hands are still at work (shifting the foresail)" said of twelve
+    hands of the starboard watch, from `change_lateen.yaml`'s `hands: all` (the lead's nudge 51,
+    item 2)."""
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "work"):
         return None
@@ -286,7 +291,9 @@ def all_hands_work(ship: Ship) -> str | None:
         if inst.waiting or inst.paused:
             continue
         evo = inst.evo
-        if not (getattr(inst, "all_hands", False) or _is_all_hands(evo)):
+        want = getattr(inst, "want", None)
+        asked = want.all_hands if want is not None else _is_all_hands(evo)
+        if not (getattr(inst, "all_hands", False) or asked):
             continue
         if evo.id in ABOUT_SHIP:
             return "The hands are still about ship; wait for her to come round."

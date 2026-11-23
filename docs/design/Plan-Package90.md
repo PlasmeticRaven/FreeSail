@@ -943,7 +943,7 @@ The pictures stay outside the repository.
       after draught (JUDGEMENT; the owner's p. 407 would settle it);
     - her length is PB-039's 61.26 m (was Winfield's 61.30), the lengthening of her lines by 1.029
       dropped; whether her eslora is between the rabbets or outside stays open;
-    - `deck_height_m` 6.06 m was ruled on the condition that it is the same deck by the same method
+    - `deck_height_m` **5.99 m, ruled (nudge 33)**, by the 74's method above her traced line. 6.06 m was first ruled on the condition that it is the same deck by the same method
       as the 74's 3.16 m and the 64's 3.22 m. Checked: the same deck by its place, not the same
       method in the line taken as the deck (the 74's mean of its top and middle red lines, her
       note's upper line); 6.00 to 6.01 m by the 74's method. **Held for the lead**, not filed;
@@ -1159,11 +1159,12 @@ plan"). **7-700 to 7-719 are other packages' and are not to be used** (the lead'
 | 7-670 to 7-679 | the engine track |
 | 7-680 | the stage-0 builder's truth 7-680 (the Spanish list's nation) |
 | 7-681 to 7-689 | the tartane |
+| 7-695 | the tartane: her watch by night (the lead's nudge 38, question 4; taken from the spare, her nine being T-1 to T-9's) |
 | 7-690 to 7-694 | A3 |
 | 7-720 to 7-725 | the polacre |
 | 7-726 to 7-734 | the xebec |
 | 7-735 to 7-739 | the *Concepción* |
-| 7-695 to 7-699, 7-740 to 7-749 | spare (the viewer and later needs) |
+| 7-696 to 7-699, 7-740 to 7-749 | spare (the viewer and later needs) |
 
 ### 10.4 Pins expected to move, by step
 

@@ -625,6 +625,8 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
             continue
         other.hear(line)
         (hearers if same_hull else elsewhere.setdefault(hull, [])).append(other.station.name)
+    from freesail.world import knowledge
+
     data = {
         "station": station,
         "words": words,
@@ -632,6 +634,9 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         "where": where,
         "hail": is_hail,
         "heard_by": hearers,
+        # where the speaker stood as he spoke (package 120): a hail from her masthead, else
+        # his station's spot
+        **knowledge.said_at(world, spot=("aboard", here, place) if is_hail else said_at),
     }
     if is_hail or (speaker is not None and station != CAPTAIN):
         # a hail, and a station's word on deck, are notable (a station with authority

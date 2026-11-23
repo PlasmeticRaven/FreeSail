@@ -100,6 +100,7 @@ from freesail.crew.model import Crew, Station, Watch, number_words
 from freesail.evolutions import expr, registry
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.scripts import (
+    HANDED_ON,
     HELM_MANOEUVRES,
     LATEEN_ABACK_WAITS_WORDS,
     SCRIPTS,
@@ -441,11 +442,19 @@ class Runner:
             # The subject is busy: the newcomer waits its turn. Its preconditions
             # are checked when it begins, since the earlier work may satisfy them.
             self.instances.append(inst)
-            first = blockers[0]
-            return (
+            handed = [b for b in blockers if b.params.get(HANDED_ON)]
+            first = (handed or blockers)[0]
+            words = (
                 f"'{self._describe(inst).capitalize()}' will follow "
                 f"'{self._describe(first)}', which the hands are still at."
             )
+            if handed:
+                # behind the yards a belay handed on (they hold the ship as the manoeuvre
+                # did): said here, at the order, since a whole-ship order's line is the
+                # runner's started line and this one would go unsaid (the lead's nudge 51,
+                # item 1: "it waits behind that work, and says so")
+                ship.note("notable", "evolution.waiting", words, sid)
+            return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
         if reason is not None:
@@ -598,8 +607,15 @@ class Runner:
             if isinstance(inst.subject, Sail):
                 entry["state"] = inst.subject.state.value
                 entry["reefs"] = inst.subject.reefs
+            handed: list[tuple[str, str, dict[str, Any]]] = []
             if inst.script is not None and not inst.waiting:
                 inst.script.belayed()  # package 37k: the capstan's pawl let go
+                # package 90: the lateens' change in hand, at no lighter a rate than the
+                # manoeuvre's own at the belay
+                aloft = getattr(inst.script, "aloft", False)
+                handed = inst.script.handed_on(self._last_factor * self._crew_factor(inst, aloft))
+            for evolution_id, subject_id, params in handed:
+                self._hand_on(ship, inst, evolution_id, subject_id, params)
             self._remove(ship, inst)
             key = inst.params.get("log_group")
             if key:
@@ -607,6 +623,54 @@ class Runner:
             self._after_all_hands(ship, inst)
             out.append(entry)
         return out
+
+    def _hand_on(
+        self,
+        ship: Ship,
+        manoeuvre: Instance,
+        evolution_id: str,
+        subject_id: str,
+        params: dict[str, Any],
+    ) -> None:
+        """Work a belay hands on (`Script.handed_on`; package 90, the lead's nudge 48, item 1: a
+        whole lateen's change begun when a manoeuvre is belayed is finished in its time): begun
+        at once, as work in hand, without the preconditions of its beginning (its yards are in
+        their gear already) and without its first line (the belay's line says it is in hand).
+        Called before the manoeuvre is removed, it takes the manoeuvre's place in the order of work
+        (`Instance.order`, `given`), so that what waited behind the manoeuvre waits behind it (the
+        lead's nudge 49, item 1: given a later number, "take in the mainsail" waiting its turn
+        began at once against a yard in its gear, "there is nothing to take in", and was
+        dropped); and the hands the manoeuvre had, its request and its call (`assignment`,
+        `want`, `all_hands`, `held_up`), so that the watch that was shifting the yards finishes
+        them and all hands up for the manoeuvre stay up for them and are piped down when they are
+        done (item 4: before, a fill-away belayed called "All hands! (to shift the mainsail)"
+        for work the watch was doing). So it never waits for hands nor its turn."""
+        evo = registry.get(evolution_id)
+        if evo is None or evo.script is None or evo.script not in SCRIPTS:
+            return
+        subject, sid = self._resolve_subject(ship, subject_id)
+        merged = dict(evo.params)
+        merged.update(params)
+        inst = Instance(evo=evo, subject=subject, subject_id=sid, params=merged)
+        inst.order = manoeuvre.order
+        inst.given = manoeuvre.given
+        inst.script = SCRIPTS[evo.script](ship, merged, self._timing(ship, evo))
+        inst.holds = self._holds(ship, inst)
+        inst.want = manoeuvre.want
+        inst.all_hands = manoeuvre.all_hands
+        inst.held_up = manoeuvre.held_up
+        got = manoeuvre.assignment
+        if got is not None:
+            got.inst_id = inst.inst_id
+            for s in got.hands:
+                s.at = inst.inst_id
+            inst.assignment = got
+            manoeuvre.assignment = None  # the manoeuvre's removal lets none of them go
+        inst.waiting = False
+        inst.waiting_for = None
+        inst.step_index = -1
+        self.instances.append(inst)
+        inst.script.begin(self._format_context(inst))
 
     def _left_words(self, ship: Ship, inst: Instance) -> str:
         """How a piece of work is left when it is belayed, in words for the log."""
@@ -620,7 +684,9 @@ class Runner:
         if isinstance(subject, Ship):
             phase = inst.script.phase.replace("_", " ") if inst.script is not None else ""
             at = f" at {phase}" if phase and phase not in ("ready", "done") else ""
-            return f"the helm and the yards left as they stand{at}"
+            # the yards a manoeuvre changes round their masts, named (package 90, nudge 46)
+            also = inst.script.changes_left_words() if inst.script is not None else ""
+            return f"the helm and the yards left as they stand{at}{'; ' + also if also else ''}"
         name = part_name(ship, inst.subject_id)
         if isinstance(subject, Sail):
             return f"the {name} left {_SAIL_LEFT.get(subject.state, subject.describe_state())}"
@@ -2031,6 +2097,12 @@ class Runner:
             )
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
+        if inst.evo.id in ("take_in_pole", "furl_pole") and isinstance(subject, Sail):
+            # a pole sail lowered onto the yard below, or to the hounds where no square yard is
+            # crossed below it (package 90, nudge 39 ruling 2)
+            from freesail.evolutions.scripts import pole_words
+
+            ctx.update(pole_words(ship, subject))
         if inst.evo.id == "get_under_way":
             # the first line by her rig (package 68): a lugger has a windlass and no
             # sail-loosers aloft
@@ -2129,7 +2201,10 @@ class Runner:
         head = own or getattr(evo, "work", None) or evo.verb.replace("_", " ")
         if isinstance(inst.subject, Ship):
             return head
-        return f"{head} the {part_name(self.ship, inst.subject_id)}"
+        # the parts a script works, where they are more than its subject: the yards a belay
+        # handed on (`Script.parts_named`; package 90, the lead's nudge 49, item 4)
+        parts = inst.script.parts_named() if inst.script is not None else None
+        return f"{head} {parts or 'the ' + part_name(self.ship, inst.subject_id)}"
 
     def _remaining_s(self, inst: Instance) -> float:
         if inst.script is not None:

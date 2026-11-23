@@ -207,7 +207,7 @@ def knowledge_block(world: World) -> dict[str, Any]:
     senses = knowledge.players_senses(world)
     if senses.everything:
         return {"place": "everything", "everything": True, "hidden": [], "words": ""}
-    rows = knowledge.rows_elsewhere(senses)
+    rows = knowledge.rows_elsewhere(senses, world)
     return {
         "place": senses.words(),
         "everything": False,
