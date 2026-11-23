@@ -2097,6 +2097,12 @@ class Runner:
             )
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
+        if inst.evo.id in ("take_in_pole", "furl_pole") and isinstance(subject, Sail):
+            # a pole sail lowered onto the yard below, or to the hounds where no square yard is
+            # crossed below it (package 90, nudge 39 ruling 2)
+            from freesail.evolutions.scripts import pole_words
+
+            ctx.update(pole_words(ship, subject))
         if inst.evo.id == "get_under_way":
             # the first line by her rig (package 68): a lugger has a windlass and no
             # sail-loosers aloft

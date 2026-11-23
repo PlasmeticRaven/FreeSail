@@ -375,7 +375,7 @@ def _sail_evolution(
     extra, call = _hands_params(
         ship,
         order,
-        [mapping[evolution_key(sail, mapping, sail_room)] for sail in to_start],
+        [mapping[evolution_key(sail, mapping, sail_room, ship)] for sail in to_start],
         _group_label(verb, res.name, group) if len(to_start) > 1 else None,
     )
     params.update(extra)
@@ -385,7 +385,7 @@ def _sail_evolution(
             failed.append(reason)
             failed_ids.append(sail.id)
             continue
-        evo = mapping[evolution_key(sail, mapping, sail_room)]
+        evo = mapping[evolution_key(sail, mapping, sail_room, ship)]
         p = dict(params)
         if verb in SAIL_SCRIPT_VERBS:
             p["sail"] = sail.id
@@ -427,7 +427,9 @@ def _sail_evolution(
 FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug", "flying")
 
 
-def evolution_key(sail: Sail, mapping: dict[str, Any], sail_room: bool = False) -> str:
+def evolution_key(
+    sail: Sail, mapping: dict[str, Any], sail_room: bool = False, ship: Ship | None = None
+) -> str:
     """The key a sail verb's evolution is found by: 'settee' for a settee where the verb has
     an evolution of its own for it (set, take in, furl, dip: package 75,
     docs/design/Design-ShipsEngineExtensions.md §5.2), 'flying' for a sail set flying where
@@ -441,9 +443,15 @@ def evolution_key(sail: Sail, mapping: dict[str, Any], sail_room: bool = False) 
     the verb has that row, `shift` and `dip`, which shift its yard round its mast
     (`change_lateen`); unless the order said "for" a sail (`sail_room`, the grammar's mark:
     `shift the mainsail for a new one`), which replaces it from the sail room by its class as
-    before. Every other lateen, the 64's and the 74's mizzen course among them, by its class."""
+    before. Every other lateen, the 64's and the 74's mizzen course among them, by its class.
+
+    Package 90, A6: 'pole' for a square sail above a pole mast's lower yard (`Ship.on_pole`,
+    read where the ship is given) where the verb has that row, `take in` and `furl`: lowered
+    onto the yard below and furled from it."""
     if sail.settee and "settee" in mapping:
         return "settee"
+    if ship is not None and "pole" in mapping and ship.on_pole(sail):
+        return "pole"
     if not sail_room and "whole_lateen" in mapping and scripts.is_whole_lateen(sail):
         return "whole_lateen"
     return "flying" if sail.flying and "flying" in mapping else sail.cls
@@ -489,7 +497,7 @@ def _sail_check(
         if sail.cls != "gaff":
             return f"{name} is a {sail.cls} sail; it has no peak to drop"
         return vocab.refusals["scandalise"].format(name=name[4:]).rstrip(".")
-    if evolution_key(sail, mapping, bool(order.modifiers.get(SAIL_ROOM_MARK))) not in mapping:
+    if evolution_key(sail, mapping, bool(order.modifiers.get(SAIL_ROOM_MARK)), ship) not in mapping:
         template = vocab.refusals.get(verb, "'{verb}' has no meaning for a {class} sail")
         return template.format(name=name[4:], **{"class": sail.cls, "verb": verb}).rstrip(".")
     if verb == "set" and sail.state is SailState.SET:
@@ -550,9 +558,10 @@ def _take_in_kind(ship: Ship, sail: Sail) -> str:
         return "settee"
     if sail.cls == "square":
         yard = ship.yard_of(sail)
-        parent = ship.parent_of(yard) if yard is not None else None
-        if parent is not None and parent.cls == "mast":
+        if yard is not None and ship.yard_level(yard) == 0:  # package 90, A5: by its level
             return "course"
+        if ship.on_pole(sail):
+            return "pole"  # package 90, A6: lowered onto the yard below
     return sail.cls
 
 
@@ -577,7 +586,11 @@ def _take_in_word_check(ship: Ship, sail: Sail, phrase: str, vocab: Vocabulary) 
         return None
     name = resolve.the(ship, sail.id)
     proper = suits[0] if suits else "take in"
-    what = {"course": "course", "square": "topsail or light sail"}.get(kind, f"{kind} sail")
+    what = {
+        "course": "course",
+        "square": "topsail or light sail",
+        "pole": "topsail or light sail on a pole mast",  # package 90, A6
+    }.get(kind, f"{kind} sail")
     return (
         f"a {what} is {_PAST.get(proper, proper)}, not {_PAST.get(phrase, phrase)}; "
         f"say '{proper} {name}' or 'take in {name}'"
@@ -1390,10 +1403,9 @@ def _every_yard(ship: Ship, yards: list[Spar]) -> bool:
 
 
 def _level_rank(ship: Ship, yard: Spar) -> int:
-    """A yard's level, 0 for a course yard up to 3 for a royal's (`trim.by_level`)."""
-    parent = ship.parent_of(yard)
-    levels = ("mast", "topmast", "topgallant_mast", "royal_mast")
-    return levels.index(parent.cls) if parent is not None and parent.cls in levels else 0
+    """A yard's level, 0 for a course yard up to 3 for a royal's (`trim.by_level`), read from
+    its order on its lower mast (`Ship.yard_level`; package 90, A5)."""
+    return max(ship.yard_level(yard), 0)
 
 
 def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list[Sail]]:

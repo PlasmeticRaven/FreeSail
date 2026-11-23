@@ -943,10 +943,9 @@ def _yard_level(ship: Ship, sail: Sail) -> int:
     memo = ship.extra.setdefault("sails.yard_level", {})
     level = memo.get(sail.id)
     if level is None:
+        # read from its order on its lower mast (`Ship.yard_level`; package 90, A5)
         yard = _trim_yard(ship, sail)
-        parent = ship.parent_of(yard) if yard is not None else None
-        cls = parent.cls if parent is not None else "mast"
-        level = YARD_LEVELS.index(cls) if cls in YARD_LEVELS else 0
+        level = max(ship.yard_level(yard), 0) if yard is not None else 0
         memo[sail.id] = level
     return level
 
@@ -1049,8 +1048,8 @@ def studding_level(ship: Ship, sail: Sail) -> str:
     yard's sail is a lower one, beside a topsail or topgallant an upper one; a sail with no
     yard (the ringtail, the water sail) takes the lower's figure, as do the save-alls."""
     yard = ship.yard_of(sail)
-    parent = ship.parent_of(yard) if yard is not None else None
-    return "upper" if parent is not None and parent.cls != "mast" else "lower"
+    # by its yard's level on its mast (`Ship.yard_level`; package 90, A5)
+    return "upper" if yard is not None and ship.yard_level(yard) != 0 else "lower"
 
 
 def studding_stall(ship: Ship, sail: Sail, off_bow: float) -> float:
