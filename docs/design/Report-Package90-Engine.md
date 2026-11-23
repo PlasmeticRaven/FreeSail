@@ -2581,3 +2581,17 @@ On every committed ship no boat is towed, so the game fills `{boat_out}` with "H
 **The tiers:** the fast tier whole runs on this commit's hash, test by test against 40a532e's. The results follow in a section of their own; the commit after this one touches the report alone.
 
 **For the coordinating session:** A4's one commit is this section's, on `…/pkg-90-a4`, pushed, its fast tier running. Next, the lateen hulls' list as it stands (nudge 60's eight), on `…/pkg-90-lateen` once A4 is on `…/pkg-90`.
+
+## A4's one commit tiered (nudge 60): 0040fda's fast tier whole, test by test against 40a532e (2026-11-23)
+
+**The tiered hash is 0040fda**, the one commit in the section above. The commit after it, which writes these results, touches this report alone. Run as before: from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a worktree of its own, with the junit kept in the session's scratch and compared test by test by the test's id (the xdist group's `@...` stripped).
+
+| Run | 0040fda | Against 40a532e |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,983: 8,974 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 13 min 35 s) | 40a532e's 8,981 (8,972 passed, 8 skipped, 1 xfailed): **every one the same outcome**, none gone; **2 new, both passed**, the pin's two cases in `tests/test_boat_towed.py` (`send_boat` and `lay_out_kedge`). The 8 skipped and the 1 xfailed are the same cases at both |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 40a532e: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 255; all passed.
+
+The slow tier is not asked for this commit and was not run. It is 40a532e's code with two entries' comments and one test added, and 40a532e's slow tier stands (569: 558 passed, 11 xfailed, 0 failed).
+
+**For the coordinating session:** A4's one commit is **0040fda** on `…/pkg-90-a4`, pushed, and its fast tier is whole with 0 failed. The commit after it touches this report alone. **Next:** the lateen hulls' list as it stands (nudge 60's eight), on `…/pkg-90-lateen` once A4 is on `…/pkg-90`.
