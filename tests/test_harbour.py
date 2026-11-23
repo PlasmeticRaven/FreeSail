@@ -567,40 +567,76 @@ def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     assert all(s["says"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"])
 
 
-def test_a_page_that_asks_while_a_game_starts_never_finds_it_started_without_its_plan(port, client):
+def _started_while_a_page_asks(port, choices: dict[str, Any]) -> tuple[dict, list[dict]]:
+    """A game started with the state asked from another thread at every line `Harbour.start`
+    runs, as a page's poll may land: the game's answer and all that was seen. An asking held
+    by a lock reads when the lock is let go."""
+    import sys
+    import threading
+
+    from freesail.ui.harbour import Harbour
+
+    seen: list[dict] = []
+    askers: list[threading.Thread] = []
+
+    def at_each_line(frame, event, arg):
+        if event == "line":
+            asker = threading.Thread(target=lambda: seen.append(port.harbour.game_state()))
+            asker.start()
+            asker.join(0.05)
+            askers.append(asker)
+        return at_each_line
+
+    def tracer(frame, event, arg):
+        return at_each_line if frame.f_code is Harbour.start.__code__ else None
+
+    sys.settrace(tracer)
+    try:
+        out = port.harbour.start(choices)
+    finally:
+        sys.settrace(None)
+    for asker in askers:
+        asker.join(5)
+    return out["game"], seen
+
+
+def test_a_page_that_asks_while_a_game_starts_finds_one_whole_game(port, client):
     """The harbour's start said the game started and then read the scenario's plan of the
-    stations into its words, and `game_state` reads those under the driver's lock, not the
-    harbour's: a page that asked between the two found a game started with no plan, and its
-    stations' table showed the officer with no model asked for (the browser's test of that
-    table failed once in many runs beside other workers; found by package 90's engine
-    builder). The plan is read first and `started` set last. Here the state is asked at the
-    moment the plan is read, the one moment between."""
+    stations into its words, and `game_state` reads under the driver's lock, not the
+    harbour's: a page that asked between found a game started with no plan, and its stations'
+    table showed the officer with no model asked for (the browser's test of that table failed
+    once in many runs beside other workers; found by package 90's engine builder); and at a
+    second start it could find the new world beside the last game's words and plan (the
+    lead's checker, who wrote this probe). The state is asked at every line of the start,
+    twice over: whatever a page sees is one whole game."""
     (port.place / "planned.yaml").parent.mkdir(parents=True, exist_ok=True)
     (port.place / "planned.yaml").write_text(
         (SCENARIOS / "tender.yaml").read_text(encoding="utf-8") + "\nstations:\n  officer: model\n",
         encoding="utf-8",
     )
-    seen: list[tuple[bool, bool]] = []
-    read_plan = port.harbour.plan
-
-    def plan_while_a_page_asks(scenario: str) -> dict[str, str]:
-        state = port.harbour.game_state()
-        seen.append((bool(state["started"]), "plan" in state["chosen"]))
-        return read_plan(scenario)
-
-    port.harbour.plan = plan_while_a_page_asks  # type: ignore[method-assign]
-    r = client.post("/api/harbour/start", json={"scenario": str(port.place / "planned.yaml")})
-    assert r.status_code == 200, r.text
-    assert seen and all(planned or not started for started, planned in seen), seen
-    game = r.json()["game"]
-    assert game["started"] and game["chosen"]["plan"] == {"officer": "model"}
-    # and a second game in place of the first: the page asking between finds the first's
-    # words whole, or the second's, never a game started with none
-    seen.clear()
-    r = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
-    assert r.status_code == 200, r.text
-    assert seen and all(planned or not started for started, planned in seen), seen
-    assert r.json()["game"]["chosen"]["plan"] == {}
+    planned = {"officer": "model"}
+    game, seen = _started_while_a_page_asks(
+        port, {"scenario": str(port.place / "planned.yaml"), "seed": 111}
+    )
+    assert game["started"] and game["chosen"]["plan"] == planned and len(seen) > 5
+    torn = [
+        (s["started"], s["seed"], s["chosen"].get("plan"))
+        for s in seen
+        if s["started"] and s["chosen"].get("plan") != planned
+    ]
+    assert not torn, ("the first start", torn)
+    # a second game in place of the first: the world of seed 222 only with its own words (no
+    # plan), the world of seed 111 only with the first's
+    game, seen = _started_while_a_page_asks(
+        port, {"scenario": "data/scenarios/tender.yaml", "seed": 222}
+    )
+    assert game["seed"] == 222 and game["chosen"]["plan"] == {} and len(seen) > 5
+    torn = [
+        (s["seed"], s["chosen"].get("scenario"), s["chosen"].get("plan"))
+        for s in seen
+        if s["chosen"].get("plan") != ({} if s["seed"] == 222 else planned)
+    ]
+    assert not torn, ("the second start", torn)
 
 
 def test_a_game_started_with_a_seat_and_a_brief_is_the_servers_game_taken_up_in_place(port, client):

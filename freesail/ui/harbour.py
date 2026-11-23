@@ -985,15 +985,18 @@ class Harbour:
         # who the scenario says holds each station (step 9: the page offers the doors of those
         # it gives to a model), read before the game is taken up
         plan = self.plan(scenario)
-        with self._lock:
+        # the driver's lock held from the world's replacing to the game's words: `game_state`
+        # reads under it, not under the harbour's, and a page that asks between must find one
+        # whole game. Without it a first start could be found started with its plan not yet
+        # said (the stations' table then showed the officer with no model asked for, and the
+        # browser's test of it failed once in many runs beside other workers; found by package
+        # 90's engine builder at A1d's tiers), and a second start the new world beside the
+        # last game's words and plan (the lead's checker). The harbour's lock first, then the
+        # driver's, as everywhere; nothing takes them the other way round.
+        with self._lock, self.driver.lock:
             self.driver.replace_world(
                 world, compression=args.time, pace=rule, ease_on_station=args.ease_on_station
             )
-            # the game's words first and `started` last: `game_state` reads under the driver's
-            # lock, not this one, and a page that asks between the two must not find the game
-            # started and its plan not yet said (the stations' table then showed the officer
-            # with no model asked for, and the browser's test of it failed once in many runs
-            # beside other workers; found by package 90's engine builder at A1d's tiers)
             self.game = {
                 "scenario": scenario,
                 "ship": ship,
