@@ -275,3 +275,54 @@ def test_the_boats_evolutions_tell_the_player_of_a_towed_boat_in_the_games_own_w
         assert "hauled up alongside" in para and "veered astern" in para
         for word in ("package", "Package", "A4", "Design", "docs/", "JUDGEMENT"):
             assert word not in para, (eid, word)
+
+
+def _glossed(text: str) -> dict[bool, dict[str, str]]:
+    """The served notes' gloss of the boat's marks: {towed: {mark: words}}, of a boat on deck
+    (False) and of one towed astern (True), in the marks' order."""
+    import re
+
+    gloss = next(p for p in text.split("\n\n") if p.startswith("In its words the game fills"))
+    on_deck, towed = re.fullmatch(
+        r"In its words the game fills (.*); for a boat towed astern, with (.*)\.", gloss
+    ).groups()
+    marks = dict(re.findall(r'\{(boat_[a-z]+)\} with "([^"]*)"', on_deck))
+    words = re.findall(r'"([^"]*)"', towed)
+    assert len(words) == len(marks), gloss
+    return {False: marks, True: dict(zip(marks, words, strict=True))}
+
+
+@pytest.mark.parametrize(
+    ("eid", "order"), [("send_boat", "send the boat ashore"), ("lay_out_kedge", "lay out a kedge")]
+)
+def test_the_boats_evolutions_marks_are_glossed_in_the_words_the_game_fills_them_with(
+    tmp_path, eid, order
+):
+    """The lead's nudge 60: `send_boat` and `lay_out_kedge` serve {boat_out} (and `send_boat`
+    {boat_back}) where they served the words, and their served notes gloss each mark in the
+    words the game fills it with, of a boat on deck and of one towed astern. Every mark of the
+    logged lines but the boat's name is glossed; on the probe with her boat on deck and towed,
+    the running script's own words are the gloss's, and the line logged at the start is the
+    entry's filled with them. A word changed in the one place and not the other fails here."""
+    import re
+
+    from freesail.agents import tools
+
+    evo = load_directory()[eid]
+    text = tools._evolution_text(evo)
+    logged = next(p for p in text.split("\n\n") if p.startswith("Logged at the start"))
+    # {boat} and {boat_cap}, the boat's name, were served before; every other mark is glossed
+    marks = [m for m in dict.fromkeys(re.findall(r"\{(boat_[a-z]+)\}", logged)) if m != "boat_cap"]
+    glossed = _glossed(text)
+    assert marks and list(glossed[False]) == marks and list(glossed[True]) == marks, (eid, marks)
+    for towed in (False, True):
+        w = at_anchor_in(CARRICK_ROAD, ship=_probe(tmp_path, towed=towed))
+        n0 = len(w.log.all())
+        assert w.submit(order).kind == "order.accepted"
+        w.run(2)
+        (inst,) = [i for i in w.ship.extra["evolutions"].instances if i.evo.id == eid]
+        words = inst.script.words()
+        expected = {m: glossed[towed][m].replace("{boat}", words["boat"]) for m in marks}
+        assert {m: words[m] for m in marks} == expected, (eid, towed)
+        started = [e.text for e in w.log.all()[n0:] if e.kind == "evolution.started"]
+        assert started == [evo.on_start.log.format_map({**words, **expected})], (eid, towed)

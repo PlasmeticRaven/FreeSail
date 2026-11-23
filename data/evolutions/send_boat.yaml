@@ -27,6 +27,10 @@
 # Where the hands on deck are too few to man her, as a small vessel's watch of two by night,
 # all hands are called to man her and piped down once her crew is told off, the rest going
 # below while she is away (judgement).
+#
+# In its words the game fills {boat_out} with "Hoist out {boat}" and {boat_back} with "hoisted
+# in"; for a boat towed astern, with "Haul {boat} up alongside" and "veered astern on her
+# painter again".
 
 # Build notes (not served by the library's catalogue):
 # Package 109, step 2 (the owner's play of 2026-11-12, note 1), made one road with package 75's
