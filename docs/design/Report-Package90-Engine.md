@@ -2472,3 +2472,66 @@ No code, data, test or tool moves: `freesail/`, `data/`, `tests/` and `tools/` a
 The results follow in a section of their own, with the seven of the lateen hulls' list read item by item. The commits after 40a532e touch this report alone.
 
 **For the coordinating session:** A4's hash is **40a532e** on `…/pkg-90-a4`, pushed, its tiers running.
+
+## A4's hash tiered (nudge 57): 40a532e test by test against 3d4a468, 6dcfe40 and ee1b856; the eighteen in gales; the seven read item by item (2026-11-23)
+
+**The tiered hash is 40a532e**, the merge in the section above. The commits after it, d2e2f0f and this one, touch this report alone. All runs are from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a worktree of its own, one after the other. Each junit is kept in the session's scratch and compared test by test by the test's id (the xdist group's `@...` stripped).
+
+| Run | 40a532e | Against 3d4a468 | Against 6dcfe40 | Against ee1b856 |
+|---|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,981: 8,972 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 30 min 23 s) | 8,903 (8,894 passed, 8 skipped, 1 xfailed): **every one the same outcome**; gone only the one renamed at nudge 53 (`..._eased_and_not_hauled_over`, now `..._hauled_to_windward_with_the_booms`); **79 new, all passed**: `tests/test_boat_towed.py` 29, `tests/test_lateen_whole.py` 29, `tests/test_yard_level.py` 20 (the pins), `tests/test_pole_mast.py` 1 | 8,923 (8,914 passed, 8 skipped, 1 xfailed): **every one the same outcome**; gone only the renamed one; **59 new, all passed**, the same less the pins | 8,981 (its run above, stopped before the slow): **every one the same outcome but one**, none gone, none new. **The one:** truth 7-284, failed there, passed here, the same code |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, **0 failed** (1 h 36 min 18 s) | 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new | 6dcfe40's slow tier is 3d4a468's, the same code (the pins' section) | not run to its end |
+
+The 8 skipped and the 1 xfailed of the fast tier, and the 11 xfailed of the slow, are the same cases at every hash.
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 3d4a468 and 6dcfe40: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 255; all passed.
+
+**Truth 7-284 alone, on the idle machine** after the tiers, ten times on this hash and ten on 6dcfe40, alternating (`pytest -q` on the one case, from each worktree):
+- **40a532e: 10 of 10 passed.**
+- **6dcfe40: 9 of 10 passed**, one failed: 0.0226 s against 0.0121 s.
+
+It fails at times on the hash whose tier it passed, the same code. It is a measure of time on this machine, not of A4, and stands as package 89 wrote it.
+
+### The eighteen in gales on this hash, old beside new
+
+`n55/gales.py` in the session's scratch, run from this hash's tree, as set out in "A4's hash (nudge 55)": every committed ship file, 35 and 50 kn gusting, the ten orders, 900 s each.
+
+The old side is **the trunk's code**. `freesail/`, `data/` and `tools/` are the same trees at d83a9b26, at `…/pkg-90`'s 7405febf and at the trunk's 9c95644b, so d83a9b26's run at nudge 55 is theirs.
+
+| | Old beside new (40a532e) |
+|---|---|
+| Against the trunk's code (d83a9b26's run) | **360 runs, the same in every event, tick, part sample and trace; the two files byte for byte** |
+| Against beeb4149's run (the trunk at nudge 55) | 360 the same |
+| Against 2df9bcc's run (the strain's line, at nudge 55) | 360 the same |
+| Events | 6,101, of 39 kinds, every strain warning line and its tick among them |
+| Strain warnings | 1,766 |
+| Sails blown out | 417 |
+| Spars carried away | 49 |
+| Lines parted | 4 |
+| Part samples | 64,800 |
+
+So on the eighteen files, every warning line and its tick is the trunk's. The strain's line moves only what a whole lateen presses, and no committed file carries one. The guard in `tests/test_lateen_whole.py` holds it for all eighteen, 18 passed on this hash.
+
+### The seven of the lateen hulls' list, read item by item on this hash
+
+Each item's proofs are in `tests/test_lateen_whole.py`, and every one passed in this hash's fast tier.
+
+1. **The dire warning missed: mended** (2df9bcc, `physics/strain.py` within the lead's widening). A lateen coming aback or onto the bad hand is warned for as it comes, keyed by its cause.
+   - Proof: `test_a_lateen_come_onto_the_bad_hand_in_a_gale_is_warned_for_at_once_before_it_goes`. The xebec, generator-rated, in 57 kn: each yard warned "bending like a whip" at once, before any carries away. It fails with the mend undone.
+   - The guard: `test_no_part_of_a_committed_ship_is_pressed_by_a_lateen_and_her_warnings_keep_their_rule`, 18 passed; and the gales above.
+   - Left as built, the lead's choice at nudge 56: within one cause the ten minutes' rule stands, as for every spar.
+2. **The take-in's wait: built** (f0914df). It is said at the order whatever work is before it, and again when its turn comes if its lateen came aback meanwhile; once.
+   - Proofs: `test_a_take_in_behind_other_work_says_the_lateens_wait_at_the_order` and `test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_turn_comes`.
+3. **The warnings that point the wrong way: both mended.**
+   - The bow's line (f0914df): "...; let fly its sheet, shift it or box her off". Proof: `test_the_bows_line_names_what_eases_a_lateen_aback_and_says_when_you_will_once`.
+   - The strain's words (2df9bcc): the cause and what eases it, in place of "if sail is not shortened" for a pressed lateen. Proof: `test_a_lateen_held_aback_is_warned_for_with_its_cause_and_what_eases_it`, the xebec in 25 kn, once in ten minutes.
+4. **Clearing for action: built** (f0914df). It begins at once beside the work handed on, short of hands and said so, the yards keeping their parties; `let go the anchor` there is answered as on the trunk.
+   - Proofs: `test_clearing_for_action_begins_at_once_beside_the_work_handed_on` and `test_letting_go_the_anchor_beside_the_work_handed_on_is_answered_as_on_the_trunk`.
+5. **The aftermost lateen in stays: put back** (1767018), hauled to windward with the booms. The design's §2.4.3a was corrected to it on `…/pkg-90` at d83a9b26.
+   - Proofs: `test_hung_in_stays_the_aftermost_lateen_is_hauled_to_windward_with_the_booms` (the pin moved, old beside new, at nudge 53) and `test_the_polacre_hung_in_stays_comes_round_with_her_mizen_hauled_to_windward`, seeds 24 and 36, 2 passed.
+6. **Said twice: both mended** (f0914df). The polacre's foresail is named once at "let go and haul", and the bow's "when you will" is said once.
+   - Proofs: `test_with_jibs_or_none_the_foresail_drawn_with_the_head_sheets_is_named_once` and the bow's line in 3.
+7. **Ratings: said, no line moves** ("A4's hash (nudge 55)", item 7). Truths 7-670, 7-671 and 7-672 re-rate the probes' lateen spars by the generator's rule before they measure, since the lead's bands are for spars rated as every committed hull's are. The probes stay as stage 0 filed them, and a hull's builder measures her own yards against A1d's bands at her gate.
+   - The three truths: 3 passed.
+
+**For the coordinating session:** A4's hash is **40a532e** on `…/pkg-90-a4`, pushed and tiered whole: the fast tier and the slow, 0 failed. The commits after it touch this report alone. Every warning line and tick of the eighteen in gales is the trunk's, and the seven are read above. **Next:** the Diana, then the tartane, whose gate begins with the lateen hulls' list, on the lead's word.
