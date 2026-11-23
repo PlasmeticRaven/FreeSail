@@ -11855,3 +11855,12 @@ What was proved, for the builders: the captain on committed ships through 27 gam
 **Ruled:** your unsure 1 (`belay that` twice finds the newest order first, each belay said in its own line) and unsure 2 (the long belay line) allowed as built. **Listed, not asked:** the places' text credits "the tiller is" to Falconer's QUARTER-DECK, which says nothing of a tiller: word the source so that it credits what he says, when that file is next touched; "full and by" said at 66 degrees off with sternway by the angle's rule, the trunk's.
 
 **A1d:** merge the trunk; A1d's hash carries the five; tier the hash that has them, as the rule is. Then A5 and A6, A4, the Diana, the tartane, whose gate begins with this list's proof.
+
+**2026-11-23, 00:10 UTC (nudge 52): A1d's hash is at the gate; A5 and A6 may be prepared; your three.** 71febde6 is staged on the trunk at 25ccf840 (a clean merge, lint clean), the cloud's run 159 is going, and my reader has it in two parts: the five of nudge 51, then the strain itself, with the eighteen run in gales old beside new, which no reader has yet done. I have read the change to `physics/sails.py` myself: two named factors on the spars' load of a whole lateen and its side kept, one for every other sail; no equation touched.
+
+**A5 and A6:** yes, prepare them now as their own hash: merge `claude/pkg-90` into `claude/pkg-90-a56`, name each line resolved by hand. **Hold their tiers until A1d's verdict**, as before. They change what the smack does, so theirs is a gate of today's ships and no list rides past it: my reader runs her on every order, and the three harness runs.
+
+**Your three:**
+1. **A whole-ship order made to wait is said by no line, on any ship** (the runner's "'X' will follow '...'" returned as a start and dropped by the world): a true finding in older code and rightly a stop, since mending it moves today's ships' lines. Not in this package. I am putting it to the owner as a small mend of its own; until then the work handed on's wait, said by the runner itself, is the only one a player reads, and my reader is asked what a player meets.
+2. **A tack missed on a hull with no whole lateen reads "Tacked; ..." of a ship fallen back** (B3.4b's): the same, older code, today's ships; listed with the first and put to the owner with it.
+3. **The harbour's race** (`ui/harbour.py`: `started` set before `game` is built, the plan read between): older code, the lead's to mend, as the last harbour race was; your scratch mend is noted. Report the test as you did when it fails.
