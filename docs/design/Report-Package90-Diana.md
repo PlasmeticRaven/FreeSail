@@ -51,6 +51,12 @@ measured: close-hauled her helm is within half a degree of amidships (-0.33 deg)
 carries 1.54 deg of weather helm. Her other truths hold, each with its figure, and her picture
 does not move. For the lead: she misses stays in 20 and 25 kn with either sail.
 
+**Why she misses stays in a breeze (§12, nudge 65): measured, nothing filed.** Her weight comes
+first, as the lead suspected: she is the lightest ship of war for her tonnage, and her yards stand
+2.5 times the frigate's against her yaw inertia. At 597 to 611 t she would stay in 8 to 15 kn from
+every heading, with truth D in its first band. Her strong-wind misses also want her rig against her
+inertia. Both are the lead's to rule.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1064,3 +1070,173 @@ send: the fast tier whole beside a base on the merged tree, and the slow tier of
 the pace tests excepted.
 
 For the lead: her missed stays in 20 and 25 kn (§11.3). For the owner: none new.
+
+## 12. Why she misses stays in a breeze: measured, nothing filed, for the lead (2026-11-23)
+
+The lead's nudge 65 (the trunk at 85364f45) ruled the finding of §11.3: mend it before her gate,
+with the cause found first. **I have found the cause, and the mend it points to is not mine to
+make.** It is her displacement, which is the lead's ruling of nudge 30, and her rig against it.
+Neither is one of my JUDGEMENT figures. By the ruling, a mend that moves more than those comes to
+the lead first. **Nothing is filed.** Her file is as at 8ce21bd, and her tiers wait. Every run
+below is a probe on a scratch copy of her file, read through the engine as it stands; no equation
+or script was changed.
+
+### 12.1 The plain figures, every committed square-rigged ship
+
+Plain sail is what the game itself sets on "set plain sail", summed. The burthen is each file's
+own, old-rule tons.
+
+| Ship | Displacement | Burthen | Displacement / burthen | Plain sail | Per tonne | Rudder / lateral plane | Lateral plane / displacement |
+|---|---|---|---|---|---|---|---|
+| **the Diana** | **470 t** | **449** | **1.05** | **1,038 m2** | **2.21 m2** | **0.025** | **0.260 m2/t** |
+| the frigate-36 | 1,270 | 933 | 1.36 | 1,584 | 1.25 | 0.037 | 0.126 |
+| the razee | 1,925 | 1,384 | 1.39 | 1,899 | 0.99 | 0.030 | 0.147 |
+| the 74 | 2,600 | 1,604 | 1.62 | 2,225 | 0.86 | 0.030 | 0.127 |
+| the 64 | 2,170 | 1,384 | 1.57 | 1,803 | 0.83 | 0.029 | 0.141 |
+| the brig | 413 | 316 | 1.31 | 766 | 1.85 | 0.037 | 0.194 |
+| the merchant brig | 413 | 316 | 1.31 | 188 | 0.46 | 0.037 | 0.194 |
+| the bilander | 229 | 128 | 1.79 | 196 | 0.86 | 0.037 | 0.280 |
+| the hermaphrodite brig | 288 | 328 | 0.88 | 959 | 3.33 | 0.026 | 0.354 |
+
+- **She is the lightest ship of war for her tonnage**, 1.05 where the others are 1.31 to 1.62. Only
+  the hermaphrodite brig is lighter for hers, and she is a brigantine (below).
+- **She carries more canvas to the tonne** than any ship but the hermaphrodite brig: 2.21 m2, the
+  frigate-36 1.25 and the brig 1.85.
+- **Her rudder to her lateral plane is the smallest** of the ships, 0.025.
+- Her block coefficient to K is 0.39, the frigate-36's 0.55 and the brig's 0.50: a fine hull, and
+  a light one, for her measured length, breadth and draught.
+- The merchant brig's and the bilander's plain sail is what their books set on the order; it is
+  not their whole rig.
+
+### 12.2 A missed tack in 20 knots, tick by tick
+
+From 292.5 deg, close-hauled on the starboard tack, settled as the truths' helpers settle her, her
+`clr_x_m` 2.65. The yaw moments are read each tick: the sails' totals, each sail's own side force
+on its lever from the centre of lateral resistance, and the rudder's by `hull.rudder_forces`.
+
+| | The Diana | The frigate-36 | The brig |
+|---|---|---|---|
+| At the order | 6.47 kn, 67.4 deg off | 6.54 kn, 67.4 deg off | 6.05 kn, 66.0 deg off |
+| Her swing at its peak | 1.89 deg/s at 13 s, 5.4 kn | 1.92 deg/s at 17 s, 5.6 kn | 2.76 deg/s at 13 s, 5.2 kn |
+| **At "mainsail haul"** (her head within a point) | **48 s, 9.9 deg off: 1.86 kn, swinging 0.72 deg/s** | **42 s, 9.9 deg off: 3.30 kn, 1.18 deg/s** | 30 s, 8.5 deg off: 3.14 kn, 1.83 deg/s |
+| The rudder then (hard over, 35 deg) | 51 kN m | 326 kN m | 96 kN m |
+| After the haul, the after yards swung, then the square sails aback | -197 to -272 kN m: her swing stops in 4 s and turns back at up to 1.5 deg/s | -337 kN m at the most: her swing slows to 0.36 deg/s and carries her through | her after yards' swing opposes her by almost nothing |
+| Her closest to the wind | **8.1 deg off, at 52 s, with 1.43 kn** | through it at 58 s, with 1.6 kn | through it |
+| The end | **"Missed stays: she fell off on the old tack"**, at 68 s, two points off | tacked in 232 s | "tacked" in 459 s (below) |
+
+- **The yaw inertia is the difference.** The engine's is the mass times her length's quarter
+  squared, times 1.5, for every ship. Hers is 5.24e7 kg m2, a quarter of the frigate's 2.08e8.
+  The same order of moment from the after yards (-272 against -337 kN m) stops her swing at 0.30
+  deg/s every second, the frigate's at 0.09.
+- **She comes to the haul with 56% of the frigate's way and 61% of her swing.** Her sails' drag
+  aback in the luff is 1.5 times the frigate's per tonne (-17 kN on 494 t moved, against -30 on
+  1,334), so her way goes sooner, and with it her rudder (its moment goes as the square of her way).
+- **Her square sails per unit of yaw inertia**, area times lever from her centre of lateral
+  resistance: her fore +61, her main -52 and her mizzen -41 (x 10^-6). The frigate-36's are +25,
+  -18 and -20, the razee's +20, -14 and -12, the brig's fore +82 and main -58. **Her after yards
+  stand 2.5 times the frigate's against her inertia.** Their centre about her lateral resistance is
+  the frigate's (5.6% of her length abaft it, the frigate's 4.9%), so it is the inertia they act
+  on, not their place.
+- In 15 kn she fails the same way at the haul (8.8 deg off at the closest) but hangs, and the head
+  yards box her off before she falls back two points. In 20 kn the yards' push is (20/15)^2 = 1.78
+  times as strong, and she falls back in 12 s.
+- The hermaphrodite brig carries more canvas to the tonne still and stays from every heading in
+  every wind: she is square on her fore alone, and has no after yards to haul.
+- The brig's 20-knot tack came through the wind, swung on round to her old tack, and was called
+  "Tacked; braced up on the starboard tack, heading SW by S (211°)" at 459 s. That is the brig's
+  and the script's, not my row: noted for the lead.
+
+### 12.3 What moves it, each measured on a scratch copy
+
+Her tacks from 290, 292.5 and 295 deg in 8, 12, 15, 20 and 25 kn at seed 7 (the seeds alike to
+the tick, §11.3): **S** for stayed, **m** for missed stays.
+
+| Variant (all else as filed) | 8 kn | 12 kn | 15 kn | 20 kn | 25 kn | Stayed, of 15 | Helm close-hauled, abeam in 15 kn |
+|---|---|---|---|---|---|---|---|
+| **as filed: 470 t, `clr_x_m` 2.65** | S m m | S S S | S S S | m m m | m m m | 7 | -0.33, 1.54 |
+| 470 t, `clr_x_m` 3.0 | S m m | S S S | S m m | m m m | m m m | 5 | 0.73, 2.11 |
+| 498 t (her table's), 3.0 | S S m | S S S | S m m | m m m | m m m | 6 | 0.70, 2.10 |
+| 546 t, 3.0 | S S m | S S S | S S ? | m m m | m m m | 7 | 0.70, 2.10 |
+| **597 t, 3.0** | **S S S** | **S S S** | **S S S** | m m m | m m m | **9** | **0.64, 2.10** |
+| **611 t, 3.0** | **S S S** | **S S S** | **S S S** | m m m | m m m | **9** | **0.74, 2.10** |
+| 700 t, 3.0 | S S S | S S S | S S S | S m m | m m m | 10 | 0.74, 2.09 |
+| 800 t, 3.0 | S S S | S S S | S S S | S S S | m m m | 12 | 0.65, 2.09 |
+| 950 t, 3.0 | S S S | S S S | S S S | S S S | S S m | 14 | 0.72, 2.09 |
+| 1,100 t, 3.0 | S S S | S S S | S S S | S S S | S S S | 15 | 0.72, 2.08 |
+| her lateral plane 108 m2 (the frigate's fill), 470 t, 3.0 | S S m | S S S | S S m | m m m | m m m | 7 | 0.41, 2.10 |
+| her square sails 0.75 of their area, 470 t, 3.0 | S m m | S S S | S S S | m m m | m m m | 7 | 0.26, 2.12 |
+| her square sails 0.85, 611 t, 3.0 | S S S | S S S | S S S | S m m | m m m | 10 | 0.76, 2.29 |
+| her square sails 0.75, 611 t, 3.0 | S S S | S S S | S S S | S S S | m m m | 12 | 0.24, 2.11 |
+| the frigate-36, as filed | S S S | S S S | S S S | S S S | S S S | 15 | 1.31, 1.99 |
+
+(At 546 t the 295-deg tack in 15 kn had not ended in 900 s.)
+
+1. **Her weight is the first cause, as the lead suspected.** At 597 to 611 t she stays from every
+   heading in 8, 12 and 15 kn, **with truth D in its first band** (0.64 to 0.74 deg of weather helm
+   close-hauled, 2.1 abeam, at `clr_x_m` 3.0). So a displacement re-ruled there would put D back to
+   its first band, as the lead's ruling has it, and her tacks in light and working winds with it.
+2. **It is not the whole of it.** By her mass alone she would want about 800 t to stay in 20 kn and
+   1,100 t in 25. That is 1.7 and 2.3 times her filed displacement, which no reading of her plan
+   gives. The
+   rest is her canvas against her inertia. A quarter less square sail, with 611 t, stays in 20 kn
+   but not in 25.
+3. **Not her lateral plane.** Cut to the frigate's fill of length times draught, it changes nothing
+   in a breeze.
+4. **Under the sail a man-of-war carried in a breeze**, her topgallants taken in, she stays in 20 kn
+   from all three headings (290, 269 and 219 s). In 25 kn she misses from 290 and 292.5 and stays
+   from 295 (213 s). The frigate-36 stays so in both (244 to 317 s).
+
+### 12.4 Her comparator, and her draught as drawn
+
+- **What her drawn hull floats at each displacement**, by the form module's own integration carried
+  above her line. Her drawn body is 448.4 t at her line, the generator's figure, and her plank is
+  in her filed 470 t. Each tenth of a metre adds about 25 t.
+
+  | Displacement | Her water raised | Draught to K (filed 3.78 m) | At the greatest section (drawn 3.26 m) |
+  |---|---|---|---|
+  | 470 t, as filed | 0 | 3.78 m | 3.26 m |
+  | 498 t, her table's | 0.11 m | 3.89 | 3.37 |
+  | 546 t | 0.30 | 4.08 | 3.56 |
+  | 588 t, the brig's ratio on her 449 tons | 0.46 | 4.24 | 3.72 |
+  | 611 t, the frigate-36's ratio | 0.55 | 4.33 | 3.81 |
+  | 800 t | about 1.3 | about 5.1 | about 4.6 |
+- **Her comparator.** Steel's 20-gun ship of 429 tons gives no displacement, only her spars. On the
+  ratios of the ships we have (1.31 to 1.62), a ship of 449 tons burthen displaces about 590 to 730
+  t. Her own table's is 498 t, at the book's libra.
+- **Her measured line says 470.** Her arrowed load line on her plan, the lead's ruling 1, floats her
+  drawn body at 448 t, 470 with her plank. To float her at 590 to 610 t she would lie about half a
+  metre below her plan's line. So her plan and her tonnage disagree: either her drawn body is a
+  light ship's, as it measures, or her line is drawn light. That is the lead's to rule, with the
+  owner's sheets if they show her draught.
+- **Her rig is Luce's chain on her particulars.** Steel's 20-gun column is shorter in every yard
+  (the main yard 3%, aloft 6 to 10%, the crossjack 14%: Pages §7). On her inertia, the rig carries
+  the rest of the fault in a breeze.
+
+### 12.5 Truth E across the winds: the count that stays
+
+Her tacks from the three headings in 8, 12, 15, 20 and 25 kn at seeds 1 to 8:
+
+| | 8 kn | 12 kn | 15 kn | 20 kn | 25 kn | Stayed, of 120 |
+|---|---|---|---|---|---|---|
+| **the Diana, as filed** (95 m2, `clr_x_m` 2.65, 470 t) | 8 of 24 | 24 | 24 | 0 | 0 | **56** |
+| **the frigate-36, as filed** (`clr_x_m` 3.0) | 24 | 24 | 24 | 24 | 24 | **120** |
+
+The frigate-36's eight seeds agree to the tick as hers do, her tacks 174 to 447 s.
+
+### 12.6 For the lead
+
+The measure is in. I have not tuned her helm round it, and nothing is filed. What I'd put before
+the lead:
+1. **Her displacement**, re-ruled at her comparators' ratio, about 590 to 610 t, floating her about
+   half a metre below her plan's line. It gives her tacks in 8 to 15 kn from every heading, and
+   truth D in its first band. Or kept at 470 t, as her plan's line measures.
+2. **The rest, in 20 and 25 kn:** her rig against her inertia. Three options:
+   - Steel's spars for Luce's chain, which is a ruling on her rig;
+   - truth E restated across the winds as she measures, under plain sail in working winds and
+     topgallants in by 20 kn;
+   - both.
+3. **The engine's one inertia for every ship** (a radius of gyration of a quarter of her length,
+   half again for the water) is read and not changed, as the ruling says. If a light, fine ship
+   swings quicker than that rule gives her, the rule is the engine's, for the lead.
+
+Her tiers wait for the lead's ruling here, and for the engine's one A4 commit.
