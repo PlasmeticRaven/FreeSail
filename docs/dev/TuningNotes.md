@@ -39995,3 +39995,15 @@ The two cases that held every square stern to `round_up_m` and `galleries_m` nam
 **Her stern lights.** Old: a judged band of four, `[3.25, 3.85, 4, 1.50]`, by Steel 1805 p. 240's "the great cabin windows only", marked `judged`. New, the lead's ruling: none filed, as for the flush-decked brig, until the owner's sheets show them (JUDGEMENT); her note and her module say so. Her marks are `sourced` but `sections_m` and `form.fullness`.
 
 **Held as designed, the ruling's word:** her rank at the rig's distance, her truth F with both figures (the dip at 21.1 and L2's shut at 18.50), her `keel_m` at K. Nothing to do on the engine's faults found above.
+
+### The Diana on the package's branch at 329648e9: her rows in its tables (2026-11-23)
+
+The package's branch merged into hers at 329648e9 (the lead's nudge 58), as `defc026`. Its new tables over every file take her row, each read off her file as committed by the test's own reader; no other ship's row or figure moved.
+
+| table | old | new | read off her file |
+|---|---|---|---|
+| `COMMITTED_YARD_LEVELS` (`tests/test_yard_level.py`), held both ways | no row; 91 yards in the table | her row, 103 yards | `ship.yard_level` of her twelve yards: the fore's and the main's four at 0 to 3, the mizen's topsail, topgallant and royal at 1 to 3 and her crossjack at 0, as the frigate-36's; the old formula by its spar the same |
+| `BRACES_SQUARE_SET` (`tests/test_rig_words.py`), named and not globbed | eighteen rows, eight with after braces | nineteen, nine: her row `"after braces"` | four head yards on the fore, eight after yards on the main and the mizen; her after braces manned and worked as filed and with every square sail set; not one-masted |
+| her evolutions against her watches (`tests/test_diana.py`) | the registry's 110: 83 numbered, manned whole by either watch, and 27 all hands' work | 113: 85 and 28 | the package's `take_in_pole` and `furl_pole` (A5 and A6), numbered and manned whole; `change_lateen` (A1a), all hands' work by its file; every other evolution's answer as before, read one by one against her branch at 0305040 |
+
+Stage 0's `KEY_CARRIERS` (`tests/test_probes_90.py`, held both ways) takes no row of hers: she carries none of the four keys, as its case on her file holds (no `helm` in her hull, so the wheel by default, which `tests/test_helm_kind.py`'s case holds; no sweeps; no boat towed; no whole lateen). The package's other cases over every file pass on her file as committed (`tests/test_pole_mast.py`, `tests/test_boat_towed.py`, `tests/test_lateen_whole.py`'s five).

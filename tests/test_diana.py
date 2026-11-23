@@ -447,17 +447,19 @@ def test_at_quarters_every_crew_of_every_fit_is_manned(fit):
 
 
 def test_every_evolutions_want_against_her_watches_is_listed():
-    """Dia-D §6.2: every evolution of data/evolutions/ (the registry's 110), its crew line asked
+    """Dia-D §6.2: every evolution of data/evolutions/ (the registry's 113), its crew line asked
     of her watch on deck alone by night, through the muster's own request (`crew.hands`): her
     watches are 71 and 70 (46 and 45 seamen with 25 soldiers each, package 119's rule for the odd
     hands), and the request takes any idle hand on deck, its stations ranked first; so every one
-    of the 83 numbered evolutions is manned whole by either watch, none calls all hands for too
-    few and none waits; the other 27 are all hands' work by their files. Her design's "the
-    anchor's twelve forecastle hands against her watch's seven" reads by station: the request
-    makes up the twelve from the watch's other hands."""
+    of the 85 numbered evolutions is manned whole by either watch, none calls all hands for too
+    few and none waits; the other 28 are all hands' work by their files. Old: 110, 83 and 27,
+    before the package's A5 and A6 (`take_in_pole` and `furl_pole`, numbered) and A1a (the
+    whole lateen's `change_lateen`, all hands); no other evolution's answer moved. Her design's
+    "the anchor's twelve forecastle hands against her watch's seven" reads by station: the
+    request makes up the twelve from the watch's other hands."""
     spec = load_spec(HER)
     evos = load_directory()
-    assert len(evos) == 110
+    assert len(evos) == 113  # 110 before the package's A1a and A5-A6
     by = {}
     for watch in (Watch.STARBOARD, Watch.LARBOARD):
         crew = muster(spec.crew, Rng(7).stream("muster"))
@@ -477,7 +479,7 @@ def test_every_evolutions_want_against_her_watches_is_listed():
             by.setdefault(said, set()).add(name)
     assert by["starboard"] == 71 and by["larboard"] == 70
     assert set(by) == {"starboard", "larboard", "all hands", hands.ENOUGH}
-    assert len(by["all hands"]) == 27 and len(by[hands.ENOUGH]) == 83
+    assert len(by["all hands"]) == 28 and len(by[hands.ENOUGH]) == 85  # 27 and 83 before
     assert {"tack", "wear", "weigh_anchor", "clear_for_action"} <= by["all hands"]
     assert {"let_go_anchor", "heave_to", "fill_away", "back_anchor"} <= by[hands.ENOUGH]
 
