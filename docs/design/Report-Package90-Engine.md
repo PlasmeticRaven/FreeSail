@@ -2085,3 +2085,93 @@ tick, kind, trace and line. The runs' files are kept in the scratch (`n52/`).
 **For the coordinating session:** A5 and A6's hash is **b40ffa3** on `…/pkg-90-a56`, pushed, its
 tiers held. The engine track's merge of A1d's hash (64efd89) is tiered meanwhile on its own
 branch, as before.
+
+## A5 and A6's hash tiered (nudges 53 and 54): `…/pkg-90` merged at efc5d779 and at 40561a76, the tiers on 3d4a468 (2026-11-23)
+
+**The first merge (nudge 53):** **50bb169** on `…/pkg-90-a56`, parents **695331e** (A5 and A6's
+hash, b40ffa3, and its section above) and **efc5d779** (`…/pkg-90`'s tip: 32c9448 with the trunk at
+e3026cdb merged in, A1d merged there at 793adc04 by 71febde6), as nudge 53 and the coordinating
+session ask. It brings four commits, the trunk's 71b89f8, 793adc0 and e3026cd and `…/pkg-90`'s
+efc5d77, and two files, both docs: `docs/dev/M7-WorkPackages.md` (41 lines in, 1 out) and
+`docs/dev/ShipsNudge.md` (1 in, 1 out), as the trunk has them. It merged clean: **no line resolved
+by hand.** Its code, data, tests and tools are b40ffa3's byte for byte; and efc5d779's are 32c9448's
+and 71febde's (`freesail/`, `data/`, `tests/` and `tools/` the same trees), so the base's tiers are
+71febde's.
+
+**Checked on the merged tree:** no conflict marker; `ruff check` and `ruff format --check` clean;
+no carriage return in the merge's diff; `python tools/gen_ships.py <scratch>`, 18 of 18 byte for
+byte.
+
+**The second merge (nudge 54):** **3d4a468** on `…/pkg-90-a56`, parents **50bb169** and
+**40561a76** (`…/pkg-90`'s tip: efc5d779 with the trunk at 8f9a4b45 merged in, the harbour's start
+race mended there by the lead at ecfacf09), as the lead asks before the next hash is sent. It brings
+three commits, the trunk's ecfacf0 and 8f9a4b4 and `…/pkg-90`'s 40561a7, and four files:
+`freesail/ui/harbour.py` (13 lines in, 6 out), `tests/test_harbour.py` (72 in), and two docs,
+`docs/dev/M7-WorkPackages.md` and `docs/dev/ShipsNudge.md`, as the trunk has them. It merged clean:
+**no line resolved by hand.** Its code over 40561a76 is A5 and A6's own lines, the twelve files of
+the section above, line for line as over efc5d779. Checked as the first: no conflict marker; ruff
+clean; no carriage return; the generator 18 of 18 byte for byte.
+
+**The tiered hash is 3d4a468**; the commit after it, which writes these results, touches this
+report alone. The tiers of 50bb169, run before nudge 54 came, are kept below as measured: that
+hash is not to be sent, but its run is the record of A5 and A6 beside efc5d779.
+
+**The tiers of 50bb169** (nudge 53's merge; begun before nudge 54, and finished). All from the
+tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, on a
+worktree of its own, each junit kept in the session's scratch, compared test by test by the
+test's id (the xdist group's `@...` stripped) beside `…/pkg-90` at efc5d779: its tiers are those
+of 71febde, the same code tree (in `…/pkg-90-a1d`'s section).
+
+| Run | 50bb169 | Against efc5d779 (71febde's tiers) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,902: 8,892 passed, 8 skipped, 1 xfailed, 1 failed (58 min 45 s) | efc5d779's 8,840 (8,830 passed, 8 skipped, 1 xfailed, 1 failed): **every one the same outcome**, none gone; **62 new, all passed**, A5 and A6's own: `tests/test_yard_level.py` 34 and `tests/test_pole_mast.py` 28. **The one failed, at both:** `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, with the same message at both ("At index 3 diff: '' != 'a model'": the planned door's cell empty), the harbour's race in its start (the lead's to mend, nudge 52), `freesail/ui/` and `client/` the same at both. Run alone on 50bb169 three times, in its own worktree: passed three times |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 9 min 17 s) | efc5d779's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+efc5d779: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74;
+`tests/test_lateen_whole.py` 227; all passed.
+
+### The smack, and the three harness runs, against efc5d779
+
+Run again on 50bb169 and on efc5d779 (each from its own worktree; `a5/play.py` and `a2/harness.py`
+in the session's scratch, as in the section above):
+- **The smack's table:** each side's run is byte for byte nudge 52's (32c9448's and b40ffa3's), so
+  the table above stands as it is, old (efc5d779) beside new (50bb169), line for line and figure
+  for figure.
+- **The harness whole:** 270 runs, **269 the same in every tick, kind, trace and line**. The one:
+  the smack's `lie_a_try`, in its refusal's words alone ("Order not carried out ('lie a-try'): She
+  has no topsail to lie a-try under." -> "Order not carried out ('lie a-try'): The topsail is not
+  set; set it to lie a-try under it."), her trace the same, 60 rows. Her `anchor` (34 events, 390
+  trace rows) and `shoal_anchor` (33 events, 390 rows) the same, line for line and tick for tick.
+  Each side's file is byte for byte its run for nudge 52 (new) and for nudge 51 (old: 71febde's).
+
+### The tiers of 3d4a468 (nudge 54), test by test
+
+Run as the first, on a worktree of its own, then `…/pkg-90` at 40561a76 tiered whole on another
+(none of its tiers was to hand, and the harbour's file is reached through `freesail/ui/server.py`
+by every page's test), each case set beside its outcome there and at 50bb169.
+
+| Run | 3d4a468 | Against 40561a76 | Against 50bb169 |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,903: 8,894 passed, 8 skipped, 1 xfailed, 0 failed (54 min 27 s) | 40561a76's 8,841 (8,832 passed, 8 skipped, 1 xfailed, 0 failed; 59 min 42 s): **every one the same outcome**, none gone; **62 new, all passed**, A5 and A6's own: `tests/test_yard_level.py` 34 and `tests/test_pole_mast.py` 28. The harbour's browser test and the trunk's new one passed at both | 50bb169's 8,902 (8,892 passed, 8 skipped, 1 xfailed, 1 failed): **every one the same outcome but one**, none gone; **1 new, passed**, the trunk's: `tests/test_harbour.py::test_a_page_that_asks_while_a_game_starts_finds_one_whole_game`. **The one:** `tests/test_harbour.py::test_in_the_browser_the_stations_are_one_table_and_a_planned_door_is_offered`, failed at 50bb169, passed here: the harbour's start, as mended on the trunk at ecfacf09 |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, 0 failed (1 h 5 min 51 s) | 40561a76's 569 (558 passed, 11 xfailed, 0 failed; 1 h 12 min 1 s): **every one the same outcome**, none gone, none new | 50bb169's 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+40561a76 and at 50bb169: the byte test and the golden classing table 96 passed;
+`tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py`
+21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth
+7-606 74; `tests/test_lateen_whole.py` 227; all passed.
+
+**The smack's table and the three harness runs** are not run again: nudge 54's merge brings no
+file they read (the harbour's two and two docs alone), and they are measured above against
+efc5d779, whose code is 40561a76's but for `freesail/ui/harbour.py`. The coordinating session
+allows it.
+
+**For the coordinating session:** A5 and A6's hash is **3d4a468** on `…/pkg-90-a56`, pushed and
+tiered; the commit after it touches this report alone. The lateen hulls' list rides A4's hash, as
+the lead confirms: five of its seven are built on `…/pkg-90-lateen` (b3cd1eb, cut from 50bb169;
+its section there), items 1 and 3's strain line stopped on `physics/strain.py` (the row's "not
+touched", the mend proposed), item 7 asked. That branch takes the trunk before A4's hash is
+reported, as nudge 54 asks, and its tiers run on that hash. **Next:** A4, on the lead's word.
