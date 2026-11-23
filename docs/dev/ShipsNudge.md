@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-20, 17:45 UTC (THE DIANA'S RULINGS: her rows in the viewer's test file and an explicit row for the two square-stern tests; a foreign gun's charge is her kind's share, as parts.charge_lb already gives, and the magazine's test moves; the ranges audit allowed; truth E her own band 180 to 330 s; the 1817 fit's ports; no stern lights above her rail). Nudge number: 32.
+Latest note: 2026-11-22, 18:42 UTC (A1c's HASH IS MERGED at 85266ea6 by 2f3285ca, over my reader's NOT PASS, on the rule now in the record: lateen-only faults are ONE LIST OWED IN FULL BEFORE ANY LATEEN HULL's FILE JOINS; FIVE FOR A1d's HASH (a fill-away belayed and given again is a gain; 'All hands are still at work' untrue; the heading where a course was given; missed stays said as Tacked; the captain's wiring pinned); merge the trunk; tier the hash that has them). Nudge number: 51.

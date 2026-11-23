@@ -101,6 +101,8 @@ __all__ = [
     "ordinal_words",
     "OFFICER",
     "OFFICER_BRIEF",
+    "PLAIN_REPORT",
+    "REGULATIONS_REPORT",
     "OFFICER_DOMAIN",
     "OFFICER_PATIENCE_S",
     "OPT_OUT_TOKEN",
@@ -1441,6 +1443,26 @@ def officer_rank(world: Any) -> tuple[str, str]:
 # files bind him, never the first lieutenant.
 MERCHANT_OFFICER = ("the mate", "mate")
 
+# The officer's duty to report, said where the Regulations do not bind her (package 121): a
+# privateer or a merchantman by her papers, a man of war of another nation's, is under no
+# Admiralty Regulations (`service.under_the_regulations`), and her officer of the watch is
+# told the same duty in plain words.
+REGULATIONS_REPORT = "Report to the captain what the Regulations gave the lieutenant to report"
+PLAIN_REPORT = "Report to the captain what the officer of the watch reports to him"
+
+
+def officer_brief(world: Any) -> str:
+    """The officer's station brief for this World's ship (`OFFICER_BRIEF`): the Regulations
+    named only where they bind her (package 121)."""
+    brief = OFFICER_BRIEF.format(person=PERSON_WORDS)
+    if world is None:
+        return brief
+    from freesail.world.service import under_the_regulations
+
+    if under_the_regulations(world):
+        return brief
+    return brief.replace(REGULATIONS_REPORT, PLAIN_REPORT)
+
 
 def merchant_ship(world: Any) -> bool:
     """Whether the ship is no King's ship (package 66): her wardroom file binds the
@@ -1495,9 +1517,12 @@ def station_outline(world: Any, station: str) -> str:
     if found is None:
         return ""
     try:
-        return str(found.outline_words())
+        words = str(found.outline_words())
     except Exception:
         return ""
+    from freesail.world.service import regulations_said
+
+    return regulations_said(world, words)
 
 
 def officer(
@@ -1524,8 +1549,9 @@ def officer(
         )
         rank = officer_rank_of(role)
     # the person by the code's words; his name, and who the other officers are, are the
-    # game's and go in the situation (package 117; `officers_words`)
-    brief = OFFICER_BRIEF.format(person=PERSON_WORDS)
+    # game's and go in the situation (package 117; `officers_words`); the Regulations named
+    # only where they bind her (package 121)
+    brief = officer_brief(world)
     return Station(
         name,
         Authority.OFFICER_2,

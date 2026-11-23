@@ -336,7 +336,7 @@ Apparent wind 66° on the larboard bow, 14.3 kn; helm +3°
   Morning watch (04:46)  Order: heave to.
   Morning watch (04:46)  Only seven hands to heave to; the rest are reefing the mainsail.
   Morning watch (04:46)  Hauled flat aft the mainsail sheet; the fore staysail sheet to windward; braced the fore topsail aback; helm a-lee.
-  Morning watch (04:46)  Hands to the after braces; heave to.
+  Morning watch (04:46)  Hands to the head braces; heave to.
 * Morning watch (04:47)  Reefed the mainsail; now set, 1 reef.
   Morning watch (04:47)  A gust: 18 knots, the mean 16.
 * Morning watch (04:49)  Hove to on the larboard tack, fore topsail to the mast, helm a-lee.
@@ -346,7 +346,7 @@ Speedwell: heading NE (50°), speed 1.2 kn, leeway 64°, heel 8°
 Apparent wind 47° on the larboard bow, 13.7 kn; helm -4°
   Morning watch (04:56)  Order: fill away.
   Morning watch (04:56)  Hauled aft the head sheets; kept the helm a-lee to let her fall off.
-  Morning watch (04:56)  Fill away; man the after braces.
+  Morning watch (04:56)  Fill away; man the head braces.
   Morning watch (04:56)  Fallen off; braced the fore topsail full.
 * Morning watch (04:57)  Filled away on the larboard tack; braced full and steering ENE (64°).
   Morning watch (04:58)  Steady on ENE (64°).

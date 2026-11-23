@@ -2472,6 +2472,10 @@ more_work_nouns:
   # package 115 D4 (e): `belay the relieving tackles`, the work by its own name
   relieving tackles: rig the relieving tackles
   wheel: repair the wheel
+  # package 90, A3 (nudge 45): the mend by the tiller's words, as by the wheel's, on either
+  # helm (`belay the tiller`, `belay the spare tiller`; the work named by her helm)
+  tiller: repair the wheel
+  spare tiller: repair the wheel
 
 # ---------------------------------------------------------------------------
 # What undoes what (package 37g, item 5; the review of gate 5c's playtests, 5.4 and 10.5):

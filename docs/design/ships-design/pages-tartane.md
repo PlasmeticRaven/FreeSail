@@ -178,6 +178,23 @@ columns) prints the ratio **0.151** and the length **10½** pieds; the *Espiègl
 misreading. **Forfait's figures (figs. 9 and 35) were not reached**: the item's last leaves (n398 to
 n404, fetched) are blank and end papers; no plate leaf was found in the time given (§9).
 
+**Leaf n166 (p. 121)**, read on its page image for the tartane builder's question 1 (the cut of her
+lateens): https://archive.org/download/bub_gb_AQUHAAAAQAAJ/page/n166.jpg, 2,500 × 3,500 px, sha256
+`0fdf7d6cccd7d75b11b88e0cc2f7a558ec608da3084fa79b96d24e75da19e5c1`, cached beside n179 with its
+neighbours n165 and n167 (pp. 120 and 122). Read on it, in our words:
+- the lateen's head is the yard less its two ends, which the page gives as 2 to 3 pieds at the
+  penne and 10 to 15 pouces at the car;
+- with the yard fully peaked, as in the vessels of figs. 35 to 38, the clew falls on the deck at
+  the foot of the mast;
+- the yard is hoisted until its jeers' block meets the return block at the mast's head, or the
+  sheave cut in the mast for the jeers;
+- of fig. 35's rig (one mast at the middle or a little forward): the car is tacked at the stem.
+
+So the design's reading, which the builder took literally, is the page's (the clew on the deck at
+the mast's foot, the car at the stem). The *Humble*'s own ends in Table II (1½ pieds and ¾ pied)
+lie under p. 121's general band; her own row stands. Page 122 (n167) is on the use of fig. 35's rig
+and its Table I, not the cut.
+
 ## 2. The table and the figures read
 
 - **The 1971 reprint's table** was not re-read here (in copyright; the tree's reading, `VesselReferences-
