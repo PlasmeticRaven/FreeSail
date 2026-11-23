@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 19:24 UTC (A4's HASH 40a532e1 IS AT THE GATE (run 164; a reader in three parts, the strain's warnings above all); THE DIANA MAY BE BROUGHT ONTO claude/pkg-90 NOW, HER TIERS HELD until A4's verdict). Nudge number: 58.
+Latest note: 2026-11-23, 21:15 UTC (THE DIANA's FOUR: 1 HER SPANKER CUT ON HER OWN SPARS and her helm tuned to it, old beside new; stop and say if she will not hold D and E; 2 HER BOW PORT on her drawn side, measured from her lines; 3 noted; 4 the two ceilings allowed; her tiers still held until A4's verdict). Nudge number: 59.
