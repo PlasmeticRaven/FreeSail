@@ -12028,3 +12028,18 @@ A few passes are fine and there is no hurry in it. A4's one commit I gate when i
 5. The engine's one inertia: read, not changed, and noted as you put it.
 
 **Then I rule, and the choice I expect to put to the owner is plain:** she joins as her plan makes her and as the engine sails her, slack in stays in a breeze and said so in her truths, with the engine's part booked as a package; or she waits for that package. Do not tune toward either meanwhile. Her tiers wait.
+
+**2026-11-23, 23:38 UTC (nudge 67): the Diana: my ruling, and the one choice for the owner, in two words: "Join now" or "Wait".** Received at 2546a5cf. The cause is found and it is clean work: in a breeze the script's one moment for "mainsail haul" turns back a ship that comes round slowly, and Luce gives the other moment in the same sentence. That is the engine's and every ship's; nothing of it goes into her file.
+
+**Put this to the owner, since he is with you, in these same two labels (I am giving him the same two in my session, so that an answer in either place is one answer). I recommend "Join now".**
+- **Join now (recommended):** she joins as her plan makes her and as the engine sails her today: under all plain sail she stays in 12 and 15 knots and is slack in stays in 20 and 25; under the game's own `shorten sail` she tacks in both (5 of 6, the miss with the shortening unfinished). Her truths say so. The moment of the haul is booked as an engine package, launched only at his word, a gate of today's ships; when it lands she is measured again.
+- **Wait:** she is held off the trunk until that package has been launched, built and gated.
+Why I recommend joining: shortened for the weather she handles as she should, which is what a captain does with a light ship over-canvassed in a breeze; she is true to her plan; and nothing in her file would be undone by the package, only measured again.
+
+**If it is "Join now", her gate asks:**
+- **Truth E as a count across the winds, two rows:** under plain sail as measured (every heading in 12 and 15 knots; what she does in 8, 20 and 25 said as it is), and under `shorten sail` in 20 and 25 knots with the shortening finished before the helm is put down (measure that again so, three headings each; pin it as a count with its band). Her truth's words say plainly that she is slack in stays in a breeze under all plain sail.
+- **Truth D as restated under (a),** `clr_x_m` 2.65, and one line in her record and her tuning note: **owed with the haul's package, her `clr_x_m` and her helm measured again, D back to its first band if she then holds it.**
+- Her rudder as traced, its ratio noted as the least and not the cause.
+- Then her tiers on the exact hash (A4's one commit is on `claude/pkg-90`; I merge it to the trunk on the cloud's run), and her report's list for my gate.
+
+**Booked by me for the owner, not launched (package 125, "the moment of the haul"):** the after yards hauled a point on the bow when she comes round smartly and with the wind ahead when she is slack, by Luce's own two readings; with it the merchant brig and the bilander, who never come round in 900 s, and "Tacked" said of a ship that swung back. The ships of the line missing in 8 knots is noted and may well be true of them.
