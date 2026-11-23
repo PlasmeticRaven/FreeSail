@@ -923,6 +923,20 @@ def _lies_on_the_mast(ship: Any, lateens: list[Any]) -> str:
     )
 
 
+def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
+    """'the mainsail is aback against the mast; shift it when you will': a whole lateen held
+    aback by the wind come round ahead onto its cloth (package 90, A1d; Design-Package90-Engine.md
+    §2.4.3a, JUDGEMENT on the words)."""
+    from freesail.evolutions.scripts import names_of_sails
+
+    one = len(lateens) == 1
+    names = names_of_sails(ship, lateens)
+    return (
+        f"{names} {'is aback against the mast' if one else 'are aback against their masts'}; "
+        f"shift {'it' if one else 'them'} when you will"
+    )
+
+
 def _on_the_bad_hand(ship: Any, side: str) -> tuple[list[Any], list[Any]]:
     """The lugger's dipping lugs (never a settee: `lugger_lugs`) and the whole lateens set whose
     yards hang on the weather side of their masts, the wind on `side` (package 90, A1a)."""
@@ -947,7 +961,16 @@ def _across_the_bow(ship: Any, side: str) -> None:
     if lugs:
         said.append(_against_their_masts(ship, lugs, "dip"))
     if lateens:
-        said.append(_lies_on_the_mast(ship, lateens))
+        from freesail.evolutions import trim as yard_trim
+
+        # held aback (package 90, A1d): the wind come round ahead onto the side its cloth lies
+        # on, pressed on its mast; else drawn round it to leeward, on the bad hand (A1a's words)
+        aback = [sl for sl in lateens if yard_trim.read_sheet(ship, sl).held_to_windward]
+        lying = [sl for sl in lateens if sl not in aback]
+        if aback:
+            said.append(_aback_against_the_mast(ship, aback))
+        if lying:
+            said.append(_lies_on_the_mast(ship, lying))
     ship.note(
         "notable",
         "sail.across_the_bow",

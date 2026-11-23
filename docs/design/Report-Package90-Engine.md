@@ -468,6 +468,121 @@ the same outcome: the byte test and the golden classing table (`tests/test_ship_
 
 Stopped after A1c, as briefed: waiting for the coordinating session's message.
 
+## Step A1d: a whole lateen aback, and on the bad hand, in a breeze (2026-11-20)
+
+**Merged first:** nothing new. The package branch's A2 mended hash had not landed when A1d was
+built (the coordinating session's word: merge it when it is said to have landed); the branch
+stands on 686557d (the package branch at 033f42b7) and A1c. The base of every comparison here is
+A1c, **0c98ff8** (a worktree; `be2c90f` above it adds the report alone).
+
+**Commit:** **8dce637** on `…/pkg-90-engine` (parent be2c90f), one commit, merged alone.
+
+**Files** (each in the engine track's §7.1 row for A1d, or A1b's places):
+- `freesail/physics/sails.py`: `LATEEN_ABACK_LOAD`, `LATEEN_BAD_HAND_LOAD` beside
+  `LUG_AGAINST_MAST_AREA`; `_carried_over_abaft_the_beam` in `_read_rig`; `lateen_load_factor` in
+  `_apply_loads`, on the spars alone;
+- `freesail/evolutions/trim.py`: `keeps_its_side`; `read_sheet`'s cloth on its yard's side;
+  `set_sheet_angle` keeping a whole lateen's drawn side, the lee included;
+- `freesail/evolutions/scripts.py` (A1b's places): the draw at "let go and haul"
+  (`TackScript._draw_lateens_over`), the hang's eased mizen, the wear's "wind aft"
+  (`WearScript._lateens_over`), `ease_off_sheets`' side, the take-in's test
+  (`lateen_aback`, `lateen_take_in_waits`) and their words;
+- `freesail/evolutions/runner.py`: the take-in's wait, at the start and in `_start_waiting`;
+- `freesail/orders/navigation.py`: the bow watch's words for a lateen held aback;
+- `tests/test_lateen_whole.py`: A1d's part, and A1a's bow line moved;
+  `tests/test_known_truths.py`: truths 7-670, 7-671 and 7-672;
+- `docs/dev/TuningNotes.md`: "Package 90, A1d".
+
+No ship file moves (`python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte). No class added
+(functions and constants only), so truth 7-606 and the checkpoint's list are not touched.
+`physics/strain.py` is not touched. LF; ruff check and format clean; no Python line over 100.
+Nothing under `docs/agents/consent/`.
+
+### What was built
+
+TuningNotes has each piece with its words. **The rule**: a whole lateen's cloth lies on its
+yard's side, kept by its mast, and its sheet keeps the side it is drawn to; the wind come round
+ahead onto that side holds it aback against its mast (the plate `_plate_force` makes, unchanged);
+in the luffing band it shakes as before; with the wind abaft the beam on it the cloth goes over to
+leeward, the bad hand. **The strain**: its pull on its yard and its mast (and any spar beneath)
+times 2.5 held aback and 2.5 on the bad hand, its cloth and lines the plain pull; the strain model
+as it is. **The evolution's part**: every lateen drawn over to the new lee at "let go and haul"
+and at "wind aft", those left said; the aftermost eased in stays and in the wear as A1b eases it;
+the bow's line "aback against the mast"; a take-in of a lateen aback over 22 kn waits till it
+fills or is drawn over.
+
+### Measured
+
+- **The bands** (truths 7-670 to 7-672; the probes' lateen yards and masts rated by the
+  generator's rule, the design's figures to the decimal): taken aback by a shift, the tartane's
+  great yard 0.94 of its rating in 28 kn, 1.26 in 31, 1.46 in 34, 1.71 in 37, so it **strains from
+  about 29 kn and may carry away from about 34½** (the polacre's fore yard 30 and 36½); her main
+  mast, carrying more, from about 40. On the bad hand the polacre's fore yard 0.95 in 42 kn, 1.37
+  in 46, 1.59 in 50: **from about 42½ and 48½**. The rules captain's board on the bad hand in 12
+  kn for 1,800 s: the yards at 0.08 to 0.12 of their ratings, **under a fifth**, no condition lost.
+  The lead's figures (28 and 35; 40 and 49) stand.
+- **The probes' going about** in 15 and 25 kn, old (A1c) beside new: **−34 to +18 m**. The tack
+  and the wear with the yards changed (A1b's figures) within 2 per cent but for the polacre's
+  25-kn tack, +17.5 m, 5 per cent: her fore lateen stands aback 28 s across the main yard's swing,
+  paying her head off, as the design means it to. With the lateens left the wear loses 5 to 20 m
+  the less (its left lateens now drawn for the wind she comes to at "wind aft") and the polacre's
+  25-kn tack 34 m the less (the design's own case, 76 m). The table is TuningNotes'. No "taken
+  aback" line is said in any run.
+- **The eighteen files**: A2's harness at 0c98ff8 and at 8dce637: **270 runs, every tick, kind,
+  trace and line the same** (the two files byte for byte).
+
+### Moved, old beside new, with reason
+
+1. `tests/test_lateen_whole.py::test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through_the_bow`
+   (A1a's own): "... the foresail and the mizen and the mainsail lie on their masts; shift them
+   when you will." -> "... are aback against their masts; shift them when you will.", the
+   design's words (§2.4.3a) for the lateens A1d holds aback there.
+
+`tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are.
+
+### The test sets run, with counts, and the base comparison
+
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base is A1c, 0c98ff8** (its fast tier's junit, run
+for A1c's report on the same code as `be2c90f`).
+
+| Run | Base (0c98ff8) | A1d (8dce637) |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,627: 8,618 passed, 8 skipped, 1 xfailed, 0 failed (1 h 15 min) | 8,638: 8,629 passed, 8 skipped, 1 xfailed, 0 failed (1 h 16 min). **Test by test: every one of the base's 8,627 the same outcome; 11 new, all passed** (eight of `tests/test_lateen_whole.py`, truths 7-670 to 7-672) |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (a new rule of force in `physics/sails.py`, so the tier whole and not the touched files' alone) | | 568: 557 passed, 11 xfailed, 0 failed (1 h 26 min). The same 568 cases as A2's slow tier (`a2`'s run on its own tree) and the same eleven xfailed; A2's five failures there (its four digests, moved since, and the browser's flake) pass |
+| **The guard and physics files with their slow cases**, `--slow`: `test_strain`, `test_lateen`, `test_settee`, `test_lug`, `test_sails`, `test_trim_order`, `test_evolutions`, `test_staying`, `test_lying_to`, `test_gale`, `test_rig_geometry`, `test_catalogue`, `test_captains`, `test_captain_trials`, `test_rig_words`, `test_held_work`, truth 7b-111 | | 590 passed, 1 xfailed (16 min), on the tree as committed |
+
+**The guard set of §10.2**, tallied from the two fast tiers' junits, base beside new, every case
+the same outcome: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py`
+74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed at both.
+`tests/test_strain.py`, `tests/test_lateen.py` and `tests/test_settee.py` as they are.
+
+**The generator:** `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte with
+`data/ships/`.
+
+### Unsure, and for the lead
+
+1. **The change in stays begins where A1b put it**, at the head yards' swing's end, "changed
+   last, as the settee"; the design's §2.4.3a has it begin at "let go and haul". So that no lateen
+   stands aback through the swing, every lateen still set is drawn over at "let go and haul" and
+   the one to be changed fills on the bad hand until its change begins. On the probes the swing
+   is short or none; on a hull with long head yards it is the swing's seconds on the bad hand.
+2. **The aftermost lateen in the wear** is eased at "up helm" and hauled aft only as she comes to
+   steady (A1b); at "wind aft" A1d takes it over to the new lee still eased. Drawn there at once,
+   as the first draft did, the wear with the lateens left lost 53 to 132 m less than A1c: a change
+   of A1b's act, not the rule's, so not built.
+3. **The tartane probe on the bad hand from 34 kn**, and in a 12-kn wind's top gust of 15.6 kn,
+   luffs and is taken aback by her own lateens, so her figures there are aback's; the bad hand's
+   band is the polacre's. Her own file measures her (Tar-D T-9).
+4. **The take-in's wait** is the runner's (no step of an evolution file can wait, and
+   `registry.py` is not in my row): a take-in of a whole lateen held aback over 22 kn waits at its
+   start and when its turn comes; its words are said once, at the order.
+5. **Truths 7-670 to 7-672** take about 3 s each (the probes tick at about a millisecond), so they
+   stand in the fast tier.
+
+Stopped after A1d, as briefed: waiting for the coordinating session's message.
+
 ## Steps A1a and A1b's second pass (nudge 46): what befalls the yard, the belay, and the words (2026-11-22)
 
 **Merged first:** nothing. `…/pkg-90-a1ab` is cut from **0d5d2c56**, the package's A1a-A1b merge
@@ -1022,19 +1137,51 @@ scratch `n49/mutate49.py`, ten mutations, each failing its pins.
 
 ### Measured: today's ships
 
-- **A2's harness** (270 runs) and **the wind-shift runs** (`n46/windshift.py`, 108) on this tree,
-  beside b3c68af4's: running beside this commit; their result follows in the next commit, which touches
-  this report alone.
+- **A2's harness** (270 runs) on this tree: byte for byte as at b3c68af4.
+- **The wind-shift runs** (`n46/windshift.py`, 108): byte for byte as at b3c68af4.
 - Every changed road is read only on a hull that carries a whole lateen, or only by the work a
   belay hands on, which only a whole lateen's change makes.
 
 ### The test sets run, with counts, and the base comparison
 
-The fast and the slow tier whole run on this commit now, and on b3c68af4 for the base. Their
-results follow in the next commit, which touches this report alone.
+**The tiered hash is 2f3285c**, this pass's commit itself. The commit after it, which writes these
+results, touches this report alone.
 
-**The lens of the touched files** (32 files, `-n 2`) runs beside the tiers; its count follows
-with theirs. Before the commit, `tests/test_lateen_whole.py` whole: 205 passed.
+All from the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`,
+each junit kept in the session's scratch. **The base, b3c68af4**, ran here the same way on its own
+worktree, and 2f3285c on its own. Compared test by test by the test's id, with the xdist group's
+`@...` stripped.
+
+| Run | b3c68af4 (the base) | 2f3285c | Against the base |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 8,793: 8,784 passed, 8 skipped, 1 xfailed, 0 failed (1 h 22 min, the lens and the harness running beside it) | 8,815: 8,806 passed, 8 skipped, 1 xfailed, 0 failed (58 min 39 s) | **Every one of the base's 8,793 the same outcome**, none gone; **22 new, all passed**, every one in `tests/test_lateen_whole.py` |
+| **Slow tier whole**, `--slow -m "slow and not pace"` (the runner, the scripts and the words touched, so the tier whole) | 569: 558 passed, 11 xfailed, 0 failed (1 h 6 min) | 569: 558 passed, 11 xfailed, 0 failed (1 h 8 min) | **Every one of the 569 the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at
+the base: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74;
+`tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the
+settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; all passed.
+`tests/test_lateen_whole.py`: 183 at the base, 205 now, all passed.
+
+**The lens of the touched files**, `-n 2`, run on the working tree beside the commit: 2,305 passed,
+1 skipped, 1 xfailed, 0 failed (18 min); the fast tier above holds each of its files on the exact
+hash. It ran over `test_lateen_whole`, `test_settee`, `test_bilander`, `test_lug`,
+`test_hull_lugger`, `test_standing`, `test_orders`, `test_held_work`, `test_evolutions`,
+`test_catalogue`, `test_probes_90`, `test_grammar_book`, `test_practice_orders`, `test_mends_75`,
+`test_lateen`, `test_agents`, `test_practice`, `test_knowledge`, `test_agent_api`, `test_readings`,
+`test_checkpoint`, `test_hands`, `test_captains`, `test_crews`, `test_helm_kind`, `test_lying_to`,
+`test_tackle_orders`, `test_found_on_the_way_85`, `test_mends_109`, `test_held_hulls`, `test_driver`
+and `test_replay`.
+
+**The coordinating session's tiers on 5e42ed2f**, quoted only as a cross-check. 5e42ed2f is
+b3c68af4's first parent, and differs from it only in `docs/dev/M7-WorkPackages.md` and
+`docs/dev/ShipsNudge.md`. Its fast tier: 8,793 (8,779 passed, 13 skipped, 1 xfailed, 0 failed), the
+same count of cases as the base here. Its slow tier: 534 passed, 14 skipped, 11 xfailed, 10 failed,
+the ten known to fail on that machine. Its pace tier: 11 passed, 4 under truth 51's floor. The
+cloud's base above is the comparison.
+
+**On 2f3285c's tree:** `python tools/gen_ships.py <scratch>`, 18 of 18 byte for byte with
+`data/ships/`; **`ruff check`** and **`ruff format --check`**, clean.
 
 ### Unsure, and for the lead
 
@@ -1047,4 +1194,258 @@ with theirs. Before the commit, `tests/test_lateen_whole.py` whole: 205 passed.
    shifted round their masts." (old, "Belayed shifting the mainsail; ..."). It is true, and the
    work's one name, but long.
 
-**Next:** the tiers, then `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.
+**Next:** `…/pkg-90-a1c` merged into `…/pkg-90-engine`, as before.
+
+## A1d on A1c's hash (nudges 50 and 51): `…/pkg-90` merged, the lines resolved by hand (2026-11-22)
+
+**The branch:** `…/pkg-90-a1d`, cut from A1d's hash **e2d6b926** (A1d's code, 8dce6372, and its
+report, on A1c as first built, be2c90fd), with no A5-A6 and no A4. Allowed by the owner, who has
+since given a standing allowance to push my own branches as needed.
+
+**The merges:**
+- **4fcd224**, parents e2d6b92 and **ee66c4a** (`…/pkg-90` then: A1c's hash with the five, A3's
+  lists, the three A1a-A1b passes and the trunk to 7a1bd65e). Git finds one merge base, be2c90fd.
+  It brings 96 commits. The code and data take 35 files, 1,477 lines in and 204 out, and the tests
+  take 8, 2,755 in and 67 out. Five files conflicted; every other merged clean,
+  `freesail/evolutions/runner.py` among them.
+- **cde50e7**, parents 4fcd224 and **a13fb0f** (`…/pkg-90` now: ee66c4a with the trunk at
+  25ccf840 merged in). It touches `docs/dev/M7-WorkPackages.md` and `docs/dev/ShipsNudge.md`
+  alone, and merged clean.
+
+**Which lines were resolved by hand** (4fcd224; both rules):
+1. **`freesail/evolutions/scripts.py`, the tack's haul** (`TackScript`, at "let go and haul"):
+   - Taken from the package: `draw = " Draw jib; trim aft the head sheets." if self._jibs() else
+     ""`, `if self.heads and not draw:`, its comment `# the fore lateen alone drawn on the new
+     board (package 90, nudge 48)` and `draw = f" Draw the {self._boom_names(self.heads)}; trim
+     aft its sheet."`.
+   - Dropped from A1d: its `draw = " Draw jib; trim aft the head sheets." if self.heads else ""`.
+   - Kept from A1d, after them: `if left:`, `on = lateens_drawn_words(self.ship, left)` and `draw
+     = f"{draw[:-1]}; {on}." if draw else f" {on[0].upper()}{on[1:]}."`.
+   - Taken from the package, after those: its five comment lines from `# her head yards hauled in
+     words only where she works her braces; ...`, then `hauled = braces_worked(self.ship)` and
+     `if self.head and hauled:`.
+   - Dropped from A1d: its `if self.head:`.
+
+   So the fore lateen's own line comes first and A1d's lateens drawn over are joined to it, as the
+   engine's merge at 0d639a6 has them, line for line.
+2. **`freesail/evolutions/scripts.py`, the wear's "Wind aft."** (`WearScript`):
+   - Taken from the package: its comment's line `# A2: "hauled out and braced up" before it,
+     whatever she had); and where she` and the six after it (A2's second pass, `braces_worked` and
+     the yards' class word), then `worked = braces_worked(self.ship)`, `swung =
+     told_of(self.ship, self.head)`, `yards = f"{class_word(self.ship, swung)}yards"`, `squared =
+     f"Squared the {yards}; shifted" if swung and worked else "Shifted"` and `braced = "; hauled
+     out and braced up" if worked else ""`.
+   - Dropped from A1d: `# A2: "hauled out and braced up" before it, whatever she had)`, `squared =
+     "Squared the head yards; shifted" if self.head else "Shifted"`, and the three lines of
+     `braced = (` ... `has_braced_yards(self.head, self.after)` ... `)`. `has_braced_yards` is gone
+     since A2's second pass.
+   - Kept from A1d: `over = self._lateens_over(new_lee, wind)  # package 90, A1d` and its note,
+     `self.note(f"Wind aft. {squared} over the sheets{over}{braced}." + dipped)`.
+   - Dropped from the package: its note without `{over}`.
+
+   The engine's merge has the same lines.
+3. **`tests/test_known_truths.py`**, one hunk at the file's end: A1d's section (truths 7-670 to
+   7-672, 145 lines) against the package's (package 121's truths 7-710 to 7-716, 302 lines). Both
+   kept whole, A1d's first, with two blank lines between. The file is byte for byte the
+   engine's.
+4. **`tests/test_lateen_whole.py`**, two hunks:
+   - The import block: A1d's `from freesail.physics import sails as P` and the package's `from
+     freesail.physics.sails import against_the_mast, compute_sail_forces`, both.
+   - A1d's section ("Taken aback, and the bad hand, in a breeze (A1d)", 166 lines) against the
+     package's three ("The second pass", "The third pass", "The five that ride A1c's hash", 1,171
+     lines). Both kept whole, A1d's first, with two blank lines and the rule line between.
+
+   The file is byte for byte the engine's (95a58e9's).
+5. **`docs/dev/TuningNotes.md`**, one hunk: A1d's section (64 lines) against the package's three
+   (the second pass, the third pass, the five; 114 lines). Both kept whole, A1d's first, with a
+   blank line between. The lead's nudge-43 paragraph merged clean, once, in A1b's section. That
+   makes 171 sections: the engine's file less its A5-A6 and A4 sections.
+6. **This report**, three hunks. Git set A1d's section against the second pass's, the two sharing
+   lines ("### The test sets run, with counts, and the base comparison", the guard set's
+   sentence), so its hunks cut across both. The file is built from both sides whole: the common
+   head (A2, A1a-A1b and A1c, 469 lines), then A1d's section as at e2d6b926, a blank, then the
+   package's three sections as at ee66c4a. Every line of each side is kept in its order, and
+   every line git merged clean is in it (both checked).
+
+**Checked on 4fcd224, before the five:**
+- No conflict marker anywhere. `ruff check` and `ruff format --check` are clean, 428 files.
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+- The tree differs from the engine's (95a58e9) only in A5-A6's and A4's files: the pole's two
+  files and its lines in the vocabulary and the runner, the towed boat's two files, `trim.py`,
+  `verbs.py`, `integrate.py`, `sails.py`, `graph.py`, `boats.py`, `dealings.py`, `ports.py`,
+  `scripts.py`'s A5-A6 and A4 lines, `test_agents.py`, and `test_boat_towed.py`,
+  `test_pole_mast.py` and `test_yard_level.py`.
+- The merge's own lens was cut at 48% by the machine's restart, with no failure to then. The
+  lens below is run on the five's tree.
+
+## A1d's hash (nudge 51): the five that ride it, the manoeuvre behind the work handed on, who has the work, her head, missed stays and the captain's road (2026-11-22)
+
+**On `…/pkg-90-a1d` at cde50e7** (above). Every changed line is this pass's own, in the files
+below. "Old" in the words below is cde50e7 (A1d on A1c's hash, before the five). **The base** of
+the tiers' comparison is `…/pkg-90` at **a13fb0f**, its two tiers run here on its own worktree.
+
+**Commits:** this pass is one commit, which carries this section with its code and the merge's
+section above. **The fast and the slow tier run on that exact commit**, whose hash is the one
+sent. Their results follow in a commit after it that touches this report alone.
+
+**Files** (my row's; none widened):
+- `freesail/evolutions/scripts.py`:
+  - `ChangeLateenScript.holds`: the work handed on holds the ship;
+  - `Script.lateen_way` and its three overrides (the tack, the wear, the box-haul), passed at the
+    hand-on as `way`, read by `ChangeLateenScript._handed_awa` as each yard is set;
+  - `TackScript.words`: her head where the line says she lies otherwise;
+  - the tack's end: missed stays read there on a hull with a whole lateen, and
+    `TackScript._miss_stays` saying her lateens where they lie.
+- `freesail/evolutions/runner.py`: `start`, the waiting line said where work handed on keeps a
+  whole-ship order waiting; `HANDED_ON` imported again.
+- `freesail/orders/crew.py`: `all_hands_work` reads the work's own request.
+- `tests/test_lateen_whole.py`: "The five that ride A1d's hash", 14 cases; no pin of before
+  moved.
+- `docs/dev/TuningNotes.md`: "Package 90, the five that ride A1d's hash".
+
+**Form:** no class and no field is added: a method on `Script` with three overrides, a key in the
+work handed on's params (read only where present, so that a save from before keeps the deck's
+reading), and a parameter. So truth 7-606 and the checkpoint's list are not touched, and a save from
+before loads. No ship file and no committed book moves (`python tools/gen_ships.py <scratch>`: 18 of
+18 byte for byte). LF; `ruff check` and `ruff format --check` clean; no Python line over 100.
+Nothing under `docs/agents/consent/`.
+
+### The five, each with its proof
+
+Each proof is in `tests/test_lateen_whole.py`, "The five that ride A1d's hash". Each fails when its
+mend is undone: the session's scratch `n51/mutate51.py`, fourteen mutations, each failing its pins.
+
+1. **No manoeuvre begins while a lateen of hers is in its gear in work handed on.** The work a
+   belay hands on holds the ship, as the manoeuvre it stands for held her
+   (`ChangeLateenScript.holds`). A manoeuvre ordered then waits behind it, and the runner says so
+   at the order ("'Fill away' will follow 'shift the foresail', which the hands are still at.").
+   A whole-ship order's line is the runner's started line, and this one would go unsaid
+   (`Runner.start`, the lines for the lead below). It begins when the yard is set.
+
+   The ground came from a second cause, found by the pin: the work handed on drew each yard's
+   sheet for the wind on deck as it was set. The manoeuvre draws it close-hauled on the way it
+   reckons with (`full_and_by_apparent`: the tack's way at "helm's a-lee", the wear's and the
+   box-haul's before the helm, the fill away's her way as she has it). The manoeuvre now hands
+   on that way (`Script.lateen_way`), and the work draws each yard as the manoeuvre would.
+
+   Measured, seed 7, from hove to, the fore lateen on her weather side, `fill away`, `belay that`
+   a second into the change, `fill away` again (`n51/r1e.py`), old and new:
+
+   | | Plain: "Filled away", to windward in 30 min | Given again, old | Given again, new |
+   |---|---|---|---|
+   | The polacre | 187 s, 650.9 m | 190 s, 1,194.5 m (+543.6) | 190 s, 624.8 m (−26.1) |
+   | The xebec | 185 s, 1,333.7 m | 187 s, 1,388.7 m (+55.0) | 186 s, 1,333.2 m (−0.5) |
+
+   (The table's times are the yard's, drawing on the new side. "Filled away" itself is said at
+   254 s plain and 265 s given again on the polacre, and at 196 and 198 s on the xebec; old, 49
+   and 14 s.)
+
+   Each yard handed on is now set with its sheet as the plain manoeuvre sets it, to the fourth
+   place, in all six of nudge 48's cases. Old, the xebec's tack belayed set her three lateens'
+   sheets at 0.0, 0.0 and 0.11 against 0.81, 0.80 and 0.83, and the fill away's at 0.997 against
+   0.58. The ground, belayed as the change begins against plain, in half an hour: the xebec's tack
+   −1,538.9 m old, −0.8 m new; the tartane's −108.2 and −0.8; the polacre's −88.8 and 0.0; her
+   box-haul −95.1 and −35.9; the xebec's wear −832.3 and −1.4. The time until her lateens draw on
+   the new side is nudge 48's in every case, to the second, but the xebec's wear belayed, 260 s
+   against 259 (plain 258).
+
+   Proofs: `test_a_fill_away_belayed_and_given_again_waits_behind_the_work_handed_on_and_gains_nothing`
+   (the polacre and the xebec: "Filled away" no sooner, no more ground in half an hour, the
+   waiting line said, the second begun after the yard is set), and
+   `test_each_yard_handed_on_is_set_with_its_sheet_as_the_manoeuvre_sets_it` (the six).
+2. **Who has the work, at `pipe down`.** `all_hands_work` (`orders/crew.py`) read the work's file
+   (`change_lateen.yaml`'s `hands: all`) beside its own state. It now reads the work's own request
+   wherever it has one, and the file only for work that has none (no company, a save from before
+   it). With a crew a request is always made from the file's line (an all-hands line stays all
+   hands whatever selector is given: `Runner._crew_line`), so no other work's answer moves. The
+   work handed on carries the manoeuvre's request.
+   - A fill away by twelve of the starboard watch, belayed: old "All hands are still at work
+     (shifting the foresail); pipe down when it is done.", no hand called; new "Nobody is turned
+     up; the starboard watch has the deck.", the line any ship gives while her watch has work in
+     hand. The yard is shifted by them in its time.
+   - A tack by all hands, belayed: refused as before, truly.
+
+   Proof: `test_pipe_down_after_the_watchs_work_is_belayed_says_who_has_it`.
+3. **Her head where she has not paid off to the course** (`TackScript.words`). Wherever the line
+   says she lies otherwise than it claims (`not_paid_off`, said only on a hull with a whole
+   lateen), the heading in it is her head and not the course. No probe end in play reaches it:
+   the sweep of the three probes over eight courses each (`n51/r3.py`, 48 ends) has none, and the
+   helm alone pays her off when her head sails are taken from her. So it is pinned at the tack's
+   own door: a tack for E by N ended on its last trim lying 44° off the wind with a knot of
+   sternway. Old "heading E by N (79°), but she has not paid off to it: she lies 44° off the
+   wind ..."; new her head, NE (44°).
+
+   Proof: `test_where_she_has_not_paid_off_to_the_course_the_line_gives_her_head`.
+4. **Missed stays, not "Tacked".** On a hull with a whole lateen, a tack that ends with the wind
+   on her old side by more than two points has not come round. It has missed stays, read as the
+   hung tack's miss reads it ("she fell off on the old tack"), and is told so in the game's own
+   words. The urgent line says her lateens where they lie as she misses. It is read where the
+   tack ends, so that a tack fallen back that comes round before its end is a tack, as it was.
+   The polacre probe, her foresail taken in, tacked, her mizen shifted in stays:
+   - old "Tacked; braced up on the starboard tack, heading SW by S (217°), the mizen on the mast,
+     but she has not paid off: she lies 143° off the wind with no way on her.";
+   - new "Missed stays: she fell off on the old tack, the mizen on the mast. Up helm; square the
+     yards; flatten in the head sheets; ease off the mizen sheet.", then "Squared the yards; she
+     fell off on the starboard tack, to try again or to wear.".
+
+   Over the polacre's 25 tacks of `n51/r4.py` (five winds, five sail plans), that end alone moves.
+   Read at the moment she fell back instead, eight tacks at 20 and 24 knots that come round by
+   their end were called missed (the mutation "read as she falls back").
+
+   Proofs: `test_a_tack_that_falls_back_on_her_old_tack_has_missed_stays` and
+   `test_a_tack_fallen_back_that_comes_round_before_its_end_is_a_tack` (the polacre at 20 knots:
+   her head through, back on her old side 84° with two knots of sternway, round on the new tack by
+   the end, "Tacked; braced up on the larboard tack, heading ENE (68°).", old and new).
+5. **The captain's wiring, through his own road.** His work (`_work`) calls the lateens' work and
+   reads the bow's line. Two tests drive `_work` itself, a sailing state set and his orders
+   recorded:
+   - the practice set as the wind falls under his book's 12 knots, and each yard shifted after a
+     board of 30 minutes on the bad hand;
+   - each lateen the bow's line named shifted.
+
+   With either call taken out of `_work`, its test fails.
+
+   Proofs: `test_the_rules_captains_own_work_sets_the_practice_and_shifts_the_yards_on_the_bad_hand`
+   and `test_the_rules_captains_own_work_shifts_the_lateens_the_bow_left_on_their_masts`.
+
+### Ruled, nothing to build
+
+- Unsure 1 (`belay that` twice finds the newest order first) and unsure 2 (the long belay line of
+  the work handed on) of A1c's hash: allowed as built.
+- Listed, not asked: the places' "the tiller is" credited to Falconer's QUARTER-DECK, to be worded
+  when that file is next touched (not in my row); "full and by" at 66° with sternway by the angle's
+  rule, the trunk's.
+
+### Measured: today's ships
+
+- **A2's harness** (270 runs) and **the wind-shift runs** (`n46/windshift.py`, 108) on this tree,
+  beside a13fb0f's (the base) and cde50e7's (old): running beside this commit. Their result follows
+  in the next commit, which touches this report alone.
+- Every changed road is read only on a hull that carries a whole lateen, or only by the work a
+  belay hands on, which only a whole lateen's change makes, but one: `all_hands_work`, which reads
+  for every other work the same flag as before (item 2).
+
+### The test sets run, with counts, and the base comparison
+
+The fast and the slow tier whole run on this commit now, and the base's on a13fb0f beside it.
+Their results follow in the next commit, which touches this report alone.
+
+**The lens of the touched files** (52 files, `-n 2`, the list in the session's scratch
+`n51/lens_files.txt`) runs beside the tiers; its count follows with theirs. Before the commit,
+`tests/test_lateen_whole.py` whole: 227 passed.
+
+### For the lead
+
+1. **A whole-ship order made to wait is said by no line, on any ship.** `_ship_evolution`
+   (`orders/verbs.py`) returns the runner's "'Tack ship' will follow '...', which the hands are
+   still at." as `evolution.started`, and the world drops that kind's text, since the runner writes
+   its own started line. So a manoeuvre ordered behind work that holds the ship (another
+   manoeuvre, sending down the topgallant masts, furling all, the anchor's work) waits unsaid.
+   `orders/fight.py` and `orders/damage.py` name theirs `evolution.queued`. Mended at its cause it
+   would move today's ships' lines, so it is not built: a stop. The work handed on's wait is said
+   by the runner itself (item 1), as A1d's take-in wait is.
+2. **A tack missed on a hull with no whole lateen** is read as before: package 75's B3.4b names
+   the tack she lies on ("Tacked; braced up on the starboard tack ..." of a ship fallen back), and
+   no other ship's end moves.
+
+**Next:** the tiers, then `…/pkg-90-a1d` merged into `…/pkg-90-engine`, as before, and A5-A6.
