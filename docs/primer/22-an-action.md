@@ -76,7 +76,7 @@ The minute's line of your own fire is notable (marked `*`) when a shot struck he
 
 ## The damage
 
-No second model of the ship exists for the fight. A hit is a change of state the game already has: a line shot away comes down as a parted line does, a spar shot away is cleared as a wreck is, a sail holed draws the less, a gun dismounted is out of the bill, the wheel shot away loses you the helm until the relieving tackles are rove, a shot hole is written with its place against the waterline for the well to read when the water comes (chapter 25), and the men at the part struck are killed and wounded in the muster, off the bill. The carpenter's and the boatswain's report:
+No second model of the ship exists for the fight. A hit is a change of state the game already has: a line shot away comes down as a parted line does, a spar shot away is cleared as a wreck is, a sail holed draws the less, a gun dismounted is out of the bill, the wheel shot away (or the tiller, in a hull steered by one) loses you the helm until the relieving tackles are rove, a shot hole is written with its place against the waterline for the well to read when the water comes (chapter 25), and the men at the part struck are killed and wounded in the muster, off the bill. The carpenter's and the boatswain's report:
 
 ```
 the damage

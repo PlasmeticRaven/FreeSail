@@ -3075,7 +3075,12 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
-GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (28741, 30178 and 56925: "Hands to the after braces; heave to." and "Fill away; man the after
+# braces." before); three lines' words, the 766 lines, every tick and every kind the same
+# (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
+GATE_5B_SCHOONER_DIGEST = "0fef1c52128ce9b2"
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4312,7 +4317,13 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # (6436eb06a665f379 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
-GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
+# package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose yards
+# are head yards alone, mans her head braces to heave to and fill away (17461, 18301, 89192 and
+# 90359: "Hands to the after braces; heave to.", "Fill away; man the after braces." before) and
+# is not told to brace in after yards she has not as she wears (90475: "Stand by to wear ship.
+# Up helm; brace in the after yards." before); five lines' words, the 3,096 lines, every tick
+# and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
+GATE_5C_MERCHANT_DIGEST = "8259996fb122428e"
 
 
 def _people(world) -> list[dict]:
@@ -4774,7 +4785,14 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # severity, and 58a's recurring lines are routine in this passage too
 # 75's words, passed by the lead by its lines (9d9efe6b21c17060 before); package 98, step 5
 # (8744d3e56cfc9508 at 65)
-GATE_6A_INTENT_DIGEST = "5d3cbbc5f4d33b84"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (19081, 19921, 30721, 32090, 64861, 66054, 83341, 84524, 97741 and 99087: "Hands to the after
+# braces; heave to." and "Fill away; man the after braces." before) and is not told to brace in
+# after yards she has not as she wears (88141: "... Up helm; brace in the after yards." before);
+# eleven lines' words, the 2,079 lines, every tick and every kind the same (5d3cbbc5f4d33b84
+# before; TuningNotes, "Package 90, A2")
+GATE_6A_INTENT_DIGEST = "7239b1a1ed45736f"
 
 
 @pytest.fixture(scope="module")
@@ -4963,7 +4981,11 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # (7076e667c2bc41e3 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# merchant passage's five lines as GATE_5C_MERCHANT_DIGEST's (17461, 18301, 89192, 90359 and
+# 90475), the 3,108 lines, every tick and every kind the same (f47f7bc0daabc950 before;
+# TuningNotes, "Package 90, A2")
+GATE_6A_FAKE_CAPTAIN_DIGEST = "50529f09d4de955e"
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -20776,6 +20798,14 @@ def test_truth_7_631_strike_the_colours_strikes_her_colours_with_the_fighting_bo
     assert e.kind == "standing.belayed", (e.kind, e.text)
 
 
+# Package 90, A3: the refusal in the words of a helm steered by a tiller, the first action's
+# cutter's (truth 7-632; `evolutions.scripts.HELM_WORDS`), beside the wheel's `HELM_LOST_WORDS`
+TILLER_LOST = (
+    "The tiller is shot away and the helm does not answer: rig the relieving tackles ('rig the "
+    "relieving tackles') to steer her by them, or ship the spare tiller ('ship the spare tiller')."
+)
+
+
 def _wheel_lost_at_seed_6():
     """The first action at seed 6 as the harbour starts it, run to the shot that takes her
     wheel (truth 7-626's own passage)."""
@@ -20798,12 +20828,19 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     to` stands (tried with the helm dead, she comes to by her sails), its line saying that
     the helm does not answer. With the tackles rove every one is taken again.
 
-    The first action at seed 6, the player at the prompt on the minute the wheel goes."""
+    The first action at seed 6, the player at the prompt on the minute the wheel goes.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick the same: the first action's ship is the cutter, who steers by a tiller, so her
+    refusals and her aside are the tiller's (`TILLER_LOST`, "the tiller shot away"), where they
+    were the wheel's (`HELM_LOST_WORDS`, "the wheel shot away"), which every ship steered by a
+    wheel keeps."""
     from freesail.evolutions.scripts import HELM_LOST_WORDS
 
     assert "'rig the relieving tackles'" in HELM_LOST_WORDS
     assert "'repair the wheel'" in HELM_LOST_WORDS
     w = _wheel_lost_at_seed_6()
+    assert w.ship.hull.spec.helm == "tiller"
     held = float(w.ship.dyn.rudder)
     refused = (
         "steer north-west",
@@ -20819,13 +20856,13 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     )
     for order in refused:
         e = _said(w, order)
-        assert e.kind == "order.rejected" and e.text.endswith(HELM_LOST_WORDS), (order, e.text)
+        assert e.kind == "order.rejected" and e.text.endswith(TILLER_LOST), (order, e.text)
     e = _said(w, 'standing order "by the wind": every 1 minute then steer north-west')
     assert e.kind != "order.rejected", e.text
     at = w.clock.tick
     w.run(130)
     fired = [x for x in w.log if x.tick > at and x.kind == "order.rejected"]
-    assert fired and all(x.text.endswith(HELM_LOST_WORDS) for x in fired), [x.text for x in fired]
+    assert fired and all(x.text.endswith(TILLER_LOST) for x in fired), [x.text for x in fired]
     assert not [x for x in w.log if x.tick > at and x.kind == "helm.order"]
     assert _said(w, 'strike standing order "by the wind"').kind == "standing.struck"
     assert abs(float(w.ship.dyn.rudder) - held) < 1e-9, "the rudder moved with the wheel gone"
@@ -20835,7 +20872,7 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     assert e.kind != "order.rejected", e.text
     w.run(5)
     said = [x.text for x in w.log if x.kind == "evolution.step" and x.tick >= e.tick]
-    assert any("the helm not answering, the wheel shot away" in s for s in said), said
+    assert any("the helm not answering, the tiller shot away" in s for s in said), said
     assert not any("helm a-lee" in s for s in said), said
 
 
@@ -20852,7 +20889,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     over, read twice: by the tackles, half the wheel's; the wheel repaired,
     the wheel's own (her file's five degrees a second). `repair the wheel` given twice is
     said once; with the wheel whole it is refused in words; the wheel made good, the
-    relieving tackles are no longer wanted."""
+    relieving tackles are no longer wanted.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick and every rate the same: the first action's cutter steers by a tiller, so her
+    tackles are hooked to its stump, "more slowly than by the tiller", and `repair the wheel` is
+    answered as the spare tiller shipped, given twice, done and with the tiller whole in the
+    tiller's words; the wheel's ("by the wheel", "repairing the wheel", "The wheel is repaired
+    and new wheel-ropes rove", "the wheel is whole") are every wheel ship's still."""
     import yaml
 
     spec = yaml.safe_load(open("data/evolutions/relieving_tackles.yaml", encoding="utf-8"))
@@ -20886,7 +20930,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
             break
     assert ship.extra.get("helm_by_tackles") and ship.extra.get("helm_rate_share") == 0.5
     relieved = [x.text for x in w.log if x.kind == "helm.relieved"]
-    assert relieved and relieved[-1].endswith("more slowly than by the wheel."), relieved
+    assert relieved and relieved[-1].endswith("more slowly than by the tiller."), relieved
     assert _said(w, "right the helm").kind == "helm.order"
     w.run(30)
     by_tackles = travel()
@@ -20896,14 +20940,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert e.kind != "order.rejected", e.text
     w.run(5)
     twice = _said(w, "repair the wheel")
-    assert twice.text.endswith("The hands are repairing the wheel already."), twice.text
+    assert twice.text.endswith("The hands are shipping the spare tiller already."), twice.text
     for _ in range(200):
         w.run(30)
         if not ship.extra.get("helm_by_tackles"):
             break
     done = [x.text for x in w.log if x.kind == "helm.repaired"]
     assert done == [
-        "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; "
+        "The spare tiller is shipped in the rudder head: she steers by the tiller again; "
         "the relieving tackles are cast off."
     ], done
     assert not ship.extra.get("helm_lost") and not ship.extra.get("helm_by_tackles")
@@ -20914,7 +20958,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert by_wheel == pytest.approx(rate * 5, rel=0.02), (by_wheel, rate)
     assert by_tackles == pytest.approx(0.5 * by_wheel, rel=0.03)
     whole = _said(w, "repair the wheel")
-    assert whole.kind == "order.rejected" and "the wheel is whole" in whole.text, whole.text
+    assert whole.kind == "order.rejected" and "the tiller is whole" in whole.text, whole.text
     none = _said(w, "rig the relieving tackles")
     assert none.kind == "order.rejected" and "no need of the relieving tackles" in none.text
 
@@ -20934,7 +20978,12 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     steers again by them; and the action over he orders the wheel repaired. And the gale
     trial of the station (`trial-station-gale`, an hour in, the wind over thirty knots),
     her wheel lost as the hit leaves it (no shot is to be had in a gale: the hit's own
-    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too."""
+    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"; the lead's word
+    of nudge 31), words only, every tick the same: the first action's cutter steers by a tiller,
+    so his mend order is her helm's, "shipping the spare tiller", where it was "repairing the
+    wheel", which every ship steered by a wheel keeps."""
     w = _wheel_lost_at_seed_6()
     lost = w.clock.tick
     for _ in range(40):
@@ -20952,7 +21001,7 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     w.run(3600)
     after = [x for x in w.log if x.tick > rove[0] and str(x.actor).startswith("captain")]
     assert [x for x in after if x.kind == "helm.order"], "he never steered by the tackles"
-    assert [x for x in after if "repairing the wheel" in x.text], [x.text for x in after][-8:]
+    assert [x for x in after if "shipping the spare tiller" in x.text], [x.text for x in after][-8:]
 
     from freesail import units as U
     from tests.test_captain_trials import trial
@@ -23336,6 +23385,153 @@ def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
         {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
     )
     assert D.budget_of(w).acts == before + 1
+
+
+# ---------------------------------------------------------------------------
+# Package 90, A1d: a whole lateen aback, and on the bad hand, in a breeze (truths 7-670 to 7-672)
+# ---------------------------------------------------------------------------
+# The owner's decision of 2026-11-18: "A lateen taken aback should increase the strain on the
+# mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may
+# strain the mast and, in high enough wind, risk damage." The lead's figures, ruled (nudge 18 and
+# 22): aback a great yard strains from about 28 kn and may carry away from about 35; on the bad
+# hand from about 40 and 49; the rules captain's board under 12 kn under a fifth of the rating.
+# docs/design/Design-Package90-Engine.md §2.4.3 and §2.2b. On the probes of `tests/rig_fixtures.py`
+# with `dipping` on each whole lateen (no committed file carries one), their lateen yards and masts
+# rated by the generator's rule (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`:
+# a lower yard for its own sail, a lower mast for every sail on it), as the design measured them.
+# Seed 7, a steady northerly, the starboard tack 67.5 degrees off under plain sail trimmed,
+# settled 600 s. "Strains" is a load over the rating (`physics/strain.py`: wear over 1.0), "may
+# carry away" over one and a half times it (a chance at every substep over `CARRY_AWAY_RATIO`).
+
+
+def _a1d_probe(doc_fn, knots: float, tmp_path: Path):
+    """A lateen probe settled in `knots`, its lateen yards and masts rated by the generator's
+    rule; the World and those spars."""
+    from rig_fixtures import write_ship
+
+    from tools.gen_ships import DESIGN_WIND_KN, design_kn
+
+    doc = doc_fn()
+    for s in doc["sails"]:
+        if s.get("class") == "lateen" and not s.get("cut_at_mast"):
+            s["dipping"] = True
+    path = write_ship(doc, tmp_path, f"{doc_fn.__name__}-{knots:g}")
+    world = make_world(
+        7,
+        path,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=knots,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=292.5,
+            ship_speed_kn=5.0,
+        ),
+    )
+    ship = world.ship
+    spars = []
+    for sl in ship.sails.values():
+        if sl.cls != "lateen":
+            continue
+        yard, mast = ship.yard_of(sl), ship.mast_of(sl)
+        on_mast = [s for s in ship.sails.values() if ship.mast_of(s) is mast]
+        lower = DESIGN_WIND_KN["lower"]
+        yard.rating_kn = float(design_kn([(sl.area_m2, sl.centre_height_m, sl.curve_class)], lower))
+        mast.rating_kn = float(
+            design_kn([(s.area_m2, s.centre_height_m, s.curve_class) for s in on_mast], lower)
+        )
+        spars += [yard, mast]
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 0 and i > 240:
+            world.submit("trim sails")
+        world.tick()
+    return world, spars
+
+
+def _a1d_peaks(world, spars, seconds: int) -> tuple[dict[str, float], int]:
+    """Each spar's peak load over its rating, and the seconds a lateen stood aback."""
+    peak = {sp.id: 0.0 for sp in spars}
+    aback = 0
+    for _ in range(seconds):
+        world.tick()
+        for sp in spars:
+            peak[sp.id] = max(peak[sp.id], sp.load_kn / sp.rating_kn)
+        aback += any(sl.backed for sl in world.ship.sails.values() if sl.cls == "lateen")
+    return peak, aback
+
+
+def _a1d_on_the_bad_hand(world) -> None:
+    """Every lateen's yard on the weather side of its mast, its cloth drawn round to leeward."""
+    from freesail.evolutions import trim as yard_trim
+
+    ship = world.ship
+    for sl in ship.sails.values():
+        if sl.cls == "lateen":
+            sl.lug_side = "starboard"  # the starboard tack: the weather side
+            yard_trim.set_sheet_angle(ship, sl, sl.sheet_angle, "larboard")
+
+
+def test_truth_7_670_a_great_lateen_taken_aback_strains_from_about_28_kn_and_risks_it_from_35(
+    tmp_path,
+):
+    """The tartane probe's great lateen taken aback by a shift with her way on (the wind come 20
+    degrees on her other bow, 120 s, nobody shifting it): under its yard's rating in 26 kn,
+    strained in 31 and not at risk, over one and a half times it in 38 (measured: 0.94 in 28,
+    1.26 in 31, 1.46 in 34, 1.71 in 37); its mast, carrying her topsail and head sails too, rated
+    higher and under its rating in 31. Her mizen's mast carries only its lateen and strains with
+    its yard, by the owner's words."""
+    from rig_fixtures import tartane_probe_doc
+
+    peaks = {}
+    for knots in (26.0, 31.0, 38.0):
+        world, spars = _a1d_probe(tartane_probe_doc, knots, tmp_path)
+        wind = world.wind
+        wind.follow(units.wrap_2pi(wind.base_direction - math.radians(87.5)), wind.base_speed)
+        world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+        peaks[knots], aback = _a1d_peaks(world, spars, 120)
+        assert aback >= 10  # held aback, its cloth on the mast ("taken aback" after 10 s)
+    yard = [peaks[k]["main.lateen_yard"] for k in (26.0, 31.0, 38.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+    assert peaks[31.0]["main.mast"] < 1.0, peaks
+    for k in peaks:
+        assert peaks[k]["mizzen.mast"] == pytest.approx(peaks[k]["mizzen.lateen_yard"])
+
+
+def test_truth_7_671_a_lateen_on_the_bad_hand_strains_from_about_40_kn_and_risks_it_from_49(
+    tmp_path,
+):
+    """The polacre probe close-hauled with both lateens on the bad hand, each yard on the weather
+    side of its mast and its cloth drawn round to leeward (300 s): her fore lateen yard under its
+    rating in 38 kn, strained in 45 and not at risk, over one and a half times it in 52 (measured:
+    0.95 in 42, 1.37 in 46, 1.59 in 50), and never aback."""
+    from rig_fixtures import polacre_probe_doc
+
+    peaks = {}
+    for knots in (38.0, 45.0, 52.0):
+        world, spars = _a1d_probe(polacre_probe_doc, knots, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks[knots], aback = _a1d_peaks(world, spars, 300)
+        assert aback == 0
+    yard = [peaks[k]["fore.lateen_yard"] for k in (38.0, 45.0, 52.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+
+
+def test_truth_7_672_the_rules_captains_board_on_the_bad_hand_under_12_kn_is_under_a_fifth(
+    tmp_path,
+):
+    """The rules captain lies on the bad hand only by choice under 12 kn, for no more than a board
+    of 1,800 s (truth of A1c's keys): so lying, each lateen yard and mast of the tartane and the
+    polacre probes stays under a fifth of its rating (measured: 0.12 and 0.10 the tartane's, 0.08
+    and 0.10 the polacre's), and under its rating a part loses nothing."""
+    from rig_fixtures import polacre_probe_doc, tartane_probe_doc
+
+    for doc_fn in (tartane_probe_doc, polacre_probe_doc):
+        world, spars = _a1d_probe(doc_fn, 12.0, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks, aback = _a1d_peaks(world, spars, 1800)
+        assert max(peaks.values()) < 0.2 and aback == 0, (doc_fn.__name__, peaks)
+        assert all(sp.condition == 100.0 for sp in spars)  # no wear under the rating
 
 
 # -- package 121 (the owner's word of 2026-11-20): her service is her papers' -----------------

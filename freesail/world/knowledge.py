@@ -1298,14 +1298,18 @@ def _heard_where_said(world: Any, kind: str, data: dict[str, Any], spot: Any) ->
     return all(within_hearing(spot_of(world, p), spot) for p in speakers)
 
 
-def rows_elsewhere(senses: Senses) -> list[Any]:
+def rows_elsewhere(senses: Senses, world: Any = None) -> list[Any]:
     """The rows of the readings registry not to be had by these senses (the sample's and
     the snapshot's "not to be had here"): the rows a person is asked, the driver's, the
-    parametric and the absent left out."""
+    parametric and the absent left out; and, given the `world`, the rows that are not her own
+    (package 90, the lead's nudge 48, item 3: the lateens' practice where she carries no whole
+    lateen, `readings.idle_lateen_rows`, so that "... and 18 more" is the trunk's to the byte on
+    every ship without one, where it had become "19 more")."""
     from freesail.api import readings as R
 
     if senses.everything:
         return []
+    not_hers = R.idle_lateen_rows(world) if world is not None else set()
     return [
         r
         for r in R.REGISTRY
@@ -1313,6 +1317,7 @@ def rows_elsewhere(senses: Senses) -> list[Any]:
         and r.parametric is None
         and r.kind not in R.DRIVER_KINDS
         and not r.per_asker
+        and r.id not in not_hers
         and not reading_here(r, senses)
     ]
 

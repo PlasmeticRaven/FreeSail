@@ -5,11 +5,19 @@
 # out" (Steel 1794 vol. II p. 316). There is no hoist: the yard stands slung at its truss,
 # held by its lifts (Lavery, I32). The sheet is trimmed to the point of sail, 18 to 85 degrees
 # for a sail cut at the mast and 8 to 85 for a whole lateen. Times as for setting a gaff sail
-# (judgement). It is not set on a wrecked boom.
+# (judgement). It is not set on a wrecked boom. A whole lateen's yard aloft keeps the side of the
+# mast it hangs on, as a settee's does; one never yet set is set to leeward. Set on the weather
+# side, it lies against its mast and draws the less until its yard is shifted round, and the
+# line says so.
 
 # Build notes (not served by the library's catalogue):
 # Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6, and §16 item 8, §17.2 for the
 # boom's check. The angle is `wanted_sheet`'s, by the class whose trim the sail takes.
+# Package 90, A1a (Design-Package90-Engine.md §2.3 item 1): `find_its_side`, the settee's step
+# of nought seconds, for a whole lateen alone (a lateen with `dipping`, which a lateen cut at the
+# mast never carries), so that the 64's and the 74's mizzen course and driver are set as before
+# (`tests/test_lateen.py`: 90 s, no hoist); `{on_the_mast}` ("; it lies on the mast", the
+# runner's, for a whole lateen set on the weather side of its mast, else nothing).
 id: set_lateen
 verb: set
 applies_to: {class: lateen}
@@ -36,11 +44,15 @@ steps:
     if: sail.state == in_the_gear
     sets: {sail.state: loosed}
     log: "Let go the brails of the {sail}."
+  - do: find_its_side
+    duration_s: 0
+    if: sail.dipping and sail.lug_side == none
+    sets: {sail.lug_side: "lee_side()"}
   - do: haul_out
     duration_s: 30
     sets: {sail.state: set, sail.sheet_angle: "wanted_sheet(sail)"}
 on_start: {log: "Hands to the {sail} sheet and tack."}
-on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_complete: {log: "Set the {sail}{on_the_mast}.", kind: sail.set, severity: notable}
 on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the afterguard man the after sail's gear and the topmen of its mast loose it on its
 # yard (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship', as

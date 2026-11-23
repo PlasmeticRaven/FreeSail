@@ -982,11 +982,18 @@ class Harbour:
         from freesail.ui.console import PACE_FREE, PACE_LOCKSTEP, PACE_RULE
 
         rule = {"rule": PACE_RULE, "lockstep": PACE_LOCKSTEP, "free": PACE_FREE}[pace]
+        # who the scenario says holds each station (step 9: the page offers the doors of those
+        # it gives to a model), read before the game is taken up
+        plan = self.plan(scenario)
         with self._lock:
             self.driver.replace_world(
                 world, compression=args.time, pace=rule, ease_on_station=args.ease_on_station
             )
-            self.started = True
+            # the game's words first and `started` last: `game_state` reads under the driver's
+            # lock, not this one, and a page that asks between the two must not find the game
+            # started and its plan not yet said (the stations' table then showed the officer
+            # with no model asked for, and the browser's test of it failed once in many runs
+            # beside other workers; found by package 90's engine builder at A1d's tiers)
             self.game = {
                 "scenario": scenario,
                 "ship": ship,
@@ -996,10 +1003,9 @@ class Harbour:
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
-                # who the scenario says holds each station (step 9): the page offers the
-                # doors of those it gives to a model
-                "plan": self.plan(scenario),
+                "plan": plan,
             }
+            self.started = True
         return {"lines": lines, "game": self.game_state()}
 
     def game_state(self) -> dict[str, Any]:

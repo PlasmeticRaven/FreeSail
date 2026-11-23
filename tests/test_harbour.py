@@ -567,6 +567,42 @@ def test_the_shelves_file_names_only_scenarios_that_are_there_and_each_once():
     assert all(s["says"] for shelf in Harbour.shelves(None) for s in shelf["scenarios"])
 
 
+def test_a_page_that_asks_while_a_game_starts_never_finds_it_started_without_its_plan(port, client):
+    """The harbour's start said the game started and then read the scenario's plan of the
+    stations into its words, and `game_state` reads those under the driver's lock, not the
+    harbour's: a page that asked between the two found a game started with no plan, and its
+    stations' table showed the officer with no model asked for (the browser's test of that
+    table failed once in many runs beside other workers; found by package 90's engine
+    builder). The plan is read first and `started` set last. Here the state is asked at the
+    moment the plan is read, the one moment between."""
+    (port.place / "planned.yaml").parent.mkdir(parents=True, exist_ok=True)
+    (port.place / "planned.yaml").write_text(
+        (SCENARIOS / "tender.yaml").read_text(encoding="utf-8") + "\nstations:\n  officer: model\n",
+        encoding="utf-8",
+    )
+    seen: list[tuple[bool, bool]] = []
+    read_plan = port.harbour.plan
+
+    def plan_while_a_page_asks(scenario: str) -> dict[str, str]:
+        state = port.harbour.game_state()
+        seen.append((bool(state["started"]), "plan" in state["chosen"]))
+        return read_plan(scenario)
+
+    port.harbour.plan = plan_while_a_page_asks  # type: ignore[method-assign]
+    r = client.post("/api/harbour/start", json={"scenario": str(port.place / "planned.yaml")})
+    assert r.status_code == 200, r.text
+    assert seen and all(planned or not started for started, planned in seen), seen
+    game = r.json()["game"]
+    assert game["started"] and game["chosen"]["plan"] == {"officer": "model"}
+    # and a second game in place of the first: the page asking between finds the first's
+    # words whole, or the second's, never a game started with none
+    seen.clear()
+    r = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
+    assert r.status_code == 200, r.text
+    assert seen and all(planned or not started for started, planned in seen), seen
+    assert r.json()["game"]["chosen"]["plan"] == {}
+
+
 def test_a_game_started_with_a_seat_and_a_brief_is_the_servers_game_taken_up_in_place(port, client):
     """Truth 7b-108's middle (the whole in test_known_truths): one server, its World
     replaced, the pages told, the clock held, the seat and the director's brief given by

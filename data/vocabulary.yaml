@@ -335,6 +335,17 @@ verbs:
     synonyms: [dip the yard of]
     object: sail
     level: 1
+  leave:
+    # Package 90, A1b: the ship's practice for her whole lateens in going about, the verb first
+    # and the occasion after it with no comma: `leave the lateens in stays`, `... in wearing`,
+    # `... in going about` (both); `shift the lateens in stays` and its kin set it back. The
+    # yards left on the mast lie on the bad hand until shifted (Design-Package90-Engine.md §2.3
+    # item 3). Its words, and the clause after `tack ship` and `wear ship` ("and leave the
+    # lateens"), are read on a hull with a whole lateen alone (`lateen_clause`,
+    # `lateen_occasions` below).
+    synonyms: []
+    object: sail
+    level: 1
   # Spars aloft (Luce 1884, ch. XX, 'Sending up and down topgallant-masts';
   # ch. XXIX, 'Preparations for a Gale'). The whole order is the verb: every
   # mast of that kind the ship has.
@@ -1610,7 +1621,8 @@ verbs:
   # steers by the wheel again and the relieving tackles are cast off
   repair the wheel:
     synonyms: [repair wheel, mend the wheel, repair the helm, reeve new wheel ropes,
-               reeve the wheel ropes, reeve new tiller ropes, ship a new wheel]
+               reeve the wheel ropes, reeve new tiller ropes, ship a new wheel,
+               ship the spare tiller, ship a spare tiller, ship a new tiller, repair the tiller]
     object: damage
     level: 1
   sling the yards:
@@ -1963,6 +1975,7 @@ evolutions:
   dip:
     lug: dip_lug
     settee: dip_settee  # package 75: the settee's yard lowered and passed round
+    whole_lateen: change_lateen  # package 90, A1a: a whole lateen's yard peaked and passed round
   brace: brace
   square: brace
   back: brace
@@ -1997,6 +2010,9 @@ evolutions:
     studding: shift_sail
     lug: shift_sail  # package 43b: the lugger's lugs and the taille-vent
     lateen: shift_sail  # package 75
+    # package 90, A1a: a whole lateen (a lateen with `dipping`) shifted round its mast; said
+    # "for" a sail (`shift the mainsail for a new one`) it is the sail room's, by its class
+    whole_lateen: change_lateen
     spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
   cut away: clear_wreck
   send down: clear_wreck
@@ -2177,6 +2193,22 @@ sheet_to:
   to weather: weather
   to leeward: lee
   over to leeward: lee
+# Package 90, A1b (Design-Package90-Engine.md §2.3 item 3): read on a hull with a whole lateen
+# alone, every other hull's answers as they were. After `tack ship`, `wear ship` or `put her
+# about`, the clause that says which whole lateens the going about shifts round their masts and
+# which it leaves on them: "and shift the lateens", "and leave the mizen" ("change" is "shift";
+# Steel 1794 II, CHANGE THE MIZEN). After `leave` or `shift` said of the lateens, the occasion
+# their practice is for, in stays, in wearing, or both. "On the mast" after the lateens left is
+# the words' own and says nothing more.
+lateen_clause:
+  and shift: shift
+  and change: shift
+  and leave: leave
+lateen_occasions:
+  in stays: stays
+  in wearing: wearing
+  in going about: both
+lateen_on_the_mast: [on the mast, on their masts, on its mast]
 reef_close: [close, close reefed, close reef, close reefs, all reefs]
 tack_phrase: ["on the", "on", "to the"]   # "on the starboard tack", "to the starboard tack"
 point_directions:
@@ -2435,6 +2467,10 @@ more_work_nouns:
   # package 115 D4 (e): `belay the relieving tackles`, the work by its own name
   relieving tackles: rig the relieving tackles
   wheel: repair the wheel
+  # package 90, A3 (nudge 45): the mend by the tiller's words, as by the wheel's, on either
+  # helm (`belay the tiller`, `belay the spare tiller`; the work named by her helm)
+  tiller: repair the wheel
+  spare tiller: repair the wheel
 
 # ---------------------------------------------------------------------------
 # What undoes what (package 37g, item 5; the review of gate 5c's playtests, 5.4 and 10.5):
