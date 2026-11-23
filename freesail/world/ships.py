@@ -2041,7 +2041,7 @@ class Vessels:
         brought up to her truth every tick of the followed hull's (`World._tick_vessels`)
         and at every asking; None on the endless plane. The name is the shadow's, which
         every reader of hers asked by it; she is the one vessel the sea never moves."""
-        from freesail.world.captains import _is_kings_ship
+        from freesail.world.service import MERCHANT, service_of
 
         with first_hull_current(world) as world:
             pos = getattr(world, "position", None)
@@ -2061,7 +2061,9 @@ class Vessels:
                 # officer and a merchant brig under a master, as before
                 rows = [k for k, d in DESCRIPTIONS.items() if d["file"].split("/")[-1] == name]
                 key = rows[0] if source and rows else ""
-                if key == "brig-sloop" and not _is_kings_ship(world):
+                # a merchant by her papers, her role or her wardroom reads as the merchant
+                # brig; a privateer keeps the brig-sloop's armed look (package 121)
+                if key == "brig-sloop" and service_of(world) == MERCHANT:
                     key = "merchant brig"
                 d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
                 ports = getattr(world, "dealings", None)

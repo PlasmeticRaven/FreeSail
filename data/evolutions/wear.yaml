@@ -26,7 +26,9 @@ on_start: {log: "Stations for wearing ship."}
 # `full_and_by`, kept full and by on the new tack. Ordered by its own word she has neither,
 # and comes to close-hauled as she always has.
 # (no defaults declared: absent, they read as none, `freesail/evolutions/expr.py`)
-on_complete: {log: "Wore ship; {braced} on the {new_tack} tack, heading {new_course}{course_words}.", kind: ship.wore, severity: notable}
+# {lateens_said} (package 90, A1b): ", the mainsail on the mast" where a whole lateen ends on the
+# weather side of its mast, left by the order or the practice; nothing for any other ship
+on_complete: {log: "Wore ship; {braced} on the {new_tack} tack, heading {new_course}{course_words}{lateens_said}.", kind: ship.wore, severity: notable}
 on_fail: {log: "Could not wear: {reason}.", kind: evolution.failed, severity: notable}
 # crew (package 19): checked; all hands, as for tacking (Luce 1884, ch. XVIII Organization, 'Station Billet').
 crew: {hands: all, rating: ordinary, stations: [all hands]}

@@ -27,7 +27,7 @@ preconditions: []
 timing:
   helm_rate_share: 0.5   # by the tackles, half the wheel's rate (JUDGEMENT; Luce 1884 says slower, and no figure)
   reeve_s: 300   # hooked to the tiller and manned below: five minutes (JUDGEMENT; Luce's quarter bill keeps men stationed at them, so the tackles are at hand)
-on_start: {log: "Rig the relieving tackles! Hands below to the tiller."}
+on_start: {log: "{begin}"}
 on_complete: {log: "{done}", kind: helm.relieved, severity: notable}
 on_fail: {log: "Could not rig the relieving tackles: {reason}.", kind: evolution.failed, severity: notable}
 # crew: "an officer or quartermaster, with a few men" (Luce 1884, l. 21775): six hands

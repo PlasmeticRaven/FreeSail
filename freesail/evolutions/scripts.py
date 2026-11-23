@@ -55,7 +55,7 @@ from freesail.evolutions import trim as yard_trim
 from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, LineState, Sail, SailState, Spar, sync_catharpins
-from freesail.ship.schema import YARD_LIKE_CLASSES
+from freesail.ship.schema import HELM_WHEEL, YARD_LIKE_CLASSES
 from freesail.ship.stub import OrderError
 
 if TYPE_CHECKING:
@@ -216,6 +216,24 @@ def head_sails(ship: Ship) -> list[Sail]:
     ]
 
 
+def head_sails_carried(ship: Ship) -> list[Sail]:
+    """The head sails she carries, set or not (`head_sails`' sails in any state that can still
+    be set: not blown out, unbent or carried away): what a heave-to's refusal asks of a rig of
+    whole lateens with nothing set to bring her to (package 90; the lead's nudge 46, item 3)."""
+    masts = [sp for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked]
+    fore_x = max((m.x_m for m in masts), default=0.0)
+    gone = (SailState.BLOWN_OUT, SailState.UNBENT)
+    return [
+        sl
+        for sl in ship.sails.values()
+        if sl.cls == "jibheaded"
+        and sl.x_m > fore_x
+        and ship.sheets_of(sl)
+        and not sl.wrecked
+        and sl.state not in gone
+    ]
+
+
 def drives_aft(sail: Sail) -> bool:
     """Whether a sail is worked as a ship's driver: a gaff sail, or a lateen cut at the
     mast, the mizen course on its yard (package 75; docs/design/Design-ShipsEngineExtensions.md
@@ -269,14 +287,16 @@ def let_fly_sheets(ship: Ship, sails: list[Sail]) -> None:
         sl.shivering = True
 
 
-def ease_off_sheets(ship: Ship, sails: list[Sail]) -> None:
+def ease_off_sheets(ship: Ship, sails: list[Sail], side: str | None = None) -> None:
     """Ease the sheets of these sails right off, belayed on the lee side: the sails luff
     (a jib eased right off with the wind ahead lies over to leeward and lifts; let fly it
     flogs, with a loose sail's windage all the while, which in the model cost the frigate
-    her way in stays and a hundred metres to leeward, package 32e)."""
+    her way in stays and a hundred metres to leeward, package 32e). `side` names the side
+    where a manoeuvre knows it and the deck's reading lags (package 90, A1d: a whole lateen
+    keeps the side its sheet is eased on)."""
     for sl in sails:
         geo = yard_trim.sheet_geometry(ship, sl)
-        yard_trim.set_sheet_angle(ship, sl, geo.ceiling, None)
+        yard_trim.set_sheet_angle(ship, sl, geo.ceiling, side)
         sl.shivering = False
 
 
@@ -378,6 +398,145 @@ def settees_held(ship: Ship) -> set[str]:
     return {sl.id for sl in settees(ship)}
 
 
+def is_whole_lateen(sail: Sail) -> bool:
+    """A whole lateen with a side to keep (package 90, A1a; docs/design/Design-Package90-Engine.md
+    §2.3 item 1): a sail of class `lateen` carrying `dipping`, which the schema allows only on a
+    lateen not cut at the mast. Its yard is slung on one side of its mast, as a dipping lug's is
+    (`Sail.lug_side`), and on the weather side it draws with the lug's two-thirds
+    (`physics.sails.against_the_mast`). The 64's and the 74's mizzen course and driver, lateens
+    cut at the mast, are never one, and go about as a ship's mizen."""
+    return sail.cls == "lateen" and bool(sail.dipping) and not sail.cut_at_mast
+
+
+def whole_lateens(ship: Ship) -> list[Sail]:
+    """The whole lateens set (`is_whole_lateen`), by the ship's order: what a manoeuvre may shift
+    round its mast, the stern and bow watches read against its mast, and a heave-to finds no
+    braced yard nor head sail beside (package 90, A1a)."""
+    return [
+        sl for sl in ship.sails.values() if is_whole_lateen(sl) and sl.is_set and ship.sheets_of(sl)
+    ]
+
+
+def lateens_held(ship: Ship) -> set[str]:
+    """The whole lateens set, by id: held from the order by a manoeuvre that may shift one round
+    its mast, as `settees_held` holds a settee, so that its shift by itself (`change_lateen`) and
+    its other work wait for the manoeuvre (package 90, A1a; Design-Package90-Engine.md §2.3a, row
+    2). A ship with none holds nothing more."""
+    return {sl.id for sl in whole_lateens(ship)}
+
+
+# The work a belay hands on (package 90; the lead's nudge 48, item 1): a `change_lateen` whose
+# params carry, by sail id, the seconds still to come of each yard whose change was begun in a
+# manoeuvre belayed, worked at no lighter a rate than the manoeuvre's own (`Script.handed_on`);
+# begun by the runner without the preconditions of its beginning, the yards being in their gear
+# already (`Runner._hand_on`), and without its first line, the belay's line saying it is in hand.
+HANDED_ON = "handed_on"
+
+# A whole lateen's yard shifted round its mast by itself (`change_lateen`; package 90, A1a): its
+# seconds a metre of yard, before the weather and the hands. The lugger's dip by itself
+# (`dip_lug.yaml`: 30, 60 and 60 s) for her 10.3-m main lug yard (`data/ships/lugger.yaml`), taken
+# as a rate: JUDGEMENT, the lean put to the lead and not ruled (Design-Package90-Engine.md
+# §2.4.4); in a manoeuvre the lead's 8.7 s a metre (A1b).
+LATEEN_SHIFT_ALONE_S_PER_M = 14.6
+# Its party: one able hand for each 2½ m of yard, and never fewer than four (the lead's ruling of
+# 2026-11-18, nudge 18; JUDGEMENT): the settee's seven for 16 m.
+LATEEN_YARD_M_A_HAND = 2.5
+LATEEN_LEAST_PARTY = 4
+
+
+def lateen_yard_m(ship: Ship, sail: Sail) -> float:
+    """The length of a lateen's yard, metres (0 with none)."""
+    yard = ship.yard_of(sail)
+    return float(yard.length_m) if yard is not None else 0.0
+
+
+def hands_to_give(ship: Ship) -> int | None:
+    """The hands her company can put to a lateen's change: every hand fit to work on deck but
+    the posts at the conn, never taken for all-hands work (the lead's ruling 11 of 2026-11-13);
+    None for a ship with no company (a test's stub)."""
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if crew is None:
+        return None
+    from freesail.crew import hands  # local import: the crew's own rule
+    from freesail.crew.model import Station
+
+    return sum(
+        1 for s in crew.sailors if hands.can_work(s, False) and s.station is not Station.QUARTERDECK
+    )
+
+
+def party_term(ship: Ship, party: int) -> float:
+    """The party's numbers term for a lateen's change (`crew.hands.crew_factor`'s: wanted over
+    got, never faster for more): the party over the hands her company can give, at least 1. The
+    change is all hands' work, whose own term is the whole deck's (`crew_factor`), so the party's
+    is taken here (package 90, A1a: the tartane's main, ten wanted of her eight, 10/8 of its
+    seconds, Design-Package90-Engine.md §2.4.4)."""
+    have = hands_to_give(ship)
+    if have is None:
+        return 1.0
+    return max(1.0, party / max(have, 1))
+
+
+def _how_it_went(ship: Ship, spar_id: str) -> str:
+    """'shot away' or 'carried away': how a spar went, read from the strain's own line for it
+    (`physics.strain._wreck_spar`'s `how`, which the spar does not keep), the ship's notes not yet
+    drained first and then the log's last lines; 'carried away' where no line says."""
+    notes = list(getattr(ship, "notes", None) or [])
+    for _sev, kind, _text, subject, data in reversed(notes):
+        if kind == "spar.carried_away" and subject == spar_id:
+            return str((data or {}).get("how") or "carried away")
+    world = _world_of(ship)
+    log = getattr(world, "log", None)
+    entries = log.all()[-400:] if log is not None else []
+    for e in reversed(entries):
+        if e.kind == "spar.carried_away" and getattr(e, "subject", None) == spar_id:
+            return str((e.data or {}).get("how") or "carried away")
+    return "carried away"
+
+
+def lateen_shift_befallen(ship: Ship, sail: Sail) -> str | None:
+    """What has befallen a whole lateen while its yard is being shifted round its mast, in words
+    for the line that ends its shift, else None (package 90; the lead's nudges 46 and 48): blown
+    out of its bolt-ropes; its yard or mast carried away or shot away, named where it went (the
+    mast where the mast went, though its yard is wrecked with it); the halyard that peaks the yard
+    parted, the yard come down and the sail hanging in its gear; or its sheet or tack parted, the
+    sail hanging in its gear, which is not set with a sheet or a tack parted (as no sail is). The
+    shift by itself (`ChangeLateenScript`) and the change in a manoeuvre (`LateenChange`) read it
+    each tick and leave the sail as the casualty left it; before, each set it on the new side
+    drawing."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    if sail.state is SailState.BLOWN_OUT:
+        return "it blew out of the bolt-ropes while it was being shifted"
+    gone = [sp for sp in ship.spar_chain(sail) if sp.wrecked or sp.sent_down]
+    if gone:
+        spar = gone[-1]  # the deepest spar gone: the mast where the mast went
+        how = _how_it_went(ship, spar.id)
+        return f"the {part_name(ship, spar.id)} was {how} while it was being shifted"
+    if sail.wrecked:
+        return "it was carried away while it was being shifted"
+    halyard = ship.halyard_of(sail)
+    if halyard is not None and halyard.state is LineState.PARTED:
+        return (
+            f"the {part_name(ship, halyard.id)} parted while it was being shifted; the yard came "
+            "down and the sail hangs in its gear"
+        )
+    for ln in ship.lines_of(sail):
+        if ln.cls in ("sheet", "tack") and ln.state is LineState.PARTED:
+            return (
+                f"the {part_name(ship, ln.id)} parted while it was being shifted; the sail hangs "
+                f"in its gear, not set, till its {ln.cls} is rove afresh"
+            )
+    return None
+
+
+def lateen_party(ship: Ship, sail: Sail) -> int:
+    """The able hands to shift a whole lateen's yard round its mast: one for each
+    `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY` (package 90; the lead's
+    ruling)."""
+    return max(LATEEN_LEAST_PARTY, math.ceil(lateen_yard_m(ship, sail) / LATEEN_YARD_M_A_HAND))
+
+
 # Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3
 # item 3): the ship's practice for a whole lateen's yard in going about, kept on her as a plain
 # dict of strings (`ship.extra["lateen_practice"]`, saved with her, as `COURSE_PENDING` is), for
@@ -398,6 +557,39 @@ def lateen_practice(ship: Ship) -> dict[str, str]:
     if not isinstance(kept, dict):
         kept = {}
     return {occasion: kept.get(occasion, default) for occasion, default in LATEEN_PRACTICE_DEFAULT}
+
+
+def has_whole_lateen(ship: Ship) -> bool:
+    """Whether the hull carries a whole lateen, set or not (package 90, A1b): the hull whose
+    going-about orders take the clause ("and leave the lateens") and whose practice is ordered and
+    read. Every other hull's answers are as they were."""
+    return any(is_whole_lateen(sl) for sl in (getattr(ship, "sails", None) or {}).values())
+
+
+def set_lateen_practice(ship: Ship, how: str, occasions: tuple[str, ...]) -> dict[str, str]:
+    """The ship's practice set to `how` ("shift" or "leave") for each occasion named, the others
+    kept, and kept on her as a plain dict of strings (package 90, A1b); the practice now."""
+    practice = lateen_practice(ship)
+    for occasion in occasions:
+        practice[occasion] = how
+    ship.extra[LATEEN_PRACTICE] = dict(practice)
+    return practice
+
+
+def lateen_practice_words(ship: Ship, practice: dict[str, str] | None = None) -> str:
+    """The practice in words, as the reading gives it and the order answers it: 'the lateens left
+    on the mast in stays, shifted in wearing', 'the lateens shifted in stays and in wearing'; the
+    lateen by its name on a hull with one (package 90, A1b; Design-Package90-Engine.md §2.3
+    item 3)."""
+    practice = practice if practice is not None else lateen_practice(ship)
+    lats = [sl for sl in ship.sails.values() if is_whole_lateen(sl)]
+    them = names_of_sails(ship, lats) if len(lats) == 1 else "the lateens"
+    said = {"shift": "shifted", "leave": "left on the mast"}
+    stays = said.get(practice.get("stays", "shift"), "shifted")
+    wearing = said.get(practice.get("wearing", "shift"), "shifted")
+    if stays == wearing:
+        return f"{them} {stays} in stays and in wearing"
+    return f"{them} {stays} in stays, {wearing} in wearing"
 
 
 # The settee's lines (package 75; Ext §5.5-§5.6), in the singular for one settee: hoisted on
@@ -577,6 +769,367 @@ class LugDip:
         return True
 
 
+# A whole lateen's yard shifted round its mast in a manoeuvre (package 90, A1b): the lead's
+# ruling of 2026-11-18 (nudge 18), the lugger's own rate, her 90 s in a manoeuvre (`dip_s`) for
+# her 10.3-m main lug yard, 8.7 s a metre of yard; the same in stays and in the wear; JUDGEMENT.
+LATEEN_CHANGE_S_PER_M = 8.7
+
+
+def lateen_change_s_per_m() -> float:
+    """The change's seconds a metre of yard in a manoeuvre, from the change's own file
+    (data/evolutions/change_lateen.yaml, `timing: in_a_manoeuvre_s_per_m`;
+    Design-Package90-Engine.md §2.3 item 4), so that `tack.yaml`'s and `wear.yaml`'s timings,
+    which `tests/test_catalogue.py` pins whole, do not move; `LATEEN_CHANGE_S_PER_M` where it
+    gives none."""
+    from freesail.evolutions import registry  # local import: the registry reads the files
+
+    evo = registry.get("change_lateen")
+    timing = evo.timing if evo is not None else {}
+    return float(timing.get("in_a_manoeuvre_s_per_m", LATEEN_CHANGE_S_PER_M))
+
+
+# A rig of whole lateens has paid off from her tack when her head is this near full and by on
+# the new board (package 90, A1b; Design-Package90-Engine.md §2.3 item 5, §2.2a's measure of the
+# mizen eased; JUDGEMENT): the tack's steady timeout ends her tack only then, or a further
+# `stays_timeout_s` after it, the line then saying how she lies.
+LATEEN_PAID_OFF_DEG = 10.0
+
+
+def part_name_of(ship: Ship, part_id: str | Sail) -> str:
+    """A part's name for the log ('mizen'), the runner's (a local import, to avoid a cycle)."""
+    from freesail.evolutions.runner import part_name
+
+    return part_name(ship, part_id if isinstance(part_id, str) else part_id.id)
+
+
+def lateen_plan(ship: Ship, params: dict[str, Any], occasion: str) -> dict[str, list[str]]:
+    """Which whole lateens set a going about shifts round their masts and which it leaves on the
+    bad hand (package 90, A1b; Design-Package90-Engine.md §2.3 items 2-3): by the order's clause
+    (`params["lateens"]`: "shift" or "leave" for a sail by its id, or for them all under "all"),
+    else by the ship's practice for the occasion ("stays" or "wearing": `lateen_practice`,
+    "shift" in both by default). {"shift": [...], "leave": [...]}, by the ship's order."""
+    practice = lateen_practice(ship).get(occasion, "shift")
+    clause = params.get("lateens") if isinstance(params.get("lateens"), dict) else {}
+    plan: dict[str, list[str]] = {"shift": [], "leave": []}
+    for sl in whole_lateens(ship):
+        how = clause.get(sl.id, clause.get("all", practice))
+        plan["leave" if how == "leave" else "shift"].append(sl.id)
+    return plan
+
+
+def lateen_plan_words(
+    ship: Ship,
+    plan: dict[str, list[str]],
+    occasion: str,
+    params: dict[str, Any] | None = None,
+) -> str:
+    """'; the lateens to be shifted in stays', '; the lateens left on the mast', or each named
+    where some are shifted and some left; "" with none (package 90, A1b: the log says which).
+    "The lateens" only of every whole lateen she carries: two of her three are named (the lead's
+    nudge 46, item 7). A lateen the order's clause names that is not set (`params["lateens"]`)
+    is said, "the mizen is not set and is let be", where before the clause was dropped without
+    a word; so where she has none set at all (`plan` empty)."""
+    shift, leave = plan.get("shift") or [], plan.get("leave") or []
+    clause = (params or {}).get("lateens")
+    clause = clause if isinstance(clause, dict) else {}
+    planned = set(shift) | set(leave)
+    carried = {sl.id for sl in ship.sails.values() if is_whole_lateen(sl)}
+    unset = {
+        how: [i for i, h in clause.items() if h == how and i in ship.sails and i not in planned]
+        for how in ("shift", "leave")
+    }
+    if "all" in clause:
+        # "the lateens" said: each she carries that is not set and not named by itself
+        named_ids = set(unset["shift"]) | set(unset["leave"]) | set(clause)
+        rest = [i for i in ship.sails if i in carried and i not in planned and i not in named_ids]
+        unset[clause["all"] if clause["all"] in unset else "shift"] += rest
+    if not shift and not leave and not unset["shift"] and not unset["leave"]:
+        return ""
+    when = "in stays" if occasion == "stays" else "with the wind aft"
+
+    def named(ids: list[str]) -> str:
+        if len(ids) > 1 and set(ids) == carried:
+            return "the lateens"
+        return names_of_sails(ship, [ship.sails[i] for i in ids])
+
+    said = []
+    if shift:
+        said.append(f"{named(shift)} to be shifted {when}")
+    if leave:
+        said.append(f"{named(leave)} left on {'the mast' if len(leave) == 1 else 'their masts'}")
+    out = "; " + ", ".join(said) if said else ""
+    ids = unset["leave"] + unset["shift"]
+    if ids:
+        # the lead's nudge 48, item 5: in a seaman's words, whatever the clause said of it
+        be = "is" if len(ids) == 1 else "are"
+        out += f"; {named(ids)} {be} not set and {be} let be"
+    return out
+
+
+def lateens_on_their_masts(ship: Ship) -> list[Sail]:
+    """The whole lateens set whose yards hang on the weather side of their masts as the deck reads
+    the wind, on the bad hand (package 90): what a going about's last line names, and what the
+    rules captain shifts after a board on it (A1c)."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    return [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+
+
+# A take-in of a whole lateen held aback in a strong wind waits (package 90, A1d; Forfait 1788
+# p. 119: aback, the canvas wraps the mast so that the yard cannot be lowered): over the wind
+# `orders.navigation.LATEEN_TACK_KN`, read as `put her about` reads it; JUDGEMENT on the words.
+LATEEN_ABACK_WAITS_WORDS = (
+    "The {sail} is aback against the mast; it will not come in till she pays off."
+)
+
+
+def lateen_aback(ship: Ship, sail: Sail) -> bool:
+    """A whole lateen set and held aback, its sheet holding its cloth on the weather side of its
+    mast with the wind come round ahead onto it (package 90, A1d)."""
+    return (
+        is_whole_lateen(sail)
+        and sail.is_set
+        and bool(ship.sheets_of(sail))
+        and yard_trim.read_sheet(ship, sail).held_to_windward
+    )
+
+
+def lateen_take_in_waits(ship: Ship, evo_verb: str, subject: Any) -> bool:
+    """Whether a take-in of this subject waits: a whole lateen held aback while the mean true wind
+    is over `LATEEN_TACK_KN` (package 90, A1d); it goes on when it fills or is drawn over."""
+    if evo_verb != "take_in" or not isinstance(subject, Sail) or not lateen_aback(ship, subject):
+        return False
+    from freesail.orders.navigation import LATEEN_TACK_KN, mean_true_wind_kn  # no cycle at load
+
+    kn = mean_true_wind_kn(ship)
+    return kn is not None and kn > LATEEN_TACK_KN
+
+
+def lateens_drawn_words(ship: Ship, sails: list[Sail]) -> str:
+    """'draw the mainsail on the mast', 'draw the lateens on their masts' (package 90, A1d;
+    JUDGEMENT on the words): the lateens left on their masts drawn over at "let go and haul"."""
+    if len(sails) == len(whole_lateens(ship)) and len(sails) > 1:
+        return "draw the lateens on their masts"
+    one = len(sails) == 1
+    return f"draw {names_of_sails(ship, sails)} on {'the mast' if one else 'their masts'}"
+
+
+def lateens_on_the_mast_words(ship: Ship) -> str:
+    """', the mainsail on the mast' (', the lateens on their masts'): the whole lateens set that
+    end a manoeuvre on the weather side of their masts, for its last line (package 90, A1b); ""
+    with none, so that no other ship's line moves."""
+    on = lateens_on_their_masts(ship)
+    if not on:
+        return ""
+    if len(on) == 1:
+        return f", {names_of_sails(ship, on)} on the mast"
+    if len(on) == len(whole_lateens(ship)):
+        return ", the lateens on their masts"
+    return f", {names_of_sails(ship, on)} on their masts"
+
+
+def aft_lateen(ship: Ship) -> Sail | None:
+    """The whole lateen set on her aftermost mast, with a mast before it: the mizen worked as a
+    ship's mizen in going about, hauled aft at helm's a-lee, eased at "up helm" (package 90, A1b;
+    Design-Package90-Engine.md §2.3 item 5); None with none."""
+    lats = [sl for sl in whole_lateens(ship) if ship.mast_of(sl) is not None]
+    if not lats:
+        return None
+    sl = min(lats, key=lambda s: ship.mast_of(s).x_m)
+    mast = ship.mast_of(sl)
+    before = any(
+        sp.cls == "mast" and not sp.wrecked and sp.x_m > mast.x_m for sp in ship.spars.values()
+    )
+    return sl if before else None
+
+
+def fore_lateen_before_square(ship: Ship) -> Sail | None:
+    """A whole lateen set on her foremost mast where a mast abaft it carries braced yards (the
+    polacre's fore before her square main): eased with the head sheets at helm's a-lee and drawn
+    at "let go and haul" (package 90, A1b; Pol-D §5.3 item 1); None with none."""
+    lats = [sl for sl in whole_lateens(ship) if ship.mast_of(sl) is not None]
+    with_yards = _masts_with_yards(ship)
+    if not lats or not with_yards:
+        return None
+    sl = max(lats, key=lambda s: ship.mast_of(s).x_m)
+    mast = ship.mast_of(sl)
+    if any(m.x_m < mast.x_m for m in with_yards) and all(
+        sp.x_m <= mast.x_m for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked
+    ):
+        return sl
+    return None
+
+
+class LateenChange:
+    """Whole lateens shifted round their masts in a manoeuvre (package 90, A1b; the lead's ruling
+    of 2026-11-18; Design-Package90-Engine.md §2.3 item 2, §2.3a, §2.4.4): each yard peaked up and
+    its car passed round abaft its mast (ruled), never lowered, the sail drawing nothing while it
+    is shifted, then set on the new lee with its single sheet drawn. Each yard's seconds are its
+    length at `LATEEN_CHANGE_S_PER_M` by the manoeuvre's factor, and its party one able hand for
+    each `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY` (`lateen_party`), drawn from
+    the hands the manoeuvre has called (`hands_to_give`): together where they serve every yard,
+    the change done when the longest is; one after another, **the main first** (the longest yard
+    first), where they do not, each by its party's numbers term over them (`party_term`), a
+    lateen waiting its turn drawing where it lies. `SetteeChange` has one timer and counts no
+    hands. A plain class, built only when a lateen is to be shifted, so that no checkpoint of the
+    game's own holds one (truth 7-606's census). A lateen taken in or carried away meanwhile is
+    let be."""
+
+    def __init__(self, ship: Ship, ids: list[str], side: str):
+        self.ship = ship
+        sails = [ship.sails[i] for i in ids if i in ship.sails]
+        self.ids = [sl.id for sl in sorted(sails, key=lambda sl: -lateen_yard_m(ship, sl))]
+        self.side = side
+        self.left: dict[str, float] = {}
+        self.active: list[str] = []
+        self.queue: list[str] = []
+        self.done = not self.ids
+        self.factor = 1.0  # the manoeuvre's last factor: no yard handed on works lighter
+        self.handed: dict[str, float] = {}  # belayed: the yards handed on, their seconds
+
+    def _name(self, ids: list[str]) -> str:
+        return names_of_sails(self.ship, [self.ship.sails[i] for i in ids])
+
+    def _words(self, ids: list[str]) -> str:
+        if len(ids) == 1:
+            return (
+                f"Shift {self._name(ids)}: ease the parrel, cast off the runners, peak up the "
+                "yard and pass the car round."
+            )
+        return (
+            f"Shift {self._name(ids)}: ease the parrels, cast off the runners, peak up the yards "
+            "and pass the cars round."
+        )
+
+    def begin(self, seconds_per_m: float = LATEEN_CHANGE_S_PER_M) -> str:
+        """Begin the change: together where the hands serve every yard, else the longest yard
+        first; returns the first line ("" with nothing to shift)."""
+        self.ids = [i for i in self.ids if self.ship.sails[i].is_set]
+        if not self.ids:
+            self.done = True
+            return ""
+        parties = {i: lateen_party(self.ship, self.ship.sails[i]) for i in self.ids}
+        have = hands_to_give(self.ship)
+        together = have is None or sum(parties.values()) <= have
+        for i in self.ids:
+            seconds = lateen_yard_m(self.ship, self.ship.sails[i]) * seconds_per_m
+            term = 1.0 if together else party_term(self.ship, parties[i])
+            self.left[i] = max(seconds * term, 0.0)
+        if together:
+            self.active, self.queue = list(self.ids), []
+        else:
+            self.active, self.queue = self.ids[:1], self.ids[1:]
+        for i in self.active:
+            self.ship.sails[i].state = SailState.IN_THE_GEAR
+        self.done = False
+        return self._words(self.active)
+
+    def left_s(self) -> float:
+        """The seconds still to come, before the weather and the hands."""
+        active = max((self.left.get(i, 0.0) for i in self.active), default=0.0)
+        return max(active, 0.0) + sum(self.left.get(i, 0.0) for i in self.queue)
+
+    def advance(self, dt: float, factor: float, awa: float | None = None) -> bool:
+        """The change's work; each yard done is set on its side with its sheet drawn for `awa`
+        (the deck's reading when None), and the next begun. Returns whether all are done."""
+        if self.done:
+            return True
+        self.factor = max(factor, 1.0)
+        for i in list(self.active):
+            sl = self.ship.sails[i]
+            befallen = lateen_shift_befallen(self.ship, sl)
+            if befallen is not None:
+                # blown out, its yard or mast carried away, or its halyard parted while it was
+                # being shifted: let be as the casualty left it, and said (the lead's nudge 46,
+                # item 1: a parted halyard ended "Shifted the mainsail" and set)
+                self.active.remove(i)
+                self.ship.note(
+                    "notable",
+                    "evolution.step",
+                    f"Could not shift {self._name([i])}: {befallen}.",
+                    self.ship.name,
+                )
+                continue
+            if sl.wrecked or sl.state is not SailState.IN_THE_GEAR:
+                self.active.remove(i)  # taken in, set by hand, or carried away: let be
+                continue
+            self.left[i] -= dt / max(factor, 1e-6)
+            if self.left[i] > 0.0:
+                continue
+            self.active.remove(i)
+            sl.state = SailState.SET
+            sl.lug_side = self.side
+            draw_sheets(self.ship, [sl], None, awa)
+            for ln in self.ship.sheets_of(sl):
+                ln.held_side = None  # its single sheet lies to leeward of the wind
+            self.ship.note(
+                "routine",
+                "evolution.step",
+                f"Shifted {self._name([i])}; it stands to leeward of the mast.",
+                self.ship.name,
+            )
+        if not self.active and self.queue:
+            nxt = self.queue.pop(0)
+            sl = self.ship.sails[nxt]
+            if sl.is_set and not sl.wrecked:
+                sl.state = SailState.IN_THE_GEAR
+                self.active = [nxt]
+                self.ship.note("routine", "evolution.step", self._words([nxt]), self.ship.name)
+        if not self.active and not self.queue:
+            self.done = True
+        return self.done
+
+    def _begun(self) -> list[str]:
+        """The yards whose change is in hand: peaked up and passed round, in their gear, nothing
+        befallen them."""
+        return [
+            i
+            for i in self.active
+            if self.ship.sails[i].state is SailState.IN_THE_GEAR
+            and not self.ship.sails[i].wrecked
+            and lateen_shift_befallen(self.ship, self.ship.sails[i]) is None
+        ]
+
+    def _waiting(self) -> list[str]:
+        """The yards waiting their turn, still set on their masts."""
+        return [i for i in self.queue if self.ship.sails[i].is_set]
+
+    def belay_words(self) -> str:
+        """How a belay of the manoeuvre leaves the change, in words for its line (package 90; the
+        lead's nudges 46 and 48): 'the mainsail, its change begun, still being shifted round to the
+        larboard side; the foresail and the mizen left on their masts, not yet shifted'; "" with
+        nothing in hand. Hands do not walk away from a yard peaked half round its mast: a yard
+        whose change is begun is finished in its time, the work handed on (`belay`), and a yard
+        not yet begun is left on its mast."""
+        if self.done:
+            return ""
+        begun, waiting = self._begun(), self._waiting()
+        said = []
+        if begun:
+            its = "its" if len(begun) == 1 else "their"
+            said.append(
+                f"{self._name(begun)}, {its} change begun, still being shifted round to the "
+                f"{self.side} side"
+            )
+        if waiting:
+            mast = "its mast" if len(waiting) == 1 else "their masts"
+            said.append(f"{self._name(waiting)} left on {mast}, not yet shifted")
+        return "; ".join(said)
+
+    def belay(self) -> None:
+        """The manoeuvre belayed (the lead's nudge 48, item 1: a yard begun is finished in its
+        time): each yard whose change is begun is kept in its gear and handed on
+        (`handed`: its seconds still to come, before the weather and the hands), for the runner
+        to carry on as work in hand at no lighter a rate (`Script.handed_on`, `Runner._hand_on`);
+        each waiting its turn is
+        left set where it hangs; the change done (`belay_words` says which). Before, the yards
+        begun were set on the new side at the belay, in one tick."""
+        if self.done:
+            return
+        self.handed = {i: max(self.left.get(i, 0.0), 0.0) for i in self._begun()}
+        self.active, self.queue = [], []
+        self.done = True
+
+
 def innermost_head_sail(ship: Ship, standing: bool = False) -> Sail | None:
     """The head sail nearest the mast (the fore staysail, or the jib if it is alone): the
     sheet a fore-and-after hauls to windward to heave to (Luce 1884, ch. XXXIV). With
@@ -695,34 +1248,153 @@ def head_and_after_yards(ship: Ship) -> tuple[list[Spar], list[Spar]]:
 
 
 # Package 90, A2: the words of a rig with no yards, mended at their cause. A line that names a
-# braced yard, or its braces, is said only where she has one, read from the yards the evolution
-# swings (`head_and_after_yards`), for every rig: a lugger's and a boat's lug yards are no braced
-# yards (`Spar.is_yard`), and the cutter, the smack and the two schooners have head yards and no
-# after yards. Before it a lugger worn was told to brace in her after yards and was braced up,
-# hove to she manned the after braces, and the cutter box-hauled braced up after yards she has
-# not, whatever the rig. The words put in their place are JUDGEMENT; no tick, no event's kind and
-# no figure moves (docs/dev/TuningNotes.md, "Package 90, A2").
+# braced yard, or its braces, is said only where she works them, read from the yards the
+# evolution swings (`head_and_after_yards`), for every rig: a lugger's and a boat's lug yards are
+# no braced yards (`Spar.is_yard`), and the cutter, the smack and the two schooners have head
+# yards and no after yards. Before it a lugger worn was told to brace in her after yards and was
+# braced up, hove to she manned the after braces, and the cutter box-hauled braced up after
+# yards she has not, whatever the rig. A2's second pass (the lead's nudge 34): on a rig without
+# after yards the words follow the square sails set, not the yards crossed (the smack under her
+# mainsail, fore staysail and jib was told to man her head braces and lay hove to by her sheets),
+# and a one-masted vessel's braces are no head braces. The words put in their place are
+# JUDGEMENT; no tick, no event's kind and no figure moves (docs/dev/TuningNotes.md, "Package 90,
+# A2").
 
 
-def has_braced_yards(head: list[Spar], after: list[Spar]) -> bool:
-    """Whether she has a braced yard among the head and after yards an evolution swings: a line
-    that says she was braced, braced up or squared is said only then (package 90, A2)."""
-    return bool(head or after)
+def square_set_on(ship: Ship, yards: list[Spar]) -> bool:
+    """Whether a square sail is set on one of these yards (package 90, A2's second pass)."""
+    for y in yards:
+        sail = ship.sail_of(y)
+        if sail is not None and sail.cls == "square" and sail.is_set:
+            return True
+    return False
+
+
+def _split_as_built(ship: Ship, yards: list[Spar]) -> tuple[list[Spar], list[Spar]]:
+    """These braced yards, each classed head or after as she was built: a head yard on the
+    foremost lower mast built with a braced yard (not a schooner's mast, `Ship.on_schooner_mast`),
+    or under the bowsprit (`Ship.under_bowsprit`), which goes with the head yards; every other an
+    after yard, a schooner's mast's among them. The masts are read from every braced yard as
+    filed, wrecked or sent down or not, as `Ship.on_schooner_mast` reads hers: a brig whose fore
+    is shot away keeps her main yards for after yards (package 90, A2's second pass, its fifth
+    commit; the lead's nudge 37)."""
+    built = [s for s in ship.spars.values() if s.is_yard]
+    masts: list[Spar] = []
+    for y in built:
+        if ship.under_bowsprit(y) or ship.on_schooner_mast(y):
+            continue
+        m = ship.mast_of(y)
+        if m is not None and m not in masts:
+            masts.append(m)
+    foremost = max(masts, key=lambda m: m.x_m) if masts else None
+    head = [
+        y
+        for y in yards
+        if ship.under_bowsprit(y) or (foremost is not None and ship.mast_of(y) is foremost)
+    ]
+    return head, [y for y in yards if y not in head]
+
+
+def after_yards_as_built(ship: Ship) -> bool:
+    """Whether she was built with after yards (`_split_as_built` over every braced yard as
+    filed): the eight rigs with after yards; never the cutter, the smack, the two schooners, the
+    lugger or a boat (package 90, A2's second pass, its third commit; the checker's finding 1)."""
+    return bool(_split_as_built(ship, [s for s in ship.spars.values() if s.is_yard])[1])
+
+
+def yards_told(ship: Ship) -> tuple[list[Spar], list[Spar]]:
+    """The braced yards her words tell of, head and after: the yards she has left
+    (`working_yards`), each classed head or after as she was built (`_split_as_built`), so that a
+    brig with her main gone has head yards alone and with her fore gone after yards alone; and
+    none where she has no braced yard left, or only the yards under her bowsprit, which alone
+    are no yards of going about (the 74 with every mast gone). The one reader of her braces in
+    words: every line that names her yards or braces head or after reads its class here, through
+    `class_word`, of the yards the evolution's action swings at that phase (`told_of`, which
+    reads them here too); `braces_worked` and `braces_manned` read it, and through
+    `braces_worked` the scud and every other line of the going-about evolutions (package 90,
+    A2's second pass, its fifth commit; the lead's nudge 37: "she is told of the yards she has
+    left, each classed head or after as she was built"; its sixth commit, the lead's nudge 40:
+    "the word follows the deed"). The evolutions' swings read `head_and_after_yards` still,
+    unchanged: a brig with her fore gone is handled with her main yards as her head yards, and
+    told of them as her after yards."""
+    left = working_yards(ship)
+    if all(ship.under_bowsprit(y) for y in left):
+        return [], []
+    return _split_as_built(ship, left)
+
+
+def braces_worked(ship: Ship) -> bool:
+    """Whether her braces are worked: a line that names her braces, or says her yards braced,
+    braced up, squared or aback, is said only then (package 90, A2), read from the yards she is
+    told of (`yards_told`) at the line's moment. On a rig built with after yards
+    (`after_yards_as_built`: the eight), while she has a braced yard left, whatever she has set;
+    on a rig built with head yards alone (the cutter, the smack, the two schooners), only while
+    a square sail is set on one of them (A2's second pass: with none set she is handled by her
+    sheets, as a lugger is, and has the lugger's words); never with no braced yard (a lugger, a
+    boat), or with only the yards under her bowsprit left."""
+    head, after = yards_told(ship)
+    if after_yards_as_built(ship):
+        return bool(head or after)
+    return square_set_on(ship, head)
+
+
+def one_masted(ship: Ship) -> bool:
+    """A vessel of one mast (the cutter, the smack, a boat), whose yards are no head yards: her
+    braces are "the braces" (package 90, A2's second pass)."""
+    return sum(1 for sp in ship.spars.values() if sp.cls == "mast") < 2
+
+
+def told_of(ship: Ship, yards: list[Spar]) -> list[Spar]:
+    """Of the yards an evolution's action swings at a phase, or holds unswung (its head or its
+    after list, `head_and_after_yards`), those a line of that phase tells of: the ones her words
+    tell of (`yards_told`), none where they are only the yards under her bowsprit. A line that
+    names a bracing of them is said only where there are some, so that the word follows the
+    deed: a brig with her fore gone, whose after list is empty, is not told to brace in her
+    after yards as she bears up to wear, for the action braces none in then (package 90, A2's
+    second pass, its sixth commit; the lead's nudge 40: "A line says a brace is hauled only
+    where the evolution hauls it then")."""
+    head, after = yards_told(ship)
+    told = [y for y in yards if y in head or y in after]
+    if all(ship.under_bowsprit(y) for y in told):
+        return []
+    return told
+
+
+def class_word(ship: Ship, yards: list[Spar]) -> str:
+    """The word before "yards" or "braces" in a line that names these yards (`told_of`): "after "
+    where they are after yards as she was built (`yards_told`), else "head "; and nothing on a
+    vessel of one mast (`one_masted`), whose yards are "the yards" and her braces "the braces".
+    The yards under her bowsprit go with the yards they are swung with and are not read. So a
+    line names the yards the action swings by their class as built, whatever list the action
+    holds them in: the main yards of a brig with her fore gone, swung in her head yards' place,
+    are her after yards in every line of one evolution (package 90, A2's second pass, its sixth
+    commit; the lead's nudge 40: "named by their as-built class"; `head_word` before it, of the
+    masts alone, its point 3 at its cause: "the head yards" and "the head braces" said of the
+    cutter and the smack)."""
+    if one_masted(ship):
+        return ""
+    _head, after = yards_told(ship)
+    named = [y for y in yards if not ship.under_bowsprit(y)]
+    return "after " if named and all(y in after for y in named) else "head "
 
 
 def braces_manned(ship: Ship) -> str:
-    """The braces a heave-to or a fill-away mans, by her rig (package 90, A2): her after braces
-    where she has after yards, as before; her head braces where her braced yards are her head
-    yards alone (the cutter, the smack, a topsail schooner: "after braces" she has not); and
-    her sheets where she has no braced yard (a lugger, a boat), who heaves to and fills away
-    the fore-and-after's way, by her sheets (Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat
-    aft the main sheet ... and haul the staysail sheet to windward"). The word is JUDGEMENT."""
-    head, after = head_and_after_yards(ship)
+    """The braces a heave-to or a fill-away mans, by the yards she has left, each classed head or
+    after as she was built (`yards_told`; package 90, A2, and its second pass's fifth commit: a
+    brig with her fore gone mans her after braces still, with her main gone her head braces):
+    her after braces where she has after yards left, as before; where the yards she has left are
+    head yards alone and she works them (`braces_worked`), her head braces (a topsail schooner:
+    "after braces" she has not), or her braces on a vessel of one mast (the cutter, the smack: A2's
+    second pass, "head braces" in A2); and her sheets where she works no braces (a lugger, a
+    boat, and the cutter or the smack with no square sail set), who heaves to and fills away the
+    fore-and-after's way, by her sheets (Luce 1884, ch. XXXIV, 'To Heave to': "Haul flat aft the
+    main sheet ... and haul the staysail sheet to windward"). The word is JUDGEMENT."""
+    head, after = yards_told(ship)
     if after:
         return "after braces"
-    if head:
-        return "head braces"
-    return "sheets"
+    if not braces_worked(ship):
+        return "sheets"
+    return f"{class_word(ship, head)}braces"
 
 
 def after_square_yards(ship: Ship) -> list[Spar]:
@@ -879,11 +1551,11 @@ def light_sails_forward_of(ship: Ship, backed: list[Spar]) -> list:
             out.append(sl)
             continue
         yard = ship.yard_of(sl)
-        above = ship.parent_of(yard) if yard is not None else None
         mast = ship.mast_of(sl)
+        # a topgallant or a royal by its level on its mast (`Ship.yard_level`; package 90, A5)
         if (
-            above is not None
-            and above.cls in ("topgallant_mast", "royal_mast")
+            yard is not None
+            and ship.yard_level(yard) >= 2
             and mast is not None
             and mast.x_m > x_backed
         ):
@@ -911,12 +1583,12 @@ def driver_words(ship: Ship, drivers: list) -> str:
 
 
 def lowest_square_sails(ship: Ship) -> list:
-    """The courses: square sails on yards that hang directly on a lower mast."""
+    """The courses: square sails on their lower masts' lowest yards (`Ship.yard_level` 0; package
+    90, A5: a topsail yard crossing a pole mast's head is a topsail, not a course)."""
     out = []
     for y in working_yards(ship):
-        parent = ship.parent_of(y)
         sl = ship.sail_of(y)
-        if parent is not None and parent.cls == "mast" and sl is not None and sl.cls == "square":
+        if ship.yard_level(y) == 0 and sl is not None and sl.cls == "square":
             out.append(sl)
     return out
 
@@ -1047,13 +1719,37 @@ class Script:
     def holds(self) -> set[str]:
         return {self.ship.name}
 
+    def work(self) -> str | None:
+        """The work in words by this ship, where it is hers and not the file's alone: read first
+        by the one road for a work's name (`Runner._describe`), so that both its forms and every
+        line that names it follow. None, the file's words (`registry.Evolution.work`, else the
+        verb's): every script but the helm's mend, whose name is the helm's (`helm_words`;
+        package 90, A3)."""
+        return self.work_of(self.ship)
+
+    def parts_named(self) -> str | None:
+        """The parts the work is named of, where they are more than its subject: "the mainsail
+        and the foresail and the mizen", read by the one road for a work's name
+        (`Runner._describe`) after its verb. None, the subject alone: every script but the shift
+        a belay handed on (`ChangeLateenScript`; package 90, the lead's nudge 49, item 4)."""
+        return None
+
+    @classmethod
+    def work_of(cls, ship: Ship) -> str | None:
+        """`work` for a ship before the work is begun, with no instance of it: what a line names
+        a work by that is not in hand (`orders.work`'s belay, "Nothing in hand or waiting is
+        shipping the spare tiller"), so that it names it as the runner will once it is begun
+        (package 90, A3, nudge 45)."""
+        return None
+
     def _hold_settees(self) -> set[str]:
         """The settees set (`settees_held`), held from the order by a manoeuvre that may change
         one round its mast, and kept as `order_settees`: the runner does not keep a manoeuvre that
         belays the step-list work in hand waiting behind an order of a settee's given before it
         on these alone (`Runner._settees_only`; package 75, the lead's ruling (3)(iii) of
-        2026-11-10, and its review)."""
-        held = settees_held(self.ship)
+        2026-11-10, and its review). And the whole lateens set, which the same manoeuvres may
+        shift round their masts, held and kept so alike (`lateens_held`; package 90, A1a)."""
+        held = settees_held(self.ship) | lateens_held(self.ship)
         self.order_settees = frozenset(held)
         return held
 
@@ -1112,7 +1808,67 @@ class Script:
     def belayed(self) -> None:
         """Called by the runner as the captain belays the work: whatever the script holds
         that would outlive it is let go (package 37k: the capstan's pawl, an anchor's
-        cable `heaving`)."""
+        cable `heaving`). A manoeuvre with whole lateens being shifted round their masts
+        (`lateen_change`: the tack, the wear, the fill away, the box-haul and the box off)
+        finishes each yard whose change is begun and leaves each not yet begun on its mast
+        (`LateenChange.belay`; package 90, the lead's nudge 46, item 2)."""
+        lateens = getattr(self, "lateen_change", None)
+        if lateens is not None:
+            lateens.belay()
+
+    def lateen_way(self) -> float | None:
+        """The way (m/s) for which this manoeuvre draws each whole lateen's sheet as the yard is
+        set on the new lee (`full_and_by_apparent`, `LateenChange.advance`): the tack's at
+        "helm's a-lee", the wear's and the box-haul's before the helm; None, her way as she has
+        it as each is set (the fill away's). The work a belay hands on draws its sheets for the
+        same (the lead's nudge 51, item 1)."""
+        return None
+
+    def handed_on(self, factor: float = 1.0) -> list[tuple[str, str, dict[str, Any]]]:
+        """The work a belay of this script hands on, read by the runner once it is removed
+        (`Runner._hand_on`): the whole lateens whose change was begun when the manoeuvre was
+        belayed, carried on as one shift by itself in hand (`change_lateen`, its subject the
+        longest yard), each for the seconds it had left, and never less than the manoeuvre would
+        have taken: worked at no lighter a rate than the manoeuvre's own at the belay (`factor`,
+        the runner's for it, or the change's last where that is the heavier), so that its time
+        is never under those seconds at that rate (package 90; the lead's nudge 48, item 1). []
+        for any other work."""
+        lateens = getattr(self, "lateen_change", None)
+        handed = getattr(lateens, "handed", None) if lateens is not None else None
+        if not handed:
+            return []
+        rate = max(factor, getattr(lateens, "factor", 1.0), 1.0)
+        ids = sorted(handed, key=lambda i: -lateen_yard_m(self.ship, self.ship.sails[i]))
+        params: dict[str, Any] = {"sail": ids[0], "side": lateens.side, "rate": rate}
+        params["way"] = self.lateen_way()  # each sheet drawn as the manoeuvre would draw it
+        params[HANDED_ON] = {i: handed[i] for i in ids}
+        lateens.handed = {}
+        return [("change_lateen", ids[0], params)]
+
+    def changes_left_words(self) -> str:
+        """How a belay leaves the yards the manoeuvre changes round their masts, in words for
+        the runner's line after "the helm and the yards left as they stand" (package 90, the
+        lead's nudge 46, item 2): the whole lateens (`LateenChange.belay_words`) and a settee
+        lowered on deck and not yet dipped (package 75's words, the fill away's), so that no
+        sail is left in its gear by a belay without a line that names it; "" with neither in
+        hand. Before, a going about belayed so said nothing of them."""
+        said = []
+        lateens = getattr(self, "lateen_change", None)
+        if lateens is not None:
+            words = lateens.belay_words()
+            if words:
+                said.append(words)
+        settee = getattr(self, "settee_change", None)
+        if settee is not None and settee.lowered and not settee.done and settee._sails():
+            said.append(f"the {settee.names()} lowered on deck, not yet dipped")
+        # the lugger's dipping lugs lowered and not yet hoisted on the new side: named, words
+        # alone (the lead's nudge 48, ruled on the second pass's unsure 4: the same cause)
+        dip = getattr(self, "dip", None)
+        if isinstance(dip, LugDip) and dip.lowered and not dip.done:
+            down = [sl for sl in dip._lugs() if sl.state is SailState.IN_THE_GEAR]
+            if down:
+                said.append(f"{names_of_sails(self.ship, down)} lowered, not yet dipped")
+        return "; ".join(said)
 
     def note(self, text: str, kind: str = "evolution.step") -> None:
         self.ship.note("routine", kind, text, self.ship.name)
@@ -1192,7 +1948,7 @@ class CourseToSteer:
 
     def words(self, braced: str, paid_off: bool) -> dict[str, str]:
         """The completion line's words: how she was braced, and the course's clause. `braced`
-        is "" for a rig with no braced yard (package 90, A2: `has_braced_yards`), which is not
+        is "" where she works no braces (package 90, A2: `braces_worked`), and she is not
         said to be braced: she ends "full and by", or "trimmed" where the course's clause
         follows, so that "full and by" is not said twice ("trimmed for the course ordered" where
         she paid off to it). The words are JUDGEMENT."""
@@ -1324,6 +2080,14 @@ class TackScript(Script):
     # (`words`)
     fore_rise = False
     timed_out = False
+    # package 90, A1b: set on the script only where she has a whole lateen set, so that every
+    # other ship's tack pickles as it did: which lateens are shifted in stays and which left
+    # (`lateen_plan`), their change (`LateenChange`), the aftermost lateen eased as she pays off
+    # with no head sail set, and the end's words where it came before she had paid off
+    lateen_plan: dict[str, list[str]] | None = None
+    lateen_change: LateenChange | None = None
+    mizen_eased = False
+    not_paid_off = ""
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
@@ -1331,7 +2095,13 @@ class TackScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being changed, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held
+
+    def lateen_way(self) -> float | None:
+        return float(self.speed_at_helm)  # at "helm's a-lee", as `advance` is given it
 
     def give_course(self, course_deg: float, full_and_by: bool) -> None:
         """A course handed to the tack in hand (package 37m): steered when she is round."""
@@ -1356,6 +2126,15 @@ class TackScript(Script):
 
     def _boom_words(self) -> str:
         return names_of_sails(self.ship, self.booms) if self.booms else ""
+
+    def _jibs(self) -> list[Sail]:
+        """The head sails among the sheets eased at helm's a-lee: not the polacre's fore lateen,
+        which is eased with them (package 90, A1b) but is no jib (nudge 48)."""
+        return [sl for sl in self.heads if sl.cls == "jibheaded"]
+
+    def _boom_names(self, sails: list[Sail]) -> str:
+        """'foresail': sails by name, the article dropped, for a sheet's words."""
+        return names_of_sails(self.ship, sails).replace("the ", "", 1)
 
     def _after_swing_s(self) -> float:
         """The after swing's time at "mainsail haul", before the weather and the hands: the
@@ -1480,8 +2259,9 @@ class TackScript(Script):
         dyn.steady = False
         self.by_wind_drawn = False
         self.phase = "by_the_wind"
-        # braced up only where she has a braced yard (package 90, A2)
-        luff = "Luff up and brace up" if has_braced_yards(self.head, self.after) else "Luff up"
+        # braced up only where she works her braces (package 90, A2: `braces_worked`)
+        worked = braces_worked(self.ship)
+        luff = "Luff up and brace up" if worked else "Luff up"
         self.note(f"{luff}: she is brought by the wind to go about.", "helm.order")
 
     def _by_the_wind(self, dt: float, wind: Wind, factor: float) -> None:
@@ -1526,12 +2306,28 @@ class TackScript(Script):
         # them if she hangs, eased off with them if she misses, and drawn on the new tack
         # with them, its yard on the old side until it is changed last (`SetteeChange`)
         self.booms += [sl for sl in settees(self.ship) if sl not in self.booms]
+        if whole_lateens(self.ship):
+            # package 90, A1b (Design-Package90-Engine.md §2.3 item 5): which lateens are shifted
+            # in stays and which left, by the order's clause or her practice; the aftermost one,
+            # with a mast before it, hauled aft as a ship's mizen is; a foremost one before a
+            # square main eased with the head sheets and drawn at "let go and haul"
+            self.lateen_plan = lateen_plan(self.ship, self.params, "stays")
+            aft = aft_lateen(self.ship)
+            if aft is not None and aft not in self.booms:
+                self.booms.append(aft)
+            fore = fore_lateen_before_square(self.ship)
+            if fore is not None and fore not in self.heads:
+                self.heads.append(fore)
         self.shifted = shifted_sails(self.ship)
         ease_off_sheets(self.ship, self.heads)
         sheets_to(self.ship, self.booms, None, None)
         words = "Ready about. Helm's a-lee"
-        if self.heads:
+        if self._jibs():
             words += "; ease off the head sheets"
+        elif self.heads:
+            # the polacre's fore lateen alone, her jibs furled: named, not "the head sheets"
+            # (package 90, the lead's nudge 48, item 5; the lateens' road, never today's ships)
+            words += f"; ease off the {self._boom_names(self.heads)} sheet"
         if self.booms:
             words += f"; haul aft the {self._boom_words().replace('the ', '')} sheet"
             if any(sl.cut_at_mast for sl in self.booms):
@@ -1548,12 +2344,22 @@ class TackScript(Script):
         lowered = self.dip.lower()
         if lowered:
             words += f"; {lowered}"
+        if self.lateen_plan is not None:
+            words += lateen_plan_words(
+                self.ship, self.lateen_plan, "stays", self.params
+            )  # package 90, A1b
+        elif isinstance(self.params.get("lateens"), dict) and has_whole_lateen(self.ship):
+            # every whole lateen taken in: the clause's lateens said, not set (nudge 48)
+            words += lateen_plan_words(self.ship, {}, "stays", self.params)
         self.note(words + ".", "helm.order")
 
     def _lugs_down(self) -> bool:
         """The dipping lugs not yet hoisted again (package 43b), or a settee not yet changed
-        round and hoisted (package 75): she is not tacked till it is up."""
+        round and hoisted (package 75), or a whole lateen not yet shifted round its mast (package
+        90, A1b): she is not tacked till it is up."""
         if self.settee_change is not None and not self.settee_change.done:
+            return True
+        if self.lateen_change is not None and not self.lateen_change.done:
             return True
         return self.dip is not None and not self.dip.done
 
@@ -1580,6 +2386,9 @@ class TackScript(Script):
         if self.settee_change is not None:
             awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
             self.settee_change.advance(dt, factor, awa)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "missed":
             # the yards squared as a brace, with hands and time; then she has missed stays
             assert self.squaring is not None
@@ -1666,8 +2475,34 @@ class TackScript(Script):
                 # (package 32e); trimmed for the wind, three and a half knots.
                 new_lee = self.old_side(weather=True)
                 self._draw_on_new_tack(new_lee, wind)
-                draw = " Draw jib; trim aft the head sheets." if self.heads else ""
-                if self.head:
+                left = self._draw_lateens_over(new_lee, wind)  # package 90, A1d
+                aft = aft_lateen(self.ship) if self.lateen_plan is not None else None
+                if aft is not None and not head_sails(self.ship):
+                    # with no head sail set the aftermost lateen is eased as she pays off on the
+                    # new board, as a ship's spanker is, and drawn when she has (package 90, A1b;
+                    # measured on the bare xebec, Design-Package90-Engine.md §2.2a: 192 m lost
+                    # against 1,064; JUDGEMENT on the act); eased on the new lee, which the
+                    # deck's reading has not yet (A1d: a whole lateen keeps its sheet's side)
+                    ease_off_sheets(self.ship, [aft], new_lee)
+                    self.mizen_eased = True
+                draw = " Draw jib; trim aft the head sheets." if self._jibs() else ""
+                if self.heads and not draw:
+                    # the fore lateen alone drawn on the new board (package 90, nudge 48)
+                    draw = f" Draw the {self._boom_names(self.heads)}; trim aft its sheet."
+                # a lateen drawn with the head sheets is named there alone (the lead's nudge 53,
+                # item 6: "Draw the foresail; trim aft its sheet; draw the lateens on their
+                # masts" named the polacre's foresail twice)
+                left = [sl for sl in left if sl not in self.heads]
+                if left:
+                    on = lateens_drawn_words(self.ship, left)
+                    draw = f"{draw[:-1]}; {on}." if draw else f" {on[0].upper()}{on[1:]}."
+                # her head yards hauled in words only where she works her braces; with no
+                # square sail set and head sheets to draw she has the lugger's line; with none
+                # to draw either, the helm's word, the helm given her new course now (package
+                # 90, A2's second pass: "Let go and haul." whatever she had set before it; the
+                # words JUDGEMENT)
+                hauled = braces_worked(self.ship)
+                if self.head and hauled:
                     # the fore tack kept fast at the haul is risen now, by its name, while its
                     # course still draws (package 75, B3.4b; `_haul_words`)
                     rise = self.fore_rise and self._courses_drawing()[0]
@@ -1675,6 +2510,8 @@ class TackScript(Script):
                     self.note(f"Rise fore tack and sheet. {said}" if rise else said)
                 elif draw:
                     self.note(draw.strip())
+                elif self.head:
+                    self.note("Meet her with the helm.")
                 sharp = sharp_up_targets(self.ship, self.head, self.after)
                 self.swing = YardSwing(
                     self.head, [-self.sign * sharp[y.id] for y in self.head], brace_s
@@ -1718,15 +2555,48 @@ class TackScript(Script):
                         f"Dip the {change.names()}: lower the yard, pass it round abaft "
                         f"{change.masts()} and shift the tack to the weather bow."
                     )
+                self._shift_lateens(new_lee)  # package 90, A1b: changed last, as the settee
         elif self.phase == "steady":
             self.t_steady += dt
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.target_heading = self.new_course
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
             steady = error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
+            paid_off = self._paid_off(wind, ch)
+            if self.mizen_eased and paid_off:
+                # she has paid off: the aftermost lateen drawn on the new board (package 90)
+                self.mizen_eased = False
+                aft = aft_lateen(self.ship)
+                if aft is not None:
+                    awa = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+                    draw_sheets(self.ship, [aft], self.old_side(weather=True), awa)
+            timeout = self.timing_value("steady_timeout_s", 120.0)
             if (
-                steady or (self.t_steady >= self.timing_value("steady_timeout_s", 120.0))
-            ) and not self._lugs_down():
+                not steady
+                and self.t_steady >= timeout
+                and self._lateen_rig()
+                and not paid_off
+                and self.t_steady < timeout + self.timing_value("stays_timeout_s", 180.0)
+            ):
+                return  # a lateen rig waits for her to pay off (package 90, A1b; ruled)
+            if (steady or (self.t_steady >= timeout)) and not self._lugs_down():
+                if has_whole_lateen(self.ship) and self.sign * rel > 2 * POINT:
+                    # ended with the wind on her old side past two points, as the hung tack's
+                    # miss reads it: she has not come round and has missed stays, said in the
+                    # game's own words, her lateens then said where they lie (`words`; the
+                    # lead's nudge 51, item 4: the polacre probe ended "Tacked; braced up on the
+                    # starboard tack, ... but she has not paid off: she lies 143° off the wind",
+                    # her yards shifted to the bad hand). On a hull with a whole lateen only, so
+                    # that no other ship's end moves (package 75, B3.4b, names the tack she
+                    # lies on); read at the end, so that a tack fallen back that comes round
+                    # before it is a tack, as before
+                    self._miss_stays("she fell off on the old tack")
+                    return
+                if not (self.steer is not None and self.steer.given):
+                    # the end's line says how she lies, on a hull with a whole lateen (nudge 48)
+                    lies = self._how_she_lies_words(wind, ch)
+                    if lies:
+                        self.not_paid_off = lies
                 if not steady:
                     # ended by the timeout, not steady on her course: the line names the tack
                     # she lies on, read from her (package 75, B3.4b; `words`)
@@ -1735,6 +2605,98 @@ class TackScript(Script):
                     self._to_the_course(wind)
                 else:
                     self.finish()
+
+    # -- the whole lateens (package 90, A1b) -----------------------------------------------
+
+    def _shift_lateens(self, new_lee: str) -> None:
+        """The lateens her plan shifts in stays begun, once her head is through the wind and her
+        head yards swung (changed last, as a settee is): each to be shifted that hangs off the
+        new lee (`LateenChange`); one on the new lee already, left on the weather side before the
+        tack, is to leeward of its mast now and is let be. The plan is read again here, so that a
+        practice set while she is in stays, before her change has begun, is the one this tack
+        reads (Design-Package90-Engine.md §2.3 item 3); the order's clause stands over it."""
+        if self.lateen_plan is None:
+            return
+        plan = self.lateen_plan = lateen_plan(self.ship, self.params, "stays")
+        ids = [i for i in plan.get("shift") or [] if self.ship.sails[i].lug_side != new_lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, new_lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
+
+    def _draw_lateens_over(self, new_lee: str, wind: Wind) -> list[Sail]:
+        """At "let go and haul" every whole lateen still set has its sheet drawn over to the new
+        lee with the head sheets (package 90, A1d; Design-Package90-Engine.md §2.4.3a): through
+        the wind its cloth lies aback against its mast on the old side, and drawn it fills, on
+        the bad hand where its yard is left, until it is changed at the swing's end or by order.
+        Returns those its order or her practice leaves there, for the line's words."""
+        lats = whole_lateens(self.ship)
+        if not lats:
+            return []
+        draw_sheets(
+            self.ship, lats, new_lee, full_and_by_apparent(self.ship, wind, self.speed_at_helm)
+        )
+        leave = set((self.lateen_plan or {}).get("leave") or [])
+        return [sl for sl in lats if sl.id in leave and sl.lug_side not in (None, new_lee)]
+
+    def _lateen_rig(self) -> bool:
+        """A rig of whole lateens: a whole lateen set and no square sail (package 90, A1b: the
+        lead's ruling, keyed on a whole lateen only, so that no other rig's end moves)."""
+        return bool(whole_lateens(self.ship)) and not any(
+            sl.cls == "square" and sl.is_set for sl in self.ship.sails.values()
+        )
+
+    def _paid_off(self, wind: Wind, ch: float) -> bool:
+        """Her head paid off to within `LATEEN_PAID_OFF_DEG` of full and by on the new board."""
+        rel = wind_rel(self.ship, wind)
+        return -self.sign * rel >= ch - units.deg_to_rad(LATEEN_PAID_OFF_DEG)
+
+    def _how_she_lies_words(self, wind: Wind, aim: float, to_it: bool = False) -> str:
+        """The end's words on a hull that carries a whole lateen, set or not (the lead's nudge 48,
+        item 5: the end's line says what she is): ', but she has not paid off: ...' where her
+        head is short of `aim` (her angle off the wind the line claims: full and by on the new
+        board, or the course ordered) by more than `LATEEN_PAID_OFF_DEG`, and ', but she has
+        fallen off: ...' where it is past it by more; "" within it, and on every other hull, whose
+        end is as it was. `to_it`, after "trimmed for the course ordered": '... not paid off to
+        it', '... fallen off past it'. Before, only a rig of whole lateens alone was read, and the
+        polacre probe with her jibs furled ended "braced up" forty degrees off with sternway; and
+        before the lead's nudge 49, item 2, an end with a course given was not read at all."""
+        if not has_whole_lateen(self.ship):
+            return ""
+        rel = -self.sign * wind_rel(self.ship, wind)
+        margin = units.deg_to_rad(LATEEN_PAID_OFF_DEG)
+        if rel < aim - margin:
+            return self._not_paid_off_words(
+                wind, "but she has not paid off to it" if to_it else "but she has not paid off"
+            )
+        if rel > aim + margin:
+            return self._not_paid_off_words(
+                wind, "but she has fallen off past it" if to_it else "but she has fallen off"
+            )
+        return ""
+
+    def _not_paid_off_words(self, wind: Wind, how: str = "but she has not paid off") -> str:
+        """', but she has not paid off: she lies 39° off the wind with a knot of way' (package 90,
+        A1b; JUDGEMENT on the words), for a tack's end that came before she had (or, `how`, after
+        she fell off past full and by): 'with a knot of sternway' going astern, 'with no way on
+        her' under half a knot either way (the lead's nudge 46, item 7: "with no way of way" was
+        said of her going astern)."""
+        from freesail.crew.model import number_words  # local import: the words' home
+
+        off = abs(units.rad_to_deg(wind_rel(self.ship, wind)))
+        u_kn = units.ms_to_knots(self.ship.dyn.u)
+        kn = round(abs(u_kn))
+        knots = "a knot" if kn == 1 else f"{number_words(kn)} knots"
+        if kn == 0:
+            way = "no way on her"
+        elif u_kn < 0.0:
+            way = f"{knots} of sternway"
+        else:
+            way = f"{knots} of way"
+        return f", {how}: she lies {off:.0f}° off the wind with {way}"
 
     # -- the course she was put about for (package 37m) ---------------------------------
 
@@ -1751,6 +2713,13 @@ class TackScript(Script):
         ch = close_hauled_true_angle(self.ship)
         if full_and_by or self.steer.off(wind.direction_from, new_sign) <= ch + 0.5 * POINT:
             _end_on_course(self.ship, self.steer, heading, full_and_by)
+            # the end's line held to her state on a hull with a whole lateen, as the plain
+            # order's is (the lead's nudge 49, item 2): "full and by" read against her
+            # close-hauled angle, "the course ordered" against the course
+            aim = ch if full_and_by else self.steer.off(wind.direction_from, new_sign)
+            lies = self._how_she_lies_words(wind, aim)
+            if lies:
+                self.not_paid_off = lies
             self.finish()
             return
         dyn = self.ship.dyn
@@ -1774,12 +2743,17 @@ class TackScript(Script):
         self.retrim_in -= dt
         if self.paying is not None and self.paying.advance(dt, factor):
             self.paying = None
+        on_course = new_sign * units.wrap_pi(wind.direction_from - self.new_course)
         if self.last_trim:
             if self.paying is None:
+                # trimmed for the course ordered: on a hull with a whole lateen the line says
+                # where she lies if she is not on it (the lead's nudge 49, item 2)
+                lies = self._how_she_lies_words(wind, on_course, to_it=True)
+                if lies:
+                    self.not_paid_off = lies
                 self.finish()
             return
         ch = close_hauled_true_angle(ship)
-        on_course = new_sign * units.wrap_pi(wind.direction_from - self.new_course)
         now = new_sign * wind_rel(ship, wind)
         there = now >= on_course - 0.5 * POINT
         late = self.pay_t >= self.timing_value("pay_off_timeout_s", 240.0)
@@ -1815,21 +2789,36 @@ class TackScript(Script):
         # on the new weather bow as she passes the wind and pay her head off
         sheets_to(self.ship, self.heads, self.old_side(weather=False), None)
         # the spanker's (or the main's) boom hauled well over to windward: aback at the
-        # stern, it pushes the stern to leeward and her head up to the wind
+        # stern, it pushes the stern to leeward and her head up to the wind; an aftermost whole
+        # lateen hauled to windward with them, held aback against its mast (A1b's place). A1d
+        # eased it on the old lee instead, reasoning that it cannot be hauled over its mast as a
+        # boom is (JUDGEMENT, no source); measured, the ease cost her stays and bought nothing,
+        # so it is put back (the lead's nudge 53, item 5): of 1,536 probe tacks (the three
+        # probes, 12 to 25 kn, 64 seeds a set) 22 hung, all the polacre's, and all 22 missed
+        # eased and came round hauled, her mizen's yard at 0.03 to 0.17 of its rating either
+        # way (docs/dev/TuningNotes.md, "the lateen hulls' list")
         sheets_to(self.ship, self.booms, self.old_side(weather=True), None)
         words = ["Her way is gone; she hangs in stays. Helm kept a-lee"]
-        if self.head:
-            words.append("the head yards aback to box her off")
+        # her head yards, held unswung by the action, aback in words only where she works her
+        # braces (package 90, A2's second pass: said of every head yard crossed before it, a
+        # square sail set or none), named by their class as built (`class_word`: "the yards" on
+        # a vessel of one mast, "the head yards" before it; a brig's main yards with her fore
+        # gone, which the tack holds as her head yards, her after yards: its sixth commit)
+        held = told_of(self.ship, self.head)
+        if held and braces_worked(self.ship):
+            words.append(f"the {class_word(self.ship, held)}yards aback to box her off")
         if self.heads:
             words.append("the head sheets held to windward")
         if self.booms:
-            names = self._boom_words().replace("the ", "")
-            # the mizen course cut at the mast has no boom, nor has a settee: its sheet hauls
-            # the sail itself over (package 75); with a boom, or for a lugger's standing lug,
-            # the words are as they were
+            booms = self.booms
+            names = names_of_sails(self.ship, booms).replace("the ", "")
+            # the mizen course cut at the mast has no boom, nor has a settee or a whole lateen:
+            # its sheet hauls the sail itself over (package 75; package 90, nudge 53, item 5);
+            # with a boom, or for a lugger's standing lug, the words are as they were
             boomless = all(
-                (sl.cut_at_mast or sl.settee) and self.ship.spar_of_role(sl, "boom") is None
-                for sl in self.booms
+                (sl.cut_at_mast or sl.settee or is_whole_lateen(sl))
+                and self.ship.spar_of_role(sl, "boom") is None
+                for sl in booms
             )
             words.append(
                 f"the {names} hauled over to windward"
@@ -1860,16 +2849,22 @@ class TackScript(Script):
         dyn.target_heading = self.old_heading
         dyn.steady = False
         orders = ["Up helm"]
-        if yards:
+        # the yards squared in words only where she works her braces (package 90, A2's second
+        # pass: "square the yards" of every yard crossed before it)
+        if yards and braces_worked(self.ship):
             orders.append("square the yards")
         if self.heads:
             orders.append("flatten in the head sheets")
         if self.booms:
             orders.append(f"ease off the {self._boom_words().replace('the ', '')} sheet")
+        # a whole lateen shifted before she fell back lies on the weather side of its mast, said
+        # as she misses (the lead's nudge 51, item 4: "the mizen on the mast"); "" for every
+        # other ship, and for a lateen not yet shifted
+        lateens = lateens_on_the_mast_words(self.ship)
         self.ship.note(
             "urgent",
             "ship.missed_stays",
-            f"Missed stays: {why}. {'; '.join(orders)}.",
+            f"Missed stays: {why}{lateens}. {'; '.join(orders)}.",
             self.ship.name,
             {"reason": why, "old_tack": self.words()["old_tack"], **self.data()},
         )
@@ -1885,10 +2880,26 @@ class TackScript(Script):
             return self.timing_value("settee_dip_s", SETTEE_DIP_S)
         return 0.0
 
+    def _lateens_to_change_s(self) -> float:
+        """The lateens' change still to come before she is tacked (package 90, A1b): the longest
+        yard's seconds by the ruled rate for those her plan shifts that hang off the new lee,
+        while the change is not begun; 0 with none (the estimate counts them together)."""
+        plan = self.lateen_plan
+        if plan is None or self.lateen_change is not None:
+            return 0.0
+        new_lee = self.old_side(weather=True)
+        rate = lateen_change_s_per_m()
+        yards = [
+            lateen_yard_m(self.ship, self.ship.sails[i])
+            for i in plan.get("shift") or []
+            if self.ship.sails[i].lug_side != new_lee
+        ]
+        return max(yards, default=0.0) * rate
+
     def remaining_s(self) -> float:
         brace_s = self.timing_value("brace_s", 45.0)
         swings = self._after_swing_s() + brace_s  # the after yards', then the head yards'
-        settee_s = self._settee_to_change_s()
+        settee_s = self._settee_to_change_s() + self._lateens_to_change_s()
         if self.phase == "in_studding_sails" and self.studding is not None:
             return self.studding.remaining_s() + 60.0 + swings + 30.0 + settee_s
         if self.phase == "helm_down":
@@ -1906,6 +2917,9 @@ class TackScript(Script):
         change = self.settee_change
         if self.phase == "steady" and change is not None and not change.done:
             return max(30.0, change.left_s)  # a settee being changed (package 75)
+        lateens = self.lateen_change
+        if self.phase == "steady" and lateens is not None and not lateens.done:
+            return max(30.0, lateens.left_s())  # a whole lateen being shifted (package 90)
         return 30.0
 
     def words(self) -> dict[str, Any]:
@@ -1925,16 +2939,34 @@ class TackScript(Script):
             # for (the cold review of 2026-11-14, 5.3 item 9; package 115 D4: "Tacked; braced
             # up on the starboard tack, heading SSE (158°)" with her head at NE)
             heading = self.ship.dyn.heading
+        if self.not_paid_off:
+            # where the line says she lies otherwise than the course, her head and not the
+            # course (the lead's nudge 51, item 3: "heading E by N (79°), but she has not paid
+            # off to it: she lies 44° off the wind", the course named as her heading); said
+            # only on a hull with a whole lateen (`_how_she_lies_words`)
+            heading = self.ship.dyn.heading
         steer = self.steer if self.steer is not None else CourseToSteer({})
-        # package 90, A2: "braced up" and "squared the yards" only where she has a braced yard
-        # ("Tacked; braced up on the larboard tack" of the lugger before it)
-        braced = has_braced_yards(self.head, self.after)
+        # package 90, A2: "braced up" and "squared the yards" only where she works her braces
+        # ("Tacked; braced up on the larboard tack" of the lugger before it; and of the cutter
+        # with no square sail set before A2's second pass: `braces_worked`)
+        braced = braces_worked(self.ship)
+        said = steer.words("braced up" if braced else "", self.paid_off)
+        if self.not_paid_off and said.get("braced") == "full and by":
+            # not "full and by" of a ship that has not paid off (the lead's nudge 46, item 7):
+            # she is through the wind on the new tack, and the line says how she lies
+            said["braced"] = "through the wind"
+        if self.not_paid_off and steer.course is not None:
+            # nor ", full and by" nor ", the course ordered" after a course given, where she
+            # lies otherwise (the lead's nudge 49, item 2): the line says how she lies
+            said["course_words"] = ""
         return {
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(heading),
             "fell_off": "Squared the yards; she fell off" if braced else "She fell off",
-        } | steer.words("braced up" if braced else "", self.paid_off)
+            # package 90, A1b: a whole lateen left on its mast, and an end before she paid off
+            "lateens_said": lateens_on_the_mast_words(self.ship) + self.not_paid_off,
+        } | said
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -1989,6 +3021,12 @@ class WearScript(Script):
     settee_change: SetteeChange | None = None  # package 75, the same
     for_the_course = False
     full_and_by = False
+    # package 90, A1b: set only where she has a whole lateen set (every other ship's wear pickles
+    # as it did): which are shifted with the wind aft and which left, their change, and the
+    # aftermost one eased at "up helm" to be hauled aft as she comes to
+    lateen_plan: dict[str, list[str]] | None = None
+    lateen_change: LateenChange | None = None
+    mizen_eased = False
 
     def holds(self) -> set[str]:
         held = {self.ship.name} | {y.id for y in self.head + self.after}
@@ -1996,7 +3034,13 @@ class WearScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee lowered, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held | {s.id for s in after_gaff_sails(self.ship)}
+
+    def lateen_way(self) -> float | None:
+        return float(self.way_before)  # by the wind before the helm, as `advance` is given it
 
     def give_course(self, course_deg: float, full_and_by: bool) -> None:
         """A course handed to the wear in hand (package 37m): she comes to it."""
@@ -2045,10 +3089,36 @@ class WearScript(Script):
             change.change(
                 new_lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_WORE_WORDS
             )
+        if whole_lateens(self.ship):
+            # package 90, A1b (Design-Package90-Engine.md §2.3 items 2 and 5): which lateens are
+            # shifted with the wind aft and which left, by the order's clause or her practice in
+            # wearing; the aftermost, with a mast before it, eased as she bears up, as a ship's
+            # mizen is hauled up, and hauled aft again as she comes to; the lateens keep drawing
+            # as she bears up, their change begun only at "wind aft" (not the settee's "up helm")
+            self.lateen_plan = lateen_plan(self.ship, self.params, "wearing")
+            aft = aft_lateen(self.ship)
+            if aft is not None:
+                ease_off_sheets(self.ship, [aft])
+                self.mizen_eased = True
+                brail += f"; ease off the {part_name_of(self.ship, aft)} sheet"
+            brail += lateen_plan_words(self.ship, self.lateen_plan, "wearing", self.params)
+        elif isinstance(self.params.get("lateens"), dict) and has_whole_lateen(self.ship):
+            # every whole lateen taken in: the clause's lateens said, not set (nudge 48)
+            brail += lateen_plan_words(self.ship, {}, "wearing", self.params)
         self.bowlined = bowlines_hauled(self.ship)
-        # the after yards braced in only where she has after yards (package 90, A2: the lugger,
-        # the boats, the cutter, the smack and the schooners were told to before it)
-        brace_in = "; brace in the after yards" if self.after else ""
+        # the after yards braced in as she falls off, said only where the action braces some in
+        # now (`told_of` its after list; the head yards follow once the wind is abaft the beam,
+        # unsaid) and she works her braces, named by their class as built (`class_word`; package
+        # 90, A2: the lugger, the boats, the cutter, the smack and the schooners were told to
+        # before it; A2's second pass, its sixth commit, the lead's nudge 40, "the word follows
+        # the deed": a brig with her fore gone, her main yards in the action's head list, has
+        # none braced in now, nor one with her main gone)
+        braced_in = told_of(self.ship, self.after)
+        brace_in = (
+            f"; brace in the {class_word(self.ship, braced_in)}yards"
+            if braced_in and braces_worked(self.ship)
+            else ""
+        )
         if let_go_bowlines(self.ship):
             self.note(
                 f"Stand by to wear ship. Up helm; clear away the bowlines{brail}{brace_in}.",
@@ -2113,12 +3183,21 @@ class WearScript(Script):
                 # and the words say nothing of them (package 75, the lead's ruling (3) of
                 # 2026-11-07, B3.4b; "Squared the head yards" before it, whatever she had); and
                 # with no braced yard at all (a lugger, a boat) none is braced up (package 90,
-                # A2: "hauled out and braced up" before it, whatever she had)
-                squared = "Squared the head yards; shifted" if self.head else "Shifted"
-                braced = (
-                    "; hauled out and braced up" if has_braced_yards(self.head, self.after) else ""
-                )
-                self.note(f"Wind aft. {squared} over the sheets{braced}." + dipped)
+                # A2: "hauled out and braced up" before it, whatever she had); and where she
+                # works no braces (head yards alone and no square sail set, A2's second pass:
+                # `braces_worked`) she is worn by her sheets and has the lugger's words; the yards
+                # squared, the action's head list, named by their class as built (`class_word`:
+                # "the yards" on a vessel of one mast, "the head yards" before it; a brig's main
+                # yards with her fore gone, her after yards, squared here as they followed the
+                # wind abaft the beam: A2's second pass, its sixth commit, the lead's nudge 40)
+                worked = braces_worked(self.ship)
+                swung = told_of(self.ship, self.head)
+                yards = f"{class_word(self.ship, swung)}yards"
+                squared = f"Squared the {yards}; shifted" if swung and worked else "Shifted"
+                braced = "; hauled out and braced up" if worked else ""
+                over = self._lateens_over(new_lee, wind)  # package 90, A1d
+                self.note(f"Wind aft. {squared} over the sheets{over}{braced}." + dipped)
+                self._shift_lateens(new_lee)  # package 90, A1b: the lateens' change begun
         if self.dip is not None:
             self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
         if self.settee_change is not None:
@@ -2127,6 +3206,9 @@ class WearScript(Script):
             past = self.sign * rel < 0
             awa = full_and_by_apparent(self.ship, wind, self.way_before)
             self.settee_change.advance(dt, factor, awa, may_hoist=past)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.way_before)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "come_to":
             sharp_up = -self.sign  # braced sharp up for the new tack
             course_rel = 0.0
@@ -2157,6 +3239,13 @@ class WearScript(Script):
             if steady and self.brailed:
                 said = "On her course." if self.for_the_course else "By the wind."
                 self.note(said + self._haul_out())
+            if steady and self.mizen_eased:
+                # the aftermost lateen hauled aft as she comes to, by the wind (package 90, A1b)
+                self.mizen_eased = False
+                aft = aft_lateen(self.ship)
+                if aft is not None:
+                    awa = full_and_by_apparent(self.ship, wind, self.way_before)
+                    draw_sheets(self.ship, [aft], _lee_name(sharp_up), awa)
             if self.for_the_course:
                 # the yards follow the wind round as she comes to the course, and are
                 # trimmed to the course's own wind when she is steady on it ("When the wind
@@ -2187,6 +3276,8 @@ class WearScript(Script):
                     head_done = False
             lugs_up = self.dip is None or self.dip.done
             settee_up = self.settee_change is None or self.settee_change.done  # package 75
+            if self.lateen_change is not None and not self.lateen_change.done:
+                settee_up = False  # a whole lateen not yet shifted (package 90, A1b)
             if steady and after_done and head_done and lugs_up and settee_up:
                 if self.for_the_course:
                     # a settee hoisted again is trimmed for the course with them (package 75)
@@ -2200,6 +3291,48 @@ class WearScript(Script):
                     _end_on_course(self.ship, steer, self.new_course, self.full_and_by)
                 self.finish()
 
+    def _lateens_over(self, new_lee: str, wind: Wind) -> str:
+        """With the wind aft every whole lateen still set goes over to the new lee with the other
+        sheets (package 90, A1d; Design-Package90-Engine.md §2.4.3a): one its order or her
+        practice leaves goes over against its mast, on the bad hand, and the line says so ("; the
+        mainsail over against the mast"); one to be changed is changed next. A wear never holds
+        a lateen aback."""
+        lats = whole_lateens(self.ship)
+        if not lats:
+            return ""
+        # the aftermost, eased at "up helm" (A1b), goes over eased and is hauled aft as she
+        # comes to, as before; the rest drawn for the wind she comes to
+        aft = aft_lateen(self.ship) if self.mizen_eased else None
+        drawn = [sl for sl in lats if sl is not aft]
+        awa = full_and_by_apparent(self.ship, wind, self.way_before)
+        draw_sheets(self.ship, drawn, new_lee, awa)
+        if aft is not None:
+            ease_off_sheets(self.ship, [aft], new_lee)
+        leave = set((self.lateen_plan or {}).get("leave") or [])
+        left = [sl for sl in lats if sl.id in leave and sl.lug_side not in (None, new_lee)]
+        if not left:
+            return ""
+        if len(left) > 1 and len(left) == len(lats):
+            return "; the lateens over against their masts"
+        mast = "the mast" if len(left) == 1 else "their masts"
+        return f"; {names_of_sails(self.ship, left)} over against {mast}"
+
+    def _shift_lateens(self, new_lee: str) -> None:
+        """The lateens her plan shifts in wearing begun with the wind aft (package 90, A1b): each
+        that hangs off the new lee (`LateenChange`); one on it already is let be. The plan read
+        again here, as the tack's is, for a practice set since "up helm"."""
+        if self.lateen_plan is None:
+            return
+        plan = self.lateen_plan = lateen_plan(self.ship, self.params, "wearing")
+        ids = [i for i in plan.get("shift") or [] if self.ship.sails[i].lug_side != new_lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, new_lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
+
     def remaining_s(self) -> float:
         first = self.studding.remaining_s() if self.studding is not None else 0.0
         return first + max(0.0, self.timing_value("wear_estimate_s", 480.0) - self.t)
@@ -2209,12 +3342,13 @@ class WearScript(Script):
         new = "larboard" if self.sign > 0 else "starboard"
         steer = self.steer if self.steer is not None else CourseToSteer({})
         braced = "braced" if self.for_the_course else "braced sharp up"
-        if not has_braced_yards(self.head, self.after):
-            braced = ""  # no braced yard to brace (package 90, A2: `CourseToSteer.words`)
+        if not braces_worked(self.ship):
+            braced = ""  # no braces worked (package 90, A2: `CourseToSteer.words`)
         return {
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
+            "lateens_said": lateens_on_the_mast_words(self.ship),  # package 90, A1b
         } | steer.words(braced, self.for_the_course)
 
     def data(self) -> dict[str, Any]:
@@ -2235,6 +3369,12 @@ class WearScript(Script):
 # 69 degrees off, forereaching a knot and a half). Luce 1866, ch. XXVI: "regulate by
 # easing off, or hauling aft, the spanker and jib sheets".
 HOVE_TO_DRIVER_APPARENT = 6 * POINT
+
+# A rig of whole lateens with no head sail set and no braced yard will not lie to (package 90,
+# A1a; Design-Package90-Engine.md §2.3 item 1; the xebec's design, her A1 (7)): the heave-to's
+# refusal in her words, keyed on a whole lateen set, so that the five boats and a schooner are
+# refused as before. Her lying to under her lateens (the cape) is the hulls' research, not built.
+LATEENS_WILL_NOT_LIE_TO = "She will not lie to under her lateens: there is no sail to bring her to."
 
 # Hove to, a settee (package 75; docs/design/Design-ShipsEngineExtensions.md §5.7): kept with
 # its sheet eased to the driver's trim where her backed yards are on her aftermost mast, by the
@@ -2280,10 +3420,75 @@ HELM_LOST_WORDS = (
     "('repair the wheel')."
 )
 HELM_LOST_ASIDE = "the helm not answering, the wheel shot away"
+# Package 90, A3 (docs/design/Plan-Package90.md §6 A3; GroundReport-Package90-2026-11.md §2.2):
+# the helm's words by what she steers by (`HullSpec.helm`, one of `schema.HELM_KINDS`), the one
+# place every line where a helm is shot away, rigged round or mended reads them, so that a hull
+# steered by a tiller is not told her wheel is shot away and mended with new wheel-ropes. The
+# wheel's row is package 116's words exactly (`HELM_LOST_WORDS` and `HELM_LOST_ASIDE` the wheel's
+# still). The tiller's are the lead's ruling of the ground report's draft (nudge 22, "as drafted":
+# the tackles hooked to the stump of the tiller and manned on deck, the spare tiller shipped by the
+# carpenter's crew aft at the rudder head; JUDGEMENT, plan §13.1 item 3); the times and the hands
+# are the wheel's, the files' own. `helm` is what she steers by, as a place's words name it (the
+# quarterdeck "where ... the wheel is", `api.readings`' `the places`; nudge 47). `lost` is the
+# state the hit writes (`ship.extra["helm_lost"]`)
+# and the minute's words; `mend` the order that mends her and its work's name; `holds` what the
+# mend holds while the tackles hold the tiller, so that the two go on together on either helm.
+HELM_WORDS: dict[str, dict[str, str]] = {
+    HELM_WHEEL: {
+        "helm": "the wheel",
+        "lost": "the wheel shot away",
+        "hit": "The wheel is shot away; the helm is lost until the relieving tackles are rove: "
+        "'rig the relieving tackles'.",
+        "refusal": HELM_LOST_WORDS,
+        "aside": HELM_LOST_ASIDE,
+        "tackles_begin": "Rig the relieving tackles! Hands below to the tiller.",
+        "tackles_rove": "The relieving tackles are rove to the tiller and manned below: the helm "
+        "answers again, steered by the tackles, and more slowly than by the wheel.",
+        "mended": "the wheel is repaired",
+        "mend": "repair the wheel",
+        "mend_begin": "Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be "
+        "rove.",
+        "mend_done": "The wheel is repaired and new wheel-ropes rove: she steers by the wheel "
+        "again",
+        "whole": "the wheel is whole and she steers by it",
+        "not_mended": "the wheel not mended",
+        "holds": "the wheel",
+    },
+    "tiller": {
+        "helm": "the tiller",
+        "lost": "the tiller shot away",
+        "hit": "The tiller is shot away; the helm is lost until the relieving tackles are rove: "
+        "'rig the relieving tackles'.",
+        "refusal": "The tiller is shot away and the helm does not answer: rig the relieving "
+        "tackles ('rig the relieving tackles') to steer her by them, or ship the spare tiller "
+        "('ship the spare tiller').",
+        "aside": "the helm not answering, the tiller shot away",
+        "tackles_begin": "Rig the relieving tackles! Hands aft to the tiller.",
+        "tackles_rove": "The relieving tackles are hooked to the stump of the tiller and manned on "
+        "deck: the helm answers again, steered by the tackles, and more slowly than by the "
+        "tiller.",
+        "mended": "the spare tiller is shipped",
+        "mend": "ship the spare tiller",
+        "mend_begin": "Ship the spare tiller! The carpenter's crew aft to the rudder head.",
+        "mend_done": "The spare tiller is shipped in the rudder head: she steers by the tiller "
+        "again",
+        "whole": "the tiller is whole and she steers by it",
+        "not_mended": "the spare tiller not shipped",
+        "holds": "the rudder head",
+    },
+}
+
+
+def helm_words(ship: Any) -> dict[str, str]:
+    """The helm's words for her (`HELM_WORDS`), by what her file says she steers by: the wheel's
+    where it says nothing, and for a ship with no hull spec (package 90, A3)."""
+    spec = getattr(getattr(ship, "hull", None), "spec", None)
+    return HELM_WORDS[getattr(spec, "helm", HELM_WHEEL)]
 
 
 def helm_lost(ship: Any) -> bool:
-    """The wheel shot away and no relieving tackles rove (`combat.hits`)."""
+    """The helm shot away, her wheel or her tiller, and no relieving tackles rove
+    (`combat.hits`)."""
     return bool((getattr(ship, "extra", None) or {}).get("helm_lost"))
 
 
@@ -2674,6 +3879,15 @@ def _judge_lying_to(
         )
 
 
+def _lateens_against_their_masts(ship: Ship) -> list[Sail]:
+    """The whole lateens set whose yards hang on the weather side of their masts as the deck reads
+    the wind, the side `change_lateen`'s precondition reads (package 90, A1b): forced round lying
+    to, a lateen's yard stays where she hove to, as a settee's does."""
+    lee = "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+    on = [sl for sl in whole_lateens(ship) if sl.lug_side not in (None, lee)]
+    return sorted(on, key=lambda sl: -lateen_yard_m(ship, sl))  # the main first
+
+
 def _settees_against_their_masts(ship: Ship) -> list[Sail]:
     """The settees set whose yards hang on the weather side of their masts as the deck reads
     the wind, the side the dip order reads (`dip_settee`'s `against_the_mast`): forced round
@@ -2717,6 +3931,9 @@ def _hove_to_no_longer(
     dyn.steady = False
     data = {**data, "speed_kn": round(units.ms_to_knots(dyn.u), 1), "heading": dyn.heading}
     dip = _settees_against_their_masts(ship) if forced_round is not None else []
+    # package 90, A1b: a whole lateen left on its mast so is shifted by the watch, its own order
+    # (`change_lateen`: all hands called, its party the yard's), as the settee is dipped
+    shift = _lateens_against_their_masts(ship) if forced_round is not None else []
     notes = getattr(ship, "notes", None)
     at = len(notes) if isinstance(notes, list) else 0  # the line goes before the dip's own
     begun: list[Sail] = []
@@ -2751,7 +3968,47 @@ def _hove_to_no_longer(
         waiting.append(sl)
         if inst.waiting_for is None:
             after.append(("evolution.queued", line, sl.id))  # its turn behind other work
+    shifted: list[Sail] = []
+    shift_waiting: list[Sail] = []
+    for sl in shift:
+        try:
+            line = forced_round.start(ship, "change_lateen", sl.id)
+        except OrderError as e:
+            why = str(e).strip().rstrip(".")
+            why = why[:1].lower() + why[1:]
+            after.append(
+                ("evolution.failed", f"Could not shift {names_of_sails(ship, [sl])}: {why}.", sl.id)
+            )
+            continue
+        inst = next(
+            (
+                i
+                for i in reversed(forced_round.instances)
+                if i.evo.id == "change_lateen" and i.subject_id == sl.id
+            ),
+            None,
+        )
+        if inst is None:
+            continue
+        if not inst.waiting:
+            shifted.append(sl)
+            continue
+        shift_waiting.append(sl)
+        if inst.waiting_for is None:
+            after.append(("evolution.queued", line, sl.id))
     said = ""
+    if shifted:
+        mast = "its mast" if len(shifted) == 1 else "their masts"
+        said += (
+            f" The watch calls all hands to shift {names_of_sails(ship, shifted)}, lying on {mast}."
+        )
+        data["lateens_shifted"] = [sl.id for sl in shifted]
+    if shift_waiting:
+        one = len(shift_waiting) == 1
+        mast, be = ("its mast", "is") if one else ("their masts", "are")
+        names = names_of_sails(ship, shift_waiting)
+        said += f" {names[:1].upper() + names[1:]}, lying on {mast}, {be} to be shifted."
+        data["lateens_to_be_shifted"] = [sl.id for sl in shift_waiting]
     if begun:
         mast = "its mast" if len(begun) == 1 else "their masts"
         who = "The watch calls all hands to dip" if called else "The watch dips"
@@ -2915,6 +4172,19 @@ class HeaveToScript(Script):
         square_set = standing_sail_on(self.ship, self.yards) is not None
         if self.fore_and_after():
             if not square_set and innermost_head_sail(self.ship, standing=True) is None:
+                head, after = head_and_after_yards(self.ship)
+                if (
+                    whole_lateens(self.ship)
+                    and not (head or after)
+                    and not head_sails_carried(self.ship)
+                ):
+                    # a rig of whole lateens with no head sail and no braced yard aboard: nothing
+                    # to bring her to, and her lying to under her lateens is not built (package
+                    # 90, A1a; the xebec's words, her A1 (7)); a boat's and a schooner's refusal
+                    # as it was. It is what she carries, not what is set, of the yards and the
+                    # head sails alike (the lead's nudges 43 and 46, item 3): a yard with its sail
+                    # furled, or a jib furled, can still be set, and she is told what is not set
+                    return LATEENS_WILL_NOT_LIE_TO
                 return "No head sail is set to haul to windward, nor a topsail to lay aback."
             if not square_set:
                 self.yards = []
@@ -3195,9 +4465,9 @@ class HeaveToScript(Script):
         }
 
     def _helm_words(self) -> str:
-        """`helm a-lee`, or that it does not answer with the wheel shot away (package 116:
-        she is brought to by her sails alone)."""
-        return HELM_LOST_ASIDE if helm_lost(self.ship) else "helm a-lee"
+        """`helm a-lee`, or that it does not answer with the helm shot away (package 116:
+        she is brought to by her sails alone), in the words of her helm (package 90, A3)."""
+        return helm_words(self.ship)["aside"] if helm_lost(self.ship) else "helm a-lee"
 
     def data(self) -> dict[str, Any]:
         d = super().data()
@@ -3278,6 +4548,9 @@ class FillAwayScript(Script):
     # B3.3b's review: true from the order to the first tick when a settee is set, the dip read
     # then by the wind (`_first_tick`); the field is gone again once read
     wind_to_read = False
+    # package 90, A1b: a whole lateen on her weather side, shifted first as she lies, as a
+    # settee is dipped (set on the script only when one is, the pickle otherwise as before)
+    lateen_change: LateenChange | None = None
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -3298,6 +4571,9 @@ class FillAwayScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)  # a settee being dipped, till it is hoisted (package 75)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # a lateen being shifted, till it is set (package 90)
         return held
 
     def check(self, words: dict[str, Any]) -> str | None:
@@ -3316,17 +4592,28 @@ class FillAwayScript(Script):
         lee = _lee_name(self.sign)
         change = SetteeChange(self.ship)
         change.ids = [i for i in change.ids if self.ship.sails[i].lug_side != lee]
-        if not change.ids:
+        # package 90, A1b: a whole lateen on that tack's weather side, shifted first as she lies
+        # (`LateenChange`, the tack's rate), as the settee is dipped; one on her lee is let be
+        lateens = [sl.id for sl in whole_lateens(self.ship) if sl.lug_side != lee]
+        if not change.ids and not lateens:
             return False
-        self.settee_change = change
+        if change.ids:
+            self.settee_change = change  # first, as before, so that its pickle is as it was
         self.lying = {"sign": self.sign}  # the tending's own record, on the tack she is on
         self.phase = "dip_settee"
         self.ship.dyn.steady = False
-        change.change(lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_DIPPED_WORDS)
-        self.note(
-            f"Dip the {change.names()}: lower the yard, pass it round abaft {change.masts()} "
-            "and shift the tack to the weather bow."
-        )
+        if change.ids:
+            change.change(lee, self.timing_value("settee_dip_s", SETTEE_DIP_S), SETTEE_DIPPED_WORDS)
+            self.note(
+                f"Dip the {change.names()}: lower the yard, pass it round abaft "
+                f"{change.masts()} and shift the tack to the weather bow."
+            )
+        if lateens:
+            shift = LateenChange(self.ship, lateens, lee)
+            said = shift.begin(lateen_change_s_per_m())
+            if said:
+                self.lateen_change = shift
+                self.note(said)
         return True
 
     def _dip_tick(self, dt: float, wind: Wind, factor: float, rel: float) -> None:
@@ -3336,8 +4623,9 @@ class FillAwayScript(Script):
         tack's lee with its sheet drawn for the wind she will have full and by with the way she
         has, as the tack hoists it (`full_and_by_apparent`); then she is let fall off."""
         change = self.settee_change
+        lateens = self.lateen_change  # package 90, A1b: a whole lateen shifted as she lies
         lying = self.lying
-        assert change is not None and lying is not None
+        assert (change is not None or lateens is not None) and lying is not None
         if not self.signed and abs(rel) > 0.5 * POINT:
             # the tack she is on, by the wind itself, read once as `tick` reads it (the deck's
             # reading lags a ship that has just come round)
@@ -3347,16 +4635,22 @@ class FillAwayScript(Script):
                 self.sign = sign
                 lying.clear()
                 lying["sign"] = sign
-                change.side = _lee_name(sign)
+                if change is not None:
+                    change.side = _lee_name(sign)
+                if lateens is not None:
+                    lateens.side = _lee_name(sign)
         tend_lying_to(self.ship, lying, dt, wind, lying_to_timing())
         awa = full_and_by_apparent(self.ship, wind, self.ship.dyn.u)
-        if change.advance(dt, factor, awa):
+        done = change.advance(dt, factor, awa) if change is not None else True
+        if lateens is not None:
+            done = lateens.advance(dt, factor, awa) and done
+        if done:
             self.fall_t0 = self.t
             self._fall_off()
 
     def begin(self, words: dict[str, Any]) -> None:
         self.sign = 1.0 if self.ship.dyn.tack == "starboard" else -1.0
-        if settees(self.ship):
+        if settees(self.ship) or whole_lateens(self.ship):  # package 90, A1b: a lateen too
             # package 75, B3.3b's review: with a settee set, whether it is dipped first is read
             # at the first tick from the wind itself (`_first_tick`), not from the deck's
             # reading, which lags a ship just come round: by the deck's alone one on her lee was
@@ -3474,12 +4768,12 @@ class FillAwayScript(Script):
                 aback = _yards_aback_for(self.ship, self.sign)
                 what = sail_name_on(self.ship, aback) if aback else "yards"
                 head, after = head_and_after_yards(self.ship)
-                # with no braced yard (a lugger, a boat) nothing is braced full: the helm is
-                # righted for her course, which is what this moment is for her (package 90, A2:
-                # "Braced the yards full." before it, whatever the rig; the words JUDGEMENT)
-                full = (
-                    f"braced the {what} full" if has_braced_yards(head, after) else "right the helm"
-                )
+                # with no braces worked (a lugger, a boat; the cutter or the smack with no square
+                # sail set, A2's second pass) nothing is braced full: the helm is righted for her
+                # course, which is what this moment is for her (package 90, A2: "Braced the yards
+                # full." before it, whatever the rig; the words JUDGEMENT)
+                worked = braces_worked(self.ship)
+                full = f"braced the {what} full" if worked else "right the helm"
                 if falling_s > 1.0:
                     self.note(f"Fallen off; {full}.")
                 else:
@@ -3567,12 +4861,18 @@ class FillAwayScript(Script):
         fall_s = self.timing_value("fall_off_timeout_s", 180.0)
         if self.phase == "dip_settee" and self.settee_change is not None:
             return self.settee_change.left_s + fall_s + brace_s  # package 75, B3.3b
+        if self.phase == "dip_settee" and self.lateen_change is not None:
+            return self.lateen_change.left_s() + fall_s + brace_s  # package 90, A1b
         if self.wind_to_read:
             # a settee set, the first tick to come (package 75, B3.3b's review): its dip
             # counted if the deck has it on her weather side, as the wind will mostly agree
             lee = _lee_name(self.sign)
             dip = any(sl.lug_side != lee for sl in settees(self.ship))
             dip_s = self.timing_value("settee_dip_s", SETTEE_DIP_S) if dip else 0.0
+            rate = lateen_change_s_per_m()
+            yards = [lateen_yard_m(self.ship, sl) for sl in whole_lateens(self.ship)]
+            if any(sl.lug_side != lee for sl in whole_lateens(self.ship)):
+                dip_s = max(dip_s, max(yards, default=0.0) * rate)  # package 90, A1b
             return dip_s + fall_s + brace_s
         if self.phase == "fall_off":
             return max(0.0, fall_s - (self.t - self.fall_t0)) + brace_s
@@ -3584,14 +4884,14 @@ class FillAwayScript(Script):
         """'the helm and the yards left as they stand; the mainsail lowered on deck, not yet
         dipped': belayed while a settee is being dipped (package 75, B3.3b's review), the
         settee in its gear on deck, which the runner's words, naming the phase, did not say;
-        None otherwise, for the runner's words."""
-        change = self.settee_change
-        if self.phase != "dip_settee" or change is None or change.done:
+        None otherwise, for the runner's words (which name the changes in hand too). A whole
+        lateen being shifted as she lies is finished at the belay and said so, one waiting its
+        turn left on its mast (`Script.changes_left_words`; package 90, the lead's nudge 46,
+        item 2: before, "... in its gear, not yet shifted round the mast", and left so)."""
+        if self.phase != "dip_settee":
             return None
-        return (
-            f"the helm and the yards left as they stand; the {change.names()} lowered on deck, "
-            "not yet dipped"
-        )
+        also = self.changes_left_words()
+        return f"the helm and the yards left as they stand; {also}" if also else None
 
     def words(self) -> dict[str, Any]:
         course = units.format_heading(self.new_course)
@@ -3602,14 +4902,13 @@ class FillAwayScript(Script):
         else:
             course_words = f"steering {course}"
         # package 90, A2: braced full, and the braces manned, by her rig (`braces_manned`);
-        # with no braced yard she is not said to be braced ("braced full and" before it)
-        head, after = head_and_after_yards(self.ship)
+        # with no braces worked she is not said to be braced ("braced full and" before it)
         return {
             "new_course": course,
             "filled_tack": _tack_name(self.sign),
             "course_words": course_words,
             "braces": braces_manned(self.ship),
-            "braced_full": "braced full and " if has_braced_yards(head, after) else "",
+            "braced_full": "braced full and " if braces_worked(self.ship) else "",
         }
 
     def data(self) -> dict[str, Any]:
@@ -3706,9 +5005,13 @@ def mast_inventory(ship: Ship) -> str:
             d for d in ship.dependents(lower) if isinstance(d, Spar) and d.cls in MAST_CLASSES
         ]
         names = [part_name(ship, m.id) for m in _in_ship_order(ship, chain)]
-        groups.append(
-            "the " + (names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
+        group = "the " + (
+            names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
         )
+        if ship.is_pole_mast(lower):
+            # package 90, A6: no topmast to strike, send down or fid on a pole
+            group += " (a pole, the mast and topmast in one stick)"
+        groups.append(group)
     if not groups:
         return "she has no masts"
     return "her masts are " + (
@@ -5339,6 +6642,31 @@ class BoxHaulScript(Script):
     # for a ship with a settee
     settee_change: SetteeChange | None = None
     by_the_bow = False
+    # package 90, A1b: a whole lateen's change, set only when one is shifted (the pickle as before)
+    lateen_change: LateenChange | None = None
+
+    def _lateens_at_box(self) -> None:
+        """The lateens at the box (package 90, A1b): box-hauling and wearing short round shift
+        theirs as the wind comes aft (`_lateens_at_come_to`), so nothing here."""
+
+    def _lateens_at_come_to(self, lee: str) -> None:
+        """The wind aft and she comes to (package 90, A1b; Design-Package90-Engine.md §2.3a row 8):
+        the whole lateens her practice shifts in wearing that hang off her new lee are shifted
+        round their masts (`LateenChange`); a change begun at the box (box her off) is carried to
+        this lee."""
+        change = self.lateen_change
+        if change is not None and not change.done:
+            change.side = lee
+            return
+        plan = lateen_plan(self.ship, self.params, "wearing")
+        ids = [i for i in plan["shift"] if self.ship.sails[i].lug_side != lee]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
 
     def _settee_at_box(self) -> tuple[SetteeChange, str, str]:
         """The settees lowered at the box, the side each is to be hoisted on, and the line said
@@ -5365,10 +6693,19 @@ class BoxHaulScript(Script):
         change = self.settee_change
         if change is not None and not change.done:
             held |= set(change.ids)
+        lateens = self.lateen_change
+        if lateens is not None and not lateens.done:
+            held |= set(lateens.ids)  # package 90, A1b
         return held
+
+    def lateen_way(self) -> float | None:
+        return float(self.way_before)  # by the wind before the helm, as `advance` is given it
 
     def check(self, words: dict[str, Any]) -> str | None:
         if not self.head:
+            # left as it is, "head" said to the five boats of one mast too: the refusal is
+            # also the rejected order's event's data (its reason), which package 90, A2's
+            # second pass holds the same (words only); for the lead
             return "She has no head yards to brace abox."
         if "hove_to" in self.ship.extra:
             return "She is hove to; fill away first, or wear."
@@ -5383,7 +6720,19 @@ class BoxHaulScript(Script):
         if self.timing_value("luff_first", 1.0) > 0:
             dyn.target_rudder = self.sign * helm
             self.phase = "luff"
-            self.note("Ready about. Helm's a-lee; checked the lee head braces.", "helm.order")
+            # the braces of the yards to be braced abox, the action's head list, named by their
+            # class as built (`class_word`: "the braces" on a vessel of one mast, package 90,
+            # A2's second pass, "the lee head braces" before it; a brig's main braces with her
+            # fore gone, her after braces: its sixth commit), and checked only where she works
+            # them (`braces_worked`: a rig of head yards alone with no square sail set, the
+            # smack under her plain sail, is given the helm's words alone)
+            abox = told_of(self.ship, self.head)
+            checked = (
+                f"; checked the lee {class_word(self.ship, abox)}braces"
+                if abox and braces_worked(self.ship)
+                else ""
+            )
+            self.note(f"Ready about. Helm's a-lee{checked}.", "helm.order")
         else:
             dyn.target_rudder = -self.sign * helm
             self._box()
@@ -5408,13 +6757,28 @@ class BoxHaulScript(Script):
             lowered = change.lower()
             up = f"{lowered[0].upper()}{lowered[1:]}! {up}"
             change.change(side, self.timing_value("settee_dip_s", SETTEE_DIP_S), said)
+        self._lateens_at_box()  # package 90, A1b
         targets = [-self.sign * y.brace_limit for y in self.head] + [0.0 for _ in self.after]
         self.swing = YardSwing(self.head + self.after, targets, self.timing_value("brace_s", 45.0))
-        if self.after:
-            text = "Square away the after yards! Brace abox the head yards!"
+        # the yards squared and the yards braced abox, the action's after and head lists, each
+        # named by its class as built (`class_word`: "the yards" on a vessel of one mast,
+        # package 90, A2's second pass, "Brace abox the head yards!" before it; a brig with her
+        # fore gone braces her main yards abox, her after yards: its sixth commit)
+        squared, abox = told_of(self.ship, self.after), told_of(self.ship, self.head)
+        yards = f"{class_word(self.ship, abox)}yards"
+        if squared:
+            after = f"{class_word(self.ship, squared)}yards"
+            text = f"Square away the {after}! Brace abox the {yards}!"
+        elif abox and braces_worked(self.ship):
+            text = f"Brace abox the {yards}!"
         else:
-            text = "Brace abox the head yards!"
-        self.note(up + text)
+            # no square sail set to box her head off with (a rig of head yards alone): her
+            # yards are swung abox bare, and the line says what is hauled up, or, with
+            # nothing, the helm as she has it (package 90, A2's second pass, the checker's
+            # finding 2: "Brace abox the yards!" before it; the words JUDGEMENT)
+            alee = self.ship.dyn.target_rudder * self.sign > 0.0
+            text = "" if up else ("Keep the helm a-lee." if alee else "Keep the helm up.")
+        self.note((up + text).strip())
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         self.t += dt
@@ -5455,6 +6819,9 @@ class BoxHaulScript(Script):
             awa = full_and_by_apparent(self.ship, wind, self.way_before)
             hoist = self.phase == "come_to" and self.sign * rel < 0
             self.settee_change.advance(dt, factor, awa, may_hoist=hoist)
+        if self.lateen_change is not None:  # package 90, A1b
+            awa = full_and_by_apparent(self.ship, wind, self.way_before)
+            self.lateen_change.advance(dt, factor, awa)
         if self.phase == "box":
             assert self.swing is not None
             if self.swing.advance(dt, factor):
@@ -5474,11 +6841,18 @@ class BoxHaulScript(Script):
                 shift_sheets_over(
                     self.ship, "starboard" if self.sign > 0 else "larboard", wind, self.way_before
                 )
-                # the after yards braced up only where she has after yards (package 90, A2:
-                # the cutter, the smack and the schooners box-hauled, worn short round or boxed
-                # off round by the stern were told so before it)
-                after = "braced up the after yards; " if self.after else ""
+                # the after yards braced up as she comes to, said only where the action braces
+                # some up now (`told_of` its after list; the head yards follow the wind, unsaid),
+                # named by their class as built (`class_word`; package 90, A2: the cutter, the
+                # smack and the schooners box-hauled, worn short round or boxed off round by the
+                # stern were told so before it; A2's second pass, its sixth commit, the lead's
+                # nudge 40: a brig with her fore gone, her main yards in the action's head list,
+                # has none braced up now, nor one with her main gone)
+                up = told_of(self.ship, self.after)
+                after = f"braced up the {class_word(self.ship, up)}yards; " if up else ""
                 self.note(f"Wind aft; {after}shifted over the sheets.{words}")
+                # package 90, A1b: the lateens' change begun with the wind aft
+                self._lateens_at_come_to("starboard" if self.sign > 0 else "larboard")
         if self.phase == "come_to":
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.helm_mode = HelmMode.HEADING
@@ -5498,6 +6872,8 @@ class BoxHaulScript(Script):
                 follow_wind(self.head, rel, ch, max_step)
                 head_done = False
             settee_up = self.settee_change is None or self.settee_change.done  # package 75
+            if self.lateen_change is not None and not self.lateen_change.done:
+                settee_up = False  # a whole lateen not yet shifted (package 90, A1b)
             if steady and after_done and head_done and settee_up:
                 self.finish()
 
@@ -5525,10 +6901,15 @@ class BoxHaulScript(Script):
     def words(self) -> dict[str, Any]:
         old = "starboard" if self.sign > 0 else "larboard"
         new = "larboard" if self.sign > 0 else "starboard"
+        # the end line's "braced sharp up", or "full and by" where she works no braces, as
+        # the tack's and the wear's ends (package 90, A2's second pass, the checker's finding
+        # 2: "braced sharp up" whatever she had set before it)
+        worked = braces_worked(self.ship)
         return {
             "old_tack": old,
             "new_tack": new,
             "new_course": units.format_heading(self.new_course),
+            "braced": "braced sharp up" if worked else "full and by",
         }
 
 
@@ -5592,6 +6973,20 @@ class BoxOffScript(BoxHaulScript):
             "and shift the tack to the weather bow."
         )
 
+    def _lateens_at_box(self) -> None:
+        """Only a whole lateen on the weather side of the tack she is boxed off on is shifted
+        (package 90, A1b; Design-Package90-Engine.md §2.3a row 9, the settee's silent case): begun
+        at the box, set on that tack's lee when its time is done, she boxed off when it is."""
+        lee = _lee_name(self.sign)
+        ids = [sl.id for sl in whole_lateens(self.ship) if sl.lug_side not in (None, lee)]
+        if not ids:
+            return
+        change = LateenChange(self.ship, ids, lee)
+        said = change.begin(lateen_change_s_per_m())
+        if said:
+            self.lateen_change = change
+            self.note(said)
+
     def begin(self, words: dict[str, Any]) -> None:
         dyn = self.ship.dyn
         self.sign = 1.0 if dyn.tack == "starboard" else -1.0
@@ -5617,7 +7012,10 @@ class BoxOffScript(BoxHaulScript):
         if change is not None:
             # a settee lowered at the box, hoisted on her lee once its time is done (package 75)
             change.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
-        if swung and (change is None or change.done):
+        lateens = self.lateen_change
+        if lateens is not None:  # a lateen shifted from the box (package 90, A1b)
+            lateens.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
+        if swung and (change is None or change.done) and (lateens is None or lateens.done):
             self.finish()
 
     def _haul(self, factor: float) -> None:
@@ -5637,13 +7035,34 @@ class BoxOffScript(BoxHaulScript):
         dyn.steady = False
         self.new_course = dyn.heading
         tack = _tack_name(self.sign)
-        self.note(f"Her after sails take. Let go and haul! Brace up for the {tack} tack.{words}")
+        # her yards hauled and braced up in words only where she works her braces; else the
+        # helm, kept full and by now (package 90, A2's second pass, the checker's finding 2;
+        # the words JUDGEMENT)
+        if braces_worked(ship):
+            said = f"Her after sails take. Let go and haul! Brace up for the {tack} tack."
+        else:
+            said = "Her after sails take; keep her full and by."
+        self.note(f"{said}{words}")
 
     def remaining_s(self) -> float:
         return max(0.0, self.timing_value("box_estimate_s", 240.0) - self.t)
 
     def words(self) -> dict[str, Any]:
-        return {"tack": _tack_name(self.sign), "new_tack": _tack_name(self.sign)}
+        # the first line's braces, of the yards to be braced abox (the action's head list),
+        # named by their class as built (`class_word`: "the braces" on a vessel of one mast,
+        # package 90, A2's second pass, "the head braces" whatever her masts before it; a brig's
+        # main braces with her fore gone, her after braces: its sixth commit), stood by only
+        # where she works them, and the end line's "braced sharp up", or "trimmed" before its
+        # "full and by" where she works none (the checker's finding 2)
+        worked = braces_worked(self.ship)
+        abox = told_of(self.ship, self.head)
+        stand_by = f" Stand by the {class_word(self.ship, abox)}braces." if abox and worked else ""
+        return {
+            "tack": _tack_name(self.sign),
+            "new_tack": _tack_name(self.sign),
+            "stand_by": stand_by,
+            "braced": "braced sharp up" if worked else "trimmed",
+        }
 
 
 # Taken aback full and by, the helm boxes her off itself after this long (package 37p;
@@ -5761,12 +7180,12 @@ def _brace_up_for_the_helm(ship: Ship, runner: Any, memo: dict[str, Any]) -> Non
 
 
 def _topsails_on(ship: Ship, yards: list[Spar]) -> list:
-    """The topsails among a mast's yards: square sails on yards that hang on a topmast."""
+    """The topsails among a mast's yards: square sails on yards of the topsail's level
+    (`Ship.yard_level` 1; package 90, A5)."""
     out = []
     for y in yards:
         sl = ship.sail_of(y)
-        parent = ship.parent_of(y)
-        if sl is not None and sl.cls == "square" and parent is not None and parent.cls == "topmast":
+        if sl is not None and sl.cls == "square" and ship.yard_level(y) == 1:
             out.append(sl)
     return out
 
@@ -5857,9 +7276,12 @@ class LieATryScript(Script):
         if "hove_to" in self.ship.extra:
             return "She is lying to already."
         if not any(s.is_set for s in self.topsails):
+            # close-reefed where it has the bands to be (package 90, A5: the smack's topsail,
+            # a topsail by its level now, has none)
+            reefed = ", close-reefed," if any(s.reef_bands > 0 for s in self.topsails) else ""
             return (
-                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it, "
-                f"close-reefed, to lie a-try under it."
+                f"The {names_of_sails(self.ship, self.topsails)[4:]} is not set; set it{reefed} "
+                f"to lie a-try under it."
             )
         return None
 
@@ -6018,8 +7440,8 @@ class ScudScript(Script):
         dyn.steady = False
         self.phase = "bear_up"
         brailed = f"; brailed up {names_of_sails(self.ship, self.drivers)}" if self.drivers else ""
-        # the yards braced in only where she has a braced yard (package 90, A2)
-        brace_in = "; brace in the yards as she goes off" if working_yards(self.ship) else ""
+        # the yards braced in only where she works her braces (package 90, A2: `braces_worked`)
+        brace_in = "; brace in the yards as she goes off" if braces_worked(self.ship) else ""
         self.note(f"Up helm{brailed}{brace_in}.", "helm.order")
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
@@ -6042,9 +7464,12 @@ class ScudScript(Script):
 
     def words(self) -> dict[str, Any]:
         side = "starboard" if self.sign > 0 else "larboard"
-        # the braces stood by only where she has a braced yard (package 90, A2)
-        braces = "; stand by the braces" if working_yards(self.ship) else ""
-        return {"course": units.format_heading(self.course), "quarter": side, "braces": braces}
+        # the braces stood by only where she works them (package 90, A2); and where she works
+        # none, the up-helm said once, by the line before this one ("Up helm." and at once "Up
+        # helm. Bear up and scud." in A2: A2's second pass), on every rig: a brig with every
+        # mast gone too, who is told of no yard (`yards_told`; the lead's nudge 37)
+        up_helm = "Up helm; stand by the braces. " if braces_worked(self.ship) else ""
+        return {"course": units.format_heading(self.course), "quarter": side, "up_helm": up_helm}
 
 
 class BackAndFillScript(Script):
@@ -7447,7 +8872,12 @@ class ComeToAnchorScript(_AnchorScript):
                 )
                 self.anchor.brought_up = True  # the evolution's own line says so
                 # the yards squared only where she has a braced yard (package 90, A2: the
-                # lugger was told to square hers before it)
+                # lugger was told to square hers before it). Read from the yards crossed, not the
+                # square sails set (A2's second pass, `braces_worked`, read under sail): this is
+                # the furl's line, which squares every yard and furls every sail not furled, and
+                # every square sail is clewed up by now ("Let go the topsail sheets; clew up"),
+                # so that a reading of the sails set would drop it from every rig of head yards
+                # alone, a topsail schooner's whose topsail is in its gear to be furled among them
                 square = "; square the yards" if yards else ""
                 self.note(f"Brought up. Stations for furling sail{square}.")
             return
@@ -7480,12 +8910,12 @@ class ComeToAnchorScript(_AnchorScript):
 
 
 def _is_upper_square(ship: Ship, sail: Any) -> bool:
-    """A square sail above the topsails: on a topgallant or royal yard."""
+    """A square sail above the topsails: on a topgallant or royal yard, by its level
+    (`Ship.yard_level`; package 90, A5)."""
     if sail.cls != "square":
         return False
     yard = ship.yard_of(sail)
-    parent = ship.parent_of(yard) if yard is not None else None
-    return parent is not None and parent.cls in ("topgallant_mast", "royal_mast")
+    return yard is not None and ship.yard_level(yard) >= 2
 
 
 class LetGoAnchorScript(_AnchorScript):
@@ -8083,16 +9513,26 @@ def _world_of(ship: Ship) -> Any:
 
 
 def _topsails(ship: Ship) -> list[Sail]:
-    """The topsails: the square sails whose yard crosses a topmast."""
+    """The topsails: the square sails whose yard is of the topsail's level (`Ship.yard_level` 1;
+    package 90, A5: a topmast's, or a pole mast's head over its lower yard)."""
     out = []
     for sl in ship.sails.values():
         if sl.cls != "square" or sl.wrecked:
             continue
         yard = ship.yard_of(sl)
-        parent = ship.parent_of(yard) if yard is not None else None
-        if parent is not None and parent.cls == "topmast":
+        if yard is not None and ship.yard_level(yard) == 1:
             out.append(sl)
     return out
+
+
+def _plain_sail_topsails(ship: Ship) -> list[Sail]:
+    """The topsails she gets under way under (package 90, nudge 39 ruling 3): getting under way
+    makes her plain sail, so a topsail not of her plain sail (the smack's, set over it only at the
+    player's word) is not loosed by the cast; ruled by the plain sail, not by the vessel. A file
+    with no plain sail group, every topsail, as before."""
+    plain = ship.groups.get("plain sail")
+    tops = _topsails(ship)
+    return tops if plain is None else [sl for sl in tops if sl.id in plain]
 
 
 def _boom_mainsails(ship: Ship) -> list[Sail]:
@@ -8184,6 +9624,50 @@ def _standing_lugs_all(ship: Ship) -> list[Sail]:
 # The first words of getting under way (`data/evolutions/get_under_way.yaml`'s on_start):
 # a ship's, and a lugger's, who has a windlass and no sail-loosers to send aloft (package
 # 68; the cold review of 2026-10-22, R-45).
+# A pole sail's words by the yard below it (package 90, nudge 39 ruling 2): lowered onto a braced
+# yard crossed below it on the mast, or, where none is (the tartane's topsail over her great
+# lateen), to the hounds, and furled there on its own yard.
+POLE_WORDS_ON_THE_YARD_BELOW = {
+    "pole_lowered": "down onto the yard below",
+    "pole_hanging": "lowered on the yard below",
+    "pole_furl_from": "Lay out on the yard below",
+    "pole_furled_on": "on the yard below",
+}
+POLE_WORDS_AT_THE_HOUNDS = {
+    "pole_lowered": "down to the hounds",
+    "pole_hanging": "lowered to the hounds",
+    "pole_furl_from": "Lay aloft to the hounds",
+    "pole_furled_on": "on its own yard, lowered to the hounds",
+}
+
+
+def pole_words(ship: Ship, sail: Sail) -> dict[str, str]:
+    """The words of `take_in_pole` and `furl_pole` for this sail: the yard below's where a braced
+    yard is crossed below its yard on the same mast, the hounds' where none is. A yard whose sail
+    is set flying and furled is not crossed: it is sent down on deck with its sail (package 57;
+    the tartane's tréou in her plain sail), as a wrecked yard is not there to lower onto."""
+    yard = ship.yard_of(sail)
+    if yard is None:
+        return dict(POLE_WORDS_AT_THE_HOUNDS)
+    order = list(ship.spars)
+    at = (yard.height_m, order.index(yard.id))
+
+    def crossed(y: Spar) -> bool:
+        on_it = ship.sail_of(y)
+        sent_down = on_it is not None and on_it.flying and on_it.state is SailState.FURLED
+        return not y.wrecked and not sent_down
+
+    below = [
+        y
+        for y in ship.spars.values()
+        if y.cls == "yard"
+        and y.parent == yard.parent
+        and (y.height_m, order.index(y.id)) < at
+        and crossed(y)
+    ]
+    return dict(POLE_WORDS_ON_THE_YARD_BELOW if below else POLE_WORDS_AT_THE_HOUNDS)
+
+
 UNDER_WAY_START_WORDS = (
     "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to "
     "get the sails ready for loosing."
@@ -8336,7 +9820,7 @@ class GetUnderWayScript(_AnchorScript):
                 "halliards manned on deck."
             )
             return
-        tops = _topsails(ship)
+        tops = _plain_sail_topsails(ship)
         mains = _boom_mainsails(ship)
         # a settee furled on its yard aloft is loosed with them, to be set after the cast
         # (package 75; Ext §5.8: `set_settee` looses it aloft first; B3.3's review)
@@ -8398,7 +9882,7 @@ class GetUnderWayScript(_AnchorScript):
             return
         if self.phase == "loose":
             if self.phase_t >= self.timing_value("loose_s", 240.0) * factor:
-                tops = _topsails(ship)
+                tops = _plain_sail_topsails(ship)
                 for sl in tops:
                     if sl.state in (SailState.LOOSED, SailState.FURLED, SailState.IN_THE_GEAR):
                         sl.state = SailState.SET
@@ -8439,9 +9923,15 @@ class GetUnderWayScript(_AnchorScript):
                     )
                 else:
                     self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 60.0))
+                    # her after and head lists braced up and abox, each named by its class as
+                    # built (`class_word`; package 90, A2's second pass, its sixth commit: a ship
+                    # with her fore gone lays her main yards abox, after yards); with two masts
+                    # of yards she has both lists
+                    up = class_word(ship, told_of(ship, after))
+                    abox = class_word(ship, told_of(ship, head))
                     self.note(
-                        f"Let fall! Sheet home! Hoist away the topsails! Brace up the after "
-                        f"yards for the {self.tack} tack, the head yards abox. Man the bars; "
+                        f"Let fall! Sheet home! Hoist away the topsails! Brace up the {up}"
+                        f"yards for the {self.tack} tack, the {abox}yards abox. Man the bars; "
                         "heave round!"
                     )
             return
@@ -8511,9 +10001,11 @@ class GetUnderWayScript(_AnchorScript):
                     )
                     return
                 # her topsail yard laid abox only where she has one: a boat at her grapnel has no
-                # braced yard (package 90, A2: "The topsail yard abox." whatever she had)
+                # braced yard (package 90, A2: "The topsail yard abox." whatever she had); and
+                # only where she works her braces (A2's second pass: `braces_worked`)
                 abox = ""
-                if self.fore_and_aft and head_and_after_yards(ship)[0]:
+                cast_head = head_and_after_yards(ship)[0]
+                if self.fore_and_aft and cast_head and braces_worked(ship):
                     abox = " The topsail yard abox."
                 self.note(
                     "Let go the downhauls, hoist away the jib, its sheet to windward!"
@@ -8632,12 +10124,17 @@ class GetUnderWayScript(_AnchorScript):
                     self.phase = "under_way"
                     self.phase_t = 0.0
                     driver = driver_words(ship, [sl for sl in drivers if sl.is_set])
-                    # the topsail yard braced round only where she has one (package 90, A2)
-                    brace = ", brace round the topsail yard" if head else ""
+                    # the topsail yard braced round only where she has one (package 90, A2), and
+                    # works her braces (A2's second pass: `braces_worked`)
+                    worked = head and braces_worked(ship)
+                    brace = ", brace round the topsail yard" if worked else ""
+                    # the head list braced round, named by its class as built (`class_word`; A2's
+                    # second pass, its sixth commit: a ship with her fore gone, her main yards)
+                    rounded = class_word(ship, told_of(ship, head))
                     self.note(
                         f"{how}; right the helm, draw the jib, haul aft the main sheet{brace}."
                         if self.fore_and_aft
-                        else f"{how}; right the helm, brace round the head yards, set {driver}."
+                        else f"{how}; right the helm, brace round the {rounded}yards, set {driver}."
                     )
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):
@@ -8983,12 +10480,49 @@ class UnmoorScript(_AnchorScript):
         return 1500.0 if self.phase in ("rig_capstan", "heave") else 400.0
 
 
+def _boat_out_s(script: Any) -> float:
+    """The seconds to get the errand's boat out: hoisted out by the yard and stay tackles
+    (`hoist_out_s`), or a boat towed astern hauled up alongside by her painter
+    (`haul_alongside_s`; package 90, A4)."""
+    from freesail.world.ports import BOAT_HAUL_ALONGSIDE_S
+
+    if script.towed:
+        return script.timing_value("haul_alongside_s", float(BOAT_HAUL_ALONGSIDE_S))
+    return script.timing_value("hoist_out_s", 300.0)
+
+
+def _boat_in_s(script: Any) -> float:
+    """The seconds to have the errand's boat back: hoisted in (`hoist_in_s`), or a towed boat
+    veered astern on her painter again (`veer_astern_s`; package 90, A4)."""
+    from freesail.world.ports import BOAT_VEER_ASTERN_S
+
+    if script.towed:
+        return script.timing_value("veer_astern_s", float(BOAT_VEER_ASTERN_S))
+    return script.timing_value("hoist_in_s", 300.0)
+
+
+def _boat_out_words(script: Any) -> str:
+    """The order that gets the errand's boat out: 'Hoist out the launch', or of a towed boat
+    'Haul the boat up alongside' (package 90, A4)."""
+    if script.towed:
+        return f"Haul {script.boat_name} up alongside"
+    return f"Hoist out {script.boat_name}"
+
+
+def _alongside_phase(script: Any) -> str:
+    """The boat's state back at the side: hoisting in, or a towed boat veering astern."""
+    return "alongside, veering astern" if script.towed else "alongside, hoisting in"
+
+
 class LayOutKedgeScript(_AnchorScript):
     """A kedge carried out by the boat and let go (data/evolutions/lay_out_kedge.yaml).
     Holds the ship and the boat (package 82, item 5: the boat's keeper reads the scripts
     that hold her, so that the kedge's boat is not denied while she is out)."""
 
     holds_subject = True
+    # a boat towed astern on her painter (package 90, A4; a boat's `towed`), set by `check`
+    # only for her: hauled up alongside and veered astern again, not hoisted out and in
+    towed = False
 
     # the phases with the boat's crew in her, away from the ship's side (hoisting out, slinging
     # the kedge and hoisting in are deck work): the review of the lead's ruling 11
@@ -9030,6 +10564,8 @@ class LayOutKedgeScript(_AnchorScript):
         if self.ports.boat.away:
             return f"{boat.name} is away"
         self.boat_name = boat.name
+        if getattr(boat, "towed", False):
+            self.towed = True
         if _water_depth(self.ship) is None:
             return "no bottom here to lay a kedge in"
         toward = self.params.get("toward_deg")
@@ -9093,7 +10629,7 @@ class LayOutKedgeScript(_AnchorScript):
                 boat_id=boat.id,
                 boat_name=boat.name,
                 errand="laying out the kedge",
-                phase="hoisting out",
+                phase="hauling alongside" if self.towed else "hoisting out",
                 since_tick=0,
             )
 
@@ -9105,7 +10641,7 @@ class LayOutKedgeScript(_AnchorScript):
         self.wind = wind
         ship = self.ship
         if self.phase == "hoist_out":
-            if self.phase_t >= self.timing_value("hoist_out_s", 300.0) * factor:
+            if self.phase_t >= _boat_out_s(self) * factor:
                 self.phase = "sling"
                 self.phase_t = 0.0
                 if self.ports is not None:
@@ -9167,10 +10703,10 @@ class LayOutKedgeScript(_AnchorScript):
                 self.phase = "hoist_in"
                 self.phase_t = 0.0
                 if self.ports is not None:
-                    self.ports.boat.phase = "alongside, hoisting in"
+                    self.ports.boat.phase = _alongside_phase(self)
             return
         if self.phase == "hoist_in":
-            if self.phase_t >= self.timing_value("hoist_in_s", 300.0) * factor:
+            if self.phase_t >= _boat_in_s(self) * factor:
                 if self.ports is not None:
                     from freesail.world.ports import BoatState
 
@@ -9184,6 +10720,7 @@ class LayOutKedgeScript(_AnchorScript):
         d.update(
             {
                 "boat": self.boat_name,
+                "boat_out": _boat_out_words(self),
                 "fathoms": _fathoms_words(units.m_to_fathoms(self.out_m)),
                 "point": units.point_name(self.toward),
             }
@@ -9200,6 +10737,9 @@ class SendBoatScript(Script):
     (`freesail.world.dealings.Dealings.boat_phase`). Holds the boat and not the ship."""
 
     holds_subject = False
+    # a boat towed astern on her painter (package 90, A4; a boat's `towed`), set by `check`
+    # only for her: hauled up alongside and veered astern again, not hoisted out and in
+    towed = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -9231,6 +10771,8 @@ class SendBoatScript(Script):
         if boat is None:
             return "she carries no boat"
         self.boat_name = boat.name
+        if getattr(boat, "towed", False):
+            self.towed = True
         from freesail.world.ports import BOAT_ASHORE_S, LIGHTER_S_PER_TON
 
         distance = self.ports.to_shore_m(port)
@@ -9279,7 +10821,7 @@ class SendBoatScript(Script):
         self.t += dt
         self.phase_t += dt
         if self.phase == "hoist_out":
-            if self.phase_t >= self.timing_value("hoist_out_s", 300.0) * factor:
+            if self.phase_t >= _boat_out_s(self) * factor:
                 self.phase = "pull_out"
                 self.phase_t = 0.0
                 self._say("away")
@@ -9301,23 +10843,31 @@ class SendBoatScript(Script):
                 self.phase = "hoist_in"
                 self.phase_t = 0.0
                 if self.ports is not None:
-                    self.ports.boat.phase = "alongside, hoisting in"
+                    self.ports.boat.phase = _alongside_phase(self)
             return
         if self.phase == "hoist_in":
-            if self.phase_t >= self.timing_value("hoist_in_s", 300.0) * factor:
+            if self.phase_t >= _boat_in_s(self) * factor:
                 self._say("alongside")
                 self.finish()
 
     def words(self) -> dict[str, Any]:
-        return {"boat": self.boat_name, "boat_cap": _cap(self.boat_name)}
+        back = "veered astern on her painter again" if self.towed else "hoisted in"
+        return {
+            "boat": self.boat_name,
+            "boat_cap": _cap(self.boat_name),
+            "boat_out": _boat_out_words(self),
+            "boat_back": back,
+        }
 
     def remaining_s(self) -> float:
+        # the boat out and in again: 300 s each, or a towed boat's (package 90, A4)
+        out_s, in_s = (_boat_out_s(self), _boat_in_s(self)) if self.towed else (300.0, 300.0)
         left = {
-            "hoist_out": 2 * self.pull_s + self.ashore_s + 600.0,
-            "pull_out": self.pull_s + self.ashore_s + 300.0 + self.pull_s,
-            "ashore": self.ashore_s + self.pull_s + 300.0,
-            "pull_back": self.pull_s + 300.0,
-            "hoist_in": 300.0,
+            "hoist_out": 2 * self.pull_s + self.ashore_s + out_s + in_s,
+            "pull_out": self.pull_s + self.ashore_s + in_s + self.pull_s,
+            "ashore": self.ashore_s + self.pull_s + in_s,
+            "pull_back": self.pull_s + in_s,
+            "hoist_in": in_s,
         }
         return max(0.0, left.get(self.phase, 600.0) - self.phase_t)
 
@@ -9416,8 +10966,238 @@ class FishingGearScript(Script):
         return {"gear": name, "Gear": _cap(name), "catch": self.catch_words}
 
 
+class ChangeLateenScript(Script):
+    """A whole lateen's yard shifted round its mast by itself, standing on her course (package
+    90, A1a; `data/evolutions/change_lateen.yaml`; Design-Package90-Engine.md §2.3 items 2 and
+    3): the parrel eased and the weather runners cast off, the yard peaked up by its halyard and
+    its car passed round abaft the mast (the lead's ruling), the tack shifted to the new weather
+    side and the runners set up again, the sheet drawn on the new lee. The yard is never lowered,
+    as a lug's and a settee's are. The sail draws nothing while it is shifted (in its gear), and
+    is set again on the lee side of the wind as the deck reads it when the work is done
+    (`Sail.lug_side`), its single sheet to leeward. Its seconds are its yard's length at
+    `LATEEN_SHIFT_ALONE_S_PER_M`, by the weather and the hands (the runner's factor), and its
+    party one able hand for each `LATEEN_YARD_M_A_HAND` of yard, at least `LATEEN_LEAST_PARTY`:
+    all hands are called for it, and the party's numbers term over the hands her company can give
+    is taken here (`party_term`), so that no post holds it and a small company has the hands at
+    any hour. Belayed, it is left in its gear where its yard
+    hangs, and the line says so (`left_words`). Its file's preconditions refuse a lateen cut at
+    the mast, blown out, unbent or not set, and one to leeward of its mast already."""
+
+    # class defaults (a checkpoint from before the lead's nudge 48): the yards a belay of a
+    # manoeuvre handed on, by sail id, their seconds still to come before the weather and the
+    # hands (`HANDED_ON`), worked at no lighter a rate than the manoeuvre's (`params["rate"]`),
+    # and the yard the last line names
+    handed: dict[str, float] | None = None
+    said_id: str | None = None
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.sail_id: str | None = (
+            params.get("sail") if isinstance(params.get("sail"), str) else None
+        )
+        self.side: str | None = None
+        self.left_s = 0.0
+
+    def _sail(self) -> Sail | None:
+        return self.ship.sails.get(self.sail_id) if self.sail_id else None
+
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the sail and its yard and mast standing (read as it is taken up
+        again after a belay; its file's preconditions read them as it begins)."""
+        sail = self._sail() or _subject_sail(self.ship, self.params, words)
+        if sail is None:
+            return None
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        name = part_name(self.ship, sail.id)
+        if sail.wrecked:
+            return f"the {name} is wrecked"
+        if any(sp.wrecked for sp in self.ship.spar_chain(sail)):
+            return f"the {name}'s yard or mast is wrecked"
+        return None
+
+    def parts_named(self) -> str | None:
+        """The yards a belay handed on and still in hand, named all, so that the work is "shifting
+        the mainsail and the foresail and the mizen" wherever it is named: the work the hands
+        are at, the belay of it, the call (the lead's nudge 49, item 4: before, "the watch is
+        shifting the mainsail" was said of three yards). None for the shift by itself."""
+        handed = self.handed if self.handed is not None else self.params.get(HANDED_ON)
+        if not isinstance(handed, dict) or not handed:
+            return None
+        return names_of_sails(self.ship, [self.ship.sails[i] for i in handed])
+
+    def holds(self) -> set[str]:
+        held = {self.sail_id} if self.sail_id else set()
+        # read by the runner as the work is made, before it begins: the yards handed on by the
+        # params, then by what is left of them
+        handed = self.handed if self.handed is not None else self.params.get(HANDED_ON)
+        if isinstance(handed, dict):
+            held |= set(handed)
+            if handed:
+                # work handed on holds the ship as the manoeuvre it stands for held her, so that
+                # no manoeuvre begins while a lateen of hers is in its gear in it: it waits
+                # behind the work, and its order says so (the lead's nudge 51, item 1: before,
+                # a fill away belayed a second into its change and given again began at once,
+                # "Filled away" at 49 s against 254 and 544 m further to windward in half an
+                # hour on the polacre probe)
+                held.add(self.ship.name)
+        return held
+
+    def begin(self, words: dict[str, Any]) -> None:
+        handed = self.params.get(HANDED_ON)
+        if isinstance(handed, dict) and handed:
+            # handed on by a manoeuvre belayed (the lead's nudge 48, item 1): the yards are in
+            # their gear already, each with the seconds it had left, going round to the side the
+            # manoeuvre took them
+            self.handed = {i: float(v) for i, v in handed.items() if i in self.ship.sails}
+            self.side = str(self.params.get("side") or "") or None
+            self.phase = "shift"
+            return
+        sail = _subject_sail(self.ship, self.params, words)
+        self.sail_id = sail.id if sail is not None else None
+        if sail is None:
+            self.fail("there is no such lateen")
+            return
+        # the new lee, the side opposite the wind as the deck reads it: where the yard goes
+        self.side = "larboard" if self.ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+        seconds = lateen_yard_m(self.ship, sail) * self.timing_value(
+            "shift_s_per_m", LATEEN_SHIFT_ALONE_S_PER_M
+        )
+        # its party's numbers term (all hands are called, the party the yard's): a company too
+        # small for the party takes the longer, never the shorter for more hands
+        self.left_s = max(seconds, 0.0) * party_term(self.ship, lateen_party(self.ship, sail))
+        sail.state = SailState.IN_THE_GEAR  # peaked up and passed round: drawing nothing
+        self.phase = "shift"
+
+    def _set_on_its_side(self, sail: Sail, awa: float | None = None) -> None:
+        sail.state = SailState.SET
+        sail.lug_side = self.side
+        draw_sheets(self.ship, [sail], None, awa)
+        for ln in self.ship.sheets_of(sail):
+            ln.held_side = None  # its single sheet lies to leeward of the wind
+
+    def _lies(self, sail: Sail) -> str:
+        """'it stands to leeward of the mast', or, set on the weather side (a yard handed on goes
+        round to the side the manoeuvre took it), 'it lies on the mast, to windward'."""
+        lee = "larboard" if self.ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+        if sail.lug_side == lee:
+            return "it stands to leeward of the mast"
+        return "it lies on the mast, to windward"
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        if self.handed is not None:
+            self._tick_handed(dt, factor, self._handed_awa(wind))
+            return
+        sail = self._sail()
+        if sail is None or self.side is None:
+            return
+        befallen = lateen_shift_befallen(self.ship, sail)
+        if befallen is not None:
+            # blown out, its yard or mast carried away, its halyard, sheet or tack parted while
+            # it was being shifted: the work ends in its own words, the sail as the casualty left
+            # it (the lead's nudges 46 and 48: before, it ended "Shifted the mainsail" set)
+            self.fail(befallen)
+            return
+        self.left_s -= dt / max(factor, 1e-6)
+        if self.left_s > 0.0:
+            return
+        self._set_on_its_side(sail)
+        self.finish()
+
+    def _handed_awa(self, wind: Wind) -> float | None:
+        """The apparent wind each yard handed on has its sheet drawn for: the manoeuvre's own,
+        close-hauled on the way it reckoned with (`Script.lateen_way`; None, her way now), so
+        that a belay leaves no sail trimmed otherwise than the manoeuvre would have left it
+        (the lead's nudge 51, item 1: before, the deck's reading as it was set, the xebec's
+        foresail hauled to 0.90 against the fill away's 0.70, and 29 m further to windward in
+        half an hour). Handed on by a save from before, which names no way: the deck's
+        reading, as then."""
+        if "way" not in self.params:
+            return None
+        way = self.params.get("way")
+        return full_and_by_apparent(self.ship, wind, float(self.ship.dyn.u if way is None else way))
+
+    def _tick_handed(self, dt: float, factor: float, awa: float | None = None) -> None:
+        """The yards a belay handed on: each set on its side when its seconds are done, worked at
+        no lighter a rate than the manoeuvre's at the belay, so never sooner than it would have
+        been, and said; each that something befalls let be and said; the work done with the
+        last."""
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        assert self.handed is not None
+        for i in list(self.handed):
+            sail = self.ship.sails[i]
+            befallen = lateen_shift_befallen(self.ship, sail)
+            if befallen is None:
+                # never lighter than the manoeuvre's rate at the belay
+                rate = max(factor, float(self.params.get("rate") or 1.0), 1e-6)
+                self.handed[i] -= dt / rate
+                if self.handed[i] > 0.0:
+                    continue
+                self._set_on_its_side(sail, awa)
+            del self.handed[i]
+            self.said_id = i
+            if not self.handed:
+                if befallen is not None:
+                    self.fail(befallen)
+                else:
+                    self.finish()
+                return
+            name = part_name(self.ship, i)
+            if befallen is not None:
+                text = f"Could not shift the {name}: {befallen}."
+                self.ship.note("notable", "evolution.failed", text, self.ship.name)
+            else:
+                text = f"Shifted the {name}; {self._lies(sail)}."
+                self.ship.note("notable", "sail.dipped", text, self.ship.name)
+
+    def remaining_s(self) -> float:
+        if self.handed:
+            rate = float(self.params.get("rate") or 1.0)
+            return max(0.0, max(self.handed.values()) * rate)
+        return max(0.0, self.left_s)
+
+    def left_words(self) -> str | None:
+        """'the mainsail in its gear, its yard not yet shifted round the mast': belayed, the
+        sail is left drawing nothing where its yard hangs; so the yards a belay handed on, belayed
+        in their turn (the lead's nudge 48: allowed as built, there being no gain in it)."""
+        if self.status != "running" or self.side is None:
+            return None
+        if self.handed:
+            sails = [self.ship.sails[i] for i in self.handed]
+            if len(sails) == 1:
+                return (
+                    f"{names_of_sails(self.ship, sails)} in its gear, its yard not yet shifted "
+                    "round the mast"
+                )
+            return (
+                f"{names_of_sails(self.ship, sails)} in their gear, their yards not yet shifted "
+                "round their masts"
+            )
+        sail = self._sail()
+        if sail is None:
+            return None
+        from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+        name = part_name(self.ship, sail.id)
+        return f"the {name} in its gear, its yard not yet shifted round the mast"
+
+    def words(self) -> dict[str, Any]:
+        out: dict[str, Any] = {"side": self.side or ""}
+        said = self.ship.sails.get(self.said_id) if self.said_id else self._sail()
+        if said is not None:
+            out["it_stands"] = self._lies(said)
+        if self.said_id:
+            from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+            out["sail"] = part_name(self.ship, self.said_id)
+        return out
+
+
 SCRIPTS: dict[str, type[Script]] = {
     "tack": TackScript,
+    "change_lateen": ChangeLateenScript,  # package 90, A1a
     "trim_sheet": TrimSheetScript,
     "wear": WearScript,
     "heave_to": HeaveToScript,

@@ -228,25 +228,63 @@ def test_the_three_decker_probe_has_three_gun_decks_and_her_company():
         assert by_deck["middle"] == by_deck["upper"] == by_deck["lower"] == 28, fit.name
 
 
-# -- no committed file carries a new key (item 10) --------------------------------------------
+# -- the stage-0 keys and the files that carry them (item 10; one table since A3) -------------
+#
+# Each key stage 0 laid inert, with exactly the committed files that carry it (the lead's nudge
+# 31). The step that writes a key into a file moves its row here, old beside new in
+# docs/dev/TuningNotes.md; the test holds the files to the table both ways: a file in a row
+# carries the key, and no file outside it does. Before A3 it was one guard that no file carried
+# any of them.
+TILLER_FILES = (
+    "cutter",
+    "hermaphrodite-brig",
+    "lugger",
+    "privateer-schooner",
+    "smack",
+    "topsail-schooner",
+)
+KEY_CARRIERS: dict[str, frozenset[str]] = {
+    "sweeps": frozenset(),  # a ship's own sweeps, or a fit's: step A7, the xebec's
+    "towed": frozenset(),  # a boat towed astern: step A4, the tartane's
+    "helm": frozenset(TILLER_FILES),  # the hull's helm: step A3, the six tiller-steered files
+    "dipping": frozenset(),  # a whole lateen dipped: the lateen hulls' files, after stage 0L
+}
+
+
+def _carried(doc: dict) -> dict[str, bool]:
+    """Which of the stage-0 keys a file's document carries, read off the file itself."""
+    fits = ((doc.get("armament") or {}).get("fits") or {}).values()
+    whole = [s for s in doc["sails"] if s["class"] == "lateen" and not s.get("cut_at_mast")]
+    return {
+        "sweeps": "sweeps" in doc or any("sweeps" in f for f in fits),
+        "towed": any("towed" in b for b in doc.get("boats") or []),
+        "helm": "helm" in doc["hull"],
+        "dipping": any("dipping" in s for s in whole),
+    }
+
+
+def test_the_table_of_carriers_names_committed_files_and_the_four_keys():
+    stems = {p.stem for p in SHIP_FILES}
+    assert set(KEY_CARRIERS) == {"sweeps", "towed", "helm", "dipping"}
+    assert all(name in stems for files in KEY_CARRIERS.values() for name in files)
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_no_committed_file_carries_sweeps_a_towed_boat_a_helm_or_a_dipping_whole_lateen(path):
-    """Read off the file itself, and again as loaded: what keeps every stage-0 key inert."""
+def test_each_stage_0_key_is_carried_by_exactly_the_files_of_its_row(path):
+    """Read off the file itself, and again as loaded: a file outside a key's row is as stage 0
+    left it, and a file in it carries the key and is read so."""
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    assert "sweeps" not in doc
-    assert "helm" not in doc["hull"]
-    assert [b["id"] for b in doc.get("boats") or [] if "towed" in b] == []
-    fits = ((doc.get("armament") or {}).get("fits") or {}).values()
-    assert [f for f in fits if "sweeps" in f] == []
-    whole = [s for s in doc["sails"] if s["class"] == "lateen" and not s.get("cut_at_mast")]
-    assert [s["id"] for s in whole if "dipping" in s] == []
+    carried = _carried(doc)
+    for key, files in KEY_CARRIERS.items():
+        assert carried[key] == (path.stem in files), (key, path.stem)
     ship = load_ship(path)
-    assert [s.id for s in ship.sails.values() if _whole(s) and s.dipping] == []  # stage 0L
-    assert ship.spec.sweeps is None and ship.spec.hull.helm == "wheel"
-    assert not any(b.towed for b in ship.spec.boats)
-    if ship.spec.armament is not None:
+    dipping = [s.id for s in ship.sails.values() if _whole(s) and s.dipping]  # stage 0L
+    assert bool(dipping) == (path.stem in KEY_CARRIERS["dipping"])
+    assert (ship.spec.sweeps is not None) == ("sweeps" in doc)
+    assert ship.spec.hull.helm == doc["hull"].get("helm", "wheel")
+    assert ship.spec.hull.helm == ("tiller" if path.stem in TILLER_FILES else "wheel")
+    assert any(b.towed for b in ship.spec.boats) == (path.stem in KEY_CARRIERS["towed"])
+    if ship.spec.armament is not None and path.stem not in KEY_CARRIERS["sweeps"]:
         assert all(f.sweeps is None for f in ship.spec.armament.fits.values())
 
 
