@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 16:03 UTC (A5 AND A6 ARE MERGED at 214e70db by your hash 6dcfe408; merge the trunk before A4's hash). Nudge number: 57.
+Latest note: 2026-11-23, 22:54 UTC (THE DIANA MISSES STAYS IN A BREEZE: MENDED BEFORE HER GATE, THE CAUSE FOUND FIRST, beside the frigate-36 tick by tick; my first suspect her drawn 448 t against her canvas; if the mend gives room, D goes back to its first band; truth E across five winds; her tiers wait). Nudge number: 65.
