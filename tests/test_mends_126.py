@@ -85,16 +85,20 @@ def test_truth_7_774_the_fog_comes_on_and_clears_over_a_time_and_is_said_as_it_d
     for a, b in zip(sights, sights[1:], strict=False):
         assert {a, b} != {"a cable", "the horizon"}, sights
     assert "a mile" in sights and "a cable" in sights
-    # the danger is notable as it thickens, as fog coming down always was
-    assert all(
-        e.severity.name == "NOTABLE"
-        for e in lines
-        if e.text != "The fog lifted."
-        and (
-            e.text
-            in ("A fog is settling in.", "The fog has shut in thick.", "The fog is thickening.")
-        )
-    )
+    # notable where the sight she is handled by has changed (settled in, shut in thick, first
+    # opening), routine the steps between and its lifting, as the lead ruled
+    severity = {
+        "A fog is settling in.": "NOTABLE",
+        "The fog has shut in thick.": "NOTABLE",
+        "The fog seems to be clearing.": "NOTABLE",
+        "The fog is thickening.": "ROUTINE",
+        "The fog is thinning.": "ROUTINE",
+        "The fog lifted.": "ROUTINE",
+    }
+    fogs = [e for e in lines if e.text in severity]
+    assert fogs and all(e.severity.name == severity[e.text] for e in fogs), [
+        (e.text, e.severity.name) for e in fogs
+    ]
 
 
 def test_truth_7_775_the_fog_is_the_same_after_a_save_and_a_plain_function_of_its_moment():

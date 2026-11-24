@@ -1939,14 +1939,17 @@ class World:
         ):
             # the sight closing or opening in the fog, a step at a time
             thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[was.visibility]
-            if thicker:
-                text = FOG_LINES["thick" if now.visibility == "a cable" else "thickening"]
-            else:
-                text = FOG_LINES["clearing" if was.visibility == "a cable" else "thinning"]
+            # notable where the sight a ship is handled by has changed: shut in thick, or
+            # first opening from a cable; the steps between are routine
+            key = (
+                ("thick" if now.visibility == "a cable" else "thickening")
+                if thicker
+                else ("clearing" if was.visibility == "a cable" else "thinning")
+            )
             self.record(
-                Severity.NOTABLE if thicker else Severity.ROUTINE,
+                Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
                 "weather.fog",
-                text,
+                FOG_LINES[key],
                 data={
                     "weather": now.weather,
                     "visibility": now.visibility,

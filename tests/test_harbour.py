@@ -1162,6 +1162,13 @@ def test_truth_7_773_a_game_ended_closes_the_doors_of_its_models_stations(tmp_pa
                 assert door["state"] == "stopped"
                 assert door["output"][-1].endswith("stopped from the harbour. ==")
                 assert played.agents["watcher"].agent.released
+                # said in the ended game's log, before the world was let go
+                stood = [e for e in played.log if e.kind == "agent.stopped"]
+                assert len(stood) == 1 and stood[0].text.startswith(
+                    "The watcher stood down by the API door: "
+                ), [e.text for e in stood]
+                assert "The station is released" in stood[0].text
+                assert played.log[len(played.log) - 1] is stood[0]
                 state = c.get("/api/harbour/state").json()
                 assert state["game"]["started"] is False and state["stations"] == []
                 assert port.driver.world is not played
