@@ -64,6 +64,13 @@ point past, she stays in 20 and 25 kn from every heading, and the frigate-36 sta
 8-knot misses are shared with the 64, the 74 and the razee. Her rudder is traced from her plan. The
 choice is the lead's and the owner's.
 
+**Truth E's shortened row (§14, the owner's "Join now"): held for the lead.** Measured with the
+shortening finished, she stays from every heading in 20 kn. In 25 kn she stays from one of three,
+because the game's shortening takes in her jib and her rudder, the least of any ship's, cannot then
+hold her. She comes up into the wind and loses her way before the helm is put down. With the
+frigate-36's rudder ratio she stays from all three. The merge of 569031b1 is done; her truths and
+tiers wait on the lead.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1392,3 +1399,83 @@ Nothing filed. For the lead's ruling: she joins as her plan makes her and as the
 slack in stays in a breeze and said so in her truths, with the haul's one moment booked as the
 engine's package; or she waits for that package. Her tiers wait for the ruling, and for the
 engine's one A4 commit.
+
+## 14. Truth E's shortened row, measured with the shortening finished: held for the lead (2026-11-24)
+
+The owner's word, Decisions Part F, row D-j (on the package's branch at 569031b1): **"Join now
+(Recommended)"**. It was given on the lead's nudge 67, whose premise is that "under the game's own
+`shorten sail` she tacks in both" 20 and 25 kn ("5 of 6, the miss with the shortening unfinished").
+The gate asks truth E's shortened row measured again **with the shortening finished before the helm
+is put down**, and pinned as a count with its band. Measured so, **the premise holds in 20 kn and not
+in 25.** In 25 kn the shortening itself leaves her up in the wind without way, and the cause is her
+rudder's margin. The nudge noted her rudder as "the least and not the cause"; it is not the cause of
+the missed stays, but it is the cause of this. So I have **not pinned the truth, and not tiered**,
+until the lead has this. The merge is done (§14.3), and nothing of her file has moved.
+
+### 14.1 The shortened row, with the shortening finished
+
+Each case runs in this order:
+1. Plain sail set and braced up as the truths settle her, and every evolution finished.
+2. "shorten sail", run until the runner holds no evolution of it.
+3. Sixty seconds trimmed.
+4. "tack ship".
+
+| Ship | 20 kn, from 290, 292.5, 295 | 25 kn, from 290, 292.5, 295 | Stayed, of 6 |
+|---|---|---|---|
+| **the Diana** | S193 S186 S187 | S235, **then twice "Could not go about: she has not way enough on her to stay"** (1.1 kn) | **4** |
+| the frigate-36 | S271 S262 S263 | S320 S221 S243 | 6 |
+| the brig | S463 S463 S210 | S482 S482 S454 | 6 |
+| the Diana with her rudder at the frigate-36's ratio, 4.6 m2 (a probe, not a mend) | | S232 S233 S279 | 3 of 3 |
+
+What the shortening leaves her:
+- **in 20 kn:** her courses, three single-reefed topsails, the fore topmast staysail, the jib and
+  the spanker (8 sails). She keeps her way, and tacks in 186 to 193 s.
+- **in 25 kn:** the same less the jib, which `shorten sail` takes in when it is loaded to its
+  rating (`orders/storm.py`), for the frigate-36 as for her.
+
+Her shortening takes 787 to 914 s, where the frigate-36's takes 429 to 554: her watch takes the
+sails in turn ("not hands enough for all at once").
+
+### 14.2 What happens to her in 25 kn
+
+Traced from 292.5 deg, every 30 s after "shorten sail":
+- **From 120 s,** with the topgallants and the jib coming in, she carries weather helm:
+  - **the Diana:** 0.9 deg, then 4.9, 8.5, 11.9, 15.9 and **21.1 deg at 270 s**, her rudder at
+    -26.6 deg. She comes up from 67.5 to **42.4 deg off** and her way falls from 7.9 to **0.87 kn**.
+  - **the frigate-36:** 2.4 deg, then 5.5, 9.6, 13.2 and **14.5 at 240 s**, her rudder at -14.5.
+    She comes up to 61 deg off and gathers way again: 7.1 kn at 67 to 70 deg off by 270 s.
+- **After her shortening ends (about 840 s),** she lies 37 to 55 deg off at 1.3 to 1.9 kn. At that
+  way her helm has no grip to bear her away, and she does not recover on her own.
+- Her rudder is traced from her plan (3.0 m2, Pages §5.5). At the frigate-36's ratio to the lateral
+  plane (4.6 m2) she keeps her way through the same shortening and tacks from all three headings.
+  So **in 25 kn under the game's shortening, her rudder's margin, the least of any ship's (0.0245),
+  is the cause**. With the jib in she wants more helm than her blade gives at her way.
+- From 290 her shortening came out otherwise, and she kept way enough to stay (235 s).
+
+### 14.3 The merge
+
+**Merged the package's branch at 569031b1** (A4's one commit, the boat entries' glosses, and
+Decisions Part F's rows D-s, D-s2 and D-j) as the merge commit `13352b8`.
+- **A clean merge: no line resolved by hand.**
+- The package's side is six commits over five files. Two of them are evolution files changed in
+  their comments alone (`lay_out_kedge`, `send_boat`); her evolutions test passes on them.
+- Her file is unmoved.
+
+### 14.4 What is ready, and what waits
+
+Ready to file as soon as the lead rules:
+- **truth E's plain-sail row**: every heading in 12 and 15 kn; in 8 kn from 290 alone; none in 20
+  and 25 kn, with the words that she is slack in stays in a breeze under all plain sail;
+- **truth D** as restated, with the line owed with package 125;
+- **her rudder's note**;
+- **truth E split by case**, each case a few seconds. Her truths B, C, D and E now run 6 to 12 s
+  each, over the five-second line (a package's truths belong in the fast tier: the lead's nudge 34).
+
+**For the lead, the one question:** how her 25-kn row is to stand. Her rudder is measured, not mine
+to move. The options I see:
+1. Pin it as measured, 1 of 3, the two refused for want of way, said in her truth.
+2. Restate the shortened row to 20 kn alone.
+3. Book her rudder's margin under the game's shortening with package 125 or beside it.
+
+Whether the owner's "Join now" stands on this is the lead's to put to them. Her tiers wait for the
+lead's word, and then run on the exact hash.
