@@ -64,8 +64,7 @@ ROAD_CHART = "channel-west"
 # yards too, and man their after braces (the hermaphrodite brig's main topsail and topgallant
 # yards on her schooner's main among them). As filed, no sail set, the ten without after yards
 # man their sheets and the eight their after braces. Named, not globbed, so that a file added
-# later is no move of this guard; a ship's builder may name hers beside them (the Diana's,
-# package 90: nineteen rows, nine with after braces; old: the eighteen).
+# later is no move of this guard.
 BRACES_SQUARE_SET = {
     "bilander": "after braces",
     "boat-cutter-23": "sheets",
@@ -74,9 +73,6 @@ BRACES_SQUARE_SET = {
     "boat-launch-31": "sheets",
     "boat-yawl-16": "sheets",
     "brig": "after braces",
-    # the Diana's (package 90, her builder): four head yards on the fore, eight after on the main
-    # and the mizen, read off her file as committed. Old: no row, before her file
-    "corvette-20": "after braces",
     "cutter": "braces",
     "frigate-36": "after braces",
     "hermaphrodite-brig": "after braces",

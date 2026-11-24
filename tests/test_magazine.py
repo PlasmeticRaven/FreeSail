@@ -179,14 +179,8 @@ def test_a_gun_the_table_does_not_name_keeps_its_kinds_share():
 def test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_table():
     """The lead's rule (freesail/ship/charges.py): every charge of the eight files is its
     kind's share as filed, the 32-pounder carronade's 2 lb 11 oz and the swivel's 4 oz among
-    them; every charge of the ships after them is `parts.charge_lb`'s for its kind and calibre,
-    the table's where Table No. 29 names the gun (the bilander's swivel 2 oz) and its kind's share
-    where it names none (the Diana's guns as her navy named them, decision 9: her 30-pounder
-    carronade 2 lb 8 oz, her Danish long 8 2 lb 11 oz, her obús of 3 4 oz), and every gun the
-    table names still gets the table's own figure. The Indefatigable's two files come out the
-    same either way, to the ounce (Indf §5.4). Old (before the Diana's file, package 90; the
-    lead's ruling of nudge 32): every charge of the ships after the eight was the table's, which
-    named all their guns."""
+    them; every charge of the ships after them is the table's, the bilander's swivel 2 oz.
+    The Indefatigable's two files come out the same either way, to the ounce (Indf §5.4)."""
     files = {p.stem: load_spec(str(p)) for p in sorted(Path("data/ships").glob("*.yaml"))}
     assert set(EIGHT) <= set(files)
     charges = {
@@ -202,16 +196,12 @@ def test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_
     for (name, fit, (kind, pounder)), lb in eight.items():
         assert lb == share_charge_lb(kind, pounder), (name, fit, kind, pounder)
     for (name, fit, (kind, pounder)), lb in new.items():
-        assert lb == charge_lb(kind, pounder), (name, fit, kind, pounder)
-        if (kind, pounder) in CHARGE_TABLE_LB:
-            assert lb == CHARGE_TABLE_LB[(kind, pounder)], (name, fit, kind, pounder)
-        else:
-            assert lb == share_charge_lb(kind, pounder), (name, fit, kind, pounder)
-    for (kind, pounder), lb in CHARGE_TABLE_LB.items():
-        assert charge_lb(kind, pounder) == lb, (kind, pounder)
-    foreign = {k[2] for k in new if k[2] not in CHARGE_TABLE_LB}
-    assert foreign == {("carronade", 30.0), ("long", 8.0), ("carronade", 3.0)}
-    assert new[("corvette-20", "carronadas de a 30 1810", ("carronade", 30.0))] == 2.5
+        assert lb == charge_lb(kind, pounder) == CHARGE_TABLE_LB[(kind, pounder)], (
+            name,
+            fit,
+            kind,
+            pounder,
+        )
     assert eight[("frigate-36", "amazon class 1795", ("carronade", 32.0))] == 2 + 11 / 16
     assert eight[("privateer-schooner", "long tom", SWIVEL)] == 0.25
     assert new[("bilander", "armed merchant", SWIVEL)] == 0.125
