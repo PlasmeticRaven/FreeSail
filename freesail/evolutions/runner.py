@@ -251,6 +251,12 @@ class _SafeDict(dict):
 # read by an order's own line (`orders.verbs.unsaid`) and gone again at the next start or tick;
 # kept in the runner's `__dict__` only while it is set, so that a checkpoint is as it was.
 WAIT_SAID = "wait_said"
+# A wait behind other work is a routine line, every such wait one rule: behind any work, behind
+# the yards a belay handed on, and a whole lateen aback that will not come in till she pays off
+# (notable before). A notable line eases a compressed passage for the player and wakes a seat
+# that samples on notable lines; a wait for its turn is neither danger nor news, and the work's
+# own first line says when it begins. A wait for hands keeps its severity (`_take_hands`).
+TURN_WAIT_SEVERITY = "routine"
 
 
 @dataclass
@@ -476,7 +482,7 @@ class Runner:
                 # did): said here, at the order, since a whole-ship order's line is the
                 # runner's started line and this one would go unsaid (the lead's nudge 51,
                 # item 1: "it waits behind that work, and says so")
-                ship.note("notable", "evolution.waiting", words, sid)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
                 said = True
             if lateen_take_in_waits(ship, evo.verb, subject):
                 # a whole lateen aback in a strong wind will not come in till she pays off,
@@ -484,12 +490,12 @@ class Runner:
                 # 53, item 2: behind `trim sails` the player read only the order, and waited
                 # 69 s)
                 words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
-                ship.note("notable", "evolution.waiting", words, sid)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
                 inst.lateen_wait_said = True
                 said = True
             elif say_wait and not said:
                 # behind any other work: said at the order, as the two above are, and once
-                ship.note("notable", "evolution.waiting", words, sid)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
                 said = True
             if said and say_wait:
                 self.__dict__[WAIT_SAID] = True
@@ -503,7 +509,8 @@ class Runner:
             # 90, A1d): the work waits, and begins when it fills or is drawn over
             self.instances.append(inst)
             words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
-            ship.note("notable", "evolution.waiting", words, sid)  # said once, at the order
+            # said once, at the order
+            ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
             inst.lateen_wait_said = True
             return words
         self.instances.append(inst)
@@ -1245,7 +1252,7 @@ class Runner:
                 if not inst.lateen_wait_said:
                     inst.lateen_wait_said = True
                     words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, inst.subject_id))
-                    ship.note("notable", "evolution.waiting", words, inst.subject_id)
+                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, inst.subject_id)
                 continue
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:

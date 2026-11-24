@@ -53,6 +53,7 @@ import re
 from typing import Any
 
 from freesail.api import readings as _readings
+from freesail.evolutions.runner import TURN_WAIT_SEVERITY
 from freesail.orders import numbers, verbs
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
@@ -376,7 +377,7 @@ def execute(ship: Any, order: Order) -> Result:
     # its wait for the anchor said in its own words; any other wait behind work, the runner's
     text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params, say_wait=False)
     if not _waits_for_the_anchor(ship, runner, evo) and "will follow" in text:
-        ship.note("notable", "evolution.waiting", text, verbs.SHIP_SUBJECT)
+        ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", text, verbs.SHIP_SUBJECT)
     data = {
         "verb": verb,
         "level": 1,

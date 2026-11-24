@@ -372,7 +372,36 @@ def _sail_evolution(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
+    # a take-in or a furl countermands the setting of its sail in hand or waiting: belayed first,
+    # said once; a sail it leaves furled is done, one half set is taken in from where it is
+    countermanded = _countermand_the_set(ship, sails, verb, vocab)
     checks = {sail.id: _sail_check(ship, sail, verb, order, mapping, vocab) for sail in sails}
+    belayed_words = ""
+    if countermanded:
+        from freesail.orders.work import _line as belay_line
+
+        belayed_words = belay_line("belay", countermanded)
+        done_ids = {
+            b["subject"]
+            for b in countermanded
+            if ship.sails[b["subject"]].state is SailState.FURLED
+        }
+        sails = [sl for sl in sails if sl.id not in done_ids]
+        if not sails or all(checks[sl.id] for sl in sails):
+            # nothing left to take in (the rest furled already): the countermand is the order's
+            # whole work and its line
+            data = {
+                "verb": verb,
+                "level": 1,
+                "object": res.name,
+                "side": res.side,
+                "subjects": sorted(done_ids),
+                "belayed": countermanded,
+                "failed": [],
+            }
+            return "work.belayed", belayed_words, data
+        ship.note("notable", "work.belayed", belayed_words, None, {"belayed": countermanded})
+        checks = {sail.id: checks[sail.id] for sail in sails}
     if all(checks.values()):
         # Nothing to start: refuse on the merits before asking for the runner.
         reasons = [r for r in checks.values() if r]
@@ -475,6 +504,30 @@ def _sail_params(order: Order) -> dict[str, Any]:
         if order.modifiers.get("close"):
             params["close"] = True
     return params
+
+
+def _countermand_the_set(
+    ship: Ship, sails: list[Sail], verb: str, vocab: Vocabulary
+) -> list[dict[str, Any]]:
+    """A take-in or a furl given while the setting of its sail is in hand or waiting belays that
+    setting (`Runner.belay`, the captain's own belay): the later order countermands the earlier,
+    and returns what was belayed and how it was left, for one line ("Belayed setting the main
+    topsail; nothing done, it was waiting for hands."). Before, a furled sail whose set was
+    waiting was refused as "already furled" and its set then went on, and one being loosed was
+    taken in only after it was set: the brig in a gale, `take in all sail` given while `set
+    plain sail` was going up, stood under her main topsail, topgallants and spanker."""
+    if verb not in ("take in", "furl"):
+        return []
+    runner = ship.extra.get("evolutions")
+    instances = list(getattr(runner, "instances", None) or [])
+    if not instances:
+        return []
+    sets = set(vocab.evolutions.get("set", {}).values())
+    ids = {sl.id for sl in sails}
+    setting = [i for i in instances if i.evo.id in sets and i.subject_id in ids]
+    if not setting:
+        return []
+    return runner.belay(ship, setting)
 
 
 def _sail_check(

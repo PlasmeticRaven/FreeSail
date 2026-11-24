@@ -17,6 +17,9 @@ it. The log is the game: a line untrue, or a wait unsaid, was a fault of the gam
 - 7-784: the smack's cast names no topsail of hers, which stays furled, and sends no hand aloft.
 - 7-785: a `set the topsail` the watch on deck is too few for says so, and what it waits for.
 - 7-786: `clear for action` says the boats are where they are: on the booms.
+- 7-787: a take-in or a furl countermands the setting of its sail in hand or waiting: the brig
+  in 40 knots, `take in all sail` given while `set plain sail` is going up, is left with nothing
+  of it set. This changes what she does, and is meant to.
 """
 
 from __future__ import annotations
@@ -79,6 +82,9 @@ def test_truth_7_780_a_sails_order_queued_behind_other_work_says_so_in_the_log_o
     )
     lines = _lines(w, t0 - 1)
     assert [x for x in lines if x[1] == waits] == [("evolution.waiting", waits)]
+    # a wait for its turn is routine: it eases no compressed passage and wakes no seat
+    (said,) = [e for e in w.log if e.text == waits]
+    assert said.severity.value == "routine"
     begun = lines.index(("evolution.started", "Lay aloft and furl the main topsail."))
     assert begun > lines.index(("evolution.waiting", waits))
 
@@ -222,6 +228,23 @@ def test_truth_7_783_one_rule_counts_every_parts_warning_and_a_cables():
     assert strain.warning_due(st, "cable:best_bower", True)  # ten minutes from the dire one
 
 
+def test_truth_7_783_a_part_held_over_its_dire_line_an_hour_says_so_once_in_ten_minutes():
+    """The frigate's jib stay loaded to 1.55 of its rating every second for an hour (no chance
+    drawn, so it stands): its dire warning six times, once in each ten minutes, and not every
+    tick."""
+    from freesail.api.session import make_ship
+
+    ship = make_ship(FRIGATE)
+    stay = ship.lines["jib.stay"]
+    said = []
+    for t in range(3600):
+        stay.load_kn = 1.55 * stay.rating_kn
+        strain.apply_strain(ship, 1.0, None)
+        said += [(t, n[2]) for n in ship.drain_notes() if n[1] == "strain.warning"]
+    dire = "Jib stay stranding; it will not hold much longer."
+    assert said == [(t, dire) for t in (0, 600, 1200, 1800, 2400, 3000)]
+
+
 # ---------------------------------------------------------------------------
 # 7-784: the smack's cast
 # ---------------------------------------------------------------------------
@@ -300,7 +323,7 @@ def test_truth_7_785_a_set_the_watch_is_too_few_for_says_what_it_waits_for():
     w.run(120)
     t0 = w.clock.tick
     w.submit("set the topsail")
-    w.run(2)
+    w.run(700)
     assert _lines(w, t0, ("evolution.waiting",)) == [
         (
             "evolution.waiting",
@@ -308,6 +331,12 @@ def test_truth_7_785_a_set_the_watch_is_too_few_for_says_what_it_waits_for():
             "for it, and it waits for the watch to be relieved or all hands called.",
         )
     ]
+    assert w.ship.sails["topsail"].state.name == "FURLED"  # the plain sail set, it waits on
+    # all hands called by the player: it is taken up at once, and said
+    called = w.clock.tick
+    w.submit("all hands")
+    w.run(2)
+    assert ("evolution.started", "Hands aloft to loose the topsail.") in _lines(w, called)
 
 
 # ---------------------------------------------------------------------------
@@ -340,3 +369,47 @@ def test_truth_7_786_clear_for_action_says_the_boats_are_on_the_booms():
         == "The boat towing astern on her painter; the ship is clear."
     )
     assert words(ship()) == "The ship is clear."
+
+
+# ---------------------------------------------------------------------------
+# 7-787: the take-in countermands the set
+# ---------------------------------------------------------------------------
+
+
+def _all_sail_in(gap: int):
+    w = _make(BRIG, heading=60.0, knots=40.0)
+    w.submit("set plain sail")
+    w.run(gap)
+    t0 = w.clock.tick
+    reply = w.submit("take in all sail")
+    w.run(1500)
+    standing = sorted(k for k, v in w.ship.sails.items() if v.state.name in ("SET", "LOOSED"))
+    set_after = [e.text for e in w.log if e.kind == "sail.set" and e.tick > t0]
+    return reply, _lines(w, t0 - 1) + [("set after", x) for x in set_after], standing
+
+
+def test_truth_7_787_take_in_all_sail_belays_the_plain_sail_going_up():
+    """The brig in 40 knots, `set plain sail`, and `take in all sail` 300 s on. Before, the main
+    topsail, the fore and main topgallants and the spanker were set after it (at 635 s to
+    1013 s) and stood in the gale; now the setting of each is belayed, said once, the fore
+    topsail being loosed is taken in from where it hung, and nothing of it is set at the end."""
+    reply, lines, standing = _all_sail_in(300)
+    assert reply.kind == "evolution.started"
+    belays = [x for x in lines if x[0] == "work.belayed"]
+    assert len(belays) == 1
+    for sail in ("main topsail", "fore topgallant", "main topgallant", "spanker", "fore topsail"):
+        assert f"setting the {sail}" in belays[0][1]
+    assert not [x for x in lines if x[0] == "set after"]  # nothing set after the order
+    assert ("sail.taken_in", "Took in the fore topsail; hanging in the gear.") in lines
+    assert standing == []
+
+
+def test_truth_7_787_given_as_the_plain_sail_begins_the_belay_is_the_orders_line():
+    """The same, `take in all sail` 30 s after `set plain sail`, every sail still furled.
+    Before, the order was refused, "Nothing done: ... already furled", and every sail was then
+    set in the gale; now the order is the belay of the setting, its reply and its line."""
+    reply, lines, standing = _all_sail_in(30)
+    assert reply.kind == "work.belayed" and reply.text.startswith("Belayed setting the foresail")
+    assert [x for x in lines if x[0] == "work.belayed"] == [("work.belayed", reply.text)]
+    assert not [x for x in lines if x[0] in ("sail.set", "set after")]
+    assert standing == []
