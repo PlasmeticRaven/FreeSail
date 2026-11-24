@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 00:52 UTC (A4 IS MERGED at b765b169 by your hash 0040fda2; merge the trunk into claude/pkg-90 before the next hash; then the lateen hulls' list of eight). Nudge number: 71.
+Latest note: 2026-11-24, 03:48 UTC (THE DIANA FIRST, (a); BEFORE HER HASH: probe her book's shortening figure at 24, 26, 28 knots in the captain's rising-wind game and file the highest at which she keeps her topgallant yards, or nothing and say; then merge claude/pkg-90, fast tier whole, the hash reported once). Nudge number: 72.
