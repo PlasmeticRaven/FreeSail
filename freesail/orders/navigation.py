@@ -924,8 +924,8 @@ def _lies_on_the_mast(ship: Any, lateens: list[Any]) -> str:
 
 
 def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
-    """'the mainsail is aback against the mast; shift it or box her off': a whole lateen held
-    aback by the wind come round ahead onto its cloth (package 90, A1d;
+    """'the mainsail is aback against the mast; shift the mainsail or box her off': a whole
+    lateen held aback by the wind come round ahead onto its cloth (package 90, A1d;
     Design-Package90-Engine.md §2.4.3a, JUDGEMENT on the words). The line names what is measured
     to relieve it, in the orders she will take, as the strain's warning does
     (`strain.pressed_reliefs`; the lead's nudge 60, item 3): the yard shifted, or her head boxed
@@ -941,7 +941,7 @@ def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
     names = names_of_sails(ship, lateens)
     return (
         f"{names} {'is aback against the mast' if one else 'are aback against their masts'}; "
-        f"{pressed_reliefs(ship, 'aback', one)}"
+        f"{pressed_reliefs(ship, 'aback', names)}"
     )
 
 
