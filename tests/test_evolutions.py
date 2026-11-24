@@ -855,18 +855,11 @@ def test_each_course_is_risen_apart_by_its_name_in_the_tack(fore, main, haul, le
     assert sum("Rise" in w for w in words) == (0 if (fore, main) == (UP, UP) else 1)
 
 
-def test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on():
-    """The lead's ruling (3) of 2026-11-07 (B3.4b): the tack ended by `steady_timeout_s` (300 s on
-    the new course order), not steady on her course, names the tack she lies on, read from the
-    ship, and not the one she was put about for. In the stub world the frigate is turned through
-    the wind and, her head yards swung, falls back on the old tack and lies there (the stub's
-    physics), four knots of way and 55 degrees off on the starboard tack: at the timeout the line
-    is "Tacked; braced up on the starboard tack, heading NE by N (35°)." (package 115 D4: the
-    heading too is hers, read from her; it said "heading SSE (158°)", the course she was put
-    about for, until then), where it said "the
-    larboard tack" (the main topgallant's rig with her fore yards shot away, sailed with the
-    lead's ruling 3 of 2026-11-06 switched off, the same: the tuning notes, B3.4b). A tack ended
-    steady on her course says the new tack as before (the tests above)."""
+def _tack_held_at_the_end(lie_deg: float | None):
+    """The stub frigate turned through the wind as below, and from the moment she is steadying
+    on the new course held where the case lies her: on the old tack as she was before the order
+    (None), or with her head at `lie_deg` true with the wind from 90. Returns the notes and the
+    ticks she was held."""
     from freesail.evolutions import scripts
 
     ship = load_ship(FRIGATE)
@@ -881,27 +874,71 @@ def test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on():
     tack = runner.instances[0].script
     assert isinstance(tack, scripts.TackScript)
     turn = turner(0.4, speed_kn=4.0)
-    steady_ticks = 0
+    held = 0
 
-    def falls_back(s, dt, w) -> None:
-        nonlocal steady_ticks
-        if tack.phase == "steady":
-            steady_ticks += 1
-            s.dyn.heading = old_heading  # fallen back on the old tack, and lying there
+    def lies(s, dt, w) -> None:
+        nonlocal held
+        if tack.phase in ("steady", "missed"):
+            held += 1
+            s.dyn.heading = old_heading if lie_deg is None else units.deg_to_rad(lie_deg)
             s.dyn.speed = units.knots_to_ms(4.0)
             deck_reading(s, w)
         else:
             turn(s, dt, w)
 
-    _, notes = run(runner, ship, wind, falls_back)
-    assert kinds(notes)[-1] == "ship.tacked"
+    _, notes = run(runner, ship, wind, lies)
+    return ship, notes, held
+
+
+def test_a_tack_ended_by_the_steady_timeout_on_her_old_tack_is_a_missed_stay():
+    """Package 125, C (the lead's ruling on its ground report): a tack ended by `steady_timeout_s`
+    (300 s on the new course order) with her fallen back on her old tack and lying there has not
+    come round, and is said so, a missed stay's words, severity and recovery: "Missed stays: she
+    came through the wind and fell back on her old tack. Up helm; square the yards." and then
+    "Squared the yards; she fell off on the starboard tack, to try again or to wear." Old (the
+    lead's ruling (3) of 2026-11-07, B3.4b, and package 115 D4): "Tacked; braced up on the starboard
+    tack, heading NE by N (35°).", the tack she lay on named, and the tack called made. In the stub
+    world the frigate is turned through the wind and, her head yards swung, falls back on the old
+    tack, four knots of way and 55 degrees off on the starboard tack."""
+    ship, notes, held = _tack_held_at_the_end(None)
+    said = dict(zip(kinds(notes), texts(notes)))
+    assert "ship.tacked" not in kinds(notes)
+    assert said["ship.missed_stays"] == (
+        "Missed stays: she came through the wind and fell back on her old tack. Up helm; square "
+        "the yards."
+    )
+    assert [n for n in notes if n[1] == "ship.missed_stays"][0][0] == "urgent"
+    assert kinds(notes)[-1] == "ship.fell_off"
     assert ship.dyn.tack == "starboard"
-    # the heading she lies on, read from her (package 115 D4, the cold review's 5.3 item 9):
-    # old "heading SSE (158°)", the course she was put about for, with her head at NE; new
-    # her own head, NE by N, fallen back on the old tack
-    assert texts(notes)[-1] == "Tacked; braced up on the starboard tack, heading NE by N (35°)."
+    # the timeout's 300 s from the tick her head yards' swing ended, and then the squaring
+    assert held > EVOLUTIONS["tack"].timing["steady_timeout_s"]
+
+
+def test_a_tack_ended_by_the_steady_timeout_with_her_head_in_the_wind_is_in_irons():
+    """Package 125, C: the same with her head held five degrees off the wind at the timeout: she
+    lies in irons, a missed stay: "Missed stays: she lies in irons, her head in the wind." (old:
+    "Tacked; braced up on the larboard tack", the tack her head five degrees over named)."""
+    _, notes, _ = _tack_held_at_the_end(95.0)
+    said = dict(zip(kinds(notes), texts(notes)))
+    assert "ship.tacked" not in kinds(notes)
+    assert said["ship.missed_stays"].startswith(
+        "Missed stays: she lies in irons, her head in the wind. "
+    )
+
+
+def test_a_tack_ended_by_the_steady_timeout_on_the_new_tack_names_where_she_lies():
+    """The lead's ruling (3) of 2026-11-07 (B3.4b) and package 115 D4, as they stand for a tack
+    that has come round: ended by the timeout on the new tack, not steady on her course (here 100
+    degrees off the wind, paid off past it), the line names the tack she lies on and her own
+    heading, read from her: "Tacked; braced up on the larboard tack, heading S by W (190°)." (this
+    case was the old test's, which held her on the old tack; that is a missed stay since package
+    125, above)."""
+    ship, notes, held = _tack_held_at_the_end(190.0)
+    assert kinds(notes)[-1] == "ship.tacked"
+    assert texts(notes)[-1] == "Tacked; braced up on the larboard tack, heading S by W (190°)."
+    assert ship.dyn.tack == "larboard"
     # the tick her head yards' swing ended, and then the timeout's 300 s
-    assert steady_ticks == EVOLUTIONS["tack"].timing["steady_timeout_s"] + 1
+    assert held == EVOLUTIONS["tack"].timing["steady_timeout_s"] + 1
 
 
 @pytest.mark.parametrize("how", ["wrecked", "sent_down"], ids=["shot away", "sent down"])
