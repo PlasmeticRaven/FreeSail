@@ -15085,6 +15085,45 @@ def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxe
     assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
 
 
+def test_truth_7_788_aback_with_no_way_and_headed_the_spanker_in_she_is_boxed_off(monkeypatch):
+    """Package 88's recovery, its second half (the doctrine boxes her off where the driver in has
+    not paid her off; `captains._aback_with_no_way`): the owner's convoy at seed 7, the
+    commodore's brig aback with no way at 1810, the work avasted and the spanker taken in at 1860
+    (in at 2019); a header of one point at 2000, the wind drawing from 45 to 56 degrees with her
+    head at 90, holds her there, and the captain boxes her off at 2040, boxed off at 2208, the
+    spanker set again and the leg shaped with way again at 2220, three knots by 2400.
+
+    Package 127, at the lead's ruling: old, truth 7-340 held the box-off in the scenario's own day
+    (boxing her off at 1980, boxed off 2110), where she lay aback eight minutes with her
+    topgallants half set; a take-in now countermands the setting of its sail (truth 7-787), she
+    stalls less, and pays off on the spanker alone (7-340 as it now stands). The header, a cause a
+    ship meets, made as the tests shift a wind, gives the box-off its cause back; a free of one to
+    three points does not (she pays off on the spanker), a header of one to three points does
+    (boxed off 2147 to 2208). With the law's switch off she lies with sternway till the book's
+    second shortening takes in her spanker at 2671."""
+    from freesail.world import captains as C
+
+    def day():
+        w = _scenario_world(CONVOY_SIX)
+        w.run(2000)
+        wind = w.wind
+        wind.follow(units.wrap_2pi(wind.base_direction + units.POINT), wind.base_speed)
+        w.run(400)
+        return w
+
+    w = day()
+    said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1860], said
+    assert [e.tick for e in said if "boxing her off" in e.text] == [2040], said
+    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2208]
+    assert any(e.tick == 2220 and "setting the spanker" in e.text for e in w.log)
+    assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
+    monkeypatch.setattr(C, "ABACK_RECOVER", False)
+    old = day()
+    assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
+    assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
+
+
 def test_truth_7_341_among_the_molene_islands_she_is_tacked_and_never_worn_onto_the_land(
     monkeypatch,
 ):
