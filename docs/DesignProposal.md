@@ -527,12 +527,12 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 | M5 | A world | A far larger sea, ports by file, navigation, tides, anchoring | 5a–5c passed; 5c on 8 Oct |
 | M6 | Officers and captains | Stations, the wardroom, rules captains, the business, the regatta, the chart to the Azores | 6a (with 6b) open; 6c run in part |
 | M7b | The director | Ten parts; frozen open (decision 51) | Never run |
-| M7 | Powder | Combat, signals, squadrons, health, prizes, one world, more sea, five ships, the harbour, safety work | Cut and released as `gate-m7` (21 Nov); the verdict pending |
+| M7 | Powder | Combat, signals, squadrons, health, prizes, one world, more sea, five ships, the harbour, safety work | Cut and released as `gate-m7` (21 Nov); **closed, with a list, by the owner on 24 Nov** |
 | M7c | (new, decision 69e) | The data made true across 1792 to 1825 | Not begun |
 
 The first roadmap's words for milestones 0 to 8 are in version 0.2 (`docs/DesignProposal-v0.2.md`, §11).
 
-**Milestone 7 closes at the owner's gate** (`docs/gates/gate-m7.md`): played on the build `m7` as cut the second time (packages 118 to 121 in it); *closed*, *closed, with a list*, or *not yet*. On *closed*, the lead writes "the game as built" and the list carried forward, and milestone 8 is fixed from it.
+**Milestone 7 closes at the owner's gate** (`docs/gates/gate-m7.md`): played on the build `m7` as cut the second time (packages 118 to 121 in it); *closed*, *closed, with a list*, or *not yet*. On *closed*, the lead writes "the game as built" and the list carried forward, and milestone 8 is fixed from it. **Closed, with a list, on 2026-11-24:** the game as built is `docs/TheGameAsBuilt.md`; the list carried forward is `docs/dev/CarriedForward-M7.md`, its first section the four things the owner names to be mended first in milestone 8.
 
 ### Milestone 8: the ship and her people (decision 75)
 
