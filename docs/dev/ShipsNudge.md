@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 23:38 UTC (THE DIANA: PUT TO THE OWNER, in these labels: JOIN NOW (recommended: as measured, slack in stays in a breeze under all plain sail, tacking shortened, E a count across the winds, the haul's moment booked as package 125) or WAIT; what her gate asks if he joins her now). Nudge number: 67.
+Latest note: 2026-11-24, 00:01 UTC (THE DIANA: THE OWNER's WORD IS JOIN NOW, given to the lead directly; prepare her for my gate as nudge 67 sets out; then her tiers on the exact hash). Nudge number: 68.
